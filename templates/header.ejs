@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title><%= appName %></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="<%= appDescription %>">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="<%= appHost %>">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#fff">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= appHost %>">
+  <meta property="og:title" content="<%= appName %>">
+  <meta property="og:description" content="<%= appDescription %>">
+  <meta property="og:image" content="<%= appHost %>/og.jpg">
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="<%= appHost %>">
+  <meta property="twitter:title" content="<%= appName %>">
+  <meta property="twitter:description" content="<%= appDescription %>">
+  <meta property="twitter:image" content="<%= appHost %>/og.jpg">
+  <meta property="twitter:site" content="@LOT_systems">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="preconnect" href="https://rsms.me/" />
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
+  <link rel="stylesheet" href="/css/index.css">
+  <link rel="icon" href="/icon/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
+  <%- include('header-scripts'); -%>
+</head>
+<body class="bg-bac text-acc selection:text-bac selection:bg-acc/75">

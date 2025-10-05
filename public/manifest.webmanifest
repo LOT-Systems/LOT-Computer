@@ -1,0 +1,13 @@
+{
+  "name": "LOT Systems",
+  "short_name": "LOT Systems",
+  "description": "LOT is a subscription service that distributes digital and physical necessities, basic wardrobes, organic self-care products, home and kids essentials.",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "theme_color": "#ffffff",
+  "start_url": "/",
+  "icons": [
+    { "src": "/icon/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ]
+}

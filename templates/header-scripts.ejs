@@ -1,0 +1,10 @@
+<% if (useHttpsRedirect) { %>
+<script nonce="<%= scriptNonce %>">
+  (() => {
+    const u = new URL(location.href)
+    if (u.protocol !== 'https:') {
+      location.replace('https://' + u.host + u.pathname + u.search)
+    }
+  })()
+</script>
+<% } %>

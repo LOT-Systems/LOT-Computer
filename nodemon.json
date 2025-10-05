@@ -1,0 +1,13 @@
+{
+  "watch": ["src"],
+  "ext": "ts",
+  "ignore": [
+    "src/client",
+    "*.tsx",
+    "src/types/*"
+  ],
+  "exec": "yarn server:build && yarn server:start",
+  "env": {
+    "NODE_DEBUG": 9229
+  }
+}
