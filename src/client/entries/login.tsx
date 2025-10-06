@@ -18,7 +18,7 @@ const App = () => {
           target="_blank"
           className="underline tablet:no-underline whitespace-nowrap"
         >
-          Shop <span className="hidden tablet:inline">↗</span>
+          Institute <span className="hidden tablet:inline">↗</span>
         </Link>
       </div>
       <EmailLogin />
