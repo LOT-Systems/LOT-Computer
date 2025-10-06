@@ -1,36 +1,38 @@
-import fastify from 'fastify';
-import fastifyStatic from '@fastify/static';
-import path from 'path';
-import dotenv from 'dotenv';
+import fastify from 'fastify'
+import fastifyStatic from '@fastify/static'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
 
-dotenv.config();
+// Fix for ESM __dirname
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
-const port = process.env.PORT || 4400;
-const host = process.env.HOST || '0.0.0.0';
+const server = fastify()
 
-const server = fastify({
-  logger: true
-});
-
-// Serve static files from client build
+// Serve static files
 server.register(fastifyStatic, {
-  root: path.join(__dirname, '../../dist/client'),
+  root: join(__dirname, '../../dist/client'),
   prefix: '/'
-});
+})
 
-// Handle all routes by serving index.html
+// Handle all routes (for SPA)
 server.setNotFoundHandler((request, reply) => {
-  reply.sendFile('index.html');
-});
+  reply.sendFile('index.html')
+})
+
+// Add a root route handler
+server.get('/', async (request, reply) => {
+  return reply.sendFile('index.html')
+})
 
 const start = async () => {
   try {
-    await server.listen({ port: Number(port), host });
-    console.log(`Server listening at http://localhost:${port}`);
+    await server.listen({ port: 3000, host: '0.0.0.0' })
+    console.log('Server listening on port 3000')
   } catch (err) {
-    server.log.error(err);
-    process.exit(1);
+    console.error(err)
+    process.exit(1)
   }
-};
+}
 
-start();
+start()
