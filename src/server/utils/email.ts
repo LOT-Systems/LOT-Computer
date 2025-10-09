@@ -1,46 +1,52 @@
-import config from '#server/config'
-import axios from 'axios'
+import { Resend } from 'resend';
 
-type Response = {
-  _id: string
-  email: string
-  status: 'sent' | 'queued' | 'scheduled' | 'rejected' | 'invalid'
-  reject_reason: string | null
-  queued_reason: string | null
-}[]
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-export async function sendEmail(props: {
-  to: string
-  subject: string
-  html: string
-}) {
-  if (config.debug) {
-    console.log(`📧 Email to ${props.to}: "${props.subject}"`)
-    console.log(props.html)
-    return
+interface EmailParams {
+  to: string;
+  html: string;
+  subject: string;
+}
+
+export async function sendEmail({ to, html, subject }: EmailParams) {
+  try {
+    console.log('Sending email via Resend:', {
+      to,
+      subject,
+      timestamp: new Date().toISOString()
+    });
+
+    // Remove any potential id field from the request
+    const emailData = {
+      from: 'auth@lot-systems.com',
+      to: [to],
+      subject,
+      html,
+      // Make sure we're not passing any additional fields
+    };
+
+    console.log('Email request data:', emailData);
+
+    const { data, error } = await resend.emails.send(emailData);
+
+    if (error) {
+      console.error('Resend error:', error);
+      throw error;
+    }
+
+    // Only log essential data
+    console.log('Email sent successfully:', {
+      to,
+      timestamp: new Date().toISOString()
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Email sending error:', {
+      error,
+      to,
+      timestamp: new Date().toISOString()
+    });
+    throw error;
   }
-  const response = await axios
-    .post<Response>('https://mandrillapp.com/api/1.0/messages/send', {
-      key: config.mailchimp.mandrillApiKey,
-      message: {
-        from_email: config.mailchimp.fromEmail,
-        from_name: config.mailchimp.fromName,
-        subject: props.subject,
-        to: [{ email: props.to, type: 'to' }],
-        html: props.html,
-        track_opens: false,
-        track_clicks: false,
-        auto_text: true,
-      },
-    })
-    .then((x) => x.data?.[0])
-  // TODO: monitor rejected emails
-  if (response?.status === 'rejected') {
-    throw new Error(
-      `Email to ${props.to} was rejected. (status: ${response?.status}, id: ${response?._id})`
-    )
-  }
-  console.log(
-    `📧 Email to ${props.to} (status: ${response?.status}, id: ${response?._id})`
-  )
 }
