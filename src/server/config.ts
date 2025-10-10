@@ -10,7 +10,7 @@ const config = {
   
   email: {
     resendApiKey: process.env.RESEND_API_KEY,
-    fromEmail: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+    fromEmail: process.env.RESEND_FROM_EMAIL || 'support@lot-systems.com',
     fromName: process.env.RESEND_FROM_NAME || 'Your App',
   },
 

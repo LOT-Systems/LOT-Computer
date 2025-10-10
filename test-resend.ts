@@ -9,7 +9,7 @@ async function testEmail() {
   try {
     console.log('Starting test...');
     const result = await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'support@lot-systems.com',
       to: ['your-test-email@example.com'],
       subject: 'Test Email',
       html: '<p>Test email</p>'

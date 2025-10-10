@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
     // Test Resend connection
     const result = await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'support@lot-systems.com',
       to: [email],
       subject: 'Test Email',
       html: '<p>Test</p>'

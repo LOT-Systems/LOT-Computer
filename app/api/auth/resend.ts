@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     
     // Remove any id field from the request
     const { data, error } = await resend.emails.send({
-      from: 'onboarding@resend.dev', // or your verified domain
+      from: 'support@lot-systems.com', // or your verified domain
       to: [email],
       subject: 'Your Verification Code',
       html: `<p>Your verification code</p>`,
