@@ -1,8 +1,13 @@
-module.exports = (ctx) => ({
+module.exports = {
   plugins: {
-    'tailwindcss/nesting': {},
-    tailwindcss: {},
-    autoprefixer: {},
-    ...(ctx.env === 'production' ? { cssnano: {} } : {}),
-  },
-})
+    'tailwindcss': {},
+    'autoprefixer': {},
+    'cssnano': {
+      preset: ['default', {
+        discardComments: {
+          removeAll: true,
+        },
+      }],
+    },
+  }
+}
