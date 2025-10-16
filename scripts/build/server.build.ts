@@ -1,5 +1,5 @@
 import { build, Loader } from 'esbuild'
-import { commonConfig } from './build.config'
+import { commonConfig } from './build.config.ts'
 
 async function buildServer() {
   try {
