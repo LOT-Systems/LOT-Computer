@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "server:build": "tsc --project tsconfig.server.json",
-    "server:start": "node server/index.js",
+    "server:start": "node dist/server/index.js",
     "build": "yarn run client:build && yarn run server:build",
     "client:build": "yarn run-p client:css:build client:js:build",
     "dev:local": "esr ./src/server/.ts",
