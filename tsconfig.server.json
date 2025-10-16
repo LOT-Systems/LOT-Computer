@@ -3,7 +3,7 @@
     "target": "ES2022",
     "module": "ESNext",
     "outDir": "./dist/server",
-    "rootDir": "./src",
+    "rootDir": "./src/server",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -20,5 +20,5 @@
       "#shared/constants": ["src/shared/constants"]
     }
   },
-  "include": ["src/server", "src/shared"]
+  "include": ["src/server"]
 }
