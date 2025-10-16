@@ -26,7 +26,10 @@ const config = {
     secret: process.env.JWT_SECRET || 'your-jwt-secret',
     cookieKey: 'auth_token',
     expiresIn: '30d',
-  }
+  },
+
+  geonamesUsername: process.env.GEONAMES_USERNAME || '',
+  openWeatherApiKey: process.env.OPENWEATHER_API_KEY || ''
 }
 
 validateConfig()
@@ -38,6 +41,9 @@ function validateConfig() {
     'DB_NAME',
     'DB_USER',
     'DB_PASSWORD',
+    // Optionally require these:
+    // 'GEONAMES_USERNAME',
+    // 'OPENWEATHER_API_KEY',
   ]
 
   const missing = required.filter(key => !process.env[key])

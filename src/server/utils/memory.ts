@@ -16,7 +16,7 @@ import {
   User,
   UserSettings,
 } from '#shared/types'
-import { toCelisus } from '#shared/utils'
+import { toCelsius } from '#shared/utils'
 import { getLogContext } from './logs'
 
 const oai = new OpenAI({
@@ -60,7 +60,7 @@ export async function buildPrompt(user: User, logs: Log[]): Promise<string> {
     }
     if (context.temperature && context.humidity) {
       contextLine += `, with a current temperature of ${Math.round(
-        toCelisus(context.temperature)
+        toCelsius(context.temperature)
       )}℃ and humidity at ${Math.round(context.humidity)}%.`
     } else {
       contextLine += '.'
@@ -170,7 +170,7 @@ function formatLog(log: Log): string {
       : ''
   const temperature =
     date && log.context.temperature
-      ? `T:${Math.round(toCelisus(log.context.temperature))}℃`
+      ? `T:${Math.round(toCelsius(log.context.temperature))}℃`
       : ''
   const humidity =
     date && log.context.humidity ? `H:${Math.round(log.context.humidity)}%` : ''

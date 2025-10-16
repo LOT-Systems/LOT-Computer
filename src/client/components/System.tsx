@@ -12,7 +12,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import { useExternalScript } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import { USER_TAGS_BY_ID } from '#shared/constants'
-import { toCelisus, toFarhenheit } from '#shared/utils'
+import { toCelsius, toFahrenheit } from '#shared/utils'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
 
@@ -57,8 +57,8 @@ export const System = () => {
     if (!weather) return null
     return Math.round(
       isTempFahrenheit
-        ? toFarhenheit(weather.tempKelvin)
-        : toCelisus(weather.tempKelvin)
+        ? toFahrenheit(weather.tempKelvin)
+        : toCelsius(weather.tempKelvin)
     )
   }, [weather, isTempFahrenheit])
 

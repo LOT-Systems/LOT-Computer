@@ -1,0 +1,83 @@
+import Module from 'module';
+import path from 'path';
+import ts from 'typescript';
+function getTsConfig() {
+    const tsConfigPath = path.join(process.cwd(), 'tsconfig.json');
+    const { error, config } = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
+    if (error)
+        return null;
+    let { options, errors } = ts.parseJsonConfigFileContent(config, ts.sys, path.resolve(path.dirname(tsConfigPath)));
+    if (errors.length > 0)
+        return null;
+    return options;
+}
+function getPrefixedPaths(paths, prefixRegexes) {
+    const result = {};
+    for (const pattern of Object.keys(paths)) {
+        if (prefixRegexes.some((regex) => regex.test(pattern))) {
+            result[pattern] = paths[pattern];
+        }
+    }
+    return result;
+}
+function resolveModuleName(request, paths, outDir) {
+    const alternativeOutDirPathRe = /^(\.\/)?..\//;
+    for (const pattern of Object.keys(paths)) {
+        const relativeTarget = paths[pattern][0];
+        const target = relativeTarget.replace(alternativeOutDirPathRe, '');
+        // "#lib-foo": ["src/utils/lib-foo"]
+        // import '#lib-foo'
+        if (request === pattern) {
+            return path.resolve(outDir, target);
+        }
+        // "#utils/*": ["src/utils/*"]
+        // import '#server/utils/lib-foo'
+        const wildcardIndex = pattern.indexOf('*');
+        if (wildcardIndex !== -1) {
+            const patternPrefix = pattern.substring(0, wildcardIndex);
+            if (request.startsWith(patternPrefix)) {
+                const requestSuffix = request.replace(patternPrefix, ''); // "lib-foo"
+                const targetPrefix = target.split('*')[0]; // "utils/"
+                return path.resolve(outDir, targetPrefix, requestSuffix);
+            }
+        }
+    }
+    return null;
+}
+function escapeRegExpSensitiveCharacters(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+function register(opts) {
+    const tsConfig = getTsConfig();
+    if (!tsConfig) {
+        console.warn(`Can't setup custom paths: missing tsconfig.json`);
+        return;
+    }
+    const prefixRegexes = opts.prefixes
+        .map(escapeRegExpSensitiveCharacters)
+        .map((prefix) => new RegExp(`^${prefix}`));
+    const paths = getPrefixedPaths(tsConfig.paths || {}, prefixRegexes);
+    if (!Object.keys(paths).length) {
+        console.warn(`Can't setup custom paths: there are no paths with ${JSON.stringify(opts.prefixes)} prefixes`);
+        return;
+    }
+    const outDir = tsConfig.outDir || '.';
+    const _Module = Module;
+    const originalResolveFilename = _Module['_resolveFilename'];
+    _Module['_resolveFilename'] = function (request, parent, ...args) {
+        if (!parent)
+            return originalResolveFilename.apply(this, arguments);
+        if (prefixRegexes.some((regex) => regex.test(request))) {
+            const moduleName = resolveModuleName(request, paths, outDir);
+            if (moduleName) {
+                return originalResolveFilename.apply(this, [
+                    moduleName,
+                    parent,
+                    ...args,
+                ]);
+            }
+        }
+        return originalResolveFilename.apply(this, arguments);
+    };
+}
+export default { register };

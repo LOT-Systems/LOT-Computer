@@ -1,4 +1,3 @@
-// Event Emitter
 export class EventEmitter {
   private listeners: { [key: string]: Function[] } = {};
 
@@ -16,11 +15,10 @@ export class EventEmitter {
   }
 }
 
-// Other utility functions
 export const fp = {
-  // Add any functional programming utilities your code uses
   pipe: (...fns: Function[]) => (x: any) => fns.reduce((v, f) => f(v), x),
-  // Add other fp utilities as needed
 };
 
-// Add any other utilities that your code imports from '#shared/utils'
+export function toCelsius(fahrenheit: number): number {
+  return ((fahrenheit - 32) * 5) / 9;
+}

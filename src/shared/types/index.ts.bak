@@ -1,0 +1,53 @@
+export type UserTag = 'Admin' | 'RND' | 'Evangelist' | 'Mala' | 'Onyx';
+
+export type UserSettings = {
+  firstName: string;
+  lastName: string;
+  country: string;
+  city: string;
+  address: string;
+  phone: string;
+  hideActivityLogs: boolean;
+};
+
+export type Color = string; // Adjust if you have a more complex color system
+
+export type DefaultQuestion = {
+  id: string;
+  text: string;
+};
+
+export type Log = {
+  id: string;
+  message: string;
+  // ...add fields as needed
+};
+
+export type LogEvent = {
+  event: string;
+  timestamp: string;
+  // ...add fields as needed
+};
+
+export type LogSettingsChangeMetadata = {
+  changedBy: string;
+  changes: Record<string, any>;
+};
+
+export type MemoryQuestion = {
+  question: string;
+  answer: string;
+};
+
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  // ...add fields as needed
+};
+
+export type Weather = {
+  temperature: number;
+  description: string;
+  // ...add fields as needed
+};

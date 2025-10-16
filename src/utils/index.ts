@@ -1,5 +1,5 @@
 export * as fp from './fp'
 export * from './event-emitter'
 
-export const toCelisus = (kelvin: number) => kelvin - 273.15
-export const toFarhenheit = (kelvin: number) => toCelisus(kelvin) * 1.8 + 32
+export const toCelsius = (kelvin: number) => kelvin - 273.15
+export const toFahrenheit = (kelvin: number) => toCelsius(kelvin) * 1.8 + 32

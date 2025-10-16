@@ -1,23 +1,36 @@
-const fastify = require('fastify')()
-const path = require('path')
-const fastifyStatic = require('@fastify/static')
-
-// Serve static files
-fastify.register(fastifyStatic, {
-  root: path.join(__dirname, '../client'),
-  prefix: '/'
-})
-
-// Handle all routes
-fastify.get('/*', (request, reply) => {
-  reply.sendFile('index.html')
-})
-
-// Start server
-fastify.listen({ port: 4400, host: '0.0.0.0' }, (err) => {
-  if (err) {
-    console.error(err)
-    process.exit(1)
-  }
-  console.log('Server listening at http://localhost:4400')
-})
+import Fastify from 'fastify';
+import fastifyStatic from '@fastify/static';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const server = Fastify({
+    logger: true
+});
+server.register(fastifyStatic, {
+    root: join(__dirname, '../../dist/client'),
+    prefix: '/',
+    decorateReply: false
+});
+server.get('/health', async (request, reply) => {
+    return { status: 'ok' };
+});
+server.setNotFoundHandler((request, reply) => {
+    return reply.sendFile('index.html');
+});
+server.get('/', async (request, reply) => {
+    return reply.sendFile('index.html');
+});
+const start = async () => {
+    try {
+        const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+        await server.listen({ port, host: '0.0.0.0' });
+        server.log.info(`Server listening on port ${port}`);
+    }
+    catch (err) {
+        server.log.error(err);
+        process.exit(1);
+    }
+};
+start();
+export default server;

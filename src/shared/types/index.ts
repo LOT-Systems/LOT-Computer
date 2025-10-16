@@ -1,8 +1,167 @@
-// Add your shared types here
-export interface BaseModel {
-  id?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
+// Enums
+export enum UserTag {
+  Admin = 'Admin',
+  RND = 'RND',
+  Evangelist = 'Evangelist',
+  Mala = 'Mala',
+  Onyx = 'Onyx'
 }
 
-// Add other shared types that your models are using
+// User Types
+export type UserSettings = {
+  firstName: string;
+  lastName: string;
+  country: string;
+  city: string;
+  address: string;
+  phone: string;
+  hideActivityLogs: boolean;
+};
+
+export type UserProfile = {
+  id: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  country: string | null;
+  city: string | null;
+  address: string | null;
+  phone: string | null;
+  tags: string[];
+  hideActivityLogs: boolean;
+};
+
+export type User = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  country: string | null;
+  city: string | null;
+  address: string | null;
+  phone: string | null;
+  timeZone: string | null;
+  hideActivityLogs: boolean;
+  tags: string[];
+  lastSeenAt: Date | null;
+  joinedAt: Date | null;
+  stripeCustomerId: string | null;
+  metadata: Record<string, any>;
+};
+
+// Session Type
+export type Session = {
+  token: string;
+  userId: string;
+  createdAt: Date;
+};
+
+// Log Types
+export type LogEvent =
+  | 'user_login'
+  | 'user_logout'
+  | 'settings_change'
+  | 'weather_update'
+  | 'other';
+
+export type Log = {
+  id: string;
+  userId: string;
+  text: string | null;
+  event: string;
+  metadata: Record<string, any>;
+  context: Record<string, any>;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type LogSettingsChangeMetadata = {
+  changedBy: string;
+  changes: Record<string, any>;
+};
+
+// Answer Type
+export type Answer = {
+  id: string;
+  userId: string;
+  question: string;
+  options: string[];
+  answer: string;
+  metadata: Record<string, any>;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+// Chat Message Types
+export type ChatMessage = {
+  id: string;
+  authorUserId: string;
+  message: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type ChatMessageLike = {
+  id: string;
+  userId: string;
+  messageId: string;
+  createdAt: Date;
+};
+
+// Live Message Type
+export type LiveMessage = {
+  id: string;
+  authorUserId: string;
+  message: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+// Email Code Type
+export type EmailCode = {
+  id: string;
+  token: string;
+  code: string;
+  email: string;
+  magicLinkToken: string;
+  validUntil: Date;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+// Weather Types
+export type Weather = {
+  temperature: number | null;
+  humidity: number | null;
+  description: string | null;
+  windSpeed: number | null;
+  pressure: number | null;
+  tempKelvin: number | null;
+};
+
+export type WeatherRecord = Weather & {
+  createdAt: Date;
+};
+
+export type WeatherResponse = {
+  id: string;
+  city: string;
+  country: string;
+  weather: Record<string, any> | null;
+  createdAt: Date;
+};
+
+// Other Types
+export type Color = string;
+
+export type DefaultQuestion = {
+  id: string;
+  text: string;
+};
+
+export type MemoryQuestion = {
+  question: string;
+  answer: string;
+};
