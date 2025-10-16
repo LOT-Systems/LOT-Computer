@@ -15,8 +15,7 @@
     "client:css:build": "postcss ./src/client/index.css -o ./dist/client/css/index.css --no-map",
     "client:css:watch": "postcss ./src/client/index.css -o ./dist/client/css/index.css -w",
     "client:watch": "yarn run-p client:js:watch client:css:watch",
-    "migrations:up": "esr ./scripts/migrations.ts -up",
-    "migrations:new": "esr ./scripts/migrations.ts -new",
+    "migrations:up": "node -r esbuild-register ./scripts/migrations.ts up",
     "production:run": "yarn run-p build migrations:up start",
     "fix": "prettier --write ./src",
     "start": "node ./dist/server/index.mjs"
