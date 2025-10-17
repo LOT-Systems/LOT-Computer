@@ -16,7 +16,7 @@ server.register(fastifyStatic, {
 });
 
 // Health check endpoint for DigitalOcean
-server.get('/health', async (request, reply) => {
+server.get('/health', async () => {
   return { status: 'ok' };
 });
 
