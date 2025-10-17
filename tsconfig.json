@@ -6,9 +6,6 @@
     "allowJs": true,
     "removeComments": true,
     "resolveJsonModule": true,
-    "typeRoots": [
-      "./node_modules/@types"
-    ],
     "sourceMap": true,
     "outDir": "dist/server",
     "strict": true,
@@ -28,12 +25,21 @@
       "#server/*": ["server/*"],
       "#shared": ["shared"],
       "#shared/*": ["shared/*"]
-    }
+    },
+    "types": [
+      "node",
+      "argparse",
+      "bluebird",
+      "debug",
+      "ejs",
+      "estree",
+      "ms",
+      "prop-types",
+      "react-dom",
+      "seedrandom",
+      "sequelize"
+    ]
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

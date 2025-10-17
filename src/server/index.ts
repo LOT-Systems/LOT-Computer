@@ -3,22 +3,25 @@ import fastifyStatic from '@fastify/static';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+// ESM __dirname workaround
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const server = Fastify();
 
+// Register static plugin BEFORE any routes using sendFile
 server.register(fastifyStatic, {
   root: path.join(__dirname, '../client'),
-  prefix: '/',
+  prefix: '/', // Serve static files at root
 });
 
+// Health check endpoint
 server.get('/health', async () => {
   return { status: 'ok' };
 });
 
+// SPA fallback: serve index.html for any unmatched route
 server.get('/*', (request, reply) => {
-  // This will only work if the plugin is registered correctly!
   reply.sendFile('index.html');
 });
 
