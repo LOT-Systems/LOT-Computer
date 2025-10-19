@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize'
-import config from '../config'  // Changed from '#server/config' to relative path
+import config from '#server/config'
 
 // Add debug logging to see what's being imported
 console.log('Imported config:', config)

@@ -16,6 +16,9 @@ import {
 } from '#server/utils'
 import { models, SessionWithUser } from '#server/models'
 import config from '#server/config'
+import authRoutes from './routes/auth.js'
+import apiRoutes from './routes/api.js'
+import adminApiRoutes from './routes/admin-api.js'
 
 const CWD = process.cwd()
 
@@ -150,7 +153,7 @@ fastify.register(async (fastify: FastifyInstance) => {
     })
 
     // Public API
-    fastify.register(require('./routes/auth'), { prefix: '/auth' })
+    fastify.register(authRoutes, { prefix: '/auth' })
 
     // User API
     fastify.register(async (fastify) => {
@@ -160,7 +163,7 @@ fastify.register(async (fastify: FastifyInstance) => {
           throw new Error('Access denied')
         }
       })
-      fastify.register(require('./routes/api'), { prefix: '/api' })
+      fastify.register(apiRoutes, { prefix: '/api' })
     })
 
     // Admin API
@@ -171,7 +174,7 @@ fastify.register(async (fastify: FastifyInstance) => {
           throw new Error('Access denied')
         }
       })
-      fastify.register(require('./routes/admin-api'), { prefix: '/admin-api' })
+      fastify.register(adminApiRoutes, { prefix: '/admin-api' })
     })
 
     // Client app / index page
