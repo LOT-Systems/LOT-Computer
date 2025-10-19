@@ -4,7 +4,7 @@ import { commonConfig } from './build.config.ts'
 
 async function buildClient() {
   try {
-    console.log('📦 Building client bundles...')
+    console.log('🔦 Building client bundles...')
     await build({
       ...commonConfig,
       entryPoints: [
@@ -15,7 +15,7 @@ async function buildClient() {
       outdir: './dist/client/js',
       splitting: true,
       format: 'esm',
-      platform: 'browser', // Important: use browser for client
+      platform: 'browser',
       bundle: true,
       minify: process.env.NODE_ENV === 'production',
       sourcemap: process.env.NODE_ENV !== 'production',
@@ -29,10 +29,8 @@ async function buildClient() {
         '.png': 'dataurl',
         '.jpg': 'dataurl'
       } as { [key: string]: Loader },
-      external: [
-        'react',
-        'react-dom'
-      ]
+      // ⚠️ REMOVED: external: ['react', 'react-dom']
+      // This was causing React to not be bundled, leaving bare imports
     })
     console.log('✅ Client build completed')
   } catch (error) {
