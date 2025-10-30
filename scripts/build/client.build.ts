@@ -19,6 +19,9 @@ async function buildClient() {
       bundle: true,
       minify: process.env.NODE_ENV === 'production',
       sourcemap: process.env.NODE_ENV !== 'production',
+      define: {
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+      },
       loader: {
         '.ts': 'ts',
         '.tsx': 'tsx',
@@ -29,8 +32,6 @@ async function buildClient() {
         '.png': 'dataurl',
         '.jpg': 'dataurl'
       } as { [key: string]: Loader },
-      // ⚠️ REMOVED: external: ['react', 'react-dom']
-      // This was causing React to not be bundled, leaving bare imports
     })
     console.log('✅ Client build completed')
   } catch (error) {
@@ -39,4 +40,4 @@ async function buildClient() {
   }
 }
 
-buildClient()// Force rebuild Thu Oct 30 11:53:11 PDT 2025
+buildClient()
