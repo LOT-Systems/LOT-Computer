@@ -10,47 +10,37 @@ services:
       
       # Install dependencies
       echo "📦 Installing dependencies..."
-      yarn install --frozen-lockfile --production=false || {
-        echo "❌ Dependency installation failed"
+      yarn install --frozen-lockfile --production=false
+      
+      # Build everything (client + server)
+      echo "🛠 Building application..."
+      NODE_ENV=production yarn build
+      
+      # Verify build output
+      echo "📁 Verifying build output..."
+      echo "Client JS files:"
+      ls -la dist/client/js/ | head -20
+      echo "Client CSS files:"
+      ls -la dist/client/css/
+      echo "Server files:"
+      ls -la dist/server/server/ | head -10
+      echo "Templates:"
+      ls -la templates/
+      echo "Public files:"
+      ls -la public/ | head -10
+      
+      if [ ! -f "dist/client/js/login.js" ]; then
+        echo "❌ Client JS build output missing!"
         exit 1
-      }
+      fi
       
-      # Create build directories
-      echo "📁 Creating build directories..."
-      mkdir -p dist/client/{css,js} dist/server
-      
-      # Build process
-      echo "🛠 Starting build process..."
-      
-      # Build server
-      echo "🔧 Building server..."
-      NODE_ENV=production yarn run server:build || {
-        echo "❌ Server build failed"
-        exit 1
-      }
-      
-      # Build client
-      echo "🔧 Building client..."
-      NODE_ENV=production yarn run client:css:build || {
-        echo "❌ CSS build failed"
-        exit 1
-      }
-      NODE_ENV=production yarn run client:js:build || {
-        echo "❌ JS build failed"
-        exit 1
-      }
-      
-      # Final verification
       if [ ! -f "dist/server/server/index.js" ]; then
-        echo "❌ Server build output missing"
-        ls -la dist/server/server/
+        echo "❌ Server build output missing!"
         exit 1
       fi
 
       echo "✅ Build completed successfully at $(date)"
-    run_command: |
-      # Start the server with ES modules support
-      NODE_OPTIONS='--experimental-specifier-resolution=node' node dist/server/server/index.js
+    run_command: node dist/server/server/index.js
     environment_slug: node-js
     instance_size_slug: basic-xxs
     instance_count: 1
@@ -89,6 +79,3 @@ services:
       - key: RESEND_FROM_NAME
         scope: RUN_TIME
         value: "LOT Systems"
-      - key: BUILD_TIME
-        scope: BUILD_TIME
-        value: "${COMMIT_SHA}-${TIMESTAMP}"
