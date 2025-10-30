@@ -140,7 +140,6 @@ export default function (fastify: FastifyInstance, opts: any, done: () => void) 
       await fastify.models.Session.create({
         token: sessionToken,
         userId: user.id,
-        expiresAt: dayjs().add(30, 'days').toDate()
       });
       
       console.log('Session created for user:', user.id);
