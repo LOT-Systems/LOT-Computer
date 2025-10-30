@@ -8,14 +8,32 @@ function fixImportsInFile(filePath) {
   let content = fs.readFileSync(filePath, 'utf8');
   const original = content;
   
-  // Fix relative imports: from '../something' -> from '../something.js'
+  // Fix relative imports to files: from '../config' -> from '../config.js'
   content = content.replace(/from '(\.\.?\/[^']+?)';/g, (match, p1) => {
+    // Skip if already has extension
     if (/\.\w+$/.test(p1)) return match;
+    
+    // Check if this is a directory with index.js
+    const fullPath = path.resolve(path.dirname(filePath), p1);
+    const indexPath = path.join(fullPath, 'index.js');
+    
+    if (fs.existsSync(indexPath)) {
+      return `from '${p1}/index.js';`;
+    }
+    
     return `from '${p1}.js';`;
   });
   
   content = content.replace(/from "(\.\.?\/[^"]+?)";/g, (match, p1) => {
     if (/\.\w+$/.test(p1)) return match;
+    
+    const fullPath = path.resolve(path.dirname(filePath), p1);
+    const indexPath = path.join(fullPath, 'index.js');
+    
+    if (fs.existsSync(indexPath)) {
+      return `from "${p1}/index.js";`;
+    }
+    
     return `from "${p1}.js";`;
   });
   
