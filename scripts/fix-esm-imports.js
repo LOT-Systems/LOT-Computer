@@ -4,20 +4,20 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Known directories that have index.js files
+const KNOWN_DIRS = ['models', 'utils', 'routes'];
+
 function fixImportsInFile(filePath) {
   let content = fs.readFileSync(filePath, 'utf8');
   const original = content;
   
-  // Fix relative imports to files: from '../config' -> from '../config.js'
+  // Fix relative imports
   content = content.replace(/from '(\.\.?\/[^']+?)';/g, (match, p1) => {
-    // Skip if already has extension
-    if (/\.\w+$/.test(p1)) return match;
+    if (/\.\w+$/.test(p1)) return match; // Already has extension
     
-    // Check if this is a directory with index.js
-    const fullPath = path.resolve(path.dirname(filePath), p1);
-    const indexPath = path.join(fullPath, 'index.js');
-    
-    if (fs.existsSync(indexPath)) {
+    // Check if it's a known directory
+    const basename = path.basename(p1);
+    if (KNOWN_DIRS.includes(basename)) {
       return `from '${p1}/index.js';`;
     }
     
@@ -27,25 +27,18 @@ function fixImportsInFile(filePath) {
   content = content.replace(/from "(\.\.?\/[^"]+?)";/g, (match, p1) => {
     if (/\.\w+$/.test(p1)) return match;
     
-    const fullPath = path.resolve(path.dirname(filePath), p1);
-    const indexPath = path.join(fullPath, 'index.js');
-    
-    if (fs.existsSync(indexPath)) {
+    const basename = path.basename(p1);
+    if (KNOWN_DIRS.includes(basename)) {
       return `from "${p1}/index.js";`;
     }
     
     return `from "${p1}.js";`;
   });
   
-  // Fix dayjs plugin imports: dayjs/plugin/timezone -> dayjs/plugin/timezone.js
+  // Fix dayjs plugin imports
   content = content.replace(/from '(dayjs\/plugin\/[^']+?)';/g, (match, p1) => {
     if (p1.endsWith('.js')) return match;
     return `from '${p1}.js';`;
-  });
-  
-  content = content.replace(/from "(dayjs\/plugin\/[^"]+?)";/g, (match, p1) => {
-    if (p1.endsWith('.js')) return match;
-    return `from "${p1}.js";`;
   });
   
   if (content !== original) {
