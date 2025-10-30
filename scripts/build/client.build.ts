@@ -20,7 +20,10 @@ async function buildClient() {
       minify: process.env.NODE_ENV === 'production',
       sourcemap: process.env.NODE_ENV !== 'production',
       define: {
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+        'process.env.APP_HOST': JSON.stringify(process.env.APP_HOST || ''),
+        'process.env.APP_NAME': JSON.stringify(process.env.APP_NAME || ''),
+        'process.env.APP_DESCRIPTION': JSON.stringify(process.env.APP_DESCRIPTION || ''),
       },
       loader: {
         '.ts': 'ts',
