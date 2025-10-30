@@ -15,10 +15,21 @@ function fixImportsInFile(filePath) {
   content = content.replace(/from '(\.\.?\/[^']+?)';/g, (match, p1) => {
     if (/\.\w+$/.test(p1)) return match; // Already has extension
     
-    // Check if it's a known directory
     const basename = path.basename(p1);
+    
+    // Check if it's a known directory with index.js
     if (KNOWN_DIRS.includes(basename)) {
       return `from '${p1}/index.js';`;
+    }
+    
+    // Check if path ends with a known directory (e.g., '../models/user')
+    const parts = p1.split('/');
+    if (parts.length >= 2) {
+      const parentDir = parts[parts.length - 2];
+      if (KNOWN_DIRS.includes(parentDir)) {
+        // This is a file inside a known directory
+        return `from '${p1}.js';`;
+      }
     }
     
     return `from '${p1}.js';`;
@@ -30,6 +41,14 @@ function fixImportsInFile(filePath) {
     const basename = path.basename(p1);
     if (KNOWN_DIRS.includes(basename)) {
       return `from "${p1}/index.js";`;
+    }
+    
+    const parts = p1.split('/');
+    if (parts.length >= 2) {
+      const parentDir = parts[parts.length - 2];
+      if (KNOWN_DIRS.includes(parentDir)) {
+        return `from "${p1}.js";`;
+      }
     }
     
     return `from "${p1}.js";`;
