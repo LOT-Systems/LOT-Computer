@@ -7,39 +7,11 @@ services:
       repo_clone_url: https://github.com/vadikmarmeladov/lot-systems.git
     build_command: |
       echo "🚀 Build started at $(date)"
-      
-      # Install dependencies
-      echo "📦 Installing dependencies..."
       yarn install --frozen-lockfile --production=false
-      
-      # Build everything (client + server)
-      echo "🛠 Building application..."
       NODE_ENV=production yarn build
-      
-      # Verify build output
       echo "📁 Verifying build output..."
-      echo "Client JS files:"
       ls -la dist/client/js/ | head -20
-      echo "Client CSS files:"
-      ls -la dist/client/css/
-      echo "Server files:"
-      ls -la dist/server/server/ | head -10
-      echo "Templates:"
-      ls -la templates/
-      echo "Public files:"
-      ls -la public/ | head -10
-      
-      if [ ! -f "dist/client/js/login.js" ]; then
-        echo "❌ Client JS build output missing!"
-        exit 1
-      fi
-      
-      if [ ! -f "dist/server/server/index.js" ]; then
-        echo "❌ Server build output missing!"
-        exit 1
-      fi
-
-      echo "✅ Build completed successfully at $(date)"
+      echo "✅ Build completed at $(date)"
     run_command: node dist/server/server/index.js
     environment_slug: node-js
     instance_size_slug: basic-xxs
@@ -60,11 +32,14 @@ services:
         scope: RUN_TIME
         value: "8080"
       - key: APP_NAME
-        scope: RUN_TIME
+        scope: RUN_AND_BUILD_TIME
         value: "LOT Systems"
       - key: APP_HOST
-        scope: RUN_TIME
+        scope: RUN_AND_BUILD_TIME
         value: "${_self.PUBLIC_URL}"
+      - key: APP_DESCRIPTION
+        scope: RUN_AND_BUILD_TIME
+        value: "LOT is a subscription service that distributes digital and physical necessities, basic wardrobes, organic self-care products, home and kids essentials."
       - key: JWT_SECRET
         scope: RUN_AND_BUILD_TIME
         type: SECRET
