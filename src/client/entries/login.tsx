@@ -41,7 +41,7 @@ const EmailLogin = () => {
       if (step === 'email') {
         setIsLoading(true)
         axios
-          .post('/auth/email', { email })
+          .post('/auth/send-code', { email })
           .then(({ data }) => {
             const token = data.token
             setToken(token)
