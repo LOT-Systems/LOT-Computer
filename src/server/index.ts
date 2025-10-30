@@ -22,6 +22,13 @@ import adminApiRoutes from './routes/admin-api.js'
 
 const CWD = process.cwd()
 
+// Debug: Check if static files exist
+console.log('🔍 CWD:', CWD)
+console.log('🔍 dist/client/js exists?', fs.existsSync(path.join(CWD, 'dist/client/js')))
+if (fs.existsSync(path.join(CWD, 'dist/client/js'))) {
+  console.log('🔍 Files in dist/client/js:', fs.readdirSync(path.join(CWD, 'dist/client/js')))
+}
+
 const fastify = Fastify({
   logger: false  // Temporarily disable logging for development
 })
@@ -85,7 +92,8 @@ fastify.register(fastifyView, {
   },
 })
 
-// gzip assets
+// gzip assets - TEMPORARILY DISABLED FOR TESTING
+/*
 if (config.env === 'production') {
   fastify.get(
     '/js/:file',
@@ -110,6 +118,7 @@ if (config.env === 'production') {
     reply.sendFile('')
   })
 }
+*/
 
 // Health check endpoint (required for Digital Ocean)
 fastify.get('/health', async (request, reply) => {
