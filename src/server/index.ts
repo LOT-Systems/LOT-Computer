@@ -140,23 +140,18 @@ fastify.register(async (fastify: FastifyInstance) => {
     fastify.addHook('onRequest', async (req: FastifyRequest, reply) => {
       const token = req.cookies[config.jwt.cookieKey]
       if (token) {
-        const verifyReq = await jwt.verify(token)
-        if (verifyReq.success) {
-          const userId = verifyReq.data.id
-          const session: SessionWithUser | null =
-            await fastify.models.Session.findOne({
-              where: { token },
-              include: [
-                {
-                  model: fastify.models.User,
-                  as: 'user',
-                  where: { id: userId },
-                },
-              ],
-            })
-          if (session && session.user) {
-            req.user = session.user
-          }
+        const session: SessionWithUser | null =
+          await fastify.models.Session.findOne({
+            where: { token },
+            include: [
+              {
+                model: fastify.models.User,
+                as: "user",
+              },
+            ],
+          })
+        if (session && session.user) {
+          req.user = session.user
         }
       }
     })
