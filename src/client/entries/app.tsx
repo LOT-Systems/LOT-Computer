@@ -39,6 +39,9 @@ const App = () => {
   }, [user, weather])
 
   React.useEffect(() => {
+    // Initialize router to listen to URL changes
+    const unbindRouter = stores.router.listen(() => {})
+
     getMe().then((user) => {
       stores.me.set(user)
       if (!user.firstName && !user.lastName) {
@@ -48,6 +51,10 @@ const App = () => {
     listenSSE('/api/sync', (data: any) => {
       sync.emit(data.event, data.data)
     })
+
+    return () => {
+      unbindRouter()
+    }
   }, [])
 
   React.useEffect(() => {
@@ -66,7 +73,7 @@ const App = () => {
 
   return (
     <Layout>
-      {router?.route === 'system' && <System />}
+      {(!router || router.route === 'system') && <System />}
       {router?.route === 'settings' && <Settings />}
       {router?.route === 'sync' && <Sync />}
       {router?.route === 'logs' && <Logs />}
