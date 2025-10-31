@@ -4,7 +4,7 @@ import { ClientTheme, ClientThemeMode } from '#client/types'
 import { generatePalette, hexToRgb } from '#client/utils/color'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
-import * as state from './state'
+import * as state from './state.js'
 
 const CUSTOM_THEME_RE = /^#([A-Fa-f0-9]{6})_#([A-Fa-f0-9]{6})$/
 
