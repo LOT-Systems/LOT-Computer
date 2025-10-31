@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize/types'
-import { Models, UserRecord } from './models/index'
+import { Models, UserRecord } from './models/index.js'
 
 declare module 'fastify' {
   interface FastifyInstance {

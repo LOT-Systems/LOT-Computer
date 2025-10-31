@@ -21,7 +21,7 @@ import {
   USER_SETTING_NAMES,
   WEATHER_STALE_TIME_MINUTES,
 } from '#shared/constants'
-import { sync } from '../sync'
+import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'

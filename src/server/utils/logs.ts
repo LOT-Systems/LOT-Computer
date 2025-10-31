@@ -2,7 +2,7 @@ import { Op } from 'sequelize'
 import dayjs from '#server/utils/dayjs'
 import { LogContext, User } from '#shared/types'
 import { DATE_TIME_FORMAT, WEATHER_STALE_TIME_MINUTES } from '#shared/constants'
-import { models } from '../models'
+import { models } from '../models/index.js'
 
 export async function getLogContext(user: User): Promise<LogContext> {
   const context: LogContext = {
