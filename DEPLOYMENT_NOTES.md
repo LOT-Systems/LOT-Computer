@@ -12,3 +12,20 @@
 6. Fastify v5 - updated all plugins
 
 See git history for detailed changes.
+
+## Update: Auth Working (Oct 30, 2025)
+
+### ✅ What's Working
+- Email sending via Resend API
+- Code generation and database storage
+- Login page UI
+- Email delivery confirmed
+
+### 🔧 Known Issue
+- Code verification doesn't redirect after login
+- Need to check `/auth/email/code` endpoint response
+
+### Next Steps
+1. Debug code verification endpoint
+2. Check session creation
+3. Test redirect after successful login
