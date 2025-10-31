@@ -30,8 +30,8 @@ const config = {
     expiresIn: '30d',
   },
 
-  geonamesUsername: process.env.GEONAMES_USERNAME || '',
-  openWeatherApiKey: process.env.OPENWEATHER_API_KEY || ''
+  geonamesUsername: process.env.GEONAMES_USERNAME || ''
+  // Note: Weather now uses Open-Meteo (free, no API key required)
 }
 
 validateConfig()
@@ -45,7 +45,6 @@ function validateConfig() {
     'DB_PASSWORD',
     // Optionally require these:
     // 'GEONAMES_USERNAME',
-    // 'OPENWEATHER_API_KEY',
   ]
 
   const missing = required.filter(key => !process.env[key])
