@@ -21,7 +21,7 @@ import {
   USER_SETTING_NAMES,
   WEATHER_STALE_TIME_MINUTES,
 } from '#shared/constants'
-import { sync } from '../sync'
+import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
@@ -299,41 +299,47 @@ export default async (fastify: FastifyInstance) => {
   )
 
   fastify.get('/weather', async (req: FastifyRequest, reply) => {
-    const { city, country } = req.user
-    if (!city || !country) {
-      return null
-    }
-    const cachedRecord = await fastify.models.WeatherResponse.findOne({
-      where: {
-        city,
-        country,
-        createdAt: {
-          [Op.gt]: dayjs()
-            .subtract(WEATHER_STALE_TIME_MINUTES, 'minute')
-            .toDate(),
+    try {
+      const { city, country } = req.user
+      if (!city || !country) {
+        return null
+      }
+      const cachedRecord = await fastify.models.WeatherResponse.findOne({
+        where: {
+          city,
+          country,
+          createdAt: {
+            [Op.gt]: dayjs()
+              .subtract(WEATHER_STALE_TIME_MINUTES, 'minute')
+              .toDate(),
+          },
         },
-      },
-    })
-    if (cachedRecord) {
-      return cachedRecord.useRecordView()
-    }
-    const coordinates = await weather.getCoordinates(city, country)
-    if (!coordinates) {
-      await fastify.models.WeatherResponse.create({
+      })
+      if (cachedRecord) {
+        return cachedRecord.useRecordView()
+      }
+      const coordinates = await weather.getCoordinates(city, country)
+      if (!coordinates) {
+        await fastify.models.WeatherResponse.create({
+          city,
+          country,
+          weather: null,
+          // TODO: add "permanent: true"
+        })
+        return null
+      }
+      const data = await weather.getWeather(coordinates.lat, coordinates.lon)
+      const newCachedRecord = await fastify.models.WeatherResponse.create({
         city,
         country,
-        weather: null,
-        // TODO: add "permanent: true"
+        weather: data,
       })
+      return newCachedRecord.useRecordView()
+    } catch (error) {
+      // Weather API unavailable or misconfigured - return null so app still works
+      console.warn('Weather API error (API key may be missing):', error.message)
       return null
     }
-    const data = await weather.getWeather(coordinates.lat, coordinates.lon)
-    const newCachedRecord = await fastify.models.WeatherResponse.create({
-      city,
-      country,
-      weather: data,
-    })
-    return newCachedRecord.useRecordView()
   })
 
   fastify.get('/logs', async (req: FastifyRequest, reply) => {

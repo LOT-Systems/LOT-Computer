@@ -4,8 +4,8 @@ import { FastifyInstance, FastifyRequest } from 'fastify'
 import { AdminUsersSort, LogEvent, Paginated, User } from '#shared/types'
 import { fp } from '#shared/utils'
 import { buildPrompt, completeAndExtractQuestion } from '#server/utils/memory'
-import { sync } from '../sync'
-import dayjs from '../utils/dayjs'
+import { sync } from '../sync.js'
+import dayjs from '../utils/dayjs.js'
 
 export default async (fastify: FastifyInstance) => {
   fastify.get(

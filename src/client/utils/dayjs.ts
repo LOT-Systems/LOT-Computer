@@ -1,6 +1,6 @@
 import _dayjs from 'dayjs'
-import dayjsUtc from 'dayjs/plugin/utc'
-import dayjsRelativeTime from 'dayjs/plugin/relativeTime'
+import dayjsUtc from 'dayjs/plugin/utc.js'
+import dayjsRelativeTime from 'dayjs/plugin/relativeTime.js'
 import { Dayjs as _Dayjs } from 'dayjs'
 
 _dayjs.extend(dayjsUtc)

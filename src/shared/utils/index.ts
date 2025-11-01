@@ -1,4 +1,4 @@
-export * as fp from './fp'
+export * as fp from './fp.js'
 
 export class EventEmitter {
   private listeners: { [key: string]: Function[] } = {}

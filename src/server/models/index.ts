@@ -1,12 +1,12 @@
-import { User } from './user'
-import { Session } from './session'
-import { EmailCode } from './email-code'
-import { LiveMessage } from './live-message'
-import { ChatMessage } from './chat-message'
-import { ChatMessageLike } from './chat-message-like'
-import { WeatherResponse } from './weather-response'
-import { Log } from './log'
-import { Answer } from './answer'
+import { User } from './user.js'
+import { Session } from './session.js'
+import { EmailCode } from './email-code.js'
+import { LiveMessage } from './live-message.js'
+import { ChatMessage } from './chat-message.js'
+import { ChatMessageLike } from './chat-message-like.js'
+import { WeatherResponse } from './weather-response.js'
+import { Log } from './log.js'
+import { Answer } from './answer.js'
 
 export type UserRecord = User
 

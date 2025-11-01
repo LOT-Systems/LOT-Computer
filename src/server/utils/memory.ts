@@ -17,7 +17,7 @@ import {
   UserSettings,
 } from '#shared/types'
 import { toCelsius } from '#shared/utils'
-import { getLogContext } from './logs'
+import { getLogContext } from './logs.js'
 
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

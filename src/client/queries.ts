@@ -20,7 +20,10 @@ import {
 import dayjs from '#client/utils/dayjs'
 import { DATE_TIME_FORMAT } from '#shared/constants'
 
-const api = axios.create({ baseURL: '/' })
+const api = axios.create({
+  baseURL: '/',
+  withCredentials: true  // Send cookies with requests
+})
 
 // Utils
 function createQuery<T>(
