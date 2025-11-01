@@ -81,8 +81,9 @@ const App = () => {
         <video
           ref={mirrorRef}
           playsInline
+          autoPlay
+          muted
           className="w-full h-full object-cover fixed inset-0 -z-10 -scale-x-100"
-          hidden
         />
       )}
     </Layout>
