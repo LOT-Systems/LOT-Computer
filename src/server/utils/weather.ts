@@ -38,11 +38,12 @@ export async function getWeather(
   const current = data.current
   const daily = data.daily
 
-  // Convert Celsius to Kelvin
-  const tempKelvin = current.temperature_2m ? current.temperature_2m + 273.15 : null
+  // Open-Meteo returns Celsius - convert to Kelvin for consistency with existing code
+  const tempCelsius = current.temperature_2m ?? null
+  const tempKelvin = tempCelsius !== null ? tempCelsius + 273.15 : null
 
   return {
-    temperature: current.temperature_2m ?? null,
+    temperature: tempCelsius,
     humidity: current.relative_humidity_2m ?? null,
     description: getWeatherDescription(current.weather_code) ?? null,
     windSpeed: current.wind_speed_10m ?? null,

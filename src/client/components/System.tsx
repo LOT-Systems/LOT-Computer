@@ -54,11 +54,11 @@ export const System = () => {
   }, [me])
 
   const temperature = React.useMemo(() => {
-    if (!weather) return null
+    if (!weather || !weather.tempKelvin) return null
+    // Convert from Kelvin to Celsius or Fahrenheit
+    const celsius = weather.tempKelvin - 273.15
     return Math.round(
-      isTempFahrenheit
-        ? toFahrenheit(weather.tempKelvin)
-        : toCelsius(weather.tempKelvin)
+      isTempFahrenheit ? toFahrenheit(celsius) : celsius
     )
   }, [weather, isTempFahrenheit])
 
@@ -208,10 +208,6 @@ export const System = () => {
         <Block label="Sound:" onClick={() => setIsSoundOn(!isSoundOn)}>
           {isSoundOn ? 'On' : 'Off'}
         </Block>
-      </div>
-
-      <div>
-        <Block label="Mala:" children={21} />
       </div>
 
       {!!liveMessage && (
