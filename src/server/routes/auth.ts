@@ -172,5 +172,39 @@ export default function (fastify: FastifyInstance, opts: any, done: () => void) 
     }
   });
 
+  // Logout route
+  fastify.get('/logout', async (request, reply) => {
+    try {
+      const token = request.cookies[config.jwt.cookieKey];
+
+      if (token) {
+        // Delete the session from database
+        await fastify.models.Session.destroy({
+          where: { token }
+        });
+
+        console.log('Session deleted for token:', token);
+      }
+
+      // Clear the cookie
+      reply.clearCookie(config.jwt.cookieKey, {
+        path: '/',
+      });
+
+      console.log('User logged out, redirecting to home');
+      return reply.redirect('/');
+
+    } catch (err: any) {
+      console.error('Logout error:', {
+        error: err?.message || 'Unknown error',
+        stack: err?.stack || 'No stack trace',
+        timestamp: new Date().toISOString()
+      });
+      // Even if there's an error, clear the cookie and redirect
+      reply.clearCookie(config.jwt.cookieKey, { path: '/' });
+      return reply.redirect('/');
+    }
+  });
+
   done();
 }
