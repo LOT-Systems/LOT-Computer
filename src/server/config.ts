@@ -16,10 +16,6 @@ const config = {
     fromName: process.env.RESEND_FROM_NAME || 'Your App',
   },
 
-  anthropic: {
-    apiKey: process.env.ANTHROPIC_API_KEY || '',
-  },
-
   db: {
     host: process.env.DB_HOST || 'db-postgresql-nyc3-92053-do-user-22640384-0.f.db.ondigitalocean.com',
     port: parseInt(process.env.DB_PORT || '25060', 10),
