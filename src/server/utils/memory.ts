@@ -1,5 +1,5 @@
 import Instructor from '@instructor-ai/instructor'
-import Anthropic from '@anthropic-ai/sdk'
+import OpenAI from 'openai'
 import { z } from 'zod'
 import dayjs from '#server/utils/dayjs'
 import {
@@ -19,12 +19,12 @@ import {
 import { toCelsius } from '#shared/utils'
 import { getLogContext } from './logs.js'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+const oai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 })
 
 const client = Instructor({
-  client: anthropic,
+  client: oai,
   mode: 'TOOLS',
 })
 
@@ -36,10 +36,9 @@ const questionSchema = z.object({
 export async function completeAndExtractQuestion(
   prompt: string
 ): Promise<MemoryQuestion> {
-  const extractedQuestion = await client.messages.create({
+  const extractedQuestion = await client.chat.completions.create({
     messages: [{ role: 'user', content: prompt }],
-    model: 'claude-3-5-haiku-20241022', // Claude 3.5 Haiku (fast and cost-effective)
-    max_tokens: 1024,
+    model: 'gpt-4o-mini',
     response_model: {
       schema: questionSchema,
       name: 'Question',
