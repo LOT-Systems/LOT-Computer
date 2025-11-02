@@ -33,8 +33,6 @@ export const Button: React.FC<Props> = ({
   ...props
 }) => {
   const isMirrorOn = useStore(stores.isMirrorOn)
-  const theme = useStore(stores.theme)
-  const isDarkMode = theme === 'dark'
   const className = cn(
     'relative overflow-hidden whitespace-nowrap',
     'disabled:opacity-80',
@@ -48,9 +46,7 @@ export const Button: React.FC<Props> = ({
           'before:content-[""] before:absolute before:inset-0 before:bg-white before:z-[-1]',
         'hover:bg-acc-300/20',
         'inline-flex justify-center items-center',
-        isDarkMode
-          ? 'border border-white text-white py-8 transition-[background-color] rounded bg-transparent'
-          : 'border border-acc text-acc py-8 transition-[background-color] rounded bg-transparent',
+        'border border-acc text-acc py-8 transition-[background-color] rounded bg-transparent',
         'disabled:border-acc-300/40 disabled:text-acc-300/40'
       ),
     kind === 'secondary-rounded' &&
@@ -59,9 +55,7 @@ export const Button: React.FC<Props> = ({
           'before:content-[""] before:absolute before:inset-0 before:bg-white before:z-[-1]',
         'hover:bg-acc-300/20',
         'inline-flex justify-center items-center transition-[background-color] rounded',
-        isDarkMode
-          ? 'bg-transparent border border-white text-white rounded-[21px]'
-          : 'bg-transparent border border-acc text-acc rounded-[21px]',
+        'bg-transparent border border-acc text-acc rounded-[21px]',
         'disabled:border-acc-300/40 disabled:text-acc-300/40'
       ),
     'cursor-pointer',
