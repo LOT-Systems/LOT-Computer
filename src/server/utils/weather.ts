@@ -30,7 +30,7 @@ export async function getWeather(
         longitude: lon,
         current: 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,surface_pressure',
         daily: 'sunrise,sunset',
-        timezone: 'auto',
+        timezone: 'UTC', // Use UTC to avoid timezone confusion
       },
     }
   )
