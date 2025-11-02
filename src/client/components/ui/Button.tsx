@@ -43,7 +43,7 @@ export const Button: React.FC<Props> = ({
     kind === 'secondary' &&
       cn(
         !isMirrorOn &&
-          'before:content-[""] before:absolute before:inset-0 before:bg-white before:z-[-1]',
+          'before:content-[""] before:absolute before:inset-0 before:bg-bac before:z-[-1]',
         'hover:bg-acc-300/20',
         'inline-flex justify-center items-center',
         'border border-acc text-acc py-8 transition-[background-color] rounded bg-transparent',
@@ -52,7 +52,7 @@ export const Button: React.FC<Props> = ({
     kind === 'secondary-rounded' &&
       cn(
         !isMirrorOn &&
-          'before:content-[""] before:absolute before:inset-0 before:bg-white before:z-[-1]',
+          'before:content-[""] before:absolute before:inset-0 before:bg-bac before:z-[-1]',
         'hover:bg-acc-300/20',
         'inline-flex justify-center items-center transition-[background-color] rounded',
         'bg-transparent border border-acc text-acc rounded-[21px]',
