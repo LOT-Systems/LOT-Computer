@@ -42,6 +42,12 @@ export async function getWeather(
   const tempCelsius = current.temperature_2m ?? null
   const tempKelvin = tempCelsius !== null ? tempCelsius + 273.15 : null
 
+  // Ensure sunrise/sunset ISO strings are parsed as UTC by appending 'Z' if missing
+  const sunriseStr = daily.sunrise?.[0]
+  const sunsetStr = daily.sunset?.[0]
+  const sunriseUTC = sunriseStr ? (sunriseStr.endsWith('Z') ? sunriseStr : sunriseStr + 'Z') : null
+  const sunsetUTC = sunsetStr ? (sunsetStr.endsWith('Z') ? sunsetStr : sunsetStr + 'Z') : null
+
   return {
     temperature: tempCelsius,
     humidity: current.relative_humidity_2m ?? null,
@@ -49,8 +55,8 @@ export async function getWeather(
     windSpeed: current.wind_speed_10m ?? null,
     pressure: current.surface_pressure ?? null,
     tempKelvin,
-    sunrise: daily.sunrise?.[0] ? new Date(daily.sunrise[0]).getTime() / 1000 : null,
-    sunset: daily.sunset?.[0] ? new Date(daily.sunset[0]).getTime() / 1000 : null,
+    sunrise: sunriseUTC ? new Date(sunriseUTC).getTime() / 1000 : null,
+    sunset: sunsetUTC ? new Date(sunsetUTC).getTime() / 1000 : null,
   }
 }
 
