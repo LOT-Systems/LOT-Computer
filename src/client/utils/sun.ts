@@ -42,6 +42,8 @@ export function useSun(
         const isDark = now.isAfter(sunset) || now.isBefore(sunrise)
         if (isDark && ['light', 'sunset', 'sunrise'].includes(currentTheme)) {
           stores.theme.set('dark')
+        } else if (!isDark && currentTheme === 'dark') {
+          stores.theme.set('light')
         }
       }
     }
