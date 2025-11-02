@@ -45,21 +45,24 @@ export const Button: React.FC<Props> = ({
     kind === 'secondary' &&
       cn(
         !isMirrorOn &&
+          !isDarkMode &&
           'before:content-[""] before:absolute before:inset-0 before:bg-bac before:z-[-1]',
         'hover:bg-acc-300/20',
         'inline-flex justify-center items-center',
-        'border border-acc text-acc py-8 transition-[background-color] rounded',
-        'bg-transparent',
+        isDarkMode
+          ? 'border border-white/30 text-white py-8 transition-[background-color] rounded bg-white/5'
+          : 'border border-acc text-acc py-8 transition-[background-color] rounded bg-transparent',
         'disabled:border-acc-300/40 disabled:text-acc-300/40'
       ),
     kind === 'secondary-rounded' &&
       cn(
         !isMirrorOn &&
+          !isDarkMode &&
           'before:content-[""] before:absolute before:inset-0 before:bg-bac before:z-[-1]',
         'hover:bg-acc-300/20',
         'inline-flex justify-center items-center transition-[background-color] rounded',
         isDarkMode
-          ? 'bg-white/10 border-2 border-white text-white rounded-[21px]'
+          ? 'bg-white/5 border border-white/30 text-white rounded-[21px]'
           : 'bg-transparent border border-acc text-acc rounded-[21px]',
         'disabled:border-acc-300/40 disabled:text-acc-300/40'
       ),
