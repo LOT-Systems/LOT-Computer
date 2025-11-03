@@ -1,7 +1,9 @@
 import Instructor from '@instructor-ai/instructor'
 import OpenAI from 'openai'
+import Anthropic from '@anthropic-ai/sdk'
 import { z } from 'zod'
 import dayjs from '#server/utils/dayjs'
+import config from '#server/config'
 import {
   COUNTRY_BY_ALPHA3,
   DATE_TIME_FORMAT,
@@ -15,16 +17,28 @@ import {
   MemoryQuestion,
   User,
   UserSettings,
+  UserTag,
 } from '#shared/types'
 import { toCelsius } from '#shared/utils'
 import { getLogContext } from './logs.js'
 
+// OpenAI client (for non-Usership users)
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-const client = Instructor({
+const oaiClient = Instructor({
   client: oai,
+  mode: 'TOOLS',
+})
+
+// Anthropic client (for Usership users)
+const anthropic = new Anthropic({
+  apiKey: config.anthropic.apiKey,
+})
+
+const anthropicClient = Instructor({
+  client: anthropic,
   mode: 'TOOLS',
 })
 
@@ -33,18 +47,44 @@ const questionSchema = z.object({
   options: z.array(z.string()),
 })
 
+// Helper to determine which engine to use based on user tags
+export function getMemoryEngine(user: User): 'claude' | 'standard' {
+  const hasUsershipTag = user.tags.some(
+    (tag) => tag.toLowerCase() === UserTag.Usership.toLowerCase()
+  )
+  return hasUsershipTag && config.anthropic.apiKey ? 'claude' : 'standard'
+}
+
 export async function completeAndExtractQuestion(
-  prompt: string
+  prompt: string,
+  user: User
 ): Promise<MemoryQuestion> {
-  const extractedQuestion = await client.chat.completions.create({
-    messages: [{ role: 'user', content: prompt }],
-    model: 'gpt-4o-mini',
-    response_model: {
-      schema: questionSchema,
-      name: 'Question',
-    },
-  })
-  return questionSchema.parse(extractedQuestion)
+  const engine = getMemoryEngine(user)
+
+  if (engine === 'claude') {
+    // Use Anthropic Claude for Usership users
+    const extractedQuestion = await anthropicClient.messages.create({
+      messages: [{ role: 'user', content: prompt }],
+      model: 'claude-3-5-haiku-20241022',
+      max_tokens: 1024,
+      response_model: {
+        schema: questionSchema,
+        name: 'Question',
+      },
+    })
+    return questionSchema.parse(extractedQuestion)
+  } else {
+    // Use OpenAI for regular users
+    const extractedQuestion = await oaiClient.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      model: 'gpt-4o-mini',
+      response_model: {
+        schema: questionSchema,
+        name: 'Question',
+      },
+    })
+    return questionSchema.parse(extractedQuestion)
+  }
 }
 
 export async function buildPrompt(user: User, logs: Log[]): Promise<string> {
