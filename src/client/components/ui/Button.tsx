@@ -33,12 +33,26 @@ export const Button: React.FC<Props> = ({
   ...props
 }) => {
   const isMirrorOn = useStore(stores.isMirrorOn)
+  const theme = useStore(stores.theme)
+  const isLightTheme = theme === 'light'
+
   const className = cn(
     'relative overflow-hidden whitespace-nowrap',
     'disabled:opacity-80',
     kind === 'primary' &&
       cn(
-        'button-primary border rounded text-black bg-blue border-blue-dark shadow-[white_inset_0_0_4px_0] transition-all hover:bg-blue-light hover:border-blue dark:bg-white dark:text-black-total dark:border-white dark:hover:bg-gray'
+        isLightTheme
+          ? // Light mode: blue button
+            'button-primary border rounded text-black bg-blue border-blue-dark shadow-[white_inset_0_0_4px_0] transition-all hover:bg-blue-light hover:border-blue'
+          : // Dark/themed mode: match secondary button style
+            cn(
+              !isMirrorOn &&
+                'before:content-[""] before:absolute before:inset-0 before:bg-bac before:z-[-1]',
+              'hover:bg-acc-300/20',
+              'inline-flex justify-center items-center',
+              'border border-acc text-acc py-8 transition-[background-color] rounded bg-transparent',
+              'disabled:border-acc-300/40 disabled:text-acc-300/40'
+            )
       ),
     kind === 'secondary' &&
       cn(
