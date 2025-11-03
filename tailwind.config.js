@@ -86,12 +86,6 @@ module.exports = {
         red: {
           DEFAULT: '#EE5959',
         },
-        gray: {
-          lighter: '#F4F4F4',
-          light: '#e6e6e6',
-          DEFAULT: '#CCCCCC',
-          dark: '#999999',
-        },
         time: {
           sunrise: '#ffd266',
           sunset: '#FF8758',

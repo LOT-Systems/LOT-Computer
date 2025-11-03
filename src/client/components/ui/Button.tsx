@@ -48,29 +48,29 @@ export const Button: React.FC<Props> = ({
             cn(
               !isMirrorOn &&
                 'before:content-[""] before:absolute before:inset-0 before:bg-bac before:z-[-1]',
-              'hover:bg-acc-300/20',
+              'hover:bg-acc/10',
               'inline-flex justify-center items-center',
               'border border-acc text-acc py-8 transition-[background-color] rounded bg-transparent',
-              'disabled:border-acc-300/40 disabled:text-acc-300/40'
+              'disabled:border-acc/40 disabled:text-acc/40'
             )
       ),
     kind === 'secondary' &&
       cn(
         !isMirrorOn &&
           'before:content-[""] before:absolute before:inset-0 before:bg-bac before:z-[-1]',
-        'hover:bg-acc-300/20',
+        'hover:bg-acc/10',
         'inline-flex justify-center items-center',
         'border border-acc text-acc py-8 transition-[background-color] rounded bg-transparent',
-        'disabled:border-acc-300/40 disabled:text-acc-300/40'
+        'disabled:border-acc/40 disabled:text-acc/40'
       ),
     kind === 'secondary-rounded' &&
       cn(
         !isMirrorOn &&
           'before:content-[""] before:absolute before:inset-0 before:bg-bac before:z-[-1]',
-        'hover:bg-acc-300/20',
+        'hover:bg-acc/10',
         'inline-flex justify-center items-center transition-[background-color] rounded',
         'bg-transparent border border-acc text-acc rounded-[21px]',
-        'disabled:border-acc-300/40 disabled:text-acc-300/40'
+        'disabled:border-acc/40 disabled:text-acc/40'
       ),
     'cursor-pointer',
     SIZE_CLASSNAME[size],
@@ -106,7 +106,7 @@ export const GhostButton: React.FC<GhostButtonProps> = ({ ...props }) => {
         {...(props as ButtonProps)}
         className={cn(
           !!(props as ButtonProps).onClick &&
-            '-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc-400/10'
+            '-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc/10'
         )}
       />
     )
@@ -118,7 +118,7 @@ export const GhostButton: React.FC<GhostButtonProps> = ({ ...props }) => {
         {...(props as AProps)}
         className={cn(
           !!(props as AProps).href &&
-            '-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc-400/10'
+            '-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc/10'
         )}
       />
     )
