@@ -10,7 +10,8 @@ async function buildClient() {
       entryPoints: [
         './src/client/entries/app.tsx',
         './src/client/entries/login.tsx',
-        './src/client/entries/ui-lib.tsx'
+        './src/client/entries/ui-lib.tsx',
+        './src/client/entries/us.tsx'
       ],
       outdir: './dist/client/js',
       splitting: true,
