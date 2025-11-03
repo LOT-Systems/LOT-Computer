@@ -25,8 +25,8 @@ type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
 const CLASS_NAME = cn(
   'px-[20px] py-8',
   'border border-acc text-base leading-1.5 transition-colors rounded',
-  'hover:bg-acc-300/10 active:bg-acc-100/10',
-  'bg-transparent placeholder:text-acc focus:placeholder:text-acc-500/20 min-h-[42px]'
+  'hover:bg-acc/10 active:bg-acc/10',
+  'bg-transparent placeholder:text-acc/40 focus:placeholder:text-acc/20 min-h-[42px]'
 )
 
 export const Input: React.FC<Props> = ({
@@ -156,7 +156,7 @@ export const ResizibleGhostInput: React.FC<ResizibleGhostInputProps> = ({
         rows={1}
         className={cn(
           'bg-transparent text-acc',
-          'placeholder:text-acc focus:placeholder:text-acc-500/20',
+          'placeholder:text-acc/40 focus:placeholder:text-acc/20',
           className
         )}
         {...props}

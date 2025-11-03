@@ -135,7 +135,7 @@ export const Sync = () => {
             containerClassName="translate-y-[5px]"
           />
           <div className="flex items-center gap-x-16">
-            <span className="opacity-40 pointer-events-none select-none whitespace-nowrap">
+            <span className="text-acc/40 pointer-events-none select-none whitespace-nowrap">
               <Clock format="hh:mm A" interval={5e3} />
             </span>
             <Button
@@ -156,7 +156,7 @@ export const Sync = () => {
             key={x.id}
             className={cn(
               'group flex items-start gap-x-16 mb-8',
-              i >= SYNC_CHAT_MESSAGES_TO_SHOW && 'opacity-20'
+              i >= SYNC_CHAT_MESSAGES_TO_SHOW && 'text-acc/20'
             )}
           >
             <GhostButton
@@ -178,7 +178,7 @@ export const Sync = () => {
             {!!x.likes && (
               <Tag
                 className={cn(
-                  'opacity-40 select-none',
+                  'text-acc/40 border-acc/40 select-none',
                   !x.isLiked && 'border-transparent'
                 )}
                 title="Press author's name to like the message"
@@ -190,7 +190,7 @@ export const Sync = () => {
             )}
 
             {!isTouchDevice && (
-              <div className="opacity-0 transition-opacity select-none pointer-events-none whitespace-nowrap group-hover:opacity-40">
+              <div className="text-acc/0 transition-opacity select-none pointer-events-none whitespace-nowrap group-hover:text-acc/40">
                 <MessageTimeLabel dateString={x.createdAt} />
               </div>
             )}
