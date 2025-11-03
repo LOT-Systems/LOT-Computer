@@ -144,6 +144,8 @@ export const Settings = () => {
           UserTag.RND,
           UserTag.Evangelist,
           UserTag.Onyx,
+          UserTag.Usership,
+          UserTag.Pro,
         ].some((x) => userTagIds.includes(x)) && (
           <div>
             <Block label="Base color:" onChildrenClick={() => null}>
