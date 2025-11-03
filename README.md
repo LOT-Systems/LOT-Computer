@@ -14,19 +14,28 @@ APP_DESCRIPTION="LOT is a subscription service that distributes digital and phys
 
 PORT=4400
 APP_HOST="http://127.0.0.1:4400"
-DATABASE_URL="postgresql://user@localhost:5432/database"
 
+# Database
+DB_HOST="localhost"
+DB_PORT="5432"
+DB_NAME="lot_systems"
+DB_USER="postgres"
+DB_PASSWORD="..."
+
+# Authentication
 JWT_SECRET="..."
-JWT_COOKIE_KEY="jwt"
+JWT_COOKIE_KEY="auth_token"
 
-OPEN_WEATHER_API_KEY="..."
+# Email (Resend)
+RESEND_API_KEY="..."
+RESEND_FROM_EMAIL="auth@lot-systems.com"
+RESEND_FROM_NAME="LOT Systems"
+
+# Optional - for geocoding
 GEONAMES_USERNAME="..."
 
-MAILCHIMP_MANDRILL_API_KEY="..."
-MAILCHIMP_FROM_EMAIL="support@lot-systems.com"
-MAILCHIMP_FROM_NAME="LOT Systems"
-
-ADMINS='["alice@acme.com"]'
+# Admin emails (comma-separated)
+ADMIN_EMAILS="vadikmarmeladov@gmail.com"
 
 ```
 
@@ -46,16 +55,13 @@ yarn production:run
 
 ### Production server
 
-The app is hosted on Heroku. To deploy to the production server, you must configure a separate Git remote:
+The app is hosted on **Digital Ocean App Platform**. Deployment is automatic when pushing to the watched branch.
 
-```bash
-git remote add heroku https://git.heroku.com/lot-systems.git
-```
+Production URL: https://lot-systems.com
 
-Once configured, simply push the changes to the `heroku` remote:
+To deploy changes:
+1. Commit your changes to the main branch or feature branch
+2. Push to GitHub
+3. Digital Ocean automatically builds and deploys
 
-```bash
-git push heroku master
-```
-
-To inspect the app logs, visit [Papertrail](https://my.papertrailapp.com/systems/lot-systems/events).
+To view logs and app status, visit the Digital Ocean dashboard.
