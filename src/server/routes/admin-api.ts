@@ -29,6 +29,7 @@ export default async (fastify: FastifyInstance) => {
         .split(',')
         .map(fp.trim)
         .filter(Boolean)
+        .map((tag) => tag.toLowerCase()) // Normalize to lowercase for database lookup
       let order: [string, string] | Literal = ['createdAt', 'ASC']
       if (req.query.sort === 'newest') {
         order = ['createdAt', 'DESC']
@@ -130,7 +131,11 @@ export default async (fastify: FastifyInstance) => {
       if (!Object.keys(body).length) {
         return reply.throw.badParams()
       }
-      await user.set(req.body).save()
+      // Normalize tags to lowercase for database storage
+      if (body.tags) {
+        body.tags = body.tags.map((tag: string) => tag.toLowerCase())
+      }
+      await user.set(body).save()
       return user
     }
   )

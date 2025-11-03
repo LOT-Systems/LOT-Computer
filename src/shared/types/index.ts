@@ -4,7 +4,9 @@ export enum UserTag {
   RND = 'RND',
   Evangelist = 'Evangelist',
   Mala = 'Mala',
-  Onyx = 'Onyx'
+  Onyx = 'Onyx',
+  Usership = 'Usership',
+  Pro = 'Pro',
 }
 
 // User Types
