@@ -31,6 +31,7 @@ export type UserProfile = {
   phone: string | null;
   tags: string[];
   hideActivityLogs: boolean;
+  memoryEngine?: 'claude' | 'standard';
 };
 
 export type User = {

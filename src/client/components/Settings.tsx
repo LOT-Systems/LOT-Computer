@@ -69,7 +69,16 @@ export const Settings = () => {
   )
 
   const userTagIds = React.useMemo(() => {
-    return (me?.tags || []).filter((x) => !!getUserTagByIdCaseInsensitive(x))
+    // Convert database tags (lowercase) to enum values (proper case) for comparison
+    return (me?.tags || [])
+      .map((tag) => {
+        // Find the matching enum value by case-insensitive comparison
+        const enumValue = Object.values(UserTag).find(
+          (enumTag) => enumTag.toLowerCase() === tag.toLowerCase()
+        )
+        return enumValue
+      })
+      .filter(Boolean) as UserTag[]
   }, [me])
 
   return (
@@ -176,6 +185,12 @@ export const Settings = () => {
         <div>
           <Block label="Activity log:" onChildrenClick={onToggleActivityLogs}>
             {state.hideActivityLogs ? 'Off' : 'On'}
+          </Block>
+        </div>
+
+        <div>
+          <Block label="Memory Engine:">
+            {me?.memoryEngine === 'claude' ? 'Claude' : 'Standard'}
           </Block>
         </div>
 

@@ -176,7 +176,7 @@ export default async (fastify: FastifyInstance) => {
     ) => {
       const user = await fastify.models.User.findByPk(req.params.userId)
       if (!user) return reply.throw.notFound()
-      return await completeAndExtractQuestion(req.body.prompt)
+      return await completeAndExtractQuestion(req.body.prompt, user)
     }
   )
 }
