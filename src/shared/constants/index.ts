@@ -18,6 +18,24 @@ export const USER_TAGS_BY_ID: Record<UserTag, { name: string }> = {
   [UserTag.Onyx]: { name: 'Onyx' },
 }
 
+// Helper function for case-insensitive tag lookup
+export function getUserTagByIdCaseInsensitive(tagId: string): { name: string } | null {
+  // First try exact match
+  if (USER_TAGS_BY_ID[tagId as UserTag]) {
+    return USER_TAGS_BY_ID[tagId as UserTag]
+  }
+
+  // Try case-insensitive match
+  const normalizedId = tagId.toLowerCase()
+  for (const [key, value] of Object.entries(USER_TAGS_BY_ID)) {
+    if (key.toLowerCase() === normalizedId) {
+      return value
+    }
+  }
+
+  return null
+}
+
 export const LOG_MESSAGE_STALE_TIME_MINUTES = 1
 
 export const WEATHER_STALE_TIME_MINUTES = 40

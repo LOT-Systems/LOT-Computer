@@ -11,7 +11,7 @@ import {
 import { cn, formatNumberWithCommas } from '#client/utils'
 import { useExternalScript } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
-import { USER_TAGS_BY_ID } from '#shared/constants'
+import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
@@ -47,8 +47,8 @@ export const System = () => {
   const userTags = React.useMemo(() => {
     return (me?.tags || [])
       .map((x) => {
-        const tag = USER_TAGS_BY_ID[x]
-        return tag || null
+        const tag = getUserTagByIdCaseInsensitive(x)
+        return tag
       })
       .filter(Boolean)
   }, [me])

@@ -16,7 +16,7 @@ import {
   useUser,
   useUserMemoryPrompt,
 } from '#client/queries'
-import { USER_TAGS_BY_ID, COUNTRY_BY_ALPHA3 } from '#shared/constants'
+import { getUserTagByIdCaseInsensitive, USER_TAGS_BY_ID, COUNTRY_BY_ALPHA3 } from '#shared/constants'
 import { DefaultQuestion, UserTag } from '#shared/types'
 import * as stores from '#client/stores'
 import * as fp from '#shared/utils/fp'
@@ -163,9 +163,8 @@ export const AdminUser = () => {
                     : !user.tags.length
                     ? [<Unknown>None</Unknown>]
                     : user.tags.map((x) => {
-                        const tag = USER_TAGS_BY_ID[x] || {
+                        const tag = getUserTagByIdCaseInsensitive(x) || {
                           name: x,
-                          color: 'gray',
                         }
                         return (
                           <Tag key={x} fill>

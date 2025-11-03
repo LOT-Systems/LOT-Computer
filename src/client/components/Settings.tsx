@@ -6,7 +6,7 @@ import { Block, Button, Input, Select } from '#client/components/ui'
 import { UserSettings, UserTag } from '#shared/types'
 import {
   COUNTRIES,
-  USER_TAGS_BY_ID,
+  getUserTagByIdCaseInsensitive,
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
 import { cn } from '#client/utils'
@@ -69,7 +69,7 @@ export const Settings = () => {
   )
 
   const userTagIds = React.useMemo(() => {
-    return (me?.tags || []).filter((x) => !!USER_TAGS_BY_ID[x])
+    return (me?.tags || []).filter((x) => !!getUserTagByIdCaseInsensitive(x))
   }, [me])
 
   return (
