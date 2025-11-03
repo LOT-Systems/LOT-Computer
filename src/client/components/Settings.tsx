@@ -70,7 +70,7 @@ export const Settings = () => {
 
   const userTagIds = React.useMemo(() => {
     // Convert database tags (lowercase) to enum values (proper case) for comparison
-    return (me?.tags || [])
+    const tags = (me?.tags || [])
       .map((tag) => {
         // Find the matching enum value by case-insensitive comparison
         const enumValue = Object.values(UserTag).find(
@@ -79,6 +79,21 @@ export const Settings = () => {
         return enumValue
       })
       .filter(Boolean) as UserTag[]
+
+    // Debug logging to diagnose theme picker visibility issue
+    console.log('[Settings Debug] User tags from DB:', me?.tags)
+    console.log('[Settings Debug] Computed userTagIds:', tags)
+    console.log('[Settings Debug] Should show theme picker:', [
+      UserTag.Admin,
+      UserTag.Mala,
+      UserTag.RND,
+      UserTag.Evangelist,
+      UserTag.Onyx,
+      UserTag.Usership,
+      UserTag.Pro,
+    ].some((x) => tags.includes(x)))
+
+    return tags
   }, [me])
 
   return (
