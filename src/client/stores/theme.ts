@@ -191,10 +191,16 @@ state.isMirrorOn.subscribe((value) => {
     // NOTE: the following logic is duplicated in src/client/utils/sun.ts
     const _theme = theme.get()
     const _isCustomThemeEnabled = isCustomThemeEnabled.get()
-    if (_isCustomThemeEnabled && _theme !== 'custom') {
-      theme.set('custom')
+
+    // If custom theme is enabled, don't auto-switch themes
+    if (_isCustomThemeEnabled) {
+      if (_theme !== 'custom') {
+        theme.set('custom')
+      }
       return
     }
+
+    // Otherwise, do automatic theme switching based on time
     const weather = state.weather.get()
     if (!weather) {
       theme.set('light')
