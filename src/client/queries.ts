@@ -158,3 +158,8 @@ export const useCompleteMemoryPrompt = createMutation<
   { userId: string; prompt: string },
   DefaultQuestion
 >('post', (data) => `/admin-api/users/${data.userId}/memory-prompt`)
+
+export const useUserSummary = (userId: string) =>
+  createQuery<{ summary: string }>(`/admin-api/users/${userId}/summary`, {
+    enabled: !!userId,
+  })

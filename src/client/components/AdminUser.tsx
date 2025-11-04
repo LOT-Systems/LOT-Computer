@@ -15,6 +15,7 @@ import {
   useUpdateUser,
   useUser,
   useUserMemoryPrompt,
+  useUserSummary,
 } from '#client/queries'
 import { getUserTagByIdCaseInsensitive, USER_TAGS_BY_ID, COUNTRY_BY_ALPHA3 } from '#shared/constants'
 import { DefaultQuestion, UserTag } from '#shared/types'
@@ -40,6 +41,7 @@ export const AdminUser = () => {
     router?.route === 'adminUser' ? router.params.userId : ''
   )
   const { data: memoryPrompt } = useUserMemoryPrompt(user?.id!)
+  const { data: userSummaryData, isLoading: isSummaryLoading } = useUserSummary(user?.id!)
   const { mutate: updateUser } = useUpdateUser({
     onSuccess: () => refetchUser(),
   })
@@ -247,12 +249,14 @@ export const AdminUser = () => {
             )}
           </Block>
 
-          {!!Object.keys(user.metadata || {}).length && (
+          {(userSummaryData?.summary || isSummaryLoading) && (
             <div className="mt-32">
-              <Block label="Metadata:" blockView>
-                <Unknown>
-                  <pre>{JSON.stringify(user.metadata, null, 2)}</pre>
-                </Unknown>
+              <Block label="AI-Generated Profile Summary:" blockView>
+                {isSummaryLoading ? (
+                  <div className="opacity-60">Generating summary...</div>
+                ) : (
+                  <div className="whitespace-pre-wrap">{userSummaryData?.summary}</div>
+                )}
               </Block>
             </div>
           )}
