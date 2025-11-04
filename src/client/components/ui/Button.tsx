@@ -42,8 +42,8 @@ export const Button: React.FC<Props> = ({
     kind === 'primary' &&
       cn(
         isLightTheme
-          ? // Light mode: use accent color for button
-            'button-primary border rounded text-bac bg-acc border-acc-900 shadow-[white_inset_0_0_4px_0] transition-all hover:bg-acc-700 hover:border-acc-800'
+          ? // Light mode: use accent color for button with white text
+            'button-primary border rounded text-white bg-acc border-acc-900 shadow-[white_inset_0_0_4px_0] transition-all hover:bg-acc-700 hover:border-acc-800'
           : // Dark/themed mode: match secondary button style
             cn(
               !isMirrorOn &&
