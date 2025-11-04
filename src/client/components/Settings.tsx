@@ -15,6 +15,7 @@ export const Settings = () => {
   const me = useStore(stores.me)
   const baseColor = useStore(stores.baseColor)
   const accentColor = useStore(stores.accentColor)
+  const isCustomThemeEnabled = useStore(stores.isCustomThemeEnabled)
 
   const { mutate: updateSettings } = useUpdateSettings({
     onSuccess: () => {
@@ -59,6 +60,17 @@ export const Settings = () => {
     }))
     setChanged(true)
   }, [])
+
+  const onToggleCustomTheme = React.useCallback(() => {
+    const newValue = !isCustomThemeEnabled
+    stores.isCustomThemeEnabled.set(newValue)
+    if (newValue) {
+      stores.theme.set('custom')
+    } else {
+      // Switch back to automatic theme based on time
+      stores.theme.set('light')
+    }
+  }, [isCustomThemeEnabled])
 
   const onSubmit = React.useCallback(
     async (ev: React.FormEvent) => {
@@ -172,6 +184,9 @@ export const Settings = () => {
           UserTag.Pro,
         ].some((x) => userTagIds.includes(x)) && (
           <div>
+            <Block label="Custom theme:" onChildrenClick={onToggleCustomTheme}>
+              {isCustomThemeEnabled ? 'On' : 'Off'}
+            </Block>
             <Block label="Base color:" onChildrenClick={() => null}>
               <span className={cn('inline-flex relative overflow-hidden')}>
                 <input
