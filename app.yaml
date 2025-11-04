@@ -33,7 +33,7 @@ services:
         value: "8080"
       - key: APP_NAME
         scope: RUN_AND_BUILD_TIME
-        value: "LOT Systems"
+        value: "LOT"
       - key: APP_HOST
         scope: RUN_AND_BUILD_TIME
         value: "${_self.PUBLIC_URL}"
@@ -53,4 +53,4 @@ services:
         value: "support@lot-systems.com"
       - key: RESEND_FROM_NAME
         scope: RUN_TIME
-        value: "LOT Systems"
+        value: "LOT"
