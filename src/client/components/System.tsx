@@ -175,7 +175,7 @@ export const System = () => {
                 className={cn(
                   weather?.humidity > 60 &&
                     theme === 'light' &&
-                    'text-blue-light'
+                    'text-acc-600'
                 )}
               >
                 {weather?.humidity}%
