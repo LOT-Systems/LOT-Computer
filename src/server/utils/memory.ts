@@ -48,6 +48,10 @@ const questionSchema = z.object({
   options: z.array(z.string()),
 })
 
+const userSummarySchema = z.object({
+  summary: z.string(),
+})
+
 // Helper to determine which engine to use based on user tags
 export function getMemoryEngine(user: User): 'claude' | 'standard' {
   // Temporarily disabled Anthropic integration due to Instructor compatibility issues
@@ -245,4 +249,50 @@ const MODULE_BY_LOG_EVENT: Record<LogEvent, string> = {
   weather_update: 'Weather',
   note: 'Note',
   other: 'Other',
+}
+
+export async function generateUserSummary(user: User, logs: Log[]): Promise<string> {
+  const context = await getLogContext(user)
+  const country = user.country ? COUNTRY_BY_ALPHA3[user.country]?.name || user.country : 'Unknown'
+
+  const tags = user.tags.length > 0 ? user.tags.join(', ') : 'None'
+  const joinedDate = user.joinedAt ? dayjs(user.joinedAt).format('D MMMM YYYY') : 'Not activated'
+  const lastSeen = user.lastSeenAt ? dayjs(user.lastSeenAt).fromNow() : 'Never'
+
+  const formattedLogs = logs.slice(0, 30).map(formatLog).filter(Boolean).join('\n\n')
+
+  const prompt = `You are an AI assistant helping administrators understand their users better.
+
+Analyze the following user profile and activity logs, then provide a concise, insightful summary of this user (2-3 paragraphs max).
+
+Focus on:
+- User's engagement patterns and activity level
+- Interests and behaviors evident from their actions
+- Location and context
+- Overall user persona and characteristics
+
+User Profile:
+- Name: ${[user.firstName, user.lastName].filter(Boolean).join(' ') || 'Not provided'}
+- Email: ${user.email}
+- Location: ${user.city || 'Unknown'}, ${country}
+- Tags: ${tags}
+- Joined: ${joinedDate}
+- Last seen: ${lastSeen}
+- Activity logs count: ${logs.length}
+
+Recent Activity Logs:
+${formattedLogs || 'No activity logs available'}
+
+Provide a professional, insightful summary of this user.`
+
+  const result = await oaiClient.chat.completions.create({
+    messages: [{ role: 'user', content: prompt }],
+    model: 'gpt-4o-mini',
+    response_model: {
+      schema: userSummarySchema,
+      name: 'UserSummary',
+    },
+  })
+
+  return userSummarySchema.parse(result).summary
 }
