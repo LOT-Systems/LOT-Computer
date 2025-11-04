@@ -259,31 +259,47 @@ export async function generateUserSummary(user: User, logs: Log[]): Promise<stri
   const joinedDate = user.joinedAt ? dayjs(user.joinedAt).format('D MMMM YYYY') : 'Not activated'
   const lastSeen = user.lastSeenAt ? dayjs(user.lastSeenAt).fromNow() : 'Never'
 
-  const formattedLogs = logs.slice(0, 30).map(formatLog).filter(Boolean).join('\n\n')
+  // Extract memory/answer logs specifically
+  const answerLogs = logs.filter((log) => log.event === 'answer')
+  const formattedAnswers = answerLogs.slice(0, 20).map(formatLog).filter(Boolean).join('\n\n')
 
-  const prompt = `You are an AI assistant helping administrators understand their users better.
+  // Extract subscription info from metadata
+  const hasSubscription = user.stripeCustomerId || (user.metadata as any)?.subscription
+  const subscriptionInfo = hasSubscription
+    ? `Has physical subscription history (Stripe ID: ${user.stripeCustomerId || 'in metadata'})`
+    : 'No physical subscription history'
 
-Analyze the following user profile and activity logs, then provide a concise, insightful summary of this user (2-3 paragraphs max).
+  // Count different types of activities
+  const answerCount = answerLogs.length
+  const otherActivityCount = logs.length - answerCount
 
-Focus on:
-- User's engagement patterns and activity level
-- Interests and behaviors evident from their actions
-- Location and context
-- Overall user persona and characteristics
+  const prompt = `You are an AI assistant helping administrators understand LOT Systems users' self-care habits and lifestyle patterns.
+
+LOT Systems is a subscription service focused on digital and physical necessities, wardrobes, organic self-care products, and essentials.
+
+Analyze this user's Memory prompt answers and activity to create an insightful profile summary (2-3 paragraphs).
+
+**Focus specifically on:**
+1. **Self-care habits and understanding** - What do their answers reveal about their lifestyle, habits, and self-care approach?
+2. **Memory engagement patterns** - How engaged are they with the Memory feature? What themes emerge from their answers?
+3. **Subscription relationship** - Do they have physical subscription history? How does this relate to their digital engagement?
 
 User Profile:
 - Name: ${[user.firstName, user.lastName].filter(Boolean).join(' ') || 'Not provided'}
-- Email: ${user.email}
 - Location: ${user.city || 'Unknown'}, ${country}
 - Tags: ${tags}
 - Joined: ${joinedDate}
 - Last seen: ${lastSeen}
-- Activity logs count: ${logs.length}
+- Subscription: ${subscriptionInfo}
+- Memory answers: ${answerCount} responses
+- Other activities: ${otherActivityCount} actions
 
-Recent Activity Logs:
-${formattedLogs || 'No activity logs available'}
+Memory Prompt Answers (their self-care and lifestyle responses):
+${formattedAnswers || 'No Memory answers yet - user hasn\'t engaged with the Memory feature'}
 
-Provide a professional, insightful summary of this user.`
+${answerCount === 0 ? '\nNote: This user has not yet answered any Memory prompts, so insights are limited to their basic profile and activity patterns.' : ''}
+
+Provide a warm, insightful summary that helps admins understand this user's self-care journey and engagement with LOT Systems.`
 
   const result = await oaiClient.chat.completions.create({
     messages: [{ role: 'user', content: prompt }],
