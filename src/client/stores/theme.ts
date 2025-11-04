@@ -133,6 +133,7 @@ theme.subscribe((value) => {
 function handleColorsChange() {
   const base = baseColor.get()
   const acc = accentColor.get()
+  const currentTheme = theme.get()
 
   let _theme: ClientTheme | null = null
   for (const [key, value] of Object.entries(THEMES)) {
@@ -141,11 +142,16 @@ function handleColorsChange() {
       break
     }
   }
-  if (_theme) {
+
+  // Prevent circular updates: only set theme if it's actually changing
+  if (_theme && _theme !== currentTheme) {
     theme.set(_theme)
-  } else {
+  } else if (!_theme && currentTheme !== 'custom') {
     customTheme.set({ base, acc })
     theme.set('custom')
+  } else if (!_theme && currentTheme === 'custom') {
+    // Already custom theme, just update colors without triggering theme change
+    customTheme.set({ base, acc })
   }
 }
 const handleColorsChangeDebounced = fp.debounce(handleColorsChange, 400)
