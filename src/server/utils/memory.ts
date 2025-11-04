@@ -1,6 +1,6 @@
 import Instructor from '@instructor-ai/instructor'
 import OpenAI from 'openai'
-import Anthropic from '@anthropic-ai/sdk'
+// import Anthropic from '@anthropic-ai/sdk' // Temporarily disabled
 import { z } from 'zod'
 import dayjs from '#server/utils/dayjs'
 import config from '#server/config'
@@ -33,14 +33,15 @@ const oaiClient = Instructor({
 })
 
 // Anthropic client (for Usership users)
-const anthropic = new Anthropic({
-  apiKey: config.anthropic.apiKey,
-})
-
-const anthropicClient = Instructor({
-  client: anthropic,
-  mode: 'TOOLS',
-})
+// TODO: Fix Anthropic client initialization with Instructor library
+// const anthropic = new Anthropic({
+//   apiKey: config.anthropic.apiKey,
+// })
+//
+// const anthropicClient = Instructor({
+//   client: anthropic,
+//   mode: 'TOOLS',
+// })
 
 const questionSchema = z.object({
   question: z.string(),
@@ -49,10 +50,14 @@ const questionSchema = z.object({
 
 // Helper to determine which engine to use based on user tags
 export function getMemoryEngine(user: User): 'claude' | 'standard' {
-  const hasUsershipTag = user.tags.some(
-    (tag) => tag.toLowerCase() === UserTag.Usership.toLowerCase()
-  )
-  return hasUsershipTag && config.anthropic.apiKey ? 'claude' : 'standard'
+  // Temporarily disabled Anthropic integration due to Instructor compatibility issues
+  // TODO: Re-enable once Anthropic client is properly configured with Instructor
+  return 'standard'
+
+  // const hasUsershipTag = user.tags.some(
+  //   (tag) => tag.toLowerCase() === UserTag.Usership.toLowerCase()
+  // )
+  // return hasUsershipTag && config.anthropic.apiKey ? 'claude' : 'standard'
 }
 
 export async function completeAndExtractQuestion(
@@ -61,20 +66,22 @@ export async function completeAndExtractQuestion(
 ): Promise<MemoryQuestion> {
   const engine = getMemoryEngine(user)
 
-  if (engine === 'claude') {
-    // Use Anthropic Claude for Usership users
-    const extractedQuestion = await anthropicClient.messages.create({
-      messages: [{ role: 'user', content: prompt }],
-      model: 'claude-3-5-haiku-20241022',
-      max_tokens: 1024,
-      response_model: {
-        schema: questionSchema,
-        name: 'Question',
-      },
-    })
-    return questionSchema.parse(extractedQuestion)
-  } else {
-    // Use OpenAI for regular users
+  // Temporarily using OpenAI for all users until Anthropic integration is fixed
+  // TODO: Re-enable Claude for Usership users once Anthropic client is properly configured
+  // if (engine === 'claude') {
+  //   // Use Anthropic Claude for Usership users
+  //   const extractedQuestion = await anthropicClient.messages.create({
+  //     messages: [{ role: 'user', content: prompt }],
+  //     model: 'claude-3-5-haiku-20241022',
+  //     max_tokens: 1024,
+  //     response_model: {
+  //       schema: questionSchema,
+  //       name: 'Question',
+  //     },
+  //   })
+  //   return questionSchema.parse(extractedQuestion)
+  // } else {
+    // Use OpenAI for all users
     const extractedQuestion = await oaiClient.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
       model: 'gpt-4o-mini',
@@ -84,7 +91,7 @@ export async function completeAndExtractQuestion(
       },
     })
     return questionSchema.parse(extractedQuestion)
-  }
+  // }
 }
 
 export async function buildPrompt(user: User, logs: Log[]): Promise<string> {
