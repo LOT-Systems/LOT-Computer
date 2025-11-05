@@ -42,9 +42,9 @@ export const Button: React.FC<Props> = ({
     kind === 'primary' &&
       cn(
         isLightTheme
-          ? // Light mode: use accent color for button with white text
-            'button-primary border rounded text-white bg-acc border-acc-900 shadow-[white_inset_0_0_4px_0] transition-all hover:bg-acc-700 hover:border-acc-800'
-          : // Dark/themed mode: transparent with accent border
+          ? // Light mode: blue solid button with white text
+            'button-primary border rounded text-white bg-blue-600 border-blue-900 shadow-[white_inset_0_0_4px_0] transition-all hover:bg-blue-700 hover:border-blue-800'
+          : // Dark/themed mode: accent-colored transparent border
             cn(
               'hover:bg-acc/10',
               'inline-flex justify-center items-center',
@@ -61,6 +61,8 @@ export const Button: React.FC<Props> = ({
       ),
     kind === 'secondary-rounded' &&
       cn(
+        !isMirrorOn &&
+          'before:content-[""] before:absolute before:inset-0 before:bg-bac before:z-[-1]',
         'hover:bg-acc/10',
         'inline-flex justify-center items-center transition-[background-color] rounded',
         'bg-transparent border border-acc text-acc rounded-[21px]',
