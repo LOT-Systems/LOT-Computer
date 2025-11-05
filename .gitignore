@@ -13,3 +13,5 @@ node_modules/
 *.zip
 *-archive/
 lot-systems_v*
+*ARCHIVE_README*
+lot-systems_master_*
