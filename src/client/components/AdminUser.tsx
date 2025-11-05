@@ -249,13 +249,15 @@ export const AdminUser = () => {
             )}
           </Block>
 
-          {(userSummaryData?.summary || isSummaryLoading) && (
+          {user && (
             <div className="mt-32">
               <Block label="AI-Generated Profile Summary:" blockView>
                 {isSummaryLoading ? (
                   <div className="opacity-60">Generating summary...</div>
+                ) : userSummaryData?.summary ? (
+                  <div className="whitespace-pre-wrap">{userSummaryData.summary}</div>
                 ) : (
-                  <div className="whitespace-pre-wrap">{userSummaryData?.summary}</div>
+                  <div className="opacity-60">No summary available</div>
                 )}
               </Block>
             </div>
