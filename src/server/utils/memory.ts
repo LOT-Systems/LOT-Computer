@@ -150,7 +150,7 @@ ${memoryLogs
     const date = log.context.timeZone
       ? dayjs(log.createdAt).tz(log.context.timeZone).format('D MMM')
       : ''
-    return `${index + 1}. ${date ? `[${date}] ` : '"}${q} → User chose: "${a}"`
+    return `${index + 1}. ${date ? `[${date}] ` : ""}${q} → User chose: "${a}"`
   })
   .join('\n')}
 

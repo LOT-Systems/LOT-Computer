@@ -166,9 +166,9 @@ export const useCompleteMemoryPrompt = createMutation<
 export const useUserSummary = (userId: string) =>
   createQuery<{ summary: string }>(`/admin-api/users/${userId}/summary`, {
     enabled: !!userId,
-  })
+  })()
 
 export const useUserMemoryStory = (userId: string) =>
   createQuery<{ story: string }>(`/admin-api/users/${userId}/memory-story`, {
     enabled: !!userId,
-  })
+  })()
