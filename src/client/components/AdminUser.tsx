@@ -16,6 +16,7 @@ import {
   useUser,
   useUserMemoryPrompt,
   useUserSummary,
+  useUserMemoryStory,
 } from '#client/queries'
 import { getUserTagByIdCaseInsensitive, USER_TAGS_BY_ID, COUNTRY_BY_ALPHA3 } from '#shared/constants'
 import { DefaultQuestion, UserTag } from '#shared/types'
@@ -42,6 +43,7 @@ export const AdminUser = () => {
   )
   const { data: memoryPrompt } = useUserMemoryPrompt(user?.id!)
   const { data: userSummaryData, isLoading: isSummaryLoading } = useUserSummary(user?.id!)
+  const { data: memoryStoryData, isLoading: isStoryLoading } = useUserMemoryStory(user?.id!)
   const { mutate: updateUser } = useUpdateUser({
     onSuccess: () => refetchUser(),
   })
@@ -248,6 +250,20 @@ export const AdminUser = () => {
               </div>
             )}
           </Block>
+
+          {user && (
+            <div className="mt-32">
+              <Block label="Memory Story (What we know about user):" blockView>
+                {isStoryLoading ? (
+                  <div className="opacity-60">Generating story...</div>
+                ) : memoryStoryData?.story ? (
+                  <div className="whitespace-pre-wrap">{memoryStoryData.story}</div>
+                ) : (
+                  <div className="opacity-60">No Memory answers yet</div>
+                )}
+              </Block>
+            </div>
+          )}
 
           {user && (
             <div className="mt-32">

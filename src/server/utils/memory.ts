@@ -274,6 +274,52 @@ const MODULE_BY_LOG_EVENT: Record<LogEvent, string> = {
   other: 'Other',
 }
 
+export async function generateMemoryStory(user: User, logs: Log[]): Promise<string> {
+  // Extract only Memory/answer logs
+  const answerLogs = logs.filter((log) => log.event === 'answer')
+
+  if (answerLogs.length === 0) {
+    return 'No Memory story yet - user hasn\'t answered any prompts.'
+  }
+
+  // Format answers for AI to synthesize
+  const formattedAnswers = answerLogs
+    .slice(0, 30)
+    .map((log) => {
+      const q = log.metadata.question || ''
+      const a = log.metadata.answer || ''
+      const date = log.context.timeZone
+        ? dayjs(log.createdAt).tz(log.context.timeZone).format('D MMM YYYY')
+        : ''
+      return `[${date}] ${q} → "${a}"`
+    })
+    .join('\n')
+
+  const prompt = `You are analyzing a user's Memory answers from LOT Systems, a self-care and lifestyle subscription service.
+
+Based on their answers to personalized questions over time, create a narrative story about their preferences, habits, and lifestyle. Write in third person ("User prefers...", "They enjoy...").
+
+Format as a flowing narrative with bullet points for key insights. Focus on:
+- Daily routines and preferences (morning beverages, meals, clothing)
+- Self-care habits and priorities
+- Lifestyle patterns and choices
+- Personality traits evident in their answers
+
+User's Memory Answers (chronological):
+${formattedAnswers}
+
+Generate a concise narrative story (3-5 bullet points) that captures who this person is based on their Memory answers:`
+
+  const result = await oaiClient.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [{ role: 'user', content: prompt }],
+    max_tokens: 500,
+    temperature: 0.7,
+  })
+
+  return result.choices[0]?.message?.content || 'Unable to generate story.'
+}
+
 export async function generateUserSummary(user: User, logs: Log[]): Promise<string> {
   const context = await getLogContext(user)
   const country = user.country ? COUNTRY_BY_ALPHA3[user.country]?.name || user.country : 'Unknown'
