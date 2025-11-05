@@ -326,7 +326,7 @@ export async function generateUserSummary(user: User, logs: Log[]): Promise<stri
 
   const tags = user.tags.length > 0 ? user.tags.join(', ') : 'None'
   const joinedDate = user.joinedAt ? dayjs(user.joinedAt).format('D MMMM YYYY') : 'Not activated'
-  const lastSeen = user.lastSeenAt ? dayjs(user.lastSeenAt).fromNow() : 'Never'
+  const lastSeen = user.lastSeenAt ? dayjs(user.lastSeenAt).format('D MMMM YYYY, HH:mm') : 'Never'
 
   // Extract memory/answer logs specifically
   const answerLogs = logs.filter((log) => log.event === 'answer')
