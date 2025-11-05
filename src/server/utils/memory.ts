@@ -1,6 +1,6 @@
 import Instructor from '@instructor-ai/instructor'
 import OpenAI from 'openai'
-// import Anthropic from '@anthropic-ai/sdk' // Temporarily disabled
+import Anthropic from '@anthropic-ai/sdk'
 import { z } from 'zod'
 import dayjs from '#server/utils/dayjs'
 import config from '#server/config'
@@ -32,16 +32,10 @@ const oaiClient = Instructor({
   mode: 'TOOLS',
 })
 
-// Anthropic client (for Usership users)
-// TODO: Fix Anthropic client initialization with Instructor library
-// const anthropic = new Anthropic({
-//   apiKey: config.anthropic.apiKey,
-// })
-//
-// const anthropicClient = Instructor({
-//   client: anthropic,
-//   mode: 'TOOLS',
-// })
+// Anthropic client (for Usership users) - using SDK directly
+const anthropic = new Anthropic({
+  apiKey: config.anthropic.apiKey,
+})
 
 const questionSchema = z.object({
   question: z.string(),
@@ -54,14 +48,10 @@ const userSummarySchema = z.object({
 
 // Helper to determine which engine to use based on user tags
 export function getMemoryEngine(user: User): 'claude' | 'standard' {
-  // Temporarily disabled Anthropic integration due to Instructor compatibility issues
-  // TODO: Re-enable once Anthropic client is properly configured with Instructor
-  return 'standard'
-
-  // const hasUsershipTag = user.tags.some(
-  //   (tag) => tag.toLowerCase() === UserTag.Usership.toLowerCase()
-  // )
-  // return hasUsershipTag && config.anthropic.apiKey ? 'claude' : 'standard'
+  const hasUsershipTag = user.tags.some(
+    (tag) => tag.toLowerCase() === UserTag.Usership.toLowerCase()
+  )
+  return hasUsershipTag && config.anthropic.apiKey ? 'claude' : 'standard'
 }
 
 export async function completeAndExtractQuestion(
@@ -70,22 +60,41 @@ export async function completeAndExtractQuestion(
 ): Promise<MemoryQuestion> {
   const engine = getMemoryEngine(user)
 
-  // Temporarily using OpenAI for all users until Anthropic integration is fixed
-  // TODO: Re-enable Claude for Usership users once Anthropic client is properly configured
-  // if (engine === 'claude') {
-  //   // Use Anthropic Claude for Usership users
-  //   const extractedQuestion = await anthropicClient.messages.create({
-  //     messages: [{ role: 'user', content: prompt }],
-  //     model: 'claude-3-5-haiku-20241022',
-  //     max_tokens: 1024,
-  //     response_model: {
-  //       schema: questionSchema,
-  //       name: 'Question',
-  //     },
-  //   })
-  //   return questionSchema.parse(extractedQuestion)
-  // } else {
-    // Use OpenAI for all users
+  if (engine === 'claude') {
+    // Use Anthropic Claude for Usership users - direct SDK call
+    const response = await anthropic.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 1024,
+      messages: [{
+        role: 'user',
+        content: `${prompt}
+
+Please respond with ONLY a valid JSON object in this exact format:
+{
+  "question": "your question here",
+  "options": ["option1", "option2", "option3"]
+}
+
+Make sure the question is personalized, relevant to self-care habits, and the options are 3-4 concise choices.`
+      }],
+    })
+
+    // Extract text content from Claude's response
+    const textContent = response.content.find((block) => block.type === 'text')
+    if (!textContent || textContent.type !== 'text') {
+      throw new Error('No text content in Claude response')
+    }
+
+    // Parse JSON from response
+    const jsonMatch = textContent.text.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) {
+      throw new Error('No JSON found in Claude response')
+    }
+
+    const parsed = JSON.parse(jsonMatch[0])
+    return questionSchema.parse(parsed)
+  } else {
+    // Use OpenAI for regular users
     const extractedQuestion = await oaiClient.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
       model: 'gpt-4o-mini',
@@ -95,7 +104,7 @@ export async function completeAndExtractQuestion(
       },
     })
     return questionSchema.parse(extractedQuestion)
-  // }
+  }
 }
 
 export async function buildPrompt(user: User, logs: Log[]): Promise<string> {
