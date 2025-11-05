@@ -448,19 +448,59 @@ export default async (fastify: FastifyInstance) => {
       }).then(Boolean)
       if (isRecentlyAsked) return null
 
-      // Generate AI-based context-aware question
-      const logs = await fastify.models.Log.findAll({
-        where: {
-          userId: req.user.id,
-        },
-        order: [['createdAt', 'DESC']],
-        limit: 20,
-      })
+      // Check if user has Usership tag for AI-generated questions
+      const hasUsershipTag = req.user.tags.some(
+        (tag) => tag.toLowerCase() === 'usership'
+      )
 
-      const prompt = await buildPrompt(req.user, logs)
-      const question = await completeAndExtractQuestion(prompt, req.user)
+      if (hasUsershipTag) {
+        // Usership users: Generate AI-based context-aware question using Claude
+        const logs = await fastify.models.Log.findAll({
+          where: {
+            userId: req.user.id,
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 20,
+        })
 
-      return question
+        const prompt = await buildPrompt(req.user, logs)
+        const question = await completeAndExtractQuestion(prompt, req.user)
+
+        return question
+      } else {
+        // Non-Usership users: Use hardcoded questions
+        const prevQuestionIds = await fastify.models.Answer.findAll({
+          where: {
+            userId: req.user.id,
+          },
+          order: [['createdAt', 'DESC']],
+          attributes: ['id', 'metadata'],
+        }).then((xs) => Array.from(new Set(xs.map((x) => x.metadata.questionId))))
+
+        let untouchedQuestions = defaultQuestions
+        if (prevQuestionIds.length) {
+          untouchedQuestions = defaultQuestions.filter(
+            fp.propNotIn('id', prevQuestionIds)
+          )
+          if (!untouchedQuestions.length) {
+            const longAgoAnsweredQuestionIds = prevQuestionIds.slice(
+              -1 * Math.floor(prevQuestionIds.length / 3)
+            )
+            untouchedQuestions = defaultQuestions.filter(
+              fp.propIn('id', longAgoAnsweredQuestionIds)
+            )
+          }
+        }
+
+        const rng = seedrandom(
+          `${req.user.id} ${localDate.format(DATE_FORMAT)} ${
+            isNightPeriod ? 'N' : 'D'
+          }`
+        )
+        const question =
+          untouchedQuestions[Math.floor(rng() * untouchedQuestions.length)]
+        return question
+      }
     }
   )
 
