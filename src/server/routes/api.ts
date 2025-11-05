@@ -25,6 +25,7 @@ import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
+import { buildPrompt, completeAndExtractQuestion } from '#server/utils/memory'
 import dayjs from '#server/utils/dayjs'
 
 export default async (fastify: FastifyInstance) => {
@@ -447,36 +448,18 @@ export default async (fastify: FastifyInstance) => {
       }).then(Boolean)
       if (isRecentlyAsked) return null
 
-      const prevQuestionIds = await fastify.models.Answer.findAll({
+      // Generate AI-based context-aware question
+      const logs = await fastify.models.Log.findAll({
         where: {
           userId: req.user.id,
         },
         order: [['createdAt', 'DESC']],
-        attributes: ['id', 'metadata'],
-      }).then((xs) => Array.from(new Set(xs.map((x) => x.metadata.questionId))))
+        limit: 20,
+      })
 
-      let untouchedQuestions = defaultQuestions
-      if (prevQuestionIds.length) {
-        untouchedQuestions = defaultQuestions.filter(
-          fp.propNotIn('id', prevQuestionIds)
-        )
-        if (!untouchedQuestions.length) {
-          const longAgoAnsweredQuestionIds = prevQuestionIds.slice(
-            -1 * Math.floor(prevQuestionIds.length / 3)
-          )
-          untouchedQuestions = defaultQuestions.filter(
-            fp.propIn('id', longAgoAnsweredQuestionIds)
-          )
-        }
-      }
+      const prompt = await buildPrompt(req.user, logs)
+      const question = await completeAndExtractQuestion(prompt, req.user)
 
-      const rng = seedrandom(
-        `${req.user.id} ${localDate.format(DATE_FORMAT)} ${
-          isNightPeriod ? 'N' : 'D'
-        }`
-      )
-      const question =
-        untouchedQuestions[Math.floor(rng() * untouchedQuestions.length)]
       return question
     }
   )
@@ -484,15 +467,38 @@ export default async (fastify: FastifyInstance) => {
   fastify.post(
     '/memory/answer',
     async (
-      req: FastifyRequest<{ Body: { questionId: string; option: string } }>,
+      req: FastifyRequest<{
+        Body: {
+          questionId: string
+          option: string
+          question?: string
+          options?: string[]
+        }
+      }>,
       reply
     ) => {
       const { questionId, option } = req.body
-      const question = defaultQuestions.find(fp.propEq('id', questionId))
-      if (!question) {
-        return reply.throw.badParams()
+
+      // Try to find in default questions first (backwards compatibility)
+      let question = defaultQuestions.find(fp.propEq('id', questionId))
+      let questionText: string
+      let questionOptions: string[]
+
+      if (question) {
+        // Default question
+        questionText = question.question
+        questionOptions = question.options
+      } else {
+        // AI-generated question - accept from request body
+        if (!req.body.question || !req.body.options) {
+          return reply.throw.badParams()
+        }
+        questionText = req.body.question
+        questionOptions = req.body.options
       }
-      if (!question.options.includes(option)) {
+
+      // Validate the selected option
+      if (!questionOptions.includes(option)) {
         return reply.throw.badParams()
       }
 
@@ -500,8 +506,8 @@ export default async (fastify: FastifyInstance) => {
 
       const answer = await fastify.models.Answer.create({
         userId: req.user.id,
-        question: question.question,
-        options: question.options,
+        question: questionText,
+        options: questionOptions,
         answer: option,
         metadata: { questionId },
       })
@@ -515,8 +521,8 @@ export default async (fastify: FastifyInstance) => {
           metadata: {
             questionId,
             answerId: answer.id,
-            question: question.question,
-            options: question.options,
+            question: questionText,
+            options: questionOptions,
             answer: option,
           },
           context,

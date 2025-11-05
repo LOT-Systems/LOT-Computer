@@ -176,6 +176,7 @@ export type DefaultQuestion = {
 };
 
 export type MemoryQuestion = {
+  id?: string;
   question: string;
   answer?: string;
   options?: string[];

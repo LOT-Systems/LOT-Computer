@@ -1,6 +1,7 @@
 import Instructor from '@instructor-ai/instructor'
 import OpenAI from 'openai'
 import Anthropic from '@anthropic-ai/sdk'
+import { randomUUID } from 'crypto'
 import { z } from 'zod'
 import dayjs from '#server/utils/dayjs'
 import config from '#server/config'
@@ -92,7 +93,11 @@ Make sure the question is personalized, relevant to self-care habits, and the op
     }
 
     const parsed = JSON.parse(jsonMatch[0])
-    return questionSchema.parse(parsed)
+    const validatedQuestion = questionSchema.parse(parsed)
+    return {
+      id: randomUUID(),
+      ...validatedQuestion,
+    }
   } else {
     // Use OpenAI for regular users
     const extractedQuestion = await oaiClient.chat.completions.create({
@@ -103,7 +108,11 @@ Make sure the question is personalized, relevant to self-care habits, and the op
         name: 'Question',
       },
     })
-    return questionSchema.parse(extractedQuestion)
+    const validatedQuestion = questionSchema.parse(extractedQuestion)
+    return {
+      id: randomUUID(),
+      ...validatedQuestion,
+    }
   }
 }
 
