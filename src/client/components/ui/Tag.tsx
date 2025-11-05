@@ -18,7 +18,7 @@ export const Tag: React.FC<Props> = ({
 }) => {
   const resultClassName = useMemo(() => {
     return cn(
-      'rounded px-[6px]',
+      'rounded px-[6px] py-[2px]',
       'border border-transparent',
       fill ? 'bg-acc text-bac' : 'border-acc text-acc',
       !!(href || rest.onClick) ? 'cursor-pointer' : '',
