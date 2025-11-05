@@ -3,7 +3,7 @@ import { Literal } from 'sequelize/types/utils'
 import { FastifyInstance, FastifyRequest } from 'fastify'
 import { AdminUsersSort, LogEvent, Paginated, User } from '#shared/types'
 import { fp } from '#shared/utils'
-import { buildPrompt, completeAndExtractQuestion, generateUserSummary } from '#server/utils/memory'
+import { buildPrompt, completeAndExtractQuestion, generateUserSummary, generateMemoryStory } from '#server/utils/memory'
 import { sync } from '../sync.js'
 import dayjs from '../utils/dayjs.js'
 
@@ -196,6 +196,26 @@ export default async (fastify: FastifyInstance) => {
 
       const summary = await generateUserSummary(user, logs)
       return { summary }
+    }
+  )
+
+  fastify.get(
+    '/users/:userId/memory-story',
+    async (req: FastifyRequest<{ Params: { userId: string } }>, reply) => {
+      const user = await fastify.models.User.findByPk(req.params.userId)
+      if (!user) return reply.throw.notFound()
+
+      const logs = await fastify.models.Log.findAll({
+        where: {
+          userId: user.id,
+          event: 'answer',
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 100,
+      })
+
+      const story = await generateMemoryStory(user, logs)
+      return { story }
     }
   )
 }
