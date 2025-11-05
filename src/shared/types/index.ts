@@ -7,6 +7,7 @@ export enum UserTag {
   Onyx = 'Onyx',
   Usership = 'Usership',
   Pro = 'Pro',
+  Suspended = 'Suspended',
 }
 
 // User Types

@@ -153,6 +153,7 @@ export const AdminUser = () => {
                         return (
                           <Tag
                             key={tagId}
+                            color={tag.color}
                             fill={tagsChanged.includes(tagId)}
                             onClick={() => {
                               setTagsChanged(
@@ -171,7 +172,7 @@ export const AdminUser = () => {
                           name: x,
                         }
                         return (
-                          <Tag key={x} fill>
+                          <Tag key={x} color={tag.color} fill>
                             {tag.name}
                           </Tag>
                         )

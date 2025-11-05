@@ -141,7 +141,7 @@ export const System = () => {
           <Block label="Team:" blockView>
             <TagsContainer
               items={userTags.map((x) => (
-                <Tag key={x.name}>{x.name}</Tag>
+                <Tag key={x.name} color={x.color}>{x.name}</Tag>
               ))}
             />
           </Block>

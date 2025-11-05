@@ -17,15 +17,24 @@ export const Tag: React.FC<Props> = ({
   ...rest
 }) => {
   const resultClassName = useMemo(() => {
+    // For red color (Suspended tag), use red regardless of theme
+    const isRed = color === 'red'
+
     return cn(
       'rounded px-[6px] py-[2px]',
       'border border-transparent',
-      fill ? 'bg-acc text-bac' : 'border-acc text-acc',
+      isRed
+        ? fill
+          ? 'bg-red-600 text-white border-red-600'
+          : 'border-red-600 text-red-600'
+        : fill
+        ? 'bg-acc text-bac'
+        : 'border-acc text-acc',
       !!(href || rest.onClick) ? 'cursor-pointer' : '',
       !!rest.onClick && 'select-none',
       className
     )
-  }, [color, className, href, rest.onClick])
+  }, [color, fill, className, href, rest.onClick])
   return href ? (
     <a href={href} className={resultClassName} {...rest} />
   ) : (
