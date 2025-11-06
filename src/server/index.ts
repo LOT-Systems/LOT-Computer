@@ -183,12 +183,12 @@ fastify.register(async (fastify: FastifyInstance) => {
       fastify.register(apiRoutes, { prefix: '/api' })
     })
 
-    // Admin API
+    // Admin API (accessible by Admin and Usership users)
     fastify.register(async (fastify) => {
       fastify.addHook('onRequest', async (req, reply) => {
-        if (!req.user || !req.user.isAdmin()) {
+        if (!req.user || !req.user.canAccessUsSection()) {
           reply.status(401)
-          throw new Error('Access denied')
+          throw new Error('Access denied: Admin or Usership access required')
         }
       })
       fastify.register(adminApiRoutes, { prefix: '/admin-api' })
@@ -214,10 +214,10 @@ fastify.register(async (fastify: FastifyInstance) => {
       })
     })
 
-    // Admin app
+    // Admin app (accessible by Admin and Usership users)
     fastify.register(async (fastify) => {
       fastify.addHook('onRequest', async (req, reply) => {
-        if (!req.user || !req.user.isAdmin()) {
+        if (!req.user || !req.user.canAccessUsSection()) {
           return reply.redirect('/')
         }
       })
