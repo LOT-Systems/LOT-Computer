@@ -45,19 +45,50 @@ async function checkDatabase(): Promise<SystemCheck> {
 async function checkWeatherAPI(): Promise<SystemCheck> {
   const start = Date.now()
   try {
-    // Try to get weather for NYC as a test
+    // Check Weather API
     const data = await weather.getWeather(40.7128, -74.0060)
+    if (!data) {
+      return {
+        name: 'Engine stack check',
+        status: 'error',
+        message: 'Weather API returned no data',
+        duration: Date.now() - start,
+      }
+    }
+
+    // Check React bundle exists
+    const reactBundlePath = path.join(process.cwd(), 'dist/client/js/app.js')
+    if (!fs.existsSync(reactBundlePath)) {
+      return {
+        name: 'Engine stack check',
+        status: 'error',
+        message: 'React bundle not found',
+        duration: Date.now() - start,
+      }
+    }
+
+    // Check Node.js version is compatible
+    const nodeVersion = process.version
+    const majorVersion = parseInt(nodeVersion.slice(1).split('.')[0])
+    if (majorVersion < 18) {
+      return {
+        name: 'Engine stack check',
+        status: 'error',
+        message: `Node.js version ${nodeVersion} is too old (requires 18+)`,
+        duration: Date.now() - start,
+      }
+    }
+
     return {
       name: 'Engine stack check',
-      status: data ? 'ok' : 'error',
-      message: data ? undefined : 'Weather API returned no data',
+      status: 'ok',
       duration: Date.now() - start,
     }
   } catch (error: any) {
     return {
       name: 'Engine stack check',
       status: 'error',
-      message: error?.message || 'Weather API failed',
+      message: error?.message || 'Engine stack check failed',
       duration: Date.now() - start,
     }
   }
@@ -68,6 +99,28 @@ async function checkAuth(): Promise<SystemCheck> {
   try {
     // Check if Session model is available
     await sequelize.models.Session.findOne()
+
+    // Check Resend API is configured
+    if (!process.env.RESEND_API_KEY) {
+      return {
+        name: 'Authentication engine',
+        status: 'error',
+        message: 'Resend API key not configured',
+        duration: Date.now() - start,
+      }
+    }
+
+    // Check manifest.webmanifest exists
+    const manifestPath = path.join(process.cwd(), 'public/manifest.webmanifest')
+    if (!fs.existsSync(manifestPath)) {
+      return {
+        name: 'Authentication engine',
+        status: 'error',
+        message: 'Manifest file not found',
+        duration: Date.now() - start,
+      }
+    }
+
     return {
       name: 'Authentication engine',
       status: 'ok',
@@ -88,6 +141,18 @@ async function checkUsers(): Promise<SystemCheck> {
   try {
     // Check if User model is available
     await sequelize.models.User.findOne()
+
+    // Check if /us page bundle exists (admin page)
+    const usPagePath = path.join(process.cwd(), 'dist/client/js/us.js')
+    if (!fs.existsSync(usPagePath)) {
+      return {
+        name: 'Admin',
+        status: 'error',
+        message: '/us page bundle not found',
+        duration: Date.now() - start,
+      }
+    }
+
     return {
       name: 'Admin',
       status: 'ok',
@@ -146,8 +211,12 @@ async function checkSync(): Promise<SystemCheck> {
 async function checkMemory(): Promise<SystemCheck> {
   const start = Date.now()
   try {
-    // Check if Memory model is available
+    // Check if Memory model is available (prompt system)
     await sequelize.models.Memory.findOne()
+
+    // Check if Log model is available (logging system)
+    await sequelize.models.Log.findOne()
+
     return {
       name: 'Memory Engine check',
       status: 'ok',
@@ -157,7 +226,7 @@ async function checkMemory(): Promise<SystemCheck> {
     return {
       name: 'Memory Engine check',
       status: 'error',
-      message: error?.message || 'Memory check failed',
+      message: error?.message || 'Memory/Log check failed',
       duration: Date.now() - start,
     }
   }
@@ -166,18 +235,18 @@ async function checkMemory(): Promise<SystemCheck> {
 async function checkStoryAI(): Promise<SystemCheck> {
   const start = Date.now()
   try {
-    // Check if OPENAI_API_KEY is configured
-    const hasKey = !!process.env.OPENAI_API_KEY
+    // Check if ANTHROPIC_API_KEY (Claude API) is configured for Usership users
+    const hasKey = !!process.env.ANTHROPIC_API_KEY || !!config.anthropic?.apiKey
     if (!hasKey) {
       return {
         name: 'Story AI stack check',
         status: 'error',
-        message: 'OpenAI API key not configured',
+        message: 'Claude API key not configured',
         duration: Date.now() - start,
       }
     }
 
-    // Check if UserMemory model is available
+    // Check if UserMemory model is available (for Usership tagged users)
     await sequelize.models.UserMemory.findOne()
     return {
       name: 'Story AI stack check',
@@ -207,6 +276,40 @@ async function checkSystems(): Promise<SystemCheck> {
         duration: Date.now() - start,
       }
     }
+
+    // Check if node_modules exists (yarn dependencies installed)
+    const nodeModulesPath = path.join(process.cwd(), 'node_modules')
+    if (!fs.existsSync(nodeModulesPath)) {
+      return {
+        name: 'Systems check',
+        status: 'error',
+        message: 'Dependencies not installed',
+        duration: Date.now() - start,
+      }
+    }
+
+    // Check if package.json exists
+    const packageJsonPath = path.join(process.cwd(), 'package.json')
+    if (!fs.existsSync(packageJsonPath)) {
+      return {
+        name: 'Systems check',
+        status: 'error',
+        message: 'package.json not found',
+        duration: Date.now() - start,
+      }
+    }
+
+    // Check if build output exists (TypeScript compiled successfully)
+    const serverBuildPath = path.join(process.cwd(), 'dist/server/server/index.js')
+    if (!fs.existsSync(serverBuildPath)) {
+      return {
+        name: 'Systems check',
+        status: 'error',
+        message: 'Server build not found',
+        duration: Date.now() - start,
+      }
+    }
+
     return {
       name: 'Systems check',
       status: 'ok',
