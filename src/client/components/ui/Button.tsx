@@ -42,8 +42,8 @@ export const Button: React.FC<Props> = ({
     kind === 'primary' &&
       cn(
         isLightTheme
-          ? // Light mode: simple, modern blue button
-            'button-primary border-0 rounded-md text-white bg-blue-600 transition-all hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed'
+          ? // Light mode: simple, modern blue button with custom colors
+            'button-primary border-0 rounded-md text-white transition-all disabled:cursor-not-allowed bg-[#5397DA] hover:bg-[#2765A5] active:bg-[#1a4d85] disabled:bg-[#a8c9ed]'
           : // Dark/themed mode: accent-colored transparent border
             cn(
               'hover:bg-acc/10',

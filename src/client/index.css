@@ -34,9 +34,7 @@ input:-webkit-autofill {
 }
 
 @layer components {
-  .button-primary:not(:hover) {
-    text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.75);
-  }
+  /* Button primary styles - removed text-shadow */
 }
 
 .whitespace-breakspaces {
