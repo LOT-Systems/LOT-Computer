@@ -38,7 +38,9 @@
     "migrations:up": "node -r esbuild-register ./scripts/migrations.ts up",
     "production:run": "yarn run-p build migrations:up start",
     "fix": "prettier --write ./src",
-    "start": "node ./dist/server/server/index.js"
+    "start": "node ./dist/server/server/index.js",
+    "test:cold-start": "esr ./test-cold-start.ts",
+    "test:cold-start:prod": "APP_HOST=https://lot-systems.com esr ./test-cold-start.ts"
   },
   "engines": {
     "node": ">=20.x",
