@@ -93,7 +93,17 @@ export const Sync = () => {
   const onToggleLike = React.useCallback(
     (messageId: string) => (ev: React.MouseEvent) => {
       ev?.preventDefault()
+      ev?.stopPropagation()
       likeChatMessage({ messageId })
+    },
+    []
+  )
+
+  const onNavigateToUserProfile = React.useCallback(
+    (userId: string) => (ev: React.MouseEvent) => {
+      ev?.preventDefault()
+      ev?.stopPropagation()
+      window.location.href = `/us/${userId}`
     },
     []
   )
@@ -151,51 +161,66 @@ export const Sync = () => {
       </div>
 
       <div>
-        {messages.map((x, i) => (
-          <div
-            key={x.id}
-            className={cn(
-              'group flex items-start gap-x-16 mb-8',
-              i >= SYNC_CHAT_MESSAGES_TO_SHOW && 'text-acc/20'
-            )}
-          >
-            <GhostButton
-              className="whitespace-nowrap"
+        {messages.map((x, i) => {
+          const authorObj = typeof x.author === 'object' ? x.author : null
+          const authorName = typeof x.author === 'string'
+            ? x.author
+            : authorObj
+              ? `${authorObj.firstName || ''} ${authorObj.lastName || ''}`.trim() || 'Unknown'
+              : 'Unknown'
+          const authorId = authorObj?.id || x.authorUserId
+
+          return (
+            <div
+              key={x.id}
+              className={cn(
+                'group flex items-start gap-x-16 mb-8 cursor-pointer hover:bg-acc/5 -mx-8 px-8 py-4 rounded transition-colors',
+                i >= SYNC_CHAT_MESSAGES_TO_SHOW && 'text-acc/20'
+              )}
               onClick={onToggleLike(x.id)}
             >
-              {x.author}
-            </GhostButton>
-            <div
-              className="whitespace-breakspaces"
-              style={{
-                wordWrap: 'break-word',
-                wordBreak: 'break-word',
-              }}
-            >
-              {x.message}
-            </div>
-
-            {!!x.likes && (
-              <Tag
-                className={cn(
-                  'text-acc/40 border-acc/40 select-none',
-                  !x.isLiked && 'border-transparent'
-                )}
-                title="Press author's name to like the message"
-                key={`${x.id}_${x.isLiked}`}
-                fill={false}
+              {authorId ? (
+                <GhostButton
+                  className="whitespace-nowrap"
+                  onClick={onNavigateToUserProfile(authorId)}
+                >
+                  {authorName}
+                </GhostButton>
+              ) : (
+                <span className="whitespace-nowrap px-4">{authorName}</span>
+              )}
+              <div
+                className="whitespace-breakspaces"
+                style={{
+                  wordWrap: 'break-word',
+                  wordBreak: 'break-word',
+                }}
               >
-                {x.likes}
-              </Tag>
-            )}
-
-            {!isTouchDevice && (
-              <div className="text-acc/0 transition-opacity select-none pointer-events-none whitespace-nowrap group-hover:text-acc/40">
-                <MessageTimeLabel dateString={x.createdAt} />
+                {x.message}
               </div>
-            )}
-          </div>
-        ))}
+
+              {!!x.likes && (
+                <Tag
+                  className={cn(
+                    'text-acc/40 border-acc/40 select-none',
+                    !x.isLiked && 'border-transparent'
+                  )}
+                  title="Click message to like/unlike"
+                  key={`${x.id}_${x.isLiked}`}
+                  fill={false}
+                >
+                  {x.likes}
+                </Tag>
+              )}
+
+              {!isTouchDevice && (
+                <div className="text-acc/0 transition-opacity select-none pointer-events-none whitespace-nowrap group-hover:text-acc/40">
+                  <MessageTimeLabel dateString={x.createdAt} />
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
     </div>
   )

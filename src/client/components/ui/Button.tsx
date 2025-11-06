@@ -42,8 +42,8 @@ export const Button: React.FC<Props> = ({
     kind === 'primary' &&
       cn(
         isLightTheme
-          ? // Light mode: blue button with white text and 3D volume effect
-            'button-primary border rounded text-white bg-blue-500 border-blue-600 shadow-[0_4px_0_0_rgb(37,99,235)] transition-all hover:bg-blue-600 hover:shadow-[0_2px_0_0_rgb(37,99,235)] active:shadow-none active:translate-y-1'
+          ? // Light mode: simple, modern blue button
+            'button-primary border-0 rounded-md text-white bg-blue-600 transition-all hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed'
           : // Dark/themed mode: accent-colored transparent border
             cn(
               'hover:bg-acc/10',

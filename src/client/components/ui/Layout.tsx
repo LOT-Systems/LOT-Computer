@@ -15,6 +15,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
   const me = useStore(stores.me)
   const layoutView = useStore(stores.layoutView)
   const none = React.useMemo(() => () => {}, [])
+  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/'
   const navLinks = React.useMemo<NavItem[]>(() => {
     const result: NavItem[] = me
       ? [
@@ -59,8 +60,9 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
                 'justify-end tablet:justify-start'
               )}
             >
-              {navLinks.map((link, i) =>
-                link.spacer ? (
+              {navLinks.map((link, i) => {
+                const isActive = link.href === currentPath
+                return link.spacer ? (
                   <div
                     key={link.label ?? i}
                     className="flex-grow tablet:block hidden"
@@ -70,14 +72,17 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
                     key={link.label}
                     href={link.href ?? undefined}
                     kind="secondary-rounded"
-                    className="mb-8"
+                    className={cn(
+                      'mb-8',
+                      isActive && 'bg-acc text-bac hover:bg-acc/90'
+                    )}
                     onClick={!link.href ? none : undefined}
                     disabled={!link.href}
                   >
                     {link.label}
                   </Button>
                 )
-              )}
+              })}
             </nav>
           </div>
         </div>
