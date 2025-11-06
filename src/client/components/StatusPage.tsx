@@ -119,14 +119,12 @@ export const StatusPage = () => {
               <Block label="Version:">v{status.version}</Block>
               <Block label="Environment:">{status.environment}</Block>
               <Block label="Last updated:">
-                <div>
-                  {formatDate(lastUpdate.toISOString())}
-                  {status.cached && status.cacheAge && (
-                    <span className="text-acc/40">
-                      {' '}(cached {status.cacheAge}s ago)
-                    </span>
-                  )}
-                </div>
+                {formatDate(lastUpdate.toISOString())}
+                {status.cached && status.cacheAge && (
+                  <span className="text-acc/40">
+                    {' '}(cached {status.cacheAge}s ago)
+                  </span>
+                )}
               </Block>
               <Block label="" containsSmallButton>
                 <Button
