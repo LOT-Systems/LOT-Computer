@@ -210,6 +210,16 @@ state.isMirrorOn.subscribe((value) => {
     const sunrise = dayjs.utc(weather.sunrise * 1000).local()
     const sunset = dayjs.utc(weather.sunset * 1000).local()
     const isDark = now.isAfter(sunset) || now.isBefore(sunrise)
+
+    // Debug: Log theme calculation
+    console.log('[Theme Debug]', {
+      now: now.format('HH:mm:ss'),
+      sunset: sunset.format('HH:mm:ss'),
+      isDark,
+      currentTheme: _theme,
+      willSetDark: isDark && ['light', 'sunset', 'sunrise'].includes(_theme)
+    })
+
     if (isDark && ['light', 'sunset', 'sunrise'].includes(_theme)) {
       theme.set('dark')
       return
