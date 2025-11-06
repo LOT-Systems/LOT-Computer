@@ -277,7 +277,7 @@ export const AdminUser = () => {
                 {isStoryLoading ? (
                   <div className="opacity-60">Generating story...</div>
                 ) : memoryStoryData?.story ? (
-                  <div className="whitespace-pre-wrap">{memoryStoryData.story}</div>
+                  <MemoryText text={memoryStoryData.story} />
                 ) : (
                   <div className="opacity-60">No Memory answers yet</div>
                 )}
@@ -295,7 +295,7 @@ export const AdminUser = () => {
                 {isSummaryLoading ? (
                   <div className="opacity-60">Generating summary...</div>
                 ) : userSummaryData?.summary ? (
-                  <div className="whitespace-pre-wrap">{userSummaryData.summary}</div>
+                  <MemoryText text={userSummaryData.summary} />
                 ) : (
                   <div className="opacity-60">No summary available</div>
                 )}
@@ -304,6 +304,31 @@ export const AdminUser = () => {
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+// Component to display Memory text with blue highlighting for high humidity (>50%)
+const MemoryText: React.FC<{ text: string }> = ({ text }) => {
+  const lines = text.split('\n')
+
+  return (
+    <div className="whitespace-pre-wrap">
+      {lines.map((line, index) => {
+        // Check if line contains humidity info like "H:77%"
+        const humidityMatch = line.match(/H:(\d+)%/)
+        const humidity = humidityMatch ? parseInt(humidityMatch[1]) : null
+        const isHighHumidity = humidity !== null && humidity > 50
+
+        return (
+          <div
+            key={index}
+            className={cn(isHighHumidity && 'text-blue-500')}
+          >
+            {line}
+          </div>
+        )
+      })}
     </div>
   )
 }
