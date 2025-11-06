@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { useStore } from '@nanostores/react'
+import * as stores from '#client/stores'
 import {
   Button,
   Input,
@@ -29,6 +31,7 @@ const SORT_OPTIONS: { id: AdminUsersSort; name: string }[] = [
 
 export const AdminUsers = () => {
   useDocumentTitle('Us')
+  const me = useStore(stores.me)
   const [liveMessageChanged, setLiveMessageChanged] = React.useState('')
   const [query, setQuery] = React.useState('')
   const [sort, setSort] = React.useState<AdminUsersSort>(SORT_OPTIONS[0].id)
@@ -42,6 +45,10 @@ export const AdminUsers = () => {
   const { mutate: updateLiveMessage } = useUpdateLiveMessage({
     onSuccess: () => refetchLiveMessage(),
   })
+
+  const isCurrentUserAdmin = React.useMemo(() => {
+    return me?.tags?.some((tag) => tag.toLowerCase() === 'admin') || false
+  }, [me])
 
   const throrrledQuery = useDebounce(query, 400)
 
@@ -164,24 +171,26 @@ export const AdminUsers = () => {
         </Link>
       </div>
 
-      <form onSubmit={onSubmitLiveMessage} className="flex gap-x-16">
-        <Input
-          name="live-message"
-          type="text"
-          value={liveMessageChanged}
-          onChange={setLiveMessageChanged}
-          placeholder="Live message"
-          containerClassName="flex-1"
-          className="w-full"
-        />
-        <Button
-          type="submit"
-          kind="secondary"
-          disabled={liveMessageChanged === liveMessage}
-        >
-          {!liveMessageChanged.trim() && !!liveMessage ? 'Remove' : 'Post'}
-        </Button>
-      </form>
+      {isCurrentUserAdmin && (
+        <form onSubmit={onSubmitLiveMessage} className="flex gap-x-16">
+          <Input
+            name="live-message"
+            type="text"
+            value={liveMessageChanged}
+            onChange={setLiveMessageChanged}
+            placeholder="Live message"
+            containerClassName="flex-1"
+            className="w-full"
+          />
+          <Button
+            type="submit"
+            kind="secondary"
+            disabled={liveMessageChanged === liveMessage}
+          >
+            {!liveMessageChanged.trim() && !!liveMessage ? 'Remove' : 'Post'}
+          </Button>
+        </form>
+      )}
 
       <div className="flex flex-col gap-y-16">
         <Input
