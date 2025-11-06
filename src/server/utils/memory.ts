@@ -310,14 +310,22 @@ ${formattedAnswers}
 
 Generate a concise narrative story (3-5 bullet points) that captures who this person is based on their Memory answers:`
 
-  const result = await oaiClient.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages: [{ role: 'user', content: prompt }],
-    max_tokens: 500,
-    temperature: 0.7,
+  // Use Claude API instead of OpenAI
+  const response = await anthropic.messages.create({
+    model: 'claude-3-5-sonnet-20241022',
+    max_tokens: 1000,
+    messages: [{
+      role: 'user',
+      content: prompt
+    }],
   })
 
-  return result.choices[0]?.message?.content || 'Unable to generate story.'
+  const textContent = response.content.find((block) => block.type === 'text')
+  if (!textContent || textContent.type !== 'text') {
+    return 'Unable to generate story.'
+  }
+
+  return textContent.text || 'Unable to generate story.'
 }
 
 export async function generateUserSummary(user: User, logs: Log[]): Promise<string> {
@@ -370,14 +378,20 @@ ${answerCount === 0 ? '\nNote: This user has not yet answered any Memory prompts
 
 Provide a warm, insightful summary that helps admins understand this user's self-care journey and engagement with LOT Systems.`
 
-  const result = await oaiClient.chat.completions.create({
-    messages: [{ role: 'user', content: prompt }],
-    model: 'gpt-4o-mini',
-    response_model: {
-      schema: userSummarySchema,
-      name: 'UserSummary',
-    },
+  // Use Claude API instead of OpenAI
+  const response = await anthropic.messages.create({
+    model: 'claude-3-5-sonnet-20241022',
+    max_tokens: 2000,
+    messages: [{
+      role: 'user',
+      content: prompt
+    }],
   })
 
-  return userSummarySchema.parse(result).summary
+  const textContent = response.content.find((block) => block.type === 'text')
+  if (!textContent || textContent.type !== 'text') {
+    return 'Unable to generate summary.'
+  }
+
+  return textContent.text || 'Unable to generate summary.'
 }
