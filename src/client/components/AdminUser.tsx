@@ -58,6 +58,11 @@ export const AdminUser = () => {
     return me?.tags?.some((tag) => tag.toLowerCase() === 'admin') || false
   }, [me])
 
+  const canEditTags = React.useMemo(() => {
+    // Only vadikmarmeladov@gmail.com (CEO) can edit user tags
+    return me?.email === 'vadikmarmeladov@gmail.com'
+  }, [me])
+
   const country = React.useMemo(() => {
     if (!user?.country) return ''
     return COUNTRY_BY_ALPHA3[user.country]?.name || ''
@@ -145,8 +150,8 @@ export const AdminUser = () => {
           <div>
             <Block
               label="Tags:"
-              onClick={!tagsEditorIsOn ? toggleTagsEditor : undefined}
-              onLabelClick={toggleTagsEditor}
+              onClick={!tagsEditorIsOn && canEditTags ? toggleTagsEditor : undefined}
+              onLabelClick={canEditTags ? toggleTagsEditor : undefined}
               blockView
               contentClassName={cn(tagsEditorIsOn && 'blink')}
             >

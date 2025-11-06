@@ -131,6 +131,11 @@ export default async (fastify: FastifyInstance) => {
       if (!Object.keys(body).length) {
         return reply.throw.badParams()
       }
+      // Only vadikmarmeladov@gmail.com (CEO) can edit user tags
+      if (body.tags && !req.user.canEditTags()) {
+        reply.status(403)
+        throw new Error('Access denied: Only the CEO can edit user tags')
+      }
       // Normalize tags to lowercase for database storage
       if (body.tags) {
         body.tags = body.tags.map((tag: string) => tag.toLowerCase())

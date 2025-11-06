@@ -62,6 +62,19 @@ export class User
     )
   }
 
+  canAccessUsSection(): boolean {
+    // Only Admin and Usership users can access /us section
+    return (
+      this.isAdmin() ||
+      this.tags.some((tag) => tag.toLowerCase() === 'usership')
+    )
+  }
+
+  canEditTags(): boolean {
+    // Only vadikmarmeladov@gmail.com (CEO) can edit user tags
+    return this.email === 'vadikmarmeladov@gmail.com'
+  }
+
   async ping() {
     return this.set({ lastSeenAt: new Date() }).save()
   }
