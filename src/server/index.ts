@@ -19,6 +19,7 @@ import config from '#server/config'
 import authRoutes from './routes/auth.js'
 import apiRoutes from './routes/api.js'
 import adminApiRoutes from './routes/admin-api.js'
+import publicApiRoutes from './routes/public-api.js'
 
 const CWD = process.cwd()
 
@@ -123,6 +124,18 @@ if (config.env === 'production') {
 // Health check endpoint (required for Digital Ocean)
 fastify.get('/health', async (request, reply) => {
   return { status: 'ok', timestamp: new Date().toISOString() }
+})
+
+// Public API routes (no authentication required)
+fastify.register(publicApiRoutes, { prefix: '/api/public' })
+
+// Public status page route (no authentication required)
+fastify.get('/status', async (req, reply) => {
+  return reply.view('generic-spa', {
+    scriptName: 'status',
+    scriptNonce: reply.cspNonce.script,
+    styleNonce: reply.cspNonce.style,
+  })
 })
 
 // Database
