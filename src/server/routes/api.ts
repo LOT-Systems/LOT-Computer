@@ -336,9 +336,9 @@ export default async (fastify: FastifyInstance) => {
         weather: data,
       })
       return newCachedRecord.useRecordView()
-    } catch (error) {
+    } catch (error: any) {
       // Weather API unavailable or misconfigured - return null so app still works
-      console.warn('Weather API error (API key may be missing):', error instanceof Error ? error.message : error)
+      console.warn('Weather API error (API key may be missing):', error?.message || error)
       return null
     }
   })
