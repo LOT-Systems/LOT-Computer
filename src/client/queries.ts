@@ -122,7 +122,7 @@ export const usePaginatedUsers = (params: {
   const usp = new URLSearchParams({
     ...params,
     skip: String(params.skip),
-    limit: String(params.skip),
+    limit: String(params.limit),
     tags: params.tags.join(','),
   })
   usp.sort()
