@@ -22,6 +22,17 @@ export function useSun(
       }
       const sunrise = dayjs.utc(weather.sunrise * 1000).local()
       const sunset = dayjs.utc(weather.sunset * 1000).local()
+
+      // Debug: Log sunset time to help diagnose issue
+      console.log('[Sun Debug]', {
+        now: now.format('HH:mm:ss'),
+        sunrise: sunrise.format('HH:mm:ss'),
+        sunset: sunset.format('HH:mm:ss'),
+        isDark: now.isAfter(sunset) || now.isBefore(sunrise),
+        isAfterSunset: now.isAfter(sunset),
+        isBeforeSunrise: now.isBefore(sunrise)
+      })
+
       if (
         now.isAfter(sunrise.subtract(10, 'second')) &&
         now.isBefore(sunrise.add(1, 'minute'))
