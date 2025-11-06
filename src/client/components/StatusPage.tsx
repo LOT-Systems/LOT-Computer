@@ -111,14 +111,14 @@ export const StatusPage = () => {
         {status && (
           <>
             <div className="mb-48">
-              <Block label="Status:">
+              <Block label="Status:" labelClassName="!pl-0">
                 {status.overall === 'ok' ? 'All systems operational' :
                  status.overall === 'degraded' ? 'Degraded performance' :
                  'System issues detected'}
               </Block>
-              <Block label="Version:">v{status.version}</Block>
-              <Block label="Environment:">{status.environment}</Block>
-              <Block label="Last updated:">
+              <Block label="Version:" labelClassName="!pl-0">v{status.version}</Block>
+              <Block label="Environment:" labelClassName="!pl-0">{status.environment}</Block>
+              <Block label="Last updated:" labelClassName="!pl-0">
                 {formatDate(lastUpdate.toISOString())}
                 {status.cached && status.cacheAge && (
                   <span className="text-acc/40">
@@ -126,7 +126,7 @@ export const StatusPage = () => {
                   </span>
                 )}
               </Block>
-              <Block label="" containsSmallButton>
+              <Block label="" containsSmallButton labelClassName="!pl-0">
                 <Button
                   kind="secondary"
                   size="small"
@@ -144,6 +144,7 @@ export const StatusPage = () => {
                 <Block
                   key={index}
                   label={check.name + ':'}
+                  labelClassName="!pl-0"
                   className="mb-8"
                 >
                   <div className="flex items-center gap-x-8">
