@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import { useUpdateSettings } from '#client/queries'
 import * as stores from '#client/stores'
-import { Block, Button, Input, Select } from '#client/components/ui'
+import { Block, Button, GhostButton, Input, Select } from '#client/components/ui'
 import { UserSettings, UserTag } from '#shared/types'
 import {
   COUNTRIES,
@@ -222,14 +222,14 @@ export const Settings = () => {
           <Block label="Memory Engine:">
             {me?.memoryEngine === 'claude' ? 'Claude' : 'Standard'}
           </Block>
+          <Block label="Site systems check:">
+            <GhostButton href="/status">Status page</GhostButton>
+          </Block>
         </div>
 
         <div className="flex gap-x-16">
           <Button kind="primary" type="submit" disabled={!changed}>
             Save
-          </Button>
-          <Button kind="secondary" href="/status">
-            Status
           </Button>
           <Button kind="secondary" href="/auth/logout" rel="external">
             Log out

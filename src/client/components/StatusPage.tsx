@@ -121,23 +121,25 @@ export const StatusPage = () => {
               </Block>
               <Block label="Version:" labelClassName="!pl-0">v{status.version}</Block>
               <Block label="Environment:" labelClassName="!pl-0">{status.environment}</Block>
-              <Block label="Last updated:" labelClassName="!pl-0">
-                {formatDate(lastUpdate.toISOString())}
-                {status.cached && status.cacheAge && (
-                  <span className="text-acc/40">
-                    {' '}(cached {status.cacheAge}s ago)
+              <Block label="Last updated:" labelClassName="!pl-0" containsSmallButton>
+                <div className="flex items-center gap-x-16">
+                  <span>
+                    {formatDate(lastUpdate.toISOString())}
+                    {status.cached && status.cacheAge && (
+                      <span className="text-acc/40">
+                        {' '}(cached {status.cacheAge}s ago)
+                      </span>
+                    )}
                   </span>
-                )}
-              </Block>
-              <Block label="" containsSmallButton labelClassName="!pl-0">
-                <Button
-                  kind="secondary"
-                  size="small"
-                  onClick={fetchStatus}
-                  disabled={loading}
-                >
-                  {loading ? 'Refreshing...' : 'Refresh'}
-                </Button>
+                  <Button
+                    kind="secondary"
+                    size="small"
+                    onClick={fetchStatus}
+                    disabled={loading}
+                  >
+                    {loading ? 'Refreshing...' : 'Refresh'}
+                  </Button>
+                </div>
               </Block>
             </div>
 
