@@ -353,7 +353,7 @@ async function performHealthChecks(): Promise<{
     version: VERSION,
     timestamp: new Date().toISOString(),
     buildDate: process.env.BUILD_DATE || new Date().toISOString(),
-    environment: config.env.charAt(0).toUpperCase() + config.env.slice(1),
+    environment: config.env ? config.env.charAt(0).toUpperCase() + config.env.slice(1) : 'Unknown',
     checks,
     overall,
   }
