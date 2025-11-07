@@ -264,11 +264,17 @@ export default async (fastify: FastifyInstance) => {
           messageId: req.body.messageId,
         })
       }
+
+      // Get updated likes count after the toggle
+      const allLikes = await fastify.models.ChatMessageLike.findAll({
+        where: { messageId: req.body.messageId },
+      })
+
       sync.emit('chat_message_like', {
         messageId: message.id,
-        likes: 0,
-        likesCount: 0,
-        isLiked: false,
+        likes: allLikes.length,
+        likesCount: allLikes.length,
+        isLiked,
       })
       process.nextTick(async () => {
         if (isLiked) {

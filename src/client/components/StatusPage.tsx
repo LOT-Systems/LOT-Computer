@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Page, Block, Button, GhostButton } from '#client/components/ui'
 import { cn } from '#client/utils'
+import { useDocumentTitle } from '#client/utils/hooks'
 
 interface SystemCheck {
   name: string
@@ -25,6 +26,8 @@ export const StatusPage = () => {
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = React.useState<Date>(new Date())
+
+  useDocumentTitle('LOT Systems Status')
 
   const fetchStatus = React.useCallback(async () => {
     try {
