@@ -223,7 +223,9 @@ export const Settings = () => {
             {me?.memoryEngine === 'claude' ? 'Claude' : 'Standard'}
           </Block>
           <Block label="Site systems check:">
-            <GhostButton href="/status">Status page</GhostButton>
+            <a href="/status" className="-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc/10">
+              Build: Nov 7, 2025 at 00:45 AM PST (v0.0.2)
+            </a>
           </Block>
         </div>
 
