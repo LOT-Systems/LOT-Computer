@@ -15,7 +15,6 @@ import {
   useUpdateUser,
   useUser,
   useUserMemoryPrompt,
-  useUserSummary,
   useUserMemoryStory,
 } from '#client/queries'
 import { getUserTagByIdCaseInsensitive, USER_TAGS_BY_ID, COUNTRY_BY_ALPHA3 } from '#shared/constants'
@@ -43,7 +42,6 @@ export const AdminUser = () => {
     router?.route === 'adminUser' ? router.params.userId : ''
   )
   const { data: memoryPrompt } = useUserMemoryPrompt(user?.id!)
-  const { data: userSummaryData, isLoading: isSummaryLoading } = useUserSummary(user?.id!)
   const { data: memoryStoryData, isLoading: isStoryLoading } = useUserMemoryStory(user?.id!)
   const { mutate: updateUser } = useUpdateUser({
     onSuccess: () => refetchUser(),
@@ -265,24 +263,6 @@ export const AdminUser = () => {
                 </div>
               )}
             </Block>
-          )}
-
-          {user && (
-            <div className="mt-32">
-              <Block
-                label="Self-care profile:"
-                blockView
-                labelClassName="!pl-0"
-              >
-                {isSummaryLoading ? (
-                  <div className="opacity-60">Generating profile...</div>
-                ) : userSummaryData?.summary ? (
-                  <MemoryText text={userSummaryData.summary} />
-                ) : (
-                  <div className="opacity-60">No self-care data yet</div>
-                )}
-              </Block>
-            </div>
           )}
 
           {user && (
