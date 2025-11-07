@@ -228,6 +228,9 @@ export const Settings = () => {
           <Button kind="primary" type="submit" disabled={!changed}>
             Save
           </Button>
+          <Button kind="secondary" href="/status">
+            Status
+          </Button>
           <Button kind="secondary" href="/auth/logout" rel="external">
             Log out
           </Button>
