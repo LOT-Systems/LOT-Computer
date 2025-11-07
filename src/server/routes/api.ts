@@ -86,6 +86,7 @@ export default async (fastify: FastifyInstance) => {
             isLiked: likes.some(fp.propEq('userId', req.user.id)),
           }
           write({ event, data: updatedPayload })
+          break
         }
       }
     })
