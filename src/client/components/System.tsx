@@ -173,9 +173,7 @@ export const System = () => {
             <Block label="Humidity:">
               <span
                 className={cn(
-                  weather?.humidity > 60 &&
-                    theme === 'light' &&
-                    'text-acc-600'
+                  weather?.humidity > 50 && 'text-blue-500'
                 )}
               >
                 {weather?.humidity}%
