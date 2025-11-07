@@ -19,8 +19,18 @@ export const Settings = () => {
 
   const { mutate: updateSettings } = useUpdateSettings({
     onSuccess: () => {
-      // setChanged(false)
-      window.location.href = '/'
+      // Ensure custom theme colors are saved before redirect
+      if (isCustomThemeEnabled) {
+        stores.customTheme.set({
+          base: baseColor,
+          acc: accentColor
+        })
+      }
+
+      // Add small delay to ensure localStorage is flushed before redirect
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 150)
     },
   })
 
