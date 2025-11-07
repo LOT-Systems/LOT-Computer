@@ -156,7 +156,7 @@ export const StatusPage = () => {
                       check.status === 'ok' && 'text-acc',
                       check.status === 'error' && 'text-acc/60'
                     )}>
-                      {check.status === 'ok' ? 'OK' :
+                      {check.status === 'ok' ? 'Ok' :
                        check.status === 'error' ? 'Error' :
                        'Unknown'}
                     </span>
