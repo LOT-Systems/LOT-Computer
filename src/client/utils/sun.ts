@@ -27,15 +27,21 @@ export function useSun(
       console.log('[Sun Debug]', {
         now: now.format('HH:mm:ss'),
         nowFull: now.format(),
+        nowUnix: now.unix(),
         sunrise: sunrise.format('HH:mm:ss'),
         sunriseFull: sunrise.format(),
         sunset: sunset.format('HH:mm:ss'),
         sunsetFull: sunset.format(),
-        sunsetTimestamp: weather.sunset,
+        sunsetUnix: sunset.unix(),
+        sunsetTimestampFromAPI: weather.sunset,
+        sunsetDifference: `${now.diff(sunset, 'minute')} minutes`,
         isDark: now.isAfter(sunset) || now.isBefore(sunrise),
         isAfterSunset: now.isAfter(sunset),
         isBeforeSunrise: now.isBefore(sunrise),
-        weatherCreatedAt: weather.createdAt
+        inSunsetTransition: now.isAfter(sunset.subtract(10, 'second')) && now.isBefore(sunset.add(1, 'minute')),
+        weatherCreatedAt: weather.createdAt,
+        weatherAge: `${now.diff(dayjs(weather.createdAt), 'minute')} minutes old`,
+        currentTheme: stores.theme.get()
       })
 
       if (
