@@ -27,7 +27,7 @@ export const StatusPage = () => {
   const [error, setError] = React.useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = React.useState<Date>(new Date())
 
-  useDocumentTitle('LOT Systems Status')
+  useDocumentTitle('Systems Status')
 
   const fetchStatus = React.useCallback(async () => {
     try {
