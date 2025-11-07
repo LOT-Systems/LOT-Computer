@@ -461,19 +461,26 @@ export default async (fastify: FastifyInstance) => {
 
       if (hasUsershipTag) {
         // Usership users: Generate AI-based context-aware question using Claude
-        const logs = await fastify.models.Log.findAll({
-          where: {
-            userId: req.user.id,
-          },
-          order: [['createdAt', 'DESC']],
-          limit: 20,
-        })
+        try {
+          const logs = await fastify.models.Log.findAll({
+            where: {
+              userId: req.user.id,
+            },
+            order: [['createdAt', 'DESC']],
+            limit: 20,
+          })
 
-        const prompt = await buildPrompt(req.user, logs)
-        const question = await completeAndExtractQuestion(prompt, req.user)
+          const prompt = await buildPrompt(req.user, logs)
+          const question = await completeAndExtractQuestion(prompt, req.user)
 
-        return question
-      } else {
+          return question
+        } catch (error) {
+          console.error('Memory question generation failed:', error)
+          // Fall back to default questions on error
+        }
+      }
+
+      {
         // Non-Usership users: Use hardcoded questions
         const prevQuestionIds = await fastify.models.Answer.findAll({
           where: {
