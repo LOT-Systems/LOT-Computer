@@ -270,7 +270,25 @@ export const AdminUser = () => {
           {user && (
             <div className="mt-32">
               <Block
-                label="Memory Story (What we know about user):"
+                label="Self-care profile:"
+                blockView
+                labelClassName="!pl-0"
+              >
+                {isSummaryLoading ? (
+                  <div className="opacity-60">Generating profile...</div>
+                ) : userSummaryData?.summary ? (
+                  <MemoryText text={userSummaryData.summary} />
+                ) : (
+                  <div className="opacity-60">No self-care data yet</div>
+                )}
+              </Block>
+            </div>
+          )}
+
+          {user && (
+            <div className="mt-32">
+              <Block
+                label="Memory Story:"
                 blockView
                 labelClassName="!pl-0"
               >
@@ -280,24 +298,6 @@ export const AdminUser = () => {
                   <MemoryText text={memoryStoryData.story} />
                 ) : (
                   <div className="opacity-60">No Memory answers yet</div>
-                )}
-              </Block>
-            </div>
-          )}
-
-          {user && (
-            <div className="mt-32">
-              <Block
-                label="AI-Generated Profile Summary:"
-                blockView
-                labelClassName="!pl-0"
-              >
-                {isSummaryLoading ? (
-                  <div className="opacity-60">Generating summary...</div>
-                ) : userSummaryData?.summary ? (
-                  <MemoryText text={userSummaryData.summary} />
-                ) : (
-                  <div className="opacity-60">No summary available</div>
                 )}
               </Block>
             </div>
