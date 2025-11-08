@@ -54,3 +54,32 @@ services:
       - key: RESEND_FROM_NAME
         scope: RUN_TIME
         value: "LOT"
+      - key: DB_HOST
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: "db-postgresql-nyc3-92053-do-user-22640384-0.f.db.ondigitalocean.com"
+      - key: DB_PORT
+        scope: RUN_AND_BUILD_TIME
+        value: "25060"
+      - key: DB_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: "defaultdb"
+      - key: DB_USER
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: "doadmin"
+      - key: DB_PASSWORD
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: "AVNS_8V6Hqzuxwj0JkMxgNvR"
+      - key: DB_SSL
+        scope: RUN_AND_BUILD_TIME
+        value: "true"
+      - key: ANTHROPIC_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "sk-ant-api03-mUyBScB4JoNdfYJm1rA8zPv_bitstkNpfa9LZnvur6D8Hi6WYUEwvdmYStLlmzOmJxKa3hYESub-wvqPsLVETg-TP4RhQAA"
+      - key: OPENAI_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "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"
