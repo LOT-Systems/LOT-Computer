@@ -29,13 +29,13 @@ async function checkDatabase(): Promise<SystemCheck> {
   try {
     await sequelize.authenticate()
     return {
-      name: 'Database stack check',
+      name: 'Database stack',
       status: 'ok',
       duration: Date.now() - start,
     }
   } catch (error: any) {
     return {
-      name: 'Database stack check',
+      name: 'Database stack',
       status: 'error',
       message: error?.message || 'Database connection failed',
       duration: Date.now() - start,
@@ -50,7 +50,7 @@ async function checkWeatherAPI(): Promise<SystemCheck> {
     const data = await weather.getWeather(40.7128, -74.0060)
     if (!data) {
       return {
-        name: 'Engine stack check',
+        name: 'Engine stack',
         status: 'error',
         message: 'Weather API returned no data',
         duration: Date.now() - start,
@@ -61,7 +61,7 @@ async function checkWeatherAPI(): Promise<SystemCheck> {
     const reactBundlePath = path.join(process.cwd(), 'dist/client/js/app.js')
     if (!fs.existsSync(reactBundlePath)) {
       return {
-        name: 'Engine stack check',
+        name: 'Engine stack',
         status: 'error',
         message: 'React bundle not found',
         duration: Date.now() - start,
@@ -73,7 +73,7 @@ async function checkWeatherAPI(): Promise<SystemCheck> {
     const majorVersion = parseInt(nodeVersion.slice(1).split('.')[0])
     if (majorVersion < 18) {
       return {
-        name: 'Engine stack check',
+        name: 'Engine stack',
         status: 'error',
         message: `Node.js version ${nodeVersion} is too old (requires 18+)`,
         duration: Date.now() - start,
@@ -81,13 +81,13 @@ async function checkWeatherAPI(): Promise<SystemCheck> {
     }
 
     return {
-      name: 'Engine stack check',
+      name: 'Engine stack',
       status: 'ok',
       duration: Date.now() - start,
     }
   } catch (error: any) {
     return {
-      name: 'Engine stack check',
+      name: 'Engine stack',
       status: 'error',
       message: error?.message || 'Engine stack check failed',
       duration: Date.now() - start,
@@ -234,7 +234,7 @@ async function checkMemory(): Promise<SystemCheck> {
     const hasAnthropicKey = !!process.env.ANTHROPIC_API_KEY || !!config.anthropic?.apiKey
     if (!hasAnthropicKey) {
       return {
-        name: 'Memory Engine check',
+        name: 'Memory Engine',
         status: 'error',
         message: 'Claude API key not configured',
         duration: Date.now() - start,
@@ -242,13 +242,13 @@ async function checkMemory(): Promise<SystemCheck> {
     }
 
     return {
-      name: 'Memory Engine check',
+      name: 'Memory Engine',
       status: 'ok',
       duration: Date.now() - start,
     }
   } catch (error: any) {
     return {
-      name: 'Memory Engine check',
+      name: 'Memory Engine',
       status: 'error',
       message: error?.message || 'Memory/Log check failed',
       duration: Date.now() - start,
@@ -263,7 +263,7 @@ async function checkSystems(): Promise<SystemCheck> {
     const hasConfig = !!config.appName && !!config.appHost
     if (!hasConfig) {
       return {
-        name: 'Systems check',
+        name: 'Systems',
         status: 'error',
         message: 'Configuration not loaded',
         duration: Date.now() - start,
@@ -274,7 +274,7 @@ async function checkSystems(): Promise<SystemCheck> {
     const nodeModulesPath = path.join(process.cwd(), 'node_modules')
     if (!fs.existsSync(nodeModulesPath)) {
       return {
-        name: 'Systems check',
+        name: 'Systems',
         status: 'error',
         message: 'Dependencies not installed',
         duration: Date.now() - start,
@@ -285,7 +285,7 @@ async function checkSystems(): Promise<SystemCheck> {
     const packageJsonPath = path.join(process.cwd(), 'package.json')
     if (!fs.existsSync(packageJsonPath)) {
       return {
-        name: 'Systems check',
+        name: 'Systems',
         status: 'error',
         message: 'package.json not found',
         duration: Date.now() - start,
@@ -296,7 +296,7 @@ async function checkSystems(): Promise<SystemCheck> {
     const serverBuildPath = path.join(process.cwd(), 'dist/server/server/index.js')
     if (!fs.existsSync(serverBuildPath)) {
       return {
-        name: 'Systems check',
+        name: 'Systems',
         status: 'error',
         message: 'Server build not found',
         duration: Date.now() - start,
@@ -304,13 +304,13 @@ async function checkSystems(): Promise<SystemCheck> {
     }
 
     return {
-      name: 'Systems check',
+      name: 'Systems',
       status: 'ok',
       duration: Date.now() - start,
     }
   } catch (error: any) {
     return {
-      name: 'Systems check',
+      name: 'Systems',
       status: 'error',
       message: error?.message || 'System check failed',
       duration: Date.now() - start,
