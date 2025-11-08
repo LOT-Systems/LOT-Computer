@@ -415,4 +415,50 @@ export default async (fastify: FastifyInstance) => {
       note: 'Keys are masked for security. Only first 8 and last 4 characters shown.',
     }
   })
+
+  // Memory Engine diagnostic endpoint - shows why Claude might not be working
+  fastify.get('/debug-memory-engine', async (req, reply) => {
+    const anthropicKey = process.env.ANTHROPIC_API_KEY || config.anthropic?.apiKey
+
+    // Test if we can initialize Anthropic client
+    let anthropicClientTest = 'NOT_TESTED'
+    try {
+      const Anthropic = (await import('@anthropic-ai/sdk')).default
+      const testClient = new Anthropic({ apiKey: anthropicKey })
+      anthropicClientTest = 'INITIALIZED_OK'
+    } catch (err: any) {
+      anthropicClientTest = `FAILED: ${err.message}`
+    }
+
+    return {
+      timestamp: new Date().toISOString(),
+      environment: config.env,
+      diagnosis: {
+        anthropicApiKey: {
+          exists: !!anthropicKey,
+          fromEnv: !!process.env.ANTHROPIC_API_KEY,
+          fromConfig: !!config.anthropic?.apiKey,
+          preview: anthropicKey ? `${anthropicKey.slice(0, 8)}...${anthropicKey.slice(-4)}` : 'NOT_SET',
+          length: anthropicKey?.length || 0,
+        },
+        anthropicClient: {
+          status: anthropicClientTest,
+        },
+        userTagCheck: {
+          requiredTag: 'Usership',
+          note: 'Users need the "Usership" tag (case-insensitive) to use Claude engine',
+        },
+        memoryEngineLogic: {
+          condition: 'hasUsershipTag && config.anthropic.apiKey',
+          result: !!anthropicKey ? 'WILL_USE_CLAUDE_IF_USER_HAS_TAG' : 'WILL_USE_STANDARD_ONLY',
+        },
+      },
+      troubleshooting: {
+        step1: 'Check if ANTHROPIC_API_KEY environment variable is set in Digital Ocean',
+        step2: 'Verify your user has the "Usership" tag in the database',
+        step3: 'Check server logs for "Memory question generation failed" errors',
+        step4: 'Test Claude API key at https://console.anthropic.com/',
+      },
+    }
+  })
 }
