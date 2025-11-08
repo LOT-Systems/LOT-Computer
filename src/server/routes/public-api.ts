@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { sequelize } from '#server/utils/db'
+import { models } from '#server/models'
 import * as weather from '#server/utils/weather'
 import config from '#server/config'
 import fs from 'fs'
@@ -98,7 +99,7 @@ async function checkAuth(): Promise<SystemCheck> {
   const start = Date.now()
   try {
     // Check if Session model is available
-    await sequelize.models.Session.findOne()
+    await models.Session.findOne()
 
     // Check Resend API is configured
     if (!process.env.RESEND_API_KEY) {
@@ -140,7 +141,7 @@ async function checkUsers(): Promise<SystemCheck> {
   const start = Date.now()
   try {
     // Check if User model is available
-    await sequelize.models.User.findOne()
+    await models.User.findOne()
 
     // Check if /us page bundle exists (admin page)
     const usPagePath = path.join(process.cwd(), 'dist/client/js/us.js')
@@ -171,8 +172,20 @@ async function checkUsers(): Promise<SystemCheck> {
 async function checkSettings(): Promise<SystemCheck> {
   const start = Date.now()
   try {
-    // Check if UserSettings model is available
-    await sequelize.models.UserSettings.findOne()
+    // Check if User model is available (settings are part of User model)
+    await models.User.findOne()
+
+    // Check if settings page bundle exists
+    const settingsPagePath = path.join(process.cwd(), 'dist/client/js/app.js')
+    if (!fs.existsSync(settingsPagePath)) {
+      return {
+        name: 'Settings',
+        status: 'error',
+        message: 'Settings page bundle not found',
+        duration: Date.now() - start,
+      }
+    }
+
     return {
       name: 'Settings',
       status: 'ok',
@@ -191,8 +204,8 @@ async function checkSettings(): Promise<SystemCheck> {
 async function checkSync(): Promise<SystemCheck> {
   const start = Date.now()
   try {
-    // Check if CategoryEntry model is available
-    await sequelize.models.CategoryEntry.findOne()
+    // Check if LiveMessage model is available (used for sync feature)
+    await models.LiveMessage.findOne()
     return {
       name: 'Sync',
       status: 'ok',
@@ -211,11 +224,22 @@ async function checkSync(): Promise<SystemCheck> {
 async function checkMemory(): Promise<SystemCheck> {
   const start = Date.now()
   try {
-    // Check if Memory model is available (prompt system)
-    await sequelize.models.Memory.findOne()
+    // Check if Answer model is available (Memory answers/prompts)
+    await models.Answer.findOne()
 
     // Check if Log model is available (logging system)
-    await sequelize.models.Log.findOne()
+    await models.Log.findOne()
+
+    // Check if Anthropic API key is configured for Claude-powered Memory
+    const hasAnthropicKey = !!process.env.ANTHROPIC_API_KEY || !!config.anthropic?.apiKey
+    if (!hasAnthropicKey) {
+      return {
+        name: 'Memory Engine check',
+        status: 'error',
+        message: 'Claude API key not configured',
+        duration: Date.now() - start,
+      }
+    }
 
     return {
       name: 'Memory Engine check',
@@ -227,37 +251,6 @@ async function checkMemory(): Promise<SystemCheck> {
       name: 'Memory Engine check',
       status: 'error',
       message: error?.message || 'Memory/Log check failed',
-      duration: Date.now() - start,
-    }
-  }
-}
-
-async function checkStoryAI(): Promise<SystemCheck> {
-  const start = Date.now()
-  try {
-    // Check if ANTHROPIC_API_KEY (Claude API) is configured for Usership users
-    const hasKey = !!process.env.ANTHROPIC_API_KEY || !!config.anthropic?.apiKey
-    if (!hasKey) {
-      return {
-        name: 'Story AI stack check',
-        status: 'error',
-        message: 'Claude API key not configured',
-        duration: Date.now() - start,
-      }
-    }
-
-    // Check if UserMemory model is available (for Usership tagged users)
-    await sequelize.models.UserMemory.findOne()
-    return {
-      name: 'Story AI stack check',
-      status: 'ok',
-      duration: Date.now() - start,
-    }
-  } catch (error: any) {
-    return {
-      name: 'Story AI stack check',
-      status: 'error',
-      message: error?.message || 'Story AI check failed',
       duration: Date.now() - start,
     }
   }
@@ -341,7 +334,6 @@ async function performHealthChecks(): Promise<{
     checkSystems(),
     checkWeatherAPI(),
     checkDatabase(),
-    checkStoryAI(),
     checkMemory(),
   ])
 

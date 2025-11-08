@@ -11,6 +11,11 @@ import {
 } from '#shared/constants'
 import { cn } from '#client/utils'
 
+interface StatusData {
+  version: string
+  overall: 'ok' | 'degraded' | 'error'
+}
+
 export const Settings = () => {
   const me = useStore(stores.me)
   const baseColor = useStore(stores.baseColor)
@@ -35,6 +40,7 @@ export const Settings = () => {
   })
 
   const [changed, setChanged] = React.useState(false)
+  const [statusData, setStatusData] = React.useState<StatusData | null>(null)
   const [state, setState] = React.useState<UserSettings>({
     firstName: me!.firstName,
     lastName: me!.lastName,
@@ -117,6 +123,27 @@ export const Settings = () => {
 
     return tags
   }, [me])
+
+  // Fetch status data for the status link
+  React.useEffect(() => {
+    fetch('/api/public/status')
+      .then((res) => res.json())
+      .then((data) => {
+        setStatusData({
+          version: data.version,
+          overall: data.overall,
+        })
+      })
+      .catch((err) => {
+        console.error('Failed to fetch status:', err)
+      })
+  }, [])
+
+  const statusText = statusData
+    ? statusData.overall === 'ok'
+      ? `Status page (v${statusData.version})`
+      : `Status page (v${statusData.version}) - System issues detected`
+    : 'Status page (loading...)'
 
   return (
     <div className="flex flex-col gap-y-48">
@@ -234,7 +261,7 @@ export const Settings = () => {
           </Block>
           <Block label="Site systems check:">
             <a href="/status" className="-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc/10">
-              Build: Nov 7, 2025 at 00:45 AM PST (v0.0.2)
+              {statusText}
             </a>
           </Block>
         </div>
