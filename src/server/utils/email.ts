@@ -8,11 +8,12 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface EmailParams {
   to: string;
-  html: string;
+  html?: string;
+  text?: string;
   subject: string;
 }
 
-export async function sendEmail({ to, html, subject }: EmailParams) {
+export async function sendEmail({ to, html, text, subject }: EmailParams) {
   try {
     console.log('Starting email send process...', {
       to,
@@ -21,16 +22,18 @@ export async function sendEmail({ to, html, subject }: EmailParams) {
       timestamp: new Date().toISOString()
     });
 
-    const emailData = {
+    const emailData: any = {
       from: 'auth@lot-systems.com',
       to: [to],
       subject,
-      html,
+      ...(html && { html }),
+      ...(text && { text }),
     };
 
     console.log('Preparing to send email with data:', {
       ...emailData,
-      html: 'HTML content hidden for logging'
+      html: html ? 'HTML content hidden for logging' : undefined,
+      text: text ? 'Text content hidden for logging' : undefined
     });
 
     let result;
