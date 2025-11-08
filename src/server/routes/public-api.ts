@@ -386,4 +386,41 @@ export default async (fastify: FastifyInstance) => {
       cached: false,
     }
   })
+
+  // API key verification endpoint - shows masked API key for verification
+  fastify.get('/verify-api-keys', async (req, reply) => {
+    const anthropicKey = process.env.ANTHROPIC_API_KEY || config.anthropic?.apiKey
+    const resendKey = process.env.RESEND_API_KEY
+    const openaiKey = process.env.OPENAI_API_KEY
+
+    const maskKey = (key: string | undefined) => {
+      if (!key) return 'NOT_SET'
+      if (key.length < 20) return 'INVALID_LENGTH'
+      // Show first 8 and last 4 characters
+      return `${key.slice(0, 8)}...${key.slice(-4)}`
+    }
+
+    return {
+      timestamp: new Date().toISOString(),
+      environment: config.env,
+      keys: {
+        anthropic: {
+          configured: !!anthropicKey,
+          preview: maskKey(anthropicKey),
+          length: anthropicKey?.length || 0,
+        },
+        resend: {
+          configured: !!resendKey,
+          preview: maskKey(resendKey),
+          length: resendKey?.length || 0,
+        },
+        openai: {
+          configured: !!openaiKey,
+          preview: maskKey(openaiKey),
+          length: openaiKey?.length || 0,
+        },
+      },
+      note: 'Keys are masked for security. Only first 8 and last 4 characters shown.',
+    }
+  })
 }
