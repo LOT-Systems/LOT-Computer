@@ -475,8 +475,15 @@ export default async (fastify: FastifyInstance) => {
           const question = await completeAndExtractQuestion(prompt, req.user)
 
           return question
-        } catch (error) {
-          console.error('Memory question generation failed:', error)
+        } catch (error: any) {
+          console.error('❌ Memory question generation failed:', {
+            error: error.message,
+            stack: error.stack,
+            userId: req.user.id,
+            hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
+            userTags: req.user.tags,
+            timestamp: new Date().toISOString(),
+          })
           // Fall back to default questions on error
         }
       }
