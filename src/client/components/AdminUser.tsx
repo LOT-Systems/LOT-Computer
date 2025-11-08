@@ -288,7 +288,7 @@ export const AdminUser = () => {
   )
 }
 
-// Component to display Memory text with blue highlighting for high humidity (>50%)
+// Component to display Memory text with blue highlighting for high humidity (>=50%)
 const MemoryText: React.FC<{ text: string }> = ({ text }) => {
   const lines = text.split('\n')
 
@@ -298,7 +298,7 @@ const MemoryText: React.FC<{ text: string }> = ({ text }) => {
         // Check if line contains humidity info like "H:77%"
         const humidityMatch = line.match(/H:(\d+)%/)
         const humidity = humidityMatch ? parseInt(humidityMatch[1]) : null
-        const isHighHumidity = humidity !== null && humidity > 50
+        const isHighHumidity = humidity !== null && humidity >= 50
 
         return (
           <div
