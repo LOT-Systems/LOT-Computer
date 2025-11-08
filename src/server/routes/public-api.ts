@@ -461,4 +461,54 @@ export default async (fastify: FastifyInstance) => {
       },
     }
   })
+
+  // Test Anthropic API key with actual API call
+  fastify.get('/test-anthropic-key', async (req, reply) => {
+    const anthropicKey = process.env.ANTHROPIC_API_KEY || config.anthropic?.apiKey
+
+    if (!anthropicKey) {
+      return {
+        success: false,
+        error: 'ANTHROPIC_API_KEY not configured',
+        timestamp: new Date().toISOString(),
+      }
+    }
+
+    try {
+      const Anthropic = (await import('@anthropic-ai/sdk')).default
+      const client = new Anthropic({ apiKey: anthropicKey })
+
+      // Make a minimal API call to test the key
+      const message = await client.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 10,
+        messages: [
+          {
+            role: 'user',
+            content: 'Respond with just "OK"',
+          },
+        ],
+      })
+
+      return {
+        success: true,
+        message: 'API key is valid and working',
+        response: message.content[0].type === 'text' ? message.content[0].text : 'OK',
+        usage: {
+          inputTokens: message.usage.input_tokens,
+          outputTokens: message.usage.output_tokens,
+        },
+        timestamp: new Date().toISOString(),
+        note: 'This test consumed a small number of tokens. Check Anthropic dashboard for usage update.',
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || 'Unknown error',
+        errorType: error.constructor.name,
+        status: error.status,
+        timestamp: new Date().toISOString(),
+      }
+    }
+  })
 }
