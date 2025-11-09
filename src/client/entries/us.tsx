@@ -22,8 +22,15 @@ const _App = () => {
   const { data: weather, refetch: refetchWeather } = useWeather()
 
   React.useEffect(() => {
+    // Initialize router to listen to URL changes
+    const unbindRouter = stores.router.listen(() => {})
+
     if (weather !== undefined) {
       stores.weather.set(weather)
+    }
+
+    return () => {
+      unbindRouter()
     }
   }, [weather])
 
@@ -31,7 +38,7 @@ const _App = () => {
 
   return (
     <Page className="leading-[1.5rem]">
-      {router?.route === 'adminUsers' && <AdminUsers />}
+      {(!router || router.route === 'adminUsers') && <AdminUsers />}
       {router?.route === 'adminUser' && <AdminUser />}
     </Page>
   )

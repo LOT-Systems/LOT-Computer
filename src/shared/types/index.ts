@@ -4,7 +4,10 @@ export enum UserTag {
   RND = 'RND',
   Evangelist = 'Evangelist',
   Mala = 'Mala',
-  Onyx = 'Onyx'
+  Onyx = 'Onyx',
+  Usership = 'Usership',
+  Pro = 'Pro',
+  Suspended = 'Suspended',
 }
 
 // User Types
@@ -29,6 +32,7 @@ export type UserProfile = {
   phone: string | null;
   tags: string[];
   hideActivityLogs: boolean;
+  memoryEngine?: 'claude' | 'standard';
 };
 
 export type User = {
@@ -173,6 +177,7 @@ export type DefaultQuestion = {
 };
 
 export type MemoryQuestion = {
+  id?: string;
   question: string;
   answer?: string;
   options?: string[];

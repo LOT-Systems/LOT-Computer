@@ -30,8 +30,12 @@ const config = {
     expiresIn: '30d',
   },
 
-  geonamesUsername: process.env.GEONAMES_USERNAME || ''
+  geonamesUsername: process.env.GEONAMES_USERNAME || '',
   // Note: Weather now uses Open-Meteo (free, no API key required)
+
+  anthropic: {
+    apiKey: process.env.ANTHROPIC_API_KEY || '',
+  },
 }
 
 validateConfig()

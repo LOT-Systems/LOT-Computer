@@ -8,6 +8,7 @@ import { System } from '#client/components/System'
 import { Settings } from '#client/components/Settings'
 import { Logs } from '#client/components/Logs'
 import { Sync } from '#client/components/Sync'
+import { StatusPage } from '#client/components/StatusPage'
 import { render } from '#client/utils/render'
 import { listenSSE } from '#client/utils/sse'
 import { useSun } from '#client/utils/sun'
@@ -76,6 +77,7 @@ const App = () => {
       {(!router || router.route === 'system') && <System />}
       {router?.route === 'settings' && <Settings />}
       {router?.route === 'sync' && <Sync />}
+      {router?.route === 'status' && <StatusPage />}
       {router?.route === 'logs' && <Logs />}
       {isMirrorOn && (
         <video

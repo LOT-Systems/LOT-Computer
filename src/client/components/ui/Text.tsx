@@ -15,7 +15,7 @@ export const Unknown: React.FC<React.HTMLAttributes<HTMLSpanElement>> = ({
   className,
   ...props
 }) => (
-  <span className={cn('opacity-40', className)} {...props}>
+  <span className={cn('text-acc/40', className)} {...props}>
     {props.children || 'Unknown'}
   </span>
 )

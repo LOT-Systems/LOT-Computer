@@ -99,15 +99,19 @@ export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
 export const useMemory = () => {
   const date = btoa(dayjs().format(DATE_TIME_FORMAT))
   const path = '/api/memory'
-  return useQuery<DefaultQuestion>(
+  return useQuery<any>(
     [path],
-    async () =>
-      (await api.get<DefaultQuestion>(path, { params: { d: date } })).data
+    async () => (await api.get<any>(path, { params: { d: date } })).data
   )
 }
 
 export const useCreateMemory = createMutation<
-  { questionId: string; option: string },
+  {
+    questionId: string
+    option: string
+    question?: string
+    options?: string[]
+  },
   { response: string }
 >('post', '/api/memory/answer')
 
@@ -158,3 +162,13 @@ export const useCompleteMemoryPrompt = createMutation<
   { userId: string; prompt: string },
   DefaultQuestion
 >('post', (data) => `/admin-api/users/${data.userId}/memory-prompt`)
+
+export const useUserSummary = (userId: string) =>
+  createQuery<{ summary: string }>(`/admin-api/users/${userId}/summary`, {
+    enabled: !!userId,
+  })()
+
+export const useUserMemoryStory = (userId: string) =>
+  createQuery<{ story: string }>(`/admin-api/users/${userId}/memory-story`, {
+    enabled: !!userId,
+  })()

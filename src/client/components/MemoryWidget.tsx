@@ -3,14 +3,14 @@ import { Block, Button } from '#client/components/ui'
 import { useMemory, useCreateMemory } from '#client/queries'
 import { cn } from '#client/utils'
 import { fp } from '#shared/utils'
-import { DefaultQuestion } from '#shared/types'
+import { MemoryQuestion } from '#shared/types'
 
 export function MemoryWidget() {
   const [isDisplayed, setIsDisplayed] = React.useState(false)
   const [isShown, setIsShown] = React.useState(false)
   const [isQuestionShown, setIsQuestionShown] = React.useState(false)
   const [isResponseShown, setIsResponseShown] = React.useState(false)
-  const [question, setQuestion] = React.useState<DefaultQuestion | null>(null)
+  const [question, setQuestion] = React.useState<MemoryQuestion | null>(null)
   const [response, setResponse] = React.useState<string | null>(null)
   const { data: loadedQuestion = null } = useMemory()
   const { mutate: createMemory } = useCreateMemory({
@@ -36,8 +36,13 @@ export function MemoryWidget() {
 
   const onAnswer = React.useCallback(
     (option: string) => (ev: React.MouseEvent) => {
-      if (!question) return
-      createMemory({ questionId: question.id, option })
+      if (!question || !question.id) return
+      createMemory({
+        questionId: question.id,
+        option,
+        question: question.question,
+        options: question.options,
+      })
     },
     [question]
   )

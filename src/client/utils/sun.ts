@@ -22,6 +22,28 @@ export function useSun(
       }
       const sunrise = dayjs.utc(weather.sunrise * 1000).local()
       const sunset = dayjs.utc(weather.sunset * 1000).local()
+
+      // Debug: Log sunset time to help diagnose issue
+      console.log('[Sun Debug]', {
+        now: now.format('HH:mm:ss'),
+        nowFull: now.format(),
+        nowUnix: now.unix(),
+        sunrise: sunrise.format('HH:mm:ss'),
+        sunriseFull: sunrise.format(),
+        sunset: sunset.format('HH:mm:ss'),
+        sunsetFull: sunset.format(),
+        sunsetUnix: sunset.unix(),
+        sunsetTimestampFromAPI: weather.sunset,
+        sunsetDifference: `${now.diff(sunset, 'minute')} minutes`,
+        isDark: now.isAfter(sunset) || now.isBefore(sunrise),
+        isAfterSunset: now.isAfter(sunset),
+        isBeforeSunrise: now.isBefore(sunrise),
+        inSunsetTransition: now.isAfter(sunset.subtract(10, 'second')) && now.isBefore(sunset.add(1, 'minute')),
+        weatherCreatedAt: weather.createdAt,
+        weatherAge: `${now.diff(dayjs(weather.createdAt), 'minute')} minutes old`,
+        currentTheme: stores.theme.get()
+      })
+
       if (
         now.isAfter(sunrise.subtract(10, 'second')) &&
         now.isBefore(sunrise.add(1, 'minute'))
@@ -35,13 +57,21 @@ export function useSun(
       } else {
         const currentTheme = stores.theme.get()
         const isCustomThemeEnabled = stores.isCustomThemeEnabled.get()
-        if (isCustomThemeEnabled && currentTheme !== 'custom') {
-          stores.theme.set('custom')
+
+        // If custom theme is enabled, don't auto-switch themes
+        if (isCustomThemeEnabled) {
+          if (currentTheme !== 'custom') {
+            stores.theme.set('custom')
+          }
           return
         }
+
+        // Otherwise, do automatic theme switching based on time
         const isDark = now.isAfter(sunset) || now.isBefore(sunrise)
         if (isDark && ['light', 'sunset', 'sunrise'].includes(currentTheme)) {
           stores.theme.set('dark')
+        } else if (!isDark && currentTheme === 'dark') {
+          stores.theme.set('light')
         }
       }
     }

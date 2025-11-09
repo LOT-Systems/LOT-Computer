@@ -19,6 +19,7 @@ import config from '#server/config'
 import authRoutes from './routes/auth.js'
 import apiRoutes from './routes/api.js'
 import adminApiRoutes from './routes/admin-api.js'
+import publicApiRoutes from './routes/public-api.js'
 
 const CWD = process.cwd()
 
@@ -125,6 +126,18 @@ fastify.get('/health', async (request, reply) => {
   return { status: 'ok', timestamp: new Date().toISOString() }
 })
 
+// Public API routes (no authentication required)
+fastify.register(publicApiRoutes, { prefix: '/api/public' })
+
+// Public status page route (no authentication required)
+fastify.get('/status', async (req, reply) => {
+  return reply.view('generic-spa', {
+    scriptName: 'status',
+    scriptNonce: reply.cspNonce.script,
+    styleNonce: reply.cspNonce.style,
+  })
+})
+
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 
@@ -170,12 +183,12 @@ fastify.register(async (fastify: FastifyInstance) => {
       fastify.register(apiRoutes, { prefix: '/api' })
     })
 
-    // Admin API
+    // Admin API (accessible by Admin and Usership users)
     fastify.register(async (fastify) => {
       fastify.addHook('onRequest', async (req, reply) => {
-        if (!req.user || !req.user.isAdmin()) {
+        if (!req.user || !req.user.canAccessUsSection()) {
           reply.status(401)
-          throw new Error('Access denied')
+          throw new Error('Access denied: Admin or Usership access required')
         }
       })
       fastify.register(adminApiRoutes, { prefix: '/admin-api' })
@@ -201,10 +214,10 @@ fastify.register(async (fastify: FastifyInstance) => {
       })
     })
 
-    // Admin app
+    // Admin app (accessible by Admin and Usership users)
     fastify.register(async (fastify) => {
       fastify.addHook('onRequest', async (req, reply) => {
-        if (!req.user || !req.user.isAdmin()) {
+        if (!req.user || !req.user.canAccessUsSection()) {
           return reply.redirect('/')
         }
       })

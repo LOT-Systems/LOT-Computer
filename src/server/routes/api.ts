@@ -25,6 +25,7 @@ import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
+import { buildPrompt, completeAndExtractQuestion } from '#server/utils/memory'
 import dayjs from '#server/utils/dayjs'
 
 export default async (fastify: FastifyInstance) => {
@@ -85,6 +86,7 @@ export default async (fastify: FastifyInstance) => {
             isLiked: likes.some(fp.propEq('userId', req.user.id)),
           }
           write({ event, data: updatedPayload })
+          break
         }
       }
     })
@@ -263,11 +265,17 @@ export default async (fastify: FastifyInstance) => {
           messageId: req.body.messageId,
         })
       }
+
+      // Get updated likes count after the toggle
+      const allLikes = await fastify.models.ChatMessageLike.findAll({
+        where: { messageId: req.body.messageId },
+      })
+
       sync.emit('chat_message_like', {
         messageId: message.id,
-        likes: 0,
-        likesCount: 0,
-        isLiked: false,
+        likes: allLikes.length,
+        likesCount: allLikes.length,
+        isLiked,
       })
       process.nextTick(async () => {
         if (isLiked) {
@@ -335,9 +343,9 @@ export default async (fastify: FastifyInstance) => {
         weather: data,
       })
       return newCachedRecord.useRecordView()
-    } catch (error) {
+    } catch (error: any) {
       // Weather API unavailable or misconfigured - return null so app still works
-      console.warn('Weather API error (API key may be missing):', error.message)
+      console.warn('Weather API error (API key may be missing):', error?.message || error)
       return null
     }
   })
@@ -447,52 +455,111 @@ export default async (fastify: FastifyInstance) => {
       }).then(Boolean)
       if (isRecentlyAsked) return null
 
-      const prevQuestionIds = await fastify.models.Answer.findAll({
-        where: {
-          userId: req.user.id,
-        },
-        order: [['createdAt', 'DESC']],
-        attributes: ['id', 'metadata'],
-      }).then((xs) => Array.from(new Set(xs.map((x) => x.metadata.questionId))))
+      // Check if user has Usership tag for AI-generated questions
+      const hasUsershipTag = req.user.tags.some(
+        (tag) => tag.toLowerCase() === 'usership'
+      )
 
-      let untouchedQuestions = defaultQuestions
-      if (prevQuestionIds.length) {
-        untouchedQuestions = defaultQuestions.filter(
-          fp.propNotIn('id', prevQuestionIds)
-        )
-        if (!untouchedQuestions.length) {
-          const longAgoAnsweredQuestionIds = prevQuestionIds.slice(
-            -1 * Math.floor(prevQuestionIds.length / 3)
-          )
-          untouchedQuestions = defaultQuestions.filter(
-            fp.propIn('id', longAgoAnsweredQuestionIds)
-          )
+      if (hasUsershipTag) {
+        // Usership users: Generate AI-based context-aware question using Claude
+        try {
+          const logs = await fastify.models.Log.findAll({
+            where: {
+              userId: req.user.id,
+            },
+            order: [['createdAt', 'DESC']],
+            limit: 20,
+          })
+
+          const prompt = await buildPrompt(req.user, logs)
+          const question = await completeAndExtractQuestion(prompt, req.user)
+
+          return question
+        } catch (error: any) {
+          console.error('❌ Memory question generation failed:', {
+            error: error.message,
+            stack: error.stack,
+            userId: req.user.id,
+            hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
+            userTags: req.user.tags,
+            timestamp: new Date().toISOString(),
+          })
+          // Fall back to default questions on error
         }
       }
 
-      const rng = seedrandom(
-        `${req.user.id} ${localDate.format(DATE_FORMAT)} ${
-          isNightPeriod ? 'N' : 'D'
-        }`
-      )
-      const question =
-        untouchedQuestions[Math.floor(rng() * untouchedQuestions.length)]
-      return question
+      {
+        // Non-Usership users: Use hardcoded questions
+        const prevQuestionIds = await fastify.models.Answer.findAll({
+          where: {
+            userId: req.user.id,
+          },
+          order: [['createdAt', 'DESC']],
+          attributes: ['id', 'metadata'],
+        }).then((xs) => Array.from(new Set(xs.map((x) => x.metadata.questionId))))
+
+        let untouchedQuestions = defaultQuestions
+        if (prevQuestionIds.length) {
+          untouchedQuestions = defaultQuestions.filter(
+            fp.propNotIn('id', prevQuestionIds)
+          )
+          if (!untouchedQuestions.length) {
+            const longAgoAnsweredQuestionIds = prevQuestionIds.slice(
+              -1 * Math.floor(prevQuestionIds.length / 3)
+            )
+            untouchedQuestions = defaultQuestions.filter(
+              fp.propIn('id', longAgoAnsweredQuestionIds)
+            )
+          }
+        }
+
+        const rng = seedrandom(
+          `${req.user.id} ${localDate.format(DATE_FORMAT)} ${
+            isNightPeriod ? 'N' : 'D'
+          }`
+        )
+        const question =
+          untouchedQuestions[Math.floor(rng() * untouchedQuestions.length)]
+        return question
+      }
     }
   )
 
   fastify.post(
     '/memory/answer',
     async (
-      req: FastifyRequest<{ Body: { questionId: string; option: string } }>,
+      req: FastifyRequest<{
+        Body: {
+          questionId: string
+          option: string
+          question?: string
+          options?: string[]
+        }
+      }>,
       reply
     ) => {
       const { questionId, option } = req.body
-      const question = defaultQuestions.find(fp.propEq('id', questionId))
-      if (!question) {
-        return reply.throw.badParams()
+
+      // Try to find in default questions first (backwards compatibility)
+      let question = defaultQuestions.find(fp.propEq('id', questionId))
+      let questionText: string
+      let questionOptions: string[]
+
+      if (question) {
+        // Default question
+        questionText = question.question
+        questionOptions = question.options
+      } else {
+        // AI-generated question - accept from request body
+        if (!req.body.question || !req.body.options) {
+          return reply.throw.badParams()
+        }
+        questionText = req.body.question
+        questionOptions = req.body.options
       }
-      if (!question.options.includes(option)) {
+
+      // Validate the selected option
+      if (!questionOptions.includes(option)) {
         return reply.throw.badParams()
       }
 
@@ -500,8 +567,8 @@ export default async (fastify: FastifyInstance) => {
 
       const answer = await fastify.models.Answer.create({
         userId: req.user.id,
-        question: question.question,
-        options: question.options,
+        question: questionText,
+        options: questionOptions,
         answer: option,
         metadata: { questionId },
       })
@@ -515,8 +582,8 @@ export default async (fastify: FastifyInstance) => {
           metadata: {
             questionId,
             answerId: answer.id,
-            question: question.question,
-            options: question.options,
+            question: questionText,
+            options: questionOptions,
             answer: option,
           },
           context,

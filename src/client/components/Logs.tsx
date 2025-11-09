@@ -234,6 +234,21 @@ const NoteEditor = ({
     textarea.addEventListener('blur', () => setIsFocused(false))
   }, [])
 
+  // Handle Enter key to save immediately
+  const onKeyDown = React.useCallback(
+    (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (ev.key === 'Enter' && !ev.shiftKey) {
+        ev.preventDefault() // Prevent newline
+        if (value !== log.text) {
+          onChange(value) // Immediate save
+        }
+        // Optionally blur to show save happened
+        ;(ev.target as HTMLTextAreaElement).blur()
+      }
+    },
+    [value, log.text, onChange]
+  )
+
   return (
     <div className="relative group">
       <div
@@ -264,6 +279,7 @@ const NoteEditor = ({
           direction="v"
           value={value}
           onChange={setValue}
+          onKeyDown={onKeyDown}
           placeholder={
             !primary ? 'The log record will be deleted' : 'Type here...'
           }

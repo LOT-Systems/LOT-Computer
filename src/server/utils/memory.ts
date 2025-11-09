@@ -1,7 +1,10 @@
 import Instructor from '@instructor-ai/instructor'
 import OpenAI from 'openai'
+import Anthropic from '@anthropic-ai/sdk'
+import { randomUUID } from 'crypto'
 import { z } from 'zod'
 import dayjs from '#server/utils/dayjs'
+import config from '#server/config'
 import {
   COUNTRY_BY_ALPHA3,
   DATE_TIME_FORMAT,
@@ -15,36 +18,111 @@ import {
   MemoryQuestion,
   User,
   UserSettings,
+  UserTag,
 } from '#shared/types'
 import { toCelsius } from '#shared/utils'
 import { getLogContext } from './logs.js'
+import { aiEngineManager, type EnginePreference } from './ai-engines.js'
 
+// OpenAI client (for non-Usership users - LEGACY fallback)
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-const client = Instructor({
+const oaiClient = Instructor({
   client: oai,
   mode: 'TOOLS',
 })
+
+// Anthropic client (LEGACY - kept for backwards compatibility)
+const anthropic = new Anthropic({
+  apiKey: config.anthropic.apiKey,
+})
+
+// ============================================================================
+// AI ENGINE CONFIGURATION
+// ============================================================================
+// Switch between 'claude', 'openai', or 'auto' (auto tries Claude first, then OpenAI)
+// This is where YOU control which AI engine to use - LOT owns the decision!
+const AI_ENGINE_PREFERENCE: EnginePreference = 'auto'
 
 const questionSchema = z.object({
   question: z.string(),
   options: z.array(z.string()),
 })
 
+const userSummarySchema = z.object({
+  summary: z.string(),
+})
+
+// Helper to determine which engine to use based on user tags
+export function getMemoryEngine(user: User): 'claude' | 'standard' {
+  const hasUsershipTag = user.tags.some(
+    (tag) => tag.toLowerCase() === UserTag.Usership.toLowerCase()
+  )
+  return hasUsershipTag && config.anthropic.apiKey ? 'claude' : 'standard'
+}
+
 export async function completeAndExtractQuestion(
-  prompt: string
+  prompt: string,
+  user: User
 ): Promise<MemoryQuestion> {
-  const extractedQuestion = await client.chat.completions.create({
-    messages: [{ role: 'user', content: prompt }],
-    model: 'gpt-4o-mini',
-    response_model: {
-      schema: questionSchema,
-      name: 'Question',
-    },
-  })
-  return questionSchema.parse(extractedQuestion)
+  // ============================================================================
+  // AI ENGINE ABSTRACTION IN ACTION
+  // LOT owns the prompt and logic. AI engine is just a tool to execute it.
+  // ============================================================================
+
+  try {
+    // Get the best available AI engine (Claude, then OpenAI, configurable)
+    const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
+
+    console.log(`🤖 Using ${engine.name} for Memory question generation`)
+
+    // LOT's prompt stays on LOT's side - engine just executes it
+    const fullPrompt = `${prompt}
+
+Please respond with ONLY a valid JSON object in this exact format:
+{
+  "question": "your question here",
+  "options": ["option1", "option2", "option3"]
+}
+
+Make sure the question is personalized, relevant to self-care habits, and the options are 3-4 concise choices.`
+
+    // Execute using whichever engine is available
+    const completion = await engine.generateCompletion(fullPrompt, 1024)
+
+    // Parse JSON from response (works for both Claude and OpenAI)
+    const jsonMatch = completion.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) {
+      throw new Error(`No JSON found in ${engine.name} response`)
+    }
+
+    const parsed = JSON.parse(jsonMatch[0])
+    const validatedQuestion = questionSchema.parse(parsed)
+
+    return {
+      id: randomUUID(),
+      ...validatedQuestion,
+    }
+  } catch (error: any) {
+    console.error('❌ AI Engine failed, falling back to legacy OpenAI:', error.message)
+
+    // FALLBACK: Use legacy OpenAI with Instructor if new system fails
+    const extractedQuestion = await oaiClient.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      model: 'gpt-4o-mini',
+      response_model: {
+        schema: questionSchema,
+        name: 'Question',
+      },
+    })
+    const validatedQuestion = questionSchema.parse(extractedQuestion)
+    return {
+      id: randomUUID(),
+      ...validatedQuestion,
+    }
+  }
 }
 
 export async function buildPrompt(user: User, logs: Log[]): Promise<string> {
@@ -67,57 +145,72 @@ export async function buildPrompt(user: User, logs: Log[]): Promise<string> {
     }
   }
 
+  // Extract Memory answers to build user's story
+  const memoryLogs = logs.filter((log) => log.event === 'answer')
+  let userStory = ''
+  if (memoryLogs.length > 0) {
+    userStory = `
+User's Memory Story (what we know about them based on previous answers):
+${memoryLogs
+  .slice(0, 15)
+  .map((log, index) => {
+    const q = log.metadata.question || ''
+    const a = log.metadata.answer || ''
+    const date = log.context.timeZone
+      ? dayjs(log.createdAt).tz(log.context.timeZone).format('D MMM')
+      : ''
+    return `${index + 1}. ${date ? `[${date}] ` : ""}${q} → User chose: "${a}"`
+  })
+  .join('\n')}
+
+Based on these answers, you can infer the user's preferences, habits, and lifestyle. Use this knowledge to craft follow-up questions that show you remember their choices.`
+  }
+
   const head = `
 You are an AI agent of LOT Systems, a subscription service that distributes digital and physical necessities, basic wardrobes, organic self-care products, home and kids essentials.
 
-On the LOT website, users can:
-- Modify their settings, such as country and city of residence, in the "Settings" section.
-- Engage with the community by leaving chat messages in the "Sync" section and upvoting other's messages.
-- Write private notes in the "Note" section.
-- Respond to prompts in the "Memory" section.
+On the LOT website, users respond to prompts in the "Memory" section. Each answer helps build a story about the user's preferences, habits, and self-care approach.
 
-Each action taken within these modules generates a log record. This log captures a snapshot of data relevant to the moment the action was performed, which may include:
-- Local time
-- Local temperature and humidity
-- City, country, and time zone
+**Your task:** Generate ONE personalized follow-up question with 3-4 answer choices that:
+1. **MUST reference their previous answers** - Always start by acknowledging something they've already shared (e.g., "Since you mentioned you prefer tea in the morning, how do you usually prepare it?")
+2. **Builds deeper into their story** - Each question should feel like a natural continuation of the conversation, not a random topic
+3. **Is contextually relevant** - Consider current time, weather, and their recent activity patterns
 
-Your task is to analyze the logs and formulate one personalized question for the user, offering three answer choices. Your response must consist only of the question and the three choices, without any additional text. The question should be general rather than specific to the log's content, designed to gauge the user's mood or state of mind. Aim for creativity, friendliness, and an engaging tone, avoiding overly generic queries. Speak to the user as if you were a friend. Keep the tone calm and supportive.
+**CRITICAL: User-Feedback Loop Requirements:**
+- If they have previous answers, you MUST explicitly reference at least one in your new question
+- Show you remember what they told you - use phrases like "You mentioned...", "Since you prefer...", "Last time you chose...", "Building on your answer about..."
+- The question should feel like you're having an ongoing conversation, not starting fresh each time
+- Make connections between their different answers to show you understand their overall lifestyle
 
-Examples of some of built-in questions (DO NOT REPEAT THEM):
-1. What is your outfit today? (Options: Neutral and comfortable, Light, Dressed up)
-2. How would you describe your lunch today? (Options: Fresh salad, Balanced proteins and carbs, It's a treat day!)
-3. Pay attention to posture? (Options: Always, Sometimes, Ask me later)
-4. Let’s try no tech 1 hour before sleep? (Options: Always, Sure, Never)
-5. Are you comfortable saying no? (Options: Yes, No, Getting there)
+**Important guidelines:**
+- Speak as a supportive friend who remembers EVERY past conversation
+- Be specific when referencing their choices - don't be vague
+- Keep tone calm, warm, and genuinely curious
+- The question should deepen understanding of their self-care habits, daily routines, and preferences
+- Each answer helps build a richer narrative about who they are
 
-Each log entry is formatted as follows:
+Examples of good Memory questions with feedback loop (STUDY THESE PATTERNS, DO NOT COPY):
+WITHOUT previous answers:
+1. "What is your outfit today?" (Options: Neutral and comfortable, Light, Dressed up)
 
-\`\`\`
----
-[<MODULE>] 19 Oct 2023 22:35, Paris, France, T:13℃, H:55%
-<CONTENT>
-\`\`\`
-Where \`<MODULE>\` indicates the section of the website the log is associated with: Settings, Sync, Note, or Memory.
-For the Memory module, the content includes a question, options, and a selected answer. You need to continue the conversation by asking a new question based on the user's context and previous responses.
+WITH previous answers (showing proper feedback loop):
+2. "Since you mentioned enjoying tea in the morning, how do you usually prepare it?" (Options: Quick tea bag, Loose leaf ritual, Matcha ceremony)
+3. "You chose 'Fresh salad' for lunch earlier. What's your go-to salad base?" (Options: Mixed greens, Spinach, Arugula)
+4. "Last time you said you prefer comfortable outfits. What fabrics feel best to you?" (Options: Soft cotton, Linen, Merino wool)
+5. "Building on your earlier answer about posture awareness, do you stretch during the day?" (Options: Regular breaks, Only when sore, Not yet)
+6. "You mentioned being comfortable saying no. How do you recharge after social interactions?" (Options: Quiet alone time, Light reading, Nature walk)
 
-${
-  contextLine
-    ? 'Keep the current user context in mind when crafting your question.'
-    : ''
-}
+${userStory}
+
+${contextLine ? 'Current context to consider:' : ''}
 ${contextLine}
 ${
   contextLine
-    ? 'Ensure the question is appropriate for this time and setting.'
-    : ''
-}
-${
-  contextLine && context.city
-    ? `Please avoid asking generic questions about the city as if the user were merely a tourist there. Instead, be direct and personal, delving into the user's personality.`
+    ? 'Ensure the question is appropriate for this time and setting. Be direct and personal, focusing on the user\'s personality and habits.'
     : ''
 }
 
-User logs:
+Recent activity logs (for additional context):
   `.trim()
   const formattedLogs = logs.map(formatLog).filter(Boolean).join('\n\n')
   return head + '\n\n' + formattedLogs
@@ -198,4 +291,148 @@ const MODULE_BY_LOG_EVENT: Record<LogEvent, string> = {
   weather_update: 'Weather',
   note: 'Note',
   other: 'Other',
+}
+
+export async function generateMemoryStory(user: User, logs: Log[]): Promise<string> {
+  // ============================================================================
+  // MEMORY STORY DENSIFICATION - LOT's Core Logic
+  // This stays on LOT's side regardless of which AI engine executes it
+  // ============================================================================
+
+  // Extract only Memory/answer logs
+  const answerLogs = logs.filter((log) => log.event === 'answer')
+
+  if (answerLogs.length === 0) {
+    return 'No Memory story yet - user hasn\'t answered any prompts.'
+  }
+
+  // Format answers for AI to synthesize - LOT owns this formatting logic
+  const formattedAnswers = answerLogs
+    .slice(0, 30)
+    .map((log) => {
+      const q = log.metadata.question || ''
+      const a = log.metadata.answer || ''
+      const date = log.context.timeZone
+        ? dayjs(log.createdAt).tz(log.context.timeZone).format('D MMM YYYY')
+        : ''
+      return `[${date}] ${q} → "${a}"`
+    })
+    .join('\n')
+
+  // LOT's prompt - stays on LOT's side, engine-independent
+  const prompt = `You are analyzing a user's Memory answers from LOT Systems, a self-care and lifestyle subscription service.
+
+Based on their answers to personalized questions over time, create a narrative story about their preferences, habits, and lifestyle. Write in third person ("User prefers...", "They enjoy...").
+
+Format as a flowing narrative with bullet points for key insights. Focus on:
+- Daily routines and preferences (morning beverages, meals, clothing)
+- Self-care habits and priorities
+- Lifestyle patterns and choices
+- Personality traits evident in their answers
+
+User's Memory Answers (chronological):
+${formattedAnswers}
+
+Generate a concise narrative story (3-5 bullet points) that captures who this person is based on their Memory answers:`
+
+  try {
+    // Use AI engine abstraction - try Claude, then OpenAI, whichever works
+    const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
+    console.log(`🤖 Using ${engine.name} for Memory Story generation`)
+
+    const story = await engine.generateCompletion(prompt, 1000)
+    return story || 'Unable to generate story.'
+  } catch (error: any) {
+    console.error('❌ AI Engine failed for Memory Story:', error.message)
+
+    // FALLBACK: Try legacy Claude if new system fails
+    try {
+      const response = await anthropic.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: prompt
+        }],
+      })
+
+      const textContent = response.content.find((block) => block.type === 'text')
+      if (!textContent || textContent.type !== 'text') {
+        return 'Unable to generate story.'
+      }
+
+      return textContent.text || 'Unable to generate story.'
+    } catch (fallbackError) {
+      console.error('❌ Legacy Claude also failed:', fallbackError)
+      return 'Unable to generate story at this time. Please try again later.'
+    }
+  }
+}
+
+export async function generateUserSummary(user: User, logs: Log[]): Promise<string> {
+  const context = await getLogContext(user)
+  const country = user.country ? COUNTRY_BY_ALPHA3[user.country]?.name || user.country : 'Unknown'
+
+  const tags = user.tags.length > 0 ? user.tags.join(', ') : 'None'
+  const joinedDate = user.joinedAt ? dayjs(user.joinedAt).format('D MMMM YYYY') : 'Not activated'
+  const lastSeen = user.lastSeenAt ? dayjs(user.lastSeenAt).format('D MMMM YYYY, HH:mm') : 'Never'
+
+  // Extract memory/answer logs specifically
+  const answerLogs = logs.filter((log) => log.event === 'answer')
+  const formattedAnswers = answerLogs.slice(0, 20).map(formatLog).filter(Boolean).join('\n\n')
+
+  // Extract subscription info from metadata
+  const hasSubscription = user.stripeCustomerId || (user.metadata as any)?.subscription
+  const subscriptionInfo = hasSubscription
+    ? `Has physical subscription history (Stripe ID: ${user.stripeCustomerId || 'in metadata'})`
+    : 'No physical subscription history'
+
+  // Count different types of activities
+  const answerCount = answerLogs.length
+  const otherActivityCount = logs.length - answerCount
+
+  const prompt = `You are an AI assistant helping administrators understand LOT Systems users' self-care habits and lifestyle patterns.
+
+LOT Systems is a subscription service focused on digital and physical necessities, wardrobes, organic self-care products, and essentials.
+
+Analyze this user's Memory prompt answers and activity to create an insightful profile summary (2-3 paragraphs).
+
+**Focus specifically on:**
+1. **Self-care habits and understanding** - What do their answers reveal about their lifestyle, habits, and self-care approach?
+2. **Memory engagement patterns** - How engaged are they with the Memory feature? What themes emerge from their answers?
+3. **Subscription relationship** - Do they have physical subscription history? How does this relate to their digital engagement?
+
+User Profile:
+- Name: ${[user.firstName, user.lastName].filter(Boolean).join(' ') || 'Not provided'}
+- Location: ${user.city || 'Unknown'}, ${country}
+- Tags: ${tags}
+- Joined: ${joinedDate}
+- Last seen: ${lastSeen}
+- Subscription: ${subscriptionInfo}
+- Memory answers: ${answerCount} responses
+- Other activities: ${otherActivityCount} actions
+
+Memory Prompt Answers (their self-care and lifestyle responses):
+${formattedAnswers || 'No Memory answers yet - user hasn\'t engaged with the Memory feature'}
+
+${answerCount === 0 ? '\nNote: This user has not yet answered any Memory prompts, so insights are limited to their basic profile and activity patterns.' : ''}
+
+Provide a warm, insightful summary that helps admins understand this user's self-care journey and engagement with LOT Systems.`
+
+  // Use Claude API instead of OpenAI
+  const response = await anthropic.messages.create({
+    model: 'claude-3-5-sonnet-20241022',
+    max_tokens: 2000,
+    messages: [{
+      role: 'user',
+      content: prompt
+    }],
+  })
+
+  const textContent = response.content.find((block) => block.type === 'text')
+  if (!textContent || textContent.type !== 'text') {
+    return 'Unable to generate summary.'
+  }
+
+  return textContent.text || 'Unable to generate summary.'
 }

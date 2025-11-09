@@ -11,7 +11,7 @@ import {
 import { cn, formatNumberWithCommas } from '#client/utils'
 import { useExternalScript } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
-import { USER_TAGS_BY_ID } from '#shared/constants'
+import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
@@ -47,8 +47,8 @@ export const System = () => {
   const userTags = React.useMemo(() => {
     return (me?.tags || [])
       .map((x) => {
-        const tag = USER_TAGS_BY_ID[x]
-        return tag || null
+        const tag = getUserTagByIdCaseInsensitive(x)
+        return tag
       })
       .filter(Boolean)
   }, [me])
@@ -141,7 +141,7 @@ export const System = () => {
           <Block label="Team:" blockView>
             <TagsContainer
               items={userTags.map((x) => (
-                <Tag key={x.name}>{x.name}</Tag>
+                <Tag key={x!.name} color={x!.color}>{x!.name}</Tag>
               ))}
             />
           </Block>
@@ -173,9 +173,7 @@ export const System = () => {
             <Block label="Humidity:">
               <span
                 className={cn(
-                  weather?.humidity > 60 &&
-                    theme === 'light' &&
-                    'text-blue-light'
+                  weather?.humidity >= 50 && 'text-blue-500'
                 )}
               >
                 {weather?.humidity}%
