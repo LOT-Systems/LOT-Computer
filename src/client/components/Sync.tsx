@@ -174,7 +174,7 @@ export const Sync = () => {
             <div
               key={x.id}
               className={cn(
-                'group flex items-start gap-x-16 mb-8 cursor-pointer hover:bg-acc/5 -mx-8 px-8 py-4 rounded transition-colors',
+                'group flex items-start gap-x-16 mb-8 cursor-pointer border border-acc/10 -mx-8 px-8 py-4 rounded transition-colors',
                 i >= SYNC_CHAT_MESSAGES_TO_SHOW && 'text-acc/20'
               )}
               onClick={onToggleLike(x.id)}
@@ -213,11 +213,9 @@ export const Sync = () => {
                 </Tag>
               )}
 
-              {!isTouchDevice && (
-                <div className="text-acc/0 transition-opacity select-none pointer-events-none whitespace-nowrap group-hover:text-acc/40">
-                  <MessageTimeLabel dateString={x.createdAt} />
-                </div>
-              )}
+              <div className="text-acc/40 select-none pointer-events-none whitespace-nowrap">
+                <MessageTimeLabel dateString={x.createdAt} />
+              </div>
             </div>
           )
         })}
