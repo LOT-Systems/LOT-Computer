@@ -53,6 +53,7 @@
     "@fastify/rate-limit": "^8.0.3",
     "@fastify/static": "^8.0.0",
     "@fastify/view": "^10.0.0",
+    "@google/generative-ai": "^0.24.1",
     "@instructor-ai/instructor": "^1.5.0",
     "@nanostores/persistent": "^0.9.1",
     "@nanostores/react": "^0.4.1",

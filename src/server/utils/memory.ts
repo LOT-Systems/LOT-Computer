@@ -22,8 +22,9 @@ import {
 } from '#shared/types'
 import { toCelsius } from '#shared/utils'
 import { getLogContext } from './logs.js'
+import { aiEngineManager, type EnginePreference } from './ai-engines.js'
 
-// OpenAI client (for non-Usership users)
+// OpenAI client (for non-Usership users - LEGACY fallback)
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
@@ -33,10 +34,17 @@ const oaiClient = Instructor({
   mode: 'TOOLS',
 })
 
-// Anthropic client (for Usership users) - using SDK directly
+// Anthropic client (LEGACY - kept for backwards compatibility)
 const anthropic = new Anthropic({
   apiKey: config.anthropic.apiKey,
 })
+
+// ============================================================================
+// AI ENGINE CONFIGURATION
+// ============================================================================
+// Switch between 'claude', 'openai', or 'auto' (auto tries Claude first, then OpenAI)
+// This is where YOU control which AI engine to use - LOT owns the decision!
+const AI_ENGINE_PREFERENCE: EnginePreference = 'auto'
 
 const questionSchema = z.object({
   question: z.string(),
@@ -59,16 +67,19 @@ export async function completeAndExtractQuestion(
   prompt: string,
   user: User
 ): Promise<MemoryQuestion> {
-  const engine = getMemoryEngine(user)
+  // ============================================================================
+  // AI ENGINE ABSTRACTION IN ACTION
+  // LOT owns the prompt and logic. AI engine is just a tool to execute it.
+  // ============================================================================
 
-  if (engine === 'claude') {
-    // Use Anthropic Claude for Usership users - direct SDK call
-    const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1024,
-      messages: [{
-        role: 'user',
-        content: `${prompt}
+  try {
+    // Get the best available AI engine (Claude, then OpenAI, configurable)
+    const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
+
+    console.log(`🤖 Using ${engine.name} for Memory question generation`)
+
+    // LOT's prompt stays on LOT's side - engine just executes it
+    const fullPrompt = `${prompt}
 
 Please respond with ONLY a valid JSON object in this exact format:
 {
@@ -77,29 +88,27 @@ Please respond with ONLY a valid JSON object in this exact format:
 }
 
 Make sure the question is personalized, relevant to self-care habits, and the options are 3-4 concise choices.`
-      }],
-    })
 
-    // Extract text content from Claude's response
-    const textContent = response.content.find((block) => block.type === 'text')
-    if (!textContent || textContent.type !== 'text') {
-      throw new Error('No text content in Claude response')
-    }
+    // Execute using whichever engine is available
+    const completion = await engine.generateCompletion(fullPrompt, 1024)
 
-    // Parse JSON from response
-    const jsonMatch = textContent.text.match(/\{[\s\S]*\}/)
+    // Parse JSON from response (works for both Claude and OpenAI)
+    const jsonMatch = completion.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
-      throw new Error('No JSON found in Claude response')
+      throw new Error(`No JSON found in ${engine.name} response`)
     }
 
     const parsed = JSON.parse(jsonMatch[0])
     const validatedQuestion = questionSchema.parse(parsed)
+
     return {
       id: randomUUID(),
       ...validatedQuestion,
     }
-  } else {
-    // Use OpenAI for regular users
+  } catch (error: any) {
+    console.error('❌ AI Engine failed, falling back to legacy OpenAI:', error.message)
+
+    // FALLBACK: Use legacy OpenAI with Instructor if new system fails
     const extractedQuestion = await oaiClient.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
       model: 'gpt-4o-mini',
@@ -285,6 +294,11 @@ const MODULE_BY_LOG_EVENT: Record<LogEvent, string> = {
 }
 
 export async function generateMemoryStory(user: User, logs: Log[]): Promise<string> {
+  // ============================================================================
+  // MEMORY STORY DENSIFICATION - LOT's Core Logic
+  // This stays on LOT's side regardless of which AI engine executes it
+  // ============================================================================
+
   // Extract only Memory/answer logs
   const answerLogs = logs.filter((log) => log.event === 'answer')
 
@@ -292,7 +306,7 @@ export async function generateMemoryStory(user: User, logs: Log[]): Promise<stri
     return 'No Memory story yet - user hasn\'t answered any prompts.'
   }
 
-  // Format answers for AI to synthesize
+  // Format answers for AI to synthesize - LOT owns this formatting logic
   const formattedAnswers = answerLogs
     .slice(0, 30)
     .map((log) => {
@@ -305,6 +319,7 @@ export async function generateMemoryStory(user: User, logs: Log[]): Promise<stri
     })
     .join('\n')
 
+  // LOT's prompt - stays on LOT's side, engine-independent
   const prompt = `You are analyzing a user's Memory answers from LOT Systems, a self-care and lifestyle subscription service.
 
 Based on their answers to personalized questions over time, create a narrative story about their preferences, habits, and lifestyle. Write in third person ("User prefers...", "They enjoy...").
@@ -320,22 +335,38 @@ ${formattedAnswers}
 
 Generate a concise narrative story (3-5 bullet points) that captures who this person is based on their Memory answers:`
 
-  // Use Claude API instead of OpenAI
-  const response = await anthropic.messages.create({
-    model: 'claude-3-5-sonnet-20241022',
-    max_tokens: 1000,
-    messages: [{
-      role: 'user',
-      content: prompt
-    }],
-  })
+  try {
+    // Use AI engine abstraction - try Claude, then OpenAI, whichever works
+    const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
+    console.log(`🤖 Using ${engine.name} for Memory Story generation`)
 
-  const textContent = response.content.find((block) => block.type === 'text')
-  if (!textContent || textContent.type !== 'text') {
-    return 'Unable to generate story.'
+    const story = await engine.generateCompletion(prompt, 1000)
+    return story || 'Unable to generate story.'
+  } catch (error: any) {
+    console.error('❌ AI Engine failed for Memory Story:', error.message)
+
+    // FALLBACK: Try legacy Claude if new system fails
+    try {
+      const response = await anthropic.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: prompt
+        }],
+      })
+
+      const textContent = response.content.find((block) => block.type === 'text')
+      if (!textContent || textContent.type !== 'text') {
+        return 'Unable to generate story.'
+      }
+
+      return textContent.text || 'Unable to generate story.'
+    } catch (fallbackError) {
+      console.error('❌ Legacy Claude also failed:', fallbackError)
+      return 'Unable to generate story at this time. Please try again later.'
+    }
   }
-
-  return textContent.text || 'Unable to generate story.'
 }
 
 export async function generateUserSummary(user: User, logs: Log[]): Promise<string> {
