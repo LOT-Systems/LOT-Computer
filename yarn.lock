@@ -455,6 +455,14 @@
   resolved "https://registry.yarnpkg.com/@luncheon/esbuild-plugin-gzip/-/esbuild-plugin-gzip-0.1.0.tgz#9a9b92d1762817173988d23f078bc92484a92c71"
   integrity sha512-xd67Zj2ERUjcyycwOu2xn+PIMWoi/ApHf3ooiYz7+uZsD+0i8psaQ+b5T4B2PBU0FYfgSxYsnwfwqeg70ZKRdw==
 
+"@mistralai/mistralai@^1.10.0":
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/@mistralai/mistralai/-/mistralai-1.10.0.tgz#6c489b5e8429ece5e5d3967c42c8f4559529a16f"
+  integrity sha512-tdIgWs4Le8vpvPiUEWne6tK0qbVc+jMenujnvTqOjogrJUsCSQhus0tHTU1avDDh5//Rq2dFgP9mWRAdIEoBqg==
+  dependencies:
+    zod "^3.20.0"
+    zod-to-json-schema "^3.24.1"
+
 "@nanostores/persistent@^0.9.1":
   version "0.9.1"
   resolved "https://registry.yarnpkg.com/@nanostores/persistent/-/persistent-0.9.1.tgz#e668c64431dee2c9d7a1b8f7ffc1e9c0806ac227"
@@ -4802,7 +4810,7 @@ zod-stream@3.0.0:
     schema-stream "^3.2.2"
     zod-to-json-schema "^3.23.1"
 
-zod-to-json-schema@^3.23.1:
+zod-to-json-schema@^3.23.1, zod-to-json-schema@^3.24.1:
   version "3.24.6"
   resolved "https://registry.yarnpkg.com/zod-to-json-schema/-/zod-to-json-schema-3.24.6.tgz#5920f020c4d2647edfbb954fa036082b92c9e12d"
   integrity sha512-h/z3PKvcTcTetyjl1fkj79MHNEjm+HpD6NXheWjzOekY7kV+lwDYnHw+ivHkijnCSMz1yJaWBD9vu/Fcmk+vEg==
@@ -4812,7 +4820,7 @@ zod-validation-error@^3.4.0:
   resolved "https://registry.yarnpkg.com/zod-validation-error/-/zod-validation-error-3.5.3.tgz#85ba33290200d8db9f043621e284f40dddefb7e5"
   integrity sha512-OT5Y8lbUadqVZCsnyFaTQ4/O2mys4tj7PqhdbBCp7McPwvIEKfPtdA6QfPeFQK2/Rz5LgwmAXRJTugBNBi0btw==
 
-zod@^3.23.8:
+zod@^3.20.0, zod@^3.23.8:
   version "3.25.76"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.76.tgz#26841c3f6fd22a6a2760e7ccb719179768471e34"
   integrity sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==

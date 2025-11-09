@@ -2,12 +2,13 @@
  * AI Engine Abstraction Layer
  *
  * Purpose: Keep memory densification logic on LOT's side, not tied to any AI provider.
- * Allows easy switching between Claude, OpenAI, Together AI, Google Gemini, and others.
+ * Allows easy switching between Claude, OpenAI, Together AI, Google Gemini, Mistral, and others.
  */
 
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { Mistral } from '@mistralai/mistralai'
 import config from '#server/config'
 
 // ============================================================================
@@ -216,10 +217,69 @@ export class GeminiEngine implements AIEngine {
 }
 
 // ============================================================================
+// Mistral AI Engine (European, Privacy-Focused)
+// ============================================================================
+
+export class MistralEngine implements AIEngine {
+  name = 'Mistral AI'
+  private client: Mistral | null = null
+
+  constructor() {
+    const apiKey = process.env.MISTRAL_API_KEY
+    if (apiKey) {
+      try {
+        this.client = new Mistral({ apiKey })
+      } catch (error) {
+        console.error('Failed to initialize Mistral engine:', error)
+      }
+    }
+  }
+
+  isAvailable(): boolean {
+    return !!this.client
+  }
+
+  async generateCompletion(prompt: string, maxTokens: number = 1024): Promise<string> {
+    if (!this.client) {
+      throw new Error('Mistral engine not available')
+    }
+
+    const response = await this.client.chat.complete({
+      model: 'mistral-large-latest',
+      messages: [
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      maxTokens,
+    })
+
+    const content = response.choices?.[0]?.message?.content
+    if (!content) {
+      throw new Error('No response from Mistral')
+    }
+
+    // Mistral can return string or ContentChunk[] - handle both
+    if (typeof content === 'string') {
+      return content
+    } else if (Array.isArray(content)) {
+      // Extract text from content chunks
+      return content
+        .filter((chunk: any) => chunk.type === 'text')
+        .map((chunk: any) => chunk.text)
+        .join('')
+    }
+
+    throw new Error('Unexpected content type from Mistral')
+  }
+}
+
+// ============================================================================
 // Engine Manager - Handles fallback logic
 // ============================================================================
 
-export type EnginePreference = 'together' | 'gemini' | 'claude' | 'openai' | 'auto'
+export type EnginePreference = 'together' | 'gemini' | 'mistral' | 'claude' | 'openai' | 'auto'
 
 export class AIEngineManager {
   private engines: Map<string, AIEngine>
@@ -230,13 +290,14 @@ export class AIEngineManager {
     // Register available engines
     this.engines.set('together', new TogetherAIEngine())
     this.engines.set('gemini', new GeminiEngine())
+    this.engines.set('mistral', new MistralEngine())
     this.engines.set('claude', new ClaudeEngine())
     this.engines.set('openai', new OpenAIEngine())
   }
 
   /**
    * Get preferred engine with automatic fallback
-   * @param preference Which engine to prefer ('together', 'gemini', 'claude', 'openai', or 'auto')
+   * @param preference Which engine to prefer ('together', 'gemini', 'mistral', 'claude', 'openai', or 'auto')
    * @returns Available engine or throws if none available
    */
   getEngine(preference: EnginePreference = 'auto'): AIEngine {
@@ -249,8 +310,9 @@ export class AIEngineManager {
       console.warn(`Preferred engine '${preference}' not available, trying fallback`)
     }
 
-    // Auto mode or fallback: try Together AI first, then Gemini, then Claude, then OpenAI
-    const fallbackOrder: string[] = ['together', 'gemini', 'claude', 'openai']
+    // Auto mode or fallback: try Together AI, Gemini, Mistral, Claude, then OpenAI
+    // Ordered by cost-effectiveness and speed
+    const fallbackOrder: string[] = ['together', 'gemini', 'mistral', 'claude', 'openai']
 
     for (const engineName of fallbackOrder) {
       const engine = this.engines.get(engineName)

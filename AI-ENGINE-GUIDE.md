@@ -13,7 +13,7 @@ LOT Systems now has a **provider-agnostic AI engine system**. This means:
 
 ## 📦 Supported AI Engines
 
-### 1. **Together AI** (Recommended)
+### 1. **Together AI** (Best for Cost)
 - **Model:** Meta Llama 3.1 70B Instruct Turbo
 - **Speed:** Very fast
 - **Cost:** Very affordable (~$0.88/million tokens)
@@ -21,15 +21,24 @@ LOT Systems now has a **provider-agnostic AI engine system**. This means:
 - **Env Var:** `TOGETHER_API_KEY`
 - **Get Key:** https://api.together.xyz/
 
-### 2. **Google Gemini**
+### 2. **Google Gemini** (Best Balance)
 - **Model:** Gemini 1.5 Pro
 - **Speed:** Fast
-- **Cost:** Competitive
+- **Cost:** Competitive (~$1.25/million tokens)
 - **Quality:** Excellent, strong reasoning
 - **Env Var:** `GOOGLE_API_KEY`
 - **Get Key:** https://aistudio.google.com/app/apikey
 
-### 3. **Anthropic Claude**
+### 3. **Mistral AI** (European Privacy)
+- **Model:** Mistral Large Latest
+- **Speed:** Fast
+- **Cost:** Affordable (~$2/million tokens)
+- **Quality:** Excellent, European-focused
+- **Privacy:** GDPR-compliant, EU-based
+- **Env Var:** `MISTRAL_API_KEY`
+- **Get Key:** https://console.mistral.ai/
+
+### 4. **Anthropic Claude** (Best Quality)
 - **Model:** Claude 3.5 Sonnet
 - **Speed:** Moderate
 - **Cost:** Higher ($3/million tokens)
@@ -37,10 +46,10 @@ LOT Systems now has a **provider-agnostic AI engine system**. This means:
 - **Env Var:** `ANTHROPIC_API_KEY`
 - **Get Key:** https://console.anthropic.com/settings/keys
 
-### 4. **OpenAI GPT-4**
+### 5. **OpenAI GPT-4** (Industry Standard)
 - **Model:** GPT-4 Turbo
 - **Speed:** Moderate
-- **Cost:** Higher ($10/million tokens)
+- **Cost:** Highest ($10/million tokens)
 - **Quality:** Excellent
 - **Env Var:** `OPENAI_API_KEY`
 - **Get Key:** https://platform.openai.com/api-keys
@@ -99,16 +108,17 @@ const AI_ENGINE_PREFERENCE: EnginePreference = 'openai'
 ### Option 2: Auto Mode (Recommended)
 
 ```typescript
-// Tries engines in order: Together AI → Gemini → Claude → OpenAI
+// Tries engines in order: Together AI → Gemini → Mistral → Claude → OpenAI
 const AI_ENGINE_PREFERENCE: EnginePreference = 'auto'
 ```
 
 **Auto mode** will:
-1. Try Together AI first
+1. Try Together AI first (cheapest)
 2. If not available, try Gemini
-3. If not available, try Claude
-4. If not available, try OpenAI
-5. If none available, use legacy fallback
+3. If not available, try Mistral
+4. If not available, try Claude
+5. If not available, try OpenAI
+6. If none available, use legacy fallback
 
 ---
 
@@ -131,6 +141,13 @@ TOGETHER_API_KEY=your_key_here
 # Get key at https://aistudio.google.com/app/apikey
 # Add to Digital Ocean environment variables:
 GOOGLE_API_KEY=your_key_here
+```
+
+**For Mistral AI:**
+```bash
+# Get key at https://console.mistral.ai/
+# Add to Digital Ocean environment variables:
+MISTRAL_API_KEY=your_key_here
 ```
 
 **For Anthropic Claude:**
@@ -214,6 +231,13 @@ To compare quality between engines:
 - $0.88/million tokens
 - Fast responses
 - Great quality for conversational AI
+
+### For Privacy/GDPR Compliance:
+**Use Mistral AI** (`'mistral'`)
+- European company, EU-based infrastructure
+- GDPR-compliant by design
+- $2/million tokens
+- Excellent quality
 
 ### For Maximum Quality:
 **Use Claude** (`'claude'`)

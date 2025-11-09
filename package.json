@@ -55,6 +55,7 @@
     "@fastify/view": "^10.0.0",
     "@google/generative-ai": "^0.24.1",
     "@instructor-ai/instructor": "^1.5.0",
+    "@mistralai/mistralai": "^1.10.0",
     "@nanostores/persistent": "^0.9.1",
     "@nanostores/react": "^0.4.1",
     "@nanostores/router": "^0.9.1",
