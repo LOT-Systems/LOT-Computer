@@ -24,6 +24,8 @@ input:-webkit-autofill {
 @layer base {
   body {
     @apply font-base tabular-nums;
+    background-color: var(--base-color);
+    color: rgb(var(--acc-color-default));
   }
 
   *:focus {
@@ -32,9 +34,7 @@ input:-webkit-autofill {
 }
 
 @layer components {
-  .button-primary:not(:hover) {
-    text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.75);
-  }
+  /* Button primary styles - removed text-shadow */
 }
 
 .whitespace-breakspaces {

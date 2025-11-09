@@ -7,3 +7,11 @@ coverage/
 .vscode/
 .idea/
 node_modules/
+
+# Archive files
+*.tar.gz
+*.zip
+*-archive/
+lot-systems_v*
+*ARCHIVE_README*
+lot-systems_master_*

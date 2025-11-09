@@ -4,6 +4,7 @@ type Routes = {
   system: void
   settings: void
   sync: void
+  status: void
   adminUsers: void
   adminUser: 'userId'
   logs: void
@@ -13,6 +14,7 @@ export const router = createRouter<Routes>({
   system: '/',
   settings: '/settings',
   sync: '/sync',
+  status: '/status',
   adminUsers: '/us',
   adminUser: '/us/:userId',
   logs: '/log',

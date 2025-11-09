@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import crypto from 'crypto';
 import dayjs from 'dayjs';
 import { sendEmail } from '../utils/email.js';
+import { verificationEmailTemplate } from '../../utils/emailTemplates.js';
 import config from '../config.js';
 
 const EMAIL_CODE_VALID_MINUTES = 10;
@@ -50,17 +51,11 @@ export default function (fastify: FastifyInstance, opts: any, done: () => void) 
       
       console.log('Email code record created:', emailCode.id);
       console.log('Sending verification email');
-      
+
       const emailResult = await sendEmail({
         to: email,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h2>Welcome to Lot Systems</h2>
-            <p>Your verification code is: <strong style="font-size: 24px; color: #4A5568;">${code}</strong></p>
-            <p>This code will expire in ${EMAIL_CODE_VALID_MINUTES} minutes.</p>
-          </div>
-        `,
-        subject: `Your Lot Systems Verification Code`,
+        text: verificationEmailTemplate(code),
+        subject: 'LOT – Verification Code',
       });
       
       if (!emailResult.success) {
@@ -169,6 +164,40 @@ export default function (fastify: FastifyInstance, opts: any, done: () => void) 
         statusCode: 500,
         message: 'Unable to verify code. Please try again.'
       });
+    }
+  });
+
+  // Logout route
+  fastify.get('/logout', async (request, reply) => {
+    try {
+      const token = request.cookies[config.jwt.cookieKey];
+
+      if (token) {
+        // Delete the session from database
+        await fastify.models.Session.destroy({
+          where: { token }
+        });
+
+        console.log('Session deleted for token:', token);
+      }
+
+      // Clear the cookie
+      reply.clearCookie(config.jwt.cookieKey, {
+        path: '/',
+      });
+
+      console.log('User logged out, redirecting to home');
+      return reply.redirect('/');
+
+    } catch (err: any) {
+      console.error('Logout error:', {
+        error: err?.message || 'Unknown error',
+        stack: err?.stack || 'No stack trace',
+        timestamp: new Date().toISOString()
+      });
+      // Even if there's an error, clear the cookie and redirect
+      reply.clearCookie(config.jwt.cookieKey, { path: '/' });
+      return reply.redirect('/');
     }
   });
 

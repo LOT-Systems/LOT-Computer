@@ -133,6 +133,7 @@ theme.subscribe((value) => {
 function handleColorsChange() {
   const base = baseColor.get()
   const acc = accentColor.get()
+  const currentTheme = theme.get()
 
   let _theme: ClientTheme | null = null
   for (const [key, value] of Object.entries(THEMES)) {
@@ -141,11 +142,16 @@ function handleColorsChange() {
       break
     }
   }
-  if (_theme) {
+
+  // Prevent circular updates: only set theme if it's actually changing
+  if (_theme && _theme !== currentTheme) {
     theme.set(_theme)
-  } else {
+  } else if (!_theme && currentTheme !== 'custom') {
     customTheme.set({ base, acc })
     theme.set('custom')
+  } else if (!_theme && currentTheme === 'custom') {
+    // Already custom theme, just update colors without triggering theme change
+    customTheme.set({ base, acc })
   }
 }
 const handleColorsChangeDebounced = fp.debounce(handleColorsChange, 400)
@@ -185,10 +191,16 @@ state.isMirrorOn.subscribe((value) => {
     // NOTE: the following logic is duplicated in src/client/utils/sun.ts
     const _theme = theme.get()
     const _isCustomThemeEnabled = isCustomThemeEnabled.get()
-    if (_isCustomThemeEnabled && _theme !== 'custom') {
-      theme.set('custom')
+
+    // If custom theme is enabled, don't auto-switch themes
+    if (_isCustomThemeEnabled) {
+      if (_theme !== 'custom') {
+        theme.set('custom')
+      }
       return
     }
+
+    // Otherwise, do automatic theme switching based on time
     const weather = state.weather.get()
     if (!weather) {
       theme.set('light')
@@ -198,6 +210,16 @@ state.isMirrorOn.subscribe((value) => {
     const sunrise = dayjs.utc(weather.sunrise * 1000).local()
     const sunset = dayjs.utc(weather.sunset * 1000).local()
     const isDark = now.isAfter(sunset) || now.isBefore(sunrise)
+
+    // Debug: Log theme calculation
+    console.log('[Theme Debug]', {
+      now: now.format('HH:mm:ss'),
+      sunset: sunset.format('HH:mm:ss'),
+      isDark,
+      currentTheme: _theme,
+      willSetDark: isDark && ['light', 'sunset', 'sunrise'].includes(_theme)
+    })
+
     if (isDark && ['light', 'sunset', 'sunrise'].includes(_theme)) {
       theme.set('dark')
       return

@@ -109,7 +109,7 @@ const EmailLogin = () => {
             value={email}
             onChange={setEmail}
             placeholder="Email"
-            className={cn(step === 'code' && 'text-gray-400')}
+            className={cn(step === 'code' && 'text-acc/40')}
             disabled={step === 'code'}
             enterKeyHint="next"
             required

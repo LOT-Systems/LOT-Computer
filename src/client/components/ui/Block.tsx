@@ -20,13 +20,7 @@ type Props = {
 export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
   const theme = useStore(stores.theme)
 
-  const hoverClassName = React.useMemo(() => {
-    if (theme === 'dark') {
-      return 'hover:bg-acc-400/20 group-hover:bg-acc-400/20'
-    } else {
-      return 'hover:bg-acc-400/10 group-hover:bg-acc-400/10'
-    }
-  }, [theme])
+  const hoverClassName = 'hover:bg-acc/10 group-hover:bg-acc/10'
 
   return (
     <div className={props.className}>

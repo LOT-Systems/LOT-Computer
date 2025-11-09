@@ -2,28 +2,45 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import { useUpdateSettings } from '#client/queries'
 import * as stores from '#client/stores'
-import { Block, Button, Input, Select } from '#client/components/ui'
+import { Block, Button, GhostButton, Input, Select } from '#client/components/ui'
 import { UserSettings, UserTag } from '#shared/types'
 import {
   COUNTRIES,
-  USER_TAGS_BY_ID,
+  getUserTagByIdCaseInsensitive,
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
 import { cn } from '#client/utils'
+
+interface StatusData {
+  version: string
+  overall: 'ok' | 'degraded' | 'error'
+}
 
 export const Settings = () => {
   const me = useStore(stores.me)
   const baseColor = useStore(stores.baseColor)
   const accentColor = useStore(stores.accentColor)
+  const isCustomThemeEnabled = useStore(stores.isCustomThemeEnabled)
 
   const { mutate: updateSettings } = useUpdateSettings({
     onSuccess: () => {
-      // setChanged(false)
-      window.location.href = '/'
+      // Ensure custom theme colors are saved before redirect
+      if (isCustomThemeEnabled) {
+        stores.customTheme.set({
+          base: baseColor,
+          acc: accentColor
+        })
+      }
+
+      // Add small delay to ensure localStorage is flushed before redirect
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 150)
     },
   })
 
   const [changed, setChanged] = React.useState(false)
+  const [statusData, setStatusData] = React.useState<StatusData | null>(null)
   const [state, setState] = React.useState<UserSettings>({
     firstName: me!.firstName,
     lastName: me!.lastName,
@@ -60,6 +77,17 @@ export const Settings = () => {
     setChanged(true)
   }, [])
 
+  const onToggleCustomTheme = React.useCallback(() => {
+    const newValue = !isCustomThemeEnabled
+    stores.isCustomThemeEnabled.set(newValue)
+    if (newValue) {
+      stores.theme.set('custom')
+    } else {
+      // Switch back to automatic theme based on time
+      stores.theme.set('light')
+    }
+  }, [isCustomThemeEnabled])
+
   const onSubmit = React.useCallback(
     async (ev: React.FormEvent) => {
       ev.preventDefault()
@@ -69,8 +97,53 @@ export const Settings = () => {
   )
 
   const userTagIds = React.useMemo(() => {
-    return (me?.tags || []).filter((x) => !!USER_TAGS_BY_ID[x])
+    // Convert database tags (lowercase) to enum values (proper case) for comparison
+    const tags = (me?.tags || [])
+      .map((tag) => {
+        // Find the matching enum value by case-insensitive comparison
+        const enumValue = Object.values(UserTag).find(
+          (enumTag) => enumTag.toLowerCase() === tag.toLowerCase()
+        )
+        return enumValue
+      })
+      .filter(Boolean) as UserTag[]
+
+    // Debug logging to diagnose theme picker visibility issue
+    console.log('[Settings Debug] User tags from DB:', me?.tags)
+    console.log('[Settings Debug] Computed userTagIds:', tags)
+    console.log('[Settings Debug] Should show theme picker:', [
+      UserTag.Admin,
+      UserTag.Mala,
+      UserTag.RND,
+      UserTag.Evangelist,
+      UserTag.Onyx,
+      UserTag.Usership,
+      UserTag.Pro,
+    ].some((x) => tags.includes(x)))
+
+    return tags
   }, [me])
+
+  // Fetch status data for the status link
+  React.useEffect(() => {
+    fetch('/api/public/status')
+      .then((res) => res.json())
+      .then((data) => {
+        setStatusData({
+          version: data.version,
+          overall: data.overall,
+        })
+      })
+      .catch((err) => {
+        console.error('Failed to fetch status:', err)
+      })
+  }, [])
+
+  const statusText = statusData
+    ? statusData.overall === 'ok'
+      ? `Status page (v${statusData.version})`
+      : `Status page (v${statusData.version}) - System issues detected`
+    : 'Status page (loading...)'
 
   return (
     <div className="flex flex-col gap-y-48">
@@ -144,8 +217,13 @@ export const Settings = () => {
           UserTag.RND,
           UserTag.Evangelist,
           UserTag.Onyx,
+          UserTag.Usership,
+          UserTag.Pro,
         ].some((x) => userTagIds.includes(x)) && (
           <div>
+            <Block label="Custom theme:" onChildrenClick={onToggleCustomTheme}>
+              {isCustomThemeEnabled ? 'On' : 'Off'}
+            </Block>
             <Block label="Base color:" onChildrenClick={() => null}>
               <span className={cn('inline-flex relative overflow-hidden')}>
                 <input
@@ -174,6 +252,17 @@ export const Settings = () => {
         <div>
           <Block label="Activity log:" onChildrenClick={onToggleActivityLogs}>
             {state.hideActivityLogs ? 'Off' : 'On'}
+          </Block>
+        </div>
+
+        <div>
+          <Block label="Memory Engine:">
+            {me?.memoryEngine === 'claude' ? 'Claude' : 'Standard'}
+          </Block>
+          <Block label="Site systems check:">
+            <a href="/status" className="-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc/10">
+              {statusText}
+            </a>
           </Block>
         </div>
 

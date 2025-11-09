@@ -31,7 +31,7 @@ export class User
   declare metadata: UserModel['metadata']
 
   useProfileView(): UserProfile {
-    return fp.pick([
+    const profile = fp.pick([
       'id',
       'email',
       'firstName',
@@ -43,12 +43,36 @@ export class User
       'tags',
       'hideActivityLogs',
     ])(this.toJSON())
+
+    // Add memory engine status based on tags
+    const hasUsershipTag = this.tags.some(
+      (tag) => tag.toLowerCase() === 'usership'
+    )
+    const hasAnthropicKey = !!config.anthropic?.apiKey
+
+    return {
+      ...profile,
+      memoryEngine: hasUsershipTag && hasAnthropicKey ? 'claude' : 'standard',
+    }
   }
 
   isAdmin(): boolean {
     return (
       config.admins.includes(this.email) || this.tags.includes(UserTag.Admin)
     )
+  }
+
+  canAccessUsSection(): boolean {
+    // Only Admin and Usership users can access /us section
+    return (
+      this.isAdmin() ||
+      this.tags.some((tag) => tag.toLowerCase() === 'usership')
+    )
+  }
+
+  canEditTags(): boolean {
+    // Only vadikmarmeladov@gmail.com (CEO) can edit user tags
+    return this.email === 'vadikmarmeladov@gmail.com'
   }
 
   async ping() {

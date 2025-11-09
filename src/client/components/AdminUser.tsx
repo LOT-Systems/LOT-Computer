@@ -15,8 +15,9 @@ import {
   useUpdateUser,
   useUser,
   useUserMemoryPrompt,
+  useUserMemoryStory,
 } from '#client/queries'
-import { USER_TAGS_BY_ID, COUNTRY_BY_ALPHA3 } from '#shared/constants'
+import { getUserTagByIdCaseInsensitive, USER_TAGS_BY_ID, COUNTRY_BY_ALPHA3 } from '#shared/constants'
 import { DefaultQuestion, UserTag } from '#shared/types'
 import * as stores from '#client/stores'
 import * as fp from '#shared/utils/fp'
@@ -35,11 +36,13 @@ export const AdminUser = () => {
   const [memoryPromptChanged, setMemoryPromptChanged] =
     React.useState<string>('')
   const router = useStore(stores.router)
+  const me = useStore(stores.me)
 
   const { data: user, refetch: refetchUser } = useUser(
     router?.route === 'adminUser' ? router.params.userId : ''
   )
   const { data: memoryPrompt } = useUserMemoryPrompt(user?.id!)
+  const { data: memoryStoryData, isLoading: isStoryLoading } = useUserMemoryStory(user?.id!)
   const { mutate: updateUser } = useUpdateUser({
     onSuccess: () => refetchUser(),
   })
@@ -48,6 +51,15 @@ export const AdminUser = () => {
       onSuccess: (x) => setMemoryQuestion(x),
     })
   useDocumentTitle(user?.email ?? null)
+
+  const isCurrentUserAdmin = React.useMemo(() => {
+    return me?.tags?.some((tag) => tag.toLowerCase() === 'admin') || false
+  }, [me])
+
+  const canEditTags = React.useMemo(() => {
+    // Only vadikmarmeladov@gmail.com (CEO) can edit user tags
+    return me?.email === 'vadikmarmeladov@gmail.com'
+  }, [me])
 
   const country = React.useMemo(() => {
     if (!user?.country) return ''
@@ -123,6 +135,9 @@ export const AdminUser = () => {
         <div>Loading...</div>
       ) : (
         <div className="grid gap-y-16">
+          <div className="mb-16">
+            LOT {user.firstName || user.email.split('@')[0]}
+          </div>
           <div>
             <Block label="Email:">
               <Link href={`mailto:${user.email}`}>{user.email}</Link>
@@ -133,8 +148,8 @@ export const AdminUser = () => {
           <div>
             <Block
               label="Tags:"
-              onClick={!tagsEditorIsOn ? toggleTagsEditor : undefined}
-              onLabelClick={toggleTagsEditor}
+              onClick={!tagsEditorIsOn && canEditTags ? toggleTagsEditor : undefined}
+              onLabelClick={canEditTags ? toggleTagsEditor : undefined}
               blockView
               contentClassName={cn(tagsEditorIsOn && 'blink')}
             >
@@ -149,6 +164,7 @@ export const AdminUser = () => {
                         return (
                           <Tag
                             key={tagId}
+                            color={tag.color}
                             fill={tagsChanged.includes(tagId)}
                             onClick={() => {
                               setTagsChanged(
@@ -163,12 +179,11 @@ export const AdminUser = () => {
                     : !user.tags.length
                     ? [<Unknown>None</Unknown>]
                     : user.tags.map((x) => {
-                        const tag = USER_TAGS_BY_ID[x] || {
+                        const tag = getUserTagByIdCaseInsensitive(x) || {
                           name: x,
-                          color: 'gray',
                         }
                         return (
-                          <Tag key={x} fill>
+                          <Tag key={x} color={tag.color} fill>
                             {tag.name}
                           </Tag>
                         )
@@ -198,67 +213,102 @@ export const AdminUser = () => {
             </div>
           )}
 
-          <Block
-            className="mt-32"
-            label="Memory engine:"
-            containsButton
-            blockView
-          >
-            {!isMemoryPromptShown ? (
-              <Button onClick={() => setIsMemoryPromptShown(true)}>
-                Show prompt editor
-              </Button>
-            ) : (
-              <div className="flex flex-col gap-y-16">
-                <Textarea
-                  className="w-full"
-                  rows={16}
-                  value={memoryPromptChanged}
-                  onChange={(v) => {
-                    setIsMemoryPromptChanged(true)
-                    setMemoryPromptChanged(v)
-                  }}
-                />
-                <div>
-                  <Button
-                    kind="primary"
-                    onClick={onCompleteMemoryPrompt}
-                    disabled={isMemoryPromptLoading}
-                  >
-                    {isMemoryPromptLoading ? 'Completing...' : 'Complete'}
-                  </Button>
-                </div>
-                {!!memoryQuestion && (
+          {isCurrentUserAdmin && (
+            <Block
+              className="mt-32"
+              label="Memory engine:"
+              containsButton
+              blockView
+            >
+              {!isMemoryPromptShown ? (
+                <Button onClick={() => setIsMemoryPromptShown(true)}>
+                  Show prompt editor
+                </Button>
+              ) : (
+                <div className="flex flex-col gap-y-16">
+                  <Textarea
+                    className="w-full"
+                    rows={16}
+                    value={memoryPromptChanged}
+                    onChange={(v) => {
+                      setIsMemoryPromptChanged(true)
+                      setMemoryPromptChanged(v)
+                    }}
+                  />
                   <div>
-                    <div className="mb-16">{memoryQuestion.question}</div>
-                    <div className="flex flex-col sm:flex-row sm:flex-wrap gap-8 sm:-mb-8">
-                      {(memoryQuestion.options || []).map((option) => (
-                        <Button
-                          key={option}
-                          className="w-full sm:w-auto sm:mb-8"
-                          onClick={() => null}
-                        >
-                          {option}
-                        </Button>
-                      ))}
-                    </div>
+                    <Button
+                      kind="primary"
+                      onClick={onCompleteMemoryPrompt}
+                      disabled={isMemoryPromptLoading}
+                    >
+                      {isMemoryPromptLoading ? 'Completing...' : 'Complete'}
+                    </Button>
                   </div>
-                )}
-              </div>
-            )}
-          </Block>
+                  {!!memoryQuestion && (
+                    <div>
+                      <div className="mb-16">{memoryQuestion.question}</div>
+                      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-8 sm:-mb-8">
+                        {(memoryQuestion.options || []).map((option) => (
+                          <Button
+                            key={option}
+                            className="w-full sm:w-auto sm:mb-8"
+                            onClick={() => null}
+                          >
+                            {option}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Block>
+          )}
 
-          {!!Object.keys(user.metadata || {}).length && (
+          {user && (
             <div className="mt-32">
-              <Block label="Metadata:" blockView>
-                <Unknown>
-                  <pre>{JSON.stringify(user.metadata, null, 2)}</pre>
-                </Unknown>
+              <Block
+                label="Memory Story:"
+                blockView
+                labelClassName="!pl-0"
+              >
+                {isStoryLoading ? (
+                  <div className="opacity-60">Generating story...</div>
+                ) : memoryStoryData?.story ? (
+                  <MemoryText text={memoryStoryData.story} />
+                ) : (
+                  <div className="opacity-60">No Memory answers yet</div>
+                )}
               </Block>
             </div>
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+// Component to display Memory text with blue highlighting for high humidity (>=50%)
+const MemoryText: React.FC<{ text: string }> = ({ text }) => {
+  const lines = text.split('\n')
+
+  return (
+    <div className="whitespace-pre-wrap">
+      {lines.map((line, index) => {
+        // Check if line contains humidity info like "H:77%"
+        const humidityMatch = line.match(/H:(\d+)%/)
+        const humidity = humidityMatch ? parseInt(humidityMatch[1]) : null
+        const isHighHumidity = humidity !== null && humidity >= 50
+
+        return (
+          <div
+            key={index}
+            className={cn(isHighHumidity && 'text-blue-500')}
+          >
+            {line}
+          </div>
+        )
+      })}
     </div>
   )
 }
