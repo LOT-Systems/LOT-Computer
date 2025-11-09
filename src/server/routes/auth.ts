@@ -55,7 +55,7 @@ export default function (fastify: FastifyInstance, opts: any, done: () => void) 
       const emailResult = await sendEmail({
         to: email,
         text: verificationEmailTemplate(code),
-        subject: 'LOT - Verification Code',
+        subject: 'LOT – Verification Code',
       });
       
       if (!emailResult.success) {
