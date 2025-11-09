@@ -54,7 +54,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
           <div className="desktop:px-64 tablet:px-48 phone:px-32 px-16 desktop:mb-64 tablet:mb-48 phone:mb-32 mb-16">
             <nav
               className={cn(
-                'flex gap-x-6 tablet:gap-x-8 -mb-8',
+                'flex gap-x-12 phone:gap-x-10 tablet:gap-x-8 -mb-8',
                 'flex-wrap-reverse tablet:flex-wrap',
                 'flex-row-reverse tablet:flex-row',
                 'justify-end tablet:justify-start'

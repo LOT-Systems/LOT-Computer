@@ -10,7 +10,7 @@ export async function sendVerificationEmail(email: string, code: string) {
     const { data, error } = await resend.emails.send({
       from: 'auth@lot-systems.com', // Your verified domain
       to: [email],
-      subject: 'LOT - Verification Code',
+      subject: 'LOT – Verification Code',
       text: verificationEmailTemplate(code)
     });
 
