@@ -23,8 +23,8 @@ const isButton = (props: Props) => {
 }
 
 const SIZE_CLASSNAME: Record<ButtonSize, string> = {
-  small: 'px-[11px] py-4',
-  normal: 'px-[20px] py-8',
+  small: 'px-[6px] py-[6px]',
+  normal: 'px-[6px] py-[6px]',
 }
 
 export const Button: React.FC<Props> = ({
@@ -43,7 +43,7 @@ export const Button: React.FC<Props> = ({
       cn(
         isLightTheme
           ? // Light mode: simple, modern blue button with custom colors
-            'button-primary border-0 rounded-md text-white transition-all disabled:cursor-not-allowed bg-[#5397DA] hover:bg-[#2765A5] active:bg-[#1a4d85] disabled:bg-[#a8c9ed]'
+            'button-primary border-0 rounded-md text-white transition-all disabled:cursor-not-allowed bg-[#0080FF] hover:bg-[#0066CC] active:bg-[#004C99] disabled:bg-[#80BFFF]'
           : // Dark/themed mode: accent-colored transparent border
             cn(
               'hover:bg-acc/10',
