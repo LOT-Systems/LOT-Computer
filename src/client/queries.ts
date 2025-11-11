@@ -172,3 +172,13 @@ export const useUserMemoryStory = (userId: string) =>
   createQuery<{ story: string }>(`/admin-api/users/${userId}/memory-story`, {
     enabled: !!userId,
   })()
+
+export const useMyMemoryStory = () =>
+  createQuery<{
+    story: string | null
+    hasUsership: boolean
+    answerCount?: number
+    message?: string
+  }>('/api/memory/story', {
+    refetchOnWindowFocus: false,
+  })()
