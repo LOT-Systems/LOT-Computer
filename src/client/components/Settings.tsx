@@ -267,6 +267,31 @@ export const Settings = () => {
           </Block>
         </div>
 
+        {/* Subscription Section for non-Usership users */}
+        {!userTagIds.includes(UserTag.Usership) && (
+          <div>
+            <Block label="Usership:" blockView>
+              <div className="mb-16">
+                Unlock premium features with Usership subscription:
+              </div>
+              <ul className="mb-16 ml-16 list-disc text-acc/80">
+                <li>AI-powered Memory Story generation</li>
+                <li>Advanced Claude memory engine</li>
+                <li>Personalized insights from your daily logs</li>
+                <li>Priority access to new features</li>
+              </ul>
+              <Button
+                kind="primary"
+                href="https://brand.lot-systems.com"
+                target="_blank"
+                rel="external"
+              >
+                Subscribe to Usership
+              </Button>
+            </Block>
+          </div>
+        )}
+
         {/* Memory Story Section */}
         {storyData && (
           <div>
