@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
-import { useUpdateSettings } from '#client/queries'
+import { useUpdateSettings, useMyMemoryStory } from '#client/queries'
 import * as stores from '#client/stores'
-import { Block, Button, GhostButton, Input, Select } from '#client/components/ui'
+import { Block, Button, GhostButton, Input, Select, Link } from '#client/components/ui'
 import { UserSettings, UserTag } from '#shared/types'
 import {
   COUNTRIES,
@@ -21,6 +21,7 @@ export const Settings = () => {
   const baseColor = useStore(stores.baseColor)
   const accentColor = useStore(stores.accentColor)
   const isCustomThemeEnabled = useStore(stores.isCustomThemeEnabled)
+  const { data: storyData } = useMyMemoryStory()
 
   const { mutate: updateSettings } = useUpdateSettings({
     onSuccess: () => {
@@ -265,6 +266,40 @@ export const Settings = () => {
             </a>
           </Block>
         </div>
+
+        {/* Memory Story Section */}
+        {storyData && (
+          <div>
+            <Block label="Memory Story:" blockView>
+              {storyData.story ? (
+                <>
+                  <div className="whitespace-pre-wrap mb-16">{storyData.story}</div>
+                  {storyData.answerCount && (
+                    <div className="text-acc/40">
+                      Based on {storyData.answerCount} answer{storyData.answerCount > 1 ? 's' : ''}
+                    </div>
+                  )}
+                </>
+              ) : storyData.hasUsership ? (
+                <div>Start answering Memory questions to build your story.</div>
+              ) : (
+                <>
+                  <div className="mb-8">
+                    Subscribe to Usership to unlock generative Memory Story feature.
+                  </div>
+                  <Link
+                    href="https://brand.lot-systems.com"
+                    target="_blank"
+                    rel="external"
+                    className="underline"
+                  >
+                    Visit brand.lot-systems.com
+                  </Link>
+                </>
+              )}
+            </Block>
+          </div>
+        )}
 
         <div className="flex gap-x-8">
           <Button kind="primary" type="submit" disabled={!changed}>

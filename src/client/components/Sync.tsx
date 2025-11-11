@@ -142,9 +142,9 @@ export const Sync = () => {
             onChange={onChangeMessage}
             onKeyDown={onKeyDown}
             placeholder="Type a message..."
-            containerClassName="translate-y-[5px]"
+            containerClassName="flex-grow"
           />
-          <div className="flex items-center gap-x-8">
+          <div className="flex items-center gap-x-8 self-start pt-2">
             <span className="text-acc/40 pointer-events-none select-none whitespace-nowrap">
               <Clock format="hh:mm A" interval={5e3} />
             </span>
