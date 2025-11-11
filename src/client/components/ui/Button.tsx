@@ -23,8 +23,8 @@ const isButton = (props: Props) => {
 }
 
 const SIZE_CLASSNAME: Record<ButtonSize, string> = {
-  small: 'px-[18px] py-[9px]',
-  normal: 'px-[18px] py-[9px]',
+  small: 'px-[24px] py-[12px]',
+  normal: 'px-[28px] py-[14px]',
 }
 
 export const Button: React.FC<Props> = ({
