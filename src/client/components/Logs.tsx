@@ -274,7 +274,7 @@ const NoteEditor = ({
           : !!log && dayjs(log.updatedAt).format(dateFormat)}
       </div>
 
-      <div className="max-w-[700px]" ref={containerRef}>
+      <div className="max-w-[700px] px-4 sm:px-0" ref={containerRef}>
         <ResizibleGhostInput
           // tabIndex={-1}
           direction="v"
@@ -318,7 +318,8 @@ const LogContainer: React.FC<{
         className={cn(
           'max-w-[500px] lg:max-w-[700px] whitespace-breakspaces',
           'transition-opacity opacity-20',
-          'group-hover:opacity-100'
+          'group-hover:opacity-100',
+          'px-4 sm:px-0'
         )}
       >
         {children}

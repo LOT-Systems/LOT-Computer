@@ -597,6 +597,11 @@ export default async (fastify: FastifyInstance) => {
   // Get user's own Memory story
   fastify.get('/memory/story', async (req, reply) => {
     try {
+      // Check if user has Usership tag
+      const hasUsershipTag = req.user.tags.some(
+        (tag) => tag.toLowerCase() === 'usership'
+      )
+
       // Get user's answer logs
       const logs = await fastify.models.Log.findAll({
         where: {
@@ -607,13 +612,10 @@ export default async (fastify: FastifyInstance) => {
         limit: 100,
       })
 
+      console.log(`Memory Story: User ${req.user.id} has ${logs.length} answers, hasUsership: ${hasUsershipTag}`)
+
       // Check if user has any answers
       if (logs.length === 0) {
-        // Check if user has Usership tag
-        const hasUsershipTag = req.user.tags.some(
-          (tag) => tag.toLowerCase() === 'usership'
-        )
-
         if (hasUsershipTag) {
           return {
             story: null,
@@ -629,8 +631,20 @@ export default async (fastify: FastifyInstance) => {
         }
       }
 
+      // Only generate story for Usership users
+      if (!hasUsershipTag) {
+        return {
+          story: null,
+          hasUsership: false,
+          answerCount: logs.length,
+          message: 'Subscribe to Usership to unlock Memory Story generation.'
+        }
+      }
+
       // Generate story from answers
+      console.log(`Generating story for user ${req.user.id}...`)
       const story = await generateMemoryStory(req.user, logs)
+      console.log(`Story generated successfully (${story?.length || 0} chars)`)
 
       return {
         story,
@@ -638,12 +652,17 @@ export default async (fastify: FastifyInstance) => {
         answerCount: logs.length
       }
     } catch (error: any) {
-      console.error('Error generating memory story:', error)
-      return reply.status(500).send({
-        story: null,
-        hasUsership: false,
-        message: 'Unable to generate story at this time.'
+      console.error('❌ Error generating memory story:', {
+        error: error.message,
+        stack: error.stack,
+        userId: req.user?.id
       })
+      return {
+        story: null,
+        hasUsership: req.user?.tags.some((tag) => tag.toLowerCase() === 'usership') || false,
+        message: 'Unable to generate story at this time. Please try again later.',
+        error: error.message
+      }
     }
   })
 }
