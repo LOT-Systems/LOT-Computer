@@ -1,6 +1,6 @@
 import React from 'react'
-import { Block, Button } from '#client/components/ui'
-import { useMemory, useCreateMemory } from '#client/queries'
+import { Block, Button, Link } from '#client/components/ui'
+import { useMemory, useCreateMemory, useMyMemoryStory } from '#client/queries'
 import { cn } from '#client/utils'
 import { fp } from '#shared/utils'
 import { MemoryQuestion } from '#shared/types'
@@ -12,7 +12,10 @@ export function MemoryWidget() {
   const [isResponseShown, setIsResponseShown] = React.useState(false)
   const [question, setQuestion] = React.useState<MemoryQuestion | null>(null)
   const [response, setResponse] = React.useState<string | null>(null)
+
   const { data: loadedQuestion = null } = useMemory()
+  const { data: storyData } = useMyMemoryStory()
+
   const { mutate: createMemory } = useCreateMemory({
     onSuccess: ({ response }) => {
       setIsQuestionShown(false)
@@ -70,7 +73,40 @@ export function MemoryWidget() {
     }
   }, [response])
 
-  // return !isDisplayed ? null : (
+  // Show story if user has answers
+  if (storyData?.story) {
+    return (
+      <Block label="Memory Story:" blockView className="min-h-[208px]">
+        <div className="whitespace-pre-wrap">{storyData.story}</div>
+        {storyData.answerCount && (
+          <div className="mt-16 text-acc/60 text-sm">
+            Based on {storyData.answerCount} answer{storyData.answerCount > 1 ? 's' : ''}
+          </div>
+        )}
+      </Block>
+    )
+  }
+
+  // Show subscription CTA for non-Usership users
+  if (storyData && !storyData.hasUsership) {
+    return (
+      <Block label="Memory Story:" blockView className="min-h-[208px]">
+        <div className="mb-16">
+          Subscribe to Usership to unlock generative Memory Story feature.
+        </div>
+        <Link
+          href="https://brand.lot-systems.com"
+          target="_blank"
+          rel="external"
+          className="underline"
+        >
+          Visit brand.lot-systems.com
+        </Link>
+      </Block>
+    )
+  }
+
+  // Show questions for Usership users (existing behavior)
   return (
     <Block
       label="Memory:"

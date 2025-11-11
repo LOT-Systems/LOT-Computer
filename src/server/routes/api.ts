@@ -593,4 +593,58 @@ export default async (fastify: FastifyInstance) => {
       return { response: fp.randomElement(defaultReplies) }
     }
   )
+
+  // Get user's own Memory story
+  fastify.get('/memory/story', async (req, reply) => {
+    try {
+      // Get user's answer logs
+      const logs = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: 'answer',
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 100,
+      })
+
+      // Check if user has any answers
+      if (logs.length === 0) {
+        // Check if user has Usership tag
+        const hasUsershipTag = req.user.tags.some(
+          (tag) => tag.toLowerCase() === 'usership'
+        )
+
+        if (hasUsershipTag) {
+          return {
+            story: null,
+            hasUsership: true,
+            message: 'Start answering Memory questions to build your story.'
+          }
+        } else {
+          return {
+            story: null,
+            hasUsership: false,
+            message: 'Subscribe to Usership to unlock Memory Story feature. Visit brand.lot-systems.com'
+          }
+        }
+      }
+
+      // Generate story from answers
+      const { generateMemoryStory } = await import('#server/utils/memory')
+      const story = await generateMemoryStory(req.user, logs)
+
+      return {
+        story,
+        hasUsership: true,
+        answerCount: logs.length
+      }
+    } catch (error: any) {
+      console.error('Error generating memory story:', error)
+      return reply.status(500).send({
+        story: null,
+        hasUsership: false,
+        message: 'Unable to generate story at this time.'
+      })
+    }
+  })
 }
