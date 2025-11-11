@@ -54,7 +54,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
           <div className="desktop:px-64 tablet:px-48 phone:px-32 px-16 desktop:mb-64 tablet:mb-48 phone:mb-32 mb-16">
             <nav
               className={cn(
-                'flex gap-16 phone:gap-12 tablet:gap-10 -mb-8',
+                'flex gap-8 phone:gap-6 tablet:gap-6 -mb-4',
                 'flex-wrap-reverse tablet:flex-wrap',
                 'flex-row-reverse tablet:flex-row',
                 'justify-end tablet:justify-start'
@@ -73,7 +73,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
                     href={link.href ?? undefined}
                     kind="secondary-rounded"
                     className={cn(
-                      'mb-8 flex-shrink-0',
+                      'mb-4 flex-shrink-0',
                       isActive && 'bg-acc text-bac hover:bg-acc/90'
                     )}
                     onClick={!link.href ? none : undefined}
