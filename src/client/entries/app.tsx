@@ -9,6 +9,7 @@ import { Settings } from '#client/components/Settings'
 import { Logs } from '#client/components/Logs'
 import { Sync } from '#client/components/Sync'
 import { StatusPage } from '#client/components/StatusPage'
+import { ConnectionStatus } from '#client/components/ConnectionStatus'
 import { render } from '#client/utils/render'
 import { listenSSE } from '#client/utils/sse'
 import { useSun } from '#client/utils/sun'
@@ -43,15 +44,39 @@ const App = () => {
     // Initialize router to listen to URL changes
     const unbindRouter = stores.router.listen(() => {})
 
+    // Fetch version info
+    fetch('/api/public/status')
+      .then((res) => res.json())
+      .then((data) => {
+        stores.appVersion.set(data.version || '0.0.3')
+        stores.lastUpdate.set(new Date())
+      })
+      .catch(() => {
+        stores.appVersion.set('0.0.3')
+      })
+
     getMe().then((user) => {
       stores.me.set(user)
       if (!user.firstName && !user.lastName) {
         stores.goTo('settings')
       }
     })
-    listenSSE('/api/sync', (data: any) => {
-      sync.emit(data.event, data.data)
-    })
+
+    listenSSE(
+      '/api/sync',
+      (data: any) => {
+        sync.emit(data.event, data.data)
+        stores.lastUpdate.set(new Date())
+      },
+      {
+        onOpen: () => {
+          stores.isConnected.set(true)
+        },
+        onError: () => {
+          stores.isConnected.set(false)
+        },
+      }
+    )
 
     return () => {
       unbindRouter()
@@ -73,22 +98,25 @@ const App = () => {
   }
 
   return (
-    <Layout>
-      {(!router || router.route === 'system') && <System />}
-      {router?.route === 'settings' && <Settings />}
-      {router?.route === 'sync' && <Sync />}
-      {router?.route === 'status' && <StatusPage />}
-      {router?.route === 'logs' && <Logs />}
-      {isMirrorOn && (
-        <video
-          ref={mirrorRef}
-          playsInline
-          autoPlay
-          muted
-          className="w-full h-full object-cover fixed inset-0 -z-10 -scale-x-100"
-        />
-      )}
-    </Layout>
+    <>
+      <ConnectionStatus />
+      <Layout>
+        {(!router || router.route === 'system') && <System />}
+        {router?.route === 'settings' && <Settings />}
+        {router?.route === 'sync' && <Sync />}
+        {router?.route === 'status' && <StatusPage />}
+        {router?.route === 'logs' && <Logs />}
+        {isMirrorOn && (
+          <video
+            ref={mirrorRef}
+            playsInline
+            autoPlay
+            muted
+            className="w-full h-full object-cover fixed inset-0 -z-10 -scale-x-100"
+          />
+        )}
+      </Layout>
+    </>
   )
 }
 
