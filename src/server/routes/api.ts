@@ -25,7 +25,7 @@ import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
-import { buildPrompt, completeAndExtractQuestion } from '#server/utils/memory'
+import { buildPrompt, completeAndExtractQuestion, generateMemoryStory } from '#server/utils/memory'
 import dayjs from '#server/utils/dayjs'
 
 export default async (fastify: FastifyInstance) => {
@@ -630,7 +630,6 @@ export default async (fastify: FastifyInstance) => {
       }
 
       // Generate story from answers
-      const { generateMemoryStory } = await import('#server/utils/memory')
       const story = await generateMemoryStory(req.user, logs)
 
       return {
