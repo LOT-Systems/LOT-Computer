@@ -39,6 +39,8 @@ export const Button: React.FC<Props> = ({
   const className = cn(
     'relative overflow-hidden whitespace-nowrap',
     'disabled:opacity-80',
+    'inline-flex justify-center items-center',
+    'text-base leading-1.5',
     kind === 'primary' &&
       cn(
         isLightTheme
@@ -47,7 +49,6 @@ export const Button: React.FC<Props> = ({
           : // Dark/themed mode: accent-colored transparent border
             cn(
               'hover:bg-acc/10',
-              'inline-flex justify-center items-center',
               'border border-acc text-acc transition-[background-color] rounded bg-transparent',
               'disabled:border-acc/40 disabled:text-acc/40'
             )
@@ -55,7 +56,6 @@ export const Button: React.FC<Props> = ({
     kind === 'secondary' &&
       cn(
         'hover:bg-acc/10',
-        'inline-flex justify-center items-center',
         'border border-acc text-acc transition-[background-color] rounded bg-transparent',
         'disabled:border-acc/40 disabled:text-acc/40'
       ),
@@ -64,7 +64,7 @@ export const Button: React.FC<Props> = ({
         !isMirrorOn &&
           'before:content-[""] before:absolute before:inset-0 before:bg-bac before:z-[-1]',
         'hover:bg-acc/10',
-        'inline-flex justify-center items-center transition-[background-color] rounded',
+        'transition-[background-color] rounded',
         'bg-transparent border border-acc text-acc rounded-[21px]',
         'disabled:border-acc/40 disabled:text-acc/40'
       ),

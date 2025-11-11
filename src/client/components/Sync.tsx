@@ -128,7 +128,7 @@ export const Sync = () => {
   return (
     <div className="max-w-[700px]">
       <div className="flex items-start mb-80">
-        <span className="mr-16 whitespace-nowrap py-2 leading-normal border border-transparent">
+        <span className="mr-8 whitespace-nowrap py-2 leading-normal border border-transparent">
           {me!.firstName}
         </span>
         <form
@@ -144,7 +144,7 @@ export const Sync = () => {
             placeholder="Type a message..."
             containerClassName="translate-y-[5px]"
           />
-          <div className="flex items-center gap-x-16">
+          <div className="flex items-center gap-x-8">
             <span className="text-acc/40 pointer-events-none select-none whitespace-nowrap">
               <Clock format="hh:mm A" interval={5e3} />
             </span>
@@ -174,20 +174,20 @@ export const Sync = () => {
             <div
               key={x.id}
               className={cn(
-                'group flex items-start gap-x-16 mb-8 cursor-pointer hover:bg-acc/5 -mx-8 px-8 py-4 rounded transition-colors',
+                'group flex items-start gap-x-8 mb-8 cursor-pointer hover:bg-acc/5 -mx-8 px-8 py-4 rounded transition-colors',
                 i >= SYNC_CHAT_MESSAGES_TO_SHOW && 'text-acc/20'
               )}
               onClick={onToggleLike(x.id)}
             >
               {authorId ? (
                 <GhostButton
-                  className="whitespace-nowrap"
+                  className="whitespace-nowrap pr-4"
                   onClick={onNavigateToUserProfile(authorId)}
                 >
                   {authorName}
                 </GhostButton>
               ) : (
-                <span className="whitespace-nowrap px-4">{authorName}</span>
+                <span className="whitespace-nowrap px-4 pr-8">{authorName}</span>
               )}
               <div
                 className="whitespace-breakspaces"
