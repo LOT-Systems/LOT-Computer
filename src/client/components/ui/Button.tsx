@@ -23,8 +23,8 @@ const isButton = (props: Props) => {
 }
 
 const SIZE_CLASSNAME: Record<ButtonSize, string> = {
-  small: 'px-[24px] py-[12px]',
-  normal: 'px-[28px] py-[14px]',
+  small: 'px-[20px] py-8',
+  normal: 'px-[20px] py-8 min-h-[42px]',
 }
 
 export const Button: React.FC<Props> = ({
@@ -48,7 +48,7 @@ export const Button: React.FC<Props> = ({
             cn(
               'hover:bg-acc/10',
               'inline-flex justify-center items-center',
-              'border border-acc text-acc py-8 transition-[background-color] rounded bg-transparent',
+              'border border-acc text-acc transition-[background-color] rounded bg-transparent',
               'disabled:border-acc/40 disabled:text-acc/40'
             )
       ),
@@ -56,7 +56,7 @@ export const Button: React.FC<Props> = ({
       cn(
         'hover:bg-acc/10',
         'inline-flex justify-center items-center',
-        'border border-acc text-acc py-8 transition-[background-color] rounded bg-transparent',
+        'border border-acc text-acc transition-[background-color] rounded bg-transparent',
         'disabled:border-acc/40 disabled:text-acc/40'
       ),
     kind === 'secondary-rounded' &&
