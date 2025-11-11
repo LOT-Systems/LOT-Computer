@@ -1,11 +1,19 @@
 import { FastifyInstance } from 'fastify';
 import crypto from 'crypto';
 import dayjs from 'dayjs';
+import fs from 'fs';
+import path from 'path';
 import { sendEmail } from '../utils/email.js';
 import { verificationEmailTemplate } from '../../utils/emailTemplates.js';
 import config from '../config.js';
 
 const EMAIL_CODE_VALID_MINUTES = 10;
+
+// Get version from package.json
+const packageJson = JSON.parse(
+  fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8')
+);
+const VERSION = packageJson.version || '0.0.4';
 
 export default function (fastify: FastifyInstance, opts: any, done: () => void) {
   // Add request logging
@@ -52,9 +60,10 @@ export default function (fastify: FastifyInstance, opts: any, done: () => void) 
       console.log('Email code record created:', emailCode.id);
       console.log('Sending verification email');
 
+      const currentDate = dayjs().format('MMMM D, YYYY h:mm A');
       const emailResult = await sendEmail({
         to: email,
-        text: verificationEmailTemplate(code),
+        text: verificationEmailTemplate(code, VERSION, currentDate),
         subject: 'LOT – Verification Code',
       });
       
