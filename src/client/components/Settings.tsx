@@ -146,14 +146,14 @@ export const Settings = () => {
     : 'Status page (loading...)'
 
   return (
-    <div className="flex flex-col gap-y-48">
+    <div className="flex flex-col gap-y-16">
       <div>
         <div>{me?.firstName ? me.firstName + `'s` : 'Your'} LOT setings.</div>
         <div>You can edit the settings at any time.</div>
       </div>
 
-      <form className="flex flex-col gap-y-48 max-w-384" onSubmit={onSubmit}>
-        <div className="flex gap-x-16">
+      <form className="flex flex-col gap-y-16 max-w-384" onSubmit={onSubmit}>
+        <div className="flex gap-x-8">
           <div className="flex-grow">
             <Input
               type="text"
@@ -176,7 +176,7 @@ export const Settings = () => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-y-16">
+        <div className="flex flex-col gap-y-8">
           <Select
             name="country"
             value={state.country || ''}
@@ -266,7 +266,7 @@ export const Settings = () => {
           </Block>
         </div>
 
-        <div className="flex gap-x-16">
+        <div className="flex gap-x-8">
           <Button kind="primary" type="submit" disabled={!changed}>
             Save
           </Button>
