@@ -234,17 +234,18 @@ const NoteEditor = ({
     textarea.addEventListener('blur', () => setIsFocused(false))
   }, [])
 
-  // Handle Enter key to save immediately
+  // Handle Enter key - allow newlines, Cmd/Ctrl+Enter to save
   const onKeyDown = React.useCallback(
     (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (ev.key === 'Enter' && !ev.shiftKey) {
-        ev.preventDefault() // Prevent newline
+      if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
+        ev.preventDefault()
         if (value !== log.text) {
           onChange(value) // Immediate save
         }
         // Optionally blur to show save happened
         ;(ev.target as HTMLTextAreaElement).blur()
       }
+      // Regular Enter key creates newline (default behavior)
     },
     [value, log.text, onChange]
   )
