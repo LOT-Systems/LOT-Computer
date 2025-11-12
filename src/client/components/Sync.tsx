@@ -127,13 +127,13 @@ export const Sync = () => {
 
   return (
     <div className="max-w-[700px]">
-      <div className="flex items-start mb-80">
-        <span className="mr-8 whitespace-nowrap py-2 leading-normal border border-transparent">
+      <div className="flex items-center mb-80">
+        <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}
         </span>
         <form
           onSubmit={onSubmitMessage}
-          className="flex items-start gap-x-8"
+          className="flex items-center gap-x-8 flex-1"
           ref={formRef}
         >
           <ResizibleGhostInput
@@ -142,10 +142,11 @@ export const Sync = () => {
             onChange={onChangeMessage}
             onKeyDown={onKeyDown}
             placeholder="Type a message..."
-            containerClassName="flex-grow"
+            containerClassName="flex-grow leading-normal"
+            className="leading-normal"
           />
-          <div className="flex items-center gap-x-8 self-start pt-2">
-            <span className="text-acc/40 pointer-events-none select-none whitespace-nowrap">
+          <div className="flex items-center gap-x-8">
+            <span className="text-acc/40 pointer-events-none select-none whitespace-nowrap leading-normal">
               <Clock format="hh:mm A" interval={5e3} />
             </span>
             <Button
