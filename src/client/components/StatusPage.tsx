@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Block, Button, GhostButton } from '#client/components/ui'
+import { Block, Button, GhostButton, Page } from '#client/components/ui'
 import { cn } from '#client/utils'
 import { useDocumentTitle } from '#client/utils/hooks'
 
@@ -91,11 +91,12 @@ export const StatusPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-y-16">
-      <div>
-        <div className="mb-16">LOT Systems Status</div>
-        <GhostButton href="/">← Home</GhostButton>
-      </div>
+    <Page>
+      <div className="flex flex-col gap-y-16">
+        <div>
+          <div className="mb-16">LOT Systems Status</div>
+          <GhostButton href="/">← Home</GhostButton>
+        </div>
 
         {loading && !status && (
           <div className="text-acc/40">Loading...</div>
@@ -180,6 +181,7 @@ export const StatusPage = () => {
             </div>
           </>
         )}
-    </div>
+      </div>
+    </Page>
   )
 }
