@@ -30,7 +30,7 @@ export async function getWeather(
         longitude: lon,
         current: 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,surface_pressure',
         daily: 'sunrise,sunset',
-        timezone: 'UTC', // Use UTC to avoid timezone confusion
+        timezone: 'auto', // Use auto to get local timezone for accurate sunrise/sunset
       },
     }
   )
@@ -42,11 +42,25 @@ export async function getWeather(
   const tempCelsius = current.temperature_2m ?? null
   const tempKelvin = tempCelsius !== null ? tempCelsius + 273.15 : null
 
-  // Ensure sunrise/sunset ISO strings are parsed as UTC by appending 'Z' if missing
+  // Parse sunrise/sunset times (API returns them in local timezone now)
   const sunriseStr = daily.sunrise?.[0]
   const sunsetStr = daily.sunset?.[0]
-  const sunriseUTC = sunriseStr ? (sunriseStr.endsWith('Z') ? sunriseStr : sunriseStr + 'Z') : null
-  const sunsetUTC = sunsetStr ? (sunsetStr.endsWith('Z') ? sunsetStr : sunsetStr + 'Z') : null
+
+  // Convert to Unix timestamp (seconds)
+  const sunriseUnix = sunriseStr ? new Date(sunriseStr).getTime() / 1000 : null
+  const sunsetUnix = sunsetStr ? new Date(sunsetStr).getTime() / 1000 : null
+
+  // Debug logging
+  console.log('[Weather API] Sunrise/Sunset debug:', {
+    lat,
+    lon,
+    sunriseStr,
+    sunsetStr,
+    sunriseUnix,
+    sunsetUnix,
+    sunriseDate: sunriseStr ? new Date(sunriseStr).toString() : null,
+    sunsetDate: sunsetStr ? new Date(sunsetStr).toString() : null,
+  })
 
   return {
     temperature: tempCelsius,
@@ -55,8 +69,8 @@ export async function getWeather(
     windSpeed: current.wind_speed_10m ?? null,
     pressure: current.surface_pressure ?? null,
     tempKelvin,
-    sunrise: sunriseUTC ? new Date(sunriseUTC).getTime() / 1000 : null,
-    sunset: sunsetUTC ? new Date(sunsetUTC).getTime() / 1000 : null,
+    sunrise: sunriseUnix,
+    sunset: sunsetUnix,
   }
 }
 
