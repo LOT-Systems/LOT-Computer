@@ -174,7 +174,7 @@ export const Sync = () => {
             <div
               key={x.id}
               className={cn(
-                'group flex items-start gap-x-8 mb-8 cursor-pointer hover:bg-acc/5 -mx-8 px-8 py-4 rounded transition-colors',
+                'group flex items-start gap-x-8 mb-8 cursor-pointer hover:bg-acc/10 -mx-4 px-4 py-2 rounded transition-colors',
                 i >= SYNC_CHAT_MESSAGES_TO_SHOW && 'text-acc/20'
               )}
               onClick={onToggleLike(x.id)}
