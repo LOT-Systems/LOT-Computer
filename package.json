@@ -23,6 +23,7 @@
     "#shared": "./dist/server/shared/index.js"
   },
   "scripts": {
+    "db:admin": "tsx scripts/db-admin.ts",
     "server:build": "tsc --project tsconfig.server.json && node scripts/fix-esm-imports.js",
     "server:start": "node dist/server/server/index.js",
     "build": "yarn run client:build && yarn run server:build",
