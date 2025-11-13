@@ -113,7 +113,7 @@ export const Logs: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="flex flex-col gap-y-[1.5rem] leading-[1.5rem] pr-4 sm:pr-0"
+      className="flex flex-col gap-y-[1.5rem] leading-[1.5rem]"
     >
       <div ref={inputContainerRef} className="min-h-[200px]">
         <NoteEditor
