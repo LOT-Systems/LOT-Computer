@@ -9,7 +9,6 @@ import {
   TagsContainer,
 } from '#client/components/ui'
 import { cn, formatNumberWithCommas } from '#client/utils'
-import { useExternalScript } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
@@ -28,6 +27,7 @@ export const System = () => {
   const isTempFahrenheit = useStore(stores.isTempFahrenheit)
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
   const isMirrorOn = useStore(stores.isMirrorOn)
+  const isSoundOn = useStore(stores.isSoundOn)
 
   const [showSunset, setShowSunset] = React.useState(
     (() => {
@@ -75,43 +75,7 @@ export const System = () => {
     return { sunrise, sunset }
   }, [weather, isTimeFormat12h])
 
-  // useMirror(mirrorRef, isMirrorOn)
-
-  const noise = React.useRef<any>(null)
-  const [isSoundLibLoaded, setIsSoundLibLoaded] = React.useState(false)
-  const [isSoundOn, setIsSoundOn] = React.useState(false)
-
-  useExternalScript(
-    'https://unpkg.com/tone',
-    () => {
-      console.log('Tone.js loaded')
-      setIsSoundLibLoaded(true)
-    },
-    isSoundOn
-  )
-
-  React.useEffect(() => {
-    // @ts-ignore
-    const Tone: any = window.Tone
-    ;(async () => {
-      if (isSoundLibLoaded) {
-        if (isSoundOn) {
-          if (!noise.current) {
-            await Tone.start()
-            Tone.Destination.volume.setValueAtTime(-20, Tone.now())
-            noise.current = new Tone.Noise('brown').start().toDestination()
-          } else {
-            noise.current?.start()
-          }
-        } else {
-          noise.current?.stop()
-        }
-      }
-    })()
-    return () => {
-      noise.current?.stop()
-    }
-  }, [isSoundOn, isSoundLibLoaded])
+  // Sound is now managed globally in app.tsx via useSound hook
 
   // const AdminLink = React.useMemo<
   //   React.FC<{ children: React.ReactNode }>
@@ -203,7 +167,7 @@ export const System = () => {
         >
           {isMirrorOn ? 'On' : 'Off'}
         </Block>
-        <Block label="Sound:" onClick={() => setIsSoundOn(!isSoundOn)}>
+        <Block label="Sound:" onClick={() => stores.isSoundOn.set(!isSoundOn)}>
           {isSoundOn ? 'On' : 'Off'}
         </Block>
       </div>
