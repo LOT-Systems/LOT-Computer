@@ -337,16 +337,27 @@ Generate a concise narrative story (3-5 bullet points) that captures who this pe
 
   try {
     // Use AI engine abstraction - try Claude, then OpenAI, whichever works
+    console.log('🔍 Attempting to get AI engine with preference:', AI_ENGINE_PREFERENCE)
     const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
     console.log(`🤖 Using ${engine.name} for Memory Story generation`)
 
     const story = await engine.generateCompletion(prompt, 1000)
+    console.log(`✅ Story generated successfully with ${engine.name} (${story?.length || 0} chars)`)
     return story || 'Unable to generate story.'
   } catch (error: any) {
-    console.error('❌ AI Engine failed for Memory Story:', error.message)
+    console.error('❌ AI Engine failed for Memory Story:', {
+      message: error.message,
+      stack: error.stack,
+      preference: AI_ENGINE_PREFERENCE
+    })
 
     // FALLBACK: Try legacy Claude if new system fails
+    console.log('🔄 Attempting legacy Claude fallback...')
     try {
+      if (!anthropic || !config.anthropic?.apiKey) {
+        throw new Error('Legacy Claude client not configured - API key missing')
+      }
+
       const response = await anthropic.messages.create({
         model: 'claude-3-5-sonnet-20241022',
         max_tokens: 1000,
@@ -358,12 +369,20 @@ Generate a concise narrative story (3-5 bullet points) that captures who this pe
 
       const textContent = response.content.find((block) => block.type === 'text')
       if (!textContent || textContent.type !== 'text') {
+        console.error('❌ Legacy Claude returned no text content')
         return 'Unable to generate story.'
       }
 
+      console.log(`✅ Story generated with legacy Claude fallback (${textContent.text?.length || 0} chars)`)
       return textContent.text || 'Unable to generate story.'
-    } catch (fallbackError) {
-      console.error('❌ Legacy Claude also failed:', fallbackError)
+    } catch (fallbackError: any) {
+      console.error('❌ Legacy Claude also failed:', {
+        message: fallbackError.message,
+        stack: fallbackError.stack,
+        hasAnthropicClient: !!anthropic,
+        hasApiKey: !!config.anthropic?.apiKey,
+        apiKeyLength: config.anthropic?.apiKey?.length || 0
+      })
       return 'Unable to generate story at this time. Please try again later.'
     }
   }

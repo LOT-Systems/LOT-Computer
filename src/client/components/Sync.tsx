@@ -188,7 +188,7 @@ export const Sync = () => {
                   {authorName}
                 </GhostButton>
               ) : (
-                <span className="whitespace-nowrap px-4 pr-8">{authorName}</span>
+                <span className="whitespace-nowrap -ml-4 px-4 pr-8">{authorName}</span>
               )}
               <div
                 className="whitespace-breakspaces"
