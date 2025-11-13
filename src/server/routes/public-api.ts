@@ -462,6 +462,55 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
+  // Test all AI engines to see which are available
+  fastify.get('/test-ai-engines', async (req, reply) => {
+    const { aiEngineManager } = await import('#server/utils/ai-engines.js')
+
+    const status = aiEngineManager.getStatus()
+    const hasAnyEngine = aiEngineManager.hasAvailableEngine()
+
+    // Try to get the preferred engine
+    let preferredEngine = null
+    let preferredEngineError = null
+    try {
+      const engine = aiEngineManager.getEngine('auto')
+      preferredEngine = engine.name
+    } catch (error: any) {
+      preferredEngineError = error.message
+    }
+
+    return {
+      timestamp: new Date().toISOString(),
+      environment: config.env,
+      engines: status,
+      summary: {
+        hasAvailableEngine: hasAnyEngine,
+        preferredEngine: preferredEngine,
+        error: preferredEngineError,
+      },
+      apiKeys: {
+        TOGETHER_API_KEY: !!process.env.TOGETHER_API_KEY,
+        GOOGLE_API_KEY: !!process.env.GOOGLE_API_KEY,
+        MISTRAL_API_KEY: !!process.env.MISTRAL_API_KEY,
+        ANTHROPIC_API_KEY: !!process.env.ANTHROPIC_API_KEY,
+        OPENAI_API_KEY: !!process.env.OPENAI_API_KEY,
+      },
+      instructions: {
+        step1: 'At least ONE API key must be configured in environment variables',
+        step2: 'Get API keys from: Together AI, Google AI Studio, Mistral, Anthropic, or OpenAI',
+        step3: 'Add the key to Digital Ocean App settings (Environment Variables)',
+        step4: 'Redeploy the app to load the new environment variable',
+      },
+      links: {
+        togetherAI: 'https://api.together.xyz/',
+        googleGemini: 'https://aistudio.google.com/app/apikey',
+        mistralAI: 'https://console.mistral.ai/',
+        anthropic: 'https://console.anthropic.com/settings/keys',
+        openAI: 'https://platform.openai.com/api-keys',
+      }
+    }
+  })
+
   // Test Anthropic API key with actual API call
   fastify.get('/test-anthropic-key', async (req, reply) => {
     const anthropicKey = process.env.ANTHROPIC_API_KEY || config.anthropic?.apiKey

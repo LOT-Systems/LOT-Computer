@@ -480,9 +480,16 @@ export default async (fastify: FastifyInstance) => {
             error: error.message,
             stack: error.stack,
             userId: req.user.id,
-            hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
             userTags: req.user.tags,
             timestamp: new Date().toISOString(),
+            apiKeysConfigured: {
+              TOGETHER_API_KEY: !!process.env.TOGETHER_API_KEY,
+              GOOGLE_API_KEY: !!process.env.GOOGLE_API_KEY,
+              MISTRAL_API_KEY: !!process.env.MISTRAL_API_KEY,
+              ANTHROPIC_API_KEY: !!process.env.ANTHROPIC_API_KEY,
+              OPENAI_API_KEY: !!process.env.OPENAI_API_KEY,
+            },
+            note: 'At least ONE valid API key is required. Visit /api/public/test-ai-engines to diagnose.',
           })
           // Fall back to default questions on error
         }

@@ -31,7 +31,8 @@ export class ClaudeEngine implements AIEngine {
 
   constructor() {
     const apiKey = process.env.ANTHROPIC_API_KEY || config.anthropic?.apiKey
-    if (apiKey) {
+    // Skip placeholder keys
+    if (apiKey && !apiKey.includes('your_') && !apiKey.includes('placeholder')) {
       try {
         this.client = new Anthropic({ apiKey })
       } catch (error) {
@@ -79,7 +80,8 @@ export class OpenAIEngine implements AIEngine {
 
   constructor() {
     const apiKey = process.env.OPENAI_API_KEY
-    if (apiKey) {
+    // Skip placeholder keys
+    if (apiKey && !apiKey.includes('your_') && !apiKey.includes('placeholder')) {
       try {
         this.client = new OpenAI({ apiKey })
       } catch (error) {
