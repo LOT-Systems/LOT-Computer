@@ -34,7 +34,7 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
         >
           <div
             className={cn(
-              'w-[150px] mr-8 -ml-4',
+              'w-[100px] sm:w-[150px] mr-8 -ml-4',
               props.containsButton && 'translate-y-8',
               props.containsSmallButton && 'translate-y-4'
             )}

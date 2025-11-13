@@ -113,7 +113,7 @@ export const Logs: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="flex flex-col gap-y-[1.5rem] leading-[1.5rem]"
+      className="flex flex-col gap-y-[1.5rem] leading-[1.5rem] pr-4 sm:pr-0"
     >
       <div ref={inputContainerRef} className="min-h-[200px]">
         <NoteEditor
@@ -254,7 +254,7 @@ const NoteEditor = ({
     <div className="relative group">
       <div
         className={cn(
-          'relative',
+          'relative mb-4 sm:mb-0',
           'sm:absolute sm:top-0 sm:right-0 text-end select-none',
           'transition-opacity',
           primary
@@ -305,7 +305,7 @@ const LogContainer: React.FC<{
     <div className="relative group">
       <div
         className={cn(
-          'relative',
+          'relative mb-4 sm:mb-0',
           'sm:absolute sm:top-0 sm:right-0 text-end select-none',
           'transition-opacity opacity-0',
           'group-hover:opacity-100'
