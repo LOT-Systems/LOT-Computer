@@ -20,6 +20,7 @@ export const System = () => {
   const me = useStore(stores.me)
   const weather = useStore(stores.weather)
   const theme = useStore(stores.theme)
+  const isCustomThemeEnabled = useStore(stores.isCustomThemeEnabled)
 
   const usersTotal = useStore(stores.usersTotal)
   const usersOnline = useStore(stores.usersOnline)
@@ -141,7 +142,7 @@ export const System = () => {
             <Block label="Humidity:">
               <span
                 className={cn(
-                  !isMirrorOn && weather?.humidity >= 50 && 'text-blue-500'
+                  !isMirrorOn && !isCustomThemeEnabled && weather?.humidity >= 50 && 'text-blue-500'
                 )}
               >
                 {weather?.humidity}%
