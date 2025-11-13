@@ -14,6 +14,7 @@ import { render } from '#client/utils/render'
 import { listenSSE } from '#client/utils/sse'
 import { useSun } from '#client/utils/sun'
 import { useMirror } from '#client/utils/mirror'
+import { useSound } from '#client/utils/sound'
 import { sync } from '../sync'
 
 sync.listen('users_total', (data) => {
@@ -33,6 +34,7 @@ const App = () => {
   const user = useStore(stores.me)
   const router = useStore(stores.router)
   const isMirrorOn = useStore(stores.isMirrorOn)
+  const isSoundOn = useStore(stores.isSoundOn)
 
   const { data: weather, refetch: refetchWeather } = useWeather()
 
@@ -92,6 +94,8 @@ const App = () => {
   useSun(weather || null, refetchWeather)
 
   useMirror(mirrorRef, isMirrorOn)
+
+  useSound(isSoundOn)
 
   if (!isLoaded) {
     return <Layout>Loading...</Layout>
