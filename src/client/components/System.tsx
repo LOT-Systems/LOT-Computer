@@ -12,6 +12,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
+import { useBreathe } from '#client/utils/breathe'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
 
@@ -28,6 +29,9 @@ export const System = () => {
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
   const isMirrorOn = useStore(stores.isMirrorOn)
   const isSoundOn = useStore(stores.isSoundOn)
+
+  const [isBreatheOn, setIsBreatheOn] = React.useState(false)
+  const breatheState = useBreathe(isBreatheOn)
 
   const [showSunset, setShowSunset] = React.useState(
     (() => {
@@ -169,6 +173,9 @@ export const System = () => {
         </Block>
         <Block label="Sound:" onClick={() => stores.isSoundOn.set(!isSoundOn)}>
           {isSoundOn ? 'On' : 'Off'}
+        </Block>
+        <Block label="Breathe:" onClick={() => setIsBreatheOn(!isBreatheOn)}>
+          {isBreatheOn ? breatheState.display : 'Off'}
         </Block>
       </div>
 
