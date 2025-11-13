@@ -6,6 +6,7 @@ import path from 'path';
 import { sendEmail } from '../utils/email.js';
 import { verificationEmailTemplate } from '../../utils/emailTemplates.js';
 import config from '../config.js';
+import { sync } from '../sync.js';
 
 const EMAIL_CODE_VALID_MINUTES = 10;
 
@@ -133,10 +134,15 @@ export default function (fastify: FastifyInstance, opts: any, done: () => void) 
       
       // Find or create user
       let user = await fastify.models.User.findOne({ where: { email } });
-      
+      let isNewUser = false;
+
       if (!user) {
         console.log('Creating new user:', email);
-        user = await fastify.models.User.create({ email });
+        user = await fastify.models.User.create({
+          email,
+          joinedAt: new Date()
+        });
+        isNewUser = true;
       }
       
       // Create session
@@ -145,8 +151,15 @@ export default function (fastify: FastifyInstance, opts: any, done: () => void) 
         token: sessionToken,
         userId: user.id,
       });
-      
+
       console.log('Session created for user:', user.id);
+
+      // Broadcast updated user count if new user joined
+      if (isNewUser) {
+        const usersTotal = await fastify.models.User.countJoined();
+        sync.emit('users_total', { value: usersTotal });
+        console.log('New user joined, broadcasting users_total:', usersTotal);
+      }
       
       // Set cookie
       reply.setCookie(config.jwt.cookieKey, sessionToken, {
