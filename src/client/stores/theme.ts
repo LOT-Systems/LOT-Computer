@@ -217,13 +217,14 @@ state.isMirrorOn.subscribe((value) => {
       sunset: sunset.format('HH:mm:ss'),
       isDark,
       currentTheme: _theme,
-      willSetDark: isDark && ['light', 'sunset', 'sunrise'].includes(_theme)
+      willSetTheme: isDark ? 'dark' : 'light'
     })
 
-    if (isDark && ['light', 'sunset', 'sunrise'].includes(_theme)) {
+    // Set theme based on time of day
+    if (isDark) {
       theme.set('dark')
-      return
+    } else {
+      theme.set('light')
     }
-    theme.set('light')
   }
 })

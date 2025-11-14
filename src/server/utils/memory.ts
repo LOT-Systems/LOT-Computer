@@ -74,9 +74,10 @@ export async function completeAndExtractQuestion(
 
   try {
     // Get the best available AI engine (Claude, then OpenAI, configurable)
+    console.log(`🔍 Attempting to get AI engine with preference: ${AI_ENGINE_PREFERENCE}`)
     const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
 
-    console.log(`🤖 Using ${engine.name} for Memory question generation`)
+    console.log(`🤖 Using ${engine.name} for Memory question generation (user: ${user.email})`)
 
     // LOT's prompt stays on LOT's side - engine just executes it
     const fullPrompt = `${prompt}
@@ -91,22 +92,29 @@ Make sure the question is personalized, relevant to self-care habits, and the op
 
     // Execute using whichever engine is available
     const completion = await engine.generateCompletion(fullPrompt, 1024)
+    console.log(`✅ Got completion from ${engine.name} (length: ${completion?.length || 0})`)
 
     // Parse JSON from response (works for both Claude and OpenAI)
     const jsonMatch = completion.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
+      console.error(`❌ No JSON found in ${engine.name} response:`, completion?.substring(0, 200))
       throw new Error(`No JSON found in ${engine.name} response`)
     }
 
     const parsed = JSON.parse(jsonMatch[0])
     const validatedQuestion = questionSchema.parse(parsed)
 
+    console.log(`✅ Successfully generated question: "${validatedQuestion.question}"`)
     return {
       id: randomUUID(),
       ...validatedQuestion,
     }
   } catch (error: any) {
-    console.error('❌ AI Engine failed, falling back to legacy OpenAI:', error.message)
+    console.error('❌ AI Engine failed, falling back to legacy OpenAI:', {
+      message: error.message,
+      stack: error.stack,
+      user: user.email,
+    })
 
     // FALLBACK: Use legacy OpenAI with Instructor if new system fails
     const extractedQuestion = await oaiClient.chat.completions.create({

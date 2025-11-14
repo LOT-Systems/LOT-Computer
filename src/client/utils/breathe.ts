@@ -21,13 +21,14 @@ const PHASE_LABELS = {
   exhale: 'Exhale',
 }
 
-// ASCII animations for each phase
-const getAsciiAnimation = (phase: BreathingPhase, count: number): string => {
+// ASCII animations for each phase (based on elapsed time in phase)
+const getAsciiAnimation = (phase: BreathingPhase, elapsed: number): string => {
   switch (phase) {
     case 'inhale':
-      // Expanding: . o O ◯ ◉
+      // Expanding: . o O ◯
       const inhaleFrames = ['.', 'o', 'O', '◯']
-      const inhaleIndex = Math.floor((count / PHASE_DURATIONS.inhale) * inhaleFrames.length)
+      const inhaleProgress = elapsed / PHASE_DURATIONS.inhale
+      const inhaleIndex = Math.floor(inhaleProgress * inhaleFrames.length)
       return inhaleFrames[Math.min(inhaleIndex, inhaleFrames.length - 1)]
 
     case 'hold':
@@ -37,7 +38,8 @@ const getAsciiAnimation = (phase: BreathingPhase, count: number): string => {
     case 'exhale':
       // Contracting: ◉ ◯ O o .
       const exhaleFrames = ['◉', '◯', 'O', 'o', '.']
-      const exhaleIndex = Math.floor((count / PHASE_DURATIONS.exhale) * exhaleFrames.length)
+      const exhaleProgress = elapsed / PHASE_DURATIONS.exhale
+      const exhaleIndex = Math.floor(exhaleProgress * exhaleFrames.length)
       return exhaleFrames[Math.min(exhaleIndex, exhaleFrames.length - 1)]
 
     default:
@@ -58,31 +60,33 @@ export function useBreathe(enabled: boolean) {
       return
     }
 
-    // Start with inhale
-    setState({ phase: 'inhale', count: PHASE_DURATIONS.inhale, display: '.' })
+    // Use performance.now() for precise timing
+    const startTime = performance.now()
+    const totalCycleDuration = PHASE_DURATIONS.inhale + PHASE_DURATIONS.hold + PHASE_DURATIONS.exhale
 
-    let currentPhase: BreathingPhase = 'inhale'
-    let countdown = PHASE_DURATIONS.inhale
+    const updateState = () => {
+      const elapsed = (performance.now() - startTime) / 1000 // seconds
+      const cyclePosition = elapsed % totalCycleDuration
 
-    const interval = setInterval(() => {
-      countdown -= 1
+      let currentPhase: BreathingPhase
+      let phaseElapsed: number
+      let countdown: number
 
-      if (countdown <= 0) {
-        // Move to next phase
-        if (currentPhase === 'inhale') {
-          currentPhase = 'hold'
-          countdown = PHASE_DURATIONS.hold
-        } else if (currentPhase === 'hold') {
-          currentPhase = 'exhale'
-          countdown = PHASE_DURATIONS.exhale
-        } else {
-          // Loop back to inhale
-          currentPhase = 'inhale'
-          countdown = PHASE_DURATIONS.inhale
-        }
+      if (cyclePosition < PHASE_DURATIONS.inhale) {
+        currentPhase = 'inhale'
+        phaseElapsed = cyclePosition
+        countdown = Math.ceil(PHASE_DURATIONS.inhale - phaseElapsed)
+      } else if (cyclePosition < PHASE_DURATIONS.inhale + PHASE_DURATIONS.hold) {
+        currentPhase = 'hold'
+        phaseElapsed = cyclePosition - PHASE_DURATIONS.inhale
+        countdown = Math.ceil(PHASE_DURATIONS.hold - phaseElapsed)
+      } else {
+        currentPhase = 'exhale'
+        phaseElapsed = cyclePosition - PHASE_DURATIONS.inhale - PHASE_DURATIONS.hold
+        countdown = Math.ceil(PHASE_DURATIONS.exhale - phaseElapsed)
       }
 
-      const ascii = getAsciiAnimation(currentPhase, countdown)
+      const ascii = getAsciiAnimation(currentPhase, phaseElapsed)
       const label = PHASE_LABELS[currentPhase]
       const display = `${ascii} ${label} ${countdown}s`
 
@@ -91,7 +95,13 @@ export function useBreathe(enabled: boolean) {
         count: countdown,
         display,
       })
-    }, 1000)
+    }
+
+    // Update immediately
+    updateState()
+
+    // Update every 100ms for smooth countdown, but use precise timing
+    const interval = setInterval(updateState, 100)
 
     return () => {
       clearInterval(interval)
