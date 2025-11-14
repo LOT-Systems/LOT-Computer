@@ -460,8 +460,17 @@ export default async (fastify: FastifyInstance) => {
         (tag) => tag.toLowerCase() === 'usership'
       )
 
+      console.log(`Memory question request:`, {
+        userId: req.user.id,
+        userEmail: req.user.email,
+        userTags: req.user.tags,
+        hasUsershipTag,
+        isRecentlyAsked,
+      })
+
       if (hasUsershipTag) {
         // Usership users: Generate AI-based context-aware question using Claude
+        console.log(`🔍 Attempting to generate AI question for Usership user ${req.user.id}`)
         try {
           const logs = await fastify.models.Log.findAll({
             where: {
