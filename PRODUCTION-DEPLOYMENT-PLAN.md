@@ -40,24 +40,25 @@ This branch contains **32 commits** of substantial new features and improvements
 
 At minimum, add ONE of the following AI provider API keys:
 
-**Recommended Option - Google Gemini (Free tier):**
+**Recommended Option - Together AI (Cheapest, Fastest):**
 ```env
-GOOGLE_API_KEY=your_google_api_key
+TOGETHER_API_KEY=91f01cf8fcba1d44dbf5e2b712210edfffecd6d7f6e5e50816cd50d1efa8414c
 ```
-Get key: https://aistudio.google.com/app/apikey
+Get key: https://api.together.xyz/
+Cost: ~$0.88/M tokens (cheapest option)
 
 **Other Options:**
 ```env
-# Together AI (Cheapest ~$0.88/M tokens)
-TOGETHER_API_KEY=your_together_api_key
+# Google Gemini (Free tier available)
+GOOGLE_API_KEY=your_google_api_key
 
 # Mistral AI (European/GDPR)
 MISTRAL_API_KEY=your_mistral_api_key
 
-# Anthropic Claude (Premium)
+# Anthropic Claude (Premium quality)
 ANTHROPIC_API_KEY=your_anthropic_api_key
 
-# OpenAI
+# OpenAI (Most expensive)
 OPENAI_API_KEY=your_openai_api_key
 ```
 
@@ -291,7 +292,7 @@ npm run migrations:down
 | Anthropic | $15-30 | Highest quality |
 | OpenAI | $50-100 | Most expensive |
 
-**Recommendation:** Start with Google Gemini (free tier) or Together AI
+**Recommendation:** Use Together AI (cheapest and fastest, already configured)
 
 ---
 
