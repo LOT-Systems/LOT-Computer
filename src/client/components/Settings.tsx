@@ -258,7 +258,7 @@ export const Settings = () => {
 
         <div>
           <Block label="Memory Engine:">
-            {me?.memoryEngine === 'claude' ? 'Claude' : 'Standard'}
+            {me?.memoryEngine === 'ai' ? 'AI-Powered' : 'Standard'}
           </Block>
           <Block label="Site systems check:">
             <a href="/status" className="-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc/10">
@@ -276,7 +276,7 @@ export const Settings = () => {
               </div>
               <ul className="mb-16 ml-16 list-disc text-acc/80">
                 <li>AI-powered Memory Story generation</li>
-                <li>Advanced Claude memory engine</li>
+                <li>Advanced AI memory engine</li>
                 <li>Personalized insights from your daily logs</li>
                 <li>Priority access to new features</li>
               </ul>

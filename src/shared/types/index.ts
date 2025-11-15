@@ -32,7 +32,7 @@ export type UserProfile = {
   phone: string | null;
   tags: string[];
   hideActivityLogs: boolean;
-  memoryEngine?: 'claude' | 'standard';
+  memoryEngine?: 'ai' | 'standard';
 };
 
 export type User = {
