@@ -1,4 +1,14 @@
-export async function listenSSE<T>(url: string, onMessage: (data: T) => void) {
+export interface SSEOptions<T> {
+  onMessage: (data: T) => void
+  onOpen?: () => void
+  onError?: () => void
+}
+
+export async function listenSSE<T>(
+  url: string,
+  onMessage: (data: T) => void,
+  options?: { onOpen?: () => void; onError?: () => void }
+) {
   let sse: EventSource
   let retryTime = 1000
   const maxRetryTime = 16000
@@ -8,10 +18,12 @@ export async function listenSSE<T>(url: string, onMessage: (data: T) => void) {
 
     sse.onopen = () => {
       retryTime = 1000
+      options?.onOpen?.()
     }
 
     sse.onerror = () => {
       sse.close()
+      options?.onError?.()
       // exponential backoff
       setTimeout(connect, retryTime)
       retryTime = Math.min(maxRetryTime, retryTime * 2)

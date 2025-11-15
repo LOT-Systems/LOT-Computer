@@ -23,8 +23,8 @@ const isButton = (props: Props) => {
 }
 
 const SIZE_CLASSNAME: Record<ButtonSize, string> = {
-  small: 'px-[11px] py-4',
-  normal: 'px-[20px] py-8',
+  small: 'px-[18px] py-[6px]',
+  normal: 'px-[18px] py-[6px] min-h-[42px]',
 }
 
 export const Button: React.FC<Props> = ({
@@ -39,24 +39,24 @@ export const Button: React.FC<Props> = ({
   const className = cn(
     'relative overflow-hidden whitespace-nowrap',
     'disabled:opacity-80',
+    'inline-flex justify-center items-center',
+    'text-base leading-1.5',
     kind === 'primary' &&
       cn(
         isLightTheme
           ? // Light mode: simple, modern blue button with custom colors
-            'button-primary border-0 rounded-md text-white transition-all disabled:cursor-not-allowed bg-[#5397DA] hover:bg-[#2765A5] active:bg-[#1a4d85] disabled:bg-[#a8c9ed]'
+            'button-primary border-0 rounded-md text-white transition-all disabled:cursor-not-allowed bg-[#0080FF] hover:bg-[#0066CC] active:bg-[#004C99] disabled:bg-[#80BFFF]'
           : // Dark/themed mode: accent-colored transparent border
             cn(
               'hover:bg-acc/10',
-              'inline-flex justify-center items-center',
-              'border border-acc text-acc py-8 transition-[background-color] rounded bg-transparent',
+              'border border-acc text-acc transition-[background-color] rounded bg-transparent',
               'disabled:border-acc/40 disabled:text-acc/40'
             )
       ),
     kind === 'secondary' &&
       cn(
         'hover:bg-acc/10',
-        'inline-flex justify-center items-center',
-        'border border-acc text-acc py-8 transition-[background-color] rounded bg-transparent',
+        'border border-acc text-acc transition-[background-color] rounded bg-transparent',
         'disabled:border-acc/40 disabled:text-acc/40'
       ),
     kind === 'secondary-rounded' &&
@@ -64,7 +64,7 @@ export const Button: React.FC<Props> = ({
         !isMirrorOn &&
           'before:content-[""] before:absolute before:inset-0 before:bg-bac before:z-[-1]',
         'hover:bg-acc/10',
-        'inline-flex justify-center items-center transition-[background-color] rounded',
+        'transition-[background-color] rounded',
         'bg-transparent border border-acc text-acc rounded-[21px]',
         'disabled:border-acc/40 disabled:text-acc/40'
       ),

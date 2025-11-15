@@ -26,6 +26,10 @@ input:-webkit-autofill {
     @apply font-base tabular-nums;
     background-color: var(--base-color);
     color: rgb(var(--acc-color-default));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   }
 
   *:focus {

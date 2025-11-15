@@ -25,7 +25,7 @@ import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
-import { buildPrompt, completeAndExtractQuestion } from '#server/utils/memory'
+import { buildPrompt, completeAndExtractQuestion, generateMemoryStory } from '#server/utils/memory'
 import dayjs from '#server/utils/dayjs'
 
 export default async (fastify: FastifyInstance) => {
@@ -460,8 +460,17 @@ export default async (fastify: FastifyInstance) => {
         (tag) => tag.toLowerCase() === 'usership'
       )
 
+      console.log(`Memory question request:`, {
+        userId: req.user.id,
+        userEmail: req.user.email,
+        userTags: req.user.tags,
+        hasUsershipTag,
+        isRecentlyAsked,
+      })
+
       if (hasUsershipTag) {
         // Usership users: Generate AI-based context-aware question using Claude
+        console.log(`🔍 Attempting to generate AI question for Usership user ${req.user.id}`)
         try {
           const logs = await fastify.models.Log.findAll({
             where: {
@@ -480,9 +489,16 @@ export default async (fastify: FastifyInstance) => {
             error: error.message,
             stack: error.stack,
             userId: req.user.id,
-            hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
             userTags: req.user.tags,
             timestamp: new Date().toISOString(),
+            apiKeysConfigured: {
+              TOGETHER_API_KEY: !!process.env.TOGETHER_API_KEY,
+              GOOGLE_API_KEY: !!process.env.GOOGLE_API_KEY,
+              MISTRAL_API_KEY: !!process.env.MISTRAL_API_KEY,
+              ANTHROPIC_API_KEY: !!process.env.ANTHROPIC_API_KEY,
+              OPENAI_API_KEY: !!process.env.OPENAI_API_KEY,
+            },
+            note: 'At least ONE valid API key is required. Visit /api/public/test-ai-engines to diagnose.',
           })
           // Fall back to default questions on error
         }
@@ -593,4 +609,76 @@ export default async (fastify: FastifyInstance) => {
       return { response: fp.randomElement(defaultReplies) }
     }
   )
+
+  // Get user's own Memory story
+  fastify.get('/memory/story', async (req, reply) => {
+    try {
+      // Check if user has Usership tag
+      const hasUsershipTag = req.user.tags.some(
+        (tag) => tag.toLowerCase() === 'usership'
+      )
+
+      // Get user's answer logs
+      const logs = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: 'answer',
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 100,
+      })
+
+      console.log(`Memory Story: User ${req.user.id} has ${logs.length} answers, hasUsership: ${hasUsershipTag}`)
+
+      // Check if user has any answers
+      if (logs.length === 0) {
+        if (hasUsershipTag) {
+          return {
+            story: null,
+            hasUsership: true,
+            message: 'Start answering Memory questions to build your story.'
+          }
+        } else {
+          return {
+            story: null,
+            hasUsership: false,
+            message: 'Subscribe to Usership to unlock Memory Story feature. Visit brand.lot-systems.com'
+          }
+        }
+      }
+
+      // Only generate story for Usership users
+      if (!hasUsershipTag) {
+        return {
+          story: null,
+          hasUsership: false,
+          answerCount: logs.length,
+          message: 'Subscribe to Usership to unlock Memory Story generation.'
+        }
+      }
+
+      // Generate story from answers
+      console.log(`Generating story for user ${req.user.id}...`)
+      const story = await generateMemoryStory(req.user, logs)
+      console.log(`Story generated successfully (${story?.length || 0} chars)`)
+
+      return {
+        story,
+        hasUsership: true,
+        answerCount: logs.length
+      }
+    } catch (error: any) {
+      console.error('❌ Error generating memory story:', {
+        error: error.message,
+        stack: error.stack,
+        userId: req.user?.id
+      })
+      return {
+        story: null,
+        hasUsership: req.user?.tags.some((tag) => tag.toLowerCase() === 'usership') || false,
+        message: 'Unable to generate story at this time. Please try again later.',
+        error: error.message
+      }
+    }
+  })
 }

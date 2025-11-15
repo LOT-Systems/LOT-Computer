@@ -74,9 +74,10 @@ export async function completeAndExtractQuestion(
 
   try {
     // Get the best available AI engine (Claude, then OpenAI, configurable)
+    console.log(`🔍 Attempting to get AI engine with preference: ${AI_ENGINE_PREFERENCE}`)
     const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
 
-    console.log(`🤖 Using ${engine.name} for Memory question generation`)
+    console.log(`🤖 Using ${engine.name} for Memory question generation (user: ${user.email})`)
 
     // LOT's prompt stays on LOT's side - engine just executes it
     const fullPrompt = `${prompt}
@@ -91,22 +92,29 @@ Make sure the question is personalized, relevant to self-care habits, and the op
 
     // Execute using whichever engine is available
     const completion = await engine.generateCompletion(fullPrompt, 1024)
+    console.log(`✅ Got completion from ${engine.name} (length: ${completion?.length || 0})`)
 
     // Parse JSON from response (works for both Claude and OpenAI)
     const jsonMatch = completion.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
+      console.error(`❌ No JSON found in ${engine.name} response:`, completion?.substring(0, 200))
       throw new Error(`No JSON found in ${engine.name} response`)
     }
 
     const parsed = JSON.parse(jsonMatch[0])
     const validatedQuestion = questionSchema.parse(parsed)
 
+    console.log(`✅ Successfully generated question: "${validatedQuestion.question}"`)
     return {
       id: randomUUID(),
       ...validatedQuestion,
     }
   } catch (error: any) {
-    console.error('❌ AI Engine failed, falling back to legacy OpenAI:', error.message)
+    console.error('❌ AI Engine failed, falling back to legacy OpenAI:', {
+      message: error.message,
+      stack: error.stack,
+      user: user.email,
+    })
 
     // FALLBACK: Use legacy OpenAI with Instructor if new system fails
     const extractedQuestion = await oaiClient.chat.completions.create({
@@ -337,16 +345,27 @@ Generate a concise narrative story (3-5 bullet points) that captures who this pe
 
   try {
     // Use AI engine abstraction - try Claude, then OpenAI, whichever works
+    console.log('🔍 Attempting to get AI engine with preference:', AI_ENGINE_PREFERENCE)
     const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
     console.log(`🤖 Using ${engine.name} for Memory Story generation`)
 
     const story = await engine.generateCompletion(prompt, 1000)
+    console.log(`✅ Story generated successfully with ${engine.name} (${story?.length || 0} chars)`)
     return story || 'Unable to generate story.'
   } catch (error: any) {
-    console.error('❌ AI Engine failed for Memory Story:', error.message)
+    console.error('❌ AI Engine failed for Memory Story:', {
+      message: error.message,
+      stack: error.stack,
+      preference: AI_ENGINE_PREFERENCE
+    })
 
     // FALLBACK: Try legacy Claude if new system fails
+    console.log('🔄 Attempting legacy Claude fallback...')
     try {
+      if (!anthropic || !config.anthropic?.apiKey) {
+        throw new Error('Legacy Claude client not configured - API key missing')
+      }
+
       const response = await anthropic.messages.create({
         model: 'claude-3-5-sonnet-20241022',
         max_tokens: 1000,
@@ -358,12 +377,20 @@ Generate a concise narrative story (3-5 bullet points) that captures who this pe
 
       const textContent = response.content.find((block) => block.type === 'text')
       if (!textContent || textContent.type !== 'text') {
+        console.error('❌ Legacy Claude returned no text content')
         return 'Unable to generate story.'
       }
 
+      console.log(`✅ Story generated with legacy Claude fallback (${textContent.text?.length || 0} chars)`)
       return textContent.text || 'Unable to generate story.'
-    } catch (fallbackError) {
-      console.error('❌ Legacy Claude also failed:', fallbackError)
+    } catch (fallbackError: any) {
+      console.error('❌ Legacy Claude also failed:', {
+        message: fallbackError.message,
+        stack: fallbackError.stack,
+        hasAnthropicClient: !!anthropic,
+        hasApiKey: !!config.anthropic?.apiKey,
+        apiKeyLength: config.anthropic?.apiKey?.length || 0
+      })
       return 'Unable to generate story at this time. Please try again later.'
     }
   }

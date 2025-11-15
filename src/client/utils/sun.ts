@@ -38,20 +38,20 @@ export function useSun(
         isDark: now.isAfter(sunset) || now.isBefore(sunrise),
         isAfterSunset: now.isAfter(sunset),
         isBeforeSunrise: now.isBefore(sunrise),
-        inSunsetTransition: now.isAfter(sunset.subtract(10, 'second')) && now.isBefore(sunset.add(1, 'minute')),
+        inSunsetTransition: now.isAfter(sunset.subtract(90, 'second')) && now.isBefore(sunset),
         weatherCreatedAt: weather.createdAt,
         weatherAge: `${now.diff(dayjs(weather.createdAt), 'minute')} minutes old`,
         currentTheme: stores.theme.get()
       })
 
       if (
-        now.isAfter(sunrise.subtract(10, 'second')) &&
-        now.isBefore(sunrise.add(1, 'minute'))
+        now.isAfter(sunrise.subtract(90, 'second')) &&
+        now.isBefore(sunrise)
       ) {
         stores.theme.set('sunrise')
       } else if (
-        now.isAfter(sunset.subtract(10, 'second')) &&
-        now.isBefore(sunset.add(1, 'minute'))
+        now.isAfter(sunset.subtract(90, 'second')) &&
+        now.isBefore(sunset)
       ) {
         stores.theme.set('sunset')
       } else {

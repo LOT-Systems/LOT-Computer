@@ -127,13 +127,13 @@ export const Sync = () => {
 
   return (
     <div className="max-w-[700px]">
-      <div className="flex items-start mb-80">
-        <span className="mr-16 whitespace-nowrap py-2 leading-normal border border-transparent">
+      <div className="flex items-center mb-80">
+        <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}
         </span>
         <form
           onSubmit={onSubmitMessage}
-          className="flex items-start gap-x-8"
+          className="flex items-center gap-x-8 flex-1"
           ref={formRef}
         >
           <ResizibleGhostInput
@@ -142,10 +142,11 @@ export const Sync = () => {
             onChange={onChangeMessage}
             onKeyDown={onKeyDown}
             placeholder="Type a message..."
-            containerClassName="translate-y-[5px]"
+            containerClassName="flex-grow leading-normal"
+            className="leading-normal"
           />
-          <div className="flex items-center gap-x-16">
-            <span className="text-acc/40 pointer-events-none select-none whitespace-nowrap">
+          <div className="flex items-center gap-x-8">
+            <span className="text-acc/40 pointer-events-none select-none whitespace-nowrap leading-normal">
               <Clock format="hh:mm A" interval={5e3} />
             </span>
             <Button
@@ -174,20 +175,20 @@ export const Sync = () => {
             <div
               key={x.id}
               className={cn(
-                'group flex items-start gap-x-16 mb-8 cursor-pointer hover:bg-acc/5 -mx-8 px-8 py-4 rounded transition-colors',
+                'group flex items-start gap-x-8 mb-8 cursor-pointer hover:bg-acc/10 -mx-4 px-4 py-2 rounded transition-colors',
                 i >= SYNC_CHAT_MESSAGES_TO_SHOW && 'text-acc/20'
               )}
               onClick={onToggleLike(x.id)}
             >
               {authorId ? (
                 <GhostButton
-                  className="whitespace-nowrap"
+                  className="whitespace-nowrap pr-4"
                   onClick={onNavigateToUserProfile(authorId)}
                 >
                   {authorName}
                 </GhostButton>
               ) : (
-                <span className="whitespace-nowrap px-4">{authorName}</span>
+                <span className="whitespace-nowrap -ml-4 px-4 pr-8">{authorName}</span>
               )}
               <div
                 className="whitespace-breakspaces"
