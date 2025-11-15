@@ -1,11 +1,20 @@
 import { FastifyInstance } from 'fastify';
 import crypto from 'crypto';
 import dayjs from 'dayjs';
+import fs from 'fs';
+import path from 'path';
 import { sendEmail } from '../utils/email.js';
 import { verificationEmailTemplate } from '../../utils/emailTemplates.js';
 import config from '../config.js';
+import { sync } from '../sync.js';
 
 const EMAIL_CODE_VALID_MINUTES = 10;
+
+// Get version from package.json
+const packageJson = JSON.parse(
+  fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8')
+);
+const VERSION = packageJson.version || '0.0.4';
 
 export default function (fastify: FastifyInstance, opts: any, done: () => void) {
   // Add request logging
@@ -52,9 +61,10 @@ export default function (fastify: FastifyInstance, opts: any, done: () => void) 
       console.log('Email code record created:', emailCode.id);
       console.log('Sending verification email');
 
+      const currentDate = dayjs().format('MMMM D, YYYY h:mm A');
       const emailResult = await sendEmail({
         to: email,
-        text: verificationEmailTemplate(code),
+        text: verificationEmailTemplate(code, VERSION, currentDate),
         subject: 'LOT – Verification Code',
       });
       
@@ -124,10 +134,15 @@ export default function (fastify: FastifyInstance, opts: any, done: () => void) 
       
       // Find or create user
       let user = await fastify.models.User.findOne({ where: { email } });
-      
+      let isNewUser = false;
+
       if (!user) {
         console.log('Creating new user:', email);
-        user = await fastify.models.User.create({ email });
+        user = await fastify.models.User.create({
+          email,
+          joinedAt: new Date()
+        });
+        isNewUser = true;
       }
       
       // Create session
@@ -136,8 +151,15 @@ export default function (fastify: FastifyInstance, opts: any, done: () => void) 
         token: sessionToken,
         userId: user.id,
       });
-      
+
       console.log('Session created for user:', user.id);
+
+      // Broadcast updated user count if new user joined
+      if (isNewUser) {
+        const usersTotal = await fastify.models.User.countJoined();
+        sync.emit('users_total', { value: usersTotal });
+        console.log('New user joined, broadcasting users_total:', usersTotal);
+      }
       
       // Set cookie
       reply.setCookie(config.jwt.cookieKey, sessionToken, {

@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
-import { useUpdateSettings } from '#client/queries'
+import { useUpdateSettings, useMyMemoryStory } from '#client/queries'
 import * as stores from '#client/stores'
-import { Block, Button, GhostButton, Input, Select } from '#client/components/ui'
+import { Block, Button, GhostButton, Input, Select, Link } from '#client/components/ui'
 import { UserSettings, UserTag } from '#shared/types'
 import {
   COUNTRIES,
@@ -21,6 +21,7 @@ export const Settings = () => {
   const baseColor = useStore(stores.baseColor)
   const accentColor = useStore(stores.accentColor)
   const isCustomThemeEnabled = useStore(stores.isCustomThemeEnabled)
+  const { data: storyData } = useMyMemoryStory()
 
   const { mutate: updateSettings } = useUpdateSettings({
     onSuccess: () => {
@@ -146,14 +147,14 @@ export const Settings = () => {
     : 'Status page (loading...)'
 
   return (
-    <div className="flex flex-col gap-y-48">
+    <div className="flex flex-col gap-y-16">
       <div>
         <div>{me?.firstName ? me.firstName + `'s` : 'Your'} LOT setings.</div>
         <div>You can edit the settings at any time.</div>
       </div>
 
-      <form className="flex flex-col gap-y-48 max-w-384" onSubmit={onSubmit}>
-        <div className="flex gap-x-16">
+      <form className="flex flex-col gap-y-16 max-w-384" onSubmit={onSubmit}>
+        <div className="flex gap-x-8">
           <div className="flex-grow">
             <Input
               type="text"
@@ -176,7 +177,7 @@ export const Settings = () => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-y-16">
+        <div className="flex flex-col gap-y-8">
           <Select
             name="country"
             value={state.country || ''}
@@ -266,7 +267,66 @@ export const Settings = () => {
           </Block>
         </div>
 
-        <div className="flex gap-x-16">
+        {/* Subscription Section for non-Usership users */}
+        {!userTagIds.includes(UserTag.Usership) && (
+          <div>
+            <Block label="Usership:" blockView>
+              <div className="mb-16">
+                Unlock premium features with Usership subscription:
+              </div>
+              <ul className="mb-16 ml-16 list-disc text-acc/80">
+                <li>AI-powered Memory Story generation</li>
+                <li>Advanced Claude memory engine</li>
+                <li>Personalized insights from your daily logs</li>
+                <li>Priority access to new features</li>
+              </ul>
+              <Button
+                kind="primary"
+                href="https://brand.lot-systems.com"
+                target="_blank"
+                rel="external"
+              >
+                Subscribe to Usership
+              </Button>
+            </Block>
+          </div>
+        )}
+
+        {/* Memory Story Section */}
+        {storyData && (
+          <div>
+            <Block label="Memory Story:" blockView>
+              {storyData.story ? (
+                <>
+                  <div className="whitespace-pre-wrap mb-16">{storyData.story}</div>
+                  {storyData.answerCount && (
+                    <div className="text-acc/40">
+                      Based on {storyData.answerCount} answer{storyData.answerCount > 1 ? 's' : ''}
+                    </div>
+                  )}
+                </>
+              ) : storyData.hasUsership ? (
+                <div>Start answering Memory questions to build your story.</div>
+              ) : (
+                <>
+                  <div className="mb-8">
+                    Subscribe to Usership to unlock generative Memory Story feature.
+                  </div>
+                  <Link
+                    href="https://brand.lot-systems.com"
+                    target="_blank"
+                    rel="external"
+                    className="underline"
+                  >
+                    Visit brand.lot-systems.com
+                  </Link>
+                </>
+              )}
+            </Block>
+          </div>
+        )}
+
+        <div className="flex gap-x-8">
           <Button kind="primary" type="submit" disabled={!changed}>
             Save
           </Button>

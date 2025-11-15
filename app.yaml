@@ -3,7 +3,7 @@ region: nyc3
 services:
   - name: web
     git:
-      branch: claude/deploy-status-page-011CUs6NQRyEJRe6h8NDvobt
+      branch: claude/work-in-progress-011CUs6NQRyEJRe6h8NDvobt
       repo_clone_url: https://github.com/vadikmarmeladov/lot-systems.git
     build_command: |
       echo "🚀 Build started at $(date)"

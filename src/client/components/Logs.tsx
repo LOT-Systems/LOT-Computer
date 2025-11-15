@@ -234,17 +234,18 @@ const NoteEditor = ({
     textarea.addEventListener('blur', () => setIsFocused(false))
   }, [])
 
-  // Handle Enter key to save immediately
+  // Handle Enter key - allow newlines, Cmd/Ctrl+Enter to save
   const onKeyDown = React.useCallback(
     (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (ev.key === 'Enter' && !ev.shiftKey) {
-        ev.preventDefault() // Prevent newline
+      if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
+        ev.preventDefault()
         if (value !== log.text) {
           onChange(value) // Immediate save
         }
         // Optionally blur to show save happened
         ;(ev.target as HTMLTextAreaElement).blur()
       }
+      // Regular Enter key creates newline (default behavior)
     },
     [value, log.text, onChange]
   )
@@ -253,7 +254,7 @@ const NoteEditor = ({
     <div className="relative group">
       <div
         className={cn(
-          'relative',
+          'relative mb-4 sm:mb-0',
           'sm:absolute sm:top-0 sm:right-0 text-end select-none',
           'transition-opacity',
           primary
@@ -273,7 +274,7 @@ const NoteEditor = ({
           : !!log && dayjs(log.updatedAt).format(dateFormat)}
       </div>
 
-      <div className="max-w-[700px]" ref={containerRef}>
+      <div className="max-w-[700px] px-4 sm:px-0" ref={containerRef}>
         <ResizibleGhostInput
           // tabIndex={-1}
           direction="v"
@@ -304,7 +305,7 @@ const LogContainer: React.FC<{
     <div className="relative group">
       <div
         className={cn(
-          'relative',
+          'relative mb-4 sm:mb-0',
           'sm:absolute sm:top-0 sm:right-0 text-end select-none',
           'transition-opacity opacity-0',
           'group-hover:opacity-100'
@@ -317,7 +318,8 @@ const LogContainer: React.FC<{
         className={cn(
           'max-w-[500px] lg:max-w-[700px] whitespace-breakspaces',
           'transition-opacity opacity-20',
-          'group-hover:opacity-100'
+          'group-hover:opacity-100',
+          'px-4 sm:px-0'
         )}
       >
         {children}

@@ -16,9 +16,9 @@ const App = () => {
           href="https://institute.lot-systems.com"
           rel="external"
           target="_blank"
-          className="underline tablet:no-underline whitespace-nowrap"
+          className="underline tablet:no-underline whitespace-nowrap pr-8"
         >
-          Institute <span className="hidden tablet:inline">↗</span>
+          Institute <span className="tablet:inline">↗</span>
         </Link>
       </div>
       <EmailLogin />

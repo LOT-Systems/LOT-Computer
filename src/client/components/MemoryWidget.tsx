@@ -12,7 +12,9 @@ export function MemoryWidget() {
   const [isResponseShown, setIsResponseShown] = React.useState(false)
   const [question, setQuestion] = React.useState<MemoryQuestion | null>(null)
   const [response, setResponse] = React.useState<string | null>(null)
+
   const { data: loadedQuestion = null } = useMemory()
+
   const { mutate: createMemory } = useCreateMemory({
     onSuccess: ({ response }) => {
       setIsQuestionShown(false)
@@ -70,7 +72,7 @@ export function MemoryWidget() {
     }
   }, [response])
 
-  // return !isDisplayed ? null : (
+  // Only show questions in System page (story moved to Settings)
   return (
     <Block
       label="Memory:"

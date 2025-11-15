@@ -16,6 +16,11 @@ export const isSoundOn = atom<boolean>(false)
 
 export const weather = atom<WeatherRecord | null>(null)
 
+// connection status
+export const isConnected = atom<boolean>(true)
+export const lastUpdate = atom<Date | null>(null)
+export const appVersion = atom<string>('')
+
 // static + localStorage
 export const isTimeFormat12h = persistentAtom<boolean>(
   'isTimeFormat12h',
