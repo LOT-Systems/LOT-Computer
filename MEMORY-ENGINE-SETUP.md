@@ -17,15 +17,16 @@ This will show:
 
 The Memory Engine requires **at least ONE valid API key** from any of these providers:
 
-### Option 1: Google Gemini (Recommended - Free Tier Available)
+### Option 1: Together AI (Recommended - Cheapest & Fastest)
+1. Get API key: https://api.together.xyz/
+2. Add to environment: `TOGETHER_API_KEY=91f01cf8fcba1d44dbf5e2b712210edfffecd6d7f6e5e50816cd50d1efa8414c`
+3. Cost: ~$0.88/million tokens (cheapest option)
+4. Model: Meta-Llama-3.1-70B-Instruct-Turbo
+
+### Option 2: Google Gemini (Free Tier Available)
 1. Get API key: https://aistudio.google.com/app/apikey
 2. Add to environment: `GOOGLE_API_KEY=your_key_here`
 3. Cost: Free tier available, then ~$1.25/million tokens
-
-### Option 2: Together AI (Cheapest)
-1. Get API key: https://api.together.xyz/
-2. Add to environment: `TOGETHER_API_KEY=your_key_here`
-3. Cost: ~$0.88/million tokens
 
 ### Option 3: OpenAI (Most Common)
 1. Get API key: https://platform.openai.com/api-keys
@@ -47,9 +48,9 @@ The Memory Engine requires **at least ONE valid API key** from any of these prov
 ### For Development (.env file):
 ```bash
 # Edit .env file
-GOOGLE_API_KEY=your_actual_key_here
+TOGETHER_API_KEY=91f01cf8fcba1d44dbf5e2b712210edfffecd6d7f6e5e50816cd50d1efa8414c
 # or
-TOGETHER_API_KEY=your_actual_key_here
+GOOGLE_API_KEY=your_actual_key_here
 ```
 
 ### For Production (Digital Ocean):
@@ -57,8 +58,8 @@ TOGETHER_API_KEY=your_actual_key_here
 2. Navigate to your app → Settings → App-Level Environment Variables
 3. Click "Edit"
 4. Add new variable:
-   - Key: `GOOGLE_API_KEY` (or another from above)
-   - Value: Your actual API key
+   - Key: `TOGETHER_API_KEY` (recommended)
+   - Value: `91f01cf8fcba1d44dbf5e2b712210edfffecd6d7f6e5e50816cd50d1efa8414c`
    - Encrypt: Yes
 5. Click "Save"
 6. Redeploy the app (or wait for auto-deploy)
@@ -70,7 +71,7 @@ After adding the API key:
 1. Visit: `https://lot-systems.com/api/public/test-ai-engines`
 2. Check that at least one engine shows `"available": true`
 3. Check that `hasAvailableEngine` is `true`
-4. Check that `preferredEngine` shows the engine name (not an error)
+4. Check that `preferredEngine` is "Together AI"
 
 ## How It Works
 

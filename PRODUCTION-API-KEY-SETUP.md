@@ -2,7 +2,7 @@
 
 ## Development is Ready ✓
 
-The Anthropic API key has been added to your local `.env` file and the Memory Engine should now work in development.
+The Together AI API key has been added to your local `.env` file and the Memory Engine should now work in development.
 
 ## Production Setup Needed
 
@@ -18,8 +18,8 @@ The Anthropic API key has been added to your local `.env` file and the Memory En
    - Go to: Settings → App-Level Environment Variables
    - Click "Edit"
    - Add new variable:
-     - **Key:** `ANTHROPIC_API_KEY`
-     - **Value:** `sk-ant-api03-mUyBScB4JoNdfYJm1rA8zPv_bitstkNpfa9LZnvur6D8Hi6WYUEwvdmYStLlmzOmJxKa3hYESub-wvqPsLVETg-TP4RhQAA`
+     - **Key:** `TOGETHER_API_KEY`
+     - **Value:** `91f01cf8fcba1d44dbf5e2b712210edfffecd6d7f6e5e50816cd50d1efa8414c`
      - **Encrypt:** Yes (recommended)
    - Click "Save"
 
@@ -30,22 +30,22 @@ The Anthropic API key has been added to your local `.env` file and the Memory En
 
 4. **Verify**
    - Visit: `https://lot-systems.com/api/public/test-ai-engines`
-   - Check that Claude engine shows `"available": true`
-   - Check that `preferredEngine` is "Claude"
+   - Check that Together AI engine shows `"available": true`
+   - Check that `preferredEngine` is "Together AI"
 
 ### Alternative: Use Another AI Provider
 
-If you prefer, you can use a different AI provider instead of Claude:
+If you prefer, you can use a different AI provider instead of Together AI:
 
 **Google Gemini (Free tier available):**
 - Get key: https://aistudio.google.com/app/apikey
 - Add: `GOOGLE_API_KEY=your_key_here`
 
-**Together AI (Cheapest):**
-- Get key: https://api.together.xyz/
-- Add: `TOGETHER_API_KEY=your_key_here`
+**Anthropic Claude (Premium quality):**
+- Get key: https://console.anthropic.com/settings/keys
+- Add: `ANTHROPIC_API_KEY=your_key_here`
 
-**OpenAI:**
+**OpenAI (Most expensive):**
 - Get key: https://platform.openai.com/api-keys
 - Add: `OPENAI_API_KEY=your_key_here`
 
@@ -74,7 +74,7 @@ Once you've added the key to Digital Ocean:
    - It should show an AI-generated personalized question
 
 3. **Check server logs:**
-   - Look for: `✅ Using AI engine: Claude`
+   - Look for: `✅ Using AI engine: Together AI`
    - Should NOT see: `❌ Memory question generation failed`
 
 ## Current Status
