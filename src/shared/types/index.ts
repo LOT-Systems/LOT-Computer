@@ -33,6 +33,7 @@ export type UserProfile = {
   tags: string[];
   hideActivityLogs: boolean;
   memoryEngine?: 'ai' | 'standard';
+  isAdmin?: boolean;
 };
 
 export type User = {

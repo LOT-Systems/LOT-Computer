@@ -47,7 +47,7 @@ export const AdminUsers = () => {
   })
 
   const isCurrentUserAdmin = React.useMemo(() => {
-    return me?.tags?.some((tag) => tag.toLowerCase() === 'admin') || false
+    return me?.isAdmin || false
   }, [me])
 
   const throrrledQuery = useDebounce(query, 400)
