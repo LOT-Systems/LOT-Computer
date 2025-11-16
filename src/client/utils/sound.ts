@@ -40,6 +40,21 @@ interface SoundContext {
   humidity: number | null // Percentage
   windSpeed: number | null // m/s
   pressure: number | null // hPa
+  dailySeed: number // Daily variation seed (0-1)
+}
+
+// Generate a daily seed (0-1) based on the current date
+// Same seed for entire day, different seed each day
+function getDailySeed(): number {
+  const now = new Date()
+  const dateString = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`
+  // Simple hash function to convert date string to 0-1 value
+  let hash = 0
+  for (let i = 0; i < dateString.length; i++) {
+    hash = (hash << 5) - hash + dateString.charCodeAt(i)
+    hash = hash & hash // Convert to 32-bit integer
+  }
+  return Math.abs(hash % 1000) / 1000
 }
 
 // Parse weather description into condition category
@@ -56,6 +71,62 @@ function getWeatherCondition(description: string | null): WeatherCondition {
   if (desc.includes('cloud') || desc.includes('overcast')) return 'cloudy'
 
   return 'unknown'
+}
+
+// Generate a poetic description of the current soundscape
+function getSoundDescription(context: SoundContext): string {
+  const { period, weather, temperature, humidity, frequency } = context
+  const parts: string[] = []
+
+  // Humidity descriptor
+  if (humidity !== null) {
+    if (humidity > 70) parts.push('Humid')
+    else if (humidity < 40) parts.push('Dry')
+  }
+
+  // Temperature descriptor
+  if (temperature !== null) {
+    if (temperature < 5) parts.push('crystalline')
+    else if (temperature < 15) parts.push('cool')
+    else if (temperature > 25) parts.push('warm')
+  }
+
+  // Primary sound elements by time of day
+  switch (period) {
+    case 'morning':
+      parts.push(`sine ${Math.round(frequency)}Hz`)
+      if (weather === 'rain' || weather === 'drizzle' || weather === 'thunderstorm') {
+        parts.push('and rain cascade')
+      } else {
+        parts.push('and gentle noise')
+      }
+      break
+    case 'day':
+      parts.push(`bass pulse ${Math.round(frequency)}Hz`)
+      if (weather === 'clear') {
+        parts.push('with bright shimmer')
+      }
+      break
+    case 'afternoon':
+      parts.push(`wooden drone ${Math.round(frequency)}Hz`)
+      parts.push('and wandering melody')
+      break
+    case 'night':
+      parts.push(`deep drone ${Math.round(frequency)}Hz`)
+      if (weather === 'clear' && temperature !== null && temperature < 5) {
+        parts.push('with crystal tones')
+      }
+      break
+  }
+
+  // Weather additions
+  if (weather === 'thunderstorm') {
+    parts.push('– distant thunder')
+  } else if (weather === 'rain' && period !== 'morning') {
+    parts.push('– soft rain')
+  }
+
+  return parts.join(' ')
 }
 
 // Detect time of day and return appropriate sound context
@@ -97,6 +168,7 @@ function getTimeContext(weather: any): SoundContext {
     humidity: weather?.humidity ?? null,
     windSpeed: weather?.windSpeed ?? null,
     pressure: weather?.pressure ?? null,
+    dailySeed: getDailySeed(),
   }
 }
 
@@ -147,8 +219,11 @@ export function useSound(enabled: boolean) {
     ;(async () => {
       if (isSoundLibLoaded && enabled) {
         await Tone.start()
-        console.log(`🔊 Sound started: ${context.period} - ${context.description}`)
+        const soundDesc = getSoundDescription(context)
+        console.log(`🔊 Sound: On (${soundDesc})`)
+        console.log(`🌊 ${context.period} - ${context.description}`)
         console.log(`🌦️ Weather: ${context.weather}, ${context.temperature}°C, ${context.humidity}% humidity, ${context.windSpeed}m/s wind`)
+        console.log(`🎲 Daily variation seed: ${context.dailySeed.toFixed(3)}`)
 
         // Clean up existing sounds if context changed
         Object.values(soundsRef.current).forEach((sound: any) => {
@@ -222,14 +297,18 @@ export function useSound(enabled: boolean) {
 
 // Morning: noise, rain, sine (Alpha waves 8-13 Hz) + weather variations
 function createMorningSounds(Tone: any, sounds: any, context: SoundContext) {
-  const { frequency, weather, temperature, humidity, windSpeed } = context
+  const { frequency, weather, temperature, humidity, windSpeed, dailySeed } = context
+
+  // Daily variation multipliers (±10-15%)
+  const freqVariation = 0.9 + dailySeed * 0.2 // 0.9-1.1
+  const volumeVariation = 0.88 + dailySeed * 0.24 // 0.88-1.12
 
   // Adjust base frequency based on temperature (cold = higher, warm = lower)
   const tempAdjustment = temperature !== null ? (20 - temperature) * 2 : 0 // -40°C to +40°C range
-  const baseSineFreq = 200 + tempAdjustment
+  const baseSineFreq = (200 + tempAdjustment) * freqVariation
 
   // Brown noise base - intensity varies with humidity
-  const noiseVolume = humidity !== null ? 0.2 + (humidity / 100) * 0.2 : 0.3
+  const noiseVolume = (humidity !== null ? 0.2 + (humidity / 100) * 0.2 : 0.3) * volumeVariation
   const noise = new Tone.Noise('brown')
   const noiseGain = new Tone.Gain(noiseVolume)
   noise.connect(noiseGain)
@@ -298,14 +377,18 @@ function createMorningSounds(Tone: any, sounds: any, context: SoundContext) {
 
 // Day: bass pulsating (Beta waves 13-30 Hz) + weather variations
 function createDaySounds(Tone: any, sounds: any, context: SoundContext) {
-  const { frequency, weather, temperature, humidity, windSpeed, pressure } = context
+  const { frequency, weather, temperature, humidity, windSpeed, pressure, dailySeed } = context
+
+  // Daily variation multipliers
+  const freqVariation = 0.92 + dailySeed * 0.16 // 0.92-1.08
+  const volumeVariation = 0.9 + dailySeed * 0.2 // 0.9-1.1
 
   // Bass frequency adjusted by pressure (low pressure = deeper, high pressure = higher)
   const pressureAdjustment = pressure !== null ? (1013 - pressure) * 0.05 : 0
-  const bassFreq = 60 + pressureAdjustment
+  const bassFreq = (60 + pressureAdjustment) * freqVariation
 
   // Pulsating bass - stronger on clear days
-  const bassVolume = weather === 'clear' ? 0.45 : 0.35
+  const bassVolume = (weather === 'clear' ? 0.45 : 0.35) * volumeVariation
   const bass = new Tone.Oscillator(bassFreq, 'sine')
   const bassGain = new Tone.Gain(bassVolume)
   const pulseModulator = new Tone.LFO(frequency, 0.2, 0.5)
@@ -372,10 +455,14 @@ function createDaySounds(Tone: any, sounds: any, context: SoundContext) {
 
 // Afternoon: noise, deep bass, random sine melody (Alpha/Theta 4-13 Hz) + weather variations
 function createAfternoonSounds(Tone: any, sounds: any, context: SoundContext) {
-  const { frequency, weather, temperature, humidity, windSpeed, pressure } = context
+  const { frequency, weather, temperature, humidity, windSpeed, pressure, dailySeed } = context
+
+  // Daily variation multipliers
+  const freqVariation = 0.88 + dailySeed * 0.24 // 0.88-1.12
+  const volumeVariation = 0.87 + dailySeed * 0.26 // 0.87-1.13
 
   // Noise volume varies with conditions
-  const noiseVolume = humidity !== null ? 0.15 + (humidity / 100) * 0.2 : 0.25
+  const noiseVolume = (humidity !== null ? 0.15 + (humidity / 100) * 0.2 : 0.25) * volumeVariation
   const noise = new Tone.Noise('brown')
   const noiseGain = new Tone.Gain(noiseVolume)
   noise.connect(noiseGain)
@@ -385,9 +472,9 @@ function createAfternoonSounds(Tone: any, sounds: any, context: SoundContext) {
 
   // Deep bass - pressure-adjusted
   const pressureAdjustment = pressure !== null ? (1013 - pressure) * 0.03 : 0
-  const bassFreq = 40 + pressureAdjustment
+  const bassFreq = (40 + pressureAdjustment) * freqVariation
   const bass = new Tone.Oscillator(bassFreq, 'sine')
-  const bassGain = new Tone.Gain(0.35)
+  const bassGain = new Tone.Gain(0.35 * volumeVariation)
   const bassModulator = new Tone.LFO(frequency, 0.2, 0.4)
   bassModulator.connect(bassGain.gain)
   bass.connect(bassGain)
@@ -439,13 +526,13 @@ function createAfternoonSounds(Tone: any, sounds: any, context: SoundContext) {
   const synth = new Tone.Synth({
     oscillator: { type: 'sine' },
     envelope: {
-      attack: 2,
+      attack: 2 * (0.95 + dailySeed * 0.1), // Slight attack variation
       decay: 1,
       sustain: 0.5,
-      release: 3,
+      release: 3 * (0.95 + dailySeed * 0.1), // Slight release variation
     },
   })
-  const synthVolume = weather === 'clear' ? 0.15 : weather === 'fog' ? 0.08 : 0.12
+  const synthVolume = (weather === 'clear' ? 0.15 : weather === 'fog' ? 0.08 : 0.12) * volumeVariation
   const synthGain = new Tone.Gain(synthVolume)
   synth.connect(synthGain)
   synthGain.toDestination()
@@ -464,10 +551,14 @@ function createAfternoonSounds(Tone: any, sounds: any, context: SoundContext) {
 
 // Night: bass, noise, pulsating (Theta/Delta 0.5-8 Hz) + weather variations
 function createNightSounds(Tone: any, sounds: any, context: SoundContext) {
-  const { frequency, weather, temperature, humidity, windSpeed, pressure } = context
+  const { frequency, weather, temperature, humidity, windSpeed, pressure, dailySeed } = context
+
+  // Daily variation multipliers
+  const freqVariation = 0.9 + dailySeed * 0.2 // 0.9-1.1
+  const volumeVariation = 0.85 + dailySeed * 0.3 // 0.85-1.15
 
   // Soft noise base - quieter at night, varies with humidity
-  const noiseVolume = humidity !== null ? 0.12 + (humidity / 100) * 0.15 : 0.2
+  const noiseVolume = (humidity !== null ? 0.12 + (humidity / 100) * 0.15 : 0.2) * volumeVariation
   const noise = new Tone.Noise('brown')
   const noiseGain = new Tone.Gain(noiseVolume)
   noise.connect(noiseGain)
@@ -477,9 +568,9 @@ function createNightSounds(Tone: any, sounds: any, context: SoundContext) {
 
   // Deep bass - adjusted by temperature (colder = slightly higher)
   const tempAdjustment = temperature !== null ? (15 - temperature) * 0.5 : 0
-  const bassFreq = 50 + Math.max(-10, Math.min(10, tempAdjustment))
+  const bassFreq = (50 + Math.max(-10, Math.min(10, tempAdjustment))) * freqVariation
   const bass = new Tone.Oscillator(bassFreq, 'sine')
-  const bassGain = new Tone.Gain(0.3)
+  const bassGain = new Tone.Gain(0.3 * volumeVariation)
   const bassModulator = new Tone.LFO(frequency, 0.15, 0.35)
   bassModulator.connect(bassGain.gain)
   bass.connect(bassGain)
@@ -533,8 +624,8 @@ function createNightSounds(Tone: any, sounds: any, context: SoundContext) {
   }
 
   // Pulsating drone - softer on clear nights, deeper in storms
-  const droneFreq = weather === 'thunderstorm' ? 70 : 80
-  const droneVolume = weather === 'clear' ? 0.2 : 0.25
+  const droneFreq = (weather === 'thunderstorm' ? 70 : 80) * freqVariation
+  const droneVolume = (weather === 'clear' ? 0.2 : 0.25) * volumeVariation
   const drone = new Tone.Oscillator(droneFreq, 'sine')
   const droneGain = new Tone.Gain(droneVolume)
   const pulseModulator = new Tone.LFO(frequency, 0.1, 0.3)
@@ -548,8 +639,8 @@ function createNightSounds(Tone: any, sounds: any, context: SoundContext) {
 
   // Crystalline tones for cold, clear nights
   if (weather === 'clear' && temperature !== null && temperature < 5) {
-    const crystal = new Tone.Oscillator(1800, 'sine')
-    const crystalGain = new Tone.Gain(0.06)
+    const crystal = new Tone.Oscillator(1800 * freqVariation, 'sine')
+    const crystalGain = new Tone.Gain(0.06 * volumeVariation)
     const crystalModulator = new Tone.LFO(0.2, 0.5, 1.0)
     crystalModulator.connect(crystalGain.gain)
     crystal.connect(crystalGain)
