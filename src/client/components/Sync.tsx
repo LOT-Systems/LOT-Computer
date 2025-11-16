@@ -100,7 +100,7 @@ export const Sync = () => {
   )
 
   const onNavigateToUserProfile = React.useCallback(
-    (userId: string) => (ev: React.MouseEvent) => {
+    (userId: string) => (ev: React.MouseEvent | React.TouchEvent) => {
       ev?.preventDefault()
       ev?.stopPropagation()
       window.location.href = `/us/${userId}`
@@ -184,6 +184,7 @@ export const Sync = () => {
                 <GhostButton
                   className="whitespace-nowrap pr-4"
                   onClick={onNavigateToUserProfile(authorId)}
+                  onTouchEnd={onNavigateToUserProfile(authorId)}
                 >
                   {authorName}
                 </GhostButton>
