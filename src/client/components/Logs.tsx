@@ -252,18 +252,19 @@ const NoteEditor = ({
 
   const contextText = React.useMemo(() => {
     if (!log?.context) return ''
-    const parts: string[] = []
+    const weatherParts: string[] = []
     if (log.context?.temperature) {
       const celsius = log.context.temperature - 273.15
-      parts.push(`${Math.round(celsius)}°C`)
+      weatherParts.push(`${Math.round(celsius)}° C`)
     }
     if (log.context?.humidity) {
-      parts.push(`${Math.round(log.context.humidity)}%`)
+      weatherParts.push(`${Math.round(log.context.humidity)}%`)
     }
+    const weatherText = weatherParts.join(', ')
     if (log.context?.city) {
-      parts.push(log.context.city)
+      return `${weatherText} – ${log.context.city}`
     }
-    return parts.join(' · ')
+    return weatherText
   }, [log?.context])
 
   return (
@@ -341,18 +342,19 @@ const LogContainer: React.FC<{
   dateFormat: string
 }> = ({ log, dateFormat, children }) => {
   const contextText = React.useMemo(() => {
-    const parts: string[] = []
+    const weatherParts: string[] = []
     if (log.context?.temperature) {
       const celsius = log.context.temperature - 273.15
-      parts.push(`${Math.round(celsius)}°C`)
+      weatherParts.push(`${Math.round(celsius)}° C`)
     }
     if (log.context?.humidity) {
-      parts.push(`${Math.round(log.context.humidity)}%`)
+      weatherParts.push(`${Math.round(log.context.humidity)}%`)
     }
+    const weatherText = weatherParts.join(', ')
     if (log.context?.city) {
-      parts.push(log.context.city)
+      return `${weatherText} – ${log.context.city}`
     }
-    return parts.join(' · ')
+    return weatherText
   }, [log.context])
 
   return (
