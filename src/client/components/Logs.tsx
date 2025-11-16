@@ -279,8 +279,8 @@ const NoteEditor = ({
                 !isMouseActive && 'sm:opacity-0'
               )
             : cn(
-                'opacity-0',
-                isFocused && 'opacity-20 sm:opacity-100',
+                'opacity-20',
+                isFocused && 'sm:opacity-100',
                 'sm:group-hover:opacity-100'
               )
         )}
@@ -362,7 +362,7 @@ const LogContainer: React.FC<{
           'relative mb-4 sm:mb-0',
           'sm:absolute sm:top-0 sm:right-0 text-end select-none',
           'transition-opacity',
-          'hidden sm:block opacity-40',
+          'hidden sm:block opacity-20',
           'group-hover:opacity-100'
         )}
       >
