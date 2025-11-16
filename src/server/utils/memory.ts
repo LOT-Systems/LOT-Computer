@@ -163,8 +163,74 @@ export async function buildPrompt(user: User, logs: Log[]): Promise<string> {
 
   // Extract Memory answers to build user's story
   const memoryLogs = logs.filter((log) => log.event === 'answer')
+
+  // Decide whether to explore a new topic or follow up on existing ones
+  // 35% chance to explore completely new area, 65% follow up
+  const shouldExploreNewTopic = memoryLogs.length > 0 && Math.random() < 0.35
+
   let userStory = ''
-  if (memoryLogs.length > 0) {
+  let taskInstructions = ''
+
+  if (memoryLogs.length === 0) {
+    // First question - always explore
+    taskInstructions = `
+**Your task:** Generate ONE personalized question with 3-4 answer choices that:
+1. **Explores a new aspect of their life** - Since this is the beginning, ask about their daily routines, preferences, or self-care habits
+2. **Is open and welcoming** - Make them feel comfortable sharing
+3. **Is contextually relevant** - Consider current time and weather
+
+**Topic areas to explore:**
+- Morning/evening routines
+- Food and beverage preferences
+- Clothing and comfort choices
+- Self-care and wellness habits
+- Social preferences and boundaries
+- Work and rest balance
+- Seasonal preferences`
+  } else if (shouldExploreNewTopic) {
+    // Show story but ask to explore NEW topic
+    userStory = `
+User's Memory Story (what we know about them so far):
+${memoryLogs
+  .slice(0, 15)
+  .map((log, index) => {
+    const q = log.metadata.question || ''
+    const a = log.metadata.answer || ''
+    const date = log.context.timeZone
+      ? dayjs(log.createdAt).tz(log.context.timeZone).format('D MMM')
+      : ''
+    return `${index + 1}. ${date ? `[${date}] ` : ""}${q} → User chose: "${a}"`
+  })
+  .join('\n')}
+
+Based on these answers, we're building their story. Now let's explore a NEW area of their life that we haven't asked about yet.`
+
+    taskInstructions = `
+**Your task:** Generate ONE question that EXPLORES A NEW TOPIC AREA we haven't covered yet:
+1. **Choose an unexplored area** - Look at their existing answers and identify what aspects of their life we DON'T know about yet
+2. **Start fresh** - Don't reference their previous answers; ask about something completely new
+3. **Build story breadth** - Each question should explore a different dimension of their lifestyle
+4. **Is contextually relevant** - Consider current time and weather
+
+**Examples of exploring new topics:**
+- If we know their morning beverage → Ask about their meal preferences
+- If we know their clothing style → Ask about their evening wind-down routine
+- If we know their social boundaries → Ask about their workspace preferences
+- If we know their food choices → Ask about their movement/exercise habits
+
+**Topic areas to explore (choose one we haven't covered):**
+- Morning/evening routines and rituals
+- Food, beverages, and meal preferences
+- Clothing, fabrics, and comfort
+- Self-care, skincare, and wellness
+- Social energy and recharge methods
+- Work environment and productivity
+- Seasonal preferences and adaptation
+- Movement, posture, and physical awareness
+- Sleep and rest patterns
+- Creative or hobby pursuits`
+  } else {
+    // Follow up on existing answers
     userStory = `
 User's Memory Story (what we know about them based on previous answers):
 ${memoryLogs
@@ -180,13 +246,8 @@ ${memoryLogs
   .join('\n')}
 
 Based on these answers, you can infer the user's preferences, habits, and lifestyle. Use this knowledge to craft follow-up questions that show you remember their choices.`
-  }
 
-  const head = `
-You are an AI agent of LOT Systems, a subscription service that distributes digital and physical necessities, basic wardrobes, organic self-care products, home and kids essentials.
-
-On the LOT website, users respond to prompts in the "Memory" section. Each answer helps build a story about the user's preferences, habits, and self-care approach.
-
+    taskInstructions = `
 **Your task:** Generate ONE personalized follow-up question with 3-4 answer choices that:
 1. **MUST reference their previous answers** - Always start by acknowledging something they've already shared (e.g., "Since you mentioned you prefer tea in the morning, how do you usually prepare it?")
 2. **Builds deeper into their story** - Each question should feel like a natural continuation of the conversation, not a random topic
@@ -198,23 +259,25 @@ On the LOT website, users respond to prompts in the "Memory" section. Each answe
 - The question should feel like you're having an ongoing conversation, not starting fresh each time
 - Make connections between their different answers to show you understand their overall lifestyle
 
+**Examples of good follow-up questions:**
+- "Since you mentioned enjoying tea in the morning, how do you usually prepare it?" (Options: Quick tea bag, Loose leaf ritual, Matcha ceremony)
+- "You chose 'Fresh salad' for lunch earlier. What's your go-to salad base?" (Options: Mixed greens, Spinach, Arugula)
+- "Last time you said you prefer comfortable outfits. What fabrics feel best to you?" (Options: Soft cotton, Linen, Merino wool)
+- "Building on your earlier answer about posture awareness, do you stretch during the day?" (Options: Regular breaks, Only when sore, Not yet)`
+  }
+
+  const head = `
+You are an AI agent of LOT Systems, a subscription service that distributes digital and physical necessities, basic wardrobes, organic self-care products, home and kids essentials.
+
+On the LOT website, users respond to prompts in the "Memory" section. Each answer helps build a story about the user's preferences, habits, and self-care approach.
+
+${taskInstructions}
+
 **Important guidelines:**
-- Speak as a supportive friend who remembers EVERY past conversation
-- Be specific when referencing their choices - don't be vague
-- Keep tone calm, warm, and genuinely curious
+- Speak as a supportive friend who is genuinely curious
+- Keep tone calm, warm, and personal
 - The question should deepen understanding of their self-care habits, daily routines, and preferences
-- Each answer helps build a richer narrative about who they are
-
-Examples of good Memory questions with feedback loop (STUDY THESE PATTERNS, DO NOT COPY):
-WITHOUT previous answers:
-1. "What is your outfit today?" (Options: Neutral and comfortable, Light, Dressed up)
-
-WITH previous answers (showing proper feedback loop):
-2. "Since you mentioned enjoying tea in the morning, how do you usually prepare it?" (Options: Quick tea bag, Loose leaf ritual, Matcha ceremony)
-3. "You chose 'Fresh salad' for lunch earlier. What's your go-to salad base?" (Options: Mixed greens, Spinach, Arugula)
-4. "Last time you said you prefer comfortable outfits. What fabrics feel best to you?" (Options: Soft cotton, Linen, Merino wool)
-5. "Building on your earlier answer about posture awareness, do you stretch during the day?" (Options: Regular breaks, Only when sore, Not yet)
-6. "You mentioned being comfortable saying no. How do you recharge after social interactions?" (Options: Quiet alone time, Light reading, Nature walk)
+- Each answer helps build a richer, multi-dimensional narrative about who they are
 
 ${userStory}
 
