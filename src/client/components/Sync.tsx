@@ -69,7 +69,8 @@ export const Sync = () => {
         setMessages((prev) => {
           return prev.map((x) => {
             if (x.id === data.messageId) {
-              return { ...x, likes: data.likes, isLiked: data.isLiked }
+              // Only update likes count from SSE, keep user's own isLiked state
+              return { ...x, likes: data.likes }
             }
             return x
           })
@@ -95,6 +96,19 @@ export const Sync = () => {
       ev?.preventDefault()
       ev?.stopPropagation()
       console.log('[Sync] Toggling like for message:', messageId)
+
+      // Optimistically update isLiked state for current user
+      setMessages((prev) => {
+        return prev.map((x) => {
+          if (x.id === messageId) {
+            const newIsLiked = !x.isLiked
+            const newLikes = newIsLiked ? (x.likes || 0) + 1 : Math.max(0, (x.likes || 0) - 1)
+            return { ...x, likes: newLikes, isLiked: newIsLiked }
+          }
+          return x
+        })
+      })
+
       likeChatMessage({ messageId })
     },
     [likeChatMessage]
