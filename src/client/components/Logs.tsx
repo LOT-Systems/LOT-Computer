@@ -266,6 +266,16 @@ const NoteEditor = ({
     return parts.join(' · ')
   }, [log?.context])
 
+  const [showMetadata, setShowMetadata] = React.useState(false)
+
+  React.useEffect(() => {
+    if (!contextText || primary) return
+    const interval = setInterval(() => {
+      setShowMetadata((prev) => !prev)
+    }, 3000) // Toggle every 3 seconds
+    return () => clearInterval(interval)
+  }, [contextText, primary])
+
   return (
     <div className="relative group">
       <div
@@ -285,13 +295,31 @@ const NoteEditor = ({
               )
         )}
       >
-        <div>
-          {primary
-            ? 'Just now'
-            : !!log && dayjs(log.updatedAt).format(dateFormat)}
-        </div>
-        {!primary && contextText && (
-          <div className="text-acc/60 mt-1">{contextText}</div>
+        {!primary && contextText ? (
+          <div className="relative h-[1.5rem]">
+            <div
+              className={cn(
+                'absolute inset-0 transition-opacity duration-700',
+                showMetadata ? 'opacity-0' : 'opacity-100'
+              )}
+            >
+              {!!log && dayjs(log.updatedAt).format(dateFormat)}
+            </div>
+            <div
+              className={cn(
+                'absolute inset-0 text-acc/60 transition-opacity duration-700',
+                showMetadata ? 'opacity-100' : 'opacity-0'
+              )}
+            >
+              {contextText}
+            </div>
+          </div>
+        ) : (
+          <div>
+            {primary
+              ? 'Just now'
+              : !!log && dayjs(log.updatedAt).format(dateFormat)}
+          </div>
         )}
       </div>
 
@@ -337,6 +365,16 @@ const LogContainer: React.FC<{
     return parts.join(' · ')
   }, [log.context])
 
+  const [showMetadata, setShowMetadata] = React.useState(false)
+
+  React.useEffect(() => {
+    if (!contextText) return
+    const interval = setInterval(() => {
+      setShowMetadata((prev) => !prev)
+    }, 3000) // Toggle every 3 seconds
+    return () => clearInterval(interval)
+  }, [contextText])
+
   return (
     <div className="relative group">
       <div
@@ -348,9 +386,27 @@ const LogContainer: React.FC<{
           'group-hover:opacity-100'
         )}
       >
-        <div>{dayjs(log.updatedAt).format(dateFormat)}</div>
-        {contextText && (
-          <div className="text-acc/60 mt-1">{contextText}</div>
+        {contextText ? (
+          <div className="relative h-[1.5rem]">
+            <div
+              className={cn(
+                'absolute inset-0 transition-opacity duration-700',
+                showMetadata ? 'opacity-0' : 'opacity-100'
+              )}
+            >
+              {dayjs(log.updatedAt).format(dateFormat)}
+            </div>
+            <div
+              className={cn(
+                'absolute inset-0 text-acc/60 transition-opacity duration-700',
+                showMetadata ? 'opacity-100' : 'opacity-0'
+              )}
+            >
+              {contextText}
+            </div>
+          </div>
+        ) : (
+          <div>{dayjs(log.updatedAt).format(dateFormat)}</div>
         )}
       </div>
 
