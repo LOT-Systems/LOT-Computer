@@ -94,9 +94,10 @@ export const Sync = () => {
     (messageId: string) => (ev: React.MouseEvent) => {
       ev?.preventDefault()
       ev?.stopPropagation()
+      console.log('[Sync] Toggling like for message:', messageId)
       likeChatMessage({ messageId })
     },
-    []
+    [likeChatMessage]
   )
 
   const onNavigateToUserProfile = React.useCallback(
