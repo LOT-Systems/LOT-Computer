@@ -291,7 +291,7 @@ const NoteEditor = ({
             : !!log && dayjs(log.updatedAt).format(dateFormat)}
         </div>
         {!primary && contextText && (
-          <div className="text-acc/60 text-sm mt-1">{contextText}</div>
+          <div className="text-acc/60 mt-1">{contextText}</div>
         )}
       </div>
 
@@ -350,7 +350,7 @@ const LogContainer: React.FC<{
       >
         <div>{dayjs(log.updatedAt).format(dateFormat)}</div>
         {contextText && (
-          <div className="text-acc/60 text-sm mt-1">{contextText}</div>
+          <div className="text-acc/60 mt-1">{contextText}</div>
         )}
       </div>
 

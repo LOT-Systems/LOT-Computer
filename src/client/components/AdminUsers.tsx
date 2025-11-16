@@ -47,6 +47,11 @@ export const AdminUsers = () => {
   })
 
   const isCurrentUserAdmin = React.useMemo(() => {
+    console.log('[AdminUsers] Checking admin status:', {
+      isAdmin: me?.isAdmin,
+      tags: me?.tags,
+      email: me?.email
+    })
     return me?.isAdmin || false
   }, [me])
 
