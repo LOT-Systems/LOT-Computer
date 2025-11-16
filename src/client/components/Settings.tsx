@@ -298,25 +298,25 @@ export const Settings = () => {
             <Block label="Memory Story:" blockView>
               {storyData.story ? (
                 <>
-                  <div className="whitespace-pre-wrap mb-16">{storyData.story}</div>
+                  <div className="whitespace-pre-wrap mb-16 md:mx-32">{storyData.story}</div>
                   {storyData.answerCount && (
-                    <div className="text-acc/40">
+                    <div className="text-acc/40 md:mx-32">
                       Based on {storyData.answerCount} answer{storyData.answerCount > 1 ? 's' : ''}
                     </div>
                   )}
                 </>
               ) : storyData.hasUsership ? (
-                <div>Start answering Memory questions to build your story.</div>
+                <div className="md:mx-32">Start answering Memory questions to build your story.</div>
               ) : (
                 <>
-                  <div className="mb-8">
+                  <div className="mb-8 md:mx-32">
                     Subscribe to Usership to unlock generative Memory Story feature.
                   </div>
                   <Link
                     href="https://brand.lot-systems.com"
                     target="_blank"
                     rel="external"
-                    className="underline"
+                    className="underline md:mx-32 block"
                   >
                     Visit brand.lot-systems.com
                   </Link>
