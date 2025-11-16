@@ -209,7 +209,6 @@ export type PublicChatMessage = ChatMessage & {
 
 export type ChatMessageLikePayload = {
   messageId: string;
-  isLiked: boolean;
 };
 
 export type ChatMessageLikeEventPayload = {
