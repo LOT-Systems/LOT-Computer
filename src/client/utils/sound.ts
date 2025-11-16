@@ -73,6 +73,62 @@ function getWeatherCondition(description: string | null): WeatherCondition {
   return 'unknown'
 }
 
+// Generate a poetic description of the current soundscape
+function getSoundDescription(context: SoundContext): string {
+  const { period, weather, temperature, humidity, frequency } = context
+  const parts: string[] = []
+
+  // Humidity descriptor
+  if (humidity !== null) {
+    if (humidity > 70) parts.push('Humid')
+    else if (humidity < 40) parts.push('Dry')
+  }
+
+  // Temperature descriptor
+  if (temperature !== null) {
+    if (temperature < 5) parts.push('crystalline')
+    else if (temperature < 15) parts.push('cool')
+    else if (temperature > 25) parts.push('warm')
+  }
+
+  // Primary sound elements by time of day
+  switch (period) {
+    case 'morning':
+      parts.push(`sine ${Math.round(frequency)}Hz`)
+      if (weather === 'rain' || weather === 'drizzle' || weather === 'thunderstorm') {
+        parts.push('and rain cascade')
+      } else {
+        parts.push('and gentle noise')
+      }
+      break
+    case 'day':
+      parts.push(`bass pulse ${Math.round(frequency)}Hz`)
+      if (weather === 'clear') {
+        parts.push('with bright shimmer')
+      }
+      break
+    case 'afternoon':
+      parts.push(`wooden drone ${Math.round(frequency)}Hz`)
+      parts.push('and wandering melody')
+      break
+    case 'night':
+      parts.push(`deep drone ${Math.round(frequency)}Hz`)
+      if (weather === 'clear' && temperature !== null && temperature < 5) {
+        parts.push('with crystal tones')
+      }
+      break
+  }
+
+  // Weather additions
+  if (weather === 'thunderstorm') {
+    parts.push('– distant thunder')
+  } else if (weather === 'rain' && period !== 'morning') {
+    parts.push('– soft rain')
+  }
+
+  return parts.join(' ')
+}
+
 // Detect time of day and return appropriate sound context
 function getTimeContext(weather: any): SoundContext {
   const hour = new Date().getHours()
@@ -163,7 +219,9 @@ export function useSound(enabled: boolean) {
     ;(async () => {
       if (isSoundLibLoaded && enabled) {
         await Tone.start()
-        console.log(`🔊 Sound started: ${context.period} - ${context.description}`)
+        const soundDesc = getSoundDescription(context)
+        console.log(`🔊 Sound: On (${soundDesc})`)
+        console.log(`🌊 ${context.period} - ${context.description}`)
         console.log(`🌦️ Weather: ${context.weather}, ${context.temperature}°C, ${context.humidity}% humidity, ${context.windSpeed}m/s wind`)
         console.log(`🎲 Daily variation seed: ${context.dailySeed.toFixed(3)}`)
 
