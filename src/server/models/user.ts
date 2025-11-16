@@ -70,11 +70,8 @@ export class User
   }
 
   canAccessUsSection(): boolean {
-    // Only Admin and Usership users can access /us section
-    return (
-      this.isAdmin() ||
-      this.tags.some((tag) => tag.toLowerCase() === 'usership')
-    )
+    // Only Admin users can access /us section
+    return this.isAdmin()
   }
 
   canEditTags(): boolean {
