@@ -53,7 +53,7 @@ export const AdminUser = () => {
   useDocumentTitle(user?.email ?? null)
 
   const isCurrentUserAdmin = React.useMemo(() => {
-    return me?.tags?.some((tag) => tag.toLowerCase() === 'admin') || false
+    return me?.isAdmin || false
   }, [me])
 
   const canEditTags = React.useMemo(() => {

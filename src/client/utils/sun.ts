@@ -28,20 +28,24 @@ export function useSun(
         now: now.format('HH:mm:ss'),
         nowFull: now.format(),
         nowUnix: now.unix(),
+        localTime: new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles', hour12: true }),
         sunrise: sunrise.format('HH:mm:ss'),
         sunriseFull: sunrise.format(),
         sunset: sunset.format('HH:mm:ss'),
         sunsetFull: sunset.format(),
         sunsetUnix: sunset.unix(),
         sunsetTimestampFromAPI: weather.sunset,
+        sunsetAPIasDate: new Date(weather.sunset * 1000).toISOString(),
         sunsetDifference: `${now.diff(sunset, 'minute')} minutes`,
+        transitionWindowStart: sunset.subtract(90, 'second').format('HH:mm:ss'),
         isDark: now.isAfter(sunset) || now.isBefore(sunrise),
         isAfterSunset: now.isAfter(sunset),
         isBeforeSunrise: now.isBefore(sunrise),
         inSunsetTransition: now.isAfter(sunset.subtract(90, 'second')) && now.isBefore(sunset),
         weatherCreatedAt: weather.createdAt,
         weatherAge: `${now.diff(dayjs(weather.createdAt), 'minute')} minutes old`,
-        currentTheme: stores.theme.get()
+        currentTheme: stores.theme.get(),
+        systemTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone
       })
 
       if (

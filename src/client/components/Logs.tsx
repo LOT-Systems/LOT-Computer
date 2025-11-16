@@ -250,6 +250,22 @@ const NoteEditor = ({
     [value, log.text, onChange]
   )
 
+  const contextText = React.useMemo(() => {
+    if (!log?.context) return ''
+    const parts: string[] = []
+    if (log.context?.temperature) {
+      const celsius = log.context.temperature - 273.15
+      parts.push(`${Math.round(celsius)}°C`)
+    }
+    if (log.context?.humidity) {
+      parts.push(`${Math.round(log.context.humidity)}%`)
+    }
+    if (log.context?.city) {
+      parts.push(log.context.city)
+    }
+    return parts.join(' · ')
+  }, [log?.context])
+
   return (
     <div className="relative group">
       <div
@@ -269,9 +285,14 @@ const NoteEditor = ({
               )
         )}
       >
-        {primary
-          ? 'Just now'
-          : !!log && dayjs(log.updatedAt).format(dateFormat)}
+        <div>
+          {primary
+            ? 'Just now'
+            : !!log && dayjs(log.updatedAt).format(dateFormat)}
+        </div>
+        {!primary && contextText && (
+          <div className="text-acc/60 text-sm mt-1">{contextText}</div>
+        )}
       </div>
 
       <div className="max-w-[700px] px-4 sm:px-0" ref={containerRef}>
@@ -301,17 +322,36 @@ const LogContainer: React.FC<{
   log: Log
   dateFormat: string
 }> = ({ log, dateFormat, children }) => {
+  const contextText = React.useMemo(() => {
+    const parts: string[] = []
+    if (log.context?.temperature) {
+      const celsius = log.context.temperature - 273.15
+      parts.push(`${Math.round(celsius)}°C`)
+    }
+    if (log.context?.humidity) {
+      parts.push(`${Math.round(log.context.humidity)}%`)
+    }
+    if (log.context?.city) {
+      parts.push(log.context.city)
+    }
+    return parts.join(' · ')
+  }, [log.context])
+
   return (
     <div className="relative group">
       <div
         className={cn(
           'relative mb-4 sm:mb-0',
           'sm:absolute sm:top-0 sm:right-0 text-end select-none',
-          'transition-opacity opacity-0',
+          'transition-opacity',
+          'hidden sm:block opacity-40',
           'group-hover:opacity-100'
         )}
       >
-        {dayjs(log.updatedAt).format(dateFormat)}
+        <div>{dayjs(log.updatedAt).format(dateFormat)}</div>
+        {contextText && (
+          <div className="text-acc/60 text-sm mt-1">{contextText}</div>
+        )}
       </div>
 
       <div
