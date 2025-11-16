@@ -48,11 +48,18 @@ export class User
     const hasUsershipTag = this.tags.some(
       (tag) => tag.toLowerCase() === 'usership'
     )
-    const hasAnthropicKey = !!config.anthropic?.apiKey
+    // Check if ANY AI engine is available (Together AI, Gemini, Mistral, Claude, OpenAI)
+    const hasAIEngine = !!(
+      process.env.TOGETHER_API_KEY ||
+      process.env.GOOGLE_API_KEY ||
+      process.env.MISTRAL_API_KEY ||
+      config.anthropic?.apiKey ||
+      process.env.OPENAI_API_KEY
+    )
 
     return {
       ...profile,
-      memoryEngine: hasUsershipTag && hasAnthropicKey ? 'claude' : 'standard',
+      memoryEngine: hasUsershipTag && hasAIEngine ? 'ai' : 'standard',
     }
   }
 

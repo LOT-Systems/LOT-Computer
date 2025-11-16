@@ -379,6 +379,30 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
+  // Admin configuration diagnostic endpoint
+  fastify.get('/verify-admin-config', async (req, reply) => {
+    const adminEmailsEnv = process.env.ADMIN_EMAILS
+    const adminsList = config.admins
+
+    return {
+      timestamp: new Date().toISOString(),
+      environment: config.env,
+      adminConfig: {
+        ADMIN_EMAILS_env_var: adminEmailsEnv || 'NOT_SET',
+        parsed_admin_emails: adminsList.length > 0 ? adminsList : ['NONE'],
+        admin_count: adminsList.length,
+        includes_vadikmarmeladov: adminsList.includes('vadikmarmeladov@gmail.com'),
+      },
+      instructions: {
+        step1: 'Ensure ADMIN_EMAILS is set in Digital Ocean environment variables',
+        step2: 'Value should be: vadikmarmeladov@gmail.com',
+        step3: 'Redeploy app after adding environment variable',
+        step4: 'Log out and log back in to refresh session',
+      },
+      note: 'This endpoint shows how ADMIN_EMAILS is configured. Admin access is granted if user email is in this list OR has Admin tag in database.',
+    }
+  })
+
   // API key verification endpoint - shows masked API key for verification
   fastify.get('/verify-api-keys', async (req, reply) => {
     const anthropicKey = process.env.ANTHROPIC_API_KEY || config.anthropic?.apiKey
