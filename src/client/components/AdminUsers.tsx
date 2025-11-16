@@ -201,7 +201,7 @@ export const AdminUsers = () => {
           className="w-full"
         />
 
-        <div className="flex flex-wrap">
+        <div className="flex flex-wrap mb-16 sm:mb-0">
           <div className="mr-8">Filters:</div>
           <TagsContainer
             items={Object.values(UserTag).map((tagId) => {
