@@ -258,7 +258,20 @@ export const Settings = () => {
 
         <div>
           <Block label="Memory Engine:">
-            {me?.memoryEngine === 'ai' ? 'AI-Powered' : 'Standard'}
+            {me?.memoryEngine === 'ai' ? (
+              'AI-Powered'
+            ) : userTagIds.includes(UserTag.Usership) ? (
+              'Standard'
+            ) : (
+              <a
+                href="https://brand.lot-systems.com"
+                target="_blank"
+                rel="external"
+                className="-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc/10"
+              >
+                Subscribe to activate → brand.lot-systems.com
+              </a>
+            )}
           </Block>
           <Block label="Site systems check:">
             <a href="/status" className="-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc/10">
@@ -298,25 +311,25 @@ export const Settings = () => {
             <Block label="Memory Story:" blockView>
               {storyData.story ? (
                 <>
-                  <div className="whitespace-pre-wrap mb-16 md:mx-32">{storyData.story}</div>
+                  <div className="whitespace-pre-wrap mb-16">{storyData.story}</div>
                   {storyData.answerCount && (
-                    <div className="text-acc/40 md:mx-32">
+                    <div className="text-acc/40">
                       Based on {storyData.answerCount} answer{storyData.answerCount > 1 ? 's' : ''}
                     </div>
                   )}
                 </>
               ) : storyData.hasUsership ? (
-                <div className="md:mx-32">Start answering Memory questions to build your story.</div>
+                <div>Start answering Memory questions to build your story.</div>
               ) : (
                 <>
-                  <div className="mb-8 md:mx-32">
+                  <div className="mb-8">
                     Subscribe to Usership to unlock generative Memory Story feature.
                   </div>
                   <Link
                     href="https://brand.lot-systems.com"
                     target="_blank"
                     rel="external"
-                    className="underline md:mx-32 block"
+                    className="underline block"
                   >
                     Visit brand.lot-systems.com
                   </Link>
