@@ -48,15 +48,7 @@ export const Sync = () => {
   // Only load messages from API on initial mount, not on refetches
   // SSE events will handle updates after initial load
   React.useEffect(() => {
-    console.log('[Sync] fetchedMessages effect:', {
-      hasMessages: !!fetchedMessages?.length,
-      hasInitiallyLoaded: hasInitiallyLoaded.current,
-      messageCount: fetchedMessages?.length,
-      firstMessageLikes: fetchedMessages?.[0]?.likes,
-      firstMessageIsLiked: fetchedMessages?.[0]?.isLiked,
-    })
     if (fetchedMessages?.length && !hasInitiallyLoaded.current) {
-      console.log('[Sync] Setting initial messages from API')
       setMessages(fetchedMessages)
       hasInitiallyLoaded.current = true
     }
@@ -78,24 +70,14 @@ export const Sync = () => {
     const { dispose: disposeChatMessageLikeListener } = sync.listen(
       'chat_message_like',
       (data) => {
-        console.log('[Sync] SSE like event:', {
-          messageId: data.messageId,
-          userId: data.userId,
-          myId: me?.id,
-          isMyAction: data.userId === me?.id,
-          likes: data.likes,
-          isLiked: data.isLiked,
-        })
         setMessages((prev) => {
           return prev.map((x) => {
             if (x.id === data.messageId) {
               // Update likes count for all users
               // Update isLiked only if this user performed the action
               if (data.userId === me?.id) {
-                console.log('[Sync] Updating MY like state:', { likes: data.likes, isLiked: data.isLiked })
                 return { ...x, likes: data.likes, isLiked: data.isLiked }
               }
-              console.log('[Sync] Updating OTHER user like, keeping my isLiked')
               return { ...x, likes: data.likes }
             }
             return x
@@ -121,7 +103,6 @@ export const Sync = () => {
     (messageId: string) => (ev: React.MouseEvent) => {
       ev?.preventDefault()
       ev?.stopPropagation()
-      console.log('[Sync] Toggling like for message:', messageId)
 
       // Optimistically update isLiked state for current user
       setMessages((prev) => {
