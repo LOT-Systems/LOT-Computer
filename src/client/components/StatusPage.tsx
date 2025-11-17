@@ -21,7 +21,11 @@ interface StatusData {
   cacheAge?: number
 }
 
-export const StatusPage = () => {
+interface StatusPageProps {
+  noWrapper?: boolean
+}
+
+export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
   const [status, setStatus] = React.useState<StatusData | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
@@ -90,98 +94,98 @@ export const StatusPage = () => {
     }
   }
 
-  return (
-    <Page>
-      <div className="flex flex-col gap-y-16">
-        <div>
-          <div className="mb-16">LOT Systems Status</div>
-          <GhostButton href="/">← Home</GhostButton>
-        </div>
-
-        {loading && !status && (
-          <div className="text-acc/40">Loading...</div>
-        )}
-
-        {error && !status && (
-          <div className="mb-32">
-            <div className="mb-16 text-acc/80">Error: {error}</div>
-            <Button kind="secondary" size="small" onClick={fetchStatus}>
-              Retry
-            </Button>
-          </div>
-        )}
-
-        {status && (
-          <>
-            <div className="mb-16">
-              <Block label="Status:" labelClassName="!pl-0">
-                {status.overall === 'ok' ? 'All systems operational' :
-                 status.overall === 'degraded' ? 'Degraded performance' :
-                 'System issues detected'}
-              </Block>
-              <Block label="Version:" labelClassName="!pl-0">v{status.version}</Block>
-              <Block label="Environment:" labelClassName="!pl-0">{status.environment}</Block>
-              <Block label="Last updated:" labelClassName="!pl-0" containsSmallButton>
-                <div className="flex items-center gap-x-16">
-                  <span>
-                    {formatDate(lastUpdate.toISOString())}
-                    {status.cached && status.cacheAge && (
-                      <span className="text-acc/40">
-                        {' '}(cached {status.cacheAge}s ago)
-                      </span>
-                    )}
-                  </span>
-                  <Button
-                    kind="secondary"
-                    size="small"
-                    onClick={fetchStatus}
-                    disabled={loading}
-                  >
-                    {loading ? 'Refreshing...' : 'Refresh'}
-                  </Button>
-                </div>
-              </Block>
-            </div>
-
-            <div className="mb-16">
-              <div className="mb-16">System components:</div>
-              {status.checks.map((check, index) => (
-                <Block
-                  key={index}
-                  label={check.name + ':'}
-                  labelClassName="!pl-0"
-                  className="mb-8"
-                >
-                  <div className="flex items-center gap-x-8">
-                    <span>{getStatusIcon(check.status)}</span>
-                    <span className={cn(
-                      check.status === 'ok' && 'text-acc',
-                      check.status === 'error' && 'text-acc/60'
-                    )}>
-                      {check.status === 'ok' ? 'Ok' :
-                       check.status === 'error' ? 'Error' :
-                       'Unknown'}
-                    </span>
-                    {check.duration !== undefined && (
-                      <span className="text-acc/40">({check.duration}ms)</span>
-                    )}
-                  </div>
-                  {check.message && (
-                    <div className="text-acc/60 mt-4">{check.message}</div>
-                  )}
-                </Block>
-              ))}
-            </div>
-
-            <div className="text-acc/40 pt-32 border-t border-acc/20">
-              <div>Build: {formatDate(status.buildDate)}</div>
-              <div className="mt-8">
-                Status checks cached for 2 minutes
-              </div>
-            </div>
-          </>
-        )}
+  const content = (
+    <div className="flex flex-col gap-y-16">
+      <div>
+        <div className="mb-16">LOT Systems Status</div>
+        <GhostButton href="/">← Home</GhostButton>
       </div>
-    </Page>
+
+      {loading && !status && (
+        <div className="text-acc/40">Loading...</div>
+      )}
+
+      {error && !status && (
+        <div className="mb-32">
+          <div className="mb-16 text-acc/80">Error: {error}</div>
+          <Button kind="secondary" size="small" onClick={fetchStatus}>
+            Retry
+          </Button>
+        </div>
+      )}
+
+      {status && (
+        <>
+          <div className="mb-16">
+            <Block label="Status:" labelClassName="!pl-0">
+              {status.overall === 'ok' ? 'All systems operational' :
+               status.overall === 'degraded' ? 'Degraded performance' :
+               'System issues detected'}
+            </Block>
+            <Block label="Version:" labelClassName="!pl-0">v{status.version}</Block>
+            <Block label="Environment:" labelClassName="!pl-0">{status.environment}</Block>
+            <Block label="Last updated:" labelClassName="!pl-0" containsSmallButton>
+              <div className="flex items-center gap-x-16">
+                <span>
+                  {formatDate(lastUpdate.toISOString())}
+                  {status.cached && status.cacheAge && (
+                    <span className="text-acc/40">
+                      {' '}(cached {status.cacheAge}s ago)
+                    </span>
+                  )}
+                </span>
+                <Button
+                  kind="secondary"
+                  size="small"
+                  onClick={fetchStatus}
+                  disabled={loading}
+                >
+                  {loading ? 'Refreshing...' : 'Refresh'}
+                </Button>
+              </div>
+            </Block>
+          </div>
+
+          <div className="mb-16">
+            <div className="mb-16">System components:</div>
+            {status.checks.map((check, index) => (
+              <Block
+                key={index}
+                label={check.name + ':'}
+                labelClassName="!pl-0"
+                className="mb-8"
+              >
+                <div className="flex items-center gap-x-8">
+                  <span>{getStatusIcon(check.status)}</span>
+                  <span className={cn(
+                    check.status === 'ok' && 'text-acc',
+                    check.status === 'error' && 'text-acc/60'
+                  )}>
+                    {check.status === 'ok' ? 'Ok' :
+                     check.status === 'error' ? 'Error' :
+                     'Unknown'}
+                  </span>
+                  {check.duration !== undefined && (
+                    <span className="text-acc/40">({check.duration}ms)</span>
+                  )}
+                </div>
+                {check.message && (
+                  <div className="text-acc/60 mt-4">{check.message}</div>
+                )}
+              </Block>
+            ))}
+          </div>
+
+          <div className="text-acc/40 pt-32 border-t border-acc/20">
+            <div>Build: {formatDate(status.buildDate)}</div>
+            <div className="mt-8">
+              Status checks cached for 2 minutes
+            </div>
+          </div>
+        </>
+      )}
+    </div>
   )
+
+  return noWrapper ? content : <Page>{content}</Page>
 }
