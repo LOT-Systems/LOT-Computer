@@ -29,6 +29,7 @@ export const Sync = () => {
 
   const [message, setMessage] = React.useState('')
   const [messages, setMessages] = React.useState<PublicChatMessage[]>([])
+  const hasInitiallyLoaded = React.useRef(false)
 
   const { data: fetchedMessages } = useChatMessages()
   const { mutate: createChatMessage } = useCreateChatMessage({
@@ -44,9 +45,12 @@ export const Sync = () => {
     )
   }, [])
 
+  // Only load messages from API on initial mount, not on refetches
+  // SSE events will handle updates after initial load
   React.useEffect(() => {
-    if (fetchedMessages?.length) {
+    if (fetchedMessages?.length && !hasInitiallyLoaded.current) {
       setMessages(fetchedMessages)
+      hasInitiallyLoaded.current = true
     }
   }, [fetchedMessages])
 
