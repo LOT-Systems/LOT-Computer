@@ -172,6 +172,7 @@ export type ChatMessageLikePayload = {
 
 export type ChatMessageLikeEventPayload = {
   messageId: string
+  userId: string
   likes: number
   isLiked: boolean
 }

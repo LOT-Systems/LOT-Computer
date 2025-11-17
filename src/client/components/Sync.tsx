@@ -69,7 +69,11 @@ export const Sync = () => {
         setMessages((prev) => {
           return prev.map((x) => {
             if (x.id === data.messageId) {
-              // Only update likes count from SSE, keep user's own isLiked state
+              // Update likes count for all users
+              // Update isLiked only if this user performed the action
+              if (data.userId === me?.id) {
+                return { ...x, likes: data.likes, isLiked: data.isLiked }
+              }
               return { ...x, likes: data.likes }
             }
             return x
@@ -81,7 +85,7 @@ export const Sync = () => {
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
     }
-  }, [])
+  }, [me?.id])
 
   const onSubmitMessage = React.useCallback(
     (ev?: React.FormEvent) => {
