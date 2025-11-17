@@ -273,6 +273,7 @@ export default async (fastify: FastifyInstance) => {
 
       sync.emit('chat_message_like', {
         messageId: message.id,
+        userId: req.user.id,
         likes: allLikes.length,
         likesCount: allLikes.length,
         isLiked,
