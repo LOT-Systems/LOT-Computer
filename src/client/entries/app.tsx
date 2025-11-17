@@ -108,7 +108,7 @@ const App = () => {
         {(!router || router.route === 'system') && <System />}
         {router?.route === 'settings' && <Settings />}
         {router?.route === 'sync' && <Sync />}
-        {router?.route === 'status' && <StatusPage />}
+        {router?.route === 'status' && <StatusPage noWrapper />}
         {router?.route === 'logs' && <Logs />}
         {isMirrorOn && (
           <video
