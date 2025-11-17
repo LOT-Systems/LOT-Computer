@@ -113,7 +113,7 @@ export const Logs: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="flex flex-col gap-y-[1.5rem] leading-[1.5rem]"
+      className="flex flex-col gap-y-[1.5rem] leading-[1.5rem] px-4 sm:px-0"
     >
       <div ref={inputContainerRef} className="min-h-[200px]">
         <NoteEditor
@@ -255,7 +255,7 @@ const NoteEditor = ({
     const weatherParts: string[] = []
     if (log.context?.temperature) {
       const celsius = log.context.temperature - 273.15
-      weatherParts.push(`${Math.round(celsius)}° C`)
+      weatherParts.push(`${Math.round(celsius)}°C`)
     }
     if (log.context?.humidity) {
       weatherParts.push(`${Math.round(log.context.humidity)}%`)
@@ -314,7 +314,7 @@ const NoteEditor = ({
         )}
       </div>
 
-      <div className="max-w-[700px] px-4 sm:px-0" ref={containerRef}>
+      <div className="max-w-[700px]" ref={containerRef}>
         <ResizibleGhostInput
           // tabIndex={-1}
           direction="v"
@@ -345,7 +345,7 @@ const LogContainer: React.FC<{
     const weatherParts: string[] = []
     if (log.context?.temperature) {
       const celsius = log.context.temperature - 273.15
-      weatherParts.push(`${Math.round(celsius)}° C`)
+      weatherParts.push(`${Math.round(celsius)}°C`)
     }
     if (log.context?.humidity) {
       weatherParts.push(`${Math.round(log.context.humidity)}%`)
@@ -396,8 +396,7 @@ const LogContainer: React.FC<{
         className={cn(
           'max-w-[500px] lg:max-w-[700px] whitespace-breakspaces',
           'transition-opacity opacity-20',
-          'group-hover:opacity-100',
-          'px-4 sm:px-0'
+          'group-hover:opacity-100'
         )}
       >
         {children}
