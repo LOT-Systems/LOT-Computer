@@ -31,6 +31,16 @@ export const Sync = () => {
   const [messages, setMessages] = React.useState<PublicChatMessage[]>([])
   const hasInitiallyLoaded = React.useRef(false)
 
+  // Check if current user can access /us section (admin-level access)
+  const canAccessUserProfiles = React.useMemo(() => {
+    if (!me) return false
+    if (me.isAdmin) return true
+    return me.tags.some((tag) =>
+      tag.toLowerCase() === UserTag.Usership.toLowerCase() ||
+      tag.toLowerCase() === UserTag.RND.toLowerCase()
+    )
+  }, [me])
+
   const { data: fetchedMessages } = useChatMessages()
   const { mutate: createChatMessage } = useCreateChatMessage({
     onSuccess: () => setMessage(''),
@@ -202,7 +212,7 @@ export const Sync = () => {
               )}
               onClick={onToggleLike(x.id)}
             >
-              {authorId ? (
+              {authorId && canAccessUserProfiles ? (
                 <GhostButton
                   className="whitespace-nowrap pr-4"
                   onClick={onNavigateToUserProfile(authorId)}
