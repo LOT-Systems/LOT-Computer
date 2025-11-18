@@ -23,6 +23,10 @@ export function useSun(
       const sunrise = dayjs.utc(weather.sunrise * 1000).local()
       const sunset = dayjs.utc(weather.sunset * 1000).local()
 
+      // Transition windows: 90 seconds before sunrise/sunset
+      const sunriseTransitionStart = sunrise.subtract(90, 'second')
+      const sunsetTransitionStart = sunset.subtract(90, 'second')
+
       // Debug: Log sunset time to help diagnose issue
       console.log('[Sun Debug]', {
         now: now.format('HH:mm:ss'),
@@ -37,11 +41,11 @@ export function useSun(
         sunsetTimestampFromAPI: weather.sunset,
         sunsetAPIasDate: new Date(weather.sunset * 1000).toISOString(),
         sunsetDifference: `${now.diff(sunset, 'minute')} minutes`,
-        transitionWindowStart: sunset.subtract(90, 'second').format('HH:mm:ss'),
+        sunsetTransitionStart: sunsetTransitionStart.format('HH:mm:ss'),
         isDark: now.isAfter(sunset) || now.isBefore(sunrise),
         isAfterSunset: now.isAfter(sunset),
         isBeforeSunrise: now.isBefore(sunrise),
-        inSunsetTransition: now.isAfter(sunset.subtract(90, 'second')) && now.isBefore(sunset),
+        inSunsetTransition: now.isAfter(sunsetTransitionStart) && now.isBefore(sunset),
         weatherCreatedAt: weather.createdAt,
         weatherAge: `${now.diff(dayjs(weather.createdAt), 'minute')} minutes old`,
         currentTheme: stores.theme.get(),
@@ -49,12 +53,12 @@ export function useSun(
       })
 
       if (
-        now.isAfter(sunrise.subtract(90, 'second')) &&
+        now.isAfter(sunriseTransitionStart) &&
         now.isBefore(sunrise)
       ) {
         stores.theme.set('sunrise')
       } else if (
-        now.isAfter(sunset.subtract(90, 'second')) &&
+        now.isAfter(sunsetTransitionStart) &&
         now.isBefore(sunset)
       ) {
         stores.theme.set('sunset')

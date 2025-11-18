@@ -403,7 +403,7 @@ export async function generateMemoryStory(user: User, logs: Log[]): Promise<stri
 
 Based on their answers to personalized questions over time, create a narrative story about their preferences, habits, and lifestyle. Write in third person ("User prefers...", "They enjoy...").
 
-Format as a flowing narrative with bullet points for key insights. Focus on:
+Format as a flowing narrative with key insights. Focus on:
 - Daily routines and preferences (morning beverages, meals, clothing)
 - Self-care habits and priorities
 - Lifestyle patterns and choices
@@ -412,7 +412,27 @@ Format as a flowing narrative with bullet points for key insights. Focus on:
 User's Memory Answers (chronological):
 ${formattedAnswers}
 
-Generate a concise narrative story (3-5 bullet points) that captures who this person is based on their Memory answers:`
+Generate a concise narrative story that captures who this person is based on their Memory answers.
+
+IMPORTANT FORMATTING RULES:
+1. Start with a brief introductory paragraph (1-2 sentences)
+2. Add a blank line after the introduction
+3. Write "Key insights into their daily routines and preferences include:"
+4. Add a blank line
+5. List key insights using "–" (en dash, not bullet points or hyphens) at the start of each line
+6. Ensure each insight is a complete sentence
+7. Do not use asterisks, bullets (•), or other symbols - only the en dash (–)
+
+Example format:
+This user is [brief description of their personality/situation].
+
+Key insights into their daily routines and preferences include:
+
+– They enjoy [specific preference with details].
+
+– They prioritize [habit or routine], engaging in it [frequency].
+
+– They have [characteristic or goal], using [method or approach].`
 
   try {
     // Use AI engine abstraction - try Claude, then OpenAI, whichever works

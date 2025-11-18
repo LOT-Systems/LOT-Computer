@@ -70,14 +70,9 @@ export class User
   }
 
   canAccessUsSection(): boolean {
-    // Admin, Usership, and R&D users can access /us section
-    return (
-      this.isAdmin() ||
-      this.tags.some((tag) =>
-        tag.toLowerCase() === 'usership' ||
-        tag.toLowerCase() === 'rnd'
-      )
-    )
+    // All authenticated users can access /us section
+    // (user profiles viewable from Sync)
+    return true
   }
 
   canEditTags(): boolean {
