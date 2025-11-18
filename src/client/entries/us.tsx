@@ -3,7 +3,7 @@ import { QueryClientProvider, QueryClient } from 'react-query'
 import { useStore } from '@nanostores/react'
 import { render } from '#client/utils/render'
 import { Page } from '#client/components/ui'
-import { useWeather } from '#client/queries'
+import { getMe, useWeather } from '#client/queries'
 import * as stores from '#client/stores'
 import { AdminUsers } from '#client/components/AdminUsers'
 import { AdminUser } from '#client/components/AdminUser'
@@ -18,12 +18,22 @@ const App = () => (
 )
 
 const _App = () => {
+  const me = useStore(stores.me)
   const router = useStore(stores.router)
   const { data: weather, refetch: refetchWeather } = useWeather()
+
+  const isLoaded = React.useMemo(() => {
+    return !!me && weather !== undefined
+  }, [me, weather])
 
   React.useEffect(() => {
     // Initialize router to listen to URL changes
     const unbindRouter = stores.router.listen(() => {})
+
+    // Load user data
+    getMe().then((user) => {
+      stores.me.set(user)
+    })
 
     if (weather !== undefined) {
       stores.weather.set(weather)
@@ -35,6 +45,10 @@ const _App = () => {
   }, [weather])
 
   useSun(weather || null, refetchWeather)
+
+  if (!isLoaded) {
+    return <Page className="leading-[1.5rem]">Loading...</Page>
+  }
 
   return (
     <Page className="leading-[1.5rem]">
