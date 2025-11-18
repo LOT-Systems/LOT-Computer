@@ -307,7 +307,7 @@ export const Settings = () => {
 
         {/* Memory Story Section */}
         {storyData && (
-          <div>
+          <div className="max-w-[700px]">
             <Block label="Memory Story:" blockView>
               {storyData.story ? (
                 <>

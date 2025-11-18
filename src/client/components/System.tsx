@@ -34,15 +34,23 @@ export const System = () => {
   const [isBreatheOn, setIsBreatheOn] = React.useState(false)
   const breatheState = useBreathe(isBreatheOn)
 
-  const [showSunset, setShowSunset] = React.useState(
-    (() => {
-      if (!weather) return false
-      const now = dayjs()
-      const sunrise = dayjs.utc(weather.sunrise * 1000).local()
-      const sunset = dayjs.utc(weather.sunset * 1000).local()
-      return now.isAfter(sunrise) && now.isBefore(sunset)
-    })()
-  )
+  // Compute whether to show sunset or sunrise based on current time
+  // Show sunset during daytime (between sunrise and sunset)
+  // Show sunrise during nighttime (before sunrise or after sunset)
+  const defaultShowSunset = React.useMemo(() => {
+    if (!weather) return false
+    const now = dayjs()
+    const sunrise = dayjs.utc(weather.sunrise * 1000).local()
+    const sunset = dayjs.utc(weather.sunset * 1000).local()
+    return now.isAfter(sunrise) && now.isBefore(sunset)
+  }, [weather])
+
+  const [showSunset, setShowSunset] = React.useState(defaultShowSunset)
+
+  // Update showSunset when weather changes or default value changes
+  React.useEffect(() => {
+    setShowSunset(defaultShowSunset)
+  }, [defaultShowSunset])
 
   const userName = React.useMemo(() => {
     if (!me) return ''
