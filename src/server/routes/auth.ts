@@ -61,7 +61,7 @@ export default function (fastify: FastifyInstance, opts: any, done: () => void) 
       console.log('Email code record created:', emailCode.id);
       console.log('Sending verification email');
 
-      const currentDate = dayjs().format('MMMM D, YYYY h:mm A');
+      const currentDate = dayjs().format('MMMM D, YYYY');
       const emailResult = await sendEmail({
         to: email,
         text: verificationEmailTemplate(code, VERSION, currentDate),
