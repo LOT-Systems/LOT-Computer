@@ -291,13 +291,14 @@ const NoteEditor = ({
             <div
               className={cn(
                 'transition-opacity duration-500',
-                'group-hover:opacity-0'
+                'sm:group-hover:opacity-0'
               )}
             >
               {!!log && dayjs(log.updatedAt).format(dateFormat)}
             </div>
             <div
               className={cn(
+                'hidden sm:block',
                 'absolute top-0 right-0 text-acc/60 transition-opacity duration-500',
                 'opacity-0 group-hover:opacity-100 whitespace-nowrap'
               )}
@@ -373,13 +374,14 @@ const LogContainer: React.FC<{
             <div
               className={cn(
                 'transition-opacity duration-500',
-                'group-hover:opacity-0'
+                'sm:group-hover:opacity-0'
               )}
             >
               {dayjs(log.updatedAt).format(dateFormat)}
             </div>
             <div
               className={cn(
+                'hidden sm:block',
                 'absolute top-0 right-0 text-acc/60 transition-opacity duration-500',
                 'opacity-0 group-hover:opacity-100 whitespace-nowrap'
               )}

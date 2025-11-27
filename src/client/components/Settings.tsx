@@ -305,40 +305,6 @@ export const Settings = () => {
           </div>
         )}
 
-        {/* Memory Story Section */}
-        {storyData && (
-          <div className="max-w-[700px]">
-            <Block label="Memory Story:" blockView>
-              {storyData.story ? (
-                <>
-                  <div className="whitespace-pre-wrap mb-16">{storyData.story}</div>
-                  {storyData.answerCount && (
-                    <div className="text-acc/40">
-                      Based on {storyData.answerCount} answer{storyData.answerCount > 1 ? 's' : ''}
-                    </div>
-                  )}
-                </>
-              ) : storyData.hasUsership ? (
-                <div>Start answering Memory questions to build your story.</div>
-              ) : (
-                <>
-                  <div className="mb-8">
-                    Subscribe to Usership to unlock generative Memory Story feature.
-                  </div>
-                  <Link
-                    href="https://brand.lot-systems.com"
-                    target="_blank"
-                    rel="external"
-                    className="underline block"
-                  >
-                    Visit brand.lot-systems.com
-                  </Link>
-                </>
-              )}
-            </Block>
-          </div>
-        )}
-
         <div className="flex gap-x-8">
           <Button kind="primary" type="submit" disabled={!changed}>
             Save
@@ -348,6 +314,40 @@ export const Settings = () => {
           </Button>
         </div>
       </form>
+
+      {/* Memory Story Section - Outside form to allow wider width */}
+      {storyData && (
+        <div className="max-w-[700px]">
+          <Block label="Memory Story:" blockView>
+            {storyData.story ? (
+              <>
+                <div className="whitespace-pre-wrap mb-16">{storyData.story}</div>
+                {storyData.answerCount && (
+                  <div className="text-acc/40">
+                    Based on {storyData.answerCount} answer{storyData.answerCount > 1 ? 's' : ''}
+                  </div>
+                )}
+              </>
+            ) : storyData.hasUsership ? (
+              <div>Start answering Memory questions to build your story.</div>
+            ) : (
+              <>
+                <div className="mb-8">
+                  Subscribe to Usership to unlock generative Memory Story feature.
+                </div>
+                <Link
+                  href="https://brand.lot-systems.com"
+                  target="_blank"
+                  rel="external"
+                  className="underline block"
+                >
+                  Visit brand.lot-systems.com
+                </Link>
+              </>
+            )}
+          </Block>
+        </div>
+      )}
     </div>
   )
 }

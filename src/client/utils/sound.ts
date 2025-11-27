@@ -181,6 +181,7 @@ export function useSound(enabled: boolean) {
   const [isSoundLibLoaded, setIsSoundLibLoaded] = React.useState(false)
   const weather = useStore(stores.weather)
   const [context, setContext] = React.useState<SoundContext>(() => getTimeContext(weather))
+  const [currentDate, setCurrentDate] = React.useState(() => new Date().toDateString())
 
   // Load Tone.js library when sound is needed
   useExternalScript(
@@ -192,24 +193,43 @@ export function useSound(enabled: boolean) {
     enabled
   )
 
-  // Update context every minute to detect time changes
+  // Update context every minute to detect time changes and new days
   React.useEffect(() => {
     if (!enabled) return
 
     const updateContext = () => {
+      const today = new Date().toDateString()
       const newContext = getTimeContext(weather)
-      setContext(newContext)
+
+      // Check if day changed or time period changed
+      if (today !== currentDate || newContext.period !== context.period) {
+        console.log('📅 Date or time period changed, updating sound context', {
+          dateChanged: today !== currentDate,
+          periodChanged: newContext.period !== context.period,
+          oldDate: currentDate,
+          newDate: today,
+          oldPeriod: context.period,
+          newPeriod: newContext.period,
+          oldSeed: context.dailySeed,
+          newSeed: newContext.dailySeed
+        })
+        setCurrentDate(today)
+        setContext(newContext)
+      }
     }
 
     // Check every minute
     const interval = setInterval(updateContext, 60000)
     return () => clearInterval(interval)
-  }, [enabled, weather])
+  }, [enabled, weather, currentDate, context.period, context.dailySeed])
 
   // Update context when weather changes
   React.useEffect(() => {
     if (!enabled) return
-    setContext(getTimeContext(weather))
+    const newContext = getTimeContext(weather)
+    const today = new Date().toDateString()
+    setCurrentDate(today)
+    setContext(newContext)
   }, [weather, enabled])
 
   React.useEffect(() => {
@@ -222,8 +242,16 @@ export function useSound(enabled: boolean) {
         const soundDesc = getSoundDescription(context)
         console.log(`🔊 Sound: On (${soundDesc})`)
         console.log(`🌊 ${context.period} - ${context.description}`)
-        console.log(`🌦️ Weather: ${context.weather}, ${context.temperature}°C, ${context.humidity}% humidity, ${context.windSpeed}m/s wind`)
+        console.log(`🌦️ Weather: ${context.weather}, ${context.temperature}°C, ${context.humidity}% humidity, ${context.windSpeed}m/s wind, ${context.pressure}hPa`)
         console.log(`🎲 Daily variation seed: ${context.dailySeed.toFixed(3)}`)
+        console.log(`📊 Sound context hash:`, JSON.stringify({
+          period: context.period,
+          weather: context.weather,
+          temp: context.temperature,
+          humidity: context.humidity,
+          seed: context.dailySeed.toFixed(3),
+          timestamp: new Date().toISOString()
+        }))
 
         // Clean up existing sounds if context changed
         Object.values(soundsRef.current).forEach((sound: any) => {
