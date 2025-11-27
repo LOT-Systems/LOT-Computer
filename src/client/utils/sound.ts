@@ -253,6 +253,9 @@ export function useSound(enabled: boolean) {
           timestamp: new Date().toISOString()
         }))
 
+        // Update sound description in store for UI display
+        stores.soundDescription.set(soundDesc)
+
         // Clean up existing sounds if context changed
         Object.values(soundsRef.current).forEach((sound: any) => {
           try {
@@ -292,6 +295,9 @@ export function useSound(enabled: boolean) {
           }
         })
         console.log('🔇 Sound stopped')
+
+        // Clear sound description in store
+        stores.soundDescription.set('')
       }
     })()
 

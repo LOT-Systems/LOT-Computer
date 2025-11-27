@@ -30,6 +30,7 @@ export const System = () => {
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
   const isMirrorOn = useStore(stores.isMirrorOn)
   const isSoundOn = useStore(stores.isSoundOn)
+  const soundDescription = useStore(stores.soundDescription)
 
   const [isBreatheOn, setIsBreatheOn] = React.useState(false)
   const breatheState = useBreathe(isBreatheOn)
@@ -181,7 +182,7 @@ export const System = () => {
           {isMirrorOn ? 'On' : 'Off'}
         </Block>
         <Block label="Sound:" onClick={() => stores.isSoundOn.set(!isSoundOn)}>
-          {isSoundOn ? 'On' : 'Off'}
+          {isSoundOn ? (soundDescription ? `On (${soundDescription})` : 'On') : 'Off'}
         </Block>
         <Block label="Breathe:" onClick={() => setIsBreatheOn(!isBreatheOn)}>
           {isBreatheOn ? breatheState.display : 'Off'}
