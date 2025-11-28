@@ -3,7 +3,7 @@ import { useStore } from '@nanostores/react'
 import { useUpdateSettings, useMyMemoryStory } from '#client/queries'
 import * as stores from '#client/stores'
 import { Block, Button, GhostButton, Input, Select, Link } from '#client/components/ui'
-import { UserSettings, UserTag } from '#shared/types'
+import { UserSettings, UserTag, UserPrivacySettings } from '#shared/types'
 import {
   COUNTRIES,
   getUserTagByIdCaseInsensitive,
@@ -52,6 +52,22 @@ export const Settings = () => {
     hideActivityLogs: me!.hideActivityLogs,
   })
 
+  // Privacy settings state
+  const [privacySettings, setPrivacySettings] = React.useState<UserPrivacySettings>(() => {
+    const metadata = (me as any)?.metadata || {}
+    return metadata.privacy || {
+      isPublicProfile: false,
+      showWeather: true,
+      showLocalTime: true,
+      showCity: true,
+      showSound: true,
+      showMemoryStory: true,
+      customUrl: null,
+    }
+  })
+  const [privacyChanged, setPrivacyChanged] = React.useState(false)
+  const [savingPrivacy, setSavingPrivacy] = React.useState(false)
+
   const counties = React.useMemo(() => {
     return COUNTRIES.map((x) => ({
       label: x.name,
@@ -77,6 +93,46 @@ export const Settings = () => {
     }))
     setChanged(true)
   }, [])
+
+  // Privacy settings handlers
+  const onTogglePrivacy = React.useCallback((field: keyof Omit<UserPrivacySettings, 'customUrl'>) => {
+    setPrivacySettings(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }))
+    setPrivacyChanged(true)
+  }, [])
+
+  const onChangeCustomUrl = React.useCallback((value: string) => {
+    setPrivacySettings(prev => ({
+      ...prev,
+      customUrl: value || null
+    }))
+    setPrivacyChanged(true)
+  }, [])
+
+  const savePrivacySettings = React.useCallback(async () => {
+    setSavingPrivacy(true)
+    try {
+      const response = await fetch('/api/update-privacy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ privacy: privacySettings })
+      })
+      if (!response.ok) {
+        const data = await response.json()
+        alert(data.message || 'Failed to save privacy settings')
+        return
+      }
+      setPrivacyChanged(false)
+      alert('Privacy settings saved successfully!')
+    } catch (error) {
+      console.error('Failed to save privacy settings:', error)
+      alert('Failed to save privacy settings')
+    } finally {
+      setSavingPrivacy(false)
+    }
+  }, [privacySettings])
 
   // Log theme change to server
   const logThemeChange = React.useCallback(async (themeData: {
@@ -299,6 +355,84 @@ export const Settings = () => {
         <div>
           <Block label="Activity log:" onChildrenClick={onToggleActivityLogs}>
             {state.hideActivityLogs ? 'Off' : 'On'}
+          </Block>
+        </div>
+
+        {/* Public Profile Section */}
+        <div>
+          <Block label="Public Profile:" blockView>
+            <div className="mb-8">
+              <Block label="Enable public profile:" onChildrenClick={() => onTogglePrivacy('isPublicProfile')}>
+                {privacySettings.isPublicProfile ? 'On' : 'Off'}
+              </Block>
+            </div>
+
+            {privacySettings.isPublicProfile && (
+              <>
+                <div className="mb-8">
+                  <Block label="Show weather:" onChildrenClick={() => onTogglePrivacy('showWeather')}>
+                    {privacySettings.showWeather ? 'On' : 'Off'}
+                  </Block>
+                  <Block label="Show local time:" onChildrenClick={() => onTogglePrivacy('showLocalTime')}>
+                    {privacySettings.showLocalTime ? 'On' : 'Off'}
+                  </Block>
+                  <Block label="Show city:" onChildrenClick={() => onTogglePrivacy('showCity')}>
+                    {privacySettings.showCity ? 'On' : 'Off'}
+                  </Block>
+                  <Block label="Show sound:" onChildrenClick={() => onTogglePrivacy('showSound')}>
+                    {privacySettings.showSound ? 'On' : 'Off'}
+                  </Block>
+                  <Block label="Show memory story:" onChildrenClick={() => onTogglePrivacy('showMemoryStory')}>
+                    {privacySettings.showMemoryStory ? 'On' : 'Off'}
+                  </Block>
+                </div>
+
+                <div className="mb-8">
+                  <Block label="Custom URL:" blockView>
+                    <Input
+                      type="text"
+                      value={privacySettings.customUrl || ''}
+                      onChange={(e) => onChangeCustomUrl(e.target.value)}
+                      placeholder="e.g., vadik (optional)"
+                      className="w-full"
+                    />
+                    <div className="text-acc/60 text-sm mt-2">
+                      Letters, numbers, dashes, underscores only (3-30 chars)
+                    </div>
+                  </Block>
+                </div>
+
+                <div className="mb-8">
+                  <Block label="Your public link:" blockView>
+                    <div className="flex items-center gap-x-8">
+                      <code className="text-acc/80 text-sm">
+                        {window.location.origin}/u/{privacySettings.customUrl || me?.id}
+                      </code>
+                      <Button
+                        kind="secondary"
+                        size="small"
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            `${window.location.origin}/u/${privacySettings.customUrl || me?.id}`
+                          )
+                          alert('Link copied to clipboard!')
+                        }}
+                      >
+                        Copy
+                      </Button>
+                    </div>
+                  </Block>
+                </div>
+
+                <Button
+                  kind="primary"
+                  onClick={savePrivacySettings}
+                  disabled={!privacyChanged || savingPrivacy}
+                >
+                  {savingPrivacy ? 'Saving...' : 'Save Public Profile Settings'}
+                </Button>
+              </>
+            )}
           </Block>
         </div>
 
