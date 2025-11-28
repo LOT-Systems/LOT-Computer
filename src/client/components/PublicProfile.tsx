@@ -1,0 +1,158 @@
+import * as React from 'react'
+import { Block, GhostButton } from '#client/components/ui'
+import { PublicProfile as PublicProfileType } from '#shared/types'
+import { cn, formatNumberWithCommas } from '#client/utils'
+import dayjs from '#client/utils/dayjs'
+
+export const PublicProfile = () => {
+  const [profile, setProfile] = React.useState<PublicProfileType | null>(null)
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
+
+  // Get user ID or username from URL
+  const userIdOrUsername = React.useMemo(() => {
+    const path = window.location.pathname
+    const match = path.match(/\/u\/([^\/]+)/)
+    return match ? match[1] : null
+  }, [])
+
+  // Fetch public profile data
+  React.useEffect(() => {
+    if (!userIdOrUsername) {
+      setError('Invalid profile URL')
+      setLoading(false)
+      return
+    }
+
+    fetch(`/api/public/profile/${userIdOrUsername}`)
+      .then(async (res) => {
+        if (!res.ok) {
+          const data = await res.json()
+          throw new Error(data.message || 'Failed to load profile')
+        }
+        return res.json()
+      })
+      .then((data) => {
+        setProfile(data)
+        setLoading(false)
+      })
+      .catch((err) => {
+        setError(err.message)
+        setLoading(false)
+      })
+  }, [userIdOrUsername])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">Loading...</div>
+      </div>
+    )
+  }
+
+  if (error || !profile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-xl mb-4">{error || 'Profile not found'}</div>
+          <GhostButton href="/">← Back to home</GhostButton>
+        </div>
+      </div>
+    )
+  }
+
+  const { privacySettings } = profile
+  const temperature = profile.weather?.temperature
+    ? Math.round(profile.weather.temperature)
+    : null
+
+  const sunrise = profile.weather?.sunrise
+    ? dayjs.unix(profile.weather.sunrise).format('h:mm A')
+    : null
+  const sunset = profile.weather?.sunset
+    ? dayjs.unix(profile.weather.sunset).format('h:mm A')
+    : null
+
+  const userName = [profile.firstName, profile.lastName]
+    .filter(Boolean)
+    .join(' ') || 'Anonymous'
+
+  return (
+    <div className="min-h-screen p-8 sm:p-16">
+      <div className="max-w-2xl mx-auto">
+        <div className="mb-8">
+          <GhostButton href="/">← Back to LOT Systems</GhostButton>
+        </div>
+
+        <div className="flex flex-col gap-y-24">
+          <div>
+            <div className="text-2xl mb-2">{userName}</div>
+            {privacySettings.showCity && profile.city && (
+              <div className="text-acc/60">
+                {profile.city}
+                {profile.country && `, ${profile.country}`}
+              </div>
+            )}
+          </div>
+
+          {(privacySettings.showLocalTime || privacySettings.showWeather) && (
+            <div>
+              {privacySettings.showLocalTime && profile.localTime && (
+                <Block label="Local time:">{profile.localTime}</Block>
+              )}
+              {privacySettings.showWeather && profile.weather && (
+                <>
+                  <Block label="Weather:">
+                    {profile.weather.description || 'Unknown'}
+                  </Block>
+                  {profile.weather.humidity && (
+                    <Block label="Humidity:">
+                      <span
+                        className={cn(
+                          profile.weather.humidity >= 50 && 'text-blue-500'
+                        )}
+                      >
+                        {profile.weather.humidity}%
+                      </span>
+                    </Block>
+                  )}
+                  {temperature !== null && (
+                    <Block label="Temperature:">
+                      {temperature}℃
+                    </Block>
+                  )}
+                  {(sunrise || sunset) && (
+                    <>
+                      {sunrise && <Block label="Sunrise:">{sunrise}</Block>}
+                      {sunset && <Block label="Sunset:">{sunset}</Block>}
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {privacySettings.showSound && profile.soundDescription && (
+            <div>
+              <Block label="Sound:" blockView>
+                {profile.soundDescription}
+              </Block>
+            </div>
+          )}
+
+          {privacySettings.showMemoryStory && profile.memoryStory && (
+            <div>
+              <Block label="Memory Story:" blockView>
+                <div className="whitespace-pre-wrap">{profile.memoryStory}</div>
+              </Block>
+            </div>
+          )}
+
+          <div className="text-acc/40 text-sm">
+            This is a public profile page on LOT Systems
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
