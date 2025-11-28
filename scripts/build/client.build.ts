@@ -12,7 +12,8 @@ async function buildClient() {
         './src/client/entries/login.tsx',
         './src/client/entries/ui-lib.tsx',
         './src/client/entries/us.tsx',
-        './src/client/entries/status.tsx'
+        './src/client/entries/status.tsx',
+        './src/client/entries/public-profile.tsx'
       ],
       outdir: './dist/client/js',
       splitting: true,

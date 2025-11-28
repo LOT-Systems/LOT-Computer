@@ -21,6 +21,16 @@ export type UserSettings = {
   hideActivityLogs: boolean;
 };
 
+export type UserPrivacySettings = {
+  isPublicProfile: boolean;
+  showWeather: boolean;
+  showLocalTime: boolean;
+  showCity: boolean;
+  showSound: boolean;
+  showMemoryStory: boolean;
+  customUrl?: string | null;
+};
+
 export type UserProfile = {
   id: string;
   email: string;
@@ -168,6 +178,19 @@ export type WeatherResponse = {
   country: string;
   weather: Record<string, any> | null;
   createdAt: Date;
+};
+
+// Public Profile Type
+export type PublicProfile = {
+  firstName: string | null;
+  lastName: string | null;
+  city: string | null;
+  country: string | null;
+  localTime?: string;
+  weather?: Weather;
+  soundDescription?: string;
+  memoryStory?: string;
+  privacySettings: UserPrivacySettings;
 };
 
 // Other Types

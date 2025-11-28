@@ -584,4 +584,133 @@ export default async (fastify: FastifyInstance) => {
       }
     }
   })
+
+  // Public profile endpoint - no authentication required
+  fastify.get<{
+    Params: { userIdOrUsername: string }
+  }>('/profile/:userIdOrUsername', async (req, reply) => {
+    const { userIdOrUsername } = req.params
+
+    try {
+      // Try to find user by ID or custom URL
+      let user = await models.User.findOne({
+        where: { id: userIdOrUsername }
+      })
+
+      // If not found by ID, try custom URL in metadata
+      if (!user) {
+        const users = await models.User.findAll()
+        user = users.find(u =>
+          u.metadata?.privacy?.customUrl === userIdOrUsername
+        ) || null
+      }
+
+      if (!user) {
+        return reply.code(404).send({
+          error: 'User not found',
+          message: 'No public profile exists for this user'
+        })
+      }
+
+      // Get privacy settings from metadata (with defaults)
+      const privacy: any = user.metadata?.privacy || {
+        isPublicProfile: false,
+        showWeather: true,
+        showLocalTime: true,
+        showCity: true,
+        showSound: true,
+        showMemoryStory: true,
+      }
+
+      // Check if profile is public
+      if (!privacy.isPublicProfile) {
+        return reply.code(403).send({
+          error: 'Profile is private',
+          message: 'This user has not enabled their public profile'
+        })
+      }
+
+      // Build public profile response
+      const profile: any = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        privacySettings: privacy,
+      }
+
+      // Add city/country if enabled
+      if (privacy.showCity) {
+        profile.city = user.city
+        profile.country = user.country
+      }
+
+      // Add local time if enabled
+      if (privacy.showLocalTime && user.city) {
+        try {
+          const now = new Date()
+          profile.localTime = now.toLocaleString('en-US', {
+            timeZone: user.timeZone || 'UTC',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+          })
+        } catch (error) {
+          // Timezone not found, skip
+        }
+      }
+
+      // Add weather if enabled
+      if (privacy.showWeather && user.city) {
+        try {
+          // Get latest weather for user's location
+          const weatherResponse = await models.WeatherResponse.findOne({
+            where: {
+              city: user.city,
+              country: user.country || '',
+            },
+            order: [['createdAt', 'DESC']],
+          })
+
+          if (weatherResponse && weatherResponse.weather) {
+            const w = weatherResponse.weather as any
+            profile.weather = {
+              temperature: w.tempKelvin ? w.tempKelvin - 273.15 : null,
+              humidity: w.humidity,
+              description: w.description,
+              windSpeed: w.windSpeed,
+              pressure: w.pressure,
+              sunrise: w.sunrise,
+              sunset: w.sunset,
+            }
+          }
+        } catch (error) {
+          // Weather not available, skip
+        }
+      }
+
+      // Add sound description if enabled (this would need to be stored in user metadata)
+      if (privacy.showSound && user.metadata?.currentSound) {
+        profile.soundDescription = user.metadata.currentSound
+      }
+
+      // Add memory story if enabled
+      if (privacy.showMemoryStory) {
+        try {
+          // Get latest memory story from user metadata
+          if (user.metadata?.memoryStory) {
+            profile.memoryStory = user.metadata.memoryStory
+          }
+        } catch (error) {
+          // Story not available, skip
+        }
+      }
+
+      return profile
+    } catch (error: any) {
+      console.error('Public profile error:', error)
+      return reply.code(500).send({
+        error: 'Internal server error',
+        message: 'Failed to fetch public profile'
+      })
+    }
+  })
 }
