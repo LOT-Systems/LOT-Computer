@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
-import { Block, ResizibleGhostInput, Unknown } from '#client/components/ui'
+import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
 import { useLogs, useUpdateLog } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
@@ -218,6 +218,16 @@ const NoteEditor = ({
   const [value, setValue] = React.useState(log.text || '')
   const debouncedValue = useDebounce(value, 800)
 
+  // Track if there are unsaved changes
+  const hasUnsavedChanges = value !== log.text
+
+  // Post handler - immediately save
+  const handlePost = React.useCallback(() => {
+    if (hasUnsavedChanges) {
+      onChange(value)
+    }
+  }, [value, hasUnsavedChanges, onChange])
+
   React.useEffect(() => {
     if (log.text === debouncedValue) return
     onChange(debouncedValue)
@@ -332,6 +342,18 @@ const NoteEditor = ({
           )}
           rows={primary ? 10 : 1}
         />
+        {primary && (
+          <div className="mt-4">
+            <Button
+              onClick={handlePost}
+              kind="secondary"
+              size="small"
+              disabled={!hasUnsavedChanges}
+            >
+              Post
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )
