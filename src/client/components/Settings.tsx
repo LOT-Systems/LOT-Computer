@@ -78,16 +78,44 @@ export const Settings = () => {
     setChanged(true)
   }, [])
 
+  // Log theme change to server
+  const logThemeChange = React.useCallback(async (themeData: {
+    theme: string
+    baseColor?: string
+    accentColor?: string
+    customThemeEnabled: boolean
+  }) => {
+    try {
+      await fetch('/api/theme-change', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(themeData),
+      })
+    } catch (error) {
+      console.error('Failed to log theme change:', error)
+    }
+  }, [])
+
   const onToggleCustomTheme = React.useCallback(() => {
     const newValue = !isCustomThemeEnabled
     stores.isCustomThemeEnabled.set(newValue)
     if (newValue) {
       stores.theme.set('custom')
+      logThemeChange({
+        theme: 'custom',
+        baseColor,
+        accentColor,
+        customThemeEnabled: true,
+      })
     } else {
       // Switch back to automatic theme based on time
       stores.theme.set('light')
+      logThemeChange({
+        theme: 'light',
+        customThemeEnabled: false,
+      })
     }
-  }, [isCustomThemeEnabled])
+  }, [isCustomThemeEnabled, baseColor, accentColor, logThemeChange])
 
   const onSubmit = React.useCallback(
     async (ev: React.FormEvent) => {
@@ -231,7 +259,16 @@ export const Settings = () => {
                   className="appearance-none cursor-pointer absolute -top-1 left-0 right-0 -bottom-1 opacity-0 w-full _h-full"
                   type="color"
                   value={baseColor}
-                  onChange={(x) => stores.baseColor.set(x.target.value)}
+                  onChange={(x) => {
+                    const newColor = x.target.value
+                    stores.baseColor.set(newColor)
+                    logThemeChange({
+                      theme: 'custom',
+                      baseColor: newColor,
+                      accentColor,
+                      customThemeEnabled: isCustomThemeEnabled,
+                    })
+                  }}
                 />
                 {baseColor.toUpperCase()}
               </span>
@@ -242,7 +279,16 @@ export const Settings = () => {
                   className="appearance-none cursor-pointer absolute -top-1 left-0 right-0 -bottom-1 opacity-0 w-full _h-full"
                   type="color"
                   value={accentColor}
-                  onChange={(x) => stores.accentColor.set(x.target.value)}
+                  onChange={(x) => {
+                    const newColor = x.target.value
+                    stores.accentColor.set(newColor)
+                    logThemeChange({
+                      theme: 'custom',
+                      baseColor,
+                      accentColor: newColor,
+                      customThemeEnabled: isCustomThemeEnabled,
+                    })
+                  }}
                 />
                 {accentColor.toUpperCase()}
               </span>

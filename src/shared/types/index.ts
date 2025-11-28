@@ -68,6 +68,7 @@ export type LogEvent =
   | 'user_login'
   | 'user_logout'
   | 'settings_change'
+  | 'theme_change'
   | 'weather_update'
   | 'note'
   | 'other';

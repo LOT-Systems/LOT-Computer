@@ -169,6 +169,47 @@ export default async (fastify: FastifyInstance) => {
     }
   )
 
+  fastify.post<{
+    Body: {
+      theme: string
+      baseColor?: string
+      accentColor?: string
+      customThemeEnabled: boolean
+    }
+  }>(
+    '/theme-change',
+    async (req: FastifyRequest<{
+      Body: {
+        theme: string
+        baseColor?: string
+        accentColor?: string
+        customThemeEnabled: boolean
+      }
+    }>, reply) => {
+      const { theme, baseColor, accentColor, customThemeEnabled } = req.body
+
+      // Log theme change asynchronously
+      process.nextTick(async () => {
+        const context = await getLogContext(req.user)
+        await fastify.models.Log.create({
+          userId: req.user.id,
+          event: 'theme_change',
+          text: '',
+          metadata: {
+            theme,
+            baseColor: baseColor || null,
+            accentColor: accentColor || null,
+            customThemeEnabled,
+            userTags: req.user.tags,
+          },
+          context,
+        })
+      })
+
+      reply.ok()
+    }
+  )
+
   fastify.get('/live-message', async (req: FastifyRequest, reply) => {
     const record = await fastify.models.LiveMessage.findOne()
     const message = record?.message || ''
