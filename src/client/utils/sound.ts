@@ -282,6 +282,17 @@ export function useSound(enabled: boolean) {
         // Update sound description in store for UI display
         stores.soundDescription.set(soundDesc)
 
+        // Save sound description to user metadata for public profile
+        try {
+          await fetch('/api/update-current-sound', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ soundDescription: soundDesc })
+          })
+        } catch (error) {
+          console.error('Failed to update current sound:', error)
+        }
+
         // Clean up existing sounds if context changed
         cleanupSounds(soundsRef.current)
         soundsRef.current = {}
@@ -312,6 +323,17 @@ export function useSound(enabled: boolean) {
 
         // Clear sound description in store
         stores.soundDescription.set('')
+
+        // Clear sound description from user metadata
+        try {
+          await fetch('/api/update-current-sound', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ soundDescription: null })
+          })
+        } catch (error) {
+          console.error('Failed to clear current sound:', error)
+        }
       }
     })()
 

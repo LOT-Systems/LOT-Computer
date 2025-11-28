@@ -210,6 +210,94 @@ export default async (fastify: FastifyInstance) => {
     }
   )
 
+  fastify.post<{
+    Body: { soundDescription: string | null }
+  }>(
+    '/update-current-sound',
+    async (req: FastifyRequest<{
+      Body: { soundDescription: string | null }
+    }>, reply) => {
+      const { soundDescription } = req.body
+
+      // Update user metadata with current sound description
+      const currentMetadata = req.user.metadata || {}
+      const updatedMetadata = {
+        ...currentMetadata,
+        currentSound: soundDescription,
+      }
+
+      await req.user.set({ metadata: updatedMetadata }).save()
+
+      reply.ok()
+    }
+  )
+
+  fastify.post<{
+    Body: {
+      privacy: {
+        isPublicProfile: boolean
+        showWeather: boolean
+        showLocalTime: boolean
+        showCity: boolean
+        showSound: boolean
+        showMemoryStory: boolean
+        customUrl?: string | null
+      }
+    }
+  }>(
+    '/update-privacy',
+    async (req: FastifyRequest<{
+      Body: {
+        privacy: {
+          isPublicProfile: boolean
+          showWeather: boolean
+          showLocalTime: boolean
+          showCity: boolean
+          showSound: boolean
+          showMemoryStory: boolean
+          customUrl?: string | null
+        }
+      }
+    }>, reply) => {
+      const { privacy } = req.body
+
+      // Validate custom URL if provided
+      if (privacy.customUrl) {
+        const urlPattern = /^[a-zA-Z0-9_-]{3,30}$/
+        if (!urlPattern.test(privacy.customUrl)) {
+          return reply.code(400).send({
+            error: 'Invalid custom URL',
+            message: 'Custom URL must be 3-30 characters (letters, numbers, dashes, underscores only)'
+          })
+        }
+
+        // Check if custom URL is already taken by another user
+        const users = await fastify.models.User.findAll()
+        const existingUser = users.find(u =>
+          u.id !== req.user.id &&
+          u.metadata?.privacy?.customUrl === privacy.customUrl
+        )
+        if (existingUser) {
+          return reply.code(400).send({
+            error: 'Custom URL taken',
+            message: 'This custom URL is already in use by another user'
+          })
+        }
+      }
+
+      // Update user metadata with privacy settings
+      const currentMetadata = req.user.metadata || {}
+      const updatedMetadata = {
+        ...currentMetadata,
+        privacy,
+      }
+
+      await req.user.set({ metadata: updatedMetadata }).save()
+
+      reply.ok()
+    }
+  )
+
   fastify.get('/live-message', async (req: FastifyRequest, reply) => {
     const record = await fastify.models.LiveMessage.findOne()
     const message = record?.message || ''
