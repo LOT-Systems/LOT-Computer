@@ -173,6 +173,32 @@ function getTimeContext(weather: any): SoundContext {
 }
 
 /**
+ * Helper function to properly clean up all sounds including timeouts
+ */
+function cleanupSounds(sounds: any) {
+  // Clear melody timeout if it exists
+  if (sounds.melodyTimeout) {
+    clearTimeout(sounds.melodyTimeout)
+    sounds.melodyTimeout = null
+  }
+
+  // Stop and dispose all sound objects
+  Object.values(sounds).forEach((sound: any) => {
+    try {
+      // Skip non-sound values like timeout IDs
+      if (sound && typeof sound === 'object' && 'stop' in sound) {
+        sound.stop()
+      }
+      if (sound && typeof sound === 'object' && 'dispose' in sound) {
+        sound.dispose()
+      }
+    } catch (e) {
+      // Ignore disposal errors
+    }
+  })
+}
+
+/**
  * Global sound hook that manages context-based ambient soundscapes
  * Works across all pages/sections since it's called from the App component
  */
@@ -257,14 +283,7 @@ export function useSound(enabled: boolean) {
         stores.soundDescription.set(soundDesc)
 
         // Clean up existing sounds if context changed
-        Object.values(soundsRef.current).forEach((sound: any) => {
-          try {
-            sound?.stop()
-            sound?.dispose()
-          } catch (e) {
-            // Ignore disposal errors
-          }
-        })
+        cleanupSounds(soundsRef.current)
         soundsRef.current = {}
 
         // Set master volume
@@ -286,14 +305,9 @@ export function useSound(enabled: boolean) {
             break
         }
       } else if (isSoundLibLoaded && !enabled) {
-        // Stop all sounds
-        Object.values(soundsRef.current).forEach((sound: any) => {
-          try {
-            sound?.stop()
-          } catch (e) {
-            // Ignore stop errors
-          }
-        })
+        // Stop all sounds including melody timeout
+        cleanupSounds(soundsRef.current)
+        soundsRef.current = {}
         console.log('🔇 Sound stopped')
 
         // Clear sound description in store
@@ -303,27 +317,14 @@ export function useSound(enabled: boolean) {
 
     return () => {
       // Stop on cleanup
-      Object.values(soundsRef.current).forEach((sound: any) => {
-        try {
-          sound?.stop()
-        } catch (e) {
-          // Ignore
-        }
-      })
+      cleanupSounds(soundsRef.current)
     }
   }, [enabled, isSoundLibLoaded, context])
 
   // Cleanup on unmount
   React.useEffect(() => {
     return () => {
-      Object.values(soundsRef.current).forEach((sound: any) => {
-        try {
-          sound?.stop()
-          sound?.dispose()
-        } catch (e) {
-          // Ignore disposal errors
-        }
-      })
+      cleanupSounds(soundsRef.current)
       soundsRef.current = {}
     }
   }, [])
