@@ -20,7 +20,7 @@ import { useExternalScript } from './hooks'
  * - Beta: 13-30 Hz (focus, active thinking)
  */
 
-type TimeOfDay = 'morning' | 'day' | 'afternoon' | 'night'
+type TimeOfDay = 'sunrise' | 'morning' | 'day' | 'afternoon' | 'sunset' | 'night'
 type WeatherCondition =
   | 'clear'
   | 'cloudy'
@@ -94,6 +94,10 @@ function getSoundDescription(context: SoundContext): string {
 
   // Primary sound elements by time of day
   switch (period) {
+    case 'sunrise':
+      parts.push(`awakening bells ${Math.round(frequency)}Hz`)
+      parts.push('and rising harmonics')
+      break
     case 'morning':
       parts.push(`sine ${Math.round(frequency)}Hz`)
       if (weather === 'rain' || weather === 'drizzle' || weather === 'thunderstorm') {
@@ -111,6 +115,10 @@ function getSoundDescription(context: SoundContext): string {
     case 'afternoon':
       parts.push(`wooden drone ${Math.round(frequency)}Hz`)
       parts.push('and wandering melody')
+      break
+    case 'sunset':
+      parts.push(`descending chimes ${Math.round(frequency)}Hz`)
+      parts.push('and settling drones')
       break
     case 'night':
       parts.push(`deep drone ${Math.round(frequency)}Hz`)
@@ -137,13 +145,37 @@ function getSoundDescription(context: SoundContext): string {
 
 // Detect time of day and return appropriate sound context
 function getTimeContext(weather: any, usersOnline: number): SoundContext {
-  const hour = new Date().getHours()
+  const now = new Date()
+  const hour = now.getHours()
+  const minute = now.getMinutes()
+  const second = now.getSeconds()
+
+  // Calculate total seconds since midnight
+  const totalSeconds = hour * 3600 + minute * 60 + second
+
+  // Sunrise: 90-second window around 6:00 AM (5:59:15 to 6:00:45)
+  const sunriseStart = 6 * 3600 - 45 // 5:59:15 AM
+  const sunriseEnd = 6 * 3600 + 45   // 6:00:45 AM
+
+  // Sunset: 90-second window around 8:00 PM / 20:00 (19:59:15 to 20:00:45)
+  const sunsetStart = 20 * 3600 - 45 // 7:59:15 PM
+  const sunsetEnd = 20 * 3600 + 45   // 8:00:45 PM
 
   let period: TimeOfDay
   let frequency: number
   let description: string
 
-  if (hour >= 6 && hour < 12) {
+  if (totalSeconds >= sunriseStart && totalSeconds < sunriseEnd) {
+    // Sunrise transition: Alpha waves rising (6-12 Hz sweep)
+    period = 'sunrise'
+    frequency = 9 // 9 Hz - awakening alpha
+    description = 'Rising Alpha waves - awakening'
+  } else if (totalSeconds >= sunsetStart && totalSeconds < sunsetEnd) {
+    // Sunset transition: Alpha to Theta (8-4 Hz descent)
+    period = 'sunset'
+    frequency = 6 // 6 Hz - settling theta
+    description = 'Descending Theta waves - settling'
+  } else if (hour >= 6 && hour < 12) {
     // Morning: Alpha waves (8-13 Hz) - waking up, calm alertness
     period = 'morning'
     frequency = 10 // 10 Hz - middle alpha
@@ -317,8 +349,8 @@ export function useSound(enabled: boolean) {
       }
     }
 
-    // Check every minute
-    const interval = setInterval(updateContext, 60000)
+    // Check every 10 seconds to catch sunrise/sunset transitions
+    const interval = setInterval(updateContext, 10000)
     return () => clearInterval(interval)
   }, [enabled, weather, usersOnline, currentDate, context.period, context.dailySeed, context.usersOnline])
 
@@ -340,7 +372,13 @@ export function useSound(enabled: boolean) {
         await Tone.start()
         const soundDesc = getSoundDescription(context)
         console.log(`🔊 Sound: On (${soundDesc})`)
-        console.log(`🌊 ${context.period} - ${context.description}`)
+        if (context.period === 'sunrise') {
+          console.log(`🌅 SUNRISE TRANSITION - ${context.description} (90 seconds)`)
+        } else if (context.period === 'sunset') {
+          console.log(`🌇 SUNSET TRANSITION - ${context.description} (90 seconds)`)
+        } else {
+          console.log(`🌊 ${context.period} - ${context.description}`)
+        }
         console.log(`🌦️ Weather: ${context.weather}, ${context.temperature}°C, ${context.humidity}% humidity, ${context.windSpeed}m/s wind, ${context.pressure}hPa`)
         console.log(`👥 Users online: ${context.usersOnline}${context.usersOnline > 5 ? ' 🎵 Click symphony active!' : ''}`)
         console.log(`🎲 Daily variation seed: ${context.dailySeed.toFixed(3)}`)
@@ -377,6 +415,9 @@ export function useSound(enabled: boolean) {
 
         // Create sounds based on time of day and weather
         switch (context.period) {
+          case 'sunrise':
+            createSunriseSounds(Tone, soundsRef.current, context)
+            break
           case 'morning':
             createMorningSounds(Tone, soundsRef.current, context)
             break
@@ -385,6 +426,9 @@ export function useSound(enabled: boolean) {
             break
           case 'afternoon':
             createAfternoonSounds(Tone, soundsRef.current, context)
+            break
+          case 'sunset':
+            createSunsetSounds(Tone, soundsRef.current, context)
             break
           case 'night':
             createNightSounds(Tone, soundsRef.current, context)
@@ -425,6 +469,145 @@ export function useSound(enabled: boolean) {
       soundsRef.current = {}
     }
   }, [])
+}
+
+// Sunrise: 90-second awakening transition with rising bells and harmonics
+function createSunriseSounds(Tone: any, sounds: any, context: SoundContext) {
+  const { frequency, weather, dailySeed } = context
+
+  // Gentle ambient base
+  const ambientVolume = 0.15
+  const ambient = new Tone.Noise('pink')
+  const ambientGain = new Tone.Gain(ambientVolume)
+  ambient.connect(ambientGain)
+  ambientGain.toDestination()
+  ambient.start()
+  sounds.ambient = ambient
+
+  // Rising bell tones - using multiple sine waves for bell-like quality
+  const bellFreqs = [400, 600, 800, 1200] // Bell harmonics
+  bellFreqs.forEach((baseFreq, index) => {
+    const bell = new Tone.Oscillator(baseFreq * (0.95 + dailySeed * 0.1), 'sine')
+    const bellGain = new Tone.Gain(0)
+    const bellEnvelope = new Tone.AmplitudeEnvelope({
+      attack: 15, // Slow 15-second rise
+      decay: 30,
+      sustain: 0.3,
+      release: 30,
+    })
+
+    bell.connect(bellEnvelope)
+    bellEnvelope.connect(bellGain)
+    bellGain.toDestination()
+    bell.start()
+
+    // Stagger the bell attacks
+    const attackTime = Tone.now() + index * 15
+    bellGain.gain.setValueAtTime(0.12 / (index + 1), attackTime)
+    bellEnvelope.triggerAttack(attackTime)
+
+    sounds[`bell${index}`] = bell
+    sounds[`bellEnvelope${index}`] = bellEnvelope
+  })
+
+  // Ascending harmonic sweep
+  const sweep = new Tone.Oscillator(200, 'sine')
+  const sweepGain = new Tone.Gain(0.15)
+  sweep.connect(sweepGain)
+  sweepGain.toDestination()
+  sweep.start()
+
+  // Slowly sweep upward over 90 seconds
+  sweep.frequency.exponentialRampTo(400, 90)
+  sounds.sweep = sweep
+
+  // Pulsating alpha wave (9 Hz modulation)
+  const pulse = new Tone.Oscillator(60, 'sine')
+  const pulseGain = new Tone.Gain(0.25)
+  const pulseModulator = new Tone.LFO(frequency, 0.2, 0.4)
+  pulseModulator.connect(pulseGain.gain)
+  pulse.connect(pulseGain)
+  pulseGain.toDestination()
+  pulse.start()
+  pulseModulator.start()
+  sounds.pulse = pulse
+  sounds.pulseModulator = pulseModulator
+
+  // Add click symphony for active site
+  createClickSymphony(Tone, sounds, context)
+}
+
+// Sunset: 90-second settling transition with descending chimes and drones
+function createSunsetSounds(Tone: any, sounds: any, context: SoundContext) {
+  const { frequency, weather, temperature, dailySeed } = context
+
+  // Warm ambient base
+  const ambientVolume = 0.18
+  const ambient = new Tone.Noise('brown')
+  const ambientFilter = new Tone.Filter(600, 'lowpass')
+  const ambientGain = new Tone.Gain(ambientVolume)
+  ambient.connect(ambientFilter)
+  ambientFilter.connect(ambientGain)
+  ambientGain.toDestination()
+  ambient.start()
+  sounds.ambient = ambient
+
+  // Descending chime tones - settling sounds
+  const chimeFreqs = [1000, 800, 600, 400] // Descending harmonics
+  chimeFreqs.forEach((baseFreq, index) => {
+    const chime = new Tone.Oscillator(baseFreq * (0.95 + dailySeed * 0.1), 'triangle')
+    const chimeGain = new Tone.Gain(0)
+    const chimeEnvelope = new Tone.AmplitudeEnvelope({
+      attack: 20,
+      decay: 35,
+      sustain: 0.2,
+      release: 35,
+    })
+
+    chime.connect(chimeEnvelope)
+    chimeEnvelope.connect(chimeGain)
+    chimeGain.toDestination()
+    chime.start()
+
+    // Stagger the chime attacks
+    const attackTime = Tone.now() + index * 18
+    chimeGain.gain.setValueAtTime(0.1 / (index + 1), attackTime)
+    chimeEnvelope.triggerAttack(attackTime)
+
+    sounds[`chime${index}`] = chime
+    sounds[`chimeEnvelope${index}`] = chimeEnvelope
+  })
+
+  // Descending frequency sweep - settling down
+  const sweep = new Tone.Oscillator(300, 'sine')
+  const sweepGain = new Tone.Gain(0.12)
+  sweep.connect(sweepGain)
+  sweepGain.toDestination()
+  sweep.start()
+
+  // Slowly sweep downward over 90 seconds
+  sweep.frequency.exponentialRampTo(150, 90)
+  sounds.sweep = sweep
+
+  // Settling drone
+  const drone = new Tone.Oscillator(80, 'sine')
+  const droneGain = new Tone.Gain(0)
+  drone.connect(droneGain)
+  droneGain.toDestination()
+  drone.start()
+
+  // Fade in the drone over the 90 seconds
+  droneGain.gain.exponentialRampTo(0.3, 90)
+  sounds.drone = drone
+
+  // Theta wave modulation (6 Hz) - settling relaxation
+  const pulseModulator = new Tone.LFO(frequency, 0.15, 0.35)
+  pulseModulator.connect(droneGain.gain)
+  pulseModulator.start()
+  sounds.pulseModulator = pulseModulator
+
+  // Add click symphony for active site
+  createClickSymphony(Tone, sounds, context)
 }
 
 // Morning: noise, rain, sine (Alpha waves 8-13 Hz) + weather variations
