@@ -41,6 +41,7 @@ interface SoundContext {
   windSpeed: number | null // m/s
   pressure: number | null // hPa
   dailySeed: number // Daily variation seed (0-1)
+  usersOnline: number // Number of users currently online
 }
 
 // Generate a daily seed (0-1) based on the current date
@@ -75,7 +76,7 @@ function getWeatherCondition(description: string | null): WeatherCondition {
 
 // Generate a poetic description of the current soundscape
 function getSoundDescription(context: SoundContext): string {
-  const { period, weather, temperature, humidity, frequency } = context
+  const { period, weather, temperature, humidity, frequency, usersOnline } = context
   const parts: string[] = []
 
   // Humidity descriptor
@@ -126,11 +127,16 @@ function getSoundDescription(context: SoundContext): string {
     parts.push('– soft rain')
   }
 
+  // Active site indicator
+  if (usersOnline > 5) {
+    parts.push('+ click symphony')
+  }
+
   return parts.join(' ')
 }
 
 // Detect time of day and return appropriate sound context
-function getTimeContext(weather: any): SoundContext {
+function getTimeContext(weather: any, usersOnline: number): SoundContext {
   const hour = new Date().getHours()
 
   let period: TimeOfDay
@@ -169,6 +175,7 @@ function getTimeContext(weather: any): SoundContext {
     windSpeed: weather?.windSpeed ?? null,
     pressure: weather?.pressure ?? null,
     dailySeed: getDailySeed(),
+    usersOnline,
   }
 }
 
@@ -180,6 +187,12 @@ function cleanupSounds(sounds: any) {
   if (sounds.melodyTimeout) {
     clearTimeout(sounds.melodyTimeout)
     sounds.melodyTimeout = null
+  }
+
+  // Clear click symphony interval if it exists
+  if (sounds.clickInterval) {
+    clearInterval(sounds.clickInterval)
+    sounds.clickInterval = null
   }
 
   // Stop and dispose all sound objects
@@ -199,6 +212,58 @@ function cleanupSounds(sounds: any) {
 }
 
 /**
+ * Create click symphony sound (active site with >5 users)
+ * A rhythmic ratchet/click sound that plays when the site is active
+ */
+function createClickSymphony(Tone: any, sounds: any, context: SoundContext) {
+  if (context.usersOnline <= 5) return
+
+  // Create a noise burst for the click/ratchet sound
+  const clickNoise = new Tone.Noise('white')
+  const clickFilter = new Tone.Filter(3000, 'highpass') // High-pass for crisp click
+  const clickGain = new Tone.Gain(0)
+  const clickEnvelope = new Tone.AmplitudeEnvelope({
+    attack: 0.001,
+    decay: 0.02,
+    sustain: 0,
+    release: 0.01,
+  })
+
+  clickNoise.connect(clickFilter)
+  clickFilter.connect(clickEnvelope)
+  clickEnvelope.connect(clickGain)
+  clickGain.toDestination()
+  clickNoise.start()
+
+  // Trigger clicks at varying intervals (200-600ms)
+  const triggerClick = () => {
+    clickGain.gain.setValueAtTime(0.6, Tone.now())
+    clickEnvelope.triggerAttackRelease(0.03, Tone.now())
+  }
+
+  // Create a rhythmic pattern
+  const scheduleNextClick = () => {
+    // More users = faster clicks
+    const baseInterval = 400
+    const speedFactor = Math.min(context.usersOnline / 10, 2) // Cap at 2x speed
+    const interval = baseInterval / speedFactor + Math.random() * 200
+
+    sounds.clickInterval = setTimeout(() => {
+      triggerClick()
+      scheduleNextClick()
+    }, interval)
+  }
+
+  // Start the click pattern
+  scheduleNextClick()
+
+  sounds.clickNoise = clickNoise
+  sounds.clickFilter = clickFilter
+  sounds.clickGain = clickGain
+  sounds.clickEnvelope = clickEnvelope
+}
+
+/**
  * Global sound hook that manages context-based ambient soundscapes
  * Works across all pages/sections since it's called from the App component
  */
@@ -206,7 +271,8 @@ export function useSound(enabled: boolean) {
   const soundsRef = React.useRef<any>({})
   const [isSoundLibLoaded, setIsSoundLibLoaded] = React.useState(false)
   const weather = useStore(stores.weather)
-  const [context, setContext] = React.useState<SoundContext>(() => getTimeContext(weather))
+  const usersOnline = useStore(stores.usersOnline)
+  const [context, setContext] = React.useState<SoundContext>(() => getTimeContext(weather, usersOnline))
   const [currentDate, setCurrentDate] = React.useState(() => new Date().toDateString())
 
   // Load Tone.js library when sound is needed
@@ -225,19 +291,26 @@ export function useSound(enabled: boolean) {
 
     const updateContext = () => {
       const today = new Date().toDateString()
-      const newContext = getTimeContext(weather)
+      const newContext = getTimeContext(weather, usersOnline)
 
-      // Check if day changed or time period changed
-      if (today !== currentDate || newContext.period !== context.period) {
+      // Check if day changed or time period changed or user count changed significantly
+      const userCountChanged = Math.abs(newContext.usersOnline - context.usersOnline) > 0
+      const crossedThreshold = (context.usersOnline <= 5 && newContext.usersOnline > 5) ||
+                               (context.usersOnline > 5 && newContext.usersOnline <= 5)
+
+      if (today !== currentDate || newContext.period !== context.period || crossedThreshold) {
         console.log('📅 Date or time period changed, updating sound context', {
           dateChanged: today !== currentDate,
           periodChanged: newContext.period !== context.period,
+          userCountChanged: crossedThreshold,
           oldDate: currentDate,
           newDate: today,
           oldPeriod: context.period,
           newPeriod: newContext.period,
           oldSeed: context.dailySeed,
-          newSeed: newContext.dailySeed
+          newSeed: newContext.dailySeed,
+          oldUsersOnline: context.usersOnline,
+          newUsersOnline: newContext.usersOnline
         })
         setCurrentDate(today)
         setContext(newContext)
@@ -247,16 +320,16 @@ export function useSound(enabled: boolean) {
     // Check every minute
     const interval = setInterval(updateContext, 60000)
     return () => clearInterval(interval)
-  }, [enabled, weather, currentDate, context.period, context.dailySeed])
+  }, [enabled, weather, usersOnline, currentDate, context.period, context.dailySeed, context.usersOnline])
 
-  // Update context when weather changes
+  // Update context when weather or usersOnline changes
   React.useEffect(() => {
     if (!enabled) return
-    const newContext = getTimeContext(weather)
+    const newContext = getTimeContext(weather, usersOnline)
     const today = new Date().toDateString()
     setCurrentDate(today)
     setContext(newContext)
-  }, [weather, enabled])
+  }, [weather, usersOnline, enabled])
 
   React.useEffect(() => {
     // @ts-ignore - Tone.js is loaded via external script
@@ -269,12 +342,14 @@ export function useSound(enabled: boolean) {
         console.log(`🔊 Sound: On (${soundDesc})`)
         console.log(`🌊 ${context.period} - ${context.description}`)
         console.log(`🌦️ Weather: ${context.weather}, ${context.temperature}°C, ${context.humidity}% humidity, ${context.windSpeed}m/s wind, ${context.pressure}hPa`)
+        console.log(`👥 Users online: ${context.usersOnline}${context.usersOnline > 5 ? ' 🎵 Click symphony active!' : ''}`)
         console.log(`🎲 Daily variation seed: ${context.dailySeed.toFixed(3)}`)
         console.log(`📊 Sound context hash:`, JSON.stringify({
           period: context.period,
           weather: context.weather,
           temp: context.temperature,
           humidity: context.humidity,
+          usersOnline: context.usersOnline,
           seed: context.dailySeed.toFixed(3),
           timestamp: new Date().toISOString()
         }))
@@ -430,6 +505,9 @@ function createMorningSounds(Tone: any, sounds: any, context: SoundContext) {
   sineModulator.start()
   sounds.sine = sine
   sounds.sineModulator = sineModulator
+
+  // Add click symphony for active site
+  createClickSymphony(Tone, sounds, context)
 }
 
 // Day: bass pulsating (Beta waves 13-30 Hz) + weather variations
@@ -508,6 +586,9 @@ function createDaySounds(Tone: any, sounds: any, context: SoundContext) {
     sounds.shimmer = shimmer
     sounds.shimmerModulator = shimmerModulator
   }
+
+  // Add click symphony for active site
+  createClickSymphony(Tone, sounds, context)
 }
 
 // Afternoon: noise, deep bass, random sine melody (Alpha/Theta 4-13 Hz) + weather variations
@@ -604,6 +685,9 @@ function createAfternoonSounds(Tone: any, sounds: any, context: SoundContext) {
   }
   playRandomNote()
   sounds.synth = synth
+
+  // Add click symphony for active site
+  createClickSymphony(Tone, sounds, context)
 }
 
 // Night: bass, noise, pulsating (Theta/Delta 0.5-8 Hz) + weather variations
@@ -707,4 +791,7 @@ function createNightSounds(Tone: any, sounds: any, context: SoundContext) {
     sounds.crystal = crystal
     sounds.crystalModulator = crystalModulator
   }
+
+  // Add click symphony for active site
+  createClickSymphony(Tone, sounds, context)
 }
