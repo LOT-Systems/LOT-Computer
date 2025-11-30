@@ -19,6 +19,14 @@ export interface AIEngine {
   name: string
   isAvailable(): boolean
   generateCompletion(prompt: string, maxTokens?: number): Promise<string>
+  generateImage?(prompt: string, options?: ImageGenerationOptions): Promise<string>
+}
+
+export interface ImageGenerationOptions {
+  width?: number
+  height?: number
+  steps?: number
+  model?: string
 }
 
 // ============================================================================
@@ -126,11 +134,13 @@ export class OpenAIEngine implements AIEngine {
 export class TogetherAIEngine implements AIEngine {
   name = 'Together AI'
   private client: OpenAI | null = null
+  private apiKey: string | null = null
 
   constructor() {
     const apiKey = process.env.TOGETHER_API_KEY
     if (apiKey) {
       try {
+        this.apiKey = apiKey
         // Together AI uses OpenAI-compatible API
         this.client = new OpenAI({
           apiKey,
@@ -168,6 +178,50 @@ export class TogetherAIEngine implements AIEngine {
     }
 
     return content
+  }
+
+  async generateImage(prompt: string, options: ImageGenerationOptions = {}): Promise<string> {
+    if (!this.apiKey) {
+      throw new Error('Together AI engine not available')
+    }
+
+    const {
+      width = 512,
+      height = 512,
+      steps = 20,
+      model = 'black-forest-labs/FLUX.1-schnell-Free'
+    } = options
+
+    // Together AI image generation uses direct API (not OpenAI-compatible for images)
+    const response = await fetch('https://api.together.xyz/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        prompt,
+        width,
+        height,
+        steps,
+        n: 1,
+      }),
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`Image generation failed: ${error}`)
+    }
+
+    const data = await response.json()
+    const imageUrl = data.data?.[0]?.url
+
+    if (!imageUrl) {
+      throw new Error('No image URL in response')
+    }
+
+    return imageUrl
   }
 }
 

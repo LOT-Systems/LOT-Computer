@@ -15,6 +15,8 @@ import { toCelsius, toFahrenheit } from '#shared/utils'
 import { useBreathe } from '#client/utils/breathe'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
+import { WorldCanvas } from './WorldCanvas'
+import { WorldElement, UserWorld } from '#shared/types'
 
 export const System = () => {
   const me = useStore(stores.me)
@@ -34,6 +36,67 @@ export const System = () => {
 
   const [isBreatheOn, setIsBreatheOn] = React.useState(false)
   const breatheState = useBreathe(isBreatheOn)
+
+  // World state
+  const [userWorld, setUserWorld] = React.useState<UserWorld>({
+    elements: [],
+    lastGenerated: null,
+    theme: ''
+  })
+  const [isGenerating, setIsGenerating] = React.useState(false)
+  const [generationMessage, setGenerationMessage] = React.useState<string>()
+
+  // Fetch user's world on mount
+  React.useEffect(() => {
+    fetch('/api/world')
+      .then(res => res.json())
+      .then(data => {
+        if (data) {
+          setUserWorld(data)
+        }
+      })
+      .catch(err => console.error('Failed to fetch world:', err))
+  }, [])
+
+  // Check if user can generate today
+  const canGenerateToday = React.useMemo(() => {
+    if (!userWorld.lastGenerated) return true
+    const lastGen = new Date(userWorld.lastGenerated)
+    const today = new Date()
+    return lastGen.toDateString() !== today.toDateString()
+  }, [userWorld.lastGenerated])
+
+  // Generate new world element
+  const handleGenerateElement = React.useCallback(async () => {
+    if (isGenerating || !canGenerateToday) return
+
+    setIsGenerating(true)
+    setGenerationMessage('Generating your world element...')
+
+    try {
+      const response = await fetch('/api/world/generate-element', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+
+      const data = await response.json()
+
+      if (data.element && data.world) {
+        setUserWorld(data.world)
+        setGenerationMessage(`✨ ${data.message}`)
+        setTimeout(() => setGenerationMessage(undefined), 3000)
+      } else {
+        setGenerationMessage(data.message || 'Failed to generate element')
+        setTimeout(() => setGenerationMessage(undefined), 3000)
+      }
+    } catch (error) {
+      console.error('Failed to generate element:', error)
+      setGenerationMessage('Failed to generate element')
+      setTimeout(() => setGenerationMessage(undefined), 3000)
+    } finally {
+      setIsGenerating(false)
+    }
+  }, [isGenerating, canGenerateToday])
 
   // Compute whether to show sunset or sunrise based on current time
   // Show sunset during daytime (between sunrise and sunset)
@@ -194,6 +257,15 @@ export const System = () => {
           <Block label="Live:" blockView children={liveMessage} />
         </div>
       )}
+
+      <div>
+        <WorldCanvas
+          elements={userWorld.elements}
+          onGenerate={handleGenerateElement}
+          canGenerate={canGenerateToday && !isGenerating}
+          generationMessage={generationMessage}
+        />
+      </div>
 
       <MemoryWidget />
     </div>

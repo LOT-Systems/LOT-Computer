@@ -31,6 +31,24 @@ export type UserPrivacySettings = {
   customUrl?: string | null;
 };
 
+export type WorldElement = {
+  id: string;
+  type: 'object' | 'creature' | 'plant' | 'structure' | 'weather-effect';
+  imageUrl: string;
+  prompt: string;
+  position: { x: number; y: number; z: number };
+  scale: number;
+  rotation: number;
+  generatedAt: Date;
+  context: string; // Short description of what influenced this element
+};
+
+export type UserWorld = {
+  elements: WorldElement[];
+  lastGenerated: Date | null;
+  theme: string; // Overall world theme derived from user context
+};
+
 export type UserProfile = {
   id: string;
   email: string;
