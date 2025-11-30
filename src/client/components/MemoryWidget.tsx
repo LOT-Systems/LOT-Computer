@@ -5,7 +5,11 @@ import { cn } from '#client/utils'
 import { fp } from '#shared/utils'
 import { MemoryQuestion } from '#shared/types'
 
-export function MemoryWidget() {
+interface MemoryWidgetProps {
+  onAnswerSubmitted?: () => void
+}
+
+export function MemoryWidget({ onAnswerSubmitted }: MemoryWidgetProps = {}) {
   const [isDisplayed, setIsDisplayed] = React.useState(false)
   const [isShown, setIsShown] = React.useState(false)
   const [isQuestionShown, setIsQuestionShown] = React.useState(false)
@@ -17,6 +21,11 @@ export function MemoryWidget() {
 
   const { mutate: createMemory } = useCreateMemory({
     onSuccess: ({ response }) => {
+      // Trigger world generation after successful answer
+      if (onAnswerSubmitted) {
+        onAnswerSubmitted()
+      }
+
       setIsQuestionShown(false)
       setTimeout(() => {
         setQuestion(null)

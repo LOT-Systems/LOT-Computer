@@ -261,13 +261,12 @@ export const System = () => {
       <div>
         <WorldCanvas
           elements={userWorld.elements}
-          onGenerate={handleGenerateElement}
-          canGenerate={canGenerateToday && !isGenerating}
+          canGenerateToday={canGenerateToday}
           generationMessage={generationMessage}
         />
       </div>
 
-      <MemoryWidget />
+      <MemoryWidget onAnswerSubmitted={handleGenerateElement} />
     </div>
   )
 }

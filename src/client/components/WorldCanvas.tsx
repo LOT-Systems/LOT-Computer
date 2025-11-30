@@ -3,15 +3,13 @@ import { WorldElement } from '#shared/types'
 
 interface WorldCanvasProps {
   elements: WorldElement[]
-  onGenerate: () => void
-  canGenerate: boolean
+  canGenerateToday: boolean
   generationMessage?: string
 }
 
 export const WorldCanvas: React.FC<WorldCanvasProps> = ({
   elements,
-  onGenerate,
-  canGenerate,
+  canGenerateToday,
   generationMessage
 }) => {
   const [rotation, setRotation] = React.useState(0)
@@ -41,19 +39,12 @@ export const WorldCanvas: React.FC<WorldCanvasProps> = ({
       </div>
 
       {/* Controls */}
-      <div className="absolute top-4 right-4 z-10 flex gap-2">
+      <div className="absolute top-4 right-4 z-10">
         <button
           onClick={() => setIsRotating(!isRotating)}
           className="px-3 py-1 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
           {isRotating ? '⏸ Pause' : '▶ Rotate'}
-        </button>
-        <button
-          onClick={onGenerate}
-          disabled={!canGenerate}
-          className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-        >
-          + Generate
         </button>
       </div>
 
@@ -95,9 +86,10 @@ export const WorldCanvas: React.FC<WorldCanvasProps> = ({
           {/* World Elements */}
           {elements.length === 0 ? (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center text-gray-500 dark:text-gray-400">
+              <div className="text-center text-gray-500 dark:text-gray-400 px-4">
                 <p className="text-lg mb-2">🌱 Your world is waiting</p>
-                <p className="text-sm">Generate your first element to begin</p>
+                <p className="text-sm">Answer your Memory prompts below</p>
+                <p className="text-sm">to grow your world each day</p>
               </div>
             </div>
           ) : (
@@ -158,11 +150,13 @@ export const WorldCanvas: React.FC<WorldCanvasProps> = ({
         </div>
       </div>
 
-      {/* Element Counter */}
+      {/* Element Info */}
       <div className="absolute bottom-4 left-4 text-xs text-gray-500 dark:text-gray-400">
-        {elements.length > 0 && (
-          <p>Next element: {['object', 'creature', 'plant', 'structure', 'weather-effect'][elements.length % 5]}</p>
-        )}
+        {canGenerateToday ? (
+          <p>💫 Answer a prompt to grow your world today</p>
+        ) : elements.length > 0 ? (
+          <p>Next element: {['object', 'creature', 'plant', 'structure', 'weather-effect'][elements.length % 5]} (tomorrow)</p>
+        ) : null}
       </div>
     </div>
   )
