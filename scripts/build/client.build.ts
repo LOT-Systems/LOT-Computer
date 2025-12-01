@@ -1,6 +1,7 @@
 import { build } from 'esbuild'
 import type { Loader } from 'esbuild'
 import { commonConfig } from './build.config.ts'
+import path from 'path'
 
 async function buildClient() {
   try {
@@ -22,6 +23,10 @@ async function buildClient() {
       bundle: true,
       minify: process.env.NODE_ENV === 'production',
       sourcemap: process.env.NODE_ENV !== 'production',
+      alias: {
+        '#client': path.resolve('./src/client'),
+        '#shared': path.resolve('./src/shared'),
+      },
       define: {
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
         'process.env.APP_HOST': JSON.stringify(process.env.APP_HOST || ''),
