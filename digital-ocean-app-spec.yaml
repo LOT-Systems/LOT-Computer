@@ -10,11 +10,24 @@ services:
 
     # Build configuration
     build_command: |
+      set -e
       echo "🚀 Build started at $(date)"
       echo "📦 Installing dependencies..."
-      yarn install --frozen-lockfile --production=false
-      echo "🔨 Building application..."
-      NODE_ENV=production yarn build
+      yarn install --frozen-lockfile --production=false 2>&1 | tail -20
+      echo "✅ Dependencies installed at $(date)"
+      echo ""
+      echo "🎨 Building client CSS..."
+      NODE_ENV=production yarn client:css:build
+      echo "✅ Client CSS built at $(date)"
+      echo ""
+      echo "📦 Building client JS..."
+      NODE_ENV=production yarn client:js:build
+      echo "✅ Client JS built at $(date)"
+      echo ""
+      echo "🔨 Building server..."
+      NODE_ENV=production yarn server:build
+      echo "✅ Server built at $(date)"
+      echo ""
       echo "📁 Verifying build output..."
       ls -la dist/server/server/ | head -10
       ls -la dist/client/js/ | head -10
@@ -23,7 +36,7 @@ services:
     # Runtime configuration
     run_command: node dist/server/server/index.js
     environment_slug: node-js
-    instance_size_slug: basic-xxs
+    instance_size_slug: basic-xs
     instance_count: 1
     http_port: 8080
 
