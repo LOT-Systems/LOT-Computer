@@ -184,6 +184,24 @@ export const Settings = () => {
     }
   }, [privacySettings])
 
+  const handleCopyLink = React.useCallback(async () => {
+    try {
+      const link = `${window.location.origin}/u/${privacySettings.customUrl || me?.id}`
+      await navigator.clipboard.writeText(link)
+      console.log('Link copied to clipboard:', link)
+      // Using console.log instead of alert to avoid blocking
+    } catch (error) {
+      console.error('Failed to copy link:', error)
+      // Fallback: create a temporary input element
+      const input = document.createElement('input')
+      input.value = `${window.location.origin}/u/${privacySettings.customUrl || me?.id}`
+      document.body.appendChild(input)
+      input.select()
+      document.execCommand('copy')
+      document.body.removeChild(input)
+    }
+  }, [privacySettings.customUrl, me?.id])
+
   // Log theme change to server
   const logThemeChange = React.useCallback(async (themeData: {
     theme: string
@@ -433,12 +451,7 @@ export const Settings = () => {
                       <Button
                         kind="secondary"
                         size="small"
-                        onClick={() => {
-                          navigator.clipboard.writeText(
-                            `${window.location.origin}/u/${privacySettings.customUrl || me?.id}`
-                          )
-                          alert('Link copied to clipboard!')
-                        }}
+                        onClick={handleCopyLink}
                       >
                         Copy
                       </Button>
