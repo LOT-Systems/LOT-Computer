@@ -46,7 +46,7 @@ services:
     # Runtime configuration
     run_command: node dist/server/server/index.js
     environment_slug: node-js
-    instance_size_slug: basic-xs
+    instance_size_slug: basic-xxs
     instance_count: 1
     http_port: 8080
 
