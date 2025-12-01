@@ -24,19 +24,25 @@ export const PublicProfile = () => {
       return
     }
 
+    console.log('[PublicProfile] Fetching profile for:', userIdOrUsername)
+
     fetch(`/api/public/profile/${userIdOrUsername}`)
       .then(async (res) => {
+        console.log('[PublicProfile] Response status:', res.status)
         if (!res.ok) {
-          const data = await res.json()
+          const data = await res.json().catch(() => ({ message: `HTTP ${res.status}` }))
+          console.error('[PublicProfile] Error response:', data)
           throw new Error(data.message || 'Failed to load profile')
         }
         return res.json()
       })
       .then((data) => {
+        console.log('[PublicProfile] Profile loaded:', data)
         setProfile(data)
         setLoading(false)
       })
       .catch((err) => {
+        console.error('[PublicProfile] Fetch error:', err)
         setError(err.message)
         setLoading(false)
       })
