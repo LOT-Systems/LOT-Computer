@@ -6,15 +6,16 @@ interface WorldCanvasProps {
 }
 
 export const WorldCanvas: React.FC<WorldCanvasProps> = ({ elements }) => {
-  const [rotation, setRotation] = React.useState(0)
+  // Rotation disabled to reduce CPU usage
+  const rotation = 0
 
-  // Auto-rotate the world slowly
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setRotation(prev => (prev + 0.3) % 360)
-    }, 50)
-    return () => clearInterval(interval)
-  }, [])
+  // Auto-rotate the world slowly - DISABLED to save costs
+  // React.useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setRotation(prev => (prev + 0.3) % 360)
+  //   }, 50)
+  //   return () => clearInterval(interval)
+  // }, [])
 
   if (elements.length === 0) {
     return null

@@ -17,11 +17,11 @@ export function MemoryWidget() {
 
   const { mutate: createMemory } = useCreateMemory({
     onSuccess: ({ response }) => {
-      // Trigger world generation after successful answer (for Usership users)
-      fetch('/api/world/generate-element', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      }).catch(err => console.error('World generation error:', err))
+      // World generation disabled to reduce server costs
+      // fetch('/api/world/generate-element', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' }
+      // }).catch(err => console.error('World generation error:', err))
 
       setIsQuestionShown(false)
       setTimeout(() => {
