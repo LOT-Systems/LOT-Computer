@@ -192,6 +192,15 @@ fastify.register(async (fastify: FastifyInstance) => {
       })
     })
 
+    // Public profile page - Must be BEFORE admin section to avoid auth redirect
+    fastify.get('/u/:userIdOrUsername', async function (req, reply) {
+      return reply.view('generic-spa', {
+        scriptName: 'public-profile',
+        scriptNonce: reply.cspNonce.script,
+        styleNonce: reply.cspNonce.style,
+      })
+    })
+
     // Admin app
     fastify.register(async (fastify) => {
       fastify.addHook('onRequest', async (req, reply) => {
@@ -206,19 +215,6 @@ fastify.register(async (fastify: FastifyInstance) => {
             scriptNonce: reply.cspNonce.script,
             styleNonce: reply.cspNonce.style,
           })
-        })
-      })
-      // Public profile page - no authentication required
-      fastify.get('/u/:userIdOrUsername', {
-        onRequest: (req, reply, done) => {
-          // Skip authentication for public profile page
-          done()
-        }
-      }, async function (req, reply) {
-        return reply.view('generic-spa', {
-          scriptName: 'public-profile',
-          scriptNonce: reply.cspNonce.script,
-          styleNonce: reply.cspNonce.style,
         })
       })
       fastify.get('/ui', async (req, reply) => {
