@@ -5,7 +5,7 @@ services:
   - name: web
     # GitHub repository configuration
     git:
-      branch: claude/deploy-status-page-011CUs6NQRyEJRe6h8NDvobt
+      branch: claude/LOT_updates_November_2025-01XjLLhgKKL2Syne7Q1nqoGS
       repo_clone_url: https://github.com/vadikmarmeladov/lot-systems.git
 
     # Build configuration
@@ -128,6 +128,11 @@ services:
         scope: RUN_TIME
         type: SECRET
         value: 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
+
+      - key: TOGETHER_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: ${TOGETHER_API_KEY}
 
 # Alerts (optional - uncomment to enable)
 # alerts:
