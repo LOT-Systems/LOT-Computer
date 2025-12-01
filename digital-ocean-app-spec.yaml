@@ -51,10 +51,14 @@ services:
       ls -la dist/ 2>&1 || echo "❌ dist/ not found"
       ls -la dist/server/ 2>&1 || echo "❌ dist/server/ not found"
       ls -la dist/server/server/ 2>&1 || echo "❌ dist/server/server/ not found"
+      echo "Checking node_modules..."
+      ls -la node_modules/ 2>&1 | head -5 || echo "❌ node_modules/ not found"
       echo "Looking for index.js..."
       find . -name "index.js" -path "*/dist/server/*" 2>&1 || echo "No index.js found"
-      echo "Starting node..."
-      node dist/server/server/index.js
+      echo "Contents of root directory:"
+      ls -la . | head -20
+      echo "Starting with yarn start..."
+      yarn start
     environment_slug: node-js
     instance_size_slug: basic-xs
     instance_count: 1
