@@ -184,33 +184,49 @@ export const Settings = () => {
     }
   }, [privacySettings])
 
-  const handleCopyLink = React.useCallback(async (e?: React.MouseEvent) => {
+  const handleCopyLink = React.useCallback((e?: React.MouseEvent) => {
     e?.preventDefault()
     e?.stopPropagation()
 
-    try {
-      const link = `${window.location.origin}/u/${privacySettings.customUrl || me?.id}`
-      await navigator.clipboard.writeText(link)
-      console.log('Link copied to clipboard:', link)
-      // Successfully copied - could add a subtle notification here
-    } catch (error) {
-      console.error('Failed to copy link:', error)
-      // Fallback: create a temporary input element
-      try {
-        const input = document.createElement('input')
-        input.value = `${window.location.origin}/u/${privacySettings.customUrl || me?.id}`
-        input.style.position = 'fixed'
-        input.style.top = '-1000px'
-        document.body.appendChild(input)
-        input.select()
-        document.execCommand('copy')
-        document.body.removeChild(input)
-        console.log('Link copied via fallback method')
-      } catch (fallbackError) {
-        console.error('Fallback copy also failed:', fallbackError)
-      }
+    const link = `${window.location.origin}/u/${privacySettings.customUrl || me?.id}`
+
+    // Try modern clipboard API first
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link)
+        .then(() => console.log('Link copied:', link))
+        .catch((err) => {
+          console.warn('Clipboard API failed, using fallback:', err)
+          copyFallback(link)
+        })
+    } else {
+      // Use fallback immediately if API not available
+      copyFallback(link)
     }
   }, [privacySettings.customUrl, me?.id])
+
+  const copyFallback = (text: string) => {
+    try {
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.left = '-9999px'
+      textarea.style.top = '0'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+
+      const successful = document.execCommand('copy')
+      document.body.removeChild(textarea)
+
+      if (successful) {
+        console.log('Link copied via fallback')
+      } else {
+        console.error('Copy fallback failed')
+      }
+    } catch (err) {
+      console.error('Copy error:', err)
+    }
+  }
 
   // Log theme change to server
   const logThemeChange = React.useCallback(async (themeData: {

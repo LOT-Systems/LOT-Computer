@@ -5,6 +5,8 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 
 export const PublicProfile = () => {
+  console.log('[PublicProfile] Component mounting')
+
   const [profile, setProfile] = React.useState<PublicProfileType | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
@@ -12,8 +14,11 @@ export const PublicProfile = () => {
   // Get user ID or username from URL
   const userIdOrUsername = React.useMemo(() => {
     const path = window.location.pathname
+    console.log('[PublicProfile] Current pathname:', path)
     const match = path.match(/\/u\/([^\/]+)/)
-    return match ? match[1] : null
+    const extracted = match ? match[1] : null
+    console.log('[PublicProfile] Extracted user ID/username:', extracted)
+    return extracted
   }, [])
 
   // Fetch public profile data
