@@ -44,13 +44,13 @@ export const Settings = () => {
   const [changed, setChanged] = React.useState(false)
   const [statusData, setStatusData] = React.useState<StatusData | null>(null)
   const [state, setState] = React.useState<UserSettings>({
-    firstName: me!.firstName,
-    lastName: me!.lastName,
-    city: me!.city,
-    phone: me!.phone,
-    address: me!.address,
-    country: me!.country,
-    hideActivityLogs: me!.hideActivityLogs,
+    firstName: me?.firstName || '',
+    lastName: me?.lastName || '',
+    city: me?.city || '',
+    phone: me?.phone || '',
+    address: me?.address || '',
+    country: me?.country || '',
+    hideActivityLogs: me?.hideActivityLogs || false,
   })
 
   // Privacy settings state
