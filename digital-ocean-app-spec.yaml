@@ -33,8 +33,14 @@ services:
       echo "✅ Migrations completed at $(date)"
       echo ""
       echo "📁 Verifying build output..."
-      ls -la dist/server/server/ | head -10
-      ls -la dist/client/js/ | head -10
+      echo "Contents of dist/:"
+      ls -la dist/ || echo "dist/ not found"
+      echo "Contents of dist/server/:"
+      ls -la dist/server/ || echo "dist/server/ not found"
+      echo "Contents of dist/server/server/:"
+      ls -la dist/server/server/ | head -10 || echo "dist/server/server/ not found"
+      echo "Contents of dist/client/js/:"
+      ls -la dist/client/js/ | head -10 || echo "dist/client/js/ not found"
       echo "✅ Build completed at $(date)"
 
     # Runtime configuration
