@@ -184,21 +184,31 @@ export const Settings = () => {
     }
   }, [privacySettings])
 
-  const handleCopyLink = React.useCallback(async () => {
+  const handleCopyLink = React.useCallback(async (e?: React.MouseEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
+
     try {
       const link = `${window.location.origin}/u/${privacySettings.customUrl || me?.id}`
       await navigator.clipboard.writeText(link)
       console.log('Link copied to clipboard:', link)
-      // Using console.log instead of alert to avoid blocking
+      // Successfully copied - could add a subtle notification here
     } catch (error) {
       console.error('Failed to copy link:', error)
       // Fallback: create a temporary input element
-      const input = document.createElement('input')
-      input.value = `${window.location.origin}/u/${privacySettings.customUrl || me?.id}`
-      document.body.appendChild(input)
-      input.select()
-      document.execCommand('copy')
-      document.body.removeChild(input)
+      try {
+        const input = document.createElement('input')
+        input.value = `${window.location.origin}/u/${privacySettings.customUrl || me?.id}`
+        input.style.position = 'fixed'
+        input.style.top = '-1000px'
+        document.body.appendChild(input)
+        input.select()
+        document.execCommand('copy')
+        document.body.removeChild(input)
+        console.log('Link copied via fallback method')
+      } catch (fallbackError) {
+        console.error('Fallback copy also failed:', fallbackError)
+      }
     }
   }, [privacySettings.customUrl, me?.id])
 
@@ -449,6 +459,7 @@ export const Settings = () => {
                         {window.location.origin}/u/{privacySettings.customUrl || me?.id}
                       </code>
                       <Button
+                        type="button"
                         kind="secondary"
                         size="small"
                         onClick={handleCopyLink}
@@ -460,6 +471,7 @@ export const Settings = () => {
                 </div>
 
                 <Button
+                  type="button"
                   kind="primary"
                   onClick={savePrivacySettings}
                   disabled={!privacyChanged || savingPrivacy}
