@@ -76,6 +76,41 @@ export const Settings = () => {
     theme: '',
   })
 
+  const counties = React.useMemo(() => {
+    return COUNTRIES.map((x) => ({
+      label: x.name,
+      value: x.alpha3,
+    }))
+  }, [])
+
+  const userTagIds = React.useMemo(() => {
+    // Convert database tags (lowercase) to enum values (proper case) for comparison
+    const tags = (me?.tags || [])
+      .map((tag) => {
+        // Find the matching enum value by case-insensitive comparison
+        const enumValue = Object.values(UserTag).find(
+          (enumTag) => enumTag.toLowerCase() === tag.toLowerCase()
+        )
+        return enumValue
+      })
+      .filter(Boolean) as UserTag[]
+
+    // Debug logging to diagnose theme picker visibility issue
+    console.log('[Settings Debug] User tags from DB:', me?.tags)
+    console.log('[Settings Debug] Computed userTagIds:', tags)
+    console.log('[Settings Debug] Should show theme picker:', [
+      UserTag.Admin,
+      UserTag.Mala,
+      UserTag.RND,
+      UserTag.Evangelist,
+      UserTag.Onyx,
+      UserTag.Usership,
+      UserTag.Pro,
+    ].some((x) => tags.includes(x)))
+
+    return tags
+  }, [me])
+
   // Fetch user's world on mount
   React.useEffect(() => {
     if (userTagIds.includes(UserTag.Usership)) {
@@ -89,13 +124,6 @@ export const Settings = () => {
         .catch(err => console.error('Failed to fetch world:', err))
     }
   }, [userTagIds])
-
-  const counties = React.useMemo(() => {
-    return COUNTRIES.map((x) => ({
-      label: x.name,
-      value: x.alpha3,
-    }))
-  }, [])
 
   const onChange = React.useCallback(
     (field: keyof UserSettings) => (value: string) => {
@@ -202,34 +230,6 @@ export const Settings = () => {
     },
     [state]
   )
-
-  const userTagIds = React.useMemo(() => {
-    // Convert database tags (lowercase) to enum values (proper case) for comparison
-    const tags = (me?.tags || [])
-      .map((tag) => {
-        // Find the matching enum value by case-insensitive comparison
-        const enumValue = Object.values(UserTag).find(
-          (enumTag) => enumTag.toLowerCase() === tag.toLowerCase()
-        )
-        return enumValue
-      })
-      .filter(Boolean) as UserTag[]
-
-    // Debug logging to diagnose theme picker visibility issue
-    console.log('[Settings Debug] User tags from DB:', me?.tags)
-    console.log('[Settings Debug] Computed userTagIds:', tags)
-    console.log('[Settings Debug] Should show theme picker:', [
-      UserTag.Admin,
-      UserTag.Mala,
-      UserTag.RND,
-      UserTag.Evangelist,
-      UserTag.Onyx,
-      UserTag.Usership,
-      UserTag.Pro,
-    ].some((x) => tags.includes(x)))
-
-    return tags
-  }, [me])
 
   // Fetch status data for the status link
   React.useEffect(() => {
