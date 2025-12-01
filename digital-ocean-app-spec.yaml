@@ -28,6 +28,10 @@ services:
       NODE_ENV=production yarn server:build
       echo "✅ Server built at $(date)"
       echo ""
+      echo "🗄️ Running database migrations..."
+      yarn migrations:up
+      echo "✅ Migrations completed at $(date)"
+      echo ""
       echo "📁 Verifying build output..."
       ls -la dist/server/server/ | head -10
       ls -la dist/client/js/ | head -10
