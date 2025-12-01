@@ -414,7 +414,7 @@ export const Settings = () => {
                     <Input
                       type="text"
                       value={privacySettings.customUrl || ''}
-                      onChange={(e) => onChangeCustomUrl(e.target.value)}
+                      onChange={onChangeCustomUrl}
                       placeholder="e.g., vadik (optional)"
                       className="w-full"
                     />
