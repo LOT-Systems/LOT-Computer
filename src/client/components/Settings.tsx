@@ -417,6 +417,29 @@ export const Settings = () => {
               </Block>
             </div>
 
+            <div className="mb-8">
+              <Block label="Your public link:" blockView>
+                <div className="flex items-center gap-x-8">
+                  <code className="text-acc/80 text-sm">
+                    {window.location.origin}/u/{privacySettings.customUrl || me?.id}
+                  </code>
+                  <Button
+                    type="button"
+                    kind="secondary"
+                    size="small"
+                    onClick={handleCopyLink}
+                  >
+                    Copy
+                  </Button>
+                </div>
+                {!privacySettings.isPublicProfile && (
+                  <div className="text-acc/60 text-sm mt-2">
+                    Enable public profile to make this link accessible
+                  </div>
+                )}
+              </Block>
+            </div>
+
             {privacySettings.isPublicProfile && (
               <>
                 <div className="mb-8">
@@ -448,24 +471,6 @@ export const Settings = () => {
                     />
                     <div className="text-acc/60 text-sm mt-2">
                       Letters, numbers, dashes, underscores only (3-30 chars)
-                    </div>
-                  </Block>
-                </div>
-
-                <div className="mb-8">
-                  <Block label="Your public link:" blockView>
-                    <div className="flex items-center gap-x-8">
-                      <code className="text-acc/80 text-sm">
-                        {window.location.origin}/u/{privacySettings.customUrl || me?.id}
-                      </code>
-                      <Button
-                        type="button"
-                        kind="secondary"
-                        size="small"
-                        onClick={handleCopyLink}
-                      >
-                        Copy
-                      </Button>
                     </div>
                   </Block>
                 </div>
