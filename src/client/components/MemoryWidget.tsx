@@ -5,11 +5,7 @@ import { cn } from '#client/utils'
 import { fp } from '#shared/utils'
 import { MemoryQuestion } from '#shared/types'
 
-interface MemoryWidgetProps {
-  onAnswerSubmitted?: () => void
-}
-
-export function MemoryWidget({ onAnswerSubmitted }: MemoryWidgetProps = {}) {
+export function MemoryWidget() {
   const [isDisplayed, setIsDisplayed] = React.useState(false)
   const [isShown, setIsShown] = React.useState(false)
   const [isQuestionShown, setIsQuestionShown] = React.useState(false)
@@ -21,10 +17,11 @@ export function MemoryWidget({ onAnswerSubmitted }: MemoryWidgetProps = {}) {
 
   const { mutate: createMemory } = useCreateMemory({
     onSuccess: ({ response }) => {
-      // Trigger world generation after successful answer
-      if (onAnswerSubmitted) {
-        onAnswerSubmitted()
-      }
+      // Trigger world generation after successful answer (for Usership users)
+      fetch('/api/world/generate-element', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }).catch(err => console.error('World generation error:', err))
 
       setIsQuestionShown(false)
       setTimeout(() => {

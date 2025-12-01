@@ -3,13 +3,14 @@ import { useStore } from '@nanostores/react'
 import { useUpdateSettings, useMyMemoryStory } from '#client/queries'
 import * as stores from '#client/stores'
 import { Block, Button, GhostButton, Input, Select, Link } from '#client/components/ui'
-import { UserSettings, UserTag, UserPrivacySettings } from '#shared/types'
+import { UserSettings, UserTag, UserPrivacySettings, UserWorld } from '#shared/types'
 import {
   COUNTRIES,
   getUserTagByIdCaseInsensitive,
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
 import { cn } from '#client/utils'
+import { WorldCanvas } from './WorldCanvas'
 
 interface StatusData {
   version: string
@@ -67,6 +68,27 @@ export const Settings = () => {
   })
   const [privacyChanged, setPrivacyChanged] = React.useState(false)
   const [savingPrivacy, setSavingPrivacy] = React.useState(false)
+
+  // Personal World state
+  const [userWorld, setUserWorld] = React.useState<UserWorld>({
+    elements: [],
+    lastGenerated: null,
+    theme: '',
+  })
+
+  // Fetch user's world on mount
+  React.useEffect(() => {
+    if (userTagIds.includes(UserTag.Usership)) {
+      fetch('/api/world')
+        .then(res => res.json())
+        .then(data => {
+          if (data) {
+            setUserWorld(data)
+          }
+        })
+        .catch(err => console.error('Failed to fetch world:', err))
+    }
+  }, [userTagIds])
 
   const counties = React.useMemo(() => {
     return COUNTRIES.map((x) => ({
@@ -528,6 +550,31 @@ export const Settings = () => {
           </Block>
         </div>
       )}
+
+      {/* Personal World Section - For Usership users only */}
+      {userTagIds.includes(UserTag.Usership) && (
+        <div className="max-w-[700px]">
+          <Block label="Personal World:" blockView>
+            {userWorld.elements.length > 0 ? (
+              <>
+                <div className="mb-8">
+                  {userWorld.elements.length} element{userWorld.elements.length !== 1 ? 's' : ''} generated
+                </div>
+                <div className="text-acc/60 text-sm">
+                  Elements appear in the background as you answer Memory prompts. One new element generated per day.
+                </div>
+              </>
+            ) : (
+              <div className="text-acc/60">
+                Answer Memory prompts on the System tab to start generating your personal world. Elements will appear in the background.
+              </div>
+            )}
+          </Block>
+        </div>
+      )}
+
+      {/* World Canvas - Background layer */}
+      {userTagIds.includes(UserTag.Usership) && <WorldCanvas elements={userWorld.elements} />}
     </div>
   )
 }
