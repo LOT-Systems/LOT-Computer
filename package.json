@@ -36,7 +36,7 @@
     "client:css:build": "postcss ./src/client/index.css -o ./dist/client/css/index.css --no-map",
     "client:css:watch": "postcss ./src/client/index.css -o ./dist/client/css/index.css -w",
     "client:watch": "npx run-p client:js:watch client:css:watch",
-    "migrations:up": "node -r esbuild-register ./scripts/migrations.ts up",
+    "migrations:up": "node -r esbuild-register ./scripts/db/migrations.ts up",
     "production:run": "npx run-p build migrations:up start",
     "fix": "prettier --write ./src",
     "start": "node ./dist/server/server/index.js",
