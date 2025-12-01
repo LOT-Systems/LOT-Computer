@@ -23,7 +23,7 @@ export const WorldCanvas: React.FC<WorldCanvasProps> = ({ elements }) => {
   return (
     <div
       className="fixed inset-0 pointer-events-none opacity-20"
-      style={{ perspective: '1200px', zIndex: 0 }}
+      style={{ perspective: '1200px', zIndex: -1 }}
     >
       <div
         className="absolute inset-0 flex items-center justify-center"
