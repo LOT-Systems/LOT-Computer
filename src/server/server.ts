@@ -19,6 +19,7 @@ import config from '#server/config'
 import authRoutes from './routes/auth.js'
 import apiRoutes from './routes/api.js'
 import adminApiRoutes from './routes/admin-api.js'
+import publicApiRoutes from './routes/public-api.js'
 
 const CWD = process.cwd()
 
@@ -147,8 +148,9 @@ fastify.register(async (fastify: FastifyInstance) => {
       }
     })
 
-    // Public API
+    // Public API (no authentication required)
     fastify.register(authRoutes, { prefix: '/auth' })
+    fastify.register(publicApiRoutes, { prefix: '/api/public' })
 
     // User API
     fastify.register(async (fastify) => {
@@ -194,6 +196,12 @@ fastify.register(async (fastify: FastifyInstance) => {
 
     // Public profile page - Must be BEFORE admin section to avoid auth redirect
     fastify.get('/u/:userIdOrUsername', async function (req, reply) {
+      const { userIdOrUsername } = req.params as { userIdOrUsername: string }
+      console.log('[PUBLIC-PROFILE] Route hit for:', userIdOrUsername)
+      console.log('[PUBLIC-PROFILE] URL:', req.url)
+      console.log('[PUBLIC-PROFILE] User authenticated:', !!req.user)
+      console.log('[PUBLIC-PROFILE] Rendering public-profile SPA')
+
       return reply.view('generic-spa', {
         scriptName: 'public-profile',
         scriptNonce: reply.cspNonce.script,
