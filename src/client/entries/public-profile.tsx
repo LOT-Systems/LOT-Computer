@@ -2,5 +2,5 @@ import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import { PublicProfile } from '#client/components/PublicProfile'
 
-const root = document.getElementById('app')!
+const root = document.getElementById('root')!
 createRoot(root).render(<PublicProfile />)
