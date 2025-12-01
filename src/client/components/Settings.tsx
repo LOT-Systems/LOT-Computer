@@ -190,24 +190,10 @@ export const Settings = () => {
 
     const link = `${window.location.origin}/u/${privacySettings.customUrl || me?.id}`
 
-    // Try modern clipboard API first
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(link)
-        .then(() => console.log('Link copied:', link))
-        .catch((err) => {
-          console.warn('Clipboard API failed, using fallback:', err)
-          copyFallback(link)
-        })
-    } else {
-      // Use fallback immediately if API not available
-      copyFallback(link)
-    }
-  }, [privacySettings.customUrl, me?.id])
-
-  const copyFallback = (text: string) => {
+    // Immediate fallback method - most reliable
     try {
       const textarea = document.createElement('textarea')
-      textarea.value = text
+      textarea.value = link
       textarea.style.position = 'fixed'
       textarea.style.left = '-9999px'
       textarea.style.top = '0'
@@ -219,14 +205,14 @@ export const Settings = () => {
       document.body.removeChild(textarea)
 
       if (successful) {
-        console.log('Link copied via fallback')
+        console.log('✓ Link copied:', link)
       } else {
-        console.error('Copy fallback failed')
+        console.error('✗ Copy failed')
       }
     } catch (err) {
-      console.error('Copy error:', err)
+      console.error('✗ Copy error:', err)
     }
-  }
+  }, [privacySettings.customUrl, me?.id])
 
   // Log theme change to server
   const logThemeChange = React.useCallback(async (themeData: {
