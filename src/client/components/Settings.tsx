@@ -10,7 +10,7 @@ import {
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
 import { cn } from '#client/utils'
-// import { WorldCanvas } from './WorldCanvas'
+import { WorldCanvas } from './WorldCanvas'
 
 interface StatusData {
   version: string
@@ -574,7 +574,9 @@ export const Settings = () => {
       )}
 
       {/* World Canvas - Background layer */}
-      {/* {userTagIds.includes(UserTag.Usership) && <WorldCanvas elements={userWorld.elements} />} */}
+      {userTagIds.includes(UserTag.Usership) && userWorld.elements.length > 0 && (
+        <WorldCanvas elements={userWorld.elements} />
+      )}
     </div>
   )
 }
