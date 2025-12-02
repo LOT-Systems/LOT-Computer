@@ -174,6 +174,14 @@ export const Settings = () => {
         alert(data.message || 'Failed to save privacy settings')
         return
       }
+
+      // Refresh user data to persist the settings
+      const userResponse = await fetch('/api/me')
+      if (userResponse.ok) {
+        const userData = await userResponse.json()
+        stores.me.set(userData)
+      }
+
       setPrivacyChanged(false)
       alert('Privacy settings saved successfully!')
     } catch (error) {
@@ -419,6 +427,23 @@ export const Settings = () => {
               </Block>
             </div>
 
+            {/* Show Save button immediately when privacy setting changes */}
+            {privacyChanged && (
+              <div className="mb-8">
+                <Button
+                  type="button"
+                  kind="primary"
+                  onClick={savePrivacySettings}
+                  disabled={savingPrivacy}
+                >
+                  {savingPrivacy ? 'Saving...' : 'Save Public Profile Settings'}
+                </Button>
+                <div className="text-acc/60 text-sm mt-2">
+                  ⚠️ Remember to click Save to apply your changes
+                </div>
+              </div>
+            )}
+
             <div className="mb-8">
               <Block label="Your public link:" blockView>
                 <div className="flex items-center gap-x-8">
@@ -476,15 +501,6 @@ export const Settings = () => {
                     </div>
                   </Block>
                 </div>
-
-                <Button
-                  type="button"
-                  kind="primary"
-                  onClick={savePrivacySettings}
-                  disabled={!privacyChanged || savingPrivacy}
-                >
-                  {savingPrivacy ? 'Saving...' : 'Save Public Profile Settings'}
-                </Button>
               </>
             )}
           </Block>
