@@ -114,8 +114,9 @@ export default async (fastify: FastifyInstance) => {
   fastify.get('/me', async (req: FastifyRequest, reply) => {
     const profile = req.user.useProfileView()
     const isAdmin = req.user.isAdmin() || undefined
+    const metadata = req.user.metadata || {}
     req.user.deferredPing()
-    return { ...profile, isAdmin }
+    return { ...profile, isAdmin, metadata }
   })
 
   fastify.post(
