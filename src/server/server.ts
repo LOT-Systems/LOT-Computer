@@ -127,13 +127,30 @@ fastify.get('/u/:userIdOrUsername', async function (req, reply) {
   const { userIdOrUsername } = req.params as { userIdOrUsername: string }
   console.log('[PUBLIC-PROFILE] Route hit for:', userIdOrUsername)
   console.log('[PUBLIC-PROFILE] URL:', req.url)
-  console.log('[PUBLIC-PROFILE] Rendering public-profile SPA')
+  console.log('[PUBLIC-PROFILE] Rendering test HTML')
 
-  return reply.view('generic-spa', {
-    scriptName: 'public-profile',
-    scriptNonce: reply.cspNonce.script,
-    styleNonce: reply.cspNonce.style,
-  })
+  // Test with plain HTML to verify route is being hit
+  reply.type('text/html')
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Public Profile Test</title>
+      <style>
+        body { font-family: system-ui; padding: 40px; max-width: 600px; margin: 0 auto; }
+        h1 { color: #2563eb; }
+      </style>
+    </head>
+    <body>
+      <h1>✓ Public Profile Route Works!</h1>
+      <p><strong>User ID/Username:</strong> ${userIdOrUsername}</p>
+      <p><strong>URL:</strong> ${req.url}</p>
+      <p><strong>Status:</strong> If you see this message, the route is being hit correctly!</p>
+      <hr>
+      <p><small>Next step: Replace with actual SPA rendering</small></p>
+    </body>
+    </html>
+  `
 })
 
 // Routes
