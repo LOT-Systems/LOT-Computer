@@ -42,7 +42,6 @@ export class User
       'phone',
       'tags',
       'hideActivityLogs',
-      'metadata',
     ])(this.toJSON())
 
     // Add memory engine status based on tags

@@ -62,12 +62,6 @@ export type UserProfile = {
   hideActivityLogs: boolean;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
-  metadata?: {
-    privacy?: UserPrivacySettings;
-    world?: UserWorld;
-    memoryStory?: string;
-    currentSound?: string;
-  };
 };
 
 export type User = {
