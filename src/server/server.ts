@@ -112,6 +112,13 @@ if (config.env === 'production') {
   })
 }
 
+// Global request logger for debugging
+fastify.addHook('onRequest', async (req, reply) => {
+  if (req.url.startsWith('/u/')) {
+    console.log('[GLOBAL] Request to:', req.method, req.url)
+  }
+})
+
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 
@@ -262,9 +269,16 @@ fastify.setErrorHandler((error, req, reply) => {
 })
 
 fastify.setNotFoundHandler(async (req, res) => {
+  console.log('[NOT-FOUND] URL:', req.url)
+  console.log('[NOT-FOUND] Method:', req.method)
+  console.log('[NOT-FOUND] Headers Accept:', req.headers.accept)
+  console.log('[NOT-FOUND] Is HTML request:', req.headers.accept?.includes('text/html'))
+
   if (req.headers.accept?.includes('text/html')) {
+    console.log('[NOT-FOUND] Redirecting HTML request to /')
     return res.redirect('/')
   }
+  console.log('[NOT-FOUND] Returning 404')
   res.code(404).send('Not found')
 })
 
