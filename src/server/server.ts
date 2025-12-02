@@ -122,6 +122,26 @@ fastify.addHook('onRequest', async (req, reply) => {
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 
+// TEST ROUTE - Simple static route to verify routing works
+fastify.get('/test-public-route', async function (req, reply) {
+  console.log('[TEST] Simple test route hit!')
+  reply.type('text/html')
+  reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  reply.header('X-Test-Route', 'hit')
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head><title>Test Route</title></head>
+    <body style="font-family: system-ui; padding: 40px;">
+      <h1 style="color: green;">✓ TEST ROUTE WORKS!</h1>
+      <p>If you see this, routing is functioning correctly.</p>
+      <p>URL: ${req.url}</p>
+      <p>Time: ${new Date().toISOString()}</p>
+    </body>
+    </html>
+  `
+})
+
 // Public profile page - MUST be at top level to avoid any auth middleware
 fastify.get('/u/:userIdOrUsername', async function (req, reply) {
   const { userIdOrUsername } = req.params as { userIdOrUsername: string }
@@ -131,6 +151,8 @@ fastify.get('/u/:userIdOrUsername', async function (req, reply) {
 
   // Test with plain HTML to verify route is being hit
   reply.type('text/html')
+  reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  reply.header('X-Profile-Route', 'hit')
   return `
     <!DOCTYPE html>
     <html>
@@ -145,6 +167,7 @@ fastify.get('/u/:userIdOrUsername', async function (req, reply) {
       <h1>✓ Public Profile Route Works!</h1>
       <p><strong>User ID/Username:</strong> ${userIdOrUsername}</p>
       <p><strong>URL:</strong> ${req.url}</p>
+      <p><strong>Time:</strong> ${new Date().toISOString()}</p>
       <p><strong>Status:</strong> If you see this message, the route is being hit correctly!</p>
       <hr>
       <p><small>Next step: Replace with actual SPA rendering</small></p>
