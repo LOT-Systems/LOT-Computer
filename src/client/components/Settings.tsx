@@ -438,9 +438,6 @@ export const Settings = () => {
                 >
                   {savingPrivacy ? 'Saving...' : 'Save Public Profile Settings'}
                 </Button>
-                <div className="text-acc/60 text-sm mt-2">
-                  ⚠️ Remember to click Save to apply your changes
-                </div>
               </div>
             )}
 
