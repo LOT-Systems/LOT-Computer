@@ -122,6 +122,20 @@ fastify.addHook('onRequest', async (req, reply) => {
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 
+// Public profile page - MUST be at top level to avoid any auth middleware
+fastify.get('/u/:userIdOrUsername', async function (req, reply) {
+  const { userIdOrUsername } = req.params as { userIdOrUsername: string }
+  console.log('[PUBLIC-PROFILE] Route hit for:', userIdOrUsername)
+  console.log('[PUBLIC-PROFILE] URL:', req.url)
+  console.log('[PUBLIC-PROFILE] Rendering public-profile SPA')
+
+  return reply.view('generic-spa', {
+    scriptName: 'public-profile',
+    scriptNonce: reply.cspNonce.script,
+    styleNonce: reply.cspNonce.style,
+  })
+})
+
 // Routes
 fastify.register(async (fastify: FastifyInstance) => {
   fastify.decorate('models', models)
@@ -198,21 +212,6 @@ fastify.register(async (fastify: FastifyInstance) => {
             styleNonce: reply.cspNonce.style,
           })
         })
-      })
-    })
-
-    // Public profile page - Must be BEFORE admin section to avoid auth redirect
-    fastify.get('/u/:userIdOrUsername', async function (req, reply) {
-      const { userIdOrUsername } = req.params as { userIdOrUsername: string }
-      console.log('[PUBLIC-PROFILE] Route hit for:', userIdOrUsername)
-      console.log('[PUBLIC-PROFILE] URL:', req.url)
-      console.log('[PUBLIC-PROFILE] User authenticated:', !!req.user)
-      console.log('[PUBLIC-PROFILE] Rendering public-profile SPA')
-
-      return reply.view('generic-spa', {
-        scriptName: 'public-profile',
-        scriptNonce: reply.cspNonce.script,
-        styleNonce: reply.cspNonce.style,
       })
     })
 
