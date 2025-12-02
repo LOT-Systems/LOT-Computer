@@ -175,11 +175,16 @@ export const Settings = () => {
         return
       }
 
-      // Refresh user data to persist the settings
-      const userResponse = await fetch('/api/me')
-      if (userResponse.ok) {
-        const userData = await userResponse.json()
-        stores.me.set(userData)
+      // Update local store with new privacy settings to persist them
+      const currentMe = stores.me.get()
+      if (currentMe) {
+        stores.me.set({
+          ...currentMe,
+          metadata: {
+            ...(currentMe as any).metadata,
+            privacy: privacySettings
+          }
+        } as any)
       }
 
       setPrivacyChanged(false)
