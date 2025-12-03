@@ -129,19 +129,6 @@ fastify.register(async (fastify: FastifyInstance) => {
   fastify.decorateReply('ok', okReplyDecorator)
   fastify.decorateReply('throw', throwReplyDecorator)
 
-  // Public profile route - NO AUTHENTICATION REQUIRED
-  // Registered here to have access to decorators but BEFORE auth hooks
-  fastify.get('/u/:userIdOrUsername', async function (req, reply) {
-    const { userIdOrUsername } = req.params as { userIdOrUsername: string }
-    console.log('[PUBLIC-PROFILE] ✓ Route hit for:', userIdOrUsername)
-
-    return reply.view('generic-spa', {
-      scriptName: 'public-profile',
-      scriptNonce: reply.cspNonce.script,
-      styleNonce: reply.cspNonce.style,
-    })
-  })
-
   fastify.register(async (fastify) => {
     fastify.decorateReply('user', null)
     fastify.addHook('onRequest', async (req: FastifyRequest, reply) => {
@@ -196,6 +183,20 @@ fastify.register(async (fastify: FastifyInstance) => {
 
     // Client app / index page
     fastify.register(async (fastify) => {
+      // Public profile route - MUST be registered FIRST for route priority
+      // This is a public route - no authentication required
+      fastify.get('/u/:userIdOrUsername', async function (req, reply) {
+        const { userIdOrUsername } = req.params as { userIdOrUsername: string }
+        console.log('[PUBLIC-PROFILE] ✓ Route hit for:', userIdOrUsername)
+        console.log('[PUBLIC-PROFILE] Auth status:', !!req.user)
+
+        return reply.view('generic-spa', {
+          scriptName: 'public-profile',
+          scriptNonce: reply.cspNonce.script,
+          styleNonce: reply.cspNonce.style,
+        })
+      })
+
       KNOWN_CLIENT_ROUTES.forEach((route) => {
         fastify.get(route, async function (req, reply) {
           if (req.user) {
