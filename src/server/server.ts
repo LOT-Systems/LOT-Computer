@@ -127,9 +127,11 @@ fastify.addHook('onClose', () => sequelize.close())
 // These MUST be registered before ANY other routes to avoid conflicts
 // ==============================================================================
 
+console.log('🔥 [SERVER-STARTUP] Registering /u/ routes at top level!')
+
 // Diagnostic test route
 fastify.get('/u/test-route-works', async function (req, reply) {
-  console.log('[DIAGNOSTIC] Test route hit!')
+  console.log('🟢 [DIAGNOSTIC] Test route hit!')
   reply.type('text/html')
   return `
     <!DOCTYPE html>
@@ -144,10 +146,22 @@ fastify.get('/u/test-route-works', async function (req, reply) {
   `
 })
 
+// Alternative diagnostic at /api/diagnostic
+fastify.get('/api/diagnostic', async function (req, reply) {
+  console.log('🟢 [API-DIAGNOSTIC] Route hit!')
+  return {
+    success: true,
+    message: 'Server code is running with latest changes',
+    timestamp: new Date().toISOString(),
+    commit: '0e839b6e',
+    uRoutesRegistered: true
+  }
+})
+
 // Public profile route
 fastify.get('/u/:userIdOrUsername', async function (req, reply) {
   const { userIdOrUsername } = req.params as { userIdOrUsername: string }
-  console.log('[PUBLIC-PROFILE-ROUTE] ✓✓✓ Route hit for:', userIdOrUsername)
+  console.log('🟢 [PUBLIC-PROFILE-ROUTE] ✓✓✓ Route hit for:', userIdOrUsername)
   console.log('[PUBLIC-PROFILE-ROUTE] Request URL:', req.url)
   console.log('[PUBLIC-PROFILE-ROUTE] Request method:', req.method)
 
