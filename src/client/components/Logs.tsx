@@ -231,11 +231,12 @@ const NoteEditor = ({
   React.useEffect(() => {
     if (log.text === debouncedValue) return
     onChange(debouncedValue)
-  }, [debouncedValue])
+  }, [debouncedValue, onChange])
 
-  // React.useEffect(() => {
-  //   setValue(log.text || '')
-  // }, [log])
+  // Sync local state when log updates from server
+  React.useEffect(() => {
+    setValue(log.text || '')
+  }, [log.text])
 
   React.useEffect(() => {
     const textarea = containerRef.current?.querySelector('textarea')
