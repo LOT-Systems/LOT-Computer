@@ -114,8 +114,9 @@ export default async (fastify: FastifyInstance) => {
   fastify.get('/me', async (req: FastifyRequest, reply) => {
     const profile = req.user.useProfileView()
     const isAdmin = req.user.isAdmin() || undefined
+    const metadata = req.user.metadata || {}
     req.user.deferredPing()
-    return { ...profile, isAdmin }
+    return { ...profile, isAdmin, metadata }
   })
 
   fastify.post(
@@ -165,6 +166,135 @@ export default async (fastify: FastifyInstance) => {
           context,
         })
       })
+      reply.ok()
+    }
+  )
+
+  fastify.post<{
+    Body: {
+      theme: string
+      baseColor?: string
+      accentColor?: string
+      customThemeEnabled: boolean
+    }
+  }>(
+    '/theme-change',
+    async (req: FastifyRequest<{
+      Body: {
+        theme: string
+        baseColor?: string
+        accentColor?: string
+        customThemeEnabled: boolean
+      }
+    }>, reply) => {
+      const { theme, baseColor, accentColor, customThemeEnabled } = req.body
+
+      // Log theme change asynchronously
+      process.nextTick(async () => {
+        const context = await getLogContext(req.user)
+        await fastify.models.Log.create({
+          userId: req.user.id,
+          event: 'theme_change',
+          text: '',
+          metadata: {
+            theme,
+            baseColor: baseColor || null,
+            accentColor: accentColor || null,
+            customThemeEnabled,
+            userTags: req.user.tags,
+          },
+          context,
+        })
+      })
+
+      reply.ok()
+    }
+  )
+
+  fastify.post<{
+    Body: { soundDescription: string | null }
+  }>(
+    '/update-current-sound',
+    async (req: FastifyRequest<{
+      Body: { soundDescription: string | null }
+    }>, reply) => {
+      const { soundDescription } = req.body
+
+      // Update user metadata with current sound description
+      const currentMetadata = req.user.metadata || {}
+      const updatedMetadata = {
+        ...currentMetadata,
+        currentSound: soundDescription,
+      }
+
+      await req.user.set({ metadata: updatedMetadata }).save()
+
+      reply.ok()
+    }
+  )
+
+  fastify.post<{
+    Body: {
+      privacy: {
+        isPublicProfile: boolean
+        showWeather: boolean
+        showLocalTime: boolean
+        showCity: boolean
+        showSound: boolean
+        showMemoryStory: boolean
+        customUrl?: string | null
+      }
+    }
+  }>(
+    '/update-privacy',
+    async (req: FastifyRequest<{
+      Body: {
+        privacy: {
+          isPublicProfile: boolean
+          showWeather: boolean
+          showLocalTime: boolean
+          showCity: boolean
+          showSound: boolean
+          showMemoryStory: boolean
+          customUrl?: string | null
+        }
+      }
+    }>, reply) => {
+      const { privacy } = req.body
+
+      // Validate custom URL if provided
+      if (privacy.customUrl) {
+        const urlPattern = /^[a-zA-Z0-9_-]{3,30}$/
+        if (!urlPattern.test(privacy.customUrl)) {
+          return reply.code(400).send({
+            error: 'Invalid custom URL',
+            message: 'Custom URL must be 3-30 characters (letters, numbers, dashes, underscores only)'
+          })
+        }
+
+        // Check if custom URL is already taken by another user
+        const users = await fastify.models.User.findAll()
+        const existingUser = users.find(u =>
+          u.id !== req.user.id &&
+          u.metadata?.privacy?.customUrl === privacy.customUrl
+        )
+        if (existingUser) {
+          return reply.code(400).send({
+            error: 'Custom URL taken',
+            message: 'This custom URL is already in use by another user'
+          })
+        }
+      }
+
+      // Update user metadata with privacy settings
+      const currentMetadata = req.user.metadata || {}
+      const updatedMetadata = {
+        ...currentMetadata,
+        privacy,
+      }
+
+      await req.user.set({ metadata: updatedMetadata }).save()
+
       reply.ok()
     }
   )
@@ -681,5 +811,140 @@ export default async (fastify: FastifyInstance) => {
         error: error.message
       }
     }
+  })
+
+  // Generate daily world element
+  fastify.post('/world/generate-element', async (req, reply) => {
+    try {
+      // Check for Usership tag
+      const hasUsership = req.user?.tags.some((tag) => tag.toLowerCase() === 'usership')
+      if (!hasUsership) {
+        return {
+          element: null,
+          message: 'Subscribe to Usership to unlock World Generation.'
+        }
+      }
+
+      // Get user's current metadata
+      const currentMetadata = req.user.metadata || {}
+      const userWorld = currentMetadata.world || { elements: [], lastGenerated: null, theme: '' }
+
+      // Check if already generated today
+      const now = new Date()
+      const lastGenerated = userWorld.lastGenerated ? new Date(userWorld.lastGenerated) : null
+      const today = now.toDateString()
+
+      if (lastGenerated && lastGenerated.toDateString() === today) {
+        return {
+          element: null,
+          world: userWorld,
+          message: 'Already generated an element today. Come back tomorrow!'
+        }
+      }
+
+      // Get user context for generation
+      const logs = await fastify.models.Log.findUserLogs(req.user, 90)
+      const memoryStory = await generateMemoryStory(req.user, logs)
+
+      // Get weather context
+      let weatherContext = 'temperate climate'
+      try {
+        const weatherData = await weather.fetchWeather(req.user, fastify.models)
+        if (weatherData) {
+          weatherContext = `${weatherData.description}, ${Math.round(weatherData.tempKelvin - 273.15)}°C`
+        }
+      } catch (e) {
+        // Ignore weather errors
+      }
+
+      // Determine element type based on number of existing elements
+      const elementTypes: Array<'object' | 'creature' | 'plant' | 'structure' | 'weather-effect'> =
+        ['object', 'creature', 'plant', 'structure', 'weather-effect']
+      const elementType = elementTypes[userWorld.elements.length % elementTypes.length]
+
+      // Build image generation prompt from context
+      const { TogetherAIEngine } = await import('#server/utils/ai-engines.js')
+      const imageEngine = new TogetherAIEngine()
+
+      if (!imageEngine.isAvailable()) {
+        throw new Error('Image generation engine not available')
+      }
+
+      // Generate element description based on context
+      const contextPrompt = `Based on this user's context: ${memoryStory?.substring(0, 500) || 'A mindful journey'}, weather: ${weatherContext}, location: ${req.user.city}, ${req.user.country}.
+
+Create a short, vivid description (1-2 sentences) for a ${elementType} that would appear in their personal 3D world. The ${elementType} should reflect their current emotional state, environment, and story. Be poetic but specific.`
+
+      const elementDescription = await imageEngine.generateCompletion(contextPrompt, 100)
+
+      // Generate image with FLUX
+      const imagePrompt = `A beautiful, isometric 3D sprite art of a ${elementType}: ${elementDescription}. Clean background, soft lighting, pixel art style, game asset, centered, high quality`
+
+      const imageUrl = await imageEngine.generateImage!(imagePrompt, {
+        width: 512,
+        height: 512,
+        steps: 20,
+      })
+
+      // Create new element
+      const newElement = {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        type: elementType,
+        imageUrl,
+        prompt: imagePrompt,
+        position: {
+          x: Math.random() * 10 - 5, // -5 to 5
+          y: 0,
+          z: Math.random() * 10 - 5
+        },
+        scale: 0.8 + Math.random() * 0.4, // 0.8 to 1.2
+        rotation: Math.random() * 360,
+        generatedAt: now,
+        context: elementDescription
+      }
+
+      // Update user world
+      const updatedWorld = {
+        elements: [...userWorld.elements, newElement],
+        lastGenerated: now,
+        theme: memoryStory?.substring(0, 200) || 'A personal journey'
+      }
+
+      // Save to metadata
+      await req.user.set({
+        metadata: {
+          ...currentMetadata,
+          world: updatedWorld
+        }
+      }).save()
+
+      console.log(`✅ Generated world element for user ${req.user.id}: ${elementType}`)
+
+      return {
+        element: newElement,
+        world: updatedWorld,
+        message: `New ${elementType} generated!`
+      }
+
+    } catch (error: any) {
+      console.error('❌ Error generating world element:', {
+        error: error.message,
+        stack: error.stack,
+        userId: req.user?.id
+      })
+      return {
+        element: null,
+        message: 'Unable to generate world element. Please try again later.',
+        error: error.message
+      }
+    }
+  })
+
+  // Get user's world
+  fastify.get('/world', async (req, reply) => {
+    const currentMetadata = req.user.metadata || {}
+    const userWorld = currentMetadata.world || { elements: [], lastGenerated: null, theme: '' }
+
+    return userWorld
   })
 }

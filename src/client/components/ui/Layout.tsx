@@ -32,7 +32,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
       : [
           { href: null, label: 'Sync' },
           { href: null, label: 'Logs' },
-          { href: null, label: 'System' },
+          { href: '/', label: 'System' },
           { href: null, label: 'Basics' },
           { href: null, label: 'Self-care' },
           { href: null, label: 'Kids' },

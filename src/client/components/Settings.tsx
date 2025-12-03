@@ -3,13 +3,14 @@ import { useStore } from '@nanostores/react'
 import { useUpdateSettings, useMyMemoryStory } from '#client/queries'
 import * as stores from '#client/stores'
 import { Block, Button, GhostButton, Input, Select, Link } from '#client/components/ui'
-import { UserSettings, UserTag } from '#shared/types'
+import { UserSettings, UserTag, UserPrivacySettings, UserWorld } from '#shared/types'
 import {
   COUNTRIES,
   getUserTagByIdCaseInsensitive,
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
 import { cn } from '#client/utils'
+import { WorldCanvas } from './WorldCanvas'
 
 interface StatusData {
   version: string
@@ -43,13 +44,36 @@ export const Settings = () => {
   const [changed, setChanged] = React.useState(false)
   const [statusData, setStatusData] = React.useState<StatusData | null>(null)
   const [state, setState] = React.useState<UserSettings>({
-    firstName: me!.firstName,
-    lastName: me!.lastName,
-    city: me!.city,
-    phone: me!.phone,
-    address: me!.address,
-    country: me!.country,
-    hideActivityLogs: me!.hideActivityLogs,
+    firstName: me?.firstName || '',
+    lastName: me?.lastName || '',
+    city: me?.city || '',
+    phone: me?.phone || '',
+    address: me?.address || '',
+    country: me?.country || '',
+    hideActivityLogs: me?.hideActivityLogs || false,
+  })
+
+  // Privacy settings state
+  const [privacySettings, setPrivacySettings] = React.useState<UserPrivacySettings>(() => {
+    const metadata = (me as any)?.metadata || {}
+    return metadata.privacy || {
+      isPublicProfile: false,
+      showWeather: true,
+      showLocalTime: true,
+      showCity: true,
+      showSound: true,
+      showMemoryStory: true,
+      customUrl: null,
+    }
+  })
+  const [privacyChanged, setPrivacyChanged] = React.useState(false)
+  const [savingPrivacy, setSavingPrivacy] = React.useState(false)
+
+  // Personal World state
+  const [userWorld, setUserWorld] = React.useState<UserWorld>({
+    elements: [],
+    lastGenerated: null,
+    theme: '',
   })
 
   const counties = React.useMemo(() => {
@@ -58,44 +82,6 @@ export const Settings = () => {
       value: x.alpha3,
     }))
   }, [])
-
-  const onChange = React.useCallback(
-    (field: keyof UserSettings) => (value: string) => {
-      setState((state) => ({
-        ...state,
-        [field]: value,
-      }))
-      setChanged(true)
-    },
-    []
-  )
-
-  const onToggleActivityLogs = React.useCallback(() => {
-    setState((state) => ({
-      ...state,
-      hideActivityLogs: !state.hideActivityLogs,
-    }))
-    setChanged(true)
-  }, [])
-
-  const onToggleCustomTheme = React.useCallback(() => {
-    const newValue = !isCustomThemeEnabled
-    stores.isCustomThemeEnabled.set(newValue)
-    if (newValue) {
-      stores.theme.set('custom')
-    } else {
-      // Switch back to automatic theme based on time
-      stores.theme.set('light')
-    }
-  }, [isCustomThemeEnabled])
-
-  const onSubmit = React.useCallback(
-    async (ev: React.FormEvent) => {
-      ev.preventDefault()
-      updateSettings(state)
-    },
-    [state]
-  )
 
   const userTagIds = React.useMemo(() => {
     // Convert database tags (lowercase) to enum values (proper case) for comparison
@@ -124,6 +110,139 @@ export const Settings = () => {
 
     return tags
   }, [me])
+
+  // Fetch user's world on mount
+  React.useEffect(() => {
+    if (userTagIds.includes(UserTag.Usership)) {
+      fetch('/api/world')
+        .then(res => res.json())
+        .then(data => {
+          if (data) {
+            setUserWorld(data)
+          }
+        })
+        .catch(err => console.error('Failed to fetch world:', err))
+    }
+  }, [userTagIds])
+
+  const onChange = React.useCallback(
+    (field: keyof UserSettings) => (value: string) => {
+      setState((state) => ({
+        ...state,
+        [field]: value,
+      }))
+      setChanged(true)
+    },
+    []
+  )
+
+  const onToggleActivityLogs = React.useCallback(() => {
+    setState((state) => ({
+      ...state,
+      hideActivityLogs: !state.hideActivityLogs,
+    }))
+    setChanged(true)
+  }, [])
+
+  // Privacy settings handlers
+  const onTogglePrivacy = React.useCallback((field: keyof Omit<UserPrivacySettings, 'customUrl'>) => {
+    setPrivacySettings(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }))
+    setPrivacyChanged(true)
+  }, [])
+
+  const onChangeCustomUrl = React.useCallback((value: string) => {
+    setPrivacySettings(prev => ({
+      ...prev,
+      customUrl: value || null
+    }))
+    setPrivacyChanged(true)
+  }, [])
+
+  const savePrivacySettings = React.useCallback(async () => {
+    setSavingPrivacy(true)
+    try {
+      const response = await fetch('/api/update-privacy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ privacy: privacySettings })
+      })
+      if (!response.ok) {
+        const data = await response.json()
+        alert(data.message || 'Failed to save privacy settings')
+        return
+      }
+
+      // Update local store with new privacy settings to persist them
+      const currentMe = stores.me.get()
+      if (currentMe) {
+        stores.me.set({
+          ...currentMe,
+          metadata: {
+            ...(currentMe as any).metadata,
+            privacy: privacySettings
+          }
+        } as any)
+      }
+
+      setPrivacyChanged(false)
+      alert('Privacy settings saved successfully!')
+    } catch (error) {
+      console.error('Failed to save privacy settings:', error)
+      alert('Failed to save privacy settings')
+    } finally {
+      setSavingPrivacy(false)
+    }
+  }, [privacySettings])
+
+  // Log theme change to server
+  const logThemeChange = React.useCallback(async (themeData: {
+    theme: string
+    baseColor?: string
+    accentColor?: string
+    customThemeEnabled: boolean
+  }) => {
+    try {
+      await fetch('/api/theme-change', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(themeData),
+      })
+    } catch (error) {
+      console.error('Failed to log theme change:', error)
+    }
+  }, [])
+
+  const onToggleCustomTheme = React.useCallback(() => {
+    const newValue = !isCustomThemeEnabled
+    stores.isCustomThemeEnabled.set(newValue)
+    if (newValue) {
+      stores.theme.set('custom')
+      logThemeChange({
+        theme: 'custom',
+        baseColor,
+        accentColor,
+        customThemeEnabled: true,
+      })
+    } else {
+      // Switch back to automatic theme based on time
+      stores.theme.set('light')
+      logThemeChange({
+        theme: 'light',
+        customThemeEnabled: false,
+      })
+    }
+  }, [isCustomThemeEnabled, baseColor, accentColor, logThemeChange])
+
+  const onSubmit = React.useCallback(
+    async (ev: React.FormEvent) => {
+      ev.preventDefault()
+      updateSettings(state)
+    },
+    [state]
+  )
 
   // Fetch status data for the status link
   React.useEffect(() => {
@@ -231,7 +350,16 @@ export const Settings = () => {
                   className="appearance-none cursor-pointer absolute -top-1 left-0 right-0 -bottom-1 opacity-0 w-full _h-full"
                   type="color"
                   value={baseColor}
-                  onChange={(x) => stores.baseColor.set(x.target.value)}
+                  onChange={(x) => {
+                    const newColor = x.target.value
+                    stores.baseColor.set(newColor)
+                    logThemeChange({
+                      theme: 'custom',
+                      baseColor: newColor,
+                      accentColor,
+                      customThemeEnabled: isCustomThemeEnabled,
+                    })
+                  }}
                 />
                 {baseColor.toUpperCase()}
               </span>
@@ -242,7 +370,16 @@ export const Settings = () => {
                   className="appearance-none cursor-pointer absolute -top-1 left-0 right-0 -bottom-1 opacity-0 w-full _h-full"
                   type="color"
                   value={accentColor}
-                  onChange={(x) => stores.accentColor.set(x.target.value)}
+                  onChange={(x) => {
+                    const newColor = x.target.value
+                    stores.accentColor.set(newColor)
+                    logThemeChange({
+                      theme: 'custom',
+                      baseColor,
+                      accentColor: newColor,
+                      customThemeEnabled: isCustomThemeEnabled,
+                    })
+                  }}
                 />
                 {accentColor.toUpperCase()}
               </span>
@@ -253,6 +390,81 @@ export const Settings = () => {
         <div>
           <Block label="Activity log:" onChildrenClick={onToggleActivityLogs}>
             {state.hideActivityLogs ? 'Off' : 'On'}
+          </Block>
+        </div>
+
+        {/* Public Profile Section */}
+        <div>
+          <Block label="Public Profile:" blockView>
+            <div className="mb-8">
+              <Block label="Enable public profile:" onChildrenClick={() => onTogglePrivacy('isPublicProfile')}>
+                {privacySettings.isPublicProfile ? 'On' : 'Off'}
+              </Block>
+            </div>
+
+            {/* Show Save button immediately when privacy setting changes */}
+            {privacyChanged && (
+              <div className="mb-8">
+                <Button
+                  type="button"
+                  kind="primary"
+                  onClick={savePrivacySettings}
+                  disabled={savingPrivacy}
+                >
+                  {savingPrivacy ? 'Saving...' : 'Save Public Profile Settings'}
+                </Button>
+              </div>
+            )}
+
+            <div className="mb-8">
+              <Block label="Your public link:" blockView>
+                <div className="text-acc/80">
+                  {window.location.origin}/u/{privacySettings.customUrl || me?.id}
+                </div>
+                {!privacySettings.isPublicProfile && (
+                  <div className="text-acc/60 mt-2">
+                    Enable public profile to make this link accessible
+                  </div>
+                )}
+              </Block>
+            </div>
+
+            {privacySettings.isPublicProfile && (
+              <>
+                <div className="mb-8">
+                  <Block label="Show weather:" onChildrenClick={() => onTogglePrivacy('showWeather')}>
+                    {privacySettings.showWeather ? 'On' : 'Off'}
+                  </Block>
+                  <Block label="Show local time:" onChildrenClick={() => onTogglePrivacy('showLocalTime')}>
+                    {privacySettings.showLocalTime ? 'On' : 'Off'}
+                  </Block>
+                  <Block label="Show city:" onChildrenClick={() => onTogglePrivacy('showCity')}>
+                    {privacySettings.showCity ? 'On' : 'Off'}
+                  </Block>
+                  <Block label="Show sound:" onChildrenClick={() => onTogglePrivacy('showSound')}>
+                    {privacySettings.showSound ? 'On' : 'Off'}
+                  </Block>
+                  <Block label="Show memory story:" onChildrenClick={() => onTogglePrivacy('showMemoryStory')}>
+                    {privacySettings.showMemoryStory ? 'On' : 'Off'}
+                  </Block>
+                </div>
+
+                <div className="mb-8">
+                  <Block label="Custom URL:" blockView>
+                    <Input
+                      type="text"
+                      value={privacySettings.customUrl || ''}
+                      onChange={onChangeCustomUrl}
+                      placeholder="e.g., vadik (optional)"
+                      className="w-full"
+                    />
+                    <div className="text-acc/60 text-sm mt-2">
+                      Letters, numbers, dashes, underscores only (3-30 chars)
+                    </div>
+                  </Block>
+                </div>
+              </>
+            )}
           </Block>
         </div>
 
@@ -347,6 +559,33 @@ export const Settings = () => {
             )}
           </Block>
         </div>
+      )}
+
+      {/* Personal World Section - For Usership users only */}
+      {userTagIds.includes(UserTag.Usership) && (
+        <div className="max-w-[700px]">
+          <Block label="Personal World:" blockView>
+            {userWorld.elements.length > 0 ? (
+              <>
+                <div className="mb-8">
+                  {userWorld.elements.length} element{userWorld.elements.length !== 1 ? 's' : ''} generated
+                </div>
+                <div className="text-acc/60 text-sm">
+                  Elements appear in the background as you answer Memory prompts. One new element generated per day.
+                </div>
+              </>
+            ) : (
+              <div className="text-acc/60">
+                Answer Memory prompts on the System tab to start generating your personal world. Elements will appear in the background.
+              </div>
+            )}
+          </Block>
+        </div>
+      )}
+
+      {/* World Canvas - Background layer */}
+      {userTagIds.includes(UserTag.Usership) && userWorld.elements.length > 0 && (
+        <WorldCanvas elements={userWorld.elements} />
       )}
     </div>
   )
