@@ -208,15 +208,50 @@ fastify.register(async (fastify: FastifyInstance) => {
         console.log('[PUBLIC-PROFILE] ✓ Route hit for:', userIdOrUsername)
         console.log('[PUBLIC-PROFILE] Auth status:', !!req.user)
 
-        // Ensure proper caching and history handling
-        reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
-        reply.header('X-Content-Type-Options', 'nosniff')
-
-        return reply.view('generic-spa', {
-          scriptName: 'public-profile',
-          scriptNonce: reply.cspNonce.script,
-          styleNonce: reply.cspNonce.style,
-        })
+        // TEMPORARY: Return plain HTML to diagnose routing issue
+        // This bypasses JavaScript bundle loading entirely
+        reply.type('text/html')
+        return `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Public Profile - ${userIdOrUsername}</title>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+            </head>
+            <body style="font-family: -apple-system, system-ui, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; line-height: 1.6;">
+              <h1 style="color: green;">✓ Public Profile Route Working!</h1>
+              <p><strong>User ID/Username:</strong> ${userIdOrUsername}</p>
+              <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
+              <p><strong>Authenticated:</strong> ${!!req.user ? 'Yes' : 'No (expected for public profile)'}</p>
+              <hr>
+              <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3>Diagnosis:</h3>
+                <p style="color: green; font-weight: bold;">✓ Server route is matching correctly</p>
+                <p style="color: green; font-weight: bold;">✓ No authentication required</p>
+                <p>Next: Will fetch profile data from API...</p>
+              </div>
+              <script>
+                // Fetch actual profile data
+                console.log('Fetching profile data for: ${userIdOrUsername}');
+                fetch('/api/public/profile/${userIdOrUsername}')
+                  .then(res => {
+                    console.log('API Response status:', res.status);
+                    return res.json();
+                  })
+                  .then(data => {
+                    console.log('Profile data:', data);
+                    document.body.innerHTML += '<div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin-top: 20px;"><h3 style="color: green;">✓ API Data Retrieved:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre></div>';
+                  })
+                  .catch(err => {
+                    console.error('API Error:', err);
+                    document.body.innerHTML += '<div style="background: #ffebee; padding: 20px; border-radius: 8px; margin-top: 20px;"><h3 style="color: red;">✗ API Error:</h3><p>' + err.message + '</p><p>Check browser console for details</p></div>';
+                  });
+              </script>
+              <p style="margin-top: 40px;"><a href="/">← Back to home</a></p>
+            </body>
+          </html>
+        `
       })
 
       KNOWN_CLIENT_ROUTES.forEach((route) => {
