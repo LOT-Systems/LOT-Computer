@@ -18,7 +18,7 @@ const App = () => {
           target="_blank"
           className="underline tablet:no-underline whitespace-nowrap pr-8"
         >
-          Institute <span className="tablet:inline">↗</span>
+          Institute <span className="tablet:inline" style={{fontFamily: 'inherit', fontVariantEmoji: 'text' as any}}>↗</span>
         </Link>
       </div>
       <EmailLogin />
