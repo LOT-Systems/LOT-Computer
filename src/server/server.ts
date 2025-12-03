@@ -154,45 +154,32 @@ fastify.get('/test-public-route', async function (req, reply) {
   `
 })
 
-// Route 3: Public profile page with parameter
-fastify.get('/u/:userIdOrUsername', async function (req, reply) {
-  const { userIdOrUsername } = req.params as { userIdOrUsername: string }
-  console.log('[PUBLIC-PROFILE] Route hit for:', userIdOrUsername)
-  console.log('[PUBLIC-PROFILE] URL:', req.url)
-  console.log('[PUBLIC-PROFILE] Rendering test HTML')
-
-  reply.type('text/html')
-  reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  reply.header('X-Profile-Route', 'hit')
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Public Profile Test</title>
-      <style>
-        body { font-family: system-ui; padding: 40px; max-width: 600px; margin: 0 auto; }
-        h1 { color: #2563eb; }
-      </style>
-    </head>
-    <body>
-      <h1>✓ Public Profile Route Works!</h1>
-      <p><strong>User ID/Username:</strong> ${userIdOrUsername}</p>
-      <p><strong>URL:</strong> ${req.url}</p>
-      <p><strong>Time:</strong> ${new Date().toISOString()}</p>
-      <p><strong>Status:</strong> If you see this message, the route is being hit correctly!</p>
-      <hr>
-      <p><small>Next step: Replace with actual SPA rendering</small></p>
-    </body>
-    </html>
-  `
-})
-
 // Routes
 fastify.register(async (fastify: FastifyInstance) => {
   fastify.decorate('models', models)
   fastify.decorate('sequelize', sequelize)
   fastify.decorateReply('ok', okReplyDecorator)
   fastify.decorateReply('throw', throwReplyDecorator)
+
+  // PUBLIC PROFILE ROUTE - Register here to have access to decorators but NO auth
+  fastify.get('/u/:userIdOrUsername', async function (req, reply) {
+    const { userIdOrUsername } = req.params as { userIdOrUsername: string }
+    console.log('[PUBLIC-PROFILE] Route hit for:', userIdOrUsername)
+
+    reply.type('text/html')
+    reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
+    return `<!DOCTYPE html>
+<html>
+<head><title>Public Profile - ${userIdOrUsername}</title></head>
+<body style="font-family:system-ui;padding:40px;max-width:600px;margin:0 auto">
+  <h1 style="color:#2563eb">✓ Profile Route Hit!</h1>
+  <p><strong>User:</strong> ${userIdOrUsername}</p>
+  <p><strong>URL:</strong> ${req.url}</p>
+  <p><strong>Time:</strong> ${new Date().toISOString()}</p>
+  <p>This route is working! Ready for real SPA.</p>
+</body>
+</html>`
+  })
 
   fastify.register(async (fastify) => {
     fastify.decorateReply('user', null)
