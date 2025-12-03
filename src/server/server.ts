@@ -185,12 +185,22 @@ fastify.register(async (fastify: FastifyInstance) => {
     fastify.register(async (fastify) => {
       // Public profile route - MUST be registered FIRST before catch-all routes
       fastify.get('/u/:userIdOrUsername', async function (req, reply) {
-        console.log('[PUBLIC-PROFILE-ROUTE] Hit! User:', req.params.userIdOrUsername)
-        return reply.view('generic-spa', {
-          scriptName: 'public-profile',
-          scriptNonce: reply.cspNonce.script,
-          styleNonce: reply.cspNonce.style,
-        })
+        const { userIdOrUsername } = req.params as { userIdOrUsername: string }
+        console.log('[PUBLIC-PROFILE-ROUTE] Hit! User:', userIdOrUsername)
+
+        // Simple text response to test if route is being hit
+        reply.type('text/html')
+        return `<!DOCTYPE html>
+<html>
+<head><title>Profile - ${userIdOrUsername}</title></head>
+<body style="font-family:system-ui;padding:40px">
+  <h1>✓ Public Profile Route Works!</h1>
+  <p><b>User:</b> ${userIdOrUsername}</p>
+  <p><b>URL:</b> ${req.url}</p>
+  <p><b>Time:</b> ${new Date().toISOString()}</p>
+  <p>If you see this, the route is working. Next: load real SPA.</p>
+</body>
+</html>`
       })
 
       KNOWN_CLIENT_ROUTES.forEach((route) => {
