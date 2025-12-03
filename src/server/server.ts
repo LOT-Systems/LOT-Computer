@@ -190,6 +190,10 @@ fastify.register(async (fastify: FastifyInstance) => {
         console.log('[PUBLIC-PROFILE] ✓ Route hit for:', userIdOrUsername)
         console.log('[PUBLIC-PROFILE] Auth status:', !!req.user)
 
+        // Ensure proper caching and history handling
+        reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        reply.header('X-Content-Type-Options', 'nosniff')
+
         return reply.view('generic-spa', {
           scriptName: 'public-profile',
           scriptNonce: reply.cspNonce.script,
