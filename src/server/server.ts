@@ -122,9 +122,21 @@ fastify.addHook('onRequest', async (req, reply) => {
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 
-// TEST ROUTE - Simple static route to verify routing works
+// DIAGNOSTIC ROUTES - Testing route registration
+// Route 1: Simple JSON (no templates, no HTML)
+fastify.get('/api/test-route', async function (req, reply) {
+  console.log('[TEST-JSON] JSON test route hit!')
+  return {
+    success: true,
+    message: 'JSON route works!',
+    url: req.url,
+    timestamp: new Date().toISOString()
+  }
+})
+
+// Route 2: Simple static route to verify routing works
 fastify.get('/test-public-route', async function (req, reply) {
-  console.log('[TEST] Simple test route hit!')
+  console.log('[TEST-HTML] Simple test route hit!')
   reply.type('text/html')
   reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
   reply.header('X-Test-Route', 'hit')
@@ -142,14 +154,13 @@ fastify.get('/test-public-route', async function (req, reply) {
   `
 })
 
-// Public profile page - MUST be at top level to avoid any auth middleware
+// Route 3: Public profile page with parameter
 fastify.get('/u/:userIdOrUsername', async function (req, reply) {
   const { userIdOrUsername } = req.params as { userIdOrUsername: string }
   console.log('[PUBLIC-PROFILE] Route hit for:', userIdOrUsername)
   console.log('[PUBLIC-PROFILE] URL:', req.url)
   console.log('[PUBLIC-PROFILE] Rendering test HTML')
 
-  // Test with plain HTML to verify route is being hit
   reply.type('text/html')
   reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
   reply.header('X-Profile-Route', 'hit')
