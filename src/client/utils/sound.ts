@@ -20,7 +20,7 @@ import { useExternalScript } from './hooks'
  * - Beta: 13-30 Hz (focus, active thinking)
  */
 
-type TimeOfDay = 'morning' | 'day' | 'afternoon' | 'night'
+type TimeOfDay = 'sunrise' | 'morning' | 'day' | 'afternoon' | 'sunset' | 'night'
 type WeatherCondition =
   | 'clear'
   | 'cloudy'
@@ -41,6 +41,7 @@ interface SoundContext {
   windSpeed: number | null // m/s
   pressure: number | null // hPa
   dailySeed: number // Daily variation seed (0-1)
+  usersOnline: number // Number of users currently online
 }
 
 // Generate a daily seed (0-1) based on the current date
@@ -75,7 +76,7 @@ function getWeatherCondition(description: string | null): WeatherCondition {
 
 // Generate a poetic description of the current soundscape
 function getSoundDescription(context: SoundContext): string {
-  const { period, weather, temperature, humidity, frequency } = context
+  const { period, weather, temperature, humidity, frequency, usersOnline } = context
   const parts: string[] = []
 
   // Humidity descriptor
@@ -93,6 +94,10 @@ function getSoundDescription(context: SoundContext): string {
 
   // Primary sound elements by time of day
   switch (period) {
+    case 'sunrise':
+      parts.push(`awakening bells ${Math.round(frequency)}Hz`)
+      parts.push('and rising harmonics')
+      break
     case 'morning':
       parts.push(`sine ${Math.round(frequency)}Hz`)
       if (weather === 'rain' || weather === 'drizzle' || weather === 'thunderstorm') {
@@ -111,6 +116,10 @@ function getSoundDescription(context: SoundContext): string {
       parts.push(`wooden drone ${Math.round(frequency)}Hz`)
       parts.push('and wandering melody')
       break
+    case 'sunset':
+      parts.push(`descending chimes ${Math.round(frequency)}Hz`)
+      parts.push('and settling drones')
+      break
     case 'night':
       parts.push(`deep drone ${Math.round(frequency)}Hz`)
       if (weather === 'clear' && temperature !== null && temperature < 5) {
@@ -126,18 +135,47 @@ function getSoundDescription(context: SoundContext): string {
     parts.push('– soft rain')
   }
 
+  // Active site indicator
+  if (usersOnline > 5) {
+    parts.push('+ click symphony')
+  }
+
   return parts.join(' ')
 }
 
 // Detect time of day and return appropriate sound context
-function getTimeContext(weather: any): SoundContext {
-  const hour = new Date().getHours()
+function getTimeContext(weather: any, usersOnline: number): SoundContext {
+  const now = new Date()
+  const hour = now.getHours()
+  const minute = now.getMinutes()
+  const second = now.getSeconds()
+
+  // Calculate total seconds since midnight
+  const totalSeconds = hour * 3600 + minute * 60 + second
+
+  // Sunrise: 90-second window around 6:00 AM (5:59:15 to 6:00:45)
+  const sunriseStart = 6 * 3600 - 45 // 5:59:15 AM
+  const sunriseEnd = 6 * 3600 + 45   // 6:00:45 AM
+
+  // Sunset: 90-second window around 8:00 PM / 20:00 (19:59:15 to 20:00:45)
+  const sunsetStart = 20 * 3600 - 45 // 7:59:15 PM
+  const sunsetEnd = 20 * 3600 + 45   // 8:00:45 PM
 
   let period: TimeOfDay
   let frequency: number
   let description: string
 
-  if (hour >= 6 && hour < 12) {
+  if (totalSeconds >= sunriseStart && totalSeconds < sunriseEnd) {
+    // Sunrise transition: Alpha waves rising (6-12 Hz sweep)
+    period = 'sunrise'
+    frequency = 9 // 9 Hz - awakening alpha
+    description = 'Rising Alpha waves - awakening'
+  } else if (totalSeconds >= sunsetStart && totalSeconds < sunsetEnd) {
+    // Sunset transition: Alpha to Theta (8-4 Hz descent)
+    period = 'sunset'
+    frequency = 6 // 6 Hz - settling theta
+    description = 'Descending Theta waves - settling'
+  } else if (hour >= 6 && hour < 12) {
     // Morning: Alpha waves (8-13 Hz) - waking up, calm alertness
     period = 'morning'
     frequency = 10 // 10 Hz - middle alpha
@@ -169,7 +207,92 @@ function getTimeContext(weather: any): SoundContext {
     windSpeed: weather?.windSpeed ?? null,
     pressure: weather?.pressure ?? null,
     dailySeed: getDailySeed(),
+    usersOnline,
   }
+}
+
+/**
+ * Helper function to properly clean up all sounds including timeouts
+ */
+function cleanupSounds(sounds: any) {
+  // Clear melody timeout if it exists
+  if (sounds.melodyTimeout) {
+    clearTimeout(sounds.melodyTimeout)
+    sounds.melodyTimeout = null
+  }
+
+  // Clear click symphony interval if it exists
+  if (sounds.clickInterval) {
+    clearInterval(sounds.clickInterval)
+    sounds.clickInterval = null
+  }
+
+  // Stop and dispose all sound objects
+  Object.values(sounds).forEach((sound: any) => {
+    try {
+      // Skip non-sound values like timeout IDs
+      if (sound && typeof sound === 'object' && 'stop' in sound) {
+        sound.stop()
+      }
+      if (sound && typeof sound === 'object' && 'dispose' in sound) {
+        sound.dispose()
+      }
+    } catch (e) {
+      // Ignore disposal errors
+    }
+  })
+}
+
+/**
+ * Create click symphony sound (active site with >5 users)
+ * A rhythmic ratchet/click sound that plays when the site is active
+ */
+function createClickSymphony(Tone: any, sounds: any, context: SoundContext) {
+  if (context.usersOnline <= 5) return
+
+  // Create a noise burst for the click/ratchet sound
+  const clickNoise = new Tone.Noise('white')
+  const clickFilter = new Tone.Filter(3000, 'highpass') // High-pass for crisp click
+  const clickGain = new Tone.Gain(0)
+  const clickEnvelope = new Tone.AmplitudeEnvelope({
+    attack: 0.001,
+    decay: 0.02,
+    sustain: 0,
+    release: 0.01,
+  })
+
+  clickNoise.connect(clickFilter)
+  clickFilter.connect(clickEnvelope)
+  clickEnvelope.connect(clickGain)
+  clickGain.toDestination()
+  clickNoise.start()
+
+  // Trigger clicks at varying intervals (200-600ms)
+  const triggerClick = () => {
+    clickGain.gain.setValueAtTime(0.6, Tone.now())
+    clickEnvelope.triggerAttackRelease(0.03, Tone.now())
+  }
+
+  // Create a rhythmic pattern
+  const scheduleNextClick = () => {
+    // More users = faster clicks
+    const baseInterval = 400
+    const speedFactor = Math.min(context.usersOnline / 10, 2) // Cap at 2x speed
+    const interval = baseInterval / speedFactor + Math.random() * 200
+
+    sounds.clickInterval = setTimeout(() => {
+      triggerClick()
+      scheduleNextClick()
+    }, interval)
+  }
+
+  // Start the click pattern
+  scheduleNextClick()
+
+  sounds.clickNoise = clickNoise
+  sounds.clickFilter = clickFilter
+  sounds.clickGain = clickGain
+  sounds.clickEnvelope = clickEnvelope
 }
 
 /**
@@ -180,7 +303,8 @@ export function useSound(enabled: boolean) {
   const soundsRef = React.useRef<any>({})
   const [isSoundLibLoaded, setIsSoundLibLoaded] = React.useState(false)
   const weather = useStore(stores.weather)
-  const [context, setContext] = React.useState<SoundContext>(() => getTimeContext(weather))
+  const usersOnline = useStore(stores.usersOnline)
+  const [context, setContext] = React.useState<SoundContext>(() => getTimeContext(weather, usersOnline))
   const [currentDate, setCurrentDate] = React.useState(() => new Date().toDateString())
 
   // Load Tone.js library when sound is needed
@@ -199,38 +323,45 @@ export function useSound(enabled: boolean) {
 
     const updateContext = () => {
       const today = new Date().toDateString()
-      const newContext = getTimeContext(weather)
+      const newContext = getTimeContext(weather, usersOnline)
 
-      // Check if day changed or time period changed
-      if (today !== currentDate || newContext.period !== context.period) {
+      // Check if day changed or time period changed or user count changed significantly
+      const userCountChanged = Math.abs(newContext.usersOnline - context.usersOnline) > 0
+      const crossedThreshold = (context.usersOnline <= 5 && newContext.usersOnline > 5) ||
+                               (context.usersOnline > 5 && newContext.usersOnline <= 5)
+
+      if (today !== currentDate || newContext.period !== context.period || crossedThreshold) {
         console.log('📅 Date or time period changed, updating sound context', {
           dateChanged: today !== currentDate,
           periodChanged: newContext.period !== context.period,
+          userCountChanged: crossedThreshold,
           oldDate: currentDate,
           newDate: today,
           oldPeriod: context.period,
           newPeriod: newContext.period,
           oldSeed: context.dailySeed,
-          newSeed: newContext.dailySeed
+          newSeed: newContext.dailySeed,
+          oldUsersOnline: context.usersOnline,
+          newUsersOnline: newContext.usersOnline
         })
         setCurrentDate(today)
         setContext(newContext)
       }
     }
 
-    // Check every minute
-    const interval = setInterval(updateContext, 60000)
+    // Check every 10 seconds to catch sunrise/sunset transitions
+    const interval = setInterval(updateContext, 10000)
     return () => clearInterval(interval)
-  }, [enabled, weather, currentDate, context.period, context.dailySeed])
+  }, [enabled, weather, usersOnline, currentDate, context.period, context.dailySeed, context.usersOnline])
 
-  // Update context when weather changes
+  // Update context when weather or usersOnline changes
   React.useEffect(() => {
     if (!enabled) return
-    const newContext = getTimeContext(weather)
+    const newContext = getTimeContext(weather, usersOnline)
     const today = new Date().toDateString()
     setCurrentDate(today)
     setContext(newContext)
-  }, [weather, enabled])
+  }, [weather, usersOnline, enabled])
 
   React.useEffect(() => {
     // @ts-ignore - Tone.js is loaded via external script
@@ -241,27 +372,42 @@ export function useSound(enabled: boolean) {
         await Tone.start()
         const soundDesc = getSoundDescription(context)
         console.log(`🔊 Sound: On (${soundDesc})`)
-        console.log(`🌊 ${context.period} - ${context.description}`)
+        if (context.period === 'sunrise') {
+          console.log(`🌅 SUNRISE TRANSITION - ${context.description} (90 seconds)`)
+        } else if (context.period === 'sunset') {
+          console.log(`🌇 SUNSET TRANSITION - ${context.description} (90 seconds)`)
+        } else {
+          console.log(`🌊 ${context.period} - ${context.description}`)
+        }
         console.log(`🌦️ Weather: ${context.weather}, ${context.temperature}°C, ${context.humidity}% humidity, ${context.windSpeed}m/s wind, ${context.pressure}hPa`)
+        console.log(`👥 Users online: ${context.usersOnline}${context.usersOnline > 5 ? ' 🎵 Click symphony active!' : ''}`)
         console.log(`🎲 Daily variation seed: ${context.dailySeed.toFixed(3)}`)
         console.log(`📊 Sound context hash:`, JSON.stringify({
           period: context.period,
           weather: context.weather,
           temp: context.temperature,
           humidity: context.humidity,
+          usersOnline: context.usersOnline,
           seed: context.dailySeed.toFixed(3),
           timestamp: new Date().toISOString()
         }))
 
+        // Update sound description in store for UI display
+        stores.soundDescription.set(soundDesc)
+
+        // Save sound description to user metadata for public profile
+        try {
+          await fetch('/api/update-current-sound', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ soundDescription: soundDesc })
+          })
+        } catch (error) {
+          console.error('Failed to update current sound:', error)
+        }
+
         // Clean up existing sounds if context changed
-        Object.values(soundsRef.current).forEach((sound: any) => {
-          try {
-            sound?.stop()
-            sound?.dispose()
-          } catch (e) {
-            // Ignore disposal errors
-          }
-        })
+        cleanupSounds(soundsRef.current)
         soundsRef.current = {}
 
         // Set master volume
@@ -269,6 +415,9 @@ export function useSound(enabled: boolean) {
 
         // Create sounds based on time of day and weather
         switch (context.period) {
+          case 'sunrise':
+            createSunriseSounds(Tone, soundsRef.current, context)
+            break
           case 'morning':
             createMorningSounds(Tone, soundsRef.current, context)
             break
@@ -278,49 +427,187 @@ export function useSound(enabled: boolean) {
           case 'afternoon':
             createAfternoonSounds(Tone, soundsRef.current, context)
             break
+          case 'sunset':
+            createSunsetSounds(Tone, soundsRef.current, context)
+            break
           case 'night':
             createNightSounds(Tone, soundsRef.current, context)
             break
         }
       } else if (isSoundLibLoaded && !enabled) {
-        // Stop all sounds
-        Object.values(soundsRef.current).forEach((sound: any) => {
-          try {
-            sound?.stop()
-          } catch (e) {
-            // Ignore stop errors
-          }
-        })
+        // Stop all sounds including melody timeout
+        cleanupSounds(soundsRef.current)
+        soundsRef.current = {}
         console.log('🔇 Sound stopped')
+
+        // Clear sound description in store
+        stores.soundDescription.set('')
+
+        // Clear sound description from user metadata
+        try {
+          await fetch('/api/update-current-sound', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ soundDescription: null })
+          })
+        } catch (error) {
+          console.error('Failed to clear current sound:', error)
+        }
       }
     })()
 
     return () => {
       // Stop on cleanup
-      Object.values(soundsRef.current).forEach((sound: any) => {
-        try {
-          sound?.stop()
-        } catch (e) {
-          // Ignore
-        }
-      })
+      cleanupSounds(soundsRef.current)
     }
   }, [enabled, isSoundLibLoaded, context])
 
   // Cleanup on unmount
   React.useEffect(() => {
     return () => {
-      Object.values(soundsRef.current).forEach((sound: any) => {
-        try {
-          sound?.stop()
-          sound?.dispose()
-        } catch (e) {
-          // Ignore disposal errors
-        }
-      })
+      cleanupSounds(soundsRef.current)
       soundsRef.current = {}
     }
   }, [])
+}
+
+// Sunrise: 90-second awakening transition with rising bells and harmonics
+function createSunriseSounds(Tone: any, sounds: any, context: SoundContext) {
+  const { frequency, weather, dailySeed } = context
+
+  // Gentle ambient base
+  const ambientVolume = 0.15
+  const ambient = new Tone.Noise('pink')
+  const ambientGain = new Tone.Gain(ambientVolume)
+  ambient.connect(ambientGain)
+  ambientGain.toDestination()
+  ambient.start()
+  sounds.ambient = ambient
+
+  // Rising bell tones - using multiple sine waves for bell-like quality
+  const bellFreqs = [400, 600, 800, 1200] // Bell harmonics
+  bellFreqs.forEach((baseFreq, index) => {
+    const bell = new Tone.Oscillator(baseFreq * (0.95 + dailySeed * 0.1), 'sine')
+    const bellGain = new Tone.Gain(0)
+    const bellEnvelope = new Tone.AmplitudeEnvelope({
+      attack: 15, // Slow 15-second rise
+      decay: 30,
+      sustain: 0.3,
+      release: 30,
+    })
+
+    bell.connect(bellEnvelope)
+    bellEnvelope.connect(bellGain)
+    bellGain.toDestination()
+    bell.start()
+
+    // Stagger the bell attacks
+    const attackTime = Tone.now() + index * 15
+    bellGain.gain.setValueAtTime(0.12 / (index + 1), attackTime)
+    bellEnvelope.triggerAttack(attackTime)
+
+    sounds[`bell${index}`] = bell
+    sounds[`bellEnvelope${index}`] = bellEnvelope
+  })
+
+  // Ascending harmonic sweep
+  const sweep = new Tone.Oscillator(200, 'sine')
+  const sweepGain = new Tone.Gain(0.15)
+  sweep.connect(sweepGain)
+  sweepGain.toDestination()
+  sweep.start()
+
+  // Slowly sweep upward over 90 seconds
+  sweep.frequency.exponentialRampTo(400, 90)
+  sounds.sweep = sweep
+
+  // Pulsating alpha wave (9 Hz modulation)
+  const pulse = new Tone.Oscillator(60, 'sine')
+  const pulseGain = new Tone.Gain(0.25)
+  const pulseModulator = new Tone.LFO(frequency, 0.2, 0.4)
+  pulseModulator.connect(pulseGain.gain)
+  pulse.connect(pulseGain)
+  pulseGain.toDestination()
+  pulse.start()
+  pulseModulator.start()
+  sounds.pulse = pulse
+  sounds.pulseModulator = pulseModulator
+
+  // Add click symphony for active site
+  createClickSymphony(Tone, sounds, context)
+}
+
+// Sunset: 90-second settling transition with descending chimes and drones
+function createSunsetSounds(Tone: any, sounds: any, context: SoundContext) {
+  const { frequency, weather, temperature, dailySeed } = context
+
+  // Warm ambient base
+  const ambientVolume = 0.18
+  const ambient = new Tone.Noise('brown')
+  const ambientFilter = new Tone.Filter(600, 'lowpass')
+  const ambientGain = new Tone.Gain(ambientVolume)
+  ambient.connect(ambientFilter)
+  ambientFilter.connect(ambientGain)
+  ambientGain.toDestination()
+  ambient.start()
+  sounds.ambient = ambient
+
+  // Descending chime tones - settling sounds
+  const chimeFreqs = [1000, 800, 600, 400] // Descending harmonics
+  chimeFreqs.forEach((baseFreq, index) => {
+    const chime = new Tone.Oscillator(baseFreq * (0.95 + dailySeed * 0.1), 'triangle')
+    const chimeGain = new Tone.Gain(0)
+    const chimeEnvelope = new Tone.AmplitudeEnvelope({
+      attack: 20,
+      decay: 35,
+      sustain: 0.2,
+      release: 35,
+    })
+
+    chime.connect(chimeEnvelope)
+    chimeEnvelope.connect(chimeGain)
+    chimeGain.toDestination()
+    chime.start()
+
+    // Stagger the chime attacks
+    const attackTime = Tone.now() + index * 18
+    chimeGain.gain.setValueAtTime(0.1 / (index + 1), attackTime)
+    chimeEnvelope.triggerAttack(attackTime)
+
+    sounds[`chime${index}`] = chime
+    sounds[`chimeEnvelope${index}`] = chimeEnvelope
+  })
+
+  // Descending frequency sweep - settling down
+  const sweep = new Tone.Oscillator(300, 'sine')
+  const sweepGain = new Tone.Gain(0.12)
+  sweep.connect(sweepGain)
+  sweepGain.toDestination()
+  sweep.start()
+
+  // Slowly sweep downward over 90 seconds
+  sweep.frequency.exponentialRampTo(150, 90)
+  sounds.sweep = sweep
+
+  // Settling drone
+  const drone = new Tone.Oscillator(80, 'sine')
+  const droneGain = new Tone.Gain(0)
+  drone.connect(droneGain)
+  droneGain.toDestination()
+  drone.start()
+
+  // Fade in the drone over the 90 seconds
+  droneGain.gain.exponentialRampTo(0.3, 90)
+  sounds.drone = drone
+
+  // Theta wave modulation (6 Hz) - settling relaxation
+  const pulseModulator = new Tone.LFO(frequency, 0.15, 0.35)
+  pulseModulator.connect(droneGain.gain)
+  pulseModulator.start()
+  sounds.pulseModulator = pulseModulator
+
+  // Add click symphony for active site
+  createClickSymphony(Tone, sounds, context)
 }
 
 // Morning: noise, rain, sine (Alpha waves 8-13 Hz) + weather variations
@@ -401,6 +688,9 @@ function createMorningSounds(Tone: any, sounds: any, context: SoundContext) {
   sineModulator.start()
   sounds.sine = sine
   sounds.sineModulator = sineModulator
+
+  // Add click symphony for active site
+  createClickSymphony(Tone, sounds, context)
 }
 
 // Day: bass pulsating (Beta waves 13-30 Hz) + weather variations
@@ -479,6 +769,9 @@ function createDaySounds(Tone: any, sounds: any, context: SoundContext) {
     sounds.shimmer = shimmer
     sounds.shimmerModulator = shimmerModulator
   }
+
+  // Add click symphony for active site
+  createClickSymphony(Tone, sounds, context)
 }
 
 // Afternoon: noise, deep bass, random sine melody (Alpha/Theta 4-13 Hz) + weather variations
@@ -575,6 +868,9 @@ function createAfternoonSounds(Tone: any, sounds: any, context: SoundContext) {
   }
   playRandomNote()
   sounds.synth = synth
+
+  // Add click symphony for active site
+  createClickSymphony(Tone, sounds, context)
 }
 
 // Night: bass, noise, pulsating (Theta/Delta 0.5-8 Hz) + weather variations
@@ -678,4 +974,7 @@ function createNightSounds(Tone: any, sounds: any, context: SoundContext) {
     sounds.crystal = crystal
     sounds.crystalModulator = crystalModulator
   }
+
+  // Add click symphony for active site
+  createClickSymphony(Tone, sounds, context)
 }

@@ -17,6 +17,12 @@ export function MemoryWidget() {
 
   const { mutate: createMemory } = useCreateMemory({
     onSuccess: ({ response }) => {
+      // World generation disabled to reduce server costs
+      // fetch('/api/world/generate-element', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' }
+      // }).catch(err => console.error('World generation error:', err))
+
       setIsQuestionShown(false)
       setTimeout(() => {
         setQuestion(null)

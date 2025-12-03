@@ -19,6 +19,7 @@ import config from '#server/config'
 import authRoutes from './routes/auth.js'
 import apiRoutes from './routes/api.js'
 import adminApiRoutes from './routes/admin-api.js'
+import publicApiRoutes from './routes/public-api.js'
 
 const CWD = process.cwd()
 
@@ -111,8 +112,29 @@ if (config.env === 'production') {
   })
 }
 
+// Global request logger for debugging
+fastify.addHook('onRequest', async (req, reply) => {
+  if (req.url.startsWith('/u/')) {
+    console.log('[GLOBAL] Request to:', req.method, req.url)
+  }
+})
+
 // Database
 fastify.addHook('onClose', () => sequelize.close())
+
+// Public profile route - ABSOLUTE TOP LEVEL - NO AUTHENTICATION
+// Must be registered before ANY other routes to avoid conflicts
+fastify.get('/u/:userIdOrUsername', async function (req, reply) {
+  const { userIdOrUsername } = req.params as { userIdOrUsername: string }
+  console.log('[PUBLIC-PROFILE] ✓ Route hit for:', userIdOrUsername)
+  console.log('[PUBLIC-PROFILE] CSP nonces:', reply.cspNonce)
+
+  return reply.view('generic-spa', {
+    scriptName: 'public-profile',
+    scriptNonce: reply.cspNonce.script,
+    styleNonce: reply.cspNonce.style,
+  })
+})
 
 // Routes
 fastify.register(async (fastify: FastifyInstance) => {
@@ -147,8 +169,9 @@ fastify.register(async (fastify: FastifyInstance) => {
       }
     })
 
-    // Public API
+    // Public API (no authentication required)
     fastify.register(authRoutes, { prefix: '/auth' })
+    fastify.register(publicApiRoutes, { prefix: '/api/public' })
 
     // User API
     fastify.register(async (fastify) => {
@@ -174,6 +197,8 @@ fastify.register(async (fastify: FastifyInstance) => {
 
     // Client app / index page
     fastify.register(async (fastify) => {
+      // Note: Public profile route /u/:userIdOrUsername is at top level (line 127)
+
       KNOWN_CLIENT_ROUTES.forEach((route) => {
         fastify.get(route, async function (req, reply) {
           if (req.user) {
@@ -245,9 +270,16 @@ fastify.setErrorHandler((error, req, reply) => {
 })
 
 fastify.setNotFoundHandler(async (req, res) => {
+  console.log('[NOT-FOUND] URL:', req.url)
+  console.log('[NOT-FOUND] Method:', req.method)
+  console.log('[NOT-FOUND] Headers Accept:', req.headers.accept)
+  console.log('[NOT-FOUND] Is HTML request:', req.headers.accept?.includes('text/html'))
+
   if (req.headers.accept?.includes('text/html')) {
+    console.log('[NOT-FOUND] Redirecting HTML request to /')
     return res.redirect('/')
   }
+  console.log('[NOT-FOUND] Returning 404')
   res.code(404).send('Not found')
 })
 

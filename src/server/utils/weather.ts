@@ -30,7 +30,7 @@ export async function getWeather(
         longitude: lon,
         current: 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,surface_pressure',
         daily: 'sunrise,sunset',
-        timezone: 'UTC', // Use UTC to avoid timezone ambiguity in parsing
+        timezone: 'auto', // Use location's actual timezone for correct sunrise/sunset times
       },
     }
   )
@@ -42,18 +42,32 @@ export async function getWeather(
   const tempCelsius = current.temperature_2m ?? null
   const tempKelvin = tempCelsius !== null ? tempCelsius + 273.15 : null
 
-  // Parse sunrise/sunset times (API returns them in UTC)
+  // Parse sunrise/sunset times (API returns them in location's local timezone)
   const sunriseStr = daily.sunrise?.[0]
   const sunsetStr = daily.sunset?.[0]
+  const utcOffsetSeconds = data.utc_offset_seconds
 
-  // Convert to Unix timestamp (seconds) - parse as UTC
-  const sunriseUnix = sunriseStr ? Date.parse(sunriseStr + 'Z') / 1000 : null
-  const sunsetUnix = sunsetStr ? Date.parse(sunsetStr + 'Z') / 1000 : null
+  // Convert to Unix timestamp (seconds)
+  // Strategy: Parse as UTC (by adding 'Z'), then adjust for the location's timezone offset
+  // Example: "16:45" in PST (UTC-8) means "00:45 UTC next day"
+  //   - Parse "16:45Z" → Unix time for 16:45 UTC
+  //   - Subtract offset (-28800) → adds 8 hours → correct Unix time for 16:45 PST
+  const sunriseUnix = sunriseStr
+    ? (Date.parse(sunriseStr + 'Z') / 1000) - utcOffsetSeconds
+    : null
+  const sunsetUnix = sunsetStr
+    ? (Date.parse(sunsetStr + 'Z') / 1000) - utcOffsetSeconds
+    : null
 
   console.log('[Weather API] Sunset debug:', {
+    timezone: data.timezone,
+    timezoneAbbr: data.timezone_abbreviation,
+    utcOffsetSeconds,
+    utcOffsetHours: utcOffsetSeconds / 3600,
     sunsetStr,
     sunsetUnix,
-    sunsetDate: sunsetStr ? new Date(sunsetStr).toString() : null,
+    sunsetDateUTC: sunsetUnix ? new Date(sunsetUnix * 1000).toISOString() : null,
+    sunsetDateLocal: sunsetUnix ? new Date(sunsetUnix * 1000).toString() : null,
     lat,
     lon
   })
@@ -142,6 +156,9 @@ export async function getCoordinates(
 interface OpenMeteoWeatherResponse {
   latitude: number
   longitude: number
+  timezone: string
+  timezone_abbreviation: string
+  utc_offset_seconds: number
   current: {
     temperature_2m: number
     relative_humidity_2m: number

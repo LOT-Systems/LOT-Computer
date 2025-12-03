@@ -21,6 +21,34 @@ export type UserSettings = {
   hideActivityLogs: boolean;
 };
 
+export type UserPrivacySettings = {
+  isPublicProfile: boolean;
+  showWeather: boolean;
+  showLocalTime: boolean;
+  showCity: boolean;
+  showSound: boolean;
+  showMemoryStory: boolean;
+  customUrl?: string | null;
+};
+
+export type WorldElement = {
+  id: string;
+  type: 'object' | 'creature' | 'plant' | 'structure' | 'weather-effect';
+  imageUrl: string;
+  prompt: string;
+  position: { x: number; y: number; z: number };
+  scale: number;
+  rotation: number;
+  generatedAt: Date;
+  context: string; // Short description of what influenced this element
+};
+
+export type UserWorld = {
+  elements: WorldElement[];
+  lastGenerated: Date | null;
+  theme: string; // Overall world theme derived from user context
+};
+
 export type UserProfile = {
   id: string;
   email: string;
@@ -68,6 +96,7 @@ export type LogEvent =
   | 'user_login'
   | 'user_logout'
   | 'settings_change'
+  | 'theme_change'
   | 'weather_update'
   | 'note'
   | 'other';
@@ -167,6 +196,19 @@ export type WeatherResponse = {
   country: string;
   weather: Record<string, any> | null;
   createdAt: Date;
+};
+
+// Public Profile Type
+export type PublicProfile = {
+  firstName: string | null;
+  lastName: string | null;
+  city: string | null;
+  country: string | null;
+  localTime?: string;
+  weather?: Weather;
+  soundDescription?: string;
+  memoryStory?: string;
+  privacySettings: UserPrivacySettings;
 };
 
 // Other Types
