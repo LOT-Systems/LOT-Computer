@@ -122,26 +122,25 @@ fastify.addHook('onRequest', async (req, reply) => {
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 
-// Public profile route - ABSOLUTE TOP LEVEL - NO AUTHENTICATION
-// Must be registered before ANY other routes to avoid conflicts
-fastify.get('/u/:userIdOrUsername', async function (req, reply) {
-  const { userIdOrUsername } = req.params as { userIdOrUsername: string }
-  console.log('[PUBLIC-PROFILE] ✓ Route hit for:', userIdOrUsername)
-  console.log('[PUBLIC-PROFILE] CSP nonces:', reply.cspNonce)
-
-  return reply.view('generic-spa', {
-    scriptName: 'public-profile',
-    scriptNonce: reply.cspNonce.script,
-    styleNonce: reply.cspNonce.style,
-  })
-})
-
 // Routes
 fastify.register(async (fastify: FastifyInstance) => {
   fastify.decorate('models', models)
   fastify.decorate('sequelize', sequelize)
   fastify.decorateReply('ok', okReplyDecorator)
   fastify.decorateReply('throw', throwReplyDecorator)
+
+  // Public profile route - NO AUTHENTICATION REQUIRED
+  // Registered here to have access to decorators but BEFORE auth hooks
+  fastify.get('/u/:userIdOrUsername', async function (req, reply) {
+    const { userIdOrUsername } = req.params as { userIdOrUsername: string }
+    console.log('[PUBLIC-PROFILE] ✓ Route hit for:', userIdOrUsername)
+
+    return reply.view('generic-spa', {
+      scriptName: 'public-profile',
+      scriptNonce: reply.cspNonce.script,
+      styleNonce: reply.cspNonce.style,
+    })
+  })
 
   fastify.register(async (fastify) => {
     fastify.decorateReply('user', null)
@@ -197,8 +196,6 @@ fastify.register(async (fastify: FastifyInstance) => {
 
     // Client app / index page
     fastify.register(async (fastify) => {
-      // Note: Public profile route /u/:userIdOrUsername is at top level (line 127)
-
       KNOWN_CLIENT_ROUTES.forEach((route) => {
         fastify.get(route, async function (req, reply) {
           if (req.user) {
