@@ -197,36 +197,6 @@ export const Settings = () => {
     }
   }, [privacySettings])
 
-  const handleCopyLink = React.useCallback((e?: React.MouseEvent) => {
-    e?.preventDefault()
-    e?.stopPropagation()
-
-    const link = `${window.location.origin}/u/${privacySettings.customUrl || me?.id}`
-
-    // Immediate fallback method - most reliable
-    try {
-      const textarea = document.createElement('textarea')
-      textarea.value = link
-      textarea.style.position = 'fixed'
-      textarea.style.left = '-9999px'
-      textarea.style.top = '0'
-      document.body.appendChild(textarea)
-      textarea.focus()
-      textarea.select()
-
-      const successful = document.execCommand('copy')
-      document.body.removeChild(textarea)
-
-      if (successful) {
-        console.log('✓ Link copied:', link)
-      } else {
-        console.error('✗ Copy failed')
-      }
-    } catch (err) {
-      console.error('✗ Copy error:', err)
-    }
-  }, [privacySettings.customUrl, me?.id])
-
   // Log theme change to server
   const logThemeChange = React.useCallback(async (themeData: {
     theme: string
@@ -448,21 +418,11 @@ export const Settings = () => {
 
             <div className="mb-8">
               <Block label="Your public link:" blockView>
-                <div className="flex items-center gap-x-8">
-                  <code className="text-acc/80 text-sm">
-                    {window.location.origin}/u/{privacySettings.customUrl || me?.id}
-                  </code>
-                  <Button
-                    type="button"
-                    kind="secondary"
-                    size="small"
-                    onClick={handleCopyLink}
-                  >
-                    Copy
-                  </Button>
+                <div className="text-acc/80">
+                  {window.location.origin}/u/{privacySettings.customUrl || me?.id}
                 </div>
                 {!privacySettings.isPublicProfile && (
-                  <div className="text-acc/60 text-sm mt-2">
+                  <div className="text-acc/60 mt-2">
                     Enable public profile to make this link accessible
                   </div>
                 )}
