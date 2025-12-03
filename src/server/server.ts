@@ -122,6 +122,78 @@ fastify.addHook('onRequest', async (req, reply) => {
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 
+// ==============================================================================
+// PUBLIC PROFILE ROUTES - ABSOLUTE TOP LEVEL - HIGHEST PRIORITY
+// These MUST be registered before ANY other routes to avoid conflicts
+// ==============================================================================
+
+// Diagnostic test route
+fastify.get('/u/test-route-works', async function (req, reply) {
+  console.log('[DIAGNOSTIC] Test route hit!')
+  reply.type('text/html')
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head><title>Route Test</title></head>
+      <body style="font-family: monospace; padding: 40px;">
+        <h1 style="color: green;">✓ Route is working!</h1>
+        <p>Timestamp: ${new Date().toISOString()}</p>
+        <p>The /u/ route is being matched correctly.</p>
+      </body>
+    </html>
+  `
+})
+
+// Public profile route
+fastify.get('/u/:userIdOrUsername', async function (req, reply) {
+  const { userIdOrUsername } = req.params as { userIdOrUsername: string }
+  console.log('[PUBLIC-PROFILE-ROUTE] ✓✓✓ Route hit for:', userIdOrUsername)
+  console.log('[PUBLIC-PROFILE-ROUTE] Request URL:', req.url)
+  console.log('[PUBLIC-PROFILE-ROUTE] Request method:', req.method)
+
+  reply.type('text/html')
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Public Profile - ${userIdOrUsername}</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+      </head>
+      <body style="font-family: -apple-system, system-ui, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto;">
+        <h1 style="color: green;">✓ Route Matched!</h1>
+        <p><strong>User:</strong> ${userIdOrUsername}</p>
+        <p><strong>Time:</strong> ${new Date().toISOString()}</p>
+        <hr>
+        <div id="result" style="margin-top: 20px;"></div>
+        <script>
+          console.log('Fetching profile for: ${userIdOrUsername}');
+          fetch('/api/public/profile/${userIdOrUsername}')
+            .then(res => res.json())
+            .then(data => {
+              console.log('Profile data:', data);
+              document.getElementById('result').innerHTML =
+                '<div style="background: #e8f5e9; padding: 20px; border-radius: 8px;">' +
+                '<h3 style="color: green;">✓ Profile Data:</h3>' +
+                '<pre>' + JSON.stringify(data, null, 2) + '</pre></div>';
+            })
+            .catch(err => {
+              console.error('Error:', err);
+              document.getElementById('result').innerHTML =
+                '<div style="background: #ffebee; padding: 20px; border-radius: 8px;">' +
+                '<h3 style="color: red;">✗ Error:</h3>' +
+                '<p>' + err.message + '</p></div>';
+            });
+        </script>
+      </body>
+    </html>
+  `
+})
+
+// ==============================================================================
+// END PUBLIC PROFILE ROUTES
+// ==============================================================================
+
 // Routes
 fastify.register(async (fastify: FastifyInstance) => {
   fastify.decorate('models', models)
@@ -183,76 +255,7 @@ fastify.register(async (fastify: FastifyInstance) => {
 
     // Client app / index page
     fastify.register(async (fastify) => {
-      // DIAGNOSTIC: Simple test route to verify routing works
-      fastify.get('/u/test-route-works', async function (req, reply) {
-        reply.type('text/html')
-        return `
-          <!DOCTYPE html>
-          <html>
-            <head><title>Route Test</title></head>
-            <body style="font-family: monospace; padding: 40px; max-width: 800px; margin: 0 auto;">
-              <h1 style="color: green;">✓ Route is working!</h1>
-              <p>The /u/ route is being matched correctly by the server.</p>
-              <p>Timestamp: ${new Date().toISOString()}</p>
-              <hr>
-              <p><strong>Next step:</strong> Visit your actual profile URL: /u/YOUR_USER_ID</p>
-            </body>
-          </html>
-        `
-      })
-
-      // Public profile route - MUST be registered FIRST for route priority
-      // This is a public route - no authentication required
-      fastify.get('/u/:userIdOrUsername', async function (req, reply) {
-        const { userIdOrUsername } = req.params as { userIdOrUsername: string }
-        console.log('[PUBLIC-PROFILE] ✓ Route hit for:', userIdOrUsername)
-        console.log('[PUBLIC-PROFILE] Auth status:', !!req.user)
-
-        // TEMPORARY: Return plain HTML to diagnose routing issue
-        // This bypasses JavaScript bundle loading entirely
-        reply.type('text/html')
-        return `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <title>Public Profile - ${userIdOrUsername}</title>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1">
-            </head>
-            <body style="font-family: -apple-system, system-ui, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; line-height: 1.6;">
-              <h1 style="color: green;">✓ Public Profile Route Working!</h1>
-              <p><strong>User ID/Username:</strong> ${userIdOrUsername}</p>
-              <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
-              <p><strong>Authenticated:</strong> ${!!req.user ? 'Yes' : 'No (expected for public profile)'}</p>
-              <hr>
-              <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <h3>Diagnosis:</h3>
-                <p style="color: green; font-weight: bold;">✓ Server route is matching correctly</p>
-                <p style="color: green; font-weight: bold;">✓ No authentication required</p>
-                <p>Next: Will fetch profile data from API...</p>
-              </div>
-              <script>
-                // Fetch actual profile data
-                console.log('Fetching profile data for: ${userIdOrUsername}');
-                fetch('/api/public/profile/${userIdOrUsername}')
-                  .then(res => {
-                    console.log('API Response status:', res.status);
-                    return res.json();
-                  })
-                  .then(data => {
-                    console.log('Profile data:', data);
-                    document.body.innerHTML += '<div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin-top: 20px;"><h3 style="color: green;">✓ API Data Retrieved:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre></div>';
-                  })
-                  .catch(err => {
-                    console.error('API Error:', err);
-                    document.body.innerHTML += '<div style="background: #ffebee; padding: 20px; border-radius: 8px; margin-top: 20px;"><h3 style="color: red;">✗ API Error:</h3><p>' + err.message + '</p><p>Check browser console for details</p></div>';
-                  });
-              </script>
-              <p style="margin-top: 40px;"><a href="/">← Back to home</a></p>
-            </body>
-          </html>
-        `
-      })
+      // Note: /u/ routes are registered at top level (lines 131-191)
 
       KNOWN_CLIENT_ROUTES.forEach((route) => {
         fastify.get(route, async function (req, reply) {
