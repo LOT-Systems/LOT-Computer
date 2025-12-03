@@ -122,64 +122,12 @@ fastify.addHook('onRequest', async (req, reply) => {
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 
-// DIAGNOSTIC ROUTES - Testing route registration
-// Route 1: Simple JSON (no templates, no HTML)
-fastify.get('/api/test-route', async function (req, reply) {
-  console.log('[TEST-JSON] JSON test route hit!')
-  return {
-    success: true,
-    message: 'JSON route works!',
-    url: req.url,
-    timestamp: new Date().toISOString()
-  }
-})
-
-// Route 2: Simple static route to verify routing works
-fastify.get('/test-public-route', async function (req, reply) {
-  console.log('[TEST-HTML] Simple test route hit!')
-  reply.type('text/html')
-  reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  reply.header('X-Test-Route', 'hit')
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head><title>Test Route</title></head>
-    <body style="font-family: system-ui; padding: 40px;">
-      <h1 style="color: green;">✓ TEST ROUTE WORKS!</h1>
-      <p>If you see this, routing is functioning correctly.</p>
-      <p>URL: ${req.url}</p>
-      <p>Time: ${new Date().toISOString()}</p>
-    </body>
-    </html>
-  `
-})
-
 // Routes
 fastify.register(async (fastify: FastifyInstance) => {
   fastify.decorate('models', models)
   fastify.decorate('sequelize', sequelize)
   fastify.decorateReply('ok', okReplyDecorator)
   fastify.decorateReply('throw', throwReplyDecorator)
-
-  // PUBLIC PROFILE ROUTE - Register here to have access to decorators but NO auth
-  fastify.get('/u/:userIdOrUsername', async function (req, reply) {
-    const { userIdOrUsername } = req.params as { userIdOrUsername: string }
-    console.log('[PUBLIC-PROFILE] Route hit for:', userIdOrUsername)
-
-    reply.type('text/html')
-    reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
-    return `<!DOCTYPE html>
-<html>
-<head><title>Public Profile - ${userIdOrUsername}</title></head>
-<body style="font-family:system-ui;padding:40px;max-width:600px;margin:0 auto">
-  <h1 style="color:#2563eb">✓ Profile Route Hit!</h1>
-  <p><strong>User:</strong> ${userIdOrUsername}</p>
-  <p><strong>URL:</strong> ${req.url}</p>
-  <p><strong>Time:</strong> ${new Date().toISOString()}</p>
-  <p>This route is working! Ready for real SPA.</p>
-</body>
-</html>`
-  })
 
   fastify.register(async (fastify) => {
     fastify.decorateReply('user', null)
@@ -249,6 +197,15 @@ fastify.register(async (fastify: FastifyInstance) => {
             scriptNonce: reply.cspNonce.script,
             styleNonce: reply.cspNonce.style,
           })
+        })
+      })
+
+      // Public profile page - no authentication required
+      fastify.get('/u/:userIdOrUsername', async function (req, reply) {
+        return reply.view('generic-spa', {
+          scriptName: 'public-profile',
+          scriptNonce: reply.cspNonce.script,
+          styleNonce: reply.cspNonce.style,
         })
       })
     })
