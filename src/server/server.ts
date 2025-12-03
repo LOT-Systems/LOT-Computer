@@ -183,6 +183,24 @@ fastify.register(async (fastify: FastifyInstance) => {
 
     // Client app / index page
     fastify.register(async (fastify) => {
+      // DIAGNOSTIC: Simple test route to verify routing works
+      fastify.get('/u/test-route-works', async function (req, reply) {
+        reply.type('text/html')
+        return `
+          <!DOCTYPE html>
+          <html>
+            <head><title>Route Test</title></head>
+            <body style="font-family: monospace; padding: 40px; max-width: 800px; margin: 0 auto;">
+              <h1 style="color: green;">✓ Route is working!</h1>
+              <p>The /u/ route is being matched correctly by the server.</p>
+              <p>Timestamp: ${new Date().toISOString()}</p>
+              <hr>
+              <p><strong>Next step:</strong> Visit your actual profile URL: /u/YOUR_USER_ID</p>
+            </body>
+          </html>
+        `
+      })
+
       // Public profile route - MUST be registered FIRST for route priority
       // This is a public route - no authentication required
       fastify.get('/u/:userIdOrUsername', async function (req, reply) {
