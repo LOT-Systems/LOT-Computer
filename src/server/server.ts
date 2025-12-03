@@ -183,6 +183,16 @@ fastify.register(async (fastify: FastifyInstance) => {
 
     // Client app / index page
     fastify.register(async (fastify) => {
+      // Public profile route - MUST be registered FIRST before catch-all routes
+      fastify.get('/u/:userIdOrUsername', async function (req, reply) {
+        console.log('[PUBLIC-PROFILE-ROUTE] Hit! User:', req.params.userIdOrUsername)
+        return reply.view('generic-spa', {
+          scriptName: 'public-profile',
+          scriptNonce: reply.cspNonce.script,
+          styleNonce: reply.cspNonce.style,
+        })
+      })
+
       KNOWN_CLIENT_ROUTES.forEach((route) => {
         fastify.get(route, async function (req, reply) {
           if (req.user) {
@@ -197,15 +207,6 @@ fastify.register(async (fastify: FastifyInstance) => {
             scriptNonce: reply.cspNonce.script,
             styleNonce: reply.cspNonce.style,
           })
-        })
-      })
-
-      // Public profile page - no authentication required
-      fastify.get('/u/:userIdOrUsername', async function (req, reply) {
-        return reply.view('generic-spa', {
-          scriptName: 'public-profile',
-          scriptNonce: reply.cspNonce.script,
-          styleNonce: reply.cspNonce.style,
         })
       })
     })
