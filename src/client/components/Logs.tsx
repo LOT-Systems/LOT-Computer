@@ -51,7 +51,7 @@ export const Logs: React.FC = () => {
     (id: string) => (text: string) => {
       updateLog({ id, text })
     },
-    [logById]
+    [updateLog]
   )
 
   const [recentLogId, pastLogIds] = React.useMemo(() => {
