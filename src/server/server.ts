@@ -122,12 +122,15 @@ fastify.addHook('onRequest', async (req, reply) => {
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 
-// Public profile route - NO AUTHENTICATION REQUIRED
-// Must be registered BEFORE any authentication logic
+// Routes
 fastify.register(async (fastify: FastifyInstance) => {
   fastify.decorate('models', models)
   fastify.decorate('sequelize', sequelize)
+  fastify.decorateReply('ok', okReplyDecorator)
+  fastify.decorateReply('throw', throwReplyDecorator)
 
+  // Public profile route - NO AUTHENTICATION REQUIRED
+  // Registered at root level of this block, BEFORE authentication sub-block
   fastify.get('/u/:userIdOrUsername', async function (req, reply) {
     const { userIdOrUsername } = req.params as { userIdOrUsername: string }
     console.log('[PUBLIC-PROFILE] Route hit for:', userIdOrUsername)
@@ -136,18 +139,8 @@ fastify.register(async (fastify: FastifyInstance) => {
       scriptName: 'public-profile',
       scriptNonce: reply.cspNonce.script,
       styleNonce: reply.cspNonce.style,
-      appName: config.appName,
-      appDescription: config.appDescription,
     })
   })
-})
-
-// Routes
-fastify.register(async (fastify: FastifyInstance) => {
-  fastify.decorate('models', models)
-  fastify.decorate('sequelize', sequelize)
-  fastify.decorateReply('ok', okReplyDecorator)
-  fastify.decorateReply('throw', throwReplyDecorator)
 
   fastify.register(async (fastify) => {
     fastify.decorateReply('user', null)
@@ -203,8 +196,8 @@ fastify.register(async (fastify: FastifyInstance) => {
 
     // Client app / index page
     fastify.register(async (fastify) => {
-      // Note: Public profile route /u/:userIdOrUsername is registered at top level (line 131)
-      // to avoid authentication requirements
+      // Note: Public profile route /u/:userIdOrUsername is registered at line 134
+      // outside this auth context to avoid authentication requirements
 
       KNOWN_CLIENT_ROUTES.forEach((route) => {
         fastify.get(route, async function (req, reply) {
