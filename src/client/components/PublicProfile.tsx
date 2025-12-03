@@ -10,6 +10,7 @@ export const PublicProfile = () => {
   const [profile, setProfile] = React.useState<PublicProfileType | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
+  const [debugInfo, setDebugInfo] = React.useState<any>(null)
 
   // Get user ID or username from URL
   const userIdOrUsername = React.useMemo(() => {
@@ -42,6 +43,10 @@ export const PublicProfile = () => {
         if (!res.ok) {
           const data = await res.json().catch(() => ({ message: `HTTP ${res.status}` }))
           console.error('[PublicProfile] Error response:', data)
+          // Capture debug info if available
+          if (data.debug) {
+            setDebugInfo(data.debug)
+          }
           throw new Error(data.message || 'Failed to load profile')
         }
         return res.json()
@@ -69,9 +74,27 @@ export const PublicProfile = () => {
   if (error || !profile) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
+        <div className="text-center max-w-2xl px-8">
           <div className="text-xl mb-4">{error || 'Profile not found'}</div>
-          <GhostButton href="/">← Back to home</GhostButton>
+          {debugInfo && (
+            <div className="mt-8 text-left bg-acc/5 p-4 rounded text-sm">
+              <div className="font-bold mb-2">Debug Information:</div>
+              <div className="mb-2">User ID: {debugInfo.userId}</div>
+              <div className="mb-2">Has Metadata: {debugInfo.hasMetadata ? 'Yes' : 'No'}</div>
+              <div className="mb-2">Has Privacy Settings: {debugInfo.hasPrivacy ? 'Yes' : 'No'}</div>
+              {debugInfo.privacySettings && (
+                <div className="mt-4">
+                  <div className="font-bold mb-1">Privacy Settings:</div>
+                  <pre className="text-xs overflow-auto">
+                    {JSON.stringify(debugInfo.privacySettings, null, 2)}
+                  </pre>
+                </div>
+              )}
+            </div>
+          )}
+          <div className="mt-8">
+            <GhostButton href="/">← Back to home</GhostButton>
+          </div>
         </div>
       </div>
     )

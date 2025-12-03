@@ -590,12 +590,14 @@ export default async (fastify: FastifyInstance) => {
     Params: { userIdOrUsername: string }
   }>('/profile/:userIdOrUsername', async (req, reply) => {
     const { userIdOrUsername } = req.params
+    console.log('[PUBLIC-PROFILE-API] Fetching profile for:', userIdOrUsername)
 
     try {
       // Try to find user by ID or custom URL
       let user = await models.User.findOne({
         where: { id: userIdOrUsername }
       })
+      console.log('[PUBLIC-PROFILE-API] User found by ID:', !!user)
 
       // If not found by ID, try custom URL in metadata
       if (!user) {
@@ -603,9 +605,11 @@ export default async (fastify: FastifyInstance) => {
         user = users.find(u =>
           u.metadata?.privacy?.customUrl === userIdOrUsername
         ) || null
+        console.log('[PUBLIC-PROFILE-API] User found by custom URL:', !!user)
       }
 
       if (!user) {
+        console.log('[PUBLIC-PROFILE-API] ❌ User not found')
         return reply.code(404).send({
           error: 'User not found',
           message: 'No public profile exists for this user'
@@ -621,14 +625,25 @@ export default async (fastify: FastifyInstance) => {
         showSound: true,
         showMemoryStory: true,
       }
+      console.log('[PUBLIC-PROFILE-API] Privacy settings:', JSON.stringify(privacy, null, 2))
+      console.log('[PUBLIC-PROFILE-API] isPublicProfile:', privacy.isPublicProfile)
 
       // Check if profile is public
       if (!privacy.isPublicProfile) {
+        console.log('[PUBLIC-PROFILE-API] ❌ Profile is private')
         return reply.code(403).send({
           error: 'Profile is private',
-          message: 'This user has not enabled their public profile'
+          message: 'This user has not enabled their public profile',
+          debug: {
+            userId: user.id,
+            hasMetadata: !!user.metadata,
+            hasPrivacy: !!user.metadata?.privacy,
+            privacySettings: privacy
+          }
         })
       }
+
+      console.log('[PUBLIC-PROFILE-API] ✓ Profile is public, building response')
 
       // Build public profile response
       const profile: any = {
