@@ -221,6 +221,15 @@ const NoteEditor = ({
   // Track if there are unsaved changes
   const hasUnsavedChanges = value !== log.text
 
+  // Post handler - get current value directly from textarea
+  const handlePost = React.useCallback(() => {
+    const textarea = containerRef.current?.querySelector('textarea')
+    const currentValue = textarea?.value || value
+    if (currentValue && currentValue.trim()) {
+      onChange(currentValue)
+    }
+  }, [value, onChange])
+
   // Autosave ONLY for old logs (primary log uses Post button exclusively)
   React.useEffect(() => {
     if (primary) return // Primary log: NO autosave, use Post button only
@@ -337,12 +346,7 @@ const NoteEditor = ({
 
       <div className="max-w-[700px]" ref={containerRef}>
         {primary ? (
-          <form
-            onSubmit={(ev) => {
-              ev.preventDefault()
-              onChange(value)
-            }}
-          >
+          <>
             <ResizibleGhostInput
               direction="v"
               value={value}
@@ -354,15 +358,14 @@ const NoteEditor = ({
             />
             <div className="mt-4">
               <Button
-                type="submit"
+                onClick={handlePost}
                 kind="secondary"
                 size="small"
-                disabled={!value.trim()}
               >
                 Post
               </Button>
             </div>
-          </form>
+          </>
         ) : (
           <ResizibleGhostInput
             direction="v"
