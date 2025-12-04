@@ -221,12 +221,6 @@ const NoteEditor = ({
   // Track if there are unsaved changes
   const hasUnsavedChanges = value !== log.text
 
-  // Post handler - immediately save without any conditions
-  const handlePost = React.useCallback(() => {
-    if (!value || !value.trim()) return // Don't save empty values
-    onChange(value)
-  }, [value, onChange])
-
   // Autosave ONLY for old logs (primary log uses Post button exclusively)
   React.useEffect(() => {
     if (primary) return // Primary log: NO autosave, use Post button only
@@ -346,7 +340,7 @@ const NoteEditor = ({
           <form
             onSubmit={(ev) => {
               ev.preventDefault()
-              handlePost()
+              onChange(value)
             }}
           >
             <ResizibleGhostInput
@@ -363,6 +357,7 @@ const NoteEditor = ({
                 type="submit"
                 kind="secondary"
                 size="small"
+                disabled={!value.trim()}
               >
                 Post
               </Button>
