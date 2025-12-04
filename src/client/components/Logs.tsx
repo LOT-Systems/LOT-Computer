@@ -214,31 +214,21 @@ const NoteEditor = ({
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null)
 
-  // For primary log, use direct mutation instead of relying on onChange prop
-  const { mutate: updateLogDirect } = useUpdateLog({
-    onSuccess: (updatedLog) => {
-      // Update local state on success
-      const logById = localStore.logById.get()
-      localStore.logById.set({
-        ...logById,
-        [updatedLog.id]: updatedLog,
-      })
-    },
-  })
-
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
   const debouncedValue = useDebounce(value, 800)
 
-  // Track if there are unsaved changes
-  const hasUnsavedChanges = value !== log.text
+  // Direct mutation for Post button (primary log only)
+  const { mutate: saveLog } = useUpdateLog()
 
-  // Post handler - call mutation directly for primary log
-  const handlePost = React.useCallback(() => {
-    if (primary && value.trim()) {
-      updateLogDirect({ id: log.id, text: value })
-    }
-  }, [primary, value, log.id, updateLogDirect])
+  // Post handler - exactly like Sync's onSubmitMessage
+  const onPost = React.useCallback(
+    (ev?: React.FormEvent) => {
+      ev?.preventDefault()
+      saveLog({ id: log.id, text: value })
+    },
+    [value, log.id, saveLog]
+  )
 
   // Autosave ONLY for old logs (primary log uses Post button exclusively)
   React.useEffect(() => {
@@ -356,7 +346,7 @@ const NoteEditor = ({
 
       <div className="max-w-[700px]" ref={containerRef}>
         {primary ? (
-          <>
+          <form onSubmit={onPost}>
             <ResizibleGhostInput
               direction="v"
               value={value}
@@ -368,14 +358,15 @@ const NoteEditor = ({
             />
             <div className="mt-4">
               <Button
-                onClick={handlePost}
+                type="submit"
                 kind="secondary"
                 size="small"
+                disabled={!value.trim()}
               >
                 Post
               </Button>
             </div>
-          </>
+          </form>
         ) : (
           <ResizibleGhostInput
             direction="v"
