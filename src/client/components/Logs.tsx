@@ -216,26 +216,6 @@ const NoteEditor = ({
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
-  const debouncedValue = useDebounce(value, 800)
-
-  // Direct mutation for Post button (primary log only)
-  const { mutate: saveLog } = useUpdateLog()
-
-  // Post handler - exactly like Sync's onSubmitMessage
-  const onPost = React.useCallback(
-    (ev?: React.FormEvent) => {
-      ev?.preventDefault()
-      saveLog({ id: log.id, text: value })
-    },
-    [value, log.id, saveLog]
-  )
-
-  // Autosave ONLY for old logs (primary log uses Post button exclusively)
-  React.useEffect(() => {
-    if (primary) return // Primary log: NO autosave, use Post button only
-    if (log.text === debouncedValue) return
-    onChange(debouncedValue)
-  }, [debouncedValue, onChange, primary, log.text])
 
   // Sync local state when log updates from server
   React.useEffect(() => {
@@ -249,34 +229,24 @@ const NoteEditor = ({
     textarea.addEventListener('blur', () => setIsFocused(false))
   }, [])
 
-  // Handle Enter key - mobile-friendly behavior like Sync
+  // Simple keydown - only allow newlines, no auto-submit
   const onKeyDown = React.useCallback(
     (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (ev.key === 'Enter') {
-        // On mobile: Enter creates newline (user must tap Post button)
-        const isTouchDevice = 'ontouchstart' in window
-        if (isTouchDevice && primary) return
+      // Allow all Enter key presses for newlines
+      // No auto-submission - user must click Post button
+    },
+    []
+  )
 
-        // On desktop: Enter without modifiers submits (for primary log)
-        if (primary && !ev.metaKey && !ev.shiftKey && !ev.ctrlKey) {
-          ev.preventDefault()
-          if (value !== log.text) {
-            onChange(value)
-          }
-          ;(ev.target as HTMLTextAreaElement).blur()
-        }
-
-        // Cmd/Ctrl+Enter also submits
-        if ((ev.metaKey || ev.ctrlKey) && !ev.shiftKey) {
-          ev.preventDefault()
-          if (value !== log.text) {
-            onChange(value)
-          }
-          ;(ev.target as HTMLTextAreaElement).blur()
-        }
+  // Simple save handler
+  const handleSave = React.useCallback(
+    (ev: React.FormEvent) => {
+      ev.preventDefault()
+      if (value && value.trim()) {
+        onChange(value)
       }
     },
-    [value, log.text, onChange, primary]
+    [value, onChange]
   )
 
   const contextText = React.useMemo(() => {
@@ -345,42 +315,31 @@ const NoteEditor = ({
       </div>
 
       <div className="max-w-[700px]" ref={containerRef}>
-        {primary ? (
-          <form onSubmit={onPost}>
-            <ResizibleGhostInput
-              direction="v"
-              value={value}
-              onChange={setValue}
-              onKeyDown={onKeyDown}
-              placeholder="Type here..."
-              className="max-w-[700px] focus:opacity-100 group-hover:opacity-100"
-              rows={10}
-            />
-            <div className="mt-4">
-              <Button
-                type="submit"
-                kind="secondary"
-                size="small"
-                disabled={!value.trim()}
-              >
-                Post
-              </Button>
-            </div>
-          </form>
-        ) : (
+        <form onSubmit={handleSave}>
           <ResizibleGhostInput
             direction="v"
             value={value}
             onChange={setValue}
             onKeyDown={onKeyDown}
-            placeholder="The log record will be deleted"
+            placeholder={primary ? 'Type here...' : 'The log record will be deleted'}
             className={cn(
               'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
-              'opacity-20'
+              !primary && 'opacity-20'
             )}
-            rows={1}
+            rows={primary ? 10 : 1}
           />
-        )}
+          {primary && (
+            <div className="mt-4">
+              <Button
+                type="submit"
+                kind="secondary"
+                size="small"
+              >
+                Post
+              </Button>
+            </div>
+          )}
+        </form>
       </div>
     </div>
   )
