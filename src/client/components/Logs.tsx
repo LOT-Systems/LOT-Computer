@@ -343,12 +343,7 @@ const NoteEditor = ({
 
       <div className="max-w-[700px]" ref={containerRef}>
         {primary ? (
-          <form
-            onSubmit={(ev) => {
-              ev.preventDefault()
-              handlePost()
-            }}
-          >
+          <>
             <ResizibleGhostInput
               direction="v"
               value={value}
@@ -360,15 +355,20 @@ const NoteEditor = ({
             />
             <div className="mt-4">
               <Button
-                type="submit"
+                onClick={(ev) => {
+                  ev.preventDefault()
+                  // Only submit if there are actual changes
+                  if (value !== log.text) {
+                    handlePost()
+                  }
+                }}
                 kind="secondary"
                 size="small"
-                disabled={!hasUnsavedChanges}
               >
                 Post
               </Button>
             </div>
-          </form>
+          </>
         ) : (
           <ResizibleGhostInput
             direction="v"

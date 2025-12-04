@@ -320,7 +320,6 @@ export const Settings = () => {
           UserTag.Admin,
           UserTag.Mala,
           UserTag.RND,
-          UserTag.Evangelist,
           UserTag.Onyx,
           UserTag.Usership,
           UserTag.Pro,
