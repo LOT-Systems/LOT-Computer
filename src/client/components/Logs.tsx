@@ -213,6 +213,7 @@ const NoteEditor = ({
   dateFormat: string
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null)
+  const isTouchDevice = useStore(stores.isTouchDevice)
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
@@ -227,12 +228,14 @@ const NoteEditor = ({
     onChange(value)
   }, [value, onChange])
 
-  // Autosave - but NOT for primary log (it has a Post button instead)
+  // Autosave logic - mobile-friendly
+  // Desktop: Only autosave old logs (primary uses Post button)
+  // Mobile: Always autosave (Post button hard to use on mobile keyboard)
   React.useEffect(() => {
-    if (primary) return // Skip autosave for primary log
+    if (!isTouchDevice && primary) return // Desktop: skip autosave for primary log
     if (log.text === debouncedValue) return
     onChange(debouncedValue)
-  }, [debouncedValue, onChange, primary, log.text])
+  }, [debouncedValue, onChange, primary, log.text, isTouchDevice])
 
   // Sync local state when log updates from server
   React.useEffect(() => {
