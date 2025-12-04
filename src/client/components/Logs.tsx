@@ -223,10 +223,9 @@ const NoteEditor = ({
 
   // Post handler - immediately save
   const handlePost = React.useCallback(() => {
-    if (hasUnsavedChanges) {
-      onChange(value)
-    }
-  }, [value, hasUnsavedChanges, onChange])
+    // Always save current value when clicked
+    onChange(value)
+  }, [value, onChange])
 
   // Autosave - but NOT for primary log (it has a Post button instead)
   React.useEffect(() => {
