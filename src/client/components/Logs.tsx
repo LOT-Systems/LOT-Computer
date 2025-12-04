@@ -222,6 +222,7 @@ const NoteEditor = ({
   // Direct mutation with error handling
   const { mutate: updateLogDirect } = useUpdateLog({
     onSuccess: (updatedLog) => {
+      console.log('✅ Post SUCCESS:', { updatedLog })
       setIsSaving(false)
       setSaveError(null)
       // Update local store
@@ -230,11 +231,12 @@ const NoteEditor = ({
         ...currentLogById,
         [updatedLog.id]: updatedLog,
       })
+      console.log('✅ Local store updated')
     },
     onError: (error: any) => {
+      console.error('❌ Post ERROR:', error)
       setIsSaving(false)
       setSaveError(error?.message || 'Failed to save')
-      console.error('Post button error:', error)
     },
   })
 
@@ -264,6 +266,7 @@ const NoteEditor = ({
     if (isSaving) return // Prevent double-save
     if (!value || !value.trim()) return
 
+    console.log('🚀 Starting save:', { logId: log.id, textLength: value.length })
     setIsSaving(true)
     setSaveError(null)
 
