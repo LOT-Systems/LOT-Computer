@@ -227,14 +227,20 @@ const NoteEditor = ({
   // Reset saving state when mutation completes
   // Check if log.text matches what we saved (stored in ref)
   React.useEffect(() => {
-    if (isSaving && log.text === savedValueRef.current) {
-      // Clear safety timeout
-      if ((window as any).__postSaveTimeout) {
-        clearTimeout((window as any).__postSaveTimeout)
-        ;(window as any).__postSaveTimeout = null
+    if (isSaving && savedValueRef.current) {
+      const saved = savedValueRef.current.trim()
+      const current = (log.text || '').trim()
+
+      // Match if they're equal OR if log contains what we saved
+      if (current === saved || current.includes(saved)) {
+        // Clear safety timeout
+        if ((window as any).__postSaveTimeout) {
+          clearTimeout((window as any).__postSaveTimeout)
+          ;(window as any).__postSaveTimeout = null
+        }
+        setIsSaving(false)
+        savedValueRef.current = ''
       }
-      setIsSaving(false)
-      savedValueRef.current = ''
     }
   }, [log.text, isSaving])
 
@@ -257,10 +263,12 @@ const NoteEditor = ({
   // Save using parent's onChange which already has mutation setup
   const doSave = React.useCallback(() => {
     if (isSaving) return // Prevent double-save
-    if (!value || !value.trim()) return
 
-    // Store value we're saving in ref for comparison later
-    savedValueRef.current = value
+    const trimmedValue = value.trim()
+    if (!trimmedValue) return
+
+    // Store TRIMMED value for comparison (API might trim it)
+    savedValueRef.current = trimmedValue
     setIsSaving(true)
 
     // Safety timeout: reset saving state after 5 seconds if not completed
@@ -272,8 +280,8 @@ const NoteEditor = ({
     // Store timeout ID to clear it if save completes earlier
     ;(window as any).__postSaveTimeout = timeoutId
 
-    // Use parent's onChange - it's already wired to mutation with proper callbacks
-    onChange(value)
+    // Use parent's onChange - pass trimmed value
+    onChange(trimmedValue)
   }, [value, onChange, isSaving])
 
   // Approach 1: Form submission
