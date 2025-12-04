@@ -214,12 +214,31 @@ const NoteEditor = ({
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null)
 
+  // For primary log, use direct mutation instead of relying on onChange prop
+  const { mutate: updateLogDirect } = useUpdateLog({
+    onSuccess: (updatedLog) => {
+      // Update local state on success
+      const logById = localStore.logById.get()
+      localStore.logById.set({
+        ...logById,
+        [updatedLog.id]: updatedLog,
+      })
+    },
+  })
+
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
   const debouncedValue = useDebounce(value, 800)
 
   // Track if there are unsaved changes
   const hasUnsavedChanges = value !== log.text
+
+  // Post handler - call mutation directly for primary log
+  const handlePost = React.useCallback(() => {
+    if (primary && value.trim()) {
+      updateLogDirect({ id: log.id, text: value })
+    }
+  }, [primary, value, log.id, updateLogDirect])
 
   // Autosave ONLY for old logs (primary log uses Post button exclusively)
   React.useEffect(() => {
@@ -349,7 +368,7 @@ const NoteEditor = ({
             />
             <div className="mt-4">
               <Button
-                onClick={() => onChange(value)}
+                onClick={handlePost}
                 kind="secondary"
                 size="small"
               >
