@@ -95,21 +95,8 @@ export const Settings = () => {
       })
       .filter(Boolean) as UserTag[]
 
-    // Debug logging to diagnose theme picker visibility issue
-    console.log('[Settings Debug] User tags from DB:', me?.tags)
-    console.log('[Settings Debug] Computed userTagIds:', tags)
-    console.log('[Settings Debug] Should show theme picker:', [
-      UserTag.Admin,
-      UserTag.Mala,
-      UserTag.RND,
-      UserTag.Evangelist,
-      UserTag.Onyx,
-      UserTag.Usership,
-      UserTag.Pro,
-    ].some((x) => tags.includes(x)))
-
     return tags
-  }, [me])
+  }, [me?.tags]) // More specific dependency
 
   // Fetch user's world on mount
   React.useEffect(() => {
@@ -244,19 +231,17 @@ export const Settings = () => {
     [state]
   )
 
-  // Fetch status data for the status link
+  // Fetch status data for the status link (REMOVED - too slow)
+  // Using cached version from localStorage instead
   React.useEffect(() => {
-    fetch('/api/public/status')
-      .then((res) => res.json())
-      .then((data) => {
-        setStatusData({
-          version: data.version,
-          overall: data.overall,
-        })
+    // Use lightweight version check instead of full health check
+    const cachedVersion = localStorage.getItem('appVersion')
+    if (cachedVersion) {
+      setStatusData({
+        version: cachedVersion,
+        overall: 'ok'
       })
-      .catch((err) => {
-        console.error('Failed to fetch status:', err)
-      })
+    }
   }, [])
 
   const statusText = statusData
