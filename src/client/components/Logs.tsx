@@ -228,10 +228,12 @@ const NoteEditor = ({
     }
   }, [value, hasUnsavedChanges, onChange])
 
+  // Autosave - but NOT for primary log (it has a Post button instead)
   React.useEffect(() => {
+    if (primary) return // Skip autosave for primary log
     if (log.text === debouncedValue) return
     onChange(debouncedValue)
-  }, [debouncedValue, onChange])
+  }, [debouncedValue, onChange, primary, log.text])
 
   // Sync local state when log updates from server
   React.useEffect(() => {
