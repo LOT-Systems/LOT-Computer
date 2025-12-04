@@ -217,6 +217,26 @@ const NoteEditor = ({
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
   const [isSaving, setIsSaving] = React.useState(false)
+  const [saveError, setSaveError] = React.useState<string | null>(null)
+
+  // Direct mutation with error handling
+  const { mutate: updateLogDirect } = useUpdateLog({
+    onSuccess: (updatedLog) => {
+      setIsSaving(false)
+      setSaveError(null)
+      // Update local store
+      const currentLogById = localStore.logById.get()
+      localStore.logById.set({
+        ...currentLogById,
+        [updatedLog.id]: updatedLog,
+      })
+    },
+    onError: (error: any) => {
+      setIsSaving(false)
+      setSaveError(error?.message || 'Failed to save')
+      console.error('Post button error:', error)
+    },
+  })
 
   // Sync local state when log updates from server
   React.useEffect(() => {
@@ -245,11 +265,11 @@ const NoteEditor = ({
     if (!value || !value.trim()) return
 
     setIsSaving(true)
-    onChange(value)
+    setSaveError(null)
 
-    // Reset after a delay
-    setTimeout(() => setIsSaving(false), 1000)
-  }, [value, onChange, isSaving])
+    // Call mutation directly with log ID and text
+    updateLogDirect({ id: log.id, text: value })
+  }, [value, log.id, isSaving, updateLogDirect])
 
   // Approach 1: Form submission
   const handleFormSubmit = React.useCallback(
@@ -371,6 +391,11 @@ const NoteEditor = ({
               >
                 {isSaving ? 'Posting...' : 'Post'}
               </Button>
+              {saveError && (
+                <div className="mt-2 text-red-500 text-sm">
+                  Error: {saveError}
+                </div>
+              )}
             </div>
           )}
         </form>
