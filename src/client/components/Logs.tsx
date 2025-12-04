@@ -217,33 +217,15 @@ const NoteEditor = ({
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
   const [isSaving, setIsSaving] = React.useState(false)
-  const [saveError, setSaveError] = React.useState<string | null>(null)
-
-  // Direct mutation with error handling
-  const { mutate: updateLogDirect } = useUpdateLog({
-    onSuccess: (updatedLog) => {
-      console.log('✅ Post SUCCESS:', { updatedLog })
-      setIsSaving(false)
-      setSaveError(null)
-      // Update local store
-      const currentLogById = localStore.logById.get()
-      localStore.logById.set({
-        ...currentLogById,
-        [updatedLog.id]: updatedLog,
-      })
-      console.log('✅ Local store updated')
-    },
-    onError: (error: any) => {
-      console.error('❌ Post ERROR:', error)
-      setIsSaving(false)
-      setSaveError(error?.message || 'Failed to save')
-    },
-  })
 
   // Sync local state when log updates from server
   React.useEffect(() => {
     setValue(log.text || '')
-  }, [log.text])
+    // Reset saving state when log updates (mutation completed)
+    if (isSaving) {
+      setIsSaving(false)
+    }
+  }, [log.text, isSaving])
 
   React.useEffect(() => {
     const textarea = containerRef.current?.querySelector('textarea')
@@ -261,18 +243,15 @@ const NoteEditor = ({
     []
   )
 
-  // Multiple save approaches for maximum compatibility
+  // Save using parent's onChange which already has mutation setup
   const doSave = React.useCallback(() => {
     if (isSaving) return // Prevent double-save
     if (!value || !value.trim()) return
 
-    console.log('🚀 Starting save:', { logId: log.id, textLength: value.length })
     setIsSaving(true)
-    setSaveError(null)
-
-    // Call mutation directly with log ID and text
-    updateLogDirect({ id: log.id, text: value })
-  }, [value, log.id, isSaving, updateLogDirect])
+    // Use parent's onChange - it's already wired to mutation with proper callbacks
+    onChange(value)
+  }, [value, onChange, isSaving])
 
   // Approach 1: Form submission
   const handleFormSubmit = React.useCallback(
@@ -394,11 +373,6 @@ const NoteEditor = ({
               >
                 {isSaving ? 'Posting...' : 'Post'}
               </Button>
-              {saveError && (
-                <div className="mt-2 text-red-500 text-sm">
-                  Error: {saveError}
-                </div>
-              )}
             </div>
           )}
         </form>
