@@ -246,20 +246,34 @@ const NoteEditor = ({
     textarea.addEventListener('blur', () => setIsFocused(false))
   }, [])
 
-  // Handle Enter key - allow newlines, Cmd/Ctrl+Enter to save
+  // Handle Enter key - mobile-friendly behavior like Sync
   const onKeyDown = React.useCallback(
     (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
-        ev.preventDefault()
-        if (value !== log.text) {
-          onChange(value) // Immediate save
+      if (ev.key === 'Enter') {
+        // On mobile: Enter creates newline (user must tap Post button)
+        const isTouchDevice = 'ontouchstart' in window
+        if (isTouchDevice && primary) return
+
+        // On desktop: Enter without modifiers submits (for primary log)
+        if (primary && !ev.metaKey && !ev.shiftKey && !ev.ctrlKey) {
+          ev.preventDefault()
+          if (value !== log.text) {
+            onChange(value)
+          }
+          ;(ev.target as HTMLTextAreaElement).blur()
         }
-        // Optionally blur to show save happened
-        ;(ev.target as HTMLTextAreaElement).blur()
+
+        // Cmd/Ctrl+Enter also submits
+        if ((ev.metaKey || ev.ctrlKey) && !ev.shiftKey) {
+          ev.preventDefault()
+          if (value !== log.text) {
+            onChange(value)
+          }
+          ;(ev.target as HTMLTextAreaElement).blur()
+        }
       }
-      // Regular Enter key creates newline (default behavior)
     },
-    [value, log.text, onChange]
+    [value, log.text, onChange, primary]
   )
 
   const contextText = React.useMemo(() => {
@@ -328,33 +342,46 @@ const NoteEditor = ({
       </div>
 
       <div className="max-w-[700px]" ref={containerRef}>
-        <ResizibleGhostInput
-          // tabIndex={-1}
-          direction="v"
-          value={value}
-          onChange={setValue}
-          onKeyDown={onKeyDown}
-          placeholder={
-            !primary ? 'The log record will be deleted' : 'Type here...'
-          }
-          className={cn(
-            'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
-            !primary && 'opacity-20'
-            // 'opacity-20'
-          )}
-          rows={primary ? 10 : 1}
-        />
-        {primary && (
-          <div className="mt-4">
-            <Button
-              onClick={handlePost}
-              kind="secondary"
-              size="small"
-              disabled={!hasUnsavedChanges}
-            >
-              Post
-            </Button>
-          </div>
+        {primary ? (
+          <form
+            onSubmit={(ev) => {
+              ev.preventDefault()
+              handlePost()
+            }}
+          >
+            <ResizibleGhostInput
+              direction="v"
+              value={value}
+              onChange={setValue}
+              onKeyDown={onKeyDown}
+              placeholder="Type here..."
+              className="max-w-[700px] focus:opacity-100 group-hover:opacity-100"
+              rows={10}
+            />
+            <div className="mt-4">
+              <Button
+                type="submit"
+                kind="secondary"
+                size="small"
+                disabled={!hasUnsavedChanges}
+              >
+                Post
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <ResizibleGhostInput
+            direction="v"
+            value={value}
+            onChange={setValue}
+            onKeyDown={onKeyDown}
+            placeholder="The log record will be deleted"
+            className={cn(
+              'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
+              'opacity-20'
+            )}
+            rows={1}
+          />
         )}
       </div>
     </div>

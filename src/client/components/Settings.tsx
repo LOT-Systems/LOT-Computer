@@ -378,8 +378,8 @@ export const Settings = () => {
           </Block>
         </div>
 
-        {/* Public Profile Section */}
-        <div>
+        {/* Public Profile Section - Grayed out (infrastructure issue) */}
+        <div className="opacity-40 pointer-events-none select-none">
           <Block label="Public Profile:" blockView>
             <div className="mb-8">
               <Block label="Enable public profile:" onChildrenClick={() => onTogglePrivacy('isPublicProfile')}>
@@ -441,7 +441,7 @@ export const Settings = () => {
                       value={privacySettings.customUrl || ''}
                       onChange={onChangeCustomUrl}
                       placeholder="e.g., vadik (optional)"
-                      className="w-full"
+                      className="w-full text-acc"
                     />
                     <div className="text-acc/60 text-sm mt-2">
                       Letters, numbers, dashes, underscores only (3-30 chars)
