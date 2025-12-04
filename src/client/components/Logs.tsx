@@ -213,6 +213,7 @@ const NoteEditor = ({
   dateFormat: string
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null)
+  const savedValueRef = React.useRef<string>('')
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
@@ -223,17 +224,19 @@ const NoteEditor = ({
     setValue(log.text || '')
   }, [log.text])
 
-  // Reset saving state when log updates (indicates mutation completed)
+  // Reset saving state when mutation completes
+  // Check if log.text matches what we saved (stored in ref)
   React.useEffect(() => {
-    if (isSaving && log.text === value) {
+    if (isSaving && log.text === savedValueRef.current) {
       // Clear safety timeout
       if ((window as any).__postSaveTimeout) {
         clearTimeout((window as any).__postSaveTimeout)
         ;(window as any).__postSaveTimeout = null
       }
       setIsSaving(false)
+      savedValueRef.current = ''
     }
-  }, [log.text, value, isSaving])
+  }, [log.text, isSaving])
 
   React.useEffect(() => {
     const textarea = containerRef.current?.querySelector('textarea')
@@ -256,11 +259,14 @@ const NoteEditor = ({
     if (isSaving) return // Prevent double-save
     if (!value || !value.trim()) return
 
+    // Store value we're saving in ref for comparison later
+    savedValueRef.current = value
     setIsSaving(true)
 
     // Safety timeout: reset saving state after 5 seconds if not completed
     const timeoutId = setTimeout(() => {
       setIsSaving(false)
+      savedValueRef.current = ''
     }, 5000)
 
     // Store timeout ID to clear it if save completes earlier
