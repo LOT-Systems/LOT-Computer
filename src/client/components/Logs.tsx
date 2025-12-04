@@ -216,6 +216,7 @@ const NoteEditor = ({
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
+  const [isSaving, setIsSaving] = React.useState(false)
 
   // Sync local state when log updates from server
   React.useEffect(() => {
@@ -238,15 +239,46 @@ const NoteEditor = ({
     []
   )
 
-  // Simple save handler
-  const handleSave = React.useCallback(
+  // Multiple save approaches for maximum compatibility
+  const doSave = React.useCallback(() => {
+    if (isSaving) return // Prevent double-save
+    if (!value || !value.trim()) return
+
+    setIsSaving(true)
+    onChange(value)
+
+    // Reset after a delay
+    setTimeout(() => setIsSaving(false), 1000)
+  }, [value, onChange, isSaving])
+
+  // Approach 1: Form submission
+  const handleFormSubmit = React.useCallback(
     (ev: React.FormEvent) => {
       ev.preventDefault()
-      if (value && value.trim()) {
-        onChange(value)
-      }
+      ev.stopPropagation()
+      doSave()
     },
-    [value, onChange]
+    [doSave]
+  )
+
+  // Approach 2: Direct click
+  const handleClick = React.useCallback(
+    (ev: React.MouseEvent) => {
+      ev.preventDefault()
+      ev.stopPropagation()
+      doSave()
+    },
+    [doSave]
+  )
+
+  // Approach 3: Touch events for mobile
+  const handleTouchEnd = React.useCallback(
+    (ev: React.TouchEvent) => {
+      ev.preventDefault()
+      ev.stopPropagation()
+      doSave()
+    },
+    [doSave]
   )
 
   const contextText = React.useMemo(() => {
@@ -315,7 +347,7 @@ const NoteEditor = ({
       </div>
 
       <div className="max-w-[700px]" ref={containerRef}>
-        <form onSubmit={handleSave}>
+        <form onSubmit={handleFormSubmit}>
           <ResizibleGhostInput
             direction="v"
             value={value}
@@ -332,10 +364,12 @@ const NoteEditor = ({
             <div className="mt-4">
               <Button
                 type="submit"
+                onClick={handleClick}
+                onTouchEnd={handleTouchEnd}
                 kind="secondary"
                 size="small"
               >
-                Post
+                {isSaving ? 'Posting...' : 'Post'}
               </Button>
             </div>
           )}
