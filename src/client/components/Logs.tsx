@@ -221,15 +221,6 @@ const NoteEditor = ({
   // Track if there are unsaved changes
   const hasUnsavedChanges = value !== log.text
 
-  // Post handler - get current value directly from textarea
-  const handlePost = React.useCallback(() => {
-    const textarea = containerRef.current?.querySelector('textarea')
-    const currentValue = textarea?.value || value
-    if (currentValue && currentValue.trim()) {
-      onChange(currentValue)
-    }
-  }, [value, onChange])
-
   // Autosave ONLY for old logs (primary log uses Post button exclusively)
   React.useEffect(() => {
     if (primary) return // Primary log: NO autosave, use Post button only
@@ -358,7 +349,7 @@ const NoteEditor = ({
             />
             <div className="mt-4">
               <Button
-                onClick={handlePost}
+                onClick={() => onChange(value)}
                 kind="secondary"
                 size="small"
               >
