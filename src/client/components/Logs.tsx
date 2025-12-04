@@ -221,11 +221,19 @@ const NoteEditor = ({
   // Sync local state when log updates from server
   React.useEffect(() => {
     setValue(log.text || '')
-    // Reset saving state when log updates (mutation completed)
-    if (isSaving) {
+  }, [log.text])
+
+  // Reset saving state when log updates (indicates mutation completed)
+  React.useEffect(() => {
+    if (isSaving && log.text === value) {
+      // Clear safety timeout
+      if ((window as any).__postSaveTimeout) {
+        clearTimeout((window as any).__postSaveTimeout)
+        ;(window as any).__postSaveTimeout = null
+      }
       setIsSaving(false)
     }
-  }, [log.text, isSaving])
+  }, [log.text, value, isSaving])
 
   React.useEffect(() => {
     const textarea = containerRef.current?.querySelector('textarea')
@@ -249,6 +257,15 @@ const NoteEditor = ({
     if (!value || !value.trim()) return
 
     setIsSaving(true)
+
+    // Safety timeout: reset saving state after 5 seconds if not completed
+    const timeoutId = setTimeout(() => {
+      setIsSaving(false)
+    }, 5000)
+
+    // Store timeout ID to clear it if save completes earlier
+    ;(window as any).__postSaveTimeout = timeoutId
+
     // Use parent's onChange - it's already wired to mutation with proper callbacks
     onChange(value)
   }, [value, onChange, isSaving])
