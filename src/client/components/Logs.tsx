@@ -221,9 +221,9 @@ const NoteEditor = ({
   // Track if there are unsaved changes
   const hasUnsavedChanges = value !== log.text
 
-  // Post handler - immediately save
+  // Post handler - immediately save without any conditions
   const handlePost = React.useCallback(() => {
-    // Always save current value when clicked
+    if (!value || !value.trim()) return // Don't save empty values
     onChange(value)
   }, [value, onChange])
 
@@ -343,7 +343,12 @@ const NoteEditor = ({
 
       <div className="max-w-[700px]" ref={containerRef}>
         {primary ? (
-          <>
+          <form
+            onSubmit={(ev) => {
+              ev.preventDefault()
+              handlePost()
+            }}
+          >
             <ResizibleGhostInput
               direction="v"
               value={value}
@@ -355,20 +360,14 @@ const NoteEditor = ({
             />
             <div className="mt-4">
               <Button
-                onClick={(ev) => {
-                  ev.preventDefault()
-                  // Only submit if there are actual changes
-                  if (value !== log.text) {
-                    handlePost()
-                  }
-                }}
+                type="submit"
                 kind="secondary"
                 size="small"
               >
                 Post
               </Button>
             </div>
-          </>
+          </form>
         ) : (
           <ResizibleGhostInput
             direction="v"

@@ -380,6 +380,12 @@ export const Settings = () => {
         {/* Public Profile Section - Grayed out (infrastructure issue) */}
         <div className="opacity-40 pointer-events-none select-none">
           <Block label="Public Profile:" blockView>
+            <div className="mb-8">
+              <Block label="Enable public profile:" onChildrenClick={() => onTogglePrivacy('isPublicProfile')}>
+                {privacySettings.isPublicProfile ? 'On' : 'Off'}
+              </Block>
+            </div>
+
             {/* Show Save button immediately when privacy setting changes */}
             {privacyChanged && (
               <div className="mb-8">
