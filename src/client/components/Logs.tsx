@@ -220,6 +220,13 @@ const NoteEditor = ({
   const debounceTime = primary ? 500 : 800
   const debouncedValue = useDebounce(value, debounceTime)
 
+  // Save immediately when blurring (switching tabs, clicking away)
+  const handleBlur = React.useCallback(() => {
+    if (value !== log.text) {
+      onChange(value)
+    }
+  }, [value, log.text, onChange])
+
   // Autosave for all logs (primary saves faster with 500ms debounce)
   React.useEffect(() => {
     if (log.text === debouncedValue) return
