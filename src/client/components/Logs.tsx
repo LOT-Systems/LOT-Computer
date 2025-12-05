@@ -223,8 +223,9 @@ const NoteEditor = ({
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
-  // Shorter debounce for primary log (faster save), longer for old logs
-  const debounceTime = primary ? 500 : 800
+  // Much longer debounce to reduce lag - only for non-primary logs
+  // Primary log relies on blur/tab switch for saving
+  const debounceTime = primary ? 10000 : 3000  // 10s for primary, 3s for old logs
   const debouncedValue = useDebounce(value, debounceTime)
 
   // Keep ref in sync with value
@@ -239,16 +240,18 @@ const NoteEditor = ({
     }
   }, [log.text, onChange])
 
-  // Autosave for all logs (primary saves faster with 500ms debounce)
+  // Autosave for all logs (with long debounce to reduce lag)
   React.useEffect(() => {
     if (log.text === debouncedValue) return
     onChange(debouncedValue)
   }, [debouncedValue, onChange, log.text])
 
   // Sync local state when log updates from server
+  // BUT: Don't overwrite if user is actively typing (focused)
   React.useEffect(() => {
+    if (isFocused) return  // Skip sync while user is typing
     setValue(log.text || '')
-  }, [log.text])
+  }, [log.text, isFocused])
 
   React.useEffect(() => {
     const textarea = containerRef.current?.querySelector('textarea')
@@ -256,6 +259,20 @@ const NoteEditor = ({
     textarea.addEventListener('focus', () => setIsFocused(true))
     textarea.addEventListener('blur', () => setIsFocused(false))
   }, [])
+
+  // Save when user switches tabs (Page Visibility API)
+  React.useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && valueRef.current !== log.text) {
+        // User switched away from tab - save immediately
+        onChange(valueRef.current)
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [log.text, onChange])
 
   // Handle Enter key - allow newlines, Cmd/Ctrl+Enter to save
   const onKeyDown = React.useCallback(
