@@ -62,6 +62,12 @@ export const Logs: React.FC = () => {
     return isTimeFormat12h ? 'h:mm:ss A (M/D/YY)' : 'H:mm:ss (D/M/YY)'
   }, [isTimeFormat12h])
 
+  // Memoize onChange for primary log to prevent excessive re-renders
+  const onChangePrimaryLog = React.useMemo(
+    () => onChangeLog(recentLogId),
+    [onChangeLog, recentLogId]
+  )
+
   React.useEffect(() => {
     setTimeout(() => {
       const textarea = inputContainerRef?.current?.querySelector('textarea')
@@ -120,7 +126,7 @@ export const Logs: React.FC = () => {
           key={recentLogId}
           log={logById[recentLogId]}
           primary
-          onChange={onChangeLog(recentLogId)}
+          onChange={onChangePrimaryLog}
           isMouseActive={isMouseActive}
           dateFormat={dateFormat}
         />
@@ -213,6 +219,7 @@ const NoteEditor = ({
   dateFormat: string
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null)
+  const valueRef = React.useRef(log.text || '')
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
@@ -220,12 +227,17 @@ const NoteEditor = ({
   const debounceTime = primary ? 500 : 800
   const debouncedValue = useDebounce(value, debounceTime)
 
+  // Keep ref in sync with value
+  React.useEffect(() => {
+    valueRef.current = value
+  }, [value])
+
   // Save immediately when blurring (switching tabs, clicking away)
   const handleBlur = React.useCallback(() => {
-    if (value !== log.text) {
-      onChange(value)
+    if (valueRef.current !== log.text) {
+      onChange(valueRef.current)
     }
-  }, [value, log.text, onChange])
+  }, [log.text, onChange])
 
   // Autosave for all logs (primary saves faster with 500ms debounce)
   React.useEffect(() => {
@@ -250,15 +262,15 @@ const NoteEditor = ({
     (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
-        if (value !== log.text) {
-          onChange(value) // Immediate save
+        if (valueRef.current !== log.text) {
+          onChange(valueRef.current) // Immediate save
         }
         // Optionally blur to show save happened
         ;(ev.target as HTMLTextAreaElement).blur()
       }
       // Regular Enter key creates newline (default behavior)
     },
-    [value, log.text, onChange]
+    [log.text, onChange]
   )
 
   const contextText = React.useMemo(() => {
