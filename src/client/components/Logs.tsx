@@ -287,6 +287,16 @@ const NoteEditor = ({
     }
   }, [])  // Empty deps - only subscribe once, use refs for latest values
 
+  // Save on unmount (when navigating to different tab within app)
+  React.useEffect(() => {
+    return () => {
+      // Save on unmount if there are unsaved changes
+      if (valueRef.current !== logTextRef.current) {
+        onChangeRef.current(valueRef.current)
+      }
+    }
+  }, [])
+
   // Handle Enter key - allow newlines, Cmd/Ctrl+Enter to save
   // Using refs to avoid recreating callback
   const onKeyDown = React.useCallback(
