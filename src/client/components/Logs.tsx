@@ -225,9 +225,8 @@ const NoteEditor = ({
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
-  // Much longer debounce to reduce lag - only for non-primary logs
-  // Primary log relies on blur/tab switch for saving
-  const debounceTime = primary ? 10000 : 3000  // 10s for primary, 3s for old logs
+  // Faster autosave to show work-in-progress saves
+  const debounceTime = primary ? 5000 : 1500  // 5s for primary, 1.5s for old logs
   const debouncedValue = useDebounce(value, debounceTime)
 
   // Keep refs in sync
