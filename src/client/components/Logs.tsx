@@ -213,36 +213,32 @@ const NoteEditor = ({
   dateFormat: string
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null)
-  const savedValueRef = React.useRef<string>('')
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
-  const [isSaving, setIsSaving] = React.useState(false)
+  const debouncedValue = useDebounce(value, 800)
+
+  // Track if there are unsaved changes
+  const hasUnsavedChanges = value !== log.text
+
+  // Post handler - immediately save
+  const handlePost = React.useCallback(() => {
+    if (hasUnsavedChanges) {
+      onChange(value)
+    }
+  }, [value, hasUnsavedChanges, onChange])
+
+  // Autosave for old logs only (primary log uses Post button)
+  React.useEffect(() => {
+    if (primary) return // Skip autosave for primary log
+    if (log.text === debouncedValue) return
+    onChange(debouncedValue)
+  }, [debouncedValue, onChange, primary, log.text])
 
   // Sync local state when log updates from server
   React.useEffect(() => {
     setValue(log.text || '')
   }, [log.text])
-
-  // Reset saving state when mutation completes
-  // Check if log.text matches what we saved (stored in ref)
-  React.useEffect(() => {
-    if (isSaving && savedValueRef.current) {
-      const saved = savedValueRef.current.trim()
-      const current = (log.text || '').trim()
-
-      // Match if they're equal OR if log contains what we saved
-      if (current === saved || current.includes(saved)) {
-        // Clear safety timeout
-        if ((window as any).__postSaveTimeout) {
-          clearTimeout((window as any).__postSaveTimeout)
-          ;(window as any).__postSaveTimeout = null
-        }
-        setIsSaving(false)
-        savedValueRef.current = ''
-      }
-    }
-  }, [log.text, isSaving])
 
   React.useEffect(() => {
     const textarea = containerRef.current?.querySelector('textarea')
@@ -251,67 +247,20 @@ const NoteEditor = ({
     textarea.addEventListener('blur', () => setIsFocused(false))
   }, [])
 
-  // Simple keydown - only allow newlines, no auto-submit
+  // Handle Enter key - allow newlines, Cmd/Ctrl+Enter to save
   const onKeyDown = React.useCallback(
     (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      // Allow all Enter key presses for newlines
-      // No auto-submission - user must click Post button
+      if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
+        ev.preventDefault()
+        if (value !== log.text) {
+          onChange(value) // Immediate save
+        }
+        // Optionally blur to show save happened
+        ;(ev.target as HTMLTextAreaElement).blur()
+      }
+      // Regular Enter key creates newline (default behavior)
     },
-    []
-  )
-
-  // Save using parent's onChange which already has mutation setup
-  const doSave = React.useCallback(() => {
-    if (isSaving) return // Prevent double-save
-
-    const trimmedValue = value.trim()
-    if (!trimmedValue) return
-
-    // Store TRIMMED value for comparison (API might trim it)
-    savedValueRef.current = trimmedValue
-    setIsSaving(true)
-
-    // Safety timeout: reset saving state after 5 seconds if not completed
-    const timeoutId = setTimeout(() => {
-      setIsSaving(false)
-      savedValueRef.current = ''
-    }, 5000)
-
-    // Store timeout ID to clear it if save completes earlier
-    ;(window as any).__postSaveTimeout = timeoutId
-
-    // Use parent's onChange - pass trimmed value
-    onChange(trimmedValue)
-  }, [value, onChange, isSaving])
-
-  // Approach 1: Form submission
-  const handleFormSubmit = React.useCallback(
-    (ev: React.FormEvent) => {
-      ev.preventDefault()
-      ev.stopPropagation()
-      doSave()
-    },
-    [doSave]
-  )
-
-  // Approach 2: Direct click
-  const handleClick = React.useCallback(
-    (ev: React.MouseEvent) => {
-      ev.preventDefault()
-      ev.stopPropagation()
-      doSave()
-    },
-    [doSave]
-  )
-
-  // Approach 3: Touch events for mobile
-  const handleTouchEnd = React.useCallback(
-    (ev: React.TouchEvent) => {
-      ev.preventDefault()
-      ev.stopPropagation()
-      doSave()
-    },
-    [doSave]
+    [value, log.text, onChange]
   )
 
   const contextText = React.useMemo(() => {
@@ -380,33 +329,34 @@ const NoteEditor = ({
       </div>
 
       <div className="max-w-[700px]" ref={containerRef}>
-        <form onSubmit={handleFormSubmit}>
-          <ResizibleGhostInput
-            direction="v"
-            value={value}
-            onChange={setValue}
-            onKeyDown={onKeyDown}
-            placeholder={primary ? 'Type here...' : 'The log record will be deleted'}
-            className={cn(
-              'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
-              !primary && 'opacity-20'
-            )}
-            rows={primary ? 10 : 1}
-          />
-          {primary && (
-            <div className="mt-4">
-              <Button
-                type="submit"
-                onClick={handleClick}
-                onTouchEnd={handleTouchEnd}
-                kind="secondary"
-                size="small"
-              >
-                {isSaving ? 'Posting...' : 'Post'}
-              </Button>
-            </div>
+        <ResizibleGhostInput
+          // tabIndex={-1}
+          direction="v"
+          value={value}
+          onChange={setValue}
+          onKeyDown={onKeyDown}
+          placeholder={
+            !primary ? 'The log record will be deleted' : 'Type here...'
+          }
+          className={cn(
+            'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
+            !primary && 'opacity-20'
+            // 'opacity-20'
           )}
-        </form>
+          rows={primary ? 10 : 1}
+        />
+        {primary && (
+          <div className="mt-4">
+            <Button
+              onClick={handlePost}
+              kind="secondary"
+              size="small"
+              disabled={!hasUnsavedChanges}
+            >
+              Post
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )
