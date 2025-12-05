@@ -158,50 +158,16 @@ fastify.get('/api/diagnostic', async function (req, reply) {
   }
 })
 
-// Public profile route
+// Public profile route - serve the React app
 fastify.get('/u/:userIdOrUsername', async function (req, reply) {
   const { userIdOrUsername } = req.params as { userIdOrUsername: string }
-  console.log('🟢 [PUBLIC-PROFILE-ROUTE] ✓✓✓ Route hit for:', userIdOrUsername)
-  console.log('[PUBLIC-PROFILE-ROUTE] Request URL:', req.url)
-  console.log('[PUBLIC-PROFILE-ROUTE] Request method:', req.method)
+  console.log('🟢 [PUBLIC-PROFILE-ROUTE] Serving profile page for:', userIdOrUsername)
 
-  reply.type('text/html')
-  return `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Public Profile - ${userIdOrUsername}</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-      </head>
-      <body style="font-family: -apple-system, system-ui, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto;">
-        <h1 style="color: green;">✓ Route Matched!</h1>
-        <p><strong>User:</strong> ${userIdOrUsername}</p>
-        <p><strong>Time:</strong> ${new Date().toISOString()}</p>
-        <hr>
-        <div id="result" style="margin-top: 20px;"></div>
-        <script>
-          console.log('Fetching profile for: ${userIdOrUsername}');
-          fetch('/api/public/profile/${userIdOrUsername}')
-            .then(res => res.json())
-            .then(data => {
-              console.log('Profile data:', data);
-              document.getElementById('result').innerHTML =
-                '<div style="background: #e8f5e9; padding: 20px; border-radius: 8px;">' +
-                '<h3 style="color: green;">✓ Profile Data:</h3>' +
-                '<pre>' + JSON.stringify(data, null, 2) + '</pre></div>';
-            })
-            .catch(err => {
-              console.error('Error:', err);
-              document.getElementById('result').innerHTML =
-                '<div style="background: #ffebee; padding: 20px; border-radius: 8px;">' +
-                '<h3 style="color: red;">✗ Error:</h3>' +
-                '<p>' + err.message + '</p></div>';
-            });
-        </script>
-      </body>
-    </html>
-  `
+  return reply.view('generic-spa', {
+    scriptName: 'public-profile',
+    scriptNonce: reply.cspNonce.script,
+    styleNonce: reply.cspNonce.style,
+  })
 })
 
 // ==============================================================================
