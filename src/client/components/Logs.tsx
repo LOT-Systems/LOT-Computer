@@ -265,15 +265,15 @@ const NoteEditor = ({
 
   // Sync local state when log updates from server
   // BUT: Don't overwrite if user is actively typing (focused)
-  // ALSO: Don't clear non-empty user input to empty server value (prevents scroll deletion on mobile)
-  // NOTE: isFocused is NOT in deps - only sync when log.text changes from server
+  // ALSO: Don't clear non-empty user input to empty server value (prevents race condition)
+  // NOTE: isFocused and value are NOT in deps - only sync when log.text changes from server
   React.useEffect(() => {
     if (isFocused) return  // Skip sync while user is typing
     // Defensive: Don't clear user's typed text if server hasn't saved yet
     // This prevents race condition on mobile where blur saves but mutation hasn't completed
     if (value && !log.text) return
     setValue(log.text || '')
-  }, [log.text, value])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [log.text])  // eslint-disable-line react-hooks/exhaustive-deps
 
   React.useEffect(() => {
     const textarea = containerRef.current?.querySelector('textarea')
