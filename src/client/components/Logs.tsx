@@ -222,6 +222,8 @@ const NoteEditor = ({
   const valueRef = React.useRef(log.text || '')
   const logTextRef = React.useRef(log.text || '')
   const onChangeRef = React.useRef(onChange)
+  const isScrollingRef = React.useRef(false)
+  const scrollTimeoutRef = React.useRef<NodeJS.Timeout>()
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
@@ -244,8 +246,12 @@ const NoteEditor = ({
   }, [onChange])
 
   // Save immediately when blurring (clicking away)
+  // BUT: Don't save if blur is caused by scrolling (scrolling should do nothing)
   // Using refs to avoid recreating callback on every change
   const handleBlur = React.useCallback(() => {
+    // Ignore blur during scroll - scrolling should not trigger save
+    if (isScrollingRef.current) return
+
     if (valueRef.current !== logTextRef.current) {
       onChangeRef.current(valueRef.current)
     }
@@ -276,7 +282,11 @@ const NoteEditor = ({
     textarea.addEventListener('focus', () => setIsFocused(true))
 
     // On blur, save immediately before marking as unfocused
+    // BUT: Don't save during scroll (scrolling should do nothing)
     const handleBlurWithSave = () => {
+      // Ignore blur during scroll - scrolling should not trigger save or change focus state
+      if (isScrollingRef.current) return
+
       // Save first if there are changes
       if (valueRef.current !== logTextRef.current) {
         onChangeRef.current(valueRef.current)
@@ -286,8 +296,30 @@ const NoteEditor = ({
 
     textarea.addEventListener('blur', handleBlurWithSave)
 
+    // Track scroll events to detect when blur is caused by scrolling
+    const handleScroll = () => {
+      isScrollingRef.current = true
+      // Clear any existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
+      // Mark as not scrolling after a short delay
+      scrollTimeoutRef.current = setTimeout(() => {
+        isScrollingRef.current = false
+      }, 150)
+    }
+
+    // Listen for scroll on window (most common) and container
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('touchmove', handleScroll, { passive: true })
+
     return () => {
       textarea.removeEventListener('blur', handleBlurWithSave)
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('touchmove', handleScroll)
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
     }
   }, [])
 
