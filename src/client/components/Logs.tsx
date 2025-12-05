@@ -221,16 +221,16 @@ const NoteEditor = ({
   // Track if there are unsaved changes
   const hasUnsavedChanges = value !== log.text
 
-  // Post handler - immediately save
-  const handlePost = React.useCallback(() => {
-    if (hasUnsavedChanges) {
+  // Save on blur for primary log (when user clicks away)
+  const handleBlur = React.useCallback(() => {
+    if (primary && hasUnsavedChanges) {
       onChange(value)
     }
-  }, [value, hasUnsavedChanges, onChange])
+  }, [primary, hasUnsavedChanges, value, onChange])
 
-  // Autosave for old logs only (primary log uses Post button)
+  // Autosave for old logs only (primary log saves on blur)
   React.useEffect(() => {
-    if (primary) return // Skip autosave for primary log
+    if (primary) return // Primary log uses blur to save
     if (log.text === debouncedValue) return
     onChange(debouncedValue)
   }, [debouncedValue, onChange, primary, log.text])
@@ -330,33 +330,20 @@ const NoteEditor = ({
 
       <div className="max-w-[700px]" ref={containerRef}>
         <ResizibleGhostInput
-          // tabIndex={-1}
           direction="v"
           value={value}
           onChange={setValue}
           onKeyDown={onKeyDown}
+          onBlur={handleBlur}
           placeholder={
             !primary ? 'The log record will be deleted' : 'Type here...'
           }
           className={cn(
             'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
             !primary && 'opacity-20'
-            // 'opacity-20'
           )}
           rows={primary ? 10 : 1}
         />
-        {primary && (
-          <div className="mt-4">
-            <Button
-              onClick={handlePost}
-              kind="secondary"
-              size="small"
-              disabled={!hasUnsavedChanges}
-            >
-              Post
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   )
