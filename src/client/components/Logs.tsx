@@ -259,17 +259,36 @@ const NoteEditor = ({
 
   // Sync local state when log updates from server
   // BUT: Don't overwrite if user is actively typing (focused)
+  // ALSO: Don't clear non-empty user input to empty server value (prevents scroll deletion on mobile)
   // NOTE: isFocused is NOT in deps - only sync when log.text changes from server
   React.useEffect(() => {
     if (isFocused) return  // Skip sync while user is typing
+    // Defensive: Don't clear user's typed text if server hasn't saved yet
+    // This prevents race condition on mobile where blur saves but mutation hasn't completed
+    if (value && !log.text) return
     setValue(log.text || '')
-  }, [log.text])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [log.text, value])  // eslint-disable-line react-hooks/exhaustive-deps
 
   React.useEffect(() => {
     const textarea = containerRef.current?.querySelector('textarea')
     if (!textarea) return
+
     textarea.addEventListener('focus', () => setIsFocused(true))
-    textarea.addEventListener('blur', () => setIsFocused(false))
+
+    // On blur, save immediately before marking as unfocused
+    const handleBlurWithSave = () => {
+      // Save first if there are changes
+      if (valueRef.current !== logTextRef.current) {
+        onChangeRef.current(valueRef.current)
+      }
+      setIsFocused(false)
+    }
+
+    textarea.addEventListener('blur', handleBlurWithSave)
+
+    return () => {
+      textarea.removeEventListener('blur', handleBlurWithSave)
+    }
   }, [])
 
   // Save when user switches tabs (Page Visibility API)
