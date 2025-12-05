@@ -222,8 +222,6 @@ const NoteEditor = ({
   const valueRef = React.useRef(log.text || '')
   const logTextRef = React.useRef(log.text || '')
   const onChangeRef = React.useRef(onChange)
-  const isScrollingRef = React.useRef(false)
-  const scrollTimeoutRef = React.useRef<NodeJS.Timeout>()
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
@@ -245,17 +243,8 @@ const NoteEditor = ({
     onChangeRef.current = onChange
   }, [onChange])
 
-  // Save immediately when blurring (clicking away)
-  // BUT: Don't save if blur is caused by scrolling (scrolling should do nothing)
-  // Using refs to avoid recreating callback on every change
-  const handleBlur = React.useCallback(() => {
-    // Ignore blur during scroll - scrolling should not trigger save
-    if (isScrollingRef.current) return
-
-    if (valueRef.current !== logTextRef.current) {
-      onChangeRef.current(valueRef.current)
-    }
-  }, [])
+  // Note: No blur save handler - saves happen via unmount and debounced autosave
+  // This keeps scrolling behavior simple (no blur = no issues)
 
   // Autosave for all logs (with long debounce to reduce lag)
   React.useEffect(() => {
@@ -275,52 +264,20 @@ const NoteEditor = ({
     setValue(log.text || '')
   }, [log.text])  // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Track focus state for sync effect (prevent overwriting while typing)
   React.useEffect(() => {
     const textarea = containerRef.current?.querySelector('textarea')
     if (!textarea) return
 
-    textarea.addEventListener('focus', () => setIsFocused(true))
+    const handleFocus = () => setIsFocused(true)
+    const handleBlur = () => setIsFocused(false)
 
-    // On blur, save immediately before marking as unfocused
-    // BUT: Don't save during scroll (scrolling should do nothing)
-    const handleBlurWithSave = () => {
-      // Ignore blur during scroll - scrolling should not trigger save or change focus state
-      if (isScrollingRef.current) return
-
-      // Save first if there are changes
-      if (valueRef.current !== logTextRef.current) {
-        onChangeRef.current(valueRef.current)
-      }
-      setIsFocused(false)
-    }
-
-    textarea.addEventListener('blur', handleBlurWithSave)
-
-    // Track scroll events to detect when blur is caused by scrolling
-    const handleScroll = () => {
-      isScrollingRef.current = true
-      // Clear any existing timeout
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current)
-      }
-      // Mark as not scrolling after a short delay
-      scrollTimeoutRef.current = setTimeout(() => {
-        isScrollingRef.current = false
-      }, 150)
-    }
-
-    // Listen for actual scroll events only (not touchmove)
-    // touchmove was too aggressive and blocked tab button taps
-    document.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('scroll', handleScroll, { passive: true })
+    textarea.addEventListener('focus', handleFocus)
+    textarea.addEventListener('blur', handleBlur)
 
     return () => {
-      textarea.removeEventListener('blur', handleBlurWithSave)
-      document.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('scroll', handleScroll)
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current)
-      }
+      textarea.removeEventListener('focus', handleFocus)
+      textarea.removeEventListener('blur', handleBlur)
     }
   }, [])
 
@@ -437,7 +394,6 @@ const NoteEditor = ({
           value={value}
           onChange={setValue}
           onKeyDown={onKeyDown}
-          onBlur={handleBlur}
           placeholder={
             !primary ? 'The log record will be deleted' : 'Type here...'
           }
