@@ -257,7 +257,7 @@ export const Settings = () => {
         <div>You can edit the settings at any time.</div>
       </div>
 
-      <form className="flex flex-col gap-y-16 max-w-384" onSubmit={onSubmit}>
+      <form className="flex flex-col gap-y-16 max-w-[600px]" onSubmit={onSubmit}>
         <div className="flex gap-x-8">
           <div className="flex-grow">
             <Input
@@ -380,12 +380,6 @@ export const Settings = () => {
         {/* Public Profile Section - Grayed out (infrastructure issue) */}
         <div className="opacity-40 pointer-events-none select-none">
           <Block label="Public Profile:" blockView>
-            <div className="mb-8">
-              <Block label="Enable public profile:" onChildrenClick={() => onTogglePrivacy('isPublicProfile')}>
-                {privacySettings.isPublicProfile ? 'On' : 'Off'}
-              </Block>
-            </div>
-
             {/* Show Save button immediately when privacy setting changes */}
             {privacyChanged && (
               <div className="mb-8">
