@@ -220,6 +220,8 @@ const NoteEditor = ({
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null)
   const valueRef = React.useRef(log.text || '')
+  const logTextRef = React.useRef(log.text || '')
+  const onChangeRef = React.useRef(onChange)
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
@@ -228,17 +230,26 @@ const NoteEditor = ({
   const debounceTime = primary ? 10000 : 3000  // 10s for primary, 3s for old logs
   const debouncedValue = useDebounce(value, debounceTime)
 
-  // Keep ref in sync with value
+  // Keep refs in sync
   React.useEffect(() => {
     valueRef.current = value
   }, [value])
 
-  // Save immediately when blurring (switching tabs, clicking away)
+  React.useEffect(() => {
+    logTextRef.current = log.text
+  }, [log.text])
+
+  React.useEffect(() => {
+    onChangeRef.current = onChange
+  }, [onChange])
+
+  // Save immediately when blurring (clicking away)
+  // Using refs to avoid recreating callback on every change
   const handleBlur = React.useCallback(() => {
-    if (valueRef.current !== log.text) {
-      onChange(valueRef.current)
+    if (valueRef.current !== logTextRef.current) {
+      onChangeRef.current(valueRef.current)
     }
-  }, [log.text, onChange])
+  }, [])
 
   // Autosave for all logs (with long debounce to reduce lag)
   React.useEffect(() => {
@@ -262,33 +273,35 @@ const NoteEditor = ({
   }, [])
 
   // Save when user switches tabs (Page Visibility API)
+  // Using refs to avoid re-subscribing on every log.text/onChange change
   React.useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.hidden && valueRef.current !== log.text) {
+      if (document.hidden && valueRef.current !== logTextRef.current) {
         // User switched away from tab - save immediately
-        onChange(valueRef.current)
+        onChangeRef.current(valueRef.current)
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [log.text, onChange])
+  }, [])  // Empty deps - only subscribe once, use refs for latest values
 
   // Handle Enter key - allow newlines, Cmd/Ctrl+Enter to save
+  // Using refs to avoid recreating callback
   const onKeyDown = React.useCallback(
     (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
-        if (valueRef.current !== log.text) {
-          onChange(valueRef.current) // Immediate save
+        if (valueRef.current !== logTextRef.current) {
+          onChangeRef.current(valueRef.current) // Immediate save
         }
         // Optionally blur to show save happened
         ;(ev.target as HTMLTextAreaElement).blur()
       }
       // Regular Enter key creates newline (default behavior)
     },
-    [log.text, onChange]
+    []
   )
 
   const contextText = React.useMemo(() => {
