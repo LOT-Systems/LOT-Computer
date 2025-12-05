@@ -332,6 +332,7 @@ const NoteEditor = ({
           value={value}
           onChange={setValue}
           onKeyDown={onKeyDown}
+          onBlur={handleBlur}
           placeholder={
             !primary ? 'The log record will be deleted' : 'Type here...'
           }
