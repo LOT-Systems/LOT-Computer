@@ -248,10 +248,11 @@ const NoteEditor = ({
 
   // Sync local state when log updates from server
   // BUT: Don't overwrite if user is actively typing (focused)
+  // NOTE: isFocused is NOT in deps - only sync when log.text changes from server
   React.useEffect(() => {
     if (isFocused) return  // Skip sync while user is typing
     setValue(log.text || '')
-  }, [log.text, isFocused])
+  }, [log.text])  // eslint-disable-line react-hooks/exhaustive-deps
 
   React.useEffect(() => {
     const textarea = containerRef.current?.querySelector('textarea')
