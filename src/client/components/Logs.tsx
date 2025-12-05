@@ -216,24 +216,15 @@ const NoteEditor = ({
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
-  const debouncedValue = useDebounce(value, 800)
+  // Shorter debounce for primary log (faster save), longer for old logs
+  const debounceTime = primary ? 500 : 800
+  const debouncedValue = useDebounce(value, debounceTime)
 
-  // Track if there are unsaved changes
-  const hasUnsavedChanges = value !== log.text
-
-  // Save on blur for primary log (when user clicks away)
-  const handleBlur = React.useCallback(() => {
-    if (primary && hasUnsavedChanges) {
-      onChange(value)
-    }
-  }, [primary, hasUnsavedChanges, value, onChange])
-
-  // Autosave for old logs only (primary log saves on blur)
+  // Autosave for all logs (primary saves faster with 500ms debounce)
   React.useEffect(() => {
-    if (primary) return // Primary log uses blur to save
     if (log.text === debouncedValue) return
     onChange(debouncedValue)
-  }, [debouncedValue, onChange, primary, log.text])
+  }, [debouncedValue, onChange, log.text])
 
   // Sync local state when log updates from server
   React.useEffect(() => {
@@ -334,7 +325,6 @@ const NoteEditor = ({
           value={value}
           onChange={setValue}
           onKeyDown={onKeyDown}
-          onBlur={handleBlur}
           placeholder={
             !primary ? 'The log record will be deleted' : 'Type here...'
           }
