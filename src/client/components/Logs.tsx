@@ -309,14 +309,15 @@ const NoteEditor = ({
       }, 150)
     }
 
-    // Listen for scroll on window (most common) and container
+    // Listen for actual scroll events only (not touchmove)
+    // touchmove was too aggressive and blocked tab button taps
+    document.addEventListener('scroll', handleScroll, { passive: true })
     window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('touchmove', handleScroll, { passive: true })
 
     return () => {
       textarea.removeEventListener('blur', handleBlurWithSave)
+      document.removeEventListener('scroll', handleScroll)
       window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('touchmove', handleScroll)
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current)
       }
