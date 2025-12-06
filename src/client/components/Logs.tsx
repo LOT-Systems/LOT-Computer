@@ -39,7 +39,8 @@ export const Logs: React.FC = () => {
         [log.id]: log,
       })
       // Refetch logs to push down saved entry and create new empty log
-      setTimeout(() => refetchLogs(), 100)
+      // Wait 2 seconds to show the blink animation, then push down
+      setTimeout(() => refetchLogs(), 2000)
     },
   })
 
@@ -229,6 +230,7 @@ const NoteEditor = ({
   const [value, setValue] = React.useState(log.text || '')
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null)
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
+  const [isAboutToPush, setIsAboutToPush] = React.useState(false) // Blink before push
   // Faster autosave to show work-in-progress saves
   const debounceTime = primary ? 5000 : 1500  // 5s for primary, 1.5s for old logs
   const debouncedValue = useDebounce(value, debounceTime)
@@ -260,7 +262,13 @@ const NoteEditor = ({
     // Update timestamp and mark as saved
     setLastSavedAt(new Date())
     setIsSaved(true)
-  }, [debouncedValue, onChange, log.text])
+
+    // For primary log: trigger blink animation then push down after 2s
+    if (primary) {
+      setIsAboutToPush(true)
+      setTimeout(() => setIsAboutToPush(false), 2000)
+    }
+  }, [debouncedValue, onChange, log.text, primary])
 
   // Sync local state when log updates from server
   // BUT: Don't overwrite if user is actively typing (focused)
@@ -325,13 +333,18 @@ const NoteEditor = ({
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
           setIsSaved(true)
+          // Trigger blink animation for manual save too
+          if (primary) {
+            setIsAboutToPush(true)
+            setTimeout(() => setIsAboutToPush(false), 2000)
+          }
         }
         // Optionally blur to show save happened
         ;(ev.target as HTMLTextAreaElement).blur()
       }
       // Regular Enter key creates newline (default behavior)
     },
-    []
+    [primary]
   )
 
   const contextText = React.useMemo(() => {
@@ -414,7 +427,8 @@ const NoteEditor = ({
             'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
             !primary && 'opacity-20',
             primary && isSaved && 'opacity-40',
-            primary && !isSaved && 'opacity-100'
+            primary && !isSaved && 'opacity-100',
+            primary && isAboutToPush && 'animate-pulse'
           )}
           rows={primary ? 10 : 1}
         />
