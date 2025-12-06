@@ -245,11 +245,20 @@ const NoteEditor = ({
   // Note: No blur save handler - saves happen via unmount and debounced autosave
   // This keeps scrolling behavior simple (no blur = no issues)
 
-  // Autosave for all logs (with long debounce to reduce lag)
+  // Autosave for all logs (with 5s debounce for primary, 1.5s for old)
   React.useEffect(() => {
-    if (log.text === debouncedValue) return
+    if (log.text === debouncedValue) {
+      console.log('[Autosave] Skipping - already saved:', debouncedValue?.slice(0, 30))
+      return
+    }
+    console.log('[Autosave] Saving after debounce:', {
+      primary,
+      debounceTime,
+      valueLength: debouncedValue?.length,
+      preview: debouncedValue?.slice(0, 50)
+    })
     onChange(debouncedValue)
-  }, [debouncedValue, onChange, log.text])
+  }, [debouncedValue, onChange, log.text, primary, debounceTime])
 
   // Sync local state when log updates from server
   // BUT: Don't overwrite if user is actively typing (focused)
@@ -285,7 +294,7 @@ const NoteEditor = ({
   React.useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden && valueRef.current !== logTextRef.current) {
-        // User switched away from tab - save immediately
+        console.log('[Visibility API] Browser tab hidden - saving:', valueRef.current?.slice(0, 50))
         onChangeRef.current(valueRef.current)
       }
     }
@@ -300,6 +309,7 @@ const NoteEditor = ({
     return () => {
       // Save on unmount if there are unsaved changes
       if (valueRef.current !== logTextRef.current) {
+        console.log('[Unmount] Component unmounting - saving:', valueRef.current?.slice(0, 50))
         onChangeRef.current(valueRef.current)
       }
     }
@@ -312,6 +322,7 @@ const NoteEditor = ({
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
         if (valueRef.current !== logTextRef.current) {
+          console.log('[Manual Save] Cmd/Ctrl+Enter pressed - saving:', valueRef.current?.slice(0, 50))
           onChangeRef.current(valueRef.current) // Immediate save
         }
         // Optionally blur to show save happened
