@@ -425,6 +425,7 @@ const NoteEditor = ({
           }
           className={cn(
             'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
+            'placeholder:opacity-20',
             !primary && 'opacity-20',
             primary && isSaved && 'opacity-40',
             primary && !isSaved && 'opacity-100',
