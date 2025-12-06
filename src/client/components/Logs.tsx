@@ -30,6 +30,7 @@ export const Logs: React.FC = () => {
   const logIds = useStore(localStore.logIds)
 
   const [isMouseActive, setIsMouseActive] = React.useState(true)
+  const pendingPushRef = React.useRef<NodeJS.Timeout | null>(null)
 
   const { data: loadedLogs = [], refetch: refetchLogs } = useLogs()
   const { mutate: updateLog } = useUpdateLog({
@@ -40,7 +41,11 @@ export const Logs: React.FC = () => {
       })
       // Refetch logs to push down saved entry and create new empty log
       // Wait 2 seconds to show the blink animation, then push down
-      setTimeout(() => refetchLogs(), 2000)
+      // Store timeout ID so it can be cancelled if user starts typing again
+      pendingPushRef.current = setTimeout(() => {
+        refetchLogs()
+        pendingPushRef.current = null
+      }, 2000)
     },
   })
 
@@ -132,6 +137,7 @@ export const Logs: React.FC = () => {
           onChange={onChangePrimaryLog}
           isMouseActive={isMouseActive}
           dateFormat={dateFormat}
+          pendingPushRef={pendingPushRef}
         />
       </div>
 
@@ -214,12 +220,14 @@ const NoteEditor = ({
   onChange,
   isMouseActive,
   dateFormat,
+  pendingPushRef,
 }: {
   log: Log
   primary?: boolean
   onChange: (text: string) => void
   isMouseActive: boolean
   dateFormat: string
+  pendingPushRef?: React.MutableRefObject<NodeJS.Timeout | null>
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null)
   const valueRef = React.useRef(log.text || '')
@@ -241,8 +249,15 @@ const NoteEditor = ({
     // Mark as unsaved when user types
     if (value !== log.text) {
       setIsSaved(false)
+      // Cancel pending push if user starts typing again
+      if (pendingPushRef?.current) {
+        clearTimeout(pendingPushRef.current)
+        pendingPushRef.current = null
+      }
+      // Cancel blink animation too
+      setIsAboutToPush(false)
     }
-  }, [value, log.text])
+  }, [value, log.text, pendingPushRef])
 
   React.useEffect(() => {
     logTextRef.current = log.text
