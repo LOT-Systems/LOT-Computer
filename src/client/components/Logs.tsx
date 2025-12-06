@@ -226,6 +226,8 @@ const NoteEditor = ({
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
   const [showSaved, setShowSaved] = React.useState(false)
+  const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null)
+  const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
   // Faster autosave to show work-in-progress saves
   const debounceTime = primary ? 5000 : 1500  // 5s for primary, 1.5s for old logs
   const debouncedValue = useDebounce(value, debounceTime)
@@ -233,7 +235,11 @@ const NoteEditor = ({
   // Keep refs in sync
   React.useEffect(() => {
     valueRef.current = value
-  }, [value])
+    // Mark as unsaved when user types
+    if (value !== log.text) {
+      setIsSaved(false)
+    }
+  }, [value, log.text])
 
   React.useEffect(() => {
     logTextRef.current = log.text
@@ -250,8 +256,10 @@ const NoteEditor = ({
   React.useEffect(() => {
     if (log.text === debouncedValue) return
     onChange(debouncedValue)
-    // Show saved indicator
+    // Show saved indicator and update timestamp
     setShowSaved(true)
+    setLastSavedAt(new Date())
+    setIsSaved(true)
     setTimeout(() => setShowSaved(false), 2000)
   }, [debouncedValue, onChange, log.text])
 
@@ -317,6 +325,8 @@ const NoteEditor = ({
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setShowSaved(true)
+          setLastSavedAt(new Date())
+          setIsSaved(true)
           setTimeout(() => setShowSaved(false), 2000)
         }
         // Optionally blur to show save happened
@@ -386,7 +396,9 @@ const NoteEditor = ({
         ) : (
           <div>
             {primary
-              ? 'Just now'
+              ? lastSavedAt
+                ? dayjs(lastSavedAt).format(dateFormat)
+                : 'Just now'
               : !!log && dayjs(log.updatedAt).format(dateFormat)}
           </div>
         )}
@@ -409,7 +421,9 @@ const NoteEditor = ({
           }
           className={cn(
             'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
-            !primary && 'opacity-20'
+            !primary && 'opacity-20',
+            primary && isSaved && 'opacity-40',
+            primary && !isSaved && 'opacity-100'
           )}
           rows={primary ? 10 : 1}
         />
