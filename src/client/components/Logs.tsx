@@ -31,13 +31,15 @@ export const Logs: React.FC = () => {
 
   const [isMouseActive, setIsMouseActive] = React.useState(true)
 
-  const { data: loadedLogs = [] } = useLogs()
+  const { data: loadedLogs = [], refetch: refetchLogs } = useLogs()
   const { mutate: updateLog } = useUpdateLog({
     onSuccess: (log) => {
       localStore.logById.set({
         ...logById,
         [log.id]: log,
       })
+      // Refetch logs to push down saved entry and create new empty log
+      setTimeout(() => refetchLogs(), 100)
     },
   })
 
@@ -225,7 +227,6 @@ const NoteEditor = ({
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
-  const [showSaved, setShowSaved] = React.useState(false)
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null)
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
   // Faster autosave to show work-in-progress saves
@@ -256,11 +257,9 @@ const NoteEditor = ({
   React.useEffect(() => {
     if (log.text === debouncedValue) return
     onChange(debouncedValue)
-    // Show saved indicator and update timestamp
-    setShowSaved(true)
+    // Update timestamp and mark as saved
     setLastSavedAt(new Date())
     setIsSaved(true)
-    setTimeout(() => setShowSaved(false), 2000)
   }, [debouncedValue, onChange, log.text])
 
   // Sync local state when log updates from server
@@ -324,10 +323,8 @@ const NoteEditor = ({
         ev.preventDefault()
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
-          setShowSaved(true)
           setLastSavedAt(new Date())
           setIsSaved(true)
-          setTimeout(() => setShowSaved(false), 2000)
         }
         // Optionally blur to show save happened
         ;(ev.target as HTMLTextAreaElement).blur()
@@ -400,12 +397,6 @@ const NoteEditor = ({
                 ? dayjs(lastSavedAt).format(dateFormat)
                 : 'Just now'
               : !!log && dayjs(log.updatedAt).format(dateFormat)}
-          </div>
-        )}
-        {/* Saved indicator */}
-        {showSaved && (
-          <div className="text-green-500 text-sm mt-1 animate-pulse">
-            ✓ Saved
           </div>
         )}
       </div>
