@@ -231,8 +231,8 @@ const NoteEditor = ({
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null)
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
   const [isAboutToPush, setIsAboutToPush] = React.useState(false) // Blink before push
-  // Faster autosave to show work-in-progress saves
-  const debounceTime = primary ? 5000 : 1500  // 5s for primary, 1.5s for old logs
+  // Timing: finish typing > wait 8s > autosave+blink > wait 2s > push (10s total)
+  const debounceTime = primary ? 8000 : 1500  // 8s for primary, 1.5s for old logs
   const debouncedValue = useDebounce(value, debounceTime)
 
   // Keep refs in sync
@@ -255,7 +255,8 @@ const NoteEditor = ({
   // Note: No blur save handler - saves happen via unmount and debounced autosave
   // This keeps scrolling behavior simple (no blur = no issues)
 
-  // Autosave for all logs (with 5s debounce for primary, 1.5s for old)
+  // Autosave for all logs (with 8s debounce for primary, 1.5s for old)
+  // Timeline: finish typing > wait 8s > [autosave + start blink] > wait 2s > [end blink + push]
   React.useEffect(() => {
     if (log.text === debouncedValue) return
     onChange(debouncedValue)
@@ -263,7 +264,7 @@ const NoteEditor = ({
     setLastSavedAt(new Date())
     setIsSaved(true)
 
-    // For primary log: trigger blink animation then push down after 2s
+    // For primary log: trigger blink animation (lasts 2s), then push happens via parent
     if (primary) {
       setIsAboutToPush(true)
       setTimeout(() => setIsAboutToPush(false), 2000)
