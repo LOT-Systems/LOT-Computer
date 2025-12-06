@@ -95,21 +95,8 @@ export const Settings = () => {
       })
       .filter(Boolean) as UserTag[]
 
-    // Debug logging to diagnose theme picker visibility issue
-    console.log('[Settings Debug] User tags from DB:', me?.tags)
-    console.log('[Settings Debug] Computed userTagIds:', tags)
-    console.log('[Settings Debug] Should show theme picker:', [
-      UserTag.Admin,
-      UserTag.Mala,
-      UserTag.RND,
-      UserTag.Evangelist,
-      UserTag.Onyx,
-      UserTag.Usership,
-      UserTag.Pro,
-    ].some((x) => tags.includes(x)))
-
     return tags
-  }, [me])
+  }, [me?.tags]) // More specific dependency
 
   // Fetch user's world on mount
   React.useEffect(() => {
@@ -244,19 +231,17 @@ export const Settings = () => {
     [state]
   )
 
-  // Fetch status data for the status link
+  // Fetch status data for the status link (REMOVED - too slow)
+  // Using cached version from localStorage instead
   React.useEffect(() => {
-    fetch('/api/public/status')
-      .then((res) => res.json())
-      .then((data) => {
-        setStatusData({
-          version: data.version,
-          overall: data.overall,
-        })
+    // Use lightweight version check instead of full health check
+    const cachedVersion = localStorage.getItem('appVersion')
+    if (cachedVersion) {
+      setStatusData({
+        version: cachedVersion,
+        overall: 'ok'
       })
-      .catch((err) => {
-        console.error('Failed to fetch status:', err)
-      })
+    }
   }, [])
 
   const statusText = statusData
@@ -272,7 +257,7 @@ export const Settings = () => {
         <div>You can edit the settings at any time.</div>
       </div>
 
-      <form className="flex flex-col gap-y-16 max-w-384" onSubmit={onSubmit}>
+      <form className="flex flex-col gap-y-16 max-w-[600px]" onSubmit={onSubmit}>
         <div className="flex gap-x-8">
           <div className="flex-grow">
             <Input
@@ -335,7 +320,6 @@ export const Settings = () => {
           UserTag.Admin,
           UserTag.Mala,
           UserTag.RND,
-          UserTag.Evangelist,
           UserTag.Onyx,
           UserTag.Usership,
           UserTag.Pro,
@@ -393,15 +377,9 @@ export const Settings = () => {
           </Block>
         </div>
 
-        {/* Public Profile Section */}
-        <div>
+        {/* Public Profile Section - Grayed out (infrastructure issue) */}
+        <div className="opacity-40 pointer-events-none select-none">
           <Block label="Public Profile:" blockView>
-            <div className="mb-8">
-              <Block label="Enable public profile:" onChildrenClick={() => onTogglePrivacy('isPublicProfile')}>
-                {privacySettings.isPublicProfile ? 'On' : 'Off'}
-              </Block>
-            </div>
-
             {/* Show Save button immediately when privacy setting changes */}
             {privacyChanged && (
               <div className="mb-8">
@@ -456,11 +434,8 @@ export const Settings = () => {
                       value={privacySettings.customUrl || ''}
                       onChange={onChangeCustomUrl}
                       placeholder="e.g., vadik (optional)"
-                      className="w-full"
+                      className="w-full text-acc"
                     />
-                    <div className="text-acc/60 text-sm mt-2">
-                      Letters, numbers, dashes, underscores only (3-30 chars)
-                    </div>
                   </Block>
                 </div>
               </>

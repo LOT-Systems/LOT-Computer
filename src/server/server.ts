@@ -122,12 +122,46 @@ fastify.addHook('onRequest', async (req, reply) => {
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 
-// Public profile route - ABSOLUTE TOP LEVEL - NO AUTHENTICATION
-// Must be registered before ANY other routes to avoid conflicts
+// ==============================================================================
+// PUBLIC PROFILE ROUTES - ABSOLUTE TOP LEVEL - HIGHEST PRIORITY
+// These MUST be registered before ANY other routes to avoid conflicts
+// ==============================================================================
+
+console.log('🔥 [SERVER-STARTUP] Registering /u/ routes at top level!')
+
+// Diagnostic test route
+fastify.get('/u/test-route-works', async function (req, reply) {
+  console.log('🟢 [DIAGNOSTIC] Test route hit!')
+  reply.type('text/html')
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head><title>Route Test</title></head>
+      <body style="font-family: monospace; padding: 40px;">
+        <h1 style="color: green;">✓ Route is working!</h1>
+        <p>Timestamp: ${new Date().toISOString()}</p>
+        <p>The /u/ route is being matched correctly.</p>
+      </body>
+    </html>
+  `
+})
+
+// Alternative diagnostic at /api/diagnostic
+fastify.get('/api/diagnostic', async function (req, reply) {
+  console.log('🟢 [API-DIAGNOSTIC] Route hit!')
+  return {
+    success: true,
+    message: 'Server code is running with latest changes',
+    timestamp: new Date().toISOString(),
+    commit: '0e839b6e',
+    uRoutesRegistered: true
+  }
+})
+
+// Public profile route - serve the React app
 fastify.get('/u/:userIdOrUsername', async function (req, reply) {
   const { userIdOrUsername } = req.params as { userIdOrUsername: string }
-  console.log('[PUBLIC-PROFILE] ✓ Route hit for:', userIdOrUsername)
-  console.log('[PUBLIC-PROFILE] CSP nonces:', reply.cspNonce)
+  console.log('🟢 [PUBLIC-PROFILE-ROUTE] Serving profile page for:', userIdOrUsername)
 
   return reply.view('generic-spa', {
     scriptName: 'public-profile',
@@ -135,6 +169,10 @@ fastify.get('/u/:userIdOrUsername', async function (req, reply) {
     styleNonce: reply.cspNonce.style,
   })
 })
+
+// ==============================================================================
+// END PUBLIC PROFILE ROUTES
+// ==============================================================================
 
 // Routes
 fastify.register(async (fastify: FastifyInstance) => {
@@ -197,7 +235,7 @@ fastify.register(async (fastify: FastifyInstance) => {
 
     // Client app / index page
     fastify.register(async (fastify) => {
-      // Note: Public profile route /u/:userIdOrUsername is at top level (line 127)
+      // Note: /u/ routes are registered at top level (lines 131-191)
 
       KNOWN_CLIENT_ROUTES.forEach((route) => {
         fastify.get(route, async function (req, reply) {

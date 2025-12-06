@@ -62,6 +62,12 @@ export const Logs: React.FC = () => {
     return isTimeFormat12h ? 'h:mm:ss A (M/D/YY)' : 'H:mm:ss (D/M/YY)'
   }, [isTimeFormat12h])
 
+  // Memoize onChange for primary log to prevent excessive re-renders
+  const onChangePrimaryLog = React.useMemo(
+    () => onChangeLog(recentLogId),
+    [onChangeLog, recentLogId]
+  )
+
   React.useEffect(() => {
     setTimeout(() => {
       const textarea = inputContainerRef?.current?.querySelector('textarea')
@@ -120,7 +126,7 @@ export const Logs: React.FC = () => {
           key={recentLogId}
           log={logById[recentLogId]}
           primary
-          onChange={onChangeLog(recentLogId)}
+          onChange={onChangePrimaryLog}
           isMouseActive={isMouseActive}
           dateFormat={dateFormat}
         />
@@ -213,52 +219,112 @@ const NoteEditor = ({
   dateFormat: string
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null)
+  const valueRef = React.useRef(log.text || '')
+  const logTextRef = React.useRef(log.text || '')
+  const onChangeRef = React.useRef(onChange)
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
-  const debouncedValue = useDebounce(value, 800)
+  const [showSaved, setShowSaved] = React.useState(false)
+  // Faster autosave to show work-in-progress saves
+  const debounceTime = primary ? 5000 : 1500  // 5s for primary, 1.5s for old logs
+  const debouncedValue = useDebounce(value, debounceTime)
 
-  // Track if there are unsaved changes
-  const hasUnsavedChanges = value !== log.text
-
-  // Post handler - immediately save
-  const handlePost = React.useCallback(() => {
-    if (hasUnsavedChanges) {
-      onChange(value)
-    }
-  }, [value, hasUnsavedChanges, onChange])
+  // Keep refs in sync
+  React.useEffect(() => {
+    valueRef.current = value
+  }, [value])
 
   React.useEffect(() => {
-    if (log.text === debouncedValue) return
-    onChange(debouncedValue)
-  }, [debouncedValue, onChange])
-
-  // Sync local state when log updates from server
-  React.useEffect(() => {
-    setValue(log.text || '')
+    logTextRef.current = log.text
   }, [log.text])
 
   React.useEffect(() => {
+    onChangeRef.current = onChange
+  }, [onChange])
+
+  // Note: No blur save handler - saves happen via unmount and debounced autosave
+  // This keeps scrolling behavior simple (no blur = no issues)
+
+  // Autosave for all logs (with 5s debounce for primary, 1.5s for old)
+  React.useEffect(() => {
+    if (log.text === debouncedValue) return
+    onChange(debouncedValue)
+    // Show saved indicator
+    setShowSaved(true)
+    setTimeout(() => setShowSaved(false), 2000)
+  }, [debouncedValue, onChange, log.text])
+
+  // Sync local state when log updates from server
+  // BUT: Don't overwrite if user is actively typing (focused)
+  // ALSO: Don't clear non-empty user input to empty server value (prevents race condition)
+  // NOTE: isFocused and value are NOT in deps - only sync when log.text changes from server
+  React.useEffect(() => {
+    if (isFocused) return  // Skip sync while user is typing
+    // Defensive: Don't clear user's typed text if server hasn't saved yet
+    // This prevents race condition on mobile where blur saves but mutation hasn't completed
+    if (value && !log.text) return
+    setValue(log.text || '')
+  }, [log.text])  // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Track focus state for sync effect (prevent overwriting while typing)
+  React.useEffect(() => {
     const textarea = containerRef.current?.querySelector('textarea')
     if (!textarea) return
-    textarea.addEventListener('focus', () => setIsFocused(true))
-    textarea.addEventListener('blur', () => setIsFocused(false))
+
+    const handleFocus = () => setIsFocused(true)
+    const handleBlur = () => setIsFocused(false)
+
+    textarea.addEventListener('focus', handleFocus)
+    textarea.addEventListener('blur', handleBlur)
+
+    return () => {
+      textarea.removeEventListener('focus', handleFocus)
+      textarea.removeEventListener('blur', handleBlur)
+    }
+  }, [])
+
+  // Save when user switches tabs (Page Visibility API)
+  // Using refs to avoid re-subscribing on every log.text/onChange change
+  React.useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && valueRef.current !== logTextRef.current) {
+        onChangeRef.current(valueRef.current)
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])  // Empty deps - only subscribe once, use refs for latest values
+
+  // Save on unmount (when navigating to different tab within app)
+  React.useEffect(() => {
+    return () => {
+      // Save on unmount if there are unsaved changes
+      if (valueRef.current !== logTextRef.current) {
+        onChangeRef.current(valueRef.current)
+      }
+    }
   }, [])
 
   // Handle Enter key - allow newlines, Cmd/Ctrl+Enter to save
+  // Using refs to avoid recreating callback
   const onKeyDown = React.useCallback(
     (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
-        if (value !== log.text) {
-          onChange(value) // Immediate save
+        if (valueRef.current !== logTextRef.current) {
+          onChangeRef.current(valueRef.current) // Immediate save
+          setShowSaved(true)
+          setTimeout(() => setShowSaved(false), 2000)
         }
         // Optionally blur to show save happened
         ;(ev.target as HTMLTextAreaElement).blur()
       }
       // Regular Enter key creates newline (default behavior)
     },
-    [value, log.text, onChange]
+    []
   )
 
   const contextText = React.useMemo(() => {
@@ -324,11 +390,16 @@ const NoteEditor = ({
               : !!log && dayjs(log.updatedAt).format(dateFormat)}
           </div>
         )}
+        {/* Saved indicator */}
+        {showSaved && (
+          <div className="text-green-500 text-sm mt-1 animate-pulse">
+            ✓ Saved
+          </div>
+        )}
       </div>
 
       <div className="max-w-[700px]" ref={containerRef}>
         <ResizibleGhostInput
-          // tabIndex={-1}
           direction="v"
           value={value}
           onChange={setValue}
@@ -339,22 +410,9 @@ const NoteEditor = ({
           className={cn(
             'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
             !primary && 'opacity-20'
-            // 'opacity-20'
           )}
           rows={primary ? 10 : 1}
         />
-        {primary && (
-          <div className="mt-4">
-            <Button
-              onClick={handlePost}
-              kind="secondary"
-              size="small"
-              disabled={!hasUnsavedChanges}
-            >
-              Post
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   )
