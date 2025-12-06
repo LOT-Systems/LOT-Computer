@@ -39,13 +39,17 @@ export const Logs: React.FC = () => {
         ...logById,
         [log.id]: log,
       })
-      // Refetch logs to push down saved entry and create new empty log
-      // Wait 2 seconds to show the blink animation, then push down
-      // Store timeout ID so it can be cancelled if user starts typing again
-      pendingPushRef.current = setTimeout(() => {
-        refetchLogs()
-        pendingPushRef.current = null
-      }, 2000)
+      // Only refetch (push down) if this is the primary/most recent log
+      // Past logs don't need to trigger push-down
+      if (log.id === recentLogId) {
+        // Refetch logs to push down saved entry and create new empty log
+        // Wait 2 seconds to show the blink animation, then push down
+        // Store timeout ID so it can be cancelled if user starts typing again
+        pendingPushRef.current = setTimeout(() => {
+          refetchLogs()
+          pendingPushRef.current = null
+        }, 2000)
+      }
     },
   })
 
