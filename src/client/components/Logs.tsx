@@ -243,6 +243,7 @@ const NoteEditor = ({
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null)
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
   const [isAboutToPush, setIsAboutToPush] = React.useState(false) // Blink before push
+  const [isSaving, setIsSaving] = React.useState(false) // Prevent concurrent saves
   // Timing: finish typing > wait 8s > autosave+blink > wait 2s > push (10s total)
   // Past logs: 5s debounce to prevent lag while still being responsive
   const debounceTime = primary ? 8000 : 5000  // 8s for primary, 5s for old logs
@@ -279,29 +280,38 @@ const NoteEditor = ({
   // Timeline: finish typing > wait 8s > [autosave + start blink] > wait 2s > [end blink + push]
   React.useEffect(() => {
     if (log.text === debouncedValue) return
+    if (isSaving) return  // Prevent concurrent saves
+
+    setIsSaving(true)
     onChange(debouncedValue)
+
     // Update timestamp and mark as saved
     setLastSavedAt(new Date())
     setIsSaved(true)
+
+    // Clear saving state after a brief delay
+    setTimeout(() => setIsSaving(false), 100)
 
     // For primary log: trigger blink animation (lasts 2s), then push happens via parent
     if (primary) {
       setIsAboutToPush(true)
       setTimeout(() => setIsAboutToPush(false), 2000)
     }
-  }, [debouncedValue, onChange, log.text, primary])
+  }, [debouncedValue, onChange, log.text, primary, isSaving])
 
   // Sync local state when log updates from server
   // BUT: Don't overwrite if user is actively typing (focused)
   // ALSO: Don't clear non-empty user input to empty server value (prevents race condition)
+  // ALSO: Don't sync if there are unsaved changes
   // NOTE: isFocused and value are NOT in deps - only sync when log.text changes from server
   React.useEffect(() => {
     if (isFocused) return  // Skip sync while user is typing
+    if (!isSaved) return  // Skip sync if there are unsaved changes
     // Defensive: Don't clear user's typed text if server hasn't saved yet
     // This prevents race condition on mobile where blur saves but mutation hasn't completed
     if (value && !log.text) return
     setValue(log.text || '')
-  }, [log.text])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [log.text, isFocused, isSaved])  // eslint-disable-line react-hooks/exhaustive-deps
 
   // Track focus state for sync effect (prevent overwriting while typing)
   React.useEffect(() => {
