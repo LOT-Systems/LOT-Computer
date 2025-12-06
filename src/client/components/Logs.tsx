@@ -244,7 +244,8 @@ const NoteEditor = ({
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
   const [isAboutToPush, setIsAboutToPush] = React.useState(false) // Blink before push
   // Timing: finish typing > wait 8s > autosave+blink > wait 2s > push (10s total)
-  const debounceTime = primary ? 8000 : 1500  // 8s for primary, 1.5s for old logs
+  // Past logs: 5s debounce to prevent lag while still being responsive
+  const debounceTime = primary ? 8000 : 5000  // 8s for primary, 5s for old logs
   const debouncedValue = useDebounce(value, debounceTime)
 
   // Keep refs in sync
@@ -274,7 +275,7 @@ const NoteEditor = ({
   // Note: No blur save handler - saves happen via unmount and debounced autosave
   // This keeps scrolling behavior simple (no blur = no issues)
 
-  // Autosave for all logs (with 8s debounce for primary, 1.5s for old)
+  // Autosave for all logs (with 8s debounce for primary, 5s for past logs)
   // Timeline: finish typing > wait 8s > [autosave + start blink] > wait 2s > [end blink + push]
   React.useEffect(() => {
     if (log.text === debouncedValue) return
@@ -447,9 +448,9 @@ const NoteEditor = ({
             'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
             'placeholder:opacity-20',
             !primary && 'opacity-20',
-            primary && isSaved && 'opacity-40',
+            primary && isSaved && !isAboutToPush && 'opacity-40',
             primary && !isSaved && 'opacity-100',
-            primary && isAboutToPush && 'animate-pulse'
+            primary && isAboutToPush && 'animate-blink'
           )}
           rows={primary ? 10 : 1}
         />
