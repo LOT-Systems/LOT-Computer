@@ -45,9 +45,14 @@ export const Logs: React.FC = () => {
         // Refetch logs to push down saved entry and create new empty log
         // Wait 2 seconds to show the blink animation, then push down
         // Store timeout ID so it can be cancelled if user starts typing again
-        pendingPushRef.current = setTimeout(() => {
-          refetchLogs()
-          pendingPushRef.current = null
+        pendingPushRef.current = setTimeout(async () => {
+          try {
+            await refetchLogs()
+            pendingPushRef.current = null
+          } catch (error) {
+            console.error('[Logs] Refetch failed:', error)
+            pendingPushRef.current = null
+          }
         }, 2000)
       }
     },
@@ -128,6 +133,12 @@ export const Logs: React.FC = () => {
 
   if (!logIds.length) return <>Loading...</>
 
+  // Defensive check: ensure the primary log exists before rendering
+  if (!logById[recentLogId]) {
+    console.warn('[Logs] Primary log not found in logById, waiting for sync...')
+    return <>Loading...</>
+  }
+
   return (
     <div
       ref={containerRef}
@@ -147,6 +158,7 @@ export const Logs: React.FC = () => {
 
       {pastLogIds.map((id) => {
         const log = logById[id]
+        if (!log) return null  // Skip if log doesn't exist yet
         if (log.event === 'answer') {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
