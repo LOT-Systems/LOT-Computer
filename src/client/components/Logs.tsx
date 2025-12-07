@@ -60,8 +60,13 @@ export const Logs: React.FC = () => {
 
   React.useEffect(() => {
     if (!loadedLogs.length) return
-    localStore.logById.set(loadedLogs.reduce(fp.by('id'), {}))
-    localStore.logIds.set(loadedLogs.map(fp.prop('id')))
+    // Update both stores atomically to prevent race condition
+    const newLogById = loadedLogs.reduce(fp.by('id'), {})
+    const newLogIds = loadedLogs.map(fp.prop('id'))
+
+    // Update in a single batch to avoid intermediate renders
+    localStore.logById.set(newLogById)
+    localStore.logIds.set(newLogIds)
   }, [loadedLogs])
 
   const onChangeLog = React.useCallback(
@@ -133,27 +138,25 @@ export const Logs: React.FC = () => {
 
   if (!logIds.length) return <>Loading...</>
 
-  // Defensive check: ensure the primary log exists before rendering
-  if (!logById[recentLogId]) {
-    console.warn('[Logs] Primary log not found in logById, waiting for sync...')
-    return <>Loading...</>
-  }
-
   return (
     <div
       ref={containerRef}
       className="flex flex-col gap-y-[1.5rem] leading-[1.5rem] px-4 sm:px-0"
     >
       <div ref={inputContainerRef} className="min-h-[200px]">
-        <NoteEditor
-          key={recentLogId}
-          log={logById[recentLogId]}
-          primary
-          onChange={onChangePrimaryLog}
-          isMouseActive={isMouseActive}
-          dateFormat={dateFormat}
-          pendingPushRef={pendingPushRef}
-        />
+        {logById[recentLogId] ? (
+          <NoteEditor
+            key={recentLogId}
+            log={logById[recentLogId]}
+            primary
+            onChange={onChangePrimaryLog}
+            isMouseActive={isMouseActive}
+            dateFormat={dateFormat}
+            pendingPushRef={pendingPushRef}
+          />
+        ) : (
+          <div className="opacity-20">Loading...</div>
+        )}
       </div>
 
       {pastLogIds.map((id) => {
@@ -304,10 +307,10 @@ const NoteEditor = ({
     // Clear saving state after a brief delay
     setTimeout(() => setIsSaving(false), 100)
 
-    // For primary log: trigger blink animation (lasts 2s), then push happens via parent
+    // For primary log: trigger blink animation (lasts 1.8s), then push happens via parent
     if (primary) {
       setIsAboutToPush(true)
-      setTimeout(() => setIsAboutToPush(false), 2000)
+      setTimeout(() => setIsAboutToPush(false), 1800)  // Match CSS animation duration
     }
   }, [debouncedValue, onChange, log.text, primary, isSaving])
 
@@ -379,7 +382,7 @@ const NoteEditor = ({
           // Trigger blink animation for manual save too
           if (primary) {
             setIsAboutToPush(true)
-            setTimeout(() => setIsAboutToPush(false), 2000)
+            setTimeout(() => setIsAboutToPush(false), 1800)  // Match CSS animation duration
           }
         }
         // Optionally blur to show save happened
