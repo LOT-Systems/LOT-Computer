@@ -52,7 +52,7 @@ input:-webkit-autofill {
 }
 
 .animate-blink {
-  animation: blink 0.6s ease-in-out 3;
+  animation: blink 0.8s ease-in-out 3;
 }
 
 ._table::-webkit-scrollbar-track,
