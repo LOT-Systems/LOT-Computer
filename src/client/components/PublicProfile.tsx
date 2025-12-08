@@ -136,13 +136,12 @@ export const PublicProfile = () => {
     .join(' ') || 'Anonymous'
 
   return (
-    <div className="min-h-screen p-8 sm:p-16">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-8">
-          <GhostButton href="/">← Back to LOT Systems</GhostButton>
-        </div>
+    <div className="max-w-2xl">
+      <div className="mb-8">
+        <GhostButton href="/">← Back to LOT Systems</GhostButton>
+      </div>
 
-        <div className="flex flex-col gap-y-24">
+      <div className="flex flex-col gap-y-24">
           <div>
             <div className="text-2xl mb-2">{userName}</div>
             {privacySettings.showCity && profile.city && (
@@ -206,9 +205,8 @@ export const PublicProfile = () => {
             </div>
           )}
 
-          <div className="text-acc/40 text-sm">
-            This is a public profile page on LOT Systems
-          </div>
+        <div className="text-acc/40 text-sm">
+          This is a public profile page on LOT Systems
         </div>
       </div>
     </div>
