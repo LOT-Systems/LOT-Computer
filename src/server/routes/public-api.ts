@@ -605,20 +605,41 @@ export default async (fastify: FastifyInstance) => {
 
       // If not found by ID, try custom URL in metadata
       if (!user) {
+        console.log('[PUBLIC-PROFILE-API] Searching for custom URL:', userIdOrUsername)
         const users = await models.User.findAll()
-        user = users.find(u =>
-          u.metadata?.privacy?.customUrl === userIdOrUsername
-        ) || null
+        console.log('[PUBLIC-PROFILE-API] Total users:', users.length)
+        user = users.find(u => {
+          const customUrl = u.metadata?.privacy?.customUrl
+          console.log(`[PUBLIC-PROFILE-API] Checking user ${u.id}: customUrl="${customUrl}"`)
+          return customUrl === userIdOrUsername
+        }) || null
         console.log('[PUBLIC-PROFILE-API] User found by custom URL:', !!user)
+        if (user) {
+          console.log('[PUBLIC-PROFILE-API] Matched user ID:', user.id)
+          console.log('[PUBLIC-PROFILE-API] Matched user metadata:', JSON.stringify(user.metadata, null, 2))
+        }
       }
 
       if (!user) {
-        console.log('[PUBLIC-PROFILE-API] ❌ User not found')
+        console.log('[PUBLIC-PROFILE-API] ❌ User not found for:', userIdOrUsername)
         return reply.code(404).send({
           error: 'User not found',
-          message: 'No public profile exists for this user'
+          message: `No public profile exists for user: ${userIdOrUsername}`,
+          debug: {
+            searchedFor: userIdOrUsername,
+            searchMethods: ['By ID', 'By custom URL in metadata']
+          }
         })
       }
+
+      console.log('[PUBLIC-PROFILE-API] ✓ User found!')
+      console.log('[PUBLIC-PROFILE-API] User details:', {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        hasMetadata: !!user.metadata,
+        metadata: user.metadata
+      })
 
       // Get privacy settings from metadata (with defaults)
       const privacy: any = user.metadata?.privacy || {
