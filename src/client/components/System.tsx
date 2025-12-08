@@ -148,6 +148,7 @@ export const System = () => {
         <TimeWidget />
         {!!weather && (
           <>
+            <Block label="Sky:">{weather?.description || 'Unknown'}</Block>
             <Block label="Humidity:">
               <span
                 className={cn(
