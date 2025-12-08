@@ -40,14 +40,20 @@ export const PublicProfile = () => {
     fetch(`/api/public/profile/${userIdOrUsername}`)
       .then(async (res) => {
         console.log('[PublicProfile] Response status:', res.status)
+        console.log('[PublicProfile] Response URL:', res.url)
         if (!res.ok) {
-          const data = await res.json().catch(() => ({ message: `HTTP ${res.status}` }))
+          const data = await res.json().catch(() => ({
+            message: `HTTP ${res.status}`,
+            error: `Server returned ${res.status}`
+          }))
           console.error('[PublicProfile] Error response:', data)
           // Capture debug info if available
           if (data.debug) {
             setDebugInfo(data.debug)
           }
-          throw new Error(data.message || 'Failed to load profile')
+          // Show more detailed error message
+          const errorMsg = data.error || data.message || 'Failed to load profile'
+          throw new Error(errorMsg)
         }
         return res.json()
       })
@@ -58,7 +64,7 @@ export const PublicProfile = () => {
       })
       .catch((err) => {
         console.error('[PublicProfile] Fetch error:', err)
-        setError(err.message)
+        setError(err.message || String(err))
         setLoading(false)
       })
   }, [userIdOrUsername])
@@ -76,6 +82,9 @@ export const PublicProfile = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-2xl px-8">
           <div className="text-xl mb-4">{error || 'Profile not found'}</div>
+          <div className="text-sm text-acc/60 mb-4">
+            Looking for: {userIdOrUsername}
+          </div>
           {debugInfo && (
             <div className="mt-8 text-left bg-acc/5 p-4 rounded text-sm">
               <div className="font-bold mb-2">Debug Information:</div>
@@ -90,6 +99,16 @@ export const PublicProfile = () => {
                   </pre>
                 </div>
               )}
+            </div>
+          )}
+          {!debugInfo && (
+            <div className="mt-4 text-sm text-acc/60">
+              Possible issues:
+              <ul className="list-disc list-inside mt-2 text-left">
+                <li>Profile not enabled in Settings</li>
+                <li>Wrong user ID or custom URL</li>
+                <li>Check Settings → Public Profile for your correct link</li>
+              </ul>
             </div>
           )}
           <div className="mt-8">
