@@ -598,6 +598,10 @@ export default async (fastify: FastifyInstance) => {
         where: { id: userIdOrUsername }
       })
       console.log('[PUBLIC-PROFILE-API] User found by ID:', !!user)
+      if (user) {
+        console.log('[PUBLIC-PROFILE-API] User ID:', user.id)
+        console.log('[PUBLIC-PROFILE-API] User metadata:', JSON.stringify(user.metadata, null, 2))
+      }
 
       // If not found by ID, try custom URL in metadata
       if (!user) {
@@ -721,10 +725,15 @@ export default async (fastify: FastifyInstance) => {
 
       return profile
     } catch (error: any) {
-      console.error('Public profile error:', error)
+      console.error('[PUBLIC-PROFILE-API] ❌ Error:', error)
+      console.error('[PUBLIC-PROFILE-API] Error stack:', error.stack)
       return reply.code(500).send({
         error: 'Internal server error',
-        message: 'Failed to fetch public profile'
+        message: error.message || 'Failed to fetch public profile',
+        debug: {
+          errorType: error.constructor.name,
+          errorMessage: error.message,
+        }
       })
     }
   })
