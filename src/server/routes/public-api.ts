@@ -593,30 +593,28 @@ export default async (fastify: FastifyInstance) => {
     console.log('[PUBLIC-PROFILE-API] Fetching profile for:', userIdOrUsername)
 
     try {
-      // Try to find user by ID or custom URL
-      let user = await models.User.findOne({
-        where: { id: userIdOrUsername }
-      })
-      console.log('[PUBLIC-PROFILE-API] User found by ID:', !!user)
+      // Prioritize custom URL over ID to avoid conflicts
+      // First, try to find user by custom URL in metadata
+      console.log('[PUBLIC-PROFILE-API] Searching for custom URL:', userIdOrUsername)
+      const users = await models.User.findAll()
+      let user = users.find(u => {
+        const customUrl = u.metadata?.privacy?.customUrl
+        return customUrl === userIdOrUsername
+      }) || null
+
       if (user) {
+        console.log('[PUBLIC-PROFILE-API] ✓ User found by custom URL')
         console.log('[PUBLIC-PROFILE-API] User ID:', user.id)
-        console.log('[PUBLIC-PROFILE-API] User metadata:', JSON.stringify(user.metadata, null, 2))
       }
 
-      // If not found by ID, try custom URL in metadata
+      // If not found by custom URL, try by user ID
       if (!user) {
-        console.log('[PUBLIC-PROFILE-API] Searching for custom URL:', userIdOrUsername)
-        const users = await models.User.findAll()
-        console.log('[PUBLIC-PROFILE-API] Total users:', users.length)
-        user = users.find(u => {
-          const customUrl = u.metadata?.privacy?.customUrl
-          console.log(`[PUBLIC-PROFILE-API] Checking user ${u.id}: customUrl="${customUrl}"`)
-          return customUrl === userIdOrUsername
-        }) || null
-        console.log('[PUBLIC-PROFILE-API] User found by custom URL:', !!user)
+        console.log('[PUBLIC-PROFILE-API] Custom URL not found, trying by ID')
+        user = await models.User.findOne({
+          where: { id: userIdOrUsername }
+        })
         if (user) {
-          console.log('[PUBLIC-PROFILE-API] Matched user ID:', user.id)
-          console.log('[PUBLIC-PROFILE-API] Matched user metadata:', JSON.stringify(user.metadata, null, 2))
+          console.log('[PUBLIC-PROFILE-API] ✓ User found by ID:', user.id)
         }
       }
 
