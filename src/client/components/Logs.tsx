@@ -154,9 +154,7 @@ export const Logs: React.FC = () => {
             dateFormat={dateFormat}
             pendingPushRef={pendingPushRef}
           />
-        ) : (
-          <div className="opacity-20">Loading...</div>
-        )}
+        ) : null}
       </div>
 
       {pastLogIds.map((id) => {
