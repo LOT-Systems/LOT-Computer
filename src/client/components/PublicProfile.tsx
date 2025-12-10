@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { Block, GhostButton, Tag } from '#client/components/ui'
+import { Block, GhostButton, Tag, TagsContainer } from '#client/components/ui'
 import { PublicProfile as PublicProfileType } from '#shared/types'
 import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
+import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 
 export const PublicProfile = () => {
   console.log('[PublicProfile] Component rendering at:', new Date().toISOString())
@@ -161,11 +162,19 @@ export const PublicProfile = () => {
 
         {/* Team tags */}
         {profile.tags && profile.tags.length > 0 && (
-          <div className="flex gap-x-4 items-center">
-            <span>Team:</span>
-            {profile.tags.map((tag: string) => (
-              <Tag key={tag}>[{tag}]</Tag>
-            ))}
+          <div>
+            <Block label="Team:" blockView>
+              <TagsContainer
+                items={profile.tags.map((tagId: string) => {
+                  const tag = getUserTagByIdCaseInsensitive(tagId)
+                  return tag ? (
+                    <Tag key={tagId} color={tag.color}>
+                      {tag.name}
+                    </Tag>
+                  ) : null
+                }).filter(Boolean)}
+              />
+            </Block>
           </div>
         )}
 
