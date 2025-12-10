@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Block, GhostButton } from '#client/components/ui'
+import { Block, GhostButton, Tag } from '#client/components/ui'
 import { PublicProfile as PublicProfileType } from '#shared/types'
 import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
@@ -135,78 +135,106 @@ export const PublicProfile = () => {
     .filter(Boolean)
     .join(' ') || 'Anonymous'
 
+  // Format current date
+  const currentDate = dayjs().format('dddd, D MMMM, YYYY')
+
   return (
     <div className="max-w-2xl">
       <div className="mb-8">
         <GhostButton href="/">← Back to LOT Systems</GhostButton>
       </div>
 
-      <div className="flex flex-col gap-y-24">
+      <div className="flex flex-col gap-y-8">
+        {/* Name */}
+        <div>{userName}</div>
+
+        {/* Date */}
+        <div>{currentDate}</div>
+
+        {/* Location */}
+        {privacySettings.showCity && profile.city && (
           <div>
-            <div>{userName}</div>
-            {privacySettings.showCity && profile.city && (
-              <div>
-                {profile.city}
-                {profile.country && `, ${profile.country}`}
-              </div>
-            )}
+            {profile.city}
+            {profile.country && `, ${profile.country}`}
           </div>
+        )}
 
-          {(privacySettings.showLocalTime || privacySettings.showWeather) && (
-            <div>
-              {privacySettings.showLocalTime && profile.localTime && (
-                <Block label="Local time:">{profile.localTime}</Block>
-              )}
-              {privacySettings.showWeather && profile.weather && (
-                <>
-                  <Block label="Weather:">
-                    {profile.weather.description || 'Unknown'}
-                  </Block>
-                  {profile.weather.humidity && (
-                    <Block label="Humidity:">
-                      <span
-                        className={cn(
-                          profile.weather.humidity >= 50 && 'text-blue-500'
-                        )}
-                      >
-                        {profile.weather.humidity}%
-                      </span>
-                    </Block>
-                  )}
-                  {temperature !== null && (
-                    <Block label="Temperature:">
-                      {temperature}℃
-                    </Block>
-                  )}
-                  {(sunrise || sunset) && (
-                    <>
-                      {sunrise && <Block label="Sunrise:">{sunrise}</Block>}
-                      {sunset && <Block label="Sunset:">{sunset}</Block>}
-                    </>
-                  )}
-                </>
-              )}
+        {/* Team tags */}
+        {profile.tags && profile.tags.length > 0 && (
+          <div className="flex gap-x-4 items-center">
+            <span>Team:</span>
+            {profile.tags.map((tag: string) => (
+              <Tag key={tag}>[{tag}]</Tag>
+            ))}
+          </div>
+        )}
+
+        {/* Status items */}
+        <div className="flex flex-col">
+          {privacySettings.showLocalTime && profile.localTime && (
+            <div className="flex">
+              <span className="inline-block w-[200px]">Local time:</span>
+              <span>{profile.localTime}</span>
             </div>
           )}
-
+          {privacySettings.showWeather && profile.weather && (
+            <>
+              <div className="flex">
+                <span className="inline-block w-[200px]">Weather:</span>
+                <span>{profile.weather.description || 'Unknown'}</span>
+              </div>
+              {profile.weather.humidity && (
+                <div className="flex">
+                  <span className="inline-block w-[200px]">Humidity:</span>
+                  <span
+                    className={cn(
+                      profile.weather.humidity >= 50 && 'text-blue-500'
+                    )}
+                  >
+                    {profile.weather.humidity}%
+                  </span>
+                </div>
+              )}
+              {temperature !== null && (
+                <div className="flex">
+                  <span className="inline-block w-[200px]">Temperature:</span>
+                  <span>{temperature}℃</span>
+                </div>
+              )}
+              {sunrise && (
+                <div className="flex">
+                  <span className="inline-block w-[200px]">Sunrise:</span>
+                  <span>{sunrise}</span>
+                </div>
+              )}
+              {sunset && (
+                <div className="flex">
+                  <span className="inline-block w-[200px]">Sunset:</span>
+                  <span>{sunset}</span>
+                </div>
+              )}
+            </>
+          )}
           {privacySettings.showSound && profile.soundDescription && (
-            <div>
-              <Block label="Sound:" blockView>
-                {profile.soundDescription}
-              </Block>
+            <div className="flex">
+              <span className="inline-block w-[200px]">Sound:</span>
+              <span>{profile.soundDescription}</span>
             </div>
           )}
+        </div>
 
-          {privacySettings.showMemoryStory && profile.memoryStory && (
-            <div>
-              <Block label="Memory Story:" blockView>
-                <div className="whitespace-pre-wrap">{profile.memoryStory}</div>
-              </Block>
-            </div>
-          )}
+        {/* Memory Story - keep as block view if present */}
+        {privacySettings.showMemoryStory && profile.memoryStory && (
+          <div>
+            <Block label="Memory Story:" blockView>
+              <div className="whitespace-pre-wrap">{profile.memoryStory}</div>
+            </Block>
+          </div>
+        )}
 
+        {/* Footer */}
         <div>
-          This is a public profile page on LOT Systems
+          This is {userName}'s System powered by LOT.
         </div>
       </div>
     </div>
