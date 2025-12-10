@@ -143,9 +143,9 @@ export const PublicProfile = () => {
 
       <div className="flex flex-col gap-y-24">
           <div>
-            <div className="text-2xl mb-2">{userName}</div>
+            <div>{userName}</div>
             {privacySettings.showCity && profile.city && (
-              <div className="text-acc/60">
+              <div>
                 {profile.city}
                 {profile.country && `, ${profile.country}`}
               </div>
@@ -205,7 +205,7 @@ export const PublicProfile = () => {
             </div>
           )}
 
-        <div className="text-acc/40 text-sm">
+        <div>
           This is a public profile page on LOT Systems
         </div>
       </div>
