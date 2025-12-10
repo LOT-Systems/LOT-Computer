@@ -141,10 +141,6 @@ export const PublicProfile = () => {
 
   return (
     <div className="max-w-2xl">
-      <div className="mb-8">
-        <GhostButton href="/">← Back to LOT Systems</GhostButton>
-      </div>
-
       <div className="flex flex-col gap-y-24">
         {/* Name */}
         <div>
@@ -222,7 +218,8 @@ export const PublicProfile = () => {
 
         {/* Footer */}
         <div>
-          This is {userName}'s System powered by LOT.
+          This is {userName}'s System powered by{' '}
+          <GhostButton href="/">LOT ↩</GhostButton>
         </div>
       </div>
     </div>
