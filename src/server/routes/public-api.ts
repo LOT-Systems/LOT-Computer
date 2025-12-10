@@ -673,6 +673,7 @@ export default async (fastify: FastifyInstance) => {
         firstName: user.firstName,
         lastName: user.lastName,
         privacySettings: privacy,
+        tags: user.tags || [], // Add user tags
       }
 
       // Add city/country if enabled
