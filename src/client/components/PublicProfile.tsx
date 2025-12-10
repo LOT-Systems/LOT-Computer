@@ -219,7 +219,7 @@ export const PublicProfile = () => {
         {/* Footer */}
         <div>
           This is {userName}'s System powered by{' '}
-          <GhostButton href="/">LOT <span dangerouslySetInnerHTML={{ __html: '&#8617;' }} /></GhostButton>
+          <GhostButton href="/">LOT</GhostButton>
         </div>
       </div>
     </div>
