@@ -145,20 +145,18 @@ export const PublicProfile = () => {
         <GhostButton href="/">← Back to LOT Systems</GhostButton>
       </div>
 
-      <div className="flex flex-col gap-y-8">
+      <div className="flex flex-col gap-y-24">
         {/* Name */}
-        <div>{userName}</div>
-
-        {/* Date */}
-        <div>{currentDate}</div>
-
-        {/* Location */}
-        {privacySettings.showCity && profile.city && (
-          <div>
-            {profile.city}
-            {profile.country && `, ${profile.country}`}
-          </div>
-        )}
+        <div>
+          <div>{userName}</div>
+          <div>{currentDate}</div>
+          {privacySettings.showCity && profile.city && (
+            <div>
+              {profile.city}
+              {profile.country && `, ${profile.country}`}
+            </div>
+          )}
+        </div>
 
         {/* Team tags */}
         {profile.tags && profile.tags.length > 0 && (
@@ -179,22 +177,17 @@ export const PublicProfile = () => {
         )}
 
         {/* Status items */}
-        <div className="flex flex-col">
+        <div>
           {privacySettings.showLocalTime && profile.localTime && (
-            <div className="flex">
-              <span className="inline-block w-[200px]">Local time:</span>
-              <span>{profile.localTime}</span>
-            </div>
+            <Block label="Local time:">{profile.localTime}</Block>
           )}
           {privacySettings.showWeather && profile.weather && (
             <>
-              <div className="flex">
-                <span className="inline-block w-[200px]">Weather:</span>
-                <span>{profile.weather.description || 'Unknown'}</span>
-              </div>
+              <Block label="Weather:">
+                {profile.weather.description || 'Unknown'}
+              </Block>
               {profile.weather.humidity && (
-                <div className="flex">
-                  <span className="inline-block w-[200px]">Humidity:</span>
+                <Block label="Humidity:">
                   <span
                     className={cn(
                       profile.weather.humidity >= 50 && 'text-blue-500'
@@ -202,33 +195,19 @@ export const PublicProfile = () => {
                   >
                     {profile.weather.humidity}%
                   </span>
-                </div>
+                </Block>
               )}
               {temperature !== null && (
-                <div className="flex">
-                  <span className="inline-block w-[200px]">Temperature:</span>
-                  <span>{temperature}℃</span>
-                </div>
+                <Block label="Temperature:">
+                  {temperature}℃
+                </Block>
               )}
-              {sunrise && (
-                <div className="flex">
-                  <span className="inline-block w-[200px]">Sunrise:</span>
-                  <span>{sunrise}</span>
-                </div>
-              )}
-              {sunset && (
-                <div className="flex">
-                  <span className="inline-block w-[200px]">Sunset:</span>
-                  <span>{sunset}</span>
-                </div>
-              )}
+              {sunrise && <Block label="Sunrise:">{sunrise}</Block>}
+              {sunset && <Block label="Sunset:">{sunset}</Block>}
             </>
           )}
           {privacySettings.showSound && profile.soundDescription && (
-            <div className="flex">
-              <span className="inline-block w-[200px]">Sound:</span>
-              <span>{profile.soundDescription}</span>
-            </div>
+            <Block label="Sound:">{profile.soundDescription}</Block>
           )}
         </div>
 
