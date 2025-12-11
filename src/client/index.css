@@ -46,21 +46,16 @@ input:-webkit-autofill {
 }
 
 /* Custom blink animation for log push warning */
-/* One gentle 2-second blink followed by satisfying fast blink */
+/* Fast satisfying blink before push */
 @keyframes blink {
-  /* Gentle 2-second blink */
   0% { opacity: 0.4; }
-  40% { opacity: 0.2; }
-  80% { opacity: 0.4; }
-
-  /* Fast satisfying blink at the end */
-  85% { opacity: 0.4; }
-  92.5% { opacity: 0.2; }
+  33% { opacity: 0.2; }
+  66% { opacity: 0.4; }
   100% { opacity: 0.2; }
 }
 
 .animate-blink {
-  animation: blink 2.5s ease-in-out;
+  animation: blink 0.5s ease-in-out;
   animation-fill-mode: forwards;
 }
 

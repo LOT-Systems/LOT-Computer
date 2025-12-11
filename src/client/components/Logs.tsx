@@ -305,10 +305,10 @@ const NoteEditor = ({
     // Clear saving state after a brief delay
     setTimeout(() => setIsSaving(false), 100)
 
-    // For primary log: trigger blink animation (lasts 2.5s), then push happens via parent
+    // For primary log: trigger blink animation (lasts 0.5s), then push happens via parent
     if (primary) {
       setIsAboutToPush(true)
-      setTimeout(() => setIsAboutToPush(false), 2500)  // Match CSS animation duration (gentle with fast end)
+      setTimeout(() => setIsAboutToPush(false), 500)  // Match CSS animation duration (fast blink)
     }
   }, [debouncedValue, onChange, log.text, primary, isSaving])
 
@@ -380,7 +380,7 @@ const NoteEditor = ({
           // Trigger blink animation for manual save too
           if (primary) {
             setIsAboutToPush(true)
-            setTimeout(() => setIsAboutToPush(false), 2500)  // Match CSS animation duration (gentle with fast end)
+            setTimeout(() => setIsAboutToPush(false), 500)  // Match CSS animation duration (fast blink)
           }
         }
         // Optionally blur to show save happened
