@@ -135,9 +135,11 @@ export const Sync = () => {
     (userId: string) => (ev: React.MouseEvent | React.TouchEvent) => {
       ev?.preventDefault()
       ev?.stopPropagation()
-      window.location.href = `/us/${userId}`
+      // Usership/Admin users go to /us (admin interface)
+      // Regular users go to /u (public profile)
+      window.location.href = canAccessUserProfiles ? `/us/${userId}` : `/u/${userId}`
     },
-    []
+    [canAccessUserProfiles]
   )
 
   const onKeyDown = React.useCallback(
@@ -212,7 +214,7 @@ export const Sync = () => {
               )}
               onClick={onToggleLike(x.id)}
             >
-              {authorId && canAccessUserProfiles ? (
+              {authorId ? (
                 <GhostButton
                   className="whitespace-nowrap pr-4"
                   onClick={onNavigateToUserProfile(authorId)}
