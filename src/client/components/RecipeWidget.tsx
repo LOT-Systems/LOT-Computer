@@ -3,6 +3,7 @@ import { useStore } from '@nanostores/react'
 import { recipeWidget, dismissRecipeWidget } from '#client/stores/recipeWidget'
 import { Block } from '#client/components/ui'
 import { useCreateLog } from '#client/queries'
+import { cn } from '#client/utils'
 import * as stores from '#client/stores'
 
 export const RecipeWidget: React.FC = () => {
@@ -10,6 +11,7 @@ export const RecipeWidget: React.FC = () => {
   const router = useStore(stores.router)
   const { mutate: createLog } = useCreateLog()
   const hasLoggedRef = React.useRef(false)
+  const [isShown, setIsShown] = React.useState(false)
 
   // Auto-log recipe when it becomes visible on System tab
   React.useEffect(() => {
@@ -38,6 +40,27 @@ export const RecipeWidget: React.FC = () => {
     )
   }, [state.isVisible, state.recipe, router, createLog])
 
+  // Handle fade-in when widget becomes visible
+  React.useEffect(() => {
+    if (state.isVisible) {
+      // Small delay before showing to trigger transition
+      setTimeout(() => {
+        setIsShown(true)
+      }, 100)
+    } else {
+      setIsShown(false)
+    }
+  }, [state.isVisible])
+
+  const handleDismiss = () => {
+    // Fade out first
+    setIsShown(false)
+    // Then dismiss after transition completes
+    setTimeout(() => {
+      dismissRecipeWidget()
+    }, 1400)
+  }
+
   if (!state.isVisible) return null
 
   const getMealLabel = () => {
@@ -52,15 +75,22 @@ export const RecipeWidget: React.FC = () => {
 
   return (
     <div>
-      <Block label={getMealLabel()} blockView>
+      <Block
+        label={getMealLabel()}
+        blockView
+        className={cn(
+          'opacity-0 transition-opacity duration-[1400ms]',
+          isShown && 'opacity-100'
+        )}
+      >
         <div className="flex items-start justify-between gap-4">
           <div>{state.recipe}</div>
           <button
-            onClick={dismissRecipeWidget}
+            onClick={handleDismiss}
             className="text-acc/40 hover:text-acc transition-colors cursor-pointer select-none"
             aria-label="Dismiss"
           >
-            ✕
+            ✓
           </button>
         </div>
       </Block>
