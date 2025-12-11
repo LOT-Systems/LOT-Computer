@@ -688,7 +688,7 @@ export default async (fastify: FastifyInstance) => {
           const now = new Date()
           profile.localTime = now.toLocaleString('en-US', {
             timeZone: user.timeZone || 'UTC',
-            hour: '2-digit',
+            hour: 'numeric',
             minute: '2-digit',
             hour12: true,
           })
