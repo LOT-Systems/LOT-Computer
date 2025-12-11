@@ -16,6 +16,7 @@ import {
   useUser,
   useUserMemoryPrompt,
   useUserMemoryStory,
+  useUserProfile,
 } from '#client/queries'
 import { getUserTagByIdCaseInsensitive, USER_TAGS_BY_ID, COUNTRY_BY_ALPHA3 } from '#shared/constants'
 import { DefaultQuestion, UserTag } from '#shared/types'
@@ -43,6 +44,7 @@ export const AdminUser = () => {
   )
   const { data: memoryPrompt } = useUserMemoryPrompt(user?.id!)
   const { data: memoryStoryData, isLoading: isStoryLoading } = useUserMemoryStory(user?.id!)
+  const { data: profileData, isLoading: isProfileLoading } = useUserProfile(user?.id!)
   const { mutate: updateUser } = useUpdateUser({
     onSuccess: () => refetchUser(),
   })
@@ -207,6 +209,114 @@ export const AdminUser = () => {
             <Block label="Address:" children={user.address || <Unknown />} />
             <Block label="Phone:" children={user.phone || <Unknown />} />
           </div>
+
+          {/* Psychological Profile Section */}
+          {user && (
+            <div className="mt-32">
+              <Block label="Psychological Profile:" blockView>
+                {isProfileLoading ? (
+                  <div className="opacity-60">Loading profile...</div>
+                ) : !profileData?.hasUsership ? (
+                  <div className="opacity-60">
+                    {profileData?.message || 'User does not have Usership'}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-y-12">
+                    {/* Soul Archetype */}
+                    {profileData.archetype && (
+                      <Block label="Soul Archetype:" blockView>
+                        <div className="font-bold text-acc mb-4">
+                          {profileData.archetype}
+                        </div>
+                        {profileData.archetypeDescription && (
+                          <div className="text-acc/80 text-sm">
+                            {profileData.archetypeDescription}
+                          </div>
+                        )}
+                      </Block>
+                    )}
+
+                    {/* Self-Awareness Level */}
+                    {profileData.selfAwarenessLevel !== undefined && (
+                      <Block label="Self-Awareness:">
+                        {profileData.selfAwarenessLevel}/10
+                      </Block>
+                    )}
+
+                    {/* Core Values */}
+                    {profileData.coreValues && profileData.coreValues.length > 0 && (
+                      <Block label="Core Values:" blockView>
+                        <TagsContainer
+                          items={profileData.coreValues.map((value, idx) => (
+                            <Tag key={idx} color="blue" fill>
+                              {value}
+                            </Tag>
+                          ))}
+                        />
+                      </Block>
+                    )}
+
+                    {/* Emotional Patterns */}
+                    {profileData.emotionalPatterns && profileData.emotionalPatterns.length > 0 && (
+                      <Block label="Emotional Patterns:" blockView>
+                        <TagsContainer
+                          items={profileData.emotionalPatterns.map((pattern, idx) => (
+                            <Tag key={idx} color="purple" fill>
+                              {pattern}
+                            </Tag>
+                          ))}
+                        />
+                      </Block>
+                    )}
+
+                    {/* Behavioral Cohort */}
+                    {profileData.behavioralCohort && (
+                      <Block label="Behavioral Cohort:">
+                        {profileData.behavioralCohort}
+                      </Block>
+                    )}
+
+                    {/* Behavioral Traits */}
+                    {profileData.behavioralTraits && profileData.behavioralTraits.length > 0 && (
+                      <Block label="Behavioral Traits:" blockView>
+                        <TagsContainer
+                          items={profileData.behavioralTraits.map((trait, idx) => (
+                            <Tag key={idx} color="green">
+                              {trait}
+                            </Tag>
+                          ))}
+                        />
+                      </Block>
+                    )}
+
+                    {/* Pattern Strength */}
+                    {profileData.patternStrength && profileData.patternStrength.length > 0 && (
+                      <Block label="Pattern Strength:" blockView>
+                        <div className="text-sm">
+                          {profileData.patternStrength.slice(0, 5).map((p, idx) => (
+                            <div key={idx} className="mb-2">
+                              <span className="opacity-80">{p.trait}:</span>{' '}
+                              <span className="font-bold">{p.count}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </Block>
+                    )}
+
+                    {/* Meta Info */}
+                    {(profileData.answerCount !== undefined || profileData.noteCount !== undefined) && (
+                      <Block label="Data:" blockView>
+                        <div className="text-sm opacity-60">
+                          {profileData.answerCount} answers • {profileData.noteCount || 0} journal entries
+                        </div>
+                      </Block>
+                    )}
+                  </div>
+                )}
+              </Block>
+            </div>
+          )}
+
           {!!user.lastSeenAt && (
             <div className="mt-32">
               Last seen {dayjs(user.lastSeenAt).fromNow()}

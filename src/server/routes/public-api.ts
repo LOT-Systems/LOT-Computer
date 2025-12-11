@@ -640,8 +640,9 @@ export default async (fastify: FastifyInstance) => {
       })
 
       // Get privacy settings from metadata (with defaults)
+      // All profiles are now public, but privacy settings control what's shown
       const privacy: any = user.metadata?.privacy || {
-        isPublicProfile: false,
+        isPublicProfile: true, // Always true - all profiles are public
         showWeather: true,
         showLocalTime: true,
         showCity: true,
@@ -649,24 +650,8 @@ export default async (fastify: FastifyInstance) => {
         showMemoryStory: true,
       }
       console.log('[PUBLIC-PROFILE-API] Privacy settings:', JSON.stringify(privacy, null, 2))
-      console.log('[PUBLIC-PROFILE-API] isPublicProfile:', privacy.isPublicProfile)
 
-      // Check if profile is public
-      if (!privacy.isPublicProfile) {
-        console.log('[PUBLIC-PROFILE-API] ❌ Profile is private')
-        return reply.code(403).send({
-          error: 'Profile is private',
-          message: 'This user has not enabled their public profile',
-          debug: {
-            userId: user.id,
-            hasMetadata: !!user.metadata,
-            hasPrivacy: !!user.metadata?.privacy,
-            privacySettings: privacy
-          }
-        })
-      }
-
-      console.log('[PUBLIC-PROFILE-API] ✓ Profile is public, building response')
+      console.log('[PUBLIC-PROFILE-API] ✓ Profile is public (all profiles are public), building response')
 
       // Build public profile response
       const profile: any = {

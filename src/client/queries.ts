@@ -178,6 +178,25 @@ export const useUserMemoryStory = (userId: string) =>
     enabled: !!userId,
   })()
 
+export const useUserProfile = (userId: string) =>
+  createQuery<{
+    hasUsership: boolean
+    archetype?: string
+    archetypeDescription?: string
+    coreValues?: string[]
+    emotionalPatterns?: string[]
+    selfAwarenessLevel?: number
+    behavioralCohort?: string
+    behavioralTraits?: string[]
+    patternStrength?: Array<{ trait: string; count: number }>
+    answerCount?: number
+    noteCount?: number
+    message?: string
+  }>(`/admin-api/users/${userId}/profile`, {
+    enabled: !!userId,
+    refetchOnWindowFocus: false,
+  })()
+
 export const useMyMemoryStory = () =>
   createQuery<{
     story: string | null

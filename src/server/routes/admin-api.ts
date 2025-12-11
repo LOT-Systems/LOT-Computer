@@ -3,7 +3,7 @@ import { Literal } from 'sequelize/types/utils'
 import { FastifyInstance, FastifyRequest } from 'fastify'
 import { AdminUsersSort, LogEvent, Paginated, User } from '#shared/types'
 import { fp } from '#shared/utils'
-import { buildPrompt, completeAndExtractQuestion, generateUserSummary, generateMemoryStory } from '#server/utils/memory'
+import { buildPrompt, completeAndExtractQuestion, generateUserSummary, generateMemoryStory, extractUserTraits, determineUserCohort } from '#server/utils/memory'
 import { sync } from '../sync.js'
 import dayjs from '../utils/dayjs.js'
 
@@ -221,6 +221,84 @@ export default async (fastify: FastifyInstance) => {
 
       const story = await generateMemoryStory(user, logs)
       return { story }
+    }
+  )
+
+  // Psychological profile endpoint for admins
+  fastify.get(
+    '/users/:userId/profile',
+    async (req: FastifyRequest<{ Params: { userId: string } }>, reply) => {
+      const user = await fastify.models.User.findByPk(req.params.userId)
+      if (!user) return reply.throw.notFound()
+
+      try {
+        // Check if user has Usership tag
+        const hasUsershipTag = user.tags.some(
+          (tag) => tag.toLowerCase() === 'usership'
+        )
+
+        if (!hasUsershipTag) {
+          return {
+            hasUsership: false,
+            message: 'User does not have Usership - psychological profile not available'
+          }
+        }
+
+        // Get ALL logs (answers + notes) for psychological analysis
+        const logs = await fastify.models.Log.findAll({
+          where: {
+            userId: user.id,
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 50,
+        })
+
+        if (logs.length === 0) {
+          return {
+            hasUsership: true,
+            message: 'User has not completed any Memory questions yet',
+            answerCount: 0
+          }
+        }
+
+        // Extract traits and determine psychological archetype + behavioral cohort
+        const analysis = extractUserTraits(logs)
+        const { traits, patterns, psychologicalDepth } = analysis
+        const cohortResult = determineUserCohort(traits, patterns, psychologicalDepth)
+
+        console.log(`🧠 Admin viewing profile for user ${user.email}:`, {
+          archetype: cohortResult.archetype,
+          behavioralCohort: cohortResult.behavioralCohort,
+          traits,
+          values: psychologicalDepth.values,
+          selfAwareness: psychologicalDepth.selfAwareness,
+          answerCount: logs.filter(l => l.event === 'answer').length,
+          noteCount: logs.filter(l => l.event === 'note' && l.text && l.text.length > 20).length
+        })
+
+        return {
+          hasUsership: true,
+          // Psychological depth (soul level)
+          archetype: cohortResult.archetype,
+          archetypeDescription: cohortResult.description,
+          coreValues: psychologicalDepth.values.map(v => v.charAt(0).toUpperCase() + v.slice(1)),
+          emotionalPatterns: psychologicalDepth.emotionalPatterns.map(p => p.replace(/([A-Z])/g, ' $1').trim()),
+          selfAwarenessLevel: psychologicalDepth.selfAwareness,
+          // Behavioral patterns (surface level)
+          behavioralCohort: cohortResult.behavioralCohort,
+          behavioralTraits: traits.map(t => t.replace(/([A-Z])/g, ' $1').trim()),
+          patternStrength: Object.entries(patterns)
+            .filter(([_, v]) => v > 0)
+            .map(([k, v]) => ({ trait: k.replace(/([A-Z])/g, ' $1').trim(), count: v }))
+            .sort((a, b) => b.count - a.count),
+          // Meta
+          answerCount: logs.filter(l => l.event === 'answer').length,
+          noteCount: logs.filter(l => l.event === 'note' && l.text && l.text.length > 20).length
+        }
+      } catch (error: any) {
+        console.error('❌ Error generating user profile for admin:', { error: error.message, userId: user.id })
+        return { hasUsership: false, error: 'Unable to generate profile at this time' }
+      }
     }
   )
 }
