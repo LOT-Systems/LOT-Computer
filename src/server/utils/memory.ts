@@ -164,6 +164,27 @@ export async function buildPrompt(user: User, logs: Log[]): Promise<string> {
   // Extract Memory answers to build user's story
   const memoryLogs = logs.filter((log) => log.event === 'answer')
 
+  // Extract traits and determine cohort for personalized questioning
+  let cohortInfo = ''
+  let cohort = ''
+  let traits: string[] = []
+  if (memoryLogs.length >= 3) {
+    const { traits: extractedTraits, patterns } = extractUserTraits(logs)
+    cohort = determineUserCohort(extractedTraits, patterns)
+    traits = extractedTraits
+
+    if (cohort && extractedTraits.length > 0) {
+      cohortInfo = `\n\n**User Cohort Profile:**
+- Identified Cohort: "${cohort}"
+- Key Traits: ${extractedTraits.map(t => t.replace(/([A-Z])/g, ' $1').trim()).join(', ')}
+- Answer Count: ${memoryLogs.length}
+
+Use this cohort profile to ask questions that are HIGHLY RELEVANT to their lifestyle pattern. Questions should feel like they're designed specifically for someone in their cohort.`
+
+      console.log(`🎯 Memory question for cohort "${cohort}":`, { traits: extractedTraits, answerCount: memoryLogs.length })
+    }
+  }
+
   // Decide whether to explore a new topic or follow up on existing ones
   // 35% chance to explore completely new area, 65% follow up
   const shouldExploreNewTopic = memoryLogs.length > 0 && Math.random() < 0.35
@@ -228,7 +249,21 @@ Based on these answers, we're building their story. Now let's explore a NEW area
 - Seasonal preferences and adaptation
 - Movement, posture, and physical awareness
 - Sleep and rest patterns
-- Creative or hobby pursuits`
+- Creative or hobby pursuits
+
+${cohortInfo ? `**Cohort-Specific Question Guidance:**
+Tailor your question to their identified cohort "${cohort}":
+- "Wellness Enthusiast": Ask about mindfulness practices, organic choices, holistic wellness
+- "Plant-Based": Explore plant protein sources, meal planning, nutritional knowledge
+- "Busy Professional": Focus on time-saving routines, efficiency hacks, quick self-care
+- "Comfort Seeker": Ask about cozy rituals, soothing routines, warm environments
+- "Culinary Explorer": Inquire about new ingredients, cooking experiments, flavor preferences
+- "Protein-Focused": Explore meal prep, protein timing, energy and performance
+- "Health-Conscious": Ask about fresh food sourcing, organic preferences, nutrient awareness
+- "Classic Comfort": Focus on familiar routines, traditional choices, consistency
+- "Balanced Lifestyle": Explore how they balance different aspects of wellness
+
+The question should feel like it was designed specifically for someone in their cohort.` : ''}`
   } else {
     // Follow up on existing answers
     userStory = `
@@ -263,7 +298,21 @@ Based on these answers, you can infer the user's preferences, habits, and lifest
 - "Since you mentioned enjoying tea in the morning, how do you usually prepare it?" (Options: Quick tea bag, Loose leaf ritual, Matcha ceremony)
 - "You chose 'Fresh salad' for lunch earlier. What's your go-to salad base?" (Options: Mixed greens, Spinach, Arugula)
 - "Last time you said you prefer comfortable outfits. What fabrics feel best to you?" (Options: Soft cotton, Linen, Merino wool)
-- "Building on your earlier answer about posture awareness, do you stretch during the day?" (Options: Regular breaks, Only when sore, Not yet)`
+- "Building on your earlier answer about posture awareness, do you stretch during the day?" (Options: Regular breaks, Only when sore, Not yet)
+
+${cohortInfo ? `**Cohort-Specific Follow-Up Guidance:**
+Since this is a FOLLOW-UP question, build deeper into their cohort "${cohort}":
+- "Wellness Enthusiast": Connect wellness practices together (morning tea → afternoon meditation)
+- "Plant-Based": Explore plant-based nutrition depth (favorite veggies → protein sources)
+- "Busy Professional": Link efficiency strategies (morning routine → evening wind-down)
+- "Comfort Seeker": Deepen comfort preferences (favorite tea → preferred ambient temperature)
+- "Culinary Explorer": Progress from ingredients to techniques (spices → cooking methods)
+- "Protein-Focused": Connect protein habits (breakfast eggs → post-workout fuel)
+- "Health-Conscious": Build health knowledge (organic produce → supplement awareness)
+- "Classic Comfort": Explore traditional rituals (family recipes → holiday traditions)
+- "Balanced Lifestyle": Connect different wellness dimensions (nutrition → movement)
+
+CRITICAL: Make sure the follow-up EXPLICITLY references a previous answer AND feels cohort-appropriate.` : ''}`
   }
 
   const head = `
