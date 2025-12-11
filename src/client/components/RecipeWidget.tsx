@@ -80,18 +80,16 @@ export const RecipeWidget: React.FC = () => {
         blockView
         className={cn(
           'opacity-0 transition-opacity duration-[1400ms]',
-          isShown && 'opacity-100'
+          isShown && 'opacity-100',
+          'cursor-pointer'
         )}
+        onClick={handleDismiss}
       >
         <div className="flex items-start justify-between gap-4">
           <div>{state.recipe}</div>
-          <button
-            onClick={handleDismiss}
-            className="text-acc/40 hover:text-acc transition-colors cursor-pointer select-none"
-            aria-label="Dismiss"
-          >
+          <div className="text-acc/40 select-none">
             ✓
-          </button>
+          </div>
         </div>
       </Block>
     </div>
