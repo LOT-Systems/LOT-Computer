@@ -874,21 +874,38 @@ export default async (fastify: FastifyInstance) => {
         }
       }
 
-      // Extract traits and determine cohort
-      const { traits, patterns } = extractUserTraits(logs)
-      const cohort = determineUserCohort(traits, patterns)
+      // Extract traits and determine psychological archetype + behavioral cohort
+      const analysis = extractUserTraits(logs)
+      const { traits, patterns, psychologicalDepth } = analysis
+      const cohortResult = determineUserCohort(traits, patterns, psychologicalDepth)
 
-      console.log(`📊 Profile request for ${req.user.email}:`, { cohort, traits, answerCount: logs.length })
+      console.log(`🧠 Profile request for ${req.user.email}:`, {
+        archetype: cohortResult.archetype,
+        behavioralCohort: cohortResult.behavioralCohort,
+        traits,
+        values: psychologicalDepth.values,
+        selfAwareness: psychologicalDepth.selfAwareness,
+        answerCount: logs.length
+      })
 
       return {
         hasUsership: true,
-        cohort,
-        traits: traits.map(t => t.replace(/([A-Z])/g, ' $1').trim()),
-        patterns: Object.entries(patterns)
+        // Psychological depth (soul level)
+        archetype: cohortResult.archetype,
+        archetypeDescription: cohortResult.description,
+        coreValues: psychologicalDepth.values.map(v => v.charAt(0).toUpperCase() + v.slice(1)),
+        emotionalPatterns: psychologicalDepth.emotionalPatterns.map(p => p.replace(/([A-Z])/g, ' $1').trim()),
+        selfAwarenessLevel: psychologicalDepth.selfAwareness,
+        // Behavioral patterns (surface level)
+        behavioralCohort: cohortResult.behavioralCohort,
+        behavioralTraits: traits.map(t => t.replace(/([A-Z])/g, ' $1').trim()),
+        patternStrength: Object.entries(patterns)
           .filter(([_, v]) => v > 0)
           .map(([k, v]) => ({ trait: k.replace(/([A-Z])/g, ' $1').trim(), count: v }))
           .sort((a, b) => b.count - a.count),
-        answerCount: logs.length
+        // Meta
+        answerCount: logs.length,
+        noteCount: logs.filter(l => l.event === 'note' && l.text && l.text.length > 20).length
       }
     } catch (error: any) {
       console.error('❌ Error generating user profile:', {
@@ -926,13 +943,13 @@ export default async (fastify: FastifyInstance) => {
 
         let logs: any[] = []
         if (hasUsershipTag) {
+          // Get ALL logs (answers + notes) for deeper psychological analysis
           logs = await fastify.models.Log.findAll({
             where: {
               userId: req.user.id,
-              event: 'answer',
             },
             order: [['createdAt', 'DESC']],
-            limit: 15,
+            limit: 50,  // Increased to capture more context including notes
           })
         }
 

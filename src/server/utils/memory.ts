@@ -164,24 +164,39 @@ export async function buildPrompt(user: User, logs: Log[]): Promise<string> {
   // Extract Memory answers to build user's story
   const memoryLogs = logs.filter((log) => log.event === 'answer')
 
-  // Extract traits and determine cohort for personalized questioning
+  // Extract traits and determine psychological archetype + behavioral cohort
   let cohortInfo = ''
-  let cohort = ''
+  let archetype = ''
+  let behavioralCohort = ''
   let traits: string[] = []
   if (memoryLogs.length >= 3) {
-    const { traits: extractedTraits, patterns } = extractUserTraits(logs)
-    cohort = determineUserCohort(extractedTraits, patterns)
+    const analysis = extractUserTraits(logs)
+    const { traits: extractedTraits, patterns, psychologicalDepth } = analysis
+    const cohortResult = determineUserCohort(extractedTraits, patterns, psychologicalDepth)
+
+    archetype = cohortResult.archetype
+    behavioralCohort = cohortResult.behavioralCohort
     traits = extractedTraits
 
-    if (cohort && extractedTraits.length > 0) {
-      cohortInfo = `\n\n**User Cohort Profile:**
-- Identified Cohort: "${cohort}"
-- Key Traits: ${extractedTraits.map(t => t.replace(/([A-Z])/g, ' $1').trim()).join(', ')}
-- Answer Count: ${memoryLogs.length}
+    if (archetype && extractedTraits.length > 0) {
+      cohortInfo = `\n\n**Deep Psychological Profile:**
+- Soul Archetype: "${archetype}" - ${cohortResult.description}
+- Behavioral Cohort: "${behavioralCohort}"
+- Core Values: ${psychologicalDepth.values.map(v => v.charAt(0).toUpperCase() + v.slice(1)).join(', ') || 'Still discovering'}
+- Emotional Patterns: ${psychologicalDepth.emotionalPatterns.map(p => p.replace(/([A-Z])/g, ' $1').trim()).join(', ') || 'Still emerging'}
+- Self-Awareness Level: ${psychologicalDepth.selfAwareness}/10
+- Behavioral Traits: ${extractedTraits.map(t => t.replace(/([A-Z])/g, ' $1').trim()).join(', ')}
 
-Use this cohort profile to ask questions that are HIGHLY RELEVANT to their lifestyle pattern. Questions should feel like they're designed specifically for someone in their cohort.`
+CRITICAL: Use this SOUL-LEVEL understanding to craft questions that speak to their deeper nature. Ask questions that ${archetype === 'The Seeker' ? 'invite reflection and growth' : archetype === 'The Nurturer' ? 'explore connection and care' : archetype === 'The Philosopher' ? 'probe meaning and purpose' : archetype === 'The Creator' ? 'celebrate expression and creativity' : archetype === 'The Harmonizer' ? 'support balance and peace' : archetype === 'The Achiever' ? 'honor goals and progress' : archetype === 'The Protector' ? 'respect security and stability' : archetype === 'The Authentic' ? 'encourage honesty and truth' : archetype === 'The Explorer' ? 'spark curiosity and discovery' : 'invite self-discovery'}.`
 
-      console.log(`🎯 Memory question for cohort "${cohort}":`, { traits: extractedTraits, answerCount: memoryLogs.length })
+      console.log(`🧠 Memory question for "${archetype}" (${behavioralCohort}):`, {
+        archetype,
+        behavioralCohort,
+        values: psychologicalDepth.values,
+        emotionalPatterns: psychologicalDepth.emotionalPatterns,
+        selfAwareness: psychologicalDepth.selfAwareness,
+        answerCount: memoryLogs.length
+      })
     }
   }
 
@@ -251,19 +266,20 @@ Based on these answers, we're building their story. Now let's explore a NEW area
 - Sleep and rest patterns
 - Creative or hobby pursuits
 
-${cohortInfo ? `**Cohort-Specific Question Guidance:**
-Tailor your question to their identified cohort "${cohort}":
-- "Wellness Enthusiast": Ask about mindfulness practices, organic choices, holistic wellness
-- "Plant-Based": Explore plant protein sources, meal planning, nutritional knowledge
-- "Busy Professional": Focus on time-saving routines, efficiency hacks, quick self-care
-- "Comfort Seeker": Ask about cozy rituals, soothing routines, warm environments
-- "Culinary Explorer": Inquire about new ingredients, cooking experiments, flavor preferences
-- "Protein-Focused": Explore meal prep, protein timing, energy and performance
-- "Health-Conscious": Ask about fresh food sourcing, organic preferences, nutrient awareness
-- "Classic Comfort": Focus on familiar routines, traditional choices, consistency
-- "Balanced Lifestyle": Explore how they balance different aspects of wellness
+${cohortInfo ? `**Soul Archetype Question Guidance:**
+Tailor your question to their soul archetype "${archetype}":
+- "The Seeker": Ask deep questions about growth, self-discovery, transformation, inner wisdom
+- "The Nurturer": Explore connection, caring for others, emotional bonds, community support
+- "The Achiever": Focus on goals, accomplishment, progress tracking, purposeful action
+- "The Philosopher": Probe meaning, purpose, life's deeper questions, existential reflection
+- "The Harmonizer": Ask about balance, peace-finding, conflict resolution, inner equilibrium
+- "The Creator": Inquire about self-expression, creative process, artistic manifestation, innovation
+- "The Protector": Explore safety needs, boundary-setting, stability creation, grounding practices
+- "The Authentic": Focus on truth-telling, self-honesty, genuine expression, living aligned
+- "The Explorer": Ask about new experiences, adventure, curiosity, expanding horizons
+- "The Wanderer": Invite self-discovery, identity exploration, path-finding, openness to change
 
-The question should feel like it was designed specifically for someone in their cohort.` : ''}`
+The question should speak to their SOUL LEVEL, not just surface behaviors. Make them think, feel, and reflect on who they truly are.` : ''}`
   } else {
     // Follow up on existing answers
     userStory = `
@@ -300,19 +316,20 @@ Based on these answers, you can infer the user's preferences, habits, and lifest
 - "Last time you said you prefer comfortable outfits. What fabrics feel best to you?" (Options: Soft cotton, Linen, Merino wool)
 - "Building on your earlier answer about posture awareness, do you stretch during the day?" (Options: Regular breaks, Only when sore, Not yet)
 
-${cohortInfo ? `**Cohort-Specific Follow-Up Guidance:**
-Since this is a FOLLOW-UP question, build deeper into their cohort "${cohort}":
-- "Wellness Enthusiast": Connect wellness practices together (morning tea → afternoon meditation)
-- "Plant-Based": Explore plant-based nutrition depth (favorite veggies → protein sources)
-- "Busy Professional": Link efficiency strategies (morning routine → evening wind-down)
-- "Comfort Seeker": Deepen comfort preferences (favorite tea → preferred ambient temperature)
-- "Culinary Explorer": Progress from ingredients to techniques (spices → cooking methods)
-- "Protein-Focused": Connect protein habits (breakfast eggs → post-workout fuel)
-- "Health-Conscious": Build health knowledge (organic produce → supplement awareness)
-- "Classic Comfort": Explore traditional rituals (family recipes → holiday traditions)
-- "Balanced Lifestyle": Connect different wellness dimensions (nutrition → movement)
+${cohortInfo ? `**Soul Archetype Follow-Up Guidance:**
+Build deeper into their soul archetype "${archetype}" with this follow-up:
+- "The Seeker": Connect growth practices (morning reflection → evening integration), deepen self-awareness
+- "The Nurturer": Explore care rituals (how you care for others → how you care for yourself)
+- "The Achiever": Link accomplishment patterns (morning productivity → evening reflection on progress)
+- "The Philosopher": Probe meaning-making (what matters to you → why it matters, life philosophy)
+- "The Harmonizer": Deepen balance practices (finding peace in mornings → maintaining it through challenges)
+- "The Creator": Progress through creative process (inspiration → manifestation → expression)
+- "The Protector": Connect safety needs (physical boundaries → emotional boundaries)
+- "The Authentic": Explore honesty layers (being honest with self → being honest with others)
+- "The Explorer": Build on curiosity (what you're exploring → what you're discovering about yourself)
+- "The Wanderer": Invite clarity emergence (what you're questioning → what's becoming clearer)
 
-CRITICAL: Make sure the follow-up EXPLICITLY references a previous answer AND feels cohort-appropriate.` : ''}`
+CRITICAL: Make the follow-up SOUL-TOUCHING - reference their previous answer AND probe their deeper nature. Ask questions that make them pause and truly reflect on who they are becoming.` : ''}`
   }
 
   const head = `
@@ -606,17 +623,33 @@ Provide a warm, insightful summary that helps admins understand this user's self
 
 /**
  * Extract user traits from their answer logs for cohort analysis
+ * Analyzes both behavioral patterns AND psychological/emotional dimensions
  */
 export function extractUserTraits(logs: Log[]): {
   traits: string[]
   patterns: { [key: string]: number }
+  psychologicalDepth: {
+    emotionalPatterns: string[]
+    values: string[]
+    selfAwareness: number
+  }
 } {
   const answerLogs = logs.filter((log) => log.event === 'answer')
+  const noteLogs = logs.filter((log) => log.event === 'note' && log.text && log.text.length > 20)
+
   if (answerLogs.length === 0) {
-    return { traits: [], patterns: {} }
+    return {
+      traits: [],
+      patterns: {},
+      psychologicalDepth: {
+        emotionalPatterns: [],
+        values: [],
+        selfAwareness: 0
+      }
+    }
   }
 
-  // Analyze answers for patterns
+  // Behavioral patterns (surface level)
   const patterns: { [key: string]: number } = {
     healthConscious: 0,    // salads, fresh, organic, wellness
     comfortSeeker: 0,      // warm, cozy, comfort, relaxing
@@ -630,7 +663,35 @@ export function extractUserTraits(logs: Log[]): {
     mindful: 0,            // mindful, aware, intentional, present
   }
 
-  // Keywords for each trait
+  // Psychological patterns (deep level)
+  const psychPatterns: { [key: string]: number } = {
+    reflective: 0,         // think, reflect, consider, ponder, wonder
+    emotionallyAware: 0,   // feel, emotion, mood, sense, notice
+    growthOriented: 0,     // learn, grow, improve, develop, evolve
+    connectionSeeking: 0,  // together, connection, share, community, relate
+    autonomyDriven: 0,     // independent, alone, self, own, personal
+    anxietyPresent: 0,     // worry, stress, anxious, overwhelm, pressure
+    peaceSeeking: 0,       // calm, peace, quiet, stillness, gentle
+    achievement: 0,        // accomplish, succeed, achieve, goal, productive
+    creative: 0,           // create, express, art, imagine, design
+    grounded: 0,           // stable, steady, routine, consistent, reliable
+  }
+
+  // Value indicators (soul level)
+  const valuePatterns: { [key: string]: number } = {
+    authenticity: 0,       // real, authentic, genuine, true, honest
+    harmony: 0,            // balance, harmony, equilibrium, centered
+    freedom: 0,            // free, choice, open, flexible, spontaneous
+    security: 0,           // safe, secure, protected, stable, certain
+    growth: 0,             // grow, expand, develop, evolve, transform
+    connection: 0,         // love, connect, belong, together, bond
+    meaning: 0,            // purpose, meaning, why, matter, significance
+    beauty: 0,             // beautiful, aesthetic, lovely, pleasing, elegant
+    simplicity: 0,         // simple, minimal, essential, clear, pure
+    vitality: 0,           // energy, alive, vibrant, dynamic, zest
+  }
+
+  // Keywords for behavioral traits
   const keywords = {
     healthConscious: ['salad', 'fresh', 'organic', 'healthy', 'wellness', 'nutritious', 'greens', 'vegetables'],
     comfortSeeker: ['warm', 'cozy', 'comfort', 'relax', 'soft', 'gentle', 'soothing', 'calm'],
@@ -644,7 +705,41 @@ export function extractUserTraits(logs: Log[]): {
     mindful: ['mindful', 'aware', 'intentional', 'present', 'conscious', 'deliberate'],
   }
 
-  // Count keyword matches in answers
+  // Keywords for psychological patterns
+  const psychKeywords = {
+    reflective: ['think', 'reflect', 'consider', 'ponder', 'wonder', 'contemplate', 'realize', 'understand'],
+    emotionallyAware: ['feel', 'feeling', 'emotion', 'mood', 'sense', 'notice', 'aware', 'experience'],
+    growthOriented: ['learn', 'grow', 'improve', 'develop', 'evolve', 'better', 'progress', 'change'],
+    connectionSeeking: ['together', 'connection', 'share', 'community', 'relate', 'friend', 'people', 'social'],
+    autonomyDriven: ['independent', 'alone', 'self', 'own', 'personal', 'individual', 'myself', 'solo'],
+    anxietyPresent: ['worry', 'stress', 'anxious', 'overwhelm', 'pressure', 'tense', 'nervous', 'uncertain'],
+    peaceSeeking: ['calm', 'peace', 'peaceful', 'quiet', 'stillness', 'gentle', 'serene', 'tranquil'],
+    achievement: ['accomplish', 'succeed', 'achieve', 'goal', 'productive', 'finish', 'complete', 'done'],
+    creative: ['create', 'creative', 'express', 'art', 'imagine', 'design', 'craft', 'make'],
+    grounded: ['stable', 'steady', 'routine', 'consistent', 'reliable', 'regular', 'predictable', 'grounded'],
+  }
+
+  // Keywords for values
+  const valueKeywords = {
+    authenticity: ['real', 'authentic', 'genuine', 'true', 'honest', 'sincere', 'actual', 'myself'],
+    harmony: ['balance', 'balanced', 'harmony', 'harmonious', 'equilibrium', 'centered', 'middle', 'moderate'],
+    freedom: ['free', 'freedom', 'choice', 'open', 'flexible', 'spontaneous', 'liberated', 'unrestricted'],
+    security: ['safe', 'safety', 'secure', 'protected', 'stable', 'certain', 'sure', 'comfort'],
+    growth: ['grow', 'growth', 'expand', 'develop', 'evolve', 'transform', 'become', 'potential'],
+    connection: ['love', 'loving', 'connect', 'connection', 'belong', 'together', 'bond', 'relationship'],
+    meaning: ['purpose', 'purposeful', 'meaning', 'meaningful', 'why', 'matter', 'significance', 'important'],
+    beauty: ['beautiful', 'beauty', 'aesthetic', 'lovely', 'pleasing', 'elegant', 'graceful', 'pretty'],
+    simplicity: ['simple', 'simplicity', 'minimal', 'essential', 'clear', 'pure', 'basic', 'uncomplicated'],
+    vitality: ['energy', 'energetic', 'alive', 'vibrant', 'dynamic', 'zest', 'vigorous', 'lively'],
+  }
+
+  // Combine all text from answers AND notes for deeper analysis
+  const allText = [
+    ...answerLogs.map(log => `${log.metadata.question || ''} ${log.metadata.answer || ''}`),
+    ...noteLogs.map(log => log.text || '')
+  ].join(' ').toLowerCase()
+
+  // Count behavioral matches in answers only
   answerLogs.forEach((log) => {
     const answer = (log.metadata.answer || '').toLowerCase()
     const question = (log.metadata.question || '').toLowerCase()
@@ -659,47 +754,164 @@ export function extractUserTraits(logs: Log[]): {
     })
   })
 
-  // Extract top traits (those with 2+ matches)
+  // Count psychological patterns across ALL logs (answers + notes)
+  Object.entries(psychKeywords).forEach(([trait, words]) => {
+    words.forEach((word) => {
+      const regex = new RegExp(`\\b${word}\\w*\\b`, 'gi')
+      const matches = allText.match(regex)
+      if (matches) {
+        psychPatterns[trait] += matches.length
+      }
+    })
+  })
+
+  // Count value indicators across ALL logs
+  Object.entries(valueKeywords).forEach(([value, words]) => {
+    words.forEach((word) => {
+      const regex = new RegExp(`\\b${word}\\w*\\b`, 'gi')
+      const matches = allText.match(regex)
+      if (matches) {
+        valuePatterns[value] += matches.length
+      }
+    })
+  })
+
+  // Calculate self-awareness score (0-10) based on reflective language
+  const reflectiveScore = psychPatterns.reflective + psychPatterns.emotionallyAware
+  const totalLogs = answerLogs.length + noteLogs.length
+  const selfAwareness = Math.min(10, Math.round((reflectiveScore / Math.max(1, totalLogs)) * 3))
+
+  // Extract top behavioral traits (2+ matches required)
   const traits: string[] = Object.entries(patterns)
     .filter(([_, count]) => count >= 2)
     .sort(([_, a], [__, b]) => b - a)
-    .slice(0, 4) // Top 4 traits
+    .slice(0, 4)
     .map(([trait, _]) => trait)
 
-  return { traits, patterns }
+  // Extract top psychological patterns (3+ matches for significance)
+  const emotionalPatterns: string[] = Object.entries(psychPatterns)
+    .filter(([_, count]) => count >= 3)
+    .sort(([_, a], [__, b]) => b - a)
+    .slice(0, 3)
+    .map(([pattern, _]) => pattern)
+
+  // Extract top values (2+ matches for significance)
+  const values: string[] = Object.entries(valuePatterns)
+    .filter(([_, count]) => count >= 2)
+    .sort(([_, a], [__, b]) => b - a)
+    .slice(0, 3)
+    .map(([value, _]) => value)
+
+  return {
+    traits,
+    patterns,
+    psychologicalDepth: {
+      emotionalPatterns,
+      values,
+      selfAwareness
+    }
+  }
 }
 
 /**
- * Determine user cohort based on trait patterns
+ * Determine user cohort based on psychological depth and behavioral patterns
+ * Returns both a psychological archetype and a behavioral cohort
  */
-export function determineUserCohort(traits: string[], patterns: { [key: string]: number }): string {
-  // Cohort classification based on dominant traits
-  if (traits.includes('healthConscious') && traits.includes('mindful')) {
-    return 'Wellness Enthusiast'
+export function determineUserCohort(
+  traits: string[],
+  patterns: { [key: string]: number },
+  psychologicalDepth?: {
+    emotionalPatterns: string[]
+    values: string[]
+    selfAwareness: number
   }
-  if (traits.includes('plantBased') || patterns.plantBased >= 3) {
-    return 'Plant-Based'
-  }
-  if (traits.includes('timeConscious') && patterns.timeConscious >= 3) {
-    return 'Busy Professional'
-  }
-  if (traits.includes('comfortSeeker') && traits.includes('warmPreference')) {
-    return 'Comfort Seeker'
-  }
-  if (traits.includes('adventurous') && patterns.adventurous >= 2) {
-    return 'Culinary Explorer'
-  }
-  if (traits.includes('proteinFocused') && patterns.proteinFocused >= 3) {
-    return 'Protein-Focused'
-  }
-  if (traits.includes('healthConscious')) {
-    return 'Health-Conscious'
-  }
-  if (traits.includes('traditional')) {
-    return 'Classic Comfort'
+): { archetype: string; behavioralCohort: string; description: string } {
+
+  // Determine psychological archetype (soul-level understanding)
+  let archetype = 'The Explorer'
+  let archetypeDescription = ''
+
+  if (psychologicalDepth) {
+    const { emotionalPatterns, values, selfAwareness } = psychologicalDepth
+
+    // High self-awareness + growth + reflective = The Seeker
+    if (selfAwareness >= 6 && emotionalPatterns.includes('growthOriented') && emotionalPatterns.includes('reflective')) {
+      archetype = 'The Seeker'
+      archetypeDescription = 'Growth-oriented soul on a journey of self-discovery. Deeply reflective, constantly evolving, values transformation.'
+    }
+    // Connection + emotionally aware + peace = The Nurturer
+    else if (emotionalPatterns.includes('connectionSeeking') && emotionalPatterns.includes('emotionallyAware') && values.includes('connection')) {
+      archetype = 'The Nurturer'
+      archetypeDescription = 'Relationship-centered soul who finds meaning in caring for others. Emotionally attuned, values deep connection.'
+    }
+    // Achievement + grounded + autonomy = The Achiever
+    else if (emotionalPatterns.includes('achievement') && emotionalPatterns.includes('grounded') && values.includes('growth')) {
+      archetype = 'The Achiever'
+      archetypeDescription = 'Purpose-driven soul focused on accomplishment and personal excellence. Structured, goal-oriented, values progress.'
+    }
+    // Reflective + meaning + high self-awareness = The Philosopher
+    else if (emotionalPatterns.includes('reflective') && values.includes('meaning') && selfAwareness >= 7) {
+      archetype = 'The Philosopher'
+      archetypeDescription = 'Meaning-seeking soul who contemplates life\'s deeper questions. Introspective, values wisdom and understanding.'
+    }
+    // Peace + harmony + emotionally aware = The Harmonizer
+    else if (emotionalPatterns.includes('peaceSeeking') && values.includes('harmony') && emotionalPatterns.includes('emotionallyAware')) {
+      archetype = 'The Harmonizer'
+      archetypeDescription = 'Balance-seeking soul who creates peace in their environment. Values equilibrium, avoids extremes, seeks centeredness.'
+    }
+    // Creative + freedom + vitality = The Creator
+    else if (emotionalPatterns.includes('creative') && values.includes('freedom') && values.includes('vitality')) {
+      archetype = 'The Creator'
+      archetypeDescription = 'Expression-focused soul who brings ideas into reality. Values artistic freedom, innovation, and authentic self-expression.'
+    }
+    // Grounded + security + autonomy = The Protector
+    else if (emotionalPatterns.includes('grounded') && values.includes('security') && emotionalPatterns.includes('autonomyDriven')) {
+      archetype = 'The Protector'
+      archetypeDescription = 'Safety-oriented soul who creates stability for themselves and others. Practical, reliable, values security and consistency.'
+    }
+    // Authenticity + freedom + high self-awareness = The Authentic
+    else if (values.includes('authenticity') && values.includes('freedom') && selfAwareness >= 6) {
+      archetype = 'The Authentic'
+      archetypeDescription = 'Truth-seeking soul committed to living genuinely. Values honesty, self-expression, refuses to conform to expectations.'
+    }
+    // Growth + vitality + adventurous = The Explorer
+    else if (values.includes('growth') && values.includes('vitality') && emotionalPatterns.includes('growthOriented')) {
+      archetype = 'The Explorer'
+      archetypeDescription = 'Adventure-seeking soul energized by new experiences. Curious, expansive, values discovery and possibility.'
+    }
+    // Default: The Wanderer (still discovering themselves)
+    else {
+      archetype = 'The Wanderer'
+      archetypeDescription = 'Soul in transition, discovering their path. Open to possibilities, exploring what resonates, values self-discovery.'
+    }
   }
 
-  return 'Balanced Lifestyle'
+  // Determine behavioral cohort (practical lifestyle patterns)
+  let behavioralCohort = 'Balanced Lifestyle'
+
+  if (traits.includes('healthConscious') && traits.includes('mindful')) {
+    behavioralCohort = 'Wellness Enthusiast'
+  } else if (traits.includes('plantBased') || patterns.plantBased >= 3) {
+    behavioralCohort = 'Plant-Based'
+  } else if (traits.includes('timeConscious') && patterns.timeConscious >= 3) {
+    behavioralCohort = 'Busy Professional'
+  } else if (traits.includes('comfortSeeker') && traits.includes('warmPreference')) {
+    behavioralCohort = 'Comfort Seeker'
+  } else if (traits.includes('adventurous') && patterns.adventurous >= 2) {
+    behavioralCohort = 'Culinary Explorer'
+  } else if (traits.includes('proteinFocused') && patterns.proteinFocused >= 3) {
+    behavioralCohort = 'Protein-Focused'
+  } else if (traits.includes('healthConscious')) {
+    behavioralCohort = 'Health-Conscious'
+  } else if (traits.includes('traditional')) {
+    behavioralCohort = 'Classic Comfort'
+  }
+
+  return {
+    archetype,
+    behavioralCohort,
+    description: archetypeDescription
+  }
 }
 
 /**
@@ -737,17 +949,27 @@ export async function generateRecipeSuggestion(
   let userStory = ''
   let cohortInfo = ''
   if (hasUsershipTag && logs.length > 0) {
-    // Extract traits and determine cohort
-    const { traits, patterns } = extractUserTraits(logs)
-    const cohort = determineUserCohort(traits, patterns)
+    // Extract traits and determine psychological archetype + behavioral cohort
+    const analysis = extractUserTraits(logs)
+    const { traits, patterns, psychologicalDepth } = analysis
+    const cohortResult = determineUserCohort(traits, patterns, psychologicalDepth)
 
     if (traits.length > 0) {
-      cohortInfo = `\n\n**User Profile Analysis:**
-- Cohort: "${cohort}"
-- Key Traits: ${traits.map(t => t.replace(/([A-Z])/g, ' $1').trim()).join(', ')}
-- Pattern Strength: ${Object.entries(patterns).filter(([_, v]) => v > 0).map(([k, v]) => `${k}:${v}`).join(', ')}`
+      cohortInfo = `\n\n**Deep Psychological Profile:**
+- Soul Archetype: "${cohortResult.archetype}" - ${cohortResult.description}
+- Behavioral Cohort: "${cohortResult.behavioralCohort}"
+- Core Values: ${psychologicalDepth.values.map(v => v.charAt(0).toUpperCase() + v.slice(1)).join(', ') || 'Still discovering'}
+- Emotional Patterns: ${psychologicalDepth.emotionalPatterns.map(p => p.replace(/([A-Z])/g, ' $1').trim()).join(', ') || 'Still emerging'}
+- Self-Awareness: ${psychologicalDepth.selfAwareness}/10
 
-      console.log(`👤 User cohort analysis for ${user.email}:`, { cohort, traits, patterns })
+Suggest a meal that resonates with their SOUL ARCHETYPE "${cohortResult.archetype}" - not just their behavioral patterns. Consider their core values and emotional nature.`
+
+      console.log(`🧠 Recipe for "${cohortResult.archetype}" (${cohortResult.behavioralCohort}):`, {
+        archetype: cohortResult.archetype,
+        behavioralCohort: cohortResult.behavioralCohort,
+        values: psychologicalDepth.values,
+        emotionalPatterns: psychologicalDepth.emotionalPatterns
+      })
     }
 
     // Get recent answer logs to understand user preferences
