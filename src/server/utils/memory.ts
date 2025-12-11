@@ -554,3 +554,114 @@ Provide a warm, insightful summary that helps admins understand this user's self
 
   return textContent.text || 'Unable to generate summary.'
 }
+
+/**
+ * Generate contextual recipe suggestion based on user's memory, weather, and time
+ */
+export async function generateRecipeSuggestion(
+  user: User,
+  mealTime: 'breakfast' | 'lunch' | 'dinner' | 'snack',
+  logs: Log[] = []
+): Promise<string> {
+  const context = await getLogContext(user)
+  const localDate = context.timeZone
+    ? dayjs().tz(context.timeZone).format('D MMM YYYY, HH:mm')
+    : null
+
+  let contextLine = ''
+  if (localDate && context.city && context.country) {
+    const country = COUNTRY_BY_ALPHA3[context.country]?.name || ''
+    if (country) {
+      contextLine = `It is ${localDate} in ${context.city}, ${country}`
+    }
+    if (context.temperature && context.humidity) {
+      const tempC = Math.round(toCelsius(context.temperature))
+      contextLine += `, with a current temperature of ${tempC}℃ and humidity at ${Math.round(context.humidity)}%.`
+    } else {
+      contextLine += '.'
+    }
+  }
+
+  // Check if user has Usership tag for personalized suggestions
+  const hasUsershipTag = user.tags.some(
+    (tag) => tag.toLowerCase() === UserTag.Usership.toLowerCase()
+  )
+
+  let userStory = ''
+  if (hasUsershipTag && logs.length > 0) {
+    // Get recent answer logs to understand user preferences
+    const answerLogs = logs.filter((log: Log) => log.event === 'answer').slice(0, 10)
+
+    if (answerLogs.length > 0) {
+      userStory = `\n\nUser's food and lifestyle preferences (from their Memory answers):
+${answerLogs
+  .map((log: Log, index: number) => {
+    const q = log.metadata.question || ''
+    const a = log.metadata.answer || ''
+    return `${index + 1}. ${q} → "${a}"`
+  })
+  .join('\n')}`
+    }
+  }
+
+  const mealLabels = {
+    breakfast: 'breakfast',
+    lunch: 'lunch',
+    dinner: 'dinner',
+    snack: 'snack or light meal'
+  }
+
+  const prompt = `You are an AI agent for LOT Systems, a self-care subscription service focused on wellness and mindful living.
+
+Generate ONE simple ${mealLabels[mealTime]} suggestion that is:
+1. **Contextually appropriate** - Consider the current weather and location
+2. **Simple and achievable** - Easy to prepare, not overly complex
+3. **Wellness-focused** - Nutritious, mindful, and supportive of self-care
+${hasUsershipTag && userStory ? '4. **Personalized** - Consider their previous answers about food and lifestyle preferences' : ''}
+
+${contextLine ? `Current context:\n${contextLine}` : ''}${userStory}
+
+**Weather-based guidance:**
+- If it's cold (below 15℃): Suggest warming, comforting foods
+- If it's hot (above 25℃): Suggest light, refreshing foods
+- If humid: Suggest lighter options
+
+**Examples of good suggestions:**
+- "Warm oatmeal with cinnamon and banana" (cold morning)
+- "Chilled cucumber and avocado salad" (hot day)
+- "Grilled salmon with roasted vegetables" (moderate evening)
+- "Fresh fruit with Greek yogurt" (warm afternoon snack)
+
+Please respond with ONLY the recipe/meal suggestion - just a simple, clear description (5-8 words maximum). No explanation, no preamble, just the meal suggestion itself.`
+
+  try {
+    // Use AI engine abstraction
+    console.log(`🍽️ Generating ${mealTime} recipe for user ${user.email}`)
+    const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
+    console.log(`🤖 Using ${engine.name} for recipe generation`)
+
+    const suggestion = await engine.generateCompletion(prompt, 100)
+    const cleaned = suggestion?.trim().replace(/^["']|["']$/g, '') || ''
+
+    console.log(`✅ Recipe generated: "${cleaned}"`)
+    return cleaned
+  } catch (error: any) {
+    console.error('❌ AI Engine failed for recipe generation:', {
+      message: error.message,
+      user: user.email,
+    })
+
+    // Fallback to simple context-based suggestions
+    const temp = context.temperature ? toCelsius(context.temperature) : 20
+
+    if (mealTime === 'breakfast') {
+      return temp < 15 ? 'Warm oatmeal with cinnamon and banana' : 'Greek yogurt with honey and berries'
+    } else if (mealTime === 'lunch') {
+      return temp < 15 ? 'Warm lentil soup with crusty bread' : 'Grilled chicken salad'
+    } else if (mealTime === 'dinner') {
+      return temp < 15 ? 'Roasted vegetables with quinoa' : 'Baked salmon with asparagus'
+    } else {
+      return temp < 15 ? 'Warm almond butter on toast' : 'Fresh fruit with nuts'
+    }
+  }
+}

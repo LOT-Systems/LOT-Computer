@@ -1,5 +1,6 @@
 import { atom } from 'nanostores'
-import { getRandomRecipe, getMealTimeForHour, type MealTime } from '#shared/constants/recipes'
+import { getMealTimeForHour, type MealTime } from '#shared/constants/recipes'
+import axios from 'axios'
 
 type RecipeWidgetState = {
   isVisible: boolean
@@ -20,7 +21,7 @@ export const recipeWidget = atom<RecipeWidgetState>({
 })
 
 // Check if widget should show (called on System tab mount and periodically)
-export function checkRecipeWidget() {
+export async function checkRecipeWidget() {
   const now = Date.now()
   const state = recipeWidget.get()
 
@@ -52,15 +53,27 @@ export function checkRecipeWidget() {
   // Random chance to show (30% probability)
   if (Math.random() > 0.3) return
 
-  // Show the recipe widget!
-  const recipe = getRandomRecipe(mealTime)
-  recipeWidget.set({
-    isVisible: true,
-    recipe,
-    mealTime,
-    showUntil: now + WIDGET_DURATION,
-    lastShownDate: `${today}-${mealTime}`,
-  })
+  // Fetch contextual recipe from server
+  try {
+    const response = await axios.get<{ recipe: string; mealTime: MealTime }>(
+      `/api/recipe-suggestion?mealTime=${mealTime}`,
+      { withCredentials: true }
+    )
+
+    const recipe = response.data.recipe
+
+    // Show the recipe widget!
+    recipeWidget.set({
+      isVisible: true,
+      recipe,
+      mealTime,
+      showUntil: now + WIDGET_DURATION,
+      lastShownDate: `${today}-${mealTime}`,
+    })
+  } catch (error) {
+    console.error('Failed to fetch recipe suggestion:', error)
+    // Don't show widget if fetch fails
+  }
 }
 
 // Manually dismiss the widget

@@ -25,7 +25,7 @@ import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
-import { buildPrompt, completeAndExtractQuestion, generateMemoryStory } from '#server/utils/memory'
+import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion } from '#server/utils/memory'
 import dayjs from '#server/utils/dayjs'
 
 export default async (fastify: FastifyInstance) => {
@@ -840,6 +840,60 @@ export default async (fastify: FastifyInstance) => {
       }
     }
   })
+
+  // Generate contextual recipe suggestion
+  fastify.get(
+    '/recipe-suggestion',
+    async (
+      req: FastifyRequest<{
+        Querystring: { mealTime: 'breakfast' | 'lunch' | 'dinner' | 'snack' }
+      }>,
+      reply
+    ) => {
+      try {
+        const mealTime = req.query.mealTime
+        if (!mealTime || !['breakfast', 'lunch', 'dinner', 'snack'].includes(mealTime)) {
+          return reply.throw.badRequest('Invalid mealTime. Must be breakfast, lunch, dinner, or snack')
+        }
+
+        console.log(`📋 Recipe suggestion request for ${mealTime} from user ${req.user.email}`)
+
+        // Get recent logs for personalization (if user has Usership tag)
+        const hasUsershipTag = req.user.tags.some(
+          (tag) => tag.toLowerCase() === 'usership'
+        )
+
+        let logs: any[] = []
+        if (hasUsershipTag) {
+          logs = await fastify.models.Log.findAll({
+            where: {
+              userId: req.user.id,
+              event: 'answer',
+            },
+            order: [['createdAt', 'DESC']],
+            limit: 15,
+          })
+        }
+
+        const recipe = await generateRecipeSuggestion(req.user, mealTime, logs)
+
+        console.log(`✅ Recipe suggestion generated: "${recipe}"`)
+        return { recipe, mealTime }
+      } catch (error: any) {
+        console.error('❌ Error generating recipe suggestion:', {
+          error: error.message,
+          stack: error.stack,
+          userId: req.user?.id,
+        })
+        // Return fallback recipe
+        return {
+          recipe: 'Simple fresh salad with seasonal ingredients',
+          mealTime: req.query.mealTime,
+          error: 'Using fallback suggestion',
+        }
+      }
+    }
+  )
 
   // Generate daily world element
   fastify.post('/world/generate-element', async (req, reply) => {
