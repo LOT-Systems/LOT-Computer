@@ -250,6 +250,7 @@ const NoteEditor = ({
   const valueRef = React.useRef(log.text || '')
   const logTextRef = React.useRef(log.text || '')
   const onChangeRef = React.useRef(onChange)
+  const blinkTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
@@ -273,7 +274,11 @@ const NoteEditor = ({
         clearTimeout(pendingPushRef.current)
         pendingPushRef.current = null
       }
-      // Cancel blink animation too
+      // Cancel blink animation timeout and state
+      if (blinkTimeoutRef.current) {
+        clearTimeout(blinkTimeoutRef.current)
+        blinkTimeoutRef.current = null
+      }
       setIsAboutToPush(false)
     }
   }, [value, log.text, pendingPushRef])
@@ -305,10 +310,14 @@ const NoteEditor = ({
     // Clear saving state after a brief delay
     setTimeout(() => setIsSaving(false), 100)
 
-    // For primary log: trigger blink animation (lasts 0.5s), then push happens via parent
+    // For primary log: trigger blink animation 1.5s after save (right before push)
+    // Timeline: save now → wait 1.5s → blink 0.5s → push happens (2s total)
     if (primary) {
-      setIsAboutToPush(true)
-      setTimeout(() => setIsAboutToPush(false), 500)  // Match CSS animation duration (fast blink)
+      blinkTimeoutRef.current = setTimeout(() => {
+        setIsAboutToPush(true)
+        setTimeout(() => setIsAboutToPush(false), 500)
+        blinkTimeoutRef.current = null
+      }, 1500)  // Start blink 1.5s after save, so it finishes right when push happens
     }
   }, [debouncedValue, onChange, log.text, primary, isSaving])
 
@@ -377,10 +386,13 @@ const NoteEditor = ({
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
           setIsSaved(true)
-          // Trigger blink animation for manual save too
+          // Trigger blink animation for manual save too (same timing as autosave)
           if (primary) {
-            setIsAboutToPush(true)
-            setTimeout(() => setIsAboutToPush(false), 500)  // Match CSS animation duration (fast blink)
+            blinkTimeoutRef.current = setTimeout(() => {
+              setIsAboutToPush(true)
+              setTimeout(() => setIsAboutToPush(false), 500)
+              blinkTimeoutRef.current = null
+            }, 1500)
           }
         }
         // Optionally blur to show save happened
