@@ -12,7 +12,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getJapaneseZodiac, getWesternZodiac, getMoonPhase } from '#shared/utils/astrology'
+import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
@@ -93,16 +93,17 @@ export const System = () => {
   // Astrology calculations
   const astrology = React.useMemo(() => {
     const now = new Date()
-    const year = now.getFullYear()
-    const japaneseZodiac = getJapaneseZodiac(year)
+    const hourlyZodiac = getHourlyZodiac(now)
     const westernZodiac = getWesternZodiac(now)
     const moonPhase = getMoonPhase(now)
+    const rokuyo = getRokuyo(now)
 
     return {
-      japaneseZodiac,
+      hourlyZodiac,
       westernZodiac,
       moonPhase: moonPhase.phase,
       moonIllumination: moonPhase.illumination,
+      rokuyo,
     }
   }, [])
 
@@ -194,7 +195,7 @@ export const System = () => {
 
       <div>
         <Block label="Astrology:">
-          {astrology.westernZodiac} • {astrology.japaneseZodiac} • {astrology.moonPhase}
+          {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
         </Block>
       </div>
 

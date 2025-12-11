@@ -8,6 +8,16 @@ const JAPANESE_ZODIAC = [
   'Horse', 'Goat', 'Monkey', 'Rooster', 'Dog', 'Pig'
 ] as const
 
+// Rokuyo (六曜) - Six-day cycle used in Japanese calendars
+const ROKUYO = [
+  'Sensho',      // 先勝 - Morning is better
+  'Tomobiki',    // 友引 - Good day (avoid funerals)
+  'Senpu',       // 先負 - Afternoon is better
+  'Butsumetsu',  // 仏滅 - Inauspicious day
+  'Taian',       // 大安 - Very auspicious day
+  'Shakku',      // 赤口 - Caution needed
+] as const
+
 // Western zodiac signs with date ranges
 const WESTERN_ZODIAC = [
   { sign: 'Capricorn', start: [12, 22], end: [1, 19] },
@@ -31,6 +41,48 @@ export function getJapaneseZodiac(year: number): string {
   // 1900 is year of the Rat (index 0)
   const index = (year - 1900) % 12
   return JAPANESE_ZODIAC[index]
+}
+
+/**
+ * Get hourly Japanese zodiac animal based on time of day
+ * Each animal governs a 2-hour period
+ */
+export function getHourlyZodiac(date: Date): string {
+  const hour = date.getHours()
+
+  // Map hours to zodiac animals (2-hour periods)
+  if (hour >= 23 || hour < 1) return 'Rat'      // 11 PM - 1 AM
+  if (hour >= 1 && hour < 3) return 'Ox'        // 1 AM - 3 AM
+  if (hour >= 3 && hour < 5) return 'Tiger'     // 3 AM - 5 AM
+  if (hour >= 5 && hour < 7) return 'Rabbit'    // 5 AM - 7 AM
+  if (hour >= 7 && hour < 9) return 'Dragon'    // 7 AM - 9 AM
+  if (hour >= 9 && hour < 11) return 'Snake'    // 9 AM - 11 AM
+  if (hour >= 11 && hour < 13) return 'Horse'   // 11 AM - 1 PM
+  if (hour >= 13 && hour < 15) return 'Goat'    // 1 PM - 3 PM
+  if (hour >= 15 && hour < 17) return 'Monkey'  // 3 PM - 5 PM
+  if (hour >= 17 && hour < 19) return 'Rooster' // 5 PM - 7 PM
+  if (hour >= 19 && hour < 21) return 'Dog'     // 7 PM - 9 PM
+  if (hour >= 21 && hour < 23) return 'Pig'     // 9 PM - 11 PM
+
+  return 'Rat'
+}
+
+/**
+ * Get Rokuyo (六曜) - Japanese six-day cycle for determining auspicious days
+ * Simplified calculation based on Gregorian calendar
+ */
+export function getRokuyo(date: Date): string {
+  // Known starting point: January 1, 2000 was Sensho (index 0)
+  const knownDate = new Date('2000-01-01')
+  const knownRokuyoIndex = 0
+
+  // Calculate days since known date
+  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
+
+  // Calculate Rokuyo index (6-day cycle)
+  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
+
+  return ROKUYO[rokuyoIndex]
 }
 
 /**
