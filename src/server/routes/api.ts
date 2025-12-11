@@ -493,13 +493,14 @@ export default async (fastify: FastifyInstance) => {
     )
 
     const recentLog = logs[0]
-    const now = dayjs()
+    // Create new empty log if:
+    // - No recent log exists
+    // - Recent log is not a note
+    // - Recent log has text (saved) - push it down immediately
     if (
       !recentLog ||
       recentLog.event !== 'note' ||
-      (recentLog.text &&
-        now.diff(recentLog.updatedAt, 'minute') >
-          LOG_MESSAGE_STALE_TIME_MINUTES)
+      (recentLog.text && recentLog.text.trim().length > 0)
     ) {
       const emptyLog = await fastify.models.Log.create({
         userId: req.user.id,
