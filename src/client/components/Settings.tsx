@@ -389,63 +389,51 @@ export const Settings = () => {
                   onClick={savePrivacySettings}
                   disabled={savingPrivacy}
                 >
-                  {savingPrivacy ? 'Saving...' : 'Save Public Profile Settings'}
+                  {savingPrivacy ? 'Saving...' : 'Save Profile Visibility Settings'}
                 </Button>
               </div>
             )}
-
-            <div className="mb-8">
-              <Block label="Enable public profile:" onChildrenClick={() => onTogglePrivacy('isPublicProfile')}>
-                {privacySettings.isPublicProfile ? 'On' : 'Off'}
-              </Block>
-            </div>
 
             <div className="mb-8">
               <Block label="Your public link:" blockView>
                 <div className="text-acc/80">
                   {window.location.origin}/u/{privacySettings.customUrl || me?.id}
                 </div>
-                {!privacySettings.isPublicProfile && (
-                  <div className="text-acc/60 mt-2">
-                    Enable public profile to make this link accessible
-                  </div>
-                )}
+                <div className="text-acc/60 mt-2 text-sm">
+                  Your profile is always public. Control what information is visible below.
+                </div>
               </Block>
             </div>
 
-            {privacySettings.isPublicProfile && (
-              <>
-                <div className="mb-8">
-                  <Block label="Show weather:" onChildrenClick={() => onTogglePrivacy('showWeather')}>
-                    {privacySettings.showWeather ? 'On' : 'Off'}
-                  </Block>
-                  <Block label="Show local time:" onChildrenClick={() => onTogglePrivacy('showLocalTime')}>
-                    {privacySettings.showLocalTime ? 'On' : 'Off'}
-                  </Block>
-                  <Block label="Show city:" onChildrenClick={() => onTogglePrivacy('showCity')}>
-                    {privacySettings.showCity ? 'On' : 'Off'}
-                  </Block>
-                  <Block label="Show sound:" onChildrenClick={() => onTogglePrivacy('showSound')}>
-                    {privacySettings.showSound ? 'On' : 'Off'}
-                  </Block>
-                  <Block label="Show memory story:" onChildrenClick={() => onTogglePrivacy('showMemoryStory')}>
-                    {privacySettings.showMemoryStory ? 'On' : 'Off'}
-                  </Block>
-                </div>
+            <div className="mb-8">
+              <Block label="Show weather:" onChildrenClick={() => onTogglePrivacy('showWeather')}>
+                {privacySettings.showWeather ? 'On' : 'Off'}
+              </Block>
+              <Block label="Show local time:" onChildrenClick={() => onTogglePrivacy('showLocalTime')}>
+                {privacySettings.showLocalTime ? 'On' : 'Off'}
+              </Block>
+              <Block label="Show city:" onChildrenClick={() => onTogglePrivacy('showCity')}>
+                {privacySettings.showCity ? 'On' : 'Off'}
+              </Block>
+              <Block label="Show sound:" onChildrenClick={() => onTogglePrivacy('showSound')}>
+                {privacySettings.showSound ? 'On' : 'Off'}
+              </Block>
+              <Block label="Show memory story:" onChildrenClick={() => onTogglePrivacy('showMemoryStory')}>
+                {privacySettings.showMemoryStory ? 'On' : 'Off'}
+              </Block>
+            </div>
 
-                <div className="mb-8">
-                  <Block label="Custom URL:" blockView>
-                    <Input
-                      type="text"
-                      value={privacySettings.customUrl || ''}
-                      onChange={onChangeCustomUrl}
-                      placeholder="e.g., vadik (optional)"
-                      className="w-full text-acc"
-                    />
-                  </Block>
-                </div>
-              </>
-            )}
+            <div className="mb-8">
+              <Block label="Custom URL:" blockView>
+                <Input
+                  type="text"
+                  value={privacySettings.customUrl || ''}
+                  onChange={onChangeCustomUrl}
+                  placeholder="e.g., vadik (optional)"
+                  className="w-full text-acc"
+                />
+              </Block>
+            </div>
           </Block>
         </div>
 
