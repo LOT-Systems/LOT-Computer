@@ -556,6 +556,104 @@ Provide a warm, insightful summary that helps admins understand this user's self
 }
 
 /**
+ * Extract user traits from their answer logs for cohort analysis
+ */
+export function extractUserTraits(logs: Log[]): {
+  traits: string[]
+  patterns: { [key: string]: number }
+} {
+  const answerLogs = logs.filter((log) => log.event === 'answer')
+  if (answerLogs.length === 0) {
+    return { traits: [], patterns: {} }
+  }
+
+  // Analyze answers for patterns
+  const patterns: { [key: string]: number } = {
+    healthConscious: 0,    // salads, fresh, organic, wellness
+    comfortSeeker: 0,      // warm, cozy, comfort, relaxing
+    timeConscious: 0,      // quick, efficient, fast, easy
+    plantBased: 0,         // vegetarian, vegan, plant-based
+    proteinFocused: 0,     // meat, protein, eggs, chicken
+    warmPreference: 0,     // hot, warm, tea, soup
+    coldPreference: 0,     // cold, iced, chilled, fresh
+    traditional: 0,        // classic, traditional, familiar
+    adventurous: 0,        // new, try, different, variety
+    mindful: 0,            // mindful, aware, intentional, present
+  }
+
+  // Keywords for each trait
+  const keywords = {
+    healthConscious: ['salad', 'fresh', 'organic', 'healthy', 'wellness', 'nutritious', 'greens', 'vegetables'],
+    comfortSeeker: ['warm', 'cozy', 'comfort', 'relax', 'soft', 'gentle', 'soothing', 'calm'],
+    timeConscious: ['quick', 'fast', 'efficient', 'easy', 'simple', 'convenient', 'busy', 'short'],
+    plantBased: ['vegetarian', 'vegan', 'plant', 'vegetables', 'beans', 'lentils', 'tofu'],
+    proteinFocused: ['meat', 'protein', 'chicken', 'beef', 'fish', 'eggs', 'salmon'],
+    warmPreference: ['hot', 'warm', 'tea', 'soup', 'heated', 'steaming', 'cooked'],
+    coldPreference: ['cold', 'iced', 'chilled', 'cool', 'refrigerated', 'raw'],
+    traditional: ['classic', 'traditional', 'familiar', 'usual', 'regular', 'standard'],
+    adventurous: ['new', 'try', 'different', 'variety', 'explore', 'experiment', 'unique'],
+    mindful: ['mindful', 'aware', 'intentional', 'present', 'conscious', 'deliberate'],
+  }
+
+  // Count keyword matches in answers
+  answerLogs.forEach((log) => {
+    const answer = (log.metadata.answer || '').toLowerCase()
+    const question = (log.metadata.question || '').toLowerCase()
+    const combinedText = `${question} ${answer}`
+
+    Object.entries(keywords).forEach(([trait, words]) => {
+      words.forEach((word) => {
+        if (combinedText.includes(word)) {
+          patterns[trait]++
+        }
+      })
+    })
+  })
+
+  // Extract top traits (those with 2+ matches)
+  const traits: string[] = Object.entries(patterns)
+    .filter(([_, count]) => count >= 2)
+    .sort(([_, a], [__, b]) => b - a)
+    .slice(0, 4) // Top 4 traits
+    .map(([trait, _]) => trait)
+
+  return { traits, patterns }
+}
+
+/**
+ * Determine user cohort based on trait patterns
+ */
+export function determineUserCohort(traits: string[], patterns: { [key: string]: number }): string {
+  // Cohort classification based on dominant traits
+  if (traits.includes('healthConscious') && traits.includes('mindful')) {
+    return 'Wellness Enthusiast'
+  }
+  if (traits.includes('plantBased') || patterns.plantBased >= 3) {
+    return 'Plant-Based'
+  }
+  if (traits.includes('timeConscious') && patterns.timeConscious >= 3) {
+    return 'Busy Professional'
+  }
+  if (traits.includes('comfortSeeker') && traits.includes('warmPreference')) {
+    return 'Comfort Seeker'
+  }
+  if (traits.includes('adventurous') && patterns.adventurous >= 2) {
+    return 'Culinary Explorer'
+  }
+  if (traits.includes('proteinFocused') && patterns.proteinFocused >= 3) {
+    return 'Protein-Focused'
+  }
+  if (traits.includes('healthConscious')) {
+    return 'Health-Conscious'
+  }
+  if (traits.includes('traditional')) {
+    return 'Classic Comfort'
+  }
+
+  return 'Balanced Lifestyle'
+}
+
+/**
  * Generate contextual recipe suggestion based on user's memory, weather, and time
  */
 export async function generateRecipeSuggestion(
@@ -588,12 +686,26 @@ export async function generateRecipeSuggestion(
   )
 
   let userStory = ''
+  let cohortInfo = ''
   if (hasUsershipTag && logs.length > 0) {
+    // Extract traits and determine cohort
+    const { traits, patterns } = extractUserTraits(logs)
+    const cohort = determineUserCohort(traits, patterns)
+
+    if (traits.length > 0) {
+      cohortInfo = `\n\n**User Profile Analysis:**
+- Cohort: "${cohort}"
+- Key Traits: ${traits.map(t => t.replace(/([A-Z])/g, ' $1').trim()).join(', ')}
+- Pattern Strength: ${Object.entries(patterns).filter(([_, v]) => v > 0).map(([k, v]) => `${k}:${v}`).join(', ')}`
+
+      console.log(`👤 User cohort analysis for ${user.email}:`, { cohort, traits, patterns })
+    }
+
     // Get recent answer logs to understand user preferences
     const answerLogs = logs.filter((log: Log) => log.event === 'answer').slice(0, 10)
 
     if (answerLogs.length > 0) {
-      userStory = `\n\nUser's food and lifestyle preferences (from their Memory answers):
+      userStory = `\n\nRecent answers:
 ${answerLogs
   .map((log: Log, index: number) => {
     const q = log.metadata.question || ''
@@ -617,20 +729,34 @@ Generate ONE simple ${mealLabels[mealTime]} suggestion that is:
 1. **Contextually appropriate** - Consider the current weather and location
 2. **Simple and achievable** - Easy to prepare, not overly complex
 3. **Wellness-focused** - Nutritious, mindful, and supportive of self-care
-${hasUsershipTag && userStory ? '4. **Personalized** - Consider their previous answers about food and lifestyle preferences' : ''}
+${hasUsershipTag && cohortInfo ? '4. **Deeply personalized** - Match their cohort profile and trait patterns' : ''}
 
-${contextLine ? `Current context:\n${contextLine}` : ''}${userStory}
+${contextLine ? `Current context:\n${contextLine}` : ''}${cohortInfo}${userStory}
 
 **Weather-based guidance:**
 - If it's cold (below 15℃): Suggest warming, comforting foods
 - If it's hot (above 25℃): Suggest light, refreshing foods
 - If humid: Suggest lighter options
 
+${cohortInfo ? `**Cohort-specific guidance:**
+Use the user's cohort profile to guide your suggestion:
+- "Wellness Enthusiast": Focus on nutrient-dense, mindful meals (smoothie bowls, buddha bowls, herbal teas)
+- "Plant-Based": Ensure 100% plant-based ingredients (tofu, tempeh, legumes, nuts)
+- "Busy Professional": Quick prep, minimal cooking (overnight oats, grab-and-go salads, pre-prepped ingredients)
+- "Comfort Seeker": Warm, soothing, nostalgic foods (porridge, soup, baked goods, tea)
+- "Culinary Explorer": Unique ingredients or preparations (matcha, kimchi, tahini, exotic spices)
+- "Protein-Focused": Include clear protein source (eggs, chicken, fish, Greek yogurt, protein)
+- "Health-Conscious": Emphasize fresh, whole foods (salads, lean proteins, vegetables, fruits)
+- "Classic Comfort": Traditional, familiar recipes (scrambled eggs, grilled cheese, chicken soup)
+- "Balanced Lifestyle": Well-rounded, moderate approach (mix of macros, variety)
+
+**IMPORTANT**: The cohort and traits are derived from pattern analysis. Prioritize their cohort profile over generic suggestions.
+` : ''}
 **Examples of good suggestions:**
-- "Warm oatmeal with cinnamon and banana" (cold morning)
-- "Chilled cucumber and avocado salad" (hot day)
-- "Grilled salmon with roasted vegetables" (moderate evening)
-- "Fresh fruit with Greek yogurt" (warm afternoon snack)
+- "Warm oatmeal with cinnamon and banana" (cold morning, comfort seeker)
+- "Chilled cucumber and avocado salad" (hot day, health-conscious)
+- "Tofu scramble with turmeric and greens" (morning, plant-based)
+- "Quick Greek yogurt bowl with berries" (busy professional, protein-focused)
 
 Please respond with ONLY the recipe/meal suggestion - just a simple, clear description (5-8 words maximum). No explanation, no preamble, just the meal suggestion itself.`
 

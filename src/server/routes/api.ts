@@ -25,7 +25,7 @@ import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
-import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion } from '#server/utils/memory'
+import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort } from '#server/utils/memory'
 import dayjs from '#server/utils/dayjs'
 
 export default async (fastify: FastifyInstance) => {
@@ -841,6 +841,67 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
+  // Get user's cohort profile based on their answers
+  fastify.get('/user-profile', async (req: FastifyRequest, reply) => {
+    try {
+      // Check if user has Usership tag
+      const hasUsershipTag = req.user.tags.some(
+        (tag) => tag.toLowerCase() === 'usership'
+      )
+
+      if (!hasUsershipTag) {
+        return {
+          hasUsership: false,
+          message: 'Subscribe to Usership to unlock profile analysis'
+        }
+      }
+
+      // Get answer logs
+      const logs = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: 'answer',
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 30,
+      })
+
+      if (logs.length === 0) {
+        return {
+          hasUsership: true,
+          message: 'Complete Memory questions to generate your profile',
+          answerCount: 0
+        }
+      }
+
+      // Extract traits and determine cohort
+      const { traits, patterns } = extractUserTraits(logs)
+      const cohort = determineUserCohort(traits, patterns)
+
+      console.log(`📊 Profile request for ${req.user.email}:`, { cohort, traits, answerCount: logs.length })
+
+      return {
+        hasUsership: true,
+        cohort,
+        traits: traits.map(t => t.replace(/([A-Z])/g, ' $1').trim()),
+        patterns: Object.entries(patterns)
+          .filter(([_, v]) => v > 0)
+          .map(([k, v]) => ({ trait: k.replace(/([A-Z])/g, ' $1').trim(), count: v }))
+          .sort((a, b) => b.count - a.count),
+        answerCount: logs.length
+      }
+    } catch (error: any) {
+      console.error('❌ Error generating user profile:', {
+        error: error.message,
+        userId: req.user?.id,
+      })
+      return {
+        hasUsership: false,
+        error: 'Unable to generate profile at this time'
+      }
+    }
+  })
+
   // Generate contextual recipe suggestion
   fastify.get(
     '/recipe-suggestion',
@@ -878,7 +939,12 @@ export default async (fastify: FastifyInstance) => {
         const recipe = await generateRecipeSuggestion(req.user, mealTime, logs)
 
         console.log(`✅ Recipe suggestion generated: "${recipe}"`)
-        return { recipe, mealTime }
+
+        return {
+          recipe,
+          mealTime,
+          hasUsership: hasUsershipTag
+        }
       } catch (error: any) {
         console.error('❌ Error generating recipe suggestion:', {
           error: error.message,
