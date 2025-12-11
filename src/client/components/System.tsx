@@ -16,6 +16,8 @@ import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#sha
 import { useBreathe } from '#client/utils/breathe'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
+import { RecipeWidget } from './RecipeWidget'
+import { checkRecipeWidget } from '#client/stores/recipeWidget'
 
 export const System = () => {
   const me = useStore(stores.me)
@@ -105,6 +107,11 @@ export const System = () => {
       moonIllumination: moonPhase.illumination,
       rokuyo,
     }
+  }, [])
+
+  // Check for recipe suggestions when component mounts
+  React.useEffect(() => {
+    checkRecipeWidget()
   }, [])
 
   // Sound is now managed globally in app.tsx via useSound hook
@@ -221,6 +228,8 @@ export const System = () => {
           <Block label="Live:" blockView children={liveMessage} />
         </div>
       )}
+
+      <RecipeWidget />
 
       <MemoryWidget />
     </div>
