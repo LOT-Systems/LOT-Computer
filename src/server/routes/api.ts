@@ -512,6 +512,33 @@ export default async (fastify: FastifyInstance) => {
     return logs
   })
 
+  fastify.post(
+    '/logs',
+    async (
+      req: FastifyRequest<{
+        Body: { text: string }
+      }>,
+      reply
+    ) => {
+      const text = (req.body.text || '').trim().slice(0, MAX_LOG_TEXT_LENGTH)
+      if (!text) return reply.throw.badRequest('Log text is required')
+
+      const log = await fastify.models.Log.create({
+        userId: req.user.id,
+        text,
+        event: 'note',
+      })
+
+      // Add context asynchronously
+      process.nextTick(async () => {
+        const context = await getLogContext(req.user)
+        await log.set({ context }).save()
+      })
+
+      return log
+    }
+  )
+
   fastify.put(
     '/logs/:id',
     async (
