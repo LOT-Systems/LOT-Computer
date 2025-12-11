@@ -303,9 +303,14 @@ const NoteEditor = ({
     setIsSaving(true)
     onChange(debouncedValue)
 
-    // Update timestamp and mark as saved
+    // Update timestamp
     setLastSavedAt(new Date())
-    setIsSaved(true)
+
+    // IMPORTANT: Only mark as saved if current value matches what we're saving
+    // This prevents race condition where user types more while save is in progress
+    if (valueRef.current === debouncedValue) {
+      setIsSaved(true)
+    }
 
     // Clear saving state after a brief delay
     setTimeout(() => setIsSaving(false), 100)
@@ -332,6 +337,9 @@ const NoteEditor = ({
     // Defensive: Don't clear user's typed text if server hasn't saved yet
     // This prevents race condition on mobile where blur saves but mutation hasn't completed
     if (value && !log.text) return
+    // Additional safety: Don't overwrite if current value is different from server value
+    // This prevents race condition where user typed more while autosave was in progress
+    if (valueRef.current !== log.text && valueRef.current.length > log.text.length) return
     setValue(log.text || '')
   }, [log.text, isFocused, isSaved])  // eslint-disable-line react-hooks/exhaustive-deps
 
