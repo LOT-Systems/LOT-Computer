@@ -30,21 +30,43 @@ export const Logs: React.FC = () => {
   const logIds = useStore(localStore.logIds)
 
   const [isMouseActive, setIsMouseActive] = React.useState(true)
+  const pendingPushRef = React.useRef<NodeJS.Timeout | null>(null)
 
-  const { data: loadedLogs = [] } = useLogs()
+  const { data: loadedLogs = [], refetch: refetchLogs } = useLogs()
   const { mutate: updateLog } = useUpdateLog({
     onSuccess: (log) => {
       localStore.logById.set({
         ...logById,
         [log.id]: log,
       })
+      // Only refetch (push down) if this is the primary/most recent log
+      // Past logs don't need to trigger push-down
+      if (log.id === recentLogId) {
+        // Refetch logs to push down saved entry and create new empty log
+        // Wait 2 seconds to show the blink animation, then push down
+        // Store timeout ID so it can be cancelled if user starts typing again
+        pendingPushRef.current = setTimeout(async () => {
+          try {
+            await refetchLogs()
+            pendingPushRef.current = null
+          } catch (error) {
+            console.error('[Logs] Refetch failed:', error)
+            pendingPushRef.current = null
+          }
+        }, 2000)
+      }
     },
   })
 
   React.useEffect(() => {
     if (!loadedLogs.length) return
-    localStore.logById.set(loadedLogs.reduce(fp.by('id'), {}))
-    localStore.logIds.set(loadedLogs.map(fp.prop('id')))
+    // Update both stores atomically to prevent race condition
+    const newLogById = loadedLogs.reduce(fp.by('id'), {})
+    const newLogIds = loadedLogs.map(fp.prop('id'))
+
+    // Update in a single batch to avoid intermediate renders
+    localStore.logById.set(newLogById)
+    localStore.logIds.set(newLogIds)
   }, [loadedLogs])
 
   const onChangeLog = React.useCallback(
@@ -122,18 +144,24 @@ export const Logs: React.FC = () => {
       className="flex flex-col gap-y-[1.5rem] leading-[1.5rem] px-4 sm:px-0"
     >
       <div ref={inputContainerRef} className="min-h-[200px]">
-        <NoteEditor
-          key={recentLogId}
-          log={logById[recentLogId]}
-          primary
-          onChange={onChangePrimaryLog}
-          isMouseActive={isMouseActive}
-          dateFormat={dateFormat}
-        />
+        {logById[recentLogId] ? (
+          <NoteEditor
+            key={recentLogId}
+            log={logById[recentLogId]}
+            primary
+            onChange={onChangePrimaryLog}
+            isMouseActive={isMouseActive}
+            dateFormat={dateFormat}
+            pendingPushRef={pendingPushRef}
+          />
+        ) : (
+          <div className="opacity-20">Loading...</div>
+        )}
       </div>
 
       {pastLogIds.map((id) => {
         const log = logById[id]
+        if (!log) return null  // Skip if log doesn't exist yet
         if (log.event === 'answer') {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
@@ -211,12 +239,14 @@ const NoteEditor = ({
   onChange,
   isMouseActive,
   dateFormat,
+  pendingPushRef,
 }: {
   log: Log
   primary?: boolean
   onChange: (text: string) => void
   isMouseActive: boolean
   dateFormat: string
+  pendingPushRef?: React.MutableRefObject<NodeJS.Timeout | null>
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null)
   const valueRef = React.useRef(log.text || '')
@@ -225,15 +255,30 @@ const NoteEditor = ({
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
-  const [showSaved, setShowSaved] = React.useState(false)
-  // Faster autosave to show work-in-progress saves
-  const debounceTime = primary ? 5000 : 1500  // 5s for primary, 1.5s for old logs
+  const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null)
+  const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
+  const [isAboutToPush, setIsAboutToPush] = React.useState(false) // Blink before push
+  const [isSaving, setIsSaving] = React.useState(false) // Prevent concurrent saves
+  // Timing: finish typing > wait 8s > autosave+blink > wait 2s > push (10s total)
+  // Past logs: 5s debounce to prevent lag while still being responsive
+  const debounceTime = primary ? 8000 : 5000  // 8s for primary, 5s for old logs
   const debouncedValue = useDebounce(value, debounceTime)
 
   // Keep refs in sync
   React.useEffect(() => {
     valueRef.current = value
-  }, [value])
+    // Mark as unsaved when user types
+    if (value !== log.text) {
+      setIsSaved(false)
+      // Cancel pending push if user starts typing again
+      if (pendingPushRef?.current) {
+        clearTimeout(pendingPushRef.current)
+        pendingPushRef.current = null
+      }
+      // Cancel blink animation too
+      setIsAboutToPush(false)
+    }
+  }, [value, log.text, pendingPushRef])
 
   React.useEffect(() => {
     logTextRef.current = log.text
@@ -246,26 +291,42 @@ const NoteEditor = ({
   // Note: No blur save handler - saves happen via unmount and debounced autosave
   // This keeps scrolling behavior simple (no blur = no issues)
 
-  // Autosave for all logs (with 5s debounce for primary, 1.5s for old)
+  // Autosave for all logs (with 8s debounce for primary, 5s for past logs)
+  // Timeline: finish typing > wait 8s > [autosave + start blink] > wait 2s > [end blink + push]
   React.useEffect(() => {
     if (log.text === debouncedValue) return
+    if (isSaving) return  // Prevent concurrent saves
+
+    setIsSaving(true)
     onChange(debouncedValue)
-    // Show saved indicator
-    setShowSaved(true)
-    setTimeout(() => setShowSaved(false), 2000)
-  }, [debouncedValue, onChange, log.text])
+
+    // Update timestamp and mark as saved
+    setLastSavedAt(new Date())
+    setIsSaved(true)
+
+    // Clear saving state after a brief delay
+    setTimeout(() => setIsSaving(false), 100)
+
+    // For primary log: trigger blink animation (lasts 2.4s), then push happens via parent
+    if (primary) {
+      setIsAboutToPush(true)
+      setTimeout(() => setIsAboutToPush(false), 2400)  // Match CSS animation duration (0.8s × 3)
+    }
+  }, [debouncedValue, onChange, log.text, primary, isSaving])
 
   // Sync local state when log updates from server
   // BUT: Don't overwrite if user is actively typing (focused)
   // ALSO: Don't clear non-empty user input to empty server value (prevents race condition)
+  // ALSO: Don't sync if there are unsaved changes
   // NOTE: isFocused and value are NOT in deps - only sync when log.text changes from server
   React.useEffect(() => {
     if (isFocused) return  // Skip sync while user is typing
+    if (!isSaved) return  // Skip sync if there are unsaved changes
     // Defensive: Don't clear user's typed text if server hasn't saved yet
     // This prevents race condition on mobile where blur saves but mutation hasn't completed
     if (value && !log.text) return
     setValue(log.text || '')
-  }, [log.text])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [log.text, isFocused, isSaved])  // eslint-disable-line react-hooks/exhaustive-deps
 
   // Track focus state for sync effect (prevent overwriting while typing)
   React.useEffect(() => {
@@ -316,15 +377,20 @@ const NoteEditor = ({
         ev.preventDefault()
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
-          setShowSaved(true)
-          setTimeout(() => setShowSaved(false), 2000)
+          setLastSavedAt(new Date())
+          setIsSaved(true)
+          // Trigger blink animation for manual save too
+          if (primary) {
+            setIsAboutToPush(true)
+            setTimeout(() => setIsAboutToPush(false), 2400)  // Match CSS animation duration (0.8s × 3)
+          }
         }
         // Optionally blur to show save happened
         ;(ev.target as HTMLTextAreaElement).blur()
       }
       // Regular Enter key creates newline (default behavior)
     },
-    []
+    [primary]
   )
 
   const contextText = React.useMemo(() => {
@@ -386,14 +452,10 @@ const NoteEditor = ({
         ) : (
           <div>
             {primary
-              ? 'Just now'
+              ? lastSavedAt
+                ? dayjs(lastSavedAt).format(dateFormat)
+                : 'Just now'
               : !!log && dayjs(log.updatedAt).format(dateFormat)}
-          </div>
-        )}
-        {/* Saved indicator */}
-        {showSaved && (
-          <div className="text-green-500 text-sm mt-1 animate-pulse">
-            ✓ Saved
           </div>
         )}
       </div>
@@ -409,7 +471,11 @@ const NoteEditor = ({
           }
           className={cn(
             'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
-            !primary && 'opacity-20'
+            'placeholder:opacity-20',
+            !primary && 'opacity-20',
+            primary && isSaved && !isAboutToPush && 'opacity-40',
+            primary && !isSaved && 'opacity-100',
+            primary && isAboutToPush && 'animate-blink'
           )}
           rows={primary ? 10 : 1}
         />

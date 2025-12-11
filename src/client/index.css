@@ -45,6 +45,16 @@ input:-webkit-autofill {
   white-space: break-spaces;
 }
 
+/* Custom blink animation for log push warning */
+@keyframes blink {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.2; }
+}
+
+.animate-blink {
+  animation: blink 0.8s ease-in-out 3;
+}
+
 ._table::-webkit-scrollbar-track,
 ._table::-webkit-scrollbar,
 ._table::-webkit-scrollbar-thumb {
