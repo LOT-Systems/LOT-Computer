@@ -27,7 +27,7 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        base: ['InterVariable', 'Inter', 'Helvetica', 'Arial', 'sans-serif'],
+        base: ['Arial', 'Helvetica', 'sans-serif'],
       },
       lineHeight: {
         1: '1',

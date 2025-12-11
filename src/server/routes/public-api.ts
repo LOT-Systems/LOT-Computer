@@ -593,28 +593,51 @@ export default async (fastify: FastifyInstance) => {
     console.log('[PUBLIC-PROFILE-API] Fetching profile for:', userIdOrUsername)
 
     try {
-      // Try to find user by ID or custom URL
-      let user = await models.User.findOne({
-        where: { id: userIdOrUsername }
-      })
-      console.log('[PUBLIC-PROFILE-API] User found by ID:', !!user)
+      // Prioritize custom URL over ID to avoid conflicts
+      // First, try to find user by custom URL in metadata
+      console.log('[PUBLIC-PROFILE-API] Searching for custom URL:', userIdOrUsername)
+      const users = await models.User.findAll()
+      let user = users.find(u => {
+        const customUrl = u.metadata?.privacy?.customUrl
+        return customUrl === userIdOrUsername
+      }) || null
 
-      // If not found by ID, try custom URL in metadata
+      if (user) {
+        console.log('[PUBLIC-PROFILE-API] ✓ User found by custom URL')
+        console.log('[PUBLIC-PROFILE-API] User ID:', user.id)
+      }
+
+      // If not found by custom URL, try by user ID
       if (!user) {
-        const users = await models.User.findAll()
-        user = users.find(u =>
-          u.metadata?.privacy?.customUrl === userIdOrUsername
-        ) || null
-        console.log('[PUBLIC-PROFILE-API] User found by custom URL:', !!user)
+        console.log('[PUBLIC-PROFILE-API] Custom URL not found, trying by ID')
+        user = await models.User.findOne({
+          where: { id: userIdOrUsername }
+        })
+        if (user) {
+          console.log('[PUBLIC-PROFILE-API] ✓ User found by ID:', user.id)
+        }
       }
 
       if (!user) {
-        console.log('[PUBLIC-PROFILE-API] ❌ User not found')
+        console.log('[PUBLIC-PROFILE-API] ❌ User not found for:', userIdOrUsername)
         return reply.code(404).send({
           error: 'User not found',
-          message: 'No public profile exists for this user'
+          message: `No public profile exists for user: ${userIdOrUsername}`,
+          debug: {
+            searchedFor: userIdOrUsername,
+            searchMethods: ['By ID', 'By custom URL in metadata']
+          }
         })
       }
+
+      console.log('[PUBLIC-PROFILE-API] ✓ User found!')
+      console.log('[PUBLIC-PROFILE-API] User details:', {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        hasMetadata: !!user.metadata,
+        metadata: user.metadata
+      })
 
       // Get privacy settings from metadata (with defaults)
       const privacy: any = user.metadata?.privacy || {
@@ -650,6 +673,7 @@ export default async (fastify: FastifyInstance) => {
         firstName: user.firstName,
         lastName: user.lastName,
         privacySettings: privacy,
+        tags: user.tags || [], // Add user tags
       }
 
       // Add city/country if enabled
@@ -664,7 +688,7 @@ export default async (fastify: FastifyInstance) => {
           const now = new Date()
           profile.localTime = now.toLocaleString('en-US', {
             timeZone: user.timeZone || 'UTC',
-            hour: '2-digit',
+            hour: 'numeric',
             minute: '2-digit',
             hour12: true,
           })
@@ -721,10 +745,15 @@ export default async (fastify: FastifyInstance) => {
 
       return profile
     } catch (error: any) {
-      console.error('Public profile error:', error)
+      console.error('[PUBLIC-PROFILE-API] ❌ Error:', error)
+      console.error('[PUBLIC-PROFILE-API] Error stack:', error.stack)
       return reply.code(500).send({
         error: 'Internal server error',
-        message: 'Failed to fetch public profile'
+        message: error.message || 'Failed to fetch public profile',
+        debug: {
+          errorType: error.constructor.name,
+          errorMessage: error.message,
+        }
       })
     }
   })

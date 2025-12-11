@@ -221,6 +221,7 @@ yarn production:run
 - 🔄 **Feedback Loops** - Every question builds on previous answers
 - 🌍 **Context Awareness** - Questions adapt to time, weather, location
 - 🔒 **Privacy First** - Your data stays yours, AI providers are just tools
+- 👤 **Public Profile** - Share your System with others (customizable privacy)
 
 ### For Developers:
 - 🤖 **AI Engine Abstraction** - Switch providers with one line of code
@@ -228,6 +229,140 @@ yarn production:run
 - 🛡️ **Auto-Fallback** - Never goes down, tries multiple engines
 - 📊 **Complete Analytics** - Health check system with status monitoring
 - 🔧 **TypeScript** - Full type safety across stack
+
+---
+
+## 👤 Public Profile System (v1.0)
+
+### Overview
+
+LOT Systems now features a beautiful public profile system that allows users to share their System with the world while maintaining complete control over their privacy.
+
+### Key Features
+
+**Custom URLs:**
+- Create memorable profile URLs: `https://lot-systems.com/u/vadik`
+- Falls back to UUID-based URLs if custom URL not set
+- Collision-safe: custom URLs are prioritized over ID matching
+
+**Privacy Controls:**
+Users can choose what to display on their public profile:
+- ✅ **Name** - Always visible
+- ✅ **Location** - City and country (optional)
+- ✅ **Date** - Current date in readable format
+- ✅ **Team Tags** - Professional affiliations (Admin, R&D, Usership, etc.)
+- ✅ **Local Time** - Current time in user's timezone
+- ✅ **Weather** - Real-time weather conditions
+  - Sky conditions
+  - Humidity (highlighted blue when ≥50%)
+  - Temperature
+  - Sunrise/Sunset times
+- ✅ **Sound Status** - Current ambient sound settings
+- ✅ **Memory Story** - Personal wellness narrative (optional)
+
+**Design Philosophy:**
+- **Consistent Styling** - Matches the System tab's Arial typography and spacing
+- **Block Components** - Uses the same UI components as the main app
+- **24px Spacing** - Identical gap-y-24 spacing for visual rhythm
+- **Tag System** - Team tags display with colors (Suspended tags show in red)
+- **Responsive Layout** - Works beautifully on all devices
+- **Clean Footer** - "This is {Name}'s System powered by LOT" with return link
+
+### Technical Implementation
+
+**API Endpoint:**
+```
+GET /api/public/profile/:userIdOrUsername
+```
+
+**Custom URL Lookup Priority:**
+1. Search by custom URL in user metadata
+2. Fall back to user ID if custom URL not found
+3. Return 404 if neither match
+
+**Type Safety:**
+```typescript
+type PublicProfile = {
+  firstName: string | null;
+  lastName: string | null;
+  city: string | null;
+  country: string | null;
+  localTime?: string;
+  weather?: Weather;
+  soundDescription?: string;
+  memoryStory?: string;
+  privacySettings: UserPrivacySettings;
+  tags?: string[];
+}
+```
+
+**Privacy Settings:**
+```typescript
+type UserPrivacySettings = {
+  showCity: boolean;
+  showLocalTime: boolean;
+  showWeather: boolean;
+  showSound: boolean;
+  showMemoryStory: boolean;
+  customUrl?: string;
+}
+```
+
+### User Experience
+
+**Example Public Profile:**
+```
+Vadik
+Tuesday, 10 December, 2025
+Malibu, USA
+
+Team: [Usership] [R&D] [Admin]
+
+Local time:       9:45 AM PST
+Weather:          Clear sky
+Humidity:         28%
+Temperature:      22℃
+Sunrise:          6:49 AM
+Sunset:           4:46 PM
+Sound:            Ocean waves
+
+This is Vadik's System powered by LOT
+```
+
+**Navigation:**
+- Clean, minimal footer with clickable "LOT" button to return to main app
+- No top navigation clutter
+- Focus on content, not chrome
+
+### Privacy by Default
+
+**What's NOT Shared (Ever):**
+- Password or authentication details
+- Email address
+- Private logs or journal entries
+- Any data marked private in settings
+- Payment or subscription information
+
+**User Control:**
+Users control every aspect of their public profile through Settings:
+- Toggle each section on/off independently
+- Set custom URL or use default UUID
+- Update profile anytime
+- Delete profile completely
+
+### Cache Management
+
+**PWA-Safe Design:**
+- Cache-busting CSS version (`?v=20241210-001`)
+- Separate entry point for public profiles
+- No interference with main app functionality
+- Users can switch between app and profiles seamlessly
+
+**Files Involved:**
+- `/src/client/components/PublicProfile.tsx` - Main component
+- `/src/client/entries/public-profile.tsx` - Entry point
+- `/src/server/routes/public-api.ts` - API endpoint
+- `/templates/generic-spa.ejs` - HTML template
 
 ---
 

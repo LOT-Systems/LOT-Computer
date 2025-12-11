@@ -228,3 +228,24 @@ state.isMirrorOn.subscribe((value) => {
     }
   }
 })
+
+// Initialize CSS custom properties on module load
+// This ensures theme colors are available immediately for Tailwind utilities
+if (typeof document !== 'undefined') {
+  const initialBase = baseColor.get()
+  const initialAcc = accentColor.get()
+  const initialPalette = accentPalette.get()
+
+  document.documentElement.style.setProperty('--base-color', initialBase)
+  const initialAccRgb = hexToRgb(initialAcc) || hexToRgb(THEMES.light.acc)!
+  document.documentElement.style.setProperty(
+    '--acc-color-default',
+    initialAccRgb.join(' ')
+  )
+  initialPalette.forEach((x) => {
+    document.documentElement.style.setProperty(
+      `--acc-color-${x.index}`,
+      x.colorRgb.join(' ')
+    )
+  })
+}

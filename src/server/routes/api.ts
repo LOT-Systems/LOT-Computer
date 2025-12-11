@@ -25,7 +25,7 @@ import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
-import { buildPrompt, completeAndExtractQuestion, generateMemoryStory } from '#server/utils/memory'
+import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort } from '#server/utils/memory'
 import dayjs from '#server/utils/dayjs'
 
 export default async (fastify: FastifyInstance) => {
@@ -512,6 +512,33 @@ export default async (fastify: FastifyInstance) => {
     return logs
   })
 
+  fastify.post(
+    '/logs',
+    async (
+      req: FastifyRequest<{
+        Body: { text: string }
+      }>,
+      reply
+    ) => {
+      const text = (req.body.text || '').trim().slice(0, MAX_LOG_TEXT_LENGTH)
+      if (!text) return reply.throw.badRequest('Log text is required')
+
+      const log = await fastify.models.Log.create({
+        userId: req.user.id,
+        text,
+        event: 'note',
+      })
+
+      // Add context asynchronously
+      process.nextTick(async () => {
+        const context = await getLogContext(req.user)
+        await log.set({ context }).save()
+      })
+
+      return log
+    }
+  )
+
   fastify.put(
     '/logs/:id',
     async (
@@ -813,6 +840,143 @@ export default async (fastify: FastifyInstance) => {
       }
     }
   })
+
+  // Get user's cohort profile based on their answers
+  fastify.get('/user-profile', async (req: FastifyRequest, reply) => {
+    try {
+      // Check if user has Usership tag
+      const hasUsershipTag = req.user.tags.some(
+        (tag) => tag.toLowerCase() === 'usership'
+      )
+
+      if (!hasUsershipTag) {
+        return {
+          hasUsership: false,
+          message: 'Subscribe to Usership to unlock profile analysis'
+        }
+      }
+
+      // Get answer logs
+      const logs = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: 'answer',
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 30,
+      })
+
+      if (logs.length === 0) {
+        return {
+          hasUsership: true,
+          message: 'Complete Memory questions to generate your profile',
+          answerCount: 0
+        }
+      }
+
+      // Extract traits and determine psychological archetype + behavioral cohort
+      const analysis = extractUserTraits(logs)
+      const { traits, patterns, psychologicalDepth } = analysis
+      const cohortResult = determineUserCohort(traits, patterns, psychologicalDepth)
+
+      console.log(`🧠 Profile request for ${req.user.email}:`, {
+        archetype: cohortResult.archetype,
+        behavioralCohort: cohortResult.behavioralCohort,
+        traits,
+        values: psychologicalDepth.values,
+        selfAwareness: psychologicalDepth.selfAwareness,
+        answerCount: logs.length
+      })
+
+      return {
+        hasUsership: true,
+        // Psychological depth (soul level)
+        archetype: cohortResult.archetype,
+        archetypeDescription: cohortResult.description,
+        coreValues: psychologicalDepth.values.map(v => v.charAt(0).toUpperCase() + v.slice(1)),
+        emotionalPatterns: psychologicalDepth.emotionalPatterns.map(p => p.replace(/([A-Z])/g, ' $1').trim()),
+        selfAwarenessLevel: psychologicalDepth.selfAwareness,
+        // Behavioral patterns (surface level)
+        behavioralCohort: cohortResult.behavioralCohort,
+        behavioralTraits: traits.map(t => t.replace(/([A-Z])/g, ' $1').trim()),
+        patternStrength: Object.entries(patterns)
+          .filter(([_, v]) => v > 0)
+          .map(([k, v]) => ({ trait: k.replace(/([A-Z])/g, ' $1').trim(), count: v }))
+          .sort((a, b) => b.count - a.count),
+        // Meta
+        answerCount: logs.length,
+        noteCount: logs.filter(l => l.event === 'note' && l.text && l.text.length > 20).length
+      }
+    } catch (error: any) {
+      console.error('❌ Error generating user profile:', {
+        error: error.message,
+        userId: req.user?.id,
+      })
+      return {
+        hasUsership: false,
+        error: 'Unable to generate profile at this time'
+      }
+    }
+  })
+
+  // Generate contextual recipe suggestion
+  fastify.get(
+    '/recipe-suggestion',
+    async (
+      req: FastifyRequest<{
+        Querystring: { mealTime: 'breakfast' | 'lunch' | 'dinner' | 'snack' }
+      }>,
+      reply
+    ) => {
+      try {
+        const mealTime = req.query.mealTime
+        if (!mealTime || !['breakfast', 'lunch', 'dinner', 'snack'].includes(mealTime)) {
+          return reply.throw.badRequest('Invalid mealTime. Must be breakfast, lunch, dinner, or snack')
+        }
+
+        console.log(`📋 Recipe suggestion request for ${mealTime} from user ${req.user.email}`)
+
+        // Get recent logs for personalization (if user has Usership tag)
+        const hasUsershipTag = req.user.tags.some(
+          (tag) => tag.toLowerCase() === 'usership'
+        )
+
+        let logs: any[] = []
+        if (hasUsershipTag) {
+          // Get ALL logs (answers + notes) for deeper psychological analysis
+          logs = await fastify.models.Log.findAll({
+            where: {
+              userId: req.user.id,
+            },
+            order: [['createdAt', 'DESC']],
+            limit: 50,  // Increased to capture more context including notes
+          })
+        }
+
+        const recipe = await generateRecipeSuggestion(req.user, mealTime, logs)
+
+        console.log(`✅ Recipe suggestion generated: "${recipe}"`)
+
+        return {
+          recipe,
+          mealTime,
+          hasUsership: hasUsershipTag
+        }
+      } catch (error: any) {
+        console.error('❌ Error generating recipe suggestion:', {
+          error: error.message,
+          stack: error.stack,
+          userId: req.user?.id,
+        })
+        // Return fallback recipe
+        return {
+          recipe: 'Simple fresh salad with seasonal ingredients',
+          mealTime: req.query.mealTime,
+          error: 'Using fallback suggestion',
+        }
+      }
+    }
+  )
 
   // Generate daily world element
   fastify.post('/world/generate-element', async (req, reply) => {

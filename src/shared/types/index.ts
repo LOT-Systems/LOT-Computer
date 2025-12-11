@@ -209,6 +209,7 @@ export type PublicProfile = {
   soundDescription?: string;
   memoryStory?: string;
   privacySettings: UserPrivacySettings;
+  tags?: string[];
 };
 
 // Other Types

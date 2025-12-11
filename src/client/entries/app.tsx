@@ -16,6 +16,7 @@ import { useSun } from '#client/utils/sun'
 import { useMirror } from '#client/utils/mirror'
 import { useSound } from '#client/utils/sound'
 import { sync } from '../sync'
+import { initRecipeWidget } from '#client/stores/recipeWidget'
 
 sync.listen('users_total', (data) => {
   stores.usersTotal.set(data.value)
@@ -79,6 +80,9 @@ const App = () => {
         },
       }
     )
+
+    // Initialize recipe widget periodic checking
+    initRecipeWidget()
 
     return () => {
       unbindRouter()

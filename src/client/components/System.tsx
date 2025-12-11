@@ -12,9 +12,12 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
+import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
+import { RecipeWidget } from './RecipeWidget'
+import { checkRecipeWidget } from '#client/stores/recipeWidget'
 
 export const System = () => {
   const me = useStore(stores.me)
@@ -89,6 +92,28 @@ export const System = () => {
     return { sunrise, sunset }
   }, [weather, isTimeFormat12h])
 
+  // Astrology calculations
+  const astrology = React.useMemo(() => {
+    const now = new Date()
+    const hourlyZodiac = getHourlyZodiac(now)
+    const westernZodiac = getWesternZodiac(now)
+    const moonPhase = getMoonPhase(now)
+    const rokuyo = getRokuyo(now)
+
+    return {
+      hourlyZodiac,
+      westernZodiac,
+      moonPhase: moonPhase.phase,
+      moonIllumination: moonPhase.illumination,
+      rokuyo,
+    }
+  }, [])
+
+  // Check for recipe suggestions when component mounts
+  React.useEffect(() => {
+    checkRecipeWidget()
+  }, [])
+
   // Sound is now managed globally in app.tsx via useSound hook
 
   // const AdminLink = React.useMemo<
@@ -148,6 +173,7 @@ export const System = () => {
         <TimeWidget />
         {!!weather && (
           <>
+            <Block label="Sky:">{weather?.description || 'Unknown'}</Block>
             <Block label="Humidity:">
               <span
                 className={cn(
@@ -175,6 +201,14 @@ export const System = () => {
       </div>
 
       <div>
+        <Block label="Astrology:">
+          <div className="inline-block">
+            {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
+          </div>
+        </Block>
+      </div>
+
+      <div>
         <Block
           label="Mirror:"
           onClick={() => stores.isMirrorOn.set(!isMirrorOn)}
@@ -194,6 +228,8 @@ export const System = () => {
           <Block label="Live:" blockView children={liveMessage} />
         </div>
       )}
+
+      <RecipeWidget />
 
       <MemoryWidget />
     </div>

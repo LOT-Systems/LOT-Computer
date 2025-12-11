@@ -91,6 +91,11 @@ export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
 
 export const useLogs = createQuery<Log[]>('/api/logs')
 
+export const useCreateLog = createMutation<{ text: string }, Log>(
+  'post',
+  '/api/logs'
+)
+
 export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
   'put',
   (data) => `/api/logs/${data.id}`
