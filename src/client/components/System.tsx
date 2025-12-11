@@ -195,9 +195,9 @@ export const System = () => {
 
       <div>
         <Block label="Astrology:">
-          <span>
+          <div className="inline-block">
             {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
-          </span>
+          </div>
         </Block>
       </div>
 
