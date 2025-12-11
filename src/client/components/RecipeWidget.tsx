@@ -85,12 +85,7 @@ export const RecipeWidget: React.FC = () => {
         )}
         onClick={handleDismiss}
       >
-        <div className="flex items-start justify-between gap-4">
-          <div>{state.recipe}</div>
-          <div className="text-acc/40 select-none">
-            ✓
-          </div>
-        </div>
+        {state.recipe}
       </Block>
     </div>
   )
