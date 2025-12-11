@@ -12,6 +12,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
+import { getJapaneseZodiac, getWesternZodiac, getMoonPhase } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
@@ -88,6 +89,22 @@ export const System = () => {
       .format(isTimeFormat12h ? 'h:mm A' : 'H:mm')
     return { sunrise, sunset }
   }, [weather, isTimeFormat12h])
+
+  // Astrology calculations
+  const astrology = React.useMemo(() => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const japaneseZodiac = getJapaneseZodiac(year)
+    const westernZodiac = getWesternZodiac(now)
+    const moonPhase = getMoonPhase(now)
+
+    return {
+      japaneseZodiac,
+      westernZodiac,
+      moonPhase: moonPhase.phase,
+      moonIllumination: moonPhase.illumination,
+    }
+  }, [])
 
   // Sound is now managed globally in app.tsx via useSound hook
 
@@ -173,6 +190,12 @@ export const System = () => {
             </Block>
           </>
         )}
+      </div>
+
+      <div>
+        <Block label="Astrology:">
+          {astrology.westernZodiac} • {astrology.japaneseZodiac} • {astrology.moonPhase}
+        </Block>
       </div>
 
       <div>
