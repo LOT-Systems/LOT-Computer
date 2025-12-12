@@ -5,16 +5,36 @@ import { Block } from '#client/components/ui'
 import { useCreateLog } from '#client/queries'
 import * as stores from '#client/stores'
 
+const FAREWELL_PHRASES = [
+  'Bon appétit!',
+  'Enjoy!',
+  'Buon appetito!',
+  'Guten Appetit!',
+  '¡Buen provecho!',
+  'Smakelijk!',
+  'Приятного аппетита!', // Russian
+  'いただきます!', // Japanese
+  'Enjoy your meal!',
+  'Dig in!',
+  'Savor it!',
+  'Delicious!',
+]
+
 export const RecipeWidget: React.FC = () => {
   const state = useStore(recipeWidget)
   const router = useStore(stores.router)
   const { mutate: createLog } = useCreateLog()
   const loggedRecipesRef = React.useRef<Set<string>>(new Set())
 
+  const [isFading, setIsFading] = React.useState(false)
+  const [farewellPhrase, setFarewellPhrase] = React.useState<string | null>(null)
+
   // Auto-log recipe when it becomes visible on System tab
   React.useEffect(() => {
     if (!state.isVisible) {
       loggedRecipesRef.current.clear()
+      setIsFading(false)
+      setFarewellPhrase(null)
       return
     }
 
@@ -50,18 +70,39 @@ export const RecipeWidget: React.FC = () => {
     }
   }
 
+  const handleDismiss = () => {
+    // Pick a random farewell phrase
+    const randomPhrase = FAREWELL_PHRASES[Math.floor(Math.random() * FAREWELL_PHRASES.length)]
+    setFarewellPhrase(randomPhrase)
+    setIsFading(true)
+
+    // Dismiss after fade animation completes
+    setTimeout(() => {
+      dismissRecipeWidget()
+    }, 1000) // Match the fade duration
+  }
+
   return (
-    <div>
+    <div
+      className={`transition-opacity duration-1000 ${isFading ? 'opacity-0' : 'opacity-100'}`}
+    >
       <Block label={getMealLabel()} blockView>
-        <div className="flex items-start justify-between gap-4">
-          <div>{state.recipe}</div>
-          <button
-            onClick={dismissRecipeWidget}
-            className="text-acc/40 hover:text-acc transition-colors cursor-pointer select-none"
-            aria-label="Dismiss"
-          >
-            ✕
-          </button>
+        <div
+          onClick={handleDismiss}
+          className="flex items-start justify-between gap-4 cursor-pointer select-none"
+        >
+          {farewellPhrase ? (
+            <div className="flex-1 text-center font-medium">
+              {farewellPhrase}
+            </div>
+          ) : (
+            <>
+              <div className="flex-1">{state.recipe}</div>
+              <div className="text-acc/40 transition-colors">
+                ✕
+              </div>
+            </>
+          )}
         </div>
       </Block>
     </div>
