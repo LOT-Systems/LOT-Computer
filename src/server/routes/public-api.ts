@@ -641,8 +641,9 @@ export default async (fastify: FastifyInstance) => {
       })
 
       // Get privacy settings from metadata (with defaults)
+      // All profiles are public by default
       const privacy: any = user.metadata?.privacy || {
-        isPublicProfile: false,
+        isPublicProfile: true,
         showWeather: true,
         showLocalTime: true,
         showCity: true,
