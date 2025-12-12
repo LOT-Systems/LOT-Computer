@@ -731,8 +731,9 @@ export default async (fastify: FastifyInstance) => {
         profile.soundDescription = user.metadata.currentSound
       }
 
-      // Add memory story if enabled
-      if (privacy.showMemoryStory) {
+      // Add memory story if enabled (only for Usership users)
+      const hasUsershipTag = user.tags?.some((tag) => tag.toLowerCase() === 'usership')
+      if (privacy.showMemoryStory && hasUsershipTag) {
         try {
           // Get latest memory story from user metadata
           if (user.metadata?.memoryStory) {

@@ -280,6 +280,16 @@ fastify.register(async (fastify: FastifyInstance) => {
           return reply.redirect('/')
         }
       })
+
+      // Internal profile route within /us context
+      fastify.get('/us/u/:userId', async function (req, reply) {
+        return reply.view('generic-spa', {
+          scriptName: 'public-profile',
+          scriptNonce: reply.cspNonce.script,
+          styleNonce: reply.cspNonce.style,
+        })
+      })
+
       ;['/us', '/us/:userId'].forEach((route) => {
         fastify.get(route, async function (req, reply) {
           return reply.view('generic-spa', {

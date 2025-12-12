@@ -542,32 +542,6 @@ export const Settings = () => {
         </div>
       )}
 
-      {/* Personal World Section - For Usership users only */}
-      {userTagIds.includes(UserTag.Usership) && (
-        <div className="max-w-[700px]">
-          <Block label="Personal World:" blockView>
-            {userWorld.elements.length > 0 ? (
-              <>
-                <div className="mb-8">
-                  {userWorld.elements.length} element{userWorld.elements.length !== 1 ? 's' : ''} generated
-                </div>
-                <div className="text-acc/60 text-sm">
-                  Elements appear in the background as you answer Memory prompts. One new element generated per day.
-                </div>
-              </>
-            ) : (
-              <div className="text-acc/60">
-                Answer Memory prompts on the System tab to start generating your personal world. Elements will appear in the background.
-              </div>
-            )}
-          </Block>
-        </div>
-      )}
-
-      {/* World Canvas - Background layer */}
-      {userTagIds.includes(UserTag.Usership) && userWorld.elements.length > 0 && (
-        <WorldCanvas elements={userWorld.elements} />
-      )}
     </div>
   )
 }
