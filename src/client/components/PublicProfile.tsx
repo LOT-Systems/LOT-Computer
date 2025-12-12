@@ -216,6 +216,113 @@ export const PublicProfile = () => {
           </div>
         )}
 
+        {/* Psychological Profile - show if available */}
+        {profile.psychologicalProfile && profile.psychologicalProfile.hasUsership && (
+          <div>
+            <Block label="Psychological Profile:" blockView>
+              {profile.psychologicalProfile.message ? (
+                <div className="opacity-60">
+                  {profile.psychologicalProfile.message}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-y-12">
+                  {/* Soul Archetype */}
+                  {profile.psychologicalProfile.archetype && (
+                    <Block label="Soul Archetype:" blockView>
+                      <div className="font-bold text-acc mb-4">
+                        {profile.psychologicalProfile.archetype}
+                      </div>
+                      {profile.psychologicalProfile.archetypeDescription && (
+                        <div className="text-acc/80 text-sm">
+                          {profile.psychologicalProfile.archetypeDescription}
+                        </div>
+                      )}
+                    </Block>
+                  )}
+
+                  {/* Self-Awareness Level */}
+                  {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
+                    <Block label="Self-Awareness:">
+                      {profile.psychologicalProfile.selfAwarenessLevel}/10
+                    </Block>
+                  )}
+
+                  {/* Core Values */}
+                  {profile.psychologicalProfile.coreValues && profile.psychologicalProfile.coreValues.length > 0 && (
+                    <Block label="Core Values:" blockView>
+                      <TagsContainer
+                        items={profile.psychologicalProfile.coreValues.map((value: string, idx: number) => (
+                          <Tag key={idx} color="blue" fill>
+                            {value}
+                          </Tag>
+                        ))}
+                      />
+                    </Block>
+                  )}
+
+                  {/* Emotional Patterns */}
+                  {profile.psychologicalProfile.emotionalPatterns && profile.psychologicalProfile.emotionalPatterns.length > 0 && (
+                    <Block label="Emotional Patterns:" blockView>
+                      <TagsContainer
+                        items={profile.psychologicalProfile.emotionalPatterns.map((pattern: string, idx: number) => (
+                          <Tag key={idx} color="purple" fill>
+                            {pattern}
+                          </Tag>
+                        ))}
+                      />
+                    </Block>
+                  )}
+
+                  {/* Behavioral Cohort */}
+                  {profile.psychologicalProfile.behavioralCohort && (
+                    <Block label="Behavioral Cohort:">
+                      {profile.psychologicalProfile.behavioralCohort}
+                    </Block>
+                  )}
+
+                  {/* Behavioral Traits */}
+                  {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
+                    <Block label="Behavioral Traits:" blockView>
+                      <TagsContainer
+                        items={profile.psychologicalProfile.behavioralTraits.map((trait: string, idx: number) => (
+                          <Tag key={idx} color="green" fill>
+                            {trait}
+                          </Tag>
+                        ))}
+                      />
+                    </Block>
+                  )}
+
+                  {/* Pattern Strength */}
+                  {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
+                    <Block label="Pattern Strength:" blockView>
+                      <div className="flex flex-col gap-y-4">
+                        {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
+                          <div key={idx} className="text-sm">
+                            {item.trait}: <span className="text-acc/60">{item.count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </Block>
+                  )}
+
+                  {/* Meta Information */}
+                  {(profile.psychologicalProfile.answerCount !== undefined || profile.psychologicalProfile.noteCount !== undefined) && (
+                    <div className="text-sm text-acc/60">
+                      {profile.psychologicalProfile.answerCount !== undefined && (
+                        <div>Answers: {profile.psychologicalProfile.answerCount}</div>
+                      )}
+                      {profile.psychologicalProfile.noteCount !== undefined && (
+                        <div>Notes: {profile.psychologicalProfile.noteCount}</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </Block>
+          </div>
+        )}
+
         {/* Footer */}
         <div>
           This is {userName}'s System powered by{' '}
