@@ -66,7 +66,7 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
             ) : (
               <span
                 className={cn(
-                  'pl-4 pr-4 rounded',
+                  'pr-4 rounded',
                   (!!props.onClick || !!props.onChildrenClick) &&
                     cn(
                       'cursor-pointer transition-[background-color]',
