@@ -210,6 +210,20 @@ export type PublicProfile = {
   memoryStory?: string;
   privacySettings: UserPrivacySettings;
   tags?: string[];
+  psychologicalProfile?: {
+    hasUsership: boolean;
+    message?: string;
+    archetype?: string;
+    archetypeDescription?: string;
+    coreValues?: string[];
+    emotionalPatterns?: string[];
+    selfAwarenessLevel?: number;
+    behavioralCohort?: string;
+    behavioralTraits?: string[];
+    patternStrength?: Array<{ trait: string; count: number }>;
+    answerCount?: number;
+    noteCount?: number;
+  };
 };
 
 // Other Types
