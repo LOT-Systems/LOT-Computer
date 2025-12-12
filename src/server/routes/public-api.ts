@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify'
 import { sequelize } from '#server/utils/db'
 import { models } from '#server/models'
 import * as weather from '#server/utils/weather'
+import { extractUserTraits, determineUserCohort } from '#server/utils/memory'
 import config from '#server/config'
 import fs from 'fs'
 import path from 'path'
@@ -755,6 +756,67 @@ export default async (fastify: FastifyInstance) => {
           }
         } catch (error) {
           // Story not available, skip
+        }
+      }
+
+      // Add psychological profile (for Usership users)
+      if (hasUsershipTag) {
+        try {
+          // Get answer logs
+          const logs = await models.Log.findAll({
+            where: {
+              userId: user.id,
+              event: 'answer',
+            },
+            order: [['createdAt', 'DESC']],
+            limit: 30,
+          })
+
+          if (logs.length === 0) {
+            profile.psychologicalProfile = {
+              hasUsership: true,
+              message: 'Complete Memory questions to generate profile',
+              answerCount: 0
+            }
+          } else {
+            // Extract traits and determine psychological archetype + behavioral cohort
+            const analysis = extractUserTraits(logs)
+            const { traits, patterns, psychologicalDepth } = analysis
+            const cohortResult = determineUserCohort(traits, patterns, psychologicalDepth)
+
+            profile.psychologicalProfile = {
+              hasUsership: true,
+              // Psychological depth (soul level)
+              archetype: cohortResult.archetype,
+              archetypeDescription: cohortResult.description,
+              coreValues: psychologicalDepth.values.map((v: string) => v.charAt(0).toUpperCase() + v.slice(1)),
+              emotionalPatterns: psychologicalDepth.emotionalPatterns.map((p: string) => p.replace(/([A-Z])/g, ' $1').trim()),
+              selfAwarenessLevel: psychologicalDepth.selfAwareness,
+              // Behavioral patterns (surface level)
+              behavioralCohort: cohortResult.behavioralCohort,
+              behavioralTraits: traits.map((t: string) => t.replace(/([A-Z])/g, ' $1').trim()),
+              patternStrength: Object.entries(patterns)
+                .filter(([_, v]) => v > 0)
+                .map(([k, v]) => ({ trait: k.replace(/([A-Z])/g, ' $1').trim(), count: v as number }))
+                .sort((a, b) => b.count - a.count),
+              // Meta
+              answerCount: logs.length,
+              noteCount: logs.filter((l: any) => l.event === 'note' && l.text && l.text.length > 20).length
+            }
+          }
+        } catch (error) {
+          console.error('[PUBLIC-PROFILE-API] Error generating psychological profile:', error)
+          // Profile generation failed, set basic response
+          profile.psychologicalProfile = {
+            hasUsership: true,
+            message: 'Profile temporarily unavailable'
+          }
+        }
+      } else {
+        // Non-Usership users don't get psychological profiles
+        profile.psychologicalProfile = {
+          hasUsership: false,
+          message: 'Subscribe to Usership to unlock profile analysis'
         }
       }
 
