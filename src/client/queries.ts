@@ -89,6 +89,13 @@ export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
 })
 
+export const useVisitorStats = createQuery<{
+  totalSiteVisitors: number
+  userProfileVisits: number
+}>('/api/visitor-stats', {
+  refetchOnWindowFocus: false,
+})
+
 export const useLogs = createQuery<Log[]>('/api/logs')
 
 export const useCreateLog = createMutation<{ text: string }, Log>(

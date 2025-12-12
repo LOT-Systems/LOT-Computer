@@ -14,6 +14,7 @@ import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
 import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
+import { useVisitorStats } from '#client/queries'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
 import { RecipeWidget } from './RecipeWidget'
@@ -28,6 +29,8 @@ export const System = () => {
   const usersTotal = useStore(stores.usersTotal)
   const usersOnline = useStore(stores.usersOnline)
   const liveMessage = useStore(stores.liveMessage)
+
+  const { data: visitorStats } = useVisitorStats()
 
   const isTempFahrenheit = useStore(stores.isTempFahrenheit)
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
@@ -168,6 +171,18 @@ export const System = () => {
           {formatNumberWithCommas(usersTotal)}
         </Block>
       </div>
+
+      {/* Visitor Statistics */}
+      {visitorStats && (
+        <div>
+          <Block label="Total visitors:">
+            {formatNumberWithCommas(visitorStats.totalSiteVisitors)}
+          </Block>
+          <Block label="Your profile visitors:">
+            {formatNumberWithCommas(visitorStats.userProfileVisits)}
+          </Block>
+        </div>
+      )}
 
       <div>
         <TimeWidget />

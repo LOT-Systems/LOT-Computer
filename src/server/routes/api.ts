@@ -119,6 +119,32 @@ export default async (fastify: FastifyInstance) => {
     return { ...profile, isAdmin, metadata }
   })
 
+  // Visitor statistics endpoint
+  fastify.get('/visitor-stats', async (req: FastifyRequest, reply) => {
+    try {
+      // Get total site visitors from a global counter
+      const globalStats = await fastify.models.User.findOne({
+        where: { email: 'system@lot' } // Special system user for global stats
+      })
+
+      const totalVisitors = globalStats?.metadata?.totalSiteVisitors || 0
+
+      // Get current user's profile visits
+      const userProfileVisits = req.user.metadata?.profileVisits || 0
+
+      return {
+        totalSiteVisitors: totalVisitors,
+        userProfileVisits: userProfileVisits
+      }
+    } catch (error) {
+      console.error('Error fetching visitor stats:', error)
+      return {
+        totalSiteVisitors: 0,
+        userProfileVisits: 0
+      }
+    }
+  })
+
   fastify.post(
     '/settings',
     async (req: FastifyRequest<{ Body: UserSettings }>, reply) => {

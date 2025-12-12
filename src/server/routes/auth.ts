@@ -154,6 +154,24 @@ export default function (fastify: FastifyInstance, opts: any, done: () => void) 
 
       console.log('Session created for user:', user.id);
 
+      // Increment total site visitors counter
+      try {
+        const systemUser = await fastify.models.User.findOne({
+          where: { email: 'system@lot' }
+        })
+        if (systemUser) {
+          const currentVisitors = systemUser.metadata?.totalSiteVisitors || 0
+          await systemUser.update({
+            metadata: {
+              ...systemUser.metadata,
+              totalSiteVisitors: currentVisitors + 1
+            }
+          })
+        }
+      } catch (error) {
+        console.error('Error incrementing total site visitors:', error)
+      }
+
       // Broadcast updated user count if new user joined
       if (isNewUser) {
         const usersTotal = await fastify.models.User.countJoined();
