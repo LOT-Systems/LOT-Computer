@@ -48,10 +48,19 @@ export async function getWeather(
   const utcOffsetSeconds = data.utc_offset_seconds
 
   // Convert to Unix timestamp (seconds)
-  // Strategy: Parse as UTC (by adding 'Z'), then adjust for the location's timezone offset
-  // Example: "16:45" in PST (UTC-8) means "00:45 UTC next day"
-  //   - Parse "16:45Z" → Unix time for 16:45 UTC
-  //   - Subtract offset (-28800) → adds 8 hours → correct Unix time for 16:45 PST
+  // The API returns times in the location's local timezone (e.g., "2024-12-12T06:45")
+  // We need to convert to Unix timestamp (UTC)
+  //
+  // Process:
+  // 1. Parse the time string by treating it as UTC (add 'Z')
+  // 2. This gives us a timestamp as if it were that time in UTC
+  // 3. Subtract the UTC offset to get the actual UTC time
+  //
+  // Example for PST (UTC-8, offset=-28800):
+  // - API returns "06:45" (6:45 AM PST)
+  // - Real UTC time is 14:45 (2:45 PM)
+  // - Parse "06:45Z" = timestamp for 06:45 UTC
+  // - Subtract offset: 06:45 UTC - (-8 hours) = 06:45 UTC + 8 hours = 14:45 UTC ✓
   const sunriseUnix = sunriseStr
     ? (Date.parse(sunriseStr + 'Z') / 1000) - utcOffsetSeconds
     : null
