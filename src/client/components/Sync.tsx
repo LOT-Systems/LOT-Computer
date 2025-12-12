@@ -212,7 +212,7 @@ export const Sync = () => {
               )}
               onClick={onToggleLike(x.id)}
             >
-              {authorId && canAccessUserProfiles ? (
+              {authorId ? (
                 <GhostButton
                   className="whitespace-nowrap pr-4"
                   onClick={onNavigateToUserProfile(authorId)}

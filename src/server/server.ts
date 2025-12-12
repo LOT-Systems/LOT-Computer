@@ -255,10 +255,10 @@ fastify.register(async (fastify: FastifyInstance) => {
       })
     })
 
-    // Admin app
+    // Admin app (accessible by Admin, Usership, and R&D users)
     fastify.register(async (fastify) => {
       fastify.addHook('onRequest', async (req, reply) => {
-        if (!req.user || !req.user.isAdmin()) {
+        if (!req.user || !req.user.canAccessUsSection()) {
           return reply.redirect('/')
         }
       })
