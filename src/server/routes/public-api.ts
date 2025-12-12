@@ -668,12 +668,26 @@ export default async (fastify: FastifyInstance) => {
 
       console.log('[PUBLIC-PROFILE-API] ✓ Profile is public, building response')
 
+      // Increment profile visit counter
+      const currentVisits = user.metadata?.profileVisits || 0
+      const newVisits = currentVisits + 1
+      await models.User.update(
+        {
+          metadata: {
+            ...user.metadata,
+            profileVisits: newVisits
+          }
+        },
+        { where: { id: user.id } }
+      )
+
       // Build public profile response
       const profile: any = {
         firstName: user.firstName,
         lastName: user.lastName,
         privacySettings: privacy,
         tags: user.tags || [], // Add user tags
+        profileVisits: newVisits, // Add visit count
       }
 
       // Add city/country if enabled

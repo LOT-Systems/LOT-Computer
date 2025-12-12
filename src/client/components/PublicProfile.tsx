@@ -323,6 +323,13 @@ export const PublicProfile = () => {
           </div>
         )}
 
+        {/* Profile Visits */}
+        {profile.profileVisits !== undefined && (
+          <div className="text-sm text-acc/60">
+            Profile visits: {formatNumberWithCommas(profile.profileVisits)}
+          </div>
+        )}
+
         {/* Footer */}
         <div>
           This is {userName}'s System powered by{' '}
