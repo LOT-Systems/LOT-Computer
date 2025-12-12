@@ -89,19 +89,14 @@ export const RecipeWidget: React.FC = () => {
       <Block label={getMealLabel()} blockView>
         <div
           onClick={handleDismiss}
-          className="flex items-start justify-between gap-4 cursor-pointer select-none"
+          className="cursor-pointer select-none"
         >
           {farewellPhrase ? (
-            <div className="flex-1 text-center font-medium">
+            <div className="text-center font-medium">
               {farewellPhrase}
             </div>
           ) : (
-            <>
-              <div className="flex-1">{state.recipe}</div>
-              <div className="text-acc/40 transition-colors">
-                ✕
-              </div>
-            </>
+            <div>{state.recipe}</div>
           )}
         </div>
       </Block>
