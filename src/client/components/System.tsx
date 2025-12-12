@@ -175,10 +175,10 @@ export const System = () => {
       {/* Visitor Statistics */}
       {visitorStats && (
         <div>
-          <Block label="Total visitors:">
+          <Block label="Total LOT visitors:">
             {formatNumberWithCommas(visitorStats.totalSiteVisitors)}
           </Block>
-          <Block label="Your profile visitors:">
+          <Block label="My OS visitors:">
             {formatNumberWithCommas(visitorStats.userProfileVisits)}
           </Block>
         </div>
