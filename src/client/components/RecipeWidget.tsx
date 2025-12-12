@@ -9,12 +9,12 @@ export const RecipeWidget: React.FC = () => {
   const state = useStore(recipeWidget)
   const router = useStore(stores.router)
   const { mutate: createLog } = useCreateLog()
-  const hasLoggedRef = React.useRef(false)
+  const loggedRecipesRef = React.useRef<Set<string>>(new Set())
 
   // Auto-log recipe when it becomes visible on System tab
   React.useEffect(() => {
     if (!state.isVisible) {
-      hasLoggedRef.current = false
+      loggedRecipesRef.current.clear()
       return
     }
 
@@ -22,9 +22,9 @@ export const RecipeWidget: React.FC = () => {
     const isOnSystemTab = !router || router.route === 'system'
     if (!isOnSystemTab) return
 
-    // Only log once per recipe show
-    if (hasLoggedRef.current) return
-    hasLoggedRef.current = true
+    // Only log each unique recipe once
+    if (loggedRecipesRef.current.has(state.recipe)) return
+    loggedRecipesRef.current.add(state.recipe)
 
     // Create log entry with recipe suggestion
     const mealLabel = getMealLabel()
