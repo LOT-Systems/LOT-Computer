@@ -56,8 +56,9 @@ export const Settings = () => {
   // Privacy settings state
   const [privacySettings, setPrivacySettings] = React.useState<UserPrivacySettings>(() => {
     const metadata = (me as any)?.metadata || {}
+    // All profiles are public by default
     return metadata.privacy || {
-      isPublicProfile: false,
+      isPublicProfile: true,
       showWeather: true,
       showLocalTime: true,
       showCity: true,
