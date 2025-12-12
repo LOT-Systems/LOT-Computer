@@ -34,7 +34,7 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
         >
           <div
             className={cn(
-              'w-[170px] sm:w-[150px] mr-16 sm:mr-8 -ml-4',
+              'w-[170px] sm:w-[150px] mr-24 sm:mr-12 -ml-4',
               props.containsButton && 'translate-y-8',
               props.containsSmallButton && 'translate-y-4'
             )}
@@ -66,7 +66,7 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
             ) : (
               <span
                 className={cn(
-                  'px-4 rounded',
+                  'pl-4 pr-4 rounded',
                   (!!props.onClick || !!props.onChildrenClick) &&
                     cn(
                       'cursor-pointer transition-[background-color]',
