@@ -135,11 +135,11 @@ export const Sync = () => {
     (userId: string) => (ev: React.MouseEvent | React.TouchEvent) => {
       ev?.preventDefault()
       ev?.stopPropagation()
-      // Usership/Admin users go to /us (admin interface)
-      // Regular users go to /u (public profile)
-      window.location.href = canAccessUserProfiles ? `/us/${userId}` : `/u/${userId}`
+      // All users go to unified public profile at /u
+      // The /us section is only accessible directly for Usership users
+      window.location.href = `/u/${userId}`
     },
-    [canAccessUserProfiles]
+    []
   )
 
   const onKeyDown = React.useCallback(
