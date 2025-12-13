@@ -164,14 +164,19 @@ export const PublicProfile = () => {
         {/* Team tags */}
         {profile.tags && profile.tags.length > 0 && (
           <div>
-            <Block label="Team:">
-              {profile.tags
-                .map((tagId: string) => {
-                  const tag = getUserTagByIdCaseInsensitive(tagId)
-                  return tag ? tag.name.charAt(0).toUpperCase() + tag.name.slice(1) : null
-                })
-                .filter(Boolean)
-                .join(' • ')}
+            <Block label="Team:" blockView>
+              <TagsContainer
+                items={profile.tags
+                  .map((tagId: string) => {
+                    const tag = getUserTagByIdCaseInsensitive(tagId)
+                    return tag ? (
+                      <Tag key={tagId} color={tag.color}>
+                        {tag.name}
+                      </Tag>
+                    ) : null
+                  })
+                  .filter(Boolean)}
+              />
             </Block>
           </div>
         )}
