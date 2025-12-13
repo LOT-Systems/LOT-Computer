@@ -32,7 +32,7 @@ export const RecipeWidget: React.FC = () => {
   // Auto-log recipe when it becomes visible on System tab
   React.useEffect(() => {
     if (!state.isVisible) {
-      loggedRecipesRef.current.clear()
+      // Don't clear logged recipes when widget hides - persist across sessions
       setIsFading(false)
       setFarewellPhrase(null)
       return
@@ -42,9 +42,10 @@ export const RecipeWidget: React.FC = () => {
     const isOnSystemTab = !router || router.route === 'system'
     if (!isOnSystemTab) return
 
-    // Only log each unique recipe once
-    if (loggedRecipesRef.current.has(state.recipe)) return
-    loggedRecipesRef.current.add(state.recipe)
+    // Create unique key from meal time and recipe to prevent duplicate logs
+    const recipeKey = `${state.mealTime}:${state.recipe}`
+    if (loggedRecipesRef.current.has(recipeKey)) return
+    loggedRecipesRef.current.add(recipeKey)
 
     // Create log entry with recipe suggestion
     const mealLabel = getMealLabel()
@@ -79,12 +80,12 @@ export const RecipeWidget: React.FC = () => {
     // Dismiss after fade animation completes
     setTimeout(() => {
       dismissRecipeWidget()
-    }, 1000) // Match the fade duration
+    }, 2000) // Match the fade duration
   }
 
   return (
     <div
-      className={`transition-opacity duration-1000 ${isFading ? 'opacity-0' : 'opacity-100'}`}
+      className={`transition-opacity duration-2000 ${isFading ? 'opacity-0' : 'opacity-100'}`}
     >
       <Block label={getMealLabel()} blockView>
         <div
@@ -92,7 +93,7 @@ export const RecipeWidget: React.FC = () => {
           className="cursor-pointer select-none"
         >
           {farewellPhrase ? (
-            <div className="text-center font-medium">
+            <div className="font-medium">
               {farewellPhrase}
             </div>
           ) : (
