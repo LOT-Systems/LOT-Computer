@@ -154,6 +154,13 @@ export const PublicProfile = () => {
           )}
         </div>
 
+        {/* Profile Visits */}
+        {profile.profileVisits !== undefined && (
+          <div>
+            Profile visits: {formatNumberWithCommas(profile.profileVisits)}
+          </div>
+        )}
+
         {/* Team tags */}
         {profile.tags && profile.tags.length > 0 && (
           <div>
@@ -184,13 +191,7 @@ export const PublicProfile = () => {
               </Block>
               {profile.weather.humidity && (
                 <Block label="Humidity:">
-                  <span
-                    className={cn(
-                      profile.weather.humidity >= 50 && 'text-blue-500'
-                    )}
-                  >
-                    {profile.weather.humidity}%
-                  </span>
+                  {profile.weather.humidity}%
                 </Block>
               )}
               {temperature !== null && (
@@ -213,13 +214,6 @@ export const PublicProfile = () => {
             <Block label="Memory Story:" blockView>
               <div className="whitespace-pre-wrap">{profile.memoryStory}</div>
             </Block>
-          </div>
-        )}
-
-        {/* Profile Visits */}
-        {profile.profileVisits !== undefined && (
-          <div className="text-sm text-acc/60">
-            Profile visits: {formatNumberWithCommas(profile.profileVisits)}
           </div>
         )}
 
