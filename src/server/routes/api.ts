@@ -547,7 +547,7 @@ export default async (fastify: FastifyInstance) => {
       reply
     ) => {
       const text = (req.body.text || '').trim().slice(0, MAX_LOG_TEXT_LENGTH)
-      if (!text) return reply.throw.badRequest('Log text is required')
+      if (!text) return reply.throw.badParams('Log text is required')
 
       const log = await fastify.models.Log.create({
         userId: req.user.id,
@@ -957,7 +957,7 @@ export default async (fastify: FastifyInstance) => {
       try {
         const mealTime = req.query.mealTime
         if (!mealTime || !['breakfast', 'lunch', 'dinner', 'snack'].includes(mealTime)) {
-          return reply.throw.badRequest('Invalid mealTime. Must be breakfast, lunch, dinner, or snack')
+          return reply.throw.badParams('Invalid mealTime. Must be breakfast, lunch, dinner, or snack')
         }
 
         console.log(`📋 Recipe suggestion request for ${mealTime} from user ${req.user.email}`)
@@ -1034,15 +1034,24 @@ export default async (fastify: FastifyInstance) => {
       }
 
       // Get user context for generation
-      const logs = await fastify.models.Log.findUserLogs(req.user, 90)
+      const logs = await fastify.models.Log.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 90
+      })
       const memoryStory = await generateMemoryStory(req.user, logs)
 
       // Get weather context
       let weatherContext = 'temperate climate'
       try {
-        const weatherData = await weather.fetchWeather(req.user, fastify.models)
-        if (weatherData) {
-          weatherContext = `${weatherData.description}, ${Math.round(weatherData.tempKelvin - 273.15)}°C`
+        if (req.user.city && req.user.country) {
+          const coordinates = await weather.getCoordinates(req.user.city, req.user.country)
+          if (coordinates) {
+            const weatherData = await weather.getWeather(coordinates.lat, coordinates.lon)
+            if (weatherData && weatherData.tempKelvin !== null) {
+              weatherContext = `${weatherData.description}, ${Math.round(weatherData.tempKelvin - 273.15)}°C`
+            }
+          }
         }
       } catch (e) {
         // Ignore weather errors

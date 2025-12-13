@@ -433,6 +433,7 @@ const MODULE_BY_LOG_EVENT: Record<LogEvent, string> = {
   user_login: 'Login',
   user_logout: 'Logout',
   settings_change: 'Settings',
+  theme_change: 'Theme',
   weather_update: 'Weather',
   note: 'Note',
   other: 'Other',
