@@ -19,8 +19,11 @@ type Props = {
 
 export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
   const theme = useStore(stores.theme)
+  const isMirrorOn = useStore(stores.isMirrorOn)
 
-  const hoverClassName = 'hover:bg-acc/10 group-hover:bg-acc/10'
+  const hoverClassName = isMirrorOn
+    ? 'hover:bg-white/10 group-hover:bg-white/10'
+    : 'hover:bg-acc/10 group-hover:bg-acc/10'
 
   return (
     <div className={props.className}>
