@@ -309,7 +309,7 @@ export function useSound(enabled: boolean) {
 
   // Load Tone.js library when sound is needed
   useExternalScript(
-    'https://unpkg.com/tone',
+    'https://unpkg.com/tone@latest/build/Tone.js',
     () => {
       console.log('🎵 Tone.js loaded')
       setIsSoundLibLoaded(true)
