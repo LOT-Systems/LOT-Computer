@@ -1,7 +1,7 @@
 // Service Worker for LOT Systems PWA
-// Version: 2024-12-13-001
+// Version: 2024-12-14-001
 
-const CACHE_VERSION = 'v2024-12-13-001';
+const CACHE_VERSION = 'v2024-12-14-001';
 const CACHE_NAME = `lot-cache-${CACHE_VERSION}`;
 
 // Files to cache initially (only static assets)
@@ -54,6 +54,11 @@ self.addEventListener('activate', (event) => {
 // Fetch event - network-first strategy for JavaScript, cache-first for static assets
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
+
+  // Skip external CDN requests - let them through without service worker interference
+  if (url.origin !== self.location.origin) {
+    return; // Pass through to network, don't intercept
+  }
 
   // Network-first for all JavaScript files (including bundles)
   if (url.pathname.endsWith('.js') || url.pathname.includes('/js/')) {
