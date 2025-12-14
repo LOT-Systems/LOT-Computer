@@ -311,8 +311,14 @@ export function useSound(enabled: boolean) {
   useExternalScript(
     'https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js',
     () => {
-      console.log('🎵 Tone.js loaded')
-      setIsSoundLibLoaded(true)
+      // @ts-ignore
+      const isToneAvailable = typeof window.Tone !== 'undefined'
+      console.log('🎵 Tone.js script loaded, window.Tone available:', isToneAvailable)
+      if (isToneAvailable) {
+        setIsSoundLibLoaded(true)
+      } else {
+        console.error('❌ Tone.js script loaded but window.Tone is undefined')
+      }
     },
     enabled
   )
@@ -369,6 +375,11 @@ export function useSound(enabled: boolean) {
 
     ;(async () => {
       if (isSoundLibLoaded && enabled) {
+        if (!Tone) {
+          console.error('❌ Tone.js library not found on window object despite isSoundLibLoaded=true')
+          return
+        }
+        console.log('🎵 Initializing Tone.js audio context...')
         await Tone.start()
         const soundDesc = getSoundDescription(context)
         console.log(`🔊 Sound: On (${soundDesc})`)

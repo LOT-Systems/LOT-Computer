@@ -68,7 +68,15 @@ function loadScript(src: string, callback: () => void) {
     const script = document.createElement('script')
     script.src = src
     script.async = true
+    script.crossOrigin = 'anonymous'
     script.onload = () => {
+      console.log(`✅ Script loaded successfully: ${src}`)
+      LOADED_SCRIPTS[src].loaded = true
+      LOADED_SCRIPTS[src].subscribers.forEach((cb) => cb())
+    }
+    script.onerror = (error) => {
+      console.error(`❌ Failed to load script: ${src}`, error)
+      // Still mark as loaded to prevent retries, but notify subscribers
       LOADED_SCRIPTS[src].loaded = true
       LOADED_SCRIPTS[src].subscribers.forEach((cb) => cb())
     }
