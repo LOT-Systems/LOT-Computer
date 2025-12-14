@@ -60,7 +60,6 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
           <div
             className={cn(
               'flex-1',
-              blockView && 'pl-4',
               props.contentClassName
             )}
           >
