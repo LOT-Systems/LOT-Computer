@@ -200,6 +200,41 @@ CRITICAL: Use this SOUL-LEVEL understanding to craft questions that speak to the
     }
   }
 
+  // Detect if recent questions are on similar topics (for compression)
+  const detectTopicRepetition = (logs: Log[]): boolean => {
+    if (logs.length < 3) return false
+
+    const recentQuestions = logs.slice(0, 5).map(log => {
+      const q = (log.metadata.question || '').toLowerCase()
+      const a = (log.metadata.answer || '').toLowerCase()
+      return `${q} ${a}`
+    })
+
+    // Common topic keywords
+    const topics = {
+      beverage: ['tea', 'coffee', 'drink', 'beverage', 'water', 'juice'],
+      food: ['food', 'meal', 'eat', 'lunch', 'dinner', 'breakfast', 'salad', 'protein'],
+      clothing: ['wear', 'clothing', 'fabric', 'outfit', 'dress', 'comfort'],
+      routine: ['morning', 'evening', 'routine', 'ritual', 'habit', 'daily'],
+      wellness: ['wellness', 'health', 'exercise', 'stretch', 'posture', 'sleep'],
+    }
+
+    // Count how many recent questions share the same topic
+    let maxTopicCount = 0
+    Object.values(topics).forEach(keywords => {
+      let count = 0
+      recentQuestions.forEach(text => {
+        if (keywords.some(keyword => text.includes(keyword))) count++
+      })
+      maxTopicCount = Math.max(maxTopicCount, count)
+    })
+
+    // If 3+ of last 5 questions are on same topic, it's repetitive
+    return maxTopicCount >= 3
+  }
+
+  const isRepetitiveFollowUp = detectTopicRepetition(memoryLogs)
+
   // Decide whether to explore a new topic or follow up on existing ones
   // 35% chance to explore completely new area, 65% follow up
   const shouldExploreNewTopic = memoryLogs.length > 0 && Math.random() < 0.35
@@ -298,7 +333,27 @@ ${memoryLogs
 
 Based on these answers, you can infer the user's preferences, habits, and lifestyle. Use this knowledge to craft follow-up questions that show you remember their choices.`
 
-    taskInstructions = `
+    // COMPRESSED FORMAT for repetitive follow-ups (3+ questions on same topic)
+    if (isRepetitiveFollowUp) {
+      taskInstructions = `
+**Your task:** Generate ONE BRIEF follow-up question with 2-3 SHORT answer choices.
+
+**CRITICAL COMPRESSION RULES:**
+- Question must be 8 words or less
+- Each option must be 2-4 words maximum (no full sentences)
+- Reference their previous answer briefly
+- No lengthy explanations
+
+**Examples of BRIEF follow-ups:**
+- "What time usually?" → Options: "Morning", "Afternoon", "Evening"
+- "How often?" → Options: "Daily", "Few times weekly", "Occasionally"
+- "What temperature?" → Options: "Hot", "Warm", "Cold"
+- "Alone or with others?" → Options: "Solo", "With someone", "Varies"
+
+Keep it SHORT and SIMPLE. The user is answering many prompts - make this quick and easy.`
+    } else {
+      // DETAILED FORMAT for initial follow-ups (exploring depth)
+      taskInstructions = `
 **Your task:** Generate ONE personalized follow-up question with 3-4 answer choices that:
 1. **MUST reference their previous answers** - Always start by acknowledging something they've already shared (e.g., "Since you mentioned you prefer tea in the morning, how do you usually prepare it?")
 2. **Builds deeper into their story** - Each question should feel like a natural continuation of the conversation, not a random topic
@@ -330,6 +385,7 @@ Build deeper into their soul archetype "${archetype}" with this follow-up:
 - "The Wanderer": Invite clarity emergence (what you're questioning → what's becoming clearer)
 
 CRITICAL: Make the follow-up SOUL-TOUCHING - reference their previous answer AND probe their deeper nature. Ask questions that make them pause and truly reflect on who they are becoming.` : ''}`
+    }
   }
 
   const head = `
