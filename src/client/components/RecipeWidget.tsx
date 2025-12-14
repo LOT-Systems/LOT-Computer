@@ -78,15 +78,15 @@ export const RecipeWidget: React.FC = () => {
     const randomPhrase = FAREWELL_PHRASES[Math.floor(Math.random() * FAREWELL_PHRASES.length)]
     setFarewellPhrase(randomPhrase)
 
-    // Start farewell fade with a gentle delay, then slower fade
+    // Start farewell fade with a longer pause, then slower gentle fade
     setTimeout(() => {
       setIsFarewellFading(true)
-    }, 500) // Brief pause before fading
+    }, 1500) // Longer pause to read the greeting
 
     // Dismiss after farewell fade animation completes
     setTimeout(() => {
       dismissRecipeWidget()
-    }, 4000) // 500ms delay + 3500ms fade = 4000ms total
+    }, 6500) // 1500ms pause + 5000ms fade = 6500ms total
   }
 
   return (
@@ -100,7 +100,7 @@ export const RecipeWidget: React.FC = () => {
         >
           {farewellPhrase ? (
             <div
-              className={`font-medium transition-opacity duration-[3500ms] ${isFarewellFading ? 'opacity-0' : 'opacity-100'}`}
+              className={`font-medium transition-opacity duration-[5000ms] ${isFarewellFading ? 'opacity-0' : 'opacity-100'}`}
             >
               {farewellPhrase}
             </div>
