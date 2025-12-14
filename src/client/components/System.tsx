@@ -118,6 +118,29 @@ export const System = () => {
   }, [])
 
   // Sound is now managed globally in app.tsx via useSound hook
+  // BUT we need to start audio context directly on user click for mobile/PWA
+  const onToggleSound = React.useCallback(async () => {
+    const newValue = !isSoundOn
+
+    // CRITICAL for mobile/PWA: Start audio context in direct user interaction
+    if (newValue && typeof window !== 'undefined') {
+      // @ts-ignore - Tone.js loaded via external script
+      const Tone = window.Tone
+      if (Tone) {
+        try {
+          console.log('[Sound Toggle] Starting Tone.js audio context...')
+          await Tone.start()
+          console.log('[Sound Toggle] ✅ Audio context started:', Tone.context.state)
+        } catch (error) {
+          console.error('[Sound Toggle] ❌ Failed to start audio context:', error)
+        }
+      } else {
+        console.warn('[Sound Toggle] ⚠️ Tone.js not loaded yet, will start when loaded')
+      }
+    }
+
+    stores.isSoundOn.set(newValue)
+  }, [isSoundOn])
 
   // const AdminLink = React.useMemo<
   //   React.FC<{ children: React.ReactNode }>
@@ -230,7 +253,7 @@ export const System = () => {
         >
           {isMirrorOn ? 'On' : 'Off'}
         </Block>
-        <Block label="Sound:" onClick={() => stores.isSoundOn.set(!isSoundOn)}>
+        <Block label="Sound:" onClick={onToggleSound}>
           {isSoundOn ? (soundDescription ? `On (${soundDescription})` : 'On') : 'Off'}
         </Block>
         <Block label="Breathe:" onClick={() => setIsBreatheOn(!isBreatheOn)}>
