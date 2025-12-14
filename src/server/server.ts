@@ -120,6 +120,17 @@ fastify.addHook('onRequest', async (req, reply) => {
   }
 })
 
+// Prevent HTML caching to ensure fresh CSP headers on every load
+fastify.addHook('onSend', async (req, reply, payload) => {
+  const contentType = reply.getHeader('content-type')
+  if (contentType && contentType.toString().includes('text/html')) {
+    reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    reply.header('Pragma', 'no-cache')
+    reply.header('Expires', '0')
+  }
+  return payload
+})
+
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 

@@ -1,7 +1,7 @@
 // Service Worker for LOT Systems PWA
-// Version: 2024-12-14-001
+// Version: 2024-12-14-002
 
-const CACHE_VERSION = 'v2024-12-14-001';
+const CACHE_VERSION = 'v2024-12-14-002';
 const CACHE_NAME = `lot-cache-${CACHE_VERSION}`;
 
 // Files to cache initially (only static assets)
@@ -57,6 +57,7 @@ self.addEventListener('fetch', (event) => {
 
   // Skip external CDN requests - let them through without service worker interference
   if (url.origin !== self.location.origin) {
+    console.log('[SW] Bypassing external request:', url.href);
     return; // Pass through to network, don't intercept
   }
 
