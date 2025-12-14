@@ -27,6 +27,7 @@ export const RecipeWidget: React.FC = () => {
   const loggedRecipesRef = React.useRef<Set<string>>(new Set())
 
   const [isFading, setIsFading] = React.useState(false)
+  const [isFarewellFading, setIsFarewellFading] = React.useState(false)
   const [farewellPhrase, setFarewellPhrase] = React.useState<string | null>(null)
 
   // Auto-log recipe when it becomes visible on System tab
@@ -34,6 +35,7 @@ export const RecipeWidget: React.FC = () => {
     if (!state.isVisible) {
       // Don't clear logged recipes when widget hides - persist across sessions
       setIsFading(false)
+      setIsFarewellFading(false)
       setFarewellPhrase(null)
       return
     }
@@ -75,17 +77,21 @@ export const RecipeWidget: React.FC = () => {
     // Pick a random farewell phrase
     const randomPhrase = FAREWELL_PHRASES[Math.floor(Math.random() * FAREWELL_PHRASES.length)]
     setFarewellPhrase(randomPhrase)
-    setIsFading(true)
 
-    // Dismiss after fade animation completes
+    // Start farewell fade with a gentle delay, then slower fade
+    setTimeout(() => {
+      setIsFarewellFading(true)
+    }, 500) // Brief pause before fading
+
+    // Dismiss after farewell fade animation completes
     setTimeout(() => {
       dismissRecipeWidget()
-    }, 2000) // Match the fade duration
+    }, 4000) // 500ms delay + 3500ms fade = 4000ms total
   }
 
   return (
     <div
-      className={`transition-opacity duration-2000 ${isFading ? 'opacity-0' : 'opacity-100'}`}
+      className={`transition-opacity duration-[1400ms] ${isFading ? 'opacity-0' : 'opacity-100'}`}
     >
       <Block label={getMealLabel()} blockView>
         <div
@@ -93,7 +99,9 @@ export const RecipeWidget: React.FC = () => {
           className="cursor-pointer select-none"
         >
           {farewellPhrase ? (
-            <div className="font-medium">
+            <div
+              className={`font-medium transition-opacity duration-[3500ms] ${isFarewellFading ? 'opacity-0' : 'opacity-100'}`}
+            >
               {farewellPhrase}
             </div>
           ) : (
