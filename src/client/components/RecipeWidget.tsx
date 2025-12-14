@@ -27,7 +27,7 @@ export const RecipeWidget: React.FC = () => {
   const loggedRecipesRef = React.useRef<Set<string>>(new Set())
 
   const [isFading, setIsFading] = React.useState(false)
-  const [isFarewellFading, setIsFarewellFading] = React.useState(false)
+  const [isLabelFading, setIsLabelFading] = React.useState(false)
   const [farewellPhrase, setFarewellPhrase] = React.useState<string | null>(null)
 
   // Auto-log recipe when it becomes visible on System tab
@@ -35,7 +35,7 @@ export const RecipeWidget: React.FC = () => {
     if (!state.isVisible) {
       // Don't clear logged recipes when widget hides - persist across sessions
       setIsFading(false)
-      setIsFarewellFading(false)
+      setIsLabelFading(false)
       setFarewellPhrase(null)
       return
     }
@@ -78,20 +78,21 @@ export const RecipeWidget: React.FC = () => {
     const randomPhrase = FAREWELL_PHRASES[Math.floor(Math.random() * FAREWELL_PHRASES.length)]
     setFarewellPhrase(randomPhrase)
 
-    // Start farewell fade with a longer pause, then slower gentle fade
+    // Greeting stays visible for 3 seconds, then fades with label at memory speed (1400ms)
     setTimeout(() => {
-      setIsFarewellFading(true)
-    }, 1500) // Longer pause to read the greeting
+      setIsFading(true) // Fade greeting content
+      setIsLabelFading(true) // Fade label at same time
+    }, 3000) // 3 seconds visible
 
-    // Dismiss after farewell fade animation completes
+    // Dismiss after fade completes
     setTimeout(() => {
       dismissRecipeWidget()
-    }, 6500) // 1500ms pause + 5000ms fade = 6500ms total
+    }, 4400) // 3000ms visible + 1400ms fade = 4400ms total
   }
 
   return (
     <div
-      className={`transition-opacity duration-[1400ms] ${isFading ? 'opacity-0' : 'opacity-100'}`}
+      className={`transition-opacity duration-[1400ms] ${isLabelFading ? 'opacity-0' : 'opacity-100'}`}
     >
       <Block label={getMealLabel()} blockView>
         <div
@@ -100,7 +101,7 @@ export const RecipeWidget: React.FC = () => {
         >
           {farewellPhrase ? (
             <div
-              className={`font-medium transition-opacity duration-[5000ms] ${isFarewellFading ? 'opacity-0' : 'opacity-100'}`}
+              className={`font-medium transition-opacity duration-[1400ms] ${isFading ? 'opacity-0' : 'opacity-100'}`}
             >
               {farewellPhrase}
             </div>
