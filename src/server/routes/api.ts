@@ -25,7 +25,7 @@ import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
-import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort } from '#server/utils/memory'
+import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import dayjs from '#server/utils/dayjs'
 
 export default async (fastify: FastifyInstance) => {
@@ -629,6 +629,26 @@ export default async (fastify: FastifyInstance) => {
         periodEdges[1].add(localDateShift, 'minute'),
       ]
       const isNightPeriod = periodEdges[0].hour() === EVENING_HOUR
+
+      // INTELLIGENT PACING: Determine daily prompt quota and timing
+      const { shouldShowPrompt, isWeekend, promptQuotaToday, promptsShownToday } =
+        await calculateIntelligentPacing(req.user.id, localDate, fastify.models)
+
+      console.log(`📊 Intelligent Pacing Analysis:`, {
+        userId: req.user.id,
+        shouldShowPrompt,
+        isWeekend,
+        promptQuotaToday,
+        promptsShownToday,
+        currentTime: localDate.format('HH:mm'),
+        dayOfWeek: localDate.format('dddd')
+      })
+
+      if (!shouldShowPrompt) {
+        console.log(`⏸️ Skipping prompt: quota reached or bad timing`)
+        return null
+      }
+
       const isRecentlyAsked = await fastify.models.Answer.count({
         where: {
           userId: req.user.id,
@@ -665,7 +685,7 @@ export default async (fastify: FastifyInstance) => {
             limit: 20,
           })
 
-          const prompt = await buildPrompt(req.user, logs)
+          const prompt = await buildPrompt(req.user, logs, isWeekend)
           const question = await completeAndExtractQuestion(prompt, req.user)
 
           return question

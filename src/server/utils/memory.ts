@@ -1,6 +1,7 @@
 import Instructor from '@instructor-ai/instructor'
 import OpenAI from 'openai'
 import Anthropic from '@anthropic-ai/sdk'
+import { Op } from 'sequelize'
 import { randomUUID } from 'crypto'
 import { z } from 'zod'
 import dayjs from '#server/utils/dayjs'
@@ -141,7 +142,7 @@ Make sure the question is personalized, relevant to self-care habits, and the op
   }
 }
 
-export async function buildPrompt(user: User, logs: Log[]): Promise<string> {
+export async function buildPrompt(user: User, logs: Log[], isWeekend: boolean = false): Promise<string> {
   const context = await getLogContext(user)
   const localDate = context.timeZone
     ? dayjs().tz(context.timeZone).format('D MMM YYYY, HH:mm')
@@ -242,7 +243,32 @@ CRITICAL: Use this SOUL-LEVEL understanding to craft questions that speak to the
   let userStory = ''
   let taskInstructions = ''
 
-  if (memoryLogs.length === 0) {
+  // WEEKEND MODE: Lighter, easier prompts
+  if (isWeekend) {
+    taskInstructions = `
+**WEEKEND MODE - Light & Easy Question**
+
+**Your task:** Generate ONE light, easy, fun question with 3 simple answer choices:
+1. **Keep it simple** - Weekend questions should be easy to answer, not require deep thought
+2. **Make it enjoyable** - Focus on pleasant topics: food, comfort, relaxation, hobbies
+3. **Quick to answer** - The user should be able to answer in 2 seconds
+4. **Positive vibe** - Weekend questions should feel uplifting and stress-free
+
+**Perfect weekend topics:**
+- Favorite weekend breakfast or brunch items
+- Comfort activities (reading, music, walks, cooking)
+- Relaxation preferences (bath, nap, movie, nature)
+- Simple pleasures (coffee, sunshine, cozy clothes)
+- Weekend hobbies or interests
+
+**Examples of good weekend questions:**
+- "What's your ideal Saturday morning drink?" (Options: Fresh coffee, Herbal tea, Smoothie, Orange juice)
+- "How do you prefer to unwind on weekends?" (Options: Reading a book, Taking a walk, Watching shows, Cooking something nice)
+- "What's your go-to weekend comfort food?" (Options: Pancakes, Fresh pastries, Homemade soup, Favorite snacks)
+
+**CRITICAL: Keep it LIGHT, SIMPLE, and FUN. No deep soul-searching on weekends - just pleasant, easy questions.**
+${userStory ? '\n\nWhat we know about the user so far:\n' + userStory : ''}`
+  } else if (memoryLogs.length === 0) {
     // First question - always explore
     taskInstructions = `
 **Your task:** Generate ONE personalized question with 3-4 answer choices that:
@@ -1117,5 +1143,109 @@ Please respond with ONLY the recipe/meal suggestion - just a simple, clear descr
     } else {
       return temp < 15 ? 'Warm almond butter on toast' : 'Fresh fruit with nuts'
     }
+  }
+}
+/**
+ * INTELLIGENT PACING SYSTEM
+ * Determines when and how many prompts to show based on:
+ * - User's day number (progressive onboarding)
+ * - Day of week (weekends are lighter)
+ * - Time of day (natural moments)
+ * - Random variation (feels organic)
+ */
+export async function calculateIntelligentPacing(
+  userId: string,
+  currentDate: dayjs.Dayjs,
+  models: any
+): Promise<{
+  shouldShowPrompt: boolean
+  isWeekend: boolean
+  promptQuotaToday: number
+  promptsShownToday: number
+  dayNumber: number
+}> {
+  // Get user's first answer to calculate day number
+  const firstAnswer = await models.Answer.findOne({
+    where: { userId },
+    order: [['createdAt', 'ASC']],
+  })
+
+  const dayNumber = firstAnswer
+    ? currentDate.diff(dayjs(firstAnswer.createdAt), 'day') + 1
+    : 1
+
+  // Check if weekend
+  const dayOfWeek = currentDate.day() // 0=Sunday, 6=Saturday
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
+
+  // Determine daily prompt quota based on day number and weekend status
+  let promptQuotaToday: number
+  
+  if (isWeekend) {
+    // Weekends: 4 light prompts throughout the day
+    promptQuotaToday = 4
+  } else if (dayNumber === 1) {
+    // Day 1: Welcome with 3 prompts
+    promptQuotaToday = 3
+  } else if (dayNumber === 2) {
+    // Day 2: Gentle follow-up with 1 prompt
+    promptQuotaToday = 1
+  } else if (dayNumber === 3) {
+    // Day 3: Building rhythm with 2 prompts
+    promptQuotaToday = 2
+  } else {
+    // Day 4+: Variable pacing (1-3 prompts)
+    // Use day number as seed for consistent daily variation
+    const seed = dayNumber % 7
+    promptQuotaToday = seed % 3 === 0 ? 1 : seed % 3 === 1 ? 2 : 3
+  }
+
+  // Count prompts shown today
+  const startOfDay = currentDate.startOf('day')
+  const endOfDay = currentDate.endOf('day')
+  
+  const promptsShownToday = await models.Answer.count({
+    where: {
+      userId,
+      createdAt: {
+        [Op.gte]: startOfDay.toDate(),
+        [Op.lte]: endOfDay.toDate(),
+      },
+    },
+  })
+
+  // Check if quota reached
+  if (promptsShownToday >= promptQuotaToday) {
+    return {
+      shouldShowPrompt: false,
+      isWeekend,
+      promptQuotaToday,
+      promptsShownToday,
+      dayNumber,
+    }
+  }
+
+  // Check if it's a good time of day to show a prompt
+  const hour = currentDate.hour()
+  const isGoodTime = isWeekend
+    ? // Weekends: spread throughout waking hours (8am-10pm)
+      hour >= 8 && hour <= 22
+    : // Weekdays: natural moments
+      (hour >= 6 && hour <= 9) || // Early morning (6am-9am)
+      (hour >= 12 && hour <= 14) || // Lunch time (12pm-2pm)
+      (hour >= 18 && hour <= 21) // Evening (6pm-9pm)
+
+  // Add some randomness (20% chance to skip even during good times)
+  // This makes it feel more organic and less mechanical
+  const randomSkip = Math.random() < 0.2
+
+  const shouldShowPrompt = isGoodTime && !randomSkip
+
+  return {
+    shouldShowPrompt,
+    isWeekend,
+    promptQuotaToday,
+    promptsShownToday,
+    dayNumber,
   }
 }
