@@ -68,12 +68,10 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
             ) : (
               <span
                 className={cn(
-                  '-ml-4 pl-4 pr-4 rounded',
-                  (!!props.onClick || !!props.onChildrenClick) &&
-                    cn(
-                      'cursor-pointer transition-[background-color]',
-                      hoverClassName
-                    ),
+                  'rounded',
+                  (!!props.onClick || !!props.onChildrenClick)
+                    ? '-ml-4 pl-4 pr-4 py-4 cursor-pointer transition-[background-color] ' + hoverClassName
+                    : '',
                   props.labelClassName
                 )}
                 onClick={props.onChildrenClick}

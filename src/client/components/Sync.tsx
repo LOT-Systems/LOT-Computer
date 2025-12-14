@@ -238,8 +238,8 @@ export const Sync = () => {
               {!!x.likes && (
                 <Tag
                   className={cn(
-                    'text-acc/40 select-none',
-                    x.isLiked ? 'border-acc' : 'border-transparent'
+                    'text-acc/40 select-none -mt-[2px]',
+                    x.isLiked ? 'border-acc/40' : 'border-transparent'
                   )}
                   title="Click message to like/unlike"
                   key={`${x.id}_${x.isLiked}`}
