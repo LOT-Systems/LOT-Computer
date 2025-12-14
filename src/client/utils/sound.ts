@@ -380,7 +380,24 @@ export function useSound(enabled: boolean) {
           return
         }
         console.log('🎵 Initializing Tone.js audio context...')
-        await Tone.start()
+        console.log('🔍 Tone.context.state before start:', Tone.context.state)
+
+        try {
+          await Tone.start()
+          console.log('✅ Tone.context.state after start:', Tone.context.state)
+
+          if (Tone.context.state !== 'running') {
+            console.error('❌ Audio context failed to start. State:', Tone.context.state)
+            console.log('💡 On mobile, ensure sound is enabled by tapping the toggle.')
+            return
+          }
+        } catch (error) {
+          console.error('❌ Failed to start Tone.js audio context:', error)
+          console.log('💡 This may be due to browser autoplay policies.')
+          console.log('💡 Try toggling sound off and on again.')
+          return
+        }
+
         const soundDesc = getSoundDescription(context)
         console.log(`🔊 Sound: On (${soundDesc})`)
         if (context.period === 'sunrise') {
