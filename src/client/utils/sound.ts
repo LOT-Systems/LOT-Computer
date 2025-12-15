@@ -309,16 +309,10 @@ export function useSound(enabled: boolean) {
 
   // Load Tone.js library when sound is needed
   useExternalScript(
-    'https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js',
+    'https://unpkg.com/tone@latest/build/Tone.js',
     () => {
-      // @ts-ignore
-      const isToneAvailable = typeof window.Tone !== 'undefined'
-      console.log('🎵 Tone.js script loaded, window.Tone available:', isToneAvailable)
-      if (isToneAvailable) {
-        setIsSoundLibLoaded(true)
-      } else {
-        console.error('❌ Tone.js script loaded but window.Tone is undefined')
-      }
+      console.log('🎵 Tone.js loaded')
+      setIsSoundLibLoaded(true)
     },
     enabled
   )
@@ -375,29 +369,7 @@ export function useSound(enabled: boolean) {
 
     ;(async () => {
       if (isSoundLibLoaded && enabled) {
-        if (!Tone) {
-          console.error('❌ Tone.js library not found on window object despite isSoundLibLoaded=true')
-          return
-        }
-        console.log('🎵 Initializing Tone.js audio context...')
-        console.log('🔍 Tone.context.state before start:', Tone.context.state)
-
-        try {
-          await Tone.start()
-          console.log('✅ Tone.context.state after start:', Tone.context.state)
-
-          if (Tone.context.state !== 'running') {
-            console.error('❌ Audio context failed to start. State:', Tone.context.state)
-            console.log('💡 On mobile, ensure sound is enabled by tapping the toggle.')
-            return
-          }
-        } catch (error) {
-          console.error('❌ Failed to start Tone.js audio context:', error)
-          console.log('💡 This may be due to browser autoplay policies.')
-          console.log('💡 Try toggling sound off and on again.')
-          return
-        }
-
+        await Tone.start()
         const soundDesc = getSoundDescription(context)
         console.log(`🔊 Sound: On (${soundDesc})`)
         if (context.period === 'sunrise') {
