@@ -37,7 +37,7 @@ fastify.register(fastifyHelmet, {
     useDefaults: config.env === 'production',
     directives: {
       'default-src': ["'self'"],
-      'connect-src': ["'self'", 'http://127.0.0.1:*', 'https://cdnjs.cloudflare.com'],
+      'connect-src': ["'self'", 'http://127.0.0.1:*', 'https://unpkg.com', 'https://cdnjs.cloudflare.com'],
       'font-src': ["'self'", 'https://rsms.me'],
       'form-action': ["'self'"],
       'frame-src': [
