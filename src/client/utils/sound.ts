@@ -307,6 +307,15 @@ export function useSound(enabled: boolean) {
   const [context, setContext] = React.useState<SoundContext>(() => getTimeContext(weather, usersOnline))
   const [currentDate, setCurrentDate] = React.useState(() => new Date().toDateString())
 
+  // Show loading state when sound is enabled but not yet loaded
+  React.useEffect(() => {
+    if (enabled && !isSoundLibLoaded) {
+      stores.soundDescription.set('Initiating...')
+    } else if (!enabled) {
+      stores.soundDescription.set('')
+    }
+  }, [enabled, isSoundLibLoaded])
+
   // Load Tone.js library when sound is needed
   useExternalScript(
     'https://unpkg.com/tone@latest/build/Tone.js',
