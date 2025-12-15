@@ -309,10 +309,9 @@ export function useSound(enabled: boolean) {
 
   // Load Tone.js library when sound is needed
   useExternalScript(
-    'https://unpkg.com/tone@14.7.77/build/Tone.js',
+    'https://unpkg.com/tone@latest/build/Tone.js',
     () => {
-      console.log('🎵 Tone.js loaded from unpkg')
-      console.log('window.Tone available:', typeof window.Tone !== 'undefined')
+      console.log('🎵 Tone.js loaded')
       setIsSoundLibLoaded(true)
     },
     enabled
@@ -368,18 +367,14 @@ export function useSound(enabled: boolean) {
     // @ts-ignore - Tone.js is loaded via external script
     const Tone: any = window.Tone
 
-    console.log('[Sound Effect] Triggered:', { isSoundLibLoaded, enabled, Tone: !!Tone })
-
     ;(async () => {
       if (isSoundLibLoaded && enabled) {
-        if (!Tone) {
-          console.error('❌ [Sound] Tone.js not available on window despite isSoundLibLoaded=true')
-          return
+        // Start Tone.context if not already running
+        // Note: Also called in toggle click handler (System.tsx) for mobile user gesture requirement
+        // This serves as fallback in case toggle was clicked before script finished loading
+        if (Tone.context.state !== 'running') {
+          await Tone.start()
         }
-
-        // Note: Tone.start() is called in the toggle click handler (System.tsx)
-        // to ensure it happens during user interaction (required for mobile)
-        console.log('[Sound] Tone.context state:', Tone.context.state)
 
         const soundDesc = getSoundDescription(context)
         console.log(`🔊 Sound: On (${soundDesc})`)
