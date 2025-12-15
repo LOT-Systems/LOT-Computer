@@ -378,76 +378,95 @@ export function useSound(enabled: boolean) {
 
     ;(async () => {
       if (isSoundLibLoaded && enabled) {
+        // Check if Tone is actually available
+        if (!Tone) {
+          console.error('❌ Tone.js not available despite isSoundLibLoaded=true')
+          stores.soundDescription.set('Error: Library not loaded')
+          return
+        }
+
         // Start Tone.context if not already running
         // Note: Also called in toggle click handler (System.tsx) for mobile user gesture requirement
         // This serves as fallback in case toggle was clicked before script finished loading
-        if (Tone.context.state !== 'running') {
-          await Tone.start()
-        }
-
-        const soundDesc = getSoundDescription(context)
-        console.log(`🔊 Sound: On (${soundDesc})`)
-        if (context.period === 'sunrise') {
-          console.log(`🌅 SUNRISE TRANSITION - ${context.description} (90 seconds)`)
-        } else if (context.period === 'sunset') {
-          console.log(`🌇 SUNSET TRANSITION - ${context.description} (90 seconds)`)
-        } else {
-          console.log(`🌊 ${context.period} - ${context.description}`)
-        }
-        console.log(`🌦️ Weather: ${context.weather}, ${context.temperature}°C, ${context.humidity}% humidity, ${context.windSpeed}m/s wind, ${context.pressure}hPa`)
-        console.log(`👥 Users online: ${context.usersOnline}${context.usersOnline > 5 ? ' 🎵 Click symphony active!' : ''}`)
-        console.log(`🎲 Daily variation seed: ${context.dailySeed.toFixed(3)}`)
-        console.log(`📊 Sound context hash:`, JSON.stringify({
-          period: context.period,
-          weather: context.weather,
-          temp: context.temperature,
-          humidity: context.humidity,
-          usersOnline: context.usersOnline,
-          seed: context.dailySeed.toFixed(3),
-          timestamp: new Date().toISOString()
-        }))
-
-        // Update sound description in store for UI display
-        stores.soundDescription.set(soundDesc)
-
-        // Save sound description to user metadata for public profile
         try {
-          await fetch('/api/update-current-sound', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ soundDescription: soundDesc })
-          })
+          if (Tone.context.state !== 'running') {
+            await Tone.start()
+          }
         } catch (error) {
-          console.error('Failed to update current sound:', error)
+          console.error('❌ Failed to start Tone.context:', error)
+          stores.soundDescription.set('Error: Failed to start')
+          return
         }
 
-        // Clean up existing sounds if context changed
-        cleanupSounds(soundsRef.current)
-        soundsRef.current = {}
+        try {
+          const soundDesc = getSoundDescription(context)
+          console.log(`🔊 Sound: On (${soundDesc})`)
+          if (context.period === 'sunrise') {
+            console.log(`🌅 SUNRISE TRANSITION - ${context.description} (90 seconds)`)
+          } else if (context.period === 'sunset') {
+            console.log(`🌇 SUNSET TRANSITION - ${context.description} (90 seconds)`)
+          } else {
+            console.log(`🌊 ${context.period} - ${context.description}`)
+          }
+          console.log(`🌦️ Weather: ${context.weather}, ${context.temperature}°C, ${context.humidity}% humidity, ${context.windSpeed}m/s wind, ${context.pressure}hPa`)
+          console.log(`👥 Users online: ${context.usersOnline}${context.usersOnline > 5 ? ' 🎵 Click symphony active!' : ''}`)
+          console.log(`🎲 Daily variation seed: ${context.dailySeed.toFixed(3)}`)
+          console.log(`📊 Sound context hash:`, JSON.stringify({
+            period: context.period,
+            weather: context.weather,
+            temp: context.temperature,
+            humidity: context.humidity,
+            usersOnline: context.usersOnline,
+            seed: context.dailySeed.toFixed(3),
+            timestamp: new Date().toISOString()
+          }))
 
-        // Set master volume
-        Tone.Destination.volume.setValueAtTime(-20, Tone.now())
+          // Update sound description in store for UI display
+          stores.soundDescription.set(soundDesc)
 
-        // Create sounds based on time of day and weather
-        switch (context.period) {
-          case 'sunrise':
-            createSunriseSounds(Tone, soundsRef.current, context)
-            break
-          case 'morning':
-            createMorningSounds(Tone, soundsRef.current, context)
-            break
-          case 'day':
-            createDaySounds(Tone, soundsRef.current, context)
-            break
-          case 'afternoon':
-            createAfternoonSounds(Tone, soundsRef.current, context)
-            break
-          case 'sunset':
-            createSunsetSounds(Tone, soundsRef.current, context)
-            break
-          case 'night':
-            createNightSounds(Tone, soundsRef.current, context)
-            break
+          // Save sound description to user metadata for public profile
+          try {
+            await fetch('/api/update-current-sound', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ soundDescription: soundDesc })
+            })
+          } catch (error) {
+            console.error('Failed to update current sound:', error)
+          }
+
+          // Clean up existing sounds if context changed
+          cleanupSounds(soundsRef.current)
+          soundsRef.current = {}
+
+          // Set master volume
+          Tone.Destination.volume.setValueAtTime(-20, Tone.now())
+
+          // Create sounds based on time of day and weather
+          switch (context.period) {
+            case 'sunrise':
+              createSunriseSounds(Tone, soundsRef.current, context)
+              break
+            case 'morning':
+              createMorningSounds(Tone, soundsRef.current, context)
+              break
+            case 'day':
+              createDaySounds(Tone, soundsRef.current, context)
+              break
+            case 'afternoon':
+              createAfternoonSounds(Tone, soundsRef.current, context)
+              break
+            case 'sunset':
+              createSunsetSounds(Tone, soundsRef.current, context)
+              break
+            case 'night':
+              createNightSounds(Tone, soundsRef.current, context)
+              break
+          }
+        } catch (error) {
+          console.error('❌ Error initializing sound:', error)
+          stores.soundDescription.set('Error: Initialization failed')
+          return
         }
       } else if (isSoundLibLoaded && !enabled) {
         // Stop all sounds including melody timeout
