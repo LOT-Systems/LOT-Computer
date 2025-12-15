@@ -309,9 +309,10 @@ export function useSound(enabled: boolean) {
 
   // Load Tone.js library when sound is needed
   useExternalScript(
-    'https://unpkg.com/tone@latest/build/Tone.js',
+    'https://unpkg.com/tone@14.7.77/build/Tone.js',
     () => {
-      console.log('🎵 Tone.js loaded')
+      console.log('🎵 Tone.js loaded from unpkg')
+      console.log('window.Tone available:', typeof window.Tone !== 'undefined')
       setIsSoundLibLoaded(true)
     },
     enabled
@@ -367,9 +368,24 @@ export function useSound(enabled: boolean) {
     // @ts-ignore - Tone.js is loaded via external script
     const Tone: any = window.Tone
 
+    console.log('[Sound Effect] Triggered:', { isSoundLibLoaded, enabled, Tone: !!Tone })
+
     ;(async () => {
       if (isSoundLibLoaded && enabled) {
-        await Tone.start()
+        if (!Tone) {
+          console.error('❌ [Sound] Tone.js not available on window despite isSoundLibLoaded=true')
+          return
+        }
+
+        console.log('[Sound] Starting Tone.context...', Tone.context.state)
+        try {
+          await Tone.start()
+          console.log('[Sound] ✅ Tone.context started:', Tone.context.state)
+        } catch (error) {
+          console.error('❌ [Sound] Failed to start Tone.context:', error)
+          return
+        }
+
         const soundDesc = getSoundDescription(context)
         console.log(`🔊 Sound: On (${soundDesc})`)
         if (context.period === 'sunrise') {
