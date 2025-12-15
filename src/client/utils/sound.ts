@@ -377,14 +377,9 @@ export function useSound(enabled: boolean) {
           return
         }
 
-        console.log('[Sound] Starting Tone.context...', Tone.context.state)
-        try {
-          await Tone.start()
-          console.log('[Sound] ✅ Tone.context started:', Tone.context.state)
-        } catch (error) {
-          console.error('❌ [Sound] Failed to start Tone.context:', error)
-          return
-        }
+        // Note: Tone.start() is called in the toggle click handler (System.tsx)
+        // to ensure it happens during user interaction (required for mobile)
+        console.log('[Sound] Tone.context state:', Tone.context.state)
 
         const soundDesc = getSoundDescription(context)
         console.log(`🔊 Sound: On (${soundDesc})`)

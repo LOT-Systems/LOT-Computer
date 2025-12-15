@@ -230,7 +230,18 @@ export const System = () => {
         >
           {isMirrorOn ? 'On' : 'Off'}
         </Block>
-        <Block label="Sound:" onClick={() => stores.isSoundOn.set(!isSoundOn)}>
+        <Block label="Sound:" onClick={async () => {
+          const newValue = !isSoundOn
+          // @ts-ignore - Tone.js loaded via external script
+          if (newValue && window.Tone) {
+            try {
+              await window.Tone.start()
+            } catch (e) {
+              console.error('Failed to start Tone.context:', e)
+            }
+          }
+          stores.isSoundOn.set(newValue)
+        }}>
           {isSoundOn ? (soundDescription ? `On (${soundDescription})` : 'On') : 'Off'}
         </Block>
         <Block label="Breathe:" onClick={() => setIsBreatheOn(!isBreatheOn)}>
