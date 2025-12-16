@@ -50,7 +50,7 @@ fastify.register(fastifyHelmet, {
         "'unsafe-inline'",
         'https://www.youtube.com/iframe_api',
         'https://www.youtube.com',
-        'https://unpkg.com/tone',
+        'https://unpkg.com',
         'https://cdnjs.cloudflare.com',
       ],
       'style-src': ["'self'", 'https://rsms.me'],
