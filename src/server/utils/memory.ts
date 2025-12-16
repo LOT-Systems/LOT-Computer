@@ -1180,24 +1180,24 @@ export async function calculateIntelligentPacing(
 
   // Determine daily prompt quota based on day number and weekend status
   let promptQuotaToday: number
-  
+
   if (isWeekend) {
-    // Weekends: 4 light prompts throughout the day
-    promptQuotaToday = 4
+    // Weekends: 6 prompts throughout the day (increased from 4)
+    promptQuotaToday = 6
   } else if (dayNumber === 1) {
-    // Day 1: Welcome with 3 prompts
-    promptQuotaToday = 3
+    // Day 1: Welcome with 5 prompts (increased from 3)
+    promptQuotaToday = 5
   } else if (dayNumber === 2) {
-    // Day 2: Gentle follow-up with 1 prompt
-    promptQuotaToday = 1
+    // Day 2: Gentle follow-up with 3 prompts (increased from 1)
+    promptQuotaToday = 3
   } else if (dayNumber === 3) {
-    // Day 3: Building rhythm with 2 prompts
-    promptQuotaToday = 2
+    // Day 3: Building rhythm with 4 prompts (increased from 2)
+    promptQuotaToday = 4
   } else {
-    // Day 4+: Variable pacing (1-3 prompts)
+    // Day 4+: Variable pacing (3-5 prompts, increased from 1-3)
     // Use day number as seed for consistent daily variation
     const seed = dayNumber % 7
-    promptQuotaToday = seed % 3 === 0 ? 1 : seed % 3 === 1 ? 2 : 3
+    promptQuotaToday = seed % 3 === 0 ? 3 : seed % 3 === 1 ? 4 : 5
   }
 
   // Count prompts shown today
@@ -1228,18 +1228,14 @@ export async function calculateIntelligentPacing(
   // Check if it's a good time of day to show a prompt
   const hour = currentDate.hour()
   const isGoodTime = isWeekend
-    ? // Weekends: spread throughout waking hours (8am-10pm)
-      hour >= 8 && hour <= 22
-    : // Weekdays: natural moments
-      (hour >= 6 && hour <= 9) || // Early morning (6am-9am)
-      (hour >= 12 && hour <= 14) || // Lunch time (12pm-2pm)
-      (hour >= 18 && hour <= 21) // Evening (6pm-9pm)
+    ? // Weekends: spread throughout waking hours (7am-11pm, expanded)
+      hour >= 7 && hour <= 23
+    : // Weekdays: expanded contextual moments throughout the day
+      (hour >= 6 && hour <= 10) ||  // Morning (6am-10am, expanded)
+      (hour >= 11 && hour <= 15) ||  // Midday (11am-3pm, expanded lunch period)
+      (hour >= 17 && hour <= 22)     // Evening (5pm-10pm, expanded)
 
-  // Add some randomness (20% chance to skip even during good times)
-  // This makes it feel more organic and less mechanical
-  const randomSkip = Math.random() < 0.2
-
-  const shouldShowPrompt = isGoodTime && !randomSkip
+  const shouldShowPrompt = isGoodTime
 
   return {
     shouldShowPrompt,
