@@ -6,6 +6,7 @@ import { extractUserTraits, determineUserCohort } from '#server/utils/memory'
 import config from '#server/config'
 import fs from 'fs'
 import path from 'path'
+import dayjs from 'dayjs'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -785,8 +786,13 @@ export default async (fastify: FastifyInstance) => {
             const { traits, patterns, psychologicalDepth } = analysis
             const cohortResult = determineUserCohort(traits, patterns, psychologicalDepth)
 
+            // Calculate OS version (months since user joined)
+            const monthsSinceJoined = dayjs().diff(dayjs(user.createdAt), 'month')
+            const osVersion = String(monthsSinceJoined).padStart(3, '0')
+
             profile.psychologicalProfile = {
               hasUsership: true,
+              version: osVersion,
               // Psychological depth (soul level)
               archetype: cohortResult.archetype,
               archetypeDescription: cohortResult.description,
