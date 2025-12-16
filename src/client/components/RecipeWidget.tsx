@@ -3,40 +3,20 @@ import { useStore } from '@nanostores/react'
 import { recipeWidget, dismissRecipeWidget } from '#client/stores/recipeWidget'
 import { Block } from '#client/components/ui'
 import { useCreateLog } from '#client/queries'
+import { cn } from '#client/utils'
 import * as stores from '#client/stores'
-
-const FAREWELL_PHRASES = [
-  'Bon appétit!',
-  'Enjoy!',
-  'Buon appetito!',
-  'Guten Appetit!',
-  '¡Buen provecho!',
-  'Smakelijk!',
-  'Приятного аппетита!', // Russian
-  'いただきます!', // Japanese
-  'Enjoy your meal!',
-  'Dig in!',
-  'Savor it!',
-  'Delicious!',
-]
 
 export const RecipeWidget: React.FC = () => {
   const state = useStore(recipeWidget)
   const router = useStore(stores.router)
   const { mutate: createLog } = useCreateLog()
-  const loggedRecipesRef = React.useRef<Set<string>>(new Set())
-
-  const [isFading, setIsFading] = React.useState(false)
-  const [isLabelFading, setIsLabelFading] = React.useState(false)
-  const [farewellPhrase, setFarewellPhrase] = React.useState<string | null>(null)
+  const hasLoggedRef = React.useRef(false)
+  const [isShown, setIsShown] = React.useState(false)
 
   // Auto-log recipe when it becomes visible on System tab
   React.useEffect(() => {
     if (!state.isVisible) {
-      // Don't clear logged recipes when widget hides - persist across sessions
-      setIsFading(false)
-      setIsLabelFading(false)
-      setFarewellPhrase(null)
+      hasLoggedRef.current = false
       return
     }
 
@@ -44,10 +24,9 @@ export const RecipeWidget: React.FC = () => {
     const isOnSystemTab = !router || router.route === 'system'
     if (!isOnSystemTab) return
 
-    // Create unique key from meal time and recipe to prevent duplicate logs
-    const recipeKey = `${state.mealTime}:${state.recipe}`
-    if (loggedRecipesRef.current.has(recipeKey)) return
-    loggedRecipesRef.current.add(recipeKey)
+    // Only log once per recipe show
+    if (hasLoggedRef.current) return
+    hasLoggedRef.current = true
 
     // Create log entry with recipe suggestion
     const mealLabel = getMealLabel()
@@ -61,6 +40,27 @@ export const RecipeWidget: React.FC = () => {
     )
   }, [state.isVisible, state.recipe, router, createLog])
 
+  // Handle fade-in when widget becomes visible
+  React.useEffect(() => {
+    if (state.isVisible) {
+      // Small delay before showing to trigger transition
+      setTimeout(() => {
+        setIsShown(true)
+      }, 100)
+    } else {
+      setIsShown(false)
+    }
+  }, [state.isVisible])
+
+  const handleDismiss = () => {
+    // Fade out first
+    setIsShown(false)
+    // Then dismiss after transition completes
+    setTimeout(() => {
+      dismissRecipeWidget()
+    }, 1400)
+  }
+
   if (!state.isVisible) return null
 
   const getMealLabel = () => {
@@ -73,42 +73,19 @@ export const RecipeWidget: React.FC = () => {
     }
   }
 
-  const handleDismiss = () => {
-    // Pick a random farewell phrase
-    const randomPhrase = FAREWELL_PHRASES[Math.floor(Math.random() * FAREWELL_PHRASES.length)]
-    setFarewellPhrase(randomPhrase)
-
-    // Greeting stays visible for 3 seconds, then fades with label at memory speed (1400ms)
-    setTimeout(() => {
-      setIsFading(true) // Fade greeting content
-      setIsLabelFading(true) // Fade label at same time
-    }, 3000) // 3 seconds visible
-
-    // Dismiss after fade completes
-    setTimeout(() => {
-      dismissRecipeWidget()
-    }, 4400) // 3000ms visible + 1400ms fade = 4400ms total
-  }
-
   return (
-    <div
-      className={`transition-opacity duration-[1400ms] ${isLabelFading ? 'opacity-0' : 'opacity-100'}`}
-    >
-      <Block label={getMealLabel()} blockView>
-        <div
-          onClick={handleDismiss}
-          className="cursor-pointer select-none"
-        >
-          {farewellPhrase ? (
-            <div
-              className={`font-medium transition-opacity duration-[1400ms] ${isFading ? 'opacity-0' : 'opacity-100'}`}
-            >
-              {farewellPhrase}
-            </div>
-          ) : (
-            <div>{state.recipe}</div>
-          )}
-        </div>
+    <div>
+      <Block
+        label={getMealLabel()}
+        blockView
+        className={cn(
+          'opacity-0 transition-opacity duration-[1400ms]',
+          isShown && 'opacity-100',
+          'cursor-pointer'
+        )}
+        onClick={handleDismiss}
+      >
+        {state.recipe}
       </Block>
     </div>
   )
