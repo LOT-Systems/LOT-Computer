@@ -311,6 +311,15 @@ export function useSound(enabled: boolean) {
   React.useEffect(() => {
     if (enabled && !isSoundLibLoaded) {
       stores.soundDescription.set('Initiating...')
+
+      // Timeout to show error if script doesn't load within 10 seconds
+      const timeout = setTimeout(() => {
+        if (!isSoundLibLoaded) {
+          stores.soundDescription.set('Error: CDN timeout (network blocked?)')
+        }
+      }, 10000)
+
+      return () => clearTimeout(timeout)
     } else if (!enabled) {
       stores.soundDescription.set('')
     }
@@ -320,7 +329,7 @@ export function useSound(enabled: boolean) {
   useExternalScript(
     'https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js',
     () => {
-      console.log('🎵 Tone.js loaded')
+      console.log('🎵 Tone.js loaded from cdnjs')
       setIsSoundLibLoaded(true)
     },
     enabled
