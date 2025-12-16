@@ -219,110 +219,91 @@ export const PublicProfile = () => {
           </div>
         )}
 
-        {/* Psychological Profile - show if available */}
+        {/* Psychological Profile - simplified single-column layout */}
         {profile.psychologicalProfile && profile.psychologicalProfile.hasUsership && (
-          <div>
-            <Block label="Psychological Profile:" blockView>
-              {profile.psychologicalProfile.message ? (
-                <div className="opacity-60">
-                  {profile.psychologicalProfile.message}
-                </div>
-              ) : (
-                <div className="flex flex-col gap-y-12">
-                  {/* Soul Archetype */}
-                  {profile.psychologicalProfile.archetype && (
-                    <Block label="Soul Archetype:" blockView>
-                      <div className="font-bold text-acc mb-4">
-                        {profile.psychologicalProfile.archetype}
+          <div className="font-sans">
+            <div className="mb-12">
+              <span className="font-bold">Psychological Profile:</span> OS v.{profile.psychologicalProfile.version || '1.0'}
+            </div>
+
+            {profile.psychologicalProfile.message ? (
+              <div className="opacity-60 font-sans">
+                {profile.psychologicalProfile.message}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-y-8 font-sans">
+                {/* Soul Archetype */}
+                {profile.psychologicalProfile.archetype && (
+                  <div>
+                    <span className="font-bold">Soul Archetype:</span> {profile.psychologicalProfile.archetype}
+                    {profile.psychologicalProfile.archetypeDescription && (
+                      <div className="ml-0 mt-2 text-acc/70 text-sm">
+                        {profile.psychologicalProfile.archetypeDescription}
                       </div>
-                      {profile.psychologicalProfile.archetypeDescription && (
-                        <div className="text-acc/80 text-sm">
-                          {profile.psychologicalProfile.archetypeDescription}
-                        </div>
-                      )}
-                    </Block>
-                  )}
+                    )}
+                  </div>
+                )}
 
-                  {/* Self-Awareness Level */}
-                  {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
-                    <Block label="Self-Awareness:">
-                      {profile.psychologicalProfile.selfAwarenessLevel}/10
-                    </Block>
-                  )}
+                {/* Self-Awareness Level */}
+                {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
+                  <div>
+                    <span className="font-bold">Self-Awareness:</span> {profile.psychologicalProfile.selfAwarenessLevel}/10
+                  </div>
+                )}
 
-                  {/* Core Values */}
-                  {profile.psychologicalProfile.coreValues && profile.psychologicalProfile.coreValues.length > 0 && (
-                    <Block label="Core Values:" blockView>
-                      <TagsContainer
-                        items={profile.psychologicalProfile.coreValues.map((value: string, idx: number) => (
-                          <Tag key={idx} color="blue" fill>
-                            {value}
-                          </Tag>
-                        ))}
-                      />
-                    </Block>
-                  )}
+                {/* Core Values */}
+                {profile.psychologicalProfile.coreValues && profile.psychologicalProfile.coreValues.length > 0 && (
+                  <div>
+                    <span className="font-bold">Core Values:</span> {profile.psychologicalProfile.coreValues.join(', ')}
+                  </div>
+                )}
 
-                  {/* Emotional Patterns */}
-                  {profile.psychologicalProfile.emotionalPatterns && profile.psychologicalProfile.emotionalPatterns.length > 0 && (
-                    <Block label="Emotional Patterns:" blockView>
-                      <TagsContainer
-                        items={profile.psychologicalProfile.emotionalPatterns.map((pattern: string, idx: number) => (
-                          <Tag key={idx} color="purple" fill>
-                            {pattern}
-                          </Tag>
-                        ))}
-                      />
-                    </Block>
-                  )}
+                {/* Emotional Patterns */}
+                {profile.psychologicalProfile.emotionalPatterns && profile.psychologicalProfile.emotionalPatterns.length > 0 && (
+                  <div>
+                    <span className="font-bold">Emotional Patterns:</span> {profile.psychologicalProfile.emotionalPatterns.join(', ')}
+                  </div>
+                )}
 
-                  {/* Behavioral Cohort */}
-                  {profile.psychologicalProfile.behavioralCohort && (
-                    <Block label="Behavioral Cohort:">
-                      {profile.psychologicalProfile.behavioralCohort}
-                    </Block>
-                  )}
+                {/* Behavioral Cohort */}
+                {profile.psychologicalProfile.behavioralCohort && (
+                  <div>
+                    <span className="font-bold">Behavioral Cohort:</span> {profile.psychologicalProfile.behavioralCohort}
+                  </div>
+                )}
 
-                  {/* Behavioral Traits */}
-                  {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
-                    <Block label="Behavioral Traits:" blockView>
-                      <TagsContainer
-                        items={profile.psychologicalProfile.behavioralTraits.map((trait: string, idx: number) => (
-                          <Tag key={idx} color="green" fill>
-                            {trait}
-                          </Tag>
-                        ))}
-                      />
-                    </Block>
-                  )}
+                {/* Behavioral Traits */}
+                {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
+                  <div>
+                    <span className="font-bold">Behavioral Traits:</span> {profile.psychologicalProfile.behavioralTraits.join(', ')}
+                  </div>
+                )}
 
-                  {/* Pattern Strength */}
-                  {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
-                    <Block label="Pattern Strength:" blockView>
-                      <div className="flex flex-col gap-y-4">
-                        {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
-                          <div key={idx} className="text-sm">
-                            {item.trait}: <span className="text-acc/60">{item.count}</span>
-                          </div>
-                        ))}
+                {/* Pattern Strength */}
+                {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
+                  <div>
+                    <div className="font-bold mb-2">Pattern Strength:</div>
+                    {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
+                      <div key={idx} className="ml-4 text-sm">
+                        {item.trait}: {item.count}
                       </div>
-                    </Block>
-                  )}
+                    ))}
+                  </div>
+                )}
 
-                  {/* Meta Information */}
-                  {(profile.psychologicalProfile.answerCount !== undefined || profile.psychologicalProfile.noteCount !== undefined) && (
-                    <div className="text-sm text-acc/60">
-                      {profile.psychologicalProfile.answerCount !== undefined && (
-                        <div>Answers: {profile.psychologicalProfile.answerCount}</div>
-                      )}
-                      {profile.psychologicalProfile.noteCount !== undefined && (
-                        <div>Notes: {profile.psychologicalProfile.noteCount}</div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </Block>
+                {/* Meta Information */}
+                {(profile.psychologicalProfile.answerCount !== undefined || profile.psychologicalProfile.noteCount !== undefined) && (
+                  <div className="text-sm text-acc/70">
+                    {profile.psychologicalProfile.answerCount !== undefined && (
+                      <div><span className="font-bold">Answers:</span> {profile.psychologicalProfile.answerCount}</div>
+                    )}
+                    {profile.psychologicalProfile.noteCount !== undefined && (
+                      <div><span className="font-bold">Notes:</span> {profile.psychologicalProfile.noteCount}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
