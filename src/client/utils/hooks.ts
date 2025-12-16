@@ -76,9 +76,8 @@ function loadScript(src: string, callback: () => void) {
     }
     script.onerror = (error) => {
       console.error(`❌ Failed to load script: ${src}`, error)
-      // Mark as failed (not loaded) so it doesn't retry but also doesn't call callbacks
-      LOADED_SCRIPTS[src].loaded = false
-      LOADED_SCRIPTS[src].subscribers = []
+      // Delete entry to allow retry on next attempt
+      delete LOADED_SCRIPTS[src]
     }
     document.body.appendChild(script)
   }
