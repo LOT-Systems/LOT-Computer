@@ -799,6 +799,12 @@ export default async (fastify: FastifyInstance) => {
             const monthsSinceJoined = dayjs().diff(dayjs(user.createdAt), 'month')
             const osVersion = String(monthsSinceJoined).padStart(3, '0')
 
+            // Calculate Pattern Strength Index with engagement weighting
+            const totalPatternMatches = Object.values(patterns).reduce((sum, count) => sum + count, 0)
+            const daysSinceJoined = dayjs().diff(dayjs(user.createdAt), 'day')
+            const engagementFactor = Math.min(1.5, Math.max(0.5, daysSinceJoined / 30))
+            const patternStrengthIndex = Math.round(totalPatternMatches * engagementFactor)
+
             // Helper to format camelCase to Title Case
             const formatTrait = (str: string): string => {
               const formatted = str.replace(/([A-Z])/g, ' $1').trim()
@@ -817,6 +823,7 @@ export default async (fastify: FastifyInstance) => {
               // Behavioral patterns (surface level)
               behavioralCohort: cohortResult.behavioralCohort,
               behavioralTraits: traits.map((t: string) => formatTrait(t)),
+              patternStrengthIndex: patternStrengthIndex,
               patternStrength: Object.entries(patterns)
                 .filter(([_, v]) => v > 0)
                 .map(([k, v]) => ({ trait: formatTrait(k), count: v as number }))
