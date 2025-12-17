@@ -139,8 +139,57 @@ export const PublicProfile = () => {
   // Format current date
   const currentDate = dayjs().format('dddd, D MMMM, YYYY')
 
+  // Determine time context for theming
+  const getTimeContext = (): string => {
+    if (!profile.localTime) return 'day'
+
+    // Parse local time (format: "3:45 PM" or "11:30 AM")
+    const timeMatch = profile.localTime.match(/(\d+):(\d+)\s*(AM|PM)/i)
+    if (!timeMatch) return 'day'
+
+    let hours = parseInt(timeMatch[1])
+    const minutes = parseInt(timeMatch[2])
+    const period = timeMatch[3].toUpperCase()
+
+    // Convert to 24-hour format
+    if (period === 'PM' && hours !== 12) hours += 12
+    if (period === 'AM' && hours === 12) hours = 0
+
+    const totalSeconds = hours * 3600 + minutes * 60
+
+    // Sunrise: 90-second window around 6:00 AM
+    const sunriseStart = 6 * 3600 - 45
+    const sunriseEnd = 6 * 3600 + 45
+
+    // Sunset: 90-second window around 8:00 PM
+    const sunsetStart = 20 * 3600 - 45
+    const sunsetEnd = 20 * 3600 + 45
+
+    if (totalSeconds >= sunriseStart && totalSeconds < sunriseEnd) return 'sunrise'
+    if (totalSeconds >= sunsetStart && totalSeconds < sunsetEnd) return 'sunset'
+    if (hours >= 6 && hours < 12) return 'morning'
+    if (hours >= 12 && hours < 17) return 'day'
+    if (hours >= 17 && hours < 20) return 'afternoon'
+    return 'night'
+  }
+
+  const timeContext = getTimeContext()
+
+  // Theme colors based on time of day
+  const getThemeClass = (): string => {
+    switch (timeContext) {
+      case 'sunrise': return 'bg-orange-50/30'
+      case 'morning': return 'bg-blue-50/30'
+      case 'day': return 'bg-yellow-50/20'
+      case 'afternoon': return 'bg-amber-50/30'
+      case 'sunset': return 'bg-rose-50/30'
+      case 'night': return 'bg-indigo-950/10'
+      default: return ''
+    }
+  }
+
   return (
-    <div className="max-w-2xl">
+    <div className={cn("max-w-2xl min-h-screen transition-colors duration-1000", getThemeClass())}>
       <div className="flex flex-col gap-y-24">
         {/* Name */}
         <div>
@@ -234,7 +283,7 @@ export const PublicProfile = () => {
               <div className="flex flex-col font-sans">
                 {/* Soul Archetype */}
                 {profile.psychologicalProfile.archetype && (
-                  <div className="mb-12">
+                  <div className="mb-24">
                     <div>Soul Archetype: {profile.psychologicalProfile.archetype}</div>
                     {profile.psychologicalProfile.archetypeDescription && (
                       <div className="mt-2">
@@ -246,42 +295,42 @@ export const PublicProfile = () => {
 
                 {/* Self-Awareness Level */}
                 {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
-                  <div className="mb-12">
+                  <div className="mb-24">
                     Self-Awareness: {profile.psychologicalProfile.selfAwarenessLevel}/10
                   </div>
                 )}
 
                 {/* Core Values */}
                 {profile.psychologicalProfile.coreValues && profile.psychologicalProfile.coreValues.length > 0 && (
-                  <div className="mb-12">
+                  <div className="mb-24">
                     Core Values: {profile.psychologicalProfile.coreValues.join(', ')}
                   </div>
                 )}
 
                 {/* Emotional Patterns */}
                 {profile.psychologicalProfile.emotionalPatterns && profile.psychologicalProfile.emotionalPatterns.length > 0 && (
-                  <div className="mb-12">
+                  <div className="mb-24">
                     Emotional Patterns: {profile.psychologicalProfile.emotionalPatterns.join(', ')}
                   </div>
                 )}
 
                 {/* Behavioral Cohort */}
                 {profile.psychologicalProfile.behavioralCohort && (
-                  <div className="mb-12">
+                  <div className="mb-24">
                     Behavioral Cohort: {profile.psychologicalProfile.behavioralCohort}
                   </div>
                 )}
 
                 {/* Behavioral Traits */}
                 {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
-                  <div className="mb-12">
+                  <div className="mb-24">
                     Behavioral Traits: {profile.psychologicalProfile.behavioralTraits.join(', ')}
                   </div>
                 )}
 
                 {/* Pattern Strength */}
                 {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
-                  <div className="mb-12">
+                  <div className="mb-24">
                     <div>Pattern Strength:</div>
                     <div className="mt-2">
                       {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
@@ -295,7 +344,7 @@ export const PublicProfile = () => {
 
                 {/* Meta Information */}
                 {(profile.psychologicalProfile.answerCount !== undefined || profile.psychologicalProfile.noteCount !== undefined) && (
-                  <div className="mb-12">
+                  <div className="mb-24">
                     {profile.psychologicalProfile.answerCount !== undefined && (
                       <div>Answers: {profile.psychologicalProfile.answerCount}</div>
                     )}
