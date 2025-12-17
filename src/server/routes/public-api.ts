@@ -764,7 +764,7 @@ export default async (fastify: FastifyInstance) => {
       // Add psychological profile (for Usership users)
       if (hasUsershipTag) {
         try {
-          // Get answer logs
+          // Get answer logs for psychological analysis
           const logs = await models.Log.findAll({
             where: {
               userId: user.id,
@@ -774,11 +774,20 @@ export default async (fastify: FastifyInstance) => {
             limit: 30,
           })
 
+          // Get note/journal entry count separately
+          const noteCount = await models.Log.count({
+            where: {
+              userId: user.id,
+              event: 'note',
+            },
+          })
+
           if (logs.length === 0) {
             profile.psychologicalProfile = {
               hasUsership: true,
               message: 'Complete Memory questions to generate profile',
-              answerCount: 0
+              answerCount: 0,
+              noteCount: noteCount
             }
           } else {
             // Extract traits and determine psychological archetype + behavioral cohort
@@ -808,7 +817,7 @@ export default async (fastify: FastifyInstance) => {
                 .sort((a, b) => b.count - a.count),
               // Meta
               answerCount: logs.length,
-              noteCount: logs.filter((l: any) => l.event === 'note' && l.text && l.text.length > 20).length
+              noteCount: noteCount
             }
           }
         } catch (error) {
