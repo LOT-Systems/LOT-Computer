@@ -231,13 +231,13 @@ export const PublicProfile = () => {
                 {profile.psychologicalProfile.message}
               </div>
             ) : (
-              <div className="flex flex-col gap-y-24 font-sans">
+              <div className="flex flex-col font-sans">
                 {/* Soul Archetype */}
                 {profile.psychologicalProfile.archetype && (
-                  <div>
+                  <div className="mb-12">
                     <div>Soul Archetype: {profile.psychologicalProfile.archetype}</div>
                     {profile.psychologicalProfile.archetypeDescription && (
-                      <div className="mt-4 opacity-60">
+                      <div className="mt-2">
                         {profile.psychologicalProfile.archetypeDescription}
                       </div>
                     )}
@@ -246,54 +246,56 @@ export const PublicProfile = () => {
 
                 {/* Self-Awareness Level */}
                 {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
-                  <div>
+                  <div className="mb-12">
                     Self-Awareness: {profile.psychologicalProfile.selfAwarenessLevel}/10
                   </div>
                 )}
 
                 {/* Core Values */}
                 {profile.psychologicalProfile.coreValues && profile.psychologicalProfile.coreValues.length > 0 && (
-                  <div>
+                  <div className="mb-12">
                     Core Values: {profile.psychologicalProfile.coreValues.join(', ')}
                   </div>
                 )}
 
                 {/* Emotional Patterns */}
                 {profile.psychologicalProfile.emotionalPatterns && profile.psychologicalProfile.emotionalPatterns.length > 0 && (
-                  <div>
+                  <div className="mb-12">
                     Emotional Patterns: {profile.psychologicalProfile.emotionalPatterns.join(', ')}
                   </div>
                 )}
 
                 {/* Behavioral Cohort */}
                 {profile.psychologicalProfile.behavioralCohort && (
-                  <div>
+                  <div className="mb-12">
                     Behavioral Cohort: {profile.psychologicalProfile.behavioralCohort}
                   </div>
                 )}
 
                 {/* Behavioral Traits */}
                 {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
-                  <div>
+                  <div className="mb-12">
                     Behavioral Traits: {profile.psychologicalProfile.behavioralTraits.join(', ')}
                   </div>
                 )}
 
                 {/* Pattern Strength */}
                 {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
-                  <div>
-                    <div className="mb-4">Pattern Strength:</div>
-                    {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
-                      <div key={idx} className="ml-8 mb-2">
-                        {item.trait}: {item.count}
-                      </div>
-                    ))}
+                  <div className="mb-12">
+                    <div>Pattern Strength:</div>
+                    <div className="mt-2">
+                      {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
+                        <div key={idx} className="ml-8">
+                          {item.trait}: {item.count}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
                 {/* Meta Information */}
                 {(profile.psychologicalProfile.answerCount !== undefined || profile.psychologicalProfile.noteCount !== undefined) && (
-                  <div className="opacity-60">
+                  <div className="mb-12">
                     {profile.psychologicalProfile.answerCount !== undefined && (
                       <div>Answers: {profile.psychologicalProfile.answerCount}</div>
                     )}
