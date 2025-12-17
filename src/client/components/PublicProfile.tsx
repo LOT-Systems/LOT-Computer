@@ -231,7 +231,7 @@ export const PublicProfile = () => {
                 {profile.psychologicalProfile.message}
               </div>
             ) : (
-              <div className="flex flex-col gap-y-12 font-sans">
+              <div className="flex flex-col gap-y-24 font-sans">
                 {/* Soul Archetype */}
                 {profile.psychologicalProfile.archetype && (
                   <div>
