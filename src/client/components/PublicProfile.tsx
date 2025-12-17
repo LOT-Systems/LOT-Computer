@@ -284,7 +284,10 @@ export const PublicProfile = () => {
                 {/* Soul Archetype */}
                 {profile.psychologicalProfile.archetype && (
                   <div className="mb-24">
-                    <div>Soul Archetype: {profile.psychologicalProfile.archetype}</div>
+                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
+                      <div>Soul Archetype:</div>
+                      <div>{profile.psychologicalProfile.archetype}</div>
+                    </div>
                     {profile.psychologicalProfile.archetypeDescription && (
                       <div className="mt-2">
                         {profile.psychologicalProfile.archetypeDescription}
@@ -296,48 +299,66 @@ export const PublicProfile = () => {
                 {/* Self-Awareness Level */}
                 {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
                   <div className="mb-24">
-                    Self-Awareness: {profile.psychologicalProfile.selfAwarenessLevel}/10
+                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
+                      <div>Self-Awareness:</div>
+                      <div>{profile.psychologicalProfile.selfAwarenessLevel}/10</div>
+                    </div>
                   </div>
                 )}
 
                 {/* Core Values */}
                 {profile.psychologicalProfile.coreValues && profile.psychologicalProfile.coreValues.length > 0 && (
                   <div className="mb-24">
-                    Core Values: {profile.psychologicalProfile.coreValues.join(', ')}
+                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
+                      <div>Core Values:</div>
+                      <div>{profile.psychologicalProfile.coreValues.join(', ')}</div>
+                    </div>
                   </div>
                 )}
 
                 {/* Emotional Patterns */}
                 {profile.psychologicalProfile.emotionalPatterns && profile.psychologicalProfile.emotionalPatterns.length > 0 && (
                   <div className="mb-24">
-                    Emotional Patterns: {profile.psychologicalProfile.emotionalPatterns.join(', ')}
+                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
+                      <div>Emotional Patterns:</div>
+                      <div>{profile.psychologicalProfile.emotionalPatterns.join(', ')}</div>
+                    </div>
                   </div>
                 )}
 
                 {/* Behavioral Cohort */}
                 {profile.psychologicalProfile.behavioralCohort && (
                   <div className="mb-24">
-                    Behavioral Cohort: {profile.psychologicalProfile.behavioralCohort}
+                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
+                      <div>Behavioral Cohort:</div>
+                      <div>{profile.psychologicalProfile.behavioralCohort}</div>
+                    </div>
                   </div>
                 )}
 
                 {/* Behavioral Traits */}
                 {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
                   <div className="mb-24">
-                    Behavioral Traits: {profile.psychologicalProfile.behavioralTraits.join(', ')}
+                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
+                      <div>Behavioral Traits:</div>
+                      <div>{profile.psychologicalProfile.behavioralTraits.join(', ')}</div>
+                    </div>
                   </div>
                 )}
 
                 {/* Pattern Strength */}
                 {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
                   <div className="mb-24">
-                    <div>Pattern Strength:</div>
-                    <div className="mt-2">
-                      {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
-                        <div key={idx} className="ml-8">
-                          {item.trait}: {item.count}
-                        </div>
-                      ))}
+                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
+                      <div>Pattern Strength:</div>
+                      <div>
+                        {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
+                          <div key={idx} className="grid grid-cols-[1fr,auto] gap-x-8">
+                            <div>{item.trait}:</div>
+                            <div>{item.count}</div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -346,10 +367,16 @@ export const PublicProfile = () => {
                 {(profile.psychologicalProfile.answerCount !== undefined || profile.psychologicalProfile.noteCount !== undefined) && (
                   <div className="mb-24">
                     {profile.psychologicalProfile.answerCount !== undefined && (
-                      <div>Answers: {profile.psychologicalProfile.answerCount}</div>
+                      <div className="grid grid-cols-[auto,1fr] gap-x-8 mb-2">
+                        <div>Answers:</div>
+                        <div>{profile.psychologicalProfile.answerCount}</div>
+                      </div>
                     )}
                     {profile.psychologicalProfile.noteCount !== undefined && (
-                      <div>Notes: {profile.psychologicalProfile.noteCount}</div>
+                      <div className="grid grid-cols-[auto,1fr] gap-x-8">
+                        <div>Notes:</div>
+                        <div>{profile.psychologicalProfile.noteCount}</div>
+                      </div>
                     )}
                   </div>
                 )}
