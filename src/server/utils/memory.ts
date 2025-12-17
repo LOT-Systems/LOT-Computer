@@ -1038,11 +1038,17 @@ export async function generateRecipeSuggestion(
     const cohortResult = determineUserCohort(traits, patterns, psychologicalDepth)
 
     if (traits.length > 0) {
+      // Helper to format camelCase to Title Case
+      const formatTrait = (str: string): string => {
+        const formatted = str.replace(/([A-Z])/g, ' $1').trim()
+        return formatted.charAt(0).toUpperCase() + formatted.slice(1)
+      }
+
       cohortInfo = `\n\n**Deep Psychological Profile:**
 - Soul Archetype: "${cohortResult.archetype}" - ${cohortResult.description}
 - Behavioral Cohort: "${cohortResult.behavioralCohort}"
 - Core Values: ${psychologicalDepth.values.map(v => v.charAt(0).toUpperCase() + v.slice(1)).join(', ') || 'Still discovering'}
-- Emotional Patterns: ${psychologicalDepth.emotionalPatterns.map(p => p.replace(/([A-Z])/g, ' $1').trim()).join(', ') || 'Still emerging'}
+- Emotional Patterns: ${psychologicalDepth.emotionalPatterns.map(p => formatTrait(p)).join(', ') || 'Still emerging'}
 - Self-Awareness: ${psychologicalDepth.selfAwareness}/10
 
 Suggest a meal that resonates with their SOUL ARCHETYPE "${cohortResult.archetype}" - not just their behavioral patterns. Consider their core values and emotional nature.`
