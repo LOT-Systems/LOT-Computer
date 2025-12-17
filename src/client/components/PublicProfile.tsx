@@ -271,7 +271,7 @@ export const PublicProfile = () => {
         {/* Psychological Profile - simplified single-column layout */}
         {profile.psychologicalProfile && profile.psychologicalProfile.hasUsership && (
           <div className="font-sans">
-            <div className="mb-24">
+            <div className="mb-12">
               Psychological Profile: OS v.{profile.psychologicalProfile.version || '1.0'}
             </div>
 
@@ -280,16 +280,13 @@ export const PublicProfile = () => {
                 {profile.psychologicalProfile.message}
               </div>
             ) : (
-              <div className="flex flex-col font-sans">
+              <div>
                 {/* Soul Archetype */}
                 {profile.psychologicalProfile.archetype && (
-                  <div className="mb-24">
-                    <div className="flex gap-x-8">
-                      <div className="w-48 flex-shrink-0">Soul Archetype:</div>
-                      <div className="flex-1">{profile.psychologicalProfile.archetype}</div>
-                    </div>
+                  <div className="mb-12">
+                    <Block label="Soul Archetype:">{profile.psychologicalProfile.archetype}</Block>
                     {profile.psychologicalProfile.archetypeDescription && (
-                      <div className="mt-2">
+                      <div className="mt-2 opacity-60">
                         {profile.psychologicalProfile.archetypeDescription}
                       </div>
                     )}
@@ -298,84 +295,59 @@ export const PublicProfile = () => {
 
                 {/* Self-Awareness Level */}
                 {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
-                  <div className="mb-24">
-                    <div className="flex gap-x-8">
-                      <div className="w-48 flex-shrink-0">Self-Awareness:</div>
-                      <div className="flex-1">{profile.psychologicalProfile.selfAwarenessLevel}/10</div>
-                    </div>
+                  <div className="mb-12">
+                    <Block label="Self-Awareness:">{profile.psychologicalProfile.selfAwarenessLevel}/10</Block>
                   </div>
                 )}
 
                 {/* Core Values */}
                 {profile.psychologicalProfile.coreValues && profile.psychologicalProfile.coreValues.length > 0 && (
-                  <div className="mb-24">
-                    <div className="flex gap-x-8">
-                      <div className="w-48 flex-shrink-0">Core Values:</div>
-                      <div className="flex-1">{profile.psychologicalProfile.coreValues.join(', ')}</div>
-                    </div>
+                  <div className="mb-12">
+                    <Block label="Core Values:">{profile.psychologicalProfile.coreValues.join(', ')}</Block>
                   </div>
                 )}
 
                 {/* Emotional Patterns */}
                 {profile.psychologicalProfile.emotionalPatterns && profile.psychologicalProfile.emotionalPatterns.length > 0 && (
-                  <div className="mb-24">
-                    <div className="flex gap-x-8">
-                      <div className="w-48 flex-shrink-0">Emotional Patterns:</div>
-                      <div className="flex-1">{profile.psychologicalProfile.emotionalPatterns.join(', ')}</div>
-                    </div>
+                  <div className="mb-12">
+                    <Block label="Emotional Patterns:">{profile.psychologicalProfile.emotionalPatterns.join(', ')}</Block>
                   </div>
                 )}
 
                 {/* Behavioral Cohort */}
                 {profile.psychologicalProfile.behavioralCohort && (
-                  <div className="mb-24">
-                    <div className="flex gap-x-8">
-                      <div className="w-48 flex-shrink-0">Behavioral Cohort:</div>
-                      <div className="flex-1">{profile.psychologicalProfile.behavioralCohort}</div>
-                    </div>
+                  <div className="mb-12">
+                    <Block label="Behavioral Cohort:">{profile.psychologicalProfile.behavioralCohort}</Block>
                   </div>
                 )}
 
                 {/* Behavioral Traits */}
                 {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
-                  <div className="mb-24">
-                    <div className="flex gap-x-8">
-                      <div className="w-48 flex-shrink-0">Behavioral Traits:</div>
-                      <div className="flex-1">{profile.psychologicalProfile.behavioralTraits.join(', ')}</div>
-                    </div>
+                  <div className="mb-12">
+                    <Block label="Behavioral Traits:">{profile.psychologicalProfile.behavioralTraits.join(', ')}</Block>
                   </div>
                 )}
 
                 {/* Pattern Strength */}
                 {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
-                  <div className="mb-24">
-                    <div className="flex gap-x-8 mb-2">
-                      <div className="w-48 flex-shrink-0">Pattern Strength:</div>
-                      <div className="flex-1">{profile.psychologicalProfile.patternStrengthIndex || profile.psychologicalProfile.patternStrength.reduce((sum: number, item: { count: number }) => sum + item.count, 0)}</div>
+                  <div className="mb-12">
+                    <Block label="Pattern Strength:">{profile.psychologicalProfile.patternStrengthIndex || profile.psychologicalProfile.patternStrength.reduce((sum: number, item: { count: number }) => sum + item.count, 0)}</Block>
+                    <div className="mt-2">
+                      {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
+                        <Block key={idx} label={`${item.trait}:`}>{item.count}</Block>
+                      ))}
                     </div>
-                    {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
-                      <div key={idx} className="flex gap-x-8">
-                        <div className="w-48 flex-shrink-0">{item.trait}:</div>
-                        <div className="flex-1">{item.count}</div>
-                      </div>
-                    ))}
                   </div>
                 )}
 
                 {/* Meta Information */}
                 {(profile.psychologicalProfile.answerCount !== undefined || profile.psychologicalProfile.noteCount !== undefined) && (
-                  <div className="mb-24">
+                  <div className="mb-12">
                     {profile.psychologicalProfile.answerCount !== undefined && (
-                      <div className="flex gap-x-8 mb-2">
-                        <div className="w-48 flex-shrink-0">Answers:</div>
-                        <div className="flex-1">{profile.psychologicalProfile.answerCount}</div>
-                      </div>
+                      <Block label="Answers:">{profile.psychologicalProfile.answerCount}</Block>
                     )}
                     {profile.psychologicalProfile.noteCount !== undefined && (
-                      <div className="flex gap-x-8">
-                        <div className="w-48 flex-shrink-0">Notes:</div>
-                        <div className="flex-1">{profile.psychologicalProfile.noteCount}</div>
-                      </div>
+                      <Block label="Notes:">{profile.psychologicalProfile.noteCount}</Block>
                     )}
                   </div>
                 )}
