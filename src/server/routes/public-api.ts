@@ -799,6 +799,12 @@ export default async (fastify: FastifyInstance) => {
             const monthsSinceJoined = dayjs().diff(dayjs(user.createdAt), 'month')
             const osVersion = String(monthsSinceJoined).padStart(3, '0')
 
+            // Helper to format camelCase to Title Case
+            const formatTrait = (str: string): string => {
+              const formatted = str.replace(/([A-Z])/g, ' $1').trim()
+              return formatted.charAt(0).toUpperCase() + formatted.slice(1)
+            }
+
             profile.psychologicalProfile = {
               hasUsership: true,
               version: osVersion,
@@ -806,14 +812,14 @@ export default async (fastify: FastifyInstance) => {
               archetype: cohortResult.archetype,
               archetypeDescription: cohortResult.description,
               coreValues: psychologicalDepth.values.map((v: string) => v.charAt(0).toUpperCase() + v.slice(1)),
-              emotionalPatterns: psychologicalDepth.emotionalPatterns.map((p: string) => p.replace(/([A-Z])/g, ' $1').trim()),
+              emotionalPatterns: psychologicalDepth.emotionalPatterns.map((p: string) => formatTrait(p)),
               selfAwarenessLevel: psychologicalDepth.selfAwareness,
               // Behavioral patterns (surface level)
               behavioralCohort: cohortResult.behavioralCohort,
-              behavioralTraits: traits.map((t: string) => t.replace(/([A-Z])/g, ' $1').trim()),
+              behavioralTraits: traits.map((t: string) => formatTrait(t)),
               patternStrength: Object.entries(patterns)
                 .filter(([_, v]) => v > 0)
-                .map(([k, v]) => ({ trait: k.replace(/([A-Z])/g, ' $1').trim(), count: v as number }))
+                .map(([k, v]) => ({ trait: formatTrait(k), count: v as number }))
                 .sort((a, b) => b.count - a.count),
               // Meta
               answerCount: logs.length,
