@@ -284,9 +284,9 @@ export const PublicProfile = () => {
                 {/* Soul Archetype */}
                 {profile.psychologicalProfile.archetype && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
-                      <div className="whitespace-nowrap">Soul Archetype:</div>
-                      <div>{profile.psychologicalProfile.archetype}</div>
+                    <div className="flex gap-x-8">
+                      <div className="w-48 flex-shrink-0">Soul Archetype:</div>
+                      <div className="flex-1">{profile.psychologicalProfile.archetype}</div>
                     </div>
                     {profile.psychologicalProfile.archetypeDescription && (
                       <div className="mt-2">
@@ -299,9 +299,9 @@ export const PublicProfile = () => {
                 {/* Self-Awareness Level */}
                 {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
-                      <div className="whitespace-nowrap">Self-Awareness:</div>
-                      <div>{profile.psychologicalProfile.selfAwarenessLevel}/10</div>
+                    <div className="flex gap-x-8">
+                      <div className="w-48 flex-shrink-0">Self-Awareness:</div>
+                      <div className="flex-1">{profile.psychologicalProfile.selfAwarenessLevel}/10</div>
                     </div>
                   </div>
                 )}
@@ -309,9 +309,9 @@ export const PublicProfile = () => {
                 {/* Core Values */}
                 {profile.psychologicalProfile.coreValues && profile.psychologicalProfile.coreValues.length > 0 && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
-                      <div className="whitespace-nowrap">Core Values:</div>
-                      <div>{profile.psychologicalProfile.coreValues.join(', ')}</div>
+                    <div className="flex gap-x-8">
+                      <div className="w-48 flex-shrink-0">Core Values:</div>
+                      <div className="flex-1">{profile.psychologicalProfile.coreValues.join(', ')}</div>
                     </div>
                   </div>
                 )}
@@ -319,9 +319,9 @@ export const PublicProfile = () => {
                 {/* Emotional Patterns */}
                 {profile.psychologicalProfile.emotionalPatterns && profile.psychologicalProfile.emotionalPatterns.length > 0 && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
-                      <div className="whitespace-nowrap">Emotional Patterns:</div>
-                      <div>{profile.psychologicalProfile.emotionalPatterns.join(', ')}</div>
+                    <div className="flex gap-x-8">
+                      <div className="w-48 flex-shrink-0">Emotional Patterns:</div>
+                      <div className="flex-1">{profile.psychologicalProfile.emotionalPatterns.join(', ')}</div>
                     </div>
                   </div>
                 )}
@@ -329,9 +329,9 @@ export const PublicProfile = () => {
                 {/* Behavioral Cohort */}
                 {profile.psychologicalProfile.behavioralCohort && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
-                      <div className="whitespace-nowrap">Behavioral Cohort:</div>
-                      <div>{profile.psychologicalProfile.behavioralCohort}</div>
+                    <div className="flex gap-x-8">
+                      <div className="w-48 flex-shrink-0">Behavioral Cohort:</div>
+                      <div className="flex-1">{profile.psychologicalProfile.behavioralCohort}</div>
                     </div>
                   </div>
                 )}
@@ -339,9 +339,9 @@ export const PublicProfile = () => {
                 {/* Behavioral Traits */}
                 {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
-                      <div className="whitespace-nowrap">Behavioral Traits:</div>
-                      <div>{profile.psychologicalProfile.behavioralTraits.join(', ')}</div>
+                    <div className="flex gap-x-8">
+                      <div className="w-48 flex-shrink-0">Behavioral Traits:</div>
+                      <div className="flex-1">{profile.psychologicalProfile.behavioralTraits.join(', ')}</div>
                     </div>
                   </div>
                 )}
@@ -349,14 +349,14 @@ export const PublicProfile = () => {
                 {/* Pattern Strength */}
                 {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8 mb-2">
-                      <div className="whitespace-nowrap">Pattern Strength:</div>
-                      <div>{profile.psychologicalProfile.patternStrengthIndex || profile.psychologicalProfile.patternStrength.reduce((sum: number, item: { count: number }) => sum + item.count, 0)}</div>
+                    <div className="flex gap-x-8 mb-2">
+                      <div className="w-48 flex-shrink-0">Pattern Strength:</div>
+                      <div className="flex-1">{profile.psychologicalProfile.patternStrengthIndex || profile.psychologicalProfile.patternStrength.reduce((sum: number, item: { count: number }) => sum + item.count, 0)}</div>
                     </div>
                     {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
-                      <div key={idx} className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
-                        <div className="whitespace-nowrap">{item.trait}:</div>
-                        <div>{item.count}</div>
+                      <div key={idx} className="flex gap-x-8">
+                        <div className="w-48 flex-shrink-0">{item.trait}:</div>
+                        <div className="flex-1">{item.count}</div>
                       </div>
                     ))}
                   </div>
@@ -366,15 +366,15 @@ export const PublicProfile = () => {
                 {(profile.psychologicalProfile.answerCount !== undefined || profile.psychologicalProfile.noteCount !== undefined) && (
                   <div className="mb-24">
                     {profile.psychologicalProfile.answerCount !== undefined && (
-                      <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8 mb-2">
-                        <div className="whitespace-nowrap">Answers:</div>
-                        <div>{profile.psychologicalProfile.answerCount}</div>
+                      <div className="flex gap-x-8 mb-2">
+                        <div className="w-48 flex-shrink-0">Answers:</div>
+                        <div className="flex-1">{profile.psychologicalProfile.answerCount}</div>
                       </div>
                     )}
                     {profile.psychologicalProfile.noteCount !== undefined && (
-                      <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
-                        <div className="whitespace-nowrap">Notes:</div>
-                        <div>{profile.psychologicalProfile.noteCount}</div>
+                      <div className="flex gap-x-8">
+                        <div className="w-48 flex-shrink-0">Notes:</div>
+                        <div className="flex-1">{profile.psychologicalProfile.noteCount}</div>
                       </div>
                     )}
                   </div>
