@@ -284,8 +284,8 @@ export const PublicProfile = () => {
                 {/* Soul Archetype */}
                 {profile.psychologicalProfile.archetype && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
-                      <div>Soul Archetype:</div>
+                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
+                      <div className="whitespace-nowrap">Soul Archetype:</div>
                       <div>{profile.psychologicalProfile.archetype}</div>
                     </div>
                     {profile.psychologicalProfile.archetypeDescription && (
@@ -299,8 +299,8 @@ export const PublicProfile = () => {
                 {/* Self-Awareness Level */}
                 {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
-                      <div>Self-Awareness:</div>
+                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
+                      <div className="whitespace-nowrap">Self-Awareness:</div>
                       <div>{profile.psychologicalProfile.selfAwarenessLevel}/10</div>
                     </div>
                   </div>
@@ -309,8 +309,8 @@ export const PublicProfile = () => {
                 {/* Core Values */}
                 {profile.psychologicalProfile.coreValues && profile.psychologicalProfile.coreValues.length > 0 && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
-                      <div>Core Values:</div>
+                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
+                      <div className="whitespace-nowrap">Core Values:</div>
                       <div>{profile.psychologicalProfile.coreValues.join(', ')}</div>
                     </div>
                   </div>
@@ -319,8 +319,8 @@ export const PublicProfile = () => {
                 {/* Emotional Patterns */}
                 {profile.psychologicalProfile.emotionalPatterns && profile.psychologicalProfile.emotionalPatterns.length > 0 && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
-                      <div>Emotional Patterns:</div>
+                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
+                      <div className="whitespace-nowrap">Emotional Patterns:</div>
                       <div>{profile.psychologicalProfile.emotionalPatterns.join(', ')}</div>
                     </div>
                   </div>
@@ -329,8 +329,8 @@ export const PublicProfile = () => {
                 {/* Behavioral Cohort */}
                 {profile.psychologicalProfile.behavioralCohort && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
-                      <div>Behavioral Cohort:</div>
+                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
+                      <div className="whitespace-nowrap">Behavioral Cohort:</div>
                       <div>{profile.psychologicalProfile.behavioralCohort}</div>
                     </div>
                   </div>
@@ -339,8 +339,8 @@ export const PublicProfile = () => {
                 {/* Behavioral Traits */}
                 {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
-                      <div>Behavioral Traits:</div>
+                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
+                      <div className="whitespace-nowrap">Behavioral Traits:</div>
                       <div>{profile.psychologicalProfile.behavioralTraits.join(', ')}</div>
                     </div>
                   </div>
@@ -349,13 +349,13 @@ export const PublicProfile = () => {
                 {/* Pattern Strength */}
                 {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[auto,1fr] gap-x-8 mb-2">
-                      <div>Pattern Strength:</div>
+                    <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8 mb-2">
+                      <div className="whitespace-nowrap">Pattern Strength:</div>
                       <div>{profile.psychologicalProfile.patternStrengthIndex || profile.psychologicalProfile.patternStrength.reduce((sum: number, item: { count: number }) => sum + item.count, 0)}</div>
                     </div>
                     {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
-                      <div key={idx} className="grid grid-cols-[auto,1fr] gap-x-8">
-                        <div>{item.trait}:</div>
+                      <div key={idx} className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
+                        <div className="whitespace-nowrap">{item.trait}:</div>
                         <div>{item.count}</div>
                       </div>
                     ))}
@@ -366,14 +366,14 @@ export const PublicProfile = () => {
                 {(profile.psychologicalProfile.answerCount !== undefined || profile.psychologicalProfile.noteCount !== undefined) && (
                   <div className="mb-24">
                     {profile.psychologicalProfile.answerCount !== undefined && (
-                      <div className="grid grid-cols-[auto,1fr] gap-x-8 mb-2">
-                        <div>Answers:</div>
+                      <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8 mb-2">
+                        <div className="whitespace-nowrap">Answers:</div>
                         <div>{profile.psychologicalProfile.answerCount}</div>
                       </div>
                     )}
                     {profile.psychologicalProfile.noteCount !== undefined && (
-                      <div className="grid grid-cols-[auto,1fr] gap-x-8">
-                        <div>Notes:</div>
+                      <div className="grid grid-cols-[minmax(auto,200px),1fr] gap-x-8">
+                        <div className="whitespace-nowrap">Notes:</div>
                         <div>{profile.psychologicalProfile.noteCount}</div>
                       </div>
                     )}
