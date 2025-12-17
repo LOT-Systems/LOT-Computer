@@ -222,8 +222,8 @@ export const PublicProfile = () => {
         {/* Psychological Profile - simplified single-column layout */}
         {profile.psychologicalProfile && profile.psychologicalProfile.hasUsership && (
           <div className="font-sans">
-            <div className="mb-12">
-              <span className="font-bold">Psychological Profile:</span> OS v.{profile.psychologicalProfile.version || '1.0'}
+            <div className="mb-24">
+              Psychological Profile: OS v.{profile.psychologicalProfile.version || '1.0'}
             </div>
 
             {profile.psychologicalProfile.message ? (
@@ -231,13 +231,13 @@ export const PublicProfile = () => {
                 {profile.psychologicalProfile.message}
               </div>
             ) : (
-              <div className="flex flex-col gap-y-8 font-sans">
+              <div className="flex flex-col gap-y-12 font-sans">
                 {/* Soul Archetype */}
                 {profile.psychologicalProfile.archetype && (
                   <div>
-                    <span className="font-bold">Soul Archetype:</span> {profile.psychologicalProfile.archetype}
+                    <div>Soul Archetype: {profile.psychologicalProfile.archetype}</div>
                     {profile.psychologicalProfile.archetypeDescription && (
-                      <div className="ml-0 mt-2 text-acc/70 text-sm">
+                      <div className="mt-4 opacity-60">
                         {profile.psychologicalProfile.archetypeDescription}
                       </div>
                     )}
@@ -247,44 +247,44 @@ export const PublicProfile = () => {
                 {/* Self-Awareness Level */}
                 {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
                   <div>
-                    <span className="font-bold">Self-Awareness:</span> {profile.psychologicalProfile.selfAwarenessLevel}/10
+                    Self-Awareness: {profile.psychologicalProfile.selfAwarenessLevel}/10
                   </div>
                 )}
 
                 {/* Core Values */}
                 {profile.psychologicalProfile.coreValues && profile.psychologicalProfile.coreValues.length > 0 && (
                   <div>
-                    <span className="font-bold">Core Values:</span> {profile.psychologicalProfile.coreValues.join(', ')}
+                    Core Values: {profile.psychologicalProfile.coreValues.join(', ')}
                   </div>
                 )}
 
                 {/* Emotional Patterns */}
                 {profile.psychologicalProfile.emotionalPatterns && profile.psychologicalProfile.emotionalPatterns.length > 0 && (
                   <div>
-                    <span className="font-bold">Emotional Patterns:</span> {profile.psychologicalProfile.emotionalPatterns.join(', ')}
+                    Emotional Patterns: {profile.psychologicalProfile.emotionalPatterns.join(', ')}
                   </div>
                 )}
 
                 {/* Behavioral Cohort */}
                 {profile.psychologicalProfile.behavioralCohort && (
                   <div>
-                    <span className="font-bold">Behavioral Cohort:</span> {profile.psychologicalProfile.behavioralCohort}
+                    Behavioral Cohort: {profile.psychologicalProfile.behavioralCohort}
                   </div>
                 )}
 
                 {/* Behavioral Traits */}
                 {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
                   <div>
-                    <span className="font-bold">Behavioral Traits:</span> {profile.psychologicalProfile.behavioralTraits.join(', ')}
+                    Behavioral Traits: {profile.psychologicalProfile.behavioralTraits.join(', ')}
                   </div>
                 )}
 
                 {/* Pattern Strength */}
                 {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
                   <div>
-                    <div className="font-bold mb-2">Pattern Strength:</div>
+                    <div className="mb-4">Pattern Strength:</div>
                     {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
-                      <div key={idx} className="ml-4 text-sm">
+                      <div key={idx} className="ml-8 mb-2">
                         {item.trait}: {item.count}
                       </div>
                     ))}
@@ -293,12 +293,12 @@ export const PublicProfile = () => {
 
                 {/* Meta Information */}
                 {(profile.psychologicalProfile.answerCount !== undefined || profile.psychologicalProfile.noteCount !== undefined) && (
-                  <div className="text-sm text-acc/70">
+                  <div className="opacity-60">
                     {profile.psychologicalProfile.answerCount !== undefined && (
-                      <div><span className="font-bold">Answers:</span> {profile.psychologicalProfile.answerCount}</div>
+                      <div>Answers: {profile.psychologicalProfile.answerCount}</div>
                     )}
                     {profile.psychologicalProfile.noteCount !== undefined && (
-                      <div><span className="font-bold">Notes:</span> {profile.psychologicalProfile.noteCount}</div>
+                      <div>Notes: {profile.psychologicalProfile.noteCount}</div>
                     )}
                   </div>
                 )}
