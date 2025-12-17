@@ -349,17 +349,18 @@ export const PublicProfile = () => {
                 {/* Pattern Strength */}
                 {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
                   <div className="mb-24">
-                    <div className="grid grid-cols-[auto,1fr] gap-x-8">
+                    <div className="grid grid-cols-[auto,1fr] gap-x-8 mb-2">
                       <div>Pattern Strength:</div>
                       <div>
-                        {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
-                          <div key={idx} className="grid grid-cols-[1fr,auto] gap-x-8">
-                            <div>{item.trait}:</div>
-                            <div>{item.count}</div>
-                          </div>
-                        ))}
+                        {profile.psychologicalProfile.patternStrength.reduce((sum: number, item: { count: number }) => sum + item.count, 0)}
                       </div>
                     </div>
+                    {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
+                      <div key={idx} className="grid grid-cols-[auto,1fr] gap-x-8">
+                        <div>{item.trait}:</div>
+                        <div>{item.count}</div>
+                      </div>
+                    ))}
                   </div>
                 )}
 
