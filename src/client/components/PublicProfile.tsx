@@ -280,11 +280,14 @@ export const PublicProfile = () => {
                 {profile.psychologicalProfile.message}
               </div>
             ) : (
-              <div>
+              <div className="space-y-3">
                 {/* Soul Archetype */}
                 {profile.psychologicalProfile.archetype && (
-                  <div className="mb-12">
-                    <Block label="Soul Archetype:">{profile.psychologicalProfile.archetype}</Block>
+                  <div>
+                    <div className="flex">
+                      <span className="inline-block" style={{ width: '200px' }}>Soul Archetype:</span>
+                      <span className="flex-1">{profile.psychologicalProfile.archetype}</span>
+                    </div>
                     {profile.psychologicalProfile.archetypeDescription && (
                       <div className="mt-2 opacity-60">
                         {profile.psychologicalProfile.archetypeDescription}
@@ -295,59 +298,74 @@ export const PublicProfile = () => {
 
                 {/* Self-Awareness Level */}
                 {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
-                  <div className="mb-12">
-                    <Block label="Self-Awareness:">{profile.psychologicalProfile.selfAwarenessLevel}/10</Block>
+                  <div className="flex">
+                    <span className="inline-block" style={{ width: '200px' }}>Self-Awareness:</span>
+                    <span className="flex-1">{profile.psychologicalProfile.selfAwarenessLevel}/10</span>
                   </div>
                 )}
 
                 {/* Core Values */}
                 {profile.psychologicalProfile.coreValues && profile.psychologicalProfile.coreValues.length > 0 && (
-                  <div className="mb-12">
-                    <Block label="Core Values:">{profile.psychologicalProfile.coreValues.join(', ')}</Block>
+                  <div className="flex">
+                    <span className="inline-block" style={{ width: '200px' }}>Core Values:</span>
+                    <span className="flex-1">{profile.psychologicalProfile.coreValues.join(', ')}</span>
                   </div>
                 )}
 
                 {/* Emotional Patterns */}
                 {profile.psychologicalProfile.emotionalPatterns && profile.psychologicalProfile.emotionalPatterns.length > 0 && (
-                  <div className="mb-12">
-                    <Block label="Emotional Patterns:">{profile.psychologicalProfile.emotionalPatterns.join(', ')}</Block>
+                  <div className="flex">
+                    <span className="inline-block" style={{ width: '200px' }}>Emotional Patterns:</span>
+                    <span className="flex-1">{profile.psychologicalProfile.emotionalPatterns.join(', ')}</span>
                   </div>
                 )}
 
                 {/* Behavioral Cohort */}
                 {profile.psychologicalProfile.behavioralCohort && (
-                  <div className="mb-12">
-                    <Block label="Behavioral Cohort:">{profile.psychologicalProfile.behavioralCohort}</Block>
+                  <div className="flex">
+                    <span className="inline-block" style={{ width: '200px' }}>Behavioral Cohort:</span>
+                    <span className="flex-1">{profile.psychologicalProfile.behavioralCohort}</span>
                   </div>
                 )}
 
                 {/* Behavioral Traits */}
                 {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
-                  <div className="mb-12">
-                    <Block label="Behavioral Traits:">{profile.psychologicalProfile.behavioralTraits.join(', ')}</Block>
+                  <div className="flex">
+                    <span className="inline-block" style={{ width: '200px' }}>Behavioral Traits:</span>
+                    <span className="flex-1">{profile.psychologicalProfile.behavioralTraits.join(', ')}</span>
                   </div>
                 )}
 
                 {/* Pattern Strength */}
                 {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
-                  <div className="mb-12">
-                    <Block label="Pattern Strength:">{profile.psychologicalProfile.patternStrengthIndex || profile.psychologicalProfile.patternStrength.reduce((sum: number, item: { count: number }) => sum + item.count, 0)}</Block>
-                    <div className="mt-2">
-                      {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
-                        <Block key={idx} label={`${item.trait}:`}>{item.count}</Block>
-                      ))}
+                  <div>
+                    <div className="flex mb-2">
+                      <span className="inline-block" style={{ width: '200px' }}>Pattern Strength:</span>
+                      <span className="flex-1">{profile.psychologicalProfile.patternStrengthIndex || profile.psychologicalProfile.patternStrength.reduce((sum: number, item: { count: number }) => sum + item.count, 0)}</span>
                     </div>
+                    {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
+                      <div key={idx} className="flex">
+                        <span className="inline-block" style={{ width: '200px' }}>{item.trait}:</span>
+                        <span className="flex-1">{item.count}</span>
+                      </div>
+                    ))}
                   </div>
                 )}
 
                 {/* Meta Information */}
                 {(profile.psychologicalProfile.answerCount !== undefined || profile.psychologicalProfile.noteCount !== undefined) && (
-                  <div className="mb-12">
+                  <div>
                     {profile.psychologicalProfile.answerCount !== undefined && (
-                      <Block label="Answers:">{profile.psychologicalProfile.answerCount}</Block>
+                      <div className="flex">
+                        <span className="inline-block" style={{ width: '200px' }}>Answers:</span>
+                        <span className="flex-1">{profile.psychologicalProfile.answerCount}</span>
+                      </div>
                     )}
                     {profile.psychologicalProfile.noteCount !== undefined && (
-                      <Block label="Notes:">{profile.psychologicalProfile.noteCount}</Block>
+                      <div className="flex">
+                        <span className="inline-block" style={{ width: '200px' }}>Notes:</span>
+                        <span className="flex-1">{profile.psychologicalProfile.noteCount}</span>
+                      </div>
                     )}
                   </div>
                 )}
