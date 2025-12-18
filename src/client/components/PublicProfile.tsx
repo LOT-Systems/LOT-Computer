@@ -298,7 +298,7 @@ export const PublicProfile = () => {
 
                 {/* Self-Awareness Level */}
                 {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
-                  <div className="flex">
+                  <div className="flex mb-24">
                     <span className="inline-block" style={{ width: '200px' }}>Self-Awareness:</span>
                     <span className="flex-1">{profile.psychologicalProfile.selfAwarenessLevel}/10</span>
                   </div>
@@ -330,7 +330,7 @@ export const PublicProfile = () => {
 
                 {/* Behavioral Traits */}
                 {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
-                  <div className="flex">
+                  <div className="flex mb-24">
                     <span className="inline-block" style={{ width: '200px' }}>Behavioral Traits:</span>
                     <span className="flex-1">{profile.psychologicalProfile.behavioralTraits.join(', ')}</span>
                   </div>
