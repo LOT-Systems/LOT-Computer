@@ -2,6 +2,8 @@ import * as React from 'react'
 import { Block, Button, GhostButton, Page } from '#client/components/ui'
 import { cn } from '#client/utils'
 import { useDocumentTitle } from '#client/utils/hooks'
+import dayjs from 'dayjs'
+import { DATE_TIME_FORMAT } from '#shared/constants'
 
 interface SystemCheck {
   name: string
@@ -64,7 +66,8 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
 
       // Try to fetch memory status (authenticated)
       try {
-        const memResponse = await fetch('/api/memory-status')
+        const localTime = btoa(dayjs().format(DATE_TIME_FORMAT))
+        const memResponse = await fetch(`/api/memory-status?d=${localTime}`)
         if (memResponse.ok) {
           const memData = await memResponse.json()
           setMemoryStatus(memData)

@@ -120,9 +120,18 @@ export default async (fastify: FastifyInstance) => {
   })
 
   // Memory prompt status - debugging endpoint
-  fastify.get('/memory-status', async (req: FastifyRequest, reply) => {
+  fastify.get('/memory-status', async (req: FastifyRequest<{ Querystring: { d?: string } }>, reply) => {
     try {
-      const localDate = dayjs()
+      // Get user's local time from query parameter (like sync endpoint)
+      let localDate = dayjs()
+      if (req.query.d) {
+        try {
+          localDate = dayjs(atob(req.query.d), DATE_TIME_FORMAT)
+        } catch {
+          // Invalid date, use server time
+        }
+      }
+
       const pacingInfo = await calculateIntelligentPacing(
         req.user.id,
         localDate,
