@@ -119,6 +119,74 @@ export default async (fastify: FastifyInstance) => {
     return { ...profile, isAdmin, metadata }
   })
 
+  // Memory prompt status - debugging endpoint
+  fastify.get('/memory-status', async (req: FastifyRequest, reply) => {
+    try {
+      const localDate = dayjs()
+      const pacingInfo = await calculateIntelligentPacing(
+        req.user.id,
+        localDate,
+        fastify.models
+      )
+
+      const hour = localDate.hour()
+      const isWeekend = localDate.day() === 0 || localDate.day() === 6
+
+      // Determine time window
+      let timeWindow = 'OUTSIDE TIME WINDOWS'
+      if (isWeekend) {
+        if (hour >= 7 && hour <= 23) {
+          timeWindow = '7am-11pm (weekend)'
+        }
+      } else {
+        if (hour >= 6 && hour <= 10) {
+          timeWindow = '6am-10am (morning)'
+        } else if (hour >= 11 && hour <= 15) {
+          timeWindow = '11am-3pm (midday)'
+        } else if (hour >= 17 && hour <= 22) {
+          timeWindow = '5pm-10pm (evening)'
+        }
+      }
+
+      // Check if recently asked (last 2 hours)
+      const twoHoursAgo = dayjs().subtract(2, 'hour')
+      const recentAnswerCount = await fastify.models.Answer.count({
+        where: {
+          userId: req.user.id,
+          createdAt: {
+            [Op.gte]: twoHoursAgo.toDate(),
+          },
+        },
+      })
+
+      return {
+        currentTime: localDate.format('h:mm A'),
+        currentHour: hour,
+        isWeekend,
+        timeWindow,
+        shouldShowPrompt: pacingInfo.shouldShowPrompt,
+        promptsShownToday: pacingInfo.promptsShownToday,
+        promptQuotaToday: pacingInfo.promptQuotaToday,
+        remainingToday: pacingInfo.promptQuotaToday - pacingInfo.promptsShownToday,
+        dayNumber: pacingInfo.dayNumber,
+        answeredInLast2Hours: recentAnswerCount > 0,
+        nextPromptAvailable: pacingInfo.shouldShowPrompt && recentAnswerCount === 0,
+        blockReason: !pacingInfo.shouldShowPrompt
+          ? timeWindow === 'OUTSIDE TIME WINDOWS'
+            ? 'Outside time windows'
+            : 'Daily quota reached'
+          : recentAnswerCount > 0
+            ? 'Answered within last 2 hours'
+            : null,
+      }
+    } catch (error: any) {
+      console.error('Memory status error:', error)
+      return {
+        error: error.message,
+      }
+    }
+  })
+
   // Visitor statistics endpoint
   fastify.get('/visitor-stats', async (req: FastifyRequest, reply) => {
     try {
