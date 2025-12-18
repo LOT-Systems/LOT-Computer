@@ -258,6 +258,7 @@ const NoteEditor = ({
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
   const [isAboutToPush, setIsAboutToPush] = React.useState(false) // Blink before push
   const [isSaving, setIsSaving] = React.useState(false) // Prevent concurrent saves
+  const savingInProgressRef = React.useRef(false) // Prevent duplicate saves during tab switch
   // Timing: finish typing > wait 8s > autosave+blink > wait 2s > push (10s total)
   // Past logs: 5s debounce to prevent lag while still being responsive
   const debounceTime = primary ? 8000 : 5000  // 8s for primary, 5s for old logs
@@ -365,7 +366,10 @@ const NoteEditor = ({
   React.useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden && valueRef.current !== logTextRef.current) {
+        if (savingInProgressRef.current) return // Prevent duplicate save
+        savingInProgressRef.current = true
         onChangeRef.current(valueRef.current)
+        setTimeout(() => { savingInProgressRef.current = false }, 500)
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
@@ -379,6 +383,7 @@ const NoteEditor = ({
     return () => {
       // Save on unmount if there are unsaved changes
       if (valueRef.current !== logTextRef.current) {
+        if (savingInProgressRef.current) return // Prevent duplicate save
         onChangeRef.current(valueRef.current)
       }
     }
@@ -489,7 +494,7 @@ const NoteEditor = ({
           }
           className={cn(
             'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
-            'placeholder:opacity-40',
+            'placeholder:opacity-20',
             !primary && 'opacity-20',
             primary && isSaved && !isAboutToPush && 'opacity-40',
             primary && !isSaved && 'opacity-100',
