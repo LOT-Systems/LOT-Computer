@@ -237,19 +237,17 @@ export const Settings = () => {
   React.useEffect(() => {
     // Use lightweight version check instead of full health check
     const cachedVersion = localStorage.getItem('appVersion')
-    if (cachedVersion) {
-      setStatusData({
-        version: cachedVersion,
-        overall: 'ok'
-      })
-    }
+    setStatusData({
+      version: cachedVersion || '0.2.0',
+      overall: 'ok'
+    })
   }, [])
 
   const statusText = statusData
     ? statusData.overall === 'ok'
       ? `Status page (v${statusData.version})`
       : `Status page (v${statusData.version}) - System issues detected`
-    : 'Status page (loading...)'
+    : 'Status page'
 
   return (
     <div className="flex flex-col gap-y-16">
