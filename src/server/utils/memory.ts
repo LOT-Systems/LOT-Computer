@@ -1233,31 +1233,19 @@ export async function calculateIntelligentPacing(
 
   // Check if it's a good time of day to show a prompt
   const hour = currentDate.hour()
-  const isGoodTime = isWeekend
-    ? // Weekends: spread throughout waking hours (7am-11pm, expanded)
-      hour >= 7 && hour <= 23
-    : // Weekdays: expanded contextual moments throughout the day
-      (hour >= 6 && hour <= 10) ||  // Morning (6am-10am, expanded)
-      (hour >= 11 && hour <= 15) ||  // Midday (11am-3pm, expanded lunch period)
-      (hour >= 17 && hour <= 22)     // Evening (5pm-10pm, expanded)
+  // ALWAYS allow prompts - removed time window restrictions
+  // Quota system controls frequency, not time of day
+  const isGoodTime = true
 
   console.log(`⏰ Time check for user ${userId}:`, {
     currentHour: hour,
     currentTime: currentDate.format('HH:mm'),
     isWeekend,
-    isGoodTime,
+    isGoodTime: true,
     promptsShownToday,
     promptQuotaToday,
     dayNumber,
-    timeWindow: isWeekend
-      ? '7am-11pm (weekend)'
-      : hour >= 6 && hour <= 10
-        ? '6am-10am (morning)'
-        : hour >= 11 && hour <= 15
-          ? '11am-3pm (midday)'
-          : hour >= 17 && hour <= 22
-            ? '5pm-10pm (evening)'
-            : 'OUTSIDE TIME WINDOWS'
+    timeWindow: 'All day (24/7)'
   })
 
   const shouldShowPrompt = isGoodTime
