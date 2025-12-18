@@ -82,7 +82,7 @@ services:
 
       - key: APP_HOST
         scope: RUN_AND_BUILD_TIME
-        value: "${_self.PUBLIC_URL}"
+        value: "https://lot-systems.com"
 
       - key: APP_DESCRIPTION
         scope: RUN_AND_BUILD_TIME

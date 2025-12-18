@@ -33,6 +33,9 @@ services:
       - key: NODE_ENV
         scope: RUN_AND_BUILD_TIME
         value: production
+      - key: APP_HOST
+        scope: RUN_AND_BUILD_TIME
+        value: https://lot-systems.com
       - key: PORT
         scope: RUN_AND_BUILD_TIME
         value: "8080"
