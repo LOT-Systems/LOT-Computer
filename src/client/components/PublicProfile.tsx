@@ -271,7 +271,7 @@ export const PublicProfile = () => {
         {/* Psychological Profile - simplified single-column layout */}
         {profile.psychologicalProfile && profile.psychologicalProfile.hasUsership && (
           <div className="font-sans">
-            <div className="mb-12">
+            <div className="mb-24">
               Psychological Profile: OS v.{profile.psychologicalProfile.version || '1.0'}
             </div>
 
@@ -283,13 +283,13 @@ export const PublicProfile = () => {
               <div className="space-y-3">
                 {/* Soul Archetype */}
                 {profile.psychologicalProfile.archetype && (
-                  <div>
+                  <div className="mb-24">
                     <div className="flex">
                       <span className="inline-block" style={{ width: '200px' }}>Soul Archetype:</span>
                       <span className="flex-1">{profile.psychologicalProfile.archetype}</span>
                     </div>
                     {profile.psychologicalProfile.archetypeDescription && (
-                      <div className="mt-2 opacity-60">
+                      <div className="mt-2">
                         {profile.psychologicalProfile.archetypeDescription}
                       </div>
                     )}
