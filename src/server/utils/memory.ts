@@ -1127,7 +1127,7 @@ Please respond with ONLY the recipe/meal suggestion - just a simple, clear descr
     console.log(`🤖 Using ${engine.name} for recipe generation`)
 
     const suggestion = await engine.generateCompletion(prompt, 100)
-    const cleaned = suggestion?.trim().replace(/^["']|["']$/g, '') || ''
+    const cleaned = suggestion?.trim().replace(/^["']|["']$/g, '').replace(/[.!?]$/g, '') || ''
 
     console.log(`✅ Recipe generated: "${cleaned}"`)
     return cleaned
