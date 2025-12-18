@@ -43,9 +43,9 @@ const anthropic = new Anthropic({
 // ============================================================================
 // AI ENGINE CONFIGURATION
 // ============================================================================
-// Switch between 'claude', 'openai', or 'auto' (auto tries Claude first, then OpenAI)
+// Switch between 'together', 'claude', 'openai', or 'auto'
 // This is where YOU control which AI engine to use - LOT owns the decision!
-const AI_ENGINE_PREFERENCE: EnginePreference = 'auto'
+const AI_ENGINE_PREFERENCE: EnginePreference = 'together'
 
 const questionSchema = z.object({
   question: z.string(),
