@@ -649,16 +649,20 @@ export default async (fastify: FastifyInstance) => {
         return null
       }
 
+      // Check if a prompt was shown in the last 2 hours (not entire period)
+      const twoHoursAgo = now.subtract(2, 'hour')
       const isRecentlyAsked = await fastify.models.Answer.count({
         where: {
           userId: req.user.id,
           createdAt: {
-            [Op.gte]: utcPeriodEdges[0].toDate(),
-            [Op.lte]: utcPeriodEdges[1].toDate(),
+            [Op.gte]: twoHoursAgo.toDate(),
           },
         },
       }).then(Boolean)
-      if (isRecentlyAsked) return null
+      if (isRecentlyAsked) {
+        console.log(`⏸️ Skipping prompt: answered within last 2 hours`)
+        return null
+      }
 
       // Check if user has Usership tag for AI-generated questions
       const hasUsershipTag = req.user.tags.some(
