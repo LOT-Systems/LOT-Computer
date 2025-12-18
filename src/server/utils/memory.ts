@@ -1241,6 +1241,25 @@ export async function calculateIntelligentPacing(
       (hour >= 11 && hour <= 15) ||  // Midday (11am-3pm, expanded lunch period)
       (hour >= 17 && hour <= 22)     // Evening (5pm-10pm, expanded)
 
+  console.log(`⏰ Time check for user ${userId}:`, {
+    currentHour: hour,
+    currentTime: currentDate.format('HH:mm'),
+    isWeekend,
+    isGoodTime,
+    promptsShownToday,
+    promptQuotaToday,
+    dayNumber,
+    timeWindow: isWeekend
+      ? '7am-11pm (weekend)'
+      : hour >= 6 && hour <= 10
+        ? '6am-10am (morning)'
+        : hour >= 11 && hour <= 15
+          ? '11am-3pm (midday)'
+          : hour >= 17 && hour <= 22
+            ? '5pm-10pm (evening)'
+            : 'OUTSIDE TIME WINDOWS'
+  })
+
   const shouldShowPrompt = isGoodTime
 
   return {
