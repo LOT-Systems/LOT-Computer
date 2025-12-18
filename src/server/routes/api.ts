@@ -132,21 +132,8 @@ export default async (fastify: FastifyInstance) => {
       const hour = localDate.hour()
       const isWeekend = localDate.day() === 0 || localDate.day() === 6
 
-      // Determine time window
-      let timeWindow = 'OUTSIDE TIME WINDOWS'
-      if (isWeekend) {
-        if (hour >= 7 && hour <= 23) {
-          timeWindow = '7am-11pm (weekend)'
-        }
-      } else {
-        if (hour >= 6 && hour <= 10) {
-          timeWindow = '6am-10am (morning)'
-        } else if (hour >= 11 && hour <= 15) {
-          timeWindow = '11am-3pm (midday)'
-        } else if (hour >= 17 && hour <= 22) {
-          timeWindow = '5pm-10pm (evening)'
-        }
-      }
+      // Time windows removed - prompts available 24/7
+      const timeWindow = 'All day (24/7)'
 
       // Check if recently asked (last 2 hours)
       const twoHoursAgo = dayjs().subtract(2, 'hour')
@@ -172,9 +159,7 @@ export default async (fastify: FastifyInstance) => {
         answeredInLast2Hours: recentAnswerCount > 0,
         nextPromptAvailable: pacingInfo.shouldShowPrompt && recentAnswerCount === 0,
         blockReason: !pacingInfo.shouldShowPrompt
-          ? timeWindow === 'OUTSIDE TIME WINDOWS'
-            ? 'Outside time windows'
-            : 'Daily quota reached'
+          ? 'Daily quota reached'
           : recentAnswerCount > 0
             ? 'Answered within last 2 hours'
             : null,
