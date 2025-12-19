@@ -154,9 +154,7 @@ export const Logs: React.FC = () => {
             dateFormat={dateFormat}
             pendingPushRef={pendingPushRef}
           />
-        ) : (
-          <div className="opacity-20">Loading...</div>
-        )}
+        ) : null}
       </div>
 
       {pastLogIds.map((id) => {
@@ -252,6 +250,7 @@ const NoteEditor = ({
   const valueRef = React.useRef(log.text || '')
   const logTextRef = React.useRef(log.text || '')
   const onChangeRef = React.useRef(onChange)
+  const blinkTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
@@ -259,6 +258,7 @@ const NoteEditor = ({
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
   const [isAboutToPush, setIsAboutToPush] = React.useState(false) // Blink before push
   const [isSaving, setIsSaving] = React.useState(false) // Prevent concurrent saves
+  const savingInProgressRef = React.useRef(false) // Prevent duplicate saves during tab switch
   // Timing: finish typing > wait 8s > autosave+blink > wait 2s > push (10s total)
   // Past logs: 5s debounce to prevent lag while still being responsive
   const debounceTime = primary ? 8000 : 5000  // 8s for primary, 5s for old logs
@@ -275,7 +275,11 @@ const NoteEditor = ({
         clearTimeout(pendingPushRef.current)
         pendingPushRef.current = null
       }
-      // Cancel blink animation too
+      // Cancel blink animation timeout and state
+      if (blinkTimeoutRef.current) {
+        clearTimeout(blinkTimeoutRef.current)
+        blinkTimeoutRef.current = null
+      }
       setIsAboutToPush(false)
     }
   }, [value, log.text, pendingPushRef])
@@ -300,17 +304,26 @@ const NoteEditor = ({
     setIsSaving(true)
     onChange(debouncedValue)
 
-    // Update timestamp and mark as saved
+    // Update timestamp
     setLastSavedAt(new Date())
-    setIsSaved(true)
+
+    // IMPORTANT: Only mark as saved if current value matches what we're saving
+    // This prevents race condition where user types more while save is in progress
+    if (valueRef.current === debouncedValue) {
+      setIsSaved(true)
+    }
 
     // Clear saving state after a brief delay
     setTimeout(() => setIsSaving(false), 100)
 
-    // For primary log: trigger blink animation (lasts 2.4s), then push happens via parent
+    // For primary log: trigger blink animation 1.5s after save (right before push)
+    // Timeline: save now → wait 1.5s → blink 0.5s → push happens (2s total)
     if (primary) {
-      setIsAboutToPush(true)
-      setTimeout(() => setIsAboutToPush(false), 2400)  // Match CSS animation duration (0.8s × 3)
+      blinkTimeoutRef.current = setTimeout(() => {
+        setIsAboutToPush(true)
+        setTimeout(() => setIsAboutToPush(false), 500)
+        blinkTimeoutRef.current = null
+      }, 1500)  // Start blink 1.5s after save, so it finishes right when push happens
     }
   }, [debouncedValue, onChange, log.text, primary, isSaving])
 
@@ -325,6 +338,9 @@ const NoteEditor = ({
     // Defensive: Don't clear user's typed text if server hasn't saved yet
     // This prevents race condition on mobile where blur saves but mutation hasn't completed
     if (value && !log.text) return
+    // Additional safety: Don't overwrite if current value is different from server value
+    // This prevents race condition where user typed more while autosave was in progress
+    if (valueRef.current !== log.text && valueRef.current.length > log.text.length) return
     setValue(log.text || '')
   }, [log.text, isFocused, isSaved])  // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -350,7 +366,10 @@ const NoteEditor = ({
   React.useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden && valueRef.current !== logTextRef.current) {
+        if (savingInProgressRef.current) return // Prevent duplicate save
+        savingInProgressRef.current = true
         onChangeRef.current(valueRef.current)
+        setTimeout(() => { savingInProgressRef.current = false }, 500)
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
@@ -364,6 +383,7 @@ const NoteEditor = ({
     return () => {
       // Save on unmount if there are unsaved changes
       if (valueRef.current !== logTextRef.current) {
+        if (savingInProgressRef.current) return // Prevent duplicate save
         onChangeRef.current(valueRef.current)
       }
     }
@@ -379,10 +399,13 @@ const NoteEditor = ({
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
           setIsSaved(true)
-          // Trigger blink animation for manual save too
+          // Trigger blink animation for manual save too (same timing as autosave)
           if (primary) {
-            setIsAboutToPush(true)
-            setTimeout(() => setIsAboutToPush(false), 2400)  // Match CSS animation duration (0.8s × 3)
+            blinkTimeoutRef.current = setTimeout(() => {
+              setIsAboutToPush(true)
+              setTimeout(() => setIsAboutToPush(false), 500)
+              blinkTimeoutRef.current = null
+            }, 1500)
           }
         }
         // Optionally blur to show save happened

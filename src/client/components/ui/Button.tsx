@@ -63,10 +63,9 @@ export const Button: React.FC<Props> = ({
       cn(
         !isMirrorOn &&
           'before:content-[""] before:absolute before:inset-0 before:bg-bac before:z-[-1]',
-        'hover:bg-acc/10',
-        'transition-[background-color] rounded',
-        'bg-transparent border border-acc text-acc rounded-[21px]',
-        'disabled:border-acc/40 disabled:text-acc/40'
+        isMirrorOn
+          ? 'hover:bg-white/10 transition-[background-color] rounded border border-white text-white rounded-[21px] disabled:border-white/40 disabled:text-white/40'
+          : 'hover:bg-acc/10 transition-[background-color] rounded bg-transparent border border-acc text-acc rounded-[21px] disabled:border-acc/40 disabled:text-acc/40'
       ),
     'cursor-pointer',
     SIZE_CLASSNAME[size],

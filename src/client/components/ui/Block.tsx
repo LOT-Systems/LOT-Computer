@@ -19,8 +19,11 @@ type Props = {
 
 export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
   const theme = useStore(stores.theme)
+  const isMirrorOn = useStore(stores.isMirrorOn)
 
-  const hoverClassName = 'hover:bg-acc/10 group-hover:bg-acc/10'
+  const hoverClassName = isMirrorOn
+    ? 'hover:bg-white/10 group-hover:bg-white/10'
+    : 'hover:bg-acc/10 group-hover:bg-acc/10'
 
   return (
     <div className={props.className}>
@@ -34,7 +37,7 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
         >
           <div
             className={cn(
-              'w-[135px] sm:w-[150px] mr-12 sm:mr-8 -ml-4',
+              'w-[170px] sm:w-[150px] mr-24 sm:mr-12 -ml-4',
               props.containsButton && 'translate-y-8',
               props.containsSmallButton && 'translate-y-4'
             )}
@@ -57,7 +60,6 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
           <div
             className={cn(
               'flex-1',
-              blockView && 'pl-4',
               props.contentClassName
             )}
           >
@@ -66,12 +68,10 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
             ) : (
               <span
                 className={cn(
-                  'px-4 rounded',
-                  (!!props.onClick || !!props.onChildrenClick) &&
-                    cn(
-                      'cursor-pointer transition-[background-color]',
-                      hoverClassName
-                    ),
+                  'rounded',
+                  (!!props.onClick || !!props.onChildrenClick)
+                    ? '-ml-4 pl-4 pr-4 cursor-pointer transition-[background-color] ' + hoverClassName
+                    : '',
                   props.labelClassName
                 )}
                 onClick={props.onChildrenClick}

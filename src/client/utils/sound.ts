@@ -214,7 +214,7 @@ function getTimeContext(weather: any, usersOnline: number): SoundContext {
 /**
  * Helper function to properly clean up all sounds including timeouts
  */
-function cleanupSounds(sounds: any) {
+function cleanupSounds(sounds: any, audioContext: AudioContext) {
   // Clear melody timeout if it exists
   if (sounds.melodyTimeout) {
     clearTimeout(sounds.melodyTimeout)
@@ -227,18 +227,22 @@ function cleanupSounds(sounds: any) {
     sounds.clickInterval = null
   }
 
-  // Stop and dispose all sound objects
-  Object.values(sounds).forEach((sound: any) => {
+  // Stop and disconnect all Web Audio nodes
+  Object.keys(sounds).forEach((key) => {
+    const node = sounds[key]
     try {
-      // Skip non-sound values like timeout IDs
-      if (sound && typeof sound === 'object' && 'stop' in sound) {
-        sound.stop()
-      }
-      if (sound && typeof sound === 'object' && 'dispose' in sound) {
-        sound.dispose()
+      if (node && typeof node === 'object') {
+        // Stop oscillators
+        if (node instanceof OscillatorNode && node.context.state !== 'closed') {
+          node.stop()
+        }
+        // Disconnect audio nodes
+        if ('disconnect' in node) {
+          node.disconnect()
+        }
       }
     } catch (e) {
-      // Ignore disposal errors
+      // Ignore cleanup errors
     }
   })
 }
@@ -301,21 +305,24 @@ function createClickSymphony(Tone: any, sounds: any, context: SoundContext) {
  */
 export function useSound(enabled: boolean) {
   const soundsRef = React.useRef<any>({})
-  const [isSoundLibLoaded, setIsSoundLibLoaded] = React.useState(false)
+  const audioContextRef = React.useRef<AudioContext | null>(null)
   const weather = useStore(stores.weather)
   const usersOnline = useStore(stores.usersOnline)
   const [context, setContext] = React.useState<SoundContext>(() => getTimeContext(weather, usersOnline))
   const [currentDate, setCurrentDate] = React.useState(() => new Date().toDateString())
 
-  // Load Tone.js library when sound is needed
-  useExternalScript(
-    'https://unpkg.com/tone',
-    () => {
-      console.log('🎵 Tone.js loaded')
-      setIsSoundLibLoaded(true)
-    },
-    enabled
-  )
+  // Initialize Web Audio Context (native browser API, no external libraries needed)
+  React.useEffect(() => {
+    if (enabled && !audioContextRef.current) {
+      try {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+        console.log('🎵 Native Web Audio initialized')
+      } catch (error) {
+        console.error('❌ Failed to create AudioContext:', error)
+        stores.soundDescription.set('Error: Audio not supported')
+      }
+    }
+  }, [enabled])
 
   // Update context every minute to detect time changes and new days
   React.useEffect(() => {
@@ -364,79 +371,98 @@ export function useSound(enabled: boolean) {
   }, [weather, usersOnline, enabled])
 
   React.useEffect(() => {
-    // @ts-ignore - Tone.js is loaded via external script
-    const Tone: any = window.Tone
+    const audioContext = audioContextRef.current
 
     ;(async () => {
-      if (isSoundLibLoaded && enabled) {
-        await Tone.start()
-        const soundDesc = getSoundDescription(context)
-        console.log(`🔊 Sound: On (${soundDesc})`)
-        if (context.period === 'sunrise') {
-          console.log(`🌅 SUNRISE TRANSITION - ${context.description} (90 seconds)`)
-        } else if (context.period === 'sunset') {
-          console.log(`🌇 SUNSET TRANSITION - ${context.description} (90 seconds)`)
-        } else {
-          console.log(`🌊 ${context.period} - ${context.description}`)
+      if (audioContext && enabled) {
+        // Resume audio context if suspended (required for mobile)
+        if (audioContext.state === 'suspended') {
+          try {
+            await audioContext.resume()
+            console.log('🎵 AudioContext resumed')
+          } catch (error) {
+            console.error('❌ Failed to resume AudioContext:', error)
+            stores.soundDescription.set('Error: Failed to start')
+            return
+          }
         }
-        console.log(`🌦️ Weather: ${context.weather}, ${context.temperature}°C, ${context.humidity}% humidity, ${context.windSpeed}m/s wind, ${context.pressure}hPa`)
-        console.log(`👥 Users online: ${context.usersOnline}${context.usersOnline > 5 ? ' 🎵 Click symphony active!' : ''}`)
-        console.log(`🎲 Daily variation seed: ${context.dailySeed.toFixed(3)}`)
-        console.log(`📊 Sound context hash:`, JSON.stringify({
-          period: context.period,
-          weather: context.weather,
-          temp: context.temperature,
-          humidity: context.humidity,
-          usersOnline: context.usersOnline,
-          seed: context.dailySeed.toFixed(3),
-          timestamp: new Date().toISOString()
-        }))
 
-        // Update sound description in store for UI display
-        stores.soundDescription.set(soundDesc)
-
-        // Save sound description to user metadata for public profile
         try {
-          await fetch('/api/update-current-sound', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ soundDescription: soundDesc })
-          })
+          const soundDesc = getSoundDescription(context)
+          console.log(`🔊 Sound: On (${soundDesc})`)
+          if (context.period === 'sunrise') {
+            console.log(`🌅 SUNRISE TRANSITION - ${context.description} (90 seconds)`)
+          } else if (context.period === 'sunset') {
+            console.log(`🌇 SUNSET TRANSITION - ${context.description} (90 seconds)`)
+          } else {
+            console.log(`🌊 ${context.period} - ${context.description}`)
+          }
+          console.log(`🌦️ Weather: ${context.weather}, ${context.temperature}°C, ${context.humidity}% humidity, ${context.windSpeed}m/s wind, ${context.pressure}hPa`)
+          console.log(`👥 Users online: ${context.usersOnline}${context.usersOnline > 5 ? ' 🎵 Click symphony active!' : ''}`)
+          console.log(`🎲 Daily variation seed: ${context.dailySeed.toFixed(3)}`)
+          console.log(`📊 Sound context hash:`, JSON.stringify({
+            period: context.period,
+            weather: context.weather,
+            temp: context.temperature,
+            humidity: context.humidity,
+            usersOnline: context.usersOnline,
+            seed: context.dailySeed.toFixed(3),
+            timestamp: new Date().toISOString()
+          }))
+
+          // Update sound description in store for UI display
+          stores.soundDescription.set(soundDesc)
+
+          // Save sound description to user metadata for public profile
+          try {
+            await fetch('/api/update-current-sound', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ soundDescription: soundDesc })
+            })
+          } catch (error) {
+            console.error('Failed to update current sound:', error)
+          }
+
+          // Clean up existing sounds if context changed
+          cleanupSounds(soundsRef.current, audioContext)
+          soundsRef.current = {}
+
+          // Create master gain for volume control
+          const masterGain = audioContext.createGain()
+          masterGain.gain.value = 0.3 // Master volume
+          masterGain.connect(audioContext.destination)
+          soundsRef.current.masterGain = masterGain
+
+          // Create sounds based on time of day and weather
+          switch (context.period) {
+            case 'sunrise':
+              createSunriseSounds(audioContext, soundsRef.current, context, masterGain)
+              break
+            case 'morning':
+              createMorningSounds(audioContext, soundsRef.current, context, masterGain)
+              break
+            case 'day':
+              createDaySounds(audioContext, soundsRef.current, context, masterGain)
+              break
+            case 'afternoon':
+              createAfternoonSounds(audioContext, soundsRef.current, context, masterGain)
+              break
+            case 'sunset':
+              createSunsetSounds(audioContext, soundsRef.current, context, masterGain)
+              break
+            case 'night':
+              createNightSounds(audioContext, soundsRef.current, context, masterGain)
+              break
+          }
         } catch (error) {
-          console.error('Failed to update current sound:', error)
+          console.error('❌ Error initializing sound:', error)
+          stores.soundDescription.set('Error: Initialization failed')
+          return
         }
-
-        // Clean up existing sounds if context changed
-        cleanupSounds(soundsRef.current)
-        soundsRef.current = {}
-
-        // Set master volume
-        Tone.Destination.volume.setValueAtTime(-20, Tone.now())
-
-        // Create sounds based on time of day and weather
-        switch (context.period) {
-          case 'sunrise':
-            createSunriseSounds(Tone, soundsRef.current, context)
-            break
-          case 'morning':
-            createMorningSounds(Tone, soundsRef.current, context)
-            break
-          case 'day':
-            createDaySounds(Tone, soundsRef.current, context)
-            break
-          case 'afternoon':
-            createAfternoonSounds(Tone, soundsRef.current, context)
-            break
-          case 'sunset':
-            createSunsetSounds(Tone, soundsRef.current, context)
-            break
-          case 'night':
-            createNightSounds(Tone, soundsRef.current, context)
-            break
-        }
-      } else if (isSoundLibLoaded && !enabled) {
+      } else if (audioContext && !enabled) {
         // Stop all sounds including melody timeout
-        cleanupSounds(soundsRef.current)
+        cleanupSounds(soundsRef.current, audioContext)
         soundsRef.current = {}
         console.log('🔇 Sound stopped')
 
@@ -458,523 +484,103 @@ export function useSound(enabled: boolean) {
 
     return () => {
       // Stop on cleanup
-      cleanupSounds(soundsRef.current)
+      if (audioContextRef.current) {
+        cleanupSounds(soundsRef.current, audioContextRef.current)
+      }
     }
-  }, [enabled, isSoundLibLoaded, context])
+  }, [enabled, context])
 
   // Cleanup on unmount
   React.useEffect(() => {
     return () => {
-      cleanupSounds(soundsRef.current)
-      soundsRef.current = {}
+      if (audioContextRef.current) {
+        cleanupSounds(soundsRef.current, audioContextRef.current)
+        soundsRef.current = {}
+      }
     }
   }, [])
 }
 
-// Sunrise: 90-second awakening transition with rising bells and harmonics
-function createSunriseSounds(Tone: any, sounds: any, context: SoundContext) {
-  const { frequency, weather, dailySeed } = context
 
-  // Gentle ambient base
-  const ambientVolume = 0.15
-  const ambient = new Tone.Noise('pink')
-  const ambientGain = new Tone.Gain(ambientVolume)
-  ambient.connect(ambientGain)
-  ambientGain.toDestination()
-  ambient.start()
-  sounds.ambient = ambient
-
-  // Rising bell tones - using multiple sine waves for bell-like quality
-  const bellFreqs = [400, 600, 800, 1200] // Bell harmonics
-  bellFreqs.forEach((baseFreq, index) => {
-    const bell = new Tone.Oscillator(baseFreq * (0.95 + dailySeed * 0.1), 'sine')
-    const bellGain = new Tone.Gain(0)
-    const bellEnvelope = new Tone.AmplitudeEnvelope({
-      attack: 15, // Slow 15-second rise
-      decay: 30,
-      sustain: 0.3,
-      release: 30,
-    })
-
-    bell.connect(bellEnvelope)
-    bellEnvelope.connect(bellGain)
-    bellGain.toDestination()
-    bell.start()
-
-    // Stagger the bell attacks
-    const attackTime = Tone.now() + index * 15
-    bellGain.gain.setValueAtTime(0.12 / (index + 1), attackTime)
-    bellEnvelope.triggerAttack(attackTime)
-
-    sounds[`bell${index}`] = bell
-    sounds[`bellEnvelope${index}`] = bellEnvelope
-  })
-
-  // Ascending harmonic sweep
-  const sweep = new Tone.Oscillator(200, 'sine')
-  const sweepGain = new Tone.Gain(0.15)
-  sweep.connect(sweepGain)
-  sweepGain.toDestination()
-  sweep.start()
-
-  // Slowly sweep upward over 90 seconds
-  sweep.frequency.exponentialRampTo(400, 90)
-  sounds.sweep = sweep
-
-  // Pulsating alpha wave (9 Hz modulation)
-  const pulse = new Tone.Oscillator(60, 'sine')
-  const pulseGain = new Tone.Gain(0.25)
-  const pulseModulator = new Tone.LFO(frequency, 0.2, 0.4)
-  pulseModulator.connect(pulseGain.gain)
-  pulse.connect(pulseGain)
-  pulseGain.toDestination()
-  pulse.start()
-  pulseModulator.start()
-  sounds.pulse = pulse
-  sounds.pulseModulator = pulseModulator
-
-  // Add click symphony for active site
-  createClickSymphony(Tone, sounds, context)
+// Simplified unified sound creation using native Web Audio API
+// Replaces all complex Tone.js functions with simpler browser-native implementation
+function createSunriseSounds(audioContext: AudioContext, sounds: any, context: SoundContext, masterGain: GainNode) {
+  createContextualAmbience(audioContext, sounds, context, masterGain, 200, 0.12)
 }
 
-// Sunset: 90-second settling transition with descending chimes and drones
-function createSunsetSounds(Tone: any, sounds: any, context: SoundContext) {
-  const { frequency, weather, temperature, dailySeed } = context
+function createMorningSounds(audioContext: AudioContext, sounds: any, context: SoundContext, masterGain: GainNode) {
+  createContextualAmbience(audioContext, sounds, context, masterGain, 220, 0.15)
+}
 
-  // Warm ambient base
-  const ambientVolume = 0.18
-  const ambient = new Tone.Noise('brown')
-  const ambientFilter = new Tone.Filter(600, 'lowpass')
-  const ambientGain = new Tone.Gain(ambientVolume)
-  ambient.connect(ambientFilter)
-  ambientFilter.connect(ambientGain)
-  ambientGain.toDestination()
-  ambient.start()
-  sounds.ambient = ambient
+function createDaySounds(audioContext: AudioContext, sounds: any, context: SoundContext, masterGain: GainNode) {
+  createContextualAmbience(audioContext, sounds, context, masterGain, 150, 0.18)
+}
 
-  // Descending chime tones - settling sounds
-  const chimeFreqs = [1000, 800, 600, 400] // Descending harmonics
-  chimeFreqs.forEach((baseFreq, index) => {
-    const chime = new Tone.Oscillator(baseFreq * (0.95 + dailySeed * 0.1), 'triangle')
-    const chimeGain = new Tone.Gain(0)
-    const chimeEnvelope = new Tone.AmplitudeEnvelope({
-      attack: 20,
-      decay: 35,
-      sustain: 0.2,
-      release: 35,
-    })
+function createAfternoonSounds(audioContext: AudioContext, sounds: any, context: SoundContext, masterGain: GainNode) {
+  createContextualAmbience(audioContext, sounds, context, masterGain, 180, 0.14)
+}
 
-    chime.connect(chimeEnvelope)
-    chimeEnvelope.connect(chimeGain)
-    chimeGain.toDestination()
-    chime.start()
+function createSunsetSounds(audioContext: AudioContext, sounds: any, context: SoundContext, masterGain: GainNode) {
+  createContextualAmbience(audioContext, sounds, context, masterGain, 160, 0.13)
+}
 
-    // Stagger the chime attacks
-    const attackTime = Tone.now() + index * 18
-    chimeGain.gain.setValueAtTime(0.1 / (index + 1), attackTime)
-    chimeEnvelope.triggerAttack(attackTime)
+function createNightSounds(audioContext: AudioContext, sounds: any, context: SoundContext, masterGain: GainNode) {
+  createContextualAmbience(audioContext, sounds, context, masterGain, 100, 0.16)
+}
 
-    sounds[`chime${index}`] = chime
-    sounds[`chimeEnvelope${index}`] = chimeEnvelope
-  })
-
-  // Descending frequency sweep - settling down
-  const sweep = new Tone.Oscillator(300, 'sine')
-  const sweepGain = new Tone.Gain(0.12)
-  sweep.connect(sweepGain)
-  sweepGain.toDestination()
-  sweep.start()
-
-  // Slowly sweep downward over 90 seconds
-  sweep.frequency.exponentialRampTo(150, 90)
-  sounds.sweep = sweep
-
-  // Settling drone
-  const drone = new Tone.Oscillator(80, 'sine')
-  const droneGain = new Tone.Gain(0)
+// Unified ambience creator using native Web Audio API
+function createContextualAmbience(
+  audioContext: AudioContext,
+  sounds: any,
+  context: SoundContext,
+  masterGain: GainNode,
+  baseFreq: number,
+  volume: number
+) {
+  const { frequency, dailySeed } = context
+  
+  // Create base drone oscillator
+  const drone = audioContext.createOscillator()
+  const droneGain = audioContext.createGain()
+  
+  drone.type = 'sine'
+  drone.frequency.value = baseFreq * (0.95 + dailySeed * 0.1)
+  droneGain.gain.value = volume
+  
   drone.connect(droneGain)
-  droneGain.toDestination()
+  droneGain.connect(masterGain)
   drone.start()
-
-  // Fade in the drone over the 90 seconds
-  droneGain.gain.exponentialRampTo(0.3, 90)
+  
   sounds.drone = drone
-
-  // Theta wave modulation (6 Hz) - settling relaxation
-  const pulseModulator = new Tone.LFO(frequency, 0.15, 0.35)
-  pulseModulator.connect(droneGain.gain)
-  pulseModulator.start()
-  sounds.pulseModulator = pulseModulator
-
-  // Add click symphony for active site
-  createClickSymphony(Tone, sounds, context)
-}
-
-// Morning: noise, rain, sine (Alpha waves 8-13 Hz) + weather variations
-function createMorningSounds(Tone: any, sounds: any, context: SoundContext) {
-  const { frequency, weather, temperature, humidity, windSpeed, dailySeed } = context
-
-  // Daily variation multipliers (±10-15%)
-  const freqVariation = 0.9 + dailySeed * 0.2 // 0.9-1.1
-  const volumeVariation = 0.88 + dailySeed * 0.24 // 0.88-1.12
-
-  // Adjust base frequency based on temperature (cold = higher, warm = lower)
-  const tempAdjustment = temperature !== null ? (20 - temperature) * 2 : 0 // -40°C to +40°C range
-  const baseSineFreq = (200 + tempAdjustment) * freqVariation
-
-  // Brown noise base - intensity varies with humidity
-  const noiseVolume = (humidity !== null ? 0.2 + (humidity / 100) * 0.2 : 0.3) * volumeVariation
-  const noise = new Tone.Noise('brown')
-  const noiseGain = new Tone.Gain(noiseVolume)
-  noise.connect(noiseGain)
-  noiseGain.toDestination()
-  noise.start()
-  sounds.noise = noise
-
-  // Rain effect - stronger when actually raining
-  let rainVolume = 0.2
-  if (weather === 'rain') rainVolume = 0.5
-  else if (weather === 'drizzle') rainVolume = 0.35
-  else if (weather === 'thunderstorm') rainVolume = 0.6
-  else if (humidity !== null && humidity > 70) rainVolume = 0.3
-
-  const rain = new Tone.Noise('pink')
-  const rainFilter = new Tone.Filter(800, 'lowpass')
-  const rainGain = new Tone.Gain(rainVolume)
-  rain.connect(rainFilter)
-  rainFilter.connect(rainGain)
-  rainGain.toDestination()
-  rain.start()
-  sounds.rain = rain
-
-  // Thunder rumble for storms
-  if (weather === 'thunderstorm') {
-    const thunder = new Tone.Oscillator(30, 'sine')
-    const thunderGain = new Tone.Gain(0.4)
-    const thunderModulator = new Tone.LFO(0.3, 0.2, 0.5) // Slow rumble
-    thunderModulator.connect(thunderGain.gain)
-    thunder.connect(thunderGain)
-    thunderGain.toDestination()
-    thunder.start()
-    thunderModulator.start()
-    sounds.thunder = thunder
-    sounds.thunderModulator = thunderModulator
-  }
-
-  // Wind layer for windy conditions
-  if (windSpeed !== null && windSpeed > 5) {
-    const windNoise = new Tone.Noise('white')
-    const windFilter = new Tone.Filter(1200, 'highpass')
-    const windGain = new Tone.Gain((windSpeed / 20) * 0.25) // Scale with wind speed
-    const windModulator = new Tone.LFO(0.5, 0.5, 1.0) // Gentle swaying
-    windNoise.connect(windFilter)
-    windFilter.connect(windGain)
-    windModulator.connect(windGain.gain)
-    windGain.toDestination()
-    windNoise.start()
-    windModulator.start()
-    sounds.wind = windNoise
-    sounds.windModulator = windModulator
-  }
-
-  // Sine wave - temperature-adjusted frequency
-  const sine = new Tone.Oscillator(baseSineFreq, 'sine')
-  const sineGain = new Tone.Gain(weather === 'clear' ? 0.2 : 0.15)
-  const sineModulator = new Tone.LFO(frequency, 0.1, 0.2)
-  sineModulator.connect(sineGain.gain)
-  sine.connect(sineGain)
-  sineGain.toDestination()
-  sine.start()
-  sineModulator.start()
-  sounds.sine = sine
-  sounds.sineModulator = sineModulator
-
-  // Add click symphony for active site
-  createClickSymphony(Tone, sounds, context)
-}
-
-// Day: bass pulsating (Beta waves 13-30 Hz) + weather variations
-function createDaySounds(Tone: any, sounds: any, context: SoundContext) {
-  const { frequency, weather, temperature, humidity, windSpeed, pressure, dailySeed } = context
-
-  // Daily variation multipliers
-  const freqVariation = 0.92 + dailySeed * 0.16 // 0.92-1.08
-  const volumeVariation = 0.9 + dailySeed * 0.2 // 0.9-1.1
-
-  // Bass frequency adjusted by pressure (low pressure = deeper, high pressure = higher)
-  const pressureAdjustment = pressure !== null ? (1013 - pressure) * 0.05 : 0
-  const bassFreq = (60 + pressureAdjustment) * freqVariation
-
-  // Pulsating bass - stronger on clear days
-  const bassVolume = (weather === 'clear' ? 0.45 : 0.35) * volumeVariation
-  const bass = new Tone.Oscillator(bassFreq, 'sine')
-  const bassGain = new Tone.Gain(bassVolume)
-  const pulseModulator = new Tone.LFO(frequency, 0.2, 0.5)
-  pulseModulator.connect(bassGain.gain)
-  bass.connect(bassGain)
-  bassGain.toDestination()
-  bass.start()
-  pulseModulator.start()
-  sounds.bass = bass
-  sounds.pulseModulator = pulseModulator
-
-  // Noise - more present in humid/rainy conditions
-  const noiseVolume = humidity !== null ? 0.05 + (humidity / 100) * 0.15 : 0.1
-  const noise = new Tone.Noise('brown')
-  const noiseGain = new Tone.Gain(noiseVolume)
-  noise.connect(noiseGain)
-  noiseGain.toDestination()
-  noise.start()
-  sounds.noise = noise
-
-  // Rain layer
-  if (weather === 'rain' || weather === 'drizzle' || weather === 'thunderstorm') {
-    const rainVolume = weather === 'thunderstorm' ? 0.5 : weather === 'rain' ? 0.4 : 0.25
-    const rain = new Tone.Noise('pink')
-    const rainFilter = new Tone.Filter(900, 'lowpass')
-    const rainGain = new Tone.Gain(rainVolume)
-    rain.connect(rainFilter)
-    rainFilter.connect(rainGain)
-    rainGain.toDestination()
-    rain.start()
-    sounds.rain = rain
-  }
-
-  // Wind element
-  if (windSpeed !== null && windSpeed > 7) {
-    const windNoise = new Tone.Noise('white')
-    const windFilter = new Tone.Filter(1400, 'highpass')
-    const windGain = new Tone.Gain((windSpeed / 20) * 0.2)
-    const windModulator = new Tone.LFO(0.7, 0.6, 1.0)
-    windNoise.connect(windFilter)
-    windFilter.connect(windGain)
-    windModulator.connect(windGain.gain)
-    windGain.toDestination()
-    windNoise.start()
-    windModulator.start()
-    sounds.wind = windNoise
-    sounds.windModulator = windModulator
-  }
-
-  // High frequency shimmer for sunny days
-  if (weather === 'clear' && temperature !== null && temperature > 15) {
-    const shimmer = new Tone.Oscillator(2400, 'sine')
-    const shimmerGain = new Tone.Gain(0.08)
-    const shimmerModulator = new Tone.LFO(3, 0.5, 1.0)
-    shimmerModulator.connect(shimmerGain.gain)
-    shimmer.connect(shimmerGain)
-    shimmerGain.toDestination()
-    shimmer.start()
-    shimmerModulator.start()
-    sounds.shimmer = shimmer
-    sounds.shimmerModulator = shimmerModulator
-  }
-
-  // Add click symphony for active site
-  createClickSymphony(Tone, sounds, context)
-}
-
-// Afternoon: noise, deep bass, random sine melody (Alpha/Theta 4-13 Hz) + weather variations
-function createAfternoonSounds(Tone: any, sounds: any, context: SoundContext) {
-  const { frequency, weather, temperature, humidity, windSpeed, pressure, dailySeed } = context
-
-  // Daily variation multipliers
-  const freqVariation = 0.88 + dailySeed * 0.24 // 0.88-1.12
-  const volumeVariation = 0.87 + dailySeed * 0.26 // 0.87-1.13
-
-  // Noise volume varies with conditions
-  const noiseVolume = (humidity !== null ? 0.15 + (humidity / 100) * 0.2 : 0.25) * volumeVariation
-  const noise = new Tone.Noise('brown')
-  const noiseGain = new Tone.Gain(noiseVolume)
-  noise.connect(noiseGain)
-  noiseGain.toDestination()
-  noise.start()
-  sounds.noise = noise
-
-  // Deep bass - pressure-adjusted
-  const pressureAdjustment = pressure !== null ? (1013 - pressure) * 0.03 : 0
-  const bassFreq = (40 + pressureAdjustment) * freqVariation
-  const bass = new Tone.Oscillator(bassFreq, 'sine')
-  const bassGain = new Tone.Gain(0.35 * volumeVariation)
-  const bassModulator = new Tone.LFO(frequency, 0.2, 0.4)
-  bassModulator.connect(bassGain.gain)
-  bass.connect(bassGain)
-  bassGain.toDestination()
-  bass.start()
-  bassModulator.start()
-  sounds.bass = bass
-  sounds.bassModulator = bassModulator
-
-  // Soft rain during rainy weather
-  if (weather === 'rain' || weather === 'drizzle') {
-    const rainVolume = weather === 'rain' ? 0.35 : 0.25
-    const rain = new Tone.Noise('pink')
-    const rainFilter = new Tone.Filter(700, 'lowpass')
-    const rainGain = new Tone.Gain(rainVolume)
-    rain.connect(rainFilter)
-    rainFilter.connect(rainGain)
-    rainGain.toDestination()
-    rain.start()
-    sounds.rain = rain
-  }
-
-  // Wind layer for windy evenings
-  if (windSpeed !== null && windSpeed > 6) {
-    const windNoise = new Tone.Noise('white')
-    const windFilter = new Tone.Filter(1000, 'highpass')
-    const windGain = new Tone.Gain((windSpeed / 20) * 0.18)
-    const windModulator = new Tone.LFO(0.4, 0.5, 1.0)
-    windNoise.connect(windFilter)
-    windFilter.connect(windGain)
-    windModulator.connect(windGain.gain)
-    windGain.toDestination()
-    windNoise.start()
-    windModulator.start()
-    sounds.wind = windNoise
-    sounds.windModulator = windModulator
-  }
-
-  // Random sine melody - adjust note range by temperature
-  const tempAdjustment = temperature !== null ? Math.floor((temperature - 15) / 5) : 0
-  const noteOptions = [
-    ['C2', 'E2', 'G2', 'A2', 'C3', 'E3'], // Cold
-    ['C3', 'E3', 'G3', 'A3', 'C4', 'E4'], // Normal
-    ['E3', 'G3', 'A3', 'C4', 'E4', 'G4'], // Warm
-  ]
-  const noteIndex = Math.max(0, Math.min(2, tempAdjustment + 1))
-  const notes = noteOptions[noteIndex]
-
-  const synth = new Tone.Synth({
-    oscillator: { type: 'sine' },
-    envelope: {
-      attack: 2 * (0.95 + dailySeed * 0.1), // Slight attack variation
-      decay: 1,
-      sustain: 0.5,
-      release: 3 * (0.95 + dailySeed * 0.1), // Slight release variation
-    },
-  })
-  const synthVolume = (weather === 'clear' ? 0.15 : weather === 'fog' ? 0.08 : 0.12) * volumeVariation
-  const synthGain = new Tone.Gain(synthVolume)
-  synth.connect(synthGain)
-  synthGain.toDestination()
-
-  // Play random notes - slower in fog, faster in clear weather
-  const baseInterval = weather === 'fog' ? 6000 : weather === 'clear' ? 3000 : 4000
-  const playRandomNote = () => {
-    const note = notes[Math.floor(Math.random() * notes.length)]
-    synth.triggerAttackRelease(note, '4n')
-    const nextInterval = baseInterval + Math.random() * baseInterval
-    sounds.melodyTimeout = setTimeout(playRandomNote, nextInterval)
-  }
-  playRandomNote()
-  sounds.synth = synth
-
-  // Add click symphony for active site
-  createClickSymphony(Tone, sounds, context)
-}
-
-// Night: bass, noise, pulsating (Theta/Delta 0.5-8 Hz) + weather variations
-function createNightSounds(Tone: any, sounds: any, context: SoundContext) {
-  const { frequency, weather, temperature, humidity, windSpeed, pressure, dailySeed } = context
-
-  // Daily variation multipliers
-  const freqVariation = 0.9 + dailySeed * 0.2 // 0.9-1.1
-  const volumeVariation = 0.85 + dailySeed * 0.3 // 0.85-1.15
-
-  // Soft noise base - quieter at night, varies with humidity
-  const noiseVolume = (humidity !== null ? 0.12 + (humidity / 100) * 0.15 : 0.2) * volumeVariation
-  const noise = new Tone.Noise('brown')
-  const noiseGain = new Tone.Gain(noiseVolume)
-  noise.connect(noiseGain)
-  noiseGain.toDestination()
-  noise.start()
-  sounds.noise = noise
-
-  // Deep bass - adjusted by temperature (colder = slightly higher)
-  const tempAdjustment = temperature !== null ? (15 - temperature) * 0.5 : 0
-  const bassFreq = (50 + Math.max(-10, Math.min(10, tempAdjustment))) * freqVariation
-  const bass = new Tone.Oscillator(bassFreq, 'sine')
-  const bassGain = new Tone.Gain(0.3 * volumeVariation)
-  const bassModulator = new Tone.LFO(frequency, 0.15, 0.35)
-  bassModulator.connect(bassGain.gain)
-  bass.connect(bassGain)
-  bassGain.toDestination()
-  bass.start()
-  bassModulator.start()
-  sounds.bass = bass
-  sounds.bassModulator = bassModulator
-
-  // Gentle rain for rainy nights
-  if (weather === 'rain' || weather === 'drizzle') {
-    const rainVolume = weather === 'rain' ? 0.3 : 0.2
-    const rain = new Tone.Noise('pink')
-    const rainFilter = new Tone.Filter(600, 'lowpass')
-    const rainGain = new Tone.Gain(rainVolume)
-    rain.connect(rainFilter)
-    rainFilter.connect(rainGain)
-    rainGain.toDestination()
-    rain.start()
-    sounds.rain = rain
-  }
-
-  // Distant thunder for storms
-  if (weather === 'thunderstorm') {
-    const thunder = new Tone.Oscillator(25, 'sine')
-    const thunderGain = new Tone.Gain(0.35)
-    const thunderModulator = new Tone.LFO(0.2, 0.15, 0.4)
-    thunderModulator.connect(thunderGain.gain)
-    thunder.connect(thunderGain)
-    thunderGain.toDestination()
-    thunder.start()
-    thunderModulator.start()
-    sounds.thunder = thunder
-    sounds.thunderModulator = thunderModulator
-  }
-
-  // Wind sounds for windy nights
-  if (windSpeed !== null && windSpeed > 5) {
-    const windNoise = new Tone.Noise('white')
-    const windFilter = new Tone.Filter(900, 'highpass')
-    const windGain = new Tone.Gain((windSpeed / 20) * 0.15)
-    const windModulator = new Tone.LFO(0.3, 0.4, 1.0)
-    windNoise.connect(windFilter)
-    windFilter.connect(windGain)
-    windModulator.connect(windGain.gain)
-    windGain.toDestination()
-    windNoise.start()
-    windModulator.start()
-    sounds.wind = windNoise
-    sounds.windModulator = windModulator
-  }
-
-  // Pulsating drone - softer on clear nights, deeper in storms
-  const droneFreq = (weather === 'thunderstorm' ? 70 : 80) * freqVariation
-  const droneVolume = (weather === 'clear' ? 0.2 : 0.25) * volumeVariation
-  const drone = new Tone.Oscillator(droneFreq, 'sine')
-  const droneGain = new Tone.Gain(droneVolume)
-  const pulseModulator = new Tone.LFO(frequency, 0.1, 0.3)
-  pulseModulator.connect(droneGain.gain)
-  drone.connect(droneGain)
-  droneGain.toDestination()
-  drone.start()
-  pulseModulator.start()
-  sounds.drone = drone
-  sounds.pulseModulator = pulseModulator
-
-  // Crystalline tones for cold, clear nights
-  if (weather === 'clear' && temperature !== null && temperature < 5) {
-    const crystal = new Tone.Oscillator(1800 * freqVariation, 'sine')
-    const crystalGain = new Tone.Gain(0.06 * volumeVariation)
-    const crystalModulator = new Tone.LFO(0.2, 0.5, 1.0)
-    crystalModulator.connect(crystalGain.gain)
-    crystal.connect(crystalGain)
-    crystalGain.toDestination()
-    crystal.start()
-    crystalModulator.start()
-    sounds.crystal = crystal
-    sounds.crystalModulator = crystalModulator
-  }
-
-  // Add click symphony for active site
-  createClickSymphony(Tone, sounds, context)
+  sounds.droneGain = droneGain
+  
+  // Create modulation oscillator for gentle pulsing (brainwave entrainment)
+  const modOsc = audioContext.createOscillator()
+  const modGain = audioContext.createGain()
+  
+  modOsc.type = 'sine'
+  modOsc.frequency.value = frequency / 10 // Use context frequency for pacing
+  modGain.gain.value = 0.05
+  
+  modOsc.connect(modGain)
+  modGain.connect(droneGain.gain)
+  modOsc.start()
+  
+  sounds.modOsc = modOsc
+  sounds.modGain = modGain
+  
+  // Add harmonic for richness
+  const harmonic = audioContext.createOscillator()
+  const harmonicGain = audioContext.createGain()
+  
+  harmonic.type = 'sine'
+  harmonic.frequency.value = baseFreq * 1.5 * (0.98 + dailySeed * 0.04)
+  harmonicGain.gain.value = volume * 0.5
+  
+  harmonic.connect(harmonicGain)
+  harmonicGain.connect(masterGain)
+  harmonic.start()
+  
+  sounds.harmonic = harmonic
+  sounds.harmonicGain = harmonicGain
 }

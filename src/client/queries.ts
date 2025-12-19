@@ -89,7 +89,19 @@ export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
 })
 
+export const useVisitorStats = createQuery<{
+  totalSiteVisitors: number
+  userProfileVisits: number
+}>('/api/visitor-stats', {
+  refetchOnWindowFocus: false,
+})
+
 export const useLogs = createQuery<Log[]>('/api/logs')
+
+export const useCreateLog = createMutation<{ text: string }, Log>(
+  'post',
+  '/api/logs'
+)
 
 export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
   'put',
@@ -97,11 +109,16 @@ export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
 )
 
 export const useMemory = () => {
-  const date = btoa(dayjs().format(DATE_TIME_FORMAT))
+  // Use date only (no time) to prevent regenerating questions multiple times per day
+  const date = btoa(dayjs().format('YYYY-MM-DD'))
   const path = '/api/memory'
   return useQuery<any>(
-    [path],
-    async () => (await api.get<any>(path, { params: { d: date } })).data
+    [path, date], // Include date in query key for proper caching
+    async () => (await api.get<any>(path, { params: { d: date } })).data,
+    {
+      staleTime: Infinity, // Never refetch - question is valid for the whole day
+      cacheTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
+    }
   )
 }
 

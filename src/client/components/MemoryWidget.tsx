@@ -99,7 +99,7 @@ export function MemoryWidget() {
           )}
         >
           <div className="mb-16">{question?.question || '...'}</div>
-          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-8 sm:-mb-8">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-8 sm:-mb-8 -ml-4">
             {(question?.options || []).map((option) => (
               <Button
                 key={option}

@@ -1,4 +1,5 @@
 export * as fp from './fp.js'
+export * from './astrology.js'
 
 export class EventEmitter {
   private listeners: { [key: string]: Function[] } = {}

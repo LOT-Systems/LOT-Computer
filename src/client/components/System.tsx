@@ -12,9 +12,13 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
+import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
+import { useVisitorStats } from '#client/queries'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
+import { RecipeWidget } from './RecipeWidget'
+import { checkRecipeWidget } from '#client/stores/recipeWidget'
 
 export const System = () => {
   const me = useStore(stores.me)
@@ -25,6 +29,8 @@ export const System = () => {
   const usersTotal = useStore(stores.usersTotal)
   const usersOnline = useStore(stores.usersOnline)
   const liveMessage = useStore(stores.liveMessage)
+
+  const { data: visitorStats } = useVisitorStats()
 
   const isTempFahrenheit = useStore(stores.isTempFahrenheit)
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
@@ -89,6 +95,28 @@ export const System = () => {
     return { sunrise, sunset }
   }, [weather, isTimeFormat12h])
 
+  // Astrology calculations
+  const astrology = React.useMemo(() => {
+    const now = new Date()
+    const hourlyZodiac = getHourlyZodiac(now)
+    const westernZodiac = getWesternZodiac(now)
+    const moonPhase = getMoonPhase(now)
+    const rokuyo = getRokuyo(now)
+
+    return {
+      hourlyZodiac,
+      westernZodiac,
+      moonPhase: moonPhase.phase,
+      moonIllumination: moonPhase.illumination,
+      rokuyo,
+    }
+  }, [])
+
+  // Check for recipe suggestions when component mounts
+  React.useEffect(() => {
+    checkRecipeWidget()
+  }, [])
+
   // Sound is now managed globally in app.tsx via useSound hook
 
   // const AdminLink = React.useMemo<
@@ -144,10 +172,23 @@ export const System = () => {
         </Block>
       </div>
 
+      {/* Visitor Statistics */}
+      {visitorStats && (
+        <div>
+          <Block label="Total LOT visitors:">
+            {formatNumberWithCommas(visitorStats.totalSiteVisitors)}
+          </Block>
+          <Block label="My OS visitors:">
+            {formatNumberWithCommas(visitorStats.userProfileVisits)}
+          </Block>
+        </div>
+      )}
+
       <div>
         <TimeWidget />
         {!!weather && (
           <>
+            <Block label="Sky:">{weather?.description || 'Unknown'}</Block>
             <Block label="Humidity:">
               <span
                 className={cn(
@@ -175,13 +216,32 @@ export const System = () => {
       </div>
 
       <div>
+        <Block label="Astrology:">
+          <div className="inline-block">
+            {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
+          </div>
+        </Block>
+      </div>
+
+      <div>
         <Block
           label="Mirror:"
           onClick={() => stores.isMirrorOn.set(!isMirrorOn)}
         >
           {isMirrorOn ? 'On' : 'Off'}
         </Block>
-        <Block label="Sound:" onClick={() => stores.isSoundOn.set(!isSoundOn)}>
+        <Block label="Sound:" onClick={async () => {
+          const newValue = !isSoundOn
+          // @ts-ignore - Tone.js loaded via external script
+          if (newValue && window.Tone) {
+            try {
+              await window.Tone.start()
+            } catch (e) {
+              console.error('Failed to start Tone.context:', e)
+            }
+          }
+          stores.isSoundOn.set(newValue)
+        }}>
           {isSoundOn ? (soundDescription ? `On (${soundDescription})` : 'On') : 'Off'}
         </Block>
         <Block label="Breathe:" onClick={() => setIsBreatheOn(!isBreatheOn)}>
@@ -194,6 +254,8 @@ export const System = () => {
           <Block label="Live:" blockView children={liveMessage} />
         </div>
       )}
+
+      <RecipeWidget />
 
       <MemoryWidget />
     </div>

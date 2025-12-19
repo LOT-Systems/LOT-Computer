@@ -14,6 +14,7 @@ type Props = {
 export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
   const me = useStore(stores.me)
   const layoutView = useStore(stores.layoutView)
+  const isMirrorOn = useStore(stores.isMirrorOn)
   const none = React.useMemo(() => () => {}, [])
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/'
   const navLinks = React.useMemo<NavItem[]>(() => {
@@ -74,7 +75,9 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
                     kind="secondary-rounded"
                     className={cn(
                       'mb-4 flex-shrink-0',
-                      isActive && 'bg-acc text-bac hover:bg-acc/90'
+                      isActive && (isMirrorOn
+                        ? 'bg-white hover:bg-white/90 [&>*]:mix-blend-difference [&>*]:text-white'
+                        : 'bg-acc text-bac hover:bg-acc/90')
                     )}
                     onClick={!link.href ? none : undefined}
                     disabled={!link.href}

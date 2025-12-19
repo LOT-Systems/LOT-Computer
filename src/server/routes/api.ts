@@ -25,7 +25,7 @@ import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
-import { buildPrompt, completeAndExtractQuestion, generateMemoryStory } from '#server/utils/memory'
+import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import dayjs from '#server/utils/dayjs'
 
 export default async (fastify: FastifyInstance) => {
@@ -117,6 +117,94 @@ export default async (fastify: FastifyInstance) => {
     const metadata = req.user.metadata || {}
     req.user.deferredPing()
     return { ...profile, isAdmin, metadata }
+  })
+
+  // Memory prompt status - debugging endpoint
+  fastify.get('/memory-status', async (req: FastifyRequest<{ Querystring: { d?: string } }>, reply) => {
+    try {
+      // Get user's local time from query parameter (like sync endpoint)
+      let localDate = dayjs()
+      if (req.query.d) {
+        try {
+          localDate = dayjs(atob(req.query.d), DATE_TIME_FORMAT)
+        } catch {
+          // Invalid date, use server time
+        }
+      }
+
+      const pacingInfo = await calculateIntelligentPacing(
+        req.user.id,
+        localDate,
+        fastify.models
+      )
+
+      const hour = localDate.hour()
+      const isWeekend = localDate.day() === 0 || localDate.day() === 6
+
+      // Time windows removed - prompts available 24/7
+      const timeWindow = 'All day (24/7)'
+
+      // Check if recently asked (last 2 hours)
+      const twoHoursAgo = dayjs().subtract(2, 'hour')
+      const recentAnswerCount = await fastify.models.Answer.count({
+        where: {
+          userId: req.user.id,
+          createdAt: {
+            [Op.gte]: twoHoursAgo.toDate(),
+          },
+        },
+      })
+
+      return {
+        currentTime: localDate.format('h:mm A'),
+        currentHour: hour,
+        isWeekend,
+        timeWindow,
+        shouldShowPrompt: pacingInfo.shouldShowPrompt,
+        promptsShownToday: pacingInfo.promptsShownToday,
+        promptQuotaToday: pacingInfo.promptQuotaToday,
+        remainingToday: pacingInfo.promptQuotaToday - pacingInfo.promptsShownToday,
+        dayNumber: pacingInfo.dayNumber,
+        answeredInLast2Hours: recentAnswerCount > 0,
+        nextPromptAvailable: pacingInfo.shouldShowPrompt && recentAnswerCount === 0,
+        blockReason: !pacingInfo.shouldShowPrompt
+          ? 'Daily quota reached'
+          : recentAnswerCount > 0
+            ? 'Answered within last 2 hours'
+            : null,
+      }
+    } catch (error: any) {
+      console.error('Memory status error:', error)
+      return {
+        error: error.message,
+      }
+    }
+  })
+
+  // Visitor statistics endpoint
+  fastify.get('/visitor-stats', async (req: FastifyRequest, reply) => {
+    try {
+      // Get total site visitors from a global counter
+      const globalStats = await fastify.models.User.findOne({
+        where: { email: 'system@lot' } // Special system user for global stats
+      })
+
+      const totalVisitors = globalStats?.metadata?.totalSiteVisitors || 0
+
+      // Get current user's profile visits
+      const userProfileVisits = req.user.metadata?.profileVisits || 0
+
+      return {
+        totalSiteVisitors: totalVisitors,
+        userProfileVisits: userProfileVisits
+      }
+    } catch (error) {
+      console.error('Error fetching visitor stats:', error)
+      return {
+        totalSiteVisitors: 0,
+        userProfileVisits: 0
+      }
+    }
   })
 
   fastify.post(
@@ -512,6 +600,33 @@ export default async (fastify: FastifyInstance) => {
     return logs
   })
 
+  fastify.post(
+    '/logs',
+    async (
+      req: FastifyRequest<{
+        Body: { text: string }
+      }>,
+      reply
+    ) => {
+      const text = (req.body.text || '').trim().slice(0, MAX_LOG_TEXT_LENGTH)
+      if (!text) return reply.throw.badParams('Log text is required')
+
+      const log = await fastify.models.Log.create({
+        userId: req.user.id,
+        text,
+        event: 'note',
+      })
+
+      // Add context asynchronously
+      process.nextTick(async () => {
+        const context = await getLogContext(req.user)
+        await log.set({ context }).save()
+      })
+
+      return log
+    }
+  )
+
   fastify.put(
     '/logs/:id',
     async (
@@ -576,16 +691,40 @@ export default async (fastify: FastifyInstance) => {
         periodEdges[1].add(localDateShift, 'minute'),
       ]
       const isNightPeriod = periodEdges[0].hour() === EVENING_HOUR
+
+      // INTELLIGENT PACING: Determine daily prompt quota and timing
+      const { shouldShowPrompt, isWeekend, promptQuotaToday, promptsShownToday } =
+        await calculateIntelligentPacing(req.user.id, localDate, fastify.models)
+
+      console.log(`📊 Intelligent Pacing Analysis:`, {
+        userId: req.user.id,
+        shouldShowPrompt,
+        isWeekend,
+        promptQuotaToday,
+        promptsShownToday,
+        currentTime: localDate.format('HH:mm'),
+        dayOfWeek: localDate.format('dddd')
+      })
+
+      if (!shouldShowPrompt) {
+        console.log(`⏸️ Skipping prompt: quota reached or bad timing`)
+        return null
+      }
+
+      // Check if a prompt was shown in the last 2 hours (not entire period)
+      const twoHoursAgo = now.subtract(2, 'hour')
       const isRecentlyAsked = await fastify.models.Answer.count({
         where: {
           userId: req.user.id,
           createdAt: {
-            [Op.gte]: utcPeriodEdges[0].toDate(),
-            [Op.lte]: utcPeriodEdges[1].toDate(),
+            [Op.gte]: twoHoursAgo.toDate(),
           },
         },
       }).then(Boolean)
-      if (isRecentlyAsked) return null
+      if (isRecentlyAsked) {
+        console.log(`⏸️ Skipping prompt: answered within last 2 hours`)
+        return null
+      }
 
       // Check if user has Usership tag for AI-generated questions
       const hasUsershipTag = req.user.tags.some(
@@ -612,7 +751,7 @@ export default async (fastify: FastifyInstance) => {
             limit: 20,
           })
 
-          const prompt = await buildPrompt(req.user, logs)
+          const prompt = await buildPrompt(req.user, logs, isWeekend)
           const question = await completeAndExtractQuestion(prompt, req.user)
 
           return question
@@ -814,6 +953,143 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
+  // Get user's cohort profile based on their answers
+  fastify.get('/user-profile', async (req: FastifyRequest, reply) => {
+    try {
+      // Check if user has Usership tag
+      const hasUsershipTag = req.user.tags.some(
+        (tag) => tag.toLowerCase() === 'usership'
+      )
+
+      if (!hasUsershipTag) {
+        return {
+          hasUsership: false,
+          message: 'Subscribe to Usership to unlock profile analysis'
+        }
+      }
+
+      // Get answer logs
+      const logs = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: 'answer',
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 30,
+      })
+
+      if (logs.length === 0) {
+        return {
+          hasUsership: true,
+          message: 'Complete Memory questions to generate your profile',
+          answerCount: 0
+        }
+      }
+
+      // Extract traits and determine psychological archetype + behavioral cohort
+      const analysis = extractUserTraits(logs)
+      const { traits, patterns, psychologicalDepth } = analysis
+      const cohortResult = determineUserCohort(traits, patterns, psychologicalDepth)
+
+      console.log(`🧠 Profile request for ${req.user.email}:`, {
+        archetype: cohortResult.archetype,
+        behavioralCohort: cohortResult.behavioralCohort,
+        traits,
+        values: psychologicalDepth.values,
+        selfAwareness: psychologicalDepth.selfAwareness,
+        answerCount: logs.length
+      })
+
+      return {
+        hasUsership: true,
+        // Psychological depth (soul level)
+        archetype: cohortResult.archetype,
+        archetypeDescription: cohortResult.description,
+        coreValues: psychologicalDepth.values.map(v => v.charAt(0).toUpperCase() + v.slice(1)),
+        emotionalPatterns: psychologicalDepth.emotionalPatterns.map(p => p.replace(/([A-Z])/g, ' $1').trim()),
+        selfAwarenessLevel: psychologicalDepth.selfAwareness,
+        // Behavioral patterns (surface level)
+        behavioralCohort: cohortResult.behavioralCohort,
+        behavioralTraits: traits.map(t => t.replace(/([A-Z])/g, ' $1').trim()),
+        patternStrength: Object.entries(patterns)
+          .filter(([_, v]) => v > 0)
+          .map(([k, v]) => ({ trait: k.replace(/([A-Z])/g, ' $1').trim(), count: v }))
+          .sort((a, b) => b.count - a.count),
+        // Meta
+        answerCount: logs.length,
+        noteCount: logs.filter(l => l.event === 'note' && l.text && l.text.length > 20).length
+      }
+    } catch (error: any) {
+      console.error('❌ Error generating user profile:', {
+        error: error.message,
+        userId: req.user?.id,
+      })
+      return {
+        hasUsership: false,
+        error: 'Unable to generate profile at this time'
+      }
+    }
+  })
+
+  // Generate contextual recipe suggestion
+  fastify.get(
+    '/recipe-suggestion',
+    async (
+      req: FastifyRequest<{
+        Querystring: { mealTime: 'breakfast' | 'lunch' | 'dinner' | 'snack' }
+      }>,
+      reply
+    ) => {
+      try {
+        const mealTime = req.query.mealTime
+        if (!mealTime || !['breakfast', 'lunch', 'dinner', 'snack'].includes(mealTime)) {
+          return reply.throw.badParams('Invalid mealTime. Must be breakfast, lunch, dinner, or snack')
+        }
+
+        console.log(`📋 Recipe suggestion request for ${mealTime} from user ${req.user.email}`)
+
+        // Get recent logs for personalization (if user has Usership tag)
+        const hasUsershipTag = req.user.tags.some(
+          (tag) => tag.toLowerCase() === 'usership'
+        )
+
+        let logs: any[] = []
+        if (hasUsershipTag) {
+          // Get ALL logs (answers + notes) for deeper psychological analysis
+          logs = await fastify.models.Log.findAll({
+            where: {
+              userId: req.user.id,
+            },
+            order: [['createdAt', 'DESC']],
+            limit: 50,  // Increased to capture more context including notes
+          })
+        }
+
+        const recipe = await generateRecipeSuggestion(req.user, mealTime, logs)
+
+        console.log(`✅ Recipe suggestion generated: "${recipe}"`)
+
+        return {
+          recipe,
+          mealTime,
+          hasUsership: hasUsershipTag
+        }
+      } catch (error: any) {
+        console.error('❌ Error generating recipe suggestion:', {
+          error: error.message,
+          stack: error.stack,
+          userId: req.user?.id,
+        })
+        // Return fallback recipe
+        return {
+          recipe: 'Simple fresh salad with seasonal ingredients',
+          mealTime: req.query.mealTime,
+          error: 'Using fallback suggestion',
+        }
+      }
+    }
+  )
+
   // Generate daily world element
   fastify.post('/world/generate-element', async (req, reply) => {
     try {
@@ -844,15 +1120,24 @@ export default async (fastify: FastifyInstance) => {
       }
 
       // Get user context for generation
-      const logs = await fastify.models.Log.findUserLogs(req.user, 90)
+      const logs = await fastify.models.Log.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 90
+      })
       const memoryStory = await generateMemoryStory(req.user, logs)
 
       // Get weather context
       let weatherContext = 'temperate climate'
       try {
-        const weatherData = await weather.fetchWeather(req.user, fastify.models)
-        if (weatherData) {
-          weatherContext = `${weatherData.description}, ${Math.round(weatherData.tempKelvin - 273.15)}°C`
+        if (req.user.city && req.user.country) {
+          const coordinates = await weather.getCoordinates(req.user.city, req.user.country)
+          if (coordinates) {
+            const weatherData = await weather.getWeather(coordinates.lat, coordinates.lon)
+            if (weatherData && weatherData.tempKelvin !== null) {
+              weatherContext = `${weatherData.description}, ${Math.round(weatherData.tempKelvin - 273.15)}°C`
+            }
+          }
         }
       } catch (e) {
         // Ignore weather errors

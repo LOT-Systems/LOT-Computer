@@ -2,6 +2,8 @@ import * as React from 'react'
 import { Block, Button, GhostButton, Page } from '#client/components/ui'
 import { cn } from '#client/utils'
 import { useDocumentTitle } from '#client/utils/hooks'
+import dayjs from 'dayjs'
+import { DATE_TIME_FORMAT } from '#shared/constants'
 
 interface SystemCheck {
   name: string
@@ -25,8 +27,24 @@ interface StatusPageProps {
   noWrapper?: boolean
 }
 
+interface MemoryStatus {
+  currentTime: string
+  currentHour: number
+  isWeekend: boolean
+  timeWindow: string
+  shouldShowPrompt: boolean
+  promptsShownToday: number
+  promptQuotaToday: number
+  remainingToday: number
+  dayNumber: number
+  answeredInLast2Hours: boolean
+  nextPromptAvailable: boolean
+  blockReason: string | null
+}
+
 export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
   const [status, setStatus] = React.useState<StatusData | null>(null)
+  const [memoryStatus, setMemoryStatus] = React.useState<MemoryStatus | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = React.useState<Date>(new Date())
@@ -37,12 +55,28 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
     try {
       setLoading(true)
       setError(null)
+
+      // Fetch public system status
       const response = await fetch('/api/public/status')
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
       const data = await response.json()
       setStatus(data)
+
+      // Try to fetch memory status (authenticated)
+      try {
+        const localTime = btoa(dayjs().format(DATE_TIME_FORMAT))
+        const memResponse = await fetch(`/api/memory-status?d=${localTime}`)
+        if (memResponse.ok) {
+          const memData = await memResponse.json()
+          setMemoryStatus(memData)
+        }
+      } catch {
+        // Not logged in or endpoint unavailable
+        setMemoryStatus(null)
+      }
+
       setLastUpdate(new Date())
     } catch (err: any) {
       setError(err.message || 'Failed to fetch status')
@@ -175,6 +209,44 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
               </Block>
             ))}
           </div>
+
+          {memoryStatus && (
+            <div className="mb-16 pt-32 border-t border-acc/20">
+              <div className="mb-16">Memory Prompts (Your Status):</div>
+              <Block label="Current time:" labelClassName="!pl-0">
+                {memoryStatus.currentTime}
+              </Block>
+              <Block label="Time window:" labelClassName="!pl-0">
+                <span className={cn(
+                  memoryStatus.timeWindow === 'OUTSIDE TIME WINDOWS' && 'text-acc/60'
+                )}>
+                  {memoryStatus.timeWindow}
+                </span>
+              </Block>
+              <Block label="Day number:" labelClassName="!pl-0">
+                Day {memoryStatus.dayNumber}
+              </Block>
+              <Block label="Today's quota:" labelClassName="!pl-0">
+                {memoryStatus.promptsShownToday} / {memoryStatus.promptQuotaToday} prompts
+                {memoryStatus.remainingToday > 0 && (
+                  <span className="text-acc/60"> ({memoryStatus.remainingToday} remaining)</span>
+                )}
+              </Block>
+              <Block label="Next prompt:" labelClassName="!pl-0">
+                <div className="flex items-center gap-x-8">
+                  <span>{memoryStatus.nextPromptAvailable ? '✓' : '✕'}</span>
+                  <span className={cn(
+                    memoryStatus.nextPromptAvailable ? 'text-acc' : 'text-acc/60'
+                  )}>
+                    {memoryStatus.nextPromptAvailable ? 'Available now' : 'Not available'}
+                  </span>
+                </div>
+                {memoryStatus.blockReason && (
+                  <div className="text-acc/60 mt-4">Reason: {memoryStatus.blockReason}</div>
+                )}
+              </Block>
+            </div>
+          )}
 
           <div className="text-acc/40 pt-32 border-t border-acc/20">
             <div>Build: {formatDate(status.buildDate)}</div>

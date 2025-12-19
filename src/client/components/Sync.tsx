@@ -135,9 +135,11 @@ export const Sync = () => {
     (userId: string) => (ev: React.MouseEvent | React.TouchEvent) => {
       ev?.preventDefault()
       ev?.stopPropagation()
-      window.location.href = `/us/${userId}`
+      // Usership users go to /us/u (internal profile within /us context)
+      // Regular users go to /u (public profile for sharing)
+      window.location.href = canAccessUserProfiles ? `/us/u/${userId}` : `/u/${userId}`
     },
-    []
+    [canAccessUserProfiles]
   )
 
   const onKeyDown = React.useCallback(
@@ -212,7 +214,7 @@ export const Sync = () => {
               )}
               onClick={onToggleLike(x.id)}
             >
-              {authorId && canAccessUserProfiles ? (
+              {authorId ? (
                 <GhostButton
                   className="whitespace-nowrap pr-4"
                   onClick={onNavigateToUserProfile(authorId)}
@@ -236,8 +238,8 @@ export const Sync = () => {
               {!!x.likes && (
                 <Tag
                   className={cn(
-                    'text-acc/40 border-acc/40 select-none',
-                    !x.isLiked && 'border-transparent'
+                    'text-acc/40 select-none -mt-[2px]',
+                    x.isLiked ? 'border-acc/40' : 'border-transparent'
                   )}
                   title="Click message to like/unlike"
                   key={`${x.id}_${x.isLiked}`}

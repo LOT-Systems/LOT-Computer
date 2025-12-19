@@ -2,9 +2,11 @@ import { FastifyInstance } from 'fastify'
 import { sequelize } from '#server/utils/db'
 import { models } from '#server/models'
 import * as weather from '#server/utils/weather'
+import { extractUserTraits, determineUserCohort } from '#server/utils/memory'
 import config from '#server/config'
 import fs from 'fs'
 import path from 'path'
+import dayjs from 'dayjs'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -593,32 +595,56 @@ export default async (fastify: FastifyInstance) => {
     console.log('[PUBLIC-PROFILE-API] Fetching profile for:', userIdOrUsername)
 
     try {
-      // Try to find user by ID or custom URL
-      let user = await models.User.findOne({
-        where: { id: userIdOrUsername }
-      })
-      console.log('[PUBLIC-PROFILE-API] User found by ID:', !!user)
+      // Prioritize custom URL over ID to avoid conflicts
+      // First, try to find user by custom URL in metadata
+      console.log('[PUBLIC-PROFILE-API] Searching for custom URL:', userIdOrUsername)
+      const users = await models.User.findAll()
+      let user = users.find(u => {
+        const customUrl = u.metadata?.privacy?.customUrl
+        return customUrl === userIdOrUsername
+      }) || null
 
-      // If not found by ID, try custom URL in metadata
+      if (user) {
+        console.log('[PUBLIC-PROFILE-API] ✓ User found by custom URL')
+        console.log('[PUBLIC-PROFILE-API] User ID:', user.id)
+      }
+
+      // If not found by custom URL, try by user ID
       if (!user) {
-        const users = await models.User.findAll()
-        user = users.find(u =>
-          u.metadata?.privacy?.customUrl === userIdOrUsername
-        ) || null
-        console.log('[PUBLIC-PROFILE-API] User found by custom URL:', !!user)
+        console.log('[PUBLIC-PROFILE-API] Custom URL not found, trying by ID')
+        user = await models.User.findOne({
+          where: { id: userIdOrUsername }
+        })
+        if (user) {
+          console.log('[PUBLIC-PROFILE-API] ✓ User found by ID:', user.id)
+        }
       }
 
       if (!user) {
-        console.log('[PUBLIC-PROFILE-API] ❌ User not found')
+        console.log('[PUBLIC-PROFILE-API] ❌ User not found for:', userIdOrUsername)
         return reply.code(404).send({
           error: 'User not found',
-          message: 'No public profile exists for this user'
+          message: `No public profile exists for user: ${userIdOrUsername}`,
+          debug: {
+            searchedFor: userIdOrUsername,
+            searchMethods: ['By ID', 'By custom URL in metadata']
+          }
         })
       }
 
+      console.log('[PUBLIC-PROFILE-API] ✓ User found!')
+      console.log('[PUBLIC-PROFILE-API] User details:', {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        hasMetadata: !!user.metadata,
+        metadata: user.metadata
+      })
+
       // Get privacy settings from metadata (with defaults)
+      // All profiles are public by default
       const privacy: any = user.metadata?.privacy || {
-        isPublicProfile: false,
+        isPublicProfile: true,
         showWeather: true,
         showLocalTime: true,
         showCity: true,
@@ -645,11 +671,26 @@ export default async (fastify: FastifyInstance) => {
 
       console.log('[PUBLIC-PROFILE-API] ✓ Profile is public, building response')
 
+      // Increment profile visit counter
+      const currentVisits = user.metadata?.profileVisits || 0
+      const newVisits = currentVisits + 1
+      await models.User.update(
+        {
+          metadata: {
+            ...user.metadata,
+            profileVisits: newVisits
+          }
+        },
+        { where: { id: user.id } }
+      )
+
       // Build public profile response
       const profile: any = {
         firstName: user.firstName,
         lastName: user.lastName,
         privacySettings: privacy,
+        tags: user.tags || [], // Add user tags
+        profileVisits: newVisits, // Add visit count
       }
 
       // Add city/country if enabled
@@ -664,7 +705,7 @@ export default async (fastify: FastifyInstance) => {
           const now = new Date()
           profile.localTime = now.toLocaleString('en-US', {
             timeZone: user.timeZone || 'UTC',
-            hour: '2-digit',
+            hour: 'numeric',
             minute: '2-digit',
             hour12: true,
           })
@@ -707,8 +748,9 @@ export default async (fastify: FastifyInstance) => {
         profile.soundDescription = user.metadata.currentSound
       }
 
-      // Add memory story if enabled
-      if (privacy.showMemoryStory) {
+      // Add memory story if enabled (only for Usership users)
+      const hasUsershipTag = user.tags?.some((tag) => tag.toLowerCase() === 'usership')
+      if (privacy.showMemoryStory && hasUsershipTag) {
         try {
           // Get latest memory story from user metadata
           if (user.metadata?.memoryStory) {
@@ -719,12 +761,105 @@ export default async (fastify: FastifyInstance) => {
         }
       }
 
+      // Add psychological profile (for Usership users)
+      if (hasUsershipTag) {
+        try {
+          // Get answer logs for psychological analysis
+          const logs = await models.Log.findAll({
+            where: {
+              userId: user.id,
+              event: 'answer',
+            },
+            order: [['createdAt', 'DESC']],
+            limit: 30,
+          })
+
+          // Get note/journal entry count separately
+          const noteCount = await models.Log.count({
+            where: {
+              userId: user.id,
+              event: 'note',
+            },
+          })
+
+          if (logs.length === 0) {
+            profile.psychologicalProfile = {
+              hasUsership: true,
+              message: 'Complete Memory questions to generate profile',
+              answerCount: 0,
+              noteCount: noteCount
+            }
+          } else {
+            // Extract traits and determine psychological archetype + behavioral cohort
+            const analysis = extractUserTraits(logs)
+            const { traits, patterns, psychologicalDepth } = analysis
+            const cohortResult = determineUserCohort(traits, patterns, psychologicalDepth)
+
+            // Calculate OS version (months since user joined)
+            const monthsSinceJoined = dayjs().diff(dayjs(user.createdAt), 'month')
+            const osVersion = String(monthsSinceJoined).padStart(3, '0')
+
+            // Calculate Pattern Strength Index with engagement weighting
+            const totalPatternMatches = Object.values(patterns).reduce((sum, count) => sum + count, 0)
+            const daysSinceJoined = dayjs().diff(dayjs(user.createdAt), 'day')
+            const engagementFactor = Math.min(1.5, Math.max(0.5, daysSinceJoined / 30))
+            const patternStrengthIndex = Math.round(totalPatternMatches * engagementFactor)
+
+            // Helper to format camelCase to Title Case
+            const formatTrait = (str: string): string => {
+              const formatted = str.replace(/([A-Z])/g, ' $1').trim()
+              return formatted.charAt(0).toUpperCase() + formatted.slice(1)
+            }
+
+            profile.psychologicalProfile = {
+              hasUsership: true,
+              version: osVersion,
+              // Psychological depth (soul level)
+              archetype: cohortResult.archetype,
+              archetypeDescription: cohortResult.description,
+              coreValues: psychologicalDepth.values.map((v: string) => v.charAt(0).toUpperCase() + v.slice(1)),
+              emotionalPatterns: psychologicalDepth.emotionalPatterns.map((p: string) => formatTrait(p)),
+              selfAwarenessLevel: psychologicalDepth.selfAwareness,
+              // Behavioral patterns (surface level)
+              behavioralCohort: cohortResult.behavioralCohort,
+              behavioralTraits: traits.map((t: string) => formatTrait(t)),
+              patternStrengthIndex: patternStrengthIndex,
+              patternStrength: Object.entries(patterns)
+                .filter(([_, v]) => v > 0)
+                .map(([k, v]) => ({ trait: formatTrait(k), count: v as number }))
+                .sort((a, b) => b.count - a.count),
+              // Meta
+              answerCount: logs.length,
+              noteCount: noteCount
+            }
+          }
+        } catch (error) {
+          console.error('[PUBLIC-PROFILE-API] Error generating psychological profile:', error)
+          // Profile generation failed, set basic response
+          profile.psychologicalProfile = {
+            hasUsership: true,
+            message: 'Profile temporarily unavailable'
+          }
+        }
+      } else {
+        // Non-Usership users don't get psychological profiles
+        profile.psychologicalProfile = {
+          hasUsership: false,
+          message: 'Subscribe to Usership to unlock profile analysis'
+        }
+      }
+
       return profile
     } catch (error: any) {
-      console.error('Public profile error:', error)
+      console.error('[PUBLIC-PROFILE-API] ❌ Error:', error)
+      console.error('[PUBLIC-PROFILE-API] Error stack:', error.stack)
       return reply.code(500).send({
         error: 'Internal server error',
-        message: 'Failed to fetch public profile'
+        message: error.message || 'Failed to fetch public profile',
+        debug: {
+          errorType: error.constructor.name,
+          errorMessage: error.message,
+        }
       })
     }
   })

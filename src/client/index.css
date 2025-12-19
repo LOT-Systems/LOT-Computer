@@ -32,6 +32,14 @@ input:-webkit-autofill {
     font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   }
 
+  /* Ensure all form elements inherit the font */
+  input,
+  select,
+  textarea,
+  button {
+    @apply font-base;
+  }
+
   *:focus {
     @apply outline-none;
   }
@@ -46,13 +54,17 @@ input:-webkit-autofill {
 }
 
 /* Custom blink animation for log push warning */
+/* Fast satisfying blink before push */
 @keyframes blink {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.2; }
+  0% { opacity: 0.4; }
+  33% { opacity: 0.2; }
+  66% { opacity: 0.4; }
+  100% { opacity: 0.2; }
 }
 
 .animate-blink {
-  animation: blink 0.8s ease-in-out 3;
+  animation: blink 0.5s ease-in-out;
+  animation-fill-mode: forwards;
 }
 
 ._table::-webkit-scrollbar-track,

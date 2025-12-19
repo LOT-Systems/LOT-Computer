@@ -37,7 +37,7 @@ fastify.register(fastifyHelmet, {
     useDefaults: config.env === 'production',
     directives: {
       'default-src': ["'self'"],
-      'connect-src': ["'self'", 'http://127.0.0.1:*'],
+      'connect-src': ["'self'", 'http://127.0.0.1:*', 'https://unpkg.com', 'https://cdnjs.cloudflare.com'],
       'font-src': ["'self'", 'https://rsms.me'],
       'form-action': ["'self'"],
       'frame-src': [
@@ -50,7 +50,8 @@ fastify.register(fastifyHelmet, {
         "'unsafe-inline'",
         'https://www.youtube.com/iframe_api',
         'https://www.youtube.com',
-        'https://unpkg.com/tone',
+        'https://unpkg.com',
+        'https://cdnjs.cloudflare.com',
       ],
       'style-src': ["'self'", 'https://rsms.me'],
       'img-src': ['*', 'data:'],
@@ -117,6 +118,17 @@ fastify.addHook('onRequest', async (req, reply) => {
   if (req.url.startsWith('/u/')) {
     console.log('[GLOBAL] Request to:', req.method, req.url)
   }
+})
+
+// Prevent HTML caching to ensure fresh CSP headers on every load
+fastify.addHook('onSend', async (req, reply, payload) => {
+  const contentType = reply.getHeader('content-type')
+  if (contentType && contentType.toString().includes('text/html')) {
+    reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    reply.header('Pragma', 'no-cache')
+    reply.header('Expires', '0')
+  }
+  return payload
 })
 
 // Database
@@ -255,10 +267,10 @@ fastify.register(async (fastify: FastifyInstance) => {
       })
     })
 
-    // Admin app
+    // Admin app (accessible by Admin, Usership, and R&D users)
     fastify.register(async (fastify) => {
       fastify.addHook('onRequest', async (req, reply) => {
-        if (!req.user || !req.user.isAdmin()) {
+        if (!req.user || !req.user.canAccessUsSection()) {
           return reply.redirect('/')
         }
       })
