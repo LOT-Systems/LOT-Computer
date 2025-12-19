@@ -165,6 +165,9 @@ export async function buildPrompt(user: User, logs: Log[], isWeekend: boolean = 
   // Extract Memory answers to build user's story
   const memoryLogs = logs.filter((log) => log.event === 'answer')
 
+  // Extract journal entries for deeper persona research
+  const journalLogs = logs.filter((log) => log.event === 'note' && log.text && log.text.length > 20)
+
   // Extract traits and determine psychological archetype + behavioral cohort
   let cohortInfo = ''
   let archetype = ''
@@ -196,7 +199,8 @@ CRITICAL: Use this SOUL-LEVEL understanding to craft questions that speak to the
         values: psychologicalDepth.values,
         emotionalPatterns: psychologicalDepth.emotionalPatterns,
         selfAwareness: psychologicalDepth.selfAwareness,
-        answerCount: memoryLogs.length
+        answerCount: memoryLogs.length,
+        journalCount: journalLogs.length
       })
     }
   }
@@ -286,6 +290,22 @@ ${userStory ? '\n\nWhat we know about the user so far:\n' + userStory : ''}`
 - Seasonal preferences`
   } else if (shouldExploreNewTopic) {
     // Show story but ask to explore NEW topic
+    const journalInsights = journalLogs.length > 0 ? `
+
+Journal Entries (their deeper thoughts and reflections):
+${journalLogs
+  .slice(0, 8)
+  .map((log, index) => {
+    const text = (log.text || '').substring(0, 200) // First 200 chars for context
+    const date = log.context.timeZone
+      ? dayjs(log.createdAt).tz(log.context.timeZone).format('D MMM')
+      : ''
+    return `${index + 1}. ${date ? `[${date}] ` : ""}"${text}${text.length >= 200 ? '...' : ''}"`
+  })
+  .join('\n')}
+
+These journal entries reveal their inner world - use them to understand their emotional state, concerns, and aspirations.` : ''
+
     userStory = `
 User's Memory Story (what we know about them so far):
 ${memoryLogs
@@ -298,9 +318,9 @@ ${memoryLogs
       : ''
     return `${index + 1}. ${date ? `[${date}] ` : ""}${q} → User chose: "${a}"`
   })
-  .join('\n')}
+  .join('\n')}${journalInsights}
 
-Based on these answers, we're building their story. Now let's explore a NEW area of their life that we haven't asked about yet.`
+Based on these answers and journal entries, we're building their story. Now let's explore a NEW area of their life that we haven't asked about yet.`
 
     taskInstructions = `
 **Your task:** Generate ONE question that EXPLORES A NEW TOPIC AREA we haven't covered yet:
@@ -343,6 +363,22 @@ Tailor your question to their soul archetype "${archetype}":
 The question should speak to their SOUL LEVEL, not just surface behaviors. Make them think, feel, and reflect on who they truly are.` : ''}`
   } else {
     // Follow up on existing answers
+    const journalInsights = journalLogs.length > 0 ? `
+
+Journal Entries (their deeper thoughts and reflections):
+${journalLogs
+  .slice(0, 8)
+  .map((log, index) => {
+    const text = (log.text || '').substring(0, 200) // First 200 chars for context
+    const date = log.context.timeZone
+      ? dayjs(log.createdAt).tz(log.context.timeZone).format('D MMM')
+      : ''
+    return `${index + 1}. ${date ? `[${date}] ` : ""}"${text}${text.length >= 200 ? '...' : ''}"`
+  })
+  .join('\n')}
+
+These journal entries reveal their inner world, emotional patterns, and personal reflections. Use them to ask questions that acknowledge what's truly on their mind.` : ''
+
     userStory = `
 User's Memory Story (what we know about them based on previous answers):
 ${memoryLogs
@@ -355,9 +391,9 @@ ${memoryLogs
       : ''
     return `${index + 1}. ${date ? `[${date}] ` : ""}${q} → User chose: "${a}"`
   })
-  .join('\n')}
+  .join('\n')}${journalInsights}
 
-Based on these answers, you can infer the user's preferences, habits, and lifestyle. Use this knowledge to craft follow-up questions that show you remember their choices.`
+Based on these answers and journal entries, you can infer the user's preferences, habits, lifestyle, and inner emotional state. Use this knowledge to craft follow-up questions that show you remember their choices AND understand what matters to them.`
 
     // COMPRESSED FORMAT for repetitive follow-ups (3+ questions on same topic)
     if (isRepetitiveFollowUp) {
@@ -388,8 +424,9 @@ Keep it SHORT and SIMPLE. The user is answering many prompts - make this quick a
 **CRITICAL: User-Feedback Loop Requirements:**
 - If they have previous answers, you MUST explicitly reference at least one in your new question
 - Show you remember what they told you - use phrases like "You mentioned...", "Since you prefer...", "Last time you chose...", "Building on your answer about..."
+- If they have journal entries, acknowledge their deeper thoughts and feelings - their journal reveals what truly matters to them
 - The question should feel like you're having an ongoing conversation, not starting fresh each time
-- Make connections between their different answers to show you understand their overall lifestyle
+- Make connections between their different answers AND journal reflections to show you understand their overall lifestyle and inner world
 
 **Examples of good follow-up questions:**
 - "Since you mentioned enjoying tea in the morning, how do you usually prepare it?" (Options: Quick tea bag, Loose leaf ritual, Matcha ceremony)
