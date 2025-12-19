@@ -285,7 +285,7 @@ export const PublicProfile = () => {
                 {profile.psychologicalProfile.archetype && (
                   <div className="mb-24">
                     <div className="flex">
-                      <span className="inline-block" style={{ width: '200px' }}>Soul Archetype:</span>
+                      <span className="inline-block" style={{ width: '200px' }}>Soul archetype:</span>
                       <span className="flex-1">
                         {profile.psychologicalProfile.archetype}
                         {profile.psychologicalProfile.archetypeDescription && (
@@ -301,7 +301,7 @@ export const PublicProfile = () => {
                 {/* Self-Awareness Level */}
                 {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
                   <div className="flex mb-24">
-                    <span className="inline-block" style={{ width: '200px' }}>Self-Awareness:</span>
+                    <span className="inline-block" style={{ width: '200px' }}>Self-awareness:</span>
                     <span className="flex-1">{profile.psychologicalProfile.selfAwarenessLevel}/10</span>
                   </div>
                 )}
@@ -309,7 +309,7 @@ export const PublicProfile = () => {
                 {/* Core Values */}
                 {profile.psychologicalProfile.coreValues && profile.psychologicalProfile.coreValues.length > 0 && (
                   <div className="flex">
-                    <span className="inline-block" style={{ width: '200px' }}>Core Values:</span>
+                    <span className="inline-block" style={{ width: '200px' }}>Core values:</span>
                     <span className="flex-1">{profile.psychologicalProfile.coreValues.join(', ')}</span>
                   </div>
                 )}
@@ -317,7 +317,7 @@ export const PublicProfile = () => {
                 {/* Emotional Patterns */}
                 {profile.psychologicalProfile.emotionalPatterns && profile.psychologicalProfile.emotionalPatterns.length > 0 && (
                   <div className="flex">
-                    <span className="inline-block" style={{ width: '200px' }}>Emotional Patterns:</span>
+                    <span className="inline-block" style={{ width: '200px' }}>Emotional patterns:</span>
                     <span className="flex-1">{profile.psychologicalProfile.emotionalPatterns.join(', ')}</span>
                   </div>
                 )}
@@ -325,7 +325,7 @@ export const PublicProfile = () => {
                 {/* Behavioral Cohort */}
                 {profile.psychologicalProfile.behavioralCohort && (
                   <div className="flex">
-                    <span className="inline-block" style={{ width: '200px' }}>Behavioral Cohort:</span>
+                    <span className="inline-block" style={{ width: '200px' }}>Behavioral cohort:</span>
                     <span className="flex-1">{profile.psychologicalProfile.behavioralCohort}</span>
                   </div>
                 )}
@@ -333,7 +333,7 @@ export const PublicProfile = () => {
                 {/* Behavioral Traits */}
                 {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
                   <div className="flex mb-24">
-                    <span className="inline-block" style={{ width: '200px' }}>Behavioral Traits:</span>
+                    <span className="inline-block" style={{ width: '200px' }}>Behavioral traits:</span>
                     <span className="flex-1">{profile.psychologicalProfile.behavioralTraits.join(', ')}</span>
                   </div>
                 )}
@@ -342,7 +342,7 @@ export const PublicProfile = () => {
                 {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
                   <div>
                     <div className="flex mb-2">
-                      <span className="inline-block" style={{ width: '200px' }}>Pattern Strength:</span>
+                      <span className="inline-block" style={{ width: '200px' }}>Pattern strength:</span>
                       <span className="flex-1">{profile.psychologicalProfile.patternStrengthIndex || profile.psychologicalProfile.patternStrength.reduce((sum: number, item: { count: number }) => sum + item.count, 0)}</span>
                     </div>
                     {profile.psychologicalProfile.patternStrength.map((item: { trait: string; count: number }, idx: number) => (
