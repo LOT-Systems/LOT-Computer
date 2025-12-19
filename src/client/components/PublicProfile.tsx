@@ -283,13 +283,13 @@ export const PublicProfile = () => {
               <div className="space-y-3">
                 {/* Soul Archetype */}
                 {profile.psychologicalProfile.archetype && (
-                  <div className="mb-48">
+                  <div className="mb-24">
                     <div className="flex">
                       <span className="inline-block" style={{ width: '200px' }}>Soul Archetype:</span>
                       <span className="flex-1">
                         {profile.psychologicalProfile.archetype}
                         {profile.psychologicalProfile.archetypeDescription && (
-                          <div className="mt-2">
+                          <div className="mt-8">
                             {profile.psychologicalProfile.archetypeDescription}
                           </div>
                         )}
