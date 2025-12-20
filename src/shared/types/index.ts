@@ -211,6 +211,12 @@ export type PublicProfile = {
   privacySettings: UserPrivacySettings;
   tags?: string[];
   profileVisits?: number;
+  theme?: {
+    theme: string;
+    baseColor: string | null;
+    accentColor: string | null;
+    customThemeEnabled: boolean;
+  };
   psychologicalProfile?: {
     hasUsership: boolean;
     message?: string;

@@ -70,6 +70,54 @@ export const PublicProfile = () => {
       })
   }, [userIdOrUsername])
 
+  // Apply owner's theme when profile loads
+  React.useEffect(() => {
+    if (!profile?.theme) return
+
+    const { theme: themeName, baseColor, accentColor } = profile.theme
+    console.log('[PublicProfile] Applying theme:', themeName, baseColor, accentColor)
+
+    // Define theme colors (matching theme.ts THEMES)
+    const THEMES: Record<string, { base: string; acc: string }> = {
+      light: { base: '#ffffff', acc: '#000000' },
+      dark: { base: '#000000', acc: '#ffffff' },
+      sunrise: { base: '#ffd266', acc: '#ffffff' },
+      sunset: { base: '#FF8758', acc: '#ffffff' },
+      fill_blue: { base: '#82CBF8', acc: '#ffffff' },
+      light_red: { base: '#FFF9F9', acc: '#E86575' },
+    }
+
+    // Helper to convert hex to RGB
+    const hexToRgb = (hex: string): number[] | null => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+      return result ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16),
+      ] : null
+    }
+
+    // Get colors from theme or custom colors
+    let finalBaseColor: string
+    let finalAccentColor: string
+
+    if (themeName === 'custom' && baseColor && accentColor) {
+      finalBaseColor = baseColor
+      finalAccentColor = accentColor
+    } else {
+      const themeColors = THEMES[themeName] || THEMES.light
+      finalBaseColor = themeColors.base
+      finalAccentColor = themeColors.acc
+    }
+
+    // Apply colors to CSS custom properties
+    document.documentElement.style.setProperty('--base-color', finalBaseColor)
+    const accRgb = hexToRgb(finalAccentColor) || [0, 0, 0]
+    document.documentElement.style.setProperty('--acc-color-default', accRgb.join(' '))
+
+    console.log('[PublicProfile] Theme applied:', finalBaseColor, finalAccentColor)
+  }, [profile])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -140,7 +188,7 @@ export const PublicProfile = () => {
   const currentDate = dayjs().format('dddd, D MMMM, YYYY')
 
   return (
-    <div className="w-full mx-auto desktop:p-64 tablet:p-48 phone:p-32 p-16 min-h-screen">
+    <div className="max-w-2xl min-h-screen">
       <div className="flex flex-col gap-y-24">
         {/* Name */}
         <div>

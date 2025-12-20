@@ -849,6 +849,11 @@ export default async (fastify: FastifyInstance) => {
         }
       }
 
+      // Add theme settings if available
+      if (user.metadata?.theme) {
+        profile.theme = user.metadata.theme
+      }
+
       return profile
     } catch (error: any) {
       console.error('[PUBLIC-PROFILE-API] ❌ Error:', error)

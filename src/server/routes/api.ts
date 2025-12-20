@@ -277,6 +277,19 @@ export default async (fastify: FastifyInstance) => {
     }>, reply) => {
       const { theme, baseColor, accentColor, customThemeEnabled } = req.body
 
+      // Store theme in user metadata for public profile
+      const currentMetadata = req.user.metadata || {}
+      const updatedMetadata = {
+        ...currentMetadata,
+        theme: {
+          theme,
+          baseColor: baseColor || null,
+          accentColor: accentColor || null,
+          customThemeEnabled,
+        },
+      }
+      await req.user.set({ metadata: updatedMetadata }).save()
+
       // Log theme change asynchronously
       process.nextTick(async () => {
         const context = await getLogContext(req.user)
