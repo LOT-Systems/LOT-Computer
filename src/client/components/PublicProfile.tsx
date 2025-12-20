@@ -140,7 +140,7 @@ export const PublicProfile = () => {
   const currentDate = dayjs().format('dddd, D MMMM, YYYY')
 
   return (
-    <div className="max-w-2xl min-h-screen">
+    <div className="w-full mx-auto desktop:p-64 tablet:p-48 phone:p-32 p-16 min-h-screen">
       <div className="flex flex-col gap-y-24">
         {/* Name */}
         <div>

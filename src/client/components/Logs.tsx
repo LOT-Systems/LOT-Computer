@@ -69,6 +69,16 @@ export const Logs: React.FC = () => {
     localStore.logIds.set(newLogIds)
   }, [loadedLogs])
 
+  // Cleanup pending push timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (pendingPushRef.current) {
+        clearTimeout(pendingPushRef.current)
+        pendingPushRef.current = null
+      }
+    }
+  }, [])
+
   const onChangeLog = React.useCallback(
     (id: string) => (text: string) => {
       updateLog({ id, text })
