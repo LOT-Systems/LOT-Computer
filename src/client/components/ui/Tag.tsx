@@ -1,4 +1,6 @@
 import React, { useMemo } from 'react'
+import { useStore } from '@nanostores/react'
+import * as stores from '#client/stores'
 import { cn } from '#client/utils'
 import { Color } from '#shared/types'
 
@@ -16,6 +18,8 @@ export const Tag: React.FC<Props> = ({
   className,
   ...rest
 }) => {
+  const isMirrorOn = useStore(stores.isMirrorOn)
+
   const resultClassName = useMemo(() => {
     // For red color (Suspended tag), use red regardless of theme
     const isRed = color === 'red'
@@ -30,11 +34,13 @@ export const Tag: React.FC<Props> = ({
         : fill
         ? 'bg-acc text-bac'
         : 'border-acc text-acc',
+      // Mirror mode: force white text and border immediately
+      isMirrorOn && !isRed && 'text-white border-white',
       !!(href || rest.onClick) ? 'cursor-pointer' : '',
       !!rest.onClick && 'select-none',
       className
     )
-  }, [color, fill, className, href, rest.onClick])
+  }, [color, fill, className, href, rest.onClick, isMirrorOn])
   return href ? (
     <a href={href} className={resultClassName} {...rest} />
   ) : (
