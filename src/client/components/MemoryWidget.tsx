@@ -12,6 +12,7 @@ export function MemoryWidget() {
   const [isResponseShown, setIsResponseShown] = React.useState(false)
   const [question, setQuestion] = React.useState<MemoryQuestion | null>(null)
   const [response, setResponse] = React.useState<string | null>(null)
+  const [lastQuestionId, setLastQuestionId] = React.useState<string | null>(null)
 
   const { data: loadedQuestion = null } = useMemory()
 
@@ -56,7 +57,9 @@ export function MemoryWidget() {
   )
 
   React.useEffect(() => {
-    if (loadedQuestion) {
+    // Prevent showing the same question twice in a row
+    if (loadedQuestion && loadedQuestion.id !== lastQuestionId) {
+      setLastQuestionId(loadedQuestion.id)
       setTimeout(() => {
         setIsDisplayed(true)
         setTimeout(() => {
@@ -68,7 +71,7 @@ export function MemoryWidget() {
         }, 100)
       }, fp.randomElement([1200, 2100, 1650, 2800]))
     }
-  }, [loadedQuestion])
+  }, [loadedQuestion, lastQuestionId])
 
   React.useEffect(() => {
     if (response) {
