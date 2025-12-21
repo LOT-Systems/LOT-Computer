@@ -591,34 +591,41 @@ export default async (fastify: FastifyInstance) => {
       order: [['createdAt', 'DESC']],
     })
 
-    // CLEANUP: Delete duplicate empty notes (keep only the most recent one)
-    const emptyNotes = allLogs.filter(
-      (x) => x.event === 'note' && (!x.text || x.text.trim().length === 0)
-    )
+    // Helper function to check if a log is empty or has placeholder text
+    const isEmptyOrPlaceholder = (log: any) => {
+      if (log.event !== 'note') return false
+      if (!log.text || log.text.trim().length === 0) return true
+      // Check for placeholder text that appears in empty logs
+      const text = log.text.trim()
+      return text === 'The log record will be deleted' || text === 'The log will be deleted'
+    }
 
-    // If there are multiple empty notes, delete all except the first one
+    // CLEANUP: Delete duplicate empty/placeholder notes (keep only most recent)
+    const emptyNotes = allLogs.filter(isEmptyOrPlaceholder)
+
+    // Delete all except the first (most recent) empty note
     if (emptyNotes.length > 1) {
       const duplicateIds = emptyNotes.slice(1).map((x) => x.id)
       await fastify.models.Log.destroy({
         where: { id: duplicateIds },
       })
-      console.log(`🧹 Deleted ${duplicateIds.length} duplicate empty notes for user ${req.user.id}`)
+      console.log(`🧹 [AUTO-CLEANUP] Deleted ${duplicateIds.length} duplicate empty/placeholder notes for user ${req.user.id}`)
     }
 
-    // Filter logs: keep non-notes, notes with text, and the first empty note (for input)
-    const logs = allLogs.filter((x, i) =>
-      x.event !== 'note' || (x.text && x.text.trim().length > 0) || i === 0
-    )
+    // Filter logs: keep notes with actual content, non-note events, and first item (for input)
+    const logs = allLogs.filter((x, i) => {
+      if (x.event !== 'note') return true // Keep activity logs
+      if (i === 0) return true // Keep first item (will be empty note for input)
+      if (isEmptyOrPlaceholder(x)) return false // Exclude other empty/placeholder
+      return true // Keep notes with content
+    })
 
     const recentLog = logs[0]
-    // Create new empty log only if:
-    // - No recent log exists
-    // - Recent log is not a note
-    // - Recent log has text (saved) - push it down immediately
+    // Create new empty log only if needed (when top log has content)
     if (
       !recentLog ||
       recentLog.event !== 'note' ||
-      (recentLog.text && recentLog.text.trim().length > 0)
+      !isEmptyOrPlaceholder(recentLog)
     ) {
       const emptyLog = await fastify.models.Log.create({
         userId: req.user.id,
@@ -642,14 +649,27 @@ export default async (fastify: FastifyInstance) => {
       order: [['createdAt', 'DESC']],
     })
 
-    const emptyNotes = allLogs.filter((x) => !x.text || x.text.trim().length === 0)
+    // Check for empty or placeholder text
+    const isEmptyOrPlaceholder = (log: any) => {
+      if (!log.text || log.text.trim().length === 0) return true
+      const text = log.text.trim()
+      return text === 'The log record will be deleted' || text === 'The log will be deleted'
+    }
+
+    const emptyNotes = allLogs.filter(isEmptyOrPlaceholder)
+    const placeholderExamples = emptyNotes.slice(0, 5).map((x) => ({
+      id: x.id,
+      text: x.text || '(empty)',
+      createdAt: x.createdAt,
+    }))
 
     const diagnostics = {
       timestamp: new Date().toISOString(),
-      codeVersion: '2024-12-21-v2', // Version marker
+      codeVersion: '2024-12-21-v3', // Version marker - updated
       totalNotes: allLogs.length,
       emptyNotesFound: emptyNotes.length,
       emptyNotesDeleted: 0,
+      examples: placeholderExamples,
       oldestEmpty: emptyNotes.length > 0 ? emptyNotes[emptyNotes.length - 1].createdAt : null,
       newestEmpty: emptyNotes.length > 0 ? emptyNotes[0].createdAt : null,
     }
@@ -660,7 +680,7 @@ export default async (fastify: FastifyInstance) => {
         where: { id: emptyIds },
       })
       diagnostics.emptyNotesDeleted = emptyIds.length
-      console.log(`🧹 [MANUAL CLEANUP] Deleted ${emptyIds.length} empty notes for user ${req.user.id}`)
+      console.log(`🧹 [MANUAL CLEANUP] Deleted ${emptyIds.length} empty/placeholder notes for user ${req.user.id}`)
     }
 
     return diagnostics
