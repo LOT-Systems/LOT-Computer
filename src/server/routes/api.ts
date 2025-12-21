@@ -608,10 +608,20 @@ export default async (fastify: FastifyInstance) => {
       cleanedLogs = allLogs.filter((x) => !deletedIdSet.has(x.id))
     }
 
-    // Filter logs: keep all non-notes, notes with text, and the first empty note
-    const logs = cleanedLogs.filter(
-      (x, i) => x.event !== 'note' || (x.text && x.text.length) || i === 0
-    )
+    // Filter logs: keep all non-notes, notes with text, and ONLY the first empty note
+    const logs = cleanedLogs.filter((x, i) => {
+      // Always keep non-note events (activity logs)
+      if (x.event !== 'note') return true
+
+      // For notes: keep if it has text
+      if (x.text && x.text.trim().length > 0) return true
+
+      // For empty notes: ONLY keep if it's at index 0
+      if (i === 0 && (!x.text || x.text.trim().length === 0)) return true
+
+      // Filter out all other empty notes
+      return false
+    })
 
     const recentLog = logs[0]
     // Create new empty log if:
