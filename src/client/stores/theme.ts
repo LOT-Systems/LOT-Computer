@@ -263,6 +263,12 @@ if (typeof document !== 'undefined') {
       if (!hasScheduledInitialSave) {
         hasScheduledInitialSave = true
         setTimeout(() => {
+          // Don't save on public profile pages (viewer might not be owner)
+          if (typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')) {
+            console.debug('Skipping theme save on public profile page')
+            return
+          }
+
           const currentTheme = theme.get()
           const currentBase = baseColor.get()
           const currentAcc = accentColor.get()
