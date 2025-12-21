@@ -14,22 +14,29 @@
     <div id="root"></div>
     <script type="module" nonce="<%= scriptNonce %>" src="/js/<%= scriptName %>.js"></script>
     <script nonce="<%= scriptNonce %>">
-      // Register service worker with network-first strategy for JS files
+      // Register service worker with aggressive update strategy
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
+        // Unregister old service workers first to force fresh install
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          for (let registration of registrations) {
+            registration.unregister();
+          }
+        }).then(() => {
+          // Register fresh service worker
           navigator.serviceWorker.register('/sw.js')
             .then(registration => {
               console.log('[PWA] Service worker registered:', registration.scope);
 
-              // Check for updates immediately
+              // Check for updates immediately and periodically
               registration.update();
+              setInterval(() => registration.update(), 60000); // Check every minute
 
               // Auto-update service worker when new version available
               registration.addEventListener('updatefound', () => {
                 const newWorker = registration.installing;
                 newWorker.addEventListener('statechange', () => {
                   if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    console.log('[PWA] New version available, will activate on next reload');
+                    console.log('[PWA] New version available, activating immediately');
                     // Automatically skip waiting to activate new SW
                     newWorker.postMessage({ type: 'SKIP_WAITING' });
                   }
