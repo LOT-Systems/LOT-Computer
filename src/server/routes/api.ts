@@ -583,14 +583,32 @@ export default async (fastify: FastifyInstance) => {
   })
 
   fastify.get('/logs', async (req: FastifyRequest, reply) => {
-    const logs = await fastify.models.Log.findAll({
+    const allLogs = await fastify.models.Log.findAll({
       where: {
         userId: req.user.id,
         ...(req.user.hideActivityLogs ? { event: 'note' } : {}),
       },
       order: [['createdAt', 'DESC']],
-    }).then((xs) =>
-      xs.filter((x, i) => x.event !== 'note' || (x.text && x.text.length) || i === 0)
+    })
+
+    // AUTO-CLEANUP: Delete duplicate empty note logs (keep only the most recent)
+    const emptyNotes = allLogs.filter(
+      (x) => x.event === 'note' && (!x.text || x.text.trim().length === 0)
+    )
+    if (emptyNotes.length > 1) {
+      // Keep the first (most recent), delete the rest
+      const duplicateIds = emptyNotes.slice(1).map((x) => x.id)
+      await fastify.models.Log.destroy({
+        where: { id: duplicateIds },
+      })
+      console.log(
+        `🧹 Auto-cleaned ${duplicateIds.length} duplicate empty logs for user ${req.user.id}`
+      )
+    }
+
+    // Filter logs: keep all non-notes, notes with text, and the first empty note
+    const logs = allLogs.filter(
+      (x, i) => x.event !== 'note' || (x.text && x.text.length) || i === 0
     )
 
     const recentLog = logs[0]
