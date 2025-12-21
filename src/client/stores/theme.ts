@@ -252,55 +252,16 @@ if (typeof document !== 'undefined') {
   // Save theme changes to backend for public profile
   let saveThemeTimeout: NodeJS.Timeout | null = null
   let isInitialLoad = true
-  let hasScheduledInitialSave = false
 
   const saveThemeToBackend = () => {
-    // On initial load, schedule a one-time save after delay to ensure current theme is persisted
+    // Skip the very first call (happens when subscriptions are set up)
     if (isInitialLoad) {
       isInitialLoad = false
+      return
+    }
 
-      // Schedule initial save only once, after 2 seconds (allows time for auth)
-      if (!hasScheduledInitialSave) {
-        hasScheduledInitialSave = true
-        setTimeout(() => {
-          // Don't save on public profile pages (viewer might not be owner)
-          if (typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')) {
-            console.debug('Skipping theme save on public profile page')
-            return
-          }
-
-          const currentTheme = theme.get()
-          const currentBase = baseColor.get()
-          const currentAcc = accentColor.get()
-          const currentCustomEnabled = isCustomThemeEnabled.get()
-
-          if (typeof fetch === 'undefined') return
-
-          fetch('/api/theme-change', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              theme: currentTheme,
-              baseColor: currentBase,
-              accentColor: currentAcc,
-              customThemeEnabled: currentCustomEnabled,
-            }),
-          })
-            .then(res => {
-              // If unauthorized/forbidden, silently skip
-              if (!res.ok && (res.status === 401 || res.status === 403)) {
-                console.debug('Theme save skipped: not authenticated')
-                return
-              }
-              if (!res.ok) {
-                throw new Error(`HTTP ${res.status}`)
-              }
-            })
-            .catch(err => {
-              console.debug('Initial theme save skipped:', err.message)
-            })
-        }, 2000)
-      }
+    // Don't save on public profile pages
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')) {
       return
     }
 
@@ -314,11 +275,6 @@ if (typeof document !== 'undefined') {
       // Only save if fetch API is available
       if (typeof fetch === 'undefined') return
 
-      // Don't save on public profile pages
-      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')) {
-        return
-      }
-
       fetch('/api/theme-change', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -328,17 +284,10 @@ if (typeof document !== 'undefined') {
           accentColor: currentAcc,
           customThemeEnabled: currentCustomEnabled,
         }),
+      }).catch(err => {
+        // Silent fail - theme will still work locally
+        console.debug('Theme save skipped:', err.message)
       })
-        .then(res => {
-          if (!res.ok && (res.status === 401 || res.status === 403)) {
-            console.debug('Theme save skipped: not authenticated')
-            return
-          }
-        })
-        .catch(err => {
-          // Silent fail - theme will still work locally
-          console.debug('Theme save skipped:', err.message)
-        })
     }, 1000) // Debounce 1 second
   }
 
