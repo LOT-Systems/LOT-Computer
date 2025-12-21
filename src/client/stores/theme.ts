@@ -252,10 +252,38 @@ if (typeof document !== 'undefined') {
   // Save theme changes to backend for public profile
   let saveThemeTimeout: NodeJS.Timeout | null = null
   let isInitialLoad = true
+  let hasScheduledInitialSave = false
+
   const saveThemeToBackend = () => {
-    // Skip saving on initial load to avoid errors before user is authenticated
+    // On initial load, schedule a one-time save after delay to ensure current theme is persisted
     if (isInitialLoad) {
       isInitialLoad = false
+
+      // Schedule initial save only once, after 2 seconds (allows time for auth)
+      if (!hasScheduledInitialSave) {
+        hasScheduledInitialSave = true
+        setTimeout(() => {
+          const currentTheme = theme.get()
+          const currentBase = baseColor.get()
+          const currentAcc = accentColor.get()
+          const currentCustomEnabled = isCustomThemeEnabled.get()
+
+          if (typeof fetch === 'undefined') return
+
+          fetch('/api/theme-change', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              theme: currentTheme,
+              baseColor: currentBase,
+              accentColor: currentAcc,
+              customThemeEnabled: currentCustomEnabled,
+            }),
+          }).catch(err => {
+            console.debug('Initial theme save skipped:', err.message)
+          })
+        }, 2000)
+      }
       return
     }
 
