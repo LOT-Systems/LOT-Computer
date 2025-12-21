@@ -93,6 +93,21 @@ export const Logs: React.FC = () => {
     localStore.logIds.set(newLogIds)
   }, [loadedLogs])
 
+  // Refetch logs when PWA app becomes visible (triggers auto-cleanup on server)
+  React.useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('[LOGS] PWA became visible, refetching to trigger cleanup...')
+        refetchLogs()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [refetchLogs])
+
   // Cleanup pending push timeout on unmount
   React.useEffect(() => {
     return () => {
