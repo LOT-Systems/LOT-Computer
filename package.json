@@ -24,6 +24,7 @@
   },
   "scripts": {
     "db:admin": "tsx scripts/db-admin.ts",
+    "cleanup-logs": "tsx scripts/cleanup-empty-logs.ts",
     "server:build": "tsc --project tsconfig.server.json && node scripts/fix-esm-imports.js",
     "server:start": "node dist/server/server/index.js",
     "build": "yarn run client:build && yarn run server:build",
