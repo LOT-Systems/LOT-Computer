@@ -1,7 +1,7 @@
 // Service Worker for LOT Systems PWA
-// Version: 2024-12-21-004
+// Version: 2024-12-21-005
 
-const CACHE_VERSION = 'v2024-12-21-004';
+const CACHE_VERSION = 'v2024-12-21-005';
 const CACHE_NAME = `lot-cache-${CACHE_VERSION}`;
 
 // Files to cache initially (only static assets)
@@ -37,15 +37,22 @@ self.addEventListener('activate', (event) => {
       .then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
-            if (cacheName !== CACHE_NAME) {
-              console.log('[SW] Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            }
+            // Delete ALL caches, even current one, to force fresh fetch
+            console.log('[SW] Deleting cache:', cacheName);
+            return caches.delete(cacheName);
           })
         );
       })
       .then(() => {
+        // Recreate cache with static assets only
+        return caches.open(CACHE_NAME).then((cache) => {
+          console.log('[SW] Creating fresh cache with static assets');
+          return cache.addAll(STATIC_CACHE);
+        });
+      })
+      .then(() => {
         // Take control of all pages immediately
+        console.log('[SW] Taking control of all pages');
         return self.clients.claim();
       })
   );
