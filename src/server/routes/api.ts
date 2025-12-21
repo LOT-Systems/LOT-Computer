@@ -591,10 +591,22 @@ export default async (fastify: FastifyInstance) => {
       order: [['createdAt', 'DESC']],
     })
 
+    console.log(`[LOGS API] Fetched ${allLogs.length} logs for user ${req.user.id}`)
+
     // AUTO-CLEANUP: Delete duplicate empty note logs (keep only the most recent)
     const emptyNotes = allLogs.filter(
       (x) => x.event === 'note' && (!x.text || x.text.trim().length === 0)
     )
+
+    console.log(`[LOGS API] Found ${emptyNotes.length} empty notes`)
+    if (emptyNotes.length > 0) {
+      console.log(`[LOGS API] Empty notes:`, emptyNotes.map(x => ({
+        id: x.id.substring(0, 8),
+        text: x.text,
+        textLength: x.text?.length || 0,
+        createdAt: x.createdAt
+      })))
+    }
 
     let cleanedLogs = allLogs
     if (emptyNotes.length > 1) {
@@ -616,7 +628,16 @@ export default async (fastify: FastifyInstance) => {
       (x, i) => x.event !== 'note' || (x.text && x.text.length) || i === 0
     )
 
+    console.log(`[LOGS API] After filtering: ${logs.length} logs (from ${cleanedLogs.length} cleaned)`)
+
     const recentLog = logs[0]
+    console.log(`[LOGS API] Recent log:`, recentLog ? {
+      id: recentLog.id.substring(0, 8),
+      event: recentLog.event,
+      hasText: !!(recentLog.text && recentLog.text.trim().length > 0),
+      textLength: recentLog.text?.length || 0
+    } : 'none')
+
     // Create new empty log if:
     // - No recent log exists
     // - Recent log is not a note
@@ -631,8 +652,11 @@ export default async (fastify: FastifyInstance) => {
         text: '',
         event: 'note',
       })
+      console.log(`[LOGS API] Created new empty log ${emptyLog.id.substring(0, 8)}`)
       return [emptyLog, ...logs]
     }
+
+    console.log(`[LOGS API] Returning ${logs.length} logs without creating new empty log`)
     return logs
   })
 
