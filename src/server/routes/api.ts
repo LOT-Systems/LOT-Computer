@@ -583,10 +583,6 @@ export default async (fastify: FastifyInstance) => {
   })
 
   fastify.get('/logs', async (req: FastifyRequest, reply) => {
-    // DIAGNOSTIC TEST: Return empty array with a special marker
-    // If you see this in the browser console, the new code IS running
-    console.log('🔍 [DIAGNOSTIC] /api/logs endpoint called - NEW CODE IS RUNNING')
-
     const allLogs = await fastify.models.Log.findAll({
       where: {
         userId: req.user.id,
@@ -595,44 +591,41 @@ export default async (fastify: FastifyInstance) => {
       order: [['createdAt', 'DESC']],
     })
 
-    console.log(`🔍 [DIAGNOSTIC] Fetched ${allLogs.length} total logs from database`)
-
-    // AUTO-CLEANUP: Delete duplicate empty note logs (keep only the most recent)
+    // AGGRESSIVE CLEANUP: Delete ALL empty notes from database
     const emptyNotes = allLogs.filter(
       (x) => x.event === 'note' && (!x.text || x.text.trim().length === 0)
     )
 
-    console.log(`🔍 [DIAGNOSTIC] Found ${emptyNotes.length} empty notes`)
-
-    let cleanedLogs = allLogs
-    if (emptyNotes.length > 1) {
-      // Keep the first (most recent), delete the rest
-      const duplicateIds = emptyNotes.slice(1).map((x) => x.id)
+    if (emptyNotes.length > 0) {
+      // Delete ALL empty notes (we'll create one fresh one below)
+      const emptyIds = emptyNotes.map((x) => x.id)
       await fastify.models.Log.destroy({
-        where: { id: duplicateIds },
+        where: { id: emptyIds },
       })
-      console.log(`🔍 [DIAGNOSTIC] Deleted ${duplicateIds.length} duplicate empty logs`)
-      // Remove deleted logs from the array before filtering
-      const deletedIdSet = new Set(duplicateIds)
-      cleanedLogs = allLogs.filter((x) => !deletedIdSet.has(x.id))
+      console.log(`🧹 Deleted ${emptyIds.length} empty notes for user ${req.user.id}`)
     }
 
-    // DIAGNOSTIC: Return ONLY logs with text - NO empty logs at all
-    const logs = cleanedLogs.filter((x) => {
-      // Always keep non-note events (activity logs)
+    // Filter: keep all logs with content (no empty notes at all)
+    const logs = allLogs.filter((x) => {
+      // Keep non-note events (activity logs)
       if (x.event !== 'note') return true
 
-      // For notes: ONLY keep if it has text
+      // Keep notes with text only
       if (x.text && x.text.trim().length > 0) return true
 
-      // Filter out ALL empty notes (even index 0)
+      // Filter out all empty notes (we deleted them from DB above)
       return false
     })
 
-    console.log(`🔍 [DIAGNOSTIC] Returning ${logs.length} logs (all empty logs filtered out)`)
+    // Always create ONE fresh empty note for input
+    const emptyLog = await fastify.models.Log.create({
+      userId: req.user.id,
+      text: '',
+      event: 'note',
+    })
 
-    // Don't create any new empty logs
-    return logs
+    // Return with fresh empty log at the top
+    return [emptyLog, ...logs]
   })
 
   fastify.post(
