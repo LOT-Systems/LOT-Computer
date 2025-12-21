@@ -248,4 +248,32 @@ if (typeof document !== 'undefined') {
       x.colorRgb.join(' ')
     )
   })
+
+  // Save theme changes to backend for public profile
+  let saveThemeTimeout: NodeJS.Timeout | null = null
+  const saveThemeToBackend = () => {
+    const currentTheme = theme.get()
+    const currentBase = baseColor.get()
+    const currentAcc = accentColor.get()
+    const currentCustomEnabled = isCustomThemeEnabled.get()
+
+    if (saveThemeTimeout) clearTimeout(saveThemeTimeout)
+    saveThemeTimeout = setTimeout(() => {
+      fetch('/api/theme-change', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          theme: currentTheme,
+          baseColor: currentBase,
+          accentColor: currentAcc,
+          customThemeEnabled: currentCustomEnabled,
+        }),
+      }).catch(err => console.error('Failed to save theme:', err))
+    }, 1000) // Debounce 1 second
+  }
+
+  // Subscribe to theme changes and save to backend
+  theme.subscribe(saveThemeToBackend)
+  baseColor.subscribe(saveThemeToBackend)
+  accentColor.subscribe(saveThemeToBackend)
 }
