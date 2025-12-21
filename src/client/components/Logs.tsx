@@ -505,7 +505,7 @@ const NoteEditor = ({
           className={cn(
             'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
             'placeholder:opacity-20',
-            !primary && 'text-acc/40',
+            !primary && 'opacity-40',
             primary && isSaved && !isAboutToPush && 'opacity-40',
             primary && !isSaved && 'opacity-100',
             primary && isAboutToPush && 'animate-blink'
@@ -577,7 +577,7 @@ const LogContainer: React.FC<{
       <div
         className={cn(
           'max-w-[500px] lg:max-w-[700px] whitespace-breakspaces',
-          'transition-opacity text-acc/40',
+          'transition-opacity opacity-40',
           'group-hover:opacity-100'
         )}
       >
