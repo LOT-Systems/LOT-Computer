@@ -70,7 +70,7 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
                 className={cn(
                   'rounded',
                   (!!props.onClick || !!props.onChildrenClick)
-                    ? '-ml-[17px] pl-[17px] pr-[17px] cursor-pointer transition-[background-color] ' + hoverClassName
+                    ? '-ml-4 pl-4 pr-4 cursor-pointer transition-[background-color] ' + hoverClassName
                     : '',
                   props.labelClassName
                 )}

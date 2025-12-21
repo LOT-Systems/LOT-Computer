@@ -251,7 +251,14 @@ if (typeof document !== 'undefined') {
 
   // Save theme changes to backend for public profile
   let saveThemeTimeout: NodeJS.Timeout | null = null
+  let isInitialLoad = true
   const saveThemeToBackend = () => {
+    // Skip saving on initial load to avoid errors before user is authenticated
+    if (isInitialLoad) {
+      isInitialLoad = false
+      return
+    }
+
     const currentTheme = theme.get()
     const currentBase = baseColor.get()
     const currentAcc = accentColor.get()
@@ -259,6 +266,9 @@ if (typeof document !== 'undefined') {
 
     if (saveThemeTimeout) clearTimeout(saveThemeTimeout)
     saveThemeTimeout = setTimeout(() => {
+      // Only save if fetch API is available
+      if (typeof fetch === 'undefined') return
+
       fetch('/api/theme-change', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -268,7 +278,10 @@ if (typeof document !== 'undefined') {
           accentColor: currentAcc,
           customThemeEnabled: currentCustomEnabled,
         }),
-      }).catch(err => console.error('Failed to save theme:', err))
+      }).catch(err => {
+        // Silent fail - theme will still work locally
+        console.debug('Theme save skipped:', err.message)
+      })
     }, 1000) // Debounce 1 second
   }
 
