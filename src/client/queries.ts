@@ -97,6 +97,7 @@ export const useVisitorStats = createQuery<{
 })
 
 export const useLogs = createQuery<Log[]>('/api/logs', {
+  refetchOnWindowFocus: false, // Prevent refetching on tab switch (was creating duplicate empty logs)
   onError: (error: any) => {
     console.error('[LOGS DEBUG] API call failed:', error)
     console.error('[LOGS DEBUG] Error details:', {
