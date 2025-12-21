@@ -595,6 +595,8 @@ export default async (fastify: FastifyInstance) => {
     const emptyNotes = allLogs.filter(
       (x) => x.event === 'note' && (!x.text || x.text.trim().length === 0)
     )
+
+    let cleanedLogs = allLogs
     if (emptyNotes.length > 1) {
       // Keep the first (most recent), delete the rest
       const duplicateIds = emptyNotes.slice(1).map((x) => x.id)
@@ -604,10 +606,13 @@ export default async (fastify: FastifyInstance) => {
       console.log(
         `🧹 Auto-cleaned ${duplicateIds.length} duplicate empty logs for user ${req.user.id}`
       )
+      // Remove deleted logs from the array before filtering
+      const deletedIdSet = new Set(duplicateIds)
+      cleanedLogs = allLogs.filter((x) => !deletedIdSet.has(x.id))
     }
 
     // Filter logs: keep all non-notes, notes with text, and the first empty note
-    const logs = allLogs.filter(
+    const logs = cleanedLogs.filter(
       (x, i) => x.event !== 'note' || (x.text && x.text.length) || i === 0
     )
 
