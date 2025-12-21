@@ -583,8 +583,6 @@ export default async (fastify: FastifyInstance) => {
   })
 
   fastify.get('/logs', async (req: FastifyRequest, reply) => {
-    console.log(`[GET /logs] v4 - User ${req.user.id}`) // Version marker in logs
-
     const allLogs = await fastify.models.Log.findAll({
       where: {
         userId: req.user.id,
@@ -598,35 +596,39 @@ export default async (fastify: FastifyInstance) => {
       (x) => x.event === 'note' && (!x.text || x.text.trim().length === 0)
     )
 
-    console.log(`[GET /logs] Found ${emptyNotes.length} empty notes for user ${req.user.id}`)
-
-    // DELETE ALL EMPTY NOTES - no exceptions
-    if (emptyNotes.length > 0) {
-      const emptyIds = emptyNotes.map((x) => x.id)
+    // Delete all empty notes EXCEPT keep the most recent one for reuse
+    if (emptyNotes.length > 1) {
+      const duplicateIds = emptyNotes.slice(1).map((x) => x.id)
       await fastify.models.Log.destroy({
-        where: { id: emptyIds },
+        where: { id: duplicateIds },
       })
-      console.log(`[GET /logs] Deleted ${emptyIds.length} empty notes`)
     }
 
-    // Filter to only show notes with content (exclude all empty notes)
-    const contentLogs = allLogs.filter((x) => {
+    // Filter to show: non-notes, notes with text, or the first item (for input)
+    const logs = allLogs.filter((x, i) => {
       if (x.event !== 'note') return true // Keep activity logs
-      if (x.text && x.text.trim().length > 0) return true // Keep notes with text
-      return false // Exclude empty notes
+      if (i === 0) return true // Keep first item (will be empty note for input)
+      if (!x.text || x.text.trim().length === 0) return false // Exclude other empty notes
+      return true // Keep notes with text
     })
 
-    console.log(`[GET /logs] Returning ${contentLogs.length} content logs + 1 fresh empty note`)
+    const recentLog = logs[0]
+    // Only create new empty log if the top log has content
+    if (
+      !recentLog ||
+      recentLog.event !== 'note' ||
+      (recentLog.text && recentLog.text.trim().length > 0)
+    ) {
+      const emptyLog = await fastify.models.Log.create({
+        userId: req.user.id,
+        text: '',
+        event: 'note',
+      })
+      return [emptyLog, ...logs]
+    }
 
-    // ALWAYS create ONE fresh empty note for input
-    const emptyLog = await fastify.models.Log.create({
-      userId: req.user.id,
-      text: '',
-      event: 'note',
-    })
-
-    // Return: [fresh empty note, ...all content logs]
-    return [emptyLog, ...contentLogs]
+    // Reuse existing empty log at the top
+    return logs
   })
 
   // Diagnostic endpoint to manually cleanup empty logs
