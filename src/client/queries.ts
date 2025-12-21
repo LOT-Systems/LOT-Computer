@@ -96,7 +96,21 @@ export const useVisitorStats = createQuery<{
   refetchOnWindowFocus: false,
 })
 
-export const useLogs = createQuery<Log[]>('/api/logs')
+export const useLogs = createQuery<Log[]>('/api/logs', {
+  onError: (error: any) => {
+    console.error('[LOGS DEBUG] API call failed:', error)
+    console.error('[LOGS DEBUG] Error details:', {
+      message: error.message,
+      response: error.response,
+      status: error.response?.status,
+      data: error.response?.data
+    })
+  },
+  onSuccess: (data: any) => {
+    console.log('[LOGS DEBUG] API call successful, received logs:', data?.length || 0)
+    console.log('[LOGS DEBUG] Logs data:', data)
+  }
+})
 
 export const useCreateLog = createMutation<{ text: string }, Log>(
   'post',
