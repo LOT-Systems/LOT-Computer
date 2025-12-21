@@ -583,6 +583,10 @@ export default async (fastify: FastifyInstance) => {
   })
 
   fastify.get('/logs', async (req: FastifyRequest, reply) => {
+    // DIAGNOSTIC TEST: Return empty array with a special marker
+    // If you see this in the browser console, the new code IS running
+    console.log('🔍 [DIAGNOSTIC] /api/logs endpoint called - NEW CODE IS RUNNING')
+
     const allLogs = await fastify.models.Log.findAll({
       where: {
         userId: req.user.id,
@@ -591,10 +595,14 @@ export default async (fastify: FastifyInstance) => {
       order: [['createdAt', 'DESC']],
     })
 
+    console.log(`🔍 [DIAGNOSTIC] Fetched ${allLogs.length} total logs from database`)
+
     // AUTO-CLEANUP: Delete duplicate empty note logs (keep only the most recent)
     const emptyNotes = allLogs.filter(
       (x) => x.event === 'note' && (!x.text || x.text.trim().length === 0)
     )
+
+    console.log(`🔍 [DIAGNOSTIC] Found ${emptyNotes.length} empty notes`)
 
     let cleanedLogs = allLogs
     if (emptyNotes.length > 1) {
@@ -603,46 +611,27 @@ export default async (fastify: FastifyInstance) => {
       await fastify.models.Log.destroy({
         where: { id: duplicateIds },
       })
+      console.log(`🔍 [DIAGNOSTIC] Deleted ${duplicateIds.length} duplicate empty logs`)
       // Remove deleted logs from the array before filtering
       const deletedIdSet = new Set(duplicateIds)
       cleanedLogs = allLogs.filter((x) => !deletedIdSet.has(x.id))
     }
 
-    // Filter logs: keep all non-notes, notes with text, and ONLY the first empty note
-    const logs = cleanedLogs.filter((x, i) => {
+    // DIAGNOSTIC: Return ONLY logs with text - NO empty logs at all
+    const logs = cleanedLogs.filter((x) => {
       // Always keep non-note events (activity logs)
       if (x.event !== 'note') return true
 
-      // For notes: keep if it has text
+      // For notes: ONLY keep if it has text
       if (x.text && x.text.trim().length > 0) return true
 
-      // TEMPORARILY: Filter out ALL empty notes to test if this stops them appearing
-      // if (i === 0 && (!x.text || x.text.trim().length === 0)) return true
-
-      // Filter out all other empty notes
+      // Filter out ALL empty notes (even index 0)
       return false
     })
 
-    const recentLog = logs[0]
-    // TEMPORARILY DISABLED: Don't create new empty logs to test
-    // Create new empty log if:
-    // - No recent log exists
-    // - Recent log is not a note
-    // - Recent log has text (saved) - push it down immediately
-    /*
-    if (
-      !recentLog ||
-      recentLog.event !== 'note' ||
-      (recentLog.text && recentLog.text.trim().length > 0)
-    ) {
-      const emptyLog = await fastify.models.Log.create({
-        userId: req.user.id,
-        text: '',
-        event: 'note',
-      })
-      return [emptyLog, ...logs]
-    }
-    */
+    console.log(`🔍 [DIAGNOSTIC] Returning ${logs.length} logs (all empty logs filtered out)`)
+
+    // Don't create any new empty logs
     return logs
   })
 
