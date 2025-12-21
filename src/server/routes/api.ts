@@ -672,6 +672,13 @@ export default async (fastify: FastifyInstance) => {
       if (!log) return reply.throw.notFound()
       if (log.event !== 'note') return log
 
+      // If user backspaced all content, delete the log instead of saving empty text
+      if (!text || text.length === 0) {
+        await log.destroy()
+        console.log(`🗑️  Deleted empty log ${log.id} for user ${req.user.id}`)
+        return { id: log.id, deleted: true }
+      }
+
       await log.set({ text }).save()
       process.nextTick(async () => {
         if (!Object.keys(log.context).length) {
