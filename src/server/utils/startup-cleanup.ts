@@ -18,24 +18,29 @@ export async function runStartupCleanup(fastify: FastifyInstance) {
       },
     })
 
-    const emptyNotes = emptyLogs.filter(
-      (log) => !log.text || log.text.trim().length === 0
-    )
+    // Check for empty or placeholder text
+    const isEmptyOrPlaceholder = (log: any) => {
+      if (!log.text || log.text.trim().length === 0) return true
+      const text = log.text.trim()
+      return text === 'The log record will be deleted' || text === 'The log will be deleted'
+    }
+
+    const emptyNotes = emptyLogs.filter(isEmptyOrPlaceholder)
 
     if (emptyNotes.length === 0) {
-      console.log('✅ [STARTUP] No empty logs found - database is clean')
+      console.log('✅ [STARTUP] No empty/placeholder logs found - database is clean')
       return
     }
 
-    console.log(`📊 [STARTUP] Found ${emptyNotes.length} empty logs across all users`)
+    console.log(`📊 [STARTUP] Found ${emptyNotes.length} empty/placeholder logs across all users`)
 
-    // Delete all empty logs
+    // Delete all empty/placeholder logs
     const deletedIds = emptyNotes.map((log) => log.id)
     await fastify.models.Log.destroy({
       where: { id: deletedIds },
     })
 
-    console.log(`✅ [STARTUP] Deleted ${emptyNotes.length} empty logs`)
+    console.log(`✅ [STARTUP] Deleted ${emptyNotes.length} empty/placeholder logs`)
     console.log('💡 [STARTUP] Fresh empty logs will be created when users load the Log page')
 
   } catch (error: any) {
