@@ -632,6 +632,40 @@ export default async (fastify: FastifyInstance) => {
     return logs
   })
 
+  // Diagnostic endpoint to manually cleanup empty logs
+  fastify.post('/logs/cleanup', async (req: FastifyRequest, reply) => {
+    const allLogs = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: 'note',
+      },
+      order: [['createdAt', 'DESC']],
+    })
+
+    const emptyNotes = allLogs.filter((x) => !x.text || x.text.trim().length === 0)
+
+    const diagnostics = {
+      timestamp: new Date().toISOString(),
+      codeVersion: '2024-12-21-v2', // Version marker
+      totalNotes: allLogs.length,
+      emptyNotesFound: emptyNotes.length,
+      emptyNotesDeleted: 0,
+      oldestEmpty: emptyNotes.length > 0 ? emptyNotes[emptyNotes.length - 1].createdAt : null,
+      newestEmpty: emptyNotes.length > 0 ? emptyNotes[0].createdAt : null,
+    }
+
+    if (emptyNotes.length > 0) {
+      const emptyIds = emptyNotes.map((x) => x.id)
+      await fastify.models.Log.destroy({
+        where: { id: emptyIds },
+      })
+      diagnostics.emptyNotesDeleted = emptyIds.length
+      console.log(`🧹 [MANUAL CLEANUP] Deleted ${emptyIds.length} empty notes for user ${req.user.id}`)
+    }
+
+    return diagnostics
+  })
+
   fastify.post(
     '/logs',
     async (
