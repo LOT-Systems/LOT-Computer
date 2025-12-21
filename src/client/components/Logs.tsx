@@ -33,6 +33,16 @@ export const Logs: React.FC = () => {
   const pendingPushRef = React.useRef<NodeJS.Timeout | null>(null)
 
   const { data: loadedLogs = [], refetch: refetchLogs } = useLogs()
+
+  // DEBUG: Log the loaded logs to console
+  React.useEffect(() => {
+    console.log('[LOGS COMPONENT DEBUG] loadedLogs changed:', {
+      length: loadedLogs?.length || 0,
+      logs: loadedLogs,
+      isArray: Array.isArray(loadedLogs)
+    })
+  }, [loadedLogs])
+
   const { mutate: updateLog } = useUpdateLog({
     onSuccess: (log) => {
       localStore.logById.set({
@@ -59,10 +69,24 @@ export const Logs: React.FC = () => {
   })
 
   React.useEffect(() => {
-    if (!loadedLogs.length) return
+    console.log('[LOGS COMPONENT DEBUG] Processing loadedLogs:', {
+      length: loadedLogs.length,
+      willUpdate: loadedLogs.length > 0
+    })
+
+    if (!loadedLogs.length) {
+      console.warn('[LOGS COMPONENT DEBUG] loadedLogs is empty, skipping store update!')
+      return
+    }
+
     // Update both stores atomically to prevent race condition
     const newLogById = loadedLogs.reduce(fp.by('id'), {})
     const newLogIds = loadedLogs.map(fp.prop('id'))
+
+    console.log('[LOGS COMPONENT DEBUG] Updating stores with:', {
+      logCount: newLogIds.length,
+      logIds: newLogIds
+    })
 
     // Update in a single batch to avoid intermediate renders
     localStore.logById.set(newLogById)
@@ -146,7 +170,17 @@ export const Logs: React.FC = () => {
     }
   }, [containerRef, isTouchDevice])
 
-  if (!logIds.length) return <>Loading...</>
+  if (!logIds.length) {
+    console.warn('[LOGS COMPONENT DEBUG] No logIds, showing Loading...')
+    console.warn('[LOGS COMPONENT DEBUG] Current state:', {
+      logIds,
+      logIdsLength: logIds?.length,
+      loadedLogsLength: loadedLogs?.length
+    })
+    return <>Loading...</>
+  }
+
+  console.log('[LOGS COMPONENT DEBUG] Rendering with logIds:', logIds.length)
 
   return (
     <div
