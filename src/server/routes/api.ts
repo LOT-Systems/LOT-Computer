@@ -616,18 +616,20 @@ export default async (fastify: FastifyInstance) => {
       // For notes: keep if it has text
       if (x.text && x.text.trim().length > 0) return true
 
-      // For empty notes: ONLY keep if it's at index 0
-      if (i === 0 && (!x.text || x.text.trim().length === 0)) return true
+      // TEMPORARILY: Filter out ALL empty notes to test if this stops them appearing
+      // if (i === 0 && (!x.text || x.text.trim().length === 0)) return true
 
       // Filter out all other empty notes
       return false
     })
 
     const recentLog = logs[0]
+    // TEMPORARILY DISABLED: Don't create new empty logs to test
     // Create new empty log if:
     // - No recent log exists
     // - Recent log is not a note
     // - Recent log has text (saved) - push it down immediately
+    /*
     if (
       !recentLog ||
       recentLog.event !== 'note' ||
@@ -640,6 +642,7 @@ export default async (fastify: FastifyInstance) => {
       })
       return [emptyLog, ...logs]
     }
+    */
     return logs
   })
 
