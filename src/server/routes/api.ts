@@ -595,8 +595,19 @@ export default async (fastify: FastifyInstance) => {
     const isEmptyOrPlaceholder = (log: any) => {
       if (log.event !== 'note') return false
       if (!log.text || log.text.trim().length === 0) return true
-      const text = log.text.trim()
-      return text === 'The log record will be deleted' || text === 'The log will be deleted'
+
+      const text = log.text.trim().toLowerCase()
+
+      // Check for placeholder text variations (case-insensitive)
+      if (text === 'the log record will be deleted') return true
+      if (text === 'the log will be deleted') return true
+      if (text.includes('will be deleted')) return true
+      if (text.includes('log record')) return true
+
+      // Check if text is very short (likely placeholder or test)
+      if (text.length < 5) return true
+
+      return false
     }
 
     // Find ALL empty/placeholder notes
@@ -608,6 +619,7 @@ export default async (fastify: FastifyInstance) => {
       await fastify.models.Log.destroy({
         where: { id: emptyIds },
       })
+      console.log(`🧹 Deleted ${emptyIds.length} empty/placeholder logs for user ${req.user.id}`)
     }
 
     // Filter to show only logs with actual content
