@@ -18,14 +18,13 @@ export async function runStartupCleanup(fastify: FastifyInstance) {
       },
     })
 
-    // Check for empty or placeholder text (MUST match GET /logs logic exactly)
+    // Check for empty or placeholder text (MUST match GET /logs ultra-broad logic)
     const isEmptyOrPlaceholder = (log: any) => {
       if (!log.text || log.text.trim().length === 0) return true
       const text = log.text.trim().toLowerCase()
-      if (text === 'the log record will be deleted') return true
-      if (text === 'the log will be deleted') return true
-      if (text.includes('will be deleted')) return true
-      if (text.includes('log record')) return true
+      // Ultra-broad matching - catch ANY variation
+      if (text.includes('delete')) return true
+      if (text.includes('record')) return true
       if (text.length < 5) return true
       return false
     }
