@@ -583,40 +583,36 @@ export default async (fastify: FastifyInstance) => {
   })
 
   fastify.get('/logs', async (req: FastifyRequest, reply) => {
-    // Fetch all logs
-    const allLogs = await fastify.models.Log.findAll({
+    // Fetch all logs and filter in one step (most efficient)
+    const logs = await fastify.models.Log.findAll({
       where: {
         userId: req.user.id,
         ...(req.user.hideActivityLogs ? { event: 'note' } : {}),
       },
       order: [['createdAt', 'DESC']],
-    })
-
-    // Separate into empty notes and content logs
-    const emptyNotes = allLogs.filter(log =>
-      log.event === 'note' && (!log.text || log.text.trim() === '')
-    )
-    const contentLogs = allLogs.filter(log =>
-      log.event !== 'note' || (log.text && log.text.trim().length > 0)
+    }).then((xs) =>
+      // Keep: all non-notes, notes with text, and first log (even if empty)
+      xs.filter((x, i) => x.event !== 'note' || (x.text && x.text.length) || i === 0)
     )
 
-    // If we have multiple empty notes, delete all except the first one
-    if (emptyNotes.length > 1) {
-      const idsToDelete = emptyNotes.slice(1).map(x => x.id)
-      await fastify.models.Log.destroy({
-        where: { id: idsToDelete },
+    const recentLog = logs[0]
+
+    // Only create new empty note if we don't have one at the top
+    if (
+      !recentLog ||
+      recentLog.event !== 'note' ||
+      (recentLog.text && recentLog.text.trim().length > 0)
+    ) {
+      const emptyLog = await fastify.models.Log.create({
+        userId: req.user.id,
+        text: '',
+        event: 'note',
       })
+      return [emptyLog, ...logs]
     }
 
-    // Reuse existing empty note or create one if none exists (prevents race condition)
-    const emptyNote = emptyNotes[0] || await fastify.models.Log.create({
-      userId: req.user.id,
-      text: '',
-      event: 'note',
-    })
-
-    // Return: [empty note for input, ...all content logs]
-    return [emptyNote, ...contentLogs]
+    // We already have an empty note at the top, just return it
+    return logs
   })
 
   // Diagnostic endpoint to manually cleanup empty logs
