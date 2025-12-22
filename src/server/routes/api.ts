@@ -591,12 +591,18 @@ export default async (fastify: FastifyInstance) => {
       order: [['createdAt', 'DESC']],
     })
 
-    // Find ALL empty notes (truly empty, no text)
-    const emptyNotes = allLogs.filter(
-      (x) => x.event === 'note' && (!x.text || x.text.trim().length === 0)
-    )
+    // Helper to check if a log is empty or has placeholder text
+    const isEmptyOrPlaceholder = (log: any) => {
+      if (log.event !== 'note') return false
+      if (!log.text || log.text.trim().length === 0) return true
+      const text = log.text.trim()
+      return text === 'The log record will be deleted' || text === 'The log will be deleted'
+    }
 
-    // Delete ALL empty notes from database
+    // Find ALL empty/placeholder notes
+    const emptyNotes = allLogs.filter(isEmptyOrPlaceholder)
+
+    // Delete ALL empty/placeholder notes from database
     if (emptyNotes.length > 0) {
       const emptyIds = emptyNotes.map((x) => x.id)
       await fastify.models.Log.destroy({
@@ -607,8 +613,8 @@ export default async (fastify: FastifyInstance) => {
     // Filter to show only logs with actual content
     const contentLogs = allLogs.filter((x) => {
       if (x.event !== 'note') return true // Keep activity logs
-      if (x.text && x.text.trim().length > 0) return true // Keep notes with text
-      return false // Exclude all empty notes (already deleted above)
+      if (isEmptyOrPlaceholder(x)) return false // Exclude empty/placeholder
+      return true // Keep notes with real content
     })
 
     // Always create ONE fresh empty note for input
