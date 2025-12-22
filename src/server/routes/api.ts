@@ -591,37 +591,39 @@ export default async (fastify: FastifyInstance) => {
       order: [['createdAt', 'DESC']],
     })
 
-    // Find the first empty note (most recent)
-    const firstEmptyNoteIndex = allLogs.findIndex(x =>
-      x.event === 'note' && (!x.text || !x.text.trim().length === 0)
-    )
+    // Separate notes and non-note events
+    const notes = allLogs.filter(x => x.event === 'note')
+    const nonNotes = allLogs.filter(x => x.event !== 'note')
 
-    // Filter: keep all non-notes, notes with text, and the first empty note (if exists)
-    // This ensures the empty note is kept even when other events are created
-    const logs = allLogs.filter((x, i) =>
-      x.event !== 'note' ||
-      (x.text && x.text.trim().length > 0) ||
-      i === firstEmptyNoteIndex
-    )
+    // Find notes with text (keep) and empty notes (remove old ones)
+    const notesWithText = notes.filter(x => x.text && x.text.trim().length > 0)
+    const emptyNotes = notes.filter(x => !x.text || x.text.trim().length === 0)
 
-    const recentLog = logs[0]
-    // Create new empty log if:
-    // - No recent log exists
-    // - Recent log is not a note
-    // - Recent log has text (saved) - push it down immediately
-    if (
-      !recentLog ||
-      recentLog.event !== 'note' ||
-      (recentLog.text && recentLog.text.trim().length > 0)
-    ) {
-      const emptyLog = await fastify.models.Log.create({
-        userId: req.user.id,
-        text: '',
-        event: 'note',
-      })
-      return [emptyLog, ...logs]
+    // Keep only the most recent empty note, delete the rest
+    if (emptyNotes.length > 1) {
+      const idsToDelete = emptyNotes.slice(1).map(x => x.id)
+      await fastify.models.Log.destroy({ where: { id: idsToDelete } })
     }
-    return logs
+
+    const currentEmptyNote = emptyNotes[0] || null
+
+    // Combine: non-notes + notes with text (sorted by date)
+    const contentLogs = [...nonNotes, ...notesWithText]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
+    // If we have an empty note, return it at top
+    if (currentEmptyNote) {
+      return [currentEmptyNote, ...contentLogs]
+    }
+
+    // No empty note exists, create one
+    const newEmptyNote = await fastify.models.Log.create({
+      userId: req.user.id,
+      text: '',
+      event: 'note',
+    })
+
+    return [newEmptyNote, ...contentLogs]
   })
 
   // Diagnostic endpoint to manually cleanup empty logs
@@ -1321,26 +1323,3 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     return userWorld
   })
 }
-  // Read-only diagnostic - just shows current state without modifying
-  fastify.get('/logs/diagnostic', async (req: FastifyRequest, reply) => {
-    const allLogs = await fastify.models.Log.findAll({
-      where: { userId: req.user.id, event: 'note' },
-      order: [['createdAt', 'DESC']],
-      limit: 20
-    })
-
-    const summary = allLogs.map((log, i) => ({
-      index: i,
-      id: log.id,
-      text: log.text || '(empty)',
-      textLength: (log.text || '').length,
-      preview: (log.text || '').substring(0, 50),
-      createdAt: log.createdAt
-    }))
-
-    return {
-      timestamp: new Date().toISOString(),
-      totalLogs: allLogs.length,
-      logs: summary
-    }
-  })
