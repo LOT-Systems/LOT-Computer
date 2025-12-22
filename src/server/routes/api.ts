@@ -657,27 +657,36 @@ export default async (fastify: FastifyInstance) => {
       order: [['createdAt', 'DESC']],
     })
 
-    // Check for empty or placeholder text
+    // Check for empty or placeholder text (same logic as GET /logs)
     const isEmptyOrPlaceholder = (log: any) => {
       if (!log.text || log.text.trim().length === 0) return true
-      const text = log.text.trim()
-      return text === 'The log record will be deleted' || text === 'The log will be deleted'
+      const text = log.text.trim().toLowerCase()
+      if (text === 'the log record will be deleted') return true
+      if (text === 'the log will be deleted') return true
+      if (text.includes('will be deleted')) return true
+      if (text.includes('log record')) return true
+      if (text.length < 5) return true
+      return false
     }
 
     const emptyNotes = allLogs.filter(isEmptyOrPlaceholder)
-    const placeholderExamples = emptyNotes.slice(0, 5).map((x) => ({
+
+    // Show ALL notes with their text for debugging
+    const allNotesExamples = allLogs.slice(0, 10).map((x) => ({
       id: x.id,
       text: x.text || '(empty)',
+      textLength: (x.text || '').length,
+      isEmptyOrPlaceholder: isEmptyOrPlaceholder(x),
       createdAt: x.createdAt,
     }))
 
     const diagnostics = {
       timestamp: new Date().toISOString(),
-      codeVersion: '2024-12-21-v3', // Version marker - updated
+      codeVersion: '2024-12-21-v4-FINAL', // Version marker
       totalNotes: allLogs.length,
       emptyNotesFound: emptyNotes.length,
       emptyNotesDeleted: 0,
-      examples: placeholderExamples,
+      allNotesPreview: allNotesExamples, // Shows ALL notes (first 10) with matching status
       oldestEmpty: emptyNotes.length > 0 ? emptyNotes[emptyNotes.length - 1].createdAt : null,
       newestEmpty: emptyNotes.length > 0 ? emptyNotes[0].createdAt : null,
     }
