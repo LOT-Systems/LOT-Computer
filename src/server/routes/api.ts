@@ -583,14 +583,25 @@ export default async (fastify: FastifyInstance) => {
   })
 
   fastify.get('/logs', async (req: FastifyRequest, reply) => {
-    const logs = await fastify.models.Log.findAll({
+    const allLogs = await fastify.models.Log.findAll({
       where: {
         userId: req.user.id,
         ...(req.user.hideActivityLogs ? { event: 'note' } : {}),
       },
       order: [['createdAt', 'DESC']],
-    }).then((xs) =>
-      xs.filter((x, i) => x.event !== 'note' || (x.text && x.text.length) || i === 0)
+    })
+
+    // Find the first empty note (most recent)
+    const firstEmptyNoteIndex = allLogs.findIndex(x =>
+      x.event === 'note' && (!x.text || !x.text.trim().length === 0)
+    )
+
+    // Filter: keep all non-notes, notes with text, and the first empty note (if exists)
+    // This ensures the empty note is kept even when other events are created
+    const logs = allLogs.filter((x, i) =>
+      x.event !== 'note' ||
+      (x.text && x.text.trim().length > 0) ||
+      i === firstEmptyNoteIndex
     )
 
     const recentLog = logs[0]
