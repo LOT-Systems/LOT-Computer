@@ -591,6 +591,8 @@ export default async (fastify: FastifyInstance) => {
       order: [['createdAt', 'DESC']],
     })
 
+    console.log(`📥 [GET /logs] Fetched ${allLogs.length} total logs for user ${req.user.id}`)
+
     // Helper to check if a log is empty or has placeholder text
     const isEmptyOrPlaceholder = (log: any) => {
       if (log.event !== 'note') return false
@@ -612,6 +614,7 @@ export default async (fastify: FastifyInstance) => {
 
     // Find ALL empty/placeholder notes
     const emptyNotes = allLogs.filter(isEmptyOrPlaceholder)
+    console.log(`🔍 [GET /logs] Found ${emptyNotes.length} empty/placeholder notes`)
 
     // Delete ALL empty/placeholder notes from database
     if (emptyNotes.length > 0) {
@@ -619,7 +622,7 @@ export default async (fastify: FastifyInstance) => {
       await fastify.models.Log.destroy({
         where: { id: emptyIds },
       })
-      console.log(`🧹 Deleted ${emptyIds.length} empty/placeholder logs for user ${req.user.id}`)
+      console.log(`🧹 [GET /logs] Deleted ${emptyIds.length} empty/placeholder logs`)
     }
 
     // Filter to show only logs with actual content
@@ -629,12 +632,16 @@ export default async (fastify: FastifyInstance) => {
       return true // Keep notes with real content
     })
 
+    console.log(`📝 [GET /logs] Kept ${contentLogs.length} content logs`)
+
     // Always create ONE fresh empty note for input
     const emptyLog = await fastify.models.Log.create({
       userId: req.user.id,
       text: '',
       event: 'note',
     })
+
+    console.log(`✨ [GET /logs] Created fresh empty log, returning ${contentLogs.length + 1} total logs`)
 
     // Return: [fresh empty note at top, ...content logs below]
     return [emptyLog, ...contentLogs]
