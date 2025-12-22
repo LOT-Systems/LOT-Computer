@@ -592,29 +592,31 @@ export default async (fastify: FastifyInstance) => {
       order: [['createdAt', 'DESC']],
     })
 
-    // Filter: keep only logs with content (non-notes OR notes with text)
-    const logsWithContent = allLogs.filter(log =>
+    // Separate into empty notes and content logs
+    const emptyNotes = allLogs.filter(log =>
+      log.event === 'note' && (!log.text || log.text.trim() === '')
+    )
+    const contentLogs = allLogs.filter(log =>
       log.event !== 'note' || (log.text && log.text.trim().length > 0)
     )
 
-    // Delete ALL empty notes for this user (clean up any accumulation)
-    await fastify.models.Log.destroy({
-      where: {
-        userId: req.user.id,
-        event: 'note',
-        text: '',  // Empty string only
-      },
-    })
+    // If we have multiple empty notes, delete all except the first one
+    if (emptyNotes.length > 1) {
+      const idsToDelete = emptyNotes.slice(1).map(x => x.id)
+      await fastify.models.Log.destroy({
+        where: { id: idsToDelete },
+      })
+    }
 
-    // Create ONE fresh empty note for user input
-    const emptyNote = await fastify.models.Log.create({
+    // Reuse existing empty note or create one if none exists (prevents race condition)
+    const emptyNote = emptyNotes[0] || await fastify.models.Log.create({
       userId: req.user.id,
       text: '',
       event: 'note',
     })
 
     // Return: [empty note for input, ...all content logs]
-    return [emptyNote, ...logsWithContent]
+    return [emptyNote, ...contentLogs]
   })
 
   // Diagnostic endpoint to manually cleanup empty logs
