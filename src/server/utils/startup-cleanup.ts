@@ -8,25 +8,32 @@
 import { FastifyInstance } from 'fastify'
 
 export async function runStartupCleanup(fastify: FastifyInstance) {
-  console.log('🧹 [STARTUP] Deleting ALL empty logs from database...')
+  console.log('🧹 [STARTUP] Running empty logs cleanup...')
 
   try {
-    // Delete ALL empty logs without filtering - clean slate
-    const result = await fastify.models.Log.destroy({
+    // Find and delete ALL empty logs (safer than direct destroy)
+    const emptyLogs = await fastify.models.Log.findAll({
       where: {
         event: 'note',
-        text: '',  // Only delete truly empty notes (empty string)
+        text: '',
       },
     })
 
-    if (result === 0) {
+    if (emptyLogs.length === 0) {
       console.log('✅ [STARTUP] No empty logs found - database is clean')
-    } else {
-      console.log(`✅ [STARTUP] Deleted ${result} empty logs`)
-      console.log('💡 [STARTUP] Fresh empty logs will be created when users load the page')
+      return
     }
+
+    // Delete by IDs
+    const idsToDelete = emptyLogs.map(log => log.id)
+    await fastify.models.Log.destroy({
+      where: { id: idsToDelete },
+    })
+
+    console.log(`✅ [STARTUP] Deleted ${emptyLogs.length} empty logs`)
 
   } catch (error: any) {
     console.error('❌ [STARTUP] Cleanup failed:', error.message)
+    // Don't throw - let server start anyway
   }
 }
