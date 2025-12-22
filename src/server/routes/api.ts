@@ -1344,3 +1344,26 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     return userWorld
   })
 }
+  // Read-only diagnostic - just shows current state without modifying
+  fastify.get('/logs/diagnostic', async (req: FastifyRequest, reply) => {
+    const allLogs = await fastify.models.Log.findAll({
+      where: { userId: req.user.id, event: 'note' },
+      order: [['createdAt', 'DESC']],
+      limit: 20
+    })
+
+    const summary = allLogs.map((log, i) => ({
+      index: i,
+      id: log.id,
+      text: log.text || '(empty)',
+      textLength: (log.text || '').length,
+      preview: (log.text || '').substring(0, 50),
+      createdAt: log.createdAt
+    }))
+
+    return {
+      timestamp: new Date().toISOString(),
+      totalLogs: allLogs.length,
+      logs: summary
+    }
+  })
