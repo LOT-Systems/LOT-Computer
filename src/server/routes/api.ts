@@ -596,39 +596,30 @@ export default async (fastify: FastifyInstance) => {
       (x) => x.event === 'note' && (!x.text || x.text.trim().length === 0)
     )
 
-    // Delete all empty notes EXCEPT keep the most recent one for reuse
-    if (emptyNotes.length > 1) {
-      const duplicateIds = emptyNotes.slice(1).map((x) => x.id)
+    // Delete ALL empty notes from database
+    if (emptyNotes.length > 0) {
+      const emptyIds = emptyNotes.map((x) => x.id)
       await fastify.models.Log.destroy({
-        where: { id: duplicateIds },
+        where: { id: emptyIds },
       })
     }
 
-    // Filter to show: non-notes, notes with text, or the first item (for input)
-    const logs = allLogs.filter((x, i) => {
+    // Filter to show only logs with actual content
+    const contentLogs = allLogs.filter((x) => {
       if (x.event !== 'note') return true // Keep activity logs
-      if (i === 0) return true // Keep first item (will be empty note for input)
-      if (!x.text || x.text.trim().length === 0) return false // Exclude other empty notes
-      return true // Keep notes with text
+      if (x.text && x.text.trim().length > 0) return true // Keep notes with text
+      return false // Exclude all empty notes (already deleted above)
     })
 
-    const recentLog = logs[0]
-    // Only create new empty log if the top log has content
-    if (
-      !recentLog ||
-      recentLog.event !== 'note' ||
-      (recentLog.text && recentLog.text.trim().length > 0)
-    ) {
-      const emptyLog = await fastify.models.Log.create({
-        userId: req.user.id,
-        text: '',
-        event: 'note',
-      })
-      return [emptyLog, ...logs]
-    }
+    // Always create ONE fresh empty note for input
+    const emptyLog = await fastify.models.Log.create({
+      userId: req.user.id,
+      text: '',
+      event: 'note',
+    })
 
-    // Reuse existing empty log at the top
-    return logs
+    // Return: [fresh empty note at top, ...content logs below]
+    return [emptyLog, ...contentLogs]
   })
 
   // Diagnostic endpoint to manually cleanup empty logs
