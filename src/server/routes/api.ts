@@ -583,6 +583,7 @@ export default async (fastify: FastifyInstance) => {
   })
 
   fastify.get('/logs', async (req: FastifyRequest, reply) => {
+    // Fetch all logs
     const allLogs = await fastify.models.Log.findAll({
       where: {
         userId: req.user.id,
@@ -591,39 +592,29 @@ export default async (fastify: FastifyInstance) => {
       order: [['createdAt', 'DESC']],
     })
 
-    // Separate notes and non-note events
-    const notes = allLogs.filter(x => x.event === 'note')
-    const nonNotes = allLogs.filter(x => x.event !== 'note')
+    // Filter: keep only logs with content (non-notes OR notes with text)
+    const logsWithContent = allLogs.filter(log =>
+      log.event !== 'note' || (log.text && log.text.trim().length > 0)
+    )
 
-    // Find notes with text (keep) and empty notes (remove old ones)
-    const notesWithText = notes.filter(x => x.text && x.text.trim().length > 0)
-    const emptyNotes = notes.filter(x => !x.text || x.text.trim().length === 0)
+    // Delete ALL empty notes for this user (clean up any accumulation)
+    await fastify.models.Log.destroy({
+      where: {
+        userId: req.user.id,
+        event: 'note',
+        text: '',  // Empty string only
+      },
+    })
 
-    // Keep only the most recent empty note, delete the rest
-    if (emptyNotes.length > 1) {
-      const idsToDelete = emptyNotes.slice(1).map(x => x.id)
-      await fastify.models.Log.destroy({ where: { id: idsToDelete } })
-    }
-
-    const currentEmptyNote = emptyNotes[0] || null
-
-    // Combine: non-notes + notes with text (sorted by date)
-    const contentLogs = [...nonNotes, ...notesWithText]
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-
-    // If we have an empty note, return it at top
-    if (currentEmptyNote) {
-      return [currentEmptyNote, ...contentLogs]
-    }
-
-    // No empty note exists, create one
-    const newEmptyNote = await fastify.models.Log.create({
+    // Create ONE fresh empty note for user input
+    const emptyNote = await fastify.models.Log.create({
       userId: req.user.id,
       text: '',
       event: 'note',
     })
 
-    return [newEmptyNote, ...contentLogs]
+    // Return: [empty note for input, ...all content logs]
+    return [emptyNote, ...logsWithContent]
   })
 
   // Diagnostic endpoint to manually cleanup empty logs
