@@ -31,7 +31,8 @@ export async function runStartupCleanup(fastify: FastifyInstance) {
       return
     }
 
-    console.log(`📊 [STARTUP] Found ${emptyLogs.length} empty/placeholder logs`)
+    console.log(`📊 [STARTUP] Found ${emptyLogs.length} empty/placeholder logs to delete`)
+    console.log(`🗑️  [STARTUP] Cleaning up accumulated empty logs...`)
 
     // Delete by IDs
     const idsToDelete = emptyLogs.map(log => log.id)
@@ -39,7 +40,8 @@ export async function runStartupCleanup(fastify: FastifyInstance) {
       where: { id: idsToDelete },
     })
 
-    console.log(`✅ [STARTUP] Deleted ${emptyLogs.length} empty logs`)
+    console.log(`✅ [STARTUP] Successfully deleted ${emptyLogs.length} empty logs`)
+    console.log(`💡 [STARTUP] A fresh empty log will be created on first /logs request`)
 
   } catch (error: any) {
     console.error('❌ [STARTUP] Cleanup failed:', error.message)
