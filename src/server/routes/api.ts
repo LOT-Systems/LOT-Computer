@@ -648,6 +648,48 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
+  // Delete empty logs from past 3 days
+  fastify.post('/logs/delete-empty', async (req: FastifyRequest, reply) => {
+    // Find all empty logs from past 3 days
+    const threeDaysAgo = dayjs().subtract(3, 'days').toDate()
+
+    const emptyLogs = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: 'note',
+        createdAt: {
+          [Op.gte]: threeDaysAgo,
+        },
+      },
+    })
+
+    // Filter to truly empty logs (empty text or placeholder text)
+    const logsToDelete = emptyLogs.filter(log => {
+      if (!log.text || log.text.trim() === '') return true
+      const text = log.text.trim().toLowerCase()
+      return text.includes('will be deleted') || text.includes('log record')
+    })
+
+    const idsToDelete = logsToDelete.map(log => log.id)
+
+    if (idsToDelete.length === 0) {
+      return {
+        deleted: 0,
+        message: 'No empty logs found from past 3 days',
+      }
+    }
+
+    // Delete them
+    await fastify.models.Log.destroy({
+      where: { id: idsToDelete },
+    })
+
+    return {
+      deleted: idsToDelete.length,
+      message: `Successfully deleted ${idsToDelete.length} empty logs from past 3 days`,
+    }
+  })
+
   fastify.post(
     '/logs',
     async (

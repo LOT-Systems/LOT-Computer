@@ -33,15 +33,17 @@ async function cleanupAllEmptyLogs(confirm: boolean) {
   try {
     console.log('🧹 Empty Log Cleanup Utility\n')
 
-    // Count and show empty logs
+    // Count and show empty logs from past 3 days
     const countResult = await client.query(`
       SELECT COUNT(*) as count
       FROM logs
-      WHERE event = 'note' AND (text IS NULL OR text = '' OR TRIM(text) = '')
+      WHERE event = 'note'
+        AND (text IS NULL OR text = '' OR TRIM(text) = '')
+        AND "createdAt" >= NOW() - INTERVAL '3 days'
     `)
 
     const totalEmpty = parseInt(countResult.rows[0].count, 10)
-    console.log(`📊 Found ${totalEmpty} empty log entries (showing "The log record will be deleted")`)
+    console.log(`📊 Found ${totalEmpty} empty log entries from past 3 days`)
 
     if (totalEmpty === 0) {
       console.log('✨ No empty logs to clean up!')
@@ -57,7 +59,9 @@ async function cleanupAllEmptyLogs(confirm: boolean) {
         "createdAt",
         "updatedAt"
       FROM logs
-      WHERE event = 'note' AND (text IS NULL OR text = '' OR TRIM(text) = '')
+      WHERE event = 'note'
+        AND (text IS NULL OR text = '' OR TRIM(text) = '')
+        AND "createdAt" >= NOW() - INTERVAL '3 days'
       ORDER BY "createdAt" DESC
       LIMIT 10
     `)
@@ -78,10 +82,12 @@ async function cleanupAllEmptyLogs(confirm: boolean) {
     }
 
     // Actually delete
-    console.log(`\n⚠️  DELETING ${totalEmpty} empty logs...`)
+    console.log(`\n⚠️  DELETING ${totalEmpty} empty logs from past 3 days...`)
     const deleteResult = await client.query(`
       DELETE FROM logs
-      WHERE event = 'note' AND (text IS NULL OR text = '' OR TRIM(text) = '')
+      WHERE event = 'note'
+        AND (text IS NULL OR text = '' OR TRIM(text) = '')
+        AND "createdAt" >= NOW() - INTERVAL '3 days'
       RETURNING id
     `)
 
