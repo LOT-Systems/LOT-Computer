@@ -565,100 +565,34 @@ export default async (fastify: FastifyInstance) => {
   })
 
   fastify.get('/logs', async (req: FastifyRequest, reply) => {
-    // Fetch all logs
-    const allLogs = await fastify.models.Log.findAll({
+    const logs = await fastify.models.Log.findAll({
       where: {
         userId: req.user.id,
         ...(req.user.hideActivityLogs ? { event: 'note' } : {}),
       },
       order: [['createdAt', 'DESC']],
-    })
-
-    // Separate empty notes from other logs (check for empty, whitespace, and placeholder text)
-    const emptyNotes = allLogs.filter(x => {
-      if (x.event !== 'note') return false
-      if (!x.text || x.text.trim() === '') return true
-      // Also catch placeholder text that might have been saved
-      const text = x.text.trim().toLowerCase()
-      return text.includes('will be deleted') || text.includes('log record')
-    })
-
-    const contentLogs = allLogs.filter(x => {
-      if (x.event !== 'note') return true
-      if (!x.text || x.text.trim() === '') return false
-      const text = x.text.trim().toLowerCase()
-      if (text.includes('will be deleted') || text.includes('log record')) return false
-      return true
-    })
-
-    // Check if we have a system snapshot from today
-    const today = dayjs().format('YYYY-MM-DD')
-    const hasSnapshotToday = allLogs.some(x =>
-      x.event === 'system_snapshot' &&
-      dayjs(x.createdAt).format('YYYY-MM-DD') === today
+    }).then((xs) =>
+      xs.filter((x, i) => x.event !== 'note' || (x.text && x.text.length) || i === 0)
     )
 
-    // Clean up empty notes and create snapshot if needed
-    if (emptyNotes.length > 1 && !hasSnapshotToday) {
-      // Convert the oldest empty note to a system snapshot
-      const context = await getLogContext(req.user)
-      const oldEmptyNote = emptyNotes[emptyNotes.length - 1]
-
-      await oldEmptyNote.set({
-        event: 'system_snapshot',
-        context,
-        metadata: {
-          sound: req.user.metadata?.currentSound || null,
-          theme: req.user.metadata?.theme || null,
-        },
-      }).save()
-
-      // Delete ALL other empty notes except the first one (for journaling)
-      const idsToDelete = emptyNotes.slice(1, -1).map(x => x.id)
-      if (idsToDelete.length > 0) {
-        await fastify.models.Log.destroy({
-          where: { id: idsToDelete },
-        })
-      }
-
-      // Refresh content logs to include the new snapshot
-      const snapshot = await fastify.models.Log.findByPk(oldEmptyNote.id)
-      contentLogs.unshift(snapshot!)
-
-    } else if (emptyNotes.length > 1) {
-      // We already have a snapshot today, delete ALL extra empty notes
-      const idsToDelete = emptyNotes.slice(1).map(x => x.id)
-      await fastify.models.Log.destroy({
-        where: { id: idsToDelete },
-      })
-    }
-
-    // Check if we have a recent empty note (created in last 5 seconds) to prevent rapid duplicates
-    let emptyNote = emptyNotes[0]
-
-    if (!emptyNote) {
-      // Check for very recent empty note that might have been created by concurrent request
-      const veryRecentEmpty = await fastify.models.Log.findOne({
-        where: {
-          userId: req.user.id,
-          event: 'note',
-          text: '',
-          createdAt: {
-            [Op.gte]: dayjs().subtract(5, 'seconds').toDate()
-          }
-        },
-        order: [['createdAt', 'DESC']],
-      })
-
-      emptyNote = veryRecentEmpty || await fastify.models.Log.create({
+    const recentLog = logs[0]
+    // Create new empty log if:
+    // - No recent log exists
+    // - Recent log is not a note
+    // - Recent log has text (saved) - push it down immediately
+    if (
+      !recentLog ||
+      recentLog.event !== 'note' ||
+      (recentLog.text && recentLog.text.trim().length > 0)
+    ) {
+      const emptyLog = await fastify.models.Log.create({
         userId: req.user.id,
         text: '',
         event: 'note',
       })
+      return [emptyLog, ...logs]
     }
-
-    // Return: [empty note for journaling, ...all other logs including snapshots]
-    return [emptyNote, ...contentLogs]
+    return logs
   })
 
   // Diagnostic endpoint to manually cleanup empty logs
