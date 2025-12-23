@@ -651,12 +651,29 @@ export default async (fastify: FastifyInstance) => {
       })
     }
 
-    // Ensure we have exactly one empty note for journaling
-    const emptyNote = emptyNotes[0] || await fastify.models.Log.create({
-      userId: req.user.id,
-      text: '',
-      event: 'note',
-    })
+    // Check if we have a recent empty note (created in last 5 seconds) to prevent rapid duplicates
+    let emptyNote = emptyNotes[0]
+
+    if (!emptyNote) {
+      // Check for very recent empty note that might have been created by concurrent request
+      const veryRecentEmpty = await fastify.models.Log.findOne({
+        where: {
+          userId: req.user.id,
+          event: 'note',
+          text: '',
+          createdAt: {
+            [Op.gte]: dayjs().subtract(5, 'seconds').toDate()
+          }
+        },
+        order: [['createdAt', 'DESC']],
+      })
+
+      emptyNote = veryRecentEmpty || await fastify.models.Log.create({
+        userId: req.user.id,
+        text: '',
+        event: 'note',
+      })
+    }
 
     // Return: [empty note for journaling, ...all other logs including snapshots]
     return [emptyNote, ...contentLogs]
