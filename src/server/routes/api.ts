@@ -290,24 +290,6 @@ export default async (fastify: FastifyInstance) => {
       }
       await req.user.set({ metadata: updatedMetadata }).save()
 
-      // Log theme change asynchronously
-      process.nextTick(async () => {
-        const context = await getLogContext(req.user)
-        await fastify.models.Log.create({
-          userId: req.user.id,
-          event: 'theme_change',
-          text: '',
-          metadata: {
-            theme,
-            baseColor: baseColor || null,
-            accentColor: accentColor || null,
-            customThemeEnabled,
-            userTags: req.user.tags,
-          },
-          context,
-        })
-      })
-
       reply.ok()
     }
   )
