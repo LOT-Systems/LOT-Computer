@@ -626,7 +626,7 @@ export default async (fastify: FastifyInstance) => {
         event: 'system_snapshot',
         context,
         metadata: {
-          sound: req.user.soundDescription || null,
+          sound: req.user.metadata?.currentSound || null,
           theme: req.user.metadata?.theme || null,
         },
       }).save()
@@ -667,55 +667,52 @@ export default async (fastify: FastifyInstance) => {
     const allLogs = await fastify.models.Log.findAll({
       where: {
         userId: req.user.id,
-        event: 'note',
       },
       order: [['createdAt', 'DESC']],
+      limit: 50,
     })
 
-    // Check for empty or placeholder text (same logic as GET /logs)
-    const isEmptyOrPlaceholder = (log: any) => {
-      if (!log.text || log.text.trim().length === 0) return true
-      const text = log.text.trim().toLowerCase()
-      if (text === 'the log record will be deleted') return true
-      if (text === 'the log will be deleted') return true
-      if (text.includes('will be deleted')) return true
-      if (text.includes('log record')) return true
-      if (text.length < 5) return true
-      return false
-    }
-
-    const emptyNotes = allLogs.filter(isEmptyOrPlaceholder)
-
-    // Show ALL notes with their text for debugging
-    const allNotesExamples = allLogs.slice(0, 10).map((x) => ({
-      id: x.id,
-      text: x.text || '(empty)',
-      textLength: (x.text || '').length,
-      isEmptyOrPlaceholder: isEmptyOrPlaceholder(x),
-      createdAt: x.createdAt,
+    // Detailed analysis of each log
+    const analysis = allLogs.map((log, i) => ({
+      index: i,
+      id: log.id,
+      event: log.event,
+      text: log.text || '(empty)',
+      textLength: (log.text || '').length,
+      textTrimmed: (log.text || '').trim(),
+      isEmpty: !log.text || log.text.trim() === '',
+      hasPlaceholder: log.text ? (
+        log.text.toLowerCase().includes('will be deleted') ||
+        log.text.toLowerCase().includes('log record')
+      ) : false,
+      createdAt: log.createdAt,
+      isSystemSnapshot: log.event === 'system_snapshot',
+      metadata: log.metadata,
+      context: log.context,
     }))
 
-    const diagnostics = {
+    // Count different types
+    const emptyNotes = analysis.filter(x =>
+      x.event === 'note' && (x.isEmpty || x.hasPlaceholder)
+    )
+    const snapshots = analysis.filter(x => x.isSystemSnapshot)
+    const validNotes = analysis.filter(x =>
+      x.event === 'note' && !x.isEmpty && !x.hasPlaceholder
+    )
+
+    return {
       timestamp: new Date().toISOString(),
-      codeVersion: '2024-12-21-v4-FINAL', // Version marker
-      totalNotes: allLogs.length,
-      emptyNotesFound: emptyNotes.length,
-      emptyNotesDeleted: 0,
-      allNotesPreview: allNotesExamples, // Shows ALL notes (first 10) with matching status
-      oldestEmpty: emptyNotes.length > 0 ? emptyNotes[emptyNotes.length - 1].createdAt : null,
-      newestEmpty: emptyNotes.length > 0 ? emptyNotes[0].createdAt : null,
+      totalLogs: allLogs.length,
+      counts: {
+        emptyNotes: emptyNotes.length,
+        systemSnapshots: snapshots.length,
+        validNotes: validNotes.length,
+        otherEvents: allLogs.length - emptyNotes.length - snapshots.length - validNotes.length,
+      },
+      emptyNotes: emptyNotes,
+      systemSnapshots: snapshots,
+      allLogs: analysis,
     }
-
-    if (emptyNotes.length > 0) {
-      const emptyIds = emptyNotes.map((x) => x.id)
-      await fastify.models.Log.destroy({
-        where: { id: emptyIds },
-      })
-      diagnostics.emptyNotesDeleted = emptyIds.length
-      console.log(`🧹 [MANUAL CLEANUP] Deleted ${emptyIds.length} empty/placeholder notes for user ${req.user.id}`)
-    }
-
-    return diagnostics
   })
 
   fastify.post(
