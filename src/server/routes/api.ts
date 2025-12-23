@@ -592,13 +592,22 @@ export default async (fastify: FastifyInstance) => {
       order: [['createdAt', 'DESC']],
     })
 
-    // Separate empty notes from other logs
-    const emptyNotes = allLogs.filter(x =>
-      x.event === 'note' && (!x.text || x.text.trim() === '')
-    )
-    const contentLogs = allLogs.filter(x =>
-      x.event !== 'note' || (x.text && x.text.trim().length > 0)
-    )
+    // Separate empty notes from other logs (check for empty, whitespace, and placeholder text)
+    const emptyNotes = allLogs.filter(x => {
+      if (x.event !== 'note') return false
+      if (!x.text || x.text.trim() === '') return true
+      // Also catch placeholder text that might have been saved
+      const text = x.text.trim().toLowerCase()
+      return text.includes('will be deleted') || text.includes('log record')
+    })
+
+    const contentLogs = allLogs.filter(x => {
+      if (x.event !== 'note') return true
+      if (!x.text || x.text.trim() === '') return false
+      const text = x.text.trim().toLowerCase()
+      if (text.includes('will be deleted') || text.includes('log record')) return false
+      return true
+    })
 
     // Check if we have a system snapshot from today
     const today = dayjs().format('YYYY-MM-DD')
@@ -607,12 +616,12 @@ export default async (fastify: FastifyInstance) => {
       dayjs(x.createdAt).format('YYYY-MM-DD') === today
     )
 
-    // If we have multiple empty notes and no snapshot today, convert one to a snapshot
+    // Clean up empty notes and create snapshot if needed
     if (emptyNotes.length > 1 && !hasSnapshotToday) {
+      // Convert the oldest empty note to a system snapshot
       const context = await getLogContext(req.user)
-
-      // Use the second empty note (oldest) as the snapshot
       const oldEmptyNote = emptyNotes[emptyNotes.length - 1]
+
       await oldEmptyNote.set({
         event: 'system_snapshot',
         context,
@@ -622,9 +631,9 @@ export default async (fastify: FastifyInstance) => {
         },
       }).save()
 
-      // Delete any other extra empty notes
-      if (emptyNotes.length > 2) {
-        const idsToDelete = emptyNotes.slice(1, -1).map(x => x.id)
+      // Delete ALL other empty notes except the first one (for journaling)
+      const idsToDelete = emptyNotes.slice(1, -1).map(x => x.id)
+      if (idsToDelete.length > 0) {
         await fastify.models.Log.destroy({
           where: { id: idsToDelete },
         })
@@ -633,15 +642,16 @@ export default async (fastify: FastifyInstance) => {
       // Refresh content logs to include the new snapshot
       const snapshot = await fastify.models.Log.findByPk(oldEmptyNote.id)
       contentLogs.unshift(snapshot!)
+
     } else if (emptyNotes.length > 1) {
-      // We have a snapshot today, just delete extra empty notes
+      // We already have a snapshot today, delete ALL extra empty notes
       const idsToDelete = emptyNotes.slice(1).map(x => x.id)
       await fastify.models.Log.destroy({
         where: { id: idsToDelete },
       })
     }
 
-    // Ensure we have one empty note for journaling
+    // Ensure we have exactly one empty note for journaling
     const emptyNote = emptyNotes[0] || await fastify.models.Log.create({
       userId: req.user.id,
       text: '',
