@@ -228,6 +228,31 @@ export const Logs: React.FC = () => {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'system_snapshot') {
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="System:" blockView>
+                {log.context?.city && (
+                  <div>
+                    Location: {log.context.city}
+                    {log.context.country && `, ${log.context.country}`}
+                  </div>
+                )}
+                {log.context?.temperature && (
+                  <div>Temperature: {Math.round(log.context.temperature - 273.15)}°C</div>
+                )}
+                {log.context?.humidity && (
+                  <div>Humidity: {log.context.humidity}%</div>
+                )}
+                {log.metadata?.sound && (
+                  <div>Sound: {log.metadata.sound}</div>
+                )}
+                {log.metadata?.theme?.theme && (
+                  <div>Theme: {log.metadata.theme.theme}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         }
         return (
           <NoteEditor
