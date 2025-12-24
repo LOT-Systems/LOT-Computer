@@ -23,7 +23,9 @@ export async function runStartupCleanup(fastify: FastifyInstance) {
       if (!log.text || log.text.trim() === '') return true
       const text = log.text.trim().toLowerCase()
       // Catch placeholder text that might have been saved
-      return text.includes('will be deleted') || text.includes('log record')
+      return text.includes('will be deleted') ||
+             text.includes('log record') ||
+             text.includes('type here')
     })
 
     if (emptyLogs.length === 0) {
