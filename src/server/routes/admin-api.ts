@@ -393,7 +393,14 @@ export default async (fastify: FastifyInstance) => {
       const btn = document.getElementById('cleanupBtn');
       const result = document.getElementById('result');
 
-      if (!confirm('Are you sure you want to delete ALL empty logs from ALL users?')) {
+      console.log('Cleanup button clicked');
+
+      // Mobile-friendly confirmation
+      const confirmed = confirm('Are you sure you want to delete ALL empty logs from ALL users?');
+      console.log('Confirmation result:', confirmed);
+
+      if (!confirmed) {
+        console.log('User cancelled');
         return;
       }
 
@@ -401,12 +408,22 @@ export default async (fastify: FastifyInstance) => {
       btn.textContent = 'Cleaning up...';
       result.style.display = 'none';
 
+      console.log('Starting fetch request...');
+
       try {
         const response = await fetch('/admin-api/cleanup-all-empty-logs', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
         });
+
+        console.log('Response status:', response.status);
+
+        if (!response.ok) {
+          throw new Error('Server returned ' + response.status);
+        }
+
         const data = await response.json();
+        console.log('Response data:', data);
 
         result.style.display = 'block';
         if (data.deleted === 0) {
@@ -424,13 +441,17 @@ export default async (fastify: FastifyInstance) => {
         btn.disabled = false;
         btn.textContent = 'Delete All Empty Logs (All Users)';
       } catch (error) {
+        console.error('Cleanup error:', error);
         result.style.display = 'block';
         result.className = 'error';
-        result.innerHTML = '❌ <strong>Error:</strong> ' + error.message;
+        result.innerHTML = '❌ <strong>Error:</strong> ' + error.message + '<br><small>Check browser console for details</small>';
         btn.disabled = false;
         btn.textContent = 'Try Again';
       }
     }
+
+    // Log on page load
+    console.log('Admin cleanup page loaded');
   </script>
 </body>
 </html>`;
