@@ -690,6 +690,114 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
+  // HTML page for mobile cleanup (no console needed)
+  fastify.get('/logs/cleanup-page', async (req: FastifyRequest, reply) => {
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cleanup Empty Logs</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin: 0 0 20px 0;
+      font-size: 24px;
+    }
+    button {
+      background: #007AFF;
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: #0051D5;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 8px;
+      display: none;
+    }
+    .success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #2e7d32;
+    }
+    .info {
+      background: #e3f2fd;
+      color: #1565c0;
+      border: 1px solid #1565c0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧹 Cleanup Empty Logs</h1>
+    <p>This will delete all empty log entries from the past 3 days.</p>
+    <button id="cleanupBtn" onclick="runCleanup()">Delete Empty Logs</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    async function runCleanup() {
+      const btn = document.getElementById('cleanupBtn');
+      const result = document.getElementById('result');
+
+      btn.disabled = true;
+      btn.textContent = 'Cleaning up...';
+
+      try {
+        const response = await fetch('/logs/delete-empty', { method: 'POST' });
+        const data = await response.json();
+
+        result.style.display = 'block';
+        if (data.deleted === 0) {
+          result.className = 'info';
+          result.innerHTML = '✨ ' + data.message;
+        } else {
+          result.className = 'success';
+          result.innerHTML = '✅ ' + data.message + '<br><br>Refresh your Logs page to see the results.';
+        }
+
+        btn.textContent = 'Cleanup Complete';
+      } catch (error) {
+        result.style.display = 'block';
+        result.className = 'error';
+        result.innerHTML = '❌ Error: ' + error.message;
+        btn.disabled = false;
+        btn.textContent = 'Try Again';
+      }
+    }
+  </script>
+</body>
+</html>`;
+
+    reply.type('text/html').send(html);
+  })
+
   fastify.post(
     '/logs',
     async (
