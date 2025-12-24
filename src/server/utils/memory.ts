@@ -97,7 +97,15 @@ Please respond with ONLY a valid JSON object in this exact format:
   "options": ["option1", "option2", "option3"]
 }
 
-Make sure the question is personalized, relevant to self-care habits, and the options are 3-4 concise choices.`
+Make sure the question is personalized, relevant to self-care habits, and the options are 3-4 concise choices.
+
+${context.weatherDescription ? `**WEATHER-AWARE QUESTIONS:**
+The current weather is "${context.weatherDescription}". Consider asking questions that acknowledge this:
+- If rainy/stormy: Ask about indoor comfort, cozy activities, or mood during rainy weather
+- If sunny/clear: Ask about outdoor activities, energy levels, or sun exposure
+- If cloudy/overcast: Ask about indoor vs outdoor preferences, lighting needs
+- If extreme weather (very hot/cold/humid): Ask about coping strategies, comfort needs
+` : ''}`
 
     // Execute using whichever engine is available
     const completion = await engine.generateCompletion(fullPrompt, 1024)
@@ -200,9 +208,9 @@ export async function buildPrompt(user: User, logs: Log[], isWeekend: boolean = 
       contextLine = `It is ${localDate} in ${context.city}, ${context.country}`
     }
     if (context.temperature && context.humidity) {
-      contextLine += `, with a current temperature of ${Math.round(
-        toCelsius(context.temperature)
-      )}℃ and humidity at ${Math.round(context.humidity)}%.`
+      const tempC = Math.round(toCelsius(context.temperature))
+      const weatherDesc = context.weatherDescription ? ` The weather is: ${context.weatherDescription}.` : ''
+      contextLine += `, with a current temperature of ${tempC}℃ and humidity at ${Math.round(context.humidity)}%.${weatherDesc}`
     } else {
       contextLine += '.'
     }
@@ -1139,7 +1147,8 @@ export async function generateRecipeSuggestion(
     }
     if (context.temperature && context.humidity) {
       const tempC = Math.round(toCelsius(context.temperature))
-      contextLine += `, with a current temperature of ${tempC}℃ and humidity at ${Math.round(context.humidity)}%.`
+      const weatherDesc = context.weatherDescription ? ` The weather is: ${context.weatherDescription}.` : ''
+      contextLine += `, with a current temperature of ${tempC}℃ and humidity at ${Math.round(context.humidity)}%.${weatherDesc}`
     } else {
       contextLine += '.'
     }
@@ -1255,9 +1264,16 @@ ${hasUsershipTag && cohortInfo ? '4. **Deeply personalized** - Match their cohor
 ${contextLine ? `Current context:\n${contextLine}` : ''}${seasonalGuidance}${avoidanceInstruction}${cohortInfo}${userStory}
 
 **Weather-based guidance:**
-- If it's cold (below 15℃): Suggest warming, comforting foods
-- If it's hot (above 25℃): Suggest light, refreshing foods
-- If humid: Suggest lighter options
+${context.weatherDescription ? `Current weather: "${context.weatherDescription}"
+- If rainy/stormy: Suggest warm, comforting, cozy foods (soups, warm drinks, baked goods)
+- If sunny/clear: Suggest fresh, light, energizing foods (salads, fruits, cold drinks)
+- If cloudy/overcast: Suggest balanced comfort foods
+- ` : ''}Temperature: ${context.temperature ? Math.round(toCelsius(context.temperature)) : 'unknown'}℃
+- If cold (below 15℃): Suggest warming, comforting foods (soups, hot meals, warm drinks)
+- If hot (above 25℃): Suggest light, refreshing, cooling foods (cold salads, smoothies, chilled items)
+- If moderate (15-25℃): Suggest balanced, versatile options
+Humidity: ${context.humidity ? Math.round(context.humidity) : 'unknown'}%
+- If very humid (above 80%): Suggest lighter, less rich options to avoid feeling heavy
 
 ${cohortInfo ? `**Cohort-specific guidance:**
 Use the user's cohort profile to guide your suggestion:
