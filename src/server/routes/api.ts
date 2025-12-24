@@ -277,23 +277,18 @@ export default async (fastify: FastifyInstance) => {
     }>, reply) => {
       const { theme, baseColor, accentColor, customThemeEnabled } = req.body
 
-      // Log theme change asynchronously
-      process.nextTick(async () => {
-        const context = await getLogContext(req.user)
-        await fastify.models.Log.create({
-          userId: req.user.id,
-          event: 'theme_change',
-          text: '',
-          metadata: {
-            theme,
-            baseColor: baseColor || null,
-            accentColor: accentColor || null,
-            customThemeEnabled,
-            userTags: req.user.tags,
-          },
-          context,
-        })
-      })
+      // Store theme in user metadata for public profile
+      const currentMetadata = req.user.metadata || {}
+      const updatedMetadata = {
+        ...currentMetadata,
+        theme: {
+          theme,
+          baseColor: baseColor || null,
+          accentColor: accentColor || null,
+          customThemeEnabled,
+        },
+      }
+      await req.user.set({ metadata: updatedMetadata }).save()
 
       reply.ok()
     }
@@ -600,6 +595,209 @@ export default async (fastify: FastifyInstance) => {
     return logs
   })
 
+  // Diagnostic endpoint to manually cleanup empty logs
+  fastify.post('/logs/cleanup', async (req: FastifyRequest, reply) => {
+    const allLogs = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+      },
+      order: [['createdAt', 'DESC']],
+      limit: 50,
+    })
+
+    // Detailed analysis of each log
+    const analysis = allLogs.map((log, i) => ({
+      index: i,
+      id: log.id,
+      event: log.event,
+      text: log.text || '(empty)',
+      textLength: (log.text || '').length,
+      textTrimmed: (log.text || '').trim(),
+      isEmpty: !log.text || log.text.trim() === '',
+      hasPlaceholder: log.text ? (
+        log.text.toLowerCase().includes('will be deleted') ||
+        log.text.toLowerCase().includes('log record')
+      ) : false,
+      createdAt: log.createdAt,
+      isSystemSnapshot: log.event === 'system_snapshot',
+      metadata: log.metadata,
+      context: log.context,
+    }))
+
+    // Count different types
+    const emptyNotes = analysis.filter(x =>
+      x.event === 'note' && (x.isEmpty || x.hasPlaceholder)
+    )
+    const snapshots = analysis.filter(x => x.isSystemSnapshot)
+    const validNotes = analysis.filter(x =>
+      x.event === 'note' && !x.isEmpty && !x.hasPlaceholder
+    )
+
+    return {
+      timestamp: new Date().toISOString(),
+      totalLogs: allLogs.length,
+      counts: {
+        emptyNotes: emptyNotes.length,
+        systemSnapshots: snapshots.length,
+        validNotes: validNotes.length,
+        otherEvents: allLogs.length - emptyNotes.length - snapshots.length - validNotes.length,
+      },
+      emptyNotes: emptyNotes,
+      systemSnapshots: snapshots,
+      allLogs: analysis,
+    }
+  })
+
+  // Delete empty logs from past 3 days
+  fastify.post('/logs/delete-empty', async (req: FastifyRequest, reply) => {
+    // Find all empty logs from past 3 days
+    const threeDaysAgo = dayjs().subtract(3, 'days').toDate()
+
+    const emptyLogs = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: 'note',
+        createdAt: {
+          [Op.gte]: threeDaysAgo,
+        },
+      },
+    })
+
+    // Filter to truly empty logs (empty text or placeholder text)
+    const logsToDelete = emptyLogs.filter(log => {
+      if (!log.text || log.text.trim() === '') return true
+      const text = log.text.trim().toLowerCase()
+      return text.includes('will be deleted') || text.includes('log record')
+    })
+
+    const idsToDelete = logsToDelete.map(log => log.id)
+
+    if (idsToDelete.length === 0) {
+      return {
+        deleted: 0,
+        message: 'No empty logs found from past 3 days',
+      }
+    }
+
+    // Delete them
+    await fastify.models.Log.destroy({
+      where: { id: idsToDelete },
+    })
+
+    return {
+      deleted: idsToDelete.length,
+      message: `Successfully deleted ${idsToDelete.length} empty logs from past 3 days`,
+    }
+  })
+
+  // HTML page for mobile cleanup (no console needed)
+  fastify.get('/logs/cleanup-page', async (req: FastifyRequest, reply) => {
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cleanup Empty Logs</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin: 0 0 20px 0;
+      font-size: 24px;
+    }
+    button {
+      background: #007AFF;
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: #0051D5;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 8px;
+      display: none;
+    }
+    .success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #2e7d32;
+    }
+    .info {
+      background: #e3f2fd;
+      color: #1565c0;
+      border: 1px solid #1565c0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧹 Cleanup Empty Logs</h1>
+    <p>This will delete all empty log entries from the past 3 days.</p>
+    <button id="cleanupBtn" onclick="runCleanup()">Delete Empty Logs</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    async function runCleanup() {
+      const btn = document.getElementById('cleanupBtn');
+      const result = document.getElementById('result');
+
+      btn.disabled = true;
+      btn.textContent = 'Cleaning up...';
+
+      try {
+        const response = await fetch('/logs/delete-empty', { method: 'POST' });
+        const data = await response.json();
+
+        result.style.display = 'block';
+        if (data.deleted === 0) {
+          result.className = 'info';
+          result.innerHTML = '✨ ' + data.message;
+        } else {
+          result.className = 'success';
+          result.innerHTML = '✅ ' + data.message + '<br><br>Refresh your Logs page to see the results.';
+        }
+
+        btn.textContent = 'Cleanup Complete';
+      } catch (error) {
+        result.style.display = 'block';
+        result.className = 'error';
+        result.innerHTML = '❌ Error: ' + error.message;
+        btn.disabled = false;
+        btn.textContent = 'Try Again';
+      }
+    }
+  </script>
+</body>
+</html>`;
+
+    reply.type('text/html').send(html);
+  })
+
   fastify.post(
     '/logs',
     async (
@@ -640,6 +838,13 @@ export default async (fastify: FastifyInstance) => {
       const log = await fastify.models.Log.findByPk(req.params.id)
       if (!log) return reply.throw.notFound()
       if (log.event !== 'note') return log
+
+      // If user backspaced all content, delete the log instead of saving empty text
+      if (!text || text.length === 0) {
+        await log.destroy()
+        console.log(`🗑️  Deleted empty log ${log.id} for user ${req.user.id}`)
+        return { id: log.id, deleted: true }
+      }
 
       await log.set({ text }).save()
       process.nextTick(async () => {

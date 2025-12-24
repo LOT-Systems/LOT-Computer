@@ -96,7 +96,11 @@ export const useVisitorStats = createQuery<{
   refetchOnWindowFocus: false,
 })
 
-export const useLogs = createQuery<Log[]>('/api/logs')
+export const useLogs = createQuery<Log[]>('/api/logs', {
+  refetchOnWindowFocus: false, // Prevent refetching on tab switch (was creating duplicate empty logs)
+  cacheTime: 0, // Don't cache - always fetch fresh
+  staleTime: 0, // Consider data stale immediately
+})
 
 export const useCreateLog = createMutation<{ text: string }, Log>(
   'post',

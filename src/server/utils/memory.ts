@@ -165,6 +165,20 @@ export async function buildPrompt(user: User, logs: Log[], isWeekend: boolean = 
   // Extract Memory answers to build user's story
   const memoryLogs = logs.filter((log) => log.event === 'answer')
 
+  // Extract recently asked questions to avoid duplicates
+  const recentQuestions = memoryLogs
+    .slice(0, 15)
+    .map(log => log.metadata.question || '')
+    .filter(Boolean)
+
+  const uniquenessInstruction = recentQuestions.length > 0 ? `
+**CRITICAL: AVOID DUPLICATE QUESTIONS**
+You have already asked these questions - DO NOT ask similar or identical questions:
+${recentQuestions.map((q, i) => `${i + 1}. "${q}"`).join('\n')}
+
+Your new question MUST be unique and different from all of the above. If you're doing a follow-up, ask about a DIFFERENT aspect or go DEEPER into their psychology, not the same question again.
+` : ''
+
   // Extract journal entries for deeper persona research
   const journalLogs = logs.filter((log) => log.event === 'note' && log.text && log.text.length > 20)
 
@@ -271,7 +285,9 @@ CRITICAL: Use this SOUL-LEVEL understanding to craft questions that speak to the
 - "What's your go-to weekend comfort food?" (Options: Pancakes, Fresh pastries, Homemade soup, Favorite snacks)
 
 **CRITICAL: Keep it LIGHT, SIMPLE, and FUN. No deep soul-searching on weekends - just pleasant, easy questions.**
-${userStory ? '\n\nWhat we know about the user so far:\n' + userStory : ''}`
+${userStory ? '\n\nWhat we know about the user so far:\n' + userStory : ''}
+
+${uniquenessInstruction}`
   } else if (memoryLogs.length === 0) {
     // First question - always explore
     taskInstructions = `
@@ -287,7 +303,9 @@ ${userStory ? '\n\nWhat we know about the user so far:\n' + userStory : ''}`
 - Self-care and wellness habits
 - Social preferences and boundaries
 - Work and rest balance
-- Seasonal preferences`
+- Seasonal preferences
+
+${uniquenessInstruction}`
   } else if (shouldExploreNewTopic) {
     // Show story but ask to explore NEW topic
     const journalInsights = journalLogs.length > 0 ? `
@@ -360,7 +378,9 @@ Tailor your question to their soul archetype "${archetype}":
 - "The Explorer": Ask about new experiences, adventure, curiosity, expanding horizons
 - "The Wanderer": Invite self-discovery, identity exploration, path-finding, openness to change
 
-The question should speak to their SOUL LEVEL, not just surface behaviors. Make them think, feel, and reflect on who they truly are.` : ''}`
+The question should speak to their SOUL LEVEL, not just surface behaviors. Make them think, feel, and reflect on who they truly are.` : ''}
+
+${uniquenessInstruction}`
   } else {
     // Follow up on existing answers
     const journalInsights = journalLogs.length > 0 ? `
@@ -412,14 +432,23 @@ Based on these answers and journal entries, you can infer the user's preferences
 - "What temperature?" → Options: "Hot", "Warm", "Cold"
 - "Alone or with others?" → Options: "Solo", "With someone", "Varies"
 
-Keep it SHORT and SIMPLE. The user is answering many prompts - make this quick and easy.`
+Keep it SHORT and SIMPLE. The user is answering many prompts - make this quick and easy.
+
+${uniquenessInstruction}`
     } else {
       // DETAILED FORMAT for initial follow-ups (exploring depth)
       taskInstructions = `
 **Your task:** Generate ONE personalized follow-up question with 3-4 answer choices that:
 1. **MUST reference their previous answers** - Always start by acknowledging something they've already shared (e.g., "Since you mentioned you prefer tea in the morning, how do you usually prepare it?")
-2. **Builds deeper into their story** - Each question should feel like a natural continuation of the conversation, not a random topic
+2. **Builds PROGRESSIVELY deeper into their psychological and soul profile** - Each follow-up should probe ONE level deeper than the previous question, moving from surface behaviors → underlying motivations → core values → soul-level identity
 3. **Is contextually relevant** - Consider current time, weather, and their recent activity patterns
+
+**CRITICAL: Progressive Depth Requirement:**
+Follow-ups must build on BOTH behavioral patterns AND psychological/soul dimensions:
+- **First follow-up**: Surface behavior details (how, when, what specifically)
+- **Second follow-up**: Motivations and reasons (why this choice, what it provides)
+- **Third follow-up**: Values and meaning (what this reveals about priorities, what matters)
+- **Fourth+ follow-up**: Soul-level identity (who they are becoming, their deeper nature)
 
 **CRITICAL: User-Feedback Loop Requirements:**
 - If they have previous answers, you MUST explicitly reference at least one in your new question
@@ -428,11 +457,11 @@ Keep it SHORT and SIMPLE. The user is answering many prompts - make this quick a
 - The question should feel like you're having an ongoing conversation, not starting fresh each time
 - Make connections between their different answers AND journal reflections to show you understand their overall lifestyle and inner world
 
-**Examples of good follow-up questions:**
-- "Since you mentioned enjoying tea in the morning, how do you usually prepare it?" (Options: Quick tea bag, Loose leaf ritual, Matcha ceremony)
-- "You chose 'Fresh salad' for lunch earlier. What's your go-to salad base?" (Options: Mixed greens, Spinach, Arugula)
-- "Last time you said you prefer comfortable outfits. What fabrics feel best to you?" (Options: Soft cotton, Linen, Merino wool)
-- "Building on your earlier answer about posture awareness, do you stretch during the day?" (Options: Regular breaks, Only when sore, Not yet)
+**Examples of progressive follow-up questions:**
+LEVEL 1 (Behavior details): "Since you mentioned enjoying tea in the morning, how do you usually prepare it?" (Options: Quick tea bag, Loose leaf ritual, Matcha ceremony)
+LEVEL 2 (Motivations): "You chose 'Loose leaf ritual' - what does this morning ritual provide for you?" (Options: Peaceful start, Mindful moment, Sensory pleasure)
+LEVEL 3 (Values): "This ritual seems important to you. What value does it honor?" (Options: Presence, Self-care, Beauty in simplicity)
+LEVEL 4 (Soul identity): "Reflecting on this practice, what does it reveal about who you're becoming?" (Options: Someone who values slowness, A mindful being, One who honors small rituals)
 
 ${cohortInfo ? `**Soul Archetype Follow-Up Guidance:**
 Build deeper into their soul archetype "${archetype}" with this follow-up:
@@ -447,7 +476,9 @@ Build deeper into their soul archetype "${archetype}" with this follow-up:
 - "The Explorer": Build on curiosity (what you're exploring → what you're discovering about yourself)
 - "The Wanderer": Invite clarity emergence (what you're questioning → what's becoming clearer)
 
-CRITICAL: Make the follow-up SOUL-TOUCHING - reference their previous answer AND probe their deeper nature. Ask questions that make them pause and truly reflect on who they are becoming.` : ''}`
+CRITICAL: Make the follow-up SOUL-TOUCHING - reference their previous answer AND probe their deeper nature. Ask questions that make them pause and truly reflect on who they are becoming.` : ''}
+
+${uniquenessInstruction}`
     }
   }
 

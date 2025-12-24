@@ -211,15 +211,6 @@ state.isMirrorOn.subscribe((value) => {
     const sunset = dayjs.utc(weather.sunset * 1000).local()
     const isDark = now.isAfter(sunset) || now.isBefore(sunrise)
 
-    // Debug: Log theme calculation
-    console.log('[Theme Debug]', {
-      now: now.format('HH:mm:ss'),
-      sunset: sunset.format('HH:mm:ss'),
-      isDark,
-      currentTheme: _theme,
-      willSetTheme: isDark ? 'dark' : 'light'
-    })
-
     // Set theme based on time of day
     if (isDark) {
       theme.set('dark')
@@ -248,4 +239,51 @@ if (typeof document !== 'undefined') {
       x.colorRgb.join(' ')
     )
   })
+
+  // Save theme changes to backend for public profile
+  let saveThemeTimeout: NodeJS.Timeout | null = null
+  let isInitialLoad = true
+
+  const saveThemeToBackend = () => {
+    // Skip the very first call (happens when subscriptions are set up)
+    if (isInitialLoad) {
+      isInitialLoad = false
+      return
+    }
+
+    // Don't save on public profile pages
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')) {
+      return
+    }
+
+    const currentTheme = theme.get()
+    const currentBase = baseColor.get()
+    const currentAcc = accentColor.get()
+    const currentCustomEnabled = isCustomThemeEnabled.get()
+
+    if (saveThemeTimeout) clearTimeout(saveThemeTimeout)
+    saveThemeTimeout = setTimeout(() => {
+      // Only save if fetch API is available
+      if (typeof fetch === 'undefined') return
+
+      fetch('/api/theme-change', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          theme: currentTheme,
+          baseColor: currentBase,
+          accentColor: currentAcc,
+          customThemeEnabled: currentCustomEnabled,
+        }),
+      }).catch(err => {
+        // Silent fail - theme will still work locally
+        console.debug('Theme save skipped:', err.message)
+      })
+    }, 1000) // Debounce 1 second
+  }
+
+  // Subscribe to theme changes and save to backend
+  theme.subscribe(saveThemeToBackend)
+  baseColor.subscribe(saveThemeToBackend)
+  accentColor.subscribe(saveThemeToBackend)
 }
