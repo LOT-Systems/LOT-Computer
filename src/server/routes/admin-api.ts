@@ -412,6 +412,9 @@ export default async (fastify: FastifyInstance) => {
       margin: 20px 0;
       color: #856404;
     }
+    form {
+      margin: 30px 0;
+    }
     button {
       background: #dc3545;
       color: white;
@@ -421,39 +424,12 @@ export default async (fastify: FastifyInstance) => {
       border-radius: 4px;
       cursor: pointer;
       font-weight: 600;
+      width: 100%;
+      max-width: 400px;
     }
     button:hover { background: #c82333; }
-    button:disabled {
-      background: #6c757d;
-      cursor: not-allowed;
-    }
-    #result {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 4px;
-      display: none;
-    }
-    .success {
-      background: #d4edda;
-      border: 1px solid #c3e6cb;
-      color: #155724;
-    }
-    .error {
-      background: #f8d7da;
-      border: 1px solid #f5c6cb;
-      color: #721c24;
-    }
+    button:active { background: #bd2130; }
     .info { color: #666; font-size: 14px; margin-top: 20px; }
-    .breakdown {
-      margin-top: 15px;
-      font-family: monospace;
-      font-size: 12px;
-      max-height: 300px;
-      overflow-y: auto;
-      background: #f8f9fa;
-      padding: 10px;
-      border-radius: 4px;
-    }
   </style>
 </head>
 <body>
@@ -465,8 +441,9 @@ export default async (fastify: FastifyInstance) => {
       ⚠️ <strong>Warning:</strong> This action affects all users. Only use this if you're sure empty logs are accumulating due to a bug.
     </div>
 
-    <button id="cleanupBtn" onclick="runCleanup()">Delete All Empty Logs (All Users)</button>
-    <div id="result"></div>
+    <form method="POST" action="/admin-api/cleanup-all-empty-logs" onsubmit="return confirm('Are you sure you want to delete ALL empty logs from ALL users? This cannot be undone.');">
+      <button type="submit">Delete All Empty Logs (All Users)</button>
+    </form>
 
     <div class="info">
       <strong>What gets deleted:</strong>
@@ -481,72 +458,6 @@ export default async (fastify: FastifyInstance) => {
       </ul>
     </div>
   </div>
-
-  <script>
-    async function runCleanup() {
-      const btn = document.getElementById('cleanupBtn');
-      const result = document.getElementById('result');
-
-      console.log('Cleanup button clicked');
-
-      // Mobile-friendly confirmation
-      const confirmed = confirm('Are you sure you want to delete ALL empty logs from ALL users?');
-      console.log('Confirmation result:', confirmed);
-
-      if (!confirmed) {
-        console.log('User cancelled');
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = 'Cleaning up...';
-      result.style.display = 'none';
-
-      console.log('Starting fetch request...');
-
-      try {
-        const response = await fetch('/admin-api/cleanup-all-empty-logs', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        });
-
-        console.log('Response status:', response.status);
-
-        if (!response.ok) {
-          throw new Error('Server returned ' + response.status);
-        }
-
-        const data = await response.json();
-        console.log('Response data:', data);
-
-        result.style.display = 'block';
-        if (data.deleted === 0) {
-          result.className = 'info';
-          result.innerHTML = '✨ <strong>Database is clean!</strong><br>No empty logs found.';
-        } else {
-          result.className = 'success';
-          result.innerHTML = \`
-            ✅ <strong>Cleanup Complete!</strong><br>
-            Deleted <strong>\${data.deleted}</strong> empty logs from <strong>\${data.affectedUsers}</strong> users<br>
-            \${data.breakdown ? '<div class="breakdown">Breakdown by user:<br>' + Object.entries(data.breakdown).map(([userId, count]) => \`\${userId.substring(0, 8)}...: \${count} logs\`).join('<br>') + '</div>' : ''}
-          \`;
-        }
-
-        btn.disabled = false;
-        btn.textContent = 'Delete All Empty Logs (All Users)';
-      } catch (error) {
-        console.error('Cleanup error:', error);
-        result.style.display = 'block';
-        result.className = 'error';
-        result.innerHTML = '❌ <strong>Error:</strong> ' + error.message + '<br><small>Check browser console for details</small>';
-        btn.disabled = false;
-        btn.textContent = 'Try Again';
-      }
-    }
-
-    // Log on page load
-    console.log('Admin cleanup page loaded');
-  </script>
 </body>
 </html>`;
 
