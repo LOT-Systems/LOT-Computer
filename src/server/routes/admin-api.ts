@@ -474,4 +474,66 @@ export default async (fastify: FastifyInstance) => {
 
     reply.type('text/html').send(html);
   })
+
+  // Diagnostic endpoint to inspect what's in "empty" logs
+  fastify.get('/inspect-empty-logs', async (req: FastifyRequest, reply) => {
+    const allNotes = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: 'note',
+      },
+      order: [['createdAt', 'DESC']],
+      limit: 50,
+    })
+
+    // Find logs that appear empty or have suspicious content
+    const suspiciousLogs = allNotes.map(log => {
+      const text = log.text || ''
+      const trimmed = text.trim()
+      const charCodes = [...text].map(c => c.charCodeAt(0))
+
+      return {
+        id: log.id,
+        length: text.length,
+        trimmedLength: trimmed.length,
+        isEmpty: !text || text.trim() === '',
+        text: text,
+        trimmedText: trimmed,
+        charCodes: charCodes,
+        hasOnlyWhitespace: text.length > 0 && trimmed.length === 0,
+        createdAt: log.createdAt,
+      }
+    }).filter(log => log.isEmpty || log.hasOnlyWhitespace || log.length < 50)
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <title>Empty Logs Inspection</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #fff; }
+    .log { border: 1px solid #444; margin: 10px 0; padding: 10px; background: #2a2a2a; }
+    .empty { background: #3a2020; }
+    .whitespace { background: #3a3a20; }
+    pre { background: #1a1a1a; padding: 10px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>Empty Logs Inspection (Last 50 Notes)</h1>
+  <p>Found ${suspiciousLogs.length} suspicious logs</p>
+  ${suspiciousLogs.map(log => `
+    <div class="log ${log.isEmpty ? 'empty' : 'whitespace'}">
+      <strong>ID:</strong> ${log.id}<br>
+      <strong>Created:</strong> ${log.createdAt}<br>
+      <strong>Length:</strong> ${log.length} | <strong>Trimmed:</strong> ${log.trimmedLength}<br>
+      <strong>Is Empty:</strong> ${log.isEmpty}<br>
+      <strong>Has Only Whitespace:</strong> ${log.hasOnlyWhitespace}<br>
+      <strong>Text (raw):</strong> <pre>"${log.text.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t')}"</pre>
+      <strong>Char codes:</strong> <pre>[${log.charCodes.join(', ')}]</pre>
+    </div>
+  `).join('')}
+</body>
+</html>`
+
+    reply.type('text/html').send(html)
+  })
 }
