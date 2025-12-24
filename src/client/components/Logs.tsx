@@ -33,6 +33,7 @@ export const Logs: React.FC = () => {
   const pendingPushRef = React.useRef<NodeJS.Timeout | null>(null)
 
   const { data: loadedLogs = [], refetch: refetchLogs } = useLogs()
+
   const { mutate: updateLog } = useUpdateLog({
     onSuccess: (log) => {
       localStore.logById.set({
@@ -60,6 +61,7 @@ export const Logs: React.FC = () => {
 
   React.useEffect(() => {
     if (!loadedLogs.length) return
+
     // Update both stores atomically to prevent race condition
     const newLogById = loadedLogs.reduce(fp.by('id'), {})
     const newLogIds = loadedLogs.map(fp.prop('id'))
@@ -68,6 +70,16 @@ export const Logs: React.FC = () => {
     localStore.logById.set(newLogById)
     localStore.logIds.set(newLogIds)
   }, [loadedLogs])
+
+  // Cleanup pending push timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (pendingPushRef.current) {
+        clearTimeout(pendingPushRef.current)
+        pendingPushRef.current = null
+      }
+    }
+  }, [])
 
   const onChangeLog = React.useCallback(
     (id: string) => (text: string) => {
@@ -213,6 +225,31 @@ export const Logs: React.FC = () => {
                     </div>
                   )
                 })}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'system_snapshot') {
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="System:" blockView>
+                {log.context?.city && (
+                  <div>
+                    Location: {log.context.city}
+                    {log.context.country && `, ${log.context.country}`}
+                  </div>
+                )}
+                {log.context?.temperature && (
+                  <div>Temperature: {Math.round(log.context.temperature - 273.15)}°C</div>
+                )}
+                {log.context?.humidity && (
+                  <div>Humidity: {log.context.humidity}%</div>
+                )}
+                {log.metadata?.sound && (
+                  <div>Sound: {log.metadata.sound}</div>
+                )}
+                {log.metadata?.theme?.theme && (
+                  <div>Theme: {log.metadata.theme.theme}</div>
+                )}
               </Block>
             </LogContainer>
           )

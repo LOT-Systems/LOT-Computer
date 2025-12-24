@@ -44,18 +44,35 @@ interface SoundContext {
   usersOnline: number // Number of users currently online
 }
 
-// Generate a daily seed (0-1) based on the current date
-// Same seed for entire day, different seed each day
-function getDailySeed(): number {
-  const now = new Date()
-  const dateString = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`
-  // Simple hash function to convert date string to 0-1 value
-  let hash = 0
-  for (let i = 0; i < dateString.length; i++) {
-    hash = (hash << 5) - hash + dateString.charCodeAt(i)
-    hash = hash & hash // Convert to 32-bit integer
+// Generate a session-based seed (0-1) that varies each time sound is activated
+// Combines date + hour + random factor for unique soundscapes
+let sessionSeed: number | null = null
+
+function getSessionSeed(): number {
+  // Generate new seed only when sessionSeed is null (new activation)
+  if (sessionSeed === null) {
+    const now = new Date()
+    const dateString = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}-${now.getHours()}`
+
+    // Hash the date+hour string
+    let hash = 0
+    for (let i = 0; i < dateString.length; i++) {
+      hash = (hash << 5) - hash + dateString.charCodeAt(i)
+      hash = hash & hash
+    }
+
+    // Add random component for per-session variation (40% weight)
+    const baseHash = Math.abs(hash % 1000) / 1000
+    const randomComponent = Math.random() * 0.4
+    sessionSeed = (baseHash * 0.6 + randomComponent) % 1
   }
-  return Math.abs(hash % 1000) / 1000
+
+  return sessionSeed
+}
+
+// Reset session seed when sound is disabled
+function resetSessionSeed() {
+  sessionSeed = null
 }
 
 // Parse weather description into condition category
@@ -206,7 +223,7 @@ function getTimeContext(weather: any, usersOnline: number): SoundContext {
     humidity: weather?.humidity ?? null,
     windSpeed: weather?.windSpeed ?? null,
     pressure: weather?.pressure ?? null,
-    dailySeed: getDailySeed(),
+    dailySeed: getSessionSeed(),
     usersOnline,
   }
 }
@@ -399,14 +416,14 @@ export function useSound(enabled: boolean) {
           }
           console.log(`🌦️ Weather: ${context.weather}, ${context.temperature}°C, ${context.humidity}% humidity, ${context.windSpeed}m/s wind, ${context.pressure}hPa`)
           console.log(`👥 Users online: ${context.usersOnline}${context.usersOnline > 5 ? ' 🎵 Click symphony active!' : ''}`)
-          console.log(`🎲 Daily variation seed: ${context.dailySeed.toFixed(3)}`)
+          console.log(`🎲 Session variation seed: ${context.dailySeed.toFixed(3)} (unique per activation)`)
           console.log(`📊 Sound context hash:`, JSON.stringify({
             period: context.period,
             weather: context.weather,
             temp: context.temperature,
             humidity: context.humidity,
             usersOnline: context.usersOnline,
-            seed: context.dailySeed.toFixed(3),
+            sessionSeed: context.dailySeed.toFixed(3),
             timestamp: new Date().toISOString()
           }))
 
@@ -465,6 +482,9 @@ export function useSound(enabled: boolean) {
         cleanupSounds(soundsRef.current, audioContext)
         soundsRef.current = {}
         console.log('🔇 Sound stopped')
+
+        // Reset session seed so next activation generates new sound
+        resetSessionSeed()
 
         // Clear sound description in store
         stores.soundDescription.set('')
@@ -537,50 +557,77 @@ function createContextualAmbience(
   baseFreq: number,
   volume: number
 ) {
-  const { frequency, dailySeed } = context
-  
+  const { frequency, dailySeed, temperature, humidity, weather } = context
+
+  // Weather-based frequency modulation
+  let weatherMod = 1.0
+  if (weather === 'rain' || weather === 'drizzle') weatherMod = 0.92
+  else if (weather === 'thunderstorm') weatherMod = 0.85
+  else if (weather === 'snow') weatherMod = 1.08
+  else if (weather === 'fog') weatherMod = 0.96
+
+  // Temperature-based timbre variation (warmer = richer/lower, colder = crystalline/higher)
+  let tempMod = 1.0
+  if (temperature !== null) {
+    tempMod = 0.95 + (temperature / 100) // Subtle shift based on temp
+  }
+
+  // Humidity-based volume variation (higher humidity = slightly louder, more fluid)
+  let humidityVolume = volume
+  if (humidity !== null) {
+    humidityVolume = volume * (0.9 + (humidity / 200))
+  }
+
   // Create base drone oscillator
   const drone = audioContext.createOscillator()
   const droneGain = audioContext.createGain()
-  
-  drone.type = 'sine'
-  drone.frequency.value = baseFreq * (0.95 + dailySeed * 0.1)
-  droneGain.gain.value = volume
-  
+
+  // Waveform varies with weather
+  if (weather === 'rain' || weather === 'drizzle') {
+    drone.type = 'triangle' // Softer for rain
+  } else if (weather === 'thunderstorm') {
+    drone.type = 'sawtooth' // Richer for storms
+  } else {
+    drone.type = 'sine' // Pure for clear/other
+  }
+
+  drone.frequency.value = baseFreq * weatherMod * tempMod * (0.95 + dailySeed * 0.1)
+  droneGain.gain.value = humidityVolume
+
   drone.connect(droneGain)
   droneGain.connect(masterGain)
   drone.start()
-  
+
   sounds.drone = drone
   sounds.droneGain = droneGain
-  
+
   // Create modulation oscillator for gentle pulsing (brainwave entrainment)
   const modOsc = audioContext.createOscillator()
   const modGain = audioContext.createGain()
-  
+
   modOsc.type = 'sine'
   modOsc.frequency.value = frequency / 10 // Use context frequency for pacing
-  modGain.gain.value = 0.05
-  
+  modGain.gain.value = 0.05 * (0.8 + dailySeed * 0.4) // Vary modulation depth
+
   modOsc.connect(modGain)
   modGain.connect(droneGain.gain)
   modOsc.start()
-  
+
   sounds.modOsc = modOsc
   sounds.modGain = modGain
-  
+
   // Add harmonic for richness
   const harmonic = audioContext.createOscillator()
   const harmonicGain = audioContext.createGain()
-  
+
   harmonic.type = 'sine'
-  harmonic.frequency.value = baseFreq * 1.5 * (0.98 + dailySeed * 0.04)
-  harmonicGain.gain.value = volume * 0.5
-  
+  harmonic.frequency.value = baseFreq * 1.5 * weatherMod * (0.98 + dailySeed * 0.04)
+  harmonicGain.gain.value = humidityVolume * 0.5 * (0.85 + dailySeed * 0.3)
+
   harmonic.connect(harmonicGain)
   harmonicGain.connect(masterGain)
   harmonic.start()
-  
+
   sounds.harmonic = harmonic
   sounds.harmonicGain = harmonicGain
 }
