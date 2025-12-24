@@ -248,6 +248,13 @@ export default async (fastify: FastifyInstance) => {
 
       if (emptyLogs.length === 0) {
         console.log('✅ [ADMIN] No empty logs found - database is clean')
+
+        // If it's an HTML form submission (no Accept: application/json), return HTML
+        const acceptsJson = req.headers.accept?.includes('application/json')
+        if (!acceptsJson) {
+          return reply.type('text/html').send(generateResultPage(0, 0, {}))
+        }
+
         return {
           success: true,
           deleted: 0,
@@ -274,6 +281,12 @@ export default async (fastify: FastifyInstance) => {
 
       console.log(`✅ [ADMIN] Successfully deleted ${emptyLogs.length} empty logs from ${userCount} users`)
 
+      // If it's an HTML form submission, return HTML
+      const acceptsJson = req.headers.accept?.includes('application/json')
+      if (!acceptsJson) {
+        return reply.type('text/html').send(generateResultPage(emptyLogs.length, userCount, byUser))
+      }
+
       return {
         success: true,
         deleted: emptyLogs.length,
@@ -286,6 +299,87 @@ export default async (fastify: FastifyInstance) => {
       return reply.throw.serverError(error.message)
     }
   })
+
+  // Helper function to generate result page
+  function generateResultPage(deleted: number, userCount: number, breakdown: { [key: string]: number }) {
+    const breakdownHtml = Object.entries(breakdown)
+      .map(([userId, count]) => `${userId.substring(0, 8)}...: ${count} logs`)
+      .join('<br>')
+
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cleanup Results</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .icon { font-size: 64px; margin-bottom: 20px; }
+    h1 { color: #28a745; margin: 0 0 20px 0; }
+    .stats {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 4px;
+      margin: 20px 0;
+      font-size: 18px;
+    }
+    .breakdown {
+      margin-top: 20px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      text-align: left;
+    }
+    a {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    a:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    ${deleted === 0 ? `
+      <div class="icon">✨</div>
+      <h1>Database is Clean!</h1>
+      <p>No empty logs found across all users.</p>
+    ` : `
+      <div class="icon">✅</div>
+      <h1>Cleanup Complete!</h1>
+      <div class="stats">
+        <strong>${deleted}</strong> empty logs deleted<br>
+        from <strong>${userCount}</strong> users
+      </div>
+      ${breakdownHtml ? `<div class="breakdown"><strong>Breakdown by user:</strong><br>${breakdownHtml}</div>` : ''}
+    `}
+    <a href="/admin-api/cleanup-all-empty-logs">← Back to Cleanup Page</a>
+  </div>
+</body>
+</html>`
+  }
 
   // Admin endpoint: Get cleanup page (HTML interface)
   fastify.get('/cleanup-all-empty-logs', async (req: FastifyRequest, reply) => {
