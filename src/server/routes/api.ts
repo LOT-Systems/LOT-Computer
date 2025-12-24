@@ -1058,12 +1058,14 @@ export default async (fastify: FastifyInstance) => {
         // Usership users: Generate AI-based context-aware question using Claude
         console.log(`🔍 Attempting to generate AI question for Usership user ${req.user.id}`)
         try {
+          // Load 60 logs to ensure we get 30+ answer logs for duplicate detection
+          // (some logs are notes/activities, not answers)
           const logs = await fastify.models.Log.findAll({
             where: {
               userId: req.user.id,
             },
             order: [['createdAt', 'DESC']],
-            limit: 20,
+            limit: 60,
           })
 
           const prompt = await buildPrompt(req.user, logs, isWeekend)
