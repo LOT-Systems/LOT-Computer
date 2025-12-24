@@ -18,14 +18,10 @@ export async function runStartupCleanup(fastify: FastifyInstance) {
       },
     })
 
-    // Filter to find truly empty notes and placeholder text
+    // Filter to find truly empty notes (empty string or whitespace only)
     const emptyLogs = allNotes.filter(log => {
-      if (!log.text || log.text.trim() === '') return true
-      const text = log.text.trim().toLowerCase()
-      // ONLY match exact placeholder text, not user content containing these words
-      return text === 'the log record will be deleted' ||
-             text === 'type here...' ||
-             text === 'type here'
+      // Match logs with no text or only whitespace
+      return !log.text || log.text.trim() === ''
     })
 
     if (emptyLogs.length === 0) {
