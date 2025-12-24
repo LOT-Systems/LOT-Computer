@@ -798,6 +798,114 @@ export default async (fastify: FastifyInstance) => {
     reply.type('text/html').send(html);
   })
 
+  // Simple GET endpoint to delete empty logs - just visit the URL
+  fastify.get('/logs/cleanup-now', async (req: FastifyRequest, reply) => {
+    try {
+      // Find all empty logs from past 7 days (extended from 3 to catch more)
+      const sevenDaysAgo = dayjs().subtract(7, 'days').toDate()
+
+      const emptyLogs = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: 'note',
+          createdAt: {
+            [Op.gte]: sevenDaysAgo,
+          },
+        },
+      })
+
+      // Filter to truly empty logs (empty text or placeholder text)
+      const logsToDelete = emptyLogs.filter(log => {
+        if (!log.text || log.text.trim() === '') return true
+        const text = log.text.trim().toLowerCase()
+        return text.includes('will be deleted') ||
+               text.includes('log record') ||
+               text.includes('type here')
+      })
+
+      const idsToDelete = logsToDelete.map(log => log.id)
+
+      if (idsToDelete.length === 0) {
+        return reply.type('text/html').send(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Cleanup Complete</title>
+            <style>
+              body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; text-align: center; }
+              .success { color: #28a745; font-size: 48px; }
+              h1 { color: #333; }
+              p { color: #666; font-size: 18px; }
+              a { color: #007bff; text-decoration: none; }
+            </style>
+          </head>
+          <body>
+            <div class="success">✨</div>
+            <h1>Database is Clean!</h1>
+            <p>No empty logs found from the past 7 days.</p>
+            <p><a href="/logs">← Back to Logs</a></p>
+          </body>
+          </html>
+        `)
+      }
+
+      // Delete them
+      await fastify.models.Log.destroy({
+        where: { id: idsToDelete },
+      })
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Cleanup Complete</title>
+          <style>
+            body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; text-align: center; }
+            .success { color: #28a745; font-size: 48px; }
+            h1 { color: #333; }
+            p { color: #666; font-size: 18px; }
+            .count { font-size: 36px; font-weight: bold; color: #007bff; }
+            a { color: #007bff; text-decoration: none; }
+          </style>
+        </head>
+        <body>
+          <div class="success">✅</div>
+          <h1>Cleanup Complete!</h1>
+          <div class="count">${idsToDelete.length}</div>
+          <p>empty logs deleted from the past 7 days</p>
+          <p><a href="/logs">← Back to Logs</a></p>
+        </body>
+        </html>
+      `)
+    } catch (error: any) {
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Cleanup Error</title>
+          <style>
+            body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; text-align: center; }
+            .error { color: #dc3545; font-size: 48px; }
+            h1 { color: #333; }
+            p { color: #666; font-size: 18px; }
+          </style>
+        </head>
+        <body>
+          <div class="error">❌</div>
+          <h1>Cleanup Failed</h1>
+          <p>${error.message}</p>
+        </body>
+        </html>
+      `)
+    }
+  })
+
   fastify.post(
     '/logs',
     async (
