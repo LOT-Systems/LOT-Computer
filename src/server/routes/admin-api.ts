@@ -8,6 +8,16 @@ import { sync } from '../sync.js'
 import dayjs from '../utils/dayjs.js'
 
 export default async (fastify: FastifyInstance) => {
+  // Add parser for form-encoded data from HTML forms
+  // This allows the cleanup page's HTML form to POST without 415 errors
+  fastify.addContentTypeParser('application/x-www-form-urlencoded',
+    { parseAs: 'string' },
+    function (req, body, done) {
+      // We don't use the body data, so just pass empty object
+      done(null, {})
+    }
+  )
+
   fastify.get(
     '/users',
     async (
@@ -225,11 +235,7 @@ export default async (fastify: FastifyInstance) => {
   )
 
   // Admin endpoint: Clean up ALL empty logs across all users
-  fastify.post('/cleanup-all-empty-logs', {
-    config: {
-      rawBody: true  // Accept form submissions
-    }
-  }, async (req: FastifyRequest, reply) => {
+  fastify.post('/cleanup-all-empty-logs', async (req: FastifyRequest, reply) => {
     try {
       console.log(`🧹 [ADMIN] Starting global empty logs cleanup...`)
       console.log(`📝 [ADMIN] Request content-type: ${req.headers['content-type']}`)
