@@ -251,10 +251,10 @@ export default async (fastify: FastifyInstance) => {
       const emptyLogs = allNotes.filter(log => {
         if (!log.text || log.text.trim() === '') return true
         const text = log.text.trim().toLowerCase()
-        // Catch placeholder text that might have been saved
-        return text.includes('will be deleted') ||
-               text.includes('log record') ||
-               text.includes('type here')
+        // ONLY match exact placeholder text, not user content containing these words
+        return text === 'the log record will be deleted' ||
+               text === 'type here...' ||
+               text === 'type here'
       })
 
       if (emptyLogs.length === 0) {
