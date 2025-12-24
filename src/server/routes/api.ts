@@ -576,15 +576,15 @@ export default async (fastify: FastifyInstance) => {
     )
 
     const recentLog = logs[0]
-    // Create new empty log if:
-    // - No recent log exists
-    // - Recent log is not a note
-    // - Recent log has text (saved) - push it down immediately
-    if (
-      !recentLog ||
-      recentLog.event !== 'note' ||
-      (recentLog.text && recentLog.text.trim().length > 0)
-    ) {
+
+    // FIXED: Only create new empty log if there ISN'T already an empty one at the top
+    // This prevents creating endless empty logs on every page load
+    const hasEmptyLogAtTop = recentLog &&
+                             recentLog.event === 'note' &&
+                             (!recentLog.text || recentLog.text.trim().length === 0)
+
+    if (!hasEmptyLogAtTop) {
+      // No empty log at top, create one for user input
       const emptyLog = await fastify.models.Log.create({
         userId: req.user.id,
         text: '',
@@ -592,6 +592,8 @@ export default async (fastify: FastifyInstance) => {
       })
       return [emptyLog, ...logs]
     }
+
+    // Already have an empty log at top, just return existing logs
     return logs
   })
 
