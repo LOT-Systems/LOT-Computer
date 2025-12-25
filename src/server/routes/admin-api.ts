@@ -240,12 +240,12 @@ export default async (fastify: FastifyInstance) => {
       console.log(`🧹 [ADMIN] Starting global empty logs cleanup...`)
       console.log(`📝 [ADMIN] Request content-type: ${req.headers['content-type']}`)
 
-      // Find ALL empty logs from past 4 days across all users (any event type)
-      const fourDaysAgo = dayjs().subtract(4, 'days').toDate()
+      // Find ALL empty logs from past 7 days across all users (any event type)
+      const sevenDaysAgo = dayjs().subtract(7, 'days').toDate()
       const allLogs = await fastify.models.Log.findAll({
         where: {
           createdAt: {
-            [Op.gte]: fourDaysAgo
+            [Op.gte]: sevenDaysAgo
           }
         },
       })
@@ -261,7 +261,7 @@ export default async (fastify: FastifyInstance) => {
       })
 
       if (emptyLogs.length === 0) {
-        console.log('✅ [ADMIN] No empty logs found from past 4 days - database is clean')
+        console.log('✅ [ADMIN] No empty logs found from past 7 days - database is clean')
 
         // If it's an HTML form submission (no Accept: application/json), return HTML
         const acceptsJson = req.headers.accept?.includes('application/json')
@@ -284,7 +284,7 @@ export default async (fastify: FastifyInstance) => {
 
       const userCount = Object.keys(byUser).length
 
-      console.log(`📊 [ADMIN] Found ${emptyLogs.length} empty logs from past 4 days across ${userCount} users`)
+      console.log(`📊 [ADMIN] Found ${emptyLogs.length} empty logs from past 7 days across ${userCount} users`)
       console.log(`🗑️  [ADMIN] Deleting...`)
 
       // Delete by IDs
@@ -293,7 +293,7 @@ export default async (fastify: FastifyInstance) => {
         where: { id: idsToDelete },
       })
 
-      console.log(`✅ [ADMIN] Successfully deleted ${emptyLogs.length} empty logs from past 4 days (${userCount} users affected)`)
+      console.log(`✅ [ADMIN] Successfully deleted ${emptyLogs.length} empty logs from past 7 days (${userCount} users affected)`)
 
       // If it's an HTML form submission, return HTML
       const acceptsJson = req.headers.accept?.includes('application/json')
@@ -449,21 +449,21 @@ export default async (fastify: FastifyInstance) => {
 <body>
   <div class="container">
     <h1>🧹 Admin: Cleanup All Empty Logs</h1>
-    <p>This will delete empty log entries from the <strong>past 4 days</strong> across ALL users.</p>
+    <p>This will delete empty log entries from the <strong>past 7 days</strong> across ALL users.</p>
 
     <div class="warning">
       ⚠️ <strong>Warning:</strong> This action affects all users. Only use this if you're sure empty logs are accumulating due to a bug.
     </div>
 
-    <form method="POST" action="/admin-api/cleanup-all-empty-logs" onsubmit="return confirm('Are you sure you want to delete empty logs from the past 4 days from ALL users? This cannot be undone.');">
-      <button type="submit">Delete Empty Logs from Past 4 Days (All Users)</button>
+    <form method="POST" action="/admin-api/cleanup-all-empty-logs" onsubmit="return confirm('Are you sure you want to delete empty logs from the past 7 days from ALL users? This cannot be undone.');">
+      <button type="submit">Delete Empty Logs from Past 7 Days (All Users)</button>
     </form>
 
     <div class="info">
       <strong>What gets deleted:</strong>
       <ul>
-        <li>ANY logs from the past 4 days with empty text (null or empty string)</li>
-        <li>ANY logs from the past 4 days with only whitespace (spaces, tabs, newlines)</li>
+        <li>ANY logs from the past 7 days with empty text (null or empty string)</li>
+        <li>ANY logs from the past 7 days with only whitespace (spaces, tabs, newlines)</li>
         <li>This includes notes, theme_change events, and any other event types</li>
       </ul>
       <strong>What's preserved:</strong>
