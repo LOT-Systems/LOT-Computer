@@ -544,4 +544,297 @@ export default async (fastify: FastifyInstance) => {
 
     reply.type('text/html').send(html)
   })
+
+  // Restore Memory Answers from Backup
+  fastify.get('/restore-memory-answers', async (req: FastifyRequest, reply) => {
+    try {
+      const { Sequelize } = await import('sequelize')
+
+      // Connect to backup database
+      const backupDb = new Sequelize('defaultdb', 'doadmin', 'AVNS_8V6Hqzuxwj0JkMxgNvR', {
+        host: 'db-postgresql-nyc3-92053-dec-24-backup-do-user-22640384-0.l.db.ondigitalocean.com',
+        port: 25060,
+        dialect: 'postgres',
+        logging: false,
+        dialectOptions: {
+          ssl: { require: true, rejectUnauthorized: false }
+        }
+      })
+
+      const fourDaysAgo = dayjs().subtract(4, 'days').toDate()
+
+      // Get answer events from backup
+      const [backupAnswers] = await backupDb.query(`
+        SELECT id, user_id, metadata, created_at
+        FROM logs
+        WHERE event = 'answer'
+          AND created_at >= :fourDaysAgo
+        ORDER BY created_at DESC
+      `, { replacements: { fourDaysAgo } })
+
+      // Get existing answer IDs from production
+      const prodAnswers = await fastify.models.Log.findAll({
+        where: { event: 'answer' },
+        attributes: ['id']
+      })
+
+      const existingIds = new Set(prodAnswers.map(r => r.id))
+      const missing = (backupAnswers as any[]).filter(r => !existingIds.has(r.id))
+
+      await backupDb.close()
+
+      // Generate HTML
+      const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restore Memory Answers</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 { color: #333; margin-top: 0; }
+    .stats {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+    }
+    .stats strong { color: #1976d2; font-size: 24px; }
+    .warning {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    .success {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover { background: #218838; }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .sample {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔄 Restore Memory Answers</h1>
+    <p>This will restore deleted Memory answer events from the backup database.</p>
+
+    <div class="stats">
+      <strong>${backupAnswers.length}</strong> answer events in backup (past 4 days)<br>
+      <strong>${existingIds.size}</strong> answer events currently in production<br>
+      <strong>${missing.length}</strong> missing (to restore)
+    </div>
+
+    ${missing.length === 0 ? `
+      <div class="success">
+        ✅ <strong>No missing answer events found!</strong><br>
+        Your database is complete. All Memory answers are present.
+      </div>
+    ` : `
+      <div class="warning">
+        ⚠️ <strong>${missing.length} Memory answer events are missing from production.</strong><br>
+        These can be safely restored without overwriting any existing data.
+      </div>
+
+      <h3>Sample of missing answers:</h3>
+      ${missing.slice(0, 3).map((a: any) => {
+        const meta = typeof a.metadata === 'string' ? JSON.parse(a.metadata) : a.metadata
+        const q = meta?.question || 'Unknown'
+        const ans = meta?.answer || 'Unknown'
+        return `<div class="sample">
+          <strong>Q:</strong> ${q.substring(0, 80)}${q.length > 80 ? '...' : ''}<br>
+          <strong>A:</strong> ${ans.substring(0, 80)}${ans.length > 80 ? '...' : ''}<br>
+          <small>${new Date(a.created_at).toLocaleString()}</small>
+        </div>`
+      }).join('')}
+      ${missing.length > 3 ? `<p><em>... and ${missing.length - 3} more</em></p>` : ''}
+
+      <form method="POST" action="/admin-api/restore-memory-answers" onsubmit="return confirm('Restore ${missing.length} Memory answer events? This is safe and will not overwrite existing data.');">
+        <button type="submit">Restore ${missing.length} Memory Answers</button>
+      </form>
+    `}
+
+    <p style="margin-top: 20px; font-size: 14px; color: #666;">
+      <a href="/admin-api/cleanup-all-empty-logs">← Back to Admin Tools</a>
+    </p>
+  </div>
+</body>
+</html>`
+
+      reply.type('text/html').send(html)
+    } catch (error: any) {
+      console.error('Restore preview error:', error)
+      reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html><body style="font-family: sans-serif; padding: 20px;">
+        <h1>Error</h1>
+        <p>${error.message}</p>
+        <p><a href="/admin-api/restore-memory-answers">Try Again</a></p>
+        </body></html>
+      `)
+    }
+  })
+
+  fastify.post('/restore-memory-answers', async (req: FastifyRequest, reply) => {
+    try {
+      const { Sequelize } = await import('sequelize')
+
+      // Connect to backup database
+      const backupDb = new Sequelize('defaultdb', 'doadmin', 'AVNS_8V6Hqzuxwj0JkMxgNvR', {
+        host: 'db-postgresql-nyc3-92053-dec-24-backup-do-user-22640384-0.l.db.ondigitalocean.com',
+        port: 25060,
+        dialect: 'postgres',
+        logging: false,
+        dialectOptions: {
+          ssl: { require: true, rejectUnauthorized: false }
+        }
+      })
+
+      const fourDaysAgo = dayjs().subtract(4, 'days').toDate()
+
+      console.log('🔄 [RESTORE] Starting Memory answer restoration...')
+
+      // Get answer events from backup
+      const [backupAnswers] = await backupDb.query(`
+        SELECT id, user_id, event, text, metadata, context, created_at, updated_at
+        FROM logs
+        WHERE event = 'answer'
+          AND created_at >= :fourDaysAgo
+        ORDER BY created_at DESC
+      `, { replacements: { fourDaysAgo } })
+
+      // Get existing answer IDs
+      const prodAnswers = await fastify.models.Log.findAll({
+        where: { event: 'answer' },
+        attributes: ['id']
+      })
+
+      const existingIds = new Set(prodAnswers.map(r => r.id))
+      const missing = (backupAnswers as any[]).filter(r => !existingIds.has(r.id))
+
+      console.log(`📊 [RESTORE] Found ${missing.length} missing answer events`)
+
+      if (missing.length === 0) {
+        await backupDb.close()
+        return reply.type('text/html').send(`
+          <!DOCTYPE html>
+          <html><body style="font-family: sans-serif; padding: 20px; text-align: center;">
+          <h1>✅ No Restoration Needed</h1>
+          <p>All Memory answers are already present in the database.</p>
+          <p><a href="/admin-api/restore-memory-answers">← Back</a></p>
+          </body></html>
+        `)
+      }
+
+      // Restore missing answers
+      let restored = 0
+      for (const answer of missing) {
+        await fastify.models.Log.create({
+          id: answer.id,
+          userId: answer.user_id,
+          event: answer.event,
+          text: answer.text || '',
+          metadata: answer.metadata,
+          context: answer.context || {},
+          createdAt: answer.created_at,
+          updatedAt: answer.updated_at
+        })
+        restored++
+      }
+
+      await backupDb.close()
+
+      console.log(`✅ [RESTORE] Successfully restored ${restored} Memory answer events`)
+
+      // Success page
+      reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Restoration Complete</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              max-width: 600px;
+              margin: 50px auto;
+              padding: 20px;
+              text-align: center;
+            }
+            .success {
+              background: #d4edda;
+              border: 2px solid #28a745;
+              padding: 30px;
+              border-radius: 8px;
+            }
+            h1 { color: #28a745; margin: 0 0 20px 0; }
+            .stats {
+              font-size: 48px;
+              font-weight: bold;
+              color: #28a745;
+              margin: 20px 0;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="success">
+            <div style="font-size: 64px;">✅</div>
+            <h1>Restoration Complete!</h1>
+            <div class="stats">${restored}</div>
+            <p>Memory answer events have been successfully restored.</p>
+            <p style="margin-top: 30px;">
+              <a href="/admin-api/restore-memory-answers">← Back to Restore Page</a>
+            </p>
+          </div>
+        </body>
+        </html>
+      `)
+    } catch (error: any) {
+      console.error('❌ [RESTORE] Restoration failed:', error)
+      reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html><body style="font-family: sans-serif; padding: 20px;">
+        <h1 style="color: red;">❌ Restoration Failed</h1>
+        <p><strong>Error:</strong> ${error.message}</p>
+        <pre style="background: #f5f5f5; padding: 10px; overflow: auto;">${error.stack}</pre>
+        <p><a href="/admin-api/restore-memory-answers">← Try Again</a></p>
+        </body></html>
+      `)
+    }
+  })
 }
