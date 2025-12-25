@@ -334,12 +334,12 @@ fastify.setNotFoundHandler(async (req, res) => {
   res.code(404).send('Not found')
 })
 
-// Run startup cleanup before starting server
+// Start server
 fastify.ready().then(async () => {
-  // Clean up empty logs on startup
-  await runStartupCleanup(fastify)
+  // REMOVED: Startup cleanup was deleting Memory answer events
+  // Memory answers have event='answer' with text='' (data is in metadata field)
+  // The cleanup was incorrectly deleting these important logs
 
-  // Start server
   fastify.listen({ port: config.port, host: '0.0.0.0' }, function (err, address) {
     if (err) {
       console.error(err)
