@@ -478,10 +478,9 @@ export default async (fastify: FastifyInstance) => {
   // Diagnostic endpoint to inspect what's in "empty" logs
   fastify.get('/inspect-empty-logs', async (req: FastifyRequest, reply) => {
     const fourDaysAgo = dayjs().subtract(4, 'days').toDate()
-    const allNotes = await fastify.models.Log.findAll({
+    const allLogs = await fastify.models.Log.findAll({
       where: {
         userId: req.user.id,
-        event: 'note',
         createdAt: {
           [Op.gte]: fourDaysAgo
         }
@@ -490,13 +489,14 @@ export default async (fastify: FastifyInstance) => {
     })
 
     // Find logs that appear empty
-    const suspiciousLogs = allNotes.map(log => {
+    const suspiciousLogs = allLogs.map(log => {
       const text = log.text || ''
       const trimmed = text.trim()
       const charCodes = [...text].map(c => c.charCodeAt(0))
 
       return {
         id: log.id,
+        event: log.event,
         length: text.length,
         trimmedLength: trimmed.length,
         isEmpty: !text || text.trim() === '',
@@ -526,6 +526,7 @@ export default async (fastify: FastifyInstance) => {
   ${suspiciousLogs.map(log => `
     <div class="log ${log.isEmpty ? 'empty' : 'whitespace'}">
       <strong>ID:</strong> ${log.id}<br>
+      <strong>Event Type:</strong> ${log.event}<br>
       <strong>Created:</strong> ${log.createdAt}<br>
       <strong>Length:</strong> ${log.length} | <strong>Trimmed:</strong> ${log.trimmedLength}<br>
       <strong>Is Empty:</strong> ${log.isEmpty}<br>
