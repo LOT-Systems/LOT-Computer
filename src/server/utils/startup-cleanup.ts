@@ -11,15 +11,13 @@ export async function runStartupCleanup(fastify: FastifyInstance) {
   console.log('🧹 [STARTUP] Running empty logs cleanup...')
 
   try {
-    // Find ALL notes (need to check text content)
-    const allNotes = await fastify.models.Log.findAll({
-      where: {
-        event: 'note',
-      },
+    // Find ALL logs (any event type) to check for empty content
+    const allLogs = await fastify.models.Log.findAll({
+      where: {},
     })
 
-    // Filter to find truly empty notes (empty string or whitespace only)
-    const emptyLogs = allNotes.filter(log => {
+    // Filter to find truly empty logs (empty string or whitespace only)
+    const emptyLogs = allLogs.filter(log => {
       // Match logs with no text or only whitespace
       return !log.text || log.text.trim() === ''
     })
@@ -29,7 +27,7 @@ export async function runStartupCleanup(fastify: FastifyInstance) {
       return
     }
 
-    console.log(`📊 [STARTUP] Found ${emptyLogs.length} empty/placeholder logs to delete`)
+    console.log(`📊 [STARTUP] Found ${emptyLogs.length} empty logs to delete (all event types)`)
     console.log(`🗑️  [STARTUP] Cleaning up accumulated empty logs...`)
 
     // Delete by IDs
