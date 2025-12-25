@@ -20,7 +20,6 @@ import authRoutes from './routes/auth.js'
 import apiRoutes from './routes/api.js'
 import adminApiRoutes from './routes/admin-api.js'
 import publicApiRoutes from './routes/public-api.js'
-import { runStartupCleanup } from '#server/utils/startup-cleanup'
 
 const CWD = process.cwd()
 
