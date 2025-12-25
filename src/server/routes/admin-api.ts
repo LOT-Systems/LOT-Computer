@@ -251,7 +251,11 @@ export default async (fastify: FastifyInstance) => {
       })
 
       // Filter to find truly empty logs (empty string or whitespace only)
+      // EXCLUDE 'answer' events - they store data in metadata, not text
       const emptyLogs = allLogs.filter(log => {
+        // Skip answer events - they have empty text but data is in metadata
+        if (log.event === 'answer') return false
+
         // Match logs with no text or only whitespace
         return !log.text || log.text.trim() === ''
       })
