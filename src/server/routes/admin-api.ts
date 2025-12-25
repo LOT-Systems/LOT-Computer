@@ -240,19 +240,18 @@ export default async (fastify: FastifyInstance) => {
       console.log(`🧹 [ADMIN] Starting global empty logs cleanup...`)
       console.log(`📝 [ADMIN] Request content-type: ${req.headers['content-type']}`)
 
-      // Find ALL empty notes from past 4 days across all users
+      // Find ALL empty logs from past 4 days across all users (any event type)
       const fourDaysAgo = dayjs().subtract(4, 'days').toDate()
-      const allNotes = await fastify.models.Log.findAll({
+      const allLogs = await fastify.models.Log.findAll({
         where: {
-          event: 'note',
           createdAt: {
             [Op.gte]: fourDaysAgo
           }
         },
       })
 
-      // Filter to find truly empty notes (empty string or whitespace only)
-      const emptyLogs = allNotes.filter(log => {
+      // Filter to find truly empty logs (empty string or whitespace only)
+      const emptyLogs = allLogs.filter(log => {
         // Match logs with no text or only whitespace
         return !log.text || log.text.trim() === ''
       })
@@ -459,13 +458,14 @@ export default async (fastify: FastifyInstance) => {
     <div class="info">
       <strong>What gets deleted:</strong>
       <ul>
-        <li>Notes from the past 4 days with empty text (null or empty string)</li>
-        <li>Notes from the past 4 days with only whitespace (spaces, tabs, newlines)</li>
+        <li>ANY logs from the past 4 days with empty text (null or empty string)</li>
+        <li>ANY logs from the past 4 days with only whitespace (spaces, tabs, newlines)</li>
+        <li>This includes notes, theme_change events, and any other event types</li>
       </ul>
       <strong>What's preserved:</strong>
       <ul>
-        <li>All notes with actual content</li>
-        <li>All other log types (answers, activities, etc.)</li>
+        <li>All logs with actual content</li>
+        <li>All logs older than 4 days</li>
       </ul>
     </div>
   </div>
