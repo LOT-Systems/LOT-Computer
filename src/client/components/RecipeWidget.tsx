@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import { recipeWidget, dismissRecipeWidget } from '#client/stores/recipeWidget'
 import { Block } from '#client/components/ui'
-import { useCreateLog } from '#client/queries'
+import { useCreateLog, useLogs } from '#client/queries'
 import { cn } from '#client/utils'
 import * as stores from '#client/stores'
 
@@ -10,6 +10,7 @@ export const RecipeWidget: React.FC = () => {
   const state = useStore(recipeWidget)
   const router = useStore(stores.router)
   const { mutate: createLog } = useCreateLog()
+  const { data: logs } = useLogs()
   const loggedRecipesRef = React.useRef<Set<string>>(new Set())
   const [isShown, setIsShown] = React.useState(false)
 
@@ -21,19 +22,29 @@ export const RecipeWidget: React.FC = () => {
     const isOnSystemTab = !router || router.route === 'system'
     if (!isOnSystemTab) return
 
+    // Create the full log text
+    const mealLabel = getMealLabel()
+    const fullText = `${mealLabel} ${state.recipe}`
+
+    // Check if this exact recipe text already exists in the database
+    const alreadyExists = logs?.some(log => log.text === fullText)
+    if (alreadyExists) {
+      console.log(`⏭️  Skipping duplicate recipe: "${fullText}"`)
+      return
+    }
+
     // Create unique key for this meal-time + recipe combination
     const recipeKey = `${state.mealTime}:${state.recipe}`
 
-    // Skip if we've already logged this exact recipe for this meal time
+    // Skip if we've already logged this exact recipe in this session
     if (loggedRecipesRef.current.has(recipeKey)) return
 
     // Mark as logged
     loggedRecipesRef.current.add(recipeKey)
 
     // Create log entry with recipe suggestion
-    const mealLabel = getMealLabel()
     createLog(
-      { text: `${mealLabel} ${state.recipe}` },
+      { text: fullText },
       {
         onSuccess: () => {
           console.log(`✅ Logged recipe: ${recipeKey}`)
@@ -45,7 +56,7 @@ export const RecipeWidget: React.FC = () => {
         }
       }
     )
-  }, [state.isVisible, state.recipe, state.mealTime, router, createLog])
+  }, [state.isVisible, state.recipe, state.mealTime, router, createLog, logs])
 
   // Handle fade-in when widget becomes visible
   React.useEffect(() => {
