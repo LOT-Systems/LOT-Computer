@@ -565,11 +565,11 @@ export default async (fastify: FastifyInstance) => {
 
       // Get answer events from backup
       const [backupAnswers] = await backupDb.query(`
-        SELECT id, user_id, metadata, created_at
+        SELECT id, "userId", metadata, "createdAt"
         FROM logs
         WHERE event = 'answer'
-          AND created_at >= :fourDaysAgo
-        ORDER BY created_at DESC
+          AND "createdAt" >= :fourDaysAgo
+        ORDER BY "createdAt" DESC
       `, { replacements: { fourDaysAgo } })
 
       // Get existing answer IDs from production
@@ -678,7 +678,7 @@ export default async (fastify: FastifyInstance) => {
         return `<div class="sample">
           <strong>Q:</strong> ${q.substring(0, 80)}${q.length > 80 ? '...' : ''}<br>
           <strong>A:</strong> ${ans.substring(0, 80)}${ans.length > 80 ? '...' : ''}<br>
-          <small>${new Date(a.created_at).toLocaleString()}</small>
+          <small>${new Date(a.createdAt).toLocaleString()}</small>
         </div>`
       }).join('')}
       ${missing.length > 3 ? `<p><em>... and ${missing.length - 3} more</em></p>` : ''}
@@ -730,11 +730,11 @@ export default async (fastify: FastifyInstance) => {
 
       // Get answer events from backup
       const [backupAnswers] = await backupDb.query(`
-        SELECT id, user_id, event, text, metadata, context, created_at, updated_at
+        SELECT id, "userId", event, text, metadata, context, "createdAt", "updatedAt"
         FROM logs
         WHERE event = 'answer'
-          AND created_at >= :fourDaysAgo
-        ORDER BY created_at DESC
+          AND "createdAt" >= :fourDaysAgo
+        ORDER BY "createdAt" DESC
       `, { replacements: { fourDaysAgo } })
 
       // Get existing answer IDs
@@ -765,13 +765,13 @@ export default async (fastify: FastifyInstance) => {
       for (const answer of missing) {
         await fastify.models.Log.create({
           id: answer.id,
-          userId: answer.user_id,
+          userId: answer.userId,
           event: answer.event,
           text: answer.text || '',
           metadata: answer.metadata,
           context: answer.context || {},
-          createdAt: answer.created_at,
-          updatedAt: answer.updated_at
+          createdAt: answer.createdAt,
+          updatedAt: answer.updatedAt
         })
         restored++
       }
