@@ -233,11 +233,22 @@ MUST explore a DIFFERENT topic now. Consider: routine, relationships, creativity
 ` : ''
 
   const uniquenessInstruction = recentQuestions.length > 0 ? `
-**CRITICAL: AVOID DUPLICATE QUESTIONS**
-You have already asked these questions - DO NOT ask similar or identical questions:
+**❌ CRITICAL: ABSOLUTE DUPLICATE PREVENTION ❌**
+You have ALREADY asked these ${recentQuestions.length} questions. NEVER ask anything similar:
 ${recentQuestions.map((q, i) => `${i + 1}. "${q}"`).join('\n')}
 
-Your new question MUST be unique and different from all of the above. If you're doing a follow-up, ask about a DIFFERENT aspect or go DEEPER into their psychology, not the same question again.
+🚨 MANDATORY RULES:
+- Your new question MUST be about a COMPLETELY DIFFERENT topic
+- DO NOT ask variations, follow-ups, or rephrased versions of the above
+- Check EVERY word of your question against the list above
+- If even 3 words match, REJECT IT and think of something else
+- Ask about habits/routines that haven't been covered yet
+
+Example of what NOT to do:
+❌ If you asked "What did you have for breakfast?" DON'T ask "What did you eat this morning?"
+❌ If you asked "How did you sleep?" DON'T ask "How was your sleep quality?"
+✅ Instead, ask about a DIFFERENT area entirely (exercise, social time, creativity, etc.)
+
 ${topicDiversityWarning}` : ''
 
   // Extract journal entries for deeper persona research
