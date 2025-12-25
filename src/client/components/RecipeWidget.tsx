@@ -22,6 +22,15 @@ export const RecipeWidget: React.FC = () => {
     const isOnSystemTab = !router || router.route === 'system'
     if (!isOnSystemTab) return
 
+    // Create unique key for this meal-time + recipe combination
+    const recipeKey = `${state.mealTime}:${state.recipe}`
+
+    // Skip if we've already logged this exact recipe in this session
+    if (loggedRecipesRef.current.has(recipeKey)) {
+      console.log(`⏭️  Skipping duplicate recipe (already in session): "${recipeKey}"`)
+      return
+    }
+
     // Create the full log text
     const mealLabel = getMealLabel()
     const fullText = `${mealLabel} ${state.recipe}`
@@ -29,17 +38,13 @@ export const RecipeWidget: React.FC = () => {
     // Check if this exact recipe text already exists in the database
     const alreadyExists = logs?.some(log => log.text === fullText)
     if (alreadyExists) {
-      console.log(`⏭️  Skipping duplicate recipe: "${fullText}"`)
+      console.log(`⏭️  Skipping duplicate recipe (already in database): "${fullText}"`)
+      // Add to session tracking even if it's already in database
+      loggedRecipesRef.current.add(recipeKey)
       return
     }
 
-    // Create unique key for this meal-time + recipe combination
-    const recipeKey = `${state.mealTime}:${state.recipe}`
-
-    // Skip if we've already logged this exact recipe in this session
-    if (loggedRecipesRef.current.has(recipeKey)) return
-
-    // Mark as logged
+    // Mark as logged BEFORE creating (prevents race conditions)
     loggedRecipesRef.current.add(recipeKey)
 
     // Create log entry with recipe suggestion
@@ -56,7 +61,7 @@ export const RecipeWidget: React.FC = () => {
         }
       }
     )
-  }, [state.isVisible, state.recipe, state.mealTime, router, createLog, logs])
+  }, [state.isVisible, state.recipe, state.mealTime, router, createLog])
 
   // Handle fade-in when widget becomes visible
   React.useEffect(() => {
