@@ -240,10 +240,14 @@ export default async (fastify: FastifyInstance) => {
       console.log(`🧹 [ADMIN] Starting global empty logs cleanup...`)
       console.log(`📝 [ADMIN] Request content-type: ${req.headers['content-type']}`)
 
-      // Find ALL empty notes across all users
+      // Find ALL empty notes from past 4 days across all users
+      const fourDaysAgo = dayjs().subtract(4, 'days').toDate()
       const allNotes = await fastify.models.Log.findAll({
         where: {
           event: 'note',
+          createdAt: {
+            [Op.gte]: fourDaysAgo
+          }
         },
       })
 
@@ -254,7 +258,7 @@ export default async (fastify: FastifyInstance) => {
       })
 
       if (emptyLogs.length === 0) {
-        console.log('✅ [ADMIN] No empty logs found - database is clean')
+        console.log('✅ [ADMIN] No empty logs found from past 4 days - database is clean')
 
         // If it's an HTML form submission (no Accept: application/json), return HTML
         const acceptsJson = req.headers.accept?.includes('application/json')
@@ -277,7 +281,7 @@ export default async (fastify: FastifyInstance) => {
 
       const userCount = Object.keys(byUser).length
 
-      console.log(`📊 [ADMIN] Found ${emptyLogs.length} empty logs across ${userCount} users`)
+      console.log(`📊 [ADMIN] Found ${emptyLogs.length} empty logs from past 4 days across ${userCount} users`)
       console.log(`🗑️  [ADMIN] Deleting...`)
 
       // Delete by IDs
@@ -286,7 +290,7 @@ export default async (fastify: FastifyInstance) => {
         where: { id: idsToDelete },
       })
 
-      console.log(`✅ [ADMIN] Successfully deleted ${emptyLogs.length} empty logs from ${userCount} users`)
+      console.log(`✅ [ADMIN] Successfully deleted ${emptyLogs.length} empty logs from past 4 days (${userCount} users affected)`)
 
       // If it's an HTML form submission, return HTML
       const acceptsJson = req.headers.accept?.includes('application/json')
@@ -442,21 +446,21 @@ export default async (fastify: FastifyInstance) => {
 <body>
   <div class="container">
     <h1>🧹 Admin: Cleanup All Empty Logs</h1>
-    <p>This will delete ALL empty log entries across ALL users in the database.</p>
+    <p>This will delete empty log entries from the <strong>past 4 days</strong> across ALL users.</p>
 
     <div class="warning">
       ⚠️ <strong>Warning:</strong> This action affects all users. Only use this if you're sure empty logs are accumulating due to a bug.
     </div>
 
-    <form method="POST" action="/admin-api/cleanup-all-empty-logs" onsubmit="return confirm('Are you sure you want to delete ALL empty logs from ALL users? This cannot be undone.');">
-      <button type="submit">Delete All Empty Logs (All Users)</button>
+    <form method="POST" action="/admin-api/cleanup-all-empty-logs" onsubmit="return confirm('Are you sure you want to delete empty logs from the past 4 days from ALL users? This cannot be undone.');">
+      <button type="submit">Delete Empty Logs from Past 4 Days (All Users)</button>
     </form>
 
     <div class="info">
       <strong>What gets deleted:</strong>
       <ul>
-        <li>Notes with empty text</li>
-        <li>Notes with placeholder text ("will be deleted", "log record", "type here")</li>
+        <li>Notes from the past 4 days with empty text (null or empty string)</li>
+        <li>Notes from the past 4 days with only whitespace (spaces, tabs, newlines)</li>
       </ul>
       <strong>What's preserved:</strong>
       <ul>
@@ -473,16 +477,19 @@ export default async (fastify: FastifyInstance) => {
 
   // Diagnostic endpoint to inspect what's in "empty" logs
   fastify.get('/inspect-empty-logs', async (req: FastifyRequest, reply) => {
+    const fourDaysAgo = dayjs().subtract(4, 'days').toDate()
     const allNotes = await fastify.models.Log.findAll({
       where: {
         userId: req.user.id,
         event: 'note',
+        createdAt: {
+          [Op.gte]: fourDaysAgo
+        }
       },
       order: [['createdAt', 'DESC']],
-      limit: 50,
     })
 
-    // Find logs that appear empty or have suspicious content
+    // Find logs that appear empty
     const suspiciousLogs = allNotes.map(log => {
       const text = log.text || ''
       const trimmed = text.trim()
@@ -499,7 +506,7 @@ export default async (fastify: FastifyInstance) => {
         hasOnlyWhitespace: text.length > 0 && trimmed.length === 0,
         createdAt: log.createdAt,
       }
-    }).filter(log => log.isEmpty || log.hasOnlyWhitespace || log.length < 50)
+    }).filter(log => log.isEmpty || log.hasOnlyWhitespace)
 
     const html = `<!DOCTYPE html>
 <html>
@@ -514,8 +521,8 @@ export default async (fastify: FastifyInstance) => {
   </style>
 </head>
 <body>
-  <h1>Empty Logs Inspection (Last 50 Notes)</h1>
-  <p>Found ${suspiciousLogs.length} suspicious logs</p>
+  <h1>Empty Logs Inspection (Past 4 Days)</h1>
+  <p>Found ${suspiciousLogs.length} empty logs from the past 4 days</p>
   ${suspiciousLogs.map(log => `
     <div class="log ${log.isEmpty ? 'empty' : 'whitespace'}">
       <strong>ID:</strong> ${log.id}<br>
