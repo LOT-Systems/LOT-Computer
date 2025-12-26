@@ -1202,23 +1202,23 @@ export default async (fastify: FastifyInstance) => {
       // Vary responses based on engagement level
       let response: string
       if (answerCount === 1) {
-        response = "Thank you for starting your Memory story with LOT"
+        response = "Thank you for starting your Memory story with LOT."
       } else if (answerCount % 10 === 0) {
         // Milestone celebrations every 10 answers
-        response = `${answerCount} moments captured. Your story is becoming richer`
+        response = `${answerCount} moments captured. Your story is becoming richer.`
       } else if (answerCount % 5 === 0) {
         // Mini milestones every 5 answers
-        response = "Your patterns are emerging beautifully"
+        response = "Your patterns are emerging beautifully."
       } else {
         // Varied acknowledgments for regular answers
         const engagingReplies = [
-          "Thank you. This helps me understand you better",
-          "Noted. Every answer deepens your Memory",
-          "Understood. Building your story",
-          "I see. Your preferences are taking shape",
-          "Thank you for sharing",
-          "This adds valuable context",
-          "Your story grows richer"
+          "Thank you. This helps me understand you better.",
+          "Noted. Every answer deepens your Memory.",
+          "Understood. Building your story.",
+          "I see. Your preferences are taking shape.",
+          "Thank you for sharing.",
+          "This adds valuable context.",
+          "Your story grows richer."
         ]
         response = fp.randomElement(engagingReplies)
       }
