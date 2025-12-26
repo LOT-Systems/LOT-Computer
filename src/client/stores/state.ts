@@ -40,5 +40,15 @@ export const isTempFahrenheit = persistentAtom<boolean>(
   }
 )
 
+// Track last answered Memory question to prevent re-showing after tab switches
+export const lastAnsweredMemoryQuestionId = persistentAtom<string | null>(
+  'lastAnsweredMemoryQuestionId',
+  null,
+  {
+    encode: (value) => value || '',
+    decode: (value) => value || null,
+  }
+)
+
 // computed
 // ...
