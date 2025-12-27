@@ -42,6 +42,7 @@ export const System = () => {
 
   const [isBreatheOn, setIsBreatheOn] = React.useState(false)
   const breatheState = useBreathe(isBreatheOn)
+  const [showRadio, setShowRadio] = React.useState(false)
 
   // Compute whether to show sunset or sunrise based on current time
   // Show sunset during daytime (between sunrise and sunset)
@@ -232,10 +233,41 @@ export const System = () => {
         >
           {isMirrorOn ? 'On' : 'Off'}
         </Block>
-        <Block label="Radio:" onClick={() => {
-          stores.isRadioOn.set(!isRadioOn)
-        }}>
-          {isRadioOn ? (radioTrackName ? `On (${radioTrackName})` : 'On') : 'Off'}
+        <Block
+          label={showRadio ? 'Radio:' : 'Sound:'}
+          onLabelClick={() => {
+            // Toggle between Sound and Radio view
+            setShowRadio(!showRadio)
+            // Turn off the mode we're switching away from
+            if (showRadio) {
+              stores.isRadioOn.set(false)
+            } else {
+              stores.isSoundOn.set(false)
+            }
+          }}
+          onChildrenClick={async () => {
+            if (showRadio) {
+              // Radio mode - toggle radio
+              stores.isRadioOn.set(!isRadioOn)
+            } else {
+              // Sound mode - toggle sound
+              const newValue = !isSoundOn
+              // @ts-ignore - Tone.js loaded via external script
+              if (newValue && window.Tone) {
+                try {
+                  await window.Tone.start()
+                } catch (e) {
+                  console.error('Failed to start Tone.context:', e)
+                }
+              }
+              stores.isSoundOn.set(newValue)
+            }
+          }}
+        >
+          {showRadio
+            ? (isRadioOn ? (radioTrackName ? `On (${radioTrackName})` : 'On') : 'Off')
+            : (isSoundOn ? (soundDescription ? `On (${soundDescription})` : 'On') : 'Off')
+          }
         </Block>
         <Block label="Breathe:" onClick={() => setIsBreatheOn(!isBreatheOn)}>
           {isBreatheOn ? breatheState.display : 'Off'}
