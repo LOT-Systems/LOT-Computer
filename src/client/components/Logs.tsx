@@ -288,6 +288,7 @@ const NoteEditor = ({
   const logTextRef = React.useRef(log.text || '')
   const onChangeRef = React.useRef(onChange)
   const blinkTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
+  const blinkOffTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
@@ -312,10 +313,14 @@ const NoteEditor = ({
         clearTimeout(pendingPushRef.current)
         pendingPushRef.current = null
       }
-      // Cancel blink animation timeout and state
+      // Cancel blink animation timeouts and state
       if (blinkTimeoutRef.current) {
         clearTimeout(blinkTimeoutRef.current)
         blinkTimeoutRef.current = null
+      }
+      if (blinkOffTimeoutRef.current) {
+        clearTimeout(blinkOffTimeoutRef.current)
+        blinkOffTimeoutRef.current = null
       }
       setIsAboutToPush(false)
     }
@@ -358,7 +363,10 @@ const NoteEditor = ({
     if (primary) {
       blinkTimeoutRef.current = setTimeout(() => {
         setIsAboutToPush(true)
-        setTimeout(() => setIsAboutToPush(false), 500)
+        blinkOffTimeoutRef.current = setTimeout(() => {
+          setIsAboutToPush(false)
+          blinkOffTimeoutRef.current = null
+        }, 500)
         blinkTimeoutRef.current = null
       }, 1500)  // Start blink 1.5s after save, so it finishes right when push happens
     }
@@ -395,6 +403,15 @@ const NoteEditor = ({
     return () => {
       textarea.removeEventListener('focus', handleFocus)
       textarea.removeEventListener('blur', handleBlur)
+      // Cleanup blink timeouts on unmount
+      if (blinkTimeoutRef.current) {
+        clearTimeout(blinkTimeoutRef.current)
+        blinkTimeoutRef.current = null
+      }
+      if (blinkOffTimeoutRef.current) {
+        clearTimeout(blinkOffTimeoutRef.current)
+        blinkOffTimeoutRef.current = null
+      }
     }
   }, [])
 
@@ -440,7 +457,10 @@ const NoteEditor = ({
           if (primary) {
             blinkTimeoutRef.current = setTimeout(() => {
               setIsAboutToPush(true)
-              setTimeout(() => setIsAboutToPush(false), 500)
+              blinkOffTimeoutRef.current = setTimeout(() => {
+                setIsAboutToPush(false)
+                blinkOffTimeoutRef.current = null
+              }, 500)
               blinkTimeoutRef.current = null
             }, 1500)
           }
