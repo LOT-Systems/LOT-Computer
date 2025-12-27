@@ -1579,4 +1579,54 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
 
     return userWorld
   })
+
+  // Get available radio tracks
+  fastify.get('/radio/tracks', async (req, reply) => {
+    try {
+      const fs = await import('fs/promises')
+      const path = await import('path')
+      const radioDir = path.join(process.cwd(), 'public', 'radio')
+
+      // Check if directory exists
+      try {
+        await fs.access(radioDir)
+      } catch {
+        return { tracks: [] }
+      }
+
+      // Read directory contents
+      const files = await fs.readdir(radioDir)
+
+      // Filter for audio files
+      const audioExtensions = ['.mp3', '.wav', '.ogg', '.m4a', '.flac']
+      const audioFiles = files.filter(file => {
+        const ext = path.extname(file).toLowerCase()
+        return audioExtensions.includes(ext)
+      })
+
+      // Map to track objects
+      const tracks = audioFiles.map(filename => {
+        const name = path.basename(filename, path.extname(filename))
+          .replace(/-/g, ' ')
+          .replace(/_/g, ' ')
+          // Capitalize first letter of each word
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+
+        return {
+          filename,
+          url: `/radio/${filename}`,
+          name
+        }
+      })
+
+      console.log(`📻 Found ${tracks.length} radio tracks`)
+
+      return { tracks }
+    } catch (error: any) {
+      console.error('❌ Error reading radio tracks:', error)
+      return { tracks: [], error: error.message }
+    }
+  })
 }

@@ -37,6 +37,8 @@ export const System = () => {
   const isMirrorOn = useStore(stores.isMirrorOn)
   const isSoundOn = useStore(stores.isSoundOn)
   const soundDescription = useStore(stores.soundDescription)
+  const isRadioOn = useStore(stores.isRadioOn)
+  const radioTrackName = useStore(stores.radioTrackName)
 
   const [isBreatheOn, setIsBreatheOn] = React.useState(false)
   const breatheState = useBreathe(isBreatheOn)
@@ -230,19 +232,10 @@ export const System = () => {
         >
           {isMirrorOn ? 'On' : 'Off'}
         </Block>
-        <Block label="Sound:" onClick={async () => {
-          const newValue = !isSoundOn
-          // @ts-ignore - Tone.js loaded via external script
-          if (newValue && window.Tone) {
-            try {
-              await window.Tone.start()
-            } catch (e) {
-              console.error('Failed to start Tone.context:', e)
-            }
-          }
-          stores.isSoundOn.set(newValue)
+        <Block label="Radio:" onClick={() => {
+          stores.isRadioOn.set(!isRadioOn)
         }}>
-          {isSoundOn ? (soundDescription ? `On (${soundDescription})` : 'On') : 'Off'}
+          {isRadioOn ? (radioTrackName ? `On (${radioTrackName})` : 'On') : 'Off'}
         </Block>
         <Block label="Breathe:" onClick={() => setIsBreatheOn(!isBreatheOn)}>
           {isBreatheOn ? breatheState.display : 'Off'}
