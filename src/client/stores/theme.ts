@@ -158,16 +158,24 @@ const handleColorsChangeDebounced = fp.debounce(handleColorsChange, 400)
 
 baseColor.subscribe((value) => {
   // Don't override on public profile pages - they handle their own theme
-  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')) {
-    return
+  try {
+    if (typeof window !== 'undefined' && window.location?.pathname?.startsWith('/u/')) {
+      return
+    }
+  } catch (e) {
+    // Continue with normal behavior if pathname check fails
   }
   document.documentElement.style.setProperty('--base-color', value)
   handleColorsChangeDebounced()
 })
 accentColor.subscribe((value) => {
   // Don't override on public profile pages - they handle their own theme
-  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')) {
-    return
+  try {
+    if (typeof window !== 'undefined' && window.location?.pathname?.startsWith('/u/')) {
+      return
+    }
+  } catch (e) {
+    // Continue with normal behavior if pathname check fails
   }
   const rgb = hexToRgb(value) || hexToRgb(THEMES.light.acc)!
   document.documentElement.style.setProperty(
@@ -178,8 +186,12 @@ accentColor.subscribe((value) => {
 })
 accentPalette.subscribe((palette) => {
   // Don't override on public profile pages - they handle their own theme
-  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')) {
-    return
+  try {
+    if (typeof window !== 'undefined' && window.location?.pathname?.startsWith('/u/')) {
+      return
+    }
+  } catch (e) {
+    // Continue with normal behavior if pathname check fails
   }
   palette.forEach((x) => {
     document.documentElement.style.setProperty(
@@ -236,7 +248,13 @@ state.isMirrorOn.subscribe((value) => {
 // This ensures theme colors are available immediately for Tailwind utilities
 if (typeof document !== 'undefined') {
   // Skip initialization on public profile pages - they handle their own theme
-  const isPublicProfile = typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')
+  let isPublicProfile = false
+  try {
+    isPublicProfile = typeof window !== 'undefined' && window.location?.pathname?.startsWith('/u/') === true
+  } catch (e) {
+    // If pathname check fails, assume not public profile and continue
+    isPublicProfile = false
+  }
 
   if (!isPublicProfile) {
     const initialBase = baseColor.get()
