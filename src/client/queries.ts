@@ -203,3 +203,20 @@ export const useMyMemoryStory = () =>
   }>('/api/memory/story', {
     refetchOnWindowFocus: false,
   })()
+
+// Get user's psychological profile (archetypes, values, patterns)
+export const useProfile = () =>
+  createQuery<{
+    hasUsership: boolean
+    archetype?: string
+    archetypeDescription?: string
+    coreValues?: string[]
+    emotionalPatterns?: string[]
+    selfAwarenessLevel?: string
+    behavioralCohort?: string
+    answerCount?: number
+    message?: string
+  }>('/api/memory/profile', {
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: false,
+  })()
