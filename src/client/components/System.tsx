@@ -46,6 +46,7 @@ export const System = () => {
   const breatheState = useBreathe(isBreatheOn)
   const [showRadio, setShowRadio] = React.useState(false)
   const [astrologyView, setAstrologyView] = React.useState<'astrology' | 'psychology' | 'journey'>('astrology')
+  const [showWeatherSuggestion, setShowWeatherSuggestion] = React.useState(false)
 
   // Compute whether to show sunset or sunrise based on current time
   // Show sunset during daytime (between sunrise and sunset)
@@ -235,11 +236,18 @@ export const System = () => {
               </span>
             </Block>
             <Block
-              label="Temperature:"
-              onClick={() => stores.isTempFahrenheit.set(!isTempFahrenheit)}
+              label={showWeatherSuggestion ? 'Suggestion:' : 'Temperature:'}
+              onLabelClick={() => setShowWeatherSuggestion(!showWeatherSuggestion)}
+              onChildrenClick={showWeatherSuggestion ? undefined : () => stores.isTempFahrenheit.set(!isTempFahrenheit)}
             >
-              {temperature}
-              {isTempFahrenheit ? '℉' : '℃'}
+              {showWeatherSuggestion ? (
+                <span className="text-sm opacity-60">{weatherSuggestion || 'Beautiful day'}</span>
+              ) : (
+                <>
+                  {temperature}
+                  {isTempFahrenheit ? '℉' : '℃'}
+                </>
+              )}
             </Block>
             <Block
               label={showSunset ? 'Sunset:' : 'Sunrise:'}
@@ -247,11 +255,6 @@ export const System = () => {
             >
               {showSunset ? sunset : sunrise}
             </Block>
-            {weatherSuggestion && (
-              <Block label="Suggestion:">
-                <span className="text-sm opacity-60">{weatherSuggestion}</span>
-              </Block>
-            )}
           </>
         )}
       </div>
@@ -282,7 +285,8 @@ export const System = () => {
             </div>
           ) : (
             <div className="inline-block">
-              Day {journeyData.daysSinceStart} • {journeyData.answerCount} memories
+              <div>Day {journeyData.daysSinceStart}: {profile?.archetype || 'The Explorer'}&#39;s Journey</div>
+              <div>{journeyData.answerCount} memories • {profile?.coreValues?.slice(0, 2).join(' & ') || 'Growing'}</div>
             </div>
           )}
         </Block>
