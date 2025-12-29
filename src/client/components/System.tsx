@@ -34,20 +34,6 @@ export const System = () => {
   const { data: profile } = useProfile()
   const { data: logs = [] } = useLogs()
 
-  // Debug: Log profile data
-  React.useEffect(() => {
-    if (profile) {
-      console.log('[System] Profile loaded:', {
-        hasUsership: profile.hasUsership,
-        selfAwarenessLevel: profile.selfAwarenessLevel,
-        archetype: profile.archetype,
-        awarenessCalculated: profile.selfAwarenessLevel
-          ? Math.round((profile.selfAwarenessLevel / 10) * 100)
-          : 0
-      })
-    }
-  }, [profile])
-
   const isTempFahrenheit = useStore(stores.isTempFahrenheit)
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
   const isMirrorOn = useStore(stores.isMirrorOn)
@@ -159,7 +145,7 @@ export const System = () => {
     return Math.round((profile.selfAwarenessLevel / 10) * 100)
   }, [profile])
 
-  // Weather suggestion based on temperature
+  // Weather suggestion based on temperature (stable - doesn't change on re-render)
   const weatherSuggestion = React.useMemo(() => {
     if (!weather || !weather.tempKelvin) return null
     const celsius = weather.tempKelvin - 273.15
@@ -205,7 +191,10 @@ export const System = () => {
     else if (celsius > 28) options = suggestions.hot
     else options = suggestions.mild
 
-    return options[Math.floor(Math.random() * options.length)]
+    // Use temperature as seed for stable randomization (same temp = same suggestion)
+    const seed = Math.floor(celsius * 10)
+    const index = seed % options.length
+    return options[index]
   }, [weather])
 
   // Check for recipe suggestions when component mounts
@@ -300,7 +289,7 @@ export const System = () => {
               onChildrenClick={showWeatherSuggestion ? undefined : () => stores.isTempFahrenheit.set(!isTempFahrenheit)}
             >
               {showWeatherSuggestion ? (
-                <span className="font-sans text-sm opacity-60">{weatherSuggestion || 'Beautiful day'}</span>
+                <span>{weatherSuggestion || 'Beautiful day'}</span>
               ) : (
                 <>
                   {temperature}
