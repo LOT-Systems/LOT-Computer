@@ -164,10 +164,48 @@ export const System = () => {
     if (!weather || !weather.tempKelvin) return null
     const celsius = weather.tempKelvin - 273.15
 
-    if (celsius < 10) return 'Perfect for warm tea'
-    if (celsius < 18) return 'Great day for a walk'
-    if (celsius > 28) return 'Stay cool, hydrate'
-    return 'Beautiful day outside'
+    const suggestions = {
+      cold: [
+        'Perfect for warm tea',
+        'Cozy day ahead',
+        'Layer up and enjoy',
+        'Hot drink weather',
+        'Time for comfort food',
+        'Bundle up warmly'
+      ],
+      cool: [
+        'Great day for a walk',
+        'Perfect weather ahead',
+        'Comfortable outside',
+        'Fresh air day',
+        'Ideal for movement',
+        'Pleasant conditions'
+      ],
+      hot: [
+        'Stay cool, hydrate',
+        'Find some shade',
+        'Keep water close',
+        'Take it easy today',
+        'Stay refreshed',
+        'Cool down often'
+      ],
+      mild: [
+        'Beautiful day outside',
+        'Lovely weather today',
+        'Perfect conditions',
+        'Enjoy the moment',
+        'Great day ahead',
+        'Nice and balanced'
+      ]
+    }
+
+    let options: string[]
+    if (celsius < 10) options = suggestions.cold
+    else if (celsius < 18) options = suggestions.cool
+    else if (celsius > 28) options = suggestions.hot
+    else options = suggestions.mild
+
+    return options[Math.floor(Math.random() * options.length)]
   }, [weather])
 
   // Check for recipe suggestions when component mounts
