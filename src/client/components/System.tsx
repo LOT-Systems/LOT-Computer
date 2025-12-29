@@ -164,10 +164,10 @@ export const System = () => {
     if (!weather || !weather.tempKelvin) return null
     const celsius = weather.tempKelvin - 273.15
 
-    if (celsius < 10) return 'Perfect for warm tea ☕'
-    if (celsius < 18) return 'Great day for a walk 🚶'
-    if (celsius > 28) return 'Stay cool, hydrate 💧'
-    return 'Beautiful day outside 🌤️'
+    if (celsius < 10) return 'Perfect for warm tea'
+    if (celsius < 18) return 'Great day for a walk'
+    if (celsius > 28) return 'Stay cool, hydrate'
+    return 'Beautiful day outside'
   }, [weather])
 
   // Check for recipe suggestions when component mounts
@@ -262,7 +262,7 @@ export const System = () => {
               onChildrenClick={showWeatherSuggestion ? undefined : () => stores.isTempFahrenheit.set(!isTempFahrenheit)}
             >
               {showWeatherSuggestion ? (
-                <span className="text-sm opacity-60">{weatherSuggestion || 'Beautiful day'}</span>
+                <span className="font-sans text-sm opacity-60">{weatherSuggestion || 'Beautiful day'}</span>
               ) : (
                 <>
                   {temperature}
