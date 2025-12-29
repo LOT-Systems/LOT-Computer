@@ -156,26 +156,32 @@ function handleColorsChange() {
 }
 const handleColorsChangeDebounced = fp.debounce(handleColorsChange, 400)
 
-baseColor.subscribe((value) => {
-  document.documentElement.style.setProperty('--base-color', value)
-  handleColorsChangeDebounced()
-})
-accentColor.subscribe((value) => {
-  const rgb = hexToRgb(value) || hexToRgb(THEMES.light.acc)!
-  document.documentElement.style.setProperty(
-    `--acc-color-default`,
-    rgb.join(' ')
-  )
-  handleColorsChangeDebounced()
-})
-accentPalette.subscribe((palette) => {
-  palette.forEach((x) => {
-    document.documentElement.style.setProperty(
-      `--acc-color-${x.index}`,
-      x.colorRgb.join(' ')
-    )
+// Don't update CSS custom properties on public profile pages
+// Public profiles handle their own theme from the profile owner's settings
+const isPublicProfilePage = typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')
+
+if (!isPublicProfilePage) {
+  baseColor.subscribe((value) => {
+    document.documentElement.style.setProperty('--base-color', value)
+    handleColorsChangeDebounced()
   })
-})
+  accentColor.subscribe((value) => {
+    const rgb = hexToRgb(value) || hexToRgb(THEMES.light.acc)!
+    document.documentElement.style.setProperty(
+      `--acc-color-default`,
+      rgb.join(' ')
+    )
+    handleColorsChangeDebounced()
+  })
+  accentPalette.subscribe((palette) => {
+    palette.forEach((x) => {
+      document.documentElement.style.setProperty(
+        `--acc-color-${x.index}`,
+        x.colorRgb.join(' ')
+      )
+    })
+  })
+}
 
 function setBrowserAppearanceColor(themeMode: ClientThemeMode) {
   const themeColor = themeMode === 'light' ? '#fff' : '#1a1a1a'
@@ -222,23 +228,28 @@ state.isMirrorOn.subscribe((value) => {
 
 // Initialize CSS custom properties on module load
 // This ensures theme colors are available immediately for Tailwind utilities
-if (typeof document !== 'undefined') {
-  const initialBase = baseColor.get()
-  const initialAcc = accentColor.get()
-  const initialPalette = accentPalette.get()
+// BUT: Skip initialization on public profile pages - they handle their own theme
+if (typeof document !== 'undefined' && typeof window !== 'undefined') {
+  const isPublicProfile = window.location.pathname.startsWith('/u/')
 
-  document.documentElement.style.setProperty('--base-color', initialBase)
-  const initialAccRgb = hexToRgb(initialAcc) || hexToRgb(THEMES.light.acc)!
-  document.documentElement.style.setProperty(
-    '--acc-color-default',
-    initialAccRgb.join(' ')
-  )
-  initialPalette.forEach((x) => {
+  if (!isPublicProfile) {
+    const initialBase = baseColor.get()
+    const initialAcc = accentColor.get()
+    const initialPalette = accentPalette.get()
+
+    document.documentElement.style.setProperty('--base-color', initialBase)
+    const initialAccRgb = hexToRgb(initialAcc) || hexToRgb(THEMES.light.acc)!
     document.documentElement.style.setProperty(
-      `--acc-color-${x.index}`,
-      x.colorRgb.join(' ')
+      '--acc-color-default',
+      initialAccRgb.join(' ')
     )
-  })
+    initialPalette.forEach((x) => {
+      document.documentElement.style.setProperty(
+        `--acc-color-${x.index}`,
+        x.colorRgb.join(' ')
+      )
+    })
+  }
 
   // Save theme changes to backend for public profile
   let saveThemeTimeout: NodeJS.Timeout | null = null
