@@ -74,7 +74,7 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
                     : '',
                   props.labelClassName
                 )}
-                onClick={props.onChildrenClick}
+                onClick={props.onChildrenClick || props.onClick}
               >
                 {props.children}
               </span>
