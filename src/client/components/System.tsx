@@ -45,8 +45,7 @@ export const System = () => {
   const [isBreatheOn, setIsBreatheOn] = React.useState(false)
   const breatheState = useBreathe(isBreatheOn)
   const [showRadio, setShowRadio] = React.useState(false)
-  const [showPsychology, setShowPsychology] = React.useState(false)
-  const [showJourney, setShowJourney] = React.useState(false)
+  const [astrologyView, setAstrologyView] = React.useState<'astrology' | 'psychology' | 'journey'>('astrology')
 
   // Compute whether to show sunset or sunrise based on current time
   // Show sunset during daytime (between sunrise and sunset)
@@ -192,31 +191,20 @@ export const System = () => {
       )}
 
       <div>
-        <Block
-          label={showJourney ? "My Journey:" : "Users online:"}
-          onLabelClick={() => setShowJourney(!showJourney)}
-          onChildrenClick={showJourney ? undefined : () => stores.goTo('sync')}
-        >
-          {showJourney
-            ? `Day ${journeyData.daysSinceStart}`
-            : formatNumberWithCommas(usersOnline)
-          }
+        <Block label="Users online:" onClick={() => stores.goTo('sync')}>
+          {formatNumberWithCommas(usersOnline)}
         </Block>
         <Block
-          label={showJourney ? "Memories:" : "Total users:"}
-          onLabelClick={() => setShowJourney(!showJourney)}
-          onChildrenClick={
-            !showJourney && me?.isAdmin
+          label="Total users:"
+          onClick={
+            me?.isAdmin
               ? () => {
                   window.location.href = '/us'
                 }
               : undefined
           }
         >
-          {showJourney
-            ? `${journeyData.answerCount} captured`
-            : formatNumberWithCommas(usersTotal)
-          }
+          {formatNumberWithCommas(usersTotal)}
         </Block>
       </div>
 
@@ -270,16 +258,31 @@ export const System = () => {
 
       <div>
         <Block
-          label={showPsychology ? "Psychology:" : "Astrology:"}
-          onLabelClick={() => setShowPsychology(!showPsychology)}
+          label={
+            astrologyView === 'astrology' ? "Astrology:" :
+            astrologyView === 'psychology' ? "Psychology:" :
+            "My Journey:"
+          }
+          onLabelClick={() => {
+            // Cycle through: Astrology → Psychology → Journey → Astrology
+            setAstrologyView(prev =>
+              prev === 'astrology' ? 'psychology' :
+              prev === 'psychology' ? 'journey' :
+              'astrology'
+            )
+          }}
         >
-          {showPsychology ? (
+          {astrologyView === 'astrology' ? (
+            <div className="inline-block">
+              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
+            </div>
+          ) : astrologyView === 'psychology' ? (
             <div className="inline-block">
               {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}
             </div>
           ) : (
             <div className="inline-block">
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
+              Day {journeyData.daysSinceStart} • {journeyData.answerCount} memories
             </div>
           )}
         </Block>
