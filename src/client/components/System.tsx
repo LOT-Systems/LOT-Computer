@@ -14,7 +14,7 @@ import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
 import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
-import { useVisitorStats } from '#client/queries'
+import { useVisitorStats, useProfile, useLogs } from '#client/queries'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
 import { RecipeWidget } from './RecipeWidget'
@@ -31,6 +31,8 @@ export const System = () => {
   const liveMessage = useStore(stores.liveMessage)
 
   const { data: visitorStats } = useVisitorStats()
+  const { data: profile } = useProfile()
+  const { data: logs = [] } = useLogs()
 
   const isTempFahrenheit = useStore(stores.isTempFahrenheit)
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
@@ -43,6 +45,8 @@ export const System = () => {
   const [isBreatheOn, setIsBreatheOn] = React.useState(false)
   const breatheState = useBreathe(isBreatheOn)
   const [showRadio, setShowRadio] = React.useState(false)
+  const [showPsychology, setShowPsychology] = React.useState(false)
+  const [showJourney, setShowJourney] = React.useState(false)
 
   // Compute whether to show sunset or sunrise based on current time
   // Show sunset during daytime (between sunrise and sunset)
@@ -115,6 +119,36 @@ export const System = () => {
     }
   }, [])
 
+  // Journey calculations
+  const journeyData = React.useMemo(() => {
+    // Count memory answers
+    const memoryAnswers = logs.filter(log => log.event === 'answer')
+    const answerCount = memoryAnswers.length
+
+    // Calculate days since first answer
+    let daysSinceStart = 0
+    if (memoryAnswers.length > 0) {
+      const firstAnswer = memoryAnswers[memoryAnswers.length - 1] // Oldest first
+      daysSinceStart = dayjs().diff(dayjs(firstAnswer.createdAt), 'day')
+    }
+
+    return {
+      daysSinceStart: daysSinceStart > 0 ? daysSinceStart : answerCount > 0 ? 1 : 0,
+      answerCount,
+    }
+  }, [logs])
+
+  // Weather suggestion based on temperature
+  const weatherSuggestion = React.useMemo(() => {
+    if (!weather || !weather.tempKelvin) return null
+    const celsius = weather.tempKelvin - 273.15
+
+    if (celsius < 10) return 'Perfect for warm tea ☕'
+    if (celsius < 18) return 'Great day for a walk 🚶'
+    if (celsius > 28) return 'Stay cool, hydrate 💧'
+    return 'Beautiful day outside 🌤️'
+  }, [weather])
+
   // Check for recipe suggestions when component mounts
   React.useEffect(() => {
     checkRecipeWidget()
@@ -158,20 +192,31 @@ export const System = () => {
       )}
 
       <div>
-        <Block label="Users online:" onClick={() => stores.goTo('sync')}>
-          {formatNumberWithCommas(usersOnline)}
+        <Block
+          label={showJourney ? "My Journey:" : "Users online:"}
+          onLabelClick={() => setShowJourney(!showJourney)}
+          onChildrenClick={showJourney ? undefined : () => stores.goTo('sync')}
+        >
+          {showJourney
+            ? `Day ${journeyData.daysSinceStart}`
+            : formatNumberWithCommas(usersOnline)
+          }
         </Block>
         <Block
-          label="Total users:"
-          onClick={
-            me?.isAdmin
+          label={showJourney ? "Memories:" : "Total users:"}
+          onLabelClick={() => setShowJourney(!showJourney)}
+          onChildrenClick={
+            !showJourney && me?.isAdmin
               ? () => {
                   window.location.href = '/us'
                 }
               : undefined
           }
         >
-          {formatNumberWithCommas(usersTotal)}
+          {showJourney
+            ? `${journeyData.answerCount} captured`
+            : formatNumberWithCommas(usersTotal)
+          }
         </Block>
       </div>
 
@@ -214,15 +259,29 @@ export const System = () => {
             >
               {showSunset ? sunset : sunrise}
             </Block>
+            {weatherSuggestion && (
+              <Block label="Suggestion:">
+                <span className="text-sm opacity-60">{weatherSuggestion}</span>
+              </Block>
+            )}
           </>
         )}
       </div>
 
       <div>
-        <Block label="Astrology:">
-          <div className="inline-block">
-            {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
-          </div>
+        <Block
+          label={showPsychology ? "Psychology:" : "Astrology:"}
+          onLabelClick={() => setShowPsychology(!showPsychology)}
+        >
+          {showPsychology ? (
+            <div className="inline-block">
+              {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}
+            </div>
+          ) : (
+            <div className="inline-block">
+              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
+            </div>
+          )}
         </Block>
       </div>
 
