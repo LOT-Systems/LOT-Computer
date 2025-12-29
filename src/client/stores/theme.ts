@@ -156,32 +156,38 @@ function handleColorsChange() {
 }
 const handleColorsChangeDebounced = fp.debounce(handleColorsChange, 400)
 
-// Don't update CSS custom properties on public profile pages
-// Public profiles handle their own theme from the profile owner's settings
-const isPublicProfilePage = typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')
-
-if (!isPublicProfilePage) {
-  baseColor.subscribe((value) => {
-    document.documentElement.style.setProperty('--base-color', value)
-    handleColorsChangeDebounced()
-  })
-  accentColor.subscribe((value) => {
-    const rgb = hexToRgb(value) || hexToRgb(THEMES.light.acc)!
+baseColor.subscribe((value) => {
+  // Don't override on public profile pages - they handle their own theme
+  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')) {
+    return
+  }
+  document.documentElement.style.setProperty('--base-color', value)
+  handleColorsChangeDebounced()
+})
+accentColor.subscribe((value) => {
+  // Don't override on public profile pages - they handle their own theme
+  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')) {
+    return
+  }
+  const rgb = hexToRgb(value) || hexToRgb(THEMES.light.acc)!
+  document.documentElement.style.setProperty(
+    `--acc-color-default`,
+    rgb.join(' ')
+  )
+  handleColorsChangeDebounced()
+})
+accentPalette.subscribe((palette) => {
+  // Don't override on public profile pages - they handle their own theme
+  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')) {
+    return
+  }
+  palette.forEach((x) => {
     document.documentElement.style.setProperty(
-      `--acc-color-default`,
-      rgb.join(' ')
+      `--acc-color-${x.index}`,
+      x.colorRgb.join(' ')
     )
-    handleColorsChangeDebounced()
   })
-  accentPalette.subscribe((palette) => {
-    palette.forEach((x) => {
-      document.documentElement.style.setProperty(
-        `--acc-color-${x.index}`,
-        x.colorRgb.join(' ')
-      )
-    })
-  })
-}
+})
 
 function setBrowserAppearanceColor(themeMode: ClientThemeMode) {
   const themeColor = themeMode === 'light' ? '#fff' : '#1a1a1a'
@@ -228,9 +234,9 @@ state.isMirrorOn.subscribe((value) => {
 
 // Initialize CSS custom properties on module load
 // This ensures theme colors are available immediately for Tailwind utilities
-// BUT: Skip initialization on public profile pages - they handle their own theme
-if (typeof document !== 'undefined' && typeof window !== 'undefined') {
-  const isPublicProfile = window.location.pathname.startsWith('/u/')
+if (typeof document !== 'undefined') {
+  // Skip initialization on public profile pages - they handle their own theme
+  const isPublicProfile = typeof window !== 'undefined' && window.location.pathname.startsWith('/u/')
 
   if (!isPublicProfile) {
     const initialBase = baseColor.get()
