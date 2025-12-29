@@ -34,13 +34,8 @@ export const ConnectionStatus = () => {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-black px-4 py-3 text-center font-medium">
-      <div className="text-sm">
-        Connection lost • Attempting to reconnect...
-      </div>
-      <div className="text-xs mt-1">
-        Last update: {formatDate(lastUpdate)}
-      </div>
+    <div className="fixed top-0 left-0 right-0 z-50 bg-acc text-base px-4 py-3 text-center">
+      Connection lost • Attempting to reconnect...
     </div>
   )
 }
