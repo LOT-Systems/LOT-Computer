@@ -34,6 +34,20 @@ export const System = () => {
   const { data: profile } = useProfile()
   const { data: logs = [] } = useLogs()
 
+  // Debug: Log profile data
+  React.useEffect(() => {
+    if (profile) {
+      console.log('[System] Profile loaded:', {
+        hasUsership: profile.hasUsership,
+        selfAwarenessLevel: profile.selfAwarenessLevel,
+        archetype: profile.archetype,
+        awarenessCalculated: profile.selfAwarenessLevel
+          ? Math.round((profile.selfAwarenessLevel / 10) * 100)
+          : 0
+      })
+    }
+  }, [profile])
+
   const isTempFahrenheit = useStore(stores.isTempFahrenheit)
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
   const isMirrorOn = useStore(stores.isMirrorOn)
@@ -139,9 +153,11 @@ export const System = () => {
   }, [logs])
 
   // Calculate awareness index from backend selfAwarenessLevel (0-10) to percentage (0-100%)
-  const awarenessIndex = profile?.selfAwarenessLevel
-    ? Math.round((profile.selfAwarenessLevel / 10) * 100)
-    : 0
+  const awarenessIndex = React.useMemo(() => {
+    if (!profile?.hasUsership) return 0
+    if (typeof profile.selfAwarenessLevel !== 'number') return 0
+    return Math.round((profile.selfAwarenessLevel / 10) * 100)
+  }, [profile])
 
   // Weather suggestion based on temperature
   const weatherSuggestion = React.useMemo(() => {
