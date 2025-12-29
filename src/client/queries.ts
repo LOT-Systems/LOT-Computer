@@ -219,7 +219,7 @@ export const useProfile = () =>
     answerCount?: number
     noteCount?: number
     message?: string
-  }>('/user-profile', {
+  }>('/api/user-profile', {
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     refetchOnWindowFocus: false,
   })()
