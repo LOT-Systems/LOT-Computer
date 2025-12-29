@@ -122,36 +122,49 @@ export function useRadio(enabled: boolean) {
       return
     }
 
-    // Update source and play
-    audioRef.current.src = currentTrack.url
+    const audio = audioRef.current
 
-    audioRef.current.play()
-      .then(() => {
-        console.log(`📻 Now playing: ${currentTrack.name}`)
+    // Show loading state while track is loading
+    stores.radioTrackName.set(`Loading ${currentTrack.name}...`)
 
-        // Start countdown interval
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current)
-        }
+    // Update source and load
+    audio.src = currentTrack.url
+    audio.load()
 
-        intervalRef.current = setInterval(() => {
-          if (audioRef.current && audioRef.current.duration) {
-            const remaining = audioRef.current.duration - audioRef.current.currentTime
-            setRemainingTime(remaining)
+    // Wait for audio to be ready before playing
+    const handleCanPlay = () => {
+      audio.play()
+        .then(() => {
+          console.log(`📻 Now playing: ${currentTrack.name}`)
 
-            // Update display with track name and countdown
-            const timeStr = formatTime(remaining)
-            stores.radioTrackName.set(`${currentTrack.name} ${timeStr}`)
+          // Start countdown interval
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current)
           }
-        }, 1000)
-      })
-      .catch(error => {
-        console.error('❌ Failed to play radio track:', error)
-        stores.radioTrackName.set('Error playing track')
-      })
 
-    // Cleanup interval when track changes
+          intervalRef.current = setInterval(() => {
+            if (audio && audio.duration) {
+              const remaining = audio.duration - audio.currentTime
+              setRemainingTime(remaining)
+
+              // Update display with track name and countdown
+              const timeStr = formatTime(remaining)
+              stores.radioTrackName.set(`${currentTrack.name} ${timeStr}`)
+            }
+          }, 1000)
+        })
+        .catch(error => {
+          console.error('❌ Failed to play radio track:', error)
+          stores.radioTrackName.set('Error playing track')
+        })
+    }
+
+    // Listen for when audio can start playing
+    audio.addEventListener('canplay', handleCanPlay, { once: true })
+
+    // Cleanup interval and event listener when track changes
     return () => {
+      audio.removeEventListener('canplay', handleCanPlay)
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
         intervalRef.current = null
