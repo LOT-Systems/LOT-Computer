@@ -312,14 +312,26 @@ const NoteEditor = ({
         clearTimeout(pendingPushRef.current)
         pendingPushRef.current = null
       }
-      // Cancel blink animation timeout and state
-      if (blinkTimeoutRef.current) {
-        clearTimeout(blinkTimeoutRef.current)
-        blinkTimeoutRef.current = null
+
+      // Start gentle blink when typing begins, but stop it if user continues typing
+      if (primary) {
+        // Clear any existing blink timeout
+        if (blinkTimeoutRef.current) {
+          clearTimeout(blinkTimeoutRef.current)
+          blinkTimeoutRef.current = null
+        }
+
+        // Start gentle blink immediately
+        setIsAboutToPush(true)
+
+        // Stop blinking after 800ms (gentle pulse)
+        blinkTimeoutRef.current = setTimeout(() => {
+          setIsAboutToPush(false)
+          blinkTimeoutRef.current = null
+        }, 800)
       }
-      setIsAboutToPush(false)
     }
-  }, [value, log.text, pendingPushRef])
+  }, [value, log.text, pendingPushRef, primary])
 
   React.useEffect(() => {
     logTextRef.current = log.text
