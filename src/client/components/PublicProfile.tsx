@@ -301,7 +301,7 @@ export const PublicProfile = () => {
                 {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
                   <div className="flex mb-24">
                     <span className="w-[170px] sm:w-[150px] mr-24 sm:mr-12 -ml-4">Self-awareness:</span>
-                    <span className="flex-1">{profile.psychologicalProfile.selfAwarenessLevel}/10</span>
+                    <span className="flex-1">{Math.round((profile.psychologicalProfile.selfAwarenessLevel / 10) * 100)}%</span>
                   </div>
                 )}
 

@@ -132,16 +132,16 @@ export const System = () => {
       daysSinceStart = dayjs().diff(dayjs(firstAnswer.createdAt), 'day')
     }
 
-    // Calculate awareness index (0-100%)
-    // Based on answer count, caps at 100 when reaching 50+ answers
-    const awarenessIndex = Math.min(100, Math.round((answerCount / 50) * 100))
-
     return {
       daysSinceStart: daysSinceStart > 0 ? daysSinceStart : answerCount > 0 ? 1 : 0,
       answerCount,
-      awarenessIndex,
     }
   }, [logs])
+
+  // Calculate awareness index from backend selfAwarenessLevel (0-10) to percentage (0-100%)
+  const awarenessIndex = profile?.selfAwarenessLevel
+    ? Math.round((profile.selfAwarenessLevel / 10) * 100)
+    : 0
 
   // Weather suggestion based on temperature
   const weatherSuggestion = React.useMemo(() => {
@@ -290,7 +290,7 @@ export const System = () => {
             </div>
           ) : (
             <div className="inline-block">
-              <div>Day {journeyData.daysSinceStart} • {journeyData.answerCount} memories • Awareness {journeyData.awarenessIndex}%</div>
+              <div>Day {journeyData.daysSinceStart} • {journeyData.answerCount} memories • Awareness {awarenessIndex}%</div>
               <div>{profile?.selfAwarenessLevel || 'Awakening'} • {profile?.emotionalPatterns?.[0] || 'Exploring patterns'}</div>
             </div>
           )}
