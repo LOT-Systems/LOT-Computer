@@ -97,7 +97,15 @@ Please respond with ONLY a valid JSON object in this exact format:
   "options": ["option1", "option2", "option3"]
 }
 
-Make sure the question is personalized, relevant to self-care habits, and the options are 3-4 concise choices.`
+Make sure the question is personalized, relevant to self-care habits, and the options are 3-4 concise choices.
+
+${context.weatherDescription ? `**WEATHER-AWARE QUESTIONS:**
+The current weather is "${context.weatherDescription}". Consider asking questions that acknowledge this:
+- If rainy/stormy: Ask about indoor comfort, cozy activities, or mood during rainy weather
+- If sunny/clear: Ask about outdoor activities, energy levels, or sun exposure
+- If cloudy/overcast: Ask about indoor vs outdoor preferences, lighting needs
+- If extreme weather (very hot/cold/humid): Ask about coping strategies, comfort needs
+` : ''}`
 
     // Execute using whichever engine is available
     const completion = await engine.generateCompletion(fullPrompt, 1024)
@@ -142,6 +150,52 @@ Make sure the question is personalized, relevant to self-care habits, and the op
   }
 }
 
+/**
+ * Extract dominant topics from recent questions to ensure diversity
+ */
+function extractQuestionTopics(questions: string[]): {
+  dominantTopic: string | null
+  topicCount: number
+} {
+  const topicKeywords = {
+    beverage: ['tea', 'coffee', 'drink', 'beverage', 'water', 'juice', 'caffeine', 'hydration'],
+    food: ['food', 'meal', 'eat', 'lunch', 'dinner', 'breakfast', 'snack', 'recipe', 'cooking'],
+    sleep: ['sleep', 'rest', 'bed', 'nap', 'tired', 'wake', 'morning routine', 'evening'],
+    movement: ['exercise', 'walk', 'movement', 'stretch', 'yoga', 'activity', 'fitness', 'posture'],
+    wellness: ['health', 'wellness', 'care', 'mindful', 'meditation', 'breath'],
+    environment: ['space', 'room', 'environment', 'home', 'surroundings', 'temperature', 'light'],
+    routine: ['routine', 'habit', 'daily', 'schedule', 'ritual', 'practice'],
+    social: ['people', 'social', 'friends', 'family', 'connection', 'relationship'],
+    creativity: ['create', 'creative', 'art', 'expression', 'hobby', 'interest'],
+    mindset: ['feel', 'think', 'mindset', 'mental', 'emotion', 'mood', 'perspective']
+  }
+
+  const topicCounts: { [key: string]: number } = {}
+
+  questions.forEach(question => {
+    const lowerQ = question.toLowerCase()
+    Object.entries(topicKeywords).forEach(([topic, keywords]) => {
+      if (keywords.some(keyword => lowerQ.includes(keyword))) {
+        topicCounts[topic] = (topicCounts[topic] || 0) + 1
+      }
+    })
+  })
+
+  // Find dominant topic (appears in 3+ recent questions)
+  const sortedTopics = Object.entries(topicCounts)
+    .sort((a, b) => b[1] - a[1])
+    .filter(([_, count]) => count >= 3)
+
+  if (sortedTopics.length > 0) {
+    return {
+      dominantTopic: sortedTopics[0][0],
+      topicCount: sortedTopics[0][1]
+    }
+  }
+
+  return { dominantTopic: null, topicCount: 0 }
+}
+
 export async function buildPrompt(user: User, logs: Log[], isWeekend: boolean = false): Promise<string> {
   const context = await getLogContext(user)
   const localDate = context.timeZone
@@ -154,9 +208,9 @@ export async function buildPrompt(user: User, logs: Log[], isWeekend: boolean = 
       contextLine = `It is ${localDate} in ${context.city}, ${context.country}`
     }
     if (context.temperature && context.humidity) {
-      contextLine += `, with a current temperature of ${Math.round(
-        toCelsius(context.temperature)
-      )}℃ and humidity at ${Math.round(context.humidity)}%.`
+      const tempC = Math.round(toCelsius(context.temperature))
+      const weatherDesc = context.weatherDescription ? ` The weather is: ${context.weatherDescription}.` : ''
+      contextLine += `, with a current temperature of ${tempC}℃ and humidity at ${Math.round(context.humidity)}%.${weatherDesc}`
     } else {
       contextLine += '.'
     }
@@ -165,19 +219,37 @@ export async function buildPrompt(user: User, logs: Log[], isWeekend: boolean = 
   // Extract Memory answers to build user's story
   const memoryLogs = logs.filter((log) => log.event === 'answer')
 
-  // Extract recently asked questions to avoid duplicates
+  // Extract recently asked questions to avoid duplicates (extended from 15 to 30)
   const recentQuestions = memoryLogs
-    .slice(0, 15)
+    .slice(0, 30)
     .map(log => log.metadata.question || '')
     .filter(Boolean)
 
+  // Track topic diversity - extract key topics from recent questions
+  const recentTopics = extractQuestionTopics(recentQuestions.slice(0, 10))
+  const topicDiversityWarning = recentTopics.dominantTopic ? `
+**TOPIC DIVERSITY WARNING**: You've asked ${recentTopics.topicCount} questions about "${recentTopics.dominantTopic}" recently.
+MUST explore a DIFFERENT topic now. Consider: routine, relationships, creativity, rest, movement, environment, or mindset.
+` : ''
+
   const uniquenessInstruction = recentQuestions.length > 0 ? `
-**CRITICAL: AVOID DUPLICATE QUESTIONS**
-You have already asked these questions - DO NOT ask similar or identical questions:
+**❌ CRITICAL: ABSOLUTE DUPLICATE PREVENTION ❌**
+You have ALREADY asked these ${recentQuestions.length} questions. NEVER ask anything similar:
 ${recentQuestions.map((q, i) => `${i + 1}. "${q}"`).join('\n')}
 
-Your new question MUST be unique and different from all of the above. If you're doing a follow-up, ask about a DIFFERENT aspect or go DEEPER into their psychology, not the same question again.
-` : ''
+🚨 MANDATORY RULES:
+- Your new question MUST be about a COMPLETELY DIFFERENT topic
+- DO NOT ask variations, follow-ups, or rephrased versions of the above
+- Check EVERY word of your question against the list above
+- If even 3 words match, REJECT IT and think of something else
+- Ask about habits/routines that haven't been covered yet
+
+Example of what NOT to do:
+❌ If you asked "What did you have for breakfast?" DON'T ask "What did you eat this morning?"
+❌ If you asked "How did you sleep?" DON'T ask "How was your sleep quality?"
+✅ Instead, ask about a DIFFERENT area entirely (exercise, social time, creativity, etc.)
+
+${topicDiversityWarning}` : ''
 
   // Extract journal entries for deeper persona research
   const journalLogs = logs.filter((log) => log.event === 'note' && log.text && log.text.length > 20)
@@ -1086,7 +1158,8 @@ export async function generateRecipeSuggestion(
     }
     if (context.temperature && context.humidity) {
       const tempC = Math.round(toCelsius(context.temperature))
-      contextLine += `, with a current temperature of ${tempC}℃ and humidity at ${Math.round(context.humidity)}%.`
+      const weatherDesc = context.weatherDescription ? ` The weather is: ${context.weatherDescription}.` : ''
+      contextLine += `, with a current temperature of ${tempC}℃ and humidity at ${Math.round(context.humidity)}%.${weatherDesc}`
     } else {
       contextLine += '.'
     }
@@ -1096,6 +1169,44 @@ export async function generateRecipeSuggestion(
   const hasUsershipTag = user.tags.some(
     (tag) => tag.toLowerCase() === UserTag.Usership.toLowerCase()
   )
+
+  // Track recent recipes to avoid repetition
+  const recentRecipeLogs = logs
+    .filter((log: Log) => log.event === 'note' && log.text &&
+            (log.text.includes('Breakfast idea') ||
+             log.text.includes('Lunch idea') ||
+             log.text.includes('Dinner idea') ||
+             log.text.includes('Snack idea')))
+    .slice(0, 14) // Last 2 weeks of recipes
+
+  const recentRecipes = recentRecipeLogs.map(log => {
+    const text = log.text || ''
+    // Extract recipe after "idea: " or "idea "
+    const match = text.match(/idea[:\s]+(.+)$/i)
+    return match ? match[1].toLowerCase().trim() : text.toLowerCase()
+  })
+
+  const avoidanceInstruction = recentRecipes.length > 0 ? `
+**RECIPE DIVERSITY - AVOID RECENT SUGGESTIONS:**
+${recentRecipes.slice(0, 7).map((r, i) => `${i + 1}. ${r}`).join('\n')}
+
+CRITICAL: Suggest something DIFFERENT from the above. Vary ingredients, cooking methods, and flavor profiles.
+` : ''
+
+  // Add seasonal awareness
+  const month = dayjs().month() // 0-11
+  const season = month >= 2 && month <= 4 ? 'spring' :
+                 month >= 5 && month <= 7 ? 'summer' :
+                 month >= 8 && month <= 10 ? 'fall' : 'winter'
+
+  const seasonalGuidance = `
+**SEASONAL INGREDIENTS (${season}):**
+${season === 'spring' ? '- Spring: asparagus, peas, strawberries, artichokes, fresh greens' :
+  season === 'summer' ? '- Summer: tomatoes, cucumbers, berries, watermelon, peaches, zucchini' :
+  season === 'fall' ? '- Fall: squash, pumpkin, apples, Brussels sprouts, sweet potatoes, mushrooms' :
+  '- Winter: root vegetables, citrus, kale, cabbage, pomegranate, warming spices'}
+Consider seasonal ingredients when appropriate.
+`
 
   let userStory = ''
   let cohortInfo = ''
@@ -1158,13 +1269,22 @@ Generate ONE simple ${mealLabels[mealTime]} suggestion that is:
 2. **Simple and achievable** - Easy to prepare, not overly complex
 3. **Wellness-focused** - Nutritious, mindful, and supportive of self-care
 ${hasUsershipTag && cohortInfo ? '4. **Deeply personalized** - Match their cohort profile and trait patterns' : ''}
+5. **Seasonal** - Incorporate seasonal ingredients when possible
+6. **Varied** - Different from recent suggestions
 
-${contextLine ? `Current context:\n${contextLine}` : ''}${cohortInfo}${userStory}
+${contextLine ? `Current context:\n${contextLine}` : ''}${seasonalGuidance}${avoidanceInstruction}${cohortInfo}${userStory}
 
 **Weather-based guidance:**
-- If it's cold (below 15℃): Suggest warming, comforting foods
-- If it's hot (above 25℃): Suggest light, refreshing foods
-- If humid: Suggest lighter options
+${context.weatherDescription ? `Current weather: "${context.weatherDescription}"
+- If rainy/stormy: Suggest warm, comforting, cozy foods (soups, warm drinks, baked goods)
+- If sunny/clear: Suggest fresh, light, energizing foods (salads, fruits, cold drinks)
+- If cloudy/overcast: Suggest balanced comfort foods
+- ` : ''}Temperature: ${context.temperature ? Math.round(toCelsius(context.temperature)) : 'unknown'}℃
+- If cold (below 15℃): Suggest warming, comforting foods (soups, hot meals, warm drinks)
+- If hot (above 25℃): Suggest light, refreshing, cooling foods (cold salads, smoothies, chilled items)
+- If moderate (15-25℃): Suggest balanced, versatile options
+Humidity: ${context.humidity ? Math.round(context.humidity) : 'unknown'}%
+- If very humid (above 80%): Suggest lighter, less rich options to avoid feeling heavy
 
 ${cohortInfo ? `**Cohort-specific guidance:**
 Use the user's cohort profile to guide your suggestion:

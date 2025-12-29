@@ -15,6 +15,7 @@ import { listenSSE } from '#client/utils/sse'
 import { useSun } from '#client/utils/sun'
 import { useMirror } from '#client/utils/mirror'
 import { useSound } from '#client/utils/sound'
+import { useRadio } from '#client/utils/radio'
 import { sync } from '../sync'
 import { initRecipeWidget } from '#client/stores/recipeWidget'
 
@@ -36,6 +37,7 @@ const App = () => {
   const router = useStore(stores.router)
   const isMirrorOn = useStore(stores.isMirrorOn)
   const isSoundOn = useStore(stores.isSoundOn)
+  const isRadioOn = useStore(stores.isRadioOn)
 
   const { data: weather, refetch: refetchWeather } = useWeather()
 
@@ -100,6 +102,8 @@ const App = () => {
   useMirror(mirrorRef, isMirrorOn)
 
   useSound(isSoundOn)
+
+  useRadio(isRadioOn)
 
   if (!isLoaded) {
     return <Layout>Loading...</Layout>

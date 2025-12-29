@@ -1,9 +1,11 @@
 import React from 'react'
+import { useStore } from '@nanostores/react'
 import { Block, Button } from '#client/components/ui'
 import { useMemory, useCreateMemory } from '#client/queries'
 import { cn } from '#client/utils'
 import { fp } from '#shared/utils'
 import { MemoryQuestion } from '#shared/types'
+import * as stores from '#client/stores'
 
 export function MemoryWidget() {
   const [isDisplayed, setIsDisplayed] = React.useState(false)
@@ -12,7 +14,7 @@ export function MemoryWidget() {
   const [isResponseShown, setIsResponseShown] = React.useState(false)
   const [question, setQuestion] = React.useState<MemoryQuestion | null>(null)
   const [response, setResponse] = React.useState<string | null>(null)
-  const [lastQuestionId, setLastQuestionId] = React.useState<string | null>(null)
+  const lastQuestionId = useStore(stores.lastAnsweredMemoryQuestionId)
 
   const { data: loadedQuestion = null } = useMemory()
 
@@ -57,9 +59,9 @@ export function MemoryWidget() {
   )
 
   React.useEffect(() => {
-    // Prevent showing the same question twice in a row
+    // Prevent showing the same question twice (persisted across tab switches)
     if (loadedQuestion && loadedQuestion.id !== lastQuestionId) {
-      setLastQuestionId(loadedQuestion.id)
+      stores.lastAnsweredMemoryQuestionId.set(loadedQuestion.id)
       setTimeout(() => {
         setIsDisplayed(true)
         setTimeout(() => {

@@ -52,6 +52,18 @@ export function useSun(
         systemTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone
       })
 
+      const currentTheme = stores.theme.get()
+      const isCustomThemeEnabled = stores.isCustomThemeEnabled.get()
+
+      // If custom theme is enabled, don't auto-switch themes
+      if (isCustomThemeEnabled) {
+        if (currentTheme !== 'custom') {
+          stores.theme.set('custom')
+        }
+        return
+      }
+
+      // Otherwise, do automatic theme switching based on time
       if (
         now.isAfter(sunriseTransitionStart) &&
         now.isBefore(sunrise)
@@ -63,18 +75,6 @@ export function useSun(
       ) {
         stores.theme.set('sunset')
       } else {
-        const currentTheme = stores.theme.get()
-        const isCustomThemeEnabled = stores.isCustomThemeEnabled.get()
-
-        // If custom theme is enabled, don't auto-switch themes
-        if (isCustomThemeEnabled) {
-          if (currentTheme !== 'custom') {
-            stores.theme.set('custom')
-          }
-          return
-        }
-
-        // Otherwise, do automatic theme switching based on time
         const isDark = now.isAfter(sunset) || now.isBefore(sunrise)
         if (isDark && ['light', 'sunset', 'sunrise'].includes(currentTheme)) {
           stores.theme.set('dark')

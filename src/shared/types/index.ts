@@ -115,8 +115,11 @@ export type Log = {
 export type LogContext = {
   temperature?: number | null;
   humidity?: number | null;
+  weatherDescription?: string | null;
   country?: string | null;
   city?: string | null;
+  timeZone?: string | null;
+  date?: string | null;
   [key: string]: any;
 };
 

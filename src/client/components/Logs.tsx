@@ -296,9 +296,9 @@ const NoteEditor = ({
   const [isAboutToPush, setIsAboutToPush] = React.useState(false) // Blink before push
   const [isSaving, setIsSaving] = React.useState(false) // Prevent concurrent saves
   const savingInProgressRef = React.useRef(false) // Prevent duplicate saves during tab switch
-  // Timing: finish typing > wait 8s > autosave+blink > wait 2s > push (10s total)
-  // Past logs: 5s debounce to prevent lag while still being responsive
-  const debounceTime = primary ? 8000 : 5000  // 8s for primary, 5s for old logs
+  // New timing: finish typing > wait 5s > gentle blink + save > push down
+  // Past logs: 5s debounce (same as primary now for consistency)
+  const debounceTime = 5000  // 5s for all logs
   const debouncedValue = useDebounce(value, debounceTime)
 
   // Keep refs in sync
@@ -312,14 +312,26 @@ const NoteEditor = ({
         clearTimeout(pendingPushRef.current)
         pendingPushRef.current = null
       }
-      // Cancel blink animation timeout and state
-      if (blinkTimeoutRef.current) {
-        clearTimeout(blinkTimeoutRef.current)
-        blinkTimeoutRef.current = null
+
+      // Start gentle blink when typing begins, but stop it if user continues typing
+      if (primary) {
+        // Clear any existing blink timeout
+        if (blinkTimeoutRef.current) {
+          clearTimeout(blinkTimeoutRef.current)
+          blinkTimeoutRef.current = null
+        }
+
+        // Start gentle blink immediately
+        setIsAboutToPush(true)
+
+        // Stop blinking after 800ms (gentle pulse)
+        blinkTimeoutRef.current = setTimeout(() => {
+          setIsAboutToPush(false)
+          blinkTimeoutRef.current = null
+        }, 800)
       }
-      setIsAboutToPush(false)
     }
-  }, [value, log.text, pendingPushRef])
+  }, [value, log.text, pendingPushRef, primary])
 
   React.useEffect(() => {
     logTextRef.current = log.text
@@ -332,13 +344,25 @@ const NoteEditor = ({
   // Note: No blur save handler - saves happen via unmount and debounced autosave
   // This keeps scrolling behavior simple (no blur = no issues)
 
-  // Autosave for all logs (with 8s debounce for primary, 5s for past logs)
-  // Timeline: finish typing > wait 8s > [autosave + start blink] > wait 2s > [end blink + push]
+  // Autosave for all logs (5s debounce)
+  // New timeline: finish typing > wait 5s > [gentle blink starts + save] > push after 2s
   React.useEffect(() => {
     if (log.text === debouncedValue) return
     if (isSaving) return  // Prevent concurrent saves
 
     setIsSaving(true)
+
+    // For primary log: start gentle blink animation immediately when save begins
+    if (primary) {
+      setIsAboutToPush(true)
+      // Gentle blink duration: 1.8 seconds (ends right before push at 2s)
+      blinkTimeoutRef.current = setTimeout(() => {
+        setIsAboutToPush(false)
+        blinkTimeoutRef.current = null
+      }, 1800)
+    }
+
+    // Save the log
     onChange(debouncedValue)
 
     // Update timestamp
@@ -352,16 +376,6 @@ const NoteEditor = ({
 
     // Clear saving state after a brief delay
     setTimeout(() => setIsSaving(false), 100)
-
-    // For primary log: trigger blink animation 1.5s after save (right before push)
-    // Timeline: save now → wait 1.5s → blink 0.5s → push happens (2s total)
-    if (primary) {
-      blinkTimeoutRef.current = setTimeout(() => {
-        setIsAboutToPush(true)
-        setTimeout(() => setIsAboutToPush(false), 500)
-        blinkTimeoutRef.current = null
-      }, 1500)  // Start blink 1.5s after save, so it finishes right when push happens
-    }
   }, [debouncedValue, onChange, log.text, primary, isSaving])
 
   // Sync local state when log updates from server
@@ -395,6 +409,11 @@ const NoteEditor = ({
     return () => {
       textarea.removeEventListener('focus', handleFocus)
       textarea.removeEventListener('blur', handleBlur)
+      // Cleanup blink timeout on unmount
+      if (blinkTimeoutRef.current) {
+        clearTimeout(blinkTimeoutRef.current)
+        blinkTimeoutRef.current = null
+      }
     }
   }, [])
 
@@ -436,13 +455,13 @@ const NoteEditor = ({
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
           setIsSaved(true)
-          // Trigger blink animation for manual save too (same timing as autosave)
+          // Trigger gentle blink animation for manual save too
           if (primary) {
+            setIsAboutToPush(true)
             blinkTimeoutRef.current = setTimeout(() => {
-              setIsAboutToPush(true)
-              setTimeout(() => setIsAboutToPush(false), 500)
+              setIsAboutToPush(false)
               blinkTimeoutRef.current = null
-            }, 1500)
+            }, 1800)
           }
         }
         // Optionally blur to show save happened
@@ -531,7 +550,7 @@ const NoteEditor = ({
           }
           className={cn(
             'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
-            'placeholder:opacity-20',
+            'placeholder:opacity-100',
             !primary && 'opacity-20',
             primary && isSaved && !isAboutToPush && 'opacity-40',
             primary && !isSaved && 'opacity-100',

@@ -14,7 +14,7 @@ import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
 import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
-import { useVisitorStats } from '#client/queries'
+import { useVisitorStats, useProfile, useLogs } from '#client/queries'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
 import { RecipeWidget } from './RecipeWidget'
@@ -31,15 +31,36 @@ export const System = () => {
   const liveMessage = useStore(stores.liveMessage)
 
   const { data: visitorStats } = useVisitorStats()
+  const { data: profile } = useProfile()
+  const { data: logs = [] } = useLogs()
+
+  // Debug: Log profile data
+  React.useEffect(() => {
+    if (profile) {
+      console.log('[System] Profile loaded:', {
+        hasUsership: profile.hasUsership,
+        selfAwarenessLevel: profile.selfAwarenessLevel,
+        archetype: profile.archetype,
+        awarenessCalculated: profile.selfAwarenessLevel
+          ? Math.round((profile.selfAwarenessLevel / 10) * 100)
+          : 0
+      })
+    }
+  }, [profile])
 
   const isTempFahrenheit = useStore(stores.isTempFahrenheit)
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
   const isMirrorOn = useStore(stores.isMirrorOn)
   const isSoundOn = useStore(stores.isSoundOn)
   const soundDescription = useStore(stores.soundDescription)
+  const isRadioOn = useStore(stores.isRadioOn)
+  const radioTrackName = useStore(stores.radioTrackName)
 
   const [isBreatheOn, setIsBreatheOn] = React.useState(false)
   const breatheState = useBreathe(isBreatheOn)
+  const [showRadio, setShowRadio] = React.useState(false)
+  const [astrologyView, setAstrologyView] = React.useState<'astrology' | 'psychology' | 'journey'>('astrology')
+  const [showWeatherSuggestion, setShowWeatherSuggestion] = React.useState(false)
 
   // Compute whether to show sunset or sunrise based on current time
   // Show sunset during daytime (between sunrise and sunset)
@@ -111,6 +132,81 @@ export const System = () => {
       rokuyo,
     }
   }, [])
+
+  // Journey calculations
+  const journeyData = React.useMemo(() => {
+    // Count memory answers
+    const memoryAnswers = logs.filter(log => log.event === 'answer')
+    const answerCount = memoryAnswers.length
+
+    // Calculate days since first answer
+    let daysSinceStart = 0
+    if (memoryAnswers.length > 0) {
+      const firstAnswer = memoryAnswers[memoryAnswers.length - 1] // Oldest first
+      daysSinceStart = dayjs().diff(dayjs(firstAnswer.createdAt), 'day')
+    }
+
+    return {
+      daysSinceStart: daysSinceStart > 0 ? daysSinceStart : answerCount > 0 ? 1 : 0,
+      answerCount,
+    }
+  }, [logs])
+
+  // Calculate awareness index from backend selfAwarenessLevel (0-10) to percentage (0-100%)
+  const awarenessIndex = React.useMemo(() => {
+    if (!profile?.hasUsership) return 0
+    if (typeof profile.selfAwarenessLevel !== 'number') return 0
+    return Math.round((profile.selfAwarenessLevel / 10) * 100)
+  }, [profile])
+
+  // Weather suggestion based on temperature
+  const weatherSuggestion = React.useMemo(() => {
+    if (!weather || !weather.tempKelvin) return null
+    const celsius = weather.tempKelvin - 273.15
+
+    const suggestions = {
+      cold: [
+        'Perfect for warm tea',
+        'Cozy day ahead',
+        'Layer up and enjoy',
+        'Hot drink weather',
+        'Time for comfort food',
+        'Bundle up warmly'
+      ],
+      cool: [
+        'Great day for a walk',
+        'Perfect weather ahead',
+        'Comfortable outside',
+        'Fresh air day',
+        'Ideal for movement',
+        'Pleasant conditions'
+      ],
+      hot: [
+        'Stay cool, hydrate',
+        'Find some shade',
+        'Keep water close',
+        'Take it easy today',
+        'Stay refreshed',
+        'Cool down often'
+      ],
+      mild: [
+        'Beautiful day outside',
+        'Lovely weather today',
+        'Perfect conditions',
+        'Enjoy the moment',
+        'Great day ahead',
+        'Nice and balanced'
+      ]
+    }
+
+    let options: string[]
+    if (celsius < 10) options = suggestions.cold
+    else if (celsius < 18) options = suggestions.cool
+    else if (celsius > 28) options = suggestions.hot
+    else options = suggestions.mild
+
+    return options[Math.floor(Math.random() * options.length)]
+  }, [weather])
 
   // Check for recipe suggestions when component mounts
   React.useEffect(() => {
@@ -199,11 +295,18 @@ export const System = () => {
               </span>
             </Block>
             <Block
-              label="Temperature:"
-              onClick={() => stores.isTempFahrenheit.set(!isTempFahrenheit)}
+              label={showWeatherSuggestion ? 'Suggestion:' : 'Temperature:'}
+              onLabelClick={() => setShowWeatherSuggestion(!showWeatherSuggestion)}
+              onChildrenClick={showWeatherSuggestion ? undefined : () => stores.isTempFahrenheit.set(!isTempFahrenheit)}
             >
-              {temperature}
-              {isTempFahrenheit ? '℉' : '℃'}
+              {showWeatherSuggestion ? (
+                <span className="font-sans text-sm opacity-60">{weatherSuggestion || 'Beautiful day'}</span>
+              ) : (
+                <>
+                  {temperature}
+                  {isTempFahrenheit ? '℉' : '℃'}
+                </>
+              )}
             </Block>
             <Block
               label={showSunset ? 'Sunset:' : 'Sunrise:'}
@@ -216,10 +319,35 @@ export const System = () => {
       </div>
 
       <div>
-        <Block label="Astrology:">
-          <div className="inline-block">
-            {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
-          </div>
+        <Block
+          label={
+            astrologyView === 'astrology' ? "Astrology:" :
+            astrologyView === 'psychology' ? "Psychology:" :
+            "My Journey:"
+          }
+          onLabelClick={() => {
+            // Cycle through: Astrology → Psychology → Journey → Astrology
+            setAstrologyView(prev =>
+              prev === 'astrology' ? 'psychology' :
+              prev === 'psychology' ? 'journey' :
+              'astrology'
+            )
+          }}
+        >
+          {astrologyView === 'astrology' ? (
+            <div className="inline-block">
+              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
+            </div>
+          ) : astrologyView === 'psychology' ? (
+            <div className="inline-block">
+              {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}
+            </div>
+          ) : (
+            <div className="inline-block">
+              <div>Day {journeyData.daysSinceStart} • {journeyData.answerCount} memories • Awareness {awarenessIndex}%</div>
+              <div>{profile?.behavioralCohort || 'Growing'} • {profile?.emotionalPatterns?.[0] || 'Exploring patterns'}</div>
+            </div>
+          )}
         </Block>
       </div>
 
@@ -230,19 +358,41 @@ export const System = () => {
         >
           {isMirrorOn ? 'On' : 'Off'}
         </Block>
-        <Block label="Sound:" onClick={async () => {
-          const newValue = !isSoundOn
-          // @ts-ignore - Tone.js loaded via external script
-          if (newValue && window.Tone) {
-            try {
-              await window.Tone.start()
-            } catch (e) {
-              console.error('Failed to start Tone.context:', e)
+        <Block
+          label={showRadio ? 'Radio:' : 'Sound:'}
+          onLabelClick={() => {
+            // Toggle between Sound and Radio view
+            setShowRadio(!showRadio)
+            // Turn off the mode we're switching away from
+            if (showRadio) {
+              stores.isRadioOn.set(false)
+            } else {
+              stores.isSoundOn.set(false)
             }
+          }}
+          onChildrenClick={async () => {
+            if (showRadio) {
+              // Radio mode - toggle radio
+              stores.isRadioOn.set(!isRadioOn)
+            } else {
+              // Sound mode - toggle sound
+              const newValue = !isSoundOn
+              // @ts-ignore - Tone.js loaded via external script
+              if (newValue && window.Tone) {
+                try {
+                  await window.Tone.start()
+                } catch (e) {
+                  console.error('Failed to start Tone.context:', e)
+                }
+              }
+              stores.isSoundOn.set(newValue)
+            }
+          }}
+        >
+          {showRadio
+            ? (isRadioOn ? (radioTrackName ? `On (${radioTrackName})` : 'On') : 'Off')
+            : (isSoundOn ? (soundDescription ? `On (${soundDescription})` : 'On') : 'Off')
           }
-          stores.isSoundOn.set(newValue)
-        }}>
-          {isSoundOn ? (soundDescription ? `On (${soundDescription})` : 'On') : 'Off'}
         </Block>
         <Block label="Breathe:" onClick={() => setIsBreatheOn(!isBreatheOn)}>
           {isBreatheOn ? breatheState.display : 'Off'}

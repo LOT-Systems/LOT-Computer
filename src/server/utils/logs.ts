@@ -8,6 +8,7 @@ export async function getLogContext(user: User): Promise<LogContext> {
   const context: LogContext = {
     temperature: null,
     humidity: null,
+    weatherDescription: null,
     country: user.country,
     city: user.city,
     timeZone: user.timeZone,
@@ -31,6 +32,7 @@ export async function getLogContext(user: User): Promise<LogContext> {
     if (cachedWeather) {
       context.temperature = cachedWeather.weather?.tempKelvin || null
       context.humidity = cachedWeather.weather?.humidity || null
+      context.weatherDescription = cachedWeather.weather?.description || null
     }
   }
   return context

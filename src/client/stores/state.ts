@@ -14,6 +14,8 @@ export const liveMessage = atom<string>('')
 export const isMirrorOn = atom<boolean>(false)
 export const isSoundOn = atom<boolean>(false)
 export const soundDescription = atom<string>('')
+export const isRadioOn = atom<boolean>(false)
+export const radioTrackName = atom<string>('')
 
 export const weather = atom<WeatherRecord | null>(null)
 
@@ -37,6 +39,16 @@ export const isTempFahrenheit = persistentAtom<boolean>(
   {
     encode: (value) => value.toString(),
     decode: (value) => value === 'true',
+  }
+)
+
+// Track last answered Memory question to prevent re-showing after tab switches
+export const lastAnsweredMemoryQuestionId = persistentAtom<string | null>(
+  'lastAnsweredMemoryQuestionId',
+  null,
+  {
+    encode: (value) => value || '',
+    decode: (value) => value || null,
   }
 )
 

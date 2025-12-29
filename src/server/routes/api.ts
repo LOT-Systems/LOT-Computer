@@ -576,15 +576,15 @@ export default async (fastify: FastifyInstance) => {
     )
 
     const recentLog = logs[0]
-    // Create new empty log if:
-    // - No recent log exists
-    // - Recent log is not a note
-    // - Recent log has text (saved) - push it down immediately
-    if (
-      !recentLog ||
-      recentLog.event !== 'note' ||
-      (recentLog.text && recentLog.text.trim().length > 0)
-    ) {
+
+    // FIXED: Only create new empty log if there ISN'T already an empty one at the top
+    // This prevents creating endless empty logs on every page load
+    const hasEmptyLogAtTop = recentLog &&
+                             recentLog.event === 'note' &&
+                             (!recentLog.text || recentLog.text.trim().length === 0)
+
+    if (!hasEmptyLogAtTop) {
+      // No empty log at top, create one for user input
       const emptyLog = await fastify.models.Log.create({
         userId: req.user.id,
         text: '',
@@ -592,6 +592,8 @@ export default async (fastify: FastifyInstance) => {
       })
       return [emptyLog, ...logs]
     }
+
+    // Already have an empty log at top, just return existing logs
     return logs
   })
 
@@ -798,6 +800,114 @@ export default async (fastify: FastifyInstance) => {
     reply.type('text/html').send(html);
   })
 
+  // Simple GET endpoint to delete empty logs - just visit the URL
+  fastify.get('/logs/cleanup-now', async (req: FastifyRequest, reply) => {
+    try {
+      // Find all empty logs from past 7 days (extended from 3 to catch more)
+      const sevenDaysAgo = dayjs().subtract(7, 'days').toDate()
+
+      const emptyLogs = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: 'note',
+          createdAt: {
+            [Op.gte]: sevenDaysAgo,
+          },
+        },
+      })
+
+      // Filter to truly empty logs (empty text or placeholder text)
+      const logsToDelete = emptyLogs.filter(log => {
+        if (!log.text || log.text.trim() === '') return true
+        const text = log.text.trim().toLowerCase()
+        return text.includes('will be deleted') ||
+               text.includes('log record') ||
+               text.includes('type here')
+      })
+
+      const idsToDelete = logsToDelete.map(log => log.id)
+
+      if (idsToDelete.length === 0) {
+        return reply.type('text/html').send(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Cleanup Complete</title>
+            <style>
+              body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; text-align: center; }
+              .success { color: #28a745; font-size: 48px; }
+              h1 { color: #333; }
+              p { color: #666; font-size: 18px; }
+              a { color: #007bff; text-decoration: none; }
+            </style>
+          </head>
+          <body>
+            <div class="success">✨</div>
+            <h1>Database is Clean!</h1>
+            <p>No empty logs found from the past 7 days.</p>
+            <p><a href="/logs">← Back to Logs</a></p>
+          </body>
+          </html>
+        `)
+      }
+
+      // Delete them
+      await fastify.models.Log.destroy({
+        where: { id: idsToDelete },
+      })
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Cleanup Complete</title>
+          <style>
+            body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; text-align: center; }
+            .success { color: #28a745; font-size: 48px; }
+            h1 { color: #333; }
+            p { color: #666; font-size: 18px; }
+            .count { font-size: 36px; font-weight: bold; color: #007bff; }
+            a { color: #007bff; text-decoration: none; }
+          </style>
+        </head>
+        <body>
+          <div class="success">✅</div>
+          <h1>Cleanup Complete!</h1>
+          <div class="count">${idsToDelete.length}</div>
+          <p>empty logs deleted from the past 7 days</p>
+          <p><a href="/logs">← Back to Logs</a></p>
+        </body>
+        </html>
+      `)
+    } catch (error: any) {
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Cleanup Error</title>
+          <style>
+            body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; text-align: center; }
+            .error { color: #dc3545; font-size: 48px; }
+            h1 { color: #333; }
+            p { color: #666; font-size: 18px; }
+          </style>
+        </head>
+        <body>
+          <div class="error">❌</div>
+          <h1>Cleanup Failed</h1>
+          <p>${error.message}</p>
+        </body>
+        </html>
+      `)
+    }
+  })
+
   fastify.post(
     '/logs',
     async (
@@ -948,12 +1058,14 @@ export default async (fastify: FastifyInstance) => {
         // Usership users: Generate AI-based context-aware question using Claude
         console.log(`🔍 Attempting to generate AI question for Usership user ${req.user.id}`)
         try {
+          // Load 60 logs to ensure we get 30+ answer logs for duplicate detection
+          // (some logs are notes/activities, not answers)
           const logs = await fastify.models.Log.findAll({
             where: {
               userId: req.user.id,
             },
             order: [['createdAt', 'DESC']],
-            limit: 20,
+            limit: 60,
           })
 
           const prompt = await buildPrompt(req.user, logs, isWeekend)
@@ -1082,7 +1194,36 @@ export default async (fastify: FastifyInstance) => {
         })
       })
 
-      return { response: fp.randomElement(defaultReplies) }
+      // Generate contextual response based on answer pattern
+      const answerCount = await fastify.models.Answer.count({
+        where: { userId: req.user.id }
+      })
+
+      // Vary responses based on engagement level
+      let response: string
+      if (answerCount === 1) {
+        response = "Thank you for starting your Memory story with LOT."
+      } else if (answerCount % 10 === 0) {
+        // Milestone celebrations every 10 answers
+        response = `${answerCount} moments captured. Your story is becoming richer.`
+      } else if (answerCount % 5 === 0) {
+        // Mini milestones every 5 answers
+        response = "Your patterns are emerging beautifully."
+      } else {
+        // Varied acknowledgments for regular answers
+        const engagingReplies = [
+          "Thank you. This helps me understand you better.",
+          "Noted. Every answer deepens your Memory.",
+          "Understood. Building your story.",
+          "I see. Your preferences are taking shape.",
+          "Thank you for sharing.",
+          "This adds valuable context.",
+          "Your story grows richer."
+        ]
+        response = fp.randomElement(engagingReplies)
+      }
+
+      return { response }
     }
   )
 
@@ -1211,14 +1352,23 @@ export default async (fastify: FastifyInstance) => {
         archetype: cohortResult.archetype,
         archetypeDescription: cohortResult.description,
         coreValues: psychologicalDepth.values.map(v => v.charAt(0).toUpperCase() + v.slice(1)),
-        emotionalPatterns: psychologicalDepth.emotionalPatterns.map(p => p.replace(/([A-Z])/g, ' $1').trim()),
+        emotionalPatterns: psychologicalDepth.emotionalPatterns.map(p => {
+          const formatted = p.replace(/([A-Z])/g, ' $1').trim()
+          return formatted.charAt(0).toUpperCase() + formatted.slice(1)
+        }),
         selfAwarenessLevel: psychologicalDepth.selfAwareness,
         // Behavioral patterns (surface level)
         behavioralCohort: cohortResult.behavioralCohort,
-        behavioralTraits: traits.map(t => t.replace(/([A-Z])/g, ' $1').trim()),
+        behavioralTraits: traits.map(t => {
+          const formatted = t.replace(/([A-Z])/g, ' $1').trim()
+          return formatted.charAt(0).toUpperCase() + formatted.slice(1)
+        }),
         patternStrength: Object.entries(patterns)
           .filter(([_, v]) => v > 0)
-          .map(([k, v]) => ({ trait: k.replace(/([A-Z])/g, ' $1').trim(), count: v }))
+          .map(([k, v]) => ({
+            trait: k.replace(/([A-Z])/g, ' $1').trim().replace(/^./, c => c.toUpperCase()),
+            count: v
+          }))
           .sort((a, b) => b.count - a.count),
         // Meta
         answerCount: logs.length,
@@ -1437,5 +1587,55 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     const userWorld = currentMetadata.world || { elements: [], lastGenerated: null, theme: '' }
 
     return userWorld
+  })
+
+  // Get available radio tracks
+  fastify.get('/radio/tracks', async (req, reply) => {
+    try {
+      const fs = await import('fs/promises')
+      const path = await import('path')
+      const radioDir = path.join(process.cwd(), 'public', 'radio')
+
+      // Check if directory exists
+      try {
+        await fs.access(radioDir)
+      } catch {
+        return { tracks: [] }
+      }
+
+      // Read directory contents
+      const files = await fs.readdir(radioDir)
+
+      // Filter for audio files
+      const audioExtensions = ['.mp3', '.wav', '.ogg', '.m4a', '.flac']
+      const audioFiles = files.filter(file => {
+        const ext = path.extname(file).toLowerCase()
+        return audioExtensions.includes(ext)
+      })
+
+      // Map to track objects
+      const tracks = audioFiles.map(filename => {
+        const name = path.basename(filename, path.extname(filename))
+          .replace(/-/g, ' ')
+          .replace(/_/g, ' ')
+          // Capitalize first letter of each word
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+
+        return {
+          filename,
+          url: `/radio/${filename}`,
+          name
+        }
+      })
+
+      console.log(`📻 Found ${tracks.length} radio tracks`)
+
+      return { tracks }
+    } catch (error: any) {
+      console.error('❌ Error reading radio tracks:', error)
+      return { tracks: [], error: error.message }
+    }
   })
 }
