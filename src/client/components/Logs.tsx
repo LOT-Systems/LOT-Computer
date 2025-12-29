@@ -365,7 +365,7 @@ const NoteEditor = ({
 
     // Clear saving state after a brief delay
     setTimeout(() => setIsSaving(false), 100)
-  }, [debouncedValue, onChange, log.text, primary, isSaving])
+  }, [debouncedValue, onChange, log.text, primary])
 
   // Sync local state when log updates from server
   // BUT: Don't overwrite if user is actively typing (focused)
