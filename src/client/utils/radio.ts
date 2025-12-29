@@ -16,14 +16,23 @@ interface RadioTrack {
 export function useRadio(enabled: boolean) {
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const tracksRef = React.useRef<RadioTrack[]>([])
+  const intervalRef = React.useRef<NodeJS.Timeout | null>(null)
   const [tracks, setTracks] = React.useState<RadioTrack[]>([])
   const [currentTrack, setCurrentTrack] = React.useState<RadioTrack | null>(null)
   const [isLoading, setIsLoading] = React.useState(false)
+  const [remainingTime, setRemainingTime] = React.useState<number | null>(null)
 
   // Keep tracksRef in sync with tracks
   React.useEffect(() => {
     tracksRef.current = tracks
   }, [tracks])
+
+  // Format seconds to MM:SS
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
 
   // Fetch available tracks from backend
   React.useEffect(() => {
@@ -104,7 +113,14 @@ export function useRadio(enabled: boolean) {
 
   // Update audio source and play when track changes
   React.useEffect(() => {
-    if (!enabled || !currentTrack || !audioRef.current) return
+    if (!enabled || !currentTrack || !audioRef.current) {
+      // Clear interval if not playing
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+      return
+    }
 
     // Update source and play
     audioRef.current.src = currentTrack.url
@@ -112,17 +128,44 @@ export function useRadio(enabled: boolean) {
     audioRef.current.play()
       .then(() => {
         console.log(`📻 Now playing: ${currentTrack.name}`)
-        stores.radioTrackName.set(currentTrack.name)
+
+        // Start countdown interval
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+        }
+
+        intervalRef.current = setInterval(() => {
+          if (audioRef.current && audioRef.current.duration) {
+            const remaining = audioRef.current.duration - audioRef.current.currentTime
+            setRemainingTime(remaining)
+
+            // Update display with track name and countdown
+            const timeStr = formatTime(remaining)
+            stores.radioTrackName.set(`${currentTrack.name} ${timeStr}`)
+          }
+        }, 1000)
       })
       .catch(error => {
         console.error('❌ Failed to play radio track:', error)
         stores.radioTrackName.set('Error playing track')
       })
-  }, [currentTrack, enabled])
+
+    // Cleanup interval when track changes
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+    }
+  }, [currentTrack, enabled, formatTime])
 
   // Cleanup on unmount
   React.useEffect(() => {
     return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
       if (audioRef.current) {
         audioRef.current.pause()
         audioRef.current.src = ''
