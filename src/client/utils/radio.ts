@@ -23,14 +23,20 @@ export function useRadio(enabled: boolean) {
   React.useEffect(() => {
     if (enabled) {
       setIsLoading(true)
+      console.log('📻 Fetching radio tracks from /api/radio/tracks...')
       fetch('/api/radio/tracks')
-        .then(res => res.json())
+        .then(res => {
+          console.log(`📻 Response status: ${res.status}`)
+          return res.json()
+        })
         .then(data => {
+          console.log('📻 Tracks data:', data)
           if (data.tracks && data.tracks.length > 0) {
+            console.log(`📻 Found ${data.tracks.length} tracks:`, data.tracks.map(t => t.name))
             setTracks(data.tracks)
           } else {
-            console.log('📻 No radio tracks available')
-            stores.radioTrackName.set('No tracks available')
+            console.log('📻 No radio tracks available - add audio files to public/radio/')
+            stores.radioTrackName.set('Add tracks to public/radio/')
           }
         })
         .catch(error => {
