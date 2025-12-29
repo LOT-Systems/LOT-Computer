@@ -157,26 +157,10 @@ function handleColorsChange() {
 const handleColorsChangeDebounced = fp.debounce(handleColorsChange, 400)
 
 baseColor.subscribe((value) => {
-  // Don't override on public profile pages - they handle their own theme
-  try {
-    if (typeof window !== 'undefined' && window.location?.pathname?.startsWith('/u/')) {
-      return
-    }
-  } catch (e) {
-    // Continue with normal behavior if pathname check fails
-  }
   document.documentElement.style.setProperty('--base-color', value)
   handleColorsChangeDebounced()
 })
 accentColor.subscribe((value) => {
-  // Don't override on public profile pages - they handle their own theme
-  try {
-    if (typeof window !== 'undefined' && window.location?.pathname?.startsWith('/u/')) {
-      return
-    }
-  } catch (e) {
-    // Continue with normal behavior if pathname check fails
-  }
   const rgb = hexToRgb(value) || hexToRgb(THEMES.light.acc)!
   document.documentElement.style.setProperty(
     `--acc-color-default`,
@@ -185,14 +169,6 @@ accentColor.subscribe((value) => {
   handleColorsChangeDebounced()
 })
 accentPalette.subscribe((palette) => {
-  // Don't override on public profile pages - they handle their own theme
-  try {
-    if (typeof window !== 'undefined' && window.location?.pathname?.startsWith('/u/')) {
-      return
-    }
-  } catch (e) {
-    // Continue with normal behavior if pathname check fails
-  }
   palette.forEach((x) => {
     document.documentElement.style.setProperty(
       `--acc-color-${x.index}`,
@@ -247,33 +223,22 @@ state.isMirrorOn.subscribe((value) => {
 // Initialize CSS custom properties on module load
 // This ensures theme colors are available immediately for Tailwind utilities
 if (typeof document !== 'undefined') {
-  // Skip initialization on public profile pages - they handle their own theme
-  let isPublicProfile = false
-  try {
-    isPublicProfile = typeof window !== 'undefined' && window.location?.pathname?.startsWith('/u/') === true
-  } catch (e) {
-    // If pathname check fails, assume not public profile and continue
-    isPublicProfile = false
-  }
+  const initialBase = baseColor.get()
+  const initialAcc = accentColor.get()
+  const initialPalette = accentPalette.get()
 
-  if (!isPublicProfile) {
-    const initialBase = baseColor.get()
-    const initialAcc = accentColor.get()
-    const initialPalette = accentPalette.get()
-
-    document.documentElement.style.setProperty('--base-color', initialBase)
-    const initialAccRgb = hexToRgb(initialAcc) || hexToRgb(THEMES.light.acc)!
+  document.documentElement.style.setProperty('--base-color', initialBase)
+  const initialAccRgb = hexToRgb(initialAcc) || hexToRgb(THEMES.light.acc)!
+  document.documentElement.style.setProperty(
+    '--acc-color-default',
+    initialAccRgb.join(' ')
+  )
+  initialPalette.forEach((x) => {
     document.documentElement.style.setProperty(
-      '--acc-color-default',
-      initialAccRgb.join(' ')
+      `--acc-color-${x.index}`,
+      x.colorRgb.join(' ')
     )
-    initialPalette.forEach((x) => {
-      document.documentElement.style.setProperty(
-        `--acc-color-${x.index}`,
-        x.colorRgb.join(' ')
-      )
-    })
-  }
+  })
 
   // Save theme changes to backend for public profile
   let saveThemeTimeout: NodeJS.Timeout | null = null
