@@ -140,13 +140,6 @@ export const System = () => {
 
   // Calculate awareness index from backend selfAwarenessLevel (0-10) to percentage (0-100%)
   const awarenessIndex = React.useMemo(() => {
-    console.log('[System] Profile data:', {
-      hasProfile: !!profile,
-      hasUsership: profile?.hasUsership,
-      selfAwarenessLevel: profile?.selfAwarenessLevel,
-      selfAwarenessType: typeof profile?.selfAwarenessLevel,
-      fullProfile: profile
-    })
     if (!profile?.hasUsership) return 0
     if (typeof profile.selfAwarenessLevel !== 'number') return 0
     return Math.round((profile.selfAwarenessLevel / 10) * 100)
