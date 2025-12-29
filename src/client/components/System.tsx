@@ -285,8 +285,8 @@ export const System = () => {
             </div>
           ) : (
             <div className="inline-block">
-              <div>Day {journeyData.daysSinceStart}: {profile?.archetype || 'The Explorer'}&#39;s Journey</div>
-              <div>{journeyData.answerCount} memories • {profile?.coreValues?.slice(0, 2).join(' & ') || 'Growing'}</div>
+              <div>Day {journeyData.daysSinceStart} • {journeyData.answerCount} memories</div>
+              <div>{profile?.selfAwarenessLevel || 'Awakening'} • {profile?.emotionalPatterns?.[0] || 'Exploring patterns'}</div>
             </div>
           )}
         </Block>
