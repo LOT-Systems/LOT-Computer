@@ -313,22 +313,11 @@ const NoteEditor = ({
         pendingPushRef.current = null
       }
 
-      // Start gentle blink when typing begins, but stop it if user continues typing
-      if (primary) {
-        // Clear any existing blink timeout
-        if (blinkTimeoutRef.current) {
-          clearTimeout(blinkTimeoutRef.current)
-          blinkTimeoutRef.current = null
-        }
-
-        // Start gentle blink immediately
-        setIsAboutToPush(true)
-
-        // Stop blinking after 800ms (gentle pulse)
-        blinkTimeoutRef.current = setTimeout(() => {
-          setIsAboutToPush(false)
-          blinkTimeoutRef.current = null
-        }, 800)
+      // Stop any ongoing blink animation when user types
+      if (primary && blinkTimeoutRef.current) {
+        clearTimeout(blinkTimeoutRef.current)
+        blinkTimeoutRef.current = null
+        setIsAboutToPush(false)
       }
     }
   }, [value, log.text, pendingPushRef, primary])
