@@ -291,7 +291,7 @@ export const System = () => {
           ) : (
             <div className="inline-block">
               <div>Day {journeyData.daysSinceStart} • {journeyData.answerCount} memories • Awareness {awarenessIndex}%</div>
-              <div>{profile?.selfAwarenessLevel || 'Awakening'} • {profile?.emotionalPatterns?.[0] || 'Exploring patterns'}</div>
+              <div>{profile?.behavioralCohort || 'Growing'} • {profile?.emotionalPatterns?.[0] || 'Exploring patterns'}</div>
             </div>
           )}
         </Block>
