@@ -1352,14 +1352,23 @@ export default async (fastify: FastifyInstance) => {
         archetype: cohortResult.archetype,
         archetypeDescription: cohortResult.description,
         coreValues: psychologicalDepth.values.map(v => v.charAt(0).toUpperCase() + v.slice(1)),
-        emotionalPatterns: psychologicalDepth.emotionalPatterns.map(p => p.replace(/([A-Z])/g, ' $1').trim()),
+        emotionalPatterns: psychologicalDepth.emotionalPatterns.map(p => {
+          const formatted = p.replace(/([A-Z])/g, ' $1').trim()
+          return formatted.charAt(0).toUpperCase() + formatted.slice(1)
+        }),
         selfAwarenessLevel: psychologicalDepth.selfAwareness,
         // Behavioral patterns (surface level)
         behavioralCohort: cohortResult.behavioralCohort,
-        behavioralTraits: traits.map(t => t.replace(/([A-Z])/g, ' $1').trim()),
+        behavioralTraits: traits.map(t => {
+          const formatted = t.replace(/([A-Z])/g, ' $1').trim()
+          return formatted.charAt(0).toUpperCase() + formatted.slice(1)
+        }),
         patternStrength: Object.entries(patterns)
           .filter(([_, v]) => v > 0)
-          .map(([k, v]) => ({ trait: k.replace(/([A-Z])/g, ' $1').trim(), count: v }))
+          .map(([k, v]) => ({
+            trait: k.replace(/([A-Z])/g, ' $1').trim().replace(/^./, c => c.toUpperCase()),
+            count: v
+          }))
           .sort((a, b) => b.count - a.count),
         // Meta
         answerCount: logs.length,
