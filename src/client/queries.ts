@@ -212,11 +212,14 @@ export const useProfile = () =>
     archetypeDescription?: string
     coreValues?: string[]
     emotionalPatterns?: string[]
-    selfAwarenessLevel?: string
+    selfAwarenessLevel?: number  // 0-10 scale
     behavioralCohort?: string
+    behavioralTraits?: string[]
+    patternStrength?: { trait: string; count: number }[]
     answerCount?: number
+    noteCount?: number
     message?: string
-  }>('/api/memory/profile', {
+  }>('/user-profile', {
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     refetchOnWindowFocus: false,
   })()
