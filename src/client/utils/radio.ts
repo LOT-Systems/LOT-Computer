@@ -15,13 +15,19 @@ interface RadioTrack {
  */
 export function useRadio(enabled: boolean) {
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
+  const tracksRef = React.useRef<RadioTrack[]>([])
   const [tracks, setTracks] = React.useState<RadioTrack[]>([])
   const [currentTrack, setCurrentTrack] = React.useState<RadioTrack | null>(null)
   const [isLoading, setIsLoading] = React.useState(false)
 
+  // Keep tracksRef in sync with tracks
+  React.useEffect(() => {
+    tracksRef.current = tracks
+  }, [tracks])
+
   // Fetch available tracks from backend
   React.useEffect(() => {
-    if (enabled) {
+    if (enabled && tracks.length === 0) {
       setIsLoading(true)
       console.log('📻 Fetching radio tracks from /api/radio/tracks...')
       fetch('/api/radio/tracks')
@@ -32,7 +38,7 @@ export function useRadio(enabled: boolean) {
         .then(data => {
           console.log('📻 Tracks data:', data)
           if (data.tracks && data.tracks.length > 0) {
-            console.log(`📻 Found ${data.tracks.length} tracks:`, data.tracks.map(t => t.name))
+            console.log(`📻 Found ${data.tracks.length} tracks:`, data.tracks.map((t: RadioTrack) => t.name))
             setTracks(data.tracks)
           } else {
             console.log('📻 No radio tracks available - add audio files to public/radio/')
@@ -47,27 +53,28 @@ export function useRadio(enabled: boolean) {
           setIsLoading(false)
         })
     }
-  }, [enabled])
+  }, [enabled, tracks.length])
 
-  // Handle track ended - play another random track
+  // Handle track ended - play another random track (stable, no deps on tracks)
   const handleTrackEnded = React.useCallback(() => {
     console.log('📻 Track ended, selecting next track...')
-    if (tracks.length === 0) return
+    const currentTracks = tracksRef.current
+    if (currentTracks.length === 0) return
 
-    if (tracks.length === 1) {
-      setCurrentTrack(tracks[0])
+    if (currentTracks.length === 1) {
+      setCurrentTrack(currentTracks[0])
       return
     }
 
     // Select random track excluding current
     setCurrentTrack(prev => {
       const availableTracks = prev
-        ? tracks.filter(t => t.filename !== prev.filename)
-        : tracks
+        ? currentTracks.filter(t => t.filename !== prev.filename)
+        : currentTracks
       const randomIndex = Math.floor(Math.random() * availableTracks.length)
       return availableTracks[randomIndex]
     })
-  }, [tracks])
+  }, [])
 
   // Play/stop radio
   React.useEffect(() => {
@@ -86,22 +93,21 @@ export function useRadio(enabled: boolean) {
     }
   }, [enabled, tracks.length, currentTrack])
 
-  // Update audio element when track changes
+  // Set up audio element once
   React.useEffect(() => {
-    if (!enabled || !currentTrack) return
-
-    // Create audio element if needed
     if (!audioRef.current) {
       audioRef.current = new Audio()
+      audioRef.current.volume = 0.6
+      audioRef.current.addEventListener('ended', handleTrackEnded)
     }
+  }, [handleTrackEnded])
 
-    // Update the event listener to use current handleTrackEnded
-    audioRef.current.removeEventListener('ended', handleTrackEnded)
-    audioRef.current.addEventListener('ended', handleTrackEnded)
+  // Update audio source and play when track changes
+  React.useEffect(() => {
+    if (!enabled || !currentTrack || !audioRef.current) return
 
     // Update source and play
     audioRef.current.src = currentTrack.url
-    audioRef.current.volume = 0.6 // Set volume to 60%
 
     audioRef.current.play()
       .then(() => {
@@ -112,7 +118,7 @@ export function useRadio(enabled: boolean) {
         console.error('❌ Failed to play radio track:', error)
         stores.radioTrackName.set('Error playing track')
       })
-  }, [currentTrack, enabled, handleTrackEnded])
+  }, [currentTrack, enabled])
 
   // Cleanup on unmount
   React.useEffect(() => {
