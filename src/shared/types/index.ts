@@ -214,6 +214,7 @@ export type PublicProfile = {
   privacySettings: UserPrivacySettings;
   tags?: string[];
   profileVisits?: number;
+  isPrivate?: boolean; // True when profile is in private mode
   theme?: {
     theme: string;
     baseColor: string | null;

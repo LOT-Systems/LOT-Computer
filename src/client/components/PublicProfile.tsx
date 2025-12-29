@@ -187,6 +187,54 @@ export const PublicProfile = () => {
   // Format current date
   const currentDate = dayjs().format('dddd, D MMMM, YYYY')
 
+  // Check if profile is private
+  if (profile.isPrivate) {
+    return (
+      <div className="max-w-2xl min-h-screen">
+        <div className="flex flex-col gap-y-24">
+          {/* Name */}
+          <div>
+            <div>{userName}</div>
+            <div>{currentDate}</div>
+          </div>
+
+          {/* Tags (show even in private mode, especially Suspended) */}
+          {profile.tags && profile.tags.length > 0 && (
+            <div>
+              <Block label="Team:" blockView>
+                <TagsContainer
+                  items={profile.tags
+                    .map((tagId: string) => {
+                      const tag = getUserTagByIdCaseInsensitive(tagId)
+                      return tag ? (
+                        <Tag key={tagId} color={tag.color}>
+                          {tag.name}
+                        </Tag>
+                      ) : null
+                    })
+                    .filter(Boolean)}
+                />
+              </Block>
+            </div>
+          )}
+
+          {/* Private mode message */}
+          <div>
+            <Block label="Profile:" blockView>
+              Private
+            </Block>
+          </div>
+
+          {/* Footer */}
+          <div>
+            This is {userName}'s System powered by{' '}
+            <GhostButton href="/">LOT</GhostButton>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-2xl min-h-screen">
       <div className="flex flex-col gap-y-24">
