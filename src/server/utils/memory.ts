@@ -1012,7 +1012,12 @@ export function extractUserTraits(logs: Log[]): {
   // Calculate self-awareness score (0-10) based on reflective language
   const reflectiveScore = psychPatterns.reflective + psychPatterns.emotionallyAware
   const totalLogs = answerLogs.length + noteLogs.length
-  const selfAwareness = Math.min(10, Math.round((reflectiveScore / Math.max(1, totalLogs)) * 3))
+  // More generous formula: base of 2 + scaled reflective score
+  // With 10 logs and 2 reflective: 2 + (2/10 * 6) = 2 + 1.2 = 3
+  // With 10 logs and 5 reflective: 2 + (5/10 * 6) = 2 + 3 = 5
+  const baseScore = totalLogs >= 5 ? 2 : 0 // Give base score after 5 logs
+  const scaledScore = (reflectiveScore / Math.max(1, totalLogs)) * 6
+  const selfAwareness = Math.min(10, Math.round(baseScore + scaledScore))
 
   // Extract top behavioral traits (2+ matches required)
   const traits: string[] = Object.entries(patterns)

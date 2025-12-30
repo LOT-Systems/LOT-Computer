@@ -96,7 +96,7 @@ export function EmotionalCheckIn() {
             </div>
           ) : (
             <>
-              <div className="mb-12 opacity-60">How are you {checkInLabel.toLowerCase()}?</div>
+              <div className="mb-12 opacity-90">How are you {checkInLabel.toLowerCase()}?</div>
               <div className="flex flex-wrap gap-8">
                 <Button onClick={() => handleCheckIn('energized')} disabled={isLoading}>
                   Energized

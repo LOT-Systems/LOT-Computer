@@ -159,14 +159,14 @@ export function SelfCareMoments() {
               </>
             )}
           </div>
-          <div className="flex gap-8">
-            <Button onClick={startTimer}>
+          <div className="flex gap-8 text-[14px]">
+            <Button onClick={startTimer} className="text-[14px]">
               Start
             </Button>
-            <Button onClick={markAsDone}>
+            <Button onClick={markAsDone} className="text-[14px]">
               Done
             </Button>
-            <Button onClick={refreshSuggestion} className="opacity-60">
+            <Button onClick={refreshSuggestion} className="text-[14px] opacity-60">
               Skip
             </Button>
           </div>
@@ -189,16 +189,16 @@ export function SelfCareMoments() {
           <div className="opacity-80 whitespace-pre-line mb-12">{currentSuggestion.practice}</div>
           {isTimerRunning ? (
             <div className="flex gap-8">
-              <Button onClick={stopTimer}>
+              <Button onClick={stopTimer} className="text-[14px]">
                 Stop
               </Button>
-              <Button onClick={markAsDone}>
+              <Button onClick={markAsDone} className="text-[14px]">
                 Done
               </Button>
             </div>
           ) : (
-            <Button onClick={markAsDone}>
-              Mark as Done
+            <Button onClick={markAsDone} className="text-[14px]">
+              Done
             </Button>
           )}
         </div>
