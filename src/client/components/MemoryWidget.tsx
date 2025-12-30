@@ -19,7 +19,7 @@ export function MemoryWidget() {
   const { data: loadedQuestion = null } = useMemory()
 
   const { mutate: createMemory } = useCreateMemory({
-    onSuccess: ({ response }) => {
+    onSuccess: ({ response, insight }) => {
       // World generation disabled to reduce server costs
       // fetch('/api/world/generate-element', {
       //   method: 'POST',
@@ -29,7 +29,9 @@ export function MemoryWidget() {
       setIsQuestionShown(false)
       setTimeout(() => {
         setQuestion(null)
-        setResponse(response)
+        // Combine response with insight if available
+        const fullResponse = insight ? `${response}\n\n${insight}` : response
+        setResponse(fullResponse)
         setTimeout(() => {
           setIsResponseShown(true)
           setTimeout(() => {
@@ -39,7 +41,7 @@ export function MemoryWidget() {
               setIsResponseShown(false)
               setResponse(null)
             }, 1500)
-          }, 5000)
+          }, insight ? 7000 : 5000) // Show longer if there's an insight
         }, 100)
       }, 1500)
     },

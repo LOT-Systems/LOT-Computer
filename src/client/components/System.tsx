@@ -18,6 +18,7 @@ import { useVisitorStats, useProfile, useLogs } from '#client/queries'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
 import { RecipeWidget } from './RecipeWidget'
+import { AwarenessDashboard } from './AwarenessDashboard'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 
 export const System = () => {
@@ -395,6 +396,8 @@ export const System = () => {
       )}
 
       <RecipeWidget />
+
+      <AwarenessDashboard />
 
       <MemoryWidget />
     </div>
