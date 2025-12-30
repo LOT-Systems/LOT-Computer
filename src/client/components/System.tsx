@@ -18,7 +18,6 @@ import { useVisitorStats, useProfile, useLogs } from '#client/queries'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
 import { RecipeWidget } from './RecipeWidget'
-import { AwarenessDashboard } from './AwarenessDashboard'
 import { EmotionalCheckIn } from './EmotionalCheckIn'
 import { JournalReflection } from './JournalReflection'
 import { SelfCareMoments } from './SelfCareMoments'
@@ -400,8 +399,6 @@ export const System = () => {
       )}
 
       <RecipeWidget />
-
-      <AwarenessDashboard />
 
       <EmotionalCheckIn />
 
