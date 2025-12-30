@@ -1,16 +1,21 @@
 import React from 'react'
-import { Block } from '#client/components/ui'
+import { Block, Button } from '#client/components/ui'
 import { useLogs } from '#client/queries'
+import axios from 'axios'
 
-type ReflectionView = 'prompt' | 'recent' | 'themes'
+type ReflectionView = 'prompt' | 'write' | 'recent' | 'themes'
 
 /**
- * Journal Reflection Widget - Time-aware prompts for deeper journaling
- * Pattern: Prompt > Recent Entries > Themes
+ * Journal Reflection Widget - Time-aware prompts for deeper journaling with direct writing
+ * Pattern: Prompt > Write > Recent > Themes
  * Shows different prompts based on time of day
  */
 export function JournalReflection() {
   const [view, setView] = React.useState<ReflectionView>('prompt')
+  const [writingText, setWritingText] = React.useState('')
+  const [isSaving, setIsSaving] = React.useState(false)
+  const [justSaved, setJustSaved] = React.useState(false)
+
   const { data: logs = [] } = useLogs()
 
   const journalEntries = logs.filter(log => log.event === 'note' && log.text && log.text.length > 20)
@@ -18,12 +23,33 @@ export function JournalReflection() {
   const cycleView = () => {
     setView(prev => {
       switch (prev) {
-        case 'prompt': return 'recent'
+        case 'prompt': return 'write'
+        case 'write': return 'recent'
         case 'recent': return 'themes'
         case 'themes': return 'prompt'
         default: return 'prompt'
       }
     })
+  }
+
+  const handleSave = async () => {
+    if (!writingText.trim() || isSaving) return
+
+    setIsSaving(true)
+    try {
+      await axios.post('/api/logs', { text: writingText.trim() })
+      setJustSaved(true)
+      setWritingText('')
+
+      setTimeout(() => {
+        setJustSaved(false)
+        setView('prompt')
+      }, 2000)
+    } catch (error) {
+      console.error('Failed to save reflection:', error)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   // Time-based prompt selection
@@ -102,6 +128,7 @@ export function JournalReflection() {
 
   const label =
     view === 'prompt' ? 'Reflect:' :
+    view === 'write' ? 'Write:' :
     view === 'recent' ? 'Recent:' :
     'Themes:'
 
@@ -117,6 +144,27 @@ export function JournalReflection() {
             <div>• {prompts.secondary}</div>
             <div>• {prompts.tertiary}</div>
           </div>
+        </div>
+      )}
+
+      {view === 'write' && (
+        <div className="inline-block w-full">
+          {justSaved ? (
+            <div className="opacity-90">Saved ✓</div>
+          ) : (
+            <>
+              <textarea
+                className="w-full min-h-[120px] bg-transparent border border-current opacity-60 p-8 mb-12 resize-none focus:opacity-90 focus:outline-none"
+                placeholder="Write what's on your mind..."
+                value={writingText}
+                onChange={(e) => setWritingText(e.target.value)}
+                disabled={isSaving}
+              />
+              <Button onClick={handleSave} disabled={isSaving || !writingText.trim()}>
+                {isSaving ? 'Saving...' : 'Save'}
+              </Button>
+            </>
+          )}
         </div>
       )}
 

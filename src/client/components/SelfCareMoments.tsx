@@ -21,10 +21,52 @@ type CareSuggestion = {
 export function SelfCareMoments() {
   const [view, setView] = React.useState<CareView>('suggestion')
   const [currentSuggestion, setCurrentSuggestion] = React.useState<CareSuggestion | null>(null)
+  const [completedToday, setCompletedToday] = React.useState<number>(0)
+  const [isTimerRunning, setIsTimerRunning] = React.useState(false)
+  const [timeRemaining, setTimeRemaining] = React.useState<number>(0)
+  const timerRef = React.useRef<NodeJS.Timeout | null>(null)
 
   const weather = useStore(stores.weather)
   const { data: profile } = useProfile()
   const { data: checkInsData } = useEmotionalCheckIns(7) // Last 7 days
+
+  // Load today's completed count from localStorage
+  React.useEffect(() => {
+    const today = new Date().toDateString()
+    const stored = localStorage.getItem('self-care-completed')
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored)
+        if (parsed.date === today) {
+          setCompletedToday(parsed.count)
+        } else {
+          // New day, reset
+          localStorage.setItem('self-care-completed', JSON.stringify({ date: today, count: 0 }))
+          setCompletedToday(0)
+        }
+      } catch (e) {
+        console.error('Failed to parse completed count:', e)
+      }
+    }
+  }, [])
+
+  // Timer effect
+  React.useEffect(() => {
+    if (isTimerRunning && timeRemaining > 0) {
+      timerRef.current = setTimeout(() => {
+        setTimeRemaining(time => time - 1)
+      }, 1000)
+    } else if (timeRemaining === 0 && isTimerRunning) {
+      setIsTimerRunning(false)
+      // Timer finished!
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
+    }
+  }, [isTimerRunning, timeRemaining])
 
   React.useEffect(() => {
     // Generate context-aware suggestion when component mounts or context changes
@@ -58,6 +100,31 @@ export function SelfCareMoments() {
     setView('suggestion')
   }
 
+  const markAsDone = () => {
+    const today = new Date().toDateString()
+    const newCount = completedToday + 1
+    setCompletedToday(newCount)
+    localStorage.setItem('self-care-completed', JSON.stringify({ date: today, count: newCount }))
+    refreshSuggestion()
+  }
+
+  const startTimer = () => {
+    if (!currentSuggestion) return
+    // Parse duration (e.g., "5 mins" -> 300 seconds)
+    const match = currentSuggestion.duration.match(/(\d+)/)
+    if (match) {
+      const minutes = parseInt(match[1])
+      setTimeRemaining(minutes * 60)
+      setIsTimerRunning(true)
+      setView('practice')
+    }
+  }
+
+  const stopTimer = () => {
+    setIsTimerRunning(false)
+    setTimeRemaining(0)
+  }
+
   if (!currentSuggestion) {
     return (
       <Block label="Self-Care:" blockView>
@@ -71,16 +138,36 @@ export function SelfCareMoments() {
     view === 'why' ? 'Why This:' :
     'Practice:'
 
+  // Format timer display
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
   return (
     <Block label={label} blockView onLabelClick={cycleView}>
       {view === 'suggestion' && (
-        <div className="inline-block">
+        <div className="inline-block w-full">
           <div className="mb-12 opacity-90">{currentSuggestion.action}</div>
-          <div className="flex items-center gap-8 opacity-60 text-[14px]">
+          <div className="flex items-center gap-8 opacity-60 text-[14px] mb-12">
             <span>{currentSuggestion.duration}</span>
-            <span>•</span>
-            <Button onClick={refreshSuggestion} className="text-[14px] opacity-60 hover:opacity-100">
-              Refresh
+            {completedToday > 0 && (
+              <>
+                <span>•</span>
+                <span>{completedToday} done today</span>
+              </>
+            )}
+          </div>
+          <div className="flex gap-8">
+            <Button onClick={startTimer}>
+              Start
+            </Button>
+            <Button onClick={markAsDone}>
+              Done
+            </Button>
+            <Button onClick={refreshSuggestion} className="opacity-60">
+              Skip
             </Button>
           </div>
         </div>
@@ -93,8 +180,27 @@ export function SelfCareMoments() {
       )}
 
       {view === 'practice' && (
-        <div className="inline-block">
-          <div className="opacity-80 whitespace-pre-line">{currentSuggestion.practice}</div>
+        <div className="inline-block w-full">
+          {isTimerRunning && (
+            <div className="mb-12 text-[20px] opacity-90">
+              {formatTime(timeRemaining)}
+            </div>
+          )}
+          <div className="opacity-80 whitespace-pre-line mb-12">{currentSuggestion.practice}</div>
+          {isTimerRunning ? (
+            <div className="flex gap-8">
+              <Button onClick={stopTimer}>
+                Stop
+              </Button>
+              <Button onClick={markAsDone}>
+                Done
+              </Button>
+            </div>
+          ) : (
+            <Button onClick={markAsDone}>
+              Mark as Done
+            </Button>
+          )}
         </div>
       )}
     </Block>

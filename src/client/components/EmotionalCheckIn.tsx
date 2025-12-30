@@ -36,17 +36,16 @@ export function EmotionalCheckIn() {
       setResponse(data.compassionateResponse)
       setInsight(data.insights)
       setShowResponse(true)
-
-      // Auto-hide after 6 seconds
-      setTimeout(() => {
-        setShowResponse(false)
-        setResponse(null)
-        setInsight(null)
-      }, 6000)
+      // Keep response visible - don't auto-hide
     }
   })
 
   const cycleView = () => {
+    // When cycling views, clear the response
+    setShowResponse(false)
+    setResponse(null)
+    setInsight(null)
+
     setView(prev => {
       switch (prev) {
         case 'prompt': return 'history'
