@@ -6,8 +6,6 @@ import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 
 export const PublicProfile = () => {
-  console.log('[PublicProfile] Component rendering at:', new Date().toISOString())
-
   const [profile, setProfile] = React.useState<PublicProfileType | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
@@ -17,11 +15,8 @@ export const PublicProfile = () => {
   const userIdOrUsername = React.useMemo(() => {
     try {
       const path = window.location.pathname
-      console.log('[PublicProfile] Pathname:', path)
       const match = path.match(/\/u\/([^\/]+)/)
-      const extracted = match ? match[1] : null
-      console.log('[PublicProfile] Extracted ID:', extracted)
-      return extracted
+      return match ? match[1] : null
     } catch (err) {
       console.error('[PublicProfile] URL parsing error:', err)
       return null
@@ -36,12 +31,8 @@ export const PublicProfile = () => {
       return
     }
 
-    console.log('[PublicProfile] Fetching profile for:', userIdOrUsername)
-
     fetch(`/api/public/profile/${userIdOrUsername}`)
       .then(async (res) => {
-        console.log('[PublicProfile] Response status:', res.status)
-        console.log('[PublicProfile] Response URL:', res.url)
         if (!res.ok) {
           const data = await res.json().catch(() => ({
             message: `HTTP ${res.status}`,
@@ -59,7 +50,6 @@ export const PublicProfile = () => {
         return res.json()
       })
       .then((data) => {
-        console.log('[PublicProfile] Profile loaded:', data)
         setProfile(data)
         setLoading(false)
       })
@@ -75,7 +65,6 @@ export const PublicProfile = () => {
     if (!profile?.theme) return
 
     const { theme: themeName, baseColor, accentColor } = profile.theme
-    console.log('[PublicProfile] Applying theme:', themeName, baseColor, accentColor)
 
     // Define theme colors (matching theme.ts THEMES)
     const THEMES: Record<string, { base: string; acc: string }> = {
@@ -114,8 +103,6 @@ export const PublicProfile = () => {
     document.documentElement.style.setProperty('--base-color', finalBaseColor)
     const accRgb = hexToRgb(finalAccentColor) || [0, 0, 0]
     document.documentElement.style.setProperty('--acc-color-default', accRgb.join(' '))
-
-    console.log('[PublicProfile] Theme applied:', finalBaseColor, finalAccentColor)
   }, [profile])
 
   if (loading) {
