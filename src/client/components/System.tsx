@@ -20,6 +20,9 @@ import { MemoryWidget } from './MemoryWidget'
 import { RecipeWidget } from './RecipeWidget'
 import { AwarenessDashboard } from './AwarenessDashboard'
 import { EmotionalCheckIn } from './EmotionalCheckIn'
+import { JournalReflection } from './JournalReflection'
+import { SelfCareMoments } from './SelfCareMoments'
+import { IntentionsWidget } from './IntentionsWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 
 export const System = () => {
@@ -401,6 +404,24 @@ export const System = () => {
       <AwarenessDashboard />
 
       <EmotionalCheckIn />
+
+      {/* Self-Care Moments - Always show (contextual by nature) */}
+      <SelfCareMoments />
+
+      {/* Journal Reflection - Show if user has entries OR it's evening */}
+      {(() => {
+        const hasJournalEntries = logs.some(log => log.event === 'note' && log.text && log.text.length > 20)
+        const isEvening = new Date().getHours() >= 17
+        return (hasJournalEntries || isEvening) && <JournalReflection />
+      })()}
+
+      {/* Intentions - Show if user has intention OR it's early in month */}
+      {(() => {
+        const hasIntention = !!localStorage.getItem('current-intention')
+        const dayOfMonth = new Date().getDate()
+        const isEarlyMonth = dayOfMonth <= 7 // First week of month
+        return (hasIntention || isEarlyMonth) && <IntentionsWidget />
+      })()}
 
       <MemoryWidget />
     </div>

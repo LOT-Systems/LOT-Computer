@@ -1,0 +1,232 @@
+import React from 'react'
+import { useStore } from '@nanostores/react'
+import * as stores from '#client/stores'
+import { Block, Button } from '#client/components/ui'
+import { useProfile, useEmotionalCheckIns } from '#client/queries'
+
+type CareView = 'suggestion' | 'why' | 'practice'
+
+type CareSuggestion = {
+  action: string
+  why: string
+  practice: string
+  duration: string
+}
+
+/**
+ * Self-Care Moments Widget - Context-aware recommendations
+ * Pattern: Suggestion > Why This > Practice
+ * Adapts based on: emotional state, weather, archetype, time
+ */
+export function SelfCareMoments() {
+  const [view, setView] = React.useState<CareView>('suggestion')
+  const [currentSuggestion, setCurrentSuggestion] = React.useState<CareSuggestion | null>(null)
+
+  const weather = useStore(stores.weather)
+  const { data: profile } = useProfile()
+  const { data: checkInsData } = useEmotionalCheckIns(7) // Last 7 days
+
+  React.useEffect(() => {
+    // Generate context-aware suggestion when component mounts or context changes
+    const suggestion = generateContextualSuggestion(
+      weather?.description,
+      profile?.archetype,
+      checkInsData?.stats.dominantMood
+    )
+    setCurrentSuggestion(suggestion)
+  }, [weather?.description, profile?.archetype, checkInsData?.stats.dominantMood])
+
+  const cycleView = () => {
+    setView(prev => {
+      switch (prev) {
+        case 'suggestion': return 'why'
+        case 'why': return 'practice'
+        case 'practice': return 'suggestion'
+        default: return 'suggestion'
+      }
+    })
+  }
+
+  const refreshSuggestion = () => {
+    const suggestion = generateContextualSuggestion(
+      weather?.description,
+      profile?.archetype,
+      checkInsData?.stats.dominantMood,
+      true // Force different suggestion
+    )
+    setCurrentSuggestion(suggestion)
+    setView('suggestion')
+  }
+
+  if (!currentSuggestion) {
+    return (
+      <Block label="Self-Care:" blockView>
+        <div className="opacity-60">Loading suggestion...</div>
+      </Block>
+    )
+  }
+
+  const label =
+    view === 'suggestion' ? 'Self-Care:' :
+    view === 'why' ? 'Why This:' :
+    'Practice:'
+
+  return (
+    <Block label={label} blockView onLabelClick={cycleView}>
+      {view === 'suggestion' && (
+        <div className="inline-block">
+          <div className="mb-12 opacity-90">{currentSuggestion.action}</div>
+          <div className="flex items-center gap-8 opacity-60 text-[14px]">
+            <span>{currentSuggestion.duration}</span>
+            <span>•</span>
+            <Button onClick={refreshSuggestion} className="text-[14px] opacity-60 hover:opacity-100">
+              Refresh
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {view === 'why' && (
+        <div className="inline-block">
+          <div className="opacity-80">{currentSuggestion.why}</div>
+        </div>
+      )}
+
+      {view === 'practice' && (
+        <div className="inline-block">
+          <div className="opacity-80 whitespace-pre-line">{currentSuggestion.practice}</div>
+        </div>
+      )}
+    </Block>
+  )
+}
+
+/**
+ * Generate contextual care suggestion based on multiple factors
+ */
+function generateContextualSuggestion(
+  weatherDesc?: string,
+  archetype?: string,
+  dominantMood?: string,
+  forceNew: boolean = false
+): CareSuggestion {
+  const suggestions: CareSuggestion[] = []
+
+  // Weather-based suggestions
+  if (weatherDesc) {
+    const weatherLower = weatherDesc.toLowerCase()
+    if (weatherLower.includes('rain') || weatherLower.includes('storm')) {
+      suggestions.push({
+        action: 'Create a cozy moment with warm tea and gentle music',
+        why: 'Rainy weather invites us inward. Coziness is self-care.',
+        practice: 'Make your favorite warm drink.\nFind a comfortable spot.\nPut on music that soothes you.\nJust be present for 10 minutes.',
+        duration: '10 mins'
+      })
+    } else if (weatherLower.includes('sun') || weatherLower.includes('clear')) {
+      suggestions.push({
+        action: 'Step outside for 5 minutes of sunlight',
+        why: 'Sunlight regulates your circadian rhythm and boosts mood.',
+        practice: 'Go outside.\nFace the sun (eyes closed).\nTake 5 deep breaths.\nNotice the warmth on your skin.',
+        duration: '5 mins'
+      })
+    }
+  }
+
+  // Mood-based suggestions
+  if (dominantMood) {
+    if (['anxious', 'overwhelmed', 'restless'].includes(dominantMood)) {
+      suggestions.push({
+        action: 'Practice 4-7-8 breathing to calm your nervous system',
+        why: 'You\'ve been experiencing tension. This activates your parasympathetic nervous system.',
+        practice: 'Breathe in for 4 counts.\nHold for 7 counts.\nExhale slowly for 8 counts.\nRepeat 4 times.',
+        duration: '2 mins'
+      })
+    } else if (['tired', 'exhausted'].includes(dominantMood)) {
+      suggestions.push({
+        action: 'Take a 10-minute power rest (not nap)',
+        why: 'Your body is asking for restoration. Short rest can restore energy.',
+        practice: 'Lie down comfortably.\nClose your eyes.\nDon\'t try to sleep.\nJust let your body rest.\nSet a timer for 10 minutes.',
+        duration: '10 mins'
+      })
+    } else if (['grateful', 'content', 'peaceful'].includes(dominantMood)) {
+      suggestions.push({
+        action: 'Write down 3 specific moments from today',
+        why: 'You\'re in a positive state. Anchoring it deepens the experience.',
+        practice: 'Get your journal.\nWrite 3 specific moments.\nWhat made each one special?\nHow did you feel?',
+        duration: '5 mins'
+      })
+    }
+  }
+
+  // Archetype-based suggestions
+  if (archetype) {
+    if (archetype === 'The Seeker') {
+      suggestions.push({
+        action: 'Spend 5 minutes in reflective inquiry',
+        why: 'Your Seeker nature thrives on self-discovery.',
+        practice: 'Ask yourself: "What am I discovering about myself right now?"\n\nSit with the question.\nDon\'t force answers.\nNotice what arises.',
+        duration: '5 mins'
+      })
+    } else if (archetype === 'The Nurturer') {
+      suggestions.push({
+        action: 'Practice nurturing yourself as you would a loved one',
+        why: 'Nurturers often forget to care for themselves.',
+        practice: 'Place hand on heart.\nSay: "I deserve care too."\nDo one small kind thing for yourself.\nNotice how it feels.',
+        duration: '3 mins'
+      })
+    } else if (archetype === 'The Creator') {
+      suggestions.push({
+        action: 'Free expression: 5 minutes of creating without purpose',
+        why: 'Your Creator soul needs expression without judgment.',
+        practice: 'Grab any creative medium.\nSet timer for 5 minutes.\nCreate without planning.\nNo goal, just expression.',
+        duration: '5 mins'
+      })
+    }
+  }
+
+  // Time-based suggestions
+  const hour = new Date().getHours()
+  if (hour >= 6 && hour < 9) {
+    suggestions.push({
+      action: 'Set one intention for how you want to feel today',
+      why: 'Morning is powerful for intention-setting.',
+      practice: 'Close your eyes.\nAsk: "How do I want to feel today?"\nChoose one word.\nSay it out loud 3 times.',
+      duration: '2 mins'
+    })
+  } else if (hour >= 19 && hour < 22) {
+    suggestions.push({
+      action: 'Release the day with a simple closing ritual',
+      why: 'Evenings need closure to prepare for rest.',
+      practice: 'Take 3 deep breaths.\nSay: "I release what no longer serves me."\nName one thing you\'re letting go.\nExhale it fully.',
+      duration: '3 mins'
+    })
+  }
+
+  // Default suggestions if none match
+  if (suggestions.length === 0) {
+    suggestions.push(
+      {
+        action: 'Take 3 conscious breaths right now',
+        why: 'Breath is always available. It anchors you to the present.',
+        practice: 'Breathe in slowly.\nPause at the top.\nBreathe out slowly.\nRepeat 3 times.\nNotice how you feel.',
+        duration: '1 min'
+      },
+      {
+        action: 'Stretch your body for 2 minutes',
+        why: 'Your body holds tension. Movement releases it.',
+        practice: 'Stand up.\nReach arms overhead.\nSide bend both ways.\nRoll shoulders.\nNotice what feels tight.',
+        duration: '2 mins'
+      },
+      {
+        action: 'Drink a glass of water mindfully',
+        why: 'Hydration affects everything. Mindfulness deepens the care.',
+        practice: 'Get water.\nHold the glass.\nTake slow sips.\nFeel the water nourishing you.\nSay thank you to your body.',
+        duration: '2 mins'
+      }
+    )
+  }
+
+  // Random selection from contextual suggestions
+  const randomIndex = Math.floor(Math.random() * suggestions.length)
+  return suggestions[randomIndex]
+}
