@@ -125,7 +125,7 @@ export function SelfCareMoments() {
     }
 
     // Show completion message
-    const messages = ['Well done ✓', 'Complete ✓', 'Done ✓', 'Finished ✓']
+    const messages = ['Well done.', 'Complete.', 'Done.', 'Finished.']
     const randomMessage = messages[Math.floor(Math.random() * messages.length)]
     setCompletionMessage(randomMessage)
 
