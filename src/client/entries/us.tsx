@@ -33,6 +33,22 @@ const _App = () => {
     // Load user data
     getMe().then((user) => {
       stores.me.set(user)
+
+      // Sync theme from user metadata (server) to local stores
+      if (user.metadata?.theme) {
+        const { theme: themeName, baseColor, accentColor, customThemeEnabled } = user.metadata.theme
+        console.log('[AdminPanel] Syncing theme from server:', themeName, customThemeEnabled)
+
+        // Update theme stores
+        if (customThemeEnabled && themeName === 'custom' && baseColor && accentColor) {
+          stores.customTheme.set({ base: baseColor, acc: accentColor })
+          stores.isCustomThemeEnabled.set(true)
+          stores.theme.set('custom')
+        } else if (themeName && themeName !== 'custom') {
+          stores.isCustomThemeEnabled.set(false)
+          stores.theme.set(themeName as any)
+        }
+      }
     })
 
     if (weather !== undefined) {

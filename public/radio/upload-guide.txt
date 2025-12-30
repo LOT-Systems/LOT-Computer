@@ -1,0 +1,24 @@
+LOT Radio - Upload Guide
+========================
+
+Expected location: /home/user/lot-systems/public/radio/
+
+Supported formats:
+- .mp3 (recommended)
+- .wav
+- .ogg
+- .m4a
+- .flac
+
+How to upload:
+1. Place audio files directly in this directory
+2. Files should be in the same folder as this guide
+3. Restart the app server if needed
+4. Check browser console for debug logs
+
+Test the upload worked:
+Run: ls -lah /home/user/lot-systems/public/radio/
+
+You should see your audio files listed alongside:
+- README.md
+- upload-guide.txt
