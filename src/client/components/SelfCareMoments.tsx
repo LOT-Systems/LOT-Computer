@@ -15,7 +15,7 @@ type CareSuggestion = {
 }
 
 /**
- * Self-Care Moments Widget - Context-aware recommendations
+ * Self-care Moments Widget - Context-aware recommendations
  * Pattern: Suggestion > Why This > Practice
  * Adapts based on: emotional state, weather, archetype, time
  */
@@ -159,7 +159,7 @@ export function SelfCareMoments() {
 
   if (!currentSuggestion) {
     return (
-      <Block label="Self-Care:" blockView>
+      <Block label="Self-care:" blockView>
         <div className="opacity-60">Loading suggestion...</div>
       </Block>
     )
@@ -168,7 +168,7 @@ export function SelfCareMoments() {
   if (!isVisible) return null
 
   const label =
-    view === 'suggestion' ? 'Self-Care:' :
+    view === 'suggestion' ? 'Self-care:' :
     view === 'why' ? 'Why This:' :
     'Practice:'
 

@@ -20,7 +20,7 @@ Major update introducing context-aware widgets, redesigned long-term awareness t
 - **Compassionate AI responses**: Backend generates personalized, empathetic responses based on emotional state
 - **View cycling**: Check-In → History (last 5) → Patterns (stats)
 
-### Self-Care Moments Widget
+### Self-care Moments Widget
 - **Context-aware suggestions**: Adapts based on weather, archetype, dominant mood, and time of day
 - **Interactive timer**: Start practice with countdown for timed activities
 - **Daily tracking**: Tracks completions with localStorage, shows "X done today"
