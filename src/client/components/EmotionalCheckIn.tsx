@@ -40,9 +40,6 @@ export function EmotionalCheckIn() {
       setInsight(data.insights)
       setShowResponse(true)
 
-      // Store last check-in timestamp for 3-hour cooldown
-      localStorage.setItem('last-mood-checkin-time', Date.now().toString())
-
       // Fade out after showing response for 3 seconds
       setTimeout(() => {
         setIsFading(true)
@@ -119,7 +116,11 @@ export function EmotionalCheckIn() {
             </div>
           ) : (
             <>
-              <div className="mb-16 opacity-90">How are you {checkInLabel.toLowerCase()}?</div>
+              <div className="mb-16">
+                {checkInLabel === 'Morning' && 'How is your morning?'}
+                {checkInLabel === 'Evening' && 'How is your evening?'}
+                {checkInLabel === 'Right Now' && 'How are you right now?'}
+              </div>
               <div className="flex flex-wrap gap-8">
                 <Button onClick={() => handleCheckIn('energized')} disabled={isLoading}>
                   Energized
