@@ -54,15 +54,15 @@ input:-webkit-autofill {
 }
 
 /* Custom blink animation for log push warning */
-/* Gentle blink that continues until push completes */
+/* Gentle, fluid breathing animation that continues until push completes */
 @keyframes blink {
-  0% { opacity: 0.4; }
-  50% { opacity: 0.25; }
-  100% { opacity: 0.4; }
+  0% { opacity: 0.35; }
+  50% { opacity: 0.75; }
+  100% { opacity: 0.35; }
 }
 
 .animate-blink {
-  animation: blink 1.8s ease-in-out infinite;
+  animation: blink 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 ._table::-webkit-scrollbar-track,
