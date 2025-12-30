@@ -6,8 +6,6 @@ import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 
 export const PublicProfile = () => {
-  console.log('[PublicProfile] Component rendering at:', new Date().toISOString())
-
   const [profile, setProfile] = React.useState<PublicProfileType | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
@@ -17,11 +15,8 @@ export const PublicProfile = () => {
   const userIdOrUsername = React.useMemo(() => {
     try {
       const path = window.location.pathname
-      console.log('[PublicProfile] Pathname:', path)
       const match = path.match(/\/u\/([^\/]+)/)
-      const extracted = match ? match[1] : null
-      console.log('[PublicProfile] Extracted ID:', extracted)
-      return extracted
+      return match ? match[1] : null
     } catch (err) {
       console.error('[PublicProfile] URL parsing error:', err)
       return null
@@ -36,12 +31,8 @@ export const PublicProfile = () => {
       return
     }
 
-    console.log('[PublicProfile] Fetching profile for:', userIdOrUsername)
-
     fetch(`/api/public/profile/${userIdOrUsername}`)
       .then(async (res) => {
-        console.log('[PublicProfile] Response status:', res.status)
-        console.log('[PublicProfile] Response URL:', res.url)
         if (!res.ok) {
           const data = await res.json().catch(() => ({
             message: `HTTP ${res.status}`,
@@ -59,7 +50,6 @@ export const PublicProfile = () => {
         return res.json()
       })
       .then((data) => {
-        console.log('[PublicProfile] Profile loaded:', data)
         setProfile(data)
         setLoading(false)
       })
@@ -75,7 +65,6 @@ export const PublicProfile = () => {
     if (!profile?.theme) return
 
     const { theme: themeName, baseColor, accentColor } = profile.theme
-    console.log('[PublicProfile] Applying theme:', themeName, baseColor, accentColor)
 
     // Define theme colors (matching theme.ts THEMES)
     const THEMES: Record<string, { base: string; acc: string }> = {
@@ -114,8 +103,6 @@ export const PublicProfile = () => {
     document.documentElement.style.setProperty('--base-color', finalBaseColor)
     const accRgb = hexToRgb(finalAccentColor) || [0, 0, 0]
     document.documentElement.style.setProperty('--acc-color-default', accRgb.join(' '))
-
-    console.log('[PublicProfile] Theme applied:', finalBaseColor, finalAccentColor)
   }, [profile])
 
   if (loading) {
@@ -186,6 +173,54 @@ export const PublicProfile = () => {
 
   // Format current date
   const currentDate = dayjs().format('dddd, D MMMM, YYYY')
+
+  // Check if profile is private
+  if (profile.isPrivate) {
+    return (
+      <div className="max-w-2xl min-h-screen">
+        <div className="flex flex-col gap-y-24">
+          {/* Name */}
+          <div>
+            <div>{userName}</div>
+            <div>{currentDate}</div>
+          </div>
+
+          {/* Tags (show even in private mode, especially Suspended) */}
+          {profile.tags && profile.tags.length > 0 && (
+            <div>
+              <Block label="Team:" blockView>
+                <TagsContainer
+                  items={profile.tags
+                    .map((tagId: string) => {
+                      const tag = getUserTagByIdCaseInsensitive(tagId)
+                      return tag ? (
+                        <Tag key={tagId} color={tag.color}>
+                          {tag.name}
+                        </Tag>
+                      ) : null
+                    })
+                    .filter(Boolean)}
+                />
+              </Block>
+            </div>
+          )}
+
+          {/* Private mode message */}
+          <div>
+            <Block label="Profile:" blockView>
+              Private
+            </Block>
+          </div>
+
+          {/* Footer */}
+          <div>
+            This is {userName}'s System powered by{' '}
+            <GhostButton href="/">LOT</GhostButton>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-2xl min-h-screen">
@@ -301,7 +336,7 @@ export const PublicProfile = () => {
                 {profile.psychologicalProfile.selfAwarenessLevel !== undefined && (
                   <div className="flex mb-24">
                     <span className="w-[170px] sm:w-[150px] mr-24 sm:mr-12 -ml-4">Self-awareness:</span>
-                    <span className="flex-1">{Math.round((profile.psychologicalProfile.selfAwarenessLevel / 10) * 100)}%</span>
+                    <span className="flex-1">{(profile.psychologicalProfile.selfAwarenessLevel / 10).toFixed(1)}%</span>
                   </div>
                 )}
 
