@@ -215,7 +215,7 @@ export function SelfCareMoments() {
             <Button onClick={markAsDone}>
               Done
             </Button>
-            <Button onClick={refreshSuggestion} className="opacity-60">
+            <Button onClick={refreshSuggestion}>
               Skip
             </Button>
           </div>
