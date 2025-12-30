@@ -219,7 +219,7 @@ export const useProfile = () =>
     noteCount?: number
     message?: string
   }>('/api/user-profile', {
-    staleTime: 2 * 60 * 1000, // Cache for 2 minutes (balance between fresh data and performance)
-    cacheTime: 10 * 60 * 1000, // Keep in memory for 10 minutes
+    staleTime: 0, // Always fetch fresh data to ensure awareness index is current
+    cacheTime: 0, // Don't cache to prevent stale data issues in PWA
     refetchOnWindowFocus: false,
   })()
