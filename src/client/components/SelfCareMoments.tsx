@@ -3,6 +3,7 @@ import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button } from '#client/components/ui'
 import { useProfile, useEmotionalCheckIns } from '#client/queries'
+import { cn } from '#client/utils'
 
 type CareView = 'suggestion' | 'why' | 'practice'
 
@@ -25,6 +26,10 @@ export function SelfCareMoments() {
   const [isTimerRunning, setIsTimerRunning] = React.useState(false)
   const [timeRemaining, setTimeRemaining] = React.useState<number>(0)
   const timerRef = React.useRef<NodeJS.Timeout | null>(null)
+  const [isVisible, setIsVisible] = React.useState(true)
+  const [isShown, setIsShown] = React.useState(false)
+  const [isFading, setIsFading] = React.useState(false)
+  const [completionMessage, setCompletionMessage] = React.useState<string | null>(null)
 
   const weather = useStore(stores.weather)
   const { data: profile } = useProfile()
@@ -76,6 +81,8 @@ export function SelfCareMoments() {
       checkInsData?.stats.dominantMood
     )
     setCurrentSuggestion(suggestion)
+    // Fade in on mount
+    setTimeout(() => setIsShown(true), 100)
   }, [weather?.description, profile?.archetype, checkInsData?.stats.dominantMood])
 
   const cycleView = () => {
@@ -105,7 +112,21 @@ export function SelfCareMoments() {
     const newCount = completedToday + 1
     setCompletedToday(newCount)
     localStorage.setItem('self-care-completed', JSON.stringify({ date: today, count: newCount }))
-    refreshSuggestion()
+
+    // Show completion message
+    const messages = ['Well done ✓', 'Complete ✓', 'Done ✓', 'Finished ✓']
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)]
+    setCompletionMessage(randomMessage)
+
+    // Fade out after 3 seconds
+    setTimeout(() => {
+      setIsFading(true)
+    }, 3000)
+
+    // Hide widget after fade completes
+    setTimeout(() => {
+      setIsVisible(false)
+    }, 4400) // 3000ms visible + 1400ms fade
   }
 
   const startTimer = () => {
@@ -133,6 +154,8 @@ export function SelfCareMoments() {
     )
   }
 
+  if (!isVisible) return null
+
   const label =
     view === 'suggestion' ? 'Self-Care:' :
     view === 'why' ? 'Why This:' :
@@ -146,7 +169,24 @@ export function SelfCareMoments() {
   }
 
   return (
-    <Block label={label} blockView onLabelClick={cycleView}>
+    <div
+      className={cn(
+        'transition-opacity duration-[1400ms]',
+        isFading ? 'opacity-0' : 'opacity-100'
+      )}
+    >
+      <Block label={label} blockView onLabelClick={cycleView}>
+      {completionMessage ? (
+        <div
+          className={cn(
+            'transition-opacity duration-[1400ms]',
+            isFading ? 'opacity-0' : 'opacity-100'
+          )}
+        >
+          {completionMessage}
+        </div>
+      ) : (
+        <>
       {view === 'suggestion' && (
         <div className="inline-block w-full">
           <div className="mb-12 opacity-90">
@@ -201,7 +241,10 @@ export function SelfCareMoments() {
           )}
         </div>
       )}
+        </>
+      )}
     </Block>
+    </div>
   )
 }
 

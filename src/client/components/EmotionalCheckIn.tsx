@@ -1,6 +1,7 @@
 import React from 'react'
 import { Block, Button } from '#client/components/ui'
 import { useCreateEmotionalCheckIn, useEmotionalCheckIns } from '#client/queries'
+import { cn } from '#client/utils'
 
 type CheckInView = 'prompt' | 'history' | 'patterns'
 
@@ -29,6 +30,8 @@ export function EmotionalCheckIn() {
   const [response, setResponse] = React.useState<string | null>(null)
   const [insight, setInsight] = React.useState<string[] | null>(null)
   const [showResponse, setShowResponse] = React.useState(false)
+  const [isVisible, setIsVisible] = React.useState(true)
+  const [isFading, setIsFading] = React.useState(false)
 
   const { data: checkInsData } = useEmotionalCheckIns(30) // Last 30 days
   const { mutate: createCheckIn, isLoading } = useCreateEmotionalCheckIn({
@@ -36,7 +39,16 @@ export function EmotionalCheckIn() {
       setResponse(data.compassionateResponse)
       setInsight(data.insights)
       setShowResponse(true)
-      // Keep response visible - don't auto-hide
+
+      // Fade out after showing response for 3 seconds
+      setTimeout(() => {
+        setIsFading(true)
+      }, 3000)
+
+      // Hide widget after fade completes
+      setTimeout(() => {
+        setIsVisible(false)
+      }, 4400) // 3000ms visible + 1400ms fade
     }
   })
 
@@ -67,6 +79,8 @@ export function EmotionalCheckIn() {
     })
   }
 
+  if (!isVisible) return null
+
   const label =
     view === 'prompt' ? 'Mood:' :
     view === 'history' ? 'History:' :
@@ -80,7 +94,13 @@ export function EmotionalCheckIn() {
     'Right Now'
 
   return (
-    <Block label={label} blockView onLabelClick={cycleView}>
+    <div
+      className={cn(
+        'transition-opacity duration-[1400ms]',
+        isFading ? 'opacity-0' : 'opacity-100'
+      )}
+    >
+      <Block label={label} blockView onLabelClick={cycleView}>
       {view === 'prompt' && (
         <div className="inline-block">
           {showResponse && response ? (
@@ -175,5 +195,6 @@ export function EmotionalCheckIn() {
         </div>
       )}
     </Block>
+    </div>
   )
 }
