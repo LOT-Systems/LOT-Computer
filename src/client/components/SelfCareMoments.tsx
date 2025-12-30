@@ -149,24 +149,22 @@ export function SelfCareMoments() {
     <Block label={label} blockView onLabelClick={cycleView}>
       {view === 'suggestion' && (
         <div className="inline-block w-full">
-          <div className="mb-12 opacity-90">{currentSuggestion.action}</div>
-          <div className="flex items-center gap-8 opacity-60 text-[14px] mb-12">
-            <span>{currentSuggestion.duration}</span>
-            {completedToday > 0 && (
-              <>
-                <span>•</span>
-                <span>{completedToday} done today</span>
-              </>
-            )}
+          <div className="mb-12 opacity-90">
+            {currentSuggestion.action} ({currentSuggestion.duration})
           </div>
-          <div className="flex gap-8 text-[14px]">
-            <Button onClick={startTimer} className="text-[14px]">
+          {completedToday > 0 && (
+            <div className="opacity-60 text-[14px] mb-12">
+              {completedToday} done today
+            </div>
+          )}
+          <div className="flex gap-8">
+            <Button onClick={startTimer}>
               Start
             </Button>
-            <Button onClick={markAsDone} className="text-[14px]">
+            <Button onClick={markAsDone}>
               Done
             </Button>
-            <Button onClick={refreshSuggestion} className="text-[14px] opacity-60">
+            <Button onClick={refreshSuggestion} className="opacity-60">
               Skip
             </Button>
           </div>
@@ -189,15 +187,15 @@ export function SelfCareMoments() {
           <div className="opacity-80 whitespace-pre-line mb-12">{currentSuggestion.practice}</div>
           {isTimerRunning ? (
             <div className="flex gap-8">
-              <Button onClick={stopTimer} className="text-[14px]">
+              <Button onClick={stopTimer}>
                 Stop
               </Button>
-              <Button onClick={markAsDone} className="text-[14px]">
+              <Button onClick={markAsDone}>
                 Done
               </Button>
             </div>
           ) : (
-            <Button onClick={markAsDone} className="text-[14px]">
+            <Button onClick={markAsDone}>
               Done
             </Button>
           )}
