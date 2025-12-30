@@ -19,6 +19,7 @@ import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
 import { RecipeWidget } from './RecipeWidget'
 import { AwarenessDashboard } from './AwarenessDashboard'
+import { EmotionalCheckIn } from './EmotionalCheckIn'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 
 export const System = () => {
@@ -398,6 +399,8 @@ export const System = () => {
       <RecipeWidget />
 
       <AwarenessDashboard />
+
+      <EmotionalCheckIn />
 
       <MemoryWidget />
     </div>

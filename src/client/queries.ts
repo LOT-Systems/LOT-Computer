@@ -210,8 +210,18 @@ export const useProfile = () =>
     archetype?: string
     archetypeDescription?: string
     coreValues?: string[]
+    values?: string[] // Also support 'values' field
     emotionalPatterns?: string[]
     selfAwarenessLevel?: number  // 0-10 scale
+    emotionalRange?: number // 0-10 scale
+    reflectionQuality?: number // 0-10 scale
+    growthTrajectory?: 'emerging' | 'developing' | 'deepening' | 'integrated'
+    dominantNeeds?: string[]
+    journalSentiment?: {
+      positive: number
+      neutral: number
+      challenging: number
+    }
     behavioralCohort?: string
     behavioralTraits?: string[]
     patternStrength?: { trait: string; count: number }[]
@@ -221,5 +231,36 @@ export const useProfile = () =>
   }>('/api/user-profile', {
     staleTime: 0, // Always fetch fresh data to ensure awareness index is current
     cacheTime: 0, // Don't cache to prevent stale data issues in PWA
+    refetchOnWindowFocus: false,
+  })()
+
+// ============================================================================
+// EMOTIONAL CHECK-IN QUERIES
+// ============================================================================
+
+export const useCreateEmotionalCheckIn = createMutation<
+  {
+    checkInType: 'morning' | 'evening' | 'moment'
+    emotionalState: string
+    intensity?: number
+    note?: string
+  },
+  {
+    checkIn: any
+    insights: string[]
+    compassionateResponse: string
+  }
+>('post', '/api/emotional-checkin')
+
+export const useEmotionalCheckIns = (days: number = 30) =>
+  createQuery<{
+    checkIns: any[]
+    stats: {
+      total: number
+      moodCounts: { [key: string]: number }
+      dominantMood: string
+      averageIntensity: number
+    }
+  }>(`/api/emotional-checkins?days=${days}`, {
     refetchOnWindowFocus: false,
   })()

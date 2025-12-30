@@ -1,31 +1,23 @@
 import React from 'react'
-import { Block, ToggleSection, ToggleGroup, Tag, TagsContainer } from '#client/components/ui'
+import { Block, Tag, TagsContainer } from '#client/components/ui'
 import { useProfile } from '#client/queries'
-import { cn } from '#client/utils'
 
-type PsychologicalProfile = {
-  selfAwarenessLevel?: number
-  emotionalRange?: number
-  reflectionQuality?: number
-  growthTrajectory?: 'emerging' | 'developing' | 'deepening' | 'integrated'
-  dominantNeeds?: string[]
-  values?: string[]
-  emotionalPatterns?: string[]
-  journalSentiment?: {
-    positive: number
-    neutral: number
-    challenging: number
-  }
-  archetype?: string
-  archetypeDescription?: string
-  behavioralCohort?: string
-}
+type AwarenessView =
+  | 'overview'
+  | 'archetype'
+  | 'values'
+  | 'patterns'
+  | 'needs'
+  | 'sentiment'
+  | 'reflection'
 
 /**
- * Awareness Dashboard - Display psychological profile with toggle sections
+ * Awareness Dashboard - Clickable cycling through psychological profile views
+ * Pattern: Overview > Archetype > Values > Patterns > Needs > Sentiment > Reflection
  */
 export function AwarenessDashboard() {
   const { data: profile } = useProfile()
+  const [awarenessView, setAwarenessView] = React.useState<AwarenessView>('overview')
 
   if (!profile || typeof profile.selfAwarenessLevel === 'undefined') {
     return (
@@ -37,169 +29,149 @@ export function AwarenessDashboard() {
     )
   }
 
-  const psychProfile: PsychologicalProfile = {
-    selfAwarenessLevel: profile.selfAwarenessLevel,
-    emotionalRange: profile.emotionalRange,
-    reflectionQuality: profile.reflectionQuality,
-    growthTrajectory: profile.growthTrajectory,
-    dominantNeeds: profile.dominantNeeds,
-    values: profile.values,
-    emotionalPatterns: profile.emotionalPatterns,
-    journalSentiment: profile.journalSentiment,
-    archetype: profile.archetype,
-    archetypeDescription: profile.archetypeDescription,
-    behavioralCohort: profile.behavioralCohort,
-  }
-
   const awarenessPercentage = Math.round((profile.selfAwarenessLevel / 10) * 100)
 
+  // Cycle through views on label click
+  const cycleView = () => {
+    setAwarenessView(prev => {
+      switch (prev) {
+        case 'overview': return 'archetype'
+        case 'archetype': return 'values'
+        case 'values': return 'patterns'
+        case 'patterns': return 'needs'
+        case 'needs': return 'sentiment'
+        case 'sentiment': return 'reflection'
+        case 'reflection': return 'overview'
+        default: return 'overview'
+      }
+    })
+  }
+
+  // Determine label based on view
+  const label =
+    awarenessView === 'overview' ? 'Awareness:' :
+    awarenessView === 'archetype' ? 'Archetype:' :
+    awarenessView === 'values' ? 'Values:' :
+    awarenessView === 'patterns' ? 'Patterns:' :
+    awarenessView === 'needs' ? 'Needs:' :
+    awarenessView === 'sentiment' ? 'Sentiment:' :
+    'Reflection:'
+
   return (
-    <Block label="Awareness:" blockView>
-      <ToggleGroup>
-        {/* Main Awareness Score */}
-        <div className="mb-16">
+    <Block label={label} blockView onLabelClick={cycleView}>
+      {awarenessView === 'overview' && (
+        <div className="inline-block">
           <div className="flex items-center gap-8">
             <span className="text-[20px]">{awarenessPercentage}%</span>
-            <span className="opacity-60">Self-Awareness Index</span>
+            <span className="opacity-60">Self-Awareness</span>
           </div>
-          {psychProfile.growthTrajectory && (
+          {profile.growthTrajectory && (
             <div className="mt-4 opacity-60 capitalize">
-              Journey: {psychProfile.growthTrajectory}
+              Journey: {profile.growthTrajectory}
             </div>
           )}
         </div>
+      )}
 
-        {/* Archetype Section */}
-        {psychProfile.archetype && (
-          <ToggleSection label="Soul Archetype" defaultOpen={true}>
-            <div className="pl-16">
-              <div className="mb-8">
-                <span className="font-medium">{psychProfile.archetype}</span>
-              </div>
-              {psychProfile.archetypeDescription && (
-                <div className="opacity-70 text-[14px] mb-12">
-                  {psychProfile.archetypeDescription}
-                </div>
-              )}
-              {psychProfile.behavioralCohort && (
-                <div className="mt-8 opacity-60">
-                  Behavioral cohort: {psychProfile.behavioralCohort}
-                </div>
-              )}
+      {awarenessView === 'archetype' && profile.archetype && (
+        <div className="inline-block">
+          <div className="mb-8">
+            <span className="font-medium">{profile.archetype}</span>
+          </div>
+          {profile.archetypeDescription && (
+            <div className="opacity-70 text-[14px] mb-12">
+              {profile.archetypeDescription}
             </div>
-          </ToggleSection>
-        )}
+          )}
+          {profile.behavioralCohort && (
+            <div className="opacity-60">
+              Cohort: {profile.behavioralCohort}
+            </div>
+          )}
+        </div>
+      )}
 
-        {/* Core Values */}
-        {psychProfile.values && psychProfile.values.length > 0 && (
-          <ToggleSection label="Core Values" defaultOpen={false}>
-            <div className="pl-16">
-              <TagsContainer>
-                {psychProfile.values.map((value) => (
-                  <Tag key={value} color="#acc">
-                    {value.charAt(0).toUpperCase() + value.slice(1)}
-                  </Tag>
-                ))}
-              </TagsContainer>
-              <div className="mt-8 opacity-60 text-[14px]">
-                Values that appear consistently in your choices
-              </div>
-            </div>
-          </ToggleSection>
-        )}
+      {awarenessView === 'values' && profile.values && profile.values.length > 0 && (
+        <div className="inline-block">
+          <TagsContainer>
+            {profile.values.map((value) => (
+              <Tag key={value} color="#acc">
+                {value.charAt(0).toUpperCase() + value.slice(1)}
+              </Tag>
+            ))}
+          </TagsContainer>
+          <div className="mt-8 opacity-60 text-[14px]">
+            Core values appearing in your choices
+          </div>
+        </div>
+      )}
 
-        {/* Emotional Patterns */}
-        {psychProfile.emotionalPatterns && psychProfile.emotionalPatterns.length > 0 && (
-          <ToggleSection label="Emotional Patterns" defaultOpen={false}>
-            <div className="pl-16">
-              <div className="flex flex-col gap-4">
-                {psychProfile.emotionalPatterns.map((pattern) => (
-                  <div key={pattern}>
-                    • {formatPattern(pattern)}
-                  </div>
-                ))}
-              </div>
-              {psychProfile.emotionalRange !== undefined && (
-                <div className="mt-12 opacity-60 text-[14px]">
-                  Emotional range: {psychProfile.emotionalRange}/10
-                </div>
-              )}
+      {awarenessView === 'patterns' && profile.emotionalPatterns && profile.emotionalPatterns.length > 0 && (
+        <div className="inline-block">
+          <div className="flex flex-col gap-4">
+            {profile.emotionalPatterns.map((pattern) => (
+              <div key={pattern}>• {pattern}</div>
+            ))}
+          </div>
+          {profile.emotionalRange !== undefined && (
+            <div className="mt-12 opacity-60 text-[14px]">
+              Emotional range: {profile.emotionalRange}/10
             </div>
-          </ToggleSection>
-        )}
+          )}
+        </div>
+      )}
 
-        {/* Dominant Needs */}
-        {psychProfile.dominantNeeds && psychProfile.dominantNeeds.length > 0 && (
-          <ToggleSection label="Dominant Needs" defaultOpen={false}>
-            <div className="pl-16">
-              <div className="flex flex-col gap-8">
-                {psychProfile.dominantNeeds.map((need, index) => (
-                  <div key={need} className="flex items-center gap-8">
-                    <span className="opacity-40">{index + 1}.</span>
-                    <span>{need.charAt(0).toUpperCase() + need.slice(1)}</span>
-                  </div>
-                ))}
+      {awarenessView === 'needs' && profile.dominantNeeds && profile.dominantNeeds.length > 0 && (
+        <div className="inline-block">
+          <div className="flex flex-col gap-8">
+            {profile.dominantNeeds.map((need, index) => (
+              <div key={need} className="flex items-center gap-8">
+                <span className="opacity-40">{index + 1}.</span>
+                <span>{need.charAt(0).toUpperCase() + need.slice(1)}</span>
               </div>
-              <div className="mt-12 opacity-60 text-[14px]">
-                Core psychological needs appearing in your patterns
-              </div>
-            </div>
-          </ToggleSection>
-        )}
+            ))}
+          </div>
+          <div className="mt-12 opacity-60 text-[14px]">
+            Core psychological needs in your patterns
+          </div>
+        </div>
+      )}
 
-        {/* Journal Sentiment */}
-        {psychProfile.journalSentiment && (
-          <ToggleSection label="Journal Sentiment" defaultOpen={false}>
-            <div className="pl-16">
-              <div className="flex flex-col gap-8">
-                <div className="flex items-center justify-between">
-                  <span>Positive:</span>
-                  <span>{psychProfile.journalSentiment.positive}%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Neutral:</span>
-                  <span>{psychProfile.journalSentiment.neutral}%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Challenging:</span>
-                  <span>{psychProfile.journalSentiment.challenging}%</span>
-                </div>
-              </div>
-              <div className="mt-12 opacity-60 text-[14px]">
-                Emotional tone across your journal entries
-              </div>
+      {awarenessView === 'sentiment' && profile.journalSentiment && (
+        <div className="inline-block">
+          <div className="flex flex-col gap-8">
+            <div className="flex items-center justify-between gap-16">
+              <span>Positive:</span>
+              <span>{profile.journalSentiment.positive}%</span>
             </div>
-          </ToggleSection>
-        )}
+            <div className="flex items-center justify-between gap-16">
+              <span>Neutral:</span>
+              <span>{profile.journalSentiment.neutral}%</span>
+            </div>
+            <div className="flex items-center justify-between gap-16">
+              <span>Challenging:</span>
+              <span>{profile.journalSentiment.challenging}%</span>
+            </div>
+          </div>
+          <div className="mt-12 opacity-60 text-[14px]">
+            Emotional tone across journal entries
+          </div>
+        </div>
+      )}
 
-        {/* Reflection Quality */}
-        {psychProfile.reflectionQuality !== undefined && (
-          <ToggleSection label="Reflection Depth" defaultOpen={false}>
-            <div className="pl-16">
-              <div className="flex items-center gap-8">
-                <span>{psychProfile.reflectionQuality}/10</span>
-                <span className="opacity-60">Introspection quality</span>
-              </div>
-              <div className="mt-8 opacity-60 text-[14px]">
-                Depth of self-reflection in your writing
-              </div>
+      {awarenessView === 'reflection' && profile.reflectionQuality !== undefined && (
+        <div className="inline-block">
+          <div className="flex items-center gap-8 mb-8">
+            <span className="text-[20px]">{profile.reflectionQuality}/10</span>
+            <span className="opacity-60">Introspection depth</span>
+          </div>
+          {profile.growthTrajectory && (
+            <div className="opacity-60 text-[14px] capitalize">
+              Quality of self-reflection in your writing
             </div>
-          </ToggleSection>
-        )}
-      </ToggleGroup>
+          )}
+        </div>
+      )}
     </Block>
   )
-}
-
-/**
- * Format camelCase pattern names to readable text
- */
-function formatPattern(pattern: string): string {
-  return pattern
-    .replace(/([A-Z])/g, ' $1') // Add space before capitals
-    .trim()
-    .toLowerCase()
-    .split(' ')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
 }
