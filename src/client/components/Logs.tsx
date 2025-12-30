@@ -44,7 +44,7 @@ export const Logs: React.FC = () => {
       // Past logs don't need to trigger push-down
       if (log.id === recentLogId) {
         // Refetch logs to push down saved entry and create new empty log
-        // Wait 2 seconds to show the blink animation, then push down
+        // Wait 1.5 seconds to start push, allowing blink animation to cover the transition
         // Store timeout ID so it can be cancelled if user starts typing again
         pendingPushRef.current = setTimeout(async () => {
           try {
@@ -54,7 +54,7 @@ export const Logs: React.FC = () => {
             console.error('[Logs] Refetch failed:', error)
             pendingPushRef.current = null
           }
-        }, 2000)
+        }, 1500)
       }
     },
   })
@@ -359,8 +359,22 @@ const NoteEditor = ({
   // Note: No blur save handler - saves happen via unmount and debounced autosave
   // This keeps scrolling behavior simple (no blur = no issues)
 
+  // Clear blink animation when log ID changes (push completed)
+  const logIdRef = React.useRef(log.id)
+  React.useEffect(() => {
+    if (primary && logIdRef.current !== log.id) {
+      // Log ID changed - push completed, clear blink immediately
+      if (blinkTimeoutRef.current) {
+        clearTimeout(blinkTimeoutRef.current)
+        blinkTimeoutRef.current = null
+      }
+      setIsAboutToPush(false)
+      logIdRef.current = log.id
+    }
+  }, [log.id, primary])
+
   // Autosave for all logs (5s debounce)
-  // New timeline: finish typing > wait 5s > [gentle blink starts + save] > push after 2s
+  // New timeline: finish typing > wait 5s > [gentle blink starts + save] > push after 1.5s
   React.useEffect(() => {
     if (log.text === debouncedValue) return
     if (isSaving) return  // Prevent concurrent saves
@@ -368,13 +382,9 @@ const NoteEditor = ({
     setIsSaving(true)
 
     // For primary log: start gentle blink animation immediately when save begins
+    // Blink continues until push completes (detected by log ID change)
     if (primary) {
       setIsAboutToPush(true)
-      // Gentle blink duration: 1.8 seconds (ends right before push at 2s)
-      blinkTimeoutRef.current = setTimeout(() => {
-        setIsAboutToPush(false)
-        blinkTimeoutRef.current = null
-      }, 1800)
     }
 
     // Save the log
@@ -471,12 +481,9 @@ const NoteEditor = ({
           setLastSavedAt(new Date())
           setIsSaved(true)
           // Trigger gentle blink animation for manual save too
+          // Blink continues until push completes (detected by log ID change)
           if (primary) {
             setIsAboutToPush(true)
-            blinkTimeoutRef.current = setTimeout(() => {
-              setIsAboutToPush(false)
-              blinkTimeoutRef.current = null
-            }, 1800)
           }
         }
         // Optionally blur to show save happened

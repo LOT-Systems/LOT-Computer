@@ -54,7 +54,7 @@ input:-webkit-autofill {
 }
 
 /* Custom blink animation for log push warning */
-/* Gentle blink before push */
+/* Gentle blink that continues until push completes */
 @keyframes blink {
   0% { opacity: 0.4; }
   50% { opacity: 0.25; }
@@ -62,8 +62,7 @@ input:-webkit-autofill {
 }
 
 .animate-blink {
-  animation: blink 1.8s ease-in-out;
-  animation-fill-mode: forwards;
+  animation: blink 1.8s ease-in-out infinite;
 }
 
 ._table::-webkit-scrollbar-track,
