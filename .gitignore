@@ -26,3 +26,6 @@ lot-systems_v*
 lot-systems_master_*
 # Radio tracks managed in master branch
 public/radio/*.mp3
+
+# Production backups (stored separately, not in git)
+backups/production-*
