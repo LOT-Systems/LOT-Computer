@@ -36,7 +36,7 @@ TABLE OF CONTENTS
 ================================================================================
 
 1. Introduction & Philosophy
-2. The Problem with Traditional Self-Care Apps
+2. The Problem with Traditional Self-care Apps
 3. LOT's Memory Densification Approach
 4. AI Engine Abstraction Architecture
 5. Technical Implementation
@@ -836,7 +836,7 @@ LONG-TERM VISION:
    • Any app can build on user's LOT memory
    • User grants selective access
 
-3. Predictive Self-Care
+3. Predictive Self-care
    • Memory story enables prediction: "Based on your patterns, you might
      enjoy trying yoga this season"
    • Proactive suggestions, not reactive tracking

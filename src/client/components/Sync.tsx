@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
+import { useQueryClient } from 'react-query'
 import * as stores from '#client/stores'
 import {
   Button,
@@ -26,6 +27,7 @@ export const Sync = () => {
   const formRef = React.useRef<HTMLFormElement>(null)
   const me = useStore(stores.me)
   const isTouchDevice = useStore(stores.isTouchDevice)
+  const queryClient = useQueryClient()
 
   const [message, setMessage] = React.useState('')
   const [messages, setMessages] = React.useState<PublicChatMessage[]>([])
@@ -45,7 +47,12 @@ export const Sync = () => {
   const { mutate: createChatMessage } = useCreateChatMessage({
     onSuccess: () => setMessage(''),
   })
-  const { mutate: likeChatMessage } = useLikeChatMessage()
+  const { mutate: likeChatMessage } = useLikeChatMessage({
+    onSuccess: () => {
+      // Invalidate chat messages cache to ensure likes persist across tab switches
+      queryClient.invalidateQueries(['/api/chat-messages'])
+    }
+  })
 
   const onChangeMessage = React.useCallback((value: string) => {
     setMessage(
@@ -63,6 +70,13 @@ export const Sync = () => {
       hasInitiallyLoaded.current = true
     }
   }, [fetchedMessages])
+
+  // Reset hasInitiallyLoaded when component unmounts so data reloads on return
+  React.useEffect(() => {
+    return () => {
+      hasInitiallyLoaded.current = false
+    }
+  }, [])
 
   React.useEffect(() => {
     const { dispose: disposeChatMessageListener } = sync.listen(

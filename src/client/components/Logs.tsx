@@ -44,7 +44,7 @@ export const Logs: React.FC = () => {
       // Past logs don't need to trigger push-down
       if (log.id === recentLogId) {
         // Refetch logs to push down saved entry and create new empty log
-        // Wait 2 seconds to show the blink animation, then push down
+        // Wait 4 seconds for 2 breathe blinks to complete (2 iterations × 2s each)
         // Store timeout ID so it can be cancelled if user starts typing again
         pendingPushRef.current = setTimeout(async () => {
           try {
@@ -54,7 +54,7 @@ export const Logs: React.FC = () => {
             console.error('[Logs] Refetch failed:', error)
             pendingPushRef.current = null
           }
-        }, 2000)
+        }, 4000)
       }
     },
   })
@@ -199,6 +199,32 @@ export const Logs: React.FC = () => {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'emotional_checkin') {
+          const emotionalState = log.metadata?.emotionalState as string
+          const checkInType = log.metadata?.checkInType as string
+          const note = log.metadata?.note as string
+          const insights = log.metadata?.insights as string[] | undefined
+
+          const timeLabel =
+            checkInType === 'morning' ? 'Morning' :
+            checkInType === 'evening' ? 'Evening' :
+            'Moment'
+
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="Mood:" blockView>
+                <div className="mb-8 capitalize">{emotionalState}</div>
+                {note && <div className="opacity-60 mb-8">{note}</div>}
+                {insights && insights.length > 0 && (
+                  <div className="opacity-60 text-[14px]">
+                    {insights.map((insight, idx) => (
+                      <div key={idx}>• {insight}</div>
+                    ))}
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'settings_change') {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
@@ -287,16 +313,15 @@ const NoteEditor = ({
   const valueRef = React.useRef(log.text || '')
   const logTextRef = React.useRef(log.text || '')
   const onChangeRef = React.useRef(onChange)
-  const blinkTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
 
   const [isFocused, setIsFocused] = React.useState(false)
   const [value, setValue] = React.useState(log.text || '')
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null)
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
-  const [isAboutToPush, setIsAboutToPush] = React.useState(false) // Blink before push
+  const [isAboutToPush, setIsAboutToPush] = React.useState(false) // 2 breathe blinks before push
   const [isSaving, setIsSaving] = React.useState(false) // Prevent concurrent saves
   const savingInProgressRef = React.useRef(false) // Prevent duplicate saves during tab switch
-  // New timing: finish typing > wait 5s > gentle blink + save > push down
+  // New timing: finish typing > wait 5s > 2 breathe blinks (4s) + save > push down
   // Past logs: 5s debounce (same as primary now for consistency)
   const debounceTime = 5000  // 5s for all logs
   const debouncedValue = useDebounce(value, debounceTime)
@@ -313,22 +338,9 @@ const NoteEditor = ({
         pendingPushRef.current = null
       }
 
-      // Start gentle blink when typing begins, but stop it if user continues typing
+      // Stop any ongoing blink animation when user types
       if (primary) {
-        // Clear any existing blink timeout
-        if (blinkTimeoutRef.current) {
-          clearTimeout(blinkTimeoutRef.current)
-          blinkTimeoutRef.current = null
-        }
-
-        // Start gentle blink immediately
-        setIsAboutToPush(true)
-
-        // Stop blinking after 800ms (gentle pulse)
-        blinkTimeoutRef.current = setTimeout(() => {
-          setIsAboutToPush(false)
-          blinkTimeoutRef.current = null
-        }, 800)
+        setIsAboutToPush(false)
       }
     }
   }, [value, log.text, pendingPushRef, primary])
@@ -345,21 +357,17 @@ const NoteEditor = ({
   // This keeps scrolling behavior simple (no blur = no issues)
 
   // Autosave for all logs (5s debounce)
-  // New timeline: finish typing > wait 5s > [gentle blink starts + save] > push after 2s
+  // New timeline: finish typing > wait 5s > [2 breathe blinks + save] > push after 4s
   React.useEffect(() => {
     if (log.text === debouncedValue) return
     if (isSaving) return  // Prevent concurrent saves
 
     setIsSaving(true)
 
-    // For primary log: start gentle blink animation immediately when save begins
+    // For primary log: start 2 breathe blinks when save begins
+    // Animation completes after 4 seconds (2 iterations × 2s each), then push starts
     if (primary) {
       setIsAboutToPush(true)
-      // Gentle blink duration: 1.8 seconds (ends right before push at 2s)
-      blinkTimeoutRef.current = setTimeout(() => {
-        setIsAboutToPush(false)
-        blinkTimeoutRef.current = null
-      }, 1800)
     }
 
     // Save the log
@@ -376,7 +384,7 @@ const NoteEditor = ({
 
     // Clear saving state after a brief delay
     setTimeout(() => setIsSaving(false), 100)
-  }, [debouncedValue, onChange, log.text, primary, isSaving])
+  }, [debouncedValue, onChange, log.text, primary])
 
   // Sync local state when log updates from server
   // BUT: Don't overwrite if user is actively typing (focused)
@@ -409,11 +417,6 @@ const NoteEditor = ({
     return () => {
       textarea.removeEventListener('focus', handleFocus)
       textarea.removeEventListener('blur', handleBlur)
-      // Cleanup blink timeout on unmount
-      if (blinkTimeoutRef.current) {
-        clearTimeout(blinkTimeoutRef.current)
-        blinkTimeoutRef.current = null
-      }
     }
   }, [])
 
@@ -455,13 +458,10 @@ const NoteEditor = ({
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
           setIsSaved(true)
-          // Trigger gentle blink animation for manual save too
+          // Trigger 2 breathe blinks for manual save too
+          // Animation completes after 4 seconds, then push starts
           if (primary) {
             setIsAboutToPush(true)
-            blinkTimeoutRef.current = setTimeout(() => {
-              setIsAboutToPush(false)
-              blinkTimeoutRef.current = null
-            }, 1800)
           }
         }
         // Optionally blur to show save happened

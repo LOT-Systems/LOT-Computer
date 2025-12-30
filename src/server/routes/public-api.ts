@@ -657,16 +657,17 @@ export default async (fastify: FastifyInstance) => {
       // Check if profile is public
       if (!privacy.isPublicProfile) {
         console.log('[PUBLIC-PROFILE-API] ❌ Profile is private')
-        return reply.code(403).send({
-          error: 'Profile is private',
-          message: 'This user has not enabled their public profile',
-          debug: {
-            userId: user.id,
-            hasMetadata: !!user.metadata,
-            hasPrivacy: !!user.metadata?.privacy,
-            privacySettings: privacy
-          }
-        })
+
+        // Even in private mode, return basic info with suspended tag
+        const basicProfile = {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          tags: user.tags || [],
+          isPrivate: true,
+          privacySettings: privacy
+        }
+
+        return basicProfile
       }
 
       console.log('[PUBLIC-PROFILE-API] ✓ Profile is public, building response')

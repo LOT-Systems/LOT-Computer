@@ -15,9 +15,14 @@ import { toCelsius, toFahrenheit } from '#shared/utils'
 import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useVisitorStats, useProfile, useLogs } from '#client/queries'
+import { UserTag } from '#shared/types'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
 import { RecipeWidget } from './RecipeWidget'
+import { EmotionalCheckIn } from './EmotionalCheckIn'
+import { SelfCareMoments } from './SelfCareMoments'
+import { IntentionsWidget } from './IntentionsWidget'
+import { SubscribeWidget } from './SubscribeWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 
 export const System = () => {
@@ -33,20 +38,6 @@ export const System = () => {
   const { data: visitorStats } = useVisitorStats()
   const { data: profile } = useProfile()
   const { data: logs = [] } = useLogs()
-
-  // Debug: Log profile data
-  React.useEffect(() => {
-    if (profile) {
-      console.log('[System] Profile loaded:', {
-        hasUsership: profile.hasUsership,
-        selfAwarenessLevel: profile.selfAwarenessLevel,
-        archetype: profile.archetype,
-        awarenessCalculated: profile.selfAwarenessLevel
-          ? Math.round((profile.selfAwarenessLevel / 10) * 100)
-          : 0
-      })
-    }
-  }, [profile])
 
   const isTempFahrenheit = useStore(stores.isTempFahrenheit)
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
@@ -152,14 +143,15 @@ export const System = () => {
     }
   }, [logs])
 
-  // Calculate awareness index from backend selfAwarenessLevel (0-10) to percentage (0-100%)
+  // Calculate awareness index from backend selfAwarenessLevel (0-100) to percentage (0-10%)
+  // Long-term growth with decimal precision (e.g., 2.3%, 5.7%)
   const awarenessIndex = React.useMemo(() => {
-    if (!profile?.hasUsership) return 0
-    if (typeof profile.selfAwarenessLevel !== 'number') return 0
-    return Math.round((profile.selfAwarenessLevel / 10) * 100)
+    if (!profile?.hasUsership) return '0.0'
+    if (typeof profile.selfAwarenessLevel !== 'number') return '0.0'
+    return (profile.selfAwarenessLevel / 10).toFixed(1)
   }, [profile])
 
-  // Weather suggestion based on temperature
+  // Weather suggestion based on temperature (stable - doesn't change on re-render)
   const weatherSuggestion = React.useMemo(() => {
     if (!weather || !weather.tempKelvin) return null
     const celsius = weather.tempKelvin - 273.15
@@ -205,7 +197,10 @@ export const System = () => {
     else if (celsius > 28) options = suggestions.hot
     else options = suggestions.mild
 
-    return options[Math.floor(Math.random() * options.length)]
+    // Use temperature as seed for stable randomization (same temp = same suggestion)
+    const seed = Math.floor(celsius * 10)
+    const index = seed % options.length
+    return options[index]
   }, [weather])
 
   // Check for recipe suggestions when component mounts
@@ -300,7 +295,7 @@ export const System = () => {
               onChildrenClick={showWeatherSuggestion ? undefined : () => stores.isTempFahrenheit.set(!isTempFahrenheit)}
             >
               {showWeatherSuggestion ? (
-                <span className="font-sans text-sm opacity-60">{weatherSuggestion || 'Beautiful day'}</span>
+                <span>{weatherSuggestion || 'Beautiful day'}</span>
               ) : (
                 <>
                   {temperature}
@@ -406,6 +401,84 @@ export const System = () => {
       )}
 
       <RecipeWidget />
+
+      {/* Mood Check-In - Show every 3 hours max, context-based on time of day */}
+      {(() => {
+        const hour = new Date().getHours()
+        const isMorning = hour >= 6 && hour < 12
+        const isEvening = hour >= 17 && hour < 22
+        const isMidDay = hour >= 12 && hour < 17
+
+        // Check if 3 hours have passed since last check-in (from database logs)
+        const emotionalCheckIns = logs.filter(log => log.event === 'emotional_checkin')
+        const lastCheckIn = emotionalCheckIns[0] // Logs are sorted newest first
+        const threeHoursMs = 3 * 60 * 60 * 1000
+        const threeHoursPassed = !lastCheckIn ||
+          (Date.now() - new Date(lastCheckIn.createdAt).getTime()) >= threeHoursMs
+
+        // Show during preferred times (morning/evening) if 3 hours passed
+        // OR show mid-day if haven't checked in at all today and 3 hours passed
+        if (!threeHoursPassed) return null
+
+        return (isMorning || isEvening || isMidDay) && <EmotionalCheckIn />
+      })()}
+
+      {/* Self-care Moments - Show during rest/refresh times */}
+      {(() => {
+        const hour = new Date().getHours()
+        const isMidMorning = hour >= 10 && hour < 12 // Pre-lunch break
+        const isAfternoon = hour >= 14 && hour < 17 // Post-lunch slump
+        const isEvening = hour >= 19 && hour < 22 // Evening wind-down
+
+        // Check if completed self-care today
+        const today = new Date().toDateString()
+        const stored = localStorage.getItem('self-care-completed')
+        let completedToday = 0
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored)
+            if (parsed.date === today) {
+              completedToday = parsed.count
+            }
+          } catch (e) {}
+        }
+
+        // Show during key times, especially if haven't done self-care yet
+        return (isMidMorning || isAfternoon || isEvening || completedToday === 0) && <SelfCareMoments />
+      })()}
+
+      {/* Intentions - Show if user has intention OR it's early in month */}
+      {(() => {
+        const hasIntention = !!localStorage.getItem('current-intention')
+        const dayOfMonth = new Date().getDate()
+        const isEarlyMonth = dayOfMonth <= 7 // First week of month
+        return (hasIntention || isEarlyMonth) && <IntentionsWidget />
+      })()}
+
+      {/* Subscribe - Show occasionally to engaged users without subscription */}
+      {(() => {
+        // Don't show if user already has R&D or Usership tags
+        const hasSubscription = me?.tags.some((tag) =>
+          tag.toLowerCase() === UserTag.Usership.toLowerCase() ||
+          tag.toLowerCase() === UserTag.RND.toLowerCase()
+        )
+        if (hasSubscription) return null
+
+        // Only show to engaged users (10+ Memory answers)
+        const answerCount = logs.filter(log => log.event === 'answer').length
+        if (answerCount < 10) return null
+
+        // Check if clicked recently (10 days cooldown)
+        const lastClicked = localStorage.getItem('subscribe-clicked')
+        const tenDaysMs = 10 * 24 * 60 * 60 * 1000
+        if (lastClicked && (Date.now() - parseInt(lastClicked)) < tenDaysMs) {
+          return null
+        }
+
+        // Random 20% chance to show when all conditions met
+        const shouldShow = Math.random() < 0.2
+        return shouldShow && <SubscribeWidget />
+      })()}
 
       <MemoryWidget />
     </div>

@@ -28,6 +28,94 @@ import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import dayjs from '#server/utils/dayjs'
 
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Generate compassionate response based on emotional state
+ */
+function generateCompassionateResponse(
+  emotionalState: string,
+  checkInType: 'morning' | 'evening' | 'moment'
+): string {
+  const responses: { [key: string]: { [key: string]: string } } = {
+    energized: {
+      morning: 'What a wonderful way to start the day. May this energy carry you forward.',
+      evening: "It's beautiful to have energy at day's end. Honor it wisely.",
+      moment: 'This vitality is a gift. Notice what created it.',
+    },
+    calm: {
+      morning: 'Beginning with calm is a precious thing. Carry this peace with you.',
+      evening: 'Ending the day in calm - this is self-care in action.',
+      moment: 'Calm is always available. You found your way back to it.',
+    },
+    tired: {
+      morning: 'Starting tired is hard. Be gentle with yourself today.',
+      evening: 'Your tiredness is valid. Rest is not weakness - it\'s wisdom.',
+      moment: 'Tiredness is your body\'s truth. Listen to what it needs.',
+    },
+    anxious: {
+      morning: 'Beginning with anxiety is challenging. You don\'t have to carry this alone.',
+      evening: 'Anxiety at day\'s end can feel heavy. You made it through today.',
+      moment: 'Anxiety is uncomfortable, but temporary. This feeling will shift.',
+    },
+    hopeful: {
+      morning: 'Hope in the morning light - may it guide your day.',
+      evening: 'Ending with hope is a beautiful thing. Tomorrow awaits.',
+      moment: 'Hope is always a choice. You chose it right now.',
+    },
+    fulfilled: {
+      morning: 'Starting fulfilled - what a gift to yourself.',
+      evening: 'Fulfillment at day\'s end means you lived well today.',
+      moment: 'This sense of fulfillment - remember what created it.',
+    },
+    exhausted: {
+      morning: 'Exhaustion in the morning is a sign. Your system needs deep rest.',
+      evening: 'Complete exhaustion. Rest isn\'t optional anymore - it\'s essential.',
+      moment: 'Exhaustion is your limit speaking clearly. Please listen.',
+    },
+    grateful: {
+      morning: 'Gratitude colors everything. What a way to begin.',
+      evening: 'Gratitude at day\'s end - you found the gifts in today.',
+      moment: 'Gratitude shifts everything. You just shifted your world.',
+    },
+    restless: {
+      morning: 'Restlessness has something to teach you. Listen closely.',
+      evening: 'Restless energy at day\'s end - what\'s unsettled in you?',
+      moment: 'Restlessness is energy seeking direction. What wants to move?',
+    },
+    content: {
+      morning: 'Contentment is underrated. This is peace found.',
+      evening: 'Contentment at sunset - you lived a day in alignment.',
+      moment: 'Content means enough. Right now, you have enough.',
+    },
+    overwhelmed: {
+      morning: 'Overwhelm this early is real. One breath, one step at a time.',
+      evening: 'The weight of today - you carried it. Now you can set it down.',
+      moment: 'Overwhelm means capacity reached. What can you release right now?',
+    },
+    peaceful: {
+      morning: 'Peace in the morning is sacred. Protect it gently today.',
+      evening: 'Peace at evening - you created sanctuary in your day.',
+      moment: 'Peace found. This is the ground of your being.',
+    },
+    excited: {
+      morning: 'Excitement for the day ahead - let it fuel you.',
+      evening: 'Still excited at day\'s end - that\'s rare and precious.',
+      moment: 'Excitement is life force moving. Ride this wave.',
+    },
+    uncertain: {
+      morning: 'Uncertainty can feel uncomfortable. It\'s also where growth lives.',
+      evening: 'Day ending in uncertainty - the path will reveal itself.',
+      moment: 'Not knowing is honest. You don\'t have to have all the answers.',
+    },
+  }
+
+  return responses[emotionalState]?.[checkInType] ||
+    'Thank you for checking in with yourself. This awareness is self-care.'
+}
+
 export default async (fastify: FastifyInstance) => {
   fastify.get('/sync', async (req, reply) => {
     // const id = String(Math.ceil(Math.random() * 99)).padStart(2, '0')
@@ -967,6 +1055,152 @@ export default async (fastify: FastifyInstance) => {
     }
   )
 
+  // ============================================================================
+  // EMOTIONAL CHECK-IN ENDPOINT
+  // ============================================================================
+  fastify.post(
+    '/emotional-checkin',
+    async (
+      req: FastifyRequest<{
+        Body: {
+          checkInType: 'morning' | 'evening' | 'moment'
+          emotionalState: string
+          intensity?: number
+          note?: string
+        }
+      }>,
+      reply
+    ) => {
+      const { checkInType, emotionalState, intensity, note } = req.body
+
+      if (!checkInType || !emotionalState) {
+        return reply.throw.badParams('Check-in type and emotional state are required')
+      }
+
+      // Get recent emotional check-ins to generate insights
+      const recentCheckIns = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: 'emotional_checkin',
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 30,
+      })
+
+      // Generate pattern insights
+      const insights: string[] = []
+
+      // Pattern: Same state multiple days in a row
+      const lastThreeStates = recentCheckIns
+        .slice(0, 3)
+        .map(log => log.metadata?.emotionalState)
+      if (lastThreeStates.length >= 3 && lastThreeStates.every(state => state === emotionalState)) {
+        insights.push(`You've felt ${emotionalState} for 3 days in a row`)
+      }
+
+      // Pattern: Morning vs evening energy
+      const morningCheckIns = recentCheckIns.filter(log => log.metadata?.checkInType === 'morning')
+      const eveningCheckIns = recentCheckIns.filter(log => log.metadata?.checkInType === 'evening')
+
+      if (checkInType === 'morning' && morningCheckIns.length >= 5) {
+        const energizedMornings = morningCheckIns.filter(log =>
+          ['energized', 'hopeful', 'excited'].includes(log.metadata?.emotionalState)
+        ).length
+        if (energizedMornings / morningCheckIns.length > 0.7) {
+          insights.push('Your mornings tend to be energizing')
+        }
+      }
+
+      if (checkInType === 'evening' && eveningCheckIns.length >= 5) {
+        const tiredEvenings = eveningCheckIns.filter(log =>
+          ['tired', 'exhausted'].includes(log.metadata?.emotionalState)
+        ).length
+        if (tiredEvenings / eveningCheckIns.length > 0.7) {
+          insights.push('Your evenings often feel depleting')
+        }
+      }
+
+      // Create the emotional check-in log
+      // Format text for visibility in Log view
+      const timeOfDay =
+        checkInType === 'morning' ? 'this morning' :
+        checkInType === 'evening' ? 'this evening' :
+        'right now'
+      const logText = note
+        ? `Feeling ${emotionalState} ${timeOfDay}: ${note}`
+        : `Feeling ${emotionalState} ${timeOfDay}`
+
+      const checkIn = await fastify.models.Log.create({
+        userId: req.user.id,
+        text: logText,
+        event: 'emotional_checkin',
+        metadata: {
+          checkInType,
+          emotionalState,
+          intensity,
+          note,
+          insights,
+        },
+      })
+
+      // Add context asynchronously
+      process.nextTick(async () => {
+        const context = await getLogContext(req.user)
+        await checkIn.set({ context }).save()
+      })
+
+      return {
+        checkIn,
+        insights,
+        compassionateResponse: generateCompassionateResponse(emotionalState, checkInType),
+      }
+    }
+  )
+
+  // Get emotional check-in history and insights
+  fastify.get(
+    '/emotional-checkins',
+    async (req: FastifyRequest<{ Querystring: { days?: string } }>, reply) => {
+      const days = parseInt(req.query.days || '30')
+      const since = dayjs().subtract(days, 'day').toDate()
+
+      const checkIns = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: 'emotional_checkin',
+          createdAt: {
+            [Op.gte]: since,
+          },
+        },
+        order: [['createdAt', 'DESC']],
+      })
+
+      // Calculate mood patterns
+      const moodCounts: { [key: string]: number } = {}
+      checkIns.forEach(checkIn => {
+        const state = checkIn.metadata?.emotionalState as string
+        if (state) {
+          moodCounts[state] = (moodCounts[state] || 0) + 1
+        }
+      })
+
+      const dominantMood = Object.entries(moodCounts)
+        .sort(([_, a], [__, b]) => b - a)[0]?.[0]
+
+      return {
+        checkIns,
+        stats: {
+          total: checkIns.length,
+          moodCounts,
+          dominantMood,
+          averageIntensity: checkIns.length > 0
+            ? checkIns.reduce((sum, c) => sum + (c.metadata?.intensity || 5), 0) / checkIns.length
+            : 0,
+        },
+      }
+    }
+  )
+
   fastify.get(
     '/memory',
     async (req: FastifyRequest<{ Querystring: { d: string } }>, reply) => {
@@ -1194,36 +1428,136 @@ export default async (fastify: FastifyInstance) => {
         })
       })
 
-      // Generate contextual response based on answer pattern
+      // ============================================================================
+      // ENHANCED INSIGHT RESPONSE SYSTEM
+      // ============================================================================
+
+      // Get user's recent answers and logs for psychological analysis
+      const recentLogs = await fastify.models.Log.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 50,
+      })
+
       const answerCount = await fastify.models.Answer.count({
         where: { userId: req.user.id }
       })
 
-      // Vary responses based on engagement level
+      // Generate personalized insight response
       let response: string
+      let insight: string | null = null
+
       if (answerCount === 1) {
         response = "Thank you for starting your Memory story with LOT."
-      } else if (answerCount % 10 === 0) {
-        // Milestone celebrations every 10 answers
-        response = `${answerCount} moments captured. Your story is becoming richer.`
-      } else if (answerCount % 5 === 0) {
-        // Mini milestones every 5 answers
-        response = "Your patterns are emerging beautifully."
+      } else if (answerCount >= 10) {
+        // For users with 10+ answers, analyze psychological depth and generate insights
+        const analysis = extractUserTraits(recentLogs)
+        const { psychologicalDepth, traits } = analysis
+        const cohortResult = determineUserCohort(traits, {}, psychologicalDepth)
+
+        // Generate archetype-based response
+        if (cohortResult.archetype !== 'The Wanderer') {
+          const archetypeResponses: { [key: string]: string[] } = {
+            'The Seeker': [
+              `Your ${cohortResult.archetype} nature is showing in your choices. You're drawn to growth.`,
+              `This answer deepens your understanding of yourself - signature of ${cohortResult.archetype}.`,
+              `${cohortResult.archetype} energy: always moving toward more awareness.`
+            ],
+            'The Nurturer': [
+              `Your choices reflect ${cohortResult.archetype} - connection and care matter deeply to you.`,
+              `${cohortResult.archetype}: You consider how choices affect relationships.`,
+              `This reveals your nurturing nature - ${cohortResult.archetype} at heart.`
+            ],
+            'The Achiever': [
+              `${cohortResult.archetype} showing through: purposeful and intentional choices.`,
+              `Your answers reveal goal-oriented clarity - classic ${cohortResult.archetype}.`,
+              `Progress-focused choices align with your ${cohortResult.archetype} nature.`
+            ],
+            'The Philosopher': [
+              `${cohortResult.archetype}: You choose with meaning in mind.`,
+              `This choice reflects your search for deeper significance - ${cohortResult.archetype}.`,
+              `Meaning-making is your gift, ${cohortResult.archetype}.`
+            ],
+            'The Harmonizer': [
+              `Balance guides your choices - pure ${cohortResult.archetype}.`,
+              `${cohortResult.archetype}: Seeking equilibrium in all things.`,
+              `Your answer shows your gift for finding center - ${cohortResult.archetype}.`
+            ],
+            'The Creator': [
+              `${cohortResult.archetype} energy: Choosing what allows expression.`,
+              `Creative freedom matters to you - signature ${cohortResult.archetype}.`,
+              `This choice honors your need for authentic expression.`
+            ],
+            'The Protector': [
+              `${cohortResult.archetype}: Security and stability guide you.`,
+              `Grounded choice - this is ${cohortResult.archetype} wisdom.`,
+              `Your answers show you value safety - ${cohortResult.archetype} at core.`
+            ],
+            'The Authentic': [
+              `Truth-aligned choice - pure ${cohortResult.archetype}.`,
+              `${cohortResult.archetype}: You refuse to pretend.`,
+              `Honesty with self is your north star - ${cohortResult.archetype}.`
+            ],
+            'The Explorer': [
+              `${cohortResult.archetype}: Always curious, always expanding.`,
+              `Your choices show openness to new experiences - ${cohortResult.archetype}.`,
+              `Discovery-oriented choice - signature ${cohortResult.archetype}.`
+            ]
+          }
+
+          const archetypeResponseOptions = archetypeResponses[cohortResult.archetype] || []
+          if (archetypeResponseOptions.length > 0) {
+            response = fp.randomElement(archetypeResponseOptions)
+          } else {
+            response = `Your ${cohortResult.archetype} nature is revealing itself through your choices.`
+          }
+
+          // Add insight about dominant needs or values
+          if (psychologicalDepth.dominantNeeds.length > 0) {
+            const topNeed = psychologicalDepth.dominantNeeds[0]
+            insight = `Pattern: ${topNeed} appears in your choices consistently.`
+          } else if (psychologicalDepth.values.length > 0) {
+            const topValue = psychologicalDepth.values[0]
+            insight = `Your answers reveal ${topValue} as a core value.`
+          }
+        } else {
+          // Still discovering archetype
+          response = fp.randomElement([
+            "Your patterns are beginning to emerge.",
+            "Each answer reveals another layer of who you are.",
+            "Your story is taking shape beautifully."
+          ])
+        }
+
+        // Milestone celebrations
+        if (answerCount % 20 === 0) {
+          response = `${answerCount} moments captured. Your psychological profile is deepening.`
+          insight = `Growth trajectory: ${psychologicalDepth.growthTrajectory} • Awareness: ${(psychologicalDepth.selfAwareness / 10).toFixed(1)}%`
+        } else if (answerCount % 10 === 0) {
+          insight = `${answerCount} answers reveal your ${cohortResult.archetype} archetype is ${psychologicalDepth.growthTrajectory}.`
+        }
       } else {
-        // Varied acknowledgments for regular answers
-        const engagingReplies = [
+        // For users with fewer answers, use encouraging responses
+        const earlyReplies = [
           "Thank you. This helps me understand you better.",
-          "Noted. Every answer deepens your Memory.",
-          "Understood. Building your story.",
-          "I see. Your preferences are taking shape.",
-          "Thank you for sharing.",
-          "This adds valuable context.",
-          "Your story grows richer."
+          "Every answer deepens your Memory.",
+          "Your preferences are taking shape.",
+          "This adds valuable context to your story.",
+          "Building your psychological profile."
         ]
-        response = fp.randomElement(engagingReplies)
+        response = fp.randomElement(earlyReplies)
+
+        // After 5 answers, hint at emerging patterns
+        if (answerCount === 5) {
+          response = "Five answers in - your patterns are beginning to speak."
+        }
       }
 
-      return { response }
+      return {
+        response,
+        insight, // Optional additional insight about patterns
+        answerCount,
+      }
     }
   )
 
@@ -1352,11 +1686,18 @@ export default async (fastify: FastifyInstance) => {
         archetype: cohortResult.archetype,
         archetypeDescription: cohortResult.description,
         coreValues: psychologicalDepth.values.map(v => v.charAt(0).toUpperCase() + v.slice(1)),
+        values: psychologicalDepth.values, // Also include raw values for compatibility
         emotionalPatterns: psychologicalDepth.emotionalPatterns.map(p => {
           const formatted = p.replace(/([A-Z])/g, ' $1').trim()
           return formatted.charAt(0).toUpperCase() + formatted.slice(1)
         }),
         selfAwarenessLevel: psychologicalDepth.selfAwareness,
+        // Enhanced psychological depth metrics
+        emotionalRange: psychologicalDepth.emotionalRange,
+        reflectionQuality: psychologicalDepth.reflectionQuality,
+        growthTrajectory: psychologicalDepth.growthTrajectory,
+        dominantNeeds: psychologicalDepth.dominantNeeds,
+        journalSentiment: psychologicalDepth.journalSentiment,
         // Behavioral patterns (surface level)
         behavioralCohort: cohortResult.behavioralCohort,
         behavioralTraits: traits.map(t => {

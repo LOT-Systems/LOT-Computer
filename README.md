@@ -12,7 +12,7 @@ But more importantly, LOT features the **Memory Engine** - a revolutionary AI-po
 
 ---
 
-## 💎 The Memory Engine: Your Personal Self-Care Vault
+## 💎 The Memory Engine: Your Personal Self-care Vault
 
 ### Unlike Any Other Wellness App
 

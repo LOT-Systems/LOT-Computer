@@ -99,7 +99,34 @@ export type LogEvent =
   | 'theme_change'
   | 'weather_update'
   | 'note'
+  | 'emotional_checkin'
   | 'other';
+
+// Emotional Check-in Types
+export type EmotionalCheckInType = 'morning' | 'evening' | 'moment';
+export type EmotionalState =
+  | 'energized'
+  | 'calm'
+  | 'tired'
+  | 'anxious'
+  | 'hopeful'
+  | 'fulfilled'
+  | 'exhausted'
+  | 'grateful'
+  | 'restless'
+  | 'content'
+  | 'overwhelmed'
+  | 'peaceful'
+  | 'excited'
+  | 'uncertain';
+
+export type EmotionalCheckInMetadata = {
+  checkInType: EmotionalCheckInType;
+  emotionalState: EmotionalState;
+  intensity?: number; // 1-10 scale
+  note?: string;
+  insights?: string[]; // AI-generated insights about patterns
+};
 
 export type Log = {
   id: string;
@@ -214,6 +241,7 @@ export type PublicProfile = {
   privacySettings: UserPrivacySettings;
   tags?: string[];
   profileVisits?: number;
+  isPrivate?: boolean; // True when profile is in private mode
   theme?: {
     theme: string;
     baseColor: string | null;
@@ -226,6 +254,7 @@ export type PublicProfile = {
     archetype?: string;
     archetypeDescription?: string;
     coreValues?: string[];
+    values?: string[]; // Alias for coreValues (enhanced system uses this)
     emotionalPatterns?: string[];
     selfAwarenessLevel?: number;
     behavioralCohort?: string;
@@ -233,6 +262,16 @@ export type PublicProfile = {
     patternStrength?: Array<{ trait: string; count: number }>;
     answerCount?: number;
     noteCount?: number;
+    // Enhanced psychological depth metrics
+    emotionalRange?: number; // 0-10
+    reflectionQuality?: number; // 0-10
+    growthTrajectory?: 'emerging' | 'developing' | 'deepening' | 'integrated';
+    dominantNeeds?: string[];
+    journalSentiment?: {
+      positive: number;
+      neutral: number;
+      challenging: number;
+    };
   };
 };
 
