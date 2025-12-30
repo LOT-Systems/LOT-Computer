@@ -180,11 +180,11 @@ export function SelfCareMoments() {
       {view === 'practice' && (
         <div className="inline-block w-full">
           {isTimerRunning && (
-            <div className="mb-12 text-[20px] opacity-90">
+            <div className="mb-12 opacity-90">
               {formatTime(timeRemaining)}
             </div>
           )}
-          <div className="opacity-80 whitespace-pre-line mb-12">{currentSuggestion.practice}</div>
+          <div className="opacity-90 mb-12">{currentSuggestion.practice.replace(/\n+/g, ' ')}</div>
           {isTimerRunning ? (
             <div className="flex gap-8">
               <Button onClick={stopTimer}>
