@@ -400,20 +400,24 @@ export const System = () => {
 
       <RecipeWidget />
 
-      {/* Mood Check-In - Show during key times or if no check-in today */}
+      {/* Mood Check-In - Show every 3 hours max, context-based on time of day */}
       {(() => {
         const hour = new Date().getHours()
         const isMorning = hour >= 6 && hour < 12
         const isEvening = hour >= 17 && hour < 22
         const isMidDay = hour >= 12 && hour < 17
 
-        // Check if user has checked in today (simple heuristic: check localStorage or recent logs)
-        const today = new Date().toDateString()
-        const lastCheckIn = localStorage.getItem('last-mood-checkin-date')
-        const hasCheckedInToday = lastCheckIn === today
+        // Check if 3 hours have passed since last check-in
+        const lastCheckInTime = localStorage.getItem('last-mood-checkin-time')
+        const threeHoursMs = 3 * 60 * 60 * 1000
+        const threeHoursPassed = !lastCheckInTime ||
+          (Date.now() - parseInt(lastCheckInTime)) >= threeHoursMs
 
-        // Show during morning/evening, or mid-day if haven't checked in
-        return (isMorning || isEvening || (isMidDay && !hasCheckedInToday)) && <EmotionalCheckIn />
+        // Show during preferred times (morning/evening) if 3 hours passed
+        // OR show mid-day if haven't checked in at all today and 3 hours passed
+        if (!threeHoursPassed) return null
+
+        return (isMorning || isEvening || isMidDay) && <EmotionalCheckIn />
       })()}
 
       {/* Self-Care Moments - Show during rest/refresh times */}
