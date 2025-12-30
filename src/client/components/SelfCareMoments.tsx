@@ -204,7 +204,7 @@ export function SelfCareMoments() {
             {currentSuggestion.action} ({currentSuggestion.duration})
           </div>
           {completedToday > 0 && (
-            <div className="opacity-60 text-[14px] mb-16">
+            <div className="opacity-90 mb-16">
               {completedToday} done today
             </div>
           )}
@@ -282,7 +282,7 @@ function generateContextualSuggestion(
       })
     } else if (weatherLower.includes('sun') || weatherLower.includes('clear')) {
       suggestions.push({
-        action: 'Step outside for 5 minutes of sunlight',
+        action: 'Step outside and get sunlight',
         why: 'Sunlight regulates your circadian rhythm and boosts mood.',
         practice: 'Go outside.\nFace the sun (eyes closed).\nTake 5 deep breaths.\nNotice the warmth on your skin.',
         duration: '5 mins'
@@ -301,7 +301,7 @@ function generateContextualSuggestion(
       })
     } else if (['tired', 'exhausted'].includes(dominantMood)) {
       suggestions.push({
-        action: 'Take a 10-minute power rest (not nap)',
+        action: 'Take a power rest (not nap)',
         why: 'Your body is asking for restoration. Short rest can restore energy.',
         practice: 'Lie down comfortably.\nClose your eyes.\nDon\'t try to sleep.\nJust let your body rest.\nSet a timer for 10 minutes.',
         duration: '10 mins'
@@ -320,7 +320,7 @@ function generateContextualSuggestion(
   if (archetype) {
     if (archetype === 'The Seeker') {
       suggestions.push({
-        action: 'Spend 5 minutes in reflective inquiry',
+        action: 'Reflective inquiry practice',
         why: 'Your Seeker nature thrives on self-discovery.',
         practice: 'Ask yourself: "What am I discovering about myself right now?"\n\nSit with the question.\nDon\'t force answers.\nNotice what arises.',
         duration: '5 mins'
@@ -334,7 +334,7 @@ function generateContextualSuggestion(
       })
     } else if (archetype === 'The Creator') {
       suggestions.push({
-        action: 'Free expression: 5 minutes of creating without purpose',
+        action: 'Free expression: creating without purpose',
         why: 'Your Creator soul needs expression without judgment.',
         practice: 'Grab any creative medium.\nSet timer for 5 minutes.\nCreate without planning.\nNo goal, just expression.',
         duration: '5 mins'
@@ -370,7 +370,7 @@ function generateContextualSuggestion(
         duration: '1 min'
       },
       {
-        action: 'Stretch your body for 2 minutes',
+        action: 'Stretch your body',
         why: 'Your body holds tension. Movement releases it.',
         practice: 'Stand up.\nReach arms overhead.\nSide bend both ways.\nRoll shoulders.\nNotice what feels tight.',
         duration: '2 mins'
