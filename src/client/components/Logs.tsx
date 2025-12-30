@@ -199,6 +199,32 @@ export const Logs: React.FC = () => {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'emotional_checkin') {
+          const emotionalState = log.metadata?.emotionalState as string
+          const checkInType = log.metadata?.checkInType as string
+          const note = log.metadata?.note as string
+          const insights = log.metadata?.insights as string[] | undefined
+
+          const timeLabel =
+            checkInType === 'morning' ? 'Morning' :
+            checkInType === 'evening' ? 'Evening' :
+            'Moment'
+
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="Mood:" blockView>
+                <div className="mb-8 capitalize">{emotionalState}</div>
+                {note && <div className="opacity-60 mb-8">{note}</div>}
+                {insights && insights.length > 0 && (
+                  <div className="opacity-60 text-[14px]">
+                    {insights.map((insight, idx) => (
+                      <div key={idx}>• {insight}</div>
+                    ))}
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'settings_change') {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>

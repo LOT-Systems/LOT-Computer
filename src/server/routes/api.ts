@@ -1121,9 +1121,18 @@ export default async (fastify: FastifyInstance) => {
       }
 
       // Create the emotional check-in log
+      // Format text for visibility in Log view
+      const timeOfDay =
+        checkInType === 'morning' ? 'this morning' :
+        checkInType === 'evening' ? 'this evening' :
+        'right now'
+      const logText = note
+        ? `Feeling ${emotionalState} ${timeOfDay}: ${note}`
+        : `Feeling ${emotionalState} ${timeOfDay}`
+
       const checkIn = await fastify.models.Log.create({
         userId: req.user.id,
-        text: note || null,
+        text: logText,
         event: 'emotional_checkin',
         metadata: {
           checkInType,
