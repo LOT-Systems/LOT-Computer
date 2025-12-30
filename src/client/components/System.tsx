@@ -15,12 +15,14 @@ import { toCelsius, toFahrenheit } from '#shared/utils'
 import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useVisitorStats, useProfile, useLogs } from '#client/queries'
+import { UserTag } from '#shared/types'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
 import { RecipeWidget } from './RecipeWidget'
 import { EmotionalCheckIn } from './EmotionalCheckIn'
 import { SelfCareMoments } from './SelfCareMoments'
 import { IntentionsWidget } from './IntentionsWidget'
+import { SubscribeWidget } from './SubscribeWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 
 export const System = () => {
@@ -450,6 +452,31 @@ export const System = () => {
         const dayOfMonth = new Date().getDate()
         const isEarlyMonth = dayOfMonth <= 7 // First week of month
         return (hasIntention || isEarlyMonth) && <IntentionsWidget />
+      })()}
+
+      {/* Subscribe - Show occasionally to engaged users without subscription */}
+      {(() => {
+        // Don't show if user already has R&D or Usership tags
+        const hasSubscription = me?.tags.some((tag) =>
+          tag.toLowerCase() === UserTag.Usership.toLowerCase() ||
+          tag.toLowerCase() === UserTag.RND.toLowerCase()
+        )
+        if (hasSubscription) return null
+
+        // Only show to engaged users (10+ Memory answers)
+        const answerCount = logs.filter(log => log.event === 'answer').length
+        if (answerCount < 10) return null
+
+        // Check if clicked recently (10 days cooldown)
+        const lastClicked = localStorage.getItem('subscribe-clicked')
+        const tenDaysMs = 10 * 24 * 60 * 60 * 1000
+        if (lastClicked && (Date.now() - parseInt(lastClicked)) < tenDaysMs) {
+          return null
+        }
+
+        // Random 20% chance to show when all conditions met
+        const shouldShow = Math.random() < 0.2
+        return shouldShow && <SubscribeWidget />
       })()}
 
       <MemoryWidget />
