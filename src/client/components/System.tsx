@@ -141,11 +141,12 @@ export const System = () => {
     }
   }, [logs])
 
-  // Calculate awareness index from backend selfAwarenessLevel (0-10) to percentage (0-100%)
+  // Calculate awareness index from backend selfAwarenessLevel (0-100) to percentage (0-10%)
+  // Long-term growth with decimal precision (e.g., 2.3%, 5.7%)
   const awarenessIndex = React.useMemo(() => {
-    if (!profile?.hasUsership) return 0
-    if (typeof profile.selfAwarenessLevel !== 'number') return 0
-    return Math.round((profile.selfAwarenessLevel / 10) * 100)
+    if (!profile?.hasUsership) return '0.0'
+    if (typeof profile.selfAwarenessLevel !== 'number') return '0.0'
+    return (profile.selfAwarenessLevel / 10).toFixed(1)
   }, [profile])
 
   // Weather suggestion based on temperature (stable - doesn't change on re-render)

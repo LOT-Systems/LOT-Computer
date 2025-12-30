@@ -1009,15 +1009,35 @@ export function extractUserTraits(logs: Log[]): {
     })
   })
 
-  // Calculate self-awareness score (0-10) based on reflective language
+  // Calculate self-awareness score (0-100) for long-term growth tracking
+  // This becomes 0-10% when divided by 10 in the frontend
+  // Growth is gradual with decimal precision (e.g., 2.3%, 5.7%)
   const reflectiveScore = psychPatterns.reflective + psychPatterns.emotionallyAware
   const totalLogs = answerLogs.length + noteLogs.length
-  // More generous formula: base of 2 + scaled reflective score
-  // With 10 logs and 2 reflective: 2 + (2/10 * 6) = 2 + 1.2 = 3
-  // With 10 logs and 5 reflective: 2 + (5/10 * 6) = 2 + 3 = 5
-  const baseScore = totalLogs >= 5 ? 2 : 0 // Give base score after 5 logs
-  const scaledScore = (reflectiveScore / Math.max(1, totalLogs)) * 6
-  const selfAwareness = Math.min(10, Math.round(baseScore + scaledScore))
+
+  // Components of awareness (each contributes to 0-100 scale):
+  // 1. Volume of engagement (0-40 points): More interactions = deeper self-knowledge
+  const volumeScore = Math.min(40, Math.sqrt(totalLogs) * 4) // Logarithmic growth
+
+  // 2. Reflective quality (0-30 points): Ratio of reflective content
+  const reflectiveRatio = reflectiveScore / Math.max(1, totalLogs)
+  const qualityScore = reflectiveRatio * 30
+
+  // 3. Consistency bonus (0-15 points): Regular engagement over time
+  const daysSinceStart = logs.length > 0
+    ? Math.floor((Date.now() - new Date(logs[logs.length - 1].createdAt).getTime()) / (1000 * 60 * 60 * 24))
+    : 0
+  const consistencyScore = Math.min(15, (totalLogs / Math.max(1, daysSinceStart)) * 100)
+
+  // 4. Depth bonus (0-15 points): Long-form journaling and emotional check-ins
+  const journalEntries = noteLogs.filter(log => log.text && log.text.length > 100).length
+  const depthScore = Math.min(15, journalEntries * 1.5)
+
+  // Combine all components (max 100)
+  const rawScore = volumeScore + qualityScore + consistencyScore + depthScore
+
+  // Return as 0-100 with 1 decimal precision (frontend will divide by 10 for %)
+  const selfAwareness = Math.min(100, Number(rawScore.toFixed(1)))
 
   // Extract top behavioral traits (2+ matches required)
   const traits: string[] = Object.entries(patterns)

@@ -1532,7 +1532,7 @@ export default async (fastify: FastifyInstance) => {
         // Milestone celebrations
         if (answerCount % 20 === 0) {
           response = `${answerCount} moments captured. Your psychological profile is deepening.`
-          insight = `Growth trajectory: ${psychologicalDepth.growthTrajectory} • Awareness: ${Math.round((psychologicalDepth.selfAwareness / 10) * 100)}%`
+          insight = `Growth trajectory: ${psychologicalDepth.growthTrajectory} • Awareness: ${(psychologicalDepth.selfAwareness / 10).toFixed(1)}%`
         } else if (answerCount % 10 === 0) {
           insight = `${answerCount} answers reveal your ${cohortResult.archetype} archetype is ${psychologicalDepth.growthTrajectory}.`
         }
