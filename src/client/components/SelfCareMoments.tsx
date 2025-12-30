@@ -2,7 +2,7 @@ import React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button } from '#client/components/ui'
-import { useProfile, useEmotionalCheckIns } from '#client/queries'
+import { useProfile, useEmotionalCheckIns, useCreateLog } from '#client/queries'
 import { cn } from '#client/utils'
 
 type CareView = 'suggestion' | 'why' | 'practice'
@@ -34,6 +34,7 @@ export function SelfCareMoments() {
   const weather = useStore(stores.weather)
   const { data: profile } = useProfile()
   const { data: checkInsData } = useEmotionalCheckIns(7) // Last 7 days
+  const { mutate: createLog } = useCreateLog()
 
   // Load today's completed count from localStorage
   React.useEffect(() => {
@@ -97,6 +98,11 @@ export function SelfCareMoments() {
   }
 
   const refreshSuggestion = () => {
+    // Log the skipped activity
+    if (currentSuggestion) {
+      createLog({ text: `Self-care skipped: ${currentSuggestion.action}` })
+    }
+
     const suggestion = generateContextualSuggestion(
       weather?.description,
       profile?.archetype,
@@ -112,6 +118,11 @@ export function SelfCareMoments() {
     const newCount = completedToday + 1
     setCompletedToday(newCount)
     localStorage.setItem('self-care-completed', JSON.stringify({ date: today, count: newCount }))
+
+    // Log the completed activity
+    if (currentSuggestion) {
+      createLog({ text: `Self-care completed: ${currentSuggestion.action}` })
+    }
 
     // Show completion message
     const messages = ['Well done ✓', 'Complete ✓', 'Done ✓', 'Finished ✓']
@@ -189,11 +200,11 @@ export function SelfCareMoments() {
         <>
       {view === 'suggestion' && (
         <div className="inline-block w-full">
-          <div className="mb-12 opacity-90">
+          <div className={cn("opacity-90", completedToday > 0 ? "mb-12" : "mb-16")}>
             {currentSuggestion.action} ({currentSuggestion.duration})
           </div>
           {completedToday > 0 && (
-            <div className="opacity-60 text-[14px] mb-12">
+            <div className="opacity-60 text-[14px] mb-16">
               {completedToday} done today
             </div>
           )}
@@ -224,7 +235,7 @@ export function SelfCareMoments() {
               {formatTime(timeRemaining)}
             </div>
           )}
-          <div className="opacity-90 mb-12">{currentSuggestion.practice.replace(/\n+/g, ' ')}</div>
+          <div className="opacity-90 mb-16">{currentSuggestion.practice.replace(/\n+/g, ' ')}</div>
           {isTimerRunning ? (
             <div className="flex gap-8">
               <Button onClick={stopTimer}>
