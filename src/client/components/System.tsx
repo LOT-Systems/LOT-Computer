@@ -399,10 +399,45 @@ export const System = () => {
 
       <RecipeWidget />
 
-      <EmotionalCheckIn />
+      {/* Mood Check-In - Show during key times or if no check-in today */}
+      {(() => {
+        const hour = new Date().getHours()
+        const isMorning = hour >= 6 && hour < 12
+        const isEvening = hour >= 17 && hour < 22
+        const isMidDay = hour >= 12 && hour < 17
 
-      {/* Self-Care Moments - Always show (contextual by nature) */}
-      <SelfCareMoments />
+        // Check if user has checked in today (simple heuristic: check localStorage or recent logs)
+        const today = new Date().toDateString()
+        const lastCheckIn = localStorage.getItem('last-mood-checkin-date')
+        const hasCheckedInToday = lastCheckIn === today
+
+        // Show during morning/evening, or mid-day if haven't checked in
+        return (isMorning || isEvening || (isMidDay && !hasCheckedInToday)) && <EmotionalCheckIn />
+      })()}
+
+      {/* Self-Care Moments - Show during rest/refresh times */}
+      {(() => {
+        const hour = new Date().getHours()
+        const isMidMorning = hour >= 10 && hour < 12 // Pre-lunch break
+        const isAfternoon = hour >= 14 && hour < 17 // Post-lunch slump
+        const isEvening = hour >= 19 && hour < 22 // Evening wind-down
+
+        // Check if completed self-care today
+        const today = new Date().toDateString()
+        const stored = localStorage.getItem('self-care-completed')
+        let completedToday = 0
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored)
+            if (parsed.date === today) {
+              completedToday = parsed.count
+            }
+          } catch (e) {}
+        }
+
+        // Show during key times, especially if haven't done self-care yet
+        return (isMidMorning || isAfternoon || isEvening || completedToday === 0) && <SelfCareMoments />
+      })()}
 
       {/* Intentions - Show if user has intention OR it's early in month */}
       {(() => {

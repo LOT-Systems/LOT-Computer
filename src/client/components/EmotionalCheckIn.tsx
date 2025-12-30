@@ -40,6 +40,10 @@ export function EmotionalCheckIn() {
       setInsight(data.insights)
       setShowResponse(true)
 
+      // Store last check-in date for context-aware rendering
+      const today = new Date().toDateString()
+      localStorage.setItem('last-mood-checkin-date', today)
+
       // Fade out after showing response for 3 seconds
       setTimeout(() => {
         setIsFading(true)
