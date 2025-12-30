@@ -219,7 +219,7 @@ export const useProfile = () =>
     noteCount?: number
     message?: string
   }>('/api/user-profile', {
-    staleTime: 0, // Don't cache - always fetch fresh
-    cacheTime: 0, // Don't keep in cache
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes (balance between fresh data and performance)
+    cacheTime: 10 * 60 * 1000, // Keep in memory for 10 minutes
     refetchOnWindowFocus: false,
   })()
