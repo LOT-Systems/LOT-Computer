@@ -204,6 +204,9 @@ export const useMyMemoryStory = () =>
   })()
 
 // Get user's psychological profile (archetypes, values, patterns)
+// Cache version: bump this to force refetch on all clients (e.g., when adding new fields)
+const PROFILE_CACHE_VERSION = 'v2';
+
 export const useProfile = () =>
   createQuery<{
     hasUsership: boolean
@@ -218,7 +221,7 @@ export const useProfile = () =>
     answerCount?: number
     noteCount?: number
     message?: string
-  }>('/api/user-profile', {
+  }>(`/api/user-profile?v=${PROFILE_CACHE_VERSION}`, {
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     refetchOnWindowFocus: false,
   })()
