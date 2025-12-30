@@ -423,7 +423,7 @@ export const System = () => {
         return (isMorning || isEvening || isMidDay) && <EmotionalCheckIn />
       })()}
 
-      {/* Self-Care Moments - Show during rest/refresh times */}
+      {/* Self-care Moments - Show during rest/refresh times */}
       {(() => {
         const hour = new Date().getHours()
         const isMidMorning = hour >= 10 && hour < 12 // Pre-lunch break
