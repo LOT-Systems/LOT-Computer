@@ -52,15 +52,7 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
                   ),
                 props.labelClassName
               )}
-              onClick={(e) => {
-                if (props.onLabelClick) {
-                  // Only stop propagation if there's a parent onClick to prevent
-                  if (props.onClick) {
-                    e.stopPropagation()
-                  }
-                  props.onLabelClick()
-                }
-              }}
+              onClick={props.onLabelClick}
             >
               {props.label}
             </span>
@@ -82,17 +74,7 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
                     : '',
                   props.labelClassName
                 )}
-                onClick={(e) => {
-                  if (props.onChildrenClick) {
-                    // Only stop propagation if there's a parent onClick to prevent
-                    if (props.onClick) {
-                      e.stopPropagation()
-                    }
-                    props.onChildrenClick()
-                  } else if (props.onClick) {
-                    props.onClick()
-                  }
-                }}
+                onClick={props.onChildrenClick || props.onClick}
               >
                 {props.children}
               </span>
