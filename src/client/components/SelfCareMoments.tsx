@@ -305,25 +305,62 @@ function generateContextualSuggestion(
   // Mood-based suggestions
   if (dominantMood) {
     if (['anxious', 'overwhelmed', 'restless'].includes(dominantMood)) {
-      suggestions.push({
-        action: 'Practice 4-7-8 breathing to calm your nervous system',
-        why: 'You\'ve been experiencing tension. This activates your parasympathetic nervous system.',
-        practice: 'Breathe in for 4 counts.\nHold for 7 counts.\nExhale slowly for 8 counts.\nRepeat 4 times.',
-        duration: '2 mins'
-      })
+      suggestions.push(
+        {
+          action: 'Practice 4-7-8 breathing to calm your nervous system',
+          why: 'You\'ve been experiencing tension. This activates your parasympathetic nervous system.',
+          practice: 'Breathe in for 4 counts.\nHold for 7 counts.\nExhale slowly for 8 counts.\nRepeat 4 times.',
+          duration: '2 mins'
+        },
+        {
+          action: 'Name and release your worries',
+          why: 'Anxiety lives in the unnamed. Speaking worries aloud diminishes their power.',
+          practice: 'Close your eyes.\nName one worry out loud.\nSay: "I see you, but you don\'t control me."\nTake a deep breath and let it go.',
+          duration: '3 mins'
+        },
+        {
+          action: 'Ground yourself with the 5-4-3-2-1 technique',
+          why: 'Overwhelm pulls you from the present. Grounding brings you back.',
+          practice: 'Name 5 things you see.\n4 things you can touch.\n3 things you hear.\n2 things you smell.\n1 thing you taste.',
+          duration: '3 mins'
+        }
+      )
     } else if (['tired', 'exhausted'].includes(dominantMood)) {
-      suggestions.push({
-        action: 'Take a power rest (not nap)',
-        why: 'Your body is asking for restoration. Short rest can restore energy.',
-        practice: 'Lie down comfortably.\nClose your eyes.\nDon\'t try to sleep.\nJust let your body rest.\nSet a timer for 10 minutes.',
-        duration: '10 mins'
-      })
+      suggestions.push(
+        {
+          action: 'Take a power rest (not nap)',
+          why: 'Your body is asking for restoration. Short rest can restore energy.',
+          practice: 'Lie down comfortably.\nClose your eyes.\nDon\'t try to sleep.\nJust let your body rest.\nSet a timer for 10 minutes.',
+          duration: '10 mins'
+        },
+        {
+          action: 'Practice radical permission to rest',
+          why: 'Tiredness is not weakness. Your body deserves rest without guilt.',
+          practice: 'Say out loud: "I give myself permission to be tired."\nPlace hand on heart.\nBreathe slowly.\nRest for 5 minutes without doing anything.',
+          duration: '5 mins'
+        }
+      )
     } else if (['grateful', 'content', 'peaceful'].includes(dominantMood)) {
+      suggestions.push(
+        {
+          action: 'Write down 3 specific moments from today',
+          why: 'You\'re in a positive state. Anchoring it deepens the experience.',
+          practice: 'Get your journal.\nWrite 3 specific moments.\nWhat made each one special?\nHow did you feel?',
+          duration: '5 mins'
+        },
+        {
+          action: 'Savor this peaceful moment',
+          why: 'Peace is rare and precious. Conscious savoring makes it last longer.',
+          practice: 'Close your eyes.\nNotice the peace in your body.\nWhere do you feel it?\nBreathe into that feeling.\nSay: "I am here."',
+          duration: '3 mins'
+        }
+      )
+    } else if (['energized', 'excited', 'hopeful'].includes(dominantMood)) {
       suggestions.push({
-        action: 'Write down 3 specific moments from today',
-        why: 'You\'re in a positive state. Anchoring it deepens the experience.',
-        practice: 'Get your journal.\nWrite 3 specific moments.\nWhat made each one special?\nHow did you feel?',
-        duration: '5 mins'
+        action: 'Channel your energy into creative movement',
+        why: 'High energy is a gift. Movement helps you embody and direct it.',
+        practice: 'Put on music that matches your energy.\nMove freely for 3 minutes.\nNo rules, just expression.\nNotice how the energy flows.',
+        duration: '3 mins'
       })
     }
   }
@@ -357,18 +394,54 @@ function generateContextualSuggestion(
   // Time-based suggestions
   const hour = new Date().getHours()
   if (hour >= 6 && hour < 9) {
+    suggestions.push(
+      {
+        action: 'Set one intention for how you want to feel today',
+        why: 'Morning is powerful for intention-setting.',
+        practice: 'Close your eyes.\nAsk: "How do I want to feel today?"\nChoose one word.\nSay it out loud 3 times.',
+        duration: '2 mins'
+      },
+      {
+        action: 'Welcome the day with gentle presence',
+        why: 'How you begin shapes the entire day. Gentleness is a choice.',
+        practice: 'Before checking your phone.\nPlace both hands on your heart.\nSay: "I welcome this day."\nTake 3 slow breaths.',
+        duration: '2 mins'
+      }
+    )
+  } else if (hour >= 12 && hour < 14) {
     suggestions.push({
-      action: 'Set one intention for how you want to feel today',
-      why: 'Morning is powerful for intention-setting.',
-      practice: 'Close your eyes.\nAsk: "How do I want to feel today?"\nChoose one word.\nSay it out loud 3 times.',
-      duration: '2 mins'
+      action: 'Midday reset: pause and recalibrate',
+      why: 'Midday is when we lose ourselves in doing. Pausing restores awareness.',
+      practice: 'Stop what you\'re doing.\nClose your eyes.\nAsk: "What do I need right now?"\nListen for the answer.\nGive yourself that one thing.',
+      duration: '3 mins'
     })
   } else if (hour >= 19 && hour < 22) {
+    suggestions.push(
+      {
+        action: 'Release the day with a simple closing ritual',
+        why: 'Evenings need closure to prepare for rest.',
+        practice: 'Take 3 deep breaths.\nSay: "I release what no longer serves me."\nName one thing you\'re letting go.\nExhale it fully.',
+        duration: '3 mins'
+      },
+      {
+        action: 'Evening gratitude: name what held you today',
+        why: 'Gratitude before sleep rewires your brain toward positivity.',
+        practice: 'Reflect on your day.\nName one thing that held you.\nIt can be small: a smile, sunlight, a moment of ease.\nSay thank you.',
+        duration: '2 mins'
+      },
+      {
+        action: 'Body scan to transition from day to night',
+        why: 'Your body holds the day\'s stress. Releasing it prepares you for rest.',
+        practice: 'Lie down or sit comfortably.\nClose your eyes.\nScan from head to toes.\nWhere is tension?\nBreathe into those places.',
+        duration: '5 mins'
+      }
+    )
+  } else if (hour >= 22 || hour < 6) {
     suggestions.push({
-      action: 'Release the day with a simple closing ritual',
-      why: 'Evenings need closure to prepare for rest.',
-      practice: 'Take 3 deep breaths.\nSay: "I release what no longer serves me."\nName one thing you\'re letting go.\nExhale it fully.',
-      duration: '3 mins'
+      action: 'Nighttime self-compassion practice',
+      why: 'Late hours can bring harsh thoughts. You deserve kindness, especially now.',
+      practice: 'Place hand on your heart.\nSay: "I did my best today."\nBreathe.\nSay: "I am enough."\nLet yourself rest.',
+      duration: '2 mins'
     })
   }
 
@@ -391,6 +464,24 @@ function generateContextualSuggestion(
         action: 'Drink a glass of water mindfully',
         why: 'Hydration affects everything. Mindfulness deepens the care.',
         practice: 'Get water.\nHold the glass.\nTake slow sips.\nFeel the water nourishing you.\nSay thank you to your body.',
+        duration: '2 mins'
+      },
+      {
+        action: 'Notice what you\'re holding and set it down',
+        why: 'We carry invisible burdens. Sometimes we just need permission to put them down.',
+        practice: 'Close your eyes.\nAsk: "What am I holding that isn\'t mine to carry?"\nImagine setting it down.\nFeel the lightness.',
+        duration: '3 mins'
+      },
+      {
+        action: 'Appreciate something in your immediate space',
+        why: 'Beauty is always present. Noticing it shifts your state.',
+        practice: 'Look around.\nFind one thing that brings you ease.\nReally look at it for 1 minute.\nNotice its details.\nSay: "Thank you for being here."',
+        duration: '2 mins'
+      },
+      {
+        action: 'Place your hand on your heart and just breathe',
+        why: 'Touch is healing, even when it\'s your own. Your heart deserves acknowledgment.',
+        practice: 'Place your hand on your chest.\nFeel your heartbeat.\nBreathe slowly.\nSay: "I am here with you."\nStay for 5 breaths.',
         duration: '2 mins'
       }
     )
