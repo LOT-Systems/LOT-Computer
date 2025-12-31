@@ -389,13 +389,15 @@ export function useSound(enabled: boolean) {
 
   React.useEffect(() => {
     const audioContext = audioContextRef.current
+    let isCancelled = false
 
     ;(async () => {
-      if (audioContext && enabled) {
+      if (audioContext && enabled && !isCancelled) {
         // Resume audio context if suspended (required for mobile)
         if (audioContext.state === 'suspended') {
           try {
             await audioContext.resume()
+            if (isCancelled) return
             console.log('🎵 AudioContext resumed')
           } catch (error) {
             console.error('❌ Failed to resume AudioContext:', error)
@@ -405,6 +407,8 @@ export function useSound(enabled: boolean) {
         }
 
         try {
+          if (isCancelled) return
+
           const soundDesc = getSoundDescription(context)
           console.log(`🔊 Sound: On (${soundDesc})`)
           if (context.period === 'sunrise') {
@@ -440,6 +444,8 @@ export function useSound(enabled: boolean) {
           } catch (error) {
             console.error('Failed to update current sound:', error)
           }
+
+          if (isCancelled) return
 
           // Clean up existing sounds if context changed
           cleanupSounds(soundsRef.current, audioContext)
@@ -503,6 +509,8 @@ export function useSound(enabled: boolean) {
     })()
 
     return () => {
+      // Cancel async operations
+      isCancelled = true
       // Stop on cleanup
       if (audioContextRef.current) {
         cleanupSounds(soundsRef.current, audioContextRef.current)

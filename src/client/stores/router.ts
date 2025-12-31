@@ -20,8 +20,23 @@ export const router = createRouter<Routes>({
   logs: '/log',
 })
 
+// Debounce navigation to prevent rapid clicks causing issues
+let navigationTimeout: NodeJS.Timeout | null = null
+const NAVIGATION_DEBOUNCE_MS = 200
+
 export const goTo = <P extends keyof Routes>(
   page: P,
   params: Record<string, string> = {}
   // @ts-ignore FIXME:
-) => openPage(router, page, params)
+) => {
+  // Clear any pending navigation
+  if (navigationTimeout) {
+    clearTimeout(navigationTimeout)
+  }
+
+  // Debounce navigation to prevent rapid clicks
+  navigationTimeout = setTimeout(() => {
+    openPage(router, page, params)
+    navigationTimeout = null
+  }, NAVIGATION_DEBOUNCE_MS)
+}
