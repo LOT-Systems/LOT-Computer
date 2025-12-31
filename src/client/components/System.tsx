@@ -23,7 +23,9 @@ import { EmotionalCheckIn } from './EmotionalCheckIn'
 import { SelfCareMoments } from './SelfCareMoments'
 import { IntentionsWidget } from './IntentionsWidget'
 import { SubscribeWidget } from './SubscribeWidget'
+import { PlannerWidget } from './PlannerWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
+import { checkPlannerWidget } from '#client/stores/plannerWidget'
 
 export const System = () => {
   const me = useStore(stores.me)
@@ -204,9 +206,10 @@ export const System = () => {
     return options[index]
   }, [weather])
 
-  // Check for recipe suggestions when component mounts
+  // Check for recipe and planner suggestions when component mounts
   React.useEffect(() => {
     checkRecipeWidget()
+    checkPlannerWidget()
   }, [])
 
   // Sound is now managed globally in app.tsx via useSound hook
@@ -498,6 +501,9 @@ export const System = () => {
         const shouldShow = Math.random() < 0.2
         return shouldShow && <SubscribeWidget />
       })()}
+
+      {/* Planner - Show occasionally for daily/weekly planning */}
+      <PlannerWidget />
 
       <MemoryWidget />
     </div>
