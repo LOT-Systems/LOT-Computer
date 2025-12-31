@@ -29,34 +29,44 @@ export function EmotionalCheckIn() {
   const [view, setView] = React.useState<CheckInView>('prompt')
   const [response, setResponse] = React.useState<string | null>(null)
   const [insight, setInsight] = React.useState<string[] | null>(null)
-  const [showResponse, setShowResponse] = React.useState(false)
-  const [isVisible, setIsVisible] = React.useState(true)
-  const [isFading, setIsFading] = React.useState(false)
+  const [isDisplayed, setIsDisplayed] = React.useState(true)
+  const [isShown, setIsShown] = React.useState(true)
+  const [isPromptShown, setIsPromptShown] = React.useState(true)
+  const [isResponseShown, setIsResponseShown] = React.useState(false)
 
   const { data: checkInsData } = useEmotionalCheckIns(30) // Last 30 days
   const { mutate: createCheckIn, isLoading } = useCreateEmotionalCheckIn({
     onSuccess: (data) => {
-      setResponse(data.compassionateResponse)
-      setInsight(data.insights)
-      setShowResponse(true)
+      // Fade out buttons
+      setIsPromptShown(false)
 
-      // Fade out after showing response for 3 seconds
       setTimeout(() => {
-        setIsFading(true)
-      }, 3000)
+        // Clear buttons and show receipt
+        setResponse(data.compassionateResponse)
+        setInsight(data.insights)
 
-      // Hide widget after fade completes
-      setTimeout(() => {
-        setIsVisible(false)
-      }, 4400) // 3000ms visible + 1400ms fade
+        setTimeout(() => {
+          setIsResponseShown(true)
+
+          // Fade out after showing response
+          setTimeout(() => {
+            setIsShown(false)
+
+            setTimeout(() => {
+              setIsDisplayed(false)
+            }, 1500) // Fade duration
+          }, data.insights?.length ? 7000 : 5000) // Show longer if there are insights
+        }, 100)
+      }, 1500) // Wait for buttons to fade out
     }
   })
 
   const cycleView = () => {
-    // When cycling views, clear the response
-    setShowResponse(false)
+    // When cycling views, reset response state
+    setIsResponseShown(false)
     setResponse(null)
     setInsight(null)
+    setIsPromptShown(true)
 
     setView(prev => {
       switch (prev) {
@@ -79,7 +89,7 @@ export function EmotionalCheckIn() {
     })
   }
 
-  if (!isVisible) return null
+  if (!isDisplayed) return null
 
   const label =
     view === 'prompt' ? 'Mood:' :
@@ -94,28 +104,25 @@ export function EmotionalCheckIn() {
     'Right Now'
 
   return (
-    <div
+    <Block
+      label={label}
+      blockView
+      onLabelClick={cycleView}
       className={cn(
-        'transition-opacity duration-[1400ms]',
-        isFading ? 'opacity-0' : 'opacity-100'
+        'opacity-0 transition-opacity duration-[1400ms]',
+        isShown && 'opacity-100'
       )}
     >
-      <Block label={label} blockView onLabelClick={cycleView}>
       {view === 'prompt' && (
-        <div className="inline-block">
-          {showResponse && response ? (
-            <div>
-              <div className="mb-8 opacity-90">{response}</div>
-              {insight && insight.length > 0 && (
-                <div className="opacity-60 text-[14px]">
-                  {insight.map((i, idx) => (
-                    <div key={idx}>• {i}</div>
-                  ))}
-                </div>
+        <>
+          {!response ? (
+            <div
+              className={cn(
+                'inline-block',
+                'opacity-0 transition-opacity duration-[1400ms]',
+                isPromptShown && 'opacity-100'
               )}
-            </div>
-          ) : (
-            <>
+            >
               <div className="mb-16">
                 {checkInLabel === 'Morning' && 'How is your morning?'}
                 {checkInLabel === 'Evening' && 'How is your evening?'}
@@ -147,9 +154,26 @@ export function EmotionalCheckIn() {
                   Content
                 </Button>
               </div>
-            </>
+            </div>
+          ) : (
+            <div
+              className={cn(
+                'inline-block',
+                'opacity-0 transition-opacity duration-[1400ms]',
+                isResponseShown && 'opacity-100'
+              )}
+            >
+              <div className="mb-8 opacity-90">{response}</div>
+              {insight && insight.length > 0 && (
+                <div className="opacity-60 text-[14px]">
+                  {insight.map((i, idx) => (
+                    <div key={idx}>• {i}</div>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
-        </div>
+        </>
       )}
 
       {view === 'history' && checkInsData && (
@@ -199,6 +223,5 @@ export function EmotionalCheckIn() {
         </div>
       )}
     </Block>
-    </div>
   )
 }
