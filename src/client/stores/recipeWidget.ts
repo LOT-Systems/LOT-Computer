@@ -11,6 +11,9 @@ type RecipeWidgetState = {
 }
 
 const WIDGET_DURATION = 30 * 60 * 1000 // 30 minutes
+const CHECK_COOLDOWN = 2 * 60 * 1000 // 2 minutes between checks
+
+let lastCheckTime = 0
 
 export const recipeWidget = atom<RecipeWidgetState>({
   isVisible: false,
@@ -23,6 +26,13 @@ export const recipeWidget = atom<RecipeWidgetState>({
 // Check if widget should show (called on System tab mount and periodically)
 export async function checkRecipeWidget() {
   const now = Date.now()
+
+  // Prevent rapid successive checks (e.g., from component re-mounting)
+  if (now - lastCheckTime < CHECK_COOLDOWN) {
+    return
+  }
+  lastCheckTime = now
+
   const state = recipeWidget.get()
 
   // If widget is visible and time is up, hide it
