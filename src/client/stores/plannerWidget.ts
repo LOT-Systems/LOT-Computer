@@ -1,14 +1,14 @@
 import { atom } from 'nanostores'
 
-type PlanCategory = 'intent' | 'expression' | 'alignment' | 'admiration'
+type PlanCategory = 'intent' | 'today' | 'how' | 'feeling'
 
 type PlannerWidgetState = {
   isVisible: boolean
   values: {
     intent: string
-    expression: string
-    alignment: string
-    admiration: string
+    today: string
+    how: string
+    feeling: string
   }
   selectedCategory: PlanCategory
   showUntil: number
@@ -24,69 +24,69 @@ export const plannerWidget = atom<PlannerWidgetState>({
   isVisible: false,
   values: {
     intent: '',
-    expression: '',
-    alignment: '',
-    admiration: ''
+    today: '',
+    how: '',
+    feeling: ''
   },
   selectedCategory: 'intent',
   showUntil: 0,
   lastShownDate: ''
 })
 
-// Intent - Your deeper purpose calling
+// Intent - Your deeper purpose for this time
 const INTENT_OPTIONS = [
-  'To create something meaningful',
-  'To be fully present',
-  'To understand myself more deeply',
-  'To contribute to others',
-  'To express what\'s inside me',
-  'To discover what I\'m here for',
-  'To live with more clarity',
-  'To align with what matters',
-  'To follow what calls me',
-  'To honor my inner truth',
+  'Move forward on what matters',
+  'Create space for focus',
+  'Complete one meaningful thing',
+  'Make something real',
+  'Understand what I need',
+  'Follow what energizes me',
+  'Honor my natural pace',
+  'Express what\'s inside',
+  'Connect with what calls',
+  'Be present with the day',
 ]
 
-// Expression - How intent wants to manifest
-const EXPRESSION_OPTIONS = [
-  'Through focused attention',
-  'Through gentle presence',
-  'Through creative work',
-  'Through conversation',
-  'Through quiet reflection',
-  'Through making something real',
-  'Through honest engagement',
-  'Through patient observation',
-  'Through deliberate practice',
-  'Through being who I am',
+// Today - What you'll actually do (next few hours)
+const TODAY_OPTIONS = [
+  'Work on one focused task',
+  'Clear my physical space',
+  'Have one important conversation',
+  'Write or create for 30 minutes',
+  'Review and organize my thoughts',
+  'Take care of one pending thing',
+  'Plan my next 3 hours',
+  'Make progress on the project',
+  'Read or learn something new',
+  'Rest and restore energy',
 ]
 
-// Alignment - What supports your intent
-const ALIGNMENT_OPTIONS = [
-  'Saying no to what doesn\'t serve this',
-  'Creating space for what does',
-  'Following curiosity over obligation',
-  'Trusting the timing',
-  'Letting go of forcing',
-  'Honoring my natural rhythm',
+// How - Your approach to the time ahead
+const HOW_OPTIONS = [
+  'With full attention, no rushing',
+  'One thing at a time',
+  'Following my energy, not force',
+  'Taking breaks when needed',
   'Staying with what resonates',
-  'Releasing what doesn\'t',
-  'Moving at my own pace',
-  'Being honest about readiness',
+  'Being honest about capacity',
+  'Moving at my natural rhythm',
+  'Protecting my focus time',
+  'Letting go of perfection',
+  'Trusting the process',
 ]
 
-// Admiration - What you notice and appreciate
-const ADMIRATION_OPTIONS = [
-  'I notice I\'m willing to try',
-  'I see the pattern emerging',
-  'I appreciate my consistency',
-  'I recognize my courage here',
-  'I observe my honesty',
-  'I witness my patience',
-  'I value this commitment',
-  'I respect this choice',
-  'I honor this direction',
-  'I acknowledge my growth',
+// Feeling - The state you're aiming for
+const FEELING_OPTIONS = [
+  'Centered and clear',
+  'Engaged but not anxious',
+  'Present with what is',
+  'Calm and productive',
+  'Creative and flowing',
+  'Grounded and steady',
+  'Energized but sustainable',
+  'Peaceful and focused',
+  'Honest and aligned',
+  'Patient with myself',
 ]
 
 function getRandomOption(options: string[]): string {
@@ -99,46 +99,67 @@ function generateContextualPlan(): PlannerWidgetState['values'] {
 
   // Default random selection
   let intent = getRandomOption(INTENT_OPTIONS)
-  let expression = getRandomOption(EXPRESSION_OPTIONS)
-  let alignment = getRandomOption(ALIGNMENT_OPTIONS)
-  let admiration = getRandomOption(ADMIRATION_OPTIONS)
+  let today = getRandomOption(TODAY_OPTIONS)
+  let how = getRandomOption(HOW_OPTIONS)
+  let feeling = getRandomOption(FEELING_OPTIONS)
 
-  // Morning: focus on discovery and presence
+  // Early morning (6-9am): Start fresh
   if (hour >= 6 && hour < 9) {
-    intent = 'To be fully present'
-    expression = 'Through quiet reflection'
-    admiration = 'I notice I\'m willing to try'
+    intent = 'Create space for focus'
+    today = 'Plan my next 3 hours'
+    how = 'One thing at a time'
+    feeling = 'Centered and clear'
   }
 
-  // Midday: focus on creation and engagement
+  // Morning peak (9-12pm): Deep work
+  if (hour >= 9 && hour < 12) {
+    intent = 'Move forward on what matters'
+    today = 'Work on one focused task'
+    how = 'With full attention, no rushing'
+    feeling = 'Engaged but not anxious'
+  }
+
+  // Afternoon (12-3pm): Sustained energy
   if (hour >= 12 && hour < 15) {
-    intent = 'To create something meaningful'
-    expression = 'Through focused attention'
+    intent = 'Make something real'
+    today = 'Make progress on the project'
+    how = 'Following my energy, not force'
+    feeling = 'Calm and productive'
   }
 
-  // Evening: focus on understanding and honoring
+  // Late afternoon (3-6pm): Winding down
+  if (hour >= 15 && hour < 18) {
+    intent = 'Complete one meaningful thing'
+    today = 'Take care of one pending thing'
+    how = 'Being honest about capacity'
+    feeling = 'Patient with myself'
+  }
+
+  // Evening (6-9pm): Reflection
   if (hour >= 18 && hour < 21) {
-    intent = 'To understand myself more deeply'
-    expression = 'Through patient observation'
-    alignment = 'Honoring my natural rhythm'
+    intent = 'Honor my natural pace'
+    today = 'Review and organize my thoughts'
+    how = 'Staying with what resonates'
+    feeling = 'Present with what is'
   }
 
-  // Monday morning: weekly intention setting
-  if (day === 1 && hour >= 7 && hour < 10) {
-    intent = 'To discover what I\'m here for'
-    alignment = 'Following curiosity over obligation'
-    admiration = 'I recognize my courage here'
+  // Monday morning: Weekly planning
+  if (day === 1 && hour >= 7 && hour < 11) {
+    intent = 'Create space for focus'
+    today = 'Plan my next 3 hours'
+    how = 'One thing at a time'
+    feeling = 'Centered and clear'
   }
 
-  // Sunday evening: reflection and honoring
-  if (day === 0 && hour >= 17) {
-    intent = 'To honor my inner truth'
-    expression = 'Through gentle presence'
-    alignment = 'Trusting the timing'
-    admiration = 'I appreciate my consistency'
+  // Friday afternoon: Week completion
+  if (day === 5 && hour >= 14 && hour < 18) {
+    intent = 'Complete one meaningful thing'
+    today = 'Take care of one pending thing'
+    how = 'Letting go of perfection'
+    feeling = 'Patient with myself'
   }
 
-  return { intent, expression, alignment, admiration }
+  return { intent, today, how, feeling }
 }
 
 export async function checkPlannerWidget() {
@@ -173,16 +194,17 @@ export async function checkPlannerWidget() {
   // Only show once per day
   if (state.lastShownDate === today) return
 
-  // Show during contemplative times
-  const isMorning = hour >= 7 && hour < 9 // Morning reflection
-  const isMidAfternoon = hour >= 14 && hour < 16 // Afternoon pause
-  const isMondayMorning = day === 1 && hour >= 8 && hour < 11 // Weekly intention
-  const isSundayEvening = day === 0 && hour >= 17 && hour < 20 // Weekly reflection
+  // Show during planning times
+  const isMorning = hour >= 7 && hour < 9 // Morning planning
+  const isMidday = hour >= 11 && hour < 13 // Midday check-in
+  const isAfternoon = hour >= 14 && hour < 16 // Afternoon reset
+  const isMondayMorning = day === 1 && hour >= 8 && hour < 11 // Weekly planning
+  const isFridayAfternoon = day === 5 && hour >= 14 && hour < 17 // Week completion
 
-  if (!isMorning && !isMidAfternoon && !isMondayMorning && !isSundayEvening) return
+  if (!isMorning && !isMidday && !isAfternoon && !isMondayMorning && !isFridayAfternoon) return
 
-  // 40% chance to show during these times (higher than other widgets - this is important)
-  if (Math.random() > 0.4) return
+  // 50% chance to show during these times (planning is important!)
+  if (Math.random() > 0.5) return
 
   // Generate contextual plan
   const values = generateContextualPlan()
@@ -196,6 +218,36 @@ export async function checkPlannerWidget() {
   })
 }
 
+// Play click sound
+function playClickSound() {
+  // Create a short, satisfying click using Web Audio API
+  if (typeof window === 'undefined') return
+
+  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+
+  // Create a short click sound with two oscillators for richness
+  const oscillator1 = audioContext.createOscillator()
+  const oscillator2 = audioContext.createOscillator()
+  const gainNode = audioContext.createGain()
+
+  oscillator1.connect(gainNode)
+  oscillator2.connect(gainNode)
+  gainNode.connect(audioContext.destination)
+
+  // Frequencies for a pleasing click
+  oscillator1.frequency.value = 800 // Higher frequency
+  oscillator2.frequency.value = 400 // Lower frequency
+
+  // Very short duration for a click
+  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05)
+
+  oscillator1.start(audioContext.currentTime)
+  oscillator2.start(audioContext.currentTime)
+  oscillator1.stop(audioContext.currentTime + 0.05)
+  oscillator2.stop(audioContext.currentTime + 0.05)
+}
+
 // Navigate through suggestions
 export function cycleValue(direction: 'up' | 'down') {
   const state = plannerWidget.get()
@@ -204,9 +256,9 @@ export function cycleValue(direction: 'up' | 'down') {
   let options: string[]
   switch (category) {
     case 'intent': options = INTENT_OPTIONS; break
-    case 'expression': options = EXPRESSION_OPTIONS; break
-    case 'alignment': options = ALIGNMENT_OPTIONS; break
-    case 'admiration': options = ADMIRATION_OPTIONS; break
+    case 'today': options = TODAY_OPTIONS; break
+    case 'how': options = HOW_OPTIONS; break
+    case 'feeling': options = FEELING_OPTIONS; break
   }
 
   const currentIndex = options.indexOf(state.values[category])
@@ -217,6 +269,8 @@ export function cycleValue(direction: 'up' | 'down') {
   } else {
     newIndex = currentIndex === options.length - 1 ? 0 : currentIndex + 1
   }
+
+  playClickSound()
 
   plannerWidget.set({
     ...state,
@@ -230,7 +284,7 @@ export function cycleValue(direction: 'up' | 'down') {
 // Navigate between categories
 export function navigateCategory(direction: 'left' | 'right') {
   const state = plannerWidget.get()
-  const categories: PlanCategory[] = ['intent', 'expression', 'alignment', 'admiration']
+  const categories: PlanCategory[] = ['intent', 'today', 'how', 'feeling']
   const currentIndex = categories.indexOf(state.selectedCategory)
 
   let newIndex: number
@@ -239,6 +293,8 @@ export function navigateCategory(direction: 'left' | 'right') {
   } else {
     newIndex = currentIndex === categories.length - 1 ? 0 : currentIndex + 1
   }
+
+  playClickSound()
 
   plannerWidget.set({
     ...state,
