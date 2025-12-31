@@ -52,6 +52,7 @@ export const System = () => {
   const [showRadio, setShowRadio] = React.useState(false)
   const [astrologyView, setAstrologyView] = React.useState<'astrology' | 'psychology' | 'journey'>('astrology')
   const [showWeatherSuggestion, setShowWeatherSuggestion] = React.useState(false)
+  const [isSoundToggling, setIsSoundToggling] = React.useState(false)
 
   // Compute whether to show sunset or sunrise based on current time
   // Show sunset during daytime (between sunrise and sunset)
@@ -366,21 +367,30 @@ export const System = () => {
             }
           }}
           onChildrenClick={async () => {
-            if (showRadio) {
-              // Radio mode - toggle radio
-              stores.isRadioOn.set(!isRadioOn)
-            } else {
-              // Sound mode - toggle sound
-              const newValue = !isSoundOn
-              // @ts-ignore - Tone.js loaded via external script
-              if (newValue && window.Tone) {
-                try {
-                  await window.Tone.start()
-                } catch (e) {
-                  console.error('Failed to start Tone.context:', e)
+            // Prevent rapid clicks
+            if (isSoundToggling) return
+            setIsSoundToggling(true)
+
+            try {
+              if (showRadio) {
+                // Radio mode - toggle radio
+                stores.isRadioOn.set(!isRadioOn)
+              } else {
+                // Sound mode - toggle sound
+                const newValue = !isSoundOn
+                // @ts-ignore - Tone.js loaded via external script
+                if (newValue && window.Tone) {
+                  try {
+                    await window.Tone.start()
+                  } catch (e) {
+                    console.error('Failed to start Tone.context:', e)
+                  }
                 }
+                stores.isSoundOn.set(newValue)
               }
-              stores.isSoundOn.set(newValue)
+            } finally {
+              // Reset toggle state after a short delay
+              setTimeout(() => setIsSoundToggling(false), 300)
             }
           }}
         >
