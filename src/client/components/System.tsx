@@ -430,6 +430,15 @@ export const System = () => {
         const isAfternoon = hour >= 14 && hour < 17 // Post-lunch slump
         const isEvening = hour >= 19 && hour < 22 // Evening wind-down
 
+        // Check cooldown (3 hours since last interaction)
+        const lastInteraction = localStorage.getItem('self-care-last-interaction')
+        const threeHoursMs = 3 * 60 * 60 * 1000
+        const cooldownPassed = !lastInteraction ||
+          (Date.now() - parseInt(lastInteraction)) >= threeHoursMs
+
+        // Don't show if cooldown hasn't passed
+        if (!cooldownPassed) return null
+
         // Check if completed self-care today
         const today = new Date().toDateString()
         const stored = localStorage.getItem('self-care-completed')

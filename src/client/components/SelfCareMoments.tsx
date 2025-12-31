@@ -98,9 +98,15 @@ export function SelfCareMoments() {
   }
 
   const refreshSuggestion = () => {
-    // Log the skipped activity
+    // Log the skipped activity and set cooldown
     if (currentSuggestion) {
-      createLog({ text: `Self-care skipped: ${currentSuggestion.action}` })
+      createLog({
+        text: `Self-care skipped: ${currentSuggestion.action}`,
+        event: 'self_care_skip'
+      })
+
+      // Set cooldown timestamp
+      localStorage.setItem('self-care-last-interaction', Date.now().toString())
     }
 
     const suggestion = generateContextualSuggestion(
@@ -119,9 +125,15 @@ export function SelfCareMoments() {
     setCompletedToday(newCount)
     localStorage.setItem('self-care-completed', JSON.stringify({ date: today, count: newCount }))
 
-    // Log the completed activity
+    // Log the completed activity and set cooldown
     if (currentSuggestion) {
-      createLog({ text: `Self-care completed: ${currentSuggestion.action}` })
+      createLog({
+        text: `Self-care completed: ${currentSuggestion.action}`,
+        event: 'self_care_complete'
+      })
+
+      // Set cooldown timestamp
+      localStorage.setItem('self-care-last-interaction', Date.now().toString())
     }
 
     // Show completion message
