@@ -6,18 +6,21 @@ import { useCreateLog } from '#client/queries'
 import { cn } from '#client/utils'
 
 /**
- * Planner Widget - Spreadsheet-style mini-game for daily planning
+ * Planner Widget - Discover Your Ultimate Intent
  *
- * Shows 4 planning values:
- * - Priority: What matters most today
- * - Time: When to focus
- * - Energy: What energy level is needed
- * - Care: How to take care of yourself
+ * A contemplative practice for discovering and admiring your deeper purpose.
+ * Not about tasks - about aligning with what calls you.
+ *
+ * Four dimensions of Intent:
+ * - Intent: Your deeper purpose calling
+ * - Expression: How it wants to manifest
+ * - Alignment: What supports this intent
+ * - Admiration: What you notice and appreciate
  *
  * Navigation:
- * - ↑/↓: Cycle through suggestions for selected category
- * - ←/→: Move between categories
- * - OK: Save plan and dismiss
+ * - ↑/↓: Explore different aspects
+ * - ←/→: Move between dimensions
+ * - OK: Admire this plan (save & reflect)
  */
 export const PlannerWidget: React.FC = () => {
   const state = useStore(plannerWidget)
@@ -35,28 +38,28 @@ export const PlannerWidget: React.FC = () => {
     }
   }, [state.isVisible, completionMessage])
 
-  const handleSave = () => {
-    // Log the plan
-    const planText = `Plan: ${state.values.priority} | ${state.values.time} | ${state.values.energy} | ${state.values.care}`
+  const handleAdmire = () => {
+    // Log the intent as a plan to admire
+    const planText = `Intent: ${state.values.intent} • ${state.values.expression} • ${state.values.alignment} • ${state.values.admiration}`
     createLog({
       text: planText,
-      event: 'plan_set'
+      event: 'intent_discovered'
     })
 
-    // Show completion message
-    setCompletionMessage('Set.')
+    // Show completion with admiration
+    setCompletionMessage('Admired.')
 
-    // Fade out after 2 seconds
+    // Fade out after 3 seconds (longer to honor the moment)
     setTimeout(() => {
       setIsFading(true)
-    }, 2000)
+    }, 3000)
 
     // Hide widget after fade completes
     setTimeout(() => {
       dismissPlannerWidget()
       setCompletionMessage(null)
       setIsFading(false)
-    }, 3400) // 2000ms visible + 1400ms fade
+    }, 4400) // 3000ms visible + 1400ms fade
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -81,7 +84,7 @@ export const PlannerWidget: React.FC = () => {
         break
       case 'Enter':
         e.preventDefault()
-        handleSave()
+        handleAdmire()
         break
     }
   }
@@ -90,10 +93,10 @@ export const PlannerWidget: React.FC = () => {
 
   const getCategoryLabel = (category: typeof state.selectedCategory) => {
     switch (category) {
-      case 'priority': return 'Priority:'
-      case 'time': return 'Time:'
-      case 'energy': return 'Energy:'
-      case 'care': return 'Care:'
+      case 'intent': return 'Intent:'
+      case 'expression': return 'Expression:'
+      case 'alignment': return 'Alignment:'
+      case 'admiration': return 'Admiration:'
     }
   }
 
@@ -124,77 +127,93 @@ export const PlannerWidget: React.FC = () => {
               isShown && 'opacity-100'
             )}
           >
-            {/* Spreadsheet-style values */}
+            {/* Intent Discovery - Spreadsheet format */}
             <div className="mb-16 space-y-4">
-              {/* Priority */}
+              {/* Intent */}
               <div
                 className={cn(
-                  'px-8 py-4 rounded transition-colors',
-                  state.selectedCategory === 'priority'
+                  'px-8 py-4 rounded transition-colors cursor-pointer',
+                  state.selectedCategory === 'intent'
                     ? 'bg-acc/10 border border-acc/30'
-                    : 'border border-transparent'
+                    : 'border border-transparent hover:border-acc/10'
                 )}
-                onClick={() => navigateCategory('right')}
+                onClick={() => {
+                  if (state.selectedCategory !== 'intent') {
+                    navigateCategory('right')
+                  }
+                }}
               >
                 <div className="opacity-60 text-[12px] mb-2">
-                  {getCategoryLabel('priority')}
+                  {getCategoryLabel('intent')}
                 </div>
                 <div className="opacity-90">
-                  {state.values.priority}
+                  {state.values.intent}
                 </div>
               </div>
 
-              {/* Time */}
+              {/* Expression */}
               <div
                 className={cn(
-                  'px-8 py-4 rounded transition-colors',
-                  state.selectedCategory === 'time'
+                  'px-8 py-4 rounded transition-colors cursor-pointer',
+                  state.selectedCategory === 'expression'
                     ? 'bg-acc/10 border border-acc/30'
-                    : 'border border-transparent'
+                    : 'border border-transparent hover:border-acc/10'
                 )}
-                onClick={() => navigateCategory('right')}
+                onClick={() => {
+                  if (state.selectedCategory !== 'expression') {
+                    navigateCategory('right')
+                  }
+                }}
               >
                 <div className="opacity-60 text-[12px] mb-2">
-                  {getCategoryLabel('time')}
+                  {getCategoryLabel('expression')}
                 </div>
                 <div className="opacity-90">
-                  {state.values.time}
+                  {state.values.expression}
                 </div>
               </div>
 
-              {/* Energy */}
+              {/* Alignment */}
               <div
                 className={cn(
-                  'px-8 py-4 rounded transition-colors',
-                  state.selectedCategory === 'energy'
+                  'px-8 py-4 rounded transition-colors cursor-pointer',
+                  state.selectedCategory === 'alignment'
                     ? 'bg-acc/10 border border-acc/30'
-                    : 'border border-transparent'
+                    : 'border border-transparent hover:border-acc/10'
                 )}
-                onClick={() => navigateCategory('right')}
+                onClick={() => {
+                  if (state.selectedCategory !== 'alignment') {
+                    navigateCategory('right')
+                  }
+                }}
               >
                 <div className="opacity-60 text-[12px] mb-2">
-                  {getCategoryLabel('energy')}
+                  {getCategoryLabel('alignment')}
                 </div>
                 <div className="opacity-90">
-                  {state.values.energy}
+                  {state.values.alignment}
                 </div>
               </div>
 
-              {/* Care */}
+              {/* Admiration */}
               <div
                 className={cn(
-                  'px-8 py-4 rounded transition-colors',
-                  state.selectedCategory === 'care'
+                  'px-8 py-4 rounded transition-colors cursor-pointer',
+                  state.selectedCategory === 'admiration'
                     ? 'bg-acc/10 border border-acc/30'
-                    : 'border border-transparent'
+                    : 'border border-transparent hover:border-acc/10'
                 )}
-                onClick={() => navigateCategory('right')}
+                onClick={() => {
+                  if (state.selectedCategory !== 'admiration') {
+                    navigateCategory('right')
+                  }
+                }}
               >
                 <div className="opacity-60 text-[12px] mb-2">
-                  {getCategoryLabel('care')}
+                  {getCategoryLabel('admiration')}
                 </div>
                 <div className="opacity-90">
-                  {state.values.care}
+                  {state.values.admiration}
                 </div>
               </div>
             </div>
@@ -204,8 +223,8 @@ export const PlannerWidget: React.FC = () => {
               {/* Up arrow */}
               <button
                 onClick={() => cycleValue('up')}
-                className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
-                aria-label="Previous suggestion"
+                className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer text-[20px]"
+                aria-label="Explore previous"
               >
                 ↑
               </button>
@@ -214,15 +233,15 @@ export const PlannerWidget: React.FC = () => {
               <div className="flex gap-16">
                 <button
                   onClick={() => navigateCategory('left')}
-                  className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
-                  aria-label="Previous category"
+                  className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer text-[20px]"
+                  aria-label="Previous dimension"
                 >
                   ←
                 </button>
                 <button
                   onClick={() => navigateCategory('right')}
-                  className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
-                  aria-label="Next category"
+                  className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer text-[20px]"
+                  aria-label="Next dimension"
                 >
                   →
                 </button>
@@ -231,23 +250,23 @@ export const PlannerWidget: React.FC = () => {
               {/* Down arrow */}
               <button
                 onClick={() => cycleValue('down')}
-                className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
-                aria-label="Next suggestion"
+                className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer text-[20px]"
+                aria-label="Explore next"
               >
                 ↓
               </button>
             </div>
 
-            {/* OK Button */}
+            {/* Admire Button */}
             <div className="flex justify-center">
-              <Button onClick={handleSave}>
-                OK
+              <Button onClick={handleAdmire}>
+                Admire Plan
               </Button>
             </div>
 
-            {/* Hint */}
+            {/* Contemplative hint */}
             <div className="mt-12 opacity-40 text-[12px] text-center">
-              Use arrows or click to navigate • Enter to save
+              Explore what calls • Admire what emerges
             </div>
           </div>
         )}
