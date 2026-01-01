@@ -40,48 +40,27 @@ export function EmotionalCheckIn() {
       // Fade out buttons
       setIsPromptShown(false)
 
+      // Wait for buttons to fade out completely (1400ms)
       setTimeout(() => {
-        // Clear buttons and show "Noted." confirmation
-        setResponse('Noted.')
-        setInsight(null)
+        // Buttons are now gone - show the affirmation/response
+        setResponse(data.compassionateResponse || 'Noted.')
+        setInsight(data.insights)
 
+        // Fade in the response
         setTimeout(() => {
           setIsResponseShown(true)
 
-          // After showing "Noted.", optionally show compassionate response
+          // Show response for a while, then fade out entire widget
           setTimeout(() => {
-            // If there's a compassionate response or insights, show them
-            if (data.compassionateResponse || data.insights?.length) {
-              setIsResponseShown(false)
+            setIsShown(false)
 
-              setTimeout(() => {
-                setResponse(data.compassionateResponse)
-                setInsight(data.insights)
-
-                setTimeout(() => {
-                  setIsResponseShown(true)
-
-                  // Fade out after showing full response
-                  setTimeout(() => {
-                    setIsShown(false)
-                    setTimeout(() => {
-                      setIsDisplayed(false)
-                    }, 1400) // Match fade duration
-                  }, 5000) // Show full response for 5s
-                }, 100)
-              }, 1400) // Fade out "Noted."
-            } else {
-              // No additional response, just fade out "Noted."
-              setTimeout(() => {
-                setIsShown(false)
-                setTimeout(() => {
-                  setIsDisplayed(false)
-                }, 1400) // Match fade duration
-              }, 2000) // Show "Noted." for 2s
-            }
-          }, 2000) // Show "Noted." for 2s before checking for more
+            // After widget fades out, hide it completely
+            setTimeout(() => {
+              setIsDisplayed(false)
+            }, 1400) // Match fade duration
+          }, data.insights?.length ? 6000 : 4000) // Show longer if there are insights
         }, 100)
-      }, 1400) // Wait for buttons to fade out (match CSS transition)
+      }, 1400) // Wait for buttons to fade out completely
     }
   })
 
