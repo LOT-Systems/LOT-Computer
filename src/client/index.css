@@ -26,24 +26,10 @@ input:-webkit-autofill {
     @apply font-base tabular-nums;
     background-color: var(--base-color);
     color: rgb(var(--acc-color-default));
-
-    /* Advanced font smoothing for crisp, modern rendering */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
-    /* Optimized text rendering */
     text-rendering: optimizeLegibility;
-
-    /* OpenType features for professional typography */
-    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1, 'tnum' 1;
-
-    /* High-level font variant properties (modern CSS, with fallback) */
-    font-variant-ligatures: common-ligatures contextual;
-    font-variant-numeric: tabular-nums;
-
-    /* Better text sizing on mobile */
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   }
 
   /* Ensure all form elements inherit the font */
