@@ -41,23 +41,47 @@ export function EmotionalCheckIn() {
       setIsPromptShown(false)
 
       setTimeout(() => {
-        // Clear buttons and show receipt
-        setResponse(data.compassionateResponse)
-        setInsight(data.insights)
+        // Clear buttons and show "Noted." confirmation
+        setResponse('Noted.')
+        setInsight(null)
 
         setTimeout(() => {
           setIsResponseShown(true)
 
-          // Fade out after showing response
+          // After showing "Noted.", optionally show compassionate response
           setTimeout(() => {
-            setIsShown(false)
+            // If there's a compassionate response or insights, show them
+            if (data.compassionateResponse || data.insights?.length) {
+              setIsResponseShown(false)
 
-            setTimeout(() => {
-              setIsDisplayed(false)
-            }, 1500) // Fade duration
-          }, data.insights?.length ? 7000 : 5000) // Show longer if there are insights
+              setTimeout(() => {
+                setResponse(data.compassionateResponse)
+                setInsight(data.insights)
+
+                setTimeout(() => {
+                  setIsResponseShown(true)
+
+                  // Fade out after showing full response
+                  setTimeout(() => {
+                    setIsShown(false)
+                    setTimeout(() => {
+                      setIsDisplayed(false)
+                    }, 1400) // Match fade duration
+                  }, 5000) // Show full response for 5s
+                }, 100)
+              }, 1400) // Fade out "Noted."
+            } else {
+              // No additional response, just fade out "Noted."
+              setTimeout(() => {
+                setIsShown(false)
+                setTimeout(() => {
+                  setIsDisplayed(false)
+                }, 1400) // Match fade duration
+              }, 2000) // Show "Noted." for 2s
+            }
+          }, 2000) // Show "Noted." for 2s before checking for more
         }, 100)
-      }, 1500) // Wait for buttons to fade out
+      }, 1400) // Wait for buttons to fade out (match CSS transition)
     }
   })
 
