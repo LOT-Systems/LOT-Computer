@@ -33,7 +33,31 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
             'flex items-start w-full',
             !!props.onClick && 'group cursor-pointer'
           )}
-          onClick={props.onClick}
+          onClick={(e) => {
+            if (!props.onClick) return
+
+            // Don't trigger parent onClick if click came from an interactive element
+            // (buttons, links, or elements with their own onClick handlers)
+            let target = e.target as HTMLElement
+            const currentEl = e.currentTarget as HTMLElement
+
+            while (target && target !== currentEl) {
+              // Check if this element is interactive
+              if (
+                target.tagName === 'BUTTON' ||
+                target.tagName === 'A' ||
+                target.tagName === 'INPUT' ||
+                target.onclick !== null ||
+                target.getAttribute('role') === 'button'
+              ) {
+                return // Don't trigger parent onClick
+              }
+              target = target.parentElement as HTMLElement
+            }
+
+            // Safe to trigger parent onClick
+            props.onClick()
+          }}
         >
           <div
             className={cn(
@@ -52,7 +76,15 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
                   ),
                 props.labelClassName
               )}
-              onClick={props.onLabelClick}
+              onClick={(e) => {
+                if (props.onLabelClick) {
+                  // Prevent parent onClick from firing if both handlers exist
+                  if (props.onClick) {
+                    e.stopPropagation()
+                  }
+                  props.onLabelClick()
+                }
+              }}
             >
               {props.label}
             </span>
@@ -74,7 +106,18 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
                     : '',
                   props.labelClassName
                 )}
-                onClick={props.onChildrenClick || props.onClick}
+                onClick={(e) => {
+                  if (props.onChildrenClick) {
+                    // Prevent parent onClick from firing if both handlers exist
+                    if (props.onClick) {
+                      e.stopPropagation()
+                    }
+                    props.onChildrenClick()
+                  } else if (props.onClick) {
+                    // Let it bubble to parent onClick
+                    props.onClick()
+                  }
+                }}
               >
                 {props.children}
               </span>
