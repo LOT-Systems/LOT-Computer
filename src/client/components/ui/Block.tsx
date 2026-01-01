@@ -114,7 +114,8 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
                     }
                     props.onChildrenClick()
                   } else if (props.onClick) {
-                    // Let it bubble to parent onClick
+                    // Stop propagation to prevent parent div from also calling onClick
+                    e.stopPropagation()
                     props.onClick()
                   }
                 }}
