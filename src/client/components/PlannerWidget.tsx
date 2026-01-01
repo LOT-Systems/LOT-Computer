@@ -265,7 +265,7 @@ export const PlannerWidget: React.FC = () => {
             </div>
 
             {/* Planning hint */}
-            <div className="mt-12 opacity-40 text-[12px] text-center">
+            <div className="mt-12 opacity-60 text-[12px] text-center">
               Explore options • Set your direction
             </div>
           </div>
