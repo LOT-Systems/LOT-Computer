@@ -118,10 +118,9 @@ export function EmotionalCheckIn() {
     >
       {view === 'prompt' && (
         <>
-          {!response ? (
+          {!response && (
             <div
               className={cn(
-                'inline-block',
                 'opacity-0 transition-opacity duration-[1400ms]',
                 isPromptShown && 'opacity-100'
               )}
@@ -158,10 +157,10 @@ export function EmotionalCheckIn() {
                 </Button>
               </div>
             </div>
-          ) : (
+          )}
+          {!!response && (
             <div
               className={cn(
-                'inline-block',
                 'opacity-0 transition-opacity duration-[1400ms]',
                 isResponseShown && 'opacity-100'
               )}
