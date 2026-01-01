@@ -40,9 +40,9 @@ export function EmotionalCheckIn() {
       // Fade out buttons
       setIsPromptShown(false)
 
-      // Wait for buttons to fade out completely (1400ms)
+      // Wait for buttons to fade out completely (1500ms - gives buffer after 1400ms CSS transition)
       setTimeout(() => {
-        // Buttons are now gone - show the affirmation/response
+        // Buttons are now fully gone - show the affirmation/response
         setResponse(data.compassionateResponse || 'Noted.')
         setInsight(data.insights)
 
@@ -54,13 +54,13 @@ export function EmotionalCheckIn() {
           setTimeout(() => {
             setIsShown(false)
 
-            // After widget fades out, hide it completely
+            // After widget fades out, hide it completely (1500ms matches Memory widget)
             setTimeout(() => {
               setIsDisplayed(false)
-            }, 1400) // Match fade duration
-          }, data.insights?.length ? 6000 : 4000) // Show longer if there are insights
+            }, 1500)
+          }, data.insights?.length ? 7000 : 5000) // Show longer if there are insights
         }, 100)
-      }, 1400) // Wait for buttons to fade out completely
+      }, 1500) // Wait for buttons to fade out completely (matches Memory widget)
     }
   })
 
