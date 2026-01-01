@@ -469,12 +469,29 @@ export const System = () => {
         return (isMidMorning || isAfternoon || isEvening || completedToday === 0) && <SelfCareMoments />
       })()}
 
-      {/* Intentions - Show if user has intention OR it's early in month */}
+      {/* Intentions - Show if user has intention OR once every 2-3 days */}
       {(() => {
         const hasIntention = !!localStorage.getItem('current-intention')
-        const dayOfMonth = new Date().getDate()
-        const isEarlyMonth = dayOfMonth <= 7 // First week of month
-        return (hasIntention || isEarlyMonth) && <IntentionsWidget />
+
+        // Check cooldown (2-3 days since last shown)
+        const lastShown = localStorage.getItem('intentions-last-shown')
+        const twoDaysMs = 2 * 24 * 60 * 60 * 1000
+        const threeDaysMs = 3 * 24 * 60 * 60 * 1000
+
+        // Random cooldown between 2-3 days
+        const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
+        const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
+
+        // Show if they have an intention, or if cooldown passed
+        if (hasIntention || cooldownPassed) {
+          // Update last shown time
+          if (!lastShown || cooldownPassed) {
+            localStorage.setItem('intentions-last-shown', Date.now().toString())
+          }
+          return <IntentionsWidget />
+        }
+
+        return null
       })()}
 
       {/* Subscribe - Show occasionally to engaged users without subscription */}
