@@ -27,7 +27,31 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        base: ['Arial', 'Helvetica', 'sans-serif'],
+        base: [
+          /* Modern system fonts for crisp rendering */
+          '-apple-system',
+          'BlinkMacSystemFont',
+          /* Segoe UI for Windows */
+          '"Segoe UI"',
+          /* Roboto for Android */
+          'Roboto',
+          /* Oxygen for KDE */
+          'Oxygen',
+          /* Ubuntu for Ubuntu */
+          'Ubuntu',
+          /* Cantarell for GNOME */
+          'Cantarell',
+          /* Fallback to classic sans-serif */
+          'Arial',
+          'Helvetica',
+          'sans-serif',
+          /* Apple emoji support */
+          '"Apple Color Emoji"',
+          /* Segoe emoji support */
+          '"Segoe UI Emoji"',
+          /* Segoe symbol support */
+          '"Segoe UI Symbol"'
+        ],
       },
       lineHeight: {
         1: '1',
