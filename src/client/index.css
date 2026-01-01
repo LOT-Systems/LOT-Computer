@@ -35,22 +35,11 @@ input:-webkit-autofill {
     text-rendering: optimizeLegibility;
 
     /* OpenType features for professional typography */
-    font-feature-settings:
-      'kern' 1,  /* Kerning for better letter spacing */
-      'liga' 1,  /* Standard ligatures (fi, fl, etc.) */
-      'calt' 1,  /* Contextual alternates */
-      'tnum' 1,  /* Tabular numbers (same width) */
-      'case' 1;  /* Case-sensitive forms */
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1, 'tnum' 1;
 
-    /* High-level font variant properties (modern CSS) */
+    /* High-level font variant properties (modern CSS, with fallback) */
     font-variant-ligatures: common-ligatures contextual;
     font-variant-numeric: tabular-nums;
-
-    /* Prevent font synthesis (use real font weights/styles only) */
-    font-synthesis: none;
-
-    /* Optical sizing for variable fonts (future-proof) */
-    font-optical-sizing: auto;
 
     /* Better text sizing on mobile */
     -webkit-text-size-adjust: 100%;
