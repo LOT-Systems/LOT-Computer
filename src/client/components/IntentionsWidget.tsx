@@ -116,14 +116,14 @@ export function IntentionsWidget() {
         <div className="inline-block w-full">
           {isSettingIntention ? (
             <>
-              <div className="mb-12 opacity-60">What do you want to cultivate this month?</div>
+              <div className="mb-12 opacity-60 text-[20px]">What do you want to cultivate this month?</div>
               <input
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSetIntention()}
                 placeholder="One word or short phrase..."
-                className="w-full bg-transparent border-none outline-none mb-12 opacity-90"
+                className="w-full bg-transparent border-none outline-none mb-12 opacity-90 text-[20px]"
                 autoFocus
               />
               <div className="flex gap-8">
@@ -137,10 +137,10 @@ export function IntentionsWidget() {
             </>
           ) : (
             <>
-              <div className="mb-12 opacity-60">
+              <div className="mb-12 opacity-60 text-[20px]">
                 {intention ? 'Set a new intention for this month' : 'What aspect of yourself do you want to nurture this month?'}
               </div>
-              <div className="flex flex-col gap-6 opacity-60 mb-12">
+              <div className="flex flex-col gap-6 opacity-60 mb-12 text-[20px]">
                 <div>Examples:</div>
                 <div>• Presence</div>
                 <div>• Self-compassion</div>
@@ -161,10 +161,10 @@ export function IntentionsWidget() {
           <div className="mb-8">
             <span className="text-[20px] capitalize">{intention.focus}</span>
           </div>
-          <div className="opacity-60 mb-12">
+          <div className="opacity-60 mb-12 text-[20px]">
             {intention.monthYear}
           </div>
-          <div className="flex items-center gap-8 opacity-60">
+          <div className="flex items-center gap-8 opacity-60 text-[20px]">
             <span>Day {daysSince + 1}</span>
             <span>•</span>
             <Button onClick={handleReleaseIntention} className="opacity-60 hover:opacity-100">
@@ -176,7 +176,7 @@ export function IntentionsWidget() {
 
       {view === 'current' && !intention && (
         <div className="inline-block">
-          <div className="opacity-60 mb-12">No intention set yet.</div>
+          <div className="opacity-60 mb-12 text-[20px]">No intention set yet.</div>
           <Button onClick={() => setView('set')}>
             Set Your Intention
           </Button>
@@ -185,8 +185,8 @@ export function IntentionsWidget() {
 
       {view === 'reflection' && intention && (
         <div className="inline-block">
-          <div className="mb-12 opacity-90">{getReflectionPrompts()}</div>
-          <div className="opacity-60">
+          <div className="mb-12 opacity-90 text-[20px]">{getReflectionPrompts()}</div>
+          <div className="opacity-60 text-[20px]">
             Reflecting on: <span className="capitalize">{intention.focus}</span>
           </div>
         </div>
@@ -194,7 +194,7 @@ export function IntentionsWidget() {
 
       {view === 'reflection' && !intention && (
         <div className="inline-block">
-          <div className="opacity-60">Set an intention first to begin reflection.</div>
+          <div className="opacity-60 text-[20px]">Set an intention first to begin reflection.</div>
         </div>
       )}
     </Block>
