@@ -19,8 +19,8 @@ import { recordSignal } from '#client/stores/intentionEngine'
  * - Feeling: The state you're aiming for
  *
  * Navigation:
- * - ↑/↓: Explore different options
- * - ←/→: Move between dimensions
+ * - ←/→: Explore different options
+ * - ↑/↓: Move between dimensions
  * - OK: Set this plan (save & begin)
  */
 export const PlannerWidget: React.FC = () => {
@@ -78,19 +78,19 @@ export const PlannerWidget: React.FC = () => {
     switch (e.key) {
       case 'ArrowUp':
         e.preventDefault()
-        cycleValue('up')
+        navigateCategory('left')
         break
       case 'ArrowDown':
         e.preventDefault()
-        cycleValue('down')
+        navigateCategory('right')
         break
       case 'ArrowLeft':
         e.preventDefault()
-        navigateCategory('left')
+        cycleValue('up')
         break
       case 'ArrowRight':
         e.preventDefault()
-        navigateCategory('right')
+        cycleValue('down')
         break
       case 'Enter':
         e.preventDefault()
@@ -232,9 +232,9 @@ export const PlannerWidget: React.FC = () => {
             <div className="flex flex-col items-center gap-4 mb-16">
               {/* Up arrow */}
               <button
-                onClick={() => cycleValue('up')}
+                onClick={() => navigateCategory('left')}
                 className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer text-[20px]"
-                aria-label="Explore previous"
+                aria-label="Previous dimension"
               >
                 ↑
               </button>
@@ -242,16 +242,16 @@ export const PlannerWidget: React.FC = () => {
               {/* Left/Right arrows */}
               <div className="flex gap-16">
                 <button
-                  onClick={() => navigateCategory('left')}
+                  onClick={() => cycleValue('up')}
                   className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer text-[20px]"
-                  aria-label="Previous dimension"
+                  aria-label="Explore previous"
                 >
                   ←
                 </button>
                 <button
-                  onClick={() => navigateCategory('right')}
+                  onClick={() => cycleValue('down')}
                   className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer text-[20px]"
-                  aria-label="Next dimension"
+                  aria-label="Explore next"
                 >
                   →
                 </button>
@@ -259,9 +259,9 @@ export const PlannerWidget: React.FC = () => {
 
               {/* Down arrow */}
               <button
-                onClick={() => cycleValue('down')}
+                onClick={() => navigateCategory('right')}
                 className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer text-[20px]"
-                aria-label="Explore next"
+                aria-label="Next dimension"
               >
                 ↓
               </button>
