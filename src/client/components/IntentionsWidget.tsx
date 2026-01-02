@@ -140,7 +140,7 @@ export function IntentionsWidget() {
               <div className="mb-12 opacity-60">
                 {intention ? 'Set a new intention for this month' : 'What aspect of yourself do you want to nurture this month?'}
               </div>
-              <div className="flex flex-col gap-6 opacity-60 text-[14px] mb-12">
+              <div className="flex flex-col gap-6 opacity-60 mb-12">
                 <div>Examples:</div>
                 <div>• Presence</div>
                 <div>• Self-compassion</div>
@@ -161,13 +161,13 @@ export function IntentionsWidget() {
           <div className="mb-8">
             <span className="text-[20px] capitalize">{intention.focus}</span>
           </div>
-          <div className="opacity-60 text-[14px] mb-12">
+          <div className="opacity-60 mb-12">
             {intention.monthYear}
           </div>
-          <div className="flex items-center gap-8 opacity-60 text-[14px]">
+          <div className="flex items-center gap-8 opacity-60">
             <span>Day {daysSince + 1}</span>
             <span>•</span>
-            <Button onClick={handleReleaseIntention} className="text-[14px] opacity-60 hover:opacity-100">
+            <Button onClick={handleReleaseIntention} className="opacity-60 hover:opacity-100">
               Release
             </Button>
           </div>
@@ -186,7 +186,7 @@ export function IntentionsWidget() {
       {view === 'reflection' && intention && (
         <div className="inline-block">
           <div className="mb-12 opacity-90">{getReflectionPrompts()}</div>
-          <div className="opacity-60 text-[14px]">
+          <div className="opacity-60">
             Reflecting on: <span className="capitalize">{intention.focus}</span>
           </div>
         </div>
