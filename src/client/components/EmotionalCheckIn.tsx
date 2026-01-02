@@ -43,11 +43,7 @@ export function EmotionalCheckIn() {
 
       // Wait for buttons to fade out completely (1500ms - matches Memory widget)
       setTimeout(() => {
-        // Clear button state (important for clean transition)
-        setResponse(null)
-        setInsight(null)
-
-        // Set the affirmation/response
+        // Set the affirmation/response (no need to clear first - direct replacement)
         const fullResponse = data.compassionateResponse || 'Noted.'
         setResponse(fullResponse)
         setInsight(data.insights)
