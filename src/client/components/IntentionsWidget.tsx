@@ -137,11 +137,10 @@ export function IntentionsWidget() {
             </>
           ) : (
             <>
-              <div className="mb-12">
-                {intention ? 'Set a new intention for this month' : 'What aspect of yourself do you want to nurture this month?'}
+              <div className="mb-16">
+                {intention ? 'Set a new intention for this month.' : 'What aspect of yourself do you want to nurture this month?'} Examples:
               </div>
-              <div className="flex flex-col gap-6 mb-12">
-                <div>Examples:</div>
+              <div className="flex flex-col gap-6 mb-16">
                 <div>• Presence</div>
                 <div>• Self-compassion</div>
                 <div>• Creative flow</div>
