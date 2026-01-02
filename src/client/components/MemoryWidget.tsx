@@ -6,6 +6,7 @@ import { cn } from '#client/utils'
 import { fp } from '#shared/utils'
 import { MemoryQuestion } from '#shared/types'
 import * as stores from '#client/stores'
+import { recordSignal } from '#client/stores/intentionEngine'
 
 export function MemoryWidget() {
   const [isDisplayed, setIsDisplayed] = React.useState(false)
@@ -50,6 +51,15 @@ export function MemoryWidget() {
   const onAnswer = React.useCallback(
     (option: string) => (ev: React.MouseEvent) => {
       if (!question || !question.id) return
+
+      // Record intention signal for quantum pattern recognition
+      recordSignal('memory', 'answer_given', {
+        questionId: question.id,
+        option,
+        question: question.question,
+        hour: new Date().getHours()
+      })
+
       createMemory({
         questionId: question.id,
         option,

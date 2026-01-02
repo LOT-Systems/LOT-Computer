@@ -2,6 +2,7 @@ import React from 'react'
 import { Block, Button } from '#client/components/ui'
 import { useCreateEmotionalCheckIn, useEmotionalCheckIns } from '#client/queries'
 import { cn } from '#client/utils'
+import { recordSignal } from '#client/stores/intentionEngine'
 
 type CheckInView = 'prompt' | 'history' | 'patterns'
 
@@ -92,6 +93,9 @@ export function EmotionalCheckIn() {
   const handleCheckIn = (emotionalState: EmotionalState) => {
     const hour = new Date().getHours()
     const checkInType = hour < 12 ? 'morning' : hour >= 19 ? 'evening' : 'moment'
+
+    // Record intention signal for quantum pattern recognition
+    recordSignal('mood', emotionalState, { checkInType, hour })
 
     createCheckIn({
       checkInType,

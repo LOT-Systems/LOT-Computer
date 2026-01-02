@@ -1,5 +1,6 @@
 import React from 'react'
 import { Block, Button } from '#client/components/ui'
+import { recordSignal } from '#client/stores/intentionEngine'
 
 type IntentionView = 'set' | 'current' | 'reflection'
 
@@ -62,6 +63,12 @@ export function IntentionsWidget() {
       setDate: new Date(),
       monthYear: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
     }
+
+    // Record intention signal for quantum pattern recognition
+    recordSignal('intentions', 'intention_set', {
+      focus: newIntention.focus,
+      monthYear: newIntention.monthYear
+    })
 
     localStorage.setItem('current-intention', JSON.stringify(newIntention))
     setIntention(newIntention)

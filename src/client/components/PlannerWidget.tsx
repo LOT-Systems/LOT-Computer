@@ -4,6 +4,7 @@ import { plannerWidget, cycleValue, navigateCategory, dismissPlannerWidget } fro
 import { Block, Button } from '#client/components/ui'
 import { useCreateLog } from '#client/queries'
 import { cn } from '#client/utils'
+import { recordSignal } from '#client/stores/intentionEngine'
 
 /**
  * Planner Widget - Daily Planning Practice
@@ -39,6 +40,15 @@ export const PlannerWidget: React.FC = () => {
   }, [state.isVisible, completionMessage])
 
   const handleSetPlan = () => {
+    // Record intention signal for quantum pattern recognition
+    recordSignal('planner', 'plan_set', {
+      intent: state.values.intent,
+      today: state.values.today,
+      how: state.values.how,
+      feeling: state.values.feeling,
+      hour: new Date().getHours()
+    })
+
     // Log the plan
     const planText = `Intent: ${state.values.intent} • Today: ${state.values.today} • How: ${state.values.how} • Feeling: ${state.values.feeling}`
     createLog({

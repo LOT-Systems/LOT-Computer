@@ -4,6 +4,7 @@ import * as stores from '#client/stores'
 import { Block, Button } from '#client/components/ui'
 import { useProfile, useEmotionalCheckIns, useCreateLog } from '#client/queries'
 import { cn } from '#client/utils'
+import { recordSignal } from '#client/stores/intentionEngine'
 
 type CareView = 'suggestion' | 'why' | 'practice'
 
@@ -125,8 +126,15 @@ export function SelfCareMoments() {
     setCompletedToday(newCount)
     localStorage.setItem('self-care-completed', JSON.stringify({ date: today, count: newCount }))
 
-    // Log the completed activity and set cooldown
+    // Record intention signal for quantum pattern recognition
     if (currentSuggestion) {
+      recordSignal('selfcare', 'practice_completed', {
+        action: currentSuggestion.action,
+        count: newCount,
+        hour: new Date().getHours()
+      })
+
+      // Log the completed activity and set cooldown
       createLog({
         text: `Self-care completed: ${currentSuggestion.action}`,
         event: 'self_care_complete'
