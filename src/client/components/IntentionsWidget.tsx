@@ -110,6 +110,11 @@ export function IntentionsWidget() {
     ? Math.floor((new Date().getTime() - new Date(intention.setDate).getTime()) / (1000 * 60 * 60 * 24))
     : 0
 
+  // Get total days in the month when intention was set
+  const totalDaysInMonth = intention
+    ? new Date(new Date(intention.setDate).getFullYear(), new Date(intention.setDate).getMonth() + 1, 0).getDate()
+    : 30
+
   return (
     <Block label={label} blockView onLabelClick={cycleView}>
       {view === 'set' && (
@@ -160,16 +165,12 @@ export function IntentionsWidget() {
           <div className="mb-8">
             <span className="capitalize">{intention.focus}</span>
           </div>
-          <div className="mb-12">
-            {intention.monthYear}
+          <div className="mb-16">
+            {intention.monthYear}; Day {daysSince + 1}/{totalDaysInMonth}
           </div>
-          <div className="flex items-center gap-8">
-            <span>Day {daysSince + 1}</span>
-            <span>•</span>
-            <Button onClick={handleReleaseIntention}>
-              Release
-            </Button>
-          </div>
+          <Button onClick={handleReleaseIntention}>
+            Release
+          </Button>
         </div>
       )}
 
