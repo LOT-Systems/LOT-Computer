@@ -159,7 +159,7 @@ export function IntentionsWidget() {
       {view === 'current' && intention && (
         <div className="inline-block">
           <div className="mb-8">
-            <span className="text-[20px] capitalize">{intention.focus}</span>
+            <span className="capitalize">{intention.focus}</span>
           </div>
           <div className="mb-12">
             {intention.monthYear}
