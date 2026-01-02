@@ -158,7 +158,7 @@ export function IntentionsWidget() {
 
       {view === 'current' && intention && (
         <div className="inline-block">
-          <div className="mb-8">
+          <div className="mb-8 opacity-90">
             <span className="text-[20px] capitalize">{intention.focus}</span>
           </div>
           <div className="opacity-60 text-[14px] mb-12">
@@ -167,9 +167,9 @@ export function IntentionsWidget() {
           <div className="flex items-center gap-8 opacity-60 text-[14px]">
             <span>Day {daysSince + 1}</span>
             <span>•</span>
-            <Button onClick={handleReleaseIntention} className="text-[14px] opacity-60 hover:opacity-100">
+            <button onClick={handleReleaseIntention} className="hover:opacity-100 transition-opacity">
               Release
-            </Button>
+            </button>
           </div>
         </div>
       )}
