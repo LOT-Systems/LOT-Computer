@@ -109,14 +109,14 @@ export function IntentionsWidget() {
         <div className="inline-block w-full">
           {isSettingIntention ? (
             <>
-              <div className="mb-12 opacity-70">What do you want to cultivate this month?</div>
+              <div className="mb-12 opacity-60">What do you want to cultivate this month?</div>
               <input
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSetIntention()}
                 placeholder="One word or short phrase..."
-                className="w-full bg-transparent border-none outline-none mb-12 opacity-80"
+                className="w-full bg-transparent border-none outline-none mb-12 opacity-90"
                 autoFocus
               />
               <div className="flex gap-8">
@@ -130,7 +130,7 @@ export function IntentionsWidget() {
             </>
           ) : (
             <>
-              <div className="mb-12 opacity-70">
+              <div className="mb-12 opacity-60">
                 {intention ? 'Set a new intention for this month' : 'What aspect of yourself do you want to nurture this month?'}
               </div>
               <div className="flex flex-col gap-6 opacity-60 text-[14px] mb-12">
@@ -152,7 +152,7 @@ export function IntentionsWidget() {
       {view === 'current' && intention && (
         <div className="inline-block">
           <div className="mb-8">
-            <span className="text-[18px] capitalize">{intention.focus}</span>
+            <span className="text-[20px] capitalize">{intention.focus}</span>
           </div>
           <div className="opacity-60 text-[14px] mb-12">
             {intention.monthYear}
