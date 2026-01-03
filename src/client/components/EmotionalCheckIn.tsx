@@ -139,28 +139,92 @@ export function EmotionalCheckIn() {
                 {checkInLabel === 'Right Now' && 'How are you right now?'}
               </div>
               <div className="flex flex-wrap gap-8">
-                <Button onClick={() => handleCheckIn('energized')} disabled={isLoading}>
+                <Button
+                  onClick={() => handleCheckIn('energized')}
+                  disabled={isLoading}
+                  className={cn(
+                    'transition-opacity duration-[400ms]',
+                    !isPromptShown && 'opacity-0'
+                  )}
+                  style={{ transitionDelay: !isPromptShown ? '0ms' : '0ms' }}
+                >
                   Energized
                 </Button>
-                <Button onClick={() => handleCheckIn('calm')} disabled={isLoading}>
+                <Button
+                  onClick={() => handleCheckIn('calm')}
+                  disabled={isLoading}
+                  className={cn(
+                    'transition-opacity duration-[400ms]',
+                    !isPromptShown && 'opacity-0'
+                  )}
+                  style={{ transitionDelay: !isPromptShown ? '50ms' : '0ms' }}
+                >
                   Calm
                 </Button>
-                <Button onClick={() => handleCheckIn('tired')} disabled={isLoading}>
+                <Button
+                  onClick={() => handleCheckIn('tired')}
+                  disabled={isLoading}
+                  className={cn(
+                    'transition-opacity duration-[400ms]',
+                    !isPromptShown && 'opacity-0'
+                  )}
+                  style={{ transitionDelay: !isPromptShown ? '100ms' : '0ms' }}
+                >
                   Tired
                 </Button>
-                <Button onClick={() => handleCheckIn('anxious')} disabled={isLoading}>
+                <Button
+                  onClick={() => handleCheckIn('anxious')}
+                  disabled={isLoading}
+                  className={cn(
+                    'transition-opacity duration-[400ms]',
+                    !isPromptShown && 'opacity-0'
+                  )}
+                  style={{ transitionDelay: !isPromptShown ? '150ms' : '0ms' }}
+                >
                   Anxious
                 </Button>
-                <Button onClick={() => handleCheckIn('hopeful')} disabled={isLoading}>
+                <Button
+                  onClick={() => handleCheckIn('hopeful')}
+                  disabled={isLoading}
+                  className={cn(
+                    'transition-opacity duration-[400ms]',
+                    !isPromptShown && 'opacity-0'
+                  )}
+                  style={{ transitionDelay: !isPromptShown ? '200ms' : '0ms' }}
+                >
                   Hopeful
                 </Button>
-                <Button onClick={() => handleCheckIn('grateful')} disabled={isLoading}>
+                <Button
+                  onClick={() => handleCheckIn('grateful')}
+                  disabled={isLoading}
+                  className={cn(
+                    'transition-opacity duration-[400ms]',
+                    !isPromptShown && 'opacity-0'
+                  )}
+                  style={{ transitionDelay: !isPromptShown ? '250ms' : '0ms' }}
+                >
                   Grateful
                 </Button>
-                <Button onClick={() => handleCheckIn('overwhelmed')} disabled={isLoading}>
+                <Button
+                  onClick={() => handleCheckIn('overwhelmed')}
+                  disabled={isLoading}
+                  className={cn(
+                    'transition-opacity duration-[400ms]',
+                    !isPromptShown && 'opacity-0'
+                  )}
+                  style={{ transitionDelay: !isPromptShown ? '300ms' : '0ms' }}
+                >
                   Overwhelmed
                 </Button>
-                <Button onClick={() => handleCheckIn('content')} disabled={isLoading}>
+                <Button
+                  onClick={() => handleCheckIn('content')}
+                  disabled={isLoading}
+                  className={cn(
+                    'transition-opacity duration-[400ms]',
+                    !isPromptShown && 'opacity-0'
+                  )}
+                  style={{ transitionDelay: !isPromptShown ? '350ms' : '0ms' }}
+                >
                   Content
                 </Button>
               </div>
@@ -173,9 +237,9 @@ export function EmotionalCheckIn() {
                 isResponseShown && 'opacity-100'
               )}
             >
-              <div className="mb-8 opacity-90">{response}</div>
+              <div className="mb-8">{response}</div>
               {insight && insight.length > 0 && (
-                <div className="opacity-60 text-[14px]">
+                <div>
                   {insight.map((i, idx) => (
                     <div key={idx}>• {i}</div>
                   ))}
@@ -189,7 +253,7 @@ export function EmotionalCheckIn() {
       {view === 'history' && checkInsData && (
         <div className="inline-block">
           {checkInsData.checkIns.length === 0 ? (
-            <div className="opacity-60">No check-ins yet. Start tracking your mood.</div>
+            <div>No check-ins yet. Start tracking your mood.</div>
           ) : (
             <div className="flex flex-col gap-4">
               {checkInsData.checkIns.slice(0, 5).map((checkIn: any) => {
@@ -201,7 +265,7 @@ export function EmotionalCheckIn() {
                 })
                 return (
                   <div key={checkIn.id} className="flex items-center justify-between gap-16">
-                    <span className="opacity-60">{time}</span>
+                    <span>{time}</span>
                     <span className="capitalize">{checkIn.metadata?.emotionalState}</span>
                   </div>
                 )
@@ -214,17 +278,17 @@ export function EmotionalCheckIn() {
       {view === 'patterns' && checkInsData?.stats && (
         <div className="inline-block">
           {checkInsData.stats.total === 0 ? (
-            <div className="opacity-60">Check in more to see patterns.</div>
+            <div>Check in more to see patterns.</div>
           ) : (
             <>
               <div className="mb-12">
                 <div className="flex items-center gap-8">
                   <span className="text-[20px]">{checkInsData.stats.total}</span>
-                  <span className="opacity-60">Check-ins</span>
+                  <span>Check-ins</span>
                 </div>
               </div>
               {checkInsData.stats.dominantMood && (
-                <div className="opacity-70">
+                <div>
                   Most common: <span className="capitalize">{checkInsData.stats.dominantMood}</span>
                 </div>
               )}
