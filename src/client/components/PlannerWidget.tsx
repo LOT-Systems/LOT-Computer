@@ -153,10 +153,10 @@ export const PlannerWidget: React.FC = () => {
                   }
                 }}
               >
-                <div className="opacity-60 text-[12px] mb-2">
+                <div className="mb-2">
                   {getCategoryLabel('intent')}
                 </div>
-                <div className="opacity-90">
+                <div>
                   {state.values.intent}
                 </div>
               </div>
@@ -175,10 +175,10 @@ export const PlannerWidget: React.FC = () => {
                   }
                 }}
               >
-                <div className="opacity-60 text-[12px] mb-2">
+                <div className="mb-2">
                   {getCategoryLabel('today')}
                 </div>
-                <div className="opacity-90">
+                <div>
                   {state.values.today}
                 </div>
               </div>
@@ -197,10 +197,10 @@ export const PlannerWidget: React.FC = () => {
                   }
                 }}
               >
-                <div className="opacity-60 text-[12px] mb-2">
+                <div className="mb-2">
                   {getCategoryLabel('how')}
                 </div>
-                <div className="opacity-90">
+                <div>
                   {state.values.how}
                 </div>
               </div>
@@ -219,10 +219,10 @@ export const PlannerWidget: React.FC = () => {
                   }
                 }}
               >
-                <div className="opacity-60 text-[12px] mb-2">
+                <div className="mb-2">
                   {getCategoryLabel('feeling')}
                 </div>
-                <div className="opacity-90">
+                <div>
                   {state.values.feeling}
                 </div>
               </div>
@@ -231,40 +231,36 @@ export const PlannerWidget: React.FC = () => {
             {/* Controller */}
             <div className="flex flex-col items-center gap-4 mb-16">
               {/* Up arrow */}
-              <button
+              <Button
                 onClick={() => navigateCategory('left')}
-                className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer text-[20px]"
                 aria-label="Previous dimension"
               >
                 ↑
-              </button>
+              </Button>
 
               {/* Left/Right arrows */}
-              <div className="flex gap-16">
-                <button
+              <div className="flex gap-8">
+                <Button
                   onClick={() => cycleValue('up')}
-                  className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer text-[20px]"
                   aria-label="Explore previous"
                 >
                   ←
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => cycleValue('down')}
-                  className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer text-[20px]"
                   aria-label="Explore next"
                 >
                   →
-                </button>
+                </Button>
               </div>
 
               {/* Down arrow */}
-              <button
+              <Button
                 onClick={() => navigateCategory('right')}
-                className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer text-[20px]"
                 aria-label="Next dimension"
               >
                 ↓
-              </button>
+              </Button>
             </div>
 
             {/* Set Plan Button */}
@@ -275,7 +271,7 @@ export const PlannerWidget: React.FC = () => {
             </div>
 
             {/* Planning hint */}
-            <div className="mt-12 opacity-60 text-[12px] text-center">
+            <div className="mt-12 text-center">
               Explore options • Set your direction
             </div>
           </div>
