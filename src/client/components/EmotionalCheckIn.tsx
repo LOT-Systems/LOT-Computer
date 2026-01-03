@@ -144,7 +144,7 @@ export function EmotionalCheckIn() {
                   disabled={isLoading}
                   className={cn(
                     'transition-opacity duration-[400ms]',
-                    !isPromptShown && 'opacity-0'
+                    isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
                   style={{ transitionDelay: !isPromptShown ? '0ms' : '0ms' }}
                 >
@@ -155,7 +155,7 @@ export function EmotionalCheckIn() {
                   disabled={isLoading}
                   className={cn(
                     'transition-opacity duration-[400ms]',
-                    !isPromptShown && 'opacity-0'
+                    isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
                   style={{ transitionDelay: !isPromptShown ? '50ms' : '0ms' }}
                 >
@@ -166,7 +166,7 @@ export function EmotionalCheckIn() {
                   disabled={isLoading}
                   className={cn(
                     'transition-opacity duration-[400ms]',
-                    !isPromptShown && 'opacity-0'
+                    isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
                   style={{ transitionDelay: !isPromptShown ? '100ms' : '0ms' }}
                 >
@@ -177,7 +177,7 @@ export function EmotionalCheckIn() {
                   disabled={isLoading}
                   className={cn(
                     'transition-opacity duration-[400ms]',
-                    !isPromptShown && 'opacity-0'
+                    isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
                   style={{ transitionDelay: !isPromptShown ? '150ms' : '0ms' }}
                 >
@@ -188,7 +188,7 @@ export function EmotionalCheckIn() {
                   disabled={isLoading}
                   className={cn(
                     'transition-opacity duration-[400ms]',
-                    !isPromptShown && 'opacity-0'
+                    isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
                   style={{ transitionDelay: !isPromptShown ? '200ms' : '0ms' }}
                 >
@@ -199,7 +199,7 @@ export function EmotionalCheckIn() {
                   disabled={isLoading}
                   className={cn(
                     'transition-opacity duration-[400ms]',
-                    !isPromptShown && 'opacity-0'
+                    isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
                   style={{ transitionDelay: !isPromptShown ? '250ms' : '0ms' }}
                 >
@@ -210,7 +210,7 @@ export function EmotionalCheckIn() {
                   disabled={isLoading}
                   className={cn(
                     'transition-opacity duration-[400ms]',
-                    !isPromptShown && 'opacity-0'
+                    isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
                   style={{ transitionDelay: !isPromptShown ? '300ms' : '0ms' }}
                 >
@@ -221,7 +221,7 @@ export function EmotionalCheckIn() {
                   disabled={isLoading}
                   className={cn(
                     'transition-opacity duration-[400ms]',
-                    !isPromptShown && 'opacity-0'
+                    isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
                   style={{ transitionDelay: !isPromptShown ? '350ms' : '0ms' }}
                 >
