@@ -127,11 +127,8 @@ export function EmotionalCheckIn() {
       {view === 'prompt' && (
         <>
           {!response && (
-            <div>
-              <div className={cn(
-                'mb-16 transition-opacity duration-[1400ms]',
-                isPromptShown ? 'opacity-100' : 'opacity-0'
-              )}>
+            <>
+              <div className="mb-16">
                 {checkInLabel === 'Morning' && 'How is your morning?'}
                 {checkInLabel === 'Evening' && 'How is your evening?'}
                 {checkInLabel === 'Right Now' && 'How are you right now?'}
@@ -141,10 +138,10 @@ export function EmotionalCheckIn() {
                   onClick={() => handleCheckIn('energized')}
                   disabled={isLoading}
                   className={cn(
-                    'transition-opacity duration-[400ms]',
+                    'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: !isPromptShown ? '0ms' : '0ms' }}
+                  style={{ transitionDelay: isPromptShown ? '0ms' : '0ms' }}
                 >
                   Energized
                 </Button>
@@ -152,10 +149,10 @@ export function EmotionalCheckIn() {
                   onClick={() => handleCheckIn('calm')}
                   disabled={isLoading}
                   className={cn(
-                    'transition-opacity duration-[400ms]',
+                    'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: !isPromptShown ? '50ms' : '0ms' }}
+                  style={{ transitionDelay: isPromptShown ? '0ms' : '50ms' }}
                 >
                   Calm
                 </Button>
@@ -163,10 +160,10 @@ export function EmotionalCheckIn() {
                   onClick={() => handleCheckIn('tired')}
                   disabled={isLoading}
                   className={cn(
-                    'transition-opacity duration-[400ms]',
+                    'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: !isPromptShown ? '100ms' : '0ms' }}
+                  style={{ transitionDelay: isPromptShown ? '0ms' : '100ms' }}
                 >
                   Tired
                 </Button>
@@ -174,10 +171,10 @@ export function EmotionalCheckIn() {
                   onClick={() => handleCheckIn('anxious')}
                   disabled={isLoading}
                   className={cn(
-                    'transition-opacity duration-[400ms]',
+                    'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: !isPromptShown ? '150ms' : '0ms' }}
+                  style={{ transitionDelay: isPromptShown ? '0ms' : '150ms' }}
                 >
                   Anxious
                 </Button>
@@ -185,10 +182,10 @@ export function EmotionalCheckIn() {
                   onClick={() => handleCheckIn('hopeful')}
                   disabled={isLoading}
                   className={cn(
-                    'transition-opacity duration-[400ms]',
+                    'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: !isPromptShown ? '200ms' : '0ms' }}
+                  style={{ transitionDelay: isPromptShown ? '0ms' : '200ms' }}
                 >
                   Hopeful
                 </Button>
@@ -196,10 +193,10 @@ export function EmotionalCheckIn() {
                   onClick={() => handleCheckIn('grateful')}
                   disabled={isLoading}
                   className={cn(
-                    'transition-opacity duration-[400ms]',
+                    'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: !isPromptShown ? '250ms' : '0ms' }}
+                  style={{ transitionDelay: isPromptShown ? '0ms' : '250ms' }}
                 >
                   Grateful
                 </Button>
@@ -207,10 +204,10 @@ export function EmotionalCheckIn() {
                   onClick={() => handleCheckIn('overwhelmed')}
                   disabled={isLoading}
                   className={cn(
-                    'transition-opacity duration-[400ms]',
+                    'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: !isPromptShown ? '300ms' : '0ms' }}
+                  style={{ transitionDelay: isPromptShown ? '0ms' : '300ms' }}
                 >
                   Overwhelmed
                 </Button>
@@ -218,15 +215,15 @@ export function EmotionalCheckIn() {
                   onClick={() => handleCheckIn('content')}
                   disabled={isLoading}
                   className={cn(
-                    'transition-opacity duration-[400ms]',
+                    'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: !isPromptShown ? '350ms' : '0ms' }}
+                  style={{ transitionDelay: isPromptShown ? '0ms' : '350ms' }}
                 >
                   Content
                 </Button>
               </div>
-            </div>
+            </>
           )}
           {!!response && (
             <div
