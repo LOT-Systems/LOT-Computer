@@ -282,6 +282,28 @@ export const useCohorts = () =>
     staleTime: 10 * 60 * 1000, // Cache for 10 minutes (cohorts don't change frequently)
   })()
 
+export interface ContextualPrompt {
+  type: 'check-in' | 'suggestion' | 'insight' | 'connection'
+  title: string
+  message: string
+  action?: {
+    label: string
+    target: 'mood' | 'memory' | 'sync' | 'log'
+  }
+  priority: number
+  triggeredBy: string
+}
+
+export const useContextualPrompts = () =>
+  createQuery<{
+    prompts: ContextualPrompt[]
+    generatedAt: string
+    message?: string
+  }>('/api/contextual-prompts', {
+    refetchOnWindowFocus: false,
+    staleTime: 15 * 60 * 1000, // Cache for 15 minutes (context changes slowly)
+  })()
+
 // ============================================================================
 // EMOTIONAL CHECK-IN QUERIES
 // ============================================================================
