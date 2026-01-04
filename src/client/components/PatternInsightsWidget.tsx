@@ -1,22 +1,26 @@
 import * as React from 'react'
 import { Block, GhostButton } from '#client/components/ui'
-import { usePatterns, useCohorts } from '#client/queries'
+import { usePatterns, useCohorts, usePatternEvolution } from '#client/queries'
+import dayjs from '#client/utils/dayjs'
 
 export const PatternInsightsWidget = () => {
   const { data: patternsData } = usePatterns()
   const { data: cohortsData } = useCohorts()
-  const [view, setView] = React.useState<'patterns' | 'cohorts'>('patterns')
+  const { data: evolutionData } = usePatternEvolution()
+  const [view, setView] = React.useState<'patterns' | 'cohorts' | 'evolution'>('patterns')
 
   // Don't show if no data
-  if (!patternsData && !cohortsData) return null
+  if (!patternsData && !cohortsData && !evolutionData) return null
 
   const insights = patternsData?.insights || []
   const matches = cohortsData?.matches || []
+  const evolution = evolutionData?.evolution || []
   const hasPatterns = insights.length > 0
   const hasCohorts = matches.length > 0
+  const hasEvolution = evolution.length > 0
 
-  // Don't show if no patterns and no cohorts
-  if (!hasPatterns && !hasCohorts) {
+  // Don't show if no patterns, cohorts, or evolution
+  if (!hasPatterns && !hasCohorts && !hasEvolution) {
     // Show encouraging message if user has started but needs more data
     if (patternsData?.message || cohortsData?.message) {
       return (
@@ -32,18 +36,36 @@ export const PatternInsightsWidget = () => {
     return null
   }
 
-  // Cycle between views if both are available
+  // Cycle between views
   const handleLabelClick = () => {
-    if (hasPatterns && hasCohorts) {
-      setView(view === 'patterns' ? 'cohorts' : 'patterns')
+    const availableViews: Array<'patterns' | 'cohorts' | 'evolution'> = []
+    if (hasPatterns) availableViews.push('patterns')
+    if (hasCohorts) availableViews.push('cohorts')
+    if (hasEvolution) availableViews.push('evolution')
+
+    if (availableViews.length <= 1) return
+
+    const currentIndex = availableViews.indexOf(view)
+    const nextIndex = (currentIndex + 1) % availableViews.length
+    setView(availableViews[nextIndex])
+  }
+
+  const getLabel = () => {
+    switch (view) {
+      case 'patterns': return 'Patterns:'
+      case 'cohorts': return 'Your Cohort:'
+      case 'evolution': return 'Evolution:'
+      default: return 'Patterns:'
     }
   }
+
+  const canCycleViews = (hasPatterns ? 1 : 0) + (hasCohorts ? 1 : 0) + (hasEvolution ? 1 : 0) > 1
 
   return (
     <div>
       <Block
-        label={view === 'patterns' ? 'Patterns:' : 'Your Cohort:'}
-        onLabelClick={hasPatterns && hasCohorts ? handleLabelClick : undefined}
+        label={getLabel()}
+        onLabelClick={canCycleViews ? handleLabelClick : undefined}
         blockView
       >
         {view === 'patterns' && hasPatterns && (
@@ -85,6 +107,32 @@ export const PatternInsightsWidget = () => {
                     {match.sharedPatterns.map((pattern, pidx) => (
                       <div key={pidx}>• {pattern}</div>
                     ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {view === 'evolution' && hasEvolution && (
+          <div className="flex flex-col gap-12">
+            <div className="mb-8">
+              How your patterns have evolved:
+            </div>
+            {evolution.slice(0, 3).map((evo, idx) => (
+              <div key={idx} className="inline-block">
+                <div className="mb-8">
+                  {evo.patternTitle}
+                </div>
+                <div className="mb-4">
+                  {evo.trend === 'strengthening' && '↗ Strengthening over time'}
+                  {evo.trend === 'stable' && '→ Stable pattern'}
+                  {evo.trend === 'weakening' && '↘ Fading pattern'}
+                  {evo.trend === 'emerging' && '✦ New pattern emerging'}
+                </div>
+                {evo.timeline.length > 0 && (
+                  <div>
+                    {evo.timeline.length} observation{evo.timeline.length > 1 ? 's' : ''} from {dayjs(evo.firstSeen).format('MMM D')} to {dayjs(evo.lastSeen).format('MMM D')}
                   </div>
                 )}
               </div>

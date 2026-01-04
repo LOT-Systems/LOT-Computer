@@ -27,7 +27,7 @@ import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
-import { generateContextualPrompts, generatePatternAwareQuestion } from '#server/utils/contextual-prompts'
+import { generateContextualPrompts, generatePatternAwareQuestion, analyzePatternEvolution } from '#server/utils/contextual-prompts'
 import dayjs from '#server/utils/dayjs'
 
 // ============================================================================
@@ -2181,6 +2181,86 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       })
       return {
         prompts: [],
+        error: error.message
+      }
+    }
+  })
+
+  // Get pattern evolution over time
+  fastify.get('/pattern-evolution', async (req, reply) => {
+    try {
+      const Log = await import('#server/models/log.js').then(m => m.default)
+
+      // Get all user logs (up to 500 for historical analysis)
+      const allLogs = await Log.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 500
+      })
+
+      if (allLogs.length < 20) {
+        return {
+          evolution: [],
+          message: 'Need more data to track pattern evolution. Keep building your practice!'
+        }
+      }
+
+      // Analyze patterns from different time periods
+      const now = dayjs()
+      const timeWindows = [
+        { label: 'Current', weeks: 0, days: 14 },  // Last 2 weeks
+        { label: '2 weeks ago', weeks: 2, days: 14 },
+        { label: '4 weeks ago', weeks: 4, days: 14 },
+        { label: '8 weeks ago', weeks: 8, days: 14 }
+      ]
+
+      const historicalPatterns: { analyzedAt: string; patterns: PatternInsight[] }[] = []
+
+      for (const window of timeWindows) {
+        const endDate = now.subtract(window.weeks, 'week')
+        const startDate = endDate.subtract(window.days, 'day')
+
+        // Filter logs within this time window
+        const windowLogs = allLogs.filter(log => {
+          const logDate = dayjs(log.createdAt)
+          return logDate.isAfter(startDate) && logDate.isBefore(endDate)
+        })
+
+        if (windowLogs.length >= 5) {
+          const patterns = await analyzeUserPatterns(req.user, windowLogs)
+          if (patterns.length > 0) {
+            historicalPatterns.push({
+              analyzedAt: endDate.toISOString(),
+              patterns
+            })
+          }
+        }
+      }
+
+      if (historicalPatterns.length < 2) {
+        return {
+          evolution: [],
+          message: 'Need more historical data to track evolution. Check back in a few weeks!'
+        }
+      }
+
+      const evolution = analyzePatternEvolution(historicalPatterns)
+
+      console.log(`📈 Analyzed ${evolution.length} pattern evolutions for user ${req.user.id}`)
+
+      return {
+        evolution,
+        timeWindows: historicalPatterns.map(h => h.analyzedAt),
+        analyzedAt: new Date().toISOString()
+      }
+
+    } catch (error: any) {
+      console.error('❌ Error analyzing pattern evolution:', {
+        error: error.message,
+        userId: req.user?.id
+      })
+      return {
+        evolution: [],
         error: error.message
       }
     }

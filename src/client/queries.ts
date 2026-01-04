@@ -304,6 +304,31 @@ export const useContextualPrompts = () =>
     staleTime: 15 * 60 * 1000, // Cache for 15 minutes (context changes slowly)
   })()
 
+export interface PatternEvolution {
+  patternType: string
+  patternTitle: string
+  timeline: {
+    week: string
+    confidence: number
+    dataPoints: number
+    value?: any
+  }[]
+  trend: 'strengthening' | 'stable' | 'weakening' | 'emerging'
+  firstSeen: string
+  lastSeen: string
+}
+
+export const usePatternEvolution = () =>
+  createQuery<{
+    evolution: PatternEvolution[]
+    timeWindows: string[]
+    analyzedAt: string
+    message?: string
+  }>('/api/pattern-evolution', {
+    refetchOnWindowFocus: false,
+    staleTime: 60 * 60 * 1000, // Cache for 1 hour (evolution is slow)
+  })()
+
 // ============================================================================
 // EMOTIONAL CHECK-IN QUERIES
 // ============================================================================
