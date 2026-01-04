@@ -234,21 +234,24 @@ export const PlannerWidget: React.FC = () => {
               <Button
                 onClick={() => navigateCategory('left')}
                 aria-label="Previous dimension"
+                className="w-[60px]"
               >
                 ↑
               </Button>
 
               {/* Left/Right arrows */}
-              <div className="flex gap-8">
+              <div className="flex gap-4">
                 <Button
                   onClick={() => cycleValue('up')}
                   aria-label="Explore previous"
+                  className="w-[60px]"
                 >
                   ←
                 </Button>
                 <Button
                   onClick={() => cycleValue('down')}
                   aria-label="Explore next"
+                  className="w-[60px]"
                 >
                   →
                 </Button>
@@ -258,6 +261,7 @@ export const PlannerWidget: React.FC = () => {
               <Button
                 onClick={() => navigateCategory('right')}
                 aria-label="Next dimension"
+                className="w-[60px]"
               >
                 ↓
               </Button>
