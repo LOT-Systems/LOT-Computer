@@ -14,7 +14,7 @@ import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
 import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
-import { useVisitorStats, useProfile, useLogs } from '#client/queries'
+import { useVisitorStats, useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { UserTag } from '#shared/types'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
@@ -46,6 +46,7 @@ export const System = () => {
   const { data: visitorStats } = useVisitorStats()
   const { data: profile } = useProfile()
   const { data: logs = [] } = useLogs()
+  const { data: communityEmotion } = useCommunityEmotion()
 
   const isTempFahrenheit = useStore(stores.isTempFahrenheit)
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
@@ -61,6 +62,7 @@ export const System = () => {
   const [astrologyView, setAstrologyView] = React.useState<'astrology' | 'psychology' | 'journey'>('astrology')
   const [showWeatherSuggestion, setShowWeatherSuggestion] = React.useState(false)
   const [isSoundToggling, setIsSoundToggling] = React.useState(false)
+  const [showSharedEmotion, setShowSharedEmotion] = React.useState(false)
 
   // Compute whether to show sunset or sunrise based on current time
   // Show sunset during daytime (between sunrise and sunset)
@@ -256,8 +258,19 @@ export const System = () => {
       )}
 
       <div>
-        <Block label="Users online:" onClick={() => stores.goTo('sync')}>
-          {formatNumberWithCommas(usersOnline)}
+        <Block
+          label={showSharedEmotion ? "Shared emotion:" : "Users online:"}
+          onClick={() => setShowSharedEmotion(!showSharedEmotion)}
+        >
+          {showSharedEmotion ? (
+            communityEmotion?.sharedEmotion ? (
+              <span className="capitalize">{communityEmotion.sharedEmotion}</span>
+            ) : (
+              'Calculating...'
+            )
+          ) : (
+            formatNumberWithCommas(usersOnline)
+          )}
         </Block>
         <Block label="Total users:">
           {me?.isAdmin ? (
