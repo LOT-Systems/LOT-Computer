@@ -28,6 +28,10 @@ import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
 import { generateContextualPrompts, generatePatternAwareQuestion, analyzePatternEvolution } from '#server/utils/contextual-prompts'
+import { analyzeEnergyState, generateEnergySuggestions } from '#server/utils/energy'
+import { generateUserNarrative } from '#server/utils/rpg-narrative'
+import { generateChatCatalysts, generateConversationStarters, shouldShowChatCatalyst } from '#server/utils/cohort-chat-catalyst'
+import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
 
 // ============================================================================
@@ -2261,6 +2265,249 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       })
       return {
         evolution: [],
+        error: error.message
+      }
+    }
+  })
+
+  // Get user's energy state
+  fastify.get('/energy', async (req, reply) => {
+    try {
+      const Log = await import('#server/models/log.js').then(m => m.default)
+
+      const logs = await Log.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 100
+      })
+
+      if (logs.length < 3) {
+        return {
+          energyState: null,
+          message: 'Keep tracking! Energy analysis available after 3+ entries.'
+        }
+      }
+
+      const energyState = analyzeEnergyState(logs)
+      const suggestions = generateEnergySuggestions(energyState)
+
+      console.log(`⚡ Energy state for user ${req.user.id}: ${energyState.status} (${energyState.currentLevel}/100)`)
+
+      return {
+        energyState,
+        suggestions,
+        analyzedAt: new Date().toISOString()
+      }
+
+    } catch (error: any) {
+      console.error('❌ Error analyzing energy:', {
+        error: error.message,
+        userId: req.user?.id
+      })
+      return {
+        energyState: null,
+        error: error.message
+      }
+    }
+  })
+
+  // Get user's RPG narrative and achievements
+  fastify.get('/narrative', async (req, reply) => {
+    try {
+      const Log = await import('#server/models/log.js').then(m => m.default)
+
+      const logs = await Log.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 500
+      })
+
+      if (logs.length === 0) {
+        return {
+          narrative: null,
+          message: 'Your story begins with your first action.'
+        }
+      }
+
+      const narrative = generateUserNarrative(req.user, logs)
+
+      console.log(`📖 Generated narrative for user ${req.user.id}: Level ${narrative.currentLevel}, Chapter ${narrative.currentArc.chapter}`)
+
+      return {
+        narrative,
+        generatedAt: new Date().toISOString()
+      }
+
+    } catch (error: any) {
+      console.error('❌ Error generating narrative:', {
+        error: error.message,
+        userId: req.user?.id
+      })
+      return {
+        narrative: null,
+        error: error.message
+      }
+    }
+  })
+
+  // Get chat catalysts (prompts to connect with cohort)
+  fastify.get('/chat-catalysts', async (req, reply) => {
+    try {
+      const User = await import('#server/models/user.js').then(m => m.default)
+      const Log = await import('#server/models/log.js').then(m => m.default)
+
+      // Get user's patterns and cohorts
+      const userLogs = await Log.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 100
+      })
+
+      if (userLogs.length < 10) {
+        return {
+          catalysts: [],
+          message: 'Keep building your practice! Chat suggestions available after 10+ entries.'
+        }
+      }
+
+      const userPatterns = await analyzeUserPatterns(req.user, userLogs)
+      if (userPatterns.length === 0) {
+        return { catalysts: [], message: 'No patterns yet to match with others.' }
+      }
+
+      // Get cohort matches
+      const allUsers = await User.findAll({
+        where: {
+          city: { [Op.not]: null },
+          country: { [Op.not]: null },
+          id: { [Op.not]: req.user.id }
+        },
+        attributes: ['id', 'firstName', 'lastName', 'city', 'country', 'metadata', 'lastSeenAt']
+      })
+
+      const patternCache = new Map<string, PatternInsight[]>()
+      const getUserPatterns = async (userId: string): Promise<PatternInsight[]> => {
+        if (patternCache.has(userId)) return patternCache.get(userId)!
+        const logs = await Log.findAll({
+          where: { userId },
+          order: [['createdAt', 'DESC']],
+          limit: 100
+        })
+        const user = allUsers.find(u => u.id === userId)
+        if (!user || logs.length < 5) return []
+        const patterns = await analyzeUserPatterns(user, logs)
+        patternCache.set(userId, patterns)
+        return patterns
+      }
+
+      const cohortMatches = await findCohortMatches(
+        req.user,
+        userPatterns,
+        allUsers,
+        getUserPatterns
+      )
+
+      // Get current emotional state
+      const recentCheckIn = userLogs.find(l => l.event === 'emotional_checkin')
+      const currentEmotionalState = recentCheckIn?.metadata?.emotionalState as string | undefined
+
+      // Get social energy needs
+      const energyState = analyzeEnergyState(userLogs)
+      const socialNeed = energyState.needsReplenishment.find(n => n.category === 'social')
+
+      const catalysts = generateChatCatalysts(
+        req.user,
+        cohortMatches,
+        allUsers,
+        currentEmotionalState,
+        socialNeed
+      )
+
+      console.log(`💬 Generated ${catalysts.length} chat catalysts for user ${req.user.id}`)
+
+      return {
+        catalysts,
+        generatedAt: new Date().toISOString()
+      }
+
+    } catch (error: any) {
+      console.error('❌ Error generating chat catalysts:', {
+        error: error.message,
+        userId: req.user?.id
+      })
+      return {
+        catalysts: [],
+        error: error.message
+      }
+    }
+  })
+
+  // Get compassionate interventions
+  fastify.get('/interventions', async (req, reply) => {
+    try {
+      const Log = await import('#server/models/log.js').then(m => m.default)
+
+      const logs = await Log.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 100
+      })
+
+      if (logs.length < 5) {
+        return {
+          interventions: [],
+          message: 'Keep going. Caring interventions emerge as patterns develop.'
+        }
+      }
+
+      // Analyze current state
+      const recentCheckIns = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
+      const emotionalCounts: Record<string, number> = {}
+      for (const checkIn of recentCheckIns) {
+        const state = checkIn.metadata?.emotionalState as string
+        if (state) {
+          emotionalCounts[state] = (emotionalCounts[state] || 0) + 1
+        }
+      }
+
+      const dominantMood = Object.entries(emotionalCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'unknown'
+      const daysInPattern = recentCheckIns.filter(c => c.metadata?.emotionalState === dominantMood).length
+
+      const negativeStates = ['anxious', 'overwhelmed', 'exhausted', 'tired']
+      const isStrugglingPattern = negativeStates.includes(dominantMood)
+
+      const energyState = analyzeEnergyState(logs)
+
+      const userState = {
+        emotionalPattern: {
+          dominantMood,
+          daysInPattern,
+          isStrugglingPattern
+        },
+        energyState,
+        recentLogs: logs.slice(0, 20),
+        romanticConnectionState: {
+          daysDisconnected: energyState.romanticConnection.daysSinceConnection,
+          qualityLevel: energyState.romanticConnection.connectionQuality
+        }
+      }
+
+      const interventions = generateCompassionateInterventions(userState)
+
+      console.log(`🫂 Generated ${interventions.length} interventions for user ${req.user.id}`)
+
+      return {
+        interventions,
+        generatedAt: new Date().toISOString()
+      }
+
+    } catch (error: any) {
+      console.error('❌ Error generating interventions:', {
+        error: error.message,
+        userId: req.user?.id
+      })
+      return {
+        interventions: [],
         error: error.message
       }
     }
