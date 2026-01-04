@@ -128,7 +128,10 @@ export function EmotionalCheckIn() {
         <>
           {!response && (
             <>
-              <div className="mb-16">
+              <div className={cn(
+                'mb-16 transition-opacity duration-[1400ms]',
+                isPromptShown ? 'opacity-100' : 'opacity-0'
+              )}>
                 {checkInLabel === 'Morning' && 'How is your morning?'}
                 {checkInLabel === 'Evening' && 'How is your evening?'}
                 {checkInLabel === 'Right Now' && 'How are you right now?'}
