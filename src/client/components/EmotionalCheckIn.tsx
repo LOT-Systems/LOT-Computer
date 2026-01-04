@@ -1,6 +1,6 @@
 import React from 'react'
 import { Block, Button } from '#client/components/ui'
-import { useCreateEmotionalCheckIn, useEmotionalCheckIns } from '#client/queries'
+import { useCreateEmotionalCheckIn, useEmotionalCheckIns, useLogs } from '#client/queries'
 import { cn } from '#client/utils'
 import { recordSignal } from '#client/stores/intentionEngine'
 
@@ -35,8 +35,34 @@ export function EmotionalCheckIn() {
   const [isPromptShown, setIsPromptShown] = React.useState(true)
   const [isResponseShown, setIsResponseShown] = React.useState(false)
   const [clickedButtonIndex, setClickedButtonIndex] = React.useState<number | null>(null)
+  const [shouldRender, setShouldRender] = React.useState(true) // Control whether widget should render at all
 
   const { data: checkInsData } = useEmotionalCheckIns(30) // Last 30 days
+  const { data: logs = [] } = useLogs()
+
+  // Check visibility based on time and cooldown
+  React.useEffect(() => {
+    const hour = new Date().getHours()
+    const isMorning = hour >= 6 && hour < 12
+    const isEvening = hour >= 17 && hour < 22
+    const isMidDay = hour >= 12 && hour < 17
+
+    // Check if 3 hours have passed since last check-in
+    const emotionalCheckIns = logs.filter(log => log.event === 'emotional_checkin')
+    const lastCheckIn = emotionalCheckIns[0]
+    const threeHoursMs = 3 * 60 * 60 * 1000
+    const threeHoursPassed = !lastCheckIn ||
+      (Date.now() - new Date(lastCheckIn.createdAt).getTime()) >= threeHoursMs
+
+    // Only hide if cooldown hasn't passed AND we're not currently showing a response
+    // This ensures the widget can complete its farewell animation
+    if (!threeHoursPassed && !response) {
+      setShouldRender(false)
+    } else if (threeHoursPassed && (isMorning || isEvening || isMidDay)) {
+      setShouldRender(true)
+    }
+  }, [logs, response])
+
   const { mutate: createCheckIn, isLoading } = useCreateEmotionalCheckIn({
     onSuccess: (data) => {
       // Fade out buttons
@@ -63,6 +89,7 @@ export function EmotionalCheckIn() {
               setIsResponseShown(false)
               setResponse(null)
               setInsight(null)
+              setShouldRender(false) // Now safe to stop rendering
             }, 1500)
           }, data.insights?.length ? 7000 : 5000) // Show longer if there are insights
         }, 100)
@@ -108,7 +135,7 @@ export function EmotionalCheckIn() {
     })
   }
 
-  if (!isDisplayed) return null
+  if (!shouldRender || !isDisplayed) return null
 
   const label =
     view === 'prompt' ? 'Mood:' :
