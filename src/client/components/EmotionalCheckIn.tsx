@@ -89,6 +89,9 @@ export function EmotionalCheckIn() {
   }
 
   const handleCheckIn = (emotionalState: EmotionalState, buttonIndex: number) => {
+    // Prevent double-clicks during API call
+    if (isLoading || !isPromptShown) return
+
     const hour = new Date().getHours()
     const checkInType = hour < 12 ? 'morning' : hour >= 19 ? 'evening' : 'moment'
 
