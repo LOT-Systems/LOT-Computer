@@ -447,6 +447,19 @@ export const useInterventions = () =>
     staleTime: 10 * 60 * 1000, // Cache for 10 minutes
   })()
 
+export const useCommunityEmotion = () =>
+  createQuery<{
+    sharedEmotion: string | null
+    confidence: number
+    participantCount: number
+    emotionBreakdown?: Record<string, number>
+    calculatedAt: string
+    message?: string
+  }>('/api/community-emotion', {
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes (more volatile than other data)
+  })()
+
 // ============================================================================
 // EMOTIONAL CHECK-IN QUERIES
 // ============================================================================

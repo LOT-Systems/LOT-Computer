@@ -2513,3 +2513,76 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     }
   })
 }
+
+/**
+ * GET /api/community-emotion
+ * Calculate shared community emotional state from recent check-ins
+ */
+router.get('/api/community-emotion', async (req, res) => {
+  try {
+    const userId = req.session?.userId
+    if (!userId) {
+      return res.status(401).json({ error: 'Not authenticated' })
+    }
+
+    // Get emotional check-ins from the last 24 hours across all users
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
+
+    const recentEmotions = await Log.findAll({
+      where: {
+        event: 'emotional_checkin',
+        createdAt: {
+          [Op.gte]: oneDayAgo
+        }
+      },
+      order: [['createdAt', 'DESC']],
+      limit: 100, // Sample last 100 check-ins for performance
+      attributes: ['emotionalState', 'createdAt']
+    })
+
+    if (recentEmotions.length === 0) {
+      return res.json({
+        sharedEmotion: null,
+        confidence: 0,
+        participantCount: 0,
+        message: 'Not enough data yet'
+      })
+    }
+
+    // Count emotional states
+    const emotionCounts: Record<string, number> = {}
+    recentEmotions.forEach(log => {
+      const emotion = log.emotionalState
+      if (emotion) {
+        emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1
+      }
+    })
+
+    // Find the most common emotion
+    let dominantEmotion = ''
+    let maxCount = 0
+    Object.entries(emotionCounts).forEach(([emotion, count]) => {
+      if (count > maxCount) {
+        maxCount = count
+        dominantEmotion = emotion
+      }
+    })
+
+    // Calculate confidence (percentage of dominant emotion)
+    const confidence = Math.round((maxCount / recentEmotions.length) * 100)
+
+    // Get unique participant count (approximate)
+    const uniqueParticipants = recentEmotions.length
+
+    return res.json({
+      sharedEmotion: dominantEmotion,
+      confidence,
+      participantCount: uniqueParticipants,
+      emotionBreakdown: emotionCounts,
+      calculatedAt: new Date().toISOString()
+    })
+  } catch (error) {
+    console.error('Error calculating community emotion:', error)
+    return res.status(500).json({ error: 'Failed to calculate community emotion' })
+  }
+})
