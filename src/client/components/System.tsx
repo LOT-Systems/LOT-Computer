@@ -26,6 +26,10 @@ import { SubscribeWidget } from './SubscribeWidget'
 import { PlannerWidget } from './PlannerWidget'
 import { PatternInsightsWidget } from './PatternInsightsWidget'
 import { ContextualPromptsWidget } from './ContextualPromptsWidget'
+import { EnergyCapacitor } from './EnergyCapacitor'
+import { NarrativeWidget } from './NarrativeWidget'
+import { InterventionsWidget } from './InterventionsWidget'
+import { ChatCatalystWidget } from './ChatCatalystWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
 
@@ -351,6 +355,18 @@ export const System = () => {
 
       {/* Contextual Prompts - Show pattern-based suggestions based on current context */}
       <ContextualPromptsWidget />
+
+      {/* Chat Catalyst - Prompts to connect with cohort members when online */}
+      <ChatCatalystWidget />
+
+      {/* Interventions - Compassionate care based on semantic struggle detection */}
+      <InterventionsWidget />
+
+      {/* Energy Capacitor - Track energy depletion/replenishment */}
+      <EnergyCapacitor />
+
+      {/* Narrative - RPG-style story progression and achievements */}
+      <NarrativeWidget />
 
       <div>
         <Block

@@ -330,6 +330,124 @@ export const usePatternEvolution = () =>
   })()
 
 // ============================================================================
+// SELF-CARE ENGINE QUERIES
+// ============================================================================
+
+export interface EnergyState {
+  currentLevel: number
+  maxCapacity: 100
+  status: 'depleted' | 'low' | 'moderate' | 'good' | 'full'
+  trajectory: 'improving' | 'stable' | 'declining' | 'critical'
+  daysUntilBurnout: number | null
+  romanticConnection: {
+    lastIntimacyMoment: string | null
+    daysSinceConnection: number
+    connectionQuality: 'disconnected' | 'distant' | 'present' | 'deep'
+    needsAttention: boolean
+  }
+  needsReplenishment: {
+    category: string
+    urgency: number
+    daysSinceLastReplenishment: number
+  }[]
+}
+
+export const useEnergy = () =>
+  createQuery<{
+    energyState: EnergyState | null
+    suggestions: string[]
+    analyzedAt: string
+    message?: string
+  }>('/api/energy', {
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  })()
+
+export interface Achievement {
+  id: string
+  title: string
+  description: string
+  unlocked: boolean
+  unlockedAt: string | null
+  category: string
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
+  icon: string
+}
+
+export interface UserNarrative {
+  archetype: string
+  currentLevel: number
+  storyline: string
+  achievements: Achievement[]
+  currentArc: {
+    chapter: number
+    title: string
+    narrative: string
+    activeQuests: any[]
+    milestones: any[]
+  }
+  totalXP: number
+  nextMilestone: any | null
+}
+
+export const useNarrative = () =>
+  createQuery<{
+    narrative: UserNarrative | null
+    generatedAt: string
+    message?: string
+  }>('/api/narrative', {
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000, // Cache for 10 minutes
+  })()
+
+export interface ChatCatalyst {
+  type: string
+  priority: number
+  title: string
+  message: string
+  action: {
+    label: string
+    cohortMember?: {
+      id: string
+      name: string
+    }
+  }
+  triggeredBy: string
+}
+
+export const useChatCatalysts = () =>
+  createQuery<{
+    catalysts: ChatCatalyst[]
+    generatedAt: string
+    message?: string
+  }>('/api/chat-catalysts', {
+    refetchOnWindowFocus: false,
+    staleTime: 15 * 60 * 1000, // Cache for 15 minutes
+  })()
+
+export interface Intervention {
+  type: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  title: string
+  message: string
+  suggestion?: string
+  action?: {
+    label: string
+    target: string
+  }
+}
+
+export const useInterventions = () =>
+  createQuery<{
+    interventions: Intervention[]
+    generatedAt: string
+    message?: string
+  }>('/api/interventions', {
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000, // Cache for 10 minutes
+  })()
+
+// ============================================================================
 // EMOTIONAL CHECK-IN QUERIES
 // ============================================================================
 
