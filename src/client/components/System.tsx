@@ -25,6 +25,7 @@ import { IntentionsWidget } from './IntentionsWidget'
 import { SubscribeWidget } from './SubscribeWidget'
 import { PlannerWidget } from './PlannerWidget'
 import { PatternInsightsWidget } from './PatternInsightsWidget'
+import { ContextualPromptsWidget } from './ContextualPromptsWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
 
@@ -347,6 +348,9 @@ export const System = () => {
           )}
         </Block>
       </div>
+
+      {/* Contextual Prompts - Show pattern-based suggestions based on current context */}
+      <ContextualPromptsWidget />
 
       <div>
         <Block

@@ -27,6 +27,7 @@ import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
+import { generateContextualPrompts, generatePatternAwareQuestion } from '#server/utils/contextual-prompts'
 import dayjs from '#server/utils/dayjs'
 
 // ============================================================================
@@ -2108,6 +2109,78 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       })
       return {
         matches: [],
+        error: error.message
+      }
+    }
+  })
+
+  // Get contextual prompts based on patterns and current context
+  fastify.get('/contextual-prompts', async (req, reply) => {
+    try {
+      const Log = await import('#server/models/log.js').then(m => m.default)
+
+      // Get user's patterns
+      const logs = await Log.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 100
+      })
+
+      if (logs.length < 5) {
+        return {
+          prompts: [],
+          message: 'Keep building your practice! Contextual prompts emerge after 5+ entries.'
+        }
+      }
+
+      const patterns = await analyzeUserPatterns(req.user, logs)
+
+      if (patterns.length === 0) {
+        return {
+          prompts: [],
+          message: 'No patterns detected yet.'
+        }
+      }
+
+      // Get current context
+      const now = new Date()
+      const hour = now.getHours()
+      const dayOfWeek = now.getDay()
+
+      // Get recent check-ins (last 12 hours)
+      const recentCheckIns = logs.filter(log => {
+        const logAge = Date.now() - new Date(log.createdAt).getTime()
+        const twelveHoursMs = 12 * 60 * 60 * 1000
+        return log.event === 'emotional_checkin' && logAge < twelveHoursMs
+      })
+
+      // Get current weather
+      let currentWeather = null
+      if (req.user.city && req.user.country) {
+        currentWeather = await weather.getWeather(req.user.city, req.user.country)
+      }
+
+      const prompts = generateContextualPrompts(patterns, {
+        hour,
+        dayOfWeek,
+        weather: currentWeather || undefined,
+        recentCheckIns
+      })
+
+      console.log(`💡 Generated ${prompts.length} contextual prompts for user ${req.user.id}`)
+
+      return {
+        prompts,
+        generatedAt: new Date().toISOString()
+      }
+
+    } catch (error: any) {
+      console.error('❌ Error generating contextual prompts:', {
+        error: error.message,
+        userId: req.user?.id
+      })
+      return {
+        prompts: [],
         error: error.message
       }
     }
