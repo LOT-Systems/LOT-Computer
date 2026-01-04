@@ -253,17 +253,14 @@ export const System = () => {
         <Block label="Users online:" onClick={() => stores.goTo('sync')}>
           {formatNumberWithCommas(usersOnline)}
         </Block>
-        <Block
-          label="Total users:"
-          onClick={
-            me?.isAdmin
-              ? () => {
-                  window.location.href = '/us'
-                }
-              : undefined
-          }
-        >
-          {formatNumberWithCommas(usersTotal)}
+        <Block label="Total users:">
+          {me?.isAdmin ? (
+            <GhostButton href="/us" rel="external">
+              {formatNumberWithCommas(usersTotal)}
+            </GhostButton>
+          ) : (
+            formatNumberWithCommas(usersTotal)
+          )}
         </Block>
       </div>
 
