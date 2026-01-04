@@ -45,7 +45,6 @@ export const Logs: React.FC = () => {
       if (log.id === recentLogId) {
         // Refetch logs to push down saved entry and create new empty log
         // Wait 4 seconds for 2 breathe blinks to complete (2 iterations × 2s each)
-        // Store timeout ID so it can be cancelled if user starts typing again
         pendingPushRef.current = setTimeout(async () => {
           try {
             await refetchLogs()
@@ -329,18 +328,15 @@ const NoteEditor = ({
     // Mark as unsaved when user types
     if (value !== log.text) {
       setIsSaved(false)
-      // Cancel pending push if user starts typing again
-      if (pendingPushRef?.current) {
-        clearTimeout(pendingPushRef.current)
-        pendingPushRef.current = null
-      }
+      // Don't cancel pending push - let the save complete and push down
+      // The sync effect has protection to not overwrite unsaved changes
 
       // Stop any ongoing blink animation when user types
       if (primary) {
         setIsAboutToPush(false)
       }
     }
-  }, [value, log.text, pendingPushRef, primary])
+  }, [value, log.text, primary])
 
   React.useEffect(() => {
     logTextRef.current = log.text
