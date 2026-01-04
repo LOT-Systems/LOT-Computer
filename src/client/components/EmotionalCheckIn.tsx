@@ -151,7 +151,6 @@ export function EmotionalCheckIn() {
               <div className="flex flex-wrap gap-8">
                 <Button
                   onClick={() => handleCheckIn('energized', 0)}
-                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
@@ -162,7 +161,6 @@ export function EmotionalCheckIn() {
                 </Button>
                 <Button
                   onClick={() => handleCheckIn('calm', 1)}
-                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
@@ -173,7 +171,6 @@ export function EmotionalCheckIn() {
                 </Button>
                 <Button
                   onClick={() => handleCheckIn('tired', 2)}
-                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
@@ -184,7 +181,6 @@ export function EmotionalCheckIn() {
                 </Button>
                 <Button
                   onClick={() => handleCheckIn('anxious', 3)}
-                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
@@ -195,7 +191,6 @@ export function EmotionalCheckIn() {
                 </Button>
                 <Button
                   onClick={() => handleCheckIn('hopeful', 4)}
-                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
@@ -206,7 +201,6 @@ export function EmotionalCheckIn() {
                 </Button>
                 <Button
                   onClick={() => handleCheckIn('grateful', 5)}
-                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
@@ -217,7 +211,6 @@ export function EmotionalCheckIn() {
                 </Button>
                 <Button
                   onClick={() => handleCheckIn('overwhelmed', 6)}
-                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
@@ -228,7 +221,6 @@ export function EmotionalCheckIn() {
                 </Button>
                 <Button
                   onClick={() => handleCheckIn('content', 7)}
-                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
