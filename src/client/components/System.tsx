@@ -24,6 +24,7 @@ import { SelfCareMoments } from './SelfCareMoments'
 import { IntentionsWidget } from './IntentionsWidget'
 import { SubscribeWidget } from './SubscribeWidget'
 import { PlannerWidget } from './PlannerWidget'
+import { PatternInsightsWidget } from './PatternInsightsWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
 
@@ -515,6 +516,9 @@ export const System = () => {
         const shouldShow = Math.random() < 0.2
         return shouldShow && <SubscribeWidget />
       })()}
+
+      {/* Pattern Insights - Show user's discovered patterns and cohort matches */}
+      <PatternInsightsWidget />
 
       {/* Planner - Show occasionally for daily/weekly planning */}
       <PlannerWidget />

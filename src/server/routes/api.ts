@@ -26,6 +26,7 @@ import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
+import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
 import dayjs from '#server/utils/dayjs'
 
 // ============================================================================
@@ -1977,6 +1978,138 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error: any) {
       console.error('❌ Error reading radio tracks:', error)
       return { tracks: [], error: error.message }
+    }
+  })
+
+  // Get user's pattern insights
+  fastify.get('/patterns', async (req, reply) => {
+    try {
+      const Log = await import('#server/models/log.js').then(m => m.default)
+
+      // Get last 100 logs for pattern analysis
+      const logs = await Log.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 100
+      })
+
+      if (logs.length < 5) {
+        return {
+          insights: [],
+          message: 'Keep checking in! Patterns emerge after 5+ entries.'
+        }
+      }
+
+      const insights = await analyzeUserPatterns(req.user, logs)
+
+      console.log(`📊 Generated ${insights.length} pattern insights for user ${req.user.id}`)
+
+      return {
+        insights,
+        lastAnalyzedAt: new Date().toISOString(),
+        dataPointsAnalyzed: logs.length
+      }
+
+    } catch (error: any) {
+      console.error('❌ Error analyzing patterns:', {
+        error: error.message,
+        userId: req.user?.id
+      })
+      return {
+        insights: [],
+        error: error.message
+      }
+    }
+  })
+
+  // Find cohort matches
+  fastify.get('/cohorts', async (req, reply) => {
+    try {
+      const User = await import('#server/models/user.js').then(m => m.default)
+      const Log = await import('#server/models/log.js').then(m => m.default)
+
+      // Get current user's patterns
+      const userLogs = await Log.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 100
+      })
+
+      if (userLogs.length < 10) {
+        return {
+          matches: [],
+          message: 'Keep building your journey! Cohort matching available after 10+ entries.'
+        }
+      }
+
+      const userPatterns = await analyzeUserPatterns(req.user, userLogs)
+
+      if (userPatterns.length === 0) {
+        return {
+          matches: [],
+          message: 'No clear patterns yet. Continue your practice!'
+        }
+      }
+
+      // Get all users with location data (for cohort matching)
+      const allUsers = await User.findAll({
+        where: {
+          city: { [Op.not]: null },
+          country: { [Op.not]: null },
+          id: { [Op.not]: req.user.id }
+        },
+        attributes: ['id', 'firstName', 'lastName', 'city', 'country', 'metadata']
+      })
+
+      // Cache for pattern lookups (to avoid re-analyzing same user)
+      const patternCache = new Map<string, PatternInsight[]>()
+
+      const getUserPatterns = async (userId: string): Promise<PatternInsight[]> => {
+        if (patternCache.has(userId)) {
+          return patternCache.get(userId)!
+        }
+
+        const logs = await Log.findAll({
+          where: { userId },
+          order: [['createdAt', 'DESC']],
+          limit: 100
+        })
+
+        const user = allUsers.find(u => u.id === userId)
+        if (!user || logs.length < 5) {
+          return []
+        }
+
+        const patterns = await analyzeUserPatterns(user, logs)
+        patternCache.set(userId, patterns)
+        return patterns
+      }
+
+      const matches = await findCohortMatches(
+        req.user,
+        userPatterns,
+        allUsers,
+        getUserPatterns
+      )
+
+      console.log(`👥 Found ${matches.length} cohort matches for user ${req.user.id}`)
+
+      return {
+        matches,
+        yourPatterns: userPatterns.slice(0, 3), // Share top 3 patterns for context
+        lastAnalyzedAt: new Date().toISOString()
+      }
+
+    } catch (error: any) {
+      console.error('❌ Error finding cohorts:', {
+        error: error.message,
+        stack: error.stack,
+        userId: req.user?.id
+      })
+      return {
+        matches: [],
+        error: error.message
+      }
     }
   })
 }

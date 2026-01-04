@@ -235,6 +235,54 @@ export const useProfile = () =>
   })()
 
 // ============================================================================
+// PATTERN & COHORT QUERIES
+// ============================================================================
+
+export interface PatternInsight {
+  type: 'weather-mood' | 'temporal' | 'social-emotional' | 'streak' | 'behavioral'
+  title: string
+  description: string
+  confidence: number
+  dataPoints: number
+  metadata?: Record<string, any>
+}
+
+export interface CohortMatch {
+  user: {
+    id: string
+    firstName: string
+    lastName: string
+    city: string
+    country: string
+    archetype?: string
+  }
+  similarity: number
+  sharedPatterns: string[]
+}
+
+export const usePatterns = () =>
+  createQuery<{
+    insights: PatternInsight[]
+    lastAnalyzedAt: string
+    dataPointsAnalyzed: number
+    message?: string
+  }>('/api/patterns', {
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  })()
+
+export const useCohorts = () =>
+  createQuery<{
+    matches: CohortMatch[]
+    yourPatterns: PatternInsight[]
+    lastAnalyzedAt: string
+    message?: string
+  }>('/api/cohorts', {
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000, // Cache for 10 minutes (cohorts don't change frequently)
+  })()
+
+// ============================================================================
 // EMOTIONAL CHECK-IN QUERIES
 // ============================================================================
 
