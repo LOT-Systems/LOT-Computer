@@ -34,6 +34,7 @@ export function EmotionalCheckIn() {
   const [isShown, setIsShown] = React.useState(true)
   const [isPromptShown, setIsPromptShown] = React.useState(true)
   const [isResponseShown, setIsResponseShown] = React.useState(false)
+  const [clickedButtonIndex, setClickedButtonIndex] = React.useState<number | null>(null)
 
   const { data: checkInsData } = useEmotionalCheckIns(30) // Last 30 days
   const { mutate: createCheckIn, isLoading } = useCreateEmotionalCheckIn({
@@ -75,6 +76,7 @@ export function EmotionalCheckIn() {
     setResponse(null)
     setInsight(null)
     setIsPromptShown(true)
+    setClickedButtonIndex(null)
 
     setView(prev => {
       switch (prev) {
@@ -86,9 +88,12 @@ export function EmotionalCheckIn() {
     })
   }
 
-  const handleCheckIn = (emotionalState: EmotionalState) => {
+  const handleCheckIn = (emotionalState: EmotionalState, buttonIndex: number) => {
     const hour = new Date().getHours()
     const checkInType = hour < 12 ? 'morning' : hour >= 19 ? 'evening' : 'moment'
+
+    // Record which button was clicked for cascade effect
+    setClickedButtonIndex(buttonIndex)
 
     // Record intention signal for quantum pattern recognition
     recordSignal('mood', emotionalState, { checkInType, hour })
@@ -114,6 +119,13 @@ export function EmotionalCheckIn() {
     hour >= 19 ? 'Evening' :
     'Right Now'
 
+  // Calculate cascade delay based on distance from clicked button
+  const getCascadeDelay = (buttonIndex: number) => {
+    if (clickedButtonIndex === null || isPromptShown) return '0ms'
+    const distance = Math.abs(buttonIndex - clickedButtonIndex)
+    return `${distance * 50}ms`
+  }
+
   return (
     <Block
       label={label}
@@ -138,90 +150,90 @@ export function EmotionalCheckIn() {
               </div>
               <div className="flex flex-wrap gap-8">
                 <Button
-                  onClick={() => handleCheckIn('energized')}
-                  disabled={isLoading}
+                  onClick={() => handleCheckIn('energized', 0)}
+                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: isPromptShown ? '0ms' : '0ms' }}
+                  style={{ transitionDelay: getCascadeDelay(0) }}
                 >
                   Energized
                 </Button>
                 <Button
-                  onClick={() => handleCheckIn('calm')}
-                  disabled={isLoading}
+                  onClick={() => handleCheckIn('calm', 1)}
+                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: isPromptShown ? '0ms' : '50ms' }}
+                  style={{ transitionDelay: getCascadeDelay(1) }}
                 >
                   Calm
                 </Button>
                 <Button
-                  onClick={() => handleCheckIn('tired')}
-                  disabled={isLoading}
+                  onClick={() => handleCheckIn('tired', 2)}
+                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: isPromptShown ? '0ms' : '100ms' }}
+                  style={{ transitionDelay: getCascadeDelay(2) }}
                 >
                   Tired
                 </Button>
                 <Button
-                  onClick={() => handleCheckIn('anxious')}
-                  disabled={isLoading}
+                  onClick={() => handleCheckIn('anxious', 3)}
+                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: isPromptShown ? '0ms' : '150ms' }}
+                  style={{ transitionDelay: getCascadeDelay(3) }}
                 >
                   Anxious
                 </Button>
                 <Button
-                  onClick={() => handleCheckIn('hopeful')}
-                  disabled={isLoading}
+                  onClick={() => handleCheckIn('hopeful', 4)}
+                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: isPromptShown ? '0ms' : '200ms' }}
+                  style={{ transitionDelay: getCascadeDelay(4) }}
                 >
                   Hopeful
                 </Button>
                 <Button
-                  onClick={() => handleCheckIn('grateful')}
-                  disabled={isLoading}
+                  onClick={() => handleCheckIn('grateful', 5)}
+                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: isPromptShown ? '0ms' : '250ms' }}
+                  style={{ transitionDelay: getCascadeDelay(5) }}
                 >
                   Grateful
                 </Button>
                 <Button
-                  onClick={() => handleCheckIn('overwhelmed')}
-                  disabled={isLoading}
+                  onClick={() => handleCheckIn('overwhelmed', 6)}
+                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: isPromptShown ? '0ms' : '300ms' }}
+                  style={{ transitionDelay: getCascadeDelay(6) }}
                 >
                   Overwhelmed
                 </Button>
                 <Button
-                  onClick={() => handleCheckIn('content')}
-                  disabled={isLoading}
+                  onClick={() => handleCheckIn('content', 7)}
+                  disabled={!isPromptShown}
                   className={cn(
                     'transition-opacity duration-[1400ms]',
                     isPromptShown ? 'opacity-100' : 'opacity-0'
                   )}
-                  style={{ transitionDelay: isPromptShown ? '0ms' : '350ms' }}
+                  style={{ transitionDelay: getCascadeDelay(7) }}
                 >
                   Content
                 </Button>
