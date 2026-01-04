@@ -319,11 +319,9 @@ const NoteEditor = ({
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null)
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
   const [isAboutToPush, setIsAboutToPush] = React.useState(false) // 2 breathe blinks before push
-  const [isSaving, setIsSaving] = React.useState(false) // Prevent concurrent saves
-  const savingInProgressRef = React.useRef(false) // Prevent duplicate saves during tab switch
-  // New timing: finish typing > wait 5s > 2 breathe blinks (4s) + save > push down
-  // Past logs: 5s debounce (same as primary now for consistency)
-  const debounceTime = 5000  // 5s for all logs
+  // New timing: finish typing > wait 2s > save + blinks > push down
+  // Reduced from 5s to 2s for more responsive feel
+  const debounceTime = 2000  // 2s for all logs (reduced from 5s)
   const debouncedValue = useDebounce(value, debounceTime)
 
   // Keep refs in sync
@@ -356,13 +354,10 @@ const NoteEditor = ({
   // Note: No blur save handler - saves happen via unmount and debounced autosave
   // This keeps scrolling behavior simple (no blur = no issues)
 
-  // Autosave for all logs (5s debounce)
-  // New timeline: finish typing > wait 5s > [2 breathe blinks + save] > push after 4s
+  // Autosave for all logs (2s debounce - reduced from 5s for better responsiveness)
+  // New timeline: finish typing > wait 2s > [2 breathe blinks + save] > push after 4s
   React.useEffect(() => {
     if (log.text === debouncedValue) return
-    if (isSaving) return  // Prevent concurrent saves
-
-    setIsSaving(true)
 
     // For primary log: start 2 breathe blinks when save begins
     // Animation completes after 4 seconds (2 iterations × 2s each), then push starts
@@ -381,9 +376,6 @@ const NoteEditor = ({
     if (valueRef.current === debouncedValue) {
       setIsSaved(true)
     }
-
-    // Clear saving state after a brief delay
-    setTimeout(() => setIsSaving(false), 100)
   }, [debouncedValue, onChange, log.text, primary])
 
   // Sync local state when log updates from server
@@ -425,10 +417,7 @@ const NoteEditor = ({
   React.useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden && valueRef.current !== logTextRef.current) {
-        if (savingInProgressRef.current) return // Prevent duplicate save
-        savingInProgressRef.current = true
         onChangeRef.current(valueRef.current)
-        setTimeout(() => { savingInProgressRef.current = false }, 500)
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
@@ -442,7 +431,6 @@ const NoteEditor = ({
     return () => {
       // Save on unmount if there are unsaved changes
       if (valueRef.current !== logTextRef.current) {
-        if (savingInProgressRef.current) return // Prevent duplicate save
         onChangeRef.current(valueRef.current)
       }
     }
