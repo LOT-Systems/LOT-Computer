@@ -123,7 +123,7 @@ export function EmotionalCheckIn() {
   const getCascadeDelay = (buttonIndex: number) => {
     if (clickedButtonIndex === null || isPromptShown) return '0ms'
     const distance = Math.abs(buttonIndex - clickedButtonIndex)
-    return `${distance * 50}ms`
+    return `${distance * 120}ms`
   }
 
   return (
