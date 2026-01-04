@@ -319,9 +319,8 @@ const NoteEditor = ({
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null)
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
   const [isAboutToPush, setIsAboutToPush] = React.useState(false) // 2 breathe blinks before push
-  // New timing: finish typing > wait 2s > save + blinks > push down
-  // Reduced from 5s to 2s for more responsive feel
-  const debounceTime = 2000  // 2s for all logs (reduced from 5s)
+  // New timing: finish typing > wait 5s > save + blinks > push down
+  const debounceTime = 5000  // 5s for all logs
   const debouncedValue = useDebounce(value, debounceTime)
 
   // Keep refs in sync
@@ -354,8 +353,8 @@ const NoteEditor = ({
   // Note: No blur save handler - saves happen via unmount and debounced autosave
   // This keeps scrolling behavior simple (no blur = no issues)
 
-  // Autosave for all logs (2s debounce - reduced from 5s for better responsiveness)
-  // New timeline: finish typing > wait 2s > [2 breathe blinks + save] > push after 4s
+  // Autosave for all logs (5s debounce)
+  // New timeline: finish typing > wait 5s > [2 breathe blinks + save] > push after 4s
   React.useEffect(() => {
     if (log.text === debouncedValue) return
 
@@ -375,6 +374,13 @@ const NoteEditor = ({
     // This prevents race condition where user types more while save is in progress
     if (valueRef.current === debouncedValue) {
       setIsSaved(true)
+    }
+
+    // Reset blink state after save completes to prevent getting stuck
+    if (primary) {
+      setTimeout(() => {
+        setIsAboutToPush(false)
+      }, 4500) // Wait for blinks + push to complete (4s + buffer)
     }
   }, [debouncedValue, onChange, log.text, primary])
 
