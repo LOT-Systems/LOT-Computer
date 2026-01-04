@@ -214,9 +214,9 @@ export const Logs: React.FC = () => {
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="Mood:" blockView>
                 <div className="mb-8 capitalize">{emotionalState}</div>
-                {note && <div className="opacity-60 mb-8">{note}</div>}
+                {note && <div className="mb-8">{note}</div>}
                 {insights && insights.length > 0 && (
-                  <div className="opacity-60 text-[14px]">
+                  <div>
                     {insights.map((insight, idx) => (
                       <div key={idx}>• {insight}</div>
                     ))}
