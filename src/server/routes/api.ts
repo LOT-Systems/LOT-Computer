@@ -1096,12 +1096,28 @@ export default async (fastify: FastifyInstance) => {
       // Generate pattern insights
       const insights: string[] = []
 
-      // Pattern: Same state multiple days in a row
-      const lastThreeStates = recentCheckIns
+      // Pattern: Same state multiple days in a row (only check PREVIOUS days, not today)
+      // Group check-ins by day to ensure we're counting consecutive days, not just consecutive check-ins
+      const checkInsByDay = new Map<string, string>()
+      recentCheckIns.forEach(log => {
+        const dayKey = new Date(log.createdAt).toDateString()
+        if (!checkInsByDay.has(dayKey)) {
+          checkInsByDay.set(dayKey, log.metadata?.emotionalState)
+        }
+      })
+
+      // Get unique days (excluding today) and check for consecutive pattern
+      const today = new Date().toDateString()
+      const previousDays = Array.from(checkInsByDay.entries())
+        .filter(([day]) => day !== today)
+        .sort((a, b) => new Date(b[0]).getTime() - new Date(a[0]).getTime())
         .slice(0, 3)
-        .map(log => log.metadata?.emotionalState)
-      if (lastThreeStates.length >= 3 && lastThreeStates.every(state => state === emotionalState)) {
-        insights.push(`You've felt ${emotionalState} for 3 days in a row`)
+
+      if (previousDays.length >= 3) {
+        const allSameAsToday = previousDays.every(([_, state]) => state === emotionalState)
+        if (allSameAsToday) {
+          insights.push(`You've felt ${emotionalState} for 3 days in a row`)
+        }
       }
 
       // Pattern: Morning vs evening energy
