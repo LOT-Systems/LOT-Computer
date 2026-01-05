@@ -33,18 +33,17 @@ export function MemoryWidget() {
         // Combine response with insight if available
         const fullResponse = insight ? `${response}\n\n${insight}` : response
         setResponse(fullResponse)
+        // Start fade-in immediately while still blinking (no pause at transparency)
+        setIsResponseShown(true)
         setTimeout(() => {
-          setIsResponseShown(true)
+          setIsShown(false)
           setTimeout(() => {
-            setIsShown(false)
-            setTimeout(() => {
-              setIsDisplayed(false)
-              setIsResponseShown(false)
-              setResponse(null)
-            }, 1500)
-          }, insight ? 7000 : 5000) // Show longer if there's an insight
-        }, 100)
-      }, 1500)
+            setIsDisplayed(false)
+            setIsResponseShown(false)
+            setResponse(null)
+          }, 1500)
+        }, insight ? 7000 : 5000) // Show longer if there's an insight
+      }, 800) // Reduced delay - response appears during the blink transition
     },
   })
 
@@ -86,14 +85,6 @@ export function MemoryWidget() {
       }, fp.randomElement([1200, 2100, 1650, 2800]))
     }
   }, [loadedQuestion, lastQuestionId])
-
-  React.useEffect(() => {
-    if (response) {
-      setTimeout(() => {
-        setIsResponseShown(true)
-      }, 1500)
-    }
-  }, [response])
 
   // Only show questions in System page (story moved to Settings)
   return (
