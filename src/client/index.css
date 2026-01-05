@@ -54,11 +54,11 @@ input:-webkit-autofill {
 }
 
 /* Custom blink animation for log push warning */
-/* Two gentle breathing blinks before push */
+/* Two gentle breathing blinks, ending at saved log opacity */
 @keyframes blink {
   0% { opacity: 0.35; }
   50% { opacity: 0.75; }
-  100% { opacity: 0.35; }
+  100% { opacity: 0.2; }
 }
 
 .animate-blink {

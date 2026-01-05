@@ -44,8 +44,8 @@ export const Logs: React.FC = () => {
       // Past logs don't need to trigger push-down
       if (log.id === recentLogId) {
         // Refetch logs to push down saved entry and create new empty log
-        // Wait 3 seconds to push during the second blink (at reduced transparency)
-        // Animation: 2s first blink + 1.5s into second blink = push during transparency
+        // Wait 4 seconds for blink animation to complete at opacity 0.2 (matching saved logs)
+        // Animation: 2 iterations × 2s = 4s, ending at opacity-20 (0.2)
         pendingPushRef.current = setTimeout(async () => {
           try {
             await refetchLogs()
@@ -54,7 +54,7 @@ export const Logs: React.FC = () => {
             console.error('[Logs] Refetch failed:', error)
             pendingPushRef.current = null
           }
-        }, 3000)
+        }, 4000)
       }
     },
   })
@@ -319,7 +319,7 @@ const NoteEditor = ({
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null)
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
   const [isAboutToPush, setIsAboutToPush] = React.useState(false) // Blink during push
-  // New timing: finish typing > wait 5s > save + start blinks > push during second blink
+  // New timing: finish typing > wait 5s > save + start blinks > push at end (4s at opacity-20)
   const debounceTime = 5000  // 5s for all logs
   const debouncedValue = useDebounce(value, debounceTime)
 
@@ -351,12 +351,12 @@ const NoteEditor = ({
   // This keeps scrolling behavior simple (no blur = no issues)
 
   // Autosave for all logs (5s debounce)
-  // New timeline: finish typing > wait 5s > [save + blinks] > push during 2nd blink (3s)
+  // New timeline: finish typing > wait 5s > [save + blinks] > push at end (4s)
   React.useEffect(() => {
     if (log.text === debouncedValue) return
 
     // For primary log: start blink animation when save begins
-    // Push happens at 3s (during second blink iteration at reduced transparency)
+    // Push happens at 4s (when animation completes at opacity 0.2, matching saved logs)
     if (primary) {
       setIsAboutToPush(true)
     }
@@ -377,7 +377,7 @@ const NoteEditor = ({
     if (primary) {
       setTimeout(() => {
         setIsAboutToPush(false)
-      }, 3500) // Wait for push to complete (3s + buffer)
+      }, 4500) // Wait for push to complete (4s + buffer)
     }
   }, [debouncedValue, onChange, log.text, primary])
 
@@ -450,7 +450,7 @@ const NoteEditor = ({
           setLastSavedAt(new Date())
           setIsSaved(true)
           // Trigger blink animation for manual save too
-          // Push happens at 3s during the second blink
+          // Push happens at 4s when animation completes at opacity 0.2
           if (primary) {
             setIsAboutToPush(true)
           }
