@@ -240,7 +240,7 @@ export const PlannerWidget: React.FC = () => {
               </Button>
 
               {/* Left/Right arrows */}
-              <div className="flex gap-[60px]">
+              <div className="flex" style={{ gap: '60px' }}>
                 <Button
                   onClick={() => cycleValue('up')}
                   aria-label="Explore previous"
