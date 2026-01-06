@@ -1,7 +1,7 @@
 {
   "name": "lot-systems",
   "type": "module",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "MIT",
   "imports": {
     "#server/config": "./dist/server/server/config.js",
