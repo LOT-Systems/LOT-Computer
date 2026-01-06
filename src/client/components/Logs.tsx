@@ -44,8 +44,8 @@ export const Logs: React.FC = () => {
       // Past logs don't need to trigger push-down
       if (log.id === recentLogId) {
         // Refetch logs to push down saved entry and create new empty log
-        // Wait 4 seconds for blink animation to complete at opacity 0.2 (matching saved logs)
-        // Animation: 2 iterations × 2s = 4s, ending at opacity-20 (0.2)
+        // Wait 7 seconds: 3s pause (read saved entry) + 4s gentle blink = 7s total
+        // Push happens when blink completes at opacity 0.2 (matching saved logs)
         pendingPushRef.current = setTimeout(async () => {
           try {
             await refetchLogs()
@@ -54,7 +54,7 @@ export const Logs: React.FC = () => {
             console.error('[Logs] Refetch failed:', error)
             pendingPushRef.current = null
           }
-        }, 4000)
+        }, 7000)
       }
     },
   })
@@ -319,8 +319,8 @@ const NoteEditor = ({
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null)
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
   const [isAboutToPush, setIsAboutToPush] = React.useState(false) // Blink during push
-  // New timing: finish typing > wait 5s > save + start blinks > push at end (4s at opacity-20)
-  const debounceTime = 5000  // 5s for all logs
+  // New timing: finish typing > wait 7s > save > pause 3s > gentle blink 4s > push
+  const debounceTime = 7000  // 7s for all logs
   const debouncedValue = useDebounce(value, debounceTime)
 
   // Keep refs in sync
@@ -350,16 +350,10 @@ const NoteEditor = ({
   // Note: No blur save handler - saves happen via unmount and debounced autosave
   // This keeps scrolling behavior simple (no blur = no issues)
 
-  // Autosave for all logs (5s debounce)
-  // New timeline: finish typing > wait 5s > [save + blinks] > push at end (4s)
+  // Autosave for all logs (7s debounce)
+  // New timeline: finish typing > wait 7s > save > pause 3s (read) > gentle blink 4s > push
   React.useEffect(() => {
     if (log.text === debouncedValue) return
-
-    // For primary log: start blink animation when save begins
-    // Push happens at 4s (when animation completes at opacity 0.2, matching saved logs)
-    if (primary) {
-      setIsAboutToPush(true)
-    }
 
     // Save the log
     onChange(debouncedValue)
@@ -373,11 +367,19 @@ const NoteEditor = ({
       setIsSaved(true)
     }
 
-    // Reset blink state after push completes to prevent getting stuck
+    // For primary log: wait 3s after save, then start gentle blink animation
+    // This gives user time to read the saved entry before it pushes down
+    if (primary) {
+      setTimeout(() => {
+        setIsAboutToPush(true)
+      }, 3000) // 3s pause to read saved entry
+    }
+
+    // Reset blink state after blink + push completes
     if (primary) {
       setTimeout(() => {
         setIsAboutToPush(false)
-      }, 4500) // Wait for push to complete (4s + buffer)
+      }, 7500) // 3s pause + 4s blink + buffer
     }
   }, [debouncedValue, onChange, log.text, primary])
 
@@ -450,9 +452,11 @@ const NoteEditor = ({
           setLastSavedAt(new Date())
           setIsSaved(true)
           // Trigger blink animation for manual save too
-          // Push happens at 4s when animation completes at opacity 0.2
+          // Wait 3s after save, then gentle blink, then push at 7s total
           if (primary) {
-            setIsAboutToPush(true)
+            setTimeout(() => {
+              setIsAboutToPush(true)
+            }, 3000)
           }
         }
         // Optionally blur to show save happened

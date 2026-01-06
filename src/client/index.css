@@ -54,15 +54,15 @@ input:-webkit-autofill {
 }
 
 /* Custom blink animation for log push warning */
-/* Two gentle breathing blinks, ending at saved log opacity */
+/* Soft, monotonic breathing - gentle fade to indicate upcoming push */
 @keyframes blink {
-  0% { opacity: 0.35; }
-  50% { opacity: 0.75; }
+  0% { opacity: 0.4; }
+  50% { opacity: 0.55; }
   100% { opacity: 0.2; }
 }
 
 .animate-blink {
-  animation: blink 2s cubic-bezier(0.4, 0, 0.6, 1);
+  animation: blink 2s ease-in-out;
   animation-iteration-count: 2;
   animation-fill-mode: forwards;
 }
