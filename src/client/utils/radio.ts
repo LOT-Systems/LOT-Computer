@@ -28,11 +28,11 @@ export function useRadio(enabled: boolean) {
   }, [tracks])
 
   // Format seconds to MM:SS
-  const formatTime = (seconds: number): string => {
+  const formatTime = React.useCallback((seconds: number): string => {
     const mins = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
     return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
+  }, [])
 
   // Fetch available tracks from backend
   React.useEffect(() => {
