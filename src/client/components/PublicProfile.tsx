@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Block, GhostButton, Tag, TagsContainer } from '#client/components/ui'
+import { Block, Button, GhostButton, Tag, TagsContainer } from '#client/components/ui'
 import { PublicProfile as PublicProfileType } from '#shared/types'
 import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
@@ -241,6 +241,17 @@ export const PublicProfile = () => {
         {profile.profileVisits !== undefined && (
           <div>
             Profile visits: {formatNumberWithCommas(profile.profileVisits)}
+          </div>
+        )}
+
+        {/* Direct Message Button */}
+        {profile.userId && (
+          <div>
+            <Button onClick={() => {
+              window.location.href = `/dm/${profile.userId}`
+            }}>
+              Direct message {profile.firstName || 'user'}
+            </Button>
           </div>
         )}
 

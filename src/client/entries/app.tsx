@@ -8,6 +8,7 @@ import { System } from '#client/components/System'
 import { Settings } from '#client/components/Settings'
 import { Logs } from '#client/components/Logs'
 import { Sync } from '#client/components/Sync'
+import { DirectMessageThread } from '#client/components/DirectMessageThread'
 import { StatusPage } from '#client/components/StatusPage'
 import { ConnectionStatus } from '#client/components/ConnectionStatus'
 import { render } from '#client/utils/render'
@@ -133,6 +134,9 @@ const App = () => {
         {(!router || router.route === 'system') && <System />}
         {router?.route === 'settings' && <Settings />}
         {router?.route === 'sync' && <Sync />}
+        {router?.route === 'dm' && router.params?.userId && (
+          <DirectMessageThread userId={router.params.userId} />
+        )}
         {router?.route === 'status' && <StatusPage noWrapper />}
         {router?.route === 'logs' && <Logs />}
         {isMirrorOn && (

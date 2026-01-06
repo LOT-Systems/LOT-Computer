@@ -4,6 +4,7 @@ import { EmailCode } from './email-code.js'
 import { LiveMessage } from './live-message.js'
 import { ChatMessage } from './chat-message.js'
 import { ChatMessageLike } from './chat-message-like.js'
+import { DirectMessage } from './direct-message.js'
 import { WeatherResponse } from './weather-response.js'
 import { Log } from './log.js'
 import { Answer } from './answer.js'
@@ -17,6 +18,7 @@ export const models = {
   LiveMessage,
   ChatMessage,
   ChatMessageLike,
+  DirectMessage,
   WeatherResponse,
   Log,
   Answer,
@@ -29,6 +31,7 @@ export type Models = {
   LiveMessage: typeof LiveMessage
   ChatMessage: typeof ChatMessage
   ChatMessageLike: typeof ChatMessageLike
+  DirectMessage: typeof DirectMessage
   WeatherResponse: typeof WeatherResponse
   Log: typeof Log
   Answer: typeof Answer

@@ -85,6 +85,33 @@ export const useLikeChatMessage = createMutation<ChatMessageLikePayload, void>(
   '/api/chat-messages/like'
 )
 
+export interface DirectMessageRecord {
+  id: string
+  senderId: string
+  receiverId: string
+  message: string
+  createdAt: string
+  updatedAt: string
+  isMine: boolean
+}
+
+export const useDirectMessages = (userId: string) =>
+  createQuery<{
+    messages: DirectMessageRecord[]
+    otherUser: {
+      id: string
+      firstName: string | null
+      lastName: string | null
+    }
+  }>(`/api/direct-messages/${userId}`, {
+    refetchOnWindowFocus: false,
+  })()
+
+export const useSendDirectMessage = createMutation<
+  { receiverId: string; message: string },
+  void
+>('post', '/api/direct-messages')
+
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
 })
