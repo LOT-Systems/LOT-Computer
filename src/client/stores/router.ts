@@ -8,6 +8,7 @@ type Routes = {
   adminUsers: void
   adminUser: 'userId'
   logs: void
+  dm: 'userId'
 }
 
 export const router = createRouter<Routes>({
@@ -18,6 +19,7 @@ export const router = createRouter<Routes>({
   adminUsers: '/us',
   adminUser: '/us/:userId',
   logs: '/log',
+  dm: '/dm/:userId',
 })
 
 // Debounce navigation to prevent rapid clicks causing issues

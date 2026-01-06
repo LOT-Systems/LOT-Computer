@@ -71,6 +71,15 @@ export interface ChatMessageLike {
   createdAt: string
 }
 
+export interface DirectMessage {
+  id: string
+  senderId: string
+  receiverId: string
+  message: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface WeatherResponse {
   id: string
   country: string

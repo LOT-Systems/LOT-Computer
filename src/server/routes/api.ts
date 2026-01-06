@@ -2607,4 +2607,119 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       return reply.status(500).send({ error: 'Failed to calculate community emotion' })
     }
   })
+
+  // Get direct message thread with another user
+  fastify.get('/direct-messages/:userId', async (req: FastifyRequest<{
+    Params: { userId: string }
+  }>, reply) => {
+    try {
+      const otherUserId = req.params.userId
+
+      // Verify other user exists
+      const otherUser = await fastify.models.User.findByPk(otherUserId)
+      if (!otherUser) {
+        return reply.status(404).send({ error: 'User not found' })
+      }
+
+      // Get all messages between current user and other user
+      const messages = await fastify.models.DirectMessage.findAll({
+        where: {
+          [Op.or]: [
+            { senderId: req.user.id, receiverId: otherUserId },
+            { senderId: otherUserId, receiverId: req.user.id }
+          ]
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 100
+      })
+
+      return reply.send({
+        messages: messages.map(m => ({
+          id: m.id,
+          senderId: m.senderId,
+          receiverId: m.receiverId,
+          message: m.message,
+          createdAt: m.createdAt,
+          updatedAt: m.updatedAt,
+          isMine: m.senderId === req.user.id
+        })),
+        otherUser: {
+          id: otherUser.id,
+          firstName: otherUser.firstName,
+          lastName: otherUser.lastName
+        }
+      })
+    } catch (error) {
+      console.error('Error fetching direct messages:', error)
+      return reply.status(500).send({ error: 'Failed to fetch messages' })
+    }
+  })
+
+  // Send direct message
+  fastify.post('/direct-messages', async (req: FastifyRequest<{
+    Body: { receiverId: string; message: string }
+  }>, reply) => {
+    try {
+      const { receiverId, message } = req.body
+
+      if (!receiverId || !message || !message.trim()) {
+        return reply.status(400).send({ error: 'Receiver and message are required' })
+      }
+
+      // Verify receiver exists
+      const receiver = await fastify.models.User.findByPk(receiverId)
+      if (!receiver) {
+        return reply.status(404).send({ error: 'Receiver not found' })
+      }
+
+      // Create message
+      const directMessage = await fastify.models.DirectMessage.create({
+        senderId: req.user.id,
+        receiverId,
+        message: message.trim().slice(0, 2000) // Limit message length
+      })
+
+      // Emit SSE event to receiver
+      sync.emit('direct_message', {
+        id: directMessage.id,
+        senderId: req.user.id,
+        receiverId,
+        message: directMessage.message,
+        senderName: `${req.user.firstName} ${req.user.lastName}`.trim(),
+        createdAt: directMessage.createdAt
+      })
+
+      // Log the sent message (for tracking social interactions)
+      process.nextTick(async () => {
+        try {
+          const context = await getLogContext(req.user)
+          await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'direct_message_sent',
+            text: '',
+            metadata: {
+              directMessageId: directMessage.id,
+              receiverId,
+              message: directMessage.message,
+            },
+            context,
+          })
+        } catch (logError) {
+          console.error('Error logging direct message:', logError)
+        }
+      })
+
+      return reply.send({
+        id: directMessage.id,
+        senderId: directMessage.senderId,
+        receiverId: directMessage.receiverId,
+        message: directMessage.message,
+        createdAt: directMessage.createdAt,
+        updatedAt: directMessage.updatedAt
+      })
+    } catch (error) {
+      console.error('Error sending direct message:', error)
+      return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
 }
