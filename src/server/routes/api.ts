@@ -1670,7 +1670,7 @@ export default async (fastify: FastifyInstance) => {
         }
       }
 
-      // Get answer logs
+      // Get answer logs (limit to 30 for analysis performance)
       const logs = await fastify.models.Log.findAll({
         where: {
           userId: req.user.id,
@@ -1678,6 +1678,11 @@ export default async (fastify: FastifyInstance) => {
         },
         order: [['createdAt', 'DESC']],
         limit: 30,
+      })
+
+      // Get full answer count for accurate display
+      const totalAnswerCount = await fastify.models.Answer.count({
+        where: { userId: req.user.id }
       })
 
       if (logs.length === 0) {
@@ -1699,7 +1704,8 @@ export default async (fastify: FastifyInstance) => {
         traits,
         values: psychologicalDepth.values,
         selfAwareness: psychologicalDepth.selfAwareness,
-        answerCount: logs.length
+        answerCount: totalAnswerCount,
+        logsAnalyzed: logs.length
       })
 
       return {
@@ -1734,8 +1740,8 @@ export default async (fastify: FastifyInstance) => {
           }))
           .sort((a, b) => b.count - a.count),
         // Meta
-        answerCount: logs.length,
-        noteCount: logs.filter(l => l.event === 'note' && l.text && l.text.length > 20).length
+        answerCount: totalAnswerCount,
+        logsAnalyzedForProfile: logs.length  // Number of recent logs used for analysis
       }
     } catch (error: any) {
       console.error('❌ Error generating user profile:', {
