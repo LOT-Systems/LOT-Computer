@@ -413,6 +413,7 @@ export interface ChatCatalyst {
     }
   }
   triggeredBy: string
+  conversationStarters?: string[]
 }
 
 export const useChatCatalysts = () =>

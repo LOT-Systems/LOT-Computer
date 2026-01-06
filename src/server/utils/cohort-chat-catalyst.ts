@@ -15,6 +15,7 @@ export interface ChatCatalyst {
     }
   }
   triggeredBy: string
+  conversationStarters?: string[]
 }
 
 /**
@@ -68,7 +69,8 @@ export function generateChatCatalysts(
               name: `${member.user.firstName} ${member.user.lastName}`
             }
           },
-          triggeredBy: `shared_state_${currentEmotionalState}`
+          triggeredBy: `shared_state_${currentEmotionalState}`,
+          conversationStarters: generateConversationStarters(member.sharedPatterns, currentEmotionalState)
         })
       }
     }
@@ -89,7 +91,8 @@ export function generateChatCatalysts(
             name: `${member.user.firstName} ${member.user.lastName}`
           }
         },
-        triggeredBy: 'cohort_online'
+        triggeredBy: 'cohort_online',
+        conversationStarters: generateConversationStarters(member.sharedPatterns, currentEmotionalState)
       })
     }
   }
@@ -111,7 +114,8 @@ export function generateChatCatalysts(
             name: `${topMatch.user.firstName} ${topMatch.user.lastName}`
           }
         },
-        triggeredBy: 'social_energy_need'
+        triggeredBy: 'social_energy_need',
+        conversationStarters: generateConversationStarters(topMatch.sharedPatterns, currentEmotionalState)
       })
     } else {
       // No specific cohort match, suggest general community
@@ -151,7 +155,8 @@ export function generateChatCatalysts(
           name: `${match.user.firstName} ${match.user.lastName}`
         }
       },
-      triggeredBy: 'similar_journey'
+      triggeredBy: 'similar_journey',
+      conversationStarters: generateConversationStarters(match.sharedPatterns, currentEmotionalState)
     })
   }
 
