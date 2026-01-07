@@ -4,6 +4,7 @@ import { Block, Button } from '#client/components/ui'
 import { useChatCatalysts } from '#client/queries'
 import * as stores from '#client/stores'
 import { UserTag } from '#shared/types'
+import { getChatCatalystNarrative } from '#client/utils/narrative'
 
 /**
  * Chat Catalyst Widget - Prompts to connect with cohort members
@@ -55,6 +56,11 @@ export function ChatCatalystWidget() {
       onLabelClick={hasMultiple ? cycleCatalyst : undefined}
     >
       <div className="inline-block">
+        {/* Narrative context */}
+        <div className="mb-12 opacity-75">
+          {getChatCatalystNarrative(catalyst.priority)}
+        </div>
+
         {/* Catalyst title */}
         <div className="mb-12">
           {catalyst.title}
@@ -84,14 +90,14 @@ export function ChatCatalystWidget() {
 
         {/* Cohort member info if present */}
         {catalyst.action.cohortMember && (
-          <div className="text-[12px]">
+          <div className="text-[12px] opacity-60">
             {catalyst.action.cohortMember.name}
           </div>
         )}
 
         {/* Multiple catalysts indicator */}
         {hasMultiple && (
-          <div className="mt-8 text-[12px]">
+          <div className="mt-8 text-[12px] opacity-60">
             {currentIndex + 1} of {data.catalysts.length}
           </div>
         )}

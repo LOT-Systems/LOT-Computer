@@ -7,6 +7,7 @@ import { fp } from '#shared/utils'
 import { MemoryQuestion } from '#shared/types'
 import * as stores from '#client/stores'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { getMemoryReflectionPrompt } from '#client/utils/narrative'
 
 export function MemoryWidget() {
   const [isDisplayed, setIsDisplayed] = React.useState(false)
@@ -115,6 +116,11 @@ export function MemoryWidget() {
             isQuestionShown && 'opacity-100'
           )}
         >
+          {/* Time-aware reflection prompt */}
+          <div className="mb-8 opacity-60">
+            {getMemoryReflectionPrompt()}
+          </div>
+
           <div className="mb-16">{question?.question || '...'}</div>
           <div className="flex flex-col sm:flex-row sm:flex-wrap gap-8 sm:-mb-8 -ml-4">
             {(question?.options || []).map((option) => (

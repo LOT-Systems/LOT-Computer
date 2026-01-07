@@ -1,6 +1,7 @@
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { useInterventions } from '#client/queries'
+import { getInterventionNarrative } from '#client/utils/narrative'
 
 /**
  * Interventions Widget - Compassionate care based on semantic struggle detection
@@ -39,6 +40,16 @@ export function InterventionsWidget() {
       onLabelClick={hasMultiple ? cycleIntervention : undefined}
     >
       <div className="inline-block">
+        {/* Narrative context */}
+        <div className="mb-12 opacity-75">
+          {getInterventionNarrative(
+            intervention.severity === 'critical' ? 'urgent' :
+            intervention.severity === 'high' ? 'high' :
+            intervention.severity === 'medium' ? 'moderate' :
+            'low'
+          )}
+        </div>
+
         {/* Severity indicator and title */}
         <div className="mb-12 flex items-center gap-8">
           <span>{getSeverityIndicator()}</span>
@@ -52,14 +63,14 @@ export function InterventionsWidget() {
 
         {/* Suggestion if present */}
         {intervention.suggestion && (
-          <div>
+          <div className="opacity-80">
             {intervention.suggestion}
           </div>
         )}
 
         {/* Multiple interventions indicator */}
         {hasMultiple && (
-          <div className="mt-12 text-[12px]">
+          <div className="mt-12 text-[12px] opacity-60">
             {currentIndex + 1} of {data.interventions.length}
           </div>
         )}

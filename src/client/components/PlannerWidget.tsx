@@ -5,6 +5,7 @@ import { Block, Button } from '#client/components/ui'
 import { useCreateLog } from '#client/queries'
 import { cn } from '#client/utils'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { getPlanningPrompt, getCompletionPhrase } from '#client/utils/narrative'
 
 /**
  * Planner Widget - Daily Planning Practice
@@ -57,7 +58,7 @@ export const PlannerWidget: React.FC = () => {
     })
 
     // Show completion
-    setCompletionMessage('Set.')
+    setCompletionMessage(getCompletionPhrase('plan'))
 
     // Fade out after 2 seconds
     setTimeout(() => {
@@ -137,6 +138,11 @@ export const PlannerWidget: React.FC = () => {
               isShown && 'opacity-100'
             )}
           >
+            {/* Time-aware narrative prompt */}
+            <div className="mb-16 opacity-60">
+              {getPlanningPrompt()}
+            </div>
+
             {/* Daily Planning - Spreadsheet format */}
             <div className="mb-16 space-y-4">
               {/* Intent */}

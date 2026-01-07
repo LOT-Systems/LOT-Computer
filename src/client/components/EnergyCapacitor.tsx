@@ -2,6 +2,7 @@ import React from 'react'
 import { Block } from '#client/components/ui'
 import { useEnergy } from '#client/queries'
 import { cn } from '#client/utils'
+import { getEnergyNarrative, getRomanticNarrative } from '#client/utils/narrative'
 
 type EnergyView = 'overview' | 'romantic' | 'needs'
 
@@ -43,17 +44,22 @@ export function EnergyCapacitor() {
     >
       {view === 'overview' && (
         <div className="inline-block">
-          {/* Energy level and status */}
+          {/* Narrative status */}
+          <div className="mb-12">
+            {getEnergyNarrative(energyState.currentLevel, energyState.trajectory)}
+          </div>
+
+          {/* Energy level */}
           <div className="mb-12 flex items-center gap-12">
             <span className="text-[20px]">
               {energyState.currentLevel}%
             </span>
-            <span className="capitalize">{energyState.status}</span>
+            <span className="capitalize opacity-60">{energyState.status}</span>
           </div>
 
           {/* Trajectory indicator */}
           {energyState.trajectory !== 'stable' && (
-            <div className="mb-12">
+            <div className="mb-12 opacity-75">
               {energyState.trajectory === 'improving' && '↑ Improving'}
               {energyState.trajectory === 'declining' && '↓ Declining'}
               {energyState.trajectory === 'critical' && '⚠ Critical'}
@@ -69,7 +75,7 @@ export function EnergyCapacitor() {
 
           {/* Top suggestion */}
           {suggestions.length > 0 && (
-            <div>
+            <div className="opacity-80">
               {suggestions[0]}
             </div>
           )}
@@ -80,10 +86,18 @@ export function EnergyCapacitor() {
         <div className="inline-block">
           {energyState.romanticConnection.lastIntimacyMoment ? (
             <>
+              {/* Narrative status */}
               <div className="mb-12">
+                {getRomanticNarrative(
+                  energyState.romanticConnection.daysSinceConnection,
+                  energyState.romanticConnection.connectionQuality
+                )}
+              </div>
+
+              <div className="mb-12 opacity-60">
                 <span className="capitalize">{energyState.romanticConnection.connectionQuality}</span>
               </div>
-              <div className="mb-12">
+              <div className="mb-12 opacity-75">
                 {energyState.romanticConnection.daysSinceConnection} day{energyState.romanticConnection.daysSinceConnection === 1 ? '' : 's'} since connection
               </div>
               {energyState.romanticConnection.needsAttention && (
