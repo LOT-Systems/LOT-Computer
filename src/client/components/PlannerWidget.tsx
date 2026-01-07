@@ -139,7 +139,7 @@ export const PlannerWidget: React.FC = () => {
             )}
           >
             {/* Time-aware narrative prompt */}
-            <div className="mb-16 opacity-60">
+            <div className="mb-16">
               {getPlanningPrompt()}
             </div>
 

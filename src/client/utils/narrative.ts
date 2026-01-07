@@ -187,9 +187,9 @@ export function getCompletionPhrase(action: 'plan' | 'check_in' | 'memory' | 'me
 
   switch (action) {
     case 'plan':
-      if (timeOfDay === 'morning') return 'Direction set'
-      if (timeOfDay === 'evening') return 'Path clear'
-      return 'Intention held'
+      if (timeOfDay === 'morning') return 'Direction set.'
+      if (timeOfDay === 'evening') return 'Path clear.'
+      return 'Intention held.'
 
     case 'check_in':
       return 'Acknowledged'
