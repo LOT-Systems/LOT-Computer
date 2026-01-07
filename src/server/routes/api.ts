@@ -1310,6 +1310,64 @@ export default async (fastify: FastifyInstance) => {
         isRecentlyAsked,
       })
 
+      // ============================================================================
+      // WEEKLY SUMMARY CHECK (Priority over regular questions)
+      // ============================================================================
+      // Check if it's time for weekly summary (Sunday or Monday, once per week)
+      const lastWeeklySummary = await fastify.models.Answer.findOne({
+        where: {
+          userId: req.user.id,
+          metadata: {
+            questionId: 'weekly_summary'
+          }
+        },
+        order: [['createdAt', 'DESC']]
+      })
+
+      const { shouldShowWeeklySummary, generateWeeklySummary } = await import('#server/utils/weekly-summary.js')
+      const showWeeklySummary = shouldShowWeeklySummary(
+        req.user,
+        lastWeeklySummary?.createdAt || null
+      )
+
+      if (showWeeklySummary) {
+        console.log(`📊 Generating weekly summary for user ${req.user.id}`)
+        try {
+          // Load 200 logs to cover the week + historical context
+          const logs = await fastify.models.Log.findAll({
+            where: {
+              userId: req.user.id,
+            },
+            order: [['createdAt', 'DESC']],
+            limit: 200,
+          })
+
+          const weeklySummary = await generateWeeklySummary(req.user, logs)
+
+          // Return as a special memory "question" with reflection prompt
+          return {
+            id: 'weekly_summary',
+            question: weeklySummary.narrative,
+            options: [
+              'Continue forward',
+              'Pause and reflect',
+              'Acknowledge'
+            ],
+            metadata: {
+              type: 'weekly_summary',
+              period: weeklySummary.period,
+              reflectionPrompt: weeklySummary.reflectionPrompt
+            }
+          }
+        } catch (error: any) {
+          console.error('❌ Weekly summary generation failed:', {
+            error: error.message,
+            userId: req.user.id,
+          })
+          // Fall through to regular questions on error
+        }
+      }
+
       if (hasUsershipTag) {
         // Usership users: Generate AI-based context-aware question using Claude
         console.log(`🔍 Attempting to generate AI question for Usership user ${req.user.id}`)
@@ -1400,6 +1458,9 @@ export default async (fastify: FastifyInstance) => {
     ) => {
       const { questionId, option } = req.body
 
+      // Check if this is a weekly summary response
+      const isWeeklySummary = questionId === 'weekly_summary'
+
       // Try to find in default questions first (backwards compatibility)
       let question = defaultQuestions.find(fp.propEq('id', questionId))
       let questionText: string
@@ -1410,7 +1471,7 @@ export default async (fastify: FastifyInstance) => {
         questionText = question.question
         questionOptions = question.options
       } else {
-        // AI-generated question - accept from request body
+        // AI-generated question or weekly summary - accept from request body
         if (!req.body.question || !req.body.options) {
           return reply.throw.badParams()
         }
@@ -1430,14 +1491,17 @@ export default async (fastify: FastifyInstance) => {
         question: questionText,
         options: questionOptions,
         answer: option,
-        metadata: { questionId },
+        metadata: {
+          questionId,
+          type: isWeeklySummary ? 'weekly_summary' : 'regular'
+        }
       })
 
       process.nextTick(async () => {
         const context = await getLogContext(req.user)
         await fastify.models.Log.create({
           userId: req.user.id,
-          event: 'answer',
+          event: isWeeklySummary ? 'weekly_summary_response' : 'answer',
           text: '',
           metadata: {
             questionId,
@@ -1469,7 +1533,18 @@ export default async (fastify: FastifyInstance) => {
       let response: string
       let insight: string | null = null
 
-      if (answerCount === 1) {
+      if (isWeeklySummary) {
+        // Weekly summary response
+        const reflectionResponses = [
+          'Week witnessed. Patterns held.',
+          'The week is complete. You showed up.',
+          'Summary acknowledged. Forward.',
+          'Your week, seen whole.'
+        ]
+        response = fp.randomElement(reflectionResponses)
+
+        // No additional insight for weekly summaries - the summary itself is the insight
+      } else if (answerCount === 1) {
         response = "Thank you for starting your Memory story with LOT."
       } else if (answerCount >= 10) {
         // For users with 10+ answers, analyze psychological depth and generate insights
