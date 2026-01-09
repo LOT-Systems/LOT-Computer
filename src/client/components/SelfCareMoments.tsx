@@ -269,9 +269,20 @@ export function SelfCareMoments() {
             {currentSuggestion.action} ({currentSuggestion.duration})
           </div>
           {(completedToday > 0 || currentStreak > 0) && (
-            <div className="opacity-90 mb-16">
+            <div className="opacity-90 mb-12">
               {completedToday > 0 && <div>{completedToday} done today</div>}
               {currentStreak > 1 && <div>{currentStreak} day streak</div>}
+            </div>
+          )}
+          {currentStreak > 2 && (
+            <div className="mb-16">
+              <a
+                href="/api/export/self-care"
+                download
+                className="opacity-60 hover:opacity-100 transition-opacity underline text-[14px]"
+              >
+                Export history
+              </a>
             </div>
           )}
           <div className="flex gap-8">

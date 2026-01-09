@@ -1223,6 +1223,62 @@ export default async (fastify: FastifyInstance) => {
     }
   )
 
+  // Export emotional check-ins as CSV
+  fastify.get('/export/emotional-checkins', async (req, reply) => {
+    const checkIns = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: 'emotional_checkin',
+      },
+      order: [['createdAt', 'ASC']],
+    })
+
+    // Generate CSV
+    const csvRows = ['Date,Time,Emotional State,Check-in Type,Intensity,Note']
+    checkIns.forEach((log: any) => {
+      const date = dayjs(log.createdAt).format('YYYY-MM-DD')
+      const time = dayjs(log.createdAt).format('HH:mm:ss')
+      const state = log.metadata?.emotionalState || ''
+      const type = log.metadata?.checkInType || ''
+      const intensity = log.metadata?.intensity || ''
+      const note = (log.metadata?.note || '').replace(/"/g, '""') // Escape quotes
+      csvRows.push(`${date},${time},"${state}","${type}",${intensity},"${note}"`)
+    })
+
+    const csv = csvRows.join('\n')
+    reply.header('Content-Type', 'text/csv')
+    reply.header('Content-Disposition', `attachment; filename="mood-checkins-${dayjs().format('YYYY-MM-DD')}.csv"`)
+    return csv
+  })
+
+  // Export self-care activities as CSV
+  fastify.get('/export/self-care', async (req, reply) => {
+    const activities = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: {
+          [Op.in]: ['self_care_complete', 'self_care_skip']
+        },
+      },
+      order: [['createdAt', 'ASC']],
+    })
+
+    // Generate CSV
+    const csvRows = ['Date,Time,Event,Activity']
+    activities.forEach((log: any) => {
+      const date = dayjs(log.createdAt).format('YYYY-MM-DD')
+      const time = dayjs(log.createdAt).format('HH:mm:ss')
+      const event = log.event === 'self_care_complete' ? 'Completed' : 'Skipped'
+      const activity = (log.text || '').replace('Self-care completed: ', '').replace('Self-care skipped: ', '').replace(/"/g, '""')
+      csvRows.push(`${date},${time},"${event}","${activity}"`)
+    })
+
+    const csv = csvRows.join('\n')
+    reply.header('Content-Type', 'text/csv')
+    reply.header('Content-Disposition', `attachment; filename="self-care-${dayjs().format('YYYY-MM-DD')}.csv"`)
+    return csv
+  })
+
   fastify.get(
     '/memory',
     async (req: FastifyRequest<{ Querystring: { d: string } }>, reply) => {
