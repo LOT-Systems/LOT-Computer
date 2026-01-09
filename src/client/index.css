@@ -56,8 +56,8 @@ input:-webkit-autofill {
 /* Custom blink animation for log push warning */
 /* Soft, monotonic breathing - gentle fade to indicate upcoming push */
 @keyframes blink {
-  0% { opacity: 0.4; }
-  50% { opacity: 0.55; }
+  0% { opacity: 0.2; }
+  50% { opacity: 0.35; }
   100% { opacity: 0.2; }
 }
 
