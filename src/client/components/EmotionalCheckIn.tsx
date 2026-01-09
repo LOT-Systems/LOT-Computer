@@ -4,7 +4,7 @@ import { useCreateEmotionalCheckIn, useEmotionalCheckIns, useLogs } from '#clien
 import { cn } from '#client/utils'
 import { recordSignal } from '#client/stores/intentionEngine'
 
-type CheckInView = 'prompt' | 'history' | 'patterns'
+type CheckInView = 'prompt' | 'history' | 'patterns' | 'graph'
 
 type EmotionalState =
   | 'energized'
@@ -109,7 +109,8 @@ export function EmotionalCheckIn() {
       switch (prev) {
         case 'prompt': return 'history'
         case 'history': return 'patterns'
-        case 'patterns': return 'prompt'
+        case 'patterns': return 'graph'
+        case 'graph': return 'prompt'
         default: return 'prompt'
       }
     })
@@ -140,7 +141,8 @@ export function EmotionalCheckIn() {
   const label =
     view === 'prompt' ? 'Mood:' :
     view === 'history' ? 'History:' :
-    'Patterns:'
+    view === 'patterns' ? 'Patterns:' :
+    'Graph:'
 
   // Determine check-in type based on time
   const hour = new Date().getHours()
@@ -325,6 +327,85 @@ export function EmotionalCheckIn() {
                 </div>
               )}
             </>
+          )}
+        </div>
+      )}
+
+      {view === 'graph' && checkInsData && (
+        <div className="inline-block">
+          {checkInsData.checkIns.length === 0 ? (
+            <div>Check in more to see your mood timeline.</div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {(() => {
+                // Group check-ins by date (last 14 days)
+                const last14Days = Array.from({ length: 14 }, (_, i) => {
+                  const date = new Date()
+                  date.setDate(date.getDate() - i)
+                  return date.toISOString().split('T')[0]
+                }).reverse()
+
+                const checkInsByDate: { [key: string]: any[] } = {}
+                checkInsData.checkIns.forEach((checkIn: any) => {
+                  const date = new Date(checkIn.createdAt).toISOString().split('T')[0]
+                  if (!checkInsByDate[date]) checkInsByDate[date] = []
+                  checkInsByDate[date].push(checkIn)
+                })
+
+                // Map mood to simple indicator
+                const getMoodIndicator = (state: string) => {
+                  const positive = ['energized', 'calm', 'hopeful', 'grateful', 'fulfilled', 'content', 'peaceful', 'excited']
+                  const neutral = ['restless', 'uncertain']
+                  const challenging = ['tired', 'anxious', 'exhausted', 'overwhelmed']
+
+                  if (positive.includes(state)) return '+'
+                  if (challenging.includes(state)) return '−'
+                  return '·'
+                }
+
+                return last14Days.map((date, idx) => {
+                  const dayCheckIns = checkInsByDate[date] || []
+                  const dateObj = new Date(date)
+                  const dayLabel = idx === 13 ? 'Today' :
+                    idx === 12 ? 'Yesterday' :
+                    dateObj.toLocaleDateString('en-US', { weekday: 'short' })
+
+                  if (dayCheckIns.length === 0) {
+                    return (
+                      <div key={date} className="flex items-center gap-8 opacity-40">
+                        <span className="w-[60px]">{dayLabel}</span>
+                        <span className="opacity-60">−</span>
+                      </div>
+                    )
+                  }
+
+                  // Show all check-ins for that day with their indicators
+                  const indicators = dayCheckIns
+                    .map(c => getMoodIndicator(c.metadata?.emotionalState))
+                    .join(' ')
+
+                  // Show dominant mood if multiple check-ins
+                  const dominantMood = dayCheckIns.length === 1
+                    ? dayCheckIns[0].metadata?.emotionalState
+                    : (() => {
+                        const counts: { [key: string]: number } = {}
+                        dayCheckIns.forEach(c => {
+                          const mood = c.metadata?.emotionalState
+                          if (mood) counts[mood] = (counts[mood] || 0) + 1
+                        })
+                        return Object.entries(counts).sort(([,a], [,b]) => b - a)[0]?.[0]
+                      })()
+
+                  return (
+                    <div key={date} className="flex items-center gap-8">
+                      <span className="w-[60px]">{dayLabel}</span>
+                      <span className="w-[40px]">{indicators}</span>
+                      <span className="capitalize opacity-75">{dominantMood}</span>
+                    </div>
+                  )
+                })
+              })()}
+            </div>
           )}
         </div>
       )}
