@@ -1282,18 +1282,18 @@ export default async (fastify: FastifyInstance) => {
         return null
       }
 
-      // Check if a prompt was shown in the last 2 hours (not entire period)
-      const twoHoursAgo = now.subtract(2, 'hour')
+      // Check if a prompt was shown in the last hour (reduced from 2 hours)
+      const oneHourAgo = now.subtract(1, 'hour')
       const isRecentlyAsked = await fastify.models.Answer.count({
         where: {
           userId: req.user.id,
           createdAt: {
-            [Op.gte]: twoHoursAgo.toDate(),
+            [Op.gte]: oneHourAgo.toDate(),
           },
         },
       }).then(Boolean)
       if (isRecentlyAsked) {
-        console.log(`⏸️ Skipping prompt: answered within last 2 hours`)
+        console.log(`⏸️ Skipping prompt: answered within last hour`)
         return null
       }
 
@@ -1372,14 +1372,14 @@ export default async (fastify: FastifyInstance) => {
         // Usership users: Generate AI-based context-aware question using Claude
         console.log(`🔍 Attempting to generate AI question for Usership user ${req.user.id}`)
         try {
-          // Load 60 logs to ensure we get 30+ answer logs for duplicate detection
-          // (some logs are notes/activities, not answers)
+          // Load 120 logs for deeper narrative context and duplicate detection
+          // Ensures we capture user's long-term patterns and recent activities
           const logs = await fastify.models.Log.findAll({
             where: {
               userId: req.user.id,
             },
             order: [['createdAt', 'DESC']],
-            limit: 60,
+            limit: 120,
           })
 
           const prompt = await buildPrompt(req.user, logs, isWeekend)

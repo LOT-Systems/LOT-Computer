@@ -233,21 +233,25 @@ MUST explore a DIFFERENT topic now. Consider: routine, relationships, creativity
 ` : ''
 
   const uniquenessInstruction = recentQuestions.length > 0 ? `
-**❌ CRITICAL: ABSOLUTE DUPLICATE PREVENTION ❌**
-You have ALREADY asked these ${recentQuestions.length} questions. NEVER ask anything similar:
+**Recent Questions (for context and diversity):**
+You have asked these ${recentQuestions.length} questions recently:
 ${recentQuestions.map((q, i) => `${i + 1}. "${q}"`).join('\n')}
 
-🚨 MANDATORY RULES:
-- Your new question MUST be about a COMPLETELY DIFFERENT topic
-- DO NOT ask variations, follow-ups, or rephrased versions of the above
-- Check EVERY word of your question against the list above
-- If even 3 words match, REJECT IT and think of something else
-- Ask about habits/routines that haven't been covered yet
+**Diversity Guidelines:**
+- Prefer exploring new aspects of their life when appropriate
+- Natural follow-ups are ALLOWED if they deepen understanding of their recent narrative
+- If they've been journaling about a topic, it's good to ask related questions
+- Avoid asking the EXACT same question twice
+- If a topic has been covered 3+ times recently, explore something new
 
-Example of what NOT to do:
-❌ If you asked "What did you have for breakfast?" DON'T ask "What did you eat this morning?"
-❌ If you asked "How did you sleep?" DON'T ask "How was your sleep quality?"
-✅ Instead, ask about a DIFFERENT area entirely (exercise, social time, creativity, etc.)
+**Examples of good follow-ups:**
+✅ If they mentioned breakfast habits → Ask about preparation method or timing
+✅ If they journal about stress → Ask about coping strategies or support
+✅ If they shared evening routine → Ask about sleep quality or morning energy
+
+**Examples to avoid:**
+❌ Exact duplicates: "What did you have for breakfast?" → "What did you have for breakfast?"
+❌ Excessive repetition: Asking about tea/coffee 5 times in a row
 
 ${topicDiversityWarning}` : ''
 
@@ -327,8 +331,8 @@ CRITICAL: Use this SOUL-LEVEL understanding to craft questions that speak to the
   const isRepetitiveFollowUp = detectTopicRepetition(memoryLogs)
 
   // Decide whether to explore a new topic or follow up on existing ones
-  // 35% chance to explore completely new area, 65% follow up
-  const shouldExploreNewTopic = memoryLogs.length > 0 && Math.random() < 0.35
+  // 15% chance to explore completely new area, 85% follow up for better narrative continuity
+  const shouldExploreNewTopic = memoryLogs.length > 0 && Math.random() < 0.15
 
   let userStory = ''
   let taskInstructions = ''
@@ -1517,22 +1521,23 @@ export async function calculateIntelligentPacing(
   let promptQuotaToday: number
 
   if (isWeekend) {
-    // Weekends: 6 prompts throughout the day (increased from 4)
-    promptQuotaToday = 6
+    // Weekends: 8-10 prompts throughout the day (increased from 6)
+    const seed = dayNumber % 3
+    promptQuotaToday = seed === 0 ? 8 : seed === 1 ? 9 : 10
   } else if (dayNumber === 1) {
-    // Day 1: Welcome with 5 prompts (increased from 3)
-    promptQuotaToday = 5
+    // Day 1: Welcome with 6 prompts (increased from 5)
+    promptQuotaToday = 6
   } else if (dayNumber === 2) {
-    // Day 2: Gentle follow-up with 3 prompts (increased from 1)
-    promptQuotaToday = 3
+    // Day 2: Gentle follow-up with 5 prompts (increased from 3)
+    promptQuotaToday = 5
   } else if (dayNumber === 3) {
-    // Day 3: Building rhythm with 4 prompts (increased from 2)
-    promptQuotaToday = 4
+    // Day 3: Building rhythm with 6 prompts (increased from 4)
+    promptQuotaToday = 6
   } else {
-    // Day 4+: Variable pacing (3-5 prompts, increased from 1-3)
+    // Day 4+: Variable pacing (5-8 prompts, increased from 3-5)
     // Use day number as seed for consistent daily variation
     const seed = dayNumber % 7
-    promptQuotaToday = seed % 3 === 0 ? 3 : seed % 3 === 1 ? 4 : 5
+    promptQuotaToday = seed % 4 === 0 ? 5 : seed % 4 === 1 ? 6 : seed % 4 === 2 ? 7 : 8
   }
 
   // Count prompts shown today
