@@ -375,11 +375,12 @@ const NoteEditor = ({
       }, 3000) // 3s pause to read saved entry
     }
 
-    // Reset blink state after blink + push completes
+    // Reset blink state right when animation completes (at 7s, same as push)
+    // This ensures opacity is at 20% when push happens, matching pushed logs
     if (primary) {
       setTimeout(() => {
         setIsAboutToPush(false)
-      }, 7500) // 3s pause + 4s blink + buffer
+      }, 7000) // 3s pause + 4s blink = 7s (matches push timing exactly)
     }
   }, [debouncedValue, onChange, log.text, primary])
 
@@ -457,6 +458,10 @@ const NoteEditor = ({
             setTimeout(() => {
               setIsAboutToPush(true)
             }, 3000)
+            // Reset blink state at 7s to match push timing
+            setTimeout(() => {
+              setIsAboutToPush(false)
+            }, 7000)
           }
         }
         // Optionally blur to show save happened
