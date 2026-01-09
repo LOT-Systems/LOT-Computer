@@ -2,7 +2,7 @@ import React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button } from '#client/components/ui'
-import { useProfile, useEmotionalCheckIns, useCreateLog } from '#client/queries'
+import { useProfile, useEmotionalCheckIns, useCreateLog, useLogs } from '#client/queries'
 import { cn } from '#client/utils'
 import { recordSignal } from '#client/stores/intentionEngine'
 
@@ -35,7 +35,52 @@ export function SelfCareMoments() {
   const weather = useStore(stores.weather)
   const { data: profile } = useProfile()
   const { data: checkInsData } = useEmotionalCheckIns(7) // Last 7 days
+  const { data: logs = [] } = useLogs()
   const { mutate: createLog } = useCreateLog()
+
+  // Calculate current streak from logs
+  const calculateStreak = React.useCallback(() => {
+    if (!logs || logs.length === 0) return 0
+
+    // Filter self-care completion logs
+    const completionLogs = logs
+      .filter(log => log.event === 'self_care_complete')
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
+    if (completionLogs.length === 0) return 0
+
+    // Group by date
+    const dateSet = new Set<string>()
+    completionLogs.forEach(log => {
+      const date = new Date(log.createdAt).toISOString().split('T')[0]
+      dateSet.add(date)
+    })
+
+    const dates = Array.from(dateSet).sort().reverse() // Most recent first
+
+    // Count consecutive days starting from today or yesterday
+    let streak = 0
+    const today = new Date().toISOString().split('T')[0]
+    let currentDate = new Date()
+
+    // Start from today or yesterday (we allow starting yesterday if user hasn't completed today yet)
+    for (let i = 0; i <= dates.length; i++) {
+      const checkDate = new Date(currentDate)
+      checkDate.setDate(checkDate.getDate() - i)
+      const checkDateStr = checkDate.toISOString().split('T')[0]
+
+      if (dates.includes(checkDateStr)) {
+        streak++
+      } else if (i > 1) {
+        // If we miss a day after the first check (allowing today to be missed), break
+        break
+      }
+    }
+
+    return streak
+  }, [logs])
+
+  const currentStreak = calculateStreak()
 
   // Load today's completed count from localStorage
   React.useEffect(() => {
@@ -220,12 +265,13 @@ export function SelfCareMoments() {
         <>
       {view === 'suggestion' && (
         <div className="inline-block w-full">
-          <div className={cn("opacity-90", completedToday > 0 ? "mb-12" : "mb-16")}>
+          <div className={cn("opacity-90", (completedToday > 0 || currentStreak > 0) ? "mb-12" : "mb-16")}>
             {currentSuggestion.action} ({currentSuggestion.duration})
           </div>
-          {completedToday > 0 && (
+          {(completedToday > 0 || currentStreak > 0) && (
             <div className="opacity-90 mb-16">
-              {completedToday} done today
+              {completedToday > 0 && <div>{completedToday} done today</div>}
+              {currentStreak > 1 && <div>{currentStreak} day streak</div>}
             </div>
           )}
           <div className="flex gap-8">
