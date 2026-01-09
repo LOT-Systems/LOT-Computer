@@ -322,17 +322,10 @@ export function EmotionalCheckIn() {
                 </div>
               </div>
               {checkInsData.stats.dominantMood && (
-                <div className="mb-16">
+                <div>
                   Most common: <span className="capitalize">{checkInsData.stats.dominantMood}</span>
                 </div>
               )}
-              <a
-                href="/api/export/emotional-checkins"
-                download
-                className="opacity-75 hover:opacity-100 transition-opacity underline"
-              >
-                Export as CSV
-              </a>
             </>
           )}
         </div>
