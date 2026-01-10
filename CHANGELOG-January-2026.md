@@ -232,14 +232,54 @@ Service worker cache version already bumped. PWA users will receive updates auto
 
 ---
 
+## ✨ Latest Additions (January 2026 - Update 2)
+
+### Personalized Widget Timing
+- **Quantum Intention Engine Integration**: Widgets now appear based on recognized behavioral patterns
+  - SelfCareMoments: Shows when anxiety/overwhelm patterns detected
+  - IntentionsWidget: Shows when seeking-direction or morning-clarity patterns detected
+  - PlannerWidget: Shows when lack-of-structure pattern detected (100% chance vs 50%)
+  - Analyzes 6 signal sources across 24h/7d windows with confidence scoring
+  - Maintains backwards compatibility with time-based fallbacks
+
+### Mood Graph Visualization
+- **14-Day Emotional Timeline**: New graph view in EmotionalCheckIn widget
+  - Simple mood indicators: + (positive), − (challenging), · (neutral)
+  - Shows dominant mood per day
+  - View cycling: Check-In → History → Patterns → Graph
+
+### Self-Care Streaks
+- **Consecutive Day Tracking**: Motivational streak counter in SelfCareMoments widget
+  - Displays "X day streak" when streak > 1
+  - Grace period for missed days
+  - Calculated from database logs for cross-device consistency
+
+### Data Export
+- **CSV Download**: Export mood and self-care data from Settings
+  - Mood check-ins: Date, time, emotional state, type, intensity, notes
+  - Self-care: Date, time, event type, activity
+  - Accessible via Settings > Data Export section
+  - Useful for analysis, backup, or sharing with healthcare providers
+
+### Self-Care Reminders
+- **Optional Browser Notifications**: Gentle, opt-in reminders for self-care moments
+  - Three frequency modes: Once daily, Twice daily, Pattern-based (adaptive)
+  - Configurable quiet hours (default: 22:00 - 8:00)
+  - Pattern-based mode integrates with intention engine
+  - Silent notifications, no sound
+  - Complete user control via Settings > Reminders
+  - 15-minute background check intervals
+
+---
+
 ## 🎯 Future Enhancements
 
 ### Potential Iterations
-1. **Mood patterns visualization**: Graph emotional states over time
-2. **Self-care streaks**: Track consecutive days of completion
-3. **Personalized timing**: ML-based optimal widget timing per user
-4. **Export functionality**: Download mood/self-care data as CSV
-5. **Reminders**: Optional opt-in notifications for self-care moments
+1. **Journal widget**: Deeper reflection prompts based on surface-awareness pattern
+2. **Mood correlations**: Identify connections between mood, weather, and activities
+3. **Self-care effectiveness**: Track which practices have most positive impact
+4. **Weekly/monthly summaries**: Comprehensive overview of emotional journey
+5. **Social features**: Share self-care practices with cohort members
 
 ### Technical Debt
 - Consider extracting widget conditional logic to separate utility functions
