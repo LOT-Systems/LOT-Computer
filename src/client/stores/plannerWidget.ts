@@ -1,4 +1,5 @@
 import { atom } from 'nanostores'
+import { shouldShowWidget } from './intentionEngine'
 
 type PlanCategory = 'intent' | 'today' | 'how' | 'feeling'
 
@@ -194,6 +195,9 @@ export async function checkPlannerWidget() {
   // Only show once per day
   if (state.lastShownDate === today) return
 
+  // Check if intention engine recognizes need for structure
+  const intentionSuggestsPlanner = shouldShowWidget('planner')
+
   // Show during planning times
   const isMorning = hour >= 7 && hour < 9 // Morning planning
   const isMidday = hour >= 11 && hour < 13 // Midday check-in
@@ -201,10 +205,14 @@ export async function checkPlannerWidget() {
   const isMondayMorning = day === 1 && hour >= 8 && hour < 11 // Weekly planning
   const isFridayAfternoon = day === 5 && hour >= 14 && hour < 17 // Week completion
 
-  if (!isMorning && !isMidday && !isAfternoon && !isMondayMorning && !isFridayAfternoon) return
+  // Show if intention engine detects lack-of-structure pattern OR during planning times
+  const isGoodTimingForPlanning = isMorning || isMidday || isAfternoon || isMondayMorning || isFridayAfternoon
 
-  // 50% chance to show during these times (planning is important!)
-  if (Math.random() > 0.5) return
+  if (!intentionSuggestsPlanner && !isGoodTimingForPlanning) return
+
+  // If intention engine suggests, show immediately (100% chance)
+  // Otherwise, 50% chance during planning times
+  if (!intentionSuggestsPlanner && Math.random() > 0.5) return
 
   // Generate contextual plan
   const values = generateContextualPlan()

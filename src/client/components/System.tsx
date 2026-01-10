@@ -32,6 +32,7 @@ import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
+import { getOptimalWidget, shouldShowWidget } from '#client/stores/intentionEngine'
 
 export const System = () => {
   const me = useStore(stores.me)
@@ -450,7 +451,7 @@ export const System = () => {
       {/* Widget controls its own visibility internally to allow farewell animations */}
       <EmotionalCheckIn />
 
-      {/* Self-care Moments - Show during rest/refresh times */}
+      {/* Self-care Moments - Show during rest/refresh times OR when intention engine detects need */}
       {(() => {
         const hour = new Date().getHours()
         const isMidMorning = hour >= 10 && hour < 12 // Pre-lunch break
@@ -479,11 +480,16 @@ export const System = () => {
           } catch (e) {}
         }
 
-        // Show during key times, especially if haven't done self-care yet
-        return (isMidMorning || isAfternoon || isEvening || completedToday === 0) && <SelfCareMoments />
+        // Check if intention engine recognizes self-care need
+        const intentionSuggestsSelfCare = shouldShowWidget('selfcare')
+
+        // Show if:
+        // 1. Intention engine detects anxiety/overwhelm patterns, OR
+        // 2. During key times, especially if haven't done self-care yet
+        return (intentionSuggestsSelfCare || isMidMorning || isAfternoon || isEvening || completedToday === 0) && <SelfCareMoments />
       })()}
 
-      {/* Intentions - Show if user has intention OR once every 2-3 days */}
+      {/* Intentions - Show if user has intention OR when intention engine detects seeking-direction pattern */}
       {(() => {
         const hasIntention = !!localStorage.getItem('current-intention')
 
@@ -496,10 +502,16 @@ export const System = () => {
         const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
         const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
 
-        // Show if they have an intention, or if cooldown passed
-        if (hasIntention || cooldownPassed) {
+        // Check if intention engine recognizes need for direction
+        const intentionSuggestsIntentions = shouldShowWidget('intentions')
+
+        // Show if:
+        // 1. User has an existing intention to display, OR
+        // 2. Intention engine detects seeking-direction or morning-clarity patterns, OR
+        // 3. Cooldown passed (fallback for periodic prompting)
+        if (hasIntention || intentionSuggestsIntentions || cooldownPassed) {
           // Update last shown time
-          if (!lastShown || cooldownPassed) {
+          if (!lastShown || cooldownPassed || intentionSuggestsIntentions) {
             localStorage.setItem('intentions-last-shown', Date.now().toString())
           }
           return <IntentionsWidget />
