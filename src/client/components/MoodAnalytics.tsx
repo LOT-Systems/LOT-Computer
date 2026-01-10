@@ -31,9 +31,9 @@ export function MoodAnalytics() {
     if (!checkInsData || checkInsData.checkIns.length < 5) return null
 
     const moodsByTime: { [key: string]: string[] } = {
-      'Morning (6-12)': [],
-      'Afternoon (12-17)': [],
-      'Evening (17-22)': []
+      'Morning hours': [],
+      'Afternoon stretch': [],
+      'Evening time': []
     }
 
     checkInsData.checkIns.forEach((checkIn: any) => {
@@ -43,16 +43,16 @@ export function MoodAnalytics() {
       const hour = new Date(checkIn.createdAt).getHours()
 
       if (hour >= 6 && hour < 12) {
-        moodsByTime['Morning (6-12)'].push(mood)
+        moodsByTime['Morning hours'].push(mood)
       } else if (hour >= 12 && hour < 17) {
-        moodsByTime['Afternoon (12-17)'].push(mood)
+        moodsByTime['Afternoon stretch'].push(mood)
       } else if (hour >= 17 && hour < 22) {
-        moodsByTime['Evening (17-22)'].push(mood)
+        moodsByTime['Evening time'].push(mood)
       }
     })
 
-    // Calculate most common mood for each time period
-    const results: { time: string; mood: string; count: number }[] = []
+    // Calculate most common mood for each time period with percentage
+    const results: { time: string; mood: string; percent: number }[] = []
 
     Object.entries(moodsByTime).forEach(([time, moods]) => {
       if (moods.length === 0) return
@@ -65,7 +65,9 @@ export function MoodAnalytics() {
       const [topMood, count] = Object.entries(moodCounts)
         .sort(([,a], [,b]) => b - a)[0]
 
-      results.push({ time, mood: topMood, count })
+      const percent = Math.round((count / moods.length) * 100)
+
+      results.push({ time, mood: topMood, percent })
     })
 
     return results
@@ -168,13 +170,13 @@ export function MoodAnalytics() {
       {view === 'time' && timeCorrelations && (
         <div className="inline-block">
           {timeCorrelations.length === 0 ? (
-            <div>Track moods at different times to see patterns.</div>
+            <div>Your patterns are forming. Keep tracking to reveal them.</div>
           ) : (
             <div className="flex flex-col gap-4">
-              {timeCorrelations.map(({ time, mood, count }) => (
-                <div key={time} className="flex items-center justify-between gap-16">
-                  <span>{time}</span>
-                  <span className="capitalize">{mood} ({count}x)</span>
+              {timeCorrelations.map(({ time, mood, percent }) => (
+                <div key={time}>
+                  <span>{time}: </span>
+                  <span className="capitalize">{mood} {percent}% of the time</span>
                 </div>
               ))}
             </div>
@@ -185,19 +187,18 @@ export function MoodAnalytics() {
       {view === 'selfcare' && (
         <div className="inline-block">
           {!selfCareCorrelations ? (
-            <div>Complete self-care to see its impact on your mood.</div>
+            <div>The self-care path awaits discovery.</div>
           ) : selfCareCorrelations.afterCount === 0 ? (
-            <div>Complete more self-care to see patterns.</div>
+            <div>Practice more to unlock this insight.</div>
           ) : (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between gap-16">
-                <span>After self-care</span>
-                <span>{selfCareCorrelations.afterCount} check-ins</span>
+              <div>
+                Your self-care affects {selfCareCorrelations.afterCount} tracked moments.
               </div>
               <div>
                 {selfCareCorrelations.hasEffect
-                  ? 'Noticeable positive impact'
-                  : 'Keep practicing to see patterns'}
+                  ? 'A clear pattern emerges: self-care shifts your state.'
+                  : 'The pattern is subtle. Continue your practice.'}
               </div>
             </div>
           )}
@@ -207,23 +208,11 @@ export function MoodAnalytics() {
       {view === 'summary' && summary && (
         <div className="inline-block">
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between gap-16">
-              <span>Total check-ins</span>
-              <span>{summary.total}</span>
-            </div>
-            <div className="flex items-center justify-between gap-16">
-              <span>Positive moods</span>
-              <span>{summary.positivePercent}%</span>
-            </div>
-            <div className="flex items-center justify-between gap-16">
-              <span>Challenging moods</span>
-              <span>{summary.challengingPercent}%</span>
-            </div>
+            <div>Your emotional journey: {summary.total} check-ins tracked</div>
+            <div>Positive states: {summary.positivePercent}% of your path</div>
+            <div>Challenging states: {summary.challengingPercent}% navigated</div>
             {summary.neutralPercent > 0 && (
-              <div className="flex items-center justify-between gap-16">
-                <span>Neutral moods</span>
-                <span>{summary.neutralPercent}%</span>
-              </div>
+              <div>Neutral states: {summary.neutralPercent}% observed</div>
             )}
           </div>
         </div>
