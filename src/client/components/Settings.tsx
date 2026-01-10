@@ -11,7 +11,6 @@ import {
 } from '#shared/constants'
 import { cn } from '#client/utils'
 import { WorldCanvas } from './WorldCanvas'
-import { notificationSettings, toggleNotifications, updateNotificationSettings, NotificationFrequency } from '#client/stores/notifications'
 
 interface StatusData {
   version: string
@@ -24,7 +23,6 @@ export const Settings = () => {
   const accentColor = useStore(stores.accentColor)
   const isCustomThemeEnabled = useStore(stores.isCustomThemeEnabled)
   const { data: storyData } = useMyMemoryStory()
-  const notifications = useStore(notificationSettings)
 
   const { mutate: updateSettings } = useUpdateSettings({
     onSuccess: () => {
@@ -400,102 +398,6 @@ export const Settings = () => {
                 Export Self-care History (CSV)
               </a>
             </div>
-          </Block>
-        </div>
-
-        {/* Reminders Section */}
-        <div>
-          <Block label="Reminders:" blockView>
-            <div className="mb-12">
-              Get gentle reminders for self-care moments. Opt-in only, respects quiet hours.
-            </div>
-
-            <div className="mb-8">
-              <Block
-                label="Self-care reminders:"
-                onChildrenClick={async () => {
-                  const enabled = await toggleNotifications()
-                  if (!enabled && Notification.permission === 'denied') {
-                    alert('Notifications blocked. Please enable them in your browser settings.')
-                  }
-                }}
-              >
-                {notifications.enabled ? 'On' : 'Off'}
-              </Block>
-            </div>
-
-            {notifications.enabled && (
-              <>
-                <div className="mb-8">
-                  <Block label="Frequency:" blockView>
-                    <div className="flex flex-col gap-4">
-                      <Block
-                        label=""
-                        onChildrenClick={() => updateNotificationSettings({ frequency: 'once-daily' })}
-                      >
-                        <span className={cn(
-                          notifications.frequency === 'once-daily' ? 'opacity-100' : 'opacity-60'
-                        )}>
-                          Once daily
-                        </span>
-                      </Block>
-                      <Block
-                        label=""
-                        onChildrenClick={() => updateNotificationSettings({ frequency: 'twice-daily' })}
-                      >
-                        <span className={cn(
-                          notifications.frequency === 'twice-daily' ? 'opacity-100' : 'opacity-60'
-                        )}>
-                          Twice daily
-                        </span>
-                      </Block>
-                      <Block
-                        label=""
-                        onChildrenClick={() => updateNotificationSettings({ frequency: 'pattern-based' })}
-                      >
-                        <span className={cn(
-                          notifications.frequency === 'pattern-based' ? 'opacity-100' : 'opacity-60'
-                        )}>
-                          Pattern-based (adaptive)
-                        </span>
-                      </Block>
-                    </div>
-                  </Block>
-                </div>
-
-                <div className="mb-8">
-                  <Block label="Quiet hours:" blockView>
-                    <div className="mb-4">
-                      No reminders between {notifications.quietHoursStart}:00 - {notifications.quietHoursEnd}:00
-                    </div>
-                    <div className="flex flex-col gap-4">
-                      <Block label="Start:">
-                        <select
-                          className="bg-transparent outline-none cursor-pointer"
-                          value={notifications.quietHoursStart}
-                          onChange={(e) => updateNotificationSettings({ quietHoursStart: parseInt(e.target.value) })}
-                        >
-                          {Array.from({ length: 24 }, (_, i) => (
-                            <option key={i} value={i}>{i}:00</option>
-                          ))}
-                        </select>
-                      </Block>
-                      <Block label="End:">
-                        <select
-                          className="bg-transparent outline-none cursor-pointer"
-                          value={notifications.quietHoursEnd}
-                          onChange={(e) => updateNotificationSettings({ quietHoursEnd: parseInt(e.target.value) })}
-                        >
-                          {Array.from({ length: 24 }, (_, i) => (
-                            <option key={i} value={i}>{i}:00</option>
-                          ))}
-                        </select>
-                      </Block>
-                    </div>
-                  </Block>
-                </div>
-              </>
-            )}
           </Block>
         </div>
 

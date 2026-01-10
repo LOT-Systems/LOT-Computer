@@ -261,15 +261,6 @@ Service worker cache version already bumped. PWA users will receive updates auto
   - Accessible via Settings > Data Export section
   - Useful for analysis, backup, or sharing with healthcare providers
 
-### Self-Care Reminders
-- **Optional Browser Notifications**: Gentle, opt-in reminders for self-care moments
-  - Three frequency modes: Once daily, Twice daily, Pattern-based (adaptive)
-  - Configurable quiet hours (default: 22:00 - 8:00)
-  - Pattern-based mode integrates with intention engine
-  - Silent notifications, no sound
-  - Complete user control via Settings > Reminders
-  - 15-minute background check intervals
-
 ---
 
 ## 🎯 Future Enhancements

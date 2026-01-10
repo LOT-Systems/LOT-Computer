@@ -19,7 +19,6 @@ import { useSound } from '#client/utils/sound'
 import { useRadio } from '#client/utils/radio'
 import { sync } from '../sync'
 import { initRecipeWidget } from '#client/stores/recipeWidget'
-import { initNotificationService } from '#client/utils/notificationService'
 
 sync.listen('users_total', (data) => {
   stores.usersTotal.set(data.value)
@@ -104,9 +103,6 @@ const App = () => {
 
     // Initialize recipe widget periodic checking
     initRecipeWidget()
-
-    // Initialize notification service for self-care reminders
-    initNotificationService()
 
     return () => {
       unbindRouter()
