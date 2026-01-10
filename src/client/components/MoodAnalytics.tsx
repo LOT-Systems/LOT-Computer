@@ -1,7 +1,6 @@
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { useEmotionalCheckIns, useLogs } from '#client/queries'
-import { cn } from '#client/utils'
 
 type AnalyticsView = 'time' | 'selfcare' | 'summary'
 
@@ -169,22 +168,16 @@ export function MoodAnalytics() {
       {view === 'time' && timeCorrelations && (
         <div className="inline-block">
           {timeCorrelations.length === 0 ? (
-            <div className="opacity-60">Track moods at different times to see patterns.</div>
+            <div>Track moods at different times to see patterns.</div>
           ) : (
-            <>
-              <div className="mb-12 opacity-90">Your mood by time of day:</div>
-              <div className="flex flex-col gap-6">
-                {timeCorrelations.map(({ time, mood, count }) => (
-                  <div key={time} className="flex flex-col gap-2">
-                    <div className="opacity-60 text-[14px]">{time}</div>
-                    <div className="flex items-center gap-8 opacity-90">
-                      <span className="capitalize">{mood}</span>
-                      <span className="opacity-60 text-[12px]">{count}x</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
+            <div className="flex flex-col gap-4">
+              {timeCorrelations.map(({ time, mood, count }) => (
+                <div key={time} className="flex items-center justify-between gap-16">
+                  <span>{time}</span>
+                  <span className="capitalize">{mood} ({count}x)</span>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}
@@ -192,54 +185,44 @@ export function MoodAnalytics() {
       {view === 'selfcare' && (
         <div className="inline-block">
           {!selfCareCorrelations ? (
-            <div className="opacity-60">Complete self-care to see its impact on your mood.</div>
+            <div>Complete self-care to see its impact on your mood.</div>
           ) : selfCareCorrelations.afterCount === 0 ? (
-            <div className="opacity-60">Complete more self-care to see patterns.</div>
+            <div>Complete more self-care to see patterns.</div>
           ) : (
-            <>
-              <div className="mb-12 opacity-90">Impact of self-care on mood:</div>
-              <div className="flex flex-col gap-6">
-                <div>
-                  <div className="opacity-60 text-[14px] mb-2">After self-care</div>
-                  <div className="opacity-90">{selfCareCorrelations.afterCount} check-ins</div>
-                </div>
-                <div>
-                  <div className="opacity-60 text-[14px] mb-2">Effect</div>
-                  <div className={cn(
-                    "opacity-90",
-                    selfCareCorrelations.hasEffect && "text-green-500"
-                  )}>
-                    {selfCareCorrelations.hasEffect
-                      ? 'Noticeable positive impact'
-                      : 'Keep practicing to see patterns'}
-                  </div>
-                </div>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between gap-16">
+                <span>After self-care</span>
+                <span>{selfCareCorrelations.afterCount} check-ins</span>
               </div>
-            </>
+              <div>
+                {selfCareCorrelations.hasEffect
+                  ? 'Noticeable positive impact'
+                  : 'Keep practicing to see patterns'}
+              </div>
+            </div>
           )}
         </div>
       )}
 
       {view === 'summary' && summary && (
         <div className="inline-block">
-          <div className="mb-12 opacity-90">Last 30 days:</div>
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-16">
-              <span className="opacity-90">Total check-ins</span>
-              <span className="opacity-80">{summary.total}</span>
+              <span>Total check-ins</span>
+              <span>{summary.total}</span>
             </div>
             <div className="flex items-center justify-between gap-16">
-              <span className="opacity-90">Positive moods</span>
-              <span className="opacity-90 text-green-500">{summary.positivePercent}%</span>
+              <span>Positive moods</span>
+              <span>{summary.positivePercent}%</span>
             </div>
             <div className="flex items-center justify-between gap-16">
-              <span className="opacity-90">Challenging moods</span>
-              <span className="opacity-90 text-yellow-500">{summary.challengingPercent}%</span>
+              <span>Challenging moods</span>
+              <span>{summary.challengingPercent}%</span>
             </div>
             {summary.neutralPercent > 0 && (
               <div className="flex items-center justify-between gap-16">
-                <span className="opacity-90">Neutral moods</span>
-                <span className="opacity-60">{summary.neutralPercent}%</span>
+                <span>Neutral moods</span>
+                <span>{summary.neutralPercent}%</span>
               </div>
             )}
           </div>
