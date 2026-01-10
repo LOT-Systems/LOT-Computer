@@ -1,6 +1,7 @@
 import React from 'react'
 import { Block, Button } from '#client/components/ui'
 import { useLogs } from '#client/queries'
+import { recordSignal } from '#client/stores/intentionEngine'
 import axios from 'axios'
 
 type ReflectionView = 'prompt' | 'write' | 'recent' | 'themes'
@@ -38,6 +39,13 @@ export function JournalReflection() {
     setIsSaving(true)
     try {
       await axios.post('/api/logs', { text: writingText.trim() })
+
+      // Record intention signal for quantum pattern recognition
+      recordSignal('journal', 'entry_written', {
+        wordCount: writingText.trim().split(/\s+/).length,
+        hour: new Date().getHours()
+      })
+
       setJustSaved(true)
       setWritingText('')
 

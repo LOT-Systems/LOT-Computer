@@ -30,6 +30,7 @@ import { EnergyCapacitor } from './EnergyCapacitor'
 import { NarrativeWidget } from './NarrativeWidget'
 import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
+import { JournalReflection } from './JournalReflection'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
 import { getOptimalWidget, shouldShowWidget } from '#client/stores/intentionEngine'
@@ -550,6 +551,15 @@ export const System = () => {
 
       {/* Planner - Show occasionally for daily/weekly planning */}
       <PlannerWidget />
+
+      {/* Journal - Show when intention engine detects surface-awareness pattern */}
+      {(() => {
+        // Check if intention engine recognizes need for deeper reflection
+        const intentionSuggestsJournal = shouldShowWidget('journal')
+
+        // Only show if pattern detected (consistent mood tracking without journaling)
+        return intentionSuggestsJournal && <JournalReflection />
+      })()}
 
       <MemoryWidget />
     </div>
