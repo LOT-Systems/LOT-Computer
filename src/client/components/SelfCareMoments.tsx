@@ -336,7 +336,10 @@ function generateContextualSuggestion(
 ): CareSuggestion {
   const suggestions: CareSuggestion[] = []
 
-  // Weather-based suggestions
+  // Get current hour for time-aware suggestions
+  const hour = new Date().getHours()
+
+  // Weather-based suggestions (time-aware)
   if (weatherDesc) {
     const weatherLower = weatherDesc.toLowerCase()
     if (weatherLower.includes('rain') || weatherLower.includes('storm')) {
@@ -346,7 +349,8 @@ function generateContextualSuggestion(
         practice: 'Make your favorite warm drink.\nFind a comfortable spot.\nPut on music that soothes you.\nJust be present for 10 minutes.',
         duration: '10 mins'
       })
-    } else if (weatherLower.includes('sun') || weatherLower.includes('clear')) {
+    } else if ((weatherLower.includes('sun') || weatherLower.includes('clear')) && hour >= 6 && hour < 19) {
+      // Only suggest sunlight during daylight hours (6 AM - 7 PM)
       suggestions.push({
         action: 'Step outside and get sunlight',
         why: 'Sunlight regulates your circadian rhythm and boosts mood.',
@@ -446,7 +450,6 @@ function generateContextualSuggestion(
   }
 
   // Time-based suggestions
-  const hour = new Date().getHours()
   if (hour >= 6 && hour < 9) {
     suggestions.push(
       {
