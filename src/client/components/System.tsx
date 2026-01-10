@@ -31,7 +31,6 @@ import { NarrativeWidget } from './NarrativeWidget'
 import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
 import { JournalReflection } from './JournalReflection'
-import { MoodAnalytics } from './MoodAnalytics'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
 import { getOptimalWidget, shouldShowWidget } from '#client/stores/intentionEngine'
@@ -452,9 +451,6 @@ export const System = () => {
       {/* Mood Check-In - Show every 3 hours max, context-based on time of day */}
       {/* Widget controls its own visibility internally to allow farewell animations */}
       <EmotionalCheckIn />
-
-      {/* Mood Analytics - Show insights when enough mood data collected (5+ check-ins) */}
-      <MoodAnalytics />
 
       {/* Self-care Moments - Show during rest/refresh times OR when intention engine detects need */}
       {(() => {
