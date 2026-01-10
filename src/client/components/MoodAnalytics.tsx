@@ -1,57 +1,31 @@
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { useEmotionalCheckIns, useLogs } from '#client/queries'
-import { useStore } from '@nanostores/react'
-import * as stores from '#client/stores'
 import { cn } from '#client/utils'
 
-type AnalyticsView = 'weather' | 'time' | 'selfcare' | 'summary'
+type AnalyticsView = 'time' | 'selfcare' | 'summary'
 
 /**
  * Mood Analytics Widget - Discover what influences your emotional state
- * Pattern: Weather → Time → Self-Care → Summary
+ * Pattern: Time → Self-Care → Summary
  * Analyzes correlations between mood and various factors
  */
 export function MoodAnalytics() {
-  const [view, setView] = React.useState<AnalyticsView>('weather')
+  const [view, setView] = React.useState<AnalyticsView>('time')
 
   const { data: checkInsData } = useEmotionalCheckIns(30) // Last 30 days
   const { data: logs = [] } = useLogs()
-  const weather = useStore(stores.weather)
 
   const cycleView = () => {
     setView(prev => {
       switch (prev) {
-        case 'weather': return 'time'
         case 'time': return 'selfcare'
         case 'selfcare': return 'summary'
-        case 'summary': return 'weather'
-        default: return 'weather'
+        case 'summary': return 'time'
+        default: return 'time'
       }
     })
   }
-
-  // Analyze mood-weather correlations
-  const weatherCorrelations = React.useMemo(() => {
-    if (!checkInsData || checkInsData.checkIns.length < 5) return null
-
-    const moodsByWeather: { [key: string]: string[] } = {}
-
-    // Group moods by general weather condition
-    checkInsData.checkIns.forEach((checkIn: any) => {
-      const mood = checkIn.metadata?.emotionalState
-      if (!mood) return
-
-      // In a real implementation, we'd fetch historical weather data
-      // For now, we'll use a simplified approach
-      const weatherType = 'clear' // Placeholder
-
-      if (!moodsByWeather[weatherType]) moodsByWeather[weatherType] = []
-      moodsByWeather[weatherType].push(mood)
-    })
-
-    return moodsByWeather
-  }, [checkInsData])
 
   // Analyze mood-time correlations
   const timeCorrelations = React.useMemo(() => {
@@ -167,21 +141,20 @@ export function MoodAnalytics() {
 
     const positiveCount = moods.filter(m => positive.includes(m)).length
     const challengingCount = moods.filter(m => challenging.includes(m)).length
-    const neutralCount = moods.length - positiveCount - challengingCount
 
     const positivePercent = Math.round((positiveCount / moods.length) * 100)
     const challengingPercent = Math.round((challengingCount / moods.length) * 100)
+    const neutralPercent = 100 - positivePercent - challengingPercent
 
     return {
       total: moods.length,
       positivePercent,
       challengingPercent,
-      neutralPercent: 100 - positivePercent - challengingPercent
+      neutralPercent
     }
   }, [checkInsData])
 
   const label =
-    view === 'weather' ? 'Weather:' :
     view === 'time' ? 'Time:' :
     view === 'selfcare' ? 'Self-care:' :
     'Summary:'
@@ -193,53 +166,52 @@ export function MoodAnalytics() {
 
   return (
     <Block label={`Insights ${label}`} blockView onLabelClick={cycleView}>
-      {view === 'weather' && (
-        <div className="inline-block">
-          <div className="mb-8 opacity-70">
-            Weather patterns coming soon. Track more moods to see correlations.
-          </div>
-        </div>
-      )}
-
       {view === 'time' && timeCorrelations && (
         <div className="inline-block">
-          <div className="mb-12 opacity-70">Your mood by time of day:</div>
-          <div className="flex flex-col gap-6">
-            {timeCorrelations.map(({ time, mood, count }) => (
-              <div key={time} className="flex flex-col gap-2">
-                <div className="opacity-60 text-[14px]">{time}</div>
-                <div className="flex items-center gap-8">
-                  <span className="capitalize">{mood}</span>
-                  <span className="opacity-60 text-[12px]">({count}x)</span>
-                </div>
+          {timeCorrelations.length === 0 ? (
+            <div className="opacity-60">Track moods at different times to see patterns.</div>
+          ) : (
+            <>
+              <div className="mb-12 opacity-90">Your mood by time of day:</div>
+              <div className="flex flex-col gap-6">
+                {timeCorrelations.map(({ time, mood, count }) => (
+                  <div key={time} className="flex flex-col gap-2">
+                    <div className="opacity-60 text-[14px]">{time}</div>
+                    <div className="flex items-center gap-8 opacity-90">
+                      <span className="capitalize">{mood}</span>
+                      <span className="opacity-60 text-[12px]">{count}x</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
         </div>
       )}
 
-      {view === 'selfcare' && selfCareCorrelations && (
+      {view === 'selfcare' && (
         <div className="inline-block">
-          {selfCareCorrelations.afterCount === 0 ? (
-            <div className="opacity-70">
-              Complete more self-care to see its impact on your mood.
-            </div>
+          {!selfCareCorrelations ? (
+            <div className="opacity-60">Complete self-care to see its impact on your mood.</div>
+          ) : selfCareCorrelations.afterCount === 0 ? (
+            <div className="opacity-60">Complete more self-care to see patterns.</div>
           ) : (
             <>
-              <div className="mb-12 opacity-70">Impact of self-care on mood:</div>
+              <div className="mb-12 opacity-90">Impact of self-care on mood:</div>
               <div className="flex flex-col gap-6">
                 <div>
                   <div className="opacity-60 text-[14px] mb-2">After self-care</div>
-                  <div>{selfCareCorrelations.afterCount} check-ins</div>
+                  <div className="opacity-90">{selfCareCorrelations.afterCount} check-ins</div>
                 </div>
                 <div>
                   <div className="opacity-60 text-[14px] mb-2">Effect</div>
                   <div className={cn(
-                    selfCareCorrelations.hasEffect ? 'text-green-500' : 'opacity-70'
+                    "opacity-90",
+                    selfCareCorrelations.hasEffect && "text-green-500"
                   )}>
                     {selfCareCorrelations.hasEffect
-                      ? '↑ Noticeable positive impact'
-                      : '→ Keep practicing to see patterns'}
+                      ? 'Noticeable positive impact'
+                      : 'Keep practicing to see patterns'}
                   </div>
                 </div>
               </div>
@@ -250,24 +222,26 @@ export function MoodAnalytics() {
 
       {view === 'summary' && summary && (
         <div className="inline-block">
-          <div className="mb-12 opacity-70">Last 30 days overview:</div>
+          <div className="mb-12 opacity-90">Last 30 days:</div>
           <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between gap-16">
-              <span>Total check-ins</span>
-              <span className="opacity-75">{summary.total}</span>
+              <span className="opacity-90">Total check-ins</span>
+              <span className="opacity-80">{summary.total}</span>
             </div>
             <div className="flex items-center justify-between gap-16">
-              <span>Positive moods</span>
-              <span className="text-green-500">{summary.positivePercent}%</span>
+              <span className="opacity-90">Positive moods</span>
+              <span className="opacity-90 text-green-500">{summary.positivePercent}%</span>
             </div>
             <div className="flex items-center justify-between gap-16">
-              <span>Challenging moods</span>
-              <span className="text-yellow-500">{summary.challengingPercent}%</span>
+              <span className="opacity-90">Challenging moods</span>
+              <span className="opacity-90 text-yellow-500">{summary.challengingPercent}%</span>
             </div>
-            <div className="flex items-center justify-between gap-16">
-              <span>Neutral moods</span>
-              <span className="opacity-60">{summary.neutralPercent}%</span>
-            </div>
+            {summary.neutralPercent > 0 && (
+              <div className="flex items-center justify-between gap-16">
+                <span className="opacity-90">Neutral moods</span>
+                <span className="opacity-60">{summary.neutralPercent}%</span>
+              </div>
+            )}
           </div>
         </div>
       )}
