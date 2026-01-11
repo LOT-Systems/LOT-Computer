@@ -142,9 +142,30 @@ export const useMemory = () => {
   // Use date only (no time) to prevent regenerating questions multiple times per day
   const date = btoa(dayjs().format('YYYY-MM-DD'))
   const path = '/api/memory'
+
   return useQuery<any>(
     [path, date], // Include date in query key for proper caching
-    async () => (await api.get<any>(path, { params: { d: date } })).data,
+    async () => {
+      // Get quantum state to send to server for context-aware question generation
+      let quantumParams = {}
+      if (typeof window !== 'undefined') {
+        try {
+          const { getUserState, analyzeIntentions } = await import('#client/stores/intentionEngine')
+          analyzeIntentions()
+          const state = getUserState()
+          quantumParams = {
+            qe: state.energy,
+            qc: state.clarity,
+            qa: state.alignment,
+            qn: state.needsSupport
+          }
+        } catch (e) {
+          // Quantum state optional - graceful degradation
+        }
+      }
+
+      return (await api.get<any>(path, { params: { d: date, ...quantumParams } })).data
+    },
     {
       staleTime: Infinity, // Never refetch - question is valid for the whole day
       cacheTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours

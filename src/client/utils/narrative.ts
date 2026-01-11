@@ -162,12 +162,31 @@ export function getRomanticNarrative(daysSince: number, quality: string): string
 }
 
 /**
- * Get memory reflection prompt based on time
+ * Get memory reflection prompt based on time and quantum state
+ *
+ * Quantum-aware: adapts to user's energy, clarity, and alignment
  */
-export function getMemoryReflectionPrompt(): string {
+export function getMemoryReflectionPrompt(
+  energy?: 'depleted' | 'low' | 'moderate' | 'high' | 'unknown',
+  clarity?: 'confused' | 'uncertain' | 'clear' | 'focused' | 'unknown',
+  alignment?: 'disconnected' | 'searching' | 'aligned' | 'flowing' | 'unknown'
+): string {
   const timeOfDay = getTimeOfDay()
-  const season = getSeason()
 
+  // Quantum-aware prompts based on user state
+  if (energy === 'depleted' || energy === 'low') {
+    return 'Rest and remember'
+  }
+
+  if (alignment === 'flowing' || (energy === 'high' && clarity === 'focused')) {
+    return 'In this moment'
+  }
+
+  if (clarity === 'confused' || alignment === 'searching') {
+    return 'Notice'
+  }
+
+  // Time-aware fallbacks
   if (timeOfDay === 'evening' || timeOfDay === 'night') {
     return 'Looking back'
   }

@@ -1281,7 +1281,13 @@ export default async (fastify: FastifyInstance) => {
 
   fastify.get(
     '/memory',
-    async (req: FastifyRequest<{ Querystring: { d: string } }>, reply) => {
+    async (req: FastifyRequest<{ Querystring: {
+      d: string
+      qe?: string // quantum energy
+      qc?: string // quantum clarity
+      qa?: string // quantum alignment
+      qn?: string // quantum needs support
+    } }>, reply) => {
       const MORNING_HOUR = 7
       const EVENING_HOUR = 19
       function getPeriodEdges(
@@ -1438,7 +1444,15 @@ export default async (fastify: FastifyInstance) => {
             limit: 120,
           })
 
-          const prompt = await buildPrompt(req.user, logs, isWeekend)
+          // Extract quantum state from client for context-aware question generation
+          const quantumState = req.query.qe ? {
+            energy: req.query.qe,
+            clarity: req.query.qc,
+            alignment: req.query.qa,
+            needsSupport: req.query.qn
+          } : undefined
+
+          const prompt = await buildPrompt(req.user, logs, isWeekend, quantumState)
           const question = await completeAndExtractQuestion(prompt, req.user)
 
           return question
