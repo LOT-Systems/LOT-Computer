@@ -32,7 +32,7 @@ import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
-import { getOptimalWidget, shouldShowWidget } from '#client/stores/intentionEngine'
+import { getOptimalWidget, shouldShowWidget, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
 
 export const System = () => {
   const me = useStore(stores.me)
@@ -60,7 +60,7 @@ export const System = () => {
   const [isBreatheOn, setIsBreatheOn] = React.useState(false)
   const breatheState = useBreathe(isBreatheOn)
   const [showRadio, setShowRadio] = React.useState(false)
-  const [astrologyView, setAstrologyView] = React.useState<'astrology' | 'psychology' | 'journey'>('astrology')
+  const [astrologyView, setAstrologyView] = React.useState<'astrology' | 'psychology' | 'journey' | 'quantum'>('astrology')
   const [showWeatherSuggestion, setShowWeatherSuggestion] = React.useState(false)
   const [isSoundToggling, setIsSoundToggling] = React.useState(false)
   const [showSharedEmotion, setShowSharedEmotion] = React.useState(false)
@@ -154,6 +154,12 @@ export const System = () => {
       answerCount,
     }
   }, [logs])
+
+  // Quantum state - analyze intentions and get current user state
+  const quantumState = React.useMemo(() => {
+    analyzeIntentions() // Trigger fresh analysis
+    return getUserState()
+  }, [logs]) // Recompute when logs change (new signals recorded)
 
   // Calculate awareness index from backend selfAwarenessLevel (0-100) to percentage (0-10%)
   // Long-term growth with decimal precision (e.g., 2.3%, 5.7%)
@@ -339,13 +345,15 @@ export const System = () => {
           label={
             astrologyView === 'astrology' ? "Astrology:" :
             astrologyView === 'psychology' ? "Psychology:" :
-            "My Journey:"
+            astrologyView === 'journey' ? "My Journey:" :
+            "Quantum:"
           }
           onLabelClick={() => {
-            // Cycle through: Astrology → Psychology → Journey → Astrology
+            // Cycle through: Astrology → Psychology → Journey → Quantum → Astrology
             setAstrologyView(prev =>
               prev === 'astrology' ? 'psychology' :
               prev === 'psychology' ? 'journey' :
+              prev === 'journey' ? 'quantum' :
               'astrology'
             )
           }}
@@ -358,10 +366,16 @@ export const System = () => {
             <div className="inline-block">
               {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}
             </div>
-          ) : (
+          ) : astrologyView === 'journey' ? (
             <div className="inline-block">
               <div>Day {journeyData.daysSinceStart} • {journeyData.answerCount} memories • Awareness {awarenessIndex}%</div>
               <div>{profile?.behavioralCohort || 'Growing'} • {profile?.emotionalPatterns?.[0] || 'Exploring patterns'}</div>
+            </div>
+          ) : (
+            <div className="inline-block">
+              <div className="capitalize">
+                {quantumState.energy} energy • {quantumState.clarity} clarity • {quantumState.alignment} alignment
+              </div>
             </div>
           )}
         </Block>
@@ -481,12 +495,24 @@ export const System = () => {
         }
 
         // Check if intention engine recognizes self-care need
-        const intentionSuggestsSelfCare = shouldShowWidget('selfcare')
+        const optimal = getOptimalWidget()
+        const intentionSuggestsSelfCare = optimal?.widget === 'selfcare'
 
         // Show if:
         // 1. Intention engine detects anxiety/overwhelm patterns, OR
         // 2. During key times, especially if haven't done self-care yet
-        return (intentionSuggestsSelfCare || isMidMorning || isAfternoon || isEvening || completedToday === 0) && <SelfCareMoments />
+        const shouldShow = intentionSuggestsSelfCare || isMidMorning || isAfternoon || isEvening || completedToday === 0
+
+        if (!shouldShow) return null
+
+        // Store quantum reasoning for widget to display
+        if (intentionSuggestsSelfCare && optimal?.reason) {
+          localStorage.setItem('selfcare-quantum-reason', optimal.reason)
+        } else {
+          localStorage.removeItem('selfcare-quantum-reason')
+        }
+
+        return <SelfCareMoments />
       })()}
 
       {/* Intentions - Show if user has intention OR when intention engine detects seeking-direction pattern */}
@@ -503,7 +529,8 @@ export const System = () => {
         const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
 
         // Check if intention engine recognizes need for direction
-        const intentionSuggestsIntentions = shouldShowWidget('intentions')
+        const optimal = getOptimalWidget()
+        const intentionSuggestsIntentions = optimal?.widget === 'intentions'
 
         // Show if:
         // 1. User has an existing intention to display, OR
@@ -514,6 +541,14 @@ export const System = () => {
           if (!lastShown || cooldownPassed || intentionSuggestsIntentions) {
             localStorage.setItem('intentions-last-shown', Date.now().toString())
           }
+
+          // Store quantum reasoning for widget to display
+          if (intentionSuggestsIntentions && optimal?.reason) {
+            localStorage.setItem('intentions-quantum-reason', optimal.reason)
+          } else {
+            localStorage.removeItem('intentions-quantum-reason')
+          }
+
           return <IntentionsWidget />
         }
 

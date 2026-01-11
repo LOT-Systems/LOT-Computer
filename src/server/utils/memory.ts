@@ -196,7 +196,17 @@ function extractQuestionTopics(questions: string[]): {
   return { dominantTopic: null, topicCount: 0 }
 }
 
-export async function buildPrompt(user: User, logs: Log[], isWeekend: boolean = false): Promise<string> {
+export async function buildPrompt(
+  user: User,
+  logs: Log[],
+  isWeekend: boolean = false,
+  quantumState?: {
+    energy?: string
+    clarity?: string
+    alignment?: string
+    needsSupport?: string
+  }
+): Promise<string> {
   const context = await getLogContext(user)
   const localDate = context.timeZone
     ? dayjs().tz(context.timeZone).format('D MMM YYYY, HH:mm')
@@ -214,6 +224,39 @@ export async function buildPrompt(user: User, logs: Log[], isWeekend: boolean = 
     } else {
       contextLine += '.'
     }
+  }
+
+  // Quantum state context from client-side intention engine
+  let quantumContext = ''
+  if (quantumState && quantumState.energy && quantumState.energy !== 'unknown') {
+    quantumContext = `\n\n**Quantum State (Real-time user energy from pattern recognition):**
+Their current state: ${quantumState.energy} energy, ${quantumState.clarity} clarity, ${quantumState.alignment} alignment
+Support level: ${quantumState.needsSupport}
+
+**Quantum-Aware Question Guidance:**
+${quantumState.energy === 'depleted' || quantumState.energy === 'low'
+  ? '- User has low energy: Ask gentle, restorative questions about rest, self-care, or small wins'
+  : quantumState.energy === 'high'
+  ? '- User has high energy: Ask expansive questions about goals, creativity, or meaningful action'
+  : '- User has moderate energy: Balanced questions about daily life and growth'}
+
+${quantumState.clarity === 'confused' || quantumState.clarity === 'uncertain'
+  ? '- User lacks clarity: Ask grounding questions to help them notice and understand their state'
+  : quantumState.clarity === 'focused'
+  ? '- User is focused: Ask deeper questions that leverage their current clarity'
+  : ''}
+
+${quantumState.alignment === 'disconnected' || quantumState.alignment === 'searching'
+  ? '- User feels disconnected: Ask questions about values, intentions, or what matters'
+  : quantumState.alignment === 'flowing'
+  ? '- User is in flow: Ask questions that celebrate and deepen this aligned state'
+  : ''}
+
+${quantumState.needsSupport === 'critical' || quantumState.needsSupport === 'moderate'
+  ? '- User needs support: Prioritize compassionate, supportive questions over analytical ones'
+  : ''}
+
+Match your question to their quantum state. The engine recognizes patterns they may not consciously see.`
   }
 
   // Extract Memory answers to build user's story
@@ -589,7 +632,7 @@ ${
 Recent activity logs (for additional context):
   `.trim()
   const formattedLogs = logs.map(formatLog).filter(Boolean).join('\n\n')
-  return head + '\n\n' + formattedLogs
+  return head + quantumContext + '\n\n' + formattedLogs
 }
 
 function formatLog(log: Log): string {

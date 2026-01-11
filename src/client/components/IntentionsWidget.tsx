@@ -121,6 +121,14 @@ export function IntentionsWidget() {
         <div className="inline-block w-full">
           {isSettingIntention ? (
             <>
+              {(() => {
+                const quantumReason = localStorage.getItem('intentions-quantum-reason')
+                return quantumReason ? (
+                  <div className="opacity-60 mb-8">
+                    {quantumReason}
+                  </div>
+                ) : null
+              })()}
               <div className="mb-12">What do you want to cultivate this month?</div>
               <input
                 type="text"
@@ -142,6 +150,14 @@ export function IntentionsWidget() {
             </>
           ) : (
             <>
+              {(() => {
+                const quantumReason = localStorage.getItem('intentions-quantum-reason')
+                return quantumReason ? (
+                  <div className="opacity-60 mb-8">
+                    {quantumReason}
+                  </div>
+                ) : null
+              })()}
               <div className="mb-16">
                 {intention ? 'Set a new intention for this month.' : 'What aspect of yourself do you want to nurture this month?'} Examples:
               </div>

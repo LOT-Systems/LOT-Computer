@@ -265,6 +265,14 @@ export function SelfCareMoments() {
         <>
       {view === 'suggestion' && (
         <div className="inline-block w-full">
+          {(() => {
+            const quantumReason = localStorage.getItem('selfcare-quantum-reason')
+            return quantumReason ? (
+              <div className="opacity-60 mb-8">
+                {quantumReason}
+              </div>
+            ) : null
+          })()}
           <div className={cn("opacity-90", (completedToday > 0 || currentStreak > 0) ? "mb-12" : "mb-16")}>
             {currentSuggestion.action} ({currentSuggestion.duration})
           </div>

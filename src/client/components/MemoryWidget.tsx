@@ -6,7 +6,7 @@ import { cn } from '#client/utils'
 import { fp } from '#shared/utils'
 import { MemoryQuestion } from '#shared/types'
 import * as stores from '#client/stores'
-import { recordSignal } from '#client/stores/intentionEngine'
+import { recordSignal, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
 import { getMemoryReflectionPrompt } from '#client/utils/narrative'
 
 export function MemoryWidget() {
@@ -96,6 +96,12 @@ export function MemoryWidget() {
     }
   }, [response])
 
+  // Get quantum state for reflection prompt
+  const quantumState = React.useMemo(() => {
+    analyzeIntentions()
+    return getUserState()
+  }, [])
+
   // Only show questions in System page (story moved to Settings)
   return (
     <Block
@@ -116,9 +122,9 @@ export function MemoryWidget() {
             isQuestionShown && 'opacity-100'
           )}
         >
-          {/* Time-aware reflection prompt */}
+          {/* Quantum-aware reflection prompt */}
           <div className="mb-8 opacity-60">
-            {getMemoryReflectionPrompt()}
+            {getMemoryReflectionPrompt(quantumState.energy, quantumState.clarity, quantumState.alignment)}
           </div>
 
           <div className="mb-16">{question?.question || '...'}</div>
