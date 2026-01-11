@@ -448,6 +448,16 @@ export const useNarrative = () =>
     staleTime: 10 * 60 * 1000, // Cache for 10 minutes
   })()
 
+export const useGoalProgression = () =>
+  createQuery<{
+    progression: any | null // TODO: Type this properly
+    generatedAt: string
+    message?: string
+  }>('/api/goal-progression', {
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000, // Cache for 10 minutes
+  })()
+
 export interface ChatCatalyst {
   type: string
   priority: number

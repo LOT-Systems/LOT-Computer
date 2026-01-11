@@ -24,6 +24,7 @@ import {
 import { toCelsius } from '#shared/utils'
 import { getLogContext } from './logs.js'
 import { aiEngineManager, type EnginePreference } from './ai-engines.js'
+import { extractGoals, type ExtractedGoal } from './goal-understanding.js'
 
 // OpenAI client (for non-Usership users - LEGACY fallback)
 const oai = new OpenAI({
@@ -257,6 +258,65 @@ ${quantumState.needsSupport === 'critical' || quantumState.needsSupport === 'mod
   : ''}
 
 Match your question to their quantum state. The engine recognizes patterns they may not consciously see.`
+  }
+
+  // Goal context - understand what user is working toward
+  const userGoals = extractGoals(user, logs)
+  const activeGoals = userGoals.filter(g => g.state === 'active' || g.state === 'progressing').slice(0, 3)
+
+  let goalContext = ''
+  if (activeGoals.length > 0) {
+    const goalList = activeGoals.map((g, i) => {
+      const progressInfo = g.progressMarkers.length > 0
+        ? ` (${g.journeyStage} stage - ${g.progressMarkers[g.progressMarkers.length - 1].description})`
+        : ` (${g.journeyStage} stage)`
+
+      return `${i + 1}. ${g.title}${progressInfo}`
+    }).join('\n')
+
+    const primaryGoal = activeGoals[0]
+
+    goalContext = `\n\n**User's Current Goals (Extracted from patterns and intentions):**
+${goalList}
+
+**CRITICAL - Goal-Aligned Question Generation:**
+This user is actively working toward: "${primaryGoal.title}"
+- Journey stage: ${primaryGoal.journeyStage}
+- Category: ${primaryGoal.category}
+- Confidence: ${Math.round(primaryGoal.confidence * 100)}%
+
+${primaryGoal.journeyStage === 'beginning'
+  ? `They're just starting this journey. Ask foundational questions that help them understand WHY this goal matters to them and what small first steps they can take.`
+  : primaryGoal.journeyStage === 'struggle'
+  ? `They're in the struggle phase. Ask supportive questions that acknowledge difficulty while reinforcing commitment. Help them see obstacles as part of growth.`
+  : primaryGoal.journeyStage === 'breakthrough'
+  ? `They're experiencing breakthrough! Ask questions that help them recognize and celebrate progress, deepen the practice, and integrate learnings.`
+  : primaryGoal.journeyStage === 'integration'
+  ? `They're integrating this practice into their life. Ask questions that explore how it's changing them, what it reveals about who they're becoming.`
+  : `Ask questions that honor their mastery and invite reflection on the wisdom gained.`}
+
+**Goal-Aligned Question Strategy:**
+1. Your questions should DIRECTLY support their active goals
+2. When exploring new topics, connect back to how it relates to their goals
+3. Celebrate progress toward goals when evident in their answers
+4. If they seem stuck, ask questions that help them see the path forward
+5. Make the connection between daily choices and long-term goals visible
+
+${primaryGoal.category === 'emotional'
+  ? 'Focus on: emotional regulation, mood patterns, triggers, coping strategies, emotional awareness'
+  : primaryGoal.category === 'relational'
+  ? 'Focus on: connection quality, boundary-setting, communication patterns, relationship needs'
+  : primaryGoal.category === 'behavioral'
+  ? 'Focus on: habit formation, consistency, routines, environmental design, accountability'
+  : primaryGoal.category === 'growth'
+  ? 'Focus on: self-awareness, values alignment, identity evolution, meaning-making'
+  : primaryGoal.category === 'physical'
+  ? 'Focus on: energy levels, sleep quality, movement, rest, body awareness'
+  : primaryGoal.category === 'creative'
+  ? 'Focus on: creative expression, flow states, inspiration, artistic practice'
+  : 'Focus on: meaning, purpose, values, existential questions, life direction'}
+
+The system exists to help users achieve their goals. Your questions are tools for transformation.`
   }
 
   // Extract Memory answers to build user's story
@@ -632,7 +692,7 @@ ${
 Recent activity logs (for additional context):
   `.trim()
   const formattedLogs = logs.map(formatLog).filter(Boolean).join('\n\n')
-  return head + quantumContext + '\n\n' + formattedLogs
+  return head + quantumContext + goalContext + '\n\n' + formattedLogs
 }
 
 function formatLog(log: Log): string {

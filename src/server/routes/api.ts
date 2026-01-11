@@ -2517,6 +2517,47 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     }
   })
 
+  // Get user's goal progression and narrative arc
+  fastify.get('/goal-progression', async (req, reply) => {
+    try {
+      const { generateGoalProgression } = await import('#server/utils/goal-understanding.js')
+      const Log = await import('#server/models/log.js').then(m => m.default)
+
+      const logs = await Log.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 500
+      })
+
+      if (logs.length < 5) {
+        return {
+          progression: null,
+          message: 'Your journey unfolds with each step. Keep practicing.'
+        }
+      }
+
+      const progression = generateGoalProgression(req.user, logs)
+
+      console.log(`🎯 Generated goal progression for user ${req.user.id}: ${progression.goals.length} goals, primary: ${progression.overallJourney.primaryGoal?.title || 'none'}`)
+
+      return {
+        progression,
+        generatedAt: new Date().toISOString()
+      }
+
+    } catch (error: any) {
+      console.error('❌ Error generating goal progression:', {
+        error: error.message,
+        stack: error.stack,
+        userId: req.user?.id
+      })
+      return {
+        progression: null,
+        error: error.message
+      }
+    }
+  })
+
   // Get chat catalysts (prompts to connect with cohort)
   fastify.get('/chat-catalysts', async (req, reply) => {
     try {
