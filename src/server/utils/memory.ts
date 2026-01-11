@@ -237,21 +237,26 @@ MUST explore a DIFFERENT topic now. Consider: routine, relationships, creativity
 You have asked these ${recentQuestions.length} questions recently:
 ${recentQuestions.map((q, i) => `${i + 1}. "${q}"`).join('\n')}
 
-**Diversity Guidelines:**
-- Prefer exploring new aspects of their life when appropriate
-- Natural follow-ups are ALLOWED if they deepen understanding of their recent narrative
-- If they've been journaling about a topic, it's good to ask related questions
-- Avoid asking the EXACT same question twice
-- If a topic has been covered 3+ times recently, explore something new
+**STRICT NO-DUPLICATE POLICY:**
+🚫 NEVER ask the same question twice - even with different wording
+🚫 NEVER ask questions that are too similar to recent questions
+🚫 If a topic was covered recently, find a completely NEW angle or topic
 
-**Examples of good follow-ups:**
-✅ If they mentioned breakfast habits → Ask about preparation method or timing
-✅ If they journal about stress → Ask about coping strategies or support
-✅ If they shared evening routine → Ask about sleep quality or morning energy
+**Diversity Requirements:**
+- MUST explore different aspects of their life each time
+- Questions should feel fresh and engaging, not repetitive
+- Natural follow-ups are OK ONLY if they reveal new information
+- If a topic appears 2+ times in recent questions, it's OFF LIMITS
 
-**Examples to avoid:**
-❌ Exact duplicates: "What did you have for breakfast?" → "What did you have for breakfast?"
-❌ Excessive repetition: Asking about tea/coffee 5 times in a row
+**Examples of FORBIDDEN repetition:**
+❌ "What did you have for breakfast?" → "What do you usually eat for breakfast?"
+❌ "How's your morning routine?" → "What time do you wake up?"
+❌ "Do you drink coffee?" → "What's your favorite morning beverage?"
+
+**Examples of GOOD diversity:**
+✅ Morning routine → Evening wind-down routine (different time)
+✅ Food preferences → Music preferences (different domain)
+✅ Work stress → Creative outlets (different focus)
 
 ${topicDiversityWarning}` : ''
 
@@ -1521,23 +1526,23 @@ export async function calculateIntelligentPacing(
   let promptQuotaToday: number
 
   if (isWeekend) {
-    // Weekends: 8-10 prompts throughout the day (increased from 6)
+    // Weekends: 12-15 prompts throughout the day (more time to reflect)
     const seed = dayNumber % 3
-    promptQuotaToday = seed === 0 ? 8 : seed === 1 ? 9 : 10
+    promptQuotaToday = seed === 0 ? 12 : seed === 1 ? 14 : 15
   } else if (dayNumber === 1) {
-    // Day 1: Welcome with 6 prompts (increased from 5)
-    promptQuotaToday = 6
+    // Day 1: Welcome with 10 prompts (strong start)
+    promptQuotaToday = 10
   } else if (dayNumber === 2) {
-    // Day 2: Gentle follow-up with 5 prompts (increased from 3)
-    promptQuotaToday = 5
+    // Day 2: Continued engagement with 8 prompts
+    promptQuotaToday = 8
   } else if (dayNumber === 3) {
-    // Day 3: Building rhythm with 6 prompts (increased from 4)
-    promptQuotaToday = 6
+    // Day 3: Building momentum with 9 prompts
+    promptQuotaToday = 9
   } else {
-    // Day 4+: Variable pacing (5-8 prompts, increased from 3-5)
-    // Use day number as seed for consistent daily variation
+    // Day 4+: Generous pacing (10-15 prompts per day)
+    // Ensures at least morning and night questions, plus throughout the day
     const seed = dayNumber % 7
-    promptQuotaToday = seed % 4 === 0 ? 5 : seed % 4 === 1 ? 6 : seed % 4 === 2 ? 7 : 8
+    promptQuotaToday = seed % 5 === 0 ? 10 : seed % 5 === 1 ? 11 : seed % 5 === 2 ? 12 : seed % 5 === 3 ? 14 : 15
   }
 
   // Count prompts shown today

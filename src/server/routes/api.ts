@@ -1338,18 +1338,18 @@ export default async (fastify: FastifyInstance) => {
         return null
       }
 
-      // Check if a prompt was shown in the last hour (reduced from 2 hours)
-      const oneHourAgo = now.subtract(1, 'hour')
+      // Check if a prompt was shown in the last 30 minutes (reduced for more frequent questions)
+      const thirtyMinutesAgo = now.subtract(30, 'minute')
       const isRecentlyAsked = await fastify.models.Answer.count({
         where: {
           userId: req.user.id,
           createdAt: {
-            [Op.gte]: oneHourAgo.toDate(),
+            [Op.gte]: thirtyMinutesAgo.toDate(),
           },
         },
       }).then(Boolean)
       if (isRecentlyAsked) {
-        console.log(`⏸️ Skipping prompt: answered within last hour`)
+        console.log(`⏸️ Skipping prompt: answered within last 30 minutes`)
         return null
       }
 
