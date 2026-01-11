@@ -318,8 +318,6 @@ const NoteEditor = ({
   const [value, setValue] = React.useState(log.text || '')
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null)
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
-  const [isAboutToPush, setIsAboutToPush] = React.useState(false) // Blink during push
-  // New timing: finish typing > wait 7s > save > pause 3s > gentle blink 4s > push
   const debounceTime = 7000  // 7s for all logs
   const debouncedValue = useDebounce(value, debounceTime)
 
@@ -331,11 +329,6 @@ const NoteEditor = ({
       setIsSaved(false)
       // Don't cancel pending push - let the save complete and push down
       // The sync effect has protection to not overwrite unsaved changes
-
-      // Stop any ongoing blink animation when user types
-      if (primary) {
-        setIsAboutToPush(false)
-      }
     }
   }, [value, log.text, primary])
 
@@ -351,7 +344,7 @@ const NoteEditor = ({
   // This keeps scrolling behavior simple (no blur = no issues)
 
   // Autosave for all logs (7s debounce)
-  // New timeline: finish typing > wait 7s > save > pause 3s (read) > gentle blink 4s > push
+  // Timeline: finish typing > wait 7s > save > opacity fades to 20% > push
   React.useEffect(() => {
     if (log.text === debouncedValue) return
 
@@ -365,22 +358,6 @@ const NoteEditor = ({
     // This prevents race condition where user types more while save is in progress
     if (valueRef.current === debouncedValue) {
       setIsSaved(true)
-    }
-
-    // For primary log: wait 3s after save, then start gentle blink animation
-    // This gives user time to read the saved entry before it pushes down
-    if (primary) {
-      setTimeout(() => {
-        setIsAboutToPush(true)
-      }, 3000) // 3s pause to read saved entry
-    }
-
-    // Reset blink state right when animation completes (at 7s, same as push)
-    // This ensures opacity is at 20% when push happens, matching pushed logs
-    if (primary) {
-      setTimeout(() => {
-        setIsAboutToPush(false)
-      }, 7000) // 3s pause + 4s blink = 7s (matches push timing exactly)
     }
   }, [debouncedValue, onChange, log.text, primary])
 
@@ -452,17 +429,6 @@ const NoteEditor = ({
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
           setIsSaved(true)
-          // Trigger blink animation for manual save too
-          // Wait 3s after save, then gentle blink, then push at 7s total
-          if (primary) {
-            setTimeout(() => {
-              setIsAboutToPush(true)
-            }, 3000)
-            // Reset blink state at 7s to match push timing
-            setTimeout(() => {
-              setIsAboutToPush(false)
-            }, 7000)
-          }
         }
         // Optionally blur to show save happened
         ;(ev.target as HTMLTextAreaElement).blur()
@@ -552,9 +518,8 @@ const NoteEditor = ({
             'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
             'placeholder:opacity-100',
             !primary && 'opacity-20',
-            primary && isSaved && !isAboutToPush && 'opacity-20',
-            primary && !isSaved && 'opacity-100',
-            primary && isAboutToPush && 'animate-blink'
+            primary && isSaved && 'opacity-20',
+            primary && !isSaved && 'opacity-100'
           )}
           rows={primary ? 10 : 1}
         />
