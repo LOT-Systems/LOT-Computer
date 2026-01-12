@@ -1,8 +1,8 @@
 import dayjs from '#server/utils/dayjs'
 import type { User, Log } from '#shared/types'
-import { analyzeEnergyState } from './energy'
-import { generateUserNarrative } from './rpg-narrative'
-import { detectSemanticStruggle } from './compassionate-interventions'
+import { analyzeEnergyState } from './energy.js'
+import { generateUserNarrative } from './rpg-narrative.js'
+import { detectSemanticStruggle } from './compassionate-interventions.js'
 
 /**
  * Weekly Summary Generator - Stand Report for Users
