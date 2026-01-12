@@ -139,14 +139,12 @@ export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
 )
 
 export const useMemory = () => {
-  // Cache key based on date only (same question all day)
-  const dateOnly = dayjs().format('YYYY-MM-DD')
-  // Server param with full datetime for timezone handling
-  const datetime = btoa(dayjs().format(DATE_TIME_FORMAT))
+  // Use date only (no time) to prevent regenerating questions multiple times per day
+  const date = btoa(dayjs().format('YYYY-MM-DD'))
   const path = '/api/memory'
 
   return useQuery<any>(
-    [path, dateOnly], // Cache by date only - same question all day
+    [path, date], // Include date in query key for proper caching
     async () => {
       // Get quantum state to send to server for context-aware question generation
       let quantumParams = {}
@@ -166,7 +164,7 @@ export const useMemory = () => {
         }
       }
 
-      return (await api.get<any>(path, { params: { d: datetime, ...quantumParams } })).data
+      return (await api.get<any>(path, { params: { d: date, ...quantumParams } })).data
     },
     {
       staleTime: Infinity, // Never refetch - question is valid for the whole day
