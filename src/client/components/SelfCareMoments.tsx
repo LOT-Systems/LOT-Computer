@@ -471,15 +471,47 @@ function generateContextualSuggestion(
         why: 'How you begin shapes the entire day. Gentleness is a choice.',
         practice: 'Before checking your phone.\nPlace both hands on your heart.\nSay: "I welcome this day."\nTake 3 slow breaths.',
         duration: '2 mins'
+      },
+      {
+        action: 'Morning space clearing: clean one surface',
+        why: 'Clean space creates mental clarity. One clear surface changes the energy.',
+        practice: 'Choose one surface (desk, counter, nightstand).\nClear everything off.\nWipe it clean.\nPlace back only what serves you.\nNotice the clarity.',
+        duration: '5 mins'
+      },
+      {
+        action: 'Shinrin-yoku (Japanese forest bathing)',
+        why: 'Nature connection lowers stress hormones and restores vitality.',
+        practice: 'Step outside, even to a small green space.\nMove slowly.\nEngage all 5 senses.\nNotice trees, plants, earth.\nBreathe deeply.',
+        duration: '10 mins'
+      },
+      {
+        action: 'Korean facial cleansing ritual',
+        why: 'Cleansing is both physical and symbolic. It releases what you carried from yesterday.',
+        practice: 'Wash face with warm water.\nGentle circular motions.\nSplash with cool water.\nPat dry softly.\nSay: "I begin fresh."',
+        duration: '3 mins'
       }
     )
   } else if (hour >= 12 && hour < 14) {
-    suggestions.push({
-      action: 'Midday reset: pause and recalibrate',
-      why: 'Midday is when we lose ourselves in doing. Pausing restores awareness.',
-      practice: 'Stop what you\'re doing.\nClose your eyes.\nAsk: "What do I need right now?"\nListen for the answer.\nGive yourself that one thing.',
-      duration: '3 mins'
-    })
+    suggestions.push(
+      {
+        action: 'Midday reset: pause and recalibrate',
+        why: 'Midday is when we lose ourselves in doing. Pausing restores awareness.',
+        practice: 'Stop what you\'re doing.\nClose your eyes.\nAsk: "What do I need right now?"\nListen for the answer.\nGive yourself that one thing.',
+        duration: '3 mins'
+      },
+      {
+        action: 'Fika (Swedish coffee break ritual)',
+        why: 'Fika is sacred pause, not productivity break. Pleasure is restorative.',
+        practice: 'Make your favorite warm drink.\nSit without devices.\nSip slowly.\nNotice the taste, warmth, moment.\nDo absolutely nothing else.',
+        duration: '10 mins'
+      },
+      {
+        action: 'Sobremesa (Latin American after-meal lingering)',
+        why: 'Rushing from meal to task denies digestion and connection. Lingering is nourishing.',
+        practice: 'After eating, stay seated.\nDon\'t rush to the next thing.\nBreathe.\nLet your body digest.\nSavor the transition.',
+        duration: '5 mins'
+      }
+    )
   } else if (hour >= 19 && hour < 22) {
     suggestions.push(
       {
@@ -498,6 +530,24 @@ function generateContextualSuggestion(
         action: 'Body scan to transition from day to night',
         why: 'Your body holds the day\'s stress. Releasing it prepares you for rest.',
         practice: 'Lie down or sit comfortably.\nClose your eyes.\nScan from head to toes.\nWhere is tension?\nBreathe into those places.',
+        duration: '5 mins'
+      },
+      {
+        action: 'Evening space reset: clear what accumulated today',
+        why: 'Physical clutter mirrors mental clutter. Evening clearing creates morning ease.',
+        practice: 'Spend 5 minutes resetting your space.\nPut items back where they belong.\nClear one surface.\nPrepare for tomorrow.\nNotice the calm.',
+        duration: '5 mins'
+      },
+      {
+        action: 'Abhyanga (Ayurvedic self-massage)',
+        why: 'Warm oil massage calms the nervous system and honors the body.',
+        practice: 'Warm a small amount of oil.\nMassage feet, hands, or scalp with gentle circles.\nTake your time.\nAppreciate your body.\nBreathe slowly.',
+        duration: '10 mins'
+      },
+      {
+        action: 'Hot towel face rest (Korean jjimjilbang-inspired)',
+        why: 'Heat releases tension held in facial muscles. It signals safety to your nervous system.',
+        practice: 'Heat a damp towel (warm, not burning).\nPlace over face and breathe.\nLie down if possible.\nStay for 5 minutes.\nFeel tension melt.',
         duration: '5 mins'
       }
     )
@@ -548,6 +598,60 @@ function generateContextualSuggestion(
         why: 'Touch is healing, even when it\'s your own. Your heart deserves acknowledgment.',
         practice: 'Place your hand on your chest.\nFeel your heartbeat.\nBreathe slowly.\nSay: "I am here with you."\nStay for 5 breaths.',
         duration: '2 mins'
+      },
+      {
+        action: 'Mindful cleaning: wash one dish slowly',
+        why: 'Cleaning is meditation when done with full attention. Clarity comes through care.',
+        practice: 'Choose one dish.\nFeel the warm water.\nNotice the soap, the movements.\nMake it a meditation.\nFinish with gratitude.',
+        duration: '3 mins'
+      },
+      {
+        action: 'Wabi-sabi moment: find beauty in imperfection',
+        why: 'Japanese wabi-sabi teaches us perfection is not the goal. Beauty lives in the worn, the weathered, the real.',
+        practice: 'Look for something imperfect nearby.\nA crack, a stain, asymmetry.\nSee its unique beauty.\nSay: "This too is perfect as it is."',
+        duration: '2 mins'
+      },
+      {
+        action: 'Ubuntu practice: recognize your connection',
+        why: 'African Ubuntu philosophy: "I am because we are." Connection is fundamental.',
+        practice: 'Think of someone in your life.\nSay: "I am because you are."\nFeel the truth of interdependence.\nBreathe with gratitude.',
+        duration: '2 mins'
+      },
+      {
+        action: 'Mediterranean olive oil hand ritual',
+        why: 'The hands carry the day\'s work. Honoring them honors your effort.',
+        practice: 'Warm a few drops of oil in palms.\nMassage each finger slowly.\nPress thumbs into palm.\nNotice the texture, warmth.\nThank your hands.',
+        duration: '3 mins'
+      },
+      {
+        action: 'Organize one small drawer or space',
+        why: 'Order in small spaces creates mental spaciousness. Start small.',
+        practice: 'Choose one drawer or shelf.\nEmpty it completely.\nWipe clean.\nReturn only what belongs.\nArrange with care.',
+        duration: '10 mins'
+      },
+      {
+        action: 'Cold water face splash (Scandinavian tradition)',
+        why: 'Cold water activates your vagus nerve, reducing stress and increasing alertness.',
+        practice: 'Splash face with cold water 3 times.\nPat dry.\nNotice the clarity.\nFeel the aliveness.\nTake a full breath.',
+        duration: '1 min'
+      },
+      {
+        action: 'Golden milk moment (Indian tradition)',
+        why: 'Turmeric, warm milk, and spices calm inflammation and signal comfort to your body.',
+        practice: 'Make warm milk with turmeric and honey.\nStir slowly.\nCup in both hands.\nSip with full attention.\nFeel the warmth spread.',
+        duration: '5 mins'
+      },
+      {
+        action: 'Clear one surface as sacred space',
+        why: 'Every cleared space is a sanctuary. Creating it is a practice of devotion.',
+        practice: 'Choose one surface.\nRemove everything.\nWipe clean.\nPlace only one meaningful object.\nSit nearby and breathe.',
+        duration: '5 mins'
+      },
+      {
+        action: 'Window cleaning meditation',
+        why: 'Clean windows change how light enters. Clarity outside creates clarity within.',
+        practice: 'Clean one window pane.\nSlow circles.\nNotice the transformation.\nWatch light differently.\nAppreciate the view.',
+        duration: '5 mins'
       }
     )
   }
