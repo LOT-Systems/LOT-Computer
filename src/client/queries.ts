@@ -349,6 +349,7 @@ export const useContextualPrompts = () =>
     message?: string
   }>('/api/contextual-prompts', {
     refetchOnWindowFocus: false,
+    refetchInterval: 15 * 60 * 1000, // Refetch every 15 minutes (context changes slowly)
     staleTime: 15 * 60 * 1000, // Cache for 15 minutes (context changes slowly)
   })()
 
