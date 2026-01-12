@@ -142,10 +142,9 @@ export const useMemory = () => {
   // Use date only (no time) to prevent regenerating questions multiple times per day
   const date = btoa(dayjs().format('YYYY-MM-DD'))
   const path = '/api/memory'
-  const version = '2026-01-12' // Update this on deployment to invalidate cache
 
   return useQuery<any>(
-    [path, date, version], // Include date and version in query key for proper caching
+    [path, date], // Include date in query key for proper caching
     async () => {
       // Get quantum state to send to server for context-aware question generation
       let quantumParams = {}
