@@ -379,6 +379,12 @@ function generateContextualSuggestion(
           duration: '2 mins'
         },
         {
+          action: 'Use Breathe module to guide your breathing',
+          why: 'Visual breathing guidance helps maintain rhythm when anxiety makes focus hard.',
+          practice: 'Go to top of System.\nClick Breathe.\nFollow the expanding circle.\nLet it pace you.\nStay for 5 cycles.',
+          duration: '3 mins'
+        },
+        {
           action: 'Name and release your worries',
           why: 'Anxiety lives in the unnamed. Speaking worries aloud diminishes their power.',
           practice: 'Close your eyes.\nName one worry out loud.\nSay: "I see you, but you don\'t control me."\nTake a deep breath and let it go.',
@@ -389,6 +395,12 @@ function generateContextualSuggestion(
           why: 'Overwhelm pulls you from the present. Grounding brings you back.',
           practice: 'Name 5 things you see.\n4 things you can touch.\n3 things you hear.\n2 things you smell.\n1 thing you taste.',
           duration: '3 mins'
+        },
+        {
+          action: 'Turn on Sound for calming ambient tones',
+          why: 'Sound masks anxious thoughts and creates a soothing container.',
+          practice: 'Go to top of System.\nClick Sound.\nChoose calming tones.\nClose your eyes.\nLet the sound hold you.',
+          duration: '5 mins'
         }
       )
     } else if (['tired', 'exhausted'].includes(dominantMood)) {
@@ -404,6 +416,12 @@ function generateContextualSuggestion(
           why: 'Tiredness is not weakness. Your body deserves rest without guilt.',
           practice: 'Say out loud: "I give myself permission to be tired."\nPlace hand on heart.\nBreathe slowly.\nRest for 5 minutes without doing anything.',
           duration: '5 mins'
+        },
+        {
+          action: 'Rest with ambient Sound to support restoration',
+          why: 'Gentle sound creates a safe container for deep rest without full sleep.',
+          practice: 'Turn on Sound.\nChoose soft flowing tones.\nLie down or sit back.\nClose eyes.\nLet sound carry you.',
+          duration: '10 mins'
         }
       )
     } else if (['grateful', 'content', 'peaceful'].includes(dominantMood)) {
@@ -415,6 +433,12 @@ function generateContextualSuggestion(
           duration: '5 mins'
         },
         {
+          action: 'Journal this peaceful state in your Log',
+          why: 'Recording peace helps you remember what created it. Future you will thank you.',
+          practice: 'Open your Log.\nWrite what contributed to this peace.\nName the feeling.\nNote the conditions.\nSave it.',
+          duration: '5 mins'
+        },
+        {
           action: 'Savor this peaceful moment',
           why: 'Peace is rare and precious. Conscious savoring makes it last longer.',
           practice: 'Close your eyes.\nNotice the peace in your body.\nWhere do you feel it?\nBreathe into that feeling.\nSay: "I am here."',
@@ -422,38 +446,85 @@ function generateContextualSuggestion(
         }
       )
     } else if (['energized', 'excited', 'hopeful'].includes(dominantMood)) {
-      suggestions.push({
-        action: 'Channel your energy into creative movement',
-        why: 'High energy is a gift. Movement helps you embody and direct it.',
-        practice: 'Put on music that matches your energy.\nMove freely for 3 minutes.\nNo rules, just expression.\nNotice how the energy flows.',
-        duration: '3 mins'
-      })
+      suggestions.push(
+        {
+          action: 'Channel your energy into creative movement',
+          why: 'High energy is a gift. Movement helps you embody and direct it.',
+          practice: 'Put on music that matches your energy.\nMove freely for 3 minutes.\nNo rules, just expression.\nNotice how the energy flows.',
+          duration: '3 mins'
+        },
+        {
+          action: 'Put on Radio and move to the music',
+          why: 'Music amplifies energy and gives it direction. Let your body express what you feel.',
+          practice: 'Turn on Radio.\nFind a track that matches your vibe.\nStand up.\nMove however feels right.\nEmbody the aliveness.',
+          duration: '5 mins'
+        }
+      )
+    } else if (['lonely', 'disconnected', 'isolated'].includes(dominantMood)) {
+      suggestions.push(
+        {
+          action: 'Connect with your cohort in Sync',
+          why: 'Loneliness dissolves through shared presence. Your cohort is there.',
+          practice: 'Open Sync tab.\nRead messages from others.\nShare something honest.\nRemember: you\'re not alone.',
+          duration: '10 mins'
+        },
+        {
+          action: 'Write about the disconnection in your Log',
+          why: 'Naming isolation begins the path back to connection. Your words matter.',
+          practice: 'Open your Log.\nWrite: "I feel disconnected."\nExplore why.\nBe honest.\nNo one has to see this but you.',
+          duration: '5 mins'
+        }
+      )
     }
   }
 
   // Archetype-based suggestions
   if (archetype) {
     if (archetype === 'The Seeker') {
-      suggestions.push({
-        action: 'Reflective inquiry practice',
-        why: 'Your Seeker nature thrives on self-discovery.',
-        practice: 'Ask yourself: "What am I discovering about myself right now?"\n\nSit with the question.\nDon\'t force answers.\nNotice what arises.',
-        duration: '5 mins'
-      })
+      suggestions.push(
+        {
+          action: 'Reflective inquiry practice',
+          why: 'Your Seeker nature thrives on self-discovery.',
+          practice: 'Ask yourself: "What am I discovering about myself right now?"\n\nSit with the question.\nDon\'t force answers.\nNotice what arises.',
+          duration: '5 mins'
+        },
+        {
+          action: 'Journal your seeking in your Log',
+          why: 'Seekers discover themselves through writing. Your Log holds your journey.',
+          practice: 'Open your Log.\nWrite what you\'re seeking right now.\nWhat questions live in you?\nLet the writing reveal answers.',
+          duration: '10 mins'
+        }
+      )
     } else if (archetype === 'The Nurturer') {
-      suggestions.push({
-        action: 'Practice nurturing yourself as you would a loved one',
-        why: 'Nurturers often forget to care for themselves.',
-        practice: 'Place hand on heart.\nSay: "I deserve care too."\nDo one small kind thing for yourself.\nNotice how it feels.',
-        duration: '3 mins'
-      })
+      suggestions.push(
+        {
+          action: 'Practice nurturing yourself as you would a loved one',
+          why: 'Nurturers often forget to care for themselves.',
+          practice: 'Place hand on heart.\nSay: "I deserve care too."\nDo one small kind thing for yourself.\nNotice how it feels.',
+          duration: '3 mins'
+        },
+        {
+          action: 'Share care with your cohort in Sync',
+          why: 'Nurturers thrive in community. Giving and receiving care creates balance.',
+          practice: 'Open Sync.\nOffer encouragement to someone.\nReceive messages sent to you.\nLet care flow both ways.',
+          duration: '10 mins'
+        }
+      )
     } else if (archetype === 'The Creator') {
-      suggestions.push({
-        action: 'Free expression: creating without purpose',
-        why: 'Your Creator soul needs expression without judgment.',
-        practice: 'Grab any creative medium.\nSet timer for 5 minutes.\nCreate without planning.\nNo goal, just expression.',
-        duration: '5 mins'
-      })
+      suggestions.push(
+        {
+          action: 'Free expression: creating without purpose',
+          why: 'Your Creator soul needs expression without judgment.',
+          practice: 'Grab any creative medium.\nSet timer for 5 minutes.\nCreate without planning.\nNo goal, just expression.',
+          duration: '5 mins'
+        },
+        {
+          action: 'Write stream-of-consciousness in your Log',
+          why: 'Creators need raw expression. Your Log is canvas for unfiltered creation.',
+          practice: 'Open your Log.\nWrite without stopping.\nDon\'t edit, censor, or plan.\nLet words flow.\nThis is creation.',
+          duration: '10 mins'
+        }
+      )
     }
   }
 
@@ -570,6 +641,12 @@ function generateContextualSuggestion(
         duration: '1 min'
       },
       {
+        action: 'Use Breathe for visual breath guidance',
+        why: 'The Breathe module offers gentle visual pacing for your breath.',
+        practice: 'Click Breathe at top of System.\nWatch the circle expand and contract.\nSync your breath to its rhythm.\nStay present.',
+        duration: '3 mins'
+      },
+      {
         action: 'Stretch your body',
         why: 'Your body holds tension. Movement releases it.',
         practice: 'Stand up.\nReach arms overhead.\nSide bend both ways.\nRoll shoulders.\nNotice what feels tight.',
@@ -580,6 +657,12 @@ function generateContextualSuggestion(
         why: 'Hydration affects everything. Mindfulness deepens the care.',
         practice: 'Get water.\nHold the glass.\nTake slow sips.\nFeel the water nourishing you.\nSay thank you to your body.',
         duration: '2 mins'
+      },
+      {
+        action: 'Write one sentence in your Log',
+        why: 'Even one sentence captures the moment. Your Log preserves what matters.',
+        practice: 'Open your Log.\nWrite one true sentence about right now.\nThat\'s it.\nOne sentence is enough.',
+        duration: '1 min'
       },
       {
         action: 'Notice what you\'re holding and set it down',
@@ -618,10 +701,28 @@ function generateContextualSuggestion(
         duration: '2 mins'
       },
       {
+        action: 'Connect with others in Sync',
+        why: 'Community dissolves isolation. Your cohort understands.',
+        practice: 'Open Sync tab.\nRead what others shared.\nOffer a kind word.\nReceive support.\nYou belong.',
+        duration: '10 mins'
+      },
+      {
         action: 'Mediterranean olive oil hand ritual',
         why: 'The hands carry the day\'s work. Honoring them honors your effort.',
         practice: 'Warm a few drops of oil in palms.\nMassage each finger slowly.\nPress thumbs into palm.\nNotice the texture, warmth.\nThank your hands.',
         duration: '3 mins'
+      },
+      {
+        action: 'Turn on Sound and just listen',
+        why: 'Sound creates spaciousness. Listening is meditation.',
+        practice: 'Click Sound at top.\nChoose any tone.\nClose your eyes.\nDon\'t do anything else.\nJust listen.',
+        duration: '5 mins'
+      },
+      {
+        action: 'Explore Radio for musical medicine',
+        why: 'Music shifts state instantly. Let sound move through you.',
+        practice: 'Turn on Radio.\nListen to a few tracks.\nNotice how each one affects you.\nStay with what resonates.',
+        duration: '10 mins'
       },
       {
         action: 'Organize one small drawer or space',
