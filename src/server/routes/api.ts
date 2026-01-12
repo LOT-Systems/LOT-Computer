@@ -275,6 +275,30 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
+  // Memory diagnostic endpoint - helps debug why questions aren't showing
+  fastify.get('/memory-debug', async (req: FastifyRequest<{ Querystring: { d: string } }>, reply) => {
+    const dateParam = req.query.d
+    const decoded = atob(dateParam)
+    const parsedWithFormat = dayjs(decoded, DATE_TIME_FORMAT)
+    const parsedWithoutFormat = dayjs(decoded)
+
+    return {
+      dateParam,
+      decoded,
+      parsedWithFormat: {
+        value: parsedWithFormat.format(),
+        isValid: parsedWithFormat.isValid(),
+        format: DATE_TIME_FORMAT
+      },
+      parsedWithoutFormat: {
+        value: parsedWithoutFormat.format(),
+        isValid: parsedWithoutFormat.isValid()
+      },
+      userTags: req.user.tags,
+      hasUsership: req.user.tags.some(t => t.toLowerCase() === 'usership')
+    }
+  })
+
   // Visitor statistics endpoint
   fastify.get('/visitor-stats', async (req: FastifyRequest, reply) => {
     try {
