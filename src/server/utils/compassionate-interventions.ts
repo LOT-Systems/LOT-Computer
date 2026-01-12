@@ -32,7 +32,7 @@ export interface UserState {
  * Semantic analysis: Detect struggle beyond just keywords
  * Looks for: intensity, frequency, combinations, context
  */
-function detectSemanticStruggle(logs: Log[]): {
+export function detectSemanticStruggle(logs: Log[]): {
   isStruggling: boolean
   struggleThemes: string[]
   urgency: number // 0-10
