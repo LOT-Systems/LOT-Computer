@@ -168,7 +168,7 @@ export const useMemory = () => {
       return (await api.get<any>(path, { params: { d: date, ...quantumParams } })).data
     },
     {
-      staleTime: 2 * 60 * 60 * 1000, // 2 hours - allows natural refetch without being too aggressive
+      staleTime: Infinity, // Never refetch - question is valid for the whole day
       cacheTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
     }
   )
