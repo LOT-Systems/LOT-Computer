@@ -1335,81 +1335,82 @@ export default async (fastify: FastifyInstance) => {
       qa?: string // quantum alignment
       qn?: string // quantum needs support
     } }>, reply) => {
-      const MORNING_HOUR = 7
-      const EVENING_HOUR = 19
-      function getPeriodEdges(
-        inputDate: dayjs.Dayjs
-      ): [dayjs.Dayjs, dayjs.Dayjs] {
-        const dayStart = inputDate
-          .set('hour', MORNING_HOUR)
-          .set('minute', 0)
-          .set('second', 0)
-        const dayEnd = inputDate
-          .set('hour', EVENING_HOUR)
-          .set('minute', 0)
-          .set('second', 0)
-        const nightStart = dayEnd
-        const nightEnd = dayStart.add(1, 'day')
+      try {
+        const MORNING_HOUR = 7
+        const EVENING_HOUR = 19
+        function getPeriodEdges(
+          inputDate: dayjs.Dayjs
+        ): [dayjs.Dayjs, dayjs.Dayjs] {
+          const dayStart = inputDate
+            .set('hour', MORNING_HOUR)
+            .set('minute', 0)
+            .set('second', 0)
+          const dayEnd = inputDate
+            .set('hour', EVENING_HOUR)
+            .set('minute', 0)
+            .set('second', 0)
+          const nightStart = dayEnd
+          const nightEnd = dayStart.add(1, 'day')
 
-        if (inputDate.isAfter(dayStart) && inputDate.isBefore(dayEnd)) {
-          return [dayStart, dayEnd]
-        } else {
-          return [nightStart, nightEnd]
+          if (inputDate.isAfter(dayStart) && inputDate.isBefore(dayEnd)) {
+            return [dayStart, dayEnd]
+          } else {
+            return [nightStart, nightEnd]
+          }
         }
-      }
 
-      const localDate = dayjs(atob(req.query.d), DATE_TIME_FORMAT)
-      if (!localDate.isValid()) {
-        return reply.throw.badParams()
-      }
+        const localDate = dayjs(atob(req.query.d), DATE_TIME_FORMAT)
+        if (!localDate.isValid()) {
+          return reply.throw.badParams()
+        }
 
-      const now = dayjs()
-      const localDateShift = now.diff(localDate, 'minute')
-      const periodEdges = getPeriodEdges(localDate)
-      const utcPeriodEdges = [
-        periodEdges[0].add(localDateShift, 'minute'),
-        periodEdges[1].add(localDateShift, 'minute'),
-      ]
-      const isNightPeriod = periodEdges[0].hour() === EVENING_HOUR
+        const now = dayjs()
+        const localDateShift = now.diff(localDate, 'minute')
+        const periodEdges = getPeriodEdges(localDate)
+        const utcPeriodEdges = [
+          periodEdges[0].add(localDateShift, 'minute'),
+          periodEdges[1].add(localDateShift, 'minute'),
+        ]
+        const isNightPeriod = periodEdges[0].hour() === EVENING_HOUR
 
-      // INTELLIGENT PACING: Determine daily prompt quota and timing
-      const { shouldShowPrompt, isWeekend, promptQuotaToday, promptsShownToday } =
-        await calculateIntelligentPacing(req.user.id, localDate, fastify.models)
+        // INTELLIGENT PACING: Determine daily prompt quota and timing
+        const { shouldShowPrompt, isWeekend, promptQuotaToday, promptsShownToday } =
+          await calculateIntelligentPacing(req.user.id, localDate, fastify.models)
 
-      console.log(`📊 Intelligent Pacing Analysis:`, {
-        userId: req.user.id,
-        shouldShowPrompt,
-        isWeekend,
-        promptQuotaToday,
-        promptsShownToday,
-        currentTime: localDate.format('HH:mm'),
-        dayOfWeek: localDate.format('dddd')
-      })
-
-      if (!shouldShowPrompt) {
-        console.log(`⏸️ Skipping prompt: quota reached or bad timing`)
-        return null
-      }
-
-      // Check if a prompt was shown in the last 30 minutes (reduced for more frequent questions)
-      const thirtyMinutesAgo = now.subtract(30, 'minute')
-      const isRecentlyAsked = await fastify.models.Answer.count({
-        where: {
+        console.log(`📊 Intelligent Pacing Analysis:`, {
           userId: req.user.id,
-          createdAt: {
-            [Op.gte]: thirtyMinutesAgo.toDate(),
-          },
-        },
-      }).then(Boolean)
-      if (isRecentlyAsked) {
-        console.log(`⏸️ Skipping prompt: answered within last 30 minutes`)
-        return null
-      }
+          shouldShowPrompt,
+          isWeekend,
+          promptQuotaToday,
+          promptsShownToday,
+          currentTime: localDate.format('HH:mm'),
+          dayOfWeek: localDate.format('dddd')
+        })
 
-      // Check if user has Usership tag for AI-generated questions
-      const hasUsershipTag = req.user.tags.some(
-        (tag) => tag.toLowerCase() === 'usership'
-      )
+        if (!shouldShowPrompt) {
+          console.log(`⏸️ Skipping prompt: quota reached or bad timing`)
+          return null
+        }
+
+        // Check if a prompt was shown in the last 30 minutes (reduced for more frequent questions)
+        const thirtyMinutesAgo = now.subtract(30, 'minute')
+        const isRecentlyAsked = await fastify.models.Answer.count({
+          where: {
+            userId: req.user.id,
+            createdAt: {
+              [Op.gte]: thirtyMinutesAgo.toDate(),
+            },
+          },
+        }).then(Boolean)
+        if (isRecentlyAsked) {
+          console.log(`⏸️ Skipping prompt: answered within last 30 minutes`)
+          return null
+        }
+
+        // Check if user has Usership tag for AI-generated questions
+        const hasUsershipTag = req.user.tags.some(
+          (tag) => tag.toLowerCase() === 'usership'
+        )
 
       console.log(`Memory question request:`, {
         userId: req.user.id,
@@ -1556,6 +1557,19 @@ export default async (fastify: FastifyInstance) => {
         const question =
           untouchedQuestions[Math.floor(rng() * untouchedQuestions.length)]
         return question
+      }
+      } catch (error: any) {
+        console.error('❌ /api/memory endpoint error:', {
+          message: error.message,
+          stack: error.stack,
+          userId: req.user?.id,
+          query: req.query
+        })
+        return reply.status(500).send({
+          error: 'Memory question generation failed',
+          details: error.message,
+          hint: 'Check /api/memory-debug for diagnostics'
+        })
       }
     }
   )
