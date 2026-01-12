@@ -72,9 +72,21 @@ export function MemoryWidget() {
   )
 
   React.useEffect(() => {
+    // Clear stale cache (older than 12 hours) to allow new questions
+    const lastQuestionTime = localStorage.getItem('lastMemoryQuestionTime')
+    if (lastQuestionTime) {
+      const hoursAgo = (Date.now() - parseInt(lastQuestionTime)) / (1000 * 60 * 60)
+      if (hoursAgo > 12) {
+        // Cache is stale - clear it to allow new questions
+        stores.lastAnsweredMemoryQuestionId.set(null)
+        localStorage.removeItem('lastMemoryQuestionTime')
+      }
+    }
+
     // Prevent showing the same question twice (persisted across tab switches)
     if (loadedQuestion && loadedQuestion.id !== lastQuestionId) {
       stores.lastAnsweredMemoryQuestionId.set(loadedQuestion.id)
+      localStorage.setItem('lastMemoryQuestionTime', Date.now().toString())
       setTimeout(() => {
         setIsDisplayed(true)
         setTimeout(() => {
