@@ -279,23 +279,46 @@ export default async (fastify: FastifyInstance) => {
   fastify.get('/memory-debug', async (req: FastifyRequest<{ Querystring: { d: string } }>, reply) => {
     const dateParam = req.query.d
     const decoded = atob(dateParam)
-    const parsedWithFormat = dayjs(decoded, DATE_TIME_FORMAT)
-    const parsedWithoutFormat = dayjs(decoded)
+    const localDate = dayjs(decoded, DATE_TIME_FORMAT)
+
+    // Check pacing
+    const pacingInfo = await calculateIntelligentPacing(req.user.id, localDate, fastify.models)
+
+    // Check 30-minute cooldown
+    const thirtyMinutesAgo = dayjs().subtract(30, 'minute')
+    const recentAnswerCount = await fastify.models.Answer.count({
+      where: {
+        userId: req.user.id,
+        createdAt: { [Op.gte]: thirtyMinutesAgo.toDate() }
+      }
+    })
+
+    // Check last answer ever
+    const lastAnswer = await fastify.models.Answer.findOne({
+      where: { userId: req.user.id },
+      order: [['createdAt', 'DESC']]
+    })
 
     return {
       dateParam,
       decoded,
-      parsedWithFormat: {
-        value: parsedWithFormat.format(),
-        isValid: parsedWithFormat.isValid(),
-        format: DATE_TIME_FORMAT
-      },
-      parsedWithoutFormat: {
-        value: parsedWithoutFormat.format(),
-        isValid: parsedWithoutFormat.isValid()
-      },
+      localDateValid: localDate.isValid(),
       userTags: req.user.tags,
-      hasUsership: req.user.tags.some(t => t.toLowerCase() === 'usership')
+      hasUsership: req.user.tags.some(t => t.toLowerCase() === 'usership'),
+      pacing: {
+        shouldShowPrompt: pacingInfo.shouldShowPrompt,
+        promptsShownToday: pacingInfo.promptsShownToday,
+        promptQuotaToday: pacingInfo.promptQuotaToday,
+        dayNumber: pacingInfo.dayNumber,
+        isWeekend: pacingInfo.isWeekend
+      },
+      cooldown: {
+        recentAnswerCount,
+        isRecentlyAsked: recentAnswerCount > 0,
+        lastAnswerAt: lastAnswer?.createdAt || 'never'
+      },
+      expectedResult: pacingInfo.shouldShowPrompt && recentAnswerCount === 0 ? 'SHOULD SHOW QUESTION' : 'BLOCKED',
+      blockReason: !pacingInfo.shouldShowPrompt ? 'Quota reached' : recentAnswerCount > 0 ? 'Answered in last 30 min' : 'None - should work'
     }
   })
 
