@@ -1434,7 +1434,7 @@ export default async (fastify: FastifyInstance) => {
         order: [['createdAt', 'DESC']]
       })
 
-      const { shouldShowWeeklySummary, generateWeeklySummary } = await import('#server/utils/weekly-summary.js')
+      const { shouldShowWeeklySummary, generateWeeklySummary } = await import('#server/utils/weekly-summary')
       const showWeeklySummary = shouldShowWeeklySummary(
         req.user,
         lastWeeklySummary?.createdAt || null
@@ -2079,7 +2079,7 @@ export default async (fastify: FastifyInstance) => {
       const elementType = elementTypes[userWorld.elements.length % elementTypes.length]
 
       // Build image generation prompt from context
-      const { TogetherAIEngine } = await import('#server/utils/ai-engines.js')
+      const { TogetherAIEngine } = await import('#server/utils/ai-engines')
       const imageEngine = new TogetherAIEngine()
 
       if (!imageEngine.isAvailable()) {
@@ -2217,7 +2217,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get user's pattern insights
   fastify.get('/patterns', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log.js').then(m => m.default)
+      const Log = await import('#server/models/log').then(m => m.default)
 
       // Get last 100 logs for pattern analysis
       const logs = await Log.findAll({
@@ -2258,8 +2258,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Find cohort matches
   fastify.get('/cohorts', async (req, reply) => {
     try {
-      const User = await import('#server/models/user.js').then(m => m.default)
-      const Log = await import('#server/models/log.js').then(m => m.default)
+      const User = await import('#server/models/user').then(m => m.default)
+      const Log = await import('#server/models/log').then(m => m.default)
 
       // Get current user's patterns
       const userLogs = await Log.findAll({
@@ -2349,7 +2349,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get contextual prompts based on patterns and current context
   fastify.get('/contextual-prompts', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log.js').then(m => m.default)
+      const Log = await import('#server/models/log').then(m => m.default)
 
       // Get user's patterns
       const logs = await Log.findAll({
@@ -2421,7 +2421,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get pattern evolution over time
   fastify.get('/pattern-evolution', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log.js').then(m => m.default)
+      const Log = await import('#server/models/log').then(m => m.default)
 
       // Get all user logs (up to 500 for historical analysis)
       const allLogs = await Log.findAll({
@@ -2501,7 +2501,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get user's energy state
   fastify.get('/energy', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log.js').then(m => m.default)
+      const Log = await import('#server/models/log').then(m => m.default)
 
       const logs = await Log.findAll({
         where: { userId: req.user.id },
@@ -2542,7 +2542,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get user's RPG narrative and achievements
   fastify.get('/narrative', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log.js').then(m => m.default)
+      const Log = await import('#server/models/log').then(m => m.default)
 
       const logs = await Log.findAll({
         where: { userId: req.user.id },
@@ -2581,8 +2581,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get user's goal progression and narrative arc
   fastify.get('/goal-progression', async (req, reply) => {
     try {
-      const { generateGoalProgression } = await import('#server/utils/goal-understanding.js')
-      const Log = await import('#server/models/log.js').then(m => m.default)
+      const { generateGoalProgression } = await import('#server/utils/goal-understanding')
+      const Log = await import('#server/models/log').then(m => m.default)
 
       const logs = await Log.findAll({
         where: { userId: req.user.id },
@@ -2622,8 +2622,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get chat catalysts (prompts to connect with cohort)
   fastify.get('/chat-catalysts', async (req, reply) => {
     try {
-      const User = await import('#server/models/user.js').then(m => m.default)
-      const Log = await import('#server/models/log.js').then(m => m.default)
+      const User = await import('#server/models/user').then(m => m.default)
+      const Log = await import('#server/models/log').then(m => m.default)
 
       // Get user's patterns and cohorts
       const userLogs = await Log.findAll({
@@ -2714,7 +2714,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get compassionate interventions
   fastify.get('/interventions', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log.js').then(m => m.default)
+      const Log = await import('#server/models/log').then(m => m.default)
 
       const logs = await Log.findAll({
         where: { userId: req.user.id },
