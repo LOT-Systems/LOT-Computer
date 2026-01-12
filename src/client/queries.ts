@@ -167,9 +167,8 @@ export const useMemory = () => {
       return (await api.get<any>(path, { params: { d: date, ...quantumParams } })).data
     },
     {
-      staleTime: 4 * 60 * 60 * 1000, // 4 hours - allows refetch after deployment or extended session
+      staleTime: Infinity, // Never refetch - question is valid for the whole day
       cacheTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
-      refetchOnMount: true, // Always check for new questions on mount
     }
   )
 }
@@ -350,7 +349,6 @@ export const useContextualPrompts = () =>
     message?: string
   }>('/api/contextual-prompts', {
     refetchOnWindowFocus: false,
-    refetchInterval: 15 * 60 * 1000, // Refetch every 15 minutes (context changes slowly)
     staleTime: 15 * 60 * 1000, // Cache for 15 minutes (context changes slowly)
   })()
 
