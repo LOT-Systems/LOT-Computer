@@ -98,15 +98,7 @@ Please respond with ONLY a valid JSON object in this exact format:
   "options": ["option1", "option2", "option3"]
 }
 
-Make sure the question is personalized, relevant to self-care habits, and the options are 3-4 concise choices.
-
-${context.weatherDescription ? `**WEATHER-AWARE QUESTIONS:**
-The current weather is "${context.weatherDescription}". Consider asking questions that acknowledge this:
-- If rainy/stormy: Ask about indoor comfort, cozy activities, or mood during rainy weather
-- If sunny/clear: Ask about outdoor activities, energy levels, or sun exposure
-- If cloudy/overcast: Ask about indoor vs outdoor preferences, lighting needs
-- If extreme weather (very hot/cold/humid): Ask about coping strategies, comfort needs
-` : ''}`
+Make sure the question is personalized, relevant to self-care habits, and the options are 3-4 concise choices.`
 
     // Execute using whichever engine is available
     const completion = await engine.generateCompletion(fullPrompt, 1024)
