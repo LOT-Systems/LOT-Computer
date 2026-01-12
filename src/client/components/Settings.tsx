@@ -232,16 +232,18 @@ export const Settings = () => {
     [state]
   )
 
+  // Get version from store (set by app.tsx from /api/public/status)
+  const appVersion = useStore(stores.appVersion)
+
   // Fetch status data for the status link (REMOVED - too slow)
-  // Using cached version from localStorage instead
+  // Using version from store instead
   React.useEffect(() => {
-    // Use lightweight version check instead of full health check
-    const cachedVersion = localStorage.getItem('appVersion')
+    // Use version from store, fallback to package.json version if not loaded yet
     setStatusData({
-      version: cachedVersion || '0.2.0',
+      version: appVersion || '1.2.0',
       overall: 'ok'
     })
-  }, [])
+  }, [appVersion])
 
   const statusText = statusData
     ? statusData.overall === 'ok'
