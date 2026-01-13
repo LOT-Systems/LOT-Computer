@@ -1361,6 +1361,15 @@ export default async (fastify: FastifyInstance) => {
       qn?: string // quantum needs support
     } }>, reply) => {
       try {
+        // Validate required parameters first
+        if (!req.query.d) {
+          console.error('❌ Memory request missing date parameter')
+          return reply.status(400).send({
+            error: 'Missing date parameter',
+            hint: 'Date parameter (d) is required'
+          })
+        }
+
         const MORNING_HOUR = 7
         const EVENING_HOUR = 19
         function getPeriodEdges(
@@ -1410,8 +1419,25 @@ export default async (fastify: FastifyInstance) => {
         const isNightPeriod = periodEdges[0].hour() === EVENING_HOUR
 
         // INTELLIGENT PACING: Determine daily prompt quota and timing
-        const { shouldShowPrompt, isWeekend, promptQuotaToday, promptsShownToday } =
-          await calculateIntelligentPacing(req.user.id, localDate, fastify.models)
+        let shouldShowPrompt, isWeekend, promptQuotaToday, promptsShownToday
+        try {
+          const pacingResult = await calculateIntelligentPacing(req.user.id, localDate, fastify.models)
+          shouldShowPrompt = pacingResult.shouldShowPrompt
+          isWeekend = pacingResult.isWeekend
+          promptQuotaToday = pacingResult.promptQuotaToday
+          promptsShownToday = pacingResult.promptsShownToday
+        } catch (pacingError: any) {
+          console.error('❌ Intelligent pacing calculation failed:', {
+            error: pacingError.message,
+            stack: pacingError.stack,
+            userId: req.user.id
+          })
+          // Default to conservative values on error
+          shouldShowPrompt = true
+          isWeekend = false
+          promptQuotaToday = 10
+          promptsShownToday = 0
+        }
 
         console.log(`📊 Intelligent Pacing Analysis:`, {
           userId: req.user.id,
@@ -1595,6 +1621,12 @@ export default async (fastify: FastifyInstance) => {
           }
         }
 
+        // Ensure we have questions to choose from
+        if (!untouchedQuestions || untouchedQuestions.length === 0) {
+          console.log(`⚠️ No untouched questions available, using first default question`)
+          untouchedQuestions = [defaultQuestions[0]]
+        }
+
         const rng = seedrandom(
           `${req.user.id} ${localDate.format(DATE_FORMAT)} ${
             isNightPeriod ? 'N' : 'D'
@@ -1602,6 +1634,12 @@ export default async (fastify: FastifyInstance) => {
         )
         const question =
           untouchedQuestions[Math.floor(rng() * untouchedQuestions.length)]
+
+        // Final safety check
+        if (!question) {
+          console.error(`❌ No question selected, returning first default`)
+          return defaultQuestions[0]
+        }
 
         console.log(`📋 Default question for user ${req.user.id}:`, {
           questionId: question.id,
