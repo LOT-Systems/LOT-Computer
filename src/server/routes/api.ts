@@ -1491,18 +1491,24 @@ export default async (fastify: FastifyInstance) => {
       // WEEKLY SUMMARY CHECK (Priority over regular questions)
       // ============================================================================
       // Check if it's time for weekly summary (Sunday or Monday, once per week)
-      const lastWeeklySummary = await fastify.models.Answer.findOne({
-        where: {
-          userId: req.user.id,
-          metadata: {
-            questionId: 'weekly_summary'
-          }
-        },
-        order: [['createdAt', 'DESC']]
-      })
+      let lastWeeklySummary = null
+      try {
+        lastWeeklySummary = await fastify.models.Answer.findOne({
+          where: {
+            userId: req.user.id,
+            metadata: {
+              questionId: 'weekly_summary'
+            }
+          },
+          order: [['createdAt', 'DESC']]
+        })
+      } catch (metadataError: any) {
+        console.warn('⚠️ Weekly summary query failed, skipping:', metadataError.message)
+        // Continue without weekly summary check
+      }
 
       const { shouldShowWeeklySummary, generateWeeklySummary } = await import('#server/utils/weekly-summary')
-      const showWeeklySummary = shouldShowWeeklySummary(
+      const showWeeklySummary = lastWeeklySummary && shouldShowWeeklySummary(
         req.user,
         lastWeeklySummary?.createdAt || null
       )
@@ -1598,13 +1604,19 @@ export default async (fastify: FastifyInstance) => {
 
       {
         // Non-Usership users: Use hardcoded questions
-        const prevQuestionIds = await fastify.models.Answer.findAll({
-          where: {
-            userId: req.user.id,
-          },
-          order: [['createdAt', 'DESC']],
-          attributes: ['id', 'metadata'],
-        }).then((xs) => Array.from(new Set(xs.map((x) => x.metadata.questionId))))
+        let prevQuestionIds: string[] = []
+        try {
+          prevQuestionIds = await fastify.models.Answer.findAll({
+            where: {
+              userId: req.user.id,
+            },
+            order: [['createdAt', 'DESC']],
+            attributes: ['id', 'metadata'],
+          }).then((xs) => Array.from(new Set(xs.map((x) => x.metadata?.questionId).filter(Boolean))))
+        } catch (queryError: any) {
+          console.warn('⚠️ Previous questions query failed, using all default questions:', queryError.message)
+          // Continue with empty array - will use all default questions
+        }
 
         let untouchedQuestions = defaultQuestions
         if (prevQuestionIds.length) {
