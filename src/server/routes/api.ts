@@ -276,49 +276,74 @@ export default async (fastify: FastifyInstance) => {
   })
 
   // Memory diagnostic endpoint - helps debug why questions aren't showing
-  fastify.get('/memory-debug', async (req: FastifyRequest<{ Querystring: { d: string } }>, reply) => {
-    const dateParam = req.query.d
-    const decoded = atob(dateParam)
-    const localDate = dayjs(decoded, DATE_FORMAT)
-
-    // Check pacing
-    const pacingInfo = await calculateIntelligentPacing(req.user.id, localDate, fastify.models)
-
-    // Check 30-minute cooldown
-    const thirtyMinutesAgo = dayjs().subtract(30, 'minute')
-    const recentAnswerCount = await fastify.models.Answer.count({
-      where: {
-        userId: req.user.id,
-        createdAt: { [Op.gte]: thirtyMinutesAgo.toDate() }
+  fastify.get('/memory-debug', async (req: FastifyRequest<{ Querystring: { d?: string } }>, reply) => {
+    try {
+      const dateParam = req.query.d
+      if (!dateParam) {
+        return reply.status(400).send({
+          error: 'Missing date parameter',
+          usage: 'Add ?d=<base64-encoded-date>',
+          example: `/api/memory-debug?d=${btoa(dayjs().format(DATE_FORMAT))}`
+        })
       }
-    })
 
-    // Check last answer ever
-    const lastAnswer = await fastify.models.Answer.findOne({
-      where: { userId: req.user.id },
-      order: [['createdAt', 'DESC']]
-    })
+      const decoded = atob(dateParam)
+      const localDate = dayjs(decoded, DATE_FORMAT)
 
-    return {
-      dateParam,
-      decoded,
-      localDateValid: localDate.isValid(),
-      userTags: req.user.tags,
-      hasUsership: req.user.tags.some(t => t.toLowerCase() === 'usership'),
-      pacing: {
-        shouldShowPrompt: pacingInfo.shouldShowPrompt,
-        promptsShownToday: pacingInfo.promptsShownToday,
-        promptQuotaToday: pacingInfo.promptQuotaToday,
-        dayNumber: pacingInfo.dayNumber,
-        isWeekend: pacingInfo.isWeekend
-      },
-      cooldown: {
-        recentAnswerCount,
-        isRecentlyAsked: recentAnswerCount > 0,
-        lastAnswerAt: lastAnswer?.createdAt || 'never'
-      },
-      expectedResult: pacingInfo.shouldShowPrompt && recentAnswerCount === 0 ? 'SHOULD SHOW QUESTION' : 'BLOCKED',
-      blockReason: !pacingInfo.shouldShowPrompt ? 'Quota reached' : recentAnswerCount > 0 ? 'Answered in last 30 min' : 'None - should work'
+      if (!localDate.isValid()) {
+        return reply.status(400).send({
+          error: 'Invalid date',
+          decoded,
+          expected: 'YYYY-MM-DD format'
+        })
+      }
+
+      // Check pacing
+      const pacingInfo = await calculateIntelligentPacing(req.user.id, localDate, fastify.models)
+
+      // Check 30-minute cooldown
+      const thirtyMinutesAgo = dayjs().subtract(30, 'minute')
+      const recentAnswerCount = await fastify.models.Answer.count({
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: thirtyMinutesAgo.toDate() }
+        }
+      })
+
+      // Check last answer ever
+      const lastAnswer = await fastify.models.Answer.findOne({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']]
+      })
+
+      return {
+        dateParam,
+        decoded,
+        localDateValid: localDate.isValid(),
+        userTags: req.user.tags,
+        hasUsership: req.user.tags.some(t => t.toLowerCase() === 'usership'),
+        pacing: {
+          shouldShowPrompt: pacingInfo.shouldShowPrompt,
+          promptsShownToday: pacingInfo.promptsShownToday,
+          promptQuotaToday: pacingInfo.promptQuotaToday,
+          dayNumber: pacingInfo.dayNumber,
+          isWeekend: pacingInfo.isWeekend
+        },
+        cooldown: {
+          recentAnswerCount,
+          isRecentlyAsked: recentAnswerCount > 0,
+          lastAnswerAt: lastAnswer?.createdAt || 'never'
+        },
+        expectedResult: pacingInfo.shouldShowPrompt && recentAnswerCount === 0 ? 'SHOULD SHOW QUESTION' : 'BLOCKED',
+        blockReason: !pacingInfo.shouldShowPrompt ? 'Quota reached' : recentAnswerCount > 0 ? 'Answered in last 30 min' : 'None - should work'
+      }
+    } catch (error: any) {
+      console.error('Memory debug error:', error)
+      return reply.status(500).send({
+        error: 'Failed to generate debug info',
+        message: error.message,
+        stack: error.stack
+      })
     }
   })
 
