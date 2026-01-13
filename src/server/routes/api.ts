@@ -1427,7 +1427,6 @@ export default async (fastify: FastifyInstance) => {
           console.log(`⏸️ Skipping prompt: quota reached or bad timing`, {
             promptsShownToday,
             promptQuotaToday,
-            dayNumber: pacingInfo.dayNumber,
             returning: 'null'
           })
           return null
