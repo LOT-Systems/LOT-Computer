@@ -143,8 +143,11 @@ export const useMemory = () => {
   const date = btoa(dayjs().format('YYYY-MM-DD'))
   const path = '/api/memory'
 
+  // Add cache buster for error recovery - clears bad cache every hour
+  const hourKey = typeof window !== 'undefined' ? Math.floor(Date.now() / (60 * 60 * 1000)) : 0
+
   return useQuery<any>(
-    [path, date], // Include date in query key for proper caching
+    [path, date, hourKey], // Include hourKey to bust cache hourly
     async () => {
       // Get quantum state to send to server for context-aware question generation
       let quantumParams = {}
