@@ -20,16 +20,23 @@ export function MemoryWidget() {
 
   const { data: loadedQuestion = null, error, isLoading } = useMemory()
 
-  // Debug logging
+  // Debug logging - wrapped in try-catch for safety
   React.useEffect(() => {
-    console.log('📊 MemoryWidget state:', {
-      loadedQuestion: loadedQuestion ? { id: loadedQuestion.id, question: loadedQuestion.question?.substring(0, 50) } : null,
-      error: error ? (error as any).message : null,
-      isLoading,
-      lastQuestionId,
-      isDisplayed,
-      isShown
-    })
+    try {
+      console.log('📊 MemoryWidget state:', {
+        loadedQuestion: loadedQuestion ? {
+          id: loadedQuestion.id,
+          question: loadedQuestion.question ? loadedQuestion.question.substring(0, 50) : 'no question text'
+        } : null,
+        error: error ? (error as any).message : null,
+        isLoading,
+        lastQuestionId,
+        isDisplayed,
+        isShown
+      })
+    } catch (e) {
+      console.error('Debug logging failed:', e)
+    }
   }, [loadedQuestion, error, isLoading, lastQuestionId, isDisplayed, isShown])
 
   const { mutate: createMemory } = useCreateMemory({
@@ -65,13 +72,17 @@ export function MemoryWidget() {
     (option: string) => (ev: React.MouseEvent) => {
       if (!question || !question.id) return
 
-      // Record intention signal for quantum pattern recognition
-      recordSignal('memory', 'answer_given', {
-        questionId: question.id,
-        option,
-        question: question.question,
-        hour: new Date().getHours()
-      })
+      // Record intention signal for quantum pattern recognition - wrapped in try-catch for safety
+      try {
+        recordSignal('memory', 'answer_given', {
+          questionId: question.id,
+          option,
+          question: question.question,
+          hour: new Date().getHours()
+        })
+      } catch (e) {
+        console.warn('Failed to record intention signal:', e)
+      }
 
       createMemory({
         questionId: question.id,
@@ -120,11 +131,26 @@ export function MemoryWidget() {
     }
   }, [response])
 
-  // Get quantum state for reflection prompt
+  // Get quantum state for reflection prompt - wrapped in try-catch for safety
   const quantumState = React.useMemo(() => {
-    analyzeIntentions()
-    return getUserState()
+    try {
+      analyzeIntentions()
+      return getUserState()
+    } catch (e) {
+      console.warn('Failed to get quantum state:', e)
+      // Return safe default state
+      return {
+        energy: 'moderate',
+        clarity: 'clear',
+        alignment: 'aligned',
+        needsSupport: 'none',
+        lastUpdated: Date.now()
+      }
+    }
   }, [])
+
+  // Show error state if API failed
+  const hasError = !!error && !isLoading && !loadedQuestion
 
   // Only show questions in System page (story moved to Settings)
   return (
@@ -136,9 +162,14 @@ export function MemoryWidget() {
         // To avoid flickering. This widget should placed last on the "systems" page.
         // Alternatively, max-height animation could be used.
         'opacity-0 transition-opacity duration-[1400ms]',
-        isShown && 'opacity-100'
+        (isShown || hasError) && 'opacity-100'
       )}
     >
+      {hasError && (
+        <div className="opacity-60 text-sm">
+          Memory temporarily unavailable. Check back soon.
+        </div>
+      )}
       {!!question && (
         <div
           className={cn(
@@ -148,7 +179,14 @@ export function MemoryWidget() {
         >
           {/* Quantum-aware reflection prompt */}
           <div className="mb-8 opacity-60">
-            {getMemoryReflectionPrompt(quantumState.energy, quantumState.clarity, quantumState.alignment)}
+            {(() => {
+              try {
+                return getMemoryReflectionPrompt(quantumState.energy, quantumState.clarity, quantumState.alignment)
+              } catch (e) {
+                console.warn('Failed to get reflection prompt:', e)
+                return 'Reflect on your recent experiences...'
+              }
+            })()}
           </div>
 
           <div className="mb-16">{question?.question || '...'}</div>
