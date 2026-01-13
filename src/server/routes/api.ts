@@ -1384,8 +1384,19 @@ export default async (fastify: FastifyInstance) => {
           }
         }
 
-        const localDate = dayjs(atob(req.query.d), DATE_FORMAT)
+        const decodedDate = atob(req.query.d)
+        const localDate = dayjs(decodedDate, DATE_FORMAT)
+
+        console.log(`🔍 Memory request:`, {
+          userId: req.user.id,
+          encodedDate: req.query.d,
+          decodedDate,
+          localDateParsed: localDate.format(),
+          isValid: localDate.isValid()
+        })
+
         if (!localDate.isValid()) {
+          console.error(`❌ Invalid date format:`, { decodedDate, expected: DATE_FORMAT })
           return reply.throw.badParams()
         }
 
@@ -1413,7 +1424,12 @@ export default async (fastify: FastifyInstance) => {
         })
 
         if (!shouldShowPrompt) {
-          console.log(`⏸️ Skipping prompt: quota reached or bad timing`)
+          console.log(`⏸️ Skipping prompt: quota reached or bad timing`, {
+            promptsShownToday,
+            promptQuotaToday,
+            dayNumber: pacingInfo.dayNumber,
+            returning: 'null'
+          })
           return null
         }
 
@@ -1528,6 +1544,11 @@ export default async (fastify: FastifyInstance) => {
           const prompt = await buildPrompt(req.user, logs, isWeekend, quantumState)
           const question = await completeAndExtractQuestion(prompt, req.user)
 
+          console.log(`✅ AI-generated question for user ${req.user.id}:`, {
+            questionId: question.id,
+            questionPreview: question.question.substring(0, 60) + '...'
+          })
+
           return question
         } catch (error: any) {
           console.error('❌ Memory question generation failed:', {
@@ -1581,6 +1602,15 @@ export default async (fastify: FastifyInstance) => {
         )
         const question =
           untouchedQuestions[Math.floor(rng() * untouchedQuestions.length)]
+
+        console.log(`📋 Default question for user ${req.user.id}:`, {
+          questionId: question.id,
+          questionPreview: question.question.substring(0, 60) + '...',
+          totalUntouched: untouchedQuestions.length,
+          hasUsership: req.user.tags.some(t => t.toLowerCase() === 'usership'),
+          reason: 'Non-Usership user or AI generation failed'
+        })
+
         return question
       }
       } catch (error: any) {
