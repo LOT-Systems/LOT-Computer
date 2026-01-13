@@ -220,7 +220,7 @@ export default async (fastify: FastifyInstance) => {
       let localDate = dayjs()
       if (req.query.d) {
         try {
-          localDate = dayjs(atob(req.query.d), DATE_TIME_FORMAT)
+          localDate = dayjs(atob(req.query.d), DATE_FORMAT)
         } catch {
           // Invalid date, use server time
         }
@@ -279,7 +279,7 @@ export default async (fastify: FastifyInstance) => {
   fastify.get('/memory-debug', async (req: FastifyRequest<{ Querystring: { d: string } }>, reply) => {
     const dateParam = req.query.d
     const decoded = atob(dateParam)
-    const localDate = dayjs(decoded, DATE_TIME_FORMAT)
+    const localDate = dayjs(decoded, DATE_FORMAT)
 
     // Check pacing
     const pacingInfo = await calculateIntelligentPacing(req.user.id, localDate, fastify.models)
@@ -1359,7 +1359,7 @@ export default async (fastify: FastifyInstance) => {
           }
         }
 
-        const localDate = dayjs(atob(req.query.d), DATE_TIME_FORMAT)
+        const localDate = dayjs(atob(req.query.d), DATE_FORMAT)
         if (!localDate.isValid()) {
           return reply.throw.badParams()
         }
