@@ -28,7 +28,11 @@ export function MemoryWidget() {
           id: loadedQuestion.id,
           question: loadedQuestion.question ? loadedQuestion.question.substring(0, 50) : 'no question text'
         } : null,
-        error: error ? (error as any).message : null,
+        error: error ? {
+          message: (error as any).message,
+          response: (error as any).response?.data,
+          status: (error as any).response?.status
+        } : null,
         isLoading,
         lastQuestionId,
         isDisplayed,
