@@ -161,14 +161,22 @@ export const useMemory = () => {
           }
         } catch (e) {
           // Quantum state optional - graceful degradation
+          console.warn('Quantum state unavailable:', e)
         }
       }
 
-      return (await api.get<any>(path, { params: { d: date, ...quantumParams } })).data
+      console.log('🔍 Fetching Memory question:', { date: dayjs().format('YYYY-MM-DD'), quantumParams })
+      const response = await api.get<any>(path, { params: { d: date, ...quantumParams } })
+      console.log('✅ Memory API response:', response.data)
+      return response.data
     },
     {
       staleTime: Infinity, // Never refetch - question is valid for the whole day
       cacheTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
+      onError: (error) => {
+        console.error('❌ Memory query failed:', error)
+      },
+      retry: false, // Don't retry on error to avoid spam
     }
   )
 }

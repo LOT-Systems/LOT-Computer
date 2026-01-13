@@ -18,7 +18,19 @@ export function MemoryWidget() {
   const [response, setResponse] = React.useState<string | null>(null)
   const lastQuestionId = useStore(stores.lastAnsweredMemoryQuestionId)
 
-  const { data: loadedQuestion = null } = useMemory()
+  const { data: loadedQuestion = null, error, isLoading } = useMemory()
+
+  // Debug logging
+  React.useEffect(() => {
+    console.log('📊 MemoryWidget state:', {
+      loadedQuestion: loadedQuestion ? { id: loadedQuestion.id, question: loadedQuestion.question?.substring(0, 50) } : null,
+      error: error ? (error as any).message : null,
+      isLoading,
+      lastQuestionId,
+      isDisplayed,
+      isShown
+    })
+  }, [loadedQuestion, error, isLoading, lastQuestionId, isDisplayed, isShown])
 
   const { mutate: createMemory } = useCreateMemory({
     onSuccess: ({ response, insight }) => {
