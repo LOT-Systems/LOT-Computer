@@ -175,6 +175,10 @@ export const useMemory = () => {
       cacheTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
       onError: (error) => {
         console.error('❌ Memory query failed:', error)
+        // Store error timestamp for manual retry UI
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(`memory-error-${date}`, Date.now().toString())
+        }
       },
       retry: false, // Don't retry on error to avoid spam
     }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { useStore } from '@nanostores/react'
+import { useQueryClient } from 'react-query'
 import { Block, Button } from '#client/components/ui'
 import { useMemory, useCreateMemory } from '#client/queries'
 import { cn } from '#client/utils'
@@ -8,6 +9,7 @@ import { MemoryQuestion } from '#shared/types'
 import * as stores from '#client/stores'
 import { recordSignal, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
 import { getMemoryReflectionPrompt } from '#client/utils/narrative'
+import dayjs from '#client/utils/dayjs'
 
 export function MemoryWidget() {
   const [isDisplayed, setIsDisplayed] = React.useState(false)
@@ -18,7 +20,8 @@ export function MemoryWidget() {
   const [response, setResponse] = React.useState<string | null>(null)
   const lastQuestionId = useStore(stores.lastAnsweredMemoryQuestionId)
 
-  const { data: loadedQuestion = null, error, isLoading } = useMemory()
+  const queryClient = useQueryClient()
+  const { data: loadedQuestion = null, error, isLoading, refetch } = useMemory()
 
   // Debug logging - wrapped in try-catch for safety
   React.useEffect(() => {
@@ -156,6 +159,25 @@ export function MemoryWidget() {
   // Show error state if API failed
   const hasError = !!error && !isLoading && !loadedQuestion
 
+  // Retry handler - clears cache and refetches
+  const handleRetry = React.useCallback(async () => {
+    try {
+      const date = btoa(dayjs().format('YYYY-MM-DD'))
+      const path = '/api/memory'
+
+      // Clear error timestamp from localStorage
+      localStorage.removeItem(`memory-error-${date}`)
+
+      // Invalidate the query cache
+      await queryClient.invalidateQueries([path, date])
+
+      // Refetch the query
+      refetch()
+    } catch (e) {
+      console.error('Retry failed:', e)
+    }
+  }, [queryClient, refetch])
+
   // Only show questions in System page (story moved to Settings)
   return (
     <Block
@@ -170,8 +192,16 @@ export function MemoryWidget() {
       )}
     >
       {hasError && (
-        <div className="opacity-60 text-sm">
-          Memory temporarily unavailable. Check back soon.
+        <div className="flex flex-col gap-4">
+          <div className="opacity-60 text-sm">
+            Memory temporarily unavailable.
+          </div>
+          <Button
+            onClick={handleRetry}
+            className="w-full sm:w-auto"
+          >
+            Try again
+          </Button>
         </div>
       )}
       {!!question && (
