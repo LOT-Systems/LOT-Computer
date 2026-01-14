@@ -33,7 +33,7 @@ import { generateUserNarrative } from '#server/utils/rpg-narrative'
 import { generateChatCatalysts, generateConversationStarters, shouldShowChatCatalyst } from '#server/utils/cohort-chat-catalyst'
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
-import { registerOSRoutes } from './os-api'
+import { registerOSRoutes } from './os-api.js'
 
 // ============================================================================
 // Helper Functions
