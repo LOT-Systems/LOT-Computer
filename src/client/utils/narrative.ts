@@ -175,27 +175,27 @@ export function getMemoryReflectionPrompt(
 
   // Quantum-aware prompts based on user state
   if (energy === 'depleted' || energy === 'low') {
-    return 'Rest and remember'
+    return 'Rest and remember.'
   }
 
   if (alignment === 'flowing' || (energy === 'high' && clarity === 'focused')) {
-    return 'In this moment'
+    return 'In this moment.'
   }
 
   if (clarity === 'confused' || alignment === 'searching') {
-    return 'Notice'
+    return 'Notice.'
   }
 
   // Time-aware fallbacks
   if (timeOfDay === 'evening' || timeOfDay === 'night') {
-    return 'Looking back'
+    return 'Looking back.'
   }
 
   if (timeOfDay === 'morning' || timeOfDay === 'early_morning') {
-    return 'Remember'
+    return 'Remember.'
   }
 
-  return 'Recall'
+  return 'Recall.'
 }
 
 /**

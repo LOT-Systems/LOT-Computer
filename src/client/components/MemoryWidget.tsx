@@ -291,13 +291,13 @@ export function MemoryWidget() {
           )}
         >
           {/* Quantum-aware reflection prompt */}
-          <div className="mb-8 opacity-60">
+          <div className="mb-8">
             {(() => {
               try {
                 return getMemoryReflectionPrompt(quantumState.energy, quantumState.clarity, quantumState.alignment)
               } catch (e) {
                 console.warn('Failed to get reflection prompt:', e)
-                return 'Reflect on your recent experiences...'
+                return 'Reflect on your recent experiences.'
               }
             })()}
           </div>
