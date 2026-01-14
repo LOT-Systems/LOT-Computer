@@ -1361,6 +1361,8 @@ export default async (fastify: FastifyInstance) => {
       qn?: string // quantum needs support
     } }>, reply) => {
       try {
+        console.log(`🎯 Memory endpoint called for user ${req.user?.id || 'UNKNOWN'}`)
+
         // Validate required parameters first
         if (!req.query.d) {
           console.error('❌ Memory request missing date parameter')
@@ -1455,6 +1457,7 @@ export default async (fastify: FastifyInstance) => {
             promptQuotaToday,
             returning: 'null'
           })
+          console.log(`↩️  Returning null from Memory endpoint (quota/timing)`)
           return null
         }
 
@@ -1478,6 +1481,7 @@ export default async (fastify: FastifyInstance) => {
 
         if (isRecentlyAsked) {
           console.log(`⏸️ Skipping prompt: already answered in this period (morning/evening)`)
+          console.log(`↩️  Returning null from Memory endpoint (cooldown)`)
           return null
         }
 
@@ -1540,6 +1544,7 @@ export default async (fastify: FastifyInstance) => {
 
           const weeklySummary = await generateWeeklySummary(req.user, logs)
 
+          console.log(`↩️  Returning weekly summary from Memory endpoint`)
           // Return as a special memory "question" with reflection prompt
           return {
             id: 'weekly_summary',
@@ -1594,6 +1599,7 @@ export default async (fastify: FastifyInstance) => {
             questionPreview: question.question.substring(0, 60) + '...'
           })
 
+          console.log(`↩️  Returning AI-generated question from Memory endpoint`)
           return question
         } catch (error: any) {
           console.error('❌ Memory question generation failed:', {
@@ -1616,65 +1622,78 @@ export default async (fastify: FastifyInstance) => {
       }
 
       {
-        // Non-Usership users: Use hardcoded questions
-        let prevQuestionIds: string[] = []
+        // Non-Usership users: Use hardcoded questions (WRAPPED FOR SAFETY)
         try {
-          prevQuestionIds = await fastify.models.Answer.findAll({
-            where: {
-              userId: req.user.id,
-            },
-            order: [['createdAt', 'DESC']],
-            attributes: ['id', 'metadata'],
-          }).then((xs) => Array.from(new Set(xs.map((x) => x.metadata?.questionId).filter(Boolean))))
-        } catch (queryError: any) {
-          console.warn('⚠️ Previous questions query failed, using all default questions:', queryError.message)
-          // Continue with empty array - will use all default questions
-        }
+          let prevQuestionIds: string[] = []
+          try {
+            prevQuestionIds = await fastify.models.Answer.findAll({
+              where: {
+                userId: req.user.id,
+              },
+              order: [['createdAt', 'DESC']],
+              attributes: ['id', 'metadata'],
+            }).then((xs) => Array.from(new Set(xs.map((x) => x.metadata?.questionId).filter(Boolean))))
+          } catch (queryError: any) {
+            console.warn('⚠️ Previous questions query failed, using all default questions:', queryError.message)
+            // Continue with empty array - will use all default questions
+          }
 
-        let untouchedQuestions = defaultQuestions
-        if (prevQuestionIds.length) {
-          untouchedQuestions = defaultQuestions.filter(
-            fp.propNotIn('id', prevQuestionIds)
-          )
-          if (!untouchedQuestions.length) {
-            const longAgoAnsweredQuestionIds = prevQuestionIds.slice(
-              -1 * Math.floor(prevQuestionIds.length / 3)
-            )
+          let untouchedQuestions = defaultQuestions
+          if (prevQuestionIds.length) {
             untouchedQuestions = defaultQuestions.filter(
-              fp.propIn('id', longAgoAnsweredQuestionIds)
+              fp.propNotIn('id', prevQuestionIds)
             )
+            if (!untouchedQuestions.length) {
+              const longAgoAnsweredQuestionIds = prevQuestionIds.slice(
+                -1 * Math.floor(prevQuestionIds.length / 3)
+              )
+              untouchedQuestions = defaultQuestions.filter(
+                fp.propIn('id', longAgoAnsweredQuestionIds)
+              )
+            }
+          }
+
+          // Ensure we have questions to choose from
+          if (!untouchedQuestions || untouchedQuestions.length === 0) {
+            console.log(`⚠️ No untouched questions available, using first default question`)
+            untouchedQuestions = [defaultQuestions[0]]
+          }
+
+          const rng = seedrandom(
+            `${req.user.id} ${localDate.format(DATE_FORMAT)} ${
+              isNightPeriod ? 'N' : 'D'
+            }`
+          )
+          const question =
+            untouchedQuestions[Math.floor(rng() * untouchedQuestions.length)]
+
+          // Final safety check
+          if (!question) {
+            console.error(`❌ No question selected, returning first default`)
+            return defaultQuestions[0]
+          }
+
+          console.log(`📋 Default question for user ${req.user.id}:`, {
+            questionId: question.id,
+            questionPreview: question.question.substring(0, 60) + '...',
+            totalUntouched: untouchedQuestions.length,
+            hasUsership: req.user.tags.some(t => t.toLowerCase() === 'usership'),
+            reason: 'Non-Usership user or AI generation failed'
+          })
+
+          console.log(`↩️  Returning default question from Memory endpoint`)
+          return question
+        } catch (defaultQuestionError: any) {
+          console.error('❌ Default question selection failed:', defaultQuestionError.message)
+          console.error('Stack:', defaultQuestionError.stack)
+          console.log(`↩️  Returning absolute fallback hardcoded question from Memory endpoint`)
+          // ABSOLUTE FALLBACK - return first hardcoded question directly
+          return {
+            id: 'n6M42WKP',
+            question: 'How do you prefer to start your mornings?',
+            options: ['Tea', 'Coffee', 'Water', 'Light breakfast'],
           }
         }
-
-        // Ensure we have questions to choose from
-        if (!untouchedQuestions || untouchedQuestions.length === 0) {
-          console.log(`⚠️ No untouched questions available, using first default question`)
-          untouchedQuestions = [defaultQuestions[0]]
-        }
-
-        const rng = seedrandom(
-          `${req.user.id} ${localDate.format(DATE_FORMAT)} ${
-            isNightPeriod ? 'N' : 'D'
-          }`
-        )
-        const question =
-          untouchedQuestions[Math.floor(rng() * untouchedQuestions.length)]
-
-        // Final safety check
-        if (!question) {
-          console.error(`❌ No question selected, returning first default`)
-          return defaultQuestions[0]
-        }
-
-        console.log(`📋 Default question for user ${req.user.id}:`, {
-          questionId: question.id,
-          questionPreview: question.question.substring(0, 60) + '...',
-          totalUntouched: untouchedQuestions.length,
-          hasUsership: req.user.tags.some(t => t.toLowerCase() === 'usership'),
-          reason: 'Non-Usership user or AI generation failed'
-        })
-
-        return question
       }
       } catch (error: any) {
         console.error('❌ /api/memory endpoint error:', {
