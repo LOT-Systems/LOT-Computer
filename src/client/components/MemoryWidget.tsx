@@ -19,6 +19,7 @@ export function MemoryWidget() {
   const [isResponseShown, setIsResponseShown] = React.useState(false)
   const [question, setQuestion] = React.useState<MemoryQuestion | null>(null)
   const [response, setResponse] = React.useState<string | null>(null)
+  const [showErrorDetails, setShowErrorDetails] = React.useState(false)
   const lastQuestionId = useStore(stores.lastAnsweredMemoryQuestionId)
 
   const queryClient = useQueryClient()
@@ -193,6 +194,10 @@ export function MemoryWidget() {
   const handleRetry = React.useCallback(async () => {
     try {
       console.log('🔄 Retry button clicked - clearing cache and refetching')
+
+      // Hide error details on retry
+      setShowErrorDetails(false)
+
       const date = btoa(dayjs().format('YYYY-MM-DD'))
       const path = '/api/memory'
 
@@ -240,12 +245,42 @@ export function MemoryWidget() {
           <div className="opacity-60 text-sm">
             Memory temporarily unavailable.
           </div>
-          <Button
-            onClick={handleRetry}
-            className="w-full sm:w-auto"
-          >
-            Try again
-          </Button>
+
+          {/* Error Details */}
+          {showErrorDetails && error && (
+            <div className="text-xs opacity-70 font-mono bg-acc/5 p-3 rounded border border-acc/20 overflow-auto max-h-[200px]">
+              <div className="mb-2 font-bold">Error Details:</div>
+              {(error as any).response?.status && (
+                <div>Status: {(error as any).response.status}</div>
+              )}
+              {(error as any).message && (
+                <div>Message: {(error as any).message}</div>
+              )}
+              {(error as any).response?.data && (
+                <div className="mt-2">
+                  Response: {JSON.stringify((error as any).response.data, null, 2)}
+                </div>
+              )}
+              {!(error as any).response && (
+                <div>Network or client error: {String(error)}</div>
+              )}
+            </div>
+          )}
+
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              onClick={handleRetry}
+              className="flex-1 sm:flex-initial"
+            >
+              Try again
+            </Button>
+            <Button
+              onClick={() => setShowErrorDetails(!showErrorDetails)}
+              className="flex-1 sm:flex-initial opacity-60"
+            >
+              {showErrorDetails ? 'Hide details' : 'Show details'}
+            </Button>
+          </div>
         </div>
       )}
       {!!question && (
