@@ -192,19 +192,33 @@ export function MemoryWidget() {
   // Retry handler - clears cache and refetches
   const handleRetry = React.useCallback(async () => {
     try {
+      console.log('🔄 Retry button clicked - clearing cache and refetching')
       const date = btoa(dayjs().format('YYYY-MM-DD'))
       const path = '/api/memory'
 
       // Clear error timestamp from localStorage
       localStorage.removeItem(`memory-error-${date}`)
 
+      // Clear all related cache items
+      localStorage.removeItem('lastMemoryQuestionTime')
+      stores.lastAnsweredMemoryQuestionId.set(null)
+
       // Reset the query completely (clears error state and cache)
       await queryClient.resetQueries([path, date])
 
+      // Small delay to ensure cache is cleared
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      console.log('🔄 Refetching Memory question...')
       // Refetch the query
-      refetch()
+      const result = await refetch()
+      console.log('🔄 Refetch result:', {
+        hasData: !!result.data,
+        hasError: !!result.error,
+        isLoading: result.isLoading
+      })
     } catch (e) {
-      console.error('Retry failed:', e)
+      console.error('❌ Retry failed:', e)
     }
   }, [queryClient, refetch])
 

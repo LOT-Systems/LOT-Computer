@@ -1704,13 +1704,22 @@ export default async (fastify: FastifyInstance) => {
           message: error.message,
           stack: error.stack,
           userId: req.user?.id,
-          query: req.query
+          query: req.query,
+          errorType: error.constructor.name,
+          errorCode: error.code
         })
-        return reply.status(500).send({
-          error: 'Memory question generation failed',
-          details: error.message,
-          hint: 'Check /api/memory-debug for diagnostics'
-        })
+
+        // Return fallback question instead of error to improve UX
+        console.log('↩️ Returning emergency fallback question due to error')
+        return {
+          id: 'emergency_fallback',
+          question: 'What matters most to you today?',
+          options: ['Connection', 'Growth', 'Rest', 'Clarity'],
+          metadata: {
+            isEmergencyFallback: true,
+            error: error.message
+          }
+        }
       }
     }
   )
