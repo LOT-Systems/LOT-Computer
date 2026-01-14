@@ -4,6 +4,7 @@ import { PublicProfile as PublicProfileType } from '#shared/types'
 import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
+import { joinWithBadges } from '#client/utils/badges'
 
 export const PublicProfile = () => {
   const [profile, setProfile] = React.useState<PublicProfileType | null>(null)
@@ -355,7 +356,7 @@ export const PublicProfile = () => {
                 {profile.psychologicalProfile.coreValues && profile.psychologicalProfile.coreValues.length > 0 && (
                   <div className="flex">
                     <span className="w-[170px] sm:w-[150px] mr-24 sm:mr-12 -ml-4">Core values:</span>
-                    <span className="flex-1">{profile.psychologicalProfile.coreValues.join(', ')}</span>
+                    <span className="flex-1">{joinWithBadges(profile.psychologicalProfile.coreValues)}</span>
                   </div>
                 )}
 
@@ -363,7 +364,7 @@ export const PublicProfile = () => {
                 {profile.psychologicalProfile.emotionalPatterns && profile.psychologicalProfile.emotionalPatterns.length > 0 && (
                   <div className="flex">
                     <span className="w-[170px] sm:w-[150px] mr-24 sm:mr-12 -ml-4">Emotional patterns:</span>
-                    <span className="flex-1">{profile.psychologicalProfile.emotionalPatterns.join(', ')}</span>
+                    <span className="flex-1">{joinWithBadges(profile.psychologicalProfile.emotionalPatterns)}</span>
                   </div>
                 )}
 
@@ -379,7 +380,7 @@ export const PublicProfile = () => {
                 {profile.psychologicalProfile.behavioralTraits && profile.psychologicalProfile.behavioralTraits.length > 0 && (
                   <div className="flex mb-24">
                     <span className="w-[170px] sm:w-[150px] mr-24 sm:mr-12 -ml-4">Behavioral traits:</span>
-                    <span className="flex-1">{profile.psychologicalProfile.behavioralTraits.join(', ')}</span>
+                    <span className="flex-1">{joinWithBadges(profile.psychologicalProfile.behavioralTraits)}</span>
                   </div>
                 )}
 
