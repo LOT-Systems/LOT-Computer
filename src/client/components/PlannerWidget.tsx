@@ -150,7 +150,7 @@ export const PlannerWidget: React.FC = () => {
                 className={cn(
                   'px-8 py-4 rounded transition-colors cursor-pointer',
                   state.selectedCategory === 'intent'
-                    ? 'bg-acc/10 border border-acc/30'
+                    ? 'bg-acc/10 border-2 border-acc/30'
                     : 'border border-transparent hover:border-acc/10'
                 )}
                 onClick={() => {
@@ -172,7 +172,7 @@ export const PlannerWidget: React.FC = () => {
                 className={cn(
                   'px-8 py-4 rounded transition-colors cursor-pointer',
                   state.selectedCategory === 'today'
-                    ? 'bg-acc/10 border border-acc/30'
+                    ? 'bg-acc/10 border-2 border-acc/30'
                     : 'border border-transparent hover:border-acc/10'
                 )}
                 onClick={() => {
@@ -194,7 +194,7 @@ export const PlannerWidget: React.FC = () => {
                 className={cn(
                   'px-8 py-4 rounded transition-colors cursor-pointer',
                   state.selectedCategory === 'how'
-                    ? 'bg-acc/10 border border-acc/30'
+                    ? 'bg-acc/10 border-2 border-acc/30'
                     : 'border border-transparent hover:border-acc/10'
                 )}
                 onClick={() => {
@@ -216,7 +216,7 @@ export const PlannerWidget: React.FC = () => {
                 className={cn(
                   'px-8 py-4 rounded transition-colors cursor-pointer',
                   state.selectedCategory === 'feeling'
-                    ? 'bg-acc/10 border border-acc/30'
+                    ? 'bg-acc/10 border-2 border-acc/30'
                     : 'border border-transparent hover:border-acc/10'
                 )}
                 onClick={() => {
