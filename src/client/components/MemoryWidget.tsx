@@ -198,8 +198,8 @@ export function MemoryWidget() {
       // Clear error timestamp from localStorage
       localStorage.removeItem(`memory-error-${date}`)
 
-      // Invalidate the query cache
-      await queryClient.invalidateQueries([path, date])
+      // Reset the query completely (clears error state and cache)
+      await queryClient.resetQueries([path, date])
 
       // Refetch the query
       refetch()
