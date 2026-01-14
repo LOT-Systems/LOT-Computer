@@ -1460,15 +1460,22 @@ export default async (fastify: FastifyInstance) => {
 
         // Check if already answered in current period (morning or evening)
         // This ensures max 2 questions per day: one in morning period, one in evening period
-        const isRecentlyAsked = await fastify.models.Answer.count({
-          where: {
-            userId: req.user.id,
-            createdAt: {
-              [Op.gte]: utcPeriodEdges[0].toDate(),
-              [Op.lte]: utcPeriodEdges[1].toDate(),
+        let isRecentlyAsked = false
+        try {
+          isRecentlyAsked = await fastify.models.Answer.count({
+            where: {
+              userId: req.user.id,
+              createdAt: {
+                [Op.gte]: utcPeriodEdges[0].toDate(),
+                [Op.lte]: utcPeriodEdges[1].toDate(),
+              },
             },
-          },
-        }).then(Boolean)
+          }).then(Boolean)
+        } catch (cooldownError: any) {
+          console.warn('⚠️ Cooldown check failed, assuming not recently asked:', cooldownError.message)
+          // On error, assume not recently asked (fail-open to show questions)
+        }
+
         if (isRecentlyAsked) {
           console.log(`⏸️ Skipping prompt: already answered in this period (morning/evening)`)
           return null
@@ -1517,13 +1524,19 @@ export default async (fastify: FastifyInstance) => {
         console.log(`📊 Generating weekly summary for user ${req.user.id}`)
         try {
           // Load 200 logs to cover the week + historical context
-          const logs = await fastify.models.Log.findAll({
-            where: {
-              userId: req.user.id,
-            },
-            order: [['createdAt', 'DESC']],
-            limit: 200,
-          })
+          let logs = []
+          try {
+            logs = await fastify.models.Log.findAll({
+              where: {
+                userId: req.user.id,
+              },
+              order: [['createdAt', 'DESC']],
+              limit: 200,
+            })
+          } catch (logsError: any) {
+            console.warn('⚠️ Failed to load logs for weekly summary:', logsError.message)
+            // Continue with empty logs array
+          }
 
           const weeklySummary = await generateWeeklySummary(req.user, logs)
 
