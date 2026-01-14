@@ -2157,6 +2157,118 @@ export default async (fastify: FastifyInstance) => {
     }
   )
 
+  // User stats for badge calculation
+  fastify.get(
+    '/user-stats',
+    async (req: FastifyRequest, reply) => {
+      try {
+        const userId = req.user.id
+
+        // Calculate streak (consecutive days with answers)
+        const answers = await fastify.models.Answer.findAll({
+          where: { userId },
+          order: [['createdAt', 'DESC']],
+          attributes: ['createdAt'],
+        })
+
+        let streak = 0
+        if (answers.length > 0) {
+          const today = dayjs().startOf('day')
+          let currentDate = today
+          const answerDays = new Set(
+            answers.map(a => dayjs(a.createdAt).startOf('day').format('YYYY-MM-DD'))
+          )
+
+          // Check consecutive days backwards from today or yesterday
+          if (!answerDays.has(today.format('YYYY-MM-DD'))) {
+            currentDate = today.subtract(1, 'day')
+          }
+
+          while (answerDays.has(currentDate.format('YYYY-MM-DD'))) {
+            streak++
+            currentDate = currentDate.subtract(1, 'day')
+          }
+        }
+
+        // Check balanced planner usage
+        const plannerLogs = await fastify.models.Log.findAll({
+          where: {
+            userId,
+            event: 'plan_set',
+          },
+          limit: 20,
+        })
+
+        let balancedPlanner = false
+        if (plannerLogs.length >= 10) {
+          // Check if all dimensions are used relatively evenly
+          const intentCount = plannerLogs.filter(l => l.text.includes('Intent:')).length
+          const todayCount = plannerLogs.filter(l => l.text.includes('Today:')).length
+          const howCount = plannerLogs.filter(l => l.text.includes('How:')).length
+          const feelingCount = plannerLogs.filter(l => l.text.includes('Feeling:')).length
+          const avg = (intentCount + todayCount + howCount + feelingCount) / 4
+          const variance = Math.abs(intentCount - avg) + Math.abs(todayCount - avg) +
+                          Math.abs(howCount - avg) + Math.abs(feelingCount - avg)
+          balancedPlanner = variance < avg * 0.5 // Low variance = balanced
+        }
+
+        // Check multi-widget sessions (multiple actions within 10 minutes)
+        const recentLogs = await fastify.models.Log.findAll({
+          where: { userId },
+          order: [['createdAt', 'DESC']],
+          limit: 200,
+        })
+
+        let multiWidgetSessions = 0
+        let lastTime = null
+        let sessionCount = 0
+        for (const log of recentLogs) {
+          const logTime = dayjs(log.createdAt)
+          if (lastTime && logTime.diff(lastTime, 'minute') <= 10) {
+            sessionCount++
+          } else {
+            if (sessionCount >= 2) multiWidgetSessions++
+            sessionCount = 1
+          }
+          lastTime = logTime
+        }
+
+        // Check consistent timing (similar hours of day)
+        const answerHours = answers.slice(0, 30).map(a => dayjs(a.createdAt).hour())
+        let consistentTiming = false
+        if (answerHours.length >= 10) {
+          const avg = answerHours.reduce((sum, h) => sum + h, 0) / answerHours.length
+          const variance = answerHours.reduce((sum, h) => sum + Math.abs(h - avg), 0) / answerHours.length
+          consistentTiming = variance < 3 // Within 3 hours on average
+        }
+
+        // Check deep reflection (longer answer patterns)
+        const memoryAnswers = await fastify.models.Answer.findAll({
+          where: { userId },
+          order: [['createdAt', 'DESC']],
+          limit: 50,
+        })
+        const deepReflection = memoryAnswers.length >= 20
+
+        // Check diverse choices (variety in options selected)
+        const uniqueOptions = new Set(memoryAnswers.map(a => a.metadata?.option).filter(Boolean))
+        const diverseChoices = uniqueOptions.size
+
+        return {
+          streak,
+          balancedPlanner,
+          multiWidgetSessions,
+          consistentTiming,
+          deepReflection,
+          diverseChoices,
+        }
+      } catch (error: any) {
+        console.error('❌ User stats calculation error:', error)
+        return reply.status(500).send({ error: 'Failed to calculate stats' })
+      }
+    }
+  )
+
   // Generate daily world element
   fastify.post('/world/generate-element', async (req, reply) => {
     try {

@@ -10,6 +10,7 @@ import * as stores from '#client/stores'
 import { recordSignal, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
 import { getMemoryReflectionPrompt } from '#client/utils/narrative'
 import dayjs from '#client/utils/dayjs'
+import { getNextBadgeUnlock, checkAndAwardBadges } from '#client/utils/badges'
 
 export function MemoryWidget() {
   const [isDisplayed, setIsDisplayed] = React.useState(false)
@@ -101,6 +102,11 @@ export function MemoryWidget() {
     [question]
   )
 
+  // Check for badge unlocks on mount and after answers
+  React.useEffect(() => {
+    checkAndAwardBadges().catch(err => console.warn('Badge check failed:', err))
+  }, [])
+
   React.useEffect(() => {
     // Clear stale cache (older than 12 hours) to allow new questions
     const lastQuestionTime = localStorage.getItem('lastMemoryQuestionTime')
@@ -111,6 +117,30 @@ export function MemoryWidget() {
         stores.lastAnsweredMemoryQuestionId.set(null)
         localStorage.removeItem('lastMemoryQuestionTime')
       }
+    }
+
+    // Check for badge unlock notification first
+    const badgeUnlock = getNextBadgeUnlock()
+    if (badgeUnlock) {
+      // Show badge unlock instead of question
+      setTimeout(() => {
+        setIsDisplayed(true)
+        setTimeout(() => {
+          setResponse(badgeUnlock.unlockMessage)
+          setIsShown(true)
+          setIsResponseShown(true)
+          // Auto-hide after 5 seconds
+          setTimeout(() => {
+            setIsShown(false)
+            setTimeout(() => {
+              setIsDisplayed(false)
+              setIsResponseShown(false)
+              setResponse(null)
+            }, 1500)
+          }, 5000)
+        }, 100)
+      }, fp.randomElement([1200, 2100, 1650, 2800]))
+      return
     }
 
     // Prevent showing the same question twice (persisted across tab switches)
