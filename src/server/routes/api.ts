@@ -33,6 +33,7 @@ import { generateUserNarrative } from '#server/utils/rpg-narrative'
 import { generateChatCatalysts, generateConversationStarters, shouldShowChatCatalyst } from '#server/utils/cohort-chat-catalyst'
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
+import { registerOSRoutes } from './os-api'
 
 // ============================================================================
 // Helper Functions
@@ -123,6 +124,9 @@ function generateCompassionateResponse(
 }
 
 export default async (fastify: FastifyInstance) => {
+  // Register User Operating System API routes
+  registerOSRoutes(fastify)
+
   fastify.get('/sync', async (req, reply) => {
     // const id = String(Math.ceil(Math.random() * 99)).padStart(2, '0')
     reply.raw.writeHead(200, {
