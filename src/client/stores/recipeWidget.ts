@@ -56,9 +56,15 @@ export async function checkRecipeWidget() {
   if (!mealTime) return // Not a meal time
 
   const today = new Date().toISOString().split('T')[0]
+  const todayMealKey = `${today}-${mealTime}`
+
+  // Check localStorage for persistence across page refreshes
+  const lastShownFromStorage = localStorage.getItem('lastRecipeShown')
 
   // Only show once per meal time per day (with 30% random chance)
-  if (state.lastShownDate === `${today}-${mealTime}`) return
+  if (state.lastShownDate === todayMealKey || lastShownFromStorage === todayMealKey) {
+    return
+  }
 
   // Random chance to show (30% probability)
   if (Math.random() > 0.3) return
@@ -71,6 +77,9 @@ export async function checkRecipeWidget() {
     )
 
     const recipe = response.data.recipe
+
+    // Persist to localStorage to prevent duplicates across page refreshes
+    localStorage.setItem('lastRecipeShown', `${today}-${mealTime}`)
 
     // Show the recipe widget!
     recipeWidget.set({
