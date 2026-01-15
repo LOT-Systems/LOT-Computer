@@ -56,10 +56,15 @@ export const DEFAULT_SEPARATOR = '•'
 export function getEarnedBadges(): BadgeType[] {
   if (typeof window === 'undefined') return []
 
-  const stored = localStorage.getItem('earned_badges')
-  if (!stored) return []
+  try {
+    const stored = localStorage.getItem('earned_badges')
+    if (!stored) return []
 
-  return stored.split(',').filter(Boolean) as BadgeType[]
+    return stored.split(',').filter(Boolean) as BadgeType[]
+  } catch (e) {
+    console.warn('Failed to get earned badges:', e)
+    return []
+  }
 }
 
 /**
@@ -67,7 +72,11 @@ export function getEarnedBadges(): BadgeType[] {
  */
 export function saveEarnedBadges(badges: BadgeType[]): void {
   if (typeof window === 'undefined') return
-  localStorage.setItem('earned_badges', badges.join(','))
+  try {
+    localStorage.setItem('earned_badges', badges.join(','))
+  } catch (e) {
+    console.warn('Failed to save earned badges:', e)
+  }
 }
 
 /**
@@ -77,20 +86,35 @@ export function hasBadge(badgeId: BadgeType): boolean {
   return getEarnedBadges().includes(badgeId)
 }
 
+// Simple lock to prevent race conditions in multi-tab scenarios
+let awardingBadge = false
+
 /**
  * Award a new badge (returns true if newly earned)
  */
 export function awardBadge(badgeId: BadgeType): boolean {
-  const earned = getEarnedBadges()
-  if (earned.includes(badgeId)) return false
+  // Prevent race conditions
+  if (awardingBadge) {
+    console.warn('Badge award in progress, skipping duplicate request')
+    return false
+  }
 
-  earned.push(badgeId)
-  saveEarnedBadges(earned)
+  try {
+    awardingBadge = true
 
-  // Queue unlock notification for Memory widget
-  queueBadgeUnlock(badgeId)
+    const earned = getEarnedBadges()
+    if (earned.includes(badgeId)) return false
 
-  return true
+    earned.push(badgeId)
+    saveEarnedBadges(earned)
+
+    // Queue unlock notification for Memory widget
+    queueBadgeUnlock(badgeId)
+
+    return true
+  } finally {
+    awardingBadge = false
+  }
 }
 
 /**
@@ -99,12 +123,16 @@ export function awardBadge(badgeId: BadgeType): boolean {
 function queueBadgeUnlock(badgeId: BadgeType): void {
   if (typeof window === 'undefined') return
 
-  const queued = localStorage.getItem('badge_unlock_queue') || ''
-  const queue = queued ? queued.split(',') : []
+  try {
+    const queued = localStorage.getItem('badge_unlock_queue') || ''
+    const queue = queued ? queued.split(',') : []
 
-  if (!queue.includes(badgeId)) {
-    queue.push(badgeId)
-    localStorage.setItem('badge_unlock_queue', queue.join(','))
+    if (!queue.includes(badgeId)) {
+      queue.push(badgeId)
+      localStorage.setItem('badge_unlock_queue', queue.join(','))
+    }
+  } catch (e) {
+    console.warn('Failed to queue badge unlock:', e)
   }
 }
 
@@ -114,15 +142,27 @@ function queueBadgeUnlock(badgeId: BadgeType): void {
 export function getNextBadgeUnlock(): Badge | null {
   if (typeof window === 'undefined') return null
 
-  const queued = localStorage.getItem('badge_unlock_queue') || ''
-  const queue = queued ? queued.split(',').filter(Boolean) : []
+  try {
+    const queued = localStorage.getItem('badge_unlock_queue') || ''
+    const queue = queued ? queued.split(',').filter(Boolean) : []
 
-  if (queue.length === 0) return null
+    if (queue.length === 0) return null
 
-  const badgeId = queue.shift() as BadgeType
-  localStorage.setItem('badge_unlock_queue', queue.join(','))
+    const badgeId = queue.shift() as BadgeType
+    localStorage.setItem('badge_unlock_queue', queue.join(','))
 
-  return BADGES[badgeId]
+    // Validate badge ID exists
+    const badge = BADGES[badgeId]
+    if (!badge) {
+      console.warn('Invalid badge ID in queue:', badgeId)
+      return null
+    }
+
+    return badge
+  } catch (e) {
+    console.warn('Failed to get next badge unlock:', e)
+    return null
+  }
 }
 
 /**
@@ -163,7 +203,20 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     const response = await fetch('/api/user-stats')
     if (!response.ok) return newBadges
 
-    const stats = await response.json()
+    // Parse JSON safely
+    let stats
+    try {
+      stats = await response.json()
+    } catch (parseError) {
+      console.warn('Failed to parse user stats response:', parseError)
+      return newBadges
+    }
+
+    // Validate stats object
+    if (!stats || typeof stats.streak !== 'number') {
+      console.warn('Invalid stats response:', stats)
+      return newBadges
+    }
 
     // Check milestone badges only (Aquatic Evolution: ∘ ≈ ≋)
     if (stats.streak >= 7 && !hasBadge('milestone_7')) {

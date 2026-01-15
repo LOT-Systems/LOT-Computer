@@ -1399,7 +1399,20 @@ export default async (fastify: FastifyInstance) => {
           }
         }
 
-        const decodedDate = atob(req.query.d)
+        let decodedDate
+        try {
+          decodedDate = atob(req.query.d)
+        } catch (e) {
+          console.error('❌ Invalid date encoding:', {
+            encoded: req.query.d,
+            error: (e as Error).message
+          })
+          return reply.status(400).send({
+            error: 'Invalid date encoding',
+            hint: 'Date parameter must be valid base64'
+          })
+        }
+
         const localDate = dayjs(decodedDate, DATE_FORMAT)
 
         console.log(`🔍 Memory request:`, {
@@ -1523,9 +1536,15 @@ export default async (fastify: FastifyInstance) => {
       }
 
       const { shouldShowWeeklySummary, generateWeeklySummary } = await import('#server/utils/weekly-summary')
-      const showWeeklySummary = lastWeeklySummary && shouldShowWeeklySummary(
+
+      // Validate weekly summary object structure
+      const validLastWeeklySummary = lastWeeklySummary &&
+                                     typeof lastWeeklySummary === 'object' &&
+                                     lastWeeklySummary.createdAt instanceof Date
+
+      const showWeeklySummary = validLastWeeklySummary && shouldShowWeeklySummary(
         req.user,
-        lastWeeklySummary?.createdAt || null
+        lastWeeklySummary.createdAt
       )
 
       if (showWeeklySummary) {
@@ -1588,11 +1607,21 @@ export default async (fastify: FastifyInstance) => {
           })
 
           // Extract quantum state from client for context-aware question generation
-          const quantumState = req.query.qe ? {
-            energy: req.query.qe,
-            clarity: req.query.qc,
-            alignment: req.query.qa,
-            needsSupport: req.query.qn
+          // Validate enum values to prevent invalid states
+          const validEnergy = ['depleted', 'low', 'moderate', 'high', 'unknown']
+          const validClarity = ['confused', 'uncertain', 'clear', 'focused', 'unknown']
+          const validAlignment = ['disconnected', 'searching', 'aligned', 'flowing', 'unknown']
+          const validNeedsSupport = ['critical', 'moderate', 'low', 'none']
+
+          const quantumState = req.query.qe &&
+                              validEnergy.includes(req.query.qe as string) &&
+                              validClarity.includes(req.query.qc as string) &&
+                              validAlignment.includes(req.query.qa as string) &&
+                              validNeedsSupport.includes(req.query.qn as string) ? {
+            energy: req.query.qe as 'depleted' | 'low' | 'moderate' | 'high' | 'unknown',
+            clarity: req.query.qc as 'confused' | 'uncertain' | 'clear' | 'focused' | 'unknown',
+            alignment: req.query.qa as 'disconnected' | 'searching' | 'aligned' | 'flowing' | 'unknown',
+            needsSupport: req.query.qn as 'critical' | 'moderate' | 'low' | 'none'
           } : undefined
 
           const prompt = await buildPrompt(req.user, logs, isWeekend, quantumState)
