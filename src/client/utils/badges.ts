@@ -1,22 +1,18 @@
 /**
- * Minimalist ASCII Badge System for LOT
+ * Aquatic Evolution Badge System for LOT
  *
- * Badges are earned through consistent engagement and are displayed
- * as subtle separators throughout the interface instead of "•" or ","
+ * Milestone badges represent growth through water metaphors:
+ * ∘ (droplet) → ≈ (wave) → ≋ (deep current)
  *
- * Philosophy: Badges should feel like natural part of the system,
- * not game-like achievements. They reflect growth patterns.
+ * Displayed in dedicated "Level:" field in Public Profile.
+ *
+ * Philosophy: Growth through natural cycles, like water flowing.
  */
 
 export type BadgeType =
-  | 'milestone_7'     // ★ - 7 day streak
-  | 'milestone_30'    // ★ - 30 day streak
-  | 'milestone_100'   // ★ - 100 day streak
-  | 'balanced'        // ◆ - Balanced planner usage (all 4 dimensions used evenly)
-  | 'flow'            // ~ - Multi-widget session engagement
-  | 'consistent'      // ▪ - Regular timing patterns
-  | 'reflective'      // ◇ - Deep memory engagement (long form answers)
-  | 'explorer'        // ▫ - Tried multiple moods/options
+  | 'milestone_7'     // ∘ - Droplet (beginning)
+  | 'milestone_30'    // ≈ - Wave (flowing)
+  | 'milestone_100'   // ≋ - Deep current (mastery)
 
 export interface Badge {
   id: BadgeType
@@ -29,59 +25,24 @@ export interface Badge {
 export const BADGES: Record<BadgeType, Badge> = {
   milestone_7: {
     id: 'milestone_7',
-    symbol: '★',
-    name: '7 Days',
+    symbol: '∘',
+    name: 'Droplet',
     description: 'Seven days of consistent practice',
-    unlockMessage: 'A week of presence. ★',
+    unlockMessage: 'First drops form. ∘',
   },
   milestone_30: {
     id: 'milestone_30',
-    symbol: '★',
-    name: '30 Days',
+    symbol: '≈',
+    name: 'Wave',
     description: 'A full month of engagement',
-    unlockMessage: 'A month of dedication. ★',
+    unlockMessage: 'Waves begin to flow. ≈',
   },
   milestone_100: {
     id: 'milestone_100',
-    symbol: '★',
-    name: '100 Days',
+    symbol: '≋',
+    name: 'Current',
     description: 'A hundred days of practice',
-    unlockMessage: 'A hundred days of growth. ★',
-  },
-  balanced: {
-    id: 'balanced',
-    symbol: '◆',
-    name: 'Balanced',
-    description: 'All planner dimensions used evenly',
-    unlockMessage: 'You explore with balance. ◆',
-  },
-  flow: {
-    id: 'flow',
-    symbol: '~',
-    name: 'Flow',
-    description: 'Engaged multiple widgets in one session',
-    unlockMessage: 'You move with flow. ~',
-  },
-  consistent: {
-    id: 'consistent',
-    symbol: '▪',
-    name: 'Consistent',
-    description: 'Regular engagement at similar times',
-    unlockMessage: 'Your rhythm is steady. ▪',
-  },
-  reflective: {
-    id: 'reflective',
-    symbol: '◇',
-    name: 'Reflective',
-    description: 'Deep engagement with memory questions',
-    unlockMessage: 'Depth in reflection. ◇',
-  },
-  explorer: {
-    id: 'explorer',
-    symbol: '▫',
-    name: 'Explorer',
-    description: 'Tried diverse options across widgets',
-    unlockMessage: 'Curiosity guides you. ▫',
+    unlockMessage: 'Deep currents established. ≋',
   },
 }
 
@@ -165,46 +126,33 @@ export function getNextBadgeUnlock(): Badge | null {
 }
 
 /**
- * Get separator symbol based on earned badges
- * Uses badges in earned order, cycles through them
+ * Get current level symbol based on streak
+ * Returns the highest milestone badge symbol earned
  */
-export function getBadgeSeparator(index: number = 0): string {
-  const earned = getEarnedBadges()
-
-  if (earned.length === 0) return DEFAULT_SEPARATOR
-
-  // Cycle through earned badges for variety
-  const badge = BADGES[earned[index % earned.length]]
-  return badge.symbol
+export function getLevelSymbol(streak: number): string {
+  if (streak >= 100) return BADGES.milestone_100.symbol // ≋
+  if (streak >= 30) return BADGES.milestone_30.symbol   // ≈
+  if (streak >= 7) return BADGES.milestone_7.symbol     // ∘
+  return '' // No level yet
 }
 
 /**
- * Get all badge symbols as a string (for displaying badge collection)
+ * Capitalize first letter of each word
  */
-export function getBadgeCollection(): string {
-  const earned = getEarnedBadges()
-
-  if (earned.length === 0) return `${DEFAULT_SEPARATOR}  (no badges yet)`
-
-  const symbols = earned.map(id => BADGES[id].symbol)
-  return `${symbols.join(' ')}  (${earned.length})`
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 /**
- * Join array with badge separators instead of commas
+ * Join array with · separator and capitalize each word
  */
-export function joinWithBadges(items: string[]): string {
+export function joinWithDots(items: string[]): string {
   if (items.length === 0) return ''
-  if (items.length === 1) return items[0]
-
-  return items.map((item, idx) => {
-    if (idx === items.length - 1) return item
-    return item + ' ' + getBadgeSeparator(idx) + ' '
-  }).join('')
+  return items.map(capitalize).join(' · ')
 }
 
 /**
- * Calculate which badges should be awarded based on user activity
+ * Calculate which milestone badges should be awarded based on streak
  * This is called periodically or after significant events
  */
 export async function checkAndAwardBadges(): Promise<BadgeType[]> {
@@ -217,7 +165,7 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
 
     const stats = await response.json()
 
-    // Check milestone badges
+    // Check milestone badges only (Aquatic Evolution: ∘ ≈ ≋)
     if (stats.streak >= 7 && !hasBadge('milestone_7')) {
       if (awardBadge('milestone_7')) newBadges.push('milestone_7')
     }
@@ -226,23 +174,6 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (stats.streak >= 100 && !hasBadge('milestone_100')) {
       if (awardBadge('milestone_100')) newBadges.push('milestone_100')
-    }
-
-    // Check pattern badges
-    if (stats.balancedPlanner && !hasBadge('balanced')) {
-      if (awardBadge('balanced')) newBadges.push('balanced')
-    }
-    if (stats.multiWidgetSessions >= 10 && !hasBadge('flow')) {
-      if (awardBadge('flow')) newBadges.push('flow')
-    }
-    if (stats.consistentTiming && !hasBadge('consistent')) {
-      if (awardBadge('consistent')) newBadges.push('consistent')
-    }
-    if (stats.deepReflection && !hasBadge('reflective')) {
-      if (awardBadge('reflective')) newBadges.push('reflective')
-    }
-    if (stats.diverseChoices >= 20 && !hasBadge('explorer')) {
-      if (awardBadge('explorer')) newBadges.push('explorer')
     }
 
   } catch (error) {
