@@ -110,18 +110,34 @@ export function MemoryWidget() {
 
   React.useEffect(() => {
     // Clear stale cache (older than 12 hours) to allow new questions
-    const lastQuestionTime = localStorage.getItem('lastMemoryQuestionTime')
-    if (lastQuestionTime) {
-      const hoursAgo = (Date.now() - parseInt(lastQuestionTime)) / (1000 * 60 * 60)
-      if (hoursAgo > 12) {
-        // Cache is stale - clear it to allow new questions
-        stores.lastAnsweredMemoryQuestionId.set(null)
-        localStorage.removeItem('lastMemoryQuestionTime')
+    try {
+      const lastQuestionTime = localStorage.getItem('lastMemoryQuestionTime')
+      if (lastQuestionTime) {
+        const timestamp = parseInt(lastQuestionTime, 10)
+        if (isNaN(timestamp)) {
+          console.warn('Invalid lastMemoryQuestionTime, clearing:', lastQuestionTime)
+          localStorage.removeItem('lastMemoryQuestionTime')
+          stores.lastAnsweredMemoryQuestionId.set(null)
+        } else {
+          const hoursAgo = (Date.now() - timestamp) / (1000 * 60 * 60)
+          if (hoursAgo > 12) {
+            stores.lastAnsweredMemoryQuestionId.set(null)
+            localStorage.removeItem('lastMemoryQuestionTime')
+          }
+        }
       }
+    } catch (e) {
+      console.warn('Failed to check lastMemoryQuestionTime:', e)
     }
 
     // Check for badge unlock notification first
-    const badgeUnlock = getNextBadgeUnlock()
+    let badgeUnlock = null
+    try {
+      badgeUnlock = getNextBadgeUnlock()
+    } catch (e) {
+      console.warn('Failed to check badge unlocks:', e)
+    }
+
     if (badgeUnlock) {
       // Show badge unlock instead of question
       setTimeout(() => {
@@ -147,7 +163,11 @@ export function MemoryWidget() {
     // Prevent showing the same question twice (persisted across tab switches)
     if (loadedQuestion && loadedQuestion.id !== lastQuestionId) {
       stores.lastAnsweredMemoryQuestionId.set(loadedQuestion.id)
-      localStorage.setItem('lastMemoryQuestionTime', Date.now().toString())
+      try {
+        localStorage.setItem('lastMemoryQuestionTime', Date.now().toString())
+      } catch (e) {
+        console.warn('Failed to save lastMemoryQuestionTime:', e)
+      }
       setTimeout(() => {
         setIsDisplayed(true)
         setTimeout(() => {
@@ -163,14 +183,15 @@ export function MemoryWidget() {
 
   React.useEffect(() => {
     if (response) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setIsResponseShown(true)
       }, 1500)
+      return () => clearTimeout(timer)
     }
   }, [response])
 
   // Get quantum state for reflection prompt - wrapped in try-catch for safety
-  const quantumState = React.useMemo(() => {
+  const getQuantumState = () => {
     try {
       analyzeIntentions()
       return getUserState()
@@ -178,14 +199,17 @@ export function MemoryWidget() {
       console.warn('Failed to get quantum state:', e)
       // Return safe default state
       return {
-        energy: 'moderate',
-        clarity: 'clear',
-        alignment: 'aligned',
-        needsSupport: 'none',
+        energy: 'moderate' as const,
+        clarity: 'clear' as const,
+        alignment: 'aligned' as const,
+        needsSupport: 'none' as const,
         lastUpdated: Date.now()
       }
     }
-  }, [])
+  }
+
+  const quantumState = React.useMemo(getQuantumState, [question?.id])
+
 
   // Show error state if API failed
   const hasError = !!error && !isLoading && !loadedQuestion

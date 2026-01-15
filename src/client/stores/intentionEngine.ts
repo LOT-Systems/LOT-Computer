@@ -45,6 +45,8 @@ type IntentionEngineState = {
 }
 
 const SIGNAL_RETENTION = 7 * 24 * 60 * 60 * 1000 // 7 days
+const MAX_SIGNALS = 1000 // Prevent unbounded growth
+const ANALYSIS_COOLDOWN = 5 * 60 * 1000 // 5 minutes
 
 export const intentionEngine = atom<IntentionEngineState>({
   signals: [],
@@ -82,6 +84,19 @@ if (typeof window !== 'undefined') {
 }
 
 /**
+ * Helper: Safely check if user has current intention
+ */
+function hasCurrentIntention(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return !!localStorage.getItem('current-intention')
+  } catch (e) {
+    console.warn('Failed to check current intention:', e)
+    return false
+  }
+}
+
+/**
  * Record a signal from any widget interaction
  */
 export function recordSignal(
@@ -100,20 +115,35 @@ export function recordSignal(
 
   const updatedSignals = [...state.signals, newSignal]
 
-  // Keep only last 7 days
+  // Keep only last 7 days AND enforce max limit
   const cutoff = Date.now() - SIGNAL_RETENTION
-  const recentSignals = updatedSignals.filter(s => s.timestamp > cutoff)
+  let recentSignals = updatedSignals.filter(s => s.timestamp > cutoff)
+
+  // Enforce MAX_SIGNALS limit (keep most recent)
+  if (recentSignals.length > MAX_SIGNALS) {
+    recentSignals = recentSignals
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, MAX_SIGNALS)
+  }
 
   intentionEngine.set({
     ...state,
     signals: recentSignals
   })
 
-  // Persist to localStorage
-  localStorage.setItem('intention-signals', JSON.stringify(recentSignals))
+  // Persist to localStorage (protected)
+  try {
+    localStorage.setItem('intention-signals', JSON.stringify(recentSignals))
+  } catch (e) {
+    console.warn('Failed to persist intention signals:', e)
+  }
 
-  // Trigger analysis if enough new signals
-  if (recentSignals.length % 5 === 0) {
+  // Trigger analysis if enough new signals AND cooldown has passed
+  const now = Date.now()
+  const shouldAnalyze = recentSignals.length % 5 === 0 &&
+                        (now - state.lastAnalysis >= ANALYSIS_COOLDOWN)
+
+  if (shouldAnalyze) {
     analyzeIntentions()
   }
 }
@@ -169,9 +199,9 @@ export function analyzeIntentions(): IntentionPattern[] {
   const intentionSignals = signals.filter(s =>
     s.source === 'intentions' && s.timestamp > weekAgo
   )
-  const hasCurrentIntention = !!localStorage.getItem('current-intention')
+  const hasIntention = hasCurrentIntention()
 
-  if (!hasCurrentIntention && intentionSignals.length === 0) {
+  if (!hasIntention && intentionSignals.length === 0) {
     patterns.push({
       pattern: 'seeking-direction',
       confidence: 0.8,
@@ -236,7 +266,7 @@ export function analyzeIntentions(): IntentionPattern[] {
     (now - s.timestamp) < 2 * 60 * 60 * 1000 // Last 2 hours
   ).length > 0
 
-  if (isMorning && calmRecently && !hasCurrentIntention) {
+  if (isMorning && calmRecently && !hasIntention) {
     patterns.push({
       pattern: 'morning-clarity',
       confidence: 0.75,
@@ -287,7 +317,7 @@ function calculateUserState(signals: IntentionSignal[], now: number): UserState 
   // Analyze clarity from planning and intention signals
   const planningSignals = recentSignals.filter(s => s.source === 'planner')
   const intentionSignals = recentSignals.filter(s => s.source === 'intentions')
-  const hasIntention = !!localStorage.getItem('current-intention')
+  const hasIntention = hasCurrentIntention()
 
   const clarity =
     planningSignals.length >= 2 && hasIntention ? 'focused' :
