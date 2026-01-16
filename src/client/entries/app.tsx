@@ -43,8 +43,10 @@ const App = () => {
   const { data: weather, refetch: refetchWeather } = useWeather()
 
   const isLoaded = React.useMemo(() => {
-    return !!user && weather !== undefined
-  }, [user, weather])
+    // Only require user data to load - weather is optional
+    // Weather is only used in System and SelfCareMoments components
+    return !!user
+  }, [user])
 
   React.useEffect(() => {
     // Initialize router to listen to URL changes
