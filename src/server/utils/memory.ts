@@ -200,6 +200,8 @@ export async function buildPrompt(
     needsSupport?: string
   }
 ): Promise<string> {
+  console.log(`📝 buildPrompt called with ${logs.length} total logs for user ${user.id}`)
+
   const context = await getLogContext(user)
   const localDate = context.timeZone
     ? dayjs().tz(context.timeZone).format('D MMM YYYY, HH:mm')
@@ -314,11 +316,15 @@ The system exists to help users achieve their goals. Your questions are tools fo
   // Extract Memory answers to build user's story
   const memoryLogs = logs.filter((log) => log.event === 'answer')
 
+  console.log(`💬 Extracted ${memoryLogs.length} memory answers from ${logs.length} total logs`)
+
   // Extract recently asked questions to avoid duplicates (extended from 15 to 30)
   const recentQuestions = memoryLogs
     .slice(0, 30)
     .map(log => log.metadata.question || '')
     .filter(Boolean)
+
+  console.log(`🔍 Found ${recentQuestions.length} recent questions for duplicate detection`)
 
   // Track topic diversity - extract key topics from recent questions
   const recentTopics = extractQuestionTopics(recentQuestions.slice(0, 10))
@@ -433,6 +439,8 @@ CRITICAL: Use this SOUL-LEVEL understanding to craft questions that speak to the
   // Decide whether to explore a new topic or follow up on existing ones
   // 15% chance to explore completely new area, 85% follow up for better narrative continuity
   const shouldExploreNewTopic = memoryLogs.length > 0 && Math.random() < 0.15
+
+  console.log(`🎯 Question strategy: ${isWeekend ? 'WEEKEND MODE' : shouldExploreNewTopic ? 'EXPLORE NEW TOPIC' : memoryLogs.length === 0 ? 'FIRST QUESTION' : 'FOLLOW UP'}`)
 
   let userStory = ''
   let taskInstructions = ''
@@ -591,6 +599,8 @@ ${memoryLogs
 
 Based on these answers and journal entries, you can infer the user's preferences, habits, lifestyle, and inner emotional state. Use this knowledge to craft follow-up questions that show you remember their choices AND understand what matters to them.`
 
+    console.log(`📖 User story built with ${memoryLogs.slice(0, 15).length} recent answers and ${journalLogs.length} journal entries`)
+
     // COMPRESSED FORMAT for repetitive follow-ups (3+ questions on same topic)
     if (isRepetitiveFollowUp) {
       taskInstructions = `
@@ -684,7 +694,18 @@ ${
 Recent activity logs (for additional context):
   `.trim()
   const formattedLogs = logs.map(formatLog).filter(Boolean).join('\n\n')
-  return head + quantumContext + goalContext + '\n\n' + formattedLogs
+
+  const fullPrompt = head + quantumContext + goalContext + '\n\n' + formattedLogs
+
+  console.log(`📨 Prompt built: ${fullPrompt.length} chars total`)
+  console.log(`   - Head section: ${head.length} chars`)
+  console.log(`   - Quantum context: ${quantumContext.length} chars`)
+  console.log(`   - Goal context: ${goalContext.length} chars`)
+  console.log(`   - Formatted logs: ${formattedLogs.length} chars (${logs.map(formatLog).filter(Boolean).length} logs)`)
+  console.log(`   - User story included: ${userStory.length > 0 ? 'YES' : 'NO'}`)
+  console.log(`   - Recent questions list: ${recentQuestions.length} questions`)
+
+  return fullPrompt
 }
 
 function formatLog(log: Log): string {
