@@ -144,7 +144,7 @@ export const PlannerWidget: React.FC = () => {
             </div>
 
             {/* Daily Planning - Spreadsheet format */}
-            <div className="mb-16 space-y-4">
+            <div className="mb-16 space-y-6">
               {/* Intent */}
               <div
                 className={cn(
