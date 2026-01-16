@@ -1627,9 +1627,70 @@ export default async (fastify: FastifyInstance) => {
           const prompt = await buildPrompt(req.user, logs, isWeekend, quantumState)
           const question = await completeAndExtractQuestion(prompt, req.user)
 
+          // Check for exact duplicate questions in last 7 days
+          const sevenDaysAgo = dayjs().subtract(7, 'days').toDate()
+          const recentAnswers = await fastify.models.Answer.findAll({
+            where: {
+              userId: req.user.id,
+              createdAt: {
+                [Op.gte]: sevenDaysAgo
+              }
+            },
+            order: [['createdAt', 'DESC']],
+            attributes: ['metadata'],
+            limit: 30
+          })
+
+          const recentQuestions = recentAnswers
+            .map(a => a.metadata?.question || '')
+            .filter(Boolean)
+
+          // Check if generated question is duplicate (exact match or very similar)
+          const isDuplicate = recentQuestions.some(recentQ => {
+            const normalizedRecent = recentQ.toLowerCase().trim().replace(/[?.!,]/g, '')
+            const normalizedNew = question.question.toLowerCase().trim().replace(/[?.!,]/g, '')
+            return normalizedRecent === normalizedNew
+          })
+
+          if (isDuplicate) {
+            console.warn(`⚠️ Duplicate question detected: "${question.question.substring(0, 60)}..."`)
+            console.log(`🔄 Attempting to regenerate unique question...`)
+
+            // Try regenerating once with stronger duplicate instruction
+            try {
+              const enhancedPrompt = `${prompt}
+
+**CRITICAL DUPLICATE PREVENTION:**
+The AI just generated this question which is a DUPLICATE: "${question.question}"
+This question was already asked recently. You MUST generate a COMPLETELY DIFFERENT question on a DIFFERENT topic.
+DO NOT ask about the same topic even with different wording.`
+
+              const retryQuestion = await completeAndExtractQuestion(enhancedPrompt, req.user)
+
+              // Check again
+              const isStillDuplicate = recentQuestions.some(recentQ => {
+                const normalizedRecent = recentQ.toLowerCase().trim().replace(/[?.!,]/g, '')
+                const normalizedRetry = retryQuestion.question.toLowerCase().trim().replace(/[?.!,]/g, '')
+                return normalizedRecent === normalizedRetry
+              })
+
+              if (!isStillDuplicate) {
+                console.log(`✅ Successfully regenerated unique question: "${retryQuestion.question.substring(0, 60)}..."`)
+                console.log(`↩️  Returning regenerated AI question from Memory endpoint`)
+                return retryQuestion
+              } else {
+                console.warn(`⚠️ Retry also produced duplicate, using original`)
+              }
+            } catch (retryError) {
+              console.warn(`⚠️ Retry generation failed:`, retryError)
+            }
+          }
+
           console.log(`✅ AI-generated question for user ${req.user.id}:`, {
             questionId: question.id,
-            questionPreview: question.question.substring(0, 60) + '...'
+            questionPreview: question.question.substring(0, 60) + '...',
+            wasDuplicate: isDuplicate,
+            recentQuestionsChecked: recentQuestions.length
           })
 
           console.log(`↩️  Returning AI-generated question from Memory endpoint`)
