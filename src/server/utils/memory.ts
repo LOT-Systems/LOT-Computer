@@ -526,10 +526,12 @@ Based on these answers and journal entries, we're building their story. Now let'
 
     taskInstructions = `
 **Your task:** Generate ONE question that EXPLORES A NEW TOPIC AREA we haven't covered yet:
-1. **Choose an unexplored area** - Look at their existing answers and identify what aspects of their life we DON'T know about yet
-2. **Start fresh** - Don't reference their previous answers; ask about something completely new
+1. **Choose an unexplored area** - READ their Memory Story above and identify what aspects of their life we DON'T know about yet
+2. **Start fresh on a NEW topic** - Don't follow up on recent answers, but ask about a completely different dimension of their life
 3. **Build story breadth** - Each question should explore a different dimension of their lifestyle
 4. **Is contextually relevant** - Consider current time and weather
+
+**REQUIREMENT:** Your question should be informed by their profile (use their archetype and cohort info) but explore a NEW area we haven't asked about. Review the list of previous questions above and choose a completely different topic.
 
 **Examples of exploring new topics:**
 - If we know their morning beverage → Ask about their meal preferences
@@ -625,9 +627,11 @@ ${uniquenessInstruction}`
       // DETAILED FORMAT for initial follow-ups (exploring depth)
       taskInstructions = `
 **Your task:** Generate ONE personalized follow-up question with 3-4 answer choices that:
-1. **MUST reference their previous answers** - Always start by acknowledging something they've already shared (e.g., "Since you mentioned you prefer tea in the morning, how do you usually prepare it?")
+1. **MUST EXPLICITLY reference their previous answers** - CRITICAL: Your question MUST start with a reference phrase like "You mentioned...", "Since you said...", "Last time you chose...", "Building on your answer about..." followed by SPECIFIC details from their actual answers shown above
 2. **Builds PROGRESSIVELY deeper into their psychological and soul profile** - Each follow-up should probe ONE level deeper than the previous question, moving from surface behaviors → underlying motivations → core values → soul-level identity
 3. **Is contextually relevant** - Consider current time, weather, and their recent activity patterns
+
+**STRICT REQUIREMENT:** Your question cannot be generic. It must demonstrate you've read their Memory Story above by referencing specific details from their actual answers. Generic questions that could apply to anyone are FORBIDDEN.
 
 **CRITICAL: Progressive Depth Requirement:**
 Follow-ups must build on BOTH behavioral patterns AND psychological/soul dimensions:
@@ -637,11 +641,17 @@ Follow-ups must build on BOTH behavioral patterns AND psychological/soul dimensi
 - **Fourth+ follow-up**: Soul-level identity (who they are becoming, their deeper nature)
 
 **CRITICAL: User-Feedback Loop Requirements:**
-- If they have previous answers, you MUST explicitly reference at least one in your new question
+- READ the "User's Memory Story" section above CAREFULLY before generating your question
+- You MUST explicitly reference AT LEAST ONE specific detail from their previous answers (not generic, use their actual answer text)
 - Show you remember what they told you - use phrases like "You mentioned...", "Since you prefer...", "Last time you chose...", "Building on your answer about..."
 - If they have journal entries, acknowledge their deeper thoughts and feelings - their journal reveals what truly matters to them
 - The question should feel like you're having an ongoing conversation, not starting fresh each time
 - Make connections between their different answers AND journal reflections to show you understand their overall lifestyle and inner world
+
+**EXAMPLE of GOOD reference:**
+User's Memory Story shows: "What do you prefer for breakfast? → User chose: 'Greek yogurt with honey'"
+GOOD question: "Since you enjoy Greek yogurt with honey for breakfast, what do you usually pair it with?"
+BAD question: "What matters most to you?" (completely ignores their history)
 
 **Examples of progressive follow-up questions:**
 LEVEL 1 (Behavior details): "Since you mentioned enjoying tea in the morning, how do you usually prepare it?" (Options: Quick tea bag, Loose leaf ritual, Matcha ceremony)
