@@ -130,6 +130,26 @@ export function MemoryWidget() {
       console.warn('Failed to check lastMemoryQuestionTime:', e)
     }
 
+    // Track recently shown questions (even unanswered) to prevent duplicates
+    // Keep last 5 questions for 7 days
+    try {
+      const recentQuestionsData = localStorage.getItem('recentMemoryQuestions')
+      if (recentQuestionsData) {
+        const recentQuestions = JSON.parse(recentQuestionsData) as Array<{
+          question: string
+          timestamp: number
+        }>
+        // Remove questions older than 7 days
+        const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000)
+        const validQuestions = recentQuestions.filter(q => q.timestamp > sevenDaysAgo)
+        if (validQuestions.length !== recentQuestions.length) {
+          localStorage.setItem('recentMemoryQuestions', JSON.stringify(validQuestions))
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to clean recent questions:', e)
+    }
+
     // Check for badge unlock notification first
     let badgeUnlock = null
     try {
@@ -162,9 +182,51 @@ export function MemoryWidget() {
 
     // Prevent showing the same question twice (persisted across tab switches)
     if (loadedQuestion && loadedQuestion.id !== lastQuestionId) {
+      // Check if this question was shown recently (even if unanswered)
+      let isRecentlyShown = false
+      try {
+        const recentQuestionsData = localStorage.getItem('recentMemoryQuestions')
+        if (recentQuestionsData && loadedQuestion.question) {
+          const recentQuestions = JSON.parse(recentQuestionsData) as Array<{
+            question: string
+            timestamp: number
+          }>
+          // Normalize for comparison (remove punctuation, lowercase)
+          const normalizedNew = loadedQuestion.question.toLowerCase().trim().replace(/[?.!,]/g, '')
+          isRecentlyShown = recentQuestions.some(q => {
+            const normalizedRecent = q.question.toLowerCase().trim().replace(/[?.!,]/g, '')
+            return normalizedRecent === normalizedNew
+          })
+
+          if (isRecentlyShown) {
+            console.warn('⚠️ Question was recently shown (unanswered):', loadedQuestion.question.substring(0, 60) + '...')
+            console.log('⏭️ Skipping duplicate question - will get new one on next refetch')
+            return
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to check recent questions:', e)
+      }
+
       stores.lastAnsweredMemoryQuestionId.set(loadedQuestion.id)
       try {
         localStorage.setItem('lastMemoryQuestionTime', Date.now().toString())
+
+        // Add to recently shown questions list (keep last 5)
+        const recentQuestionsData = localStorage.getItem('recentMemoryQuestions')
+        const recentQuestions = recentQuestionsData
+          ? JSON.parse(recentQuestionsData) as Array<{ question: string; timestamp: number }>
+          : []
+
+        recentQuestions.unshift({
+          question: loadedQuestion.question,
+          timestamp: Date.now()
+        })
+
+        // Keep only last 5
+        const trimmed = recentQuestions.slice(0, 5)
+        localStorage.setItem('recentMemoryQuestions', JSON.stringify(trimmed))
+        console.log(`✅ Tracked shown question (total tracked: ${trimmed.length})`)
       } catch (e) {
         console.warn('Failed to save lastMemoryQuestionTime:', e)
       }

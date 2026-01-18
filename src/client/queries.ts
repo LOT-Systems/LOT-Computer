@@ -167,11 +167,21 @@ export const useMemory = () => {
 
       console.log('🔍 Fetching Memory question:', { date: dayjs().format('YYYY-MM-DD'), quantumParams })
       const response = await api.get<any>(path, { params: { d: date, ...quantumParams } })
-      console.log('✅ Memory API response:', response.data)
+
+      // Server returns null during cooldown (already answered this period)
+      if (response.data === null) {
+        console.log('⏸️ Memory cooldown: already answered question in current period (morning 7am-7pm or evening 7pm-7am)')
+      } else if (response.data?.question) {
+        console.log('✅ Memory question received:', {
+          questionId: response.data.id,
+          questionPreview: response.data.question.substring(0, 60) + '...'
+        })
+      }
+
       return response.data
     },
     {
-      staleTime: Infinity, // Never refetch - question is valid for the whole day
+      staleTime: 1000 * 60 * 60 * 4, // Cache for 4 hours - allows refetching for evening period (7am/7pm periods)
       cacheTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
       onError: (error) => {
         console.error('❌ Memory query failed:', error)
