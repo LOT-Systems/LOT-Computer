@@ -109,7 +109,7 @@ export function MemoryWidget() {
   }, [])
 
   React.useEffect(() => {
-    // Clear stale cache (older than 12 hours) to allow new questions
+    // Clear cache from previous day to allow new questions each day
     try {
       const lastQuestionTime = localStorage.getItem('lastMemoryQuestionTime')
       if (lastQuestionTime) {
@@ -119,8 +119,11 @@ export function MemoryWidget() {
           localStorage.removeItem('lastMemoryQuestionTime')
           stores.lastAnsweredMemoryQuestionId.set(null)
         } else {
-          const hoursAgo = (Date.now() - timestamp) / (1000 * 60 * 60)
-          if (hoursAgo > 12) {
+          // Clear if from a different day (not just 12 hours ago)
+          const lastQuestionDate = dayjs(timestamp).format('YYYY-MM-DD')
+          const today = dayjs().format('YYYY-MM-DD')
+          if (lastQuestionDate !== today) {
+            console.log(`🗑️ Clearing cache from ${lastQuestionDate} (today is ${today})`)
             stores.lastAnsweredMemoryQuestionId.set(null)
             localStorage.removeItem('lastMemoryQuestionTime')
           }
@@ -182,44 +185,6 @@ export function MemoryWidget() {
 
     // Prevent showing the same question twice (persisted across tab switches)
     if (loadedQuestion && loadedQuestion.id !== lastQuestionId) {
-      // Check if this question was shown recently (even if unanswered)
-      let isRecentlyShown = false
-      try {
-        const recentQuestionsData = localStorage.getItem('recentMemoryQuestions')
-        if (recentQuestionsData && loadedQuestion.question) {
-          const recentQuestions = JSON.parse(recentQuestionsData) as Array<{
-            question: string
-            timestamp: number
-          }>
-          // Normalize for comparison (remove punctuation, lowercase)
-          const normalizedNew = loadedQuestion.question.toLowerCase().trim().replace(/[?.!,]/g, '')
-          isRecentlyShown = recentQuestions.some(q => {
-            const normalizedRecent = q.question.toLowerCase().trim().replace(/[?.!,]/g, '')
-            return normalizedRecent === normalizedNew
-          })
-
-          if (isRecentlyShown) {
-            console.warn('⚠️ Question was recently shown (unanswered):', loadedQuestion.question.substring(0, 60) + '...')
-            console.log('🔄 Invalidating cache and refetching to get new question...')
-
-            // Invalidate the cache for this date to force refetch
-            const date = btoa(dayjs().format('YYYY-MM-DD'))
-            const path = '/api/memory'
-
-            // Clear the cache and refetch
-            queryClient.invalidateQueries([path, date])
-
-            // Clear the lastQuestionId so we can show the new question
-            stores.lastAnsweredMemoryQuestionId.set(null)
-
-            // Don't show this duplicate question
-            return
-          }
-        }
-      } catch (e) {
-        console.warn('Failed to check recent questions:', e)
-      }
-
       stores.lastAnsweredMemoryQuestionId.set(loadedQuestion.id)
       try {
         localStorage.setItem('lastMemoryQuestionTime', Date.now().toString())
