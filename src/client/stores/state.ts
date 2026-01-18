@@ -41,6 +41,14 @@ export const isTempFahrenheit = persistentAtom<boolean>(
     decode: (value) => value === 'true',
   }
 )
+export const isTimeChimeEnabled = persistentAtom<boolean>(
+  'isTimeChimeEnabled',
+  false,
+  {
+    encode: (value) => value.toString(),
+    decode: (value) => value === 'true',
+  }
+)
 
 // Track last answered Memory question to prevent re-showing after tab switches
 export const lastAnsweredMemoryQuestionId = persistentAtom<string | null>(

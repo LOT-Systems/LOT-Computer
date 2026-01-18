@@ -24,6 +24,7 @@ export class User
   declare phone: UserModel['phone']
   declare timeZone: UserModel['timeZone']
   declare hideActivityLogs: UserModel['hideActivityLogs']
+  declare timeChime: UserModel['timeChime']
   declare tags: UserModel['tags']
   declare lastSeenAt: UserModel['lastSeenAt']
   declare joinedAt: UserModel['joinedAt']
@@ -142,6 +143,10 @@ User.init(
     phone: DataTypes.STRING,
     timeZone: DataTypes.STRING,
     hideActivityLogs: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    timeChime: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
