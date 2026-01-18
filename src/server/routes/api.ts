@@ -1478,30 +1478,6 @@ export default async (fastify: FastifyInstance) => {
           return null
         }
 
-        // Check if already answered in current period (morning or evening)
-        // This ensures max 2 questions per day: one in morning period, one in evening period
-        let isRecentlyAsked = false
-        try {
-          isRecentlyAsked = await fastify.models.Answer.count({
-            where: {
-              userId: req.user.id,
-              createdAt: {
-                [Op.gte]: utcPeriodEdges[0].toDate(),
-                [Op.lte]: utcPeriodEdges[1].toDate(),
-              },
-            },
-          }).then(Boolean)
-        } catch (cooldownError: any) {
-          console.warn('⚠️ Cooldown check failed, assuming not recently asked:', cooldownError.message)
-          // On error, assume not recently asked (fail-open to show questions)
-        }
-
-        if (isRecentlyAsked) {
-          console.log(`⏸️ Skipping prompt: already answered in this period (morning/evening)`)
-          console.log(`↩️  Returning null from Memory endpoint (cooldown)`)
-          return null
-        }
-
         // Check if user has Usership tag for AI-generated questions
         const hasUsershipTag = req.user.tags.some(
           (tag) => tag.toLowerCase() === 'usership'
