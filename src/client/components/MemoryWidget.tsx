@@ -200,7 +200,19 @@ export function MemoryWidget() {
 
           if (isRecentlyShown) {
             console.warn('⚠️ Question was recently shown (unanswered):', loadedQuestion.question.substring(0, 60) + '...')
-            console.log('⏭️ Skipping duplicate question - will get new one on next refetch')
+            console.log('🔄 Invalidating cache and refetching to get new question...')
+
+            // Invalidate the cache for this date to force refetch
+            const date = btoa(dayjs().format('YYYY-MM-DD'))
+            const path = '/api/memory'
+
+            // Clear the cache and refetch
+            queryClient.invalidateQueries([path, date])
+
+            // Clear the lastQuestionId so we can show the new question
+            stores.lastAnsweredMemoryQuestionId.set(null)
+
+            // Don't show this duplicate question
             return
           }
         }
