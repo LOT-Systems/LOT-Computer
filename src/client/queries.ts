@@ -146,22 +146,23 @@ export const useMemory = () => {
   return useQuery<any>(
     [path, date], // Include date in query key for proper caching
     async () => {
-      // Get quantum state to send to server for context-aware question generation
+      // Get quantum state for context (optional - graceful degradation)
       let quantumParams = {}
       if (typeof window !== 'undefined') {
         try {
-          const { getUserState, analyzeIntentions } = await import('#client/stores/intentionEngine')
-          analyzeIntentions()
+          const { getUserState } = await import('#client/stores/intentionEngine')
           const state = getUserState()
-          quantumParams = {
-            qe: state.energy,
-            qc: state.clarity,
-            qa: state.alignment,
-            qn: state.needsSupport
+          // Only send if state is available
+          if (state && state.energy !== 'unknown') {
+            quantumParams = {
+              qe: state.energy,
+              qc: state.clarity,
+              qa: state.alignment,
+              qn: state.needsSupport
+            }
           }
         } catch (e) {
           // Quantum state optional - graceful degradation
-          console.warn('Quantum state unavailable:', e)
         }
       }
 
@@ -187,18 +188,17 @@ export const useMemory = () => {
 
       console.log('🔍 Fetching Memory question:', {
         date: dayjs().format('YYYY-MM-DD'),
-        quantumParams,
+        hasQuantumState: Object.keys(quantumParams).length > 0,
         recentQuestionsToAvoid: recentlyShownQuestions.length
       })
 
       const response = await api.get<any>(path, {
         params: {
           d: date,
-          ...quantumParams,
-          // Send recently shown questions as JSON string
-          recentShown: recentlyShownQuestions.length > 0
-            ? JSON.stringify(recentlyShownQuestions)
-            : undefined
+          // Only include quantum params if available
+          ...(Object.keys(quantumParams).length > 0 ? quantumParams : {}),
+          // Send recently shown questions as JSON string (for duplicate prevention)
+          ...(recentlyShownQuestions.length > 0 ? { recentShown: JSON.stringify(recentlyShownQuestions) } : {})
         }
       })
 
@@ -215,7 +215,7 @@ export const useMemory = () => {
       return response.data
     },
     {
-      staleTime: 1000 * 60 * 60 * 4, // Cache for 4 hours - allows refetching for evening period (7am/7pm periods)
+      staleTime: Infinity, // Cache forever for the day - prevents duplicate questions
       cacheTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
       onError: (error) => {
         console.error('❌ Memory query failed:', error)
