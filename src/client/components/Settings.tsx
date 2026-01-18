@@ -23,6 +23,7 @@ export const Settings = () => {
   const baseColor = useStore(stores.baseColor)
   const accentColor = useStore(stores.accentColor)
   const isCustomThemeEnabled = useStore(stores.isCustomThemeEnabled)
+  const isTimeChimeEnabled = useStore(stores.isTimeChimeEnabled)
   const { data: storyData } = useMyMemoryStory()
 
   const { mutate: updateSettings } = useUpdateSettings({
@@ -52,6 +53,7 @@ export const Settings = () => {
     address: me?.address || '',
     country: me?.country || '',
     hideActivityLogs: me?.hideActivityLogs || false,
+    timeChime: me?.timeChime || false,
   })
 
   // Privacy settings state
@@ -132,6 +134,15 @@ export const Settings = () => {
     }))
     setChanged(true)
   }, [])
+
+  const onToggleTimeChime = React.useCallback(() => {
+    setState((state) => ({
+      ...state,
+      timeChime: !state.timeChime,
+    }))
+    stores.isTimeChimeEnabled.set(!isTimeChimeEnabled)
+    setChanged(true)
+  }, [isTimeChimeEnabled])
 
   // Privacy settings handlers
   const onTogglePrivacy = React.useCallback((field: keyof Omit<UserPrivacySettings, 'customUrl'>) => {
@@ -376,6 +387,9 @@ export const Settings = () => {
         <div>
           <Block label="Activity log:" onChildrenClick={onToggleActivityLogs}>
             {state.hideActivityLogs ? 'Off' : 'On'}
+          </Block>
+          <Block label="Hourly chime:" onChildrenClick={onToggleTimeChime}>
+            {state.timeChime ? 'On' : 'Off'}
           </Block>
         </div>
 
