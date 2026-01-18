@@ -1645,12 +1645,26 @@ export default async (fastify: FastifyInstance) => {
             .map(a => a.metadata?.question || '')
             .filter(Boolean)
 
+          // Add recently shown questions from client (even if unanswered)
+          let recentlyShownQuestions: string[] = []
+          if (req.query.recentShown && typeof req.query.recentShown === 'string') {
+            try {
+              recentlyShownQuestions = JSON.parse(req.query.recentShown) as string[]
+              console.log(`📋 Client sent ${recentlyShownQuestions.length} recently shown questions to avoid`)
+            } catch (e) {
+              console.warn('Failed to parse recentShown parameter:', e)
+            }
+          }
+
+          // Combine answered and shown questions for duplicate detection
+          const allRecentQuestions = [
+            ...recentQuestions.map(q => q.toLowerCase().trim().replace(/[?.!,]/g, '')),
+            ...recentlyShownQuestions
+          ]
+
           // Check if generated question is duplicate (exact match or very similar)
-          const isDuplicate = recentQuestions.some(recentQ => {
-            const normalizedRecent = recentQ.toLowerCase().trim().replace(/[?.!,]/g, '')
-            const normalizedNew = question.question.toLowerCase().trim().replace(/[?.!,]/g, '')
-            return normalizedRecent === normalizedNew
-          })
+          const normalizedNew = question.question.toLowerCase().trim().replace(/[?.!,]/g, '')
+          const isDuplicate = allRecentQuestions.some(recentQ => recentQ === normalizedNew)
 
           if (isDuplicate) {
             console.warn(`⚠️ Duplicate question detected: "${question.question.substring(0, 60)}..."`)
@@ -1667,12 +1681,9 @@ DO NOT ask about the same topic even with different wording.`
 
               const retryQuestion = await completeAndExtractQuestion(enhancedPrompt, req.user)
 
-              // Check again
-              const isStillDuplicate = recentQuestions.some(recentQ => {
-                const normalizedRecent = recentQ.toLowerCase().trim().replace(/[?.!,]/g, '')
-                const normalizedRetry = retryQuestion.question.toLowerCase().trim().replace(/[?.!,]/g, '')
-                return normalizedRecent === normalizedRetry
-              })
+              // Check again against all recent questions (answered + shown)
+              const normalizedRetry = retryQuestion.question.toLowerCase().trim().replace(/[?.!,]/g, '')
+              const isStillDuplicate = allRecentQuestions.some(recentQ => recentQ === normalizedRetry)
 
               if (!isStillDuplicate) {
                 console.log(`✅ Successfully regenerated unique question: "${retryQuestion.question.substring(0, 60)}..."`)
@@ -1690,7 +1701,9 @@ DO NOT ask about the same topic even with different wording.`
             questionId: question.id,
             questionPreview: question.question.substring(0, 60) + '...',
             wasDuplicate: isDuplicate,
-            recentQuestionsChecked: recentQuestions.length
+            recentQuestionsChecked: allRecentQuestions.length,
+            answeredQuestionsChecked: recentQuestions.length,
+            shownQuestionsChecked: recentlyShownQuestions.length
           })
 
           console.log(`↩️  Returning AI-generated question from Memory endpoint`)

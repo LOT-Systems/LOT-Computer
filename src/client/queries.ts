@@ -165,8 +165,42 @@ export const useMemory = () => {
         }
       }
 
-      console.log('🔍 Fetching Memory question:', { date: dayjs().format('YYYY-MM-DD'), quantumParams })
-      const response = await api.get<any>(path, { params: { d: date, ...quantumParams } })
+      // Get recently shown questions to avoid duplicates
+      let recentlyShownQuestions: string[] = []
+      if (typeof window !== 'undefined') {
+        try {
+          const recentQuestionsData = localStorage.getItem('recentMemoryQuestions')
+          if (recentQuestionsData) {
+            const recentQuestions = JSON.parse(recentQuestionsData) as Array<{
+              question: string
+              timestamp: number
+            }>
+            // Send normalized questions to server for duplicate detection
+            recentlyShownQuestions = recentQuestions
+              .map(q => q.question.toLowerCase().trim().replace(/[?.!,]/g, ''))
+              .slice(0, 5) // Only send last 5
+          }
+        } catch (e) {
+          console.warn('Failed to get recent questions:', e)
+        }
+      }
+
+      console.log('🔍 Fetching Memory question:', {
+        date: dayjs().format('YYYY-MM-DD'),
+        quantumParams,
+        recentQuestionsToAvoid: recentlyShownQuestions.length
+      })
+
+      const response = await api.get<any>(path, {
+        params: {
+          d: date,
+          ...quantumParams,
+          // Send recently shown questions as JSON string
+          recentShown: recentlyShownQuestions.length > 0
+            ? JSON.stringify(recentlyShownQuestions)
+            : undefined
+        }
+      })
 
       // Server returns null during cooldown (already answered this period)
       if (response.data === null) {
