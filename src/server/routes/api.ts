@@ -570,12 +570,22 @@ export default async (fastify: FastifyInstance) => {
     })
     const userById = users.reduce(fp.by('id'), {})
 
+    // Filter out messages from suspended users
+    const filteredMessages = messages.filter((msg) => {
+      const author = userById[msg.authorUserId]
+      if (!author) return false
+
+      // Check if user is suspended
+      const isSuspended = author.tags?.some((tag: string) => tag.toLowerCase() === 'suspended')
+      return !isSuspended
+    })
+
     const likes = await fastify.models.ChatMessageLike.findAll({
-      where: { messageId: messages.map(fp.prop('id')) },
+      where: { messageId: filteredMessages.map(fp.prop('id')) },
     })
     const likesByMessageId = likes.reduce(fp.groupBy('messageId'), {})
 
-    const result: PublicChatMessage[] = messages.map((x) => {
+    const result: PublicChatMessage[] = filteredMessages.map((x) => {
       const likes = likesByMessageId[x.id] || []
       return {
         id: x.id,
@@ -595,6 +605,13 @@ export default async (fastify: FastifyInstance) => {
   fastify.post(
     '/chat-messages',
     async (req: FastifyRequest<{ Body: { message: string } }>, reply) => {
+      // Prevent suspended users from posting messages
+      const isSuspended = req.user.tags?.some((tag: string) => tag.toLowerCase() === 'suspended')
+      if (isSuspended) {
+        console.log(`🚫 Suspended user ${req.user.id} attempted to post message`)
+        return reply.status(403).send({ error: 'Account suspended' })
+      }
+
       const message = req.body.message.slice(0, MAX_SYNC_CHAT_MESSAGE_LENGTH)
       const chatMessage = await fastify.models.ChatMessage.create({
         authorUserId: req.user.id,
