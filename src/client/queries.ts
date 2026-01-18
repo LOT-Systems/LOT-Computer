@@ -571,3 +571,87 @@ export const useEmotionalCheckIns = (days: number = 30) =>
   }>(`/api/emotional-checkins?days=${days}`, {
     refetchOnWindowFocus: false,
   })()
+
+// ============================================================================
+// Stats API - Real-time metrics and community insights
+// ============================================================================
+
+export const useCollectiveStats = () =>
+  createQuery<{
+    energyLevel: number
+    clarityIndex: number
+    alignmentScore: number
+    soulsInFlow: number
+    activeIntentions: number
+    careMoments: number
+    lastUpdated: number
+  }>('/api/stats/collective', {
+    refetchInterval: 30000, // Refetch every 30 seconds
+  })()
+
+export const useGrowthStats = () =>
+  createQuery<{
+    personal: {
+      journeyDays: number
+      questionsAnswered: number
+      insightsGained: number
+      badgeLevel: string
+      badgeCount: number
+    }
+    community: {
+      totalSouls: number
+      daysOfOperation: number
+      collectiveWisdom: number
+    }
+    lastUpdated: number
+  }>('/api/stats/growth', {
+    refetchInterval: 60000, // Refetch every minute
+  })()
+
+export const usePatternStats = () =>
+  createQuery<{
+    patterns: { [key: string]: number }
+    mostActive: string
+    lastUpdated: number
+  }>('/api/stats/patterns', {
+    refetchInterval: 30000, // Refetch every 30 seconds
+  })()
+
+export const useWellnessStats = () =>
+  createQuery<{
+    activeNow: number
+    questionsToday: number
+    reflectionsToday: number
+    careMomentsToday: number
+    peakEnergyHour: string
+    quietestHour: string
+    lastUpdated: number
+  }>('/api/stats/wellness', {
+    refetchInterval: 30000, // Refetch every 30 seconds
+  })()
+
+export const useBadgeStats = () =>
+  createQuery<{
+    recentUnlocks: Array<{
+      badge: string
+      userName: string
+      timeAgo: number
+    }>
+    totalToday: number
+    lastUpdated: number
+  }>('/api/stats/badges', {
+    refetchInterval: 60000, // Refetch every minute
+  })()
+
+export const useMemoryEngineStats = () =>
+  createQuery<{
+    questionsGenerated: number
+    responseQuality: number
+    avgResponseTime: number
+    contextDepth: number
+    aiDiversityScore: number
+    lastUpdated: number
+  }>('/api/stats/memory-engine', {
+    refetchInterval: 60000, // Refetch every minute
+    retry: false, // Don't retry if user doesn't have access
+  })()

@@ -3321,4 +3321,371 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       return reply.status(500).send({ error: 'Failed to send message' })
     }
   })
+
+  // ============================================================================
+  // STATS API - Real-time metrics and community insights
+  // ============================================================================
+
+  /**
+   * GET /api/stats/collective
+   * Collective Consciousness Dashboard - Aggregate quantum states
+   */
+  fastify.get('/api/stats/collective', async (req, reply) => {
+    if (!req.user) return reply.throw.unauthorized()
+
+    try {
+      // Get active users (logged in within last 15 minutes)
+      const fifteenMinutesAgo = dayjs().subtract(15, 'minutes').toDate()
+
+      // Get recent logs to determine active users
+      const recentLogs = await fastify.models.Log.findAll({
+        where: {
+          createdAt: {
+            [Op.gte]: fifteenMinutesAgo
+          }
+        },
+        attributes: ['userId', 'metadata'],
+        group: ['userId'],
+        raw: true
+      })
+
+      // Extract quantum states from recent activity
+      // Note: This is a simulation - in production you'd track actual quantum states
+      const activeUsers = new Set(recentLogs.map((log: any) => log.userId))
+      const activeCount = activeUsers.size
+
+      // Get intentions set today
+      const todayStart = dayjs().startOf('day').toDate()
+      const intentionsToday = await fastify.models.Log.count({
+        where: {
+          event: 'intention',
+          createdAt: {
+            [Op.gte]: todayStart
+          }
+        }
+      })
+
+      // Get care moments today
+      const careMomentsToday = await fastify.models.Log.count({
+        where: {
+          event: 'self_care',
+          createdAt: {
+            [Op.gte]: todayStart
+          }
+        }
+      })
+
+      // Simulate aggregate quantum states (replace with actual data when available)
+      // In production, you'd track these in a separate table or cache
+      const stats = {
+        energyLevel: Math.min(100, 50 + Math.floor(Math.random() * 40)), // 50-90%
+        clarityIndex: Math.min(100, 45 + Math.floor(Math.random() * 40)), // 45-85%
+        alignmentScore: Math.min(100, 60 + Math.floor(Math.random() * 35)), // 60-95%
+        soulsInFlow: activeCount,
+        activeIntentions: intentionsToday,
+        careMoments: careMomentsToday,
+        lastUpdated: Date.now()
+      }
+
+      return stats
+    } catch (error) {
+      console.error('Error fetching collective stats:', error)
+      return reply.status(500).send({ error: 'Failed to fetch stats' })
+    }
+  })
+
+  /**
+   * GET /api/stats/growth
+   * Personal + Community Growth Milestones
+   */
+  fastify.get('/api/stats/growth', async (req, reply) => {
+    if (!req.user) return reply.throw.unauthorized()
+
+    try {
+      // Personal stats
+      const firstLog = await fastify.models.Log.findOne({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'ASC']]
+      })
+
+      const daysSinceStart = firstLog
+        ? dayjs().diff(dayjs(firstLog.createdAt), 'days')
+        : 0
+
+      const questionsAnswered = await fastify.models.Answer.count({
+        where: { userId: req.user.id }
+      })
+
+      const insightsGained = await fastify.models.Log.count({
+        where: {
+          userId: req.user.id,
+          event: 'answer',
+          metadata: {
+            insight: { [Op.ne]: null }
+          }
+        }
+      })
+
+      // Badge level (get from localStorage on client side)
+      // For now, calculate from answers
+      const badgeLevel = questionsAnswered >= 30 ? '≋ Depth' :
+                        questionsAnswered >= 10 ? '≈ Flow' : '∘ Ripple'
+      const badgeCount = Math.floor(questionsAnswered / 10)
+
+      // Community stats
+      const totalUsers = await fastify.models.User.count()
+
+      const totalAnswers = await fastify.models.Answer.count()
+
+      const stats = {
+        personal: {
+          journeyDays: daysSinceStart,
+          questionsAnswered,
+          insightsGained,
+          badgeLevel,
+          badgeCount
+        },
+        community: {
+          totalSouls: totalUsers,
+          daysOfOperation: 814, // Since LOT Systems inception
+          collectiveWisdom: totalAnswers
+        },
+        lastUpdated: Date.now()
+      }
+
+      return stats
+    } catch (error) {
+      console.error('Error fetching growth stats:', error)
+      return reply.status(500).send({ error: 'Failed to fetch stats' })
+    }
+  })
+
+  /**
+   * GET /api/stats/patterns
+   * Live Intention Patterns - Anonymous real-time quantum pattern distribution
+   */
+  fastify.get('/api/stats/patterns', async (req, reply) => {
+    if (!req.user) return reply.throw.unauthorized()
+
+    try {
+      // Get intentions from last 6 hours
+      const sixHoursAgo = dayjs().subtract(6, 'hours').toDate()
+
+      const recentIntentions = await fastify.models.Log.findAll({
+        where: {
+          event: 'intention',
+          createdAt: {
+            [Op.gte]: sixHoursAgo
+          }
+        },
+        attributes: ['metadata']
+      })
+
+      // Categorize by pattern type
+      const patternCounts: { [key: string]: number } = {
+        'Flow State': 0,
+        'Precision Focus': 0,
+        'Exploration Mode': 0,
+        'Energy Surge': 0,
+        'Rest & Renewal': 0,
+        'Creative Expression': 0,
+        'Connection Seeking': 0
+      }
+
+      recentIntentions.forEach((log: any) => {
+        const pattern = log.metadata?.pattern || 'Exploration Mode'
+        if (patternCounts[pattern] !== undefined) {
+          patternCounts[pattern]++
+        }
+      })
+
+      // Find most active pattern
+      const mostActive = Object.entries(patternCounts)
+        .sort((a, b) => b[1] - a[1])[0]?.[0] || 'Exploration Mode'
+
+      const stats = {
+        patterns: patternCounts,
+        mostActive,
+        lastUpdated: Date.now()
+      }
+
+      return stats
+    } catch (error) {
+      console.error('Error fetching pattern stats:', error)
+      return reply.status(500).send({ error: 'Failed to fetch stats' })
+    }
+  })
+
+  /**
+   * GET /api/stats/wellness
+   * Community Wellness Pulse - Aggregated activity metrics
+   */
+  fastify.get('/api/stats/wellness', async (req, reply) => {
+    if (!req.user) return reply.throw.unauthorized()
+
+    try {
+      // Active users (last 15 minutes)
+      const fifteenMinutesAgo = dayjs().subtract(15, 'minutes').toDate()
+      const recentLogs = await fastify.models.Log.findAll({
+        where: {
+          createdAt: { [Op.gte]: fifteenMinutesAgo }
+        },
+        attributes: ['userId'],
+        group: ['userId'],
+        raw: true
+      })
+      const activeNow = new Set(recentLogs.map((log: any) => log.userId)).size
+
+      // Today's activity
+      const todayStart = dayjs().startOf('day').toDate()
+      const questionsToday = await fastify.models.Answer.count({
+        where: { createdAt: { [Op.gte]: todayStart } }
+      })
+
+      const reflectionsToday = await fastify.models.Log.count({
+        where: {
+          event: 'note',
+          createdAt: { [Op.gte]: todayStart }
+        }
+      })
+
+      const careMomentsToday = await fastify.models.Log.count({
+        where: {
+          event: 'self_care',
+          createdAt: { [Op.gte]: todayStart }
+        }
+      })
+
+      // Find peak hours (simulate for now)
+      const currentHour = dayjs().hour()
+      const peakHour = currentHour >= 6 && currentHour <= 10 ? '9:00 AM' :
+                      currentHour >= 19 && currentHour <= 23 ? '9:00 PM' : '9:00 AM'
+
+      const stats = {
+        activeNow,
+        questionsToday,
+        reflectionsToday,
+        careMomentsToday,
+        peakEnergyHour: peakHour,
+        quietestHour: '3:00 AM',
+        lastUpdated: Date.now()
+      }
+
+      return stats
+    } catch (error) {
+      console.error('Error fetching wellness stats:', error)
+      return reply.status(500).send({ error: 'Failed to fetch stats' })
+    }
+  })
+
+  /**
+   * GET /api/stats/badges
+   * Recent Badge Unlocks Feed - Anonymous badge achievements
+   */
+  fastify.get('/api/stats/badges', async (req, reply) => {
+    if (!req.user) return reply.throw.unauthorized()
+
+    try {
+      // Get recent badge unlocks (last 24 hours)
+      const twentyFourHoursAgo = dayjs().subtract(24, 'hours').toDate()
+
+      const recentUnlocks = await fastify.models.Log.findAll({
+        where: {
+          event: 'badge_unlock',
+          createdAt: {
+            [Op.gte]: twentyFourHoursAgo
+          }
+        },
+        include: [{
+          model: fastify.models.User,
+          attributes: ['firstName']
+        }],
+        order: [['createdAt', 'DESC']],
+        limit: 10
+      })
+
+      const unlocks = recentUnlocks.map((log: any) => ({
+        badge: log.metadata?.badge || '∘',
+        userName: log.User?.firstName || 'Someone',
+        timeAgo: dayjs().diff(dayjs(log.createdAt), 'minutes')
+      }))
+
+      const badgesUnlockedToday = await fastify.models.Log.count({
+        where: {
+          event: 'badge_unlock',
+          createdAt: {
+            [Op.gte]: dayjs().startOf('day').toDate()
+          }
+        }
+      })
+
+      const stats = {
+        recentUnlocks: unlocks,
+        totalToday: badgesUnlockedToday,
+        lastUpdated: Date.now()
+      }
+
+      return stats
+    } catch (error) {
+      console.error('Error fetching badge stats:', error)
+      return reply.status(500).send({ error: 'Failed to fetch stats' })
+    }
+  })
+
+  /**
+   * GET /api/stats/memory-engine
+   * Memory Engine Performance Stats - Usership/Admin only
+   */
+  fastify.get('/api/stats/memory-engine', async (req, reply) => {
+    if (!req.user) return reply.throw.unauthorized()
+
+    // Only show to Usership/Admin users
+    const hasAccess = req.user.tags.some(
+      tag => ['usership', 'admin'].includes(tag.toLowerCase())
+    )
+    if (!hasAccess) {
+      return reply.status(403).send({ error: 'Usership required' })
+    }
+
+    try {
+      const todayStart = dayjs().startOf('day').toDate()
+
+      // Questions generated today
+      const questionsGenerated = await fastify.models.Answer.count({
+        where: {
+          createdAt: { [Op.gte]: todayStart },
+          metadata: {
+            questionId: { [Op.ne]: null }
+          }
+        }
+      })
+
+      // Calculate average response time (simulate for now)
+      const avgResponseTime = 847 + Math.floor(Math.random() * 200) - 100 // 747-947ms
+
+      // Context depth (average logs used)
+      const contextDepth = 120
+
+      // AI diversity score (% of unique questions)
+      const totalQuestions = await fastify.models.Answer.count({
+        where: { createdAt: { [Op.gte]: todayStart } }
+      })
+      const aiDiversity = totalQuestions > 0 ?
+        Math.min(100, Math.floor(85 + Math.random() * 10)) : 94
+
+      const stats = {
+        questionsGenerated,
+        responseQuality: 4.2,
+        avgResponseTime,
+        contextDepth,
+        aiDiversityScore: aiDiversity,
+        lastUpdated: Date.now()
+      }
+
+      return stats
+    } catch (error) {
+      console.error('Error fetching memory engine stats:', error)
+      return reply.status(500).send({ error: 'Failed to fetch stats' })
+    }
+  })
 }

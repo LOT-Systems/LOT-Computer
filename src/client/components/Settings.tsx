@@ -11,6 +11,7 @@ import {
 } from '#shared/constants'
 import { cn } from '#client/utils'
 import { WorldCanvas } from './WorldCanvas'
+import { GrowthMilestones, BadgeUnlockFeed } from './stats'
 
 interface StatusData {
   version: string
@@ -567,6 +568,10 @@ export const Settings = () => {
           </Block>
         </div>
       )}
+
+      {/* Stats Widgets - Show on Settings/Profile page */}
+      <GrowthMilestones />
+      <BadgeUnlockFeed />
 
     </div>
   )
