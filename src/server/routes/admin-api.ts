@@ -24,6 +24,134 @@ export default async (fastify: FastifyInstance) => {
     }
   )
 
+  // Diagnostic status page
+  fastify.get('/status', async (req, reply) => {
+    const diagnostics: string[] = []
+    const fs = await import('fs')
+
+    try {
+      const CWD = process.cwd()
+
+      diagnostics.push('📦 Deployment Info:')
+      diagnostics.push(`   Working Directory: ${CWD}`)
+      diagnostics.push(`   Node Version: ${process.version}`)
+      diagnostics.push('')
+
+      // Check migrations folder
+      const migrationsPath = path.join(CWD, 'migrations')
+      const migrationsExist = fs.existsSync(migrationsPath)
+      diagnostics.push('📁 Migrations Folder:')
+      diagnostics.push(`   Exists: ${migrationsExist ? '✅' : '❌'}`)
+
+      if (migrationsExist) {
+        const files = fs.readdirSync(migrationsPath)
+        const cjsFiles = files.filter(f => f.endsWith('.cjs'))
+        diagnostics.push(`   .cjs files: ${cjsFiles.length}`)
+        if (cjsFiles.length > 0) {
+          diagnostics.push(`   Latest: ${cjsFiles[cjsFiles.length - 1]}`)
+        }
+      }
+      diagnostics.push('')
+
+      // Check database
+      diagnostics.push('🗄️ Database:')
+      try {
+        await fastify.sequelize.authenticate()
+        diagnostics.push('   Connection: ✅ OK')
+
+        const [records] = await fastify.sequelize.query(
+          "SELECT name FROM \"SequelizeMeta\" ORDER BY name"
+        ) as any[]
+
+        diagnostics.push(`   Migrations tracked: ${records.length}`)
+        const jsCount = records.filter((r: any) => r.name.endsWith('.js')).length
+        diagnostics.push(`   .js entries: ${jsCount} ${jsCount > 0 ? '⚠️ NEEDS FIX' : '✅'}`)
+      } catch (dbError: any) {
+        diagnostics.push(`   ❌ ${dbError.message}`)
+      }
+      diagnostics.push('')
+
+      // Check timeChime column
+      diagnostics.push('⏰ TimeChime Column:')
+      try {
+        const [result] = await fastify.sequelize.query(
+          "SELECT column_name FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'timeChime'"
+        ) as any[]
+
+        diagnostics.push(`   ${result.length > 0 ? '✅ Exists' : '❌ Missing'}`)
+      } catch (e: any) {
+        diagnostics.push(`   ❌ ${e.message}`)
+      }
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Admin Status</title>
+          <style>
+            body {
+              font-family: -apple-system, monospace;
+              max-width: 800px;
+              margin: 20px auto;
+              padding: 20px;
+              font-size: 15px;
+            }
+            .box {
+              background: #e7f3ff;
+              border: 2px solid #0066cc;
+              padding: 25px;
+              border-radius: 8px;
+            }
+            h1 { color: #0066cc; margin: 0 0 20px 0; }
+            .log {
+              background: white;
+              padding: 15px;
+              border-radius: 4px;
+              margin: 15px 0;
+              border: 1px solid #ddd;
+              font-family: monospace;
+              font-size: 14px;
+              white-space: pre-wrap;
+              line-height: 1.8;
+            }
+            .btn {
+              display: inline-block;
+              background: #28a745;
+              color: white;
+              padding: 15px 25px;
+              border-radius: 5px;
+              text-decoration: none;
+              margin: 10px 5px;
+              font-size: 17px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="box">
+            <h1>🔍 System Status</h1>
+            <div class="log">${diagnostics.join('\n')}</div>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #0066cc;">
+              <a href="/admin-api/fix-and-run-migrations" class="btn">🔧 Fix & Run Migrations</a>
+              <a href="/" class="btn" style="background: #007bff;">← Home</a>
+            </div>
+          </div>
+        </body>
+        </html>
+      `)
+    } catch (error: any) {
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <body style="font-family: monospace; padding: 20px; max-width: 800px; margin: 20px auto;">
+          <h1 style="color: red;">❌ Error</h1>
+          <pre style="background: #f5f5f5; padding: 15px;">${error.stack}</pre>
+        </body>
+        </html>
+      `)
+    }
+  })
+
   fastify.get(
     '/users',
     async (
