@@ -66,8 +66,8 @@ export async function checkRecipeWidget() {
     return
   }
 
-  // Random chance to show (30% probability)
-  if (Math.random() > 0.3) return
+  // Random chance to show (60% probability)
+  if (Math.random() > 0.6) return
 
   // Fetch contextual recipe from server
   try {
