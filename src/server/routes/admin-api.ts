@@ -1478,4 +1478,171 @@ export default async (fastify: FastifyInstance) => {
       `)
     }
   })
+
+  // Memory Engine diagnostic
+  fastify.get('/memory-debug', async (req, reply) => {
+    const log: string[] = []
+
+    try {
+      log.push('🧠 Memory Engine Diagnostics')
+      log.push('='.repeat(40))
+      log.push('')
+
+      // Check user
+      const user = req.user
+      log.push(`👤 User: ${user.id}`)
+      log.push(`   Email: ${user.email}`)
+      log.push(`   Tags: ${user.tags.join(', ')}`)
+      const hasUsership = user.tags.some(t => t.toLowerCase() === 'usership')
+      log.push(`   Has Usership: ${hasUsership ? '✅' : '❌'}`)
+      log.push('')
+
+      // Check API keys
+      log.push('🔑 AI API Keys:')
+      log.push(`   TOGETHER_API_KEY: ${!!process.env.TOGETHER_API_KEY ? '✅' : '❌'}`)
+      log.push(`   GOOGLE_API_KEY: ${!!process.env.GOOGLE_API_KEY ? '✅' : '❌'}`)
+      log.push(`   MISTRAL_API_KEY: ${!!process.env.MISTRAL_API_KEY ? '✅' : '❌'}`)
+      log.push(`   ANTHROPIC_API_KEY: ${!!process.env.ANTHROPIC_API_KEY ? '✅' : '❌'}`)
+      log.push(`   OPENAI_API_KEY: ${!!process.env.OPENAI_API_KEY ? '✅' : '❌'}`)
+      log.push('')
+
+      // Check intelligent pacing
+      log.push('📊 Intelligent Pacing:')
+      const { calculateIntelligentPacing } = await import('#server/utils/memory')
+      const dayjs = (await import('#server/utils/dayjs')).default
+      const localDate = dayjs().tz(user.timeZone || 'America/New_York')
+
+      const pacing = await calculateIntelligentPacing(user.id, localDate, fastify.models)
+      log.push(`   Should show prompt: ${pacing.shouldShowPrompt ? '✅' : '❌'}`)
+      log.push(`   Is weekend: ${pacing.isWeekend}`)
+      log.push(`   Quota today: ${pacing.promptQuotaToday}`)
+      log.push(`   Prompts shown today: ${pacing.promptsShownToday}`)
+      log.push(`   Day number: ${pacing.dayNumber}`)
+      log.push('')
+
+      // Check recent answers
+      log.push('💬 Recent Answers (last 5):')
+      const answers = await fastify.models.Answer.findAll({
+        where: { userId: user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 5,
+        attributes: ['question', 'createdAt']
+      })
+
+      if (answers.length > 0) {
+        answers.forEach((a: any, i: number) => {
+          const timeAgo = dayjs().diff(dayjs(a.createdAt), 'hours')
+          log.push(`   ${i + 1}. "${a.question.substring(0, 50)}..." (${timeAgo}h ago)`)
+        })
+      } else {
+        log.push('   No answers found')
+      }
+      log.push('')
+
+      // Check recent logs count
+      log.push('📝 Recent Logs:')
+      const logsCount = await fastify.models.Log.count({
+        where: { userId: user.id }
+      })
+      log.push(`   Total logs: ${logsCount}`)
+      log.push('')
+
+      // Try generating a test question
+      log.push('🧪 Test Question Generation:')
+      try {
+        const logs = await fastify.models.Log.findAll({
+          where: { userId: user.id },
+          order: [['createdAt', 'DESC']],
+          limit: 40,
+        })
+
+        log.push(`   Loaded ${logs.length} logs for context`)
+        log.push(`   Attempting AI generation...`)
+
+        const { buildPrompt, completeAndExtractQuestion } = await import('#server/utils/memory')
+        const isWeekend = pacing.isWeekend
+
+        const prompt = await buildPrompt(user, logs, isWeekend, undefined)
+        log.push(`   Prompt built: ${prompt.length} characters`)
+
+        const question = await completeAndExtractQuestion(prompt, user)
+        log.push(`   ✅ SUCCESS! Generated question:`)
+        log.push(`   "${question.question}"`)
+        log.push(`   Options: ${question.options?.length || 0}`)
+      } catch (aiError: any) {
+        log.push(`   ❌ FAILED: ${aiError.message}`)
+        log.push(`   This is why you're getting default questions!`)
+      }
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Memory Engine Debug</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              max-width: 900px;
+              margin: 20px auto;
+              padding: 20px;
+              font-size: 15px;
+            }
+            .box {
+              background: #fff3cd;
+              border: 2px solid #ffc107;
+              padding: 25px;
+              border-radius: 8px;
+            }
+            h1 { color: #856404; margin: 0 0 20px 0; }
+            .log {
+              background: white;
+              padding: 15px;
+              border-radius: 4px;
+              margin: 15px 0;
+              border: 1px solid #ddd;
+              font-family: monospace;
+              font-size: 13px;
+              white-space: pre-wrap;
+              line-height: 1.8;
+            }
+            .btn {
+              display: inline-block;
+              background: #007bff;
+              color: white;
+              padding: 12px 24px;
+              border-radius: 5px;
+              text-decoration: none;
+              margin: 5px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="box">
+            <h1>🧠 Memory Engine Diagnostics</h1>
+            <div class="log">${log.join('\n')}</div>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #ffc107;">
+              <a href="/" class="btn">← Home</a>
+              <a href="/admin-api/status" class="btn">System Status</a>
+            </div>
+          </div>
+        </body>
+        </html>
+      `)
+    } catch (error: any) {
+      log.push('')
+      log.push(`❌ Diagnostic Error: ${error.message}`)
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family: monospace; padding: 20px; max-width: 900px; margin: 20px auto;">
+          <h1 style="color: red;">❌ Diagnostic Failed</h1>
+          <pre style="background: #f5f5f5; padding: 15px;">${log.join('\n')}\n\n${error.stack}</pre>
+        </body>
+        </html>
+      `)
+    }
+  })
 }
