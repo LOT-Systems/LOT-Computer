@@ -19,7 +19,7 @@ export type UserSettings = {
   address: string;
   phone: string;
   hideActivityLogs: boolean;
-  timeChime: boolean;
+  timeChime?: boolean;
 };
 
 export type UserPrivacySettings = {

@@ -53,7 +53,7 @@ export const Settings = () => {
     address: me?.address || '',
     country: me?.country || '',
     hideActivityLogs: me?.hideActivityLogs || false,
-    timeChime: me?.timeChime || false,
+    timeChime: me?.timeChime ?? false,
   })
 
   // Privacy settings state
