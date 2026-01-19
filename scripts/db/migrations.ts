@@ -66,7 +66,7 @@ if (['-up', '-down'].includes(command)) {
       console.log('Database connection established successfully')
 
       const umzug = new Umzug({
-        migrations: { glob: MIGRATIONS_PATH + '/*.js' },
+        migrations: { glob: MIGRATIONS_PATH + '/*.cjs' },
         context: sequelize.getQueryInterface(),
         storage: new SequelizeStorage({ sequelize }),
         logger: console,
