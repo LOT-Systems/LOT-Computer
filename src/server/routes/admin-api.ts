@@ -6,6 +6,12 @@ import { fp } from '#shared/utils'
 import { buildPrompt, completeAndExtractQuestion, generateUserSummary, generateMemoryStory } from '#server/utils/memory'
 import { sync } from '../sync.js'
 import dayjs from '../utils/dayjs.js'
+import { Umzug, SequelizeStorage } from 'umzug'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export default async (fastify: FastifyInstance) => {
   // Add parser for form-encoded data from HTML forms
@@ -834,6 +840,185 @@ export default async (fastify: FastifyInstance) => {
         <pre style="background: #f5f5f5; padding: 10px; overflow: auto;">${error.stack}</pre>
         <p><a href="/admin-api/restore-memory-answers">← Try Again</a></p>
         </body></html>
+      `)
+    }
+  })
+
+  // Run database migrations endpoint (mobile-friendly)
+  fastify.get('/run-migrations', async (req, reply) => {
+    try {
+      console.log('🔄 Running database migrations via admin endpoint...')
+
+      const MIGRATIONS_PATH = path.join(__dirname, '../../../migrations')
+
+      const umzug = new Umzug({
+        migrations: { glob: MIGRATIONS_PATH + '/*.js' },
+        context: fastify.sequelize.getQueryInterface(),
+        storage: new SequelizeStorage({ sequelize: fastify.sequelize }),
+        logger: console,
+      })
+
+      const pendingMigrations = await umzug.pending()
+      const executedMigrations = await umzug.executed()
+
+      if (pendingMigrations.length === 0) {
+        return reply.type('text/html').send(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Migrations Up to Date</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                max-width: 600px;
+                margin: 50px auto;
+                padding: 20px;
+              }
+              .info {
+                background: #d1ecf1;
+                border: 2px solid #17a2b8;
+                padding: 30px;
+                border-radius: 8px;
+                text-align: center;
+              }
+              h1 { color: #17a2b8; margin: 0 0 20px 0; }
+              .list {
+                text-align: left;
+                margin: 20px 0;
+                background: white;
+                padding: 15px;
+                border-radius: 4px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="info">
+              <div style="font-size: 64px;">✅</div>
+              <h1>Database Up to Date</h1>
+              <p>All migrations have been applied. No pending migrations found.</p>
+              <div class="list">
+                <strong>Executed migrations (${executedMigrations.length}):</strong>
+                <ul>
+                  ${executedMigrations.map(m => `<li>${m.name}</li>`).join('')}
+                </ul>
+              </div>
+              <p style="margin-top: 30px;">
+                <a href="/">← Back to Home</a>
+              </p>
+            </div>
+          </body>
+          </html>
+        `)
+      }
+
+      // Run pending migrations
+      await umzug.up()
+      const newExecuted = await umzug.executed()
+
+      console.log(`✅ Successfully ran ${pendingMigrations.length} migration(s)`)
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Migrations Complete</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              max-width: 600px;
+              margin: 50px auto;
+              padding: 20px;
+            }
+            .success {
+              background: #d4edda;
+              border: 2px solid #28a745;
+              padding: 30px;
+              border-radius: 8px;
+              text-align: center;
+            }
+            h1 { color: #28a745; margin: 0 0 20px 0; }
+            .stats {
+              font-size: 48px;
+              font-weight: bold;
+              color: #28a745;
+              margin: 20px 0;
+            }
+            .list {
+              text-align: left;
+              margin: 20px 0;
+              background: white;
+              padding: 15px;
+              border-radius: 4px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="success">
+            <div style="font-size: 64px;">✅</div>
+            <h1>Migrations Complete!</h1>
+            <div class="stats">${pendingMigrations.length}</div>
+            <p>Database migrations have been successfully applied.</p>
+            <div class="list">
+              <strong>Applied migrations:</strong>
+              <ul>
+                ${pendingMigrations.map(m => `<li>${m.name}</li>`).join('')}
+              </ul>
+            </div>
+            <p style="margin-top: 30px;">
+              <a href="/">← Back to Home</a>
+            </p>
+          </div>
+        </body>
+        </html>
+      `)
+    } catch (error: any) {
+      console.error('❌ Migration failed:', error)
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Migration Failed</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              max-width: 600px;
+              margin: 50px auto;
+              padding: 20px;
+            }
+            .error {
+              background: #f8d7da;
+              border: 2px solid #dc3545;
+              padding: 30px;
+              border-radius: 8px;
+            }
+            h1 { color: #dc3545; }
+            pre {
+              background: #f5f5f5;
+              padding: 15px;
+              border-radius: 4px;
+              overflow: auto;
+              font-size: 12px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="error">
+            <div style="font-size: 64px; text-align: center;">❌</div>
+            <h1>Migration Failed</h1>
+            <p><strong>Error:</strong> ${error.message}</p>
+            <pre>${error.stack}</pre>
+            <p style="margin-top: 30px;">
+              <a href="/admin-api/run-migrations">← Try Again</a>
+            </p>
+          </div>
+        </body>
+        </html>
       `)
     }
   })
