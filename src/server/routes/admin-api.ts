@@ -863,6 +863,20 @@ export default async (fastify: FastifyInstance) => {
         logger: console,
       })
 
+      // Fix migration tracking: Update .js extensions to .cjs in SequelizeMeta table
+      // This is needed because we renamed migration files from .js to .cjs
+      console.log('🔧 Checking migration tracking table...')
+      try {
+        const [results] = await fastify.sequelize.query(
+          "UPDATE \"SequelizeMeta\" SET name = REPLACE(name, '.js', '.cjs') WHERE name LIKE '%.js' RETURNING name"
+        )
+        if (results && results.length > 0) {
+          console.log(`✅ Updated ${results.length} migration records from .js to .cjs`)
+        }
+      } catch (error: any) {
+        console.log('ℹ️ Migration tracking update skipped (table may not exist yet):', error.message)
+      }
+
       const pendingMigrations = await umzug.pending()
       const executedMigrations = await umzug.executed()
 
