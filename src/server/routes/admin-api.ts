@@ -1044,4 +1044,102 @@ export default async (fastify: FastifyInstance) => {
       `)
     }
   })
+
+  // Fix migration tracking table (separate endpoint for manual control)
+  fastify.get('/fix-migration-tracking', async (req, reply) => {
+    try {
+      // Get current state
+      const [oldRecords] = await fastify.sequelize.query(
+        "SELECT name FROM \"SequelizeMeta\" WHERE name LIKE '%.js' ORDER BY name"
+      )
+
+      const [allRecords] = await fastify.sequelize.query(
+        "SELECT name FROM \"SequelizeMeta\" ORDER BY name"
+      )
+
+      // Update if there are .js records
+      let updated = []
+      if (oldRecords && oldRecords.length > 0) {
+        const [results] = await fastify.sequelize.query(
+          "UPDATE \"SequelizeMeta\" SET name = REPLACE(name, '.js', '.cjs') WHERE name LIKE '%.js' RETURNING name"
+        )
+        updated = results || []
+      }
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Migration Tracking Fixed</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              max-width: 700px;
+              margin: 50px auto;
+              padding: 20px;
+            }
+            .success {
+              background: #d4edda;
+              border: 2px solid #28a745;
+              padding: 30px;
+              border-radius: 8px;
+              margin-bottom: 20px;
+            }
+            .info {
+              background: #d1ecf1;
+              border: 2px solid #17a2b8;
+              padding: 20px;
+              border-radius: 8px;
+              margin-bottom: 20px;
+            }
+            h1 { color: #28a745; margin: 0 0 20px 0; }
+            pre {
+              background: white;
+              padding: 15px;
+              border-radius: 4px;
+              overflow: auto;
+              font-size: 12px;
+              border: 1px solid #ddd;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="success">
+            <div style="font-size: 64px; text-align: center;">✅</div>
+            <h1 style="text-align: center;">Migration Tracking Fixed!</h1>
+            ${updated.length > 0 ? `
+              <p><strong>Updated ${updated.length} migration records from .js to .cjs:</strong></p>
+              <pre>${updated.map((r: any) => r.name).join('\n')}</pre>
+            ` : `
+              <p>No .js records found - tracking table is already up to date!</p>
+            `}
+          </div>
+
+          <div class="info">
+            <h2>Current Migration Tracking (${allRecords.length} total):</h2>
+            <pre>${allRecords.map((r: any) => r.name).join('\n')}</pre>
+          </div>
+
+          <p style="text-align: center; margin-top: 30px;">
+            <a href="/admin-api/run-migrations" style="font-size: 18px;">→ Now Run Migrations</a>
+          </p>
+        </body>
+        </html>
+      `)
+    } catch (error: any) {
+      console.error('❌ Fix migration tracking failed:', error)
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family: sans-serif; padding: 20px; max-width: 600px; margin: 50px auto;">
+          <h1 style="color: red;">❌ Error</h1>
+          <p><strong>Error:</strong> ${error.message}</p>
+          <pre style="background: #f5f5f5; padding: 10px; overflow: auto;">${error.stack}</pre>
+        </body>
+        </html>
+      `)
+    }
+  })
 }
