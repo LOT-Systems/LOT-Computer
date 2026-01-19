@@ -849,7 +849,12 @@ export default async (fastify: FastifyInstance) => {
     try {
       console.log('🔄 Running database migrations via admin endpoint...')
 
-      const MIGRATIONS_PATH = path.join(__dirname, '../../../migrations')
+      // Use CWD to find migrations folder (works in both dev and production)
+      const CWD = process.cwd()
+      const MIGRATIONS_PATH = path.join(CWD, 'migrations')
+
+      console.log('📁 Migrations path:', MIGRATIONS_PATH)
+      console.log('📁 CWD:', CWD)
 
       const umzug = new Umzug({
         migrations: { glob: MIGRATIONS_PATH + '/*.js' },
@@ -860,6 +865,9 @@ export default async (fastify: FastifyInstance) => {
 
       const pendingMigrations = await umzug.pending()
       const executedMigrations = await umzug.executed()
+
+      console.log('📋 Pending migrations:', pendingMigrations.length)
+      console.log('✅ Executed migrations:', executedMigrations.length)
 
       if (pendingMigrations.length === 0) {
         return reply.type('text/html').send(`
