@@ -1143,3 +1143,211 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 }
+  // One-step migration fix and execution (mobile-friendly)
+  fastify.get('/fix-and-run-migrations', async (req, reply) => {
+    const log: string[] = []
+
+    try {
+      log.push('🔧 Step 1: Fixing migration tracking table...')
+
+      const [oldRecords] = await fastify.sequelize.query(
+        "SELECT name FROM \"SequelizeMeta\" WHERE name LIKE '%.js' ORDER BY name"
+      ) as any[]
+
+      log.push(`   Found ${oldRecords.length} records with .js extension`)
+
+      if (oldRecords.length > 0) {
+        await fastify.sequelize.query(
+          "UPDATE \"SequelizeMeta\" SET name = REPLACE(name, '.js', '.cjs') WHERE name LIKE '%.js'"
+        )
+        log.push(`   ✅ Updated ${oldRecords.length} records to .cjs`)
+      } else {
+        log.push('   ✅ Already up to date')
+      }
+
+      log.push('')
+      log.push('📋 Step 2: Checking pending migrations...')
+
+      const CWD = process.cwd()
+      const MIGRATIONS_PATH = path.join(CWD, 'migrations')
+
+      const umzug = new Umzug({
+        migrations: { glob: MIGRATIONS_PATH + '/*.cjs' },
+        context: fastify.sequelize.getQueryInterface(),
+        storage: new SequelizeStorage({ sequelize: fastify.sequelize }),
+        logger: console,
+      })
+
+      const pending = await umzug.pending()
+      const executed = await umzug.executed()
+
+      log.push(`   Executed: ${executed.length} migrations`)
+      log.push(`   Pending: ${pending.length} migrations`)
+
+      if (pending.length === 0) {
+        log.push('')
+        log.push('✅ All migrations up to date!')
+
+        return reply.type('text/html').send(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Migrations Complete</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                max-width: 800px;
+                margin: 20px auto;
+                padding: 20px;
+                font-size: 16px;
+              }
+              .box {
+                background: #d4edda;
+                border: 2px solid #28a745;
+                padding: 25px;
+                border-radius: 8px;
+              }
+              .log {
+                background: white;
+                padding: 15px;
+                border-radius: 4px;
+                margin: 15px 0;
+                border: 1px solid #ddd;
+                font-family: monospace;
+                font-size: 13px;
+                white-space: pre-wrap;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="box">
+              <h1 style="color: #28a745; margin: 0 0 20px 0;">✅ Complete!</h1>
+              <div class="log">${log.join('\n')}</div>
+              <p style="margin-top: 20px;"><a href="/">← Back to Home</a></p>
+            </div>
+          </body>
+          </html>
+        `)
+      }
+
+      log.push('')
+      log.push(`⚙️ Step 3: Running ${pending.length} pending migration(s)...`)
+
+      for (const migration of pending) {
+        log.push(`   → ${migration.name}`)
+      }
+
+      await umzug.up()
+
+      log.push('')
+      log.push('✅ SUCCESS! All migrations complete!')
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Migration Success</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              max-width: 800px;
+              margin: 20px auto;
+              padding: 20px;
+              font-size: 16px;
+            }
+            .box {
+              background: #d4edda;
+              border: 2px solid #28a745;
+              padding: 25px;
+              border-radius: 8px;
+            }
+            .log {
+              background: white;
+              padding: 15px;
+              border-radius: 4px;
+              margin: 15px 0;
+              border: 1px solid #ddd;
+              font-family: monospace;
+              font-size: 13px;
+              white-space: pre-wrap;
+            }
+            .btn {
+              display: inline-block;
+              background: #007bff;
+              color: white;
+              padding: 12px 24px;
+              border-radius: 5px;
+              text-decoration: none;
+              margin-top: 15px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="box">
+            <h1 style="color: #28a745; margin: 0 0 20px 0;">🎉 Migration Success!</h1>
+            <div class="log">${log.join('\n')}</div>
+            <p>
+              <strong>Next step:</strong> Uncomment the hourly chime code and redeploy.
+            </p>
+            <a href="/" class="btn">← Back to Home</a>
+          </div>
+        </body>
+        </html>
+      `)
+
+    } catch (error: any) {
+      log.push('')
+      log.push(`❌ ERROR: ${error.message}`)
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Migration Error</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              max-width: 800px;
+              margin: 20px auto;
+              padding: 20px;
+              font-size: 16px;
+            }
+            .box {
+              background: #f8d7da;
+              border: 2px solid #dc3545;
+              padding: 25px;
+              border-radius: 8px;
+            }
+            .log {
+              background: white;
+              padding: 15px;
+              border-radius: 4px;
+              margin: 15px 0;
+              border: 1px solid #ddd;
+              font-family: monospace;
+              font-size: 13px;
+              white-space: pre-wrap;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="box">
+            <h1 style="color: #dc3545; margin: 0 0 20px 0;">❌ Migration Failed</h1>
+            <div class="log">${log.join('\n')}</div>
+            <details style="margin-top: 15px;">
+              <summary style="cursor: pointer; font-weight: bold;">Show Error Details</summary>
+              <pre style="background: white; padding: 10px; margin-top: 10px; overflow: auto; font-size: 12px;">${error.stack}</pre>
+            </details>
+          </div>
+        </body>
+        </html>
+      `)
+    }
+  })
+}
