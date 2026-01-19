@@ -14,7 +14,7 @@ export interface User {
   phone: string | null
   timeZone: string | null
   hideActivityLogs: boolean
-  timeChime: boolean
+  timeChime?: boolean
 
   tags: UserTag[]
   lastSeenAt: Date | null
