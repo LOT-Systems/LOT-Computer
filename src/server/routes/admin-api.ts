@@ -857,7 +857,7 @@ export default async (fastify: FastifyInstance) => {
       console.log('📁 CWD:', CWD)
 
       const umzug = new Umzug({
-        migrations: { glob: MIGRATIONS_PATH + '/*.js' },
+        migrations: { glob: MIGRATIONS_PATH + '/*.cjs' },
         context: fastify.sequelize.getQueryInterface(),
         storage: new SequelizeStorage({ sequelize: fastify.sequelize }),
         logger: console,
