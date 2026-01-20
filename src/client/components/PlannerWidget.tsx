@@ -144,14 +144,14 @@ export const PlannerWidget: React.FC = () => {
             </div>
 
             {/* Daily Planning - Spreadsheet format */}
-            <div className="mb-16 space-y-6">
+            <div className="mb-16 rounded-lg border border-acc/20 overflow-hidden">
               {/* Intent */}
               <div
                 className={cn(
-                  'px-8 py-4 rounded transition-colors cursor-pointer border',
+                  'px-8 py-4 transition-colors cursor-pointer',
                   state.selectedCategory === 'intent'
-                    ? 'bg-acc/10 border-acc'
-                    : 'border-acc/20 hover:border-acc/40 hover:bg-acc/5'
+                    ? 'bg-acc/10'
+                    : 'hover:bg-acc/5'
                 )}
                 onClick={() => {
                   if (state.selectedCategory !== 'intent') {
@@ -170,10 +170,10 @@ export const PlannerWidget: React.FC = () => {
               {/* Today */}
               <div
                 className={cn(
-                  'px-8 py-4 rounded transition-colors cursor-pointer border',
+                  'px-8 py-4 transition-colors cursor-pointer border-t border-acc/20',
                   state.selectedCategory === 'today'
-                    ? 'bg-acc/10 border-acc'
-                    : 'border-acc/20 hover:border-acc/40 hover:bg-acc/5'
+                    ? 'bg-acc/10'
+                    : 'hover:bg-acc/5'
                 )}
                 onClick={() => {
                   if (state.selectedCategory !== 'today') {
@@ -192,10 +192,10 @@ export const PlannerWidget: React.FC = () => {
               {/* How */}
               <div
                 className={cn(
-                  'px-8 py-4 rounded transition-colors cursor-pointer border',
+                  'px-8 py-4 transition-colors cursor-pointer border-t border-acc/20',
                   state.selectedCategory === 'how'
-                    ? 'bg-acc/10 border-acc'
-                    : 'border-acc/20 hover:border-acc/40 hover:bg-acc/5'
+                    ? 'bg-acc/10'
+                    : 'hover:bg-acc/5'
                 )}
                 onClick={() => {
                   if (state.selectedCategory !== 'how') {
@@ -214,10 +214,10 @@ export const PlannerWidget: React.FC = () => {
               {/* Feeling */}
               <div
                 className={cn(
-                  'px-8 py-4 rounded transition-colors cursor-pointer border',
+                  'px-8 py-4 transition-colors cursor-pointer border-t border-acc/20',
                   state.selectedCategory === 'feeling'
-                    ? 'bg-acc/10 border-acc'
-                    : 'border-acc/20 hover:border-acc/40 hover:bg-acc/5'
+                    ? 'bg-acc/10'
+                    : 'hover:bg-acc/5'
                 )}
                 onClick={() => {
                   if (state.selectedCategory !== 'feeling') {
