@@ -24,6 +24,25 @@ export default async (fastify: FastifyInstance) => {
     }
   )
 
+  // Simple ping endpoint to verify admin-api routes are working
+  fastify.get('/ping', async (req, reply) => {
+    return reply.type('text/html').send(`
+      <!DOCTYPE html>
+      <html>
+      <head><title>Admin API Ping</title></head>
+      <body style="font-family: monospace; padding: 40px; text-align: center;">
+        <h1 style="color: green;">✅ Admin API Routes Working!</h1>
+        <p>User: ${req.user.email}</p>
+        <p>Tags: ${req.user.tags.join(', ')}</p>
+        <p>Timestamp: ${new Date().toISOString()}</p>
+        <hr>
+        <a href="/admin-api/status">Status</a> |
+        <a href="/admin-api/memory-debug">Memory Debug</a>
+      </body>
+      </html>
+    `)
+  })
+
   // Diagnostic status page
   fastify.get('/status', async (req, reply) => {
     const diagnostics: string[] = []
