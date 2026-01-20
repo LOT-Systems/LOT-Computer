@@ -1255,6 +1255,7 @@ export default async (fastify: FastifyInstance) => {
           intensity,
           note,
           insights,
+          timestamp: new Date().toISOString(),
         },
       })
 
