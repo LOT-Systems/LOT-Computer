@@ -1798,6 +1798,9 @@ export default async (fastify: FastifyInstance) => {
         questionOptions = req.body.options
       }
 
+      // Clean up badge formatting - remove period before [badge] marker
+      questionText = questionText.replace(/\.\s*\[badge\]/g, ' [badge]')
+
       // Validate the selected option
       if (!questionOptions.includes(option)) {
         return reply.throw.badParams()
