@@ -29,15 +29,70 @@ export default async (fastify: FastifyInstance) => {
     return reply.type('text/html').send(`
       <!DOCTYPE html>
       <html>
-      <head><title>Admin API Ping</title></head>
-      <body style="font-family: monospace; padding: 40px; text-align: center;">
-        <h1 style="color: green;">✅ Admin API Routes Working!</h1>
-        <p>User: ${req.user.email}</p>
-        <p>Tags: ${req.user.tags.join(', ')}</p>
-        <p>Timestamp: ${new Date().toISOString()}</p>
-        <hr>
-        <a href="/admin-api/status">Status</a> |
-        <a href="/admin-api/memory-debug">Memory Debug</a>
+      <head>
+        <title>Admin API Ping</title>
+        <style>
+          body {
+            font-family: monospace;
+            padding: 40px;
+            text-align: center;
+          }
+          .info {
+            background: #e7f3ff;
+            border: 2px solid #0066cc;
+            padding: 25px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+          }
+          .note {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-size: 14px;
+            text-align: left;
+          }
+          a {
+            display: inline-block;
+            background: #0066cc;
+            color: white;
+            padding: 12px 24px;
+            margin: 10px;
+            border-radius: 5px;
+            text-decoration: none;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="info">
+          <h1 style="color: green; margin: 0 0 20px 0;">✅ Admin API Routes Working!</h1>
+          <p>User: ${req.user.email}</p>
+          <p>Tags: ${req.user.tags.join(', ')}</p>
+          <p>Timestamp: ${new Date().toISOString()}</p>
+
+          <div class="note">
+            <strong>Note:</strong> To access admin pages, you need to type the full URL in your browser's address bar.
+            The client-side router intercepts link clicks.
+          </div>
+        </div>
+
+        <div>
+          <p><strong>Available Admin Pages:</strong></p>
+          <code>/admin-api/status</code><br>
+          <code>/admin-api/memory-debug</code><br>
+          <code>/admin-api/ping</code>
+        </div>
+
+        <div style="margin-top: 30px;">
+          <button onclick="navigator.clipboard.writeText(window.location.origin + '/admin-api/status')" style="cursor: pointer;">
+            📋 Copy Status URL
+          </button>
+          <button onclick="navigator.clipboard.writeText(window.location.origin + '/admin-api/memory-debug')" style="cursor: pointer;">
+            📋 Copy Memory Debug URL
+          </button>
+        </div>
       </body>
       </html>
     `)
