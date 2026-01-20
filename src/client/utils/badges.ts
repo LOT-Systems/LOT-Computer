@@ -1,53 +1,99 @@
 /**
- * Aquatic Evolution Badge System for LOT
+ * Badge System for LOT - Dual Theme Support
  *
- * Milestone badges represent growth through water metaphors:
- * ∘ (droplet) → ≈ (wave) → ≋ (deep current)
+ * Two parallel systems representing spiritual growth:
  *
+ * 1. WATER (Aquatic Evolution): ∘ → ≈ → ≋
+ *    Growth through natural cycles, like water flowing
+ *
+ * 2. ARCHITECTURE (Box Drawing): ├─ → ╞═╡ → ║·║
+ *    Structural building and growth, construction of self
+ *
+ * Users can choose their preferred metaphor for growth.
  * Displayed in dedicated "Level:" field in Public Profile.
- *
- * Philosophy: Growth through natural cycles, like water flowing.
  */
 
+export type BadgeTheme = 'water' | 'architecture'
+
 export type BadgeType =
-  | 'milestone_7'     // ∘ - Droplet (beginning)
-  | 'milestone_30'    // ≈ - Wave (flowing)
-  | 'milestone_100'   // ≋ - Deep current (mastery)
+  // Water milestones
+  | 'milestone_7'     // ∘ Droplet / ├─ Foundation
+  | 'milestone_30'    // ≈ Wave / ╞═╡ Structure
+  | 'milestone_100'   // ≋ Current / ║·║ Architecture
 
 export interface Badge {
   id: BadgeType
-  symbol: string
-  name: string
+  waterSymbol: string
+  architectureSymbol: string
+  waterName: string
+  architectureName: string
   description: string
-  unlockMessage: string // Shown via Memory widget
+  waterUnlockMessage: string
+  architectureUnlockMessage: string
 }
 
 export const BADGES: Record<BadgeType, Badge> = {
   milestone_7: {
     id: 'milestone_7',
-    symbol: '∘',
-    name: 'Droplet',
+    waterSymbol: '∘',
+    architectureSymbol: '├─',
+    waterName: 'Droplet',
+    architectureName: 'Foundation',
     description: 'Seven days of consistent practice',
-    unlockMessage: 'First drops form. ∘',
+    waterUnlockMessage: 'First drops form [badge]',
+    architectureUnlockMessage: 'Foundation laid [badge]',
   },
   milestone_30: {
     id: 'milestone_30',
-    symbol: '≈',
-    name: 'Wave',
+    waterSymbol: '≈',
+    architectureSymbol: '╞═╡',
+    waterName: 'Wave',
+    architectureName: 'Structure',
     description: 'A full month of engagement',
-    unlockMessage: 'Waves begin to flow. ≈',
+    waterUnlockMessage: 'Waves begin to flow [badge]',
+    architectureUnlockMessage: 'Structure rises [badge]',
   },
   milestone_100: {
     id: 'milestone_100',
-    symbol: '≋',
-    name: 'Current',
+    waterSymbol: '≋',
+    architectureSymbol: '║·║',
+    waterName: 'Current',
+    architectureName: 'Architecture',
     description: 'A hundred days of practice',
-    unlockMessage: 'Deep currents established. ≋',
+    waterUnlockMessage: 'Deep currents established [badge]',
+    architectureUnlockMessage: 'Architecture complete [badge]',
   },
 }
 
 // Default separator when no badges earned yet
 export const DEFAULT_SEPARATOR = '•'
+
+/**
+ * Get user's preferred badge theme
+ */
+export function getBadgeTheme(): BadgeTheme {
+  if (typeof window === 'undefined') return 'water'
+
+  try {
+    const stored = localStorage.getItem('badge_theme')
+    return (stored === 'architecture' ? 'architecture' : 'water') as BadgeTheme
+  } catch (e) {
+    return 'water'
+  }
+}
+
+/**
+ * Set user's preferred badge theme
+ */
+export function setBadgeTheme(theme: BadgeTheme): void {
+  if (typeof window === 'undefined') return
+
+  try {
+    localStorage.setItem('badge_theme', theme)
+  } catch (e) {
+    console.warn('Failed to set badge theme:', e)
+  }
+}
 
 /**
  * Get earned badges from localStorage
@@ -138,8 +184,9 @@ function queueBadgeUnlock(badgeId: BadgeType): void {
 
 /**
  * Get next badge unlock to display (and remove from queue)
+ * Returns badge with theme-appropriate message
  */
-export function getNextBadgeUnlock(): Badge | null {
+export function getNextBadgeUnlock(): { badge: Badge; unlockMessage: string; symbol: string; name: string } | null {
   if (typeof window === 'undefined') return null
 
   try {
@@ -158,7 +205,13 @@ export function getNextBadgeUnlock(): Badge | null {
       return null
     }
 
-    return badge
+    // Get theme-appropriate message and symbol
+    const theme = getBadgeTheme()
+    const unlockMessage = theme === 'water' ? badge.waterUnlockMessage : badge.architectureUnlockMessage
+    const symbol = theme === 'water' ? badge.waterSymbol : badge.architectureSymbol
+    const name = theme === 'water' ? badge.waterName : badge.architectureName
+
+    return { badge, unlockMessage, symbol, name }
   } catch (e) {
     console.warn('Failed to get next badge unlock:', e)
     return null
@@ -167,12 +220,38 @@ export function getNextBadgeUnlock(): Badge | null {
 
 /**
  * Get current level symbol based on streak
- * Returns the highest milestone badge symbol earned
+ * Returns the highest milestone badge symbol earned (theme-specific)
  */
-export function getLevelSymbol(streak: number): string {
-  if (streak >= 100) return BADGES.milestone_100.symbol // ≋
-  if (streak >= 30) return BADGES.milestone_30.symbol   // ≈
-  if (streak >= 7) return BADGES.milestone_7.symbol     // ∘
+export function getLevelSymbol(streak: number, theme?: BadgeTheme): string {
+  const badgeTheme = theme || getBadgeTheme()
+
+  if (streak >= 100) {
+    return badgeTheme === 'water' ? BADGES.milestone_100.waterSymbol : BADGES.milestone_100.architectureSymbol
+  }
+  if (streak >= 30) {
+    return badgeTheme === 'water' ? BADGES.milestone_30.waterSymbol : BADGES.milestone_30.architectureSymbol
+  }
+  if (streak >= 7) {
+    return badgeTheme === 'water' ? BADGES.milestone_7.waterSymbol : BADGES.milestone_7.architectureSymbol
+  }
+  return '' // No level yet
+}
+
+/**
+ * Get current level name based on streak (theme-specific)
+ */
+export function getLevelName(streak: number, theme?: BadgeTheme): string {
+  const badgeTheme = theme || getBadgeTheme()
+
+  if (streak >= 100) {
+    return badgeTheme === 'water' ? BADGES.milestone_100.waterName : BADGES.milestone_100.architectureName
+  }
+  if (streak >= 30) {
+    return badgeTheme === 'water' ? BADGES.milestone_30.waterName : BADGES.milestone_30.architectureName
+  }
+  if (streak >= 7) {
+    return badgeTheme === 'water' ? BADGES.milestone_7.waterName : BADGES.milestone_7.architectureName
+  }
   return '' // No level yet
 }
 
