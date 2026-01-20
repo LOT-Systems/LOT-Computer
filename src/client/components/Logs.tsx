@@ -204,7 +204,6 @@ export const Logs: React.FC = () => {
           const checkInType = log.metadata?.checkInType as string
           const note = log.metadata?.note as string
           const insights = log.metadata?.insights as string[] | undefined
-          const timestamp = log.metadata?.timestamp as string | undefined
 
           const timeLabel =
             checkInType === 'morning' ? 'Morning' :
@@ -214,14 +213,7 @@ export const Logs: React.FC = () => {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="Mood:" blockView>
-                <div className="mb-8 capitalize">
-                  {emotionalState}
-                  {timestamp && (
-                    <span className="opacity-40 ml-8">
-                      {dayjs(timestamp).format(isTimeFormat12h ? 'h:mm A' : 'H:mm')}
-                    </span>
-                  )}
-                </div>
+                <div className="mb-8 capitalize">{emotionalState}</div>
                 {note && <div className="mb-8">{note}</div>}
                 {insights && insights.length > 0 && (
                   <div>
