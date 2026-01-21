@@ -83,6 +83,12 @@ const App = () => {
         }
       }
 
+      // Sync timeChime setting from user (server) to local store
+      if (user.timeChime !== undefined) {
+        stores.isTimeChimeEnabled.set(user.timeChime)
+        console.log('[App] Syncing timeChime from server:', user.timeChime)
+      }
+
       if (!user.firstName && !user.lastName) {
         stores.goTo('settings')
       }
