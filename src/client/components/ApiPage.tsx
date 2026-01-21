@@ -160,6 +160,7 @@ export function ApiPage() {
             }
           ]}
           paddingClassName="p-8"
+          highlightFirstRow
         />
       </Block>
     </div>

@@ -14,6 +14,7 @@ interface Props<Datum> {
   className?: string
   paddingClassName?: string
   hideHeader?: boolean
+  highlightFirstRow?: boolean
 }
 
 export const Table = <D,>(props: Props<D>) => {
@@ -32,7 +33,7 @@ export const Table = <D,>(props: Props<D>) => {
           )}
           <tbody>
             {props.data.map((d: D, i) => (
-              <tr key={i}>
+              <tr key={i} className={cn(props.highlightFirstRow && i === 0 && 'bg-acc-400/10')}>
                 {props.columns.map((c) => (
                   <Td key={c.id}>{c.accessor(d)}</Td>
                 ))}
