@@ -325,10 +325,10 @@ fastify.setNotFoundHandler(async (req, res) => {
   console.log('[NOT-FOUND] Headers Accept:', req.headers.accept)
   console.log('[NOT-FOUND] Is HTML request:', req.headers.accept?.includes('text/html'))
 
-  // Don't redirect admin-api routes - let them return proper 404
-  if (req.url.startsWith('/admin-api/')) {
-    console.log('[NOT-FOUND] Admin API route not found, returning 404')
-    return res.code(404).send('Admin API endpoint not found: ' + req.url)
+  // Don't redirect API routes - let them return proper 404 or handle authentication
+  if (req.url.startsWith('/api/') || req.url.startsWith('/admin-api/')) {
+    console.log('[NOT-FOUND] API route not found, returning 404')
+    return res.code(404).send('API endpoint not found: ' + req.url)
   }
 
   if (req.headers.accept?.includes('text/html')) {
