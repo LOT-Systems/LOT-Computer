@@ -1,5 +1,5 @@
 import React from 'react'
-import { Block, Button } from '#client/components/ui'
+import { Block, Button, Table } from '#client/components/ui'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 
@@ -14,12 +14,12 @@ export function ApiPage() {
   // Require authentication
   if (!me) {
     return (
-      <div className="space-y-8">
+      <div className="flex flex-col gap-y-16">
         <Block label="Authentication Required" blockView>
-          <div className="space-y-4">
-            <p className="opacity-75">
+          <div className="flex flex-col gap-y-16">
+            <div className="opacity-75">
               Please log in to access the API documentation and export your data.
-            </p>
+            </div>
             <Button onClick={() => stores.goTo('system')}>
               Go to Home
             </Button>
@@ -28,6 +28,34 @@ export function ApiPage() {
       </div>
     )
   }
+
+  // API endpoints data for table
+  const apiEndpoints = [
+    {
+      method: 'GET',
+      endpoint: '/api/export/training-data',
+      description: 'Complete dataset for AI training',
+      format: 'JSON'
+    },
+    {
+      method: 'GET',
+      endpoint: '/api/export/emotional-checkins',
+      description: 'Mood and emotional check-in history',
+      format: 'CSV'
+    },
+    {
+      method: 'GET',
+      endpoint: '/api/export/self-care',
+      description: 'Self-care activities and habits',
+      format: 'CSV'
+    },
+    {
+      method: 'GET',
+      endpoint: '/api/export/all-logs',
+      description: 'Complete activity log',
+      format: 'CSV'
+    }
+  ]
 
   const handleExportTrainingData = async () => {
     setExportStatus('loading')
@@ -57,23 +85,17 @@ export function ApiPage() {
   }
 
   return (
-    <div className="space-y-8">
-
-      <Block label="API Documentation" blockView>
-        <div className="space-y-6">
-          <h2 className="text-lg mb-4">Export Your Data for AI Training</h2>
-          <p className="opacity-75">
-            LOT tracks your psychological patterns, quantum intent signals, and behavioral data.
-            Export this data to train humanoid robots, autonomous vehicles, or personal AI assistants.
-          </p>
-        </div>
-      </Block>
+    <div className="flex flex-col gap-y-16">
+      <div>
+        <div>Export your psychological data and quantum intent for AI training.</div>
+        <div>LOT tracks your patterns to train humanoid robots, autonomous vehicles, or personal AI assistants.</div>
+      </div>
 
       <Block label="Export Training Data" blockView>
-        <div className="space-y-6">
-          <p className="opacity-75">
+        <div className="flex flex-col gap-y-16">
+          <div className="opacity-75">
             Download your complete psychological and quantum intent data as a structured JSON file.
-          </p>
+          </div>
 
           <Button
             onClick={handleExportTrainingData}
@@ -86,7 +108,7 @@ export function ApiPage() {
           </Button>
 
           {lastExport && (
-            <div className="text-sm opacity-60">
+            <div className="opacity-60">
               Last export: {lastExport}
             </div>
           )}
@@ -94,62 +116,51 @@ export function ApiPage() {
       </Block>
 
       <Block label="What's Included" blockView>
-        <ul className="space-y-2 opacity-75">
-          <li>• Quantum Intent Signals (energy, clarity, alignment, needs support)</li>
-          <li>• Emotional Patterns (mood check-ins, emotional states)</li>
-          <li>• Behavioral Data (self-care activities, habits)</li>
-          <li>• Memory Questions & Answers</li>
-          <li>• Goal & Progress Tracking</li>
-        </ul>
+        <div className="flex flex-col gap-y-6 opacity-75">
+          <div>• Quantum Intent Signals (energy, clarity, alignment, needs support)</div>
+          <div>• Emotional Patterns (mood check-ins, emotional states)</div>
+          <div>• Behavioral Data (self-care activities, habits)</div>
+          <div>• Memory Questions & Answers</div>
+          <div>• Goal & Progress Tracking</div>
+        </div>
       </Block>
 
       <Block label="Use Cases" blockView>
-        <ul className="space-y-2 opacity-75">
-          <li>• Train humanoid companions to recognize your emotional states</li>
-          <li>• Configure autonomous vehicles based on your preferences</li>
-          <li>• Build personalized AI assistants</li>
-          <li>• Research on human behavior patterns</li>
-        </ul>
+        <div className="flex flex-col gap-y-6 opacity-75">
+          <div>• Train humanoid companions to recognize your emotional states</div>
+          <div>• Configure autonomous vehicles based on your preferences</div>
+          <div>• Build personalized AI assistants</div>
+          <div>• Research on human behavior patterns</div>
+        </div>
       </Block>
 
       <Block label="API Endpoints" blockView>
-        <div className="space-y-4">
-          <div className="border border-acc-400/30 rounded p-4">
-            <div className="font-mono text-sm mb-2">
-              <span className="text-green">GET</span> /api/export/training-data
-            </div>
-            <div className="text-sm opacity-75">
-              Complete dataset for AI training (JSON format)
-            </div>
-          </div>
-
-          <div className="border border-acc-400/30 rounded p-4">
-            <div className="font-mono text-sm mb-2">
-              <span className="text-green">GET</span> /api/export/emotional-checkins
-            </div>
-            <div className="text-sm opacity-75">
-              Mood and emotional check-in history (CSV format)
-            </div>
-          </div>
-
-          <div className="border border-acc-400/30 rounded p-4">
-            <div className="font-mono text-sm mb-2">
-              <span className="text-green">GET</span> /api/export/self-care
-            </div>
-            <div className="text-sm opacity-75">
-              Self-care activities and habits (CSV format)
-            </div>
-          </div>
-
-          <div className="border border-acc-400/30 rounded p-4">
-            <div className="font-mono text-sm mb-2">
-              <span className="text-green">GET</span> /api/export/all-logs
-            </div>
-            <div className="text-sm opacity-75">
-              Complete activity log (CSV format)
-            </div>
-          </div>
-        </div>
+        <Table
+          data={apiEndpoints}
+          columns={[
+            {
+              id: 'method',
+              header: 'Method',
+              accessor: (row) => <span className="text-green">{row.method}</span>
+            },
+            {
+              id: 'endpoint',
+              header: 'Endpoint',
+              accessor: (row) => <span className="font-mono">{row.endpoint}</span>
+            },
+            {
+              id: 'description',
+              header: 'Description',
+              accessor: (row) => <span className="opacity-75">{row.description}</span>
+            },
+            {
+              id: 'format',
+              header: 'Format',
+              accessor: (row) => row.format
+            }
+          ]}
+          paddingClassName="p-8"
+        />
       </Block>
     </div>
   )
