@@ -1,13 +1,13 @@
 import dayjs from '#client/utils/dayjs'
 
 /**
- * Cleanness Narrative - Context and time-aware language
+ * Cleanness Narrative – Context and time-aware language
  *
  * Provides simple, purposeful narrative elements based on:
- * - Time of day (morning, afternoon, evening, night)
- * - Day of week (weekday vs weekend)
- * - Season
- * - User context (energy, patterns, activity)
+ * – Time of day (morning, afternoon, evening, night)
+ * – Day of week (weekday vs weekend)
+ * – Season
+ * – User context (energy, patterns, activity)
  */
 
 export type TimeOfDay = 'early_morning' | 'morning' | 'midday' | 'afternoon' | 'evening' | 'night' | 'late_night'

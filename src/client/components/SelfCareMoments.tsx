@@ -16,7 +16,7 @@ type CareSuggestion = {
 }
 
 /**
- * Self-care Moments Widget - Context-aware recommendations
+ * Self-care Moments Widget – Context-aware recommendations
  * Pattern: Suggestion > Why This > Practice
  * Adapts based on: emotional state, weather, archetype, time
  */
@@ -358,7 +358,7 @@ function generateContextualSuggestion(
         duration: '10 mins'
       })
     } else if ((weatherLower.includes('sun') || weatherLower.includes('clear')) && hour >= 6 && hour < 19) {
-      // Only suggest sunlight during daylight hours (6 AM - 7 PM)
+      // Only suggest sunlight during daylight hours (6 AM – 7 PM)
       suggestions.push({
         action: 'Step outside and get sunlight',
         why: 'Sunlight regulates your circadian rhythm and boosts mood.',
@@ -373,7 +373,7 @@ function generateContextualSuggestion(
     if (['anxious', 'overwhelmed', 'restless'].includes(dominantMood)) {
       suggestions.push(
         {
-          action: 'Practice 4-7-8 breathing to calm your nervous system',
+          action: 'Run breathing protocol to reset nervous system',
           why: 'You\'ve been experiencing tension. This activates your parasympathetic nervous system.',
           practice: 'Breathe in for 4 counts.\nHold for 7 counts.\nExhale slowly for 8 counts.\nRepeat 4 times.',
           duration: '2 mins'
@@ -391,7 +391,7 @@ function generateContextualSuggestion(
           duration: '3 mins'
         },
         {
-          action: 'Ground yourself with the 5-4-3-2-1 technique',
+          action: 'Run grounding sequence: 5–4–3–2–1 sensory scan',
           why: 'Overwhelm pulls you from the present. Grounding brings you back.',
           practice: 'Name 5 things you see.\n4 things you can touch.\n3 things you hear.\n2 things you smell.\n1 thing you taste.',
           duration: '3 mins'
@@ -406,7 +406,7 @@ function generateContextualSuggestion(
     } else if (['tired', 'exhausted'].includes(dominantMood)) {
       suggestions.push(
         {
-          action: 'Take a power rest (not nap)',
+          action: 'Initialize power rest cycle (not nap)',
           why: 'Your body is asking for restoration. Short rest can restore energy.',
           practice: 'Lie down comfortably.\nClose your eyes.\nDon\'t try to sleep.\nJust let your body rest.\nSet a timer for 10 minutes.',
           duration: '10 mins'
@@ -544,7 +544,7 @@ function generateContextualSuggestion(
         duration: '2 mins'
       },
       {
-        action: 'Morning space clearing: clean one surface',
+        action: 'Clear cache: clean one surface',
         why: 'Clean space creates mental clarity. One clear surface changes the energy.',
         practice: 'Choose one surface (desk, counter, nightstand).\nClear everything off.\nWipe it clean.\nPlace back only what serves you.\nNotice the clarity.',
         duration: '5 mins'
@@ -565,7 +565,7 @@ function generateContextualSuggestion(
   } else if (hour >= 12 && hour < 14) {
     suggestions.push(
       {
-        action: 'Midday reset: pause and recalibrate',
+        action: 'Execute midday reset: pause and recalibrate systems',
         why: 'Midday is when we lose ourselves in doing. Pausing restores awareness.',
         practice: 'Stop what you\'re doing.\nClose your eyes.\nAsk: "What do I need right now?"\nListen for the answer.\nGive yourself that one thing.',
         duration: '3 mins'
@@ -598,7 +598,7 @@ function generateContextualSuggestion(
         duration: '2 mins'
       },
       {
-        action: 'Body scan to transition from day to night',
+        action: 'Run body scan: head to toes diagnostic',
         why: 'Your body holds the day\'s stress. Releasing it prepares you for rest.',
         practice: 'Lie down or sit comfortably.\nClose your eyes.\nScan from head to toes.\nWhere is tension?\nBreathe into those places.',
         duration: '5 mins'
