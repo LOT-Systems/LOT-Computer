@@ -1344,7 +1344,6 @@ export default async (fastify: FastifyInstance) => {
       `)
     }
   })
-}
   // One-step migration fix and execution (mobile-friendly)
   fastify.get('/fix-and-run-migrations', async (req, reply) => {
     const log: string[] = []
