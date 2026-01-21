@@ -20,7 +20,7 @@ export const Table = <D,>(props: Props<D>) => {
   return (
     <div className={cn('_table relative', props.className)}>
       <div className={cn('_table-wrapper', props.paddingClassName)}>
-        <table className="overflow-hidden border border-acc-400/30">
+        <table className="overflow-hidden border border-acc-400/30 rounded-lg">
           {!props.hideHeader && (
             <thead>
               <tr>
@@ -59,7 +59,7 @@ export const Td: React.FC<{ children: ReactEl; className?: string }> = (
   props
 ) => {
   return (
-    <td className={cn('border-b border-r border-acc-400/30', props.className)}>
+    <td className={cn('border-b border-r border-acc-400/30 hover:bg-acc-400/10 transition-colors', props.className)}>
       {props.children}
     </td>
   )
