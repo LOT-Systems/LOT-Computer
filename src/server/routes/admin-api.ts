@@ -1060,7 +1060,13 @@ export default async (fastify: FastifyInstance) => {
 
       // Create context with sequelize instance for migrations
       const context = fastify.sequelize.getQueryInterface()
-      context.sequelize = fastify.sequelize
+      // Use Object.defineProperty to ensure the property is set correctly
+      Object.defineProperty(context, 'sequelize', {
+        value: fastify.sequelize,
+        writable: true,
+        enumerable: true,
+        configurable: true
+      })
 
       const umzug = new Umzug({
         migrations: { glob: MIGRATIONS_PATH + '/*.cjs' },
@@ -1405,7 +1411,13 @@ export default async (fastify: FastifyInstance) => {
 
       // Create context with sequelize instance for migrations
       const context = fastify.sequelize.getQueryInterface()
-      context.sequelize = fastify.sequelize
+      // Use Object.defineProperty to ensure the property is set correctly
+      Object.defineProperty(context, 'sequelize', {
+        value: fastify.sequelize,
+        writable: true,
+        enumerable: true,
+        configurable: true
+      })
 
       const umzug = new Umzug({
         migrations: { glob: MIGRATIONS_PATH + '/*.cjs' },
