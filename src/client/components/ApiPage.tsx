@@ -10,7 +10,6 @@ export function ApiPage() {
   const me = useStore(stores.me)
   const [exportStatus, setExportStatus] = React.useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [lastExport, setLastExport] = React.useState<string | null>(null)
-  const [selectedRowIndex, setSelectedRowIndex] = React.useState(0)
 
   // Require authentication
   if (!me) {
@@ -142,12 +141,12 @@ export function ApiPage() {
             {
               id: 'method',
               header: 'Method',
-              accessor: (row) => <span className="text-green">{row.method}</span>
+              accessor: (row) => <span className="text-green opacity-75">{row.method}</span>
             },
             {
               id: 'endpoint',
               header: 'Endpoint',
-              accessor: (row) => <span className="font-mono">{row.endpoint}</span>
+              accessor: (row) => <span className="font-mono opacity-75">{row.endpoint}</span>
             },
             {
               id: 'description',
@@ -157,12 +156,11 @@ export function ApiPage() {
             {
               id: 'format',
               header: 'Format',
-              accessor: (row) => row.format
+              accessor: (row) => <span className="opacity-75">{row.format}</span>
             }
           ]}
           paddingClassName="p-8"
-          selectedRowIndex={selectedRowIndex}
-          onRowClick={(index) => setSelectedRowIndex(index)}
+          highlightFirstRow
         />
       </Block>
     </div>

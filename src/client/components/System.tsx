@@ -7,6 +7,7 @@ import {
   Clock,
   Tag,
   TagsContainer,
+  Table,
 } from '#client/components/ui'
 import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
@@ -65,6 +66,7 @@ export const System = () => {
   const [showWeatherSuggestion, setShowWeatherSuggestion] = React.useState(false)
   const [isSoundToggling, setIsSoundToggling] = React.useState(false)
   const [showSharedEmotion, setShowSharedEmotion] = React.useState(false)
+  const [selectedQuantumCell, setSelectedQuantumCell] = React.useState(0)
 
   // Compute whether to show sunset or sunrise based on current time
   // Show sunset during daytime (between sunrise and sunset)
@@ -373,11 +375,28 @@ export const System = () => {
               <div>{profile?.behavioralCohort || 'Growing'} • {profile?.emotionalPatterns?.[0] || 'Exploring patterns'}</div>
             </div>
           ) : (
-            <div className="inline-block">
-              <div className="capitalize">
-                {quantumState.energy} energy • {quantumState.clarity} clarity • {quantumState.alignment} alignment
-              </div>
-            </div>
+            <Table
+              data={[
+                { metric: 'Energy', value: quantumState.energy },
+                { metric: 'Clarity', value: quantumState.clarity },
+                { metric: 'Alignment', value: quantumState.alignment }
+              ]}
+              columns={[
+                {
+                  id: 'metric',
+                  header: 'Metric',
+                  accessor: (row) => <span className="capitalize">{row.metric}</span>
+                },
+                {
+                  id: 'value',
+                  header: 'Value',
+                  accessor: (row) => <span className="capitalize">{row.value}</span>
+                }
+              ]}
+              paddingClassName="p-8"
+              selectedRowIndex={selectedQuantumCell}
+              onRowClick={(index) => setSelectedQuantumCell(index)}
+            />
           )}
         </Block>
       </div>
