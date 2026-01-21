@@ -43,6 +43,7 @@ export class User
       'phone',
       'tags',
       'hideActivityLogs',
+      'timeChime',
     ])(this.toJSON())
 
     // Add memory engine status based on tags

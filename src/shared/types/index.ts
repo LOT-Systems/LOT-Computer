@@ -61,6 +61,7 @@ export type UserProfile = {
   phone: string | null;
   tags: string[];
   hideActivityLogs: boolean;
+  timeChime?: boolean;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
 };
@@ -78,6 +79,7 @@ export type User = {
   phone: string | null;
   timeZone: string | null;
   hideActivityLogs: boolean;
+  timeChime?: boolean;
   tags: string[];
   lastSeenAt: Date | null;
   joinedAt: Date | null;
