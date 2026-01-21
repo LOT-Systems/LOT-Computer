@@ -15,6 +15,8 @@ interface Props<Datum> {
   paddingClassName?: string
   hideHeader?: boolean
   highlightFirstRow?: boolean
+  selectedRowIndex?: number
+  onRowClick?: (index: number) => void
 }
 
 export const Table = <D,>(props: Props<D>) => {
@@ -32,13 +34,27 @@ export const Table = <D,>(props: Props<D>) => {
             </thead>
           )}
           <tbody>
-            {props.data.map((d: D, i) => (
-              <tr key={i} className={cn(props.highlightFirstRow && i === 0 && 'bg-acc-400/10')}>
-                {props.columns.map((c) => (
-                  <Td key={c.id}>{c.accessor(d)}</Td>
-                ))}
-              </tr>
-            ))}
+            {props.data.map((d: D, i) => {
+              const isSelected = props.selectedRowIndex !== undefined
+                ? i === props.selectedRowIndex
+                : props.highlightFirstRow && i === 0
+              const isClickable = props.onRowClick !== undefined
+
+              return (
+                <tr
+                  key={i}
+                  className={cn(
+                    isSelected && 'bg-acc-400/10',
+                    isClickable && 'cursor-pointer'
+                  )}
+                  onClick={() => props.onRowClick?.(i)}
+                >
+                  {props.columns.map((c) => (
+                    <Td key={c.id}>{c.accessor(d)}</Td>
+                  ))}
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
