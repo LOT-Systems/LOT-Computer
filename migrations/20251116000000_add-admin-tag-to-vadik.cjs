@@ -8,7 +8,7 @@
  */
 
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up({ context: queryInterface }) {
     console.log('🔧 Adding Admin tag to vadikmarmeladov@gmail.com...')
 
     try {
@@ -53,7 +53,7 @@ module.exports = {
     }
   },
 
-  async down(queryInterface, Sequelize) {
+  async down({ context: queryInterface }) {
     console.log('🔄 Removing Admin tag from vadikmarmeladov@gmail.com...')
 
     try {
