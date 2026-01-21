@@ -10,6 +10,7 @@ export function ApiPage() {
   const me = useStore(stores.me)
   const [exportStatus, setExportStatus] = React.useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [lastExport, setLastExport] = React.useState<string | null>(null)
+  const [selectedRowIndex, setSelectedRowIndex] = React.useState(0)
 
   // Require authentication
   if (!me) {
@@ -160,7 +161,8 @@ export function ApiPage() {
             }
           ]}
           paddingClassName="p-8"
-          highlightFirstRow
+          selectedRowIndex={selectedRowIndex}
+          onRowClick={(index) => setSelectedRowIndex(index)}
         />
       </Block>
     </div>
