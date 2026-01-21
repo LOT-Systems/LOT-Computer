@@ -7,12 +7,27 @@ import * as stores from '#client/stores'
  * API Page - Export psychological data and quantum intent for AI training
  */
 export function ApiPage() {
-  console.log('[ApiPage] Rendering API page')
   const me = useStore(stores.me)
   const [exportStatus, setExportStatus] = React.useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [lastExport, setLastExport] = React.useState<string | null>(null)
 
-  console.log('[ApiPage] Component state:', { exportStatus, lastExport, hasUser: !!me })
+  // Require authentication
+  if (!me) {
+    return (
+      <div className="space-y-8">
+        <Block label="Authentication Required" blockView>
+          <div className="space-y-4">
+            <p className="opacity-75">
+              Please log in to access the API documentation and export your data.
+            </p>
+            <Button onClick={() => stores.goTo('system')}>
+              Go to Home
+            </Button>
+          </div>
+        </Block>
+      </div>
+    )
+  }
 
   const handleExportTrainingData = async () => {
     setExportStatus('loading')
@@ -43,10 +58,6 @@ export function ApiPage() {
 
   return (
     <div className="space-y-8">
-      {/* Debug test div */}
-      <div style={{ padding: '20px', background: '#ff000020', border: '2px solid red' }}>
-        🔍 API Page Test Render - If you see this, React is rendering
-      </div>
 
       <Block label="API Documentation" blockView>
         <div className="space-y-6">
