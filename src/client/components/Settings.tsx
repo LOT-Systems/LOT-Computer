@@ -135,14 +135,28 @@ export const Settings = () => {
     setChanged(true)
   }, [])
 
-  const onToggleTimeChime = React.useCallback(() => {
-    setState((state) => ({
-      ...state,
-      timeChime: !state.timeChime,
+  const onToggleTimeChime = React.useCallback(async () => {
+    const newValue = !state.timeChime
+    setState((prevState) => ({
+      ...prevState,
+      timeChime: newValue,
     }))
-    stores.isTimeChimeEnabled.set(!isTimeChimeEnabled)
-    setChanged(true)
-  }, [isTimeChimeEnabled])
+    stores.isTimeChimeEnabled.set(newValue)
+
+    // Save immediately to database
+    try {
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...state,
+          timeChime: newValue
+        }),
+      })
+    } catch (error) {
+      console.error('Failed to save timeChime setting:', error)
+    }
+  }, [state])
 
   // Privacy settings handlers
   const onTogglePrivacy = React.useCallback((field: keyof Omit<UserPrivacySettings, 'customUrl'>) => {
