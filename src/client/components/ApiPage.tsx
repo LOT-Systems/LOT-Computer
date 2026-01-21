@@ -105,7 +105,7 @@ export function ApiPage() {
         <div className="space-y-4">
           <div className="border border-acc-400/30 rounded p-4">
             <div className="font-mono text-sm mb-2">
-              <span className="text-green-500">GET</span> /api/export/training-data
+              <span className="text-green">GET</span> /api/export/training-data
             </div>
             <div className="text-sm opacity-75">
               Complete dataset for AI training (JSON format)
@@ -114,7 +114,7 @@ export function ApiPage() {
 
           <div className="border border-acc-400/30 rounded p-4">
             <div className="font-mono text-sm mb-2">
-              <span className="text-green-500">GET</span> /api/export/emotional-checkins
+              <span className="text-green">GET</span> /api/export/emotional-checkins
             </div>
             <div className="text-sm opacity-75">
               Mood and emotional check-in history (CSV format)
@@ -123,7 +123,7 @@ export function ApiPage() {
 
           <div className="border border-acc-400/30 rounded p-4">
             <div className="font-mono text-sm mb-2">
-              <span className="text-green-500">GET</span> /api/export/self-care
+              <span className="text-green">GET</span> /api/export/self-care
             </div>
             <div className="text-sm opacity-75">
               Self-care activities and habits (CSV format)
@@ -132,7 +132,7 @@ export function ApiPage() {
 
           <div className="border border-acc-400/30 rounded p-4">
             <div className="font-mono text-sm mb-2">
-              <span className="text-green-500">GET</span> /api/export/all-logs
+              <span className="text-green">GET</span> /api/export/all-logs
             </div>
             <div className="text-sm opacity-75">
               Complete activity log (CSV format)
