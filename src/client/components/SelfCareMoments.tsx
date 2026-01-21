@@ -125,12 +125,14 @@ export function SelfCareMoments() {
     const suggestion = generateContextualSuggestion(
       weather?.description,
       profile?.archetype,
-      checkInsData?.stats.dominantMood
+      checkInsData?.stats.dominantMood,
+      currentStreak,
+      false
     )
     setCurrentSuggestion(suggestion)
     // Fade in on mount
     setTimeout(() => setIsShown(true), 100)
-  }, [weather?.description, profile?.archetype, checkInsData?.stats.dominantMood])
+  }, [weather?.description, profile?.archetype, checkInsData?.stats.dominantMood, currentStreak])
 
   const cycleView = () => {
     setView(prev => {
@@ -159,6 +161,7 @@ export function SelfCareMoments() {
       weather?.description,
       profile?.archetype,
       checkInsData?.stats.dominantMood,
+      currentStreak,
       true // Force different suggestion
     )
     setCurrentSuggestion(suggestion)
@@ -335,17 +338,26 @@ export function SelfCareMoments() {
 
 /**
  * Generate contextual care suggestion based on multiple factors
+ * Language adapts based on user's practice level (streak)
  */
 function generateContextualSuggestion(
   weatherDesc?: string,
   archetype?: string,
   dominantMood?: string,
+  streak: number = 0,
   forceNew: boolean = false
 ): CareSuggestion {
   const suggestions: CareSuggestion[] = []
 
   // Get current hour for time-aware suggestions
   const hour = new Date().getHours()
+
+  // Determine language style based on badge progression
+  // 7+ days: Mix technical and natural
+  // 30+ days: More technical/systems language
+  // 100+ days: Full technical mastery
+  const useTechLanguage = streak >= 7 && Math.random() > 0.5 // 50/50 mix at 7+
+  const preferTechLanguage = streak >= 30 // Prefer technical at 30+
 
   // Weather-based suggestions (time-aware)
   if (weatherDesc) {
@@ -373,7 +385,7 @@ function generateContextualSuggestion(
     if (['anxious', 'overwhelmed', 'restless'].includes(dominantMood)) {
       suggestions.push(
         {
-          action: 'Run breathing protocol to reset nervous system',
+          action: useTechLanguage || preferTechLanguage ? 'Run breathing protocol to reset nervous system' : 'Practice 4–7–8 breathing to calm your nervous system',
           why: 'You\'ve been experiencing tension. This activates your parasympathetic nervous system.',
           practice: 'Breathe in for 4 counts.\nHold for 7 counts.\nExhale slowly for 8 counts.\nRepeat 4 times.',
           duration: '2 mins'
@@ -391,7 +403,7 @@ function generateContextualSuggestion(
           duration: '3 mins'
         },
         {
-          action: 'Run grounding sequence: 5–4–3–2–1 sensory scan',
+          action: useTechLanguage || preferTechLanguage ? 'Run grounding sequence: 5–4–3–2–1 sensory scan' : 'Ground yourself with the 5–4–3–2–1 technique',
           why: 'Overwhelm pulls you from the present. Grounding brings you back.',
           practice: 'Name 5 things you see.\n4 things you can touch.\n3 things you hear.\n2 things you smell.\n1 thing you taste.',
           duration: '3 mins'
@@ -406,7 +418,7 @@ function generateContextualSuggestion(
     } else if (['tired', 'exhausted'].includes(dominantMood)) {
       suggestions.push(
         {
-          action: 'Initialize power rest cycle (not nap)',
+          action: useTechLanguage || preferTechLanguage ? 'Initialize power rest cycle (not nap)' : 'Take a power rest (not nap)',
           why: 'Your body is asking for restoration. Short rest can restore energy.',
           practice: 'Lie down comfortably.\nClose your eyes.\nDon\'t try to sleep.\nJust let your body rest.\nSet a timer for 10 minutes.',
           duration: '10 mins'
@@ -544,7 +556,7 @@ function generateContextualSuggestion(
         duration: '2 mins'
       },
       {
-        action: 'Clear cache: clean one surface',
+        action: useTechLanguage || preferTechLanguage ? 'Clear cache: clean one surface' : 'Morning space clearing: clean one surface',
         why: 'Clean space creates mental clarity. One clear surface changes the energy.',
         practice: 'Choose one surface (desk, counter, nightstand).\nClear everything off.\nWipe it clean.\nPlace back only what serves you.\nNotice the clarity.',
         duration: '5 mins'
@@ -565,7 +577,7 @@ function generateContextualSuggestion(
   } else if (hour >= 12 && hour < 14) {
     suggestions.push(
       {
-        action: 'Execute midday reset: pause and recalibrate systems',
+        action: useTechLanguage || preferTechLanguage ? 'Execute midday reset: pause and recalibrate systems' : 'Midday reset: pause and recalibrate',
         why: 'Midday is when we lose ourselves in doing. Pausing restores awareness.',
         practice: 'Stop what you\'re doing.\nClose your eyes.\nAsk: "What do I need right now?"\nListen for the answer.\nGive yourself that one thing.',
         duration: '3 mins'
@@ -598,13 +610,13 @@ function generateContextualSuggestion(
         duration: '2 mins'
       },
       {
-        action: 'Run body scan: head to toes diagnostic',
+        action: useTechLanguage || preferTechLanguage ? 'Run body scan: head to toes diagnostic' : 'Body scan to transition from day to night',
         why: 'Your body holds the day\'s stress. Releasing it prepares you for rest.',
         practice: 'Lie down or sit comfortably.\nClose your eyes.\nScan from head to toes.\nWhere is tension?\nBreathe into those places.',
         duration: '5 mins'
       },
       {
-        action: 'Evening space reset: clear what accumulated today',
+        action: useTechLanguage || preferTechLanguage ? 'Clear daily cache: reset your environment' : 'Evening space reset: clear what accumulated today',
         why: 'Physical clutter mirrors mental clutter. Evening clearing creates morning ease.',
         practice: 'Spend 5 minutes resetting your space.\nPut items back where they belong.\nClear one surface.\nPrepare for tomorrow.\nNotice the calm.',
         duration: '5 mins'
