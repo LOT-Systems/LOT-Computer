@@ -1069,8 +1069,17 @@ export default async (fastify: FastifyInstance) => {
       // This is needed because we renamed migration files from .js to .cjs
       console.log('🔧 Checking migration tracking table...')
       try {
+        // Can't UPDATE primary key, so we need to INSERT new records and DELETE old ones
+        await fastify.sequelize.query(`
+          INSERT INTO "SequelizeMeta" (name)
+          SELECT REPLACE(name, '.js', '.cjs')
+          FROM "SequelizeMeta"
+          WHERE name LIKE '%.js'
+          ON CONFLICT (name) DO NOTHING
+        `)
+
         const [results] = await fastify.sequelize.query(
-          "UPDATE \"SequelizeMeta\" SET name = REPLACE(name, '.js', '.cjs') WHERE name LIKE '%.js' RETURNING name"
+          "DELETE FROM \"SequelizeMeta\" WHERE name LIKE '%.js' RETURNING name"
         )
         if (results && results.length > 0) {
           console.log(`✅ Updated ${results.length} migration records from .js to .cjs`)
@@ -1262,8 +1271,17 @@ export default async (fastify: FastifyInstance) => {
       // Update if there are .js records
       let updated = []
       if (oldRecords && oldRecords.length > 0) {
+        // Can't UPDATE primary key, so we need to INSERT new records and DELETE old ones
+        await fastify.sequelize.query(`
+          INSERT INTO "SequelizeMeta" (name)
+          SELECT REPLACE(name, '.js', '.cjs')
+          FROM "SequelizeMeta"
+          WHERE name LIKE '%.js'
+          ON CONFLICT (name) DO NOTHING
+        `)
+
         const [results] = await fastify.sequelize.query(
-          "UPDATE \"SequelizeMeta\" SET name = REPLACE(name, '.js', '.cjs') WHERE name LIKE '%.js' RETURNING name"
+          "DELETE FROM \"SequelizeMeta\" WHERE name LIKE '%.js' RETURNING name"
         )
         updated = results || []
       }
@@ -1358,8 +1376,17 @@ export default async (fastify: FastifyInstance) => {
       log.push(`   Found ${oldRecords.length} records with .js extension`)
 
       if (oldRecords.length > 0) {
+        // Can't UPDATE primary key, so we need to INSERT new records and DELETE old ones
+        await fastify.sequelize.query(`
+          INSERT INTO "SequelizeMeta" (name)
+          SELECT REPLACE(name, '.js', '.cjs')
+          FROM "SequelizeMeta"
+          WHERE name LIKE '%.js'
+          ON CONFLICT (name) DO NOTHING
+        `)
+
         await fastify.sequelize.query(
-          "UPDATE \"SequelizeMeta\" SET name = REPLACE(name, '.js', '.cjs') WHERE name LIKE '%.js'"
+          "DELETE FROM \"SequelizeMeta\" WHERE name LIKE '%.js'"
         )
         log.push(`   ✅ Updated ${oldRecords.length} records to .cjs`)
       } else {
