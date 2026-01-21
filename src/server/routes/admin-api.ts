@@ -1058,11 +1058,9 @@ export default async (fastify: FastifyInstance) => {
       console.log('📁 Migrations path:', MIGRATIONS_PATH)
       console.log('📁 CWD:', CWD)
 
-      // Create context with both QueryInterface methods AND sequelize instance
-      const context = Object.assign(
-        fastify.sequelize.getQueryInterface(),
-        { sequelize: fastify.sequelize }
-      )
+      // Create context with sequelize instance for migrations
+      const context = fastify.sequelize.getQueryInterface()
+      context.sequelize = fastify.sequelize
 
       const umzug = new Umzug({
         migrations: { glob: MIGRATIONS_PATH + '/*.cjs' },
@@ -1405,11 +1403,9 @@ export default async (fastify: FastifyInstance) => {
       const CWD = process.cwd()
       const MIGRATIONS_PATH = path.join(CWD, 'migrations')
 
-      // Create context with both QueryInterface methods AND sequelize instance
-      const context = Object.assign(
-        fastify.sequelize.getQueryInterface(),
-        { sequelize: fastify.sequelize }
-      )
+      // Create context with sequelize instance for migrations
+      const context = fastify.sequelize.getQueryInterface()
+      context.sequelize = fastify.sequelize
 
       const umzug = new Umzug({
         migrations: { glob: MIGRATIONS_PATH + '/*.cjs' },
