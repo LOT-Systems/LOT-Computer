@@ -1058,15 +1058,15 @@ export default async (fastify: FastifyInstance) => {
       console.log('📁 Migrations path:', MIGRATIONS_PATH)
       console.log('📁 CWD:', CWD)
 
-      const queryInterface = fastify.sequelize.getQueryInterface()
-      // Ensure queryInterface has sequelize property for migrations that need it
-      if (!queryInterface.sequelize) {
-        (queryInterface as any).sequelize = fastify.sequelize
-      }
+      // Create context with both QueryInterface methods AND sequelize instance
+      const context = Object.assign(
+        fastify.sequelize.getQueryInterface(),
+        { sequelize: fastify.sequelize }
+      )
 
       const umzug = new Umzug({
         migrations: { glob: MIGRATIONS_PATH + '/*.cjs' },
-        context: queryInterface,
+        context,
         storage: new SequelizeStorage({ sequelize: fastify.sequelize }),
         logger: console,
       })
@@ -1405,15 +1405,15 @@ export default async (fastify: FastifyInstance) => {
       const CWD = process.cwd()
       const MIGRATIONS_PATH = path.join(CWD, 'migrations')
 
-      const queryInterface = fastify.sequelize.getQueryInterface()
-      // Ensure queryInterface has sequelize property for migrations that need it
-      if (!queryInterface.sequelize) {
-        (queryInterface as any).sequelize = fastify.sequelize
-      }
+      // Create context with both QueryInterface methods AND sequelize instance
+      const context = Object.assign(
+        fastify.sequelize.getQueryInterface(),
+        { sequelize: fastify.sequelize }
+      )
 
       const umzug = new Umzug({
         migrations: { glob: MIGRATIONS_PATH + '/*.cjs' },
-        context: queryInterface,
+        context,
         storage: new SequelizeStorage({ sequelize: fastify.sequelize }),
         logger: console,
       })
