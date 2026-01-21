@@ -127,6 +127,103 @@ export default async (fastify: FastifyInstance) => {
   // Register User Operating System API routes
   registerOSRoutes(fastify)
 
+  // Admin diagnostic ping endpoint
+  fastify.get('/ping', async (req, reply) => {
+    const hasUsership = req.user.tags.some((t) => t.toLowerCase() === 'usership')
+
+    if (!hasUsership) {
+      return reply.code(403).send({
+        error: 'Access denied',
+        message: 'This endpoint requires usership tag',
+        yourTags: req.user.tags
+      })
+    }
+
+    return reply.type('text/html').send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>API Ping - Working!</title>
+        <style>
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", monospace;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f5f5f5;
+          }
+          .success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+          }
+          h1 {
+            color: #28a745;
+            margin: 0 0 20px 0;
+            font-size: 32px;
+          }
+          .info {
+            background: white;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            text-align: left;
+            font-family: monospace;
+            font-size: 14px;
+          }
+          .links {
+            margin-top: 30px;
+          }
+          a {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 5px;
+            text-decoration: none;
+          }
+          code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #e83e8c;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="success">
+          <h1>✅ API Routes Working!</h1>
+
+          <div class="info">
+            <strong>User:</strong> ${req.user.email}<br>
+            <strong>Tags:</strong> ${req.user.tags.join(', ')}<br>
+            <strong>Timestamp:</strong> ${new Date().toISOString()}<br>
+            <strong>Route:</strong> /api/ping
+          </div>
+
+          <p>This endpoint is accessible! The API routes are working correctly.</p>
+
+          <div class="links">
+            <p><strong>Try accessing admin-api routes by typing these URLs directly:</strong></p>
+            <p>
+              <code>${req.protocol}://${req.hostname}/admin-api/ping</code><br>
+              <code>${req.protocol}://${req.hostname}/admin-api/status</code><br>
+              <code>${req.protocol}://${req.hostname}/admin-api/memory-debug</code>
+            </p>
+          </div>
+
+          <div style="margin-top: 30px;">
+            <a href="/">← Back to Home</a>
+          </div>
+        </div>
+      </body>
+      </html>
+    `)
+  })
+
   fastify.get('/sync', async (req, reply) => {
     // const id = String(Math.ceil(Math.random() * 99)).padStart(2, '0')
     reply.raw.writeHead(200, {
