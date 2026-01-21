@@ -10,6 +10,7 @@ import { Logs } from '#client/components/Logs'
 import { Sync } from '#client/components/Sync'
 import { DirectMessageThread } from '#client/components/DirectMessageThread'
 import { StatusPage } from '#client/components/StatusPage'
+import { ApiPage } from '#client/components/ApiPage'
 import { ConnectionStatus } from '#client/components/ConnectionStatus'
 import { render } from '#client/utils/render'
 import { listenSSE } from '#client/utils/sse'
@@ -135,6 +136,7 @@ const App = () => {
       <Layout>
         {(!router || router.route === 'system') && <System />}
         {router?.route === 'settings' && <Settings />}
+        {router?.route === 'api' && <ApiPage />}
         {router?.route === 'sync' && <Sync />}
         {router?.route === 'dm' && router.params?.userId && (
           <DirectMessageThread userId={router.params.userId} />

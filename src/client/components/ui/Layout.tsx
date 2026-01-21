@@ -28,6 +28,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
           { href: null, label: 'Kids' },
           { href: null, label: 'Home' },
           { href: null, label: null, spacer: true },
+          { href: '/api', label: 'API' },
           { href: '/settings', label: 'Settings' },
         ]
       : [

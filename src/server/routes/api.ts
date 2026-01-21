@@ -1470,6 +1470,125 @@ export default async (fastify: FastifyInstance) => {
     return csv
   })
 
+  // Export complete training dataset for AI (humanoids, cars, personal AI)
+  fastify.get('/export/training-data', async (req, reply) => {
+    console.log(`📦 Training data export requested by user ${req.user.id}`)
+
+    try {
+      // Load all user data for training
+      const [logs, answers, emotionalCheckins] = await Promise.all([
+        fastify.models.Log.findAll({
+          where: { userId: req.user.id },
+          order: [['createdAt', 'DESC']],
+          limit: 1000, // Last 1000 logs
+        }),
+        fastify.models.Answer.findAll({
+          where: { userId: req.user.id },
+          order: [['createdAt', 'DESC']],
+          limit: 500, // Last 500 answers
+        }),
+        fastify.models.Log.findAll({
+          where: {
+            userId: req.user.id,
+            event: 'emotional_checkin'
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 500,
+        })
+      ])
+
+      // Extract quantum states from logs
+      const quantumStates = logs
+        .filter(log => log.metadata?.quantumState)
+        .map(log => ({
+          timestamp: log.createdAt,
+          energy: log.metadata.quantumState.energy,
+          clarity: log.metadata.quantumState.clarity,
+          alignment: log.metadata.quantumState.alignment,
+          needsSupport: log.metadata.quantumState.needsSupport,
+        }))
+
+      // Extract emotional patterns
+      const emotionalPatterns = emotionalCheckins.map(log => ({
+        timestamp: log.createdAt,
+        emotion: log.metadata?.emotion || 'unknown',
+        intensity: log.metadata?.intensity || 5,
+        context: log.text || '',
+      }))
+
+      // Extract behavioral data (self-care activities)
+      const behaviors = logs
+        .filter(log => log.event === 'self_care_complete' || log.event === 'self_care_skip')
+        .map(log => ({
+          timestamp: log.createdAt,
+          activity: log.text?.replace('Self-care completed: ', '').replace('Self-care skipped: ', '') || '',
+          completed: log.event === 'self_care_complete',
+          notes: log.metadata?.notes || '',
+        }))
+
+      // Extract memory Q&A
+      const memoryQA = answers.map(answer => ({
+        question: answer.metadata?.questionText || '',
+        answer: answer.text || '',
+        timestamp: answer.createdAt,
+        options: answer.metadata?.options || [],
+      }))
+
+      // Extract goals and intentions
+      const goals = logs
+        .filter(log => log.event === 'goal_set' || log.event === 'goal_complete')
+        .map(log => ({
+          goal: log.text || '',
+          status: log.event === 'goal_complete' ? 'completed' : 'active',
+          timestamp: log.createdAt,
+        }))
+
+      // Build complete training dataset
+      const trainingData = {
+        user: {
+          id: req.user.id,
+          metadata: {
+            timeZone: req.user.metadata?.timeZone || null,
+            tags: req.user.tags || [],
+          },
+          exportDate: new Date().toISOString(),
+        },
+        quantum_states: quantumStates,
+        emotional_patterns: emotionalPatterns,
+        behaviors: behaviors,
+        memory_qa: memoryQA,
+        goals: goals,
+        statistics: {
+          total_logs: logs.length,
+          total_answers: answers.length,
+          total_quantum_states: quantumStates.length,
+          total_emotional_checkins: emotionalPatterns.length,
+          total_behaviors: behaviors.length,
+          total_goals: goals.length,
+        },
+        metadata: {
+          format_version: '1.0',
+          exported_at: new Date().toISOString(),
+          data_range: {
+            oldest: logs[logs.length - 1]?.createdAt || null,
+            newest: logs[0]?.createdAt || null,
+          },
+          intended_use: 'AI training for humanoid companions, autonomous vehicles, personal assistants',
+        }
+      }
+
+      reply.header('Content-Type', 'application/json')
+      reply.header('Content-Disposition', `attachment; filename="lot-training-data-${dayjs().format('YYYY-MM-DD')}.json"`)
+      return trainingData
+    } catch (error: any) {
+      console.error('❌ Training data export failed:', error)
+      return reply.status(500).send({
+        error: 'Export failed',
+        message: error.message
+      })
+    }
+  })
+
   fastify.get(
     '/memory',
     async (req: FastifyRequest<{ Querystring: {
