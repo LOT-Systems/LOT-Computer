@@ -1741,7 +1741,7 @@ export default async (fastify: FastifyInstance) => {
 
           return question
         } catch (error: any) {
-          console.error('❌ Memory question generation failed:', {
+          console.error('❌ Memory question generation failed, falling back to default questions:', {
             error: error.message,
             stack: error.stack,
             userId: req.user.id,
@@ -1756,12 +1756,22 @@ export default async (fastify: FastifyInstance) => {
             },
             note: 'At least ONE valid API key is required. Visit /api/public/test-ai-engines to diagnose.',
           })
-          // Fall back to default questions on error
+          console.log('↩️  Falling through to default questions after AI failure')
+          // Explicitly continue to default questions block below - do NOT return here
         }
       }
 
+      // ============================================================================
+      // DEFAULT QUESTIONS FALLBACK
+      // Used for non-Usership users OR when AI generation fails
+      // ============================================================================
+      console.log(`📋 Using default questions for user ${req.user.id}`, {
+        reason: hasUsershipTag ? 'AI generation failed' : 'Non-Usership user',
+        hasUsershipTag
+      })
+
       {
-        // Non-Usership users: Use hardcoded questions (WRAPPED FOR SAFETY)
+        // Default questions block (WRAPPED FOR SAFETY)
         try {
           let prevQuestionIds: string[] = []
           try {
