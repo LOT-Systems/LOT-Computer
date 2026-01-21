@@ -53,7 +53,7 @@ export const Settings = () => {
     address: me?.address || '',
     country: me?.country || '',
     hideActivityLogs: me?.hideActivityLogs || false,
-    // timeChime: me?.timeChime ?? false, // Commented out until migration runs
+    timeChime: me?.timeChime ?? false,
   })
 
   // Privacy settings state
@@ -388,10 +388,9 @@ export const Settings = () => {
           <Block label="Activity log:" onChildrenClick={onToggleActivityLogs}>
             {state.hideActivityLogs ? 'Off' : 'On'}
           </Block>
-          {/* Temporarily hidden until migration runs - uncomment after /admin-api/run-migrations */}
-          {/* <Block label="Hourly chime:" onChildrenClick={onToggleTimeChime}>
+          <Block label="Hourly chime:" onChildrenClick={onToggleTimeChime}>
             {state.timeChime ? 'On' : 'Off'}
-          </Block> */}
+          </Block>
         </div>
 
         {/* Data Export Section */}
