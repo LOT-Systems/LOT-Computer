@@ -556,7 +556,7 @@ const LogContainer: React.FC<{
           'relative mb-4 sm:mb-0',
           'sm:absolute sm:top-0 sm:right-0 text-end select-none',
           'transition-opacity',
-          'hidden sm:block opacity-20',
+          'opacity-20',
           'group-hover:opacity-100'
         )}
       >
