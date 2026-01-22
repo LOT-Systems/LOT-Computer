@@ -31,6 +31,7 @@ import { EnergyCapacitor } from './EnergyCapacitor'
 import { NarrativeWidget } from './NarrativeWidget'
 import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
+import { SystemProgressWidget } from './SystemProgressWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
 import { getOptimalWidget, shouldShowWidget, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
@@ -607,6 +608,9 @@ export const System = () => {
       <PlannerWidget />
 
       <MemoryWidget />
+
+      {/* System Progress - Deployment info with feedback */}
+      <SystemProgressWidget />
 
       {/* Real-time Stats Widgets - Show in System page */}
       <IntentionPatterns />
