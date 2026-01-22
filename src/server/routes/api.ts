@@ -3865,4 +3865,132 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       return reply.status(500).send({ error: 'Failed to fetch stats' })
     }
   })
+
+  /**
+   * GET /api/system/deployment-status
+   * System Progress - Latest deployment info with sci-fi terminology
+   */
+  fastify.get('/api/system/deployment-status', async (req, reply) => {
+    if (!req.user) return reply.throw.unauthorized()
+
+    try {
+      // Get current version from package.json or env
+      const version = process.env.APP_VERSION || 'v1.2.1-stable'
+
+      // Determine protocol name based on version features
+      const getProtocolName = (ver: string) => {
+        if (ver.includes('1.2.1')) return 'Quantum Intent Calibration'
+        if (ver.includes('1.2.0')) return 'Memory Engine Synthesis'
+        return 'Neural Pathway Integration'
+      }
+
+      // Latest deployment timestamp (in production, read from deployment log)
+      const deploymentTime = dayjs().subtract(2, 'hours').toISOString()
+
+      // Get status based on deployment time
+      const getStatus = () => {
+        const hoursSinceDeploy = dayjs().diff(dayjs(deploymentTime), 'hours')
+        if (hoursSinceDeploy < 1) return 'integrating'
+        if (hoursSinceDeploy < 24) return 'synchronized'
+        return 'activated'
+      }
+
+      // Features in current version
+      const features = [
+        'API Data Export Protocol',
+        'Hourly Time Chime Resonance',
+        'Quantum Intent Interactive Matrix',
+        'Community Wellness Pulse Monitor',
+        'Memory Engine Neural Analytics',
+        'Growth Milestone Tracking System'
+      ]
+
+      const deployment = {
+        version,
+        timestamp: deploymentTime,
+        protocol: getProtocolName(version),
+        status: getStatus(),
+        features
+      }
+
+      return deployment
+    } catch (error) {
+      console.error('Error fetching deployment status:', error)
+      return reply.status(500).send({ error: 'Failed to fetch deployment status' })
+    }
+  })
+
+  /**
+   * GET /api/system/my-feedback
+   * Get current user's feedback for the active deployment
+   */
+  fastify.get('/api/system/my-feedback', async (req, reply) => {
+    if (!req.user) return reply.throw.unauthorized()
+
+    try {
+      const version = process.env.APP_VERSION || 'v1.2.1-stable'
+
+      // Find user's latest feedback log for this version
+      const feedbackLog = await fastify.models.Log.findOne({
+        where: {
+          userId: req.user.id,
+          event: 'system_feedback',
+          metadata: {
+            version: version
+          }
+        },
+        order: [['createdAt', 'DESC']]
+      })
+
+      if (!feedbackLog || !feedbackLog.metadata?.feedback) {
+        return { feedback: null }
+      }
+
+      return {
+        feedback: feedbackLog.metadata.feedback,
+        timestamp: feedbackLog.createdAt
+      }
+    } catch (error) {
+      console.error('Error fetching feedback:', error)
+      return reply.status(500).send({ error: 'Failed to fetch feedback' })
+    }
+  })
+
+  /**
+   * POST /api/system/submit-feedback
+   * Submit system feedback for current deployment
+   */
+  fastify.post<{
+    Body: {
+      version: string
+      feedback: 'operational' | 'resonating' | 'needs-calibration' | 'evolving'
+    }
+  }>('/api/system/submit-feedback', async (req, reply) => {
+    if (!req.user) return reply.throw.unauthorized()
+
+    const { version, feedback } = req.body
+
+    if (!version || !feedback) {
+      return reply.status(400).send({ error: 'Missing version or feedback' })
+    }
+
+    try {
+      // Log feedback
+      await fastify.models.Log.create({
+        userId: req.user.id,
+        event: 'system_feedback',
+        text: `System feedback: ${feedback}`,
+        metadata: {
+          version,
+          feedback,
+          timestamp: Date.now()
+        }
+      })
+
+      return { success: true }
+    } catch (error) {
+      console.error('Error submitting feedback:', error)
+      return reply.status(500).send({ error: 'Failed to submit feedback' })
+    }
+  })
 }

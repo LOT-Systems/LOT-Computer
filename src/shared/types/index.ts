@@ -103,6 +103,7 @@ export type LogEvent =
   | 'weather_update'
   | 'note'
   | 'emotional_checkin'
+  | 'system_feedback'
   | 'other';
 
 // Emotional Check-in Types
