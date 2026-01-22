@@ -34,7 +34,7 @@ import { ChatCatalystWidget } from './ChatCatalystWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
 import { getOptimalWidget, shouldShowWidget, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
-import { CollectiveConsciousness, WellnessPulse, MemoryEngineStats, IntentionPatterns } from './stats'
+import { CollectiveConsciousness, WellnessPulse, MemoryEngineStats, IntentionPatterns, BadgeUnlockFeed, GrowthMilestones } from './stats'
 
 export const System = () => {
   const me = useStore(stores.me)
@@ -613,6 +613,8 @@ export const System = () => {
       <CollectiveConsciousness />
       <WellnessPulse />
       <MemoryEngineStats />
+      <GrowthMilestones />
+      <BadgeUnlockFeed />
     </div>
   )
 }
