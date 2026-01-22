@@ -32,6 +32,7 @@ import { NarrativeWidget } from './NarrativeWidget'
 import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
 import { SystemProgressWidget } from './SystemProgressWidget'
+import { SystemPulseWidget } from './SystemPulseWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
 import { getOptimalWidget, shouldShowWidget, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
@@ -611,6 +612,9 @@ export const System = () => {
 
       {/* System Progress - Deployment info with feedback */}
       <SystemProgressWidget />
+
+      {/* System Pulse - Ultra-fast live activity metrics */}
+      <SystemPulseWidget />
 
       {/* Real-time Stats Widgets - Show in System page */}
       <IntentionPatterns />

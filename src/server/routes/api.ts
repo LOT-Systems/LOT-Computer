@@ -3993,4 +3993,71 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       return reply.status(500).send({ error: 'Failed to submit feedback' })
     }
   })
+
+  /**
+   * GET /api/system/pulse
+   * Ultra-fast real-time system activity metrics
+   * Updates every second with live stats
+   */
+  fastify.get('/api/system/pulse', async (req, reply) => {
+    if (!req.user) return reply.throw.unauthorized()
+
+    try {
+      const now = dayjs()
+      const oneMinuteAgo = now.subtract(1, 'minute').toDate()
+      const fiveMinutesAgo = now.subtract(5, 'minutes').toDate()
+
+      // Events in last minute (rapid change)
+      const recentEvents = await fastify.models.Log.count({
+        where: {
+          createdAt: { [Op.gte]: oneMinuteAgo }
+        }
+      })
+
+      // Events in last 5 minutes for smoothing
+      const recentEventsSmoothed = await fastify.models.Log.count({
+        where: {
+          createdAt: { [Op.gte]: fiveMinutesAgo }
+        }
+      })
+
+      // Calculate events per minute (with some smoothing)
+      const eventsPerMinute = recentEvents + Math.floor(recentEventsSmoothed / 5)
+
+      // Quantum flux - based on activity variance
+      // Simulates the "quantum uncertainty" of the system
+      const baseFlux = 42.0 // Base frequency
+      const activityModifier = (eventsPerMinute / 100) * 30 // 0-30% variance
+      const quantumFlux = Math.min(100, baseFlux + activityModifier + (Math.random() * 10 - 5))
+
+      // Neural activity - total unique users active in last minute
+      const activeUsers = await fastify.models.Log.findAll({
+        where: {
+          createdAt: { [Op.gte]: oneMinuteAgo }
+        },
+        attributes: ['userId'],
+        group: ['userId']
+      })
+      const neuralActivity = activeUsers.length
+
+      // Resonance frequency - based on system harmony
+      // Higher when many users are active and engaged
+      const baseResonance = 432.0 // A = 432 Hz (natural frequency)
+      const resonanceVariance = (neuralActivity * 2) + (Math.random() * 5 - 2.5)
+      const resonanceHz = baseResonance + resonanceVariance
+
+      const pulse = {
+        eventsPerMinute,
+        quantumFlux,
+        neuralActivity,
+        resonanceHz,
+        lastUpdate: Date.now()
+      }
+
+      return pulse
+    } catch (error) {
+      console.error('Error fetching system pulse:', error)
+      return reply.status(500).send({ error: 'Failed to fetch pulse' })
+    }
+  })
 }
