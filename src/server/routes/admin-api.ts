@@ -1765,4 +1765,204 @@ export default async (fastify: FastifyInstance) => {
       `)
     }
   })
+
+  /**
+   * GET /admin-api/widget-diagnostic
+   * Diagnostic endpoint to check why community/stats widgets aren't showing
+   */
+  fastify.get('/widget-diagnostic', async (req, reply) => {
+    if (!req.user) return reply.throw.unauthorized()
+
+    const log: string[] = []
+    log.push('🔍 LOT System Widget Diagnostic')
+    log.push('='.repeat(60))
+    log.push('')
+
+    try {
+      const now = dayjs()
+      const todayStart = now.startOf('day').toDate()
+      const sixHoursAgo = now.subtract(6, 'hours').toDate()
+      const fifteenMinutesAgo = now.subtract(15, 'minutes').toDate()
+
+      // Check IntentionPatterns data
+      log.push('📊 IntentionPatterns Widget')
+      log.push('-'.repeat(60))
+      const intentionLogs = await fastify.models.Log.findAll({
+        where: {
+          event: 'intention',
+          createdAt: { [Op.gte]: sixHoursAgo }
+        }
+      })
+      log.push(`Intention logs (last 6 hours): ${intentionLogs.length}`)
+      if (intentionLogs.length === 0) {
+        log.push('⚠️  NO DATA - Widget will not appear')
+        log.push('   Reason: No intention events logged in last 6 hours')
+      } else {
+        log.push('✅ Widget should appear')
+      }
+      log.push('')
+
+      // Check CollectiveConsciousness data
+      log.push('🌍 CollectiveConsciousness Widget')
+      log.push('-'.repeat(60))
+      const recentLogs = await fastify.models.Log.findAll({
+        where: {
+          createdAt: { [Op.gte]: fifteenMinutesAgo }
+        },
+        attributes: ['userId'],
+        group: ['userId']
+      })
+      const activeUsers = new Set(recentLogs.map((log: any) => log.userId))
+      log.push(`Active users (last 15 min): ${activeUsers.size}`)
+
+      const intentionsToday = await fastify.models.Log.count({
+        where: {
+          event: 'intention',
+          createdAt: { [Op.gte]: todayStart }
+        }
+      })
+      log.push(`Intentions today: ${intentionsToday}`)
+
+      const careMomentsToday = await fastify.models.Log.count({
+        where: {
+          event: 'self_care',
+          createdAt: { [Op.gte]: todayStart }
+        }
+      })
+      log.push(`Care moments today: ${careMomentsToday}`)
+      log.push('✅ Widget should appear (uses simulated data + real counts)')
+      log.push('')
+
+      // Check WellnessPulse data
+      log.push('💚 WellnessPulse Widget')
+      log.push('-'.repeat(60))
+      const questionsToday = await fastify.models.Answer.count({
+        where: {
+          createdAt: { [Op.gte]: todayStart }
+        }
+      })
+      log.push(`Questions answered today: ${questionsToday}`)
+
+      const emotionalCheckinsToday = await fastify.models.EmotionalCheckIn.count({
+        where: {
+          createdAt: { [Op.gte]: todayStart }
+        }
+      })
+      log.push(`Emotional check-ins today: ${emotionalCheckinsToday}`)
+      log.push(`Active users now: ${activeUsers.size}`)
+      log.push('✅ Widget should appear (uses simulated peak hours + real counts)')
+      log.push('')
+
+      // Check MemoryEngineStats data
+      log.push('🧠 MemoryEngineStats Widget')
+      log.push('-'.repeat(60))
+      const questionsGenerated = await fastify.models.Answer.count({
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: todayStart }
+        }
+      })
+      log.push(`Questions answered by you today: ${questionsGenerated}`)
+      log.push('✅ Widget should appear (uses calculated metrics)')
+      log.push('')
+
+      // Summary
+      log.push('='.repeat(60))
+      log.push('📋 SUMMARY')
+      log.push('-'.repeat(60))
+
+      if (intentionLogs.length === 0) {
+        log.push('⚠️  IntentionPatterns will NOT show (no data)')
+        log.push('   → To fix: Record intention signals via System widgets')
+      } else {
+        log.push('✅ All widgets should appear')
+      }
+
+      log.push('')
+      log.push('💡 TIP: Widgets return null if:')
+      log.push('   1. API is still loading')
+      log.push('   2. API returns error')
+      log.push('   3. No data exists for that widget')
+      log.push('')
+      log.push('🔗 Check these API endpoints directly:')
+      log.push('   • /api/stats/patterns')
+      log.push('   • /api/stats/collective')
+      log.push('   • /api/stats/wellness')
+      log.push('   • /api/stats/memory-engine')
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Widget Diagnostic</title>
+          <style>
+            body {
+              font-family: 'Courier New', monospace;
+              background: #1a1a1a;
+              color: #e0e0e0;
+              padding: 20px;
+              max-width: 900px;
+              margin: 20px auto;
+            }
+            .box {
+              background: #2a2a2a;
+              border: 2px solid #ffc107;
+              padding: 30px;
+              border-radius: 8px;
+            }
+            h1 {
+              color: #ffc107;
+              margin: 0 0 20px 0;
+            }
+            .log {
+              background: #1a1a1a;
+              padding: 20px;
+              border-radius: 4px;
+              white-space: pre-wrap;
+              font-size: 14px;
+              line-height: 1.6;
+            }
+            .btn {
+              display: inline-block;
+              background: #ffc107;
+              color: #1a1a1a;
+              padding: 10px 20px;
+              text-decoration: none;
+              border-radius: 4px;
+              margin-right: 10px;
+              font-weight: bold;
+            }
+            .btn:hover {
+              background: #ffca28;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="box">
+            <h1>🔍 Widget Diagnostic Results</h1>
+            <div class="log">${log.join('\n')}</div>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #ffc107;">
+              <a href="/" class="btn">← Home</a>
+              <a href="/admin-api/status" class="btn">System Status</a>
+              <a href="/admin-api/memory-diagnostic" class="btn">Memory Diagnostic</a>
+            </div>
+          </div>
+        </body>
+        </html>
+      `)
+    } catch (error: any) {
+      log.push('')
+      log.push(`❌ Diagnostic Error: ${error.message}`)
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family: monospace; padding: 20px; max-width: 900px; margin: 20px auto;">
+          <h1 style="color: red;">❌ Diagnostic Failed</h1>
+          <pre style="background: #f5f5f5; padding: 15px;">${log.join('\n')}\n\n${error.stack}</pre>
+        </body>
+        </html>
+      `)
+    }
+  })
 }
