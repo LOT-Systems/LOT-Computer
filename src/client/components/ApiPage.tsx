@@ -91,7 +91,7 @@ export function ApiPage() {
         <div>LOT tracks your patterns to train humanoid robots, autonomous vehicles, or personal AI assistants.</div>
       </div>
 
-      <Block label="Export Training Data" blockView>
+      <Block label="Export Training Data:" blockView>
         <div className="flex flex-col gap-y-16">
           <div className="opacity-75">
             Download your complete psychological and quantum intent data as a structured JSON file.
@@ -115,7 +115,7 @@ export function ApiPage() {
         </div>
       </Block>
 
-      <Block label="What's Included" blockView>
+      <Block label="What's Included:" blockView>
         <div className="flex flex-col gap-y-6 opacity-75">
           <div>• Quantum Intent Signals (energy, clarity, alignment, needs support)</div>
           <div>• Emotional Patterns (mood check-ins, emotional states)</div>
@@ -125,7 +125,7 @@ export function ApiPage() {
         </div>
       </Block>
 
-      <Block label="Use Cases" blockView>
+      <Block label="Use Cases:" blockView>
         <div className="flex flex-col gap-y-6 opacity-75">
           <div>• Train humanoid companions to recognize your emotional states</div>
           <div>• Configure autonomous vehicles based on your preferences</div>
@@ -134,7 +134,7 @@ export function ApiPage() {
         </div>
       </Block>
 
-      <Block label="API Endpoints" blockView>
+      <Block label="API Endpoints:" blockView>
         <Table
           data={apiEndpoints}
           columns={[
