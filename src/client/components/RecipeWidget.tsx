@@ -117,11 +117,11 @@ export const RecipeWidget: React.FC = () => {
 
   const getMealLabel = () => {
     switch (state.mealTime) {
-      case 'breakfast': return 'Breakfast idea'
-      case 'lunch': return 'Lunch idea'
-      case 'dinner': return 'Dinner idea'
-      case 'snack': return 'Snack idea'
-      default: return 'Recipe idea'
+      case 'breakfast': return 'Breakfast idea:'
+      case 'lunch': return 'Lunch idea:'
+      case 'dinner': return 'Dinner idea:'
+      case 'snack': return 'Snack idea:'
+      default: return 'Recipe idea:'
     }
   }
 

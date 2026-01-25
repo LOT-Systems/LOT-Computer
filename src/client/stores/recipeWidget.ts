@@ -11,6 +11,9 @@ type RecipeWidgetState = {
 }
 
 const WIDGET_DURATION = 30 * 60 * 1000 // 30 minutes
+const CHECK_COOLDOWN = 2 * 60 * 1000 // 2 minutes between checks
+
+let lastCheckTime = 0
 
 export const recipeWidget = atom<RecipeWidgetState>({
   isVisible: false,
@@ -23,6 +26,13 @@ export const recipeWidget = atom<RecipeWidgetState>({
 // Check if widget should show (called on System tab mount and periodically)
 export async function checkRecipeWidget() {
   const now = Date.now()
+
+  // Prevent rapid successive checks (e.g., from component re-mounting)
+  if (now - lastCheckTime < CHECK_COOLDOWN) {
+    return
+  }
+  lastCheckTime = now
+
   const state = recipeWidget.get()
 
   // If widget is visible and time is up, hide it
@@ -46,12 +56,18 @@ export async function checkRecipeWidget() {
   if (!mealTime) return // Not a meal time
 
   const today = new Date().toISOString().split('T')[0]
+  const todayMealKey = `${today}-${mealTime}`
+
+  // Check localStorage for persistence across page refreshes
+  const lastShownFromStorage = localStorage.getItem('lastRecipeShown')
 
   // Only show once per meal time per day (with 30% random chance)
-  if (state.lastShownDate === `${today}-${mealTime}`) return
+  if (state.lastShownDate === todayMealKey || lastShownFromStorage === todayMealKey) {
+    return
+  }
 
-  // Random chance to show (30% probability)
-  if (Math.random() > 0.3) return
+  // Random chance to show (60% probability)
+  if (Math.random() > 0.6) return
 
   // Fetch contextual recipe from server
   try {
@@ -61,6 +77,9 @@ export async function checkRecipeWidget() {
     )
 
     const recipe = response.data.recipe
+
+    // Persist to localStorage to prevent duplicates across page refreshes
+    localStorage.setItem('lastRecipeShown', `${today}-${mealTime}`)
 
     // Show the recipe widget!
     recipeWidget.set({

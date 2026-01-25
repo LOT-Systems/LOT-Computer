@@ -19,6 +19,7 @@ export type UserSettings = {
   address: string;
   phone: string;
   hideActivityLogs: boolean;
+  timeChime?: boolean;
 };
 
 export type UserPrivacySettings = {
@@ -60,6 +61,7 @@ export type UserProfile = {
   phone: string | null;
   tags: string[];
   hideActivityLogs: boolean;
+  timeChime?: boolean;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
 };
@@ -77,6 +79,7 @@ export type User = {
   phone: string | null;
   timeZone: string | null;
   hideActivityLogs: boolean;
+  timeChime?: boolean;
   tags: string[];
   lastSeenAt: Date | null;
   joinedAt: Date | null;
@@ -100,6 +103,7 @@ export type LogEvent =
   | 'weather_update'
   | 'note'
   | 'emotional_checkin'
+  | 'system_feedback'
   | 'other';
 
 // Emotional Check-in Types

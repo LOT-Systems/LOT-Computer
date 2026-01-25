@@ -54,13 +54,13 @@ export function getRandomRecipe(mealTime: MealTime): string {
 }
 
 export function getMealTimeForHour(hour: number): MealTime | null {
-  // Breakfast: 6 AM - 10 AM
-  if (hour >= 6 && hour < 10) return 'breakfast'
-  // Lunch: 11 AM - 2 PM
-  if (hour >= 11 && hour < 14) return 'lunch'
-  // Dinner: 5 PM - 8 PM
-  if (hour >= 17 && hour < 20) return 'dinner'
-  // Snack: 8 PM - 11 PM
-  if (hour >= 20 && hour < 23) return 'snack'
+  // Breakfast: 6 AM - 11 AM (expanded to include mid-morning)
+  if (hour >= 6 && hour < 11) return 'breakfast'
+  // Lunch: 11 AM - 3 PM (expanded)
+  if (hour >= 11 && hour < 15) return 'lunch'
+  // Dinner: 4 PM - 9 PM (expanded to include early/late dinner)
+  if (hour >= 16 && hour < 21) return 'dinner'
+  // Snack: 9 PM - midnight (expanded)
+  if (hour >= 21 && hour < 24) return 'snack'
   return null
 }

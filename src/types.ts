@@ -14,6 +14,7 @@ export interface User {
   phone: string | null
   timeZone: string | null
   hideActivityLogs: boolean
+  timeChime?: boolean
 
   tags: UserTag[]
   lastSeenAt: Date | null
@@ -69,6 +70,15 @@ export interface ChatMessageLike {
   userId: string
   messageId: string
   createdAt: string
+}
+
+export interface DirectMessage {
+  id: string
+  senderId: string
+  receiverId: string
+  message: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface WeatherResponse {
@@ -147,6 +157,7 @@ export type UserSettings = Pick<
   | 'address'
   | 'phone'
   | 'hideActivityLogs'
+  | 'timeChime'
 >
 
 export type SyncEvents = {

@@ -24,6 +24,7 @@ import {
 import { toCelsius } from '#shared/utils'
 import { getLogContext } from './logs.js'
 import { aiEngineManager, type EnginePreference } from './ai-engines.js'
+import { extractGoals, type ExtractedGoal } from './goal-understanding.js'
 
 // OpenAI client (for non-Usership users - LEGACY fallback)
 const oai = new OpenAI({
@@ -97,15 +98,7 @@ Please respond with ONLY a valid JSON object in this exact format:
   "options": ["option1", "option2", "option3"]
 }
 
-Make sure the question is personalized, relevant to self-care habits, and the options are 3-4 concise choices.
-
-${context.weatherDescription ? `**WEATHER-AWARE QUESTIONS:**
-The current weather is "${context.weatherDescription}". Consider asking questions that acknowledge this:
-- If rainy/stormy: Ask about indoor comfort, cozy activities, or mood during rainy weather
-- If sunny/clear: Ask about outdoor activities, energy levels, or sun exposure
-- If cloudy/overcast: Ask about indoor vs outdoor preferences, lighting needs
-- If extreme weather (very hot/cold/humid): Ask about coping strategies, comfort needs
-` : ''}`
+Make sure the question is personalized, relevant to self-care habits, and the options are 3-4 concise choices.`
 
     // Execute using whichever engine is available
     const completion = await engine.generateCompletion(fullPrompt, 1024)
@@ -196,7 +189,19 @@ function extractQuestionTopics(questions: string[]): {
   return { dominantTopic: null, topicCount: 0 }
 }
 
-export async function buildPrompt(user: User, logs: Log[], isWeekend: boolean = false): Promise<string> {
+export async function buildPrompt(
+  user: User,
+  logs: Log[],
+  isWeekend: boolean = false,
+  quantumState?: {
+    energy?: string
+    clarity?: string
+    alignment?: string
+    needsSupport?: string
+  }
+): Promise<string> {
+  console.log(`📝 buildPrompt called with ${logs.length} total logs for user ${user.id}`)
+
   const context = await getLogContext(user)
   const localDate = context.timeZone
     ? dayjs().tz(context.timeZone).format('D MMM YYYY, HH:mm')
@@ -216,14 +221,110 @@ export async function buildPrompt(user: User, logs: Log[], isWeekend: boolean = 
     }
   }
 
+  // Quantum state context from client-side intention engine
+  let quantumContext = ''
+  if (quantumState && quantumState.energy && quantumState.energy !== 'unknown') {
+    quantumContext = `\n\n**Quantum State (Real-time user energy from pattern recognition):**
+Their current state: ${quantumState.energy} energy, ${quantumState.clarity} clarity, ${quantumState.alignment} alignment
+Support level: ${quantumState.needsSupport}
+
+**Quantum-Aware Question Guidance:**
+${quantumState.energy === 'depleted' || quantumState.energy === 'low'
+  ? '- User has low energy: Ask gentle, restorative questions about rest, self-care, or small wins'
+  : quantumState.energy === 'high'
+  ? '- User has high energy: Ask expansive questions about goals, creativity, or meaningful action'
+  : '- User has moderate energy: Balanced questions about daily life and growth'}
+
+${quantumState.clarity === 'confused' || quantumState.clarity === 'uncertain'
+  ? '- User lacks clarity: Ask grounding questions to help them notice and understand their state'
+  : quantumState.clarity === 'focused'
+  ? '- User is focused: Ask deeper questions that leverage their current clarity'
+  : ''}
+
+${quantumState.alignment === 'disconnected' || quantumState.alignment === 'searching'
+  ? '- User feels disconnected: Ask questions about values, intentions, or what matters'
+  : quantumState.alignment === 'flowing'
+  ? '- User is in flow: Ask questions that celebrate and deepen this aligned state'
+  : ''}
+
+${quantumState.needsSupport === 'critical' || quantumState.needsSupport === 'moderate'
+  ? '- User needs support: Prioritize compassionate, supportive questions over analytical ones'
+  : ''}
+
+Match your question to their quantum state. The engine recognizes patterns they may not consciously see.`
+  }
+
+  // Goal context - understand what user is working toward
+  const userGoals = extractGoals(user, logs)
+  const activeGoals = userGoals.filter(g => g.state === 'active' || g.state === 'progressing').slice(0, 3)
+
+  let goalContext = ''
+  if (activeGoals.length > 0) {
+    const goalList = activeGoals.map((g, i) => {
+      const progressInfo = g.progressMarkers.length > 0
+        ? ` (${g.journeyStage} stage - ${g.progressMarkers[g.progressMarkers.length - 1].description})`
+        : ` (${g.journeyStage} stage)`
+
+      return `${i + 1}. ${g.title}${progressInfo}`
+    }).join('\n')
+
+    const primaryGoal = activeGoals[0]
+
+    goalContext = `\n\n**User's Current Goals (Extracted from patterns and intentions):**
+${goalList}
+
+**CRITICAL - Goal-Aligned Question Generation:**
+This user is actively working toward: "${primaryGoal.title}"
+- Journey stage: ${primaryGoal.journeyStage}
+- Category: ${primaryGoal.category}
+- Confidence: ${Math.round(primaryGoal.confidence * 100)}%
+
+${primaryGoal.journeyStage === 'beginning'
+  ? `They're just starting this journey. Ask foundational questions that help them understand WHY this goal matters to them and what small first steps they can take.`
+  : primaryGoal.journeyStage === 'struggle'
+  ? `They're in the struggle phase. Ask supportive questions that acknowledge difficulty while reinforcing commitment. Help them see obstacles as part of growth.`
+  : primaryGoal.journeyStage === 'breakthrough'
+  ? `They're experiencing breakthrough! Ask questions that help them recognize and celebrate progress, deepen the practice, and integrate learnings.`
+  : primaryGoal.journeyStage === 'integration'
+  ? `They're integrating this practice into their life. Ask questions that explore how it's changing them, what it reveals about who they're becoming.`
+  : `Ask questions that honor their mastery and invite reflection on the wisdom gained.`}
+
+**Goal-Aligned Question Strategy:**
+1. Your questions should DIRECTLY support their active goals
+2. When exploring new topics, connect back to how it relates to their goals
+3. Celebrate progress toward goals when evident in their answers
+4. If they seem stuck, ask questions that help them see the path forward
+5. Make the connection between daily choices and long-term goals visible
+
+${primaryGoal.category === 'emotional'
+  ? 'Focus on: emotional regulation, mood patterns, triggers, coping strategies, emotional awareness'
+  : primaryGoal.category === 'relational'
+  ? 'Focus on: connection quality, boundary-setting, communication patterns, relationship needs'
+  : primaryGoal.category === 'behavioral'
+  ? 'Focus on: habit formation, consistency, routines, environmental design, accountability'
+  : primaryGoal.category === 'growth'
+  ? 'Focus on: self-awareness, values alignment, identity evolution, meaning-making'
+  : primaryGoal.category === 'physical'
+  ? 'Focus on: energy levels, sleep quality, movement, rest, body awareness'
+  : primaryGoal.category === 'creative'
+  ? 'Focus on: creative expression, flow states, inspiration, artistic practice'
+  : 'Focus on: meaning, purpose, values, existential questions, life direction'}
+
+The system exists to help users achieve their goals. Your questions are tools for transformation.`
+  }
+
   // Extract Memory answers to build user's story
   const memoryLogs = logs.filter((log) => log.event === 'answer')
+
+  console.log(`💬 Extracted ${memoryLogs.length} memory answers from ${logs.length} total logs`)
 
   // Extract recently asked questions to avoid duplicates (extended from 15 to 30)
   const recentQuestions = memoryLogs
     .slice(0, 30)
     .map(log => log.metadata.question || '')
     .filter(Boolean)
+
+  console.log(`🔍 Found ${recentQuestions.length} recent questions for duplicate detection`)
 
   // Track topic diversity - extract key topics from recent questions
   const recentTopics = extractQuestionTopics(recentQuestions.slice(0, 10))
@@ -233,21 +334,30 @@ MUST explore a DIFFERENT topic now. Consider: routine, relationships, creativity
 ` : ''
 
   const uniquenessInstruction = recentQuestions.length > 0 ? `
-**❌ CRITICAL: ABSOLUTE DUPLICATE PREVENTION ❌**
-You have ALREADY asked these ${recentQuestions.length} questions. NEVER ask anything similar:
+**Recent Questions (for context and diversity):**
+You have asked these ${recentQuestions.length} questions recently:
 ${recentQuestions.map((q, i) => `${i + 1}. "${q}"`).join('\n')}
 
-🚨 MANDATORY RULES:
-- Your new question MUST be about a COMPLETELY DIFFERENT topic
-- DO NOT ask variations, follow-ups, or rephrased versions of the above
-- Check EVERY word of your question against the list above
-- If even 3 words match, REJECT IT and think of something else
-- Ask about habits/routines that haven't been covered yet
+**STRICT NO-DUPLICATE POLICY:**
+🚫 NEVER ask the same question twice - even with different wording
+🚫 NEVER ask questions that are too similar to recent questions
+🚫 If a topic was covered recently, find a completely NEW angle or topic
 
-Example of what NOT to do:
-❌ If you asked "What did you have for breakfast?" DON'T ask "What did you eat this morning?"
-❌ If you asked "How did you sleep?" DON'T ask "How was your sleep quality?"
-✅ Instead, ask about a DIFFERENT area entirely (exercise, social time, creativity, etc.)
+**Diversity Requirements:**
+- MUST explore different aspects of their life each time
+- Questions should feel fresh and engaging, not repetitive
+- Natural follow-ups are OK ONLY if they reveal new information
+- If a topic appears 2+ times in recent questions, it's OFF LIMITS
+
+**Examples of FORBIDDEN repetition:**
+❌ "What did you have for breakfast?" → "What do you usually eat for breakfast?"
+❌ "How's your morning routine?" → "What time do you wake up?"
+❌ "Do you drink coffee?" → "What's your favorite morning beverage?"
+
+**Examples of GOOD diversity:**
+✅ Morning routine → Evening wind-down routine (different time)
+✅ Food preferences → Music preferences (different domain)
+✅ Work stress → Creative outlets (different focus)
 
 ${topicDiversityWarning}` : ''
 
@@ -327,8 +437,10 @@ CRITICAL: Use this SOUL-LEVEL understanding to craft questions that speak to the
   const isRepetitiveFollowUp = detectTopicRepetition(memoryLogs)
 
   // Decide whether to explore a new topic or follow up on existing ones
-  // 35% chance to explore completely new area, 65% follow up
-  const shouldExploreNewTopic = memoryLogs.length > 0 && Math.random() < 0.35
+  // 15% chance to explore completely new area, 85% follow up for better narrative continuity
+  const shouldExploreNewTopic = memoryLogs.length > 0 && Math.random() < 0.15
+
+  console.log(`🎯 Question strategy: ${isWeekend ? 'WEEKEND MODE' : shouldExploreNewTopic ? 'EXPLORE NEW TOPIC' : memoryLogs.length === 0 ? 'FIRST QUESTION' : 'FOLLOW UP'}`)
 
   let userStory = ''
   let taskInstructions = ''
@@ -414,10 +526,12 @@ Based on these answers and journal entries, we're building their story. Now let'
 
     taskInstructions = `
 **Your task:** Generate ONE question that EXPLORES A NEW TOPIC AREA we haven't covered yet:
-1. **Choose an unexplored area** - Look at their existing answers and identify what aspects of their life we DON'T know about yet
-2. **Start fresh** - Don't reference their previous answers; ask about something completely new
+1. **Choose an unexplored area** - READ their Memory Story above and identify what aspects of their life we DON'T know about yet
+2. **Start fresh on a NEW topic** - Don't follow up on recent answers, but ask about a completely different dimension of their life
 3. **Build story breadth** - Each question should explore a different dimension of their lifestyle
 4. **Is contextually relevant** - Consider current time and weather
+
+**REQUIREMENT:** Your question should be informed by their profile (use their archetype and cohort info) but explore a NEW area we haven't asked about. Review the list of previous questions above and choose a completely different topic.
 
 **Examples of exploring new topics:**
 - If we know their morning beverage → Ask about their meal preferences
@@ -487,6 +601,8 @@ ${memoryLogs
 
 Based on these answers and journal entries, you can infer the user's preferences, habits, lifestyle, and inner emotional state. Use this knowledge to craft follow-up questions that show you remember their choices AND understand what matters to them.`
 
+    console.log(`📖 User story built with ${memoryLogs.slice(0, 15).length} recent answers and ${journalLogs.length} journal entries`)
+
     // COMPRESSED FORMAT for repetitive follow-ups (3+ questions on same topic)
     if (isRepetitiveFollowUp) {
       taskInstructions = `
@@ -511,9 +627,11 @@ ${uniquenessInstruction}`
       // DETAILED FORMAT for initial follow-ups (exploring depth)
       taskInstructions = `
 **Your task:** Generate ONE personalized follow-up question with 3-4 answer choices that:
-1. **MUST reference their previous answers** - Always start by acknowledging something they've already shared (e.g., "Since you mentioned you prefer tea in the morning, how do you usually prepare it?")
+1. **MUST EXPLICITLY reference their previous answers** - CRITICAL: Your question MUST start with a reference phrase like "You mentioned...", "Since you said...", "Last time you chose...", "Building on your answer about..." followed by SPECIFIC details from their actual answers shown above
 2. **Builds PROGRESSIVELY deeper into their psychological and soul profile** - Each follow-up should probe ONE level deeper than the previous question, moving from surface behaviors → underlying motivations → core values → soul-level identity
 3. **Is contextually relevant** - Consider current time, weather, and their recent activity patterns
+
+**STRICT REQUIREMENT:** Your question cannot be generic. It must demonstrate you've read their Memory Story above by referencing specific details from their actual answers. Generic questions that could apply to anyone are FORBIDDEN.
 
 **CRITICAL: Progressive Depth Requirement:**
 Follow-ups must build on BOTH behavioral patterns AND psychological/soul dimensions:
@@ -523,11 +641,17 @@ Follow-ups must build on BOTH behavioral patterns AND psychological/soul dimensi
 - **Fourth+ follow-up**: Soul-level identity (who they are becoming, their deeper nature)
 
 **CRITICAL: User-Feedback Loop Requirements:**
-- If they have previous answers, you MUST explicitly reference at least one in your new question
+- READ the "User's Memory Story" section above CAREFULLY before generating your question
+- You MUST explicitly reference AT LEAST ONE specific detail from their previous answers (not generic, use their actual answer text)
 - Show you remember what they told you - use phrases like "You mentioned...", "Since you prefer...", "Last time you chose...", "Building on your answer about..."
 - If they have journal entries, acknowledge their deeper thoughts and feelings - their journal reveals what truly matters to them
 - The question should feel like you're having an ongoing conversation, not starting fresh each time
 - Make connections between their different answers AND journal reflections to show you understand their overall lifestyle and inner world
+
+**EXAMPLE of GOOD reference:**
+User's Memory Story shows: "What do you prefer for breakfast? → User chose: 'Greek yogurt with honey'"
+GOOD question: "Since you enjoy Greek yogurt with honey for breakfast, what do you usually pair it with?"
+BAD question: "What matters most to you?" (completely ignores their history)
 
 **Examples of progressive follow-up questions:**
 LEVEL 1 (Behavior details): "Since you mentioned enjoying tea in the morning, how do you usually prepare it?" (Options: Quick tea bag, Loose leaf ritual, Matcha ceremony)
@@ -580,7 +704,18 @@ ${
 Recent activity logs (for additional context):
   `.trim()
   const formattedLogs = logs.map(formatLog).filter(Boolean).join('\n\n')
-  return head + '\n\n' + formattedLogs
+
+  const fullPrompt = head + quantumContext + goalContext + '\n\n' + formattedLogs
+
+  console.log(`📨 Prompt built: ${fullPrompt.length} chars total`)
+  console.log(`   - Head section: ${head.length} chars`)
+  console.log(`   - Quantum context: ${quantumContext.length} chars`)
+  console.log(`   - Goal context: ${goalContext.length} chars`)
+  console.log(`   - Formatted logs: ${formattedLogs.length} chars (${logs.map(formatLog).filter(Boolean).length} logs)`)
+  console.log(`   - User story included: ${userStory.length > 0 ? 'YES' : 'NO'}`)
+  console.log(`   - Recent questions list: ${recentQuestions.length} questions`)
+
+  return fullPrompt
 }
 
 function formatLog(log: Log): string {
@@ -1517,22 +1652,23 @@ export async function calculateIntelligentPacing(
   let promptQuotaToday: number
 
   if (isWeekend) {
-    // Weekends: 6 prompts throughout the day (increased from 4)
-    promptQuotaToday = 6
+    // Weekends: 12-15 prompts throughout the day (more time to reflect)
+    const seed = dayNumber % 3
+    promptQuotaToday = seed === 0 ? 12 : seed === 1 ? 14 : 15
   } else if (dayNumber === 1) {
-    // Day 1: Welcome with 5 prompts (increased from 3)
-    promptQuotaToday = 5
+    // Day 1: Welcome with 10 prompts (strong start)
+    promptQuotaToday = 10
   } else if (dayNumber === 2) {
-    // Day 2: Gentle follow-up with 3 prompts (increased from 1)
-    promptQuotaToday = 3
+    // Day 2: Continued engagement with 8 prompts
+    promptQuotaToday = 8
   } else if (dayNumber === 3) {
-    // Day 3: Building rhythm with 4 prompts (increased from 2)
-    promptQuotaToday = 4
+    // Day 3: Building momentum with 9 prompts
+    promptQuotaToday = 9
   } else {
-    // Day 4+: Variable pacing (3-5 prompts, increased from 1-3)
-    // Use day number as seed for consistent daily variation
+    // Day 4+: Generous pacing (10-15 prompts per day)
+    // Ensures at least morning and night questions, plus throughout the day
     const seed = dayNumber % 7
-    promptQuotaToday = seed % 3 === 0 ? 3 : seed % 3 === 1 ? 4 : 5
+    promptQuotaToday = seed % 5 === 0 ? 10 : seed % 5 === 1 ? 11 : seed % 5 === 2 ? 12 : seed % 5 === 3 ? 14 : 15
   }
 
   // Count prompts shown today

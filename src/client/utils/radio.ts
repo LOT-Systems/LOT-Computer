@@ -28,11 +28,11 @@ export function useRadio(enabled: boolean) {
   }, [tracks])
 
   // Format seconds to MM:SS
-  const formatTime = (seconds: number): string => {
+  const formatTime = React.useCallback((seconds: number): string => {
     const mins = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
     return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
+  }, [])
 
   // Fetch available tracks from backend
   React.useEffect(() => {
@@ -113,6 +113,8 @@ export function useRadio(enabled: boolean) {
 
   // Update audio source and play when track changes
   React.useEffect(() => {
+    let isCancelled = false
+
     if (!enabled || !currentTrack || !audioRef.current) {
       // Clear interval if not playing
       if (intervalRef.current) {
@@ -133,8 +135,11 @@ export function useRadio(enabled: boolean) {
 
     // Wait for audio to be ready before playing
     const handleCanPlay = () => {
+      if (isCancelled) return
+
       audio.play()
         .then(() => {
+          if (isCancelled) return
           console.log(`📻 Now playing: ${currentTrack.name}`)
 
           // Start countdown interval
@@ -164,6 +169,7 @@ export function useRadio(enabled: boolean) {
 
     // Cleanup interval and event listener when track changes
     return () => {
+      isCancelled = true
       audio.removeEventListener('canplay', handleCanPlay)
       if (intervalRef.current) {
         clearInterval(intervalRef.current)

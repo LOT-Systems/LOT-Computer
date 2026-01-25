@@ -8,7 +8,9 @@ import { System } from '#client/components/System'
 import { Settings } from '#client/components/Settings'
 import { Logs } from '#client/components/Logs'
 import { Sync } from '#client/components/Sync'
+import { DirectMessageThread } from '#client/components/DirectMessageThread'
 import { StatusPage } from '#client/components/StatusPage'
+import { ApiPage } from '#client/components/ApiPage'
 import { ConnectionStatus } from '#client/components/ConnectionStatus'
 import { render } from '#client/utils/render'
 import { listenSSE } from '#client/utils/sse'
@@ -42,8 +44,10 @@ const App = () => {
   const { data: weather, refetch: refetchWeather } = useWeather()
 
   const isLoaded = React.useMemo(() => {
-    return !!user && weather !== undefined
-  }, [user, weather])
+    // Only require user data to load - weather is optional
+    // Weather is only used in System and SelfCareMoments components
+    return !!user
+  }, [user])
 
   React.useEffect(() => {
     // Initialize router to listen to URL changes
@@ -77,6 +81,12 @@ const App = () => {
           stores.isCustomThemeEnabled.set(false)
           stores.theme.set(themeName as any)
         }
+      }
+
+      // Sync timeChime setting from user (server) to local store
+      if (user.timeChime !== undefined) {
+        stores.isTimeChimeEnabled.set(user.timeChime)
+        console.log('[App] Syncing timeChime from server:', user.timeChime)
       }
 
       if (!user.firstName && !user.lastName) {
@@ -132,7 +142,11 @@ const App = () => {
       <Layout>
         {(!router || router.route === 'system') && <System />}
         {router?.route === 'settings' && <Settings />}
+        {router?.route === 'api' && <ApiPage />}
         {router?.route === 'sync' && <Sync />}
+        {router?.route === 'dm' && router.params?.userId && (
+          <DirectMessageThread userId={router.params.userId} />
+        )}
         {router?.route === 'status' && <StatusPage noWrapper />}
         {router?.route === 'logs' && <Logs />}
         {isMirrorOn && (

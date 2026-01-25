@@ -27,7 +27,7 @@ const fastify = Fastify({
   logger: false  // Temporarily disable logging for development
 })
 
-const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log']
+const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/api', '/sync', '/log']
 
 // Plugins
 fastify.register(fastifyCookie)
@@ -324,6 +324,12 @@ fastify.setNotFoundHandler(async (req, res) => {
   console.log('[NOT-FOUND] Method:', req.method)
   console.log('[NOT-FOUND] Headers Accept:', req.headers.accept)
   console.log('[NOT-FOUND] Is HTML request:', req.headers.accept?.includes('text/html'))
+
+  // Don't redirect API routes - let them return proper 404 or handle authentication
+  if (req.url.startsWith('/api/') || req.url.startsWith('/admin-api/')) {
+    console.log('[NOT-FOUND] API route not found, returning 404')
+    return res.code(404).send('API endpoint not found: ' + req.url)
+  }
 
   if (req.headers.accept?.includes('text/html')) {
     console.log('[NOT-FOUND] Redirecting HTML request to /')
