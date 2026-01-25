@@ -1,5 +1,6 @@
 import React from 'react'
 import { Block, Button } from '#client/components/ui'
+import { recordSignal } from '#client/stores/intentionEngine'
 
 type IntentionView = 'set' | 'current' | 'reflection'
 
@@ -63,6 +64,12 @@ export function IntentionsWidget() {
       monthYear: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
     }
 
+    // Record intention signal for quantum pattern recognition
+    recordSignal('intentions', 'intention_set', {
+      focus: newIntention.focus,
+      monthYear: newIntention.monthYear
+    })
+
     localStorage.setItem('current-intention', JSON.stringify(newIntention))
     setIntention(newIntention)
     setInputValue('')
@@ -103,20 +110,33 @@ export function IntentionsWidget() {
     ? Math.floor((new Date().getTime() - new Date(intention.setDate).getTime()) / (1000 * 60 * 60 * 24))
     : 0
 
+  // Get total days in the month when intention was set
+  const totalDaysInMonth = intention
+    ? new Date(new Date(intention.setDate).getFullYear(), new Date(intention.setDate).getMonth() + 1, 0).getDate()
+    : 30
+
   return (
     <Block label={label} blockView onLabelClick={cycleView}>
       {view === 'set' && (
         <div className="inline-block w-full">
           {isSettingIntention ? (
             <>
-              <div className="mb-12 opacity-70">What do you want to cultivate this month?</div>
+              {(() => {
+                const quantumReason = localStorage.getItem('intentions-quantum-reason')
+                return quantumReason ? (
+                  <div className="opacity-60 mb-8">
+                    {quantumReason}
+                  </div>
+                ) : null
+              })()}
+              <div className="mb-12">What do you want to cultivate this month?</div>
               <input
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSetIntention()}
                 placeholder="One word or short phrase..."
-                className="w-full bg-transparent border-none outline-none mb-12 opacity-80"
+                className="w-full bg-transparent border-none outline-none mb-12"
                 autoFocus
               />
               <div className="flex gap-8">
@@ -130,11 +150,18 @@ export function IntentionsWidget() {
             </>
           ) : (
             <>
-              <div className="mb-12 opacity-70">
-                {intention ? 'Set a new intention for this month' : 'What aspect of yourself do you want to nurture this month?'}
+              {(() => {
+                const quantumReason = localStorage.getItem('intentions-quantum-reason')
+                return quantumReason ? (
+                  <div className="opacity-60 mb-8">
+                    {quantumReason}
+                  </div>
+                ) : null
+              })()}
+              <div className="mb-16">
+                {intention ? 'Set a new intention for this month.' : 'What aspect of yourself do you want to nurture this month?'} Examples:
               </div>
-              <div className="flex flex-col gap-6 opacity-60 text-[14px] mb-12">
-                <div>Examples:</div>
+              <div className="flex flex-col gap-6 mb-16">
                 <div>• Presence</div>
                 <div>• Self-compassion</div>
                 <div>• Creative flow</div>
@@ -152,24 +179,20 @@ export function IntentionsWidget() {
       {view === 'current' && intention && (
         <div className="inline-block">
           <div className="mb-8">
-            <span className="text-[18px] capitalize">{intention.focus}</span>
+            <span className="capitalize">{intention.focus}</span>
           </div>
-          <div className="opacity-60 text-[14px] mb-12">
-            {intention.monthYear}
+          <div className="mb-16">
+            {intention.monthYear}; Day {daysSince + 1}/{totalDaysInMonth}
           </div>
-          <div className="flex items-center gap-8 opacity-60 text-[14px]">
-            <span>Day {daysSince + 1}</span>
-            <span>•</span>
-            <Button onClick={handleReleaseIntention} className="text-[14px] opacity-60 hover:opacity-100">
-              Release
-            </Button>
-          </div>
+          <Button onClick={handleReleaseIntention}>
+            Release
+          </Button>
         </div>
       )}
 
       {view === 'current' && !intention && (
         <div className="inline-block">
-          <div className="opacity-60 mb-12">No intention set yet.</div>
+          <div className="mb-12">No intention set yet.</div>
           <Button onClick={() => setView('set')}>
             Set Your Intention
           </Button>
@@ -178,8 +201,8 @@ export function IntentionsWidget() {
 
       {view === 'reflection' && intention && (
         <div className="inline-block">
-          <div className="mb-12 opacity-90">{getReflectionPrompts()}</div>
-          <div className="opacity-60 text-[14px]">
+          <div className="mb-12">{getReflectionPrompts()}</div>
+          <div>
             Reflecting on: <span className="capitalize">{intention.focus}</span>
           </div>
         </div>
@@ -187,7 +210,7 @@ export function IntentionsWidget() {
 
       {view === 'reflection' && !intention && (
         <div className="inline-block">
-          <div className="opacity-60">Set an intention first to begin reflection.</div>
+          <div>Set an intention first to begin reflection.</div>
         </div>
       )}
     </Block>

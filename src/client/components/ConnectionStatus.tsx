@@ -34,7 +34,7 @@ export const ConnectionStatus = () => {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-acc text-base px-4 py-3 text-center">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-acc text-bac text-base px-4 py-3 text-center">
       <div>
         Connection lost • Attempting to reconnect...
       </div>

@@ -23,8 +23,9 @@ const _App = () => {
   const { data: weather, refetch: refetchWeather } = useWeather()
 
   const isLoaded = React.useMemo(() => {
-    return !!me && weather !== undefined
-  }, [me, weather])
+    // Only require user data to load - weather is optional
+    return !!me
+  }, [me])
 
   React.useEffect(() => {
     // Initialize router to listen to URL changes
@@ -51,6 +52,7 @@ const _App = () => {
       }
     })
 
+    // Update weather store if available (but don't block loading)
     if (weather !== undefined) {
       stores.weather.set(weather)
     }

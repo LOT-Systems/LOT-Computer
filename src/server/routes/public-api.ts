@@ -783,12 +783,43 @@ export default async (fastify: FastifyInstance) => {
             },
           })
 
+          // Calculate streak (consecutive days with answers)
+          let streak = 0
+          try {
+            const answers = await models.Answer.findAll({
+              where: { userId: user.id },
+              order: [['createdAt', 'DESC']],
+              attributes: ['createdAt'],
+            })
+
+            if (answers.length > 0) {
+              const today = dayjs().startOf('day')
+              let currentDate = today
+              const answerDays = new Set(
+                answers.map(a => dayjs(a.createdAt).startOf('day').format('YYYY-MM-DD'))
+              )
+
+              // Check consecutive days backwards from today or yesterday
+              if (!answerDays.has(today.format('YYYY-MM-DD'))) {
+                currentDate = today.subtract(1, 'day')
+              }
+
+              while (answerDays.has(currentDate.format('YYYY-MM-DD'))) {
+                streak++
+                currentDate = currentDate.subtract(1, 'day')
+              }
+            }
+          } catch (streakError) {
+            console.warn('[PUBLIC-PROFILE-API] Streak calculation failed:', streakError)
+          }
+
           if (logs.length === 0) {
             profile.psychologicalProfile = {
               hasUsership: true,
               message: 'Complete Memory questions to generate profile',
               answerCount: 0,
-              noteCount: noteCount
+              noteCount: noteCount,
+              streak: streak
             }
           } else {
             // Extract traits and determine psychological archetype + behavioral cohort
@@ -818,12 +849,14 @@ export default async (fastify: FastifyInstance) => {
               // Psychological depth (soul level)
               archetype: cohortResult.archetype,
               archetypeDescription: cohortResult.description,
-              coreValues: psychologicalDepth.values.map((v: string) => v.charAt(0).toUpperCase() + v.slice(1)),
-              emotionalPatterns: psychologicalDepth.emotionalPatterns.map((p: string) => formatTrait(p)),
+              coreValues: psychologicalDepth.values.map((v: string) => v.toLowerCase()),
+              emotionalPatterns: psychologicalDepth.emotionalPatterns.map((p: string) => formatTrait(p).toLowerCase()),
               selfAwarenessLevel: psychologicalDepth.selfAwareness,
+              // Level badge (Aquatic Evolution)
+              streak: streak,
               // Behavioral patterns (surface level)
               behavioralCohort: cohortResult.behavioralCohort,
-              behavioralTraits: traits.map((t: string) => formatTrait(t)),
+              behavioralTraits: traits.map((t: string) => formatTrait(t).toLowerCase()),
               patternStrengthIndex: patternStrengthIndex,
               patternStrength: Object.entries(patterns)
                 .filter(([_, v]) => v > 0)

@@ -2,11 +2,15 @@ import React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Clock } from '#client/components/ui'
+import { playSovietChime } from '#client/utils/sovietChime'
+import dayjs from '#client/utils/dayjs'
 
 export const TimeWidget = () => {
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
+  const isTimeChimeEnabled = useStore(stores.isTimeChimeEnabled)
   const startTimeRef = React.useRef(0)
   const requestRef = React.useRef<number>()
+  const lastChimeHour = React.useRef<number>(-1)
 
   const [showStopwatch, setShowStopwatch] = React.useState(false)
   const [timeElapsed, setTimeElapsed] = React.useState(0)
@@ -74,6 +78,37 @@ export const TimeWidget = () => {
 
     return () => cancelAnimationFrame(requestRef.current!)
   }, [isRunning])
+
+  // Hourly chime effect - Soviet-era digital coo-coo clock
+  React.useEffect(() => {
+    if (!isTimeChimeEnabled) return
+
+    const checkHour = () => {
+      const now = dayjs()
+      const currentHour = now.hour()
+      const currentMinute = now.minute()
+      const currentSecond = now.second()
+
+      // Play chime at the top of each hour (00:00)
+      if (currentMinute === 0 && currentSecond === 0 && lastChimeHour.current !== currentHour) {
+        lastChimeHour.current = currentHour
+        playSovietChime(currentHour)
+      }
+
+      // Reset the last chime hour when we move past 00:00
+      if (currentMinute === 0 && currentSecond > 2) {
+        // Give a 2 second buffer
+      } else if (currentMinute > 0) {
+        lastChimeHour.current = -1
+      }
+    }
+
+    // Check every second
+    const interval = setInterval(checkHour, 1000)
+    checkHour() // Check immediately
+
+    return () => clearInterval(interval)
+  }, [isTimeChimeEnabled])
 
   return (
     <Block

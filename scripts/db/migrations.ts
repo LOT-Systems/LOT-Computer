@@ -1,13 +1,19 @@
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
 import { Sequelize } from 'sequelize'
 import { Umzug, SequelizeStorage } from 'umzug'
 import dotenv from 'dotenv'
+import pg from 'pg'
 
 // Load environment variables
 dotenv.config()
 
-const MIGRATIONS_PATH = path.join(__dirname, '../migrations')
+// ES module compatibility
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+const MIGRATIONS_PATH = path.join(__dirname, '../../migrations')
 
 // Debug: Print available environment variables
 console.log('Environment variables available:', Object.keys(process.env));
@@ -24,7 +30,7 @@ if (!databaseUrl) {
 // Initialize Sequelize with explicit configuration
 const sequelize = new Sequelize(databaseUrl, {
   dialect: 'postgres',
-  dialectModule: require('pg'),
+  dialectModule: pg,
   logging: false,
   dialectOptions: {
     ssl: {
@@ -60,7 +66,7 @@ if (['-up', '-down'].includes(command)) {
       console.log('Database connection established successfully')
 
       const umzug = new Umzug({
-        migrations: { glob: MIGRATIONS_PATH + '/*.js' },
+        migrations: { glob: MIGRATIONS_PATH + '/*.cjs' },
         context: sequelize.getQueryInterface(),
         storage: new SequelizeStorage({ sequelize }),
         logger: console,

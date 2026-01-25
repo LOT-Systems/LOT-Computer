@@ -7,6 +7,7 @@ import {
   Clock,
   Tag,
   TagsContainer,
+  Table,
 } from '#client/components/ui'
 import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
@@ -14,7 +15,7 @@ import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
 import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
-import { useVisitorStats, useProfile, useLogs } from '#client/queries'
+import { useVisitorStats, useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { UserTag } from '#shared/types'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
@@ -23,7 +24,19 @@ import { EmotionalCheckIn } from './EmotionalCheckIn'
 import { SelfCareMoments } from './SelfCareMoments'
 import { IntentionsWidget } from './IntentionsWidget'
 import { SubscribeWidget } from './SubscribeWidget'
+import { PlannerWidget } from './PlannerWidget'
+import { PatternInsightsWidget } from './PatternInsightsWidget'
+import { ContextualPromptsWidget } from './ContextualPromptsWidget'
+import { EnergyCapacitor } from './EnergyCapacitor'
+import { NarrativeWidget } from './NarrativeWidget'
+import { InterventionsWidget } from './InterventionsWidget'
+import { ChatCatalystWidget } from './ChatCatalystWidget'
+import { SystemProgressWidget } from './SystemProgressWidget'
+import { SystemPulseWidget } from './SystemPulseWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
+import { checkPlannerWidget } from '#client/stores/plannerWidget'
+import { getOptimalWidget, shouldShowWidget, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
+import { CollectiveConsciousness, WellnessPulse, MemoryEngineStats, IntentionPatterns, BadgeUnlockFeed, GrowthMilestones } from './stats'
 
 export const System = () => {
   const me = useStore(stores.me)
@@ -38,6 +51,7 @@ export const System = () => {
   const { data: visitorStats } = useVisitorStats()
   const { data: profile } = useProfile()
   const { data: logs = [] } = useLogs()
+  const { data: communityEmotion } = useCommunityEmotion()
 
   const isTempFahrenheit = useStore(stores.isTempFahrenheit)
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
@@ -50,8 +64,11 @@ export const System = () => {
   const [isBreatheOn, setIsBreatheOn] = React.useState(false)
   const breatheState = useBreathe(isBreatheOn)
   const [showRadio, setShowRadio] = React.useState(false)
-  const [astrologyView, setAstrologyView] = React.useState<'astrology' | 'psychology' | 'journey'>('astrology')
+  const [astrologyView, setAstrologyView] = React.useState<'astrology' | 'psychology' | 'journey' | 'quantum'>('astrology')
   const [showWeatherSuggestion, setShowWeatherSuggestion] = React.useState(false)
+  const [isSoundToggling, setIsSoundToggling] = React.useState(false)
+  const [showSharedEmotion, setShowSharedEmotion] = React.useState(false)
+  const [selectedQuantumCell, setSelectedQuantumCell] = React.useState(0)
 
   // Compute whether to show sunset or sunrise based on current time
   // Show sunset during daytime (between sunrise and sunset)
@@ -143,6 +160,12 @@ export const System = () => {
     }
   }, [logs])
 
+  // Quantum state - analyze intentions and get current user state
+  const quantumState = React.useMemo(() => {
+    analyzeIntentions() // Trigger fresh analysis
+    return getUserState()
+  }, [logs]) // Recompute when logs change (new signals recorded)
+
   // Calculate awareness index from backend selfAwarenessLevel (0-100) to percentage (0-10%)
   // Long-term growth with decimal precision (e.g., 2.3%, 5.7%)
   const awarenessIndex = React.useMemo(() => {
@@ -203,9 +226,10 @@ export const System = () => {
     return options[index]
   }, [weather])
 
-  // Check for recipe suggestions when component mounts
+  // Check for recipe and planner suggestions when component mounts
   React.useEffect(() => {
     checkRecipeWidget()
+    checkPlannerWidget()
   }, [])
 
   // Sound is now managed globally in app.tsx via useSound hook
@@ -246,20 +270,28 @@ export const System = () => {
       )}
 
       <div>
-        <Block label="Users online:" onClick={() => stores.goTo('sync')}>
-          {formatNumberWithCommas(usersOnline)}
-        </Block>
         <Block
-          label="Total users:"
-          onClick={
-            me?.isAdmin
-              ? () => {
-                  window.location.href = '/us'
-                }
-              : undefined
-          }
+          label={showSharedEmotion ? "Shared emotion:" : "Users online:"}
+          onClick={() => setShowSharedEmotion(!showSharedEmotion)}
         >
-          {formatNumberWithCommas(usersTotal)}
+          {showSharedEmotion ? (
+            communityEmotion?.sharedEmotion ? (
+              <span className="capitalize">{communityEmotion.sharedEmotion}</span>
+            ) : (
+              'Calculating...'
+            )
+          ) : (
+            formatNumberWithCommas(usersOnline)
+          )}
+        </Block>
+        <Block label="Total users:">
+          {me?.isAdmin ? (
+            <GhostButton href="/us" rel="external">
+              {formatNumberWithCommas(usersTotal)}
+            </GhostButton>
+          ) : (
+            formatNumberWithCommas(usersTotal)
+          )}
         </Block>
       </div>
 
@@ -318,13 +350,15 @@ export const System = () => {
           label={
             astrologyView === 'astrology' ? "Astrology:" :
             astrologyView === 'psychology' ? "Psychology:" :
-            "My Journey:"
+            astrologyView === 'journey' ? "My Journey:" :
+            "Quantum:"
           }
           onLabelClick={() => {
-            // Cycle through: Astrology → Psychology → Journey → Astrology
+            // Cycle through: Astrology → Psychology → Journey → Quantum → Astrology
             setAstrologyView(prev =>
               prev === 'astrology' ? 'psychology' :
               prev === 'psychology' ? 'journey' :
+              prev === 'journey' ? 'quantum' :
               'astrology'
             )
           }}
@@ -337,14 +371,52 @@ export const System = () => {
             <div className="inline-block">
               {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}
             </div>
-          ) : (
+          ) : astrologyView === 'journey' ? (
             <div className="inline-block">
               <div>Day {journeyData.daysSinceStart} • {journeyData.answerCount} memories • Awareness {awarenessIndex}%</div>
               <div>{profile?.behavioralCohort || 'Growing'} • {profile?.emotionalPatterns?.[0] || 'Exploring patterns'}</div>
             </div>
+          ) : (
+            <Table
+              data={[
+                { metric: 'Energy', value: quantumState.energy },
+                { metric: 'Clarity', value: quantumState.clarity },
+                { metric: 'Alignment', value: quantumState.alignment }
+              ]}
+              columns={[
+                {
+                  id: 'metric',
+                  header: 'Metric',
+                  accessor: (row) => <span className="capitalize">{row.metric}</span>
+                },
+                {
+                  id: 'value',
+                  header: 'Value',
+                  accessor: (row) => <span className="capitalize">{row.value}</span>
+                }
+              ]}
+              paddingClassName="p-8"
+              selectedRowIndex={selectedQuantumCell}
+              onRowClick={(index) => setSelectedQuantumCell(index)}
+            />
           )}
         </Block>
       </div>
+
+      {/* Contextual Prompts - Show pattern-based suggestions based on current context */}
+      <ContextualPromptsWidget />
+
+      {/* Chat Catalyst - Prompts to connect with cohort members when online */}
+      <ChatCatalystWidget />
+
+      {/* Interventions - Compassionate care based on semantic struggle detection */}
+      <InterventionsWidget />
+
+      {/* Energy Capacitor - Track energy depletion/replenishment */}
+      <EnergyCapacitor />
+
+      {/* Narrative - RPG-style story progression and achievements */}
+      <NarrativeWidget />
 
       <div>
         <Block
@@ -366,21 +438,30 @@ export const System = () => {
             }
           }}
           onChildrenClick={async () => {
-            if (showRadio) {
-              // Radio mode - toggle radio
-              stores.isRadioOn.set(!isRadioOn)
-            } else {
-              // Sound mode - toggle sound
-              const newValue = !isSoundOn
-              // @ts-ignore - Tone.js loaded via external script
-              if (newValue && window.Tone) {
-                try {
-                  await window.Tone.start()
-                } catch (e) {
-                  console.error('Failed to start Tone.context:', e)
+            // Prevent rapid clicks
+            if (isSoundToggling) return
+            setIsSoundToggling(true)
+
+            try {
+              if (showRadio) {
+                // Radio mode - toggle radio
+                stores.isRadioOn.set(!isRadioOn)
+              } else {
+                // Sound mode - toggle sound
+                const newValue = !isSoundOn
+                // @ts-ignore - Tone.js loaded via external script
+                if (newValue && window.Tone) {
+                  try {
+                    await window.Tone.start()
+                  } catch (e) {
+                    console.error('Failed to start Tone.context:', e)
+                  }
                 }
+                stores.isSoundOn.set(newValue)
               }
-              stores.isSoundOn.set(newValue)
+            } finally {
+              // Reset toggle state after a short delay
+              setTimeout(() => setIsSoundToggling(false), 300)
             }
           }}
         >
@@ -403,32 +484,24 @@ export const System = () => {
       <RecipeWidget />
 
       {/* Mood Check-In - Show every 3 hours max, context-based on time of day */}
-      {(() => {
-        const hour = new Date().getHours()
-        const isMorning = hour >= 6 && hour < 12
-        const isEvening = hour >= 17 && hour < 22
-        const isMidDay = hour >= 12 && hour < 17
+      {/* Widget controls its own visibility internally to allow farewell animations */}
+      <EmotionalCheckIn />
 
-        // Check if 3 hours have passed since last check-in (from database logs)
-        const emotionalCheckIns = logs.filter(log => log.event === 'emotional_checkin')
-        const lastCheckIn = emotionalCheckIns[0] // Logs are sorted newest first
-        const threeHoursMs = 3 * 60 * 60 * 1000
-        const threeHoursPassed = !lastCheckIn ||
-          (Date.now() - new Date(lastCheckIn.createdAt).getTime()) >= threeHoursMs
-
-        // Show during preferred times (morning/evening) if 3 hours passed
-        // OR show mid-day if haven't checked in at all today and 3 hours passed
-        if (!threeHoursPassed) return null
-
-        return (isMorning || isEvening || isMidDay) && <EmotionalCheckIn />
-      })()}
-
-      {/* Self-care Moments - Show during rest/refresh times */}
+      {/* Self-care Moments - Show during rest/refresh times OR when intention engine detects need */}
       {(() => {
         const hour = new Date().getHours()
         const isMidMorning = hour >= 10 && hour < 12 // Pre-lunch break
         const isAfternoon = hour >= 14 && hour < 17 // Post-lunch slump
         const isEvening = hour >= 19 && hour < 22 // Evening wind-down
+
+        // Check cooldown (3 hours since last interaction)
+        const lastInteraction = localStorage.getItem('self-care-last-interaction')
+        const threeHoursMs = 3 * 60 * 60 * 1000
+        const cooldownPassed = !lastInteraction ||
+          (Date.now() - parseInt(lastInteraction)) >= threeHoursMs
+
+        // Don't show if cooldown hasn't passed
+        if (!cooldownPassed) return null
 
         // Check if completed self-care today
         const today = new Date().toDateString()
@@ -443,16 +516,65 @@ export const System = () => {
           } catch (e) {}
         }
 
-        // Show during key times, especially if haven't done self-care yet
-        return (isMidMorning || isAfternoon || isEvening || completedToday === 0) && <SelfCareMoments />
+        // Check if intention engine recognizes self-care need
+        const optimal = getOptimalWidget()
+        const intentionSuggestsSelfCare = optimal?.widget === 'selfcare'
+
+        // Show if:
+        // 1. Intention engine detects anxiety/overwhelm patterns, OR
+        // 2. During key times, especially if haven't done self-care yet
+        const shouldShow = intentionSuggestsSelfCare || isMidMorning || isAfternoon || isEvening || completedToday === 0
+
+        if (!shouldShow) return null
+
+        // Store quantum reasoning for widget to display
+        if (intentionSuggestsSelfCare && optimal?.reason) {
+          localStorage.setItem('selfcare-quantum-reason', optimal.reason)
+        } else {
+          localStorage.removeItem('selfcare-quantum-reason')
+        }
+
+        return <SelfCareMoments />
       })()}
 
-      {/* Intentions - Show if user has intention OR it's early in month */}
+      {/* Intentions - Show if user has intention OR when intention engine detects seeking-direction pattern */}
       {(() => {
         const hasIntention = !!localStorage.getItem('current-intention')
-        const dayOfMonth = new Date().getDate()
-        const isEarlyMonth = dayOfMonth <= 7 // First week of month
-        return (hasIntention || isEarlyMonth) && <IntentionsWidget />
+
+        // Check cooldown (2-3 days since last shown)
+        const lastShown = localStorage.getItem('intentions-last-shown')
+        const twoDaysMs = 2 * 24 * 60 * 60 * 1000
+        const threeDaysMs = 3 * 24 * 60 * 60 * 1000
+
+        // Random cooldown between 2-3 days
+        const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
+        const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
+
+        // Check if intention engine recognizes need for direction
+        const optimal = getOptimalWidget()
+        const intentionSuggestsIntentions = optimal?.widget === 'intentions'
+
+        // Show if:
+        // 1. User has an existing intention to display, OR
+        // 2. Intention engine detects seeking-direction or morning-clarity patterns, OR
+        // 3. Cooldown passed (fallback for periodic prompting)
+        if (hasIntention || intentionSuggestsIntentions || cooldownPassed) {
+          // Update last shown time
+          if (!lastShown || cooldownPassed || intentionSuggestsIntentions) {
+            localStorage.setItem('intentions-last-shown', Date.now().toString())
+          }
+
+          // Store quantum reasoning for widget to display
+          if (intentionSuggestsIntentions && optimal?.reason) {
+            localStorage.setItem('intentions-quantum-reason', optimal.reason)
+          } else {
+            localStorage.removeItem('intentions-quantum-reason')
+          }
+
+          return <IntentionsWidget />
+        }
+
+        return null
       })()}
 
       {/* Subscribe - Show occasionally to engaged users without subscription */}
@@ -480,7 +602,27 @@ export const System = () => {
         return shouldShow && <SubscribeWidget />
       })()}
 
+      {/* Pattern Insights - Show user's discovered patterns and cohort matches */}
+      <PatternInsightsWidget />
+
+      {/* Planner - Show occasionally for daily/weekly planning */}
+      <PlannerWidget />
+
       <MemoryWidget />
+
+      {/* System Progress - Deployment info with feedback */}
+      <SystemProgressWidget />
+
+      {/* System Pulse - Ultra-fast live activity metrics */}
+      <SystemPulseWidget />
+
+      {/* Real-time Stats Widgets - Show in System page */}
+      <IntentionPatterns />
+      <CollectiveConsciousness />
+      <WellnessPulse />
+      <MemoryEngineStats />
+      <GrowthMilestones />
+      <BadgeUnlockFeed />
     </div>
   )
 }

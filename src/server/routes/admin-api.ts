@@ -6,6 +6,12 @@ import { fp } from '#shared/utils'
 import { buildPrompt, completeAndExtractQuestion, generateUserSummary, generateMemoryStory } from '#server/utils/memory'
 import { sync } from '../sync.js'
 import dayjs from '../utils/dayjs.js'
+import { Umzug, SequelizeStorage } from 'umzug'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export default async (fastify: FastifyInstance) => {
   // Add parser for form-encoded data from HTML forms
@@ -17,6 +23,208 @@ export default async (fastify: FastifyInstance) => {
       done(null, {})
     }
   )
+
+  // Simple ping endpoint to verify admin-api routes are working
+  fastify.get('/ping', async (req, reply) => {
+    return reply.type('text/html').send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Admin API Ping</title>
+        <style>
+          body {
+            font-family: monospace;
+            padding: 40px;
+            text-align: center;
+          }
+          .info {
+            background: #e7f3ff;
+            border: 2px solid #0066cc;
+            padding: 25px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+          }
+          .note {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-size: 14px;
+            text-align: left;
+          }
+          a {
+            display: inline-block;
+            background: #0066cc;
+            color: white;
+            padding: 12px 24px;
+            margin: 10px;
+            border-radius: 5px;
+            text-decoration: none;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="info">
+          <h1 style="color: green; margin: 0 0 20px 0;">✅ Admin API Routes Working!</h1>
+          <p>User: ${req.user.email}</p>
+          <p>Tags: ${req.user.tags.join(', ')}</p>
+          <p>Timestamp: ${new Date().toISOString()}</p>
+
+          <div class="note">
+            <strong>Note:</strong> To access admin pages, you need to type the full URL in your browser's address bar.
+            The client-side router intercepts link clicks.
+          </div>
+        </div>
+
+        <div>
+          <p><strong>Available Admin Pages:</strong></p>
+          <code>/admin-api/status</code><br>
+          <code>/admin-api/memory-debug</code><br>
+          <code>/admin-api/ping</code>
+        </div>
+
+        <div style="margin-top: 30px;">
+          <button onclick="navigator.clipboard.writeText(window.location.origin + '/admin-api/status')" style="cursor: pointer;">
+            📋 Copy Status URL
+          </button>
+          <button onclick="navigator.clipboard.writeText(window.location.origin + '/admin-api/memory-debug')" style="cursor: pointer;">
+            📋 Copy Memory Debug URL
+          </button>
+        </div>
+      </body>
+      </html>
+    `)
+  })
+
+  // Diagnostic status page
+  fastify.get('/status', async (req, reply) => {
+    const diagnostics: string[] = []
+    const fs = await import('fs')
+
+    try {
+      const CWD = process.cwd()
+
+      diagnostics.push('📦 Deployment Info:')
+      diagnostics.push(`   Working Directory: ${CWD}`)
+      diagnostics.push(`   Node Version: ${process.version}`)
+      diagnostics.push('')
+
+      // Check migrations folder
+      const migrationsPath = path.join(CWD, 'migrations')
+      const migrationsExist = fs.existsSync(migrationsPath)
+      diagnostics.push('📁 Migrations Folder:')
+      diagnostics.push(`   Exists: ${migrationsExist ? '✅' : '❌'}`)
+
+      if (migrationsExist) {
+        const files = fs.readdirSync(migrationsPath)
+        const cjsFiles = files.filter(f => f.endsWith('.cjs'))
+        diagnostics.push(`   .cjs files: ${cjsFiles.length}`)
+        if (cjsFiles.length > 0) {
+          diagnostics.push(`   Latest: ${cjsFiles[cjsFiles.length - 1]}`)
+        }
+      }
+      diagnostics.push('')
+
+      // Check database
+      diagnostics.push('🗄️ Database:')
+      try {
+        await fastify.sequelize.authenticate()
+        diagnostics.push('   Connection: ✅ OK')
+
+        const [records] = await fastify.sequelize.query(
+          "SELECT name FROM \"SequelizeMeta\" ORDER BY name"
+        ) as any[]
+
+        diagnostics.push(`   Migrations tracked: ${records.length}`)
+        const jsCount = records.filter((r: any) => r.name.endsWith('.js')).length
+        diagnostics.push(`   .js entries: ${jsCount} ${jsCount > 0 ? '⚠️ NEEDS FIX' : '✅'}`)
+      } catch (dbError: any) {
+        diagnostics.push(`   ❌ ${dbError.message}`)
+      }
+      diagnostics.push('')
+
+      // Check timeChime column
+      diagnostics.push('⏰ TimeChime Column:')
+      try {
+        const [result] = await fastify.sequelize.query(
+          "SELECT column_name FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'timeChime'"
+        ) as any[]
+
+        diagnostics.push(`   ${result.length > 0 ? '✅ Exists' : '❌ Missing'}`)
+      } catch (e: any) {
+        diagnostics.push(`   ❌ ${e.message}`)
+      }
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Admin Status</title>
+          <style>
+            body {
+              font-family: -apple-system, monospace;
+              max-width: 800px;
+              margin: 20px auto;
+              padding: 20px;
+              font-size: 15px;
+            }
+            .box {
+              background: #e7f3ff;
+              border: 2px solid #0066cc;
+              padding: 25px;
+              border-radius: 8px;
+            }
+            h1 { color: #0066cc; margin: 0 0 20px 0; }
+            .log {
+              background: white;
+              padding: 15px;
+              border-radius: 4px;
+              margin: 15px 0;
+              border: 1px solid #ddd;
+              font-family: monospace;
+              font-size: 14px;
+              white-space: pre-wrap;
+              line-height: 1.8;
+            }
+            .btn {
+              display: inline-block;
+              background: #28a745;
+              color: white;
+              padding: 15px 25px;
+              border-radius: 5px;
+              text-decoration: none;
+              margin: 10px 5px;
+              font-size: 17px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="box">
+            <h1>🔍 System Status</h1>
+            <div class="log">${diagnostics.join('\n')}</div>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #0066cc;">
+              <a href="/admin-api/fix-and-run-migrations" class="btn">🔧 Fix & Run Migrations</a>
+              <a href="/" class="btn" style="background: #007bff;">← Home</a>
+            </div>
+          </div>
+        </body>
+        </html>
+      `)
+    } catch (error: any) {
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <body style="font-family: monospace; padding: 20px; max-width: 800px; margin: 20px auto;">
+          <h1 style="color: red;">❌ Error</h1>
+          <pre style="background: #f5f5f5; padding: 15px;">${error.stack}</pre>
+        </body>
+        </html>
+      `)
+    }
+  })
 
   fastify.get(
     '/users',
@@ -834,6 +1042,926 @@ export default async (fastify: FastifyInstance) => {
         <pre style="background: #f5f5f5; padding: 10px; overflow: auto;">${error.stack}</pre>
         <p><a href="/admin-api/restore-memory-answers">← Try Again</a></p>
         </body></html>
+      `)
+    }
+  })
+
+  // Run database migrations endpoint (mobile-friendly)
+  fastify.get('/run-migrations', async (req, reply) => {
+    try {
+      console.log('🔄 Running database migrations via admin endpoint...')
+
+      // Use CWD to find migrations folder (works in both dev and production)
+      const CWD = process.cwd()
+      const MIGRATIONS_PATH = path.join(CWD, 'migrations')
+
+      console.log('📁 Migrations path:', MIGRATIONS_PATH)
+      console.log('📁 CWD:', CWD)
+
+      // Create context with sequelize instance for migrations
+      const context = fastify.sequelize.getQueryInterface()
+      // Use Object.defineProperty to ensure the property is set correctly
+      Object.defineProperty(context, 'sequelize', {
+        value: fastify.sequelize,
+        writable: true,
+        enumerable: true,
+        configurable: true
+      })
+
+      const umzug = new Umzug({
+        migrations: { glob: MIGRATIONS_PATH + '/*.cjs' },
+        context,
+        storage: new SequelizeStorage({ sequelize: fastify.sequelize }),
+        logger: console,
+      })
+
+      // Fix migration tracking: Update .js extensions to .cjs in SequelizeMeta table
+      // This is needed because we renamed migration files from .js to .cjs
+      console.log('🔧 Checking migration tracking table...')
+      try {
+        // Can't UPDATE primary key, so we need to INSERT new records and DELETE old ones
+        await fastify.sequelize.query(`
+          INSERT INTO "SequelizeMeta" (name)
+          SELECT REPLACE(name, '.js', '.cjs')
+          FROM "SequelizeMeta"
+          WHERE name LIKE '%.js'
+          ON CONFLICT (name) DO NOTHING
+        `)
+
+        const [results] = await fastify.sequelize.query(
+          "DELETE FROM \"SequelizeMeta\" WHERE name LIKE '%.js' RETURNING name"
+        )
+        if (results && results.length > 0) {
+          console.log(`✅ Updated ${results.length} migration records from .js to .cjs`)
+        }
+      } catch (error: any) {
+        console.log('ℹ️ Migration tracking update skipped (table may not exist yet):', error.message)
+      }
+
+      const pendingMigrations = await umzug.pending()
+      const executedMigrations = await umzug.executed()
+
+      console.log('📋 Pending migrations:', pendingMigrations.length)
+      console.log('✅ Executed migrations:', executedMigrations.length)
+
+      if (pendingMigrations.length === 0) {
+        return reply.type('text/html').send(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Migrations Up to Date</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                max-width: 600px;
+                margin: 50px auto;
+                padding: 20px;
+              }
+              .info {
+                background: #d1ecf1;
+                border: 2px solid #17a2b8;
+                padding: 30px;
+                border-radius: 8px;
+                text-align: center;
+              }
+              h1 { color: #17a2b8; margin: 0 0 20px 0; }
+              .list {
+                text-align: left;
+                margin: 20px 0;
+                background: white;
+                padding: 15px;
+                border-radius: 4px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="info">
+              <div style="font-size: 64px;">✅</div>
+              <h1>Database Up to Date</h1>
+              <p>All migrations have been applied. No pending migrations found.</p>
+              <div class="list">
+                <strong>Executed migrations (${executedMigrations.length}):</strong>
+                <ul>
+                  ${executedMigrations.map(m => `<li>${m.name}</li>`).join('')}
+                </ul>
+              </div>
+              <p style="margin-top: 30px;">
+                <a href="/">← Back to Home</a>
+              </p>
+            </div>
+          </body>
+          </html>
+        `)
+      }
+
+      // Run pending migrations
+      await umzug.up()
+      const newExecuted = await umzug.executed()
+
+      console.log(`✅ Successfully ran ${pendingMigrations.length} migration(s)`)
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Migrations Complete</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              max-width: 600px;
+              margin: 50px auto;
+              padding: 20px;
+            }
+            .success {
+              background: #d4edda;
+              border: 2px solid #28a745;
+              padding: 30px;
+              border-radius: 8px;
+              text-align: center;
+            }
+            h1 { color: #28a745; margin: 0 0 20px 0; }
+            .stats {
+              font-size: 48px;
+              font-weight: bold;
+              color: #28a745;
+              margin: 20px 0;
+            }
+            .list {
+              text-align: left;
+              margin: 20px 0;
+              background: white;
+              padding: 15px;
+              border-radius: 4px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="success">
+            <div style="font-size: 64px;">✅</div>
+            <h1>Migrations Complete!</h1>
+            <div class="stats">${pendingMigrations.length}</div>
+            <p>Database migrations have been successfully applied.</p>
+            <div class="list">
+              <strong>Applied migrations:</strong>
+              <ul>
+                ${pendingMigrations.map(m => `<li>${m.name}</li>`).join('')}
+              </ul>
+            </div>
+            <p style="margin-top: 30px;">
+              <a href="/">← Back to Home</a>
+            </p>
+          </div>
+        </body>
+        </html>
+      `)
+    } catch (error: any) {
+      console.error('❌ Migration failed:', error)
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Migration Failed</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              max-width: 600px;
+              margin: 50px auto;
+              padding: 20px;
+            }
+            .error {
+              background: #f8d7da;
+              border: 2px solid #dc3545;
+              padding: 30px;
+              border-radius: 8px;
+            }
+            h1 { color: #dc3545; }
+            pre {
+              background: #f5f5f5;
+              padding: 15px;
+              border-radius: 4px;
+              overflow: auto;
+              font-size: 12px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="error">
+            <div style="font-size: 64px; text-align: center;">❌</div>
+            <h1>Migration Failed</h1>
+            <p><strong>Error:</strong> ${error.message}</p>
+            <pre>${error.stack}</pre>
+            <p style="margin-top: 30px;">
+              <a href="/admin-api/run-migrations">← Try Again</a>
+            </p>
+          </div>
+        </body>
+        </html>
+      `)
+    }
+  })
+
+  // Fix migration tracking table (separate endpoint for manual control)
+  fastify.get('/fix-migration-tracking', async (req, reply) => {
+    try {
+      // Get current state
+      const [oldRecords] = await fastify.sequelize.query(
+        "SELECT name FROM \"SequelizeMeta\" WHERE name LIKE '%.js' ORDER BY name"
+      )
+
+      const [allRecords] = await fastify.sequelize.query(
+        "SELECT name FROM \"SequelizeMeta\" ORDER BY name"
+      )
+
+      // Update if there are .js records
+      let updated = []
+      if (oldRecords && oldRecords.length > 0) {
+        // Can't UPDATE primary key, so we need to INSERT new records and DELETE old ones
+        await fastify.sequelize.query(`
+          INSERT INTO "SequelizeMeta" (name)
+          SELECT REPLACE(name, '.js', '.cjs')
+          FROM "SequelizeMeta"
+          WHERE name LIKE '%.js'
+          ON CONFLICT (name) DO NOTHING
+        `)
+
+        const [results] = await fastify.sequelize.query(
+          "DELETE FROM \"SequelizeMeta\" WHERE name LIKE '%.js' RETURNING name"
+        )
+        updated = results || []
+      }
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Migration Tracking Fixed</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              max-width: 700px;
+              margin: 50px auto;
+              padding: 20px;
+            }
+            .success {
+              background: #d4edda;
+              border: 2px solid #28a745;
+              padding: 30px;
+              border-radius: 8px;
+              margin-bottom: 20px;
+            }
+            .info {
+              background: #d1ecf1;
+              border: 2px solid #17a2b8;
+              padding: 20px;
+              border-radius: 8px;
+              margin-bottom: 20px;
+            }
+            h1 { color: #28a745; margin: 0 0 20px 0; }
+            pre {
+              background: white;
+              padding: 15px;
+              border-radius: 4px;
+              overflow: auto;
+              font-size: 12px;
+              border: 1px solid #ddd;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="success">
+            <div style="font-size: 64px; text-align: center;">✅</div>
+            <h1 style="text-align: center;">Migration Tracking Fixed!</h1>
+            ${updated.length > 0 ? `
+              <p><strong>Updated ${updated.length} migration records from .js to .cjs:</strong></p>
+              <pre>${updated.map((r: any) => r.name).join('\n')}</pre>
+            ` : `
+              <p>No .js records found - tracking table is already up to date!</p>
+            `}
+          </div>
+
+          <div class="info">
+            <h2>Current Migration Tracking (${allRecords.length} total):</h2>
+            <pre>${allRecords.map((r: any) => r.name).join('\n')}</pre>
+          </div>
+
+          <p style="text-align: center; margin-top: 30px;">
+            <a href="/admin-api/run-migrations" style="font-size: 18px;">→ Now Run Migrations</a>
+          </p>
+        </body>
+        </html>
+      `)
+    } catch (error: any) {
+      console.error('❌ Fix migration tracking failed:', error)
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family: sans-serif; padding: 20px; max-width: 600px; margin: 50px auto;">
+          <h1 style="color: red;">❌ Error</h1>
+          <p><strong>Error:</strong> ${error.message}</p>
+          <pre style="background: #f5f5f5; padding: 10px; overflow: auto;">${error.stack}</pre>
+        </body>
+        </html>
+      `)
+    }
+  })
+  // One-step migration fix and execution (mobile-friendly)
+  fastify.get('/fix-and-run-migrations', async (req, reply) => {
+    const log: string[] = []
+
+    try {
+      log.push('🔧 Step 1: Fixing migration tracking table...')
+
+      const [oldRecords] = await fastify.sequelize.query(
+        "SELECT name FROM \"SequelizeMeta\" WHERE name LIKE '%.js' ORDER BY name"
+      ) as any[]
+
+      log.push(`   Found ${oldRecords.length} records with .js extension`)
+
+      if (oldRecords.length > 0) {
+        // Can't UPDATE primary key, so we need to INSERT new records and DELETE old ones
+        await fastify.sequelize.query(`
+          INSERT INTO "SequelizeMeta" (name)
+          SELECT REPLACE(name, '.js', '.cjs')
+          FROM "SequelizeMeta"
+          WHERE name LIKE '%.js'
+          ON CONFLICT (name) DO NOTHING
+        `)
+
+        await fastify.sequelize.query(
+          "DELETE FROM \"SequelizeMeta\" WHERE name LIKE '%.js'"
+        )
+        log.push(`   ✅ Updated ${oldRecords.length} records to .cjs`)
+      } else {
+        log.push('   ✅ Already up to date')
+      }
+
+      log.push('')
+      log.push('📋 Step 2: Checking pending migrations...')
+
+      const CWD = process.cwd()
+      const MIGRATIONS_PATH = path.join(CWD, 'migrations')
+
+      // Create context with sequelize instance for migrations
+      const context = fastify.sequelize.getQueryInterface()
+      // Use Object.defineProperty to ensure the property is set correctly
+      Object.defineProperty(context, 'sequelize', {
+        value: fastify.sequelize,
+        writable: true,
+        enumerable: true,
+        configurable: true
+      })
+
+      const umzug = new Umzug({
+        migrations: { glob: MIGRATIONS_PATH + '/*.cjs' },
+        context,
+        storage: new SequelizeStorage({ sequelize: fastify.sequelize }),
+        logger: console,
+      })
+
+      const pending = await umzug.pending()
+      const executed = await umzug.executed()
+
+      log.push(`   Executed: ${executed.length} migrations`)
+      log.push(`   Pending: ${pending.length} migrations`)
+
+      if (pending.length === 0) {
+        log.push('')
+        log.push('✅ All migrations up to date!')
+
+        return reply.type('text/html').send(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Migrations Complete</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                max-width: 800px;
+                margin: 20px auto;
+                padding: 20px;
+                font-size: 16px;
+              }
+              .box {
+                background: #d4edda;
+                border: 2px solid #28a745;
+                padding: 25px;
+                border-radius: 8px;
+              }
+              .log {
+                background: white;
+                padding: 15px;
+                border-radius: 4px;
+                margin: 15px 0;
+                border: 1px solid #ddd;
+                font-family: monospace;
+                font-size: 13px;
+                white-space: pre-wrap;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="box">
+              <h1 style="color: #28a745; margin: 0 0 20px 0;">✅ Complete!</h1>
+              <div class="log">${log.join('\n')}</div>
+              <p style="margin-top: 20px;"><a href="/">← Back to Home</a></p>
+            </div>
+          </body>
+          </html>
+        `)
+      }
+
+      log.push('')
+      log.push(`⚙️ Step 3: Running ${pending.length} pending migration(s)...`)
+
+      for (const migration of pending) {
+        log.push(`   → ${migration.name}`)
+      }
+
+      await umzug.up()
+
+      log.push('')
+      log.push('✅ SUCCESS! All migrations complete!')
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Migration Success</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              max-width: 800px;
+              margin: 20px auto;
+              padding: 20px;
+              font-size: 16px;
+            }
+            .box {
+              background: #d4edda;
+              border: 2px solid #28a745;
+              padding: 25px;
+              border-radius: 8px;
+            }
+            .log {
+              background: white;
+              padding: 15px;
+              border-radius: 4px;
+              margin: 15px 0;
+              border: 1px solid #ddd;
+              font-family: monospace;
+              font-size: 13px;
+              white-space: pre-wrap;
+            }
+            .btn {
+              display: inline-block;
+              background: #007bff;
+              color: white;
+              padding: 12px 24px;
+              border-radius: 5px;
+              text-decoration: none;
+              margin-top: 15px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="box">
+            <h1 style="color: #28a745; margin: 0 0 20px 0;">🎉 Migration Success!</h1>
+            <div class="log">${log.join('\n')}</div>
+            <p>
+              <strong>Next step:</strong> Uncomment the hourly chime code and redeploy.
+            </p>
+            <a href="/" class="btn">← Back to Home</a>
+          </div>
+        </body>
+        </html>
+      `)
+
+    } catch (error: any) {
+      log.push('')
+      log.push(`❌ ERROR: ${error.message}`)
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Migration Error</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              max-width: 800px;
+              margin: 20px auto;
+              padding: 20px;
+              font-size: 16px;
+            }
+            .box {
+              background: #f8d7da;
+              border: 2px solid #dc3545;
+              padding: 25px;
+              border-radius: 8px;
+            }
+            .log {
+              background: white;
+              padding: 15px;
+              border-radius: 4px;
+              margin: 15px 0;
+              border: 1px solid #ddd;
+              font-family: monospace;
+              font-size: 13px;
+              white-space: pre-wrap;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="box">
+            <h1 style="color: #dc3545; margin: 0 0 20px 0;">❌ Migration Failed</h1>
+            <div class="log">${log.join('\n')}</div>
+            <details style="margin-top: 15px;">
+              <summary style="cursor: pointer; font-weight: bold;">Show Error Details</summary>
+              <pre style="background: white; padding: 10px; margin-top: 10px; overflow: auto; font-size: 12px;">${error.stack}</pre>
+            </details>
+          </div>
+        </body>
+        </html>
+      `)
+    }
+  })
+
+  // Memory Engine diagnostic
+  fastify.get('/memory-debug', async (req, reply) => {
+    const log: string[] = []
+
+    try {
+      log.push('🧠 Memory Engine Diagnostics')
+      log.push('='.repeat(40))
+      log.push('')
+
+      // Check user
+      const user = req.user
+      log.push(`👤 User: ${user.id}`)
+      log.push(`   Email: ${user.email}`)
+      log.push(`   Tags: ${user.tags.join(', ')}`)
+      const hasUsership = user.tags.some(t => t.toLowerCase() === 'usership')
+      log.push(`   Has Usership: ${hasUsership ? '✅' : '❌'}`)
+      log.push('')
+
+      // Check API keys
+      log.push('🔑 AI API Keys:')
+      log.push(`   TOGETHER_API_KEY: ${!!process.env.TOGETHER_API_KEY ? '✅' : '❌'}`)
+      log.push(`   GOOGLE_API_KEY: ${!!process.env.GOOGLE_API_KEY ? '✅' : '❌'}`)
+      log.push(`   MISTRAL_API_KEY: ${!!process.env.MISTRAL_API_KEY ? '✅' : '❌'}`)
+      log.push(`   ANTHROPIC_API_KEY: ${!!process.env.ANTHROPIC_API_KEY ? '✅' : '❌'}`)
+      log.push(`   OPENAI_API_KEY: ${!!process.env.OPENAI_API_KEY ? '✅' : '❌'}`)
+      log.push('')
+
+      // Check intelligent pacing
+      log.push('📊 Intelligent Pacing:')
+      const { calculateIntelligentPacing } = await import('#server/utils/memory')
+      const dayjs = (await import('#server/utils/dayjs')).default
+      const localDate = dayjs().tz(user.timeZone || 'America/New_York')
+
+      const pacing = await calculateIntelligentPacing(user.id, localDate, fastify.models)
+      log.push(`   Should show prompt: ${pacing.shouldShowPrompt ? '✅' : '❌'}`)
+      log.push(`   Is weekend: ${pacing.isWeekend}`)
+      log.push(`   Quota today: ${pacing.promptQuotaToday}`)
+      log.push(`   Prompts shown today: ${pacing.promptsShownToday}`)
+      log.push(`   Day number: ${pacing.dayNumber}`)
+      log.push('')
+
+      // Check recent answers
+      log.push('💬 Recent Answers (last 5):')
+      const answers = await fastify.models.Answer.findAll({
+        where: { userId: user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 5,
+        attributes: ['question', 'createdAt']
+      })
+
+      if (answers.length > 0) {
+        answers.forEach((a: any, i: number) => {
+          const timeAgo = dayjs().diff(dayjs(a.createdAt), 'hours')
+          log.push(`   ${i + 1}. "${a.question.substring(0, 50)}..." (${timeAgo}h ago)`)
+        })
+      } else {
+        log.push('   No answers found')
+      }
+      log.push('')
+
+      // Check recent logs count
+      log.push('📝 Recent Logs:')
+      const logsCount = await fastify.models.Log.count({
+        where: { userId: user.id }
+      })
+      log.push(`   Total logs: ${logsCount}`)
+      log.push('')
+
+      // Try generating a test question
+      log.push('🧪 Test Question Generation:')
+      try {
+        const logs = await fastify.models.Log.findAll({
+          where: { userId: user.id },
+          order: [['createdAt', 'DESC']],
+          limit: 40,
+        })
+
+        log.push(`   Loaded ${logs.length} logs for context`)
+        log.push(`   Attempting AI generation...`)
+
+        const { buildPrompt, completeAndExtractQuestion } = await import('#server/utils/memory')
+        const isWeekend = pacing.isWeekend
+
+        const prompt = await buildPrompt(user, logs, isWeekend, undefined)
+        log.push(`   Prompt built: ${prompt.length} characters`)
+
+        const question = await completeAndExtractQuestion(prompt, user)
+        log.push(`   ✅ SUCCESS! Generated question:`)
+        log.push(`   "${question.question}"`)
+        log.push(`   Options: ${question.options?.length || 0}`)
+      } catch (aiError: any) {
+        log.push(`   ❌ FAILED: ${aiError.message}`)
+        log.push(`   This is why you're getting default questions!`)
+      }
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Memory Engine Debug</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              max-width: 900px;
+              margin: 20px auto;
+              padding: 20px;
+              font-size: 15px;
+            }
+            .box {
+              background: #fff3cd;
+              border: 2px solid #ffc107;
+              padding: 25px;
+              border-radius: 8px;
+            }
+            h1 { color: #856404; margin: 0 0 20px 0; }
+            .log {
+              background: white;
+              padding: 15px;
+              border-radius: 4px;
+              margin: 15px 0;
+              border: 1px solid #ddd;
+              font-family: monospace;
+              font-size: 13px;
+              white-space: pre-wrap;
+              line-height: 1.8;
+            }
+            .btn {
+              display: inline-block;
+              background: #007bff;
+              color: white;
+              padding: 12px 24px;
+              border-radius: 5px;
+              text-decoration: none;
+              margin: 5px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="box">
+            <h1>🧠 Memory Engine Diagnostics</h1>
+            <div class="log">${log.join('\n')}</div>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #ffc107;">
+              <a href="/" class="btn">← Home</a>
+              <a href="/admin-api/status" class="btn">System Status</a>
+            </div>
+          </div>
+        </body>
+        </html>
+      `)
+    } catch (error: any) {
+      log.push('')
+      log.push(`❌ Diagnostic Error: ${error.message}`)
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family: monospace; padding: 20px; max-width: 900px; margin: 20px auto;">
+          <h1 style="color: red;">❌ Diagnostic Failed</h1>
+          <pre style="background: #f5f5f5; padding: 15px;">${log.join('\n')}\n\n${error.stack}</pre>
+        </body>
+        </html>
+      `)
+    }
+  })
+
+  /**
+   * GET /admin-api/widget-diagnostic
+   * Diagnostic endpoint to check why community/stats widgets aren't showing
+   */
+  fastify.get('/widget-diagnostic', async (req, reply) => {
+    if (!req.user) return reply.throw.unauthorized()
+
+    const log: string[] = []
+    log.push('🔍 LOT System Widget Diagnostic')
+    log.push('='.repeat(60))
+    log.push('')
+
+    try {
+      const now = dayjs()
+      const todayStart = now.startOf('day').toDate()
+      const sixHoursAgo = now.subtract(6, 'hours').toDate()
+      const fifteenMinutesAgo = now.subtract(15, 'minutes').toDate()
+
+      // Check IntentionPatterns data
+      log.push('📊 IntentionPatterns Widget')
+      log.push('-'.repeat(60))
+      const intentionLogs = await fastify.models.Log.findAll({
+        where: {
+          event: 'intention',
+          createdAt: { [Op.gte]: sixHoursAgo }
+        }
+      })
+      log.push(`Intention logs (last 6 hours): ${intentionLogs.length}`)
+      if (intentionLogs.length === 0) {
+        log.push('⚠️  NO DATA - Widget will not appear')
+        log.push('   Reason: No intention events logged in last 6 hours')
+      } else {
+        log.push('✅ Widget should appear')
+      }
+      log.push('')
+
+      // Check CollectiveConsciousness data
+      log.push('🌍 CollectiveConsciousness Widget')
+      log.push('-'.repeat(60))
+      const recentLogs = await fastify.models.Log.findAll({
+        where: {
+          createdAt: { [Op.gte]: fifteenMinutesAgo }
+        },
+        attributes: ['userId'],
+        group: ['userId']
+      })
+      const activeUsers = new Set(recentLogs.map((log: any) => log.userId))
+      log.push(`Active users (last 15 min): ${activeUsers.size}`)
+
+      const intentionsToday = await fastify.models.Log.count({
+        where: {
+          event: 'intention',
+          createdAt: { [Op.gte]: todayStart }
+        }
+      })
+      log.push(`Intentions today: ${intentionsToday}`)
+
+      const careMomentsToday = await fastify.models.Log.count({
+        where: {
+          event: 'self_care',
+          createdAt: { [Op.gte]: todayStart }
+        }
+      })
+      log.push(`Care moments today: ${careMomentsToday}`)
+      log.push('✅ Widget should appear (uses simulated data + real counts)')
+      log.push('')
+
+      // Check WellnessPulse data
+      log.push('💚 WellnessPulse Widget')
+      log.push('-'.repeat(60))
+      const questionsToday = await fastify.models.Answer.count({
+        where: {
+          createdAt: { [Op.gte]: todayStart }
+        }
+      })
+      log.push(`Questions answered today: ${questionsToday}`)
+
+      const emotionalCheckinsToday = await fastify.models.EmotionalCheckIn.count({
+        where: {
+          createdAt: { [Op.gte]: todayStart }
+        }
+      })
+      log.push(`Emotional check-ins today: ${emotionalCheckinsToday}`)
+      log.push(`Active users now: ${activeUsers.size}`)
+      log.push('✅ Widget should appear (uses simulated peak hours + real counts)')
+      log.push('')
+
+      // Check MemoryEngineStats data
+      log.push('🧠 MemoryEngineStats Widget')
+      log.push('-'.repeat(60))
+      const questionsGenerated = await fastify.models.Answer.count({
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: todayStart }
+        }
+      })
+      log.push(`Questions answered by you today: ${questionsGenerated}`)
+      log.push('✅ Widget should appear (uses calculated metrics)')
+      log.push('')
+
+      // Summary
+      log.push('='.repeat(60))
+      log.push('📋 SUMMARY')
+      log.push('-'.repeat(60))
+
+      if (intentionLogs.length === 0) {
+        log.push('⚠️  IntentionPatterns will NOT show (no data)')
+        log.push('   → To fix: Record intention signals via System widgets')
+      } else {
+        log.push('✅ All widgets should appear')
+      }
+
+      log.push('')
+      log.push('💡 TIP: Widgets return null if:')
+      log.push('   1. API is still loading')
+      log.push('   2. API returns error')
+      log.push('   3. No data exists for that widget')
+      log.push('')
+      log.push('🔗 Check these API endpoints directly:')
+      log.push('   • /api/stats/patterns')
+      log.push('   • /api/stats/collective')
+      log.push('   • /api/stats/wellness')
+      log.push('   • /api/stats/memory-engine')
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Widget Diagnostic</title>
+          <style>
+            body {
+              font-family: 'Courier New', monospace;
+              background: #1a1a1a;
+              color: #e0e0e0;
+              padding: 20px;
+              max-width: 900px;
+              margin: 20px auto;
+            }
+            .box {
+              background: #2a2a2a;
+              border: 2px solid #ffc107;
+              padding: 30px;
+              border-radius: 8px;
+            }
+            h1 {
+              color: #ffc107;
+              margin: 0 0 20px 0;
+            }
+            .log {
+              background: #1a1a1a;
+              padding: 20px;
+              border-radius: 4px;
+              white-space: pre-wrap;
+              font-size: 14px;
+              line-height: 1.6;
+            }
+            .btn {
+              display: inline-block;
+              background: #ffc107;
+              color: #1a1a1a;
+              padding: 10px 20px;
+              text-decoration: none;
+              border-radius: 4px;
+              margin-right: 10px;
+              font-weight: bold;
+            }
+            .btn:hover {
+              background: #ffca28;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="box">
+            <h1>🔍 Widget Diagnostic Results</h1>
+            <div class="log">${log.join('\n')}</div>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #ffc107;">
+              <a href="/" class="btn">← Home</a>
+              <a href="/admin-api/status" class="btn">System Status</a>
+              <a href="/admin-api/memory-diagnostic" class="btn">Memory Diagnostic</a>
+            </div>
+          </div>
+        </body>
+        </html>
+      `)
+    } catch (error: any) {
+      log.push('')
+      log.push(`❌ Diagnostic Error: ${error.message}`)
+
+      return reply.type('text/html').send(`
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family: monospace; padding: 20px; max-width: 900px; margin: 20px auto;">
+          <h1 style="color: red;">❌ Diagnostic Failed</h1>
+          <pre style="background: #f5f5f5; padding: 15px;">${log.join('\n')}\n\n${error.stack}</pre>
+        </body>
+        </html>
       `)
     }
   })

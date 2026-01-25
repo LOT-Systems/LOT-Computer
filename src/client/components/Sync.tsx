@@ -71,8 +71,10 @@ export const Sync = () => {
     }
   }, [fetchedMessages])
 
+  // Invalidate cache on mount to ensure fresh data (filters suspended users)
   // Reset hasInitiallyLoaded when component unmounts so data reloads on return
   React.useEffect(() => {
+    queryClient.invalidateQueries(['/api/chat-messages'])
     return () => {
       hasInitiallyLoaded.current = false
     }

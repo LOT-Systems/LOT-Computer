@@ -44,8 +44,8 @@ export const Logs: React.FC = () => {
       // Past logs don't need to trigger push-down
       if (log.id === recentLogId) {
         // Refetch logs to push down saved entry and create new empty log
-        // Wait 4 seconds for 2 breathe blinks to complete (2 iterations × 2s each)
-        // Store timeout ID so it can be cancelled if user starts typing again
+        // Wait 7 seconds: 3s pause (read saved entry) + 4s gentle blink = 7s total
+        // Push happens when blink completes at opacity 0.2 (matching saved logs)
         pendingPushRef.current = setTimeout(async () => {
           try {
             await refetchLogs()
@@ -54,7 +54,7 @@ export const Logs: React.FC = () => {
             console.error('[Logs] Refetch failed:', error)
             pendingPushRef.current = null
           }
-        }, 4000)
+        }, 7000)
       }
     },
   })
@@ -214,9 +214,9 @@ export const Logs: React.FC = () => {
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="Mood:" blockView>
                 <div className="mb-8 capitalize">{emotionalState}</div>
-                {note && <div className="opacity-60 mb-8">{note}</div>}
+                {note && <div className="mb-8">{note}</div>}
                 {insights && insights.length > 0 && (
-                  <div className="opacity-60 text-[14px]">
+                  <div>
                     {insights.map((insight, idx) => (
                       <div key={idx}>• {insight}</div>
                     ))}
@@ -318,12 +318,7 @@ const NoteEditor = ({
   const [value, setValue] = React.useState(log.text || '')
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null)
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
-  const [isAboutToPush, setIsAboutToPush] = React.useState(false) // 2 breathe blinks before push
-  const [isSaving, setIsSaving] = React.useState(false) // Prevent concurrent saves
-  const savingInProgressRef = React.useRef(false) // Prevent duplicate saves during tab switch
-  // New timing: finish typing > wait 5s > 2 breathe blinks (4s) + save > push down
-  // Past logs: 5s debounce (same as primary now for consistency)
-  const debounceTime = 5000  // 5s for all logs
+  const debounceTime = 7000  // 7s for all logs
   const debouncedValue = useDebounce(value, debounceTime)
 
   // Keep refs in sync
@@ -332,18 +327,10 @@ const NoteEditor = ({
     // Mark as unsaved when user types
     if (value !== log.text) {
       setIsSaved(false)
-      // Cancel pending push if user starts typing again
-      if (pendingPushRef?.current) {
-        clearTimeout(pendingPushRef.current)
-        pendingPushRef.current = null
-      }
-
-      // Stop any ongoing blink animation when user types
-      if (primary) {
-        setIsAboutToPush(false)
-      }
+      // Don't cancel pending push - let the save complete and push down
+      // The sync effect has protection to not overwrite unsaved changes
     }
-  }, [value, log.text, pendingPushRef, primary])
+  }, [value, log.text, primary])
 
   React.useEffect(() => {
     logTextRef.current = log.text
@@ -356,19 +343,10 @@ const NoteEditor = ({
   // Note: No blur save handler - saves happen via unmount and debounced autosave
   // This keeps scrolling behavior simple (no blur = no issues)
 
-  // Autosave for all logs (5s debounce)
-  // New timeline: finish typing > wait 5s > [2 breathe blinks + save] > push after 4s
+  // Autosave for all logs (7s debounce)
+  // Timeline: finish typing > wait 7s > save > opacity fades to 20% > push
   React.useEffect(() => {
     if (log.text === debouncedValue) return
-    if (isSaving) return  // Prevent concurrent saves
-
-    setIsSaving(true)
-
-    // For primary log: start 2 breathe blinks when save begins
-    // Animation completes after 4 seconds (2 iterations × 2s each), then push starts
-    if (primary) {
-      setIsAboutToPush(true)
-    }
 
     // Save the log
     onChange(debouncedValue)
@@ -381,9 +359,6 @@ const NoteEditor = ({
     if (valueRef.current === debouncedValue) {
       setIsSaved(true)
     }
-
-    // Clear saving state after a brief delay
-    setTimeout(() => setIsSaving(false), 100)
   }, [debouncedValue, onChange, log.text, primary])
 
   // Sync local state when log updates from server
@@ -425,10 +400,7 @@ const NoteEditor = ({
   React.useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden && valueRef.current !== logTextRef.current) {
-        if (savingInProgressRef.current) return // Prevent duplicate save
-        savingInProgressRef.current = true
         onChangeRef.current(valueRef.current)
-        setTimeout(() => { savingInProgressRef.current = false }, 500)
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
@@ -442,7 +414,6 @@ const NoteEditor = ({
     return () => {
       // Save on unmount if there are unsaved changes
       if (valueRef.current !== logTextRef.current) {
-        if (savingInProgressRef.current) return // Prevent duplicate save
         onChangeRef.current(valueRef.current)
       }
     }
@@ -458,11 +429,6 @@ const NoteEditor = ({
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
           setIsSaved(true)
-          // Trigger 2 breathe blinks for manual save too
-          // Animation completes after 4 seconds, then push starts
-          if (primary) {
-            setIsAboutToPush(true)
-          }
         }
         // Optionally blur to show save happened
         ;(ev.target as HTMLTextAreaElement).blur()
@@ -552,9 +518,8 @@ const NoteEditor = ({
             'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
             'placeholder:opacity-100',
             !primary && 'opacity-20',
-            primary && isSaved && !isAboutToPush && 'opacity-40',
-            primary && !isSaved && 'opacity-100',
-            primary && isAboutToPush && 'animate-blink'
+            primary && isSaved && 'opacity-20',
+            primary && !isSaved && 'opacity-100'
           )}
           rows={primary ? 10 : 1}
         />
@@ -591,7 +556,7 @@ const LogContainer: React.FC<{
           'relative mb-4 sm:mb-0',
           'sm:absolute sm:top-0 sm:right-0 text-end select-none',
           'transition-opacity',
-          'hidden sm:block opacity-20',
+          'opacity-20',
           'group-hover:opacity-100'
         )}
       >

@@ -24,6 +24,7 @@ export class User
   declare phone: UserModel['phone']
   declare timeZone: UserModel['timeZone']
   declare hideActivityLogs: UserModel['hideActivityLogs']
+  declare timeChime?: UserModel['timeChime']
   declare tags: UserModel['tags']
   declare lastSeenAt: UserModel['lastSeenAt']
   declare joinedAt: UserModel['joinedAt']
@@ -42,6 +43,7 @@ export class User
       'phone',
       'tags',
       'hideActivityLogs',
+      'timeChime',
     ])(this.toJSON())
 
     // Add memory engine status based on tags
@@ -145,6 +147,10 @@ User.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    // timeChime: {
+    //   type: DataTypes.BOOLEAN,
+    //   defaultValue: false,
+    // },
     tags: {
       type: DataTypes.ARRAY(DataTypes.STRING),
       defaultValue: [],

@@ -51,6 +51,7 @@ export const USER_SETTING_NAMES: (keyof UserSettings)[] = [
   'address',
   'phone',
   'hideActivityLogs',
+  // 'timeChime', // Commented out until migration runs - uncomment after running /admin-api/run-migrations
 ]
 
 export const USER_SETTING_NAME_BY_ID: Record<keyof UserSettings, string> = {
@@ -61,6 +62,7 @@ export const USER_SETTING_NAME_BY_ID: Record<keyof UserSettings, string> = {
   address: 'Address',
   phone: 'Phone',
   hideActivityLogs: 'Activity log',
+  timeChime: 'Hourly chime',
 }
 
 // the list is taken from "iso-3166/1.js"

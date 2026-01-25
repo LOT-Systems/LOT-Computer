@@ -11,6 +11,7 @@ import {
 } from '#shared/constants'
 import { cn } from '#client/utils'
 import { WorldCanvas } from './WorldCanvas'
+import { GrowthMilestones, BadgeUnlockFeed } from './stats'
 
 interface StatusData {
   version: string
@@ -22,6 +23,7 @@ export const Settings = () => {
   const baseColor = useStore(stores.baseColor)
   const accentColor = useStore(stores.accentColor)
   const isCustomThemeEnabled = useStore(stores.isCustomThemeEnabled)
+  const isTimeChimeEnabled = useStore(stores.isTimeChimeEnabled)
   const { data: storyData } = useMyMemoryStory()
 
   const { mutate: updateSettings } = useUpdateSettings({
@@ -51,6 +53,7 @@ export const Settings = () => {
     address: me?.address || '',
     country: me?.country || '',
     hideActivityLogs: me?.hideActivityLogs || false,
+    timeChime: me?.timeChime ?? false,
   })
 
   // Privacy settings state
@@ -131,6 +134,29 @@ export const Settings = () => {
     }))
     setChanged(true)
   }, [])
+
+  const onToggleTimeChime = React.useCallback(async () => {
+    const newValue = !state.timeChime
+    setState((prevState) => ({
+      ...prevState,
+      timeChime: newValue,
+    }))
+    stores.isTimeChimeEnabled.set(newValue)
+
+    // Save immediately to database
+    try {
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...state,
+          timeChime: newValue
+        }),
+      })
+    } catch (error) {
+      console.error('Failed to save timeChime setting:', error)
+    }
+  }, [state])
 
   // Privacy settings handlers
   const onTogglePrivacy = React.useCallback((field: keyof Omit<UserPrivacySettings, 'customUrl'>) => {
@@ -232,16 +258,18 @@ export const Settings = () => {
     [state]
   )
 
+  // Get version from store (set by app.tsx from /api/public/status)
+  const appVersion = useStore(stores.appVersion)
+
   // Fetch status data for the status link (REMOVED - too slow)
-  // Using cached version from localStorage instead
+  // Using version from store instead
   React.useEffect(() => {
-    // Use lightweight version check instead of full health check
-    const cachedVersion = localStorage.getItem('appVersion')
+    // Use version from store, fallback to package.json version if not loaded yet
     setStatusData({
-      version: cachedVersion || '0.2.0',
+      version: appVersion || '1.2.0',
       overall: 'ok'
     })
-  }, [])
+  }, [appVersion])
 
   const statusText = statusData
     ? statusData.overall === 'ok'
@@ -373,6 +401,34 @@ export const Settings = () => {
         <div>
           <Block label="Activity log:" onChildrenClick={onToggleActivityLogs}>
             {state.hideActivityLogs ? 'Off' : 'On'}
+          </Block>
+          <Block label="Hourly chime:" onChildrenClick={onToggleTimeChime}>
+            {state.timeChime ? 'On' : 'Off'}
+          </Block>
+        </div>
+
+        {/* Data Export Section */}
+        <div>
+          <Block label="Data Export:" blockView>
+            <div className="mb-12">
+              Download your personal data as CSV files for analysis, backup, or sharing with healthcare providers.
+            </div>
+            <div className="flex flex-col gap-4">
+              <a
+                href="/api/export/emotional-checkins"
+                download
+                className="opacity-75 hover:opacity-100 transition-opacity underline"
+              >
+                Export Mood Check-ins (CSV)
+              </a>
+              <a
+                href="/api/export/self-care"
+                download
+                className="opacity-75 hover:opacity-100 transition-opacity underline"
+              >
+                Export Self-care History (CSV)
+              </a>
+            </div>
           </Block>
         </div>
 
@@ -540,6 +596,10 @@ export const Settings = () => {
           </Block>
         </div>
       )}
+
+      {/* Stats Widgets - Show on Settings/Profile page */}
+      <GrowthMilestones />
+      <BadgeUnlockFeed />
 
     </div>
   )
