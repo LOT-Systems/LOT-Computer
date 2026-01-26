@@ -311,7 +311,7 @@ export function MemoryWidget() {
 
           {/* Error Details */}
           {showErrorDetails && error && (
-            <div className="text-xs opacity-70 font-mono bg-acc/5 p-3 rounded border border-acc/20 overflow-auto max-h-[200px]">
+            <div className="text-xs opacity-70 font-mono grid-fill-light p-3 rounded border border-acc/20 overflow-auto max-h-[200px]">
               <div className="mb-2 font-bold">Error Details:</div>
               {(error as any).response?.status && (
                 <div>Status: {(error as any).response.status}</div>

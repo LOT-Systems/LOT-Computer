@@ -123,7 +123,7 @@ export const PublicProfile = () => {
             Looking for: {userIdOrUsername}
           </div>
           {debugInfo && (
-            <div className="mt-8 text-left bg-acc/5 p-4 rounded text-sm">
+            <div className="mt-8 text-left grid-fill-light p-4 rounded text-sm">
               <div className="font-bold mb-2">Debug Information:</div>
               <div className="mb-2">User ID: {debugInfo.userId}</div>
               <div className="mb-2">Has Metadata: {debugInfo.hasMetadata ? 'Yes' : 'No'}</div>
