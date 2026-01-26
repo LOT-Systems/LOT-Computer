@@ -141,22 +141,22 @@ export function ApiPage() {
             {
               id: 'method',
               header: 'Method',
-              accessor: (row) => <span className="text-green opacity-75">{row.method}</span>
+              accessor: (row) => row.method
             },
             {
               id: 'endpoint',
               header: 'Endpoint',
-              accessor: (row) => <span className="font-mono opacity-75">{row.endpoint}</span>
+              accessor: (row) => row.endpoint
             },
             {
               id: 'description',
               header: 'Description',
-              accessor: (row) => <span className="opacity-75">{row.description}</span>
+              accessor: (row) => row.description
             },
             {
               id: 'format',
               header: 'Format',
-              accessor: (row) => <span className="opacity-75">{row.format}</span>
+              accessor: (row) => row.format
             }
           ]}
           paddingClassName="p-8"
