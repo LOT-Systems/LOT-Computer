@@ -147,10 +147,10 @@ User.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    // timeChime: {
-    //   type: DataTypes.BOOLEAN,
-    //   defaultValue: false,
-    // },
+    timeChime: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     tags: {
       type: DataTypes.ARRAY(DataTypes.STRING),
       defaultValue: [],

@@ -51,7 +51,7 @@ export const USER_SETTING_NAMES: (keyof UserSettings)[] = [
   'address',
   'phone',
   'hideActivityLogs',
-  // 'timeChime', // Commented out until migration runs - uncomment after running /admin-api/run-migrations
+  'timeChime',
 ]
 
 export const USER_SETTING_NAME_BY_ID: Record<keyof UserSettings, string> = {
