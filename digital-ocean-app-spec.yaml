@@ -5,7 +5,7 @@ services:
   - name: web
     # GitHub repository configuration
     git:
-      branch: claude/LOT_updates_November_2025-01XjLLhgKKL2Syne7Q1nqoGS
+      branch: claude/february-2025-updates-HZZTF
       repo_clone_url: https://github.com/vadikmarmeladov/lot-systems.git
 
     # Build configuration
