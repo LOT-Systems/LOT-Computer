@@ -33,6 +33,7 @@ import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
 import { SystemProgressWidget } from './SystemProgressWidget'
 import { SystemPulseWidget } from './SystemPulseWidget'
+import { EvolutionWidget } from './EvolutionWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
 import { getOptimalWidget, shouldShowWidget, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
@@ -417,6 +418,9 @@ export const System = () => {
 
       {/* Narrative - RPG-style story progression and achievements */}
       <NarrativeWidget />
+
+      {/* Evolution - Minimalist profile growth indicators */}
+      <EvolutionWidget />
 
       <div>
         <Block

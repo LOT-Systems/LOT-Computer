@@ -1965,4 +1965,198 @@ export default async (fastify: FastifyInstance) => {
       `)
     }
   })
+
+  // Send monthly review email to specific user (for testing)
+  fastify.post('/send-monthly-review/:userId', async (req: FastifyRequest<{
+    Params: { userId: string }
+  }>, reply) => {
+    try {
+      const { sendEmail } = await import('../utils/email.js')
+      const { generateMonthlySummary, generateMonthlyEmailBody } = await import('../utils/monthly-summary.js')
+
+      const userId = req.params.userId
+
+      // Fetch user
+      const user = await fastify.models.User.findByPk(userId)
+      if (!user) {
+        return reply.status(404).send({ error: 'User not found' })
+      }
+
+      // Fetch user's logs
+      const logs = await fastify.models.Log.findAll({
+        where: { userId: user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 1000 // Last 1000 logs should cover several months
+      })
+
+      // Generate monthly summary
+      const summary = await generateMonthlySummary(user.toPublic(), logs.map(l => l.toJSON()))
+
+      // Generate email body
+      const emailBody = generateMonthlyEmailBody(summary, user.firstName || '')
+
+      // Send email
+      const result = await sendEmail({
+        to: user.email,
+        subject: `${summary.period.month} ${summary.period.year} — Your LOT Review`,
+        text: emailBody
+      })
+
+      return reply.send({
+        success: result.success,
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName
+        },
+        summary: {
+          period: summary.period,
+          presence: summary.presence,
+          growth: summary.growth
+        },
+        email: result.success ? {
+          sent: true,
+          messageId: result.messageId
+        } : {
+          sent: false,
+          error: result.error
+        }
+      })
+    } catch (error: any) {
+      console.error('Failed to send monthly review:', error)
+      return reply.status(500).send({
+        error: 'Failed to send monthly review',
+        details: error.message
+      })
+    }
+  })
+
+  // Send monthly review to all active users (for cron scheduling)
+  fastify.post('/send-monthly-reviews-all', async (req: FastifyRequest, reply) => {
+    try {
+      const { sendEmail } = await import('../utils/email.js')
+      const { generateMonthlySummary, generateMonthlyEmailBody, shouldShowMonthlySummary } = await import('../utils/monthly-summary.js')
+
+      // Find all users who have been active in the last 60 days
+      const sixtyDaysAgo = dayjs().subtract(60, 'day').toDate()
+
+      const activeUsers = await fastify.models.User.findAll({
+        where: {
+          lastSeenAt: {
+            [Op.gte]: sixtyDaysAgo
+          },
+          // Only send to users with Usership tag for now
+          tags: {
+            [Op.contains]: ['usership']
+          }
+        },
+        order: [['lastSeenAt', 'DESC']]
+      })
+
+      const results = {
+        total: activeUsers.length,
+        sent: 0,
+        skipped: 0,
+        failed: 0,
+        details: [] as any[]
+      }
+
+      // Process each user
+      for (const user of activeUsers) {
+        try {
+          // Check if user should receive monthly summary
+          const metadata = user.metadata as any || {}
+          const lastMonthlySummary = metadata.lastMonthlySummaryDate ? new Date(metadata.lastMonthlySummaryDate) : null
+
+          if (!shouldShowMonthlySummary(user.toPublic(), lastMonthlySummary)) {
+            results.skipped++
+            results.details.push({
+              userId: user.id,
+              email: user.email,
+              status: 'skipped',
+              reason: 'Too soon since last summary'
+            })
+            continue
+          }
+
+          // Fetch user's logs
+          const logs = await fastify.models.Log.findAll({
+            where: { userId: user.id },
+            order: [['createdAt', 'DESC']],
+            limit: 1000
+          })
+
+          // Need at least some activity to generate summary
+          if (logs.length < 5) {
+            results.skipped++
+            results.details.push({
+              userId: user.id,
+              email: user.email,
+              status: 'skipped',
+              reason: 'Insufficient activity'
+            })
+            continue
+          }
+
+          // Generate monthly summary
+          const summary = await generateMonthlySummary(user.toPublic(), logs.map(l => l.toJSON()))
+
+          // Generate email body
+          const emailBody = generateMonthlyEmailBody(summary, user.firstName || '')
+
+          // Send email
+          const result = await sendEmail({
+            to: user.email,
+            subject: `${summary.period.month} ${summary.period.year} — Your LOT Review`,
+            text: emailBody
+          })
+
+          if (result.success) {
+            // Update user metadata with last summary date
+            await user.set({
+              metadata: {
+                ...metadata,
+                lastMonthlySummaryDate: new Date().toISOString()
+              }
+            }).save()
+
+            results.sent++
+            results.details.push({
+              userId: user.id,
+              email: user.email,
+              status: 'sent',
+              messageId: result.messageId
+            })
+          } else {
+            results.failed++
+            results.details.push({
+              userId: user.id,
+              email: user.email,
+              status: 'failed',
+              error: result.error
+            })
+          }
+
+          // Small delay between emails to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 1000))
+        } catch (error: any) {
+          results.failed++
+          results.details.push({
+            userId: user.id,
+            email: user.email,
+            status: 'failed',
+            error: error.message
+          })
+        }
+      }
+
+      return reply.send(results)
+    } catch (error: any) {
+      console.error('Failed to send monthly reviews:', error)
+      return reply.status(500).send({
+        error: 'Failed to send monthly reviews',
+        details: error.message
+      })
+    }
+  })
 }
