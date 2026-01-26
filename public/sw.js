@@ -1,7 +1,7 @@
 // Service Worker for LOT Systems PWA
-// Version: 2025-12-30-003
+// Version: 2026-01-26-001 - Force refresh after Memory Engine fixes
 
-const CACHE_VERSION = 'v2025-12-30-003';
+const CACHE_VERSION = 'v2026-01-26-001';
 const CACHE_NAME = `lot-cache-${CACHE_VERSION}`;
 
 // Files to cache initially (only static assets)
