@@ -792,5 +792,7 @@ const MODULE_BY_LOG_EVENT: Record<LogEvent, string> = {
   theme_change: 'Theme',
   weather_update: 'Weather',
   note: 'Note',
+  emotional_checkin: 'Check-in',
+  system_feedback: 'Feedback',
   other: 'Other',
 }
