@@ -4,7 +4,7 @@ import { analyzeEnergyState } from '#server/utils/energy.js'
 import { generateUserNarrative } from '#server/utils/rpg-narrative.js'
 import { detectSemanticStruggle } from '#server/utils/compassionate-interventions.js'
 import { analyzeUserPatterns, type PatternInsight } from '#server/utils/patterns.js'
-import { determineUserCohort, extractUserTraits } from '#server/utils/memory.js'
+import { determineUserCohort, extractUserTraits, generateMemoryStory } from '#server/utils/memory.js'
 
 /**
  * Monthly Summary Generator - Plain LOT Style Review
@@ -50,6 +50,7 @@ export interface MonthlySummary {
   }
   narrative: string
   forwardLook: string
+  memoryStory: string | null
 }
 
 /**
@@ -293,6 +294,22 @@ export async function generateMonthlySummary(
 
   const forwardLook = generateForwardLook(consistency, strugglingPeriods, notableProgress, cohort)
 
+  // Generate Memory Story - narrative synthesis of user's answers
+  let memoryStory: string | null = null
+  try {
+    // Only generate if user has answered Memory questions
+    const answerLogs = logs.filter(log => log.event === 'answer')
+    if (answerLogs.length >= 5) {
+      memoryStory = await generateMemoryStory(user, logs)
+      console.log(`📖 Generated Memory Story for monthly summary (${memoryStory?.length || 0} chars)`)
+    } else {
+      console.log('⏭️ Skipping Memory Story - insufficient answers')
+    }
+  } catch (error: any) {
+    console.error('❌ Failed to generate Memory Story for monthly summary:', error.message)
+    memoryStory = null
+  }
+
   return {
     period,
     presence: { activeDays, totalEntries, consistency, longestStreak },
@@ -320,7 +337,8 @@ export async function generateMonthlySummary(
       notableProgress
     },
     narrative: narrativeText,
-    forwardLook
+    forwardLook,
+    memoryStory
   }
 }
 
@@ -518,17 +536,39 @@ function mostCommon<T>(arr: T[]): T | undefined {
 export function generateMonthlyEmailBody(summary: MonthlySummary, userFirstName: string): string {
   const greeting = userFirstName ? userFirstName : 'there'
 
-  return `${greeting},
+  // Build email sections
+  const sections: string[] = []
 
-Your ${summary.period.month} review from LOT Systems.
+  // Header
+  sections.push(`${greeting},`)
+  sections.push('')
+  sections.push(`Your ${summary.period.month} review from LOT Systems.`)
+  sections.push('')
 
-${summary.narrative}
+  // Main narrative
+  sections.push(summary.narrative)
+  sections.push('')
 
-${summary.forwardLook}
+  // Memory Story if available
+  if (summary.memoryStory) {
+    sections.push('─'.repeat(40))
+    sections.push('')
+    sections.push('Memory Story')
+    sections.push('')
+    sections.push(summary.memoryStory)
+    sections.push('')
+  }
 
-Continue at lot-systems.com
+  // Forward look
+  sections.push(summary.forwardLook)
+  sections.push('')
 
-—
-LOT Systems
-Patterns. Growth. Presence.`
+  // Footer
+  sections.push('Continue at lot-systems.com')
+  sections.push('')
+  sections.push('—')
+  sections.push('LOT Systems')
+  sections.push('Patterns. Growth. Presence.')
+
+  return sections.join('\n')
 }
