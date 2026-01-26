@@ -34,6 +34,7 @@ import { ChatCatalystWidget } from './ChatCatalystWidget'
 import { SystemProgressWidget } from './SystemProgressWidget'
 import { SystemPulseWidget } from './SystemPulseWidget'
 import { EvolutionWidget } from './EvolutionWidget'
+import { CohortConnectWidget } from './CohortConnectWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
 import { getOptimalWidget, shouldShowWidget, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
@@ -608,6 +609,9 @@ export const System = () => {
 
       {/* Pattern Insights - Show user's discovered patterns and cohort matches */}
       <PatternInsightsWidget />
+
+      {/* Cohort Connect - Browse and connect with cohort members */}
+      <CohortConnectWidget />
 
       {/* Planner - Show occasionally for daily/weekly planning */}
       <PlannerWidget />
