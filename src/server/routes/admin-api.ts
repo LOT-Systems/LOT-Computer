@@ -2163,16 +2163,18 @@ export default async (fastify: FastifyInstance) => {
   // Manually trigger scheduled jobs (for testing)
   fastify.post('/trigger-scheduled-jobs', async (req: FastifyRequest, reply) => {
     try {
-      console.log('🔧 Manually triggering scheduled jobs...')
-      const { checkAndRunScheduledJobs } = await import('../scheduled-jobs.js')
+      console.log('🔧 Manually triggering monthly email job...')
+      const { manuallyTriggerMonthlyEmails } = await import('../scheduled-jobs.js')
 
-      // Run jobs immediately (bypass time checks for manual trigger)
-      await checkAndRunScheduledJobs()
+      // Run job immediately (bypasses time checks)
+      const result = await manuallyTriggerMonthlyEmails()
 
       return reply.send({
-        success: true,
-        message: 'Scheduled jobs triggered successfully',
-        triggeredAt: new Date().toISOString()
+        success: result.success,
+        message: 'Monthly email job executed',
+        triggeredAt: result.executedAt,
+        result: result.result,
+        error: result.error
       })
     } catch (error: any) {
       console.error('Failed to trigger scheduled jobs:', error)

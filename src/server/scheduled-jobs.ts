@@ -248,6 +248,15 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
 }
 
 /**
+ * Manually trigger monthly email job (bypasses time checks)
+ * Used for testing and manual sends
+ */
+export async function manuallyTriggerMonthlyEmails(): Promise<JobResult> {
+  console.log('🔧 Manual trigger requested - bypassing time checks')
+  return await executeMonthlyEmailJob()
+}
+
+/**
  * Initialize scheduled job system
  * Sets up a simple interval-based scheduler
  */

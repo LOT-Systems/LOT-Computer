@@ -43,20 +43,27 @@ export const EvolutionWidget: React.FC = () => {
   // Calculate current streak
   const sortedDays = Array.from(uniqueDays).sort().reverse()
   let streakDays = 0
+  const today = dayjs().format('YYYY-MM-DD')
+  const yesterday = dayjs().subtract(1, 'day').format('YYYY-MM-DD')
 
-  for (let i = 0; i < sortedDays.length; i++) {
-    const expectedDay = dayjs().subtract(i, 'day').format('YYYY-MM-DD')
-    if (sortedDays[i] === expectedDay || (i === 0 && sortedDays[i] === dayjs().subtract(1, 'day').format('YYYY-MM-DD'))) {
-      streakDays++
-    } else {
-      break
+  // Check if streak is active (includes today or yesterday)
+  if (sortedDays.length > 0 && (sortedDays[0] === today || sortedDays[0] === yesterday)) {
+    // Count consecutive days from most recent
+    const startOffset = sortedDays[0] === today ? 0 : 1
+    for (let i = 0; i < sortedDays.length; i++) {
+      const expectedDay = dayjs().subtract(i + startOffset, 'day').format('YYYY-MM-DD')
+      if (sortedDays[i] === expectedDay) {
+        streakDays++
+      } else {
+        break
+      }
     }
   }
 
   const consistency = activeDays > 0 ? Math.min(100, Math.round((streakDays / Math.min(activeDays, 30)) * 100)) : 0
 
-  // Calculate XP for next level (simple formula: level * 100)
-  const xpForNextLevel = (currentLevel + 1) * 100
+  // Display XP progress (totalXP is actual activity count)
+  // Show last 2 digits as progress indicator
   const xpProgress = totalXP % 100
 
   // Determine evolution stage based on level
@@ -120,16 +127,16 @@ export const EvolutionWidget: React.FC = () => {
           )}
         </div>
 
-        {/* XP Progress - minimal bar */}
+        {/* Activity Progress - minimal bar */}
         <div>
           <div className="flex justify-between text-xs opacity-40 mb-2">
-            <div>Progress</div>
-            <div>{xpProgress}/{xpForNextLevel} XP</div>
+            <div>Total XP</div>
+            <div>{totalXP}</div>
           </div>
           <div className="h-1 grid-fill-light rounded-full overflow-hidden">
             <div
               className="h-full bg-acc transition-all duration-500"
-              style={{ width: `${Math.min(100, (xpProgress / xpForNextLevel) * 100)}%` }}
+              style={{ width: `${Math.min(100, xpProgress)}%` }}
             />
           </div>
         </div>
