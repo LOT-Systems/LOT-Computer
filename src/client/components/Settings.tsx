@@ -515,14 +515,14 @@ export const Settings = () => {
                 href="https://brand.lot-systems.com"
                 target="_blank"
                 rel="external"
-                className="-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc/10"
+                className="-ml-4 px-4 rounded cursor-pointer grid-fill-hover"
               >
                 Subscribe to activate → brand.lot-systems.com
               </a>
             )}
           </Block>
           <Block label="Site systems check:">
-            <a href="/status" className="-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc/10">
+            <a href="/status" className="-ml-4 px-4 rounded cursor-pointer grid-fill-hover">
               {statusText}
             </a>
           </Block>

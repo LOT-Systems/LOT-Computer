@@ -44,7 +44,7 @@ export const Table = <D,>(props: Props<D>) => {
                 <tr
                   key={i}
                   className={cn(
-                    isSelected && 'bg-acc-400/10',
+                    isSelected && 'grid-fill',
                     isClickable && 'cursor-pointer'
                   )}
                   onClick={() => props.onRowClick?.(i)}
@@ -77,7 +77,7 @@ export const Td: React.FC<{ children: ReactEl; className?: string; isSelected?: 
 ) => {
   return (
     <td className={cn(
-      'border-b border-r hover:bg-acc-400/10 transition-colors p-8',
+      'border-b border-r grid-fill-hover p-8',
       props.isSelected ? 'border-acc-400' : 'border-acc-400/30',
       props.className
     )}>

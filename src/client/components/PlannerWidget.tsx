@@ -150,8 +150,8 @@ export const PlannerWidget: React.FC = () => {
                 className={cn(
                   'px-8 py-4 transition-colors cursor-pointer',
                   state.selectedCategory === 'intent'
-                    ? 'bg-acc/10'
-                    : 'hover:bg-acc/5'
+                    ? 'grid-fill'
+                    : 'grid-fill-hover'
                 )}
                 onClick={() => {
                   if (state.selectedCategory !== 'intent') {
@@ -172,8 +172,8 @@ export const PlannerWidget: React.FC = () => {
                 className={cn(
                   'px-8 py-4 transition-colors cursor-pointer border-t border-acc/20',
                   state.selectedCategory === 'today'
-                    ? 'bg-acc/10'
-                    : 'hover:bg-acc/5'
+                    ? 'grid-fill'
+                    : 'grid-fill-hover'
                 )}
                 onClick={() => {
                   if (state.selectedCategory !== 'today') {
@@ -194,8 +194,8 @@ export const PlannerWidget: React.FC = () => {
                 className={cn(
                   'px-8 py-4 transition-colors cursor-pointer border-t border-acc/20',
                   state.selectedCategory === 'how'
-                    ? 'bg-acc/10'
-                    : 'hover:bg-acc/5'
+                    ? 'grid-fill'
+                    : 'grid-fill-hover'
                 )}
                 onClick={() => {
                   if (state.selectedCategory !== 'how') {
@@ -216,8 +216,8 @@ export const PlannerWidget: React.FC = () => {
                 className={cn(
                   'px-8 py-4 transition-colors cursor-pointer border-t border-acc/20',
                   state.selectedCategory === 'feeling'
-                    ? 'bg-acc/10'
-                    : 'hover:bg-acc/5'
+                    ? 'grid-fill'
+                    : 'grid-fill-hover'
                 )}
                 onClick={() => {
                   if (state.selectedCategory !== 'feeling') {

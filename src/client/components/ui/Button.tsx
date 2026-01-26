@@ -48,15 +48,15 @@ export const Button: React.FC<Props> = ({
             'button-primary border-0 rounded-md text-white transition-all disabled:cursor-not-allowed bg-[#0080FF] hover:bg-[#0066CC] active:bg-[#004C99] disabled:bg-[#80BFFF]'
           : // Dark/themed mode: accent-colored transparent border
             cn(
-              'hover:bg-acc/10',
-              'border border-acc text-acc transition-[background-color] rounded bg-transparent',
+              'grid-fill-hover',
+              'border border-acc text-acc rounded bg-transparent',
               'disabled:border-acc/40 disabled:text-acc/40'
             )
       ),
     kind === 'secondary' &&
       cn(
-        'hover:bg-acc/10',
-        'border border-acc text-acc transition-[background-color] rounded bg-transparent',
+        'grid-fill-hover',
+        'border border-acc text-acc rounded bg-transparent',
         'disabled:border-acc/40 disabled:text-acc/40'
       ),
     kind === 'secondary-rounded' &&
@@ -65,7 +65,7 @@ export const Button: React.FC<Props> = ({
           'before:content-[""] before:absolute before:inset-0 before:bg-bac before:z-[-1]',
         isMirrorOn
           ? 'hover:bg-white/10 transition-[background-color] rounded border border-white text-white rounded-[21px] disabled:border-white/40 disabled:text-white/40'
-          : 'hover:bg-acc/10 transition-[background-color] rounded bg-transparent border border-acc text-acc rounded-[21px] disabled:border-acc/40 disabled:text-acc/40'
+          : 'grid-fill-hover rounded bg-transparent border border-acc text-acc rounded-[21px] disabled:border-acc/40 disabled:text-acc/40'
       ),
     'cursor-pointer',
     SIZE_CLASSNAME[size],
@@ -101,7 +101,7 @@ export const GhostButton: React.FC<GhostButtonProps> = ({ ...props }) => {
         {...(props as ButtonProps)}
         className={cn(
           !!(props as ButtonProps).onClick &&
-            '-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc/10'
+            '-ml-4 px-4 rounded cursor-pointer grid-fill-hover'
         )}
       />
     )
@@ -113,7 +113,7 @@ export const GhostButton: React.FC<GhostButtonProps> = ({ ...props }) => {
         {...(props as AProps)}
         className={cn(
           !!(props as AProps).href &&
-            '-ml-4 px-4 rounded cursor-pointer transition-[background-color] hover:bg-acc/10'
+            '-ml-4 px-4 rounded cursor-pointer grid-fill-hover'
         )}
       />
     )

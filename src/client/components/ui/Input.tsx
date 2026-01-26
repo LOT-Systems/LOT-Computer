@@ -24,8 +24,8 @@ type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
 
 const CLASS_NAME = cn(
   'px-[20px] py-8',
-  'border border-acc text-base leading-1.5 transition-colors rounded',
-  'hover:bg-acc/10 active:bg-acc/10',
+  'border border-acc text-base leading-1.5 rounded',
+  'grid-fill-hover active:grid-fill',
   'bg-transparent placeholder:text-acc/40 focus:placeholder:text-acc/20 min-h-[42px]'
 )
 

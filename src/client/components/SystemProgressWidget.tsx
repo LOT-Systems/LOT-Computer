@@ -138,8 +138,8 @@ export function SystemProgressWidget() {
                 className={`
                   px-12 py-8 rounded border transition-all
                   ${feedback === option.id
-                    ? 'border-acc bg-acc-400/20 text-acc'
-                    : 'border-acc-400/30 hover:border-acc-400/60 hover:bg-acc-400/10'
+                    ? 'border-acc grid-fill text-acc'
+                    : 'border-acc-400/30 hover:border-acc-400/60 grid-fill-hover'
                   }
                   ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                 `}
