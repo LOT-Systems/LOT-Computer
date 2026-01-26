@@ -136,6 +136,18 @@ export class TogetherAIEngine implements AIEngine {
   private client: OpenAI | null = null
   private apiKey: string | null = null
 
+  // Fallback model chain - try these in order if primary fails
+  // Updated Feb 2026: Meta-Llama-3.1-70B-Instruct-Turbo discontinued Feb 6, 2026
+  private modelFallbackChain = [
+    'meta-llama/Llama-3.3-70B-Instruct-Turbo',      // Primary: Latest, best quality
+    'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free', // Fallback 1: Free version
+    'meta-llama/Llama-4-Scout-17B-16E-Instruct',    // Fallback 2: New efficient model
+    'mistralai/Mixtral-8x7B-Instruct-v0.1',         // Fallback 3: Excellent quality
+    'Qwen/Qwen2-72B-Instruct',                      // Fallback 4: Multilingual
+    'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',  // Fallback 5: Degraded service
+    'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo', // Fallback 6: Legacy (deprecated)
+  ]
+
   constructor() {
     const apiKey = process.env.TOGETHER_API_KEY
     if (apiKey) {
@@ -161,23 +173,40 @@ export class TogetherAIEngine implements AIEngine {
       throw new Error('Together AI engine not available')
     }
 
-    const response = await this.client.chat.completions.create({
-      model: 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
-      max_tokens: maxTokens,
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-    })
+    // Try each model in fallback chain
+    let lastError: Error | null = null
 
-    const content = response.choices[0]?.message?.content
-    if (!content) {
-      throw new Error('No response from Together AI')
+    for (const model of this.modelFallbackChain) {
+      try {
+        console.log(`🤖 Together AI: Trying model ${model}`)
+
+        const response = await this.client.chat.completions.create({
+          model,
+          max_tokens: maxTokens,
+          messages: [
+            {
+              role: 'user',
+              content: prompt,
+            },
+          ],
+        })
+
+        const content = response.choices[0]?.message?.content
+        if (!content) {
+          throw new Error(`No response from Together AI model: ${model}`)
+        }
+
+        console.log(`✅ Together AI: Successfully used model ${model}`)
+        return content
+      } catch (error: any) {
+        console.warn(`⚠️ Together AI: Model ${model} failed: ${error.message}`)
+        lastError = error
+        // Continue to next model in fallback chain
+      }
     }
 
-    return content
+    // All models failed
+    throw new Error(`All Together AI models failed. Last error: ${lastError?.message}`)
   }
 
   async generateImage(prompt: string, options: ImageGenerationOptions = {}): Promise<string> {

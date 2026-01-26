@@ -50,7 +50,7 @@ export const Table = <D,>(props: Props<D>) => {
                   onClick={() => props.onRowClick?.(i)}
                 >
                   {props.columns.map((c) => (
-                    <Td key={c.id}>{c.accessor(d)}</Td>
+                    <Td key={c.id} isSelected={isSelected}>{c.accessor(d)}</Td>
                   ))}
                 </tr>
               )
@@ -72,11 +72,15 @@ export const Th: React.FC<{ children: ReactEl; className?: string }> = (
   )
 }
 
-export const Td: React.FC<{ children: ReactEl; className?: string }> = (
+export const Td: React.FC<{ children: ReactEl; className?: string; isSelected?: boolean }> = (
   props
 ) => {
   return (
-    <td className={cn('border-b border-r border-acc-400/30 hover:bg-acc-400/10 transition-colors p-8', props.className)}>
+    <td className={cn(
+      'border-b border-r hover:bg-acc-400/10 transition-colors p-8',
+      props.isSelected ? 'border-acc-400' : 'border-acc-400/30',
+      props.className
+    )}>
       {props.children}
     </td>
   )
