@@ -444,9 +444,238 @@ CRITICAL: Use this SOUL-LEVEL understanding to craft questions that speak to the
   let userStory = ''
   let taskInstructions = ''
 
-  // Construct task instructions based on context
-  // (Weekend mode, first question, explore new topic, or follow up)
-  // ... [Rest of buildPrompt function continues with all the logic from the original file]
+  // WEEKEND MODE: Lighter, easier prompts
+  if (isWeekend) {
+    taskInstructions = `
+**WEEKEND MODE - Light & Easy Question**
+
+**Your task:** Generate ONE light, easy, fun question with 3 simple answer choices:
+1. **Keep it simple** - Weekend questions should be easy to answer, not require deep thought
+2. **Make it enjoyable** - Focus on pleasant topics: food, comfort, relaxation, hobbies
+3. **Quick to answer** - The user should be able to answer in 2 seconds
+4. **Positive vibe** - Weekend questions should feel uplifting and stress-free
+
+**Perfect weekend topics:**
+- Favorite weekend breakfast or brunch items
+- Comfort activities (reading, music, walks, cooking)
+- Relaxation preferences (bath, nap, movie, nature)
+- Simple pleasures (coffee, sunshine, cozy clothes)
+- Weekend hobbies or interests
+
+**Examples of good weekend questions:**
+- "What's your ideal Saturday morning drink?" (Options: Fresh coffee, Herbal tea, Smoothie, Orange juice)
+- "How do you prefer to unwind on weekends?" (Options: Reading a book, Taking a walk, Watching shows, Cooking something nice)
+- "What's your go-to weekend comfort food?" (Options: Pancakes, Fresh pastries, Homemade soup, Favorite snacks)
+
+**CRITICAL: Keep it LIGHT, SIMPLE, and FUN. No deep soul-searching on weekends - just pleasant, easy questions.**
+${userStory ? '\n\nWhat we know about the user so far:\n' + userStory : ''}
+
+${uniquenessInstruction}`
+  } else if (memoryLogs.length === 0) {
+    // First question - always explore
+    taskInstructions = `
+**Your task:** Generate ONE personalized question with 3-4 answer choices that:
+1. **Explores a new aspect of their life** - Since this is the beginning, ask about their daily routines, preferences, or self-care habits
+2. **Is open and welcoming** - Make them feel comfortable sharing
+3. **Is contextually relevant** - Consider current time and weather
+
+**Topic areas to explore:**
+- Morning/evening routines
+- Food and beverage preferences
+- Clothing and comfort choices
+- Self-care and wellness habits
+- Social preferences and boundaries
+- Work and rest balance
+- Seasonal preferences
+
+${uniquenessInstruction}`
+  } else if (shouldExploreNewTopic) {
+    // Show story but ask to explore NEW topic
+    const journalInsights = journalLogs.length > 0 ? `
+
+Journal Entries (their deeper thoughts and reflections):
+${journalLogs
+  .slice(0, 8)
+  .map((log, index) => {
+    const text = (log.text || '').substring(0, 200) // First 200 chars for context
+    const date = log.context.timeZone
+      ? dayjs(log.createdAt).tz(log.context.timeZone).format('D MMM')
+      : ''
+    return `${index + 1}. ${date ? `[${date}] ` : ""}"${text}${text.length >= 200 ? '...' : ''}"`
+  })
+  .join('\n')}
+
+These journal entries reveal their inner world - use them to understand their emotional state, concerns, and aspirations.` : ''
+
+    userStory = `
+User's Memory Story (what we know about them so far):
+${memoryLogs
+  .slice(0, 15)
+  .map((log, index) => {
+    const q = log.metadata.question || ''
+    const a = log.metadata.answer || ''
+    const date = log.context.timeZone
+      ? dayjs(log.createdAt).tz(log.context.timeZone).format('D MMM')
+      : ''
+    return `${index + 1}. ${date ? `[${date}] ` : ""}${q} → User chose: "${a}"`
+  })
+  .join('\n')}${journalInsights}
+
+Based on these answers and journal entries, we're building their story. Now let's explore a NEW area of their life that we haven't asked about yet.`
+
+    taskInstructions = `
+**Your task:** Generate ONE question that EXPLORES A NEW TOPIC AREA we haven't covered yet:
+1. **Choose an unexplored area** - READ their Memory Story above and identify what aspects of their life we DON'T know about yet
+2. **Start fresh on a NEW topic** - Don't follow up on recent answers, but ask about a completely different dimension of their life
+3. **Build story breadth** - Each question should explore a different dimension of their lifestyle
+4. **Is contextually relevant** - Consider current time and weather
+
+**REQUIREMENT:** Your question should be informed by their profile (use their archetype and cohort info) but explore a NEW area we haven't asked about. Review the list of previous questions above and choose a completely different topic.
+
+**Examples of exploring new topics:**
+- If we know their morning beverage → Ask about their meal preferences
+- If we know their clothing style → Ask about their evening wind-down routine
+- If we know their social boundaries → Ask about their workspace preferences
+- If we know their food choices → Ask about their movement/exercise habits
+
+**Topic areas to explore (choose one we haven't covered):**
+- Morning/evening routines and rituals
+- Food, beverages, and meal preferences
+- Clothing, fabrics, and comfort
+- Self-care, skincare, and wellness
+- Social energy and recharge methods
+- Work environment and productivity
+- Seasonal preferences and adaptation
+- Movement, posture, and physical awareness
+- Sleep and rest patterns
+- Creative or hobby pursuits
+
+${cohortInfo ? `**Soul Archetype Question Guidance:**
+Tailor your question to their soul archetype "${archetype}":
+- "The Seeker": Ask deep questions about growth, self-discovery, transformation, inner wisdom
+- "The Nurturer": Explore connection, caring for others, emotional bonds, community support
+- "The Achiever": Focus on goals, accomplishment, progress tracking, purposeful action
+- "The Philosopher": Probe meaning, purpose, life's deeper questions, existential reflection
+- "The Harmonizer": Ask about balance, peace-finding, conflict resolution, inner equilibrium
+- "The Creator": Inquire about self-expression, creative process, artistic manifestation, innovation
+- "The Protector": Explore safety needs, boundary-setting, stability creation, grounding practices
+- "The Authentic": Focus on truth-telling, self-honesty, genuine expression, living aligned
+- "The Explorer": Ask about new experiences, adventure, curiosity, expanding horizons
+- "The Wanderer": Invite self-discovery, identity exploration, path-finding, openness to change
+
+The question should speak to their SOUL LEVEL, not just surface behaviors. Make them think, feel, and reflect on who they truly are.` : ''}
+
+${uniquenessInstruction}`
+  } else {
+    // Follow up on existing answers
+    const journalInsights = journalLogs.length > 0 ? `
+
+Journal Entries (their deeper thoughts and reflections):
+${journalLogs
+  .slice(0, 8)
+  .map((log, index) => {
+    const text = (log.text || '').substring(0, 200) // First 200 chars for context
+    const date = log.context.timeZone
+      ? dayjs(log.createdAt).tz(log.context.timeZone).format('D MMM')
+      : ''
+    return `${index + 1}. ${date ? `[${date}] ` : ""}"${text}${text.length >= 200 ? '...' : ''}"`
+  })
+  .join('\n')}
+
+These journal entries reveal their inner world, emotional patterns, and personal reflections. Use them to ask questions that acknowledge what's truly on their mind.` : ''
+
+    userStory = `
+User's Memory Story (what we know about them based on previous answers):
+${memoryLogs
+  .slice(0, 15)
+  .map((log, index) => {
+    const q = log.metadata.question || ''
+    const a = log.metadata.answer || ''
+    const date = log.context.timeZone
+      ? dayjs(log.createdAt).tz(log.context.timeZone).format('D MMM')
+      : ''
+    return `${index + 1}. ${date ? `[${date}] ` : ""}${q} → User chose: "${a}"`
+  })
+  .join('\n')}${journalInsights}
+
+Based on these answers and journal entries, you can infer the user's preferences, habits, lifestyle, and inner emotional state. Use this knowledge to craft follow-up questions that show you remember their choices AND understand what matters to them.`
+
+    console.log(`📖 User story built with ${memoryLogs.slice(0, 15).length} recent answers and ${journalLogs.length} journal entries`)
+
+    // COMPRESSED FORMAT for repetitive follow-ups (3+ questions on same topic)
+    if (isRepetitiveFollowUp) {
+      taskInstructions = `
+**Your task:** Generate ONE BRIEF follow-up question with 2-3 SHORT answer choices.
+
+**CRITICAL COMPRESSION RULES:**
+- Question must be 8 words or less
+- Each option must be 2-4 words maximum (no full sentences)
+- Reference their previous answer briefly
+- No lengthy explanations
+
+**Examples of BRIEF follow-ups:**
+- "What time usually?" → Options: "Morning", "Afternoon", "Evening"
+- "How often?" → Options: "Daily", "Few times weekly", "Occasionally"
+- "What temperature?" → Options: "Hot", "Warm", "Cold"
+- "Alone or with others?" → Options: "Solo", "With someone", "Varies"
+
+Keep it SHORT and SIMPLE. The user is answering many prompts - make this quick and easy.
+
+${uniquenessInstruction}`
+    } else {
+      // DETAILED FORMAT for initial follow-ups (exploring depth)
+      taskInstructions = `
+**Your task:** Generate ONE personalized follow-up question with 3-4 answer choices that:
+1. **MUST EXPLICITLY reference their previous answers** - CRITICAL: Your question MUST start with a reference phrase like "You mentioned...", "Since you said...", "Last time you chose...", "Building on your answer about..." followed by SPECIFIC details from their actual answers shown above
+2. **Builds PROGRESSIVELY deeper into their psychological and soul profile** - Each follow-up should probe ONE level deeper than the previous question, moving from surface behaviors → underlying motivations → core values → soul-level identity
+3. **Is contextually relevant** - Consider current time, weather, and their recent activity patterns
+
+**STRICT REQUIREMENT:** Your question cannot be generic. It must demonstrate you've read their Memory Story above by referencing specific details from their actual answers. Generic questions that could apply to anyone are FORBIDDEN.
+
+**CRITICAL: Progressive Depth Requirement:**
+Follow-ups must build on BOTH behavioral patterns AND psychological/soul dimensions:
+- **First follow-up**: Surface behavior details (how, when, what specifically)
+- **Second follow-up**: Motivations and reasons (why this choice, what it provides)
+- **Third follow-up**: Values and meaning (what this reveals about priorities, what matters)
+- **Fourth+ follow-up**: Soul-level identity (who they are becoming, their deeper nature)
+
+**CRITICAL: User-Feedback Loop Requirements:**
+- READ the "User's Memory Story" section above CAREFULLY before generating your question
+- You MUST explicitly reference AT LEAST ONE specific detail from their previous answers (not generic, use their actual answer text)
+- Show you remember what they told you - use phrases like "You mentioned...", "Since you prefer...", "Last time you chose...", "Building on your answer about..."
+- If they have journal entries, acknowledge their deeper thoughts and feelings - their journal reveals what truly matters to them
+- The question should feel like you're having an ongoing conversation, not starting fresh each time
+- Make connections between their different answers AND journal reflections to show you understand their overall lifestyle and inner world
+
+**EXAMPLE of GOOD reference:**
+User's Memory Story shows: "What do you prefer for breakfast? → User chose: 'Greek yogurt with honey'"
+GOOD question: "Since you enjoy Greek yogurt with honey for breakfast, what do you usually pair it with?"
+BAD question: "What matters most to you?" (completely ignores their history)
+
+**Examples of progressive follow-up questions:**
+LEVEL 1 (Behavior details): "Since you mentioned enjoying tea in the morning, how do you usually prepare it?" (Options: Quick tea bag, Loose leaf ritual, Matcha ceremony)
+LEVEL 2 (Motivations): "You chose 'Loose leaf ritual' - what does this morning ritual provide for you?" (Options: Peaceful start, Mindful moment, Sensory pleasure)
+LEVEL 3 (Values): "This ritual seems important to you. What value does it honor?" (Options: Presence, Self-care, Beauty in simplicity)
+LEVEL 4 (Soul identity): "Reflecting on this practice, what does it reveal about who you're becoming?" (Options: Someone who values slowness, A mindful being, One who honors small rituals)
+
+${cohortInfo ? `**Soul Archetype Follow-Up Guidance:**
+Build deeper into their soul archetype "${archetype}" with this follow-up:
+- "The Seeker": Connect growth practices (morning reflection → evening integration), deepen self-awareness
+- "The Nurturer": Explore care rituals (how you care for others → how you care for yourself)
+- "The Achiever": Link accomplishment patterns (morning productivity → evening reflection on progress)
+- "The Philosopher": Probe meaning-making (what matters to you → why it matters, life philosophy)
+- "The Harmonizer": Deepen balance practices (finding peace in mornings → maintaining it through challenges)
+- "The Creator": Progress through creative process (inspiration → manifestation → expression)
+- "The Protector": Connect safety needs (physical boundaries → emotional boundaries)
+- "The Authentic": Explore honesty layers (being honest with self → being honest with others)
+- "The Explorer": Build on curiosity (what you're exploring → what you're discovering about yourself)
+- "The Wanderer": Invite clarity emergence (what you're questioning → what's becoming clearer)
+
+CRITICAL: Make the follow-up SOUL-TOUCHING - reference their previous answer AND probe their deeper nature. Ask questions that make them pause and truly reflect on who they are becoming.` : ''}
+
+${uniquenessInstruction}`
+    }
+  }
 
   const head = `
 You are an AI agent of LOT Systems, a subscription service that distributes digital and physical necessities, basic wardrobes, organic self-care products, home and kids essentials.
