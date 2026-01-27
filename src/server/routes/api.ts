@@ -1811,7 +1811,12 @@ export default async (fastify: FastifyInstance) => {
         userEmail: req.user.email,
         userTags: req.user.tags,
         hasUsershipTag,
-        isRecentlyAsked,
+        intelligentPacing: {
+          shouldShowPrompt,
+          isWeekend,
+          promptQuotaToday,
+          promptsShownToday
+        }
       })
 
       // ============================================================================
