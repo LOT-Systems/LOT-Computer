@@ -518,7 +518,7 @@ export default async (fastify: FastifyInstance) => {
       }
     } catch (error: any) {
       console.error('❌ [ADMIN] Cleanup failed:', error.message)
-      return reply.throw.serverError(error.message)
+      return reply.throw.internalError(error.message)
     }
   })
 
@@ -1771,7 +1771,7 @@ export default async (fastify: FastifyInstance) => {
    * Diagnostic endpoint to check why community/stats widgets aren't showing
    */
   fastify.get('/widget-diagnostic', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+    if (!req.user) return reply.throw.authException()
 
     const log: string[] = []
     log.push('🔍 LOT System Widget Diagnostic')
