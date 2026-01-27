@@ -89,7 +89,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       title: 'First Breath',
       description: 'Your first emotional check-in',
       unlocked: checkIns.length >= 1,
-      unlockedAt: checkIns.length >= 1 ? checkIns[checkIns.length - 1].createdAt : null,
+      unlockedAt: checkIns.length >= 1 ? checkIns[checkIns.length - 1].createdAt.toISOString() : null,
       category: 'exploration',
       rarity: 'common',
       icon: '🌱'
@@ -99,7 +99,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       title: 'Mirror Gazer',
       description: 'Answered your first memory question',
       unlocked: answers.length >= 1,
-      unlockedAt: answers.length >= 1 ? answers[answers.length - 1].createdAt : null,
+      unlockedAt: answers.length >= 1 ? answers[answers.length - 1].createdAt.toISOString() : null,
       category: 'exploration',
       rarity: 'common',
       icon: '🪞'
@@ -109,7 +109,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       title: 'Community Voice',
       description: 'Shared your first message with the community',
       unlocked: chatMessages.length >= 1,
-      unlockedAt: chatMessages.length >= 1 ? chatMessages[chatMessages.length - 1].createdAt : null,
+      unlockedAt: chatMessages.length >= 1 ? chatMessages[chatMessages.length - 1].createdAt.toISOString() : null,
       category: 'connection',
       rarity: 'uncommon',
       icon: '💬'
@@ -121,7 +121,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       title: 'Week Warrior',
       description: 'Checked in 7 days in a row',
       unlocked: consecutiveDays >= 7,
-      unlockedAt: consecutiveDays >= 7 ? checkIns[0].createdAt : null,
+      unlockedAt: consecutiveDays >= 7 ? checkIns[0].createdAt.toISOString() : null,
       category: 'consistency',
       rarity: 'uncommon',
       icon: '🔥'
@@ -131,7 +131,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       title: 'Moon Cycle',
       description: '30 consecutive days of practice',
       unlocked: consecutiveDays >= 30,
-      unlockedAt: consecutiveDays >= 30 ? checkIns[0].createdAt : null,
+      unlockedAt: consecutiveDays >= 30 ? checkIns[0].createdAt.toISOString() : null,
       category: 'consistency',
       rarity: 'rare',
       icon: '🌙'
@@ -141,7 +141,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       title: 'Unwavering',
       description: '100 days of continuous practice',
       unlocked: consecutiveDays >= 100,
-      unlockedAt: consecutiveDays >= 100 ? checkIns[0].createdAt : null,
+      unlockedAt: consecutiveDays >= 100 ? checkIns[0].createdAt.toISOString() : null,
       category: 'consistency',
       rarity: 'epic',
       icon: '⭐'
@@ -153,7 +153,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       title: 'Deep Diver',
       description: 'Answered 50 memory questions',
       unlocked: answers.length >= 50,
-      unlockedAt: answers.length >= 50 ? answers[49].createdAt : null,
+      unlockedAt: answers.length >= 50 ? answers[49].createdAt.toISOString() : null,
       category: 'depth',
       rarity: 'rare',
       icon: '🌊'
@@ -163,7 +163,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       title: 'Self Scholar',
       description: 'Answered 100 memory questions',
       unlocked: answers.length >= 100,
-      unlockedAt: answers.length >= 100 ? answers[99].createdAt : null,
+      unlockedAt: answers.length >= 100 ? answers[99].createdAt.toISOString() : null,
       category: 'depth',
       rarity: 'epic',
       icon: '📚'
@@ -173,7 +173,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       title: 'Soul Cartographer',
       description: 'Answered 250 memory questions',
       unlocked: answers.length >= 250,
-      unlockedAt: answers.length >= 250 ? answers[249].createdAt : null,
+      unlockedAt: answers.length >= 250 ? answers[249].createdAt.toISOString() : null,
       category: 'depth',
       rarity: 'legendary',
       icon: '🗺️'
@@ -185,7 +185,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       title: 'Bridge Builder',
       description: 'Sent 20 community messages',
       unlocked: chatMessages.length >= 20,
-      unlockedAt: chatMessages.length >= 20 ? chatMessages[19].createdAt : null,
+      unlockedAt: chatMessages.length >= 20 ? chatMessages[19].createdAt.toISOString() : null,
       category: 'connection',
       rarity: 'uncommon',
       icon: '🌉'
@@ -197,7 +197,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       title: 'Heart Tender',
       description: 'Acknowledged romantic connection in your practice',
       unlocked: romanticNotes.length >= 1,
-      unlockedAt: romanticNotes.length >= 1 ? romanticNotes[0].createdAt : null,
+      unlockedAt: romanticNotes.length >= 1 ? romanticNotes[0].createdAt.toISOString() : null,
       category: 'romance',
       rarity: 'uncommon',
       icon: '💕'
@@ -207,7 +207,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       title: 'Intimacy Keeper',
       description: 'Regularly tending to romantic connection',
       unlocked: romanticNotes.length >= 10,
-      unlockedAt: romanticNotes.length >= 10 ? romanticNotes[9].createdAt : null,
+      unlockedAt: romanticNotes.length >= 10 ? romanticNotes[9].createdAt.toISOString() : null,
       category: 'romance',
       rarity: 'rare',
       icon: '💝'
@@ -220,7 +220,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       description: 'Practiced self-care 10 times',
       unlocked: logs.filter(l => l.event === 'self_care_completed').length >= 10,
       unlockedAt: logs.filter(l => l.event === 'self_care_completed').length >= 10 ?
-        logs.filter(l => l.event === 'self_care_completed')[9].createdAt : null,
+        logs.filter(l => l.event === 'self_care_completed')[9].createdAt.toISOString() : null,
       category: 'care',
       rarity: 'uncommon',
       icon: '🫂'
@@ -232,7 +232,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       title: 'Truth Speaker',
       description: 'Logged 50 honest entries',
       unlocked: notes.length >= 50,
-      unlockedAt: notes.length >= 50 ? notes[49].createdAt : null,
+      unlockedAt: notes.length >= 50 ? notes[49].createdAt.toISOString() : null,
       category: 'courage',
       rarity: 'rare',
       icon: '🔊'

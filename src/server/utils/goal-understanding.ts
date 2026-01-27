@@ -179,8 +179,8 @@ function extractGoalsFromIntentions(logs: Log[]): ExtractedGoal[] {
           state: 'active', // Explicitly set intention = active goal
           confidence: 0.95, // High confidence from explicit intention
           extractedFrom: [`intention:${keyword}`],
-          firstDetected: log.createdAt,
-          lastUpdated: log.createdAt,
+          firstDetected: log.createdAt.toISOString(),
+          lastUpdated: log.createdAt.toISOString(),
           baseline: null, // Will be set during progress tracking
           progressMarkers: [],
           journeyStage: 'beginning',
@@ -242,7 +242,7 @@ function extractGoalsFromJournal(logs: Log[]): ExtractedGoal[] {
         const existingGoal = goals.find(g => g.id === goalId)
         if (existingGoal) {
           existingGoal.extractedFrom.push(`journal:${log.id}`)
-          existingGoal.lastUpdated = log.createdAt
+          existingGoal.lastUpdated = log.createdAt.toISOString()
           existingGoal.confidence = Math.min(existingGoal.confidence + 0.05, 0.98)
         } else {
           goals.push({
@@ -253,8 +253,8 @@ function extractGoalsFromJournal(logs: Log[]): ExtractedGoal[] {
             state: 'active',
             confidence: baseConfidence,
             extractedFrom: [`journal:${log.id}`],
-            firstDetected: log.createdAt,
-            lastUpdated: log.createdAt,
+            firstDetected: log.createdAt.toISOString(),
+            lastUpdated: log.createdAt.toISOString(),
             baseline: null,
             progressMarkers: [],
             journeyStage: 'beginning',
@@ -290,15 +290,15 @@ function extractGoalsFromPatterns(logs: Log[]): ExtractedGoal[] {
         state: 'progressing',
         confidence: 0.85,
         extractedFrom: [`pattern:self-care-${daysCovered}-days`],
-        firstDetected: selfCareLogs[selfCareLogs.length - 1].createdAt,
-        lastUpdated: selfCareLogs[0].createdAt,
+        firstDetected: selfCareLogs[selfCareLogs.length - 1].createdAt.toISOString(),
+        lastUpdated: selfCareLogs[0].createdAt.toISOString(),
         baseline: {
           description: 'Started practicing self-care occasionally',
-          detectedAt: selfCareLogs[selfCareLogs.length - 1].createdAt
+          detectedAt: selfCareLogs[selfCareLogs.length - 1].createdAt.toISOString()
         },
         progressMarkers: [{
           description: `Practiced self-care on ${daysCovered} different days`,
-          detectedAt: selfCareLogs[0].createdAt,
+          detectedAt: selfCareLogs[0].createdAt.toISOString(),
           metric: Math.min((daysCovered / 30) * 100, 100)
         }],
         journeyStage: daysCovered >= 20 ? 'integration' : daysCovered >= 10 ? 'breakthrough' : 'struggle',
@@ -318,15 +318,15 @@ function extractGoalsFromPatterns(logs: Log[]): ExtractedGoal[] {
       state: 'progressing',
       confidence: 0.9,
       extractedFrom: [`pattern:check-ins-${checkIns.length}`],
-      firstDetected: checkIns[checkIns.length - 1].createdAt,
-      lastUpdated: checkIns[0].createdAt,
+      firstDetected: checkIns[checkIns.length - 1].createdAt.toISOString(),
+      lastUpdated: checkIns[0].createdAt.toISOString(),
       baseline: {
         description: 'Beginning to notice and track emotional states',
-        detectedAt: checkIns[checkIns.length - 1].createdAt
+        detectedAt: checkIns[checkIns.length - 1].createdAt.toISOString()
       },
       progressMarkers: [{
         description: `Completed ${checkIns.length} emotional check-ins`,
-        detectedAt: checkIns[0].createdAt,
+        detectedAt: checkIns[0].createdAt.toISOString(),
         metric: Math.min((checkIns.length / 100) * 100, 100)
       }],
       journeyStage: checkIns.length >= 50 ? 'integration' : checkIns.length >= 20 ? 'breakthrough' : 'beginning',
@@ -345,15 +345,15 @@ function extractGoalsFromPatterns(logs: Log[]): ExtractedGoal[] {
       state: 'active',
       confidence: 0.8,
       extractedFrom: [`pattern:planning-${plans.length}-times`],
-      firstDetected: plans[plans.length - 1].createdAt,
-      lastUpdated: plans[0].createdAt,
+      firstDetected: plans[plans.length - 1].createdAt.toISOString(),
+      lastUpdated: plans[0].createdAt.toISOString(),
       baseline: {
         description: 'Started using intentional planning',
-        detectedAt: plans[plans.length - 1].createdAt
+        detectedAt: plans[plans.length - 1].createdAt.toISOString()
       },
       progressMarkers: [{
         description: `Set ${plans.length} intentional plans`,
-        detectedAt: plans[0].createdAt,
+        detectedAt: plans[0].createdAt.toISOString(),
         metric: Math.min((plans.length / 30) * 100, 100)
       }],
       journeyStage: 'beginning',
@@ -409,15 +409,15 @@ function extractGoalsFromCheckIns(logs: Log[]): ExtractedGoal[] {
       state: isImproving ? 'progressing' : 'active',
       confidence: 0.88,
       extractedFrom: [`checkin:anxious-${percentage}%`],
-      firstDetected: olderCheckIns[olderCheckIns.length - 1]?.createdAt || checkIns[checkIns.length - 1].createdAt,
-      lastUpdated: checkIns[0].createdAt,
+      firstDetected: (olderCheckIns[olderCheckIns.length - 1]?.createdAt || checkIns[checkIns.length - 1].createdAt).toISOString(),
+      lastUpdated: checkIns[0].createdAt.toISOString(),
       baseline: {
         description: `Initially feeling anxious/overwhelmed ${Math.round(olderAnxious * 100)}% of the time`,
-        detectedAt: olderCheckIns[olderCheckIns.length - 1]?.createdAt || checkIns[checkIns.length - 1].createdAt
+        detectedAt: (olderCheckIns[olderCheckIns.length - 1]?.createdAt || checkIns[checkIns.length - 1].createdAt).toISOString()
       },
       progressMarkers: isImproving ? [{
         description: `Anxiety decreased from ${Math.round(olderAnxious * 100)}% to ${Math.round(recentAnxious * 100)}%`,
-        detectedAt: checkIns[0].createdAt,
+        detectedAt: checkIns[0].createdAt.toISOString(),
         metric: Math.max(0, 100 - Math.round(recentAnxious * 100))
       }] : [],
       journeyStage: isImproving ? 'breakthrough' : 'struggle',
@@ -439,11 +439,11 @@ function extractGoalsFromCheckIns(logs: Log[]): ExtractedGoal[] {
       state: 'active',
       confidence: 0.75,
       extractedFrom: [`checkin:low-energy-${tiredCount}-times`],
-      firstDetected: checkIns[checkIns.length - 1].createdAt,
-      lastUpdated: checkIns[0].createdAt,
+      firstDetected: checkIns[checkIns.length - 1].createdAt.toISOString(),
+      lastUpdated: checkIns[0].createdAt.toISOString(),
       baseline: {
         description: `Feeling tired frequently, energized only ${Math.round((energizedCount / checkIns.length) * 100)}% of the time`,
-        detectedAt: checkIns[checkIns.length - 1].createdAt
+        detectedAt: checkIns[checkIns.length - 1].createdAt.toISOString()
       },
       progressMarkers: [],
       journeyStage: 'beginning',
@@ -485,8 +485,8 @@ function extractGoalsFromMemoryAnswers(logs: Log[]): ExtractedGoal[] {
       state: 'active',
       confidence: 0.8,
       extractedFrom: [`memory:meditation-mentioned-${meditationCount}-times`],
-      firstDetected: answers[answers.length - 1].createdAt,
-      lastUpdated: answers[0].createdAt,
+      firstDetected: answers[answers.length - 1].createdAt.toISOString(),
+      lastUpdated: answers[0].createdAt.toISOString(),
       baseline: null,
       progressMarkers: [],
       journeyStage: 'beginning',
