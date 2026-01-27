@@ -8,89 +8,11 @@ services:
       branch: claude/february-2025-updates-HZZTF
       repo_clone_url: https://github.com/vadikmarmeladov/lot-systems.git
 
-    # Build configuration
-    build_command: |
-      set -e
-      echo "🚀 Build started at $(date)"
-      echo "📦 Installing dependencies..."
-      yarn install --frozen-lockfile --production=false 2>&1 | tail -20
-      echo "✅ Dependencies installed at $(date)"
-      echo ""
-      echo "🎨 Building client CSS..."
-      NODE_ENV=production yarn client:css:build
-      echo "✅ Client CSS built at $(date)"
-      echo ""
-      echo "📦 Building client JS..."
-      NODE_ENV=production yarn client:js:build
-      echo "✅ Client JS built at $(date)"
-      echo ""
-      echo "🔨 Building server..."
-      NODE_ENV=production yarn server:build
-      echo "✅ Server built at $(date)"
-      echo ""
-      echo "🗄️ Running database migrations..."
-      yarn migrations:up
-      echo "✅ Migrations completed at $(date)"
-      echo ""
-      echo "📁 Verifying build output..."
-      if [ ! -d "dist" ]; then
-        echo "❌ CRITICAL ERROR: dist/ folder not created!"
-        echo "Build failed - dist folder missing"
-        exit 1
-      fi
-      echo "✅ dist/ exists"
+    # Use Dockerfile instead of buildpack to ensure dist/ is preserved
+    dockerfile_path: Dockerfile
 
-      if [ ! -f "dist/server/server/index.js" ]; then
-        echo "❌ CRITICAL ERROR: Server entry point not found!"
-        echo "Contents of dist/server/:"
-        ls -la dist/server/ || echo "dist/server/ not found"
-        exit 1
-      fi
-      echo "✅ Server entry point exists ($(wc -c < dist/server/server/index.js) bytes)"
-
-      echo "Contents of dist/:"
-      ls -la dist/ || echo "dist/ not found"
-      echo "Contents of dist/server/server/:"
-      ls -la dist/server/server/ | head -10 || echo "dist/server/server/ not found"
-      echo "Contents of dist/client/js/:"
-      ls -la dist/client/js/ | head -10 || echo "dist/client/js/ not found"
-
-      echo "📊 Build size summary:"
-      du -sh dist/server/ dist/client/ 2>/dev/null || echo "Could not calculate sizes"
-
-      echo "✅ Build completed successfully at $(date)"
-
-    # Source directory - DO NOT CHANGE
-    # This tells Digital Ocean which directory to deploy
-    # MUST include dist/ folder for runtime
-    source_dir: /
-
-    # Output directory (what gets deployed to runtime)
-    # Leave empty to deploy entire source_dir including dist/
-    # output_dir is NOT set - we need the whole workspace
-
-    # Runtime configuration
-    run_command: |
-      set -e
-      echo "🚀 Starting server at $(date)"
-      echo "📁 Current directory: $(pwd)"
-      echo "📦 Verifying dist folder exists..."
-      if [ ! -d "dist" ]; then
-        echo "❌ ERROR: dist/ folder not found!"
-        echo "Contents of current directory:"
-        ls -la
-        exit 1
-      fi
-      echo "✅ dist/ exists"
-      if [ ! -f "dist/server/server/index.js" ]; then
-        echo "❌ ERROR: dist/server/server/index.js not found!"
-        echo "Contents of dist/server/:"
-        ls -la dist/server/ || echo "dist/server/ not found"
-        exit 1
-      fi
-      echo "✅ Server entry point exists"
-      echo "🎯 Starting Node.js server..."
-      node dist/server/server/index.js
+    # Runtime configuration (handled by Dockerfile CMD)
+    # run_command not needed when using Dockerfile
     environment_slug: node-js
     instance_size_slug: basic-xxs
     instance_count: 1
