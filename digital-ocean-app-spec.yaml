@@ -11,9 +11,8 @@ services:
     # Use Dockerfile instead of buildpack to ensure dist/ is preserved
     dockerfile_path: Dockerfile
 
-    # Runtime configuration (handled by Dockerfile CMD)
-    # run_command not needed when using Dockerfile
-    environment_slug: node-js
+    # Remove environment_slug to force Dockerfile usage
+    # environment_slug: node-js  # REMOVED - conflicts with Dockerfile
     instance_size_slug: basic-xxs
     instance_count: 1
     http_port: 8080
