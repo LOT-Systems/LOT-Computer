@@ -33,18 +33,55 @@ services:
       echo "✅ Migrations completed at $(date)"
       echo ""
       echo "📁 Verifying build output..."
+      if [ ! -d "dist" ]; then
+        echo "❌ CRITICAL ERROR: dist/ folder not created!"
+        echo "Build failed - dist folder missing"
+        exit 1
+      fi
+      echo "✅ dist/ exists"
+
+      if [ ! -f "dist/server/server/index.js" ]; then
+        echo "❌ CRITICAL ERROR: Server entry point not found!"
+        echo "Contents of dist/server/:"
+        ls -la dist/server/ || echo "dist/server/ not found"
+        exit 1
+      fi
+      echo "✅ Server entry point exists ($(wc -c < dist/server/server/index.js) bytes)"
+
       echo "Contents of dist/:"
       ls -la dist/ || echo "dist/ not found"
-      echo "Contents of dist/server/:"
-      ls -la dist/server/ || echo "dist/server/ not found"
       echo "Contents of dist/server/server/:"
       ls -la dist/server/server/ | head -10 || echo "dist/server/server/ not found"
       echo "Contents of dist/client/js/:"
       ls -la dist/client/js/ | head -10 || echo "dist/client/js/ not found"
-      echo "✅ Build completed at $(date)"
+
+      echo "📊 Build size summary:"
+      du -sh dist/server/ dist/client/ 2>/dev/null || echo "Could not calculate sizes"
+
+      echo "✅ Build completed successfully at $(date)"
 
     # Runtime configuration
-    run_command: node dist/server/server/index.js
+    run_command: |
+      set -e
+      echo "🚀 Starting server at $(date)"
+      echo "📁 Current directory: $(pwd)"
+      echo "📦 Verifying dist folder exists..."
+      if [ ! -d "dist" ]; then
+        echo "❌ ERROR: dist/ folder not found!"
+        echo "Contents of current directory:"
+        ls -la
+        exit 1
+      fi
+      echo "✅ dist/ exists"
+      if [ ! -f "dist/server/server/index.js" ]; then
+        echo "❌ ERROR: dist/server/server/index.js not found!"
+        echo "Contents of dist/server/:"
+        ls -la dist/server/ || echo "dist/server/ not found"
+        exit 1
+      fi
+      echo "✅ Server entry point exists"
+      echo "🎯 Starting Node.js server..."
+      node dist/server/server/index.js
     environment_slug: node-js
     instance_size_slug: basic-xxs
     instance_count: 1
