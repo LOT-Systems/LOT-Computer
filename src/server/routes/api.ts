@@ -3602,7 +3602,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * Collective Consciousness Dashboard - Aggregate quantum states
    */
   fastify.get('/api/stats/collective', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+    if (!req.user) return reply.throw.authException()
 
     try {
       // Get active users (logged in within last 15 minutes)
@@ -3670,7 +3670,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * Personal + Community Growth Milestones
    */
   fastify.get('/api/stats/growth', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+    if (!req.user) return reply.throw.authException()
 
     try {
       // Personal stats
@@ -3736,7 +3736,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * Live Intention Patterns - Anonymous real-time quantum pattern distribution
    */
   fastify.get('/api/stats/patterns', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+    if (!req.user) return reply.throw.authException()
 
     try {
       // Get intentions from last 6 hours
@@ -3792,7 +3792,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * Community Wellness Pulse - Aggregated activity metrics
    */
   fastify.get('/api/stats/wellness', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+    if (!req.user) return reply.throw.authException()
 
     try {
       // Active users (last 15 minutes)
@@ -3854,7 +3854,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * Recent Badge Unlocks Feed - Anonymous badge achievements
    */
   fastify.get('/api/stats/badges', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+    if (!req.user) return reply.throw.authException()
 
     try {
       // Get recent badge unlocks (last 24 hours)
@@ -3908,7 +3908,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * Memory Engine Performance Stats - Usership/Admin only
    */
   fastify.get('/api/stats/memory-engine', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+    if (!req.user) return reply.throw.authException()
 
     // Only show to Usership/Admin users
     const hasAccess = req.user.tags.some(
@@ -3965,7 +3965,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * System Progress - Latest deployment info with sci-fi terminology
    */
   fastify.get('/api/system/deployment-status', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+    if (!req.user) return reply.throw.authException()
 
     try {
       // Get current version from package.json or env
@@ -4019,7 +4019,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * Get current user's feedback for the active deployment
    */
   fastify.get('/api/system/my-feedback', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+    if (!req.user) return reply.throw.authException()
 
     try {
       const version = process.env.APP_VERSION || 'v1.2.1-stable'
@@ -4060,7 +4060,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       feedback: 'operational' | 'resonating' | 'needs-calibration' | 'evolving'
     }
   }>('/api/system/submit-feedback', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+    if (!req.user) return reply.throw.authException()
 
     const { version, feedback } = req.body
 
@@ -4094,7 +4094,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * Updates every second with live stats
    */
   fastify.get('/api/system/pulse', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+    if (!req.user) return reply.throw.authException()
 
     try {
       const now = dayjs()
