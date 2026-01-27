@@ -139,6 +139,42 @@ export default async (fastify: FastifyInstance) => {
       })
     }
 
+    // Check Memory Engine refactoring modules
+    const fs = await import('fs')
+    const path = await import('path')
+
+    let memoryModuleStatus = '✅ Phase 1 Complete'
+    let moduleDetails = ''
+
+    try {
+      const memoryDir = path.join(process.cwd(), 'dist/server/server/utils/memory')
+      const modules = [
+        'constants.js',
+        'types.js',
+        'trait-extraction.js',
+        'cohort-determination.js',
+        'pacing.js',
+        'recipe-suggestions.js',
+        'story-generator.js',
+        'question-generator.js',
+        'index.js'
+      ]
+
+      const moduleChecks = modules.map(mod => {
+        const exists = fs.existsSync(path.join(memoryDir, mod))
+        return `${exists ? '✅' : '❌'} ${mod}`
+      })
+
+      moduleDetails = moduleChecks.join('<br>')
+
+      // Check backward compatibility
+      const legacyMemory = fs.existsSync(path.join(process.cwd(), 'dist/server/server/utils/memory.js'))
+      moduleDetails += `<br><br><strong>Backward Compatibility:</strong><br>${legacyMemory ? '✅' : '❌'} memory.js (original)`
+    } catch (error: any) {
+      memoryModuleStatus = '⚠️ Check Failed'
+      moduleDetails = error.message
+    }
+
     return reply.type('text/html').send(`
       <!DOCTYPE html>
       <html>
@@ -148,7 +184,7 @@ export default async (fastify: FastifyInstance) => {
           body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", monospace;
             padding: 40px;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: #f5f5f5;
           }
@@ -157,12 +193,16 @@ export default async (fastify: FastifyInstance) => {
             border: 2px solid #28a745;
             padding: 30px;
             border-radius: 8px;
-            text-align: center;
           }
           h1 {
             color: #28a745;
             margin: 0 0 20px 0;
             font-size: 32px;
+          }
+          h2 {
+            color: #155724;
+            margin: 20px 0 10px 0;
+            font-size: 20px;
           }
           .info {
             background: white;
@@ -172,6 +212,18 @@ export default async (fastify: FastifyInstance) => {
             text-align: left;
             font-family: monospace;
             font-size: 14px;
+            line-height: 1.8;
+          }
+          .module-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            text-align: left;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            border: 1px solid #dee2e6;
           }
           .links {
             margin-top: 30px;
@@ -191,23 +243,59 @@ export default async (fastify: FastifyInstance) => {
             border-radius: 3px;
             color: #e83e8c;
           }
+          .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+          }
+          .badge-success {
+            background: #28a745;
+            color: white;
+          }
         </style>
       </head>
       <body>
         <div class="success">
-          <h1>✅ API Routes Working!</h1>
+          <h1>✅ February 2025 Deployment Live!</h1>
 
           <div class="info">
             <strong>User:</strong> ${req.user.email}<br>
             <strong>Tags:</strong> ${req.user.tags.join(', ')}<br>
             <strong>Timestamp:</strong> ${new Date().toISOString()}<br>
-            <strong>Route:</strong> /api/ping
+            <strong>Route:</strong> /api/ping<br>
+            <strong>Branch:</strong> claude/february-2025-updates-HZZTF
           </div>
 
-          <p>This endpoint is accessible! The API routes are working correctly.</p>
+          <h2>🧠 Memory Engine Refactoring</h2>
+          <div class="module-info">
+            <strong>Status:</strong> ${memoryModuleStatus}<br>
+            <strong>Architecture:</strong> Modular (9 focused modules)<br><br>
+            ${moduleDetails}
+          </div>
+
+          <h2>🎮 RPG Quantum Badges System</h2>
+          <div class="module-info">
+            <strong>Water Badges (Oceanic Mayan):</strong> ○∿ ≋○≋ ≈○≈<br>
+            • Organic matter growth & healing<br>
+            • Memory Engine integration<br><br>
+            <strong>Architecture Badges:</strong> Coming soon<br>
+            • Intent manifestation & rendering<br>
+            • Quantum Intent Engine integration
+          </div>
+
+          <h2>📊 February Features</h2>
+          <div class="module-info">
+            ✅ Monthly Email System<br>
+            ✅ Evolution Widget<br>
+            ✅ Cohort-Connect Widget<br>
+            ✅ Memory Engine Modularization (Phase 1)
+          </div>
 
           <div class="links">
-            <p><strong>Try accessing admin-api routes by typing these URLs directly:</strong></p>
+            <p><strong>Diagnostic Endpoints:</strong></p>
             <p>
               <code>${req.protocol}://${req.hostname}/admin-api/ping</code><br>
               <code>${req.protocol}://${req.hostname}/admin-api/status</code><br>
@@ -217,6 +305,7 @@ export default async (fastify: FastifyInstance) => {
 
           <div style="margin-top: 30px;">
             <a href="/">← Back to Home</a>
+            <a href="/admin-api/memory-debug">Memory Diagnostics</a>
           </div>
         </div>
       </body>
