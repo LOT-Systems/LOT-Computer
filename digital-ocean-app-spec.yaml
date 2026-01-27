@@ -60,6 +60,15 @@ services:
 
       echo "✅ Build completed successfully at $(date)"
 
+    # Source directory - DO NOT CHANGE
+    # This tells Digital Ocean which directory to deploy
+    # MUST include dist/ folder for runtime
+    source_dir: /
+
+    # Output directory (what gets deployed to runtime)
+    # Leave empty to deploy entire source_dir including dist/
+    # output_dir is NOT set - we need the whole workspace
+
     # Runtime configuration
     run_command: |
       set -e
