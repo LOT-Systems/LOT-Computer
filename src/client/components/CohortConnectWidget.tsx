@@ -3,7 +3,6 @@ import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button } from '#client/components/ui'
 import { useCohorts } from '#client/queries'
-import { useNavigate } from 'react-router-dom'
 
 /**
  * Cohort Connect Widget - Find and connect with cohort members
@@ -14,7 +13,6 @@ import { useNavigate } from 'react-router-dom'
 export const CohortConnectWidget: React.FC = () => {
   const me = useStore(stores.me)
   const { data: cohortData, isLoading } = useCohorts()
-  const navigate = useNavigate()
   const [expandedMemberId, setExpandedMemberId] = React.useState<string | null>(null)
 
   if (isLoading || !cohortData?.matches || cohortData.matches.length === 0) {
@@ -34,7 +32,7 @@ export const CohortConnectWidget: React.FC = () => {
     .slice(0, 5)
 
   const handleViewProfile = (userId: string) => {
-    navigate(`/users/${userId}`)
+    window.location.href = `/users/${userId}`
   }
 
   const handleToggleExpand = (userId: string) => {
@@ -117,7 +115,7 @@ export const CohortConnectWidget: React.FC = () => {
                         size="small"
                         onClick={(e) => {
                           e.stopPropagation()
-                          navigate('/sync')
+                          window.location.href = '/sync'
                         }}
                       >
                         Send message
@@ -134,7 +132,7 @@ export const CohortConnectWidget: React.FC = () => {
         {matches.length > 5 && (
           <div className="mt-16 text-center">
             <button
-              onClick={() => navigate('/community')}
+              onClick={() => window.location.href = '/community'}
               className="text-xs opacity-60 hover:opacity-100 transition-opacity"
             >
               View all {matches.length} members →
