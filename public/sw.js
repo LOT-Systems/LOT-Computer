@@ -1,214 +1,49 @@
 // Service Worker for LOT Systems PWA
-// Version: 2026-01-28-002 - Fix navigation request handling for Safari PWA root path and document loads
+// Version: 2026-01-28-003 - DISABLED - Bypass all requests to diagnose Safari PWA issue
 
-const CACHE_VERSION = 'v2026-01-28-002';
+const CACHE_VERSION = 'v2026-01-28-003';
 const CACHE_NAME = `lot-cache-${CACHE_VERSION}`;
 
-// Files to cache initially (only static assets)
+// Minimal cache - just PWA icons
 const STATIC_CACHE = [
   '/icon/icon-192.png',
   '/icon/icon-512.png',
-  '/og.jpg'
 ];
 
-// Install event - cache static assets
+// Install event - minimal caching
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker version:', CACHE_VERSION);
-
+  console.log('[SW] Installing minimal service worker version:', CACHE_VERSION);
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('[SW] Caching static assets');
-        return cache.addAll(STATIC_CACHE);
-      })
-      .then(() => {
-        // Force the waiting service worker to become the active service worker
-        return self.skipWaiting();
-      })
+      .then((cache) => cache.addAll(STATIC_CACHE))
+      .then(() => self.skipWaiting())
   );
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up and take control
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker version:', CACHE_VERSION);
-
+  console.log('[SW] Activating minimal service worker');
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
-            // Delete ALL caches, even current one, to force fresh fetch
-            console.log('[SW] Deleting cache:', cacheName);
-            return caches.delete(cacheName);
+            if (cacheName !== CACHE_NAME) {
+              console.log('[SW] Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            }
           })
         );
       })
-      .then(() => {
-        // Recreate cache with static assets only
-        return caches.open(CACHE_NAME).then((cache) => {
-          console.log('[SW] Creating fresh cache with static assets');
-          return cache.addAll(STATIC_CACHE);
-        });
-      })
-      .then(() => {
-        // Take control of all pages immediately
-        console.log('[SW] Taking control of all pages');
-        return self.clients.claim();
-      })
+      .then(() => self.clients.claim())
   );
 });
 
-// Fetch event - network-first strategy for JavaScript, cache-first for static assets
+// Fetch event - BYPASS EVERYTHING - Let all requests go straight to network
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-
-  // Skip external CDN requests - let them through without service worker interference
-  if (url.origin !== self.location.origin) {
-    // Don't intercept external requests - pass through to browser
-    return;
-  }
-
-  // Helper to check if this is a navigation/document request
-  const acceptHeader = event.request.headers.get('accept') || '';
-  const isNavigationRequest = event.request.mode === 'navigate' ||
-                               event.request.destination === 'document' ||
-                               (event.request.method === 'GET' && acceptHeader.includes('text/html'));
-
-  // Network-first for navigation/document requests (root path, /u/, /us/, etc.)
-  if (isNavigationRequest) {
-    event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          // Only cache successful responses
-          if (response && response.status === 200) {
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          // Try cache as fallback for offline
-          return caches.match(event.request).then((cachedResponse) => {
-            return cachedResponse || new Response('<!DOCTYPE html><html><body>Page not available offline</body></html>', {
-              status: 503,
-              statusText: 'Service Unavailable',
-              headers: { 'Content-Type': 'text/html' }
-            });
-          });
-        })
-    );
-    return;
-  }
-
-  // Network-first for all JavaScript files (including bundles)
-  if (url.pathname.endsWith('.js') || url.pathname.includes('/js/')) {
-    event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          // Clone the response before returning it
-          const responseToCache = response.clone();
-
-          // Update cache with fresh response
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-
-          return response;
-        })
-        .catch(() => {
-          // If network fails, try cache as fallback
-          return caches.match(event.request)
-            .then((cachedResponse) => {
-              if (cachedResponse) {
-                console.log('[SW] Serving cached JS (offline):', url.pathname);
-                return cachedResponse;
-              }
-              // If not in cache, return error response
-              return new Response('Offline - file not cached', {
-                status: 503,
-                statusText: 'Service Unavailable'
-              });
-            });
-        })
-    );
-    return;
-  }
-
-  // Network-first for API calls
-  if (url.pathname.startsWith('/api/')) {
-    event.respondWith(
-      fetch(event.request)
-        .catch(() => {
-          // For API calls, return proper error response
-          return new Response(JSON.stringify({ error: 'API not available offline' }), {
-            status: 503,
-            statusText: 'Service Unavailable',
-            headers: { 'Content-Type': 'application/json' }
-          });
-        })
-    );
-    return;
-  }
-
-  // Cache-first for CSS and static assets
-  if (url.pathname.endsWith('.css') || url.pathname.includes('/icon/') ||
-      url.pathname.endsWith('.png') || url.pathname.endsWith('.jpg')) {
-    event.respondWith(
-      caches.match(event.request)
-        .then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-
-          return fetch(event.request).then((response) => {
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-            return response;
-          }).catch(() => {
-            // Return fallback for static assets
-            return new Response('Asset not available', {
-              status: 503,
-              statusText: 'Service Unavailable'
-            });
-          });
-        })
-    );
-    return;
-  }
-
-  // Default: network-first for everything else
-  event.respondWith(
-    fetch(event.request)
-      .catch(() => {
-        return caches.match(event.request).then((cachedResponse) => {
-          return cachedResponse || new Response('Content not available offline', {
-            status: 503,
-            statusText: 'Service Unavailable'
-          });
-        });
-      })
-  );
+  // Don't intercept anything - pass everything through to the network
+  // This helps diagnose if the service worker is causing the issue
+  return;
 });
 
-// Listen for messages from clients
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-
-  if (event.data && event.data.type === 'CLEAR_CACHE') {
-    event.waitUntil(
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => caches.delete(cacheName))
-        );
-      })
-    );
-  }
-});
-
-console.log('[SW] Service worker loaded, version:', CACHE_VERSION);
+console.log('[SW] Minimal bypass service worker loaded, version:', CACHE_VERSION);
