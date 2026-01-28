@@ -3537,7 +3537,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/community-emotion
    * Calculate shared community emotional state from recent check-ins
    */
-  fastify.get('/api/community-emotion', async (req, reply) => {
+  fastify.get('/community-emotion', async (req, reply) => {
     try {
       const userId = (req as any).session?.userId || req.user?.id
       if (!userId) {
@@ -3729,7 +3729,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/stats/collective
    * Collective Consciousness Dashboard - Aggregate quantum states
    */
-  fastify.get('/api/stats/collective', async (req, reply) => {
+  fastify.get('/stats/collective', async (req, reply) => {
     if (!req.user) return reply.throw.authException()
 
     try {
@@ -3797,7 +3797,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/stats/growth
    * Personal + Community Growth Milestones
    */
-  fastify.get('/api/stats/growth', async (req, reply) => {
+  fastify.get('/stats/growth', async (req, reply) => {
     if (!req.user) return reply.throw.authException()
 
     try {
@@ -3863,7 +3863,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/stats/patterns
    * Live Intention Patterns - Anonymous real-time quantum pattern distribution
    */
-  fastify.get('/api/stats/patterns', async (req, reply) => {
+  fastify.get('/stats/patterns', async (req, reply) => {
     if (!req.user) return reply.throw.authException()
 
     try {
@@ -3919,7 +3919,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/stats/wellness
    * Community Wellness Pulse - Aggregated activity metrics
    */
-  fastify.get('/api/stats/wellness', async (req, reply) => {
+  fastify.get('/stats/wellness', async (req, reply) => {
     if (!req.user) return reply.throw.authException()
 
     try {
@@ -3981,7 +3981,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/stats/badges
    * Recent Badge Unlocks Feed - Anonymous badge achievements
    */
-  fastify.get('/api/stats/badges', async (req, reply) => {
+  fastify.get('/stats/badges', async (req, reply) => {
     if (!req.user) return reply.throw.authException()
 
     try {
@@ -4035,7 +4035,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/stats/memory-engine
    * Memory Engine Performance Stats - Usership/Admin only
    */
-  fastify.get('/api/stats/memory-engine', async (req, reply) => {
+  fastify.get('/stats/memory-engine', async (req, reply) => {
     if (!req.user) return reply.throw.authException()
 
     // Only show to Usership/Admin users
@@ -4092,7 +4092,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/system/deployment-status
    * System Progress - Latest deployment info with sci-fi terminology
    */
-  fastify.get('/api/system/deployment-status', async (req, reply) => {
+  fastify.get('/system/deployment-status', async (req, reply) => {
     if (!req.user) return reply.throw.authException()
 
     try {
@@ -4146,7 +4146,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/system/my-feedback
    * Get current user's feedback for the active deployment
    */
-  fastify.get('/api/system/my-feedback', async (req, reply) => {
+  fastify.get('/system/my-feedback', async (req, reply) => {
     if (!req.user) return reply.throw.authException()
 
     try {
@@ -4221,7 +4221,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * Ultra-fast real-time system activity metrics
    * Updates every second with live stats
    */
-  fastify.get('/api/system/pulse', async (req, reply) => {
+  fastify.get('/system/pulse', async (req, reply) => {
     if (!req.user) return reply.throw.authException()
 
     try {
