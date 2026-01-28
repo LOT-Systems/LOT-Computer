@@ -24,10 +24,10 @@ import publicApiRoutes from './routes/public-api.js'
 const CWD = process.cwd()
 
 // Debug: Check if static files exist
-console.log('🔍 CWD:', CWD)
-console.log('🔍 dist/client/js exists?', fs.existsSync(path.join(CWD, 'dist/client/js')))
+console.log('CWD:', CWD)
+console.log('dist/client/js exists?', fs.existsSync(path.join(CWD, 'dist/client/js')))
 if (fs.existsSync(path.join(CWD, 'dist/client/js'))) {
-  console.log('🔍 Files in dist/client/js:', fs.readdirSync(path.join(CWD, 'dist/client/js')))
+  console.log('Files in dist/client/js:', fs.readdirSync(path.join(CWD, 'dist/client/js')))
 }
 
 const fastify = Fastify({
@@ -146,7 +146,7 @@ fastify.addHook('onClose', () => sequelize.close())
 // These MUST be registered before ANY other routes to avoid conflicts
 // ==============================================================================
 
-console.log('🔥 [SERVER-STARTUP] Registering /u/ routes at top level!')
+console.log('[SERVER-STARTUP] Registering /u/ routes at top level!')
 
 // Global request logger for debugging
 fastify.addHook('onRequest', async (req, reply) => {
@@ -367,7 +367,7 @@ fastify.listen({ port, host: '0.0.0.0' }, async function (err, address) {
     const { initializeScheduledJobs } = await import('./scheduled-jobs.js')
     initializeScheduledJobs()
   } catch (error) {
-    console.error('❌ Failed to initialize scheduled jobs:', error)
+    console.error('Failed to initialize scheduled jobs:', error)
   }
-  console.log(`🚀 App launched: ${config.appHost}`)
+  console.log(`App launched: ${config.appHost}`)
 })

@@ -306,7 +306,7 @@ export async function generateMonthlySummary(
       console.log('⏭️ Skipping Memory Story - insufficient answers')
     }
   } catch (error: any) {
-    console.error('❌ Failed to generate Memory Story for monthly summary:', error.message)
+    console.error('Failed to generate Memory Story for monthly summary:', error.message)
     memoryStory = null
   }
 

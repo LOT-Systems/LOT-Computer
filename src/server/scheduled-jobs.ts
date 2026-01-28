@@ -41,7 +41,7 @@ function shouldRunMonthlyEmailJob(): boolean {
   if (lastMonthlyEmailRun) {
     const lastRun = dayjs(lastMonthlyEmailRun)
     if (lastRun.isSame(now, 'day')) {
-      console.log('✅ Monthly email job already ran today, skipping')
+      console.log('Monthly email job already ran today, skipping')
       return false
     }
   }
@@ -142,7 +142,7 @@ async function executeMonthlyEmailJob(): Promise<JobResult> {
         }
 
         // Generate monthly summary
-        console.log(`📊 Generating summary for ${user.email}...`)
+        console.log(`Generating summary for ${user.email}...`)
         const summary = await generateMonthlySummary(userPublic, logs.map(l => l.toJSON()))
 
         // Generate email body
@@ -172,7 +172,7 @@ async function executeMonthlyEmailJob(): Promise<JobResult> {
             status: 'sent',
             messageId: result.messageId
           })
-          console.log(`✅ ${user.email}: Sent successfully`)
+          console.log(`${user.email}: Sent successfully`)
         } else {
           results.failed++
           results.details.push({
@@ -181,7 +181,7 @@ async function executeMonthlyEmailJob(): Promise<JobResult> {
             status: 'failed',
             error: result.error
           })
-          console.log(`❌ ${user.email}: Failed - ${result.error}`)
+          console.log(`${user.email}: Failed - ${result.error}`)
         }
 
         // Small delay between emails to avoid rate limiting
@@ -194,13 +194,13 @@ async function executeMonthlyEmailJob(): Promise<JobResult> {
           status: 'failed',
           error: error.message
         })
-        console.log(`❌ ${user.email}: Error - ${error.message}`)
+        console.log(`${user.email}: Error - ${error.message}`)
       }
     }
 
     console.log('')
     console.log('━'.repeat(60))
-    console.log('📊 MONTHLY EMAIL JOB COMPLETE')
+    console.log('MONTHLY EMAIL JOB COMPLETE')
     console.log(`   Sent: ${results.sent}`)
     console.log(`   Skipped: ${results.skipped}`)
     console.log(`   Failed: ${results.failed}`)
@@ -220,7 +220,7 @@ async function executeMonthlyEmailJob(): Promise<JobResult> {
   } catch (error: any) {
     console.error('')
     console.error('━'.repeat(60))
-    console.error('❌ MONTHLY EMAIL JOB FAILED')
+    console.error('MONTHLY EMAIL JOB FAILED')
     console.error(`   Error: ${error.message}`)
     console.error('━'.repeat(60))
     console.error('')
@@ -277,12 +277,12 @@ export function initializeScheduledJobs(): void {
       try {
         await checkAndRunScheduledJobs()
       } catch (error: any) {
-        console.error('❌ Scheduled job check failed:', error.message)
+        console.error('Scheduled job check failed:', error.message)
       }
     }
   }, HOURLY_CHECK)
 
-  console.log('✅ Scheduled job system initialized')
+  console.log('Scheduled job system initialized')
   console.log(`   Current time: ${dayjs().format('YYYY-MM-DD HH:mm:ss')} UTC`)
   console.log('')
 }

@@ -28,7 +28,7 @@ export function MemoryWidget() {
   // Debug logging - wrapped in try-catch for safety
   React.useEffect(() => {
     try {
-      console.log('📊 MemoryWidget state:', {
+      console.log('MemoryWidget state:', {
         loadedQuestion: loadedQuestion ? {
           id: loadedQuestion.id,
           question: loadedQuestion.question ? loadedQuestion.question.substring(0, 50) : 'no question text'
@@ -203,7 +203,7 @@ export function MemoryWidget() {
         // Keep only last 5
         const trimmed = recentQuestions.slice(0, 5)
         localStorage.setItem('recentMemoryQuestions', JSON.stringify(trimmed))
-        console.log(`✅ Tracked shown question (total tracked: ${trimmed.length})`)
+        console.log(`Tracked shown question (total tracked: ${trimmed.length})`)
       } catch (e) {
         console.warn('Failed to save lastMemoryQuestionTime:', e)
       }
@@ -256,7 +256,7 @@ export function MemoryWidget() {
   // Retry handler - clears cache and refetches
   const handleRetry = React.useCallback(async () => {
     try {
-      console.log('🔄 Retry button clicked - clearing cache and refetching')
+      console.log('Retry button clicked - clearing cache and refetching')
 
       // Hide error details on retry
       setShowErrorDetails(false)
@@ -277,16 +277,16 @@ export function MemoryWidget() {
       // Small delay to ensure cache is cleared
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      console.log('🔄 Refetching Memory question...')
+      console.log('Refetching Memory question...')
       // Refetch the query
       const result = await refetch()
-      console.log('🔄 Refetch result:', {
+      console.log('Refetch result:', {
         hasData: !!result.data,
         hasError: !!result.error,
         isLoading: result.isLoading
       })
     } catch (e) {
-      console.error('❌ Retry failed:', e)
+      console.error('Retry failed:', e)
     }
   }, [queryClient, refetch])
 
@@ -311,8 +311,8 @@ export function MemoryWidget() {
 
           {/* Error Details */}
           {showErrorDetails && error && (
-            <div className="text-xs opacity-70 font-mono grid-fill-light p-3 rounded border border-acc/20 overflow-auto max-h-[200px]">
-              <div className="mb-2 font-bold">Error Details:</div>
+            <div className="text-sm opacity-75 font-mono grid-fill-light p-3 rounded border border-acc/20 overflow-auto max-h-[200px]">
+              <div className="mb-2">Error Details:</div>
               {(error as any).response?.status && (
                 <div>Status: {(error as any).response.status}</div>
               )}

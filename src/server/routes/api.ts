@@ -143,7 +143,7 @@ export default async (fastify: FastifyInstance) => {
     const fs = await import('fs')
     const path = await import('path')
 
-    let memoryModuleStatus = '✅ Phase 1 Complete'
+    let memoryModuleStatus = 'Phase 1 Complete'
     let moduleDetails = ''
 
     try {
@@ -162,16 +162,16 @@ export default async (fastify: FastifyInstance) => {
 
       const moduleChecks = modules.map(mod => {
         const exists = fs.existsSync(path.join(memoryDir, mod))
-        return `${exists ? '✅' : '❌'} ${mod}`
+        return `${exists ? 'Yes' : 'No'} ${mod}`
       })
 
       moduleDetails = moduleChecks.join('<br>')
 
       // Check backward compatibility
       const legacyMemory = fs.existsSync(path.join(process.cwd(), 'dist/server/server/utils/memory.js'))
-      moduleDetails += `<br><br><strong>Backward Compatibility:</strong><br>${legacyMemory ? '✅' : '❌'} memory.js (original)`
+      moduleDetails += `<br><br><strong>Backward Compatibility:</strong><br>${legacyMemory ? 'Yes' : 'No'} memory.js (original)`
     } catch (error: any) {
-      memoryModuleStatus = '⚠️ Check Failed'
+      memoryModuleStatus = 'Check Failed'
       moduleDetails = error.message
     }
 
@@ -259,7 +259,7 @@ export default async (fastify: FastifyInstance) => {
       </head>
       <body>
         <div class="success">
-          <h1>✅ February 2025 Deployment Live!</h1>
+          <h1>February 2025 Deployment Live!</h1>
 
           <div class="info">
             <strong>User:</strong> ${req.user.email}<br>
@@ -286,12 +286,12 @@ export default async (fastify: FastifyInstance) => {
             • Quantum Intent Engine integration
           </div>
 
-          <h2>📊 February Features</h2>
+          <h2>February Features</h2>
           <div class="module-info">
-            ✅ Monthly Email System<br>
-            ✅ Evolution Widget<br>
-            ✅ Cohort-Connect Widget<br>
-            ✅ Memory Engine Modularization (Phase 1)
+            Monthly Email System<br>
+            Evolution Widget<br>
+            Cohort-Connect Widget<br>
+            Memory Engine Modularization (Phase 1)
           </div>
 
           <div class="links">
@@ -1151,17 +1151,17 @@ export default async (fastify: FastifyInstance) => {
         result.style.display = 'block';
         if (data.deleted === 0) {
           result.className = 'info';
-          result.innerHTML = '✨ ' + data.message;
+          result.innerHTML = '' + data.message;
         } else {
           result.className = 'success';
-          result.innerHTML = '✅ ' + data.message + '<br><br>Refresh your Logs page to see the results.';
+          result.innerHTML = '' + data.message + '<br><br>Refresh your Logs page to see the results.';
         }
 
         btn.textContent = 'Cleanup Complete';
       } catch (error) {
         result.style.display = 'block';
         result.className = 'error';
-        result.innerHTML = '❌ Error: ' + error.message;
+        result.innerHTML = 'Error: ' + error.message;
         btn.disabled = false;
         btn.textContent = 'Try Again';
       }
@@ -1217,7 +1217,7 @@ export default async (fastify: FastifyInstance) => {
             </style>
           </head>
           <body>
-            <div class="success">✨</div>
+            <div class="success">OK</div>
             <h1>Database is Clean!</h1>
             <p>No empty logs found from the past 7 days.</p>
             <p><a href="/logs">← Back to Logs</a></p>
@@ -1248,7 +1248,7 @@ export default async (fastify: FastifyInstance) => {
           </style>
         </head>
         <body>
-          <div class="success">✅</div>
+          <div class="success">OK</div>
           <h1>Cleanup Complete!</h1>
           <div class="count">${idsToDelete.length}</div>
           <p>empty logs deleted from the past 7 days</p>
@@ -1272,7 +1272,7 @@ export default async (fastify: FastifyInstance) => {
           </style>
         </head>
         <body>
-          <div class="error">❌</div>
+          <div class="error">Error</div>
           <h1>Cleanup Failed</h1>
           <p>${error.message}</p>
         </body>
@@ -1670,7 +1670,7 @@ export default async (fastify: FastifyInstance) => {
       reply.header('Content-Disposition', `attachment; filename="lot-training-data-${dayjs().format('YYYY-MM-DD')}.json"`)
       return trainingData
     } catch (error: any) {
-      console.error('❌ Training data export failed:', error)
+      console.error('Training data export failed:', error)
       return reply.status(500).send({
         error: 'Export failed',
         message: error.message
@@ -1688,11 +1688,11 @@ export default async (fastify: FastifyInstance) => {
       qn?: string // quantum needs support
     } }>, reply) => {
       try {
-        console.log(`🎯 Memory endpoint called for user ${req.user?.id || 'UNKNOWN'}`)
+        console.log(`Memory endpoint called for user ${req.user?.id || 'UNKNOWN'}`)
 
         // Validate required parameters first
         if (!req.query.d) {
-          console.error('❌ Memory request missing date parameter')
+          console.error('Memory request missing date parameter')
           return reply.status(400).send({
             error: 'Missing date parameter',
             hint: 'Date parameter (d) is required'
@@ -1726,7 +1726,7 @@ export default async (fastify: FastifyInstance) => {
         try {
           decodedDate = atob(req.query.d)
         } catch (e) {
-          console.error('❌ Invalid date encoding:', {
+          console.error('Invalid date encoding:', {
             encoded: req.query.d,
             error: (e as Error).message
           })
@@ -1738,7 +1738,7 @@ export default async (fastify: FastifyInstance) => {
 
         const localDate = dayjs(decodedDate, DATE_FORMAT)
 
-        console.log(`🔍 Memory request:`, {
+        console.log(`Memory request:`, {
           userId: req.user.id,
           encodedDate: req.query.d,
           decodedDate,
@@ -1747,7 +1747,7 @@ export default async (fastify: FastifyInstance) => {
         })
 
         if (!localDate.isValid()) {
-          console.error(`❌ Invalid date format:`, { decodedDate, expected: DATE_FORMAT })
+          console.error(`Invalid date format:`, { decodedDate, expected: DATE_FORMAT })
           return reply.throw.badParams()
         }
 
@@ -1769,7 +1769,7 @@ export default async (fastify: FastifyInstance) => {
           promptQuotaToday = pacingResult.promptQuotaToday
           promptsShownToday = pacingResult.promptsShownToday
         } catch (pacingError: any) {
-          console.error('❌ Intelligent pacing calculation failed:', {
+          console.error('Intelligent pacing calculation failed:', {
             error: pacingError.message,
             stack: pacingError.stack,
             userId: req.user.id
@@ -1781,7 +1781,7 @@ export default async (fastify: FastifyInstance) => {
           promptsShownToday = 0
         }
 
-        console.log(`📊 Intelligent Pacing Analysis:`, {
+        console.log(`Intelligent Pacing Analysis:`, {
           userId: req.user.id,
           shouldShowPrompt,
           isWeekend,
@@ -1797,7 +1797,7 @@ export default async (fastify: FastifyInstance) => {
             promptQuotaToday,
             returning: 'null'
           })
-          console.log(`↩️  Returning null from Memory endpoint (quota/timing)`)
+          console.log(` Returning null from Memory endpoint (quota/timing)`)
           return null
         }
 
@@ -1835,7 +1835,7 @@ export default async (fastify: FastifyInstance) => {
           order: [['createdAt', 'DESC']]
         })
       } catch (metadataError: any) {
-        console.warn('⚠️ Weekly summary query failed, skipping:', metadataError.message)
+        console.warn('Weekly summary query failed, skipping:', metadataError.message)
         // Continue without weekly summary check
       }
 
@@ -1852,7 +1852,7 @@ export default async (fastify: FastifyInstance) => {
       )
 
       if (showWeeklySummary) {
-        console.log(`📊 Generating weekly summary for user ${req.user.id}`)
+        console.log(`Generating weekly summary for user ${req.user.id}`)
         try {
           // Load 200 logs to cover the week + historical context
           let logs: any[] = []
@@ -1865,13 +1865,13 @@ export default async (fastify: FastifyInstance) => {
               limit: 200,
             })
           } catch (logsError: any) {
-            console.warn('⚠️ Failed to load logs for weekly summary:', logsError.message)
+            console.warn('Failed to load logs for weekly summary:', logsError.message)
             // Continue with empty logs array
           }
 
           const weeklySummary = await generateWeeklySummary(req.user, logs as any)
 
-          console.log(`↩️  Returning weekly summary from Memory endpoint`)
+          console.log(` Returning weekly summary from Memory endpoint`)
           // Return as a special memory "question" with reflection prompt
           return {
             id: 'weekly_summary',
@@ -1888,7 +1888,7 @@ export default async (fastify: FastifyInstance) => {
             }
           }
         } catch (error: any) {
-          console.error('❌ Weekly summary generation failed:', {
+          console.error('Weekly summary generation failed:', {
             error: error.message,
             userId: req.user.id,
           })
@@ -1898,7 +1898,7 @@ export default async (fastify: FastifyInstance) => {
 
       if (hasUsershipTag) {
         // Usership users: Generate AI-based context-aware question using Claude
-        console.log(`🔍 Attempting to generate AI question for Usership user ${req.user.id}`)
+        console.log(`Attempting to generate AI question for Usership user ${req.user.id}`)
         try {
           // Load recent logs for context - balanced amount for good context without overwhelming AI
           const logs = await fastify.models.Log.findAll({
@@ -1947,7 +1947,7 @@ export default async (fastify: FastifyInstance) => {
           // Generate question - AI already has instructions to avoid duplicates from buildPrompt
           const question = await completeAndExtractQuestion(prompt, req.user)
 
-          console.log(`✅ Generated question for user ${req.user.id}:`, {
+          console.log(`Generated question for user ${req.user.id}:`, {
             questionId: question.id,
             questionPreview: question.question.substring(0, 60) + '...',
             logsUsed: logs.length
@@ -1955,7 +1955,7 @@ export default async (fastify: FastifyInstance) => {
 
           return question
         } catch (error: any) {
-          console.error('❌ Memory question generation failed, falling back to default questions:', {
+          console.error('Memory question generation failed, falling back to default questions:', {
             error: error.message,
             stack: error.stack,
             userId: req.user.id,
@@ -1970,7 +1970,7 @@ export default async (fastify: FastifyInstance) => {
             },
             note: 'At least ONE valid API key is required. Visit /api/public/test-ai-engines to diagnose.',
           })
-          console.log('↩️  Falling through to default questions after AI failure')
+          console.log(' Falling through to default questions after AI failure')
           // Explicitly continue to default questions block below - do NOT return here
         }
       }
@@ -1997,7 +1997,7 @@ export default async (fastify: FastifyInstance) => {
               attributes: ['id', 'metadata'],
             }).then((xs) => Array.from(new Set(xs.map((x) => x.metadata?.questionId).filter(Boolean))))
           } catch (queryError: any) {
-            console.warn('⚠️ Previous questions query failed, using all default questions:', queryError.message)
+            console.warn('Previous questions query failed, using all default questions:', queryError.message)
             // Continue with empty array - will use all default questions
           }
 
@@ -2018,7 +2018,7 @@ export default async (fastify: FastifyInstance) => {
 
           // Ensure we have questions to choose from
           if (!untouchedQuestions || untouchedQuestions.length === 0) {
-            console.log(`⚠️ No untouched questions available, using first default question`)
+            console.log(`No untouched questions available, using first default question`)
             untouchedQuestions = [defaultQuestions[0]]
           }
 
@@ -2032,7 +2032,7 @@ export default async (fastify: FastifyInstance) => {
 
           // Final safety check
           if (!question) {
-            console.error(`❌ No question selected, returning first default`)
+            console.error(`No question selected, returning first default`)
             return defaultQuestions[0]
           }
 
@@ -2044,12 +2044,12 @@ export default async (fastify: FastifyInstance) => {
             reason: 'Non-Usership user or AI generation failed'
           })
 
-          console.log(`↩️  Returning default question from Memory endpoint`)
+          console.log(` Returning default question from Memory endpoint`)
           return question
         } catch (defaultQuestionError: any) {
-          console.error('❌ Default question selection failed:', defaultQuestionError.message)
+          console.error('Default question selection failed:', defaultQuestionError.message)
           console.error('Stack:', defaultQuestionError.stack)
-          console.log(`↩️  Returning absolute fallback hardcoded question from Memory endpoint`)
+          console.log(` Returning absolute fallback hardcoded question from Memory endpoint`)
           // ABSOLUTE FALLBACK - return first hardcoded question directly
           return {
             id: 'n6M42WKP',
@@ -2059,7 +2059,7 @@ export default async (fastify: FastifyInstance) => {
         }
       }
       } catch (error: any) {
-        console.error('❌ /api/memory endpoint error:', {
+        console.error('/api/memory endpoint error:', {
           message: error.message,
           stack: error.stack,
           userId: req.user?.id,
@@ -2069,7 +2069,7 @@ export default async (fastify: FastifyInstance) => {
         })
 
         // Return fallback question instead of error to improve UX
-        console.log('↩️ Returning emergency fallback question due to error')
+        console.log('Returning emergency fallback question due to error')
         return {
           id: 'emergency_fallback',
           question: 'What matters most to you today?',
@@ -2368,9 +2368,9 @@ export default async (fastify: FastifyInstance) => {
           }
         }).save()
 
-        console.log(`✅ Memory Story v${storyVersion} saved to user metadata`)
+        console.log(`Memory Story v${storyVersion} saved to user metadata`)
       } catch (saveError: any) {
-        console.error('⚠️ Failed to save Memory Story to metadata:', saveError.message)
+        console.error('Failed to save Memory Story to metadata:', saveError.message)
         // Continue anyway - story generation succeeded
       }
 
@@ -2380,7 +2380,7 @@ export default async (fastify: FastifyInstance) => {
         answerCount: logs.length
       }
     } catch (error: any) {
-      console.error('❌ Error generating memory story:', {
+      console.error('Error generating memory story:', {
         error: error.message,
         stack: error.stack,
         userId: req.user?.id
@@ -2483,7 +2483,7 @@ export default async (fastify: FastifyInstance) => {
         logsAnalyzedForProfile: logs.length  // Number of recent logs used for analysis
       }
     } catch (error: any) {
-      console.error('❌ Error generating user profile:', {
+      console.error('Error generating user profile:', {
         error: error.message,
         userId: req.user?.id,
       })
@@ -2530,7 +2530,7 @@ export default async (fastify: FastifyInstance) => {
 
         const recipe = await generateRecipeSuggestion(req.user, mealTime, logs)
 
-        console.log(`✅ Recipe suggestion generated: "${recipe}"`)
+        console.log(`Recipe suggestion generated: "${recipe}"`)
 
         return {
           recipe,
@@ -2538,7 +2538,7 @@ export default async (fastify: FastifyInstance) => {
           hasUsership: hasUsershipTag
         }
       } catch (error: any) {
-        console.error('❌ Error generating recipe suggestion:', {
+        console.error('Error generating recipe suggestion:', {
           error: error.message,
           stack: error.stack,
           userId: req.user?.id,
@@ -2659,7 +2659,7 @@ export default async (fastify: FastifyInstance) => {
           diverseChoices,
         }
       } catch (error: any) {
-        console.error('❌ User stats calculation error:', error)
+        console.error('User stats calculation error:', error)
         return reply.status(500).send({ error: 'Failed to calculate stats' })
       }
     }
@@ -2779,7 +2779,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         }
       }).save()
 
-      console.log(`✅ Generated world element for user ${req.user.id}: ${elementType}`)
+      console.log(`Generated world element for user ${req.user.id}: ${elementType}`)
 
       return {
         element: newElement,
@@ -2788,7 +2788,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error generating world element:', {
+      console.error('Error generating world element:', {
         error: error.message,
         stack: error.stack,
         userId: req.user?.id
@@ -2854,7 +2854,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
 
       return { tracks }
     } catch (error: any) {
-      console.error('❌ Error reading radio tracks:', error)
+      console.error('Error reading radio tracks:', error)
       return { tracks: [], error: error.message }
     }
   })
@@ -2880,7 +2880,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
 
       const insights = await analyzeUserPatterns(req.user, logs)
 
-      console.log(`📊 Generated ${insights.length} pattern insights for user ${req.user.id}`)
+      console.log(`Generated ${insights.length} pattern insights for user ${req.user.id}`)
 
       return {
         insights,
@@ -2889,7 +2889,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error analyzing patterns:', {
+      console.error('Error analyzing patterns:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -2979,7 +2979,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error finding cohorts:', {
+      console.error('Error finding cohorts:', {
         error: error.message,
         stack: error.stack,
         userId: req.user?.id
@@ -3060,7 +3060,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error generating contextual prompts:', {
+      console.error('Error generating contextual prompts:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -3140,7 +3140,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error analyzing pattern evolution:', {
+      console.error('Error analyzing pattern evolution:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -3172,7 +3172,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       const energyState = analyzeEnergyState(logs)
       const suggestions = generateEnergySuggestions(energyState)
 
-      console.log(`⚡ Energy state for user ${req.user.id}: ${energyState.status} (${energyState.currentLevel}/100)`)
+      console.log(`Energy state for user ${req.user.id}: ${energyState.status} (${energyState.currentLevel}/100)`)
 
       return {
         energyState,
@@ -3181,7 +3181,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error analyzing energy:', {
+      console.error('Error analyzing energy:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -3220,7 +3220,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error generating narrative:', {
+      console.error('Error generating narrative:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -3252,7 +3252,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
 
       const progression = generateGoalProgression(req.user, logs)
 
-      console.log(`🎯 Generated goal progression for user ${req.user.id}: ${progression.goals.length} goals, primary: ${progression.overallJourney.primaryGoal?.title || 'none'}`)
+      console.log(`Generated goal progression for user ${req.user.id}: ${progression.goals.length} goals, primary: ${progression.overallJourney.primaryGoal?.title || 'none'}`)
 
       return {
         progression,
@@ -3260,7 +3260,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error generating goal progression:', {
+      console.error('Error generating goal progression:', {
         error: error.message,
         stack: error.stack,
         userId: req.user?.id
@@ -3304,7 +3304,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         return reply.status(400).send({ error: 'No signals provided' })
       }
 
-      console.log(`📊 Syncing ${signals.length} Quantum Intent signals for user ${req.user.id}`)
+      console.log(`Syncing ${signals.length} Quantum Intent signals for user ${req.user.id}`)
 
       // Save each signal as a log entry for historical tracking
       const savedSignals = []
@@ -3324,7 +3324,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
           })
           savedSignals.push(log.id)
         } catch (signalError: any) {
-          console.error('⚠️ Failed to save individual signal:', signalError.message)
+          console.error('Failed to save individual signal:', signalError.message)
           // Continue with other signals
         }
       }
@@ -3342,9 +3342,9 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
               quantumIntentSignalCount: (currentMetadata.quantumIntentSignalCount || 0) + signals.length
             }
           }).save()
-          console.log(`✅ Quantum Intent state saved to user metadata`)
+          console.log(`Quantum Intent state saved to user metadata`)
         } catch (metadataError: any) {
-          console.error('⚠️ Failed to save Quantum Intent state to metadata:', metadataError.message)
+          console.error('Failed to save Quantum Intent state to metadata:', metadataError.message)
         }
       }
 
@@ -3355,7 +3355,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         timestamp: new Date().toISOString()
       }
     } catch (error: any) {
-      console.error('❌ Error syncing Quantum Intent signals:', {
+      console.error('Error syncing Quantum Intent signals:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -3451,7 +3451,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error generating chat catalysts:', {
+      console.error('Error generating chat catalysts:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -3522,7 +3522,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error generating interventions:', {
+      console.error('Error generating interventions:', {
         error: error.message,
         userId: req.user?.id
       })

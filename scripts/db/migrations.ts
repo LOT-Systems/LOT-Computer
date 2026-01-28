@@ -56,7 +56,7 @@ if (command === '-new') {
   const fileName = getMigrationFileName(timeToken, name)
   const filePath = path.join(MIGRATIONS_PATH, fileName)
   generateMigration(filePath)
-  console.log(`✅ Generated migration:\n\t${filePath}`)
+  console.log(`Generated migration:\n\t${filePath}`)
   process.exit(0)
 }
 

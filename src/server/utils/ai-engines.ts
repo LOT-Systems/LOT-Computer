@@ -196,10 +196,10 @@ export class TogetherAIEngine implements AIEngine {
           throw new Error(`No response from Together AI model: ${model}`)
         }
 
-        console.log(`✅ Together AI: Successfully used model ${model}`)
+        console.log(`Together AI: Successfully used model ${model}`)
         return content
       } catch (error: any) {
-        console.warn(`⚠️ Together AI: Model ${model} failed: ${error.message}`)
+        console.warn(`Together AI: Model ${model} failed: ${error.message}`)
         lastError = error
         // Continue to next model in fallback chain
       }
@@ -402,7 +402,7 @@ export class AIEngineManager {
     for (const engineName of fallbackOrder) {
       const engine = this.engines.get(engineName)
       if (engine?.isAvailable()) {
-        console.log(`✅ Using AI engine: ${engine.name}`)
+        console.log(`Using AI engine: ${engine.name}`)
         return engine
       }
     }

@@ -73,7 +73,7 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         },
       }
     } catch (error: any) {
-      console.error('❌ OS Status error:', error)
+      console.error('OS Status error:', error)
       return reply.status(500).send({ error: 'Failed to retrieve OS status' })
     }
   })
@@ -124,7 +124,7 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         milestones: version.milestones,
       }
     } catch (error: any) {
-      console.error('❌ OS Version error:', error)
+      console.error('OS Version error:', error)
       return reply.status(500).send({ error: 'Failed to retrieve OS version' })
     }
   })
@@ -163,7 +163,7 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString(),
       }
     } catch (error: any) {
-      console.error('❌ OS Insights error:', error)
+      console.error('OS Insights error:', error)
       return reply.status(500).send({ error: 'Failed to generate insights' })
     }
   })
@@ -218,7 +218,7 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         },
       }
     } catch (error: any) {
-      console.error('❌ OS Performance error:', error)
+      console.error('OS Performance error:', error)
       return reply.status(500).send({ error: 'Failed to calculate performance' })
     }
   })
@@ -322,7 +322,7 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         recommendations: generateOptimizationSteps(issues),
       }
     } catch (error: any) {
-      console.error('❌ OS Diagnostics error:', error)
+      console.error('OS Diagnostics error:', error)
       return reply.status(500).send({ error: 'Failed to run diagnostics' })
     }
   })
@@ -365,7 +365,7 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         },
       }
     } catch (error: any) {
-      console.error('❌ OS Config error:', error)
+      console.error('OS Config error:', error)
       return reply.status(500).send({ error: 'Failed to retrieve config' })
     }
   })

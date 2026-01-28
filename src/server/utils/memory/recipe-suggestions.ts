@@ -188,10 +188,10 @@ Please respond with ONLY the recipe/meal suggestion - just a simple, clear descr
     const suggestion = await engine.generateCompletion(prompt, 100)
     const cleaned = suggestion?.trim().replace(/^["']|["']$/g, '').replace(/[.!?]$/g, '') || ''
 
-    console.log(`✅ Recipe generated: "${cleaned}"`)
+    console.log(`Recipe generated: "${cleaned}"`)
     return cleaned
   } catch (error: any) {
-    console.error('❌ AI Engine failed for recipe generation:', {
+    console.error('AI Engine failed for recipe generation:', {
       message: error.message,
       user: user.email,
     })

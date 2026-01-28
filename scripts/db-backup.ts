@@ -65,7 +65,7 @@ async function createBackup(keepDays: number = DEFAULT_RETENTION_DAYS) {
     const stats = fs.statSync(backupFile)
     const fileSizeMB = (stats.size / (1024 * 1024)).toFixed(2)
 
-    console.log(`✅ Backup created successfully!`)
+    console.log(`Backup created successfully!`)
     console.log(`   Size: ${fileSizeMB} MB`)
     console.log(`   Location: ${backupFile}`)
 
@@ -77,7 +77,7 @@ async function createBackup(keepDays: number = DEFAULT_RETENTION_DAYS) {
     const compressedSizeMB = (compressedStats.size / (1024 * 1024)).toFixed(2)
     const compressionRatio = ((1 - compressedStats.size / stats.size) * 100).toFixed(1)
 
-    console.log(`✅ Compression complete!`)
+    console.log(`Compression complete!`)
     console.log(`   Compressed size: ${compressedSizeMB} MB`)
     console.log(`   Compression ratio: ${compressionRatio}%`)
     console.log(`   File: ${compressedFile}`)
@@ -87,7 +87,7 @@ async function createBackup(keepDays: number = DEFAULT_RETENTION_DAYS) {
 
     return compressedFile
   } catch (error: any) {
-    console.error('❌ Backup failed:', error.message)
+    console.error('Backup failed:', error.message)
     if (error.stderr) {
       console.error('Error details:', error.stderr)
     }
@@ -127,7 +127,7 @@ async function cleanupOldBackups(backupDir: string, keepDays: number) {
 
     if (deletedCount > 0) {
       const deletedSizeMB = (deletedSize / (1024 * 1024)).toFixed(2)
-      console.log(`✅ Cleaned up ${deletedCount} old backup(s), freed ${deletedSizeMB} MB`)
+      console.log(`Cleaned up ${deletedCount} old backup(s), freed ${deletedSizeMB} MB`)
     } else {
       console.log('   No old backups to delete')
     }
@@ -137,7 +137,7 @@ async function cleanupOldBackups(backupDir: string, keepDays: number) {
       .filter(f => f.startsWith('lot-systems-db-') && f.endsWith('.gz'))
     console.log(`\n📚 Total backups: ${remaining.length}`)
   } catch (error: any) {
-    console.error('⚠️  Cleanup warning:', error.message)
+    console.error(' Cleanup warning:', error.message)
     // Don't fail the backup if cleanup fails
   }
 }
@@ -187,7 +187,7 @@ async function main() {
   if (keepIndex !== -1 && args[keepIndex + 1]) {
     keepDays = parseInt(args[keepIndex + 1], 10)
     if (isNaN(keepDays) || keepDays < 1) {
-      console.error('❌ Invalid --keep value. Must be a positive number.')
+      console.error('Invalid --keep value. Must be a positive number.')
       process.exit(1)
     }
   }
@@ -197,7 +197,7 @@ async function main() {
 
   await createBackup(keepDays)
 
-  console.log('\n✨ Backup process complete!\n')
+  console.log('\nBackup process complete!\n')
   console.log('💡 To list all backups: npm run db:backup -- --list')
   console.log('💡 To restore: gunzip backup.sql.gz && psql < backup.sql')
 }

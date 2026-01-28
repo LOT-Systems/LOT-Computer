@@ -67,7 +67,7 @@ export default async (fastify: FastifyInstance) => {
       </head>
       <body>
         <div class="info">
-          <h1 style="color: green; margin: 0 0 20px 0;">✅ Admin API Routes Working!</h1>
+          <h1 style="color: green; margin: 0 0 20px 0;">Admin API Routes Working!</h1>
           <p>User: ${req.user.email}</p>
           <p>Tags: ${req.user.tags.join(', ')}</p>
           <p>Timestamp: ${new Date().toISOString()}</p>
@@ -114,8 +114,8 @@ export default async (fastify: FastifyInstance) => {
       // Check migrations folder
       const migrationsPath = path.join(CWD, 'migrations')
       const migrationsExist = fs.existsSync(migrationsPath)
-      diagnostics.push('📁 Migrations Folder:')
-      diagnostics.push(`   Exists: ${migrationsExist ? '✅' : '❌'}`)
+      diagnostics.push('Migrations Folder:')
+      diagnostics.push(`   Exists: ${migrationsExist ? 'Yes' : 'No'}`)
 
       if (migrationsExist) {
         const files = fs.readdirSync(migrationsPath)
@@ -131,7 +131,7 @@ export default async (fastify: FastifyInstance) => {
       diagnostics.push('🗄️ Database:')
       try {
         await fastify.sequelize.authenticate()
-        diagnostics.push('   Connection: ✅ OK')
+        diagnostics.push('   Connection: OK')
 
         const [records] = await fastify.sequelize.query(
           "SELECT name FROM \"SequelizeMeta\" ORDER BY name"
@@ -139,9 +139,9 @@ export default async (fastify: FastifyInstance) => {
 
         diagnostics.push(`   Migrations tracked: ${records.length}`)
         const jsCount = records.filter((r: any) => r.name.endsWith('.js')).length
-        diagnostics.push(`   .js entries: ${jsCount} ${jsCount > 0 ? '⚠️ NEEDS FIX' : '✅'}`)
+        diagnostics.push(`   .js entries: ${jsCount} ${jsCount > 0 ? 'NEEDS FIX' : 'OK'}`)
       } catch (dbError: any) {
-        diagnostics.push(`   ❌ ${dbError.message}`)
+        diagnostics.push(`   ${dbError.message}`)
       }
       diagnostics.push('')
 
@@ -152,9 +152,9 @@ export default async (fastify: FastifyInstance) => {
           "SELECT column_name FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'timeChime'"
         ) as any[]
 
-        diagnostics.push(`   ${result.length > 0 ? '✅ Exists' : '❌ Missing'}`)
+        diagnostics.push(`   ${result.length > 0 ? 'Exists' : 'Missing'}`)
       } catch (e: any) {
-        diagnostics.push(`   ❌ ${e.message}`)
+        diagnostics.push(`   ${e.message}`)
       }
 
       return reply.type('text/html').send(`
@@ -204,7 +204,7 @@ export default async (fastify: FastifyInstance) => {
         </head>
         <body>
           <div class="box">
-            <h1>🔍 System Status</h1>
+            <h1>System Status</h1>
             <div class="log">${diagnostics.join('\n')}</div>
             <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #0066cc;">
               <a href="/admin-api/fix-and-run-migrations" class="btn">🔧 Fix & Run Migrations</a>
@@ -218,7 +218,7 @@ export default async (fastify: FastifyInstance) => {
       return reply.type('text/html').send(`
         <!DOCTYPE html>
         <body style="font-family: monospace; padding: 20px; max-width: 800px; margin: 20px auto;">
-          <h1 style="color: red;">❌ Error</h1>
+          <h1 style="color: red;">Error</h1>
           <pre style="background: #f5f5f5; padding: 15px;">${error.stack}</pre>
         </body>
         </html>
@@ -469,7 +469,7 @@ export default async (fastify: FastifyInstance) => {
       })
 
       if (emptyLogs.length === 0) {
-        console.log('✅ [ADMIN] No empty logs found from past 7 days - database is clean')
+        console.log('[ADMIN] No empty logs found from past 7 days - database is clean')
 
         // If it's an HTML form submission (no Accept: application/json), return HTML
         const acceptsJson = req.headers.accept?.includes('application/json')
@@ -492,7 +492,7 @@ export default async (fastify: FastifyInstance) => {
 
       const userCount = Object.keys(byUser).length
 
-      console.log(`📊 [ADMIN] Found ${emptyLogs.length} empty logs from past 7 days across ${userCount} users`)
+      console.log(`[ADMIN] Found ${emptyLogs.length} empty logs from past 7 days across ${userCount} users`)
       console.log(`🗑️  [ADMIN] Deleting...`)
 
       // Delete by IDs
@@ -501,7 +501,7 @@ export default async (fastify: FastifyInstance) => {
         where: { id: idsToDelete },
       })
 
-      console.log(`✅ [ADMIN] Successfully deleted ${emptyLogs.length} empty logs from past 7 days (${userCount} users affected)`)
+      console.log(`[ADMIN] Successfully deleted ${emptyLogs.length} empty logs from past 7 days (${userCount} users affected)`)
 
       // If it's an HTML form submission, return HTML
       const acceptsJson = req.headers.accept?.includes('application/json')
@@ -517,7 +517,7 @@ export default async (fastify: FastifyInstance) => {
         breakdown: byUser
       }
     } catch (error: any) {
-      console.error('❌ [ADMIN] Cleanup failed:', error.message)
+      console.error('[ADMIN] Cleanup failed:', error.message)
       return reply.throw.internalError(error.message)
     }
   })
@@ -585,11 +585,11 @@ export default async (fastify: FastifyInstance) => {
 <body>
   <div class="container">
     ${deleted === 0 ? `
-      <div class="icon">✨</div>
+      <div class="icon">*</div>
       <h1>Database is Clean!</h1>
       <p>No empty logs found across all users.</p>
     ` : `
-      <div class="icon">✅</div>
+      <div class="icon">OK</div>
       <h1>Cleanup Complete!</h1>
       <div class="stats">
         <strong>${deleted}</strong> empty logs deleted<br>
@@ -660,7 +660,7 @@ export default async (fastify: FastifyInstance) => {
     <p>This will delete empty log entries from the <strong>past 7 days</strong> across ALL users.</p>
 
     <div class="warning">
-      ⚠️ <strong>Warning:</strong> This action affects all users. Only use this if you're sure empty logs are accumulating due to a bug.
+      <strong>Warning:</strong> This action affects all users. Only use this if you're sure empty logs are accumulating due to a bug.
     </div>
 
     <form method="POST" action="/admin-api/cleanup-all-empty-logs" onsubmit="return confirm('Are you sure you want to delete empty logs from the past 7 days from ALL users? This cannot be undone.');">
@@ -858,7 +858,7 @@ export default async (fastify: FastifyInstance) => {
 </head>
 <body>
   <div class="container">
-    <h1>🔄 Restore Memory Answers</h1>
+    <h1>Restore Memory Answers</h1>
     <p>This will restore deleted Memory answer events from the backup database.</p>
 
     <div class="stats">
@@ -869,12 +869,12 @@ export default async (fastify: FastifyInstance) => {
 
     ${missing.length === 0 ? `
       <div class="success">
-        ✅ <strong>No missing answer events found!</strong><br>
+        <strong>No missing answer events found!</strong><br>
         Your database is complete. All Memory answers are present.
       </div>
     ` : `
       <div class="warning">
-        ⚠️ <strong>${missing.length} Memory answer events are missing from production.</strong><br>
+        <strong>${missing.length} Memory answer events are missing from production.</strong><br>
         These can be safely restored without overwriting any existing data.
       </div>
 
@@ -934,7 +934,7 @@ export default async (fastify: FastifyInstance) => {
 
       const fourDaysAgo = dayjs().subtract(4, 'days').toDate()
 
-      console.log('🔄 [RESTORE] Starting Memory answer restoration...')
+      console.log('[RESTORE] Starting Memory answer restoration...')
 
       // Get answer events from backup
       const [backupAnswers] = await backupDb.query(`
@@ -954,14 +954,14 @@ export default async (fastify: FastifyInstance) => {
       const existingIds = new Set(prodAnswers.map(r => r.id))
       const missing = (backupAnswers as any[]).filter(r => !existingIds.has(r.id))
 
-      console.log(`📊 [RESTORE] Found ${missing.length} missing answer events`)
+      console.log(`[RESTORE] Found ${missing.length} missing answer events`)
 
       if (missing.length === 0) {
         await backupDb.close()
         return reply.type('text/html').send(`
           <!DOCTYPE html>
           <html><body style="font-family: sans-serif; padding: 20px; text-align: center;">
-          <h1>✅ No Restoration Needed</h1>
+          <h1>No Restoration Needed</h1>
           <p>All Memory answers are already present in the database.</p>
           <p><a href="/admin-api/restore-memory-answers">← Back</a></p>
           </body></html>
@@ -986,7 +986,7 @@ export default async (fastify: FastifyInstance) => {
 
       await backupDb.close()
 
-      console.log(`✅ [RESTORE] Successfully restored ${restored} Memory answer events`)
+      console.log(`[RESTORE] Successfully restored ${restored} Memory answer events`)
 
       // Success page
       reply.type('text/html').send(`
@@ -1021,7 +1021,7 @@ export default async (fastify: FastifyInstance) => {
         </head>
         <body>
           <div class="success">
-            <div style="font-size: 64px;">✅</div>
+            <div style="font-size: 24px;">OK</div>
             <h1>Restoration Complete!</h1>
             <div class="stats">${restored}</div>
             <p>Memory answer events have been successfully restored.</p>
@@ -1033,11 +1033,11 @@ export default async (fastify: FastifyInstance) => {
         </html>
       `)
     } catch (error: any) {
-      console.error('❌ [RESTORE] Restoration failed:', error)
+      console.error('[RESTORE] Restoration failed:', error)
       reply.type('text/html').send(`
         <!DOCTYPE html>
         <html><body style="font-family: sans-serif; padding: 20px;">
-        <h1 style="color: red;">❌ Restoration Failed</h1>
+        <h1 style="color: red;">Restoration Failed</h1>
         <p><strong>Error:</strong> ${error.message}</p>
         <pre style="background: #f5f5f5; padding: 10px; overflow: auto;">${error.stack}</pre>
         <p><a href="/admin-api/restore-memory-answers">← Try Again</a></p>
@@ -1049,14 +1049,14 @@ export default async (fastify: FastifyInstance) => {
   // Run database migrations endpoint (mobile-friendly)
   fastify.get('/run-migrations', async (req, reply) => {
     try {
-      console.log('🔄 Running database migrations via admin endpoint...')
+      console.log('Running database migrations via admin endpoint...')
 
       // Use CWD to find migrations folder (works in both dev and production)
       const CWD = process.cwd()
       const MIGRATIONS_PATH = path.join(CWD, 'migrations')
 
-      console.log('📁 Migrations path:', MIGRATIONS_PATH)
-      console.log('📁 CWD:', CWD)
+      console.log('Migrations path:', MIGRATIONS_PATH)
+      console.log('CWD:', CWD)
 
       // Create context with sequelize instance for migrations
       const context = fastify.sequelize.getQueryInterface()
@@ -1092,7 +1092,7 @@ export default async (fastify: FastifyInstance) => {
           "DELETE FROM \"SequelizeMeta\" WHERE name LIKE '%.js' RETURNING name"
         )
         if (results && results.length > 0) {
-          console.log(`✅ Updated ${results.length} migration records from .js to .cjs`)
+          console.log(`Updated ${results.length} migration records from .js to .cjs`)
         }
       } catch (error: any) {
         console.log('ℹ️ Migration tracking update skipped (table may not exist yet):', error.message)
@@ -1102,7 +1102,7 @@ export default async (fastify: FastifyInstance) => {
       const executedMigrations = await umzug.executed()
 
       console.log('📋 Pending migrations:', pendingMigrations.length)
-      console.log('✅ Executed migrations:', executedMigrations.length)
+      console.log('Executed migrations:', executedMigrations.length)
 
       if (pendingMigrations.length === 0) {
         return reply.type('text/html').send(`
@@ -1138,7 +1138,7 @@ export default async (fastify: FastifyInstance) => {
           </head>
           <body>
             <div class="info">
-              <div style="font-size: 64px;">✅</div>
+              <div style="font-size: 24px;">OK</div>
               <h1>Database Up to Date</h1>
               <p>All migrations have been applied. No pending migrations found.</p>
               <div class="list">
@@ -1160,7 +1160,7 @@ export default async (fastify: FastifyInstance) => {
       await umzug.up()
       const newExecuted = await umzug.executed()
 
-      console.log(`✅ Successfully ran ${pendingMigrations.length} migration(s)`)
+      console.log(`Successfully ran ${pendingMigrations.length} migration(s)`)
 
       return reply.type('text/html').send(`
         <!DOCTYPE html>
@@ -1201,7 +1201,7 @@ export default async (fastify: FastifyInstance) => {
         </head>
         <body>
           <div class="success">
-            <div style="font-size: 64px;">✅</div>
+            <div style="font-size: 24px;">OK</div>
             <h1>Migrations Complete!</h1>
             <div class="stats">${pendingMigrations.length}</div>
             <p>Database migrations have been successfully applied.</p>
@@ -1219,7 +1219,7 @@ export default async (fastify: FastifyInstance) => {
         </html>
       `)
     } catch (error: any) {
-      console.error('❌ Migration failed:', error)
+      console.error('Migration failed:', error)
       return reply.type('text/html').send(`
         <!DOCTYPE html>
         <html>
@@ -1252,7 +1252,7 @@ export default async (fastify: FastifyInstance) => {
         </head>
         <body>
           <div class="error">
-            <div style="font-size: 64px; text-align: center;">❌</div>
+            <div style="font-size: 24px; text-align: center;">Error</div>
             <h1>Migration Failed</h1>
             <p><strong>Error:</strong> ${error.message}</p>
             <pre>${error.stack}</pre>
@@ -1337,7 +1337,7 @@ export default async (fastify: FastifyInstance) => {
         </head>
         <body>
           <div class="success">
-            <div style="font-size: 64px; text-align: center;">✅</div>
+            <div style="font-size: 24px; text-align: center;">OK</div>
             <h1 style="text-align: center;">Migration Tracking Fixed!</h1>
             ${updated.length > 0 ? `
               <p><strong>Updated ${updated.length} migration records from .js to .cjs:</strong></p>
@@ -1359,12 +1359,12 @@ export default async (fastify: FastifyInstance) => {
         </html>
       `)
     } catch (error: any) {
-      console.error('❌ Fix migration tracking failed:', error)
+      console.error('Fix migration tracking failed:', error)
       return reply.type('text/html').send(`
         <!DOCTYPE html>
         <html>
         <body style="font-family: sans-serif; padding: 20px; max-width: 600px; margin: 50px auto;">
-          <h1 style="color: red;">❌ Error</h1>
+          <h1 style="color: red;">Error</h1>
           <p><strong>Error:</strong> ${error.message}</p>
           <pre style="background: #f5f5f5; padding: 10px; overflow: auto;">${error.stack}</pre>
         </body>
@@ -1398,9 +1398,9 @@ export default async (fastify: FastifyInstance) => {
         await fastify.sequelize.query(
           "DELETE FROM \"SequelizeMeta\" WHERE name LIKE '%.js'"
         )
-        log.push(`   ✅ Updated ${oldRecords.length} records to .cjs`)
+        log.push(`   Updated ${oldRecords.length} records to .cjs`)
       } else {
-        log.push('   ✅ Already up to date')
+        log.push('   Already up to date')
       }
 
       log.push('')
@@ -1434,7 +1434,7 @@ export default async (fastify: FastifyInstance) => {
 
       if (pending.length === 0) {
         log.push('')
-        log.push('✅ All migrations up to date!')
+        log.push('All migrations up to date!')
 
         return reply.type('text/html').send(`
           <!DOCTYPE html>
@@ -1471,7 +1471,7 @@ export default async (fastify: FastifyInstance) => {
           </head>
           <body>
             <div class="box">
-              <h1 style="color: #28a745; margin: 0 0 20px 0;">✅ Complete!</h1>
+              <h1 style="color: #28a745; margin: 0 0 20px 0;">Complete!</h1>
               <div class="log">${log.join('\n')}</div>
               <p style="margin-top: 20px;"><a href="/">← Back to Home</a></p>
             </div>
@@ -1490,7 +1490,7 @@ export default async (fastify: FastifyInstance) => {
       await umzug.up()
 
       log.push('')
-      log.push('✅ SUCCESS! All migrations complete!')
+      log.push('SUCCESS! All migrations complete!')
 
       return reply.type('text/html').send(`
         <!DOCTYPE html>
@@ -1549,7 +1549,7 @@ export default async (fastify: FastifyInstance) => {
 
     } catch (error: any) {
       log.push('')
-      log.push(`❌ ERROR: ${error.message}`)
+      log.push(`ERROR: ${error.message}`)
 
       return reply.type('text/html').send(`
         <!DOCTYPE html>
@@ -1586,7 +1586,7 @@ export default async (fastify: FastifyInstance) => {
         </head>
         <body>
           <div class="box">
-            <h1 style="color: #dc3545; margin: 0 0 20px 0;">❌ Migration Failed</h1>
+            <h1 style="color: #dc3545; margin: 0 0 20px 0;">Migration Failed</h1>
             <div class="log">${log.join('\n')}</div>
             <details style="margin-top: 15px;">
               <summary style="cursor: pointer; font-weight: bold;">Show Error Details</summary>
@@ -1614,26 +1614,26 @@ export default async (fastify: FastifyInstance) => {
       log.push(`   Email: ${user.email}`)
       log.push(`   Tags: ${user.tags.join(', ')}`)
       const hasUsership = user.tags.some(t => t.toLowerCase() === 'usership')
-      log.push(`   Has Usership: ${hasUsership ? '✅' : '❌'}`)
+      log.push(`   Has Usership: ${hasUsership ? 'Yes' : 'No'}`)
       log.push('')
 
       // Check API keys
       log.push('🔑 AI API Keys:')
-      log.push(`   TOGETHER_API_KEY: ${!!process.env.TOGETHER_API_KEY ? '✅' : '❌'}`)
-      log.push(`   GOOGLE_API_KEY: ${!!process.env.GOOGLE_API_KEY ? '✅' : '❌'}`)
-      log.push(`   MISTRAL_API_KEY: ${!!process.env.MISTRAL_API_KEY ? '✅' : '❌'}`)
-      log.push(`   ANTHROPIC_API_KEY: ${!!process.env.ANTHROPIC_API_KEY ? '✅' : '❌'}`)
-      log.push(`   OPENAI_API_KEY: ${!!process.env.OPENAI_API_KEY ? '✅' : '❌'}`)
+      log.push(`   TOGETHER_API_KEY: ${!!process.env.TOGETHER_API_KEY ? 'Yes' : 'No'}`)
+      log.push(`   GOOGLE_API_KEY: ${!!process.env.GOOGLE_API_KEY ? 'Yes' : 'No'}`)
+      log.push(`   MISTRAL_API_KEY: ${!!process.env.MISTRAL_API_KEY ? 'Yes' : 'No'}`)
+      log.push(`   ANTHROPIC_API_KEY: ${!!process.env.ANTHROPIC_API_KEY ? 'Yes' : 'No'}`)
+      log.push(`   OPENAI_API_KEY: ${!!process.env.OPENAI_API_KEY ? 'Yes' : 'No'}`)
       log.push('')
 
       // Check intelligent pacing
-      log.push('📊 Intelligent Pacing:')
+      log.push('Intelligent Pacing:')
       const { calculateIntelligentPacing } = await import('#server/utils/memory')
       const dayjs = (await import('#server/utils/dayjs')).default
       const localDate = dayjs().tz(user.timeZone || 'America/New_York')
 
       const pacing = await calculateIntelligentPacing(user.id, localDate, fastify.models)
-      log.push(`   Should show prompt: ${pacing.shouldShowPrompt ? '✅' : '❌'}`)
+      log.push(`   Should show prompt: ${pacing.shouldShowPrompt ? 'Yes' : 'No'}`)
       log.push(`   Is weekend: ${pacing.isWeekend}`)
       log.push(`   Quota today: ${pacing.promptQuotaToday}`)
       log.push(`   Prompts shown today: ${pacing.promptsShownToday}`)
@@ -1686,11 +1686,11 @@ export default async (fastify: FastifyInstance) => {
         log.push(`   Prompt built: ${prompt.length} characters`)
 
         const question = await completeAndExtractQuestion(prompt, user)
-        log.push(`   ✅ SUCCESS! Generated question:`)
+        log.push(`   SUCCESS! Generated question:`)
         log.push(`   "${question.question}"`)
         log.push(`   Options: ${question.options?.length || 0}`)
       } catch (aiError: any) {
-        log.push(`   ❌ FAILED: ${aiError.message}`)
+        log.push(`   FAILED: ${aiError.message}`)
         log.push(`   This is why you're getting default questions!`)
       }
 
@@ -1752,13 +1752,13 @@ export default async (fastify: FastifyInstance) => {
       `)
     } catch (error: any) {
       log.push('')
-      log.push(`❌ Diagnostic Error: ${error.message}`)
+      log.push(`Diagnostic Error: ${error.message}`)
 
       return reply.type('text/html').send(`
         <!DOCTYPE html>
         <html>
         <body style="font-family: monospace; padding: 20px; max-width: 900px; margin: 20px auto;">
-          <h1 style="color: red;">❌ Diagnostic Failed</h1>
+          <h1 style="color: red;">Diagnostic Failed</h1>
           <pre style="background: #f5f5f5; padding: 15px;">${log.join('\n')}\n\n${error.stack}</pre>
         </body>
         </html>
@@ -1774,7 +1774,7 @@ export default async (fastify: FastifyInstance) => {
     if (!req.user) return reply.throw.authException()
 
     const log: string[] = []
-    log.push('🔍 LOT System Widget Diagnostic')
+    log.push('LOT System Widget Diagnostic')
     log.push('='.repeat(60))
     log.push('')
 
@@ -1785,7 +1785,7 @@ export default async (fastify: FastifyInstance) => {
       const fifteenMinutesAgo = now.subtract(15, 'minutes').toDate()
 
       // Check IntentionPatterns data
-      log.push('📊 IntentionPatterns Widget')
+      log.push('IntentionPatterns Widget')
       log.push('-'.repeat(60))
       const intentionLogs = await fastify.models.Log.findAll({
         where: {
@@ -1795,10 +1795,10 @@ export default async (fastify: FastifyInstance) => {
       })
       log.push(`Intention logs (last 6 hours): ${intentionLogs.length}`)
       if (intentionLogs.length === 0) {
-        log.push('⚠️  NO DATA - Widget will not appear')
+        log.push(' NO DATA - Widget will not appear')
         log.push('   Reason: No intention events logged in last 6 hours')
       } else {
-        log.push('✅ Widget should appear')
+        log.push('Widget should appear')
       }
       log.push('')
 
@@ -1830,7 +1830,7 @@ export default async (fastify: FastifyInstance) => {
         }
       })
       log.push(`Care moments today: ${careMomentsToday}`)
-      log.push('✅ Widget should appear (uses simulated data + real counts)')
+      log.push('Widget should appear (uses simulated data + real counts)')
       log.push('')
 
       // Check WellnessPulse data
@@ -1851,7 +1851,7 @@ export default async (fastify: FastifyInstance) => {
       // })
       // log.push(`Emotional check-ins today: ${emotionalCheckinsToday}`)
       log.push(`Active users now: ${activeUsers.size}`)
-      log.push('✅ Widget should appear (uses simulated peak hours + real counts)')
+      log.push('Widget should appear (uses simulated peak hours + real counts)')
       log.push('')
 
       // Check MemoryEngineStats data
@@ -1864,7 +1864,7 @@ export default async (fastify: FastifyInstance) => {
         }
       })
       log.push(`Questions answered by you today: ${questionsGenerated}`)
-      log.push('✅ Widget should appear (uses calculated metrics)')
+      log.push('Widget should appear (uses calculated metrics)')
       log.push('')
 
       // Summary
@@ -1873,10 +1873,10 @@ export default async (fastify: FastifyInstance) => {
       log.push('-'.repeat(60))
 
       if (intentionLogs.length === 0) {
-        log.push('⚠️  IntentionPatterns will NOT show (no data)')
+        log.push(' IntentionPatterns will NOT show (no data)')
         log.push('   → To fix: Record intention signals via System widgets')
       } else {
-        log.push('✅ All widgets should appear')
+        log.push('All widgets should appear')
       }
 
       log.push('')
@@ -1940,7 +1940,7 @@ export default async (fastify: FastifyInstance) => {
         </head>
         <body>
           <div class="box">
-            <h1>🔍 Widget Diagnostic Results</h1>
+            <h1>Widget Diagnostic Results</h1>
             <div class="log">${log.join('\n')}</div>
             <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #ffc107;">
               <a href="/" class="btn">← Home</a>
@@ -1953,13 +1953,13 @@ export default async (fastify: FastifyInstance) => {
       `)
     } catch (error: any) {
       log.push('')
-      log.push(`❌ Diagnostic Error: ${error.message}`)
+      log.push(`Diagnostic Error: ${error.message}`)
 
       return reply.type('text/html').send(`
         <!DOCTYPE html>
         <html>
         <body style="font-family: monospace; padding: 20px; max-width: 900px; margin: 20px auto;">
-          <h1 style="color: red;">❌ Diagnostic Failed</h1>
+          <h1 style="color: red;">Diagnostic Failed</h1>
           <pre style="background: #f5f5f5; padding: 15px;">${log.join('\n')}\n\n${error.stack}</pre>
         </body>
         </html>

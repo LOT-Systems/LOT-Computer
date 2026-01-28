@@ -437,7 +437,7 @@ export async function syncToServer(): Promise<boolean> {
   }
 
   try {
-    console.log(`🔄 Syncing ${unsyncedSignals.length} Quantum Intent signals to server...`)
+    console.log(`Syncing ${unsyncedSignals.length} Quantum Intent signals to server...`)
 
     const response = await fetch('/quantum-intent/sync', {
       method: 'POST',
@@ -464,10 +464,10 @@ export async function syncToServer(): Promise<boolean> {
       lastSyncedTimestamp: now
     })
 
-    console.log(`✅ Synced ${result.savedSignals}/${result.totalSignals} signals successfully`)
+    console.log(`Synced ${result.savedSignals}/${result.totalSignals} signals successfully`)
     return true
   } catch (error: any) {
-    console.error('❌ Failed to sync Quantum Intent signals:', error.message)
+    console.error('Failed to sync Quantum Intent signals:', error.message)
     return false
   }
 }

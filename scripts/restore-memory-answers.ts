@@ -29,23 +29,23 @@ const PRODUCTION_DB = {
 }
 
 async function restoreMemoryAnswers() {
-  console.log('🔄 Starting Memory Answer Restoration\n')
+  console.log('Starting Memory Answer Restoration\n')
 
   // Connect to backup database
   console.log('📦 Connecting to backup database...')
   const backupClient = new Client(BACKUP_DB)
   await backupClient.connect()
-  console.log('✅ Connected to backup database\n')
+  console.log('Connected to backup database\n')
 
   // Connect to production database
   console.log('🗄️  Connecting to production database...')
   const prodClient = new Client(PRODUCTION_DB)
   await prodClient.connect()
-  console.log('✅ Connected to production database\n')
+  console.log('Connected to production database\n')
 
   try {
     // Find deleted answer events (from past 4 days in backup, not in production)
-    console.log('🔍 Finding deleted Memory answer events...')
+    console.log('Finding deleted Memory answer events...')
 
     const fourDaysAgo = new Date()
     fourDaysAgo.setDate(fourDaysAgo.getDate() - 4)
@@ -72,13 +72,13 @@ async function restoreMemoryAnswers() {
     // Find missing answers
     const missingAnswers = backupAnswers.rows.filter(row => !existingIds.has(row.id))
 
-    console.log(`📊 Analysis:`)
+    console.log(`Analysis:`)
     console.log(`   Total in backup (past 4 days): ${backupAnswers.rows.length}`)
     console.log(`   Currently in production: ${existingIds.size}`)
     console.log(`   Missing (to restore): ${missingAnswers.length}\n`)
 
     if (missingAnswers.length === 0) {
-      console.log('✅ No missing answer events found. Database is complete!')
+      console.log('No missing answer events found. Database is complete!')
       return
     }
 
@@ -94,13 +94,13 @@ async function restoreMemoryAnswers() {
     console.log()
 
     // Ask for confirmation
-    console.log(`⚠️  Ready to restore ${missingAnswers.length} Memory answer events`)
+    console.log(` Ready to restore ${missingAnswers.length} Memory answer events`)
     console.log('   This will insert the missing records into production database.\n')
 
     // In a real script, you'd want to add confirmation here
     // For now, we'll proceed automatically
 
-    console.log('💾 Starting restoration...')
+    console.log('Starting restoration...')
     let restored = 0
 
     for (const answer of missingAnswers) {
@@ -125,20 +125,20 @@ async function restoreMemoryAnswers() {
       }
     }
 
-    console.log(`\n✅ Restoration complete!`)
+    console.log(`\nRestoration complete!`)
     console.log(`   Restored ${restored} Memory answer events`)
     console.log(`   No data was overwritten or lost\n`)
 
     // Verify restoration
-    console.log('🔍 Verifying restoration...')
+    console.log('Verifying restoration...')
     const verifyResult = await prodClient.query(`
       SELECT COUNT(*) as count FROM logs WHERE event = 'answer'
     `)
     console.log(`   Total answer events in production: ${verifyResult.rows[0].count}`)
-    console.log('✅ Verification complete!\n')
+    console.log('Verification complete!\n')
 
   } catch (error: any) {
-    console.error('❌ Restoration failed:', error.message)
+    console.error('Restoration failed:', error.message)
     throw error
   } finally {
     // Close connections
@@ -151,7 +151,7 @@ async function restoreMemoryAnswers() {
 // Run restoration
 restoreMemoryAnswers()
   .then(() => {
-    console.log('\n✨ Memory Answer restoration completed successfully!')
+    console.log('\nMemory Answer restoration completed successfully!')
     process.exit(0)
   })
   .catch((error) => {
