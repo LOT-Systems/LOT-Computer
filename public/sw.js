@@ -1,7 +1,7 @@
 // Service Worker for LOT Systems PWA
-// Version: 2026-01-28-001 - Fix Safari PWA null response errors, ensure all fetch paths return valid Response
+// Version: 2026-01-28-002 - Fix navigation request handling for Safari PWA root path and document loads
 
-const CACHE_VERSION = 'v2026-01-28-001';
+const CACHE_VERSION = 'v2026-01-28-002';
 const CACHE_NAME = `lot-cache-${CACHE_VERSION}`;
 
 // Files to cache initially (only static assets)
@@ -68,6 +68,40 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Helper to check if this is a navigation/document request
+  const acceptHeader = event.request.headers.get('accept') || '';
+  const isNavigationRequest = event.request.mode === 'navigate' ||
+                               event.request.destination === 'document' ||
+                               (event.request.method === 'GET' && acceptHeader.includes('text/html'));
+
+  // Network-first for navigation/document requests (root path, /u/, /us/, etc.)
+  if (isNavigationRequest) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Only cache successful responses
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Try cache as fallback for offline
+          return caches.match(event.request).then((cachedResponse) => {
+            return cachedResponse || new Response('<!DOCTYPE html><html><body>Page not available offline</body></html>', {
+              status: 503,
+              statusText: 'Service Unavailable',
+              headers: { 'Content-Type': 'text/html' }
+            });
+          });
+        })
+    );
+    return;
+  }
+
   // Network-first for all JavaScript files (including bundles)
   if (url.pathname.endsWith('.js') || url.pathname.includes('/js/')) {
     event.respondWith(
@@ -102,22 +136,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-first for HTML pages and API calls
-  if (url.pathname.endsWith('.html') || url.pathname.startsWith('/api/') ||
-      url.pathname.startsWith('/u/') || url.pathname.startsWith('/us/')) {
+  // Network-first for API calls
+  if (url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(event.request)
         .catch(() => {
-          // For HTML pages, try cache as fallback
-          if (!url.pathname.startsWith('/api/')) {
-            return caches.match(event.request).then((cachedResponse) => {
-              return cachedResponse || new Response('Page not available offline', {
-                status: 503,
-                statusText: 'Service Unavailable',
-                headers: { 'Content-Type': 'text/html' }
-              });
-            });
-          }
           // For API calls, return proper error response
           return new Response(JSON.stringify({ error: 'API not available offline' }), {
             status: 503,
