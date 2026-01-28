@@ -3,7 +3,7 @@ region: nyc3
 services:
   - name: web
     git:
-      branch: claude/January-2026-updates-gLJWJ
+      branch: claude/february-2025-updates-HZZTF
       repo_clone_url: https://github.com/vadikmarmeladov/lot-systems.git
     build_command: |
       echo "🚀 Build started at $(date)"
@@ -36,7 +36,7 @@ services:
         value: "LOT"
       - key: APP_HOST
         scope: RUN_AND_BUILD_TIME
-        value: "https://lot-systems.com"
+        value: "https://lot-systems-dev-9wfop.ondigitalocean.app"
       - key: APP_DESCRIPTION
         scope: RUN_AND_BUILD_TIME
         value: "LOT is a subscription service that distributes digital and physical necessities, basic wardrobes, organic self-care products, home and kids essentials."
