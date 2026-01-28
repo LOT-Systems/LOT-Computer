@@ -34,7 +34,7 @@ async function connectDB() {
 async function analyzeEmptyLogs() {
   const client = await connectDB()
   try {
-    console.log('📊 Analyzing empty log entries...\n')
+    console.log('Analyzing empty log entries...\n')
 
     // 1. Count empty logs by date
     console.log('1️⃣  Empty logs by date (last 10 days):')
@@ -81,9 +81,9 @@ async function cleanupEmptyLogs(dryRun: boolean) {
   const client = await connectDB()
   try {
     if (dryRun) {
-      console.log('🔍 DRY RUN MODE - Nothing will be deleted\n')
+      console.log('DRY RUN MODE - Nothing will be deleted\n')
     } else {
-      console.log('⚠️  LIVE MODE - Will delete duplicate empty logs\n')
+      console.log(' LIVE MODE - Will delete duplicate empty logs\n')
     }
 
     // Get logs that would be deleted
@@ -131,7 +131,7 @@ async function cleanupEmptyLogs(dryRun: boolean) {
         RETURNING id
       `)
 
-      console.log(`\n✅ Successfully deleted ${result.rows.length} duplicate empty logs`)
+      console.log(`\nSuccessfully deleted ${result.rows.length} duplicate empty logs`)
       console.log(`   Kept the most recent empty log for each user`)
     } else {
       console.log(`\n💡 To actually delete these logs, run:`)
@@ -153,7 +153,7 @@ async function main() {
     const { totalDuplicates, affectedUsers } = await analyzeEmptyLogs()
 
     if (totalDuplicates === 0) {
-      console.log('✨ No duplicate empty logs found! Database is clean.')
+      console.log('No duplicate empty logs found! Database is clean.')
       return
     }
 
@@ -164,10 +164,10 @@ async function main() {
 
   } catch (error: any) {
     if (error.code === 'ECONNREFUSED') {
-      console.error('❌ Cannot connect to database')
+      console.error('Cannot connect to database')
       console.error('   Make sure DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD are set in .env')
     } else {
-      console.error('❌ Error:', error.message)
+      console.error('Error:', error.message)
     }
     process.exit(1)
   }

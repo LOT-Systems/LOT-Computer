@@ -86,7 +86,7 @@ export function SystemProgressWidget() {
 
   const getStatusText = () => {
     switch (deployment.status) {
-      case 'activated': return '⚡ Protocol Activated'
+      case 'activated': return 'Protocol Activated'
       case 'integrating': return '⟳ Neural Pathways Integrating'
       case 'synchronized': return '◈ Quantum Core Synchronized'
       default: return 'Status Unknown'

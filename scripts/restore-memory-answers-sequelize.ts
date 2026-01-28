@@ -45,23 +45,23 @@ const prodDb = new Sequelize(
 )
 
 async function restoreMemoryAnswers() {
-  console.log('🔄 Starting Memory Answer Restoration\n')
+  console.log('Starting Memory Answer Restoration\n')
 
   try {
     // Test connections
     console.log('📦 Connecting to backup database...')
     await backupDb.authenticate()
-    console.log('✅ Connected to backup database\n')
+    console.log('Connected to backup database\n')
 
     console.log('🗄️  Connecting to production database...')
     await prodDb.authenticate()
-    console.log('✅ Connected to production database\n')
+    console.log('Connected to production database\n')
 
     // Calculate 4 days ago
     const fourDaysAgo = new Date()
     fourDaysAgo.setDate(fourDaysAgo.getDate() - 4)
 
-    console.log('🔍 Finding deleted Memory answer events...')
+    console.log('Finding deleted Memory answer events...')
     console.log(`   Looking for events since: ${fourDaysAgo.toISOString()}\n`)
 
     // Get answer events from backup (past 4 days)
@@ -88,13 +88,13 @@ async function restoreMemoryAnswers() {
     // Find missing answers
     const missingAnswers = (backupAnswers as any[]).filter(row => !existingIds.has(row.id))
 
-    console.log(`📊 Analysis:`)
+    console.log(`Analysis:`)
     console.log(`   Total in backup (past 4 days): ${backupAnswers.length}`)
     console.log(`   Currently in production: ${existingIds.size}`)
     console.log(`   Missing (to restore): ${missingAnswers.length}\n`)
 
     if (missingAnswers.length === 0) {
-      console.log('✅ No missing answer events found. Database is complete!')
+      console.log('No missing answer events found. Database is complete!')
       return
     }
 
@@ -113,8 +113,8 @@ async function restoreMemoryAnswers() {
     }
     console.log()
 
-    console.log(`⚠️  Ready to restore ${missingAnswers.length} Memory answer events\n`)
-    console.log('💾 Starting restoration...')
+    console.log(` Ready to restore ${missingAnswers.length} Memory answer events\n`)
+    console.log('Starting restoration...')
 
     let restored = 0
     for (const answer of missingAnswers) {
@@ -145,20 +145,20 @@ async function restoreMemoryAnswers() {
       }
     }
 
-    console.log(`\n✅ Restoration complete!`)
+    console.log(`\nRestoration complete!`)
     console.log(`   Restored ${restored} Memory answer events`)
     console.log(`   No data was overwritten or lost\n`)
 
     // Verify restoration
-    console.log('🔍 Verifying restoration...')
+    console.log('Verifying restoration...')
     const [verifyResult] = await prodDb.query(`
       SELECT COUNT(*) as count FROM logs WHERE event = 'answer'
     `)
     console.log(`   Total answer events in production: ${(verifyResult as any[])[0].count}`)
-    console.log('✅ Verification complete!\n')
+    console.log('Verification complete!\n')
 
   } catch (error: any) {
-    console.error('❌ Restoration failed:', error.message)
+    console.error('Restoration failed:', error.message)
     if (error.original) {
       console.error('Database error:', error.original.message)
     }
@@ -174,7 +174,7 @@ async function restoreMemoryAnswers() {
 // Run restoration
 restoreMemoryAnswers()
   .then(() => {
-    console.log('\n✨ Memory Answer restoration completed successfully!')
+    console.log('\nMemory Answer restoration completed successfully!')
     process.exit(0)
   })
   .catch((error) => {

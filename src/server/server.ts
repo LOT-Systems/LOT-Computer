@@ -139,7 +139,7 @@ fastify.addHook('onClose', () => sequelize.close())
 // These MUST be registered before ANY other routes to avoid conflicts
 // ==============================================================================
 
-console.log('🔥 [SERVER-STARTUP] Registering /u/ routes at top level!')
+console.log('[SERVER-STARTUP] Registering /u/ routes at top level!')
 
 // Diagnostic test route
 fastify.get('/u/test-route-works', async function (req, reply) {
@@ -350,6 +350,6 @@ fastify.ready().then(async () => {
       console.error(err)
       process.exit(1)
     }
-    console.log(`🚀 App launched: ${config.appHost}`)
+    console.log(`App launched: ${config.appHost}`)
   })
 })

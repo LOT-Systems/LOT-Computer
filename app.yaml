@@ -6,12 +6,12 @@ services:
       branch: claude/february-2025-updates-HZZTF
       repo_clone_url: https://github.com/vadikmarmeladov/lot-systems.git
     build_command: |
-      echo "🚀 Build started at $(date)"
+      echo "Build started at $(date)"
       yarn install --frozen-lockfile --production=false
       NODE_ENV=production yarn build
-      echo "📁 Verifying build output..."
+      echo "Verifying build output..."
       ls -la dist/client/js/ | head -20
-      echo "✅ Build completed at $(date)"
+      echo "Build completed at $(date)"
     run_command: node dist/server/server/index.js
     environment_slug: node-js
     instance_size_slug: basic-xxs

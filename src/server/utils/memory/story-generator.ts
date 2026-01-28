@@ -151,22 +151,22 @@ Key insights into their daily routines and preferences include:
 
   try {
     // Use AI engine abstraction - try Claude, then OpenAI, whichever works
-    console.log('🔍 Attempting to get AI engine with preference:', AI_ENGINE_PREFERENCE)
+    console.log('Attempting to get AI engine with preference:', AI_ENGINE_PREFERENCE)
     const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
     console.log(`🤖 Using ${engine.name} for Memory Story generation`)
 
     const story = await engine.generateCompletion(prompt, 1000)
-    console.log(`✅ Story generated successfully with ${engine.name} (${story?.length || 0} chars)`)
+    console.log(`Story generated successfully with ${engine.name} (${story?.length || 0} chars)`)
     return story || 'Unable to generate story.'
   } catch (error: any) {
-    console.error('❌ AI Engine failed for Memory Story:', {
+    console.error('AI Engine failed for Memory Story:', {
       message: error.message,
       stack: error.stack,
       preference: AI_ENGINE_PREFERENCE
     })
 
     // FALLBACK: Try legacy Claude if new system fails
-    console.log('🔄 Attempting legacy Claude fallback...')
+    console.log('Attempting legacy Claude fallback...')
     try {
       if (!anthropic || !config.anthropic?.apiKey) {
         throw new Error('Legacy Claude client not configured - API key missing')
@@ -183,14 +183,14 @@ Key insights into their daily routines and preferences include:
 
       const textContent = response.content.find((block) => block.type === 'text')
       if (!textContent || textContent.type !== 'text') {
-        console.error('❌ Legacy Claude returned no text content')
+        console.error('Legacy Claude returned no text content')
         return 'Unable to generate story.'
       }
 
-      console.log(`✅ Story generated with legacy Claude fallback (${textContent.text?.length || 0} chars)`)
+      console.log(`Story generated with legacy Claude fallback (${textContent.text?.length || 0} chars)`)
       return textContent.text || 'Unable to generate story.'
     } catch (fallbackError: any) {
-      console.error('❌ Legacy Claude also failed:', {
+      console.error('Legacy Claude also failed:', {
         message: fallbackError.message,
         stack: fallbackError.stack,
         hasAnthropicClient: !!anthropic,

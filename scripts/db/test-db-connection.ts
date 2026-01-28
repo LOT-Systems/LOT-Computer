@@ -42,17 +42,17 @@ async function testConnection(): Promise<void> {
   try {
     console.log('Attempting database connection...')
     await sequelize.authenticate()
-    console.log('✅ Database connection successful')
+    console.log('Database connection successful')
     
     // Test query
     try {
       await sequelize.query('SELECT NOW()')
-      console.log('✅ Test query successful')
+      console.log('Test query successful')
     } catch (queryError) {
-      console.error('❌ Test query failed:', (queryError as Error).message)
+      console.error('Test query failed:', (queryError as Error).message)
     }
   } catch (error) {
-    console.error('❌ Database connection failed:', (error as Error).message)
+    console.error('Database connection failed:', (error as Error).message)
     if ((error as any).original) {
       console.error('Original error:', (error as any).original.message)
     }

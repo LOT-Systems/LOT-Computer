@@ -91,7 +91,7 @@ export function SystemPulseWidget() {
     <Block label="System Pulse:" blockView>
       <div className="flex flex-col gap-y-12">
         {/* Live indicator */}
-        <div className="flex items-center gap-4 text-xs opacity-60">
+        <div className="flex items-center gap-4 text-sm opacity-60">
           <div className={cn(
             'w-8 h-8 rounded-full transition-all duration-300',
             isLive ? 'bg-green animate-pulse' : 'bg-red-500'
@@ -101,7 +101,7 @@ export function SystemPulseWidget() {
 
         {/* Events Per Minute */}
         <div className="flex justify-between items-baseline">
-          <span className="opacity-80">Events/Min</span>
+          <span className="opacity-75">Events/Min</span>
           <div className="flex items-baseline gap-4">
             <span className={cn(
               'text-2xl font-mono transition-colors duration-300',
@@ -119,7 +119,7 @@ export function SystemPulseWidget() {
 
         {/* Quantum Flux */}
         <div className="flex justify-between items-baseline">
-          <span className="opacity-80">Quantum Flux</span>
+          <span className="opacity-75">Quantum Flux</span>
           <div className="flex items-baseline gap-4">
             <span className={cn(
               'text-2xl font-mono transition-colors duration-300',
@@ -134,7 +134,7 @@ export function SystemPulseWidget() {
 
         {/* Neural Activity */}
         <div className="flex justify-between items-baseline">
-          <span className="opacity-80">Neural Activity</span>
+          <span className="opacity-75">Neural Activity</span>
           <span className="text-xl font-mono">
             <AnimatedNumber value={pulse.neuralActivity} />
           </span>
@@ -142,7 +142,7 @@ export function SystemPulseWidget() {
 
         {/* Resonance Frequency */}
         <div className="flex justify-between items-baseline pt-8 border-t border-acc-400/30">
-          <span className="opacity-80">Resonance</span>
+          <span className="opacity-75">Resonance</span>
           <span className="text-xl font-mono">
             <AnimatedNumber value={pulse.resonanceHz} decimals={1} /> Hz
           </span>
@@ -164,7 +164,7 @@ export function SystemPulseWidget() {
         </div>
 
         {/* Last update timestamp */}
-        <div className="text-xs opacity-40 font-mono text-right">
+        <div className="text-sm opacity-60 font-mono text-right">
           {new Date(pulse.lastUpdate).toLocaleTimeString()}
         </div>
       </div>

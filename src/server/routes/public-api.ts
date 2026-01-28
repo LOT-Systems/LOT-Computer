@@ -621,7 +621,7 @@ export default async (fastify: FastifyInstance) => {
       }
 
       if (!user) {
-        console.log('[PUBLIC-PROFILE-API] ❌ User not found for:', userIdOrUsername)
+        console.log('[PUBLIC-PROFILE-API] User not found for:', userIdOrUsername)
         return reply.code(404).send({
           error: 'User not found',
           message: `No public profile exists for user: ${userIdOrUsername}`,
@@ -656,7 +656,7 @@ export default async (fastify: FastifyInstance) => {
 
       // Check if profile is public
       if (!privacy.isPublicProfile) {
-        console.log('[PUBLIC-PROFILE-API] ❌ Profile is private')
+        console.log('[PUBLIC-PROFILE-API] Profile is private')
 
         // Even in private mode, return basic info with suspended tag
         const basicProfile = {
@@ -890,7 +890,7 @@ export default async (fastify: FastifyInstance) => {
 
       return profile
     } catch (error: any) {
-      console.error('[PUBLIC-PROFILE-API] ❌ Error:', error)
+      console.error('[PUBLIC-PROFILE-API] Error:', error)
       console.error('[PUBLIC-PROFILE-API] Error stack:', error.stack)
       return reply.code(500).send({
         error: 'Internal server error',

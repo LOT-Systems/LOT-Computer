@@ -5,7 +5,7 @@ import path from 'path'
 
 async function buildClient() {
   try {
-    console.log('🔦 Building client bundles...')
+    console.log('Building client bundles...')
     await build({
       ...commonConfig,
       entryPoints: [
@@ -44,9 +44,9 @@ async function buildClient() {
         '.jpg': 'dataurl'
       } as { [key: string]: Loader },
     })
-    console.log('✅ Client build completed')
+    console.log('Client build completed')
   } catch (error) {
-    console.error('❌ Client build failed:', error)
+    console.error('Client build failed:', error)
     process.exit(1)
   }
 }

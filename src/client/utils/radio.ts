@@ -55,7 +55,7 @@ export function useRadio(enabled: boolean) {
           }
         })
         .catch(error => {
-          console.error('❌ Failed to fetch radio tracks:', error)
+          console.error('Failed to fetch radio tracks:', error)
           stores.radioTrackName.set('Error loading tracks')
         })
         .finally(() => {
@@ -159,7 +159,7 @@ export function useRadio(enabled: boolean) {
           }, 1000)
         })
         .catch(error => {
-          console.error('❌ Failed to play radio track:', error)
+          console.error('Failed to play radio track:', error)
           stores.radioTrackName.set('Error playing track')
         })
     }

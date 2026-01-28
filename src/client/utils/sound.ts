@@ -335,7 +335,7 @@ export function useSound(enabled: boolean) {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
         console.log('🎵 Native Web Audio initialized')
       } catch (error) {
-        console.error('❌ Failed to create AudioContext:', error)
+        console.error('Failed to create AudioContext:', error)
         stores.soundDescription.set('Error: Audio not supported')
       }
     }
@@ -400,7 +400,7 @@ export function useSound(enabled: boolean) {
             if (isCancelled) return
             console.log('🎵 AudioContext resumed')
           } catch (error) {
-            console.error('❌ Failed to resume AudioContext:', error)
+            console.error('Failed to resume AudioContext:', error)
             stores.soundDescription.set('Error: Failed to start')
             return
           }
@@ -416,12 +416,12 @@ export function useSound(enabled: boolean) {
           } else if (context.period === 'sunset') {
             console.log(`🌇 SUNSET TRANSITION - ${context.description} (90 seconds)`)
           } else {
-            console.log(`🌊 ${context.period} - ${context.description}`)
+            console.log(`${context.period} - ${context.description}`)
           }
           console.log(`🌦️ Weather: ${context.weather}, ${context.temperature}°C, ${context.humidity}% humidity, ${context.windSpeed}m/s wind, ${context.pressure}hPa`)
           console.log(`👥 Users online: ${context.usersOnline}${context.usersOnline > 5 ? ' 🎵 Click symphony active!' : ''}`)
           console.log(`🎲 Session variation seed: ${context.dailySeed.toFixed(3)} (unique per activation)`)
-          console.log(`📊 Sound context hash:`, JSON.stringify({
+          console.log(`Sound context hash:`, JSON.stringify({
             period: context.period,
             weather: context.weather,
             temp: context.temperature,
@@ -479,7 +479,7 @@ export function useSound(enabled: boolean) {
               break
           }
         } catch (error) {
-          console.error('❌ Error initializing sound:', error)
+          console.error('Error initializing sound:', error)
           stores.soundDescription.set('Error: Initialization failed')
           return
         }

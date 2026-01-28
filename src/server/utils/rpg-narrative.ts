@@ -124,7 +124,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: consecutiveDays >= 7 ? checkIns[0].createdAt.toISOString() : null,
       category: 'consistency',
       rarity: 'uncommon',
-      icon: '🔥'
+      icon: 'Fire'
     },
     {
       id: 'moon_cycle',
@@ -134,7 +134,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: consecutiveDays >= 30 ? checkIns[0].createdAt.toISOString() : null,
       category: 'consistency',
       rarity: 'rare',
-      icon: '🌙'
+      icon: 'Moon'
     },
     {
       id: 'unwavering',
@@ -144,7 +144,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: consecutiveDays >= 100 ? checkIns[0].createdAt.toISOString() : null,
       category: 'consistency',
       rarity: 'epic',
-      icon: '⭐'
+      icon: 'Star'
     },
 
     // Depth achievements
@@ -156,7 +156,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: answers.length >= 50 ? answers[49].createdAt.toISOString() : null,
       category: 'depth',
       rarity: 'rare',
-      icon: '🌊'
+      icon: 'Flow'
     },
     {
       id: 'self_scholar',

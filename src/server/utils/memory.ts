@@ -104,7 +104,7 @@ function getBackupQuestion(dayOfYear: number): MemoryQuestion {
   const index = dayOfYear % BACKUP_SELFCARE_QUESTIONS.length
   const backup = BACKUP_SELFCARE_QUESTIONS[index]
 
-  console.log(`🔄 Using backup question #${index + 1}/${BACKUP_SELFCARE_QUESTIONS.length}`)
+  console.log(`Using backup question #${index + 1}/${BACKUP_SELFCARE_QUESTIONS.length}`)
 
   return {
     id: randomUUID(),
@@ -140,7 +140,7 @@ export async function completeAndExtractQuestion(
 
   try {
     // Get the best available AI engine (Claude, then OpenAI, configurable)
-    console.log(`🔍 Attempting to get AI engine with preference: ${AI_ENGINE_PREFERENCE}`)
+    console.log(`Attempting to get AI engine with preference: ${AI_ENGINE_PREFERENCE}`)
     const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
 
     console.log(`🤖 Using ${engine.name} for Memory question generation (user: ${user.email})`)
@@ -158,25 +158,25 @@ Make sure the question is personalized, relevant to self-care habits, and the op
 
     // Execute using whichever engine is available
     const completion = await engine.generateCompletion(fullPrompt, 1024)
-    console.log(`✅ Got completion from ${engine.name} (length: ${completion?.length || 0})`)
+    console.log(`Got completion from ${engine.name} (length: ${completion?.length || 0})`)
 
     // Parse JSON from response (works for both Claude and OpenAI)
     const jsonMatch = completion.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
-      console.error(`❌ No JSON found in ${engine.name} response:`, completion?.substring(0, 200))
+      console.error(`No JSON found in ${engine.name} response:`, completion?.substring(0, 200))
       throw new Error(`No JSON found in ${engine.name} response`)
     }
 
     const parsed = JSON.parse(jsonMatch[0])
     const validatedQuestion = questionSchema.parse(parsed)
 
-    console.log(`✅ Successfully generated question: "${validatedQuestion.question}"`)
+    console.log(`Successfully generated question: "${validatedQuestion.question}"`)
     return {
       id: randomUUID(),
       ...validatedQuestion,
     }
   } catch (error: any) {
-    console.error('❌ AI Engine failed, falling back to legacy OpenAI:', {
+    console.error('AI Engine failed, falling back to legacy OpenAI:', {
       message: error.message,
       stack: error.stack,
       user: user.email,
@@ -199,7 +199,7 @@ Make sure the question is personalized, relevant to self-care habits, and the op
       }
     } catch (openaiError: any) {
       // FALLBACK 2: All AI engines failed - use hardcoded backup questions
-      console.error('❌ OpenAI fallback also failed, using backup questions:', {
+      console.error('OpenAI fallback also failed, using backup questions:', {
         message: openaiError.message,
         user: user.email,
       })
@@ -394,7 +394,7 @@ The system exists to help users achieve their goals. Your questions are tools fo
     .map(log => log.metadata.question || '')
     .filter(Boolean)
 
-  console.log(`🔍 Found ${recentQuestions.length} recent questions for duplicate detection`)
+  console.log(`Found ${recentQuestions.length} recent questions for duplicate detection`)
 
   // Track topic diversity - extract key topics from recent questions
   const recentTopics = extractQuestionTopics(recentQuestions.slice(0, 10))
@@ -420,14 +420,14 @@ ${recentQuestions.map((q, i) => `${i + 1}. "${q}"`).join('\n')}
 - If a topic appears 2+ times in recent questions, it's OFF LIMITS
 
 **Examples of FORBIDDEN repetition:**
-❌ "What did you have for breakfast?" → "What do you usually eat for breakfast?"
-❌ "How's your morning routine?" → "What time do you wake up?"
-❌ "Do you drink coffee?" → "What's your favorite morning beverage?"
+"What did you have for breakfast?" → "What do you usually eat for breakfast?"
+"How's your morning routine?" → "What time do you wake up?"
+"Do you drink coffee?" → "What's your favorite morning beverage?"
 
 **Examples of GOOD diversity:**
-✅ Morning routine → Evening wind-down routine (different time)
-✅ Food preferences → Music preferences (different domain)
-✅ Work stress → Creative outlets (different focus)
+Morning routine → Evening wind-down routine (different time)
+Food preferences → Music preferences (different domain)
+Work stress → Creative outlets (different focus)
 
 ${topicDiversityWarning}` : ''
 
@@ -510,7 +510,7 @@ CRITICAL: Use this SOUL-LEVEL understanding to craft questions that speak to the
   // 15% chance to explore completely new area, 85% follow up for better narrative continuity
   const shouldExploreNewTopic = memoryLogs.length > 0 && Math.random() < 0.15
 
-  console.log(`🎯 Question strategy: ${isWeekend ? 'WEEKEND MODE' : shouldExploreNewTopic ? 'EXPLORE NEW TOPIC' : memoryLogs.length === 0 ? 'FIRST QUESTION' : 'FOLLOW UP'}`)
+  console.log(`Question strategy: ${isWeekend ? 'WEEKEND MODE' : shouldExploreNewTopic ? 'EXPLORE NEW TOPIC' : memoryLogs.length === 0 ? 'FIRST QUESTION' : 'FOLLOW UP'}`)
 
   let userStory = ''
   let taskInstructions = ''
@@ -932,22 +932,22 @@ Key insights into their daily routines and preferences include:
 
   try {
     // Use AI engine abstraction - try Claude, then OpenAI, whichever works
-    console.log('🔍 Attempting to get AI engine with preference:', AI_ENGINE_PREFERENCE)
+    console.log('Attempting to get AI engine with preference:', AI_ENGINE_PREFERENCE)
     const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
     console.log(`🤖 Using ${engine.name} for Memory Story generation`)
 
     const story = await engine.generateCompletion(prompt, 1000)
-    console.log(`✅ Story generated successfully with ${engine.name} (${story?.length || 0} chars)`)
+    console.log(`Story generated successfully with ${engine.name} (${story?.length || 0} chars)`)
     return story || 'Unable to generate story.'
   } catch (error: any) {
-    console.error('❌ AI Engine failed for Memory Story:', {
+    console.error('AI Engine failed for Memory Story:', {
       message: error.message,
       stack: error.stack,
       preference: AI_ENGINE_PREFERENCE
     })
 
     // FALLBACK: Try legacy Claude if new system fails
-    console.log('🔄 Attempting legacy Claude fallback...')
+    console.log('Attempting legacy Claude fallback...')
     try {
       if (!anthropic || !config.anthropic?.apiKey) {
         throw new Error('Legacy Claude client not configured - API key missing')
@@ -964,14 +964,14 @@ Key insights into their daily routines and preferences include:
 
       const textContent = response.content.find((block) => block.type === 'text')
       if (!textContent || textContent.type !== 'text') {
-        console.error('❌ Legacy Claude returned no text content')
+        console.error('Legacy Claude returned no text content')
         return 'Unable to generate story.'
       }
 
-      console.log(`✅ Story generated with legacy Claude fallback (${textContent.text?.length || 0} chars)`)
+      console.log(`Story generated with legacy Claude fallback (${textContent.text?.length || 0} chars)`)
       return textContent.text || 'Unable to generate story.'
     } catch (fallbackError: any) {
-      console.error('❌ Legacy Claude also failed:', {
+      console.error('Legacy Claude also failed:', {
         message: fallbackError.message,
         stack: fallbackError.stack,
         hasAnthropicClient: !!anthropic,
@@ -1665,10 +1665,10 @@ Please respond with ONLY the recipe/meal suggestion - just a simple, clear descr
     const suggestion = await engine.generateCompletion(prompt, 100)
     const cleaned = suggestion?.trim().replace(/^["']|["']$/g, '').replace(/[.!?]$/g, '') || ''
 
-    console.log(`✅ Recipe generated: "${cleaned}"`)
+    console.log(`Recipe generated: "${cleaned}"`)
     return cleaned
   } catch (error: any) {
-    console.error('❌ AI Engine failed for recipe generation:', {
+    console.error('AI Engine failed for recipe generation:', {
       message: error.message,
       user: user.email,
     })
