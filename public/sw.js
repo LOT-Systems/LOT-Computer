@@ -1,7 +1,7 @@
 // Service Worker for LOT Systems PWA
-// Version: 2026-01-26-002 - February updates: monthly emails, evolution widget, cohort-connect, UI improvements
+// Version: 2026-01-28-001 - Fix Safari PWA null response errors, ensure all fetch paths return valid Response
 
-const CACHE_VERSION = 'v2026-01-26-002';
+const CACHE_VERSION = 'v2026-01-28-001';
 const CACHE_NAME = `lot-cache-${CACHE_VERSION}`;
 
 // Files to cache initially (only static assets)
@@ -64,8 +64,8 @@ self.addEventListener('fetch', (event) => {
 
   // Skip external CDN requests - let them through without service worker interference
   if (url.origin !== self.location.origin) {
-    console.log('[SW] Bypassing external request:', url.href);
-    return; // Pass through to network, don't intercept
+    // Don't intercept external requests - pass through to browser
+    return;
   }
 
   // Network-first for all JavaScript files (including bundles)
@@ -110,9 +110,20 @@ self.addEventListener('fetch', (event) => {
         .catch(() => {
           // For HTML pages, try cache as fallback
           if (!url.pathname.startsWith('/api/')) {
-            return caches.match(event.request);
+            return caches.match(event.request).then((cachedResponse) => {
+              return cachedResponse || new Response('Page not available offline', {
+                status: 503,
+                statusText: 'Service Unavailable',
+                headers: { 'Content-Type': 'text/html' }
+              });
+            });
           }
-          throw new Error('API not available offline');
+          // For API calls, return proper error response
+          return new Response(JSON.stringify({ error: 'API not available offline' }), {
+            status: 503,
+            statusText: 'Service Unavailable',
+            headers: { 'Content-Type': 'application/json' }
+          });
         })
     );
     return;
@@ -134,6 +145,12 @@ self.addEventListener('fetch', (event) => {
               cache.put(event.request, responseToCache);
             });
             return response;
+          }).catch(() => {
+            // Return fallback for static assets
+            return new Response('Asset not available', {
+              status: 503,
+              statusText: 'Service Unavailable'
+            });
           });
         })
     );
@@ -143,7 +160,14 @@ self.addEventListener('fetch', (event) => {
   // Default: network-first for everything else
   event.respondWith(
     fetch(event.request)
-      .catch(() => caches.match(event.request))
+      .catch(() => {
+        return caches.match(event.request).then((cachedResponse) => {
+          return cachedResponse || new Response('Content not available offline', {
+            status: 503,
+            statusText: 'Service Unavailable'
+          });
+        });
+      })
   );
 });
 
