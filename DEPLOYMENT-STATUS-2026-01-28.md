@@ -85,7 +85,37 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 ---
 
-## ⚠️ Current Issue: Safari PWA Not Loading
+## ✅ Configuration Restored + AI Engine Support Added
+
+### **app.yaml Configuration:**
+- ✅ Branch: `claude/february-2025-updates-HZZTF` (correct)
+- ✅ APP_HOST: `https://lot-systems.com` (restored to working domain)
+- ✅ Added Together.AI support (primary AI engine)
+- ✅ Added Google Gemini support (fallback option)
+- ✅ Added Mistral AI support (fallback option)
+
+### **🔑 Action Required: Add Together.AI API Key**
+
+The following placeholders need real API keys:
+
+```yaml
+TOGETHER_API_KEY: "PLACEHOLDER_TOGETHER_API_KEY_REQUIRED"  # ⚠️ Replace this
+GOOGLE_API_KEY: "PLACEHOLDER_GOOGLE_API_KEY_OPTIONAL"      # Optional
+MISTRAL_API_KEY: "PLACEHOLDER_MISTRAL_API_KEY_OPTIONAL"    # Optional
+```
+
+**Memory Engine AI Fallback Order:**
+1. **Together AI** (preferred - fastest, cheapest)
+2. **Google Gemini** (fallback)
+3. **Mistral AI** (fallback)
+4. **Claude Anthropic** (fallback - already configured)
+5. **OpenAI** (final fallback - already configured)
+
+### **Deployment URL:**
+- Production: https://lot-systems.com
+- Digital Ocean: https://lot-systems-dev-9wfop.ondigitalocean.app
+
+## ⚠️ Previous Issue: Safari PWA Not Loading (RESOLVED)
 
 ### What We've Tried:
 1. ❌ Service worker null response fixes (3 versions)
