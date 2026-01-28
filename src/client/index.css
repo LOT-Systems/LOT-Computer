@@ -50,11 +50,11 @@ input:-webkit-autofill {
 }
 
 @layer utilities {
-  /* 1px grid pattern fill - replaces solid opacity fills */
+  /* 1px grid pattern fill - sharp and subtle */
   .grid-fill {
     background-image:
-      linear-gradient(to right, rgb(var(--acc-color-400) / 0.3) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(var(--acc-color-400) / 0.3) 1px, transparent 1px);
+      linear-gradient(to right, rgb(var(--acc-color-400) / 0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--acc-color-400) / 0.5) 1px, transparent 1px);
     background-size: 2px 2px;
   }
 
@@ -64,16 +64,16 @@ input:-webkit-autofill {
 
   .grid-fill-hover:hover {
     background-image:
-      linear-gradient(to right, rgb(var(--acc-color-400) / 0.3) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(var(--acc-color-400) / 0.3) 1px, transparent 1px);
+      linear-gradient(to right, rgb(var(--acc-color-400) / 0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--acc-color-400) / 0.5) 1px, transparent 1px);
     background-size: 2px 2px;
   }
 
   /* Lighter grid pattern for subtle backgrounds */
   .grid-fill-light {
     background-image:
-      linear-gradient(to right, rgb(var(--acc-color-400) / 0.15) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(var(--acc-color-400) / 0.15) 1px, transparent 1px);
+      linear-gradient(to right, rgb(var(--acc-color-400) / 0.25) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--acc-color-400) / 0.25) 1px, transparent 1px);
     background-size: 2px 2px;
   }
 }

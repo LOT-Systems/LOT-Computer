@@ -6,6 +6,15 @@ import * as stores from '#client/stores'
 export const ContextualPromptsWidget = () => {
   const { data } = useContextualPrompts()
   const [dismissedPrompts, setDismissedPrompts] = React.useState<Set<string>>(new Set())
+  const [quantumShift, setQuantumShift] = React.useState(0)
+
+  // Quantum variation: subtle shift on mount and every 15 seconds
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setQuantumShift(prev => (prev + 1) % 5)
+    }, 15000)
+    return () => clearInterval(interval)
+  }, [])
 
   if (!data || data.prompts.length === 0) return null
 
@@ -48,26 +57,25 @@ export const ContextualPromptsWidget = () => {
     setDismissedPrompts(prev => new Set(prev).add(topPrompt.triggeredBy))
   }
 
-  // Different labels for different prompt types
-  const getLabel = () => {
-    switch (topPrompt.type) {
-      case 'check-in':
-        return 'Context:'
-      case 'suggestion':
-        return 'Suggestion:'
-      case 'insight':
-        return 'Insight:'
-      case 'connection':
-        return 'Connection:'
-      default:
-        return 'Notice:'
+  // Quantum-varied labels that shift subtly over time
+  const getLabelVariations = () => {
+    const variations: Record<string, string[]> = {
+      'check-in': ['Context:', 'State:', 'Present:', 'Awareness:', 'Now:'],
+      'suggestion': ['Suggestion:', 'Path:', 'Direction:', 'Opening:', 'Possibility:'],
+      'insight': ['Insight:', 'Pattern:', 'Recognition:', 'Clarity:', 'Understanding:'],
+      'connection': ['Connection:', 'Thread:', 'Link:', 'Resonance:', 'Alignment:']
     }
+
+    const defaultVariations = ['Notice:', 'Attention:', 'Signal:', 'Observation:', 'Scan:']
+
+    const typeVariations = variations[topPrompt.type] || defaultVariations
+    return typeVariations[quantumShift % typeVariations.length]
   }
 
   return (
     <div>
-      <Block label={getLabel()} blockView>
-        <div className="mb-12">
+      <Block label={getLabelVariations()} blockView>
+        <div className="mb-12 opacity-75">
           {topPrompt.message}
         </div>
         <div className="flex gap-8">
@@ -81,7 +89,7 @@ export const ContextualPromptsWidget = () => {
           </Button>
         </div>
         {activePrompts.length > 1 && (
-          <div className="mt-8">
+          <div className="mt-8 opacity-60">
             +{activePrompts.length - 1} more insight{activePrompts.length - 1 > 1 ? 's' : ''}
           </div>
         )}
