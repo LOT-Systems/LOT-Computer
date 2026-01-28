@@ -1,12 +1,6 @@
 name: lot-systems
 region: nyc3
 
-domains:
-  - domain: lot-systems.com
-    type: PRIMARY
-  - domain: www.lot-systems.com
-    type: ALIAS
-
 services:
   - name: web
     # GitHub repository configuration

@@ -1,10 +1,5 @@
 name: web
 region: nyc3
-domains:
-  - domain: lot-systems.com
-    type: PRIMARY
-  - domain: www.lot-systems.com
-    type: ALIAS
 services:
   - name: web
     git:
@@ -91,7 +86,7 @@ services:
       - key: TOGETHER_API_KEY
         scope: RUN_TIME
         type: SECRET
-        value: "tgp_v1_T3CicyWdakDXJhaWefknD6lTKsPFvLukpS99YJM77A0"
+        value: "PLACEHOLDER_TOGETHER_API_KEY_REQUIRED"
       - key: GOOGLE_API_KEY
         scope: RUN_TIME
         type: SECRET
