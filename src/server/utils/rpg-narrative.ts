@@ -92,7 +92,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: checkIns.length >= 1 ? checkIns[checkIns.length - 1].createdAt.toISOString() : null,
       category: 'exploration',
       rarity: 'common',
-      icon: '🌱'
+      icon: 'Spring'
     },
     {
       id: 'first_answer',
@@ -102,7 +102,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: answers.length >= 1 ? answers[answers.length - 1].createdAt.toISOString() : null,
       category: 'exploration',
       rarity: 'common',
-      icon: '🪞'
+      icon: 'Reflection Pool'
     },
     {
       id: 'community_voice',
@@ -112,7 +112,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: chatMessages.length >= 1 ? chatMessages[chatMessages.length - 1].createdAt.toISOString() : null,
       category: 'connection',
       rarity: 'uncommon',
-      icon: '💬'
+      icon: 'Current'
     },
 
     // Consistency achievements
@@ -124,7 +124,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: consecutiveDays >= 7 ? checkIns[0].createdAt.toISOString() : null,
       category: 'consistency',
       rarity: 'uncommon',
-      icon: 'Fire'
+      icon: 'Rapids'
     },
     {
       id: 'moon_cycle',
@@ -134,7 +134,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: consecutiveDays >= 30 ? checkIns[0].createdAt.toISOString() : null,
       category: 'consistency',
       rarity: 'rare',
-      icon: 'Moon'
+      icon: 'Tidal Cycle'
     },
     {
       id: 'unwavering',
@@ -144,7 +144,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: consecutiveDays >= 100 ? checkIns[0].createdAt.toISOString() : null,
       category: 'consistency',
       rarity: 'epic',
-      icon: 'Star'
+      icon: 'Constellation'
     },
 
     // Depth achievements
@@ -156,7 +156,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: answers.length >= 50 ? answers[49].createdAt.toISOString() : null,
       category: 'depth',
       rarity: 'rare',
-      icon: 'Flow'
+      icon: 'Deep Water'
     },
     {
       id: 'self_scholar',
@@ -166,7 +166,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: answers.length >= 100 ? answers[99].createdAt.toISOString() : null,
       category: 'depth',
       rarity: 'epic',
-      icon: '📚'
+      icon: 'Archive'
     },
     {
       id: 'soul_cartographer',
@@ -176,7 +176,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: answers.length >= 250 ? answers[249].createdAt.toISOString() : null,
       category: 'depth',
       rarity: 'legendary',
-      icon: '🗺️'
+      icon: 'Cartography'
     },
 
     // Connection achievements
@@ -188,7 +188,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: chatMessages.length >= 20 ? chatMessages[19].createdAt.toISOString() : null,
       category: 'connection',
       rarity: 'uncommon',
-      icon: '🌉'
+      icon: 'Archway'
     },
 
     // Romance achievements
@@ -200,7 +200,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: romanticNotes.length >= 1 ? romanticNotes[0].createdAt.toISOString() : null,
       category: 'romance',
       rarity: 'uncommon',
-      icon: '💕'
+      icon: 'Heart Chamber'
     },
     {
       id: 'intimacy_keeper',
@@ -210,7 +210,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: romanticNotes.length >= 10 ? romanticNotes[9].createdAt.toISOString() : null,
       category: 'romance',
       rarity: 'rare',
-      icon: '💝'
+      icon: 'Sanctuary'
     },
 
     // Care achievements
@@ -223,7 +223,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
         logs.filter(l => l.event === 'self_care_completed')[9].createdAt.toISOString() : null,
       category: 'care',
       rarity: 'uncommon',
-      icon: '🫂'
+      icon: 'Warm Bath'
     },
 
     // Courage achievements
@@ -235,7 +235,7 @@ function defineAchievements(logs: Log[]): Achievement[] {
       unlockedAt: notes.length >= 50 ? notes[49].createdAt.toISOString() : null,
       category: 'courage',
       rarity: 'rare',
-      icon: '🔊'
+      icon: 'Resonance Hall'
     }
   ]
 
