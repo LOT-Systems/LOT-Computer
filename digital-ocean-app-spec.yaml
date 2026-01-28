@@ -2,7 +2,7 @@ name: lot-systems
 region: nyc3
 
 services:
-  - name: lot-systems
+  - name: web
     # GitHub repository configuration
     git:
       branch: claude/february-2025-updates-HZZTF
