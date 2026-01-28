@@ -86,7 +86,7 @@ services:
       - key: TOGETHER_API_KEY
         scope: RUN_TIME
         type: SECRET
-        value: "PLACEHOLDER_TOGETHER_API_KEY_REQUIRED"
+        value: "tgp_v1_T3CicyWdakDXJhaWefknD6lTKsPFvLukpS99YJM77A0"
       - key: GOOGLE_API_KEY
         scope: RUN_TIME
         type: SECRET
