@@ -1,5 +1,10 @@
 name: web
 region: nyc3
+domains:
+  - domain: lot-systems.com
+    type: PRIMARY
+  - domain: www.lot-systems.com
+    type: ALIAS
 services:
   - name: web
     git:

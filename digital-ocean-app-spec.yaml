@@ -1,6 +1,12 @@
 name: lot-systems
 region: nyc3
 
+domains:
+  - domain: lot-systems.com
+    type: PRIMARY
+  - domain: www.lot-systems.com
+    type: ALIAS
+
 services:
   - name: web
     # GitHub repository configuration
@@ -122,7 +128,17 @@ services:
       - key: TOGETHER_API_KEY
         scope: RUN_TIME
         type: SECRET
-        value: 91f01cf8fcba1d44dbf5e2b712210edfffecd6d7f6e5e50816cd50d1efa8414c
+        value: tgp_v1_T3CicyWdakDXJhaWefknD6lTKsPFvLukpS99YJM77A0
+
+      - key: GOOGLE_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: PLACEHOLDER_GOOGLE_API_KEY_OPTIONAL
+
+      - key: MISTRAL_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: PLACEHOLDER_MISTRAL_API_KEY_OPTIONAL
 
 # Alerts (optional - uncomment to enable)
 # alerts:
