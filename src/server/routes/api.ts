@@ -811,18 +811,17 @@ export default async (fastify: FastifyInstance) => {
         likes: 0,
         isLiked: false,
       })
-      process.nextTick(async () => {
-        const context = await getLogContext(req.user)
-        await fastify.models.Log.create({
-          userId: req.user.id,
-          event: 'chat_message',
-          text: '',
-          metadata: {
-            chatMessageId: chatMessage.id,
-            message: chatMessage.message,
-          },
-          context,
-        })
+      // Log chat message synchronously with context for pattern analysis
+      const context = await getLogContext(req.user)
+      await fastify.models.Log.create({
+        userId: req.user.id,
+        event: 'chat_message',
+        text: '',
+        metadata: {
+          chatMessageId: chatMessage.id,
+          message: chatMessage.message,
+        },
+        context,
       })
       return reply.ok()
     }
@@ -1292,16 +1291,14 @@ export default async (fastify: FastifyInstance) => {
       const text = (req.body.text || '').trim().slice(0, MAX_LOG_TEXT_LENGTH)
       if (!text) return reply.throw.badParams('Log text is required')
 
+      // Get context before creating log to ensure consistency
+      const context = await getLogContext(req.user)
+
       const log = await fastify.models.Log.create({
         userId: req.user.id,
         text,
         event: 'note',
-      })
-
-      // Add context asynchronously
-      process.nextTick(async () => {
-        const context = await getLogContext(req.user)
-        await log.set({ context }).save()
+        context,
       })
 
       return log
@@ -1431,10 +1428,14 @@ export default async (fastify: FastifyInstance) => {
         ? `Feeling ${emotionalState} ${timeOfDay}: ${note}`
         : `Feeling ${emotionalState} ${timeOfDay}`
 
+      // Get context BEFORE creating the log to ensure weather data is available for pattern analysis
+      const context = await getLogContext(req.user)
+
       const checkIn = await fastify.models.Log.create({
         userId: req.user.id,
         text: logText,
         event: 'emotional_checkin',
+        context, // Include context immediately
         metadata: {
           checkInType,
           emotionalState,
@@ -1443,12 +1444,6 @@ export default async (fastify: FastifyInstance) => {
           insights,
           timestamp: new Date().toISOString(),
         },
-      })
-
-      // Add context asynchronously
-      process.nextTick(async () => {
-        const context = await getLogContext(req.user)
-        await checkIn.set({ context }).save()
       })
 
       return {
@@ -2140,21 +2135,20 @@ export default async (fastify: FastifyInstance) => {
         }
       })
 
-      process.nextTick(async () => {
-        const context = await getLogContext(req.user)
-        await fastify.models.Log.create({
-          userId: req.user.id,
-          event: isWeeklySummary ? 'weekly_summary_response' : 'answer',
-          text: '',
-          metadata: {
-            questionId,
-            answerId: answer.id,
-            question: questionText,
-            options: questionOptions,
-            answer: option,
-          },
-          context,
-        })
+      // Log answer synchronously with context for pattern analysis
+      const context = await getLogContext(req.user)
+      await fastify.models.Log.create({
+        userId: req.user.id,
+        event: isWeeklySummary ? 'weekly_summary_response' : 'answer',
+        text: '',
+        metadata: {
+          questionId,
+          answerId: answer.id,
+          question: questionText,
+          options: questionOptions,
+          answer: option,
+        },
+        context,
       })
 
       // ============================================================================
@@ -3012,10 +3006,25 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
 
       const patterns = await analyzeUserPatterns(req.user, logs)
 
+      console.log(`Pattern Analysis for user ${req.user.id}:`, {
+        totalLogs: logs.length,
+        patternsFound: patterns.length,
+        patternTypes: patterns.map(p => p.type),
+        patternTitles: patterns.map(p => p.title),
+        hasWeatherContext: logs.filter(l => l.context?.temperature).length,
+        hasEmotionalState: logs.filter(l => l.metadata?.emotionalState).length
+      })
+
       if (patterns.length === 0) {
+        console.log(`No patterns detected for user ${req.user.id}`, {
+          reason: 'Need more logs with weather context and emotional states',
+          logsWithWeather: logs.filter(l => l.context?.temperature).length,
+          logsWithEmotions: logs.filter(l => l.metadata?.emotionalState).length,
+          checkIns: logs.filter(l => l.event === 'emotional_checkin').length
+        })
         return {
           prompts: [],
-          message: 'No patterns detected yet.'
+          message: 'No patterns detected yet. Keep building your practice!'
         }
       }
 
@@ -3052,7 +3061,15 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         recentCheckIns
       })
 
-      console.log(`💡 Generated ${prompts.length} contextual prompts for user ${req.user.id}`)
+      console.log(`💡 Generated ${prompts.length} contextual prompts for user ${req.user.id}`, {
+        patternsUsed: patterns.length,
+        hasCurrentWeather: !!currentWeather,
+        currentHour: hour,
+        recentCheckInsCount: recentCheckIns.length,
+        promptTypes: prompts.map(p => p.type),
+        promptTitles: prompts.map(p => p.title),
+        promptPriorities: prompts.map(p => p.priority)
+      })
 
       return {
         prompts,
