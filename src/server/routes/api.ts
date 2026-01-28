@@ -2353,6 +2353,27 @@ export default async (fastify: FastifyInstance) => {
       const story = await generateMemoryStory(req.user, logs)
       console.log(`Story generated successfully (${story?.length || 0} chars)`)
 
+      // Persist the generated story to user metadata
+      try {
+        const currentMetadata = req.user.metadata as any || {}
+        const storyVersion = (currentMetadata.memoryStoryVersion || 0) + 1
+
+        await req.user.set({
+          metadata: {
+            ...currentMetadata,
+            lastMemoryStory: story,
+            lastMemoryStoryDate: new Date().toISOString(),
+            memoryStoryVersion: storyVersion,
+            memoryStoryAnswerCount: logs.length
+          }
+        }).save()
+
+        console.log(`✅ Memory Story v${storyVersion} saved to user metadata`)
+      } catch (saveError: any) {
+        console.error('⚠️ Failed to save Memory Story to metadata:', saveError.message)
+        // Continue anyway - story generation succeeded
+      }
+
       return {
         story,
         hasUsership: true,
@@ -3248,6 +3269,100 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         progression: null,
         error: error.message
       }
+    }
+  })
+
+  // Sync Quantum Intent Engine signals from client to server
+  fastify.post<{
+    Body: {
+      signals: Array<{
+        timestamp: number
+        source: 'mood' | 'memory' | 'planner' | 'intentions' | 'selfcare' | 'journal'
+        signal: string
+        metadata?: Record<string, any>
+      }>
+      userState?: {
+        energy: string
+        clarity: string
+        alignment: string
+        needsSupport: string
+        lastUpdated: number
+      }
+      recognizedPatterns?: Array<{
+        pattern: string
+        confidence: number
+        suggestedWidget: string
+        suggestedTiming: string
+        reason: string
+      }>
+    }
+  }>('/quantum-intent/sync', async (req, reply) => {
+    try {
+      const { signals, userState, recognizedPatterns } = req.body
+
+      if (!signals || !Array.isArray(signals) || signals.length === 0) {
+        return reply.status(400).send({ error: 'No signals provided' })
+      }
+
+      console.log(`📊 Syncing ${signals.length} Quantum Intent signals for user ${req.user.id}`)
+
+      // Save each signal as a log entry for historical tracking
+      const savedSignals = []
+      for (const signal of signals) {
+        try {
+          const log = await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'quantum_intent_signal',
+            text: signal.signal,
+            metadata: {
+              source: signal.source,
+              signal: signal.signal,
+              signalMetadata: signal.metadata,
+              timestamp: signal.timestamp
+            },
+            context: await getLogContext(req.user)
+          })
+          savedSignals.push(log.id)
+        } catch (signalError: any) {
+          console.error('⚠️ Failed to save individual signal:', signalError.message)
+          // Continue with other signals
+        }
+      }
+
+      // Save aggregated state to user metadata
+      if (userState || recognizedPatterns) {
+        try {
+          const currentMetadata = req.user.metadata as any || {}
+          await req.user.set({
+            metadata: {
+              ...currentMetadata,
+              quantumIntentState: userState,
+              quantumIntentPatterns: recognizedPatterns,
+              quantumIntentLastSync: new Date().toISOString(),
+              quantumIntentSignalCount: (currentMetadata.quantumIntentSignalCount || 0) + signals.length
+            }
+          }).save()
+          console.log(`✅ Quantum Intent state saved to user metadata`)
+        } catch (metadataError: any) {
+          console.error('⚠️ Failed to save Quantum Intent state to metadata:', metadataError.message)
+        }
+      }
+
+      return {
+        success: true,
+        savedSignals: savedSignals.length,
+        totalSignals: signals.length,
+        timestamp: new Date().toISOString()
+      }
+    } catch (error: any) {
+      console.error('❌ Error syncing Quantum Intent signals:', {
+        error: error.message,
+        userId: req.user?.id
+      })
+      return reply.status(500).send({
+        success: false,
+        error: error.message
+      })
     }
   })
 

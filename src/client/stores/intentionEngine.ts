@@ -42,11 +42,14 @@ type IntentionEngineState = {
   userState: UserState
   recognizedPatterns: IntentionPattern[]
   lastAnalysis: number
+  lastSyncedTimestamp: number
 }
 
 const SIGNAL_RETENTION = 7 * 24 * 60 * 60 * 1000 // 7 days
 const MAX_SIGNALS = 1000 // Prevent unbounded growth
 const ANALYSIS_COOLDOWN = 5 * 60 * 1000 // 5 minutes
+const SYNC_INTERVAL = 10 // Sync every 10 signals
+const SYNC_COOLDOWN = 5 * 60 * 1000 // Don't sync more than once per 5 minutes
 
 export const intentionEngine = atom<IntentionEngineState>({
   signals: [],
@@ -58,7 +61,8 @@ export const intentionEngine = atom<IntentionEngineState>({
     lastUpdated: 0
   },
   recognizedPatterns: [],
-  lastAnalysis: 0
+  lastAnalysis: 0,
+  lastSyncedTimestamp: 0
 })
 
 // Load signals from localStorage on init
@@ -145,6 +149,14 @@ export function recordSignal(
 
   if (shouldAnalyze) {
     analyzeIntentions()
+  }
+
+  // Trigger server sync periodically
+  const shouldSync = recentSignals.length % SYNC_INTERVAL === 0 &&
+                     (now - state.lastSyncedTimestamp >= SYNC_COOLDOWN)
+
+  if (shouldSync) {
+    syncToServer()
   }
 }
 
@@ -399,4 +411,76 @@ export function shouldShowWidget(widgetName: string): boolean {
  */
 export function getUserState(): UserState {
   return intentionEngine.get().userState
+}
+
+/**
+ * Sync signals to server for persistence and cross-device continuity
+ */
+export async function syncToServer(): Promise<boolean> {
+  if (typeof window === 'undefined') return false
+
+  const state = intentionEngine.get()
+  const now = Date.now()
+
+  // Don't sync too frequently
+  if (now - state.lastSyncedTimestamp < SYNC_COOLDOWN) {
+    return false
+  }
+
+  // Get signals that haven't been synced yet
+  const unsyncedSignals = state.signals.filter(
+    s => s.timestamp > state.lastSyncedTimestamp
+  )
+
+  if (unsyncedSignals.length === 0) {
+    return false
+  }
+
+  try {
+    console.log(`🔄 Syncing ${unsyncedSignals.length} Quantum Intent signals to server...`)
+
+    const response = await fetch('/quantum-intent/sync', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        signals: unsyncedSignals,
+        userState: state.userState,
+        recognizedPatterns: state.recognizedPatterns
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error(`Sync failed: ${response.status} ${response.statusText}`)
+    }
+
+    const result = await response.json()
+
+    // Update last synced timestamp
+    intentionEngine.set({
+      ...state,
+      lastSyncedTimestamp: now
+    })
+
+    console.log(`✅ Synced ${result.savedSignals}/${result.totalSignals} signals successfully`)
+    return true
+  } catch (error: any) {
+    console.error('❌ Failed to sync Quantum Intent signals:', error.message)
+    return false
+  }
+}
+
+/**
+ * Manually trigger sync (useful for debugging or before logout)
+ */
+export function forceSyncToServer(): Promise<boolean> {
+  const state = intentionEngine.get()
+  // Reset lastSyncedTimestamp to allow immediate sync
+  intentionEngine.set({
+    ...state,
+    lastSyncedTimestamp: 0
+  })
+  return syncToServer()
 }
