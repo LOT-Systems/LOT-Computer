@@ -1,4 +1,4 @@
-name: web
+name: lot-systems
 region: nyc3
 services:
   - name: web
