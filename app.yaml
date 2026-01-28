@@ -36,7 +36,7 @@ services:
         value: "LOT"
       - key: APP_HOST
         scope: RUN_AND_BUILD_TIME
-        value: "https://lot-systems-dev-9wfop.ondigitalocean.app"
+        value: "https://lot-systems.com"
       - key: APP_DESCRIPTION
         scope: RUN_AND_BUILD_TIME
         value: "LOT is a subscription service that distributes digital and physical necessities, basic wardrobes, organic self-care products, home and kids essentials."
@@ -83,3 +83,15 @@ services:
         scope: RUN_TIME
         type: SECRET
         value: "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"
+      - key: TOGETHER_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "PLACEHOLDER_TOGETHER_API_KEY_REQUIRED"
+      - key: GOOGLE_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "PLACEHOLDER_GOOGLE_API_KEY_OPTIONAL"
+      - key: MISTRAL_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "PLACEHOLDER_MISTRAL_API_KEY_OPTIONAL"
