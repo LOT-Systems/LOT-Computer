@@ -1618,7 +1618,7 @@ export default async (fastify: FastifyInstance) => {
       // Extract memory Q&A
       const memoryQA = answers.map(answer => ({
         question: answer.metadata?.questionText || '',
-        answer: answer.text || '',
+        answer: answer.answer || '',
         timestamp: answer.createdAt,
         options: answer.metadata?.options || [],
       }))
@@ -1846,7 +1846,7 @@ export default async (fastify: FastifyInstance) => {
                                      typeof lastWeeklySummary === 'object' &&
                                      lastWeeklySummary.createdAt instanceof Date
 
-      const showWeeklySummary = validLastWeeklySummary && shouldShowWeeklySummary(
+      const showWeeklySummary = validLastWeeklySummary && lastWeeklySummary && shouldShowWeeklySummary(
         req.user,
         lastWeeklySummary.createdAt
       )
@@ -1855,7 +1855,7 @@ export default async (fastify: FastifyInstance) => {
         console.log(`📊 Generating weekly summary for user ${req.user.id}`)
         try {
           // Load 200 logs to cover the week + historical context
-          let logs = []
+          let logs: any[] = []
           try {
             logs = await fastify.models.Log.findAll({
               where: {
@@ -1869,7 +1869,7 @@ export default async (fastify: FastifyInstance) => {
             // Continue with empty logs array
           }
 
-          const weeklySummary = await generateWeeklySummary(req.user, logs)
+          const weeklySummary = await generateWeeklySummary(req.user, logs as any)
 
           console.log(`↩️  Returning weekly summary from Memory endpoint`)
           // Return as a special memory "question" with reflection prompt
@@ -1929,9 +1929,10 @@ export default async (fastify: FastifyInstance) => {
 
           // Get recently shown questions from client (even if unanswered)
           let recentlyShownQuestions: string[] = []
-          if (req.query.recentShown && typeof req.query.recentShown === 'string') {
+          const queryRecentShown = (req.query as any).recentShown
+          if (queryRecentShown && typeof queryRecentShown === 'string') {
             try {
-              recentlyShownQuestions = JSON.parse(req.query.recentShown) as string[]
+              recentlyShownQuestions = JSON.parse(queryRecentShown) as string[]
               if (recentlyShownQuestions.length > 0) {
                 console.log(`📋 Avoiding ${recentlyShownQuestions.length} recently shown questions`)
               }
@@ -2576,10 +2577,10 @@ export default async (fastify: FastifyInstance) => {
         let balancedPlanner = false
         if (plannerLogs.length >= 10) {
           // Check if all dimensions are used relatively evenly
-          const intentCount = plannerLogs.filter(l => l.text.includes('Intent:')).length
-          const todayCount = plannerLogs.filter(l => l.text.includes('Today:')).length
-          const howCount = plannerLogs.filter(l => l.text.includes('How:')).length
-          const feelingCount = plannerLogs.filter(l => l.text.includes('Feeling:')).length
+          const intentCount = plannerLogs.filter(l => l.text?.includes('Intent:')).length
+          const todayCount = plannerLogs.filter(l => l.text?.includes('Today:')).length
+          const howCount = plannerLogs.filter(l => l.text?.includes('How:')).length
+          const feelingCount = plannerLogs.filter(l => l.text?.includes('Feeling:')).length
           const avg = (intentCount + todayCount + howCount + feelingCount) / 4
           const variance = Math.abs(intentCount - avg) + Math.abs(todayCount - avg) +
                           Math.abs(howCount - avg) + Math.abs(feelingCount - avg)
@@ -2840,7 +2841,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get user's pattern insights
   fastify.get('/patterns', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       // Get last 100 logs for pattern analysis
       const logs = await Log.findAll({
@@ -2881,8 +2882,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Find cohort matches
   fastify.get('/cohorts', async (req, reply) => {
     try {
-      const User = await import('#server/models/user').then(m => m.default)
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { User } = await import('#server/models/user')
+      const { Log } = await import('#server/models/log')
 
       // Get current user's patterns
       const userLogs = await Log.findAll({
@@ -2931,7 +2932,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
           limit: 100
         })
 
-        const user = allUsers.find(u => u.id === userId)
+        const user = allUsers.find((u: any) => u.id === userId)
         if (!user || logs.length < 5) {
           return []
         }
@@ -2972,7 +2973,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get contextual prompts based on patterns and current context
   fastify.get('/contextual-prompts', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       // Get user's patterns
       const logs = await Log.findAll({
@@ -3010,9 +3011,17 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       })
 
       // Get current weather
-      let currentWeather = null
+      let currentWeather: any = null
       if (req.user.city && req.user.country) {
-        currentWeather = await weather.getWeather(req.user.city, req.user.country)
+        try {
+          const coordinates = await weather.getCoordinates(req.user.city, req.user.country)
+          if (coordinates) {
+            const weatherData = await weather.getWeather(coordinates.lat, coordinates.lon)
+            currentWeather = { ...weatherData, createdAt: new Date() }
+          }
+        } catch (error) {
+          console.warn('Failed to fetch weather for contextual prompts:', error)
+        }
       }
 
       const prompts = generateContextualPrompts(patterns, {
@@ -3044,7 +3053,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get pattern evolution over time
   fastify.get('/pattern-evolution', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       // Get all user logs (up to 500 for historical analysis)
       const allLogs = await Log.findAll({
@@ -3124,7 +3133,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get user's energy state
   fastify.get('/energy', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       const logs = await Log.findAll({
         where: { userId: req.user.id },
@@ -3165,7 +3174,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get user's RPG narrative and achievements
   fastify.get('/narrative', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       const logs = await Log.findAll({
         where: { userId: req.user.id },
@@ -3205,7 +3214,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   fastify.get('/goal-progression', async (req, reply) => {
     try {
       const { generateGoalProgression } = await import('#server/utils/goal-understanding')
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       const logs = await Log.findAll({
         where: { userId: req.user.id },
@@ -3245,8 +3254,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get chat catalysts (prompts to connect with cohort)
   fastify.get('/chat-catalysts', async (req, reply) => {
     try {
-      const User = await import('#server/models/user').then(m => m.default)
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { User } = await import('#server/models/user')
+      const { Log } = await import('#server/models/log')
 
       // Get user's patterns and cohorts
       const userLogs = await Log.findAll({
@@ -3285,7 +3294,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
           order: [['createdAt', 'DESC']],
           limit: 100
         })
-        const user = allUsers.find(u => u.id === userId)
+        const user = allUsers.find((u: any) => u.id === userId)
         if (!user || logs.length < 5) return []
         const patterns = await analyzeUserPatterns(user, logs)
         patternCache.set(userId, patterns)
@@ -3300,12 +3309,16 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       )
 
       // Get current emotional state
-      const recentCheckIn = userLogs.find(l => l.event === 'emotional_checkin')
+      const recentCheckIn = userLogs.find((l: any) => l.event === 'emotional_checkin')
       const currentEmotionalState = recentCheckIn?.metadata?.emotionalState as string | undefined
 
       // Get social energy needs
       const energyState = analyzeEnergyState(userLogs)
-      const socialNeed = energyState.needsReplenishment.find(n => n.category === 'social')
+      const socialNeedRaw = energyState.needsReplenishment.find(n => n.category === 'social')
+      const socialNeed = socialNeedRaw ? {
+        urgency: socialNeedRaw.urgency,
+        daysSinceConnection: socialNeedRaw.daysSinceLastReplenishment
+      } : undefined
 
       const catalysts = generateChatCatalysts(
         req.user,
@@ -3337,7 +3350,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get compassionate interventions
   fastify.get('/interventions', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       const logs = await Log.findAll({
         where: { userId: req.user.id },
@@ -3353,7 +3366,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
       // Analyze current state
-      const recentCheckIns = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
+      const recentCheckIns = logs.filter((l: any) => l.event === 'emotional_checkin').slice(0, 10)
       const emotionalCounts: Record<string, number> = {}
       for (const checkIn of recentCheckIns) {
         const state = checkIn.metadata?.emotionalState as string
@@ -3363,7 +3376,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
       const dominantMood = Object.entries(emotionalCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'unknown'
-      const daysInPattern = recentCheckIns.filter(c => c.metadata?.emotionalState === dominantMood).length
+      const daysInPattern = recentCheckIns.filter((c: any) => c.metadata?.emotionalState === dominantMood).length
 
       const negativeStates = ['anxious', 'overwhelmed', 'exhausted', 'tired']
       const isStrugglingPattern = negativeStates.includes(dominantMood)
@@ -3411,7 +3424,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    */
   fastify.get('/api/community-emotion', async (req, reply) => {
     try {
-      const userId = req.session?.userId
+      const userId = (req as any).session?.userId || req.user?.id
       if (!userId) {
         return reply.status(401).send({ error: 'Not authenticated' })
       }
@@ -3419,7 +3432,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       // Get emotional check-ins from the last 24 hours across all users
       const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
 
-      const recentEmotions = await Log.findAll({
+      const recentEmotions = await fastify.models.Log.findAll({
         where: {
           event: 'emotional_checkin',
           createdAt: {
@@ -3442,7 +3455,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
 
       // Count emotional states
       const emotionCounts: Record<string, number> = {}
-      recentEmotions.forEach(log => {
+      recentEmotions.forEach((log: any) => {
         const emotion = log.emotionalState
         if (emotion) {
           emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1

@@ -336,9 +336,8 @@ export function registerOSRoutes(fastify: FastifyInstance) {
       const user = req.user
 
       // Get privacy settings if they exist
-      const metadata = await fastify.models.UserMetadata.findOne({
-        where: { userId: user.id },
-      })
+      // UserMetadata model not implemented yet
+      const metadata = null as any
 
       return {
         user: {
@@ -350,9 +349,9 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         settings: {
           privacy: metadata?.privacySettings || {},
           theme: {
-            current: user.theme || 'light',
-            baseColor: user.baseColor || '#ffffff',
-            accentColor: user.accentColor || '#000000',
+            current: (user.metadata as any)?.theme || 'light',
+            baseColor: (user.metadata as any)?.baseColor || '#ffffff',
+            accentColor: (user.metadata as any)?.accentColor || '#000000',
           },
           location: user.city && user.country ? {
             city: user.city,
@@ -362,7 +361,7 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         features: {
           usership: user.tags.some(t => t.toLowerCase() === 'usership'),
           publicProfile: metadata?.privacySettings?.isProfilePublic || false,
-          customUrl: user.customUrl || null,
+          customUrl: (user.metadata as any)?.customUrl || null,
         },
       }
     } catch (error: any) {

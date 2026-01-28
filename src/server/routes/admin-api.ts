@@ -1279,7 +1279,7 @@ export default async (fastify: FastifyInstance) => {
       )
 
       // Update if there are .js records
-      let updated = []
+      let updated: any[] = []
       if (oldRecords && oldRecords.length > 0) {
         // Can't UPDATE primary key, so we need to INSERT new records and DELETE old ones
         await fastify.sequelize.query(`
@@ -1843,12 +1843,13 @@ export default async (fastify: FastifyInstance) => {
       })
       log.push(`Questions answered today: ${questionsToday}`)
 
-      const emotionalCheckinsToday = await fastify.models.EmotionalCheckIn.count({
-        where: {
-          createdAt: { [Op.gte]: todayStart }
-        }
-      })
-      log.push(`Emotional check-ins today: ${emotionalCheckinsToday}`)
+      // EmotionalCheckIn model not implemented yet
+      // const emotionalCheckinsToday = await fastify.models.EmotionalCheckIn.count({
+      //   where: {
+      //     createdAt: { [Op.gte]: todayStart }
+      //   }
+      // })
+      // log.push(`Emotional check-ins today: ${emotionalCheckinsToday}`)
       log.push(`Active users now: ${activeUsers.size}`)
       log.push('✅ Widget should appear (uses simulated peak hours + real counts)')
       log.push('')

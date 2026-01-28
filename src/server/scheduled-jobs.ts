@@ -69,8 +69,8 @@ async function executeMonthlyEmailJob(): Promise<JobResult> {
     // Dynamic import to avoid circular dependencies
     const { sendEmail } = await import('#server/utils/email.js')
     const { generateMonthlySummary, generateMonthlyEmailBody, shouldShowMonthlySummary } = await import('#server/utils/monthly-summary.js')
-    const { default: User } = await import('#server/models/user.js')
-    const { default: Log } = await import('#server/models/log.js')
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
     const { Op } = await import('sequelize')
 
     // Find all active users with Usership

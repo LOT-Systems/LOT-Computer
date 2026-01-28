@@ -250,8 +250,8 @@ export async function generateMonthlySummary(
 
   // Cohort evolution
   const userTraits = extractUserTraits(monthLogs)
-  const cohort = determineUserCohort(userTraits)
-  const cohortEvolution = describeCohortEvolution(cohort, userTraits)
+  const cohort = determineUserCohort(userTraits.traits, userTraits.patterns, userTraits.psychologicalDepth)
+  const cohortEvolution = describeCohortEvolution(cohort.behavioralCohort, userTraits)
 
   // Notable progress
   const notableProgress: string[] = []
@@ -292,7 +292,7 @@ export async function generateMonthlySummary(
     }
   })
 
-  const forwardLook = generateForwardLook(consistency, strugglingPeriods, notableProgress, cohort)
+  const forwardLook = generateForwardLook(consistency, strugglingPeriods, notableProgress, cohort.behavioralCohort)
 
   // Generate Memory Story - narrative synthesis of user's answers
   let memoryStory: string | null = null
@@ -404,7 +404,7 @@ function describeCohortEvolution(cohort: string, traits: any): string {
 /**
  * Generate clean narrative in plain LOT style
  */
-function generateMonthlyNarrative(summary: Omit<MonthlySummary, 'narrative' | 'forwardLook'>): string {
+function generateMonthlyNarrative(summary: Omit<MonthlySummary, 'narrative' | 'forwardLook' | 'memoryStory'>): string {
   const lines: string[] = []
 
   // Header
