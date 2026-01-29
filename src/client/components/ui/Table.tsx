@@ -21,7 +21,7 @@ interface Props<Datum> {
 
 export const Table = <D,>(props: Props<D>) => {
   return (
-    <div className={cn('_table relative font-mono', props.className)}>
+    <div className={cn('_table relative', props.className)}>
       <div className={cn('_table-wrapper overflow-x-auto', props.paddingClassName)}>
         <table className="w-full overflow-hidden border border-acc-400/30 rounded-lg bg-acc-400/10">
           {!props.hideHeader && (
