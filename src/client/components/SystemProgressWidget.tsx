@@ -146,14 +146,14 @@ export function SystemProgressWidget() {
               >
                 <div className="flex items-center gap-4">
                   <span className="font-mono">{option.symbol}</span>
-                  <span className="text-sm">{option.label}</span>
+                  <span>{option.label}</span>
                 </div>
               </button>
             ))}
           </div>
 
           {feedback && (
-            <div className="mt-12 text-sm opacity-60">
+            <div className="mt-12 opacity-60">
               Status logged. System calibration optimized.
             </div>
           )}

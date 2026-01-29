@@ -38,32 +38,32 @@ export function GrowthMilestones() {
       <div className="space-y-12">
         {/* Personal Journey */}
         <div>
-          <div className="text-sm opacity-60 mb-6">Your Journey</div>
+          <div className="opacity-60 mb-6">Your Journey</div>
           <div className="space-y-3">
             <div className="flex justify-between items-baseline">
-              <span className="opacity-80">Days</span>
-              <span className="text-2xl font-mono tabular-nums">
+              <span className="opacity-60">Days</span>
+              <span className="font-mono tabular-nums">
                 {personal.journeyDays}
                 {hasGrown('journeyDays', personal.journeyDays) && <GrowthIndicator />}
               </span>
             </div>
             <div className="flex justify-between items-baseline">
-              <span className="opacity-80">Questions Answered</span>
-              <span className="text-2xl font-mono tabular-nums">
+              <span className="opacity-60">Questions Answered</span>
+              <span className="font-mono tabular-nums">
                 {personal.questionsAnswered}
                 {hasGrown('questionsAnswered', personal.questionsAnswered) && <GrowthIndicator />}
               </span>
             </div>
             <div className="flex justify-between items-baseline">
-              <span className="opacity-80">Insights Gained</span>
-              <span className="text-2xl font-mono tabular-nums">
+              <span className="opacity-60">Insights Gained</span>
+              <span className="font-mono tabular-nums">
                 {personal.insightsGained}
                 {hasGrown('insightsGained', personal.insightsGained) && <GrowthIndicator />}
               </span>
             </div>
             <div className="flex justify-between items-baseline pt-2 border-t border-acc/20">
-              <span className="opacity-80">Badge Level</span>
-              <span className="text-xl font-mono">
+              <span className="opacity-60">Badge Level</span>
+              <span className="font-mono">
                 {personal.badgeLevel} ({personal.badgeCount})
                 {hasGrown('badgeCount', personal.badgeCount) && <GrowthIndicator />}
               </span>
@@ -73,25 +73,25 @@ export function GrowthMilestones() {
 
         {/* Community Stats */}
         <div className="pt-6 border-t border-acc/20">
-          <div className="text-sm opacity-60 mb-4">Community</div>
+          <div className="opacity-60 mb-4">Community</div>
           <div className="space-y-3">
             <div className="flex justify-between items-baseline">
-              <span className="opacity-80">Total Souls</span>
-              <span className="text-xl font-mono tabular-nums">
+              <span className="opacity-60">Total Souls</span>
+              <span className="font-mono tabular-nums">
                 {community.totalSouls.toLocaleString()}
                 {hasGrown('totalSouls', community.totalSouls) && <GrowthIndicator />}
               </span>
             </div>
             <div className="flex justify-between items-baseline">
-              <span className="opacity-80">Days of Operation</span>
-              <span className="text-xl font-mono tabular-nums">
+              <span className="opacity-60">Days of Operation</span>
+              <span className="font-mono tabular-nums">
                 {community.daysOfOperation}
                 {hasGrown('daysOfOperation', community.daysOfOperation) && <GrowthIndicator />}
               </span>
             </div>
             <div className="flex justify-between items-baseline">
-              <span className="opacity-80">Collective Wisdom</span>
-              <span className="text-xl font-mono tabular-nums">
+              <span className="opacity-60">Collective Wisdom</span>
+              <span className="font-mono tabular-nums">
                 {community.collectiveWisdom.toLocaleString()}
                 {hasGrown('collectiveWisdom', community.collectiveWisdom) && <GrowthIndicator />}
               </span>

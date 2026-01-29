@@ -46,18 +46,18 @@ export function MemoryEngineStats() {
     <Block label="Memory Engine:" blockView className="min-h-[200px]">
       <div className="space-y-4">
         <div className="flex justify-between items-baseline">
-          <span className="opacity-80">Questions Generated</span>
-          <span className="text-xl font-mono tabular-nums">
+          <span className="opacity-60">Questions Generated</span>
+          <span className="font-mono tabular-nums">
             {stats.questionsGenerated}/day
             {hasGrown('questionsGenerated', stats.questionsGenerated) && <GrowthIndicator />}
           </span>
         </div>
 
         <div className="flex justify-between items-baseline">
-          <span className="opacity-80">Response Quality</span>
+          <span className="opacity-60">Response Quality</span>
           <span className="flex items-center gap-3">
             {renderQualityBars(stats.responseQuality)}
-            <span className="text-sm font-mono">
+            <span className="font-mono">
               {stats.responseQuality.toFixed(1)}/5
               {hasGrown('responseQuality', stats.responseQuality * 100) && <GrowthIndicator />}
             </span>
@@ -65,21 +65,21 @@ export function MemoryEngineStats() {
         </div>
 
         <div className="flex justify-between items-baseline">
-          <span className="opacity-80">Avg Response Time</span>
-          <span className="text-lg font-mono tabular-nums">{stats.avgResponseTime}ms</span>
+          <span className="opacity-60">Avg Response Time</span>
+          <span className="font-mono tabular-nums">{stats.avgResponseTime}ms</span>
         </div>
 
         <div className="flex justify-between items-baseline">
-          <span className="opacity-80">Context Depth</span>
-          <span className="text-lg font-mono tabular-nums">
+          <span className="opacity-60">Context Depth</span>
+          <span className="font-mono tabular-nums">
             {stats.contextDepth} logs
             {hasGrown('contextDepth', stats.contextDepth) && <GrowthIndicator />}
           </span>
         </div>
 
         <div className="flex justify-between items-baseline">
-          <span className="opacity-80">AI Diversity Score</span>
-          <span className="text-lg font-mono tabular-nums">
+          <span className="opacity-60">AI Diversity Score</span>
+          <span className="font-mono tabular-nums">
             {stats.aiDiversityScore}%
             {hasGrown('aiDiversityScore', stats.aiDiversityScore) && <GrowthIndicator />}
           </span>

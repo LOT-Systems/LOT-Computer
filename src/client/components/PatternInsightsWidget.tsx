@@ -125,10 +125,10 @@ export const PatternInsightsWidget = () => {
                   {evo.patternTitle}
                 </div>
                 <div className="mb-4">
-                  {evo.trend === 'strengthening' && 'Strengthening over time'}
-                  {evo.trend === 'stable' && 'Stable pattern'}
-                  {evo.trend === 'weakening' && 'Fading pattern'}
-                  {evo.trend === 'emerging' && 'New pattern emerging'}
+                  {evo.trend === 'strengthening' && '↗ Strengthening over time'}
+                  {evo.trend === 'stable' && '→ Stable pattern'}
+                  {evo.trend === 'weakening' && '↘ Fading pattern'}
+                  {evo.trend === 'emerging' && '✦ New pattern emerging'}
                 </div>
                 {evo.timeline.length > 0 && (
                   <div>
