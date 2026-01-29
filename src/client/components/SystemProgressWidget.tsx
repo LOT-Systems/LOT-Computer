@@ -14,10 +14,10 @@ interface Deployment {
 }
 
 const FEEDBACK_OPTIONS = [
-  { id: 'operational', label: 'Operational', emoji: '✓' },
-  { id: 'resonating', label: 'Resonating', emoji: '∿' },
-  { id: 'needs-calibration', label: 'Needs Calibration', emoji: '⚙' },
-  { id: 'evolving', label: 'Evolving', emoji: '↗' }
+  { id: 'operational', label: 'Operational', symbol: '|' },
+  { id: 'resonating', label: 'Resonating', symbol: '~' },
+  { id: 'needs-calibration', label: 'Needs Calibration', symbol: '*' },
+  { id: 'evolving', label: 'Evolving', symbol: '^' }
 ] as const
 
 /**
@@ -145,7 +145,7 @@ export function SystemProgressWidget() {
                 `}
               >
                 <div className="flex items-center gap-4">
-                  <span>{option.emoji}</span>
+                  <span className="font-mono">{option.symbol}</span>
                   <span className="text-sm">{option.label}</span>
                 </div>
               </button>

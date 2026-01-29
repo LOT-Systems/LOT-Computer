@@ -35,10 +35,10 @@ export function GrowthMilestones() {
 
   return (
     <Block label="Growth Metrics:" blockView className="min-h-[200px]">
-      <div className="space-y-8">
+      <div className="space-y-12">
         {/* Personal Journey */}
         <div>
-          <div className="text-sm opacity-60 mb-4">Your Journey</div>
+          <div className="text-sm opacity-60 mb-6">Your Journey</div>
           <div className="space-y-3">
             <div className="flex justify-between items-baseline">
               <span className="opacity-80">Days</span>

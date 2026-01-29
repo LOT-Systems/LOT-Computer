@@ -123,7 +123,7 @@ export function MemoryWidget() {
           const lastQuestionDate = dayjs(timestamp).format('YYYY-MM-DD')
           const today = dayjs().format('YYYY-MM-DD')
           if (lastQuestionDate !== today) {
-            console.log(`🗑️ Clearing cache from ${lastQuestionDate} (today is ${today})`)
+            console.log(`Clearing cache from ${lastQuestionDate} (today is ${today})`)
             stores.lastAnsweredMemoryQuestionId.set(null)
             localStorage.removeItem('lastMemoryQuestionTime')
           }
@@ -166,10 +166,12 @@ export function MemoryWidget() {
       setTimeout(() => {
         setIsDisplayed(true)
         setTimeout(() => {
-          setResponse(badgeUnlock.unlockMessage)
+          // Format badge unlock message with visual enhancement
+          const badgeDisplay = `${badgeUnlock.symbol} ${badgeUnlock.name}\n\n${badgeUnlock.unlockMessage.replace('[badge]', badgeUnlock.symbol)}`
+          setResponse(badgeDisplay)
           setIsShown(true)
           setIsResponseShown(true)
-          // Auto-hide after 5 seconds
+          // Auto-hide after 6 seconds for badge unlocks
           setTimeout(() => {
             setIsShown(false)
             setTimeout(() => {
@@ -177,7 +179,7 @@ export function MemoryWidget() {
               setIsResponseShown(false)
               setResponse(null)
             }, 1500)
-          }, 5000)
+          }, 6000)
         }, 100)
       }, fp.randomElement([1200, 2100, 1650, 2800]))
       return
@@ -354,7 +356,7 @@ export function MemoryWidget() {
           )}
         >
           {/* Quantum-aware reflection prompt */}
-          <div className="mb-8">
+          <div className="mb-12 opacity-75 text-sm italic">
             {(() => {
               try {
                 return getMemoryReflectionPrompt(quantumState.energy, quantumState.clarity, quantumState.alignment)
@@ -383,7 +385,8 @@ export function MemoryWidget() {
         <div
           className={cn(
             'opacity-0 transition-opacity duration-[1400ms]',
-            isResponseShown && 'opacity-100'
+            isResponseShown && 'opacity-100',
+            'whitespace-pre-line'
           )}
         >
           {response}

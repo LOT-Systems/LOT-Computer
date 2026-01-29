@@ -25,20 +25,18 @@ export function MemoryEngineStats() {
     return null
   }
 
-  // Render quality stars
-  const renderStars = (rating: number) => {
-    const fullStars = Math.floor(rating)
-    const hasHalfStar = rating % 1 >= 0.5
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0)
+  // Render quality bars (LOT design system - no emojis)
+  const renderQualityBars = (rating: number) => {
+    const fullBars = Math.floor(rating)
+    const emptyBars = 5 - fullBars
 
     return (
-      <span className="flex items-center gap-0.5">
-        {Array(fullStars).fill('★').map((star, i) => (
-          <span key={`full-${i}`} className="text-acc">{star}</span>
+      <span className="flex items-center gap-1 font-mono">
+        {Array(fullBars).fill('|').map((bar, i) => (
+          <span key={`full-${i}`} className="text-acc">{bar}</span>
         ))}
-        {hasHalfStar && <span className="text-acc">☆</span>}
-        {Array(emptyStars).fill('☆').map((star, i) => (
-          <span key={`empty-${i}`} className="opacity-40">{star}</span>
+        {Array(emptyBars).fill('|').map((bar, i) => (
+          <span key={`empty-${i}`} className="opacity-30">{bar}</span>
         ))}
       </span>
     )
@@ -57,10 +55,10 @@ export function MemoryEngineStats() {
 
         <div className="flex justify-between items-baseline">
           <span className="opacity-80">Response Quality</span>
-          <span className="flex items-center gap-2">
-            {renderStars(stats.responseQuality)}
+          <span className="flex items-center gap-3">
+            {renderQualityBars(stats.responseQuality)}
             <span className="text-sm font-mono">
-              {stats.responseQuality}/5
+              {stats.responseQuality.toFixed(1)}/5
               {hasGrown('responseQuality', stats.responseQuality * 100) && <GrowthIndicator />}
             </span>
           </span>
