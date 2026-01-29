@@ -23,13 +23,13 @@ input:-webkit-autofill {
 
 @layer base {
   body {
-    @apply font-base tabular-nums;
+    @apply font-base;
     background-color: var(--base-color);
     color: rgb(var(--acc-color-default));
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
+    text-rendering: geometricPrecision;
+    font-variant-numeric: normal;
   }
 
   /* Ensure all form elements inherit the font */
