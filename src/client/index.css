@@ -15,6 +15,31 @@
   --acc-color-300: 102 102 102;
   --acc-color-200: 153 153 153;
   --acc-color-100: 204 204 204;
+
+  /* Evolution system variables - dynamically updated based on user progression */
+  --evolution-base-opacity: 0.85;
+  --evolution-accent-opacity: 0.7;
+  --evolution-grid-opacity: 0.15;
+  --evolution-letter-spacing: -0.02em;
+  --evolution-line-height: 1.4;
+  --evolution-grid-size: 6px;
+  --evolution-glow-intensity: 0;
+  --evolution-blur-radius: 8px;
+  --evolution-transition-speed: 400ms;
+  --evolution-color-saturation: 0.8;
+  --evolution-max-columns: 1;
+
+  /* Theme evolution variables - badge theme specific aesthetics */
+  --theme-flow-intensity: 0.4;
+  --theme-organic-curve: 2px;
+  --theme-wave-frequency: 4s;
+  --theme-geometric-precision: 0.4;
+  --theme-structural-depth: 2px;
+  --theme-symmetry-balance: 0.5;
+  --theme-color-flow-direction: vertical;
+  --theme-pattern-scale: 1;
+  --theme-edge-sharpness: 1px;
+  --evolution-background-pattern: none;
 }
 
 input:-webkit-autofill {
@@ -25,10 +50,15 @@ input:-webkit-autofill {
   body {
     @apply font-base;
     background-color: var(--base-color);
-    color: rgb(var(--acc-color-default));
+    color: rgb(var(--acc-color-default) / var(--evolution-accent-opacity));
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    letter-spacing: var(--evolution-letter-spacing);
+    line-height: var(--evolution-line-height);
+    transition: color var(--evolution-transition-speed) ease,
+                letter-spacing var(--evolution-transition-speed) ease,
+                line-height var(--evolution-transition-speed) ease;
   }
 
   /* Ensure all form elements inherit the font */
@@ -49,31 +79,103 @@ input:-webkit-autofill {
 }
 
 @layer utilities {
-  /* 1px grid pattern fill - sharp and subtle */
+  /* 1px grid pattern fill - sharp and subtle, evolves with progression */
   .grid-fill {
     background-image:
-      linear-gradient(to right, rgb(var(--acc-color-400) / 0.5) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(var(--acc-color-400) / 0.5) 1px, transparent 1px);
-    background-size: 2px 2px;
+      linear-gradient(to right, rgb(var(--acc-color-400) / var(--evolution-grid-opacity)) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--acc-color-400) / var(--evolution-grid-opacity)) 1px, transparent 1px);
+    background-size: var(--evolution-grid-size) var(--evolution-grid-size);
+    transition: background-size var(--evolution-transition-speed) ease,
+                background-image var(--evolution-transition-speed) ease;
   }
 
   .grid-fill-hover {
-    transition: background-image 0.2s;
+    transition: background-image var(--evolution-transition-speed);
   }
 
   .grid-fill-hover:hover {
     background-image:
-      linear-gradient(to right, rgb(var(--acc-color-400) / 0.5) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(var(--acc-color-400) / 0.5) 1px, transparent 1px);
-    background-size: 2px 2px;
+      linear-gradient(to right, rgb(var(--acc-color-400) / calc(var(--evolution-grid-opacity) * 1.2)) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--acc-color-400) / calc(var(--evolution-grid-opacity) * 1.2)) 1px, transparent 1px);
+    background-size: var(--evolution-grid-size) var(--evolution-grid-size);
   }
 
   /* Lighter grid pattern for subtle backgrounds */
   .grid-fill-light {
     background-image:
-      linear-gradient(to right, rgb(var(--acc-color-400) / 0.25) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(var(--acc-color-400) / 0.25) 1px, transparent 1px);
-    background-size: 2px 2px;
+      linear-gradient(to right, rgb(var(--acc-color-400) / calc(var(--evolution-grid-opacity) * 0.5)) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--acc-color-400) / calc(var(--evolution-grid-opacity) * 0.5)) 1px, transparent 1px);
+    background-size: var(--evolution-grid-size) var(--evolution-grid-size);
+  }
+
+  /* Evolution-aware utilities */
+  .evolved-text {
+    letter-spacing: var(--evolution-letter-spacing);
+    line-height: var(--evolution-line-height);
+    transition: letter-spacing var(--evolution-transition-speed) ease,
+                line-height var(--evolution-transition-speed) ease;
+  }
+
+  .evolved-opacity {
+    opacity: var(--evolution-base-opacity);
+    transition: opacity var(--evolution-transition-speed) ease;
+  }
+
+  .evolved-glow {
+    text-shadow: 0 0 calc(var(--evolution-glow-intensity) * 20px) rgb(var(--acc-color-default) / var(--evolution-glow-intensity));
+    transition: text-shadow var(--evolution-transition-speed) ease;
+  }
+
+  .evolved-blur {
+    filter: blur(var(--evolution-blur-radius));
+    transition: filter var(--evolution-transition-speed) ease;
+  }
+
+  /* Animation speed adapts to user's evolution */
+  .evolved-transition {
+    transition-duration: var(--evolution-transition-speed);
+  }
+
+  /* Theme evolution utilities */
+  .theme-water-flow {
+    border-radius: var(--theme-organic-curve);
+    transition: transform var(--theme-wave-frequency) ease,
+                border-radius var(--evolution-transition-speed) ease;
+  }
+
+  .theme-architecture-structure {
+    box-shadow: 0 var(--theme-structural-depth) calc(var(--theme-structural-depth) * 2)
+                rgb(var(--acc-color-default) / calc(var(--theme-geometric-precision) * 0.1));
+    transition: box-shadow var(--evolution-transition-speed) ease;
+  }
+
+  .theme-evolved-border {
+    border-radius: var(--theme-organic-curve);
+    transition: border-radius var(--evolution-transition-speed) ease;
+  }
+
+  .theme-evolved-pattern {
+    background-size: calc(20px * var(--theme-pattern-scale));
+    transition: background-size var(--evolution-transition-speed) ease;
+  }
+
+  /* Evolution background overlay */
+  .evolution-background {
+    position: relative;
+  }
+
+  .evolution-background::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--evolution-background-pattern);
+    pointer-events: none;
+    z-index: 0;
+    opacity: calc(var(--evolution-base-opacity) * 0.5);
+    transition: opacity var(--evolution-transition-speed) ease;
   }
 }
 
