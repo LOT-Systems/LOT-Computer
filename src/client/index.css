@@ -26,10 +26,9 @@ input:-webkit-autofill {
     @apply font-base;
     background-color: var(--base-color);
     color: rgb(var(--acc-color-default));
-    -webkit-font-smoothing: auto;
-    -moz-osx-font-smoothing: auto;
-    text-rendering: geometricPrecision;
-    font-variant-numeric: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   /* Ensure all form elements inherit the font */
