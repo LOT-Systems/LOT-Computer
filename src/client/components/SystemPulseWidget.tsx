@@ -162,11 +162,6 @@ export function SystemPulseWidget() {
             }}
           />
         </div>
-
-        {/* Last update timestamp */}
-        <div className="text-sm opacity-60 font-mono text-right">
-          {new Date(pulse.lastUpdate).toLocaleTimeString()}
-        </div>
       </div>
     </Block>
   )
