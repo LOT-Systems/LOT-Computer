@@ -100,7 +100,7 @@ export function SystemProgressWidget() {
         <div>
           <div className="flex justify-between items-baseline mb-8">
             <span className="opacity-60">Build Version</span>
-            <span className="font-mono">{deployment.version}</span>
+            <span>{deployment.version}</span>
           </div>
 
           <div className="flex justify-between items-baseline mb-8">
@@ -117,7 +117,7 @@ export function SystemProgressWidget() {
         {deployment.features.length > 0 && (
           <div className="border-t border-acc-400/30 pt-12">
             <div className="opacity-60 mb-8">Neural Enhancements Active:</div>
-            <div className="flex flex-col gap-y-4 opacity-75">
+            <div className="flex flex-col gap-y-4 opacity-60">
               {deployment.features.map((feature, idx) => (
                 <div key={idx}>• {feature}</div>
               ))}
@@ -145,7 +145,7 @@ export function SystemProgressWidget() {
                 `}
               >
                 <div className="flex items-center gap-4">
-                  <span className="font-mono">{option.symbol}</span>
+                  <span>{option.symbol}</span>
                   <span>{option.label}</span>
                 </div>
               </button>

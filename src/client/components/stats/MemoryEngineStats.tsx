@@ -25,13 +25,13 @@ export function MemoryEngineStats() {
     return null
   }
 
-  // Render quality bars (LOT design system - no emojis)
+  // Render quality bars (text-based game aesthetic)
   const renderQualityBars = (rating: number) => {
     const fullBars = Math.floor(rating)
     const emptyBars = 5 - fullBars
 
     return (
-      <span className="flex items-center gap-1 font-mono">
+      <span className="flex items-center gap-1">
         {Array(fullBars).fill('|').map((bar, i) => (
           <span key={`full-${i}`} className="text-acc">{bar}</span>
         ))}
@@ -47,7 +47,7 @@ export function MemoryEngineStats() {
       <div className="space-y-4">
         <div className="flex justify-between items-baseline">
           <span className="opacity-60">Questions Generated</span>
-          <span className="font-mono tabular-nums">
+          <span>
             {stats.questionsGenerated}/day
             {hasGrown('questionsGenerated', stats.questionsGenerated) && <GrowthIndicator />}
           </span>
@@ -57,7 +57,7 @@ export function MemoryEngineStats() {
           <span className="opacity-60">Response Quality</span>
           <span className="flex items-center gap-3">
             {renderQualityBars(stats.responseQuality)}
-            <span className="font-mono">
+            <span>
               {stats.responseQuality.toFixed(1)}/5
               {hasGrown('responseQuality', stats.responseQuality * 100) && <GrowthIndicator />}
             </span>
@@ -66,12 +66,12 @@ export function MemoryEngineStats() {
 
         <div className="flex justify-between items-baseline">
           <span className="opacity-60">Avg Response Time</span>
-          <span className="font-mono tabular-nums">{stats.avgResponseTime}ms</span>
+          <span>{stats.avgResponseTime}ms</span>
         </div>
 
         <div className="flex justify-between items-baseline">
           <span className="opacity-60">Context Depth</span>
-          <span className="font-mono tabular-nums">
+          <span>
             {stats.contextDepth} logs
             {hasGrown('contextDepth', stats.contextDepth) && <GrowthIndicator />}
           </span>
@@ -79,7 +79,7 @@ export function MemoryEngineStats() {
 
         <div className="flex justify-between items-baseline">
           <span className="opacity-60">AI Diversity Score</span>
-          <span className="font-mono tabular-nums">
+          <span>
             {stats.aiDiversityScore}%
             {hasGrown('aiDiversityScore', stats.aiDiversityScore) && <GrowthIndicator />}
           </span>

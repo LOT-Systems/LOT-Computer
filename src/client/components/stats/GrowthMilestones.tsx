@@ -42,28 +42,28 @@ export function GrowthMilestones() {
           <div className="space-y-3">
             <div className="flex justify-between items-baseline">
               <span className="opacity-60">Days</span>
-              <span className="font-mono tabular-nums">
+              <span>
                 {personal.journeyDays}
                 {hasGrown('journeyDays', personal.journeyDays) && <GrowthIndicator />}
               </span>
             </div>
             <div className="flex justify-between items-baseline">
               <span className="opacity-60">Questions Answered</span>
-              <span className="font-mono tabular-nums">
+              <span>
                 {personal.questionsAnswered}
                 {hasGrown('questionsAnswered', personal.questionsAnswered) && <GrowthIndicator />}
               </span>
             </div>
             <div className="flex justify-between items-baseline">
               <span className="opacity-60">Insights Gained</span>
-              <span className="font-mono tabular-nums">
+              <span>
                 {personal.insightsGained}
                 {hasGrown('insightsGained', personal.insightsGained) && <GrowthIndicator />}
               </span>
             </div>
             <div className="flex justify-between items-baseline pt-2 border-t border-acc/20">
               <span className="opacity-60">Badge Level</span>
-              <span className="font-mono">
+              <span>
                 {personal.badgeLevel} ({personal.badgeCount})
                 {hasGrown('badgeCount', personal.badgeCount) && <GrowthIndicator />}
               </span>
@@ -77,21 +77,21 @@ export function GrowthMilestones() {
           <div className="space-y-3">
             <div className="flex justify-between items-baseline">
               <span className="opacity-60">Total Souls</span>
-              <span className="font-mono tabular-nums">
+              <span>
                 {community.totalSouls.toLocaleString()}
                 {hasGrown('totalSouls', community.totalSouls) && <GrowthIndicator />}
               </span>
             </div>
             <div className="flex justify-between items-baseline">
               <span className="opacity-60">Days of Operation</span>
-              <span className="font-mono tabular-nums">
+              <span>
                 {community.daysOfOperation}
                 {hasGrown('daysOfOperation', community.daysOfOperation) && <GrowthIndicator />}
               </span>
             </div>
             <div className="flex justify-between items-baseline">
               <span className="opacity-60">Collective Wisdom</span>
-              <span className="font-mono tabular-nums">
+              <span>
                 {community.collectiveWisdom.toLocaleString()}
                 {hasGrown('collectiveWisdom', community.collectiveWisdom) && <GrowthIndicator />}
               </span>
