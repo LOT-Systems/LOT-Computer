@@ -24,10 +24,10 @@ import publicApiRoutes from './routes/public-api.js'
 const CWD = process.cwd()
 
 // Debug: Check if static files exist
-console.log('🔍 CWD:', CWD)
-console.log('🔍 dist/client/js exists?', fs.existsSync(path.join(CWD, 'dist/client/js')))
+console.log('CWD:', CWD)
+console.log('dist/client/js exists?', fs.existsSync(path.join(CWD, 'dist/client/js')))
 if (fs.existsSync(path.join(CWD, 'dist/client/js'))) {
-  console.log('🔍 Files in dist/client/js:', fs.readdirSync(path.join(CWD, 'dist/client/js')))
+  console.log('Files in dist/client/js:', fs.readdirSync(path.join(CWD, 'dist/client/js')))
 }
 
 const fastify = Fastify({
@@ -146,7 +146,7 @@ fastify.addHook('onClose', () => sequelize.close())
 // These MUST be registered before ANY other routes to avoid conflicts
 // ==============================================================================
 
-console.log('🔥 [SERVER-STARTUP] Registering /u/ routes at top level!')
+console.log('[SERVER-STARTUP] Registering /u/ routes at top level!')
 
 // Global request logger for debugging
 fastify.addHook('onRequest', async (req, reply) => {
@@ -355,11 +355,19 @@ fastify.setNotFoundHandler(async (req, res) => {
 
 // Start server - use PORT from environment or default to 8080
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080
-fastify.listen({ port, host: '0.0.0.0' }, function (err, address) {
+fastify.listen({ port, host: '0.0.0.0' }, async function (err, address) {
   if (err) {
     console.error(err)
     process.exit(1)
   }
   console.log(`Server is running at ${address}`)
-  console.log(`🚀 App launched: ${config.appHost}`)
+
+  // Initialize scheduled jobs (monthly emails, etc.)
+  try {
+    const { initializeScheduledJobs } = await import('./scheduled-jobs.js')
+    initializeScheduledJobs()
+  } catch (error) {
+    console.error('Failed to initialize scheduled jobs:', error)
+  }
+  console.log(`App launched: ${config.appHost}`)
 })

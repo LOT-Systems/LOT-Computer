@@ -71,7 +71,7 @@ async function monitor() {
     console.log('\n=== Database Health Monitor ===')
     console.log('Timestamp:', status.timestamp)
     console.log('\nDatabase:')
-    console.log('Status:', status.database.connected ? '✅ Connected' : '❌ Disconnected')
+    console.log('Status:', status.database.connected ? 'Connected' : 'Disconnected')
     console.log('Latency:', status.database.latency + 'ms')
     if (status.database.activeConnections) {
       console.log('Active Connections:', status.database.activeConnections)

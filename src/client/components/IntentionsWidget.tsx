@@ -139,7 +139,7 @@ export function IntentionsWidget() {
                 className="w-full bg-transparent border-none outline-none mb-12"
                 autoFocus
               />
-              <div className="flex gap-8">
+              <div className="flex gap-8 mb-24">
                 <Button onClick={handleSetIntention} disabled={!inputValue.trim()}>
                   Set Intention
                 </Button>
@@ -168,9 +168,11 @@ export function IntentionsWidget() {
                 <div>• Boundaries</div>
                 <div>• Rest</div>
               </div>
-              <Button onClick={() => setIsSettingIntention(true)}>
-                {intention ? 'Set New Intention' : 'Set Intention'}
-              </Button>
+              <div className="mb-24">
+                <Button onClick={() => setIsSettingIntention(true)}>
+                  {intention ? 'Set New Intention' : 'Set Intention'}
+                </Button>
+              </div>
             </>
           )}
         </div>
@@ -184,18 +186,22 @@ export function IntentionsWidget() {
           <div className="mb-16">
             {intention.monthYear}; Day {daysSince + 1}/{totalDaysInMonth}
           </div>
-          <Button onClick={handleReleaseIntention}>
-            Release
-          </Button>
+          <div className="mb-24">
+            <Button onClick={handleReleaseIntention}>
+              Release
+            </Button>
+          </div>
         </div>
       )}
 
       {view === 'current' && !intention && (
         <div className="inline-block">
           <div className="mb-12">No intention set yet.</div>
-          <Button onClick={() => setView('set')}>
-            Set Your Intention
-          </Button>
+          <div className="mb-24">
+            <Button onClick={() => setView('set')}>
+              Set Your Intention
+            </Button>
+          </div>
         </div>
       )}
 

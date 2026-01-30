@@ -28,7 +28,7 @@ export function MemoryWidget() {
   // Debug logging - wrapped in try-catch for safety
   React.useEffect(() => {
     try {
-      console.log('📊 MemoryWidget state:', {
+      console.log('MemoryWidget state:', {
         loadedQuestion: loadedQuestion ? {
           id: loadedQuestion.id,
           question: loadedQuestion.question ? loadedQuestion.question.substring(0, 50) : 'no question text'
@@ -123,7 +123,7 @@ export function MemoryWidget() {
           const lastQuestionDate = dayjs(timestamp).format('YYYY-MM-DD')
           const today = dayjs().format('YYYY-MM-DD')
           if (lastQuestionDate !== today) {
-            console.log(`🗑️ Clearing cache from ${lastQuestionDate} (today is ${today})`)
+            console.log(`Clearing cache from ${lastQuestionDate} (today is ${today})`)
             stores.lastAnsweredMemoryQuestionId.set(null)
             localStorage.removeItem('lastMemoryQuestionTime')
           }
@@ -166,10 +166,12 @@ export function MemoryWidget() {
       setTimeout(() => {
         setIsDisplayed(true)
         setTimeout(() => {
-          setResponse(badgeUnlock.unlockMessage)
+          // Format badge unlock message with visual enhancement
+          const badgeDisplay = `${badgeUnlock.symbol} ${badgeUnlock.name}\n\n${badgeUnlock.unlockMessage.replace('[badge]', badgeUnlock.symbol)}`
+          setResponse(badgeDisplay)
           setIsShown(true)
           setIsResponseShown(true)
-          // Auto-hide after 5 seconds
+          // Auto-hide after 6 seconds for badge unlocks
           setTimeout(() => {
             setIsShown(false)
             setTimeout(() => {
@@ -177,7 +179,7 @@ export function MemoryWidget() {
               setIsResponseShown(false)
               setResponse(null)
             }, 1500)
-          }, 5000)
+          }, 6000)
         }, 100)
       }, fp.randomElement([1200, 2100, 1650, 2800]))
       return
@@ -203,7 +205,7 @@ export function MemoryWidget() {
         // Keep only last 5
         const trimmed = recentQuestions.slice(0, 5)
         localStorage.setItem('recentMemoryQuestions', JSON.stringify(trimmed))
-        console.log(`✅ Tracked shown question (total tracked: ${trimmed.length})`)
+        console.log(`Tracked shown question (total tracked: ${trimmed.length})`)
       } catch (e) {
         console.warn('Failed to save lastMemoryQuestionTime:', e)
       }
@@ -256,7 +258,7 @@ export function MemoryWidget() {
   // Retry handler - clears cache and refetches
   const handleRetry = React.useCallback(async () => {
     try {
-      console.log('🔄 Retry button clicked - clearing cache and refetching')
+      console.log('Retry button clicked - clearing cache and refetching')
 
       // Hide error details on retry
       setShowErrorDetails(false)
@@ -277,16 +279,16 @@ export function MemoryWidget() {
       // Small delay to ensure cache is cleared
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      console.log('🔄 Refetching Memory question...')
+      console.log('Refetching Memory question...')
       // Refetch the query
       const result = await refetch()
-      console.log('🔄 Refetch result:', {
+      console.log('Refetch result:', {
         hasData: !!result.data,
         hasError: !!result.error,
         isLoading: result.isLoading
       })
     } catch (e) {
-      console.error('❌ Retry failed:', e)
+      console.error('Retry failed:', e)
     }
   }, [queryClient, refetch])
 
@@ -311,8 +313,8 @@ export function MemoryWidget() {
 
           {/* Error Details */}
           {showErrorDetails && error && (
-            <div className="text-xs opacity-70 font-mono bg-acc/5 p-3 rounded border border-acc/20 overflow-auto max-h-[200px]">
-              <div className="mb-2 font-bold">Error Details:</div>
+            <div className="text-sm opacity-75 font-mono grid-fill-light p-3 rounded border border-acc/20 overflow-auto max-h-[200px]">
+              <div className="mb-2">Error Details:</div>
               {(error as any).response?.status && (
                 <div>Status: {(error as any).response.status}</div>
               )}
@@ -354,7 +356,7 @@ export function MemoryWidget() {
           )}
         >
           {/* Quantum-aware reflection prompt */}
-          <div className="mb-8">
+          <div className="mb-12 opacity-60">
             {(() => {
               try {
                 return getMemoryReflectionPrompt(quantumState.energy, quantumState.clarity, quantumState.alignment)
@@ -383,7 +385,8 @@ export function MemoryWidget() {
         <div
           className={cn(
             'opacity-0 transition-opacity duration-[1400ms]',
-            isResponseShown && 'opacity-100'
+            isResponseShown && 'opacity-100',
+            'whitespace-pre-line'
           )}
         >
           {response}

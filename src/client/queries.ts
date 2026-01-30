@@ -186,7 +186,7 @@ export const useMemory = () => {
         }
       }
 
-      console.log('🔍 Fetching Memory question:', {
+      console.log('Fetching Memory question:', {
         date: dayjs().format('YYYY-MM-DD'),
         hasQuantumState: Object.keys(quantumParams).length > 0,
         recentQuestionsToAvoid: recentlyShownQuestions.length
@@ -206,7 +206,7 @@ export const useMemory = () => {
       if (response.data === null) {
         console.log('⏸️ Memory cooldown: already answered question in current period (morning 7am-7pm or evening 7pm-7am)')
       } else if (response.data?.question) {
-        console.log('✅ Memory question received:', {
+        console.log('Memory question received:', {
           questionId: response.data.id,
           questionPreview: response.data.question.substring(0, 60) + '...'
         })
@@ -218,7 +218,7 @@ export const useMemory = () => {
       staleTime: Infinity, // Cache forever for the day - prevents duplicate questions
       cacheTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
       onError: (error) => {
-        console.error('❌ Memory query failed:', error)
+        console.error('Memory query failed:', error)
         // Store error timestamp for manual retry UI
         if (typeof window !== 'undefined') {
           localStorage.setItem(`memory-error-${date}`, Date.now().toString())

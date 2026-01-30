@@ -119,12 +119,12 @@ export const PublicProfile = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-2xl px-8">
           <div className="text-xl mb-4">{error || 'Profile not found'}</div>
-          <div className="text-sm text-acc/60 mb-4">
+          <div className="text-sm opacity-60 mb-4">
             Looking for: {userIdOrUsername}
           </div>
           {debugInfo && (
             <div className="mt-8 text-left bg-acc/5 p-4 rounded text-sm">
-              <div className="font-bold mb-2">Debug Information:</div>
+              <div className="mb-2">Debug Information:</div>
               <div className="mb-2">User ID: {debugInfo.userId}</div>
               <div className="mb-2">Has Metadata: {debugInfo.hasMetadata ? 'Yes' : 'No'}</div>
               <div className="mb-2">Has Privacy Settings: {debugInfo.hasPrivacy ? 'Yes' : 'No'}</div>
@@ -139,7 +139,7 @@ export const PublicProfile = () => {
             </div>
           )}
           {!debugInfo && (
-            <div className="mt-4 text-sm text-acc/60">
+            <div className="mt-4 text-sm opacity-60">
               Possible issues:
               <ul className="list-disc list-inside mt-2 text-left">
                 <li>Profile not enabled in Settings</li>
@@ -316,13 +316,13 @@ export const PublicProfile = () => {
 
         {/* Psychological Profile - simplified single-column layout */}
         {profile.psychologicalProfile && profile.psychologicalProfile.hasUsership && (
-          <div className="font-sans">
+          <div className="font-base">
             <div className="mb-24">
               Psychological Profile: OS v.{profile.psychologicalProfile.version || '1.0'}
             </div>
 
             {profile.psychologicalProfile.message ? (
-              <div className="opacity-60 font-sans">
+              <div className="opacity-60 font-base">
                 {profile.psychologicalProfile.message}
               </div>
             ) : (

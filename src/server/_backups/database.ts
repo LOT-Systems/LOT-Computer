@@ -23,10 +23,10 @@ const sequelize = new Sequelize('defaultdb', 'doadmin', 'AVNS_8V6Hqzuxwj0JkMxgNv
 async function testConnection() {
   try {
     await sequelize.authenticate()
-    console.log('✅ Database connection successful')
+    console.log('Database connection successful')
     return true
   } catch (error) {
-    console.error('❌ Database connection failed:', error)
+    console.error('Database connection failed:', error)
     return false
   }
 }

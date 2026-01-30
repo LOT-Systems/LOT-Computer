@@ -410,8 +410,8 @@ export async function findCohortMatches(
       matches.push({
         user: {
           id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
+          firstName: user.firstName || '',
+          lastName: user.lastName || '',
           city: user.city,
           country: user.country,
           archetype: user.metadata?.archetype as string | undefined

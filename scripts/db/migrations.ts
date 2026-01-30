@@ -9,6 +9,10 @@ import pg from 'pg'
 // Load environment variables
 dotenv.config()
 
+// Disable SSL certificate validation for self-signed certificates
+// This is needed for some managed database services
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+
 // ES module compatibility
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -52,7 +56,7 @@ if (command === '-new') {
   const fileName = getMigrationFileName(timeToken, name)
   const filePath = path.join(MIGRATIONS_PATH, fileName)
   generateMigration(filePath)
-  console.log(`✅ Generated migration:\n\t${filePath}`)
+  console.log(`Generated migration:\n\t${filePath}`)
   process.exit(0)
 }
 

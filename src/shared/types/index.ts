@@ -171,6 +171,16 @@ export type Answer = {
   updatedAt: Date;
 };
 
+// Direct Message Type
+export type DirectMessage = {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  message: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 // Chat Message Types
 export type ChatMessage = {
   id: string;
