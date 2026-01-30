@@ -2,13 +2,13 @@
 
 ## Current Situation
 
-There are **1241 commits** on branch `claude/february-2025-updates-HZZTF` that need to be pushed to GitHub.
+There are **1242 commits** on branch `claude/february-2025-updates-HZZTF` that need to be pushed to GitHub.
 
-- **Repository**: https://github.com/vadikmarmeladov/lot-systems
+- **Repository**: https://github.com/LOT-Systems/LOT-Computer (ownership transferred from vadikmarmeladov/lot-systems)
 - **Branch**: `claude/february-2025-updates-HZZTF`
-- **Latest local commit**: `33f7c1be` - Merge Dan's repository reorganization
+- **Latest local commit**: `6f308d29` - Add documentation and scripts for pushing commits from local machine
 - **Latest remote commit**: `44938aec` - Add subtle interface evolution system...
-- **Commits to push**: 1241
+- **Commits to push**: 1242
 
 ## Why Can't We Push from the Docker Environment?
 
@@ -43,7 +43,7 @@ git push origin claude/february-2025-updates-HZZTF
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/vadikmarmeladov/lot-systems.git
+git clone https://github.com/LOT-Systems/LOT-Computer.git
 cd lot-systems
 
 # 2. Checkout the branch with unpushed commits
@@ -111,7 +111,7 @@ The unpushed commits contain significant work:
 
 After successfully pushing, verify the push was successful:
 
-1. Visit: https://github.com/vadikmarmeladov/lot-systems/tree/claude/february-2025-updates-HZZTF
+1. Visit: https://github.com/LOT-Systems/LOT-Computer/tree/claude/february-2025-updates-HZZTF
 
 2. Check that the latest commit is:
    ```
