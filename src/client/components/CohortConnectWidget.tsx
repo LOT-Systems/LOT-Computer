@@ -44,12 +44,12 @@ export const CohortConnectWidget: React.FC = () => {
       <div className="font-mono">
         {/* Cohort name */}
         <div className="mb-16">
-          <div className="text-sm opacity-60 mb-4">Your cohort</div>
+          <div className="  mb-4">Your cohort</div>
           <div className="text-base capitalize">{cohort}</div>
         </div>
 
         {/* Total members */}
-        <div className="mb-16 text-sm opacity-60">
+        <div className="mb-16  ">
           {matches.length} {matches.length === 1 ? 'member' : 'members'} with shared patterns
         </div>
 
@@ -71,16 +71,16 @@ export const CohortConnectWidget: React.FC = () => {
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-2">
-                      <div className="text-sm">
+                      <div className="">
                         {match.user.firstName} {match.user.lastName?.charAt(0)}.
                       </div>
                     </div>
-                    <div className="text-sm opacity-60">
+                    <div className=" ">
                       {match.user.city || 'Location unknown'} • {similarity}% match
                     </div>
                   </div>
 
-                  <div className="text-sm opacity-60">
+                  <div className=" ">
                     {isExpanded ? '−' : '+'}
                   </div>
                 </div>
@@ -91,10 +91,10 @@ export const CohortConnectWidget: React.FC = () => {
                     {/* Shared patterns */}
                     {match.sharedPatterns.length > 0 && (
                       <div>
-                        <div className="text-sm opacity-60 mb-4">Shared patterns</div>
-                        <div className="text-sm space-y-2">
+                        <div className="  mb-4">Shared patterns</div>
+                        <div className=" space-y-2">
                           {match.sharedPatterns.slice(0, 3).map((pattern, i) => (
-                            <div key={i} className="opacity-75">• {pattern}</div>
+                            <div key={i} className="">• {pattern}</div>
                           ))}
                         </div>
                       </div>
@@ -133,7 +133,7 @@ export const CohortConnectWidget: React.FC = () => {
           <div className="mt-16 text-center">
             <button
               onClick={() => window.location.href = '/community'}
-              className="text-sm opacity-60 hover:opacity-100 transition-opacity"
+              className="  hover:opacity-100 transition-opacity"
             >
               View all {matches.length} members →
             </button>
@@ -141,7 +141,7 @@ export const CohortConnectWidget: React.FC = () => {
         )}
 
         {/* Subtle hint */}
-        <div className="mt-16 text-sm opacity-60 text-center">
+        <div className="mt-16   text-center">
           Connections based on patterns
         </div>
       </div>

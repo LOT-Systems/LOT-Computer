@@ -22,7 +22,7 @@ export function AwarenessDashboard() {
   if (!profile || typeof profile.selfAwarenessLevel === 'undefined') {
     return (
       <Block label="Awareness:" blockView>
-        <div className="opacity-60">
+        <div className="">
           Answer more Memory questions to reveal your psychological profile.
         </div>
       </Block>
@@ -62,11 +62,11 @@ export function AwarenessDashboard() {
       {awarenessView === 'overview' && (
         <div className="inline-block">
           <div className="flex items-center gap-8">
-            <span className="text-[20px]">{awarenessPercentage}%</span>
-            <span className="opacity-60">Self-Awareness</span>
+            <span className="">{awarenessPercentage}%</span>
+            <span className="">Self-Awareness</span>
           </div>
           {profile.growthTrajectory && (
-            <div className="mt-4 opacity-60 capitalize">
+            <div className="mt-4  capitalize">
               Journey: {profile.growthTrajectory}
             </div>
           )}
@@ -79,12 +79,12 @@ export function AwarenessDashboard() {
             <span className="font-medium">{profile.archetype}</span>
           </div>
           {profile.archetypeDescription && (
-            <div className="opacity-70 text-[14px] mb-12">
+            <div className="  mb-12">
               {profile.archetypeDescription}
             </div>
           )}
           {profile.behavioralCohort && (
-            <div className="opacity-60">
+            <div className="">
               Cohort: {profile.behavioralCohort}
             </div>
           )}
@@ -100,7 +100,7 @@ export function AwarenessDashboard() {
               </Tag>
             ))}
           </TagsContainer>
-          <div className="mt-8 opacity-60 text-[14px]">
+          <div className="mt-8  ">
             Core values appearing in your choices
           </div>
         </div>
@@ -114,7 +114,7 @@ export function AwarenessDashboard() {
             ))}
           </div>
           {profile.emotionalRange !== undefined && (
-            <div className="mt-12 opacity-60 text-[14px]">
+            <div className="mt-12  ">
               Emotional range: {profile.emotionalRange}/10
             </div>
           )}
@@ -126,12 +126,12 @@ export function AwarenessDashboard() {
           <div className="flex flex-col gap-8">
             {profile.dominantNeeds.map((need, index) => (
               <div key={need} className="flex items-center gap-8">
-                <span className="opacity-40">{index + 1}.</span>
+                <span className="">{index + 1}.</span>
                 <span>{need.charAt(0).toUpperCase() + need.slice(1)}</span>
               </div>
             ))}
           </div>
-          <div className="mt-12 opacity-60 text-[14px]">
+          <div className="mt-12  ">
             Core psychological needs in your patterns
           </div>
         </div>
@@ -153,7 +153,7 @@ export function AwarenessDashboard() {
               <span>{profile.journalSentiment.challenging}%</span>
             </div>
           </div>
-          <div className="mt-12 opacity-60 text-[14px]">
+          <div className="mt-12  ">
             Emotional tone across journal entries
           </div>
         </div>
@@ -162,11 +162,11 @@ export function AwarenessDashboard() {
       {awarenessView === 'reflection' && profile.reflectionQuality !== undefined && (
         <div className="inline-block">
           <div className="flex items-center gap-8 mb-8">
-            <span className="text-[20px]">{profile.reflectionQuality}/10</span>
-            <span className="opacity-60">Introspection depth</span>
+            <span className="">{profile.reflectionQuality}/10</span>
+            <span className="">Introspection depth</span>
           </div>
           {profile.growthTrajectory && (
-            <div className="opacity-60 text-[14px] capitalize">
+            <div className="  capitalize">
               Quality of self-reflection in your writing
             </div>
           )}

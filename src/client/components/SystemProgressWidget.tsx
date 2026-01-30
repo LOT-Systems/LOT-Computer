@@ -117,7 +117,7 @@ export function SystemProgressWidget() {
         {deployment.features.length > 0 && (
           <div className="border-t border-acc-400/30 pt-12">
             <div className="opacity-60 mb-8">Neural Enhancements Active:</div>
-            <div className="flex flex-col gap-y-4 opacity-60">
+            <div className="flex flex-col gap-y-4">
               {deployment.features.map((feature, idx) => (
                 <div key={idx}>• {feature}</div>
               ))}
@@ -153,7 +153,7 @@ export function SystemProgressWidget() {
           </div>
 
           {feedback && (
-            <div className="mt-12 opacity-60">
+            <div className="mt-12">
               Status logged. System calibration optimized.
             </div>
           )}

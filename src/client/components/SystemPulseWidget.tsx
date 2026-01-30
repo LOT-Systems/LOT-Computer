@@ -91,7 +91,7 @@ export function SystemPulseWidget() {
     <Block label="System Pulse:" blockView>
       <div className="flex flex-col gap-y-12">
         {/* Live indicator */}
-        <div className="flex items-center gap-4 text-sm opacity-60">
+        <div className="flex items-center gap-4">
           <div className={cn(
             'w-8 h-8 rounded-full transition-all duration-300',
             isLive ? 'bg-green animate-pulse' : 'bg-red-500'
@@ -112,7 +112,7 @@ export function SystemPulseWidget() {
               <AnimatedNumber value={pulse.eventsPerMinute} />
             </span>
             {eventsIntensity === 'high' && (
-              <span className="text-green text-lg animate-pulse">▲</span>
+              <span className="text-green animate-pulse">▲</span>
             )}
           </div>
         </div>

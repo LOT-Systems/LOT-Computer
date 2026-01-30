@@ -18,7 +18,7 @@ export function SubscribeWidget() {
   return (
     <Block label="Subscribe:" blockView>
       <div className="inline-block w-full">
-        <div className="mb-16 opacity-90">Consider subscribing!</div>
+        <div className="mb-16">Consider subscribing!</div>
         <div className="flex gap-8">
           <Button onClick={handleSubscribe}>
             R&D $15

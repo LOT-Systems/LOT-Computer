@@ -118,12 +118,12 @@ export const PublicProfile = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-2xl px-8">
-          <div className="text-xl mb-4">{error || 'Profile not found'}</div>
-          <div className="text-sm opacity-60 mb-4">
+          <div className="mb-4">{error || 'Profile not found'}</div>
+          <div className="mb-4">
             Looking for: {userIdOrUsername}
           </div>
           {debugInfo && (
-            <div className="mt-8 text-left bg-acc/5 p-4 rounded text-sm">
+            <div className="mt-8 text-left bg-acc/5 p-4 rounded">
               <div className="mb-2">Debug Information:</div>
               <div className="mb-2">User ID: {debugInfo.userId}</div>
               <div className="mb-2">Has Metadata: {debugInfo.hasMetadata ? 'Yes' : 'No'}</div>
@@ -139,7 +139,7 @@ export const PublicProfile = () => {
             </div>
           )}
           {!debugInfo && (
-            <div className="mt-4 text-sm opacity-60">
+            <div className="mt-4">
               Possible issues:
               <ul className="list-disc list-inside mt-2 text-left">
                 <li>Profile not enabled in Settings</li>
@@ -322,11 +322,11 @@ export const PublicProfile = () => {
             </div>
 
             {profile.psychologicalProfile.message ? (
-              <div className="opacity-60 font-base">
+              <div className="font-base">
                 {profile.psychologicalProfile.message}
               </div>
             ) : (
-              <div className="space-y-3">
+              <div>
                 {/* Soul Archetype */}
                 {profile.psychologicalProfile.archetype && (
                   <div className="mb-24">
@@ -395,7 +395,7 @@ export const PublicProfile = () => {
                 {/* Pattern Strength */}
                 {profile.psychologicalProfile.patternStrength && profile.psychologicalProfile.patternStrength.length > 0 && (
                   <div>
-                    <div className="flex mb-2">
+                    <div className="flex mb-24">
                       <span className="w-[170px] sm:w-[150px] mr-24 sm:mr-12 -ml-4">Pattern strength:</span>
                       <span className="flex-1">{profile.psychologicalProfile.patternStrengthIndex || profile.psychologicalProfile.patternStrength.reduce((sum: number, item: { count: number }) => sum + item.count, 0)}</span>
                     </div>

@@ -20,7 +20,7 @@ export function CollectiveConsciousness() {
       <div className="space-y-6">
         {/* Energy Level */}
         <div>
-          <div className="flex justify-between mb-2 text-sm">
+          <div className="flex justify-between mb-2">
             <span className="opacity-80">Energy Level</span>
             <span className="font-mono">{stats.energyLevel}%</span>
           </div>
@@ -38,7 +38,7 @@ export function CollectiveConsciousness() {
 
         {/* Clarity Index */}
         <div>
-          <div className="flex justify-between mb-2 text-sm">
+          <div className="flex justify-between mb-2">
             <span className="opacity-80">Clarity Index</span>
             <span className="font-mono">{stats.clarityIndex}%</span>
           </div>
@@ -56,7 +56,7 @@ export function CollectiveConsciousness() {
 
         {/* Alignment Score */}
         <div>
-          <div className="flex justify-between mb-2 text-sm">
+          <div className="flex justify-between mb-2">
             <span className="opacity-80">Alignment Score</span>
             <span className="font-mono">{stats.alignmentScore}%</span>
           </div>
@@ -80,7 +80,7 @@ export function CollectiveConsciousness() {
         </div>
 
         {/* Today's Activity */}
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <div className="opacity-60 mb-1">Active Intentions</div>
             <div className="text-lg font-mono tabular-nums">{stats.activeIntentions}</div>

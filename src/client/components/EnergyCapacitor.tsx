@@ -54,12 +54,12 @@ export function EnergyCapacitor() {
             <span className="text-[20px]">
               {energyState.currentLevel}%
             </span>
-            <span className="capitalize opacity-60">{energyState.status}</span>
+            <span className="capitalize">{energyState.status}</span>
           </div>
 
           {/* Trajectory indicator */}
           {energyState.trajectory !== 'stable' && (
-            <div className="mb-12 opacity-75">
+            <div className="mb-12">
               {energyState.trajectory === 'improving' && '↑ Improving'}
               {energyState.trajectory === 'declining' && '↓ Declining'}
               {energyState.trajectory === 'critical' && '⚠ Critical'}
@@ -94,10 +94,10 @@ export function EnergyCapacitor() {
                 )}
               </div>
 
-              <div className="mb-12 opacity-60">
+              <div className="mb-12">
                 <span className="capitalize">{energyState.romanticConnection.connectionQuality}</span>
               </div>
-              <div className="mb-12 opacity-75">
+              <div className="mb-12">
                 {energyState.romanticConnection.daysSinceConnection} day{energyState.romanticConnection.daysSinceConnection === 1 ? '' : 's'} since connection
               </div>
               {energyState.romanticConnection.needsAttention && (

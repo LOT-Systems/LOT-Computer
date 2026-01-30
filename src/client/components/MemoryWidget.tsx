@@ -307,13 +307,13 @@ export function MemoryWidget() {
     >
       {hasError && (
         <div className="flex flex-col gap-4">
-          <div className="opacity-60 text-sm">
+          <div>
             Memory temporarily unavailable.
           </div>
 
           {/* Error Details */}
           {showErrorDetails && error && (
-            <div className="text-sm opacity-75 font-mono grid-fill-light p-3 rounded border border-acc/20 overflow-auto max-h-[200px]">
+            <div className="font-mono grid-fill-light p-3 rounded border border-acc/20 overflow-auto max-h-[200px]">
               <div className="mb-2">Error Details:</div>
               {(error as any).response?.status && (
                 <div>Status: {(error as any).response.status}</div>
@@ -341,7 +341,7 @@ export function MemoryWidget() {
             </Button>
             <Button
               onClick={() => setShowErrorDetails(!showErrorDetails)}
-              className="flex-1 sm:flex-initial opacity-60"
+              className="flex-1 sm:flex-initial"
             >
               {showErrorDetails ? 'Hide details' : 'Show details'}
             </Button>
@@ -356,7 +356,7 @@ export function MemoryWidget() {
           )}
         >
           {/* Quantum-aware reflection prompt */}
-          <div className="mb-12 opacity-60">
+          <div className="mb-12">
             {(() => {
               try {
                 return getMemoryReflectionPrompt(quantumState.energy, quantumState.clarity, quantumState.alignment)

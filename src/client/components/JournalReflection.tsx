@@ -147,8 +147,8 @@ export function JournalReflection() {
     <Block label={label} blockView onLabelClick={cycleView}>
       {view === 'prompt' && (
         <div className="inline-block">
-          <div className="mb-12 opacity-90">{prompts.primary}</div>
-          <div className="flex flex-col gap-8 opacity-60 text-[14px]">
+          <div className="mb-12 ">{prompts.primary}</div>
+          <div className="flex flex-col gap-8  ">
             <div>• {prompts.secondary}</div>
             <div>• {prompts.tertiary}</div>
           </div>
@@ -158,11 +158,11 @@ export function JournalReflection() {
       {view === 'write' && (
         <div className="inline-block w-full">
           {justSaved ? (
-            <div className="opacity-90">Saved ✓</div>
+            <div className="">Saved ✓</div>
           ) : (
             <>
               <textarea
-                className="w-full min-h-[120px] bg-transparent border border-current opacity-60 p-8 mb-12 resize-none focus:opacity-90 focus:outline-none"
+                className="w-full min-h-[120px] bg-transparent border border-current  p-8 mb-12 resize-none focus: focus:outline-none"
                 placeholder="Write what's on your mind..."
                 value={writingText}
                 onChange={(e) => setWritingText(e.target.value)}
@@ -179,7 +179,7 @@ export function JournalReflection() {
       {view === 'recent' && (
         <div className="inline-block">
           {journalEntries.length === 0 ? (
-            <div className="opacity-60">No journal entries yet. Start reflecting.</div>
+            <div className="">No journal entries yet. Start reflecting.</div>
           ) : (
             <div className="flex flex-col gap-8">
               {journalEntries.slice(0, 3).map((entry: any) => {
@@ -188,8 +188,8 @@ export function JournalReflection() {
                 const timeAgo = getTimeAgo(date)
                 return (
                   <div key={entry.id} className="flex flex-col gap-2">
-                    <div className="opacity-60 text-[12px]">{timeAgo}</div>
-                    <div className="opacity-80 text-[14px]">
+                    <div className=" ">{timeAgo}</div>
+                    <div className=" ">
                       {preview}{preview.length >= 60 ? '...' : ''}
                     </div>
                   </div>
@@ -203,15 +203,15 @@ export function JournalReflection() {
       {view === 'themes' && (
         <div className="inline-block">
           {themes.length === 0 ? (
-            <div className="opacity-60">Write more to see emerging themes.</div>
+            <div className="">Write more to see emerging themes.</div>
           ) : (
             <>
-              <div className="mb-8 opacity-70">Recurring in your writing:</div>
+              <div className="mb-8 ">Recurring in your writing:</div>
               <div className="flex flex-col gap-6">
                 {themes.map(({ theme, count }) => (
                   <div key={theme} className="flex items-center justify-between gap-12">
                     <span className="capitalize">{theme}</span>
-                    <span className="opacity-60">{count}x</span>
+                    <span className="">{count}x</span>
                   </div>
                 ))}
               </div>

@@ -28,17 +28,17 @@ export function BadgeUnlockFeed() {
         {stats.recentUnlocks.slice(0, 5).map((unlock, index) => (
           <div
             key={index}
-            className="flex justify-between items-center opacity-90 hover:opacity-100 transition-opacity"
+            className="flex justify-between items-center hover:opacity-100 transition-opacity"
           >
             <span className="flex items-center gap-2">
               <span className="text-lg">{unlock.badge}</span>
               <span className="opacity-80">{unlock.userName} unlocked</span>
             </span>
-            <span className="text-xs opacity-60 font-mono">{formatTimeAgo(unlock.timeAgo)}</span>
+            <span className="text-xs font-mono">{formatTimeAgo(unlock.timeAgo)}</span>
           </div>
         ))}
 
-        <div className="pt-4 mt-4 border-t border-acc/20 text-sm">
+        <div className="pt-4 mt-4 border-t border-acc/20">
           <div className="opacity-60">{stats.totalToday} badges unlocked today</div>
         </div>
       </div>

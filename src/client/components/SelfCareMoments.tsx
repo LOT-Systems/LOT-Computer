@@ -308,7 +308,7 @@ export function SelfCareMoments() {
       {view === 'practice' && (
         <div className="inline-block w-full">
           {isTimerRunning && (
-            <div className="mb-12 opacity-90">
+            <div className="mb-12">
               {formatTime(timeRemaining)}
             </div>
           )}

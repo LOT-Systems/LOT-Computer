@@ -121,7 +121,7 @@ export function InterfaceEvolutionWidget() {
                       style={{ width: `${dim.value * 100}%` }}
                     />
                   </div>
-                  <span className="w-32 text-right text-[12px] opacity-60">
+                  <span className="w-32 text-right">
                     {Math.round(dim.value * 100)}%
                   </span>
                 </div>
@@ -135,7 +135,7 @@ export function InterfaceEvolutionWidget() {
         <div className="inline-block">
           {featureCategories.map(cat => (
             <div key={cat.category} className="mb-12 last:mb-0">
-              <div className="mb-4 text-[12px] opacity-60">{cat.category}</div>
+              <div className="mb-4">{cat.category}</div>
               <div className="flex flex-col gap-2">
                 {cat.features.map(feature => (
                   <div key={feature.name} className="flex items-center gap-8">
@@ -169,7 +169,7 @@ export function InterfaceEvolutionWidget() {
               <span>{Math.round(evolutionState.animationIntensity * 100)}%</span>
             </div>
 
-            <div className="mt-8 pt-8 border-t border-[rgb(var(--acc-color-default)/0.1)] text-[12px] opacity-60">
+            <div className="mt-8 pt-8 border-t border-[rgb(var(--acc-color-default)/0.1)]">
               <div className="mb-4">Current Effects:</div>
               <div className="flex flex-col gap-2">
                 <div>Opacity: {visualEffects.baseOpacity.toFixed(2)}</div>

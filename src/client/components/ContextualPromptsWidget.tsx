@@ -164,7 +164,7 @@ export const ContextualPromptsWidget = () => {
   return (
     <div>
       <Block label={getLabelVariations()} blockView>
-        <div className="mb-12 opacity-75">
+        <div className="mb-12">
           {topPrompt.message}
         </div>
         <div className="flex gap-8">
@@ -178,7 +178,7 @@ export const ContextualPromptsWidget = () => {
           </Button>
         </div>
         {activePrompts.length > 1 && (
-          <div className="mt-8 opacity-60">
+          <div className="mt-8">
             +{activePrompts.length - 1} more insight{activePrompts.length - 1 > 1 ? 's' : ''}
           </div>
         )}
