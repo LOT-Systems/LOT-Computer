@@ -8,7 +8,6 @@ dist/
 coverage/
 .vscode/
 .idea/
-node_modules/
 
 # Environment and secret files
 .env.local
@@ -16,6 +15,36 @@ node_modules/
 .backups/.env*
 .config-backups/.env*
 config/backups/.env*
+
+# Security: SSH keys and credentials
+*.key
+*.key.pub
+*.pgpass
+*.pem
+*.p12
+id_rsa*
+id_ed25519*
+
+# Configuration files with secrets (keep example versions)
+app.yaml
+spec.yaml
+digital-ocean-app-spec.yaml
+!.yaml.example
+!app.yaml.example
+!spec.yaml.example
+
+# Backup and working files
+package.json.backup
+package.json.working
+package.json.working-backup
+postcss.config.*.backup
+*.backup
+*.working
+*.working-backup
+
+# Compiled output (should not be in repo)
+server/
+*.js.map
 
 # Archive files
 *.tar.gz
@@ -27,3 +56,6 @@ lot-systems_master_*
 
 # Production backups (stored separately, not in git)
 backups/production-*
+
+# Suspicious files
+yarn 2.lock
