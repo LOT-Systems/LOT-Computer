@@ -5,47 +5,14 @@ services:
   - name: web
     # GitHub repository configuration
     git:
-      branch: claude/LOT_updates_November_2025-01XjLLhgKKL2Syne7Q1nqoGS
+      branch: claude/february-2025-updates-HZZTF
       repo_clone_url: https://github.com/vadikmarmeladov/lot-systems.git
 
-    # Build configuration
-    build_command: |
-      set -e
-      echo "🚀 Build started at $(date)"
-      echo "📦 Installing dependencies..."
-      yarn install --frozen-lockfile --production=false 2>&1 | tail -20
-      echo "✅ Dependencies installed at $(date)"
-      echo ""
-      echo "🎨 Building client CSS..."
-      NODE_ENV=production yarn client:css:build
-      echo "✅ Client CSS built at $(date)"
-      echo ""
-      echo "📦 Building client JS..."
-      NODE_ENV=production yarn client:js:build
-      echo "✅ Client JS built at $(date)"
-      echo ""
-      echo "🔨 Building server..."
-      NODE_ENV=production yarn server:build
-      echo "✅ Server built at $(date)"
-      echo ""
-      echo "🗄️ Running database migrations..."
-      yarn migrations:up
-      echo "✅ Migrations completed at $(date)"
-      echo ""
-      echo "📁 Verifying build output..."
-      echo "Contents of dist/:"
-      ls -la dist/ || echo "dist/ not found"
-      echo "Contents of dist/server/:"
-      ls -la dist/server/ || echo "dist/server/ not found"
-      echo "Contents of dist/server/server/:"
-      ls -la dist/server/server/ | head -10 || echo "dist/server/server/ not found"
-      echo "Contents of dist/client/js/:"
-      ls -la dist/client/js/ | head -10 || echo "dist/client/js/ not found"
-      echo "✅ Build completed at $(date)"
+    # Use Dockerfile instead of buildpack to ensure dist/ is preserved
+    dockerfile_path: Dockerfile
 
-    # Runtime configuration
-    run_command: node dist/server/server/index.js
-    environment_slug: node-js
+    # Remove environment_slug to force Dockerfile usage
+    # environment_slug: node-js  # REMOVED - conflicts with Dockerfile
     instance_size_slug: basic-xxs
     instance_count: 1
     http_port: 8080
@@ -155,7 +122,17 @@ services:
       - key: TOGETHER_API_KEY
         scope: RUN_TIME
         type: SECRET
-        value: 91f01cf8fcba1d44dbf5e2b712210edfffecd6d7f6e5e50816cd50d1efa8414c
+        value: tgp_v1_T3CicyWdakDXJhaWefknD6lTKsPFvLukpS99YJM77A0
+
+      - key: GOOGLE_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: PLACEHOLDER_GOOGLE_API_KEY_OPTIONAL
+
+      - key: MISTRAL_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: PLACEHOLDER_MISTRAL_API_KEY_OPTIONAL
 
 # Alerts (optional - uncomment to enable)
 # alerts:

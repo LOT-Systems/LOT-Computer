@@ -73,7 +73,7 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         },
       }
     } catch (error: any) {
-      console.error('❌ OS Status error:', error)
+      console.error('OS Status error:', error)
       return reply.status(500).send({ error: 'Failed to retrieve OS status' })
     }
   })
@@ -124,7 +124,7 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         milestones: version.milestones,
       }
     } catch (error: any) {
-      console.error('❌ OS Version error:', error)
+      console.error('OS Version error:', error)
       return reply.status(500).send({ error: 'Failed to retrieve OS version' })
     }
   })
@@ -163,7 +163,7 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString(),
       }
     } catch (error: any) {
-      console.error('❌ OS Insights error:', error)
+      console.error('OS Insights error:', error)
       return reply.status(500).send({ error: 'Failed to generate insights' })
     }
   })
@@ -218,7 +218,7 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         },
       }
     } catch (error: any) {
-      console.error('❌ OS Performance error:', error)
+      console.error('OS Performance error:', error)
       return reply.status(500).send({ error: 'Failed to calculate performance' })
     }
   })
@@ -322,7 +322,7 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         recommendations: generateOptimizationSteps(issues),
       }
     } catch (error: any) {
-      console.error('❌ OS Diagnostics error:', error)
+      console.error('OS Diagnostics error:', error)
       return reply.status(500).send({ error: 'Failed to run diagnostics' })
     }
   })
@@ -336,9 +336,8 @@ export function registerOSRoutes(fastify: FastifyInstance) {
       const user = req.user
 
       // Get privacy settings if they exist
-      const metadata = await fastify.models.UserMetadata.findOne({
-        where: { userId: user.id },
-      })
+      // UserMetadata model not implemented yet
+      const metadata = null as any
 
       return {
         user: {
@@ -350,9 +349,9 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         settings: {
           privacy: metadata?.privacySettings || {},
           theme: {
-            current: user.theme || 'light',
-            baseColor: user.baseColor || '#ffffff',
-            accentColor: user.accentColor || '#000000',
+            current: (user.metadata as any)?.theme || 'light',
+            baseColor: (user.metadata as any)?.baseColor || '#ffffff',
+            accentColor: (user.metadata as any)?.accentColor || '#000000',
           },
           location: user.city && user.country ? {
             city: user.city,
@@ -362,11 +361,11 @@ export function registerOSRoutes(fastify: FastifyInstance) {
         features: {
           usership: user.tags.some(t => t.toLowerCase() === 'usership'),
           publicProfile: metadata?.privacySettings?.isProfilePublic || false,
-          customUrl: user.customUrl || null,
+          customUrl: (user.metadata as any)?.customUrl || null,
         },
       }
     } catch (error: any) {
-      console.error('❌ OS Config error:', error)
+      console.error('OS Config error:', error)
       return reply.status(500).send({ error: 'Failed to retrieve config' })
     }
   })

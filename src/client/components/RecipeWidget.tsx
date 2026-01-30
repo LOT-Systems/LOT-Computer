@@ -70,7 +70,7 @@ export const RecipeWidget: React.FC = () => {
       { text: fullText },
       {
         onSuccess: () => {
-          console.log(`✅ Logged recipe: ${recipeKey}`)
+          console.log(`Logged recipe: ${recipeKey}`)
         },
         onError: (error) => {
           console.error('Failed to log recipe:', error)

@@ -30,7 +30,7 @@ export function generateContextualPrompts(
 
   for (const pattern of patterns) {
     // Weather-mood pattern triggers
-    if (pattern.type === 'weather-mood' && currentContext.weather) {
+    if (pattern.type === 'weather-mood' && currentContext.weather && currentContext.weather.tempKelvin) {
       const tempC = currentContext.weather.tempKelvin - 273.15
       const avgTemp = pattern.metadata?.avgTemp
       const emotionalState = pattern.metadata?.emotionalState
@@ -54,7 +54,7 @@ export function generateContextualPrompts(
       const humidity = currentContext.weather.humidity
       const avgHumidity = pattern.metadata?.avgHumidity
 
-      if (avgHumidity && Math.abs(humidity - avgHumidity) <= 10) {
+      if (avgHumidity && humidity !== null && Math.abs(humidity - avgHumidity) <= 10) {
         prompts.push({
           type: 'insight',
           title: 'Humidity awareness',
@@ -289,7 +289,7 @@ export function generatePatternAwareQuestion(
   // Find most relevant pattern for current context
   for (const pattern of patterns) {
     // Weather-mood pattern
-    if (pattern.type === 'weather-mood' && currentContext.weather) {
+    if (pattern.type === 'weather-mood' && currentContext.weather && currentContext.weather.tempKelvin) {
       const tempC = currentContext.weather.tempKelvin - 273.15
       const avgTemp = pattern.metadata?.avgTemp
       const emotionalState = pattern.metadata?.emotionalState

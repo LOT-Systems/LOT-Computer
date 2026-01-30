@@ -75,4 +75,4 @@ function walk(dir) {
 }
 
 walk('./dist/server');
-console.log('✅ ESM imports fixed');
+console.log('ESM imports fixed');

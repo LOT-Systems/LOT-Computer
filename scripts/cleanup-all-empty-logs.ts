@@ -43,10 +43,10 @@ async function cleanupAllEmptyLogs(confirm: boolean) {
     `)
 
     const totalEmpty = parseInt(countResult.rows[0].count, 10)
-    console.log(`📊 Found ${totalEmpty} empty log entries from past 3 days`)
+    console.log(`Found ${totalEmpty} empty log entries from past 3 days`)
 
     if (totalEmpty === 0) {
-      console.log('✨ No empty logs to clean up!')
+      console.log('No empty logs to clean up!')
       return
     }
 
@@ -75,14 +75,14 @@ async function cleanupAllEmptyLogs(confirm: boolean) {
     })))
 
     if (!confirm) {
-      console.log(`\n⚠️  DRY RUN MODE - Nothing deleted`)
+      console.log(`\n DRY RUN MODE - Nothing deleted`)
       console.log(`\n💡 To actually delete these ${totalEmpty} empty logs, run:`)
       console.log(`   npx tsx scripts/cleanup-all-empty-logs.ts --confirm`)
       return
     }
 
     // Actually delete
-    console.log(`\n⚠️  DELETING ${totalEmpty} empty logs from past 3 days...`)
+    console.log(`\n DELETING ${totalEmpty} empty logs from past 3 days...`)
     const deleteResult = await client.query(`
       DELETE FROM logs
       WHERE event = 'note'
@@ -91,11 +91,11 @@ async function cleanupAllEmptyLogs(confirm: boolean) {
       RETURNING id
     `)
 
-    console.log(`\n✅ Deleted ${deleteResult.rows.length} empty log entries`)
+    console.log(`\nDeleted ${deleteResult.rows.length} empty log entries`)
     console.log('\n💡 Next time you load the Log page, the API will create one fresh empty log for input.')
 
   } catch (error: any) {
-    console.error('❌ Error:', error.message)
+    console.error('Error:', error.message)
     throw error
   } finally {
     await client.end()

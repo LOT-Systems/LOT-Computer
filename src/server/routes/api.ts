@@ -139,6 +139,42 @@ export default async (fastify: FastifyInstance) => {
       })
     }
 
+    // Check Memory Engine refactoring modules
+    const fs = await import('fs')
+    const path = await import('path')
+
+    let memoryModuleStatus = 'Phase 1 Complete'
+    let moduleDetails = ''
+
+    try {
+      const memoryDir = path.join(process.cwd(), 'dist/server/server/utils/memory')
+      const modules = [
+        'constants.js',
+        'types.js',
+        'trait-extraction.js',
+        'cohort-determination.js',
+        'pacing.js',
+        'recipe-suggestions.js',
+        'story-generator.js',
+        'question-generator.js',
+        'index.js'
+      ]
+
+      const moduleChecks = modules.map(mod => {
+        const exists = fs.existsSync(path.join(memoryDir, mod))
+        return `${exists ? 'Yes' : 'No'} ${mod}`
+      })
+
+      moduleDetails = moduleChecks.join('<br>')
+
+      // Check backward compatibility
+      const legacyMemory = fs.existsSync(path.join(process.cwd(), 'dist/server/server/utils/memory.js'))
+      moduleDetails += `<br><br><strong>Backward Compatibility:</strong><br>${legacyMemory ? 'Yes' : 'No'} memory.js (original)`
+    } catch (error: any) {
+      memoryModuleStatus = 'Check Failed'
+      moduleDetails = error.message
+    }
+
     return reply.type('text/html').send(`
       <!DOCTYPE html>
       <html>
@@ -148,7 +184,7 @@ export default async (fastify: FastifyInstance) => {
           body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", monospace;
             padding: 40px;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: #f5f5f5;
           }
@@ -157,12 +193,16 @@ export default async (fastify: FastifyInstance) => {
             border: 2px solid #28a745;
             padding: 30px;
             border-radius: 8px;
-            text-align: center;
           }
           h1 {
             color: #28a745;
             margin: 0 0 20px 0;
             font-size: 32px;
+          }
+          h2 {
+            color: #155724;
+            margin: 20px 0 10px 0;
+            font-size: 20px;
           }
           .info {
             background: white;
@@ -172,6 +212,18 @@ export default async (fastify: FastifyInstance) => {
             text-align: left;
             font-family: monospace;
             font-size: 14px;
+            line-height: 1.8;
+          }
+          .module-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            text-align: left;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            border: 1px solid #dee2e6;
           }
           .links {
             margin-top: 30px;
@@ -191,23 +243,59 @@ export default async (fastify: FastifyInstance) => {
             border-radius: 3px;
             color: #e83e8c;
           }
+          .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+          }
+          .badge-success {
+            background: #28a745;
+            color: white;
+          }
         </style>
       </head>
       <body>
         <div class="success">
-          <h1>✅ API Routes Working!</h1>
+          <h1>February 2025 Deployment Live!</h1>
 
           <div class="info">
             <strong>User:</strong> ${req.user.email}<br>
             <strong>Tags:</strong> ${req.user.tags.join(', ')}<br>
             <strong>Timestamp:</strong> ${new Date().toISOString()}<br>
-            <strong>Route:</strong> /api/ping
+            <strong>Route:</strong> /api/ping<br>
+            <strong>Branch:</strong> claude/february-2025-updates-HZZTF
           </div>
 
-          <p>This endpoint is accessible! The API routes are working correctly.</p>
+          <h2>🧠 Memory Engine Refactoring</h2>
+          <div class="module-info">
+            <strong>Status:</strong> ${memoryModuleStatus}<br>
+            <strong>Architecture:</strong> Modular (9 focused modules)<br><br>
+            ${moduleDetails}
+          </div>
+
+          <h2>🎮 RPG Quantum Badges System</h2>
+          <div class="module-info">
+            <strong>Water Badges (Oceanic Mayan):</strong> ○∿ ≋○≋ ≈○≈<br>
+            • Organic matter growth & healing<br>
+            • Memory Engine integration<br><br>
+            <strong>Architecture Badges:</strong> Coming soon<br>
+            • Intent manifestation & rendering<br>
+            • Quantum Intent Engine integration
+          </div>
+
+          <h2>February Features</h2>
+          <div class="module-info">
+            Monthly Email System<br>
+            Evolution Widget<br>
+            Cohort-Connect Widget<br>
+            Memory Engine Modularization (Phase 1)
+          </div>
 
           <div class="links">
-            <p><strong>Try accessing admin-api routes by typing these URLs directly:</strong></p>
+            <p><strong>Diagnostic Endpoints:</strong></p>
             <p>
               <code>${req.protocol}://${req.hostname}/admin-api/ping</code><br>
               <code>${req.protocol}://${req.hostname}/admin-api/status</code><br>
@@ -217,6 +305,7 @@ export default async (fastify: FastifyInstance) => {
 
           <div style="margin-top: 30px;">
             <a href="/">← Back to Home</a>
+            <a href="/admin-api/memory-debug">Memory Diagnostics</a>
           </div>
         </div>
       </body>
@@ -722,18 +811,17 @@ export default async (fastify: FastifyInstance) => {
         likes: 0,
         isLiked: false,
       })
-      process.nextTick(async () => {
-        const context = await getLogContext(req.user)
-        await fastify.models.Log.create({
-          userId: req.user.id,
-          event: 'chat_message',
-          text: '',
-          metadata: {
-            chatMessageId: chatMessage.id,
-            message: chatMessage.message,
-          },
-          context,
-        })
+      // Log chat message synchronously with context for pattern analysis
+      const context = await getLogContext(req.user)
+      await fastify.models.Log.create({
+        userId: req.user.id,
+        event: 'chat_message',
+        text: '',
+        metadata: {
+          chatMessageId: chatMessage.id,
+          message: chatMessage.message,
+        },
+        context,
       })
       return reply.ok()
     }
@@ -1062,17 +1150,17 @@ export default async (fastify: FastifyInstance) => {
         result.style.display = 'block';
         if (data.deleted === 0) {
           result.className = 'info';
-          result.innerHTML = '✨ ' + data.message;
+          result.innerHTML = '' + data.message;
         } else {
           result.className = 'success';
-          result.innerHTML = '✅ ' + data.message + '<br><br>Refresh your Logs page to see the results.';
+          result.innerHTML = '' + data.message + '<br><br>Refresh your Logs page to see the results.';
         }
 
         btn.textContent = 'Cleanup Complete';
       } catch (error) {
         result.style.display = 'block';
         result.className = 'error';
-        result.innerHTML = '❌ Error: ' + error.message;
+        result.innerHTML = 'Error: ' + error.message;
         btn.disabled = false;
         btn.textContent = 'Try Again';
       }
@@ -1128,7 +1216,7 @@ export default async (fastify: FastifyInstance) => {
             </style>
           </head>
           <body>
-            <div class="success">✨</div>
+            <div class="success">OK</div>
             <h1>Database is Clean!</h1>
             <p>No empty logs found from the past 7 days.</p>
             <p><a href="/logs">← Back to Logs</a></p>
@@ -1159,7 +1247,7 @@ export default async (fastify: FastifyInstance) => {
           </style>
         </head>
         <body>
-          <div class="success">✅</div>
+          <div class="success">OK</div>
           <h1>Cleanup Complete!</h1>
           <div class="count">${idsToDelete.length}</div>
           <p>empty logs deleted from the past 7 days</p>
@@ -1183,7 +1271,7 @@ export default async (fastify: FastifyInstance) => {
           </style>
         </head>
         <body>
-          <div class="error">❌</div>
+          <div class="error">Error</div>
           <h1>Cleanup Failed</h1>
           <p>${error.message}</p>
         </body>
@@ -1203,16 +1291,14 @@ export default async (fastify: FastifyInstance) => {
       const text = (req.body.text || '').trim().slice(0, MAX_LOG_TEXT_LENGTH)
       if (!text) return reply.throw.badParams('Log text is required')
 
+      // Get context before creating log to ensure consistency
+      const context = await getLogContext(req.user)
+
       const log = await fastify.models.Log.create({
         userId: req.user.id,
         text,
         event: 'note',
-      })
-
-      // Add context asynchronously
-      process.nextTick(async () => {
-        const context = await getLogContext(req.user)
-        await log.set({ context }).save()
+        context,
       })
 
       return log
@@ -1342,10 +1428,14 @@ export default async (fastify: FastifyInstance) => {
         ? `Feeling ${emotionalState} ${timeOfDay}: ${note}`
         : `Feeling ${emotionalState} ${timeOfDay}`
 
+      // Get context BEFORE creating the log to ensure weather data is available for pattern analysis
+      const context = await getLogContext(req.user)
+
       const checkIn = await fastify.models.Log.create({
         userId: req.user.id,
         text: logText,
         event: 'emotional_checkin',
+        context, // Include context immediately
         metadata: {
           checkInType,
           emotionalState,
@@ -1354,12 +1444,6 @@ export default async (fastify: FastifyInstance) => {
           insights,
           timestamp: new Date().toISOString(),
         },
-      })
-
-      // Add context asynchronously
-      process.nextTick(async () => {
-        const context = await getLogContext(req.user)
-        await checkIn.set({ context }).save()
       })
 
       return {
@@ -1529,7 +1613,7 @@ export default async (fastify: FastifyInstance) => {
       // Extract memory Q&A
       const memoryQA = answers.map(answer => ({
         question: answer.metadata?.questionText || '',
-        answer: answer.text || '',
+        answer: answer.answer || '',
         timestamp: answer.createdAt,
         options: answer.metadata?.options || [],
       }))
@@ -1581,7 +1665,7 @@ export default async (fastify: FastifyInstance) => {
       reply.header('Content-Disposition', `attachment; filename="lot-training-data-${dayjs().format('YYYY-MM-DD')}.json"`)
       return trainingData
     } catch (error: any) {
-      console.error('❌ Training data export failed:', error)
+      console.error('Training data export failed:', error)
       return reply.status(500).send({
         error: 'Export failed',
         message: error.message
@@ -1599,11 +1683,11 @@ export default async (fastify: FastifyInstance) => {
       qn?: string // quantum needs support
     } }>, reply) => {
       try {
-        console.log(`🎯 Memory endpoint called for user ${req.user?.id || 'UNKNOWN'}`)
+        console.log(`Memory endpoint called for user ${req.user?.id || 'UNKNOWN'}`)
 
         // Validate required parameters first
         if (!req.query.d) {
-          console.error('❌ Memory request missing date parameter')
+          console.error('Memory request missing date parameter')
           return reply.status(400).send({
             error: 'Missing date parameter',
             hint: 'Date parameter (d) is required'
@@ -1637,7 +1721,7 @@ export default async (fastify: FastifyInstance) => {
         try {
           decodedDate = atob(req.query.d)
         } catch (e) {
-          console.error('❌ Invalid date encoding:', {
+          console.error('Invalid date encoding:', {
             encoded: req.query.d,
             error: (e as Error).message
           })
@@ -1649,7 +1733,7 @@ export default async (fastify: FastifyInstance) => {
 
         const localDate = dayjs(decodedDate, DATE_FORMAT)
 
-        console.log(`🔍 Memory request:`, {
+        console.log(`Memory request:`, {
           userId: req.user.id,
           encodedDate: req.query.d,
           decodedDate,
@@ -1658,7 +1742,7 @@ export default async (fastify: FastifyInstance) => {
         })
 
         if (!localDate.isValid()) {
-          console.error(`❌ Invalid date format:`, { decodedDate, expected: DATE_FORMAT })
+          console.error(`Invalid date format:`, { decodedDate, expected: DATE_FORMAT })
           return reply.throw.badParams()
         }
 
@@ -1680,7 +1764,7 @@ export default async (fastify: FastifyInstance) => {
           promptQuotaToday = pacingResult.promptQuotaToday
           promptsShownToday = pacingResult.promptsShownToday
         } catch (pacingError: any) {
-          console.error('❌ Intelligent pacing calculation failed:', {
+          console.error('Intelligent pacing calculation failed:', {
             error: pacingError.message,
             stack: pacingError.stack,
             userId: req.user.id
@@ -1692,7 +1776,7 @@ export default async (fastify: FastifyInstance) => {
           promptsShownToday = 0
         }
 
-        console.log(`📊 Intelligent Pacing Analysis:`, {
+        console.log(`Intelligent Pacing Analysis:`, {
           userId: req.user.id,
           shouldShowPrompt,
           isWeekend,
@@ -1708,7 +1792,7 @@ export default async (fastify: FastifyInstance) => {
             promptQuotaToday,
             returning: 'null'
           })
-          console.log(`↩️  Returning null from Memory endpoint (quota/timing)`)
+          console.log(` Returning null from Memory endpoint (quota/timing)`)
           return null
         }
 
@@ -1722,7 +1806,12 @@ export default async (fastify: FastifyInstance) => {
         userEmail: req.user.email,
         userTags: req.user.tags,
         hasUsershipTag,
-        isRecentlyAsked,
+        intelligentPacing: {
+          shouldShowPrompt,
+          isWeekend,
+          promptQuotaToday,
+          promptsShownToday
+        }
       })
 
       // ============================================================================
@@ -1741,7 +1830,7 @@ export default async (fastify: FastifyInstance) => {
           order: [['createdAt', 'DESC']]
         })
       } catch (metadataError: any) {
-        console.warn('⚠️ Weekly summary query failed, skipping:', metadataError.message)
+        console.warn('Weekly summary query failed, skipping:', metadataError.message)
         // Continue without weekly summary check
       }
 
@@ -1752,16 +1841,16 @@ export default async (fastify: FastifyInstance) => {
                                      typeof lastWeeklySummary === 'object' &&
                                      lastWeeklySummary.createdAt instanceof Date
 
-      const showWeeklySummary = validLastWeeklySummary && shouldShowWeeklySummary(
+      const showWeeklySummary = validLastWeeklySummary && lastWeeklySummary && shouldShowWeeklySummary(
         req.user,
         lastWeeklySummary.createdAt
       )
 
       if (showWeeklySummary) {
-        console.log(`📊 Generating weekly summary for user ${req.user.id}`)
+        console.log(`Generating weekly summary for user ${req.user.id}`)
         try {
           // Load 200 logs to cover the week + historical context
-          let logs = []
+          let logs: any[] = []
           try {
             logs = await fastify.models.Log.findAll({
               where: {
@@ -1771,13 +1860,13 @@ export default async (fastify: FastifyInstance) => {
               limit: 200,
             })
           } catch (logsError: any) {
-            console.warn('⚠️ Failed to load logs for weekly summary:', logsError.message)
+            console.warn('Failed to load logs for weekly summary:', logsError.message)
             // Continue with empty logs array
           }
 
-          const weeklySummary = await generateWeeklySummary(req.user, logs)
+          const weeklySummary = await generateWeeklySummary(req.user, logs as any)
 
-          console.log(`↩️  Returning weekly summary from Memory endpoint`)
+          console.log(` Returning weekly summary from Memory endpoint`)
           // Return as a special memory "question" with reflection prompt
           return {
             id: 'weekly_summary',
@@ -1794,7 +1883,7 @@ export default async (fastify: FastifyInstance) => {
             }
           }
         } catch (error: any) {
-          console.error('❌ Weekly summary generation failed:', {
+          console.error('Weekly summary generation failed:', {
             error: error.message,
             userId: req.user.id,
           })
@@ -1804,7 +1893,7 @@ export default async (fastify: FastifyInstance) => {
 
       if (hasUsershipTag) {
         // Usership users: Generate AI-based context-aware question using Claude
-        console.log(`🔍 Attempting to generate AI question for Usership user ${req.user.id}`)
+        console.log(`Attempting to generate AI question for Usership user ${req.user.id}`)
         try {
           // Load recent logs for context - balanced amount for good context without overwhelming AI
           const logs = await fastify.models.Log.findAll({
@@ -1835,9 +1924,10 @@ export default async (fastify: FastifyInstance) => {
 
           // Get recently shown questions from client (even if unanswered)
           let recentlyShownQuestions: string[] = []
-          if (req.query.recentShown && typeof req.query.recentShown === 'string') {
+          const queryRecentShown = (req.query as any).recentShown
+          if (queryRecentShown && typeof queryRecentShown === 'string') {
             try {
-              recentlyShownQuestions = JSON.parse(req.query.recentShown) as string[]
+              recentlyShownQuestions = JSON.parse(queryRecentShown) as string[]
               if (recentlyShownQuestions.length > 0) {
                 console.log(`📋 Avoiding ${recentlyShownQuestions.length} recently shown questions`)
               }
@@ -1852,7 +1942,7 @@ export default async (fastify: FastifyInstance) => {
           // Generate question - AI already has instructions to avoid duplicates from buildPrompt
           const question = await completeAndExtractQuestion(prompt, req.user)
 
-          console.log(`✅ Generated question for user ${req.user.id}:`, {
+          console.log(`Generated question for user ${req.user.id}:`, {
             questionId: question.id,
             questionPreview: question.question.substring(0, 60) + '...',
             logsUsed: logs.length
@@ -1860,7 +1950,7 @@ export default async (fastify: FastifyInstance) => {
 
           return question
         } catch (error: any) {
-          console.error('❌ Memory question generation failed, falling back to default questions:', {
+          console.error('Memory question generation failed, falling back to default questions:', {
             error: error.message,
             stack: error.stack,
             userId: req.user.id,
@@ -1875,7 +1965,7 @@ export default async (fastify: FastifyInstance) => {
             },
             note: 'At least ONE valid API key is required. Visit /api/public/test-ai-engines to diagnose.',
           })
-          console.log('↩️  Falling through to default questions after AI failure')
+          console.log(' Falling through to default questions after AI failure')
           // Explicitly continue to default questions block below - do NOT return here
         }
       }
@@ -1902,7 +1992,7 @@ export default async (fastify: FastifyInstance) => {
               attributes: ['id', 'metadata'],
             }).then((xs) => Array.from(new Set(xs.map((x) => x.metadata?.questionId).filter(Boolean))))
           } catch (queryError: any) {
-            console.warn('⚠️ Previous questions query failed, using all default questions:', queryError.message)
+            console.warn('Previous questions query failed, using all default questions:', queryError.message)
             // Continue with empty array - will use all default questions
           }
 
@@ -1923,7 +2013,7 @@ export default async (fastify: FastifyInstance) => {
 
           // Ensure we have questions to choose from
           if (!untouchedQuestions || untouchedQuestions.length === 0) {
-            console.log(`⚠️ No untouched questions available, using first default question`)
+            console.log(`No untouched questions available, using first default question`)
             untouchedQuestions = [defaultQuestions[0]]
           }
 
@@ -1937,7 +2027,7 @@ export default async (fastify: FastifyInstance) => {
 
           // Final safety check
           if (!question) {
-            console.error(`❌ No question selected, returning first default`)
+            console.error(`No question selected, returning first default`)
             return defaultQuestions[0]
           }
 
@@ -1949,12 +2039,12 @@ export default async (fastify: FastifyInstance) => {
             reason: 'Non-Usership user or AI generation failed'
           })
 
-          console.log(`↩️  Returning default question from Memory endpoint`)
+          console.log(` Returning default question from Memory endpoint`)
           return question
         } catch (defaultQuestionError: any) {
-          console.error('❌ Default question selection failed:', defaultQuestionError.message)
+          console.error('Default question selection failed:', defaultQuestionError.message)
           console.error('Stack:', defaultQuestionError.stack)
-          console.log(`↩️  Returning absolute fallback hardcoded question from Memory endpoint`)
+          console.log(` Returning absolute fallback hardcoded question from Memory endpoint`)
           // ABSOLUTE FALLBACK - return first hardcoded question directly
           return {
             id: 'n6M42WKP',
@@ -1964,7 +2054,7 @@ export default async (fastify: FastifyInstance) => {
         }
       }
       } catch (error: any) {
-        console.error('❌ /api/memory endpoint error:', {
+        console.error('/api/memory endpoint error:', {
           message: error.message,
           stack: error.stack,
           userId: req.user?.id,
@@ -1974,7 +2064,7 @@ export default async (fastify: FastifyInstance) => {
         })
 
         // Return fallback question instead of error to improve UX
-        console.log('↩️ Returning emergency fallback question due to error')
+        console.log('Returning emergency fallback question due to error')
         return {
           id: 'emergency_fallback',
           question: 'What matters most to you today?',
@@ -2045,21 +2135,20 @@ export default async (fastify: FastifyInstance) => {
         }
       })
 
-      process.nextTick(async () => {
-        const context = await getLogContext(req.user)
-        await fastify.models.Log.create({
-          userId: req.user.id,
-          event: isWeeklySummary ? 'weekly_summary_response' : 'answer',
-          text: '',
-          metadata: {
-            questionId,
-            answerId: answer.id,
-            question: questionText,
-            options: questionOptions,
-            answer: option,
-          },
-          context,
-        })
+      // Log answer synchronously with context for pattern analysis
+      const context = await getLogContext(req.user)
+      await fastify.models.Log.create({
+        userId: req.user.id,
+        event: isWeeklySummary ? 'weekly_summary_response' : 'answer',
+        text: '',
+        metadata: {
+          questionId,
+          answerId: answer.id,
+          question: questionText,
+          options: questionOptions,
+          answer: option,
+        },
+        context,
       })
 
       // ============================================================================
@@ -2258,13 +2347,34 @@ export default async (fastify: FastifyInstance) => {
       const story = await generateMemoryStory(req.user, logs)
       console.log(`Story generated successfully (${story?.length || 0} chars)`)
 
+      // Persist the generated story to user metadata
+      try {
+        const currentMetadata = req.user.metadata as any || {}
+        const storyVersion = (currentMetadata.memoryStoryVersion || 0) + 1
+
+        await req.user.set({
+          metadata: {
+            ...currentMetadata,
+            lastMemoryStory: story,
+            lastMemoryStoryDate: new Date().toISOString(),
+            memoryStoryVersion: storyVersion,
+            memoryStoryAnswerCount: logs.length
+          }
+        }).save()
+
+        console.log(`Memory Story v${storyVersion} saved to user metadata`)
+      } catch (saveError: any) {
+        console.error('Failed to save Memory Story to metadata:', saveError.message)
+        // Continue anyway - story generation succeeded
+      }
+
       return {
         story,
         hasUsership: true,
         answerCount: logs.length
       }
     } catch (error: any) {
-      console.error('❌ Error generating memory story:', {
+      console.error('Error generating memory story:', {
         error: error.message,
         stack: error.stack,
         userId: req.user?.id
@@ -2367,7 +2477,7 @@ export default async (fastify: FastifyInstance) => {
         logsAnalyzedForProfile: logs.length  // Number of recent logs used for analysis
       }
     } catch (error: any) {
-      console.error('❌ Error generating user profile:', {
+      console.error('Error generating user profile:', {
         error: error.message,
         userId: req.user?.id,
       })
@@ -2414,7 +2524,7 @@ export default async (fastify: FastifyInstance) => {
 
         const recipe = await generateRecipeSuggestion(req.user, mealTime, logs)
 
-        console.log(`✅ Recipe suggestion generated: "${recipe}"`)
+        console.log(`Recipe suggestion generated: "${recipe}"`)
 
         return {
           recipe,
@@ -2422,7 +2532,7 @@ export default async (fastify: FastifyInstance) => {
           hasUsership: hasUsershipTag
         }
       } catch (error: any) {
-        console.error('❌ Error generating recipe suggestion:', {
+        console.error('Error generating recipe suggestion:', {
           error: error.message,
           stack: error.stack,
           userId: req.user?.id,
@@ -2482,10 +2592,10 @@ export default async (fastify: FastifyInstance) => {
         let balancedPlanner = false
         if (plannerLogs.length >= 10) {
           // Check if all dimensions are used relatively evenly
-          const intentCount = plannerLogs.filter(l => l.text.includes('Intent:')).length
-          const todayCount = plannerLogs.filter(l => l.text.includes('Today:')).length
-          const howCount = plannerLogs.filter(l => l.text.includes('How:')).length
-          const feelingCount = plannerLogs.filter(l => l.text.includes('Feeling:')).length
+          const intentCount = plannerLogs.filter(l => l.text?.includes('Intent:')).length
+          const todayCount = plannerLogs.filter(l => l.text?.includes('Today:')).length
+          const howCount = plannerLogs.filter(l => l.text?.includes('How:')).length
+          const feelingCount = plannerLogs.filter(l => l.text?.includes('Feeling:')).length
           const avg = (intentCount + todayCount + howCount + feelingCount) / 4
           const variance = Math.abs(intentCount - avg) + Math.abs(todayCount - avg) +
                           Math.abs(howCount - avg) + Math.abs(feelingCount - avg)
@@ -2543,7 +2653,7 @@ export default async (fastify: FastifyInstance) => {
           diverseChoices,
         }
       } catch (error: any) {
-        console.error('❌ User stats calculation error:', error)
+        console.error('User stats calculation error:', error)
         return reply.status(500).send({ error: 'Failed to calculate stats' })
       }
     }
@@ -2663,7 +2773,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         }
       }).save()
 
-      console.log(`✅ Generated world element for user ${req.user.id}: ${elementType}`)
+      console.log(`Generated world element for user ${req.user.id}: ${elementType}`)
 
       return {
         element: newElement,
@@ -2672,7 +2782,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error generating world element:', {
+      console.error('Error generating world element:', {
         error: error.message,
         stack: error.stack,
         userId: req.user?.id
@@ -2738,7 +2848,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
 
       return { tracks }
     } catch (error: any) {
-      console.error('❌ Error reading radio tracks:', error)
+      console.error('Error reading radio tracks:', error)
       return { tracks: [], error: error.message }
     }
   })
@@ -2746,7 +2856,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get user's pattern insights
   fastify.get('/patterns', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       // Get last 100 logs for pattern analysis
       const logs = await Log.findAll({
@@ -2764,7 +2874,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
 
       const insights = await analyzeUserPatterns(req.user, logs)
 
-      console.log(`📊 Generated ${insights.length} pattern insights for user ${req.user.id}`)
+      console.log(`Generated ${insights.length} pattern insights for user ${req.user.id}`)
 
       return {
         insights,
@@ -2773,7 +2883,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error analyzing patterns:', {
+      console.error('Error analyzing patterns:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -2787,8 +2897,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Find cohort matches
   fastify.get('/cohorts', async (req, reply) => {
     try {
-      const User = await import('#server/models/user').then(m => m.default)
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { User } = await import('#server/models/user')
+      const { Log } = await import('#server/models/log')
 
       // Get current user's patterns
       const userLogs = await Log.findAll({
@@ -2837,7 +2947,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
           limit: 100
         })
 
-        const user = allUsers.find(u => u.id === userId)
+        const user = allUsers.find((u: any) => u.id === userId)
         if (!user || logs.length < 5) {
           return []
         }
@@ -2863,7 +2973,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error finding cohorts:', {
+      console.error('Error finding cohorts:', {
         error: error.message,
         stack: error.stack,
         userId: req.user?.id
@@ -2878,7 +2988,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get contextual prompts based on patterns and current context
   fastify.get('/contextual-prompts', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       // Get user's patterns
       const logs = await Log.findAll({
@@ -2896,10 +3006,25 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
 
       const patterns = await analyzeUserPatterns(req.user, logs)
 
+      console.log(`Pattern Analysis for user ${req.user.id}:`, {
+        totalLogs: logs.length,
+        patternsFound: patterns.length,
+        patternTypes: patterns.map(p => p.type),
+        patternTitles: patterns.map(p => p.title),
+        hasWeatherContext: logs.filter(l => l.context?.temperature).length,
+        hasEmotionalState: logs.filter(l => l.metadata?.emotionalState).length
+      })
+
       if (patterns.length === 0) {
+        console.log(`No patterns detected for user ${req.user.id}`, {
+          reason: 'Need more logs with weather context and emotional states',
+          logsWithWeather: logs.filter(l => l.context?.temperature).length,
+          logsWithEmotions: logs.filter(l => l.metadata?.emotionalState).length,
+          checkIns: logs.filter(l => l.event === 'emotional_checkin').length
+        })
         return {
           prompts: [],
-          message: 'No patterns detected yet.'
+          message: 'No patterns detected yet. Keep building your practice!'
         }
       }
 
@@ -2916,9 +3041,17 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       })
 
       // Get current weather
-      let currentWeather = null
+      let currentWeather: any = null
       if (req.user.city && req.user.country) {
-        currentWeather = await weather.getWeather(req.user.city, req.user.country)
+        try {
+          const coordinates = await weather.getCoordinates(req.user.city, req.user.country)
+          if (coordinates) {
+            const weatherData = await weather.getWeather(coordinates.lat, coordinates.lon)
+            currentWeather = { ...weatherData, createdAt: new Date() }
+          }
+        } catch (error) {
+          console.warn('Failed to fetch weather for contextual prompts:', error)
+        }
       }
 
       const prompts = generateContextualPrompts(patterns, {
@@ -2928,7 +3061,15 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         recentCheckIns
       })
 
-      console.log(`💡 Generated ${prompts.length} contextual prompts for user ${req.user.id}`)
+      console.log(`💡 Generated ${prompts.length} contextual prompts for user ${req.user.id}`, {
+        patternsUsed: patterns.length,
+        hasCurrentWeather: !!currentWeather,
+        currentHour: hour,
+        recentCheckInsCount: recentCheckIns.length,
+        promptTypes: prompts.map(p => p.type),
+        promptTitles: prompts.map(p => p.title),
+        promptPriorities: prompts.map(p => p.priority)
+      })
 
       return {
         prompts,
@@ -2936,7 +3077,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error generating contextual prompts:', {
+      console.error('Error generating contextual prompts:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -2950,7 +3091,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get pattern evolution over time
   fastify.get('/pattern-evolution', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       // Get all user logs (up to 500 for historical analysis)
       const allLogs = await Log.findAll({
@@ -3016,7 +3157,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error analyzing pattern evolution:', {
+      console.error('Error analyzing pattern evolution:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -3030,7 +3171,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get user's energy state
   fastify.get('/energy', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       const logs = await Log.findAll({
         where: { userId: req.user.id },
@@ -3048,7 +3189,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       const energyState = analyzeEnergyState(logs)
       const suggestions = generateEnergySuggestions(energyState)
 
-      console.log(`⚡ Energy state for user ${req.user.id}: ${energyState.status} (${energyState.currentLevel}/100)`)
+      console.log(`Energy state for user ${req.user.id}: ${energyState.status} (${energyState.currentLevel}/100)`)
 
       return {
         energyState,
@@ -3057,7 +3198,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error analyzing energy:', {
+      console.error('Error analyzing energy:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -3071,7 +3212,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get user's RPG narrative and achievements
   fastify.get('/narrative', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       const logs = await Log.findAll({
         where: { userId: req.user.id },
@@ -3096,7 +3237,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error generating narrative:', {
+      console.error('Error generating narrative:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -3111,7 +3252,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   fastify.get('/goal-progression', async (req, reply) => {
     try {
       const { generateGoalProgression } = await import('#server/utils/goal-understanding')
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       const logs = await Log.findAll({
         where: { userId: req.user.id },
@@ -3128,7 +3269,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
 
       const progression = generateGoalProgression(req.user, logs)
 
-      console.log(`🎯 Generated goal progression for user ${req.user.id}: ${progression.goals.length} goals, primary: ${progression.overallJourney.primaryGoal?.title || 'none'}`)
+      console.log(`Generated goal progression for user ${req.user.id}: ${progression.goals.length} goals, primary: ${progression.overallJourney.primaryGoal?.title || 'none'}`)
 
       return {
         progression,
@@ -3136,7 +3277,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error generating goal progression:', {
+      console.error('Error generating goal progression:', {
         error: error.message,
         stack: error.stack,
         userId: req.user?.id
@@ -3148,11 +3289,105 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     }
   })
 
+  // Sync Quantum Intent Engine signals from client to server
+  fastify.post<{
+    Body: {
+      signals: Array<{
+        timestamp: number
+        source: 'mood' | 'memory' | 'planner' | 'intentions' | 'selfcare' | 'journal'
+        signal: string
+        metadata?: Record<string, any>
+      }>
+      userState?: {
+        energy: string
+        clarity: string
+        alignment: string
+        needsSupport: string
+        lastUpdated: number
+      }
+      recognizedPatterns?: Array<{
+        pattern: string
+        confidence: number
+        suggestedWidget: string
+        suggestedTiming: string
+        reason: string
+      }>
+    }
+  }>('/quantum-intent/sync', async (req, reply) => {
+    try {
+      const { signals, userState, recognizedPatterns } = req.body
+
+      if (!signals || !Array.isArray(signals) || signals.length === 0) {
+        return reply.status(400).send({ error: 'No signals provided' })
+      }
+
+      console.log(`Syncing ${signals.length} Quantum Intent signals for user ${req.user.id}`)
+
+      // Save each signal as a log entry for historical tracking
+      const savedSignals = []
+      for (const signal of signals) {
+        try {
+          const log = await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'quantum_intent_signal',
+            text: signal.signal,
+            metadata: {
+              source: signal.source,
+              signal: signal.signal,
+              signalMetadata: signal.metadata,
+              timestamp: signal.timestamp
+            },
+            context: await getLogContext(req.user)
+          })
+          savedSignals.push(log.id)
+        } catch (signalError: any) {
+          console.error('Failed to save individual signal:', signalError.message)
+          // Continue with other signals
+        }
+      }
+
+      // Save aggregated state to user metadata
+      if (userState || recognizedPatterns) {
+        try {
+          const currentMetadata = req.user.metadata as any || {}
+          await req.user.set({
+            metadata: {
+              ...currentMetadata,
+              quantumIntentState: userState,
+              quantumIntentPatterns: recognizedPatterns,
+              quantumIntentLastSync: new Date().toISOString(),
+              quantumIntentSignalCount: (currentMetadata.quantumIntentSignalCount || 0) + signals.length
+            }
+          }).save()
+          console.log(`Quantum Intent state saved to user metadata`)
+        } catch (metadataError: any) {
+          console.error('Failed to save Quantum Intent state to metadata:', metadataError.message)
+        }
+      }
+
+      return {
+        success: true,
+        savedSignals: savedSignals.length,
+        totalSignals: signals.length,
+        timestamp: new Date().toISOString()
+      }
+    } catch (error: any) {
+      console.error('Error syncing Quantum Intent signals:', {
+        error: error.message,
+        userId: req.user?.id
+      })
+      return reply.status(500).send({
+        success: false,
+        error: error.message
+      })
+    }
+  })
+
   // Get chat catalysts (prompts to connect with cohort)
   fastify.get('/chat-catalysts', async (req, reply) => {
     try {
-      const User = await import('#server/models/user').then(m => m.default)
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { User } = await import('#server/models/user')
+      const { Log } = await import('#server/models/log')
 
       // Get user's patterns and cohorts
       const userLogs = await Log.findAll({
@@ -3191,7 +3426,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
           order: [['createdAt', 'DESC']],
           limit: 100
         })
-        const user = allUsers.find(u => u.id === userId)
+        const user = allUsers.find((u: any) => u.id === userId)
         if (!user || logs.length < 5) return []
         const patterns = await analyzeUserPatterns(user, logs)
         patternCache.set(userId, patterns)
@@ -3206,12 +3441,16 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       )
 
       // Get current emotional state
-      const recentCheckIn = userLogs.find(l => l.event === 'emotional_checkin')
+      const recentCheckIn = userLogs.find((l: any) => l.event === 'emotional_checkin')
       const currentEmotionalState = recentCheckIn?.metadata?.emotionalState as string | undefined
 
       // Get social energy needs
       const energyState = analyzeEnergyState(userLogs)
-      const socialNeed = energyState.needsReplenishment.find(n => n.category === 'social')
+      const socialNeedRaw = energyState.needsReplenishment.find(n => n.category === 'social')
+      const socialNeed = socialNeedRaw ? {
+        urgency: socialNeedRaw.urgency,
+        daysSinceConnection: socialNeedRaw.daysSinceLastReplenishment
+      } : undefined
 
       const catalysts = generateChatCatalysts(
         req.user,
@@ -3229,7 +3468,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error generating chat catalysts:', {
+      console.error('Error generating chat catalysts:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -3243,7 +3482,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   // Get compassionate interventions
   fastify.get('/interventions', async (req, reply) => {
     try {
-      const Log = await import('#server/models/log').then(m => m.default)
+      const { Log } = await import('#server/models/log')
 
       const logs = await Log.findAll({
         where: { userId: req.user.id },
@@ -3259,7 +3498,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
       // Analyze current state
-      const recentCheckIns = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
+      const recentCheckIns = logs.filter((l: any) => l.event === 'emotional_checkin').slice(0, 10)
       const emotionalCounts: Record<string, number> = {}
       for (const checkIn of recentCheckIns) {
         const state = checkIn.metadata?.emotionalState as string
@@ -3269,7 +3508,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
       const dominantMood = Object.entries(emotionalCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'unknown'
-      const daysInPattern = recentCheckIns.filter(c => c.metadata?.emotionalState === dominantMood).length
+      const daysInPattern = recentCheckIns.filter((c: any) => c.metadata?.emotionalState === dominantMood).length
 
       const negativeStates = ['anxious', 'overwhelmed', 'exhausted', 'tired']
       const isStrugglingPattern = negativeStates.includes(dominantMood)
@@ -3300,7 +3539,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
     } catch (error: any) {
-      console.error('❌ Error generating interventions:', {
+      console.error('Error generating interventions:', {
         error: error.message,
         userId: req.user?.id
       })
@@ -3315,9 +3554,9 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/community-emotion
    * Calculate shared community emotional state from recent check-ins
    */
-  fastify.get('/api/community-emotion', async (req, reply) => {
+  fastify.get('/community-emotion', async (req, reply) => {
     try {
-      const userId = req.session?.userId
+      const userId = (req as any).session?.userId || req.user?.id
       if (!userId) {
         return reply.status(401).send({ error: 'Not authenticated' })
       }
@@ -3325,7 +3564,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       // Get emotional check-ins from the last 24 hours across all users
       const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
 
-      const recentEmotions = await Log.findAll({
+      const recentEmotions = await fastify.models.Log.findAll({
         where: {
           event: 'emotional_checkin',
           createdAt: {
@@ -3348,7 +3587,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
 
       // Count emotional states
       const emotionCounts: Record<string, number> = {}
-      recentEmotions.forEach(log => {
+      recentEmotions.forEach((log: any) => {
         const emotion = log.emotionalState
         if (emotion) {
           emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1
@@ -3507,8 +3746,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/stats/collective
    * Collective Consciousness Dashboard - Aggregate quantum states
    */
-  fastify.get('/api/stats/collective', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+  fastify.get('/stats/collective', async (req, reply) => {
+    if (!req.user) return reply.throw.authException()
 
     try {
       // Get active users (logged in within last 15 minutes)
@@ -3575,8 +3814,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/stats/growth
    * Personal + Community Growth Milestones
    */
-  fastify.get('/api/stats/growth', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+  fastify.get('/stats/growth', async (req, reply) => {
+    if (!req.user) return reply.throw.authException()
 
     try {
       // Personal stats
@@ -3641,8 +3880,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/stats/patterns
    * Live Intention Patterns - Anonymous real-time quantum pattern distribution
    */
-  fastify.get('/api/stats/patterns', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+  fastify.get('/stats/patterns', async (req, reply) => {
+    if (!req.user) return reply.throw.authException()
 
     try {
       // Get intentions from last 6 hours
@@ -3697,8 +3936,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/stats/wellness
    * Community Wellness Pulse - Aggregated activity metrics
    */
-  fastify.get('/api/stats/wellness', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+  fastify.get('/stats/wellness', async (req, reply) => {
+    if (!req.user) return reply.throw.authException()
 
     try {
       // Active users (last 15 minutes)
@@ -3759,8 +3998,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/stats/badges
    * Recent Badge Unlocks Feed - Anonymous badge achievements
    */
-  fastify.get('/api/stats/badges', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+  fastify.get('/stats/badges', async (req, reply) => {
+    if (!req.user) return reply.throw.authException()
 
     try {
       // Get recent badge unlocks (last 24 hours)
@@ -3813,8 +4052,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/stats/memory-engine
    * Memory Engine Performance Stats - Usership/Admin only
    */
-  fastify.get('/api/stats/memory-engine', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+  fastify.get('/stats/memory-engine', async (req, reply) => {
+    if (!req.user) return reply.throw.authException()
 
     // Only show to Usership/Admin users
     const hasAccess = req.user.tags.some(
@@ -3870,8 +4109,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/system/deployment-status
    * System Progress - Latest deployment info with sci-fi terminology
    */
-  fastify.get('/api/system/deployment-status', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+  fastify.get('/system/deployment-status', async (req, reply) => {
+    if (!req.user) return reply.throw.authException()
 
     try {
       // Get current version from package.json or env
@@ -3924,8 +4163,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * GET /api/system/my-feedback
    * Get current user's feedback for the active deployment
    */
-  fastify.get('/api/system/my-feedback', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+  fastify.get('/system/my-feedback', async (req, reply) => {
+    if (!req.user) return reply.throw.authException()
 
     try {
       const version = process.env.APP_VERSION || 'v1.2.1-stable'
@@ -3966,7 +4205,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       feedback: 'operational' | 'resonating' | 'needs-calibration' | 'evolving'
     }
   }>('/api/system/submit-feedback', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+    if (!req.user) return reply.throw.authException()
 
     const { version, feedback } = req.body
 
@@ -3999,8 +4238,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
    * Ultra-fast real-time system activity metrics
    * Updates every second with live stats
    */
-  fastify.get('/api/system/pulse', async (req, reply) => {
-    if (!req.user) return reply.throw.unauthorized()
+  fastify.get('/system/pulse', async (req, reply) => {
+    if (!req.user) return reply.throw.authException()
 
     try {
       const now = dayjs()

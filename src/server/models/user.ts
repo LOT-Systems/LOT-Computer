@@ -31,6 +31,10 @@ export class User
   declare stripeCustomerId: UserModel['stripeCustomerId']
   declare metadata: UserModel['metadata']
 
+  toPublic(): UserModel {
+    return this.toJSON() as UserModel
+  }
+
   useProfileView(): UserProfile {
     const profile = fp.pick([
       'id',
@@ -147,10 +151,10 @@ User.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    // timeChime: {
-    //   type: DataTypes.BOOLEAN,
-    //   defaultValue: false,
-    // },
+    timeChime: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     tags: {
       type: DataTypes.ARRAY(DataTypes.STRING),
       defaultValue: [],

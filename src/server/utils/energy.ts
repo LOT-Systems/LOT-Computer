@@ -174,7 +174,7 @@ function logToEnergyTransaction(log: Log): EnergyTransaction | null {
   }
 
   return {
-    timestamp: log.createdAt,
+    timestamp: log.createdAt.toISOString(),
     activity,
     energyCost,
     category,

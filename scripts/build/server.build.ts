@@ -21,9 +21,9 @@ async function buildServer() {
         '.js': 'js'
       } as { [key: string]: Loader }
     })
-    console.log('✅ Server build completed')
+    console.log('Server build completed')
   } catch (error) {
-    console.error('❌ Server build failed:', error)
+    console.error('Server build failed:', error)
     process.exit(1)
   }
 }

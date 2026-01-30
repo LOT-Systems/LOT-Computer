@@ -102,8 +102,8 @@ export function ApiPage() {
             disabled={exportStatus === 'loading'}
           >
             {exportStatus === 'loading' ? 'Exporting...' :
-             exportStatus === 'success' ? '✓ Exported!' :
-             exportStatus === 'error' ? '✗ Failed' :
+             exportStatus === 'success' ? 'Exported' :
+             exportStatus === 'error' ? 'Failed' :
              'Export Training Data (JSON)'}
           </Button>
 

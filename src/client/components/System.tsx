@@ -16,6 +16,7 @@ import { toCelsius, toFahrenheit } from '#shared/utils'
 import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useVisitorStats, useProfile, useLogs, useCommunityEmotion } from '#client/queries'
+import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
 import { UserTag } from '#shared/types'
 import { TimeWidget } from './TimeWidget'
 import { MemoryWidget } from './MemoryWidget'
@@ -33,6 +34,10 @@ import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
 import { SystemProgressWidget } from './SystemProgressWidget'
 import { SystemPulseWidget } from './SystemPulseWidget'
+import { EvolutionWidget } from './EvolutionWidget'
+import { CohortConnectWidget } from './CohortConnectWidget'
+import { InterfaceEvolutionWidget } from './InterfaceEvolutionWidget'
+import { EvolutionMilestoneToast } from './EvolutionMilestoneToast'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
 import { getOptimalWidget, shouldShowWidget, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
@@ -165,6 +170,39 @@ export const System = () => {
     analyzeIntentions() // Trigger fresh analysis
     return getUserState()
   }, [logs]) // Recompute when logs change (new signals recorded)
+
+  // Calculate streak for evolution system
+  const evolutionStreak = React.useMemo(() => {
+    const answerLogs = logs.filter(log => log.event === 'answer')
+    if (answerLogs.length === 0) return 0
+
+    // Get unique days with answers
+    const uniqueDays = new Set(
+      answerLogs.map(log => dayjs(log.createdAt).format('YYYY-MM-DD'))
+    )
+    const sortedDays = Array.from(uniqueDays).sort().reverse()
+
+    // Calculate streak (consecutive days including today or yesterday)
+    let streakDays = 0
+    const today = dayjs().format('YYYY-MM-DD')
+    const yesterday = dayjs().subtract(1, 'day').format('YYYY-MM-DD')
+
+    if (sortedDays.length > 0 && (sortedDays[0] === today || sortedDays[0] === yesterday)) {
+      const startOffset = sortedDays[0] === today ? 0 : 1
+      for (let i = 0; i < sortedDays.length; i++) {
+        const expectedDay = dayjs().subtract(i + startOffset, 'day').format('YYYY-MM-DD')
+        if (sortedDays[i] === expectedDay) {
+          streakDays++
+        } else {
+          break
+        }
+      }
+    }
+    return streakDays
+  }, [logs])
+
+  // Sync evolution state with achievements and progression
+  useEvolutionSync(logs.length, evolutionStreak)
 
   // Calculate awareness index from backend selfAwarenessLevel (0-100) to percentage (0-10%)
   // Long-term growth with decimal precision (e.g., 2.3%, 5.7%)
@@ -418,6 +456,15 @@ export const System = () => {
       {/* Narrative - RPG-style story progression and achievements */}
       <NarrativeWidget />
 
+      {/* Evolution - Minimalist profile growth indicators */}
+      <EvolutionWidget />
+
+      {/* Interface Evolution - Spiritual/psychological progression & feature unlocks */}
+      <InterfaceEvolutionWidget />
+
+      {/* Evolution Milestone Toast - Subtle notifications for progression milestones */}
+      <EvolutionMilestoneToast />
+
       <div>
         <Block
           label="Mirror:"
@@ -604,6 +651,9 @@ export const System = () => {
 
       {/* Pattern Insights - Show user's discovered patterns and cohort matches */}
       <PatternInsightsWidget />
+
+      {/* Cohort Connect - Browse and connect with cohort members */}
+      <CohortConnectWidget />
 
       {/* Planner - Show occasionally for daily/weekly planning */}
       <PlannerWidget />

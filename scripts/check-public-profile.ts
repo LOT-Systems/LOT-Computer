@@ -3,7 +3,7 @@ import { models } from '../src/server/models/index.js'
 
 async function checkPublicProfile() {
   try {
-    console.log('🔍 Checking public profile configuration...\n')
+    console.log('Checking public profile configuration...\n')
 
     // Get all users
     const users = await models.User.findAll()
@@ -19,13 +19,13 @@ async function checkPublicProfile() {
 
       const privacy = user.metadata?.privacy || {}
       console.log('\nPrivacy Settings:')
-      console.log(`  - Public Profile Enabled: ${privacy.isPublicProfile ? '✅ YES' : '❌ NO'}`)
+      console.log(`  - Public Profile Enabled: ${privacy.isPublicProfile ? 'YES' : 'NO'}`)
       console.log(`  - Custom URL: ${privacy.customUrl || '(none)'}`)
-      console.log(`  - Show Weather: ${privacy.showWeather !== false ? '✅' : '❌'}`)
-      console.log(`  - Show Local Time: ${privacy.showLocalTime !== false ? '✅' : '❌'}`)
-      console.log(`  - Show City: ${privacy.showCity !== false ? '✅' : '❌'}`)
-      console.log(`  - Show Sound: ${privacy.showSound !== false ? '✅' : '❌'}`)
-      console.log(`  - Show Memory Story: ${privacy.showMemoryStory !== false ? '✅' : '❌'}`)
+      console.log(`  - Show Weather: ${privacy.showWeather !== false ? 'Yes' : 'No'}`)
+      console.log(`  - Show Local Time: ${privacy.showLocalTime !== false ? 'Yes' : 'No'}`)
+      console.log(`  - Show City: ${privacy.showCity !== false ? 'Yes' : 'No'}`)
+      console.log(`  - Show Sound: ${privacy.showSound !== false ? 'Yes' : 'No'}`)
+      console.log(`  - Show Memory Story: ${privacy.showMemoryStory !== false ? 'Yes' : 'No'}`)
 
       console.log('\nPublic Profile URLs:')
       console.log(`  By ID: /u/${user.id}`)
@@ -43,15 +43,15 @@ async function checkPublicProfile() {
     console.log('-----------------------------------\n')
 
     if (users.length === 0) {
-      console.log('⚠️  No users found in database')
+      console.log(' No users found in database')
     } else {
       const publicProfiles = users.filter(u => u.metadata?.privacy?.isPublicProfile)
-      console.log(`📊 Summary: ${publicProfiles.length} of ${users.length} users have public profiles enabled`)
+      console.log(`Summary: ${publicProfiles.length} of ${users.length} users have public profiles enabled`)
     }
 
     await sequelize.close()
   } catch (error) {
-    console.error('❌ Error:', error)
+    console.error('Error:', error)
     process.exit(1)
   }
 }

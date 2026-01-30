@@ -14,10 +14,10 @@ interface Deployment {
 }
 
 const FEEDBACK_OPTIONS = [
-  { id: 'operational', label: 'Operational', emoji: '✓' },
-  { id: 'resonating', label: 'Resonating', emoji: '∿' },
-  { id: 'needs-calibration', label: 'Needs Calibration', emoji: '⚙' },
-  { id: 'evolving', label: 'Evolving', emoji: '↗' }
+  { id: 'operational', label: 'Operational', symbol: '|' },
+  { id: 'resonating', label: 'Resonating', symbol: '~' },
+  { id: 'needs-calibration', label: 'Needs Calibration', symbol: '*' },
+  { id: 'evolving', label: 'Evolving', symbol: '^' }
 ] as const
 
 /**
@@ -86,7 +86,7 @@ export function SystemProgressWidget() {
 
   const getStatusText = () => {
     switch (deployment.status) {
-      case 'activated': return '⚡ Protocol Activated'
+      case 'activated': return 'Protocol Activated'
       case 'integrating': return '⟳ Neural Pathways Integrating'
       case 'synchronized': return '◈ Quantum Core Synchronized'
       default: return 'Status Unknown'
@@ -100,7 +100,7 @@ export function SystemProgressWidget() {
         <div>
           <div className="flex justify-between items-baseline mb-8">
             <span className="opacity-60">Build Version</span>
-            <span className="font-mono">{deployment.version}</span>
+            <span>{deployment.version}</span>
           </div>
 
           <div className="flex justify-between items-baseline mb-8">
@@ -117,7 +117,7 @@ export function SystemProgressWidget() {
         {deployment.features.length > 0 && (
           <div className="border-t border-acc-400/30 pt-12">
             <div className="opacity-60 mb-8">Neural Enhancements Active:</div>
-            <div className="flex flex-col gap-y-4 opacity-75">
+            <div className="flex flex-col gap-y-4 opacity-60">
               {deployment.features.map((feature, idx) => (
                 <div key={idx}>• {feature}</div>
               ))}
@@ -138,22 +138,22 @@ export function SystemProgressWidget() {
                 className={`
                   px-12 py-8 rounded border transition-all
                   ${feedback === option.id
-                    ? 'border-acc bg-acc-400/20 text-acc'
-                    : 'border-acc-400/30 hover:border-acc-400/60 hover:bg-acc-400/10'
+                    ? 'border-acc grid-fill text-acc'
+                    : 'border-acc-400/30 hover:border-acc-400/60 grid-fill-hover'
                   }
                   ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                 `}
               >
                 <div className="flex items-center gap-4">
-                  <span>{option.emoji}</span>
-                  <span className="text-sm">{option.label}</span>
+                  <span>{option.symbol}</span>
+                  <span>{option.label}</span>
                 </div>
               </button>
             ))}
           </div>
 
           {feedback && (
-            <div className="mt-12 text-sm opacity-60">
+            <div className="mt-12 opacity-60">
               Status logged. System calibration optimized.
             </div>
           )}

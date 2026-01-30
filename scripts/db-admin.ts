@@ -52,14 +52,14 @@ async function addAdminTag(email: string) {
     )
 
     if (result.rows.length === 0) {
-      console.log('❌ User not found or already has Admin tag')
+      console.log('User not found or already has Admin tag')
       return
     }
 
-    console.log('✅ Admin tag added successfully!')
+    console.log('Admin tag added successfully!')
     console.log('User:', result.rows[0])
   } catch (error) {
-    console.error('❌ Error:', error)
+    console.error('Error:', error)
   } finally {
     await client.end()
   }
@@ -81,14 +81,14 @@ async function addTag(email: string, tag: string) {
     )
 
     if (result.rows.length === 0) {
-      console.log('❌ User not found or already has this tag')
+      console.log('User not found or already has this tag')
       return
     }
 
-    console.log('✅ Tag added successfully!')
+    console.log('Tag added successfully!')
     console.log('User:', result.rows[0])
   } catch (error) {
-    console.error('❌ Error:', error)
+    console.error('Error:', error)
   } finally {
     await client.end()
   }
@@ -109,14 +109,14 @@ async function removeTag(email: string, tag: string) {
     )
 
     if (result.rows.length === 0) {
-      console.log('❌ User not found')
+      console.log('User not found')
       return
     }
 
-    console.log('✅ Tag removed successfully!')
+    console.log('Tag removed successfully!')
     console.log('User:', result.rows[0])
   } catch (error) {
-    console.error('❌ Error:', error)
+    console.error('Error:', error)
   } finally {
     await client.end()
   }
@@ -127,14 +127,14 @@ async function runQuery(query: string) {
   try {
     console.log(`Running query: ${query}`)
     const result = await client.query(query)
-    console.log('\n✅ Query executed successfully!')
+    console.log('\nQuery executed successfully!')
     console.log(`Rows returned: ${result.rows.length}`)
     if (result.rows.length > 0) {
       console.log('\nResults:')
       console.table(result.rows)
     }
   } catch (error) {
-    console.error('❌ Error:', error)
+    console.error('Error:', error)
   } finally {
     await client.end()
   }
@@ -152,7 +152,7 @@ async function listUsers() {
     console.log(`Total users: ${result.rows.length}\n`)
     console.table(result.rows)
   } catch (error) {
-    console.error('❌ Error:', error)
+    console.error('Error:', error)
   } finally {
     await client.end()
   }
@@ -169,7 +169,7 @@ async function setLiveMessage(message: string) {
     )
 
     if (adminResult.rows.length === 0) {
-      console.error('❌ No admin user found to set as author')
+      console.error('No admin user found to set as author')
       return
     }
 
@@ -189,7 +189,7 @@ async function setLiveMessage(message: string) {
          RETURNING id, message, "updatedAt"`,
         [message, existingResult.rows[0].id]
       )
-      console.log('✅ Live message updated successfully!')
+      console.log('Live message updated successfully!')
       console.log('Message:', result.rows[0])
     } else {
       // Create new message
@@ -199,11 +199,11 @@ async function setLiveMessage(message: string) {
          RETURNING id, message, "createdAt"`,
         [authorUserId, message]
       )
-      console.log('✅ Live message created successfully!')
+      console.log('Live message created successfully!')
       console.log('Message:', result.rows[0])
     }
   } catch (error) {
-    console.error('❌ Error:', error)
+    console.error('Error:', error)
   } finally {
     await client.end()
   }
@@ -225,10 +225,10 @@ async function clearLiveMessage() {
       return
     }
 
-    console.log('✅ Live message cleared successfully!')
+    console.log('Live message cleared successfully!')
     console.log('Message:', result.rows[0])
   } catch (error) {
-    console.error('❌ Error:', error)
+    console.error('Error:', error)
   } finally {
     await client.end()
   }
@@ -255,7 +255,7 @@ async function getLiveMessage() {
     console.log('Current live message:')
     console.table(result.rows)
   } catch (error) {
-    console.error('❌ Error:', error)
+    console.error('Error:', error)
   } finally {
     await client.end()
   }
@@ -298,7 +298,7 @@ Examples:
   switch (command) {
     case 'add-admin-tag':
       if (!args[0]) {
-        console.error('❌ Email required')
+        console.error('Email required')
         process.exit(1)
       }
       await addAdminTag(args[0])
@@ -306,7 +306,7 @@ Examples:
 
     case 'add-tag':
       if (!args[0] || !args[1]) {
-        console.error('❌ Email and tag required')
+        console.error('Email and tag required')
         process.exit(1)
       }
       await addTag(args[0], args[1])
@@ -314,7 +314,7 @@ Examples:
 
     case 'remove-tag':
       if (!args[0] || !args[1]) {
-        console.error('❌ Email and tag required')
+        console.error('Email and tag required')
         process.exit(1)
       }
       await removeTag(args[0], args[1])
@@ -322,7 +322,7 @@ Examples:
 
     case 'query':
       if (!args[0]) {
-        console.error('❌ SQL query required')
+        console.error('SQL query required')
         process.exit(1)
       }
       await runQuery(args[0])
@@ -334,7 +334,7 @@ Examples:
 
     case 'set-live':
       if (!args[0]) {
-        console.error('❌ Message required')
+        console.error('Message required')
         process.exit(1)
       }
       await setLiveMessage(args.join(' '))
@@ -349,7 +349,7 @@ Examples:
       break
 
     default:
-      console.error(`❌ Unknown command: ${command}`)
+      console.error(`Unknown command: ${command}`)
       process.exit(1)
   }
 }

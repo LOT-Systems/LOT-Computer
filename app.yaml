@@ -1,17 +1,17 @@
-name: web
+name: lot-systems
 region: nyc3
 services:
   - name: web
     git:
-      branch: claude/January-2026-updates-gLJWJ
+      branch: claude/february-2025-updates-HZZTF
       repo_clone_url: https://github.com/vadikmarmeladov/lot-systems.git
     build_command: |
-      echo "🚀 Build started at $(date)"
+      echo "Build started at $(date)"
       yarn install --frozen-lockfile --production=false
       NODE_ENV=production yarn build
-      echo "📁 Verifying build output..."
+      echo "Verifying build output..."
       ls -la dist/client/js/ | head -20
-      echo "✅ Build completed at $(date)"
+      echo "Build completed at $(date)"
     run_command: node dist/server/server/index.js
     environment_slug: node-js
     instance_size_slug: basic-xxs
@@ -83,3 +83,15 @@ services:
         scope: RUN_TIME
         type: SECRET
         value: "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"
+      - key: TOGETHER_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "tgp_v1_T3CicyWdakDXJhaWefknD6lTKsPFvLukpS99YJM77A0"
+      - key: GOOGLE_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "PLACEHOLDER_GOOGLE_API_KEY_OPTIONAL"
+      - key: MISTRAL_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "PLACEHOLDER_MISTRAL_API_KEY_OPTIONAL"

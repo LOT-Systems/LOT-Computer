@@ -14,10 +14,18 @@ RUN yarn install --frozen-lockfile --production=false
 COPY . .
 
 # Build the application
-RUN yarn build
+RUN echo "🔨 Building application..." && \
+    yarn build && \
+    echo "✅ Build completed" && \
+    ls -la dist/server/server/index.js && \
+    echo "📦 Server entry point verified ($(wc -c < dist/server/server/index.js) bytes)"
 
 # Expose the port your application will run on
 EXPOSE 8080
 
-# Start the application
-CMD ["node", "dist/server/server/index.js"]
+# Start the application with migrations
+CMD echo "🗄️ Running migrations..." && \
+    yarn migrations:up && \
+    echo "✅ Migrations completed" && \
+    echo "🚀 Starting server..." && \
+    node dist/server/server/index.js
