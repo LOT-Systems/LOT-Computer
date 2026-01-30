@@ -59,3 +59,13 @@ backups/production-*
 
 # Suspicious files
 yarn 2.lock
+
+# Random/unnecessary files
+*.mp3
+touch
+middleware.ts
+server.ts
+
+# OS files
+.DS_Store
+.*.DS_Store
