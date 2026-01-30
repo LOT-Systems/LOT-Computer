@@ -113,22 +113,28 @@ See `AI-ENGINE-GUIDE.md` for complete documentation.
 
 ## 📚 Documentation
 
-- **White Paper:** `LOT-self-care-proactive-context-AI-white-paper.txt`
-  - Complete philosophy and technical architecture
-  - Memory densification vs data accumulation
-  - Economic model and unit economics
+All documentation has been organized into the [`docs/`](./docs/) directory. See [`docs/README.md`](./docs/README.md) for a complete index.
 
-- **AI Engine Guide:** `AI-ENGINE-GUIDE.md`
-  - Setup instructions for all 5 AI engines
-  - Configuration and switching guide
-  - Cost comparisons
+**Key Documentation:**
 
-- **Switching Test:** `AI-ENGINE-SWITCHING-TEST.md`
-  - Verification that LOT owns memory logic
-  - Proof of vendor independence
+- **Technical Documentation:** [`docs/technical/`](./docs/technical/)
+  - AI Engine Guide - Setup for all 5 AI engines
+  - Memory Engine Documentation - Complete system docs
+  - Psychological Depth Analysis - User analysis engine
+  - White Paper - Philosophy and technical architecture
 
-- **Release Notes:** `RELEASE-NOTES-v0.0.3.md`
-  - Complete changelog
+- **Deployment Guides:** [`docs/deployment/`](./docs/deployment/)
+  - Deploy to Digital Ocean - Production deployment
+  - Production setup and configuration
+  - Health checks and monitoring
+
+- **Setup Guides:** [`docs/setup/`](./docs/setup/)
+  - Resend email setup
+  - Database administration
+  - API key configuration
+
+- **Release Notes:** [`docs/releases/`](./docs/releases/)
+  - Complete changelog and version history
   - Deployment history
 
 ---
