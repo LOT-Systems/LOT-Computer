@@ -4,7 +4,7 @@ services:
   - name: web
     git:
       branch: claude/february-2025-updates-HZZTF
-      repo_clone_url: https://github.com/vadikmarmeladov/lot-systems.git
+      repo_clone_url: https://github.com/LOT-Systems/LOT-Computer.git
     build_command: |
       echo "Build started at $(date)"
       yarn install --frozen-lockfile --production=false
