@@ -1,5 +1,8 @@
 # Memory Engine Core Principles - Verified ✅
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 **Date**: January 26, 2026
 **Branch**: `claude/february-2025-updates-HZZTF`
 **Status**: All core principles maintained after Together.AI fixes

@@ -1,5 +1,8 @@
 # 🧠 February 2025 Memory Engine Improvements
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 ## Overview
 Complete overhaul of Memory Engine data persistence and AI engine infrastructure for Usership users.
 

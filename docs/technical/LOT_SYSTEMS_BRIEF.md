@@ -1,5 +1,9 @@
 # LOT SYSTEMS: Technical Brief & Strategic Overview
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+**License:** Proprietary - All intellectual property rights reserved by Vadik Marmeladov
+
 **Classification:** Public
 **Document Version:** 1.0
 **Last Updated:** January 15, 2026

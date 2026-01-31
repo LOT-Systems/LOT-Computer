@@ -1,5 +1,8 @@
 # Badge Level System: Milestone Under Awareness
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 ## New Design Philosophy
 
 **Remove:** Badges as separators in trait lists

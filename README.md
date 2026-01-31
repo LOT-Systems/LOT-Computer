@@ -2,6 +2,9 @@
 
 **Self-care through proactive context-aware AI**
 
+**Created by:** Vadik Marmeladov, CEO & Founder
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 ---
 
 ## 🌟 What is LOT?

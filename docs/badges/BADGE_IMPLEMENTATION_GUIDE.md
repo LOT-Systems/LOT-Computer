@@ -1,5 +1,8 @@
 # Badge Implementation Guide
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 ## Quick Reference for Each Option
 
 ### Option 1: Minimal Geometric Combinations

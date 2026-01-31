@@ -1,5 +1,8 @@
 # Badge Visual Previews
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 ## How Each Option Looks in Real Profile Context
 
 ### Current (Single Symbols)

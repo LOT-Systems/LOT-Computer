@@ -1,5 +1,8 @@
 # Badge Progression Preview
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 ## How Badges Evolve as User Grows
 
 ### Scenario: User Journey Over 100 Days

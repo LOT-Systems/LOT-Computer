@@ -2,6 +2,10 @@
 
 **"The AI That Asks First: Building Digital Companionship Through Context-Aware Prompts"**
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+**License:** Proprietary - All intellectual property rights reserved by Vadik Marmeladov
+
 ---
 
 ## Executive Summary

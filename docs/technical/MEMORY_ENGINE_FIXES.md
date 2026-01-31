@@ -1,5 +1,8 @@
 # Memory Engine Critical Fixes Applied
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 ## Summary
 Fixed **21 issues** found during comprehensive testing, prioritized by severity.
 

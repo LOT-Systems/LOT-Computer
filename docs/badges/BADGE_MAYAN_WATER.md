@@ -1,5 +1,8 @@
 # Mayan Water / Cosmic Badge System
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 **Philosophy:** Badges inspired by Mayan vigesimal counting, water cycles, and cosmic/alien aesthetics. Each badge represents cyclical growth through fluid, otherworldly patterns.
 
 ---

@@ -1,5 +1,8 @@
 # Mayan Water Badge Evolution
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 ## How Badges Progress Through Mayan Cycles
 
 ### The Mayan Calendar Metaphor

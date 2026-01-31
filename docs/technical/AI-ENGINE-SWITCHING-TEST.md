@@ -1,5 +1,8 @@
 # AI Engine Switching Test - Verification
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 ## Test Scenario: Switch from Mistral to Together AI Mid-Conversation
 
 ### Goal:

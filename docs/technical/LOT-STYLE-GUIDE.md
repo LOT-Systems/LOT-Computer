@@ -1,5 +1,8 @@
 # LOT Design System & Style Guide
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 **Version**: 1.0 (January 2026)
 **Status**: Stable Reference
 **Last Updated**: January 2026

@@ -1,5 +1,8 @@
 # Badge Symbol Options
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 Current badges use single simple symbols. Here are 5 distinctive style options:
 
 ---

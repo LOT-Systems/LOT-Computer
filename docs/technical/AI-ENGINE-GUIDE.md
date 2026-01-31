@@ -1,5 +1,8 @@
 # AI Engine Abstraction Layer
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 ## Overview
 
 LOT Systems now has a **provider-agnostic AI engine system**. This means:

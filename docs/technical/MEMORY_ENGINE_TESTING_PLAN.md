@@ -1,5 +1,8 @@
 # Comprehensive Memory Engine Testing Plan
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 ## System Overview
 
 **Components to Test:**

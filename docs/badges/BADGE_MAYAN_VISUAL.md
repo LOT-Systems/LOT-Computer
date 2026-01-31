@@ -1,5 +1,8 @@
 # Mayan Water Badges: Visual Showcase
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 ## Side-by-Side Comparison: All Mayan Options
 
 ### Full Profile With All 8 Badges Unlocked

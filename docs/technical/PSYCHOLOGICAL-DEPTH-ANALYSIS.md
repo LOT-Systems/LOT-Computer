@@ -2,9 +2,12 @@
 
 **Revolutionary AI-powered soul-level understanding through the Virtuous Compression Cycle**
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+**License:** Proprietary - All intellectual property rights reserved by Vadik Marmeladov
+
 Version: 1.0.0
 Last Updated: December 11, 2025
-Author: LOT Systems Engineering Team
 
 ---
 

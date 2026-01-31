@@ -1,5 +1,8 @@
 # Memory Engine Setup Guide
 
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025-2026 LOT Systems. All rights reserved.
+
 ## Problem
 
 The Memory Engine is not responding because **no valid AI API keys are configured**.
