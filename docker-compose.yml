@@ -1,0 +1,112 @@
+# LOT-Computer Docker Compose Configuration
+# For Akamai Connected Cloud (Linode) deployment
+
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: lot-computer:latest
+    container_name: lot-computer-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - lot-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    container_name: lot-computer-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - lot-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    image: postgres:15-alpine
+    container_name: lot-computer-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${DB_USER:-lot_user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME:-lot_computer}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-lot_user} -d ${DB_NAME:-lot_computer}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lot-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Backup service for database
+  backup:
+    image: postgres:15-alpine
+    container_name: lot-computer-backup
+    restart: "no"
+    environment:
+      - PGPASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./backups:/backups
+    depends_on:
+      - db
+    entrypoint: /bin/sh
+    command: >
+      -c "pg_dump -h db -U ${DB_USER:-lot_user} ${DB_NAME:-lot_computer} > /backups/backup_$$(date +%Y%m%d_%H%M%S).sql"
+    networks:
+      - lot-network
+    profiles:
+      - backup
+
+volumes:
+  redis-data:
+    driver: local
+  postgres-data:
+    driver: local
+
+networks:
+  lot-network:
+    driver: bridge

@@ -1,0 +1,27 @@
+# LOT-Computer Development Docker Compose Configuration
+# Use: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: '3.8'
+
+services:
+  app:
+    build:
+      target: builder
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  # Development database admin tool
+  adminer:
+    image: adminer:latest
+    container_name: lot-computer-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - lot-network

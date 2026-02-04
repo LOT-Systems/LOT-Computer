@@ -1,0 +1,177 @@
+# LOT-Computer Deployment Pipeline
+# Deploys to Akamai Connected Cloud (Linode)
+
+name: Deploy to Akamai
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint --if-present
+
+      - name: Run tests
+        run: npm test --if-present
+
+  build:
+    name: Build and Push Image
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to Akamai
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+      url: https://${{ vars.DOMAIN }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER || 'deploy' }}
+          IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
+        run: |
+          ssh $DEPLOY_USER@$SERVER_IP << 'ENDSSH'
+            cd /opt/lot-computer
+
+            # Pull latest code
+            git pull origin main || git pull origin master
+
+            # Login to container registry
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # Pull new image
+            docker compose pull
+
+            # Deploy with zero-downtime
+            docker compose up -d --remove-orphans
+
+            # Cleanup old images
+            docker image prune -f
+
+            # Health check
+            sleep 10
+            curl -f http://localhost:3000/health || exit 1
+
+            echo "Deployment successful!"
+          ENDSSH
+
+      - name: Notify deployment
+        if: success()
+        run: echo "Deployed successfully to ${{ github.event.inputs.environment || 'production' }}"
+
+  rollback:
+    name: Rollback (Manual)
+    runs-on: ubuntu-latest
+    if: failure() && needs.deploy.result == 'failure'
+    needs: deploy
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Rollback
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER || 'deploy' }}
+        run: |
+          ssh $DEPLOY_USER@$SERVER_IP << 'ENDSSH'
+            cd /opt/lot-computer
+
+            # Rollback to previous version
+            docker compose down
+            docker compose up -d --force-recreate
+
+            echo "Rollback completed"
+          ENDSSH

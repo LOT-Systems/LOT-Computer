@@ -1,0 +1,66 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+out/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/terraform.tfvars
+terraform/.terraform.lock.hcl
+
+# SSL Certificates (keep examples, ignore real certs)
+terraform/certs/*.crt
+terraform/certs/*.key
+!terraform/certs/.gitkeep
+
+# Backups
+backups/
+*.sql
+*.sql.gz
+*.tar.gz
+
+# Docker
+.docker/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Secrets
+*.pem
+*.p12
+credentials.json
+secrets.json

@@ -1,0 +1,31 @@
+# Akamai Connected Cloud (Linode) Configuration
+# Copy this file to terraform.tfvars and fill in your values
+
+# Required: Your Linode API token
+# Generate at: https://cloud.linode.com/profile/tokens
+linode_token = "your-linode-api-token-here"
+
+# Required: Root password for the server
+root_password = "your-secure-root-password"
+
+# Optional: SSH public keys for access (recommended)
+authorized_keys = [
+  "ssh-rsa AAAA... your-key-here"
+]
+
+# Optional: Region selection
+# Available regions: https://api.linode.com/v4/regions
+# us-east (Newark), us-west (Fremont), us-central (Dallas)
+# eu-west (London), eu-central (Frankfurt)
+# ap-south (Singapore), ap-northeast (Tokyo)
+region = "us-east"
+
+# Optional: Instance type
+# g6-nanode-1: 1GB RAM, 1 CPU ($5/mo)
+# g6-standard-1: 2GB RAM, 1 CPU ($12/mo)
+# g6-standard-2: 4GB RAM, 2 CPU ($24/mo)
+# g6-standard-4: 8GB RAM, 4 CPU ($48/mo)
+instance_type = "g6-standard-1"
+
+# Optional: Environment
+environment = "production"
