@@ -90,7 +90,7 @@ export function ChatCatalystWidget() {
 
         {/* Cohort member info if present */}
         {catalyst.action.cohortMember && (
-          <div className="text-[12px]">
+          <div className="text-xs">
             {catalyst.action.cohortMember.name}
           </div>
         )}

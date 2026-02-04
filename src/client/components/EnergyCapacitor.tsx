@@ -51,7 +51,7 @@ export function EnergyCapacitor() {
 
           {/* Energy level */}
           <div className="mb-12 flex items-center gap-12">
-            <span className="text-[20px]">
+            <span className="text-xl">
               {energyState.currentLevel}%
             </span>
             <span className="capitalize">{energyState.status}</span>

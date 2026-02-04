@@ -89,7 +89,7 @@ export function InterfaceEvolutionWidget() {
         <div className="inline-block">
           {/* Overall maturity */}
           <div className="mb-12 flex items-center gap-12">
-            <span className="text-[20px]">
+            <span className="text-xl">
               {Math.round(evolutionState.overallMaturity * 100)}%
             </span>
             <span>Overall Maturity</span>

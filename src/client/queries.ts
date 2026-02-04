@@ -139,12 +139,17 @@ export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
 )
 
 export const useMemory = () => {
-  // Use date only (no time) to prevent regenerating questions multiple times per day
+  // Use date and period to allow different questions throughout the day
   const date = btoa(dayjs().format('YYYY-MM-DD'))
+  const hour = new Date().getHours()
+  // Create periods: morning (6-12), midday (12-18), evening (18-24), night (0-6)
+  const period = hour >= 6 && hour < 12 ? 'morning' :
+                 hour >= 12 && hour < 18 ? 'midday' :
+                 hour >= 18 && hour < 24 ? 'evening' : 'night'
   const path = '/api/memory'
 
   return useQuery<any>(
-    [path, date], // Include date in query key for proper caching
+    [path, date, period], // Include date and period in query key for varied questions
     async () => {
       // Get quantum state for context (optional - graceful degradation)
       let quantumParams = {}
@@ -215,8 +220,8 @@ export const useMemory = () => {
       return response.data
     },
     {
-      staleTime: Infinity, // Cache forever for the day - prevents duplicate questions
-      cacheTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
+      staleTime: 3 * 60 * 60 * 1000, // Cache for 3 hours - allows multiple questions per day
+      cacheTime: 6 * 60 * 60 * 1000, // Keep in cache for 6 hours
       onError: (error) => {
         console.error('Memory query failed:', error)
         // Store error timestamp for manual retry UI

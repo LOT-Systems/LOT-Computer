@@ -44,7 +44,7 @@ export function NarrativeWidget() {
         <div className="inline-block">
           {/* Level and chapter */}
           <div className="mb-12 flex items-center gap-12">
-            <span className="text-[20px]">Level {narrative.currentLevel}</span>
+            <span className="text-xl">Level {narrative.currentLevel}</span>
             <span>Chapter {narrative.currentArc.chapter}: {narrative.currentArc.title}</span>
           </div>
 
@@ -104,7 +104,7 @@ export function NarrativeWidget() {
                     {quest.complete && <span>✓</span>}
                   </div>
                   {!quest.complete && quest.progress !== undefined && (
-                    <div className="text-[12px]">
+                    <div className="text-xs">
                       {quest.progress}% complete
                     </div>
                   )}

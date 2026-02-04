@@ -74,7 +74,7 @@ export function EvolutionMilestoneToast() {
           {currentMilestone.message}
         </div>
         {unlockedCount > 0 && (
-          <div className="text-[12px]">
+          <div className="text-xs">
             {unlockedCount} feature{unlockedCount !== 1 ? 's' : ''} unlocked
           </div>
         )}

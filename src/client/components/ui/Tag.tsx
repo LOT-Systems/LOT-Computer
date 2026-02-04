@@ -25,7 +25,7 @@ export const Tag: React.FC<Props> = ({
     const isRed = color === 'red'
 
     return cn(
-      'rounded px-[6px] py-[2px]',
+      'rounded px-1.5 py-0.5',
       'border border-transparent',
       isRed
         ? fill

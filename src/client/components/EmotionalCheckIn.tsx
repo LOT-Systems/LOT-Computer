@@ -317,7 +317,7 @@ export function EmotionalCheckIn() {
             <>
               <div className="mb-12">
                 <div className="flex items-center gap-8">
-                  <span className="text-[20px]">{checkInsData.stats.total}</span>
+                  <span className="text-xl">{checkInsData.stats.total}</span>
                   <span>Check-ins</span>
                 </div>
               </div>
