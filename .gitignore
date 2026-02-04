@@ -48,9 +48,10 @@ terraform/certs/*.key
 
 # Backups
 backups/
-*.sql
 *.sql.gz
 *.tar.gz
+# Allow init scripts but ignore backup sql files
+!scripts/init-db.sql
 
 # Docker
 .docker/
