@@ -52,7 +52,7 @@ export const TagsContainer: React.FC<{
   className?: string
   items: React.ReactNode[]
 }> = ({ className, items }) => (
-  <div className={cn('flex flex-wrap gap-x-4', className)}>
+  <div className={cn('flex flex-wrap gap-x-4 gap-y-4', className)}>
     {items.map((x, i) => (
       <div key={i}>{x}</div>
     ))}
