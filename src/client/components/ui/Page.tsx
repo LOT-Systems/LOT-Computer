@@ -13,7 +13,7 @@ export const Page: React.FC<Props> = ({ className, children, ...props }) => {
       id="page"
       className={cn(
         'w-full mx-auto desktop:p-64 tablet:p-48 phone:p-32 p-16',
-        isMirrorOn && 'text-acc',
+        isMirrorOn && 'text-white',
         className
       )}
       {...props}

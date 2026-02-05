@@ -22,7 +22,7 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
   const isMirrorOn = useStore(stores.isMirrorOn)
 
   const hoverClassName = isMirrorOn
-    ? 'hover:bg-acc/10 group-hover:bg-acc/10'
+    ? 'hover:bg-white/10 group-hover:bg-white/10'
     : 'grid-fill-hover'
 
   return (
