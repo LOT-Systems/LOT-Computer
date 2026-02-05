@@ -104,7 +104,7 @@ export function SystemPulseWidget() {
           <span className="opacity-75">Events/Min</span>
           <div className="flex items-baseline gap-4">
             <span className={cn(
-              'text-2xl font-mono transition-colors duration-300',
+              'text-2xl transition-colors duration-300',
               eventsIntensity === 'high' && 'text-green',
               eventsIntensity === 'medium' && 'text-blue',
               eventsIntensity === 'low' && 'opacity-75'
@@ -122,7 +122,7 @@ export function SystemPulseWidget() {
           <span className="opacity-75">Quantum Flux</span>
           <div className="flex items-baseline gap-4">
             <span className={cn(
-              'text-2xl font-mono transition-colors duration-300',
+              'text-2xl transition-colors duration-300',
               fluxIntensity === 'high' && 'text-acc',
               fluxIntensity === 'medium' && 'text-blue',
               fluxIntensity === 'low' && 'opacity-75'
@@ -135,15 +135,15 @@ export function SystemPulseWidget() {
         {/* Neural Activity */}
         <div className="flex justify-between items-baseline">
           <span className="opacity-75">Neural Activity</span>
-          <span className="text-xl font-mono">
+          <span className="text-xl">
             <AnimatedNumber value={pulse.neuralActivity} />
           </span>
         </div>
 
         {/* Resonance Frequency */}
-        <div className="flex justify-between items-baseline pt-8 border-t border-acc-400/30">
+        <div className="flex justify-between items-baseline pt-8 border-t border-acc/30">
           <span className="opacity-75">Resonance</span>
-          <span className="text-xl font-mono">
+          <span className="text-xl">
             <AnimatedNumber value={pulse.resonanceHz} decimals={1} /> Hz
           </span>
         </div>
