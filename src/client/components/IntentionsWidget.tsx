@@ -167,6 +167,10 @@ export function IntentionsWidget() {
                 <div>• Creative flow</div>
                 <div>• Boundaries</div>
                 <div>• Rest</div>
+                <div>• Sport</div>
+                <div>• Exercise</div>
+                <div>• Relationships</div>
+                <div>• Humor</div>
               </div>
               <div className="mb-24">
                 <Button onClick={() => setIsSettingIntention(true)}>
