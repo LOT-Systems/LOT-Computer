@@ -309,3 +309,166 @@ export function getDayStateNarrative(): string {
   // Late night
   return 'Late hours'
 }
+
+/**
+ * Stoic Wisdom - Context-aware reflections
+ *
+ * Provides stoic-inspired guidance based on time, energy, and circumstances
+ */
+export function getStoicReflection(context: {
+  timeOfDay?: TimeOfDay
+  energy?: 'depleted' | 'low' | 'moderate' | 'high'
+  streak?: number
+  actionsToday?: number
+}): string {
+  const time = context.timeOfDay || getTimeOfDay()
+
+  // Low energy or depletion
+  if (context.energy === 'depleted' || context.energy === 'low') {
+    const reflections = [
+      'Rest is not idleness. Recover with purpose.',
+      'The wise know when to pause and restore.',
+      'Energy returns through stillness and care.',
+    ]
+    return reflections[Math.floor(Math.random() * reflections.length)]
+  }
+
+  // Morning wisdom
+  if (time === 'morning' || time === 'early_morning') {
+    const reflections = [
+      'Begin with intention. Each day is a fresh start.',
+      'What you do today shapes tomorrow.',
+      'Morning clarity guides the day ahead.',
+      'Focus on what you can control.',
+    ]
+    return reflections[Math.floor(Math.random() * reflections.length)]
+  }
+
+  // Evening reflections
+  if (time === 'evening' || time === 'night') {
+    const reflections = [
+      'Review the day without judgment.',
+      'Learn from today to improve tomorrow.',
+      'Rest earned through effort is sacred.',
+      'What matters most today?',
+    ]
+    return reflections[Math.floor(Math.random() * reflections.length)]
+  }
+
+  // Streak-based wisdom
+  if (context.streak && context.streak > 3) {
+    return 'Consistency builds character.'
+  }
+
+  // General stoic wisdom
+  const general = [
+    'Progress requires patience.',
+    'Small actions compound over time.',
+    'Control your responses, not events.',
+    'Be present in this moment.',
+    'Excellence is a habit.',
+  ]
+  return general[Math.floor(Math.random() * general.length)]
+}
+
+/**
+ * Self-Care Prompts - Gentle reminders for well-being
+ */
+export function getSelfCarePrompt(context: {
+  timeOfDay?: TimeOfDay
+  energy?: 'depleted' | 'low' | 'moderate' | 'high'
+  lastBreak?: number // minutes since last break
+  screenTime?: number // hours today
+}): string | null {
+  const time = context.timeOfDay || getTimeOfDay()
+
+  // Critical energy - immediate care
+  if (context.energy === 'depleted') {
+    return 'Take a break. Your well-being matters.'
+  }
+
+  // Long screen time
+  if (context.screenTime && context.screenTime > 3) {
+    const prompts = [
+      'Rest your eyes. Look at something distant.',
+      'Stand and stretch for a moment.',
+      'Step away from the screen briefly.',
+    ]
+    return prompts[Math.floor(Math.random() * prompts.length)]
+  }
+
+  // Long work session
+  if (context.lastBreak && context.lastBreak > 90) {
+    return 'Time for a short break. Move your body.'
+  }
+
+  // Time-based care prompts
+  if (time === 'midday') {
+    return 'Pause for nourishment and rest.'
+  }
+
+  if (time === 'night' || time === 'late_night') {
+    return 'Consider rest. Tomorrow will come.'
+  }
+
+  return null
+}
+
+/**
+ * Breathing Exercise Prompts
+ */
+export function getBreathingPrompt(context: {
+  stress?: 'low' | 'moderate' | 'high'
+  timeOfDay?: TimeOfDay
+}): string {
+  if (context.stress === 'high') {
+    return 'Breathe. Center yourself in this moment.'
+  }
+
+  if (context.stress === 'moderate') {
+    return 'A few deep breaths restore clarity.'
+  }
+
+  const time = context.timeOfDay || getTimeOfDay()
+
+  if (time === 'morning' || time === 'early_morning') {
+    return 'Begin with breath. Ground yourself.'
+  }
+
+  if (time === 'evening' || time === 'night') {
+    return 'Breathe and release the day.'
+  }
+
+  return 'Pause. Breathe deeply.'
+}
+
+/**
+ * Progress Affirmations - Recognition of effort
+ */
+export function getProgressAffirmation(achievement: {
+  type: 'streak' | 'milestone' | 'consistency' | 'first_action'
+  value?: number
+}): string {
+  switch (achievement.type) {
+    case 'streak':
+      if (achievement.value && achievement.value >= 30) {
+        return 'A month of dedication. Remarkable.'
+      }
+      if (achievement.value && achievement.value >= 7) {
+        return 'A week of consistency. Well done.'
+      }
+      return 'You showed up. That matters.'
+
+    case 'milestone':
+      return 'Another milestone reached through persistent effort.'
+
+    case 'consistency':
+      return 'Steady progress builds lasting change.'
+
+    case 'first_action':
+      return 'Every journey begins with a single step.'
+
+    default:
+      return 'You are making progress.'
+  }
+}

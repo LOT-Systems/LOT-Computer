@@ -8,7 +8,7 @@ import { fp } from '#shared/utils'
 import { MemoryQuestion } from '#shared/types'
 import * as stores from '#client/stores'
 import { recordSignal, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
-import { getMemoryReflectionPrompt } from '#client/utils/narrative'
+import { getMemoryReflectionPrompt, getStoicReflection, getProgressAffirmation } from '#client/utils/narrative'
 import dayjs from '#client/utils/dayjs'
 import { getNextBadgeUnlock, checkAndAwardBadges } from '#client/utils/badges'
 
@@ -59,8 +59,20 @@ export function MemoryWidget() {
       setIsQuestionShown(false)
       setTimeout(() => {
         setQuestion(null)
-        // Combine response with insight if available
-        const fullResponse = insight ? `${response}\n\n${insight}` : response
+
+        // Add stoic reflection to response
+        const stoicReflection = getStoicReflection({
+          timeOfDay: undefined,
+          actionsToday: 1
+        })
+
+        // Combine response with insight and stoic reflection
+        let fullResponse = response
+        if (insight) {
+          fullResponse += `\n\n${insight}`
+        }
+        fullResponse += `\n\n${stoicReflection}`
+
         setResponse(fullResponse)
         setTimeout(() => {
           setIsResponseShown(true)
@@ -71,7 +83,7 @@ export function MemoryWidget() {
               setIsResponseShown(false)
               setResponse(null)
             }, 1500)
-          }, insight ? 7000 : 5000) // Show longer if there's an insight
+          }, insight ? 8000 : 6000) // Show slightly longer for stoic reflection
         }, 100)
       }, 1500)
     },

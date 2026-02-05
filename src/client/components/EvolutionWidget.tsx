@@ -4,6 +4,7 @@ import * as stores from '#client/stores'
 import { Block } from '#client/components/ui'
 import { useNarrative, useLogs } from '#client/queries'
 import dayjs from '#client/utils/dayjs'
+import { ProgressBars, getStoicProgressLabel } from '#client/utils/progressBars'
 
 /**
  * Evolution Widget - Minimalist Profile Growth Indicators
@@ -113,13 +114,8 @@ export const EvolutionWidget: React.FC = () => {
             <>
               <div className="col-span-2">
                 <div className="mb-8">Consistency</div>
-                <div className="flex items-center gap-4">
-                  <div className="flex-1 h-2 grid-fill-light rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-acc"
-                      style={{ width: `${consistency}%` }}
-                    />
-                  </div>
+                <div className="flex items-center gap-8">
+                  <ProgressBars percentage={consistency} barCount={10} />
                   <div>{consistency}%</div>
                 </div>
               </div>
@@ -127,24 +123,22 @@ export const EvolutionWidget: React.FC = () => {
           )}
         </div>
 
-        {/* Activity Progress - minimal bar */}
+        {/* Activity Progress - bar symbols */}
         <div>
-          <div className="flex justify-between mb-8">
+          <div className="flex justify-between items-center mb-8">
             <div>Total XP</div>
             <div>{totalXP}</div>
           </div>
-          <div className="h-1 grid-fill-light rounded-full overflow-hidden">
-            <div
-              className="h-full bg-acc transition-all duration-500"
-              style={{ width: `${Math.min(100, xpProgress)}%` }}
-            />
+          <div className="flex items-center gap-8">
+            <ProgressBars percentage={Math.min(100, xpProgress)} barCount={10} />
+            <div className="text-sm">{getStoicProgressLabel(xpProgress)}</div>
           </div>
         </div>
 
-        {/* Subtle creature-like evolution hint */}
+        {/* Stoic reflection on progress */}
         {currentLevel > 1 && (
-          <div className="mt-24 text-center">
-            Profile organism adapting
+          <div className="mt-24 text-center italic">
+            Growth comes from consistent action
           </div>
         )}
       </div>
