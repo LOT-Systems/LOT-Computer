@@ -34,8 +34,8 @@ export const Tag: React.FC<Props> = ({
         : fill
         ? 'bg-acc text-bac'
         : 'border-acc text-acc',
-      // Mirror mode: force white text and border immediately
-      isMirrorOn && !isRed && 'text-white border-white',
+      // Mirror mode: use theme accent color for text and border
+      isMirrorOn && !isRed && 'text-acc border-acc',
       !!(href || rest.onClick) ? 'cursor-pointer' : '',
       !!rest.onClick && 'select-none',
       className
