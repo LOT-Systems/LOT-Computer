@@ -174,7 +174,7 @@ export const ContextualPromptsWidget = () => {
             </Button>
           )}
           <Button onClick={handleDismiss}>
-            Dismiss
+            Skip
           </Button>
         </div>
         {activePrompts.length > 1 && (

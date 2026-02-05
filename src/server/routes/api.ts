@@ -4116,8 +4116,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       // Get current version from package.json or env
       const version = process.env.APP_VERSION || 'v1.2.1-stable'
 
-      // Determine protocol name based on version features
-      const getProtocolName = (ver: string) => {
+      // Determine program name based on version features
+      const getProgramName = (ver: string) => {
         if (ver.includes('1.2.1')) return 'Quantum Intent Calibration'
         if (ver.includes('1.2.0')) return 'Memory Engine Synthesis'
         return 'Neural Pathway Integration'
@@ -4147,7 +4147,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       const deployment = {
         version,
         timestamp: deploymentTime,
-        protocol: getProtocolName(version),
+        program: getProgramName(version),
         status: getStatus(),
         features
       }
@@ -4230,6 +4230,116 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error submitting feedback:', error)
       return reply.status(500).send({ error: 'Failed to submit feedback' })
+    }
+  })
+
+  /**
+   * GET /api/system/feedback-analytics
+   * Aggregated community feedback for system self-evolution
+   * Shows patterns in user feedback to guide development priorities
+   */
+  fastify.get('/system/feedback-analytics', async (req, reply) => {
+    if (!req.user) return reply.throw.authException()
+
+    try {
+      const version = process.env.APP_VERSION || 'v1.2.1-stable'
+      const sevenDaysAgo = dayjs().subtract(7, 'days').toDate()
+
+      // Get all feedback logs for current version in last 7 days
+      const feedbackLogs = await fastify.models.Log.findAll({
+        where: {
+          event: 'system_feedback',
+          metadata: {
+            version: version
+          },
+          createdAt: { [Op.gte]: sevenDaysAgo }
+        },
+        attributes: ['metadata', 'createdAt']
+      })
+
+      // Aggregate feedback counts
+      const feedbackCounts = {
+        operational: 0,
+        resonating: 0,
+        'needs-calibration': 0,
+        evolving: 0
+      }
+
+      feedbackLogs.forEach(log => {
+        const feedback = log.metadata?.feedback
+        if (feedback && feedback in feedbackCounts) {
+          feedbackCounts[feedback as keyof typeof feedbackCounts]++
+        }
+      })
+
+      const total = Object.values(feedbackCounts).reduce((sum, count) => sum + count, 0)
+
+      // Calculate percentages
+      const feedbackPercentages = {
+        operational: total > 0 ? Math.round((feedbackCounts.operational / total) * 100) : 0,
+        resonating: total > 0 ? Math.round((feedbackCounts.resonating / total) * 100) : 0,
+        'needs-calibration': total > 0 ? Math.round((feedbackCounts['needs-calibration'] / total) * 100) : 0,
+        evolving: total > 0 ? Math.round((feedbackCounts.evolving / total) * 100) : 0
+      }
+
+      // Determine system health status
+      const getSystemHealth = () => {
+        if (feedbackPercentages['needs-calibration'] > 40) {
+          return {
+            status: 'attention-needed',
+            message: 'Community signals calibration needed',
+            priority: 'high'
+          }
+        }
+        if (feedbackPercentages.resonating > 50) {
+          return {
+            status: 'resonant',
+            message: 'System resonating with community',
+            priority: 'healthy'
+          }
+        }
+        if (feedbackPercentages.evolving > 30) {
+          return {
+            status: 'transforming',
+            message: 'Active evolution in progress',
+            priority: 'medium'
+          }
+        }
+        return {
+          status: 'stable',
+          message: 'System operating normally',
+          priority: 'normal'
+        }
+      }
+
+      // Generate evolution insights based on patterns
+      const insights = []
+      if (feedbackPercentages.resonating > 40) {
+        insights.push('High resonance: Current features are well-received')
+      }
+      if (feedbackPercentages['needs-calibration'] > 25) {
+        insights.push('Calibration needed: User experience improvements required')
+      }
+      if (feedbackPercentages.evolving > 25) {
+        insights.push('Evolution active: Users are experiencing growth')
+      }
+      if (feedbackPercentages.operational > 50) {
+        insights.push('Stable foundation: Core systems functioning well')
+      }
+
+      return {
+        version,
+        period: '7 days',
+        totalResponses: total,
+        feedbackCounts,
+        feedbackPercentages,
+        systemHealth: getSystemHealth(),
+        insights,
+        timestamp: Date.now()
+      }
+    } catch (error) {
+      console.error('Error fetching feedback analytics:', error)
+      return reply.status(500).send({ error: 'Failed to fetch feedback analytics' })
     }
   })
 
