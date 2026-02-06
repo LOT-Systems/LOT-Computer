@@ -1,0 +1,105 @@
+import React from 'react'
+import { Block } from '#client/components/ui'
+import { useStore } from '@nanostores/react'
+import { intentionEngine, type IntentionSignal } from '#client/stores/intentionEngine'
+import { cn } from '#client/utils'
+
+/**
+ * Signal Stream Widget - Terminal-style live feed of Quantum Intent Engine signals
+ * Shows the most recent signals as they arrive, like a system log
+ * No cycling views - single focused display
+ */
+export function SignalStreamWidget() {
+  const engine = useStore(intentionEngine)
+  const [highlightedIndex, setHighlightedIndex] = React.useState<number | null>(null)
+  const prevCountRef = React.useRef(engine.signals.length)
+
+  // Highlight newest signal briefly when it arrives
+  React.useEffect(() => {
+    if (engine.signals.length > prevCountRef.current) {
+      setHighlightedIndex(0)
+      const timer = setTimeout(() => setHighlightedIndex(null), 2000)
+      prevCountRef.current = engine.signals.length
+      return () => clearTimeout(timer)
+    }
+    prevCountRef.current = engine.signals.length
+  }, [engine.signals.length])
+
+  // Don't show if fewer than 3 signals
+  if (engine.signals.length < 3) return null
+
+  // Get last 12 signals, newest first
+  const recentSignals = [...engine.signals]
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, 12)
+
+  const formatTimestamp = (ts: number): string => {
+    const date = new Date(ts)
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    const seconds = date.getSeconds().toString().padStart(2, '0')
+    return `${hours}:${minutes}:${seconds}`
+  }
+
+  // Calculate signal rate (signals per hour over last 24h)
+  const signalRate = React.useMemo(() => {
+    const dayAgo = Date.now() - 24 * 60 * 60 * 1000
+    const daySignals = engine.signals.filter(s => s.timestamp > dayAgo)
+    if (daySignals.length < 2) return null
+
+    const timeSpan = Date.now() - daySignals[daySignals.length - 1].timestamp
+    const hours = timeSpan / (60 * 60 * 1000)
+    if (hours < 0.1) return null
+
+    return (daySignals.length / hours).toFixed(1)
+  }, [engine.signals])
+
+  return (
+    <Block label="Signal Stream:" blockView>
+      <div className="inline-block">
+        {/* Stream header */}
+        <div className="flex justify-between mb-12">
+          <span className="opacity-60">
+            {engine.signals.length} total
+          </span>
+          {signalRate && (
+            <span className="opacity-60">
+              {signalRate}/hr
+            </span>
+          )}
+        </div>
+
+        {/* Signal entries - terminal style */}
+        <div className="flex flex-col gap-2">
+          {recentSignals.map((signal, idx) => (
+            <div
+              key={`${signal.timestamp}-${idx}`}
+              className={cn(
+                'flex items-baseline gap-8 transition-opacity duration-[1400ms]',
+                idx === 0 && highlightedIndex === 0 ? 'opacity-100' : 'opacity-80'
+              )}
+            >
+              <span className="opacity-40 tabular-nums w-[64px]">
+                {formatTimestamp(signal.timestamp)}
+              </span>
+              <span className="w-[56px] capitalize opacity-60">
+                {signal.source}
+              </span>
+              <span>
+                {signal.signal}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Sync status */}
+        <div className="mt-12 opacity-40">
+          {engine.lastSyncedTimestamp > 0
+            ? `Last sync: ${formatTimestamp(engine.lastSyncedTimestamp)}`
+            : 'Not yet synced.'
+          }
+        </div>
+      </div>
+    </Block>
+  )
+}

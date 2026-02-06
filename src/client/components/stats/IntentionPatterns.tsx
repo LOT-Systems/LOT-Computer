@@ -21,12 +21,12 @@ export function IntentionPatterns() {
   }
 
   return (
-    <Block label="Quantum Patterns Today:" blockView className="min-h-[200px]">
+    <Block label="Quantum Patterns Today:" blockView className="">
       <div className="space-y-4">
         {sortedPatterns.map(([pattern, count]) => (
           <div key={pattern} className="flex justify-between items-center">
             <span className="opacity-75">{pattern}</span>
-            <span className="font-mono tabular-nums">{count}</span>
+            <span className="tabular-nums">{count}</span>
           </div>
         ))}
 

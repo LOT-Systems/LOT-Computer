@@ -34,7 +34,7 @@ export function GrowthMilestones() {
   const { personal, community } = stats
 
   return (
-    <Block label="Growth Metrics:" blockView className="min-h-[200px]">
+    <Block label="Growth Metrics:" blockView className="">
       <div className="space-y-12">
         {/* Personal Journey */}
         <div>

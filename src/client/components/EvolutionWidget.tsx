@@ -135,10 +135,10 @@ export const EvolutionWidget: React.FC = () => {
           </div>
         </div>
 
-        {/* Stoic reflection on progress */}
+        {/* Reflection on progress */}
         {currentLevel > 1 && (
-          <div className="mt-24 text-center italic">
-            Growth comes from consistent action
+          <div className="mt-24 opacity-60">
+            Growth comes from consistent action.
           </div>
         )}
       </div>

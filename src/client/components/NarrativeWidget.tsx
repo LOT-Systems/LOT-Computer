@@ -73,15 +73,13 @@ export function NarrativeWidget() {
               {narrative.achievements
                 .filter(a => a.unlocked)
                 .sort((a, b) => {
-                  // Sort by unlocked date, newest first
                   if (!a.unlockedAt || !b.unlockedAt) return 0
                   return new Date(b.unlockedAt).getTime() - new Date(a.unlockedAt).getTime()
                 })
                 .slice(0, 5)
                 .map((achievement) => (
-                  <div key={achievement.id} className="flex items-center gap-8">
-                    <span>{achievement.icon}</span>
-                    <span>{achievement.title}</span>
+                  <div key={achievement.id}>
+                    {achievement.title}
                   </div>
                 ))}
             </div>
@@ -99,12 +97,11 @@ export function NarrativeWidget() {
             <div className="flex flex-col gap-8">
               {narrative.currentArc.activeQuests.map((quest: any) => (
                 <div key={quest.id}>
-                  <div className="mb-4 flex items-center gap-8">
-                    <span>{quest.title}</span>
-                    {quest.complete && <span>✓</span>}
+                  <div className="mb-4">
+                    {quest.title}{quest.complete ? '. Done.' : ''}
                   </div>
                   {!quest.complete && quest.progress !== undefined && (
-                    <div className="text-xs">
+                    <div className="opacity-60">
                       {quest.progress}% complete
                     </div>
                   )}

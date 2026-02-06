@@ -41,7 +41,7 @@ export const CohortConnectWidget: React.FC = () => {
 
   return (
     <Block label="Cohort:" blockView>
-      <div className="font-mono">
+      <div className="inline-block">
         {/* Cohort name */}
         <div className="mb-16">
           <div className="  mb-4">Your cohort</div>
@@ -135,7 +135,7 @@ export const CohortConnectWidget: React.FC = () => {
               onClick={() => window.location.href = '/community'}
               className="  hover:opacity-100 transition-opacity"
             >
-              View all {matches.length} members →
+              View all {matches.length} members
             </button>
           </div>
         )}

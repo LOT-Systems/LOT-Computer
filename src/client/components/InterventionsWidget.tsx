@@ -25,10 +25,10 @@ export function InterventionsWidget() {
 
   const getSeverityIndicator = () => {
     switch (intervention.severity) {
-      case 'critical': return '⚠⚠⚠'
-      case 'high': return '⚠⚠'
-      case 'medium': return '⚠'
-      case 'low': return '•'
+      case 'critical': return '[critical]'
+      case 'high': return '[high]'
+      case 'medium': return '[medium]'
+      case 'low': return '[low]'
       default: return ''
     }
   }

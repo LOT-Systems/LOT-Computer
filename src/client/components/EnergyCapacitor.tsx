@@ -59,10 +59,10 @@ export function EnergyCapacitor() {
 
           {/* Trajectory indicator */}
           {energyState.trajectory !== 'stable' && (
-            <div className="mb-12">
-              {energyState.trajectory === 'improving' && '↑ Improving'}
-              {energyState.trajectory === 'declining' && '↓ Declining'}
-              {energyState.trajectory === 'critical' && '⚠ Critical'}
+            <div className="mb-12 opacity-60">
+              {energyState.trajectory === 'improving' && 'Improving.'}
+              {energyState.trajectory === 'declining' && 'Declining.'}
+              {energyState.trajectory === 'critical' && 'Critical.'}
             </div>
           )}
 

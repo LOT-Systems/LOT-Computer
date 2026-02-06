@@ -41,6 +41,9 @@ import { EvolutionMilestoneToast } from './EvolutionMilestoneToast'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
 import { getOptimalWidget, shouldShowWidget, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
+import { QuantumStateWidget } from './QuantumStateWidget'
+import { SignalStreamWidget } from './SignalStreamWidget'
+import { PatternRecognitionWidget } from './PatternRecognitionWidget'
 import { CollectiveConsciousness, WellnessPulse, MemoryEngineStats, IntentionPatterns, BadgeUnlockFeed, GrowthMilestones } from './stats'
 
 export const System = () => {
@@ -660,13 +663,18 @@ export const System = () => {
 
       <MemoryWidget />
 
+      {/* Quantum Intent Engine Widgets */}
+      <QuantumStateWidget />
+      <PatternRecognitionWidget />
+      <SignalStreamWidget />
+
       {/* System Progress - Deployment info with feedback */}
       <SystemProgressWidget />
 
-      {/* System Pulse - Ultra-fast live activity metrics */}
+      {/* System Pulse - Real-time system metrics */}
       <SystemPulseWidget />
 
-      {/* Real-time Stats Widgets - Show in System page */}
+      {/* Stats Widgets */}
       <IntentionPatterns />
       <CollectiveConsciousness />
       <WellnessPulse />
