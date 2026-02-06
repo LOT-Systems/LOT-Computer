@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Block, Button } from '#client/components/ui'
 import { useContextualPrompts } from '#client/queries'
 import * as stores from '#client/stores'
+import axios from 'axios'
 
 export const ContextualPromptsWidget = () => {
   const { data } = useContextualPrompts()
@@ -127,14 +128,14 @@ export const ContextualPromptsWidget = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' })
         break
       case 'memory':
-        // Scroll to memory widget (it's at the bottom)
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+        // Navigate to Log tab for reflection and integration
+        stores.goTo('logs')
         break
       case 'sync':
         stores.goTo('sync')
         break
       case 'log':
-        stores.goTo('log')
+        stores.goTo('logs')
         break
     }
 
@@ -142,7 +143,17 @@ export const ContextualPromptsWidget = () => {
     setDismissedPrompts(prev => new Set(prev).add(topPrompt.triggeredBy))
   }
 
-  const handleDismiss = () => {
+  const handleDismiss = async () => {
+    // Log the skip action
+    try {
+      await axios.post('/api/logs', {
+        text: `Skipped prompt: ${topPrompt.message}`
+      })
+    } catch (error) {
+      console.error('Failed to log skip action:', error)
+    }
+
+    // Dismiss the prompt without switching tabs
     setDismissedPrompts(prev => new Set(prev).add(topPrompt.triggeredBy))
   }
 
