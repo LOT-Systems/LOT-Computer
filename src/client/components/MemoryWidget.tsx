@@ -8,7 +8,7 @@ import { fp } from '#shared/utils'
 import { MemoryQuestion } from '#shared/types'
 import * as stores from '#client/stores'
 import { recordSignal, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
-import { getMemoryReflectionPrompt } from '#client/utils/narrative'
+import { getMemoryReflectionPrompt, getStoicReflection, getProgressAffirmation } from '#client/utils/narrative'
 import dayjs from '#client/utils/dayjs'
 import { getNextBadgeUnlock, checkAndAwardBadges } from '#client/utils/badges'
 
@@ -59,8 +59,20 @@ export function MemoryWidget() {
       setIsQuestionShown(false)
       setTimeout(() => {
         setQuestion(null)
-        // Combine response with insight if available
-        const fullResponse = insight ? `${response}\n\n${insight}` : response
+
+        // Add stoic reflection to response
+        const stoicReflection = getStoicReflection({
+          timeOfDay: undefined,
+          actionsToday: 1
+        })
+
+        // Combine response with insight and stoic reflection
+        let fullResponse = response
+        if (insight) {
+          fullResponse += `\n\n${insight}`
+        }
+        fullResponse += `\n\n${stoicReflection}`
+
         setResponse(fullResponse)
         setTimeout(() => {
           setIsResponseShown(true)
@@ -71,7 +83,7 @@ export function MemoryWidget() {
               setIsResponseShown(false)
               setResponse(null)
             }, 1500)
-          }, insight ? 7000 : 5000) // Show longer if there's an insight
+          }, insight ? 8000 : 6000) // Show slightly longer for stoic reflection
         }, 100)
       }, 1500)
     },
@@ -307,13 +319,13 @@ export function MemoryWidget() {
     >
       {hasError && (
         <div className="flex flex-col gap-4">
-          <div className="opacity-60 text-sm">
+          <div>
             Memory temporarily unavailable.
           </div>
 
           {/* Error Details */}
           {showErrorDetails && error && (
-            <div className="text-sm opacity-75 font-mono grid-fill-light p-3 rounded border border-acc/20 overflow-auto max-h-[200px]">
+            <div className="font-mono grid-fill-light p-3 rounded border border-acc/20 overflow-auto max-h-[200px]">
               <div className="mb-2">Error Details:</div>
               {(error as any).response?.status && (
                 <div>Status: {(error as any).response.status}</div>
@@ -341,7 +353,7 @@ export function MemoryWidget() {
             </Button>
             <Button
               onClick={() => setShowErrorDetails(!showErrorDetails)}
-              className="flex-1 sm:flex-initial opacity-60"
+              className="flex-1 sm:flex-initial"
             >
               {showErrorDetails ? 'Hide details' : 'Show details'}
             </Button>
@@ -356,7 +368,7 @@ export function MemoryWidget() {
           )}
         >
           {/* Quantum-aware reflection prompt */}
-          <div className="mb-12 opacity-60">
+          <div className="mb-12">
             {(() => {
               try {
                 return getMemoryReflectionPrompt(quantumState.energy, quantumState.clarity, quantumState.alignment)

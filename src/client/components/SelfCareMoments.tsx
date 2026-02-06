@@ -5,6 +5,8 @@ import { Block, Button } from '#client/components/ui'
 import { useProfile, useEmotionalCheckIns, useCreateLog, useLogs } from '#client/queries'
 import { cn } from '#client/utils'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { ProgressBars } from '#client/utils/progressBars'
+import { getStoicReflection, getProgressAffirmation } from '#client/utils/narrative'
 
 type CareView = 'suggestion' | 'why' | 'practice'
 
@@ -192,10 +194,16 @@ export function SelfCareMoments() {
       localStorage.setItem('self-care-last-interaction', Date.now().toString())
     }
 
-    // Show completion message
-    const messages = ['Well done.', 'Complete.', 'Done.', 'Finished.']
-    const randomMessage = messages[Math.floor(Math.random() * messages.length)]
-    setCompletionMessage(randomMessage)
+    // Show completion message with stoic reflection
+    const affirmation = getProgressAffirmation({
+      type: 'consistency',
+      value: currentStreak + 1
+    })
+    const stoicReflection = getStoicReflection({
+      streak: currentStreak + 1,
+      actionsToday: newCount
+    })
+    setCompletionMessage(`${affirmation}\n\n${stoicReflection}`)
 
     // Fade out after 3 seconds
     setTimeout(() => {
@@ -282,7 +290,15 @@ export function SelfCareMoments() {
           {(completedToday > 0 || currentStreak > 0) && (
             <div className="opacity-90 mb-16">
               {completedToday > 0 && <div>{completedToday} done today</div>}
-              {currentStreak > 1 && <div>{currentStreak} day streak</div>}
+              {currentStreak > 1 && (
+                <div className="flex items-center gap-8">
+                  <ProgressBars
+                    percentage={Math.min(100, (currentStreak / 30) * 100)}
+                    barCount={10}
+                  />
+                  <span>{currentStreak} day streak</span>
+                </div>
+              )}
             </div>
           )}
           <div className="flex gap-8">
@@ -308,7 +324,7 @@ export function SelfCareMoments() {
       {view === 'practice' && (
         <div className="inline-block w-full">
           {isTimerRunning && (
-            <div className="mb-12 opacity-90">
+            <div className="mb-12">
               {formatTime(timeRemaining)}
             </div>
           )}

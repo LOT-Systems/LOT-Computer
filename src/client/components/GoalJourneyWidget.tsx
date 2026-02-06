@@ -51,7 +51,7 @@ export function GoalJourneyWidget() {
               <div className="mb-8">
                 {overallJourney.primaryGoal.title}
               </div>
-              <div className="mb-12 opacity-60">
+              <div className="mb-12">
                 {overallJourney.primaryGoal.narrative}
               </div>
               {overallJourney.recentBreakthroughs.length > 0 && (
@@ -107,7 +107,7 @@ export function GoalJourneyWidget() {
           </div>
 
           {/* Story arc */}
-          <div className="mb-12 opacity-60">
+          <div className="mb-12">
             {narrative.storyArc}
           </div>
 

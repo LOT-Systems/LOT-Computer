@@ -1,0 +1,97 @@
+name: lot-systems
+region: nyc3
+services:
+  - name: web
+    git:
+      branch: master
+      repo_clone_url: https://github.com/your-username/lot-systems.git
+    build_command: |
+      echo "Build started at $(date)"
+      yarn install --frozen-lockfile --production=false
+      NODE_ENV=production yarn build
+      echo "Verifying build output..."
+      ls -la dist/client/js/ | head -20
+      echo "Build completed at $(date)"
+    run_command: node dist/server/server/index.js
+    environment_slug: node-js
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    http_port: 8080
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 30
+    envs:
+      - key: NODE_ENV
+        scope: RUN_AND_BUILD_TIME
+        value: production
+      - key: DATABASE_URL
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: "${DATABASE_URL}"  # Set in Digital Ocean dashboard
+      - key: PORT
+        scope: RUN_TIME
+        value: "8080"
+      - key: APP_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: "LOT"
+      - key: APP_HOST
+        scope: RUN_AND_BUILD_TIME
+        value: "https://lot-systems.com"
+      - key: APP_DESCRIPTION
+        scope: RUN_AND_BUILD_TIME
+        value: "LOT is a subscription service that distributes digital and physical necessities, basic wardrobes, organic self-care products, home and kids essentials."
+      - key: JWT_SECRET
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: "${JWT_SECRET}"  # Generate a secure random string
+      - key: RESEND_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "${RESEND_API_KEY}"  # Get from Resend dashboard
+      - key: RESEND_FROM_EMAIL
+        scope: RUN_TIME
+        value: "support@lot-systems.com"
+      - key: RESEND_FROM_NAME
+        scope: RUN_TIME
+        value: "LOT"
+      - key: DB_HOST
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: "${DB_HOST}"  # Your database host
+      - key: DB_PORT
+        scope: RUN_AND_BUILD_TIME
+        value: "25060"
+      - key: DB_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: "${DB_NAME}"  # Your database name
+      - key: DB_USER
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: "${DB_USER}"  # Your database user
+      - key: DB_PASSWORD
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: "${DB_PASSWORD}"  # Your database password
+      - key: DB_SSL
+        scope: RUN_AND_BUILD_TIME
+        value: "true"
+      - key: ANTHROPIC_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "${ANTHROPIC_API_KEY}"  # Optional: Get from Anthropic
+      - key: OPENAI_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "${OPENAI_API_KEY}"  # Optional: Get from OpenAI
+      - key: TOGETHER_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "${TOGETHER_API_KEY}"  # Optional: Get from Together AI
+      - key: GOOGLE_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "${GOOGLE_API_KEY}"  # Optional: Get from Google
+      - key: MISTRAL_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "${MISTRAL_API_KEY}"  # Optional: Get from Mistral AI

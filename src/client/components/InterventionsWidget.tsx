@@ -41,7 +41,7 @@ export function InterventionsWidget() {
     >
       <div className="inline-block">
         {/* Narrative context */}
-        <div className="mb-12 opacity-75">
+        <div className="mb-12">
           {getInterventionNarrative(
             intervention.severity === 'critical' ? 'urgent' :
             intervention.severity === 'high' ? 'high' :
@@ -70,7 +70,7 @@ export function InterventionsWidget() {
 
         {/* Multiple interventions indicator */}
         {hasMultiple && (
-          <div className="mt-12 text-[12px] opacity-60">
+          <div className="mt-12">
             {currentIndex + 1} of {data.interventions.length}
           </div>
         )}

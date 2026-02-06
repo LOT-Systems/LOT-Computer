@@ -25,7 +25,7 @@ export const Tag: React.FC<Props> = ({
     const isRed = color === 'red'
 
     return cn(
-      'rounded px-[6px] py-[2px]',
+      'rounded px-1.5 py-0.5',
       'border border-transparent',
       isRed
         ? fill
@@ -34,7 +34,7 @@ export const Tag: React.FC<Props> = ({
         : fill
         ? 'bg-acc text-bac'
         : 'border-acc text-acc',
-      // Mirror mode: force white text and border immediately
+      // Mirror mode: use white for text and border
       isMirrorOn && !isRed && 'text-white border-white',
       !!(href || rest.onClick) ? 'cursor-pointer' : '',
       !!rest.onClick && 'select-none',
@@ -52,7 +52,7 @@ export const TagsContainer: React.FC<{
   className?: string
   items: React.ReactNode[]
 }> = ({ className, items }) => (
-  <div className={cn('flex flex-wrap gap-x-4', className)}>
+  <div className={cn('flex flex-wrap gap-x-4 gap-y-4', className)}>
     {items.map((x, i) => (
       <div key={i}>{x}</div>
     ))}

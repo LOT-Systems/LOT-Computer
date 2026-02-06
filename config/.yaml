@@ -1,0 +1,20 @@
+name: lot-systems-dev
+region: nyc3  # Match your database region
+services:
+  - name: web
+    git:
+      branch: master
+      repo_clone_url: https://github.com/vadikmarmeladov/lot-systems.git
+    build_command: yarn build
+    run_command: yarn start
+    environment_slug: node-js
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    env:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "8080"
+      - key: DATABASE_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${DATABASE_URL}  # Will be set in Digital Ocean dashboard

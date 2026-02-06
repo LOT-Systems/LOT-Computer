@@ -17,8 +17,8 @@
   --acc-color-100: 204 204 204;
 
   /* Evolution system variables - dynamically updated based on user progression */
-  --evolution-base-opacity: 0.85;
-  --evolution-accent-opacity: 0.7;
+  --evolution-base-opacity: 1.0;
+  --evolution-accent-opacity: 1.0;
   --evolution-grid-opacity: 0.15;
   --evolution-letter-spacing: -0.02em;
   --evolution-line-height: 1.4;
@@ -43,7 +43,7 @@
 }
 
 input:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--base-color) inset !important;
 }
 
 @layer base {

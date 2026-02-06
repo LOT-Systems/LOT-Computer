@@ -1,0 +1,140 @@
+name: lot-systems
+region: nyc3
+
+services:
+  - name: web
+    # GitHub repository configuration
+    git:
+      branch: claude/february-2025-updates-HZZTF
+      repo_clone_url: https://github.com/vadikmarmeladov/lot-systems.git
+
+    # Use Dockerfile instead of buildpack to ensure dist/ is preserved
+    dockerfile_path: Dockerfile
+
+    # Remove environment_slug to force Dockerfile usage
+    # environment_slug: node-js  # REMOVED - conflicts with Dockerfile
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    http_port: 8080
+
+    # Health check configuration
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+
+    # Environment variables
+    envs:
+      # Node.js Environment
+      - key: NODE_ENV
+        scope: RUN_AND_BUILD_TIME
+        value: production
+
+      - key: PORT
+        scope: RUN_TIME
+        value: "8080"
+
+      # Build metadata
+      - key: BUILD_DATE
+        scope: RUN_AND_BUILD_TIME
+        value: "${_self.CREATED_AT}"
+
+      # Application Configuration
+      - key: APP_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: LOT
+
+      - key: APP_HOST
+        scope: RUN_AND_BUILD_TIME
+        value: "https://lot-systems.com"
+
+      - key: APP_DESCRIPTION
+        scope: RUN_AND_BUILD_TIME
+        value: "LOT is a subscription service that distributes digital and physical necessities, basic wardrobes, organic self-care products, home and kids essentials."
+
+      # Database Configuration (PostgreSQL)
+      - key: DATABASE_URL
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: postgresql://doadmin:AVNS_8V6Hqzuxwj0JkMxgNvR@db-postgresql-nyc3-92053-do-user-22640384-0.f.db.ondigitalocean.com:25060/defaultdb?sslmode=require
+
+      - key: DB_HOST
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: db-postgresql-nyc3-92053-do-user-22640384-0.f.db.ondigitalocean.com
+
+      - key: DB_PORT
+        scope: RUN_AND_BUILD_TIME
+        value: "25060"
+
+      - key: DB_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: defaultdb
+
+      - key: DB_USER
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: doadmin
+
+      - key: DB_PASSWORD
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: AVNS_8V6Hqzuxwj0JkMxgNvR
+
+      - key: DB_SSL
+        scope: RUN_AND_BUILD_TIME
+        value: "true"
+
+      # JWT Configuration
+      - key: JWT_SECRET
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: 13919320b2a8816ced947b7a6385811b
+
+      # Email Service Configuration (Resend)
+      - key: RESEND_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: re_83s23f6W_LbDfdmmXpXJ4je4i2kt1HA7u
+
+      - key: RESEND_FROM_EMAIL
+        scope: RUN_TIME
+        value: support@lot-systems.com
+
+      - key: RESEND_FROM_NAME
+        scope: RUN_TIME
+        value: LOT
+
+      # AI/ML API Keys
+      - key: ANTHROPIC_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: sk-ant-api03-mUyBScB4JoNdfYJm1rA8zPv_bitstkNpfa9LZnvur6D8Hi6WYUEwvdmYStLlmzOmJxKa3hYESub-wvqPsLVETg-TP4RhQAA
+
+      - key: OPENAI_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: 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
+
+      - key: TOGETHER_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: tgp_v1_T3CicyWdakDXJhaWefknD6lTKsPFvLukpS99YJM77A0
+
+      - key: GOOGLE_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: PLACEHOLDER_GOOGLE_API_KEY_OPTIONAL
+
+      - key: MISTRAL_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: PLACEHOLDER_MISTRAL_API_KEY_OPTIONAL
+
+# Alerts (optional - uncomment to enable)
+# alerts:
+#   - rule: DEPLOYMENT_FAILED
+#   - rule: DOMAIN_FAILED

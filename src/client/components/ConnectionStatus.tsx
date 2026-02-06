@@ -38,7 +38,7 @@ export const ConnectionStatus = () => {
       <div>
         Connection lost • Attempting to reconnect...
       </div>
-      <div className="mt-1 opacity-60">
+      <div className="mt-1">
         Last update: {formatDate(lastUpdate)} • Version: {appVersion}
       </div>
     </div>

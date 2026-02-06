@@ -57,7 +57,7 @@ export function ChatCatalystWidget() {
     >
       <div className="inline-block">
         {/* Narrative context */}
-        <div className="mb-12 opacity-75">
+        <div className="mb-12">
           {getChatCatalystNarrative(catalyst.priority)}
         </div>
 
@@ -80,7 +80,7 @@ export function ChatCatalystWidget() {
 
         {/* Conversation starters if available */}
         {catalyst.conversationStarters && catalyst.conversationStarters.length > 0 && (
-          <div className="mb-12 text-[12px] opacity-60">
+          <div className="mb-12">
             <div className="mb-4">Conversation ideas:</div>
             {catalyst.conversationStarters.map((starter, i) => (
               <div key={i} className="mb-2">• {starter}</div>
@@ -90,14 +90,14 @@ export function ChatCatalystWidget() {
 
         {/* Cohort member info if present */}
         {catalyst.action.cohortMember && (
-          <div className="text-[12px] opacity-60">
+          <div className="text-xs">
             {catalyst.action.cohortMember.name}
           </div>
         )}
 
         {/* Multiple catalysts indicator */}
         {hasMultiple && (
-          <div className="mt-8 text-[12px] opacity-60">
+          <div className="mt-8">
             {currentIndex + 1} of {data.catalysts.length}
           </div>
         )}

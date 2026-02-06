@@ -4,6 +4,7 @@ import * as stores from '#client/stores'
 import { Block } from '#client/components/ui'
 import { useNarrative, useLogs } from '#client/queries'
 import dayjs from '#client/utils/dayjs'
+import { ProgressBars, getStoicProgressLabel } from '#client/utils/progressBars'
 
 /**
  * Evolution Widget - Minimalist Profile Growth Indicators
@@ -80,71 +81,64 @@ export const EvolutionWidget: React.FC = () => {
 
   return (
     <Block label="Evolution:" blockView>
-      <div className="font-mono">
+      <div>
         {/* Main level display */}
-        <div className="mb-16 flex items-baseline gap-8">
-          <div className="text-2xl">{currentLevel}</div>
-          <div className="text-sm opacity-60">{stage}</div>
+        <div className="mb-24 flex items-baseline gap-8">
+          <div>{currentLevel}</div>
+          <div>{stage}</div>
         </div>
 
         {/* Grid of metrics - minimalist */}
-        <div className="grid grid-cols-2 gap-x-16 gap-y-8 mb-16 text-sm">
+        <div className="grid grid-cols-2 gap-x-16 gap-y-8 mb-24">
           <div>
-            <div className="opacity-60 text-sm mb-2">Entries</div>
+            <div className="mb-8">Entries</div>
             <div>{totalEntries}</div>
           </div>
 
           <div>
-            <div className="opacity-60 text-sm mb-2">Active days</div>
+            <div className="mb-8">Active days</div>
             <div>{activeDays}</div>
           </div>
 
           <div>
-            <div className="opacity-60 text-sm mb-2">Streak</div>
+            <div className="mb-8">Streak</div>
             <div>{streakDays} {streakDays === 1 ? 'day' : 'days'}</div>
           </div>
 
           <div>
-            <div className="opacity-60 text-sm mb-2">Achievements</div>
+            <div className="mb-8">Achievements</div>
             <div>{unlockedAchievements}/{totalAchievements}</div>
           </div>
 
           {consistency > 0 && (
             <>
               <div className="col-span-2">
-                <div className="opacity-60 text-sm mb-2">Consistency</div>
-                <div className="flex items-center gap-4">
-                  <div className="flex-1 h-2 grid-fill-light rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-acc"
-                      style={{ width: `${consistency}%` }}
-                    />
-                  </div>
-                  <div className="text-sm opacity-60">{consistency}%</div>
+                <div className="mb-8">Consistency</div>
+                <div className="flex items-center gap-8">
+                  <ProgressBars percentage={consistency} barCount={10} />
+                  <div>{consistency}%</div>
                 </div>
               </div>
             </>
           )}
         </div>
 
-        {/* Activity Progress - minimal bar */}
+        {/* Activity Progress - bar symbols */}
         <div>
-          <div className="flex justify-between text-sm opacity-60 mb-2">
+          <div className="flex justify-between items-center mb-8">
             <div>Total XP</div>
             <div>{totalXP}</div>
           </div>
-          <div className="h-1 grid-fill-light rounded-full overflow-hidden">
-            <div
-              className="h-full bg-acc transition-all duration-500"
-              style={{ width: `${Math.min(100, xpProgress)}%` }}
-            />
+          <div className="flex items-center gap-8">
+            <ProgressBars percentage={Math.min(100, xpProgress)} barCount={10} />
+            <div className="text-sm">{getStoicProgressLabel(xpProgress)}</div>
           </div>
         </div>
 
-        {/* Subtle creature-like evolution hint */}
+        {/* Stoic reflection on progress */}
         {currentLevel > 1 && (
-          <div className="mt-16 text-sm opacity-60 text-center">
-            Profile organism adapting
+          <div className="mt-24 text-center italic">
+            Growth comes from consistent action
           </div>
         )}
       </div>

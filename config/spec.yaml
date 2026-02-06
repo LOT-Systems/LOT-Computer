@@ -1,0 +1,53 @@
+name: lot-systems-dev
+region: nyc
+domains:
+  - domain: lot-systems.com
+    type: PRIMARY
+    wildcard: false
+  - domain: www.lot-systems.com
+    type: ALIAS
+    wildcard: false
+services:
+  - name: web
+    git:
+      repo_clone_url: https://github.com/vadikmarmeladov/lot-systems.git
+      branch: master
+    build_command: |
+      npm install --legacy-peer-deps
+      npm install -g postcss-cli esbuild-runner typescript-esbuild
+      npm run client:css:build
+      npm run client:js:build
+      npm run server:build
+      if [ "$?" -eq "0" ]; then
+        NODE_ENV=production npm run migrations:up
+      fi
+    run_command: node ./dist/server/server/index.js
+    environment_slug: node-js
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    http_port: 8080
+    routes:
+      - path: /
+        preserve_path_prefix: true
+    envs:
+      - key: NODE_ENV
+        scope: RUN_AND_BUILD_TIME
+        value: production
+      - key: APP_HOST
+        scope: RUN_AND_BUILD_TIME
+        value: https://lot-systems.com
+      - key: PORT
+        scope: RUN_AND_BUILD_TIME
+        value: "8080"
+      - key: DATABASE_URL
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: postgresql://doadmin:AVNS_8V6Hqzuxwj0JkMxgNvR@db-postgresql-nyc3-92053-do-user-22640384-0.f.db.ondigitalocean.com:25060/defaultdb?sslmode=require
+      - key: JWT_SECRET
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: 13919320b2a8816ced947b7a6385811b
+      - key: OPENAI_API_KEY
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: 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

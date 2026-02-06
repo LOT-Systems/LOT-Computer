@@ -29,8 +29,8 @@ export function WellnessPulse() {
       <div className="space-y-6">
         {/* Active Now */}
         <div className="pb-4 border-b border-acc/20">
-          <div className="opacity-60 text-sm mb-2">Active Now</div>
-          <div className="text-3xl font-mono tabular-nums">
+          <div className="opacity-60 mb-2">Active Now</div>
+          <div className="text-3xl tabular-nums">
             {stats.activeNow} souls
             {hasGrown('activeNow', stats.activeNow) && <GrowthIndicator />}
           </div>
@@ -39,22 +39,22 @@ export function WellnessPulse() {
         {/* Today's Activity */}
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
-            <div className="opacity-60 text-xs mb-1">Questions</div>
-            <div className="text-2xl font-mono tabular-nums">
+            <div className="opacity-60 mb-1">Questions</div>
+            <div className="text-2xl tabular-nums">
               {stats.questionsToday}
               {hasGrown('questionsToday', stats.questionsToday) && <GrowthIndicator />}
             </div>
           </div>
           <div>
-            <div className="opacity-60 text-xs mb-1">Reflections</div>
-            <div className="text-2xl font-mono tabular-nums">
+            <div className="opacity-60 mb-1">Reflections</div>
+            <div className="text-2xl tabular-nums">
               {stats.reflectionsToday}
               {hasGrown('reflectionsToday', stats.reflectionsToday) && <GrowthIndicator />}
             </div>
           </div>
           <div>
-            <div className="opacity-60 text-xs mb-1">Care</div>
-            <div className="text-2xl font-mono tabular-nums">
+            <div className="opacity-60 mb-1">Care</div>
+            <div className="text-2xl tabular-nums">
               {stats.careMomentsToday}
               {hasGrown('careMomentsToday', stats.careMomentsToday) && <GrowthIndicator />}
             </div>
@@ -62,14 +62,14 @@ export function WellnessPulse() {
         </div>
 
         {/* Peak Hours */}
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-acc/20 text-sm">
+        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-acc/20">
           <div>
             <div className="opacity-60 mb-1">Peak Energy Hour</div>
-            <div className="font-mono">{stats.peakEnergyHour}</div>
+            <div >{stats.peakEnergyHour}</div>
           </div>
           <div>
             <div className="opacity-60 mb-1">Quietest Hour</div>
-            <div className="font-mono">{stats.quietestHour}</div>
+            <div >{stats.quietestHour}</div>
           </div>
         </div>
       </div>

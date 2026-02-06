@@ -116,7 +116,7 @@ export function ApiPage() {
       </Block>
 
       <Block label="What's Included:" blockView>
-        <div className="flex flex-col gap-y-6 opacity-75">
+        <div className="flex flex-col gap-y-6">
           <div>• Quantum Intent Signals (energy, clarity, alignment, needs support)</div>
           <div>• Emotional Patterns (mood check-ins, emotional states)</div>
           <div>• Behavioral Data (self-care activities, habits)</div>
@@ -126,7 +126,7 @@ export function ApiPage() {
       </Block>
 
       <Block label="Use Cases:" blockView>
-        <div className="flex flex-col gap-y-6 opacity-75">
+        <div className="flex flex-col gap-y-6">
           <div>• Train humanoid companions to recognize your emotional states</div>
           <div>• Configure autonomous vehicles based on your preferences</div>
           <div>• Build personalized AI assistants</div>
@@ -141,12 +141,12 @@ export function ApiPage() {
             {
               id: 'method',
               header: 'Method',
-              accessor: (row) => <span className="text-green opacity-75">{row.method}</span>
+              accessor: (row) => <span className="text-green">{row.method}</span>
             },
             {
               id: 'endpoint',
               header: 'Endpoint',
-              accessor: (row) => <span className="font-mono opacity-75">{row.endpoint}</span>
+              accessor: (row) => <span className="font-mono">{row.endpoint}</span>
             },
             {
               id: 'description',
