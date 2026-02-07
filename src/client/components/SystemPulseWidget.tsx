@@ -1,6 +1,7 @@
 import React from 'react'
 import { Block } from '#client/components/ui'
-import { cn } from '#client/utils'
+import { ProgressBars } from '#client/utils/progressBars'
+import { useLogContext } from '#client/hooks/useLogContext'
 
 interface PulseData {
   eventsPerMinute: number
@@ -10,15 +11,31 @@ interface PulseData {
   lastUpdate: number
 }
 
+type PulseView = 'metrics' | 'activity' | 'userload'
+
 /**
- * SystemPulseWidget - Ultra-fast updating stats showing system heartbeat
- * Updates every 1 second with real-time activity metrics
+ * SystemPulseWidget - Real-time system heartbeat + user activity telemetry
+ * Updates every 1 second with live activity data, cross-referenced with log context
+ * Cycles: Metrics > Activity > User Load
  */
 export function SystemPulseWidget() {
   const [pulse, setPulse] = React.useState<PulseData | null>(null)
   const [isLive, setIsLive] = React.useState(true)
+  const [view, setView] = React.useState<PulseView>('metrics')
   const intervalRef = React.useRef<NodeJS.Timeout>()
   const lastFetchRef = React.useRef<number>(0)
+  const logCtx = useLogContext()
+
+  const cycleView = () => {
+    setView(prev => {
+      switch (prev) {
+        case 'metrics': return 'activity'
+        case 'activity': return 'userload'
+        case 'userload': return 'metrics'
+        default: return 'metrics'
+      }
+    })
+  }
 
   // Fetch pulse data
   const fetchPulse = React.useCallback(async () => {
@@ -38,11 +55,11 @@ export function SystemPulseWidget() {
 
   // Auto-fetch every 1 second
   React.useEffect(() => {
-    fetchPulse() // Initial fetch
+    fetchPulse()
 
     intervalRef.current = setInterval(() => {
       fetchPulse()
-    }, 1000) // Update every second
+    }, 1000)
 
     return () => {
       if (intervalRef.current) {
@@ -67,102 +84,117 @@ export function SystemPulseWidget() {
     return null
   }
 
-  // Animate number changes
-  const AnimatedNumber: React.FC<{ value: number; decimals?: number }> = ({ value, decimals = 0 }) => {
-    return (
-      <span className="inline-block transition-all duration-300 ease-out tabular-nums">
-        {decimals > 0 ? value.toFixed(decimals) : Math.round(value)}
-      </span>
-    )
-  }
-
-  // Get intensity level for visual feedback
-  const getIntensity = (value: number, max: number) => {
-    const percent = (value / max) * 100
-    if (percent > 80) return 'high'
-    if (percent > 50) return 'medium'
-    return 'low'
-  }
-
-  const eventsIntensity = getIntensity(pulse.eventsPerMinute, 100)
-  const fluxIntensity = getIntensity(pulse.quantumFlux, 100)
+  const label =
+    view === 'metrics' ? 'System Pulse:' :
+    view === 'activity' ? 'System Load:' :
+    'User Telemetry:'
 
   return (
-    <Block label="System Pulse:" blockView>
-      <div className="flex flex-col gap-y-12">
-        {/* Live indicator */}
-        <div className="flex items-center gap-4">
-          <div className={cn(
-            'w-8 h-8 rounded-full transition-all duration-300',
-            isLive ? 'bg-green animate-pulse' : 'bg-red-500'
-          )} />
-          <span>{isLive ? 'LIVE' : 'RECONNECTING...'}</span>
-        </div>
+    <Block label={label} blockView onLabelClick={cycleView}>
+      {view === 'metrics' && (
+        <div className="inline-block">
+          {/* Live status with user context */}
+          <div className="mb-12 opacity-60">
+            {isLive ? 'Live.' : 'Reconnecting.'}
+            {!logCtx.isEmpty && logCtx.sessionDepth > 0 ? ` Session depth: ${logCtx.sessionDepth}.` : ''}
+          </div>
 
-        {/* Events Per Minute */}
-        <div className="flex justify-between items-baseline">
-          <span className="opacity-75">Events/Min</span>
-          <div className="flex items-baseline gap-4">
-            <span className={cn(
-              'text-2xl transition-colors duration-300',
-              eventsIntensity === 'high' && 'text-green',
-              eventsIntensity === 'medium' && 'text-blue',
-              eventsIntensity === 'low' && 'opacity-75'
-            )}>
-              <AnimatedNumber value={pulse.eventsPerMinute} />
-            </span>
-            {eventsIntensity === 'high' && (
-              <span className="text-green animate-pulse">▲</span>
-            )}
+          {/* Events per minute */}
+          <div className="flex justify-between items-baseline mb-8">
+            <span className="opacity-60">Events/min</span>
+            <span className="tabular-nums">{Math.round(pulse.eventsPerMinute)}</span>
+          </div>
+
+          {/* Quantum Flux */}
+          <div className="flex justify-between items-baseline mb-8">
+            <span className="opacity-60">Quantum flux</span>
+            <span className="tabular-nums">{pulse.quantumFlux.toFixed(1)}%</span>
+          </div>
+
+          {/* Neural Activity */}
+          <div className="flex justify-between items-baseline mb-8">
+            <span className="opacity-60">Neural activity</span>
+            <span className="tabular-nums">{Math.round(pulse.neuralActivity)}</span>
+          </div>
+
+          {/* Resonance */}
+          <div className="flex justify-between items-baseline">
+            <span className="opacity-60">Resonance</span>
+            <span className="tabular-nums">{pulse.resonanceHz.toFixed(1)} Hz</span>
           </div>
         </div>
+      )}
 
-        {/* Quantum Flux */}
-        <div className="flex justify-between items-baseline">
-          <span className="opacity-75">Quantum Flux</span>
-          <div className="flex items-baseline gap-4">
-            <span className={cn(
-              'text-2xl transition-colors duration-300',
-              fluxIntensity === 'high' && 'text-acc',
-              fluxIntensity === 'medium' && 'text-blue',
-              fluxIntensity === 'low' && 'opacity-75'
-            )}>
-              <AnimatedNumber value={pulse.quantumFlux} decimals={1} />%
-            </span>
+      {view === 'activity' && (
+        <div className="inline-block">
+          {/* Activity level as progress bars */}
+          <div className="mb-12">
+            <div className="flex justify-between mb-4">
+              <span className="opacity-60">Load</span>
+              <span className="tabular-nums">{Math.min(100, Math.round(pulse.eventsPerMinute))}%</span>
+            </div>
+            <ProgressBars percentage={Math.min(100, pulse.eventsPerMinute)} barCount={20} />
+          </div>
+
+          <div className="mb-12">
+            <div className="flex justify-between mb-4">
+              <span className="opacity-60">Flux</span>
+              <span className="tabular-nums">{pulse.quantumFlux.toFixed(1)}%</span>
+            </div>
+            <ProgressBars percentage={pulse.quantumFlux} barCount={20} />
+          </div>
+
+          {/* Status */}
+          <div className="opacity-60">
+            {isLive ? 'System operational.' : 'Connection interrupted.'}
           </div>
         </div>
+      )}
 
-        {/* Neural Activity */}
-        <div className="flex justify-between items-baseline">
-          <span className="opacity-75">Neural Activity</span>
-          <span className="text-xl">
-            <AnimatedNumber value={pulse.neuralActivity} />
-          </span>
-        </div>
+      {view === 'userload' && (
+        <div className="inline-block">
+          {logCtx.isEmpty ? (
+            <div className="opacity-60">No user telemetry. Begin logging to populate.</div>
+          ) : (
+            <>
+              {/* Today's user activity metrics */}
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Today signals</span>
+                <span className="tabular-nums">{logCtx.todayActivity.length}</span>
+              </div>
 
-        {/* Resonance Frequency */}
-        <div className="flex justify-between items-baseline pt-8 border-t border-acc/30">
-          <span className="opacity-75">Resonance</span>
-          <span className="text-xl">
-            <AnimatedNumber value={pulse.resonanceHz} decimals={1} /> Hz
-          </span>
-        </div>
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Weekly rate</span>
+                <span className="tabular-nums">{logCtx.weeklyRate}/wk</span>
+              </div>
 
-        {/* Activity bar */}
-        <div className="w-full h-4 bg-acc/10 rounded-full overflow-hidden">
-          <div
-            className={cn(
-              'h-full rounded-full transition-all duration-500 ease-out',
-              eventsIntensity === 'high' && 'bg-green',
-              eventsIntensity === 'medium' && 'bg-blue',
-              eventsIntensity === 'low' && 'bg-acc'
-            )}
-            style={{
-              width: `${Math.min(100, (pulse.eventsPerMinute / 100) * 100)}%`
-            }}
-          />
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Module coverage</span>
+                <span className="tabular-nums">{logCtx.activeModules.length}/6</span>
+              </div>
+
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Engagement</span>
+                <span className="capitalize">{logCtx.engagementLevel}</span>
+              </div>
+
+              {logCtx.lastActivityAgo && (
+                <div className="flex justify-between items-baseline mb-8">
+                  <span className="opacity-60">Last signal</span>
+                  <span>{logCtx.lastActivityAgo}</span>
+                </div>
+              )}
+
+              {logCtx.peakHour !== null && (
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-60">Peak hour</span>
+                  <span className="tabular-nums">{logCtx.peakHour}:00</span>
+                </div>
+              )}
+            </>
+          )}
         </div>
-      </div>
+      )}
     </Block>
   )
 }

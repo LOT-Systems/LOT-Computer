@@ -87,7 +87,7 @@ export const Sync = () => {
         setMessages((prev) => {
           if (prev.some((x) => x.id === data.id)) return prev
           const newValue = [data, ...prev]
-          return me?.isAdmin
+          return canAccessUserProfiles
             ? newValue
             : newValue.slice(0, SYNC_CHAT_MESSAGES_TO_SHOW)
         })

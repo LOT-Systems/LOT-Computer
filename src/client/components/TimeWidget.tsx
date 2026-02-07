@@ -89,16 +89,14 @@ export const TimeWidget = () => {
       const currentMinute = now.minute()
       const currentSecond = now.second()
 
-      // Play chime at the top of each hour (00:00)
-      if (currentMinute === 0 && currentSecond === 0 && lastChimeHour.current !== currentHour) {
+      // Play chime at the top of each hour (within first 3 seconds to avoid missing)
+      if (currentMinute === 0 && currentSecond <= 2 && lastChimeHour.current !== currentHour) {
         lastChimeHour.current = currentHour
         playSovietChime(currentHour)
       }
 
-      // Reset the last chime hour when we move past 00:00
-      if (currentMinute === 0 && currentSecond > 2) {
-        // Give a 2 second buffer
-      } else if (currentMinute > 0) {
+      // Reset the last chime hour once past the chime window
+      if (currentMinute >= 1) {
         lastChimeHour.current = -1
       }
     }

@@ -1,8 +1,9 @@
 import React from 'react'
 import { Block, Button } from '#client/components/ui'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { useLogContext } from '#client/hooks/useLogContext'
 
-type IntentionView = 'set' | 'current' | 'reflection'
+type IntentionView = 'set' | 'current' | 'reflection' | 'alignment'
 
 type Intention = {
   focus: string
@@ -20,6 +21,7 @@ export function IntentionsWidget() {
   const [intention, setIntention] = React.useState<Intention | null>(null)
   const [isSettingIntention, setIsSettingIntention] = React.useState(false)
   const [inputValue, setInputValue] = React.useState('')
+  const logCtx = useLogContext()
 
   // Load intention from localStorage
   React.useEffect(() => {
@@ -48,7 +50,8 @@ export function IntentionsWidget() {
     setView(prev => {
       switch (prev) {
         case 'set': return intention ? 'current' : 'set'
-        case 'current': return 'reflection'
+        case 'current': return 'alignment'
+        case 'alignment': return 'reflection'
         case 'reflection': return 'set'
         default: return 'current'
       }
@@ -103,6 +106,7 @@ export function IntentionsWidget() {
   const label =
     view === 'set' ? 'Intention:' :
     view === 'current' ? 'Current:' :
+    view === 'alignment' ? 'Alignment:' :
     'Reflect:'
 
   // Get days since intention was set
@@ -206,6 +210,58 @@ export function IntentionsWidget() {
               Set Your Intention
             </Button>
           </div>
+        </div>
+      )}
+
+      {view === 'alignment' && intention && (
+        <div className="inline-block">
+          <div className="mb-8">
+            Intention: <span className="capitalize">{intention.focus}</span>
+          </div>
+
+          {/* Activity since intention was set */}
+          <div className="mb-12 opacity-60">
+            {logCtx.totalEntries > 0
+              ? `${logCtx.todayActivity.length} action${logCtx.todayActivity.length === 1 ? '' : 's'} today. ${logCtx.streak} day streak.`
+              : 'No activity recorded yet.'
+            }
+          </div>
+
+          {/* Behavioral alignment */}
+          <div className="flex flex-col gap-4 mb-12">
+            <div className="flex justify-between items-baseline">
+              <span className="opacity-60">Widget diversity</span>
+              <span>{logCtx.widgetDiversity} types</span>
+            </div>
+            <div className="flex justify-between items-baseline">
+              <span className="opacity-60">Weekly rate</span>
+              <span>~{logCtx.weeklyRate} interactions</span>
+            </div>
+            {logCtx.dominantMood && (
+              <div className="flex justify-between items-baseline">
+                <span className="opacity-60">Mood pattern</span>
+                <span className="capitalize">{logCtx.dominantMood}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Alignment assessment */}
+          <div className="opacity-60">
+            {logCtx.streak >= 7
+              ? 'Strong convergence. Intention integrated into daily runtime.'
+              : logCtx.streak >= 3
+              ? 'Momentum compiling. Continue execution.'
+              : logCtx.streak >= 1
+              ? 'Active today. Each cycle reinforces the directive.'
+              : 'Resume execution to synchronize with this intention.'
+            }
+          </div>
+        </div>
+      )}
+
+      {view === 'alignment' && !intention && (
+        <div className="inline-block">
+          <div>Set an intention first to track alignment.</div>
         </div>
       )}
 

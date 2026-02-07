@@ -3,12 +3,15 @@
  *
  * Displays current interface evolution state, feature unlocks,
  * and progression through spiritual/psychological dimensions.
+ * Enriched with user log context for grounded evolution metrics.
  */
 
 import React from 'react';
 import { useStore } from '@nanostores/react';
 import { Block } from '#client/components/ui';
 import { $evolutionState, $featureUnlocks, $visualEffects } from '#client/stores/evolution';
+import { ProgressBars } from '#client/utils/progressBars';
+import { useLogContext } from '#client/hooks/useLogContext';
 
 type EvolutionView = 'dimensions' | 'features' | 'effects';
 
@@ -17,6 +20,7 @@ export function InterfaceEvolutionWidget() {
   const evolutionState = useStore($evolutionState);
   const featureUnlocks = useStore($featureUnlocks);
   const visualEffects = useStore($visualEffects);
+  const logCtx = useLogContext();
 
   const cycleView = () => {
     setView(prev => {
@@ -38,13 +42,13 @@ export function InterfaceEvolutionWidget() {
 
   // Dimension data
   const dimensions = [
-    { name: 'Exploration', value: evolutionState.exploration, icon: '∘' },
-    { name: 'Consistency', value: evolutionState.consistency, icon: '≋' },
-    { name: 'Depth', value: evolutionState.depth, icon: '⊕' },
-    { name: 'Connection', value: evolutionState.connection, icon: '◊' },
-    { name: 'Intimacy', value: evolutionState.intimacy, icon: '♡' },
-    { name: 'Care', value: evolutionState.care, icon: '✧' },
-    { name: 'Courage', value: evolutionState.courage, icon: '↑' },
+    { name: 'Exploration', value: evolutionState.exploration },
+    { name: 'Consistency', value: evolutionState.consistency },
+    { name: 'Depth', value: evolutionState.depth },
+    { name: 'Connection', value: evolutionState.connection },
+    { name: 'Intimacy', value: evolutionState.intimacy },
+    { name: 'Care', value: evolutionState.care },
+    { name: 'Courage', value: evolutionState.courage },
   ];
 
   // Feature unlock categories
@@ -97,13 +101,8 @@ export function InterfaceEvolutionWidget() {
 
           {/* Badge tier */}
           {evolutionState.badgeTier > 0 && (
-            <div className="mb-12 flex items-center gap-8">
-              <span>
-                {evolutionState.badgeTheme === 'water' ? '≋' : '║·║'}
-              </span>
-              <span>
-                Tier {evolutionState.badgeTier} ({evolutionState.badgeTheme})
-              </span>
+            <div className="mb-12">
+              Tier {evolutionState.badgeTier} ({evolutionState.badgeTheme})
             </div>
           )}
 
@@ -111,23 +110,22 @@ export function InterfaceEvolutionWidget() {
           <div className="flex flex-col gap-4">
             {dimensions.map(dim => (
               <div key={dim.name} className="flex items-center gap-8">
-                <span className="w-12">{dim.icon}</span>
-                <span className="w-80">{dim.name}</span>
-                <div className="flex-1 flex items-center gap-4">
-                  <div className="flex-1 h-4 border border-[rgb(var(--acc-color-default)/0.2)]">
-                    <div
-                      className="h-full bg-[rgb(var(--acc-color-default)/var(--evolution-accent-opacity))]
-                                 evolved-transition"
-                      style={{ width: `${dim.value * 100}%` }}
-                    />
-                  </div>
-                  <span className="w-32 text-right">
-                    {Math.round(dim.value * 100)}%
-                  </span>
-                </div>
+                <span className="w-[80px]">{dim.name}</span>
+                <ProgressBars percentage={dim.value * 100} barCount={10} />
+                <span className="w-[32px] text-right tabular-nums">
+                  {Math.round(dim.value * 100)}%
+                </span>
               </div>
             ))}
           </div>
+
+          {/* Log-context-grounded evolution insight */}
+          {!logCtx.isEmpty && (
+            <div className="mt-12 opacity-40">
+              {logCtx.engagementLevel} phase . {logCtx.activeDays} active day{logCtx.activeDays === 1 ? '' : 's'}
+              {logCtx.streak > 1 ? ` . ${logCtx.streak}d streak` : ''}
+            </div>
+          )}
         </div>
       )}
 
@@ -139,12 +137,12 @@ export function InterfaceEvolutionWidget() {
               <div className="flex flex-col gap-2">
                 {cat.features.map(feature => (
                   <div key={feature.name} className="flex items-center gap-8">
-                    <span className={feature.unlocked ? 'opacity-100' : 'opacity-30'}>
-                      {feature.unlocked ? '✓' : '○'}
-                    </span>
-                    <span className={feature.unlocked ? 'opacity-100' : 'opacity-40'}>
+                    <span className={feature.unlocked ? 'opacity-90' : 'opacity-30'}>
                       {feature.name}
                     </span>
+                    {feature.unlocked && (
+                      <span className="opacity-60">unlocked.</span>
+                    )}
                   </div>
                 ))}
               </div>

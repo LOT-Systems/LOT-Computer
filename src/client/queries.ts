@@ -694,3 +694,83 @@ export const useMemoryEngineStats = () =>
     refetchInterval: 60000, // Refetch every minute
     retry: false, // Don't retry if user doesn't have access
   })()
+
+// ============================================================================
+// OS API - User Operating System metrics
+// ============================================================================
+
+export const useOSStatus = () =>
+  createQuery<{
+    health: number
+    state: 'initializing' | 'active' | 'engaged' | 'optimized' | 'dormant'
+    uptime: number
+    streak: number
+    lastActivity: string | null
+    metrics: {
+      totalInteractions: number
+      memoryQuestions: number
+      journalEntries: number
+      engagementRate: number
+    }
+  }>('/api/os/status', {
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
+  })()
+
+export const useOSVersion = () =>
+  createQuery<{
+    version: string
+    name: string
+    description: string
+    progression: number
+    nextVersion: string | null
+    requirements: { answers: number; days: number }
+    unlocked: string[]
+    milestones: string[]
+  }>('/api/os/version', {
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000,
+  })()
+
+export const useOSPerformance = () =>
+  createQuery<{
+    overall: {
+      consistency: number
+      velocity: number
+      depth: number
+      balance: number
+    }
+    trends: {
+      weekly: Array<{ week: string; count: number }>
+      trajectory: 'increasing' | 'stable' | 'decreasing'
+    }
+    benchmarks: {
+      answers: number
+      logs: number
+      avgPerWeek: number
+    }
+  }>('/api/os/performance', {
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000,
+  })()
+
+export const useOSDiagnostics = () =>
+  createQuery<{
+    status: 'optimal' | 'good' | 'needs_attention'
+    optimizationScore: number
+    issues: Array<{
+      type: string
+      severity: 'low' | 'medium' | 'high'
+      description: string
+      suggestion: string
+    }>
+    lastActivity: {
+      memory: string | null
+      mood: string | null
+      planner: string | null
+    }
+    recommendations: string[]
+  }>('/api/os/diagnostics', {
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000,
+  })()

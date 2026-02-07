@@ -25,52 +25,50 @@ export function WellnessPulse() {
   }
 
   return (
-    <Block label="Community Wellness:" blockView className="min-h-[200px]">
-      <div className="space-y-6">
-        {/* Active Now */}
-        <div className="pb-4 border-b border-acc/20">
-          <div className="opacity-60 mb-2">Active Now</div>
-          <div className="text-3xl tabular-nums">
-            {stats.activeNow} souls
+    <Block label="Community Wellness:" blockView>
+      <div className="inline-block">
+        {/* Active now */}
+        <div className="mb-16">
+          <div className="opacity-60 mb-4">Active now</div>
+          <div className="flex items-baseline gap-4">
+            <span className="tabular-nums">{stats.activeNow} users</span>
             {hasGrown('activeNow', stats.activeNow) && <GrowthIndicator />}
           </div>
         </div>
 
-        {/* Today's Activity */}
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div>
-            <div className="opacity-60 mb-1">Questions</div>
-            <div className="text-2xl tabular-nums">
-              {stats.questionsToday}
+        {/* Today's activity */}
+        <div className="flex flex-col gap-8 mb-16">
+          <div className="flex justify-between items-baseline">
+            <span className="opacity-60">Questions</span>
+            <span className="flex items-center gap-4">
+              <span className="tabular-nums">{stats.questionsToday}</span>
               {hasGrown('questionsToday', stats.questionsToday) && <GrowthIndicator />}
-            </div>
+            </span>
           </div>
-          <div>
-            <div className="opacity-60 mb-1">Reflections</div>
-            <div className="text-2xl tabular-nums">
-              {stats.reflectionsToday}
+          <div className="flex justify-between items-baseline">
+            <span className="opacity-60">Reflections</span>
+            <span className="flex items-center gap-4">
+              <span className="tabular-nums">{stats.reflectionsToday}</span>
               {hasGrown('reflectionsToday', stats.reflectionsToday) && <GrowthIndicator />}
-            </div>
+            </span>
           </div>
-          <div>
-            <div className="opacity-60 mb-1">Care</div>
-            <div className="text-2xl tabular-nums">
-              {stats.careMomentsToday}
+          <div className="flex justify-between items-baseline">
+            <span className="opacity-60">Care moments</span>
+            <span className="flex items-center gap-4">
+              <span className="tabular-nums">{stats.careMomentsToday}</span>
               {hasGrown('careMomentsToday', stats.careMomentsToday) && <GrowthIndicator />}
-            </div>
+            </span>
           </div>
         </div>
 
-        {/* Peak Hours */}
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-acc/20">
-          <div>
-            <div className="opacity-60 mb-1">Peak Energy Hour</div>
-            <div >{stats.peakEnergyHour}</div>
-          </div>
-          <div>
-            <div className="opacity-60 mb-1">Quietest Hour</div>
-            <div >{stats.quietestHour}</div>
-          </div>
+        {/* Peak hours */}
+        <div className="flex justify-between items-baseline mb-8">
+          <span className="opacity-60">Peak energy hour</span>
+          <span>{stats.peakEnergyHour}</span>
+        </div>
+        <div className="flex justify-between items-baseline">
+          <span className="opacity-60">Quietest hour</span>
+          <span>{stats.quietestHour}</span>
         </div>
       </div>
     </Block>

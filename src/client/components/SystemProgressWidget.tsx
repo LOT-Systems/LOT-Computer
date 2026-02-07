@@ -116,10 +116,10 @@ export function SystemProgressWidget() {
 
   const getStatusText = () => {
     switch (deployment.status) {
-      case 'activated': return 'Program Activated'
-      case 'integrating': return '⟳ Neural Pathways Integrating'
-      case 'synchronized': return '◈ Quantum Core Synchronized'
-      default: return 'Status Unknown'
+      case 'activated': return 'Program activated.'
+      case 'integrating': return 'Neural pathways integrating.'
+      case 'synchronized': return 'Quantum core synchronized.'
+      default: return 'Status unknown.'
     }
   }
 
@@ -146,7 +146,7 @@ export function SystemProgressWidget() {
         {/* Features */}
         {deployment.features.length > 0 && (
           <div className="border-t border-acc-400/30 pt-12">
-            <div className="opacity-60 mb-8">Neural Enhancements Active:</div>
+            <div className="opacity-60 mb-8">Active enhancements:</div>
             <div className="flex flex-col gap-y-4">
               {deployment.features.map((feature, idx) => (
                 <div key={idx}>• {feature}</div>
@@ -157,7 +157,7 @@ export function SystemProgressWidget() {
 
         {/* Feedback Section */}
         <div className="border-t border-acc-400/30 pt-12">
-          <div className="opacity-60 mb-8">System Status Assessment:</div>
+          <div className="opacity-60 mb-8">System status assessment:</div>
 
           <div className="grid grid-cols-2 gap-8">
             {FEEDBACK_OPTIONS.map(option => (
@@ -183,8 +183,8 @@ export function SystemProgressWidget() {
           </div>
 
           {feedback && (
-            <div className="mt-12 opacity-75">
-              Status logged. System calibration optimized.
+            <div className="mt-12 opacity-60">
+              Status logged. Calibration updated.
             </div>
           )}
         </div>
@@ -196,64 +196,50 @@ export function SystemProgressWidget() {
               onClick={() => setShowAnalytics(!showAnalytics)}
               className="w-full flex justify-between items-center opacity-60 hover:opacity-100 transition-opacity mb-8"
             >
-              <span>Community Feedback Evolution:</span>
-              <span>{showAnalytics ? '▼' : '▶'}</span>
+              <span>Community feedback:</span>
+              <span>{showAnalytics ? '-' : '+'}</span>
             </button>
 
             {showAnalytics && (
               <div className="flex flex-col gap-y-12">
                 {/* System Health Status */}
-                <div className={`p-12 rounded border ${
-                  analytics.systemHealth.priority === 'high' ? 'border-red-500/50 bg-red-500/5' :
-                  analytics.systemHealth.priority === 'healthy' ? 'border-green-500/50 bg-green-500/5' :
-                  analytics.systemHealth.priority === 'medium' ? 'border-yellow-500/50 bg-yellow-500/5' :
-                  'border-acc-400/30'
-                }`}>
-                  <div className="opacity-75 text-sm mb-4">System Health:</div>
-                  <div className="font-medium">{analytics.systemHealth.message}</div>
+                <div className="p-12 rounded border border-acc-400/30">
+                  <div className="opacity-60 mb-4">System health:</div>
+                  <div>{analytics.systemHealth.message}</div>
                 </div>
 
                 {/* Feedback Distribution */}
                 <div>
-                  <div className="opacity-75 text-sm mb-8">Feedback Distribution ({analytics.totalResponses} responses):</div>
-                  <div className="flex flex-col gap-y-6">
+                  <div className="opacity-60 mb-8">Distribution ({analytics.totalResponses} responses):</div>
+                  <div className="flex flex-col gap-y-4">
                     {FEEDBACK_OPTIONS.map(option => {
                       const percentage = analytics.feedbackPercentages[option.id as keyof typeof analytics.feedbackPercentages]
                       return (
-                        <div key={option.id}>
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm opacity-75">{option.symbol} {option.label}</span>
-                            <span className="text-sm">{percentage}%</span>
-                          </div>
-                          <div className="w-full bg-acc-400/20 rounded-full h-4">
-                            <div
-                              className="bg-acc h-4 rounded-full transition-all duration-500"
-                              style={{ width: `${percentage}%` }}
-                            />
-                          </div>
+                        <div key={option.id} className="flex justify-between items-center">
+                          <span className="opacity-60">{option.symbol} {option.label}</span>
+                          <span className="tabular-nums">{percentage}%</span>
                         </div>
                       )
                     })}
                   </div>
                 </div>
 
-                {/* Evolution Insights */}
+                {/* Insights */}
                 {analytics.insights.length > 0 && (
                   <div>
-                    <div className="opacity-75 text-sm mb-8">Self-Evolution Insights:</div>
+                    <div className="opacity-60 mb-8">Insights:</div>
                     <div className="flex flex-col gap-y-4">
                       {analytics.insights.map((insight, idx) => (
-                        <div key={idx} className="flex gap-x-4">
-                          <span className="opacity-50">•</span>
-                          <span className="opacity-90">{insight}</span>
+                        <div key={idx}>
+                          {insight}
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                <div className="text-xs opacity-50 text-center pt-8">
-                  Analytics based on {analytics.period} of community feedback
+                <div className="opacity-40 pt-8">
+                  Based on {analytics.period} of feedback.
                 </div>
               </div>
             )}

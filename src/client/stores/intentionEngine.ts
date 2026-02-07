@@ -439,7 +439,7 @@ export async function syncToServer(): Promise<boolean> {
   try {
     console.log(`Syncing ${unsyncedSignals.length} Quantum Intent signals to server...`)
 
-    const response = await fetch('/quantum-intent/sync', {
+    const response = await fetch('/api/quantum-intent/sync', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

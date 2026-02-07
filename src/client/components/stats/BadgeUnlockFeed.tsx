@@ -23,18 +23,17 @@ export function BadgeUnlockFeed() {
   }
 
   return (
-    <Block label="Recent Unlocks:" blockView className="min-h-[200px]">
+    <Block label="Recent Unlocks:" blockView className="">
       <div className="space-y-3">
         {stats.recentUnlocks.slice(0, 5).map((unlock, index) => (
           <div
             key={index}
             className="flex justify-between items-center hover:opacity-100 transition-opacity"
           >
-            <span className="flex items-center gap-2">
-              <span className="text-lg">{unlock.badge}</span>
-              <span className="opacity-80">{unlock.userName} unlocked</span>
+            <span>
+              {unlock.userName} unlocked {unlock.badge}
             </span>
-            <span className="text-xs font-mono">{formatTimeAgo(unlock.timeAgo)}</span>
+            <span className="opacity-60 tabular-nums">{formatTimeAgo(unlock.timeAgo)}</span>
           </div>
         ))}
 

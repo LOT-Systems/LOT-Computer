@@ -1,7 +1,7 @@
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { useCollectiveStats } from '#client/queries'
-import { cn } from '#client/utils'
+import { ProgressBars } from '#client/utils/progressBars'
 
 export function CollectiveConsciousness() {
   const { data: stats, isLoading, error } = useCollectiveStats()
@@ -10,85 +10,44 @@ export function CollectiveConsciousness() {
     return null
   }
 
-  // Calculate bar widths for progress bars
-  const energyWidth = `${stats.energyLevel}%`
-  const clarityWidth = `${stats.clarityIndex}%`
-  const alignmentWidth = `${stats.alignmentScore}%`
-
   return (
-    <Block label="Collective State:" blockView className="min-h-[200px]">
-      <div className="space-y-6">
-        {/* Energy Level */}
-        <div>
-          <div className="flex justify-between mb-2">
-            <span className="opacity-80">Energy Level</span>
-            <span className="font-mono">{stats.energyLevel}%</span>
+    <Block label="Collective State:" blockView>
+      <div className="inline-block">
+        {/* Dimensional metrics with text-based bars */}
+        <div className="flex flex-col gap-8 mb-16">
+          <div className="flex items-center gap-8">
+            <span className="w-[80px] opacity-60">Energy</span>
+            <ProgressBars percentage={stats.energyLevel} barCount={10} />
+            <span className="tabular-nums">{stats.energyLevel}%</span>
           </div>
-          <div className="w-full bg-acc/10 rounded-full h-2 overflow-hidden">
-            <div
-              className={cn(
-                'h-full bg-acc rounded-full transition-all duration-500',
-                stats.energyLevel >= 70 && 'bg-green-500',
-                stats.energyLevel < 50 && 'bg-orange-500'
-              )}
-              style={{ width: energyWidth }}
-            />
+
+          <div className="flex items-center gap-8">
+            <span className="w-[80px] opacity-60">Clarity</span>
+            <ProgressBars percentage={stats.clarityIndex} barCount={10} />
+            <span className="tabular-nums">{stats.clarityIndex}%</span>
+          </div>
+
+          <div className="flex items-center gap-8">
+            <span className="w-[80px] opacity-60">Alignment</span>
+            <ProgressBars percentage={stats.alignmentScore} barCount={10} />
+            <span className="tabular-nums">{stats.alignmentScore}%</span>
           </div>
         </div>
 
-        {/* Clarity Index */}
-        <div>
-          <div className="flex justify-between mb-2">
-            <span className="opacity-80">Clarity Index</span>
-            <span className="font-mono">{stats.clarityIndex}%</span>
-          </div>
-          <div className="w-full bg-acc/10 rounded-full h-2 overflow-hidden">
-            <div
-              className={cn(
-                'h-full bg-acc rounded-full transition-all duration-500',
-                stats.clarityIndex >= 70 && 'bg-blue-500',
-                stats.clarityIndex < 50 && 'bg-yellow-500'
-              )}
-              style={{ width: clarityWidth }}
-            />
-          </div>
+        {/* Active users in flow */}
+        <div className="flex justify-between items-baseline mb-8">
+          <span className="opacity-60">Users in flow</span>
+          <span className="tabular-nums">{stats.soulsInFlow}</span>
         </div>
 
-        {/* Alignment Score */}
-        <div>
-          <div className="flex justify-between mb-2">
-            <span className="opacity-80">Alignment Score</span>
-            <span className="font-mono">{stats.alignmentScore}%</span>
-          </div>
-          <div className="w-full bg-acc/10 rounded-full h-2 overflow-hidden">
-            <div
-              className={cn(
-                'h-full bg-acc rounded-full transition-all duration-500',
-                stats.alignmentScore >= 70 && 'bg-purple-500'
-              )}
-              style={{ width: alignmentWidth }}
-            />
-          </div>
+        {/* Today's activity */}
+        <div className="flex justify-between items-baseline mb-8">
+          <span className="opacity-60">Active intentions</span>
+          <span className="tabular-nums">{stats.activeIntentions}</span>
         </div>
-
-        {/* Souls in Flow */}
-        <div className="pt-4 border-t border-acc/20">
-          <div className="flex justify-between items-center">
-            <span className="opacity-80">Souls in Flow</span>
-            <span className="text-2xl font-mono tabular-nums">{stats.soulsInFlow}</span>
-          </div>
-        </div>
-
-        {/* Today's Activity */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <div className="opacity-60 mb-1">Active Intentions</div>
-            <div className="text-lg font-mono tabular-nums">{stats.activeIntentions}</div>
-          </div>
-          <div>
-            <div className="opacity-60 mb-1">Care Moments</div>
-            <div className="text-lg font-mono tabular-nums">{stats.careMoments}</div>
-          </div>
+        <div className="flex justify-between items-baseline">
+          <span className="opacity-60">Care moments</span>
+          <span className="tabular-nums">{stats.careMoments}</span>
         </div>
       </div>
     </Block>

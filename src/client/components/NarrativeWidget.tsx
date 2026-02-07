@@ -1,38 +1,76 @@
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { useNarrative } from '#client/queries'
+import { useLogContext } from '#client/hooks/useLogContext'
+import { ProgressBars } from '#client/utils/progressBars'
 
-type NarrativeView = 'story' | 'achievements' | 'quests'
+type NarrativeView = 'story' | 'achievements' | 'quests' | 'context'
 
 /**
- * Narrative Widget - RPG-style story progression and achievements
- * Cycles: Story > Achievements > Quests
+ * Narrative Widget - RPG-style story progression grounded in user log context
+ * Cycles: Story > Achievements > Quests > Context
  */
 export function NarrativeWidget() {
   const [view, setView] = React.useState<NarrativeView>('story')
   const { data, isLoading } = useNarrative()
+  const logCtx = useLogContext()
 
   const cycleView = () => {
     setView(prev => {
       switch (prev) {
         case 'story': return 'achievements'
         case 'achievements': return 'quests'
-        case 'quests': return 'story'
+        case 'quests': return 'context'
+        case 'context': return 'story'
         default: return 'story'
       }
     })
   }
 
   if (isLoading) return null
-  if (!data || data.message) return null // Not enough data yet
+  if (!data || data.message) return null
   if (!data.narrative) return null
 
   const { narrative } = data
 
   const label =
-    view === 'story' ? 'Story:' :
-    view === 'achievements' ? 'Achievements:' :
-    'Quests:'
+    view === 'story' ? 'Arc:' :
+    view === 'achievements' ? 'Unlocked:' :
+    view === 'quests' ? 'Active Quests:' :
+    'Runtime Context:'
+
+  // Log-context-aware narrative enhancement
+  const getContextNarrative = (): string => {
+    if (logCtx.isEmpty) return 'No telemetry to compile narrative context.'
+
+    const parts: string[] = []
+
+    // Engagement level narrative
+    const engagementNarr: Record<string, string> = {
+      'new': 'You are at the beginning. Every signal matters.',
+      'exploring': 'The exploration phase is active. Each new module broadens the map.',
+      'building': 'Foundation is compiling. Patterns are beginning to converge.',
+      'integrated': 'Systems integrated. Deep correlations forming across modules.',
+      'mastered': 'Full observability achieved. The system mirrors your rhythm.'
+    }
+    parts.push(engagementNarr[logCtx.engagementLevel] || '')
+
+    // Mood trajectory narrative
+    if (logCtx.moodTrend === 'improving') {
+      parts.push('Mood trajectory ascending. The current arc favors forward momentum.')
+    } else if (logCtx.moodTrend === 'declining') {
+      parts.push('Mood signal weakening. This chapter calls for restoration and reflection.')
+    }
+
+    // Streak narrative
+    if (logCtx.streak >= 7) {
+      parts.push(`${logCtx.streak}-day streak compiled. Consistency is your strongest pattern.`)
+    } else if (logCtx.streak >= 3) {
+      parts.push(`${logCtx.streak} consecutive days logged. Momentum building.`)
+    }
+
+    return parts.filter(Boolean).join(' ')
+  }
 
   return (
     <Block
@@ -53,10 +91,18 @@ export function NarrativeWidget() {
             {narrative.currentArc.narrative}
           </div>
 
-          {/* Next milestone */}
+          {/* Next milestone with log-aware context */}
           {narrative.nextMilestone && (
-            <div>
+            <div className="mb-8">
               Next: {narrative.nextMilestone.title} at level {narrative.nextMilestone.level}
+            </div>
+          )}
+
+          {/* Log-derived progress context */}
+          {!logCtx.isEmpty && (
+            <div className="opacity-40">
+              {logCtx.totalEntries} total entries . {logCtx.activeDays} active day{logCtx.activeDays === 1 ? '' : 's'}
+              {logCtx.streak > 1 ? ` . ${logCtx.streak}d streak` : ''}
             </div>
           )}
         </div>
@@ -66,22 +112,20 @@ export function NarrativeWidget() {
         <div className="inline-block">
           {narrative.achievements.filter(a => a.unlocked).length === 0 ? (
             <div>
-              No achievements yet. Keep practicing.
+              No achievements unlocked yet. Continue input.
             </div>
           ) : (
             <div className="flex flex-col gap-4">
               {narrative.achievements
                 .filter(a => a.unlocked)
                 .sort((a, b) => {
-                  // Sort by unlocked date, newest first
                   if (!a.unlockedAt || !b.unlockedAt) return 0
                   return new Date(b.unlockedAt).getTime() - new Date(a.unlockedAt).getTime()
                 })
                 .slice(0, 5)
                 .map((achievement) => (
-                  <div key={achievement.id} className="flex items-center gap-8">
-                    <span>{achievement.icon}</span>
-                    <span>{achievement.title}</span>
+                  <div key={achievement.id}>
+                    {achievement.title}
                   </div>
                 ))}
             </div>
@@ -93,24 +137,69 @@ export function NarrativeWidget() {
         <div className="inline-block">
           {narrative.currentArc.activeQuests.length === 0 ? (
             <div>
-              No active quests right now.
+              No active quests. Awaiting next directive.
             </div>
           ) : (
             <div className="flex flex-col gap-8">
               {narrative.currentArc.activeQuests.map((quest: any) => (
                 <div key={quest.id}>
-                  <div className="mb-4 flex items-center gap-8">
-                    <span>{quest.title}</span>
-                    {quest.complete && <span>✓</span>}
+                  <div className="mb-4">
+                    {quest.title}{quest.complete ? '. Completed.' : ''}
                   </div>
                   {!quest.complete && quest.progress !== undefined && (
-                    <div className="text-xs">
-                      {quest.progress}% complete
+                    <div className="flex items-center gap-8">
+                      <ProgressBars percentage={quest.progress} barCount={10} />
+                      <span className="opacity-60 tabular-nums">{quest.progress}%</span>
                     </div>
                   )}
                 </div>
               ))}
             </div>
+          )}
+        </div>
+      )}
+
+      {view === 'context' && (
+        <div className="inline-block">
+          {logCtx.isEmpty ? (
+            <div className="opacity-60">No log data to compile narrative context.</div>
+          ) : (
+            <>
+              {/* Runtime narrative derived from logs */}
+              <div className="mb-12">
+                {getContextNarrative()}
+              </div>
+
+              {/* Module coverage for quest context */}
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Modules deployed</span>
+                <span className="tabular-nums">{logCtx.activeModules.length}/6</span>
+              </div>
+
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Widget diversity</span>
+                <span className="tabular-nums">{logCtx.widgetDiversity}</span>
+              </div>
+
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Session depth</span>
+                <span className="tabular-nums">{logCtx.sessionDepth}</span>
+              </div>
+
+              {logCtx.dominantMood && (
+                <div className="flex justify-between items-baseline mb-8">
+                  <span className="opacity-60">Dominant mood</span>
+                  <span>{logCtx.dominantMood}</span>
+                </div>
+              )}
+
+              {/* Dormant modules as potential quests */}
+              {logCtx.dormantModules.length > 0 && (
+                <div className="mt-8 opacity-40">
+                  Unexplored: {logCtx.dormantModules.join(', ')}.
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

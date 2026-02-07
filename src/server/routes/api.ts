@@ -747,7 +747,7 @@ export default async (fastify: FastifyInstance) => {
   fastify.get('/chat-messages', async (req: FastifyRequest, reply) => {
     const messages = await fastify.models.ChatMessage.findAll({
       order: [['createdAt', 'DESC']],
-      limit: req.user.isAdmin() ? undefined : SYNC_CHAT_MESSAGES_TO_SHOW,
+      limit: req.user.canAccessUsSection() ? undefined : SYNC_CHAT_MESSAGES_TO_SHOW,
     })
 
     const userIds = messages.map((m) => m.authorUserId)
@@ -3791,12 +3791,33 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         }
       })
 
-      // Simulate aggregate quantum states (replace with actual data when available)
-      // In production, you'd track these in a separate table or cache
+      // Derive quantum states from actual collective activity
+      const todayLogs = await fastify.models.Log.count({
+        where: { createdAt: { [Op.gte]: todayStart } }
+      })
+      const todayMoodLogs = await fastify.models.Log.count({
+        where: { event: 'emotional_checkin', createdAt: { [Op.gte]: todayStart } }
+      })
+      const totalUsersCount = await fastify.models.User.count()
+
+      // Energy: ratio of today's activity to expected baseline (5 logs/user/day)
+      const expectedDailyLogs = Math.max(1, totalUsersCount * 5)
+      const energyLevel = Math.min(100, Math.round((todayLogs / expectedDailyLogs) * 100))
+
+      // Clarity: mood check-in coverage across active users
+      const clarityIndex = activeCount > 0
+        ? Math.min(100, Math.round((todayMoodLogs / Math.max(1, activeCount)) * 100))
+        : 0
+
+      // Alignment: intention-to-activity ratio (users with intentions vs active users)
+      const alignmentScore = activeCount > 0
+        ? Math.min(100, Math.round((intentionsToday / Math.max(1, activeCount)) * 100))
+        : 0
+
       const stats = {
-        energyLevel: Math.min(100, 50 + Math.floor(Math.random() * 40)), // 50-90%
-        clarityIndex: Math.min(100, 45 + Math.floor(Math.random() * 40)), // 45-85%
-        alignmentScore: Math.min(100, 60 + Math.floor(Math.random() * 35)), // 60-95%
+        energyLevel,
+        clarityIndex,
+        alignmentScore,
         soulsInFlow: activeCount,
         activeIntentions: intentionsToday,
         careMoments: careMomentsToday,
@@ -3853,6 +3874,15 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
 
       const totalAnswers = await fastify.models.Answer.count()
 
+      // Days of operation from earliest system log
+      const earliestLog = await fastify.models.Log.findOne({
+        order: [['createdAt', 'ASC']],
+        attributes: ['createdAt']
+      })
+      const daysOfOperation = earliestLog
+        ? dayjs().diff(dayjs(earliestLog.createdAt), 'days')
+        : 0
+
       const stats = {
         personal: {
           journeyDays: daysSinceStart,
@@ -3863,7 +3893,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         },
         community: {
           totalSouls: totalUsers,
-          daysOfOperation: 814, // Since LOT Systems inception
+          daysOfOperation,
           collectiveWisdom: totalAnswers
         },
         lastUpdated: Date.now()
@@ -3972,18 +4002,38 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         }
       })
 
-      // Find peak hours (simulate for now)
-      const currentHour = dayjs().hour()
-      const peakHour = currentHour >= 6 && currentHour <= 10 ? '9:00 AM' :
-                      currentHour >= 19 && currentHour <= 23 ? '9:00 PM' : '9:00 AM'
+      // Find actual peak and quietest hours from recent log distribution
+      const weekAgo = now.subtract(7, 'day').toDate()
+      const weekLogs = await fastify.models.Log.findAll({
+        where: { createdAt: { [Op.gte]: weekAgo } },
+        attributes: ['createdAt'],
+        raw: true
+      })
+
+      const hourCounts: Record<number, number> = {}
+      for (let h = 0; h < 24; h++) hourCounts[h] = 0
+      weekLogs.forEach((log: any) => {
+        const h = dayjs(log.createdAt).hour()
+        hourCounts[h] = (hourCounts[h] || 0) + 1
+      })
+
+      const sortedHours = Object.entries(hourCounts).sort(([, a], [, b]) => (b as number) - (a as number))
+      const peakH = Number(sortedHours[0]?.[0] ?? 9)
+      const quietH = Number(sortedHours[sortedHours.length - 1]?.[0] ?? 3)
+
+      const formatHour = (h: number) => {
+        const suffix = h >= 12 ? 'PM' : 'AM'
+        const display = h === 0 ? 12 : h > 12 ? h - 12 : h
+        return `${display}:00 ${suffix}`
+      }
 
       const stats = {
         activeNow,
         questionsToday,
         reflectionsToday,
         careMomentsToday,
-        peakEnergyHour: peakHour,
-        quietestHour: '3:00 AM',
+        peakEnergyHour: formatHour(peakH),
+        quietestHour: formatHour(quietH),
         lastUpdated: Date.now()
       }
 
@@ -4076,22 +4126,54 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         }
       })
 
-      // Calculate average response time (simulate for now)
-      const avgResponseTime = 847 + Math.floor(Math.random() * 200) - 100 // 747-947ms
+      // Context depth (actual user log count)
+      const contextDepth = await fastify.models.Log.count({
+        where: { userId: req.user.id }
+      })
 
-      // Context depth (average logs used)
-      const contextDepth = 120
+      // Total answers for this user
+      const totalUserAnswers = await fastify.models.Answer.count({
+        where: { userId: req.user.id }
+      })
 
-      // AI diversity score (% of unique questions)
+      // AI diversity: unique question topics / total questions
       const totalQuestions = await fastify.models.Answer.count({
         where: { createdAt: { [Op.gte]: todayStart } }
       })
-      const aiDiversity = totalQuestions > 0 ?
-        Math.min(100, Math.floor(85 + Math.random() * 10)) : 94
+      const uniqueQuestions = await fastify.models.Answer.count({
+        where: { createdAt: { [Op.gte]: todayStart } },
+        distinct: true,
+        col: 'questionId'
+      })
+      const aiDiversity = totalQuestions > 0
+        ? Math.min(100, Math.round((uniqueQuestions / totalQuestions) * 100))
+        : 0
+
+      // Response quality derived from user engagement depth
+      // Scale: context depth and answer frequency indicate quality
+      const responseQuality = totalUserAnswers > 0
+        ? Math.min(5.0, Math.round((3.0 + Math.min(2.0, (contextDepth / 100) + (totalUserAnswers / 50))) * 10) / 10)
+        : 0
+
+      // Average response time derived from answer creation patterns
+      const recentAnswers = await fastify.models.Answer.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 20,
+        attributes: ['createdAt']
+      })
+      let avgResponseTime = 0
+      if (recentAnswers.length >= 2) {
+        const intervals = recentAnswers.slice(0, -1).map((a: any, i: number) => {
+          const next = recentAnswers[i + 1] as any
+          return Math.abs(dayjs(a.createdAt).diff(dayjs(next.createdAt), 'millisecond'))
+        })
+        avgResponseTime = Math.round(intervals.reduce((s: number, v: number) => s + v, 0) / intervals.length)
+      }
 
       const stats = {
         questionsGenerated,
-        responseQuality: 4.2,
+        responseQuality,
         avgResponseTime,
         contextDepth,
         aiDiversityScore: aiDiversity,
@@ -4123,8 +4205,15 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         return 'Neural Pathway Integration'
       }
 
-      // Latest deployment timestamp (in production, read from deployment log)
-      const deploymentTime = dayjs().subtract(2, 'hours').toISOString()
+      // Deployment timestamp from last system snapshot or settings change
+      const lastSystemLog = await fastify.models.Log.findOne({
+        where: { event: { [Op.in]: ['system_snapshot', 'settings_change'] } },
+        order: [['createdAt', 'DESC']],
+        attributes: ['createdAt']
+      })
+      const deploymentTime = lastSystemLog
+        ? dayjs(lastSystemLog.createdAt).toISOString()
+        : dayjs().subtract(1, 'day').toISOString()
 
       // Get status based on deployment time
       const getStatus = () => {
@@ -4373,12 +4462,6 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       // Calculate events per minute (with some smoothing)
       const eventsPerMinute = recentEvents + Math.floor(recentEventsSmoothed / 5)
 
-      // Quantum flux - based on activity variance
-      // Simulates the "quantum uncertainty" of the system
-      const baseFlux = 42.0 // Base frequency
-      const activityModifier = (eventsPerMinute / 100) * 30 // 0-30% variance
-      const quantumFlux = Math.min(100, baseFlux + activityModifier + (Math.random() * 10 - 5))
-
       // Neural activity - total unique users active in last minute
       const activeUsers = await fastify.models.Log.findAll({
         where: {
@@ -4389,11 +4472,19 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       })
       const neuralActivity = activeUsers.length
 
-      // Resonance frequency - based on system harmony
-      // Higher when many users are active and engaged
-      const baseResonance = 432.0 // A = 432 Hz (natural frequency)
-      const resonanceVariance = (neuralActivity * 2) + (Math.random() * 5 - 2.5)
-      const resonanceHz = baseResonance + resonanceVariance
+      // Quantum flux - derived from activity ratio and user engagement
+      // Higher flux = more system activity variance
+      const fiveMinRate = recentEventsSmoothed / 5
+      const activityDelta = Math.abs(recentEvents - fiveMinRate)
+      const quantumFlux = Math.min(100, Math.round(
+        (eventsPerMinute * 2) + (activityDelta * 10) + (neuralActivity * 5)
+      ))
+
+      // Resonance frequency - deterministic from system harmony
+      // Base 432 Hz, modulated by active user engagement depth
+      const baseResonance = 432.0
+      const engagementDepth = neuralActivity > 0 ? (eventsPerMinute / neuralActivity) : 0
+      const resonanceHz = baseResonance + (neuralActivity * 2) + (engagementDepth * 0.5)
 
       const pulse = {
         eventsPerMinute,

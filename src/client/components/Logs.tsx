@@ -588,7 +588,7 @@ const LogContainer: React.FC<{
       <div
         className={cn(
           'max-w-[500px] lg:max-w-[700px] whitespace-breakspaces',
-          'transition-opacity',
+          'opacity-20 transition-opacity',
           'group-hover:opacity-100'
         )}
       >

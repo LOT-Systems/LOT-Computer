@@ -7,6 +7,7 @@ import { cn } from '#client/utils'
 import { recordSignal } from '#client/stores/intentionEngine'
 import { ProgressBars } from '#client/utils/progressBars'
 import { getStoicReflection, getProgressAffirmation } from '#client/utils/narrative'
+import { useLogContext } from '#client/hooks/useLogContext'
 
 type CareView = 'suggestion' | 'why' | 'practice'
 
@@ -39,6 +40,7 @@ export function SelfCareMoments() {
   const { data: checkInsData } = useEmotionalCheckIns(7) // Last 7 days
   const { data: logs = [] } = useLogs()
   const { mutate: createLog } = useCreateLog()
+  const logCtx = useLogContext()
 
   // Calculate current streak from logs
   const calculateStreak = React.useCallback(() => {
@@ -278,9 +280,17 @@ export function SelfCareMoments() {
         <div className="inline-block w-full">
           {(() => {
             const quantumReason = localStorage.getItem('selfcare-quantum-reason')
-            return quantumReason ? (
+            // Log-context-grounded reason when quantum reason is absent
+            const contextReason = !quantumReason && !logCtx.isEmpty
+              ? (logCtx.moodTrend === 'declining' ? 'Mood trajectory declining. Restoration recommended.'
+                : logCtx.hoursSinceLastActivity !== null && logCtx.hoursSinceLastActivity > 6 ? 'Extended gap since last signal. Re-engage gently.'
+                : logCtx.todaySelfCareCount > 0 ? `${logCtx.todaySelfCareCount} self-care session${logCtx.todaySelfCareCount === 1 ? '' : 's'} logged today.`
+                : logCtx.timePhase === 'evening' ? 'Evening phase. Restoration supports overnight compilation.'
+                : null)
+              : null
+            return (quantumReason || contextReason) ? (
               <div className="opacity-60 mb-8">
-                {quantumReason}
+                {quantumReason || contextReason}
               </div>
             ) : null
           })()}

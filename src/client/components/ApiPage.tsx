@@ -87,14 +87,14 @@ export function ApiPage() {
   return (
     <div className="flex flex-col gap-y-16">
       <div>
-        <div>Export your psychological data and quantum intent for AI training.</div>
-        <div>LOT tracks your patterns to train humanoid robots, autonomous vehicles, or personal AI assistants.</div>
+        <div>Export your compiled behavioral data and quantum intent telemetry for AI integration.</div>
+        <div className="opacity-60">LOT aggregates your patterns to deploy into humanoid systems, autonomous vehicles, or personal AI modules.</div>
       </div>
 
       <Block label="Export Training Data:" blockView>
         <div className="flex flex-col gap-y-16">
-          <div className="opacity-75">
-            Download your complete psychological and quantum intent data as a structured JSON file.
+          <div className="opacity-60">
+            Compile and download your complete psychological and quantum intent dataset as structured JSON.
           </div>
 
           <Button
@@ -115,33 +115,33 @@ export function ApiPage() {
         </div>
       </Block>
 
-      <Block label="What's Included:" blockView>
+      <Block label="Included Modules:" blockView>
         <div className="flex flex-col gap-y-6">
-          <div>• Quantum Intent Signals (energy, clarity, alignment, needs support)</div>
-          <div>• Emotional Patterns (mood check-ins, emotional states)</div>
-          <div>• Behavioral Data (self-care activities, habits)</div>
-          <div>• Memory Questions & Answers</div>
-          <div>• Goal & Progress Tracking</div>
+          <div>Quantum Intent Signals. Energy, clarity, alignment, support vectors.</div>
+          <div>Emotional Pattern Data. Mood check-ins, temporal emotional states.</div>
+          <div>Behavioral Telemetry. Self-care routines, habit compilation.</div>
+          <div>Memory Engine Output. Questions, responses, reflection depth.</div>
+          <div>Goal Progression Index. Detected objectives, milestone tracking.</div>
         </div>
       </Block>
 
-      <Block label="Use Cases:" blockView>
+      <Block label="Integration Targets:" blockView>
         <div className="flex flex-col gap-y-6">
-          <div>• Train humanoid companions to recognize your emotional states</div>
-          <div>• Configure autonomous vehicles based on your preferences</div>
-          <div>• Build personalized AI assistants</div>
-          <div>• Research on human behavior patterns</div>
+          <div>Humanoid companion systems. Emotional state recognition.</div>
+          <div>Autonomous vehicle configuration. Preference calibration.</div>
+          <div>Personal AI deployment. Context-aware assistant training.</div>
+          <div>Behavioral research pipelines. Pattern analysis datasets.</div>
         </div>
       </Block>
 
-      <Block label="API Endpoints:" blockView>
+      <Block label="Endpoints:" blockView>
         <Table
           data={apiEndpoints}
           columns={[
             {
               id: 'method',
               header: 'Method',
-              accessor: (row) => <span className="text-green">{row.method}</span>
+              accessor: (row) => <span className="opacity-90">{row.method}</span>
             },
             {
               id: 'endpoint',

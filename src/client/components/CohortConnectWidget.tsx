@@ -3,17 +3,20 @@ import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button } from '#client/components/ui'
 import { useCohorts } from '#client/queries'
+import { useLogContext } from '#client/hooks/useLogContext'
+import { recordSignal } from '#client/stores/intentionEngine'
 
 /**
  * Cohort Connect Widget - Find and connect with cohort members
  *
  * Shows users in the same cohort with shared patterns and behaviors
- * Enables meaningful connections based on actual user patterns
+ * Enriched with user log context for personalized cohort presentation
  */
 export const CohortConnectWidget: React.FC = () => {
   const me = useStore(stores.me)
   const { data: cohortData, isLoading } = useCohorts()
   const [expandedMemberId, setExpandedMemberId] = React.useState<string | null>(null)
+  const logCtx = useLogContext()
 
   if (isLoading || !cohortData?.matches || cohortData.matches.length === 0) {
     return null
@@ -32,6 +35,7 @@ export const CohortConnectWidget: React.FC = () => {
     .slice(0, 5)
 
   const handleViewProfile = (userId: string) => {
+    recordSignal('mood', 'cohort_profile_viewed', { userId, hour: new Date().getHours() })
     window.location.href = `/users/${userId}`
   }
 
@@ -41,7 +45,7 @@ export const CohortConnectWidget: React.FC = () => {
 
   return (
     <Block label="Cohort:" blockView>
-      <div className="font-mono">
+      <div className="inline-block">
         {/* Cohort name */}
         <div className="mb-16">
           <div className="  mb-4">Your cohort</div>
@@ -135,14 +139,17 @@ export const CohortConnectWidget: React.FC = () => {
               onClick={() => window.location.href = '/community'}
               className="  hover:opacity-100 transition-opacity"
             >
-              View all {matches.length} members →
+              View all {matches.length} members
             </button>
           </div>
         )}
 
-        {/* Subtle hint */}
-        <div className="mt-16   text-center">
-          Connections based on patterns
+        {/* Log-context-grounded cohort insight */}
+        <div className="mt-16 opacity-40 text-center">
+          {!logCtx.isEmpty && logCtx.widgetDiversity >= 3
+            ? `Matched on ${logCtx.widgetDiversity} behavioral dimensions.`
+            : 'Connections based on shared patterns.'
+          }
         </div>
       </div>
     </Block>
