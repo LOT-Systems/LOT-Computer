@@ -4003,7 +4003,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       })
 
       // Find actual peak and quietest hours from recent log distribution
-      const weekAgo = now.subtract(7, 'day').toDate()
+      const weekAgo = dayjs().subtract(7, 'day').toDate()
       const weekLogs = await fastify.models.Log.findAll({
         where: { createdAt: { [Op.gte]: weekAgo } },
         attributes: ['createdAt'],
