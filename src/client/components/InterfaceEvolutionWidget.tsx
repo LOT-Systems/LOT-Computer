@@ -3,6 +3,7 @@
  *
  * Displays current interface evolution state, feature unlocks,
  * and progression through spiritual/psychological dimensions.
+ * Enriched with user log context for grounded evolution metrics.
  */
 
 import React from 'react';
@@ -10,6 +11,7 @@ import { useStore } from '@nanostores/react';
 import { Block } from '#client/components/ui';
 import { $evolutionState, $featureUnlocks, $visualEffects } from '#client/stores/evolution';
 import { ProgressBars } from '#client/utils/progressBars';
+import { useLogContext } from '#client/hooks/useLogContext';
 
 type EvolutionView = 'dimensions' | 'features' | 'effects';
 
@@ -18,6 +20,7 @@ export function InterfaceEvolutionWidget() {
   const evolutionState = useStore($evolutionState);
   const featureUnlocks = useStore($featureUnlocks);
   const visualEffects = useStore($visualEffects);
+  const logCtx = useLogContext();
 
   const cycleView = () => {
     setView(prev => {
@@ -115,6 +118,14 @@ export function InterfaceEvolutionWidget() {
               </div>
             ))}
           </div>
+
+          {/* Log-context-grounded evolution insight */}
+          {!logCtx.isEmpty && (
+            <div className="mt-12 opacity-40">
+              {logCtx.engagementLevel} phase . {logCtx.activeDays} active day{logCtx.activeDays === 1 ? '' : 's'}
+              {logCtx.streak > 1 ? ` . ${logCtx.streak}d streak` : ''}
+            </div>
+          )}
         </div>
       )}
 

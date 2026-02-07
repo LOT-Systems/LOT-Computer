@@ -5,18 +5,20 @@ import { intentionEngine, analyzeIntentions, getOptimalWidget, type IntentionPat
 import { useLogs } from '#client/queries'
 import { ProgressBars } from '#client/utils/progressBars'
 import { cn } from '#client/utils'
+import { useLogContext } from '#client/hooks/useLogContext'
 
 type PatternView = 'active' | 'recommendation' | 'confidence'
 
 /**
  * Pattern Recognition Widget - Shows detected behavioral patterns from QIE
- * Displays confidence levels as text-based progress bars
+ * Displays confidence levels as text-based progress bars, enriched with log context
  * Cycles: Active Patterns > Recommendation > Confidence Map
  */
 export function PatternRecognitionWidget() {
   const [view, setView] = React.useState<PatternView>('active')
   const engine = useStore(intentionEngine)
   const { data: logs = [] } = useLogs()
+  const logCtx = useLogContext()
 
   // Trigger analysis
   React.useEffect(() => {
@@ -135,16 +137,20 @@ export function PatternRecognitionWidget() {
               <div className="mb-8">
                 Suggested: {getWidgetLabel(optimal.widget)}.
               </div>
-              {/* Show confidence context */}
+              {/* Show confidence context enriched with log data */}
               {patterns.length > 0 && (
                 <div className="opacity-40">
-                  Derived from {patterns.filter(p => p.confidence >= 0.5).length} pattern{patterns.filter(p => p.confidence >= 0.5).length === 1 ? '' : 's'} above threshold.
+                  Derived from {patterns.filter(p => p.confidence >= 0.5).length} pattern{patterns.filter(p => p.confidence >= 0.5).length === 1 ? '' : 's'}
+                  {!logCtx.isEmpty ? ` and ${logCtx.totalEntries} log entries.` : ' above threshold.'}
                 </div>
               )}
             </>
           ) : (
             <div>
-              No module recommendation at this time. System nominal.
+              {logCtx.isEmpty
+                ? 'No telemetry for pattern compilation. Begin logging to initialize.'
+                : 'No module recommendation at this time. System nominal.'
+              }
             </div>
           )}
         </div>
@@ -171,9 +177,10 @@ export function PatternRecognitionWidget() {
                 ))
               }
 
-              {/* Summary */}
+              {/* Summary enriched with log context */}
               <div className="mt-8 opacity-60">
                 {patterns.length} pattern{patterns.length === 1 ? '' : 's'} indexed.
+                {!logCtx.isEmpty ? ` ${logCtx.activeModules.length}/6 modules reporting.` : ''}
               </div>
             </div>
           )}

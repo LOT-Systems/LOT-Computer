@@ -2,12 +2,13 @@ import React from 'react'
 import { Block } from '#client/components/ui'
 import { useOSStatus, useOSVersion, useOSPerformance } from '#client/queries'
 import { ProgressBars } from '#client/utils/progressBars'
+import { useLogContext } from '#client/hooks/useLogContext'
 
 type MetricsView = 'status' | 'performance' | 'version'
 
 /**
- * UserMetricsWidget - Personal operating system metrics
- * Shows health, performance, version progression from the OS API
+ * UserMetricsWidget - Personal operating system metrics cross-referenced with log context
+ * Shows health, performance, version progression from OS API enriched with user log data
  * Cycles: Status > Performance > Version
  */
 export function UserMetricsWidget() {
@@ -15,6 +16,7 @@ export function UserMetricsWidget() {
   const { data: status, isLoading: statusLoading } = useOSStatus()
   const { data: performance, isLoading: perfLoading } = useOSPerformance()
   const { data: version, isLoading: versionLoading } = useOSVersion()
+  const logCtx = useLogContext()
 
   const cycleView = () => {
     setView(prev => {
@@ -66,17 +68,24 @@ export function UserMetricsWidget() {
             <span className="tabular-nums">{status.uptime} day{status.uptime === 1 ? '' : 's'}</span>
           </div>
 
-          {/* Streak */}
+          {/* Streak - cross-reference with log-derived streak */}
           <div className="flex justify-between items-baseline mb-8">
             <span className="opacity-60">Streak</span>
             <span className="tabular-nums">{status.streak} day{status.streak === 1 ? '' : 's'}</span>
           </div>
 
           {/* Interactions */}
-          <div className="flex justify-between items-baseline">
+          <div className="flex justify-between items-baseline mb-8">
             <span className="opacity-60">Interactions</span>
             <span className="tabular-nums">{status.metrics.totalInteractions}</span>
           </div>
+
+          {/* Log-derived context */}
+          {!logCtx.isEmpty && (
+            <div className="opacity-40 mt-8">
+              {logCtx.todayActivity.length} signal{logCtx.todayActivity.length === 1 ? '' : 's'} today . {logCtx.activeModules.length}/6 modules active
+            </div>
+          )}
         </div>
       )}
 
@@ -106,20 +115,24 @@ export function UserMetricsWidget() {
             </div>
           </div>
 
-          {/* Trajectory */}
+          {/* Trajectory enriched with log mood trend */}
           <div className="opacity-60">
             Trajectory: {
               performance.trends.trajectory === 'increasing' ? 'accelerating.' :
               performance.trends.trajectory === 'decreasing' ? 'decelerating.' :
               'holding steady.'
             }
+            {logCtx.moodTrend !== 'stable' ? ` Mood ${logCtx.moodTrend}.` : ''}
           </div>
         </div>
       )}
 
       {view === 'performance' && !performance && (
         <div className="inline-block">
-          <div className="opacity-60">Insufficient telemetry for performance benchmarks.</div>
+          <div className="opacity-60">
+            Insufficient telemetry for performance benchmarks.
+            {!logCtx.isEmpty && logCtx.totalEntries < 10 ? ` ${logCtx.totalEntries} entries logged. Continue input.` : ''}
+          </div>
         </div>
       )}
 
@@ -148,6 +161,14 @@ export function UserMetricsWidget() {
           {version.unlocked.length > 0 && (
             <div className="opacity-60">
               {version.unlocked.join(' . ')}
+            </div>
+          )}
+
+          {/* Log-derived engagement context */}
+          {!logCtx.isEmpty && (
+            <div className="opacity-40 mt-8">
+              Engagement: {logCtx.engagementLevel}
+              {logCtx.widgetDiversity > 0 ? ` . ${logCtx.widgetDiversity} event types` : ''}
             </div>
           )}
         </div>

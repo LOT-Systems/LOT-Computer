@@ -4,11 +4,12 @@ import { useStore } from '@nanostores/react'
 import { intentionEngine, analyzeIntentions, getUserState, type UserState } from '#client/stores/intentionEngine'
 import { useLogs } from '#client/queries'
 import { ProgressBars } from '#client/utils/progressBars'
+import { useLogContext } from '#client/hooks/useLogContext'
 
 type QuantumView = 'state' | 'dimensions' | 'history'
 
 /**
- * Quantum State Widget - Real-time 4-dimensional user state from the Intent Engine
+ * Quantum State Widget - Real-time 4D user state from QIE cross-referenced with log context
  * Displays energy, clarity, alignment, and support needs as text-based meters
  * Cycles: State > Dimensions > History
  */
@@ -16,6 +17,7 @@ export function QuantumStateWidget() {
   const [view, setView] = React.useState<QuantumView>('state')
   const engine = useStore(intentionEngine)
   const { data: logs = [] } = useLogs()
+  const logCtx = useLogContext()
 
   // Trigger fresh analysis when logs change
   React.useEffect(() => {
@@ -141,10 +143,16 @@ export function QuantumStateWidget() {
             </div>
           </div>
 
-          {/* Signal count */}
+          {/* Signal count enriched with log context */}
           <div className="opacity-60">
             {engine.signals.length} signal{engine.signals.length === 1 ? '' : 's'} cached in local memory.
           </div>
+          {!logCtx.isEmpty && (
+            <div className="mt-4 opacity-40">
+              {logCtx.timePhase} phase . {logCtx.engagementLevel}
+              {logCtx.dominantMood ? ` . ${logCtx.dominantMood}` : ''}
+            </div>
+          )}
         </div>
       )}
 
@@ -163,13 +171,18 @@ export function QuantumStateWidget() {
             }
           </div>
 
-          {/* Analysis metadata */}
+          {/* Analysis metadata enriched with log context */}
           <div className="opacity-60">
             {engine.lastAnalysis > 0
               ? `Last compiled: ${formatTimeAgo(engine.lastAnalysis)} ago.`
               : 'Awaiting initial compilation.'
             }
           </div>
+          {!logCtx.isEmpty && (
+            <div className="mt-4 opacity-40">
+              {logCtx.activeModules.length}/6 modules reporting . {logCtx.todayActivity.length} today
+            </div>
+          )}
         </div>
       )}
 

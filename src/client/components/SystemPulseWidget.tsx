@@ -1,6 +1,7 @@
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { ProgressBars } from '#client/utils/progressBars'
+import { useLogContext } from '#client/hooks/useLogContext'
 
 interface PulseData {
   eventsPerMinute: number
@@ -10,12 +11,12 @@ interface PulseData {
   lastUpdate: number
 }
 
-type PulseView = 'metrics' | 'activity'
+type PulseView = 'metrics' | 'activity' | 'userload'
 
 /**
- * SystemPulseWidget - Real-time system heartbeat metrics
- * Updates every 1 second with live activity data
- * Cycles: Metrics > Activity
+ * SystemPulseWidget - Real-time system heartbeat + user activity telemetry
+ * Updates every 1 second with live activity data, cross-referenced with log context
+ * Cycles: Metrics > Activity > User Load
  */
 export function SystemPulseWidget() {
   const [pulse, setPulse] = React.useState<PulseData | null>(null)
@@ -23,9 +24,17 @@ export function SystemPulseWidget() {
   const [view, setView] = React.useState<PulseView>('metrics')
   const intervalRef = React.useRef<NodeJS.Timeout>()
   const lastFetchRef = React.useRef<number>(0)
+  const logCtx = useLogContext()
 
   const cycleView = () => {
-    setView(prev => prev === 'metrics' ? 'activity' : 'metrics')
+    setView(prev => {
+      switch (prev) {
+        case 'metrics': return 'activity'
+        case 'activity': return 'userload'
+        case 'userload': return 'metrics'
+        default: return 'metrics'
+      }
+    })
   }
 
   // Fetch pulse data
@@ -75,15 +84,19 @@ export function SystemPulseWidget() {
     return null
   }
 
-  const label = view === 'metrics' ? 'System Pulse:' : 'Activity:'
+  const label =
+    view === 'metrics' ? 'System Pulse:' :
+    view === 'activity' ? 'System Load:' :
+    'User Telemetry:'
 
   return (
     <Block label={label} blockView onLabelClick={cycleView}>
       {view === 'metrics' && (
         <div className="inline-block">
-          {/* Live status */}
+          {/* Live status with user context */}
           <div className="mb-12 opacity-60">
             {isLive ? 'Live.' : 'Reconnecting.'}
+            {!logCtx.isEmpty && logCtx.sessionDepth > 0 ? ` Session depth: ${logCtx.sessionDepth}.` : ''}
           </div>
 
           {/* Events per minute */}
@@ -135,6 +148,51 @@ export function SystemPulseWidget() {
           <div className="opacity-60">
             {isLive ? 'System operational.' : 'Connection interrupted.'}
           </div>
+        </div>
+      )}
+
+      {view === 'userload' && (
+        <div className="inline-block">
+          {logCtx.isEmpty ? (
+            <div className="opacity-60">No user telemetry. Begin logging to populate.</div>
+          ) : (
+            <>
+              {/* Today's user activity metrics */}
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Today signals</span>
+                <span className="tabular-nums">{logCtx.todayActivity.length}</span>
+              </div>
+
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Weekly rate</span>
+                <span className="tabular-nums">{logCtx.weeklyRate}/wk</span>
+              </div>
+
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Module coverage</span>
+                <span className="tabular-nums">{logCtx.activeModules.length}/6</span>
+              </div>
+
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Engagement</span>
+                <span className="capitalize">{logCtx.engagementLevel}</span>
+              </div>
+
+              {logCtx.lastActivityAgo && (
+                <div className="flex justify-between items-baseline mb-8">
+                  <span className="opacity-60">Last signal</span>
+                  <span>{logCtx.lastActivityAgo}</span>
+                </div>
+              )}
+
+              {logCtx.peakHour !== null && (
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-60">Peak hour</span>
+                  <span className="tabular-nums">{logCtx.peakHour}:00</span>
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
     </Block>

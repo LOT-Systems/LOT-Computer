@@ -3,14 +3,15 @@ import { Block } from '#client/components/ui'
 import { useStore } from '@nanostores/react'
 import { intentionEngine, getUserState, analyzeIntentions, type UserState } from '#client/stores/intentionEngine'
 import { useOSDiagnostics, useProfile, useLogs } from '#client/queries'
+import { useLogContext } from '#client/hooks/useLogContext'
 
 type FeedbackView = 'insight' | 'diagnostics' | 'guidance'
 
 /**
  * AIFeedbackWidget - Quantum-state-aware personal AI feedback
- * Combines QIE state with OS diagnostics and profile data
- * to provide personalized, context-aware guidance
- * Cycles: Insight > Diagnostics > Guidance
+ * Combines QIE state + OS diagnostics + profile + user log context
+ * to provide personalized, log-grounded guidance
+ * Cycles: Insight > Diagnostics > Directive
  */
 export function AIFeedbackWidget() {
   const [view, setView] = React.useState<FeedbackView>('insight')
@@ -18,6 +19,7 @@ export function AIFeedbackWidget() {
   const { data: diagnostics } = useOSDiagnostics()
   const { data: profile } = useProfile()
   const { data: logs = [] } = useLogs()
+  const logCtx = useLogContext()
 
   // Trigger analysis when logs change
   React.useEffect(() => {
@@ -45,29 +47,44 @@ export function AIFeedbackWidget() {
     view === 'diagnostics' ? 'Diagnostics:' :
     'Directive:'
 
-  // Generate state-aware insight based on quantum state
+  // Generate state-aware insight grounded in both quantum state and log context
   const getStateInsight = (state: UserState): string => {
     const { energy, clarity, alignment, needsSupport } = state
 
-    // Critical support needed
+    // Critical support needed — enriched with log context
     if (needsSupport === 'critical') {
+      if (logCtx.moodTrend === 'declining') {
+        return 'System strain detected. Mood trajectory declining across recent check-ins. Prioritize restoration.'
+      }
       return 'System strain detected. Prioritize energy restoration before deploying further modules.'
     }
 
     if (needsSupport === 'moderate') {
+      if (logCtx.hoursSinceLastMood !== null && logCtx.hoursSinceLastMood > 6) {
+        return 'Moderate load detected. Mood data stale. Re-calibrate with a fresh check-in.'
+      }
       return 'Moderate load detected. Initialize self-care or mood calibration.'
     }
 
-    // Energy-based insights
+    // Energy-based insights enriched with log data
     if (energy === 'depleted') {
+      if (logCtx.todaySelfCareCount === 0) {
+        return 'Energy buffer depleted. No self-care logged today. Deploy restoration module.'
+      }
       return 'Energy buffer depleted. Suspend deep processing. Focus on input restoration.'
     }
 
     if (energy === 'high' && clarity === 'focused') {
+      if (logCtx.sessionDepth > 5) {
+        return 'Optimal state compiled. Deep session active. Deploy Memory Engine for maximum integration.'
+      }
       return 'Optimal state compiled. Deploy Memory Engine for maximum integration depth.'
     }
 
     if (energy === 'high' && clarity === 'confused') {
+      if (!logCtx.hasIntention) {
+        return 'Energy available but no intention vector set. Initialize Intention Engine to calibrate.'
+      }
       return 'Energy available but vector undefined. Initialize intention to calibrate direction.'
     }
 
@@ -82,6 +99,9 @@ export function AIFeedbackWidget() {
 
     // Alignment-based insights
     if (alignment === 'searching') {
+      if (logCtx.engagementLevel === 'new' || logCtx.engagementLevel === 'exploring') {
+        return 'Search mode active. Expected in early exploration phase. Pattern recognition accelerating.'
+      }
       return 'Search mode active. Exploratory phase is part of the compilation process.'
     }
 
@@ -89,18 +109,27 @@ export function AIFeedbackWidget() {
       return 'Aligned and stable. Maintain current execution path.'
     }
 
-    // Default
+    // Default — use log context for richer fallback
     if (energy === 'unknown') {
+      if (logCtx.isEmpty) {
+        return 'No telemetry received. Begin with any module to initialize the system.'
+      }
       return 'Indexing signals. Additional telemetry will refine output.'
     }
 
     return 'System nominal. Continue current execution.'
   }
 
-  // Generate guidance based on patterns and state
+  // Generate guidance deeply grounded in log context
   const getGuidance = (): string[] => {
     const guidance: string[] = []
     const patterns = engine.recognizedPatterns
+
+    // Log-context-derived guidance (highest priority)
+    const logDirective = logCtx.getContextualDirective()
+    if (logDirective) {
+      guidance.push(logDirective)
+    }
 
     // Pattern-based guidance
     const highConfidence = patterns.filter(p => p.confidence >= 0.8)
@@ -108,24 +137,30 @@ export function AIFeedbackWidget() {
       guidance.push(highConfidence[0].reason)
     }
 
-    // State-based guidance
-    if (userState.energy === 'depleted' || userState.energy === 'low') {
+    // State + log cross-reference
+    if ((userState.energy === 'depleted' || userState.energy === 'low') && logCtx.todaySelfCareCount === 0) {
+      guidance.push('Energy low and no self-care today. Deploy self-care module to restore buffer.')
+    } else if (userState.energy === 'depleted' || userState.energy === 'low') {
       guidance.push('Prioritize energy restoration before further module deployment.')
     }
 
-    if (userState.clarity === 'confused') {
-      guidance.push('Initialize a simple intention to calibrate direction.')
+    if (userState.clarity === 'confused' && !logCtx.hasIntention) {
+      guidance.push('No intention vector found. Initialize one to calibrate direction.')
     }
 
     if (userState.alignment === 'flowing') {
       guidance.push('Protect this flow runtime. Minimize context switches.')
     }
 
+    // Dormant module guidance
+    if (logCtx.dormantModules.length >= 3) {
+      guidance.push(`${logCtx.dormantModules.length} modules dormant. Broaden input for richer pattern coverage.`)
+    }
+
     // Profile-based guidance
     if (profile?.growthTrajectory === 'emerging') {
       guidance.push('Patterns initializing. Consistent input will accelerate compilation.')
     }
-
     if (profile?.growthTrajectory === 'deepening') {
       guidance.push('Practice depth increasing. Integrate new dimensions.')
     }
@@ -158,19 +193,22 @@ export function AIFeedbackWidget() {
             {getStateInsight(userState)}
           </div>
 
-          {/* Context: archetype and growth */}
-          {profile?.archetype && (
+          {/* Log-derived context line */}
+          {!logCtx.isEmpty && (
             <div className="mb-8 opacity-60">
-              {profile.archetype}
-              {profile.growthTrajectory ? ` . ${profile.growthTrajectory}` : ''}
+              {logCtx.engagementLevel} runtime
+              {logCtx.dominantMood ? ` . ${logCtx.dominantMood}` : ''}
+              {logCtx.streak > 1 ? ` . ${logCtx.streak}d streak` : ''}
+              {profile?.archetype ? ` . ${profile.archetype}` : ''}
             </div>
           )}
 
           {/* Signal summary */}
           <div className="opacity-40">
             Based on {engine.signals.length} signal{engine.signals.length === 1 ? '' : 's'}
+            {logCtx.totalEntries > 0 ? `, ${logCtx.totalEntries} log entries` : ''}
             {engine.recognizedPatterns.length > 0
-              ? ` and ${engine.recognizedPatterns.filter(p => p.confidence >= 0.5).length} pattern${engine.recognizedPatterns.filter(p => p.confidence >= 0.5).length === 1 ? '' : 's'}.`
+              ? `, ${engine.recognizedPatterns.filter(p => p.confidence >= 0.5).length} pattern${engine.recognizedPatterns.filter(p => p.confidence >= 0.5).length === 1 ? '' : 's'}.`
               : '.'
             }
           </div>
@@ -187,9 +225,20 @@ export function AIFeedbackWidget() {
                 <span className="capitalize">{diagnostics.status.replace('_', ' ')}</span>
               </div>
 
-              <div className="flex justify-between items-baseline mb-12">
+              <div className="flex justify-between items-baseline mb-8">
                 <span className="opacity-60">Optimization</span>
                 <span className="tabular-nums">{diagnostics.optimizationScore}%</span>
+              </div>
+
+              {/* Log-derived diagnostics */}
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Module coverage</span>
+                <span className="tabular-nums">{logCtx.activeModules.length}/6</span>
+              </div>
+
+              <div className="flex justify-between items-baseline mb-12">
+                <span className="opacity-60">Session depth</span>
+                <span className="tabular-nums">{logCtx.sessionDepth}</span>
               </div>
 
               {/* Issues */}
@@ -207,14 +256,37 @@ export function AIFeedbackWidget() {
               )}
             </>
           ) : (
-            <div className="opacity-60">Diagnostics loading.</div>
+            // Fallback diagnostics from log context when OS diagnostics unavailable
+            <div className="inline-block">
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Engagement</span>
+                <span className="capitalize">{logCtx.engagementLevel}</span>
+              </div>
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Active modules</span>
+                <span className="tabular-nums">{logCtx.activeModules.length}/6</span>
+              </div>
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Today signals</span>
+                <span className="tabular-nums">{logCtx.todayActivity.length}</span>
+              </div>
+              <div className="flex justify-between items-baseline mb-8">
+                <span className="opacity-60">Mood trend</span>
+                <span>{logCtx.moodTrend}</span>
+              </div>
+              {logCtx.dormantModules.length > 0 && (
+                <div className="mt-8 opacity-60">
+                  Dormant: {logCtx.dormantModules.join(', ')}.
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}
 
       {view === 'guidance' && (
         <div className="inline-block">
-          {/* State-aware guidance */}
+          {/* Log-grounded guidance */}
           <div className="flex flex-col gap-8 mb-12">
             {getGuidance().map((item, idx) => (
               <div key={idx}>

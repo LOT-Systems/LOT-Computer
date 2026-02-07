@@ -3,16 +3,18 @@ import { Block } from '#client/components/ui'
 import { useStore } from '@nanostores/react'
 import { intentionEngine, type IntentionSignal } from '#client/stores/intentionEngine'
 import { cn } from '#client/utils'
+import { useLogContext } from '#client/hooks/useLogContext'
 
 /**
- * Signal Stream Widget - Terminal-style live feed of Quantum Intent Engine signals
- * Shows the most recent signals as they arrive, like a system log
+ * Signal Stream Widget - Terminal-style live feed of QIE signals + log context
+ * Shows the most recent signals with user log grounding
  * No cycling views - single focused display
  */
 export function SignalStreamWidget() {
   const engine = useStore(intentionEngine)
   const [highlightedIndex, setHighlightedIndex] = React.useState<number | null>(null)
   const prevCountRef = React.useRef(engine.signals.length)
+  const logCtx = useLogContext()
 
   // Highlight newest signal briefly when it arrives
   React.useEffect(() => {
@@ -57,10 +59,11 @@ export function SignalStreamWidget() {
   return (
     <Block label="Signal Bus:" blockView>
       <div className="inline-block">
-        {/* Stream header */}
+        {/* Stream header with log-context enrichment */}
         <div className="flex justify-between mb-12">
           <span className="opacity-60">
             {engine.signals.length} total
+            {!logCtx.isEmpty ? ` . ${logCtx.totalEntries} logs` : ''}
           </span>
           {signalRate && (
             <span className="opacity-60">
@@ -92,12 +95,13 @@ export function SignalStreamWidget() {
           ))}
         </div>
 
-        {/* Sync status */}
+        {/* Sync status enriched with log context */}
         <div className="mt-12 opacity-40">
           {engine.lastSyncedTimestamp > 0
             ? `Last upstream sync: ${formatTimestamp(engine.lastSyncedTimestamp)}`
             : 'Awaiting upstream sync.'
           }
+          {!logCtx.isEmpty && logCtx.lastActivityAgo ? ` . Last log: ${logCtx.lastActivityAgo}.` : ''}
         </div>
       </div>
     </Block>
