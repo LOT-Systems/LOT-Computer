@@ -44,6 +44,8 @@ import { getOptimalWidget, shouldShowWidget, getUserState, analyzeIntentions } f
 import { QuantumStateWidget } from './QuantumStateWidget'
 import { SignalStreamWidget } from './SignalStreamWidget'
 import { PatternRecognitionWidget } from './PatternRecognitionWidget'
+import { UserMetricsWidget } from './UserMetricsWidget'
+import { AIFeedbackWidget } from './AIFeedbackWidget'
 import { CollectiveConsciousness, WellnessPulse, MemoryEngineStats, IntentionPatterns, BadgeUnlockFeed, GrowthMilestones } from './stats'
 
 export const System = () => {
@@ -666,7 +668,11 @@ export const System = () => {
       {/* Quantum Intent Engine Widgets */}
       <QuantumStateWidget />
       <PatternRecognitionWidget />
+      <AIFeedbackWidget />
       <SignalStreamWidget />
+
+      {/* User Metrics - Personal OS health, performance, version */}
+      <UserMetricsWidget />
 
       {/* System Progress - Deployment info with feedback */}
       <SystemProgressWidget />

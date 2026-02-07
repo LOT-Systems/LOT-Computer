@@ -96,6 +96,7 @@ export function PatternRecognitionWidget() {
           ) : (
             <div className="flex flex-col gap-12">
               {patterns
+                .filter(p => p.confidence >= 0.5) // Only show patterns above threshold
                 .sort((a, b) => b.confidence - a.confidence)
                 .map((pattern, idx) => (
                   <div key={idx}>
@@ -104,12 +105,21 @@ export function PatternRecognitionWidget() {
                       <ProgressBars percentage={pattern.confidence * 100} barCount={10} />
                       <span className="opacity-60">{Math.round(pattern.confidence * 100)}%</span>
                     </div>
+                    {/* Confidence-based messaging: >0.8 specific, 0.5-0.8 general */}
                     <div className="opacity-60">
-                      {getWidgetLabel(pattern.suggestedWidget)} . {getTimingLabel(pattern.suggestedTiming)}
+                      {pattern.confidence >= 0.8
+                        ? `${getWidgetLabel(pattern.suggestedWidget)}. ${getTimingLabel(pattern.suggestedTiming)}.`
+                        : 'Pattern emerging. Continue for clarity.'
+                      }
                     </div>
                   </div>
                 ))
               }
+              {patterns.filter(p => p.confidence < 0.5).length > 0 && (
+                <div className="opacity-40">
+                  {patterns.filter(p => p.confidence < 0.5).length} weak signal{patterns.filter(p => p.confidence < 0.5).length === 1 ? '' : 's'} below threshold.
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -122,9 +132,15 @@ export function PatternRecognitionWidget() {
               <div className="mb-12">
                 {optimal.reason}
               </div>
-              <div className="mb-12">
-                Suggested: {getWidgetLabel(optimal.widget)}
+              <div className="mb-8">
+                Suggested: {getWidgetLabel(optimal.widget)}.
               </div>
+              {/* Show confidence context */}
+              {patterns.length > 0 && (
+                <div className="opacity-40">
+                  Based on {patterns.filter(p => p.confidence >= 0.5).length} pattern{patterns.filter(p => p.confidence >= 0.5).length === 1 ? '' : 's'} above threshold.
+                </div>
+              )}
             </>
           ) : (
             <div>
