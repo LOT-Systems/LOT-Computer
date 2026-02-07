@@ -58,31 +58,31 @@ export function UserMetricsWidget() {
 
           {/* State */}
           <div className="flex justify-between items-baseline mb-8">
-            <span className="opacity-60">State</span>
+            <span className="opacity-30">State</span>
             <span className="capitalize">{status.state}</span>
           </div>
 
           {/* Uptime */}
           <div className="flex justify-between items-baseline mb-8">
-            <span className="opacity-60">Uptime</span>
+            <span className="opacity-30">Uptime</span>
             <span className="tabular-nums">{status.uptime} day{status.uptime === 1 ? '' : 's'}</span>
           </div>
 
           {/* Streak - cross-reference with log-derived streak */}
           <div className="flex justify-between items-baseline mb-8">
-            <span className="opacity-60">Streak</span>
+            <span className="opacity-30">Streak</span>
             <span className="tabular-nums">{status.streak} day{status.streak === 1 ? '' : 's'}</span>
           </div>
 
           {/* Interactions */}
           <div className="flex justify-between items-baseline mb-8">
-            <span className="opacity-60">Interactions</span>
+            <span className="opacity-30">Interactions</span>
             <span className="tabular-nums">{status.metrics.totalInteractions}</span>
           </div>
 
           {/* Log-derived context */}
           {!logCtx.isEmpty && (
-            <div className="opacity-40 mt-8">
+            <div className="opacity-30 mt-8">
               {logCtx.todayActivity.length} signal{logCtx.todayActivity.length === 1 ? '' : 's'} today . {logCtx.activeModules.length}/6 modules active
             </div>
           )}
@@ -94,29 +94,29 @@ export function UserMetricsWidget() {
           {/* Performance dimensions */}
           <div className="flex flex-col gap-8 mb-16">
             <div className="flex items-center gap-8">
-              <span className="w-[80px] opacity-60">Consistency</span>
+              <span className="w-[80px] opacity-30">Consistency</span>
               <ProgressBars percentage={performance.overall.consistency} barCount={10} />
               <span className="tabular-nums">{performance.overall.consistency}%</span>
             </div>
             <div className="flex items-center gap-8">
-              <span className="w-[80px] opacity-60">Velocity</span>
+              <span className="w-[80px] opacity-30">Velocity</span>
               <ProgressBars percentage={performance.overall.velocity} barCount={10} />
               <span className="tabular-nums">{performance.overall.velocity}%</span>
             </div>
             <div className="flex items-center gap-8">
-              <span className="w-[80px] opacity-60">Depth</span>
+              <span className="w-[80px] opacity-30">Depth</span>
               <ProgressBars percentage={performance.overall.depth} barCount={10} />
               <span className="tabular-nums">{performance.overall.depth}%</span>
             </div>
             <div className="flex items-center gap-8">
-              <span className="w-[80px] opacity-60">Balance</span>
+              <span className="w-[80px] opacity-30">Balance</span>
               <ProgressBars percentage={performance.overall.balance} barCount={10} />
               <span className="tabular-nums">{performance.overall.balance}%</span>
             </div>
           </div>
 
           {/* Trajectory enriched with log mood trend */}
-          <div className="opacity-60">
+          <div className="opacity-30">
             Trajectory: {
               performance.trends.trajectory === 'increasing' ? 'accelerating.' :
               performance.trends.trajectory === 'decreasing' ? 'decelerating.' :
@@ -129,7 +129,7 @@ export function UserMetricsWidget() {
 
       {view === 'performance' && !performance && (
         <div className="inline-block">
-          <div className="opacity-60">
+          <div className="opacity-30">
             Insufficient telemetry for performance benchmarks.
             {!logCtx.isEmpty && logCtx.totalEntries < 10 ? ` ${logCtx.totalEntries} entries logged. Continue input.` : ''}
           </div>
@@ -141,14 +141,14 @@ export function UserMetricsWidget() {
           {/* Version info */}
           <div className="mb-12">
             <div className="mb-4">{version.version} {version.name}</div>
-            <div className="opacity-60">{version.description}</div>
+            <div className="opacity-30">{version.description}</div>
           </div>
 
           {/* Progression to next version */}
           {version.nextVersion && (
             <div className="mb-12">
               <div className="flex items-center gap-8 mb-4">
-                <span className="opacity-60">Progress to {version.nextVersion}</span>
+                <span className="opacity-30">Progress to {version.nextVersion}</span>
               </div>
               <div className="flex items-center gap-8">
                 <ProgressBars percentage={version.progression} barCount={20} />
@@ -159,14 +159,14 @@ export function UserMetricsWidget() {
 
           {/* Unlocked features */}
           {version.unlocked.length > 0 && (
-            <div className="opacity-60">
+            <div className="opacity-30">
               {version.unlocked.join(' . ')}
             </div>
           )}
 
           {/* Log-derived engagement context */}
           {!logCtx.isEmpty && (
-            <div className="opacity-40 mt-8">
+            <div className="opacity-30 mt-8">
               Engagement: {logCtx.engagementLevel}
               {logCtx.widgetDiversity > 0 ? ` . ${logCtx.widgetDiversity} event types` : ''}
             </div>
@@ -176,7 +176,7 @@ export function UserMetricsWidget() {
 
       {view === 'version' && !version && (
         <div className="inline-block">
-          <div className="opacity-60">Loading version data.</div>
+          <div className="opacity-30">Loading version data.</div>
         </div>
       )}
     </Block>

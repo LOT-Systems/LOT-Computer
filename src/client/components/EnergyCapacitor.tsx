@@ -92,7 +92,7 @@ export function EnergyCapacitor() {
 
           {/* Energy level */}
           <div className="mb-12 flex items-center gap-12">
-            <span className="text-xl">
+            <span>
               {energyState.currentLevel}%
             </span>
             <span className="capitalize">{energyState.status}</span>
@@ -100,7 +100,7 @@ export function EnergyCapacitor() {
 
           {/* Trajectory indicator */}
           {energyState.trajectory !== 'stable' && (
-            <div className="mb-12 opacity-60">
+            <div className="mb-12 opacity-30">
               {energyState.trajectory === 'improving' && 'Improving.'}
               {energyState.trajectory === 'declining' && 'Declining.'}
               {energyState.trajectory === 'critical' && 'Critical.'}
@@ -116,7 +116,7 @@ export function EnergyCapacitor() {
 
           {/* Top suggestion */}
           {suggestions.length > 0 && (
-            <div className="opacity-80">
+            <div className="opacity-30">
               {suggestions[0]}
             </div>
           )}
@@ -131,7 +131,7 @@ export function EnergyCapacitor() {
               {getMoodEnergyCorrelation()}
             </div>
           ) : (
-            <div className="mb-12 opacity-60">
+            <div className="mb-12 opacity-30">
               Record mood check-ins to see energy-mood correlation.
             </div>
           )}
@@ -145,17 +145,17 @@ export function EnergyCapacitor() {
 
           {/* Suggestion based on combined state */}
           {energyState.currentLevel < 40 && logCtx.hasSelfCare && (
-            <div className="opacity-60">
+            <div className="opacity-30">
               Deploy self-care module to restore energy buffer.
             </div>
           )}
           {energyState.currentLevel < 40 && !logCtx.hasSelfCare && (
-            <div className="opacity-60">
+            <div className="opacity-30">
               Initialize self-care module to build energy awareness.
             </div>
           )}
           {energyState.currentLevel >= 70 && !logCtx.hasMemory && (
-            <div className="opacity-60">
+            <div className="opacity-30">
               Energy buffer high. Optimal window for Memory Engine integration.
             </div>
           )}

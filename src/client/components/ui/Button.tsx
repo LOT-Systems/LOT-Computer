@@ -38,7 +38,7 @@ export const Button: React.FC<Props> = ({
 
   const className = cn(
     'relative overflow-hidden whitespace-nowrap',
-    'disabled:opacity-80',
+    'disabled:opacity-30',
     'inline-flex justify-center items-center',
     'text-base leading-1.5',
     kind === 'primary' &&

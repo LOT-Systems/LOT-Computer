@@ -124,9 +124,9 @@ export const PatternInsightsWidget = () => {
                 >
                   {insight.title}
                 </div>
-                <div className="opacity-60">{insight.description}</div>
+                <div className="opacity-30">{insight.description}</div>
                 {insight.dataPoints && (
-                  <div className="mt-4 opacity-40">
+                  <div className="mt-4 opacity-30">
                     Compiled from {insight.dataPoints} data point{insight.dataPoints > 1 ? 's' : ''}.
                   </div>
                 )}
@@ -148,7 +148,7 @@ export const PatternInsightsWidget = () => {
 
         {view === 'cohorts' && hasCohorts && (
           <div className="flex flex-col gap-12">
-            <div className="mb-8 opacity-60">
+            <div className="mb-8 opacity-30">
               Users with correlated behavioral signatures:
             </div>
             {matches.map((match, idx) => (
@@ -158,16 +158,16 @@ export const PatternInsightsWidget = () => {
                     {match.user.firstName} {match.user.lastName}
                   </GhostButton>
                   {match.user.archetype && (
-                    <span className="opacity-60"> . {match.user.archetype}</span>
+                    <span className="opacity-30"> . {match.user.archetype}</span>
                   )}
                 </div>
-                <div className="mb-4 opacity-60">
+                <div className="mb-4 opacity-30">
                   {match.user.city}, {match.user.country}
                 </div>
                 {match.sharedPatterns.length > 0 && (
                   <div className="flex flex-col gap-2">
                     {match.sharedPatterns.map((pattern, pidx) => (
-                      <div key={pidx} className="opacity-60">{pattern}</div>
+                      <div key={pidx} className="opacity-30">{pattern}</div>
                     ))}
                   </div>
                 )}
@@ -178,7 +178,7 @@ export const PatternInsightsWidget = () => {
 
         {view === 'evolution' && hasEvolution && (
           <div className="flex flex-col gap-12">
-            <div className="mb-8 opacity-60">
+            <div className="mb-8 opacity-30">
               Pattern delta over observed windows:
             </div>
             {evolution.slice(0, 3).map((evo, idx) => (
@@ -186,14 +186,14 @@ export const PatternInsightsWidget = () => {
                 <div className="mb-8">
                   {evo.patternTitle}
                 </div>
-                <div className="mb-4 opacity-60">
+                <div className="mb-4 opacity-30">
                   {evo.trend === 'strengthening' && 'Signal strengthening. Pattern compiling.'}
                   {evo.trend === 'stable' && 'Stable oscillation. Pattern integrated.'}
                   {evo.trend === 'weakening' && 'Signal attenuating. Pattern deprecating.'}
                   {evo.trend === 'emerging' && 'New signal detected. Pattern initializing.'}
                 </div>
                 {evo.timeline.length > 0 && (
-                  <div className="opacity-40">
+                  <div className="opacity-30">
                     {evo.timeline.length} observation{evo.timeline.length > 1 ? 's' : ''} from{' '}
                     {dayjs(evo.lastSeen).subtract(7, 'day').format('MMM D')} to {dayjs(evo.lastSeen).format('MMM D')}
                   </div>

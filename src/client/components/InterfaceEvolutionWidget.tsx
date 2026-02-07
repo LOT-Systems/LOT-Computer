@@ -93,7 +93,7 @@ export function InterfaceEvolutionWidget() {
         <div className="inline-block">
           {/* Overall maturity */}
           <div className="mb-12 flex items-center gap-12">
-            <span className="text-xl">
+            <span>
               {Math.round(evolutionState.overallMaturity * 100)}%
             </span>
             <span>Overall Maturity</span>
@@ -122,7 +122,7 @@ export function InterfaceEvolutionWidget() {
 
           {/* Log-context-grounded evolution insight */}
           {!logCtx.isEmpty && (
-            <div className="mt-12 opacity-40">
+            <div className="mt-12 opacity-30">
               {logCtx.engagementLevel} phase . {logCtx.activeDays} active day{logCtx.activeDays === 1 ? '' : 's'}
               {logCtx.streak > 1 ? ` . ${logCtx.streak}d streak` : ''}
             </div>
@@ -138,11 +138,11 @@ export function InterfaceEvolutionWidget() {
               <div className="flex flex-col gap-2">
                 {cat.features.map(feature => (
                   <div key={feature.name} className="flex items-center gap-8">
-                    <span className={feature.unlocked ? 'opacity-90' : 'opacity-30'}>
+                    <span className={feature.unlocked ? '' : 'opacity-30'}>
                       {feature.name}
                     </span>
                     {feature.unlocked && (
-                      <span className="opacity-60">unlocked.</span>
+                      <span className="opacity-30">unlocked.</span>
                     )}
                   </div>
                 ))}

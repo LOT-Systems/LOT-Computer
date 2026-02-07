@@ -76,7 +76,7 @@ export function updateStatSnapshot(stats: Record<string, number>): void {
 export function GrowthIndicator() {
   return (
     <span
-      className="ml-2 opacity-60"
+      className="ml-2 opacity-30"
       title="Growing since last session"
     >
       ↑

@@ -29,7 +29,7 @@ export function WellnessPulse() {
       <div className="inline-block">
         {/* Active now */}
         <div className="mb-16">
-          <div className="opacity-60 mb-4">Active now</div>
+          <div className="opacity-30 mb-4">Active now</div>
           <div className="flex items-baseline gap-4">
             <span className="tabular-nums">{stats.activeNow} users</span>
             {hasGrown('activeNow', stats.activeNow) && <GrowthIndicator />}
@@ -39,21 +39,21 @@ export function WellnessPulse() {
         {/* Today's activity */}
         <div className="flex flex-col gap-8 mb-16">
           <div className="flex justify-between items-baseline">
-            <span className="opacity-60">Questions</span>
+            <span className="opacity-30">Questions</span>
             <span className="flex items-center gap-4">
               <span className="tabular-nums">{stats.questionsToday}</span>
               {hasGrown('questionsToday', stats.questionsToday) && <GrowthIndicator />}
             </span>
           </div>
           <div className="flex justify-between items-baseline">
-            <span className="opacity-60">Reflections</span>
+            <span className="opacity-30">Reflections</span>
             <span className="flex items-center gap-4">
               <span className="tabular-nums">{stats.reflectionsToday}</span>
               {hasGrown('reflectionsToday', stats.reflectionsToday) && <GrowthIndicator />}
             </span>
           </div>
           <div className="flex justify-between items-baseline">
-            <span className="opacity-60">Care moments</span>
+            <span className="opacity-30">Care moments</span>
             <span className="flex items-center gap-4">
               <span className="tabular-nums">{stats.careMomentsToday}</span>
               {hasGrown('careMomentsToday', stats.careMomentsToday) && <GrowthIndicator />}
@@ -63,11 +63,11 @@ export function WellnessPulse() {
 
         {/* Peak hours */}
         <div className="flex justify-between items-baseline mb-8">
-          <span className="opacity-60">Peak energy hour</span>
+          <span className="opacity-30">Peak energy hour</span>
           <span>{stats.peakEnergyHour}</span>
         </div>
         <div className="flex justify-between items-baseline">
-          <span className="opacity-60">Quietest hour</span>
+          <span className="opacity-30">Quietest hour</span>
           <span>{stats.quietestHour}</span>
         </div>
       </div>

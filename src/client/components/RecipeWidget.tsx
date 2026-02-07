@@ -140,7 +140,7 @@ export const RecipeWidget: React.FC = () => {
           {farewellPhrase ? (
             <div
               className={cn(
-                'font-medium transition-opacity duration-[1400ms]',
+                'transition-opacity duration-[1400ms]',
                 isFading ? 'opacity-0' : 'opacity-100'
               )}
             >

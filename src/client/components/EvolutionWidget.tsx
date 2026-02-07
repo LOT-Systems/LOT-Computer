@@ -108,7 +108,7 @@ export const EvolutionWidget: React.FC = () => {
               .slice(0, 6)
               .map(([event, count]) => (
                 <div key={event} className="flex justify-between items-baseline">
-                  <span className="opacity-60">{activityLabels[event] || event}</span>
+                  <span className="opacity-30">{activityLabels[event] || event}</span>
                   <span className="tabular-nums">{count}</span>
                 </div>
               ))
@@ -117,14 +117,14 @@ export const EvolutionWidget: React.FC = () => {
 
           {/* Diversity */}
           <div className="flex justify-between items-baseline mb-8">
-            <span className="opacity-60">Widget diversity</span>
+            <span className="opacity-30">Widget diversity</span>
             <span>{logCtx.widgetDiversity} types</span>
           </div>
 
           {/* Mood trend */}
           {logCtx.dominantMood && (
             <div className="flex justify-between items-baseline mb-8">
-              <span className="opacity-60">Dominant mood</span>
+              <span className="opacity-30">Dominant mood</span>
               <span className="capitalize">{logCtx.dominantMood}</span>
             </div>
           )}
@@ -132,13 +132,13 @@ export const EvolutionWidget: React.FC = () => {
           {/* Peak hour */}
           {logCtx.peakHour !== null && (
             <div className="flex justify-between items-baseline mb-8">
-              <span className="opacity-60">Peak hour</span>
+              <span className="opacity-30">Peak hour</span>
               <span>{logCtx.peakHour}:00</span>
             </div>
           )}
 
           {/* Weekly rate */}
-          <div className="opacity-40 mt-12">
+          <div className="opacity-30 mt-12">
             ~{logCtx.weeklyRate} interactions per week.
           </div>
         </div>
@@ -194,13 +194,13 @@ export const EvolutionWidget: React.FC = () => {
           </div>
           <div className="flex items-center gap-8">
             <ProgressBars percentage={Math.min(100, xpProgress)} barCount={10} />
-            <div className="text-sm">{getStoicProgressLabel(xpProgress)}</div>
+            <div>{getStoicProgressLabel(xpProgress)}</div>
           </div>
         </div>
 
         {/* Reflection on progress */}
         {currentLevel > 1 && (
-          <div className="mt-24 opacity-60">
+          <div className="mt-24 opacity-30">
             Consistent input accelerates compilation.
           </div>
         )}

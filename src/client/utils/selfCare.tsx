@@ -264,8 +264,8 @@ export const SelfCarePrompt: React.FC<SelfCarePromptProps> = ({
   return (
     <div className={`p-4 grid-fill-light rounded-lg border border-acc/20 ${className}`}>
       <div className="mb-3 italic">{prompt}</div>
-      <div className="mb-2 font-medium">{routine.title}</div>
-      <div className="mb-3 text-sm opacity-70">{routine.description}</div>
+      <div className="mb-2">{routine.title}</div>
+      <div className="mb-3 opacity-30">{routine.description}</div>
       <div className="flex gap-2">
         <button
           onClick={() => onStart?.(recommendedRoutine)}

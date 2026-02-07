@@ -273,11 +273,11 @@ export const AdminUser = () => {
                 labelClassName="!pl-0"
               >
                 {isStoryLoading ? (
-                  <div className="opacity-60">Generating story...</div>
+                  <div className="opacity-30">Generating story...</div>
                 ) : memoryStoryData?.story ? (
                   <MemoryText text={memoryStoryData.story} />
                 ) : (
-                  <div className="opacity-60">No Memory answers yet</div>
+                  <div className="opacity-30">No Memory answers yet</div>
                 )}
               </Block>
             </div>

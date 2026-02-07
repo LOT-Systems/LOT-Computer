@@ -110,7 +110,7 @@ export function SystemProgressWidget() {
       case 'activated': return 'text-green'
       case 'integrating': return 'text-blue'
       case 'synchronized': return 'text-acc'
-      default: return 'opacity-75'
+      default: return 'opacity-30'
     }
   }
 
@@ -129,12 +129,12 @@ export function SystemProgressWidget() {
         {/* Deployment Info */}
         <div>
           <div className="flex justify-between items-baseline mb-8">
-            <span className="opacity-60">Build Version</span>
+            <span className="opacity-30">Build Version</span>
             <span>{deployment.version}</span>
           </div>
 
           <div className="flex justify-between items-baseline mb-8">
-            <span className="opacity-60">Program</span>
+            <span className="opacity-30">Program</span>
             <span className="capitalize">{deployment.program}</span>
           </div>
 
@@ -146,7 +146,7 @@ export function SystemProgressWidget() {
         {/* Features */}
         {deployment.features.length > 0 && (
           <div className="border-t border-acc-400/30 pt-12">
-            <div className="opacity-60 mb-8">Active enhancements:</div>
+            <div className="opacity-30 mb-8">Active enhancements:</div>
             <div className="flex flex-col gap-y-4">
               {deployment.features.map((feature, idx) => (
                 <div key={idx}>• {feature}</div>
@@ -157,7 +157,7 @@ export function SystemProgressWidget() {
 
         {/* Feedback Section */}
         <div className="border-t border-acc-400/30 pt-12">
-          <div className="opacity-60 mb-8">System status assessment:</div>
+          <div className="opacity-30 mb-8">System status assessment:</div>
 
           <div className="grid grid-cols-2 gap-8">
             {FEEDBACK_OPTIONS.map(option => (
@@ -171,7 +171,7 @@ export function SystemProgressWidget() {
                     ? 'border-acc grid-fill text-acc'
                     : 'border-acc-400/30 hover:border-acc-400/60 grid-fill-hover'
                   }
-                  ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                  ${isSubmitting ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
                 `}
               >
                 <div className="flex items-center gap-4">
@@ -183,7 +183,7 @@ export function SystemProgressWidget() {
           </div>
 
           {feedback && (
-            <div className="mt-12 opacity-60">
+            <div className="mt-12 opacity-30">
               Status logged. Calibration updated.
             </div>
           )}
@@ -194,7 +194,7 @@ export function SystemProgressWidget() {
           <div className="border-t border-acc-400/30 pt-12">
             <button
               onClick={() => setShowAnalytics(!showAnalytics)}
-              className="w-full flex justify-between items-center opacity-60 hover:opacity-100 transition-opacity mb-8"
+              className="w-full flex justify-between items-center opacity-30 hover:opacity-100 transition-opacity mb-8"
             >
               <span>Community feedback:</span>
               <span>{showAnalytics ? '-' : '+'}</span>
@@ -204,19 +204,19 @@ export function SystemProgressWidget() {
               <div className="flex flex-col gap-y-12">
                 {/* System Health Status */}
                 <div className="p-12 rounded border border-acc-400/30">
-                  <div className="opacity-60 mb-4">System health:</div>
+                  <div className="opacity-30 mb-4">System health:</div>
                   <div>{analytics.systemHealth.message}</div>
                 </div>
 
                 {/* Feedback Distribution */}
                 <div>
-                  <div className="opacity-60 mb-8">Distribution ({analytics.totalResponses} responses):</div>
+                  <div className="opacity-30 mb-8">Distribution ({analytics.totalResponses} responses):</div>
                   <div className="flex flex-col gap-y-6">
                     {FEEDBACK_OPTIONS.map(option => {
                       const percentage = analytics.feedbackPercentages[option.id as keyof typeof analytics.feedbackPercentages]
                       return (
                         <div key={option.id} className="flex justify-between items-center">
-                          <span className="opacity-60">{option.symbol} {option.label}</span>
+                          <span className="opacity-30">{option.symbol} {option.label}</span>
                           <span className="tabular-nums">{percentage}%</span>
                         </div>
                       )
@@ -227,7 +227,7 @@ export function SystemProgressWidget() {
                 {/* Insights */}
                 {analytics.insights.length > 0 && (
                   <div>
-                    <div className="opacity-60 mb-8">Insights:</div>
+                    <div className="opacity-30 mb-8">Insights:</div>
                     <div className="flex flex-col gap-y-4">
                       {analytics.insights.map((insight, idx) => (
                         <div key={idx}>
@@ -238,7 +238,7 @@ export function SystemProgressWidget() {
                   </div>
                 )}
 
-                <div className="opacity-40 pt-8">
+                <div className="opacity-30 pt-8">
                   Based on {analytics.period} of feedback.
                 </div>
               </div>

@@ -238,7 +238,7 @@ export function SelfCareMoments() {
   if (!currentSuggestion) {
     return (
       <Block label="Self-care:" blockView>
-        <div className="opacity-60">Loading suggestion...</div>
+        <div className="opacity-30">Loading suggestion...</div>
       </Block>
     )
   }
@@ -289,16 +289,16 @@ export function SelfCareMoments() {
                 : null)
               : null
             return (quantumReason || contextReason) ? (
-              <div className="opacity-60 mb-8">
+              <div className="opacity-30 mb-8">
                 {quantumReason || contextReason}
               </div>
             ) : null
           })()}
-          <div className={cn("opacity-90", (completedToday > 0 || currentStreak > 0) ? "mb-12" : "mb-16")}>
+          <div className={cn("", (completedToday > 0 || currentStreak > 0) ? "mb-12" : "mb-16")}>
             {currentSuggestion.action} ({currentSuggestion.duration})
           </div>
           {(completedToday > 0 || currentStreak > 0) && (
-            <div className="opacity-90 mb-16">
+            <div className="mb-16">
               {completedToday > 0 && <div>{completedToday} done today</div>}
               {currentStreak > 1 && (
                 <div className="flex items-center gap-8">
@@ -327,7 +327,7 @@ export function SelfCareMoments() {
 
       {view === 'why' && (
         <div className="inline-block">
-          <div className="opacity-80">{currentSuggestion.why}</div>
+          <div className="opacity-30">{currentSuggestion.why}</div>
         </div>
       )}
 
@@ -338,7 +338,7 @@ export function SelfCareMoments() {
               {formatTime(timeRemaining)}
             </div>
           )}
-          <div className="opacity-90 mb-16">{currentSuggestion.practice.replace(/\n+/g, ' ')}</div>
+          <div className="mb-16">{currentSuggestion.practice.replace(/\n+/g, ' ')}</div>
           {isTimerRunning ? (
             <div className="flex gap-8">
               <Button onClick={stopTimer}>

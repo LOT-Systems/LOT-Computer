@@ -105,10 +105,10 @@ export function PatternRecognitionWidget() {
                     <div className="mb-4">{getPatternName(pattern.pattern)}</div>
                     <div className="flex items-center gap-8 mb-4">
                       <ProgressBars percentage={pattern.confidence * 100} barCount={10} />
-                      <span className="opacity-60">{Math.round(pattern.confidence * 100)}%</span>
+                      <span className="opacity-30">{Math.round(pattern.confidence * 100)}%</span>
                     </div>
                     {/* Confidence-based messaging: >0.8 specific, 0.5-0.8 general */}
-                    <div className="opacity-60">
+                    <div className="opacity-30">
                       {pattern.confidence >= 0.8
                         ? `${getWidgetLabel(pattern.suggestedWidget)}. ${getTimingLabel(pattern.suggestedTiming)}.`
                         : 'Pattern initializing. Continue for convergence.'
@@ -118,7 +118,7 @@ export function PatternRecognitionWidget() {
                 ))
               }
               {patterns.filter(p => p.confidence < 0.5).length > 0 && (
-                <div className="opacity-40">
+                <div className="opacity-30">
                   {patterns.filter(p => p.confidence < 0.5).length} weak signal{patterns.filter(p => p.confidence < 0.5).length === 1 ? '' : 's'} below threshold.
                 </div>
               )}
@@ -139,7 +139,7 @@ export function PatternRecognitionWidget() {
               </div>
               {/* Show confidence context enriched with log data */}
               {patterns.length > 0 && (
-                <div className="opacity-40">
+                <div className="opacity-30">
                   Derived from {patterns.filter(p => p.confidence >= 0.5).length} pattern{patterns.filter(p => p.confidence >= 0.5).length === 1 ? '' : 's'}
                   {!logCtx.isEmpty ? ` and ${logCtx.totalEntries} log entries.` : ' above threshold.'}
                 </div>
@@ -178,7 +178,7 @@ export function PatternRecognitionWidget() {
               }
 
               {/* Summary enriched with log context */}
-              <div className="mt-8 opacity-60">
+              <div className="mt-8 opacity-30">
                 {patterns.length} pattern{patterns.length === 1 ? '' : 's'} indexed.
                 {!logCtx.isEmpty ? ` ${logCtx.activeModules.length}/6 modules reporting.` : ''}
               </div>

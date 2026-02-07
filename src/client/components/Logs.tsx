@@ -464,11 +464,11 @@ const NoteEditor = ({
           'transition-opacity',
           primary
             ? cn(
-                'hidden sm:block ___opacity-20 sm:opacity-100',
+                'hidden sm:block ___opacity-30 sm:opacity-100',
                 !isMouseActive && 'sm:opacity-0'
               )
             : cn(
-                'opacity-20',
+                'opacity-30',
                 isFocused && 'sm:opacity-100',
                 'sm:group-hover:opacity-100'
               )
@@ -517,8 +517,8 @@ const NoteEditor = ({
           className={cn(
             'max-w-[700px] focus:opacity-100 group-hover:opacity-100',
             'placeholder:opacity-100',
-            !primary && 'opacity-20',
-            primary && isSaved && 'opacity-20',
+            !primary && 'opacity-30',
+            primary && isSaved && 'opacity-30',
             primary && !isSaved && 'opacity-100'
           )}
           rows={primary ? 10 : 1}
@@ -556,7 +556,7 @@ const LogContainer: React.FC<{
           'relative mb-4 sm:mb-0',
           'sm:absolute sm:top-0 sm:right-0 text-end select-none',
           'transition-opacity',
-          'opacity-20',
+          'opacity-30',
           'group-hover:opacity-100'
         )}
       >
@@ -588,7 +588,7 @@ const LogContainer: React.FC<{
       <div
         className={cn(
           'max-w-[500px] lg:max-w-[700px] whitespace-breakspaces',
-          'opacity-20 transition-opacity',
+          'opacity-30 transition-opacity',
           'group-hover:opacity-100'
         )}
       >

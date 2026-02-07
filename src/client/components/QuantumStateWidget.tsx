@@ -144,11 +144,11 @@ export function QuantumStateWidget() {
           </div>
 
           {/* Signal count enriched with log context */}
-          <div className="opacity-60">
+          <div className="opacity-30">
             {engine.signals.length} signal{engine.signals.length === 1 ? '' : 's'} cached in local memory.
           </div>
           {!logCtx.isEmpty && (
-            <div className="mt-4 opacity-40">
+            <div className="mt-4 opacity-30">
               {logCtx.timePhase} phase . {logCtx.engagementLevel}
               {logCtx.dominantMood ? ` . ${logCtx.dominantMood}` : ''}
             </div>
@@ -172,14 +172,14 @@ export function QuantumStateWidget() {
           </div>
 
           {/* Analysis metadata enriched with log context */}
-          <div className="opacity-60">
+          <div className="opacity-30">
             {engine.lastAnalysis > 0
               ? `Last compiled: ${formatTimeAgo(engine.lastAnalysis)} ago.`
               : 'Awaiting initial compilation.'
             }
           </div>
           {!logCtx.isEmpty && (
-            <div className="mt-4 opacity-40">
+            <div className="mt-4 opacity-30">
               {logCtx.activeModules.length}/6 modules reporting . {logCtx.todayActivity.length} today
             </div>
           )}
@@ -194,8 +194,8 @@ export function QuantumStateWidget() {
             <div className="flex flex-col gap-4">
               {recentSignals.map((signal, idx) => (
                 <div key={idx} className="flex items-center gap-8">
-                  <span className="w-[32px] opacity-60">{formatTimeAgo(signal.timestamp)}</span>
-                  <span className="w-[64px] capitalize opacity-60">{signal.source}</span>
+                  <span className="w-[32px] opacity-30">{formatTimeAgo(signal.timestamp)}</span>
+                  <span className="w-[64px] capitalize opacity-30">{signal.source}</span>
                   <span>{signal.signal}</span>
                 </div>
               ))}

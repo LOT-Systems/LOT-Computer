@@ -76,7 +76,7 @@ export function AwarenessDashboard() {
       {awarenessView === 'archetype' && profile.archetype && (
         <div className="inline-block">
           <div className="mb-8">
-            <span className="font-medium">{profile.archetype}</span>
+            <span>{profile.archetype}</span>
           </div>
           {profile.archetypeDescription && (
             <div className="  mb-12">

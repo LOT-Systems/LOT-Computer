@@ -91,14 +91,14 @@ export function ChatCatalystWidget() {
           <div className="mb-12">
             <div className="mb-4">Conversation ideas:</div>
             {catalyst.conversationStarters.map((starter, i) => (
-              <div key={i} className="mb-2 opacity-60">{starter}</div>
+              <div key={i} className="mb-2 opacity-30">{starter}</div>
             ))}
           </div>
         )}
 
         {/* Cohort member info if present */}
         {catalyst.action.cohortMember && (
-          <div className="text-xs">
+          <div>
             {catalyst.action.cohortMember.name}
           </div>
         )}

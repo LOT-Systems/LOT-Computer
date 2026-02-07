@@ -427,14 +427,14 @@ export const Settings = () => {
               <a
                 href="/api/export/emotional-checkins"
                 download
-                className="opacity-75 hover:opacity-100 transition-opacity underline"
+                className="opacity-30 hover:opacity-100 transition-opacity underline"
               >
                 Export Mood Check-ins (CSV)
               </a>
               <a
                 href="/api/export/self-care"
                 download
-                className="opacity-75 hover:opacity-100 transition-opacity underline"
+                className="opacity-30 hover:opacity-100 transition-opacity underline"
               >
                 Export Self-care History (CSV)
               </a>

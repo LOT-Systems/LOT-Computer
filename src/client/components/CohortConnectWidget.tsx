@@ -49,7 +49,7 @@ export const CohortConnectWidget: React.FC = () => {
         {/* Cohort name */}
         <div className="mb-16">
           <div className="  mb-4">Your cohort</div>
-          <div className="text-base capitalize">{cohort}</div>
+          <div className="capitalize">{cohort}</div>
         </div>
 
         {/* Total members */}
@@ -145,7 +145,7 @@ export const CohortConnectWidget: React.FC = () => {
         )}
 
         {/* Log-context-grounded cohort insight */}
-        <div className="mt-16 opacity-40 text-center">
+        <div className="mt-16 opacity-30 text-center">
           {!logCtx.isEmpty && logCtx.widgetDiversity >= 3
             ? `Matched on ${logCtx.widgetDiversity} behavioral dimensions.`
             : 'Connections based on shared patterns.'

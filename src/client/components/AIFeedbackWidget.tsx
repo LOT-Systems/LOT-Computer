@@ -195,7 +195,7 @@ export function AIFeedbackWidget() {
 
           {/* Log-derived context line */}
           {!logCtx.isEmpty && (
-            <div className="mb-8 opacity-60">
+            <div className="mb-8 opacity-30">
               {logCtx.engagementLevel} runtime
               {logCtx.dominantMood ? ` . ${logCtx.dominantMood}` : ''}
               {logCtx.streak > 1 ? ` . ${logCtx.streak}d streak` : ''}
@@ -204,7 +204,7 @@ export function AIFeedbackWidget() {
           )}
 
           {/* Signal summary */}
-          <div className="opacity-40">
+          <div className="opacity-30">
             Based on {engine.signals.length} signal{engine.signals.length === 1 ? '' : 's'}
             {logCtx.totalEntries > 0 ? `, ${logCtx.totalEntries} log entries` : ''}
             {engine.recognizedPatterns.length > 0
@@ -221,23 +221,23 @@ export function AIFeedbackWidget() {
             <>
               {/* System status */}
               <div className="flex justify-between items-baseline mb-8">
-                <span className="opacity-60">Status</span>
+                <span className="opacity-30">Status</span>
                 <span className="capitalize">{diagnostics.status.replace('_', ' ')}</span>
               </div>
 
               <div className="flex justify-between items-baseline mb-8">
-                <span className="opacity-60">Optimization</span>
+                <span className="opacity-30">Optimization</span>
                 <span className="tabular-nums">{diagnostics.optimizationScore}%</span>
               </div>
 
               {/* Log-derived diagnostics */}
               <div className="flex justify-between items-baseline mb-8">
-                <span className="opacity-60">Module coverage</span>
+                <span className="opacity-30">Module coverage</span>
                 <span className="tabular-nums">{logCtx.activeModules.length}/6</span>
               </div>
 
               <div className="flex justify-between items-baseline mb-12">
-                <span className="opacity-60">Session depth</span>
+                <span className="opacity-30">Session depth</span>
                 <span className="tabular-nums">{logCtx.sessionDepth}</span>
               </div>
 
@@ -247,35 +247,35 @@ export function AIFeedbackWidget() {
                   {diagnostics.issues.slice(0, 3).map((issue, idx) => (
                     <div key={idx}>
                       <div className="mb-4">{issue.description}</div>
-                      <div className="opacity-60">{issue.suggestion}</div>
+                      <div className="opacity-30">{issue.suggestion}</div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="opacity-60">No issues detected. System optimal.</div>
+                <div className="opacity-30">No issues detected. System optimal.</div>
               )}
             </>
           ) : (
             // Fallback diagnostics from log context when OS diagnostics unavailable
             <div className="inline-block">
               <div className="flex justify-between items-baseline mb-8">
-                <span className="opacity-60">Engagement</span>
+                <span className="opacity-30">Engagement</span>
                 <span className="capitalize">{logCtx.engagementLevel}</span>
               </div>
               <div className="flex justify-between items-baseline mb-8">
-                <span className="opacity-60">Active modules</span>
+                <span className="opacity-30">Active modules</span>
                 <span className="tabular-nums">{logCtx.activeModules.length}/6</span>
               </div>
               <div className="flex justify-between items-baseline mb-8">
-                <span className="opacity-60">Today signals</span>
+                <span className="opacity-30">Today signals</span>
                 <span className="tabular-nums">{logCtx.todayActivity.length}</span>
               </div>
               <div className="flex justify-between items-baseline mb-8">
-                <span className="opacity-60">Mood trend</span>
+                <span className="opacity-30">Mood trend</span>
                 <span>{logCtx.moodTrend}</span>
               </div>
               {logCtx.dormantModules.length > 0 && (
-                <div className="mt-8 opacity-60">
+                <div className="mt-8 opacity-30">
                   Dormant: {logCtx.dormantModules.join(', ')}.
                 </div>
               )}
@@ -297,7 +297,7 @@ export function AIFeedbackWidget() {
 
           {/* Recommendations from diagnostics */}
           {diagnostics?.recommendations && diagnostics.recommendations.length > 0 && (
-            <div className="opacity-60">
+            <div className="opacity-30">
               {diagnostics.recommendations[0]}
             </div>
           )}

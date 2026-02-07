@@ -252,7 +252,7 @@ export const ContextualPromptsWidget = () => {
         </div>
         {/* Log context summary line */}
         {!logCtx.isEmpty && (
-          <div className="mb-12 opacity-40">
+          <div className="mb-12 opacity-30">
             {logCtx.todayActivity.length} signal{logCtx.todayActivity.length === 1 ? '' : 's'} today
             {logCtx.streak > 1 ? ` . ${logCtx.streak}d streak` : ''}
             {logCtx.sessionDepth > 0 ? ` . session depth ${logCtx.sessionDepth}` : ''}
@@ -269,7 +269,7 @@ export const ContextualPromptsWidget = () => {
           </Button>
         </div>
         {activePrompts.length > 1 && (
-          <div className="mt-8 opacity-60">
+          <div className="mt-8 opacity-30">
             +{activePrompts.length - 1} more directive{activePrompts.length - 1 > 1 ? 's' : ''}
           </div>
         )}

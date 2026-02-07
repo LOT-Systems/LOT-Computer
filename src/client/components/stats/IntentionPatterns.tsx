@@ -25,14 +25,14 @@ export function IntentionPatterns() {
       <div className="space-y-4">
         {sortedPatterns.map(([pattern, count]) => (
           <div key={pattern} className="flex justify-between items-center">
-            <span className="opacity-75">{pattern}</span>
+            <span className="opacity-30">{pattern}</span>
             <span className="tabular-nums">{count}</span>
           </div>
         ))}
 
         <div className="pt-4 mt-6 border-t border-acc/20">
-          <div className="opacity-60 mb-8">Most Active Pattern</div>
-          <div className="opacity-75">{mostActive}</div>
+          <div className="opacity-30 mb-8">Most Active Pattern</div>
+          <div className="opacity-30">{mostActive}</div>
         </div>
       </div>
     </Block>

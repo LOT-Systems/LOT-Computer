@@ -17,7 +17,7 @@ export function ApiPage() {
       <div className="flex flex-col gap-y-16">
         <Block label="Authentication Required" blockView>
           <div className="flex flex-col gap-y-16">
-            <div className="opacity-75">
+            <div className="opacity-30">
               Please log in to access the API documentation and export your data.
             </div>
             <Button onClick={() => stores.goTo('system')}>
@@ -88,12 +88,12 @@ export function ApiPage() {
     <div className="flex flex-col gap-y-16">
       <div>
         <div>Export your compiled behavioral data and quantum intent telemetry for AI integration.</div>
-        <div className="opacity-60">LOT aggregates your patterns to deploy into humanoid systems, autonomous vehicles, or personal AI modules.</div>
+        <div className="opacity-30">LOT aggregates your patterns to deploy into humanoid systems, autonomous vehicles, or personal AI modules.</div>
       </div>
 
       <Block label="Export Training Data:" blockView>
         <div className="flex flex-col gap-y-16">
-          <div className="opacity-60">
+          <div className="opacity-30">
             Compile and download your complete psychological and quantum intent dataset as structured JSON.
           </div>
 
@@ -108,7 +108,7 @@ export function ApiPage() {
           </Button>
 
           {lastExport && (
-            <div className="opacity-60">
+            <div className="opacity-30">
               Last export: {lastExport}
             </div>
           )}
@@ -141,7 +141,7 @@ export function ApiPage() {
             {
               id: 'method',
               header: 'Method',
-              accessor: (row) => <span className="opacity-90">{row.method}</span>
+              accessor: (row) => <span >{row.method}</span>
             },
             {
               id: 'endpoint',
@@ -151,12 +151,12 @@ export function ApiPage() {
             {
               id: 'description',
               header: 'Description',
-              accessor: (row) => <span className="opacity-75">{row.description}</span>
+              accessor: (row) => <span className="opacity-30">{row.description}</span>
             },
             {
               id: 'format',
               header: 'Format',
-              accessor: (row) => <span className="opacity-75">{row.format}</span>
+              accessor: (row) => <span className="opacity-30">{row.format}</span>
             }
           ]}
           paddingClassName="p-8"

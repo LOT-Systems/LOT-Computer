@@ -94,32 +94,32 @@ export function SystemPulseWidget() {
       {view === 'metrics' && (
         <div className="inline-block">
           {/* Live status with user context */}
-          <div className="mb-12 opacity-60">
+          <div className="mb-12 opacity-30">
             {isLive ? 'Live.' : 'Reconnecting.'}
             {!logCtx.isEmpty && logCtx.sessionDepth > 0 ? ` Session depth: ${logCtx.sessionDepth}.` : ''}
           </div>
 
           {/* Events per minute */}
           <div className="flex justify-between items-baseline mb-8">
-            <span className="opacity-60">Events/min</span>
+            <span className="opacity-30">Events/min</span>
             <span className="tabular-nums">{Math.round(pulse.eventsPerMinute)}</span>
           </div>
 
           {/* Quantum Flux */}
           <div className="flex justify-between items-baseline mb-8">
-            <span className="opacity-60">Quantum flux</span>
+            <span className="opacity-30">Quantum flux</span>
             <span className="tabular-nums">{pulse.quantumFlux.toFixed(1)}%</span>
           </div>
 
           {/* Neural Activity */}
           <div className="flex justify-between items-baseline mb-8">
-            <span className="opacity-60">Neural activity</span>
+            <span className="opacity-30">Neural activity</span>
             <span className="tabular-nums">{Math.round(pulse.neuralActivity)}</span>
           </div>
 
           {/* Resonance */}
           <div className="flex justify-between items-baseline">
-            <span className="opacity-60">Resonance</span>
+            <span className="opacity-30">Resonance</span>
             <span className="tabular-nums">{pulse.resonanceHz.toFixed(1)} Hz</span>
           </div>
         </div>
@@ -130,7 +130,7 @@ export function SystemPulseWidget() {
           {/* Activity level as progress bars */}
           <div className="mb-12">
             <div className="flex justify-between mb-4">
-              <span className="opacity-60">Load</span>
+              <span className="opacity-30">Load</span>
               <span className="tabular-nums">{Math.min(100, Math.round(pulse.eventsPerMinute))}%</span>
             </div>
             <ProgressBars percentage={Math.min(100, pulse.eventsPerMinute)} barCount={20} />
@@ -138,14 +138,14 @@ export function SystemPulseWidget() {
 
           <div className="mb-12">
             <div className="flex justify-between mb-4">
-              <span className="opacity-60">Flux</span>
+              <span className="opacity-30">Flux</span>
               <span className="tabular-nums">{pulse.quantumFlux.toFixed(1)}%</span>
             </div>
             <ProgressBars percentage={pulse.quantumFlux} barCount={20} />
           </div>
 
           {/* Status */}
-          <div className="opacity-60">
+          <div className="opacity-30">
             {isLive ? 'System operational.' : 'Connection interrupted.'}
           </div>
         </div>
@@ -154,40 +154,40 @@ export function SystemPulseWidget() {
       {view === 'userload' && (
         <div className="inline-block">
           {logCtx.isEmpty ? (
-            <div className="opacity-60">No user telemetry. Begin logging to populate.</div>
+            <div className="opacity-30">No user telemetry. Begin logging to populate.</div>
           ) : (
             <>
               {/* Today's user activity metrics */}
               <div className="flex justify-between items-baseline mb-8">
-                <span className="opacity-60">Today signals</span>
+                <span className="opacity-30">Today signals</span>
                 <span className="tabular-nums">{logCtx.todayActivity.length}</span>
               </div>
 
               <div className="flex justify-between items-baseline mb-8">
-                <span className="opacity-60">Weekly rate</span>
+                <span className="opacity-30">Weekly rate</span>
                 <span className="tabular-nums">{logCtx.weeklyRate}/wk</span>
               </div>
 
               <div className="flex justify-between items-baseline mb-8">
-                <span className="opacity-60">Module coverage</span>
+                <span className="opacity-30">Module coverage</span>
                 <span className="tabular-nums">{logCtx.activeModules.length}/6</span>
               </div>
 
               <div className="flex justify-between items-baseline mb-8">
-                <span className="opacity-60">Engagement</span>
+                <span className="opacity-30">Engagement</span>
                 <span className="capitalize">{logCtx.engagementLevel}</span>
               </div>
 
               {logCtx.lastActivityAgo && (
                 <div className="flex justify-between items-baseline mb-8">
-                  <span className="opacity-60">Last signal</span>
+                  <span className="opacity-30">Last signal</span>
                   <span>{logCtx.lastActivityAgo}</span>
                 </div>
               )}
 
               {logCtx.peakHour !== null && (
                 <div className="flex justify-between items-baseline">
-                  <span className="opacity-60">Peak hour</span>
+                  <span className="opacity-30">Peak hour</span>
                   <span className="tabular-nums">{logCtx.peakHour}:00</span>
                 </div>
               )}

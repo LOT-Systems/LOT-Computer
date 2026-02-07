@@ -317,7 +317,7 @@ export function EmotionalCheckIn() {
             <>
               <div className="mb-12">
                 <div className="flex items-center gap-8">
-                  <span className="text-xl">{checkInsData.stats.total}</span>
+                  <span>{checkInsData.stats.total}</span>
                   <span>Check-ins</span>
                 </div>
               </div>
@@ -374,7 +374,7 @@ export function EmotionalCheckIn() {
                     return (
                       <div key={date} className="flex items-center gap-8">
                         <span className="w-[60px]">{dayLabel}</span>
-                        <span className="opacity-60">−</span>
+                        <span className="opacity-30">−</span>
                       </div>
                     )
                   }

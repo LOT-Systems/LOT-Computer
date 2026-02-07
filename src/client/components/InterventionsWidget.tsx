@@ -75,7 +75,7 @@ export function InterventionsWidget() {
 
         {/* Suggestion if present */}
         {intervention.suggestion && (
-          <div className="opacity-80">
+          <div className="opacity-30">
             {intervention.suggestion}
           </div>
         )}

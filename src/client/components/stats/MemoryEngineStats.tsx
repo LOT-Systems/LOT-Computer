@@ -46,7 +46,7 @@ export function MemoryEngineStats() {
     <Block label="Memory Engine:" blockView className="min-h-[200px]">
       <div className="space-y-4">
         <div className="flex justify-between items-baseline">
-          <span className="opacity-60">Questions Generated</span>
+          <span className="opacity-30">Questions Generated</span>
           <span>
             {stats.questionsGenerated}/day
             {hasGrown('questionsGenerated', stats.questionsGenerated) && <GrowthIndicator />}
@@ -54,7 +54,7 @@ export function MemoryEngineStats() {
         </div>
 
         <div className="flex justify-between items-baseline">
-          <span className="opacity-60">Response Quality</span>
+          <span className="opacity-30">Response Quality</span>
           <span className="flex items-center gap-3">
             {renderQualityBars(stats.responseQuality)}
             <span>
@@ -65,12 +65,12 @@ export function MemoryEngineStats() {
         </div>
 
         <div className="flex justify-between items-baseline">
-          <span className="opacity-60">Avg Response Time</span>
+          <span className="opacity-30">Avg Response Time</span>
           <span>{stats.avgResponseTime}ms</span>
         </div>
 
         <div className="flex justify-between items-baseline">
-          <span className="opacity-60">Context Depth</span>
+          <span className="opacity-30">Context Depth</span>
           <span>
             {stats.contextDepth} logs
             {hasGrown('contextDepth', stats.contextDepth) && <GrowthIndicator />}
@@ -78,7 +78,7 @@ export function MemoryEngineStats() {
         </div>
 
         <div className="flex justify-between items-baseline">
-          <span className="opacity-60">AI Diversity Score</span>
+          <span className="opacity-30">AI Diversity Score</span>
           <span>
             {stats.aiDiversityScore}%
             {hasGrown('aiDiversityScore', stats.aiDiversityScore) && <GrowthIndicator />}

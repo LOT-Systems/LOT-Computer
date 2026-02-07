@@ -61,12 +61,12 @@ export function SignalStreamWidget() {
       <div className="inline-block">
         {/* Stream header with log-context enrichment */}
         <div className="flex justify-between mb-12">
-          <span className="opacity-60">
+          <span className="opacity-30">
             {engine.signals.length} total
             {!logCtx.isEmpty ? ` . ${logCtx.totalEntries} logs` : ''}
           </span>
           {signalRate && (
-            <span className="opacity-60">
+            <span className="opacity-30">
               {signalRate}/hr
             </span>
           )}
@@ -79,13 +79,13 @@ export function SignalStreamWidget() {
               key={`${signal.timestamp}-${idx}`}
               className={cn(
                 'flex items-baseline gap-8 transition-opacity duration-[1400ms]',
-                idx === 0 && highlightedIndex === 0 ? 'opacity-100' : 'opacity-80'
+                idx === 0 && highlightedIndex === 0 ? 'opacity-100' : 'opacity-30'
               )}
             >
-              <span className="opacity-40 tabular-nums w-[64px]">
+              <span className="opacity-30 tabular-nums w-[64px]">
                 {formatTimestamp(signal.timestamp)}
               </span>
-              <span className="w-[56px] capitalize opacity-60">
+              <span className="w-[56px] capitalize opacity-30">
                 {signal.source}
               </span>
               <span>
@@ -96,7 +96,7 @@ export function SignalStreamWidget() {
         </div>
 
         {/* Sync status enriched with log context */}
-        <div className="mt-12 opacity-40">
+        <div className="mt-12 opacity-30">
           {engine.lastSyncedTimestamp > 0
             ? `Last upstream sync: ${formatTimestamp(engine.lastSyncedTimestamp)}`
             : 'Awaiting upstream sync.'

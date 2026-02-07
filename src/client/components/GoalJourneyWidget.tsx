@@ -97,7 +97,7 @@ export function GoalJourneyWidget() {
                     <div className="mb-4">
                       {goal.title}
                     </div>
-                    <div className="opacity-60">
+                    <div className="opacity-30">
                       {goal.journeyStage === 'beginning' && 'Beginning'}
                       {goal.journeyStage === 'struggle' && 'In progress'}
                       {goal.journeyStage === 'breakthrough' && 'Breakthrough'}

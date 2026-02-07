@@ -36,7 +36,7 @@ export function ToggleSection({
       <button
         onClick={handleToggle}
         className={cn(
-          'w-full text-left flex items-center gap-8 py-8 transition-opacity hover:opacity-70',
+          'w-full text-left flex items-center gap-8 py-8 transition-opacity hover:opacity-30',
           indent > 0 && 'pl-' + (indent * 16)
         )}
         style={{ paddingLeft: indent > 0 ? `${indent * 16}px` : undefined }}

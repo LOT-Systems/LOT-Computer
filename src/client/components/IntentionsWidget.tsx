@@ -128,7 +128,7 @@ export function IntentionsWidget() {
               {(() => {
                 const quantumReason = localStorage.getItem('intentions-quantum-reason')
                 return quantumReason ? (
-                  <div className="opacity-60 mb-8">
+                  <div className="opacity-30 mb-8">
                     {quantumReason}
                   </div>
                 ) : null
@@ -157,7 +157,7 @@ export function IntentionsWidget() {
               {(() => {
                 const quantumReason = localStorage.getItem('intentions-quantum-reason')
                 return quantumReason ? (
-                  <div className="opacity-60 mb-8">
+                  <div className="opacity-30 mb-8">
                     {quantumReason}
                   </div>
                 ) : null
@@ -220,7 +220,7 @@ export function IntentionsWidget() {
           </div>
 
           {/* Activity since intention was set */}
-          <div className="mb-12 opacity-60">
+          <div className="mb-12 opacity-30">
             {logCtx.totalEntries > 0
               ? `${logCtx.todayActivity.length} action${logCtx.todayActivity.length === 1 ? '' : 's'} today. ${logCtx.streak} day streak.`
               : 'No activity recorded yet.'
@@ -230,23 +230,23 @@ export function IntentionsWidget() {
           {/* Behavioral alignment */}
           <div className="flex flex-col gap-4 mb-12">
             <div className="flex justify-between items-baseline">
-              <span className="opacity-60">Widget diversity</span>
+              <span className="opacity-30">Widget diversity</span>
               <span>{logCtx.widgetDiversity} types</span>
             </div>
             <div className="flex justify-between items-baseline">
-              <span className="opacity-60">Weekly rate</span>
+              <span className="opacity-30">Weekly rate</span>
               <span>~{logCtx.weeklyRate} interactions</span>
             </div>
             {logCtx.dominantMood && (
               <div className="flex justify-between items-baseline">
-                <span className="opacity-60">Mood pattern</span>
+                <span className="opacity-30">Mood pattern</span>
                 <span className="capitalize">{logCtx.dominantMood}</span>
               </div>
             )}
           </div>
 
           {/* Alignment assessment */}
-          <div className="opacity-60">
+          <div className="opacity-30">
             {logCtx.streak >= 7
               ? 'Strong convergence. Intention integrated into daily runtime.'
               : logCtx.streak >= 3
