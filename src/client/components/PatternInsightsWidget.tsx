@@ -195,10 +195,7 @@ export const PatternInsightsWidget = () => {
                 {evo.timeline.length > 0 && (
                   <div className="opacity-40">
                     {evo.timeline.length} observation{evo.timeline.length > 1 ? 's' : ''} from{' '}
-                    {dayjs(evo.firstSeen).isSame(dayjs(evo.lastSeen), 'day')
-                      ? `${dayjs(evo.lastSeen).subtract(7, 'day').format('MMM D')} to ${dayjs(evo.lastSeen).format('MMM D')}`
-                      : `${dayjs(evo.firstSeen).format('MMM D')} to ${dayjs(evo.lastSeen).format('MMM D')}`
-                    }
+                    {dayjs(evo.lastSeen).subtract(7, 'day').format('MMM D')} to {dayjs(evo.lastSeen).format('MMM D')}
                   </div>
                 )}
               </div>

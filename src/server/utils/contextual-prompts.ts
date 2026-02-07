@@ -237,7 +237,13 @@ export function analyzePatternEvolution(
         value: pattern.metadata?.avgTemp || pattern.metadata?.peakHour || null
       })
 
-      evolution.lastSeen = snapshot.analyzedAt
+      // Track chronological min/max dates
+      if (dayjs(snapshot.analyzedAt).isBefore(dayjs(evolution.firstSeen))) {
+        evolution.firstSeen = snapshot.analyzedAt
+      }
+      if (dayjs(snapshot.analyzedAt).isAfter(dayjs(evolution.lastSeen))) {
+        evolution.lastSeen = snapshot.analyzedAt
+      }
     }
   }
 

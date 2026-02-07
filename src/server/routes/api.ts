@@ -747,7 +747,7 @@ export default async (fastify: FastifyInstance) => {
   fastify.get('/chat-messages', async (req: FastifyRequest, reply) => {
     const messages = await fastify.models.ChatMessage.findAll({
       order: [['createdAt', 'DESC']],
-      limit: req.user.isAdmin() ? undefined : SYNC_CHAT_MESSAGES_TO_SHOW,
+      limit: req.user.canAccessUsSection() ? undefined : SYNC_CHAT_MESSAGES_TO_SHOW,
     })
 
     const userIds = messages.map((m) => m.authorUserId)
@@ -4079,8 +4079,10 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       // Calculate average response time (simulate for now)
       const avgResponseTime = 847 + Math.floor(Math.random() * 200) - 100 // 747-947ms
 
-      // Context depth (average logs used)
-      const contextDepth = 120
+      // Context depth (actual user log count)
+      const contextDepth = await fastify.models.Log.count({
+        where: { userId: req.user.id }
+      })
 
       // AI diversity score (% of unique questions)
       const totalQuestions = await fastify.models.Answer.count({
