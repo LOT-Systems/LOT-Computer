@@ -211,7 +211,7 @@ export function SystemProgressWidget() {
                 {/* Feedback Distribution */}
                 <div>
                   <div className="opacity-60 mb-8">Distribution ({analytics.totalResponses} responses):</div>
-                  <div className="flex flex-col gap-y-4">
+                  <div className="flex flex-col gap-y-6">
                     {FEEDBACK_OPTIONS.map(option => {
                       const percentage = analytics.feedbackPercentages[option.id as keyof typeof analytics.feedbackPercentages]
                       return (

@@ -101,8 +101,9 @@ export function InterfaceEvolutionWidget() {
 
           {/* Badge tier */}
           {evolutionState.badgeTier > 0 && (
-            <div className="mb-12">
-              Tier {evolutionState.badgeTier} ({evolutionState.badgeTheme})
+            <div className="mb-12 flex items-center gap-8">
+              <span>Tier {evolutionState.badgeTier}</span>
+              <span>({evolutionState.badgeTheme})</span>
             </div>
           )}
 

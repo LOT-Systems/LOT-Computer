@@ -45,7 +45,7 @@ export const CohortConnectWidget: React.FC = () => {
 
   return (
     <Block label="Cohort:" blockView>
-      <div className="inline-block">
+      <div className="font-mono">
         {/* Cohort name */}
         <div className="mb-16">
           <div className="  mb-4">Your cohort</div>

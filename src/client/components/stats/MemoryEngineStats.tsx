@@ -43,7 +43,7 @@ export function MemoryEngineStats() {
   }
 
   return (
-    <Block label="Memory Engine:" blockView className="">
+    <Block label="Memory Engine:" blockView className="min-h-[200px]">
       <div className="space-y-4">
         <div className="flex justify-between items-baseline">
           <span className="opacity-60">Questions Generated</span>

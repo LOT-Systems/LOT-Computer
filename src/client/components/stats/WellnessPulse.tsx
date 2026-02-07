@@ -25,7 +25,7 @@ export function WellnessPulse() {
   }
 
   return (
-    <Block label="Community Wellness:" blockView>
+    <Block label="Community Wellness:" blockView className="min-h-[200px]">
       <div className="inline-block">
         {/* Active now */}
         <div className="mb-16">

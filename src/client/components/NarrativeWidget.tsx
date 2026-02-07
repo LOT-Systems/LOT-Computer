@@ -124,8 +124,8 @@ export function NarrativeWidget() {
                 })
                 .slice(0, 5)
                 .map((achievement) => (
-                  <div key={achievement.id}>
-                    {achievement.title}
+                  <div key={achievement.id} className="flex items-center gap-8">
+                    <span>{achievement.title}</span>
                   </div>
                 ))}
             </div>
@@ -143,8 +143,9 @@ export function NarrativeWidget() {
             <div className="flex flex-col gap-8">
               {narrative.currentArc.activeQuests.map((quest: any) => (
                 <div key={quest.id}>
-                  <div className="mb-4">
-                    {quest.title}{quest.complete ? '. Completed.' : ''}
+                  <div className="mb-4 flex items-center gap-8">
+                    <span>{quest.title}</span>
+                    {quest.complete && <span>completed.</span>}
                   </div>
                   {!quest.complete && quest.progress !== undefined && (
                     <div className="flex items-center gap-8">

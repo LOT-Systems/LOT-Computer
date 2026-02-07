@@ -23,7 +23,7 @@ export function BadgeUnlockFeed() {
   }
 
   return (
-    <Block label="Recent Unlocks:" blockView className="">
+    <Block label="Recent Unlocks:" blockView className="min-h-[200px]">
       <div className="space-y-3">
         {stats.recentUnlocks.slice(0, 5).map((unlock, index) => (
           <div
