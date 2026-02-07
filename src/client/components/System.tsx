@@ -38,6 +38,7 @@ import { EvolutionWidget } from './EvolutionWidget'
 import { CohortConnectWidget } from './CohortConnectWidget'
 import { InterfaceEvolutionWidget } from './InterfaceEvolutionWidget'
 import { EvolutionMilestoneToast } from './EvolutionMilestoneToast'
+import { MicroCalculatorWidget } from './MicroCalculatorWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
 import { getOptimalWidget, shouldShowWidget, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
@@ -664,6 +665,9 @@ export const System = () => {
       <PlannerWidget />
 
       <MemoryWidget />
+
+      {/* Micro Calculator - appears at magical number times */}
+      <MicroCalculatorWidget />
 
       {/* Quantum Intent Engine Widgets */}
       <QuantumStateWidget />
