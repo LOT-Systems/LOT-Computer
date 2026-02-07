@@ -3,21 +3,26 @@ import { Block } from '#client/components/ui'
 import { useEnergy } from '#client/queries'
 import { cn } from '#client/utils'
 import { getEnergyNarrative, getRomanticNarrative } from '#client/utils/narrative'
+import { recordSignal } from '#client/stores/intentionEngine'
+import { useLogContext } from '#client/hooks/useLogContext'
 
-type EnergyView = 'overview' | 'romantic' | 'needs'
+type EnergyView = 'overview' | 'romantic' | 'needs' | 'correlation'
 
 /**
  * Energy Capacitor Widget - Tracks energy depletion/replenishment
- * Cycles: Overview > Romantic Connection > Needs
+ * Cycles: Overview > Correlation > Romantic Connection > Needs
  */
 export function EnergyCapacitor() {
   const [view, setView] = React.useState<EnergyView>('overview')
   const { data, isLoading } = useEnergy()
+  const logCtx = useLogContext()
+  const hasRecordedRef = React.useRef(false)
 
   const cycleView = () => {
     setView(prev => {
       switch (prev) {
-        case 'overview': return 'romantic'
+        case 'overview': return 'correlation'
+        case 'correlation': return 'romantic'
         case 'romantic': return 'needs'
         case 'needs': return 'overview'
         default: return 'overview'
@@ -31,8 +36,44 @@ export function EnergyCapacitor() {
 
   const { energyState, suggestions } = data
 
+  // Record energy signal once per mount
+  if (!hasRecordedRef.current && energyState) {
+    recordSignal('selfcare', `energy_${energyState.status}`, {
+      level: energyState.currentLevel,
+      trajectory: energyState.trajectory,
+      hour: new Date().getHours()
+    })
+    hasRecordedRef.current = true
+  }
+
+  // Correlate energy with mood
+  const getMoodEnergyCorrelation = (): string | null => {
+    if (!logCtx.dominantMood) return null
+
+    const mood = logCtx.dominantMood
+    const level = energyState.currentLevel
+
+    if (level < 30 && ['anxious', 'overwhelmed', 'tired'].includes(mood)) {
+      return `Low energy aligns with ${mood} mood. Rest is the priority.`
+    }
+    if (level < 30 && ['calm', 'peaceful'].includes(mood)) {
+      return `Low energy but calm mood. Gentle replenishment works best.`
+    }
+    if (level > 70 && ['energized', 'excited', 'hopeful'].includes(mood)) {
+      return `High energy matches positive mood. Good conditions for deep work.`
+    }
+    if (level > 70 && ['anxious', 'restless'].includes(mood)) {
+      return `High energy but unsettled mood. Channel energy with intention.`
+    }
+    if (level >= 30 && level <= 70) {
+      return `Moderate energy. ${logCtx.moodTrend === 'improving' ? 'Mood is trending positive.' : logCtx.moodTrend === 'declining' ? 'Watch the mood trend.' : 'Steady state.'}`
+    }
+    return null
+  }
+
   const label =
     view === 'overview' ? 'Energy:' :
+    view === 'correlation' ? 'Energy + Mood:' :
     view === 'romantic' ? 'Connection:' :
     'Needs:'
 
@@ -69,7 +110,7 @@ export function EnergyCapacitor() {
           {/* Burnout warning */}
           {energyState.daysUntilBurnout !== null && energyState.daysUntilBurnout <= 7 && (
             <div className="mb-12">
-              {energyState.daysUntilBurnout} day{energyState.daysUntilBurnout === 1 ? '' : 's'} until burnout
+              Estimated {energyState.daysUntilBurnout} day{energyState.daysUntilBurnout === 1 ? '' : 's'} until buffer overflow.
             </div>
           )}
 
@@ -77,6 +118,45 @@ export function EnergyCapacitor() {
           {suggestions.length > 0 && (
             <div className="opacity-80">
               {suggestions[0]}
+            </div>
+          )}
+        </div>
+      )}
+
+      {view === 'correlation' && (
+        <div className="inline-block">
+          {/* Mood-energy correlation */}
+          {getMoodEnergyCorrelation() ? (
+            <div className="mb-12">
+              {getMoodEnergyCorrelation()}
+            </div>
+          ) : (
+            <div className="mb-12 opacity-60">
+              Record mood check-ins to see energy-mood correlation.
+            </div>
+          )}
+
+          {/* Activity context */}
+          {logCtx.todayActivity.length > 0 && (
+            <div className="mb-8">
+              {logCtx.todayActivity.length} interaction{logCtx.todayActivity.length === 1 ? '' : 's'} today.
+            </div>
+          )}
+
+          {/* Suggestion based on combined state */}
+          {energyState.currentLevel < 40 && logCtx.hasSelfCare && (
+            <div className="opacity-60">
+              Deploy self-care module to restore energy buffer.
+            </div>
+          )}
+          {energyState.currentLevel < 40 && !logCtx.hasSelfCare && (
+            <div className="opacity-60">
+              Initialize self-care module to build energy awareness.
+            </div>
+          )}
+          {energyState.currentLevel >= 70 && !logCtx.hasMemory && (
+            <div className="opacity-60">
+              Energy buffer high. Optimal window for Memory Engine integration.
             </div>
           )}
         </div>

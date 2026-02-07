@@ -41,9 +41,9 @@ export function AIFeedbackWidget() {
   if (engine.signals.length === 0 && !diagnostics && !profile?.hasUsership) return null
 
   const label =
-    view === 'insight' ? 'AI Feedback:' :
+    view === 'insight' ? 'System Analysis:' :
     view === 'diagnostics' ? 'Diagnostics:' :
-    'Guidance:'
+    'Directive:'
 
   // Generate state-aware insight based on quantum state
   const getStateInsight = (state: UserState): string => {
@@ -51,50 +51,50 @@ export function AIFeedbackWidget() {
 
     // Critical support needed
     if (needsSupport === 'critical') {
-      return 'Your system shows signs of strain. Prioritize rest and self-care before continuing.'
+      return 'System strain detected. Prioritize energy restoration before deploying further modules.'
     }
 
     if (needsSupport === 'moderate') {
-      return 'Moderate support needed. Consider a self-care moment or mood check-in.'
+      return 'Moderate load detected. Initialize self-care or mood calibration.'
     }
 
     // Energy-based insights
     if (energy === 'depleted') {
-      return 'Energy is low. Focus on replenishment before deep work.'
+      return 'Energy buffer depleted. Suspend deep processing. Focus on input restoration.'
     }
 
     if (energy === 'high' && clarity === 'focused') {
-      return 'Optimal state detected. This is a good moment for meaningful questions.'
+      return 'Optimal state compiled. Deploy Memory Engine for maximum integration depth.'
     }
 
     if (energy === 'high' && clarity === 'confused') {
-      return 'Energy is available but direction is unclear. An intention may help.'
+      return 'Energy available but vector undefined. Initialize intention to calibrate direction.'
     }
 
     // Clarity-based insights
     if (clarity === 'confused' && alignment === 'disconnected') {
-      return 'Your system needs grounding. Start with a simple check-in.'
+      return 'System requires grounding. Initialize with a baseline check-in.'
     }
 
     if (clarity === 'focused' && alignment === 'flowing') {
-      return 'You are in flow. Maintain this state. Deep work is possible.'
+      return 'Flow state active. Protect this runtime. Deep integration possible.'
     }
 
     // Alignment-based insights
     if (alignment === 'searching') {
-      return 'You are in a searching phase. Trust the process of exploration.'
+      return 'Search mode active. Exploratory phase is part of the compilation process.'
     }
 
     if (alignment === 'aligned' && energy === 'moderate') {
-      return 'Aligned and steady. Continue your current practice.'
+      return 'Aligned and stable. Maintain current execution path.'
     }
 
     // Default
     if (energy === 'unknown') {
-      return 'Recording signals. More data will refine your feedback.'
+      return 'Indexing signals. Additional telemetry will refine output.'
     }
 
-    return 'System operating normally. Continue your practice.'
+    return 'System nominal. Continue current execution.'
   }
 
   // Generate guidance based on patterns and state
@@ -110,24 +110,24 @@ export function AIFeedbackWidget() {
 
     // State-based guidance
     if (userState.energy === 'depleted' || userState.energy === 'low') {
-      guidance.push('Prioritize energy restoration before engagement.')
+      guidance.push('Prioritize energy restoration before further module deployment.')
     }
 
     if (userState.clarity === 'confused') {
-      guidance.push('Set a simple intention to build direction.')
+      guidance.push('Initialize a simple intention to calibrate direction.')
     }
 
     if (userState.alignment === 'flowing') {
-      guidance.push('Protect this flow state. Minimize interruptions.')
+      guidance.push('Protect this flow runtime. Minimize context switches.')
     }
 
     // Profile-based guidance
     if (profile?.growthTrajectory === 'emerging') {
-      guidance.push('Your patterns are forming. Consistency will deepen them.')
+      guidance.push('Patterns initializing. Consistent input will accelerate compilation.')
     }
 
     if (profile?.growthTrajectory === 'deepening') {
-      guidance.push('Your practice is deepening. Explore new dimensions.')
+      guidance.push('Practice depth increasing. Integrate new dimensions.')
     }
 
     // Diagnostics-based guidance
@@ -139,7 +139,7 @@ export function AIFeedbackWidget() {
     }
 
     if (guidance.length === 0) {
-      guidance.push('Continue your current practice.')
+      guidance.push('Continue current execution path.')
     }
 
     return guidance.slice(0, 3)

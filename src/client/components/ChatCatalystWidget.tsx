@@ -5,6 +5,7 @@ import { useChatCatalysts } from '#client/queries'
 import * as stores from '#client/stores'
 import { UserTag } from '#shared/types'
 import { getChatCatalystNarrative } from '#client/utils/narrative'
+import { recordSignal } from '#client/stores/intentionEngine'
 
 /**
  * Chat Catalyst Widget - Prompts to connect with cohort members
@@ -38,6 +39,13 @@ export function ChatCatalystWidget() {
   const hasMultiple = data.catalysts.length > 1
 
   const handleAction = () => {
+    // Record connection signal
+    recordSignal('journal', 'connection_accepted', {
+      type: catalyst.type,
+      cohortMember: catalyst.action.cohortMember?.name || 'community',
+      hour: new Date().getHours()
+    })
+
     // Navigate to specific user profile or community chat
     if (catalyst.action.cohortMember) {
       // Navigate to user profile (using same pattern as Sync.tsx)
@@ -83,7 +91,7 @@ export function ChatCatalystWidget() {
           <div className="mb-12">
             <div className="mb-4">Conversation ideas:</div>
             {catalyst.conversationStarters.map((starter, i) => (
-              <div key={i} className="mb-2">• {starter}</div>
+              <div key={i} className="mb-2 opacity-60">{starter}</div>
             ))}
           </div>
         )}

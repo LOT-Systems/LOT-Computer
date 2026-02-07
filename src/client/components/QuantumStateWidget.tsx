@@ -40,8 +40,8 @@ export function QuantumStateWidget() {
 
   const label =
     view === 'state' ? 'Quantum State:' :
-    view === 'dimensions' ? 'Dimensions:' :
-    'Signal History:'
+    view === 'dimensions' ? 'Signal Allocation:' :
+    'Signal Log:'
 
   // Map state values to numeric percentages for bars
   const getEnergyPercent = (energy: UserState['energy']): number => {
@@ -143,7 +143,7 @@ export function QuantumStateWidget() {
 
           {/* Signal count */}
           <div className="opacity-60">
-            {engine.signals.length} signal{engine.signals.length === 1 ? '' : 's'} in memory.
+            {engine.signals.length} signal{engine.signals.length === 1 ? '' : 's'} cached in local memory.
           </div>
         </div>
       )}
@@ -166,8 +166,8 @@ export function QuantumStateWidget() {
           {/* Analysis metadata */}
           <div className="opacity-60">
             {engine.lastAnalysis > 0
-              ? `Last analysis: ${formatTimeAgo(engine.lastAnalysis)} ago.`
-              : 'No analysis performed yet.'
+              ? `Last compiled: ${formatTimeAgo(engine.lastAnalysis)} ago.`
+              : 'Awaiting initial compilation.'
             }
           </div>
         </div>
@@ -176,7 +176,7 @@ export function QuantumStateWidget() {
       {view === 'history' && (
         <div className="inline-block">
           {recentSignals.length === 0 ? (
-            <div>No signals recorded yet.</div>
+            <div>No signals indexed yet.</div>
           ) : (
             <div className="flex flex-col gap-4">
               {recentSignals.map((signal, idx) => (

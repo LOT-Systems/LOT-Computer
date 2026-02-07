@@ -41,44 +41,44 @@ export function PatternRecognitionWidget() {
   if (patterns.length === 0 && !optimal) return null
 
   const label =
-    view === 'active' ? 'Recognized:' :
-    view === 'recommendation' ? 'Recommended:' :
-    'Confidence:'
+    view === 'active' ? 'Recognized Patterns:' :
+    view === 'recommendation' ? 'Suggested Module:' :
+    'Confidence Matrix:'
 
-  // Human-readable pattern names
+  // Technical pattern names
   const getPatternName = (pattern: string): string => {
     const names: Record<string, string> = {
-      'anxiety-pattern': 'Anxiety pattern detected',
-      'lack-of-structure': 'Structure needed',
-      'seeking-direction': 'Seeking direction',
-      'flow-potential': 'Flow state potential',
-      'evening-overwhelm': 'Evening overwhelm',
-      'surface-awareness': 'Surface-level tracking',
+      'anxiety-pattern': 'Anxiety signal detected',
+      'lack-of-structure': 'Structure deficit',
+      'seeking-direction': 'Direction-seeking state',
+      'flow-potential': 'Flow state available',
+      'evening-overwhelm': 'Evening overload signal',
+      'surface-awareness': 'Surface-level telemetry',
       'morning-clarity': 'Morning clarity window'
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
 
-  // Human-readable timing
+  // Timing labels
   const getTimingLabel = (timing: string): string => {
     const labels: Record<string, string> = {
-      'immediate': 'Now',
-      'soon': 'Soon',
+      'immediate': 'Deploy now',
+      'soon': 'Queue next',
       'next-session': 'Next session',
-      'passive': 'When ready'
+      'passive': 'Standby'
     }
     return labels[timing] || timing
   }
 
-  // Human-readable widget names
+  // Module names
   const getWidgetLabel = (widget: string): string => {
     const labels: Record<string, string> = {
-      'selfcare': 'Self-care',
-      'planner': 'Planner',
-      'intentions': 'Intentions',
-      'memory': 'Memory',
-      'journal': 'Journal',
-      'mood': 'Mood'
+      'selfcare': 'Self-care module',
+      'planner': 'Planner module',
+      'intentions': 'Intention engine',
+      'memory': 'Memory engine',
+      'journal': 'Journal module',
+      'mood': 'Mood interface'
     }
     return labels[widget] || widget
   }
@@ -92,7 +92,7 @@ export function PatternRecognitionWidget() {
       {view === 'active' && (
         <div className="inline-block">
           {patterns.length === 0 ? (
-            <div>No behavioral patterns detected yet.</div>
+            <div>No behavioral patterns compiled yet.</div>
           ) : (
             <div className="flex flex-col gap-12">
               {patterns
@@ -109,7 +109,7 @@ export function PatternRecognitionWidget() {
                     <div className="opacity-60">
                       {pattern.confidence >= 0.8
                         ? `${getWidgetLabel(pattern.suggestedWidget)}. ${getTimingLabel(pattern.suggestedTiming)}.`
-                        : 'Pattern emerging. Continue for clarity.'
+                        : 'Pattern initializing. Continue for convergence.'
                       }
                     </div>
                   </div>
@@ -138,13 +138,13 @@ export function PatternRecognitionWidget() {
               {/* Show confidence context */}
               {patterns.length > 0 && (
                 <div className="opacity-40">
-                  Based on {patterns.filter(p => p.confidence >= 0.5).length} pattern{patterns.filter(p => p.confidence >= 0.5).length === 1 ? '' : 's'} above threshold.
+                  Derived from {patterns.filter(p => p.confidence >= 0.5).length} pattern{patterns.filter(p => p.confidence >= 0.5).length === 1 ? '' : 's'} above threshold.
                 </div>
               )}
             </>
           ) : (
             <div>
-              No specific recommendation at this time. Continue as you are.
+              No module recommendation at this time. System nominal.
             </div>
           )}
         </div>
@@ -153,7 +153,7 @@ export function PatternRecognitionWidget() {
       {view === 'confidence' && (
         <div className="inline-block">
           {patterns.length === 0 ? (
-            <div>Insufficient data for confidence mapping.</div>
+            <div>Insufficient telemetry for confidence mapping.</div>
           ) : (
             <div className="flex flex-col gap-4">
               {/* Confidence distribution */}
@@ -173,7 +173,7 @@ export function PatternRecognitionWidget() {
 
               {/* Summary */}
               <div className="mt-8 opacity-60">
-                {patterns.length} pattern{patterns.length === 1 ? '' : 's'} above threshold.
+                {patterns.length} pattern{patterns.length === 1 ? '' : 's'} indexed.
               </div>
             </div>
           )}

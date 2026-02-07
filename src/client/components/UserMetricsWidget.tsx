@@ -34,8 +34,8 @@ export function UserMetricsWidget() {
 
   const label =
     view === 'status' ? 'System Health:' :
-    view === 'performance' ? 'Performance:' :
-    'OS Version:'
+    view === 'performance' ? 'Performance Benchmark:' :
+    'Runtime Version:'
 
   return (
     <Block
@@ -108,14 +108,18 @@ export function UserMetricsWidget() {
 
           {/* Trajectory */}
           <div className="opacity-60">
-            Trajectory: {performance.trends.trajectory}.
+            Trajectory: {
+              performance.trends.trajectory === 'increasing' ? 'accelerating.' :
+              performance.trends.trajectory === 'decreasing' ? 'decelerating.' :
+              'holding steady.'
+            }
           </div>
         </div>
       )}
 
       {view === 'performance' && !performance && (
         <div className="inline-block">
-          <div className="opacity-60">Insufficient data for performance metrics.</div>
+          <div className="opacity-60">Insufficient telemetry for performance benchmarks.</div>
         </div>
       )}
 

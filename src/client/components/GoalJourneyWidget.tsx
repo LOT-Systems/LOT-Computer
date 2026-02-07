@@ -1,6 +1,7 @@
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { useGoalProgression } from '#client/queries'
+import { recordSignal } from '#client/stores/intentionEngine'
 
 type GoalView = 'journey' | 'goals' | 'narrative'
 
@@ -13,6 +14,7 @@ type GoalView = 'journey' | 'goals' | 'narrative'
 export function GoalJourneyWidget() {
   const [view, setView] = React.useState<GoalView>('journey')
   const { data, isLoading } = useGoalProgression()
+  const hasRecordedRef = React.useRef(false)
 
   const cycleView = () => {
     setView(prev => {
@@ -31,6 +33,17 @@ export function GoalJourneyWidget() {
 
   const { progression } = data
   const { goals, overallJourney, narrative } = progression
+
+  // Record goal signal once per mount
+  if (!hasRecordedRef.current) {
+    const activeGoals = goals?.filter((g: any) => g.state === 'active' || g.state === 'progressing') || []
+    recordSignal('intentions', 'goals_viewed', {
+      activeGoalCount: activeGoals.length,
+      primaryGoal: overallJourney?.primaryGoal?.title || null,
+      hour: new Date().getHours()
+    })
+    hasRecordedRef.current = true
+  }
 
   const label =
     view === 'journey' ? 'Journey:' :

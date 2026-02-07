@@ -55,7 +55,7 @@ export function SignalStreamWidget() {
   }, [engine.signals])
 
   return (
-    <Block label="Signal Stream:" blockView>
+    <Block label="Signal Bus:" blockView>
       <div className="inline-block">
         {/* Stream header */}
         <div className="flex justify-between mb-12">
@@ -95,8 +95,8 @@ export function SignalStreamWidget() {
         {/* Sync status */}
         <div className="mt-12 opacity-40">
           {engine.lastSyncedTimestamp > 0
-            ? `Last sync: ${formatTimestamp(engine.lastSyncedTimestamp)}`
-            : 'Not yet synced.'
+            ? `Last upstream sync: ${formatTimestamp(engine.lastSyncedTimestamp)}`
+            : 'Awaiting upstream sync.'
           }
         </div>
       </div>

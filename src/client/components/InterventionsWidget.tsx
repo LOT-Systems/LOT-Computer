@@ -2,6 +2,7 @@ import React from 'react'
 import { Block } from '#client/components/ui'
 import { useInterventions } from '#client/queries'
 import { getInterventionNarrative } from '#client/utils/narrative'
+import { recordSignal } from '#client/stores/intentionEngine'
 
 /**
  * Interventions Widget - Compassionate care based on semantic struggle detection
@@ -10,6 +11,7 @@ import { getInterventionNarrative } from '#client/utils/narrative'
 export function InterventionsWidget() {
   const [currentIndex, setCurrentIndex] = React.useState(0)
   const { data, isLoading } = useInterventions()
+  const hasRecordedRef = React.useRef(false)
 
   const cycleIntervention = () => {
     if (!data || data.interventions.length === 0) return
@@ -22,6 +24,16 @@ export function InterventionsWidget() {
 
   const intervention = data.interventions[currentIndex]
   const hasMultiple = data.interventions.length > 1
+
+  // Record intervention signal once per mount
+  if (!hasRecordedRef.current) {
+    recordSignal('mood', `intervention_${intervention.severity}`, {
+      type: intervention.type,
+      severity: intervention.severity,
+      hour: new Date().getHours()
+    })
+    hasRecordedRef.current = true
+  }
 
   const getSeverityIndicator = () => {
     switch (intervention.severity) {

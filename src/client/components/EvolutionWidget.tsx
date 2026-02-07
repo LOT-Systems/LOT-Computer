@@ -5,6 +5,7 @@ import { Block } from '#client/components/ui'
 import { useNarrative, useLogs } from '#client/queries'
 import dayjs from '#client/utils/dayjs'
 import { ProgressBars, getStoicProgressLabel } from '#client/utils/progressBars'
+import { useLogContext } from '#client/hooks/useLogContext'
 
 /**
  * Evolution Widget - Minimalist Profile Growth Indicators
@@ -16,6 +17,12 @@ export const EvolutionWidget: React.FC = () => {
   const me = useStore(stores.me)
   const { data: narrativeData } = useNarrative()
   const { data: logs } = useLogs()
+  const logCtx = useLogContext()
+  const [view, setView] = React.useState<'metrics' | 'activity'>('metrics')
+
+  const cycleView = () => {
+    setView(prev => prev === 'metrics' ? 'activity' : 'metrics')
+  }
 
   if (!narrativeData?.narrative || !logs) {
     return null
@@ -69,19 +76,75 @@ export const EvolutionWidget: React.FC = () => {
 
   // Determine evolution stage based on level
   const getEvolutionStage = (level: number): string => {
-    if (level >= 50) return 'Transcendent'
-    if (level >= 40) return 'Masterful'
-    if (level >= 30) return 'Advanced'
-    if (level >= 20) return 'Developed'
-    if (level >= 10) return 'Emerging'
-    return 'Forming'
+    if (level >= 50) return 'Deployed'
+    if (level >= 40) return 'Optimized'
+    if (level >= 30) return 'Compiled'
+    if (level >= 20) return 'Integrated'
+    if (level >= 10) return 'Initializing'
+    return 'Bootstrapping'
   }
 
   const stage = getEvolutionStage(currentLevel)
 
+  // Activity breakdown labels
+  const activityLabels: Record<string, string> = {
+    'answer': 'Memory',
+    'emotional_checkin': 'Mood',
+    'plan_set': 'Planner',
+    'self_care_complete': 'Self-care',
+    'intention': 'Intention',
+    'note': 'Journal',
+    'quantum_intent_signal': 'QIE signal',
+  }
+
   return (
-    <Block label="Evolution:" blockView>
-      <div>
+    <Block label={view === 'metrics' ? 'Evolution:' : 'Activity:'} blockView onLabelClick={cycleView}>
+      {view === 'activity' && (
+        <div>
+          {/* Activity type breakdown */}
+          <div className="flex flex-col gap-4 mb-16">
+            {Object.entries(logCtx.activityBreakdown)
+              .sort(([, a], [, b]) => b - a)
+              .slice(0, 6)
+              .map(([event, count]) => (
+                <div key={event} className="flex justify-between items-baseline">
+                  <span className="opacity-60">{activityLabels[event] || event}</span>
+                  <span className="tabular-nums">{count}</span>
+                </div>
+              ))
+            }
+          </div>
+
+          {/* Diversity */}
+          <div className="flex justify-between items-baseline mb-8">
+            <span className="opacity-60">Widget diversity</span>
+            <span>{logCtx.widgetDiversity} types</span>
+          </div>
+
+          {/* Mood trend */}
+          {logCtx.dominantMood && (
+            <div className="flex justify-between items-baseline mb-8">
+              <span className="opacity-60">Dominant mood</span>
+              <span className="capitalize">{logCtx.dominantMood}</span>
+            </div>
+          )}
+
+          {/* Peak hour */}
+          {logCtx.peakHour !== null && (
+            <div className="flex justify-between items-baseline mb-8">
+              <span className="opacity-60">Peak hour</span>
+              <span>{logCtx.peakHour}:00</span>
+            </div>
+          )}
+
+          {/* Weekly rate */}
+          <div className="opacity-40 mt-12">
+            ~{logCtx.weeklyRate} interactions per week.
+          </div>
+        </div>
+      )}
+
+      {view === 'metrics' && <div>
         {/* Main level display */}
         <div className="mb-24 flex items-baseline gap-8">
           <div>{currentLevel}</div>
@@ -138,10 +201,10 @@ export const EvolutionWidget: React.FC = () => {
         {/* Reflection on progress */}
         {currentLevel > 1 && (
           <div className="mt-24 opacity-60">
-            Growth comes from consistent action.
+            Consistent input accelerates compilation.
           </div>
         )}
-      </div>
+      </div>}
     </Block>
   )
 }

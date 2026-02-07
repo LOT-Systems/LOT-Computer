@@ -79,7 +79,7 @@ export function GrowthIndicator() {
       className="ml-2 opacity-60"
       title="Growing since last session"
     >
-      grew.
+      ↑
     </span>
   )
 }

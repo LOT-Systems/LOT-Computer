@@ -2,9 +2,11 @@ import React from 'react'
 import { Block } from '#client/components/ui'
 import { useGrowthStats } from '#client/queries'
 import { hasGrown, updateStatSnapshot, GrowthIndicator } from '#client/utils/statGrowth'
+import { useLogContext } from '#client/hooks/useLogContext'
 
 export function GrowthMilestones() {
   const { data: stats, isLoading, error } = useGrowthStats()
+  const logCtx = useLogContext()
 
   // Track stat changes on mount and when stats update
   React.useEffect(() => {
@@ -76,7 +78,7 @@ export function GrowthMilestones() {
           <div className="opacity-60 mb-4">Community</div>
           <div className="space-y-3">
             <div className="flex justify-between items-baseline">
-              <span className="opacity-60">Total Souls</span>
+              <span className="opacity-60">Total users</span>
               <span>
                 {community.totalSouls.toLocaleString()}
                 {hasGrown('totalSouls', community.totalSouls) && <GrowthIndicator />}
@@ -98,6 +100,29 @@ export function GrowthMilestones() {
             </div>
           </div>
         </div>
+
+        {/* Next action guidance based on log context */}
+        {!logCtx.isEmpty && (
+          <div className="pt-6 border-t border-acc/20">
+            <div className="opacity-60 mb-4">Next directive</div>
+            <div className="opacity-60">
+              {personal.questionsAnswered < 7
+                ? `${7 - personal.questionsAnswered} more input${7 - personal.questionsAnswered === 1 ? '' : 's'} to initialize pattern compiler.`
+                : personal.questionsAnswered < 20
+                ? `${20 - personal.questionsAnswered} more to deploy full profiling pipeline.`
+                : !logCtx.hasMood
+                ? 'Initialize mood interface to broaden telemetry.'
+                : !logCtx.hasPlanner
+                ? 'Deploy planner module to deepen integration.'
+                : !logCtx.hasSelfCare
+                ? 'Initialize self-care module for system balance.'
+                : logCtx.streak === 0
+                ? 'Execute check-in to start a streak.'
+                : `Maintain your ${logCtx.streak}-day execution streak.`
+              }
+            </div>
+          </div>
+        )}
       </div>
     </Block>
   )
