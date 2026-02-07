@@ -187,7 +187,7 @@ export function AIFeedbackWidget() {
       onLabelClick={cycleView}
     >
       {view === 'insight' && (
-        <div className="inline-block">
+        <div>
           {/* Primary quantum-state-aware insight */}
           <div className="mb-12">
             {getStateInsight(userState)}
@@ -216,7 +216,7 @@ export function AIFeedbackWidget() {
       )}
 
       {view === 'diagnostics' && (
-        <div className="inline-block">
+        <div>
           {diagnostics ? (
             <>
               {/* System status */}
@@ -257,7 +257,7 @@ export function AIFeedbackWidget() {
             </>
           ) : (
             // Fallback diagnostics from log context when OS diagnostics unavailable
-            <div className="inline-block">
+            <div>
               <div className="flex justify-between items-baseline mb-8">
                 <span className="opacity-30">Engagement</span>
                 <span className="capitalize">{logCtx.engagementLevel}</span>
@@ -285,7 +285,7 @@ export function AIFeedbackWidget() {
       )}
 
       {view === 'guidance' && (
-        <div className="inline-block">
+        <div>
           {/* Log-grounded guidance */}
           <div className="flex flex-col gap-8 mb-12">
             {getGuidance().map((item, idx) => (

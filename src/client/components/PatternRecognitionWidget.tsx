@@ -92,7 +92,7 @@ export function PatternRecognitionWidget() {
       onLabelClick={cycleView}
     >
       {view === 'active' && (
-        <div className="inline-block">
+        <div>
           {patterns.length === 0 ? (
             <div>No behavioral patterns compiled yet.</div>
           ) : (
@@ -128,7 +128,7 @@ export function PatternRecognitionWidget() {
       )}
 
       {view === 'recommendation' && (
-        <div className="inline-block">
+        <div>
           {optimal ? (
             <>
               <div className="mb-12">
@@ -157,7 +157,7 @@ export function PatternRecognitionWidget() {
       )}
 
       {view === 'confidence' && (
-        <div className="inline-block">
+        <div>
           {patterns.length === 0 ? (
             <div>Insufficient telemetry for confidence mapping.</div>
           ) : (

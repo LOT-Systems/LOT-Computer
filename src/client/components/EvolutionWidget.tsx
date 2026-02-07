@@ -151,38 +151,30 @@ export const EvolutionWidget: React.FC = () => {
           <div>{stage}</div>
         </div>
 
-        {/* Grid of metrics - minimalist */}
-        <div className="grid grid-cols-2 gap-x-16 gap-y-8 mb-24">
-          <div>
-            <div className="mb-8">Entries</div>
-            <div>{totalEntries}</div>
+        {/* Metrics */}
+        <div className="flex flex-col gap-4 mb-24">
+          <div className="flex justify-between items-baseline">
+            <span className="opacity-30">Entries</span>
+            <span className="tabular-nums">{totalEntries}</span>
           </div>
-
-          <div>
-            <div className="mb-8">Active days</div>
-            <div>{activeDays}</div>
+          <div className="flex justify-between items-baseline">
+            <span className="opacity-30">Active days</span>
+            <span className="tabular-nums">{activeDays}</span>
           </div>
-
-          <div>
-            <div className="mb-8">Streak</div>
-            <div>{streakDays} {streakDays === 1 ? 'day' : 'days'}</div>
+          <div className="flex justify-between items-baseline">
+            <span className="opacity-30">Streak</span>
+            <span className="tabular-nums">{streakDays} {streakDays === 1 ? 'day' : 'days'}</span>
           </div>
-
-          <div>
-            <div className="mb-8">Achievements</div>
-            <div>{unlockedAchievements}/{totalAchievements}</div>
+          <div className="flex justify-between items-baseline">
+            <span className="opacity-30">Achievements</span>
+            <span className="tabular-nums">{unlockedAchievements}/{totalAchievements}</span>
           </div>
-
           {consistency > 0 && (
-            <>
-              <div className="col-span-2">
-                <div className="mb-8">Consistency</div>
-                <div className="flex items-center gap-8">
-                  <ProgressBars percentage={consistency} barCount={10} />
-                  <div>{consistency}%</div>
-                </div>
-              </div>
-            </>
+            <div className="flex items-center gap-8 mt-4">
+              <span className="opacity-30">Consistency</span>
+              <ProgressBars percentage={consistency} barCount={10} />
+              <span className="tabular-nums">{consistency}%</span>
+            </div>
           )}
         </div>
 

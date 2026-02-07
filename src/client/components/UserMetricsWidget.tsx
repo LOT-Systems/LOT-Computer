@@ -46,7 +46,7 @@ export function UserMetricsWidget() {
       onLabelClick={cycleView}
     >
       {view === 'status' && (
-        <div className="inline-block">
+        <div>
           {/* Health meter */}
           <div className="mb-12">
             <div className="flex items-center gap-8 mb-8">
@@ -90,7 +90,7 @@ export function UserMetricsWidget() {
       )}
 
       {view === 'performance' && performance && (
-        <div className="inline-block">
+        <div>
           {/* Performance dimensions */}
           <div className="flex flex-col gap-8 mb-16">
             <div className="flex items-center gap-8">
@@ -128,7 +128,7 @@ export function UserMetricsWidget() {
       )}
 
       {view === 'performance' && !performance && (
-        <div className="inline-block">
+        <div>
           <div className="opacity-30">
             Insufficient telemetry for performance benchmarks.
             {!logCtx.isEmpty && logCtx.totalEntries < 10 ? ` ${logCtx.totalEntries} entries logged. Continue input.` : ''}
@@ -137,7 +137,7 @@ export function UserMetricsWidget() {
       )}
 
       {view === 'version' && version && (
-        <div className="inline-block">
+        <div>
           {/* Version info */}
           <div className="mb-12">
             <div className="mb-4">{version.version} {version.name}</div>
@@ -175,7 +175,7 @@ export function UserMetricsWidget() {
       )}
 
       {view === 'version' && !version && (
-        <div className="inline-block">
+        <div>
           <div className="opacity-30">Loading version data.</div>
         </div>
       )}

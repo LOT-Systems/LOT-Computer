@@ -84,7 +84,7 @@ export function EnergyCapacitor() {
       onLabelClick={cycleView}
     >
       {view === 'overview' && (
-        <div className="inline-block">
+        <div>
           {/* Narrative status */}
           <div className="mb-12">
             {getEnergyNarrative(energyState.currentLevel, energyState.trajectory)}
@@ -124,7 +124,7 @@ export function EnergyCapacitor() {
       )}
 
       {view === 'correlation' && (
-        <div className="inline-block">
+        <div>
           {/* Mood-energy correlation */}
           {getMoodEnergyCorrelation() ? (
             <div className="mb-12">
@@ -163,7 +163,7 @@ export function EnergyCapacitor() {
       )}
 
       {view === 'romantic' && (
-        <div className="inline-block">
+        <div>
           {energyState.romanticConnection.lastIntimacyMoment ? (
             <>
               {/* Narrative status */}
@@ -195,7 +195,7 @@ export function EnergyCapacitor() {
       )}
 
       {view === 'needs' && (
-        <div className="inline-block">
+        <div>
           {energyState.needsReplenishment.length === 0 ? (
             <div>
               All needs balanced.

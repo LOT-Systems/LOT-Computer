@@ -117,7 +117,7 @@ export const PatternInsightsWidget = () => {
         {view === 'patterns' && hasPatterns && (
           <div className="flex flex-col gap-12">
             {insights.map((insight, idx) => (
-              <div key={idx} className="inline-block">
+              <div key={idx}>
                 <div
                   className="mb-8 cursor-pointer"
                   onClick={() => setSelectedInsight(selectedInsight === idx ? null : idx)}
@@ -152,7 +152,7 @@ export const PatternInsightsWidget = () => {
               Users with correlated behavioral signatures:
             </div>
             {matches.map((match, idx) => (
-              <div key={idx} className="inline-block">
+              <div key={idx}>
                 <div className="mb-8">
                   <GhostButton href={`/@${match.user.id}`} rel="external">
                     {match.user.firstName} {match.user.lastName}
@@ -182,7 +182,7 @@ export const PatternInsightsWidget = () => {
               Pattern delta over observed windows:
             </div>
             {evolution.slice(0, 3).map((evo, idx) => (
-              <div key={idx} className="inline-block">
+              <div key={idx}>
                 <div className="mb-8">
                   {evo.patternTitle}
                 </div>

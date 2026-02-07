@@ -122,7 +122,7 @@ export function IntentionsWidget() {
   return (
     <Block label={label} blockView onLabelClick={cycleView}>
       {view === 'set' && (
-        <div className="inline-block w-full">
+        <div className="w-full">
           {isSettingIntention ? (
             <>
               {(() => {
@@ -187,7 +187,7 @@ export function IntentionsWidget() {
       )}
 
       {view === 'current' && intention && (
-        <div className="inline-block">
+        <div>
           <div className="mb-8">
             <span className="capitalize">{intention.focus}</span>
           </div>
@@ -203,7 +203,7 @@ export function IntentionsWidget() {
       )}
 
       {view === 'current' && !intention && (
-        <div className="inline-block">
+        <div>
           <div className="mb-12">No intention set yet.</div>
           <div className="mb-24">
             <Button onClick={() => setView('set')}>
@@ -214,7 +214,7 @@ export function IntentionsWidget() {
       )}
 
       {view === 'alignment' && intention && (
-        <div className="inline-block">
+        <div>
           <div className="mb-8">
             Intention: <span className="capitalize">{intention.focus}</span>
           </div>
@@ -260,13 +260,13 @@ export function IntentionsWidget() {
       )}
 
       {view === 'alignment' && !intention && (
-        <div className="inline-block">
+        <div>
           <div>Set an intention first to track alignment.</div>
         </div>
       )}
 
       {view === 'reflection' && intention && (
-        <div className="inline-block">
+        <div>
           <div className="mb-12">{getReflectionPrompts()}</div>
           <div>
             Reflecting on: <span className="capitalize">{intention.focus}</span>
@@ -275,7 +275,7 @@ export function IntentionsWidget() {
       )}
 
       {view === 'reflection' && !intention && (
-        <div className="inline-block">
+        <div>
           <div>Set an intention first to begin reflection.</div>
         </div>
       )}

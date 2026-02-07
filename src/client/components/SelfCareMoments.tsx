@@ -277,7 +277,7 @@ export function SelfCareMoments() {
       ) : (
         <>
       {view === 'suggestion' && (
-        <div className="inline-block w-full">
+        <div className="w-full">
           {(() => {
             const quantumReason = localStorage.getItem('selfcare-quantum-reason')
             // Log-context-grounded reason when quantum reason is absent
@@ -326,13 +326,13 @@ export function SelfCareMoments() {
       )}
 
       {view === 'why' && (
-        <div className="inline-block">
+        <div>
           <div className="opacity-30">{currentSuggestion.why}</div>
         </div>
       )}
 
       {view === 'practice' && (
-        <div className="inline-block w-full">
+        <div className="w-full">
           {isTimerRunning && (
             <div className="mb-12">
               {formatTime(timeRemaining)}

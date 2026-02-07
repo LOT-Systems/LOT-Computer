@@ -285,7 +285,7 @@ export function EmotionalCheckIn() {
       )}
 
       {view === 'history' && checkInsData && (
-        <div className="inline-block">
+        <div>
           {checkInsData.checkIns.length === 0 ? (
             <div>No check-ins yet. Start tracking your mood.</div>
           ) : (
@@ -310,7 +310,7 @@ export function EmotionalCheckIn() {
       )}
 
       {view === 'patterns' && checkInsData?.stats && (
-        <div className="inline-block">
+        <div>
           {checkInsData.stats.total === 0 ? (
             <div>Check in more to see patterns.</div>
           ) : (
@@ -332,7 +332,7 @@ export function EmotionalCheckIn() {
       )}
 
       {view === 'graph' && checkInsData && (
-        <div className="inline-block">
+        <div>
           {checkInsData.checkIns.length === 0 ? (
             <div>Check in more to see your mood timeline.</div>
           ) : (

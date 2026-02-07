@@ -12,7 +12,7 @@ export function CollectiveConsciousness() {
 
   return (
     <Block label="Collective State:" blockView className="min-h-[200px]">
-      <div className="inline-block">
+      <div>
         {/* Dimensional metrics with text-based bars */}
         <div className="flex flex-col gap-8 mb-16">
           <div className="flex items-center gap-8">

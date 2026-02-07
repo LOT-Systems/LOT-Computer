@@ -58,7 +58,7 @@ export function SignalStreamWidget() {
 
   return (
     <Block label="Signal Bus:" blockView>
-      <div className="inline-block">
+      <div>
         {/* Stream header with log-context enrichment */}
         <div className="flex justify-between mb-12">
           <span className="opacity-30">

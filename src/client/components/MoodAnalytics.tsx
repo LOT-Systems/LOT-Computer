@@ -168,7 +168,7 @@ export function MoodAnalytics() {
   return (
     <Block label={`Insights ${label}`} blockView onLabelClick={cycleView}>
       {view === 'time' && timeCorrelations && (
-        <div className="inline-block">
+        <div>
           {timeCorrelations.length === 0 ? (
             <div>Your patterns are forming. Keep tracking to reveal them.</div>
           ) : (
@@ -185,7 +185,7 @@ export function MoodAnalytics() {
       )}
 
       {view === 'selfcare' && (
-        <div className="inline-block">
+        <div>
           {!selfCareCorrelations ? (
             <div>The self-care path awaits discovery.</div>
           ) : selfCareCorrelations.afterCount === 0 ? (
@@ -206,7 +206,7 @@ export function MoodAnalytics() {
       )}
 
       {view === 'summary' && summary && (
-        <div className="inline-block">
+        <div>
           <div className="flex flex-col gap-4">
             <div>Your emotional journey: {summary.total} check-ins tracked</div>
             <div>Positive states: {summary.positivePercent}% of your path</div>

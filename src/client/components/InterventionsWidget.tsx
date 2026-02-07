@@ -51,7 +51,7 @@ export function InterventionsWidget() {
       blockView
       onLabelClick={hasMultiple ? cycleIntervention : undefined}
     >
-      <div className="inline-block">
+      <div>
         {/* Narrative context */}
         <div className="mb-12">
           {getInterventionNarrative(

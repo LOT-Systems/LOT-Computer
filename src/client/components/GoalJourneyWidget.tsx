@@ -57,7 +57,7 @@ export function GoalJourneyWidget() {
       onLabelClick={cycleView}
     >
       {view === 'journey' && (
-        <div className="inline-block">
+        <div>
           {/* Primary goal */}
           {overallJourney.primaryGoal ? (
             <>
@@ -82,7 +82,7 @@ export function GoalJourneyWidget() {
       )}
 
       {view === 'goals' && (
-        <div className="inline-block">
+        <div>
           {goals.filter(g => g.state === 'active' || g.state === 'progressing').length === 0 ? (
             <div>
               No active goals detected yet. Your journey reveals them.
@@ -113,7 +113,7 @@ export function GoalJourneyWidget() {
       )}
 
       {view === 'narrative' && (
-        <div className="inline-block">
+        <div>
           {/* Chapter title */}
           <div className="mb-8">
             {narrative.currentChapter}

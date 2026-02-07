@@ -22,7 +22,7 @@ export function AwarenessDashboard() {
   if (!profile || typeof profile.selfAwarenessLevel === 'undefined') {
     return (
       <Block label="Awareness:" blockView>
-        <div className="">
+        <div>
           Answer more Memory questions to reveal your psychological profile.
         </div>
       </Block>
@@ -60,10 +60,10 @@ export function AwarenessDashboard() {
   return (
     <Block label={label} blockView onLabelClick={cycleView}>
       {awarenessView === 'overview' && (
-        <div className="inline-block">
+        <div>
           <div className="flex items-center gap-8">
-            <span className="">{awarenessPercentage}%</span>
-            <span className="">Self-Awareness</span>
+            <span>{awarenessPercentage}%</span>
+            <span>Self-Awareness</span>
           </div>
           {profile.growthTrajectory && (
             <div className="mt-4  capitalize">
@@ -74,7 +74,7 @@ export function AwarenessDashboard() {
       )}
 
       {awarenessView === 'archetype' && profile.archetype && (
-        <div className="inline-block">
+        <div>
           <div className="mb-8">
             <span>{profile.archetype}</span>
           </div>
@@ -84,7 +84,7 @@ export function AwarenessDashboard() {
             </div>
           )}
           {profile.behavioralCohort && (
-            <div className="">
+            <div>
               Cohort: {profile.behavioralCohort}
             </div>
           )}
@@ -92,7 +92,7 @@ export function AwarenessDashboard() {
       )}
 
       {awarenessView === 'values' && profile.values && profile.values.length > 0 && (
-        <div className="inline-block">
+        <div>
           <TagsContainer>
             {profile.values.map((value) => (
               <Tag key={value} color="#acc">
@@ -107,7 +107,7 @@ export function AwarenessDashboard() {
       )}
 
       {awarenessView === 'patterns' && profile.emotionalPatterns && profile.emotionalPatterns.length > 0 && (
-        <div className="inline-block">
+        <div>
           <div className="flex flex-col gap-4">
             {profile.emotionalPatterns.map((pattern) => (
               <div key={pattern}>• {pattern}</div>
@@ -122,11 +122,11 @@ export function AwarenessDashboard() {
       )}
 
       {awarenessView === 'needs' && profile.dominantNeeds && profile.dominantNeeds.length > 0 && (
-        <div className="inline-block">
+        <div>
           <div className="flex flex-col gap-8">
             {profile.dominantNeeds.map((need, index) => (
               <div key={need} className="flex items-center gap-8">
-                <span className="">{index + 1}.</span>
+                <span>{index + 1}.</span>
                 <span>{need.charAt(0).toUpperCase() + need.slice(1)}</span>
               </div>
             ))}
@@ -138,7 +138,7 @@ export function AwarenessDashboard() {
       )}
 
       {awarenessView === 'sentiment' && profile.journalSentiment && (
-        <div className="inline-block">
+        <div>
           <div className="flex flex-col gap-8">
             <div className="flex items-center justify-between gap-16">
               <span>Positive:</span>
@@ -160,10 +160,10 @@ export function AwarenessDashboard() {
       )}
 
       {awarenessView === 'reflection' && profile.reflectionQuality !== undefined && (
-        <div className="inline-block">
+        <div>
           <div className="flex items-center gap-8 mb-8">
-            <span className="">{profile.reflectionQuality}/10</span>
-            <span className="">Introspection depth</span>
+            <span>{profile.reflectionQuality}/10</span>
+            <span>Introspection depth</span>
           </div>
           {profile.growthTrajectory && (
             <div className="  capitalize">

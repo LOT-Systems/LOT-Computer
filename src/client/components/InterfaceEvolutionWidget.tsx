@@ -90,7 +90,7 @@ export function InterfaceEvolutionWidget() {
       onLabelClick={cycleView}
     >
       {view === 'dimensions' && (
-        <div className="inline-block">
+        <div>
           {/* Overall maturity */}
           <div className="mb-12 flex items-center gap-12">
             <span>
@@ -131,7 +131,7 @@ export function InterfaceEvolutionWidget() {
       )}
 
       {view === 'features' && (
-        <div className="inline-block">
+        <div>
           {featureCategories.map(cat => (
             <div key={cat.category} className="mb-12 last:mb-0">
               <div className="mb-4">{cat.category}</div>
@@ -153,7 +153,7 @@ export function InterfaceEvolutionWidget() {
       )}
 
       {view === 'effects' && (
-        <div className="inline-block">
+        <div>
           <div className="flex flex-col gap-6">
             <div className="flex justify-between gap-16">
               <span>Visual Refinement</span>

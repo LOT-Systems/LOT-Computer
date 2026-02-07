@@ -75,7 +75,7 @@ export const CohortConnectWidget: React.FC = () => {
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-2">
-                      <div className="">
+                      <div>
                         {match.user.firstName} {match.user.lastName?.charAt(0)}.
                       </div>
                     </div>
@@ -98,7 +98,7 @@ export const CohortConnectWidget: React.FC = () => {
                         <div className="  mb-4">Shared patterns</div>
                         <div className=" space-y-2">
                           {match.sharedPatterns.slice(0, 3).map((pattern, i) => (
-                            <div key={i} className="">• {pattern}</div>
+                            <div key={i}>• {pattern}</div>
                           ))}
                         </div>
                       </div>

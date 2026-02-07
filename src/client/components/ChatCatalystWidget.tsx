@@ -63,7 +63,7 @@ export function ChatCatalystWidget() {
       blockView
       onLabelClick={hasMultiple ? cycleCatalyst : undefined}
     >
-      <div className="inline-block">
+      <div>
         {/* Narrative context */}
         <div className="mb-12">
           {getChatCatalystNarrative(catalyst.priority)}

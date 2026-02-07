@@ -79,7 +79,7 @@ export function NarrativeWidget() {
       onLabelClick={cycleView}
     >
       {view === 'story' && (
-        <div className="inline-block">
+        <div>
           {/* Level and chapter */}
           <div className="mb-12 flex items-center gap-12">
             <span>Level {narrative.currentLevel}</span>
@@ -109,7 +109,7 @@ export function NarrativeWidget() {
       )}
 
       {view === 'achievements' && (
-        <div className="inline-block">
+        <div>
           {narrative.achievements.filter(a => a.unlocked).length === 0 ? (
             <div>
               No achievements unlocked yet. Continue input.
@@ -134,7 +134,7 @@ export function NarrativeWidget() {
       )}
 
       {view === 'quests' && (
-        <div className="inline-block">
+        <div>
           {narrative.currentArc.activeQuests.length === 0 ? (
             <div>
               No active quests. Awaiting next directive.
@@ -161,7 +161,7 @@ export function NarrativeWidget() {
       )}
 
       {view === 'context' && (
-        <div className="inline-block">
+        <div>
           {logCtx.isEmpty ? (
             <div className="opacity-30">No log data to compile narrative context.</div>
           ) : (

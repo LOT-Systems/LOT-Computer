@@ -92,7 +92,7 @@ export function SystemPulseWidget() {
   return (
     <Block label={label} blockView onLabelClick={cycleView}>
       {view === 'metrics' && (
-        <div className="inline-block">
+        <div>
           {/* Live status with user context */}
           <div className="mb-12 opacity-30">
             {isLive ? 'Live.' : 'Reconnecting.'}
@@ -126,7 +126,7 @@ export function SystemPulseWidget() {
       )}
 
       {view === 'activity' && (
-        <div className="inline-block">
+        <div>
           {/* Activity level as progress bars */}
           <div className="mb-12">
             <div className="flex justify-between mb-4">
@@ -152,7 +152,7 @@ export function SystemPulseWidget() {
       )}
 
       {view === 'userload' && (
-        <div className="inline-block">
+        <div>
           {logCtx.isEmpty ? (
             <div className="opacity-30">No user telemetry. Begin logging to populate.</div>
           ) : (

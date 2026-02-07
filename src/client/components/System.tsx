@@ -408,15 +408,15 @@ export const System = () => {
           }}
         >
           {astrologyView === 'astrology' ? (
-            <div className="inline-block">
+            <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
             </div>
           ) : astrologyView === 'psychology' ? (
-            <div className="inline-block">
+            <div>
               {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}
             </div>
           ) : astrologyView === 'journey' ? (
-            <div className="inline-block">
+            <div>
               <div>Day {journeyData.daysSinceStart} • {journeyData.answerCount} memories • Awareness {awarenessIndex}%</div>
               <div>{profile?.behavioralCohort || 'Growing'} • {profile?.emotionalPatterns?.[0] || 'Exploring patterns'}</div>
             </div>

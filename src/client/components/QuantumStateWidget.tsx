@@ -118,7 +118,7 @@ export function QuantumStateWidget() {
       onLabelClick={cycleView}
     >
       {view === 'state' && (
-        <div className="inline-block">
+        <div>
           {/* 4D State with progress bars */}
           <div className="flex flex-col gap-8 mb-16">
             <div className="flex items-center gap-8">
@@ -157,7 +157,7 @@ export function QuantumStateWidget() {
       )}
 
       {view === 'dimensions' && (
-        <div className="inline-block">
+        <div>
           {/* Signal sources breakdown */}
           <div className="flex flex-col gap-4 mb-16">
             {Object.entries(signalCounts)
@@ -187,7 +187,7 @@ export function QuantumStateWidget() {
       )}
 
       {view === 'history' && (
-        <div className="inline-block">
+        <div>
           {recentSignals.length === 0 ? (
             <div>No signals indexed yet.</div>
           ) : (
