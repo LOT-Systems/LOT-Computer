@@ -17,7 +17,7 @@ export function ApiPage() {
       <div className="flex flex-col gap-y-16">
         <Block label="Authentication Required" blockView>
           <div className="flex flex-col gap-y-16">
-            <div className="opacity-30">
+            <div>
               Please log in to access the API documentation and export your data.
             </div>
             <Button onClick={() => stores.goTo('system')}>
@@ -88,12 +88,12 @@ export function ApiPage() {
     <div className="flex flex-col gap-y-16">
       <div>
         <div>Export your compiled behavioral data and quantum intent telemetry for AI integration.</div>
-        <div className="opacity-30">LOT aggregates your patterns to deploy into humanoid systems, autonomous vehicles, or personal AI modules.</div>
+        <div>LOT aggregates your patterns to deploy into humanoid systems, consumer and prototype vehicles, or personal AI modules.</div>
       </div>
 
       <Block label="Export Training Data:" blockView>
         <div className="flex flex-col gap-y-16">
-          <div className="opacity-30">
+          <div>
             Compile and download your complete psychological and quantum intent dataset as structured JSON.
           </div>
 
@@ -108,7 +108,7 @@ export function ApiPage() {
           </Button>
 
           {lastExport && (
-            <div className="opacity-30">
+            <div>
               Last export: {lastExport}
             </div>
           )}
@@ -128,7 +128,7 @@ export function ApiPage() {
       <Block label="Integration Targets:" blockView>
         <div className="flex flex-col gap-y-6">
           <div>Humanoid companion systems. Emotional state recognition.</div>
-          <div>Autonomous vehicle configuration. Preference calibration.</div>
+          <div>Consumer and prototype vehicle configuration. Preference calibration.</div>
           <div>Personal AI deployment. Context-aware assistant training.</div>
           <div>Behavioral research pipelines. Pattern analysis datasets.</div>
         </div>
@@ -141,26 +141,25 @@ export function ApiPage() {
             {
               id: 'method',
               header: 'Method',
-              accessor: (row) => <span >{row.method}</span>
+              accessor: (row) => <span>{row.method}</span>
             },
             {
               id: 'endpoint',
               header: 'Endpoint',
-              accessor: (row) => <span className="font-mono">{row.endpoint}</span>
+              accessor: (row) => <span>{row.endpoint}</span>
             },
             {
               id: 'description',
               header: 'Description',
-              accessor: (row) => <span className="opacity-30">{row.description}</span>
+              accessor: (row) => <span>{row.description}</span>
             },
             {
               id: 'format',
               header: 'Format',
-              accessor: (row) => <span className="opacity-30">{row.format}</span>
+              accessor: (row) => <span>{row.format}</span>
             }
           ]}
           paddingClassName="p-8"
-          highlightFirstRow
         />
       </Block>
     </div>
