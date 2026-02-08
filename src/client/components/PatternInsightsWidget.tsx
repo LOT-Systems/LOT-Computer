@@ -115,11 +115,11 @@ export const PatternInsightsWidget = () => {
         blockView
       >
         {view === 'patterns' && hasPatterns && (
-          <div className="flex flex-col gap-12">
+          <div className="flex flex-col gap-20">
             {insights.map((insight, idx) => (
               <div key={idx}>
                 <div
-                  className="mb-8 cursor-pointer"
+                  className="mb-4 cursor-pointer"
                   onClick={() => setSelectedInsight(selectedInsight === idx ? null : idx)}
                 >
                   {insight.title}
@@ -147,13 +147,13 @@ export const PatternInsightsWidget = () => {
         )}
 
         {view === 'cohorts' && hasCohorts && (
-          <div className="flex flex-col gap-12">
-            <div className="mb-8 opacity-30">
+          <div className="flex flex-col gap-20">
+            <div className="opacity-30">
               Users with correlated behavioral signatures:
             </div>
             {matches.map((match, idx) => (
               <div key={idx}>
-                <div className="mb-8">
+                <div className="mb-4">
                   <GhostButton href={`/@${match.user.id}`} rel="external">
                     {match.user.firstName} {match.user.lastName}
                   </GhostButton>
@@ -161,7 +161,7 @@ export const PatternInsightsWidget = () => {
                     <span className="opacity-30"> . {match.user.archetype}</span>
                   )}
                 </div>
-                <div className="mb-4 opacity-30">
+                <div className="opacity-30">
                   {match.user.city}, {match.user.country}
                 </div>
                 {match.sharedPatterns.length > 0 && (
@@ -177,16 +177,16 @@ export const PatternInsightsWidget = () => {
         )}
 
         {view === 'evolution' && hasEvolution && (
-          <div className="flex flex-col gap-12">
-            <div className="mb-8 opacity-30">
+          <div className="flex flex-col gap-20">
+            <div className="opacity-30">
               Pattern delta over observed windows:
             </div>
             {evolution.slice(0, 3).map((evo, idx) => (
               <div key={idx}>
-                <div className="mb-8">
+                <div className="mb-4">
                   {evo.patternTitle}
                 </div>
-                <div className="mb-4 opacity-30">
+                <div className="opacity-30">
                   {evo.trend === 'strengthening' && 'Signal strengthening. Pattern compiling.'}
                   {evo.trend === 'stable' && 'Stable oscillation. Pattern integrated.'}
                   {evo.trend === 'weakening' && 'Signal attenuating. Pattern deprecating.'}
