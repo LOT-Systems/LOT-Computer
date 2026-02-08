@@ -143,7 +143,7 @@ export function IntentionsWidget() {
                 className="w-full bg-transparent border-none outline-none mb-12"
                 autoFocus
               />
-              <div className="flex gap-8 mb-24">
+              <div className="flex gap-16 mb-24">
                 <Button onClick={handleSetIntention} disabled={!inputValue.trim()}>
                   Set Intention
                 </Button>
@@ -165,7 +165,7 @@ export function IntentionsWidget() {
               <div className="mb-16">
                 {intention ? 'Set a new intention for this month.' : 'What aspect of yourself do you want to nurture this month?'} Examples:
               </div>
-              <div className="flex flex-col gap-6 mb-16">
+              <div className="flex flex-col gap-6 mb-24">
                 <div>• Presence</div>
                 <div>• Self-compassion</div>
                 <div>• Creative flow</div>
