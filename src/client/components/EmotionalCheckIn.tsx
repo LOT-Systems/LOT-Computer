@@ -275,7 +275,7 @@ export function EmotionalCheckIn() {
               {insight && insight.length > 0 && (
                 <div>
                   {insight.map((i, idx) => (
-                    <div key={idx}>• {i}</div>
+                    <div key={idx}>. {i}</div>
                   ))}
                 </div>
               )}

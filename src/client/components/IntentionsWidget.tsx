@@ -166,15 +166,15 @@ export function IntentionsWidget() {
                 {intention ? 'Set a new intention for this month.' : 'What aspect of yourself do you want to nurture this month?'} Examples:
               </div>
               <div className="flex flex-col gap-6 mb-24">
-                <div>• Presence</div>
-                <div>• Self-compassion</div>
-                <div>• Creative flow</div>
-                <div>• Boundaries</div>
-                <div>• Rest</div>
-                <div>• Sport</div>
-                <div>• Exercise</div>
-                <div>• Relationships</div>
-                <div>• Humor</div>
+                <div>. Presence</div>
+                <div>. Self-compassion</div>
+                <div>. Creative flow</div>
+                <div>. Boundaries</div>
+                <div>. Rest</div>
+                <div>. Sport</div>
+                <div>. Exercise</div>
+                <div>. Relationships</div>
+                <div>. Humor</div>
               </div>
               <div className="mb-24">
                 <Button onClick={() => setIsSettingIntention(true)}>

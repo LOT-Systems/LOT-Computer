@@ -51,7 +51,7 @@ export const PlannerWidget: React.FC = () => {
     })
 
     // Log the plan
-    const planText = `Intent: ${state.values.intent} • Today: ${state.values.today} • How: ${state.values.how} • Feeling: ${state.values.feeling}`
+    const planText = `Intent: ${state.values.intent} . Today: ${state.values.today} . How: ${state.values.how} . Feeling: ${state.values.feeling}`
     createLog({
       text: planText,
       event: 'plan_set'
@@ -282,7 +282,7 @@ export const PlannerWidget: React.FC = () => {
 
             {/* Planning hint */}
             <div className="mt-12 text-center">
-              Explore options • Set your direction
+              Explore options . Set your direction
             </div>
           </div>
         )}

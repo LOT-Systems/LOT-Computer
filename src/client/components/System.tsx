@@ -409,16 +409,16 @@ export const System = () => {
         >
           {astrologyView === 'astrology' ? (
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
+              {astrology.westernZodiac} . {astrology.hourlyZodiac} . {astrology.rokuyo} . {astrology.moonPhase}
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>
-              {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}
+              {profile?.archetype || 'The Explorer'} . {profile?.coreValues?.slice(0, 2).join(' . ') || 'Growing'}
             </div>
           ) : astrologyView === 'journey' ? (
             <div>
-              <div>Day {journeyData.daysSinceStart} • {journeyData.answerCount} memories • Awareness {awarenessIndex}%</div>
-              <div>{profile?.behavioralCohort || 'Growing'} • {profile?.emotionalPatterns?.[0] || 'Exploring patterns'}</div>
+              <div>Day {journeyData.daysSinceStart} . {journeyData.answerCount} memories . Awareness {awarenessIndex}%</div>
+              <div>{profile?.behavioralCohort || 'Growing'} . {profile?.emotionalPatterns?.[0] || 'Exploring patterns'}</div>
             </div>
           ) : (
             <Table

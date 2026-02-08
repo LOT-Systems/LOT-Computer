@@ -218,7 +218,7 @@ export const Logs: React.FC = () => {
                 {insights && insights.length > 0 && (
                   <div>
                     {insights.map((insight, idx) => (
-                      <div key={idx}>• {insight}</div>
+                      <div key={idx}>. {insight}</div>
                     ))}
                   </div>
                 )}

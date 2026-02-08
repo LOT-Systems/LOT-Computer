@@ -66,7 +66,7 @@ export const BADGES: Record<BadgeType, Badge> = {
 }
 
 // Default separator when no badges earned yet
-export const DEFAULT_SEPARATOR = '•'
+export const DEFAULT_SEPARATOR = '.'
 
 /**
  * Get user's preferred badge theme

@@ -61,8 +61,8 @@ export function JournalReflection() {
       <div>
         <div className="mb-12 ">{prompts.primary}</div>
         <div className="flex flex-col gap-8  ">
-          <div>• {prompts.secondary}</div>
-          <div>• {prompts.tertiary}</div>
+          <div>. {prompts.secondary}</div>
+          <div>. {prompts.tertiary}</div>
         </div>
       </div>
     </Block>

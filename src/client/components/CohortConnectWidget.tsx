@@ -80,7 +80,7 @@ export const CohortConnectWidget: React.FC = () => {
                       </div>
                     </div>
                     <div className=" ">
-                      {match.user.city || 'Location unknown'} • {similarity}% match
+                      {match.user.city || 'Location unknown'} . {similarity}% match
                     </div>
                   </div>
 
@@ -98,7 +98,7 @@ export const CohortConnectWidget: React.FC = () => {
                         <div className="  mb-4">Shared patterns</div>
                         <div className=" space-y-2">
                           {match.sharedPatterns.slice(0, 3).map((pattern, i) => (
-                            <div key={i}>• {pattern}</div>
+                            <div key={i}>. {pattern}</div>
                           ))}
                         </div>
                       </div>

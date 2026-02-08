@@ -149,7 +149,7 @@ export function SystemProgressWidget() {
             <div className="opacity-30 mb-8">Active enhancements:</div>
             <div className="flex flex-col gap-y-4">
               {deployment.features.map((feature, idx) => (
-                <div key={idx}>• {feature}</div>
+                <div key={idx}>. {feature}</div>
               ))}
             </div>
           </div>

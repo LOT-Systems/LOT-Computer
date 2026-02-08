@@ -110,7 +110,7 @@ export function AwarenessDashboard() {
         <div>
           <div className="flex flex-col gap-4">
             {profile.emotionalPatterns.map((pattern) => (
-              <div key={pattern}>• {pattern}</div>
+              <div key={pattern}>. {pattern}</div>
             ))}
           </div>
           {profile.emotionalRange !== undefined && (
