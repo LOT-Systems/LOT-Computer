@@ -670,10 +670,12 @@ export const System = () => {
       <MicroCalculatorWidget />
 
       {/* Quantum Intent Engine Widgets */}
-      <QuantumStateWidget />
-      <PatternRecognitionWidget />
-      <AIFeedbackWidget />
-      <SignalStreamWidget />
+      <div>
+        <QuantumStateWidget />
+        <PatternRecognitionWidget />
+        <AIFeedbackWidget />
+        <SignalStreamWidget />
+      </div>
 
       {/* User Metrics - Personal OS health, performance, version */}
       <UserMetricsWidget />
