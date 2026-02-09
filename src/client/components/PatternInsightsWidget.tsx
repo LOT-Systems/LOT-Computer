@@ -27,13 +27,11 @@ export const PatternInsightsWidget = () => {
     // Show message if user has started but needs more data
     if (patternsData?.message || cohortsData?.message) {
       return (
-        <div>
-          <Block label="Pattern Compiler:" blockView>
-            <div className="mb-8">
-              {patternsData?.message || cohortsData?.message}
-            </div>
-          </Block>
-        </div>
+        <Block label="Pattern Compiler:" blockView>
+          <div className="mb-8">
+            {patternsData?.message || cohortsData?.message}
+          </div>
+        </Block>
       )
     }
     return null
@@ -108,12 +106,11 @@ export const PatternInsightsWidget = () => {
   }
 
   return (
-    <div>
-      <Block
-        label={getLabel()}
-        onLabelClick={canCycleViews ? handleLabelClick : undefined}
-        blockView
-      >
+    <Block
+      label={getLabel()}
+      onLabelClick={canCycleViews ? handleLabelClick : undefined}
+      blockView
+    >
         {view === 'patterns' && hasPatterns && (
           <div className="flex flex-col gap-20">
             {insights.map((insight, idx) => (
@@ -202,7 +199,6 @@ export const PatternInsightsWidget = () => {
             ))}
           </div>
         )}
-      </Block>
-    </div>
+    </Block>
   )
 }

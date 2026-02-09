@@ -141,7 +141,7 @@ export function MicroCalculatorWidget() {
     <button
       onClick={onClick}
       className={cn(
-        'py-4 rounded border cursor-pointer select-none',
+        'py-4 border cursor-pointer select-none',
         active
           ? 'border-acc text-acc'
           : 'border-acc/30 grid-fill-hover',
@@ -160,7 +160,7 @@ export function MicroCalculatorWidget() {
       <Block label={`${magicTime} Calculator:`} blockView>
         <div className="max-w-[200px]">
           {/* Display */}
-          <div className="mb-8 pb-4 border-b border-acc/30">
+          <div className="mb-8 pb-4">
             {buffer !== null && (
               <div className="opacity-30 tabular-nums text-right">
                 {fmt(buffer)} {op === '*' ? '×' : op === '/' ? '÷' : op}
