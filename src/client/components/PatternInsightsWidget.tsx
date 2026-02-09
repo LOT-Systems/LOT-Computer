@@ -112,7 +112,7 @@ export const PatternInsightsWidget = () => {
       blockView
     >
         {view === 'patterns' && hasPatterns && (
-          <div className="flex flex-col gap-20">
+          <div className="flex flex-col">
             {insights.map((insight, idx) => (
               <div key={idx}>
                 <div
@@ -144,7 +144,7 @@ export const PatternInsightsWidget = () => {
         )}
 
         {view === 'cohorts' && hasCohorts && (
-          <div className="flex flex-col gap-20">
+          <div className="flex flex-col">
             <div className="opacity-30">
               Users with correlated behavioral signatures:
             </div>
@@ -174,7 +174,7 @@ export const PatternInsightsWidget = () => {
         )}
 
         {view === 'evolution' && hasEvolution && (
-          <div className="flex flex-col gap-20">
+          <div className="flex flex-col">
             <div className="opacity-30">
               Pattern delta over observed windows:
             </div>
