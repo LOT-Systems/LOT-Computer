@@ -133,14 +133,14 @@ export function IntentionsWidget() {
                   </div>
                 ) : null
               })()}
-              <div className="mb-12">What do you want to cultivate this month?</div>
+              <div className="mb-8">What do you want to cultivate this month?</div>
               <input
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSetIntention()}
                 placeholder="One word or short phrase..."
-                className="w-full bg-transparent border-none outline-none mb-12"
+                className="w-full bg-transparent border-none outline-none mb-8"
                 autoFocus
               />
               <div className="flex gap-16 mb-24">
@@ -165,7 +165,7 @@ export function IntentionsWidget() {
               <div className="mb-16">
                 {intention ? 'Set a new intention for this month.' : 'What aspect of yourself do you want to nurture this month?'} Examples:
               </div>
-              <div className="flex flex-col gap-6 mb-24">
+              <div className="flex flex-col gap-8 mb-24">
                 <div>. Presence</div>
                 <div>. Self-compassion</div>
                 <div>. Creative flow</div>
@@ -204,7 +204,7 @@ export function IntentionsWidget() {
 
       {view === 'current' && !intention && (
         <div>
-          <div className="mb-12">No intention set yet.</div>
+          <div className="mb-8">No intention set yet.</div>
           <div className="mb-24">
             <Button onClick={() => setView('set')}>
               Set Your Intention
@@ -220,7 +220,7 @@ export function IntentionsWidget() {
           </div>
 
           {/* Activity since intention was set */}
-          <div className="mb-12 opacity-30">
+          <div className="mb-8 opacity-30">
             {logCtx.totalEntries > 0
               ? `${logCtx.todayActivity.length} action${logCtx.todayActivity.length === 1 ? '' : 's'} today. ${logCtx.streak} day streak.`
               : 'No activity recorded yet.'
@@ -228,7 +228,7 @@ export function IntentionsWidget() {
           </div>
 
           {/* Behavioral alignment */}
-          <div className="flex flex-col gap-4 mb-12">
+          <div className="flex flex-col gap-4 mb-8">
             <div className="flex justify-between items-baseline">
               <span className="opacity-30">Widget diversity</span>
               <span>{logCtx.widgetDiversity} types</span>
@@ -267,7 +267,7 @@ export function IntentionsWidget() {
 
       {view === 'reflection' && intention && (
         <div>
-          <div className="mb-12">{getReflectionPrompts()}</div>
+          <div className="mb-8">{getReflectionPrompts()}</div>
           <div>
             Reflecting on: <span className="capitalize">{intention.focus}</span>
           </div>

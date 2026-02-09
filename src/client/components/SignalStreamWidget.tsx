@@ -60,7 +60,7 @@ export function SignalStreamWidget() {
     <Block label="Signal Bus:" blockView>
       <div>
         {/* Stream header with log-context enrichment */}
-        <div className="flex justify-between mb-12">
+        <div className="flex justify-between mb-8">
           <span className="opacity-30">
             {engine.signals.length} total
             {!logCtx.isEmpty ? ` . ${logCtx.totalEntries} logs` : ''}

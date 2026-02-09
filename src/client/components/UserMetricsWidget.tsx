@@ -48,7 +48,7 @@ export function UserMetricsWidget() {
       {view === 'status' && (
         <div>
           {/* Health meter */}
-          <div className="mb-12">
+          <div className="mb-8">
             <div className="flex items-center gap-8 mb-8">
               <span className="w-[80px]">Health</span>
               <ProgressBars percentage={status.health} barCount={10} />
@@ -139,14 +139,14 @@ export function UserMetricsWidget() {
       {view === 'version' && version && (
         <div>
           {/* Version info */}
-          <div className="mb-12">
+          <div className="mb-8">
             <div className="mb-4">{version.version} {version.name}</div>
             <div className="opacity-30">{version.description}</div>
           </div>
 
           {/* Progression to next version */}
           {version.nextVersion && (
-            <div className="mb-12">
+            <div className="mb-8">
               <div className="flex items-center gap-8 mb-4">
                 <span className="opacity-30">Progress to {version.nextVersion}</span>
               </div>

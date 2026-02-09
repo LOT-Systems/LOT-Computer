@@ -65,17 +65,17 @@ export function ChatCatalystWidget() {
     >
       <div>
         {/* Narrative context */}
-        <div className="mb-12">
+        <div className="mb-8">
           {getChatCatalystNarrative(catalyst.priority)}
         </div>
 
         {/* Catalyst title */}
-        <div className="mb-12">
+        <div className="mb-8">
           {catalyst.title}
         </div>
 
         {/* Main message */}
-        <div className="mb-12">
+        <div className="mb-8">
           {catalyst.message}
         </div>
 
@@ -88,7 +88,7 @@ export function ChatCatalystWidget() {
 
         {/* Conversation starters if available */}
         {catalyst.conversationStarters && catalyst.conversationStarters.length > 0 && (
-          <div className="mb-12">
+          <div className="mb-8">
             <div className="mb-4">Conversation ideas:</div>
             {catalyst.conversationStarters.map((starter, i) => (
               <div key={i} className="mb-2 opacity-30">{starter}</div>

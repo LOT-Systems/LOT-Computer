@@ -79,7 +79,7 @@ export function AwarenessDashboard() {
             <span>{profile.archetype}</span>
           </div>
           {profile.archetypeDescription && (
-            <div className="  mb-12">
+            <div className="  mb-8">
               {profile.archetypeDescription}
             </div>
           )}

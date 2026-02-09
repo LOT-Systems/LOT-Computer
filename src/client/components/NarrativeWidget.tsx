@@ -81,13 +81,13 @@ export function NarrativeWidget() {
       {view === 'story' && (
         <div>
           {/* Level and chapter */}
-          <div className="mb-12 flex items-center gap-12">
+          <div className="mb-8 flex items-center gap-8">
             <span>Level {narrative.currentLevel}</span>
             <span>Chapter {narrative.currentArc.chapter}: {narrative.currentArc.title}</span>
           </div>
 
           {/* Current narrative */}
-          <div className="mb-12">
+          <div className="mb-8">
             {narrative.currentArc.narrative}
           </div>
 
@@ -167,7 +167,7 @@ export function NarrativeWidget() {
           ) : (
             <>
               {/* Runtime narrative derived from logs */}
-              <div className="mb-12">
+              <div className="mb-8">
                 {getContextNarrative()}
               </div>
 

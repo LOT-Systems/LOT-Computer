@@ -96,7 +96,7 @@ export function PatternRecognitionWidget() {
           {patterns.length === 0 ? (
             <div>No behavioral patterns compiled yet.</div>
           ) : (
-            <div className="flex flex-col gap-12">
+            <div className="flex flex-col gap-8">
               {patterns
                 .filter(p => p.confidence >= 0.5) // Only show patterns above threshold
                 .sort((a, b) => b.confidence - a.confidence)
@@ -131,7 +131,7 @@ export function PatternRecognitionWidget() {
         <div>
           {optimal ? (
             <>
-              <div className="mb-12">
+              <div className="mb-8">
                 {optimal.reason}
               </div>
               <div className="mb-8">

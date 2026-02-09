@@ -53,7 +53,7 @@ export function InterventionsWidget() {
     >
       <div>
         {/* Narrative context */}
-        <div className="mb-12">
+        <div className="mb-8">
           {getInterventionNarrative(
             intervention.severity === 'critical' ? 'urgent' :
             intervention.severity === 'high' ? 'high' :
@@ -63,13 +63,13 @@ export function InterventionsWidget() {
         </div>
 
         {/* Severity indicator and title */}
-        <div className="mb-12 flex items-center gap-8">
+        <div className="mb-8 flex items-center gap-8">
           <span>{getSeverityIndicator()}</span>
           <span>{intervention.title}</span>
         </div>
 
         {/* Main message */}
-        <div className="mb-12">
+        <div className="mb-8">
           {intervention.message}
         </div>
 

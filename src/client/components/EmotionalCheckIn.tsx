@@ -315,7 +315,7 @@ export function EmotionalCheckIn() {
             <div>Check in more to see patterns.</div>
           ) : (
             <>
-              <div className="mb-12">
+              <div className="mb-8">
                 <div className="flex items-center gap-8">
                   <span>{checkInsData.stats.total}</span>
                   <span>Check-ins</span>

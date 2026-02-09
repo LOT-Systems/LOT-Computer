@@ -94,7 +94,7 @@ export function SystemPulseWidget() {
       {view === 'metrics' && (
         <div>
           {/* Live status with user context */}
-          <div className="mb-12 opacity-30">
+          <div className="mb-8 opacity-30">
             {isLive ? 'Live.' : 'Reconnecting.'}
             {!logCtx.isEmpty && logCtx.sessionDepth > 0 ? ` Session depth: ${logCtx.sessionDepth}.` : ''}
           </div>
@@ -128,7 +128,7 @@ export function SystemPulseWidget() {
       {view === 'activity' && (
         <div>
           {/* Activity level as progress bars */}
-          <div className="mb-12">
+          <div className="mb-8">
             <div className="flex justify-between mb-4">
               <span className="opacity-30">Load</span>
               <span className="tabular-nums">{Math.min(100, Math.round(pulse.eventsPerMinute))}%</span>
@@ -136,7 +136,7 @@ export function SystemPulseWidget() {
             <ProgressBars percentage={Math.min(100, pulse.eventsPerMinute)} barCount={20} />
           </div>
 
-          <div className="mb-12">
+          <div className="mb-8">
             <div className="flex justify-between mb-4">
               <span className="opacity-30">Flux</span>
               <span className="tabular-nums">{pulse.quantumFlux.toFixed(1)}%</span>

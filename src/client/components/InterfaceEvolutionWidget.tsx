@@ -92,7 +92,7 @@ export function InterfaceEvolutionWidget() {
       {view === 'dimensions' && (
         <div>
           {/* Overall maturity */}
-          <div className="mb-12 flex items-center gap-12">
+          <div className="mb-8 flex items-center gap-8">
             <span>
               {Math.round(evolutionState.overallMaturity * 100)}%
             </span>
@@ -101,7 +101,7 @@ export function InterfaceEvolutionWidget() {
 
           {/* Badge tier */}
           {evolutionState.badgeTier > 0 && (
-            <div className="mb-12 flex items-center gap-8">
+            <div className="mb-8 flex items-center gap-8">
               <span>Tier {evolutionState.badgeTier}</span>
               <span>({evolutionState.badgeTheme})</span>
             </div>
@@ -133,7 +133,7 @@ export function InterfaceEvolutionWidget() {
       {view === 'features' && (
         <div>
           {featureCategories.map(cat => (
-            <div key={cat.category} className="mb-12 last:mb-0">
+            <div key={cat.category} className="mb-8 last:mb-0">
               <div className="mb-4">{cat.category}</div>
               <div className="flex flex-col gap-2">
                 {cat.features.map(feature => (
@@ -154,7 +154,7 @@ export function InterfaceEvolutionWidget() {
 
       {view === 'effects' && (
         <div>
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-8">
             <div className="flex justify-between gap-16">
               <span>Visual Refinement</span>
               <span>{Math.round(evolutionState.visualRefinement * 100)}%</span>

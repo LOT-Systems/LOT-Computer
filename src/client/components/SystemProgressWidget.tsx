@@ -138,7 +138,7 @@ export function SystemProgressWidget() {
             <span className="capitalize">{deployment.program}</span>
           </div>
 
-          <div className={`mb-12 ${getStatusColor()}`}>
+          <div className={`mb-8 ${getStatusColor()}`}>
             {getStatusText()}
           </div>
         </div>

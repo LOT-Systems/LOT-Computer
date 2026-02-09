@@ -294,7 +294,7 @@ export function SelfCareMoments() {
               </div>
             ) : null
           })()}
-          <div className={cn("", (completedToday > 0 || currentStreak > 0) ? "mb-12" : "mb-16")}>
+          <div className={cn("", (completedToday > 0 || currentStreak > 0) ? "mb-8" : "mb-16")}>
             {currentSuggestion.action} ({currentSuggestion.duration})
           </div>
           {(completedToday > 0 || currentStreak > 0) && (
@@ -334,7 +334,7 @@ export function SelfCareMoments() {
       {view === 'practice' && (
         <div className="w-full">
           {isTimerRunning && (
-            <div className="mb-12">
+            <div className="mb-8">
               {formatTime(timeRemaining)}
             </div>
           )}

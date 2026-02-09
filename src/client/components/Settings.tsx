@@ -420,7 +420,7 @@ export const Settings = () => {
         {/* Data Export Section */}
         <div>
           <Block label="Data Export:" blockView>
-            <div className="mb-12">
+            <div className="mb-8">
               Download your personal data as CSV files for analysis, backup, or sharing with healthcare providers.
             </div>
             <div className="flex flex-col gap-4">

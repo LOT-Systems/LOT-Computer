@@ -55,7 +55,7 @@ export function MemoryEngineStats() {
 
         <div className="flex justify-between items-baseline">
           <span className="opacity-30">Response Quality</span>
-          <span className="flex items-center gap-3">
+          <span className="flex items-center gap-4">
             {renderQualityBars(stats.responseQuality)}
             <span>
               {stats.responseQuality.toFixed(1)}/5

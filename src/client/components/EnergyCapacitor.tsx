@@ -86,12 +86,12 @@ export function EnergyCapacitor() {
       {view === 'overview' && (
         <div>
           {/* Narrative status */}
-          <div className="mb-12">
+          <div className="mb-8">
             {getEnergyNarrative(energyState.currentLevel, energyState.trajectory)}
           </div>
 
           {/* Energy level */}
-          <div className="mb-12 flex items-center gap-12">
+          <div className="mb-8 flex items-center gap-8">
             <span>
               {energyState.currentLevel}%
             </span>
@@ -100,7 +100,7 @@ export function EnergyCapacitor() {
 
           {/* Trajectory indicator */}
           {energyState.trajectory !== 'stable' && (
-            <div className="mb-12 opacity-30">
+            <div className="mb-8 opacity-30">
               {energyState.trajectory === 'improving' && 'Improving.'}
               {energyState.trajectory === 'declining' && 'Declining.'}
               {energyState.trajectory === 'critical' && 'Critical.'}
@@ -109,7 +109,7 @@ export function EnergyCapacitor() {
 
           {/* Burnout warning */}
           {energyState.daysUntilBurnout !== null && energyState.daysUntilBurnout <= 7 && (
-            <div className="mb-12">
+            <div className="mb-8">
               Estimated {energyState.daysUntilBurnout} day{energyState.daysUntilBurnout === 1 ? '' : 's'} until buffer overflow.
             </div>
           )}
@@ -127,11 +127,11 @@ export function EnergyCapacitor() {
         <div>
           {/* Mood-energy correlation */}
           {getMoodEnergyCorrelation() ? (
-            <div className="mb-12">
+            <div className="mb-8">
               {getMoodEnergyCorrelation()}
             </div>
           ) : (
-            <div className="mb-12 opacity-30">
+            <div className="mb-8 opacity-30">
               Record mood check-ins to see energy-mood correlation.
             </div>
           )}
@@ -167,17 +167,17 @@ export function EnergyCapacitor() {
           {energyState.romanticConnection.lastIntimacyMoment ? (
             <>
               {/* Narrative status */}
-              <div className="mb-12">
+              <div className="mb-8">
                 {getRomanticNarrative(
                   energyState.romanticConnection.daysSinceConnection,
                   energyState.romanticConnection.connectionQuality
                 )}
               </div>
 
-              <div className="mb-12">
+              <div className="mb-8">
                 <span className="capitalize">{energyState.romanticConnection.connectionQuality}</span>
               </div>
-              <div className="mb-12">
+              <div className="mb-8">
                 {energyState.romanticConnection.daysSinceConnection} day{energyState.romanticConnection.daysSinceConnection === 1 ? '' : 's'} since connection
               </div>
               {energyState.romanticConnection.needsAttention && (

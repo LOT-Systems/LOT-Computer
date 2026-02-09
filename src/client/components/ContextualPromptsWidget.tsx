@@ -247,12 +247,12 @@ export const ContextualPromptsWidget = () => {
   return (
     <div>
       <Block label={getLabelVariations()} blockView>
-        <div className="mb-12">
+        <div className="mb-8">
           {topPrompt.message}
         </div>
         {/* Log context summary line */}
         {!logCtx.isEmpty && (
-          <div className="mb-12 opacity-30">
+          <div className="mb-8 opacity-30">
             {logCtx.todayActivity.length} signal{logCtx.todayActivity.length === 1 ? '' : 's'} today
             {logCtx.streak > 1 ? ` . ${logCtx.streak}d streak` : ''}
             {logCtx.sessionDepth > 0 ? ` . session depth ${logCtx.sessionDepth}` : ''}

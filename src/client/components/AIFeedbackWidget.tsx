@@ -189,7 +189,7 @@ export function AIFeedbackWidget() {
       {view === 'insight' && (
         <div>
           {/* Primary quantum-state-aware insight */}
-          <div className="mb-12">
+          <div className="mb-8">
             {getStateInsight(userState)}
           </div>
 
@@ -236,7 +236,7 @@ export function AIFeedbackWidget() {
                 <span className="tabular-nums">{logCtx.activeModules.length}/6</span>
               </div>
 
-              <div className="flex justify-between items-baseline mb-12">
+              <div className="flex justify-between items-baseline mb-8">
                 <span className="opacity-30">Session depth</span>
                 <span className="tabular-nums">{logCtx.sessionDepth}</span>
               </div>
@@ -287,7 +287,7 @@ export function AIFeedbackWidget() {
       {view === 'guidance' && (
         <div>
           {/* Log-grounded guidance */}
-          <div className="flex flex-col gap-8 mb-12">
+          <div className="flex flex-col gap-8 mb-8">
             {getGuidance().map((item, idx) => (
               <div key={idx}>
                 {item}
