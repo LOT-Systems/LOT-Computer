@@ -19,6 +19,7 @@ export function MemoryWidget() {
   const [question, setQuestion] = React.useState<MemoryQuestion | null>(null)
   const [response, setResponse] = React.useState<string | null>(null)
   const [showErrorDetails, setShowErrorDetails] = React.useState(false)
+  const [clickedButtonIndex, setClickedButtonIndex] = React.useState<number | null>(null)
 
   // Session-local ref to prevent re-showing the same question during this mount
   const shownQuestionId = React.useRef<string | null>(null)
@@ -59,9 +60,18 @@ export function MemoryWidget() {
     },
   })
 
+  // Cascade delay for button fade-out (matches Mood widget pattern)
+  const getCascadeDelay = (buttonIndex: number) => {
+    if (clickedButtonIndex === null || isQuestionShown) return '0ms'
+    const distance = Math.abs(buttonIndex - clickedButtonIndex)
+    return `${distance * 120}ms`
+  }
+
   const onAnswer = React.useCallback(
-    (option: string) => (ev: React.MouseEvent) => {
+    (option: string, buttonIndex: number) => (ev: React.MouseEvent) => {
       if (!question || !question.id) return
+
+      setClickedButtonIndex(buttonIndex)
 
       try {
         recordSignal('memory', 'answer_given', {
@@ -140,6 +150,7 @@ export function MemoryWidget() {
             setResponse(null)
             setTimeout(() => {
               setQuestion(loadedQuestion)
+              setClickedButtonIndex(null)
               setIsQuestionShown(true)
             }, 400)
           }, 5000)
@@ -153,6 +164,7 @@ export function MemoryWidget() {
       setIsDisplayed(true)
       setTimeout(() => {
         setQuestion(loadedQuestion)
+        setClickedButtonIndex(null)
         setIsShown(true)
         setIsQuestionShown(true)
         setResponse(null)
@@ -260,13 +272,11 @@ export function MemoryWidget() {
         </div>
       )}
       {!!question && (
-        <div
-          className={cn(
-            'opacity-0 transition-opacity duration-[1400ms]',
-            isQuestionShown && 'opacity-100'
-          )}
-        >
-          <div className="mb-8">
+        <div>
+          <div className={cn(
+            'mb-8 transition-opacity duration-[1400ms]',
+            isQuestionShown ? 'opacity-100' : 'opacity-0'
+          )}>
             {(() => {
               try {
                 return getMemoryReflectionPrompt(quantumState.energy, quantumState.clarity, quantumState.alignment)
@@ -276,13 +286,22 @@ export function MemoryWidget() {
             })()}
           </div>
 
-          <div className="mb-16">{question?.question || '...'}</div>
+          <div className={cn(
+            'mb-16 transition-opacity duration-[1400ms]',
+            isQuestionShown ? 'opacity-100' : 'opacity-0'
+          )}>
+            {question?.question || '...'}
+          </div>
           <div className="flex flex-col sm:flex-row sm:flex-wrap gap-8 sm:-mb-8 -ml-4">
-            {(question?.options || []).map((option) => (
+            {(question?.options || []).map((option, index) => (
               <Button
                 key={option}
-                className="w-full sm:w-auto sm:mb-8"
-                onClick={onAnswer(option)}
+                className={cn(
+                  'w-full sm:w-auto sm:mb-8 transition-opacity duration-[1400ms]',
+                  isQuestionShown ? 'opacity-100' : 'opacity-0'
+                )}
+                style={{ transitionDelay: getCascadeDelay(index) }}
+                onClick={onAnswer(option, index)}
               >
                 {option}
               </Button>
