@@ -253,6 +253,24 @@ ${quantumState.needsSupport === 'critical' || quantumState.needsSupport === 'mod
 Match your question to their quantum state. The engine recognizes patterns they may not consciously see.`
   }
 
+  // Widget interaction patterns from synced signals
+  let widgetContext = ''
+  try {
+    const userMeta = (user as any).metadata as Record<string, any> | undefined
+    const patterns = userMeta?.quantumIntentPatterns as Array<{ pattern: string; confidence: number; reason: string }> | undefined
+    if (patterns && patterns.length > 0) {
+      const patternLines = patterns
+        .filter(p => p.confidence >= 0.5)
+        .map(p => `- ${p.reason} (${Math.round(p.confidence * 100)}% confidence)`)
+        .join('\n')
+      if (patternLines) {
+        widgetContext = `\n\n**Recognized Behavioral Patterns (from widget interactions):**\n${patternLines}\nUse these patterns to ask questions that meet the user where they are.`
+      }
+    }
+  } catch (e) {
+    // Non-critical
+  }
+
   // Goal context - understand what user is working toward
   const userGoals = extractGoals(user, logs)
   const activeGoals = userGoals.filter(g => g.state === 'active' || g.state === 'progressing').slice(0, 3)
@@ -704,7 +722,7 @@ Recent activity logs (for additional context):
   `.trim()
   const formattedLogs = logs.map(formatLog).filter(Boolean).join('\n\n')
 
-  const fullPrompt = head + quantumContext + goalContext + '\n\n' + formattedLogs
+  const fullPrompt = head + quantumContext + widgetContext + goalContext + '\n\n' + formattedLogs
 
   console.log(`📨 Prompt built: ${fullPrompt.length} chars total`)
   console.log(`   - Head section: ${head.length} chars`)
@@ -750,6 +768,31 @@ function formatLog(log: Log): string {
       body = changes.filter(Boolean).join('\n').trim()
       break
     }
+    case 'emotional_checkin': {
+      const mood = log.metadata.mood || log.metadata.state || log.text || ''
+      const checkInType = log.metadata.checkInType || ''
+      body = checkInType ? `${mood} (${checkInType})` : String(mood)
+      break
+    }
+    default: {
+      // quantum_intent_signal and other widget interactions
+      if ((log as any).event === 'quantum_intent_signal') {
+        const source = log.metadata.source || ''
+        const signal = log.metadata.signal || log.text || ''
+        const meta = log.metadata.signalMetadata as Record<string, any> | undefined
+        const parts = [`${source}: ${signal}`]
+        if (meta) {
+          if (meta.questionId) parts.push(`question: ${meta.question || meta.questionId}`)
+          if (meta.option) parts.push(`chose: ${meta.option}`)
+          if (meta.intention) parts.push(`intention: ${meta.intention}`)
+          if (meta.practice) parts.push(`practice: ${meta.practice}`)
+          if (meta.energyLevel) parts.push(`energy: ${meta.energyLevel}`)
+          if (meta.result) parts.push(`result: ${meta.result}`)
+        }
+        body = parts.join(' . ')
+      }
+      break
+    }
   }
   body = body.trim()
   if (!body) return ''
@@ -772,7 +815,7 @@ function formatLog(log: Log): string {
   return [
     `---`,
     [
-      `[${MODULE_BY_LOG_EVENT[log.event as LogEvent] ?? log.event}] ${date}`,
+      `[${MODULE_BY_LOG_EVENT[log.event as LogEvent] ?? ((log as any).event === 'quantum_intent_signal' ? 'Signal' : log.event)}] ${date}`,
       city,
       country,
       temperature,
