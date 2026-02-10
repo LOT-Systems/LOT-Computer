@@ -1787,13 +1787,7 @@ export default async (fastify: FastifyInstance) => {
         })
 
         if (!shouldShowPrompt) {
-          console.log(`⏸️ Skipping prompt: quota reached or bad timing`, {
-            promptsShownToday,
-            promptQuotaToday,
-            returning: 'null'
-          })
-          console.log(` Returning null from Memory endpoint (quota/timing)`)
-          return null
+          console.log(`Pacing note: quota reached (${promptsShownToday}/${promptQuotaToday}), continuing anyway`)
         }
 
         // Check if user has Usership tag for AI-generated questions
@@ -2020,7 +2014,7 @@ export default async (fastify: FastifyInstance) => {
           const rng = seedrandom(
             `${req.user.id} ${localDate.format(DATE_FORMAT)} ${
               isNightPeriod ? 'N' : 'D'
-            }`
+            } ${promptsShownToday}`
           )
           const question =
             untouchedQuestions[Math.floor(rng() * untouchedQuestions.length)]

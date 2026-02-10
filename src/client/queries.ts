@@ -139,25 +139,17 @@ export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
 )
 
 export const useMemory = () => {
-  // Use date and period to allow different questions throughout the day
   const date = btoa(dayjs().format('YYYY-MM-DD'))
-  const hour = new Date().getHours()
-  // Create periods: morning (6-12), midday (12-18), evening (18-24), night (0-6)
-  const period = hour >= 6 && hour < 12 ? 'morning' :
-                 hour >= 12 && hour < 18 ? 'midday' :
-                 hour >= 18 && hour < 24 ? 'evening' : 'night'
   const path = '/api/memory'
 
   return useQuery<any>(
-    [path, date, period], // Include date and period in query key for varied questions
+    [path, date],
     async () => {
-      // Get quantum state for context (optional - graceful degradation)
       let quantumParams = {}
       if (typeof window !== 'undefined') {
         try {
           const { getUserState } = await import('#client/stores/intentionEngine')
           const state = getUserState()
-          // Only send if state is available
           if (state && state.energy !== 'unknown') {
             quantumParams = {
               qe: state.energy,
@@ -167,11 +159,11 @@ export const useMemory = () => {
             }
           }
         } catch (e) {
-          // Quantum state optional - graceful degradation
+          // Quantum state optional
         }
       }
 
-      // Get recently shown questions to avoid duplicates
+      // Send recently shown questions for duplicate avoidance
       let recentlyShownQuestions: string[] = []
       if (typeof window !== 'undefined') {
         try {
@@ -181,55 +173,29 @@ export const useMemory = () => {
               question: string
               timestamp: number
             }>
-            // Send normalized questions to server for duplicate detection
             recentlyShownQuestions = recentQuestions
               .map(q => q.question.toLowerCase().trim().replace(/[?.!,]/g, ''))
-              .slice(0, 5) // Only send last 5
+              .slice(0, 10)
           }
         } catch (e) {
-          console.warn('Failed to get recent questions:', e)
+          // Non-critical
         }
       }
-
-      console.log('Fetching Memory question:', {
-        date: dayjs().format('YYYY-MM-DD'),
-        hasQuantumState: Object.keys(quantumParams).length > 0,
-        recentQuestionsToAvoid: recentlyShownQuestions.length
-      })
 
       const response = await api.get<any>(path, {
         params: {
           d: date,
-          // Only include quantum params if available
           ...(Object.keys(quantumParams).length > 0 ? quantumParams : {}),
-          // Send recently shown questions as JSON string (for duplicate prevention)
           ...(recentlyShownQuestions.length > 0 ? { recentShown: JSON.stringify(recentlyShownQuestions) } : {})
         }
       })
 
-      // Server returns null during cooldown (already answered this period)
-      if (response.data === null) {
-        console.log('⏸️ Memory cooldown: already answered question in current period (morning 7am-7pm or evening 7pm-7am)')
-      } else if (response.data?.question) {
-        console.log('Memory question received:', {
-          questionId: response.data.id,
-          questionPreview: response.data.question.substring(0, 60) + '...'
-        })
-      }
-
       return response.data
     },
     {
-      staleTime: 3 * 60 * 60 * 1000, // Cache for 3 hours - allows multiple questions per day
-      cacheTime: 6 * 60 * 60 * 1000, // Keep in cache for 6 hours
-      onError: (error) => {
-        console.error('Memory query failed:', error)
-        // Store error timestamp for manual retry UI
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(`memory-error-${date}`, Date.now().toString())
-        }
-      },
-      retry: false, // Don't retry on error to avoid spam
+      staleTime: 10 * 60 * 1000, // 10 minutes
+      cacheTime: 30 * 60 * 1000, // 30 minutes
+      retry: 1,
     }
   )
 }
