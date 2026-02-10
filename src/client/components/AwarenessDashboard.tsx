@@ -61,10 +61,7 @@ export function AwarenessDashboard() {
     <Block label={label} blockView onLabelClick={cycleView}>
       {awarenessView === 'overview' && (
         <div>
-          <div className="flex items-center gap-8">
-            <span>{awarenessPercentage}%</span>
-            <span>Self-Awareness</span>
-          </div>
+          <div>{awarenessPercentage}% Self-Awareness</div>
           {profile.growthTrajectory && (
             <div className="mt-4  capitalize">
               Journey: {profile.growthTrajectory}
@@ -79,7 +76,7 @@ export function AwarenessDashboard() {
             <span>{profile.archetype}</span>
           </div>
           {profile.archetypeDescription && (
-            <div className="  mb-8">
+            <div className="mb-8">
               {profile.archetypeDescription}
             </div>
           )}
@@ -100,7 +97,7 @@ export function AwarenessDashboard() {
               </Tag>
             ))}
           </TagsContainer>
-          <div className="mt-8  ">
+          <div className="mt-8">
             Core values appearing in your choices
           </div>
         </div>
@@ -114,7 +111,7 @@ export function AwarenessDashboard() {
             ))}
           </div>
           {profile.emotionalRange !== undefined && (
-            <div className="mt-12  ">
+            <div className="mt-12">
               Emotional range: {profile.emotionalRange}/10
             </div>
           )}
@@ -131,7 +128,7 @@ export function AwarenessDashboard() {
               </div>
             ))}
           </div>
-          <div className="mt-12  ">
+          <div className="mt-12">
             Core psychological needs in your patterns
           </div>
         </div>
@@ -153,7 +150,7 @@ export function AwarenessDashboard() {
               <span>{profile.journalSentiment.challenging}%</span>
             </div>
           </div>
-          <div className="mt-12  ">
+          <div className="mt-12">
             Emotional tone across journal entries
           </div>
         </div>
@@ -161,12 +158,9 @@ export function AwarenessDashboard() {
 
       {awarenessView === 'reflection' && profile.reflectionQuality !== undefined && (
         <div>
-          <div className="flex items-center gap-8 mb-8">
-            <span>{profile.reflectionQuality}/10</span>
-            <span>Introspection depth</span>
-          </div>
+          <div className="mb-8">{profile.reflectionQuality}/10 Introspection depth</div>
           {profile.growthTrajectory && (
-            <div className="  capitalize">
+            <div className="capitalize">
               Quality of self-reflection in your writing
             </div>
           )}

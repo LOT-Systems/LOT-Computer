@@ -315,12 +315,7 @@ export function EmotionalCheckIn() {
             <div>Check in more to see patterns.</div>
           ) : (
             <>
-              <div className="mb-8">
-                <div className="flex items-center gap-8">
-                  <span>{checkInsData.stats.total}</span>
-                  <span>Check-ins</span>
-                </div>
-              </div>
+              <div className="mb-8">{checkInsData.stats.total} Check-ins</div>
               {checkInsData.stats.dominantMood && (
                 <div>
                   Most common: <span className="capitalize">{checkInsData.stats.dominantMood}</span>

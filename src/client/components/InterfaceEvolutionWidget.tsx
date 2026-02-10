@@ -92,19 +92,11 @@ export function InterfaceEvolutionWidget() {
       {view === 'dimensions' && (
         <div>
           {/* Overall maturity */}
-          <div className="mb-8 flex items-center gap-8">
-            <span>
-              {Math.round(evolutionState.overallMaturity * 100)}%
-            </span>
-            <span>Overall Maturity</span>
-          </div>
+          <div className="mb-8">{Math.round(evolutionState.overallMaturity * 100)}% Overall Maturity</div>
 
           {/* Badge tier */}
           {evolutionState.badgeTier > 0 && (
-            <div className="mb-8 flex items-center gap-8">
-              <span>Tier {evolutionState.badgeTier}</span>
-              <span>({evolutionState.badgeTheme})</span>
-            </div>
+            <div className="mb-8">Tier {evolutionState.badgeTier} ({evolutionState.badgeTheme})</div>
           )}
 
           {/* Dimensions */}

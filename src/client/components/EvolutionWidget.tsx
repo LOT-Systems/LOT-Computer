@@ -146,9 +146,8 @@ export const EvolutionWidget: React.FC = () => {
 
       {view === 'metrics' && <div>
         {/* Main level display */}
-        <div className="mb-24 flex items-baseline gap-8">
-          <div>{currentLevel}</div>
-          <div>{stage}</div>
+        <div className="mb-24">
+          {currentLevel} {stage}
         </div>
 
         {/* Metrics */}

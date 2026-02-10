@@ -81,10 +81,7 @@ export function NarrativeWidget() {
       {view === 'story' && (
         <div>
           {/* Level and chapter */}
-          <div className="mb-8 flex items-center gap-8">
-            <span>Level {narrative.currentLevel}</span>
-            <span>Chapter {narrative.currentArc.chapter}: {narrative.currentArc.title}</span>
-          </div>
+          <div className="mb-8">Level {narrative.currentLevel} . Chapter {narrative.currentArc.chapter}: {narrative.currentArc.title}</div>
 
           {/* Current narrative */}
           <div className="mb-8">

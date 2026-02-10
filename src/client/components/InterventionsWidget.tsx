@@ -63,10 +63,7 @@ export function InterventionsWidget() {
         </div>
 
         {/* Severity indicator and title */}
-        <div className="mb-8 flex items-center gap-8">
-          <span>{getSeverityIndicator()}</span>
-          <span>{intervention.title}</span>
-        </div>
+        <div className="mb-8">{getSeverityIndicator()} {intervention.title}</div>
 
         {/* Main message */}
         <div className="mb-8">
