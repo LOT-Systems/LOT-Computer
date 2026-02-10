@@ -835,7 +835,7 @@ function formatLog(log: Log): string {
     }
     case 'plan_set': {
       const text = log.text || ''
-      // Plan logs store: "Intent: X . Today: Y . How: Z . Feeling: W"
+      // Plan logs store: "Intent: X • Today: Y • How: Z • Feeling: W"
       body = text || 'Plan set'
       break
     }
@@ -878,7 +878,7 @@ function formatLog(log: Log): string {
           if (meta.severity) parts.push(`severity: ${meta.severity}`)
           if (meta.result) parts.push(`result: ${meta.result}`)
         }
-        body = parts.join(' . ')
+        body = parts.join(' • ')
       }
       break
     }

@@ -103,7 +103,7 @@ export function GoalJourneyWidget() {
                       {goal.journeyStage === 'breakthrough' && 'Breakthrough'}
                       {goal.journeyStage === 'integration' && 'Integrating'}
                       {goal.journeyStage === 'mastery' && 'Mastery'}
-                      {goal.progressMarkers.length > 0 && ` . ${goal.progressMarkers.length} ${goal.progressMarkers.length === 1 ? 'marker' : 'markers'}`}
+                      {goal.progressMarkers.length > 0 && ` • ${goal.progressMarkers.length} ${goal.progressMarkers.length === 1 ? 'marker' : 'markers'}`}
                     </div>
                   </div>
                 ))}

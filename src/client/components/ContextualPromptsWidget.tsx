@@ -254,8 +254,8 @@ export const ContextualPromptsWidget = () => {
         {!logCtx.isEmpty && (
           <div className="mb-8 opacity-30">
             {logCtx.todayActivity.length} signal{logCtx.todayActivity.length === 1 ? '' : 's'} today
-            {logCtx.streak > 1 ? ` . ${logCtx.streak}d streak` : ''}
-            {logCtx.sessionDepth > 0 ? ` . session depth ${logCtx.sessionDepth}` : ''}
+            {logCtx.streak > 1 ? ` • ${logCtx.streak}d streak` : ''}
+            {logCtx.sessionDepth > 0 ? ` • session depth ${logCtx.sessionDepth}` : ''}
           </div>
         )}
         <div className="flex gap-8">

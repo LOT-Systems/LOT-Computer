@@ -149,8 +149,8 @@ export function QuantumStateWidget() {
           </div>
           {!logCtx.isEmpty && (
             <div className="mt-4 opacity-30">
-              {logCtx.timePhase} phase . {logCtx.engagementLevel}
-              {logCtx.dominantMood ? ` . ${logCtx.dominantMood}` : ''}
+              {logCtx.timePhase} phase • {logCtx.engagementLevel}
+              {logCtx.dominantMood ? ` • ${logCtx.dominantMood}` : ''}
             </div>
           )}
         </div>
@@ -180,7 +180,7 @@ export function QuantumStateWidget() {
           </div>
           {!logCtx.isEmpty && (
             <div className="mt-4 opacity-30">
-              {logCtx.activeModules.length}/6 modules reporting . {logCtx.todayActivity.length} today
+              {logCtx.activeModules.length}/6 modules reporting • {logCtx.todayActivity.length} today
             </div>
           )}
         </div>

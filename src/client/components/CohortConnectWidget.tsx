@@ -80,7 +80,7 @@ export const CohortConnectWidget: React.FC = () => {
                       </div>
                     </div>
                     <div className=" ">
-                      {match.user.city || 'Location unknown'} . {similarity}% match
+                      {match.user.city || 'Location unknown'} • {similarity}% match
                     </div>
                   </div>
 

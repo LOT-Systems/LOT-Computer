@@ -197,9 +197,9 @@ export function AIFeedbackWidget() {
           {!logCtx.isEmpty && (
             <div className="mb-8 opacity-30">
               {logCtx.engagementLevel} runtime
-              {logCtx.dominantMood ? ` . ${logCtx.dominantMood}` : ''}
-              {logCtx.streak > 1 ? ` . ${logCtx.streak}d streak` : ''}
-              {profile?.archetype ? ` . ${profile.archetype}` : ''}
+              {logCtx.dominantMood ? ` • ${logCtx.dominantMood}` : ''}
+              {logCtx.streak > 1 ? ` • ${logCtx.streak}d streak` : ''}
+              {profile?.archetype ? ` • ${profile.archetype}` : ''}
             </div>
           )}
 

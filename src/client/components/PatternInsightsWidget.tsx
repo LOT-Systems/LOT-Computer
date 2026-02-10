@@ -155,7 +155,7 @@ export const PatternInsightsWidget = () => {
                     {match.user.firstName} {match.user.lastName}
                   </GhostButton>
                   {match.user.archetype && (
-                    <span className="opacity-30"> . {match.user.archetype}</span>
+                    <span className="opacity-30"> • {match.user.archetype}</span>
                   )}
                 </div>
                 <div className="opacity-30">

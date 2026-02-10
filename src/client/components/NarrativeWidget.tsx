@@ -81,7 +81,7 @@ export function NarrativeWidget() {
       {view === 'story' && (
         <div>
           {/* Level and chapter */}
-          <div className="mb-8">Level {narrative.currentLevel} . Chapter {narrative.currentArc.chapter}: {narrative.currentArc.title}</div>
+          <div className="mb-8">Level {narrative.currentLevel} • Chapter {narrative.currentArc.chapter}: {narrative.currentArc.title}</div>
 
           {/* Current narrative */}
           <div className="mb-8">
@@ -98,8 +98,8 @@ export function NarrativeWidget() {
           {/* Log-derived progress context */}
           {!logCtx.isEmpty && (
             <div className="opacity-30">
-              {logCtx.totalEntries} total entries . {logCtx.activeDays} active day{logCtx.activeDays === 1 ? '' : 's'}
-              {logCtx.streak > 1 ? ` . ${logCtx.streak}d streak` : ''}
+              {logCtx.totalEntries} total entries • {logCtx.activeDays} active day{logCtx.activeDays === 1 ? '' : 's'}
+              {logCtx.streak > 1 ? ` • ${logCtx.streak}d streak` : ''}
             </div>
           )}
         </div>

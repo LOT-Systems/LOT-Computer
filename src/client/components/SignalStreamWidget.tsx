@@ -63,7 +63,7 @@ export function SignalStreamWidget() {
         <div className="flex justify-between mb-8">
           <span className="opacity-30">
             {engine.signals.length} total
-            {!logCtx.isEmpty ? ` . ${logCtx.totalEntries} logs` : ''}
+            {!logCtx.isEmpty ? ` • ${logCtx.totalEntries} logs` : ''}
           </span>
           {signalRate && (
             <span className="opacity-30">
@@ -101,7 +101,7 @@ export function SignalStreamWidget() {
             ? `Last upstream sync: ${formatTimestamp(engine.lastSyncedTimestamp)}`
             : 'Awaiting upstream sync.'
           }
-          {!logCtx.isEmpty && logCtx.lastActivityAgo ? ` . Last log: ${logCtx.lastActivityAgo}.` : ''}
+          {!logCtx.isEmpty && logCtx.lastActivityAgo ? ` • Last log: ${logCtx.lastActivityAgo}.` : ''}
         </div>
       </div>
     </Block>

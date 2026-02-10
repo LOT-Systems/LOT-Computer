@@ -83,7 +83,7 @@ export function UserMetricsWidget() {
           {/* Log-derived context */}
           {!logCtx.isEmpty && (
             <div className="opacity-30 mt-8">
-              {logCtx.todayActivity.length} signal{logCtx.todayActivity.length === 1 ? '' : 's'} today . {logCtx.activeModules.length}/6 modules active
+              {logCtx.todayActivity.length} signal{logCtx.todayActivity.length === 1 ? '' : 's'} today • {logCtx.activeModules.length}/6 modules active
             </div>
           )}
         </div>
@@ -160,7 +160,7 @@ export function UserMetricsWidget() {
           {/* Unlocked features */}
           {version.unlocked.length > 0 && (
             <div className="opacity-30">
-              {version.unlocked.join(' . ')}
+              {version.unlocked.join(' • ')}
             </div>
           )}
 
@@ -168,7 +168,7 @@ export function UserMetricsWidget() {
           {!logCtx.isEmpty && (
             <div className="opacity-30 mt-8">
               Engagement: {logCtx.engagementLevel}
-              {logCtx.widgetDiversity > 0 ? ` . ${logCtx.widgetDiversity} event types` : ''}
+              {logCtx.widgetDiversity > 0 ? ` • ${logCtx.widgetDiversity} event types` : ''}
             </div>
           )}
         </div>
