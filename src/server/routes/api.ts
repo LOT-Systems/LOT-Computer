@@ -1828,17 +1828,23 @@ export default async (fastify: FastifyInstance) => {
         // Continue without weekly summary check
       }
 
-      const { shouldShowWeeklySummary, generateWeeklySummary } = await import('#server/utils/weekly-summary')
+      let showWeeklySummary = false
+      let generateWeeklySummary: any = null
+      try {
+        const weeklySummaryModule = await import('#server/utils/weekly-summary')
 
-      // Validate weekly summary object structure
-      const validLastWeeklySummary = lastWeeklySummary &&
-                                     typeof lastWeeklySummary === 'object' &&
-                                     lastWeeklySummary.createdAt instanceof Date
+        const validLastWeeklySummary = lastWeeklySummary &&
+                                       typeof lastWeeklySummary === 'object' &&
+                                       lastWeeklySummary.createdAt instanceof Date
 
-      const showWeeklySummary = validLastWeeklySummary && lastWeeklySummary && shouldShowWeeklySummary(
-        req.user,
-        lastWeeklySummary.createdAt
-      )
+        showWeeklySummary = !!(validLastWeeklySummary && lastWeeklySummary && weeklySummaryModule.shouldShowWeeklySummary(
+          req.user,
+          lastWeeklySummary.createdAt
+        ))
+        generateWeeklySummary = weeklySummaryModule.generateWeeklySummary
+      } catch (weeklyImportError: any) {
+        console.warn('Weekly summary module unavailable:', weeklyImportError.message)
+      }
 
       if (showWeeklySummary) {
         console.log(`Generating weekly summary for user ${req.user.id}`)
