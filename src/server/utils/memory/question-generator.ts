@@ -271,6 +271,64 @@ Match your question to their quantum state. The engine recognizes patterns they 
     // Non-critical
   }
 
+  // Engagement analytics — server-side mirror of useLogContext
+  let engagementContext = ''
+  try {
+    const uniqueDays = new Set(logs.map(l => dayjs(l.createdAt).format('YYYY-MM-DD')))
+    const activeDays = uniqueDays.size
+    const eventTypes = new Set(logs.map(l => l.event))
+
+    // Module usage map
+    const moduleMap: Record<string, string> = {
+      'answer': 'Memory', 'emotional_checkin': 'Mood', 'plan_set': 'Planner',
+      'self_care_complete': 'Self-care', 'intention': 'Intentions',
+      'note': 'Journal', 'chat_message': 'Chat',
+    }
+    const moduleCounts: Record<string, number> = {}
+    for (const log of logs) {
+      const mod = moduleMap[log.event]
+      if (mod) moduleCounts[mod] = (moduleCounts[mod] || 0) + 1
+    }
+    const activeModules = Object.keys(moduleCounts).filter(m => moduleCounts[m] > 0)
+    const allModules = ['Memory', 'Mood', 'Planner', 'Self-care', 'Intentions', 'Journal']
+    const dormantModules = allModules.filter(m => !activeModules.includes(m))
+
+    // Mood trend from recent check-ins
+    const positiveMoods = ['energized', 'calm', 'hopeful', 'grateful', 'fulfilled', 'content', 'peaceful', 'excited']
+    const negativeMoods = ['tired', 'anxious', 'exhausted', 'overwhelmed', 'restless', 'uncertain']
+    const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
+    let moodTrend = ''
+    if (moodLogs.length >= 3) {
+      const recent = moodLogs.slice(0, 3).map(l => (l.metadata.mood || l.metadata.state || l.text || '') as string)
+      const older = moodLogs.slice(3, 6).map(l => (l.metadata.mood || l.metadata.state || l.text || '') as string)
+      const recentPositive = recent.filter(m => positiveMoods.includes(m)).length
+      const olderPositive = older.length > 0 ? older.filter(m => positiveMoods.includes(m)).length : recentPositive
+      moodTrend = recentPositive > olderPositive ? 'improving' : recentPositive < olderPositive ? 'declining' : 'stable'
+    }
+
+    // Self-care / planner activity
+    const planCount = logs.filter(l => l.event === 'plan_set').length
+    const selfCareCount = logs.filter(l => l.event === 'self_care_complete').length
+    const selfCareSkipCount = logs.filter(l => (l as any).event === 'self_care_skip').length
+
+    const parts: string[] = []
+    parts.push(`Active days: ${activeDays}`)
+    parts.push(`Modules used: ${activeModules.join(', ') || 'none'}`)
+    if (dormantModules.length > 0) parts.push(`Unused modules: ${dormantModules.join(', ')}`)
+    if (moodTrend) parts.push(`Mood trend: ${moodTrend}`)
+    if (planCount > 0) parts.push(`Plans set: ${planCount}`)
+    if (selfCareCount > 0 || selfCareSkipCount > 0) parts.push(`Self-care: ${selfCareCount} completed, ${selfCareSkipCount} skipped`)
+
+    const mostUsed = Object.entries(moduleCounts).sort(([,a], [,b]) => b - a)[0]
+    const leastUsed = Object.entries(moduleCounts).filter(([,v]) => v > 0).sort(([,a], [,b]) => a - b)[0]
+    if (mostUsed) parts.push(`Most active: ${mostUsed[0]} (${mostUsed[1]})`)
+    if (leastUsed && leastUsed[0] !== mostUsed?.[0]) parts.push(`Least active: ${leastUsed[0]} (${leastUsed[1]})`)
+
+    engagementContext = `\n\n**Engagement Analytics:**\n${parts.join('\n')}\n\nUse this to understand their engagement depth. If modules are dormant, consider questions that naturally lead toward those areas. If mood is declining, prioritize supportive questions.`
+  } catch (e) {
+    // Non-critical
+  }
+
   // Goal context - understand what user is working toward
   const userGoals = extractGoals(user, logs)
   const activeGoals = userGoals.filter(g => g.state === 'active' || g.state === 'progressing').slice(0, 3)
@@ -722,11 +780,12 @@ Recent activity logs (for additional context):
   `.trim()
   const formattedLogs = logs.map(formatLog).filter(Boolean).join('\n\n')
 
-  const fullPrompt = head + quantumContext + widgetContext + goalContext + '\n\n' + formattedLogs
+  const fullPrompt = head + quantumContext + widgetContext + engagementContext + goalContext + '\n\n' + formattedLogs
 
   console.log(`📨 Prompt built: ${fullPrompt.length} chars total`)
   console.log(`   - Head section: ${head.length} chars`)
   console.log(`   - Quantum context: ${quantumContext.length} chars`)
+  console.log(`   - Engagement context: ${engagementContext.length} chars`)
   console.log(`   - Goal context: ${goalContext.length} chars`)
   console.log(`   - Formatted logs: ${formattedLogs.length} chars (${logs.map(formatLog).filter(Boolean).length} logs)`)
   console.log(`   - User story included: ${userStory.length > 0 ? 'YES' : 'NO'}`)
@@ -774,6 +833,26 @@ function formatLog(log: Log): string {
       body = checkInType ? `${mood} (${checkInType})` : String(mood)
       break
     }
+    case 'plan_set': {
+      const text = log.text || ''
+      // Plan logs store: "Intent: X . Today: Y . How: Z . Feeling: W"
+      body = text || 'Plan set'
+      break
+    }
+    case 'self_care_complete': {
+      const action = (log.text || '').replace('Self-care completed: ', '')
+      body = action ? `Completed: ${action}` : 'Self-care completed'
+      break
+    }
+    case 'self_care_skip': {
+      const skipped = (log.text || '').replace('Self-care skipped: ', '')
+      body = skipped ? `Skipped: ${skipped}` : 'Self-care skipped'
+      break
+    }
+    case 'theme_change': {
+      body = log.text || 'Theme changed'
+      break
+    }
     default: {
       // quantum_intent_signal and other widget interactions
       if ((log as any).event === 'quantum_intent_signal') {
@@ -784,9 +863,19 @@ function formatLog(log: Log): string {
         if (meta) {
           if (meta.questionId) parts.push(`question: ${meta.question || meta.questionId}`)
           if (meta.option) parts.push(`chose: ${meta.option}`)
+          if (meta.intent) parts.push(`intent: ${meta.intent}`)
+          if (meta.today) parts.push(`today: ${meta.today}`)
+          if (meta.how) parts.push(`how: ${meta.how}`)
+          if (meta.feeling) parts.push(`feeling: ${meta.feeling}`)
+          if (meta.focus) parts.push(`focus: ${meta.focus}`)
           if (meta.intention) parts.push(`intention: ${meta.intention}`)
           if (meta.practice) parts.push(`practice: ${meta.practice}`)
+          if (meta.action) parts.push(`action: ${meta.action}`)
+          if (meta.pattern) parts.push(`pattern: ${meta.pattern}`)
+          if (meta.level) parts.push(`level: ${meta.level}`)
+          if (meta.trajectory) parts.push(`trajectory: ${meta.trajectory}`)
           if (meta.energyLevel) parts.push(`energy: ${meta.energyLevel}`)
+          if (meta.severity) parts.push(`severity: ${meta.severity}`)
           if (meta.result) parts.push(`result: ${meta.result}`)
         }
         body = parts.join(' . ')
@@ -828,7 +917,7 @@ function formatLog(log: Log): string {
   ].join('\n')
 }
 
-const MODULE_BY_LOG_EVENT: Record<LogEvent, string> = {
+const MODULE_BY_LOG_EVENT: Record<string, string> = {
   user_login: 'Login',
   user_logout: 'Logout',
   settings_change: 'Settings',
@@ -837,5 +926,10 @@ const MODULE_BY_LOG_EVENT: Record<LogEvent, string> = {
   note: 'Note',
   emotional_checkin: 'Check-in',
   system_feedback: 'Feedback',
+  plan_set: 'Planner',
+  self_care_complete: 'Self-care',
+  self_care_skip: 'Self-care',
+  intention: 'Intention',
+  answer: 'Memory',
   other: 'Other',
 }

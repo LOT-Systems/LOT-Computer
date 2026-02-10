@@ -3,6 +3,7 @@ import { Block } from '#client/components/ui'
 import { useNarrative } from '#client/queries'
 import { useLogContext } from '#client/hooks/useLogContext'
 import { ProgressBars } from '#client/utils/progressBars'
+import { recordSignal } from '#client/stores/intentionEngine'
 
 type NarrativeView = 'story' | 'achievements' | 'quests' | 'context'
 
@@ -17,13 +18,12 @@ export function NarrativeWidget() {
 
   const cycleView = () => {
     setView(prev => {
-      switch (prev) {
-        case 'story': return 'achievements'
-        case 'achievements': return 'quests'
-        case 'quests': return 'context'
-        case 'context': return 'story'
-        default: return 'story'
-      }
+      const next = prev === 'story' ? 'achievements'
+        : prev === 'achievements' ? 'quests'
+        : prev === 'quests' ? 'context'
+        : 'story'
+      try { recordSignal('journal', 'narrative_explored', { view: next, hour: new Date().getHours() }) } catch (e) {}
+      return next
     })
   }
 

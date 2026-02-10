@@ -14,7 +14,7 @@ import { atom } from 'nanostores'
 // Intention signals collected from all widgets
 export type IntentionSignal = {
   timestamp: number
-  source: 'mood' | 'memory' | 'planner' | 'intentions' | 'selfcare' | 'journal'
+  source: 'mood' | 'memory' | 'planner' | 'intentions' | 'selfcare' | 'journal' | 'calculator'
   signal: string
   metadata?: Record<string, any>
 }

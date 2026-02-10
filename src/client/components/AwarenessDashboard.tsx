@@ -1,6 +1,7 @@
 import React from 'react'
 import { Block, Tag, TagsContainer } from '#client/components/ui'
 import { useProfile } from '#client/queries'
+import { recordSignal } from '#client/stores/intentionEngine'
 
 type AwarenessView =
   | 'overview'
@@ -34,16 +35,15 @@ export function AwarenessDashboard() {
   // Cycle through views on label click
   const cycleView = () => {
     setAwarenessView(prev => {
-      switch (prev) {
-        case 'overview': return 'archetype'
-        case 'archetype': return 'values'
-        case 'values': return 'patterns'
-        case 'patterns': return 'needs'
-        case 'needs': return 'sentiment'
-        case 'sentiment': return 'reflection'
-        case 'reflection': return 'overview'
-        default: return 'overview'
-      }
+      const next = prev === 'overview' ? 'archetype'
+        : prev === 'archetype' ? 'values'
+        : prev === 'values' ? 'patterns'
+        : prev === 'patterns' ? 'needs'
+        : prev === 'needs' ? 'sentiment'
+        : prev === 'sentiment' ? 'reflection'
+        : 'overview'
+      try { recordSignal('mood', 'awareness_explored', { view: next, hour: new Date().getHours() }) } catch (e) {}
+      return next
     })
   }
 

@@ -5,6 +5,7 @@ import { Block } from '#client/components/ui'
 import { useCreateLog, useLogs } from '#client/queries'
 import { cn } from '#client/utils'
 import * as stores from '#client/stores'
+import { recordSignal } from '#client/stores/intentionEngine'
 
 const FAREWELL_PHRASES = [
   'Bon appétit!',
@@ -97,6 +98,8 @@ export const RecipeWidget: React.FC = () => {
   }, [state.isVisible])
 
   const handleDismiss = () => {
+    try { recordSignal('selfcare', 'recipe_acknowledged', { mealTime: state.mealTime, hour: new Date().getHours() }) } catch (e) {}
+
     // Pick a random farewell phrase
     const randomPhrase = FAREWELL_PHRASES[Math.floor(Math.random() * FAREWELL_PHRASES.length)]
     setFarewellPhrase(randomPhrase)
