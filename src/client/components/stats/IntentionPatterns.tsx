@@ -30,7 +30,7 @@ export function IntentionPatterns() {
           </div>
         ))}
 
-        <div className="pt-4 mt-6 border-t border-acc/20">
+        <div className="pt-4 mt-8 border-t border-acc/20">
           <div className="opacity-30 mb-8">Most Active Pattern</div>
           <div className="opacity-30">{mostActive}</div>
         </div>

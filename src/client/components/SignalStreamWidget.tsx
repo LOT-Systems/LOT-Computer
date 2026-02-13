@@ -96,7 +96,7 @@ export function SignalStreamWidget() {
         </div>
 
         {/* Sync status enriched with log context */}
-        <div className="mt-12 opacity-30">
+        <div className="mt-16 opacity-30">
           {engine.lastSyncedTimestamp > 0
             ? `Last upstream sync: ${formatTimestamp(engine.lastSyncedTimestamp)}`
             : 'Awaiting upstream sync.'

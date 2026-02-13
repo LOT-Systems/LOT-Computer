@@ -115,7 +115,7 @@ export function InterfaceEvolutionWidget() {
           {/* Log-context-grounded evolution insight */}
           {!logCtx.isEmpty && (
             <div className="mt-12 opacity-30">
-              {logCtx.engagementLevel} phase • {logCtx.activeDays} active day{logCtx.activeDays === 1 ? '' : 's'}
+              <span className="capitalize">{logCtx.engagementLevel}</span> phase • {logCtx.activeDays} active day{logCtx.activeDays === 1 ? '' : 's'}
               {logCtx.streak > 1 ? ` • ${logCtx.streak}d streak` : ''}
             </div>
           )}

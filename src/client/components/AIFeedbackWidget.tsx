@@ -196,7 +196,7 @@ export function AIFeedbackWidget() {
           {/* Log-derived context line */}
           {!logCtx.isEmpty && (
             <div className="mb-8 opacity-30">
-              {logCtx.engagementLevel} runtime
+              <span className="capitalize">{logCtx.engagementLevel}</span> runtime
               {logCtx.dominantMood ? ` • ${logCtx.dominantMood}` : ''}
               {logCtx.streak > 1 ? ` • ${logCtx.streak}d streak` : ''}
               {profile?.archetype ? ` • ${profile.archetype}` : ''}

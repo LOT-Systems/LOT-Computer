@@ -447,29 +447,35 @@ export const System = () => {
         </Block>
       </div>
 
-      {/* Contextual Prompts - Show pattern-based suggestions based on current context */}
-      <ContextualPromptsWidget />
+      {/* Context stack */}
+      <div>
+        {/* Contextual Prompts - Show pattern-based suggestions based on current context */}
+        <ContextualPromptsWidget />
 
-      {/* Chat Catalyst - Prompts to connect with cohort members when online */}
-      <ChatCatalystWidget />
+        {/* Chat Catalyst - Prompts to connect with cohort members when online */}
+        <ChatCatalystWidget />
 
-      {/* Interventions - Compassionate care based on semantic struggle detection */}
-      <InterventionsWidget />
+        {/* Interventions - Compassionate care based on semantic struggle detection */}
+        <InterventionsWidget />
+      </div>
 
-      {/* Energy Capacitor - Track energy depletion/replenishment */}
-      <EnergyCapacitor />
+      {/* Growth stack */}
+      <div>
+        {/* Energy Capacitor - Track energy depletion/replenishment */}
+        <EnergyCapacitor />
 
-      {/* Narrative - RPG-style story progression and achievements */}
-      <NarrativeWidget />
+        {/* Narrative - RPG-style story progression and achievements */}
+        <NarrativeWidget />
 
-      {/* Evolution - Minimalist profile growth indicators */}
-      <EvolutionWidget />
+        {/* Evolution - Minimalist profile growth indicators */}
+        <EvolutionWidget />
 
-      {/* Interface Evolution - Spiritual/psychological progression & feature unlocks */}
-      <InterfaceEvolutionWidget />
+        {/* Interface Evolution - Spiritual/psychological progression & feature unlocks */}
+        <InterfaceEvolutionWidget />
 
-      {/* Evolution Milestone Toast - Subtle notifications for progression milestones */}
-      <EvolutionMilestoneToast />
+        {/* Evolution Milestone Toast - Subtle notifications for progression milestones */}
+        <EvolutionMilestoneToast />
+      </div>
 
       <div>
         <Block
@@ -655,19 +661,25 @@ export const System = () => {
         return shouldShow && <SubscribeWidget />
       })()}
 
-      {/* Pattern Insights - Show user's discovered patterns and cohort matches */}
-      <PatternInsightsWidget />
+      {/* Community stack */}
+      <div>
+        {/* Pattern Insights - Show user's discovered patterns and cohort matches */}
+        <PatternInsightsWidget />
 
-      {/* Cohort Connect - Browse and connect with cohort members */}
-      <CohortConnectWidget />
+        {/* Cohort Connect - Browse and connect with cohort members */}
+        <CohortConnectWidget />
+      </div>
 
-      {/* Planner - Show occasionally for daily/weekly planning */}
-      <PlannerWidget />
+      {/* Planning stack */}
+      <div>
+        {/* Planner - Show occasionally for daily/weekly planning */}
+        <PlannerWidget />
 
-      <MemoryWidget />
+        <MemoryWidget />
 
-      {/* Micro Calculator - appears at magical number times */}
-      <MicroCalculatorWidget />
+        {/* Micro Calculator - appears at magical number times */}
+        <MicroCalculatorWidget />
+      </div>
 
       {/* Quantum Intent Engine Widgets */}
       <div>
@@ -677,22 +689,27 @@ export const System = () => {
         <SignalStreamWidget />
       </div>
 
-      {/* User Metrics - Personal OS health, performance, version */}
-      <UserMetricsWidget />
+      {/* System stack */}
+      <div>
+        {/* User Metrics - Personal OS health, performance, version */}
+        <UserMetricsWidget />
 
-      {/* System Progress - Deployment info with feedback */}
-      <SystemProgressWidget />
+        {/* System Progress - Deployment info with feedback */}
+        <SystemProgressWidget />
 
-      {/* System Pulse - Real-time system metrics */}
-      <SystemPulseWidget />
+        {/* System Pulse - Real-time system metrics */}
+        <SystemPulseWidget />
+      </div>
 
-      {/* Stats Widgets */}
-      <IntentionPatterns />
-      <CollectiveConsciousness />
-      <WellnessPulse />
-      <MemoryEngineStats />
-      <GrowthMilestones />
-      <BadgeUnlockFeed />
+      {/* Stats stack */}
+      <div>
+        <IntentionPatterns />
+        <CollectiveConsciousness />
+        <WellnessPulse />
+        <MemoryEngineStats />
+        <GrowthMilestones />
+        <BadgeUnlockFeed />
+      </div>
     </div>
   )
 }

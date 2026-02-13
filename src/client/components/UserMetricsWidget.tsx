@@ -167,7 +167,7 @@ export function UserMetricsWidget() {
           {/* Log-derived engagement context */}
           {!logCtx.isEmpty && (
             <div className="opacity-30 mt-8">
-              Engagement: {logCtx.engagementLevel}
+              Engagement: <span className="capitalize">{logCtx.engagementLevel}</span>
               {logCtx.widgetDiversity > 0 ? ` • ${logCtx.widgetDiversity} event types` : ''}
             </div>
           )}

@@ -37,11 +37,11 @@ export function GrowthMilestones() {
 
   return (
     <Block label="Growth Metrics:" blockView className="min-h-[200px]">
-      <div className="space-y-12">
+      <div className="space-y-16">
         {/* Personal Journey */}
         <div>
-          <div className="opacity-30 mb-6">Your Journey</div>
-          <div className="space-y-3">
+          <div className="opacity-30 mb-8">Your Journey</div>
+          <div className="space-y-4">
             <div className="flex justify-between items-baseline">
               <span className="opacity-30">Days</span>
               <span>
@@ -74,9 +74,9 @@ export function GrowthMilestones() {
         </div>
 
         {/* Community Stats */}
-        <div className="pt-6 border-t border-acc/20">
+        <div className="pt-8 border-t border-acc/20">
           <div className="opacity-30 mb-4">Community</div>
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="flex justify-between items-baseline">
               <span className="opacity-30">Total users</span>
               <span>
@@ -103,7 +103,7 @@ export function GrowthMilestones() {
 
         {/* Next action guidance based on log context */}
         {!logCtx.isEmpty && (
-          <div className="pt-6 border-t border-acc/20">
+          <div className="pt-8 border-t border-acc/20">
             <div className="opacity-30 mb-4">Next directive</div>
             <div className="opacity-30">
               {personal.questionsAnswered < 7

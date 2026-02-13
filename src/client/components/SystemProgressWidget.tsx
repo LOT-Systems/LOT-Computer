@@ -145,7 +145,7 @@ export function SystemProgressWidget() {
 
         {/* Features */}
         {deployment.features.length > 0 && (
-          <div className="border-t border-acc-400/30 pt-12">
+          <div className="border-t border-acc-400/30 pt-16">
             <div className="opacity-30 mb-8">Active enhancements:</div>
             <div className="flex flex-col gap-y-4">
               {deployment.features.map((feature, idx) => (
@@ -156,7 +156,7 @@ export function SystemProgressWidget() {
         )}
 
         {/* Feedback Section */}
-        <div className="border-t border-acc-400/30 pt-12">
+        <div className="border-t border-acc-400/30 pt-16">
           <div className="opacity-30 mb-8">System status assessment:</div>
 
           <div className="grid grid-cols-2 gap-8">
@@ -166,7 +166,7 @@ export function SystemProgressWidget() {
                 onClick={() => handleFeedback(option.id as FeedbackStatus)}
                 disabled={isSubmitting}
                 className={`
-                  px-12 py-8 rounded border transition-all
+                  px-16 py-8 rounded border transition-all
                   ${feedback === option.id
                     ? 'border-acc grid-fill text-acc'
                     : 'border-acc-400/30 hover:border-acc-400/60 grid-fill-hover'
@@ -183,7 +183,7 @@ export function SystemProgressWidget() {
           </div>
 
           {feedback && (
-            <div className="mt-12 opacity-30">
+            <div className="mt-16 opacity-30">
               Status logged. Calibration updated.
             </div>
           )}
@@ -191,7 +191,7 @@ export function SystemProgressWidget() {
 
         {/* Community Feedback Analytics - Self-Evolution Insights */}
         {analytics && analytics.totalResponses > 0 && (
-          <div className="border-t border-acc-400/30 pt-12">
+          <div className="border-t border-acc-400/30 pt-16">
             <button
               onClick={() => setShowAnalytics(!showAnalytics)}
               className="w-full flex justify-between items-center opacity-30 hover:opacity-100 transition-opacity mb-8"
@@ -201,9 +201,9 @@ export function SystemProgressWidget() {
             </button>
 
             {showAnalytics && (
-              <div className="flex flex-col gap-y-12">
+              <div className="flex flex-col gap-y-16">
                 {/* System Health Status */}
-                <div className="p-12 rounded border border-acc-400/30">
+                <div className="p-16 rounded border border-acc-400/30">
                   <div className="opacity-30 mb-4">System health:</div>
                   <div>{analytics.systemHealth.message}</div>
                 </div>
@@ -211,7 +211,7 @@ export function SystemProgressWidget() {
                 {/* Feedback Distribution */}
                 <div>
                   <div className="opacity-30 mb-8">Distribution ({analytics.totalResponses} responses):</div>
-                  <div className="flex flex-col gap-y-6">
+                  <div className="flex flex-col gap-y-4">
                     {FEEDBACK_OPTIONS.map(option => {
                       const percentage = analytics.feedbackPercentages[option.id as keyof typeof analytics.feedbackPercentages]
                       return (

@@ -149,7 +149,7 @@ export function QuantumStateWidget() {
           </div>
           {!logCtx.isEmpty && (
             <div className="mt-4 opacity-30">
-              {logCtx.timePhase} phase • {logCtx.engagementLevel}
+              <span className="capitalize">{logCtx.timePhase}</span> phase • <span className="capitalize">{logCtx.engagementLevel}</span>
               {logCtx.dominantMood ? ` • ${logCtx.dominantMood}` : ''}
             </div>
           )}
