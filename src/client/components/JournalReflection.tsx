@@ -61,8 +61,8 @@ export function JournalReflection() {
   return (
     <Block label="Reflect:" blockView onLabelClick={handleReflectClick}>
       <div>
-        <div className="mb-8 ">{prompts.primary}</div>
-        <div className="flex flex-col gap-8  ">
+        <div className="mb-8">{prompts.primary}</div>
+        <div className="flex flex-col gap-8">
           <div>. {prompts.secondary}</div>
           <div>. {prompts.tertiary}</div>
         </div>
