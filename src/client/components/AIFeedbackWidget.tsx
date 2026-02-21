@@ -54,24 +54,24 @@ export function AIFeedbackWidget() {
     // Critical support needed — enriched with log context
     if (needsSupport === 'critical') {
       if (logCtx.moodTrend === 'declining') {
-        return 'System strain detected. Mood trajectory declining across recent check-ins. Prioritize restoration.'
+        return 'Biofield strain detected. Trajectory declining across recent readings. Prioritize restoration.'
       }
-      return 'System strain detected. Prioritize energy restoration before deploying further modules.'
+      return 'Biofield strain detected. Prioritize ATP restoration before deploying further modules.'
     }
 
     if (needsSupport === 'moderate') {
       if (logCtx.hoursSinceLastMood !== null && logCtx.hoursSinceLastMood > 6) {
-        return 'Moderate load detected. Mood data stale. Re-calibrate with a fresh check-in.'
+        return 'Moderate load detected. Biofield data stale. Re-calibrate with a fresh reading.'
       }
-      return 'Moderate load detected. Initialize self-care or mood calibration.'
+      return 'Moderate load detected. Initialize Cleanness module or biofield calibration.'
     }
 
     // Energy-based insights enriched with log data
     if (energy === 'depleted') {
       if (logCtx.todaySelfCareCount === 0) {
-        return 'Energy buffer depleted. No self-care logged today. Deploy restoration module.'
+        return 'ATP depleted. No Cleanness logged today. Deploy restoration module.'
       }
-      return 'Energy buffer depleted. Suspend deep processing. Focus on input restoration.'
+      return 'ATP depleted. Suspend deep processing. Focus on biofield restoration.'
     }
 
     if (energy === 'high' && clarity === 'focused') {
@@ -112,12 +112,12 @@ export function AIFeedbackWidget() {
     // Default — use log context for richer fallback
     if (energy === 'unknown') {
       if (logCtx.isEmpty) {
-        return 'No telemetry received. Begin with any module to initialize the system.'
+        return 'No biofeedback received. Begin with any CQGS module to initialize.'
       }
-      return 'Indexing signals. Additional telemetry will refine output.'
+      return 'Indexing signals. Additional biofeedback will refine output.'
     }
 
-    return 'System nominal. Continue current execution.'
+    return 'CQGS nominal. Continue current execution.'
   }
 
   // Generate guidance deeply grounded in log context
@@ -139,9 +139,9 @@ export function AIFeedbackWidget() {
 
     // State + log cross-reference
     if ((userState.energy === 'depleted' || userState.energy === 'low') && logCtx.todaySelfCareCount === 0) {
-      guidance.push('Energy low and no self-care today. Deploy self-care module to restore buffer.')
+      guidance.push('ATP low and no Cleanness today. Deploy Cleanness module to restore biofield.')
     } else if (userState.energy === 'depleted' || userState.energy === 'low') {
-      guidance.push('Prioritize energy restoration before further module deployment.')
+      guidance.push('Prioritize biofield restoration before further module deployment.')
     }
 
     if (userState.clarity === 'confused' && !logCtx.hasIntention) {
@@ -154,7 +154,7 @@ export function AIFeedbackWidget() {
 
     // Dormant module guidance
     if (logCtx.dormantModules.length >= 3) {
-      guidance.push(`${logCtx.dormantModules.length} modules dormant. Broaden input for richer pattern coverage.`)
+      guidance.push(`${logCtx.dormantModules.length} CQGS modules dormant. Broaden biofeedback for richer pattern coverage.`)
     }
 
     // Profile-based guidance

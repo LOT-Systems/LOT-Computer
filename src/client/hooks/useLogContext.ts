@@ -4,12 +4,13 @@ import dayjs from '#client/utils/dayjs'
 import type { Log } from '#shared/types'
 
 /**
- * useLogContext - Shared log analytics hook for cross-widget correlation
+ * useLogContext - CQGS Bioethics analytics hook for cross-widget correlation
  *
- * Provides computed metrics from user logs that multiple widgets can use
- * without duplicating calculation logic. Computes mood trends, activity
- * patterns, streaks, behavioral breakdowns, environment-time context,
- * recent content excerpts, and session-aware telemetry from the log history.
+ * Provides computed metrics from user logs aligned with CQGS Bioethics:
+ * Cleanness, Routine, Nutrition, and Laughter parameters.
+ * Computes biofield trends, activity patterns, streaks, behavioral
+ * breakdowns, environment-time context, recent content excerpts,
+ * and session-aware biofeedback from the log history.
  */
 export function useLogContext() {
   const { data: logs = [] } = useLogs()
@@ -65,7 +66,7 @@ export function useLogContext() {
         activeModules: [] as string[],
         dormantModules: [] as string[],
         engagementLevel: 'new' as 'new' | 'exploring' | 'building' | 'integrated' | 'mastered',
-        getContextualDirective: () => 'Initialize your first module to begin telemetry.',
+        getContextualDirective: () => 'Initialize your first CQGS module to begin biofeedback.',
       }
     }
 
@@ -241,32 +242,32 @@ export function useLogContext() {
       logs.length < 50 || widgetDiversity < 4 ? 'building' :
       logs.length < 100 || streak < 7 ? 'integrated' : 'mastered'
 
-    // Contextual directive generator based on all log-derived context
+    // CQGS contextual directive generator based on all log-derived context
     const getContextualDirective = (): string => {
       // Immediate time-gap based directives
       if (hoursSinceLastActivity !== null && hoursSinceLastActivity > 24) {
-        return 'Extended absence detected. Re-initialize with a mood check-in to recalibrate state.'
+        return 'Extended absence detected. Re-initialize with a biofield check-in to recalibrate state.'
       }
       if (hoursSinceLastActivity !== null && hoursSinceLastActivity > 8) {
-        return 'Session gap detected. Run a brief status scan to re-synchronize.'
+        return 'Session gap detected. Run a brief biofield scan to re-synchronize.'
       }
 
-      // Mood-gap directive
+      // Biofield-gap directive
       if (hoursSinceLastMood !== null && hoursSinceLastMood > 12) {
-        return 'Mood telemetry stale. Deploy emotional check-in for fresh state data.'
+        return 'Biofield telemetry stale. Deploy check-in for fresh state data.'
       }
       if (!hasMood && logs.length > 3) {
-        return 'No mood data in pipeline. Initialize mood interface to calibrate emotional telemetry.'
+        return 'No biofield data in pipeline. Initialize to calibrate emotional telemetry.'
       }
 
-      // Declining mood trend
+      // Declining biofield trend
       if (moodTrend === 'declining') {
-        return 'Declining mood trajectory detected. Deploy self-care module or reflective journaling.'
+        return 'Declining biofield trajectory. Deploy Cleanness module or reflective journaling.'
       }
 
       // Module coverage directives
       if (dormantModules.length >= 4) {
-        return `${dormantModules.length} modules dormant. Expand telemetry coverage for richer pattern compilation.`
+        return `${dormantModules.length} CQGS modules dormant. Expand biofeedback coverage for richer compilation.`
       }
       if (!hasMemory && logs.length > 10) {
         return 'Memory engine idle. Deploy to begin long-term pattern integration.'
@@ -275,36 +276,36 @@ export function useLogContext() {
         return 'No intention vector set. Initialize to calibrate alignment signals.'
       }
 
-      // Time-phase directives grounded in user data
+      // Time-phase directives grounded in CQGS Routine
       if (timePhase === 'morning' && todayActivity.length === 0) {
-        return 'Morning window open. Set an intention to initialize today\'s execution context.'
+        return 'Morning routine window open. Set an intention to initialize today\'s context.'
       }
       if (timePhase === 'evening' && todayMoodCount === 0) {
-        return 'Evening approaching. Log mood state before daily buffer flushes.'
+        return 'Evening approaching. Log biofield state before daily buffer flushes.'
       }
       if (timePhase === 'night' && sessionDepth > 5) {
-        return 'Extended night session. Consider winding down. State persists across sessions.'
+        return 'Extended night session. Consider winding down. The biofield compiles at rest.'
       }
 
       // High engagement directives
       if (sessionDepth > 10) {
-        return 'Deep session active. Maintain focus or deploy a brief self-care interrupt.'
+        return 'Deep session active. Maintain focus or deploy a Cleanness interrupt.'
       }
 
-      // Positive reinforcement directives
+      // Positive reinforcement — CQGS Citizen Index
       if (streak >= 7 && moodTrend === 'improving') {
-        return 'Streak and mood trajectory aligned. System compiling optimally.'
+        return 'Routine and biofield trajectory aligned. Citizen Index compiling optimally.'
       }
       if (todayActivity.length >= 5) {
-        return 'Strong input volume today. Patterns converging with higher fidelity.'
+        return 'Strong biofeedback volume today. Patterns converging with higher fidelity.'
       }
 
       // Default based on engagement level
-      if (engagementLevel === 'new') return 'System initializing. Continue input to bootstrap pattern recognition.'
-      if (engagementLevel === 'exploring') return 'Exploration phase active. Broaden module coverage for richer telemetry.'
-      if (engagementLevel === 'building') return 'Foundation compiling. Maintain consistency to accelerate pattern integration.'
-      if (engagementLevel === 'integrated') return 'Integrated state achieved. System operating at full observability.'
-      return 'Mastered runtime. All modules online and converging.'
+      if (engagementLevel === 'new') return 'CQGS initializing. Continue input to bootstrap pattern recognition.'
+      if (engagementLevel === 'exploring') return 'Exploration phase active. Broaden CQGS module coverage for richer biofeedback.'
+      if (engagementLevel === 'building') return 'Foundation compiling. Maintain routine to accelerate Bioethics Index.'
+      if (engagementLevel === 'integrated') return 'Integrated state achieved. CQGS operating at full observability.'
+      return 'Transparent citizen. All CQGS modules online and converging.'
     }
 
     return {

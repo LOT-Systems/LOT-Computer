@@ -9,9 +9,10 @@ import { useLogContext } from '#client/hooks/useLogContext'
 type QuantumView = 'state' | 'dimensions' | 'history'
 
 /**
- * Quantum State Widget - Real-time 4D user state from QIE cross-referenced with log context
- * Displays energy, clarity, alignment, and support needs as text-based meters
- * Cycles: State > Dimensions > History
+ * CQGS Quantum State Widget - Real-time 4D biofield state from QIE
+ * Displays ATP energy, clarity, alignment, and support needs as text-based meters.
+ * Cross-referenced with log context for biofeedback loop.
+ * Cycles: Biofield State > Signal Allocation > Signal Log
  */
 export function QuantumStateWidget() {
   const [view, setView] = React.useState<QuantumView>('state')
@@ -41,7 +42,7 @@ export function QuantumStateWidget() {
   if (engine.signals.length === 0) return null
 
   const label =
-    view === 'state' ? 'Quantum State:' :
+    view === 'state' ? 'Biofield State:' :
     view === 'dimensions' ? 'Signal Allocation:' :
     'Signal Log:'
 
@@ -119,10 +120,10 @@ export function QuantumStateWidget() {
     >
       {view === 'state' && (
         <div>
-          {/* 4D State with progress bars */}
+          {/* 4D Biofield State with progress bars */}
           <div className="flex flex-col gap-8 mb-16">
             <div className="flex items-center gap-8">
-              <span className="w-[80px]">Energy</span>
+              <span className="w-[80px]">ATP</span>
               <ProgressBars percentage={getEnergyPercent(userState.energy)} barCount={10} />
               <span className="capitalize">{userState.energy}</span>
             </div>
@@ -143,9 +144,9 @@ export function QuantumStateWidget() {
             </div>
           </div>
 
-          {/* Signal count enriched with log context */}
+          {/* Signal count enriched with log context — biofeedback loop */}
           <div className="opacity-30">
-            {engine.signals.length} signal{engine.signals.length === 1 ? '' : 's'} cached in local memory.
+            {engine.signals.length} signal{engine.signals.length === 1 ? '' : 's'} in biofeedback loop.
           </div>
           {!logCtx.isEmpty && (
             <div className="mt-4 opacity-30">
@@ -171,11 +172,11 @@ export function QuantumStateWidget() {
             }
           </div>
 
-          {/* Analysis metadata enriched with log context */}
+          {/* Analysis metadata — CQGS biofeedback loop */}
           <div className="opacity-30">
             {engine.lastAnalysis > 0
-              ? `Last compiled: ${formatTimeAgo(engine.lastAnalysis)} ago.`
-              : 'Awaiting initial compilation.'
+              ? `Last biofield compilation: ${formatTimeAgo(engine.lastAnalysis)} ago.`
+              : 'Awaiting initial biofield compilation.'
             }
           </div>
           {!logCtx.isEmpty && (

@@ -56,7 +56,7 @@ export const ContextualPromptsWidget = () => {
       prompts.push({
         type: 'insight' as const,
         title: 'Pattern shift detected',
-        message: 'Mood trajectory declining over recent check-ins. Consider deploying self-care or reflective journaling.',
+        message: 'Biofield trajectory declining over recent readings. Consider deploying Cleanness module or reflective journaling.',
         action: { label: 'Deploy', target: 'log' as const },
         priority: 8,
         triggeredBy: 'log-mood-declining'
@@ -66,8 +66,8 @@ export const ContextualPromptsWidget = () => {
     // Priority 4: Dormant module activation (log-derived)
     if (dormantModules.length > 0 && engagementLevel !== 'new') {
       const moduleLabelMap: Record<string, string> = {
-        'memory': 'Memory engine', 'mood': 'Mood interface', 'planner': 'Planner module',
-        'selfcare': 'Self-care module', 'intentions': 'Intention engine', 'journal': 'Journal module'
+        'memory': 'Memory engine', 'mood': 'Biofield interface', 'planner': 'Routine module',
+        'selfcare': 'Cleanness module', 'intentions': 'Intention engine', 'journal': 'Journal module'
       }
       const targetModule = dormantModules[0]
       const targetMap: Record<string, 'mood' | 'memory' | 'log' | 'sync'> = {

@@ -72,15 +72,15 @@ export function PatternRecognitionWidget() {
     return labels[timing] || timing
   }
 
-  // Module names
+  // CQGS module names
   const getWidgetLabel = (widget: string): string => {
     const labels: Record<string, string> = {
-      'selfcare': 'Self-care module',
-      'planner': 'Planner module',
+      'selfcare': 'Cleanness module',
+      'planner': 'Routine module',
       'intentions': 'Intention engine',
       'memory': 'Memory engine',
       'journal': 'Journal module',
-      'mood': 'Mood interface'
+      'mood': 'Biofield interface'
     }
     return labels[widget] || widget
   }

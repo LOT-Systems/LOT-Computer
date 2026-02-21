@@ -9,7 +9,9 @@ import { useLogContext } from '#client/hooks/useLogContext'
 type EnergyView = 'overview' | 'romantic' | 'needs' | 'correlation'
 
 /**
- * Energy Capacitor Widget - Tracks energy depletion/replenishment
+ * Biofield Capacitor Widget - Tracks ATP energy depletion/replenishment
+ * CQGS Bioethics: The health of the ATP cells, body heat, water quality,
+ * and nutrition regimen become visible and transparent through the biofield.
  * Cycles: Overview > Correlation > Romantic Connection > Needs
  */
 export function EnergyCapacitor() {
@@ -54,26 +56,26 @@ export function EnergyCapacitor() {
     const level = energyState.currentLevel
 
     if (level < 30 && ['anxious', 'overwhelmed', 'tired'].includes(mood)) {
-      return `Low energy aligns with ${mood} mood. Rest is the priority.`
+      return `Low ATP aligns with ${mood} biofield. Rest is the priority.`
     }
     if (level < 30 && ['calm', 'peaceful'].includes(mood)) {
-      return `Low energy but calm mood. Gentle replenishment works best.`
+      return `Low ATP but calm biofield. Gentle replenishment works best.`
     }
     if (level > 70 && ['energized', 'excited', 'hopeful'].includes(mood)) {
-      return `High energy matches positive mood. Good conditions for deep work.`
+      return `High ATP matches positive biofield emission. Good conditions for deep work.`
     }
     if (level > 70 && ['anxious', 'restless'].includes(mood)) {
-      return `High energy but unsettled mood. Channel energy with intention.`
+      return `High ATP but unsettled biofield. Channel energy with intention.`
     }
     if (level >= 30 && level <= 70) {
-      return `Moderate energy. ${logCtx.moodTrend === 'improving' ? 'Mood is trending positive.' : logCtx.moodTrend === 'declining' ? 'Watch the mood trend.' : 'Steady state.'}`
+      return `Moderate ATP. ${logCtx.moodTrend === 'improving' ? 'Biofield trending positive.' : logCtx.moodTrend === 'declining' ? 'Watch the biofield trend.' : 'Steady state.'}`
     }
     return null
   }
 
   const label =
-    view === 'overview' ? 'Energy:' :
-    view === 'correlation' ? 'Energy + Mood:' :
+    view === 'overview' ? 'Biofield:' :
+    view === 'correlation' ? 'Biofield + Mood:' :
     view === 'romantic' ? 'Connection:' :
     'Needs:'
 
@@ -107,10 +109,10 @@ export function EnergyCapacitor() {
             </div>
           )}
 
-          {/* Burnout warning */}
+          {/* Burnout warning - biofield depletion forecast */}
           {energyState.daysUntilBurnout !== null && energyState.daysUntilBurnout <= 7 && (
             <div className="mb-8">
-              Estimated {energyState.daysUntilBurnout} day{energyState.daysUntilBurnout === 1 ? '' : 's'} until buffer overflow.
+              Estimated {energyState.daysUntilBurnout} day{energyState.daysUntilBurnout === 1 ? '' : 's'} until biofield depletion.
             </div>
           )}
 
@@ -132,7 +134,7 @@ export function EnergyCapacitor() {
             </div>
           ) : (
             <div className="mb-8 opacity-30">
-              Record mood check-ins to see energy-mood correlation.
+              Log biofield readings to see ATP-mood correlation.
             </div>
           )}
 
@@ -146,17 +148,17 @@ export function EnergyCapacitor() {
           {/* Suggestion based on combined state */}
           {energyState.currentLevel < 40 && logCtx.hasSelfCare && (
             <div className="opacity-30">
-              Deploy self-care module to restore energy buffer.
+              Deploy Cleanness module to restore biofield buffer.
             </div>
           )}
           {energyState.currentLevel < 40 && !logCtx.hasSelfCare && (
             <div className="opacity-30">
-              Initialize self-care module to build energy awareness.
+              Initialize Cleanness module to build biofield awareness.
             </div>
           )}
           {energyState.currentLevel >= 70 && !logCtx.hasMemory && (
             <div className="opacity-30">
-              Energy buffer high. Optimal window for Memory Engine integration.
+              Biofield high. Optimal window for Memory Engine integration.
             </div>
           )}
         </div>
@@ -182,7 +184,7 @@ export function EnergyCapacitor() {
               </div>
               {energyState.romanticConnection.needsAttention && (
                 <div>
-                  Your heart needs tending.
+                  Partnership needs tending. Bioethics parameter.
                 </div>
               )}
             </>

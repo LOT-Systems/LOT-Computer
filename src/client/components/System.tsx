@@ -395,7 +395,7 @@ export const System = () => {
             astrologyView === 'astrology' ? "Astrology:" :
             astrologyView === 'psychology' ? "Psychology:" :
             astrologyView === 'journey' ? "My Journey:" :
-            "Quantum:"
+            "Biofield:"
           }
           onLabelClick={() => {
             // Cycle through: Astrology → Psychology → Journey → Quantum → Astrology
@@ -423,7 +423,7 @@ export const System = () => {
           ) : (
             <Table
               data={[
-                { metric: 'Energy', value: quantumState.energy },
+                { metric: 'ATP', value: quantumState.energy },
                 { metric: 'Clarity', value: quantumState.clarity },
                 { metric: 'Alignment', value: quantumState.alignment }
               ]}
@@ -459,18 +459,18 @@ export const System = () => {
         <InterventionsWidget />
       </div>
 
-      {/* Growth stack */}
+      {/* CQGS Bioethics stack */}
       <div>
-        {/* Energy Capacitor - Track energy depletion/replenishment */}
+        {/* Biofield Capacitor - Track ATP energy depletion/replenishment */}
         <EnergyCapacitor />
 
-        {/* Narrative - RPG-style story progression and achievements */}
+        {/* Narrative - Story progression and achievements */}
         <NarrativeWidget />
 
-        {/* Evolution - Minimalist profile growth indicators */}
+        {/* Citizen Index - CQGS growth indicators */}
         <EvolutionWidget />
 
-        {/* Interface Evolution - Spiritual/psychological progression & feature unlocks */}
+        {/* Interface Evolution - Progression & feature unlocks */}
         <InterfaceEvolutionWidget />
 
         {/* Evolution Milestone Toast - Subtle notifications for progression milestones */}
@@ -542,11 +542,11 @@ export const System = () => {
 
       <RecipeWidget />
 
-      {/* Mood Check-In - Show every 3 hours max, context-based on time of day */}
+      {/* Biofield Check-In - Show every 3 hours max, context-based on time of day */}
       {/* Widget controls its own visibility internally to allow farewell animations */}
       <EmotionalCheckIn />
 
-      {/* Self-care Moments - Show during rest/refresh times OR when intention engine detects need */}
+      {/* Cleanness Module - Show during rest/refresh times OR when intention engine detects need */}
       {(() => {
         const hour = new Date().getHours()
         const isMidMorning = hour >= 10 && hour < 12 // Pre-lunch break
@@ -681,7 +681,7 @@ export const System = () => {
         <MicroCalculatorWidget />
       </div>
 
-      {/* Quantum Intent Engine Widgets */}
+      {/* CQGS Biofield Engine Widgets */}
       <div>
         <QuantumStateWidget />
         <PatternRecognitionWidget />
@@ -689,9 +689,9 @@ export const System = () => {
         <SignalStreamWidget />
       </div>
 
-      {/* System stack */}
+      {/* CQGS Dashboard stack */}
       <div>
-        {/* User Metrics - Personal OS health, performance, version */}
+        {/* CQGS Dashboard - Bioethics health, performance, version */}
         <UserMetricsWidget />
 
         {/* System Progress - Deployment info with feedback */}

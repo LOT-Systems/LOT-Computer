@@ -19,9 +19,11 @@ type CareSuggestion = {
 }
 
 /**
- * Self-care Moments Widget – Context-aware recommendations
- * Pattern: Suggestion > Why This > Practice
- * Adapts based on: emotional state, weather, archetype, time
+ * Cleanness Widget – CQGS Bioethics self-care module
+ * Pattern: Cleanness > Why This > Practice
+ * Adapts based on: biofield state, weather, archetype, time
+ * CQGS Bioethics: Cleanness is the first pillar — care of the self,
+ * hygiene, environment, and the daily routine that sustains the biofield.
  */
 export function SelfCareMoments() {
   const [view, setView] = React.useState<CareView>('suggestion')
@@ -237,7 +239,7 @@ export function SelfCareMoments() {
 
   if (!currentSuggestion) {
     return (
-      <Block label="Self-care:" blockView>
+      <Block label="Cleanness:" blockView>
         <div className="opacity-30">Loading suggestion...</div>
       </Block>
     )
@@ -246,7 +248,7 @@ export function SelfCareMoments() {
   if (!isVisible) return null
 
   const label =
-    view === 'suggestion' ? 'Self-care:' :
+    view === 'suggestion' ? 'Cleanness:' :
     view === 'why' ? 'Why This:' :
     'Practice:'
 
@@ -282,10 +284,10 @@ export function SelfCareMoments() {
             const quantumReason = localStorage.getItem('selfcare-quantum-reason')
             // Log-context-grounded reason when quantum reason is absent
             const contextReason = !quantumReason && !logCtx.isEmpty
-              ? (logCtx.moodTrend === 'declining' ? 'Mood trajectory declining. Restoration recommended.'
+              ? (logCtx.moodTrend === 'declining' ? 'Biofield trajectory declining. Cleanness protocol recommended.'
                 : logCtx.hoursSinceLastActivity !== null && logCtx.hoursSinceLastActivity > 6 ? 'Extended gap since last signal. Re-engage gently.'
-                : logCtx.todaySelfCareCount > 0 ? `${logCtx.todaySelfCareCount} self-care session${logCtx.todaySelfCareCount === 1 ? '' : 's'} logged today.`
-                : logCtx.timePhase === 'evening' ? 'Evening phase. Restoration supports overnight compilation.'
+                : logCtx.todaySelfCareCount > 0 ? `${logCtx.todaySelfCareCount} cleanness session${logCtx.todaySelfCareCount === 1 ? '' : 's'} logged today.`
+                : logCtx.timePhase === 'evening' ? 'Evening phase. Restoration supports overnight biofield compilation.'
                 : null)
               : null
             return (quantumReason || contextReason) ? (
@@ -363,8 +365,9 @@ export function SelfCareMoments() {
 }
 
 /**
- * Generate contextual care suggestion based on multiple factors
+ * Generate contextual cleanness suggestion based on CQGS Bioethics framework
  * Language adapts based on user's practice level (streak)
+ * Pillars: Cleanness, Routine, Nutrition, Laughter
  */
 function generateContextualSuggestion(
   weatherDesc?: string,
@@ -582,8 +585,8 @@ function generateContextualSuggestion(
         duration: '2 mins'
       },
       {
-        action: useTechLanguage || preferTechLanguage ? 'Clear cache: clean one surface' : 'Morning space clearing: clean one surface',
-        why: 'Clean space creates mental clarity. One clear surface changes the energy.',
+        action: useTechLanguage || preferTechLanguage ? 'Cleanness protocol: clear one surface' : 'Morning space clearing: clean one surface',
+        why: 'Cleanness is the first pillar of Bioethics. One clear surface changes the biofield.',
         practice: 'Choose one surface (desk, counter, nightstand).\nClear everything off.\nWipe it clean.\nPlace back only what serves you.\nNotice the clarity.',
         duration: '5 mins'
       },
@@ -595,7 +598,7 @@ function generateContextualSuggestion(
       },
       {
         action: 'Korean facial cleansing ritual',
-        why: 'Cleansing is both physical and symbolic. It releases what you carried from yesterday.',
+        why: 'Cleanness begins with the body. Cleansing releases what you carried from yesterday.',
         practice: 'Wash face with warm water.\nGentle circular motions.\nSplash with cool water.\nPat dry softly.\nSay: "I begin fresh."',
         duration: '3 mins'
       }
@@ -642,8 +645,8 @@ function generateContextualSuggestion(
         duration: '5 mins'
       },
       {
-        action: useTechLanguage || preferTechLanguage ? 'Clear daily cache: reset your environment' : 'Evening space reset: clear what accumulated today',
-        why: 'Physical clutter mirrors mental clutter. Evening clearing creates morning ease.',
+        action: useTechLanguage || preferTechLanguage ? 'Cleanness flush: reset your environment' : 'Evening space reset: clear what accumulated today',
+        why: 'Cleanness of the household is a Bioethics parameter. Evening clearing creates morning ease.',
         practice: 'Spend 5 minutes resetting your space.\nPut items back where they belong.\nClear one surface.\nPrepare for tomorrow.\nNotice the calm.',
         duration: '5 mins'
       },
@@ -692,7 +695,7 @@ function generateContextualSuggestion(
       },
       {
         action: 'Drink a glass of water mindfully',
-        why: 'Hydration affects everything. Mindfulness deepens the care.',
+        why: 'The quality of water is a biofield parameter. Hydration affects everything.',
         practice: 'Get water.\nHold the glass.\nTake slow sips.\nFeel the water nourishing you.\nSay thank you to your body.',
         duration: '2 mins'
       },
@@ -722,7 +725,7 @@ function generateContextualSuggestion(
       },
       {
         action: 'Mindful cleaning: wash one dish slowly',
-        why: 'Cleaning is meditation when done with full attention. Clarity comes through care.',
+        why: 'Cleanness is meditation when done with full attention. A handmade meal starts with a clean surface.',
         practice: 'Choose one dish.\nFeel the warm water.\nNotice the soap, the movements.\nMake it a meditation.\nFinish with gratitude.',
         duration: '3 mins'
       },
@@ -776,13 +779,13 @@ function generateContextualSuggestion(
       },
       {
         action: 'Golden milk moment (Indian tradition)',
-        why: 'Turmeric, warm milk, and spices calm inflammation and signal comfort to your body.',
+        why: 'Nutrition is a biofield parameter. Turmeric calms inflammation and signals comfort to the body.',
         practice: 'Make warm milk with turmeric and honey.\nStir slowly.\nCup in both hands.\nSip with full attention.\nFeel the warmth spread.',
         duration: '5 mins'
       },
       {
         action: 'Clear one surface as sacred space',
-        why: 'Every cleared space is a sanctuary. Creating it is a practice of devotion.',
+        why: 'Household Cleanness is a Bioethics Index parameter. Every cleared space is a sanctuary.',
         practice: 'Choose one surface.\nRemove everything.\nWipe clean.\nPlace only one meaningful object.\nSit nearby and breathe.',
         duration: '5 mins'
       },

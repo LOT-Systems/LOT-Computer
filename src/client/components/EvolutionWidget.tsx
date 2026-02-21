@@ -8,10 +8,11 @@ import { ProgressBars, getStoicProgressLabel } from '#client/utils/progressBars'
 import { useLogContext } from '#client/hooks/useLogContext'
 
 /**
- * Evolution Widget - Minimalist Profile Growth Indicators
+ * Citizen Index Widget - CQGS Growth Indicators
  *
- * Shows how user's profile is evolving through pure numbers and minimal indicators
- * Displays growth metrics in an elegant, creature-evolution style
+ * Tracks the citizen's progression through the CQGS Bioethics framework.
+ * The Citizen Index reflects transparency, routine consistency, cleanness,
+ * and biofield engagement — compounding into the Bioethics Index.
  */
 export const EvolutionWidget: React.FC = () => {
   const me = useStore(stores.me)
@@ -74,9 +75,9 @@ export const EvolutionWidget: React.FC = () => {
   // Show last 2 digits as progress indicator
   const xpProgress = totalXP % 100
 
-  // Determine evolution stage based on level
+  // Determine citizen stage based on level (CQGS progression)
   const getEvolutionStage = (level: number): string => {
-    if (level >= 50) return 'Deployed'
+    if (level >= 50) return 'Transparent'
     if (level >= 40) return 'Optimized'
     if (level >= 30) return 'Compiled'
     if (level >= 20) return 'Integrated'
@@ -86,19 +87,19 @@ export const EvolutionWidget: React.FC = () => {
 
   const stage = getEvolutionStage(currentLevel)
 
-  // Activity breakdown labels
+  // Activity breakdown labels (CQGS module mapping)
   const activityLabels: Record<string, string> = {
     'answer': 'Memory',
-    'emotional_checkin': 'Mood',
-    'plan_set': 'Planner',
-    'self_care_complete': 'Self-care',
+    'emotional_checkin': 'Biofield',
+    'plan_set': 'Routine',
+    'self_care_complete': 'Cleanness',
     'intention': 'Intention',
     'note': 'Journal',
     'quantum_intent_signal': 'QIE signal',
   }
 
   return (
-    <Block label={view === 'metrics' ? 'Evolution:' : 'Activity:'} blockView onLabelClick={cycleView}>
+    <Block label={view === 'metrics' ? 'Citizen Index:' : 'Activity:'} blockView onLabelClick={cycleView}>
       {view === 'activity' && (
         <div>
           {/* Activity type breakdown */}
@@ -192,7 +193,7 @@ export const EvolutionWidget: React.FC = () => {
         {/* Reflection on progress */}
         {currentLevel > 1 && (
           <div className="mt-24 opacity-30">
-            Consistent input accelerates compilation.
+            Consistent routine accelerates Bioethics Index compilation.
           </div>
         )}
       </div>}

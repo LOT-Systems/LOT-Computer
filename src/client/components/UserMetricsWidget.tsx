@@ -7,8 +7,9 @@ import { useLogContext } from '#client/hooks/useLogContext'
 type MetricsView = 'status' | 'performance' | 'version'
 
 /**
- * UserMetricsWidget - Personal operating system metrics cross-referenced with log context
- * Shows health, performance, version progression from OS API enriched with user log data
+ * CQGS Dashboard Widget - Personal operating system metrics
+ * Shows Bioethics health, performance, version progression from OS API
+ * enriched with user log data and biofeedback loop.
  * Cycles: Status > Performance > Version
  */
 export function UserMetricsWidget() {
@@ -35,7 +36,7 @@ export function UserMetricsWidget() {
   if (!status) return null
 
   const label =
-    view === 'status' ? 'System Health:' :
+    view === 'status' ? 'CQGS Health:' :
     view === 'performance' ? 'Performance Benchmark:' :
     'Runtime Version:'
 
@@ -80,10 +81,10 @@ export function UserMetricsWidget() {
             <span className="tabular-nums">{status.metrics.totalInteractions}</span>
           </div>
 
-          {/* Log-derived context */}
+          {/* Biofeedback loop context */}
           {!logCtx.isEmpty && (
             <div className="opacity-30 mt-8">
-              {logCtx.todayActivity.length} signal{logCtx.todayActivity.length === 1 ? '' : 's'} today • {logCtx.activeModules.length}/6 modules active
+              {logCtx.todayActivity.length} signal{logCtx.todayActivity.length === 1 ? '' : 's'} today • {logCtx.activeModules.length}/6 CQGS modules active
             </div>
           )}
         </div>
@@ -130,7 +131,7 @@ export function UserMetricsWidget() {
       {view === 'performance' && !performance && (
         <div>
           <div className="opacity-30">
-            Insufficient telemetry for performance benchmarks.
+            Insufficient biofeedback for performance benchmarks.
             {!logCtx.isEmpty && logCtx.totalEntries < 10 ? ` ${logCtx.totalEntries} entries logged. Continue input.` : ''}
           </div>
         </div>

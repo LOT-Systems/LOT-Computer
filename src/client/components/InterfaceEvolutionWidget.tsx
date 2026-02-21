@@ -1,9 +1,9 @@
 /**
- * Interface Evolution Widget
+ * Bioethics Evolution Widget
  *
- * Displays current interface evolution state, feature unlocks,
- * and progression through spiritual/psychological dimensions.
- * Enriched with user log context for grounded evolution metrics.
+ * Displays current CQGS evolution state, feature unlocks,
+ * and progression through Bioethics dimensions.
+ * Enriched with user log context for grounded biofeedback metrics.
  */
 
 import React from 'react';
