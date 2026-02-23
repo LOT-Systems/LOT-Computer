@@ -76,12 +76,11 @@ export class User
   }
 
   canAccessUsSection(): boolean {
-    // Admin, Usership, and R&D users can access /us section and admin API
+    // Admin and Usership users can access /us section and admin API
     return (
       this.isAdmin() ||
       this.tags.some((tag) =>
-        tag.toLowerCase() === 'usership' ||
-        tag.toLowerCase() === 'rnd'
+        tag.toLowerCase() === 'usership'
       )
     )
   }
