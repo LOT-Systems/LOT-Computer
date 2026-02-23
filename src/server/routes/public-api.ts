@@ -901,7 +901,8 @@ export default async (fastify: FastifyInstance) => {
           const boardMemberNumber = usershipMembers.findIndex(u => u.id === user.id) + 1
           const totalUsers = allUsers.length
           const usershipCount = usershipMembers.length
-          const poweringCitizens = Math.max(0, totalUsers - usershipCount)
+          const freeCitizens = Math.max(0, totalUsers - usershipCount)
+          const poweringCitizens = usershipCount > 0 ? Math.round(freeCitizens / usershipCount) : 0
 
           // Tenure and investment
           const joinDate = user.joinedAt || user.createdAt
