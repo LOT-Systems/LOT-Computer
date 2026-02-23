@@ -3,6 +3,8 @@ import { sequelize } from '#server/utils/db'
 import { models } from '#server/models'
 import * as weather from '#server/utils/weather'
 import { extractUserTraits, determineUserCohort } from '#server/utils/memory'
+import { aiEngineManager } from '#server/utils/ai-engines'
+import { AI_ENGINE_PREFERENCE } from '#server/utils/memory/constants'
 import config from '#server/config'
 import { toCelsius } from '#shared/utils'
 import fs from 'fs'
@@ -881,6 +883,77 @@ export default async (fastify: FastifyInstance) => {
         profile.psychologicalProfile = {
           hasUsership: false,
           message: 'Subscribe to Usership to unlock profile analysis'
+        }
+      }
+
+      // Add board profile for Usership members
+      if (hasUsershipTag) {
+        try {
+          // Board member number: sequential ordering by joinedAt among Usership users
+          const allUsers = await models.User.findAll()
+          const usershipMembers = allUsers
+            .filter(u => u.tags?.some(t => t.toLowerCase() === 'usership'))
+            .sort((a, b) => {
+              const dateA = a.joinedAt || a.createdAt
+              const dateB = b.joinedAt || b.createdAt
+              return new Date(dateA).getTime() - new Date(dateB).getTime()
+            })
+          const boardMemberNumber = usershipMembers.findIndex(u => u.id === user.id) + 1
+          const totalUsers = allUsers.length
+          const usershipCount = usershipMembers.length
+          const poweringCitizens = Math.max(0, totalUsers - usershipCount)
+
+          // Tenure and investment
+          const joinDate = user.joinedAt || user.createdAt
+          const boardTenureMonths = dayjs().diff(dayjs(joinDate), 'month')
+          const totalInvested = Math.max(1, boardTenureMonths) * 99
+
+          // Biofield state from quantum intent metadata
+          const meta = user.metadata as any
+          const quantumState = meta?.quantumIntentState
+          const biofieldState = quantumState?.energy && quantumState.energy !== 'unknown' ? {
+            energy: quantumState.energy,
+            clarity: quantumState.clarity || 'balanced',
+            alignment: quantumState.alignment || 'searching',
+          } : undefined
+
+          // Activity stats
+          const totalLogs = await models.Log.count({ where: { userId: user.id } })
+          const answerCount = await models.Log.count({ where: { userId: user.id, event: 'answer' } })
+          const noteCount = await models.Log.count({ where: { userId: user.id, event: 'note' } })
+          const allLogs = await models.Log.findAll({
+            where: { userId: user.id },
+            attributes: ['createdAt'],
+          })
+          const activeDays = new Set(allLogs.map(l => dayjs(l.createdAt).format('YYYY-MM-DD'))).size
+
+          // Memory engine name
+          let memoryEngineName = 'Standard'
+          try {
+            const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
+            memoryEngineName = `AI-Powered (${engine.name})`
+          } catch {
+            memoryEngineName = 'AI-Powered'
+          }
+
+          profile.boardProfile = {
+            boardMemberNumber,
+            citizenSince: dayjs(joinDate).format('MMMM YYYY'),
+            poweringCitizens,
+            boardTenureMonths,
+            totalInvested,
+            biofieldState,
+            activity: {
+              memoriesCompiled: answerCount,
+              journalEntries: noteCount,
+              activeDays,
+            },
+            memoryEngine: memoryEngineName,
+            clearanceLevel: 'Full',
+            totalEntries: totalLogs,
+          }
+        } catch (boardError: any) {
+          console.error('[PUBLIC-PROFILE-API] Board profile error:', boardError.message)
         }
       }
 

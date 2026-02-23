@@ -276,6 +276,45 @@ export const PublicProfile = () => {
           </div>
         )}
 
+        {/* Usership Board Profile */}
+        {profile.boardProfile && (
+          <div>
+            <Block label="Citizen Index:" blockView>
+              {[
+                `Board Member #${profile.boardProfile.boardMemberNumber}`,
+                `Citizen since ${profile.boardProfile.citizenSince}`,
+                `Powering ${formatNumberWithCommas(profile.boardProfile.poweringCitizens)} citizens`,
+                `Board tenure ${profile.boardProfile.boardTenureMonths} months`,
+              ].join(' • ')}
+            </Block>
+            <Block label="Total invested:">
+              ${formatNumberWithCommas(profile.boardProfile.totalInvested)}
+            </Block>
+            {profile.boardProfile.biofieldState && (
+              <Block label="Biofield State:">
+                {[
+                  profile.boardProfile.biofieldState.clarity,
+                  profile.boardProfile.biofieldState.alignment,
+                  `${profile.boardProfile.biofieldState.energy} energy`,
+                ].map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' • ')}
+              </Block>
+            )}
+            <Block label="Activity:">
+              {[
+                `${formatNumberWithCommas(profile.boardProfile.activity.memoriesCompiled)} memories compiled`,
+                `${formatNumberWithCommas(profile.boardProfile.activity.journalEntries)} journal entries`,
+                `${formatNumberWithCommas(profile.boardProfile.activity.activeDays)} active days`,
+              ].join(' • ')}
+            </Block>
+            <Block label="Memory Engine:">
+              {profile.boardProfile.memoryEngine}
+            </Block>
+            <Block label="Clearance level:">
+              {profile.boardProfile.clearanceLevel} ({formatNumberWithCommas(profile.boardProfile.totalEntries)} entries)
+            </Block>
+          </div>
+        )}
+
         {/* Status items */}
         <div>
           {privacySettings.showLocalTime && profile.localTime && (

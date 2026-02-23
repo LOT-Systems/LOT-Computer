@@ -287,6 +287,27 @@ export type PublicProfile = {
       challenging: number;
     };
   };
+  // Usership board profile (exclusive to Usership members)
+  boardProfile?: {
+    boardMemberNumber: number;
+    citizenSince: string; // e.g. "February 2025"
+    poweringCitizens: number;
+    boardTenureMonths: number;
+    totalInvested: number; // $ amount
+    biofieldState?: {
+      energy: string;
+      clarity: string;
+      alignment: string;
+    };
+    activity: {
+      memoriesCompiled: number;
+      journalEntries: number;
+      activeDays: number;
+    };
+    memoryEngine: string; // e.g. "AI-Powered (Together.AI)"
+    clearanceLevel: string; // e.g. "Full"
+    totalEntries: number;
+  };
 };
 
 // Other Types
