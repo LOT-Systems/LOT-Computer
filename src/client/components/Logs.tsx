@@ -14,6 +14,7 @@ import {
   USER_SETTING_NAMES,
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
+import { toCelsius } from '#shared/utils'
 
 const localStore = {
   logById: map<Record<string, Log>>({}),
@@ -265,7 +266,7 @@ export const Logs: React.FC = () => {
                   </div>
                 )}
                 {log.context?.temperature && (
-                  <div>Temperature: {Math.round(log.context.temperature - 273.15)}°C</div>
+                  <div>Temperature: {Math.round(toCelsius(log.context.temperature))}°C</div>
                 )}
                 {log.context?.humidity && (
                   <div>Humidity: {log.context.humidity}%</div>
@@ -442,7 +443,7 @@ const NoteEditor = ({
     if (!log?.context) return ''
     const weatherParts: string[] = []
     if (log.context?.temperature) {
-      const celsius = log.context.temperature - 273.15
+      const celsius = toCelsius(log.context.temperature)
       weatherParts.push(`${Math.round(celsius)}°C`)
     }
     if (log.context?.humidity) {
@@ -536,7 +537,7 @@ const LogContainer: React.FC<{
   const contextText = React.useMemo(() => {
     const weatherParts: string[] = []
     if (log.context?.temperature) {
-      const celsius = log.context.temperature - 273.15
+      const celsius = toCelsius(log.context.temperature)
       weatherParts.push(`${Math.round(celsius)}°C`)
     }
     if (log.context?.humidity) {

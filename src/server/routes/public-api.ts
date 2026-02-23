@@ -4,6 +4,7 @@ import { models } from '#server/models'
 import * as weather from '#server/utils/weather'
 import { extractUserTraits, determineUserCohort } from '#server/utils/memory'
 import config from '#server/config'
+import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
@@ -730,7 +731,7 @@ export default async (fastify: FastifyInstance) => {
           if (weatherResponse && weatherResponse.weather) {
             const w = weatherResponse.weather as any
             profile.weather = {
-              temperature: w.tempKelvin ? w.tempKelvin - 273.15 : null,
+              temperature: w.tempKelvin ? toCelsius(w.tempKelvin) : null,
               humidity: w.humidity,
               description: w.description,
               windSpeed: w.windSpeed,

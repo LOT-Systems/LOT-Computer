@@ -15,6 +15,6 @@ export class EventEmitter {
 export const fp = {
     pipe: (...fns) => (x) => fns.reduce((v, f) => f(v), x),
 };
-export function toCelsius(fahrenheit) {
-    return ((fahrenheit - 32) * 5) / 9;
+export function toCelsius(kelvin) {
+    return kelvin - 273.15;
 }

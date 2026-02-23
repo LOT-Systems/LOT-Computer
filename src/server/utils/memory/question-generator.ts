@@ -15,6 +15,7 @@ import {
   UserSettings,
   UserTag,
 } from '#shared/types'
+import { toCelsius } from '#shared/utils'
 import { getLogContext } from '../logs.js'
 import { aiEngineManager } from '../ai-engines.js'
 import { extractGoals, type ExtractedGoal } from '../goal-understanding.js'
@@ -211,7 +212,7 @@ export async function buildPrompt(
       contextLine = `It is ${localDate} in ${context.city}, ${country}`
     }
     if (context.temperature && context.humidity) {
-      const tempC = Math.round(context.temperature - 273.15)
+      const tempC = Math.round(toCelsius(context.temperature))
       const weatherDesc = context.weatherDescription ? ` The weather is: ${context.weatherDescription}.` : ''
       contextLine += `, with a current temperature of ${tempC}℃ and humidity at ${Math.round(context.humidity)}%.${weatherDesc}`
     } else {
@@ -903,7 +904,7 @@ function formatLog(log: Log): string {
       : ''
   const temperature =
     date && log.context.temperature
-      ? `T:${Math.round(log.context.temperature - 273.15)}℃`
+      ? `T:${Math.round(toCelsius(log.context.temperature))}℃`
       : ''
   const humidity =
     date && log.context.humidity ? `H:${Math.round(log.context.humidity)}%` : ''

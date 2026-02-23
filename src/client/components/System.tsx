@@ -115,8 +115,7 @@ export const System = () => {
 
   const temperature = React.useMemo(() => {
     if (!weather || !weather.tempKelvin) return null
-    // Convert from Kelvin to Celsius or Fahrenheit
-    const celsius = weather.tempKelvin - 273.15
+    const celsius = toCelsius(weather.tempKelvin)
     return Math.round(
       isTempFahrenheit ? toFahrenheit(celsius) : celsius
     )
@@ -221,7 +220,7 @@ export const System = () => {
   // Weather suggestion based on temperature (stable - doesn't change on re-render)
   const weatherSuggestion = React.useMemo(() => {
     if (!weather || !weather.tempKelvin) return null
-    const celsius = weather.tempKelvin - 273.15
+    const celsius = toCelsius(weather.tempKelvin)
 
     const suggestions = {
       cold: [
