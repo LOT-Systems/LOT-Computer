@@ -173,7 +173,7 @@ export const PublicProfile = () => {
     .join(' ') || 'Anonymous'
 
   // Format current date
-  const currentDate = dayjs().format('dddd, D MMMM, YYYY')
+  const currentDate = dayjs().format('[Week] w, dddd, MMMM D')
 
   // Check if profile is private
   if (profile.isPrivate) {
