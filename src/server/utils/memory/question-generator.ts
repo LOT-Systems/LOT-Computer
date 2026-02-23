@@ -15,7 +15,6 @@ import {
   UserSettings,
   UserTag,
 } from '#shared/types'
-import { toCelsius } from '#shared/utils'
 import { getLogContext } from '../logs.js'
 import { aiEngineManager } from '../ai-engines.js'
 import { extractGoals, type ExtractedGoal } from '../goal-understanding.js'
@@ -209,14 +208,22 @@ export async function buildPrompt(
   if (localDate && context.city && context.country) {
     const country = COUNTRY_BY_ALPHA3[context.country]?.name || ''
     if (country) {
-      contextLine = `It is ${localDate} in ${context.city}, ${context.country}`
+      contextLine = `It is ${localDate} in ${context.city}, ${country}`
     }
     if (context.temperature && context.humidity) {
-      const tempC = Math.round(toCelsius(context.temperature))
+      const tempC = Math.round(context.temperature - 273.15)
       const weatherDesc = context.weatherDescription ? ` The weather is: ${context.weatherDescription}.` : ''
       contextLine += `, with a current temperature of ${tempC}℃ and humidity at ${Math.round(context.humidity)}%.${weatherDesc}`
     } else {
-      contextLine += '.'
+      // No weather data cached — derive season from date to prevent weather-inappropriate questions
+      const localMonth = context.timeZone
+        ? dayjs().tz(context.timeZone).month() + 1
+        : new Date().getMonth() + 1
+      const season =
+        localMonth >= 3 && localMonth <= 5 ? 'spring' :
+        localMonth >= 6 && localMonth <= 8 ? 'summer' :
+        localMonth >= 9 && localMonth <= 11 ? 'autumn' : 'winter'
+      contextLine += ` (${season}).`
     }
   }
 
@@ -772,7 +779,7 @@ ${contextLine ? 'Current context to consider:' : ''}
 ${contextLine}
 ${
   contextLine
-    ? 'Ensure the question is appropriate for this time and setting. Be direct and personal, focusing on the user\'s personality and habits.'
+    ? 'Ensure the question is appropriate for this time, location, season, and weather. NEVER reference weather conditions (snow, rain, cold, heat) that contradict the current context. Be direct and personal, focusing on the user\'s personality and habits.'
     : ''
 }
 
@@ -896,7 +903,7 @@ function formatLog(log: Log): string {
       : ''
   const temperature =
     date && log.context.temperature
-      ? `T:${Math.round(toCelsius(log.context.temperature))}℃`
+      ? `T:${Math.round(log.context.temperature - 273.15)}℃`
       : ''
   const humidity =
     date && log.context.humidity ? `H:${Math.round(log.context.humidity)}%` : ''
