@@ -45,10 +45,8 @@ import { generateCompassionateInterventions, shouldShowIntervention } from '#ser
 import dayjs from '#server/utils/dayjs'
 import { registerOSRoutes } from './os-api.js'
 
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
+// =====================================================================// Helper Functions
+// =====================================================================
 /**
  * Generate compassionate response based on emotional state
  */
@@ -1618,10 +1616,8 @@ export default async (fastify: FastifyInstance) => {
     }
   )
 
-  // ============================================================================
-  // EMOTIONAL CHECK-IN ENDPOINT
-  // ============================================================================
-  fastify.post(
+  // =====================================================================  // EMOTIONAL CHECK-IN ENDPOINT
+  // =====================================================================  fastify.post(
     '/emotional-checkin',
     async (
       req: FastifyRequest<{
@@ -2090,10 +2086,8 @@ export default async (fastify: FastifyInstance) => {
         }
       })
 
-      // ============================================================================
-      // WEEKLY SUMMARY CHECK (Priority over regular questions)
-      // ============================================================================
-      // Check if it's time for weekly summary (Sunday or Monday, once per week)
+      // =====================================================================      // WEEKLY SUMMARY CHECK (Priority over regular questions)
+      // =====================================================================      // Check if it's time for weekly summary (Sunday or Monday, once per week)
       let lastWeeklySummary = null
       try {
         lastWeeklySummary = await fastify.models.Answer.findOne({
@@ -2252,11 +2246,9 @@ export default async (fastify: FastifyInstance) => {
         }
       }
 
-      // ============================================================================
-      // DEFAULT QUESTIONS FALLBACK
+      // =====================================================================      // DEFAULT QUESTIONS FALLBACK
       // Used for non-Usership users OR when AI generation fails
-      // ============================================================================
-      console.log(`📋 Using default questions for user ${req.user.id}`, {
+      // =====================================================================      console.log(`📋 Using default questions for user ${req.user.id}`, {
         reason: hasUsershipTag ? 'AI generation failed' : 'Non-Usership user',
         hasUsershipTag
       })
@@ -2462,10 +2454,8 @@ export default async (fastify: FastifyInstance) => {
         context,
       })
 
-      // ============================================================================
-      // ENHANCED INSIGHT RESPONSE SYSTEM
-      // ============================================================================
-
+      // =====================================================================      // ENHANCED INSIGHT RESPONSE SYSTEM
+      // =====================================================================
       // Get user's recent answers and logs for psychological analysis
       const recentLogs = await fastify.models.Log.findAll({
         where: { userId: req.user.id },
@@ -4085,10 +4075,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     }
   })
 
-  // ============================================================================
-  // STATS API - Real-time metrics and community insights
-  // ============================================================================
-
+  // =====================================================================  // STATS API - Real-time metrics and community insights
+  // =====================================================================
   // In-memory cache for hot endpoints (shared across all users)
   const statsCache = new Map<string, { data: any; expiresAt: number }>()
   function getCached(key: string, ttlMs: number, compute: () => Promise<any>): Promise<any> {
@@ -4868,10 +4856,8 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     }
   })
 
-  // ============================================================================
-  // Cosmic Update — Together AI image generation
-  // ============================================================================
-  fastify.post(
+  // =====================================================================  // Cosmic Update — Together AI image generation
+  // =====================================================================  fastify.post(
     '/cosmic-update',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
     async (req: FastifyRequest<{ Body: { prompt?: string } }>, reply) => {
@@ -4916,12 +4902,10 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     }
   )
 
-  // ============================================================================
-  // QI — Quantum Intelligence RFI (Request for Information)
+  // =====================================================================  // QI — Quantum Intelligence RFI (Request for Information)
   // Operator queries their own intelligence apparatus via /qi in the LOG.
   // Engine: Together AI. Response format: military INTSUM (intelligence summary).
-  // ============================================================================
-  fastify.post(
+  // =====================================================================  fastify.post(
     '/qi',
     { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } },
     async (
@@ -5124,12 +5108,10 @@ OPERATOR RFI: ${query.trim()}`
     }
   )
 
-  // ============================================================================
-  // ASSEMBLY — Self-Assembly Directive
+  // =====================================================================  // ASSEMBLY — Self-Assembly Directive
   // System scans operator's signal record and generates a long-term directive.
   // Not a response to a question — a proactive instruction from the machine.
-  // ============================================================================
-  fastify.post(
+  // =====================================================================  fastify.post(
     '/assembly',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
     async (
@@ -5341,12 +5323,10 @@ ${qieLogs.length > 0 ? qieLogs.map(l => `${(l.metadata?.pattern as string || '')
     }
   )
 
-  // ============================================================================
-  // PRAYER — Contextual Scripture
+  // =====================================================================  // PRAYER — Contextual Scripture
   // System reads the operator's log entry + biofield state and returns
   // a Bible verse that resonates. The scripture finds the operator.
-  // ============================================================================
-  fastify.post(
+  // =====================================================================  fastify.post(
     '/prayer',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
     async (
@@ -5478,12 +5458,10 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
     }
   )
 
-  // ============================================================================
-  // STORY — Contextual AI Story
+  // =====================================================================  // STORY — Contextual AI Story
   // Generates a 1-2 paragraph story based on recent logs, self-care events,
   // and widget data. The story reflects the operator's recent journey.
-  // ============================================================================
-  fastify.post(
+  // =====================================================================  fastify.post(
     '/story',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
     async (
@@ -5612,6 +5590,190 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           logId: null,
         }
       }
+  // LOT-FM-001 — BASIC RATION MODULE
+  // Month 1: read-only manifest (public)
+  // Month 2: upgrade/stand-down state machine + roster intake
+  // Month 3: issue log + next issue
+  // =====================================================================
+  // GET /api/basic/subscription — current subscriber status
+  fastify.get('/basic/subscription', async (req: FastifyRequest, reply) => {
+    const sub = await fastify.models.BasicSubscription.findOne({
+      where: { userId: req.user.id },
+    })
+    return sub ?? null
+  })
+
+  // POST /api/basic/upgrade — USERSHIP → PENDING
+  fastify.post('/basic/upgrade', async (req: FastifyRequest, reply) => {
+    const existing = await fastify.models.BasicSubscription.findOne({
+      where: { userId: req.user.id },
+    })
+    if (existing) {
+      return reply.status(409).send({ error: 'SUBSCRIPTION ALREADY EXISTS' })
+    }
+    const sub = await fastify.models.BasicSubscription.create({
+      userId: req.user.id,
+      status: 'PENDING',
+    })
+    const context = await getLogContext(req.user)
+    await fastify.models.Log.create({
+      userId: req.user.id,
+      event: 'other',
+      text: 'Basic ration upgrade initiated — PENDING',
+      metadata: { type: 'basic_upgrade', subscriptionId: sub.id },
+      context,
+    })
+    return sub
+  })
+
+  // POST /api/basic/roster — roster intake → ON_STRENGTH + schedule first issue
+  fastify.post<{ Body: {
+    shippingName: string; shippingLine1: string; shippingLine2?: string
+    shippingCity: string; shippingState: string; shippingZip: string
+    shippingCountry: string; shirtSize: string; shoeSize: string
+  } }>(
+    '/basic/roster',
+    async (req, reply) => {
+      const sub = await fastify.models.BasicSubscription.findOne({
+        where: { userId: req.user.id },
+      })
+      if (!sub) {
+        return reply.status(404).send({ error: 'NO SUBSCRIPTION FOUND' })
+      }
+      if (sub.status !== 'PENDING') {
+        return reply.status(409).send({ error: 'ROSTER ALREADY CONFIRMED' })
+      }
+
+      const now = new Date()
+      // First issue: 1st of next month
+      const cadenceStart = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+      const periodLabel = cadenceStart.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()
+
+      await sub.update({
+        ...req.body,
+        status: 'ON_STRENGTH',
+        cadenceStart,
+      })
+
+      // Count monthly items for first issue (cadences: MONTHLY + QUARTERLY + SEMI-ANNUALLY + ANNUALLY)
+      const firstIssueItemCount = 23 // all items ship in issue #1 per LOT-FM-001
+
+      await fastify.models.BasicIssue.create({
+        subscriptionId: sub.id,
+        userId: req.user.id,
+        issueNumber: 1,
+        periodLabel,
+        itemCount: firstIssueItemCount,
+        status: 'SCHEDULED',
+        issuedAt: cadenceStart,
+      })
+
+      const context = await getLogContext(req.user)
+      await fastify.models.Log.create({
+        userId: req.user.id,
+        event: 'other',
+        text: `Basic ration roster confirmed — ON STRENGTH. First issue: ${periodLabel}`,
+        metadata: { type: 'basic_roster', subscriptionId: sub.id },
+        context,
+      })
+
+      return sub
+    }
+  )
+
+  // POST /api/basic/stand-down — ON_STRENGTH → USERSHIP (drops ration, retains AI)
+  fastify.post('/basic/stand-down', async (req: FastifyRequest, reply) => {
+    const sub = await fastify.models.BasicSubscription.findOne({
+      where: { userId: req.user.id },
+    })
+    if (!sub) {
+      return reply.status(404).send({ error: 'NO SUBSCRIPTION FOUND' })
+    }
+
+    // Cancel any scheduled issues
+    await fastify.models.BasicIssue.update(
+      { status: 'CANCELLED' },
+      { where: { subscriptionId: sub.id, status: 'SCHEDULED' } }
+    )
+
+    await sub.destroy()
+
+    const context = await getLogContext(req.user)
+    await fastify.models.Log.create({
+      userId: req.user.id,
+      event: 'other',
+      text: 'Basic ration stand-down — ration dropped, AI plan retained',
+      metadata: { type: 'basic_stand_down' },
+      context,
+    })
+
+    return { ok: true }
+  })
+
+  // GET /api/basic/issues — issue log for this subscriber
+  fastify.get('/basic/issues', async (req: FastifyRequest, reply) => {
+    const sub = await fastify.models.BasicSubscription.findOne({
+      where: { userId: req.user.id },
+    })
+    if (!sub) return []
+    const issues = await fastify.models.BasicIssue.findAll({
+      where: { subscriptionId: sub.id },
+      order: [['issueNumber', 'ASC']],
+    })
+    return issues
+  })
+
+  // POST /api/basic/issues/:id/advance — advance issue status (admin/fulfillment)
+  fastify.post<{ Params: { id: string }; Body: { status: string; trackingNumber?: string } }>(
+    '/basic/issues/:id/advance',
+    async (req, reply) => {
+      const issue = await fastify.models.BasicIssue.findByPk(req.params.id)
+      if (!issue) return reply.status(404).send({ error: 'ISSUE NOT FOUND' })
+
+      const validStatuses = ['PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED']
+      if (!validStatuses.includes(req.body.status)) {
+        return reply.status(400).send({ error: 'INVALID STATUS' })
+      }
+
+      const updates: Record<string, any> = { status: req.body.status }
+      if (req.body.trackingNumber) updates.trackingNumber = req.body.trackingNumber
+      if (req.body.status === 'SHIPPED')   updates.shippedAt   = new Date()
+      if (req.body.status === 'DELIVERED') updates.deliveredAt = new Date()
+
+      await issue.update(updates)
+
+      // When issue is delivered, schedule next issue and advance to STEADY_STATE
+      if (req.body.status === 'DELIVERED') {
+        const sub = await fastify.models.BasicSubscription.findByPk(issue.subscriptionId)
+        if (sub && sub.status === 'ON_STRENGTH') {
+          await sub.update({ status: 'STEADY_STATE' })
+        }
+
+        if (sub) {
+          const nextIssueNumber = issue.issueNumber + 1
+          const issueDate = new Date()
+          issueDate.setMonth(issueDate.getMonth() + 1, 1)
+          const periodLabel = issueDate.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()
+
+          // Monthly items: 17; quarterly: add 4 on months 3,6,9,12; semi-annual: add 1 on months 1,7
+          const n = ((nextIssueNumber - 1) % 6) + 1
+          const itemCount = 17 +
+            ([1, 3, 5].includes(n) ? 4 : 0) +
+            (n === 1 ? 2 : 0)
+
+          await fastify.models.BasicIssue.create({
+            subscriptionId: sub.id,
+            userId: sub.userId,
+            issueNumber: nextIssueNumber,
+            periodLabel,
+            itemCount,
+            status: 'SCHEDULED',
+            issuedAt: issueDate,
+          })
+        }
+      }
+
+      return issue
     }
   )
 }

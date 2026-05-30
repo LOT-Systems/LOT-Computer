@@ -1,0 +1,213 @@
+/**
+ * LOT-BASIC terminal tokens
+ * LiberationMono-Bold · white ground / black ink · 2px rules · square corners
+ * IBM 3270 register: uppercase, terse, quartermaster voice
+ */
+
+.lot-basic {
+  --lb-bg: #ffffff;
+  --lb-fg: #000000;
+  --lb-font: 'Liberation Mono', 'Courier New', Courier, monospace;
+  --lb-weight: 700;
+  --lb-rule: 2px solid #000000;
+  --lb-rule-thin: 1px solid #000000;
+  --lb-ch: 1ch;
+  --lb-lh: 1.5rem;
+
+  background: var(--lb-bg);
+  color: var(--lb-fg);
+  font-family: var(--lb-font) !important;
+  font-weight: var(--lb-weight);
+  letter-spacing: 0;
+  line-height: var(--lb-lh);
+  min-height: 100%;
+}
+
+.lot-basic *,
+.lot-basic *::before,
+.lot-basic *::after {
+  border-radius: 0 !important;
+  box-sizing: border-box;
+  font-family: var(--lb-font) !important;
+}
+
+/* Inversion — primary hierarchy mechanism */
+.lb-inv {
+  background: #000000;
+  color: #ffffff;
+}
+
+/* Rule utilities */
+.lb-rule-t  { border-top: var(--lb-rule); }
+.lb-rule-b  { border-bottom: var(--lb-rule); }
+.lb-rule-l  { border-left: var(--lb-rule); }
+.lb-rule-r  { border-right: var(--lb-rule); }
+.lb-border  { border: var(--lb-rule); }
+.lb-rule-thin-b { border-bottom: var(--lb-rule-thin); }
+.lb-rule-thin-r { border-right: var(--lb-rule-thin); }
+
+/* Ledger row */
+.lb-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: var(--lb-rule-thin);
+  min-height: var(--lb-lh);
+}
+.lb-row:last-child {
+  border-bottom: none;
+}
+.lb-row-head {
+  background: #000000;
+  color: #ffffff;
+  border-bottom: var(--lb-rule);
+  font-weight: 700;
+}
+
+/* Ledger cell */
+.lb-cell {
+  padding: 0.1875rem 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-right: var(--lb-rule-thin);
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.lb-cell:last-child {
+  border-right: none;
+}
+.lb-cell-mono {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+
+/* Status line — fixed bottom strip */
+.lb-status {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  border-top: var(--lb-rule);
+  padding: 0.25rem 0.75rem;
+  background: var(--lb-bg);
+}
+.lb-status-field {
+  display: flex;
+  gap: 0.5rem;
+}
+.lb-status-key {
+  opacity: 0.4;
+}
+
+/* Section header */
+.lb-section-head {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  padding: 0.25rem 0.75rem;
+  border-bottom: var(--lb-rule);
+}
+
+/* State badge */
+.lb-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: var(--lb-rule);
+  white-space: nowrap;
+}
+.lb-badge-inv {
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+/* Input field */
+.lb-input {
+  background: var(--lb-bg);
+  color: var(--lb-fg);
+  border: var(--lb-rule);
+  padding: 0.25rem 0.5rem;
+  font-family: var(--lb-font) !important;
+  font-weight: var(--lb-weight);
+  font-size: 0.875rem;
+  width: 100%;
+  outline: none;
+}
+.lb-input:focus {
+  outline: 2px solid #000000;
+  outline-offset: 1px;
+}
+
+/* Select */
+.lb-select {
+  background: var(--lb-bg);
+  color: var(--lb-fg);
+  border: var(--lb-rule);
+  padding: 0.25rem 0.5rem;
+  font-family: var(--lb-font) !important;
+  font-weight: var(--lb-weight);
+  font-size: 0.875rem;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+}
+.lb-select:focus {
+  outline: 2px solid #000000;
+  outline-offset: 1px;
+}
+
+/* Button */
+.lb-btn {
+  background: var(--lb-bg);
+  color: var(--lb-fg);
+  border: var(--lb-rule);
+  padding: 0.375rem 1rem;
+  font-family: var(--lb-font) !important;
+  font-weight: var(--lb-weight);
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.lb-btn:hover {
+  background: #000000;
+  color: #ffffff;
+}
+.lb-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.lb-btn-inv {
+  background: #000000;
+  color: #ffffff;
+}
+.lb-btn-inv:hover {
+  background: #333333;
+}
+
+/* Doctrine lines */
+.lb-doctrine {
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  padding: 0.25rem 0.75rem;
+  border-bottom: var(--lb-rule-thin);
+}
+.lb-doctrine:last-child {
+  border-bottom: none;
+}
+
+/* Manifest card — printable */
+@media print {
+  .lb-no-print { display: none !important; }
+  .lot-basic { padding: 0; }
+}

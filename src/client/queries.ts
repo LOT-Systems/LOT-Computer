@@ -15,11 +15,14 @@ import {
 } from 'react-query'
 import {
   AdminUsersSort,
+  BasicIssue,
+  BasicSubscription,
   ChatMessageLikePayload,
   DefaultQuestion,
   Log,
   Paginated,
   PublicChatMessage,
+  RosterIntakePayload,
   User,
   UserProfile,
   UserSettings,
@@ -316,10 +319,8 @@ export const useProfile = () =>
     refetchOnWindowFocus: false,
   })()
 
-// ============================================================================
-// PATTERN & COHORT QUERIES
-// ============================================================================
-
+// =====================================================================// PATTERN & COHORT QUERIES
+// =====================================================================
 export interface PatternInsight {
   type: 'weather-mood' | 'temporal' | 'social-emotional' | 'streak' | 'behavioral'
   title: string
@@ -411,10 +412,8 @@ export const usePatternEvolution = () =>
     staleTime: 60 * 60 * 1000, // Cache for 1 hour (evolution is slow)
   })()
 
-// ============================================================================
-// SELF-CARE ENGINE QUERIES
-// ============================================================================
-
+// =====================================================================// SELF-CARE ENGINE QUERIES
+// =====================================================================
 export interface EnergyState {
   currentLevel: number
   maxCapacity: 100
@@ -553,10 +552,8 @@ export const useCommunityEmotion = () =>
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes (more volatile than other data)
   })()
 
-// ============================================================================
-// EMOTIONAL CHECK-IN QUERIES
-// ============================================================================
-
+// =====================================================================// EMOTIONAL CHECK-IN QUERIES
+// =====================================================================
 export const useCreateEmotionalCheckIn = createMutation<
   {
     checkInType: 'morning' | 'evening' | 'moment'
@@ -584,10 +581,8 @@ export const useEmotionalCheckIns = (days: number = 30) =>
     refetchOnWindowFocus: false,
   })()
 
-// ============================================================================
-// Stats API - Real-time metrics and community insights
-// ============================================================================
-
+// =====================================================================// Stats API - Real-time metrics and community insights
+// =====================================================================
 export const useCollectiveStats = () =>
   createQuery<{
     energyLevel: number
@@ -695,10 +690,8 @@ export const useAIUsageStats = () =>
     retry: false,
   })()
 
-// ============================================================================
-// OS API - User Operating System metrics
-// ============================================================================
-
+// =====================================================================// OS API - User Operating System metrics
+// =====================================================================
 export const useOSStatus = () =>
   createQuery<{
     health: number
@@ -797,18 +790,14 @@ export const useOSIndexes = () =>
     staleTime: 10 * 60 * 1000,
   })()
 
-// ============================================================================
-// COSMIC UPDATE
-// ============================================================================
-export const useCosmicUpdate = createMutation<
+// =====================================================================// COSMIC UPDATE
+// =====================================================================export const useCosmicUpdate = createMutation<
   { prompt?: string },
   { imageUrl: string; prompt: string }
 >('post', '/api/cosmic-update')
 
-// ============================================================================
-// QI — Quantum Intelligence RFI
-// ============================================================================
-
+// =====================================================================// QI — Quantum Intelligence RFI
+// =====================================================================
 export const useQiQuery = createMutation<
   {
     query: string
@@ -830,10 +819,8 @@ export const useQiQuery = createMutation<
   }
 >('post', '/api/qi')
 
-// ============================================================================
-// ASSEMBLY — Self-Assembly Directive
-// ============================================================================
-
+// =====================================================================// ASSEMBLY — Self-Assembly Directive
+// =====================================================================
 export const useAssemblyDirective = createMutation<
   {
     quantumState?: {
@@ -862,10 +849,8 @@ export const useAssemblyDirective = createMutation<
   }
 >('post', '/api/assembly')
 
-// ============================================================================
-// PRAYER — Contextual Scripture
-// ============================================================================
-
+// =====================================================================// PRAYER — Contextual Scripture
+// =====================================================================
 export const usePrayerScripture = createMutation<
   {
     logText: string
@@ -888,10 +873,8 @@ export const usePrayerScripture = createMutation<
   }
 >('post', '/api/prayer')
 
-// ============================================================================
-// STORY — Contextual AI Story
-// ============================================================================
-
+// =====================================================================// STORY — Contextual AI Story
+// =====================================================================
 export const useStoryGeneration = createMutation<
   {
     logText: string
@@ -912,3 +895,38 @@ export const useStoryGeneration = createMutation<
     logId: string | null
   }
 >('post', '/api/story')
+// LOT-FM-001 — BASIC RATION
+// =====================================================================export const useBasicSubscription = createQuery<BasicSubscription | null>(
+  '/api/basic/subscription',
+  { refetchOnWindowFocus: false, staleTime: 30_000 }
+)
+
+export const useBasicIssues = createQuery<BasicIssue[]>(
+  '/api/basic/issues',
+  { refetchOnWindowFocus: false, staleTime: 30_000 }
+)
+
+export const useUpgradeToBasic = (
+  config?: Partial<UseMutationOptions<BasicSubscription, AxiosError, undefined>>
+) =>
+  useMutation<BasicSubscription, AxiosError, undefined>({
+    mutationFn: () => api.post<BasicSubscription>('/api/basic/upgrade').then(r => r.data),
+    ...config,
+  })
+
+export const useStandDown = (
+  config?: Partial<UseMutationOptions<{ ok: boolean }, AxiosError, undefined>>
+) =>
+  useMutation<{ ok: boolean }, AxiosError, undefined>({
+    mutationFn: () => api.post<{ ok: boolean }>('/api/basic/stand-down').then(r => r.data),
+    ...config,
+  })
+
+export const useRosterIntake = (
+  config?: Partial<UseMutationOptions<BasicSubscription, AxiosError, RosterIntakePayload>>
+) =>
+  useMutation<BasicSubscription, AxiosError, RosterIntakePayload>({
+    mutationFn: (data) =>
+      api.post<BasicSubscription>('/api/basic/roster', data).then(r => r.data),
+    ...config,
+  })
