@@ -12,6 +12,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* LOT-FM-001 — BASIC RATION MODULE */
+@import './components/Basics/basics.css';
+
 :root {
   --base-color: #fff;
 
