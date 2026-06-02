@@ -235,12 +235,12 @@ export function Basics() {
           </>
         )}
 
-        {/* ── ISSUE LOG SCAFFOLD (Month 2) ────────────────────────────── */}
+        {/* ── ISSUE LOG (Month 3: live data) ──────────────────────────── */}
         {fetchDone && (status === 'ON_STRENGTH' || status === 'STEADY_STATE' || status === 'PENDING') && (
           <>
             <SectionHeader>ISSUE LOG</SectionHeader>
             <IssueLog
-              entries={[]}
+              entries={subState?.issues ?? []}
               nextIssueDate={subState?.nextIssueDate ?? null}
             />
           </>
