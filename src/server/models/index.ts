@@ -17,6 +17,7 @@ import { WeatherResponse } from './weather-response.js'
 import { Log } from './log.js'
 import { Answer } from './answer.js'
 import { RationSubscription } from './ration-subscription.js'
+import { RationIssue } from './ration-issue.js'
 
 export type UserRecord = User
 
@@ -32,6 +33,7 @@ export const models = {
   Log,
   Answer,
   RationSubscription,
+  RationIssue,
 }
 
 export type Models = {

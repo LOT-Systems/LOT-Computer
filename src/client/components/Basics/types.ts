@@ -22,11 +22,17 @@ export type RationSubscriptionState = {
   subscribedAt: string | null
   standDownAt: string | null
   roster: RationRoster | null
+  issues: IssueLogEntry[]
 }
 
 export type IssueLogEntry = {
+  id: string
   no: number
   date: string
-  status: 'DISPATCHED' | 'DELIVERED' | 'IN_TRANSIT'
+  status: 'SCHEDULED' | 'DISPATCHED' | 'IN_TRANSIT' | 'DELIVERED'
   items: number
+  cogsTotal: number
+  marginPct: number
+  trackingCode: string | null
+  dispatchedAt: string | null
 }
