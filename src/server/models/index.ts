@@ -16,6 +16,7 @@ import { DirectMessage } from './direct-message.js'
 import { WeatherResponse } from './weather-response.js'
 import { Log } from './log.js'
 import { Answer } from './answer.js'
+import { RationSubscription } from './ration-subscription.js'
 
 export type UserRecord = User
 
@@ -30,6 +31,7 @@ export const models = {
   WeatherResponse,
   Log,
   Answer,
+  RationSubscription,
 }
 
 export type Models = {
