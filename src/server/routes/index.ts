@@ -11,6 +11,7 @@ import adminApiRoutes from './admin-api';
 import apiRoutes from './api';
 import authRoutes from './auth';
 import publicApiRoutes from './public-api';
+import basicsApiRoutes from './basics-api';
 
 export async function registerRoutes(fastify: FastifyInstance) {
   // Register all route groups
@@ -18,6 +19,7 @@ export async function registerRoutes(fastify: FastifyInstance) {
   await fastify.register(apiRoutes, { prefix: '/api' });
   await fastify.register(adminApiRoutes, { prefix: '/admin-api' });
   await fastify.register(publicApiRoutes, { prefix: '/api/public' });
+  await fastify.register(basicsApiRoutes, { prefix: '/api/basics' });
 
   // Client app / index page
   fastify.get('/', async (req, reply) => {
