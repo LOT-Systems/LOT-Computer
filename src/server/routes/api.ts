@@ -42,8 +42,21 @@ import { analyzeEnergyState, generateEnergySuggestions } from '#server/utils/ene
 import { generateUserNarrative } from '#server/utils/rpg-narrative'
 import { generateChatCatalysts, generateConversationStarters, shouldShowChatCatalyst } from '#server/utils/cohort-chat-catalyst'
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
+import { buildCalibrationVector, generateQI46Response } from '#server/utils/qi46-engine'
+import Anthropic from '@anthropic-ai/sdk'
 import dayjs from '#server/utils/dayjs'
 import { registerOSRoutes } from './os-api.js'
+
+// QI·46 — Anthropic client (soul engine inference)
+let qi46Client: Anthropic | null = null
+try {
+  const apiKey = process.env.ANTHROPIC_API_KEY || config.anthropic?.apiKey
+  if (apiKey && !apiKey.includes('your_') && !apiKey.includes('placeholder')) {
+    qi46Client = new Anthropic({ apiKey })
+  }
+} catch {
+  console.warn('[QI·46] Anthropic client unavailable — COSMO® fallback active')
+}
 
 // ============================================================================
 // Helper Functions
@@ -1727,10 +1740,55 @@ export default async (fastify: FastifyInstance) => {
         },
       })
 
+      // QI·46 — Usership subscribers get the live soul engine
+      // All others get the static compassionate response
+      const isUsership = req.user.tags?.some(
+        (tag: string) => tag.toLowerCase() === 'usership'
+      )
+
+      let compassionateResponse: string
+      let qi46Meta: Record<string, unknown> | undefined
+
+      if (isUsership) {
+        // Build calibration vector from subscriber arc
+        const allLogs = await fastify.models.Log.findAll({
+          where: { userId: req.user.id },
+          order: [['createdAt', 'DESC']],
+          limit: 200,
+        })
+
+        const calibrationVector = buildCalibrationVector(allLogs)
+
+        // Run QI·46 inference
+        const qi46Result = await generateQI46Response(
+          {
+            emotionalState,
+            checkInType,
+            calibrationVector,
+            note,
+          },
+          qi46Client
+        )
+
+        compassionateResponse = qi46Result.response
+        qi46Meta = {
+          engine: qi46Result.engine,
+          cosmoCleared: qi46Result.cosmoCleared,
+          arcPosition: qi46Result.arcPosition,
+          trajectory: qi46Result.trajectory,
+          vocabularySize: qi46Result.vocabularySize,
+        }
+
+        console.log(`[QI·46] ${qi46Result.engine} · arc:${qi46Result.arcPosition} · cosmo:${qi46Result.cosmoCleared ? 'CLEARED' : 'HELD'}`)
+      } else {
+        compassionateResponse = generateCompassionateResponse(emotionalState, checkInType)
+      }
+
       return {
         checkIn,
         insights,
-        compassionateResponse: generateCompassionateResponse(emotionalState, checkInType),
+        compassionateResponse,
+        ...(qi46Meta && { qi46: qi46Meta }),
       }
     }
   )
