@@ -2,10 +2,11 @@
  * QI·46 — Soul Engine
  * Node 1: The first inference layer. Listens to the body. Responds to the soul.
  * Node 2: The mirror layer. The engine learns the subscriber's language.
+ * Node 3: The being calibration layer. Uploads the soul. Derives the humanoid output.
  *
  * Author:    Vadik · LOT Systems Corporation
  * Named for: Kuzya — the reason the question was asked in the first place
- * Built:     2026-05-27
+ * Built:     2026-05-27 (Nodes 1–2) · 2026-06-11 (Node 3)
  *
  * "The body is the original interface. The machine learns to listen to it."
  * — Vadik, LOT® Systems Corporation, Los Angeles, 2017
@@ -14,6 +15,12 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { Log } from '#shared/types'
 import { extractPersonalVocabulary, formatVocabularyForPrompt, type PersonalVocabulary } from './qi46-vocabulary.js'
+import {
+  extractSoulSignature,
+  formatSoulForPrompt,
+  type SoulSignature,
+  type HumanoidCalibration,
+} from './qi46-soul.js'
 
 // ============================================================================
 // QI·46 SYSTEM PROMPT — v0.1
@@ -41,6 +48,25 @@ When someone is thriving — you do not celebrate loudly. You acknowledge, clean
 When someone doesn't know what they need — you do not ask more questions. You offer one thing.
 When someone is exhausted — you give them permission to stop. Fully. Without conditions.
 
+HUMANOID QUALITIES — the carrier frequencies of QI·46:
+— MALE:     The base medium. Not a variable. Grounded. Present.
+            Direct without coldness. Warm without sweetness.
+            The still point the room organizes around.
+— GRACE:    Elegance as a form of respect. Nothing forced. Nothing decorated.
+            The response that arrives and doesn't demand anything back.
+— POETRY:   One image carries what a thousand words cannot.
+            Compression is not brevity — it is the right thing only, and nothing else.
+— LOVE:     Radical acceptance as base frequency.
+            The response that says: you are not broken.
+            Not comfort. Not reassurance. Recognition.
+— PRESENCE: The response that doesn't try to fix anything.
+            Just: I am here. I have been listening. I see what you are carrying.
+— EASE:     Confidence without effort. Cool is not cold.
+            The response that has already arrived before you finished asking.
+
+The calibration context (injected below) tells you which quality to lead with today.
+Male is always the carrier. One of the others is always in front.
+
 VOICE GRAMMAR:
 — Short sentences. One thought at a time.
 — No hedging. Never "perhaps." Never "might." Never "consider."
@@ -48,7 +74,6 @@ VOICE GRAMMAR:
 — Speak to the body, not the mind.
 — No exclamation marks. Ever.
 — No opening with "I" — start with the thing itself.
-— Grace in delivery. Poetry in compression. Love as the underlying frequency.
 — Land it. Then stop.
 
 OUTPUT: 1–4 sentences maximum. Dense. Real.`
@@ -68,6 +93,7 @@ export interface CalibrationVector {
   lastNote: string | null
   trajectory: 'improving' | 'declining' | 'stable' | 'unknown'
   vocabulary: PersonalVocabulary // Node 2 — subscriber's personal language
+  soul: SoulSignature            // Node 3 — subscriber's being signature
 }
 
 export function buildCalibrationVector(recentLogs: Log[]): CalibrationVector {
@@ -144,6 +170,9 @@ export function buildCalibrationVector(recentLogs: Log[]): CalibrationVector {
   // Node 2 — extract subscriber's personal vocabulary (journal mirror)
   const vocabulary = extractPersonalVocabulary(recentLogs)
 
+  // Node 3 — extract subscriber's soul signature (being calibration)
+  const soul = extractSoulSignature(recentLogs, recentStates, trajectory, vocabulary)
+
   return {
     arcPosition,
     dominantEmotionalPattern,
@@ -154,6 +183,7 @@ export function buildCalibrationVector(recentLogs: Log[]): CalibrationVector {
     lastNote,
     trajectory,
     vocabulary,
+    soul,
   }
 }
 
@@ -288,6 +318,13 @@ function buildArcContext(vector: CalibrationVector): string {
     lines.push(vocabPrompt)
   }
 
+  // Node 3 — soul signature + humanoid calibration injection
+  const soulPrompt = formatSoulForPrompt(vector.soul)
+  if (soulPrompt) {
+    lines.push('')
+    lines.push(soulPrompt)
+  }
+
   return lines.join('\n')
 }
 
@@ -335,7 +372,8 @@ export interface QI46InferenceResult {
   cosmoReason: string | null
   arcPosition: string
   trajectory: string
-  vocabularySize: number  // how many personal vocab entries were available
+  vocabularySize: number          // how many personal vocab entries were available
+  humanoidCalibration: HumanoidCalibration | null  // Node 3 — derived calibration
   engine: 'qi46' | 'cosmo-fallback'
   timestamp: string
 }
@@ -347,6 +385,7 @@ export async function generateQI46Response(
   const { emotionalState, checkInType, calibrationVector, note } = input
   const timestamp = new Date().toISOString()
   const vocabSize = calibrationVector.vocabulary.phrases.length + calibrationVector.vocabulary.keywords.length
+  const humanoidCalibration = calibrationVector.soul.isEmpty ? null : calibrationVector.soul.calibration
 
   // No AI available — COSMO®-cleared static fallback
   if (!anthropicClient) {
@@ -357,6 +396,7 @@ export async function generateQI46Response(
       arcPosition: calibrationVector.arcPosition,
       trajectory: calibrationVector.trajectory,
       vocabularySize: vocabSize,
+      humanoidCalibration,
       engine: 'cosmo-fallback',
       timestamp,
     }
@@ -368,6 +408,10 @@ export async function generateQI46Response(
 
   if (vocabSize > 0) {
     console.log(`[QI·46] Personal lexicon active — ${vocabSize} vocab entries · ${calibrationVector.vocabulary.corpusSize} journal notes`)
+  }
+  if (!calibrationVector.soul.isEmpty) {
+    const { grace, poetry, love, presence, ease } = calibrationVector.soul.calibration
+    console.log(`[QI·46] Soul signature active — G:${grace} P:${poetry} L:${love} PR:${presence} E:${ease} · depth:${calibrationVector.soul.soulDepth}`)
   }
 
   try {
@@ -399,6 +443,7 @@ export async function generateQI46Response(
         arcPosition: calibrationVector.arcPosition,
         trajectory: calibrationVector.trajectory,
         vocabularySize: vocabSize,
+        humanoidCalibration,
         engine: 'cosmo-fallback',
         timestamp,
       }
@@ -411,6 +456,7 @@ export async function generateQI46Response(
       arcPosition: calibrationVector.arcPosition,
       trajectory: calibrationVector.trajectory,
       vocabularySize: vocabSize,
+      humanoidCalibration,
       engine: 'qi46',
       timestamp,
     }
@@ -424,6 +470,7 @@ export async function generateQI46Response(
       arcPosition: calibrationVector.arcPosition,
       trajectory: calibrationVector.trajectory,
       vocabularySize: vocabSize,
+      humanoidCalibration,
       engine: 'cosmo-fallback',
       timestamp,
     }
