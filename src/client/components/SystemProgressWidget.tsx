@@ -1489,6 +1489,34 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'Journal vocabulary extraction → personal interface language injection',
   },
+  {
+    date: '2026-05-27',
+    built: ['QI·46 Soul Engine (Node 1)', 'COSMO® safety node', 'Calibration Loop — subscriber arc vector', 'Usership inference routing'],
+    feedbackApplied: 'extract the engine based on people\'s soul and emotions',
+    status: 'DEPLOYED',
+    next: 'QI·46 Node 2 — journal vocabulary extraction · personal voice injection',
+  },
+  {
+    date: '2026-05-27',
+    built: ['QI·46 Node 2 — Journal Vocabulary Extractor', 'Personal lexicon injection', 'Body metaphor detection', 'Mirror layer active'],
+    feedbackApplied: 'the engine speaks back in the subscriber\'s own language',
+    status: 'DEPLOYED',
+    next: 'QI·46 Node 3 — soul upload · being calibration · humanoid output',
+  },
+  {
+    date: '2026-06-11',
+    built: [
+      'QI·46 Node 3 — Soul Upload Engine',
+      'Soul signature extraction (shadow · light · themes · aspiration)',
+      'Humanoid calibration: grace · poetry · love · presence · ease',
+      'Calibration bars injected into inference context',
+      'System prompt updated with humanoid quality grammar',
+      'Male as the carrier. Five qualities as the signal.',
+    ],
+    feedbackApplied: 'upload a person\'s being · calibrate the human with the humanoid output',
+    status: 'DEPLOYED',
+    next: 'QI·46 Node 4 — arc memory persistence · /qi46/infer standalone endpoint',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
