@@ -120,6 +120,38 @@ export const useSendDirectMessage = createMutation<
   void
 >('post', '/api/direct-messages')
 
+// LOT Mail
+export type LotMailRecord = {
+  id: string
+  fromUserId: string
+  fromUser: { id: string; firstName: string | null; lastName: string | null } | null
+  subject: string | null
+  body: string
+  read: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export const useLotMailInbox = createQuery<LotMailRecord[]>('/api/mail/inbox', {
+  refetchOnWindowFocus: false,
+  staleTime: 30 * 1000,
+})
+
+export const useLotMailUnreadCount = createQuery<{ count: number }>(
+  '/api/mail/unread-count',
+  { staleTime: 15 * 1000 }
+)
+
+export const useSendLotMail = createMutation<
+  { toName: string; body: string; subject?: string },
+  { id: string; toUser: { id: string; firstName: string | null; lastName: string | null } }
+>('post', '/api/mail')
+
+export const useMarkMailRead = createMutation<{ id: string }, { ok: boolean }>(
+  'put',
+  (data) => `/api/mail/${data.id}/read`
+)
+
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
 })
