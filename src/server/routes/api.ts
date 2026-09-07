@@ -5483,6 +5483,13 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   // Generates a 1-2 paragraph story based on recent logs, self-care events,
   // and widget data. The story reflects the operator's recent journey.
   // ============================================================================
+  const STORY_WINDOWS: Record<'day' | 'week' | 'month' | 'year', { ms: number; label: string; wordTarget: string; sampleSize: number; logLimit: number }> = {
+    day:   { ms: 24 * 60 * 60 * 1000,           label: 'the last 24 hours',  wordTarget: '60-100 words (1 tight paragraph)',  sampleSize: 5,  logLimit: 100 },
+    week:  { ms: 7 * 24 * 60 * 60 * 1000,       label: 'the last 7 days',    wordTarget: '100-200 words (1-2 paragraphs)',    sampleSize: 10, logLimit: 200 },
+    month: { ms: 30 * 24 * 60 * 60 * 1000,      label: 'the last 30 days',   wordTarget: '200-300 words (2-3 paragraphs)',    sampleSize: 20, logLimit: 500 },
+    year:  { ms: 365 * 24 * 60 * 60 * 1000,     label: 'the last 365 days',  wordTarget: '300-450 words (3-4 paragraphs)',    sampleSize: 30, logLimit: 800 },
+  }
+
   fastify.post(
     '/story',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
@@ -5490,6 +5497,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: 'day' | 'week' | 'month' | 'year'
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,25 +5522,31 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period = req.body.period && STORY_WINDOWS[req.body.period] ? req.body.period : null
+      const window = period ? STORY_WINDOWS[period] : null
 
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: window
+          ? { userId: req.user.id, createdAt: { [Op.gte]: new Date(Date.now() - window.ms) } }
+          : { userId: req.user.id },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: window ? window.logLimit : 200,
       })
+
+      const sampleSize = window ? window.sampleSize : 10
 
       const recentEntries = logs
         .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
+        .slice(0, sampleSize)
         .map(l => (l.text || '').substring(0, 200))
         .filter(Boolean)
 
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
+      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, sampleSize)
       const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
 
       const selfCareLogs = logs.filter(l =>
         l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
+      ).slice(0, sampleSize)
       const selfCareNotes = selfCareLogs.map(l => {
         const q = (l.metadata?.question as string || '')
         const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
@@ -5547,9 +5561,13 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const scopeLine = window
+        ? `The operator invoked /story ${period} — a compression request for ${window.label}. Your task: compress that whole window into ${window.wordTarget} that reflect their arc across it, not just the latest entry.`
+        : `The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns.`
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's own data into a short narrative.
+
+${scopeLine} The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
@@ -5560,20 +5578,21 @@ RULES:
 - The tone should match their current energy: reflective if low, energized if high
 - End with a single forward-looking sentence — not a pep talk, just a quiet truth
 - Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Target length: ${window ? window.wordTarget : 'under 200 words'}.`
 
       const dataBlock = `
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+${window ? `COMPRESSION WINDOW: ${window.label}` : ''}
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
+RECENT MOODS: ${recentMoods.slice(0, sampleSize).join(', ') || 'NO DATA'}
 
 RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
+${recentEntries.slice(0, sampleSize).map(e => `- ${e}`).join('\n') || '- (none)'}
 
 SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
+${selfCareNotes.slice(0, sampleSize).map(n => `- ${n}`).join('\n') || '- (none)'}`
 
       const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
 
@@ -5581,9 +5600,9 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
 
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
+        console.log(`📖 Story generation (${period || 'recent'}) for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
 
-        const story = await engine.generateCompletion(fullPrompt, 512)
+        const story = await engine.generateCompletion(fullPrompt, period === 'year' || period === 'month' ? 768 : 512)
 
         const cleaned = story.trim().replace(/^["']|["']$/g, '')
 
@@ -5596,6 +5615,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            period: period || 'recent',
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
