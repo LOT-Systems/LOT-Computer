@@ -387,6 +387,7 @@ export const System = React.memo(function SystemInner() {
       .filter(log => log.event === 'calendar_entry' && log.metadata?.date && (log.metadata.date as string) >= today)
       .map(log => ({
         date: log.metadata!.date as string,
+        time: (log.metadata!.time as string) || undefined,
         text: (log.metadata!.text as string) || log.text || '',
       }))
       .sort((a, b) => a.date.localeCompare(b.date))
@@ -725,6 +726,7 @@ export const System = React.memo(function SystemInner() {
         <div>
           <Block label="Next:">
             {dayjs(upcomingCalendar.next.date).format('ddd, MMMM D')}
+            {upcomingCalendar.next.time && ` ${upcomingCalendar.next.time}`}
             {' — '}
             {upcomingCalendar.next.text}
             {upcomingCalendar.count > 1 && ` (+${upcomingCalendar.count - 1} more)`}
