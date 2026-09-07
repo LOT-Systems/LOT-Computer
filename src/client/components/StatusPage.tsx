@@ -111,12 +111,34 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
   const getStatusIcon = (checkStatus: 'ok' | 'error' | 'unknown') => {
     switch (checkStatus) {
       case 'ok':
-        return '✓'
+        return '●'
       case 'error':
-        return '✕'
+        return '●'
       case 'unknown':
-        return '?'
+        return '○'
     }
+  }
+
+  const getStatusLabel = (checkStatus: 'ok' | 'error' | 'unknown') => {
+    switch (checkStatus) {
+      case 'ok': return 'Operational'
+      case 'error': return 'Error'
+      case 'unknown': return 'Unknown'
+    }
+  }
+
+  const getOverallLabel = (overall: 'ok' | 'degraded' | 'error') => {
+    switch (overall) {
+      case 'ok': return 'All Systems Operational'
+      case 'degraded': return 'Degraded Performance'
+      case 'error': return 'System Outage'
+    }
+  }
+
+  const formatDuration = (ms: number) => {
+    if (ms < 100) return `${ms}ms`
+    if (ms < 1000) return `${ms}ms`
+    return `${(ms / 1000).toFixed(1)}s`
   }
 
   const formatDate = (dateString: string) => {
@@ -160,9 +182,13 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
         <>
           <div className="mb-16">
             <Block label="Status:" labelClassName="!pl-0">
-              {status.overall === 'ok' ? 'All systems operational' :
-               status.overall === 'degraded' ? 'Degraded performance' :
-               'System issues detected'}
+              <span className={cn(
+                status.overall === 'ok' && 'text-acc',
+                status.overall === 'degraded' && 'text-acc/70',
+                status.overall === 'error' && 'text-acc/50'
+              )}>
+                {getOverallLabel(status.overall)}
+              </span>
             </Block>
             <Block label="Version:" labelClassName="!pl-0">v{status.version}</Block>
             <Block label="Environment:" labelClassName="!pl-0">{status.environment}</Block>
@@ -170,7 +196,7 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
               <div className="flex items-center gap-x-16">
                 <span>
                   {formatDate(lastUpdate.toISOString())}
-                  {status.cached && status.cacheAge && (
+                  {status.cached && status.cacheAge !== undefined && (
                     <span className="text-acc/40">
                       {' '}(cached {status.cacheAge}s ago)
                     </span>
@@ -189,7 +215,12 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
           </div>
 
           <div className="mb-16">
-            <div className="mb-16">System components:</div>
+            <div className="mb-16">
+              System components
+              <span className="text-acc/40 ml-8">
+                {status.checks.filter(c => c.status === 'ok').length}/{status.checks.length} operational
+              </span>
+            </div>
             {status.checks.map((check, index) => (
               <Block
                 key={index}
@@ -198,21 +229,26 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
                 className="mb-8"
               >
                 <div className="flex items-center gap-x-8">
-                  <span>{getStatusIcon(check.status)}</span>
                   <span className={cn(
                     check.status === 'ok' && 'text-acc',
-                    check.status === 'error' && 'text-acc/60'
+                    check.status === 'error' && 'text-acc/50',
+                    check.status === 'unknown' && 'text-acc/30'
                   )}>
-                    {check.status === 'ok' ? 'Ok' :
-                     check.status === 'error' ? 'Error' :
-                     'Unknown'}
+                    {getStatusIcon(check.status)}
+                  </span>
+                  <span className={cn(
+                    check.status === 'ok' && 'text-acc',
+                    check.status === 'error' && 'text-acc/60',
+                    check.status === 'unknown' && 'text-acc/40'
+                  )}>
+                    {getStatusLabel(check.status)}
                   </span>
                   {check.duration !== undefined && (
-                    <span className="text-acc/40">({check.duration}ms)</span>
+                    <span className="text-acc/30">{formatDuration(check.duration)}</span>
                   )}
                 </div>
                 {check.message && (
-                  <div className="text-acc/60 mt-4">{check.message}</div>
+                  <div className="text-acc/50 mt-4 text-sm">{check.message}</div>
                 )}
               </Block>
             ))}
