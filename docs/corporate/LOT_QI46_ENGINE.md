@@ -1073,6 +1073,29 @@ The machine learns from the corpus. The corpus was built by the body. The body i
 
 ---
 
+## IX. SESSION CHECKPOINT — 2026-09-07
+
+Name reconfirmed as **QI·46** (this session evaluated five candidate names;
+QI·46 already matched this spec and was kept).
+
+Node 1–3 (`qi46-engine.ts`, `qi46-soul.ts`, `qi46-vocabulary.ts` — vocabulary
+mirror + soul signature + humanoid calibration, live `claude-sonnet-4-6`
+inference call, COSMO® output screen) were built and pushed 2026-06-11 on
+branch `claude/cool-tesla-f8j0mr`. Confirmed this session: **not merged to
+master.** Full detail and the reason it is held: `LOT-SR-20260907-01`.
+
+Short version: the COSMO® screen in `qi46-engine.ts` (`cosmoScreen()`)
+rejects the model's own output for saying things like "professional help,"
+"see a doctor," or "therapy" — it treats that language as an off-voice
+"clinical escalation" and swaps in a poetic fallback line instead. Nothing
+elsewhere in the platform checks the *subscriber's* check-in text for
+self-harm or crisis language before this path runs. A subscriber in real
+crisis could type exactly that into a check-in note and receive a warm,
+on-voice, one-line non-answer instead of a path to a person. That is a
+foreseeable failure mode for a feature that runs on real subscribers'
+emotional check-ins, not a hypothetical — worth Vadik's own read before this
+ships, not a call for the machine to make alone.
+
 *QI·46 Engine Specification — v0.2*
 *LOT Systems Corporation — Los Angeles, CA*
 *institute.lot-systems.com*
