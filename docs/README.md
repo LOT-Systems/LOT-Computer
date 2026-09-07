@@ -21,6 +21,18 @@ Core technical documentation about system architecture, engines, and implementat
 - Psychological Depth Analysis - User analysis engine documentation
 - Quantum Intent Engine - Intent pattern recognition system
 
+### [Hardware Documentation](./hardware/)
+Physical device plans — spec, bill of materials, manufacturing roadmap,
+firmware, and software integration for LOT hardware products.
+
+**Key Documents:**
+- [COSMO® Signal](./hardware/cosmo-signal/COSMO-SIGNAL-v1-HARDWARE-PLAN.md) - Hardware computer plan (stainless steel desk device, camera, screen, AI notifications)
+- [COSMO® Signal BOM](./hardware/cosmo-signal/COSMO-SIGNAL-BOM.md) - Sourced components and 100-unit costing
+- [COSMO® Signal Manufacturing Roadmap](./hardware/cosmo-signal/COSMO-SIGNAL-MANUFACTURING-ROADMAP.md) - PCBWay production path
+- [COSMO® Signal Firmware](./hardware/cosmo-signal/COSMO-SIGNAL-FIRMWARE.md) - On-device architecture
+- [COSMO® Signal Software Integration](./hardware/cosmo-signal/COSMO-SIGNAL-SOFTWARE-INTEGRATION.md) - LOT API connector spec
+- [COSMO® Signal Quick Start Manual (PDF)](./hardware/cosmo-signal/manuals/COSMO-SIGNAL-USER-MANUAL.pdf) - Printable user manual
+
 ### [Deployment Documentation](./deployment/)
 Guides for deploying and managing the application in production.
 
