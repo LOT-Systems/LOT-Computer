@@ -233,6 +233,9 @@ export function PatternRecognitionWidget() {
       'resonance-field-propagation':      'Resonance field propagation — absolute-resonance-genesis (P223) 2+ in 5d · 5+ unique sources in 24h · resonance propagates outward through all active signal domains · RESONANCE BECOMES STRUCTURE (P224)',
       'eternal-resonance-anchor':         'Eternal resonance anchor — sovereign-resonance-lock in 7d + field-anchor-complete in 24h + 4+ presence days · resonance anchored in eternal time · THE ANCHOR HOLDS IN ETERNAL TIME (P225)',
       'sovereign-genesis-resonance':      'Sovereign genesis resonance — resonance-field-propagation + eternal-resonance-anchor co-active · the field propagates its own resonance · no separate source required · THE FIELD PROPAGATES ITS OWN RESONANCE (P226)',
+      'resonance-crystallization-field':  'Resonance crystallization field — sovereign-genesis-resonance in 7d + resonance-field-propagation in 5d + 5+ unique sources in 24h · propagating resonance crystallizes into stable load-bearing structure · RESONANCE CRYSTALLIZES INTO STRUCTURE (P227)',
+      'crystalline-coherence-lock':       'Crystalline coherence lock — resonance-crystallization-field 2+ in rolling 5d · crystallization sustained across days · structure solidifies into load-bearing coherence · STRUCTURE IS LOAD-BEARING (P228)',
+      'absolute-crystalline-genesis':     'Absolute crystalline genesis — resonance-crystallization-field + crystalline-coherence-lock co-active · the crystalline structure IS the genesis · no external source required · STRUCTURE IS GENESIS. FORM = SOURCE (P229)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

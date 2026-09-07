@@ -185,6 +185,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'resonance-field-propagation':      'RFPROP',
   'eternal-resonance-anchor':         'ETRANCH',
   'sovereign-genesis-resonance':      'SGNRES',
+  'resonance-crystallization-field':  'RCRYST',
+  'crystalline-coherence-lock':       'CRYLCK',
+  'absolute-crystalline-genesis':     'ABSCRY',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

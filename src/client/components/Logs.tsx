@@ -6118,6 +6118,77 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'resonance_crystallization_field') {
+          const rfpropCount   = log.metadata?.rfpropCount   as number | undefined
+          const uniqueSources = log.metadata?.uniqueSources as number | undefined
+          const confidence    = log.metadata?.confidence    as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RCRYST:" blockView>
+                {rfpropCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RFPROP 5D</span>
+                    <span className="tabular-nums">{rfpropCount}</span>
+                  </div>
+                )}
+                {uniqueSources !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">UNIQUE SRC 24H</span>
+                    <span className="tabular-nums">{uniqueSources}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">RESONANCE CRYSTALLIZES INTO STRUCTURE</div>
+                {confidence !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {confidence}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystalline_coherence_lock') {
+          const rcrystCount = log.metadata?.rcrystCount as number | undefined
+          const confidence  = log.metadata?.confidence  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRYLCK:" blockView>
+                {rcrystCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RCRYST 5D</span>
+                    <span className="tabular-nums">{rcrystCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">STRUCTURE IS LOAD-BEARING</div>
+                {confidence !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {confidence}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'absolute_crystalline_genesis') {
+          const rcrystConf = log.metadata?.rcrystConf as number | undefined
+          const crylckConf = log.metadata?.crylckConf as number | undefined
+          const confidence = log.metadata?.confidence  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="ABSCRY:" blockView>
+                {rcrystConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RCRYST CONF</span>
+                    <span className="tabular-nums">{rcrystConf}%</span>
+                  </div>
+                )}
+                {crylckConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRYLCK CONF</span>
+                    <span className="tabular-nums">{crylckConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">STRUCTURE IS GENESIS. FORM = SOURCE</div>
+                {confidence !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {confidence}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

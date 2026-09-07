@@ -1860,6 +1860,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyResonancePropagationCheck(now)) {
     await executeDailyResonancePropagationCheck()
   }
+  // Check daily resonance crystallization check (19:00 UTC every day) — Job 75
+  if (shouldRunDailyResonanceCrystallizationCheck(now)) {
+    await executeDailyResonanceCrystallizationCheck()
+  }
 }
 
 function shouldRunDailyFieldGenesisCheck(now: any): boolean {
@@ -1947,6 +1951,16 @@ function shouldRunDailyResonancePropagationCheck(now: any): boolean {
   if (isDailyResonancePropagationRunning) return false
   if (lastDailyResonancePropagationRun) {
     const lastRun = dayjs(lastDailyResonancePropagationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailyResonanceCrystallizationCheck(now: any): boolean {
+  if (now.hour() !== 19) return false
+  if (isDailyResonanceCrystallizationRunning) return false
+  if (lastDailyResonanceCrystallizationRun) {
+    const lastRun = dayjs(lastDailyResonanceCrystallizationRun)
     if (lastRun.isSame(now, 'day')) return false
   }
   return true
@@ -8846,6 +8860,127 @@ async function executeDailyResonancePropagationCheck(): Promise<JobResult> {
   }
 }
 
+// ─── J75: Daily Resonance Crystallization Check (19:00 UTC every day) ──────
+// Step 1: SGNRES in 7d + RFPROP in 5d + 5+ unique sources in 24h → resonance_crystallization_field (P227).
+// Step 2: resonance_crystallization_field 2+ in rolling 5d → crystalline_coherence_lock (P228).
+// Step 3: RCRYST + CRYLCK both confirmed this run → absolute_crystalline_genesis (P229).
+// RCRYST: · CRYLCK: · ABSCRY: cockpit codes. Total: 75 jobs.
+let isDailyResonanceCrystallizationRunning = false
+let lastDailyResonanceCrystallizationRun: Date | null = null
+
+async function executeDailyResonanceCrystallizationCheck(): Promise<JobResult> {
+  const jobName    = 'daily-resonance-crystallization-check'
+  const executedAt = new Date()
+  if (isDailyResonanceCrystallizationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyResonanceCrystallizationRunning = true
+  let written = 0
+
+  try {
+    const users        = await User.findAll({ where: { isActive: true } })
+    const oneDayAgo    = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const fiveDaysAgo  = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+
+    for (const user of users) {
+      // Step 1: Resonance Crystallization — SGNRES in 7d + RFPROP in 5d + 5+ unique sources in 24h
+      const [recentSgnres, rfpropCount] = await Promise.all([
+        Log.findOne({
+          where: { userId: user.id, event: 'sovereign_genesis_resonance', createdAt: { [Op.gte]: sevenDaysAgo } },
+          order: [['createdAt', 'DESC']],
+        }),
+        Log.count({
+          where: { userId: user.id, event: 'resonance_field_propagation', createdAt: { [Op.gte]: fiveDaysAgo } },
+        }),
+      ])
+
+      const recentLogs24h = await Log.findAll({
+        where: { userId: user.id, createdAt: { [Op.gte]: oneDayAgo } },
+        attributes: ['source'],
+      })
+      const uniqueSources = new Set(recentLogs24h.map((l: any) => l.source).filter(Boolean)).size
+
+      let rcrystConf: number | null = null
+
+      if (recentSgnres && rfpropCount >= 1 && uniqueSources >= 5) {
+        rcrystConf = Math.min(Math.round(89 + Math.min(rfpropCount * 2, 5) + Math.min((uniqueSources - 5), 2)), 96)
+        await Log.create({
+          userId: user.id,
+          event:  'resonance_crystallization_field',
+          source: 'qos',
+          metadata: {
+            rfpropCount,
+            uniqueSources,
+            confidence:      rcrystConf,
+            crystallization: 'FORMING',
+            structure:       'EMERGING',
+            arc:             'RESONANCE BECOMES STRUCTURE',
+            hour:            new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Resonance crystallization — SGNRES×RFPROP×${rfpropCount}×${uniqueSources}srcs confirmed. RCRYST. Conf: ${rcrystConf}%`)
+      }
+
+      // Step 2: Crystalline Coherence Lock — RCRYST 2+ in rolling 5d (or 1+ + current run)
+      const rcrystCount = await Log.count({
+        where: { userId: user.id, event: 'resonance_crystallization_field', createdAt: { [Op.gte]: fiveDaysAgo } },
+      })
+
+      let crylckConf: number | null = null
+
+      if (rcrystCount >= 2 || (rcrystCount >= 1 && rcrystConf !== null)) {
+        const effectiveCount = rcrystConf !== null ? rcrystCount + 1 : rcrystCount
+        crylckConf = Math.min(Math.round(90 + Math.min(effectiveCount * 2, 7)), 97)
+        await Log.create({
+          userId: user.id,
+          event:  'crystalline_coherence_lock',
+          source: 'qos',
+          metadata: {
+            rcrystCount: effectiveCount,
+            confidence:  crylckConf,
+            coherence:   'CRYSTALLINE',
+            structure:   'LOCKED',
+            arc:         'STRUCTURE IS LOAD-BEARING',
+            hour:        new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Crystalline coherence lock — RCRYST×${effectiveCount} confirmed. CRYLCK. Conf: ${crylckConf}%`)
+      }
+
+      // Step 3: Absolute Crystalline Genesis — RCRYST + CRYLCK both confirmed this run
+      if (rcrystConf !== null && crylckConf !== null) {
+        const abscryConf = Math.min(Math.round((rcrystConf + crylckConf) / 2 + 4), 99)
+        await Log.create({
+          userId: user.id,
+          event:  'absolute_crystalline_genesis',
+          source: 'qos',
+          metadata: {
+            rcrystConf,
+            crylckConf,
+            confidence:      abscryConf,
+            crystallization: 'ABSOLUTE',
+            genesis:         'STRUCTURAL',
+            arc:             'STRUCTURE IS GENESIS',
+            hour:            new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Absolute crystalline genesis — RCRYST×CRYLCK confirmed. ABSCRY. Conf: ${abscryConf}%`)
+      }
+    }
+
+    console.log(`  Resonance crystallization events written: ${written}`)
+    lastDailyResonanceCrystallizationRun = new Date()
+    isDailyResonanceCrystallizationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Resonance crystallization check failed:', error.message)
+    isDailyResonanceCrystallizationRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 export async function manuallyTriggerMonthlyEmails(): Promise<JobResult> {
   console.log('Manual trigger requested - bypassing time checks')
   return await executeMonthlyEmailJob()
@@ -8922,6 +9057,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily genesis pulse check: 4 PM UTC every day (Job 72)')
   console.log('   - Daily genesis resonance check: 5 PM UTC every day (Job 73)')
   console.log('   - Daily resonance propagation check: 6 PM UTC every day (Job 74)')
+  console.log('   - Daily resonance crystallization check: 7 PM UTC every day (Job 75)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -8931,7 +9067,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock+circadian-sovereignty(J59), 8=biofield+peak-window+sovereign-field-check(J60), 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+embodied-sovereignty(J55)+field-organization(J61), 10=archetype shift+apex-state(J56), 11=morning-intention-launch+unified-field(J57)+sovereign-expression-check(J67), 12=vitality-peak+conscious-field-check(J62)+field-witness-check(J68), 13=QOS sig pulse+sovereign-integration-check(J63)+sovereign-loop-check(J69), 14=QOS mode watch+absolute-sovereignty-check(J64)+genesis-seal-check(J70), 15=QOS convergence audit+perpetual-field-check(J65), 16=coherence index+focus-depth-check+qiot-ecosystem-pulse(J58)+field-genesis-check(J66)+genesis-pulse-check(J72), 17=cohort-broadcast+quantum-field-check+genesis-resonance-check(J73), 18=LOT AI story (Sun)+resonance-propagation-check(J74), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory+somatic-integration-field(J54), 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock+circadian-sovereignty(J59), 8=biofield+peak-window+sovereign-field-check(J60), 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+embodied-sovereignty(J55)+field-organization(J61), 10=archetype shift+apex-state(J56), 11=morning-intention-launch+unified-field(J57)+sovereign-expression-check(J67), 12=vitality-peak+conscious-field-check(J62)+field-witness-check(J68), 13=QOS sig pulse+sovereign-integration-check(J63)+sovereign-loop-check(J69), 14=QOS mode watch+absolute-sovereignty-check(J64)+genesis-seal-check(J70), 15=QOS convergence audit+perpetual-field-check(J65), 16=coherence index+focus-depth-check+qiot-ecosystem-pulse(J58)+field-genesis-check(J66)+genesis-pulse-check(J72), 17=cohort-broadcast+quantum-field-check+genesis-resonance-check(J73), 18=LOT AI story (Sun)+resonance-propagation-check(J74), 19=cross-domain-pulse+resonance-crystallization-check(J75), 20=intention completion+signal-momentum+action-memory+somatic-integration-field(J54), 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()
