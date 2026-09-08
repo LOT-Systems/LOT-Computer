@@ -3428,6 +3428,26 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Auspicious Day Alignment — the daily ambient astrology reading
+  // (Tier 0, recorded once per calendar day by recordAstrologySignal) lands on a
+  // Taian rokuyo day AND the operator sets an intention or logs goal progress in
+  // the same 24h window. Ambient conditions and directed intent co-occurring —
+  // not causal, not a natal claim, just two Tier 0/1 signals aligning same-day.
+  const dayMs152 = 24 * 60 * 60 * 1000
+  const recentDay152 = signals.filter(s => now - s.timestamp < dayMs152)
+  const auspiciousReading152 = recentDay152.find(s => s.source === 'astrology' && s.metadata?.auspicious === true)
+  const intentOrGoal152 = recentDay152.filter(s => s.source === 'intentions' || s.source === 'goals')
+  if (auspiciousReading152 && intentOrGoal152.length >= 1) {
+    const sameDayCount = intentOrGoal152.length
+    patterns.push({
+      pattern: 'auspicious-day-alignment',
+      confidence: Math.min(0.55 + sameDayCount * 0.08, 0.75),
+      suggestedWidget: 'intentions',
+      suggestedTiming: 'passive',
+      reason: `AUSP-ALIGN: Taian day — ${auspiciousReading152.metadata?.rokuyo ?? 'Taian'} rokuyo, ${auspiciousReading152.metadata?.moonPhase ?? ''} — and an intention set the same day. Ambient reading and directed intent aligned; not causal, just coincident.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
