@@ -48,7 +48,7 @@ const fastify = Fastify({
   bodyLimit: 1_048_576,
 })
 
-const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log']
+const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log', '/basics']
 
 // ==============================================================================
 // SECURITY PLUGINS

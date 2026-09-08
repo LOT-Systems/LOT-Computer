@@ -8,12 +8,15 @@
 
 import * as React from 'react'
 import axios, { AxiosError } from 'axios'
+import { useStore } from '@nanostores/react'
 import { Button, ErrorLine, Input, Link, P } from '#client/components/ui'
 import { cn } from '#client/utils'
 import { render } from '#client/utils/render'
 import config from '#client/config'
+import * as stores from '#client/stores'
 import '#client/stores/theme'
 import { Layout } from '#client/components/ui'
+import { Basics } from '#client/components/Basics'
 
 const LOT_ONELINERS = [
   'LOT is the subscription for basic essentials.',
@@ -41,6 +44,18 @@ function LotOneliner() {
 }
 
 const App = () => {
+  const router = useStore(stores.router)
+
+  // OPEN TAB: the Basics ledger is public — a signed-out visitor can read it
+  // without logging in. Every other route on this bundle falls back to login.
+  if (router?.route === 'basics') {
+    return (
+      <Layout>
+        <Basics />
+      </Layout>
+    )
+  }
+
   return (
     <Layout>
       <div className="mb-24">
