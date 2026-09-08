@@ -24,7 +24,7 @@ import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
 import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
-import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
+import { useProfile, useLogs, useCommunityEmotion, useCreateLog } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
 import { UserTag } from '#shared/types'
 import { TimeWidget } from './TimeWidget'
@@ -136,6 +136,18 @@ export const System = React.memo(function SystemInner() {
   const [isSoundToggling, setIsSoundToggling] = React.useState(false)
   const [showSharedEmotion, setShowSharedEmotion] = React.useState(false)
   const [selectedQuantumCell, setSelectedQuantumCell] = React.useState(0)
+
+  // Moment snapshot — click any environment reading (sky, astrology) to
+  // record a context-only record/snapshot with no photo or sound, just
+  // the ambient weather + astrology state at that instant. Reuses the
+  // system_snapshot log event (context is attached server-side).
+  const { mutate: createMomentSnapshot } = useCreateLog()
+  const [momentSnapshotFlash, setMomentSnapshotFlash] = React.useState(false)
+  const recordMomentSnapshot = React.useCallback(() => {
+    createMomentSnapshot({ text: 'Moment recorded.', event: 'system_snapshot' })
+    setMomentSnapshotFlash(true)
+    setTimeout(() => setMomentSnapshotFlash(false), 1500)
+  }, [createMomentSnapshot])
 
   // Compute whether to show sunset or sunrise based on current time
   // Show sunset during daytime (between sunrise and sunset)
@@ -444,7 +456,9 @@ export const System = React.memo(function SystemInner() {
           <TimeWidget />
           {!!weather && (
             <>
-              <Block label="Sky:">{weather?.description || 'Unknown'}</Block>
+              <Block label="Sky:" onClick={recordMomentSnapshot}>
+                {momentSnapshotFlash ? 'Moment recorded ✓' : weather?.description || 'Unknown'}
+              </Block>
               <Block
                 label="Temperature:"
                 onClick={() => stores.isTempFahrenheit.set(!isTempFahrenheit)}
@@ -463,9 +477,11 @@ export const System = React.memo(function SystemInner() {
         </div>
 
         <div>
-          <Block label="Astrology:">
+          <Block label="Astrology:" onClick={recordMomentSnapshot}>
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              {momentSnapshotFlash
+                ? 'Moment recorded ✓'
+                : `${astrology.westernZodiac} • ${astrology.hourlyZodiac} • ${astrology.rokuyo} • ${astrology.moonPhase} (${astrology.moonIllumination}%)`}
             </div>
           </Block>
         </div>
@@ -617,7 +633,9 @@ export const System = React.memo(function SystemInner() {
         <QuantumRandomWidget />
         {!!weather && (
           <>
-            <Block label="Sky:">{weather?.description || 'Unknown'}</Block>
+            <Block label="Sky:" onClick={recordMomentSnapshot}>
+              {momentSnapshotFlash ? 'Moment recorded ✓' : weather?.description || 'Unknown'}
+            </Block>
             <Block label="Humidity:">
               <span
                 className={cn(
@@ -668,10 +686,13 @@ export const System = React.memo(function SystemInner() {
               'astrology'
             )
           }}
+          onChildrenClick={astrologyView === 'astrology' ? recordMomentSnapshot : undefined}
         >
           {astrologyView === 'astrology' ? (
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              {momentSnapshotFlash
+                ? 'Moment recorded ✓'
+                : `${astrology.westernZodiac} • ${astrology.hourlyZodiac} • ${astrology.rokuyo} • ${astrology.moonPhase} (${astrology.moonIllumination}%)`}
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>
