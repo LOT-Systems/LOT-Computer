@@ -281,7 +281,7 @@ export const CohortConnectWidget: React.FC = () => {
         {matches.length > 5 && (
           <div className="mt-16">
             <button
-              onClick={() => window.location.href = '/community'}
+              onClick={() => stores.goTo('sync')}
               className="hover:opacity-100 transition-opacity"
             >
               View all {matches.length} members
