@@ -30,7 +30,7 @@ export type LogTrigger =
   | 'force-fast'        // /fast
   | 'radio-toggle'      // 🎧  or  /radio
   | 'night-mode'        // 🌙  or  /night
-  | 'prayer-mode'       // 🕯️  or  /prayer
+  | 'prayer-mode'       // 핯️  or  /prayer
   | 'freeze-widgets'    // 🧊  or  /freeze
   | 'cohort-support'    // ❗  (heavy exclamation, distinct from regular '!')
   | 'qos-report'        // /qos — surface Quantum OS state in current log session
@@ -39,7 +39,7 @@ export type LogTrigger =
   | 'sil-check'         // /sil — check for signal silence pattern
   | 'qi-rfi'            // /qi — Quantum Intelligence RFI (Request for Information)
   | 'system-help'       // /system — list all available slash commands
-  | 'story-mode'        // /story — generate contextual story from recent data
+  | 'story-mode'        // /story [day|week|month|year] — generate/compress a story
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
 
 interface TriggerRule {
@@ -56,7 +56,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'force-fast',     emojis: [],       keywords: ['fast'] },
   { trigger: 'radio-toggle',   emojis: ['🎧'],    keywords: ['radio'] },
   { trigger: 'night-mode',     emojis: ['🌙'],    keywords: ['night'] },
-  { trigger: 'prayer-mode',    emojis: ['🕯️', '🕯'], keywords: ['prayer', 'candle'] },
+  { trigger: 'prayer-mode',    emojis: ['핯️', '핯'], keywords: ['prayer', 'candle'] },
   { trigger: 'freeze-widgets', emojis: ['🧊'],    keywords: ['freeze', 'pause'] },
   { trigger: 'cohort-support', emojis: ['❗', '‼️', '‼'], keywords: [] },
   { trigger: 'qos-report',     emojis: [],        keywords: ['qos', 'os-report'] },
