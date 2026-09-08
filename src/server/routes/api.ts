@@ -1318,6 +1318,10 @@ export default async (fastify: FastifyInstance) => {
       'resonance_crystallization_field',
       'crystalline_coherence_lock',
       'absolute_crystalline_genesis',
+      // v142: crystalline sovereignty field · absolute crystalline sovereignty · eternal crystalline genesis (P230/P231/P232)
+      'crystalline_sovereignty_field',
+      'absolute_crystalline_sovereignty',
+      'eternal_crystalline_genesis',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

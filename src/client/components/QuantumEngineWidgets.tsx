@@ -188,6 +188,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'resonance-crystallization-field':  'RCRYST',
   'crystalline-coherence-lock':       'CRYLCK',
   'absolute-crystalline-genesis':     'ABSCRY',
+  'crystalline-sovereignty-field':    'CRYSOV',
+  'absolute-crystalline-sovereignty': 'ABSCSOV',
+  'eternal-crystalline-genesis':      'ECRYGEN',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

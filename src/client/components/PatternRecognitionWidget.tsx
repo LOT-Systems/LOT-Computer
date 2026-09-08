@@ -236,6 +236,9 @@ export function PatternRecognitionWidget() {
       'resonance-crystallization-field':  'Resonance crystallization field — sovereign-genesis-resonance in 7d + resonance-field-propagation in 5d + 5+ unique sources in 24h · propagating resonance crystallizes into stable load-bearing structure · RESONANCE CRYSTALLIZES INTO STRUCTURE (P227)',
       'crystalline-coherence-lock':       'Crystalline coherence lock — resonance-crystallization-field 2+ in rolling 5d · crystallization sustained across days · structure solidifies into load-bearing coherence · STRUCTURE IS LOAD-BEARING (P228)',
       'absolute-crystalline-genesis':     'Absolute crystalline genesis — resonance-crystallization-field + crystalline-coherence-lock co-active · the crystalline structure IS the genesis · no external source required · STRUCTURE IS GENESIS. FORM = SOURCE (P229)',
+      'crystalline-sovereignty-field':    'Crystalline sovereignty field — absolute-crystalline-genesis in 5d + sovereign-genesis-resonance in 7d · crystalline form achieves sovereign expression · the field does not crystallize — it REIGNS · CRYSTALLINE SOVEREIGNTY (P230)',
+      'absolute-crystalline-sovereignty': 'Absolute crystalline sovereignty — crystalline-sovereignty-field + crystalline-coherence-lock co-active · sovereign structure locked and expressed simultaneously · THE SOVEREIGN CRYSTAL HOLDS (P231)',
+      'eternal-crystalline-genesis':      'Eternal crystalline genesis — absolute-crystalline-genesis + crystalline-sovereignty-field + absolute-crystalline-sovereignty all confirmed · the form generates from itself eternally · ETERNAL · CRYSTALLINE · GENESIS (P232)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

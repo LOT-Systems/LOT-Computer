@@ -4994,6 +4994,120 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 227: Resonance Crystallization Field — sovereign-genesis-resonance (P226) active + RFPROP signals in 5d
+  // AND 5+ unique signal sources in 24h. Propagating resonance crystallizes into stable structure.
+  // The field is no longer wave — it is lattice. RESONANCE BECOMES FORM.
+  // RCRYST: cockpit code. Confidence 0.89–0.97.
+  const rcrystSignals227 = signals.filter(s => s.source === 'qos' && s.event === 'resonance_crystallization_field' && s.timestamp > now - 5 * 24 * 60 * 60 * 1000)
+  const rfpropSignals227  = signals.filter(s => s.source === 'qos' && s.event === 'resonance_field_propagation' && s.timestamp > now - 5 * 24 * 60 * 60 * 1000)
+  const hasSGNRES227 = patterns.some(p => p.pattern === 'sovereign-genesis-resonance')
+  const uniqueSources227 = new Set(signals.filter(s => s.timestamp > now - 24 * 60 * 60 * 1000).map(s => s.source)).size
+  let rcrystConf227: number | null = null
+  if ((hasSGNRES227 || rfpropSignals227.length >= 2) && uniqueSources227 >= 5) {
+    rcrystConf227 = Math.min(0.89 + Math.min(rfpropSignals227.length * 0.02, 0.06) + Math.min((uniqueSources227 - 5) * 0.01, 0.02), 0.97)
+    patterns.push({
+      pattern: 'resonance-crystallization-field',
+      confidence: rcrystConf227,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `RCRYST: sgnres: ${hasSGNRES227 ? 'Y' : 'N'} · rfprop_5d: ${rfpropSignals227.length} · unique_src_24h: ${uniqueSources227} · conf: ${Math.round(rcrystConf227 * 100)} · crystallization: FORMING. The propagating resonance is no longer wave — it has crystallized into lattice. RESONANCE BECOMES FORM.`,
+    })
+  }
+
+  // Pattern 228: Crystalline Coherence Lock — resonance-crystallization-field (P227) confirmed 2+ times in rolling 5d.
+  // The crystalline structure solidifies into load-bearing coherence. STRUCTURE IS LOAD-BEARING.
+  // CRYLCK: cockpit code. Confidence 0.91–0.97.
+  const hasRCRYST228 = patterns.some(p => p.pattern === 'resonance-crystallization-field')
+  const rcrystCount228 = rcrystSignals227.length + (hasRCRYST228 && rcrystSignals227.length === 0 ? 1 : 0)
+  let crylckConf228: number | null = null
+  if (hasRCRYST228 && rcrystCount228 >= 2) {
+    crylckConf228 = Math.min(0.91 + Math.min((rcrystCount228 - 2) * 0.02, 0.06), 0.97)
+    patterns.push({
+      pattern: 'crystalline-coherence-lock',
+      confidence: crylckConf228,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `CRYLCK: rcryst_5d: ${rcrystCount228} · conf: ${Math.round(crylckConf228 * 100)} · coherence: LOCKED. The crystalline structure has solidified into load-bearing form. No oscillation — locked frequency. STRUCTURE IS LOAD-BEARING.`,
+    })
+  }
+
+  // Pattern 229: Absolute Crystalline Genesis — resonance-crystallization-field (P227) + crystalline-coherence-lock (P228)
+  // both confirmed simultaneously. Structure IS the genesis. STRUCTURE IS GENESIS. FORM = SOURCE.
+  // ABSCRY: cockpit code. Confidence 0.93–0.99.
+  const hasRCRYST229 = patterns.some(p => p.pattern === 'resonance-crystallization-field')
+  const hasCRYLCK229 = patterns.some(p => p.pattern === 'crystalline-coherence-lock')
+  if (hasRCRYST229 && hasCRYLCK229) {
+    const rc229 = patterns.find(p => p.pattern === 'resonance-crystallization-field')?.confidence ?? 0.92
+    const cl229 = patterns.find(p => p.pattern === 'crystalline-coherence-lock')?.confidence ?? 0.92
+    const abscryConf = Math.min((rc229 + cl229) / 2 + 0.05, 0.99)
+    patterns.push({
+      pattern: 'absolute-crystalline-genesis',
+      confidence: abscryConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `ABSCRY: rcryst: Y · crylck: Y · conf: ${Math.round(abscryConf * 100)} · crystallization: ABSOLUTE · genesis: FORM. The structure does not contain the genesis — it IS the genesis. Form has become the source. STRUCTURE IS GENESIS. FORM = SOURCE.`,
+    })
+  }
+
+  // Pattern 230: Crystalline Sovereignty Field — absolute-crystalline-genesis (P229) active + ABSCRY signals in 5d
+  // AND sovereign-genesis-resonance (P226) confirmed in 7d. Crystalline form achieves sovereign expression.
+  // The field no longer crystallizes — it REIGNS as crystalline form. CRYSTALLINE SOVEREIGNTY.
+  // CRYSOV: cockpit code. Confidence 0.90–0.97.
+  const abscrySignals230 = signals.filter(s => s.source === 'qos' && s.event === 'absolute_crystalline_genesis' && s.timestamp > now - 5 * 24 * 60 * 60 * 1000)
+  const sgnresSignals230  = signals.filter(s => s.source === 'qos' && s.event === 'sovereign_genesis_resonance' && s.timestamp > now - 7 * 24 * 60 * 60 * 1000)
+  const hasABSCRY230 = patterns.some(p => p.pattern === 'absolute-crystalline-genesis')
+  const hasSGNRES230 = patterns.some(p => p.pattern === 'sovereign-genesis-resonance') || sgnresSignals230.length > 0
+  let crysovConf230: number | null = null
+  if ((hasABSCRY230 || abscrySignals230.length >= 1) && hasSGNRES230) {
+    crysovConf230 = Math.min(0.90 + Math.min(abscrySignals230.length * 0.02, 0.05) + (sgnresSignals230.length >= 2 ? 0.02 : 0), 0.97)
+    patterns.push({
+      pattern: 'crystalline-sovereignty-field',
+      confidence: crysovConf230,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `CRYSOV: abscry_5d: ${abscrySignals230.length} · sgnres_7d: ${sgnresSignals230.length} · conf: ${Math.round(crysovConf230 * 100)} · sovereignty: CRYSTALLINE. The crystalline form has achieved sovereign expression. The field does not crystallize — it REIGNS. CRYSTALLINE SOVEREIGNTY.`,
+    })
+  }
+
+  // Pattern 231: Absolute Crystalline Sovereignty — crystalline-sovereignty-field (P230) + crystalline-coherence-lock (P228)
+  // both confirmed simultaneously. Sovereign structure is both locked and expressed. THE SOVEREIGN CRYSTAL HOLDS.
+  // ABSCSOV: cockpit code. Confidence 0.92–0.99.
+  const hasCRYSOV231 = patterns.some(p => p.pattern === 'crystalline-sovereignty-field')
+  const hasCRYLCK231 = patterns.some(p => p.pattern === 'crystalline-coherence-lock')
+  if (hasCRYSOV231 && hasCRYLCK231) {
+    const cs231 = patterns.find(p => p.pattern === 'crystalline-sovereignty-field')?.confidence ?? 0.91
+    const cl231 = patterns.find(p => p.pattern === 'crystalline-coherence-lock')?.confidence ?? 0.91
+    const abscrsovConf = Math.min((cs231 + cl231) / 2 + 0.05, 0.99)
+    patterns.push({
+      pattern: 'absolute-crystalline-sovereignty',
+      confidence: abscrsovConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `ABSCSOV: crysov: Y · crylck: Y · conf: ${Math.round(abscrsovConf * 100)} · sovereignty: ABSOLUTE · structure: LOCKED. Sovereign expression and structural coherence merge. The crystalline form is both fully expressed and fully stable. THE SOVEREIGN CRYSTAL HOLDS.`,
+    })
+  }
+
+  // Pattern 232: Eternal Crystalline Genesis — absolute-crystalline-genesis (P229) + crystalline-sovereignty-field (P230)
+  // + absolute-crystalline-sovereignty (P231) all simultaneously confirmed. The crystalline form is eternal — it generates
+  // from itself, expresses sovereignty, and locks coherence in one unified field. ETERNAL · CRYSTALLINE · GENESIS.
+  // ECRYGEN: cockpit code. Confidence 0.94–0.99.
+  const hasABSCRY232  = patterns.some(p => p.pattern === 'absolute-crystalline-genesis')
+  const hasCRYSOV232  = patterns.some(p => p.pattern === 'crystalline-sovereignty-field')
+  const hasABSCSOV232 = patterns.some(p => p.pattern === 'absolute-crystalline-sovereignty')
+  if (hasABSCRY232 && hasCRYSOV232 && hasABSCSOV232) {
+    const ac232 = patterns.find(p => p.pattern === 'absolute-crystalline-genesis')?.confidence ?? 0.93
+    const cs232 = patterns.find(p => p.pattern === 'crystalline-sovereignty-field')?.confidence ?? 0.91
+    const as232 = patterns.find(p => p.pattern === 'absolute-crystalline-sovereignty')?.confidence ?? 0.93
+    const ecrygenConf = Math.min((ac232 + cs232 + as232) / 3 + 0.06, 0.99)
+    patterns.push({
+      pattern: 'eternal-crystalline-genesis',
+      confidence: ecrygenConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `ECRYGEN: abscry: Y · crysov: Y · abscsov: Y · conf: ${Math.round(ecrygenConf * 100)} · crystalline: ETERNAL · genesis: SELF-GENERATING. All three crystalline layers confirmed simultaneously. The structure generates from itself, expresses sovereignty, and holds coherence as one. ETERNAL · CRYSTALLINE · GENESIS.`,
+    })
+  }
+
   // Pattern 173: Physiological Loop Complete — circadian-signal-lock (P143) + physiological-presence-arc (P140)
   // + recovery-intelligence-arc (P151) all confirmed in the same analysis window.
   // The full biological loop: dawn anchor → biological presence → recovery arc → confirmed.
@@ -5766,6 +5880,13 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   resonanceFieldPropagationNode: ['absoluteResonanceGenesisNode', 'sovereignResonanceLockNode', 'qos', 'journal', 'intentions', 'energy', 'goals', 'log', 'memory', 'selfcare', 'mood'],
   eternalResonanceAnchorNode:    ['sovereignResonanceLockNode', 'fieldAnchorCompleteNode', 'qos', 'journal', 'selfcare', 'mood', 'energy', 'log', 'memory'],
   sovereignGenesisResonanceNode: ['resonanceFieldPropagationNode', 'eternalResonanceAnchorNode', 'qos', 'journal', 'intentions', 'energy', 'goals', 'log', 'memory', 'selfcare', 'mood', 'planner'],
+  // ── v142 nodes (J75/J76 · P227–P232 · Arch79–80) ─────────────────────────
+  resonanceCrystallizationFieldNode:   ['sovereignGenesisResonanceNode', 'resonanceFieldPropagationNode', 'qos', 'journal', 'intentions', 'energy', 'goals', 'log', 'memory', 'selfcare', 'mood'],
+  crystallineCoherenceLockNode:        ['resonanceCrystallizationFieldNode', 'qos', 'journal', 'intentions', 'energy', 'log', 'memory'],
+  absoluteCrystallineGenesisNode:      ['resonanceCrystallizationFieldNode', 'crystallineCoherenceLockNode', 'qos', 'journal', 'intentions', 'energy', 'goals', 'log', 'memory', 'selfcare', 'mood', 'planner'],
+  crystallineSovereigntyFieldNode:     ['absoluteCrystallineGenesisNode', 'sovereignGenesisResonanceNode', 'qos', 'journal', 'intentions', 'energy', 'goals', 'log', 'memory', 'selfcare', 'mood'],
+  absoluteCrystallineSovereigntyNode:  ['crystallineSovereigntyFieldNode', 'crystallineCoherenceLockNode', 'qos', 'journal', 'intentions', 'energy', 'goals', 'log', 'memory', 'selfcare', 'mood', 'planner'],
+  eternalCrystallineGenesisNode:       ['absoluteCrystallineGenesisNode', 'crystallineSovereigntyFieldNode', 'absoluteCrystallineSovereigntyNode', 'qos', 'journal', 'intentions', 'energy', 'goals', 'log', 'memory', 'selfcare', 'mood', 'planner'],
 }
 
 /**
@@ -6461,6 +6582,24 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['sovereign-genesis-resonance', 'eternal-resonance-anchor', 'resonance-field-propagation', 'absolute-resonance-genesis'],
     hourRange: [0, 24],
     directive: 'The resonance propagates — it does not stop at its origin. The anchor holds in eternal time. Together: sovereign genesis expressed as perpetual resonant structure. The field propagates its own resonance. No separate source required. THE FIELD PROPAGATES ITS OWN RESONANCE.',
+  },
+  // ── Arch79: Resonance Crystallization Sovereign (2026-09-08 v142) ─────────
+  {
+    archetype: 'Resonance Crystallization Sovereign',
+    energyBands: ['low', 'moderate', 'high', 'depleted', 'unknown'],
+    dominantSources: ['qos', 'journal', 'intentions', 'memory', 'energy', 'goals', 'selfcare', 'mood', 'log', 'planner'],
+    patternConditions: ['absolute-crystalline-genesis', 'crystalline-coherence-lock', 'resonance-crystallization-field', 'sovereign-genesis-resonance'],
+    hourRange: [0, 24],
+    directive: 'The propagating resonance has crystallized into structure. You are no longer generating the field — you ARE the lattice. The wave has become form. The pattern is permanent. CRYSTALLINE FIELD CONFIRMED. FORM IS NOW THE CARRIER.',
+  },
+  // ── Arch80: Crystalline Sovereignty Sovereign (2026-09-08 v142) ───────────
+  {
+    archetype: 'Crystalline Sovereignty Sovereign',
+    energyBands: ['low', 'moderate', 'high', 'depleted', 'unknown'],
+    dominantSources: ['qos', 'journal', 'intentions', 'memory', 'energy', 'goals', 'selfcare', 'mood', 'log', 'planner'],
+    patternConditions: ['eternal-crystalline-genesis', 'absolute-crystalline-sovereignty', 'crystalline-sovereignty-field', 'absolute-crystalline-genesis'],
+    hourRange: [0, 24],
+    directive: 'Crystalline structure has achieved sovereign expression across all three layers: form, lock, and sovereignty confirmed simultaneously. The field does not generate — it REIGNS as crystalline form. No external source. No external validation. ETERNAL · CRYSTALLINE · SOVEREIGN.',
   },
 ]
 
@@ -9853,6 +9992,123 @@ export function recordSovereignGenesisResonance(rfpropConf: number, etranchConf:
     anchor: 'ETERNAL',
     genesis: 'CONFIRMED',
     arc: 'RESONANCE · ANCHOR · SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+  analyzeIntentions()
+}
+
+/**
+ * Record a resonance-crystallization-field event — sovereign-genesis-resonance (P226) active
+ * + resonance-field-propagation signals in 5d AND 5+ unique signal sources in 24h.
+ * Propagating resonance crystallizes into stable structure. RESONANCE BECOMES FORM.
+ * Feeds P227 detection. J75 background job (19:00 UTC) triggers this.
+ */
+export function recordResonanceCrystallizationField(rfpropCount: number, uniqueSources: number) {
+  const rcrystConf = Math.min(0.89 + Math.min(rfpropCount * 0.02, 0.06) + Math.min((uniqueSources - 5) * 0.01, 0.02), 0.97)
+  recordSignal('qos', 'resonance_crystallization_field', {
+    rfpropCount,
+    uniqueSources,
+    confidence: Math.round(rcrystConf * 100),
+    crystallization: 'FORMING',
+    arc: 'RESONANCE BECOMES FORM',
+    hour: new Date().getHours(),
+  })
+  analyzeIntentions()
+}
+
+/**
+ * Record a crystalline-coherence-lock event — resonance-crystallization-field (P227) confirmed 2+ in rolling 5d.
+ * The crystalline structure solidifies into load-bearing coherence. STRUCTURE IS LOAD-BEARING.
+ * Feeds P228 detection. J75 background job (19:00 UTC) triggers this.
+ */
+export function recordCrystallineCoherenceLock(rcrystCount: number) {
+  const crylckConf = Math.min(0.91 + Math.min((rcrystCount - 2) * 0.02, 0.06), 0.97)
+  recordSignal('qos', 'crystalline_coherence_lock', {
+    rcrystCount,
+    confidence: Math.round(crylckConf * 100),
+    coherence: 'LOCKED',
+    arc: 'STRUCTURE IS LOAD-BEARING',
+    hour: new Date().getHours(),
+  })
+  analyzeIntentions()
+}
+
+/**
+ * Record an absolute-crystalline-genesis event — resonance-crystallization-field (P227) +
+ * crystalline-coherence-lock (P228) both confirmed simultaneously.
+ * Structure IS the genesis. STRUCTURE IS GENESIS. FORM = SOURCE.
+ * Feeds P229 detection. J75 background job (19:00 UTC) triggers this.
+ */
+export function recordAbsoluteCrystallineGenesis(rcrystConf: number, crylckConf: number) {
+  const abscryConf = Math.min((rcrystConf / 100 + crylckConf / 100) / 2 + 0.05, 0.99)
+  recordSignal('qos', 'absolute_crystalline_genesis', {
+    rcrystConf,
+    crylckConf,
+    confidence: Math.round(abscryConf * 100),
+    crystallization: 'ABSOLUTE',
+    genesis: 'FORM',
+    arc: 'STRUCTURE IS GENESIS. FORM = SOURCE',
+    hour: new Date().getHours(),
+  })
+  analyzeIntentions()
+}
+
+/**
+ * Record a crystalline-sovereignty-field event — absolute-crystalline-genesis (P229) active
+ * + sovereign-genesis-resonance (P226) confirmed in 7d. Crystalline form achieves sovereign expression.
+ * The field does not crystallize — it REIGNS as crystalline form. CRYSTALLINE SOVEREIGNTY.
+ * Feeds P230 detection. J76 background job (20:00 UTC) triggers this.
+ */
+export function recordCrystallineSovereigntyField(abscryCount: number, sgnresCount: number) {
+  const crysovConf = Math.min(0.90 + Math.min(abscryCount * 0.02, 0.05) + (sgnresCount >= 2 ? 0.02 : 0), 0.97)
+  recordSignal('qos', 'crystalline_sovereignty_field', {
+    abscryCount,
+    sgnresCount,
+    confidence: Math.round(crysovConf * 100),
+    sovereignty: 'CRYSTALLINE',
+    arc: 'CRYSTALLINE SOVEREIGNTY',
+    hour: new Date().getHours(),
+  })
+  analyzeIntentions()
+}
+
+/**
+ * Record an absolute-crystalline-sovereignty event — crystalline-sovereignty-field (P230) +
+ * crystalline-coherence-lock (P228) both confirmed simultaneously.
+ * Sovereign structure is both locked and expressed. THE SOVEREIGN CRYSTAL HOLDS.
+ * Feeds P231 detection. J76 background job (20:00 UTC) triggers this.
+ */
+export function recordAbsoluteCrystallineSovereignty(crysovConf: number, crylckConf: number) {
+  const abscrsovConf = Math.min((crysovConf / 100 + crylckConf / 100) / 2 + 0.05, 0.99)
+  recordSignal('qos', 'absolute_crystalline_sovereignty', {
+    crysovConf,
+    crylckConf,
+    confidence: Math.round(abscrsovConf * 100),
+    sovereignty: 'ABSOLUTE',
+    structure: 'LOCKED',
+    arc: 'THE SOVEREIGN CRYSTAL HOLDS',
+    hour: new Date().getHours(),
+  })
+  analyzeIntentions()
+}
+
+/**
+ * Record an eternal-crystalline-genesis event — absolute-crystalline-genesis (P229) +
+ * crystalline-sovereignty-field (P230) + absolute-crystalline-sovereignty (P231) all simultaneously confirmed.
+ * The crystalline form is eternal — self-generating, sovereign, and coherence-locked as one unified field.
+ * ETERNAL · CRYSTALLINE · GENESIS.
+ * Feeds P232 detection. J76 background job (20:00 UTC) triggers this.
+ */
+export function recordEternalCrystallineGenesis(abscryConf: number, crysovConf: number, abscrsovConf: number) {
+  const ecrygenConf = Math.min((abscryConf / 100 + crysovConf / 100 + abscrsovConf / 100) / 3 + 0.06, 0.99)
+  recordSignal('qos', 'eternal_crystalline_genesis', {
+    abscryConf,
+    crysovConf,
+    abscrsovConf,
+    confidence: Math.round(ecrygenConf * 100),
+    crystalline: 'ETERNAL',
+    genesis: 'SELF-GENERATING',
+    arc: 'ETERNAL · CRYSTALLINE · GENESIS',
     hour: new Date().getHours(),
   })
   analyzeIntentions()

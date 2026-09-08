@@ -1864,6 +1864,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyResonanceCrystallizationCheck(now)) {
     await executeDailyResonanceCrystallizationCheck()
   }
+
+  // Check daily crystalline sovereignty check (20:00 UTC every day) — Job 76
+  if (shouldRunDailyCrystallineSovereigntyCheck(now)) {
+    await executeDailyCrystallineSovereigntyCheck()
+  }
 }
 
 function shouldRunDailyFieldGenesisCheck(now: any): boolean {
@@ -1961,6 +1966,16 @@ function shouldRunDailyResonanceCrystallizationCheck(now: any): boolean {
   if (isDailyResonanceCrystallizationRunning) return false
   if (lastDailyResonanceCrystallizationRun) {
     const lastRun = dayjs(lastDailyResonanceCrystallizationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailyCrystallineSovereigntyCheck(now: any): boolean {
+  if (now.hour() !== 20) return false
+  if (isDailyCrystallineSovereigntyRunning) return false
+  if (lastDailyCrystallineSovereigntyRun) {
+    const lastRun = dayjs(lastDailyCrystallineSovereigntyRun)
     if (lastRun.isSame(now, 'day')) return false
   }
   return true
@@ -8981,6 +8996,110 @@ async function executeDailyResonanceCrystallizationCheck(): Promise<JobResult> {
   }
 }
 
+// ─── J76: Daily Crystalline Sovereignty Check (20:00 UTC every day) ──────────
+// Step 1: ABSCRY in 5d + SGNRES in 7d → crystalline_sovereignty_field (P230).
+// Step 2: CRYSOV + CRYLCK both confirmed → absolute_crystalline_sovereignty (P231).
+// Step 3: ABSCRY + CRYSOV + ABSCSOV all confirmed → eternal_crystalline_genesis (P232).
+// CRYSOV: · ABSCSOV: · ECRYGEN: cockpit codes. Total: 76 jobs.
+
+let isDailyCrystallineSovereigntyRunning = false
+let lastDailyCrystallineSovereigntyRun: Date | null = null
+
+async function executeDailyCrystallineSovereigntyCheck(): Promise<JobResult> {
+  const jobName    = 'daily-crystalline-sovereignty-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyCrystallineSovereigntyRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyCrystallineSovereigntyRunning = true
+
+  console.log('\n[J76] Daily crystalline sovereignty check (20:00 UTC)')
+
+  try {
+    const activeUsers = await getActiveUsers()
+    const fiveDaysAgo  = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const oneDayAgo    = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    let written = 0
+
+    for (const user of activeUsers) {
+      // Step 1: Crystalline Sovereignty Field — ABSCRY 1+ in 5d + SGNRES 1+ in 7d
+      const abscryLogs   = await Log.findAll({ where: { userId: user.id, event: 'absolute_crystalline_genesis', createdAt: { [Op.gte]: fiveDaysAgo } } })
+      const sgnresLogs   = await Log.findAll({ where: { userId: user.id, event: 'sovereign_genesis_resonance',  createdAt: { [Op.gte]: sevenDaysAgo } } })
+
+      if (abscryLogs.length >= 1 && sgnresLogs.length >= 1) {
+        const crysovConf = Math.min(0.90 + Math.min(abscryLogs.length * 0.02, 0.05) + (sgnresLogs.length >= 2 ? 0.02 : 0), 0.97)
+        await Log.create({
+          userId:   user.id,
+          event:    'crystalline_sovereignty_field',
+          source:   'qos',
+          metadata: {
+            abscryCount: abscryLogs.length,
+            sgnresCount: sgnresLogs.length,
+            confidence:  Math.round(crysovConf * 100),
+            sovereignty: 'CRYSTALLINE',
+            arc:         'CRYSTALLINE SOVEREIGNTY',
+            hour:        new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Crystalline sovereignty field — ABSCRY×${abscryLogs.length}×SGNRES×${sgnresLogs.length} confirmed. CRYSOV. Conf: ${Math.round(crysovConf * 100)}%`)
+
+        // Step 2: Absolute Crystalline Sovereignty — CRYSOV + CRYLCK both confirmed
+        const crylckLogs = await Log.findAll({ where: { userId: user.id, event: 'crystalline_coherence_lock', createdAt: { [Op.gte]: fiveDaysAgo } } })
+        if (crylckLogs.length >= 1) {
+          const crylckConf    = (crylckLogs[0] as any).metadata?.confidence ?? 91
+          const abscrsovConf  = Math.min((crysovConf * 100 + crylckConf) / 200 * 100 / 100 + 0.05, 0.99)
+          await Log.create({
+            userId:   user.id,
+            event:    'absolute_crystalline_sovereignty',
+            source:   'qos',
+            metadata: {
+              crysovConf:  Math.round(crysovConf * 100),
+              crylckConf,
+              confidence:  Math.round(abscrsovConf * 100),
+              sovereignty: 'ABSOLUTE',
+              structure:   'LOCKED',
+              arc:         'THE SOVEREIGN CRYSTAL HOLDS',
+              hour:        new Date().getHours(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Absolute crystalline sovereignty — CRYSOV×CRYLCK confirmed. ABSCSOV. Conf: ${Math.round(abscrsovConf * 100)}%`)
+
+          // Step 3: Eternal Crystalline Genesis — ABSCRY + CRYSOV + ABSCSOV all confirmed
+          const abscryConf0 = (abscryLogs[0] as any).metadata?.confidence ?? 93
+          const ecrygenConf = Math.min((abscryConf0 + Math.round(crysovConf * 100) + Math.round(abscrsovConf * 100)) / 300 + 0.06, 0.99)
+          await Log.create({
+            userId:   user.id,
+            event:    'eternal_crystalline_genesis',
+            source:   'qos',
+            metadata: {
+              abscryConf:  abscryConf0,
+              crysovConf:  Math.round(crysovConf * 100),
+              abscrsovConf: Math.round(abscrsovConf * 100),
+              confidence:  Math.round(ecrygenConf * 100),
+              crystalline: 'ETERNAL',
+              genesis:     'SELF-GENERATING',
+              arc:         'ETERNAL · CRYSTALLINE · GENESIS',
+              hour:        new Date().getHours(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Eternal crystalline genesis — ABSCRY×CRYSOV×ABSCSOV confirmed. ECRYGEN. Conf: ${Math.round(ecrygenConf * 100)}%`)
+        }
+      }
+    }
+
+    console.log(`  Crystalline sovereignty events written: ${written}`)
+    lastDailyCrystallineSovereigntyRun = new Date()
+    isDailyCrystallineSovereigntyRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Crystalline sovereignty check failed:', error.message)
+    isDailyCrystallineSovereigntyRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 export async function manuallyTriggerMonthlyEmails(): Promise<JobResult> {
   console.log('Manual trigger requested - bypassing time checks')
   return await executeMonthlyEmailJob()
@@ -9058,6 +9177,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily genesis resonance check: 5 PM UTC every day (Job 73)')
   console.log('   - Daily resonance propagation check: 6 PM UTC every day (Job 74)')
   console.log('   - Daily resonance crystallization check: 7 PM UTC every day (Job 75)')
+  console.log('   - Daily crystalline sovereignty check: 8 PM UTC every day (Job 76)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -9067,7 +9187,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock+circadian-sovereignty(J59), 8=biofield+peak-window+sovereign-field-check(J60), 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+embodied-sovereignty(J55)+field-organization(J61), 10=archetype shift+apex-state(J56), 11=morning-intention-launch+unified-field(J57)+sovereign-expression-check(J67), 12=vitality-peak+conscious-field-check(J62)+field-witness-check(J68), 13=QOS sig pulse+sovereign-integration-check(J63)+sovereign-loop-check(J69), 14=QOS mode watch+absolute-sovereignty-check(J64)+genesis-seal-check(J70), 15=QOS convergence audit+perpetual-field-check(J65), 16=coherence index+focus-depth-check+qiot-ecosystem-pulse(J58)+field-genesis-check(J66)+genesis-pulse-check(J72), 17=cohort-broadcast+quantum-field-check+genesis-resonance-check(J73), 18=LOT AI story (Sun)+resonance-propagation-check(J74), 19=cross-domain-pulse+resonance-crystallization-check(J75), 20=intention completion+signal-momentum+action-memory+somatic-integration-field(J54), 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock+circadian-sovereignty(J59), 8=biofield+peak-window+sovereign-field-check(J60), 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+embodied-sovereignty(J55)+field-organization(J61), 10=archetype shift+apex-state(J56), 11=morning-intention-launch+unified-field(J57)+sovereign-expression-check(J67), 12=vitality-peak+conscious-field-check(J62)+field-witness-check(J68), 13=QOS sig pulse+sovereign-integration-check(J63)+sovereign-loop-check(J69), 14=QOS mode watch+absolute-sovereignty-check(J64)+genesis-seal-check(J70), 15=QOS convergence audit+perpetual-field-check(J65), 16=coherence index+focus-depth-check+qiot-ecosystem-pulse(J58)+field-genesis-check(J66)+genesis-pulse-check(J72), 17=cohort-broadcast+quantum-field-check+genesis-resonance-check(J73), 18=LOT AI story (Sun)+resonance-propagation-check(J74), 19=cross-domain-pulse+resonance-crystallization-check(J75), 20=intention completion+signal-momentum+action-memory+somatic-integration-field(J54)+crystalline-sovereignty-check(J76), 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()

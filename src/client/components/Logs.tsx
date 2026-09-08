@@ -6189,6 +6189,91 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'crystalline_sovereignty_field') {
+          const abscryCount = log.metadata?.abscryCount as number | undefined
+          const sgnresCount = log.metadata?.sgnresCount as number | undefined
+          const confidence  = log.metadata?.confidence  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRYSOV:" blockView>
+                {abscryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ABSCRY 5D</span>
+                    <span className="tabular-nums">{abscryCount}</span>
+                  </div>
+                )}
+                {sgnresCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SGNRES 7D</span>
+                    <span className="tabular-nums">{sgnresCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">THE FIELD REIGNS AS CRYSTALLINE FORM</div>
+                {confidence !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {confidence}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'absolute_crystalline_sovereignty') {
+          const crysovConf = log.metadata?.crysovConf as number | undefined
+          const crylckConf = log.metadata?.crylckConf as number | undefined
+          const confidence = log.metadata?.confidence  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="ABSCSOV:" blockView>
+                {crysovConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRYSOV CONF</span>
+                    <span className="tabular-nums">{crysovConf}%</span>
+                  </div>
+                )}
+                {crylckConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRYLCK CONF</span>
+                    <span className="tabular-nums">{crylckConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">THE SOVEREIGN CRYSTAL HOLDS</div>
+                {confidence !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {confidence}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'eternal_crystalline_genesis') {
+          const abscryConf  = log.metadata?.abscryConf   as number | undefined
+          const crysovConf  = log.metadata?.crysovConf   as number | undefined
+          const abscrsovConf = log.metadata?.abscrsovConf as number | undefined
+          const confidence  = log.metadata?.confidence   as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="ECRYGEN:" blockView>
+                {abscryConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ABSCRY</span>
+                    <span className="tabular-nums">{abscryConf}%</span>
+                  </div>
+                )}
+                {crysovConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRYSOV</span>
+                    <span className="tabular-nums">{crysovConf}%</span>
+                  </div>
+                )}
+                {abscrsovConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ABSCSOV</span>
+                    <span className="tabular-nums">{abscrsovConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ETERNAL · CRYSTALLINE · GENESIS</div>
+                {confidence !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {confidence}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
