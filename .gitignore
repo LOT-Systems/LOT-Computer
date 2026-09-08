@@ -47,7 +47,10 @@ postcss.config.*.backup
 *.working-backup
 
 # Compiled output (should not be in repo)
-server/
+# NOTE: `dist/` above already covers all compiled output (dist/server/**).
+# An unanchored `server/` rule used to live here and silently swallowed any
+# NEW file under src/server/ (already-tracked files were grandfathered in,
+# which is why this went unnoticed) — removed 2026-09-08.
 *.js.map
 
 # Archive files
