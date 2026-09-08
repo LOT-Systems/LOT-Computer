@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.2 — DEVELOPMENT CYCLE 2 (USE CASE 02 APPENDED 2026-09-08)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -57,6 +57,18 @@ read in full:
 
 No prior document specified jump mechanics, surface locomotion, or a
 levitation roadmap. This document is that specification, v.0.
+
+  DEVELOPMENT CYCLE 2 — 2026-09-08 — RE-READING LOG
+  Per this document's own standing instruction (Section 07), this cycle
+  re-read the full corpus before appending — this document in full
+  (v.0.1, Use Case 01), LOT-CUBIQ-VISION.md, LOT-CUBIQ-OPERATOR.md, and
+  the QI·46 Quantum Cube sync milestone (LOT_QI46_ENGINE.md, line
+  750-764: haptic preference / usage frequency / biofield response as
+  the three signal types the cube reports back). No section of the
+  mechanical, electronic, or roadmap spec (01-06, 08) required revision.
+  This cycle adds USE CASE 02 to Section 07 only — the document's
+  design lock (Section 01) has not been reached, so v.0's architecture
+  remains open, but nothing here changed it.
 
 --------------------------------------------------------------------------------
 01 // WHAT v.0 IS AND WHAT IT IS NOT
@@ -320,6 +332,62 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE SHARED NIGHTSTAND                       2026-09-08
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, Archetype "Momentum Architect,"
+  38-day self-care streak, lives with a partner, keeps the CUBIQ
+  charging pad on a nightstand shared by two people in a one-bedroom
+  apartment. Phone is in another room by house rule after 22:00 — the
+  operator's own intentional-tech boundary, set inside the Planner
+  (LOT-CUBIQ-OPERATOR.md, Section 02, "MINUTE 3-5," IntentionsWidget).
+
+  At 22:40 the operator closes their 38th consecutive SelfCareMoments
+  practice of the streak — a Ground exercise logged from bed on a
+  laptop, now also closed. Two things are true at once: this is exactly
+  the kind of sustained-engagement signal Section 04 of
+  LOT-CUBIQ-OPERATOR.md names as the trigger for the AI's next layer of
+  care, and it is 22:40, in a dark room, six inches from a sleeping
+  partner's shoulder. A phone would light the ceiling. A chime would
+  wake the room. Nothing in the operator's Index of Systems should cost
+  someone else their sleep.
+
+  The Index of Systems fires a milestone signal — badge unlock, common
+  class, streak-tier ("uncommon," per Section 03's gesture table). Under
+  the mapping in Section 04, an uncommon unlock would ordinarily call
+  THE HOP: a full <10mm vertical rise, audible against a hard nightstand
+  surface. The v.0 driver does not fire it. The IMU's ambient
+  accelerometer channel — the same sensor stack specified for landing
+  recovery in Section 03 — has been reading near-zero surface vibration
+  and a flat, motionless local field since 22:15: a nightstand at rest,
+  a room gone quiet. The driver treats sustained stillness after 22:00
+  as a standing "quiet-hours" context and downgrades every queued
+  gesture one tier for the remainder of the local night, regardless of
+  badge class. THE HOP is not sent. THE SETTLE is sent instead — the
+  same 2-second held actuator pressure Section 04 built for "presence
+  without spectacle," reused here for a second purpose its designers
+  did not originally name: presence without disturbance.
+
+  The operator, still awake, feels nothing through the nightstand they
+  are not touching — but the next morning, opening the cubic, they find
+  the badge already unlocked, the streak counter already advanced, and
+  a single line in the log: the cube settled at 22:41, holding position
+  through the night the way a hand rests on a shoulder without
+  squeezing it. Their partner never woke. The Robot Training Data API
+  (LOT-CUBIQ-OPERATOR.md, Section 06) later records this as a "boundary-
+  respecting" signal in the operator's haptic preference profile — proof
+  that the cube learned not just when to speak, but when the room around
+  the operator matters more than the message.
+
+  This is the use case that extends v.0's four-gesture vocabulary
+  (Section 04) without adding a fifth gesture or a new actuator: the
+  same landing-recovery IMU that rights a tipped cube also reads the
+  room it is standing in, and the same THE SETTLE gesture built for
+  quiet daytime presence becomes, at night, an act of restraint. A
+  notification system that knows when NOT to notify — for the operator's
+  own household, not just the operator — is the physical expression of
+  the anti-feed thesis reaching further than the software cubic alone
+  ever could.
 
 --------------------------------------------------------------------------------
 08 // BRAND
