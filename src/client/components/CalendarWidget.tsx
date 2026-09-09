@@ -13,7 +13,7 @@ import { useCreateLog, useLogs } from '#client/queries'
 import { cn } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import type { Dayjs } from '#client/utils/dayjs'
-import { recordCalendarSignal } from '#client/stores/intentionEngine'
+import { recordCalendarSignal, recordCalendarTimeSignal } from '#client/stores/intentionEngine'
 
 type EntryType = 'note' | 'task' | 'call'
 
@@ -23,7 +23,56 @@ type CalendarEntry = {
   type: EntryType
 }
 
+type ActiveTimer = {
+  key: string
+  date: string
+  text: string
+  type: EntryType
+  startedAt: number
+}
+
+type Notice = {
+  id: string
+  label: string
+  message: string
+}
+
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+const ACTIVE_TIMER_KEY = 'lot_calendar_active_timer'
+const NOTICE_LIFETIME_MS = 4200
+
+function entryKey(e: { date: string; type: EntryType; text: string }): string {
+  return `${e.date}|${e.type}|${e.text}`
+}
+
+function formatDuration(totalSeconds: number): string {
+  const h = Math.floor(totalSeconds / 3600)
+  const m = Math.floor((totalSeconds % 3600) / 60)
+  const s = totalSeconds % 60
+  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  return `${m}:${String(s).padStart(2, '0')}`
+}
+
+function formatTrackedBadge(totalSeconds: number): string {
+  if (totalSeconds < 60) return `${totalSeconds}s`
+  const totalMinutes = Math.round(totalSeconds / 60)
+  const h = Math.floor(totalMinutes / 60)
+  const m = totalMinutes % 60
+  if (h > 0) return `${h}h${m > 0 ? ` ${m}m` : ''}`
+  return `${m}m`
+}
+
+function loadActiveTimer(): ActiveTimer | null {
+  try {
+    const raw = localStorage.getItem(ACTIVE_TIMER_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (parsed && typeof parsed.startedAt === 'number' && typeof parsed.key === 'string') {
+      return parsed as ActiveTimer
+    }
+  } catch (_) {}
+  return null
+}
 
 function getMonthWeeks(year: number, month: number): Dayjs[][] {
   const first = dayjs().year(year).month(month).startOf('month')
@@ -60,6 +109,39 @@ export function CalendarWidget() {
   const [entryText, setEntryText] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
 
+  const [activeTimer, setActiveTimer] = React.useState<ActiveTimer | null>(loadActiveTimer)
+  const [tick, setTick] = React.useState(0)
+  const [notices, setNotices] = React.useState<Notice[]>([])
+  const dueTodayNotifiedRef = React.useRef(false)
+
+  const pushNotice = React.useCallback((label: string, message: string) => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    setNotices(prev => [...prev.slice(-3), { id, label, message }])
+    setTimeout(() => {
+      setNotices(prev => prev.filter(n => n.id !== id))
+    }, NOTICE_LIFETIME_MS)
+  }, [])
+
+  // Tick every second while a timer is running so elapsed time stays live.
+  React.useEffect(() => {
+    if (!activeTimer) return
+    const id = setInterval(() => setTick(t => t + 1), 1000)
+    return () => clearInterval(id)
+  }, [activeTimer])
+
+  // Persist the running timer so it survives a reload — reliability over a pure in-memory timer.
+  React.useEffect(() => {
+    try {
+      if (activeTimer) localStorage.setItem(ACTIVE_TIMER_KEY, JSON.stringify(activeTimer))
+      else localStorage.removeItem(ACTIVE_TIMER_KEY)
+    } catch (_) {}
+  }, [activeTimer])
+
+  const elapsedSeconds = React.useMemo(() => {
+    if (!activeTimer) return 0
+    return Math.max(0, Math.floor((Date.now() - activeTimer.startedAt) / 1000))
+  }, [activeTimer, tick])
+
   const entries = React.useMemo<CalendarEntry[]>(() => {
     return logs
       .filter(log => log.event === 'calendar_entry' && log.metadata)
@@ -90,11 +172,37 @@ export function CalendarWidget() {
     return set
   }, [entries])
 
+  const totalTrackedByKey = React.useMemo(() => {
+    const map = new Map<string, number>()
+    logs
+      .filter(log => log.event === 'calendar_time_log' && log.metadata)
+      .forEach(log => {
+        const date = log.metadata?.date as string
+        const type = (log.metadata?.entryType as EntryType) || 'note'
+        const text = log.metadata?.text as string
+        const duration = Number(log.metadata?.durationSeconds) || 0
+        if (!date || !text || duration <= 0) return
+        const key = entryKey({ date, type, text })
+        map.set(key, (map.get(key) || 0) + duration)
+      })
+    return map
+  }, [logs])
+
   const today = dayjs().format('YYYY-MM-DD')
   const weeks = React.useMemo(
     () => getMonthWeeks(viewMonth.year(), viewMonth.month()),
     [viewMonth]
   )
+
+  // Fire a one-time "due today" alert per mount once entries have loaded.
+  React.useEffect(() => {
+    if (dueTodayNotifiedRef.current) return
+    const dueToday = entries.filter(e => e.date === today)
+    if (dueToday.length > 0) {
+      dueTodayNotifiedRef.current = true
+      pushNotice('ALERT', `${dueToday.length} EVENT${dueToday.length !== 1 ? 'S' : ''} DUE TODAY`)
+    }
+  }, [entries, today, pushNotice])
 
   const handleDateClick = (d: Dayjs) => {
     const key = d.format('YYYY-MM-DD')
@@ -122,11 +230,86 @@ export function CalendarWidget() {
       onSuccess: () => {
         queryClient.refetchQueries(['/api/logs'])
         try { recordCalendarSignal(entryType, selectedDate!) } catch (_) {}
+        pushNotice('ENTRY', `${entryType.toUpperCase()} LOGGED — ${dateLabel}`)
       },
     })
 
     setEntryText('')
     setIsAddingEntry(false)
+  }
+
+  const handleStartTimer = (entry: CalendarEntry) => {
+    if (activeTimer) return
+    setActiveTimer({
+      key: entryKey(entry),
+      date: entry.date,
+      text: entry.text,
+      type: entry.type,
+      startedAt: Date.now(),
+    })
+    pushNotice('TIMER', `ENGAGED — ${entry.text.toUpperCase()}`)
+  }
+
+  const handleStopTimer = () => {
+    if (!activeTimer) return
+    const timer = activeTimer
+    const durationSeconds = Math.max(1, Math.floor((Date.now() - timer.startedAt) / 1000))
+
+    createLog({
+      text: `[TIMELOG] ${timer.type}: ${timer.text} — ${formatDuration(durationSeconds)}`,
+      event: 'calendar_time_log',
+      metadata: {
+        date: timer.date,
+        text: timer.text,
+        entryType: timer.type,
+        durationSeconds,
+        startedAt: timer.startedAt,
+        endedAt: Date.now(),
+      },
+    }, {
+      onSuccess: () => {
+        queryClient.refetchQueries(['/api/logs'])
+        try { recordCalendarTimeSignal(timer.type, timer.date, durationSeconds) } catch (_) {}
+      },
+    })
+
+    setActiveTimer(null)
+    pushNotice('TIMER', `STANDBY — ${formatDuration(durationSeconds)} LOGGED`)
+  }
+
+  const renderTimerControl = (entry: CalendarEntry) => {
+    const key = entryKey(entry)
+    const isActive = activeTimer?.key === key
+    const tracked = totalTrackedByKey.get(key) || 0
+
+    if (isActive) {
+      return (
+        <button
+          onClick={handleStopTimer}
+          className="text-acc/60 hover:text-acc transition-opacity whitespace-nowrap"
+        >
+          ■ {formatDuration(elapsedSeconds)}
+        </button>
+      )
+    }
+
+    return (
+      <span className="flex items-center gap-4 whitespace-nowrap">
+        {tracked > 0 && (
+          <span className="text-acc/30">{formatTrackedBadge(tracked)}</span>
+        )}
+        <button
+          onClick={() => handleStartTimer(entry)}
+          disabled={!!activeTimer}
+          className={cn(
+            'transition-opacity',
+            activeTimer ? 'text-acc/15 cursor-default' : 'text-acc/30 hover:text-acc/60'
+          )}
+        >
+          ▶
+        </button>
+      </span>
+    )
   }
 
   const handleToggleCalendar = () => {
@@ -248,8 +431,9 @@ export function CalendarWidget() {
                   {dayjs(selectedDate).format('dddd, MMMM D')}
                 </div>
                 {entriesOnDate.map((e, i) => (
-                  <div key={i} className="text-acc/80 mb-1">
-                    {e.text}
+                  <div key={i} className="flex items-center justify-between gap-8 text-acc/80 mb-1">
+                    <span>{e.text}</span>
+                    {renderTimerControl(e)}
                   </div>
                 ))}
               </div>
@@ -260,12 +444,13 @@ export function CalendarWidget() {
         {upcomingEntries.length > 0 && (
           <div className="space-y-1">
             {upcomingEntries.map((entry, i) => (
-              <div key={i} className="flex justify-between gap-16">
+              <div key={i} className="flex justify-between items-center gap-16">
                 <span className="text-acc whitespace-nowrap">
                   {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
                 </span>
-                <span className="text-acc text-right">
-                  {entry.text}
+                <span className="text-acc text-right flex items-center justify-end gap-8">
+                  <span>{entry.text}</span>
+                  {renderTimerControl(entry)}
                 </span>
               </div>
             ))}
@@ -276,6 +461,36 @@ export function CalendarWidget() {
           <div className="text-acc/40">No upcoming dates.</div>
         )}
       </div>
+
+      {notices.length > 0 && (
+        <div className="fixed bottom-16 right-16 z-50 flex flex-col items-end gap-4 pointer-events-none">
+          {notices.map(n => (
+            <div
+              key={n.id}
+              className="pointer-events-auto border border-acc/30 bg-[var(--base-color)] px-8 py-4 text-acc font-mono text-xs uppercase tracking-wide"
+              style={{ animation: 'calNoticeIn 0.25s ease-out, calNoticeOut 0.3s ease-in 3.9s forwards' }}
+            >
+              <span className="text-acc/50">[CAL::{n.label}]</span> {n.message}
+            </div>
+          ))}
+        </div>
+      )}
     </Block>
   )
+}
+
+if (typeof document !== 'undefined' && !document.getElementById('calendar-widget-keyframes')) {
+  const style = document.createElement('style')
+  style.id = 'calendar-widget-keyframes'
+  style.textContent = `
+    @keyframes calNoticeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes calNoticeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+  `
+  document.head.appendChild(style)
 }

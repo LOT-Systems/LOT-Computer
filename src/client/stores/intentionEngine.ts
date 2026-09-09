@@ -4870,6 +4870,15 @@ export function recordCalendarSignal(entryType: string, date: string) {
 }
 
 /**
+ * Record a completed calendar time-tracking session (Start/Stop timer on an
+ * entry) so the self-assembly pattern engine can factor tracked time into
+ * archetype/engagement detection the same way it does discrete entries.
+ */
+export function recordCalendarTimeSignal(entryType: string, date: string, durationSeconds: number) {
+  recordSignal('log', 'calendar_time_log', { entryType, date, durationSeconds, hour: new Date().getHours() })
+}
+
+/**
  * Record the day's ambient astrology reading — rokuyo, moon phase, and
  * zodiac hour. Ambient/environmental conditions only, not a personal
  * natal chart. Called once per calendar day from the System dashboard so
