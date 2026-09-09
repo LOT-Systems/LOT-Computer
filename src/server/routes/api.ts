@@ -5482,7 +5482,16 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   // STORY — Contextual AI Story
   // Generates a 1-2 paragraph story based on recent logs, self-care events,
   // and widget data. The story reflects the operator's recent journey.
+  //
+  // /story              — recent journey (last ~200 logs, unbounded window)
+  // /story day|week|month|year — compresses that calendar period, and surfaces
+  //   its highest and lowest energy moments as the narrative's emotional spine
+  //   (LOT-SR-20260909: "creates a compressed story of your day/week/month/year
+  //   ... surface more intimate high and low peaks").
   // ============================================================================
+  const STORY_PERIODS = ['day', 'week', 'month', 'year'] as const
+  type StoryPeriod = typeof STORY_PERIODS[number]
+
   fastify.post(
     '/story',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
@@ -5490,6 +5499,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: StoryPeriod
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,12 +5524,58 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period: StoryPeriod | undefined = STORY_PERIODS.includes(req.body.period as StoryPeriod)
+        ? req.body.period
+        : undefined
+
+      const tz = req.user.timeZone || 'UTC'
+      const since = period ? dayjs().tz(tz).startOf(period).toDate() : null
 
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          ...(since ? { createdAt: { [Op.gte]: since } } : {}),
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        // A bounded period can span thousands of logs (a year of BIO/QIE
+        // signals); an unbounded /story keeps the original tight recency window.
+        limit: period ? 2000 : 200,
       })
+
+      // PEAKS — the "intimate high and low" moments within the period.
+      // Energy level is the only numeric, comparable signal we log (0-100),
+      // so it anchors the compression; emotional_checkin state changes add
+      // qualitative texture around it.
+      let peaksBlock = ''
+      let compressionBlock = ''
+      if (period) {
+        const energyPoints = logs
+          .filter(l => l.event === 'energy_state' || l.event === 'energy_update' || l.event === 'energy_check' || l.event === 'energy_checkin')
+          .map(l => ({ level: l.metadata?.level, date: l.createdAt }))
+          .filter((p): p is { level: number; date: Date } => typeof p.level === 'number')
+
+        let peakHigh: { level: number; date: Date } | null = null
+        let peakLow: { level: number; date: Date } | null = null
+        for (const p of energyPoints) {
+          if (!peakHigh || p.level > peakHigh.level) peakHigh = p
+          if (!peakLow || p.level < peakLow.level) peakLow = p
+        }
+
+        const activeDays = new Set(logs.map(l => dayjs(l.createdAt).tz(tz).format('YYYY-MM-DD')))
+        const journalWords = logs
+          .filter(l => l.event === 'note' || l.event === 'log_entry' || l.event === 'journal')
+          .reduce((sum, l) => sum + (l.text || '').trim().split(/\s+/).filter(Boolean).length, 0)
+        const careCount = logs.filter(l => l.event === 'self_care_complete' || l.event === 'self_care_completed').length
+
+        const periodLabel = { day: 'TODAY', week: 'THIS WEEK', month: 'THIS MONTH', year: 'THIS YEAR' }[period]
+        compressionBlock = `\nCOMPRESSION WINDOW: ${periodLabel} — ${activeDays.size} active day${activeDays.size !== 1 ? 's' : ''}, ${journalWords} journal words, ${careCount} self-care act${careCount !== 1 ? 's' : ''}, ${logs.length} total signals`
+
+        if (peakHigh || peakLow) {
+          peaksBlock = '\nPEAKS:'
+          if (peakHigh) peaksBlock += `\n- HIGH: energy ${peakHigh.level}% on ${dayjs(peakHigh.date).tz(tz).format('D MMM, HH:mm')}`
+          if (peakLow) peaksBlock += `\n- LOW: energy ${peakLow.level}% on ${dayjs(peakLow.date).tz(tz).format('D MMM, HH:mm')}`
+        }
+      }
 
       const recentEntries = logs
         .filter(l => l.event === 'log_entry' || l.event === 'journal')
@@ -5547,14 +5603,15 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story${period ? ` ${period}` : ''}. Your task: write 1-2 paragraphs (100-200 words) that ${period ? `compress their entire ${period} into a narrative` : 'reflect their recent journey'}, tracing mood trajectory and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
 - Draw from their actual log entries, moods, and self-care answers below
 - Reference specific details from their data — make it feel like THEIR story
+${period ? '- If a PEAKS block is present below, name the specific high point and low point — they are the emotional spine of this story' : ''}
 - If they've been consistent with check-ins, acknowledge the discipline
 - If there are gaps or struggle, acknowledge that with compassion
 - The tone should match their current energy: reflective if low, energized if high
@@ -5566,6 +5623,8 @@ RULES:
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
+${compressionBlock}
+${peaksBlock}
 
 RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
 
@@ -5596,6 +5655,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            period: period || 'recent',
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5604,6 +5664,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          period: period || 'recent',
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
