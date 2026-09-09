@@ -3427,3 +3427,108 @@ export function checkCalendarV25(): BadgeType[] {
 
   return awarded
 }
+
+// ── Calendar Easter Egg v26 — THE ROGUE CALENDAR ─────────────────────────────
+// Roguelike history dates: Rogue (Nov 8 1980) · NetHack (Jul 28 1987) · Spelunky (Jul 1 2008)
+
+export function checkCalendarV26Rogue(): BadgeType[] {
+  const awarded: BadgeType[] = []
+  const now = new Date()
+  const month = now.getMonth() + 1
+  const day = now.getDate()
+
+  // November 8 — Rogue first released 1980
+  if (month === 11 && day === 8 && !hasBadge('rogue_release' as BadgeType)) {
+    if (awardBadge('rogue_release' as BadgeType)) awarded.push('rogue_release' as BadgeType)
+  }
+
+  // July 28 — NetHack first released 1987
+  if (month === 7 && day === 28 && !hasBadge('nethack_day' as BadgeType)) {
+    if (awardBadge('nethack_day' as BadgeType)) awarded.push('nethack_day' as BadgeType)
+  }
+
+  // July 1 — Spelunky original release 2008
+  if (month === 7 && day === 1 && !hasBadge('spelunky_day' as BadgeType)) {
+    if (awardBadge('spelunky_day' as BadgeType)) awarded.push('spelunky_day' as BadgeType)
+  }
+
+  return awarded
+}
+
+// ── Behavioral v29 — ROGUE PATTERNS ──────────────────────────────────────────
+
+/**
+ * Award daily_run badge if 7 consecutive days each with at least 1 journal entry.
+ * Accepts a sorted array of date strings YYYY-MM-DD (newest first).
+ */
+export function checkDailyRun(journalDates: string[]): BadgeType | null {
+  if (hasBadge('daily_run' as BadgeType)) return null
+  if (journalDates.length < 7) return null
+
+  const today = new Date()
+  let consecutive = 0
+  for (let i = 0; i < 7; i++) {
+    const expected = new Date(today)
+    expected.setDate(today.getDate() - i)
+    const expectedStr = expected.toISOString().slice(0, 10)
+    if (journalDates.includes(expectedStr)) {
+      consecutive++
+    } else {
+      break
+    }
+  }
+
+  if (consecutive >= 7) {
+    if (awardBadge('daily_run' as BadgeType)) return 'daily_run' as BadgeType
+  }
+  return null
+}
+
+/**
+ * Award the_seed badge if same check-in time (±30min) 5+ times in 7-day window.
+ * Accepts array of ISO timestamp strings for check-in times.
+ */
+export function checkTheSeed(checkinTimes: string[]): BadgeType | null {
+  if (hasBadge('the_seed' as BadgeType)) return null
+
+  const now = Date.now()
+  const sevenDays = 7 * 24 * 60 * 60 * 1000
+  const recent = checkinTimes
+    .map(t => new Date(t).getTime())
+    .filter(t => now - t < sevenDays)
+
+  if (recent.length < 5) return null
+
+  const minutesOfDay = recent.map(t => {
+    const d = new Date(t)
+    return d.getHours() * 60 + d.getMinutes()
+  })
+
+  minutesOfDay.sort((a, b) => a - b)
+  for (let i = 0; i <= minutesOfDay.length - 5; i++) {
+    const window = minutesOfDay.slice(i, i + 5)
+    if (window[window.length - 1] - window[0] <= 60) {
+      if (awardBadge('the_seed' as BadgeType)) return 'the_seed' as BadgeType
+    }
+  }
+  return null
+}
+
+/**
+ * Award meta_session badge if journal entry references 5+ previous entries
+ * (detected by "last time", "yesterday", "before", "remember when", "previous").
+ */
+export function checkMetaSession(journalText: string): BadgeType | null {
+  if (hasBadge('meta_session' as BadgeType)) return null
+
+  const referencePatterns = [
+    /last time/gi, /yesterday/gi, /before i/gi, /remember when/gi,
+    /previous/gi, /a few days ago/gi, /last week/gi, /used to/gi,
+  ]
+
+  const matchCount = referencePatterns.filter(p => p.test(journalText)).length
+  if (matchCount >= 5) {
+    if (awardBadge('meta_session' as BadgeType)) return 'meta_session' as BadgeType
+  }
+  return null
+}

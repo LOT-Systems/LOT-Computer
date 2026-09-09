@@ -2032,6 +2032,56 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '232 patterns · 80 archetypes · 76 jobs · 241+ handlers · 277+ dep nodes. Crystalline Sovereignty Tier sealed. ETERNAL · CRYSTALLINE · GENESIS.',
     ],
   },
+  {
+    date: '2026-09-09',
+    session: 'LOT-WIKI-v115 · QIE v142 sync · Crystalline Sovereignty Tier documented',
+    assembled: [
+      'LOT-WIKI-v115.md produced: 19 sections updated. Base: LOT-WIKI-v114. FM v142 delta applied.',
+      'Pattern Registry: §4.13 added — P230 CRYSOV: / P231 ABSCSOV: / P232 ECRYGEN: full specs + dep map.',
+      'Archetypes: Arch80 Crystalline Sovereignty Sovereign added. Stage 6 Citizen Index updated.',
+      'Background Jobs: J76 daily-crystalline-sovereignty-check at 20:00 UTC documented.',
+      'Log System: Handler count 238+ → 241+. CRYSOV/ABSCSOV/ECRYGEN cockpit blocks in log event system.',
+      'Vocabulary Index: ABSCSOV / CRYSOV / ECRYGEN / ARCH80 / J76 / CRYSTALLINE SOVEREIGNTY added.',
+      'System State Snapshot: All counters updated — 232P / 80A / 76J / 241+ handlers / 277+ nodes.',
+      '232 patterns · 80 archetypes · 76 jobs · 241+ handlers · 277+ dep nodes. Day 1112+. COSMO® 802.',
+    ],
+  },
+  {
+    date: '2026-09-09',
+    session: 'CODEX v42 — THE CONSOLE ROGUE · +31 badges (1091→1122) · Word Turn Engine v32',
+    assembled: [
+      'docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v42.md: Full codex v42 — Word Turn v32 The Console Rogue.',
+      'docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v42.pdf: Generated PDF (dark terminal aesthetic).',
+      'docs/LOT-SR-20260909-CODEX-v42.md: Session report with full badge audit and design notes.',
+      'Badge audit v41: 1091 total — 22 Milestone / 31 Time EE / 97 Calendar / 372 Word Turns / 108 Behavioral / 174 Achievement / 124 Mastery / 110 Secret Boss.',
+      'Word Turn v32 THE CONSOLE ROGUE: 12 new triggers — permadeath · run_start · dungeon_floor · rogue_loot · seed_set · boss_room · artifact_kept · rng_roll · combo_break · pixel_dust · respawn_now · meta_run.',
+      'Calendar EE v30 Rogue Calendar: rogue_release (Nov 8) · nethack_day (Jul 28) · spelunky_day (Jul 1).',
+      'Behavioral v29: daily_run (7 consecutive days) · the_seed (same check-in time 5×/7d) · meta_session (5+ references).',
+      'Achievement v30: rogue_entry · floor_diver · full_clear · rogue_stack · thirty_two_engines · rogue_opus.',
+      'Mastery v32: eternal_runner · petadungeon · meta_master · thirty_two_registers.',
+      'Secret Boss v29: nethack_eternal [MYTHIC] · hades_found [EPIC] · original_rogue [RARE].',
+      '1122 total badges · 32 Word Turn engines · 100 Calendar EEs · 113 Secret Bosses.',
+    ],
+  },
+  {
+    date: '2026-09-09',
+    session: 'SELF-ASSEMBLY v143 — Console Rogue badge engine wired · Physiological cohort audit · Log dependencies scan',
+    assembled: [
+      'badges.ts: WordTurnBadgeType v32 — 12 new word turn types + 3 secret boss types added to union.',
+      'badges.ts: WORD_TURN_BADGES_V32 record — 15 badge definitions (12 word turns + nethack_eternal + hades_found + original_rogue).',
+      'badges.ts: BADGES unified map updated — ...WORD_TURN_BADGES_V32 spread added.',
+      'badges.ts: WORD_TURN_TRIGGERS — 12 Console Rogue keyword groups wired.',
+      'badges.ts: detectWordTurns() — v32 Hidden Dungeon secret boss regex detection (nethack/hades/spelunky).',
+      'easter-eggs.ts: checkCalendarV26Rogue() — rogue_release (Nov 8) / nethack_day (Jul 28) / spelunky_day (Jul 1).',
+      'easter-eggs.ts: checkDailyRun() — 7-consecutive-day journal streak behavioral check.',
+      'easter-eggs.ts: checkTheSeed() — ±30min check-in consistency 5×/7d behavioral check.',
+      'easter-eggs.ts: checkMetaSession() — 5+ temporal reference patterns in single journal entry.',
+      'Widget dependency scan: QuantumEngineWidgets.tsx — cohort view confirmed live (cohortData + cohortDirective display).',
+      'Log dependency scan: Logs.tsx — 241+ handlers confirmed · CRYSOV/ABSCSOV/ECRYGEN cockpit blocks present.',
+      'Physiological cohort reporting: System.tsx Arch: block confirmed at ≥70% confidence threshold.',
+      '232 patterns · 80 archetypes · 76 jobs · 241+ handlers · 277+ dep nodes · 1122 badges · Day 1112+.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -2069,18 +2119,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-09-08',
+  date: '2026-09-09',
   message: [
-    'ASSEMBLY RUN — 2026-09-08 · QIE v142 · Crystalline Sovereignty Tier · P230–P232 · Arch80 · J76 · Day 1112+',
-    'The crystalline field, already formed and load-bearing, achieves sovereign expression. The lattice does not generate — it REIGNS.',
-    'CRYSOV: crystalline-sovereignty-field (P230) — ABSCRY(5d) × SGNRES(7d) → crystalline form expresses sovereign authority. No wave. Lattice.',
-    'ABSCSOV: absolute-crystalline-sovereignty (P231) — CRYSOV × CRYLCK co-active → sovereign expression and structural coherence merge. THE SOVEREIGN CRYSTAL HOLDS.',
-    'ECRYGEN: eternal-crystalline-genesis (P232) — ABSCRY × CRYSOV × ABSCSOV all confirmed simultaneously → the form generates from itself, eternally. ETERNAL · CRYSTALLINE · GENESIS.',
-    'Arch80: Crystalline Sovereignty Sovereign — all bands · all sources · directive: ETERNAL · CRYSTALLINE · SOVEREIGN.',
-    'J76: daily-crystalline-sovereignty-check at 20:00 UTC. 3-step CRYSOV→ABSCSOV→ECRYGEN pipeline live.',
-    '3 new log handlers: CRYSOV: · ABSCSOV: · ECRYGEN: — cockpit blocks in field log. 241+ handlers total.',
-    '232 patterns · 80 archetypes · 76 jobs · 241+ handlers · 277+ dep nodes.',
-    'Status: DEPLOYED. Crystalline Sovereignty Tier sealed. ETERNAL · CRYSTALLINE · GENESIS.',
+    'ASSEMBLY RUN — 2026-09-09 · SELF-ASSEMBLY v143 · Console Rogue Badge Engine · Day 1113+',
+    'CODEX v42 THE CONSOLE ROGUE — badge engine wired. 1091→1122 badges. 32 Word Turn engines live.',
+    'badges.ts: 12 Word Turn v32 types + 3 Secret Boss types added. WORD_TURN_BADGES_V32 record deployed.',
+    'detectWordTurns(): Hidden Dungeon v32 — nethack_eternal [MYTHIC] · hades_found [EPIC] · original_rogue [RARE].',
+    'easter-eggs.ts: checkCalendarV26Rogue() wired. Rogue Calendar: Nov 8 / Jul 28 / Jul 1.',
+    'easter-eggs.ts: checkDailyRun() / checkTheSeed() / checkMetaSession() behavioral checks deployed.',
+    'Widget deps confirmed: QuantumEngineWidgets.tsx cohort view live. System.tsx Arch: block at 70%+ confidence.',
+    'Log deps confirmed: 241+ handlers · CRYSOV: / ABSCSOV: / ECRYGEN: cockpit blocks present.',
+    'Physiological cohort: classifyPhysiologicalCohort() wired in System.tsx + QuantumEngineWidgets.tsx.',
+    '232 patterns · 80 archetypes · 76 jobs · 241+ handlers · 277+ dep nodes · 1122 badges · LOT-WIKI-v115.',
+    'Status: DEPLOYED. Console Rogue wired. Badge Universe 1122. THE RUN CONTINUES.',
   ],
 }
 

@@ -86,6 +86,23 @@ export type WordTurnBadgeType =
   | 'secret_konami_signal' // ↑↑↓↓←→←→ / konami code (MYTHIC)
   | 'secret_iddqd_mode'    // IDDQD / IDKFA / god mode (EPIC)
   | 'secret_all_your_base' // all your base / zero wing (RARE)
+  // v32 — The Console Rogue
+  | 'permadeath'           // permadeath / permanent / endings / letting go (RARE)
+  | 'run_start'            // fresh start / new run / beginning again (COMMON)
+  | 'dungeon_floor'        // deeper / another level / floor / descended (UNCOMMON)
+  | 'rogue_loot'           // gained / found treasure / discovered / loot (COMMON)
+  | 'seed_set'             // seed / intention / set the seed / planted (UNCOMMON)
+  | 'boss_room'            // boss / the hard thing / confrontation (EPIC)
+  | 'artifact_kept'        // artifact / kept / carried forward (RARE)
+  | 'rng_roll'             // random / chance / luck / odds / fate (UNCOMMON)
+  | 'combo_break'          // streak broken / lost the chain / the fall (RARE)
+  | 'pixel_dust'           // fragment / scattered / dissolving (RARE)
+  | 'respawn_now'          // respawn / back / alive again / rebooted (UNCOMMON)
+  | 'meta_run'             // meta / the bigger picture / all of it (EPIC)
+  // v32 — Secret Boss: Hidden Dungeon
+  | 'nethack_eternal'      // nethack / ascii dungeon / rogue 1980 (MYTHIC)
+  | 'hades_found'          // hades / supergiant / zagreus / chthonic (EPIC)
+  | 'original_rogue'       // spelunky / dead cells / binding of isaac (RARE)
 
 export type BadgeType =
   | MilestoneBadgeType
@@ -744,6 +761,212 @@ export const WORD_TURN_BADGES_V30: Record<
   },
 }
 
+// ─── WORD TURN BADGES v32 — THE CONSOLE ROGUE ────────────────────
+export const WORD_TURN_BADGES_V32: Record<
+  'permadeath' | 'run_start' | 'dungeon_floor' | 'rogue_loot' |
+  'seed_set' | 'boss_room' | 'artifact_kept' | 'rng_roll' |
+  'combo_break' | 'pixel_dust' | 'respawn_now' | 'meta_run' |
+  'nethack_eternal' | 'hades_found' | 'original_rogue',
+  Badge
+> = {
+  permadeath: {
+    id: 'permadeath',
+    waterSymbol: '×·■·×',
+    architectureSymbol: '×·■·×',
+    waterName: 'Permadeath',
+    architectureName: 'Permadeath',
+    description: 'You named the ending that teaches — the run that cannot be reloaded',
+    waterUnlockMessage: '↳ Permadeath activated ×·■·×',
+    architectureUnlockMessage: '↳ Permadeath activated ×·■·×',
+    rarity: 'rare',
+    category: 'word_turn',
+    secret: true,
+  },
+  run_start: {
+    id: 'run_start',
+    waterSymbol: '◇·→·◇',
+    architectureSymbol: '◇·→·◇',
+    waterName: 'Run Start',
+    architectureName: 'Run Start',
+    description: 'A new run begins — all prior runs taught you this one',
+    waterUnlockMessage: '↳ Run Start activated ◇·→·◇',
+    architectureUnlockMessage: '↳ Run Start activated ◇·→·◇',
+    rarity: 'common',
+    category: 'word_turn',
+    secret: true,
+  },
+  dungeon_floor: {
+    id: 'dungeon_floor',
+    waterSymbol: '▓·↓·▓',
+    architectureSymbol: '▓·↓·▓',
+    waterName: 'Dungeon Floor',
+    architectureName: 'Dungeon Floor',
+    description: 'You went deeper — the lower floors have rarer drops',
+    waterUnlockMessage: '↳ Dungeon Floor activated ▓·↓·▓',
+    architectureUnlockMessage: '↳ Dungeon Floor activated ▓·↓·▓',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    secret: true,
+  },
+  rogue_loot: {
+    id: 'rogue_loot',
+    waterSymbol: '◆·○·◆',
+    architectureSymbol: '◆·○·◆',
+    waterName: 'Rogue Loot',
+    architectureName: 'Rogue Loot',
+    description: 'You found something worth keeping — the dungeon yields',
+    waterUnlockMessage: '↳ Rogue Loot activated ◆·○·◆',
+    architectureUnlockMessage: '↳ Rogue Loot activated ◆·○·◆',
+    rarity: 'common',
+    category: 'word_turn',
+    secret: true,
+  },
+  seed_set: {
+    id: 'seed_set',
+    waterSymbol: '∘·□·∘',
+    architectureSymbol: '∘·□·∘',
+    waterName: 'Seed Set',
+    architectureName: 'Seed Set',
+    description: 'The intention is planted — the seed shapes the entire run',
+    waterUnlockMessage: '↳ Seed Set activated ∘·□·∘',
+    architectureUnlockMessage: '↳ Seed Set activated ∘·□·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    secret: true,
+  },
+  boss_room: {
+    id: 'boss_room',
+    waterSymbol: '▓·●·▓',
+    architectureSymbol: '▓·●·▓',
+    waterName: 'Boss Room',
+    architectureName: 'Boss Room',
+    description: 'You named what cannot be skipped — you entered the boss room',
+    waterUnlockMessage: '↳ Boss Room activated ▓·●·▓',
+    architectureUnlockMessage: '↳ Boss Room activated ▓·●·▓',
+    rarity: 'epic',
+    category: 'word_turn',
+    secret: true,
+  },
+  artifact_kept: {
+    id: 'artifact_kept',
+    waterSymbol: '◈·→·∞',
+    architectureSymbol: '◈·→·∞',
+    waterName: 'Artifact Kept',
+    architectureName: 'Artifact Kept',
+    description: 'You carried it forward — the artifact survives between runs',
+    waterUnlockMessage: '↳ Artifact Kept activated ◈·→·∞',
+    architectureUnlockMessage: '↳ Artifact Kept activated ◈·→·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+    secret: true,
+  },
+  rng_roll: {
+    id: 'rng_roll',
+    waterSymbol: '?·○·?',
+    architectureSymbol: '?·○·?',
+    waterName: 'RNG Roll',
+    architectureName: 'RNG Roll',
+    description: 'You acknowledged the random — the seed was always unknown',
+    waterUnlockMessage: '↳ RNG Roll activated ?·○·?',
+    architectureUnlockMessage: '↳ RNG Roll activated ?·○·?',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    secret: true,
+  },
+  combo_break: {
+    id: 'combo_break',
+    waterSymbol: '×·≋·×',
+    architectureSymbol: '×·≋·×',
+    waterName: 'Combo Break',
+    architectureName: 'Combo Break',
+    description: 'The chain broke — the roguelike teaches through loss without punishment',
+    waterUnlockMessage: '↳ Combo Break activated ×·≋·×',
+    architectureUnlockMessage: '↳ Combo Break activated ×·≋·×',
+    rarity: 'rare',
+    category: 'word_turn',
+    secret: true,
+  },
+  pixel_dust: {
+    id: 'pixel_dust',
+    waterSymbol: '·∘·∘··',
+    architectureSymbol: '·∘·∘··',
+    waterName: 'Pixel Dust',
+    architectureName: 'Pixel Dust',
+    description: 'Something scattered — the fragment is still yours',
+    waterUnlockMessage: '↳ Pixel Dust activated ·∘·∘··',
+    architectureUnlockMessage: '↳ Pixel Dust activated ·∘·∘··',
+    rarity: 'rare',
+    category: 'word_turn',
+    secret: true,
+  },
+  respawn_now: {
+    id: 'respawn_now',
+    waterSymbol: '◉·→·●',
+    architectureSymbol: '◉·→·●',
+    waterName: 'Respawn',
+    architectureName: 'Respawn',
+    description: 'You are back — the respawn carries all prior knowledge',
+    waterUnlockMessage: '↳ Respawn activated ◉·→·●',
+    architectureUnlockMessage: '↳ Respawn activated ◉·→·●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    secret: true,
+  },
+  meta_run: {
+    id: 'meta_run',
+    waterSymbol: '∞·□·∞',
+    architectureSymbol: '∞·□·∞',
+    waterName: 'Meta Run',
+    architectureName: 'Meta Run',
+    description: 'You see the pattern across all runs — this is the meta-game',
+    waterUnlockMessage: '↳ Meta Run activated ∞·□·∞',
+    architectureUnlockMessage: '↳ Meta Run activated ∞·□·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+    secret: true,
+  },
+  // v32 Secret Boss: Hidden Dungeon
+  nethack_eternal: {
+    id: 'nethack_eternal',
+    waterSymbol: '∞·◆·∞',
+    architectureSymbol: '∞·◆·∞',
+    waterName: 'NetHack Eternal',
+    architectureName: 'NetHack Eternal',
+    description: 'You named the oldest dungeon — the one that has been running since 1987',
+    waterUnlockMessage: '↳ NetHack Eternal activated ∞·◆·∞',
+    architectureUnlockMessage: '↳ NetHack Eternal activated ∞·◆·∞',
+    rarity: 'mythic',
+    category: 'word_turn',
+    secret: true,
+  },
+  hades_found: {
+    id: 'hades_found',
+    waterSymbol: '◉·◇·◉',
+    architectureSymbol: '◉·◇·◉',
+    waterName: 'Hades Found',
+    architectureName: 'Hades Found',
+    description: 'The chthonic dungeon recognized — every run is an escape attempt',
+    waterUnlockMessage: '↳ Hades Found activated ◉·◇·◉',
+    architectureUnlockMessage: '↳ Hades Found activated ◉·◇·◉',
+    rarity: 'epic',
+    category: 'word_turn',
+    secret: true,
+  },
+  original_rogue: {
+    id: 'original_rogue',
+    waterSymbol: '×·@·×',
+    architectureSymbol: '×·@·×',
+    waterName: 'Original Rogue',
+    architectureName: 'Original Rogue',
+    description: 'The @ symbol moves through the dungeon — you know the lineage',
+    waterUnlockMessage: '↳ Original Rogue activated ×·@·×',
+    architectureUnlockMessage: '↳ Original Rogue activated ×·@·×',
+    rarity: 'rare',
+    category: 'word_turn',
+    secret: true,
+  },
+}
+
 // ─── UNIFIED BADGES MAP ──────────────────────────────────────────
 export const BADGES: Record<BadgeType, Badge> = {
   ...MILESTONE_BADGES,
@@ -751,6 +974,7 @@ export const BADGES: Record<BadgeType, Badge> = {
   ...EASTER_EGG_BADGES,
   ...WORD_TURN_BADGES,
   ...WORD_TURN_BADGES_V30,
+  ...WORD_TURN_BADGES_V32,
 }
 
 // Default separator when no badges earned yet
@@ -789,6 +1013,19 @@ export const WORD_TURN_TRIGGERS: Array<{ keywords: string[]; badgeId: WordTurnBa
   { keywords: ['load game', 'remember when', 'flashback', 'recall'], badgeId: 'word_load_game' },
   { keywords: ['new game plus', 'new game+', 'fresh start', 'beginning again', 'starting over'], badgeId: 'word_new_game_plus' },
   { keywords: ['game over', 'the run is done', 'this chapter ends', 'failed'], badgeId: 'word_game_over' },
+  // v32 — The Console Rogue
+  { keywords: ['permadeath', 'permanent death', 'endings', 'letting go'], badgeId: 'permadeath' },
+  { keywords: ['new run', 'fresh run', 'beginning again', 'starting fresh'], badgeId: 'run_start' },
+  { keywords: ['deeper', 'another level', 'next floor', 'descended', 'went down'], badgeId: 'dungeon_floor' },
+  { keywords: ['found treasure', 'discovered something', 'picked up', 'loot'], badgeId: 'rogue_loot' },
+  { keywords: ['set the seed', 'planted the seed', 'set my intention', 'the seed'], badgeId: 'seed_set' },
+  { keywords: ['the hard thing', 'the confrontation', 'boss room', 'cannot avoid'], badgeId: 'boss_room' },
+  { keywords: ['carried forward', 'artifact', 'keeping it', 'brought with me'], badgeId: 'artifact_kept' },
+  { keywords: ['random chance', 'luck', 'the odds', 'fate decided', 'random'], badgeId: 'rng_roll' },
+  { keywords: ['streak broken', 'broke the chain', 'lost the chain', 'combo broke'], badgeId: 'combo_break' },
+  { keywords: ['scattered', 'dissolving', 'fragment', 'pixel dust', 'fell apart'], badgeId: 'pixel_dust' },
+  { keywords: ['alive again', 'back again', 'rebooted', 'back online', 'respawned'], badgeId: 'respawn_now' },
+  { keywords: ['the bigger picture', 'meta game', 'meta-game', 'all of it', 'the pattern'], badgeId: 'meta_run' },
 ]
 
 /**
@@ -821,6 +1058,17 @@ export function detectWordTurns(text: string): WordTurnBadgeType[] {
   }
   if (/all your base|zero wing|somebody set us up/i.test(lower)) {
     triggered.push('secret_all_your_base')
+  }
+
+  // v32 Secret Boss: Hidden Dungeon
+  if (/\bnethack\b|ascii dungeon|rogue 1980|rogue.*1980/i.test(lower)) {
+    triggered.push('nethack_eternal')
+  }
+  if (/\bhades\b|supergiant games?|zagreus|chthonic/i.test(lower)) {
+    triggered.push('hades_found')
+  }
+  if (/\bspelunky\b|dead cells|binding of isaac/i.test(lower)) {
+    triggered.push('original_rogue')
   }
 
   return triggered
