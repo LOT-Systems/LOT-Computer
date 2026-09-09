@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo, getMoonEmoji, getTimeZoneWallClockDate } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -203,9 +203,15 @@ export const System = React.memo(function SystemInner() {
   }, [])
 
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
-  // rokuyo), not a personal natal chart.
+  // rokuyo), not a personal natal chart. When the user has a saved timeZone
+  // (set from their city/country in Settings), read the reading against that
+  // timeZone's wall clock instead of the viewing device's — same reading
+  // whichever device/timeZone they're looking from, matching the Logs
+  // snapshot (getLogContext) which is already timeZone-aware this way.
   const astrology = React.useMemo(() => {
-    const now = new Date()
+    const now = me?.timeZone
+      ? getTimeZoneWallClockDate(new Date(), me.timeZone)
+      : new Date()
     const hourlyZodiac = getHourlyZodiac(now)
     const westernZodiac = getWesternZodiac(now)
     const moonPhase = getMoonPhase(now)
@@ -216,10 +222,11 @@ export const System = React.memo(function SystemInner() {
       westernZodiac,
       moonPhase: moonPhase.phase,
       moonIllumination: moonPhase.illumination,
+      moonEmoji: getMoonEmoji(moonPhase.phase),
       rokuyo,
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+  }, [astrologyTick, me?.timeZone])
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
@@ -465,7 +472,7 @@ export const System = React.memo(function SystemInner() {
         <div>
           <Block label="Astrology:">
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonEmoji} {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
           </Block>
         </div>
@@ -671,7 +678,7 @@ export const System = React.memo(function SystemInner() {
         >
           {astrologyView === 'astrology' ? (
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonEmoji} {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>

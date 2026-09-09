@@ -43,6 +43,40 @@ const WESTERN_ZODIAC = [
 ] as const
 
 /**
+ * Convert a moment to the wall-clock date/time it represents in a given IANA
+ * timeZone, expressed as a plain local Date. Round-trips correctly through
+ * the getHours()/getMonth()/getDate() readers the functions in this file use,
+ * regardless of the runtime's own local timeZone — pure Intl, no dayjs
+ * timezone plugin/tz-data dependency, so it's safe to call from the client
+ * bundle as well as the server.
+ */
+export function getTimeZoneWallClockDate(date: Date, timeZone: string): Date {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).formatToParts(date)
+
+  const get = (type: string) => parts.find((p) => p.type === type)?.value
+  const hour = get('hour')
+
+  return new Date(
+    Number(get('year')),
+    Number(get('month')) - 1,
+    Number(get('day')),
+    // Intl reports midnight as hour "24" with hour12: false
+    hour === '24' ? 0 : Number(hour),
+    Number(get('minute')),
+    Number(get('second'))
+  )
+}
+
+/**
  * Get Japanese zodiac animal for a given year
  */
 export function getJapaneseZodiac(year: number): string {
