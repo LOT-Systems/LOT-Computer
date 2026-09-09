@@ -172,7 +172,8 @@ Surfaces self-care suggestions during key times of day (10 AM–12 PM, 2–5 PM,
 A clickable, cycling display of the user's psychological profile. Shows self-awareness percentage, archetype, values, emotional patterns, dominant needs, sentiment breakdown, and introspection depth.
 
 - **Data Source:** `/api/profile` endpoint via the `useProfile` hook
-- **Connection:** Displays profile-derived awareness metrics; integrated into the System.tsx layout
+- **Connection:** Displays profile-derived awareness metrics
+- **STATUS: ORPHANED (confirmed 2026-09-09).** The component exists at `src/client/components/AwarenessDashboard.tsx` but is not imported anywhere — not in `System.tsx`, not on the public profile page. It is not currently reachable by any user. This was a deliberate decision (LOT-SR-20260719-01, R6: skipped as a duplicate of MoodAnalytics/GoalJourney when those were wired in), not a wiring bug — but it has sat as dead code since. It remains the natural home for QIE/AI-derived profile data on a personal profile page if S-2 wants it revived; otherwise it's a delete candidate.
 
 ---
 
@@ -221,7 +222,7 @@ Generates random numbers (0–99) at randomized countdown intervals between 1 an
 
 Personal operating system metrics dashboard. Cycles through Status, Performance, and Version views. Status shows health percentage, system state, uptime, streak, and interaction counts. Performance shows consistency and engagement scores. Version shows runtime progression.
 
-- **Data Source:** `/api/os-status`, `/api/os-performance`, and `/api/os-version` endpoints; log context for module coverage analysis
+- **Data Source:** `/api/os/status`, `/api/os/performance`, and `/api/os/version` endpoints (registered via `registerOSRoutes`); log context for module coverage analysis
 - **Connection:** Cross-references log module usage for comprehensive system diagnostics
 
 ### System Progress Widget
@@ -237,10 +238,53 @@ Five background jobs feed this widget: Daily OS Vitals Snapshot (02:00 UTC), Dai
 
 ### System Pulse Widget
 
-Real-time system heartbeat metrics with 1-second polling. Displays events per minute, quantum flux, neural activity, and resonance (Hz). Cycles through Metrics, Activity, and User Load views.
+Real-time system heartbeat metrics, polled client-side every 10 seconds (reduced from an original 1-second interval, which was found to overload the DB under traffic) against a 5-second server-side cache. Displays events per minute, quantum flux, neural activity, and resonance (Hz). Cycles through Metrics, Activity, and User Load views.
 
-- **Data Source:** `/api/system/pulse` endpoint (polled every second); log context for comparison
+- **Data Source:** `/api/system/pulse` endpoint (10s client poll, 5s server cache); log context for comparison
 - **Connection:** Provides live system telemetry; cross-references with log context for anomaly detection
+
+### Mood Analytics
+
+Analytical breakdown of emotional check-in history — mood distribution, trend direction, and correlation with other signal sources over time.
+
+- **Data Source:** `/api/emotional-checkins` endpoint
+- **Connection:** Companion analytics view to the Emotional Check-In widget; part of the biofeedback stack
+
+### Correlated Indexes Widget
+
+Cross-references multiple QIE signal sources to surface correlated indexes (e.g. energy vs. mood, activity vs. clarity) as a compact index readout.
+
+- **Data Source:** `intentionEngine` store; `/api/logs` for cross-source correlation
+- **Connection:** QIE analytics display; consumes the same signal set as Pattern Insights
+
+### Chakra Ergonomics Widget
+
+Maps session activity to the 7-chakra model referenced in the Core Data Systems table below, giving a holistic-wellness readout of which life domains are active this session.
+
+- **Data Source:** `chakraErgonomics` nanostore
+- **Connection:** Derived from log/session activity; independent visual layer, does not itself record signals
+
+### Four Dimensional UI
+
+Presentation layer implementing the 4D UI concept (write, draw, eat, drink, laugh) referenced in the Demo Day investor pitch; provides the interactive surface for that experience outside investor mode.
+
+- **Data Source:** Local component state
+- **Connection:** Rendered within the main widget stack; complements the Demo Day Widget's investor-mode pitch
+
+### Calendar Widget
+
+Live clock, T-minus countdowns, and calendar anchor events with a military-style alert overlay for upcoming deadlines.
+
+- **Data Source:** Local component state; system clock
+- **Persistence:** Anchor events logged via `useCreateLog` (a direct log-write path, distinct from the `recordSignal` path most other widgets use)
+- **Connection:** Calendar anchor events feed the QIE's Temporal Alignment Peak (P107) pattern
+
+### Benchmark Widget / Architect Widget / Integrity Widget
+
+Three System-tab diagnostic widgets surfacing this benchmark protocol's own output back into the UI: Benchmark Widget displays recent session-report summaries, Architect Widget surfaces self-assembly module state, and Integrity Widget runs the 6-fracture-type "lie detector" intent-contradiction analysis (4 views) documented in `LOT-MANIFEST.md`.
+
+- **Data Source:** `docs/benchmark/` session-report metadata (Benchmark); `selfAssembly` nanostore (Architect); `intentionEngine` signal history (Integrity)
+- **Connection:** Read-only diagnostic surfaces; none of the three currently record their own usage signals (see Health Notes below)
 
 ---
 
@@ -470,6 +514,10 @@ All widgets are orchestrated by `System.tsx`, the master dashboard component. Wi
 - **Nanostores** — Global reactive state for cross-widget communication (user, weather, theme, online counts, sound, settings, evolution, signals)
 - **localStorage** — Persistent preferences, cooldowns, session tracking, and mode flags
 - **Server endpoints** — Dynamic data via REST API with React Query caching
+
+### Personal Profile Page
+
+The user-facing personal profile ("Portrait") is `src/client/components/PublicProfile.tsx` — badges, tags, wallet, and weather are shown there, but no QIE signal data or AI-generated feedback is currently surfaced on that page; the widgets that hold psychological/AI-derived profile data (Awareness Dashboard, AI Feedback Widget) live only on the System tab today. There is no dedicated file or route literally named "Portrait" in the codebase.
 
 ### Visibility Logic
 
