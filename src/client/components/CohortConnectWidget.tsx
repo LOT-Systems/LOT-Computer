@@ -116,14 +116,27 @@ export const CohortConnectWidget: React.FC = () => {
     window.location.href = `/users/${userId}`
   }
 
-  const handleSendMessage = (userId: string, similarity: number) => {
+  const handleSendMessage = (userId: string, similarity: number, name: string) => {
     recordSignal('mood', 'cohort_message_initiated', {
       userId,
       similarity,
       connectionReadiness,
       hour: new Date().getHours()
     })
-    stores.goTo('sync')
+    stores.goTo('logs')
+    // Pre-fill a LOT Mail compose command addressed to this cohort match.
+    setTimeout(() => {
+      const ta = document.querySelector<HTMLTextAreaElement>('textarea')
+      if (!ta) return
+      const nativeSetter = Object.getOwnPropertyDescriptor(
+        window.HTMLTextAreaElement.prototype,
+        'value'
+      )?.set
+      nativeSetter?.call(ta, `/email to ${name} `)
+      ta.dispatchEvent(new Event('input', { bubbles: true }))
+      ta.focus()
+      ta.setSelectionRange(ta.value.length, ta.value.length)
+    }, 300)
   }
 
   const handleToggleExpand = (userId: string) => {
@@ -264,7 +277,8 @@ export const CohortConnectWidget: React.FC = () => {
                         size="small"
                         onClick={(e: React.MouseEvent) => {
                           e.stopPropagation()
-                          handleSendMessage(match.user.id, match.similarity)
+                          const name = `${match.user.firstName || ''} ${match.user.lastName || ''}`.trim()
+                          handleSendMessage(match.user.id, match.similarity, name)
                         }}
                       >
                         Send message

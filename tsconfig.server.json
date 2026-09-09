@@ -21,8 +21,7 @@
     },
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noEmitOnError": false,
-    "ignoreDeprecations": "5.0"
+    "noEmitOnError": false
   },
   "include": ["src/server", "src/shared"]
 }

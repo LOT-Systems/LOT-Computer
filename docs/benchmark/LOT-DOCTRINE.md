@@ -226,3 +226,21 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## TypeScript ignoreDeprecations Fragility
+
+`ignoreDeprecations` in a tsconfig is not a fixed target — it is only valid
+relative to the CURRENTLY INSTALLED TypeScript version. A value that
+correctly silences moduleResolution/baseUrl deprecation notices today can,
+after the next `tsc` bump, flip to raising TS5103 ("Invalid value") or let
+the original TS5107/TS5101 errors resurface as hard build failures. Chasing
+the version number is a trap: bumping it to match the new `tsc` version is
+not guaranteed to be a valid value either. When server:build fails with
+either symptom, remove the option entirely rather than re-guessing a
+version string — the underlying moduleResolution:"node" / baseUrl options
+do not block compilation on their own. Re-add only if a future `tsc`
+starts hard-erroring on the bare options without it.
+(SR-20260707-01: set "5.0" — "6.0" was invalid for TS 5.9.3 then installed.
+SR-20260909-01: environment TS bumped to 6.0.2; "5.0" now errors, "6.0" is
+also invalid; option removed entirely, server:build green with no
+ignoreDeprecations key at all.)
