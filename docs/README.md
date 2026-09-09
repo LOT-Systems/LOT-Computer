@@ -21,6 +21,16 @@ Core technical documentation about system architecture, engines, and implementat
 - Psychological Depth Analysis - User analysis engine documentation
 - Quantum Intent Engine - Intent pattern recognition system
 
+### [Hardware Documentation](./hardware/)
+Planning documents for LOT Computer, the physical notification companion —
+industrial design, BOM, roadmap, firmware, and the device-facing API.
+
+**Key Documents:**
+- LOT Computer Spec - Industrial design and electronics stack
+- LOT Computer BOM - Components buying list and costs
+- LOT Computer Roadmap - Phased plan to a 100-unit run
+- LOT Computer Firmware / API - On-device and server-side software
+
 ### [Deployment Documentation](./deployment/)
 Guides for deploying and managing the application in production.
 
