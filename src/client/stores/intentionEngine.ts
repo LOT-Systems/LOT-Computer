@@ -3428,6 +3428,79 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Field Renaissance — signal-silence (P51) followed by recovery-intelligence-arc (P151)
+  // both present in the same 24h window. The OS went dark, self-corrected, and documented the arc.
+  // Full regeneration cycle: silence → intervention → restoration → reflection. The Cube reboots itself.
+  const hasSilenceP51     = patterns.some(p => p.pattern === 'signal-silence')
+  const hasRecArcP151     = patterns.some(p => p.pattern === 'recovery-intelligence-arc')
+  if (hasSilenceP51 && hasRecArcP151) {
+    const silenceConf = patterns.find(p => p.pattern === 'signal-silence')?.confidence ?? 0.60
+    const arcConf     = patterns.find(p => p.pattern === 'recovery-intelligence-arc')?.confidence ?? 0.65
+    const renaissanceConf = Math.min(0.72 + (silenceConf + arcConf - 1.25) * 0.3, 0.90)
+    patterns.push({
+      pattern: 'field-renaissance',
+      confidence: Math.max(0.72, renaissanceConf),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `RENAIS: Field renaissance — signal silence detected · recovery arc completed · regeneration cycle confirmed. The OS went dark, tended itself, and returned. Silence → intervention → restoration → reflection. Full reboot.`,
+    })
+  }
+
+  // Pattern 153: Long-Arc Coherence — total-field-coherence (P150) active now AND evidence of a prior
+  // total-field-coherence event in QOS snapshot history (last 7d). Peak coherence is not a single event —
+  // it is a plateau. The system has achieved absolute convergence on multiple distinct days.
+  const hasTFCNow = patterns.some(p => p.pattern === 'total-field-coherence')
+  if (hasTFCNow) {
+    let priorTFCDays = 0
+    try {
+      const history = typeof window !== 'undefined'
+        ? JSON.parse(localStorage.getItem('qos-snapshots') || '[]') as Array<{ patterns?: string[]; timestamp?: number }>
+        : []
+      const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000
+      const todayStart   = new Date(now).setHours(0, 0, 0, 0)
+      const priorSnaps   = history.filter(s => (s.timestamp ?? 0) >= sevenDaysAgo && (s.timestamp ?? 0) < todayStart)
+      const priorDaysWithTFC = new Set(
+        priorSnaps
+          .filter(s => (s.patterns ?? []).includes('total-field-coherence'))
+          .map(s => new Date(s.timestamp ?? 0).toDateString())
+      )
+      priorTFCDays = priorDaysWithTFC.size
+    } catch { /* non-critical */ }
+    if (priorTFCDays >= 1) {
+      const tfcNowConf = patterns.find(p => p.pattern === 'total-field-coherence')?.confidence ?? 0.92
+      const longArcBonus = Math.min(priorTFCDays * 0.01, 0.03)
+      patterns.push({
+        pattern: 'long-arc-coherence',
+        confidence: Math.min(0.85 + longArcBonus + (tfcNowConf - 0.92) * 0.3, 0.95),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'immediate',
+        reason: `LARC: Long-arc coherence — total-field-coherence active · prior TFC confirmed ${priorTFCDays} day(s) this week. Peak coherence is not a peak — it is a plateau. Absolute convergence sustained across multiple days.`,
+      })
+    }
+  }
+
+  // Pattern 154: Narrative Self-Emergence — journal depth >100 words + memory capture signal + any
+  // Level 5/6 coherence pattern (P146–P151) active — all within the same 4h window.
+  // The story is being told at the OS's highest confirmed state. Language + memory + peak coherence.
+  const fourHoursMs2  = 4 * 60 * 60 * 1000
+  const recent4H2     = signals.filter(s => now - s.timestamp < fourHoursMs2)
+  const deepJournal154 = recent4H2.filter(s => (s.source === 'journal' || s.source === 'log') && (s.metadata?.wordCount ?? 0) > 100)
+  const memCapture154  = recent4H2.filter(s => s.source === 'memory')
+  const level56Patterns = ['signal-coherence-cascade', 'quantum-presence-field', 'identity-momentum-lock',
+    'quantum-presence-crystallization', 'total-field-coherence', 'recovery-intelligence-arc']
+  const hasLevel56Active = patterns.some(p => level56Patterns.includes(p.pattern))
+  if (deepJournal154.length >= 1 && memCapture154.length >= 1 && hasLevel56Active) {
+    const wordCount154 = deepJournal154[0].metadata?.wordCount ?? 100
+    const narrativeBonus = Math.min((wordCount154 - 100) / 500 * 0.18, 0.18)
+    patterns.push({
+      pattern: 'narrative-self-emergence',
+      confidence: Math.min(0.70 + narrativeBonus, 0.88),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'soon',
+      reason: `NARSEL: Narrative self-emergence — journal ${wordCount154}w · memory captured · Level 5/6 coherence active in 4h window. The story is being told from the OS's highest confirmed state. Language + memory + peak coherence co-present.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4137,10 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+  // ── v114 nodes (P152–P154) ───────────────────────────────────────────────────
+  fieldRenaissanceNode:       ['qos', 'mood', 'selfcare', 'journal', 'energy', 'log'],
+  longArcCoherenceNode:       ['qos', 'mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'log'],
+  narrativeSelfEmergenceNode: ['journal', 'memory', 'qos', 'log'],
 }
 
 /**
@@ -6498,6 +6575,52 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a field-renaissance event — signal-silence detected (P51) + recovery-intelligence-arc (P151)
+ * confirmed in same 24h window. The OS went dark, intervened, restored, reflected.
+ * Full regeneration cycle from quiet through return. Feeds P152 detection.
+ */
+export function recordFieldRenaissance(silenceWindowH: number, arcVelocityH: number) {
+  recordSignal('qos', 'field_renaissance', {
+    silenceWindowH,
+    arcVelocityH,
+    cycle: 'SILENCE→INTERVENTION→RESTORATION→REFLECTION',
+    cycleStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a long-arc-coherence event — total-field-coherence (P150) has now fired AND
+ * it fired on 1+ prior distinct days in the same 7-day window.
+ * Peak convergence is not a single event — it is a plateau. Feeds P153 detection.
+ */
+export function recordLongArcCoherence(priorTFCDays: number, currentConf: number) {
+  recordSignal('qos', 'long_arc_coherence', {
+    priorTFCDays,
+    currentConf: Math.round(currentConf * 100),
+    metaSeals: ['COHERENCE', 'PRESENCE', 'MOMENTUM'],
+    convergenceType: 'SUSTAINED',
+    plateauDays: priorTFCDays + 1,
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a narrative-self-emergence event — journal >100w + memory capture + Level 5/6 pattern
+ * all active in same 4h window. Language + memory + peak coherence: the story told at highest state.
+ * Feeds P154 detection.
+ */
+export function recordNarrativeSelfEmergence(wordCount: number, activeLevel56Pattern: string) {
+  recordSignal('journal', 'narrative_self_emergence', {
+    wordCount,
+    activeLevel56Pattern,
+    stateLevel: activeLevel56Pattern.includes('total-field') ? 'LEVEL_6_CEILING' : 'LEVEL_5_6',
+    narrativeStatus: 'PEAK_EXPRESSION',
     hour: new Date().getHours(),
   })
 }

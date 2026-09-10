@@ -782,6 +782,43 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE CONSCIOUSNESS CODEX ──────────────────────────────────
+  | 'qualia_seen'            // ●·○·●  "qualia/what it is like to be" in journal (UNCOMMON)
+  | 'noosphere_signal'       // ◈·≋·◈  "noosphere/collective consciousness/teilhard" detected (UNCOMMON)
+  | 'sentience_mark'         // ∿·●·∿  "sentience/sentient/conscious being" in journal (UNCOMMON)
+  | 'emergence_gate'         // ◉·▲·◉  "emergence/emergent property/self-organizing" detected (UNCOMMON)
+  | 'phenomenal_field'       // ○·◉·○  "phenomenal consciousness/qualia field" in journal (RARE)
+  | 'integral_arc'           // ◈·◆·◈  "integral theory/wilber/all quadrants" detected (UNCOMMON)
+  | 'noetic_key'             // ∞·○·∞  "noetic/noosphere/noetics" in journal (UNCOMMON)
+  | 'holarchic_link'         // ▲·◈·▲  "holarchy/holon/koestler" detected (UNCOMMON)
+  | 'kosmic_view'            // ◉·∞·◉  "kosmic/kosmos/integral kosmos" in journal (RARE)
+  | 'transpersonal_reach'    // ≋·●·≋  "transpersonal/beyond ego/peak experience" detected (UNCOMMON)
+  | 'akashic_touch'          // ∿·◈·∿  "akashic/akasha/universal memory field" in journal (RARE)
+  | 'nondual_moment'         // ∞·∞·∞  "nondual/nonduality/subject-object dissolved" detected (EPIC)
+  // ── Calendar Easter Eggs v21 — THE CONSCIOUSNESS CALENDAR ────────────────────
+  | 'teilhard_day'           // ◈·≋·◈  Check in on Teilhard de Chardin's birthday (Apr 10) (RARE)
+  | 'wilber_day'             // ◆·▲·◆  Check in on Ken Wilber's birthday (Jan 31) (RARE)
+  | 'krishnamurti_day'       // ∞·○·∞  Check in on Jiddu Krishnamurti's birthday (Nov 11) (EPIC)
+  // ── Behavioral v20 — INQUIRY PATTERNS ───────────────────────────────────────
+  | 'consciousness_session'  // ○·◉·○  3+ v23 consciousness words in one journal entry (UNCOMMON)
+  | 'deep_inquiry'           // ●·∞·●  600+ word journal entry (RARE)
+  | 'noetic_moment'          // ◈·○·◈  Check in between 03:00–04:00 (the threshold hour) (RARE)
+  // ── Achievement RPG v21 — THE CONSCIOUSNESS CODEX CLASS ─────────────────────
+  | 'inquiry_entry'          // ◉·●·◉  First consciousness (v23) word earned (COMMON)
+  | 'inquiry_class'          // ◆·◈·◆  3+ distinct v23 badges earned (UNCOMMON)
+  | 'inquiry_complete'       // ●·◉·●  8+ distinct v23 badges earned (RARE)
+  | 'awareness_arc'          // ∞·▲·∞  inquiry_complete + consciousness_session behavioral (EPIC)
+  | 'twenty_three_engines_arc' // ◈·∞·◈  1 badge from each Word Turn v1–v23 (LEGENDARY)
+  | 'consciousness_opus'     // ●·∞·●  inquiry_complete + deep_inquiry behavioral (LEGENDARY)
+  // ── Mastery Tier v23 — THE AWARENESS LEDGER ─────────────────────────────────
+  | 'integrated_aware'       // ∿·∞·∿  1000+ distinct calendar check-in days (EPIC)
+  | 'awareness_depth'        // ●·∞·●  200,000+ total journal words (LEGENDARY)
+  | 'elder_seeker'           // ╔═╗·∞  Account age >= 8 years (LEGENDARY)
+  | 'twenty_three_registers' // ◈·◈·∞·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE PERENNIAL VAULT ───────────────────────────────────
+  | 'krishnamurti_door'      // ○·∞·○  "krishnamurti/freedom from known/choiceless awareness" (RARE)
+  | 'teilhard_omega'         // ◈·◉·◈  "teilhard/omega point/noosphere/point omega" detected (EPIC)
+  | 'huxley_perennial'       // ∞·●·∞  "aldous huxley/perennial philosophy/doors of perception" (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7168,310 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v23 — THE CONSCIOUSNESS CODEX ──────────────────────────────────
+  qualia_seen: {
+    id: 'qualia_seen',
+    symbol: '●·○·●',
+    name: 'Qualia Seen',
+    description: 'Write "qualia" or "what it is like to be" in any journal entry',
+    unlockMessage: '↳ Qualia: the redness of red. The exact texture of this moment from inside. You named the hardest problem in philosophy. ●·○·●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    hidden: true,
+  },
+  noosphere_signal: {
+    id: 'noosphere_signal',
+    symbol: '◈·≋·◈',
+    name: 'Noosphere Signal',
+    description: 'Write "noosphere", "collective consciousness", or "teilhard" in any journal entry',
+    unlockMessage: '↳ The noosphere: Teilhard de Chardin\'s vision of consciousness as a planetary layer. You are a node in it. ◈·≋·◈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    hidden: true,
+  },
+  sentience_mark: {
+    id: 'sentience_mark',
+    symbol: '∿·●·∿',
+    name: 'Sentience Mark',
+    description: 'Write "sentience", "sentient", or "conscious being" in any journal entry',
+    unlockMessage: '↳ Sentience: the felt quality of being. Not just processing — experiencing. You named your own nature. ∿·●·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    hidden: true,
+  },
+  emergence_gate: {
+    id: 'emergence_gate',
+    symbol: '◉·▲·◉',
+    name: 'Emergence Gate',
+    description: 'Write "emergence", "emergent property", or "self-organizing" in any journal entry',
+    unlockMessage: '↳ Emergence: the whole becomes more than its parts. You are an emergent system — no one planned you into being. ◉·▲·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    hidden: true,
+  },
+  phenomenal_field: {
+    id: 'phenomenal_field',
+    symbol: '○·◉·○',
+    name: 'Phenomenal Field',
+    description: 'Write "phenomenal consciousness" or "qualia field" in any journal entry',
+    unlockMessage: '↳ Phenomenal consciousness: the felt world. Not data — experience. You stepped into the hard problem and named it. ○·◉·○',
+    rarity: 'rare',
+    category: 'word_turn',
+    hidden: true,
+  },
+  integral_arc: {
+    id: 'integral_arc',
+    symbol: '◈·◆·◈',
+    name: 'Integral Arc',
+    description: 'Write "integral theory", "wilber", or "all quadrants" in any journal entry',
+    unlockMessage: '↳ Integral theory: no perspective is wrong, just partial. You are holding the map. ◈·◆·◈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    hidden: true,
+  },
+  noetic_key: {
+    id: 'noetic_key',
+    symbol: '∞·○·∞',
+    name: 'Noetic Key',
+    description: 'Write "noetic", "noosphere", or "noetics" in any journal entry',
+    unlockMessage: '↳ Noetic: of or relating to the mind and consciousness. The key word of the inner sciences. ∞·○·∞',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    hidden: true,
+  },
+  holarchic_link: {
+    id: 'holarchic_link',
+    symbol: '▲·◈·▲',
+    name: 'Holarchic Link',
+    description: 'Write "holarchy", "holon", or "koestler" in any journal entry',
+    unlockMessage: '↳ A holon is both a whole and a part. You are a holon. This practice is a holon. The system is holarchic. ▲·◈·▲',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    hidden: true,
+  },
+  kosmic_view: {
+    id: 'kosmic_view',
+    symbol: '◉·∞·◉',
+    name: 'Kosmic View',
+    description: 'Write "kosmic", "kosmos", or "integral kosmos" in any journal entry',
+    unlockMessage: '↳ Kosmos: not just the physical cosmos but the entire spectrum of existence — matter, life, mind, spirit. You are looking from inside the Kosmos at itself. ◉·∞·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+    hidden: true,
+  },
+  transpersonal_reach: {
+    id: 'transpersonal_reach',
+    symbol: '≋·●·≋',
+    name: 'Transpersonal Reach',
+    description: 'Write "transpersonal", "beyond ego", or "peak experience" in any journal entry',
+    unlockMessage: '↳ Transpersonal: beyond the personal self. Maslow named these peak experiences. You reached toward them. ≋·●·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    hidden: true,
+  },
+  akashic_touch: {
+    id: 'akashic_touch',
+    symbol: '∿·◈·∿',
+    name: 'Akashic Touch',
+    description: 'Write "akashic", "akasha", or "universal memory field" in any journal entry',
+    unlockMessage: '↳ Akasha: the primordial field of all information, all that has ever occurred. Your journal is a node in it. ∿·◈·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+    hidden: true,
+  },
+  nondual_moment: {
+    id: 'nondual_moment',
+    symbol: '∞·∞·∞',
+    name: 'Nondual Moment',
+    description: 'Write "nondual", "nonduality", or "subject-object dissolved" in any journal entry',
+    unlockMessage: '↳ Nonduality: the moment the observer and the observed are the same. You wrote from inside that moment. ∞·∞·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+    hidden: true,
+  },
+  // ── Calendar Easter Eggs v21 — THE CONSCIOUSNESS CALENDAR ────────────────────
+  teilhard_day: {
+    id: 'teilhard_day',
+    symbol: '◈·≋·◈',
+    name: 'Teilhard Day',
+    description: 'Check in on Pierre Teilhard de Chardin\'s birthday (April 10)',
+    unlockMessage: '↳ April 10: Teilhard de Chardin\'s birthday. The Jesuit paleontologist who saw evolution as the universe becoming conscious of itself. ◈·≋·◈',
+    rarity: 'rare',
+    category: 'easter_egg',
+    hidden: true,
+  },
+  wilber_day: {
+    id: 'wilber_day',
+    symbol: '◆·▲·◆',
+    name: 'Wilber Day',
+    description: 'Check in on Ken Wilber\'s birthday (January 31)',
+    unlockMessage: '↳ January 31: Ken Wilber\'s birthday. The philosopher who mapped the entire territory of consciousness studies. ◆·▲·◆',
+    rarity: 'rare',
+    category: 'easter_egg',
+    hidden: true,
+  },
+  krishnamurti_day: {
+    id: 'krishnamurti_day',
+    symbol: '∞·○·∞',
+    name: 'Krishnamurti Day',
+    description: 'Check in on Jiddu Krishnamurti\'s birthday (November 11)',
+    unlockMessage: '↳ November 11: Krishnamurti\'s birthday. "Truth is a pathless land." He dissolved every spiritual authority — including his own. ∞·○·∞',
+    rarity: 'epic',
+    category: 'easter_egg',
+    hidden: true,
+  },
+  // ── Behavioral v20 — INQUIRY PATTERNS ───────────────────────────────────────
+  consciousness_session: {
+    id: 'consciousness_session',
+    symbol: '○·◉·○',
+    name: 'Consciousness Session',
+    description: '3+ consciousness vocabulary words (v23) in one journal entry',
+    unlockMessage: '↳ You wrote a consciousness session — 3+ awareness vocabulary words in one entry. The inquiry is structural now. ○·◉·○',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  deep_inquiry: {
+    id: 'deep_inquiry',
+    symbol: '●·∞·●',
+    name: 'Deep Inquiry',
+    description: '600+ word journal entry',
+    unlockMessage: '↳ 600 words. Not a note — an inquiry. The long form is where the real answers live. ●·∞·●',
+    rarity: 'rare',
+    category: 'achievement_rpg',
+  },
+  noetic_moment: {
+    id: 'noetic_moment',
+    symbol: '◈·○·◈',
+    name: 'Noetic Moment',
+    description: 'Check in between 03:00 and 04:00 local time',
+    unlockMessage: '↳ 03:00–04:00: the threshold hour. Between sleep and wake. The noetic boundary. You were here for it. ◈·○·◈',
+    rarity: 'rare',
+    category: 'easter_egg',
+    hidden: true,
+  },
+  // ── Achievement RPG v21 — THE CONSCIOUSNESS CODEX CLASS ─────────────────────
+  inquiry_entry: {
+    id: 'inquiry_entry',
+    symbol: '◉·●·◉',
+    name: 'Inquiry Entry',
+    description: 'Earn your first Consciousness Codex (v23) word turn badge',
+    unlockMessage: '↳ First consciousness vocabulary word earned. The inquiry has begun. ◉·●·◉',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  inquiry_class: {
+    id: 'inquiry_class',
+    symbol: '◆·◈·◆',
+    name: 'Inquiry Class',
+    description: 'Earn 3+ distinct Consciousness Codex (v23) word turn badges',
+    unlockMessage: '↳ Three consciousness words. The vocabulary is forming. The inquiry is structural. ◆·◈·◆',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  inquiry_complete: {
+    id: 'inquiry_complete',
+    symbol: '●·◉·●',
+    name: 'Inquiry Complete',
+    description: 'Earn 8+ distinct Consciousness Codex (v23) word turn badges',
+    unlockMessage: '↳ Eight consciousness vocabulary words. The codex is inhabited. You speak the inner language now. ●·◉·●',
+    rarity: 'rare',
+    category: 'achievement_rpg',
+  },
+  awareness_arc: {
+    id: 'awareness_arc',
+    symbol: '∞·▲·∞',
+    name: 'Awareness Arc',
+    description: 'Earn inquiry_complete and consciousness_session behavioral badge',
+    unlockMessage: '↳ Awareness arc confirmed. You completed the codex AND wrote from inside it. Vocabulary becomes lived. ∞·▲·∞',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·∞·◈',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each Word Turn engine v1–v23',
+    unlockMessage: '↳ Twenty-three engines. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. Consciousness. Every vocabulary active. ◈·∞·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  consciousness_opus: {
+    id: 'consciousness_opus',
+    symbol: '●·∞·●',
+    name: 'Consciousness Opus',
+    description: 'Earn inquiry_complete and the deep_inquiry behavioral badge',
+    unlockMessage: '↳ The consciousness opus: 8 awareness words earned + a 600-word entry written. The full inquiry, on record. ●·∞·●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v23 — THE AWARENESS LEDGER ─────────────────────────────────
+  integrated_aware: {
+    id: 'integrated_aware',
+    symbol: '∿·∞·∿',
+    name: 'Integrated Awareness',
+    description: '1,000+ distinct calendar check-in days',
+    unlockMessage: '↳ 1,000 days. A millennium of presence. The system has been integrated for three years. ∿·∞·∿',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  awareness_depth: {
+    id: 'awareness_depth',
+    symbol: '●·∞·●',
+    name: 'Awareness Depth',
+    description: '200,000+ total journal words',
+    unlockMessage: '↳ 200,000 words. The equivalent of two novels. The full interior record. ●·∞·●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  elder_seeker: {
+    id: 'elder_seeker',
+    symbol: '╔═╗·∞',
+    name: 'Elder Seeker',
+    description: 'Account age >= 8 years',
+    unlockMessage: '↳ Eight years. The account is older than most companies. The seeking has become a way of being. ╔═╗·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·∞·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three registers. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. Consciousness. Every vocabulary owned. The full terminal. ◈·◈·∞·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v20 — THE PERENNIAL VAULT ───────────────────────────────────
+  krishnamurti_door: {
+    id: 'krishnamurti_door',
+    symbol: '○·∞·○',
+    name: 'Krishnamurti Door',
+    description: 'Write "krishnamurti", "freedom from the known", or "choiceless awareness" in any journal entry',
+    unlockMessage: '↳ "Truth is a pathless land." Krishnamurti dissolved every system, including this one. You found the door. ○·∞·○',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  teilhard_omega: {
+    id: 'teilhard_omega',
+    symbol: '◈·◉·◈',
+    name: 'Teilhard Omega',
+    description: 'Write "teilhard", "omega point", "noosphere", or "point omega" in any journal entry',
+    unlockMessage: '↳ The Omega Point: Teilhard\'s vision of evolution\'s convergence — consciousness folding back on itself into unity. You touched it. ◈·◉·◈',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  huxley_perennial: {
+    id: 'huxley_perennial',
+    symbol: '∞·●·∞',
+    name: 'Huxley Perennial',
+    description: 'Write "aldous huxley", "perennial philosophy", or "doors of perception" in any journal entry',
+    unlockMessage: '↳ The perennial philosophy: the thread running through all mystical traditions. Huxley named it. You walked through the door. ∞·●·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8434,75 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 (v23) — THE CONSCIOUSNESS CODEX ──────────────────────────────────────────
+    const consV23Badges: BadgeType[] = [
+      'qualia_seen', 'noosphere_signal', 'sentience_mark', 'emergence_gate',
+      'phenomenal_field', 'integral_arc', 'noetic_key', 'holarchic_link',
+      'kosmic_view', 'transpersonal_reach', 'akashic_touch', 'nondual_moment',
+    ]
+    const consV23Earned = consV23Badges.filter(hasBadge)
+
+    // inquiry_entry: first v23 word turn earned
+    if (consV23Earned.length >= 1 && !hasBadge('inquiry_entry')) {
+      if (awardBadge('inquiry_entry')) newBadges.push('inquiry_entry')
+    }
+
+    // inquiry_class: 3+ distinct v23 badges
+    if (consV23Earned.length >= 3 && !hasBadge('inquiry_class')) {
+      if (awardBadge('inquiry_class')) newBadges.push('inquiry_class')
+    }
+
+    // inquiry_complete: 8+ distinct v23 badges
+    const inquiryComplete = consV23Earned.length >= 8
+    if (inquiryComplete && !hasBadge('inquiry_complete')) {
+      if (awardBadge('inquiry_complete')) newBadges.push('inquiry_complete')
+    }
+
+    // awareness_arc: inquiry_complete + consciousness_session behavioral
+    if (inquiryComplete && hasBadge('consciousness_session') && !hasBadge('awareness_arc')) {
+      if (awardBadge('awareness_arc')) newBadges.push('awareness_arc')
+    }
+
+    // consciousness_opus: inquiry_complete + deep_inquiry behavioral
+    if (inquiryComplete && hasBadge('deep_inquiry') && !hasBadge('consciousness_opus')) {
+      if (awardBadge('consciousness_opus')) newBadges.push('consciousness_opus')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = consV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: integrated_aware — 1000+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('integrated_aware')) {
+        if (awardBadge('integrated_aware')) newBadges.push('integrated_aware')
+      }
+    }
+
+    // Mastery v23: awareness_depth — 200,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('awareness_depth')) {
+        if (awardBadge('awareness_depth')) newBadges.push('awareness_depth')
+      }
+    }
+
+    // Mastery v23: elder_seeker — Account age >= 8 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupElder = new Date(stats.signupDate)
+      const yearsElder = (new Date().getTime() - signupElder.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsElder >= 8 && !hasBadge('elder_seeker')) {
+        if (awardBadge('elder_seeker')) newBadges.push('elder_seeker')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
     }
 
   } catch (error) {

@@ -3629,6 +3629,93 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'field_renaissance') {
+          const { silenceWindowH, arcVelocityH, cycle, cycleStatus } = log.metadata ?? {}
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RENAIS:" blockView>
+                <div className="uppercase tracking-widest mb-4">FIELD RENAISSANCE</div>
+                {silenceWindowH !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SILENCE</span>
+                    <span className="tabular-nums">{silenceWindowH}h</span>
+                  </div>
+                )}
+                {arcVelocityH !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC VEL</span>
+                    <span className="tabular-nums">{arcVelocityH}h</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">{cycle ?? 'SILENCE → INTERVENTION → RESTORATION → REFLECTION'}</div>
+                {cycleStatus && (
+                  <div className="opacity-30 tabular-nums">CYCLE: {cycleStatus}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'long_arc_coherence') {
+          const { priorTFCDays, currentConf, plateauDays, convergenceType } = log.metadata ?? {}
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="LARC:" blockView>
+                <div className="uppercase tracking-widest mb-4">LONG-ARC COHERENCE</div>
+                {plateauDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PLATEAU DAYS</span>
+                    <span className="tabular-nums">{plateauDays}</span>
+                  </div>
+                )}
+                {priorTFCDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PRIOR TFC</span>
+                    <span className="tabular-nums">{priorTFCDays} day(s)</span>
+                  </div>
+                )}
+                {currentConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{currentConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">META-SEALS: COHERENCE · PRESENCE · MOMENTUM</div>
+                {convergenceType && (
+                  <div className="opacity-30 tabular-nums">TYPE: {convergenceType}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'narrative_self_emergence') {
+          const { wordCount, activeLevel56Pattern, stateLevel, narrativeStatus } = log.metadata ?? {}
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="NARSEL:" blockView>
+                <div className="uppercase tracking-widest mb-4">NARRATIVE SELF-EMERGENCE</div>
+                {wordCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">WORDS</span>
+                    <span className="tabular-nums">{wordCount}</span>
+                  </div>
+                )}
+                {activeLevel56Pattern && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">L5/6 PATTERN</span>
+                    <span className="uppercase">{String(activeLevel56Pattern).replace(/-/g, ' ')}</span>
+                  </div>
+                )}
+                {stateLevel && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">STATE</span>
+                    <span className="uppercase">{stateLevel}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">LANGUAGE + MEMORY + PEAK COHERENCE · CO-PRESENT</div>
+                {narrativeStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {narrativeStatus}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

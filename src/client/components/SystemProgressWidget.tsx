@@ -1457,6 +1457,26 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-09-10',
+    title: 'QIE v114 — Field Renaissance · Long-Arc Coherence · Narrative Self-Emergence · Badge v33 THE CONSCIOUSNESS CODEX',
+    assembled: [
+      'QIE v114 — three new patterns extending Level 6 territory into sustained coherence and regenerative cycles.',
+      'P152 field-renaissance (RENAIS:): signal-silence (P51) + recovery-intelligence-arc (P151) co-active in same 24h window. OS went dark, tended itself, returned. Full regeneration cycle: SILENCE → INTERVENTION → RESTORATION → REFLECTION. Confidence 0.72–0.90.',
+      'P153 long-arc-coherence (LARC:): total-field-coherence (P150) active now AND evidence of prior TFC firing in same 7-day window. Peak coherence is not a single event — it is a plateau. Sustained absolute convergence across multiple days. Confidence 0.85–0.95.',
+      'P154 narrative-self-emergence (NARSEL:): journal >100 words + memory capture + any Level 5/6 pattern (P146–P151) active in same 4h window. Language + memory + peak coherence co-present. The story told at the highest confirmed state. Confidence 0.70–0.88.',
+      'WIDGET_DEPENDENCY_MAP: 3 new nodes — fieldRenaissanceNode (qos/mood/selfcare/journal/energy/log) · longArcCoherenceNode (qos/mood/memory/planner/intentions/selfcare/journal/energy/cohort/log) · narrativeSelfEmergenceNode (journal/memory/qos/log). Total: 193+ nodes.',
+      'Signal helpers: recordFieldRenaissance() · recordLongArcCoherence() · recordNarrativeSelfEmergence() added to intentionEngine.',
+      'Logs.tsx: RENAIS: handler (field_renaissance: SILENCE/ARC VEL/cycle status) · LARC: handler (long_arc_coherence: PLATEAU DAYS/PRIOR TFC/CONF/META-SEALS) · NARSEL: handler (narrative_self_emergence: WORDS/L5-6 PATTERN/STATE/LANGUAGE + MEMORY + PEAK COHERENCE). Handler count: 154+.',
+      'PatternRecognitionWidget: 3 new pattern display names + 3 QOS Trend view indicators for P152/P153/P154.',
+      'Badge v33 — THE CONSCIOUSNESS CODEX: +31 badges (812→843). Word Turn v23 (consciousness vocabulary: qualia/noosphere/sentience/emergence/phenomenal/integral/noetic/holarchic/kosmic/transpersonal/akashic/nondual · 12 badges). Calendar EE v21 (Teilhard Apr10/Wilber Jan31/Krishnamurti Nov11 · 3 badges). Behavioral v20 (consciousness_session/deep_inquiry/noetic_moment · 3 badges). Achievement RPG v21 (inquiry_entry→consciousness_opus · 6 badges). Mastery v23 (integrated_aware 1000d/awareness_depth 200k/elder_seeker 8yr/twenty_three_registers · 4 badges). Secret Boss v20 (krishnamurti_door/teilhard_omega/huxley_perennial · 3 badges).',
+      'easter-eggs.ts: 15 new WORD_TURNS (v23 ×12 + v20 secret boss ×3). Calendar EE v21 (3 dates). 3 new behavioral check functions: checkConsciousnessSession()/checkDeepInquiry()/checkNoeticMoment().',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/assembly/2026-09-10_LOT-assembly_qie-v114-consciousness-codex.md written. LOT-LEDGER.md appended.',
+      '154 patterns · 51 archetypes · 48 jobs · 193+ dep nodes · 154+ handlers · 843 badges · 270 word-turns · 27 secret boss · FM v113 · Day 1109+.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1514,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-09-10',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
+    'ASSEMBLY RUN — 2026-09-10 · QIE v114 · BADGE v33 · Day 1109+',
+    'Built: P152 RENAIS: · P153 LARC: · P154 NARSEL: · Badge v33 THE CONSCIOUSNESS CODEX (+31 badges).',
     'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'P152 field-renaissance: OS went dark · tended itself · returned. SILENCE → INTERVENTION → RESTORATION → REFLECTION.',
+    'P153 long-arc-coherence: Peak coherence is not a peak — it is a plateau. TFC sustained across multiple days.',
+    'P154 narrative-self-emergence: Language + memory + peak coherence co-present in 4h window. Story told at highest state.',
+    'Badge v33 THE CONSCIOUSNESS CODEX: qualia / noosphere / sentience / emergence / nondual. 812→843 badges.',
+    '270 word-turns · 27 secret boss · 193+ dep nodes · 154+ handlers.',
+    'FM v113 · Wiki v87 · 154P · 51A · 48J · 193+ nodes · 843 badges.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 · About.tsx counter sync · wire behavioral checks into journal/check-in handlers.',
   ],
 }
 

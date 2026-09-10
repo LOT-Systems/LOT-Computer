@@ -870,6 +870,22 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awardBadge('odyssey_day')
     awarded.push('odyssey_day')
   }
+  // ── Calendar EE v21 — THE CONSCIOUSNESS CALENDAR ────────────────────────────
+  // Teilhard Day: April 10 — Pierre Teilhard de Chardin birthday
+  if (!hasBadge('teilhard_day') && month === 4 && day === 10) {
+    awardBadge('teilhard_day')
+    awarded.push('teilhard_day')
+  }
+  // Wilber Day: January 31 — Ken Wilber birthday
+  if (!hasBadge('wilber_day') && month === 1 && day === 31) {
+    awardBadge('wilber_day')
+    awarded.push('wilber_day')
+  }
+  // Krishnamurti Day: November 11 — Jiddu Krishnamurti birthday
+  if (!hasBadge('krishnamurti_day') && month === 11 && day === 11) {
+    awardBadge('krishnamurti_day')
+    awarded.push('krishnamurti_day')
+  }
 
   return awarded
 }
@@ -1483,6 +1499,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE CONSCIOUSNESS CODEX ────────────────────────────────────────────
+  { patterns: /\bqualia\b|\bwhat[\s-]?it[\s-]?is[\s-]?like[\s-]?to[\s-]?be\b/i,              badge: 'qualia_seen' },
+  { patterns: /\bnoosphere\b|\bcollective[\s-]?consciousness\b|\bteilhard\b/i,                badge: 'noosphere_signal' },
+  { patterns: /\bsentience\b|\bsentient\b|\bconscious[\s-]?being\b/i,                        badge: 'sentience_mark' },
+  { patterns: /\bemergence\b|\bemergent[\s-]?propert\b|\bself[\s-]?organiz\b/i,              badge: 'emergence_gate' },
+  { patterns: /\bphenomenal[\s-]?consciousness\b|\bqualia[\s-]?field\b/i,                    badge: 'phenomenal_field' },
+  { patterns: /\bintegral[\s-]?theory\b|\bwilber\b|\ball[\s-]?quadrants\b/i,                badge: 'integral_arc' },
+  { patterns: /\bnoetic\b|\bnoosphere\b|\bnoetics\b/i,                                       badge: 'noetic_key' },
+  { patterns: /\bholarchy\b|\bholon\b|\bkoestler\b/i,                                        badge: 'holarchic_link' },
+  { patterns: /\bkosmic\b|\bkosmos\b|\bintegral[\s-]?kosmos\b/i,                             badge: 'kosmic_view' },
+  { patterns: /\btranspersonal\b|\bbeyond[\s-]?ego\b|\bpeak[\s-]?experience\b/i,             badge: 'transpersonal_reach' },
+  { patterns: /\bakashic\b|\bakasha\b|\buniversal[\s-]?memory[\s-]?field\b/i,                badge: 'akashic_touch' },
+  { patterns: /\bnondual\b|\bnonduality\b|\bsubject[\s-]?object[\s-]?dissolv/i,              badge: 'nondual_moment' },
+  // ── v20 Secret Boss — THE PERENNIAL VAULT word triggers ─────────────────────
+  { patterns: /\bkrishnamurti\b|\bfreedom[\s-]?from[\s-]?the[\s-]?known\b|\bchoiceless[\s-]?awareness\b/i, badge: 'krishnamurti_door' },
+  { patterns: /\bteilhard\b|\bomega[\s-]?point\b|\bpoint[\s-]?omega\b/i,                     badge: 'teilhard_omega' },
+  { patterns: /\baldous[\s-]?huxley\b|\bperennial[\s-]?philosophy\b|\bdoors[\s-]?of[\s-]?perception\b/i, badge: 'huxley_perennial' },
 ]
 
 /**
@@ -2711,6 +2744,65 @@ export function checkThresholdMoment(): BadgeType | null {
   if (hour === 0 && minute <= 30) {
     awardBadge('threshold_moment')
     return 'threshold_moment'
+  }
+  return null
+}
+
+// ── Consciousness Codex v23 behavioral checks ─────────────────────────────────
+
+const CONSCIOUSNESS_WORDS_V23 = [
+  /\bqualia\b|\bwhat[\s-]?it[\s-]?is[\s-]?like[\s-]?to[\s-]?be\b/i,
+  /\bnoosphere\b|\bcollective[\s-]?consciousness\b|\bteilhard\b/i,
+  /\bsentience\b|\bsentient\b|\bconscious[\s-]?being\b/i,
+  /\bemergence\b|\bemergent[\s-]?propert\b|\bself[\s-]?organiz\b/i,
+  /\bphenomenal[\s-]?consciousness\b|\bqualia[\s-]?field\b/i,
+  /\bintegral[\s-]?theory\b|\bwilber\b|\ball[\s-]?quadrants\b/i,
+  /\bnoetic\b|\bnoetics\b/i,
+  /\bholarchy\b|\bholon\b|\bkoestler\b/i,
+  /\bkosmic\b|\bkosmos\b/i,
+  /\btranspersonal\b|\bbeyond[\s-]?ego\b|\bpeak[\s-]?experience\b/i,
+  /\bakashic\b|\bakasha\b/i,
+  /\bnondual\b|\bnonduality\b/i,
+]
+
+/**
+ * Award consciousness_session badge if 3+ Consciousness Codex (v23) words appear in one journal entry.
+ */
+export function checkConsciousnessSession(journalText: string): BadgeType | null {
+  if (hasBadge('consciousness_session')) return null
+  const matchCount = CONSCIOUSNESS_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('consciousness_session')
+    return 'consciousness_session'
+  }
+  return null
+}
+
+/**
+ * Award deep_inquiry badge if journal entry is 600+ words.
+ */
+export function checkDeepInquiry(journalText: string): BadgeType | null {
+  if (hasBadge('deep_inquiry')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 600) {
+    awardBadge('deep_inquiry')
+    return 'deep_inquiry'
+  }
+  return null
+}
+
+/**
+ * Award noetic_moment badge if user checks in between 03:00 and 04:00 local time.
+ */
+export function checkNoeticMoment(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('noetic_moment')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour === 3) {
+    awardBadge('noetic_moment')
+    return 'noetic_moment'
   }
   return null
 }

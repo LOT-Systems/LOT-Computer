@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'field-renaissance':                'Field renaissance — signal silence + recovery arc confirmed same day, full OS regeneration cycle (P152)',
+      'long-arc-coherence':               'Long-arc coherence — total-field-coherence sustained across multiple days this week (P153)',
+      'narrative-self-emergence':         'Narrative self-emergence — journal >100w + memory + Level 5/6 pattern co-present in 4h window (P154)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
@@ -544,6 +547,27 @@ export function PatternRecognitionWidget() {
               {patterns.some(p => p.pattern === 'resilience-cascade') && (
                 <div className="mt-4 uppercase tracking-widest text-xs">
                   Resilience cascade. Recovery + knowledge arc closed.
+                </div>
+              )}
+
+              {/* Field renaissance — P152 */}
+              {patterns.some(p => p.pattern === 'field-renaissance') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Field renaissance. OS regenerated from silence.
+                </div>
+              )}
+
+              {/* Long-arc coherence — P153 */}
+              {patterns.some(p => p.pattern === 'long-arc-coherence') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Coherence plateau. Peak state sustained across days.
+                </div>
+              )}
+
+              {/* Narrative self-emergence — P154 */}
+              {patterns.some(p => p.pattern === 'narrative-self-emergence') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Narrative from peak state. Language + memory + coherence.
                 </div>
               )}
 
