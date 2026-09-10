@@ -65,8 +65,7 @@ export class WidgetErrorBoundary extends React.Component<
             Failed to load.{' '}
             <button
               onClick={() => this.setState({ hasError: false, error: null })}
-              className="underline cursor-pointer"
-              style={{ background: 'none', border: 'none', color: 'inherit', font: 'inherit', padding: 0 }}
+              className="underline cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit"
             >
               Retry
             </button>
