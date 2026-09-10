@@ -5,8 +5,9 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.2 — DEVELOPMENT CYCLE 02 (ELECTRONICS + FIRMWARE PASS)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
+REVISED:  2026-09-10 — see Section 09, REVISION LOG
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -57,6 +58,20 @@ read in full:
 
 No prior document specified jump mechanics, surface locomotion, or a
 levitation roadmap. This document is that specification, v.0.
+
+  CYCLE 02 READING PASS — 2026-09-10
+    Before extending the spec, this cycle re-read every document above
+    plus this file itself (LOT-CUBIQ-QUANTUM-CUBE-v0.md, cycle 01, in
+    full) and docs/benchmark/LOT-MANIFEST.md, confirming the COSMO®
+    Hardware track (brave-lamport-t9z5u8 series, "complete hardware
+    computer design v1.0") remains textually and functionally distinct
+    from CUBIQ™ — no naming or scope collision found. No other CUBIQ
+    hardware document exists yet; this file is still the only hardware
+    spec in the corpus. Cycle 01 committed the mechanical/electronic
+    architecture and the notification vocabulary but left the actual
+    electronics (MCU, driver, power budget) and firmware unspecified.
+    Cycle 02 (Section 06.1) closes that gap without altering anything
+    cycle 01 already locked.
 
 --------------------------------------------------------------------------------
 01 // WHAT v.0 IS AND WHAT IT IS NOT
@@ -279,6 +294,77 @@ assumed.
     levitating future in mind rather than foreclosing it.
 
 --------------------------------------------------------------------------------
+06.1 // CYCLE 02 DEVELOPMENT PASS — ELECTRONICS, POWER, FIRMWARE
+--------------------------------------------------------------------------------
+
+Cycle 01 locked the mechanical architecture (Section 03) and the gesture
+vocabulary (Section 04) but left the control electronics unspecified.
+This pass closes that gap so the v.0 gate (Section 06, "500/500 hop-and-
+recover cycles") is testable against a real bill of materials, not just a
+mechanical description.
+
+  COMPUTE
+    Low-power BLE-class MCU (Cortex-M0+/M4F tier, e.g. Nordic nRF52-
+    class), chosen for three reasons specific to this object: (1) BLE is
+    the pairing/telemetry link back to the charging-pad hub and onward to
+    the Index of Systems (Section 05); (2) hardware PWM channels drive
+    the voice-coil and piezo bias element without bit-banging; (3) sleep
+    current in the low microamp range matters because the cube is
+    expected to sit idle, unplugged from the charge pad, for hours
+    between gestures — see power budget below.
+
+  ACTUATOR DRIVE
+    Single H-bridge motor driver IC sized for the voice-coil's peak
+    current draw, PWM-controlled from the MCU for stroke-length and
+    velocity shaping (the same channel that lets THE NUDGE and THE LEAP
+    in Section 04 be the same actuator at two different drive
+    amplitudes, not two different parts). The piezoelectric bimorph is
+    driven off a small boost/driver stage timed off the same clock, so
+    the "fire the bias element ~1ms after actuator release" behavior in
+    Section 03 is a firmware timer, not a separate analog trigger circuit.
+
+  POWER BUDGET (v.0 REFERENCE, PENDING BENCH MEASUREMENT)
+    Cell: single LiPo pouch cell sized to the 45mm shell interior,
+    budgeted under the <120g mass target (Section 02) — cell mass is
+    the single largest lever against jump height-to-power ratio after
+    the shell itself, so v.0 intentionally under-sizes capacity rather
+    than over-sizes it.
+    Idle (BLE connectable, IMU in low-power wake-on-motion mode):
+      target <10uA average — this is what makes "sits on the desk for
+      days between charges" plausible rather than aspirational.
+    Per-gesture draw: THE NUDGE and THE HOP are single-digit-millisecond
+    actuator pulses — negligible against idle budget even at high
+    frequency. THE LEAP is the outlier (full-amplitude coil stroke) and
+    is the gesture the coulomb-counting bench test in the v.0 exit gate
+    should be run against first. THE SETTLE (2s sustained light
+    pressure) is a HOLD, not a pulse — it is flagged here as the one
+    gesture that needs a thermal duty-cycle check on the coil before
+    it ships, since sustained current through a small voice-coil is the
+    actuator failure mode most likely to trip the "zero actuator
+    failures" clause of the v.0 gate.
+
+  FIRMWARE — GESTURE STATE MACHINE
+    A single finite-state machine sits between the BLE signal-receive
+    handler and the actuator driver: IDLE -> GESTURE_ARMED (edge-detection
+    ToF check, Section 03, must clear before arming) -> ACTUATING ->
+    LANDING_RECOVERY (IMU tilt check, corrective pulse if >25 degrees,
+    Section 03) -> IDLE. Every one of the four Section 04 gestures is a
+    named parameter set (stroke amplitude, piezo delay, hold duration)
+    fed into the same state machine — v.0 ships no gesture-specific code
+    path, only gesture-specific parameters. This is the firmware
+    expression of the same "one actuator, mechanically boring" principle
+    Section 03 states for the hardware, and it is what makes v.1's
+    longer-stroke retune (Section 06) a parameter change, not a rewrite.
+
+  WHAT THIS PASS DOES NOT CLOSE
+    No specific IC part numbers are locked — that is a bench-test and
+    supplier-availability decision for the hardware team, not a spec
+    decision. This pass fixes the ARCHITECTURE (one MCU, one driver IC,
+    one battery cell, one state machine) so that decision has a shape to
+    fill in, the same way Section 03 fixed the mechanical architecture
+    before any actuator vendor was chosen.
+
+--------------------------------------------------------------------------------
 07 // CONSUMER USE CASES
 --------------------------------------------------------------------------------
 
@@ -321,6 +407,41 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE NIGHTSTAND EDGE                          2026-09-10
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Legacy tier, three-year founder cohort, keeps the
+  CUBIQ charging pad on a narrow nightstand rather than a desk — the
+  only flat surface in the room not already claimed by a lamp or a
+  glass of water. The nightstand is 300mm deep. The pad sits 40mm from
+  its front edge, because that is the only place it fits.
+
+  A cohort resonance ping fires overnight — the Index of Systems detects
+  that three other Legacy-tier operators in the same founder cohort
+  completed the same badge tier within the same 48-hour window, a signal
+  class distinct from an individual badge unlock. This is exactly the
+  kind of event the Section 04 vocabulary maps to THE HOP: a shared
+  milestone, not a private one, so it is felt as a hop rather than the
+  private-feeling NUDGE or the attention-seeking LEAP.
+
+  Here the mechanical architecture, not the notification design, is what
+  makes the use case work. The time-of-flight edge sensor (Section 03)
+  checks the 40mm clearance to the nightstand's front edge before the
+  actuator arms. Full-amplitude THE HOP has a displacement radius large
+  enough to be inside the 20mm edge-detection inhibit threshold at this
+  distance — so the state machine (Section 06.1) silently substitutes
+  the in-place shudder gesture instead, the same hardware failsafe
+  Section 03 specifies for exactly this situation. The operator wakes to
+  a cube that is precisely where they left it the night before, having
+  still marked the moment. They never learn the full hop was withheld
+  unless they read this document. The cube's one hard promise — it does
+  not leap itself onto the floor — held on a surface it was never
+  designed around, without the operator doing anything to make that true.
+
+  This is the use case the Section 03 edge-detection gate was built to
+  survive: a real desk is rarely the 45mm-cube-friendly open plane a v.0
+  spec implicitly imagines, and the hardware has to be the thing that
+  notices, not the operator.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
@@ -329,6 +450,44 @@ LOT® Quantum Cube             The object
 CUBIQ™                        The experience — software and hardware,
                                one name, one system
 LOT®† CUBIQ®                  The combined mark
+
+--------------------------------------------------------------------------------
+09 // REVISION LOG
+--------------------------------------------------------------------------------
+
+This document is revised in place, cycle over cycle, rather than forked
+into new versioned files — sections already locked (03, 04, roadmap
+gates in 06) are never edited or removed, only extended. Each cycle
+reads the full document first (Section 00) and appends one entry here.
+
+  CYCLE 01 — 2026-07-28
+    Opened the document. Locked the v.0 mechanical + electronic
+    architecture (single voice-coil actuator, piezoelectric bias,
+    6-axis IMU, ToF edge detection), the four-gesture notification
+    vocabulary, the QI·46 signal-integration loop, and the v.0-v.3
+    roadmap with gate criteria. Recorded USE CASE 01 (THE DESK
+    MIGRATION).
+
+  CYCLE 02 — 2026-09-10
+    Re-read the full corpus (Section 00 reading log, plus this file's
+    own cycle 01 text) before extending anything. Added Section 06.1 —
+    the electronics/power/firmware architecture pass (MCU class, driver
+    IC, power budget, gesture state machine) that cycle 01 left
+    unspecified. Recorded USE CASE 02 (THE NIGHTSTAND EDGE), which
+    exercises the edge-detection safety gate from Section 03 in a
+    real-furniture scenario rather than the open-desk scenario of
+    USE CASE 01. No section from cycle 01 was edited or removed.
+
+  NEXT CYCLE — OPEN ITEMS FOR WHOEVER READS THIS NEXT
+    (a) v.0 has no physical prototype yet — every gate in Section 06 is
+    still a paper gate. The next concrete step toward "development"
+    rather than "specification" is a single bench mule: one voice-coil
+    actuator, one MCU dev board, the state machine from Section 06.1,
+    tested for the "controlled hop, lands upright" behavior Section 01
+    defines as the entire v.0 deliverable.
+    (b) A third consumer use case should exercise THE SETTLE gesture
+    (Section 04) and the thermal duty-cycle question flagged in Section
+    06.1 — neither has been walked through in a use case yet.
 
 ================================================================================
 AUTHORIZED BY: S-2 // VADIK MARMELADOV
