@@ -25,6 +25,32 @@ type CalendarEntry = {
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
+const TIMER_STORAGE_KEY = 'calendar_active_timer'
+
+type ActiveTimer = {
+  date: string
+  entryType: EntryType
+  startedAt: number
+}
+
+function loadActiveTimer(): ActiveTimer | null {
+  try {
+    const raw = localStorage.getItem(TIMER_STORAGE_KEY)
+    return raw ? (JSON.parse(raw) as ActiveTimer) : null
+  } catch (_) {
+    return null
+  }
+}
+
+function formatElapsed(ms: number): string {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000))
+  const h = Math.floor(totalSeconds / 3600)
+  const m = Math.floor((totalSeconds % 3600) / 60)
+  const s = totalSeconds % 60
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`
+}
+
 function getMonthWeeks(year: number, month: number): Dayjs[][] {
   const first = dayjs().year(year).month(month).startOf('month')
   const last = dayjs().year(year).month(month).endOf('month')
@@ -59,6 +85,51 @@ export function CalendarWidget() {
   const [isAddingEntry, setIsAddingEntry] = React.useState(false)
   const [entryText, setEntryText] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
+
+  const [activeTimer, setActiveTimer] = React.useState<ActiveTimer | null>(() => loadActiveTimer())
+  const [now, setNow] = React.useState(() => Date.now())
+
+  React.useEffect(() => {
+    if (!activeTimer) return
+    const interval = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(interval)
+  }, [activeTimer])
+
+  const elapsedMs = activeTimer ? now - activeTimer.startedAt : 0
+
+  const handleStartTimer = () => {
+    if (!selectedDate || activeTimer) return
+    const timer: ActiveTimer = { date: selectedDate, entryType, startedAt: Date.now() }
+    setActiveTimer(timer)
+    setNow(Date.now())
+    try { localStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify(timer)) } catch (_) {}
+  }
+
+  const handleStopTimer = () => {
+    if (!activeTimer) return
+    const durationMs = Date.now() - activeTimer.startedAt
+    const dateLabel = dayjs(activeTimer.date).format('dddd, MMMM D, YYYY')
+
+    if (durationMs >= 1000) {
+      createLog({
+        text: `[TIME] ${activeTimer.entryType}: ${formatElapsed(durationMs)} (${dateLabel})`,
+        event: 'calendar_time_entry',
+        metadata: {
+          date: activeTimer.date,
+          entryType: activeTimer.entryType,
+          durationMs,
+        },
+      }, {
+        onSuccess: () => {
+          queryClient.refetchQueries(['/api/logs'])
+          try { recordCalendarSignal(activeTimer.entryType, activeTimer.date) } catch (_) {}
+        },
+      })
+    }
+
+    setActiveTimer(null)
+    try { localStorage.removeItem(TIMER_STORAGE_KEY) } catch (_) {}
+  }
 
   const entries = React.useMemo<CalendarEntry[]>(() => {
     return logs
@@ -209,6 +280,20 @@ export function CalendarWidget() {
                   )}
                 </div>
               ))}
+            </div>
+
+            <div className="mt-8 flex items-center gap-8">
+              {activeTimer ? (
+                <>
+                  <span className="text-acc/40 uppercase tracking-widest">{activeTimer.entryType}</span>
+                  <span className="text-acc tabular-nums">{formatElapsed(elapsedMs)}</span>
+                  <Button onClick={handleStopTimer}>Stop</Button>
+                </>
+              ) : (
+                selectedDate && (
+                  <Button onClick={handleStartTimer}>Track time</Button>
+                )
+              )}
             </div>
 
             {isAddingEntry && selectedDate && (

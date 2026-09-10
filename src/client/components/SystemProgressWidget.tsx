@@ -1457,6 +1457,21 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    date: '2026-09-10',
+    session: 'Calendar Widget — Time Tracking + CAL-TIME: Handler + Due-Today Alert',
+    assembled: [
+      'CalendarWidget.tsx: time tracking added — start/stop timer scoped to the selected date + entry type, localStorage-persisted (calendar_active_timer) so a page refresh does not drop a running session. Single-segment only (no pause/resume) — deliberately simple for reliability.',
+      'On stop, durations >=1s are written to Log as calendar_time_entry (metadata: date, entryType, durationMs) via the same createLog pattern used for calendar_entry. recordCalendarSignal() reused on success — no new QIE signal minted, since no existing pattern checks a distinct signal name yet.',
+      'Logs.tsx: CAL-TIME: military handler added, sibling to the existing CAL: handler — entry type, formatted duration (formatLogDuration, H:MM:SS or M:SS), date. Terse, tabular-nums, no prose.',
+      'CalendarAlertToast.tsx (new): due-today calendar_entry alerts in the same CAL: terse format, following the EvolutionMilestoneToast plumbing (localStorage seen-set keyed by log id, capped at 100; polls every 30s while the System tab is visible; auto-hides after 6s; queued one at a time). Deliberately does not re-alert daily on overdue entries — the widget has no completion/dismiss state yet.',
+      'System.tsx: CalendarAlertToast mounted alongside EvolutionMilestoneToast.',
+      'Full build green (client+server). tsc --noEmit strict-mode error count unchanged at 128 before/after (confirmed via git stash) — zero new type errors introduced.',
+      'Deferred (open from 2026-04-29 v11 assembly log, still not built): upcoming calendar entries surfaced in the System context panel; next calendar event in the System header.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/benchmark/LOT-SR-20260910-01.md written. LOT-LEDGER.md appended.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1509,16 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-09-10',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-09-10 · Calendar Widget — Time Tracking + Alerts',
+    'Built: CalendarWidget start/stop time tracking (localStorage-persisted, survives refresh) · calendar_time_entry Log event · CAL-TIME: military handler · CalendarAlertToast due-today notification in CAL: format.',
+    'Feedback applied: "Make a reliable Calendar widget that tracks time and logs into Log with stylish military-grade event notifications — keep the minimalist UI."',
+    'Kept it honest: single-segment timer (no pause/resume), reused recordCalendarSignal() rather than minting an unused new QIE signal, and the alert fires once per entry per day — no overdue re-nagging, since the widget has no completion state yet.',
+    'Full build green. tsc strict-mode error count unchanged (128, confirmed via git stash) — zero new type errors from this change.',
+    'Open next: surface upcoming calendar entries in the System context panel (deferred since the 2026-04-29 v11 assembly log, still not built).',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: Temporal Planner — next calendar event in the System header.',
   ],
 }
 
