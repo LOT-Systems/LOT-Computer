@@ -5482,7 +5482,68 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   // STORY — Contextual AI Story
   // Generates a 1-2 paragraph story based on recent logs, self-care events,
   // and widget data. The story reflects the operator's recent journey.
+  //
+  // Optional `period` (day/week/month/year) scopes the compression window —
+  // this is the on-demand counterpart to Job 24's Sunday weekly story: same
+  // dense, honest, template-based fallback tone, callable any time on any
+  // window. Omitting period keeps the original "last 200 logs" behavior.
   // ============================================================================
+  const STORY_PERIOD_DAYS: Record<'day' | 'week' | 'month' | 'year', number> = {
+    day: 1,
+    week: 7,
+    month: 30,
+    year: 365,
+  }
+  const STORY_PERIOD_LABEL: Record<'day' | 'week' | 'month' | 'year', string> = {
+    day: 'today',
+    week: 'this week',
+    month: 'this month',
+    year: 'this year',
+  }
+  const MOOD_POSITIVE = new Set(['energized', 'calm', 'hopeful', 'grateful', 'fulfilled', 'content', 'peaceful', 'excited', 'grounded', 'focused', 'flowing', 'steady'])
+  const MOOD_HARD = new Set(['tired', 'anxious', 'exhausted', 'overwhelmed', 'restless', 'uncertain', 'drained', 'depleted', 'unsettled', 'heavy'])
+
+  function composePeriodStory(period: 'day' | 'week' | 'month' | 'year', periodLogs: any[]): string {
+    const checkins = periodLogs.filter((l) => l.event === 'emotional_checkin')
+    const selfCare = periodLogs.filter((l) => ['self_care_complete', 'self_care_completed'].includes(l.event))
+    const intentions = periodLogs.filter((l) => l.event === 'intention')
+    const notes = periodLogs.filter((l) => ['note', 'journal', 'log_entry'].includes(l.event))
+
+    let positiveCount = 0
+    let hardCount = 0
+    const moodCounts: Record<string, number> = {}
+    for (const c of checkins) {
+      const mood = (c.metadata as any)?.emotionalState
+      if (!mood) continue
+      moodCounts[mood] = (moodCounts[mood] || 0) + 1
+      if (MOOD_POSITIVE.has(mood)) positiveCount++
+      if (MOOD_HARD.has(mood)) hardCount++
+    }
+    const dominantMood = Object.keys(moodCounts).length > 0
+      ? Object.entries(moodCounts).sort(([, a], [, b]) => b - a)[0][0]
+      : null
+    const tone = positiveCount > hardCount ? 'growth' : hardCount > positiveCount ? 'recovery' : 'steady'
+
+    const lines: string[] = []
+    const cap = STORY_PERIOD_LABEL[period].charAt(0).toUpperCase() + STORY_PERIOD_LABEL[period].slice(1)
+    lines.push(`${cap}:`)
+    if (dominantMood) {
+      const moodCap = dominantMood.charAt(0).toUpperCase() + dominantMood.slice(1)
+      lines.push(`${moodCap} was the dominant state across ${checkins.length} check-in${checkins.length !== 1 ? 's' : ''}.`)
+    }
+    if (selfCare.length > 0) lines.push(`${selfCare.length} self-care moment${selfCare.length !== 1 ? 's' : ''} completed.`)
+    if (intentions.length > 0) lines.push(`${intentions.length} intention${intentions.length !== 1 ? 's' : ''} set.`)
+    if (notes.length > 0) lines.push(`${notes.length} note${notes.length !== 1 ? 's' : ''} logged.`)
+    if (lines.length === 1) lines.push('Quiet — no signal recorded yet.')
+    const closing: Record<string, string> = {
+      growth: 'The signal was forward.',
+      recovery: 'The system held.',
+      steady: 'Consistent. The foundation holds.',
+    }
+    lines.push(closing[tone])
+    return lines.join(' ')
+  }
+
   fastify.post(
     '/story',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
@@ -5490,6 +5551,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: 'day' | 'week' | 'month' | 'year'
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,9 +5576,12 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period = req.body.period && STORY_PERIOD_DAYS[req.body.period] ? req.body.period : null
 
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: period
+          ? { userId: req.user.id, createdAt: { [Op.gte]: dayjs().subtract(STORY_PERIOD_DAYS[period], 'day').toDate() } }
+          : { userId: req.user.id },
         order: [['createdAt', 'DESC']],
         limit: 200,
       })
@@ -5547,13 +5612,15 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const periodLabel = period ? STORY_PERIOD_LABEL[period] : 'their recent journey'
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's data into a short narrative.
+
+The operator typed a log entry and invoked /story${period ? ` ${period}` : ''}. Your task: write 1-2 paragraphs (100-200 words) that compress ${periodLabel} into their mood trajectory and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
+- Draw from their actual log entries, moods, and self-care answers below — scoped to ${periodLabel}
 - Reference specific details from their data — make it feel like THEIR story
 - If they've been consistent with check-ins, acknowledge the discipline
 - If there are gaps or struggle, acknowledge that with compassion
@@ -5564,6 +5631,7 @@ RULES:
 
       const dataBlock = `
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+WINDOW: ${period ? periodLabel.toUpperCase() : 'RECENT (no explicit window)'}
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 
@@ -5581,7 +5649,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
 
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
+        console.log(`📖 Story generation${period ? ` [${period}]` : ''} for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
 
         const story = await engine.generateCompletion(fullPrompt, 512)
 
@@ -5595,6 +5663,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           context,
           metadata: {
             story: cleaned,
+            period: period || null,
             logText: (logText || '').substring(0, 500),
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
@@ -5607,8 +5676,14 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
+        // Fallback: LOT's own template-based compression (same tone as the
+        // weekly Job 24 story) so a /story call never returns nothing just
+        // because the AI vendor is unreachable — honest, not fabricated.
+        const fallback = period
+          ? composePeriodStory(period, logs)
+          : 'The system holds your data quietly. When the engine returns, your story will be here.'
         return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
+          story: fallback,
           logId: null,
         }
       }

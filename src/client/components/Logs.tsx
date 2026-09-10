@@ -3706,6 +3706,12 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyPeriod, setStoryPeriod] = React.useState<'day' | 'week' | 'month' | 'year' | null>(null)
+  // Last-processed /qi query and /story period — de-dupes the instant
+  // trigger fire (on the bare "/qi"/"/story" token) against the debounced
+  // argument-upgrade pass below (once the query or period word settles).
+  const lastQiArgRef = React.useRef<string>('')
+  const lastStoryArgRef = React.useRef<string>('')
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -4037,6 +4043,7 @@ const NoteEditor = ({
         const qiMatch = value.match(/\/qi\s+(.+)/i)
         if (qiMatch && qiMatch[1].trim().length >= 2 && !qiLoading) {
           const query = qiMatch[1].trim()
+          lastQiArgRef.current = query
           setQiLoading(true)
           setQiResponse(null)
           try {
@@ -4125,7 +4132,11 @@ const NoteEditor = ({
           'AVAILABLE COMMANDS',
           '',
           '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
+          '/story        Compressed story from recent data',
+          '/story day    Compressed story of today',
+          '/story week   Compressed story of this week',
+          '/story month  Compressed story of this month',
+          '/story year   Compressed story of this year',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
@@ -4152,11 +4163,18 @@ const NoteEditor = ({
           setStoryLoading(true)
           setStoryResponse(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const periodMatch = value.match(/\/story\s+(day|week|month|year)\b/i)
+            const period = periodMatch
+              ? (periodMatch[1].toLowerCase() as 'day' | 'week' | 'month' | 'year')
+              : undefined
+            lastStoryArgRef.current = period || ''
+            setStoryPeriod(period || null)
+            const logText = value.replace(/\/story(\s+(day|week|month|year))?/i, '').replace(/📖/g, '').trim()
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              period,
               quantumState: state,
               userIndex: index,
             })
@@ -4167,6 +4185,57 @@ const NoteEditor = ({
       }
     }
   }, [value])
+
+  // --------------------------------------------------------------------
+  // Argument upgrade pass: /qi and /story take a trailing argument
+  // (query text, or day|week|month|year) that is usually still being
+  // typed when the trigger above first fires — the bare "/qi" or
+  // "/story" token completes a keystroke before the argument does, so
+  // the instant handler above fires with no argument. This short
+  // debounce re-checks the settled text once typing pauses, so a query
+  // or period typed after the command word isn't silently dropped.
+  // --------------------------------------------------------------------
+  const commandArgValue = useDebounce(value, 500)
+  React.useEffect(() => {
+    const qiMatch = commandArgValue.match(/\/qi\s+(.+)/i)
+    if (qiMatch) {
+      const query = qiMatch[1].trim()
+      if (query.length >= 2 && query !== lastQiArgRef.current && !qiLoading) {
+        lastQiArgRef.current = query
+        setQiLoading(true)
+        setQiResponse(null)
+        try {
+          const state = getUserState()
+          const index = getUserIndex()
+          submitQi({ query, quantumState: state, userIndex: index })
+        } catch {
+          submitQi({ query })
+        }
+      }
+    }
+
+    const storyMatch = commandArgValue.match(/\/story\s+(day|week|month|year)\b/i)
+    if (storyMatch) {
+      const period = storyMatch[1].toLowerCase() as 'day' | 'week' | 'month' | 'year'
+      if (period !== lastStoryArgRef.current && !storyLoading) {
+        lastStoryArgRef.current = period
+        setStoryLoading(true)
+        setStoryResponse(null)
+        setStoryPeriod(period)
+        const logText = commandArgValue
+          .replace(/\/story(\s+(day|week|month|year))?/i, '')
+          .replace(/📖/g, '')
+          .trim()
+        try {
+          const state = getUserState()
+          const index = getUserIndex()
+          submitStory({ logText, period, quantumState: state, userIndex: index })
+        } catch {
+          submitStory({ logText: commandArgValue, period })
+        }
+      }
+    }
+  }, [commandArgValue])
 
   const contextText = React.useMemo(() => {
     if (!log?.context) return ''
@@ -4416,7 +4485,7 @@ const NoteEditor = ({
         )}
         {(storyLoading || storyResponse) && (
           <div className="mt-8">
-            <Block label="📖" blockView>
+            <Block label={storyPeriod ? `📖 [${storyPeriod.toUpperCase()}]` : '📖'} blockView>
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
               )}
