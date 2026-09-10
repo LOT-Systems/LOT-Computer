@@ -277,6 +277,14 @@ export const System = React.memo(function SystemInner() {
     return classifyPhysiologicalCohort(eng.signals, quantumState, eng.recognizedPatterns ?? [])
   }, [quantumState])
 
+  // Cosmic resonance — P152: today's ambient astrology reading (auspicious rokuyo
+  // or a Full/New Moon marker) co-occurring with 3+ distinct signal sources logged
+  // the same day. Personalization surfaced in the Astrology block below.
+  const cosmicResonance = React.useMemo(() => {
+    const eng = intentionEngine.get()
+    return (eng.recognizedPatterns ?? []).find(p => p.pattern === 'cosmic-resonance-day') ?? null
+  }, [quantumState])
+
   // Accumulative User Index - holistic score from all widget signals
   const userIndex = React.useMemo(() => {
     return getUserIndex()
@@ -467,6 +475,9 @@ export const System = React.memo(function SystemInner() {
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
+            {cosmicResonance && (
+              <div className="mt-4 opacity-50">Cosmic resonance — today's marker and your own signals align</div>
+            )}
           </Block>
         </div>
 
@@ -671,7 +682,10 @@ export const System = React.memo(function SystemInner() {
         >
           {astrologyView === 'astrology' ? (
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              <div>{astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)</div>
+              {cosmicResonance && (
+                <div className="mt-4 opacity-50">{cosmicResonance.reason}</div>
+              )}
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>

@@ -3428,6 +3428,36 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Cosmic Resonance Day — the day's ambient astrology reading (Tier 0,
+  // recorded once daily by the System dashboard: see recordAstrologySignal) lands on
+  // an auspicious marker (Taian rokuyo, or a Full/New Moon turning point) AND the
+  // operator independently logs 3+ distinct signal sources the same day. This is a
+  // co-occurrence, not a claim of causation — ambient condition and personal
+  // engagement both true on the same day. The reading is personalization: it only
+  // fires for operators whose own signals happen to land there, not a forecast.
+  const todayStart152 = new Date(); todayStart152.setHours(0, 0, 0, 0)
+  const todaySignals152 = signals.filter(s => s.timestamp >= todayStart152.getTime())
+  const astrologyToday152 = todaySignals152.find(s => s.source === 'astrology' && s.signal === 'ambient_reading')
+  if (astrologyToday152) {
+    const meta152 = astrologyToday152.metadata ?? {}
+    const auspiciousMarker = meta152.auspicious === true || meta152.moonPhase === 'Full Moon' || meta152.moonPhase === 'New Moon'
+    const engagedSources152 = new Set(
+      todaySignals152
+        .filter(s => s.source !== 'astrology' && s.source !== 'log')
+        .map(s => s.source)
+    )
+    if (auspiciousMarker && engagedSources152.size >= 3) {
+      const breadthBonus = Math.min((engagedSources152.size - 3) * 0.04, 0.12)
+      patterns.push({
+        pattern: 'cosmic-resonance-day',
+        confidence: Math.min(0.62 + breadthBonus, 0.83),
+        suggestedWidget: 'system',
+        suggestedTiming: 'passive',
+        reason: `COSRES: Cosmic resonance day — today's ambient reading (${meta152.rokuyo ?? 'rokuyo'} · ${meta152.moonPhase ?? 'moon phase'}) is a marked day, and ${engagedSources152.size} distinct signal sources are independently active. Ambient condition and personal engagement co-occur.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -3813,7 +3843,7 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   journal:           ['mood', 'planner'],
   goals:             ['planner', 'intentions', 'memory', 'journal'],
   chakra:            ['mood', 'energy', 'selfcare', 'journal'],
-  cohort:            ['mood', 'memory', 'journal', 'selfcare', 'intentions'],
+  cohort:            ['mood', 'memory', 'journal', 'selfcare', 'intentions', 'astrology'],
   narrative:         ['mood', 'memory', 'journal', 'intentions'],
   evolution:         ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy'],
   assessment:        ['mood', 'memory', 'journal', 'energy'],
@@ -4064,6 +4094,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (P152 · Arch52) ───────────────────────────────────────────────
+  cosmicResonanceNode:        ['astrology', 'mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'log'],
 }
 
 /**
@@ -4510,6 +4543,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Cosmic-Aligned Operator (2026-09-10 v114) ─────────────────────────────
+  {
+    archetype: 'Cosmic-Aligned Operator',
+    energyBands: ['moderate', 'high'],
+    dominantSources: ['astrology', 'journal', 'mood', 'intentions', 'memory'],
+    patternConditions: ['cosmic-resonance-day', 'signal-momentum-lock'],
+    hourRange: [5, 24],
+    directive: 'The ambient reading and the operator\'s own signals land on the same day. Not a claim the sky moved anything — a note that today, both are true at once. Worth logging what it feels like.',
   },
 ]
 
