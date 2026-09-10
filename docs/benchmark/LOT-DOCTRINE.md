@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
 
 ## Render Isolation
 
@@ -226,3 +226,23 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Feature Branch Pruning Loses Unshipped Work (Basics Tab precedent)
+
+A branch marked BEST in the manifest is not safe from pruning until it is
+actually SHIPPED to master. beautiful-johnson-56p7ov built Basics Tab Month
+1 (8 iterations, +293 lines, BEST per SR-20260612-06) but was never carried
+through the Ship pipeline; by 2026-09-10 the branch no longer existed on
+the remote and the work had to be rebuilt from the manifest's one-line
+summary and the doctrine's own description of the feature, not from a
+diff. The manifest entry and this doctrine survived; the code did not.
+
+Corollary: BEST is a ranking among competing iterations, not a durability
+guarantee. A feature that reaches BEST and has no further competing
+iterations pending is a candidate for Ship Mode on its next touch — sitting
+at BEST indefinitely is exactly the state a branch prune can erase.
+
+(SR-20260910-01: Basics Tab Month 1 rebuilt on claude/beautiful-johnson-eqc3r6
+after confirming the prior BEST branch was gone; LOT-FM-001.md written as
+the durable spec so a second loss would not require re-deriving the
+23-item load and doctrine from scratch again.)

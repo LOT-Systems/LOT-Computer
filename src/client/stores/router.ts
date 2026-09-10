@@ -14,6 +14,7 @@ type Routes = {
   api: void
   sync: void
   status: void
+  basics: void
   adminUsers: void
   adminUser: 'userId'
   logs: void
@@ -26,6 +27,7 @@ export const router = createRouter<Routes>({
   api: '/api',
   sync: '/sync',
   status: '/status',
+  basics: '/basics',
   adminUsers: '/us',
   adminUser: '/us/:userId',
   logs: '/log',

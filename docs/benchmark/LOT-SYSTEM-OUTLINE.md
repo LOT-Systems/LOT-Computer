@@ -115,6 +115,10 @@ LOG TAB:
 SETTINGS TAB:
   Settings                Theme, sound, mirror, format preferences
 
+BASICS TAB:
+  BasicsTab               OPEN TAB — LOT-FM-001 ration ledger, doctrine, price line
+  BasicsStatusLine        Inverted terminal status line (reusable)
+
 OTHER:
   AngelInvestorWidget     Investor information (tag-gated)
   CorporatePlanWidget     Corporate plan display
@@ -125,7 +129,6 @@ OTHER:
 
 PENDING (on feature branches, not yet on master):
   Mail                    In-app email system (relaxed-hamilton-eRBVA)
-  Basics                  Ration subscription tab (nifty-allen-jWyOe)
   MailWidget              System tab email indicator (relaxed-hamilton-eRBVA)
   EmailCompose            Email compose overlay (relaxed-hamilton-eRBVA)
 
