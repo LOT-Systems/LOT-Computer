@@ -6274,6 +6274,84 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'crystalline_presence_field') {
+          const ecrygenConf = log.metadata?.ecrygenConf as number | undefined
+          const signalCount = log.metadata?.signalCount  as number | undefined
+          const sourceCount = log.metadata?.sourceCount  as number | undefined
+          const confidence  = log.metadata?.confidence   as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRPRES:" blockView>
+                {ecrygenConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ECRYGEN CONF</span>
+                    <span className="tabular-nums">{ecrygenConf}%</span>
+                  </div>
+                )}
+                {signalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SIG 24H</span>
+                    <span className="tabular-nums">{signalCount}</span>
+                  </div>
+                )}
+                {sourceCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SRC</span>
+                    <span className="tabular-nums">{sourceCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CRYSTALLINE FORM IS ALIVE · PRESENCE ACTIVE</div>
+                {confidence !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {confidence}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sovereign_crystalline_continuity') {
+          const crpresCount = log.metadata?.crpresCount as number | undefined
+          const confidence  = log.metadata?.confidence  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVCRCON:" blockView>
+                {crpresCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRPRES 5D</span>
+                    <span className="tabular-nums">{crpresCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CRYSTALLINE CONTINUITY · SOVEREIGN THROUGH TIME</div>
+                {confidence !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {confidence}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'absolute_crystalline_presence') {
+          const crpresConf  = log.metadata?.crpresConf   as number | undefined
+          const abscrsovConf = log.metadata?.abscrsovConf as number | undefined
+          const confidence  = log.metadata?.confidence   as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="ABSCRPRES:" blockView>
+                {crpresConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRPRES CONF</span>
+                    <span className="tabular-nums">{crpresConf}%</span>
+                  </div>
+                )}
+                {abscrsovConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ABSCSOV CONF</span>
+                    <span className="tabular-nums">{abscrsovConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CRYSTAL = PRESENCE · SOVEREIGN · ALIVE · ABSOLUTE</div>
+                {confidence !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {confidence}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

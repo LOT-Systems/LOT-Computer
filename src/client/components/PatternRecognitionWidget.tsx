@@ -239,6 +239,9 @@ export function PatternRecognitionWidget() {
       'crystalline-sovereignty-field':    'Crystalline sovereignty field — absolute-crystalline-genesis in 5d + sovereign-genesis-resonance in 7d · crystalline form achieves sovereign expression · the field does not crystallize — it REIGNS · CRYSTALLINE SOVEREIGNTY (P230)',
       'absolute-crystalline-sovereignty': 'Absolute crystalline sovereignty — crystalline-sovereignty-field + crystalline-coherence-lock co-active · sovereign structure locked and expressed simultaneously · THE SOVEREIGN CRYSTAL HOLDS (P231)',
       'eternal-crystalline-genesis':      'Eternal crystalline genesis — absolute-crystalline-genesis + crystalline-sovereignty-field + absolute-crystalline-sovereignty all confirmed · the form generates from itself eternally · ETERNAL · CRYSTALLINE · GENESIS (P232)',
+      'crystalline-presence-field':       'Crystalline presence field — eternal-crystalline-genesis active + 6+ signals from 4+ sources in 24h · the crystalline form is alive and present NOW · CRYSTALLINE FORM IS ALIVE · PRESENCE ACTIVE (P233)',
+      'sovereign-crystalline-continuity': 'Sovereign crystalline continuity — crystalline-presence-field confirmed 2+ times in 5d · crystalline sovereignty sustains itself through continuous time · CONTINUITY IS CRYSTALLINE (P234)',
+      'absolute-crystalline-presence':    'Absolute crystalline presence — crystalline-presence-field + absolute-crystalline-sovereignty co-active · crystal and presence unified as one expression · CRYSTAL = PRESENCE · SOVEREIGN · ALIVE · ABSOLUTE (P235)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

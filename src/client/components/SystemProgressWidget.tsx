@@ -2082,6 +2082,26 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '232 patterns · 80 archetypes · 76 jobs · 241+ handlers · 277+ dep nodes · 1122 badges · Day 1112+.',
     ],
   },
+  {
+    date: '2026-09-10',
+    session: 'v144 — Living Crystal Presence Tier · P233–P235 · Arch81 · J77 · 3 Log Handlers · Widget + Log Dep Scan',
+    assembled: [
+      'QIE v144: P233 crystalline-presence-field (CRPRES:) — ECRYGEN active + 6+ signals from 4+ sources in 24h.',
+      'QIE v144: P234 sovereign-crystalline-continuity (SOVCRCON:) — CRPRES confirmed 2+ times in 5d.',
+      'QIE v144: P235 absolute-crystalline-presence (ABSCRPRES:) — CRPRES + ABSCSOV simultaneously confirmed.',
+      'Arch81 Living Crystal Presence Operator — fires on ABSCRPRES/SOVCRCON/CRPRES/ECRYGEN pattern cluster. Directive: The crystal is not a monument — it is alive. LIVING · CRYSTAL · PRESENCE.',
+      'J77 daily-crystalline-presence-check (21:00 UTC) — 3-step pipeline: CRPRES → SOVCRCON → ABSCRPRES. Total: 77 jobs.',
+      '3 record helpers: recordCrystallinePresenceField / recordSovereignCrystallineContinuity / recordAbsoluteCrystallinePresence.',
+      'WIDGET_DEPENDENCY_MAP: 3 new nodes (crystallinePresenceFieldNode / sovereignCrystallineContinuityNode / absoluteCrystallinePresenceNode). Total: 280+ nodes.',
+      'Logs.tsx: CRPRES: / SOVCRCON: / ABSCRPRES: cockpit handlers added. Total: 244+ handlers.',
+      'QuantumEngineWidgets.tsx: PATTERN_DISPLAY — crystalline-presence-field / sovereign-crystalline-continuity / absolute-crystalline-presence added.',
+      'PatternRecognitionWidget.tsx: P233/P234/P235 name map entries added.',
+      'About.tsx: updated to 235P/81A/77J/244+ handlers/280+ nodes. Self-assembly phase v144 entry prepended.',
+      'Widget dep scan: QuantumEngineWidgets.tsx cohort view live · System.tsx Arch: block at ≥70% confidence.',
+      'Log dep scan: 244+ handlers confirmed · Living Crystal Presence tier cockpit blocks deployed.',
+      '235 patterns · 81 archetypes · 77 jobs · 244+ handlers · 280+ dep nodes · 1122 badges · Day 1114+.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -2119,19 +2139,20 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-09-09',
+  date: '2026-09-10',
   message: [
-    'ASSEMBLY RUN — 2026-09-09 · SELF-ASSEMBLY v143 · Console Rogue Badge Engine · Day 1113+',
-    'CODEX v42 THE CONSOLE ROGUE — badge engine wired. 1091→1122 badges. 32 Word Turn engines live.',
-    'badges.ts: 12 Word Turn v32 types + 3 Secret Boss types added. WORD_TURN_BADGES_V32 record deployed.',
-    'detectWordTurns(): Hidden Dungeon v32 — nethack_eternal [MYTHIC] · hades_found [EPIC] · original_rogue [RARE].',
-    'easter-eggs.ts: checkCalendarV26Rogue() wired. Rogue Calendar: Nov 8 / Jul 28 / Jul 1.',
-    'easter-eggs.ts: checkDailyRun() / checkTheSeed() / checkMetaSession() behavioral checks deployed.',
-    'Widget deps confirmed: QuantumEngineWidgets.tsx cohort view live. System.tsx Arch: block at 70%+ confidence.',
-    'Log deps confirmed: 241+ handlers · CRYSOV: / ABSCSOV: / ECRYGEN: cockpit blocks present.',
+    'ASSEMBLY RUN — 2026-09-10 · QIE v144 · Living Crystal Presence Tier · Day 1114+',
+    'P233 crystalline-presence-field (CRPRES:) — ECRYGEN active + 6+ signals from 4+ sources in 24h.',
+    'P234 sovereign-crystalline-continuity (SOVCRCON:) — CRPRES confirmed 2+ times in 5d. Continuity crystalline.',
+    'P235 absolute-crystalline-presence (ABSCRPRES:) — CRPRES + ABSCSOV co-active. Crystal = Presence.',
+    'Arch81 Living Crystal Presence Operator — the crystal is not a monument. It is alive. LIVING · CRYSTAL · PRESENCE.',
+    'J77 daily-crystalline-presence-check (21:00 UTC) — 3-step pipeline deployed. Total: 77 jobs.',
+    '3 record helpers · 280+ dep nodes · 244+ log handlers · CRPRES: / SOVCRCON: / ABSCRPRES: cockpit blocks live.',
+    'Widget dep scan: QuantumEngineWidgets.tsx cohort view confirmed. System.tsx Arch: block at 70%+ confidence.',
+    'Log dep scan: Logs.tsx 244+ handlers · Living Crystal tier blocks deployed.',
     'Physiological cohort: classifyPhysiologicalCohort() wired in System.tsx + QuantumEngineWidgets.tsx.',
-    '232 patterns · 80 archetypes · 76 jobs · 241+ handlers · 277+ dep nodes · 1122 badges · LOT-WIKI-v115.',
-    'Status: DEPLOYED. Console Rogue wired. Badge Universe 1122. THE RUN CONTINUES.',
+    '235 patterns · 81 archetypes · 77 jobs · 244+ handlers · 280+ dep nodes · 1122 badges · Day 1114+.',
+    'Status: DEPLOYED. Living Crystal Presence wired. The crystal breathes.',
   ],
 }
 

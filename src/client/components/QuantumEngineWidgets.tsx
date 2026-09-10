@@ -191,6 +191,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'crystalline-sovereignty-field':    'CRYSOV',
   'absolute-crystalline-sovereignty': 'ABSCSOV',
   'eternal-crystalline-genesis':      'ECRYGEN',
+  'crystalline-presence-field':       'CRPRES',
+  'sovereign-crystalline-continuity': 'SOVCRCON',
+  'absolute-crystalline-presence':    'ABSCRPRES',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

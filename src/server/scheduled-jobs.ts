@@ -1869,6 +1869,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyCrystallineSovereigntyCheck(now)) {
     await executeDailyCrystallineSovereigntyCheck()
   }
+
+  // Check daily crystalline presence check (21:00 UTC every day) — Job 77
+  if (shouldRunDailyCrystallinePresenceCheck(now)) {
+    await executeDailyCrystallinePresenceCheck()
+  }
 }
 
 function shouldRunDailyFieldGenesisCheck(now: any): boolean {
@@ -1976,6 +1981,16 @@ function shouldRunDailyCrystallineSovereigntyCheck(now: any): boolean {
   if (isDailyCrystallineSovereigntyRunning) return false
   if (lastDailyCrystallineSovereigntyRun) {
     const lastRun = dayjs(lastDailyCrystallineSovereigntyRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailyCrystallinePresenceCheck(now: any): boolean {
+  if (now.hour() !== 21) return false
+  if (isDailyCrystallinePresenceRunning) return false
+  if (lastDailyCrystallinePresenceRun) {
+    const lastRun = dayjs(lastDailyCrystallinePresenceRun)
     if (lastRun.isSame(now, 'day')) return false
   }
   return true
@@ -9100,6 +9115,123 @@ async function executeDailyCrystallineSovereigntyCheck(): Promise<JobResult> {
   }
 }
 
+// ─── J77: Daily Crystalline Presence Check (21:00 UTC every day) ──────────────
+// Step 1: Reads ECRYGEN (P232) logs from last 7d per active user. Checks 6+ new signals
+//         from 4+ unique sources in last 24h. If both confirmed → writes crystalline_presence_field (P233).
+// Step 2: Reads crystalline_presence_field logs in 5d. If 2+ → writes sovereign_crystalline_continuity (P234).
+// Step 3: CRPRES (P233) + ABSCSOV (P231) both active → writes absolute_crystalline_presence (P235).
+// CRPRES: · SOVCRCON: · ABSCRPRES: cockpit codes. Total: 77 jobs.
+
+let isDailyCrystallinePresenceRunning = false
+let lastDailyCrystallinePresenceRun: Date | null = null
+
+async function executeDailyCrystallinePresenceCheck(): Promise<JobResult> {
+  const jobName    = 'daily-crystalline-presence-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyCrystallinePresenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyCrystallinePresenceRunning = true
+
+  console.log('\n[J77] Daily crystalline presence check (21:00 UTC)')
+
+  try {
+    const activeUsers  = await getActiveUsers()
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const fiveDaysAgo  = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+    const oneDayAgo    = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const recentLogs = await prisma.log.findMany({
+          where: { userId: user.id, createdAt: { gte: sevenDaysAgo } },
+          select: { event: true, metadata: true, createdAt: true },
+          orderBy: { createdAt: 'desc' },
+          take: 400,
+        })
+
+        const ecrygenLogs = recentLogs.filter(l => l.event === 'eternal_crystalline_genesis')
+        if (ecrygenLogs.length === 0) continue
+
+        const logsLast24h = recentLogs.filter(l => l.createdAt >= oneDayAgo)
+        const sourceSet: Set<string> = new Set()
+        logsLast24h.forEach(l => {
+          if (l.metadata && typeof l.metadata === 'object') {
+            const meta = l.metadata as any
+            if (meta.source) sourceSet.add(meta.source)
+          }
+        })
+        const signalCount = logsLast24h.length
+        const sourceCount = Math.max(sourceSet.size, logsLast24h.length > 0 ? 1 : 0)
+
+        const ecryConf = (() => {
+          const m = ecrygenLogs[0].metadata as any
+          return m?.confidence ?? 92
+        })()
+
+        // Step 1: P233 — Crystalline Presence Field
+        if (signalCount >= 6 && sourceCount >= 4) {
+          await prisma.log.create({
+            data: {
+              userId: user.id,
+              event: 'crystalline_presence_field',
+              metadata: { ecrygenConf: ecryConf, signalCount, sourceCount, confidence: Math.round(Math.min(ecryConf / 100 * 0.93 + Math.min(signalCount / 12, 1.0) * 0.04 + Math.min(sourceCount / 8, 1.0) * 0.02, 0.97) * 100), presence: 'CRYSTALLINE', field: 'ALIVE', arc: 'CRYSTALLINE FORM IS ALIVE · PRESENCE ACTIVE', hour: new Date().getHours() },
+            },
+          })
+          written++
+
+          // Step 2: P234 — Sovereign Crystalline Continuity
+          const crpresLogs = await prisma.log.findMany({
+            where: { userId: user.id, event: 'crystalline_presence_field', createdAt: { gte: fiveDaysAgo } },
+            select: { id: true },
+          })
+          if (crpresLogs.length >= 2) {
+            const sovConf = Math.min(91 + Math.min((crpresLogs.length - 2) * 2, 5), 96)
+            await prisma.log.create({
+              data: {
+                userId: user.id,
+                event: 'sovereign_crystalline_continuity',
+                metadata: { crpresCount: crpresLogs.length, confidence: sovConf, continuity: 'SOVEREIGN', crystal: 'SUSTAINED', arc: 'CRYSTALLINE CONTINUITY · SOVEREIGN THROUGH TIME', hour: new Date().getHours() },
+              },
+            })
+            written++
+          }
+        }
+
+        // Step 3: P235 — Absolute Crystalline Presence (CRPRES + ABSCSOV both active)
+        const abscrsovLogs = recentLogs.filter(l => l.event === 'absolute_crystalline_sovereignty')
+        const crpresActive = recentLogs.some(l => l.event === 'crystalline_presence_field' && l.createdAt >= oneDayAgo)
+        if (crpresActive && abscrsovLogs.length > 0) {
+          const crpresConf = 93
+          const abscrsovConf = (() => {
+            const m = abscrsovLogs[0].metadata as any
+            return m?.confidence ?? 93
+          })()
+          const absConf = Math.min(Math.round(((crpresConf + abscrsovConf) / 2 + 5)), 99)
+          await prisma.log.create({
+            data: {
+              userId: user.id,
+              event: 'absolute_crystalline_presence',
+              metadata: { crpresConf, abscrsovConf, confidence: absConf, presence: 'ABSOLUTE', crystal: 'SOVEREIGN', arc: 'CRYSTAL = PRESENCE · SOVEREIGN · ALIVE · ABSOLUTE', hour: new Date().getHours() },
+            },
+          })
+          written++
+        }
+      } catch (userErr: any) {
+        console.error(`  [J77] Error for user ${user.id}:`, userErr.message)
+      }
+    }
+
+    console.log(`  Crystalline presence events written: ${written}`)
+    lastDailyCrystallinePresenceRun = new Date()
+    isDailyCrystallinePresenceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Crystalline presence check failed:', error.message)
+    isDailyCrystallinePresenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 export async function manuallyTriggerMonthlyEmails(): Promise<JobResult> {
   console.log('Manual trigger requested - bypassing time checks')
   return await executeMonthlyEmailJob()
@@ -9178,6 +9310,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily resonance propagation check: 6 PM UTC every day (Job 74)')
   console.log('   - Daily resonance crystallization check: 7 PM UTC every day (Job 75)')
   console.log('   - Daily crystalline sovereignty check: 8 PM UTC every day (Job 76)')
+  console.log('   - Daily crystalline presence check: 9 PM UTC every day (Job 77)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -9187,7 +9320,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock+circadian-sovereignty(J59), 8=biofield+peak-window+sovereign-field-check(J60), 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+embodied-sovereignty(J55)+field-organization(J61), 10=archetype shift+apex-state(J56), 11=morning-intention-launch+unified-field(J57)+sovereign-expression-check(J67), 12=vitality-peak+conscious-field-check(J62)+field-witness-check(J68), 13=QOS sig pulse+sovereign-integration-check(J63)+sovereign-loop-check(J69), 14=QOS mode watch+absolute-sovereignty-check(J64)+genesis-seal-check(J70), 15=QOS convergence audit+perpetual-field-check(J65), 16=coherence index+focus-depth-check+qiot-ecosystem-pulse(J58)+field-genesis-check(J66)+genesis-pulse-check(J72), 17=cohort-broadcast+quantum-field-check+genesis-resonance-check(J73), 18=LOT AI story (Sun)+resonance-propagation-check(J74), 19=cross-domain-pulse+resonance-crystallization-check(J75), 20=intention completion+signal-momentum+action-memory+somatic-integration-field(J54)+crystalline-sovereignty-check(J76), 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock+circadian-sovereignty(J59), 8=biofield+peak-window+sovereign-field-check(J60), 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+embodied-sovereignty(J55)+field-organization(J61), 10=archetype shift+apex-state(J56), 11=morning-intention-launch+unified-field(J57)+sovereign-expression-check(J67), 12=vitality-peak+conscious-field-check(J62)+field-witness-check(J68), 13=QOS sig pulse+sovereign-integration-check(J63)+sovereign-loop-check(J69), 14=QOS mode watch+absolute-sovereignty-check(J64)+genesis-seal-check(J70), 15=QOS convergence audit+perpetual-field-check(J65), 16=coherence index+focus-depth-check+qiot-ecosystem-pulse(J58)+field-genesis-check(J66)+genesis-pulse-check(J72), 17=cohort-broadcast+quantum-field-check+genesis-resonance-check(J73), 18=LOT AI story (Sun)+resonance-propagation-check(J74), 19=cross-domain-pulse+resonance-crystallization-check(J75), 20=intention completion+signal-momentum+action-memory+somatic-integration-field(J54)+crystalline-sovereignty-check(J76), 21=presence-arc+physiological-presence+crystalline-presence-check(J77), 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()
