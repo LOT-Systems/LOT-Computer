@@ -16,7 +16,11 @@ removed; per-item subscriptions lifted to parent in Sync; nav buttons
 memoized so only active-state changes trigger re-render. SR-20260719-01:
 System quantumState analyzeIntentions()+recomputeAssembly() moved
 useMemo->useEffect — 10 subscriber re-renders no longer block paint;
-SystemProgressWidget 60s recompute interval gated on !document.hidden.)
+SystemProgressWidget 60s recompute interval gated on !document.hidden.
+SR-20260910-01: zero-prop sibling widgets (SystemProgressWidget,
+QuantumEngineWidgets, PatternRecognitionWidget) wrapped in React.memo —
+System.tsx's ~26 useState/useStore hooks no longer cascade full re-renders
+into widgets that don't read any of that state.)
 
 ## Client Cache Freshness
 

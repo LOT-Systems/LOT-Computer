@@ -44,7 +44,7 @@ const HEALTH_SYMBOL: Record<QOSSnapshot['systemHealth'], string> = {
  * Displays confidence levels as text-based progress bars, enriched with log context
  * Cycles: Active Patterns > Recommendation > Confidence Map > QOS Trend
  */
-export function PatternRecognitionWidget() {
+export const PatternRecognitionWidget = React.memo(function PatternRecognitionWidget() {
   const [view, setView] = React.useState<PatternView>('active')
   const engine = useStore(intentionEngine)
   const { data: logs = [] } = useLogs()
@@ -558,4 +558,4 @@ export function PatternRecognitionWidget() {
       )}
     </Block>
   )
-}
+})

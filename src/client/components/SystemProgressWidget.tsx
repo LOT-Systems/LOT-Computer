@@ -1521,7 +1521,7 @@ const FEEDBACK_OPTIONS = [
  * Tracks how this site assembles and evolves itself from user signals
  * Now includes Assembly Map: real-time view of which modules have self-assembled
  */
-export function SystemProgressWidget() {
+export const SystemProgressWidget = React.memo(function SystemProgressWidget() {
   const me = useStore(stores.me)
   const [feedback, setFeedback] = React.useState<FeedbackStatus | null>(null)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
@@ -2510,4 +2510,4 @@ export function SystemProgressWidget() {
       </div>
     </Block>
   )
-}
+})

@@ -153,7 +153,7 @@ function computeQOSMode(
   return { mode, pressure, directive: directives[mode] }
 }
 
-export const QuantumEngineWidgets: React.FC = () => {
+export const QuantumEngineWidgets: React.FC = React.memo(() => {
   const [carConnected, setCarConnected] = usePersistedState('qe-car-connected')
   const [homeConnected, setHomeConnected] = usePersistedState('qe-home-connected')
   const [computerConnected, setComputerConnected] = usePersistedState('qe-computer-connected')
@@ -648,4 +648,4 @@ export const QuantumEngineWidgets: React.FC = () => {
       </Block>
     </>
   )
-}
+})
