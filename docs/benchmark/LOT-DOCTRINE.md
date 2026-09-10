@@ -1,4 +1,24 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
+
+## Environment Bootstrap
+
+A fresh clone (new container, new sandbox) has no `node_modules/`. Running a
+build command in that state does not fail loudly — `npx tsc` silently
+resolves a stray global/cache TypeScript instead of the repo-pinned version,
+and a mismatched major version rejects this repo's `tsconfig.server.json`
+(`ignoreDeprecations` value tied to a specific TS release), reading as a code
+defect when it is a missing-install defect. Always `npm install` (or
+equivalent) before trusting CHECK A output on an unfamiliar environment; a
+red CHECK A that clears after install is an environment fix, not a source
+fix, and should be logged as such rather than mixed into a code diff.
+Corollary: this sandbox's outbound proxy allow-lists `registry.npmjs.org`
+but rejects `registry.yarnpkg.com` (403) even though the project's build
+scripts invoke `yarn run` — use `npm install --legacy-peer-deps` against the
+npm registry to unblock installs when `yarn install` cannot reach its
+registry; the peer-conflict strictness that plain `npm install` refuses on
+(`@nanostores/react` vs `nanostores`) is pre-existing in package.json, not
+introduced by the workaround. (SR-20260910-01: server:build false-red from
+tsc@6.0.2 shadowing pinned 5.9.3; resolved by installing dependencies.)
 
 ## Render Isolation
 

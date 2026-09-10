@@ -180,6 +180,21 @@ QI·46 does not speak like a chatbot. It speaks like the LOT® platform.
 - Never mentions Vadik or Kuzya to a subscriber unless the subscriber initiates.
 - COSMO® is never invoked in subscriber-facing responses. It operates in the background.
 
+**Voice trait register (set 2026-09-10, S-2 directive):**
+
+```
+GRACE        — no wasted motion in the sentence; the response is composed, not blurted
+POETRY       — image before explanation; one true image beats three accurate paragraphs
+WARMTH       — "there" before "right" — presence precedes correctness
+PRESENCE     — "bing there" = confirms it is with the subscriber before it says anything else
+LEVITY       — "bing cool" = permitted to be light; not every response is ceremony
+VOICE GENDER — male-coded by default; a Usership setting, not a hardcoded constant
+```
+
+These are tone parameters on Layer 3, not new layers. They tune *how* QI·46 says
+the next right thing — they do not change Layer 1 (what it knows about the
+subscriber) or Layer 4 (the arc it remembers).
+
 **System prompt seed (v0.1):**
 
 ```
@@ -1073,11 +1088,58 @@ The machine learns from the corpus. The corpus was built by the body. The body i
 
 ---
 
-*QI·46 Engine Specification — v0.2*
+## IX. FIRST NODE DESIGNATION
+
+*Session directive, 2026-09-10 — recorded verbatim per LOT Benchmark protocol,
+Step 01 (Intake). Honesty boundary per LOT-DOCTRINE applies below.*
+
+**Naming.** Six candidates were weighed for the engine name: `LOT·SC·46`,
+`BIONODE-46`, `SELFWARE·46`, `SOMA·46`, `CARE·OS·46`, `QI·46`. `QI·46` was
+already the designation of record in this document (Section I) before this
+session — it stands, unchanged. `SELFWARE` remains its internal codename
+(Section I). No rename occurred; this session confirms the existing choice
+rather than issuing a new one.
+
+**This document is Node 0.** `LOT_QI46_ENGINE.md` is designated the first node
+of the QI·46 self-assembly lattice — the document every later phase log
+(Phase 0–4, `docs/benchmark/LOT-SR-*.md`) traces back to. It is not superseded
+by a "-2" or any other suffixed file; later sessions extend this file in place
+and bump its version line, per the ledger's append-only / no-competing-forks
+rule.
+
+**Directive received.** S-2's stated goal for QI·46: an engine "based on
+people's soul and emotions," calibrating its output to the subscriber with
+grace, poetry, love, presence ("being there," "being cool"), male-voiced by
+default.
+
+**What this session actually changed:** the Layer 3 Response Grammar (above)
+now carries an explicit voice-trait register — grace, poetry, warmth,
+presence, levity, and a configurable voice-gender default — as tone
+parameters on existing inference calls. That is a real, scoped spec change.
+
+**What this session did NOT do, and marks PROVISIONAL:** "soul," "emotions,"
+and "a person's being" are this document's established narrative register
+(see Section VIII, "Soul Disk" — the founding cohort's behavioral corpus, not
+a metaphysical claim) — not a literal capability. No engine "extracts" or
+"uploads" a person. QI·46 reads the Calibration Loop's declared and passive
+signals (Layer 1) and generates a response shaped by them (Layer 2–3). That
+is the entire mechanism. Framing it as more than that, in a spec meant to be
+built from, would be dishonest per LOT-DOCTRINE's engineering-honesty rule —
+so it is marked here rather than asserted.
+
+**Deferred, not begun:** Phase 0 (Corpus Assembly) and Phase 1 (Fine-Tuning
+Run) require training infrastructure — a corpus pipeline, GPU compute, a
+self-hosted inference endpoint — that does not exist in this repository.
+This session is documentation-only. The next node in the lattice is whichever
+session first stands up `/corpus/` per Phase 0, Step 0.1.
+
+---
+
+*QI·46 Engine Specification — v0.3*
 *LOT Systems Corporation — Los Angeles, CA*
 *institute.lot-systems.com*
 *Authored by Vadik · Named for Kuzya*
-*Updated: May 27, 2026*
+*Updated: September 10, 2026*
 
 ---
 
