@@ -33,7 +33,7 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useSendLotMail } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3713,6 +3713,20 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  const [mailTo, setMailTo] = React.useState<string | null>(null)
+  const [mailBody, setMailBody] = React.useState('')
+  const [mailResult, setMailResult] = React.useState<string | null>(null)
+  const { mutate: sendLotMail, isLoading: mailSending } = useSendLotMail({
+    onSuccess: (data) => {
+      setMailResult(`SENT → ${data.toName.toUpperCase()}`)
+      setMailTo(null)
+      setMailBody('')
+    },
+    onError: (err: any) => {
+      const hint = err?.response?.data?.hint || err?.response?.data?.error
+      setMailResult(hint ? hint.toUpperCase() : 'EMAIL FAILED — TRY AGAIN')
+    },
+  })
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -4120,6 +4134,15 @@ const NoteEditor = ({
         } catch {
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
+      } else if (trigger === 'email-compose') {
+        const mailMatch = value.match(/\/(?:email|mail)\s+to\s+([a-zA-Z][\w'-]*(?:\s+[a-zA-Z][\w'-]*)?)/i)
+        if (mailMatch) {
+          const name = mailMatch[1].trim().replace(/[.,!?;:]+$/, '')
+          const afterMatch = value.slice((mailMatch.index || 0) + mailMatch[0].length).trim()
+          setMailTo(name)
+          setMailBody(afterMatch)
+          setMailResult(null)
+        }
       } else if (trigger === 'system-help') {
         const lines = [
           'AVAILABLE COMMANDS',
@@ -4139,6 +4162,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to [name]  Compose a LOT Mail (delivered in Sync)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4384,6 +4408,48 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {mailTo && (
+          <div className="mt-8">
+            <Block label="✉ MAIL:" blockView>
+              <div className="opacity-60 mb-8">To: {mailTo}</div>
+              <ResizibleGhostInput
+                direction="vh"
+                value={mailBody}
+                onChange={setMailBody}
+                placeholder="Write your LOT Mail..."
+                containerClassName="leading-normal"
+                className="leading-normal"
+              />
+              <div className="flex items-center gap-x-8 mt-8">
+                <Button
+                  kind="secondary"
+                  size="small"
+                  disabled={!mailBody.trim() || mailSending}
+                  onClick={() => sendLotMail({ toName: mailTo, body: mailBody })}
+                >
+                  Send
+                </Button>
+                <Button
+                  kind="secondary"
+                  size="small"
+                  onClick={() => {
+                    setMailTo(null)
+                    setMailBody('')
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </Block>
+          </div>
+        )}
+        {mailResult && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{mailResult}</div>
             </Block>
           </div>
         )}

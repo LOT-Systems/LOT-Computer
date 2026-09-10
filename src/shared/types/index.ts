@@ -200,6 +200,18 @@ export type DirectMessage = {
   updatedAt: Date;
 };
 
+// LOT Mail Type — in-app email, sent via the /email log trigger
+export type LotMail = {
+  id: string;
+  fromUserId: string;
+  toUserId: string;
+  subject: string | null;
+  body: string;
+  read: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 // Chat Message Types
 export type ChatMessage = {
   id: string;
@@ -445,9 +457,25 @@ export type ChatMessageLikeEventPayload = {
   isLiked?: boolean;
 };
 
+// LOT Mail Extended Types
+export type LotMailRecord = LotMail & {
+  fromUser: Pick<User, 'id' | 'firstName' | 'lastName'> | null;
+};
+
+export type LotMailSyncPayload = {
+  id: string;
+  fromUserId: string;
+  toUserId: string;
+  fromName: string;
+  subject: string | null;
+  preview: string;
+  createdAt: Date;
+};
+
 // Sync Events
 export type SyncEvents = {
   chatMessage: PublicChatMessage;
   chatMessageLike: ChatMessageLikeEventPayload;
   settings_updated: Record<string, never>;
+  lot_mail: LotMailSyncPayload;
 };

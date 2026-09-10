@@ -123,7 +123,9 @@ export const CohortConnectWidget: React.FC = () => {
       connectionReadiness,
       hour: new Date().getHours()
     })
-    stores.goTo('sync')
+    // LOT Mail is composed in Log via "/email to [name]" and delivered into
+    // Sync — send Cohort matches there rather than straight to Sync itself.
+    stores.goTo('logs')
   }
 
   const handleToggleExpand = (userId: string) => {
@@ -267,7 +269,7 @@ export const CohortConnectWidget: React.FC = () => {
                           handleSendMessage(match.user.id, match.similarity)
                         }}
                       >
-                        Send message
+                        ✉ LOT Mail
                       </Button>
                     </div>
                   </div>

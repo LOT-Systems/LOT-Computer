@@ -24,7 +24,9 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useLotMailUnreadCount,
 } from '#client/queries'
+import { EmailInbox } from '#client/components/EmailInbox'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
 import {
@@ -52,6 +54,8 @@ export const Sync = React.memo(function SyncInner() {
   const [message, setMessage] = React.useState('')
   // SSE-received messages not yet reflected in the API response
   const [sseMessages, setSseMessages] = React.useState<PublicChatMessage[]>([])
+  const [tab, setTab] = React.useState<'chat' | 'mail'>('chat')
+  const { data: mailUnread } = useLotMailUnreadCount()
 
   // Check if current user can access /us section (admin-level access)
   const canAccessUserProfiles = React.useMemo(() => {
@@ -117,9 +121,14 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeLotMailListener } = sync.listen('lot_mail', () => {
+      queryClient.invalidateQueries(['/api/mail/inbox'])
+      queryClient.invalidateQueries(['/api/mail/unread-count'])
+    })
     return () => {
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
+      disposeLotMailListener()
     }
   }, [me?.id])
 
@@ -170,16 +179,33 @@ export const Sync = React.memo(function SyncInner() {
     formRef.current?.querySelector('textarea')?.focus()
   }, [])
 
-  if (!canAccessChat) {
-    return (
-      <div className="max-w-[700px] text-acc/40 py-8">
-        Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
-      </div>
-    )
-  }
+  const unreadMailCount = mailUnread?.count || 0
 
   return (
     <div className="max-w-[700px]">
+      <div className="flex items-center gap-x-16 mb-40">
+        <GhostButton
+          className={tab === 'chat' ? 'opacity-100' : 'opacity-40'}
+          onClick={() => setTab('chat')}
+        >
+          Chat
+        </GhostButton>
+        <GhostButton
+          className={tab === 'mail' ? 'opacity-100' : 'opacity-40'}
+          onClick={() => setTab('mail')}
+        >
+          Mail{unreadMailCount > 0 ? ` (${unreadMailCount})` : ''}
+        </GhostButton>
+      </div>
+
+      {tab === 'mail' ? (
+        <EmailInbox />
+      ) : !canAccessChat ? (
+        <div className="text-acc/40 py-8">
+          Sync chat is available for Usership, Onyx, Legacy, R&D, and Admin members.
+        </div>
+      ) : (
+      <>
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}
@@ -277,6 +303,8 @@ export const Sync = React.memo(function SyncInner() {
           )
         })}
       </div>
+      </>
+      )}
     </div>
   )
 })
