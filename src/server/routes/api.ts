@@ -744,6 +744,119 @@ export default async (fastify: FastifyInstance) => {
     }
   )
 
+  // ==========================================================================
+  // BASICS — LOT-FM-001 ration subscription. UPGRADE state machine:
+  //   USERSHIP/AI -> PENDING -> ON STRENGTH -> STEADY STATE
+  // PENDING is self-service intent (roster intake). Granting ON STRENGTH
+  // (the 'Basic' tag) is CEO-confirmed — see User.canEditTags() — since it
+  // gates a paid physical ration and no automated billing is wired yet.
+  // Self-service is safe only in the de-escalating direction (stand-down).
+  // ==========================================================================
+
+  const BASICS_SIZING = ['S', 'M', 'L', 'XL']
+  const BASICS_CADENCE = ['IMMEDIATE', 'NEXT_CYCLE']
+  const hasTag = (tags: string[], tag: string) =>
+    (tags || []).some((t) => t.toLowerCase() === tag.toLowerCase())
+
+  fastify.post<{
+    Body: { sizing: string; shippingAddress: string; cadenceStart: string }
+  }>(
+    '/basics/enroll',
+    async (req: FastifyRequest<{
+      Body: { sizing: string; shippingAddress: string; cadenceStart: string }
+    }>, reply) => {
+      if (!hasTag(req.user.tags, 'usership')) {
+        return reply.code(400).send({ error: 'USERSHIP / AI required as base layer' })
+      }
+      if (hasTag(req.user.tags, 'basic')) {
+        return reply.code(400).send({ error: 'Already ON STRENGTH' })
+      }
+
+      const { sizing, shippingAddress, cadenceStart } = req.body
+      if (!BASICS_SIZING.includes(sizing)) {
+        return reply.code(400).send({ error: 'Invalid sizing' })
+      }
+      if (!BASICS_CADENCE.includes(cadenceStart)) {
+        return reply.code(400).send({ error: 'Invalid cadenceStart' })
+      }
+      if (!shippingAddress || !shippingAddress.trim() || shippingAddress.length > 500) {
+        return reply.code(400).send({ error: 'Shipping address required (max 500 chars)' })
+      }
+
+      const currentMetadata = req.user.metadata || {}
+      const existing = currentMetadata.basics
+      const updatedMetadata = {
+        ...currentMetadata,
+        basics: {
+          status: 'PENDING',
+          roster: { sizing, shippingAddress: shippingAddress.trim(), cadenceStart },
+          requestedAt: existing?.status === 'PENDING' ? existing.requestedAt : new Date().toISOString(),
+          issueLog: existing?.issueLog || [],
+        },
+      }
+      await req.user.set({ metadata: updatedMetadata }).save()
+      sync.emit('settings_updated', { userId: req.user.id })
+
+      reply.ok()
+    }
+  )
+
+  fastify.post('/basics/stand-down', async (req: FastifyRequest, reply) => {
+    const currentMetadata = req.user.metadata || {}
+    const basics = currentMetadata.basics
+    if (!basics || (basics.status !== 'PENDING' && basics.status !== 'ON_STRENGTH')) {
+      return reply.code(400).send({ error: 'Not PENDING or ON STRENGTH' })
+    }
+
+    if (basics.status === 'ON_STRENGTH') {
+      const remainingTags = (req.user.tags || []).filter((t) => t.toLowerCase() !== 'basic')
+      await req.user.set({ tags: remainingTags }).save()
+    }
+
+    const updatedMetadata = {
+      ...currentMetadata,
+      basics: { ...basics, status: 'STOOD_DOWN', standDownAt: new Date().toISOString() },
+    }
+    await req.user.set({ metadata: updatedMetadata }).save()
+    sync.emit('settings_updated', { userId: req.user.id })
+
+    reply.ok()
+  })
+
+  // CEO-confirmed issue: PENDING -> ON STRENGTH. Manual gate until an
+  // automated payment processor is integrated (LOT-FM-001 doctrine: never
+  // fabricate a billing event that didn't happen).
+  fastify.post<{ Body: { userId: string } }>(
+    '/basics/confirm',
+    async (req: FastifyRequest<{ Body: { userId: string } }>, reply) => {
+      if (!req.user.canEditTags()) {
+        return reply.code(403).send({ error: 'Access denied: Only the CEO can confirm issue' })
+      }
+      const { userId } = req.body
+      const target = await fastify.models.User.findByPk(userId)
+      if (!target) return reply.throw.notFound()
+
+      const targetMetadata = target.metadata || {}
+      const basics = targetMetadata.basics
+      if (!basics || basics.status !== 'PENDING') {
+        return reply.code(400).send({ error: 'Target is not PENDING' })
+      }
+
+      const tags = target.tags || []
+      if (!hasTag(tags, 'basic')) {
+        await target.set({ tags: [...tags, 'Basic'] }).save()
+      }
+      const updatedMetadata = {
+        ...targetMetadata,
+        basics: { ...basics, status: 'ON_STRENGTH', activatedAt: new Date().toISOString() },
+      }
+      await target.set({ metadata: updatedMetadata }).save()
+      sync.emit('settings_updated', { userId: target.id })
+
+      reply.ok()
+    }
+  )
+
   fastify.post<{
     Body: {
       privacy: {

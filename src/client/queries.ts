@@ -76,6 +76,18 @@ export const useUpdateSettings = createMutation<UserSettings, void>(
   '/api/settings'
 )
 
+// BASICS — LOT-FM-001. Self-service enroll/stand-down only; the ON STRENGTH
+// tag grant itself is CEO-confirmed server-side (see api.ts /basics/confirm).
+export const useEnrollBasics = createMutation<
+  { sizing: string; shippingAddress: string; cadenceStart: 'IMMEDIATE' | 'NEXT_CYCLE' },
+  void
+>('post', '/api/basics/enroll')
+
+export const useStandDownBasics = createMutation<void, void>(
+  'post',
+  '/api/basics/stand-down'
+)
+
 export const useLiveMessage = createQuery<{ message: string }>(
   '/api/live-message'
 )

@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
 
 ## Render Isolation
 
@@ -226,3 +226,25 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Tag-Gated Paid Access (BASICS-BOUNDARY)
+
+When a user tag gates paid or privileged access (Usership, Admin, and now
+Basic all work this way — see User.canEditTags()), no self-service code path
+may grant that tag to its own holder, even indirectly through a "confirm my
+own request" endpoint. Self-service is safe only in the de-escalating
+direction (a user may always drop a tag they hold — STAND DOWN, cancel,
+downgrade). Escalating a user's own access must land on a CEO- or admin-
+gated endpoint that reuses the existing canEditTags() check, not a new
+parallel authority. Where the escalation is meant to follow a real-world
+event this codebase cannot yet verify (a payment clearing, in Basics' case —
+no payment processor is wired), the intent is recorded as a distinct pending
+state (metadata.basics.status = 'PENDING') rather than either blocking the
+user or fabricating the confirming event. The gated endpoint is real code,
+callable today, standing in for the automation until it exists — it is not
+a stub and not a placeholder response.
+(SR-20260911-01: /api/basics/enroll self-service to PENDING; /api/basics/
+stand-down self-service in both directions it's ever safe to be; /api/
+basics/confirm CEO-gated for PENDING->ON_STRENGTH — the one tag grant in
+this build, guarded by the same canEditTags() already protecting the
+general tags PATCH route.)

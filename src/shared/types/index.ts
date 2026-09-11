@@ -17,7 +17,33 @@ export enum UserTag {
   Pro = 'Pro',
   Suspended = 'Suspended',
   Legacy = 'Legacy',
+  Basic = 'Basic',
 }
+
+// BASIC ration subscription — LOT-FM-001. Additive to Usership (AI plan).
+// Tag grant/removal for ON_STRENGTH is CEO-gated (see User.canEditTags());
+// PENDING/STOOD_DOWN are self-service intent states recorded in metadata.basics.
+export type BasicsStatus = 'PENDING' | 'ON_STRENGTH' | 'STOOD_DOWN'
+
+export type BasicsRoster = {
+  sizing: string;
+  shippingAddress: string;
+  cadenceStart: 'IMMEDIATE' | 'NEXT_CYCLE';
+};
+
+export type BasicsIssueLogEntry = {
+  date: string;
+  note: string;
+};
+
+export type BasicsEnrollment = {
+  status: BasicsStatus;
+  roster: BasicsRoster;
+  requestedAt: string;
+  activatedAt?: string;
+  standDownAt?: string;
+  issueLog: BasicsIssueLogEntry[];
+};
 
 // User Types
 export type UserSettings = {
@@ -73,6 +99,7 @@ export type UserProfile = {
   timeChime?: boolean;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
+  metadata?: Record<string, any>;
 };
 
 export type User = {

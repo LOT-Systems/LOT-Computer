@@ -3,7 +3,7 @@ LOT SYSTEMS / SELF-ASSEMBLY MANIFEST
 DOCUMENT: LOT-MANIFEST
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
-DATE:     2026-06-27 (updated)
+DATE:     2026-09-11 (updated)
 ================================================================================
 
 Central catalog of all self-assembly routines across all branches.
@@ -25,7 +25,7 @@ STATUS KEY:
 FEATURE          | BEST BRANCH                   | HASH     | ITER  | STATUS | FILES | LINES  | SUMMARY
 ──────────────     ─────────────────────────────   ────────   ─────   ──────   ─────   ──────   ──────────────────────
 LOT Mail         | determined-turing-f6bw7r     | fa622a25 | 11/11 | BEST   | 11    | +504   | In-app email: /email trigger, Sync inbox, Cohort integration, yarn.lock
-Basics Tab       | beautiful-johnson-56p7ov      | 6815f550 | 8/8   | BEST   | 5     | +293   | BASICS M1: OPEN TAB live — 23-item ration ledger, doctrine, status line
+Basics Tab       | beautiful-johnson-se8mh8      | (head)   | 9/9   | BEST   | 9     | +636   | BASICS M1+M2: OPEN TAB live + UPGRADE state machine, self-service enroll/stand-down, CEO-gated issue confirm
 Calendar Alerts  | gifted-lovelace-cZOWR         | 978cf52  | 6/6   | BEST   | 3     | +359   | Live clock, T-minus countdown, military alert overlay, today panel
 QI-46 Engine     | cool-tesla-f8j0mr            | 36ef4dde | 8/8   | BEST   | 8     | +2050  | QI·46 Node 3 engine integration + Soul Upload + Being Calibration
 COSMO Hardware   | brave-lamport-t9z5u8         | c7d353ef | 14/14 | BEST   | 7     | +2610  | COSMO® Cube — complete hardware computer design v1.0
@@ -89,7 +89,7 @@ dazzling-shannon | 9     | ykKT5             | 8     | COSMO hardware iterations
 brave-lamport    | 5     | t9z5u8            | 4     | COSMO hardware iterations (latest series)
 gifted-lovelace  | 6     | cZOWR             | 5     | Calendar alert iterations
 nifty-allen      | 6     | jWyOe             | 5     | Basics Tab iterations (SUPERSEDED by beautiful-johnson)
-beautiful-johnson| 2     | 56p7ov            | 1     | Basics Tab iterations (latest series)
+beautiful-johnson| 3     | se8mh8            | 2     | Basics Tab iterations (latest series; se8mh8 supersedes 56p7ov, carries M1+M2)
 gracious-gauss   | 7     | WnL0k             | 6     | QI-46 Engine iterations (SUPERSEDED by cool-tesla)
 upbeat-faraday   | 2     | xviFF             | 1     | Badge RPG iterations (SUPERSEDED by cool-hypatia)
 inspiring-volta  | 6     | 2hmidy            | 5     | Health check iterations
@@ -180,17 +180,17 @@ PROTECTED FILES (always restore from master during any branch merge):
   docs/benchmark/LOT-MANIFEST.md      — session-managed, never merge from branch
 
 CURRENT SHIP QUEUE (BEST, awaiting Sunday merge):
-  LOT Mail         | determined-turing-f6bw7r  | +504 lines
-  Basics Tab       | beautiful-johnson-56p7ov   | +293 lines
-  Calendar Alerts  | gifted-lovelace-cZOWR      | +359 lines
-  QI-46 Engine     | cool-tesla-f8j0mr          | +2050 lines
-  COSMO Hardware   | brave-lamport-t9z5u8        | +2610 lines
-  Badge RPG        | cool-hypatia-aqj7dg         | +1832 lines
+  Basics Tab       | beautiful-johnson-se8mh8   | +636 lines
 
-NOTE: As of 2026-06-27, the above branches no longer exist on the remote —
-they were incorporated into master in prior sessions. The ship queue will be
-re-populated as new BEST branches are designated from future assembly runs.
-The protocol above applies to all future merges.
+NOTE: As of 2026-06-27, the other branches once listed here (LOT Mail,
+Calendar Alerts, QI-46 Engine, COSMO Hardware, Badge RPG) no longer exist on
+the remote and were incorporated into master in prior sessions. Basics Tab
+was a standing exception to that note — as of 2026-09-11, src/client/
+components/Basics.tsx still does not exist on master (verified directly;
+the nav "Basics" tab is greyed out as coming-soon there), so the M1 work on
+56p7ov was never actually shipped despite carrying BEST status since June.
+This session's se8mh8 supersedes 56p7ov (M1 + M2) and is the current ship
+candidate. The protocol above applies to all future merges.
 
 RULE: One feature per Sunday merge pass. If multiple features are queued,
 start with the smallest diff — lower blast radius, cleaner green gate.
