@@ -4,8 +4,8 @@ DOCUMENT: LOT-CUBIQ-QUANTUM-CUBE-v0
 TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Device
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
-DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+DATE:     2026-07-28 (v0.1) · 2026-09-11 (v0.2, Cycle 2)
+VERSION:  0.2 — DEVELOPMENT CYCLE 2
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -57,6 +57,45 @@ read in full:
 
 No prior document specified jump mechanics, surface locomotion, or a
 levitation roadmap. This document is that specification, v.0.
+
+--------------------------------------------------------------------------------
+00b // CYCLE 2 READING LOG ADDENDUM — 2026-09-11
+--------------------------------------------------------------------------------
+
+Before extending this document, Cycle 2 re-read the following in full,
+in addition to everything logged in Section 00 above:
+
+  THIS DOCUMENT, v0.1 (2026-07-28)
+    Read end to end so nothing in Sections 01-08 below is contradicted,
+    only extended. The v.0/v.1/v.2/v.3 roadmap (Section 06) and the
+    four-gesture vocabulary (Section 04) are treated as locked; Cycle 2
+    adds detail underneath them, it does not renegotiate them.
+
+  docs/corporate/LOT-CUBIQ-OPERATOR.md, Section 03 — "The Index of
+  Systems"
+    Confirms "cohort" as one of the 15 signal sources and "cohort
+    resonance" as a named trigger class already implied in Section 04's
+    gesture table below. Use Case 02 (Section 07) is the first to write
+    out what a cohort-sourced signal looks like on the hardware side.
+
+  docs/corporate/LOT_QI46_ENGINE.md, Layer 0 and the Month-12
+  "Quantum Cube sync" block
+    Reconfirms the three haptic telemetry types the cube must be able to
+    emit (pressure, duration, cadence) and the corpus line "piezoelectric
+    mechanics, nano-ceramic architecture, biofield theory, haptic
+    feedback language" — the vocabulary Cycle 2's firmware section
+    (03b) and BOM (02b) are built from, not new terms.
+
+  docs/corporate/CQGS-WHITE-PAPER-SNAPSHOT.md, Section II status table
+    "Quantum Cube Hardware | Hardware feedback integration (Month 12+) |
+    PLANNED" is unchanged by this cycle — Cycle 2 is design work, not a
+    status change. No claim is made here that PLANNED becomes LIVE.
+
+This document's own STATUS line (header, above) stays PRE-HARDWARE. Cycle
+2 narrows engineering choices and records one new consumer use case; it
+does not fabricate test data, build a physical unit, or move the gate
+counters in Section 06. Honesty about what has and has not been built is
+worth more to this record than the appearance of progress.
 
 --------------------------------------------------------------------------------
 01 // WHAT v.0 IS AND WHAT IT IS NOT
@@ -279,6 +318,83 @@ assumed.
     levitating future in mind rather than foreclosing it.
 
 --------------------------------------------------------------------------------
+06b // CYCLE 2 ENGINEERING REFINEMENTS
+--------------------------------------------------------------------------------
+
+The roadmap in Section 06 stands unchanged. This subsection narrows three
+of its open questions one notch further, per the Cycle 2 reading log
+(00b) above. None of this is a hardware claim — it is design work that
+the next cycle (fabrication or simulation) will need in hand.
+
+  BOM CANDIDATE CLASSES (v.0, not yet sourced to part numbers)
+    ACTUATOR         Voice-coil, linear, sub-100mA drive class — chosen
+                      over solenoid in Section 03 for controllability;
+                      Cycle 2 adds the constraint that stroke length is
+                      the single lever v.1 pulls hardest (see below).
+    BIAS ELEMENT     Piezoelectric bimorph strip, angle-mount bracket
+                      5-15° off the vertical actuator axis (Section 03).
+    IMU              6-axis (3-axis accel + 3-axis gyro), center-mass
+                      mount (Section 03, landing recovery).
+    EDGE SENSOR      Time-of-flight, base face, forward-facing, v.0;
+                      v.2 requires this to become a ring (multi-
+                      directional cone, Section 06 v.2 entry) — Cycle 2
+                      flags this as the one part class v.0 should
+                      socket for a 4-unit ring even though only one ToF
+                      unit is populated at v.0.
+    CHARGE COIL      Qi-class inductive receiver, base face.
+    SHELL            Nano-ceramic composite (Section 02); mass budget is
+                      the shell's binding constraint, not its material —
+                      see v.1 mass note below.
+    These remain candidate CLASSES, matched to the component language
+    already in the Institute corpus (LOT_QI46_ENGINE.md Layer 0). No
+    vendor, model number, or cost has been locked — that is fabrication-
+    phase work, out of scope for a pre-hardware document.
+
+  FIRMWARE GESTURE STATE MACHINE (v.0 driver, Section 05's missing detail)
+    Section 05 draws the signal loop; Cycle 2 gives it states:
+
+      IDLE
+        └─▶ SIGNAL_RECEIVED (Index of Systems event lands, Section 05)
+              └─▶ GESTURE_SELECT (map signal → NUDGE/HOP/LEAP/SETTLE,
+                    Section 04 table)
+                    └─▶ EDGE_CHECK (ToF read; Section 03 safety gate)
+                          ├─▶ INHIBITED → SUBSTITUTE_GESTURE (shudder,
+                          │     lower amplitude) → IDLE
+                          └─▶ CLEAR → ACTUATE (coil + piezo bias fire)
+                                └─▶ IMU_MONITOR (post-motion window)
+                                      ├─▶ WITHIN 25° → IDLE
+                                      └─▶ TIPPED > 25° → RECOVER
+                                            (corrective micro-pulse,
+                                            Section 03) → IMU_MONITOR
+
+    EDGE_CHECK is placed before ACTUATE, not after — the v.0 safety gate
+    (Section 03: "a physical object that leaps unattended on a desk MUST
+    refuse to leap itself onto the floor") only holds if inhibition is
+    checked before the coil fires, never as a post-hoc correction.
+
+  v.1 MASS/STROKE NOTE (long jump, Section 06 v.1 entry)
+    Section 06 already sets the v.1 shell-mass target at <90g (down from
+    v.0's <120g) and calls for "longer coil stroke." Cycle 2 records the
+    reasoning: hop height for a fixed actuator impulse scales inversely
+    with reaction mass, so the two levers (lighter shell, longer stroke)
+    compound rather than substitute — v.1 should pull both, not choose
+    one. This is a design note, not a simulated or measured result; no
+    displacement figure in Section 06 is revised by it.
+
+  v.3 LEVITATION — NARROWING THE RESEARCH LEAD (Section 06 v.3 entry)
+    Section 06 named two candidate directions without ranking them.
+    Cycle 2 proposes acoustic levitation (6a) as the lead research
+    candidate, for one architectural reason: it extends the table-as-
+    power-surface design already locked at v.0 (Section 02 — the
+    charging pad IS the table) into a phased ultrasonic array on the
+    same physical surface, rather than requiring a second, incompatible
+    table technology (the servo-electromagnet array of 6b). Diamagnetic/
+    active magnetic levitation (6b) remains the fallback candidate if
+    acoustic standing-wave control proves incompatible with the shell
+    mass budget. This is a research-priority note, not a decision —
+    v.3 still has no gate criteria and is not scheduled.
+
+--------------------------------------------------------------------------------
 07 // CONSUMER USE CASES
 --------------------------------------------------------------------------------
 
@@ -320,6 +436,48 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE COHORT RESONANCE                         2026-09-11
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Legacy tier, two operators (not a couple, not
+  co-workers — a cohort pair formed through the community layer,
+  LOT-CUBIQ-OPERATOR.md Section 05) who have run parallel self-care
+  streaks for 40+ days without ever messaging each other about it. Each
+  keeps a CUBIQ cube on a nightstand, not a desk — the evening-cadence
+  variant of the same charging-pad hardware.
+
+  Both operators independently complete their self-care check-in within
+  the same rolling window one evening. The Index of Systems (Section 05
+  of LOT-CUBIQ-OPERATOR.md, "cohort" signal source) recognizes the
+  overlap as a cohort resonance event — not a message, not a shared
+  post, just two independent signals landing close together in time.
+
+  Under the software-only cubic, this resonance would surface as a
+  single line in each operator's own Index, seen only if they went
+  looking. With CUBIQ hardware v.0 present: both cubes perform THE HOP
+  (Section 04) within the same minute — two nightstands, two cities,
+  one un-announced synchronized gesture, each operator only ever seeing
+  their own cube move. Neither is told the other's cube moved too. The
+  resonance is structural, not broadcast — the platform does not turn
+  it into a shared notification, a leaderboard, or a "your friend also
+  checked in" push. It stays exactly what Section 04's principle
+  requires: presence, not spectacle.
+
+  Later that night, once each operator's Assembly State (LOT-CUBIQ-
+  OPERATOR.md Section 03) advances a phase on the strength of the
+  streak, their cube performs THE SETTLE — the standing-pressure gesture
+  reserved for assembly-phase advancement. No light, no sound, no
+  count-up animation. Just a cube that, for two seconds, presses very
+  slightly harder into the table than it did a moment before.
+
+  This is the use case that argues for the firmware state machine added
+  in Section 06b: cohort resonance and assembly-phase advancement are
+  two different SIGNAL_RECEIVED events that must resolve to two
+  different, non-conflicting gestures (HOP vs. SETTLE) inside the same
+  short evening window, cleanly, through the same EDGE_CHECK gate,
+  without the operator ever needing to know which signal fired which
+  motion. The gesture vocabulary carries the meaning; the operator is
+  never asked to parse it.
 
 --------------------------------------------------------------------------------
 08 // BRAND
