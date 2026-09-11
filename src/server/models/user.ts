@@ -53,6 +53,7 @@ export class User
       'city',
       'address',
       'phone',
+      'timeZone',
       'tags',
       'hideActivityLogs',
       'timeChime',
