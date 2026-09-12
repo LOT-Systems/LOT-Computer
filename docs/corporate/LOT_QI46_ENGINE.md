@@ -6,6 +6,13 @@
   Made in the USA | brand.lot-systems.com
 -->
 
+> **NODE STATUS:** This is v0.2, the base specification. It is superseded, not
+> replaced, by `LOT_QI-46_ENGINE-2.md`, which extends Layer 1 (Calibration
+> Loop) and Layer 4 (Memory Arc) with a Soul Upload / Being Calibration
+> sub-layer. Read this document first for Layers 0, 2, 3, 5 and the Phase 0–4
+> self-assembly manual, which remain authoritative; read v2 for the
+> Being Calibration addition. (2026-09-12)
+
 # QI·46
 ## LOT® Proprietary AI Engine — Self-Assembly Specification & Machine Manual
 ### LOT Systems Corporation · Los Angeles, CA
