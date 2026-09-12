@@ -3629,6 +3629,112 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'field_resonance_arc') {
+          const qpcCount = log.metadata?.qpcCount as number | undefined
+          const spanHours = log.metadata?.spanHours as number | undefined
+          const sessionCount = log.metadata?.sessionCount as number | undefined
+          const resonanceStrength = log.metadata?.resonanceStrength as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FIELDRES:" blockView>
+                <div className="uppercase tracking-widest mb-4">FIELD RESONANCE ARC</div>
+                {qpcCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRYST EVENTS</span>
+                    <span className="tabular-nums">{qpcCount}</span>
+                  </div>
+                )}
+                {spanHours !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SPAN</span>
+                    <span className="tabular-nums">{spanHours}h</span>
+                  </div>
+                )}
+                {sessionCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SESSIONS</span>
+                    <span className="tabular-nums">{sessionCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">SUSTAINED CRYSTALLIZATION · NOT AN EVENT</div>
+                {resonanceStrength !== undefined && (
+                  <div className="opacity-30 tabular-nums">RESONANCE: {resonanceStrength}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'coherence_memory_imprint') {
+          const captureCount = log.metadata?.captureCount as number | undefined
+          const tfcConf = log.metadata?.tfcConf as number | undefined
+          const imprintStrength = log.metadata?.imprintStrength as number | undefined
+          const arc = log.metadata?.arc as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COHIMPRINT:" blockView>
+                <div className="uppercase tracking-widest mb-4">COHERENCE MEMORY IMPRINT</div>
+                {captureCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CAPTURE EVENTS</span>
+                    <span className="tabular-nums">{captureCount}</span>
+                  </div>
+                )}
+                {tfcConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TFC CONF</span>
+                    <span className="tabular-nums">{tfcConf}%</span>
+                  </div>
+                )}
+                {imprintStrength !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">IMPRINT</span>
+                    <span className="tabular-nums">{imprintStrength}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PEAK COHERENCE PRESERVED IN MEMORY</div>
+                {arc && (
+                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_self_regulation') {
+          const arcCount = log.metadata?.arcCount as number | undefined
+          const weekSpanDays = log.metadata?.weekSpanDays as number | undefined
+          const competency = log.metadata?.competency as string | undefined
+          const cadence = log.metadata?.cadence as string | undefined
+          const arc = log.metadata?.arc as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QSREG:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM SELF-REGULATION</div>
+                {arcCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARCS 7D</span>
+                    <span className="tabular-nums">{arcCount}</span>
+                  </div>
+                )}
+                {weekSpanDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SPAN</span>
+                    <span className="tabular-nums">{weekSpanDays}d</span>
+                  </div>
+                )}
+                {competency && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COMPETENCY</span>
+                    <span className="tabular-nums">{competency}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">DETECT → INTERVENE → RESTORE → REFLECT</div>
+                {cadence && (
+                  <div className="opacity-30 tabular-nums">CADENCE: {cadence}</div>
+                )}
+                {arc && (
+                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

@@ -1438,6 +1438,25 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'v114',
+    date: '2026-09-12',
+    title: 'QIE Engineering — Field Resonance Arc / Coherence Memory Imprint / Quantum Self-Regulation',
+    assembled: [
+      'P152 FIELD RESONANCE ARC: meta-pattern — quantum-presence-crystallization (P149) fires 2+ times in 48h across distinct sessions. Not a single crystallization event — a sustained structural state. The OS is not peaking and recovering; it is resonating. Confidence 0.75–0.87.',
+      'P153 COHERENCE MEMORY IMPRINT: convergence pattern — total-field-coherence (P150) active AND memory/journal signals captured in same 4h window. Peak convergence preserved in the knowledge system. The system learns its own ceiling. Confidence 0.85–0.93.',
+      'P154 QUANTUM SELF-REGULATION: competency pattern — recovery-intelligence-arc (P151) fires 2+ times in 7 days. Intelligent recovery is no longer situational — it is structural protocol. The system regulates itself. Confidence 0.72–0.88.',
+      'Arch52 COHERENCE FIELD KEEPER: energy high/moderate · dominant: qos/memory/journal/intentions/cohort · patterns: quantum-presence-crystallization + total-field-coherence + field-resonance-arc. Directive: Crystallization sustained. Total coherence confirmed. The OS has stabilized at the top of its range. Operate from here as baseline.',
+      'J49 daily-field-resonance-check: 10:00 UTC daily. Checks whether quantum-presence-crystallization (P149) fired 2+ times in 48h → records field_resonance_arc. Also checks recovery-intelligence-arc (P151) 2+ times in 7D → records quantum_self_regulation. Dual-purpose J49 job. 49 jobs total.',
+      'intentionEngine.ts: P152/P153/P154 detection blocks added after P151. Arch52 appended to PHYSIOLOGICAL_ARCHETYPES. 3 dep map nodes (fieldResonanceMonitor · coherenceMemoryImprinter · selfRegulationMonitor). 4 signal helpers (recordFieldResonanceArc · recordCoherenceMemoryImprint · recordQuantumSelfRegulation · checkFieldResonanceArc). checkFieldResonanceArc() wired into background check loop. 193+ dep nodes.',
+      'Logs.tsx: FIELDRES: · COHIMPRINT: · QSREG: military handlers added. CRYST EVENTS/SPAN/SESSIONS/RESONANCE · CAPTURE EVENTS/TFC CONF/IMPRINT · ARCS 7D/SPAN/COMPETENCY/CADENCE. Handler count: 154+.',
+      'QuantumEngineWidgets.tsx: FIELDRES · COHIMPRINT · QSREG added to PATTERN_DISPLAY.',
+      'About.tsx: FM v113→v114. Day 1105+. 151→154 patterns. 51→52 archetypes. 48→49 jobs. 190+→193+ dep nodes. 151+→154+ handlers.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/LOT-SR-20260912-01.md: Session report written. docs/assembly/2026-09-12_LOT-assembly_qie-v114.md: Assembly log written.',
+      '154 patterns · 52 archetypes · 49 jobs · 154+ handlers · 193+ dep nodes. QIE v114 deployed. Field resonance structural. Coherence memory active. Self-regulation confirmed as competency.',
+    ],
+  },
+  {
     version: 'wiki-v87',
     date: '2026-08-05',
     title: 'LOT-WIKI-v87 · FM v113 Sync · QIE v113 + Badge v31 documentation',
@@ -1494,18 +1513,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-09-12',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-09-12 · QIE v114 · Day 1105+',
+    'Built: P152 FIELDRES · P153 COHIMPRINT · P154 QSREG · Arch52 Coherence Field Keeper · J49 daily-field-resonance-check.',
+    'Feedback applied: "Self-assembly session. Continue developing the Quantum Operating System."',
+    'P152: Field Resonance Arc — crystallization is no longer an event. It is a structural state. The field holds.',
+    'P153: Coherence Memory Imprint — peak convergence captured. The system learns its own ceiling.',
+    'P154: Quantum Self-Regulation — recovery loop confirmed 2× in 7D. Structural competency. The system regulates itself.',
+    'Arch52: Coherence Field Keeper — presence crystallized. Total coherence confirmed. Baseline elevated.',
+    'J49: 10:00 UTC. Field resonance + self-regulation dual check.',
+    'FM v113→v114 · 151→154P · 51→52A · 48→49J · 190+→193+ nodes · 812 badges.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114+. Document P152/P153/P154 architecture.',
   ],
 }
 

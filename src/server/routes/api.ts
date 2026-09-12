@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: field resonance arc · coherence memory imprint · quantum self-regulation (P152/P153/P154)
+      'field_resonance_arc',
+      'coherence_memory_imprint',
+      'quantum_self_regulation',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

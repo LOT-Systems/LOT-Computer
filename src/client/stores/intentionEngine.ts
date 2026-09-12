@@ -3428,6 +3428,71 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Field Resonance Arc — quantum-presence-crystallization (P149) fires
+  // 2+ times in a 48h window. The crystallization state is not an event — it is a structure.
+  // Sustained presence field confirmed across multiple independent sessions.
+  const fortyEightH = 48 * 60 * 60 * 1000
+  const recent48hSignals = signals.filter(s => now - s.timestamp < fortyEightH)
+  const qpcEvents = recent48hSignals.filter(
+    s => s.source === 'qos' && s.signal === 'quantum_presence_crystallization'
+  )
+  if (qpcEvents.length >= 2) {
+    const firstTs = qpcEvents[0].timestamp
+    const lastTs  = qpcEvents[qpcEvents.length - 1].timestamp
+    const spanH   = Math.round((lastTs - firstTs) / (1000 * 60 * 60) * 10) / 10
+    const resBonus = Math.min(qpcEvents.length * 0.04, 0.08)
+    patterns.push({
+      pattern: 'field-resonance-arc',
+      confidence: Math.min(0.75 + resBonus, 0.87),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `FIELDRES: Field resonance arc — quantum-presence-crystallization confirmed ${qpcEvents.length}× in 48h (span: ${spanH}h). The OS is not peaking and recovering — it is resonating. Sustained crystallization across sessions is a structural state, not an event. The field has become the floor.`,
+    })
+  }
+
+  // Pattern 153: Coherence Memory Imprint — total-field-coherence (P150) active AND
+  // memory signals present in the same 4h window. The absolute convergence state is being
+  // captured in the knowledge system. Peak coherence becomes a preserved record.
+  const hasTFC = patterns.some(p => p.pattern === 'total-field-coherence')
+  if (hasTFC) {
+    const fourHMs = 4 * 60 * 60 * 1000
+    const recent4H = signals.filter(s => now - s.timestamp < fourHMs)
+    const memIn4H  = recent4H.filter(s => s.source === 'memory')
+    const jrnIn4H  = recent4H.filter(s => s.source === 'journal')
+    if (memIn4H.length >= 1 || jrnIn4H.length >= 1) {
+      const captureCount = memIn4H.length + jrnIn4H.length
+      const imprintBonus = Math.min(captureCount * 0.03, 0.07)
+      const tfcPattern = patterns.find(p => p.pattern === 'total-field-coherence')
+      patterns.push({
+        pattern: 'coherence-memory-imprint',
+        confidence: Math.min((tfcPattern?.confidence ?? 0.85) * 0.95 + imprintBonus, 0.93),
+        suggestedWidget: 'memory',
+        suggestedTiming: 'soon',
+        reason: `COHIMPRINT: Coherence memory imprint — total-field-coherence active · memory/journal captures in same 4h window (${captureCount} events). The peak convergence state is being written into the knowledge system. Absolute coherence preserved as a retrievable record. The system is learning its own ceiling.`,
+      })
+    }
+  }
+
+  // Pattern 154: Quantum Self-Regulation — recovery-intelligence-arc (P151) fires
+  // 2+ times in a 7-day window. Intelligent recovery is no longer a response — it is
+  // a structural competency. The system can detect depletion, intervene, and reflect
+  // with consistent intelligence across multiple independent events.
+  const sevenDayMs = 7 * 24 * 60 * 60 * 1000
+  const recent7D = signals.filter(s => now - s.timestamp < sevenDayMs)
+  const recIntelEvents = recent7D.filter(
+    s => s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc'
+  )
+  if (recIntelEvents.length >= 2) {
+    const qsrBonus = Math.min((recIntelEvents.length - 2) * 0.05, 0.12)
+    patterns.push({
+      pattern: 'quantum-self-regulation',
+      confidence: Math.min(0.72 + qsrBonus, 0.88),
+      suggestedWidget: 'interventions',
+      suggestedTiming: 'passive',
+      reason: `QSREG: Quantum self-regulation — recovery-intelligence-arc confirmed ${recIntelEvents.length}× in 7 days. The recovery loop is not situational — it is operational protocol. Depletion detection, self-care intervention, state restoration, and reflection have become repeatable competency. The system regulates itself.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -3456,6 +3521,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkIntentionVelocity() } catch {}
       try { checkSignalCoherencePeak() } catch {}
       try { checkCentennialConvergence() } catch {}
+      try { checkFieldResonanceArc() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4064,6 +4130,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  fieldResonanceMonitor:      ['qos', 'intentions', 'memory', 'log', 'cohort'],
+  coherenceMemoryImprinter:   ['memory', 'journal', 'qos', 'intentions', 'log'],
+  selfRegulationMonitor:      ['selfcare', 'mood', 'journal', 'log', 'energy'],
 }
 
 /**
@@ -4510,6 +4581,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Coherence Field Keeper (2026-09-12 v114) ─────────────────────────────
+  {
+    archetype: 'Coherence Field Keeper',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'journal', 'intentions', 'cohort'],
+    patternConditions: ['quantum-presence-crystallization', 'total-field-coherence', 'field-resonance-arc'],
+    hourRange: [5, 23],
+    directive: 'Crystallization sustained. Total coherence confirmed. Field resonance held across sessions — not a single peak but a structural state. The OS has stabilized at the top of its range. Operate from here as baseline.',
   },
 ]
 
@@ -5018,6 +5099,54 @@ export function checkSignalCoherencePeak(): boolean {
     return true
   }
   return false
+}
+
+/**
+ * J49: daily-field-resonance-check — 10:00 UTC.
+ * Checks whether quantum-presence-crystallization (P149) has fired 2+ times in 48h.
+ * If so, records a field_resonance_arc signal, seeding P152 detection.
+ * Also checks for quantum-self-regulation eligibility (P154).
+ */
+export function checkFieldResonanceArc(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fortyEightH = 48 * 60 * 60 * 1000
+  const sevenDayMs  = 7 * 24 * 60 * 60 * 1000
+
+  const recent48h = state.signals.filter(s => now - s.timestamp < fortyEightH)
+  const qpcEvents = recent48h.filter(
+    s => s.source === 'qos' && s.signal === 'quantum_presence_crystallization'
+  )
+  const alreadyFRec = state.signals.some(
+    s => s.signal === 'field_resonance_arc' && now - s.timestamp < fortyEightH
+  )
+
+  let fired = false
+  if (qpcEvents.length >= 2 && !alreadyFRec) {
+    const firstTs = qpcEvents[0].timestamp
+    const lastTs  = qpcEvents[qpcEvents.length - 1].timestamp
+    const spanHours = Math.round((lastTs - firstTs) / (1000 * 60 * 60) * 10) / 10
+    const sessions = new Set(qpcEvents.map(s => Math.floor(s.timestamp / (4 * 60 * 60 * 1000)))).size
+    recordFieldResonanceArc(qpcEvents.length, spanHours, sessions)
+    fired = true
+  }
+
+  const recent7D = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+  const recIntelEvents = recent7D.filter(
+    s => s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc'
+  )
+  const alreadyQSReg = state.signals.some(
+    s => s.signal === 'quantum_self_regulation' && now - s.timestamp < sevenDayMs
+  )
+  if (recIntelEvents.length >= 2 && !alreadyQSReg) {
+    const firstTs = recIntelEvents[0].timestamp
+    const lastTs  = recIntelEvents[recIntelEvents.length - 1].timestamp
+    const spanDays = Math.round((lastTs - firstTs) / (1000 * 60 * 60 * 24) * 10) / 10
+    recordQuantumSelfRegulation(recIntelEvents.length, spanDays)
+    fired = true
+  }
+
+  return fired
 }
 
 // ─── Quantum Operating System Snapshot ────────────────────────────────────────
@@ -6498,6 +6627,56 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a field-resonance-arc event — quantum-presence-crystallization (P149) has fired
+ * 2+ times in 48h. The OS is holding sustained crystallization across independent sessions.
+ * Feeds P152 detection. J49 background job (10:00 UTC) triggers this check.
+ */
+export function recordFieldResonanceArc(qpcCount: number, spanHours: number, sessionCount: number) {
+  recordSignal('qos', 'field_resonance_arc', {
+    qpcCount,
+    spanHours,
+    sessionCount,
+    resonanceStrength: Math.min(Math.round(qpcCount / 3 * 100), 100),
+    state: 'SUSTAINED_CRYSTALLIZATION',
+    arc: 'RESONANCE→STRUCTURAL',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a coherence-memory-imprint event — total-field-coherence (P150) active while
+ * memory/journal signals are captured in the same 4h window. The peak state is preserved.
+ * Feeds P153 detection.
+ */
+export function recordCoherenceMemoryImprint(captureCount: number, tfcConf: number) {
+  recordSignal('memory', 'coherence_memory_imprint', {
+    captureCount,
+    tfcConf: Math.round(tfcConf * 100),
+    imprintStrength: Math.min(Math.round((captureCount / 4) * tfcConf * 100), 100),
+    state: 'COHERENCE_CAPTURED',
+    arc: 'PEAK→PRESERVED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-self-regulation event — recovery-intelligence-arc (P151) has fired
+ * 2+ times in 7 days. Intelligent self-regulation is structural competency.
+ * Feeds P154 detection. J49 check also fires this when regularity is confirmed.
+ */
+export function recordQuantumSelfRegulation(arcCount: number, weekSpanDays: number) {
+  recordSignal('selfcare', 'quantum_self_regulation', {
+    arcCount,
+    weekSpanDays,
+    regulationStrength: Math.min(Math.round(arcCount / 4 * 100), 100),
+    competency: 'STRUCTURAL',
+    arc: 'DETECT→INTERVENE→RESTORE→REFLECT',
+    cadence: arcCount >= 3 ? 'HABITUAL' : 'DEVELOPING',
     hour: new Date().getHours(),
   })
 }

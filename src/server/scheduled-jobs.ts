@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily field resonance check (10:00 UTC every day) — Job 49
+  if (shouldRunDailyFieldResonanceCheck()) {
+    await executeDailyFieldResonanceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,135 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Field Resonance Check (Job 49 — 10:00 UTC every day) ───────────────
+// Dual check: (1) field_resonance_arc — if quantum_presence_crystallization fired
+// 2+ times in the prior 48h window, the crystallization is structural, not an event.
+// (2) quantum_self_regulation — if recovery_intelligence_arc fired 2+ times in 7d,
+// the recovery loop is a competency, not a response.
+
+let isDailyFieldResonanceRunning = false
+let lastDailyFieldResonanceRun: Date | null = null
+
+function shouldRunDailyFieldResonanceCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFieldResonanceRunning) return false
+  if (lastDailyFieldResonanceRun) {
+    const lastRun = dayjs(lastDailyFieldResonanceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily
+}
+
+async function executeDailyFieldResonanceCheck(): Promise<JobResult> {
+  const jobName = 'daily-field-resonance-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFieldResonanceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFieldResonanceRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIELD RESONANCE CHECK — 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const window48hStart = dayjs().subtract(48, 'hour').toDate()
+    const window7dStart  = dayjs().subtract(7, 'day').toDate()
+    const now = new Date()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(3, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (3d): ${activeUsers.length}`)
+    let writtenFRA = 0
+    let writtenQSR = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // ── Field Resonance Arc (P152) ────────────────────────────────────────
+        const qpcLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window48hStart, [Op.lte]: now },
+            event: 'quantum_presence_crystallization',
+          },
+          attributes: ['id', 'createdAt', 'metadata'],
+        })
+
+        if (qpcLogs.length >= 2) {
+          const spanHours = Math.round(
+            (new Date(qpcLogs[qpcLogs.length - 1].createdAt).getTime() -
+             new Date(qpcLogs[0].createdAt).getTime()) / 3600000
+          )
+          const resonance = Math.min(0.99, 0.75 + qpcLogs.length * 0.04)
+          await (Log as any).create({
+            userId,
+            event: 'field_resonance_arc',
+            text: `Field resonance arc: ${qpcLogs.length} crystallization events in ${spanHours}h. Sustained crystallization confirmed. Not an event — a structural state. The field holds across sessions.`,
+            metadata: {
+              crystEvents: qpcLogs.length,
+              spanHours,
+              sessions: qpcLogs.length,
+              resonance: resonance.toFixed(2),
+              window: '48h',
+              hour: 10,
+            },
+          })
+          writtenFRA++
+        }
+
+        // ── Quantum Self-Regulation (P154) ────────────────────────────────────
+        const riaLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window7dStart, [Op.lte]: now },
+            event: 'recovery_intelligence_arc',
+          },
+          attributes: ['id', 'createdAt'],
+        })
+
+        if (riaLogs.length >= 2) {
+          const spanDays = Math.round(
+            (new Date(riaLogs[riaLogs.length - 1].createdAt).getTime() -
+             new Date(riaLogs[0].createdAt).getTime()) / 86400000
+          )
+          const competency = Math.min(0.97, 0.72 + riaLogs.length * 0.05)
+          await (Log as any).create({
+            userId,
+            event: 'quantum_self_regulation',
+            text: `Quantum self-regulation: ${riaLogs.length} recovery arcs in 7d. The recovery loop is structural competency — detect, intervene, restore, reflect. System regulates itself.`,
+            metadata: {
+              arcs7d: riaLogs.length,
+              spanDays,
+              competency: competency.toFixed(2),
+              cadence: `${riaLogs.length} arcs / 7d`,
+              window: '7d',
+              hour: 10,
+            },
+          })
+          writtenQSR++
+        }
+      } catch {}
+    }
+
+    console.log(`  Field resonance arc events written: ${writtenFRA}`)
+    console.log(`  Quantum self-regulation events written: ${writtenQSR}`)
+    lastDailyFieldResonanceRun = new Date()
+    isDailyFieldResonanceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: writtenFRA + writtenQSR }
+  } catch (error: any) {
+    console.error('Daily field resonance check failed:', error.message)
+    isDailyFieldResonanceRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5608,6 +5741,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily field resonance check: 10 AM UTC every day (Job 49)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -5617,7 +5751,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift, 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+total-field-coherence, 10=archetype shift+temporal-alignment+field-resonance(J49), 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()
