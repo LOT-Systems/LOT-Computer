@@ -4870,6 +4870,14 @@ export function recordCalendarSignal(entryType: string, date: string) {
 }
 
 /**
+ * Record a calendar alert firing (T-15 / DUE / OVERDUE / TODAY) when the
+ * Calendar widget's notification tier crosses for a scheduled entry.
+ */
+export function recordCalendarAlertSignal(entryType: string, date: string, tier: string) {
+  recordSignal('log', 'calendar_alert', { entryType, date, tier, hour: new Date().getHours() })
+}
+
+/**
  * Record the day's ambient astrology reading — rokuyo, moon phase, and
  * zodiac hour. Ambient/environmental conditions only, not a personal
  * natal chart. Called once per calendar day from the System dashboard so
