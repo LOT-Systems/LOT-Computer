@@ -59,15 +59,19 @@ export function ToggleSection({
         <span>{label}</span>
       </button>
 
-      {/* Content */}
+      {/* Content — CSS grid technique: animates grid-rows-[0fr→1fr] so
+          transition tracks true content height without a fixed max-h cap. */}
       <div
-        className={cn(
-          'overflow-hidden transition-all duration-300',
-          isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
-        )}
+        className="overflow-hidden transition-[grid-template-rows] duration-300"
+        style={{ display: 'grid', gridTemplateRows: isOpen ? '1fr' : '0fr' }}
       >
-        <div className="py-4">
-          {children}
+        <div className={cn(
+          'min-h-0 transition-opacity duration-300',
+          isOpen ? 'opacity-100' : 'opacity-0'
+        )}>
+          <div className="py-4">
+            {children}
+          </div>
         </div>
       </div>
     </div>
