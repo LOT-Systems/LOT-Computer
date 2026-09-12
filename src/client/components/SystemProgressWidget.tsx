@@ -2102,6 +2102,25 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '235 patterns · 81 archetypes · 77 jobs · 244+ handlers · 280+ dep nodes · 1122 badges · Day 1114+.',
     ],
   },
+  {
+    date: '2026-09-12',
+    session: 'v145 — Philosophy Operator Tier · P236–P238 · Arch82 · J78 · Badge v43 +12 · 3 Log Handlers',
+    assembled: [
+      'QIE v145: P236 philosophic-will-field (PHILWILL:) — philosophy vocabulary detected in journal text within 7d.',
+      'QIE v145: P237 stoic-discipline-arc (STOICARC:) — PHILWILL active + 5+ selfcare signals in 7d + intention pattern.',
+      'QIE v145: P238 philosopher-operator-field (PHILOPS:) — STOICARC + PHILWILL + any crystalline pattern co-active.',
+      'Arch82 The Philosopher Operator — fires on PHILOPS/STOICARC/PHILWILL cluster. Directive: The philosophy is your operating system. You do not study it — you run it. PHILOSOPHER · OPERATOR · FIELD.',
+      'J78 daily-philosophy-scan (22:00 UTC) — 3-step scan: journal text → PHILWILL → STOICARC → PHILOPS. Total: 78 jobs.',
+      '3 record helpers: recordPhilosophicWillField / recordStoicDisciplineArc / recordPhilosopherOperatorField.',
+      'WIDGET_DEPENDENCY_MAP: 3 new nodes (philosophicWillFieldNode / stoicDisciplineArcNode / philosopherOperatorFieldNode). Total: 283+ nodes.',
+      'Logs.tsx: PHILWILL: / STOICARC: / PHILOPS: cockpit handlers added. Total: 247+ handlers.',
+      'QuantumEngineWidgets.tsx: PATTERN_DISPLAY — philosophic-will-field / stoic-discipline-arc / philosopher-operator-field added.',
+      'PatternRecognitionWidget.tsx: P236/P237/P238 name map entries added.',
+      'Badge v43 — The Philosophy Engine: +12 badges (1122→1134). marcus_invoked / amor_fati / eternal_return / will_to_power / camus_signal / sisyphus_myth / nietzsche_call / abyss_gaze / cogito / stoic_fire / memento_mori / philosophic_engine.',
+      'About.tsx: updated to 238P/82A/78J/247+ handlers/283+ nodes. Self-assembly phase v145 entry prepended.',
+      '238 patterns · 82 archetypes · 78 jobs · 247+ handlers · 283+ dep nodes · 1134 badges · Day 1116+.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -2139,20 +2158,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-09-10',
+  date: '2026-09-12',
   message: [
-    'ASSEMBLY RUN — 2026-09-10 · QIE v144 · Living Crystal Presence Tier · Day 1114+',
-    'P233 crystalline-presence-field (CRPRES:) — ECRYGEN active + 6+ signals from 4+ sources in 24h.',
-    'P234 sovereign-crystalline-continuity (SOVCRCON:) — CRPRES confirmed 2+ times in 5d. Continuity crystalline.',
-    'P235 absolute-crystalline-presence (ABSCRPRES:) — CRPRES + ABSCSOV co-active. Crystal = Presence.',
-    'Arch81 Living Crystal Presence Operator — the crystal is not a monument. It is alive. LIVING · CRYSTAL · PRESENCE.',
-    'J77 daily-crystalline-presence-check (21:00 UTC) — 3-step pipeline deployed. Total: 77 jobs.',
-    '3 record helpers · 280+ dep nodes · 244+ log handlers · CRPRES: / SOVCRCON: / ABSCRPRES: cockpit blocks live.',
-    'Widget dep scan: QuantumEngineWidgets.tsx cohort view confirmed. System.tsx Arch: block at 70%+ confidence.',
-    'Log dep scan: Logs.tsx 244+ handlers · Living Crystal tier blocks deployed.',
-    'Physiological cohort: classifyPhysiologicalCohort() wired in System.tsx + QuantumEngineWidgets.tsx.',
-    '235 patterns · 81 archetypes · 77 jobs · 244+ handlers · 280+ dep nodes · 1122 badges · Day 1114+.',
-    'Status: DEPLOYED. Living Crystal Presence wired. The crystal breathes.',
+    'ASSEMBLY RUN — 2026-09-12 · QIE v145 · Philosophy Operator Tier · Day 1116+',
+    'P236 philosophic-will-field (PHILWILL:) — philosophy vocabulary active in journal text. The will engages the idea.',
+    'P237 stoic-discipline-arc (STOICARC:) — PHILWILL + care signals + intention arc. Discipline is structured freedom.',
+    'P238 philosopher-operator-field (PHILOPS:) — STOICARC + PHILWILL + crystalline co-active. Philosophy is the OS.',
+    'Arch82 The Philosopher Operator — the philosophy is your operating system. You do not study it — you run it.',
+    'J78 daily-philosophy-scan (22:00 UTC) — scans journal text for philosophy vocabulary. Total: 78 jobs.',
+    'Badge v43 The Philosophy Engine — +12 badges (1122→1134). marcus_invoked / amor_fati / eternal_return / will_to_power / camus_signal / sisyphus_myth / nietzsche_call / abyss_gaze / cogito / stoic_fire / memento_mori / philosophic_engine.',
+    '3 record helpers · 283+ dep nodes · 247+ log handlers · PHILWILL: / STOICARC: / PHILOPS: cockpit blocks live.',
+    'Amor fati. One must imagine Sisyphus happy. The impediment to action advances action. PHILOSOPHER · OPERATOR · FIELD.',
+    '238 patterns · 82 archetypes · 78 jobs · 247+ handlers · 283+ dep nodes · 1134 badges · Day 1116+.',
+    'Status: DEPLOYED. Philosophy Operator Tier wired. The OS runs philosophy.',
   ],
 }
 

@@ -194,6 +194,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'crystalline-presence-field':       'CRPRES',
   'sovereign-crystalline-continuity': 'SOVCRCON',
   'absolute-crystalline-presence':    'ABSCRPRES',
+  'philosophic-will-field':           'PHILWILL',
+  'stoic-discipline-arc':             'STOICARC',
+  'philosopher-operator-field':       'PHILOPS',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

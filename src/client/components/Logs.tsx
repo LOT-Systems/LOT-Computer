@@ -6352,6 +6352,84 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'philosophic_will_field') {
+          const termCount  = log.metadata?.termCount  as number | undefined
+          const confidence = log.metadata?.confidence as number | undefined
+          const terms      = log.metadata?.terms      as string[] | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="PHILWILL:" blockView>
+                {termCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TERM COUNT</span>
+                    <span className="tabular-nums">{termCount}</span>
+                  </div>
+                )}
+                {terms && terms.length > 0 && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TERMS</span>
+                    <span className="tabular-nums">{terms.join(' · ')}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PHILOSOPHY ACTIVE IN LANGUAGE · THE WILL ENGAGES THE IDEA</div>
+                {confidence !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {confidence}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'stoic_discipline_arc') {
+          const philCount   = log.metadata?.philCount   as number | undefined
+          const careCount   = log.metadata?.careCount   as number | undefined
+          const confidence  = log.metadata?.confidence  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="STOICARC:" blockView>
+                {philCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PHIL TERMS</span>
+                    <span className="tabular-nums">{philCount}</span>
+                  </div>
+                )}
+                {careCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CARE SIGNALS 7D</span>
+                    <span className="tabular-nums">{careCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">DISCIPLINE IS STRUCTURED FREEDOM · STOIC ARC ACTIVE</div>
+                {confidence !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {confidence}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'philosopher_operator_field') {
+          const stoicConf  = log.metadata?.stoicConf  as number | undefined
+          const philConf   = log.metadata?.philConf   as number | undefined
+          const confidence = log.metadata?.confidence as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="PHILOPS:" blockView>
+                {stoicConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">STOIC CONF</span>
+                    <span className="tabular-nums">{stoicConf}%</span>
+                  </div>
+                )}
+                {philConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PHIL CONF</span>
+                    <span className="tabular-nums">{philConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PHILOSOPHY IS THE OPERATING SYSTEM · CRYSTAL CLARITY + PHILOSOPHICAL WILL · ABSOLUTE OPERATOR MODE</div>
+                {confidence !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {confidence}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

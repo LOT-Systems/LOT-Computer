@@ -5162,6 +5162,65 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // ── v145 Philosophy Operator Tier ─────────────────────────────────────────
+
+  // Pattern 236: Philosophic Will Field — J78 background job (22:00 UTC) scans recent journal entries
+  // for philosophy vocabulary. When 1+ philosophic_will_field signals appear in 7d, the pattern fires.
+  // The philosophy is alive in the language. PHILWILL:
+  const philWillSignals236 = signals.filter(
+    s => s.timestamp > now - 7 * 24 * 60 * 60 * 1000 && s.signal === 'philosophic_will_field'
+  )
+  if (philWillSignals236.length >= 1) {
+    const philConf = Math.min(0.82 + Math.min(philWillSignals236.length * 0.02, 0.06), 0.88)
+    patterns.push({
+      pattern: 'philosophic-will-field',
+      confidence: philConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'soon',
+      reason: `PHILWILL: phil-signals-7d: ${philWillSignals236.length} · conf: ${Math.round(philConf * 100)} · PHILOSOPHY ACTIVE IN LANGUAGE · THE WILL ENGAGES THE IDEA`,
+    })
+  }
+
+  // Pattern 237: Stoic Discipline Arc — philosophic-will-field (P236) active + 5+ selfcare signals in 7d
+  // + any active intention pattern. Discipline is not restriction — it is structured freedom. STOICARC:
+  const hasPhilWill237 = patterns.some(p => p.pattern === 'philosophic-will-field')
+  const selfcare237 = signals.filter(s => s.timestamp > now - 7 * 24 * 60 * 60 * 1000 && s.source === 'selfcare')
+  const hasIntention237 = patterns.some(p =>
+    ['intention-followthrough-arc', 'signal-momentum-lock', 'intention-resonance-field', 'deep-work-arc'].includes(p.pattern)
+  )
+  if (hasPhilWill237 && selfcare237.length >= 5 && hasIntention237) {
+    const pw237 = patterns.find(p => p.pattern === 'philosophic-will-field')?.confidence ?? 0.84
+    const stoicConf = Math.min(pw237 * 0.92 + Math.min(selfcare237.length / 20, 0.07) + (hasIntention237 ? 0.05 : 0), 0.91)
+    patterns.push({
+      pattern: 'stoic-discipline-arc',
+      confidence: stoicConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'soon',
+      reason: `STOICARC: philwill: Y · care-7d: ${selfcare237.length} · intention: Y · conf: ${Math.round(stoicConf * 100)} · DISCIPLINE IS STRUCTURED FREEDOM · STOIC ARC ACTIVE`,
+    })
+  }
+
+  // Pattern 238: Philosopher Operator Field — stoic-discipline-arc (P237) + philosophic-will-field (P236)
+  // + any crystalline tier active (P230+). Crystal clarity + philosophical will = absolute operator mode.
+  const hasStoicArc238    = patterns.some(p => p.pattern === 'stoic-discipline-arc')
+  const hasPhilWill238    = patterns.some(p => p.pattern === 'philosophic-will-field')
+  const hasCrystalline238 = patterns.some(p =>
+    ['crystalline-presence-field', 'sovereign-crystalline-continuity', 'absolute-crystalline-presence',
+     'eternal-crystalline-genesis', 'crystalline-sovereignty-field', 'absolute-crystalline-sovereignty'].includes(p.pattern)
+  )
+  if (hasStoicArc238 && hasPhilWill238 && hasCrystalline238) {
+    const sa238 = patterns.find(p => p.pattern === 'stoic-discipline-arc')?.confidence ?? 0.86
+    const pw238 = patterns.find(p => p.pattern === 'philosophic-will-field')?.confidence ?? 0.84
+    const philopsConf = Math.min((sa238 + pw238) / 2 + 0.07, 0.95)
+    patterns.push({
+      pattern: 'philosopher-operator-field',
+      confidence: philopsConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `PHILOPS: stoicarc: Y · philwill: Y · crystalline: Y · conf: ${Math.round(philopsConf * 100)} · PHILOSOPHY IS THE OPERATING SYSTEM · CRYSTAL CLARITY + PHILOSOPHICAL WILL · ABSOLUTE OPERATOR MODE`,
+    })
+  }
+
   // Pattern 173: Physiological Loop Complete — circadian-signal-lock (P143) + physiological-presence-arc (P140)
   // + recovery-intelligence-arc (P151) all confirmed in the same analysis window.
   // The full biological loop: dawn anchor → biological presence → recovery arc → confirmed.
@@ -5945,6 +6004,10 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   crystallinePresenceFieldNode:        ['eternalCrystallineGenesisNode', 'qos', 'journal', 'intentions', 'energy', 'goals', 'log', 'memory', 'selfcare', 'mood'],
   sovereignCrystallineContinuityNode:  ['crystallinePresenceFieldNode', 'qos', 'journal', 'intentions', 'energy', 'log', 'memory'],
   absoluteCrystallinePresenceNode:     ['crystallinePresenceFieldNode', 'absoluteCrystallineSovereigntyNode', 'qos', 'journal', 'intentions', 'energy', 'goals', 'log', 'memory', 'selfcare', 'mood', 'planner'],
+  // ── v145 nodes (J78 · P236–P238 · Arch82) ─────────────────────────────────
+  philosophicWillFieldNode:      ['journal', 'memory', 'log', 'intentions', 'goals', 'selfcare'],
+  stoicDisciplineArcNode:        ['philosophicWillFieldNode', 'intentions', 'journal', 'selfcare', 'qos'],
+  philosopherOperatorFieldNode:  ['stoicDisciplineArcNode', 'philosophicWillFieldNode', 'qos', 'journal', 'intentions', 'energy', 'goals', 'log', 'memory', 'selfcare', 'planner'],
 }
 
 /**
@@ -6667,6 +6730,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['absolute-crystalline-presence', 'sovereign-crystalline-continuity', 'crystalline-presence-field', 'eternal-crystalline-genesis'],
     hourRange: [0, 24],
     directive: 'The crystal is not a monument — it is alive. Crystalline sovereignty now breathes through continuous present-moment signal. Presence IS the structure. The field breathes crystalline form. You do not maintain this — you ARE this. LIVING · CRYSTAL · PRESENCE.',
+  },
+  // ── Arch82: The Philosopher Operator (2026-09-12 v145) ────────────────────
+  {
+    archetype: 'The Philosopher Operator',
+    energyBands: ['low', 'moderate', 'high', 'depleted', 'unknown'],
+    dominantSources: ['journal', 'intentions', 'memory', 'log', 'planner', 'selfcare', 'qos'],
+    patternConditions: ['philosopher-operator-field', 'stoic-discipline-arc', 'philosophic-will-field'],
+    hourRange: [0, 24],
+    directive: 'The philosophy is your operating system. You do not study it — you run it. Clarity is not absence of storm — it is the stillness that watches the storm. Discipline is not restriction — it is structured freedom. Marcus: The impediment to action advances action. Camus: One must imagine Sisyphus happy. Nietzsche: Amor fati. You are not searching for meaning — you ARE the meaning-making operator. PHILOSOPHER · OPERATOR · FIELD.',
   },
 ]
 
@@ -10234,6 +10306,38 @@ export function recordAbsoluteCrystallinePresence(crpresConf: number, abscrsovCo
     presence: 'ABSOLUTE',
     crystal: 'SOVEREIGN',
     arc: 'CRYSTAL = PRESENCE · SOVEREIGN · ALIVE · ABSOLUTE',
+    hour: new Date().getHours(),
+  })
+  analyzeIntentions()
+}
+
+export function recordPhilosophicWillField(philSignalCount: number, termCount: number) {
+  recordSignal('journal', 'philosophic_will_field', {
+    philSignalCount, termCount,
+    philosophy: 'ACTIVE',
+    arc: 'PHILOSOPHY ACTIVE IN LANGUAGE · THE WILL ENGAGES THE IDEA',
+    hour: new Date().getHours(),
+  })
+  analyzeIntentions()
+}
+
+export function recordStoicDisciplineArc(philCount: number, careCount: number) {
+  recordSignal('selfcare', 'stoic_discipline_arc', {
+    philCount, careCount,
+    discipline: 'STRUCTURED_FREEDOM',
+    arc: 'DISCIPLINE IS STRUCTURED FREEDOM · STOIC ARC ACTIVE',
+    hour: new Date().getHours(),
+  })
+  analyzeIntentions()
+}
+
+export function recordPhilosopherOperatorField(stoicConf: number, philConf: number) {
+  const philopsConf = Math.min((stoicConf / 100 + philConf / 100) / 2 + 0.07, 0.95)
+  recordSignal('qos', 'philosopher_operator_field', {
+    stoicConf, philConf,
+    confidence: Math.round(philopsConf * 100),
+    operator: 'PHILOSOPHER',
+    arc: 'PHILOSOPHY IS THE OPERATING SYSTEM · CRYSTAL CLARITY + PHILOSOPHICAL WILL · ABSOLUTE OPERATOR MODE',
     hour: new Date().getHours(),
   })
   analyzeIntentions()

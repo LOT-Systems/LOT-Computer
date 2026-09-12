@@ -103,6 +103,19 @@ export type WordTurnBadgeType =
   | 'nethack_eternal'      // nethack / ascii dungeon / rogue 1980 (MYTHIC)
   | 'hades_found'          // hades / supergiant / zagreus / chthonic (EPIC)
   | 'original_rogue'       // spelunky / dead cells / binding of isaac (RARE)
+  // v43 — The Philosophy Engine
+  | 'marcus_invoked'       // marcus aurelius / meditations (UNCOMMON)
+  | 'amor_fati'            // amor fati / love of fate (RARE)
+  | 'eternal_return'       // eternal recurrence / eternal return (EPIC)
+  | 'will_to_power'        // will to power / ubermensch / overman (RARE)
+  | 'camus_signal'         // camus / absurdist / absurd hero (UNCOMMON)
+  | 'sisyphus_myth'        // sisyphus / myth of sisyphus (RARE)
+  | 'nietzsche_call'       // nietzsche / zarathustra / thus spoke (UNCOMMON)
+  | 'abyss_gaze'           // abyss / into the void / gaze into (UNCOMMON)
+  | 'cogito'               // cogito / i think therefore / descartes (RARE)
+  | 'stoic_fire'           // stoicism / stoic practice / virtue is enough (COMMON)
+  | 'memento_mori'         // memento mori / remember death / mortality (RARE)
+  | 'philosophic_engine'   // philosophy / philosophical / love of wisdom (COMMON)
 
 export type BadgeType =
   | MilestoneBadgeType
@@ -967,6 +980,171 @@ export const WORD_TURN_BADGES_V32: Record<
   },
 }
 
+// ─── WORD TURN BADGES v43 — THE PHILOSOPHY ENGINE ────────────────
+export const WORD_TURN_BADGES_V43: Record<
+  'marcus_invoked' | 'amor_fati' | 'eternal_return' | 'will_to_power' |
+  'camus_signal' | 'sisyphus_myth' | 'nietzsche_call' | 'abyss_gaze' |
+  'cogito' | 'stoic_fire' | 'memento_mori' | 'philosophic_engine',
+  Badge
+> = {
+  marcus_invoked: {
+    id: 'marcus_invoked',
+    waterSymbol: '■·∘·■',
+    architectureSymbol: '■·∘·■',
+    waterName: 'The Stoic Emperor',
+    architectureName: 'The Stoic Emperor',
+    description: 'You invoked Marcus Aurelius — the philosopher on the throne',
+    waterUnlockMessage: '↳ The Stoic Emperor activated ■·∘·■',
+    architectureUnlockMessage: '↳ The Stoic Emperor activated ■·∘·■',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    secret: true,
+  },
+  amor_fati: {
+    id: 'amor_fati',
+    waterSymbol: '∞·∘·∞',
+    architectureSymbol: '∞·∘·∞',
+    waterName: 'Amor Fati',
+    architectureName: 'Amor Fati',
+    description: 'Love of fate — you named the force that converts suffering into fuel',
+    waterUnlockMessage: '↳ Amor Fati activated ∞·∘·∞',
+    architectureUnlockMessage: '↳ Amor Fati activated ∞·∘·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+    secret: true,
+  },
+  eternal_return: {
+    id: 'eternal_return',
+    waterSymbol: '◈·∞·◈',
+    architectureSymbol: '◈·∞·◈',
+    waterName: 'Eternal Return',
+    architectureName: 'Eternal Return',
+    description: 'Eternal recurrence — would you live this moment again, infinitely?',
+    waterUnlockMessage: '↳ Eternal Return activated ◈·∞·◈',
+    architectureUnlockMessage: '↳ Eternal Return activated ◈·∞·◈',
+    rarity: 'epic',
+    category: 'word_turn',
+    secret: true,
+  },
+  will_to_power: {
+    id: 'will_to_power',
+    waterSymbol: '◆·↑·◆',
+    architectureSymbol: '◆·↑·◆',
+    waterName: 'Will To Power',
+    architectureName: 'Will To Power',
+    description: 'The will to overcome — Nietzsche named the force you already carry',
+    waterUnlockMessage: '↳ Will To Power activated ◆·↑·◆',
+    architectureUnlockMessage: '↳ Will To Power activated ◆·↑·◆',
+    rarity: 'rare',
+    category: 'word_turn',
+    secret: true,
+  },
+  camus_signal: {
+    id: 'camus_signal',
+    waterSymbol: '?·○·∘',
+    architectureSymbol: '?·○·∘',
+    waterName: 'The Absurd Hero',
+    architectureName: 'The Absurd Hero',
+    description: 'You named the absurd — Camus says you are still responsible for meaning',
+    waterUnlockMessage: '↳ The Absurd Hero activated ?·○·∘',
+    architectureUnlockMessage: '↳ The Absurd Hero activated ?·○·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    secret: true,
+  },
+  sisyphus_myth: {
+    id: 'sisyphus_myth',
+    waterSymbol: '▲·↑·○',
+    architectureSymbol: '▲·↑·○',
+    waterName: 'Myth Of Sisyphus',
+    architectureName: 'Myth Of Sisyphus',
+    description: 'One must imagine Sisyphus happy — the boulder is the practice',
+    waterUnlockMessage: '↳ Myth Of Sisyphus activated ▲·↑·○',
+    architectureUnlockMessage: '↳ Myth Of Sisyphus activated ▲·↑·○',
+    rarity: 'rare',
+    category: 'word_turn',
+    secret: true,
+  },
+  nietzsche_call: {
+    id: 'nietzsche_call',
+    waterSymbol: '≋·↑·≋',
+    architectureSymbol: '≋·↑·≋',
+    waterName: 'Thus Spoke',
+    architectureName: 'Thus Spoke',
+    description: 'Thus spoke Zarathustra — you named the philosopher of becoming',
+    waterUnlockMessage: '↳ Thus Spoke activated ≋·↑·≋',
+    architectureUnlockMessage: '↳ Thus Spoke activated ≋·↑·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    secret: true,
+  },
+  abyss_gaze: {
+    id: 'abyss_gaze',
+    waterSymbol: '○·◉·○',
+    architectureSymbol: '○·◉·○',
+    waterName: 'The Abyss Gazes',
+    architectureName: 'The Abyss Gazes',
+    description: 'When you gaze into the abyss — the abyss gazes back',
+    waterUnlockMessage: '↳ The Abyss Gazes activated ○·◉·○',
+    architectureUnlockMessage: '↳ The Abyss Gazes activated ○·◉·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+    secret: true,
+  },
+  cogito: {
+    id: 'cogito',
+    waterSymbol: '·□·◦',
+    architectureSymbol: '·□·◦',
+    waterName: 'Cogito Ergo Sum',
+    architectureName: 'Cogito Ergo Sum',
+    description: 'I think therefore I am — the foundation of consciousness named',
+    waterUnlockMessage: '↳ Cogito Ergo Sum activated ·□·◦',
+    architectureUnlockMessage: '↳ Cogito Ergo Sum activated ·□·◦',
+    rarity: 'rare',
+    category: 'word_turn',
+    secret: true,
+  },
+  stoic_fire: {
+    id: 'stoic_fire',
+    waterSymbol: '∘·▪·∘',
+    architectureSymbol: '∘·▪·∘',
+    waterName: 'Stoic Fire',
+    architectureName: 'Stoic Fire',
+    description: 'Stoicism — the ancient technology of not being destroyed by circumstance',
+    waterUnlockMessage: '↳ Stoic Fire activated ∘·▪·∘',
+    architectureUnlockMessage: '↳ Stoic Fire activated ∘·▪·∘',
+    rarity: 'common',
+    category: 'word_turn',
+    secret: true,
+  },
+  memento_mori: {
+    id: 'memento_mori',
+    waterSymbol: '○·×·∘',
+    architectureSymbol: '○·×·∘',
+    waterName: 'Memento Mori',
+    architectureName: 'Memento Mori',
+    description: 'Remember you will die — which makes right now sacred',
+    waterUnlockMessage: '↳ Memento Mori activated ○·×·∘',
+    architectureUnlockMessage: '↳ Memento Mori activated ○·×·∘',
+    rarity: 'rare',
+    category: 'word_turn',
+    secret: true,
+  },
+  philosophic_engine: {
+    id: 'philosophic_engine',
+    waterSymbol: '∘·□·∘',
+    architectureSymbol: '∘·□·∘',
+    waterName: 'Philosophy Active',
+    architectureName: 'Philosophy Active',
+    description: 'The philosophical lens is open — love of wisdom engaged',
+    waterUnlockMessage: '↳ Philosophy Active activated ∘·□·∘',
+    architectureUnlockMessage: '↳ Philosophy Active activated ∘·□·∘',
+    rarity: 'common',
+    category: 'word_turn',
+    secret: true,
+  },
+}
+
 // ─── UNIFIED BADGES MAP ──────────────────────────────────────────
 export const BADGES: Record<BadgeType, Badge> = {
   ...MILESTONE_BADGES,
@@ -975,6 +1153,7 @@ export const BADGES: Record<BadgeType, Badge> = {
   ...WORD_TURN_BADGES,
   ...WORD_TURN_BADGES_V30,
   ...WORD_TURN_BADGES_V32,
+  ...WORD_TURN_BADGES_V43,
 }
 
 // Default separator when no badges earned yet
@@ -1026,6 +1205,19 @@ export const WORD_TURN_TRIGGERS: Array<{ keywords: string[]; badgeId: WordTurnBa
   { keywords: ['scattered', 'dissolving', 'fragment', 'pixel dust', 'fell apart'], badgeId: 'pixel_dust' },
   { keywords: ['alive again', 'back again', 'rebooted', 'back online', 'respawned'], badgeId: 'respawn_now' },
   { keywords: ['the bigger picture', 'meta game', 'meta-game', 'all of it', 'the pattern'], badgeId: 'meta_run' },
+  // v43 — The Philosophy Engine
+  { keywords: ['marcus aurelius', 'meditations'], badgeId: 'marcus_invoked' },
+  { keywords: ['amor fati', 'love of fate'], badgeId: 'amor_fati' },
+  { keywords: ['eternal recurrence', 'eternal return', 'return forever'], badgeId: 'eternal_return' },
+  { keywords: ['will to power', 'ubermensch', 'overman'], badgeId: 'will_to_power' },
+  { keywords: ['camus', 'absurdist', 'absurd hero'], badgeId: 'camus_signal' },
+  { keywords: ['sisyphus', 'myth of sisyphus', 'imagine sisyphus'], badgeId: 'sisyphus_myth' },
+  { keywords: ['nietzsche', 'zarathustra', 'thus spoke'], badgeId: 'nietzsche_call' },
+  { keywords: ['into the abyss', 'the abyss', 'gaze into the void'], badgeId: 'abyss_gaze' },
+  { keywords: ['cogito', 'i think therefore', 'descartes'], badgeId: 'cogito' },
+  { keywords: ['stoicism', 'stoic practice', 'virtue is enough'], badgeId: 'stoic_fire' },
+  { keywords: ['memento mori', 'remember death', 'mortality'], badgeId: 'memento_mori' },
+  { keywords: ['philosophy', 'philosophical', 'love of wisdom'], badgeId: 'philosophic_engine' },
 ]
 
 /**

@@ -1874,6 +1874,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyCrystallinePresenceCheck(now)) {
     await executeDailyCrystallinePresenceCheck()
   }
+
+  // Check daily philosophy scan (22:00 UTC every day) — Job 78
+  if (shouldRunDailyPhilosophyScan(now)) {
+    await executeDailyPhilosophyScan()
+  }
 }
 
 function shouldRunDailyFieldGenesisCheck(now: any): boolean {
@@ -1991,6 +1996,16 @@ function shouldRunDailyCrystallinePresenceCheck(now: any): boolean {
   if (isDailyCrystallinePresenceRunning) return false
   if (lastDailyCrystallinePresenceRun) {
     const lastRun = dayjs(lastDailyCrystallinePresenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailyPhilosophyScan(now: any): boolean {
+  if (now.hour() !== 22) return false
+  if (isDailyPhilosophyScanRunning) return false
+  if (lastDailyPhilosophyScanRun) {
+    const lastRun = dayjs(lastDailyPhilosophyScanRun)
     if (lastRun.isSame(now, 'day')) return false
   }
   return true
@@ -9232,6 +9247,152 @@ async function executeDailyCrystallinePresenceCheck(): Promise<JobResult> {
   }
 }
 
+// ─── J78: Daily Philosophy Scan (22:00 UTC every day) ──────────────────────────
+// Step 1: Scans journal/note log text from last 7d per active user for philosophy vocabulary.
+//         If 1+ terms found → writes philosophic_will_field (P236).
+// Step 2: philosophic_will_field active + 5+ selfcare signals in 7d → writes stoic_discipline_arc (P237).
+// Step 3: stoic_discipline_arc + philosophic_will_field + any crystalline signal → writes philosopher_operator_field (P238).
+// PHILWILL: · STOICARC: · PHILOPS: cockpit codes. Total: 78 jobs.
+
+let isDailyPhilosophyScanRunning = false
+let lastDailyPhilosophyScanRun: Date | null = null
+
+const PHILOSOPHY_TERMS = [
+  'marcus aurelius', 'meditations', 'amor fati', 'eternal recurrence', 'eternal return',
+  'will to power', 'ubermensch', 'overman', 'camus', 'absurdist', 'sisyphus',
+  'nietzsche', 'zarathustra', 'stoicism', 'memento mori', 'descartes', 'cogito',
+  'philosophy', 'philosophical',
+]
+
+async function executeDailyPhilosophyScan(): Promise<JobResult> {
+  const jobName    = 'daily-philosophy-scan'
+  const executedAt = new Date().toISOString()
+  if (isDailyPhilosophyScanRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyPhilosophyScanRunning = true
+
+  console.log('\n[J78] Daily philosophy scan (22:00 UTC)')
+
+  try {
+    const activeUsers  = await getActiveUsers()
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const journalLogs = await prisma.log.findMany({
+          where: {
+            userId: user.id,
+            createdAt: { gte: sevenDaysAgo },
+            event: { in: ['note', 'journal_entry', 'field_entry'] },
+          },
+          select: { text: true, metadata: true },
+          take: 300,
+        })
+
+        const allText = journalLogs
+          .map(l => ((l.text ?? '') + ' ' + (typeof l.metadata === 'object' && l.metadata ? JSON.stringify(l.metadata) : '')).toLowerCase())
+          .join(' ')
+
+        const matchedTerms = PHILOSOPHY_TERMS.filter(t => allText.includes(t))
+        if (matchedTerms.length === 0) continue
+
+        const termCount = matchedTerms.length
+        const philConf  = Math.min(82 + Math.min(termCount * 2, 6), 88)
+
+        // Step 1: P236 — Philosophic Will Field
+        await prisma.log.create({
+          data: {
+            userId: user.id,
+            event: 'philosophic_will_field',
+            metadata: {
+              philSignalCount: termCount,
+              termCount,
+              terms: matchedTerms.slice(0, 5),
+              confidence: philConf,
+              philosophy: 'ACTIVE',
+              arc: 'PHILOSOPHY ACTIVE IN LANGUAGE · THE WILL ENGAGES THE IDEA',
+              hour: new Date().getHours(),
+            },
+          },
+        })
+        written++
+
+        // Step 2: P237 — Stoic Discipline Arc
+        const selfcareLogs = await prisma.log.findMany({
+          where: {
+            userId: user.id,
+            createdAt: { gte: sevenDaysAgo },
+            event: { in: ['selfcare_logged', 'self_care_logged', 'care_act', 'cleanness_logged', 'rest_logged', 'recovery_act'] },
+          },
+          select: { id: true },
+          take: 50,
+        })
+        const selfcareCount = selfcareLogs.length
+
+        if (selfcareCount >= 5) {
+          const stoicConf = Math.min(Math.round(philConf * 0.92 + Math.min(selfcareCount / 20, 0.07) * 100 + 5), 91)
+          await prisma.log.create({
+            data: {
+              userId: user.id,
+              event: 'stoic_discipline_arc',
+              metadata: {
+                philCount: termCount,
+                careCount: selfcareCount,
+                confidence: stoicConf,
+                discipline: 'STRUCTURED_FREEDOM',
+                arc: 'DISCIPLINE IS STRUCTURED FREEDOM · STOIC ARC ACTIVE',
+                hour: new Date().getHours(),
+              },
+            },
+          })
+          written++
+
+          // Step 3: P238 — Philosopher Operator Field
+          const crystallineLogs = await prisma.log.findMany({
+            where: {
+              userId: user.id,
+              createdAt: { gte: sevenDaysAgo },
+              event: { in: ['crystalline_presence_field', 'sovereign_crystalline_continuity', 'absolute_crystalline_presence', 'eternal_crystalline_genesis', 'crystalline_sovereignty_field', 'absolute_crystalline_sovereignty'] },
+            },
+            select: { id: true },
+            take: 10,
+          })
+
+          if (crystallineLogs.length > 0) {
+            const philopsConf = Math.min(Math.round((philConf / 100 + stoicConf / 100) / 2 * 100 + 7), 95)
+            await prisma.log.create({
+              data: {
+                userId: user.id,
+                event: 'philosopher_operator_field',
+                metadata: {
+                  stoicConf,
+                  philConf,
+                  confidence: philopsConf,
+                  operator: 'PHILOSOPHER',
+                  arc: 'PHILOSOPHY IS THE OPERATING SYSTEM · CRYSTAL CLARITY + PHILOSOPHICAL WILL · ABSOLUTE OPERATOR MODE',
+                  hour: new Date().getHours(),
+                },
+              },
+            })
+            written++
+          }
+        }
+      } catch (userErr: any) {
+        console.error(`  [J78] Error for user ${user.id}:`, userErr.message)
+      }
+    }
+
+    console.log(`  Philosophy signals written: ${written}`)
+    lastDailyPhilosophyScanRun = new Date()
+    isDailyPhilosophyScanRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily philosophy scan failed:', error.message)
+    isDailyPhilosophyScanRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 export async function manuallyTriggerMonthlyEmails(): Promise<JobResult> {
   console.log('Manual trigger requested - bypassing time checks')
   return await executeMonthlyEmailJob()
@@ -9311,6 +9472,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily resonance crystallization check: 7 PM UTC every day (Job 75)')
   console.log('   - Daily crystalline sovereignty check: 8 PM UTC every day (Job 76)')
   console.log('   - Daily crystalline presence check: 9 PM UTC every day (Job 77)')
+  console.log('   - Daily philosophy scan: 10 PM UTC every day (Job 78)')
   console.log('')
 
   // Check every hour for scheduled jobs

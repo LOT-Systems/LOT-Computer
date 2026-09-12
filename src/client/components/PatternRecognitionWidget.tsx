@@ -242,6 +242,9 @@ export function PatternRecognitionWidget() {
       'crystalline-presence-field':       'Crystalline presence field — eternal-crystalline-genesis active + 6+ signals from 4+ sources in 24h · the crystalline form is alive and present NOW · CRYSTALLINE FORM IS ALIVE · PRESENCE ACTIVE (P233)',
       'sovereign-crystalline-continuity': 'Sovereign crystalline continuity — crystalline-presence-field confirmed 2+ times in 5d · crystalline sovereignty sustains itself through continuous time · CONTINUITY IS CRYSTALLINE (P234)',
       'absolute-crystalline-presence':    'Absolute crystalline presence — crystalline-presence-field + absolute-crystalline-sovereignty co-active · crystal and presence unified as one expression · CRYSTAL = PRESENCE · SOVEREIGN · ALIVE · ABSOLUTE (P235)',
+      'philosophic-will-field':           'Philosophic will field — philosophy vocabulary detected in journal text within 7d · the will engages the idea · PHILOSOPHY ACTIVE IN LANGUAGE · THE WILL ENGAGES THE IDEA (P236)',
+      'stoic-discipline-arc':             'Stoic discipline arc — philosophic-will-field + 5+ selfcare signals in 7d + intention pattern active · discipline is structured freedom · DISCIPLINE IS STRUCTURED FREEDOM · STOIC ARC ACTIVE (P237)',
+      'philosopher-operator-field':       'Philosopher operator field — stoic-discipline-arc + philosophic-will-field + any crystalline pattern co-active · philosophy is the operating system · PHILOSOPHY IS THE OPERATING SYSTEM · CRYSTAL CLARITY + PHILOSOPHICAL WILL · ABSOLUTE OPERATOR MODE (P238)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
