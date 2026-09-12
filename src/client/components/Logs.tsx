@@ -2691,6 +2691,17 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'generated_story') {
+          const period = (log.metadata?.period as string | undefined) || 'day'
+          if (!log.text) return null
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="📖" blockView>
+                <div className="opacity-30 uppercase tracking-widest mb-4">{period}</div>
+                <div className="opacity-60">{log.text}</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'quantum_learning_spiral') {
           const memoryCount  = log.metadata?.memoryCount  as number | undefined
           const journalWords = log.metadata?.journalWords as number | undefined
@@ -3706,6 +3717,7 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const STORY_PERIODS = ['day', 'week', 'month', 'year'] as const
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3745,7 +3757,22 @@ const NoteEditor = ({
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
-      const updated = current + separator + '📖 ' + data.story
+      let appended = '📖 ' + data.story
+      try {
+        const key = 'lot_story_periods_used'
+        const stored = JSON.parse(localStorage.getItem(key) || '[]') as string[]
+        const seen = new Set(stored)
+        const hadAll = STORY_PERIODS.every(p => seen.has(p))
+        seen.add(data.period || 'day')
+        localStorage.setItem(key, JSON.stringify(Array.from(seen)))
+        const hasAllNow = STORY_PERIODS.every(p => seen.has(p))
+        if (hasAllNow && !hadAll) {
+          appended += '\n\n🏆 COMPRESSION CYCLE COMPLETE — day, week, month, and year all captured.'
+        }
+      } catch {
+        // localStorage unavailable — arcade tracking is cosmetic, story delivery is not
+      }
+      const updated = current + separator + appended
       setValue(updated)
       valueRef.current = updated
       onChangeRef.current(updated)
@@ -4125,7 +4152,10 @@ const NoteEditor = ({
           'AVAILABLE COMMANDS',
           '',
           '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
+          '/story        Compressed personal story (day, default)',
+          '/story week   Compressed story of the last 7 days',
+          '/story month  Compressed story of the last 30 days',
+          '/story year   Compressed story of the last 365 days',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
@@ -4149,19 +4179,25 @@ const NoteEditor = ({
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
+          const periodMatch = value.match(/\/story\s+(day|week|month|year)\b/i)
+          const period = (periodMatch?.[1]?.toLowerCase() as typeof STORY_PERIODS[number]) || 'day'
           setStoryLoading(true)
           setStoryResponse(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const logText = value
+              .replace(/\/story(\s+(day|week|month|year))?/i, '')
+              .replace(/📖/g, '')
+              .trim()
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              period,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: value, period })
           }
         }
       }
