@@ -226,3 +226,24 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Three Clocks Convergence
+
+The product runs three independent, already-shipped progress clocks against
+the same operator: the day clock (badges.ts, join-date deterministic, 7/30/
+100/180/365), the month clock (MonthlyPulseWidget, calendar, Usership-gated,
+1-12), and the level/XP clock (Citizen Index + RPG story arcs, behavioral
+pace, not calendar). 12 months × ~30.4 days ≈ 365 days — so for an operator
+who joined and stayed, the Day-365 "Year One — Legendary" badge and the
+Month-12 pulse message ("the portrait is complete") land in the same week
+without the two systems ever having been wired together. Design work that
+touches operator-facing progression should read all three clocks before
+proposing a new counter — the convergence points (day 30 ~ month 1, day 100
+~ month 4, day 180 ~ month 6, day 365 ~ month 12) are where a payoff should
+land, and inventing a fourth calendar independent of these three fragments
+the story instead of compressing it. The level/XP clock is the one exception
+that must never be pinned to a specific month in a design doc — it is pace-
+dependent per operator; stating "Level 20 by Month 4" would be a fabricated
+precision the honest-engineering rule forbids.
+(SR-20260913-01: Usership 12-month evolution doc; Memory Shelf proposal
+built on top of this convergence rather than adding a fourth clock.)
