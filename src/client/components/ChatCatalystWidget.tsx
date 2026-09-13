@@ -8,8 +8,8 @@
 
 import React from 'react'
 import { useStore } from '@nanostores/react'
-import { Block, Button } from '#client/components/ui'
-import { useChatCatalysts } from '#client/queries'
+import { Block, Button, GhostButton } from '#client/components/ui'
+import { useChatCatalysts, useSendMail } from '#client/queries'
 import * as stores from '#client/stores'
 import { UserTag } from '#shared/types'
 import { getChatCatalystNarrative } from '#client/utils/narrative'
@@ -21,11 +21,17 @@ import { recordSignal } from '#client/stores/intentionEngine'
  */
 export function ChatCatalystWidget() {
   const [currentIndex, setCurrentIndex] = React.useState(0)
+  const [mailStatus, setMailStatus] = React.useState<'sent' | 'error' | null>(null)
   const { data, isLoading } = useChatCatalysts()
   const me = useStore(stores.me)
+  const { mutate: sendMail, isLoading: isMailing } = useSendMail({
+    onSuccess: () => setMailStatus('sent'),
+    onError: () => setMailStatus('error'),
+  })
 
   const cycleCatalyst = () => {
     if (!data || data.catalysts.length === 0) return
+    setMailStatus(null)
     setCurrentIndex(prev => (prev + 1) % data.catalysts.length)
   }
 
@@ -63,6 +69,17 @@ export function ChatCatalystWidget() {
       // Navigate to community chat
       stores.goTo('sync')
     }
+  }
+
+  // LOT Mail quick-send — reaches a matched cohort member directly, without
+  // leaving the widget. Arrives in their Sync as LOT Mail.
+  const handleMail = () => {
+    const cohortMember = catalyst.action.cohortMember
+    if (!cohortMember || isMailing) return
+    const firstName = cohortMember.name.split(' ')[0]
+    const body = catalyst.conversationStarters?.[0] || 'Hi — connecting via LOT Community.'
+    setMailStatus(null)
+    sendMail({ toName: firstName, message: body })
   }
 
   return (
@@ -106,8 +123,11 @@ export function ChatCatalystWidget() {
 
         {/* Cohort member info if present */}
         {catalyst.action.cohortMember && (
-          <div>
-            {catalyst.action.cohortMember.name}
+          <div className="flex items-center gap-x-8">
+            <span>{catalyst.action.cohortMember.name}</span>
+            <GhostButton onClick={handleMail} disabled={isMailing || mailStatus === 'sent'}>
+              {mailStatus === 'sent' ? '✉ Sent' : mailStatus === 'error' ? '✉ Failed — retry' : '✉ Email'}
+            </GhostButton>
           </div>
         )}
 

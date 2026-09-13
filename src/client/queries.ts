@@ -120,6 +120,28 @@ export const useSendDirectMessage = createMutation<
   void
 >('post', '/api/direct-messages')
 
+// ============================================================================
+// LOT MAIL — /email trigger in the Log, surfaced in Sync
+// ============================================================================
+
+export interface LotMailRecord {
+  id: string
+  senderId: string
+  senderName: string
+  message: string
+  createdAt: string
+}
+
+export const useMailInbox = createQuery<{ mail: LotMailRecord[] }>(
+  '/api/direct-messages/inbox',
+  { refetchOnWindowFocus: false }
+)
+
+export const useSendMail = createMutation<
+  { toName: string; message: string },
+  { id: string; toName: string; createdAt: string }
+>('post', '/api/mail')
+
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
 })

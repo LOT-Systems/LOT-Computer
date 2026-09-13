@@ -24,9 +24,11 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useMailInbox,
+  LotMailRecord,
 } from '#client/queries'
 import { sync } from '../sync'
-import { PublicChatMessage, UserTag } from '#shared/types'
+import { PublicChatMessage, UserTag, LotMailPayload } from '#shared/types'
 import {
   SYNC_CHAT_MESSAGES_TO_SHOW,
   MAX_SYNC_CHAT_MESSAGE_LENGTH,
@@ -52,6 +54,8 @@ export const Sync = React.memo(function SyncInner() {
   const [message, setMessage] = React.useState('')
   // SSE-received messages not yet reflected in the API response
   const [sseMessages, setSseMessages] = React.useState<PublicChatMessage[]>([])
+  // LOT Mail — SSE-received mail not yet reflected in the inbox fetch
+  const [sseMail, setSseMail] = React.useState<LotMailRecord[]>([])
 
   // Check if current user can access /us section (admin-level access)
   const canAccessUserProfiles = React.useMemo(() => {
@@ -71,6 +75,7 @@ export const Sync = React.memo(function SyncInner() {
   }, [me])
 
   const { data: fetchedMessages } = useChatMessages()
+  const { data: mailInbox } = useMailInbox()
   const { mutate: createChatMessage } = useCreateChatMessage({
     onSuccess: () => setMessage(''),
   })
@@ -94,6 +99,14 @@ export const Sync = React.memo(function SyncInner() {
     return canAccessUserProfiles ? combined : combined.slice(0, SYNC_CHAT_MESSAGES_TO_SHOW)
   }, [fetchedMessages, sseMessages, canAccessUserProfiles])
 
+  // LOT Mail — SSE-only mail (not yet in the inbox fetch) prepended to it
+  const mail = React.useMemo(() => {
+    const fetched = mailInbox?.mail || []
+    const fetchedIds = new Set(fetched.map((m) => m.id))
+    const fresh = sseMail.filter((m) => !fetchedIds.has(m.id))
+    return [...fresh, ...fetched]
+  }, [mailInbox, sseMail])
+
   React.useEffect(() => {
     const { dispose: disposeChatMessageListener } = sync.listen(
       'chat_message',
@@ -101,6 +114,25 @@ export const Sync = React.memo(function SyncInner() {
         setSseMessages((prev) => {
           if (prev.some((x) => x.id === data.id)) return prev
           return [data, ...prev]
+        })
+      }
+    )
+    const { dispose: disposeMailListener } = sync.listen(
+      'direct_message',
+      (data: LotMailPayload) => {
+        if (data.receiverId !== me?.id) return
+        setSseMail((prev) => {
+          if (prev.some((x) => x.id === data.id)) return prev
+          return [
+            {
+              id: data.id,
+              senderId: data.senderId,
+              senderName: data.senderName,
+              message: data.message,
+              createdAt: data.createdAt as unknown as string,
+            },
+            ...prev,
+          ]
         })
       }
     )
@@ -119,6 +151,7 @@ export const Sync = React.memo(function SyncInner() {
     )
     return () => {
       disposeChatMessageListener()
+      disposeMailListener()
       disposeChatMessageLikeListener()
     }
   }, [me?.id])
@@ -213,6 +246,31 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {mail.length > 0 && (
+        <div className="mb-80">
+          <div className="mb-8 opacity-40 uppercase tracking-widest text-xs">
+            LOT MAIL
+          </div>
+          {mail.map((m) => (
+            <div
+              key={m.id}
+              className="flex items-start gap-x-8 -mx-4 px-4 py-2 rounded grid-fill-hover"
+            >
+              <span className="whitespace-nowrap">{m.senderName}</span>
+              <div
+                className="flex-1 opacity-60 whitespace-breakspaces"
+                style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}
+              >
+                {m.message}
+              </div>
+              <div className="text-acc/40 whitespace-nowrap">
+                <MessageTimeLabel dateString={m.createdAt} isTimeFormat12h={isTimeFormat12h} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {

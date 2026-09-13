@@ -226,3 +226,20 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Migration-Model Parity
+
+A Sequelize model, its routes, and its client component can all exist,
+import cleanly, and type-check with zero errors while the table backing
+the model was never created by any migration. TypeScript sees the model
+class, never the schema — a missing migration is invisible to every check
+this repo runs (tsc, esbuild). The only tell is `grep -rl <table_name>
+migrations/` coming back empty with no `sequelize.sync()` anywhere to
+paper over it at runtime; such a feature is dead on arrival, one INSERT
+away from a 42P01 "relation does not exist." Before building new routes
+on an existing model, confirm its table's migration exists — absence is
+not "already handled elsewhere."
+(SR-20260913-01: DirectMessage model/routes/DirectMessageThread.tsx all
+shipped and type-checked cleanly on master with no direct_messages
+migration ever written; fixed with migrations/20260913000000_add-direct-
+messages.cjs while building LOT Mail on top of the same model.)

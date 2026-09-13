@@ -33,7 +33,7 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useSendMail } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3692,6 +3692,20 @@ const NoteEditor = ({
       setQiLoading(false)
     },
   })
+  const [emailResult, setEmailResult] = React.useState<string | null>(null)
+  const [emailLoading, setEmailLoading] = React.useState(false)
+  const emailSentToRef = React.useRef<string | null>(null)
+  const { mutate: submitMail } = useSendMail({
+    onSuccess: (data) => {
+      setEmailResult(['TO              ' + data.toName.toUpperCase(), 'STATUS          SENT'].join('\n'))
+      setEmailLoading(false)
+    },
+    onError: (error) => {
+      const apiError = (error.response?.data as { error?: string } | undefined)?.error
+      setEmailResult(['STATUS          ERROR', (apiError || 'DELIVERY FAILED').toUpperCase()].join('\n'))
+      setEmailLoading(false)
+    },
+  })
   const { mutate: submitAssembly } = useAssemblyDirective({
     onSuccess: (data) => {
       setAsmResponse(data.directive)
@@ -4139,6 +4153,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to X   Send this log as LOT Mail to operator X',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4147,6 +4162,15 @@ const NoteEditor = ({
         setSystemHelp(lines.join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
+      } else if (trigger === 'email-compose') {
+        const mailMatch = value.match(/(?:\/email|\/mail|✉️|✉|📧)\s+to\s+(\S+)/i)
+        const toName = mailMatch?.[1]?.replace(/[.,!?;:]+$/, '')
+        if (toName && !emailLoading && emailSentToRef.current !== value) {
+          emailSentToRef.current = value
+          setEmailLoading(true)
+          setEmailResult(null)
+          submitMail({ toName, message: value.trim() })
+        }
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
@@ -4274,6 +4298,22 @@ const NoteEditor = ({
           )}
           rows={primary ? 10 : 1}
         />
+        {(emailLoading || emailResult) && (
+          <div className="mt-8">
+            <Block label="MAIL:" blockView>
+              {emailLoading && !emailResult && (
+                <div className="opacity-40 uppercase tracking-widest">Sending...</div>
+              )}
+              {emailResult && (
+                <div className="opacity-60">
+                  {emailResult.split('\n').map((line, idx) => (
+                    <div key={idx}>{line}</div>
+                  ))}
+                </div>
+              )}
+            </Block>
+          </div>
+        )}
         {(qiLoading || qiResponse) && (
           <div className="mt-8">
             <Block label="QI [INTSUM]:" blockView>

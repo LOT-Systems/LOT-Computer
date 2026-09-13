@@ -445,9 +445,22 @@ export type ChatMessageLikeEventPayload = {
   isLiked?: boolean;
 };
 
+// LOT Mail — in-app email reusing the DirectMessage table.
+// `/email to <Name>` in the Log resolves <Name> to a user and sends the
+// log text as a direct message; Sync surfaces it as LOT Mail.
+export type LotMailPayload = {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  message: string;
+  senderName: string;
+  createdAt: Date;
+};
+
 // Sync Events
 export type SyncEvents = {
   chatMessage: PublicChatMessage;
   chatMessageLike: ChatMessageLikeEventPayload;
   settings_updated: Record<string, never>;
+  direct_message: LotMailPayload;
 };
