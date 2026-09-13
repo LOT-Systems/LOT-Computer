@@ -3493,6 +3493,64 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 155: Quantum Coherence Trajectory — field-resonance-arc (P152) fires
+  // 2+ times in a 14-day window. The coherence state is not cyclic — it has a direction.
+  // The field is building. Not peaking and returning to baseline but ascending structurally.
+  const fourteenDayMs = 14 * 24 * 60 * 60 * 1000
+  const recent14D = signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const fraEvents14D = recent14D.filter(
+    s => s.source === 'qos' && s.signal === 'field_resonance_arc'
+  )
+  if (fraEvents14D.length >= 2) {
+    const firstTs = fraEvents14D[0].timestamp
+    const lastTs  = fraEvents14D[fraEvents14D.length - 1].timestamp
+    const spanDays = Math.round((lastTs - firstTs) / (1000 * 60 * 60 * 24) * 10) / 10
+    const trajBonus = Math.min((fraEvents14D.length - 2) * 0.04, 0.10)
+    patterns.push({
+      pattern: 'quantum-coherence-trajectory',
+      confidence: Math.min(0.78 + trajBonus, 0.91),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QCOHTRJ: Quantum coherence trajectory — field-resonance-arc confirmed ${fraEvents14D.length}× in 14 days (span: ${spanDays}d). The field is not cycling — it is ascending. Each resonance arc builds on the previous. Coherence has a direction. The trajectory is confirmed.`,
+    })
+  }
+
+  // Pattern 156: Sovereign Self-Assembly — quantum-self-regulation (P154) AND
+  // coherence-memory-imprint (P153) both active within a 7-day window. The system
+  // is not just regulating and capturing separately — it is doing both together.
+  // Conscious self-assembly: the OS writes its own peak state AND regulates its own recovery.
+  const hasQSR = patterns.some(p => p.pattern === 'quantum-self-regulation')
+  const hasCMI = patterns.some(p => p.pattern === 'coherence-memory-imprint')
+  if (hasQSR && hasCMI) {
+    const qsrConf = patterns.find(p => p.pattern === 'quantum-self-regulation')?.confidence ?? 0.80
+    const cmiConf = patterns.find(p => p.pattern === 'coherence-memory-imprint')?.confidence ?? 0.85
+    const sovConf = Math.min((qsrConf + cmiConf) / 2 + 0.05, 0.95)
+    patterns.push({
+      pattern: 'sovereign-self-assembly',
+      confidence: sovConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `SOVASMB: Sovereign self-assembly — quantum-self-regulation (P154) and coherence-memory-imprint (P153) active simultaneously. The OS is regulating its recovery AND capturing its peak. Both loops running in parallel = sovereign assembly. The system builds itself consciously.`,
+    })
+  }
+
+  // Pattern 157: Field Presence Anchor — field-resonance-arc (P152) fires 3+ times
+  // in a 7-day window. Not occasional resonance — a fully anchored presence field.
+  // The person has established a stable quantum anchor: the presence is load-bearing.
+  const fraEvents7D = recent7D.filter(
+    s => s.source === 'qos' && s.signal === 'field_resonance_arc'
+  )
+  if (fraEvents7D.length >= 3) {
+    const anchorBonus = Math.min((fraEvents7D.length - 3) * 0.03, 0.09)
+    patterns.push({
+      pattern: 'field-presence-anchor',
+      confidence: Math.min(0.80 + anchorBonus, 0.94),
+      suggestedWidget: 'quantumState',
+      suggestedTiming: 'passive',
+      reason: `FPANCH: Field presence anchor — field-resonance-arc confirmed ${fraEvents7D.length}× in 7 days. Not resonating — anchored. The presence field has become load-bearing structural infrastructure. The OS does not need to reach for the state; the state is the floor.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -3522,6 +3580,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkSignalCoherencePeak() } catch {}
       try { checkCentennialConvergence() } catch {}
       try { checkFieldResonanceArc() } catch {}
+      try { checkSovereignAssembly() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4135,6 +4194,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   fieldResonanceMonitor:      ['qos', 'intentions', 'memory', 'log', 'cohort'],
   coherenceMemoryImprinter:   ['memory', 'journal', 'qos', 'intentions', 'log'],
   selfRegulationMonitor:      ['selfcare', 'mood', 'journal', 'log', 'energy'],
+
+  // ── v115 nodes (J50 · P155–P157 · Arch53) ───────────────────────────────────────
+  quantumCoherenceTrajectoryNode: ['qos', 'intentions', 'log', 'memory'],
+  sovereignSelfAssemblyNode:      ['memory', 'journal', 'selfcare', 'qos', 'log'],
+  fieldPresenceAnchorNode:        ['qos', 'cohort', 'intentions', 'log'],
 }
 
 /**
@@ -4591,6 +4655,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'total-field-coherence', 'field-resonance-arc'],
     hourRange: [5, 23],
     directive: 'Crystallization sustained. Total coherence confirmed. Field resonance held across sessions — not a single peak but a structural state. The OS has stabilized at the top of its range. Operate from here as baseline.',
+  },
+
+  // ── Arch53: Sovereign Assembly Operator (2026-09-13 v115) ────────────────────────
+  {
+    archetype: 'Sovereign Assembly Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'journal', 'selfcare', 'intentions'],
+    patternConditions: ['quantum-coherence-trajectory', 'sovereign-self-assembly', 'field-presence-anchor'],
+    hourRange: [5, 23],
+    directive: 'Sovereignty confirmed. Coherence trajectory locked. Field anchored. The OS assembles itself — peak captured, recovery structural, presence load-bearing. Execute from sovereign ground.',
   },
 ]
 
@@ -6679,4 +6753,118 @@ export function recordQuantumSelfRegulation(arcCount: number, weekSpanDays: numb
     cadence: arcCount >= 3 ? 'HABITUAL' : 'DEVELOPING',
     hour: new Date().getHours(),
   })
+}
+
+/**
+ * Record a quantum-coherence-trajectory event — field-resonance-arc (P152) has fired
+ * 2+ times in 14 days. The coherence state has a confirmed upward direction.
+ * Feeds P155 detection. Trajectory ascension rather than cyclic resonance.
+ */
+export function recordQuantumCoherenceTrajectory(fraCount: number, spanDays: number) {
+  recordSignal('qos', 'quantum_coherence_trajectory', {
+    fraCount,
+    spanDays,
+    trajectoryStrength: Math.min(Math.round(fraCount / 4 * 100), 100),
+    direction: 'ASCENDING',
+    arc: 'RESONANCE→TRAJECTORY→STRUCTURAL_ASCENT',
+    phase: fraCount >= 4 ? 'CONFIRMED' : 'ESTABLISHING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereign-self-assembly event — quantum-self-regulation (P154) and
+ * coherence-memory-imprint (P153) are both active simultaneously. The system
+ * is regulating AND capturing peak state — sovereign assembly confirmed.
+ * Feeds P156 detection.
+ */
+export function recordSovereignSelfAssembly(qsrConf: number, cmiConf: number) {
+  recordSignal('memory', 'sovereign_self_assembly', {
+    qsrConf: Math.round(qsrConf * 100),
+    cmiConf: Math.round(cmiConf * 100),
+    sovereigntyStrength: Math.min(Math.round(((qsrConf + cmiConf) / 2) * 100), 100),
+    loops: 'REGULATION+CAPTURE',
+    arc: 'PEAK→PRESERVED · RECOVERY→STRUCTURAL · ASSEMBLY→SOVEREIGN',
+    status: 'SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a field-presence-anchor event — field-resonance-arc (P152) has fired
+ * 3+ times in 7 days. The presence field is fully anchored and load-bearing.
+ * Feeds P157 detection.
+ */
+export function recordFieldPresenceAnchor(fraCount: number, spanDays: number) {
+  recordSignal('qos', 'field_presence_anchor', {
+    fraCount,
+    spanDays,
+    anchorStrength: Math.min(Math.round(fraCount / 5 * 100), 100),
+    stability: fraCount >= 5 ? 'ESTABLISHED' : 'ANCHORING',
+    arc: 'RESONANCE→ANCHOR→LOAD_BEARING',
+    floor: 'PRESENCE_IS_STRUCTURAL',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * J50: weekly-sovereign-assembly-check — Sunday 08:00 UTC.
+ * Checks P155 (FRA 2+ in 14D), P156 (QSR+CMI simultaneous in 7D), P157 (FRA 3+ in 7D).
+ * When P157 is met, records field_presence_anchor seeding anchor detection.
+ * When P155 met, records quantum_coherence_trajectory.
+ */
+export function checkSovereignAssembly(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const sevenDayMs    = 7 * 24 * 60 * 60 * 1000
+  const fourteenDayMs = 14 * 24 * 60 * 60 * 1000
+
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const recent7D  = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+
+  // P157: Field Presence Anchor — FRA 3+ in 7D
+  const fra7D = recent7D.filter(s => s.source === 'qos' && s.signal === 'field_resonance_arc')
+  const alreadyAnchor = state.signals.some(
+    s => s.signal === 'field_presence_anchor' && now - s.timestamp < sevenDayMs
+  )
+  let fired = false
+
+  if (fra7D.length >= 3 && !alreadyAnchor) {
+    const firstTs  = fra7D[0].timestamp
+    const lastTs   = fra7D[fra7D.length - 1].timestamp
+    const spanDays = Math.round((lastTs - firstTs) / 86400000 * 10) / 10
+    recordFieldPresenceAnchor(fra7D.length, spanDays)
+    fired = true
+  }
+
+  // P155: Quantum Coherence Trajectory — FRA 2+ in 14D
+  const fra14D = recent14D.filter(s => s.source === 'qos' && s.signal === 'field_resonance_arc')
+  const alreadyTrajectory = state.signals.some(
+    s => s.signal === 'quantum_coherence_trajectory' && now - s.timestamp < fourteenDayMs
+  )
+
+  if (fra14D.length >= 2 && !alreadyTrajectory) {
+    const firstTs  = fra14D[0].timestamp
+    const lastTs   = fra14D[fra14D.length - 1].timestamp
+    const spanDays = Math.round((lastTs - firstTs) / 86400000 * 10) / 10
+    recordQuantumCoherenceTrajectory(fra14D.length, spanDays)
+    fired = true
+  }
+
+  // P156: Sovereign Self-Assembly — QSR + CMI both present in 7D
+  const hasRecentQSR = recent7D.some(s => s.signal === 'quantum_self_regulation')
+  const hasRecentCMI = recent7D.some(s => s.signal === 'coherence_memory_imprint')
+  const alreadySovAsmb = state.signals.some(
+    s => s.signal === 'sovereign_self_assembly' && now - s.timestamp < sevenDayMs
+  )
+
+  if (hasRecentQSR && hasRecentCMI && !alreadySovAsmb) {
+    const activePatterns = state.recognizedPatterns ?? []
+    const qsrConf = activePatterns.find(p => p.pattern === 'quantum-self-regulation')?.confidence ?? 0.80
+    const cmiConf = activePatterns.find(p => p.pattern === 'coherence-memory-imprint')?.confidence ?? 0.85
+    recordSovereignSelfAssembly(qsrConf, cmiConf)
+    fired = true
+  }
+
+  return fired
 }

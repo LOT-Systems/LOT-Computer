@@ -113,6 +113,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'field-resonance-arc':              'FIELDRES',
   'coherence-memory-imprint':         'COHIMPRINT',
   'quantum-self-regulation':          'QSREG',
+  'quantum-coherence-trajectory':     'QCOHTRJ',
+  'sovereign-self-assembly':          'SOVASMB',
+  'field-presence-anchor':            'FPANCH',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

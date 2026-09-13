@@ -3735,6 +3735,120 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'quantum_coherence_trajectory') {
+          const fraCount   = log.metadata?.fraCount as number | undefined
+          const spanDays   = log.metadata?.spanDays as number | undefined
+          const direction  = log.metadata?.direction as string | undefined
+          const phase      = log.metadata?.phase as string | undefined
+          const arc        = log.metadata?.arc as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QCOHTRJ:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM COHERENCE TRAJECTORY</div>
+                {fraCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FRA EVENTS</span>
+                    <span className="tabular-nums">{fraCount}</span>
+                  </div>
+                )}
+                {spanDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SPAN</span>
+                    <span className="tabular-nums">{spanDays}d</span>
+                  </div>
+                )}
+                {direction && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DIRECTION</span>
+                    <span className="tabular-nums">{direction}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">NOT CYCLING — ASCENDING</div>
+                {phase && (
+                  <div className="opacity-30 tabular-nums">PHASE: {phase}</div>
+                )}
+                {arc && (
+                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sovereign_self_assembly') {
+          const qsrConf          = log.metadata?.qsrConf as number | undefined
+          const cmiConf          = log.metadata?.cmiConf as number | undefined
+          const sovereigntyStr   = log.metadata?.sovereigntyStrength as number | undefined
+          const loops            = log.metadata?.loops as string | undefined
+          const arc              = log.metadata?.arc as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVASMB:" blockView>
+                <div className="uppercase tracking-widest mb-4">SOVEREIGN SELF-ASSEMBLY</div>
+                {qsrConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">QSR CONF</span>
+                    <span className="tabular-nums">{qsrConf}%</span>
+                  </div>
+                )}
+                {cmiConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CMI CONF</span>
+                    <span className="tabular-nums">{cmiConf}%</span>
+                  </div>
+                )}
+                {sovereigntyStr !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVEREIGNTY</span>
+                    <span className="tabular-nums">{sovereigntyStr}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">REGULATION + CAPTURE = SOVEREIGN ASSEMBLY</div>
+                {loops && (
+                  <div className="opacity-30 tabular-nums">LOOPS: {loops}</div>
+                )}
+                {arc && (
+                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'field_presence_anchor') {
+          const fraCount      = log.metadata?.fraCount as number | undefined
+          const spanDays      = log.metadata?.spanDays as number | undefined
+          const anchorStr     = log.metadata?.anchorStrength as number | undefined
+          const stability     = log.metadata?.stability as string | undefined
+          const arc           = log.metadata?.arc as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FPANCH:" blockView>
+                <div className="uppercase tracking-widest mb-4">FIELD PRESENCE ANCHOR</div>
+                {fraCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FRA EVENTS 7D</span>
+                    <span className="tabular-nums">{fraCount}</span>
+                  </div>
+                )}
+                {spanDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SPAN</span>
+                    <span className="tabular-nums">{spanDays}d</span>
+                  </div>
+                )}
+                {anchorStr !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ANCHOR</span>
+                    <span className="tabular-nums">{anchorStr}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PRESENCE IS THE FLOOR · NOT THE PEAK</div>
+                {stability && (
+                  <div className="opacity-30 tabular-nums">STABILITY: {stability}</div>
+                )}
+                {arc && (
+                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

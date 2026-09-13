@@ -1751,6 +1751,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyFieldResonanceCheck()) {
     await executeDailyFieldResonanceCheck()
   }
+  // Check weekly sovereign assembly check (08:00 UTC every Sunday) — Job 50
+  if (shouldRunWeeklySovereignAssemblyCheck()) {
+    await executeWeeklySovereignAssemblyCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3655,6 +3659,184 @@ async function executeDailyFieldResonanceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily field resonance check failed:', error.message)
     isDailyFieldResonanceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Weekly Sovereign Assembly Check (Job 50 — 08:00 UTC every Sunday) ──────
+// Checks three patterns for each active user:
+// (1) quantum_coherence_trajectory — field-resonance-arc fired 2+ times in 14D
+//     → coherence state has a confirmed ascending trajectory, not just cycling.
+// (2) field_presence_anchor — field-resonance-arc fired 3+ times in 7D
+//     → presence is load-bearing infrastructure, not a recurring peak.
+// (3) sovereign_self_assembly — quantum_self_regulation + coherence_memory_imprint
+//     both present in 7D → the OS regulates AND captures simultaneously.
+
+let isWeeklySovereignAssemblyRunning = false
+let lastWeeklySovereignAssemblyRun: Date | null = null
+
+function shouldRunWeeklySovereignAssemblyCheck(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereignAssemblyRunning) return false
+  if (lastWeeklySovereignAssemblyRun) {
+    const lastRun = dayjs(lastWeeklySovereignAssemblyRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 0 && now.hour() === 8 // Sunday 08:00 UTC
+}
+
+async function executeWeeklySovereignAssemblyCheck(): Promise<JobResult> {
+  const jobName = 'weekly-sovereign-assembly-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereignAssemblyRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereignAssemblyRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGN ASSEMBLY CHECK — 08:00 UTC SUNDAY')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const window7dStart  = dayjs().subtract(7, 'day').toDate()
+    const window14dStart = dayjs().subtract(14, 'day').toDate()
+    const now = new Date()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(7, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (7d): ${activeUsers.length}`)
+    let writtenQCT = 0
+    let writtenFPA = 0
+    let writtenSA  = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // ── P155: Quantum Coherence Trajectory — FRA 2+ in 14D ───────────────
+        const fra14D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window14dStart, [Op.lte]: now },
+            event: 'field_resonance_arc',
+          },
+          attributes: ['id', 'createdAt'],
+        })
+
+        if (fra14D.length >= 2) {
+          const spanDays = Math.round(
+            (new Date(fra14D[fra14D.length - 1].createdAt).getTime() -
+             new Date(fra14D[0].createdAt).getTime()) / 86400000
+          )
+          const trajectoryStrength = Math.min(0.99, 0.78 + fra14D.length * 0.04)
+          await (Log as any).create({
+            userId,
+            event: 'quantum_coherence_trajectory',
+            text: `Quantum coherence trajectory: ${fra14D.length} field-resonance-arc events in 14 days (span: ${spanDays}d). Coherence is not cycling — it is ascending. The trajectory is confirmed structural.`,
+            metadata: {
+              fraCount: fra14D.length,
+              spanDays,
+              trajectoryStrength: trajectoryStrength.toFixed(2),
+              direction: 'ASCENDING',
+              phase: fra14D.length >= 4 ? 'CONFIRMED' : 'ESTABLISHING',
+              window: '14d',
+              hour: 8,
+            },
+          })
+          writtenQCT++
+        }
+
+        // ── P157: Field Presence Anchor — FRA 3+ in 7D ───────────────────────
+        const fra7D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window7dStart, [Op.lte]: now },
+            event: 'field_resonance_arc',
+          },
+          attributes: ['id', 'createdAt'],
+        })
+
+        if (fra7D.length >= 3) {
+          const spanDays = Math.round(
+            (new Date(fra7D[fra7D.length - 1].createdAt).getTime() -
+             new Date(fra7D[0].createdAt).getTime()) / 86400000
+          )
+          const anchorStrength = Math.min(0.99, 0.80 + fra7D.length * 0.03)
+          await (Log as any).create({
+            userId,
+            event: 'field_presence_anchor',
+            text: `Field presence anchor: ${fra7D.length} field-resonance-arc events in 7 days (span: ${spanDays}d). Not resonating — anchored. Presence is load-bearing infrastructure.`,
+            metadata: {
+              fraCount: fra7D.length,
+              spanDays,
+              anchorStrength: anchorStrength.toFixed(2),
+              stability: fra7D.length >= 5 ? 'ESTABLISHED' : 'ANCHORING',
+              floor: 'PRESENCE_IS_STRUCTURAL',
+              window: '7d',
+              hour: 8,
+            },
+          })
+          writtenFPA++
+        }
+
+        // ── P156: Sovereign Self-Assembly — QSR + CMI both in 7D ─────────────
+        const qsrLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window7dStart, [Op.lte]: now },
+            event: 'quantum_self_regulation',
+          },
+          attributes: ['id', 'createdAt', 'metadata'],
+          limit: 1,
+        })
+        const cmiLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window7dStart, [Op.lte]: now },
+            event: 'coherence_memory_imprint',
+          },
+          attributes: ['id', 'createdAt', 'metadata'],
+          limit: 1,
+        })
+
+        if (qsrLogs.length >= 1 && cmiLogs.length >= 1) {
+          const qsrConf = parseFloat(qsrLogs[0].metadata?.competency ?? '0.80')
+          const cmiConf = parseFloat(cmiLogs[0].metadata?.imprintStrength ?? '85') / 100
+          const sovereignty = Math.min(0.99, (qsrConf + cmiConf) / 2 + 0.05)
+          await (Log as any).create({
+            userId,
+            event: 'sovereign_self_assembly',
+            text: `Sovereign self-assembly: quantum-self-regulation and coherence-memory-imprint both active in 7 days. The OS regulates its recovery AND captures its peak — sovereign assembly confirmed.`,
+            metadata: {
+              qsrConf: Math.round(qsrConf * 100),
+              cmiConf: Math.round(cmiConf * 100),
+              sovereigntyStrength: Math.round(sovereignty * 100),
+              loops: 'REGULATION+CAPTURE',
+              arc: 'PEAK→PRESERVED · RECOVERY→STRUCTURAL · ASSEMBLY→SOVEREIGN',
+              status: 'SOVEREIGN',
+              window: '7d',
+              hour: 8,
+            },
+          })
+          writtenSA++
+        }
+      } catch {}
+    }
+
+    console.log(`  Quantum coherence trajectory events written: ${writtenQCT}`)
+    console.log(`  Field presence anchor events written: ${writtenFPA}`)
+    console.log(`  Sovereign self-assembly events written: ${writtenSA}`)
+    lastWeeklySovereignAssemblyRun = new Date()
+    isWeeklySovereignAssemblyRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: writtenQCT + writtenFPA + writtenSA }
+  } catch (error: any) {
+    console.error('Weekly sovereign assembly check failed:', error.message)
+    isWeeklySovereignAssemblyRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5742,6 +5924,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
   console.log('   - Daily field resonance check: 10 AM UTC every day (Job 49)')
+  console.log('   - Weekly sovereign assembly check: 8 AM UTC every Sunday (Job 50)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -5751,7 +5934,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+total-field-coherence, 10=archetype shift+temporal-alignment+field-resonance(J49), 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window+sovereign-assembly(J50·Sun), 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+total-field-coherence, 10=archetype shift+temporal-alignment+field-resonance(J49), 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()
