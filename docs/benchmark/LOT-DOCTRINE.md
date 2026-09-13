@@ -226,3 +226,39 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Ambient-Reading Personalization Chain (timeZone wall-clock passthrough)
+
+Any client-side ambient/environmental computation (astrology, time-of-day
+theming, circadian phase) that already has a server-side, timeZone-aware
+counterpart must reuse the identical wall-clock-passthrough trick, not
+re-derive its own:
+
+  const localMoment = user.timeZone ? dayjs().tz(user.timeZone) : dayjs()
+  const wallClockDate = new Date(
+    localMoment.year(), localMoment.month(), localMoment.date(),
+    localMoment.hour(), localMoment.minute(), localMoment.second()
+  )
+
+Passing `wallClockDate` into any function that reads `getHours()`/`getMonth()`/
+`getDate()` makes it return the *user's saved timeZone's* wall-clock fields
+regardless of the runtime's own local timeZone — true on the server process,
+and equally true in the browser tab (device timeZone vs. saved profile
+timeZone can differ, e.g. a traveling operator). The client dayjs instance
+(`#client/utils/dayjs`) needed the `timezone` plugin added alongside `utc` to
+support `.tz()` — it did not carry it by default the way the server instance
+(`#server/utils/dayjs`) already did. Falls back to plain `dayjs()` (device
+time) when no `timeZone` is saved yet — this is not a regression, it is the
+same default behavior the feature already had.
+
+Corollary: a value picked via a model's `useProfileView()` fp.pick allowlist
+is not automatically present on the client `UserProfile` type or the `me`
+store — both the pick-list AND the shared type must be extended together, or
+the field silently round-trips as `undefined` on the client despite the
+server actually sending it.
+
+(SR-20260913-01: astrology dashboard display — System.tsx — made
+timeZone-aware via `me.timeZone` from a widened `useProfileView()` pick-list
+and `UserProfile` type; previously read device-local time only, unlike the
+Logs-side `getLogContext()` reading, which was already timeZone-aware since
+SR-20260727 [docs/assembly/2026-07-27_LOT-assembly_astrology-widget-personalization-sync.md].)

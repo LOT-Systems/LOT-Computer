@@ -68,6 +68,7 @@ export type UserProfile = {
   city: string | null;
   address: string | null;
   phone: string | null;
+  timeZone: string | null;
   tags: string[];
   hideActivityLogs: boolean;
   timeChime?: boolean;

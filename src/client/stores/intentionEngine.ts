@@ -3428,6 +3428,24 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Auspicious Alignment — an intention or goal is set within 24h of
+  // the ambient astrology reading reporting a Taian (auspicious) rokuyo day.
+  // Not causal, not a natal-chart claim — this is the astrology Tier 0 signal
+  // (registered 2026-07-27, silent until now) actually being consumed by another
+  // source, closing the widget-synchronization loop the dependency map declared.
+  const p152Cut       = now - 24 * 60 * 60 * 1000
+  const p152Auspicious = signals.filter(s => s.source === 'astrology' && s.timestamp > p152Cut && s.metadata?.auspicious === true)
+  const p152Intent     = signals.filter(s => s.timestamp > p152Cut && ((s.source === 'intentions' && s.signal === 'intention_set') || s.source === 'goals'))
+  if (p152Auspicious.length >= 1 && p152Intent.length >= 1) {
+    patterns.push({
+      pattern: 'auspicious-alignment',
+      confidence: Math.min(0.60 + p152Intent.length * 0.05, 0.78),
+      suggestedWidget: 'system',
+      suggestedTiming: 'passive',
+      reason: `AUSPALIGN: Taian day + ${p152Intent.length} intention/goal signal(s) in 24h. Ambient reading and declared direction land on the same day.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
