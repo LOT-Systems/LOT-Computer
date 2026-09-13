@@ -62,7 +62,13 @@ export const PlannerWidget: React.FC = () => {
     const planText = `Intent: ${state.values.intent} • Today: ${state.values.today} • How: ${state.values.how} • Feeling: ${state.values.feeling}`
     createLog({
       text: planText,
-      event: 'plan_set'
+      event: 'plan_set',
+      metadata: {
+        intent: state.values.intent,
+        today: state.values.today,
+        how: state.values.how,
+        feeling: state.values.feeling
+      }
     })
 
     // Show completion
