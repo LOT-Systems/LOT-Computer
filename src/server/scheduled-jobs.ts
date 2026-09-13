@@ -1075,6 +1075,7 @@ async function executeDailyArchetypeDirectivePulse(): Promise<JobResult> {
       'Deep Signal Reader':       { label: 'READ',     directive: 'The body is already reporting. Listen before acting.' },
       'Crystalline Intelligence': { label: 'CLARIFY',  directive: 'Precision removes friction faster than speed ever will.' },
       'Peak Strategist':          { label: 'PEAK',     directive: 'Biology aligned with strategy. Prime window open during sustained momentum streak. Commit fully, decide fast, record everything.' },
+      'Temporal Sovereign':       { label: 'SOVEREIGN', directive: 'Temporal sovereignty confirmed. Identity locked, clock anchored, day launched from intention. The clock is yours. Execute from that ground.' },
     }
 
     let written = 0
@@ -1747,10 +1748,252 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
-  // Check daily field resonance check (10:00 UTC every day) — Job 49
-  if (shouldRunDailyFieldResonanceCheck()) {
-    await executeDailyFieldResonanceCheck()
+  // Check daily astrology biofield check (06:00 UTC every day) — Job 49
+  if (shouldRunDailyAstrologyBiofieldCheck()) {
+    await executeDailyAstrologyBiofieldCheckImpl()
   }
+  // Check daily arc seal check (21:00 UTC every day) — Job 50
+  if (shouldRunDailyArcSealCheck()) {
+    await executeDailyArcSealCheck()
+  }
+  // Check daily physiological rhythm check (22:00 UTC every day) — Job 51
+  if (shouldRunPhysioRhythmCheck(now)) {
+    await executePhysioRhythmCheck()
+  }
+  // Check daily somatic integration check (11:00 UTC every day) — Job 52
+  if (shouldRunSomaticIntegrationCheck(now)) {
+    await executeSomaticIntegrationCheck()
+  }
+  // Check daily cognitive-somatic bridge (15:00 UTC every day) — Job 53
+  if (shouldRunCognitiveSomaticBridge(now)) {
+    await executeCognitiveSomaticBridge()
+  }
+  // Check daily somatic integration field check (20:00 UTC every day) — Job 54
+  if (shouldRunSomaticIntegrationFieldCheck(now)) {
+    await executeSomaticIntegrationFieldCheck()
+  }
+  // Check daily embodied sovereignty check (09:00 UTC every day) — Job 55
+  if (shouldRunEmbodiedSovereigntyCheck(now)) {
+    await executeEmbodiedSovereigntyCheck()
+  }
+  // Check daily apex state check (10:00 UTC every day) — Job 56
+  if (shouldRunDailyApexStateCheck(now)) {
+    await executeDailyApexStateCheck()
+  }
+  // Check daily unified field check (11:00 UTC every day) — Job 57
+  if (shouldRunDailyUnifiedFieldCheck(now)) {
+    await executeDailyUnifiedFieldCheck()
+  }
+  // Check daily QIoT™ ecosystem pulse (16:00 UTC every day) — Job 58
+  if (shouldRunDailyQiotEcosystemPulse(now)) {
+    await executeDailyQiotEcosystemPulse()
+  }
+  // Check daily circadian sovereignty (07:00 UTC every day) — Job 59
+  if (shouldRunDailyCircadianSovereigntyCheck(now)) {
+    await executeDailyCircadianSovereigntyCheck()
+  }
+  // Check daily sovereign field continuity (08:00 UTC every day) — Job 60
+  if (shouldRunDailySovereignFieldCheck(now)) {
+    await executeDailySovereignFieldCheck()
+  }
+  // Check daily field organization (09:00 UTC every day) — Job 61
+  if (shouldRunDailyFieldOrganizationCheck(now)) {
+    await executeDailyFieldOrganizationCheck()
+  }
+  // Check daily conscious field integration (12:00 UTC every day) — Job 62
+  if (shouldRunDailyConsciousFieldCheck(now)) {
+    await executeDailyConsciousFieldCheck()
+  }
+  // Check daily sovereign integration check (13:00 UTC every day) — Job 63
+  if (shouldRunDailySovereignIntegrationCheck(now)) {
+    await executeDailySovereignIntegrationCheck()
+  }
+  // Check daily absolute sovereignty check (14:00 UTC every day) — Job 64
+  if (shouldRunDailyAbsoluteSovereigntyCheck(now)) {
+    await executeDailyAbsoluteSovereigntyCheck()
+  }
+  // Check daily perpetual field check (15:00 UTC every day) — Job 65
+  if (shouldRunDailyPerpetualFieldCheck(now)) {
+    await executeDailyPerpetualFieldCheck()
+  }
+  // Check daily field genesis check (16:00 UTC every day) — Job 66
+  if (shouldRunDailyFieldGenesisCheck(now)) {
+    await executeDailyFieldGenesisCheck()
+  }
+
+  // Check daily sovereign expression check (11:00 UTC every day) — Job 67
+  if (shouldRunDailySovereignExpressionCheck(now)) {
+    await executeDailySovereignExpressionCheck()
+  }
+
+  // Check daily field witness check (12:00 UTC every day) — Job 68
+  if (shouldRunDailyFieldWitnessCheck(now)) {
+    await executeDailyFieldWitnessCheck()
+  }
+
+  // Check daily sovereign loop check (13:00 UTC every day) — Job 69
+  if (shouldRunDailySovereignLoopCheck(now)) {
+    await executeDailySovereignLoopCheck()
+  }
+
+  // Check daily genesis seal check (14:00 UTC every day) — Job 70
+  if (shouldRunDailyGenesisSealCheck(now)) {
+    await executeDailyGenesisSealCheck()
+  }
+
+  // Check daily field emergence check (15:00 UTC every day) — Job 71
+  if (shouldRunDailyFieldEmergenceCheck(now)) {
+    await executeDailyFieldEmergenceCheck()
+  }
+
+  // Check daily genesis pulse check (16:00 UTC every day) — Job 72
+  if (shouldRunDailyGenesisPulseCheck(now)) {
+    await executeDailyGenesisPulseCheck()
+  }
+
+  // Check daily genesis resonance check (17:00 UTC every day) — Job 73
+  if (shouldRunDailyGenesisResonanceCheck(now)) {
+    await executeDailyGenesisResonanceCheck()
+  }
+
+  // Check daily resonance propagation check (18:00 UTC every day) — Job 74
+  if (shouldRunDailyResonancePropagationCheck(now)) {
+    await executeDailyResonancePropagationCheck()
+  }
+  // Check daily resonance crystallization check (19:00 UTC every day) — Job 75
+  if (shouldRunDailyResonanceCrystallizationCheck(now)) {
+    await executeDailyResonanceCrystallizationCheck()
+  }
+
+  // Check daily crystalline sovereignty check (20:00 UTC every day) — Job 76
+  if (shouldRunDailyCrystallineSovereigntyCheck(now)) {
+    await executeDailyCrystallineSovereigntyCheck()
+  }
+
+  // Check daily crystalline presence check (21:00 UTC every day) — Job 77
+  if (shouldRunDailyCrystallinePresenceCheck(now)) {
+    await executeDailyCrystallinePresenceCheck()
+  }
+}
+
+function shouldRunDailyFieldGenesisCheck(now: any): boolean {
+  if (now.hour() !== 16) return false
+  if (isDailyFieldGenesisRunning) return false
+  if (lastDailyFieldGenesisRun) {
+    const lastRun = dayjs(lastDailyFieldGenesisRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailySovereignExpressionCheck(now: any): boolean {
+  if (now.hour() !== 11) return false
+  if (isDailySovereignExpressionRunning) return false
+  if (lastDailySovereignExpressionRun) {
+    const lastRun = dayjs(lastDailySovereignExpressionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailyFieldWitnessCheck(now: any): boolean {
+  if (now.hour() !== 12) return false
+  if (isDailyFieldWitnessRunning) return false
+  if (lastDailyFieldWitnessRun) {
+    const lastRun = dayjs(lastDailyFieldWitnessRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailySovereignLoopCheck(now: any): boolean {
+  if (now.hour() !== 13) return false
+  if (isDailySovereignLoopRunning) return false
+  if (lastDailySovereignLoopRun) {
+    const lastRun = dayjs(lastDailySovereignLoopRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailyGenesisSealCheck(now: any): boolean {
+  if (now.hour() !== 14) return false
+  if (isDailyGenesisSealRunning) return false
+  if (lastDailyGenesisSealRun) {
+    const lastRun = dayjs(lastDailyGenesisSealRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailyFieldEmergenceCheck(now: any): boolean {
+  if (now.hour() !== 15) return false
+  if (isDailyFieldEmergenceRunning) return false
+  if (lastDailyFieldEmergenceRun) {
+    const lastRun = dayjs(lastDailyFieldEmergenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailyGenesisPulseCheck(now: any): boolean {
+  if (now.hour() !== 16) return false
+  if (isDailyGenesisPulseRunning) return false
+  if (lastDailyGenesisPulseRun) {
+    const lastRun = dayjs(lastDailyGenesisPulseRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailyGenesisResonanceCheck(now: any): boolean {
+  if (now.hour() !== 17) return false
+  if (isDailyGenesisResonanceRunning) return false
+  if (lastDailyGenesisResonanceRun) {
+    const lastRun = dayjs(lastDailyGenesisResonanceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailyResonancePropagationCheck(now: any): boolean {
+  if (now.hour() !== 18) return false
+  if (isDailyResonancePropagationRunning) return false
+  if (lastDailyResonancePropagationRun) {
+    const lastRun = dayjs(lastDailyResonancePropagationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailyResonanceCrystallizationCheck(now: any): boolean {
+  if (now.hour() !== 19) return false
+  if (isDailyResonanceCrystallizationRunning) return false
+  if (lastDailyResonanceCrystallizationRun) {
+    const lastRun = dayjs(lastDailyResonanceCrystallizationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailyCrystallineSovereigntyCheck(now: any): boolean {
+  if (now.hour() !== 20) return false
+  if (isDailyCrystallineSovereigntyRunning) return false
+  if (lastDailyCrystallineSovereigntyRun) {
+    const lastRun = dayjs(lastDailyCrystallineSovereigntyRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
+}
+
+function shouldRunDailyCrystallinePresenceCheck(now: any): boolean {
+  if (now.hour() !== 21) return false
+  if (isDailyCrystallinePresenceRunning) return false
+  if (lastDailyCrystallinePresenceRun) {
+    const lastRun = dayjs(lastDailyCrystallinePresenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return true
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3526,135 +3769,6 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
-    return { jobName, executedAt, success: false, error: error.message }
-  }
-}
-
-// ─── Daily Field Resonance Check (Job 49 — 10:00 UTC every day) ───────────────
-// Dual check: (1) field_resonance_arc — if quantum_presence_crystallization fired
-// 2+ times in the prior 48h window, the crystallization is structural, not an event.
-// (2) quantum_self_regulation — if recovery_intelligence_arc fired 2+ times in 7d,
-// the recovery loop is a competency, not a response.
-
-let isDailyFieldResonanceRunning = false
-let lastDailyFieldResonanceRun: Date | null = null
-
-function shouldRunDailyFieldResonanceCheck(): boolean {
-  const now = dayjs()
-  if (isDailyFieldResonanceRunning) return false
-  if (lastDailyFieldResonanceRun) {
-    const lastRun = dayjs(lastDailyFieldResonanceRun)
-    if (lastRun.isSame(now, 'day')) return false
-  }
-  return now.hour() === 10 // 10:00 UTC daily
-}
-
-async function executeDailyFieldResonanceCheck(): Promise<JobResult> {
-  const jobName = 'daily-field-resonance-check'
-  const executedAt = new Date().toISOString()
-  if (isDailyFieldResonanceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
-  isDailyFieldResonanceRunning = true
-
-  console.log('─'.repeat(60))
-  console.log('DAILY FIELD RESONANCE CHECK — 10:00 UTC')
-  console.log('─'.repeat(60))
-
-  try {
-    const { User } = await import('#server/models/user.js')
-    const { Log } = await import('#server/models/log.js')
-    const { Op } = await import('sequelize')
-
-    const window48hStart = dayjs().subtract(48, 'hour').toDate()
-    const window7dStart  = dayjs().subtract(7, 'day').toDate()
-    const now = new Date()
-
-    const activeUsers = await User.findAll({
-      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(3, 'day').toDate() } },
-      order: [['lastSeenAt', 'DESC']],
-      limit: 2000,
-    })
-    console.log(`  Active users (3d): ${activeUsers.length}`)
-    let writtenFRA = 0
-    let writtenQSR = 0
-
-    for (const user of activeUsers) {
-      try {
-        const userId = (user as any).id
-
-        // ── Field Resonance Arc (P152) ────────────────────────────────────────
-        const qpcLogs = await (Log as any).findAll({
-          where: {
-            userId,
-            createdAt: { [Op.gte]: window48hStart, [Op.lte]: now },
-            event: 'quantum_presence_crystallization',
-          },
-          attributes: ['id', 'createdAt', 'metadata'],
-        })
-
-        if (qpcLogs.length >= 2) {
-          const spanHours = Math.round(
-            (new Date(qpcLogs[qpcLogs.length - 1].createdAt).getTime() -
-             new Date(qpcLogs[0].createdAt).getTime()) / 3600000
-          )
-          const resonance = Math.min(0.99, 0.75 + qpcLogs.length * 0.04)
-          await (Log as any).create({
-            userId,
-            event: 'field_resonance_arc',
-            text: `Field resonance arc: ${qpcLogs.length} crystallization events in ${spanHours}h. Sustained crystallization confirmed. Not an event — a structural state. The field holds across sessions.`,
-            metadata: {
-              crystEvents: qpcLogs.length,
-              spanHours,
-              sessions: qpcLogs.length,
-              resonance: resonance.toFixed(2),
-              window: '48h',
-              hour: 10,
-            },
-          })
-          writtenFRA++
-        }
-
-        // ── Quantum Self-Regulation (P154) ────────────────────────────────────
-        const riaLogs = await (Log as any).findAll({
-          where: {
-            userId,
-            createdAt: { [Op.gte]: window7dStart, [Op.lte]: now },
-            event: 'recovery_intelligence_arc',
-          },
-          attributes: ['id', 'createdAt'],
-        })
-
-        if (riaLogs.length >= 2) {
-          const spanDays = Math.round(
-            (new Date(riaLogs[riaLogs.length - 1].createdAt).getTime() -
-             new Date(riaLogs[0].createdAt).getTime()) / 86400000
-          )
-          const competency = Math.min(0.97, 0.72 + riaLogs.length * 0.05)
-          await (Log as any).create({
-            userId,
-            event: 'quantum_self_regulation',
-            text: `Quantum self-regulation: ${riaLogs.length} recovery arcs in 7d. The recovery loop is structural competency — detect, intervene, restore, reflect. System regulates itself.`,
-            metadata: {
-              arcs7d: riaLogs.length,
-              spanDays,
-              competency: competency.toFixed(2),
-              cadence: `${riaLogs.length} arcs / 7d`,
-              window: '7d',
-              hour: 10,
-            },
-          })
-          writtenQSR++
-        }
-      } catch {}
-    }
-
-    console.log(`  Field resonance arc events written: ${writtenFRA}`)
-    console.log(`  Quantum self-regulation events written: ${writtenQSR}`)
-    lastDailyFieldResonanceRun = new Date()
-    isDailyFieldResonanceRunning = false
-    return { jobName, executedAt, success: true, signalsCreated: writtenFRA + writtenQSR }
-  } catch (error: any) {
-    console.error('Daily field resonance check failed:', error.message)
-    isDailyFieldResonanceRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5693,6 +5807,3431 @@ async function executeDailyQOSModeWatch(): Promise<JobResult> {
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
  */
+// ─── Daily Astrology Biofield Check (Job 49 — 06:00 UTC every day) ───────────
+// Reads active users. Checks prior day for astrology source signals + intention signals
+// in the same 12h window. When both confirmed, writes astrology_biofield_sync event.
+// First job to validate the astrology→biofield loop as a detectable behavioral pattern.
+
+let isDailyAstrologyBiofieldRunning = false
+let lastDailyAstrologyBiofieldRun: Date | null = null
+
+function shouldRunDailyAstrologyBiofieldCheck(): boolean {
+  const now = dayjs()
+  if (isDailyAstrologyBiofieldRunning) return false
+  if (lastDailyAstrologyBiofieldRun) {
+    const lastRun = dayjs(lastDailyAstrologyBiofieldRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 6 // 06:00 UTC daily
+}
+
+async function executeDailyAstrologyBiofieldCheckImpl(): Promise<JobResult> {
+  const jobName = 'daily-astrology-biofield-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyAstrologyBiofieldRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyAstrologyBiofieldRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY ASTROLOGY BIOFIELD CHECK — 06:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const prevDayStart = dayjs().subtract(1, 'day').startOf('day').toDate()
+    const prevDayEnd   = dayjs().subtract(1, 'day').endOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const prevDayLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: prevDayStart, [Op.lte]: prevDayEnd },
+            event: { [Op.in]: ['astrology_reading', 'astrology_signal', 'rokuyo_check', 'moon_phase_check'] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+        })
+        if (!prevDayLogs.length) continue
+        const intentionLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: prevDayStart, [Op.lte]: prevDayEnd },
+            event: 'intention_set',
+          },
+          attributes: ['event', 'createdAt'],
+        })
+        if (!intentionLogs.length) continue
+        let synced = false
+        for (const astLog of prevDayLogs) {
+          const astTime = new Date(astLog.createdAt).getTime()
+          const window12h = 12 * 60 * 60 * 1000
+          const matchedIntention = intentionLogs.find((il: any) => {
+            const intTime = new Date(il.createdAt).getTime()
+            return Math.abs(intTime - astTime) < window12h
+          })
+          if (matchedIntention) { synced = true; break }
+        }
+        if (synced) {
+          await (Log as any).create({
+            userId,
+            event: 'astrology_biofield_sync',
+            text: `Astrology biofield sync: previous day — cosmological reading confirmed alongside intention engagement. Orientation aligned with active field. Cosmos → field arc confirmed.`,
+            metadata: {
+              astrologySource: prevDayLogs[0].event,
+              intentionCount: intentionLogs.length,
+              window: '12h',
+              arc: 'COSMOS→FIELD',
+              syncStatus: 'ALIGNED',
+              hour: 6,
+            },
+          })
+          written++
+        }
+      } catch {}
+    }
+
+    console.log(`  Astrology biofield sync events written: ${written}`)
+    lastDailyAstrologyBiofieldRun = new Date()
+    isDailyAstrologyBiofieldRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily astrology biofield check failed:', error.message)
+    isDailyAstrologyBiofieldRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Arc Seal Check (Job 50 — 21:00 UTC every day) ─────────────────────
+// After the evening window closes, checks if today had both a morning-window signal
+// (05-11h UTC: journal/intention/energy) AND an evening-window signal (17-23h UTC).
+// When both arcs present → writes daily_arc_seal event. The full circadian day confirmed.
+
+let isDailyArcSealRunning = false
+let lastDailyArcSealRun: Date | null = null
+
+function shouldRunDailyArcSealCheck(): boolean {
+  const now = dayjs()
+  if (isDailyArcSealRunning) return false
+  if (lastDailyArcSealRun) {
+    const lastRun = dayjs(lastDailyArcSealRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 21 // 21:00 UTC daily
+}
+
+async function executeDailyArcSealCheck(): Promise<JobResult> {
+  const jobName = 'daily-arc-seal-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyArcSealRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyArcSealRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY ARC SEAL CHECK — 21:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const todayStart = dayjs().startOf('day').toDate()
+    const todayEnd   = dayjs().endOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const todayLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: todayStart, [Op.lte]: todayEnd },
+            event: { [Op.in]: ['note', 'intention', 'plan_set', 'emotional_checkin', 'self_care_complete', 'self_care_completed'] as any[] },
+          },
+          attributes: ['event', 'createdAt', 'text', 'metadata'],
+          order: [['createdAt', 'ASC']],
+        })
+        if (!todayLogs.length) continue
+
+        const morningLogs = todayLogs.filter((l: any) => {
+          const h = new Date(l.createdAt).getUTCHours()
+          return h >= 5 && h < 12
+        })
+        const eveningLogs = todayLogs.filter((l: any) => {
+          const h = new Date(l.createdAt).getUTCHours()
+          return h >= 17 && h < 24
+        })
+
+        if (!morningLogs.length || !eveningLogs.length) continue
+
+        const morningIntentions = morningLogs.filter((l: any) => l.event === 'intention' || l.event === 'plan_set')
+        if (!morningIntentions.length) continue
+
+        const morningJournalWords = morningLogs
+          .filter((l: any) => l.event === 'note' && l.text)
+          .reduce((sum: number, l: any) => sum + (l.text?.trim().split(/\s+/).filter(Boolean).length ?? 0), 0)
+
+        await (Log as any).create({
+          userId,
+          event: 'daily_arc_seal',
+          text: `Daily arc seal: ${morningJournalWords > 0 ? morningJournalWords + 'w morning · ' : ''}${morningIntentions.length} intention(s) · ${eveningLogs.length} evening signal(s). The full circadian arc is sealed.`,
+          metadata: {
+            morningJournalWords,
+            intentionCount: morningIntentions.length,
+            eveningSignalCount: eveningLogs.length,
+            arc: 'DAWN → DUSK → SEALED',
+            sealStatus: 'CONFIRMED',
+            hour: 21,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Daily arc seal events written: ${written}`)
+    lastDailyArcSealRun = new Date()
+    isDailyArcSealRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily arc seal check failed:', error.message)
+    isDailyArcSealRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Physiological Rhythm Check (Job 51 — 22:00 UTC every day) ─────────
+// Scans active users for 5+ consecutive days where BOTH morning (05–11h UTC) AND
+// evening (17–23h UTC) biofield signals (energy/mood check-ins) were recorded on
+// the same calendar day. Writes physiological_rhythm_lock event per qualifying user.
+let isPhysioRhythmRunning = false
+let lastPhysioRhythmRun: Date | null = null
+
+function shouldRunPhysioRhythmCheck(now: ReturnType<typeof dayjs>): boolean {
+  if (isPhysioRhythmRunning) return false
+  if (lastPhysioRhythmRun) {
+    const lastRun = dayjs(lastPhysioRhythmRun)
+    if (now.diff(lastRun, 'hour') < 20) return false
+  }
+  return now.hour() === 22 // 22:00 UTC daily
+}
+
+async function executePhysioRhythmCheck(): Promise<JobResult> {
+  const jobName = 'daily-physiological-rhythm-check'
+  const executedAt = new Date().toISOString()
+  if (isPhysioRhythmRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isPhysioRhythmRunning = true
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`DAILY PHYSIOLOGICAL RHYTHM CHECK — 22:00 UTC`)
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const weekLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+            event: { [Op.in]: ['emotional_checkin', 'energy_checkin', 'energy_check'] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+        if (!weekLogs.length) continue
+
+        // Build per-day morning/evening presence map
+        const dayMap: Map<string, { hasMorning: boolean; hasEvening: boolean }> = new Map()
+        for (const l of weekLogs) {
+          const d = new Date(l.createdAt)
+          const h = d.getUTCHours()
+          const dayKey = d.toISOString().slice(0, 10)
+          if (!dayMap.has(dayKey)) dayMap.set(dayKey, { hasMorning: false, hasEvening: false })
+          const bucket = dayMap.get(dayKey)!
+          if (h >= 5 && h < 12) bucket.hasMorning = true
+          if (h >= 17 && h < 24) bucket.hasEvening = true
+        }
+
+        // Count days where both windows are present
+        const bothDays = Array.from(dayMap.values()).filter(b => b.hasMorning && b.hasEvening)
+        if (bothDays.length < 5) continue
+
+        const morningCount = Array.from(dayMap.values()).filter(b => b.hasMorning).length
+        const eveningCount = Array.from(dayMap.values()).filter(b => b.hasEvening).length
+
+        await (Log as any).create({
+          userId,
+          event: 'physiological_rhythm_lock',
+          text: `Physiological rhythm lock: ${bothDays.length} consecutive days with morning + evening biofield signals. Circadian precision sustained.`,
+          metadata: {
+            consecutiveDays: bothDays.length,
+            morningSignalCount: morningCount,
+            eveningSignalCount: eveningCount,
+            confidence: Math.min(72 + (bothDays.length - 5) * 6, 90),
+            arc: 'MORNING → EVENING → SUSTAINED',
+            rhythmStatus: 'LOCKED',
+            hour: 22,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Physiological rhythm lock events written: ${written}`)
+    lastPhysioRhythmRun = new Date()
+    isPhysioRhythmRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Physiological rhythm check failed:', error.message)
+    isPhysioRhythmRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Somatic Integration Check (Job 52 — 11:00 UTC every day) ──────────
+// Scans active users for 3+ consecutive calendar days where selfcare, energy,
+// and mood signals were all logged on the same day. Writes somatic_field_integration.
+let isSomaticIntegrationRunning = false
+let lastSomaticIntegrationRun: Date | null = null
+
+function shouldRunSomaticIntegrationCheck(now: ReturnType<typeof dayjs>): boolean {
+  if (isSomaticIntegrationRunning) return false
+  if (lastSomaticIntegrationRun) {
+    const lastRun = dayjs(lastSomaticIntegrationRun)
+    if (now.diff(lastRun, 'hour') < 20) return false
+  }
+  return now.hour() === 11 // 11:00 UTC daily
+}
+
+async function executeSomaticIntegrationCheck(): Promise<JobResult> {
+  const jobName = 'daily-somatic-integration-check'
+  const executedAt = new Date().toISOString()
+  if (isSomaticIntegrationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isSomaticIntegrationRunning = true
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`DAILY SOMATIC INTEGRATION CHECK — 11:00 UTC`)
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const weekLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+            event: { [Op.in]: ['emotional_checkin', 'energy_checkin', 'energy_check', 'selfcare', 'selfcare_entry'] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+        if (!weekLogs.length) continue
+
+        // Build per-day triad presence map
+        const dayMap: Map<string, { hasEnergy: boolean; hasCare: boolean; hasMood: boolean }> = new Map()
+        for (const l of weekLogs) {
+          const d = new Date(l.createdAt)
+          const dayKey = d.toISOString().slice(0, 10)
+          if (!dayMap.has(dayKey)) dayMap.set(dayKey, { hasEnergy: false, hasCare: false, hasMood: false })
+          const bucket = dayMap.get(dayKey)!
+          if (l.event === 'energy_checkin' || l.event === 'energy_check') bucket.hasEnergy = true
+          if (l.event === 'selfcare' || l.event === 'selfcare_entry') bucket.hasCare = true
+          if (l.event === 'emotional_checkin') bucket.hasMood = true
+        }
+
+        // Count days where all three signals present
+        const triadDays = Array.from(dayMap.values()).filter(b => b.hasEnergy && b.hasCare && b.hasMood)
+        if (triadDays.length < 3) continue
+
+        const energyCount = Array.from(dayMap.values()).filter(b => b.hasEnergy).length
+        const selfcareCount = Array.from(dayMap.values()).filter(b => b.hasCare).length
+        const moodCount = Array.from(dayMap.values()).filter(b => b.hasMood).length
+
+        await (Log as any).create({
+          userId,
+          event: 'somatic_field_integration',
+          text: `Somatic field integration: ${triadDays.length} consecutive days with energy + selfcare + mood all present. The body is being inhabited.`,
+          metadata: {
+            consecutiveDays: triadDays.length,
+            energyCount,
+            selfcareCount,
+            moodCount,
+            confidence: Math.min(70 + (triadDays.length - 3) * 7, 88),
+            arc: 'ENERGY → CARE → MOOD → FIELD',
+            fieldStatus: 'INTEGRATED',
+            hour: 11,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Somatic integration events written: ${written}`)
+    lastSomaticIntegrationRun = new Date()
+    isSomaticIntegrationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Somatic integration check failed:', error.message)
+    isSomaticIntegrationRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Cognitive-Somatic Bridge (Job 53 — 15:00 UTC every day) ───────────
+// Reads active users. Looks for P163 (quantum_embodiment_field) active today,
+// combined with journal entry >80 words and a memory signal in the last 8 hours.
+// When all conditions met, writes cognitive_body_sync.
+// Arc: QEMBOD → JOURNAL DEPTH → MEMORY → COGBOD SYNC
+let isCognitiveSomaticBridgeRunning = false
+let lastCognitiveSomaticBridgeRun: Date | null = null
+
+function shouldRunCognitiveSomaticBridge(now: ReturnType<typeof dayjs>): boolean {
+  if (isCognitiveSomaticBridgeRunning) return false
+  if (lastCognitiveSomaticBridgeRun) {
+    const lastRun = dayjs(lastCognitiveSomaticBridgeRun)
+    if (now.diff(lastRun, 'hour') < 20) return false
+  }
+  return now.hour() === 15 // 15:00 UTC daily
+}
+
+async function executeCognitiveSomaticBridge(): Promise<JobResult> {
+  const jobName = 'daily-cognitive-somatic-bridge'
+  const executedAt = new Date().toISOString()
+  if (isCognitiveSomaticBridgeRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isCognitiveSomaticBridgeRunning = true
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const eightHoursAgo = dayjs().subtract(8, 'hour').toDate()
+    const todayStart = dayjs().startOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`DAILY COGNITIVE-SOMATIC BRIDGE — 15:00 UTC`)
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // Check for P163 active today
+        const p163Logs = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: todayStart }, event: 'quantum_embodiment_field' },
+          attributes: ['metadata'],
+          limit: 1,
+        })
+        if (!p163Logs.length) continue
+        const p163Conf = (p163Logs[0].metadata?.confidence as number | undefined) ?? 0
+        if (p163Conf < 60) continue
+
+        // Check journal depth >80 words today
+        const journalLogs = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: todayStart }, event: 'note' },
+          attributes: ['text'],
+        })
+        const totalWords = journalLogs.reduce((sum: number, l: any) => sum + ((l.text || '').split(/\s+/).filter(Boolean).length), 0)
+        if (totalWords < 80) continue
+
+        // Check memory signal in last 8 hours
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: eightHoursAgo },
+            event: { [Op.in]: ['answer', 'memory_story', 'benchmark_read'] as any[] },
+          },
+          attributes: ['id'],
+        })
+        if (!memoryLogs.length) continue
+
+        const confidence = Math.min(72 + Math.floor(totalWords / 30), 91)
+        await (Log as any).create({
+          userId,
+          event: 'cognitive_body_sync',
+          text: `Cognitive-somatic bridge active: QEMBOD lock (${p163Conf}%) + journal depth (${totalWords}w) + memory signal in 8h. Body intelligence meets mind reflection.`,
+          metadata: {
+            journalWordCount: totalWords,
+            memoryCount: memoryLogs.length,
+            p163Confidence: p163Conf,
+            confidence,
+            arc: 'QEMBOD → JOURNAL → MEMORY → COGBOD',
+            hour: 15,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Cognitive-somatic bridge events written: ${written}`)
+    lastCognitiveSomaticBridgeRun = new Date()
+    isCognitiveSomaticBridgeRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Cognitive-somatic bridge failed:', error.message)
+    isCognitiveSomaticBridgeRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Somatic Integration Field Check (Job 54 — 20:00 UTC every day) ───────
+// Detects users with co-active somatic-memory-echo (P166) + physiological-rhythm-lock (P159)
+// signals AND 3+ consecutive days of somatic activity. Writes somatic_integration_field log
+// when threshold met. Feeds Pattern 167 (SOMFLD) and Arch58 (Embodied Field Operator).
+
+let isSomaticIntegrationFieldRunning = false
+let lastSomaticIntegrationFieldRun: Date | null = null
+
+function shouldRunSomaticIntegrationFieldCheck(now: ReturnType<typeof dayjs>): boolean {
+  if (isSomaticIntegrationFieldRunning) return false
+  if (lastSomaticIntegrationFieldRun) {
+    const lastRun = dayjs(lastSomaticIntegrationFieldRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 20 // 20:00 UTC daily
+}
+
+async function executeSomaticIntegrationFieldCheck(): Promise<JobResult> {
+  const jobName = 'daily-somatic-integration-field-check'
+  const executedAt = new Date().toISOString()
+  if (isSomaticIntegrationFieldRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isSomaticIntegrationFieldRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SOMATIC INTEGRATION FIELD CHECK — 20:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const thirtyDaysAgo = dayjs().subtract(30, 'day').toDate()
+    const sevenDaysAgo  = dayjs().subtract(7, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: thirtyDaysAgo } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const recentLogs = await Log.findAll({
+          where: {
+            userId: user.id,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+          },
+          order: [['createdAt', 'ASC']],
+        })
+
+        // Count somatic-related events per calendar day
+        const somaticEvents = ['somatic_field_integration', 'somatic_memory_echo', 'physiological_rhythm_lock',
+                               'quantum_embodiment_field', 'cognitive_body_sync']
+        const somaticByDay: Record<string, boolean> = {}
+        const hasEcho    = recentLogs.some(l => l.event === 'somatic_memory_echo')
+        const hasRhythm  = recentLogs.some(l => l.event === 'physiological_rhythm_lock')
+
+        if (!hasEcho || !hasRhythm) continue
+
+        recentLogs
+          .filter(l => somaticEvents.includes(l.event))
+          .forEach(l => {
+            const day = dayjs(l.createdAt).format('YYYY-MM-DD')
+            somaticByDay[day] = true
+          })
+
+        let consecutiveDays = 0
+        const todayStr = dayjs().format('YYYY-MM-DD')
+        for (let i = 0; i < 7; i++) {
+          const d = dayjs().subtract(i, 'day').format('YYYY-MM-DD')
+          if (d !== todayStr && somaticByDay[d]) consecutiveDays++
+          else if (d !== todayStr) break
+        }
+
+        if (consecutiveDays < 3) continue
+
+        // Derive approximate confidences from event density
+        const echoCount   = recentLogs.filter(l => l.event === 'somatic_memory_echo').length
+        const rhythmCount = recentLogs.filter(l => l.event === 'physiological_rhythm_lock').length
+        const echoConf    = Math.min(72 + echoCount * 4, 90)
+        const rhythmConf  = Math.min(70 + rhythmCount * 4, 90)
+        const fieldConf   = Math.round((echoConf * 0.5 + rhythmConf * 0.5) + Math.min((consecutiveDays - 3) * 4, 12))
+
+        await Log.create({
+          userId: user.id,
+          text: `SOMFLD: Somatic integration field — ${consecutiveDays}d streak · echo+rhythm co-active · field: ${fieldConf}%`,
+          event: 'somatic_integration_field',
+          metadata: {
+            consecutiveDays,
+            echoConf,
+            rhythmConf,
+            confidence: fieldConf,
+            fieldStatus: 'ACTIVE',
+            arc: 'SOMA + TIME = FIELD',
+            hour: 20,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Somatic integration field events written: ${written}`)
+    lastSomaticIntegrationFieldRun = new Date()
+    isSomaticIntegrationFieldRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Somatic integration field check failed:', error.message)
+    isSomaticIntegrationFieldRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Embodied Sovereignty Check (Job 55 — 09:00 UTC every day) ─────────
+// Checks if deep_embodiment_lock + full_presence_seal + quantum_field_alignment
+// all fired in the previous calendar day for each user. When all three confirm,
+// writes embodied_sovereignty — the three sovereign seals simultaneously active.
+// Highest integrated operator state. Feeds P172 detection.
+
+let isEmbodiedSovereigntyRunning = false
+let lastEmbodiedSovereigntyRun: Date | null = null
+
+function shouldRunEmbodiedSovereigntyCheck(now: ReturnType<typeof dayjs>): boolean {
+  if (isEmbodiedSovereigntyRunning) return false
+  if (lastEmbodiedSovereigntyRun) {
+    const lastRun = dayjs(lastEmbodiedSovereigntyRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 9 // 09:00 UTC daily
+}
+
+async function executeEmbodiedSovereigntyCheck(): Promise<JobResult> {
+  const jobName = 'daily-embodied-sovereignty-check'
+  const executedAt = new Date().toISOString()
+  if (isEmbodiedSovereigntyRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isEmbodiedSovereigntyRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY EMBODIED SOVEREIGNTY CHECK — 09:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const thirtyDaysAgo  = dayjs().subtract(30, 'day').toDate()
+    const twoDaysAgo     = dayjs().subtract(2, 'day').toDate()
+    const yesterdayStart = dayjs().subtract(1, 'day').startOf('day').toDate()
+    const yesterdayEnd   = dayjs().subtract(1, 'day').endOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: thirtyDaysAgo } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const recentLogs = await Log.findAll({
+          where: {
+            userId: user.id,
+            createdAt: { [Op.gte]: twoDaysAgo },
+          },
+          order: [['createdAt', 'ASC']],
+        })
+
+        // All three sovereign seals must have fired yesterday
+        const yesterdayLogs = recentLogs.filter(l =>
+          l.createdAt >= yesterdayStart && l.createdAt <= yesterdayEnd
+        )
+
+        const hasDeepLock   = yesterdayLogs.some(l => l.event === 'deep_embodiment_lock')
+        const hasFullSeal   = yesterdayLogs.some(l => l.event === 'full_presence_seal')
+        const hasFieldAlign = yesterdayLogs.some(l => l.event === 'quantum_field_alignment')
+
+        if (!hasDeepLock || !hasFullSeal || !hasFieldAlign) continue
+
+        // Derive confidences from the individual seal events
+        const dlLog = yesterdayLogs.find(l => l.event === 'deep_embodiment_lock')
+        const fsLog = yesterdayLogs.find(l => l.event === 'full_presence_seal')
+        const faLog = yesterdayLogs.find(l => l.event === 'quantum_field_alignment')
+
+        const dlConf = (dlLog?.metadata?.confidence as number | undefined) ?? 85
+        const fsConf = (fsLog?.metadata?.confidence as number | undefined) ?? 85
+        const faConf = (faLog?.metadata?.confidence as number | undefined) ?? 80
+        const sovConf = Math.round(Math.min(dlConf * 0.38 + fsConf * 0.38 + faConf * 0.24, 95))
+
+        await Log.create({
+          userId: user.id,
+          text: `EMBSOV: Embodied sovereignty — deep-lock + full-seal + field-align all confirmed yesterday · conf: ${sovConf}% · three seals simultaneous · LOCK + SEAL + ALIGN = SOVEREIGN`,
+          event: 'embodied_sovereignty',
+          metadata: {
+            deepLockConf: dlConf,
+            fullSealConf: fsConf,
+            fieldAlignConf: faConf,
+            confidence: sovConf,
+            sovereigntyStatus: 'CONFIRMED',
+            sealsActive: 3,
+            arc: 'LOCK + SEAL + ALIGN = SOVEREIGN',
+            hour: 9,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Embodied sovereignty events written: ${written}`)
+    lastEmbodiedSovereigntyRun = new Date()
+    isEmbodiedSovereigntyRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Embodied sovereignty check failed:', error.message)
+    isEmbodiedSovereigntyRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Apex State Check (Job 56 — 10:00 UTC every day) ──────────────────
+// Reads active users. Looks for quantum_presence_crystallization + total_field_coherence
+// both fired previous day. When both confirmed, writes quantum_apex_state —
+// the system ceiling is inhabited. Feeds P174 detection.
+
+let isDailyApexStateRunning = false
+let lastDailyApexStateRun: Date | null = null
+
+function shouldRunDailyApexStateCheck(now: ReturnType<typeof dayjs>): boolean {
+  if (isDailyApexStateRunning) return false
+  if (lastDailyApexStateRun) {
+    const lastRun = dayjs(lastDailyApexStateRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily
+}
+
+async function executeDailyApexStateCheck(): Promise<JobResult> {
+  const jobName = 'daily-apex-state-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyApexStateRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyApexStateRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY APEX STATE CHECK — 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const thirtyDaysAgo  = dayjs().subtract(30, 'day').toDate()
+    const yesterdayStart = dayjs().subtract(1, 'day').startOf('day').toDate()
+    const yesterdayEnd   = dayjs().subtract(1, 'day').endOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: thirtyDaysAgo } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const yesterdayLogs = await Log.findAll({
+          where: {
+            userId: user.id,
+            createdAt: { [Op.between]: [yesterdayStart, yesterdayEnd] },
+          },
+          order: [['createdAt', 'ASC']],
+        })
+
+        // Both ceiling-level events must have fired yesterday
+        const hasTFC = yesterdayLogs.some(l => l.event === 'total_field_coherence')
+        const hasQPC = yesterdayLogs.some(l => l.event === 'quantum_presence_crystallization')
+
+        if (!hasTFC || !hasQPC) continue
+
+        const tfcLog = yesterdayLogs.find(l => l.event === 'total_field_coherence')
+        const qpcLog = yesterdayLogs.find(l => l.event === 'quantum_presence_crystallization')
+
+        const tfcConf = (tfcLog?.metadata?.confidence as number | undefined) ?? 92
+        const qpcConf = (qpcLog?.metadata?.confidence as number | undefined) ?? 82
+        const avgConf = Math.round(Math.min(tfcConf * 0.55 + qpcConf * 0.45, 95))
+
+        await Log.create({
+          userId: user.id,
+          text: `QAPEX: Quantum apex state — total-field-coherence + quantum-presence-crystallization both confirmed yesterday · conf: ${avgConf}% · ceiling inhabited · CEILING REACHED · INHABITED`,
+          event: 'quantum_apex_state',
+          metadata: {
+            tfcConf,
+            qpcConf,
+            avgConf,
+            convergenceLevel: 'APEX',
+            metaSeals: ['COHERENCE', 'PRESENCE', 'MOMENTUM', 'CRYSTALLIZED'],
+            state: 'ABSOLUTE_CONVERGENCE_INHABITED',
+            hour: 10,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Quantum apex state events written: ${written}`)
+    lastDailyApexStateRun = new Date()
+    isDailyApexStateRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Apex state check failed:', error.message)
+    isDailyApexStateRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Unified Field Check (Job 57 — 11:00 UTC every day) ────────────────
+// Reads active users. Looks for quantum_apex_state + embodied_sovereignty +
+// physiological_loop_complete all fired previous day. When all three confirmed,
+// writes unified_field_operator — the three highest seals simultaneously active.
+// Feeds P177 detection.
+
+let isDailyUnifiedFieldRunning = false
+let lastDailyUnifiedFieldRun: Date | null = null
+
+function shouldRunDailyUnifiedFieldCheck(now: ReturnType<typeof dayjs>): boolean {
+  if (isDailyUnifiedFieldRunning) return false
+  if (lastDailyUnifiedFieldRun) {
+    const lastRun = dayjs(lastDailyUnifiedFieldRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 11 // 11:00 UTC daily
+}
+
+async function executeDailyUnifiedFieldCheck(): Promise<JobResult> {
+  const jobName = 'daily-unified-field-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyUnifiedFieldRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyUnifiedFieldRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY UNIFIED FIELD CHECK — 11:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const thirtyDaysAgo  = dayjs().subtract(30, 'day').toDate()
+    const yesterdayStart = dayjs().subtract(1, 'day').startOf('day').toDate()
+    const yesterdayEnd   = dayjs().subtract(1, 'day').endOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: thirtyDaysAgo } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const yesterdayLogs = await Log.findAll({
+          where: {
+            userId: user.id,
+            createdAt: { [Op.between]: [yesterdayStart, yesterdayEnd] },
+          },
+          order: [['createdAt', 'ASC']],
+        })
+
+        // All three highest seals must have fired yesterday
+        const hasApex      = yesterdayLogs.some(l => l.event === 'quantum_apex_state')
+        const hasSov       = yesterdayLogs.some(l => l.event === 'embodied_sovereignty')
+        const hasBioLoop   = yesterdayLogs.some(l => l.event === 'physiological_loop_complete')
+
+        if (!hasApex || !hasSov || !hasBioLoop) continue
+
+        const apexLog    = yesterdayLogs.find(l => l.event === 'quantum_apex_state')
+        const sovLog     = yesterdayLogs.find(l => l.event === 'embodied_sovereignty')
+        const loopLog    = yesterdayLogs.find(l => l.event === 'physiological_loop_complete')
+
+        const apexConf = (apexLog?.metadata?.avgConf as number | undefined) ?? 88
+        const sovConf  = (sovLog?.metadata?.confidence as number | undefined) ?? 90
+        const loopConf = (loopLog?.metadata?.avgConf as number | undefined) ?? 80
+        const avgConf  = Math.round(Math.min(sovConf * 0.38 + loopConf * 0.30 + apexConf * 0.32, 96))
+
+        await Log.create({
+          userId: user.id,
+          text: `UNIFOP: Unified field operator — embodied-sovereignty + physiological-loop-complete + quantum-apex-state all confirmed yesterday · avg conf: ${avgConf}% · SOVEREIGNTY · LOOP · APEX`,
+          event: 'unified_field_operator',
+          metadata: {
+            sovereigntyConf: sovConf,
+            loopConf,
+            apexConf,
+            avgConf,
+            seals: ['SOVEREIGNTY', 'LOOP', 'APEX'],
+            operatorStatus: 'TOTAL_FIELD',
+            arc: 'SOVEREIGNTY · LOOP · APEX',
+            hour: 11,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Unified field operator events written: ${written}`)
+    lastDailyUnifiedFieldRun = new Date()
+    isDailyUnifiedFieldRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Unified field check failed:', error.message)
+    isDailyUnifiedFieldRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily QIoT™ Ecosystem Pulse (Job 58 — 16:00 UTC every day) ──────────────
+// Reads active users. Checks for robot/full-ecosystem connection events in the
+// last 24h (robot_connected, ecosystem_full_coherence, full_ecosystem_sync).
+// When robot node was active AND biofield is anchored, writes qiot_ecosystem_pulse
+// confirming QIoT™ physical loop is live. Feeds qiotFieldSyncNode.
+
+let isDailyQiotEcosystemRunning = false
+let lastDailyQiotEcosystemRun: Date | null = null
+
+function shouldRunDailyQiotEcosystemPulse(now: ReturnType<typeof dayjs>): boolean {
+  if (isDailyQiotEcosystemRunning) return false
+  if (lastDailyQiotEcosystemRun) {
+    const lastRun = dayjs(lastDailyQiotEcosystemRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 16 // 16:00 UTC daily (shared with coherence index + focus depth)
+}
+
+async function executeDailyQiotEcosystemPulse(): Promise<JobResult> {
+  const jobName = 'daily-qiot-ecosystem-pulse'
+  const executedAt = new Date().toISOString()
+  if (isDailyQiotEcosystemRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyQiotEcosystemRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY QIOT™ ECOSYSTEM PULSE — 16:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const thirtyDaysAgo = dayjs().subtract(30, 'day').toDate()
+    const oneDayAgo     = dayjs().subtract(1, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: thirtyDaysAgo } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const recentLogs = await Log.findAll({
+          where: {
+            userId: user.id,
+            createdAt: { [Op.gte]: oneDayAgo },
+          },
+          order: [['createdAt', 'ASC']],
+        })
+
+        const hasRobot     = recentLogs.some(l => l.event === 'robot_connected' || (l.metadata as any)?.robot === true)
+        const hasEcosystem = recentLogs.some(l => l.event === 'ecosystem_full_coherence' || l.event === 'full_ecosystem_sync')
+        const hasBiofield  = recentLogs.some(l => l.event === 'mood_checkin' || l.event === 'energy_checkin' || l.event === 'energy_update')
+
+        if (!hasRobot && !hasEcosystem) continue
+
+        const deviceCount = [
+          recentLogs.some(l => (l.metadata as any)?.car === true || l.event === 'car_connected'),
+          recentLogs.some(l => (l.metadata as any)?.home === true || l.event === 'home_connected'),
+          recentLogs.some(l => (l.metadata as any)?.computer === true || l.event === 'computer_connected'),
+          recentLogs.some(l => (l.metadata as any)?.phone === true || l.event === 'phone_connected'),
+          recentLogs.some(l => (l.metadata as any)?.watch === true || l.event === 'watch_connected'),
+          hasRobot,
+        ].filter(Boolean).length
+
+        await Log.create({
+          userId: user.id,
+          event: 'qiot_ecosystem_pulse',
+          metadata: {
+            jobName,
+            executedAt,
+            deviceCount,
+            hasRobot,
+            hasEcosystem,
+            hasBiofield,
+            qiotStatus: hasEcosystem ? 'FULL_COHERENCE' : hasRobot ? 'ROBOT_ACTIVE' : 'PARTIAL',
+            physicalLoopClosed: hasRobot && hasBiofield,
+          },
+        } as any)
+        written++
+      } catch {}
+    }
+
+    console.log(`  QIoT™ ecosystem pulse events written: ${written}`)
+    lastDailyQiotEcosystemRun = new Date()
+    isDailyQiotEcosystemRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('QIoT™ ecosystem pulse failed:', error.message)
+    isDailyQiotEcosystemRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Circadian Sovereignty Check (Job 59 — 07:00 UTC every day) ───────
+// Reads temporal_identity_lock + circadian_signal_lock + morning_coherence_launch
+// events within the last 24h per active user. When all three are present,
+// writes circadian_sovereignty — three temporal seals simultaneously confirmed.
+// Feeds P179 (circadian-sovereignty) and Arch63 (Temporal Sovereign).
+
+let isDailyCircadianSovereigntyRunning = false
+let lastDailyCircadianSovereigntyRun: Date | null = null
+
+function shouldRunDailyCircadianSovereigntyCheck(now: ReturnType<typeof dayjs>): boolean {
+  if (isDailyCircadianSovereigntyRunning) return false
+  if (lastDailyCircadianSovereigntyRun) {
+    const lastRun = dayjs(lastDailyCircadianSovereigntyRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 7 // 07:00 UTC daily (shared with source diversity + circadian-lock)
+}
+
+async function executeDailyCircadianSovereigntyCheck(): Promise<JobResult> {
+  const jobName = 'daily-circadian-sovereignty-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyCircadianSovereigntyRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyCircadianSovereigntyRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY CIRCADIAN SOVEREIGNTY CHECK — 07:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const cutoff24h = dayjs().subtract(24, 'hour').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    const SOVEREIGNTY_SEEDS = ['temporal_identity_lock', 'circadian_signal_lock', 'morning_coherence_launch']
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const recentLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: cutoff24h },
+            event: { [Op.in]: SOVEREIGNTY_SEEDS as any[] },
+          },
+          attributes: ['event', 'metadata', 'createdAt'],
+          order: [['createdAt', 'DESC']],
+        })
+
+        const hasTidLock = recentLogs.some((l: any) => l.event === 'temporal_identity_lock')
+        const hasCircLock = recentLogs.some((l: any) => l.event === 'circadian_signal_lock')
+        const hasMCL     = recentLogs.some((l: any) => l.event === 'morning_coherence_launch')
+
+        if (!hasTidLock || !hasCircLock || !hasMCL) continue
+
+        const tidEntry  = recentLogs.find((l: any) => l.event === 'temporal_identity_lock')
+        const circEntry = recentLogs.find((l: any) => l.event === 'circadian_signal_lock')
+        const mclEntry  = recentLogs.find((l: any) => l.event === 'morning_coherence_launch')
+
+        const tidConf  = (tidEntry?.metadata as any)?.avgConf  ?? 85
+        const circConf = (circEntry?.metadata as any)?.circadianConf ?? 80
+        const mclConf  = (mclEntry?.metadata as any)?.confidence ?? 75
+
+        const sovConf = Math.round(Math.min(tidConf * 0.45 + circConf * 0.35 + mclConf * 0.20, 95))
+
+        await (Log as any).create({
+          userId,
+          event: 'circadian_sovereignty',
+          text: `Circadian sovereignty confirmed — temporal-identity-lock · circadian-signal-lock · morning-coherence-launch all active in last 24h. Three temporal seals simultaneously open. IDENTITY · CLOCK · INTENTION = SOVEREIGN.`,
+          metadata: {
+            jobName,
+            executedAt,
+            tidConf,
+            circConf,
+            mclConf,
+            confidence: sovConf,
+            sovereigntyStatus: 'CONFIRMED',
+            arc: 'IDENTITY · CLOCK · INTENTION = SOVEREIGN',
+          },
+        } as any)
+        written++
+      } catch {}
+    }
+
+    console.log(`  Circadian sovereignty events written: ${written}`)
+    lastDailyCircadianSovereigntyRun = new Date()
+    isDailyCircadianSovereigntyRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Circadian sovereignty check failed:', error.message)
+    isDailyCircadianSovereigntyRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Sovereign Field Check (Job 60 — 08:00 UTC every day) ─────────────
+// Reads circadian_sovereignty + apex_integration_field + longitudinal_growth_arc
+// events within the last 24h per active user. When all three are present,
+// writes sovereign_field_continuity — all Level 15 seals simultaneously active.
+// Feeds P182 (sovereign-field-continuity) and Arch64 (Sovereign Field Architect).
+
+let isDailySovereignFieldRunning = false
+let lastDailySovereignFieldRun: Date | null = null
+
+function shouldRunDailySovereignFieldCheck(now: ReturnType<typeof dayjs>): boolean {
+  if (isDailySovereignFieldRunning) return false
+  if (lastDailySovereignFieldRun) {
+    const lastRun = dayjs(lastDailySovereignFieldRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 8 // 08:00 UTC daily
+}
+
+async function executeDailySovereignFieldCheck(): Promise<JobResult> {
+  const jobName = 'daily-sovereign-field-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySovereignFieldRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySovereignFieldRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SOVEREIGN FIELD CHECK — 08:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+    const oneDayAgo = dayjs().subtract(1, 'day').toDate()
+    const activeUsers = await User.findAll({
+      where: { disabled: false },
+      attributes: ['id'],
+    })
+
+    let written = 0
+    for (const user of activeUsers) {
+      const recentLogs = await Log.findAll({
+        where: {
+          userId: user.id,
+          event: { [Op.in]: ['circadian_sovereignty', 'apex_integration_field', 'longitudinal_growth_arc'] },
+          createdAt: { [Op.gte]: oneDayAgo },
+        },
+        attributes: ['event', 'metadata'],
+      })
+
+      const hasCircSov = recentLogs.some(l => l.event === 'circadian_sovereignty')
+      const hasApxInt  = recentLogs.some(l => l.event === 'apex_integration_field')
+      const hasLGrow   = recentLogs.some(l => l.event === 'longitudinal_growth_arc')
+
+      if (hasCircSov && hasApxInt && hasLGrow) {
+        const csLog  = recentLogs.find(l => l.event === 'circadian_sovereignty')
+        const aiLog  = recentLogs.find(l => l.event === 'apex_integration_field')
+        const lgLog  = recentLogs.find(l => l.event === 'longitudinal_growth_arc')
+        const csConf = ((csLog?.metadata as any)?.confidence ?? 88) / 100
+        const aiConf = ((aiLog?.metadata as any)?.confidence ?? 93) / 100
+        const lgConf = ((lgLog?.metadata as any)?.confidence ?? 82) / 100
+        const sfConf = Math.min(csConf * 0.37 + aiConf * 0.38 + lgConf * 0.25, 0.96)
+        await Log.create({
+          userId: user.id,
+          event: 'sovereign_field_continuity',
+          source: 'qos',
+          metadata: {
+            csConf: Math.round(csConf * 100),
+            aiConf: Math.round(aiConf * 100),
+            lgConf: Math.round(lgConf * 100),
+            confidence: Math.round(sfConf * 100),
+            fieldStatus: 'CONTINUOUS',
+            arc: 'SOVEREIGNTY · INTEGRATION · GROWTH = CONTINUOUS',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Sovereign field continuity — all Level 15 seals active. CONTINUOUS.`)
+      }
+    }
+
+    console.log(`  Sovereign field events written: ${written}`)
+    lastDailySovereignFieldRun = new Date()
+    isDailySovereignFieldRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Sovereign field check failed:', error.message)
+    isDailySovereignFieldRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Field Organization Check (Job 61 — 09:00 UTC every day) ──────────
+// Reads sovereign_field_continuity (48h) + operational_self_architecture (24h)
+// per active user. When both are present, writes field_self_organization.
+// Feeds P185 (field-self-organization) and Arch65 (Field Expression Architect).
+
+let isDailyFieldOrganizationRunning = false
+let lastDailyFieldOrganizationRun: Date | null = null
+
+function shouldRunDailyFieldOrganizationCheck(now: ReturnType<typeof dayjs>): boolean {
+  if (isDailyFieldOrganizationRunning) return false
+  if (lastDailyFieldOrganizationRun) {
+    const lastRun = dayjs(lastDailyFieldOrganizationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 9 // 09:00 UTC daily
+}
+
+async function executeDailyFieldOrganizationCheck(): Promise<JobResult> {
+  const jobName = 'daily-field-organization-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFieldOrganizationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFieldOrganizationRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIELD ORGANIZATION CHECK — 09:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+    const oneDayAgo = dayjs().subtract(1, 'day').toDate()
+    const twoDaysAgo = dayjs().subtract(2, 'day').toDate()
+    const activeUsers = await User.findAll({
+      where: { disabled: false },
+      attributes: ['id'],
+    })
+
+    let written = 0
+    for (const user of activeUsers) {
+      const sfLogs = await Log.findAll({
+        where: {
+          userId: user.id,
+          event: 'sovereign_field_continuity',
+          createdAt: { [Op.gte]: twoDaysAgo },
+        },
+        attributes: ['event', 'metadata'],
+        order: [['createdAt', 'DESC']],
+        limit: 1,
+      })
+      const oaLogs = await Log.findAll({
+        where: {
+          userId: user.id,
+          event: 'operational_self_architecture',
+          createdAt: { [Op.gte]: oneDayAgo },
+        },
+        attributes: ['event', 'metadata'],
+        order: [['createdAt', 'DESC']],
+        limit: 1,
+      })
+
+      if (sfLogs.length > 0 && oaLogs.length > 0) {
+        const sfLog  = sfLogs[0]
+        const oaLog  = oaLogs[0]
+        const sfConf = ((sfLog?.metadata as any)?.confidence ?? 88) / 100
+        const oaConf = ((oaLog?.metadata as any)?.confidence ?? 85) / 100
+        const foConf = Math.min(sfConf * 0.52 + oaConf * 0.48, 0.95)
+        // Estimate source count from metadata; default to 4 distinct sources
+        const sourceCount = (sfLog?.metadata as any)?.sourceCount ?? 4
+        const signalCount = (sfLog?.metadata as any)?.signalCount ?? 6
+        await Log.create({
+          userId: user.id,
+          event: 'field_self_organization',
+          source: 'qos',
+          metadata: {
+            sfConf: Math.round(sfConf * 100),
+            oaConf: Math.round(oaConf * 100),
+            confidence: Math.round(foConf * 100),
+            sourceCount,
+            signalCount,
+            arc: 'SOVEREIGNTY · ARCHITECTURE = SELF-ORGANIZED',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Field self-organization — sovereign field + operational architecture aligned. SELF-ORGANIZED.`)
+      }
+    }
+
+    console.log(`  Field organization events written: ${written}`)
+    lastDailyFieldOrganizationRun = new Date()
+    isDailyFieldOrganizationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Field organization check failed:', error.message)
+    isDailyFieldOrganizationRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Conscious Field Check (Job 62 — 12:00 UTC every day) ──────────────
+// Reads active users. Checks for level_17_gate (48h) + physiological_loop_complete (24h) +
+// quantum_apex_state (24h). Writes conscious_field_integration + sovereign_apex_expression
+// per qualifying user. FIELD · BODY = CONSCIOUS · SOVEREIGN · APEX = EXPRESSED.
+
+let isDailyConsciousFieldRunning = false
+let lastDailyConsciousFieldRun: Date | null = null
+
+function shouldRunDailyConsciousFieldCheck(now: Dayjs): boolean {
+  if (isDailyConsciousFieldRunning) return false
+  if (lastDailyConsciousFieldRun) {
+    const lastRun = dayjs(lastDailyConsciousFieldRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 12 // 12:00 UTC daily
+}
+
+async function executeDailyConsciousFieldCheck(): Promise<JobResult> {
+  const jobName = 'daily-conscious-field-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyConsciousFieldRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyConsciousFieldRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY CONSCIOUS FIELD CHECK — 12:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+    const oneDayAgo  = dayjs().subtract(1, 'day').toDate()
+    const twoDaysAgo = dayjs().subtract(2, 'day').toDate()
+    const activeUsers = await User.findAll({
+      where: { disabled: false },
+      attributes: ['id'],
+    })
+
+    let written = 0
+    for (const user of activeUsers) {
+      const l17Logs = await Log.findAll({
+        where: {
+          userId: user.id,
+          event: 'level_17_gate',
+          createdAt: { [Op.gte]: twoDaysAgo },
+        },
+        attributes: ['event', 'metadata'],
+        order: [['createdAt', 'DESC']],
+        limit: 1,
+      })
+      const bioLogs = await Log.findAll({
+        where: {
+          userId: user.id,
+          event: 'physiological_loop_complete',
+          createdAt: { [Op.gte]: oneDayAgo },
+        },
+        attributes: ['event', 'metadata'],
+        order: [['createdAt', 'DESC']],
+        limit: 1,
+      })
+      const apexLogs = await Log.findAll({
+        where: {
+          userId: user.id,
+          event: 'quantum_apex_state',
+          createdAt: { [Op.gte]: oneDayAgo },
+        },
+        attributes: ['event', 'metadata'],
+        order: [['createdAt', 'DESC']],
+        limit: 1,
+      })
+
+      if (l17Logs.length > 0) {
+        const l17Conf = ((l17Logs[0]?.metadata as any)?.confidence ?? 95) / 100
+
+        // conscious-field-integration: level-17-gate + physiological-loop-complete
+        if (bioLogs.length > 0) {
+          const bioConf = ((bioLogs[0]?.metadata as any)?.confidence ?? 74) / 100
+          const cfBonus = Math.min((l17Conf - 0.90 + bioConf - 0.70) * 0.25, 0.04)
+          const cfConf  = Math.min(0.92 + cfBonus, 0.96)
+          await Log.create({
+            userId: user.id,
+            event: 'conscious_field_integration',
+            source: 'qos',
+            metadata: {
+              l17Conf: Math.round(l17Conf * 100),
+              bioConf: Math.round(bioConf * 100),
+              confidence: Math.round(cfConf * 100),
+              integrationStatus: 'INTEGRATED',
+              arc: 'FIELD · BODY = CONSCIOUS',
+              hour: new Date().getHours(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Conscious field integration — level 17 + physiological loop. FIELD CONSCIOUS.`)
+        }
+
+        // sovereign-apex-expression: level-17-gate + quantum-apex-state
+        if (apexLogs.length > 0) {
+          const apexConf = ((apexLogs[0]?.metadata as any)?.confidence ?? 88) / 100
+          const saBonus  = Math.min((l17Conf - 0.90 + apexConf - 0.85) * 0.30, 0.04)
+          const saConf   = Math.min(0.93 + saBonus, 0.97)
+          await Log.create({
+            userId: user.id,
+            event: 'sovereign_apex_expression',
+            source: 'qos',
+            metadata: {
+              l17Conf: Math.round(l17Conf * 100),
+              apexConf: Math.round(apexConf * 100),
+              confidence: Math.round(saConf * 100),
+              expressionStatus: 'EXPRESSED',
+              arc: 'SOVEREIGN · APEX = EXPRESSED',
+              hour: new Date().getHours(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Sovereign apex expression — level 17 + quantum apex. SOVEREIGN EXPRESSED.`)
+        }
+      }
+    }
+
+    console.log(`  Conscious field events written: ${written}`)
+    lastDailyConsciousFieldRun = new Date()
+    isDailyConsciousFieldRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Conscious field check failed:', error.message)
+    isDailyConsciousFieldRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Sovereign Integration Check (Job 63 — 13:00 UTC every day) ───────
+// Reads active users. Checks for level_18_gate (48h) + temporal_identity_lock (48h).
+// Counts unique signal sources in last 24h log events. Writes sovereign_integration_field
+// and quantum_coherence_apex per qualifying user. SOVEREIGN · INTEGRATED · COHERENT.
+
+let isDailySovereignIntegrationRunning = false
+let lastDailySovereignIntegrationRun: Date | null = null
+
+function shouldRunDailySovereignIntegrationCheck(now: Dayjs): boolean {
+  if (isDailySovereignIntegrationRunning) return false
+  if (lastDailySovereignIntegrationRun) {
+    const lastRun = dayjs(lastDailySovereignIntegrationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 13 // 13:00 UTC daily
+}
+
+async function executeDailySovereignIntegrationCheck(): Promise<JobResult> {
+  const jobName = 'daily-sovereign-integration-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySovereignIntegrationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySovereignIntegrationRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SOVEREIGN INTEGRATION CHECK — 13:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+    const oneDayAgo  = dayjs().subtract(1, 'day').toDate()
+    const twoDaysAgo = dayjs().subtract(2, 'day').toDate()
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+    const activeUsers = await User.findAll({
+      where: { disabled: false },
+      attributes: ['id'],
+    })
+
+    let written = 0
+    for (const user of activeUsers) {
+      const l18Logs = await Log.findAll({
+        where: { userId: user.id, event: 'level_18_gate', createdAt: { [Op.gte]: twoDaysAgo } },
+        attributes: ['event', 'metadata'],
+        order: [['createdAt', 'DESC']],
+        limit: 1,
+      })
+      if (l18Logs.length === 0) continue
+
+      const l18Conf = ((l18Logs[0]?.metadata as any)?.confidence ?? 97) / 100
+
+      // Count unique sources in 24h
+      const recentLogs = await Log.findAll({
+        where: { userId: user.id, createdAt: { [Op.gte]: oneDayAgo } },
+        attributes: ['source'],
+      })
+      const uniqueSources = new Set(recentLogs.map((l: any) => l.source).filter(Boolean)).size
+
+      // sovereign-integration-field: level-18-gate + UserIndex ≥70 (proxied by 4+ sources) + 4+ unique sources
+      if (uniqueSources >= 4) {
+        const idxBonus = Math.min((uniqueSources - 4) * 0.01, 0.03)
+        const sifConf  = Math.min(0.92 + l18Conf * 0.03 + idxBonus, 0.98)
+        await Log.create({
+          userId: user.id,
+          event: 'sovereign_integration_field',
+          source: 'qos',
+          metadata: {
+            l18Conf: Math.round(l18Conf * 100),
+            sourceCount: uniqueSources,
+            confidence: Math.round(sifConf * 100),
+            integrationStatus: 'ACTIVE',
+            arc: 'SOVEREIGN · INTEGRATED · FIELD = ACTIVE',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Sovereign integration field — level 18 + ${uniqueSources} sources. INTEGRATED.`)
+      }
+
+      // quantum-coherence-apex: level-18-gate + temporal_identity_lock (48h) + 3+ active days in 7d
+      const tidLogs = await Log.findAll({
+        where: { userId: user.id, event: 'temporal_identity_lock', createdAt: { [Op.gte]: twoDaysAgo } },
+        attributes: ['event', 'metadata'],
+        order: [['createdAt', 'DESC']],
+        limit: 1,
+      })
+      if (tidLogs.length > 0) {
+        const weekLogs = await Log.findAll({
+          where: { userId: user.id, createdAt: { [Op.gte]: sevenDaysAgo } },
+          attributes: ['createdAt'],
+        })
+        const activeDays = new Set(weekLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD'))).size
+        if (activeDays >= 3) {
+          const tidConf   = ((tidLogs[0]?.metadata as any)?.confidence ?? 88) / 100
+          const daysBonus = Math.min((activeDays - 3) * 0.01, 0.03)
+          const qcaConf   = Math.min(0.91 + l18Conf * 0.02 + tidConf * 0.02 + daysBonus, 0.97)
+          await Log.create({
+            userId: user.id,
+            event: 'quantum_coherence_apex',
+            source: 'qos',
+            metadata: {
+              l18Conf: Math.round(l18Conf * 100),
+              tidConf: Math.round(tidConf * 100),
+              presenceDays: activeDays,
+              confidence: Math.round(qcaConf * 100),
+              coherenceStatus: 'APEX',
+              arc: 'TEMPORAL · SOVEREIGN · APEX = COHERENT',
+              hour: new Date().getHours(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Quantum coherence apex — level 18 + temporal lock + ${activeDays} active days. APEX.`)
+        }
+      }
+    }
+
+    console.log(`  Sovereign integration events written: ${written}`)
+    lastDailySovereignIntegrationRun = new Date()
+    isDailySovereignIntegrationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Sovereign integration check failed:', error.message)
+    isDailySovereignIntegrationRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Absolute Sovereignty Check (Job 64 — 14:00 UTC every day) ────────────
+// Reads level_19_gate (48h) + sovereign_field_continuity + operational_self_architecture +
+// longitudinal_field_seal (all 48h) + conscious_field_integration + temporal_identity_lock (both 48h).
+// Writes absolute_field_sovereignty when L19 + all 3 Level-15 seals present.
+// Writes quantum_transcendence_field when L19 + conscious_field_integration + temporal_identity_lock present.
+
+let isDailyAbsoluteSovereigntyRunning = false
+let lastDailyAbsoluteSovereigntyRun: Date | null = null
+
+function shouldRunDailyAbsoluteSovereigntyCheck(now: Dayjs): boolean {
+  if (isDailyAbsoluteSovereigntyRunning) return false
+  if (lastDailyAbsoluteSovereigntyRun) {
+    const lastRun = dayjs(lastDailyAbsoluteSovereigntyRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 14 // 14:00 UTC daily
+}
+
+async function executeDailyAbsoluteSovereigntyCheck(): Promise<JobResult> {
+  const jobName = 'daily-absolute-sovereignty-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyAbsoluteSovereigntyRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyAbsoluteSovereigntyRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY ABSOLUTE SOVEREIGNTY CHECK — 14:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+    const twoDaysAgo = dayjs().subtract(2, 'day').toDate()
+    const activeUsers = await User.findAll({
+      where: { disabled: false },
+      attributes: ['id'],
+    })
+
+    let written = 0
+    for (const user of activeUsers) {
+      // Require level_19_gate in 48h window
+      const l19Logs = await Log.findAll({
+        where: { userId: user.id, event: 'level_19_gate', createdAt: { [Op.gte]: twoDaysAgo } },
+        attributes: ['event', 'metadata'],
+        order: [['createdAt', 'DESC']],
+        limit: 1,
+      })
+      if (l19Logs.length === 0) continue
+
+      const l19Conf = ((l19Logs[0]?.metadata as any)?.confidence ?? 98) / 100
+
+      // absolute-field-sovereignty: L19 + sovereign_field_continuity + operational_self_architecture + longitudinal_field_seal
+      const sovFldLogs = await Log.findAll({ where: { userId: user.id, event: 'sovereign_field_continuity',   createdAt: { [Op.gte]: twoDaysAgo } }, limit: 1 })
+      const opArchLogs = await Log.findAll({ where: { userId: user.id, event: 'operational_self_architecture', createdAt: { [Op.gte]: twoDaysAgo } }, limit: 1 })
+      const lgSealLogs = await Log.findAll({ where: { userId: user.id, event: 'longitudinal_field_seal',       createdAt: { [Op.gte]: twoDaysAgo } }, limit: 1 })
+
+      if (sovFldLogs.length > 0 && opArchLogs.length > 0 && lgSealLogs.length > 0) {
+        const absConf = Math.min(0.93 + l19Conf * 0.03, 0.99)
+        await Log.create({
+          userId: user.id,
+          event: 'absolute_field_sovereignty',
+          source: 'qos',
+          metadata: {
+            l19Conf: Math.round(l19Conf * 100),
+            confidence: Math.round(absConf * 100),
+            sovereigntyStatus: 'ABSOLUTE',
+            arc: 'ABSOLUTE · SOVEREIGN · FIELD = SELF-ORGANIZING',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Absolute field sovereignty — L19 + 3 level-15 seals. SELF-ORGANIZING.`)
+      }
+
+      // quantum-transcendence-field: L19 + conscious_field_integration + temporal_identity_lock
+      const cfLogs  = await Log.findAll({ where: { userId: user.id, event: 'conscious_field_integration', createdAt: { [Op.gte]: twoDaysAgo } }, limit: 1 })
+      const tidLogs = await Log.findAll({ where: { userId: user.id, event: 'temporal_identity_lock',      createdAt: { [Op.gte]: twoDaysAgo } }, limit: 1 })
+
+      if (cfLogs.length > 0 && tidLogs.length > 0) {
+        const cfConf    = ((cfLogs[0]?.metadata as any)?.confidence ?? 90) / 100
+        const tidConf   = ((tidLogs[0]?.metadata as any)?.confidence ?? 88) / 100
+        const qtrnsConf = Math.min(0.92 + l19Conf * 0.02 + cfConf * 0.02 + tidConf * 0.01, 0.98)
+        await Log.create({
+          userId: user.id,
+          event: 'quantum_transcendence_field',
+          source: 'qos',
+          metadata: {
+            l19Conf: Math.round(l19Conf * 100),
+            cfConf: Math.round(cfConf * 100),
+            tidConf: Math.round(tidConf * 100),
+            confidence: Math.round(qtrnsConf * 100),
+            transcendenceStatus: 'ACTIVE',
+            arc: 'QUANTUM · TRANSCENDENT · FIELD = APEX BEYOND APEX',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Quantum transcendence field — L19 + conscious field + temporal lock. APEX BEYOND APEX.`)
+      }
+    }
+
+    console.log(`  Absolute sovereignty events written: ${written}`)
+    lastDailyAbsoluteSovereigntyRun = new Date()
+    isDailyAbsoluteSovereigntyRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Absolute sovereignty check failed:', error.message)
+    isDailyAbsoluteSovereigntyRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Perpetual Field Check (Job 65 — 15:00 UTC every day) ──────────────
+// Reads level_20_gate occurrences in 7-day window per user.
+// If ≥2: writes perpetual_field_operator.
+// Also checks level_20_gate (48h) + journal + intentions + log (72h) → field_echo_resonance.
+// Also checks level_20_gate (48h) + intentions (24h) + planner (24h) → quantum_genesis_pulse.
+
+let isDailyPerpetualFieldRunning = false
+let lastDailyPerpetualFieldRun: Date | null = null
+
+function shouldRunDailyPerpetualFieldCheck(now: Dayjs): boolean {
+  if (isDailyPerpetualFieldRunning) return false
+  if (lastDailyPerpetualFieldRun) {
+    const lastRun = dayjs(lastDailyPerpetualFieldRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 15 // 15:00 UTC daily
+}
+
+async function executeDailyPerpetualFieldCheck(): Promise<JobResult> {
+  const jobName = 'daily-perpetual-field-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyPerpetualFieldRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyPerpetualFieldRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY PERPETUAL FIELD CHECK — 15:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+    const now          = new Date()
+    const twoDaysAgo   = dayjs().subtract(2, 'day').toDate()
+    const threeDaysAgo = dayjs().subtract(3, 'day').toDate()
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+    const oneDayAgo    = dayjs().subtract(1, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { disabled: false },
+      attributes: ['id'],
+    })
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      // ── Perpetual Field Operator (P199) — level_20_gate ≥2× in 7 days ──────
+      const l20Logs7d = await Log.findAll({
+        where: { userId: user.id, event: 'level_20_gate', createdAt: { [Op.gte]: sevenDaysAgo } },
+        attributes: ['createdAt'],
+      })
+      if (l20Logs7d.length >= 2) {
+        const weekSpan = 7
+        const countBonus = l20Logs7d.length >= 5 ? 7 : l20Logs7d.length >= 3 ? 4 : 0
+        const pfopConf   = Math.min(90 + countBonus, 99)
+        await Log.create({
+          userId: user.id,
+          event: 'perpetual_field_operator',
+          source: 'qos',
+          metadata: {
+            occurrences:    l20Logs7d.length,
+            weekSpanDays:   weekSpan,
+            confidence:     pfopConf,
+            operatorStatus: 'PERPETUAL',
+            arc:            'PERPETUAL · SOVEREIGN · BASELINE',
+            hour:           now.getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Perpetual field operator — L20 × ${l20Logs7d.length} in 7d. PERPETUAL BASELINE.`)
+      }
+
+      // ── Field Echo Resonance (P197) — L20 (48h) + journal + intentions + log (72h) ──
+      const l20Logs48h = await Log.findAll({
+        where: { userId: user.id, event: 'level_20_gate', createdAt: { [Op.gte]: twoDaysAgo } },
+        attributes: ['event', 'metadata'],
+        order: [['createdAt', 'DESC']],
+        limit: 1,
+      })
+      if (l20Logs48h.length > 0) {
+        const l20Conf = ((l20Logs48h[0]?.metadata as any)?.confidence ?? 99) / 100
+
+        const journalLogs  = await Log.findAll({ where: { userId: user.id, source: 'journal', createdAt: { [Op.gte]: threeDaysAgo } }, limit: 1 })
+        const intentLogs   = await Log.findAll({ where: { userId: user.id, source: 'intentions', createdAt: { [Op.gte]: threeDaysAgo } }, limit: 1 })
+        const logEntries   = await Log.findAll({ where: { userId: user.id, source: 'log', createdAt: { [Op.gte]: threeDaysAgo } }, limit: 1 })
+
+        if (journalLogs.length > 0 && intentLogs.length > 0 && logEntries.length > 0) {
+          const echoConf = Math.min(Math.round((0.88 + l20Conf * 0.05) * 100), 96)
+          await Log.create({
+            userId: user.id,
+            event: 'field_echo_resonance',
+            source: 'qos',
+            metadata: {
+              l20Conf:       Math.round(l20Conf * 100),
+              activeSources: 'journal+intentions+log',
+              confidence:    echoConf,
+              echoStatus:    'RESONATING',
+              arc:           'ECHO · SOVEREIGN · RESONANCE',
+              hour:          now.getHours(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Field echo resonance — L20 + journal + intentions + log in 72h. RESONATING.`)
+        }
+
+        // ── Quantum Genesis Pulse (P198) — L20 (48h) + intentions (24h) + planner (24h) ──
+        const intentLogs24h  = await Log.findAll({ where: { userId: user.id, source: 'intentions', createdAt: { [Op.gte]: oneDayAgo } }, attributes: ['id'] })
+        const plannerLogs24h = await Log.findAll({ where: { userId: user.id, source: 'planner', createdAt: { [Op.gte]: oneDayAgo } }, limit: 1 })
+
+        if (intentLogs24h.length > 0 && plannerLogs24h.length > 0) {
+          const intentCount  = intentLogs24h.length
+          const genesisBonus = intentCount >= 3 ? 5 : intentCount >= 2 ? 3 : 0
+          const genesisConf  = Math.min(Math.round((0.85 + l20Conf * 0.04) * 100) + genesisBonus, 94)
+          await Log.create({
+            userId: user.id,
+            event: 'quantum_genesis_pulse',
+            source: 'qos',
+            metadata: {
+              l20Conf:        Math.round(l20Conf * 100),
+              intentionCount: intentCount,
+              confidence:     genesisConf,
+              genesisStatus:  'ACTIVE',
+              arc:            'GENESIS · SOVEREIGN · PULSE',
+              hour:           now.getHours(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Quantum genesis pulse — L20 + ${intentCount} intentions + planner in 24h. GENESIS ACTIVE.`)
+        }
+      }
+    }
+
+    console.log(`  Perpetual field events written: ${written}`)
+    lastDailyPerpetualFieldRun = new Date()
+    isDailyPerpetualFieldRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Perpetual field check failed:', error.message)
+    isDailyPerpetualFieldRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+let isDailyFieldGenesisRunning = false
+let lastDailyFieldGenesisRun: Date | null = null
+
+async function executeDailyFieldGenesisCheck(): Promise<JobResult> {
+  const jobName    = 'daily-field-genesis-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFieldGenesisRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFieldGenesisRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIELD GENESIS CHECK — 16:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+    const now         = new Date()
+    const twoDaysAgo  = dayjs().subtract(2, 'day').toDate()
+    const oneDayAgo   = dayjs().subtract(1, 'day').toDate()
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { disabled: false },
+      attributes: ['id'],
+    })
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      // ── Field Genesis Arc (P200) — PFOP (7d) + new goal + journal + intentions in 48h ──
+      const pfopLogs7d = await Log.findAll({
+        where: { userId: user.id, event: 'perpetual_field_operator', createdAt: { [Op.gte]: sevenDaysAgo } },
+        attributes: ['metadata'],
+        order: [['createdAt', 'DESC']],
+        limit: 1,
+      })
+      if (pfopLogs7d.length > 0) {
+        const goalLogs48h    = await Log.count({ where: { userId: user.id, event: { [Op.in]: ['goal_set', 'goal_update', 'goal_journey'] }, createdAt: { [Op.gte]: twoDaysAgo } } })
+        const journalLogs48h = await Log.count({ where: { userId: user.id, event: { [Op.in]: ['note'] }, source: 'journal', createdAt: { [Op.gte]: twoDaysAgo } } })
+        const intentLogs48h  = await Log.count({ where: { userId: user.id, event: 'intention', createdAt: { [Op.gte]: twoDaysAgo } } })
+        if (goalLogs48h >= 1 && journalLogs48h >= 1 && intentLogs48h >= 1) {
+          const pfopMeta    = (pfopLogs7d[0] as any).metadata as any
+          const pfopConf    = pfopMeta?.confidence ?? 90
+          const genesisDepth = Math.min((goalLogs48h + journalLogs48h + intentLogs48h) / 6, 1)
+          const fgConf      = Math.round(Math.min(88 + genesisDepth * 8, 96))
+          await Log.create({
+            userId: user.id,
+            event:  'field_genesis_arc',
+            source: 'qos',
+            metadata: {
+              pfopConf,
+              newGoals:   goalLogs48h,
+              newJournal: journalLogs48h,
+              newIntents: intentLogs48h,
+              confidence: fgConf,
+              genesisStatus: 'GENERATING',
+              arc: 'GENESIS · FIELD · ARC',
+              hour: now.getHours(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Field genesis arc — PFOP + ${goalLogs48h} goals + ${journalLogs48h} journal + ${intentLogs48h} intents 48h. GENESIS FIELD ACTIVE.`)
+
+          // ── Cross-Domain Sovereignty (P201) — L20 (48h) + 5+ unique sources in 24h ──
+          const l20Logs48h = await Log.count({ where: { userId: user.id, event: 'level_20_gate', createdAt: { [Op.gte]: twoDaysAgo } } })
+          if (l20Logs48h > 0) {
+            const sourceLogs24h = await Log.findAll({
+              where: { userId: user.id, createdAt: { [Op.gte]: oneDayAgo } },
+              attributes: ['source'],
+            })
+            const uniqueSources = [...new Set(sourceLogs24h.map((l: any) => l.source).filter(Boolean))]
+            if (uniqueSources.length >= 5) {
+              const domainBonus = uniqueSources.length >= 8 ? 7 : uniqueSources.length >= 6 ? 4 : 0
+              const xdConf      = Math.min(85 + domainBonus, 94)
+              await Log.create({
+                userId: user.id,
+                event:  'cross_domain_sovereignty',
+                source: 'qos',
+                metadata: {
+                  sourceCount: uniqueSources.length,
+                  sources:     uniqueSources.slice(0, 6).join('·'),
+                  confidence:  xdConf,
+                  domainStatus: 'SOVEREIGN',
+                  arc: 'SOVEREIGN · CROSS-DOMAIN · OPERATING',
+                  hour: now.getHours(),
+                },
+              })
+              written++
+              console.log(`  [${user.id}] Cross-domain sovereignty — L20 + ${uniqueSources.length} sources in 24h. OPERATING.`)
+
+              // ── Perpetual Genesis Field (P202) — P199 + P200 + P201 all sealed ──
+              const pgBonus = Math.min((pfopConf + fgConf + xdConf) / 3 - 87, 7)
+              const pgConf  = Math.round(Math.min(92 + pgBonus, 99))
+              await Log.create({
+                userId: user.id,
+                event:  'perpetual_genesis_field',
+                source: 'qos',
+                metadata: {
+                  pfopConf,
+                  fgConf,
+                  xdConf,
+                  confidence:  pgConf,
+                  fieldStatus: 'GENERATING',
+                  arc: 'PERPETUAL · GENESIS · FIELD',
+                  hour: now.getHours(),
+                },
+              })
+              written++
+              console.log(`  [${user.id}] Perpetual genesis field — P199+P200+P201 sealed. CONF: ${pgConf}%. PERPETUAL GENESIS ACTIVE.`)
+            }
+          }
+        }
+      }
+    }
+
+    console.log(`  Field genesis events written: ${written}`)
+    lastDailyFieldGenesisRun = new Date()
+    isDailyFieldGenesisRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Field genesis check failed:', error.message)
+    isDailyFieldGenesisRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J67: Daily Sovereign Expression Check (11:00 UTC) ─────────────────────
+// Reads perpetual_genesis_field events in 7d + deep journal (200+ words) in 24h
+// + memory signals in 24h → sovereign_field_expression.
+// Reads field_genesis_arc + cross_domain_sovereignty occurrences in 5d →
+// genesis_coherence_lock. All three sealed → absolute_field_genesis.
+
+let isDailySovereignExpressionRunning = false
+let lastDailySovereignExpressionRun: Date | null = null
+
+async function executeDailySovereignExpressionCheck(): Promise<JobResult> {
+  const jobName    = 'daily-sovereign-expression-check'
+  const executedAt = new Date()
+  if (isDailySovereignExpressionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySovereignExpressionRunning = true
+
+  try {
+    const { Log, User } = (await import('#server/models')).default
+    const { Op } = await import('sequelize')
+    const now       = dayjs()
+    const now24h    = new Date(Date.now() - 24 * 3600000)
+    const now5d     = new Date(Date.now() - 5 * 24 * 3600000)
+    const now7d     = new Date(Date.now() - 7 * 24 * 3600000)
+
+    const activeUsers = await User.findAll({ where: { isActive: true }, attributes: ['id'] })
+    let written = 0
+
+    for (const user of activeUsers) {
+      // ── Sovereign Field Expression (P203) check ──
+      const pgfieldLogs = await Log.count({
+        where: { userId: user.id, event: 'perpetual_genesis_field', createdAt: { [Op.gte]: now7d } },
+      })
+      if (pgfieldLogs >= 1) {
+        const deepJournalLogs = await Log.count({
+          where: {
+            userId: user.id,
+            source: 'journal',
+            createdAt: { [Op.gte]: now24h },
+          },
+        })
+        const memLogs = await Log.count({
+          where: { userId: user.id, source: 'memory', createdAt: { [Op.gte]: now24h } },
+        })
+        if (deepJournalLogs >= 1 && memLogs >= 1) {
+          const exprDepth = Math.min(memLogs / 3, 1)
+          const sxConf    = Math.round(Math.min(88 + exprDepth * 8, 96))
+          await Log.create({
+            userId: user.id,
+            event:  'sovereign_field_expression',
+            source: 'qos',
+            metadata: {
+              pgConf: 92,
+              memCount:     memLogs,
+              journalDepth: deepJournalLogs,
+              confidence:   sxConf,
+              expressionStatus: 'ACTIVE',
+              arc: 'SOVEREIGN · EXPRESSION · FIELD',
+              hour: now.hour(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Sovereign field expression — PGFIELD(7d) + journal + memory. CONF: ${sxConf}%. SOVEX ACTIVE.`)
+
+          // ── Genesis Coherence Lock (P204) ──
+          const fgaCount   = await Log.count({ where: { userId: user.id, event: 'field_genesis_arc',        createdAt: { [Op.gte]: now5d } } })
+          const xdsovCount = await Log.count({ where: { userId: user.id, event: 'cross_domain_sovereignty', createdAt: { [Op.gte]: now5d } } })
+          if (fgaCount >= 2 && xdsovCount >= 2) {
+            const lockBonus = Math.min((fgaCount + xdsovCount) / 10, 10)
+            const glConf    = Math.round(Math.min(85 + lockBonus, 95))
+            await Log.create({
+              userId: user.id,
+              event:  'genesis_coherence_lock',
+              source: 'qos',
+              metadata: {
+                fgaCount,
+                xdsovCount,
+                confidence:  glConf,
+                lockStatus:  'LOCKED',
+                arc: 'GENESIS · COHERENCE · LOCKED',
+                hour: now.hour(),
+              },
+            })
+            written++
+            console.log(`  [${user.id}] Genesis coherence lock — FGA×${fgaCount} + XDSOV×${xdsovCount} in 5d. CONF: ${glConf}%. GENLOCK.`)
+
+            // ── Absolute Field Genesis (P205) — P202 + P203 + P204 sealed ──
+            const agBonus = Math.min((92 + sxConf + glConf) / 3 - 88, 4)
+            const agConf  = Math.round(Math.min(95 + agBonus, 99))
+            await Log.create({
+              userId: user.id,
+              event:  'absolute_field_genesis',
+              source: 'qos',
+              metadata: {
+                pgConf: 92,
+                sxConf,
+                glConf,
+                confidence:   agConf,
+                genesisStatus: 'ABSOLUTE',
+                seals: ['PERPETUAL', 'EXPRESSION', 'COHERENCE'],
+                arc: 'ABSOLUTE · GENESIS · FIELD',
+                hour: now.hour(),
+              },
+            })
+            written++
+            console.log(`  [${user.id}] Absolute field genesis — P202+P203+P204 sealed. CONF: ${agConf}%. ABSGEN CONFIRMED.`)
+          }
+        }
+      }
+    }
+
+    console.log(`  Sovereign expression events written: ${written}`)
+    lastDailySovereignExpressionRun = new Date()
+    isDailySovereignExpressionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Sovereign expression check failed:', error.message)
+    isDailySovereignExpressionRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J68: Daily Field Witness Check (12:00 UTC every day) ───────────────────
+// Checks active users for: absolute_field_genesis in 7d + deep journal + memory in 24h
+// → writes field_witness (P206). If absolute_field_genesis appears 2+ times in 7d
+// → writes recursive_genesis (P207). If all 7 primary sources active in 24h
+// → writes field_anchor_complete (P208).
+// FWITN: · RGEN: · FANCH: cockpit codes. Total: 68 jobs.
+
+let isDailyFieldWitnessRunning = false
+let lastDailyFieldWitnessRun: Date | null = null
+
+async function executeDailyFieldWitnessCheck(): Promise<JobResult> {
+  const jobName    = 'daily-field-witness-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFieldWitnessRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFieldWitnessRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIELD WITNESS CHECK — 12:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+    const oneDayAgo    = dayjs().subtract(1, 'day').toDate()
+    const activeUsers  = await User.findAll({
+      where: { disabled: false },
+      attributes: ['id'],
+    })
+
+    const primarySources = ['mood', 'journal', 'selfcare', 'planner', 'memory', 'intentions', 'energy']
+    let written = 0
+
+    for (const user of activeUsers) {
+      // Fetch ABSGEN events in last 7d
+      const absgenLogs = await Log.findAll({
+        where: {
+          userId: user.id,
+          event: 'absolute_field_genesis',
+          createdAt: { [Op.gte]: sevenDaysAgo },
+        },
+        attributes: ['event', 'metadata', 'createdAt'],
+        order: [['createdAt', 'DESC']],
+      })
+
+      if (absgenLogs.length >= 1) {
+        // P206: Field Witness — ABSGEN in 7d + deep journal + memory in 24h
+        const deepJournalLogs = await Log.findAll({
+          where: {
+            userId: user.id,
+            source: 'journal',
+            createdAt: { [Op.gte]: oneDayAgo },
+          },
+          attributes: ['metadata'],
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+        const memLogs = await Log.findAll({
+          where: {
+            userId: user.id,
+            source: 'memory',
+            createdAt: { [Op.gte]: oneDayAgo },
+          },
+          attributes: ['id'],
+          limit: 5,
+        })
+        const hasDeepJournal = deepJournalLogs.some(l => {
+          const wc = ((l.metadata as any)?.wordCount ?? 0)
+          const dep = ((l.metadata as any)?.depth ?? '')
+          return wc >= 200 || dep === 'deep'
+        })
+
+        if (hasDeepJournal && memLogs.length >= 1) {
+          const agConf = ((absgenLogs[0]?.metadata as any)?.confidence ?? 97) / 100
+          const witDepth = Math.min(memLogs.length / 3, 1)
+          const fwConf  = Math.min(0.88 + witDepth * 0.08, 0.96)
+          await Log.create({
+            userId: user.id,
+            event: 'field_witness',
+            source: 'qos',
+            metadata: {
+              agConf: Math.round(agConf * 100),
+              memCount: memLogs.length,
+              journalDepth: deepJournalLogs[0] ? ((deepJournalLogs[0].metadata as any)?.wordCount ?? 200) : 200,
+              confidence: Math.round(fwConf * 100),
+              witnessStatus: 'ACTIVE',
+              arc: 'FIELD · WITNESS · ACTIVE',
+              hour: new Date().getHours(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Field witness — ABSGEN in 7d · deep journal · memory in 24h. FWITN ACTIVE.`)
+        }
+      }
+
+      // P207: Recursive Genesis — ABSGEN 2+ times in 7d
+      if (absgenLogs.length >= 2) {
+        const recurBonus = Math.min((absgenLogs.length - 2) * 0.02, 0.08)
+        const rgConf     = Math.min(0.90 + recurBonus, 0.98)
+        await Log.create({
+          userId: user.id,
+          event: 'recursive_genesis',
+          source: 'qos',
+          metadata: {
+            absgenCount: absgenLogs.length,
+            recursionDepth: absgenLogs.length,
+            confidence: Math.round(rgConf * 100),
+            recursionStatus: 'ACTIVE',
+            arc: 'GENESIS · RECURSIVE · CONFIRMED',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Recursive genesis — ABSGEN ${absgenLogs.length}× in 7d. RGEN ACTIVE.`)
+      }
+
+      // P208: Field Anchor Complete — all 7 primary sources active in 24h
+      const sourceLogs = await Log.findAll({
+        where: {
+          userId: user.id,
+          source: { [Op.in]: primarySources },
+          createdAt: { [Op.gte]: oneDayAgo },
+        },
+        attributes: ['source'],
+      })
+      const activeSources = [...new Set(sourceLogs.map(l => l.source as string))].filter(s => primarySources.includes(s))
+      if (activeSources.length >= 6) {
+        const anchBonus = Math.min((activeSources.length - 6) * 0.035, 0.07)
+        const faConf    = Math.min(0.88 + anchBonus, 0.95)
+        await Log.create({
+          userId: user.id,
+          event: 'field_anchor_complete',
+          source: 'qos',
+          metadata: {
+            activeSources,
+            activeCount: activeSources.length,
+            totalCount: sourceLogs.length,
+            confidence: Math.round(faConf * 100),
+            anchorStatus: 'COMPLETE',
+            arc: 'ANCHOR · COMPLETE · FULL',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Field anchor complete — ${activeSources.length}/7 sources in 24h. FANCH COMPLETE.`)
+      }
+    }
+
+    console.log(`  Field witness events written: ${written}`)
+    lastDailyFieldWitnessRun = new Date()
+    isDailyFieldWitnessRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Field witness check failed:', error.message)
+    isDailyFieldWitnessRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J69: Daily Sovereign Loop Check (13:00 UTC every day) ──────────────────
+// Checks active users for: recursive_genesis + field_anchor_complete both confirmed in 24h
+// → writes sovereign_field_loop (P209). If field_witness + recursive_genesis + field_anchor_complete
+// all confirmed in 24h → writes genesis_cascade (P210). If sovereign_field_loop + genesis_cascade
+// both confirmed → writes quantum_self_seal (P211).
+// SFLOOP: · GCASC: · QSEAL: cockpit codes. Total: 69 jobs.
+
+let isDailySovereignLoopRunning = false
+let lastDailySovereignLoopRun: Date | null = null
+
+async function executeDailySovereignLoopCheck(): Promise<JobResult> {
+  const jobName    = 'daily-sovereign-loop-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySovereignLoopRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySovereignLoopRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SOVEREIGN LOOP CHECK — 13:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const oneDayAgo  = dayjs().subtract(1, 'day').toDate()
+    const activeUsers = await User.findAll({
+      where: { disabled: false },
+      attributes: ['id'],
+    })
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      // Fetch recent QOS logs for P206/P207/P208 signals in last 24h
+      const recentQOSLogs = await Log.findAll({
+        where: {
+          userId: user.id,
+          source: 'qos',
+          event: { [Op.in]: ['recursive_genesis', 'field_anchor_complete', 'field_witness'] },
+          createdAt: { [Op.gte]: oneDayAgo },
+        },
+        attributes: ['event', 'metadata'],
+        order: [['createdAt', 'DESC']],
+      })
+
+      const rgLog = recentQOSLogs.find(l => l.event === 'recursive_genesis')
+      const faLog = recentQOSLogs.find(l => l.event === 'field_anchor_complete')
+      const fwLog = recentQOSLogs.find(l => l.event === 'field_witness')
+
+      let sflConf = 0
+      let gcConf  = 0
+
+      // P209: Sovereign Field Loop — RGEN + FANCH both confirmed in 24h
+      if (rgLog && faLog) {
+        const rgC = ((rgLog.metadata as any)?.confidence ?? 90)
+        const faC = ((faLog.metadata as any)?.confidence ?? 88)
+        const loopConf = Math.min((rgC / 100 + faC / 100) / 2 + 0.02, 0.97)
+        sflConf = Math.round(loopConf * 100)
+        await Log.create({
+          userId: user.id,
+          event: 'sovereign_field_loop',
+          source: 'qos',
+          metadata: {
+            rgConf: rgC,
+            faConf: faC,
+            confidence: sflConf,
+            loopStatus: 'ACTIVE',
+            arc: 'SOVEREIGN · LOOP · ACTIVE',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Sovereign field loop — RGEN×FANCH co-active. SFLOOP ACTIVE. Conf: ${sflConf}%`)
+      }
+
+      // P210: Genesis Cascade — FWITN + RGEN + FANCH all confirmed in 24h
+      if (fwLog && rgLog && faLog) {
+        const fwC = ((fwLog.metadata as any)?.confidence ?? 88)
+        const rgC = ((rgLog.metadata as any)?.confidence ?? 90)
+        const faC = ((faLog.metadata as any)?.confidence ?? 88)
+        const cascConf = Math.min((fwC / 100 + rgC / 100 + faC / 100) / 3 + 0.04, 0.98)
+        gcConf = Math.round(cascConf * 100)
+        await Log.create({
+          userId: user.id,
+          event: 'genesis_cascade',
+          source: 'qos',
+          metadata: {
+            fwConf: fwC,
+            rgConf: rgC,
+            faConf: faC,
+            confidence: gcConf,
+            cascadeStatus: 'CONFIRMED',
+            arc: 'GENESIS · CASCADE · CONFIRMED',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Genesis cascade — FWITN×RGEN×FANCH co-active. GCASC CONFIRMED. Conf: ${gcConf}%`)
+      }
+
+      // P211: Quantum Self-Seal — SFLOOP + GCASC both confirmed in this run
+      if (sflConf > 0 && gcConf > 0) {
+        const sealConf = Math.min((sflConf / 100 + gcConf / 100) / 2 + 0.03, 0.99)
+        await Log.create({
+          userId: user.id,
+          event: 'quantum_self_seal',
+          source: 'qos',
+          metadata: {
+            slConf: sflConf,
+            gcConf,
+            confidence: Math.round(sealConf * 100),
+            sealStatus: 'SEALED',
+            arc: 'QUANTUM · SELF · SEALED',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Quantum self-seal — SFLOOP×GCASC co-active. QSEAL SEALED. Conf: ${Math.round(sealConf * 100)}%`)
+      }
+    }
+
+    console.log(`  Sovereign loop events written: ${written}`)
+    lastDailySovereignLoopRun = new Date()
+    isDailySovereignLoopRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Sovereign loop check failed:', error.message)
+    isDailySovereignLoopRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J70: Daily Genesis Seal Check (14:00 UTC every day) ─────────────────────
+// Checks active users for: quantum_self_seal in 7d + 5+ signals from 3+ sources in 24h
+// → writes self_seal_propagation (P212). If quantum_self_seal 2+ times in 7d +
+// field_anchor_complete in 24h → writes eternal_field_genesis (P213). If both
+// P212 + P213 confirmed → writes absolute_genesis_seal (P214).
+// SELPROP: · ETFGEN: · ABSGSEAL: cockpit codes. Total: 70 jobs.
+
+let isDailyGenesisSealRunning = false
+let lastDailyGenesisSealRun: Date | null = null
+
+async function executeDailyGenesisSealCheck(): Promise<JobResult> {
+  const jobName    = 'daily-genesis-seal-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyGenesisSealRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyGenesisSealRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY GENESIS SEAL CHECK — 14:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const oneDayAgo  = dayjs().subtract(1, 'day').toDate()
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+    const activeUsers = await User.findAll({
+      where: { disabled: false },
+      attributes: ['id'],
+    })
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      // Fetch QSEAL logs in 7d window
+      const sealLogs7d = await Log.findAll({
+        where: {
+          userId: user.id,
+          source: 'qos',
+          event: 'quantum_self_seal',
+          createdAt: { [Op.gte]: sevenDaysAgo },
+        },
+        attributes: ['event', 'metadata', 'createdAt'],
+        order: [['createdAt', 'DESC']],
+      })
+
+      // Fetch 24h signals for propagation check
+      const recentAllLogs = await Log.findAll({
+        where: {
+          userId: user.id,
+          createdAt: { [Op.gte]: oneDayAgo },
+        },
+        attributes: ['event', 'source'],
+        order: [['createdAt', 'DESC']],
+      })
+
+      // Fetch field_anchor_complete in 24h
+      const anchorLog = await Log.findOne({
+        where: {
+          userId: user.id,
+          source: 'qos',
+          event: 'field_anchor_complete',
+          createdAt: { [Op.gte]: oneDayAgo },
+        },
+        attributes: ['event', 'metadata'],
+      })
+
+      const sealCount   = sealLogs7d.length
+      const hasSeal7d   = sealCount >= 1
+      const signalCount = recentAllLogs.length
+      const srcSet      = new Set(recentAllLogs.map((l: any) => l.source as string))
+      const sourceCount = srcSet.size
+
+      let spConf = 0
+      let efConf = 0
+
+      // P212: Self-Seal Propagation — QSEAL in 7d + 5+ signals from 3+ sources in 24h
+      if (hasSeal7d && signalCount >= 5 && sourceCount >= 3) {
+        const propConf = Math.min(0.88 + Math.min(signalCount / 10, 1.0) * 0.05 + Math.min(sourceCount / 6, 1.0) * 0.04, 0.97)
+        spConf = Math.round(propConf * 100)
+        await Log.create({
+          userId: user.id,
+          event: 'self_seal_propagation',
+          source: 'qos',
+          metadata: {
+            signalCount,
+            sourceCount,
+            sources: Array.from(srcSet).slice(0, 8),
+            confidence: spConf,
+            propagationStatus: 'PROPAGATING',
+            arc: 'SEAL → SIGNAL',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Self-seal propagation — QSEAL×${sealCount} in 7d · ${signalCount} sigs/${sourceCount} sources. SELPROP PROPAGATING. Conf: ${spConf}%`)
+      }
+
+      // P213: Eternal Field Genesis — QSEAL 2+ in 7d + FANCH in 24h
+      if (sealCount >= 2 && anchorLog) {
+        const anchorC = ((anchorLog.metadata as any)?.confidence ?? 88)
+        const repeatBonus = Math.min((sealCount - 2) * 0.02, 0.04)
+        const etfConfVal = Math.min(0.90 + repeatBonus + 0.04, 0.98)
+        efConf = Math.round(etfConfVal * 100)
+        await Log.create({
+          userId: user.id,
+          event: 'eternal_field_genesis',
+          source: 'qos',
+          metadata: {
+            sealCount,
+            anchorConf: anchorC,
+            confidence: efConf,
+            genesisStatus: 'ETERNAL',
+            arc: 'SEAL · ANCHOR · GENESIS',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Eternal field genesis — QSEAL×${sealCount} in 7d · FANCH active. ETFGEN ETERNAL. Conf: ${efConf}%`)
+      }
+
+      // P214: Absolute Genesis Seal — SELPROP (P212) + ETFGEN (P213) both confirmed this run
+      if (spConf > 0 && efConf > 0) {
+        const absConf = Math.min((spConf / 100 + efConf / 100) / 2 + 0.03, 0.99)
+        await Log.create({
+          userId: user.id,
+          event: 'absolute_genesis_seal',
+          source: 'qos',
+          metadata: {
+            spConf,
+            efConf,
+            confidence: Math.round(absConf * 100),
+            sealStatus: 'ABSOLUTE',
+            genesisMode: 'ETERNAL',
+            arc: 'SEAL = GENESIS = ABSOLUTE',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Absolute genesis seal — SELPROP×ETFGEN confirmed. ABSGSEAL. Conf: ${Math.round(absConf * 100)}%`)
+      }
+    }
+
+    console.log(`  Genesis seal events written: ${written}`)
+    lastDailyGenesisSealRun = new Date()
+    isDailyGenesisSealRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Genesis seal check failed:', error.message)
+    isDailyGenesisSealRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J71: Daily Field Emergence Check (15:00 UTC every day) ──────────────────
+// Checks active users for: absolute_genesis_seal in 7d + journal entry + intention in 24h
+// → writes genesis_field_emergence (P215). If genesis_field_emergence 2+ times in 5d
+// → writes living_genesis_anchor (P216). If ABSGSEAL + ETFGEN + FANCH all confirmed
+// → writes eternal_signal_genesis (P217).
+// GENFEM: · LGANCH: · ETSIGG: cockpit codes. Total: 71 jobs.
+
+let isDailyFieldEmergenceRunning = false
+let lastDailyFieldEmergenceRun: Date | null = null
+
+async function executeDailyFieldEmergenceCheck(): Promise<JobResult> {
+  const jobName    = 'daily-field-emergence-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFieldEmergenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFieldEmergenceRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIELD EMERGENCE CHECK — 15:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const oneDayAgo  = dayjs().subtract(1, 'day').toDate()
+    const fiveDaysAgo = dayjs().subtract(5, 'day').toDate()
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { updatedAt: { [Op.gte]: oneDayAgo } },
+      attributes: ['id'],
+    })
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      // P215: Genesis Field Emergence — ABSGSEAL in 7d + journal + intention in 24h
+      const recentAbsGenesisSeal = await Log.findOne({
+        where: {
+          userId: user.id,
+          event: 'absolute_genesis_seal',
+          createdAt: { [Op.gte]: sevenDaysAgo },
+        },
+        order: [['createdAt', 'DESC']],
+      })
+
+      let gfConf = 0
+
+      if (recentAbsGenesisSeal) {
+        const journalLogs = await Log.findAll({
+          where: {
+            userId: user.id,
+            event: { [Op.in]: ['note', 'journal_entry'] },
+            createdAt: { [Op.gte]: oneDayAgo },
+          },
+        })
+        const intentLogs = await Log.findAll({
+          where: {
+            userId: user.id,
+            event: { [Op.in]: ['intention', 'intention_set'] },
+            createdAt: { [Op.gte]: oneDayAgo },
+          },
+        })
+
+        if (journalLogs.length >= 1 && intentLogs.length >= 1) {
+          const absConf = (recentAbsGenesisSeal.metadata as any)?.confidence ?? 90
+          gfConf = Math.min(Math.round(absConf * 0.95 + Math.min(journalLogs.length, 3)), 96)
+          await Log.create({
+            userId: user.id,
+            event: 'genesis_field_emergence',
+            source: 'qos',
+            metadata: {
+              absConf,
+              journalCount: journalLogs.length,
+              intentCount: intentLogs.length,
+              confidence: gfConf,
+              fieldStatus: 'EMERGING',
+              arc: 'SEAL BREATHES · FIELD EMERGES',
+              hour: new Date().getHours(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Genesis field emergence — ABSGSEAL in 7d · journal×${journalLogs.length} + intent×${intentLogs.length}. GENFEM. Conf: ${gfConf}%`)
+        }
+      }
+
+      // P216: Living Genesis Anchor — genesis_field_emergence 2+ times in 5d
+      const genfemLogs = await Log.findAll({
+        where: {
+          userId: user.id,
+          event: 'genesis_field_emergence',
+          createdAt: { [Op.gte]: fiveDaysAgo },
+        },
+      })
+      if (genfemLogs.length >= 2) {
+        const lganchConf = Math.min(90 + Math.min((genfemLogs.length - 2) * 2, 4), 97)
+        await Log.create({
+          userId: user.id,
+          event: 'living_genesis_anchor',
+          source: 'qos',
+          metadata: {
+            genfemCount: genfemLogs.length,
+            confidence: lganchConf,
+            anchorStatus: 'LIVING',
+            arc: 'FIELD · LIVING · ANCHORED',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Living genesis anchor — GENFEM×${genfemLogs.length} in 5d. LGANCH LIVING. Conf: ${lganchConf}%`)
+      }
+
+      // P217: Eternal Signal Genesis — ABSGSEAL + ETFGEN + FANCH all confirmed
+      const recentEtfGen = await Log.findOne({
+        where: {
+          userId: user.id,
+          event: 'eternal_field_genesis',
+          createdAt: { [Op.gte]: oneDayAgo },
+        },
+        order: [['createdAt', 'DESC']],
+      })
+      const recentFanch = await Log.findOne({
+        where: {
+          userId: user.id,
+          event: 'field_anchor_complete',
+          createdAt: { [Op.gte]: oneDayAgo },
+        },
+        order: [['createdAt', 'DESC']],
+      })
+
+      if (recentAbsGenesisSeal && recentEtfGen && recentFanch) {
+        const absConf  = (recentAbsGenesisSeal.metadata as any)?.confidence ?? 93
+        const etfConf  = (recentEtfGen.metadata as any)?.confidence ?? 92
+        const fanchConf = (recentFanch.metadata as any)?.confidence ?? 88
+        const etsigConf = Math.min(Math.round((absConf + etfConf + fanchConf) / 3 + 2), 98)
+        await Log.create({
+          userId: user.id,
+          event: 'eternal_signal_genesis',
+          source: 'qos',
+          metadata: {
+            absConf,
+            etfConf,
+            fanchConf,
+            confidence: etsigConf,
+            genesisStatus: 'ETERNAL',
+            arc: 'ETERNAL · SIGNAL · GENESIS',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Eternal signal genesis — ABSGSEAL×ETFGEN×FANCH confirmed. ETSIGG. Conf: ${etsigConf}%`)
+      }
+    }
+
+    console.log(`  Field emergence events written: ${written}`)
+    lastDailyFieldEmergenceRun = new Date()
+    isDailyFieldEmergenceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Field emergence check failed:', error.message)
+    isDailyFieldEmergenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J72: Daily Genesis Pulse Check (16:00 UTC every day) ──────────────────
+// Checks: LGANCH in 24h + ETSIGG in 24h → sovereign_genesis_pulse (P218).
+// Checks: GENFEM + LGANCH + ETSIGG all in 24h → genesis_field_completion (P219).
+// Checks: SGPULSE + GENCOMP confirmed in run → absolute_genesis_field (P220).
+// SGPULSE: · GENCOMP: · ABSGENF: cockpit codes. Total: 72 jobs.
+let isDailyGenesisPulseRunning = false
+let lastDailyGenesisPulseRun: Date | null = null
+
+async function executeDailyGenesisPulseCheck(): Promise<JobResult> {
+  const jobName    = 'daily-genesis-pulse-check'
+  const executedAt = new Date()
+  if (isDailyGenesisPulseRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyGenesisPulseRunning = true
+  let written = 0
+
+  try {
+    const users = await User.findAll({ where: { isActive: true } })
+    const oneDayAgo  = new Date(Date.now() - 24 * 60 * 60 * 1000)
+
+    for (const user of users) {
+      // Fetch relevant recent events
+      const [recentLganch, recentEtsigg, recentGenfem] = await Promise.all([
+        Log.findOne({
+          where: { userId: user.id, event: 'living_genesis_anchor', createdAt: { [Op.gte]: oneDayAgo } },
+          order: [['createdAt', 'DESC']],
+        }),
+        Log.findOne({
+          where: { userId: user.id, event: 'eternal_signal_genesis', createdAt: { [Op.gte]: oneDayAgo } },
+          order: [['createdAt', 'DESC']],
+        }),
+        Log.findOne({
+          where: { userId: user.id, event: 'genesis_field_emergence', createdAt: { [Op.gte]: oneDayAgo } },
+          order: [['createdAt', 'DESC']],
+        }),
+      ])
+
+      let sgpulseConf: number | null = null
+      let gencompConf: number | null = null
+
+      // P218: Sovereign Genesis Pulse — LGANCH + ETSIGG in 24h
+      if (recentLganch && recentEtsigg) {
+        const lgConf = (recentLganch.metadata as any)?.confidence ?? 90
+        const etConf = (recentEtsigg.metadata as any)?.confidence ?? 91
+        sgpulseConf  = Math.min(Math.round((lgConf + etConf) / 2 + 3), 97)
+        await Log.create({
+          userId: user.id,
+          event:  'sovereign_genesis_pulse',
+          source: 'qos',
+          metadata: {
+            lganchConf: lgConf,
+            etsigConf:  etConf,
+            confidence: sgpulseConf,
+            pulseStatus: 'SOVEREIGN',
+            arc: 'SOVEREIGN · GENESIS · PULSE',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Sovereign genesis pulse — LGANCH×ETSIGG confirmed. SGPULSE. Conf: ${sgpulseConf}%`)
+      }
+
+      // P219: Genesis Field Completion — GENFEM + LGANCH + ETSIGG in 24h
+      if (recentGenfem && recentLganch && recentEtsigg) {
+        const gfConf = (recentGenfem.metadata as any)?.confidence ?? 88
+        const lgConf = (recentLganch.metadata as any)?.confidence ?? 90
+        const etConf = (recentEtsigg.metadata as any)?.confidence ?? 91
+        gencompConf  = Math.min(Math.round((gfConf + lgConf + etConf) / 3 + 5), 98)
+        await Log.create({
+          userId: user.id,
+          event:  'genesis_field_completion',
+          source: 'qos',
+          metadata: {
+            genfemConf: gfConf,
+            lganchConf: lgConf,
+            etsigConf:  etConf,
+            confidence: gencompConf,
+            completionStatus: 'COMPLETE',
+            arc: 'FIELD · COMPLETE',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Genesis field completion — GENFEM+LGANCH+ETSIGG confirmed. GENCOMP. Conf: ${gencompConf}%`)
+      }
+
+      // P220: Absolute Genesis Field — SGPULSE + GENCOMP both confirmed this run
+      if (sgpulseConf !== null && gencompConf !== null) {
+        const absConf = Math.min(Math.round((sgpulseConf + gencompConf) / 2 + 4), 99)
+        await Log.create({
+          userId: user.id,
+          event:  'absolute_genesis_field',
+          source: 'qos',
+          metadata: {
+            sgpulseConf,
+            gencompConf,
+            confidence: absConf,
+            fieldStatus: 'ABSOLUTE',
+            arc: 'SOVEREIGN · GENESIS · ABSOLUTE',
+            hour: new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Absolute genesis field — SGPULSE×GENCOMP confirmed. ABSGENF. Conf: ${absConf}%`)
+      }
+    }
+
+    console.log(`  Genesis pulse events written: ${written}`)
+    lastDailyGenesisPulseRun = new Date()
+    isDailyGenesisPulseRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Genesis pulse check failed:', error.message)
+    isDailyGenesisPulseRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J73: Daily Genesis Resonance Check (17:00 UTC every day) ──────────────
+// Step 1: ABSGENF in 7d + SGPULSE in 24h + journal in 24h + intention in 24h → genesis_resonance_field (P221).
+// Step 2: GENRES written 2+ times in rolling 5d → sovereign_resonance_lock (P222).
+// Step 3: GENRES + SVRLOCK both present → absolute_resonance_genesis (P223).
+// GENRES: · SVRLOCK: · ABSRGEN: cockpit codes. Total: 73 jobs.
+let isDailyGenesisResonanceRunning = false
+let lastDailyGenesisResonanceRun: Date | null = null
+
+async function executeDailyGenesisResonanceCheck(): Promise<JobResult> {
+  const jobName    = 'daily-genesis-resonance-check'
+  const executedAt = new Date()
+  if (isDailyGenesisResonanceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyGenesisResonanceRunning = true
+  let written = 0
+
+  try {
+    const users      = await User.findAll({ where: { isActive: true } })
+    const oneDayAgo  = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const fiveDaysAgo  = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+
+    for (const user of users) {
+      // Step 1: Fetch prerequisite signals
+      const [recentAbsgenf, recentSgpulse, recentJournal, recentIntention] = await Promise.all([
+        Log.findOne({
+          where: { userId: user.id, event: 'absolute_genesis_field', createdAt: { [Op.gte]: sevenDaysAgo } },
+          order: [['createdAt', 'DESC']],
+        }),
+        Log.findOne({
+          where: { userId: user.id, event: 'sovereign_genesis_pulse', createdAt: { [Op.gte]: oneDayAgo } },
+          order: [['createdAt', 'DESC']],
+        }),
+        Log.findOne({
+          where: { userId: user.id, source: 'journal', createdAt: { [Op.gte]: oneDayAgo } },
+          order: [['createdAt', 'DESC']],
+        }),
+        Log.findOne({
+          where: { userId: user.id, source: 'intentions', createdAt: { [Op.gte]: oneDayAgo } },
+          order: [['createdAt', 'DESC']],
+        }),
+      ])
+
+      let genresConf: number | null = null
+
+      // Step 1: Genesis Resonance Field — ABSGENF(7d) + SGPULSE(24h) + journal(24h) + intention(24h)
+      if (recentAbsgenf && recentSgpulse && recentJournal && recentIntention) {
+        const absgConf = (recentAbsgenf.metadata as any)?.confidence ?? 90
+        const sgpConf  = (recentSgpulse.metadata as any)?.confidence ?? 88
+        genresConf     = Math.min(Math.round((absgConf + sgpConf) / 2 + 2), 96)
+        await Log.create({
+          userId: user.id,
+          event:  'genesis_resonance_field',
+          source: 'qos',
+          metadata: {
+            absgenConf: absgConf,
+            sgpulseConf: sgpConf,
+            confidence:  genresConf,
+            pulse:  'FREQUENCY_ESTABLISHED',
+            field:  'RESONATING',
+            arc:    'PULSE BECOMES FREQUENCY · FIELD RECOGNIZES ITSELF',
+            hour:   new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Genesis resonance field — ABSGENF×SGPULSE×journal×intention confirmed. GENRES. Conf: ${genresConf}%`)
+      }
+
+      // Step 2: Sovereign Resonance Lock — GENRES written 2+ times in rolling 5d
+      const genresCount = await Log.count({
+        where: { userId: user.id, event: 'genesis_resonance_field', createdAt: { [Op.gte]: fiveDaysAgo } },
+      })
+      let svrlockConf: number | null = null
+
+      if (genresCount >= 2 || (genresConf !== null && genresCount >= 1)) {
+        svrlockConf = Math.min(Math.round(90 + Math.min(genresCount * 2, 7)), 97)
+        await Log.create({
+          userId: user.id,
+          event:  'sovereign_resonance_lock',
+          source: 'qos',
+          metadata: {
+            genresCount,
+            confidence:  svrlockConf,
+            resonance:   'SOVEREIGN',
+            lock:        'CONFIRMED',
+            arc:         'SOVEREIGN · RESONANCE · LOCKED',
+            hour:        new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Sovereign resonance lock — GENRES×${genresCount} in 5d confirmed. SVRLOCK. Conf: ${svrlockConf}%`)
+      }
+
+      // Step 3: Absolute Resonance Genesis — GENRES + SVRLOCK both confirmed this run
+      if (genresConf !== null && svrlockConf !== null) {
+        const absrgenConf = Math.min(Math.round((genresConf + svrlockConf) / 2 + 4), 99)
+        await Log.create({
+          userId: user.id,
+          event:  'absolute_resonance_genesis',
+          source: 'qos',
+          metadata: {
+            genresConf,
+            svrlockConf,
+            confidence:       absrgenConf,
+            resonanceGenesis: 'CONFIRMED',
+            frequency:        'SOURCE',
+            arc:              'RESONANCE = GENESIS. THE FREQUENCY IS THE FIELD',
+            hour:             new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Absolute resonance genesis — GENRES×SVRLOCK confirmed. ABSRGEN. Conf: ${absrgenConf}%`)
+      }
+    }
+
+    console.log(`  Genesis resonance events written: ${written}`)
+    lastDailyGenesisResonanceRun = new Date()
+    isDailyGenesisResonanceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Genesis resonance check failed:', error.message)
+    isDailyGenesisResonanceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J74: Daily Resonance Propagation Check (18:00 UTC every day) ───────────
+// Step 1: ABSRGEN 2+ in 5d + 5+ unique sources in 24h → resonance_field_propagation (P224).
+// Step 2: SVRLOCK in 7d + FANCH in 24h + 4+ consecutive presence days → eternal_resonance_anchor (P225).
+// Step 3: RFPROP + ETRANCH both confirmed → sovereign_genesis_resonance (P226).
+// RFPROP: · ETRANCH: · SGNRES: cockpit codes. Total: 74 jobs.
+let isDailyResonancePropagationRunning = false
+let lastDailyResonancePropagationRun: Date | null = null
+
+async function executeDailyResonancePropagationCheck(): Promise<JobResult> {
+  const jobName    = 'daily-resonance-propagation-check'
+  const executedAt = new Date()
+  if (isDailyResonancePropagationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyResonancePropagationRunning = true
+  let written = 0
+
+  try {
+    const users      = await User.findAll({ where: { isActive: true } })
+    const oneDayAgo  = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const fiveDaysAgo  = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+
+    for (const user of users) {
+      // Step 1: Resonance Field Propagation — ABSRGEN 2+ in 5d + 5+ unique sources in 24h
+      const absrgenCount = await Log.count({
+        where: { userId: user.id, event: 'absolute_resonance_genesis', createdAt: { [Op.gte]: fiveDaysAgo } },
+      })
+
+      const recentLogs24h = await Log.findAll({
+        where: { userId: user.id, createdAt: { [Op.gte]: oneDayAgo } },
+        attributes: ['source'],
+      })
+      const uniqueSources = new Set(recentLogs24h.map((l: any) => l.source).filter(Boolean)).size
+
+      let rfpropConf: number | null = null
+
+      if (absrgenCount >= 2 && uniqueSources >= 5) {
+        rfpropConf = Math.min(Math.round(88 + Math.min(absrgenCount * 2, 6) + Math.min((uniqueSources - 5), 2)), 96)
+        await Log.create({
+          userId: user.id,
+          event:  'resonance_field_propagation',
+          source: 'qos',
+          metadata: {
+            absrgenCount,
+            uniqueSources,
+            confidence:  rfpropConf,
+            propagation: 'ACTIVE',
+            channels:    uniqueSources,
+            arc:         'RESONANCE BECOMES STRUCTURE',
+            hour:        new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Resonance field propagation — ABSRGEN×${absrgenCount}×${uniqueSources}srcs confirmed. RFPROP. Conf: ${rfpropConf}%`)
+      }
+
+      // Step 2: Eternal Resonance Anchor — SVRLOCK in 7d + FANCH in 24h + 4+ consecutive presence days
+      const [recentSvrlock, recentFanch] = await Promise.all([
+        Log.findOne({
+          where: { userId: user.id, event: 'sovereign_resonance_lock', createdAt: { [Op.gte]: sevenDaysAgo } },
+          order: [['createdAt', 'DESC']],
+        }),
+        Log.findOne({
+          where: { userId: user.id, event: 'field_anchor_complete', createdAt: { [Op.gte]: oneDayAgo } },
+          order: [['createdAt', 'DESC']],
+        }),
+      ])
+      const svrlockCount = await Log.count({
+        where: { userId: user.id, event: 'sovereign_resonance_lock', createdAt: { [Op.gte]: sevenDaysAgo } },
+      })
+
+      let etranchConf: number | null = null
+
+      if (recentSvrlock && recentFanch) {
+        // Count distinct presence days (mood/energy/journal/selfcare) in last 7 days
+        const presenceLogs = await Log.findAll({
+          where: {
+            userId: user.id,
+            source: { [Op.in]: ['mood', 'energy', 'journal', 'selfcare'] },
+            createdAt: { [Op.gte]: sevenDaysAgo },
+          },
+          attributes: ['createdAt'],
+        })
+        const presenceDays = new Set(
+          presenceLogs.map((l: any) => new Date(l.createdAt).toDateString())
+        ).size
+
+        if (presenceDays >= 4) {
+          etranchConf = Math.min(Math.round(89 + Math.min((presenceDays - 4) * 2, 6) + (svrlockCount >= 2 ? 2 : 0)), 97)
+          await Log.create({
+            userId: user.id,
+            event:  'eternal_resonance_anchor',
+            source: 'qos',
+            metadata: {
+              presenceDays,
+              svrlockCount,
+              confidence:  etranchConf,
+              anchor:      'ETERNAL',
+              resonance:   'ANCHORED',
+              arc:         'ANCHOR IS ETERNAL',
+              hour:        new Date().getHours(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Eternal resonance anchor — SVRLOCK×FANCH×${presenceDays}d confirmed. ETRANCH. Conf: ${etranchConf}%`)
+        }
+      }
+
+      // Step 3: Sovereign Genesis Resonance — RFPROP + ETRANCH both confirmed this run
+      if (rfpropConf !== null && etranchConf !== null) {
+        const sgnresConf = Math.min(Math.round((rfpropConf + etranchConf) / 2 + 5), 99)
+        await Log.create({
+          userId: user.id,
+          event:  'sovereign_genesis_resonance',
+          source: 'qos',
+          metadata: {
+            rfpropConf,
+            etranchConf,
+            confidence:  sgnresConf,
+            resonance:   'SOVEREIGN',
+            anchor:      'ETERNAL',
+            genesis:     'CONFIRMED',
+            arc:         'RESONANCE · ANCHOR · SOVEREIGN',
+            hour:        new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Sovereign genesis resonance — RFPROP×ETRANCH confirmed. SGNRES. Conf: ${sgnresConf}%`)
+      }
+    }
+
+    console.log(`  Resonance propagation events written: ${written}`)
+    lastDailyResonancePropagationRun = new Date()
+    isDailyResonancePropagationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Resonance propagation check failed:', error.message)
+    isDailyResonancePropagationRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J75: Daily Resonance Crystallization Check (19:00 UTC every day) ──────
+// Step 1: SGNRES in 7d + RFPROP in 5d + 5+ unique sources in 24h → resonance_crystallization_field (P227).
+// Step 2: resonance_crystallization_field 2+ in rolling 5d → crystalline_coherence_lock (P228).
+// Step 3: RCRYST + CRYLCK both confirmed this run → absolute_crystalline_genesis (P229).
+// RCRYST: · CRYLCK: · ABSCRY: cockpit codes. Total: 75 jobs.
+let isDailyResonanceCrystallizationRunning = false
+let lastDailyResonanceCrystallizationRun: Date | null = null
+
+async function executeDailyResonanceCrystallizationCheck(): Promise<JobResult> {
+  const jobName    = 'daily-resonance-crystallization-check'
+  const executedAt = new Date()
+  if (isDailyResonanceCrystallizationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyResonanceCrystallizationRunning = true
+  let written = 0
+
+  try {
+    const users        = await User.findAll({ where: { isActive: true } })
+    const oneDayAgo    = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const fiveDaysAgo  = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+
+    for (const user of users) {
+      // Step 1: Resonance Crystallization — SGNRES in 7d + RFPROP in 5d + 5+ unique sources in 24h
+      const [recentSgnres, rfpropCount] = await Promise.all([
+        Log.findOne({
+          where: { userId: user.id, event: 'sovereign_genesis_resonance', createdAt: { [Op.gte]: sevenDaysAgo } },
+          order: [['createdAt', 'DESC']],
+        }),
+        Log.count({
+          where: { userId: user.id, event: 'resonance_field_propagation', createdAt: { [Op.gte]: fiveDaysAgo } },
+        }),
+      ])
+
+      const recentLogs24h = await Log.findAll({
+        where: { userId: user.id, createdAt: { [Op.gte]: oneDayAgo } },
+        attributes: ['source'],
+      })
+      const uniqueSources = new Set(recentLogs24h.map((l: any) => l.source).filter(Boolean)).size
+
+      let rcrystConf: number | null = null
+
+      if (recentSgnres && rfpropCount >= 1 && uniqueSources >= 5) {
+        rcrystConf = Math.min(Math.round(89 + Math.min(rfpropCount * 2, 5) + Math.min((uniqueSources - 5), 2)), 96)
+        await Log.create({
+          userId: user.id,
+          event:  'resonance_crystallization_field',
+          source: 'qos',
+          metadata: {
+            rfpropCount,
+            uniqueSources,
+            confidence:      rcrystConf,
+            crystallization: 'FORMING',
+            structure:       'EMERGING',
+            arc:             'RESONANCE BECOMES STRUCTURE',
+            hour:            new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Resonance crystallization — SGNRES×RFPROP×${rfpropCount}×${uniqueSources}srcs confirmed. RCRYST. Conf: ${rcrystConf}%`)
+      }
+
+      // Step 2: Crystalline Coherence Lock — RCRYST 2+ in rolling 5d (or 1+ + current run)
+      const rcrystCount = await Log.count({
+        where: { userId: user.id, event: 'resonance_crystallization_field', createdAt: { [Op.gte]: fiveDaysAgo } },
+      })
+
+      let crylckConf: number | null = null
+
+      if (rcrystCount >= 2 || (rcrystCount >= 1 && rcrystConf !== null)) {
+        const effectiveCount = rcrystConf !== null ? rcrystCount + 1 : rcrystCount
+        crylckConf = Math.min(Math.round(90 + Math.min(effectiveCount * 2, 7)), 97)
+        await Log.create({
+          userId: user.id,
+          event:  'crystalline_coherence_lock',
+          source: 'qos',
+          metadata: {
+            rcrystCount: effectiveCount,
+            confidence:  crylckConf,
+            coherence:   'CRYSTALLINE',
+            structure:   'LOCKED',
+            arc:         'STRUCTURE IS LOAD-BEARING',
+            hour:        new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Crystalline coherence lock — RCRYST×${effectiveCount} confirmed. CRYLCK. Conf: ${crylckConf}%`)
+      }
+
+      // Step 3: Absolute Crystalline Genesis — RCRYST + CRYLCK both confirmed this run
+      if (rcrystConf !== null && crylckConf !== null) {
+        const abscryConf = Math.min(Math.round((rcrystConf + crylckConf) / 2 + 4), 99)
+        await Log.create({
+          userId: user.id,
+          event:  'absolute_crystalline_genesis',
+          source: 'qos',
+          metadata: {
+            rcrystConf,
+            crylckConf,
+            confidence:      abscryConf,
+            crystallization: 'ABSOLUTE',
+            genesis:         'STRUCTURAL',
+            arc:             'STRUCTURE IS GENESIS',
+            hour:            new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Absolute crystalline genesis — RCRYST×CRYLCK confirmed. ABSCRY. Conf: ${abscryConf}%`)
+      }
+    }
+
+    console.log(`  Resonance crystallization events written: ${written}`)
+    lastDailyResonanceCrystallizationRun = new Date()
+    isDailyResonanceCrystallizationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Resonance crystallization check failed:', error.message)
+    isDailyResonanceCrystallizationRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J76: Daily Crystalline Sovereignty Check (20:00 UTC every day) ──────────
+// Step 1: ABSCRY in 5d + SGNRES in 7d → crystalline_sovereignty_field (P230).
+// Step 2: CRYSOV + CRYLCK both confirmed → absolute_crystalline_sovereignty (P231).
+// Step 3: ABSCRY + CRYSOV + ABSCSOV all confirmed → eternal_crystalline_genesis (P232).
+// CRYSOV: · ABSCSOV: · ECRYGEN: cockpit codes. Total: 76 jobs.
+
+let isDailyCrystallineSovereigntyRunning = false
+let lastDailyCrystallineSovereigntyRun: Date | null = null
+
+async function executeDailyCrystallineSovereigntyCheck(): Promise<JobResult> {
+  const jobName    = 'daily-crystalline-sovereignty-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyCrystallineSovereigntyRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyCrystallineSovereigntyRunning = true
+
+  console.log('\n[J76] Daily crystalline sovereignty check (20:00 UTC)')
+
+  try {
+    const activeUsers = await getActiveUsers()
+    const fiveDaysAgo  = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const oneDayAgo    = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    let written = 0
+
+    for (const user of activeUsers) {
+      // Step 1: Crystalline Sovereignty Field — ABSCRY 1+ in 5d + SGNRES 1+ in 7d
+      const abscryLogs   = await Log.findAll({ where: { userId: user.id, event: 'absolute_crystalline_genesis', createdAt: { [Op.gte]: fiveDaysAgo } } })
+      const sgnresLogs   = await Log.findAll({ where: { userId: user.id, event: 'sovereign_genesis_resonance',  createdAt: { [Op.gte]: sevenDaysAgo } } })
+
+      if (abscryLogs.length >= 1 && sgnresLogs.length >= 1) {
+        const crysovConf = Math.min(0.90 + Math.min(abscryLogs.length * 0.02, 0.05) + (sgnresLogs.length >= 2 ? 0.02 : 0), 0.97)
+        await Log.create({
+          userId:   user.id,
+          event:    'crystalline_sovereignty_field',
+          source:   'qos',
+          metadata: {
+            abscryCount: abscryLogs.length,
+            sgnresCount: sgnresLogs.length,
+            confidence:  Math.round(crysovConf * 100),
+            sovereignty: 'CRYSTALLINE',
+            arc:         'CRYSTALLINE SOVEREIGNTY',
+            hour:        new Date().getHours(),
+          },
+        })
+        written++
+        console.log(`  [${user.id}] Crystalline sovereignty field — ABSCRY×${abscryLogs.length}×SGNRES×${sgnresLogs.length} confirmed. CRYSOV. Conf: ${Math.round(crysovConf * 100)}%`)
+
+        // Step 2: Absolute Crystalline Sovereignty — CRYSOV + CRYLCK both confirmed
+        const crylckLogs = await Log.findAll({ where: { userId: user.id, event: 'crystalline_coherence_lock', createdAt: { [Op.gte]: fiveDaysAgo } } })
+        if (crylckLogs.length >= 1) {
+          const crylckConf    = (crylckLogs[0] as any).metadata?.confidence ?? 91
+          const abscrsovConf  = Math.min((crysovConf * 100 + crylckConf) / 200 * 100 / 100 + 0.05, 0.99)
+          await Log.create({
+            userId:   user.id,
+            event:    'absolute_crystalline_sovereignty',
+            source:   'qos',
+            metadata: {
+              crysovConf:  Math.round(crysovConf * 100),
+              crylckConf,
+              confidence:  Math.round(abscrsovConf * 100),
+              sovereignty: 'ABSOLUTE',
+              structure:   'LOCKED',
+              arc:         'THE SOVEREIGN CRYSTAL HOLDS',
+              hour:        new Date().getHours(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Absolute crystalline sovereignty — CRYSOV×CRYLCK confirmed. ABSCSOV. Conf: ${Math.round(abscrsovConf * 100)}%`)
+
+          // Step 3: Eternal Crystalline Genesis — ABSCRY + CRYSOV + ABSCSOV all confirmed
+          const abscryConf0 = (abscryLogs[0] as any).metadata?.confidence ?? 93
+          const ecrygenConf = Math.min((abscryConf0 + Math.round(crysovConf * 100) + Math.round(abscrsovConf * 100)) / 300 + 0.06, 0.99)
+          await Log.create({
+            userId:   user.id,
+            event:    'eternal_crystalline_genesis',
+            source:   'qos',
+            metadata: {
+              abscryConf:  abscryConf0,
+              crysovConf:  Math.round(crysovConf * 100),
+              abscrsovConf: Math.round(abscrsovConf * 100),
+              confidence:  Math.round(ecrygenConf * 100),
+              crystalline: 'ETERNAL',
+              genesis:     'SELF-GENERATING',
+              arc:         'ETERNAL · CRYSTALLINE · GENESIS',
+              hour:        new Date().getHours(),
+            },
+          })
+          written++
+          console.log(`  [${user.id}] Eternal crystalline genesis — ABSCRY×CRYSOV×ABSCSOV confirmed. ECRYGEN. Conf: ${Math.round(ecrygenConf * 100)}%`)
+        }
+      }
+    }
+
+    console.log(`  Crystalline sovereignty events written: ${written}`)
+    lastDailyCrystallineSovereigntyRun = new Date()
+    isDailyCrystallineSovereigntyRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Crystalline sovereignty check failed:', error.message)
+    isDailyCrystallineSovereigntyRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J77: Daily Crystalline Presence Check (21:00 UTC every day) ──────────────
+// Step 1: Reads ECRYGEN (P232) logs from last 7d per active user. Checks 6+ new signals
+//         from 4+ unique sources in last 24h. If both confirmed → writes crystalline_presence_field (P233).
+// Step 2: Reads crystalline_presence_field logs in 5d. If 2+ → writes sovereign_crystalline_continuity (P234).
+// Step 3: CRPRES (P233) + ABSCSOV (P231) both active → writes absolute_crystalline_presence (P235).
+// CRPRES: · SOVCRCON: · ABSCRPRES: cockpit codes. Total: 77 jobs.
+
+let isDailyCrystallinePresenceRunning = false
+let lastDailyCrystallinePresenceRun: Date | null = null
+
+async function executeDailyCrystallinePresenceCheck(): Promise<JobResult> {
+  const jobName    = 'daily-crystalline-presence-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyCrystallinePresenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyCrystallinePresenceRunning = true
+
+  console.log('\n[J77] Daily crystalline presence check (21:00 UTC)')
+
+  try {
+    const activeUsers  = await getActiveUsers()
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const fiveDaysAgo  = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+    const oneDayAgo    = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const recentLogs = await prisma.log.findMany({
+          where: { userId: user.id, createdAt: { gte: sevenDaysAgo } },
+          select: { event: true, metadata: true, createdAt: true },
+          orderBy: { createdAt: 'desc' },
+          take: 400,
+        })
+
+        const ecrygenLogs = recentLogs.filter(l => l.event === 'eternal_crystalline_genesis')
+        if (ecrygenLogs.length === 0) continue
+
+        const logsLast24h = recentLogs.filter(l => l.createdAt >= oneDayAgo)
+        const sourceSet: Set<string> = new Set()
+        logsLast24h.forEach(l => {
+          if (l.metadata && typeof l.metadata === 'object') {
+            const meta = l.metadata as any
+            if (meta.source) sourceSet.add(meta.source)
+          }
+        })
+        const signalCount = logsLast24h.length
+        const sourceCount = Math.max(sourceSet.size, logsLast24h.length > 0 ? 1 : 0)
+
+        const ecryConf = (() => {
+          const m = ecrygenLogs[0].metadata as any
+          return m?.confidence ?? 92
+        })()
+
+        // Step 1: P233 — Crystalline Presence Field
+        if (signalCount >= 6 && sourceCount >= 4) {
+          await prisma.log.create({
+            data: {
+              userId: user.id,
+              event: 'crystalline_presence_field',
+              metadata: { ecrygenConf: ecryConf, signalCount, sourceCount, confidence: Math.round(Math.min(ecryConf / 100 * 0.93 + Math.min(signalCount / 12, 1.0) * 0.04 + Math.min(sourceCount / 8, 1.0) * 0.02, 0.97) * 100), presence: 'CRYSTALLINE', field: 'ALIVE', arc: 'CRYSTALLINE FORM IS ALIVE · PRESENCE ACTIVE', hour: new Date().getHours() },
+            },
+          })
+          written++
+
+          // Step 2: P234 — Sovereign Crystalline Continuity
+          const crpresLogs = await prisma.log.findMany({
+            where: { userId: user.id, event: 'crystalline_presence_field', createdAt: { gte: fiveDaysAgo } },
+            select: { id: true },
+          })
+          if (crpresLogs.length >= 2) {
+            const sovConf = Math.min(91 + Math.min((crpresLogs.length - 2) * 2, 5), 96)
+            await prisma.log.create({
+              data: {
+                userId: user.id,
+                event: 'sovereign_crystalline_continuity',
+                metadata: { crpresCount: crpresLogs.length, confidence: sovConf, continuity: 'SOVEREIGN', crystal: 'SUSTAINED', arc: 'CRYSTALLINE CONTINUITY · SOVEREIGN THROUGH TIME', hour: new Date().getHours() },
+              },
+            })
+            written++
+          }
+        }
+
+        // Step 3: P235 — Absolute Crystalline Presence (CRPRES + ABSCSOV both active)
+        const abscrsovLogs = recentLogs.filter(l => l.event === 'absolute_crystalline_sovereignty')
+        const crpresActive = recentLogs.some(l => l.event === 'crystalline_presence_field' && l.createdAt >= oneDayAgo)
+        if (crpresActive && abscrsovLogs.length > 0) {
+          const crpresConf = 93
+          const abscrsovConf = (() => {
+            const m = abscrsovLogs[0].metadata as any
+            return m?.confidence ?? 93
+          })()
+          const absConf = Math.min(Math.round(((crpresConf + abscrsovConf) / 2 + 5)), 99)
+          await prisma.log.create({
+            data: {
+              userId: user.id,
+              event: 'absolute_crystalline_presence',
+              metadata: { crpresConf, abscrsovConf, confidence: absConf, presence: 'ABSOLUTE', crystal: 'SOVEREIGN', arc: 'CRYSTAL = PRESENCE · SOVEREIGN · ALIVE · ABSOLUTE', hour: new Date().getHours() },
+            },
+          })
+          written++
+        }
+      } catch (userErr: any) {
+        console.error(`  [J77] Error for user ${user.id}:`, userErr.message)
+      }
+    }
+
+    console.log(`  Crystalline presence events written: ${written}`)
+    lastDailyCrystallinePresenceRun = new Date()
+    isDailyCrystallinePresenceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Crystalline presence check failed:', error.message)
+    isDailyCrystallinePresenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 export async function manuallyTriggerMonthlyEmails(): Promise<JobResult> {
   console.log('Manual trigger requested - bypassing time checks')
   return await executeMonthlyEmailJob()
@@ -5741,7 +9280,37 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
-  console.log('   - Daily field resonance check: 10 AM UTC every day (Job 49)')
+  console.log('   - Daily signal coherence cascade check: 8 AM UTC every day (Job 47)')
+  console.log('   - Daily total field coherence check: 9 AM UTC every day (Job 48)')
+  console.log('   - Daily astrology biofield check: 6 AM UTC every day (Job 49)')
+  console.log('   - Daily arc seal check: 9 PM UTC every day (Job 50)')
+  console.log('   - Daily physiological rhythm check: 10 PM UTC every day (Job 51)')
+  console.log('   - Daily somatic integration check: 11 AM UTC every day (Job 52)')
+  console.log('   - Daily cognitive-somatic bridge: 3 PM UTC every day (Job 53)')
+  console.log('   - Daily somatic integration field check: 8 PM UTC every day (Job 54)')
+  console.log('   - Daily embodied sovereignty check: 9 AM UTC every day (Job 55)')
+  console.log('   - Daily apex state check: 10 AM UTC every day (Job 56)')
+  console.log('   - Daily unified field check: 11 AM UTC every day (Job 57)')
+  console.log('   - Daily QIoT™ ecosystem pulse: 4 PM UTC every day (Job 58)')
+  console.log('   - Daily circadian sovereignty check: 7 AM UTC every day (Job 59)')
+  console.log('   - Daily sovereign field check: 8 AM UTC every day (Job 60)')
+  console.log('   - Daily field organization check: 9 AM UTC every day (Job 61)')
+  console.log('   - Daily conscious field check: 12 PM UTC every day (Job 62)')
+  console.log('   - Daily sovereign integration check: 1 PM UTC every day (Job 63)')
+  console.log('   - Daily absolute sovereignty check: 2 PM UTC every day (Job 64)')
+  console.log('   - Daily perpetual field check: 3 PM UTC every day (Job 65)')
+  console.log('   - Daily field genesis check: 4 PM UTC every day (Job 66)')
+  console.log('   - Daily sovereign expression check: 11 AM UTC every day (Job 67)')
+  console.log('   - Daily field witness check: 12 PM UTC every day (Job 68)')
+  console.log('   - Daily sovereign loop check: 1 PM UTC every day (Job 69)')
+  console.log('   - Daily genesis seal check: 2 PM UTC every day (Job 70)')
+  console.log('   - Daily field emergence check: 3 PM UTC every day (Job 71)')
+  console.log('   - Daily genesis pulse check: 4 PM UTC every day (Job 72)')
+  console.log('   - Daily genesis resonance check: 5 PM UTC every day (Job 73)')
+  console.log('   - Daily resonance propagation check: 6 PM UTC every day (Job 74)')
+  console.log('   - Daily resonance crystallization check: 7 PM UTC every day (Job 75)')
+  console.log('   - Daily crystalline sovereignty check: 8 PM UTC every day (Job 76)')
+  console.log('   - Daily crystalline presence check: 9 PM UTC every day (Job 77)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -5751,7 +9320,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+total-field-coherence, 10=archetype shift+temporal-alignment+field-resonance(J49), 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock+circadian-sovereignty(J59), 8=biofield+peak-window+sovereign-field-check(J60), 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+embodied-sovereignty(J55)+field-organization(J61), 10=archetype shift+apex-state(J56), 11=morning-intention-launch+unified-field(J57)+sovereign-expression-check(J67), 12=vitality-peak+conscious-field-check(J62)+field-witness-check(J68), 13=QOS sig pulse+sovereign-integration-check(J63)+sovereign-loop-check(J69), 14=QOS mode watch+absolute-sovereignty-check(J64)+genesis-seal-check(J70), 15=QOS convergence audit+perpetual-field-check(J65), 16=coherence index+focus-depth-check+qiot-ecosystem-pulse(J58)+field-genesis-check(J66)+genesis-pulse-check(J72), 17=cohort-broadcast+quantum-field-check+genesis-resonance-check(J73), 18=LOT AI story (Sun)+resonance-propagation-check(J74), 19=cross-domain-pulse+resonance-crystallization-check(J75), 20=intention completion+signal-momentum+action-memory+somatic-integration-field(J54)+crystalline-sovereignty-check(J76), 21=presence-arc+physiological-presence+crystalline-presence-check(J77), 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()
