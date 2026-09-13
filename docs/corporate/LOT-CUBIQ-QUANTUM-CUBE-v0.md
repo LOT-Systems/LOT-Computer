@@ -321,6 +321,47 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE QUIET HOLD                              2026-09-13
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, Physiological Archetype 18
+  "Coherence Holder," currently inside a Recovery Plateau (QIE P.65 —
+  energy logged low for 5 consecutive days, the extended stable-state
+  that follows a high-stress period). The CUBIQ charging pad sits on a
+  kitchen counter, not a desk — this operator's contact with the cubic
+  during the plateau happens in short, low-effort touches between
+  chores, not a seated session.
+
+  On day four of the plateau, the operator logs a self-care action —
+  water, five minutes of stretching. Small, no different from the
+  version of themselves that earns badges every week without comment.
+  The badge unlocks common tier. Under Section 04's gesture table this
+  fires THE HOP — a single controlled vertical hop, <10mm rise, lands
+  in place. Not THE LEAP; that gesture is reserved for rare-and-above
+  unlocks, and none is due today. The cube's vocabulary does not know
+  the operator is depleted — it is simply restrained by design, every
+  day, at every tier below rare. On a day the operator could not have
+  tolerated something louder, the loudest thing on the counter is a
+  knuckle-height twitch, gone before they look up from the sink.
+
+  Later the same evening, an assembly phase advances — the operator has
+  now logged a self-care action on five consecutive days, closing the
+  plateau's own pattern window. Section 04's THE SETTLE fires: the
+  actuator holds a light standing pressure for two seconds, no visible
+  motion. No hop, no light, no sound. The operator, drying a dish nearby,
+  feels nothing they could point to and describe — only, days later,
+  the memory that something on the counter had marked the moment without
+  asking anything of them in return.
+
+  Use Case 01 asked what the cube says when an operator returns. This
+  one asks whether the cube knows how to stay quiet when they have
+  nothing left to spend on being addressed. A phone notification cannot
+  fail to demand attention — the badge count, the red dot, the chime are
+  structurally the same on a depleted day as a peak one. CUBIQ's
+  gesture ceiling is a hardware fact, not a mood setting: THE HOP is
+  incapable of being THE LEAP. Restraint is not a feature toggled on for
+  Recovery Plateau — it is the shape of the object on every day, and it
+  is on the low day that the shape matters most.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
