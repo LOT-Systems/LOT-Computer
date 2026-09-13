@@ -226,3 +226,23 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Ship Mode: Divergence Timeout
+
+A BEST-marked branch left unshipped long enough for master to move on loses
+its merge-base — cherry-pick then fails cleanly, and every subsequent session
+reimplements the feature from scratch on a new branch instead of shipping the
+old one. The reimplementation is itself real and green, but it lands on
+another throwaway branch, so the cycle repeats indefinitely: N sessions,
+N branches, zero merges. This is not a build failure — every individual
+session reports GREEN — it is a ship-mode failure that never shows up in any
+single session's CHECK B, only in the MANIFEST's "BEST since" age.
+Mitigation: a BEST candidate unshipped past ~2 weeks should be either (a)
+ship-moded immediately even if it requires a manual/staged rebuild rather than
+a clean cherry-pick, or (b) escalated to S-2 as a decision blocker rather than
+left to accumulate silent rebuild cycles. Autonomous sessions should check
+MANIFEST "BEST since" age before rebuilding a feature that already has a BEST
+entry, and prefer porting/shipping the existing BEST over writing a new
+competing iteration.
+(SR-20260913-01: Basics Tab BEST since 20260612, rebuilt clean-but-unshipped
+on 30 separate dates across 3 months, 36 commits, zero PRs opened.)

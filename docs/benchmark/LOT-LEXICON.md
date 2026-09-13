@@ -72,4 +72,7 @@ COMINTEL:          Community Intelligence Peak — log block label; cohort + jou
 EMBODIED-COGNITION-ARC   QIE P110 — selfcare + journal 150+w + memory capture all in 24h; biological grounding and cognitive expression confirmed simultaneously; body feeding mind  B  20260706
 INTENTION-COMPLETION-LOOP QIE P111 — intention set + planner + goal action all in 24h; direction→structure→outcome arc closed in one day; rare single-day loop  B  20260706
 COMMUNITY-INTELLIGENCE-PEAK  QIE P112 — cohort signal + journal + memory + intentions all in 48h; external social signal anchored internally through writing, capture, and direction-setting  B  20260706
+OPEN TAB           LOT-FM-001 public/read-only surface — ledger visible before enrollment; no data collected, no money moved  A  20260913
+ON STRENGTH        LOT-FM-001 status: operator actively enrolled and receiving the physical ration                          A  20260913
+BASIC-RATION       LOT-FM-001 physical/hardware layer of the LOT system — 23-item monthly issue, $100/mo, ≤$40 landed COGS  A  20260913
 ```
