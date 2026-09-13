@@ -1978,6 +1978,35 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'generated_story') {
+          const story = log.metadata?.story as string | undefined
+          const period = log.metadata?.period as string | undefined
+          const peakHigh = log.metadata?.peakHigh as { mood?: string; date?: string } | null | undefined
+          const peakLow = log.metadata?.peakLow as { mood?: string; date?: string } | null | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="STORY:" blockView>
+                {period && (
+                  <div className="uppercase tracking-widest mb-4">{period.toUpperCase()} COMPRESSION</div>
+                )}
+                {story && (
+                  <div className="opacity-60 mb-4">{story}</div>
+                )}
+                {peakHigh?.mood && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">HIGH</span>
+                    <span className="uppercase">{peakHigh.mood}{peakHigh.date ? ` · ${peakHigh.date}` : ''}</span>
+                  </div>
+                )}
+                {peakLow?.mood && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">LOW</span>
+                    <span className="uppercase">{peakLow.mood}{peakLow.date ? ` · ${peakLow.date}` : ''}</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'assembly_directive') {
           const directive = log.metadata?.directive as string | undefined
           const isError = log.metadata?.error as boolean | undefined
@@ -4126,6 +4155,10 @@ const NoteEditor = ({
           '',
           '/prayer       Generate contextual scripture',
           '/story        Generate a personal story from recent data',
+          '/story day    Compress today into a story — high/low peak',
+          '/story week   Compress this week into a story',
+          '/story month  Compress this month into a story',
+          '/story year   Compress this year into a story',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
@@ -4152,11 +4185,17 @@ const NoteEditor = ({
           setStoryLoading(true)
           setStoryResponse(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const stripped = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            // /story day|week|month|year compresses that window instead of the
+            // default "last 200 signals" behavior. Bare /story is unaffected.
+            const periodMatch = stripped.match(/^(day|week|month|year)\b/i)
+            const period = periodMatch ? (periodMatch[1].toLowerCase() as 'day' | 'week' | 'month' | 'year') : undefined
+            const logText = period ? stripped.slice(periodMatch![0].length).trim() : stripped
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              period,
               quantumState: state,
               userIndex: index,
             })

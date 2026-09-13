@@ -1085,7 +1085,7 @@ export default async (fastify: FastifyInstance) => {
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
       'weekly_summary_response', 'calendar_entry', 'qi_rfi',
-      'assembly_directive', 'prayer_scripture',
+      'assembly_directive', 'prayer_scripture', 'generated_story',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
       // Achievement + goal events
@@ -5490,6 +5490,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: 'day' | 'week' | 'month' | 'year'
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,11 +5515,23 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period = req.body.period
+
+      // Compressed-period story: /story day|week|month|year narrows the window
+      // and looks for the highest and lowest signal moments in that window, not
+      // just the last N logs. No period (bare /story) keeps the prior behavior —
+      // last 200 logs, unwindowed — so existing usage is unaffected.
+      const PERIOD_WINDOWS: Record<string, number> = { day: 1, week: 7, month: 30, year: 365 }
+      const PERIOD_LIMITS: Record<string, number> = { day: 200, week: 200, month: 500, year: 1500 }
+      const since = period ? dayjs().subtract(PERIOD_WINDOWS[period], 'day').toDate() : undefined
 
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          ...(since ? { createdAt: { [Op.gte]: since } } : {}),
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: period ? PERIOD_LIMITS[period] : 200,
       })
 
       const recentEntries = logs
@@ -5527,8 +5540,8 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         .map(l => (l.text || '').substring(0, 200))
         .filter(Boolean)
 
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
+      const moodLogs = logs.filter(l => l.event === 'emotional_checkin')
+      const recentMoods = moodLogs.slice(0, 10).map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
 
       const selfCareLogs = logs.filter(l =>
         l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
@@ -5547,14 +5560,55 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
+      // Compressed-period digest: mood distribution + the single highest and
+      // lowest signal moments in the window, so a month/year story compresses
+      // to peaks rather than diluting into an average.
+      let digestBlock = ''
+      let peakHigh: { text: string; mood: string; date: string } | null = null
+      let peakLow: { text: string; mood: string; date: string } | null = null
+      if (period) {
+        const MOOD_POSITIVE = new Set(['energized', 'calm', 'hopeful', 'grateful', 'fulfilled', 'content', 'peaceful', 'excited', 'grounded', 'focused', 'flowing', 'steady'])
+        const MOOD_HARD = new Set(['tired', 'anxious', 'exhausted', 'overwhelmed', 'restless', 'uncertain', 'drained', 'depleted', 'unsettled', 'heavy'])
+
+        const moodCounts: Record<string, number> = {}
+        for (const l of moodLogs) {
+          const mood = (l.metadata?.emotionalState as string) || ''
+          if (!mood) continue
+          moodCounts[mood] = (moodCounts[mood] || 0) + 1
+          const text = (l.text || '').substring(0, 160)
+          const entry = { text, mood, date: dayjs(l.createdAt).format('YYYY-MM-DD') }
+          if (MOOD_POSITIVE.has(mood) && !peakHigh) peakHigh = entry
+          if (MOOD_HARD.has(mood) && !peakLow) peakLow = entry
+        }
+        const dominantMood = Object.entries(moodCounts).sort(([, a], [, b]) => b - a)[0]?.[0]
+        const selfCareCount = logs.filter(l => ['self_care_complete', 'self_care_completed'].includes(l.event)).length
+        const intentionsCount = logs.filter(l => l.event === 'intention').length
+        const journalCount = logs.filter(l => ['note', 'journal', 'log_entry'].includes(l.event) && l.text).length
+
+        digestBlock = `
+PERIOD DIGEST (${period.toUpperCase()}, ${PERIOD_WINDOWS[period]} DAYS):
+TOTAL SIGNALS: ${logs.length}
+DOMINANT MOOD: ${dominantMood ? dominantMood.toUpperCase() : 'NO DATA'}
+JOURNAL ENTRIES: ${journalCount}
+SELF-CARE ACTS: ${selfCareCount}
+INTENTIONS SET: ${intentionsCount}
+HIGH PEAK: ${peakHigh ? `${(peakHigh as any).date} — ${(peakHigh as any).mood.toUpperCase()}${(peakHigh as any).text ? ` — "${(peakHigh as any).text}"` : ''}` : 'NONE DETECTED'}
+LOW PEAK: ${peakLow ? `${(peakLow as any).date} — ${(peakLow as any).mood.toUpperCase()}${(peakLow as any).text ? ` — "${(peakLow as any).text}"` : ''}` : 'NONE DETECTED'}`
+      }
+
+      const periodLabel = period
+        ? `Compress the operator's PAST ${period.toUpperCase()} into their story — not just the latest entry.`
+        : `Reflect the operator's recent journey.`
+
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story${period ? ` ${period}` : ''}. ${periodLabel} Your task: write 1-2 paragraphs (100-200 words) that reflect their journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
 - Draw from their actual log entries, moods, and self-care answers below
 - Reference specific details from their data — make it feel like THEIR story
+${period ? '- If a HIGH PEAK or LOW PEAK is named in the digest below, name that specific moment — the story should surface the actual high and low, not smooth them into an average' : ''}
 - If they've been consistent with check-ins, acknowledge the discipline
 - If there are gaps or struggle, acknowledge that with compassion
 - The tone should match their current energy: reflective if low, energized if high
@@ -5566,6 +5620,7 @@ RULES:
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
+${digestBlock}
 
 RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
 
@@ -5581,7 +5636,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
 
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
+        console.log(`📖 Story generation for ${req.user.email}${period ? ` [${period}]` : ''}: "${(logText || '').substring(0, 80)}"`)
 
         const story = await engine.generateCompletion(fullPrompt, 512)
 
@@ -5596,6 +5651,9 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            period: period || null,
+            peakHigh,
+            peakLow,
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
