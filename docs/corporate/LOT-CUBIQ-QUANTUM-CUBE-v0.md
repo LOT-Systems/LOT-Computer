@@ -5,8 +5,9 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
-STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
+REVISED:  2026-09-14 — CYCLE 2 — component selection + firmware state machine
+VERSION:  0.2 — DEVELOPMENT CONTINUED
+STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (BOM DRAFTED, DESIGN LOCK PENDING)
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -58,6 +59,21 @@ read in full:
 No prior document specified jump mechanics, surface locomotion, or a
 levitation roadmap. This document is that specification, v.0.
 
+  CYCLE 2 READING LOG — 2026-09-14
+
+  Per this document's own Section 09 instruction ("Future sessions read
+  this document first"), this cycle re-read LOT-CUBIQ-QUANTUM-CUBE-v0.md
+  v0.1 in full before extending it, plus every source named above. No new
+  LOT® Institute document exists between v0.1 (2026-07-28) and this cycle
+  — the two-source corpus (LOT_QI46_ENGINE.md, CQGS-WHITE-PAPER-SNAPSHOT.md)
+  remains the complete Institute record on hardware. This cycle's addition
+  (Sections 06-07, below) is therefore an extension of that same corpus,
+  not a new source: it converts the "class"-level component language
+  already in Section 03 (voice-coil OR solenoid class, piezoelectric
+  bimorph, 6-axis IMU, ToF sensor) into a locked reference selection and a
+  firmware state machine, and appends the next required consumer use case
+  to Section 09.
+
 --------------------------------------------------------------------------------
 01 // WHAT v.0 IS AND WHAT IT IS NOT
 --------------------------------------------------------------------------------
@@ -91,7 +107,7 @@ their attention.
       PLUS a second axis of actuation (yaw torque) and a friction/
       traction model this document opens research on but does not close.
     - A levitating cube. Levitation is the named horizon, not a v.0
-      deliverable. Section 06 opens the research track. No claim is made
+      deliverable. Section 08 opens the research track. No claim is made
       here about a working levitation mechanism.
 
   THE PRINCIPLE
@@ -231,7 +247,128 @@ with a physical actuator standing where a passive sensor used to be
 assumed.
 
 --------------------------------------------------------------------------------
-06 // ROADMAP — v.0 → v.1 → v.2 → v.3
+06 // COMPONENT SELECTION — v.0 REFERENCE BOM
+--------------------------------------------------------------------------------
+
+Section 03 named component CLASSES (voice-coil OR solenoid, piezoelectric
+bimorph, 6-axis IMU, ToF sensor). This cycle locks the reference selection
+each class resolves to for the first BOM lock candidate. Every line is
+sized against the mass budget in Section 02 (<120g fully assembled) —
+mass, not cost, is the constraint that governs this table.
+
+  SUBSYSTEM          CLASS                          v.0 REFERENCE TARGET
+  ─────────          ─────                          ─────────────────────
+  Primary actuator   Voice-coil linear actuator      8-10mm diameter,
+                      (selected over solenoid for     3-5mm stroke, 1.5-2N
+                      controllability + quiet          peak force, <8g
+                      operation — Section 03)
+  Direction bias      Piezoelectric bimorph strip,     15-20mm length,
+                      angle-mounted                    5-15deg fixed mount
+                                                        angle, <2g, fires
+                                                        1ms post-release
+  Motion sensing      6-axis IMU (accel + gyro),        MEMS package,
+                      geometric center                  <2mm z-height,
+                                                          400Hz+ sample rate
+                                                          for landing-recovery
+                                                          window (Section 03)
+  Edge safety         Time-of-flight, base face,        <20mm to <2m range,
+                      forward-facing                    <10ms response —
+                                                         Section 03's 20mm
+                                                         inhibit threshold
+                                                         needs sub-hop-latency
+                                                         reads, not sub-second
+  Power               Wireless (Qi-class inductive)      Receiver coil sized
+                      receiver coil + Li-Po cell          to base face
+                                                          (Section 02); cell
+                                                          capacity sized to
+                                                          survive charging-pad
+                                                          removal (operator
+                                                          carries cube off the
+                                                          "table") for a full
+                                                          waking day of
+                                                          gesture-class events
+  Indicator           Single LED ring, base face          Pairing/charge
+                                                          state only —
+                                                          Section 02's
+                                                          anti-feed constraint
+                                                          (motion is the
+                                                          language, not light)
+  Compute             Low-power MCU, single die           Drives actuator
+                                                          PWM, reads IMU + ToF,
+                                                          runs the Section 07
+                                                          state machine, holds
+                                                          the BLE/Wi-Fi link
+                                                          back to the Index of
+                                                          Systems signal bus
+  Shell               Nano-ceramic composite, matte,       Per Section 02 —
+                      LOT® black                           unchanged this
+                                                            cycle
+
+  MASS LEDGER (v.0 TARGET, NOT YET MEASURED)
+    Actuator + bias element      ~10g
+    IMU + ToF + MCU              ~5g
+    Coil + cell                  ~35g  (largest single line — v.1's <90g
+                                        target (Section 08) depends on
+                                        trimming this line first, not the
+                                        actuator)
+    Shell + feet + assembly      ~65g  (remainder of the <120g budget)
+    TOTAL TARGET                 <120g — matches Section 02
+
+  WHAT IS NOT YET LOCKED
+    No vendor part numbers are named in this document. "Reference target"
+    means a size/spec envelope a real component must fit, not a
+    procurement decision. Vendor selection and first-article sourcing are
+    a v.0 hardware-build milestone, not a documentation milestone — they
+    are gated behind this BOM being reviewed and signed off by S-2.
+
+--------------------------------------------------------------------------------
+07 // FIRMWARE — GESTURE DISPATCH STATE MACHINE
+--------------------------------------------------------------------------------
+
+The MCU (Section 06) runs one state machine. It is the software expression
+of the loop already drawn in Section 05 — this section specifies the
+on-device half of that loop, not a new architecture.
+
+    IDLE
+      │  signal arrives on the bus (Section 05: badge unlock / memory
+      │  question ready / cohort resonance ping)
+      ▼
+    GESTURE_ARMED
+      │  map signal → gesture (Section 04 table)
+      │  IF gesture requires liftoff (THE HOP, THE LEAP):
+      │      poll ToF edge sensor — Section 03's 20mm inhibit check
+      │      IF edge detected within threshold:
+      │          SUBSTITUTE gesture → THE NUDGE-class in-place shudder
+      │          (Section 03: "a physical object that leaps unattended
+      │          on a desk MUST refuse to leap itself onto the floor" —
+      │          this is that rule, as code, not just as a spec sentence)
+      ▼
+    GESTURE_EXECUTING
+      │  drive actuator PWM per gesture profile (Section 04)
+      │  piezoelectric bias fires 1ms post-release for THE HOP / THE LEAP
+      │  IMU sampling continues through the full motion window
+      ▼
+    LANDING_RECOVERY
+      │  read IMU tilt angle post-landing
+      │  IF tilt > 25deg (Section 03 threshold):
+      │      fire corrective micro-pulse from same actuator
+      │      re-sample IMU, repeat once
+      ▼
+    TELEMETRY_EMIT
+      │  package pressure/duration/cadence + tilt/recovery-count as the
+      │  "haptic preference" signal (Section 05; LOT_QI46_ENGINE.md
+      │  line 757) and push to the Calibration Loop
+      ▼
+    IDLE
+
+  GATE FOR THIS STATE MACHINE (inherits Section 08's v.0 gate)
+    500/500 simulated dispatch cycles (bench rig, not yet the physical
+    actuator) with zero missed edge-inhibit substitutions and zero
+    unhandled tilt-recovery cases before this firmware is eligible to
+    drive a physical actuator build.
+
+--------------------------------------------------------------------------------
+08 // ROADMAP — v.0 → v.1 → v.2 → v.3
 --------------------------------------------------------------------------------
 
   v.0 — CONTROLLED HOP (THIS DOCUMENT)
@@ -279,7 +416,7 @@ assumed.
     levitating future in mind rather than foreclosing it.
 
 --------------------------------------------------------------------------------
-07 // CONSUMER USE CASES
+09 // CONSUMER USE CASES
 --------------------------------------------------------------------------------
 
 This section accumulates one new consumer use case per development
@@ -321,8 +458,50 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE SHARED TABLE                             2026-09-14
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Legacy tier, Archetype "Diurnal Operator" (Arch25),
+  active J18 evening-close job (22:00 UTC EVE: handler), three-years-plus
+  tenure, two school-age children at home. The CUBIQ charging pad sits on
+  the family dinner table, not a desk — the operator's evening pattern is
+  a 20-30 minute wind-down after dinner, cube present, phone left in
+  another room by household rule.
+
+  Mid-dinner, the QIE fires P79 evening-coherence-close — the pattern
+  that closes the operator's DIURNAL ARC for the day. Under a phone-based
+  notification model this would be a buzz face-down on a counter,
+  unseen until after the meal, or worse, seen and answered mid-bite. On
+  CUBIQ hardware v.0, the signal maps to THE HOP (Section 04): a single
+  controlled vertical hop, <10mm rise, lands in place.
+
+  Here the Section 07 firmware state machine's edge-inhibit path is not a
+  hypothetical — it is load-bearing. The dinner table has place settings,
+  a water glass, a child's hand inches from the cube. The ToF sensor
+  reads the reduced clearance and the state machine substitutes the
+  THE NUDGE-class shudder in place of the hop before any liftoff is
+  attempted. What the family witnesses is not a leaping object near
+  glassware; it is a small, contained tremor, felt by whoever's hand is
+  nearest the table edge, gone before it is questioned.
+
+  The children ask what it was. The operator explains, plainly: the
+  system noticed the day's care was complete. Nothing to open, nothing to
+  answer, nothing to scroll — a fact registered by a machine, made
+  briefly physical, then already over. This is the LOT® Person™ data
+  thesis (LOT-CUBIQ-OPERATOR.md, Section 06) made visible at the table:
+  a parent modeling self-care discipline as a felt, momentary event
+  rather than a screen pulled out at dinner. The robot that eventually
+  trains on this operator's Index inherits not just the signal that fired,
+  but the fact that the household's evening stayed a household evening —
+  the anti-feed thesis holding even under the hardest social condition
+  v.0 has yet been asked to perform in: shared, unpredictable, physically
+  crowded space, with a child's hand near the actuator.
+
+  This is why Section 06's edge-safety line item and Section 07's
+  inhibit-substitution branch are v.0 requirements, not v.1 refinements:
+  the first real household this cube sits in will not be a clear desk.
+
 --------------------------------------------------------------------------------
-08 // BRAND
+10 // BRAND
 --------------------------------------------------------------------------------
 
 LOT® Quantum Cube             The object
