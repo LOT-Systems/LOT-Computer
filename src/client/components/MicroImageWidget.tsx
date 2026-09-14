@@ -244,8 +244,13 @@ export const MicroImageWidget: React.FC = () => {
     }
   }, [composition, density, seed])
 
-  // Record a signal once when the widget mounts with meaningful context
-  if (!hasRecordedRef.current && punctuation.sampleSize > 0) {
+  // Record a signal once when the widget mounts with meaningful context.
+  // Deferred to an effect — recordSignal() writes the intentionEngine store,
+  // and a store write during render cascades subscriber re-renders before
+  // paint (LOT-DOCTRINE: Async Signal Recording / Render Isolation).
+  React.useEffect(() => {
+    if (hasRecordedRef.current || punctuation.sampleSize === 0) return
+    hasRecordedRef.current = true
     recordSignal('intentions', 'microimage_rendered', {
       composition,
       tone: punctuation.aggregate.tone,
@@ -254,8 +259,8 @@ export const MicroImageWidget: React.FC = () => {
       callForHelp: punctuation.callForHelp,
       hour: new Date().getHours(),
     })
-    hasRecordedRef.current = true
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [punctuation.sampleSize])
 
   const handleRegenerate = () => {
     setSeed(Math.floor(Math.random() * 1e6) + 1)

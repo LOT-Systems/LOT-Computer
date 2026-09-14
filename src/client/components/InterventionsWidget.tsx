@@ -26,22 +26,30 @@ export function InterventionsWidget() {
     setCurrentIndex(prev => (prev + 1) % data.interventions.length)
   }
 
+  // Record intervention signal once per mount. Deferred to an effect (kept
+  // above the data-dependent early returns below, so hook call order stays
+  // stable) — recordSignal() writes the intentionEngine store, and a store
+  // write during render cascades subscriber re-renders before paint
+  // (LOT-DOCTRINE: Async Signal Recording / Render Isolation).
+  React.useEffect(() => {
+    if (hasRecordedRef.current) return
+    if (!data || data.message || data.interventions.length === 0) return
+    hasRecordedRef.current = true
+    const first = data.interventions[0]
+    recordSignal('mood', `intervention_${first.severity}`, {
+      type: first.type,
+      severity: first.severity,
+      hour: new Date().getHours()
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
+
   if (isLoading) return null
   if (!data || data.message) return null // Not enough data yet
   if (data.interventions.length === 0) return null // No interventions needed
 
   const intervention = data.interventions[currentIndex]
   const hasMultiple = data.interventions.length > 1
-
-  // Record intervention signal once per mount
-  if (!hasRecordedRef.current) {
-    recordSignal('mood', `intervention_${intervention.severity}`, {
-      type: intervention.type,
-      severity: intervention.severity,
-      hour: new Date().getHours()
-    })
-    hasRecordedRef.current = true
-  }
 
   const getSeverityIndicator = () => {
     switch (intervention.severity) {

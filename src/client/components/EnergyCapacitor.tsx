@@ -40,21 +40,29 @@ export function EnergyCapacitor() {
     })
   }
 
-  if (isLoading) return null
-  if (!data || data.message) return null // Not enough data yet
-  if (!data.energyState) return null
-
-  const { energyState, suggestions } = data
-
-  // Record energy signal once per mount
-  if (!hasRecordedRef.current && energyState) {
+  // Record energy signal once per mount. Deferred to an effect (kept above
+  // the data-dependent early returns below, so hook call order stays
+  // stable) — recordSignal() writes the intentionEngine store, and a store
+  // write during render cascades subscriber re-renders before paint
+  // (LOT-DOCTRINE: Async Signal Recording / Render Isolation).
+  React.useEffect(() => {
+    if (hasRecordedRef.current) return
+    const energyState = data?.energyState
+    if (!energyState) return
+    hasRecordedRef.current = true
     recordSignal('selfcare', `energy_${energyState.status}`, {
       level: energyState.currentLevel,
       trajectory: energyState.trajectory,
       hour: new Date().getHours()
     })
-    hasRecordedRef.current = true
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
+
+  if (isLoading) return null
+  if (!data || data.message) return null // Not enough data yet
+  if (!data.energyState) return null
+
+  const { energyState, suggestions } = data
 
   // Correlate energy with mood
   const getMoodEnergyCorrelation = (): string | null => {

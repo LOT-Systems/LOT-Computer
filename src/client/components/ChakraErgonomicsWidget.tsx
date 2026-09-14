@@ -58,8 +58,13 @@ export function ChakraErgonomicsWidget() {
     return () => clearInterval(interval)
   }, [])
 
-  // Record signal once per mount
-  if (!hasInitRef.current) {
+  // Record signal once per mount. Deferred to an effect (not run in the
+  // render body) — recordSignal() writes the intentionEngine store, and a
+  // store write during render cascades subscriber re-renders before paint
+  // (LOT-DOCTRINE: Async Signal Recording / Render Isolation).
+  React.useEffect(() => {
+    if (hasInitRef.current) return
+    hasInitRef.current = true
     const weakest = [...state.chakras].sort((a, b) => a.charge - b.charge)[0]
     if (weakest) {
       recordSignal('selfcare', `chakra_scan_${weakest.id}`, {
@@ -68,8 +73,8 @@ export function ChakraErgonomicsWidget() {
         durationMinutes: state.session.durationMinutes,
       })
     }
-    hasInitRef.current = true
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const cycleView = () => {
     setView(prev =>

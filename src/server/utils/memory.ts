@@ -784,7 +784,8 @@ Recent activity logs (for additional context):
 function formatLog(log: Log): string {
   let body = ''
   switch (log.event) {
-    case 'answer': {
+    case 'answer':
+    case 'medical_record': {
       body = [
         `Q: "${log.metadata.question}"`,
         `O: ${((log.metadata.options || []) as string[])
@@ -821,6 +822,52 @@ function formatLog(log: Log): string {
     case 'emotional_checkin': {
       const state = (log.metadata as any)?.emotionalState
       if (state) body = `Biofield check-in: ${state}`
+      break
+    }
+    case 'self_care_complete': {
+      const action = (log.text || '').replace('Self-care completed: ', '')
+      body = action ? `Completed: ${action}` : 'Self-care completed'
+      break
+    }
+    case 'self_care_skip': {
+      const skipped = (log.text || '').replace('Self-care skipped: ', '')
+      body = skipped ? `Skipped: ${skipped}` : 'Self-care skipped'
+      break
+    }
+    case 'theme_change': {
+      body = log.text || 'Theme changed'
+      break
+    }
+    default: {
+      // quantum_intent_signal — the bulk of QIE widget interactions land here
+      // (recordSignal -> /api/quantum-intent/sync writes them all under this
+      // single event type; without this default case they were silently
+      // dropped from the Memory Engine prompt, see LOT-DOCTRINE PLANNER-CONTEXT).
+      if ((log as any).event === 'quantum_intent_signal') {
+        const source = log.metadata?.source || ''
+        const signal = log.metadata?.signal || log.text || ''
+        const meta = log.metadata?.signalMetadata as Record<string, any> | undefined
+        const parts = [`${source}: ${signal}`]
+        if (meta) {
+          if (meta.questionId) parts.push(`question: ${meta.question || meta.questionId}`)
+          if (meta.option) parts.push(`chose: ${meta.option}`)
+          if (meta.intent) parts.push(`intent: ${meta.intent}`)
+          if (meta.today) parts.push(`today: ${meta.today}`)
+          if (meta.how) parts.push(`how: ${meta.how}`)
+          if (meta.feeling) parts.push(`feeling: ${meta.feeling}`)
+          if (meta.focus) parts.push(`focus: ${meta.focus}`)
+          if (meta.intention) parts.push(`intention: ${meta.intention}`)
+          if (meta.practice) parts.push(`practice: ${meta.practice}`)
+          if (meta.action) parts.push(`action: ${meta.action}`)
+          if (meta.pattern) parts.push(`pattern: ${meta.pattern}`)
+          if (meta.level) parts.push(`level: ${meta.level}`)
+          if (meta.trajectory) parts.push(`trajectory: ${meta.trajectory}`)
+          if (meta.energyLevel) parts.push(`energy: ${meta.energyLevel}`)
+          if (meta.severity) parts.push(`severity: ${meta.severity}`)
+          if (meta.result) parts.push(`result: ${meta.result}`)
+        }
+        body = parts.join(' • ')
+      }
       break
     }
   }

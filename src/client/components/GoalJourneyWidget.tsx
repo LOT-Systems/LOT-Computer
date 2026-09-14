@@ -35,23 +35,31 @@ export function GoalJourneyWidget() {
     })
   }
 
-  if (isLoading) return null
-  if (!data || data.message) return null // Not enough data yet
-  if (!data.progression) return null
-
-  const { progression } = data
-  const { goals, overallJourney, narrative } = progression
-
-  // Record goal signal once per mount
-  if (!hasRecordedRef.current) {
+  // Record goal signal once per mount. Deferred to an effect (kept above the
+  // data-dependent early returns below, so hook call order stays stable) —
+  // recordSignal() writes the intentionEngine store, and a store write during
+  // render cascades subscriber re-renders before paint (LOT-DOCTRINE: Async
+  // Signal Recording / Render Isolation).
+  React.useEffect(() => {
+    if (hasRecordedRef.current) return
+    if (!data || data.message || !data.progression) return
+    hasRecordedRef.current = true
+    const { goals, overallJourney } = data.progression
     const activeGoals = goals?.filter((g: any) => g.state === 'active' || g.state === 'progressing') || []
     recordSignal('intentions', 'goals_viewed', {
       activeGoalCount: activeGoals.length,
       primaryGoal: overallJourney?.primaryGoal?.title || null,
       hour: new Date().getHours()
     })
-    hasRecordedRef.current = true
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
+
+  if (isLoading) return null
+  if (!data || data.message) return null // Not enough data yet
+  if (!data.progression) return null
+
+  const { progression } = data
+  const { goals, overallJourney, narrative } = progression
 
   const label =
     view === 'journey' ? 'Journey:' :

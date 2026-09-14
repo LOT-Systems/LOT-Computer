@@ -41,7 +41,8 @@ export const CohortConnectWidget: React.FC = () => {
   // Record cohort widget view signal once. Include punctuation tone
   // so the intent engine can correlate cohort engagement with the
   // user's current intonation.
-  if (!hasRecordedRef.current && cohortData?.matches?.length) {
+  React.useEffect(() => {
+    if (hasRecordedRef.current || !cohortData?.matches?.length) return
     recordSignal('mood', 'cohort_widget_viewed', {
       matchCount: cohortData.matches.length,
       hour: new Date().getHours(),
@@ -50,7 +51,7 @@ export const CohortConnectWidget: React.FC = () => {
       callForHelp: punctuation.callForHelp,
     })
     hasRecordedRef.current = true
-  }
+  }, [cohortData?.matches?.length, punctuation.aggregate.tone, punctuation.aggregate.intensity, punctuation.callForHelp])
 
   if (isLoading || !cohortData?.matches || cohortData.matches.length === 0) {
     return null

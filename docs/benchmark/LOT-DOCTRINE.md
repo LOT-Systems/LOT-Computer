@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
 
 ## Render Isolation
 
@@ -9,14 +9,23 @@ visibility belongs in lightweight wrapper components, not the root.
 Corollary: work that WRITES to a store must not run inside useMemo (render
 phase) — the writes schedule subscriber re-renders before the browser can
 paint. Move such work to useEffect so atom writes land after paint; seed
-the derived value with useState for an identical first render.
+the derived value with useState for an identical first render. The same
+corollary applies to a bare `if (!ref.current) { store.write(...) }` guard
+placed directly in a component body — a ref guard prevents repeat calls,
+not the render-phase timing violation; it still needs useEffect.
 (SR-20260602-01: router moved from App to TabPanel; System re-render
 eliminated on tab switch. SR-20260603-01: unused Block subscriptions
 removed; per-item subscriptions lifted to parent in Sync; nav buttons
 memoized so only active-state changes trigger re-render. SR-20260719-01:
 System quantumState analyzeIntentions()+recomputeAssembly() moved
 useMemo->useEffect — 10 subscriber re-renders no longer block paint;
-SystemProgressWidget 60s recompute interval gated on !document.hidden.)
+SystemProgressWidget 60s recompute interval gated on !document.hidden.
+SR-20260914-01: same ref-guarded-render-body pattern found and fixed in six
+widgets — CohortConnectWidget, ChakraErgonomicsWidget, GoalJourneyWidget,
+InterventionsWidget, EnergyCapacitor, MicroImageWidget — each calling
+recordSignal() [intentionEngine store write] unconditionally during render;
+moved to useEffect, placed above data-dependent early returns where those
+existed so hook-call order stays stable across renders.)
 
 ## Client Cache Freshness
 
@@ -226,3 +235,12 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+(SR-20260914-01: rule 1 found actually violated — quantum_intent_signal, the
+event type nearly all QIE recordSignal() calls are synced under, had no
+formatLog() case and no default branch, so the majority of widget signal
+volume was silently absent from every AI prompt build. A default case now
+decodes source/signal/signalMetadata. This event type is intentionally
+excluded from the human-facing Log tab's displayableEvents allowlist —
+that is a separate whitelist (Backend Whitelist Hygiene, api.ts GET /logs)
+and was not the bug; formatLog() operates on the full unfiltered log
+fetch used for AI context, independent of what the UI displays.)
