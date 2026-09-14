@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo, getJapaneseZodiac, getMoonEmoji, wallClockDateFromMoment } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -202,14 +202,21 @@ export const System = React.memo(function SystemInner() {
     return () => clearInterval(id)
   }, [])
 
+  // Personalization anchor: read the ambient reading in the user's saved
+  // profile timeZone when they have one set (same wall-clock-passthrough
+  // trick as the server-side Logs snapshot in getLogContext), falling back
+  // to device-local time for logged-out/no-timeZone users.
+  const userTimeZone = (me as any)?.metadata?.timeZone as string | null | undefined
+
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
-  // rokuyo), not a personal natal chart.
+  // rokuyo, current-year zodiac animal), not a personal natal chart.
   const astrology = React.useMemo(() => {
-    const now = new Date()
+    const now = userTimeZone ? wallClockDateFromMoment(dayjs().tz(userTimeZone)) : new Date()
     const hourlyZodiac = getHourlyZodiac(now)
     const westernZodiac = getWesternZodiac(now)
     const moonPhase = getMoonPhase(now)
     const rokuyo = getRokuyo(now)
+    const yearZodiac = getJapaneseZodiac(now.getFullYear())
 
     return {
       hourlyZodiac,
@@ -217,9 +224,10 @@ export const System = React.memo(function SystemInner() {
       moonPhase: moonPhase.phase,
       moonIllumination: moonPhase.illumination,
       rokuyo,
+      yearZodiac,
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+  }, [astrologyTick, userTimeZone])
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
@@ -233,10 +241,11 @@ export const System = React.memo(function SystemInner() {
       astrology.moonPhase,
       astrology.moonIllumination,
       astrology.hourlyZodiac,
-      astrology.westernZodiac
+      astrology.westernZodiac,
+      astrology.yearZodiac
     )
     localStorage.setItem(lastRecordedKey, today)
-  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac])
+  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac, astrology.yearZodiac])
 
   const answerLogs = React.useMemo(() => {
     return logs.filter(log => log.event === 'answer')
@@ -465,7 +474,7 @@ export const System = React.memo(function SystemInner() {
         <div>
           <Block label="Astrology:">
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {getMoonEmoji(astrology.moonPhase)} {astrology.moonPhase} ({astrology.moonIllumination}%) • Year of the {astrology.yearZodiac}
             </div>
           </Block>
         </div>
@@ -671,7 +680,7 @@ export const System = React.memo(function SystemInner() {
         >
           {astrologyView === 'astrology' ? (
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {getMoonEmoji(astrology.moonPhase)} {astrology.moonPhase} ({astrology.moonIllumination}%) • Year of the {astrology.yearZodiac}
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>

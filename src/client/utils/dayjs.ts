@@ -8,6 +8,7 @@
 
 import _dayjs from 'dayjs'
 import dayjsUtc from 'dayjs/plugin/utc.js'
+import dayjsTimeZone from 'dayjs/plugin/timezone.js'
 import dayjsRelativeTime from 'dayjs/plugin/relativeTime.js'
 import dayjsWeekOfYear from 'dayjs/plugin/weekOfYear.js'
 import dayjsIsoWeek from 'dayjs/plugin/isoWeek.js'
@@ -15,7 +16,9 @@ import dayjsAdvancedFormat from 'dayjs/plugin/advancedFormat.js'
 import dayjsDayOfYear from 'dayjs/plugin/dayOfYear.js'
 import { Dayjs as _Dayjs } from 'dayjs'
 
+// utc must be extended before timezone - dayjs's own plugin requirement.
 _dayjs.extend(dayjsUtc)
+_dayjs.extend(dayjsTimeZone)
 _dayjs.extend(dayjsRelativeTime)
 _dayjs.extend(dayjsWeekOfYear)
 _dayjs.extend(dayjsIsoWeek)

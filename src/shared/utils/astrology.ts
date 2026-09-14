@@ -162,6 +162,26 @@ export function getMoonPhase(date: Date): { phase: string; illumination: number 
 }
 
 /**
+ * Build a plain Date from a moment's local wall-clock fields (year, month,
+ * day, hour, minute, second). Round-tripping through the Date constructor
+ * this way means the getHours()/getMonth()/getDate() readers the functions
+ * above use reflect whatever timeZone the moment was resolved in — the
+ * caller's own process/runtime timeZone never enters into it. Takes a
+ * duck-typed moment (matches dayjs' `.year()`/`.month()`/… accessors) rather
+ * than importing dayjs into this isomorphic, dependency-free module.
+ */
+export function wallClockDateFromMoment(moment: {
+  year(): number
+  month(): number
+  date(): number
+  hour(): number
+  minute(): number
+  second(): number
+}): Date {
+  return new Date(moment.year(), moment.month(), moment.date(), moment.hour(), moment.minute(), moment.second())
+}
+
+/**
  * Get moon emoji based on phase
  */
 export function getMoonEmoji(phaseName: string): string {
