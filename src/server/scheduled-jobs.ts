@@ -2363,7 +2363,7 @@ async function executeDailyTemporalAlignmentCheck(): Promise<JobResult> {
 
     const PLANNER_EVENTS = ['plan_set', 'goal_created', 'goal_updated', 'task_created', 'task_completed']
     const INTENTION_EVENTS = ['intention_set', 'intention_updated', 'intention_created']
-    const CALENDAR_EVENTS = ['event_created', 'calendar_entry', 'deadline_set', 'schedule_block']
+    const CALENDAR_EVENTS = ['event_created', 'calendar_entry', 'calendar_alert', 'deadline_set', 'schedule_block']
     const ALL_EVENTS = [...PLANNER_EVENTS, ...INTENTION_EVENTS, ...CALENDAR_EVENTS]
 
     let written = 0

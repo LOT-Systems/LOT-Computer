@@ -21,6 +21,7 @@ type CalendarEntry = {
   date: string
   text: string
   type: EntryType
+  time?: string
 }
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -59,6 +60,14 @@ export function CalendarWidget() {
   const [isAddingEntry, setIsAddingEntry] = React.useState(false)
   const [entryText, setEntryText] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
+  const [entryTime, setEntryTime] = React.useState('')
+
+  // Ticks every 30s so relative "due in ..." labels on timed entries stay live.
+  const [clockTick, setClockTick] = React.useState(0)
+  React.useEffect(() => {
+    const interval = setInterval(() => setClockTick(t => t + 1), 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   const entries = React.useMemo<CalendarEntry[]>(() => {
     return logs
@@ -67,9 +76,10 @@ export function CalendarWidget() {
         date: log.metadata?.date as string,
         text: log.metadata?.text as string || log.text || '',
         type: (log.metadata?.entryType as EntryType) || 'note',
+        time: log.metadata?.time as string | undefined,
       }))
       .filter(e => e.date && e.text)
-      .sort((a, b) => a.date.localeCompare(b.date))
+      .sort((a, b) => a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''))
   }, [logs])
 
   const upcomingEntries = React.useMemo(() => {
@@ -90,6 +100,17 @@ export function CalendarWidget() {
     return set
   }, [entries])
 
+  // Nearest timed entry still ahead of now — the "tracked" countdown.
+  const nextTimedEntry = React.useMemo(() => {
+    const now = dayjs()
+    for (const e of entries) {
+      if (!e.time) continue
+      const due = dayjs(`${e.date}T${e.time}`)
+      if (due.isValid() && due.isAfter(now)) return { ...e, due }
+    }
+    return null
+  }, [entries, clockTick])
+
   const today = dayjs().format('YYYY-MM-DD')
   const weeks = React.useMemo(
     () => getMonthWeeks(viewMonth.year(), viewMonth.month()),
@@ -109,14 +130,16 @@ export function CalendarWidget() {
     if (!selectedDate || !entryText.trim()) return
 
     const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
+    const timeSuffix = entryTime ? ` @ ${entryTime}` : ''
 
     createLog({
-      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel})`,
+      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel}${timeSuffix})`,
       event: 'calendar_entry',
       metadata: {
         date: selectedDate,
         text: entryText.trim(),
         entryType,
+        ...(entryTime ? { time: entryTime } : {}),
       },
     }, {
       onSuccess: () => {
@@ -126,6 +149,7 @@ export function CalendarWidget() {
     })
 
     setEntryText('')
+    setEntryTime('')
     setIsAddingEntry(false)
   }
 
@@ -237,6 +261,14 @@ export function CalendarWidget() {
                     className="bg-transparent border border-acc/20 text-acc px-4 py-2 flex-1 outline-none focus:border-acc/40"
                     autoFocus
                   />
+                  <input
+                    type="time"
+                    value={entryTime}
+                    onChange={e => setEntryTime(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleAddEntry() }}
+                    aria-label="Entry time (optional)"
+                    className="bg-transparent border border-acc/20 text-acc/60 px-4 py-2 outline-none focus:border-acc/40 tabular-nums"
+                  />
                   <Button onClick={handleAddEntry}>Add</Button>
                 </div>
               </div>
@@ -248,12 +280,19 @@ export function CalendarWidget() {
                   {dayjs(selectedDate).format('dddd, MMMM D')}
                 </div>
                 {entriesOnDate.map((e, i) => (
-                  <div key={i} className="text-acc/80 mb-1">
-                    {e.text}
+                  <div key={i} className="text-acc/80 mb-1 flex justify-between gap-16">
+                    <span>{e.text}</span>
+                    {e.time && <span className="text-acc/40 tabular-nums">{e.time}</span>}
                   </div>
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {nextTimedEntry && (
+          <div className="text-acc/40 uppercase tracking-widest mb-8">
+            TRACKING: {nextTimedEntry.text} — {nextTimedEntry.due.fromNow()}
           </div>
         )}
 
@@ -263,6 +302,7 @@ export function CalendarWidget() {
               <div key={i} className="flex justify-between gap-16">
                 <span className="text-acc whitespace-nowrap">
                   {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
+                  {entry.time && <span className="text-acc/40 tabular-nums"> · {entry.time}</span>}
                 </span>
                 <span className="text-acc text-right">
                   {entry.text}
