@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'dawn-to-dusk-synthesis':           'Dawn-to-dusk synthesis — all three circadian arcs + intention + memory confirmed in 24h, full arc navigated (P152)',
+      'recovery-to-creation-arc':         'Recovery-to-creation arc — recovery loop closed then generative output within 12h, elixir returned (P153)',
+      'quantum-week-anchor':              'Quantum week anchor — recovery arc + circadian lock + morning intention all confirmed within 7d (P154)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily dawn synthesis check (22:30 UTC every day) — Job 49
+  if (shouldRunDailyDawnSynthesisCheck()) {
+    await executeDailyDawnSynthesisCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,117 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Dawn Synthesis Check (Job 49 — 22:30 UTC every day) ───────────────
+// Scans each active user's signals for the current 24h window.
+// Fires when dawn signals (pre-10:00 mood/energy/selfcare/journal) + meridian
+// signals (12:00–17:00) + dusk signals (18:00+) + intention + memory are all
+// present. Writes dawn_to_dusk_synthesis event. DUSKSYNTH: cockpit handler.
+
+let isDailyDawnSynthesisRunning = false
+let lastDailyDawnSynthesisRun: Date | null = null
+
+function shouldRunDailyDawnSynthesisCheck(): boolean {
+  const now = dayjs()
+  if (isDailyDawnSynthesisRunning) return false
+  if (lastDailyDawnSynthesisRun) {
+    const lastRun = dayjs(lastDailyDawnSynthesisRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 22 // 22:30 UTC daily (fires within hour 22 window)
+}
+
+async function executeDailyDawnSynthesisCheck(): Promise<JobResult> {
+  const jobName = 'daily-dawn-synthesis-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyDawnSynthesisRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyDawnSynthesisRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY DAWN SYNTHESIS CHECK — 22:30 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const ARC_SOURCES = ['mood', 'energy', 'selfcare', 'journal']
+    const dayStart = dayjs().startOf('day').toDate()
+    const now24h   = new Date()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const todayLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: dayStart, [Op.lte]: now24h },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        if (!todayLogs.length) continue
+
+        let dawnCount     = 0
+        let meridianCount = 0
+        let duskCount     = 0
+        let intentionSeen = false
+        let memorySeen    = false
+
+        for (const log of todayLogs) {
+          const h = dayjs(log.createdAt).hour()
+          const src = (log.event as string).split('_')[0] // rough source prefix
+          const isArcSource = ARC_SOURCES.some(s => (log.event as string).startsWith(s) || (log.event as string).includes(s))
+          if (isArcSource) {
+            if (h < 10)                  dawnCount++
+            else if (h >= 12 && h < 17) meridianCount++
+            else if (h >= 18)           duskCount++
+          }
+          if ((log.event as string).includes('intention')) intentionSeen = true
+          if ((log.event as string).includes('memory'))    memorySeen    = true
+        }
+
+        if (dawnCount >= 1 && meridianCount >= 1 && duskCount >= 1 && intentionSeen && memorySeen) {
+          await (Log as any).create({
+            userId,
+            event: 'dawn_to_dusk_synthesis',
+            text: `Dawn-to-dusk synthesis: dawn arc active · meridian arc active · dusk arc active · intention logged · memory captured. The day is not survived. It is moved through with awareness.`,
+            metadata: {
+              dawnArc:     dawnCount,
+              meridianArc: meridianCount,
+              duskArc:     duskCount,
+              intentionConfirmed: true,
+              memoryConfirmed:    true,
+              window: '24h-today',
+              hour:   22,
+            },
+          })
+          written++
+        }
+      } catch {}
+    }
+
+    console.log(`  Dawn synthesis events written: ${written}`)
+    lastDailyDawnSynthesisRun = new Date()
+    isDailyDawnSynthesisRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily dawn synthesis check failed:', error.message)
+    isDailyDawnSynthesisRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

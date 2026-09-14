@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: dawn-to-dusk synthesis · recovery-to-creation arc · quantum week anchor (P152/P153/P154)
+      'dawn_to_dusk_synthesis',
+      'recovery_to_creation_arc',
+      'quantum_week_anchor',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

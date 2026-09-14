@@ -110,6 +110,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'quantum-presence-crystallization': 'QPCRYST',
   'total-field-coherence':            'TOTCOH',
   'recovery-intelligence-arc':        'RECINTEL',
+  'dawn-to-dusk-synthesis':           'DUSKSYNTH',
+  'recovery-to-creation-arc':         'CREAREC',
+  'quantum-week-anchor':              'WKHERO',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

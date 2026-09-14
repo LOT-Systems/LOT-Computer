@@ -3629,6 +3629,101 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'dawn_to_dusk_synthesis') {
+          const dawnCount = log.metadata?.dawnCount as number | undefined
+          const meridianCount = log.metadata?.meridianCount as number | undefined
+          const duskCount = log.metadata?.duskCount as number | undefined
+          const synthesisState = log.metadata?.synthesisState as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="DUSKSYNTH:" blockView>
+                <div className="uppercase tracking-widest mb-4">DAWN-TO-DUSK SYNTHESIS</div>
+                {dawnCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DAWN ARC</span>
+                    <span className="tabular-nums">{dawnCount} SIG</span>
+                  </div>
+                )}
+                {meridianCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MERIDIAN ARC</span>
+                    <span className="tabular-nums">{meridianCount} SIG</span>
+                  </div>
+                )}
+                {duskCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DUSK ARC</span>
+                    <span className="tabular-nums">{duskCount} SIG</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">3 ARCS · INTENTION · MEMORY · DAY COMPLETE</div>
+                {synthesisState && (
+                  <div className="opacity-30 tabular-nums">STATE: {synthesisState}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'recovery_to_creation_arc') {
+          const velocityHours = log.metadata?.velocityHours as number | undefined
+          const creativeType = log.metadata?.creativeType as string | undefined
+          const elixirState = log.metadata?.elixirState as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CREAREC:" blockView>
+                <div className="uppercase tracking-widest mb-4">RECOVERY-TO-CREATION ARC</div>
+                {velocityHours !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">VELOCITY</span>
+                    <span className="tabular-nums">{velocityHours}h</span>
+                  </div>
+                )}
+                {creativeType && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">OUTPUT TYPE</span>
+                    <span className="tabular-nums">{creativeType.toUpperCase()}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">RECOVERY → CREATION · ELIXIR RETURNED</div>
+                {elixirState && (
+                  <div className="opacity-30 tabular-nums">ELIXIR: {elixirState}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_week_anchor') {
+          const recoveryCount = log.metadata?.recoveryCount as number | undefined
+          const circadianCount = log.metadata?.circadianCount as number | undefined
+          const intentionCount = log.metadata?.intentionCount as number | undefined
+          const weekAnchorState = log.metadata?.weekAnchorState as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="WKHERO:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM WEEK ANCHOR</div>
+                {recoveryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECOVERY ARCS 7D</span>
+                    <span className="tabular-nums">{recoveryCount}</span>
+                  </div>
+                )}
+                {circadianCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CIRCADIAN LOCKS 7D</span>
+                    <span className="tabular-nums">{circadianCount}</span>
+                  </div>
+                )}
+                {intentionCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENTION LOCKS 7D</span>
+                    <span className="tabular-nums">{intentionCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">REST · RHYTHM · INTENTION · WEEK ANCHORED</div>
+                {weekAnchorState && (
+                  <div className="opacity-30 tabular-nums">ANCHOR: {weekAnchorState}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

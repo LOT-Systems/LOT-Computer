@@ -1457,6 +1457,26 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v32-v114',
+    date: '2026-09-14',
+    title: 'Badge v32 Hero\'s Journey + QIE v114 Navigator\'s Arc — P152–P154 Arch52 J49',
+    assembled: [
+      'Badge v32 THE HERO\'S JOURNEY backfill note: v32 deployed 2026-08-05 · +31 badges (781→812) · Word Turn v22 (call_heard/threshold_crossed/mentor_arrived/ordeal_survived/elixir_found/shadow_met/innermost_cave/shapeshifter/herald_call/trickster_mode/ally_gained/return_road). Campbell/Hobbit/Odyssey Calendar EE v20. hero_session/long_quest/threshold_moment behavioral v19. quest_entry→hero_opus achievement v20. Mastery v22 (odyssey_log/great_work/saga_age/twenty_two_registers [COSMIC]). Secret Boss v19 (tolkien_ring/odysseus_bow/gilgamesh_word [MYTHIC]).',
+      'P152 DAWN-TO-DUSK SYNTHESIS: behavioral pattern — all three circadian arcs (dawn/meridian/dusk) active in 24h window + intention signal + memory signal confirmed. The day is not survived. It is moved through with awareness. Confidence 0.68–0.85.',
+      'P153 RECOVERY-TO-CREATION ARC: behavioral pattern — P151 recovery_intelligence_arc event confirmed + generative output (journal >60w or memory capture) within subsequent 12h. The hero returns with the elixir. Depletion → care → restoration → creation. Confidence 0.62–0.84.',
+      'P154 QUANTUM WEEK ANCHOR: temporal pattern — recovery arc (P151) + circadian lock (P143) + morning intention lock (P128) all confirmed at least once within 7d window. Rest, rhythm, intention: the week is anchored. Confidence 0.72–0.90.',
+      'Arch52 NAVIGATOR\'S ARC OPERATOR: energy high/moderate · dominant: journal/intentions/memory/mood/energy · patterns: dawn-to-dusk-synthesis + circadian-signal-lock. Hours 06–23. Directive: The full arc is navigated. Dawn to dusk — intentional, circadian, present. The day is not survived. It is moved through with awareness.',
+      'J49 daily-dawn-synthesis-check: 22:30 UTC daily. Reads current day — checks if dawn arc + meridian arc + dusk arc + intention + memory all present → writes dawn_to_dusk_synthesis event.',
+      'intentionEngine.ts: P152/P153/P154 detection blocks added after P151. Arch52 appended to PHYSIOLOGICAL_COHORTS. 3 dep map nodes (dawnToDuskSynthesisNode · recoveryToCreationNode · quantumWeekAnchorNode). 3 signal helpers (recordDawnToDuskSynthesis · recordRecoveryToCreationArc · recordQuantumWeekAnchor). 193+ dep nodes.',
+      'Logs.tsx: DUSKSYNTH: · CREAREC: · WKHERO: military handlers added.',
+      'QuantumEngineWidgets.tsx: DUSKSYNTH · CREAREC · WKHERO added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P152/P153/P154 display names added.',
+      'About.tsx: FM v113→v114. Day 1113+. 151→154 patterns. 51→52 archetypes. 48→49 jobs. 190+→193+ dep nodes. 151+→154+ handlers.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      '812 badges · 270 word-turns · 27 secret boss · 154 patterns · 52 archetypes · 49 jobs · 154+ handlers · 193+ dep nodes. QIE v114 deployed. The Navigator\'s Arc. The week is anchored.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1514,18 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-09-14',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-09-14 · v32-v114 · FM v114 · Day 1113+',
+    'Built: QIE v114 — THE NAVIGATOR\'S ARC. P152 dawn-to-dusk-synthesis · P153 recovery-to-creation-arc · P154 quantum-week-anchor.',
+    'Feedback applied: "call heard · threshold crossed · elixir found · return road" — the hero\'s journey vocabulary enters the behavioral detection layer.',
+    'Badge v32 THE HERO\'S JOURNEY synchronized: 812 badges · Word Turn v22 (Campbell monomyth) · Secret Boss v19 (tolkien/odysseus/gilgamesh) · 270 trigger words · 27 secret boss triggers.',
+    'LEVEL 7 — TEMPORAL MASTERY. The week is anchored. The arc is navigated. Creation follows recovery.',
+    'Arch52 Navigator\'s Arc Operator deployed. J49 daily-dawn-synthesis-check 22:30 UTC wired.',
+    'DUSKSYNTH: · CREAREC: · WKHERO: handlers live in the cockpit.',
+    'FM v114 · Wiki v88 pending · 154P · 52A · 49J · 193+ nodes · 812 badges.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync Badge v32 + QIE v114 to Field Manual v114',
   ],
 }
 

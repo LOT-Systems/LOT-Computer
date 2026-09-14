@@ -3428,6 +3428,89 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Dawn-to-Dusk Synthesis — all three circadian arcs present (dawn/meridian/dusk)
+  // in last 24h window AND at least 1 intention signal AND 1 memory signal. The day was lived
+  // in full — intentionally. Not just physically anchored (P143) but cognitively occupied.
+  const dayWindowMs   = 24 * 60 * 60 * 1000
+  const recent24h     = signals.filter(s => now - s.timestamp < dayWindowMs)
+  const todayStart    = new Date(); todayStart.setHours(0, 0, 0, 0)
+  const todayStartMs  = todayStart.getTime()
+  const dawnSigs      = recent24h.filter(s => {
+    const h = new Date(s.timestamp).getHours()
+    return h < 10 && (s.source === 'mood' || s.source === 'energy' || s.source === 'selfcare' || s.source === 'journal')
+  })
+  const meridianSigs  = recent24h.filter(s => {
+    const h = new Date(s.timestamp).getHours()
+    return h >= 12 && h < 17 && (s.source === 'mood' || s.source === 'energy' || s.source === 'selfcare' || s.source === 'journal')
+  })
+  const duskSigs      = recent24h.filter(s => {
+    const h = new Date(s.timestamp).getHours()
+    return h >= 18 && (s.source === 'mood' || s.source === 'energy' || s.source === 'selfcare' || s.source === 'journal')
+  })
+  const intention152  = recent24h.filter(s => s.source === 'intentions')
+  const memory152     = recent24h.filter(s => s.source === 'memory')
+  if (dawnSigs.length >= 1 && meridianSigs.length >= 1 && duskSigs.length >= 1 && intention152.length >= 1 && memory152.length >= 1) {
+    const arcBonus = Math.min((dawnSigs.length + meridianSigs.length + duskSigs.length - 3) * 0.02, 0.08)
+    const intentBonus = Math.min(intention152.length * 0.02, 0.06)
+    patterns.push({
+      pattern: 'dawn-to-dusk-synthesis',
+      confidence: Math.min(0.68 + arcBonus + intentBonus, 0.85),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `DUSKSYNTH: Dawn-to-dusk synthesis — dawn arc active · meridian arc active · dusk arc active · intention logged · memory captured. The day is not survived. It is moved through with awareness.`,
+    })
+  }
+
+  // Pattern 153: Recovery-to-Creation Arc — P151 recovery arc completed (recovery_intelligence_arc
+  // in qos/selfcare events within 12h) AND generative output (journal >60 words or memory capture)
+  // within the 12h window AFTER the recovery arc closed. The hero returns with the elixir.
+  const twelveHoursMs     = 12 * 60 * 60 * 1000
+  const recent12h         = signals.filter(s => now - s.timestamp < twelveHoursMs)
+  const recoveryEvent153  = recent12h.filter(s => (s.source === 'selfcare' || s.source === 'qos') && s.signal === 'recovery_intelligence_arc')
+  const creativeAfterRec  = recoveryEvent153.length > 0
+    ? recent12h.filter(s => {
+        if (s.timestamp <= recoveryEvent153[0].timestamp) return false
+        if (s.source === 'memory') return true
+        if (s.source === 'journal' && (s.metadata?.wordCount ?? 0) > 60) return true
+        if (s.source === 'log' && (s.metadata?.wordCount ?? 0) > 60) return true
+        return false
+      })
+    : []
+  if (recoveryEvent153.length >= 1 && creativeAfterRec.length >= 1) {
+    const velocityMs153    = creativeAfterRec[0].timestamp - recoveryEvent153[0].timestamp
+    const velBonus153      = Math.min((twelveHoursMs - velocityMs153) / twelveHoursMs * 0.22, 0.22)
+    patterns.push({
+      pattern: 'recovery-to-creation-arc',
+      confidence: Math.min(0.62 + velBonus153, 0.84),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'soon',
+      reason: `CREAREC: Recovery-to-creation arc — recovery loop closed · generative output confirmed within 12h. The loop completes: depletion → care → restoration → creation. The elixir is returned.`,
+    })
+  }
+
+  // Pattern 154: Quantum Week Anchor — within a 7-day window, the three foundational arcs all
+  // confirmed at least once: recovery arc (P151 → recovery_intelligence_arc event), circadian
+  // lock (P143 → circadian_signal_lock event), morning intention lock (P128 → morning_intention_lock event).
+  // Rest + rhythm + intention: the week is anchored.
+  const sevenDaysMs      = 7 * 24 * 60 * 60 * 1000
+  const recent7d         = signals.filter(s => now - s.timestamp < sevenDaysMs)
+  const recoveryInWeek   = recent7d.filter(s => (s.source === 'selfcare' || s.source === 'qos') && s.signal === 'recovery_intelligence_arc')
+  const circadianInWeek  = recent7d.filter(s => s.source === 'qos' && s.signal === 'circadian_signal_lock')
+  const intentionInWeek  = recent7d.filter(s => s.source === 'qos' && s.signal === 'morning_intention_lock')
+  if (recoveryInWeek.length >= 1 && circadianInWeek.length >= 1 && intentionInWeek.length >= 1) {
+    const anchorScore = Math.min(
+      (recoveryInWeek.length + circadianInWeek.length + intentionInWeek.length - 3) * 0.03,
+      0.18
+    )
+    patterns.push({
+      pattern: 'quantum-week-anchor',
+      confidence: Math.min(0.72 + anchorScore, 0.90),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `WKHERO: Quantum week anchor — recovery arc confirmed · circadian lock confirmed · morning intention lock confirmed within 7d. Rest, rhythm, intention: the week is anchored. The navigator holds the course.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4147,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  dawnToDuskSynthesisNode:    ['mood', 'energy', 'selfcare', 'journal', 'intentions', 'memory'],
+  recoveryToCreationNode:     ['selfcare', 'qos', 'journal', 'memory', 'log'],
+  quantumWeekAnchorNode:      ['qos', 'selfcare', 'intentions', 'journal', 'energy', 'mood'],
 }
 
 /**
@@ -4510,6 +4598,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Navigator's Arc Operator (2026-09-14 v114) ────────────────────────
+  {
+    archetype: "Navigator's Arc Operator",
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'intentions', 'memory', 'mood', 'energy'],
+    patternConditions: ['dawn-to-dusk-synthesis', 'circadian-signal-lock'],
+    hourRange: [6, 23],
+    directive: "The full arc is navigated. Dawn to dusk — intentional, circadian, present. The day is not survived. It is moved through with awareness.",
   },
 ]
 
@@ -6498,6 +6596,53 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+// ── v114 signal helpers (P152–P154 · Arch52 · J49) ──────────────────────────────
+
+/**
+ * Record a dawn-to-dusk-synthesis event — all three circadian arcs active in 24h
+ * + intention and memory signals confirmed. Feeds P152 detection.
+ */
+export function recordDawnToDuskSynthesis(dawnCount: number, meridianCount: number, duskCount: number) {
+  recordSignal('qos', 'dawn_to_dusk_synthesis', {
+    dawnCount,
+    meridianCount,
+    duskCount,
+    arcsCovered: 3,
+    synthesisState: 'FULL_ARC',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a recovery-to-creation-arc event — P151 recovery completed + creative
+ * output confirmed within 12h. Feeds P153 detection.
+ */
+export function recordRecoveryToCreationArc(velocityMs: number, creativeType: string) {
+  const velocityHours = Math.round(velocityMs / (1000 * 60 * 60) * 10) / 10
+  recordSignal('qos', 'recovery_to_creation_arc', {
+    velocityHours,
+    creativeType,
+    arc: 'RECOVERY→CREATION',
+    elixirState: 'RETURNED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-week-anchor event — recovery arc + circadian lock + morning
+ * intention lock all confirmed within 7d. Feeds P154 detection.
+ */
+export function recordQuantumWeekAnchor(recoveryCount: number, circadianCount: number, intentionCount: number) {
+  recordSignal('qos', 'quantum_week_anchor', {
+    recoveryCount,
+    circadianCount,
+    intentionCount,
+    weekAnchorState: 'CONFIRMED',
+    arcs: ['REST', 'RHYTHM', 'INTENTION'],
     hour: new Date().getHours(),
   })
 }
