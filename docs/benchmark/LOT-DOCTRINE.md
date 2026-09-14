@@ -1,4 +1,20 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
+
+## Design-Ship Lag
+
+A MANIFEST row marked "incorporated into master" (or any receiving branch)
+is a claim, not a fact, until the target files are confirmed present on
+that branch via `ls`/`grep` — the same discipline step 00 already applies
+to `LAST_GREEN` tags. The 2026-06-27 MANIFEST note that ship-queue branches
+"no longer exist on the remote — incorporated into master in prior
+sessions" was never checked against the live tree and was wrong for COSMO
+Hardware: `brave-lamport-t9z5u8` still existed on the remote 94 days later,
+at its original commit, and `docs/hardware/` had never landed anywhere. A
+BEST tag is not, by itself, evidence of shipping — only a verified file
+listing on the receiving branch is.
+(SR-20260914-01: COSMO® Cube v1.0 design — 7 documents, 2610 lines — copied
+from the stale branch to claude/brave-lamport-1fwetj; MANIFEST row corrected
+BEST->SHIPPED with the false claim struck.)
 
 ## Render Isolation
 
