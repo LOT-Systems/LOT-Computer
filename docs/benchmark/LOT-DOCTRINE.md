@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
 
 ## Render Isolation
 
@@ -226,3 +226,63 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## SILENT-DROP (generalized failure class)
+
+A component built on one side of a boundary — a client trigger, a DB event
+type, a signal name — but missing its counterpart wiring on the other side
+degrades silently: no error, no log line, just absent output. The operator
+cannot tell "not implemented" from "implemented but invisible" without
+reading source.
+
+This has recurred four times across the corpus, always at one of two
+boundaries:
+  1. CLIENT DISPATCH GAP — a trigger exists in the detector (logTriggers.ts
+     RULES) but has no `if (trigger === ...)` branch in the handler chain.
+     Typing the command does nothing observable.
+  2. WHITELIST GAP — a Log event type is written to the DB but is missing
+     from either formatLog()'s switch (invisible to future AI prompts —
+     see Widget→Memory Compression Loop, above) or displayableEvents in
+     GET /logs (invisible in the Log tab's own history).
+
+Prior instances: signal_momentum missing from displayableEvents
+(SR-20260622-03), STORY:/DRCT: whitelist hygiene pass (SR-20260627-02), a
+v84 displayableEvents gap (SR-20260705-01). Fourth instance, both boundary
+types at once: /sil declared in RULES with no dispatch branch (boundary 1),
+and generated_story missing from both formatLog() and displayableEvents
+(boundary 2, twice) (SR-20260914-01).
+
+RULE: when a session adds a new Log event type or a new log-text trigger,
+CHECK A must include a manual scan of (a) the trigger's dispatch branch
+existing, (b) formatLog()'s switch, and (c) displayableEvents — not just a
+green tsc/build, since a SILENT-DROP compiles clean and builds clean. It
+is a logic gap, not a type error, so the green gate does not catch it on
+its own.
+
+## Periodic Story (period-scaled AI compression)
+
+/story generates an AI narrative from the operator's own log record; before
+SR-20260914-01 it always compressed an undifferentiated "last 200 logs,"
+with no way to ask for a specific scale. Three parameters must move
+together when a compression command is asked to operate at multiple time
+scales, or the output degrades at the extremes (a "year" story built from
+5 sampled entries reads as vague; a "day" story built from 200 logs of
+noise reads as unfocused):
+  1. THE QUERY WINDOW — date-filtered (Op.gte cutoff), not just a flat
+     row limit. A flat limit with no date filter (the pre-fix behavior)
+     means "recent" silently drifts to mean whatever the last N rows
+     happen to span for that operator's usage density.
+  2. THE SAMPLE SIZE fed into the prompt — must scale up with the window
+     (5 entries at day/week scale, 15-25 at month/year) or a wide window
+     is queried but then thrown away by a fixed small slice.
+  3. THE COMPRESSION INSTRUCTION ITSELF — the system prompt must name the
+     scale explicitly ("one paragraph, same-day mirror" vs "seasons and
+     turning points, not individual days"), not just receive more data
+     and hope the model infers the right register.
+Token budget should scale with window too (512/640/768 in this
+implementation) — a year compressed into a day's token budget truncates.
+
+(SR-20260914-01: /story day|week|month|year implemented on all three axes;
+Sunday's weekly cron — Job 24, template-based, no AI call — remains the
+only always-on periodic compression; /story is on-demand and AI-generated,
+complementary rather than redundant.)

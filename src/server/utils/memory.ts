@@ -823,6 +823,17 @@ function formatLog(log: Log): string {
       if (state) body = `Biofield check-in: ${state}`
       break
     }
+    case 'generated_story': {
+      // Closes the Widget->Memory compression loop for /story: without this
+      // case the log entry is silently dropped from formatLog() and every
+      // past /story output stays invisible to future question generation,
+      // even though it is fetched into the logs array. See LOT-DOCTRINE.md,
+      // Widget-Memory Compression Loop clause.
+      const period = (log.metadata as any)?.period
+      const text = log.text || (log.metadata as any)?.story || ''
+      if (text) body = period && period !== 'recent' ? `Story (${period}): ${text}` : `Story: ${text}`
+      break
+    }
   }
   body = body.trim()
   if (!body) return ''

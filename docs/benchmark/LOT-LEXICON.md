@@ -72,4 +72,5 @@ COMINTEL:          Community Intelligence Peak — log block label; cohort + jou
 EMBODIED-COGNITION-ARC   QIE P110 — selfcare + journal 150+w + memory capture all in 24h; biological grounding and cognitive expression confirmed simultaneously; body feeding mind  B  20260706
 INTENTION-COMPLETION-LOOP QIE P111 — intention set + planner + goal action all in 24h; direction→structure→outcome arc closed in one day; rare single-day loop  B  20260706
 COMMUNITY-INTELLIGENCE-PEAK  QIE P112 — cohort signal + journal + memory + intentions all in 48h; external social signal anchored internally through writing, capture, and direction-setting  B  20260706
+SILENT-DROP        A trigger, event type, or signal fully built on one side (client dispatcher, DB write) but missing its counterpart wiring (whitelist entry, formatLog case, handler branch) — degrades with no error, no log line, just absent output. 4th occurrence this session (2x): signal_momentum whitelist (20260622-03), STORY:/DRCT: whitelist hygiene (20260627-02), v84 displayableEvents gap (20260705-01), generated_story missing from both formatLog() and displayableEvents (20260914-01)  A  20260914
 ```

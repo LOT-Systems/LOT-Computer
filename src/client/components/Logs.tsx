@@ -3705,7 +3705,9 @@ const NoteEditor = ({
   const [prayerResponse, setPrayerResponse] = React.useState<string | null>(null)
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
+  const [storyPeriod, setStoryPeriod] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [silResult, setSilResult] = React.useState<string | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3742,10 +3744,12 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryPeriod(data.period && data.period !== 'recent' ? data.period : null)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
-      const updated = current + separator + '📖 ' + data.story
+      const tag = data.period && data.period !== 'recent' ? `📖 [${data.period.toUpperCase()}] ` : '📖 '
+      const updated = current + separator + tag + data.story
       setValue(updated)
       valueRef.current = updated
       onChangeRef.current(updated)
@@ -3754,6 +3758,7 @@ const NoteEditor = ({
     onError: () => {
       const fallback = 'The system holds your data quietly. When the engine returns, your story will be here.'
       setStoryResponse(fallback)
+      setStoryPeriod(null)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -4071,6 +4076,30 @@ const NoteEditor = ({
         } catch {
           setSilentResult('SIGNAL STREAM QUIET\nRESPONSE        STANDBY')
         }
+      } else if (trigger === 'sil-check') {
+        // Distinct from /silent (raw time-since-last-signal): /sil reads
+        // QIE Pattern 51 (signal-silence) — whether the engine has actually
+        // recognized the "went dark after sustained engagement" pattern,
+        // not just that time has passed.
+        try {
+          const eng = intentionEngine.get()
+          const patterns = (eng as any).recognizedPatterns || []
+          const p51 = patterns.find((p: any) => p.pattern === 'signal-silence')
+          const signals = (eng as any).signals || []
+          const lastSignal = signals.length > 0 ? signals[signals.length - 1] : null
+          const silenceHours = lastSignal
+            ? Math.round((Date.now() - lastSignal.timestamp) / (1000 * 60 * 60))
+            : null
+          const lines = [
+            `PATTERN P51     ${p51 ? 'ACTIVE' : 'CLEAR'}`,
+            silenceHours !== null ? `LAST SIGNAL     ${silenceHours}H AGO` : 'LAST SIGNAL     NO DATA',
+            p51 ? `CONFIDENCE      ${Math.round((p51.confidence || 0) * 100)}%` : 'THRESHOLD       48H QUIET AFTER 3+ ACTIVE SOURCES',
+            p51 ? p51.reason.toUpperCase() : 'NO SILENCE PATTERN DETECTED — FIELD IS LIVE',
+          ]
+          setSilResult(lines.join('\n'))
+        } catch {
+          setSilResult('PATTERN P51     UNAVAILABLE')
+        }
       } else if (trigger === 'freeze-widgets') {
         const now = new Date()
         const hh = now.getHours().toString().padStart(2, '0')
@@ -4125,7 +4154,11 @@ const NoteEditor = ({
           'AVAILABLE COMMANDS',
           '',
           '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
+          '/story        Compress recent record into a personal story',
+          '/story day    Compress today only',
+          '/story week   Compress the last 7 days',
+          '/story month  Compress the last 30 days',
+          '/story year   Compress the last 365 days',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
@@ -4134,7 +4167,8 @@ const NoteEditor = ({
           '/fast         Orthodox fasting calendar',
           '/breathe      4-2-6 breathing exercise',
           '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
+          '/silent       Time since last signal',
+          '/sil          Signal silence pattern check (P51)',
           '/synth        Toggle keyboard sound',
           '/radio        Toggle radio',
           '/night        Dark mode',
@@ -4151,17 +4185,24 @@ const NoteEditor = ({
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
+          // "/story" alone compresses the recent record (original behavior).
+          // "/story day|week|month|year" narrows the compression window —
+          // the same command answers "what happened today" through "what
+          // was this year" per S-2 directive.
+          const periodMatch = value.match(/\/story\s+(day|week|month|year)\b/i)
+          const period = periodMatch ? (periodMatch[1].toLowerCase() as 'day' | 'week' | 'month' | 'year') : undefined
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const logText = value.replace(/\/story(\s+(day|week|month|year))?/i, '').replace(/📖/g, '').trim()
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              period,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: value, period })
           }
         }
       }
@@ -4366,6 +4407,13 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        {silResult && (
+          <div className="mt-8">
+            <Block label="SIL-CHK [P51]:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{silResult}</div>
+            </Block>
+          </div>
+        )}
         {freezeResult && (
           <div className="mt-8">
             <Block label="FREEZE:" blockView>
@@ -4416,7 +4464,7 @@ const NoteEditor = ({
         )}
         {(storyLoading || storyResponse) && (
           <div className="mt-8">
-            <Block label="📖" blockView>
+            <Block label={storyPeriod ? `📖 [${storyPeriod.toUpperCase()}]` : '📖'} blockView>
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
               )}

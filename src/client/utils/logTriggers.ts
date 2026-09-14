@@ -39,7 +39,7 @@ export type LogTrigger =
   | 'sil-check'         // /sil — check for signal silence pattern
   | 'qi-rfi'            // /qi — Quantum Intelligence RFI (Request for Information)
   | 'system-help'       // /system — list all available slash commands
-  | 'story-mode'        // /story — generate contextual story from recent data
+  | 'story-mode'        // /story [day|week|month|year] — compress that window into a story
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
 
 interface TriggerRule {
