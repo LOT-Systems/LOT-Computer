@@ -116,6 +116,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'quantum-coherence-trajectory':     'QCOHTRJ',
   'sovereign-self-assembly':          'SOVASMB',
   'field-presence-anchor':            'FPANCH',
+  'sovereign-coherence-lock':         'SLOCK',
+  'living-assembly-arc':              'LARC',
+  'quantum-identity-sovereign':       'QIDSOV',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

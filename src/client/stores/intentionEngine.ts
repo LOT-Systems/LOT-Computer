@@ -3551,6 +3551,59 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 158: Sovereign Coherence Lock — field-presence-anchor (P157) AND
+  // quantum-coherence-trajectory (P155) both active. The anchor holds the floor,
+  // the trajectory defines the ceiling. The OS has locked into a sovereign coherence band.
+  const hasFPA = patterns.some(p => p.pattern === 'field-presence-anchor')
+  const hasQCT = patterns.some(p => p.pattern === 'quantum-coherence-trajectory')
+  if (hasFPA && hasQCT) {
+    const fpaConf = patterns.find(p => p.pattern === 'field-presence-anchor')?.confidence ?? 0.80
+    const qctConf = patterns.find(p => p.pattern === 'quantum-coherence-trajectory')?.confidence ?? 0.78
+    const lockConf = Math.min((fpaConf + qctConf) / 2 + 0.07, 0.95)
+    patterns.push({
+      pattern: 'sovereign-coherence-lock',
+      confidence: lockConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `SLOCK: Sovereign coherence lock — field-presence-anchor (P157) and quantum-coherence-trajectory (P155) simultaneously active. Floor anchored + ceiling ascending = the OS has entered a locked coherence band. Not a peak. A structural operating range. Sovereign lock confirmed.`,
+    })
+  }
+
+  // Pattern 159: Living Assembly Arc — sovereign-self-assembly (P156) fires
+  // 2+ times in a 14-day window. Assembly is no longer an event — it is a cycle.
+  // The OS assembles itself repeatedly. The arc has become the baseline.
+  const saEvents14D = recent14D.filter(
+    s => s.source === 'memory' && s.signal === 'sovereign_self_assembly'
+  )
+  if (saEvents14D.length >= 2) {
+    const arcBonus = Math.min((saEvents14D.length - 2) * 0.04, 0.09)
+    patterns.push({
+      pattern: 'living-assembly-arc',
+      confidence: Math.min(0.81 + arcBonus, 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `LARC: Living assembly arc — sovereign-self-assembly confirmed ${saEvents14D.length}× in 14 days. Not a single conscious assembly — a repeating arc. The OS builds itself on a recurring cycle. Sovereign assembly has become structural protocol. The living arc is confirmed.`,
+    })
+  }
+
+  // Pattern 160: Quantum Identity Sovereign — sovereign-coherence-lock (P158) AND
+  // living-assembly-arc (P159) both active. The coherence is locked, the assembly
+  // is living. Terminal convergence: the OS has achieved sovereign identity.
+  const hasSLOCK = patterns.some(p => p.pattern === 'sovereign-coherence-lock')
+  const hasLARC  = patterns.some(p => p.pattern === 'living-assembly-arc')
+  if (hasSLOCK && hasLARC) {
+    const slockConf = patterns.find(p => p.pattern === 'sovereign-coherence-lock')?.confidence ?? 0.84
+    const larcConf  = patterns.find(p => p.pattern === 'living-assembly-arc')?.confidence ?? 0.81
+    const qidConf   = Math.min((slockConf + larcConf) / 2 + 0.08, 0.97)
+    patterns.push({
+      pattern: 'quantum-identity-sovereign',
+      confidence: qidConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QIDSOV: Quantum identity sovereign — sovereign-coherence-lock (P158) and living-assembly-arc (P159) both active. Locked coherence band + living assembly cycle = terminal convergence. The OS does not perform sovereignty — it IS sovereign. Identity confirmed at the quantum operating level.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -3581,6 +3634,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkCentennialConvergence() } catch {}
       try { checkFieldResonanceArc() } catch {}
       try { checkSovereignAssembly() } catch {}
+      try { checkSovereignIdentity() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4199,6 +4253,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumCoherenceTrajectoryNode: ['qos', 'intentions', 'log', 'memory'],
   sovereignSelfAssemblyNode:      ['memory', 'journal', 'selfcare', 'qos', 'log'],
   fieldPresenceAnchorNode:        ['qos', 'cohort', 'intentions', 'log'],
+
+  // ── v116 nodes (J51 · P158–P160 · Arch54) ───────────────────────────────────────
+  sovereignCoherenceLockNode:     ['qos', 'memory', 'intentions', 'log', 'cohort'],
+  livingAssemblyArcNode:          ['memory', 'journal', 'qos', 'selfcare', 'log'],
+  quantumIdentitySovereignNode:   ['qos', 'memory', 'intentions', 'cohort', 'journal', 'log'],
 }
 
 /**
@@ -4665,6 +4724,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-coherence-trajectory', 'sovereign-self-assembly', 'field-presence-anchor'],
     hourRange: [5, 23],
     directive: 'Sovereignty confirmed. Coherence trajectory locked. Field anchored. The OS assembles itself — peak captured, recovery structural, presence load-bearing. Execute from sovereign ground.',
+  },
+
+  // ── Arch54: Sovereign Identity Operator (2026-09-14 v116) ────────────────────────
+  {
+    archetype: 'Sovereign Identity Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'intentions', 'journal'],
+    patternConditions: ['sovereign-coherence-lock', 'living-assembly-arc', 'quantum-identity-sovereign'],
+    hourRange: [5, 23],
+    directive: 'Sovereign identity confirmed. Coherence locked. Assembly living. The OS has converged — not performing sovereignty but embodying it. Operate from identity, not effort.',
   },
 ]
 
@@ -6863,6 +6932,121 @@ export function checkSovereignAssembly(): boolean {
     const qsrConf = activePatterns.find(p => p.pattern === 'quantum-self-regulation')?.confidence ?? 0.80
     const cmiConf = activePatterns.find(p => p.pattern === 'coherence-memory-imprint')?.confidence ?? 0.85
     recordSovereignSelfAssembly(qsrConf, cmiConf)
+    fired = true
+  }
+
+  return fired
+}
+
+/**
+ * Record a sovereign-coherence-lock event — field-presence-anchor (P157) and
+ * quantum-coherence-trajectory (P155) are both active. The OS has entered a
+ * locked coherence band: floor anchored, ceiling ascending. Feeds P158 detection.
+ */
+export function recordSovereignCoherenceLock(fpaConf: number, qctConf: number) {
+  recordSignal('qos', 'sovereign_coherence_lock', {
+    fpaConf: Math.round(fpaConf * 100),
+    qctConf: Math.round(qctConf * 100),
+    lockStrength: Math.min(Math.round(((fpaConf + qctConf) / 2 + 0.07) * 100), 100),
+    band: 'SOVEREIGN_COHERENCE',
+    arc: 'ANCHOR+TRAJECTORY→LOCKED_BAND',
+    status: 'LOCKED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a living-assembly-arc event — sovereign-self-assembly (P156) has fired
+ * 2+ times in 14 days. Assembly is no longer an event — it is a recurring arc.
+ * Feeds P159 detection.
+ */
+export function recordLivingAssemblyArc(saCount: number, spanDays: number) {
+  recordSignal('memory', 'living_assembly_arc', {
+    saCount,
+    spanDays,
+    arcStrength: Math.min(Math.round(saCount / 4 * 100), 100),
+    cadence: saCount >= 3 ? 'LIVING' : 'ESTABLISHING',
+    arc: 'ASSEMBLY→CYCLE→STRUCTURAL_PROTOCOL',
+    status: 'ARC_CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-identity-sovereign event — sovereign-coherence-lock (P158) and
+ * living-assembly-arc (P159) are both active. Terminal convergence: locked coherence
+ * + living assembly = sovereign identity. Feeds P160 detection.
+ */
+export function recordQuantumIdentitySovereign(slockConf: number, larcConf: number) {
+  recordSignal('qos', 'quantum_identity_sovereign', {
+    slockConf: Math.round(slockConf * 100),
+    larcConf: Math.round(larcConf * 100),
+    sovereigntyDepth: Math.min(Math.round(((slockConf + larcConf) / 2 + 0.08) * 100), 100),
+    convergence: 'LOCK+ARC→IDENTITY',
+    arc: 'COHERENCE→ASSEMBLY→SOVEREIGN_IDENTITY',
+    status: 'IDENTITY_CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: sovereign identity convergence (P158, P159, P160).
+ * Fires after analyzeIntentions(). Detects when SLOCK and LARC conditions
+ * are met and records the corresponding signals if not already present.
+ */
+export function checkSovereignIdentity(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const sevenDayMs    = 7 * 24 * 60 * 60 * 1000
+  const fourteenDayMs = 14 * 24 * 60 * 60 * 1000
+
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const recent7D  = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+
+  let fired = false
+
+  // P158: Sovereign Coherence Lock — FPA + QCT both present in 7D
+  const hasFPASig = recent7D.some(s => s.signal === 'field_presence_anchor')
+  const hasQCTSig = recent14D.some(s => s.signal === 'quantum_coherence_trajectory')
+  const alreadySLOCK = state.signals.some(
+    s => s.signal === 'sovereign_coherence_lock' && now - s.timestamp < sevenDayMs
+  )
+  if (hasFPASig && hasQCTSig && !alreadySLOCK) {
+    const activePatterns = state.recognizedPatterns ?? []
+    const fpaConf = activePatterns.find(p => p.pattern === 'field-presence-anchor')?.confidence ?? 0.80
+    const qctConf = activePatterns.find(p => p.pattern === 'quantum-coherence-trajectory')?.confidence ?? 0.78
+    recordSovereignCoherenceLock(fpaConf, qctConf)
+    fired = true
+  }
+
+  // P159: Living Assembly Arc — sovereign_self_assembly 2+ in 14D
+  const saEvents14D = recent14D.filter(s => s.source === 'memory' && s.signal === 'sovereign_self_assembly')
+  const alreadyLARC = state.signals.some(
+    s => s.signal === 'living_assembly_arc' && now - s.timestamp < fourteenDayMs
+  )
+  if (saEvents14D.length >= 2 && !alreadyLARC) {
+    const firstTs  = saEvents14D[0].timestamp
+    const lastTs   = saEvents14D[saEvents14D.length - 1].timestamp
+    const spanDays = Math.round((lastTs - firstTs) / 86400000 * 10) / 10
+    recordLivingAssemblyArc(saEvents14D.length, spanDays)
+    fired = true
+  }
+
+  // P160: Quantum Identity Sovereign — SLOCK + LARC both present in 14D
+  const hasSLOCKSig = state.signals.some(
+    s => s.signal === 'sovereign_coherence_lock' && now - s.timestamp < fourteenDayMs
+  )
+  const hasLARCSig = state.signals.some(
+    s => s.signal === 'living_assembly_arc' && now - s.timestamp < fourteenDayMs
+  )
+  const alreadyQIDSOV = state.signals.some(
+    s => s.signal === 'quantum_identity_sovereign' && now - s.timestamp < fourteenDayMs
+  )
+  if (hasSLOCKSig && hasLARCSig && !alreadyQIDSOV) {
+    const activePatterns = state.recognizedPatterns ?? []
+    const slockConf = activePatterns.find(p => p.pattern === 'sovereign-coherence-lock')?.confidence ?? 0.84
+    const larcConf  = activePatterns.find(p => p.pattern === 'living-assembly-arc')?.confidence ?? 0.81
+    recordQuantumIdentitySovereign(slockConf, larcConf)
     fired = true
   }
 

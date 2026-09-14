@@ -1308,22 +1308,35 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="QFIELD:" blockView>
-                <div className="uppercase tracking-widest mb-4">QUANTUM FIELD ALIGNMENT</div>
                 {sealConf !== undefined && (
-                  <div className="opacity-60 tabular-nums">SEAL: {Math.round(sealConf * 100)}%</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SEAL</span>
+                    <span className="tabular-nums">{Math.round(sealConf * 100)}%</span>
+                  </div>
                 )}
                 {rhythmConf !== undefined && (
-                  <div className="opacity-60 tabular-nums">RHYTHM: {Math.round(rhythmConf * 100)}%</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RHYTHM</span>
+                    <span className="tabular-nums">{Math.round(rhythmConf * 100)}%</span>
+                  </div>
                 )}
                 {biofieldConf !== undefined && (
-                  <div className="opacity-60 tabular-nums">BIOFIELD: {Math.round(biofieldConf * 100)}%</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BIOFIELD</span>
+                    <span className="tabular-nums">{Math.round(biofieldConf * 100)}%</span>
+                  </div>
                 )}
                 {composite !== undefined && (
-                  <div className="opacity-50 tabular-nums">COMPOSITE: {composite}%</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COMPOSITE</span>
+                    <span className="tabular-nums">{composite}%</span>
+                  </div>
                 )}
-                <div className="opacity-40 tabular-nums">FIELD: COMPLETE</div>
                 {confidence !== undefined && (
-                  <div className="opacity-30 tabular-nums">CONF: {Math.round(confidence * 100)}%</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{Math.round(confidence * 100)}%</span>
+                  </div>
                 )}
               </Block>
             </LogContainer>
@@ -3603,7 +3616,6 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="RECINTEL:" blockView>
-                <div className="uppercase tracking-widest mb-4">RECOVERY INTELLIGENCE ARC</div>
                 {negMoodCount !== undefined && (
                   <div className="flex justify-between items-baseline mb-4">
                     <span className="opacity-30">NEG SIGNALS</span>
@@ -3622,9 +3634,11 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                     <span className="tabular-nums">{velocityHours}h</span>
                   </div>
                 )}
-                <div className="opacity-40 tabular-nums">FELT → TENDED → RECOVERED → REFLECTED</div>
                 {arc && (
-                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC</span>
+                    <span className="tabular-nums">{arc}</span>
+                  </div>
                 )}
               </Block>
             </LogContainer>
@@ -3637,7 +3651,6 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="FIELDRES:" blockView>
-                <div className="uppercase tracking-widest mb-4">FIELD RESONANCE ARC</div>
                 {qpcCount !== undefined && (
                   <div className="flex justify-between items-baseline mb-4">
                     <span className="opacity-30">CRYST EVENTS</span>
@@ -3656,9 +3669,11 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                     <span className="tabular-nums">{sessionCount}</span>
                   </div>
                 )}
-                <div className="opacity-40 tabular-nums">SUSTAINED CRYSTALLIZATION · NOT AN EVENT</div>
                 {resonanceStrength !== undefined && (
-                  <div className="opacity-30 tabular-nums">RESONANCE: {resonanceStrength}%</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RESONANCE</span>
+                    <span className="tabular-nums">{resonanceStrength}%</span>
+                  </div>
                 )}
               </Block>
             </LogContainer>
@@ -3671,7 +3686,6 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="COHIMPRINT:" blockView>
-                <div className="uppercase tracking-widest mb-4">COHERENCE MEMORY IMPRINT</div>
                 {captureCount !== undefined && (
                   <div className="flex justify-between items-baseline mb-4">
                     <span className="opacity-30">CAPTURE EVENTS</span>
@@ -3690,9 +3704,11 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                     <span className="tabular-nums">{imprintStrength}%</span>
                   </div>
                 )}
-                <div className="opacity-40 tabular-nums">PEAK COHERENCE PRESERVED IN MEMORY</div>
                 {arc && (
-                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC</span>
+                    <span className="tabular-nums">{arc}</span>
+                  </div>
                 )}
               </Block>
             </LogContainer>
@@ -3706,7 +3722,6 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="QSREG:" blockView>
-                <div className="uppercase tracking-widest mb-4">QUANTUM SELF-REGULATION</div>
                 {arcCount !== undefined && (
                   <div className="flex justify-between items-baseline mb-4">
                     <span className="opacity-30">ARCS 7D</span>
@@ -3725,12 +3740,17 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                     <span className="tabular-nums">{competency}</span>
                   </div>
                 )}
-                <div className="opacity-40 tabular-nums">DETECT → INTERVENE → RESTORE → REFLECT</div>
                 {cadence && (
-                  <div className="opacity-30 tabular-nums">CADENCE: {cadence}</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CADENCE</span>
+                    <span className="tabular-nums">{cadence}</span>
+                  </div>
                 )}
                 {arc && (
-                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC</span>
+                    <span className="tabular-nums">{arc}</span>
+                  </div>
                 )}
               </Block>
             </LogContainer>
@@ -3744,7 +3764,6 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="QCOHTRJ:" blockView>
-                <div className="uppercase tracking-widest mb-4">QUANTUM COHERENCE TRAJECTORY</div>
                 {fraCount !== undefined && (
                   <div className="flex justify-between items-baseline mb-4">
                     <span className="opacity-30">FRA EVENTS</span>
@@ -3763,12 +3782,17 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                     <span className="tabular-nums">{direction}</span>
                   </div>
                 )}
-                <div className="opacity-40 tabular-nums">NOT CYCLING — ASCENDING</div>
                 {phase && (
-                  <div className="opacity-30 tabular-nums">PHASE: {phase}</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PHASE</span>
+                    <span className="tabular-nums">{phase}</span>
+                  </div>
                 )}
                 {arc && (
-                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC</span>
+                    <span className="tabular-nums">{arc}</span>
+                  </div>
                 )}
               </Block>
             </LogContainer>
@@ -3782,7 +3806,6 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="SOVASMB:" blockView>
-                <div className="uppercase tracking-widest mb-4">SOVEREIGN SELF-ASSEMBLY</div>
                 {qsrConf !== undefined && (
                   <div className="flex justify-between items-baseline mb-4">
                     <span className="opacity-30">QSR CONF</span>
@@ -3801,12 +3824,17 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                     <span className="tabular-nums">{sovereigntyStr}%</span>
                   </div>
                 )}
-                <div className="opacity-40 tabular-nums">REGULATION + CAPTURE = SOVEREIGN ASSEMBLY</div>
                 {loops && (
-                  <div className="opacity-30 tabular-nums">LOOPS: {loops}</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LOOPS</span>
+                    <span className="tabular-nums">{loops}</span>
+                  </div>
                 )}
                 {arc && (
-                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC</span>
+                    <span className="tabular-nums">{arc}</span>
+                  </div>
                 )}
               </Block>
             </LogContainer>
@@ -3820,7 +3848,6 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="FPANCH:" blockView>
-                <div className="uppercase tracking-widest mb-4">FIELD PRESENCE ANCHOR</div>
                 {fraCount !== undefined && (
                   <div className="flex justify-between items-baseline mb-4">
                     <span className="opacity-30">FRA EVENTS 7D</span>
@@ -3839,12 +3866,143 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                     <span className="tabular-nums">{anchorStr}%</span>
                   </div>
                 )}
-                <div className="opacity-40 tabular-nums">PRESENCE IS THE FLOOR · NOT THE PEAK</div>
                 {stability && (
-                  <div className="opacity-30 tabular-nums">STABILITY: {stability}</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">STABILITY</span>
+                    <span className="tabular-nums">{stability}</span>
+                  </div>
                 )}
                 {arc && (
-                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC</span>
+                    <span className="tabular-nums">{arc}</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sovereign_coherence_lock') {
+          const fpaConf     = log.metadata?.fpaConf     as number | undefined
+          const qctConf     = log.metadata?.qctConf     as number | undefined
+          const lockStr     = log.metadata?.lockStrength as number | undefined
+          const band        = log.metadata?.band        as string | undefined
+          const arc         = log.metadata?.arc         as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SLOCK:" blockView>
+                {fpaConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FPA CONF</span>
+                    <span className="tabular-nums">{fpaConf}%</span>
+                  </div>
+                )}
+                {qctConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">QCT CONF</span>
+                    <span className="tabular-nums">{qctConf}%</span>
+                  </div>
+                )}
+                {lockStr !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LOCK</span>
+                    <span className="tabular-nums">{lockStr}%</span>
+                  </div>
+                )}
+                {band && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BAND</span>
+                    <span className="tabular-nums">{band}</span>
+                  </div>
+                )}
+                {arc && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC</span>
+                    <span className="tabular-nums">{arc}</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'living_assembly_arc') {
+          const saCount   = log.metadata?.saCount   as number | undefined
+          const spanDays  = log.metadata?.spanDays  as number | undefined
+          const arcStr    = log.metadata?.arcStrength as number | undefined
+          const cadence   = log.metadata?.cadence   as string | undefined
+          const arc       = log.metadata?.arc        as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="LARC:" blockView>
+                {saCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SA EVENTS 14D</span>
+                    <span className="tabular-nums">{saCount}</span>
+                  </div>
+                )}
+                {spanDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SPAN</span>
+                    <span className="tabular-nums">{spanDays}d</span>
+                  </div>
+                )}
+                {arcStr !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC STR</span>
+                    <span className="tabular-nums">{arcStr}%</span>
+                  </div>
+                )}
+                {cadence && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CADENCE</span>
+                    <span className="tabular-nums">{cadence}</span>
+                  </div>
+                )}
+                {arc && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC</span>
+                    <span className="tabular-nums">{arc}</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_identity_sovereign') {
+          const slockConf       = log.metadata?.slockConf        as number | undefined
+          const larcConf        = log.metadata?.larcConf         as number | undefined
+          const sovereignDepth  = log.metadata?.sovereigntyDepth as number | undefined
+          const convergence     = log.metadata?.convergence      as string | undefined
+          const arc             = log.metadata?.arc              as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QIDSOV:" blockView>
+                {slockConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SLOCK CONF</span>
+                    <span className="tabular-nums">{slockConf}%</span>
+                  </div>
+                )}
+                {larcConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LARC CONF</span>
+                    <span className="tabular-nums">{larcConf}%</span>
+                  </div>
+                )}
+                {sovereignDepth !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVEREIGNTY</span>
+                    <span className="tabular-nums">{sovereignDepth}%</span>
+                  </div>
+                )}
+                {convergence && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONVERGENCE</span>
+                    <span className="tabular-nums">{convergence}</span>
+                  </div>
+                )}
+                {arc && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC</span>
+                    <span className="tabular-nums">{arc}</span>
+                  </div>
                 )}
               </Block>
             </LogContainer>

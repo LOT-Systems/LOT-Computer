@@ -1217,6 +1217,14 @@ export default async (fastify: FastifyInstance) => {
       'field_resonance_arc',
       'coherence_memory_imprint',
       'quantum_self_regulation',
+      // v115: quantum coherence trajectory · sovereign self-assembly · field presence anchor (P155/P156/P157)
+      'quantum_coherence_trajectory',
+      'sovereign_self_assembly',
+      'field_presence_anchor',
+      // v116: sovereign coherence lock · living assembly arc · quantum identity sovereign (P158/P159/P160)
+      'sovereign_coherence_lock',
+      'living_assembly_arc',
+      'quantum_identity_sovereign',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

@@ -185,6 +185,12 @@ export function PatternRecognitionWidget() {
       'field-resonance-arc':              'Field resonance arc — crystallization structural across sessions, not a single event (P152)',
       'coherence-memory-imprint':         'Coherence memory imprint — peak convergence captured and preserved in memory layer (P153)',
       'quantum-self-regulation':          'Quantum self-regulation — recovery loop confirmed 2× in 7d, structural competency established (P154)',
+      'quantum-coherence-trajectory':     'Quantum coherence trajectory — FRA 2+ in 14d, coherence ascending not cycling (P155)',
+      'sovereign-self-assembly':          'Sovereign self-assembly — QSR + CMI simultaneously active, OS assembles itself (P156)',
+      'field-presence-anchor':            'Field presence anchor — FRA 3+ in 7d, presence is load-bearing floor (P157)',
+      'sovereign-coherence-lock':         'Sovereign coherence lock — FPA + QCT active, OS locked in sovereign coherence band (P158)',
+      'living-assembly-arc':              'Living assembly arc — sovereign assembly 2+ in 14d, recurring cycle confirmed (P159)',
+      'quantum-identity-sovereign':       'Quantum identity sovereign — SLOCK + LARC active, terminal convergence confirmed (P160)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
