@@ -356,8 +356,13 @@ async function performHealthChecks(): Promise<{
   ])
 
   // Determine overall status
-  const hasErrors = checks.some((c) => c.status === 'error')
-  const overall = hasErrors ? 'error' : 'ok'
+  // Core checks: database + auth. Failures there = full error.
+  // Non-core check failures = degraded (site is up but something is wrong).
+  const CORE_CHECKS = new Set(['Database stack', 'Authentication engine'])
+  const coreErrors = checks.filter((c) => c.status === 'error' && CORE_CHECKS.has(c.name))
+  const nonCoreErrors = checks.filter((c) => c.status === 'error' && !CORE_CHECKS.has(c.name))
+  const overall: 'ok' | 'degraded' | 'error' =
+    coreErrors.length > 0 ? 'error' : nonCoreErrors.length > 0 ? 'degraded' : 'ok'
 
   return {
     version: VERSION,

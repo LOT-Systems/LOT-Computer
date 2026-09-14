@@ -50,6 +50,45 @@ interface MemoryStatus {
   blockReason: string | null
 }
 
+// Animated pulse dot for live-ok status
+const PulseDot = ({ color }: { color: string }) => (
+  <span className="relative inline-flex items-center justify-center" style={{ width: 10, height: 10 }}>
+    <span
+      className="absolute inline-flex rounded-full opacity-75"
+      style={{
+        width: 10,
+        height: 10,
+        backgroundColor: color,
+        animation: 'lot-ping 1.5s cubic-bezier(0,0,0.2,1) infinite',
+      }}
+    />
+    <span
+      className="relative inline-flex rounded-full"
+      style={{ width: 6, height: 6, backgroundColor: color }}
+    />
+  </span>
+)
+
+// Static dot for non-ok states
+const StaticDot = ({ color }: { color: string }) => (
+  <span
+    className="inline-flex rounded-full flex-shrink-0"
+    style={{ width: 6, height: 6, backgroundColor: color }}
+  />
+)
+
+const CHECK_COLORS = {
+  ok: 'var(--lot-green, #22c55e)',
+  error: 'var(--lot-red, #ef4444)',
+  unknown: 'var(--lot-muted, rgba(128,128,128,0.5))',
+}
+
+const OVERALL_META: Record<string, { label: string; color: string; pulse: boolean }> = {
+  ok:       { label: 'All systems operational',   color: CHECK_COLORS.ok,      pulse: true  },
+  degraded: { label: 'Partial system degradation', color: 'var(--lot-amber, #f59e0b)', pulse: false },
+  error:    { label: 'System issues detected',     color: CHECK_COLORS.error,  pulse: false },
+}
+
 export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
   const [status, setStatus] = React.useState<StatusData | null>(null)
   const [memoryStatus, setMemoryStatus] = React.useState<MemoryStatus | null>(null)
@@ -64,7 +103,6 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
       setLoading(true)
       setError(null)
 
-      // Fetch public system status
       const response = await fetch('/api/public/status')
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
@@ -72,7 +110,6 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
       const data = await response.json()
       setStatus(data)
 
-      // Try to fetch memory status (authenticated)
       try {
         const localTime = btoa(dayjs().format(DATE_TIME_FORMAT))
         const memResponse = await fetch(`/api/memory-status?d=${localTime}`)
@@ -81,54 +118,29 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
           setMemoryStatus(memData)
         }
       } catch {
-        // Not logged in or endpoint unavailable
         setMemoryStatus(null)
       }
 
       setLastUpdate(new Date())
     } catch (err: any) {
       setError(err.message || 'Failed to fetch status')
-      console.error('Status fetch error:', err)
     } finally {
       setLoading(false)
     }
   }, [])
 
-  // Fetch status on mount
-  React.useEffect(() => {
-    fetchStatus()
-  }, [fetchStatus])
+  React.useEffect(() => { fetchStatus() }, [fetchStatus])
 
-  // Auto-refresh every 2 minutes
   React.useEffect(() => {
-    const interval = setInterval(() => {
-      fetchStatus()
-    }, 2 * 60 * 1000) // 2 minutes
-
+    const interval = setInterval(fetchStatus, 2 * 60 * 1000)
     return () => clearInterval(interval)
   }, [fetchStatus])
 
-  const getStatusIcon = (checkStatus: 'ok' | 'error' | 'unknown') => {
-    switch (checkStatus) {
-      case 'ok':
-        return '✓'
-      case 'error':
-        return '✕'
-      case 'unknown':
-        return '?'
-    }
-  }
-
   const formatDate = (dateString: string) => {
     try {
-      const date = new Date(dateString)
-      return date.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
+      return new Date(dateString).toLocaleString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
         timeZoneName: 'short',
       })
     } catch {
@@ -138,6 +150,13 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
 
   const content = (
     <div className="flex flex-col gap-y-16">
+      {/* Keyframe injection */}
+      <style>{`
+        @keyframes lot-ping {
+          75%, 100% { transform: scale(2); opacity: 0; }
+        }
+      `}</style>
+
       <div>
         <div className="mb-16">LOT Systems Status</div>
         <GhostButton href="/">← Home</GhostButton>
@@ -150,120 +169,116 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
       {error && !status && (
         <div className="mb-32">
           <div className="mb-16 text-acc/80">Error: {error}</div>
-          <Button kind="secondary" size="small" onClick={fetchStatus}>
-            Retry
-          </Button>
+          <Button kind="secondary" size="small" onClick={fetchStatus}>Retry</Button>
         </div>
       )}
 
-      {status && (
-        <>
-          <div className="mb-16">
-            <Block label="Status:" labelClassName="!pl-0">
-              {status.overall === 'ok' ? 'All systems operational' :
-               status.overall === 'degraded' ? 'Degraded performance' :
-               'System issues detected'}
-            </Block>
-            <Block label="Version:" labelClassName="!pl-0">v{status.version}</Block>
-            <Block label="Environment:" labelClassName="!pl-0">{status.environment}</Block>
-            <Block label="Last updated:" labelClassName="!pl-0" containsSmallButton>
-              <div className="flex items-center gap-x-16">
-                <span>
-                  {formatDate(lastUpdate.toISOString())}
-                  {status.cached && status.cacheAge && (
-                    <span className="text-acc/40">
-                      {' '}(cached {status.cacheAge}s ago)
-                    </span>
-                  )}
-                </span>
-                <Button
-                  kind="secondary"
-                  size="small"
-                  onClick={fetchStatus}
-                  disabled={loading}
+      {status && (() => {
+        const meta = OVERALL_META[status.overall] ?? OVERALL_META.error
+        return (
+          <>
+            {/* Overall status banner */}
+            <div className="mb-16">
+              <Block label="Status:" labelClassName="!pl-0">
+                <div className="flex items-center gap-x-10">
+                  {meta.pulse
+                    ? <PulseDot color={meta.color} />
+                    : <StaticDot color={meta.color} />}
+                  <span style={{ color: meta.color }}>{meta.label}</span>
+                </div>
+              </Block>
+              <Block label="Version:" labelClassName="!pl-0">v{status.version}</Block>
+              <Block label="Environment:" labelClassName="!pl-0">{status.environment}</Block>
+              <Block label="Last updated:" labelClassName="!pl-0" containsSmallButton>
+                <div className="flex items-center gap-x-16">
+                  <span>
+                    {formatDate(lastUpdate.toISOString())}
+                    {status.cached && status.cacheAge != null && (
+                      <span className="text-acc/40"> (cached {status.cacheAge}s ago)</span>
+                    )}
+                  </span>
+                  <Button kind="secondary" size="small" onClick={fetchStatus} disabled={loading}>
+                    {loading ? 'Refreshing...' : 'Refresh'}
+                  </Button>
+                </div>
+              </Block>
+            </div>
+
+            {/* Component checks */}
+            <div className="mb-16">
+              <div className="mb-16">System components:</div>
+              {status.checks.map((check, index) => (
+                <Block
+                  key={index}
+                  label={check.name + ':'}
+                  labelClassName="!pl-0"
+                  className="mb-8"
                 >
-                  {loading ? 'Refreshing...' : 'Refresh'}
-                </Button>
-              </div>
-            </Block>
-          </div>
-
-          <div className="mb-16">
-            <div className="mb-16">System components:</div>
-            {status.checks.map((check, index) => (
-              <Block
-                key={index}
-                label={check.name + ':'}
-                labelClassName="!pl-0"
-                className="mb-8"
-              >
-                <div className="flex items-center gap-x-8">
-                  <span>{getStatusIcon(check.status)}</span>
-                  <span className={cn(
-                    check.status === 'ok' && 'text-acc',
-                    check.status === 'error' && 'text-acc/60'
-                  )}>
-                    {check.status === 'ok' ? 'Ok' :
-                     check.status === 'error' ? 'Error' :
-                     'Unknown'}
-                  </span>
-                  {check.duration !== undefined && (
-                    <span className="text-acc/40">({check.duration}ms)</span>
+                  <div className="flex items-center gap-x-10">
+                    {check.status === 'ok'
+                      ? <PulseDot color={CHECK_COLORS.ok} />
+                      : <StaticDot color={check.status === 'error' ? CHECK_COLORS.error : CHECK_COLORS.unknown} />}
+                    <span
+                      className={cn(
+                        check.status === 'ok'    && 'text-acc',
+                        check.status === 'error' && 'text-acc/60',
+                        check.status === 'unknown' && 'text-acc/40'
+                      )}
+                    >
+                      {check.status === 'ok' ? 'Operational' : check.status === 'error' ? 'Error' : 'Unknown'}
+                    </span>
+                    {check.duration !== undefined && (
+                      <span className="text-acc/30">{check.duration}ms</span>
+                    )}
+                  </div>
+                  {check.message && (
+                    <div className="text-acc/60 mt-4 text-sm">{check.message}</div>
                   )}
-                </div>
-                {check.message && (
-                  <div className="text-acc/60 mt-4">{check.message}</div>
-                )}
-              </Block>
-            ))}
-          </div>
+                </Block>
+              ))}
+            </div>
 
-          {memoryStatus && (
-            <div className="mb-16 pt-32 border-t border-acc/20">
-              <div className="mb-16">Memory Prompts (Your Status):</div>
-              <Block label="Current time:" labelClassName="!pl-0">
-                {memoryStatus.currentTime}
-              </Block>
-              <Block label="Time window:" labelClassName="!pl-0">
-                <span className={cn(
-                  memoryStatus.timeWindow === 'OUTSIDE TIME WINDOWS' && 'text-acc/60'
-                )}>
-                  {memoryStatus.timeWindow}
-                </span>
-              </Block>
-              <Block label="Day number:" labelClassName="!pl-0">
-                Day {memoryStatus.dayNumber}
-              </Block>
-              <Block label="Today's quota:" labelClassName="!pl-0">
-                {memoryStatus.promptsShownToday} / {memoryStatus.promptQuotaToday} prompts
-                {memoryStatus.remainingToday > 0 && (
-                  <span className="text-acc/60"> ({memoryStatus.remainingToday} remaining)</span>
-                )}
-              </Block>
-              <Block label="Next prompt:" labelClassName="!pl-0">
-                <div className="flex items-center gap-x-8">
-                  <span>{memoryStatus.nextPromptAvailable ? '✓' : '✕'}</span>
-                  <span className={cn(
-                    memoryStatus.nextPromptAvailable ? 'text-acc' : 'text-acc/60'
-                  )}>
-                    {memoryStatus.nextPromptAvailable ? 'Available now' : 'Not available'}
+            {/* Memory status (authenticated) */}
+            {memoryStatus && (
+              <div className="mb-16 pt-32 border-t border-acc/20">
+                <div className="mb-16">Memory Prompts (Your Status):</div>
+                <Block label="Current time:" labelClassName="!pl-0">{memoryStatus.currentTime}</Block>
+                <Block label="Time window:" labelClassName="!pl-0">
+                  <span className={cn(memoryStatus.timeWindow === 'OUTSIDE TIME WINDOWS' && 'text-acc/60')}>
+                    {memoryStatus.timeWindow}
                   </span>
-                </div>
-                {memoryStatus.blockReason && (
-                  <div className="text-acc/60 mt-4">Reason: {memoryStatus.blockReason}</div>
-                )}
-              </Block>
-            </div>
-          )}
+                </Block>
+                <Block label="Day number:" labelClassName="!pl-0">Day {memoryStatus.dayNumber}</Block>
+                <Block label="Today's quota:" labelClassName="!pl-0">
+                  {memoryStatus.promptsShownToday} / {memoryStatus.promptQuotaToday} prompts
+                  {memoryStatus.remainingToday > 0 && (
+                    <span className="text-acc/60"> ({memoryStatus.remainingToday} remaining)</span>
+                  )}
+                </Block>
+                <Block label="Next prompt:" labelClassName="!pl-0">
+                  <div className="flex items-center gap-x-10">
+                    {memoryStatus.nextPromptAvailable
+                      ? <PulseDot color={CHECK_COLORS.ok} />
+                      : <StaticDot color={CHECK_COLORS.error} />}
+                    <span className={cn(memoryStatus.nextPromptAvailable ? 'text-acc' : 'text-acc/60')}>
+                      {memoryStatus.nextPromptAvailable ? 'Available now' : 'Not available'}
+                    </span>
+                  </div>
+                  {memoryStatus.blockReason && (
+                    <div className="text-acc/60 mt-4">Reason: {memoryStatus.blockReason}</div>
+                  )}
+                </Block>
+              </div>
+            )}
 
-          <div className="text-acc/40 pt-32 border-t border-acc/20">
-            <div>Build: {formatDate(status.buildDate)}</div>
-            <div className="mt-8">
-              Status checks cached for 2 minutes
+            {/* Footer */}
+            <div className="text-acc/40 pt-32 border-t border-acc/20">
+              <div>Build: {formatDate(status.buildDate)}</div>
+              <div className="mt-8">Status checks cached for 2 minutes</div>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )
+      })()}
     </div>
   )
 
