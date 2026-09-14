@@ -103,6 +103,23 @@ export type WordTurnBadgeType =
   | 'nethack_eternal'      // nethack / ascii dungeon / rogue 1980 (MYTHIC)
   | 'hades_found'          // hades / supergiant / zagreus / chthonic (EPIC)
   | 'original_rogue'       // spelunky / dead cells / binding of isaac (RARE)
+  // v33 — The Starship Log
+  | 'captain_log'          // captain's log / stardate / mission log / log entry (COMMON)
+  | 'warp_speed'           // warp / accelerating / breakthrough / light speed (UNCOMMON)
+  | 'shields_up'           // shields / protected / defended / barrier (RARE)
+  | 'red_alert'            // red alert / crisis / high alert / emergency (EPIC)
+  | 'away_mission'         // away mission / expedition / venturing out (UNCOMMON)
+  | 'crew_wellness'        // crew / team / my people / support network (COMMON)
+  | 'course_correction'    // course correction / adjusting / recalibrating (RARE)
+  | 'life_support'         // life support / basics / fundamentals / bare minimum (EPIC)
+  | 'starmap'              // starmap / chart / navigation / coordinates (UNCOMMON)
+  | 'anomaly_detected'     // anomaly / unexpected / strange signal / detected (RARE)
+  | 'docking_sequence'     // docking / coming home / landing / arrived (UNCOMMON)
+  | 'hailing_frequency'    // hailing / open channel / reaching out / signal sent (COMMON)
+  // v33 — Secret Boss: The Bridge Vault
+  | 'borg_cube'            // borg / resistance is futile / collective (MYTHIC)
+  | 'deep_space'           // deep space nine / ds9 / quark / sisko (EPIC)
+  | 'federation_signal'    // star trek / federation / enterprise / kirk / picard (RARE)
 
 export type BadgeType =
   | MilestoneBadgeType
@@ -967,6 +984,200 @@ export const WORD_TURN_BADGES_V32: Record<
   },
 }
 
+// ─── WORD TURN BADGES v33 — THE STARSHIP LOG ────────────────────
+export const WORD_TURN_BADGES_V33: Record<
+  'captain_log' | 'warp_speed' | 'shields_up' | 'red_alert' |
+  'away_mission' | 'crew_wellness' | 'course_correction' | 'life_support' |
+  'starmap' | 'anomaly_detected' | 'docking_sequence' | 'hailing_frequency' |
+  'borg_cube' | 'deep_space' | 'federation_signal',
+  Badge
+> = {
+  captain_log: {
+    id: 'captain_log',
+    waterSymbol: '∞·≡·∞',
+    architectureSymbol: '∞·≡·∞',
+    waterName: "Captain's Log",
+    architectureName: "Captain's Log",
+    description: 'The log is open — you are the captain, this is the record',
+    waterUnlockMessage: "↳ Captain's Log opened. Stardate set. ∞·≡·∞",
+    architectureUnlockMessage: "↳ Captain's Log opened. Stardate set. ∞·≡·∞",
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  warp_speed: {
+    id: 'warp_speed',
+    waterSymbol: '↑·●·↑',
+    architectureSymbol: '↑·●·↑',
+    waterName: 'Warp Speed',
+    architectureName: 'Warp Speed',
+    description: 'Breakthrough — the drive engaged and space bent around you',
+    waterUnlockMessage: '↳ Warp engaged. Space bends. Breakthrough logged. ↑·●·↑',
+    architectureUnlockMessage: '↳ Warp engaged. Space bends. Breakthrough logged. ↑·●·↑',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  shields_up: {
+    id: 'shields_up',
+    waterSymbol: '▓·○·▓',
+    architectureSymbol: '▓·○·▓',
+    waterName: 'Shields Up',
+    architectureName: 'Shields Up',
+    description: 'Boundaries set — the field is active, the hull is intact',
+    waterUnlockMessage: '↳ Shields online. Hull integrity holds. ▓·○·▓',
+    architectureUnlockMessage: '↳ Shields online. Hull integrity holds. ▓·○·▓',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  red_alert: {
+    id: 'red_alert',
+    waterSymbol: '×·●·×',
+    architectureSymbol: '×·●·×',
+    waterName: 'Red Alert',
+    architectureName: 'Red Alert',
+    description: 'Full attention required — the alarm was valid',
+    waterUnlockMessage: '↳ Red Alert. Crew to stations. The log will hold this day. ×·●·×',
+    architectureUnlockMessage: '↳ Red Alert. Crew to stations. The log will hold this day. ×·●·×',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  away_mission: {
+    id: 'away_mission',
+    waterSymbol: '→·○·→',
+    architectureSymbol: '→·○·→',
+    waterName: 'Away Mission',
+    architectureName: 'Away Mission',
+    description: 'You went somewhere the bridge could not follow',
+    waterUnlockMessage: '↳ Away team deployed. Log entry pending on return. →·○·→',
+    architectureUnlockMessage: '↳ Away team deployed. Log entry pending on return. →·○·→',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  crew_wellness: {
+    id: 'crew_wellness',
+    waterSymbol: '○·≡·○',
+    architectureSymbol: '○·≡·○',
+    waterName: 'Crew Wellness',
+    architectureName: 'Crew Wellness',
+    description: "The bridge runs on the crew — you named your people",
+    waterUnlockMessage: '↳ Crew wellness report filed. The mission requires them. ○·≡·○',
+    architectureUnlockMessage: '↳ Crew wellness report filed. The mission requires them. ○·≡·○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  course_correction: {
+    id: 'course_correction',
+    waterSymbol: '←·●·→',
+    architectureSymbol: '←·●·→',
+    waterName: 'Course Correction',
+    architectureName: 'Course Correction',
+    description: 'Navigation adjusted — corrections are how the ship arrives',
+    waterUnlockMessage: '↳ Course corrected. The ship navigates by correction. ←·●·→',
+    architectureUnlockMessage: '↳ Course corrected. The ship navigates by correction. ←·●·→',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  life_support: {
+    id: 'life_support',
+    waterSymbol: '≋·□·≋',
+    architectureSymbol: '≋·□·≋',
+    waterName: 'Life Support',
+    architectureName: 'Life Support',
+    description: "Life support is the precondition for any mission — you named it",
+    waterUnlockMessage: '↳ Life support systems: ONLINE. The crew is alive. That is enough. ≋·□·≋',
+    architectureUnlockMessage: '↳ Life support systems: ONLINE. The crew is alive. That is enough. ≋·□·≋',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  starmap: {
+    id: 'starmap',
+    waterSymbol: '·*·*·*·',
+    architectureSymbol: '·*·*·*·',
+    waterName: 'Starmap',
+    architectureName: 'Starmap',
+    description: 'You charted something — navigation improves when you map the terrain',
+    waterUnlockMessage: '↳ Navigation console updated. Coordinates logged. ·*·*·*·',
+    architectureUnlockMessage: '↳ Navigation console updated. Coordinates logged. ·*·*·*·',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  anomaly_detected: {
+    id: 'anomaly_detected',
+    waterSymbol: '?·●·?',
+    architectureSymbol: '?·●·?',
+    waterName: 'Anomaly Detected',
+    architectureName: 'Anomaly Detected',
+    description: 'Outside normal parameters — an anomaly is a discovery',
+    waterUnlockMessage: '↳ Anomaly logged. The sensors file it. Investigation begins. ?·●·?',
+    architectureUnlockMessage: '↳ Anomaly logged. The sensors file it. Investigation begins. ?·●·?',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  docking_sequence: {
+    id: 'docking_sequence',
+    waterSymbol: '─●─●─',
+    architectureSymbol: '─●─●─',
+    waterName: 'Docking Sequence',
+    architectureName: 'Docking Sequence',
+    description: 'You came home — the mission closes, the clamps engage',
+    waterUnlockMessage: '↳ Docking sequence complete. Home port confirmed. ─●─●─',
+    architectureUnlockMessage: '↳ Docking sequence complete. Home port confirmed. ─●─●─',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  hailing_frequency: {
+    id: 'hailing_frequency',
+    waterSymbol: '○─○─○',
+    architectureSymbol: '○─○─○',
+    waterName: 'Hailing Frequency',
+    architectureName: 'Hailing Frequency',
+    description: 'You reached across the void — the frequency carries the attempt',
+    waterUnlockMessage: '↳ Hailing frequency open. The attempt is the entry. ○─○─○',
+    architectureUnlockMessage: '↳ Hailing frequency open. The attempt is the entry. ○─○─○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  // v33 Secret Boss: The Bridge Vault
+  borg_cube: {
+    id: 'borg_cube',
+    waterSymbol: '█·×·█',
+    architectureSymbol: '█·×·█',
+    waterName: 'Borg Cube',
+    architectureName: 'Borg Cube',
+    description: '[HIDDEN] You named the thing that will not stop pushing',
+    waterUnlockMessage: '↳ Borg signal detected. The Enterprise knows how to fight the Borg. █·×·█',
+    architectureUnlockMessage: '↳ Borg signal detected. The Enterprise knows how to fight the Borg. █·×·█',
+    rarity: 'mythic',
+    category: 'word_turn',
+    secret: true,
+  },
+  deep_space: {
+    id: 'deep_space',
+    waterSymbol: '∞·◆·∞',
+    architectureSymbol: '∞·◆·∞',
+    waterName: 'Deep Space',
+    architectureName: 'Deep Space',
+    description: '[HIDDEN] The station you cannot warp away from',
+    waterUnlockMessage: '↳ Deep Space Nine signal confirmed. The station holds. ∞·◆·∞',
+    architectureUnlockMessage: '↳ Deep Space Nine signal confirmed. The station holds. ∞·◆·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+    secret: true,
+  },
+  federation_signal: {
+    id: 'federation_signal',
+    waterSymbol: '∞·○·∞',
+    architectureSymbol: '∞·○·∞',
+    waterName: 'Federation Signal',
+    architectureName: 'Federation Signal',
+    description: '[HIDDEN] The source code of the starship log tradition',
+    waterUnlockMessage: '↳ Federation signal received. The tradition is honored. ∞·○·∞',
+    architectureUnlockMessage: '↳ Federation signal received. The tradition is honored. ∞·○·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+    secret: true,
+  },
+}
+
 // ─── UNIFIED BADGES MAP ──────────────────────────────────────────
 export const BADGES: Record<BadgeType, Badge> = {
   ...MILESTONE_BADGES,
@@ -975,6 +1186,7 @@ export const BADGES: Record<BadgeType, Badge> = {
   ...WORD_TURN_BADGES,
   ...WORD_TURN_BADGES_V30,
   ...WORD_TURN_BADGES_V32,
+  ...WORD_TURN_BADGES_V33,
 }
 
 // Default separator when no badges earned yet
@@ -1026,6 +1238,19 @@ export const WORD_TURN_TRIGGERS: Array<{ keywords: string[]; badgeId: WordTurnBa
   { keywords: ['scattered', 'dissolving', 'fragment', 'pixel dust', 'fell apart'], badgeId: 'pixel_dust' },
   { keywords: ['alive again', 'back again', 'rebooted', 'back online', 'respawned'], badgeId: 'respawn_now' },
   { keywords: ['the bigger picture', 'meta game', 'meta-game', 'all of it', 'the pattern'], badgeId: 'meta_run' },
+  // v33 — The Starship Log
+  { keywords: ["captain's log", 'stardate', 'mission log', 'log entry', 'recording this'], badgeId: 'captain_log' },
+  { keywords: ['warp speed', 'at warp', 'breakthrough', 'light speed', 'everything clicked'], badgeId: 'warp_speed' },
+  { keywords: ['shields up', 'shields are', 'boundaries set', 'put up walls', 'defended myself'], badgeId: 'shields_up' },
+  { keywords: ['red alert', 'crisis mode', 'high alert', 'emergency', 'system failure'], badgeId: 'red_alert' },
+  { keywords: ['away mission', 'expedition', 'venturing out', 'outside my comfort'], badgeId: 'away_mission' },
+  { keywords: ['my crew', 'my people', 'support network', "we're holding", 'together we'], badgeId: 'crew_wellness' },
+  { keywords: ['course correction', 'recalibrating', 'course corrected', 'adjusting course'], badgeId: 'course_correction' },
+  { keywords: ['life support', 'bare minimum', 'keeping it going', 'just surviving', 'fundamentals only'], badgeId: 'life_support' },
+  { keywords: ['charting course', 'navigation check', 'coordinates', 'starmap', 'mapping the'], badgeId: 'starmap' },
+  { keywords: ['anomaly detected', 'anomaly', "something's different", 'unexpected signal', "didn't expect this"], badgeId: 'anomaly_detected' },
+  { keywords: ['docking sequence', 'coming home', 'home port', 'safe harbor', 'landed safely'], badgeId: 'docking_sequence' },
+  { keywords: ['hailing frequency', 'open channel', 'reaching out', 'signal sent', 'hailing'], badgeId: 'hailing_frequency' },
 ]
 
 /**
@@ -1069,6 +1294,17 @@ export function detectWordTurns(text: string): WordTurnBadgeType[] {
   }
   if (/\bspelunky\b|dead cells|binding of isaac/i.test(lower)) {
     triggered.push('original_rogue')
+  }
+
+  // v33 Secret Boss: The Bridge Vault
+  if (/\bborg\b|resistance is futile|we are the borg|assimilated|borg collective/i.test(lower)) {
+    triggered.push('borg_cube')
+  }
+  if (/deep space nine|ds9\b|quark's bar|\bsisko\b|bajoran wormhole|\bcardassian/i.test(lower)) {
+    triggered.push('deep_space')
+  }
+  if (/star trek|starfleet|united federation|captain kirk|captain picard|mr\.? spock|live long and prosper/i.test(lower)) {
+    triggered.push('federation_signal')
   }
 
   return triggered
