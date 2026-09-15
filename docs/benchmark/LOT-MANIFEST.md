@@ -24,7 +24,7 @@ STATUS KEY:
 
 FEATURE          | BEST BRANCH                   | HASH     | ITER  | STATUS | FILES | LINES  | SUMMARY
 ──────────────     ─────────────────────────────   ────────   ─────   ──────   ─────   ──────   ──────────────────────
-LOT Mail         | determined-turing-f6bw7r     | fa622a25 | 11/11 | BEST   | 11    | +504   | In-app email: /email trigger, Sync inbox, Cohort integration, yarn.lock
+LOT Mail         | determined-turing-kxa984     | (SR-20260915-01) | 12/12 | BEST | 12 | +~700 | Re-derived onto current branch tip (prior fa622a25 iteration never shipped, 3mo stale vs Sync/Logs); /email trigger, Sync Chat|Mail inbox, Cohort Dating ✉ Mail button
 Basics Tab       | beautiful-johnson-56p7ov      | 6815f550 | 8/8   | BEST   | 5     | +293   | BASICS M1: OPEN TAB live — 23-item ration ledger, doctrine, status line
 Calendar Alerts  | gifted-lovelace-cZOWR         | 978cf52  | 6/6   | BEST   | 3     | +359   | Live clock, T-minus countdown, military alert overlay, today panel
 QI-46 Engine     | cool-tesla-f8j0mr            | 36ef4dde | 8/8   | BEST   | 8     | +2050  | QI·46 Node 3 engine integration + Soul Upload + Being Calibration
@@ -180,7 +180,7 @@ PROTECTED FILES (always restore from master during any branch merge):
   docs/benchmark/LOT-MANIFEST.md      — session-managed, never merge from branch
 
 CURRENT SHIP QUEUE (BEST, awaiting Sunday merge):
-  LOT Mail         | determined-turing-f6bw7r  | +504 lines
+  LOT Mail         | determined-turing-kxa984  | +~700 lines (re-derived, SR-20260915-01)
   Basics Tab       | beautiful-johnson-56p7ov   | +293 lines
   Calendar Alerts  | gifted-lovelace-cZOWR      | +359 lines
   QI-46 Engine     | cool-tesla-f8j0mr          | +2050 lines

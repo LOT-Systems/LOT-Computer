@@ -65,6 +65,27 @@ export function ChatCatalystWidget() {
     }
   }
 
+  const handleEmail = () => {
+    if (!catalyst.action.cohortMember) return
+    recordSignal('journal', 'connection_accepted', {
+      type: 'email',
+      cohortMember: catalyst.action.cohortMember.name,
+      hour: new Date().getHours()
+    })
+    stores.goTo('log')
+    // Pre-populate the Log with an email compose command
+    setTimeout(() => {
+      const ta = document.querySelector<HTMLTextAreaElement>('textarea')
+      if (ta) {
+        const name = catalyst.action.cohortMember!.name
+        ta.value = `/email to ${name} `
+        ta.dispatchEvent(new Event('input', { bubbles: true }))
+        ta.focus()
+        ta.setSelectionRange(ta.value.length, ta.value.length)
+      }
+    }, 300)
+  }
+
   return (
     <Block
       label="Connect:"
@@ -88,10 +109,15 @@ export function ChatCatalystWidget() {
         </div>
 
         {/* Action button */}
-        <div className="mb-8">
+        <div className="mb-8 flex gap-x-8">
           <Button onClick={handleAction}>
             {catalyst.action.label}
           </Button>
+          {catalyst.action.cohortMember && (
+            <Button kind="secondary" onClick={handleEmail}>
+              ✉ Mail
+            </Button>
+          )}
         </div>
 
         {/* Conversation starters if available */}
