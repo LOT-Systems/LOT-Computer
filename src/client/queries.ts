@@ -76,6 +76,18 @@ export const useUpdateSettings = createMutation<UserSettings, void>(
   '/api/settings'
 )
 
+export type RationStatusResponse = { tags: string[]; metadata: Record<string, any> }
+
+export const useEnrollRation = createMutation<{ sizing?: string }, RationStatusResponse>(
+  'post',
+  '/api/basics/enroll'
+)
+
+export const useStandDownRation = createMutation<void, RationStatusResponse>(
+  'post',
+  '/api/basics/stand-down'
+)
+
 export const useLiveMessage = createQuery<{ message: string }>(
   '/api/live-message'
 )

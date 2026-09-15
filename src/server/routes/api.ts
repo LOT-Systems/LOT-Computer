@@ -13,11 +13,12 @@ import {
   ChatMessageLikeEventPayload,
   ChatMessageLikePayload,
   PublicChatMessage,
+  RationEnrollment,
   UserSettings,
   UserTag,
 } from '#shared/types'
 import config from '#server/config'
-import { fp } from '#shared/utils'
+import { fp, computeCadenceStart, emptyRationEnrollment } from '#shared/utils'
 import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
@@ -624,6 +625,86 @@ export default async (fastify: FastifyInstance) => {
         }
       })
       reply.ok()
+    }
+  )
+
+  // LOT-FM-001 BASIC ration module — Month 2: UPGRADE control + roster intake.
+  // Self-service only: an operator may set/clear the Basic tag on their own
+  // account. Requires an existing Usership (AI plan) tag as the base layer —
+  // BASIC ships as an additive ration on top of it, never standalone.
+  fastify.post(
+    '/basics/enroll',
+    async (req: FastifyRequest<{ Body: { sizing?: string } }>, reply) => {
+      const hasUsership = req.user.tags.some((t) => t.toLowerCase() === 'usership')
+      if (!hasUsership) {
+        return reply.throw.badParams('USERSHIP / AI plan required as base layer')
+      }
+      const current: RationEnrollment = req.user.metadata?.basics || emptyRationEnrollment()
+      if (current.state === 'ON_STRENGTH') {
+        return reply.throw.badParams('Already on strength')
+      }
+      if (!req.user.address || !req.user.city || !req.user.country) {
+        return reply.throw.badParams('Complete shipping address in Settings first')
+      }
+
+      const now = new Date()
+      const enrollment: RationEnrollment = {
+        ...current,
+        state: 'ON_STRENGTH',
+        sizing: req.body?.sizing?.trim() || null,
+        enrolledAt: now.toISOString(),
+        cadenceStart: computeCadenceStart(now),
+        issueLog: [
+          ...current.issueLog,
+          {
+            id: `iss-${now.getTime()}`,
+            scheduledFor: computeCadenceStart(now),
+            status: 'SCHEDULED',
+            dispatchedAt: null,
+          },
+        ],
+        stateHistory: [...current.stateHistory, { state: 'ON_STRENGTH', at: now.toISOString() }],
+      }
+
+      const existingTags = req.user.tags || []
+      const tags = existingTags.some((t) => t.toLowerCase() === 'basic')
+        ? existingTags
+        : [...existingTags, 'basic']
+
+      await req.user
+        .set({ tags, metadata: { ...req.user.metadata, basics: enrollment } })
+        .save()
+      sync.emit('settings_updated', { userId: req.user.id })
+
+      reply.send({ tags: req.user.tags, metadata: req.user.metadata })
+    }
+  )
+
+  fastify.post(
+    '/basics/stand-down',
+    async (req: FastifyRequest, reply) => {
+      const current: RationEnrollment = req.user.metadata?.basics || emptyRationEnrollment()
+      if (current.state !== 'ON_STRENGTH') {
+        return reply.throw.badParams('Not currently on strength')
+      }
+
+      const now = new Date()
+      const enrollment: RationEnrollment = {
+        ...current,
+        state: 'NONE',
+        standDownAt: now.toISOString(),
+        stateHistory: [...current.stateHistory, { state: 'NONE', at: now.toISOString() }],
+      }
+
+      // Drops the ration only. Usership (AI plan) tag is untouched.
+      const tags = (req.user.tags || []).filter((t) => t.toLowerCase() !== 'basic')
+
+      await req.user
+        .set({ tags, metadata: { ...req.user.metadata, basics: enrollment } })
+        .save()
+      sync.emit('settings_updated', { userId: req.user.id })
+
+      reply.send({ tags: req.user.tags, metadata: req.user.metadata })
     }
   )
 

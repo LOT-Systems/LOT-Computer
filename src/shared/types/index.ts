@@ -17,7 +17,40 @@ export enum UserTag {
   Pro = 'Pro',
   Suspended = 'Suspended',
   Legacy = 'Legacy',
+  Basic = 'Basic',
 }
+
+// LOT-FM-001 BASIC ration module — roster state machine.
+// NONE: not enrolled. ON_STRENGTH: enrolled, ration active (Basic tag set).
+// STEADY_STATE is a derived display status (ON_STRENGTH past first cadence
+// cycle), never persisted — see basics/doctrine.ts ROSTER_CADENCE_DAYS.
+export type RationState = 'NONE' | 'ON_STRENGTH'
+
+export type RationIssueStatus = 'SCHEDULED' | 'DISPATCHED'
+
+export type RationIssueLogEntry = {
+  id: string;
+  scheduledFor: string; // ISO date
+  status: RationIssueStatus;
+  dispatchedAt: string | null;
+};
+
+export type RationStateTransition = {
+  state: RationState;
+  at: string; // ISO datetime
+};
+
+// Stored at User.metadata.basics (JSONB) — see src/server/routes/api.ts
+// POST /basics/enroll and /basics/stand-down.
+export type RationEnrollment = {
+  state: RationState;
+  sizing: string | null;
+  enrolledAt: string | null;
+  standDownAt: string | null;
+  cadenceStart: string | null; // ISO date of first scheduled issue
+  issueLog: RationIssueLogEntry[];
+  stateHistory: RationStateTransition[];
+};
 
 // User Types
 export type UserSettings = {
