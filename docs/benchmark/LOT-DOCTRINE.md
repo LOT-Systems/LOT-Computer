@@ -226,3 +226,33 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Log-Tab Follow-Up Wiring
+
+`GET /interventions` (compassionate-interventions.ts) and its System-tab
+`InterventionsWidget` are a real, complete struggle/pattern-change detector
+— `detectSemanticStruggle`, `generateCompassionateInterventions`,
+`shouldShowIntervention` — that existed for months without ever being
+consulted from the Log tab itself. `shouldShowIntervention` specifically
+had zero call sites anywhere in src/ before this session: imported into
+api.ts, never invoked. Before adding new pattern-detection code to answer
+"does the system notice a spike in an entry," search for a working
+detector that was built for a different surface first — this corpus grows
+by wiring, not only by minting. `buildInterventionUserState()` now
+centralizes the UserState assembly (previously duplicated inline at the
+interventions route) so any future caller — a third surface, a background
+job — reads the same signal the same way GET /interventions and the
+Log-tab follow-up both do.
+
+The follow-up itself writes back into the Log as its own entry
+(event: `qie_followup`, block label `NOTICED:`), not a popup or modal.
+This preserves the passive-UI principle documented in the QIE white paper:
+the machine's response lives in the same medium as the operator's own
+words, timestamped and scrollable like everything else, never a blocking
+interruption. Cooldown (`shouldShowIntervention`, keyed off the operator's
+own last `qie_followup` row rather than a new table) prevents the 7s
+autosave debounce from re-triggering the same-severity notice on every
+paragraph of a long entry.
+
+(SR-20260915-01: NOTICED: minted; buildInterventionUserState extracted;
+qie_followup event type introduced.)

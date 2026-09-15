@@ -7,7 +7,7 @@
  */
 
 import type { Log, User } from '#shared/types'
-import { EnergyState } from './energy'
+import { EnergyState, analyzeEnergyState } from './energy'
 import dayjs from '#server/utils/dayjs'
 
 export interface Intervention {
@@ -33,6 +33,40 @@ export interface UserState {
   romanticConnectionState: {
     daysDisconnected: number
     qualityLevel: string
+  }
+}
+
+/**
+ * Assemble a UserState from a raw log window. Shared by GET /interventions
+ * and the per-entry follow-up check so both read the same signal the same
+ * way — previously this was duplicated inline at the /interventions route.
+ */
+export function buildInterventionUserState(logs: Log[]): UserState {
+  const recentCheckIns = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
+  const emotionalCounts: Record<string, number> = {}
+  for (const checkIn of recentCheckIns) {
+    const state = checkIn.metadata?.emotionalState as string
+    if (state) {
+      emotionalCounts[state] = (emotionalCounts[state] || 0) + 1
+    }
+  }
+
+  const dominantMood = Object.entries(emotionalCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'unknown'
+  const daysInPattern = recentCheckIns.filter(c => c.metadata?.emotionalState === dominantMood).length
+
+  const negativeStates = ['anxious', 'overwhelmed', 'exhausted', 'tired']
+  const isStrugglingPattern = negativeStates.includes(dominantMood)
+
+  const energyState = analyzeEnergyState(logs)
+
+  return {
+    emotionalPattern: { dominantMood, daysInPattern, isStrugglingPattern },
+    energyState,
+    recentLogs: logs.slice(0, 20),
+    romanticConnectionState: {
+      daysDisconnected: energyState.romanticConnection.daysSinceConnection ?? 0,
+      qualityLevel: energyState.romanticConnection.connectionQuality,
+    },
   }
 }
 

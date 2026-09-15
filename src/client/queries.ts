@@ -141,7 +141,10 @@ export const useCreateLog = createMutation<{ text: string; event?: string; metad
   '/api/logs'
 )
 
-export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
+export const useUpdateLog = createMutation<
+  { id: string; text: string },
+  Log & { followUp?: Log | null; deleted?: boolean }
+>(
   'put',
   (data) => `/api/logs/${data.id}`
 )
@@ -895,6 +898,7 @@ export const usePrayerScripture = createMutation<
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    range?: 'day' | 'week' | 'month' | 'year'
     quantumState?: {
       energy?: string
       clarity?: string

@@ -33,7 +33,7 @@ import {
 } from '#shared/constants'
 import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
-import { getLogContext } from '#server/utils/logs'
+import { getLogContext, maybeCreateEntryFollowUp } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
@@ -41,7 +41,7 @@ import { generateContextualPrompts, generatePatternAwareQuestion, analyzePattern
 import { analyzeEnergyState, generateEnergySuggestions } from '#server/utils/energy'
 import { generateUserNarrative } from '#server/utils/rpg-narrative'
 import { generateChatCatalysts, generateConversationStarters, shouldShowChatCatalyst } from '#server/utils/cohort-chat-catalyst'
-import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
+import { generateCompassionateInterventions, shouldShowIntervention, buildInterventionUserState } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
 import { registerOSRoutes } from './os-api.js'
 
@@ -1614,7 +1614,19 @@ export default async (fastify: FastifyInstance) => {
           await log.set({ context }).save()
         }
       })
-      return log
+
+      // Passive spike/pattern-change follow-up — skipped for short fragments
+      // so a stray sentence doesn't trigger the full 100-log analysis pass.
+      let followUp = null
+      if (text.length >= 20) {
+        try {
+          followUp = await maybeCreateEntryFollowUp(req.user, log.id)
+        } catch (error: any) {
+          console.error('Entry follow-up check failed:', error.message)
+        }
+      }
+
+      return { ...log.toJSON(), followUp }
     }
   )
 
@@ -3845,37 +3857,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       }
 
       // Analyze current state
-      const recentCheckIns = logs.filter((l: any) => l.event === 'emotional_checkin').slice(0, 10)
-      const emotionalCounts: Record<string, number> = {}
-      for (const checkIn of recentCheckIns) {
-        const state = checkIn.metadata?.emotionalState as string
-        if (state) {
-          emotionalCounts[state] = (emotionalCounts[state] || 0) + 1
-        }
-      }
-
-      const dominantMood = Object.entries(emotionalCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'unknown'
-      const daysInPattern = recentCheckIns.filter((c: any) => c.metadata?.emotionalState === dominantMood).length
-
-      const negativeStates = ['anxious', 'overwhelmed', 'exhausted', 'tired']
-      const isStrugglingPattern = negativeStates.includes(dominantMood)
-
-      const energyState = analyzeEnergyState(logs)
-
-      const userState = {
-        emotionalPattern: {
-          dominantMood,
-          daysInPattern,
-          isStrugglingPattern
-        },
-        energyState,
-        recentLogs: logs.slice(0, 20),
-        romanticConnectionState: {
-          daysDisconnected: energyState.romanticConnection.daysSinceConnection ?? 0,
-          qualityLevel: energyState.romanticConnection.connectionQuality
-        }
-      }
-
+      const userState = buildInterventionUserState(logs)
       const interventions = generateCompassionateInterventions(userState)
 
       console.log(`🫂 Generated ${interventions.length} interventions for user ${req.user.id}`)
@@ -5490,6 +5472,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          range?: 'day' | 'week' | 'month' | 'year'
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,25 +5497,46 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const range: 'day' | 'week' | 'month' | 'year' =
+        req.body.range && ['day', 'week', 'month', 'year'].includes(req.body.range)
+          ? req.body.range
+          : 'day'
+
+      // Wider windows need more raw rows to compress and a longer lookback —
+      // 200/24h was fine for "today," starves everything coarser.
+      const RANGE_CONFIG: Record<typeof range, { limit: number; days: number; label: string }> = {
+        day: { limit: 200, days: 1, label: 'the last day' },
+        week: { limit: 500, days: 7, label: 'the last week' },
+        month: { limit: 1500, days: 31, label: 'the last month' },
+        year: { limit: 4000, days: 366, label: 'the last year' },
+      }
+      const { limit, days, label } = RANGE_CONFIG[range]
 
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: dayjs().subtract(days, 'day').toDate() },
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit,
       })
 
+      // 'note' is the actual journal-entry event (see POST /logs) — the
+      // 'log_entry'/'journal' aliases are kept for any legacy rows.
       const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
+        .filter(l => l.event === 'note' || l.event === 'log_entry' || l.event === 'journal')
+        .slice(0, range === 'day' ? 10 : 25)
         .map(l => (l.text || '').substring(0, 200))
         .filter(Boolean)
 
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
+      const sampleSize = range === 'day' ? 10 : 25
+
+      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, sampleSize)
       const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
 
       const selfCareLogs = logs.filter(l =>
         l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
+      ).slice(0, sampleSize)
       const selfCareNotes = selfCareLogs.map(l => {
         const q = (l.metadata?.question as string || '')
         const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
@@ -5547,9 +5551,11 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
+      const wordBudget = range === 'day' ? '100-200 words' : range === 'week' ? '150-250 words' : '200-350 words'
+
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story ${range}. Your task: write 1-2 paragraphs (${wordBudget}) that compress ${label} of their journey, mood trajectory, and self-care patterns into a single story. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
@@ -5560,20 +5566,20 @@ RULES:
 - The tone should match their current energy: reflective if low, energized if high
 - End with a single forward-looking sentence — not a pep talk, just a quiet truth
 - Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Stay within the word budget above.`
 
       const dataBlock = `
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
+RECENT MOODS: ${recentMoods.slice(0, sampleSize).join(', ') || 'NO DATA'}
 
 RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
+${recentEntries.slice(0, sampleSize).map(e => `- ${e}`).join('\n') || '- (none)'}
 
 SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
+${selfCareNotes.slice(0, sampleSize).map(n => `- ${n}`).join('\n') || '- (none)'}`
 
       const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
 
@@ -5581,9 +5587,9 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
 
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
+        console.log(`📖 Story generation (${range}) for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
 
-        const story = await engine.generateCompletion(fullPrompt, 512)
+        const story = await engine.generateCompletion(fullPrompt, range === 'day' ? 512 : 768)
 
         const cleaned = story.trim().replace(/^["']|["']$/g, '')
 
@@ -5595,6 +5601,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           context,
           metadata: {
             story: cleaned,
+            range,
             logText: (logText || '').substring(0, 500),
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),

@@ -69,10 +69,27 @@ export const Logs: React.FC = React.memo(function LogsInner() {
       }
       // Read fresh store value to avoid stale closure overwriting recent data
       const current = localStore.logById.get()
-      localStore.logById.set({
+      const withUpdatedLog = {
         ...current,
         [log.id]: log as Log,
-      })
+      }
+
+      // Passive follow-up: the server noticed a spike/pattern change tied to
+      // this entry and wrote its own log row for it — surface it immediately
+      // rather than waiting for the next full refetch.
+      if (log.followUp) {
+        const followUp = log.followUp as Log
+        localStore.logById.set({ ...withUpdatedLog, [followUp.id]: followUp })
+        const ids = localStore.logIds.get()
+        if (!ids.includes(followUp.id)) {
+          const logIndex = ids.indexOf(log.id)
+          const insertAt = logIndex === -1 ? 0 : logIndex + 1
+          localStore.logIds.set([...ids.slice(0, insertAt), followUp.id, ...ids.slice(insertAt)])
+        }
+      } else {
+        localStore.logById.set(withUpdatedLog)
+      }
+
       // Only refetch (push down) if this is the primary/most recent log
       // Past logs don't need to trigger push-down
       if (log.id === recentLogId) {
@@ -3629,6 +3646,22 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'qie_followup') {
+          const severity = log.metadata?.severity as string | undefined
+          const title = log.metadata?.title as string | undefined
+          if (!log.text) return null
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="NOTICED:" blockView>
+                {title && (
+                  <div className="uppercase tracking-widest mb-4">
+                    {title}{severity ? ` · ${severity.toUpperCase()}` : ''}
+                  </div>
+                )}
+                <div>{log.text}</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
@@ -4125,7 +4158,7 @@ const NoteEditor = ({
           'AVAILABLE COMMANDS',
           '',
           '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
+          '/story        Compressed story of today (also: /story week, /story month, /story year)',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
@@ -4151,17 +4184,26 @@ const NoteEditor = ({
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
+          // "/story week" (or day/month/year) picks the compression window;
+          // bare "/story" stays today, unchanged from prior behavior.
+          const rangeMatch = value.match(/\/story\s+(day|week|month|year)\b/i)
+          const range = (rangeMatch?.[1]?.toLowerCase() || 'day') as 'day' | 'week' | 'month' | 'year'
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const logText = value
+              .replace(/\/story\s+(day|week|month|year)\b/i, '')
+              .replace(/\/story/i, '')
+              .replace(/📖/g, '')
+              .trim()
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              range,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: value, range })
           }
         }
       }

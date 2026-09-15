@@ -160,6 +160,10 @@ export type LogContext = {
   temperature?: number | null;
   humidity?: number | null;
   weatherDescription?: string | null;
+  // Coarse visual sky read (clear/cloudy/overcast/rain/snow/storm/fog),
+  // derived from weatherDescription — distinct from the raw API string so
+  // the client can render a single glyph without parsing prose.
+  sky?: string | null;
   country?: string | null;
   city?: string | null;
   timeZone?: string | null;
