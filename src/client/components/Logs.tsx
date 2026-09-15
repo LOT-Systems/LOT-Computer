@@ -2079,11 +2079,39 @@ export const Logs: React.FC = React.memo(function LogsInner() {
         } else if (log.event === 'calendar_entry') {
           const entryType = log.metadata?.entryType as string | undefined
           const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const text = log.metadata?.text as string | undefined
+
+          const sector =
+            entryType === 'call' ? 'COMM' :
+            entryType === 'task' ? 'OPS' :
+            'NOTE'
+
+          let tMinus: string | null = null
+          if (date) {
+            const target = time ? dayjs(`${date} ${time}`) : dayjs(date).startOf('day')
+            const now = dayjs()
+            if (target.isBefore(now)) {
+              tMinus = 'ELAPSED'
+            } else {
+              const hours = target.diff(now, 'hour')
+              tMinus = hours < 24 ? `T-MINUS ${hours}H` : `T-MINUS ${target.diff(now, 'day')}D`
+            }
+          }
+
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
-              <Block label="CAL:" blockView>
-                <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+              <Block label={`CAL [${sector}]:`} blockView>
+                <div className="uppercase tracking-widest mb-4">{entryType || 'ENTRY'}</div>
+                {text && <div className="opacity-80 mb-4">{text}</div>}
+                <div className="flex justify-between items-baseline">
+                  {date && (
+                    <span className="opacity-40 tabular-nums">
+                      {dayjs(date).format('MMM D, YYYY')}{time && ` · ${time}`}
+                    </span>
+                  )}
+                  {tMinus && <span className="opacity-30 tabular-nums">{tMinus}</span>}
+                </div>
               </Block>
             </LogContainer>
           )
