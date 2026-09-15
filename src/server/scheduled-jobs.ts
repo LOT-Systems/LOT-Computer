@@ -1759,6 +1759,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklySovereignIdentityCheck()) {
     await executeWeeklySovereignIdentityCheck()
   }
+  // Check weekly sovereign state report (06:00 UTC every Wednesday) — Job 52
+  if (shouldRunWeeklySovereignStateReport()) {
+    await executeWeeklySovereignStateReport()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -4032,6 +4036,121 @@ async function executeWeeklySovereignIdentityCheck(): Promise<JobResult> {
   }
 }
 
+// ─── J52: Weekly Sovereign State Report (Wednesday 06:00 UTC) ────────────────
+// For each active user reads sovereign-tier signals (P158 SLOCK · P159 LARC ·
+// P160 QIDSOV) present in the 14-day window and writes a sovereign_state_report
+// event summarising the current coherence band.
+// Band scale: ABSENT → EMERGING → ANCHORING → LOCKED → SOVEREIGN.
+
+let isWeeklySovereignStateReportRunning = false
+let lastWeeklySovereignStateReportRun: Date | null = null
+
+function shouldRunWeeklySovereignStateReport(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereignStateReportRunning) return false
+  if (lastWeeklySovereignStateReportRun) {
+    const lastRun = dayjs(lastWeeklySovereignStateReportRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 3 && now.hour() === 6 // Wednesday 06:00 UTC
+}
+
+async function executeWeeklySovereignStateReport(): Promise<JobResult> {
+  const jobName = 'weekly-sovereign-state-report'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereignStateReportRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereignStateReportRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGN STATE REPORT — WEDNESDAY 06:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const activeUsers = await getActiveUsers()
+    const now = dayjs()
+    const fourteenDaysAgo = now.subtract(14, 'day').toDate()
+
+    const SOVEREIGN_EVENTS = [
+      'sovereign_coherence_lock',   // P158 SLOCK
+      'living_assembly_arc',         // P159 LARC
+      'quantum_identity_sovereign',  // P160 QIDSOV
+      'field_presence_anchor',       // P157 FPANCH
+      'quantum_coherence_trajectory',// P155 QCOHTRJ
+      'sovereign_self_assembly',     // P156 SOVASMB
+    ] as const
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const sovereignLogs = await Log.findAll({
+          where: {
+            userId: user.id,
+            event: { [Op.in]: [...SOVEREIGN_EVENTS] as any[] },
+            createdAt: { [Op.gte]: fourteenDaysAgo },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'DESC']],
+        })
+
+        const events = sovereignLogs.map((l: any) => l.event as string)
+        const slockPresent  = events.includes('sovereign_coherence_lock')
+        const larcPresent   = events.includes('living_assembly_arc')
+        const qidsovPresent = events.includes('quantum_identity_sovereign')
+
+        // P155/P156/P157 as precursor tier signals
+        const hasPrecursor = events.some(e =>
+          ['field_presence_anchor', 'quantum_coherence_trajectory', 'sovereign_self_assembly'].includes(e)
+        )
+
+        const band: string =
+          qidsovPresent                   ? 'SOVEREIGN'  :
+          slockPresent && larcPresent     ? 'LOCKED'     :
+          slockPresent || larcPresent     ? 'ANCHORING'  :
+          hasPrecursor                    ? 'EMERGING'   :
+          'ABSENT'
+
+        if (band === 'ABSENT') continue // No sovereign signal — no report needed
+
+        await Log.create({
+          userId: user.id,
+          event: 'sovereign_state_report',
+          text: '',
+          metadata: {
+            slockPresent,
+            larcPresent,
+            qidsovPresent,
+            band,
+            patternCount: [slockPresent, larcPresent, qidsovPresent].filter(Boolean).length,
+            status: qidsovPresent ? 'TERMINAL_CONVERGENCE' : 'PARTIAL',
+            windowDays: 14,
+            date: now.format('YYYY-MM-DD'),
+          },
+        } as any)
+        written++
+        console.log(`  [${user.id}] Sovereign band: ${band} (SLOCK:${slockPresent} LARC:${larcPresent} QIDSOV:${qidsovPresent})`)
+      } catch (userErr: any) {
+        console.warn(`  User ${user.id} sovereign state report failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereign state reports written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY SOVEREIGN STATE REPORT COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklySovereignStateReportRun = new Date()
+    isWeeklySovereignStateReportRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly sovereign state report failed:', error.message)
+    isWeeklySovereignStateReportRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 // ─── Daily OS Snapshot ───────────────────────────────────────────────────────
 
 let isDailyOSSnapshotRunning = false
@@ -6116,6 +6235,8 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
   console.log('   - Daily field resonance check: 10 AM UTC every day (Job 49)')
   console.log('   - Weekly sovereign assembly check: 8 AM UTC every Sunday (Job 50)')
+  console.log('   - Weekly sovereign identity check: 10 AM UTC every Sunday (Job 51)')
+  console.log('   - Weekly sovereign state report: 6 AM UTC every Wednesday (Job 52)')
   console.log('')
 
   // Check every hour for scheduled jobs

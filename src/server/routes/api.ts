@@ -1225,6 +1225,8 @@ export default async (fastify: FastifyInstance) => {
       'sovereign_coherence_lock',
       'living_assembly_arc',
       'quantum_identity_sovereign',
+      // v117: sovereign state report (J52 weekly band summary)
+      'sovereign_state_report',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

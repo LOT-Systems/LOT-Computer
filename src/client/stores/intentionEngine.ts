@@ -4258,6 +4258,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   sovereignCoherenceLockNode:     ['qos', 'memory', 'intentions', 'log', 'cohort'],
   livingAssemblyArcNode:          ['memory', 'journal', 'qos', 'selfcare', 'log'],
   quantumIdentitySovereignNode:   ['qos', 'memory', 'intentions', 'cohort', 'journal', 'log'],
+
+  // ── v117 nodes (J52 · Sovereign Field Report layer) ──────────────────────────
+  sovereignFieldNode:             ['qos', 'memory', 'intentions', 'cohort', 'journal', 'log'],
+  coherenceBandMonitor:           ['qos', 'selfcare', 'energy', 'log'],
+  sovereignReportNode:            ['qos', 'memory', 'intentions', 'cohort', 'journal', 'selfcare', 'energy', 'log'],
 }
 
 /**
@@ -5474,6 +5479,12 @@ export type QuantumOS = {
   signalMap: Partial<Record<IntentionSignal['source'], number>>
   coherence: number
   operationalStatus: 'nominal' | 'degraded' | 'critical' | 'peak'
+  sovereignTier: {
+    slockActive: boolean    // P158: sovereign-coherence-lock
+    larcActive: boolean     // P159: living-assembly-arc
+    qidsovActive: boolean   // P160: quantum-identity-sovereign
+    band: 'ABSENT' | 'EMERGING' | 'ANCHORING' | 'LOCKED' | 'SOVEREIGN'
+  }
   computedAt: number
 }
 
@@ -5506,6 +5517,20 @@ export function getQuantumOS(): QuantumOS {
     coherence >= 80 && userIndex.overall >= 60                                ? 'peak'    :
     'nominal'
 
+  // Sovereign tier — P158/P159/P160 presence in 14D window
+  const fourteenDayMs = 14 * 24 * 60 * 60 * 1000
+  const recent14D = signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const slockActive  = recent14D.some(s => s.signal === 'sovereign_coherence_lock')
+  const larcActive   = recent14D.some(s => s.signal === 'living_assembly_arc')
+  const qidsovActive = recent14D.some(s => s.signal === 'quantum_identity_sovereign')
+
+  const sovereignBand: QuantumOS['sovereignTier']['band'] =
+    qidsovActive          ? 'SOVEREIGN' :
+    slockActive && larcActive ? 'LOCKED' :
+    slockActive || larcActive ? 'ANCHORING' :
+    recent14D.some(s => ['field_presence_anchor','quantum_coherence_trajectory','sovereign_self_assembly'].includes(s.signal)) ? 'EMERGING' :
+    'ABSENT'
+
   return {
     runtime: {
       energy: userState.energy,
@@ -5528,6 +5553,7 @@ export function getQuantumOS(): QuantumOS {
     signalMap,
     coherence,
     operationalStatus,
+    sovereignTier: { slockActive, larcActive, qidsovActive, band: sovereignBand },
     computedAt: now,
   }
 }
@@ -6985,6 +7011,28 @@ export function recordQuantumIdentitySovereign(slockConf: number, larcConf: numb
     convergence: 'LOCK+ARC→IDENTITY',
     arc: 'COHERENCE→ASSEMBLY→SOVEREIGN_IDENTITY',
     status: 'IDENTITY_CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereign-state-report event — J52 weekly report summarising
+ * which sovereign-tier signals (P158/P159/P160) are active in the 14-day window.
+ * Written by the server job; also callable client-side for manual snapshots.
+ */
+export function recordSovereignStateReport(
+  slockPresent: boolean,
+  larcPresent: boolean,
+  qidsovPresent: boolean,
+  band: 'ABSENT' | 'EMERGING' | 'ANCHORING' | 'LOCKED' | 'SOVEREIGN'
+) {
+  recordSignal('qos', 'sovereign_state_report', {
+    slockPresent,
+    larcPresent,
+    qidsovPresent,
+    band,
+    patternCount: [slockPresent, larcPresent, qidsovPresent].filter(Boolean).length,
+    status: qidsovPresent ? 'TERMINAL_CONVERGENCE' : slockPresent || larcPresent ? 'PARTIAL' : 'BASELINE',
     hour: new Date().getHours(),
   })
 }

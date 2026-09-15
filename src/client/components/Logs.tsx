@@ -4007,6 +4007,56 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sovereign_state_report') {
+          const band          = log.metadata?.band          as string | undefined
+          const slockPresent  = log.metadata?.slockPresent  as boolean | undefined
+          const larcPresent   = log.metadata?.larcPresent   as boolean | undefined
+          const qidsovPresent = log.metadata?.qidsovPresent as boolean | undefined
+          const patternCount  = log.metadata?.patternCount  as number | undefined
+          const status        = log.metadata?.status        as string | undefined
+          const windowDays    = log.metadata?.windowDays    as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVSTATE:" blockView>
+                {band && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BAND</span>
+                    <span className="uppercase tracking-widest">{band}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">SLOCK</span>
+                  <span className={slockPresent ? '' : 'opacity-30'}>{slockPresent ? 'ACTIVE' : 'ABSENT'}</span>
+                </div>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">LARC</span>
+                  <span className={larcPresent ? '' : 'opacity-30'}>{larcPresent ? 'ACTIVE' : 'ABSENT'}</span>
+                </div>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">QIDSOV</span>
+                  <span className={qidsovPresent ? '' : 'opacity-30'}>{qidsovPresent ? 'CONFIRMED' : 'PENDING'}</span>
+                </div>
+                {patternCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PATTERNS</span>
+                    <span className="tabular-nums">{patternCount}/3</span>
+                  </div>
+                )}
+                {status && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">STATUS</span>
+                    <span className="uppercase opacity-60">{status.replace(/_/g, ' ')}</span>
+                  </div>
+                )}
+                {windowDays !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">WINDOW</span>
+                    <span className="tabular-nums opacity-40">{windowDays}D</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
