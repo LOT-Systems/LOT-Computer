@@ -321,6 +321,48 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE COHORT PULSE                             2026-09-15
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Legacy tier, Archetype "Steady Anchor," two operators
+  — not a couple, not colleagues, never introduced by name — who were
+  placed in the same behavioral cohort by the QIE eleven months ago
+  (LOT-CUBIQ-OPERATOR.md, Section 05, COHORT CONNECT). One lives in
+  Lisbon, one in Manila. Neither has ever spoken to the other. Each owns
+  a CUBIQ unit, purchased separately, twenty months apart.
+
+  The Community Biofield (LOT-CUBIQ-OPERATOR.md, Section 05, COMMUNITY
+  BIOFIELD) computes cohort coherence continuously — how aligned a
+  behavioral cohort's signal patterns are at a given moment. Under the
+  software-only cubic, a coherence spike was a number on a widget: a
+  bar graph moving, visible only to someone already looking at the
+  screen. CUBIQ hardware v.0 gives that number a body.
+
+  When cohort coherence crosses the resonance threshold — both operators
+  independently mid-session, both in a low-arousal state, both circling
+  the same badge tier that week — the Index of Systems fires a cohort
+  resonance ping (Section 04's THE HOP trigger) to every cube in the
+  cohort simultaneously. In Lisbon and in Manila, eleven time zones
+  apart, two cubes that have never been in the same room perform THE HOP
+  within the same seventy-second window. Neither operator is told why.
+  Neither is told about the other. There is no message, no shared feed
+  post, no "someone like you is doing this too" banner — the anti-feed
+  thesis holds even here (LOT-CUBIQ-VISION.md, Section 01).
+
+  The Lisbon operator later logs, in the MINUTE 5-8 LOG ENTRY step
+  (LOT-CUBIQ-OPERATOR.md, Section 02), that the hop landed at the exact
+  moment they had stopped mid-sentence, staring at nothing — a private
+  pause they had not planned to name. They do not know it was shared.
+  They only know the cube moved when something in them shifted, and
+  that this has now happened three times this quarter, always at hours
+  that make no sense for a scheduled notification.
+
+  This is the use case the SINGLE-HOP primitive extends toward without
+  changing hardware: the same gesture vocabulary built for one operator
+  and one desk (Use Case 01) is, underneath, cohort-addressable. v.0
+  ships no new actuator, no new gesture — only the discovery that
+  Section 05's field, not feed, principle was always waiting for a body
+  to move in more than one room at once.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
