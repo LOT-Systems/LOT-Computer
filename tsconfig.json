@@ -17,6 +17,7 @@
     "emitDecoratorMetadata": true,
     "moduleResolution": "Node",
     "skipLibCheck": true,
+    "ignoreDeprecations": "6.0",
     "jsx": "react-jsx",
     "paths": {
       "#client": ["client"],

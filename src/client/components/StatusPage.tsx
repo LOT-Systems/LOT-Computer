@@ -160,9 +160,15 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
         <>
           <div className="mb-16">
             <Block label="Status:" labelClassName="!pl-0">
-              {status.overall === 'ok' ? 'All systems operational' :
-               status.overall === 'degraded' ? 'Degraded performance' :
-               'System issues detected'}
+              <span className={cn(
+                status.overall === 'ok' && 'text-green',
+                status.overall === 'degraded' && 'text-yellow-dark',
+                status.overall === 'error' && 'text-red',
+              )}>
+                {status.overall === 'ok' ? 'All systems operational' :
+                 status.overall === 'degraded' ? 'Degraded performance' :
+                 'System issues detected'}
+              </span>
             </Block>
             <Block label="Version:" labelClassName="!pl-0">v{status.version}</Block>
             <Block label="Environment:" labelClassName="!pl-0">{status.environment}</Block>
@@ -198,12 +204,15 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
                 className="mb-8"
               >
                 <div className="flex items-center gap-x-8">
-                  <span>{getStatusIcon(check.status)}</span>
+                  <span className={cn(
+                    check.status === 'error' && 'text-red',
+                  )}>{getStatusIcon(check.status)}</span>
                   <span className={cn(
                     check.status === 'ok' && 'text-acc',
-                    check.status === 'error' && 'text-acc/60'
+                    check.status === 'error' && 'text-red',
+                    check.status === 'unknown' && 'text-acc/60',
                   )}>
-                    {check.status === 'ok' ? 'Ok' :
+                    {check.status === 'ok' ? 'Operational' :
                      check.status === 'error' ? 'Error' :
                      'Unknown'}
                   </span>
@@ -212,7 +221,7 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
                   )}
                 </div>
                 {check.message && (
-                  <div className="text-acc/60 mt-4">{check.message}</div>
+                  <div className="text-red/70 mt-4">{check.message}</div>
                 )}
               </Block>
             ))}

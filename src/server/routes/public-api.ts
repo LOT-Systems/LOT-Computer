@@ -344,7 +344,16 @@ async function performHealthChecks(): Promise<{
   checks: SystemCheck[]
   overall: 'ok' | 'degraded' | 'error'
 }> {
-  const checks = await Promise.all([
+  const [
+    authCheck,
+    syncCheck,
+    settingsCheck,
+    usersCheck,
+    systemsCheck,
+    engineCheck,
+    dbCheck,
+    memoryCheck,
+  ] = await Promise.all([
     checkAuth(),
     checkSync(),
     checkSettings(),
@@ -355,9 +364,14 @@ async function performHealthChecks(): Promise<{
     checkMemory(),
   ])
 
-  // Determine overall status
-  const hasErrors = checks.some((c) => c.status === 'error')
-  const overall = hasErrors ? 'error' : 'ok'
+  const checks = [authCheck, syncCheck, settingsCheck, usersCheck, systemsCheck, engineCheck, dbCheck, memoryCheck]
+
+  // Core checks: if these fail, the system is down
+  const coreChecks = [dbCheck, memoryCheck, authCheck]
+  // Non-critical checks: failures degrade but don't halt the system
+  const hasCoreError = coreChecks.some((c) => c.status === 'error')
+  const hasAnyError = checks.some((c) => c.status === 'error')
+  const overall: 'ok' | 'degraded' | 'error' = hasCoreError ? 'error' : hasAnyError ? 'degraded' : 'ok'
 
   return {
     version: VERSION,
