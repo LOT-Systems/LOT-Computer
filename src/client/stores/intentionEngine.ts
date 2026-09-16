@@ -4870,6 +4870,15 @@ export function recordCalendarSignal(entryType: string, date: string) {
 }
 
 /**
+ * Record a calendar alert signal when a timed entry's due moment fires.
+ * Companion to recordCalendarSignal — feeds the same Temporal Planner /
+ * Pattern 26 (calendar-gap) surface with the alert-fired half of the loop.
+ */
+export function recordCalendarAlertSignal(entryType: string, date: string, time: string) {
+  recordSignal('log', 'calendar_alert', { entryType, date, time, hour: new Date().getHours() })
+}
+
+/**
  * Record the day's ambient astrology reading — rokuyo, moon phase, and
  * zodiac hour. Ambient/environmental conditions only, not a personal
  * natal chart. Called once per calendar day from the System dashboard so
