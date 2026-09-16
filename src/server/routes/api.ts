@@ -5614,4 +5614,75 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
       }
     }
   )
+
+  // ============================================================================
+  // BASICS — LOT-FM-001 Month 2: roster intake + STAND DOWN
+  // Enrollment (ON STRENGTH) is quartermaster-issued via the existing CEO-only
+  // tags route, by design — see canEditTags(). These two routes are the only
+  // self-service ration actions: submit an intake (-> PENDING) and STAND DOWN
+  // (drop the ration, retain any AI/Usership standing).
+  // ============================================================================
+  fastify.post<{ Body: { cadenceStart: string } }>(
+    '/basics/roster',
+    async (req: FastifyRequest<{ Body: { cadenceStart: string } }>, reply) => {
+      const isOnStrength = req.user.tags.some(
+        (t: string) => t.toLowerCase() === UserTag.Basic.toLowerCase()
+      )
+      if (isOnStrength) {
+        return reply.code(409).send({ error: 'Already ON STRENGTH.' })
+      }
+      if (!req.user.address || !req.user.city || !req.user.country) {
+        return reply.code(400).send({
+          error: 'Shipping address incomplete. Set address, city, and country in Settings first.',
+        })
+      }
+
+      const cadenceStart = req.body?.cadenceStart
+      if (!cadenceStart || !/^\d{4}-\d{2}-\d{2}$/.test(cadenceStart)) {
+        return reply.code(400).send({ error: 'cadenceStart must be an ISO date (YYYY-MM-DD).' })
+      }
+
+      const currentMetadata = req.user.metadata || {}
+      const updatedMetadata = {
+        ...currentMetadata,
+        ration: {
+          status: 'PENDING',
+          submittedAt: new Date().toISOString(),
+          cadenceStart,
+          issueLog: currentMetadata.ration?.issueLog || [],
+        },
+      }
+      await req.user.set({ metadata: updatedMetadata }).save()
+
+      return { ration: updatedMetadata.ration }
+    }
+  )
+
+  fastify.post('/basics/stand-down', async (req: FastifyRequest, reply) => {
+    const isOnStrength = req.user.tags.some(
+      (t: string) => t.toLowerCase() === UserTag.Basic.toLowerCase()
+    )
+    const currentMetadata = req.user.metadata || {}
+    const wasPending = currentMetadata.ration?.status === 'PENDING'
+    if (!isOnStrength && !wasPending) {
+      return reply.code(409).send({ error: 'Not ON STRENGTH or PENDING — nothing to stand down.' })
+    }
+
+    if (isOnStrength) {
+      await req.user.standDownRation()
+    }
+
+    const updatedMetadata = {
+      ...currentMetadata,
+      ration: {
+        ...(currentMetadata.ration || {}),
+        status: 'STAND_DOWN',
+        standDownAt: new Date().toISOString(),
+        issueLog: currentMetadata.ration?.issueLog || [],
+      },
+    }
+    await req.user.set({ metadata: updatedMetadata }).save()
+
+    return { ration: updatedMetadata.ration }
+  })
 }

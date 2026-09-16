@@ -17,6 +17,26 @@ export enum UserTag {
   Pro = 'Pro',
   Suspended = 'Suspended',
   Legacy = 'Legacy',
+  Basic = 'Basic',
+}
+
+// LOT-FM-001 — BASIC ration state machine (Month 2).
+// Derived status (not stored directly): NONE -> PENDING -> ON_STRENGTH -> STEADY_STATE,
+// with STAND_DOWN reachable from ON_STRENGTH/STEADY_STATE. ON_STRENGTH itself is a
+// tag grant (UserTag.Basic), issued by the quartermaster — never self-service.
+export type RationStatus = 'NONE' | 'PENDING' | 'ON_STRENGTH' | 'STEADY_STATE' | 'STAND_DOWN'
+
+export type RationIssue = {
+  date: string; // ISO
+  note: string;
+}
+
+export type RationRoster = {
+  status: Exclude<RationStatus, 'NONE' | 'ON_STRENGTH' | 'STEADY_STATE'>;
+  submittedAt: string; // ISO
+  cadenceStart: string; // ISO date, first-of-month
+  standDownAt?: string; // ISO
+  issueLog: RationIssue[];
 }
 
 // User Types
@@ -73,6 +93,7 @@ export type UserProfile = {
   timeChime?: boolean;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
+  metadata?: Record<string, any>;
 };
 
 export type User = {

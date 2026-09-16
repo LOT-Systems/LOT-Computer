@@ -3,7 +3,7 @@ LOT SYSTEMS / SELF-ASSEMBLY MANIFEST
 DOCUMENT: LOT-MANIFEST
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
-DATE:     2026-06-27 (updated)
+DATE:     2026-09-16 (updated — see 06 NOTE re: 2026-06-27 stale branch claims)
 ================================================================================
 
 Central catalog of all self-assembly routines across all branches.
@@ -25,7 +25,7 @@ STATUS KEY:
 FEATURE          | BEST BRANCH                   | HASH     | ITER  | STATUS | FILES | LINES  | SUMMARY
 ──────────────     ─────────────────────────────   ────────   ─────   ──────   ─────   ──────   ──────────────────────
 LOT Mail         | determined-turing-f6bw7r     | fa622a25 | 11/11 | BEST   | 11    | +504   | In-app email: /email trigger, Sync inbox, Cohort integration, yarn.lock
-Basics Tab       | beautiful-johnson-56p7ov      | 6815f550 | 8/8   | BEST   | 5     | +293   | BASICS M1: OPEN TAB live — 23-item ration ledger, doctrine, status line
+Basics Tab       | claude/beautiful-johnson-kvlpkl | 055f11fb | 9/9 | BEST | 14    | +764  | M1 recovered (cherry-picked from stale beautiful-johnson-56p7ov, 6815f550) + M2 built: UserTag.Basic, roster intake, self-service STAND DOWN, issue-log scaffold. M3 not started — see LOT-SR-20260916-01.
 Calendar Alerts  | gifted-lovelace-cZOWR         | 978cf52  | 6/6   | BEST   | 3     | +359   | Live clock, T-minus countdown, military alert overlay, today panel
 QI-46 Engine     | cool-tesla-f8j0mr            | 36ef4dde | 8/8   | BEST   | 8     | +2050  | QI·46 Node 3 engine integration + Soul Upload + Being Calibration
 COSMO Hardware   | brave-lamport-t9z5u8         | c7d353ef | 14/14 | BEST   | 7     | +2610  | COSMO® Cube — complete hardware computer design v1.0
@@ -181,11 +181,17 @@ PROTECTED FILES (always restore from master during any branch merge):
 
 CURRENT SHIP QUEUE (BEST, awaiting Sunday merge):
   LOT Mail         | determined-turing-f6bw7r  | +504 lines
-  Basics Tab       | beautiful-johnson-56p7ov   | +293 lines
+  Basics Tab       | claude/beautiful-johnson-kvlpkl | +764 lines (M1+M2)
   Calendar Alerts  | gifted-lovelace-cZOWR      | +359 lines
   QI-46 Engine     | cool-tesla-f8j0mr          | +2050 lines
   COSMO Hardware   | brave-lamport-t9z5u8        | +2610 lines
   Badge RPG        | cool-hypatia-aqj7dg         | +1832 lines
+
+NOTE (2026-09-16): the 2026-06-27 note below claiming these branches "no
+longer exist on the remote" was wrong for Basics Tab at least —
+beautiful-johnson-56p7ov was still live on origin 3 months later, its BEST
+work never merged. Verify with `git ls-remote --heads origin` before trusting
+this section's branch-existence claims; don't assume stale notes are current.
 
 NOTE: As of 2026-06-27, the above branches no longer exist on the remote —
 they were incorporated into master in prior sessions. The ship queue will be

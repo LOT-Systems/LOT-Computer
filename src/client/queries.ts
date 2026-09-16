@@ -20,6 +20,7 @@ import {
   Log,
   Paginated,
   PublicChatMessage,
+  RationRoster,
   User,
   UserProfile,
   UserSettings,
@@ -144,6 +145,16 @@ export const useCreateLog = createMutation<{ text: string; event?: string; metad
 export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
   'put',
   (data) => `/api/logs/${data.id}`
+)
+
+export const useSubmitRoster = createMutation<{ cadenceStart: string }, { ration: RationRoster }>(
+  'post',
+  '/api/basics/roster'
+)
+
+export const useStandDown = createMutation<void, { ration: RationRoster }>(
+  'post',
+  '/api/basics/stand-down'
 )
 
 export const useMemory = () => {

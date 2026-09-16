@@ -98,6 +98,16 @@ export class User
     return this.email === 'vadikmarmeladov@gmail.com'
   }
 
+  // Self-service exception to canEditTags(): a user may always drop their own
+  // BASIC ration tag (STAND DOWN). Granting it (ON STRENGTH) stays quartermaster-
+  // issued via the admin tags route — this only ever removes.
+  async standDownRation(): Promise<void> {
+    const nextTags = this.tags.filter(
+      (tag) => tag.toLowerCase() !== UserTag.Basic.toLowerCase()
+    )
+    await this.set({ tags: nextTags }).save()
+  }
+
   async ping() {
     return this.set({ lastSeenAt: new Date() }).save()
   }
