@@ -4450,10 +4450,20 @@ const LogContainer: React.FC<{
       weatherParts.push(`${Math.round(log.context.humidity)}%`)
     }
     const weatherText = weatherParts.join(', ')
+
+    // Ambient astrology reading at log time (rokuyo, moon phase) — same
+    // context.astro* fields the server attaches to every log; surfaced here
+    // so every entry, not just system_snapshot, carries its astro tag.
+    const astroParts: string[] = []
+    if (log.context?.astroRokuyo) astroParts.push(log.context.astroRokuyo)
+    if (log.context?.astroMoonPhase) astroParts.push(log.context.astroMoonPhase)
+    const astroText = astroParts.join(' · ')
+
+    const summary = [weatherText, astroText].filter(Boolean).join(' · ')
     if (log.context?.city) {
-      return `${weatherText} – ${log.context.city}`
+      return `${summary} – ${log.context.city}`
     }
-    return weatherText
+    return summary
   }, [log.context])
 
   return (

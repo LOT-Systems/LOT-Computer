@@ -131,7 +131,7 @@ export const System = React.memo(function SystemInner() {
   const [isBreatheOn, setIsBreatheOn] = React.useState(false)
   const breatheState = useBreathe(isBreatheOn)
   const [showRadio, setShowRadio] = React.useState(false)
-  const [astrologyView, setAstrologyView] = React.useState<'astrology' | 'psychology' | 'journey' | 'quantum'>('astrology')
+  const [astrologyView, setAstrologyView] = React.useState<'astrology' | 'personal' | 'psychology' | 'journey' | 'quantum'>('astrology')
   const [showWeatherSuggestion, setShowWeatherSuggestion] = React.useState(false)
   const [isSoundToggling, setIsSoundToggling] = React.useState(false)
   const [showSharedEmotion, setShowSharedEmotion] = React.useState(false)
@@ -237,6 +237,18 @@ export const System = React.memo(function SystemInner() {
     )
     localStorage.setItem(lastRecordedKey, today)
   }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac])
+
+  // Personal astrology correlation — how many of the user's own past logs
+  // were written under today's same ambient conditions. Every log already
+  // carries an astro* snapshot in its context (server/utils/logs.ts), so
+  // this is a real count over the user's own history, not a prediction —
+  // honest personalization instead of invented meaning.
+  const astrologyPersonal = React.useMemo(() => {
+    const sameRokuyoCount = logs.filter(l => l.context?.astroRokuyo === astrology.rokuyo).length
+    const sameMoonPhaseCount = logs.filter(l => l.context?.astroMoonPhase === astrology.moonPhase).length
+    const taianCount = logs.filter(l => l.context?.astroRokuyo === 'Taian').length
+    return { sameRokuyoCount, sameMoonPhaseCount, taianCount }
+  }, [logs, astrology.rokuyo, astrology.moonPhase])
 
   const answerLogs = React.useMemo(() => {
     return logs.filter(log => log.event === 'answer')
@@ -655,14 +667,16 @@ export const System = React.memo(function SystemInner() {
         <Block
           label={
             astrologyView === 'astrology' ? "Astrology:" :
+            astrologyView === 'personal' ? "Astrology × You:" :
             astrologyView === 'psychology' ? "Psychology:" :
             astrologyView === 'journey' ? "My Journey:" :
             "Biofield:"
           }
           onLabelClick={() => {
-            // Cycle through: Astrology → Psychology → Journey → Quantum → Astrology
+            // Cycle through: Astrology → Personal → Psychology → Journey → Quantum → Astrology
             setAstrologyView(prev =>
-              prev === 'astrology' ? 'psychology' :
+              prev === 'astrology' ? 'personal' :
+              prev === 'personal' ? 'psychology' :
               prev === 'psychology' ? 'journey' :
               prev === 'journey' ? 'quantum' :
               'astrology'
@@ -672,6 +686,11 @@ export const System = React.memo(function SystemInner() {
           {astrologyView === 'astrology' ? (
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+            </div>
+          ) : astrologyView === 'personal' ? (
+            <div>
+              <div>{astrology.rokuyo} days logged: {astrologyPersonal.sameRokuyoCount} • {astrology.moonPhase} days logged: {astrologyPersonal.sameMoonPhaseCount}</div>
+              <div className="opacity-60">Auspicious (Taian) entries: {astrologyPersonal.taianCount}</div>
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>

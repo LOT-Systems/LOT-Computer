@@ -12,6 +12,7 @@ import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { useCosmicUpdate } from '#client/queries'
 import { shouldShowRewardWidget } from '#client/stores/rewardWidgets'
+import { getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 
 /**
  * Cosmic Update Widget — Together AI image generation token
@@ -48,8 +49,17 @@ function getPixelPrompt(): string {
     '1-bit pixel art portrait, 1980s boombox LCD screen style, pixelated face with cassette tape hair, antenna crown, 64x64, monochrome, black and white only, no gradients',
     '1-bit pixel art, old car audio system display, figure composed of speaker cones and waveform lines, 64x64, monochrome, black and white only, no gradients',
   ]
-  const all = [...japanese, ...carAudio]
-  return all[Math.floor(Math.random() * all.length)]
+  // Ambient astrology reading steers which visual register today leans
+  // toward — a near-full moon or an auspicious (Taian) day favors the
+  // Japanese woodblock set, otherwise the ancient car-audio set. This is
+  // the 'astrology' -> 'cosmic' link documented in WIDGET_DEPENDENCY_MAP
+  // (intentionEngine.ts) made real. Which pattern plays within the chosen
+  // pool stays random, so "New Reflection" still varies within a day.
+  const now = new Date()
+  const { illumination } = getMoonPhase(now)
+  const rokuyo = getRokuyo(now)
+  const pool = (illumination >= 50 || rokuyo === 'Taian') ? japanese : carAudio
+  return pool[Math.floor(Math.random() * pool.length)]
 }
 
 /** Convert an image to monochrome on a 64×64 canvas */
