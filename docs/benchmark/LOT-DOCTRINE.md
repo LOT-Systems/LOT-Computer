@@ -55,7 +55,12 @@ deferred to allow immediate visual response.)
 
 User-facing event types created via POST must appear in the GET
 displayableEvents whitelist or the write→read loop is silently broken.
-(SR-20260604-01: calendar_entry saved but never returned.)
+(SR-20260604-01: calendar_entry saved but never returned. SR-20260916-01:
+generated_story — same class of gap, this time on an AI-generated event type
+that had been live and silently unreadable since /story was first built.
+Two independent instances now; a third earns this a pre-push lint check
+that diffs new POST .../Log.create event strings against the whitelist
+array, rather than continuing to catch it by manual audit.)
 
 ## Ship Mode Discipline
 

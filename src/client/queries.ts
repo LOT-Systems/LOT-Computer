@@ -892,9 +892,12 @@ export const usePrayerScripture = createMutation<
 // STORY — Contextual AI Story
 // ============================================================================
 
+export type StoryRange = 'day' | 'week' | 'month' | 'year'
+
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    range?: StoryRange
     quantumState?: {
       energy?: string
       clarity?: string
@@ -909,6 +912,7 @@ export const useStoryGeneration = createMutation<
   },
   {
     story: string
+    range: StoryRange
     logId: string | null
   }
 >('post', '/api/story')

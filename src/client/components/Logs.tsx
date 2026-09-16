@@ -33,7 +33,7 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, type StoryRange } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3706,6 +3706,7 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyRange, setStoryRange] = React.useState<StoryRange>('day')
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3742,6 +3743,7 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryRange(data.range || 'day')
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -4125,7 +4127,7 @@ const NoteEditor = ({
           'AVAILABLE COMMANDS',
           '',
           '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
+          '/story [range]  Compressed story: day|week|month|year (default day)',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
@@ -4151,17 +4153,25 @@ const NoteEditor = ({
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
+          const rangeMatch = value.match(/\/story\s+(day|week|month|year)\b/i)
+          const range: StoryRange = (rangeMatch ? rangeMatch[1].toLowerCase() : 'day') as StoryRange
+          setStoryRange(range)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const logText = value
+              .replace(/\/story\s+(day|week|month|year)\b/i, '')
+              .replace(/\/story/i, '')
+              .replace(/📖/g, '')
+              .trim()
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              range,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: value, range })
           }
         }
       }
@@ -4416,9 +4426,9 @@ const NoteEditor = ({
         )}
         {(storyLoading || storyResponse) && (
           <div className="mt-8">
-            <Block label="📖" blockView>
+            <Block label={`📖 STORY [${storyRange.toUpperCase()}]:`} blockView>
               {storyLoading && !storyResponse && (
-                <div className="opacity-40 tracking-widest">...</div>
+                <div className="opacity-40 tracking-widest">Compressing {storyRange}...</div>
               )}
               {storyResponse && (
                 <div className="opacity-60">
