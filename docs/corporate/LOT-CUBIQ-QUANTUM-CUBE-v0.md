@@ -169,6 +169,21 @@ their attention.
     not a nice-to-have — no v.0 unit ships without it passing 100/100
     edge-approach trials.
 
+  GESTURE QUEUE — CONTACT GATE
+    Not every trigger from the Index of Systems (Section 05) arrives
+    while a human hand is near the cube. A signal that fires while the
+    operator is away is held in a single-slot gesture queue rather than
+    performed against an empty room — a hop nobody is present to feel
+    is wasted motion and unnecessary wear on the actuator. The queue
+    drains on the next PRESENCE EVENT: a break in the wireless charge
+    coupling (Section 02) followed by its re-establishment, read as
+    "an object — a hand, the cube itself — was lifted and set back down."
+    Only the highest-priority queued gesture fires; the queue holds one
+    slot, not a backlog, so the cube never performs a burst of stale
+    notifications on contact. This is the same actuator and IMU stack
+    as the rest of Section 03 — contact-gating changes WHEN a gesture
+    fires, not what hardware performs it.
+
 --------------------------------------------------------------------------------
 04 // THE HAPTIC NOTIFICATION LANGUAGE
 --------------------------------------------------------------------------------
@@ -320,6 +335,47 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE EVENING SETTLE                          2026-09-16
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Legacy tier, 340+ day continuous streak, Assembly
+  phase recently advanced from "forming" to "assembled"
+  (LOT-CUBIQ-OPERATOR.md, Section 03, ASSEMBLY STATE). Works a fixed
+  commute schedule — out of the house 7:30 to 18:30, no access to the
+  cubic during the day except a phone the operator has deliberately
+  chosen not to install LOT® on. The CUBIQ charging pad sits on the
+  kitchen counter, the first surface touched on returning home.
+
+  Under the software-only cubic, an assembly-phase transition is a
+  number that changes on a dashboard the operator may not open again
+  for days. It is correct, but it is inert — a fact waiting to be
+  discovered rather than a moment marked. Sci-fi wellness products
+  compete for this exact moment (the return home) with vibration
+  alerts, badge pop-ups, and app-open streak nags, all of which read as
+  demands the moment the front door closes.
+
+  With CUBIQ hardware v.0 present: the assembly-phase advancement
+  fired mid-afternoon while the operator was away. The cube did not
+  hop while the kitchen was empty — Section 03's actuator stack is
+  live, but the gesture is queued, not fired blind, against an
+  unattended surface. The moment the operator sets their keys down
+  on the charging pad — the inductive charge interface (Section 02)
+  detecting contact — the cube performs THE SETTLE: a two-second
+  standing pressure, no liftoff, no sound. Not an alert. A held
+  breath released.
+
+  The operator does not check a phone to learn what happened. They
+  feel the cube press once into the counter and understand, without
+  translation, that something in their Index of Systems reached a new
+  state while they were living their day away from any screen. Later,
+  opening the cubic, the MemoryWidget confirms what THE SETTLE already
+  told the body: assembled.
+
+  This is the use case the queued-gesture / contact-triggered
+  architecture was built to serve — a notification that waits for the
+  right physical moment to exist at all, rather than firing into an
+  empty room. Structure delivered to a body, not a badge delivered to
+  a dashboard.
 
 --------------------------------------------------------------------------------
 08 // BRAND
