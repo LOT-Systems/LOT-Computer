@@ -871,6 +871,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('odyssey_day')
   }
 
+  // ── Calendar v21 — THE ASTRONOMERS' CALENDAR ──────────────────────────────────
+  // Galileo Birthday: February 15 — Galileo Galilei born 1564
+  if (!hasBadge('galileo_birthday') && month === 2 && day === 15) {
+    awardBadge('galileo_birthday')
+    awarded.push('galileo_birthday')
+  }
+  // Copernicus Day: February 19 — Nicolaus Copernicus born 1473
+  if (!hasBadge('copernicus_day') && month === 2 && day === 19) {
+    awardBadge('copernicus_day')
+    awarded.push('copernicus_day')
+  }
+  // Hubble Day: November 20 — Edwin Hubble born 1889
+  if (!hasBadge('hubble_day') && month === 11 && day === 20) {
+    awardBadge('hubble_day')
+    awarded.push('hubble_day')
+  }
+
   return awarded
 }
 
@@ -1483,6 +1500,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE ANCIENT OBSERVATORY ────────────────────────────────────────────
+  { patterns: /\bzenith\b/i,                                                              badge: 'zenith_reached' },
+  { patterns: /\bnadir\b/i,                                                               badge: 'nadir_point' },
+  { patterns: /\b(solar[\s-]?eclipse|lunar[\s-]?eclipse|eclipse)\b/i,                    badge: 'eclipse_note' },
+  { patterns: /\baphelion\b/i,                                                            badge: 'aphelion_log' },
+  { patterns: /\bperihelion\b/i,                                                          badge: 'perihelion_note' },
+  { patterns: /\bazimuth\b/i,                                                             badge: 'azimuth_arc' },
+  { patterns: /\b(declination|right[\s-]?ascension)\b/i,                                 badge: 'declination_field' },
+  { patterns: /\bculmina(tion|ting)\b/i,                                                  badge: 'culmination_arc' },
+  { patterns: /\b(opposition|retrograde)\b/i,                                             badge: 'opposition_gate' },
+  { patterns: /\becliptic\b/i,                                                            badge: 'ecliptic_path' },
+  { patterns: /\bparallax\b/i,                                                            badge: 'parallax_note' },
+  { patterns: /\b(precession|axial[\s-]?precession)\b/i,                                 badge: 'precession_arc' },
+  // ── v20 Secret Boss — THE GREAT OBSERVERS word triggers ──────────────────────
+  { patterns: /\b(copernicus|heliocentric)\b/i,                                           badge: 'copernicus_key' },
+  { patterns: /\b(galileo|moons[\s-]?of[\s-]?jupiter)\b/i,                               badge: 'galileo_signal' },
+  { patterns: /\b(kepler|ellipse|orbital[\s-]?mechanics)\b/i,                            badge: 'kepler_arc' },
 ]
 
 /**
@@ -2711,6 +2745,81 @@ export function checkThresholdMoment(): BadgeType | null {
   if (hour === 0 && minute <= 30) {
     awardBadge('threshold_moment')
     return 'threshold_moment'
+  }
+  return null
+}
+
+// ── Behavioral v20 — OBSERVATORY PATTERNS ────────────────────────────────────
+
+const OBSERVATORY_WORDS_V23 = [
+  /\bzenith\b/i, /\bnadir\b/i, /\beclipse\b/i, /\baphelion\b/i,
+  /\bperihelion\b/i, /\bazimuth\b/i, /\bdeclination\b/i, /\bculminat(ion|ing)\b/i,
+  /\bopposition\b/i, /\bretrograde\b/i, /\becliptic\b/i, /\bparallax\b/i,
+  /\bprecession\b/i,
+]
+
+/**
+ * Award dawn_observer badge: check-in before 05:30 local on 2+ days in any 7-day window.
+ * Call on every check-in.
+ */
+export function checkDawnObserver(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_observer')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  const minute = now.getMinutes()
+  if (hour >= 6 || (hour === 5 && minute >= 30)) return null
+
+  try {
+    const key = 'dawn_observer_dates'
+    const stored = localStorage.getItem(key)
+    const dates: string[] = stored ? JSON.parse(stored) : []
+    const todayStr = now.toISOString().slice(0, 10)
+
+    if (!dates.includes(todayStr)) {
+      dates.push(todayStr)
+      const recent = dates.slice(-14)
+      localStorage.setItem(key, JSON.stringify(recent))
+
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      const inWindow = recent.filter(d => new Date(d) >= sevenDaysAgo)
+      if (inWindow.length >= 2) {
+        awardBadge('dawn_observer')
+        return 'dawn_observer'
+      }
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+/**
+ * Award long_night badge: journal entry written between 01:00 and 04:00 local.
+ * Call when a journal entry is saved.
+ */
+export function checkLongNight(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('long_night')) return null
+
+  const hour = new Date().getHours()
+  if (hour >= 1 && hour < 4) {
+    awardBadge('long_night')
+    return 'long_night'
+  }
+  return null
+}
+
+/**
+ * Award observatory_session badge if 3+ Ancient Observatory vocabulary words appear in one journal entry.
+ * Call when a journal entry is saved.
+ */
+export function checkObservatorySession(journalText: string): BadgeType | null {
+  if (hasBadge('observatory_session')) return null
+  const matchCount = OBSERVATORY_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('observatory_session')
+    return 'observatory_session'
   }
   return null
 }

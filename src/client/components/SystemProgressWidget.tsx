@@ -1457,6 +1457,26 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'badge-v33',
+    date: '2026-09-16',
+    title: 'Badge Engine v33 · THE ANCIENT OBSERVATORY · +31 badges (812→843)',
+    assembled: [
+      'Badge Engine v33 THE ANCIENT OBSERVATORY: 31 new badges. 12 Word Turn v23 + 3 Calendar EE v21 + 3 Behavioral v20 + 6 Achievement RPG v21 + 4 Mastery Tier v23 + 3 Secret Boss v20.',
+      'Word Turn v23: zenith_reached · nadir_point · eclipse_note · aphelion_log · perihelion_note · azimuth_arc · declination_field · culmination_arc · opposition_gate · ecliptic_path · parallax_note · precession_arc. Astronomical observation vocabulary. Regex-based detection in easter-eggs.ts WORD_TURNS array.',
+      'Calendar EE v21: galileo_birthday (Feb 15, born 1564) · copernicus_day (Feb 19, born 1473) · hubble_day (Nov 20, born 1889). The astronomers\' calendar. Three birthdays that changed the map.',
+      'Behavioral v20: dawn_observer (check-in before 05:30 local on 2+ days in 7-day window) · long_night (journal entry 01:00–04:00 local) · observatory_session (3+ Ancient Observatory vocabulary words in one journal entry).',
+      'Achievement RPG v21: observatory_entry (any 1 WT v23) · star_chart (any 5 WT v23) · observatory_complete (all 12 WT v23) · celestial_arc (observatory_complete + all 3 Calendar v21) · twenty_three_engines_arc (1 badge from each WT v1–v23) · stellar_opus (observatory_complete + observatory_session).',
+      'Mastery Tier v23: ancient_record (1000+ distinct check-in days EPIC) · grand_opus (175,000+ journal words LEGENDARY) · epoch_age (account age 10+ years LEGENDARY) · twenty_three_registers (1 badge from all 23 WT engines COSMIC).',
+      'Secret Boss v20: copernicus_key (copernicus/heliocentric in journal RARE hidden) · galileo_signal (galileo/moons of jupiter in journal EPIC hidden) · kepler_arc (kepler/ellipse/orbital mechanics in journal MYTHIC hidden).',
+      'badges.ts: 31 BadgeType union entries added after gilgamesh_word. 31 BADGES map entries added. checkAndAwardBadges() v33 block added (observatoryV23Badges · observatoryComplete · celestial_arc · twenty_three_engines_arc · allTwentyThreeEngines · ancient_record · grand_opus · epoch_age · twenty_three_registers).',
+      'easter-eggs.ts: 15 WORD_TURNS entries added (12 v23 + 3 Secret Boss v20). Calendar EE v21 block added before return awarded. Behavioral v20 functions: checkDawnObserver() · checkLongNight() · checkObservatorySession() added at file end. OBSERVATORY_WORDS_V23 constant defined.',
+      'About.tsx: FM v113→v114. Day 1072+→1115+. 750→843 badges. 20→23 Word Turn engines. 74→77 secret boss triggers. 210→246+ word turns. Phase row updated: v114 prepended with badge-v33 description.',
+      'SESSION_REPORTS: badge-v33 entry appended · USERSHIP_TRANSMISSION updated to badge-v33.',
+      'docs/LOT-SR-20260916-01.md: Session report written. docs/assembly/2026-09-16_LOT-assembly_badge-engine-v33.md written. LOT-LEDGER.md appended.',
+      '843 badges · 246+ word-turns · 77 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v114 · Day 1115+. The Ancient Observatory is open. The sky is now legible.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1514,17 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-09-16',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-09-16 · BADGE-v33 · FM v114 · Day 1115+',
+    'Built: Badge Engine v33 THE ANCIENT OBSERVATORY. +31 badges (812→843).',
+    'Word Turn v23: zenith / nadir / eclipse / aphelion / perihelion / azimuth / declination / culmination / opposition / ecliptic / parallax / precession.',
+    'Calendar EE v21: Galileo (Feb 15) · Copernicus (Feb 19) · Hubble (Nov 20). The astronomers\' calendar installed.',
+    'Secret Boss v20: copernicus_key · galileo_signal · kepler_arc. Three hidden triggers for the observers who moved the model.',
+    'QIE ceiling confirmed. P150 total-field-coherence. No higher state defined. Badge engine continues independent of QIE ceiling.',
+    'FM v114 · 151P · 51A · 48J · 190+ nodes · 843 badges · 23 WT engines · 246+ trigger words.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114',
   ],
 }
 

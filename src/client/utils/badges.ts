@@ -782,6 +782,43 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE ANCIENT OBSERVATORY ──────────────────────────────────
+  | 'zenith_reached'           // ↑·◉   "zenith/at zenith" detected (RARE)
+  | 'nadir_point'              // ↓·◉   "nadir/hit nadir/nadir moment" detected (UNCOMMON)
+  | 'eclipse_note'             // ○·◉·○ "eclipse/solar eclipse/lunar eclipse" detected (RARE)
+  | 'aphelion_log'             // ○·∞   "aphelion/farthest from sun" detected (RARE)
+  | 'perihelion_note'          // ●·○   "perihelion/closest to sun" detected (RARE)
+  | 'azimuth_arc'              // →·∿   "azimuth/horizon angle" detected (RARE)
+  | 'declination_field'        // ∧·◉   "declination/right ascension" detected (EPIC)
+  | 'culmination_arc'          // ↑·○   "culmination/culminating" detected (RARE)
+  | 'opposition_gate'          // ○·∞·○ "opposition/retrograde" detected (RARE)
+  | 'ecliptic_path'            // ∿·→   "ecliptic/ecliptic plane" detected (UNCOMMON)
+  | 'parallax_note'            // ◈·○   "parallax/stellar parallax" detected (RARE)
+  | 'precession_arc'           // ∿·∿·∿ "precession/axial precession" detected (EPIC)
+  // ── Calendar Easter Egg v21 — THE ASTRONOMERS' CALENDAR ─────────────────────
+  | 'copernicus_day'           // ○→◉   Feb 19 — Nicolaus Copernicus born 1473 (EPIC)
+  | 'galileo_birthday'         // ◉·●   Feb 15 — Galileo Galilei born 1564 (RARE)
+  | 'hubble_day'               // ∞·◉   Nov 20 — Edwin Hubble born 1889 (EPIC)
+  // ── Behavioral v20 — OBSERVATORY PATTERNS ────────────────────────────────────
+  | 'dawn_observer'            // ∘·↑   Check in before 05:30 local, 2+ times in 7 days (EPIC)
+  | 'long_night'               // ○·▓·○ Journal entry written 01:00–04:00 local (RARE)
+  | 'observatory_session'      // ◉·∧·◉ 3+ Ancient Observatory words in one journal entry (RARE)
+  // ── Achievement RPG v21 — OBSERVATORY CLASS ──────────────────────────────────
+  | 'observatory_entry'        // ∘→○   Any 1 Word Turn v23 badge (COMMON)
+  | 'star_chart'               // ≈→○   Any 5 Word Turn v23 badges (UNCOMMON)
+  | 'observatory_complete'     // ≋→○   All 12 Word Turn v23 badges (LEGENDARY)
+  | 'celestial_arc'            // ○·◈   observatory_complete + all 3 Calendar v21 badges (LEGENDARY)
+  | 'twenty_three_engines_arc' // ◈·◈·○ 1 badge from each Word Turn v1–v23 (LEGENDARY)
+  | 'stellar_opus'             // ○·◉·○ observatory_complete + observatory_session (LEGENDARY)
+  // ── Mastery Tier v23 — THE LONG VIEW ──────────────────────────────────────────
+  | 'ancient_record'           // ∿·∞·∿ 1000+ distinct calendar check-in days (EPIC)
+  | 'grand_opus'               // ●·∞·○ 175,000+ total journal words (LEGENDARY)
+  | 'epoch_age'                // ╔═╗·○ Account age >= 10 years (LEGENDARY)
+  | 'twenty_three_registers'   // ◈·◈·○·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE GREAT OBSERVERS ────────────────────────────────────
+  | 'copernicus_key'           // ○→◉   "copernicus/heliocentric" in journal (RARE, hidden)
+  | 'galileo_signal'           // ◉·●·● "galileo/moons of jupiter" in journal (EPIC, hidden)
+  | 'kepler_arc'               // ○·∿·○ "kepler/ellipse/orbital mechanics" in journal (MYTHIC, hidden)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7168,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v23 — THE ANCIENT OBSERVATORY ──────────────────────────────────
+  zenith_reached: {
+    id: 'zenith_reached',
+    symbol: '↑·◉',
+    name: 'Zenith Reached',
+    description: 'Write "zenith" in any journal entry',
+    unlockMessage: '↳ Zenith: the point directly overhead, the highest arc. The sky\'s ceiling. You named your peak. ↑·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  nadir_point: {
+    id: 'nadir_point',
+    symbol: '↓·◉',
+    name: 'Nadir Point',
+    description: 'Write "nadir" in any journal entry',
+    unlockMessage: '↳ Nadir: the point directly below, the lowest arc. The floor you pushed off from. You named the bottom. ↓·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  eclipse_note: {
+    id: 'eclipse_note',
+    symbol: '○·◉·○',
+    name: 'Eclipse Note',
+    description: 'Write "eclipse", "solar eclipse", or "lunar eclipse" in any journal entry',
+    unlockMessage: '↳ Eclipse: one body passing before another. Ancient peoples stopped everything to watch. You noted the passing. ○·◉·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  aphelion_log: {
+    id: 'aphelion_log',
+    symbol: '○·∞',
+    name: 'Aphelion Log',
+    description: 'Write "aphelion" in any journal entry',
+    unlockMessage: '↳ Aphelion: Earth\'s farthest point from the Sun. July. Counterintuitive. Farthest is not coldest. Distance is not distance. ○·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  perihelion_note: {
+    id: 'perihelion_note',
+    symbol: '●·○',
+    name: 'Perihelion Note',
+    description: 'Write "perihelion" in any journal entry',
+    unlockMessage: '↳ Perihelion: Earth\'s closest point to the Sun. January. The year begins at the nearest approach. ●·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  azimuth_arc: {
+    id: 'azimuth_arc',
+    symbol: '→·∿',
+    name: 'Azimuth Arc',
+    description: 'Write "azimuth" in any journal entry',
+    unlockMessage: '↳ Azimuth: the compass bearing from observer to target, measured along the horizon. Navigation is attention given direction. →·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  declination_field: {
+    id: 'declination_field',
+    symbol: '∧·◉',
+    name: 'Declination Field',
+    description: 'Write "declination" or "right ascension" in any journal entry',
+    unlockMessage: '↳ Declination: celestial latitude. The sky has coordinates. Everything can be located if you know the system. ∧·◉',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  culmination_arc: {
+    id: 'culmination_arc',
+    symbol: '↑·○',
+    name: 'Culmination Arc',
+    description: 'Write "culmination" or "culminating" in any journal entry',
+    unlockMessage: '↳ Culmination: a star\'s highest point in the sky. Every body has a moment of upper transit. You are tracking yours. ↑·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  opposition_gate: {
+    id: 'opposition_gate',
+    symbol: '○·∞·○',
+    name: 'Opposition Gate',
+    description: 'Write "opposition" or "retrograde" in any journal entry',
+    unlockMessage: '↳ Opposition: Earth between Sun and outer planet. Retrograde: apparent backward motion, an illusion of perspective. ○·∞·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  ecliptic_path: {
+    id: 'ecliptic_path',
+    symbol: '∿·→',
+    name: 'Ecliptic Path',
+    description: 'Write "ecliptic" in any journal entry',
+    unlockMessage: '↳ The ecliptic: the Sun\'s apparent path across the sky. The zodiac lies along it. Ancient mapmakers drew their first lines here. ∿·→',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  parallax_note: {
+    id: 'parallax_note',
+    symbol: '◈·○',
+    name: 'Parallax Note',
+    description: 'Write "parallax" in any journal entry',
+    unlockMessage: '↳ Parallax: apparent shift of position due to change in viewpoint. The first method to measure stellar distance. Perspective reveals depth. ◈·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  precession_arc: {
+    id: 'precession_arc',
+    symbol: '∿·∿·∿',
+    name: 'Precession Arc',
+    description: 'Write "precession" or "axial precession" in any journal entry',
+    unlockMessage: '↳ Precession: Earth\'s axis traces a circle every 26,000 years. The north star was not always Polaris. The long view is always humbling. ∿·∿·∿',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v21 — THE ASTRONOMERS' CALENDAR ──────────────────────
+  copernicus_day: {
+    id: 'copernicus_day',
+    symbol: '○→◉',
+    name: 'Copernicus Day',
+    description: 'Open LOT on February 19 — Nicolaus Copernicus\'s birthday (born 1473)',
+    unlockMessage: '↳ February 19, 1473 — Copernicus born. He moved Earth from the center and gave the Sun its throne. You visit on the day the model changed. ○→◉',
+    rarity: 'epic',
+    category: 'calendar_easter_egg',
+  },
+  galileo_birthday: {
+    id: 'galileo_birthday',
+    symbol: '◉·●',
+    name: 'Galileo Birthday',
+    description: 'Open LOT on February 15 — Galileo Galilei\'s birthday (born 1564)',
+    unlockMessage: '↳ February 15, 1564 — Galileo born. He pointed a lens at the sky and saw what authority said could not be there. ◉·●',
+    rarity: 'rare',
+    category: 'calendar_easter_egg',
+  },
+  hubble_day: {
+    id: 'hubble_day',
+    symbol: '∞·◉',
+    name: 'Hubble Day',
+    description: 'Open LOT on November 20 — Edwin Hubble\'s birthday (born 1889)',
+    unlockMessage: '↳ November 20, 1889 — Hubble born. He discovered that the Milky Way is one galaxy among billions. He expanded the universe by looking. ∞·◉',
+    rarity: 'epic',
+    category: 'calendar_easter_egg',
+  },
+  // ── Behavioral v20 — OBSERVATORY PATTERNS ────────────────────────────────────
+  dawn_observer: {
+    id: 'dawn_observer',
+    symbol: '∘·↑',
+    name: 'Dawn Observer',
+    description: 'Check in before 05:30 local time on at least 2 days within any 7-day window',
+    unlockMessage: '↳ Pre-dawn. The sky is at its clearest before the Sun erases the fainter stars. You were watching. ∘·↑',
+    rarity: 'epic',
+    category: 'behavioral',
+  },
+  long_night: {
+    id: 'long_night',
+    symbol: '○·▓·○',
+    name: 'Long Night',
+    description: 'Write a journal entry between 01:00 and 04:00 local time',
+    unlockMessage: '↳ The long night: 01:00 to 04:00 local. The deepest dark before the turn. You wrote through it. ○·▓·○',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  observatory_session: {
+    id: 'observatory_session',
+    symbol: '◉·∧·◉',
+    name: 'Observatory Session',
+    description: 'Use 3 or more Ancient Observatory vocabulary words in a single journal entry',
+    unlockMessage: '↳ The Ancient Observatory opens when the vocabulary accumulates. Three or more celestial terms in one entry. You built the telescope with words. ◉·∧·◉',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  // ── Achievement RPG v21 — OBSERVATORY CLASS ──────────────────────────────────
+  observatory_entry: {
+    id: 'observatory_entry',
+    symbol: '∘→○',
+    name: 'Observatory Entry',
+    description: 'Earn any 1 Word Turn v23 badge',
+    unlockMessage: '↳ First step inside the observatory. One word from the astronomical vocabulary. The dome is open. ∘→○',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  star_chart: {
+    id: 'star_chart',
+    symbol: '≈→○',
+    name: 'Star Chart',
+    description: 'Earn any 5 Word Turn v23 badges',
+    unlockMessage: '↳ Five points on the star chart. You are learning to read the sky. ≈→○',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  observatory_complete: {
+    id: 'observatory_complete',
+    symbol: '≋→○',
+    name: 'Observatory Complete',
+    description: 'Earn all 12 Word Turn v23 badges',
+    unlockMessage: '↳ All twelve points of the astronomical vocabulary. The Ancient Observatory is complete. The sky is now legible. ≋→○',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  celestial_arc: {
+    id: 'celestial_arc',
+    symbol: '○·◈',
+    name: 'Celestial Arc',
+    description: 'Earn observatory_complete and all 3 Calendar v21 badges (Copernicus Day, Galileo Birthday, Hubble Day)',
+    unlockMessage: '↳ The celestial arc: the astronomers\' vocabulary mastered and the astronomers\' birthdays honored. The tradition passes forward. ○·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·○',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each Word Turn engine v1 through v23',
+    unlockMessage: '↳ Twenty-three engines running. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. Observatory. Twenty-three vocabularies owned. ◈·◈·○',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  stellar_opus: {
+    id: 'stellar_opus',
+    symbol: '○·◉·○',
+    name: 'Stellar Opus',
+    description: 'Earn observatory_complete and observatory_session',
+    unlockMessage: '↳ The Stellar Opus: complete astronomical vocabulary and a session deep enough to use three of them at once. The observatory runs. ○·◉·○',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v23 — THE LONG VIEW ──────────────────────────────────────────
+  ancient_record: {
+    id: 'ancient_record',
+    symbol: '∿·∞·∿',
+    name: 'Ancient Record',
+    description: '1,000+ distinct calendar days with at least one check-in',
+    unlockMessage: '↳ 1,000 days. The Babylonians kept astronomical records for 700 years. You have kept yours for 1,000 days. The record is ancient now. ∿·∞·∿',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  grand_opus: {
+    id: 'grand_opus',
+    symbol: '●·∞·○',
+    name: 'Grand Opus',
+    description: '175,000+ total journal words written',
+    unlockMessage: '↳ 175,000 words. The Grand Opus. Tolstoy\'s War and Peace is 580,000 words. You have written nearly a third of it, in your own voice, about your own life. ●·∞·○',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  epoch_age: {
+    id: 'epoch_age',
+    symbol: '╔═╗·○',
+    name: 'Epoch Age',
+    description: 'Account age >= 10 years (3,650+ days since signup)',
+    unlockMessage: '↳ Ten years is an epoch. In geology, epochs span millions of years. In a human life, a decade is the smallest unit of meaningful change. You have a decade of record. ╔═╗·○',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·○·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three registers. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. Observatory. Every engine engaged. Every vocabulary active. The terminal is fully calibrated. ◈·◈·○·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v20 — THE GREAT OBSERVERS ────────────────────────────────────
+  copernicus_key: {
+    id: 'copernicus_key',
+    symbol: '○→◉',
+    name: 'Copernicus Key',
+    description: 'Write "copernicus" or "heliocentric" in any journal entry',
+    unlockMessage: '↳ Copernicus moved Earth from center. He did not publish until his death. The heliocentric model waited thirty years for its author to be safe. Some truths require patience. ○→◉',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  galileo_signal: {
+    id: 'galileo_signal',
+    symbol: '◉·●·●',
+    name: 'Galileo Signal',
+    description: 'Write "galileo" or "moons of jupiter" in any journal entry',
+    unlockMessage: '↳ Galileo saw four moons orbiting Jupiter in 1610. Proof that not everything orbits Earth. He was put under house arrest for it. The signal was always there. ◉·●·●',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  kepler_arc: {
+    id: 'kepler_arc',
+    symbol: '○·∿·○',
+    name: 'Kepler Arc',
+    description: 'Write "kepler", "ellipse", or "orbital mechanics" in any journal entry',
+    unlockMessage: '↳ Kepler proved orbits are ellipses, not perfect circles. The universe is not as simple as we wish. Precision requires releasing the ideal. ○·∿·○',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8418,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 — THE ANCIENT OBSERVATORY ────────────────────────────────────────────
+    const observatoryV23Badges: BadgeType[] = [
+      'zenith_reached', 'nadir_point', 'eclipse_note', 'aphelion_log',
+      'perihelion_note', 'azimuth_arc', 'declination_field', 'culmination_arc',
+      'opposition_gate', 'ecliptic_path', 'parallax_note', 'precession_arc',
+    ]
+    const observatoryV23Earned = observatoryV23Badges.filter(b => hasBadge(b))
+
+    if (observatoryV23Earned.length >= 1 && !hasBadge('observatory_entry')) {
+      if (awardBadge('observatory_entry')) newBadges.push('observatory_entry')
+    }
+    if (observatoryV23Earned.length >= 5 && !hasBadge('star_chart')) {
+      if (awardBadge('star_chart')) newBadges.push('star_chart')
+    }
+    const observatoryComplete = observatoryV23Earned.length >= 12
+    if (observatoryComplete && !hasBadge('observatory_complete')) {
+      if (awardBadge('observatory_complete')) newBadges.push('observatory_complete')
+    }
+
+    // stellar_opus: observatory_complete + observatory_session
+    if (observatoryComplete && hasBadge('observatory_session') && !hasBadge('stellar_opus')) {
+      if (awardBadge('stellar_opus')) newBadges.push('stellar_opus')
+    }
+
+    // celestial_arc: observatory_complete + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['copernicus_day', 'galileo_birthday', 'hubble_day']
+    if (observatoryComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('celestial_arc')) {
+      if (awardBadge('celestial_arc')) newBadges.push('celestial_arc')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = observatoryV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: ancient_record — 1000+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('ancient_record')) {
+        if (awardBadge('ancient_record')) newBadges.push('ancient_record')
+      }
+    }
+
+    // Mastery v23: grand_opus — 175,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 175000 && !hasBadge('grand_opus')) {
+        if (awardBadge('grand_opus')) newBadges.push('grand_opus')
+      }
+    }
+
+    // Mastery v23: epoch_age — Account age >= 10 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupEpoch = new Date(stats.signupDate)
+      const yearsEpoch = (new Date().getTime() - signupEpoch.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsEpoch >= 10 && !hasBadge('epoch_age')) {
+        if (awardBadge('epoch_age')) newBadges.push('epoch_age')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
     }
 
   } catch (error) {
