@@ -55,7 +55,15 @@ deferred to allow immediate visual response.)
 
 User-facing event types created via POST must appear in the GET
 displayableEvents whitelist or the write→read loop is silently broken.
-(SR-20260604-01: calendar_entry saved but never returned.)
+(SR-20260604-01: calendar_entry saved but never returned. SR-20260916-01:
+widget health audit found four more instances — direct_message_sent,
+generated_story, system_feedback, cosmic_update/other all written via
+Log.create() but absent from the whitelist — plus the inverse failure this
+clause hadn't yet named: ~35 Logs.tsx render cases with no emitter anywhere
+in src/server, dead formatter branches that can never fire. The whitelist
+and the formatter switch are two independently-maintained lists with no
+shared source of truth; that is the root cause repeating across every SR
+citation here.)
 
 ## Ship Mode Discipline
 
