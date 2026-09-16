@@ -24,9 +24,10 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useLotMail,
 } from '#client/queries'
 import { sync } from '../sync'
-import { PublicChatMessage, UserTag } from '#shared/types'
+import { PublicChatMessage, PublicLotMail, UserTag } from '#shared/types'
 import {
   SYNC_CHAT_MESSAGES_TO_SHOW,
   MAX_SYNC_CHAT_MESSAGE_LENGTH,
@@ -52,6 +53,10 @@ export const Sync = React.memo(function SyncInner() {
   const [message, setMessage] = React.useState('')
   // SSE-received messages not yet reflected in the API response
   const [sseMessages, setSseMessages] = React.useState<PublicChatMessage[]>([])
+  // LOT Email — composed in Log via "/email to <name>", rendered here as
+  // envelope-style feed items alongside chat. SSE-received mail not yet
+  // reflected in the API response.
+  const [sseMail, setSseMail] = React.useState<PublicLotMail[]>([])
 
   // Check if current user can access /us section (admin-level access)
   const canAccessUserProfiles = React.useMemo(() => {
@@ -71,6 +76,7 @@ export const Sync = React.memo(function SyncInner() {
   }, [me])
 
   const { data: fetchedMessages } = useChatMessages()
+  const { data: fetchedMail } = useLotMail()
   const { mutate: createChatMessage } = useCreateChatMessage({
     onSuccess: () => setMessage(''),
   })
@@ -85,14 +91,41 @@ export const Sync = React.memo(function SyncInner() {
     queryClient.invalidateQueries(['/api/chat-messages'])
   }, [])
 
+  // LOT Email renders in the same feed as chat, envelope-style, so a sent
+  // "/email to <name>" shows up in Sync the same way a chat message does.
+  const mailToFeedItem = React.useCallback(
+    (m: PublicLotMail): PublicChatMessage & { isMail: true } => ({
+      id: `mail-${m.id}`,
+      authorUserId: m.senderUserId,
+      author: m.senderName,
+      message: `✉ to ${m.recipientName}: ${m.body}`,
+      createdAt: m.createdAt,
+      updatedAt: m.createdAt,
+      likesCount: 0,
+      likes: 0,
+      isLiked: false,
+      isMail: true,
+    }),
+    []
+  )
+
   // Merge: SSE-only messages (not yet in API response) prepended to API list
   const messages = React.useMemo(() => {
     const fetched = fetchedMessages || []
     const fetchedIds = new Set(fetched.map((m) => m.id))
     const fresh = sseMessages.filter((m) => !fetchedIds.has(m.id))
-    const combined = [...fresh, ...fetched].filter((m) => !isBlankMessage(m.message))
+    const chatItems = [...fresh, ...fetched].filter((m) => !isBlankMessage(m.message))
+
+    const fetchedMailList = fetchedMail || []
+    const fetchedMailIds = new Set(fetchedMailList.map((m) => m.id))
+    const freshMail = sseMail.filter((m) => !fetchedMailIds.has(m.id))
+    const mailItems = [...freshMail, ...fetchedMailList].map(mailToFeedItem)
+
+    const combined = [...chatItems, ...mailItems].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
     return canAccessUserProfiles ? combined : combined.slice(0, SYNC_CHAT_MESSAGES_TO_SHOW)
-  }, [fetchedMessages, sseMessages, canAccessUserProfiles])
+  }, [fetchedMessages, sseMessages, fetchedMail, sseMail, mailToFeedItem, canAccessUserProfiles])
 
   React.useEffect(() => {
     const { dispose: disposeChatMessageListener } = sync.listen(
@@ -117,9 +150,19 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeLotMailListener } = sync.listen(
+      'lot_mail',
+      (data: PublicLotMail) => {
+        setSseMail((prev) => {
+          if (prev.some((x) => x.id === data.id)) return prev
+          return [data, ...prev]
+        })
+      }
+    )
     return () => {
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
+      disposeLotMailListener()
     }
   }, [me?.id])
 
@@ -216,6 +259,7 @@ export const Sync = React.memo(function SyncInner() {
 
       <div>
         {messages.map((x, i) => {
+          const isMail = (x as PublicChatMessage & { isMail?: boolean }).isMail === true
           const authorObj = typeof x.author === 'object' ? x.author : null
           const authorName = typeof x.author === 'string'
             ? x.author
@@ -228,12 +272,13 @@ export const Sync = React.memo(function SyncInner() {
             <div
               key={x.id}
               className={cn(
-                'group flex items-start gap-x-8 cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded',
+                'group flex items-start gap-x-8 grid-fill-hover -mx-4 px-4 py-2 rounded',
+                isMail ? 'opacity-70' : 'cursor-pointer',
                 i >= SYNC_CHAT_MESSAGES_TO_SHOW && 'text-acc/20'
               )}
-              onClick={onToggleLike(x.id)}
+              onClick={isMail ? undefined : onToggleLike(x.id)}
             >
-              {authorId && (featureUnlocks?.socialMentions || canAccessUserProfiles) ? (
+              {!isMail && authorId && (featureUnlocks?.socialMentions || canAccessUserProfiles) ? (
                 <GhostButton
                   className="whitespace-nowrap pr-4"
                   onClick={onNavigateToUserProfile(authorId)}

@@ -27,6 +27,10 @@ export const radioTrackName = atom<string>('')
 
 export const weather = atom<WeatherRecord | null>(null)
 
+// Cohort Connect (LOT Community) -> LOT Email handoff: the recipient's
+// first name to hint in the Log composer after navigating there.
+export const pendingEmailRecipient = atom<string | null>(null)
+
 // connection status
 export const isConnected = atom<boolean>(true)
 export const lastUpdate = atom<Date | null>(null)

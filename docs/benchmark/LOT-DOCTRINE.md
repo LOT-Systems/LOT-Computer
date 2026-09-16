@@ -226,3 +226,24 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Gitignore Shadow on src/server
+
+`dist/` is ignored globally (line 2 of .gitignore). A separate bare `server/`
+rule under "Compiled output" is therefore dead for its stated purpose, but
+gitignore patterns without a leading slash match a directory name at ANY
+depth — so it also silently swallowed new, never-yet-tracked files under the
+real, checked-in `src/server/` tree. `git status` shows nothing wrong: an
+ignored untracked file simply doesn't appear, and `git add -A` skips it
+without a warning. Existing tracked src/server files were unaffected
+(gitignore cannot untrack a tracked path), which is what let this hide for
+as long as it did.
+
+The rule: when adding a new file under a path that already contains
+committed files of the same kind, always confirm it appears in `git status`
+before trusting `git add`. A "nothing to commit" surprise after creating a
+model/route/component file is the tell — check `git check-ignore -v <path>`
+before assuming the file doesn't need saving.
+
+(SR-20260916-01: found while adding src/server/models/lot-mail.ts; removed
+the redundant `server/` line.)

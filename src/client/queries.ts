@@ -20,6 +20,7 @@ import {
   Log,
   Paginated,
   PublicChatMessage,
+  PublicLotMail,
   User,
   UserProfile,
   UserSettings,
@@ -92,6 +93,14 @@ export const useLikeChatMessage = createMutation<ChatMessageLikePayload, void>(
   'post',
   '/api/chat-messages/like'
 )
+
+// LOT Email — composed in Log via "/email to <name>", surfaces in Sync
+export const useLotMail = createQuery<PublicLotMail[]>('/api/lot-mail')
+
+export const useCreateLotMail = createMutation<
+  { recipientName: string; body: string },
+  PublicLotMail
+>('post', '/api/lot-mail')
 
 export interface DirectMessageRecord {
   id: string

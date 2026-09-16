@@ -41,6 +41,7 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'lot-email'         // /email to <name> — send a LOT Email, surfaces in Sync
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -67,6 +68,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'lot-email',      emojis: ['✉️', '✉'], keywords: ['email'] },
 ]
 
 /**

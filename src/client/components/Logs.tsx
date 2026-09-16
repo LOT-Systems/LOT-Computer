@@ -33,7 +33,7 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useCreateLotMail } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -50,6 +50,7 @@ export const Logs: React.FC = React.memo(function LogsInner() {
   const isTouchDevice = useStore(stores.isTouchDevice)
   const logById = useStore(localStore.logById)
   const logIds = useStore(localStore.logIds)
+  const pendingEmailRecipient = useStore(stores.pendingEmailRecipient)
 
   const [isMouseActive, setIsMouseActive] = React.useState(true)
   const pendingPushRef = React.useRef<NodeJS.Timeout | null>(null)
@@ -206,6 +207,15 @@ export const Logs: React.FC = React.memo(function LogsInner() {
       className="flex flex-col gap-y-[1.5rem] leading-[1.5rem] px-4 sm:px-0"
     >
       <div ref={inputContainerRef} className="min-h-[200px]">
+        {pendingEmailRecipient && (
+          <div
+            className="mb-8 opacity-40 cursor-pointer"
+            onClick={() => stores.pendingEmailRecipient.set(null)}
+          >
+            From LOT Community — write your message, then send with{' '}
+            <span className="opacity-100">/email to {pendingEmailRecipient}</span>
+          </div>
+        )}
         {logById[recentLogId] ? (
           <NoteEditor
             key={recentLogId}
@@ -3706,6 +3716,20 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [emailResult, setEmailResult] = React.useState<string | null>(null)
+  const [emailLoading, setEmailLoading] = React.useState(false)
+  const { mutate: submitLotMail } = useCreateLotMail({
+    onSuccess: (data) => {
+      setEmailResult(
+        `SENT -> ${data.recipientName.toUpperCase()}${data.recipientUserId ? '' : '  (NOT YET ON LOT)'}`
+      )
+      setEmailLoading(false)
+    },
+    onError: () => {
+      setEmailResult('EMAIL FAILED — Unable to send.')
+      setEmailLoading(false)
+    },
+  })
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -4139,6 +4163,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to X   Send a LOT Email to X (appears in Sync)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4147,6 +4172,21 @@ const NoteEditor = ({
         setSystemHelp(lines.join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
+      } else if (trigger === 'lot-email') {
+        const emailMatch = value.match(/\/email\s+to\s+(\S+)/i)
+        if (emailMatch && !emailLoading) {
+          const recipientName = emailMatch[1].replace(/[.,!?;:]+$/, '')
+          const body = value
+            .replace(/\/email\s+to\s+\S+[.,!?;:]*/i, '')
+            .replace(/✉️?/g, '')
+            .trim()
+          if (recipientName && body.length >= 1) {
+            setEmailLoading(true)
+            setEmailResult(null)
+            submitLotMail({ recipientName, body })
+            stores.pendingEmailRecipient.set(null)
+          }
+        }
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
@@ -4274,6 +4314,18 @@ const NoteEditor = ({
           )}
           rows={primary ? 10 : 1}
         />
+        {(emailLoading || emailResult) && (
+          <div className="mt-8">
+            <Block label="LOT EMAIL:" blockView>
+              {emailLoading && !emailResult && (
+                <div className="opacity-40 uppercase tracking-widest">Sending...</div>
+              )}
+              {emailResult && (
+                <div className="opacity-60">{emailResult}</div>
+              )}
+            </Block>
+          </div>
+        )}
         {(qiLoading || qiResponse) && (
           <div className="mt-8">
             <Block label="QI [INTSUM]:" blockView>

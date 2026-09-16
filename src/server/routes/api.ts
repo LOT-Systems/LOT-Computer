@@ -13,6 +13,7 @@ import {
   ChatMessageLikeEventPayload,
   ChatMessageLikePayload,
   PublicChatMessage,
+  PublicLotMail,
   UserSettings,
   UserTag,
 } from '#shared/types'
@@ -383,6 +384,13 @@ export default async (fastify: FastifyInstance) => {
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
+          }
+          break
+        }
+        case 'lot_mail': {
+          const payload = data as PublicLotMail
+          if (payload.senderUserId === req.user.id || payload.recipientUserId === req.user.id) {
+            write({ event, data: payload })
           }
           break
         }
@@ -1032,6 +1040,101 @@ export default async (fastify: FastifyInstance) => {
         }
       })
       return reply.ok()
+    }
+  )
+
+  // ============================================================================
+  // LOT EMAIL — composed in Log via "/email to <name>", surfaces in Sync.
+  // Same participation gate as Chat: it is Chat's private-message sibling.
+  // ============================================================================
+  const MAX_LOT_MAIL_BODY_LENGTH = MAX_SYNC_CHAT_MESSAGE_LENGTH
+
+  const toPublicLotMail = (mail: any, senderName: string): PublicLotMail => ({
+    id: mail.id,
+    senderUserId: mail.senderUserId,
+    senderName,
+    recipientName: mail.recipientName,
+    recipientUserId: mail.recipientUserId,
+    body: mail.body,
+    createdAt: mail.createdAt,
+  })
+
+  fastify.get('/lot-mail', async (req: FastifyRequest, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'LOT Email requires Usership, Onyx, Legacy, R&D, or Admin' })
+    }
+    const mail = await fastify.models.LotMail.findAll({
+      where: {
+        [Op.or]: [{ senderUserId: req.user.id }, { recipientUserId: req.user.id }],
+      },
+      order: [['createdAt', 'DESC']],
+      limit: SYNC_CHAT_MESSAGES_TO_SHOW,
+    })
+    const senderIds = [...new Set(mail.map((m) => m.senderUserId))]
+    const senders = await fastify.models.User.findAll({
+      where: { id: senderIds },
+      attributes: ['id', 'firstName'],
+    })
+    const senderNameById = senders.reduce<Record<string, string>>(
+      (acc, u: any) => ({ ...acc, [u.id]: u.firstName || 'Unknown' }),
+      {}
+    )
+    return mail.map((m) => toPublicLotMail(m, senderNameById[m.senderUserId] || 'Unknown'))
+  })
+
+  fastify.post(
+    '/lot-mail',
+    async (req: FastifyRequest<{ Body: { recipientName: string; body: string } }>, reply) => {
+      const isSuspended = req.user.tags?.some((tag: string) => tag.toLowerCase() === 'suspended')
+      if (isSuspended) {
+        return reply.status(403).send({ error: 'Account suspended' })
+      }
+      if (!canAccessChat(req.user.tags || [])) {
+        return reply.status(403).send({ error: 'LOT Email requires Usership, Onyx, Legacy, R&D, or Admin' })
+      }
+
+      const recipientName = (req.body.recipientName || '').trim().slice(0, 60)
+      const body = (req.body.body || '').trim().slice(0, MAX_LOT_MAIL_BODY_LENGTH)
+      if (!recipientName) return reply.throw.badParams('Recipient name is required')
+      if (isBlankMessage(body)) {
+        return reply.status(400).send({ error: 'Message cannot be empty' })
+      }
+
+      // Resolve recipient against real users by first name (case-insensitive).
+      // No match (e.g. "Hitomi" isn't on LOT yet) still records the intent —
+      // it stays visible to the sender's own Sync feed.
+      const recipient = await fastify.models.User.findOne({
+        where: {
+          firstName: { [Op.iLike]: recipientName },
+          id: { [Op.not]: req.user.id },
+        },
+        attributes: ['id', 'firstName'],
+      })
+
+      const mail = await fastify.models.LotMail.create({
+        senderUserId: req.user.id,
+        recipientName,
+        recipientUserId: recipient?.id || null,
+        body,
+      })
+
+      const publicMail = toPublicLotMail(mail, req.user.firstName || 'Unknown')
+      sync.emit('lot_mail', publicMail)
+
+      const context = await getLogContext(req.user)
+      await fastify.models.Log.create({
+        userId: req.user.id,
+        event: 'email_sent',
+        text: '',
+        metadata: {
+          lotMailId: mail.id,
+          recipientName,
+          recipientUserId: recipient?.id || null,
+        },
+        context,
+      })
+
+      return publicMail
     }
   )
 

@@ -216,6 +216,27 @@ export type ChatMessageLike = {
   createdAt: Date;
 };
 
+// LOT Email — composed in Log via "/email to <name>", surfaces in Sync
+export type LotMail = {
+  id: string;
+  senderUserId: string;
+  recipientName: string;
+  recipientUserId: string | null;
+  body: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PublicLotMail = {
+  id: string;
+  senderUserId: string;
+  senderName: string;
+  recipientName: string;
+  recipientUserId: string | null;
+  body: string;
+  createdAt: Date;
+};
+
 // Live Message Type
 export type LiveMessage = {
   id: string;
@@ -450,4 +471,5 @@ export type SyncEvents = {
   chatMessage: PublicChatMessage;
   chatMessageLike: ChatMessageLikeEventPayload;
   settings_updated: Record<string, never>;
+  lot_mail: PublicLotMail;
 };
