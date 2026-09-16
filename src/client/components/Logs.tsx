@@ -4057,6 +4057,85 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sovereign_field_pulse') {
+          const confidence  = log.metadata?.confidence  as number  | undefined
+          const energyLevel = log.metadata?.energyLevel as string  | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SFPULSE:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATE</span>
+                  <span className="uppercase tracking-widest">RADIATING</span>
+                </div>
+                {energyLevel && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ENERGY</span>
+                    <span className="uppercase opacity-70">{energyLevel}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{confidence}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystalline_identity_field') {
+          const userIndexOverall    = log.metadata?.userIndexOverall    as number | undefined
+          const activePatternCount  = log.metadata?.activePatternCount  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRYSTID:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">FIELD</span>
+                  <span className="uppercase tracking-widest">CRYSTALLINE</span>
+                </div>
+                <div className="flex gap-x-8 opacity-60 mb-4">
+                  <span>SLOCK</span>
+                  <span>LARC</span>
+                  <span>QIDSOV</span>
+                </div>
+                {userIndexOverall !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX</span>
+                    <span className="tabular-nums">{userIndexOverall}</span>
+                  </div>
+                )}
+                {activePatternCount !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">PATTERNS</span>
+                    <span className="tabular-nums opacity-60">{activePatternCount}</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sovereign_temporal_lock') {
+          const crystallineActive = log.metadata?.crystallineActive as boolean | undefined
+          const patternCount      = log.metadata?.patternCount      as number  | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVTLOCK:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">TEMPORAL</span>
+                  <span className="uppercase tracking-widest">LOCKED</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className={crystallineActive ? 'opacity-80' : 'opacity-30'}>CRYSTID</span>
+                  <span className="opacity-60">DCS</span>
+                  <span className="opacity-60">QRL</span>
+                </div>
+                {patternCount !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">PATTERNS</span>
+                    <span className="tabular-nums opacity-40">{patternCount}</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

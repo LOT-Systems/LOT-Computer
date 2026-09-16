@@ -1227,6 +1227,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_identity_sovereign',
       // v117: sovereign state report (J52 weekly band summary)
       'sovereign_state_report',
+      // v118: sovereign continuity tier (J53 daily pulse — P161/P162/P163)
+      'sovereign_field_pulse',
+      'crystalline_identity_field',
+      'sovereign_temporal_lock',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

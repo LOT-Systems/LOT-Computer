@@ -120,6 +120,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'living-assembly-arc':              'LARC',
   'quantum-identity-sovereign':       'QIDSOV',
   'sovereign_state_report':           'SOV REPORT',
+  'sovereign-field-pulse':            'SFPULSE',
+  'crystalline-identity-field':       'CRYSTID',
+  'sovereign-temporal-lock':          'SOVTLOCK',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

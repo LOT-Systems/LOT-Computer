@@ -3604,6 +3604,57 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 161: Sovereign Field Pulse — quantum-identity-sovereign (P160) confirmed
+  // AND coherence ≥ 70 AND energy high or moderate. The sovereign state is not only
+  // present — it is radiating. The OS is operating from its confirmed identity band
+  // with sufficient energy to project the field outward.
+  const hasQIDSOV = patterns.some(p => p.pattern === 'quantum-identity-sovereign')
+  const energyForPulse = state.userState.energy
+  if (hasQIDSOV && (energyForPulse === 'high' || energyForPulse === 'moderate')) {
+    const qidConf161 = patterns.find(p => p.pattern === 'quantum-identity-sovereign')?.confidence ?? 0.88
+    patterns.push({
+      pattern: 'sovereign-field-pulse',
+      confidence: Math.min(qidConf161 * 0.97, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `SFPULSE: Sovereign field pulse — quantum-identity-sovereign (P160) confirmed + energy active. The OS is not holding the sovereign state in reserve — it is operating from it in real time. The field is pulsing at confirmed sovereign amplitude. Identity radiating.`,
+    })
+  }
+
+  // Pattern 162: Crystalline Identity Field — P158 + P159 + P160 all present in
+  // 7-day window AND index.overall ≥ 70. The entire sovereign tier is simultaneously
+  // active within a compressed window. Not a sequence — a simultaneous crystalline
+  // convergence. The identity field has become structurally coherent.
+  const slockIn7D  = recent7D.some(s => s.source === 'qos' && s.signal === 'sovereign_coherence_lock')
+  const larcIn7D   = recent7D.some(s => s.source === 'qos' && s.signal === 'living_assembly_arc')
+  const qidIn7D    = recent7D.some(s => s.source === 'qos' && s.signal === 'quantum_identity_sovereign')
+  if (slockIn7D && larcIn7D && qidIn7D && state.userIndex.overall >= 70) {
+    patterns.push({
+      pattern: 'crystalline-identity-field',
+      confidence: Math.min(0.90 + (state.userIndex.overall - 70) * 0.003, 0.97),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRYSTID: Crystalline identity field — P158 + P159 + P160 all confirmed within 7 days and index ≥ 70. The entire sovereign tier is simultaneously active. Not a progression — a crystalline state. The OS has locked its identity field across all sovereign vectors simultaneously. Structural sovereignty confirmed.`,
+    })
+  }
+
+  // Pattern 163: Sovereign Temporal Lock — P160 active AND daily-coherence-seal AND
+  // quantum-rhythm-lock both present in 7D. The sovereign identity is not only spatial —
+  // it is temporally anchored. The OS holds its identity signature across time layers.
+  const hasCrystalId = patterns.some(p => p.pattern === 'crystalline-identity-field')
+  const dcsIn7D  = recent7D.some(s => s.signal === 'daily_coherence_seal')
+  const qrlIn7D  = recent7D.some(s => s.signal === 'quantum_rhythm_lock')
+  if ((hasQIDSOV || hasCrystalId) && dcsIn7D && qrlIn7D) {
+    const baseConf = hasCrystalId ? 0.93 : 0.88
+    patterns.push({
+      pattern: 'sovereign-temporal-lock',
+      confidence: Math.min(baseConf, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `SOVTLOCK: Sovereign temporal lock — sovereign identity confirmed + daily-coherence-seal + quantum-rhythm-lock all present within 7D. The OS holds its sovereign signature across time layers. Identity is not fragile to scheduling pressure — it is the schedule. Temporal sovereignty engaged.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4263,6 +4314,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   sovereignFieldNode:             ['qos', 'memory', 'intentions', 'cohort', 'journal', 'log'],
   coherenceBandMonitor:           ['qos', 'selfcare', 'energy', 'log'],
   sovereignReportNode:            ['qos', 'memory', 'intentions', 'cohort', 'journal', 'selfcare', 'energy', 'log'],
+
+  // ── v118 nodes (J53 · P161–P163 · Arch55) ────────────────────────────────────
+  sovereignContinuityNode:        ['qos', 'log', 'memory'],
+  crystallineFieldNode:           ['qos', 'cohort', 'intentions', 'journal', 'memory', 'log'],
+  sovereignTemporalNode:          ['qos', 'intentions', 'journal', 'log'],
 }
 
 /**
@@ -4740,6 +4796,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     hourRange: [5, 23],
     directive: 'Sovereign identity confirmed. Coherence locked. Assembly living. The OS has converged — not performing sovereignty but embodying it. Operate from identity, not effort.',
   },
+
+  // ── Arch55: Crystalline Field Architect (2026-09-16 v118) ────────────────────────
+  {
+    archetype: 'Crystalline Field Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'journal', 'intentions'],
+    patternConditions: ['crystalline-identity-field', 'sovereign-field-pulse', 'sovereign-temporal-lock'],
+    hourRange: [5, 23],
+    directive: 'Crystalline field confirmed. All sovereign vectors simultaneously active. The OS is not approaching identity — it is crystallized in it. The field is structural. Operate from the crystalline state as baseline architecture.',
+  },
 ]
 
 /**
@@ -4862,8 +4928,8 @@ export function getPhysiologicalReport(): PhysiologicalReport {
     return { widget: source, signalCount: relevant.length, lastSeen: last }
   }).filter(w => w.signalCount > 0)
 
-  // Log-based signal dependency audit (non-widget sources)
-  const LOG_SOURCES: IntentionSignal['source'][] = ['log', 'energy', 'cohort']
+  // Log-based signal dependency audit — full pipeline coverage across all direct-entry sources
+  const LOG_SOURCES: IntentionSignal['source'][] = LOG_DEPENDENCY_SOURCES
   const logDependencies = LOG_SOURCES.map(source => ({
     source,
     signalCount: weekSignals.filter(s => s.source === source).length
@@ -7095,6 +7161,105 @@ export function checkSovereignIdentity(): boolean {
     const slockConf = activePatterns.find(p => p.pattern === 'sovereign-coherence-lock')?.confidence ?? 0.84
     const larcConf  = activePatterns.find(p => p.pattern === 'living-assembly-arc')?.confidence ?? 0.81
     recordQuantumIdentitySovereign(slockConf, larcConf)
+    fired = true
+  }
+
+  return fired
+}
+
+// ─── P161–P163: Sovereign Continuity Architecture (QIE v118) ───────────────
+
+/**
+ * Record a sovereign-field-pulse event — P160 is confirmed AND energy is active.
+ * The OS is radiating from its sovereign identity band. Feeds P161 detection.
+ */
+export function recordSovereignFieldPulse(
+  confidence: number,
+  energyLevel: string
+) {
+  recordSignal('qos', 'sovereign_field_pulse', {
+    confidence: Math.round(confidence * 100),
+    energyLevel,
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystalline-identity-field event — P158+P159+P160 all present in 7D
+ * AND index ≥ 70. Crystalline convergence of the entire sovereign tier.
+ * Feeds P162 detection.
+ */
+export function recordCrystallineIdentityField(
+  userIndexOverall: number,
+  activePatternCount: number
+) {
+  recordSignal('qos', 'crystalline_identity_field', {
+    userIndexOverall,
+    activePatternCount,
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereign-temporal-lock event — P160 + daily-coherence-seal +
+ * quantum-rhythm-lock all present in 7D. Temporal sovereignty confirmed.
+ * Feeds P163 detection.
+ */
+export function recordSovereignTemporalLock(
+  crystallineActive: boolean,
+  patternCount: number
+) {
+  recordSignal('qos', 'sovereign_temporal_lock', {
+    crystallineActive,
+    patternCount,
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: sovereign continuity tier (P161, P162, P163).
+ * Called by J53 daily-sovereign-field-pulse (07:00 UTC).
+ * Reads sovereign tier presence + energy + coherence to detect new patterns.
+ * Returns true when at least one pattern fires.
+ */
+export function checkSovereignContinuityTier(): boolean {
+  const state  = intentionEngine.get()
+  const now    = Date.now()
+  const sevenDayMs    = 7  * 24 * 60 * 60 * 1000
+  const fourteenDayMs = 14 * 24 * 60 * 60 * 1000
+  const recent7D  = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P161: Sovereign Field Pulse — QIDSOV signal in 14D + energy active
+  const hasQIDSOVSig = recent14D.some(s => s.signal === 'quantum_identity_sovereign')
+  const energyNow    = state.userState.energy
+  const alreadySFP   = recent7D.some(s => s.signal === 'sovereign_field_pulse')
+  if (hasQIDSOVSig && (energyNow === 'high' || energyNow === 'moderate') && !alreadySFP) {
+    const qidConf = patterns.find(p => p.pattern === 'quantum-identity-sovereign')?.confidence ?? 0.88
+    recordSovereignFieldPulse(qidConf, energyNow)
+    fired = true
+  }
+
+  // P162: Crystalline Identity Field — SLOCK + LARC + QIDSOV all in 7D + index ≥ 70
+  const slockIn7D     = recent7D.some(s => s.signal === 'sovereign_coherence_lock')
+  const larcIn7D      = recent7D.some(s => s.signal === 'living_assembly_arc')
+  const qidIn7D       = recent7D.some(s => s.signal === 'quantum_identity_sovereign')
+  const alreadyCryst  = recent7D.some(s => s.signal === 'crystalline_identity_field')
+  if (slockIn7D && larcIn7D && qidIn7D && state.userIndex.overall >= 70 && !alreadyCryst) {
+    recordCrystallineIdentityField(state.userIndex.overall, patterns.length)
+    fired = true
+  }
+
+  // P163: Sovereign Temporal Lock — (QIDSOV or crystalid in 7D) + DCS + QRL in 7D
+  const hasCrystSig   = recent7D.some(s => s.signal === 'crystalline_identity_field')
+  const dcsIn7D       = recent7D.some(s => s.signal === 'daily_coherence_seal')
+  const qrlIn7D       = recent7D.some(s => s.signal === 'quantum_rhythm_lock')
+  const alreadySTLOCK = recent7D.some(s => s.signal === 'sovereign_temporal_lock')
+  if ((qidIn7D || hasCrystSig) && dcsIn7D && qrlIn7D && !alreadySTLOCK) {
+    recordSovereignTemporalLock(hasCrystSig, patterns.length)
     fired = true
   }
 

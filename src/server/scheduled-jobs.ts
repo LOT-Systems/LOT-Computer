@@ -1763,6 +1763,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklySovereignStateReport()) {
     await executeWeeklySovereignStateReport()
   }
+  // Check daily sovereign field pulse (07:00 UTC every day) — Job 53
+  if (shouldRunDailySovereignFieldPulse()) {
+    await executeDailySovereignFieldPulse()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -4147,6 +4151,170 @@ async function executeWeeklySovereignStateReport(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Weekly sovereign state report failed:', error.message)
     isWeeklySovereignStateReportRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J53: Daily Sovereign Field Pulse (07:00 UTC every day) ─────────────────
+// Reads active users. Checks whether P160 QIDSOV has fired in 14D AND P162/P163
+// signals are accumulating. Writes sovereign_field_pulse, crystalline_identity_field,
+// or sovereign_temporal_lock log entries when conditions are met.
+
+let isDailySovereignFieldPulseRunning = false
+let lastDailySovereignFieldPulseRun: Date | null = null
+
+function shouldRunDailySovereignFieldPulse(): boolean {
+  const now = dayjs()
+  if (isDailySovereignFieldPulseRunning) return false
+  if (lastDailySovereignFieldPulseRun) {
+    const lastRun = dayjs(lastDailySovereignFieldPulseRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 7 // 07:00 UTC daily
+}
+
+async function executeDailySovereignFieldPulse(): Promise<JobResult> {
+  const jobName = 'daily-sovereign-field-pulse'
+  const executedAt = new Date().toISOString()
+  if (isDailySovereignFieldPulseRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySovereignFieldPulseRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SOVEREIGN FIELD PULSE — 07:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const activeUsers = await getActiveUsers()
+    const now = dayjs()
+    const sevenDaysAgo     = now.subtract(7, 'day').toDate()
+    const fourteenDaysAgo  = now.subtract(14, 'day').toDate()
+    const todayStart       = now.startOf('day').toDate()
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const recentLogs14D = await Log.findAll({
+          where: {
+            userId: user.id,
+            event: { [Op.in]: [
+              'quantum_identity_sovereign',   // P160
+              'sovereign_coherence_lock',     // P158
+              'living_assembly_arc',          // P159
+              'daily_coherence_seal',         // DCS
+              'quantum_rhythm_lock',          // QRL
+              'sovereign_field_pulse',        // P161 (avoid dup)
+              'crystalline_identity_field',   // P162 (avoid dup)
+              'sovereign_temporal_lock',      // P163 (avoid dup)
+              'energy_state', 'energy_update', 'energy_check',
+            ] as any[] },
+            createdAt: { [Op.gte]: fourteenDaysAgo },
+          },
+          attributes: ['event', 'createdAt', 'metadata'],
+          order: [['createdAt', 'DESC']],
+        })
+
+        const events14D = recentLogs14D.map((l: any) => l.event as string)
+        const events7D  = recentLogs14D.filter((l: any) =>
+          new Date((l as any).createdAt).getTime() >= sevenDaysAgo.getTime()
+        ).map((l: any) => l.event as string)
+
+        const hasQIDSOV14D = events14D.includes('quantum_identity_sovereign')
+        const hasSLOCK7D   = events7D.includes('sovereign_coherence_lock')
+        const hasLARC7D    = events7D.includes('living_assembly_arc')
+        const hasQIDSOV7D  = events7D.includes('quantum_identity_sovereign')
+        const hasDCS7D     = events7D.includes('daily_coherence_seal')
+        const hasQRL7D     = events7D.includes('quantum_rhythm_lock')
+
+        // Avoid writing P161/P162/P163 twice in one day
+        const alreadySFP    = events14D.filter(e => e === 'sovereign_field_pulse')
+          .length > (recentLogs14D.filter((l: any) =>
+            (l as any).event === 'sovereign_field_pulse' &&
+            new Date((l as any).createdAt).getTime() >= todayStart.getTime()
+          ).length > 0 ? 0 : -1)
+        const alreadyCryst  = events7D.includes('crystalline_identity_field')
+        const alreadySTLOCK = events7D.includes('sovereign_temporal_lock')
+
+        // Energy proxy: check recent energy logs for high/moderate state
+        const recentEnergyLogs = recentLogs14D.filter((l: any) =>
+          ['energy_state', 'energy_update', 'energy_check'].includes((l as any).event) &&
+          new Date((l as any).createdAt).getTime() >= sevenDaysAgo.getTime()
+        )
+        const latestEnergy: string = recentEnergyLogs.length > 0
+          ? ((recentEnergyLogs[0] as any).metadata?.energy as string ?? 'unknown')
+          : 'unknown'
+        const energyActive = latestEnergy === 'high' || latestEnergy === 'moderate'
+
+        // P161: Sovereign Field Pulse
+        const sfpToday = recentLogs14D.some((l: any) =>
+          (l as any).event === 'sovereign_field_pulse' &&
+          new Date((l as any).createdAt).getTime() >= todayStart.getTime()
+        )
+        if (hasQIDSOV14D && energyActive && !sfpToday) {
+          await Log.create({
+            userId: user.id,
+            event: 'sovereign_field_pulse',
+            text: '',
+            metadata: {
+              confidence: 88,
+              energyLevel: latestEnergy,
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${user.id}] P161 SFPULSE — energy:${latestEnergy}`)
+        }
+
+        // P162: Crystalline Identity Field
+        if (hasSLOCK7D && hasLARC7D && hasQIDSOV7D && !alreadyCryst) {
+          await Log.create({
+            userId: user.id,
+            event: 'crystalline_identity_field',
+            text: '',
+            metadata: {
+              userIndexOverall: 0, // server can't read client index — 0 signals server origin
+              activePatternCount: [hasSLOCK7D, hasLARC7D, hasQIDSOV7D].filter(Boolean).length,
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${user.id}] P162 CRYSTID — all sovereign tier signals in 7D`)
+        }
+
+        // P163: Sovereign Temporal Lock
+        const hasSovBase = hasQIDSOV7D || alreadyCryst
+        if (hasSovBase && hasDCS7D && hasQRL7D && !alreadySTLOCK) {
+          await Log.create({
+            userId: user.id,
+            event: 'sovereign_temporal_lock',
+            text: '',
+            metadata: {
+              crystallineActive: alreadyCryst,
+              patternCount: [hasSLOCK7D, hasLARC7D, hasQIDSOV7D, hasDCS7D, hasQRL7D].filter(Boolean).length,
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${user.id}] P163 SOVTLOCK — temporal sovereignty confirmed`)
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${user.id} sovereign field pulse failed: ${(userErr as any).message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereign continuity events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('DAILY SOVEREIGN FIELD PULSE COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastDailySovereignFieldPulseRun = new Date()
+    isDailySovereignFieldPulseRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Daily sovereign field pulse failed:', error.message)
+    isDailySovereignFieldPulseRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
