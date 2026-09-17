@@ -190,10 +190,6 @@ async function checkUsers(): Promise<SystemCheck> {
 async function checkSettings(): Promise<SystemCheck> {
   const start = Date.now()
   try {
-    // Check if User model is available (settings are part of User model)
-    await models.User.findOne()
-
-    // Check if settings page bundle exists
     const settingsPagePath = path.join(process.cwd(), 'dist/client/js/app.js')
     if (!fs.existsSync(settingsPagePath)) {
       return {
@@ -288,28 +284,6 @@ async function checkSystems(): Promise<SystemCheck> {
       }
     }
 
-    // Check if node_modules exists (yarn dependencies installed)
-    const nodeModulesPath = path.join(process.cwd(), 'node_modules')
-    if (!fs.existsSync(nodeModulesPath)) {
-      return {
-        name: 'Systems',
-        status: 'error',
-        message: 'Dependencies not installed',
-        duration: Date.now() - start,
-      }
-    }
-
-    // Check if package.json exists
-    const packageJsonPath = path.join(process.cwd(), 'package.json')
-    if (!fs.existsSync(packageJsonPath)) {
-      return {
-        name: 'Systems',
-        status: 'error',
-        message: 'package.json not found',
-        duration: Date.now() - start,
-      }
-    }
-
     // Check if build output exists (TypeScript compiled successfully)
     const serverBuildPath = path.join(process.cwd(), 'dist/server/server/index.js')
     if (!fs.existsSync(serverBuildPath)) {
@@ -336,6 +310,8 @@ async function checkSystems(): Promise<SystemCheck> {
   }
 }
 
+const CRITICAL_CHECK_NAMES = new Set(['Database stack', 'Authentication engine', 'Memory Engine'])
+
 async function performHealthChecks(): Promise<{
   version: string
   timestamp: string
@@ -345,19 +321,25 @@ async function performHealthChecks(): Promise<{
   overall: 'ok' | 'degraded' | 'error'
 }> {
   const checks = await Promise.all([
+    checkDatabase(),
     checkAuth(),
+    checkMemory(),
     checkSync(),
     checkSettings(),
     checkUsers(),
     checkSystems(),
     checkWeatherAPI(),
-    checkDatabase(),
-    checkMemory(),
   ])
 
-  // Determine overall status
-  const hasErrors = checks.some((c) => c.status === 'error')
-  const overall = hasErrors ? 'error' : 'ok'
+  const criticalError = checks.some(
+    (c) => c.status === 'error' && CRITICAL_CHECK_NAMES.has(c.name)
+  )
+  const anyError = checks.some((c) => c.status === 'error')
+  const overall: 'ok' | 'degraded' | 'error' = criticalError
+    ? 'error'
+    : anyError
+      ? 'degraded'
+      : 'ok'
 
   return {
     version: VERSION,
