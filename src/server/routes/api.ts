@@ -1128,6 +1128,8 @@ export default async (fastify: FastifyInstance) => {
       // v73: weekly LOT® AI story (Job 24 output) + archetype directive pulse (Job 25 output)
       'lot_ai_story',
       'archetype_directive_pulse',
+      // on-demand Story feature (POST /story) — user-triggered, distinct from the scheduled lot_ai_story job
+      'generated_story',
       // v76: quantum learning spiral · accountability arc · full presence arc · pattern health scan
       'quantum_learning_spiral',
       'accountability_arc',

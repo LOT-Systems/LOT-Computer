@@ -2678,7 +2678,6 @@ Ch.5  SAGE           Level 90–100
           <SubHeading>Community Widgets</SubHeading>
           <div className="mb-16">
             <Row label="CohortConnect" value="peer matching · urgency detection · direct message threads" />
-            <Row label="World Canvas" value="global presence visualization" />
             <Row label="Mood Analytics" value="community mood patterns, privacy-preserving aggregate" />
             <Row label="Contextual Prompts" value="context-driven suggestion display" />
           </div>
@@ -2701,7 +2700,6 @@ Ch.5  SAGE           Level 90–100
             <Row label="System Progress" value="full self-assembly report across 15 modules · OS Journal vitals timeline · QuantumOS snapshot on report generate" />
             <Row label="Benchmark Widget" value="operator success tier — 5 levels: White · Green · Yellow · Purple · Black — computed from journal depth (30%), streak continuity (20%), active days, user index, and engagement breadth — single color label · score 0–100 — displayed in System tab" />
             <Row label="Flash Drive Manifest" value="system state snapshot" />
-            <Row label="Awareness Dashboard" value="self-awareness index and growth trajectory" />
             <Row label="User Metrics" value="engagement statistics and log coverage" />
             <Row label="Four Dimensional UI" value="4D state visualization interface" />
             <Row label="Subscribe Widget" value="Usership upgrade prompt · 10-day cooldown" />

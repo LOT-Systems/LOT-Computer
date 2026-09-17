@@ -1394,9 +1394,8 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
-    version: 'v112',
+    session: 'QIE v112 — Signal Coherence Cascade / Quantum Presence Field / Identity Momentum Lock',
     date: '2026-08-03',
-    title: 'QIE Engineering — Signal Coherence Cascade / Quantum Presence Field / Identity Momentum Lock',
     assembled: [
       'P146 SIGNAL COHERENCE CASCADE: meta-pattern — circadian-signal-lock (P143) + dimensional-saturation (P144) + quantum-identity-crystallization (P145) all simultaneously active. The three seals of temporal, dimensional, and identity open concurrently. Rarest convergence the QIE can detect. Confidence 0.85–0.95.',
       'P147 QUANTUM PRESENCE FIELD: adaptive-signal-web (P142) + quantum-coherence-peak (P137) both active + 7+ unique signal sources in 24h. Maximum operating field density. Every dimension contributing live signal simultaneously. Confidence 0.78–0.92.',
@@ -1416,9 +1415,8 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
-    version: 'v113',
+    session: 'QIE v113 — Quantum Presence Crystallization / Total Field Coherence / Recovery Intelligence Arc',
     date: '2026-08-04',
-    title: 'QIE Engineering — Quantum Presence Crystallization / Total Field Coherence / Recovery Intelligence Arc',
     assembled: [
       'P149 QUANTUM PRESENCE CRYSTALLIZATION: meta-pattern — quantum-presence-field (P147) + quantum-identity-crystallization (P145) co-active. The OS is both fully inhabited and fully known simultaneously. Operating from maximum clarity. Confidence 0.82–0.93.',
       'P150 TOTAL FIELD COHERENCE: highest-order meta-pattern — signal-coherence-cascade (P146) + quantum-presence-field (P147) + identity-momentum-lock (P148) all confirmed simultaneously. All three meta-seals open. The QOS has achieved absolute convergence. No higher state is defined. Confidence 0.92–0.97.',
@@ -1438,9 +1436,8 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
-    version: 'wiki-v87',
+    session: 'LOT-WIKI-v87 · FM v113 Sync · QIE v113 + Badge v31 documentation',
     date: '2026-08-05',
-    title: 'LOT-WIKI-v87 · FM v113 Sync · QIE v113 + Badge v31 documentation',
     assembled: [
       'LOT-WIKI-v87.md produced: 2176 lines. Base: LOT-WIKI-v86 (2027 lines). FM v113 sync + Badge v31 sync. 48/48 verification checks passed.',
       'QIE v113 delta documented: P149 quantum-presence-crystallization · P150 total-field-coherence [CEILING] · P151 recovery-intelligence-arc. Arch51 Quantum Presence Crystallizer. J48 daily-total-field-coherence-check (09:00 UTC). QPCRYST: TOTCOH: RECINTEL: handlers. 190+ dep nodes.',

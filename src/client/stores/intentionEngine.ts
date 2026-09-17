@@ -4072,7 +4072,7 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
  * tracked separately in the physiological report log-dependency audit.
  */
 export const LOG_DEPENDENCY_SOURCES: IntentionSignal['source'][] = [
-  'log', 'energy', 'cohort', 'recipe', 'goals', 'qos', 'intentions', 'memory', 'planner', 'selfcare', 'journal', 'medical', 'resilience', 'badges', 'calculator', 'ecosystem',
+  'log', 'energy', 'cohort', 'recipe', 'goals', 'qos', 'intentions', 'memory', 'planner', 'selfcare', 'journal', 'medical', 'resilience', 'badges', 'calculator',
 ]
 
 /** Returns which signal sources a given widget depends on. */
