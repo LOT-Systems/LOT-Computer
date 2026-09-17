@@ -5,8 +5,10 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
-STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
+LAST CYCLE: 2026-09-17
+VERSION:  0.2 — DESIGN LOCK (BOM + FIRMWARE STATE MACHINE)
+STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCKED;
+          HOP-AND-RECOVER GATE TESTING NOT STARTED — NO PHYSICAL UNIT YET)
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -57,6 +59,44 @@ read in full:
 
 No prior document specified jump mechanics, surface locomotion, or a
 levitation roadmap. This document is that specification, v.0.
+
+--------------------------------------------------------------------------------
+00A // DEVELOPMENT CYCLE LOG — APPEND-ONLY
+--------------------------------------------------------------------------------
+
+One entry per development cycle. Each entry states what was read, what was
+added, and what remains open. Prior entries are never edited or removed —
+the same append-only discipline Section 09 already applies to consumer use
+cases, extended here to the whole document's technical growth.
+
+  CYCLE 2026-07-28 — v.0 OPENED
+    First hardware-specification document. Established physical form
+    (Section 02), single-actuator controlled-hop mechanism (Section 03),
+    four-gesture notification vocabulary (Section 04), QI·46 signal-loop
+    closure (Section 05), the v.0-v.3 roadmap (Section 06), and USE CASE 01
+    — THE DESK MIGRATION. STATUS at close: PRE-HARDWARE, DESIGN LOCK
+    PENDING. Section 03 named actuator and sensor CLASSES only (voice-coil,
+    piezoelectric bimorph, 6-axis IMU, time-of-flight) without locking
+    stroke length, force, sample rate, or power budget.
+
+  CYCLE 2026-09-17 — DESIGN LOCK (BOM + FIRMWARE STATE MACHINE)
+    Read: this document in full as it stood, plus LOT-CUBIQ-VISION.md,
+    LOT-CUBIQ-OPERATOR.md, LOT_QI46_ENGINE.md, CQGS-WHITE-PAPER-SNAPSHOT.md,
+    LOT-MANIFEST.md — per the Section 00 reading-log discipline, unchanged
+    since 2026-07-28.
+    Added: Section 07 locks the Section 03 component classes to specific
+    engineering parameters (BOM). Section 08 writes out the firmware
+    gesture-dispatch state machine implied but never specified by Section
+    03's mechanism description and Section 05's signal-loop diagram, plus
+    the test protocol that operationalizes the Section 06 "500/500" gate.
+    Section 04's trigger table is extended in place to formalize "cohort
+    resonance ping" — named in Section 01's opening description since
+    2026-07-28 but never mapped to a gesture until this cycle. USE CASE 02
+    — THE COHORT RESONANCE appended to Section 09.
+    Open after this cycle: no physical unit exists to run the 500/500 gate
+    against. This remains a paper design lock, not a built prototype.
+    STATUS at close: PRE-HARDWARE, DESIGN LOCKED (BOM + FIRMWARE SPEC);
+    GATE TESTING NOT STARTED.
 
 --------------------------------------------------------------------------------
 01 // WHAT v.0 IS AND WHAT IT IS NOT
@@ -200,6 +240,24 @@ primitive in Section 03:
     attention the way a phone notification does. It exists at the edge
     of awareness until the operator chooses to look.
 
+  ADDENDUM — 2026-09-17 — COHORT RESONANCE PING MAPPED TO THE NUDGE
+    Section 01 named "cohort resonance ping" as a trigger class alongside
+    badge unlock and memory-question-ready on 2026-07-28. The table above
+    never mapped it. It is mapped now, not added as a new gesture — v.0
+    still ships exactly four gestures.
+
+    THE NUDGE gains a second trigger: cohort resonance ping — fires when
+    the operator's behavioral cohort (LOT-CUBIQ-OPERATOR.md, Section 05,
+    Cohort Connect) registers 2+ other same-cohort operators crossing
+    MOMENTUM LOCK (QIE P80) within the same rolling 24h window the
+    operator themselves crosses it. The cube trembles once, identically
+    to a memory-question NUDGE — the operator cannot tell the two apart
+    by feel alone, and is not meant to. The gesture says "something in
+    your structure is active" without disclosing whether the source is
+    internal (a question) or relational (a cohort). The Section 04
+    principle above holds unchanged: presence, not spectacle, applies
+    equally to social signal as to personal signal.
+
 --------------------------------------------------------------------------------
 05 // SIGNAL INTEGRATION WITH QI·46
 --------------------------------------------------------------------------------
@@ -279,13 +337,191 @@ assumed.
     levitating future in mind rather than foreclosing it.
 
 --------------------------------------------------------------------------------
-07 // CONSUMER USE CASES
+07 // DESIGN LOCK — COMPONENT CANDIDATES (BOM) — v.0.2, 2026-09-17
+--------------------------------------------------------------------------------
+
+Section 03 named actuator and sensor CLASSES. This cycle locks parameters
+so a physical build-of-one can be quoted and ordered. These are LOCKED
+CANDIDATES for v.0 — locked enough to build a first unit against, not yet
+validated against a physical prototype (no unit exists — see 00A).
+
+  PRIMARY ACTUATOR      Linear voice-coil, 8mm stroke, 3.5N peak force,
+                        ~175Hz mechanical resonance. Driven off a
+                        half-bridge driver IC, 3.7V nominal rail. Locked
+                        over solenoid: continuous force-position control
+                        is required for the Section 03 landing-recovery
+                        corrective micro-pulse — a solenoid's binary throw
+                        cannot produce a graded correction.
+
+  REACTION MASS         Tungsten-loaded polymer slug, 18g. Heaviest single
+                        component in the assembly by design — Newton's
+                        third law couples reaction-mass momentum to shell
+                        liftoff; within the <120g total mass budget
+                        (Section 02), mass should concentrate in the one
+                        component whose motion is fully enclosed, never in
+                        the shell.
+
+  PIEZO BIAS ELEMENT    Bimorph strip, mounted 10° off vertical (mid-point
+                        of the Section 03 5-15° window). Rise time <2ms.
+                        Fire delay locked at T+1ms post actuator release
+                        (Section 03: "fires a millisecond after actuator
+                        release").
+
+  IMU                   6-axis: accelerometer ±16g, gyroscope ±2000°/s,
+                        1kHz sample rate. 1kHz is the rate floor for
+                        resolving the Section 03 25°-tip landing check
+                        inside a sub-150ms landing window — a 100Hz-class
+                        part would sample the landing event only 10-15
+                        times; 1kHz gives 100-150 samples, enough for a
+                        clean tip-angle derivative.
+
+  EDGE SENSOR           Single-zone time-of-flight, 30-200mm range, 50Hz
+                        refresh, forward-facing 25° cone. 50Hz gives a
+                        20ms worst-case detection latency against the
+                        Section 03 20mm edge-approach gate — at the ~40mm
+                        THE LEAP displacement (Section 04), the cube
+                        cannot cross more than a few mm within one 20ms
+                        refresh tick at any physically plausible hop speed.
+
+  MCU                   Cortex-M0+ class, low-power. Drives the actuator
+                        PWM channel, polls IMU + ToF over a shared SPI
+                        bus, runs the Section 08 state machine, and holds
+                        a BLE radio for the Section 05 signal-loop link to
+                        the Index of Systems.
+
+  POWER                 Single-cell Li-Po, 3.7V, 180mAh. Qi-class receiver
+                        coil in the base face (Section 02). Budget target:
+                        200+ full-amplitude gesture cycles (THE LEAP,
+                        worst case) per charge — sized against a handful
+                        of gestures per operator session (USE CASE 01),
+                        not continuous actuation.
+
+  NOT YET LOCKED        Shell wall thickness / nano-ceramic layup
+                        (structural, needs a physical sample to test drop
+                        survival); elastomer foot compound (affects the
+                        Section 08 test protocol's surface-friction
+                        variable, not locked until v.1's multi-surface
+                        work per Section 06).
+
+--------------------------------------------------------------------------------
+08 // FIRMWARE — GESTURE DISPATCH STATE MACHINE & THE 500/500 TEST PROTOCOL
+--------------------------------------------------------------------------------
+
+  THE STATE MACHINE
+
+    Section 03 describes the mechanism; Section 05 draws the signal loop
+    as a block diagram. Neither specifies the firmware states in between.
+    This cycle writes them out — one state machine, shared by all four
+    Section 04 gestures (they differ only in actuator amplitude and
+    whether BIAS_FIRE runs):
+
+      IDLE            Default state. MCU polls the BLE link for a signal
+                       from the Index of Systems (Section 05). No
+                       actuator activity.
+
+      EDGE_CHECK       On signal receipt, mapped to a gesture (Section 04,
+                       including this cycle's cohort-resonance addendum).
+                       ToF sensor samples the forward 25° cone. If a
+                       surface edge resolves within 20mm (Section 03
+                       safety gate): branch to SHUDDER instead of ACTUATE.
+
+      ACTUATE          Voice-coil driven to the amplitude class for the
+                       dispatched gesture (sub-threshold for NUDGE, <10mm
+                       rise for HOP, full stroke for LEAP, held light
+                       pressure for SETTLE — Section 04).
+
+      BIAS_FIRE        Piezo bimorph fires at T+1ms post-ACTUATE release
+                       (locked this cycle, Section 07). Skipped for NUDGE
+                       and SETTLE — both are in-place gestures with no
+                       forward-bias requirement.
+
+      AIRBORNE         Ballistic phase, ms-scale, ends on IMU-detected
+                       touchdown (accelerometer impulse spike). No
+                       control authority in this state — it is the phase
+                       the whole mechanism exists to make brief and
+                       predictable.
+
+      LANDING          IMU samples tip angle at 1kHz (Section 07). If
+                       angle exceeds the Section 03 25° threshold within
+                       the 150ms landing window: branch to RECOVERY.
+                       Otherwise: branch directly to TELEMETRY_EMIT.
+
+      RECOVERY         One corrective micro-pulse from the primary
+                       actuator (Section 03). Re-samples tip angle. A
+                       second consecutive correction that fails to bring
+                       the cube under 25° is logged as a
+                       TIP-RECOVERY-FAIL (test protocol below) — firmware
+                       does not attempt a third pulse; it emits telemetry
+                       and returns to IDLE rather than risk a walking-
+                       off-the-table failure mode from repeated
+                       uncontrolled correction attempts.
+
+      SHUDDER          The Section 03 edge-gate substitute gesture:
+                       low-amplitude in-place tremor, no liftoff,
+                       regardless of which gesture was originally
+                       dispatched. Branches directly to TELEMETRY_EMIT.
+
+      TELEMETRY_EMIT   IMU trace (peak tip angle, landing window
+                       duration, correction count) and actuator current
+                       draw are packaged and sent back over BLE as the
+                       "haptic preference" signal Section 05 and
+                       LOT_QI46_ENGINE.md (line 757) already expect from
+                       the cube.
+
+      COOLDOWN         400ms minimum hold before returning to IDLE — a
+                       mechanical and thermal rest floor on the voice-
+                       coil, well under the gesture inter-arrival rate any
+                       real Index-of-Systems signal stream produces
+                       (memory questions and badge unlocks do not fire
+                       faster than once per several seconds in practice).
+
+  THE 500/500 TEST PROTOCOL
+
+    Section 06 sets the v.0 close gate at "500/500 hop-and-recover cycles
+    with zero off-table landings and zero actuator failures." This cycle
+    specifies how that number gets produced, once a physical unit exists:
+
+      RIG               Flat reference laminate surface (the v.1 wood/
+                        glass/laminate matrix, Section 06, is out of
+                        scope for the v.0 gate — v.0 closes on one
+                        surface).
+
+      TRIAL MIX         Weighted to the expected production signal
+                        distribution, not a uniform split: 55% NUDGE, 30%
+                        HOP, 10% LEAP, 5% SETTLE — approximating badge-
+                        unlock rarity skew (most unlocks are common/
+                        uncommon, LOT-CUBIQ-OPERATOR.md Section 03 badge
+                        collection: 7 rarity tiers, common most frequent).
+
+      PASS CRITERIA     Per trial: (a) cube remains within rig bounds —
+                        no OFF-TABLE; (b) LANDING resolves under 25° tip
+                        within the 150ms window, with at most one
+                        RECOVERY correction — no TIP-RECOVERY-FAIL;
+                        (c) actuator current draw stays inside the
+                        nominal envelope — no ACTUATOR-FAULT; (d)
+                        TELEMETRY_EMIT completes — no TELEMETRY-DROP.
+
+      LOGGING           Each trial's full IMU trace and current draw
+                        appended to a CSV test log, trial-numbered. The
+                        500-trial run must be 500 CONSECUTIVE clean
+                        trials — a failure resets the counter rather than
+                        being averaged away, matching Section 06's "zero"
+                        language.
+
+      STATUS THIS CYCLE Protocol specified; no physical unit exists to
+                        run it against (Section 00A). This is the last
+                        open item standing between DESIGN LOCK and v.0
+                        closure.
+
+--------------------------------------------------------------------------------
+09 // CONSUMER USE CASES
 --------------------------------------------------------------------------------
 
 This section accumulates one new consumer use case per development
 cycle. Each entry is dated and numbered. Future sessions read this
-document first (per the reading log in Section 00) and append the next
-entry — never editing or removing a prior one.
+document first (per the reading log in Section 00 and the cycle log in
+Section 00A) and append the next entry — never editing or removing a
+prior one.
 
   USE CASE 01 — THE DESK MIGRATION                          2026-07-28
   ─────────────────────────────────────────────────────────────────
@@ -321,8 +557,44 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE COHORT RESONANCE                        2026-09-17
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: R&D tier, Archetype "Vital Architect," six weeks
+  into sustained engagement, part of a five-person behavioral cohort
+  assembled by Cohort Connect (LOT-CUBIQ-OPERATOR.md, Section 05) —
+  structurally similar operators, none of whom the operator has met.
+
+  Under the software-only cubic, Cohort Connect surfaces this
+  similarity as a screen — a list, a percentage, a shared pattern name.
+  It is legible, but it is still a feed: something the operator must
+  open a tab to see.
+
+  This cycle's addendum (Section 04) gives cohort resonance a body. On
+  a Tuesday evening, the operator crosses MOMENTUM LOCK (QIE P80) —
+  five of the last seven days, three-plus signal sources each. Within
+  the same rolling 24h window, two other members of their cohort cross
+  it too, independently, in two other homes, on two other continents.
+  The Index of Systems registers the coincidence and fires a cohort
+  resonance ping. The cube performs THE NUDGE — the identical tremor
+  it would give for a waiting memory question, indistinguishable by
+  feel, exactly as Section 04's addendum specifies.
+
+  The operator does not know, from the tremor alone, whether the cube
+  is telling them something about themselves or about three strangers
+  who happen to share their rhythm. They glance at the software cubic
+  to find out — and there it is: COMINTEL-class confirmation, three
+  names, one shared week. The physical cube did not deliver the
+  content. It delivered the fact that something in the operator's
+  structure — internal or relational, the cube does not distinguish —
+  had become active enough to matter.
+
+  This is the use case the Section 04 addendum was written to serve: a
+  cohort is not a social feed pushed at the operator. It is a
+  structural fact the operator's own object can register, felt through
+  the same desk, in the same idiom, as a private thought.
+
 --------------------------------------------------------------------------------
-08 // BRAND
+10 // BRAND
 --------------------------------------------------------------------------------
 
 LOT® Quantum Cube             The object
