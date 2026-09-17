@@ -23,6 +23,7 @@ import {
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
 import { toCelsius } from '#shared/utils'
+import { getMoonEmoji } from '#shared/utils/astrology'
 import {
   playKeyClick,
   playSynthActivationChime,
@@ -363,7 +364,10 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                   <div>HUM: {log.context.humidity}%</div>
                 )}
                 {log.context?.astroRokuyo && (
-                  <div>ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}</div>
+                  <div>
+                    ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase && getMoonEmoji(log.context.astroMoonPhase)} {log.context.astroMoonPhase}
+                    {log.context.astroMoonIllumination != null && ` (${log.context.astroMoonIllumination}%)`}
+                  </div>
                 )}
                 {log.metadata?.sound && (
                   <div>SND: {log.metadata.sound}</div>

@@ -68,6 +68,10 @@ export type UserProfile = {
   city: string | null;
   address: string | null;
   phone: string | null;
+  // Saved profile timeZone (IANA name), exposed 2026-09-17 so client-side
+  // widgets (e.g. System dashboard astrology) can read the user's saved
+  // timeZone the same way the server-side Logs snapshot already does.
+  timeZone?: string | null;
   tags: string[];
   hideActivityLogs: boolean;
   timeChime?: boolean;

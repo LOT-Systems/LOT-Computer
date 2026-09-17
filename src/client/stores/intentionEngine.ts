@@ -3428,6 +3428,27 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Auspicious Intention Alignment — a goal or intention is declared while
+  // today's ambient astrology reading is a Taian (大安) day, the most auspicious day in
+  // the six-day rokuyo cycle. First pattern to react to the 'astrology' signal source
+  // (wired 2026-07-27, one ambient reading per calendar day) together with goal/intention
+  // -setting behavior. A same-day correlation between two already-flowing ambient signals —
+  // no natal-chart or personal astrology data involved, consistent with the ambient-only
+  // design. Feeds the existing Arch16 (Intention Executor) archetype rather than a new one.
+  const p152Astro = recentSignals.find(s => s.source === 'astrology' && s.metadata?.auspicious === true)
+  const p152Declarations = recentSignals.filter(s => s.source === 'goals' || s.source === 'intentions')
+  if (p152Astro && p152Declarations.length >= 1) {
+    const p152Kind = p152Declarations[0].source === 'goals' ? 'goal' : 'intention'
+    const p152Bonus = Math.min((p152Declarations.length - 1) * 0.03, 0.13)
+    patterns.push({
+      pattern: 'auspicious-intention-alignment',
+      confidence: Math.min(0.72 + p152Bonus, 0.85),
+      suggestedWidget: 'intentions',
+      suggestedTiming: 'passive',
+      reason: `Auspicious-day alignment — a ${p152Kind} was set on a Taian (大安) rokuyo day, the most auspicious day in the six-day cycle. Ambient reading and declared intent co-occurring today. Offered as an observation, not a directive.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -3811,7 +3832,7 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   memory:            ['mood', 'journal'],
   intentions:        ['mood', 'memory'],
   journal:           ['mood', 'planner'],
-  goals:             ['planner', 'intentions', 'memory', 'journal'],
+  goals:             ['planner', 'intentions', 'memory', 'journal', 'astrology'], // (2026-09-17 audit) astrology added — P152 auspicious-day alignment reacts to Taian-day + goal/intention co-occurrence
   chakra:            ['mood', 'energy', 'selfcare', 'journal'],
   cohort:            ['mood', 'memory', 'journal', 'selfcare', 'intentions'],
   narrative:         ['mood', 'memory', 'journal', 'intentions'],
@@ -4240,8 +4261,8 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
   {
     archetype: 'Intention Executor',
     energyBands: ['moderate', 'high'],
-    dominantSources: ['intentions', 'planner', 'goals'],
-    patternConditions: ['intention-follow-through', 'temporal-coherence-window', 'care-momentum'],
+    dominantSources: ['intentions', 'planner', 'goals', 'astrology'],
+    patternConditions: ['intention-follow-through', 'temporal-coherence-window', 'care-momentum', 'auspicious-intention-alignment'],
     directive: 'Execution arc complete. Intention is lived, not declared. Scale what works.',
   },
   {
