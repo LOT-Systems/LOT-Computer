@@ -24,7 +24,7 @@ STATUS KEY:
 
 FEATURE          | BEST BRANCH                   | HASH     | ITER  | STATUS | FILES | LINES  | SUMMARY
 ──────────────     ─────────────────────────────   ────────   ─────   ──────   ─────   ──────   ──────────────────────
-LOT Mail         | determined-turing-f6bw7r     | fa622a25 | 11/11 | BEST   | 11    | +504   | In-app email: /email trigger, Sync inbox, Cohort integration, yarn.lock
+LOT Mail         | determined-turing-gglbv4      | b8fef31  | 12/12 | READY  | 12    | +554   | In-app email: /email trigger, Sync inbox, Cohort integration — rebased onto master 2026-09-17 (see SR-20260917-01); still unmerged, awaiting explicit ship authorization
 Basics Tab       | beautiful-johnson-56p7ov      | 6815f550 | 8/8   | BEST   | 5     | +293   | BASICS M1: OPEN TAB live — 23-item ration ledger, doctrine, status line
 Calendar Alerts  | gifted-lovelace-cZOWR         | 978cf52  | 6/6   | BEST   | 3     | +359   | Live clock, T-minus countdown, military alert overlay, today panel
 QI-46 Engine     | cool-tesla-f8j0mr            | 36ef4dde | 8/8   | BEST   | 8     | +2050  | QI·46 Node 3 engine integration + Soul Upload + Being Calibration
@@ -84,7 +84,7 @@ CLUSTER          | COUNT | KEEP              | PRUNE | REASON
 gallant-mayer    | 35    | GqGA0             | 34    | Same health check fix iterated 35 times
 pensive-rubin    | 5     | 4jhgF             | 4     | Strict superset progression
 relaxed-hamilton | 8     | eRBVA             | 7     | LOT Mail iterations (SUPERSEDED by determined-turing)
-determined-turing| 6     | f6bw7r            | 5     | LOT Mail iterations (latest series)
+determined-turing| 80+   | gglbv4 (was f6bw7r)| 79+   | LOT Mail iterations — count was stale (recorded as 6); actual remote branch count as of 2026-09-17 is 80+, all re-running the same unshipped scheduled task. Needs a prune audit + the underlying schedule fixed so it stops branching once the feature is built. See SR-20260917-01.
 dazzling-shannon | 9     | ykKT5             | 8     | COSMO hardware iterations (SUPERSEDED by brave-lamport)
 brave-lamport    | 5     | t9z5u8            | 4     | COSMO hardware iterations (latest series)
 gifted-lovelace  | 6     | cZOWR             | 5     | Calendar alert iterations
@@ -191,6 +191,19 @@ NOTE: As of 2026-06-27, the above branches no longer exist on the remote —
 they were incorporated into master in prior sessions. The ship queue will be
 re-populated as new BEST branches are designated from future assembly runs.
 The protocol above applies to all future merges.
+
+CORRECTION (2026-09-17, SR-20260917-01): the 2026-06-27 note above was wrong
+for LOT Mail — `git merge-base --is-ancestor` against origin/master proves it
+was never merged. determined-turing-f6bw7r sat unshipped for 3 months while
+the same scheduled task kept re-firing and cutting new determined-turing-*
+branches (80+ found on the remote) instead of noticing the feature already
+existed. This session rebased the BEST iteration onto current master on
+branch determined-turing-gglbv4 (green build) but could not merge to master
+or delete the stale branches — this session's git access is scoped to
+pushing determined-turing-gglbv4 only. Master merge and branch pruning need
+an explicit "Ship LOT Mail" from S-2 or a session with master push access.
+Treat any other manifest row not independently re-verified against git with
+the same suspicion.
 
 RULE: One feature per Sunday merge pass. If multiple features are queued,
 start with the smallest diff — lower blast radius, cleaner green gate.
