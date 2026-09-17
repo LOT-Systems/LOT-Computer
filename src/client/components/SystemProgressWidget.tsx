@@ -1438,6 +1438,28 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'v114',
+    date: '2026-09-17',
+    title: 'QIE Engineering — Circadian Depth Integration / Field Velocity Arc / Operator Presence Seal',
+    assembled: [
+      'P152 CIRCADIAN DEPTH INTEGRATION: meta-pattern — circadian-signal-lock (P143) anchored + journal 150+w + memory capture all confirmed within 24h. The temporal clock is inhabited through depth: the arc is not just marked but recorded and remembered. Confidence 0.72–0.88.',
+      'P153 FIELD VELOCITY ARC: compound pattern — signal-density-peak (P120) + care-intelligence-loop (P118) simultaneously active. High signal throughput with embedded care intelligence: the field moves fast and tends itself. Confidence 0.68–0.86.',
+      'P154 OPERATOR PRESENCE SEAL: highest-compound pattern — total-field-coherence (P150) + recovery-intelligence-arc (P151) co-active simultaneously. The ceiling state is inhabited and the full recovery loop is confirmed in the same window. Confidence 0.88–0.96.',
+      'Arch52 TEMPORAL DEPTH OPERATOR: energy moderate/high · dominant: journal/selfcare/energy/mood · patterns: circadian-depth-integration + daily-coherence-seal + recovery-intelligence-arc. Directive: Temporal clock inhabited through depth. Arc marked, recorded, remembered. The field is deep and tended. Execute from temporal grounding — the clock is yours.',
+      'J49 daily-circadian-depth-check: 07:00 UTC daily. Reads previous calendar day — checks if circadian_signal_lock + journal 150+w + memory capture all confirmed → writes circadian_depth_integration. Co-located with J46 (07:00 UTC circadian lock check). 49 jobs total.',
+      'intentionEngine.ts: P152/P153/P154 detection blocks added after P151. Arch52 appended to PHYSIOLOGICAL_ARCHETYPES. 3 dep map nodes (circadianDepthIntegrationNode · fieldVelocityArcNode · operatorPresenceSealNode). 3 signal helpers (recordCircadianDepthIntegration · recordFieldVelocityArc · recordOperatorPresenceSeal). 193+ dep nodes.',
+      'scheduled-jobs.ts: J49 executeDailyCircadianDepthCheck() · shouldRunDailyCircadianDepthCheck() wired into checkAndRunScheduledJobs().',
+      'routes/api.ts: circadian_depth_integration · field_velocity_arc · operator_presence_seal added to displayableEvents.',
+      'Logs.tsx: CIRDEP: · FVARC: · OPSEAL: military handlers added. ARCS 24H/WORDS/MEM/CLOCK→DEPTH · SIG DENSITY/SOURCES/DENSITY PEAK+CARE INTEL LOOP · TOTCOH CONF/RECINTEL CONF/SEAL %.',
+      'QuantumEngineWidgets.tsx: CIRDEP · FVARC · OPSEAL added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P152/P153/P154 display names + QOS Trend indicators added.',
+      'About.tsx: FM v113→v114. Day 1107+. 151→154 patterns. 51→52 archetypes. 48→49 jobs. 190+→193+ dep nodes. 151+→154+ handlers.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/assembly/2026-09-17_LOT-assembly_qie-v114.md: Session report written.',
+      '154 patterns · 52 archetypes · 49 jobs · 154+ handlers · 193+ dep nodes. QIE v114 deployed. Circadian depth confirmed. Field velocity arc active. Operator presence sealed.',
+    ],
+  },
+  {
     version: 'wiki-v87',
     date: '2026-08-05',
     title: 'LOT-WIKI-v87 · FM v113 Sync · QIE v113 + Badge v31 documentation',
@@ -1494,18 +1516,18 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-09-17',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-09-17 · QIE v114 · FM v114 · Day 1107+',
+    'Built: P152 CIRDEP · P153 FVARC · P154 OPSEAL · Arch52 Temporal Depth Operator · J49 07:00 UTC.',
+    'P152 CIRCADIAN DEPTH INTEGRATION: clock inhabited through depth — arc + journal 150+w + memory in 24h.',
+    'P153 FIELD VELOCITY ARC: signal density peak + care intelligence loop simultaneous — field moves fast and tends itself.',
+    'P154 OPERATOR PRESENCE SEAL: total field coherence + recovery intelligence arc co-active — ceiling state inhabited and recovery loop confirmed.',
+    'J49 daily-circadian-depth-check wired at 07:00 UTC. 49 background jobs total.',
+    'CIRDEP: FVARC: OPSEAL: military handlers deployed. 193+ dep nodes. 154+ log event types.',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes · 781 badges.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114',
   ],
 }
 

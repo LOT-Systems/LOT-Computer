@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily circadian depth check (07:00 UTC every day) — Job 49
+  if (shouldRunDailyCircadianDepthCheck()) {
+    await executeDailyCircadianDepthCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,114 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Circadian Depth Check (Job 49 — 07:00 UTC every day) ──────────────
+// Reads previous calendar day per active user. Checks if circadian_signal_lock event
+// was written (P143 confirmed) AND total journal word count ≥150 AND memory capture
+// is present. When all three conditions met, writes circadian_depth_integration.
+// Temporal structure inhabited through cognitive depth. Extends J46 at the same hour.
+
+let isDailyCircadianDepthRunning = false
+let lastDailyCircadianDepthRun: Date | null = null
+
+function shouldRunDailyCircadianDepthCheck(): boolean {
+  const now = dayjs()
+  if (isDailyCircadianDepthRunning) return false
+  if (lastDailyCircadianDepthRun) {
+    const lastRun = dayjs(lastDailyCircadianDepthRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 7 // 07:00 UTC daily — co-located with J46 circadian-lock-check
+}
+
+async function executeDailyCircadianDepthCheck(): Promise<JobResult> {
+  const jobName = 'daily-circadian-depth-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyCircadianDepthRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyCircadianDepthRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY CIRCADIAN DEPTH CHECK — 07:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const prevDayStart = dayjs().subtract(1, 'day').startOf('day').toDate()
+    const prevDayEnd   = dayjs().subtract(1, 'day').endOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const prevDayLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: prevDayStart, [Op.lte]: prevDayEnd },
+          },
+          attributes: ['event', 'text', 'metadata'],
+        })
+
+        if (!prevDayLogs.length) continue
+
+        // Check circadian_signal_lock present (P143 confirmed)
+        const hasCircadianLock = prevDayLogs.some((l: any) => l.event === 'circadian_signal_lock')
+        if (!hasCircadianLock) continue
+
+        // Count total journal words
+        const journalLogs = prevDayLogs.filter((l: any) =>
+          l.event === 'field_entry' || l.event === 'note' || l.event === 'journal_signal'
+        )
+        const totalWords = journalLogs.reduce((sum: number, l: any) => {
+          const wordCount = l.metadata?.wordCount ?? (l.text ? l.text.split(/\s+/).filter(Boolean).length : 0)
+          return sum + wordCount
+        }, 0)
+        if (totalWords < 150) continue
+
+        // Check memory capture present
+        const memoryLogs = prevDayLogs.filter((l: any) =>
+          l.event === 'memory_captured' || l.event === 'answer_saved' || l.event === 'weekly_summary_response'
+        )
+        if (!memoryLogs.length) continue
+
+        await (Log as any).create({
+          userId,
+          event: 'circadian_depth_integration',
+          text: `Circadian depth integration: previous day — circadian clock anchored (P143) · journal ${totalWords}+ words · memory capture confirmed. Temporal structure inhabited through depth. The clock is written into, not just tracked.`,
+          metadata: {
+            arcCount: 3,
+            journalWords: totalWords,
+            memoryCount: memoryLogs.length,
+            integration: 'CLOCK→DEPTH',
+            status: 'TEMPORAL STRUCTURE INHABITED',
+            window: '24h-prior-day',
+            hour: 7,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Circadian depth integration events written: ${written}`)
+    lastDailyCircadianDepthRun = new Date()
+    isDailyCircadianDepthRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily circadian depth check failed:', error.message)
+    isDailyCircadianDepthRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5608,6 +5720,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily circadian depth check: 7 AM UTC every day (Job 49)')
   console.log('')
 
   // Check every hour for scheduled jobs

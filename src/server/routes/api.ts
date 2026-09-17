@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: circadian depth integration · field velocity arc · operator presence seal (P152/P153/P154)
+      'circadian_depth_integration',
+      'field_velocity_arc',
+      'operator_presence_seal',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

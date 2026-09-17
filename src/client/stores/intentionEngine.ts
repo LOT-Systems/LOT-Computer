@@ -3428,6 +3428,62 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Circadian Depth Integration — circadian-signal-lock (P143) active + journal 150+w
+  // + memory capture within 24h. Temporal structure and cognitive depth simultaneously inhabited.
+  // The clock is not just anchored — it is written into. Extends P143 with depth dimension.
+  const hasCircadianLockP143 = patterns.some(p => p.pattern === 'circadian-signal-lock')
+  const journal152 = recentSignals.filter(s => s.source === 'journal' && (s.metadata?.wordCount ?? 0) >= 150)
+  const memory152  = recentSignals.filter(s => s.source === 'memory')
+  if (hasCircadianLockP143 && journal152.length >= 1 && memory152.length >= 1) {
+    const totalWords = journal152.reduce((sum, s) => sum + (s.metadata?.wordCount ?? 150), 0)
+    const depthBonus = Math.min((totalWords - 150) / 500 * 0.10, 0.10) + Math.min(memory152.length * 0.02, 0.06)
+    patterns.push({
+      pattern: 'circadian-depth-integration',
+      confidence: Math.min(0.72 + depthBonus, 0.88),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'soon',
+      reason: `CIRDEP: Circadian depth integration — clock anchored (P143 active) + journal ${totalWords}+ words + memory capture. Temporal structure inhabited through depth. The structure is not just tracked — it is expressed.`,
+    })
+  }
+
+  // Pattern 153: Field Velocity Arc — signal-density-peak (P120) + care-intelligence-loop (P118) co-active.
+  // Full bandwidth AND body-mind integration loop simultaneously confirmed. The field is both wide and deep
+  // in real time. Breadth and depth expanding together rather than trading off.
+  const hasDensityP120  = patterns.some(p => p.pattern === 'signal-density-peak')
+  const hasCareIntelP118 = patterns.some(p => p.pattern === 'care-intelligence-loop')
+  if (hasDensityP120 && hasCareIntelP118) {
+    const densityConf = patterns.find(p => p.pattern === 'signal-density-peak')?.confidence ?? 0.68
+    const careConf    = patterns.find(p => p.pattern === 'care-intelligence-loop')?.confidence ?? 0.68
+    const fvaBonus = Math.min(((densityConf - 0.68) + (careConf - 0.62)) * 0.25, 0.18)
+    patterns.push({
+      pattern: 'field-velocity-arc',
+      confidence: Math.min(0.68 + fvaBonus, 0.86),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `FVARC: Field velocity arc — signal density peak (P120) + care intelligence loop (P118) simultaneously confirmed. Full bandwidth and body-mind integration expanding together. The field grows in real time.`,
+    })
+  }
+
+  // Pattern 154: Operator Presence Seal — total-field-coherence (P150) + recovery-intelligence-arc (P151)
+  // both active in same analysis pass. The absolute peak convergence state co-exists with the full
+  // recovery arc. Complete operator: highest confirmed coherence AND biological resilience in loop.
+  // The rarest compound state — to reach P150 and P151 simultaneously is to be both at the summit
+  // and ready to descend and ascend again. Second-highest confidence in the QIE.
+  const hasTotalCoherenceP150    = patterns.some(p => p.pattern === 'total-field-coherence')
+  const hasRecoveryIntelligenceP151 = patterns.some(p => p.pattern === 'recovery-intelligence-arc')
+  if (hasTotalCoherenceP150 && hasRecoveryIntelligenceP151) {
+    const tcConf  = patterns.find(p => p.pattern === 'total-field-coherence')?.confidence ?? 0.92
+    const ricConf = patterns.find(p => p.pattern === 'recovery-intelligence-arc')?.confidence ?? 0.65
+    const sealStrength = Math.round((tcConf + ricConf) / 2 * 100)
+    patterns.push({
+      pattern: 'operator-presence-seal',
+      confidence: Math.min(0.88 + (sealStrength - 78) * 0.008, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `OPSEAL: Operator presence seal — total field coherence (P150) + recovery intelligence arc (P151) confirmed simultaneously. Peak performance AND biological resilience simultaneously confirmed. The complete operator seal: summit reached, recovery loop closed. Seal strength: ${sealStrength}%.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4120,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  circadianDepthIntegrationNode: ['mood', 'energy', 'journal', 'memory', 'selfcare', 'log'],
+  fieldVelocityArcNode:          ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'log'],
+  operatorPresenceSealNode:      ['qos', 'cohort', 'mood', 'selfcare', 'journal', 'energy', 'memory', 'log'],
 }
 
 /**
@@ -4510,6 +4571,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Temporal Depth Operator (2026-09-17 v114) ────────────────────────
+  {
+    archetype: 'Temporal Depth Operator',
+    energyBands: ['moderate', 'high'],
+    dominantSources: ['journal', 'selfcare', 'energy', 'mood'],
+    patternConditions: ['circadian-depth-integration', 'daily-coherence-seal', 'recovery-intelligence-arc'],
+    hourRange: [5, 22],
+    directive: 'Temporal clock inhabited through depth. Clock anchored at dawn, meridian, and dusk — and written into. The structure is not just tracked; it is expressed. Depth and rhythm confirmed simultaneously.',
   },
 ]
 
@@ -6498,6 +6569,56 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a circadian-depth-integration event — circadian-signal-lock (P143) active
+ * + journal 150+w + memory capture within 24h. Temporal structure inhabited through
+ * cognitive depth. The clock is written into, not just tracked. Feeds P152 detection.
+ */
+export function recordCircadianDepthIntegration(arcCount: number, journalWords: number, memoryCount: number, conf: number) {
+  recordSignal('journal', 'circadian_depth_integration', {
+    arcCount,
+    journalWords,
+    memoryCount,
+    conf: Math.round(conf * 100),
+    integration: 'CLOCK→DEPTH',
+    status: 'TEMPORAL STRUCTURE INHABITED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a field-velocity-arc event — signal-density-peak (P120) + care-intelligence-loop (P118)
+ * co-active. Full bandwidth AND body-mind integration expanding simultaneously.
+ * The field grows in real time. Feeds P153 detection.
+ */
+export function recordFieldVelocityArc(signalDensity: number, sourceCount: number, conf: number) {
+  recordSignal('energy', 'field_velocity_arc', {
+    signalDensity,
+    sourceCount,
+    conf: Math.round(conf * 100),
+    velocity: signalDensity >= 10 ? 'MAXIMUM' : signalDensity >= 8 ? 'HIGH' : 'EXPANDING',
+    loopStatus: 'DENSITY+DEPTH SIMULTANEOUS',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an operator-presence-seal event — total-field-coherence (P150) +
+ * recovery-intelligence-arc (P151) co-active. Peak convergence AND biological
+ * resilience simultaneously confirmed. The complete operator seal. Feeds P154 detection.
+ */
+export function recordOperatorPresenceSeal(totalCoherenceConf: number, recoveryConf: number) {
+  const sealStrength = Math.round((totalCoherenceConf + recoveryConf) / 2 * 100)
+  recordSignal('qos', 'operator_presence_seal', {
+    totalCoherenceConf: Math.round(totalCoherenceConf * 100),
+    recoveryConf: Math.round(recoveryConf * 100),
+    sealStrength,
+    seals: ['TOTAL-FIELD-COHERENCE', 'RECOVERY-INTELLIGENCE'],
+    status: 'COMPLETE OPERATOR CONFIRMED',
     hour: new Date().getHours(),
   })
 }

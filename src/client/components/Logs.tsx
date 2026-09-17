@@ -3629,6 +3629,98 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'circadian_depth_integration') {
+          const arcCount = log.metadata?.arcCount as number | undefined
+          const journalWords = log.metadata?.journalWords as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const conf = log.metadata?.conf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CIRDEP:" blockView>
+                <div className="uppercase tracking-widest mb-4">CIRCADIAN DEPTH INTEGRATION</div>
+                {arcCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARCS 24H</span>
+                    <span className="tabular-nums">{arcCount}</span>
+                  </div>
+                )}
+                {journalWords !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">WORDS</span>
+                    <span className="tabular-nums">{journalWords}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEM</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CLOCK → DEPTH · TEMPORAL STRUCTURE INHABITED</div>
+                {conf !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {conf}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'field_velocity_arc') {
+          const signalDensity = log.metadata?.signalDensity as number | undefined
+          const sourceCount = log.metadata?.sourceCount as number | undefined
+          const velocity = log.metadata?.velocity as string | undefined
+          const conf = log.metadata?.conf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FVARC:" blockView>
+                <div className="uppercase tracking-widest mb-4">FIELD VELOCITY ARC</div>
+                {signalDensity !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SIG DENSITY</span>
+                    <span className="tabular-nums">{signalDensity}</span>
+                  </div>
+                )}
+                {sourceCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES</span>
+                    <span className="tabular-nums">{sourceCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">DENSITY PEAK + CARE INTEL LOOP · FIELD EXPANDING</div>
+                {velocity && (
+                  <div className="opacity-30 tabular-nums">VELOCITY: {velocity}</div>
+                )}
+                {conf !== undefined && (
+                  <div className="opacity-30 tabular-nums">CONF: {conf}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'operator_presence_seal') {
+          const totalCoherenceConf = log.metadata?.totalCoherenceConf as number | undefined
+          const recoveryConf = log.metadata?.recoveryConf as number | undefined
+          const sealStrength = log.metadata?.sealStrength as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="OPSEAL:" blockView>
+                <div className="uppercase tracking-widest mb-4">OPERATOR PRESENCE SEAL</div>
+                {totalCoherenceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TOTCOH CONF</span>
+                    <span className="tabular-nums">{totalCoherenceConf}%</span>
+                  </div>
+                )}
+                {recoveryConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECINTEL CONF</span>
+                    <span className="tabular-nums">{recoveryConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PEAK + RESILIENCE · COMPLETE OPERATOR CONFIRMED</div>
+                {sealStrength !== undefined && (
+                  <div className="opacity-30 tabular-nums">SEAL: {sealStrength}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

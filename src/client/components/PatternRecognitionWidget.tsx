@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'circadian-depth-integration':      'Circadian depth integration — clock anchored (P143) + journal 150+w + memory capture in 24h (P152)',
+      'field-velocity-arc':               'Field velocity arc — signal density peak + care intelligence loop simultaneously active (P153)',
+      'operator-presence-seal':           'Operator presence seal — total field coherence + recovery intelligence arc co-active (P154)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
@@ -544,6 +547,27 @@ export function PatternRecognitionWidget() {
               {patterns.some(p => p.pattern === 'resilience-cascade') && (
                 <div className="mt-4 uppercase tracking-widest text-xs">
                   Resilience cascade. Recovery + knowledge arc closed.
+                </div>
+              )}
+
+              {/* Circadian depth integration — P152 */}
+              {patterns.some(p => p.pattern === 'circadian-depth-integration') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Clock inhabited through depth. Structure expressed.
+                </div>
+              )}
+
+              {/* Field velocity arc — P153 */}
+              {patterns.some(p => p.pattern === 'field-velocity-arc') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Field expanding. Breadth and depth simultaneous.
+                </div>
+              )}
+
+              {/* Operator presence seal — P154 */}
+              {patterns.some(p => p.pattern === 'operator-presence-seal') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  OPERATOR SEAL. Peak convergence + resilience. Complete.
                 </div>
               )}
 
