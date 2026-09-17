@@ -191,6 +191,12 @@ export function PatternRecognitionWidget() {
       'sovereign-coherence-lock':         'Sovereign coherence lock — FPA + QCT active, OS locked in sovereign coherence band (P158)',
       'living-assembly-arc':              'Living assembly arc — sovereign assembly 2+ in 14d, recurring cycle confirmed (P159)',
       'quantum-identity-sovereign':       'Quantum identity sovereign — SLOCK + LARC active, terminal convergence confirmed (P160)',
+      'sovereign-field-pulse':            'Sovereign field pulse — QIDSOV active 14D + energy signal present, field radiating (P161)',
+      'crystalline-identity-field':       'Crystalline identity field — SLOCK + LARC + QIDSOV all in 7D, full crystalline coherence (P162)',
+      'sovereign-temporal-lock':          'Sovereign temporal lock — sovereign base + DCS + QRL in 7D, temporal sovereignty confirmed (P163)',
+      'sovereignty-duration-streak':      'Sovereignty duration streak — SOVTLOCK on 7+ distinct days in 14D, identity signature persistent (P164)',
+      'crystalline-field-sustain':        'Crystalline field sustain — P161 + P162 + P163 all present in 14D, full sovereign field sustaining (P165)',
+      'sovereign-momentum-arc':           'Sovereign momentum arc — SFPULSE fires 4+ days in 14D, sovereign field radiating on momentum (P166)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

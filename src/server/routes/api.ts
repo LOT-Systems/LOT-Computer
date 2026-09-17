@@ -1231,6 +1231,10 @@ export default async (fastify: FastifyInstance) => {
       'sovereign_field_pulse',
       'crystalline_identity_field',
       'sovereign_temporal_lock',
+      // v119: sovereignty persistence tier (J54 weekly audit — P164/P165/P166)
+      'sovereignty_duration_streak',
+      'crystalline_field_sustain',
+      'sovereign_momentum_arc',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

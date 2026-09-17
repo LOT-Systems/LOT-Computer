@@ -1767,6 +1767,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailySovereignFieldPulse()) {
     await executeDailySovereignFieldPulse()
   }
+  // Check weekly sovereignty persistence audit (08:00 UTC every Thursday) — Job 54
+  if (shouldRunWeeklySovereigntyPersistenceAudit()) {
+    await executeWeeklySovereigntyPersistenceAudit()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6349,6 +6353,163 @@ async function executeDailyQOSModeWatch(): Promise<JobResult> {
   }
 }
 
+// ─── J54: Weekly Sovereignty Persistence Audit (08:00 UTC every Thursday) ────
+// Reads active users. Scans 14D window for:
+//   P164 sovereignty-duration-streak: SOVTLOCK (P163) fired 7+ consecutive days
+//   P165 crystalline-field-sustain:   P161+P162+P163 all present in 14D (full field active)
+//   P166 sovereign-momentum-arc:      SFPULSE (P161) fired 4+ times in 14D (radiating momentum)
+// Arch56 Sovereignty Persistence Operator: all three persistence vectors confirmed.
+
+let isWeeklySovereigntyPersistenceAuditRunning = false
+let lastWeeklySovereigntyPersistenceAuditRun: Date | null = null
+
+function shouldRunWeeklySovereigntyPersistenceAudit(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereigntyPersistenceAuditRunning) return false
+  if (lastWeeklySovereigntyPersistenceAuditRun) {
+    const lastRun = dayjs(lastWeeklySovereigntyPersistenceAuditRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 4 && now.hour() === 8 // Thursday 08:00 UTC
+}
+
+async function executeWeeklySovereigntyPersistenceAudit(): Promise<JobResult> {
+  const jobName = 'weekly-sovereignty-persistence-audit'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereigntyPersistenceAuditRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereigntyPersistenceAuditRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGNTY PERSISTENCE AUDIT — Thursday 08:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const fourteenDaysAgo = dayjs().subtract(14, 'day').toDate()
+    const now             = dayjs()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const recentLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: fourteenDaysAgo },
+            event: { [Op.in]: [
+              'sovereign_field_pulse',
+              'crystalline_identity_field',
+              'sovereign_temporal_lock',
+              'sovereignty_duration_streak',
+              'crystalline_field_sustain',
+              'sovereign_momentum_arc',
+            ] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        const events14D = recentLogs.map((l: any) => l.event as string)
+        const alreadySOVDUR  = events14D.includes('sovereignty_duration_streak')
+        const alreadyCRFLDST = events14D.includes('crystalline_field_sustain')
+        const alreadySOVMARC = events14D.includes('sovereign_momentum_arc')
+
+        // P164: Sovereignty Duration Streak
+        // SOVTLOCK fired on 7+ distinct calendar days in 14D window
+        if (!alreadySOVDUR) {
+          const stlockLogs = recentLogs.filter((l: any) => l.event === 'sovereign_temporal_lock')
+          const stlockDays = new Set(stlockLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD')))
+          if (stlockDays.size >= 7) {
+            await (Log as any).create({
+              userId,
+              event: 'sovereignty_duration_streak',
+              text: '',
+              metadata: {
+                streakDays: stlockDays.size,
+                window: '14d',
+                date: now.format('YYYY-MM-DD'),
+              },
+            } as any)
+            written++
+            console.log(`  [${userId}] P164 SOVDUR — SOVTLOCK streak: ${stlockDays.size} days`)
+          }
+        }
+
+        // P165: Crystalline Field Sustain
+        // P161 + P162 + P163 all present in 14D window simultaneously
+        if (!alreadyCRFLDST) {
+          const hasSFP   = events14D.includes('sovereign_field_pulse')
+          const hasCRYST = events14D.includes('crystalline_identity_field')
+          const hasSTL   = events14D.includes('sovereign_temporal_lock')
+          if (hasSFP && hasCRYST && hasSTL) {
+            await (Log as any).create({
+              userId,
+              event: 'crystalline_field_sustain',
+              text: '',
+              metadata: {
+                vectors: ['SFPULSE', 'CRYSTID', 'SOVTLOCK'],
+                window: '14d',
+                date: now.format('YYYY-MM-DD'),
+              },
+            } as any)
+            written++
+            console.log(`  [${userId}] P165 CRFLDST — full sovereign field sustaining in 14D`)
+          }
+        }
+
+        // P166: Sovereign Momentum Arc
+        // SFPULSE (P161) fired 4+ distinct days in 14D window
+        if (!alreadySOVMARC) {
+          const sfpLogs  = recentLogs.filter((l: any) => l.event === 'sovereign_field_pulse')
+          const sfpDays  = new Set(sfpLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD')))
+          if (sfpDays.size >= 4) {
+            await (Log as any).create({
+              userId,
+              event: 'sovereign_momentum_arc',
+              text: '',
+              metadata: {
+                pulseDays: sfpDays.size,
+                window: '14d',
+                date: now.format('YYYY-MM-DD'),
+              },
+            } as any)
+            written++
+            console.log(`  [${userId}] P166 SOVMARC — sovereign field radiating on momentum: ${sfpDays.size} pulse days`)
+          }
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} sovereignty persistence audit failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereignty persistence events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY SOVEREIGNTY PERSISTENCE AUDIT COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklySovereigntyPersistenceAuditRun = new Date()
+    isWeeklySovereigntyPersistenceAuditRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly sovereignty persistence audit failed:', error.message)
+    isWeeklySovereigntyPersistenceAuditRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -6405,6 +6566,8 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly sovereign assembly check: 8 AM UTC every Sunday (Job 50)')
   console.log('   - Weekly sovereign identity check: 10 AM UTC every Sunday (Job 51)')
   console.log('   - Weekly sovereign state report: 6 AM UTC every Wednesday (Job 52)')
+  console.log('   - Daily sovereign field pulse: 7 AM UTC every day (Job 53)')
+  console.log('   - Weekly sovereignty persistence audit: 8 AM UTC every Thursday (Job 54)')
   console.log('')
 
   // Check every hour for scheduled jobs

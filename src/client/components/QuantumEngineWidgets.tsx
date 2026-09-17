@@ -123,6 +123,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'sovereign-field-pulse':            'SFPULSE',
   'crystalline-identity-field':       'CRYSTID',
   'sovereign-temporal-lock':          'SOVTLOCK',
+  'sovereignty-duration-streak':      'SOVDUR',
+  'crystalline-field-sustain':        'CRFLDST',
+  'sovereign-momentum-arc':           'SOVMARC',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

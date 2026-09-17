@@ -4136,6 +4136,58 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sovereignty_duration_streak') {
+          const streakDays = log.metadata?.streakDays as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVDUR:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">SIGNATURE</span>
+                  <span className="uppercase tracking-widest">PERSISTENT</span>
+                </div>
+                {streakDays !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">STREAK</span>
+                    <span className="tabular-nums opacity-60">{streakDays}d</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystalline_field_sustain') {
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRFLDST:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">FIELD</span>
+                  <span className="uppercase tracking-widest">SUSTAINING</span>
+                </div>
+                <div className="flex gap-x-8">
+                  <span className="opacity-60">SFPULSE</span>
+                  <span className="opacity-60">CRYSTID</span>
+                  <span className="opacity-60">SOVTLOCK</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sovereign_momentum_arc') {
+          const pulseDays = log.metadata?.pulseDays as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVMARC:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">MOMENTUM</span>
+                  <span className="uppercase tracking-widest">RADIATING</span>
+                </div>
+                {pulseDays !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">PULSES</span>
+                    <span className="tabular-nums opacity-60">{pulseDays}d</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
