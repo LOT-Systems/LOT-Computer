@@ -16,13 +16,12 @@ type Props = {
 
 export const Clock: React.FC<Props> = ({ format, interval }) => {
   const [state, setState] = React.useState(dayjs().format(format))
-  const loop = React.useRef<number>()
+  const loop = React.useRef<ReturnType<typeof setInterval> | undefined>(undefined)
   React.useEffect(() => {
     if (loop.current) {
       clearInterval(loop.current)
     }
     if (interval) {
-      // @ts-ignore
       loop.current = setInterval(
         () => setState(dayjs().format(format)),
         interval
