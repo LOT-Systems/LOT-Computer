@@ -3629,6 +3629,123 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'longitudinal_growth_arc') {
+          const badges30d  = log.metadata?.badges30d as number | undefined
+          const memory30d  = log.metadata?.memory30d as number | undefined
+          const journal30d = log.metadata?.journal30d as number | undefined
+          const growthConf = log.metadata?.growthConf as number | undefined
+          const recentCount = log.metadata?.recentCount as number | undefined
+          const priorCount  = log.metadata?.priorCount as number | undefined
+          const growthRatio = log.metadata?.growthRatio as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="GROWTH:" blockView>
+                <div className="uppercase tracking-widest mb-4">LONGITUDINAL GROWTH ARC</div>
+                {(badges30d !== undefined || recentCount !== undefined) && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGES 30D</span>
+                    <span className="tabular-nums">{badges30d ?? recentCount}</span>
+                  </div>
+                )}
+                {memory30d !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEM 30D</span>
+                    <span className="tabular-nums">{memory30d}</span>
+                  </div>
+                )}
+                {journal30d !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 30D</span>
+                    <span className="tabular-nums">{journal30d}</span>
+                  </div>
+                )}
+                {growthRatio !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">GROWTH</span>
+                    <span className="tabular-nums">+{growthRatio}%</span>
+                  </div>
+                )}
+                {growthConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">GROWTH CONF</span>
+                    <span className="tabular-nums">{growthConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">AXIS: BADGES · MEMORY · JOURNAL</div>
+                <div className="opacity-30 tabular-nums">ARC: EXPANDING</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sustained_presence_signature') {
+          const activeDays  = log.metadata?.activeDays as number | undefined
+          const presenceConf = log.metadata?.presenceConf as number | undefined
+          const continuity  = log.metadata?.continuity as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SUSP:" blockView>
+                <div className="uppercase tracking-widest mb-4">SUSTAINED PRESENCE SIGNATURE</div>
+                {activeDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ACTIVE DAYS 7D</span>
+                    <span className="tabular-nums">{activeDays}/7</span>
+                  </div>
+                )}
+                {presenceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PRESENCE CONF</span>
+                    <span className="tabular-nums">{presenceConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">OPERATIONAL CONTINUITY: {continuity ?? 'CONFIRMED'}</div>
+                <div className="opacity-30 tabular-nums">PRESENCE: CONTINUOUS</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'mastery_depth_peak') {
+          const badges7d       = log.metadata?.badges7d as number | undefined
+          const memory7dVal    = log.metadata?.memory7d as number | undefined
+          const journal7dVal   = log.metadata?.journal7d as number | undefined
+          const coPresenceDays = log.metadata?.coPresenceDays as number | undefined
+          const depthConf      = log.metadata?.depthConf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="MASDP:" blockView>
+                <div className="uppercase tracking-widest mb-4">MASTERY DEPTH PEAK</div>
+                {badges7d !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGES 7D</span>
+                    <span className="tabular-nums">{badges7d}</span>
+                  </div>
+                )}
+                {memory7dVal !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEM 7D</span>
+                    <span className="tabular-nums">{memory7dVal}</span>
+                  </div>
+                )}
+                {journal7dVal !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 7D</span>
+                    <span className="tabular-nums">{journal7dVal}</span>
+                  </div>
+                )}
+                {coPresenceDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CO-PRESENCE</span>
+                    <span className="tabular-nums">{coPresenceDays} DAY(S)</span>
+                  </div>
+                )}
+                {depthConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DEPTH CONF</span>
+                    <span className="tabular-nums">{depthConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CHANNELS: BADGES · MEMORY · JOURNAL</div>
+                <div className="opacity-30 tabular-nums">DEPTH: PEAK</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

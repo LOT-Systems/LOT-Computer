@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Weekly longitudinal growth check (Saturday 10:00 UTC) — Job 49
+  if (shouldRunWeeklyLongitudinalGrowthCheck()) {
+    await executeWeeklyLongitudinalGrowthCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,113 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J49 · Weekly Longitudinal Growth Check ──────────────────────────────────
+// Runs Saturday 10:00 UTC. Compares signal density in last 7d vs prior 7–14d window.
+// If recent week has more badge + memory signals than prior week → writes longitudinal_growth_arc.
+
+let isWeeklyLongitudinalGrowthRunning = false
+let lastWeeklyLongitudinalGrowthRun: Date | null = null
+
+function shouldRunWeeklyLongitudinalGrowthCheck(): boolean {
+  const now = dayjs()
+  if (isWeeklyLongitudinalGrowthRunning) return false
+  if (lastWeeklyLongitudinalGrowthRun) {
+    const lastRun = dayjs(lastWeeklyLongitudinalGrowthRun)
+    if (now.diff(lastRun, 'day') < 6) return false
+  }
+  return now.day() === 6 && now.hour() === 10 // Saturday 10:00 UTC
+}
+
+async function executeWeeklyLongitudinalGrowthCheck(): Promise<JobResult> {
+  const jobName = 'weekly-longitudinal-growth-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklyLongitudinalGrowthRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklyLongitudinalGrowthRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY LONGITUDINAL GROWTH CHECK — SAT 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const recent7dStart  = dayjs().subtract(7, 'day').toDate()
+    const prior7dStart   = dayjs().subtract(14, 'day').toDate()
+    const prior7dEnd     = dayjs().subtract(7, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(14, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (14d): ${activeUsers.length}`)
+    let written = 0
+
+    const GROWTH_EVENTS = ['badge_unlock', 'badge_progress_scan', 'memory_saved', 'journal_saved', 'user_answered']
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const recentLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: recent7dStart },
+            event: { [Op.in]: GROWTH_EVENTS as any[] },
+          },
+          attributes: ['event'],
+        })
+
+        const priorLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: prior7dStart, [Op.lte]: prior7dEnd },
+            event: { [Op.in]: GROWTH_EVENTS as any[] },
+          },
+          attributes: ['event'],
+        })
+
+        const recentCount = recentLogs.length
+        const priorCount  = priorLogs.length
+
+        if (recentCount < 5) continue
+        if (recentCount <= priorCount) continue
+
+        const growthRatio = priorCount > 0 ? Math.round((recentCount / priorCount - 1) * 100) : 100
+        const growthConf  = Math.min(0.65 + Math.min(recentCount / 30 * 0.17, 0.17), 0.82)
+
+        await (Log as any).create({
+          userId,
+          event: 'longitudinal_growth_arc',
+          text: `Longitudinal growth arc: weekly check — recent 7d (${recentCount} events) exceeds prior 7d (${priorCount} events). Growth ratio: +${growthRatio}%. The system is expanding. Growth confirmed across operational axes.`,
+          metadata: {
+            recentCount,
+            priorCount,
+            growthRatio,
+            growthConf: Math.round(growthConf * 100),
+            window: '7d-vs-prior-7d',
+            axes: ['BADGES', 'MEMORY', 'JOURNAL'],
+            growthStatus: 'EXPANDING',
+            hour: 10,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Longitudinal growth arc events written: ${written}`)
+    lastWeeklyLongitudinalGrowthRun = new Date()
+    isWeeklyLongitudinalGrowthRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Weekly longitudinal growth check failed:', error.message)
+    isWeeklyLongitudinalGrowthRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5608,6 +5719,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Weekly longitudinal growth check: 10 AM UTC every Saturday (Job 49)')
   console.log('')
 
   // Check every hour for scheduled jobs

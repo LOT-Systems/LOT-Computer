@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: longitudinal growth arc · sustained presence signature · mastery depth peak (P152/P153/P154)
+      'longitudinal_growth_arc',
+      'sustained_presence_signature',
+      'mastery_depth_peak',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

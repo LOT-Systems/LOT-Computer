@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'longitudinal-growth-arc':          'Longitudinal growth arc — badges + memory + journal all accumulating over 30d, system expanding (P152)',
+      'sustained-presence-signature':     'Sustained presence signature — active 5+ of last 7 days, continuous operational presence (P153)',
+      'mastery-depth-peak':               'Mastery depth peak — badges + memory + journal co-present on same day(s), full depth open (P154)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

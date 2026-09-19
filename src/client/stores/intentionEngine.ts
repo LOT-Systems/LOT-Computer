@@ -3428,6 +3428,76 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Longitudinal Growth Arc — sustained badge + memory + journal accumulation over 30d.
+  // When all three depth channels have been actively growing for 30 days, the system is not
+  // maintaining state — it is expanding. Behavioral arc: growth process, not a point-in-time state.
+  const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000
+  const recent30d = signals.filter(s => now - s.timestamp < thirtyDaysMs)
+  const badgeSignals30d = recent30d.filter(s => s.source === 'badges')
+  const memSignals30d   = recent30d.filter(s => s.source === 'memory')
+  const jrnlSignals30d  = recent30d.filter(s => s.source === 'journal')
+  const logSignals30d   = recent30d.filter(s => s.source === 'log')
+  if (badgeSignals30d.length >= 2 && memSignals30d.length >= 5 && jrnlSignals30d.length >= 10 && logSignals30d.length >= 20) {
+    const growthDepth = badgeSignals30d.length + memSignals30d.length + jrnlSignals30d.length
+    const growthConf  = 0.65 + Math.min(growthDepth / 100 * 0.17, 0.17)
+    patterns.push({
+      pattern: 'longitudinal-growth-arc',
+      confidence: Math.min(growthConf, 0.82),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'passive',
+      reason: `GROWTH: Longitudinal growth arc — badges · memory · journal actively accumulating over 30d. Badges: ${badgeSignals30d.length} · Memory: ${memSignals30d.length} · Journal: ${jrnlSignals30d.length}. The system is not maintaining state — it is expanding. Growth confirmed across multiple axes.`,
+    })
+  }
+
+  // Pattern 153: Sustained Presence Signature — continuous operation across 5+ of last 7 days.
+  // The OS has been inhabited without significant absence. Presence is not a burst — it is a practice.
+  // Behavioral arc: operational continuity over a week.
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000
+  const recent7dSPS = signals.filter(s => now - s.timestamp < sevenDaysMs)
+  if (recent7dSPS.length >= 10) {
+    const daySet = new Set<string>()
+    recent7dSPS.forEach(s => {
+      const d = new Date(s.timestamp)
+      daySet.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`)
+    })
+    const uniqueDays = daySet.size
+    if (uniqueDays >= 5) {
+      const presenceBonus = Math.min((uniqueDays - 5) * 0.09, 0.18)
+      patterns.push({
+        pattern: 'sustained-presence-signature',
+        confidence: Math.min(0.70 + presenceBonus, 0.88),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'passive',
+        reason: `SUSP: Sustained presence signature — active ${uniqueDays} of last 7 days. No significant operational gap. The OS has been continuously inhabited. Presence is not a burst — it is a practice.`,
+      })
+    }
+  }
+
+  // Pattern 154: Mastery Depth Peak — badges + memory + journal simultaneously active on same day(s).
+  // All three depth channels open at once. Not just high volume — co-present on the same calendar day.
+  // Behavioral arc: full-depth operation confirmed.
+  const recent7dMastery  = signals.filter(s => now - s.timestamp < sevenDaysMs)
+  const badges7d          = recent7dMastery.filter(s => s.source === 'badges')
+  const memory7d          = recent7dMastery.filter(s => s.source === 'memory')
+  const journal7d         = recent7dMastery.filter(s => s.source === 'journal')
+  if (badges7d.length >= 1 && memory7d.length >= 3 && journal7d.length >= 5) {
+    const badgeDays   = new Set(badges7d.map(s => new Date(s.timestamp).getDate()))
+    const memDays     = new Set(memory7d.map(s => new Date(s.timestamp).getDate()))
+    const journalDays = new Set(journal7d.map(s => new Date(s.timestamp).getDate()))
+    const coPresence  = [...badgeDays].filter(d => memDays.has(d) && journalDays.has(d))
+    if (coPresence.length >= 1) {
+      const depthScore = badges7d.length + memory7d.length * 0.5 + journal7d.length * 0.3
+      const depthConf  = 0.72 + Math.min(depthScore / 20 * 0.18, 0.18)
+      patterns.push({
+        pattern: 'mastery-depth-peak',
+        confidence: Math.min(depthConf, 0.90),
+        suggestedWidget: 'memory',
+        suggestedTiming: 'passive',
+        reason: `MASDP: Mastery depth peak — badges · memory · journal co-present on ${coPresence.length} day(s) in last 7d. All three depth channels simultaneously open. Badges: ${badges7d.length} · Memory: ${memory7d.length} · Journal: ${journal7d.length}. The system is operating at full knowledge depth.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4134,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  longitudinalGrowthNode:     ['badges', 'memory', 'journal', 'log', 'qos'],
+  sustainedPresenceNode:      ['mood', 'log', 'journal', 'energy', 'selfcare'],
+  masteryDepthNode:           ['badges', 'memory', 'journal', 'intentions', 'log'],
 }
 
 /**
@@ -4510,6 +4585,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Longitudinal Operator (2026-09-19 v114) ──────────────────────────────
+  {
+    archetype: 'Longitudinal Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['badges', 'memory', 'journal', 'log'],
+    patternConditions: ['longitudinal-growth-arc', 'sustained-presence-signature', 'mastery-depth-peak'],
+    hourRange: [5, 23],
+    directive: 'Growth confirmed across every axis. The system is not returning to baseline — it is operating from a higher baseline than it left. Continuous presence. Continuous expansion. The arc is not a moment — it is a practice.',
   },
 ]
 
@@ -6498,6 +6583,59 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a longitudinal-growth-arc event — badges + memory + journal all accumulating
+ * over a 30-day window. The system is not maintaining state — it is expanding.
+ * Feeds P152 detection.
+ */
+export function recordLongitudinalGrowthArc(badges30d: number, memory30d: number, journal30d: number, growthConf: number) {
+  recordSignal('badges', 'longitudinal_growth_arc', {
+    badges30d,
+    memory30d,
+    journal30d,
+    growthConf: Math.round(growthConf * 100),
+    axes: ['BADGES', 'MEMORY', 'JOURNAL'],
+    growthStatus: 'EXPANDING',
+    window: '30d',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sustained-presence-signature event — the OS has been active 5+ of last 7 days
+ * without significant operational absence. Continuous presence confirmed.
+ * Feeds P153 detection.
+ */
+export function recordSustainedPresenceSignature(activeDays: number, presenceConf: number) {
+  recordSignal('log', 'sustained_presence_signature', {
+    activeDays,
+    activeDaysOf: 7,
+    presenceConf: Math.round(presenceConf * 100),
+    continuity: activeDays >= 6 ? 'HIGH' : 'CONFIRMED',
+    status: 'CONTINUOUS',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a mastery-depth-peak event — badges + memory + journal all co-present
+ * on the same day(s) within a 7-day window. All three depth channels simultaneously open.
+ * Feeds P154 detection.
+ */
+export function recordMasteryDepthPeak(badges7d: number, memory7d: number, journal7d: number, coPresenceDays: number, depthConf: number) {
+  recordSignal('memory', 'mastery_depth_peak', {
+    badges7d,
+    memory7d,
+    journal7d,
+    coPresenceDays,
+    depthConf: Math.round(depthConf * 100),
+    channels: ['BADGES', 'MEMORY', 'JOURNAL'],
+    depthStatus: 'PEAK',
+    window: '7d',
     hour: new Date().getHours(),
   })
 }
