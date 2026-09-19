@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
 
 ## Render Isolation
 
@@ -226,3 +226,25 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Route Discovery Before Route Creation
+
+In a route file large enough to need scrolling past 5000 lines, a feature that
+"sounds missing" may already exist, broken, further down. Before adding a new
+fastify.post/get for a slash-command or endpoint, grep the route file for the
+literal path string first. Two handlers registered on the same method+path is
+a Fastify boot-time crash, not a silent overwrite — it will not surface until
+the next server start, after the broken version is already pushed. The same
+discovery step applies to event names: a new Log event handler is worthless if
+the filter that reads it back uses a different event string than the one the
+write path actually creates (see Backend Whitelist Hygiene) — grep for the
+event string on both the write and read side before trusting either.
+This generalizes Manifest Hygiene and Master-Authoritative Files from the
+branch level to the file level: this codebase now has two parallel Memory
+Engine implementations (src/server/utils/memory.ts vs memory/*.ts) reachable
+depending on which import path a route uses, a competing-iteration shape
+the doctrine already has a name for at the branch level but not yet inside
+a single file tree.
+(SR-20260919-01: added a second POST /story before discovering api.ts:5487
+already had one with a working AI call and a dead event-name filter; deleted
+the duplicate, fixed the original's filters instead of shipping two.)
