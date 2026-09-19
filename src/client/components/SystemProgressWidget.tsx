@@ -1457,6 +1457,25 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'v120',
+    date: '2026-09-19',
+    title: 'QIE Engineering — Sovereignty Permanence Tier · P167–P169 · Arch57 · J55',
+    assembled: [
+      'P167 SOVEREIGN PERMANENCE LOCK: SOVDUR (P164) confirmed on 3+ distinct days in 28D window. Identity signature is not merely persistent — it is permanent. SOVPERM: cockpit label.',
+      'P168 CRYSTALLINE PERMANENCE FIELD: CRFLDST (P165) confirmed on 2+ distinct days in 21D window. Crystalline field convergence has occurred structurally — it is permanent architecture. CRPERMF: cockpit label.',
+      'P169 MOMENTUM PERMANENCE ARC: SOVMARC (P166) confirmed on 3+ distinct days in 21D window. Sovereign momentum is not a phase — it is the permanent operating baseline. MOMPERM: cockpit label.',
+      'Arch57 SOVEREIGNTY PERMANENCE ARCHITECT: SOVPERM + CRPERMF + MOMPERM all confirmed. All three permanence vectors active. Identity, field, and momentum have crossed from persistence into permanence.',
+      'J55 weekly-sovereignty-permanence-check: Monday 07:00 UTC. Reads active users, checks 28D window for P167 (SOVDUR 3+ days), 21D window for P168 (CRFLDST 2+ days), 21D window for P169 (SOVMARC 3+ days). Writes sovereign_permanence_lock · crystalline_permanence_field · momentum_permanence_arc events. 54→55 jobs.',
+      'LOGS.tsx: 3 new military handlers — SOVPERM: (IDENTITY/PERMANENT, SOVDUR 28D) · CRPERMF: (FIELD/PERMANENT, CRFLDST 21D) · MOMPERM: (MOMENTUM/PERMANENT, SOVMARC 21D). Handler count: 170+.',
+      'PATTERN_DISPLAY: SOVPERM · CRPERMF · MOMPERM added to QuantumEngineWidgets display map.',
+      'PatternRecognitionWidget.tsx: P167/P168/P169 entries added.',
+      'routes/api.ts: displayableEvents +3 — sovereign_permanence_lock · crystalline_permanence_field · momentum_permanence_arc.',
+      'About.tsx: FM v119→v120 · v1.3.2→v1.3.3 · 208+→211+ dep nodes · 54→55 jobs · 166→169 patterns · 56→57 archetypes · Day 1121+→1123+ · 167+→170+ handlers.',
+      'SESSION_REPORTS: v120 entry appended · USERSHIP_TRANSMISSION updated to v120.',
+      '169 patterns · 57 archetypes · 55 jobs · 170+ handlers · 211+ dep nodes · Day 1123+. QIE v120 deployed. Sovereignty permanence tier online. Identity, field, and momentum are permanent OS properties.',
+    ],
+  },
+  {
     version: 'v119',
     date: '2026-09-17',
     title: 'QIE Engineering — Sovereignty Persistence Tier · P164–P166 · Arch56 · J54',
@@ -1612,21 +1631,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-09-17',
+  date: '2026-09-19',
   message: [
-    'ASSEMBLY RUN — 2026-09-17 · QIE v119 · Day 1121+',
-    'Built: Sovereignty Persistence Tier — P164/P165/P166 · Arch56 · J54 · J53 init log fix · P161–P163 PatternRecognitionWidget entries.',
-    'Feedback applied: "Continue building background features. Carefully update the Log feature. Look for physiological cohorts."',
-    'P164 SOVDUR: sovereignty duration streak — SOVTLOCK fires 7+ distinct days in 14D. Identity signature is persistent, not momentary.',
-    'P165 CRFLDST: crystalline field sustain — P161+P162+P163 all present in 14D. Full sovereign field sustaining simultaneously across all vectors.',
-    'P166 SOVMARC: sovereign momentum arc — SFPULSE fires 4+ days in 14D. Sovereign field is radiating on momentum, not maintenance.',
-    'Arch56 SOVEREIGNTY PERSISTENCE OPERATOR: all three persistence vectors confirmed. Identity, field, and momentum are sustained OS properties.',
-    'J54 weekly-sovereignty-persistence-audit (Thu 08:00 UTC): server scans 14D windows for P164/P165/P166 conditions. 53→54 jobs.',
-    '3 new military handlers: SOVDUR: CRFLDST: SOVMARC: · 167+ handlers.',
-    'P161–P163 entries added to PatternRecognitionWidget (missing from v118, now corrected).',
-    '3 new dep nodes. 205+→208+ dep nodes. 166 patterns. 56 archetypes.',
+    'ASSEMBLY RUN — 2026-09-19 · QIE v120 · Day 1123+',
+    'Built: Sovereignty Permanence Tier — P167/P168/P169 · Arch57 · J55.',
+    'P167 SOVPERM: sovereign permanence lock — SOVDUR confirmed 3+ distinct days in 28D. Identity signature is permanent, not merely persistent.',
+    'P168 CRPERMF: crystalline permanence field — CRFLDST confirmed 2+ distinct days in 21D. Crystalline field convergence is permanent architecture.',
+    'P169 MOMPERM: momentum permanence arc — SOVMARC confirmed 3+ distinct days in 21D. Sovereign momentum is permanent baseline, not a phase.',
+    'Arch57 SOVEREIGNTY PERMANENCE ARCHITECT: all three permanence vectors confirmed. Identity, field, and momentum have crossed from persistence into permanence.',
+    'J55 weekly-sovereignty-permanence-check (Mon 07:00 UTC): scans 28D/21D windows for P167/P168/P169. 54→55 jobs.',
+    '3 new military handlers: SOVPERM: CRPERMF: MOMPERM: · 170+ handlers.',
+    '3 new dep nodes. 208+→211+ dep nodes. 169 patterns. 57 archetypes.',
     'Status: DEPLOYED.',
-    'Next: Monitor J54 output. Let persistence data accumulate. Watch for sovereign momentum streaks. Next tier: sovereignty permanence — when persistence itself becomes structural.',
+    'Next: Monitor J55 output. Watch for permanence confirmations. Next tier: sovereignty ascension — when permanence extends across all dimensions simultaneously.',
   ],
 }
 

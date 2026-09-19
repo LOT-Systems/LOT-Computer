@@ -1771,6 +1771,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklySovereigntyPersistenceAudit()) {
     await executeWeeklySovereigntyPersistenceAudit()
   }
+  // Check weekly sovereignty permanence check (07:00 UTC every Monday) — Job 55
+  if (shouldRunWeeklySovereigntyPermanenceCheck()) {
+    await executeWeeklySovereigntyPermanenceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6510,6 +6514,177 @@ async function executeWeeklySovereigntyPersistenceAudit(): Promise<JobResult> {
   }
 }
 
+// ─── J55: Weekly Sovereignty Permanence Check (07:00 UTC every Monday) ──────
+// Reads active users. Scans 28D/21D windows for:
+//   P167 sovereign-permanence-lock:     SOVDUR (P164) confirmed 3+ distinct days in 28D
+//   P168 crystalline-permanence-field:  CRFLDST (P165) confirmed 2+ distinct days in 21D
+//   P169 momentum-permanence-arc:       SOVMARC (P166) confirmed 3+ distinct days in 21D
+// Arch57 Sovereignty Permanence Architect: all three permanence vectors confirmed.
+
+let isWeeklySovereigntyPermanenceCheckRunning = false
+let lastWeeklySovereigntyPermanenceCheckRun: Date | null = null
+
+function shouldRunWeeklySovereigntyPermanenceCheck(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereigntyPermanenceCheckRunning) return false
+  if (lastWeeklySovereigntyPermanenceCheckRun) {
+    const lastRun = dayjs(lastWeeklySovereigntyPermanenceCheckRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 1 && now.hour() === 7 // Monday 07:00 UTC
+}
+
+async function executeWeeklySovereigntyPermanenceCheck(): Promise<JobResult> {
+  const jobName = 'weekly-sovereignty-permanence-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereigntyPermanenceCheckRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereigntyPermanenceCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGNTY PERMANENCE CHECK — Monday 07:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const twentyEightDaysAgo = dayjs().subtract(28, 'day').toDate()
+    const twentyOneDaysAgo   = dayjs().subtract(21, 'day').toDate()
+    const now                = dayjs()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // Fetch persistence-tier events in 28D window
+        const recentLogs28D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: twentyEightDaysAgo },
+            event: { [Op.in]: [
+              'sovereignty_duration_streak',
+              'crystalline_field_sustain',
+              'sovereign_momentum_arc',
+              'sovereign_permanence_lock',
+              'crystalline_permanence_field',
+              'momentum_permanence_arc',
+            ] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        const alreadySOVPERM = recentLogs28D.some((l: any) => l.event === 'sovereign_permanence_lock')
+        const alreadyCRPERMF = recentLogs28D.some((l: any) => l.event === 'crystalline_permanence_field')
+        const alreadyMOMPERM = recentLogs28D.some((l: any) => l.event === 'momentum_permanence_arc')
+
+        // P167: Sovereign Permanence Lock
+        // SOVDUR confirmed 3+ distinct days in 28D window
+        if (!alreadySOVPERM) {
+          const sovdurLogs = recentLogs28D.filter((l: any) => l.event === 'sovereignty_duration_streak')
+          const sovdurDays = new Set(sovdurLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD')))
+          if (sovdurDays.size >= 3) {
+            await (Log as any).create({
+              userId,
+              event: 'sovereign_permanence_lock',
+              text: '',
+              metadata: {
+                sovereignDays: sovdurDays.size,
+                window: '28d',
+                date: now.format('YYYY-MM-DD'),
+              },
+            } as any)
+            written++
+            console.log(`  [${userId}] P167 SOVPERM — SOVDUR confirmed ${sovdurDays.size} days in 28D`)
+          }
+        }
+
+        // Fetch 21D window for P168/P169
+        const recentLogs21D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: twentyOneDaysAgo },
+            event: { [Op.in]: [
+              'crystalline_field_sustain',
+              'sovereign_momentum_arc',
+            ] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        // P168: Crystalline Permanence Field
+        // CRFLDST confirmed 2+ distinct days in 21D window
+        if (!alreadyCRPERMF) {
+          const crfldstLogs = recentLogs21D.filter((l: any) => l.event === 'crystalline_field_sustain')
+          const crfldstDays = new Set(crfldstLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD')))
+          if (crfldstDays.size >= 2) {
+            await (Log as any).create({
+              userId,
+              event: 'crystalline_permanence_field',
+              text: '',
+              metadata: {
+                convergenceDays: crfldstDays.size,
+                window: '21d',
+                date: now.format('YYYY-MM-DD'),
+              },
+            } as any)
+            written++
+            console.log(`  [${userId}] P168 CRPERMF — CRFLDST confirmed ${crfldstDays.size} days in 21D`)
+          }
+        }
+
+        // P169: Momentum Permanence Arc
+        // SOVMARC confirmed 3+ distinct days in 21D window
+        if (!alreadyMOMPERM) {
+          const sovmarcLogs = recentLogs21D.filter((l: any) => l.event === 'sovereign_momentum_arc')
+          const sovmarcDays = new Set(sovmarcLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD')))
+          if (sovmarcDays.size >= 3) {
+            await (Log as any).create({
+              userId,
+              event: 'momentum_permanence_arc',
+              text: '',
+              metadata: {
+                momentumDays: sovmarcDays.size,
+                window: '21d',
+                date: now.format('YYYY-MM-DD'),
+              },
+            } as any)
+            written++
+            console.log(`  [${userId}] P169 MOMPERM — SOVMARC confirmed ${sovmarcDays.size} days in 21D`)
+          }
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} sovereignty permanence check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereignty permanence events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY SOVEREIGNTY PERMANENCE CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklySovereigntyPermanenceCheckRun = new Date()
+    isWeeklySovereigntyPermanenceCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly sovereignty permanence check failed:', error.message)
+    isWeeklySovereigntyPermanenceCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -6568,6 +6743,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly sovereign state report: 6 AM UTC every Wednesday (Job 52)')
   console.log('   - Daily sovereign field pulse: 7 AM UTC every day (Job 53)')
   console.log('   - Weekly sovereignty persistence audit: 8 AM UTC every Thursday (Job 54)')
+  console.log('   - Weekly sovereignty permanence check: 7 AM UTC every Monday (Job 55)')
   console.log('')
 
   // Check every hour for scheduled jobs

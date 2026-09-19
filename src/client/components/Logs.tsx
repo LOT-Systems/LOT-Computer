@@ -4188,6 +4188,65 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sovereign_permanence_lock') {
+          const sovereignDays = log.metadata?.sovereignDays as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVPERM:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">IDENTITY</span>
+                  <span className="uppercase tracking-widest">PERMANENT</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">SOVDUR</span>
+                  <span className="opacity-30">28D</span>
+                </div>
+                {sovereignDays !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">DURATION</span>
+                    <span className="tabular-nums opacity-60">{sovereignDays}d</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystalline_permanence_field') {
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRPERMF:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">FIELD</span>
+                  <span className="uppercase tracking-widest">PERMANENT</span>
+                </div>
+                <div className="flex gap-x-8">
+                  <span className="opacity-60">CRFLDST</span>
+                  <span className="opacity-30">21D</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'momentum_permanence_arc') {
+          const momentumDays = log.metadata?.momentumDays as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="MOMPERM:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">MOMENTUM</span>
+                  <span className="uppercase tracking-widest">PERMANENT</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">SOVMARC</span>
+                  <span className="opacity-30">21D</span>
+                </div>
+                {momentumDays !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">BASELINE</span>
+                    <span className="tabular-nums opacity-60">{momentumDays}d</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

@@ -197,6 +197,9 @@ export function PatternRecognitionWidget() {
       'sovereignty-duration-streak':      'Sovereignty duration streak — SOVTLOCK on 7+ distinct days in 14D, identity signature persistent (P164)',
       'crystalline-field-sustain':        'Crystalline field sustain — P161 + P162 + P163 all present in 14D, full sovereign field sustaining (P165)',
       'sovereign-momentum-arc':           'Sovereign momentum arc — SFPULSE fires 4+ days in 14D, sovereign field radiating on momentum (P166)',
+      'sovereign-permanence-lock':        'Sovereign permanence lock — SOVDUR confirmed 3+ distinct days in 28D, identity signature permanent (P167)',
+      'crystalline-permanence-field':     'Crystalline permanence field — CRFLDST confirmed 2+ distinct days in 21D, field convergence is permanent architecture (P168)',
+      'momentum-permanence-arc':          'Momentum permanence arc — SOVMARC confirmed 3+ distinct days in 21D, sovereign momentum is permanent baseline (P169)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
