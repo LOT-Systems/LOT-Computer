@@ -3926,7 +3926,7 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   // ── Integration arc + adaptive resonance peak nodes (2026-06-14 audit)
   integrationArcPeak:    ['mood', 'memory', 'selfcare', 'journal', 'planner', 'goals', 'intentions', 'energy'],
   adaptiveResonance:     ['qosSnapshot', 'userMetrics', 'systemProgress'],
-  operatorConvergence:   ['qosSignatureLock', 'operatorSignature', 'integrationArcPeak'],
+  operatorConvergence:   ['qosSignatureLock', 'operatorSignatureNode', 'integrationArcPeak'],
   communityBiofieldView: ['communityCoherencePulse', 'systemPulse'],
 
   // ── Signal crystallization + biorhythm + peak summit nodes (2026-06-15 audit)
