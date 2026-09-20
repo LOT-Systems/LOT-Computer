@@ -1241,6 +1241,10 @@ export default async (fastify: FastifyInstance) => {
       'momentum_permanence_arc',
       // v121: sovereignty ascension tier (J56 weekly check — P170)
       'sovereignty_ascension',
+      // v122: sovereignty in motion tier (J57 weekly check — P171–P173)
+      'sovereign_momentum_crystallization',
+      'living_sovereign_field',
+      'sovereign_in_motion',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

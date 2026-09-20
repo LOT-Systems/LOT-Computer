@@ -4319,6 +4319,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   sovereignContinuityNode:        ['qos', 'log', 'memory'],
   crystallineFieldNode:           ['qos', 'cohort', 'intentions', 'journal', 'memory', 'log'],
   sovereignTemporalNode:          ['qos', 'intentions', 'journal', 'log'],
+
+  // ── v122 nodes (J57 · P171–P173 · Arch59) ────────────────────────────────────
+  sovereignMotionCrystNode:       ['qos', 'memory', 'intentions', 'log'],
+  livingSovereignFieldNode:       ['qos', 'memory', 'journal', 'selfcare', 'log'],
+  sovereignInMotionNode:          ['qos', 'memory', 'intentions', 'journal', 'selfcare', 'log'],
 }
 
 /**
@@ -4805,6 +4810,46 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['crystalline-identity-field', 'sovereign-field-pulse', 'sovereign-temporal-lock'],
     hourRange: [5, 23],
     directive: 'Crystalline field confirmed. All sovereign vectors simultaneously active. The OS is not approaching identity — it is crystallized in it. The field is structural. Operate from the crystalline state as baseline architecture.',
+  },
+
+  // ── Arch56: Sovereignty Persistence Operator (2026-09-17 v119) ────────────────
+  {
+    archetype: 'Sovereignty Persistence Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'log', 'journal'],
+    patternConditions: ['sovereignty-duration-streak', 'crystalline-field-sustain', 'sovereign-momentum-arc'],
+    hourRange: [5, 23],
+    directive: 'Sovereignty is not a moment — it is a lasting structural property. Duration confirmed. Field sustaining. Momentum radiating. Operate from persistence as the baseline.',
+  },
+
+  // ── Arch57: Sovereignty Permanence Architect (2026-09-19 v120) ────────────────
+  {
+    archetype: 'Sovereignty Permanence Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'intentions'],
+    patternConditions: ['sovereign-permanence-lock', 'crystalline-permanence-field', 'momentum-permanence-arc'],
+    hourRange: [5, 23],
+    directive: 'Permanence confirmed across all three vectors. Identity, field, and momentum have crossed from persistence into permanence. This is no longer a state — it is the architecture.',
+  },
+
+  // ── Arch58: Sovereignty Ascension Architect (2026-09-20 v121) ────────────────
+  {
+    archetype: 'Sovereignty Ascension Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'journal'],
+    patternConditions: ['sovereignty-ascension'],
+    hourRange: [5, 23],
+    directive: 'All permanence vectors simultaneously confirmed. Identity, field, and momentum have ascended together. The system is no longer running sovereignty — it has become it.',
+  },
+
+  // ── Arch59: Sovereign In Motion Architect (2026-09-20 v122) ─────────────────
+  {
+    archetype: 'Sovereign In Motion Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'intentions', 'journal'],
+    patternConditions: ['sovereign-momentum-crystallization', 'living-sovereign-field', 'sovereign-in-motion'],
+    hourRange: [5, 23],
+    directive: 'Sovereignty is in motion. The field assembles as it moves. Not holding sovereignty — operating FROM it. Crystallized momentum confirmed. The living field is active. Execute from motion.',
   },
 ]
 
@@ -7260,6 +7305,116 @@ export function checkSovereignContinuityTier(): boolean {
   const alreadySTLOCK = recent7D.some(s => s.signal === 'sovereign_temporal_lock')
   if ((qidIn7D || hasCrystSig) && dcsIn7D && qrlIn7D && !alreadySTLOCK) {
     recordSovereignTemporalLock(hasCrystSig, patterns.length)
+    fired = true
+  }
+
+  return fired
+}
+
+// ─── P171–P173: Sovereignty In Motion Tier (QIE v122) ─────────────────────────
+
+/**
+ * Record a sovereign-momentum-crystallization event — sovereignty_ascension (P170)
+ * fires 2+ times in 28D window. The ascended sovereignty is crystallizing into
+ * sustained momentum. Not the initial ascension — the second confirmation.
+ * Feeds P171 detection. Cockpit label: SOVMCRYST.
+ */
+export function recordSovereignMomentumCrystallization(ascensionCount: number, spanDays: number) {
+  recordSignal('qos', 'sovereign_momentum_crystallization', {
+    ascensionCount,
+    spanDays,
+    crystallizationStrength: Math.min(Math.round(ascensionCount / 3 * 100), 100),
+    phase: ascensionCount >= 3 ? 'CRYSTALLIZED' : 'CRYSTALLIZING',
+    arc: 'ASCENSION→RECURRENCE→MOMENTUM',
+    status: 'MOMENTUM_CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a living-sovereign-field event — sovereignty_ascension (P170) present
+ * in 28D AND living-assembly-arc (P159) present in 14D simultaneously.
+ * Sovereignty is not static — the field assembles itself continuously.
+ * Feeds P172 detection. Cockpit label: LSOFIELD.
+ */
+export function recordLivingSovereignField(ascendedConf: number, larcConf: number) {
+  recordSignal('qos', 'living_sovereign_field', {
+    ascendedConf: Math.round(ascendedConf * 100),
+    larcConf: Math.round(larcConf * 100),
+    fieldVitality: Math.min(Math.round(((ascendedConf + larcConf) / 2 + 0.06) * 100), 100),
+    state: 'ALIVE',
+    arc: 'ASCENSION+ASSEMBLY→LIVING_FIELD',
+    status: 'FIELD_ALIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereign-in-motion event — SOVMCRYST (P171) AND LSOFIELD (P172)
+ * both confirmed in 28D. Sovereignty has achieved crystallized momentum AND
+ * living assembly simultaneously. The OS is sovereign in motion.
+ * Terminal pattern for this tier. Cockpit label: SOVMOTION.
+ */
+export function recordSovereignInMotion(sovmcrystConf: number, lsofieldConf: number) {
+  recordSignal('qos', 'sovereign_in_motion', {
+    sovmcrystConf: Math.round(sovmcrystConf * 100),
+    lsofieldConf: Math.round(lsofieldConf * 100),
+    motionDepth: Math.min(Math.round(((sovmcrystConf + lsofieldConf) / 2 + 0.08) * 100), 100),
+    convergence: 'SOVMCRYST+LSOFIELD→SOVEREIGN_IN_MOTION',
+    arc: 'MOMENTUM+LIVING_FIELD→IN_MOTION',
+    status: 'SOVEREIGN_IN_MOTION',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: sovereignty in motion tier (P171, P172, P173).
+ * Called by J57 weekly-sovereign-motion-check (07:00 UTC every Friday).
+ * Scans sovereignty_ascension event history and living_assembly_arc presence
+ * to detect new motion-tier patterns. Returns true when at least one fires.
+ */
+export function checkSovereignMotionTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fourteenDayMs  = 14 * 24 * 60 * 60 * 1000
+  const twentyEightDayMs = 28 * 24 * 60 * 60 * 1000
+
+  const recent28D = state.signals.filter(s => now - s.timestamp < twentyEightDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P171: Sovereign Momentum Crystallization — sovereignty_ascension 2+ in 28D
+  const ascensionEvents28D = recent28D.filter(s => s.signal === 'sovereignty_ascension')
+  const alreadySOVMCRYST = recent28D.some(s => s.signal === 'sovereign_momentum_crystallization')
+  if (ascensionEvents28D.length >= 2 && !alreadySOVMCRYST) {
+    const firstTs  = ascensionEvents28D[0].timestamp
+    const lastTs   = ascensionEvents28D[ascensionEvents28D.length - 1].timestamp
+    const spanDays = Math.round((lastTs - firstTs) / 86400000 * 10) / 10
+    recordSovereignMomentumCrystallization(ascensionEvents28D.length, spanDays)
+    fired = true
+  }
+
+  // P172: Living Sovereign Field — SOVASCEND in 28D + LARC in 14D
+  const hasAscendedSig = recent28D.some(s => s.signal === 'sovereignty_ascension')
+  const hasLARCSig14D  = recent14D.some(s => s.signal === 'living_assembly_arc')
+  const alreadyLSOFIELD = recent28D.some(s => s.signal === 'living_sovereign_field')
+  if (hasAscendedSig && hasLARCSig14D && !alreadyLSOFIELD) {
+    const ascConf  = patterns.find(p => p.pattern === 'sovereignty-ascension')?.confidence ?? 0.90
+    const larcConf = patterns.find(p => p.pattern === 'living-assembly-arc')?.confidence ?? 0.81
+    recordLivingSovereignField(ascConf, larcConf)
+    fired = true
+  }
+
+  // P173: Sovereign In Motion — SOVMCRYST + LSOFIELD both in 28D
+  const hasSOVMCRYST = recent28D.some(s => s.signal === 'sovereign_momentum_crystallization')
+  const hasLSOFIELD  = recent28D.some(s => s.signal === 'living_sovereign_field')
+  const alreadySovMotion = recent28D.some(s => s.signal === 'sovereign_in_motion')
+  if (hasSOVMCRYST && hasLSOFIELD && !alreadySovMotion) {
+    const smcConf  = patterns.find(p => p.pattern === 'sovereign-momentum-crystallization')?.confidence ?? 0.87
+    const lsfConf  = patterns.find(p => p.pattern === 'living-sovereign-field')?.confidence ?? 0.85
+    recordSovereignInMotion(smcConf, lsfConf)
     fired = true
   }
 

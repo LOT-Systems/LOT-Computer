@@ -130,6 +130,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'crystalline-permanence-field':     'CRPERMF',
   'momentum-permanence-arc':          'MOMPERM',
   'sovereignty-ascension':            'SOVASCEND',
+  'sovereign-momentum-crystallization': 'SOVMCRYST',
+  'living-sovereign-field':            'LSOFIELD',
+  'sovereign-in-motion':               'SOVMOTION',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

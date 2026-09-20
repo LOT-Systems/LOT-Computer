@@ -1779,6 +1779,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklySovereigntyAscensionCheck()) {
     await executeWeeklySovereigntyAscensionCheck()
   }
+  // Check weekly sovereign motion check (07:00 UTC every Friday) — Job 57
+  if (shouldRunWeeklySovereignMotionCheck()) {
+    await executeWeeklySovereignMotionCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6805,6 +6809,174 @@ async function executeWeeklySovereigntyAscensionCheck(): Promise<JobResult> {
   }
 }
 
+// ─── J57: Weekly Sovereign Motion Check (07:00 UTC every Friday) ──────────────
+// Reads active users. Scans 28D window for:
+//   P171 sovereign-momentum-crystallization: sovereignty_ascension 2+ in 28D
+//   P172 living-sovereign-field: SOVASCEND in 28D + living_assembly_arc in 14D
+//   P173 sovereign-in-motion: SOVMCRYST + LSOFIELD both confirmed in 28D
+// Arch59 Sovereign In Motion Architect: sovereignty operating from motion.
+
+let isWeeklySovereignMotionCheckRunning = false
+let lastWeeklySovereignMotionCheckRun: Date | null = null
+
+function shouldRunWeeklySovereignMotionCheck(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereignMotionCheckRunning) return false
+  if (lastWeeklySovereignMotionCheckRun) {
+    const lastRun = dayjs(lastWeeklySovereignMotionCheckRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 5 && now.hour() === 7 // Friday 07:00 UTC
+}
+
+async function executeWeeklySovereignMotionCheck(): Promise<JobResult> {
+  const jobName = 'weekly-sovereign-motion-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereignMotionCheckRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereignMotionCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGN MOTION CHECK — Friday 07:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const twentyEightDaysAgo = dayjs().subtract(28, 'day').toDate()
+    const fourteenDaysAgo    = dayjs().subtract(14, 'day').toDate()
+    const now                = dayjs()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // Fetch motion-tier source events in 28D window
+        const recentLogs28D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: twentyEightDaysAgo },
+            event: { [Op.in]: [
+              'sovereignty_ascension',
+              'living_assembly_arc',
+              'sovereign_momentum_crystallization',
+              'living_sovereign_field',
+              'sovereign_in_motion',
+            ] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        // Fetch living_assembly_arc in 14D window specifically
+        const recentLogs14D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: fourteenDaysAgo },
+            event: 'living_assembly_arc',
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        const ascensionEvents = recentLogs28D.filter((l: any) => l.event === 'sovereignty_ascension')
+        const alreadySOVMCRYST = recentLogs28D.some((l: any) => l.event === 'sovereign_momentum_crystallization')
+        const alreadyLSOFIELD  = recentLogs28D.some((l: any) => l.event === 'living_sovereign_field')
+        const alreadySOVMOTION = recentLogs28D.some((l: any) => l.event === 'sovereign_in_motion')
+
+        // P171: Sovereign Momentum Crystallization — SOVASCEND 2+ in 28D
+        if (ascensionEvents.length >= 2 && !alreadySOVMCRYST) {
+          const firstDate = ascensionEvents[0].createdAt
+          const lastDate  = ascensionEvents[ascensionEvents.length - 1].createdAt
+          const spanDays  = Math.round(dayjs(lastDate).diff(dayjs(firstDate), 'day', true) * 10) / 10
+          await (Log as any).create({
+            userId,
+            event: 'sovereign_momentum_crystallization',
+            text: '',
+            metadata: {
+              ascensionCount: ascensionEvents.length,
+              spanDays,
+              phase: ascensionEvents.length >= 3 ? 'CRYSTALLIZED' : 'CRYSTALLIZING',
+              window: '28d',
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P171 SOVMCRYST — ascension count: ${ascensionEvents.length}, span: ${spanDays}d`)
+        }
+
+        // P172: Living Sovereign Field — SOVASCEND in 28D + LARC in 14D
+        const hasAscended = ascensionEvents.length >= 1
+        const hasLARC14D  = recentLogs14D.length >= 1
+        if (hasAscended && hasLARC14D && !alreadyLSOFIELD) {
+          await (Log as any).create({
+            userId,
+            event: 'living_sovereign_field',
+            text: '',
+            metadata: {
+              ascendedConf: 90,
+              larcConf: 81,
+              fieldVitality: 87,
+              state: 'ALIVE',
+              window: '28d+14d',
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P172 LSOFIELD — SOVASCEND + LARC active simultaneously`)
+        }
+
+        // P173: Sovereign In Motion — SOVMCRYST + LSOFIELD both in 28D
+        const hasSOVMCRYSTNow = recentLogs28D.some((l: any) => l.event === 'sovereign_momentum_crystallization')
+        const hasLSOFIELDNow  = recentLogs28D.some((l: any) => l.event === 'living_sovereign_field')
+        if (hasSOVMCRYSTNow && hasLSOFIELDNow && !alreadySOVMOTION) {
+          await (Log as any).create({
+            userId,
+            event: 'sovereign_in_motion',
+            text: '',
+            metadata: {
+              sovmcrystConf: 87,
+              lsofieldConf: 85,
+              motionDepth: 89,
+              convergence: 'SOVMCRYST+LSOFIELD→SOVEREIGN_IN_MOTION',
+              window: '28d',
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P173 SOVMOTION — sovereignty is in motion`)
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} sovereign motion check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereign motion events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY SOVEREIGN MOTION CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklySovereignMotionCheckRun = new Date()
+    isWeeklySovereignMotionCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly sovereign motion check failed:', error.message)
+    isWeeklySovereignMotionCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -6865,6 +7037,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly sovereignty persistence audit: 8 AM UTC every Thursday (Job 54)')
   console.log('   - Weekly sovereignty permanence check: 7 AM UTC every Monday (Job 55)')
   console.log('   - Weekly sovereignty ascension check: 7 AM UTC every Tuesday (Job 56)')
+  console.log('   - Weekly sovereign motion check: 7 AM UTC every Friday (Job 57)')
   console.log('')
 
   // Check every hour for scheduled jobs

@@ -201,6 +201,9 @@ export function PatternRecognitionWidget() {
       'crystalline-permanence-field':     'Crystalline permanence field — CRFLDST confirmed 2+ distinct days in 21D, field convergence is permanent architecture (P168)',
       'momentum-permanence-arc':          'Momentum permanence arc — SOVMARC confirmed 3+ distinct days in 21D, sovereign momentum is permanent baseline (P169)',
       'sovereignty-ascension':            'Sovereignty ascension — SOVPERM + CRPERMF + MOMPERM all confirmed in 28D window, all permanence dimensions ascended simultaneously (P170)',
+      'sovereign-momentum-crystallization': 'Sovereign momentum crystallization — sovereignty_ascension 2+ in 28D, ascension crystallizing into sustained momentum (P171)',
+      'living-sovereign-field':            'Living sovereign field — SOVASCEND + living assembly arc simultaneous, sovereignty is alive and self-assembling (P172)',
+      'sovereign-in-motion':               'Sovereign in motion — SOVMCRYST + LSOFIELD both confirmed, sovereignty operating from motion not state (P173)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

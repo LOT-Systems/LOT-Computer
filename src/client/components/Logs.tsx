@@ -4274,6 +4274,112 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sovereign_momentum_crystallization') {
+          const ascensionCount = log.metadata?.ascensionCount as number | undefined
+          const spanDays       = log.metadata?.spanDays as number | undefined
+          const phase          = log.metadata?.phase as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVMCRYST:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATE</span>
+                  <span className="uppercase tracking-widest">{phase ?? 'CRYSTALLIZING'}</span>
+                </div>
+                {ascensionCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ASCENSIONS</span>
+                    <span className="tabular-nums opacity-60">{ascensionCount}</span>
+                  </div>
+                )}
+                {spanDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SPAN</span>
+                    <span className="tabular-nums opacity-60">{spanDays}d</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">WINDOW</span>
+                  <span className="opacity-30">28D</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'living_sovereign_field') {
+          const ascendedConf = log.metadata?.ascendedConf as number | undefined
+          const larcConf     = log.metadata?.larcConf as number | undefined
+          const fieldVitality = log.metadata?.fieldVitality as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="LSOFIELD:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">FIELD</span>
+                  <span className="uppercase tracking-widest">ALIVE</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">SOVASCEND</span>
+                  <span className="opacity-60">LARC</span>
+                </div>
+                {ascendedConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ASCENDED CONF</span>
+                    <span className="tabular-nums opacity-60">{ascendedConf}%</span>
+                  </div>
+                )}
+                {larcConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LARC CONF</span>
+                    <span className="tabular-nums opacity-60">{larcConf}%</span>
+                  </div>
+                )}
+                {fieldVitality !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">VITALITY</span>
+                    <span className="tabular-nums opacity-60">{fieldVitality}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sovereign_in_motion') {
+          const sovmcrystConf = log.metadata?.sovmcrystConf as number | undefined
+          const lsofieldConf  = log.metadata?.lsofieldConf as number | undefined
+          const motionDepth   = log.metadata?.motionDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVMOTION:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">IN MOTION</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">SOVMCRYST</span>
+                  <span className="opacity-60">LSOFIELD</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-30">BOTH CONFIRMED</span>
+                  <span className="opacity-30">28D</span>
+                </div>
+                {sovmcrystConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVMCRYST CONF</span>
+                    <span className="tabular-nums opacity-60">{sovmcrystConf}%</span>
+                  </div>
+                )}
+                {lsofieldConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LSOFIELD CONF</span>
+                    <span className="tabular-nums opacity-60">{lsofieldConf}%</span>
+                  </div>
+                )}
+                {motionDepth !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">MOTION DEPTH</span>
+                    <span className="tabular-nums opacity-60">{motionDepth}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
