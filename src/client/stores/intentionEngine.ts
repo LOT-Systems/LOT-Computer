@@ -22,6 +22,7 @@
  */
 
 import { atom } from 'nanostores'
+import { getHourlyZodiac } from '#shared/utils/astrology'
 
 // Intention signals collected from all widgets and background monitors
 export type IntentionSignal = {
@@ -3424,6 +3425,43 @@ export function analyzeIntentions(): IntentionPattern[] {
         suggestedWidget: 'memory',
         suggestedTiming: 'soon',
         reason: `RECINTEL: Recovery intelligence arc — depletion detected · self-care applied · state restored · reflection captured within 6h. The loop is complete: felt → tended → recovered → reflected. The system learns from its own restoration.`,
+      })
+    }
+  }
+
+  // Pattern 152: Circadian Zodiac Affinity — the 'astrology' source has been a declared
+  // Tier 0 dependency for the system/cosmic widgets since P0 but had no consumer of its own;
+  // this is the first pattern that actually reads it. Buckets the user's own logged mood
+  // signals (not the astrology readings themselves) by which Japanese hourly-zodiac window
+  // they fell in, over the signal-retention window, and surfaces the bucket where the user's
+  // own moods run most positive vs. most negative. An observed correlation in the user's own
+  // data — not a causal astrological claim, and not a forecast. Honest personalization within
+  // the "ambient conditions, not a natal chart" boundary: no birth data is collected or used.
+  const POSITIVE_MOODS_152 = ['calm', 'peaceful', 'energized', 'hopeful', 'grateful', 'content', 'excited', 'fulfilled']
+  const NEGATIVE_MOODS_152 = ['anxious', 'overwhelmed', 'tired', 'exhausted']
+  const zodiacMoodBuckets152: Record<string, { pos: number; neg: number; total: number }> = {}
+  const moodSignals152 = signals.filter(s => s.source === 'mood')
+  for (const s of moodSignals152) {
+    const zodiacHour = getHourlyZodiac(new Date(s.timestamp))
+    const bucket = zodiacMoodBuckets152[zodiacHour] ?? (zodiacMoodBuckets152[zodiacHour] = { pos: 0, neg: 0, total: 0 })
+    bucket.total += 1
+    if (POSITIVE_MOODS_152.includes(s.signal)) bucket.pos += 1
+    else if (NEGATIVE_MOODS_152.includes(s.signal)) bucket.neg += 1
+  }
+  const qualifyingBuckets152 = Object.entries(zodiacMoodBuckets152).filter(([, b]) => b.total >= 2)
+  if (qualifyingBuckets152.length >= 2 && moodSignals152.length >= 6) {
+    const scored152 = qualifyingBuckets152
+      .map(([zodiac, b]) => ({ zodiac, score: (b.pos - b.neg) / b.total, total: b.total }))
+      .sort((a, b) => b.score - a.score)
+    const best152 = scored152[0]
+    const worst152 = scored152[scored152.length - 1]
+    if (best152.zodiac !== worst152.zodiac && best152.score - worst152.score >= 1) {
+      patterns.push({
+        pattern: 'circadian-zodiac-affinity',
+        confidence: Math.min(0.5 + (best152.score - worst152.score) * 0.1, 0.8),
+        suggestedWidget: 'astrology',
+        suggestedTiming: 'passive',
+        reason: `ZODAFN: Circadian zodiac affinity — across your own logged moods, the Hour of the ${best152.zodiac} runs most positive (${best152.total} logs) and the Hour of the ${worst152.zodiac} runs most drained (${worst152.total} logs). An observed correlation in your own data, not a forecast.`,
       })
     }
   }

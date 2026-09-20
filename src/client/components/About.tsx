@@ -3991,6 +3991,17 @@ Ecosystem Synchrony signal: ecosystem_full_sync (all 5 nodes)`}</CodeBlock>
             astronomical algorithms, not API calls. Updates daily.
           </P>
 
+          <SubHeading>Circadian Zodiac Affinity</SubHeading>
+          <P>
+            Personalization layer, not a forecast. Buckets the user&apos;s own
+            logged moods by which hourly-zodiac window they fell in and
+            surfaces which window runs most positive and which runs most
+            drained — an observed correlation in the user&apos;s own data,
+            appearing only once enough of it exists. No birth date is
+            collected or used; the reading stays ambient, never a natal
+            chart.
+          </P>
+
           {/* ── WEATHER SOUND SYSTEM ────────────────────────────────── */}
           <SectionHeading id="weather-sound">Weather Sound System</SectionHeading>
           <P>

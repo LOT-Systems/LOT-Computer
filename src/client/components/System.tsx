@@ -277,6 +277,14 @@ export const System = React.memo(function SystemInner() {
     return classifyPhysiologicalCohort(eng.signals, quantumState, eng.recognizedPatterns ?? [])
   }, [quantumState])
 
+  // Circadian zodiac affinity (P152) — personalized read on the ambient astrology
+  // block, derived from the user's own logged moods bucketed by hourly zodiac.
+  // Only appears once enough of the user's own data exists; otherwise stays hidden.
+  const zodiacAffinity = React.useMemo(() => {
+    const eng = intentionEngine.get()
+    return eng.recognizedPatterns?.find(p => p.pattern === 'circadian-zodiac-affinity') ?? null
+  }, [quantumState])
+
   // Accumulative User Index - holistic score from all widget signals
   const userIndex = React.useMemo(() => {
     return getUserIndex()
@@ -671,7 +679,12 @@ export const System = React.memo(function SystemInner() {
         >
           {astrologyView === 'astrology' ? (
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              <div>
+                {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              </div>
+              {zodiacAffinity && (
+                <div className="opacity-60">{zodiacAffinity.reason.replace(/^[A-Z]+:\s*/, '')}</div>
+              )}
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>
