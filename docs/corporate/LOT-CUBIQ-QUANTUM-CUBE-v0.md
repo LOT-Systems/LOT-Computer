@@ -321,6 +321,57 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE COHORT RESONANCE                        2026-09-20
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, Archetype "Momentum Architect,"
+  member of a behavioral cohort assigned by the Quantum Intent Engine
+  (LOT-CUBIQ-OPERATOR.md, Section 05, "Cohort Connect" — operators
+  grouped by signal pattern, not demographics). Works late; the
+  CUBIQ charging pad sits on a home-office console beside a monitor
+  that stays off after 21:00 — a "Night Operator" behavioral pattern
+  (LOT-SR-20260805-01.md, v22 pattern set: `checkNightOperator()`,
+  check-in after 22:00, 3+ occurrences in 7 days).
+
+  USE CASE 01 was a private signal: one operator, one Memory Engine
+  question, one desk. USE CASE 02 is a community signal reaching the
+  same physical object. The CollectiveConsciousness widget
+  (LOT-CUBIQ-OPERATOR.md, Section 05) aggregates signal data
+  network-wide; when three or more operators in the same cohort close
+  a self-care session inside a 15-minute window, the QIE marks a
+  COHORT RESONANCE spike — a moment when structurally similar people,
+  unaware of each other, moved through the cubic in near-unison.
+
+  Under the software-only cubic, this spike is legible only as a
+  number inside a widget the operator would have to open and read —
+  easy to miss on a night when the screen is already closed. With
+  CUBIQ hardware v.0 present, a cohort resonance spike routes through
+  the same signal path Section 05 diagrams (Index of Systems →
+  CUBIQ HARDWARE DRIVER → gesture), mapped to THE HOP: a single
+  controlled vertical hop, <10mm rise, landing in place. Not THE LEAP
+  — a cohort event belongs to no one operator individually, so it earns
+  the shared-tier gesture, not the personal-badge one reserved for the
+  operator's own unlocks (Section 04).
+
+  The operator, closing their log entry for the night, feels the cube
+  hop once on the console — a small confirmation that arrives with no
+  name attached to it, no leaderboard number, no push notification
+  demanding a response. They do not know which other operators moved
+  in step with them, and the system does not tell them. What they
+  register is simpler: they were not doing this alone at this hour,
+  even though the room is empty and the screen has been off for an
+  hour. The gesture closes the DIURNAL ARC (LOT-CUBIQ-OPERATOR.md,
+  Section 03 — P76 morning-launch + P79 evening-close + P80
+  momentum-lock) with a physical period at the end of the sentence.
+
+  This use case extends v.0's notification language past the
+  individual operator for the first time: the same four-gesture
+  vocabulary (Section 04) already carries a community signal without
+  requiring a new gesture class or a v.1/v.2 mechanical change. The
+  hardware built for one purpose (private presence) turns out to
+  generalize to a second (collective coherence) without modification —
+  evidence that the single-hop primitive, chosen for mechanical
+  boredom in Section 03, was the right thing to make boring.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
