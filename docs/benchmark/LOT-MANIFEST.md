@@ -24,7 +24,7 @@ STATUS KEY:
 
 FEATURE          | BEST BRANCH                   | HASH     | ITER  | STATUS | FILES | LINES  | SUMMARY
 ──────────────     ─────────────────────────────   ────────   ─────   ──────   ─────   ──────   ──────────────────────
-LOT Mail         | determined-turing-f6bw7r     | fa622a25 | 11/11 | BEST   | 11    | +504   | In-app email: /email trigger, Sync inbox, Cohort integration, yarn.lock
+LOT Mail         | determined-turing-vj89sq     | 008651cb | 12/12 | BEST   | 12    | +553   | In-app email: /email trigger, Sync inbox, Cohort integration — re-validated against master HEAD 98971f20 (was stale since 2026-06-12 on f6bw7r), green gate confirmed, ready to fast-forward via Ship Mode
 Basics Tab       | beautiful-johnson-56p7ov      | 6815f550 | 8/8   | BEST   | 5     | +293   | BASICS M1: OPEN TAB live — 23-item ration ledger, doctrine, status line
 Calendar Alerts  | gifted-lovelace-cZOWR         | 978cf52  | 6/6   | BEST   | 3     | +359   | Live clock, T-minus countdown, military alert overlay, today panel
 QI-46 Engine     | cool-tesla-f8j0mr            | 36ef4dde | 8/8   | BEST   | 8     | +2050  | QI·46 Node 3 engine integration + Soul Upload + Being Calibration
@@ -180,17 +180,31 @@ PROTECTED FILES (always restore from master during any branch merge):
   docs/benchmark/LOT-MANIFEST.md      — session-managed, never merge from branch
 
 CURRENT SHIP QUEUE (BEST, awaiting Sunday merge):
-  LOT Mail         | determined-turing-f6bw7r  | +504 lines
+  LOT Mail         | determined-turing-vj89sq  | +553 lines  (re-validated 2026-09-20 @ 008651cb — see below)
   Basics Tab       | beautiful-johnson-56p7ov   | +293 lines
   Calendar Alerts  | gifted-lovelace-cZOWR      | +359 lines
   QI-46 Engine     | cool-tesla-f8j0mr          | +2050 lines
   COSMO Hardware   | brave-lamport-t9z5u8        | +2610 lines
   Badge RPG        | cool-hypatia-aqj7dg         | +1832 lines
 
-NOTE: As of 2026-06-27, the above branches no longer exist on the remote —
-they were incorporated into master in prior sessions. The ship queue will be
-re-populated as new BEST branches are designated from future assembly runs.
-The protocol above applies to all future merges.
+NOTE: As of 2026-06-27, most of the above branches no longer existed on the
+remote — they were believed incorporated into master in prior sessions.
+CORRECTION 2026-09-20: this was confirmed WRONG for LOT Mail specifically —
+determined-turing-f6bw7r was still on the remote, unmerged, and its 2026-06-12
+work was never in master. Verify each queue entry against the live remote
+before trusting this note for any other row; it is a running observation, not
+a guarantee. The ship queue will be re-populated as new BEST branches are
+designated from future assembly runs. The protocol above applies to all
+future merges.
+
+LOT MAIL RE-VALIDATION (2026-09-20, LOT-SR-20260920-01): the original BEST
+commit (f6bw7r@19f7906e) was cherry-picked forward onto current master HEAD
+(98971f20) on branch determined-turing-vj89sq, 3 conflicts resolved by hand
+against interim chat-gating/story-mode work, full green gate confirmed
+(client+server build). Landed on that branch at 008651cb, NOT yet merged to
+master — the session that did this work was scoped to push only to its own
+assigned branch. An S-2-authorized "Ship LOT Mail" session can cherry-pick
+008651cb straight to staging; the conflict-resolution work is already done.
 
 RULE: One feature per Sunday merge pass. If multiple features are queued,
 start with the smallest diff — lower blast radius, cleaner green gate.
