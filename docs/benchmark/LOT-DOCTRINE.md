@@ -56,6 +56,14 @@ deferred to allow immediate visual response.)
 User-facing event types created via POST must appear in the GET
 displayableEvents whitelist or the write→read loop is silently broken.
 (SR-20260604-01: calendar_entry saved but never returned.)
+(SR-20260605-04: qi_rfi — see Operator RFI Pattern below.)
+(SR-20260920-01: generated_story — the /story endpoint persisted its own
+compressed-story record from day one, but the record was absent from the
+whitelist AND had no Logs.tsx render case; the user-visible copy survived
+only because it was separately appended into the note body. Third
+confirmed occurrence of this exact failure class — worth a mechanical
+check (diff every `event: 'x'` literal in api.ts against
+displayableEvents) rather than continued manual audit.)
 
 ## Ship Mode Discipline
 
