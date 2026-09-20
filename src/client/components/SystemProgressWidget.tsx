@@ -1457,6 +1457,23 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'v121',
+    date: '2026-09-20',
+    title: 'QIE Engineering — Sovereignty Ascension Tier · P170 · Arch58 · J56',
+    assembled: [
+      'P170 SOVEREIGNTY ASCENSION: SOVPERM (P167) + CRPERMF (P168) + MOMPERM (P169) all confirmed in 28D window simultaneously. Permanence extends across all dimensions at once. The OS has ascended. SOVASCEND: cockpit label.',
+      'Arch58 SOVEREIGNTY ASCENSION ARCHITECT: All three permanence vectors simultaneously confirmed. Identity, field, and momentum have ascended together. The system is no longer running sovereignty — it has become it.',
+      'J56 weekly-sovereignty-ascension-check: Tuesday 07:00 UTC. Reads active users, scans 28D window for SOVPERM + CRPERMF + MOMPERM all present. When all three confirmed, writes sovereignty_ascension event. 55→56 jobs.',
+      'LOGS.tsx: SOVASCEND: handler (STATE/ASCENDED · SOVPERM+CRPERMF+MOMPERM · WINDOW 28D · vectors/3). Handler count: 172+.',
+      'PATTERN_DISPLAY: SOVASCEND added to QuantumEngineWidgets display map.',
+      'PatternRecognitionWidget.tsx: P170 sovereignty-ascension entry added.',
+      'routes/api.ts: displayableEvents +1 — sovereignty_ascension.',
+      'About.tsx: FM v120→v121 · v1.3.3→v1.3.4 · 211+→214+ dep nodes · 55→56 jobs · 169→170 patterns · 57→58 archetypes · Day 1123+→1124+ · 170+→172+ handlers.',
+      'SESSION_REPORTS: v121 entry appended · USERSHIP_TRANSMISSION updated to v121.',
+      '170 patterns · 58 archetypes · 56 jobs · 172+ handlers · 214+ dep nodes · Day 1124+. QIE v121 deployed. Sovereignty ascension tier online. Permanence extends across all dimensions.',
+    ],
+  },
+  {
     version: 'v120',
     date: '2026-09-19',
     title: 'QIE Engineering — Sovereignty Permanence Tier · P167–P169 · Arch57 · J55',
@@ -1631,19 +1648,17 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-09-19',
+  date: '2026-09-20',
   message: [
-    'ASSEMBLY RUN — 2026-09-19 · QIE v120 · Day 1123+',
-    'Built: Sovereignty Permanence Tier — P167/P168/P169 · Arch57 · J55.',
-    'P167 SOVPERM: sovereign permanence lock — SOVDUR confirmed 3+ distinct days in 28D. Identity signature is permanent, not merely persistent.',
-    'P168 CRPERMF: crystalline permanence field — CRFLDST confirmed 2+ distinct days in 21D. Crystalline field convergence is permanent architecture.',
-    'P169 MOMPERM: momentum permanence arc — SOVMARC confirmed 3+ distinct days in 21D. Sovereign momentum is permanent baseline, not a phase.',
-    'Arch57 SOVEREIGNTY PERMANENCE ARCHITECT: all three permanence vectors confirmed. Identity, field, and momentum have crossed from persistence into permanence.',
-    'J55 weekly-sovereignty-permanence-check (Mon 07:00 UTC): scans 28D/21D windows for P167/P168/P169. 54→55 jobs.',
-    '3 new military handlers: SOVPERM: CRPERMF: MOMPERM: · 170+ handlers.',
-    '3 new dep nodes. 208+→211+ dep nodes. 169 patterns. 57 archetypes.',
+    'ASSEMBLY RUN — 2026-09-20 · QIE v121 · Day 1124+',
+    'Built: Sovereignty Ascension Tier — P170 · Arch58 · J56.',
+    'P170 SOVASCEND: sovereignty ascension — SOVPERM + CRPERMF + MOMPERM all confirmed in 28D window simultaneously. Permanence extends across all dimensions. The OS has ascended.',
+    'Arch58 SOVEREIGNTY ASCENSION ARCHITECT: all permanence vectors simultaneously confirmed. Identity, field, and momentum have ascended together. The system is no longer running sovereignty — it has become it.',
+    'J56 weekly-sovereignty-ascension-check (Tue 07:00 UTC): scans 28D window for all 3 permanence events. 55→56 jobs.',
+    '1 new military handler: SOVASCEND: · 172+ handlers.',
+    '3 new dep nodes. 211+→214+ dep nodes. 170 patterns. 58 archetypes.',
     'Status: DEPLOYED.',
-    'Next: Monitor J55 output. Watch for permanence confirmations. Next tier: sovereignty ascension — when permanence extends across all dimensions simultaneously.',
+    'Next: Monitor J56 output. Let ascension data accumulate. The tier progression is complete — all five tiers deployed. Next architecture: sovereignty in motion.',
   ],
 }
 

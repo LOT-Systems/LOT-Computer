@@ -200,6 +200,7 @@ export function PatternRecognitionWidget() {
       'sovereign-permanence-lock':        'Sovereign permanence lock — SOVDUR confirmed 3+ distinct days in 28D, identity signature permanent (P167)',
       'crystalline-permanence-field':     'Crystalline permanence field — CRFLDST confirmed 2+ distinct days in 21D, field convergence is permanent architecture (P168)',
       'momentum-permanence-arc':          'Momentum permanence arc — SOVMARC confirmed 3+ distinct days in 21D, sovereign momentum is permanent baseline (P169)',
+      'sovereignty-ascension':            'Sovereignty ascension — SOVPERM + CRPERMF + MOMPERM all confirmed in 28D window, all permanence dimensions ascended simultaneously (P170)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

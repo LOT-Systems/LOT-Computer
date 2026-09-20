@@ -4247,6 +4247,33 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sovereignty_ascension') {
+          const vectors = log.metadata?.vectors as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVASCEND:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATE</span>
+                  <span className="uppercase tracking-widest">ASCENDED</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">SOVPERM</span>
+                  <span className="opacity-60">CRPERMF</span>
+                  <span className="opacity-60">MOMPERM</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-30">WINDOW</span>
+                  <span className="opacity-30">28D</span>
+                </div>
+                {vectors !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">VECTORS</span>
+                    <span className="tabular-nums opacity-60">{vectors}/3</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

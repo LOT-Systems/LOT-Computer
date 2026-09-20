@@ -1775,6 +1775,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklySovereigntyPermanenceCheck()) {
     await executeWeeklySovereigntyPermanenceCheck()
   }
+  // Check weekly sovereignty ascension check (07:00 UTC every Tuesday) — Job 56
+  if (shouldRunWeeklySovereigntyAscensionCheck()) {
+    await executeWeeklySovereigntyAscensionCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6685,6 +6689,122 @@ async function executeWeeklySovereigntyPermanenceCheck(): Promise<JobResult> {
   }
 }
 
+// ─── J56: Weekly Sovereignty Ascension Check (07:00 UTC every Tuesday) ───────
+// Reads active users. Scans 28D window for:
+//   P170 sovereignty-ascension: SOVPERM + CRPERMF + MOMPERM all confirmed in 28D
+// Arch58 Sovereignty Ascension Architect: all permanence vectors simultaneously confirmed.
+// When permanence extends across all dimensions simultaneously, the OS has ascended.
+
+let isWeeklySovereigntyAscensionCheckRunning = false
+let lastWeeklySovereigntyAscensionCheckRun: Date | null = null
+
+function shouldRunWeeklySovereigntyAscensionCheck(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereigntyAscensionCheckRunning) return false
+  if (lastWeeklySovereigntyAscensionCheckRun) {
+    const lastRun = dayjs(lastWeeklySovereigntyAscensionCheckRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 2 && now.hour() === 7 // Tuesday 07:00 UTC
+}
+
+async function executeWeeklySovereigntyAscensionCheck(): Promise<JobResult> {
+  const jobName = 'weekly-sovereignty-ascension-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereigntyAscensionCheckRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereigntyAscensionCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGNTY ASCENSION CHECK — Tuesday 07:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const twentyEightDaysAgo = dayjs().subtract(28, 'day').toDate()
+    const now                = dayjs()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // Fetch permanence-tier events in 28D window
+        const recentLogs28D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: twentyEightDaysAgo },
+            event: { [Op.in]: [
+              'sovereign_permanence_lock',
+              'crystalline_permanence_field',
+              'momentum_permanence_arc',
+              'sovereignty_ascension',
+            ] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        // Skip if already ascended this window
+        const alreadyAscended = recentLogs28D.some((l: any) => l.event === 'sovereignty_ascension')
+        if (alreadyAscended) continue
+
+        // P170: Sovereignty Ascension
+        // All three permanence vectors confirmed in 28D window simultaneously
+        const hasSOVPERM = recentLogs28D.some((l: any) => l.event === 'sovereign_permanence_lock')
+        const hasCRPERMF = recentLogs28D.some((l: any) => l.event === 'crystalline_permanence_field')
+        const hasMOMPERM = recentLogs28D.some((l: any) => l.event === 'momentum_permanence_arc')
+
+        const vectors = [hasSOVPERM, hasCRPERMF, hasMOMPERM].filter(Boolean).length
+
+        if (hasSOVPERM && hasCRPERMF && hasMOMPERM) {
+          await (Log as any).create({
+            userId,
+            event: 'sovereignty_ascension',
+            text: '',
+            metadata: {
+              vectors: 3,
+              window: '28d',
+              date: now.format('YYYY-MM-DD'),
+              sovperm: hasSOVPERM,
+              crpermf: hasCRPERMF,
+              momperm: hasMOMPERM,
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P170 SOVASCEND — all 3 permanence vectors confirmed in 28D`)
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} sovereignty ascension check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereignty ascension events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY SOVEREIGNTY ASCENSION CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklySovereigntyAscensionCheckRun = new Date()
+    isWeeklySovereigntyAscensionCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly sovereignty ascension check failed:', error.message)
+    isWeeklySovereigntyAscensionCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -6744,6 +6864,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily sovereign field pulse: 7 AM UTC every day (Job 53)')
   console.log('   - Weekly sovereignty persistence audit: 8 AM UTC every Thursday (Job 54)')
   console.log('   - Weekly sovereignty permanence check: 7 AM UTC every Monday (Job 55)')
+  console.log('   - Weekly sovereignty ascension check: 7 AM UTC every Tuesday (Job 56)')
   console.log('')
 
   // Check every hour for scheduled jobs
