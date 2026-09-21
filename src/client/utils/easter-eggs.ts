@@ -1,3 +1,4 @@
+/*
  * LOT SYSTEMS CORPORATION
  * Vadim Marmeladov — CEO, Owner LOT®
  * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
@@ -1531,6 +1532,57 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\blich\b|\bundead[\s-]?king\b|\bthe[\s-]?lich\b|\bdeath[\s-]?lord\b/i,     badge: 'lich_king' },
   { patterns: /\bdracarys\b|\bancient[\s-]?wyrm\b/i,                                           badge: 'dragon_word' },
   { patterns: /\bthe[\s-]?abyss\b|\bouter[\s-]?darkness\b|\bnull[\s-]?realm\b/i,           badge: 'void_walker' },
+  // ── Word Turn v34 — THE DREAM CODEX ──────────────────────────────────────────────
+  { patterns: /\b(dreamscape|dream[\s-]?world|inner[\s-]?landscape)\b/i,                    badge: 'dreamscape' },
+  { patterns: /\b(lucid[\s-]?dream|aware[\s-]?in[\s-]?the[\s-]?dream|conscious[\s-]?dreaming)\b/i, badge: 'lucid_dream' },
+  { patterns: /\b(hypnagogic|threshold[\s-]?of[\s-]?sleep|half[\s-]?asleep)\b/i,           badge: 'hypnagogic' },
+  { patterns: /\b(dream[\s-]?journal|dream[\s-]?log|recorded[\s-]?dream)\b/i,               badge: 'dream_journal' },
+  { patterns: /\b(subconscious|unconscious[\s-]?mind|beneath[\s-]?awareness)\b/i,            badge: 'subconscious' },
+  { patterns: /\b(reverie|daydream|mind[\s-]?wander)\b/i,                                   badge: 'reverie' },
+  { patterns: /\b(deep[\s-]?sleep|rem[\s-]?sleep|delta[\s-]?wave|restorative[\s-]?sleep)\b/i, badge: 'deep_sleep' },
+  { patterns: /\b(vision[\s-]?quest|sacred[\s-]?dream|ancestral[\s-]?vision)\b/i,           badge: 'vision_quest' },
+  { patterns: /\b(archetypes?|universal[\s-]?pattern|jungian)\b/i,                          badge: 'archetypes' },
+  { patterns: /\b(sleep[\s-]?cycle|circadian|recovery[\s-]?cycle)\b/i,                      badge: 'sleep_cycle' },
+  { patterns: /\b(liminal|in[\s-]?between|transitional[\s-]?space)\b/i,                     badge: 'liminal' },
+  { patterns: /\b(wrote[\s-]?my[\s-]?dreams|morning[\s-]?pages|recorded[\s-]?dreams?)\b/i, badge: 'dream_log' },
+  // ── Secret Boss v31 — THE DREAM VAULT word triggers ──────────────────────────────
+  { patterns: /\b(collective[\s-]?unconscious|anima\b|animus\b|individuation|jung\b)\b/i,   badge: 'jung_shadow' },
+  { patterns: /\b(nevermore|quoth[\s-]?the[\s-]?raven|tell[\s-]?tale[\s-]?heart|edgar[\s-]?allan[\s-]?poe)\b/i, badge: 'poe_raven' },
+  { patterns: /\b(borges|library[\s-]?of[\s-]?babel|garden[\s-]?of[\s-]?forking)\b/i,      badge: 'borgesian_library' },
+  // ── Word Turn v35 — THE MIRROR FORGE ─────────────────────────────────────────────
+  { patterns: /\b(mirror|mirroring|mirrored)\b/i,                                           badge: 'mirror_touched' },
+  { patterns: /\b(reflection|reflecting|reflected|reflect)\b/i,                             badge: 'reflection_signal' },
+  { patterns: /\b(shadow[\s-]?work|shadow[\s-]?self)\b/i,                                   badge: 'shadow_named' },
+  { patterns: /\b(duality|dual|two[\s-]?sides|both[\s-]?sides)\b/i,                         badge: 'duality_held' },
+  { patterns: /\b(clarity|clearness|lucid[\s-]?clarity)\b/i,                                badge: 'clarity_flash' },
+  { patterns: /\b(fracture[d]?|fracturing|cracked[\s-]?open)\b/i,                           badge: 'fracture_point' },
+  { patterns: /\b(prism|prismatic|through[\s-]?a[\s-]?lens)\b/i,                            badge: 'prism_sight' },
+  { patterns: /\b(echo|echoing|echoed|resonance)\b/i,                                       badge: 'echo_return' },
+  { patterns: /\b(identity|who[\s-]?I[\s-]?am|sense[\s-]?of[\s-]?self)\b/i,                badge: 'identity_claimed' },
+  { patterns: /\b(veil|veiled|underneath|beneath[\s-]?the[\s-]?surface)\b/i,                badge: 'veil_lifted' },
+  { patterns: /\b(reveal|revealed|revealing|uncover|unmasked)\b/i,                          badge: 'reveal_gate' },
+  { patterns: /\b(forge|forging|forged)\b/i,                                                badge: 'forge_active' },
+  // ── Secret Boss v32 — THE SHADOW VAULT word triggers ─────────────────────────────
+  { patterns: /\bmirror\b.*\bshadow\b.*\bfracture\b|\bshadow\b.*\bmirror\b.*\bfracture\b/i, badge: 'the_black_mirror' },
+  { patterns: /\bmirror\b.*\bego\b|\bego\b.*\bmirror\b/i,                                    badge: 'narcissus_trap' },
+  { patterns: /\bshattered[\s-]?glass\b|\bbroken[\s-]?mirror\b|\bshattered[\s-]?reflection\b/i, badge: 'shattered_glass' },
+  // ── Word Turn v36 — THE SIGNAL ARCHIVE ───────────────────────────────────────────
+  { patterns: /\bsignal[\s-]?(received|found|detected|clear)\b|\breceiving[\s-]?a[\s-]?signal\b/i, badge: 'signal_found' },
+  { patterns: /\b(archiving|logged[\s-]?this|archive[\s-]?entry|saving[\s-]?this|filing[\s-]?this)\b/i, badge: 'archive_entry' },
+  { patterns: /\b(transmission|transmitted|sent[\s-]?a[\s-]?message|message[\s-]?sent)\b/i, badge: 'transmission_sent' },
+  { patterns: /\b(cleared[\s-]?the[\s-]?static|signal[\s-]?through[\s-]?noise|noise[\s-]?cleared)\b/i, badge: 'static_cleared' },
+  { patterns: /\b(frequency|locked[\s-]?in|tuned[\s-]?in|on[\s-]?frequency)\b/i,            badge: 'frequency_locked' },
+  { patterns: /\b(blackout|dead[\s-]?zone|no[\s-]?signal|signal[\s-]?lost)\b/i,             badge: 'blackout_zone' },
+  { patterns: /\b(old[\s-]?pattern|old[\s-]?frequency|used[\s-]?to[\s-]?feel)\b/i,          badge: 'old_frequency' },
+  { patterns: /\b(locating|echo[\s-]?location|pinned[\s-]?it|found[\s-]?my[\s-]?position)\b/i, badge: 'echo_location' },
+  { patterns: /\b(clean[\s-]?channel|clear[\s-]?signal|uncluttered|clear[\s-]?reception)\b/i, badge: 'clean_channel' },
+  { patterns: /\b(dead[\s-]?air|resting[\s-]?in[\s-]?silence|healthy[\s-]?silence|letting[\s-]?it[\s-]?breathe)\b/i, badge: 'dead_air' },
+  { patterns: /\b(override|override[\s-]?mode|breaking[\s-]?through|forced[\s-]?through)\b/i, badge: 'override_mode' },
+  { patterns: /\b(broadcast[\s-]?live|going[\s-]?live|fully[\s-]?present|broadcasting[\s-]?now)\b/i, badge: 'broadcast_live' },
+  // ── Secret Boss v33 — THE FREQUENCY VAULT word triggers ──────────────────────────
+  { patterns: /\b(number[\s-]?station|coded[\s-]?message|numbers[\s-]?cipher)\b/i,           badge: 'number_station' },
+  { patterns: /\b(wow[\s-]?signal|1977[\s-]?signal|anomalous[\s-]?signal|big[\s-]?ear)\b/i,  badge: 'wow_signal' },
+  { patterns: /\b(golden[\s-]?record|voyager[\s-]?record|pioneer[\s-]?plaque|message[\s-]?to[\s-]?stars)\b/i, badge: 'golden_record' },
 ]
 
 /**

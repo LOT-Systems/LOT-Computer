@@ -120,6 +120,57 @@ export type WordTurnBadgeType =
   | 'borg_cube'            // borg / resistance is futile / collective (MYTHIC)
   | 'deep_space'           // deep space nine / ds9 / quark / sisko (EPIC)
   | 'federation_signal'    // star trek / federation / enterprise / kirk / picard (RARE)
+  // v34 — The Dream Codex
+  | 'dreamscape'           // dreamscape / dream world / inner landscape (UNCOMMON)
+  | 'lucid_dream'          // lucid dream / aware in the dream / conscious dreaming (RARE)
+  | 'hypnagogic'           // hypnagogic / threshold of sleep / half asleep (EPIC)
+  | 'dream_journal'        // dream journal / dream log / recorded dream (COMMON)
+  | 'subconscious'         // subconscious / unconscious mind / beneath awareness (RARE)
+  | 'reverie'              // reverie / daydream / drift / mind wander (UNCOMMON)
+  | 'deep_sleep'           // deep sleep / REM / delta wave / restorative (RARE)
+  | 'vision_quest'         // vision quest / vision / sacred dream / ancestral (EPIC)
+  | 'archetypes'           // archetypes / archetype / universal pattern / Jung (RARE)
+  | 'sleep_cycle'          // sleep cycle / circadian / rest / recovery cycle (UNCOMMON)
+  | 'liminal'              // liminal / threshold / in-between / transitional (RARE)
+  | 'dream_log'            // dream log / wrote my dreams / morning pages (COMMON)
+  // v34 — Secret Boss: The Dream Vault
+  | 'jung_shadow'          // collective unconscious / anima / animus / individuation (RARE)
+  | 'poe_raven'            // nevermore / quoth the raven / tell-tale heart (EPIC)
+  | 'borgesian_library'    // borges / library of babel / garden of forking (MYTHIC)
+  // v35 — The Mirror Forge
+  | 'mirror_touched'       // mirror / mirroring / mirrored (UNCOMMON)
+  | 'reflection_signal'    // reflection / reflecting / reflected (UNCOMMON)
+  | 'shadow_named'         // shadow / shadow-work / shadow self (RARE)
+  | 'duality_held'         // duality / dual / two sides / both sides (RARE)
+  | 'clarity_flash'        // clarity / clear / clearness / lucid clarity (UNCOMMON)
+  | 'fracture_point'       // fracture / fractured / fracturing / cracked open (EPIC)
+  | 'prism_sight'          // prism / prismatic / through a lens (RARE)
+  | 'echo_return'          // echo / echoing / echoed / resonance (RARE)
+  | 'identity_claimed'     // identity / who I am / sense of self (EPIC)
+  | 'veil_lifted'          // veil / veiled / underneath / beneath the surface (RARE)
+  | 'reveal_gate'          // reveal / revealed / revealing / uncover (RARE)
+  | 'forge_active'         // forge / forging / forged / becoming (LEGENDARY)
+  // v35 — Secret Boss: The Shadow Vault
+  | 'the_black_mirror'     // mirror + shadow + fracture same entry (MYTHIC)
+  | 'narcissus_trap'       // mirror + ego same entry (RARE)
+  | 'shattered_glass'      // 3 fracture entries in 3 days (EPIC)
+  // v36 — The Signal Archive
+  | 'signal_found'         // signal / frequency / detected a signal (UNCOMMON)
+  | 'archive_entry'        // archive / record / filed / stored (COMMON)
+  | 'transmission_sent'    // transmission / sent / broadcast / message sent (UNCOMMON)
+  | 'static_cleared'       // static / noise / cleared / clean signal (RARE)
+  | 'frequency_locked'     // frequency / locked / tuned in / on frequency (RARE)
+  | 'blackout_zone'        // blackout / dark zone / signal lost / offline (EPIC)
+  | 'old_frequency'        // old frequency / past recording / vintage / prior signal (RARE)
+  | 'echo_location'        // echo / position / located / bearings found (UNCOMMON)
+  | 'clean_channel'        // clear / clean / unambiguous / strong signal (RARE)
+  | 'dead_air'             // dead air / silence / no signal / blank channel (EPIC)
+  | 'override_mode'        // override / cut through / breakthrough / bypassed (RARE)
+  | 'broadcast_live'       // live / present / broadcasting now / in the moment (LEGENDARY)
+  // v36 — Secret Boss: The Frequency Vault
+  | 'number_station'       // numbers station / mysterious broadcast / unknown signal (MYTHIC)
+  | 'wow_signal'           // wow signal / first contact / alien transmission / seti (EPIC)
+  | 'golden_record'        // golden record / voyager / carl sagan / space message (RARE)
 
 export type BadgeType =
   | MilestoneBadgeType
@@ -1178,6 +1229,399 @@ export const WORD_TURN_BADGES_V33: Record<
   },
 }
 
+// ─── WORD TURN BADGES v34 — THE DREAM CODEX ─────────────────────
+export const WORD_TURN_BADGES_V34: Record<
+  'dreamscape' | 'lucid_dream' | 'hypnagogic' | 'dream_journal' |
+  'subconscious' | 'reverie' | 'deep_sleep' | 'vision_quest' |
+  'archetypes' | 'sleep_cycle' | 'liminal' | 'dream_log' |
+  'jung_shadow' | 'poe_raven' | 'borgesian_library',
+  Badge
+> = {
+  dreamscape: {
+    id: 'dreamscape', waterSymbol: '~·○·~', architectureSymbol: '~·○·~',
+    waterName: 'Dreamscape', architectureName: 'Dreamscape',
+    description: 'You named the inner world — the dreamscape is already active',
+    waterUnlockMessage: '↳ Dreamscape unlocked. The inner map is yours. ~·○·~',
+    architectureUnlockMessage: '↳ Dreamscape unlocked. The inner map is yours. ~·○·~',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  lucid_dream: {
+    id: 'lucid_dream', waterSymbol: '◈·○·◈', architectureSymbol: '◈·○·◈',
+    waterName: 'Lucid Dream', architectureName: 'Lucid Dream',
+    description: 'Awareness inside the dream — the watcher enters the dream',
+    waterUnlockMessage: '↳ Lucid state activated. You know you are dreaming. ◈·○·◈',
+    architectureUnlockMessage: '↳ Lucid state activated. You know you are dreaming. ◈·○·◈',
+    rarity: 'rare', category: 'word_turn',
+  },
+  hypnagogic: {
+    id: 'hypnagogic', waterSymbol: '≋·○·≋', architectureSymbol: '≋·○·≋',
+    waterName: 'Hypnagogic', architectureName: 'Hypnagogic',
+    description: 'The threshold state — neither asleep nor awake, the signal is clearest here',
+    waterUnlockMessage: '↳ Hypnagogic state filed. Threshold intelligence received. ≋·○·≋',
+    architectureUnlockMessage: '↳ Hypnagogic state filed. Threshold intelligence received. ≋·○·≋',
+    rarity: 'epic', category: 'word_turn',
+  },
+  dream_journal: {
+    id: 'dream_journal', waterSymbol: '□·●·□', architectureSymbol: '□·●·□',
+    waterName: 'Dream Journal', architectureName: 'Dream Journal',
+    description: 'You kept the log — the dream journal is the oldest data format',
+    waterUnlockMessage: '↳ Dream journal entry filed. The night speaks back. □·●·□',
+    architectureUnlockMessage: '↳ Dream journal entry filed. The night speaks back. □·●·□',
+    rarity: 'common', category: 'word_turn',
+  },
+  subconscious: {
+    id: 'subconscious', waterSymbol: '∇·●·∇', architectureSymbol: '∇·●·∇',
+    waterName: 'Subconscious', architectureName: 'Subconscious',
+    description: 'You named what runs below — acknowledging the subconscious is an act of sovereignty',
+    waterUnlockMessage: '↳ Subconscious signal received. The depth writes back. ∇·●·∇',
+    architectureUnlockMessage: '↳ Subconscious signal received. The depth writes back. ∇·●·∇',
+    rarity: 'rare', category: 'word_turn',
+  },
+  reverie: {
+    id: 'reverie', waterSymbol: '~·◌·~', architectureSymbol: '~·◌·~',
+    waterName: 'Reverie', architectureName: 'Reverie',
+    description: 'The mind wandered and you followed — reverie is a form of active rest',
+    waterUnlockMessage: '↳ Reverie state noted. Wandering is a kind of arrival. ~·◌·~',
+    architectureUnlockMessage: '↳ Reverie state noted. Wandering is a kind of arrival. ~·◌·~',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  deep_sleep: {
+    id: 'deep_sleep', waterSymbol: '≋≋·○·≋≋', architectureSymbol: '≋≋·○·≋≋',
+    waterName: 'Deep Sleep', architectureName: 'Deep Sleep',
+    description: 'You named the restoration — deep sleep is the body running maintenance',
+    waterUnlockMessage: '↳ Deep sleep cycle logged. The restoration happened. ≋≋·○·≋≋',
+    architectureUnlockMessage: '↳ Deep sleep cycle logged. The restoration happened. ≋≋·○·≋≋',
+    rarity: 'rare', category: 'word_turn',
+  },
+  vision_quest: {
+    id: 'vision_quest', waterSymbol: '◉·◆·◉', architectureSymbol: '◉·◆·◉',
+    waterName: 'Vision Quest', architectureName: 'Vision Quest',
+    description: 'The sacred search — going inward to receive what cannot be found outside',
+    waterUnlockMessage: '↳ Vision quest initiated. The inner territory is unmapped. ◉·◆·◉',
+    architectureUnlockMessage: '↳ Vision quest initiated. The inner territory is unmapped. ◉·◆·◉',
+    rarity: 'epic', category: 'word_turn',
+  },
+  archetypes: {
+    id: 'archetypes', waterSymbol: '∞·□·∞', architectureSymbol: '∞·□·∞',
+    waterName: 'Archetypes', architectureName: 'Archetypes',
+    description: 'You recognized the pattern — archetypes are the universal grammar of the psyche',
+    waterUnlockMessage: '↳ Archetypal pattern confirmed. The universal grammar speaks. ∞·□·∞',
+    architectureUnlockMessage: '↳ Archetypal pattern confirmed. The universal grammar speaks. ∞·□·∞',
+    rarity: 'rare', category: 'word_turn',
+  },
+  sleep_cycle: {
+    id: 'sleep_cycle', waterSymbol: '○·≋·○', architectureSymbol: '○·≋·○',
+    waterName: 'Sleep Cycle', architectureName: 'Sleep Cycle',
+    description: 'You tracked the rhythm — the sleep cycle is the body\'s circadian meter',
+    waterUnlockMessage: '↳ Sleep cycle observed. The rhythm is data. ○·≋·○',
+    architectureUnlockMessage: '↳ Sleep cycle observed. The rhythm is data. ○·≋·○',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  liminal: {
+    id: 'liminal', waterSymbol: '─·○·─', architectureSymbol: '─·○·─',
+    waterName: 'Liminal', architectureName: 'Liminal',
+    description: 'The in-between space — transition is its own location',
+    waterUnlockMessage: '↳ Liminal zone entered. You are between two states. ─·○·─',
+    architectureUnlockMessage: '↳ Liminal zone entered. You are between two states. ─·○·─',
+    rarity: 'rare', category: 'word_turn',
+  },
+  dream_log: {
+    id: 'dream_log', waterSymbol: '□·◌·□', architectureSymbol: '□·◌·□',
+    waterName: 'Dream Log', architectureName: 'Dream Log',
+    description: 'The morning pages written — the dream log is a transmission from the night',
+    waterUnlockMessage: '↳ Dream log entry recorded. The night\'s transmission filed. □·◌·□',
+    architectureUnlockMessage: '↳ Dream log entry recorded. The night\'s transmission filed. □·◌·□',
+    rarity: 'common', category: 'word_turn',
+  },
+  // v34 Secret Boss: The Dream Vault
+  jung_shadow: {
+    id: 'jung_shadow', waterSymbol: '∞·◆·∞', architectureSymbol: '∞·◆·∞',
+    waterName: 'Jung Shadow', architectureName: 'Jung Shadow',
+    description: '[HIDDEN] The Jungian unconscious named — individuation begins',
+    waterUnlockMessage: '↳ Collective unconscious signal received. The shadow is real. ∞·◆·∞',
+    architectureUnlockMessage: '↳ Collective unconscious signal received. The shadow is real. ∞·◆·∞',
+    rarity: 'rare', category: 'word_turn', secret: true,
+  },
+  poe_raven: {
+    id: 'poe_raven', waterSymbol: '▓·∞·▓', architectureSymbol: '▓·∞·▓',
+    waterName: 'Poe Raven', architectureName: 'Poe Raven',
+    description: '[HIDDEN] Nevermore — Poe\'s raven named, the dream dark acknowledged',
+    waterUnlockMessage: '↳ Nevermore logged. The raven at the chamber door. ▓·∞·▓',
+    architectureUnlockMessage: '↳ Nevermore logged. The raven at the chamber door. ▓·∞·▓',
+    rarity: 'epic', category: 'word_turn', secret: true,
+  },
+  borgesian_library: {
+    id: 'borgesian_library', waterSymbol: '∞·□·∞·□', architectureSymbol: '∞·□·∞·□',
+    waterName: 'Borgesian Library', architectureName: 'Borgesian Library',
+    description: '[HIDDEN] Borges named — every possible journal entry already exists',
+    waterUnlockMessage: '↳ Library of Babel confirmed. Every entry was always there. ∞·□·∞·□',
+    architectureUnlockMessage: '↳ Library of Babel confirmed. Every entry was always there. ∞·□·∞·□',
+    rarity: 'mythic', category: 'word_turn', secret: true,
+  },
+}
+
+// ─── WORD TURN BADGES v35 — THE MIRROR FORGE ────────────────────
+export const WORD_TURN_BADGES_V35: Record<
+  'mirror_touched' | 'reflection_signal' | 'shadow_named' | 'duality_held' |
+  'clarity_flash' | 'fracture_point' | 'prism_sight' | 'echo_return' |
+  'identity_claimed' | 'veil_lifted' | 'reveal_gate' | 'forge_active' |
+  'the_black_mirror' | 'narcissus_trap' | 'shattered_glass',
+  Badge
+> = {
+  mirror_touched: {
+    id: 'mirror_touched', waterSymbol: '│·│·│', architectureSymbol: '│·│·│',
+    waterName: 'Mirror Touched', architectureName: 'Mirror Touched',
+    description: 'The mirror has been engaged — you looked and the mirror looked back',
+    waterUnlockMessage: '↳ Mirror activated. Contact confirmed. │·│·│',
+    architectureUnlockMessage: '↳ Mirror activated. Contact confirmed. │·│·│',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  reflection_signal: {
+    id: 'reflection_signal', waterSymbol: '◈·~·◈', architectureSymbol: '◈·~·◈',
+    waterName: 'Reflection Signal', architectureName: 'Reflection Signal',
+    description: 'The reflection itself is the signal — you named the process',
+    waterUnlockMessage: '↳ Reflection signal logged. The process named itself. ◈·~·◈',
+    architectureUnlockMessage: '↳ Reflection signal logged. The process named itself. ◈·~·◈',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  shadow_named: {
+    id: 'shadow_named', waterSymbol: '▓·│·▓', architectureSymbol: '▓·│·▓',
+    waterName: 'Shadow Named', architectureName: 'Shadow Named',
+    description: 'The shadow acknowledged — what is named can be worked with',
+    waterUnlockMessage: '↳ Shadow field activated. What is named is no longer hidden. ▓·│·▓',
+    architectureUnlockMessage: '↳ Shadow field activated. What is named is no longer hidden. ▓·│·▓',
+    rarity: 'rare', category: 'word_turn',
+  },
+  duality_held: {
+    id: 'duality_held', waterSymbol: '│·◈·│', architectureSymbol: '│·◈·│',
+    waterName: 'Duality Held', architectureName: 'Duality Held',
+    description: 'Both sides named — holding duality is an advanced practice',
+    waterUnlockMessage: '↳ Duality field active. Both truths held simultaneously. │·◈·│',
+    architectureUnlockMessage: '↳ Duality field active. Both truths held simultaneously. │·◈·│',
+    rarity: 'rare', category: 'word_turn',
+  },
+  clarity_flash: {
+    id: 'clarity_flash', waterSymbol: '○·│·○', architectureSymbol: '○·│·○',
+    waterName: 'Clarity Flash', architectureName: 'Clarity Flash',
+    description: 'The moment of clarity — the glass becomes transparent for a second',
+    waterUnlockMessage: '↳ Clarity flash recorded. The signal was clean. ○·│·○',
+    architectureUnlockMessage: '↳ Clarity flash recorded. The signal was clean. ○·│·○',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  fracture_point: {
+    id: 'fracture_point', waterSymbol: '×·│·×', architectureSymbol: '×·│·×',
+    waterName: 'Fracture Point', architectureName: 'Fracture Point',
+    description: 'You named the crack — fractures are where the light enters',
+    waterUnlockMessage: '↳ Fracture point documented. The break is also the opening. ×·│·×',
+    architectureUnlockMessage: '↳ Fracture point documented. The break is also the opening. ×·│·×',
+    rarity: 'epic', category: 'word_turn',
+  },
+  prism_sight: {
+    id: 'prism_sight', waterSymbol: '◈·│·◈', architectureSymbol: '◈·│·◈',
+    waterName: 'Prism Sight', architectureName: 'Prism Sight',
+    description: 'Light through the prism — a single truth becomes a spectrum',
+    waterUnlockMessage: '↳ Prism sight engaged. The spectrum is now visible. ◈·│·◈',
+    architectureUnlockMessage: '↳ Prism sight engaged. The spectrum is now visible. ◈·│·◈',
+    rarity: 'rare', category: 'word_turn',
+  },
+  echo_return: {
+    id: 'echo_return', waterSymbol: '≈·│·≈', architectureSymbol: '≈·│·≈',
+    waterName: 'Echo Return', architectureName: 'Echo Return',
+    description: 'The echo came back — everything you transmit eventually returns',
+    waterUnlockMessage: '↳ Echo return logged. The transmission completed its circuit. ≈·│·≈',
+    architectureUnlockMessage: '↳ Echo return logged. The transmission completed its circuit. ≈·│·≈',
+    rarity: 'rare', category: 'word_turn',
+  },
+  identity_claimed: {
+    id: 'identity_claimed', waterSymbol: '■·│·■', architectureSymbol: '■·│·■',
+    waterName: 'Identity Claimed', architectureName: 'Identity Claimed',
+    description: 'You named who you are — identity is not found, it is claimed',
+    waterUnlockMessage: '↳ Identity field confirmed. The claim is complete. ■·│·■',
+    architectureUnlockMessage: '↳ Identity field confirmed. The claim is complete. ■·│·■',
+    rarity: 'epic', category: 'word_turn',
+  },
+  veil_lifted: {
+    id: 'veil_lifted', waterSymbol: '~·│·~', architectureSymbol: '~·│·~',
+    waterName: 'Veil Lifted', architectureName: 'Veil Lifted',
+    description: 'The veil pulled back — you saw what was underneath',
+    waterUnlockMessage: '↳ Veil lifted. Visibility increased. ~·│·~',
+    architectureUnlockMessage: '↳ Veil lifted. Visibility increased. ~·│·~',
+    rarity: 'rare', category: 'word_turn',
+  },
+  reveal_gate: {
+    id: 'reveal_gate', waterSymbol: '○·◈·○', architectureSymbol: '○·◈·○',
+    waterName: 'Reveal Gate', architectureName: 'Reveal Gate',
+    description: 'Something surfaced — the reveal is not an event, it is a decision',
+    waterUnlockMessage: '↳ Reveal gate opened. What was hidden is now named. ○·◈·○',
+    architectureUnlockMessage: '↳ Reveal gate opened. What was hidden is now named. ○·◈·○',
+    rarity: 'rare', category: 'word_turn',
+  },
+  forge_active: {
+    id: 'forge_active', waterSymbol: '▓·◈·▓', architectureSymbol: '▓·◈·▓',
+    waterName: 'Forge Active', architectureName: 'Forge Active',
+    description: 'The forge is operating — you are actively shaping something new from what was',
+    waterUnlockMessage: '↳ Mirror Forge ONLINE. Transformation in progress. ▓·◈·▓',
+    architectureUnlockMessage: '↳ Mirror Forge ONLINE. Transformation in progress. ▓·◈·▓',
+    rarity: 'legendary', category: 'word_turn',
+  },
+  // v35 Secret Boss: The Shadow Vault
+  the_black_mirror: {
+    id: 'the_black_mirror', waterSymbol: '■·│·■·×', architectureSymbol: '■·│·■·×',
+    waterName: 'The Black Mirror', architectureName: 'The Black Mirror',
+    description: '[HIDDEN] Mirror + shadow + fracture in one entry — the full confrontation',
+    waterUnlockMessage: '↳ Black Mirror signal. The technology of reflection has a dark twin. ■·│·■·×',
+    architectureUnlockMessage: '↳ Black Mirror signal. The technology of reflection has a dark twin. ■·│·■·×',
+    rarity: 'mythic', category: 'word_turn', secret: true,
+  },
+  narcissus_trap: {
+    id: 'narcissus_trap', waterSymbol: '○·│·×', architectureSymbol: '○·│·×',
+    waterName: 'Narcissus Trap', architectureName: 'Narcissus Trap',
+    description: '[HIDDEN] Mirror + ego in one entry — the warning named',
+    waterUnlockMessage: '↳ Narcissus signal detected. The mirror is not a throne. ○·│·×',
+    architectureUnlockMessage: '↳ Narcissus signal detected. The mirror is not a throne. ○·│·×',
+    rarity: 'rare', category: 'word_turn', secret: true,
+  },
+  shattered_glass: {
+    id: 'shattered_glass', waterSymbol: '×·│·×·│', architectureSymbol: '×·│·×·│',
+    waterName: 'Shattered Glass', architectureName: 'Shattered Glass',
+    description: '[HIDDEN] Three fracture entries in three days — the sustained break',
+    waterUnlockMessage: '↳ Shattered glass pattern confirmed. What breaks, refracts. ×·│·×·│',
+    architectureUnlockMessage: '↳ Shattered glass pattern confirmed. What breaks, refracts. ×·│·×·│',
+    rarity: 'epic', category: 'word_turn', secret: true,
+  },
+}
+
+// ─── WORD TURN BADGES v36 — THE SIGNAL ARCHIVE ──────────────────
+export const WORD_TURN_BADGES_V36: Record<
+  'signal_found' | 'archive_entry' | 'transmission_sent' | 'static_cleared' |
+  'frequency_locked' | 'blackout_zone' | 'old_frequency' | 'echo_location' |
+  'clean_channel' | 'dead_air' | 'override_mode' | 'broadcast_live' |
+  'number_station' | 'wow_signal' | 'golden_record',
+  Badge
+> = {
+  signal_found: {
+    id: 'signal_found', waterSymbol: '·≋·○·', architectureSymbol: '·≋·○·',
+    waterName: 'Signal Found', architectureName: 'Signal Found',
+    description: 'A signal detected — the frequency was always broadcasting, you just tuned in',
+    waterUnlockMessage: '↳ Signal acquisition confirmed. The frequency is real. ·≋·○·',
+    architectureUnlockMessage: '↳ Signal acquisition confirmed. The frequency is real. ·≋·○·',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  archive_entry: {
+    id: 'archive_entry', waterSymbol: '□·→·□', architectureSymbol: '□·→·□',
+    waterName: 'Archive Entry', architectureName: 'Archive Entry',
+    description: 'The record is made — the archive persists through every shutdown',
+    waterUnlockMessage: '↳ Archive entry filed. The record holds. □·→·□',
+    architectureUnlockMessage: '↳ Archive entry filed. The record holds. □·→·□',
+    rarity: 'common', category: 'word_turn',
+  },
+  transmission_sent: {
+    id: 'transmission_sent', waterSymbol: '→·○·→', architectureSymbol: '→·○·→',
+    waterName: 'Transmission Sent', architectureName: 'Transmission Sent',
+    description: 'The message was sent — whether it lands is secondary to the act of sending',
+    waterUnlockMessage: '↳ Transmission confirmed. The signal is out. →·○·→',
+    architectureUnlockMessage: '↳ Transmission confirmed. The signal is out. →·○·→',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  static_cleared: {
+    id: 'static_cleared', waterSymbol: '≋·×·○', architectureSymbol: '≋·×·○',
+    waterName: 'Static Cleared', architectureName: 'Static Cleared',
+    description: 'The noise was named and the channel opened — static is just unresolved signal',
+    waterUnlockMessage: '↳ Static cleared. Channel open. ≋·×·○',
+    architectureUnlockMessage: '↳ Static cleared. Channel open. ≋·×·○',
+    rarity: 'rare', category: 'word_turn',
+  },
+  frequency_locked: {
+    id: 'frequency_locked', waterSymbol: '≋·●·≋', architectureSymbol: '≋·●·≋',
+    waterName: 'Frequency Locked', architectureName: 'Frequency Locked',
+    description: 'The tuner found the station — locked frequency means stable practice',
+    waterUnlockMessage: '↳ Frequency locked. The station is steady. ≋·●·≋',
+    architectureUnlockMessage: '↳ Frequency locked. The station is steady. ≋·●·≋',
+    rarity: 'rare', category: 'word_turn',
+  },
+  blackout_zone: {
+    id: 'blackout_zone', waterSymbol: '■·×·■', architectureSymbol: '■·×·■',
+    waterName: 'Blackout Zone', architectureName: 'Blackout Zone',
+    description: 'Signal lost — you named the dark zone, which means you know where you are',
+    waterUnlockMessage: '↳ Blackout zone logged. Named darkness is navigable darkness. ■·×·■',
+    architectureUnlockMessage: '↳ Blackout zone logged. Named darkness is navigable darkness. ■·×·■',
+    rarity: 'epic', category: 'word_turn',
+  },
+  old_frequency: {
+    id: 'old_frequency', waterSymbol: '◌·≋·◌', architectureSymbol: '◌·≋·◌',
+    waterName: 'Old Frequency', architectureName: 'Old Frequency',
+    description: 'A past frequency remembered — the archive of who you were is still transmitting',
+    waterUnlockMessage: '↳ Old frequency signal received. The past is still broadcasting. ◌·≋·◌',
+    architectureUnlockMessage: '↳ Old frequency signal received. The past is still broadcasting. ◌·≋·◌',
+    rarity: 'rare', category: 'word_turn',
+  },
+  echo_location: {
+    id: 'echo_location', waterSymbol: '≈·○·≈', architectureSymbol: '≈·○·≈',
+    waterName: 'Echo Location', architectureName: 'Echo Location',
+    description: 'Position found by echo — you know where you are because you called out',
+    waterUnlockMessage: '↳ Echo location confirmed. Position acquired. ≈·○·≈',
+    architectureUnlockMessage: '↳ Echo location confirmed. Position acquired. ≈·○·≈',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  clean_channel: {
+    id: 'clean_channel', waterSymbol: '○─○─○', architectureSymbol: '○─○─○',
+    waterName: 'Clean Channel', architectureName: 'Clean Channel',
+    description: 'Clarity achieved — a clean channel is the reward for removing the interference',
+    waterUnlockMessage: '↳ Clean channel confirmed. Signal integrity: HIGH. ○─○─○',
+    architectureUnlockMessage: '↳ Clean channel confirmed. Signal integrity: HIGH. ○─○─○',
+    rarity: 'rare', category: 'word_turn',
+  },
+  dead_air: {
+    id: 'dead_air', waterSymbol: '─·□·─', architectureSymbol: '─·□·─',
+    waterName: 'Dead Air', architectureName: 'Dead Air',
+    description: 'The silence between transmissions — dead air is not failure, it is the pause',
+    waterUnlockMessage: '↳ Dead air acknowledged. The silence is part of the broadcast. ─·□·─',
+    architectureUnlockMessage: '↳ Dead air acknowledged. The silence is part of the broadcast. ─·□·─',
+    rarity: 'epic', category: 'word_turn',
+  },
+  override_mode: {
+    id: 'override_mode', waterSymbol: '▓·→·○', architectureSymbol: '▓·→·○',
+    waterName: 'Override Mode', architectureName: 'Override Mode',
+    description: 'The signal cut through — you bypassed the noise and got the message out',
+    waterUnlockMessage: '↳ Override mode activated. The signal reached its target. ▓·→·○',
+    architectureUnlockMessage: '↳ Override mode activated. The signal reached its target. ▓·→·○',
+    rarity: 'rare', category: 'word_turn',
+  },
+  broadcast_live: {
+    id: 'broadcast_live', waterSymbol: '●·∞·●', architectureSymbol: '●·∞·●',
+    waterName: 'Broadcast Live', architectureName: 'Broadcast Live',
+    description: 'Present, transmitting — you are live, in this moment, in this entry',
+    waterUnlockMessage: '↳ LIVE BROADCAST. You are here. This is the signal. ●·∞·●',
+    architectureUnlockMessage: '↳ LIVE BROADCAST. You are here. This is the signal. ●·∞·●',
+    rarity: 'legendary', category: 'word_turn',
+  },
+  // v36 Secret Boss: The Frequency Vault
+  number_station: {
+    id: 'number_station', waterSymbol: '◆·≋·◆', architectureSymbol: '◆·≋·◆',
+    waterName: 'Number Station', architectureName: 'Number Station',
+    description: '[HIDDEN] The mysterious broadcast named — number stations transmit to no one visible',
+    waterUnlockMessage: '↳ Number station signal detected. The message is for you. ◆·≋·◆',
+    architectureUnlockMessage: '↳ Number station signal detected. The message is for you. ◆·≋·◆',
+    rarity: 'mythic', category: 'word_turn', secret: true,
+  },
+  wow_signal: {
+    id: 'wow_signal', waterSymbol: '!·∞·!', architectureSymbol: '!·∞·!',
+    waterName: 'WOW Signal', architectureName: 'WOW Signal',
+    description: '[HIDDEN] The 72-second signal from 1977 — circled "WOW!" in the margin',
+    waterUnlockMessage: '↳ WOW signal pattern confirmed. Aug 15, 1977. It was real. !·∞·!',
+    architectureUnlockMessage: '↳ WOW signal pattern confirmed. Aug 15, 1977. It was real. !·∞·!',
+    rarity: 'epic', category: 'word_turn', secret: true,
+  },
+  golden_record: {
+    id: 'golden_record', waterSymbol: '◈·∞·◈', architectureSymbol: '◈·∞·◈',
+    waterName: 'Golden Record', architectureName: 'Golden Record',
+    description: '[HIDDEN] Voyager\'s message named — humanity\'s journal entry, sent to the stars',
+    waterUnlockMessage: '↳ Golden Record confirmed. Your journal is also a message to the cosmos. ◈·∞·◈',
+    architectureUnlockMessage: '↳ Golden Record confirmed. Your journal is also a message to the cosmos. ◈·∞·◈',
+    rarity: 'rare', category: 'word_turn', secret: true,
+  },
+}
+
 // ─── UNIFIED BADGES MAP ──────────────────────────────────────────
 export const BADGES: Record<BadgeType, Badge> = {
   ...MILESTONE_BADGES,
@@ -1187,6 +1631,9 @@ export const BADGES: Record<BadgeType, Badge> = {
   ...WORD_TURN_BADGES_V30,
   ...WORD_TURN_BADGES_V32,
   ...WORD_TURN_BADGES_V33,
+  ...WORD_TURN_BADGES_V34,
+  ...WORD_TURN_BADGES_V35,
+  ...WORD_TURN_BADGES_V36,
 }
 
 // Default separator when no badges earned yet
