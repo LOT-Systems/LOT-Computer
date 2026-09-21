@@ -90,8 +90,8 @@ services:
       - key: GOOGLE_API_KEY
         scope: RUN_TIME
         type: SECRET
-        value: "PLACEHOLDER_GOOGLE_API_KEY_OPTIONAL"
+        value: "${GOOGLE_API_KEY}"
       - key: MISTRAL_API_KEY
         scope: RUN_TIME
         type: SECRET
-        value: "PLACEHOLDER_MISTRAL_API_KEY_OPTIONAL"
+        value: "${MISTRAL_API_KEY}"
