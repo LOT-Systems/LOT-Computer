@@ -5521,8 +5521,11 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         limit: 200,
       })
 
+      // Journal notes are written with event: 'note' (see POST /logs) — 'log_entry'
+      // and 'journal' are not event values this codebase ever writes, so this filter
+      // matched zero rows and the AI prompt below silently ran on empty data.
       const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
+        .filter(l => l.event === 'note')
         .slice(0, 10)
         .map(l => (l.text || '').substring(0, 200))
         .filter(Boolean)
@@ -5530,14 +5533,26 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
       const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
 
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
+      // Memory Q&A logs are written with event: 'answer' and metadata {question, answer}.
+      // Self-care completions are written with event: 'self_care_complete' /
+      // 'self_care_completed' and carry the description in `text`, not in
+      // metadata.question/option. 'memory_answer' / 'self_care_checkin' /
+      // 'energy_checkin' are not event values this codebase ever writes.
+      const memoryAnswerLogs = logs.filter(l => l.event === 'answer').slice(0, 10)
+      const selfCareCompleteLogs = logs
+        .filter(l => l.event === 'self_care_complete' || l.event === 'self_care_completed')
+        .slice(0, 10)
+      const selfCareNotes = [
+        ...memoryAnswerLogs.map(l => {
+          const q = (l.metadata?.question as string || '')
+          const a = (l.metadata?.answer as string || '')
+          return q && a ? `${q}: ${a}` : ''
+        }),
+        ...selfCareCompleteLogs.map(l => {
+          const activity = (l.text || '').replace('Self-care completed: ', '').trim()
+          return activity ? `Self-care: ${activity}` : ''
+        }),
+      ].filter(Boolean).slice(0, 10)
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
