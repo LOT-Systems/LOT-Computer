@@ -3428,6 +3428,25 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Auspicious Intention Alignment — the day's ambient astrology reading
+  // came back Taian (auspicious, recordAstrologySignal's auspicious flag) AND the user
+  // set at least one goal or intention that same day. First pattern to react to the
+  // 'astrology' Tier 0 source (wired 2026-07-27) together with a real activity source —
+  // the deferred pattern-authoring pass from that session. Ambient conditions only;
+  // no natal-chart data involved, matches the standing astrology-widget doctrine.
+  const p152Astro  = recentSignals.find(s => s.source === 'astrology' && s.metadata?.auspicious === true)
+  const p152Intent = recentSignals.filter(s => s.source === 'intentions' || s.source === 'goals')
+  if (p152Astro && p152Intent.length >= 1) {
+    const alignBonus = Math.min((p152Intent.length - 1) * 0.04, 0.15)
+    patterns.push({
+      pattern: 'auspicious-intention-alignment',
+      confidence: Math.min(0.62 + alignBonus, 0.80),
+      suggestedWidget: 'cosmic',
+      suggestedTiming: 'passive',
+      reason: `AUSP-ALIGN: Auspicious intention alignment — today's rokuyo reading is Taian (大安) · ${p152Intent.length} goal/intention signal(s) set today. A favorable ambient reading and active direction-setting, same day. Not causal — ambient conditions, not a forecast — but worth noticing when they line up.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
