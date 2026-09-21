@@ -24,7 +24,7 @@ STATUS KEY:
 
 FEATURE          | BEST BRANCH                   | HASH     | ITER  | STATUS | FILES | LINES  | SUMMARY
 ──────────────     ─────────────────────────────   ────────   ─────   ──────   ─────   ──────   ──────────────────────
-LOT Mail         | determined-turing-f6bw7r     | fa622a25 | 11/11 | BEST   | 11    | +504   | In-app email: /email trigger, Sync inbox, Cohort integration, yarn.lock
+LOT Mail         | determined-turing-b2ckxl     | (pending)| 12/12 | READY  | 12    | +554   | In-app email: /email trigger, Sync inbox, Cohort integration — recovered from f6bw7r (SUPERSEDED, no merge-base w/ master) and rebuilt green against current master 2026-09-21; awaiting S-2 "Ship LOT Mail"
 Basics Tab       | beautiful-johnson-56p7ov      | 6815f550 | 8/8   | BEST   | 5     | +293   | BASICS M1: OPEN TAB live — 23-item ration ledger, doctrine, status line
 Calendar Alerts  | gifted-lovelace-cZOWR         | 978cf52  | 6/6   | BEST   | 3     | +359   | Live clock, T-minus countdown, military alert overlay, today panel
 QI-46 Engine     | cool-tesla-f8j0mr            | 36ef4dde | 8/8   | BEST   | 8     | +2050  | QI·46 Node 3 engine integration + Soul Upload + Being Calibration
@@ -84,7 +84,7 @@ CLUSTER          | COUNT | KEEP              | PRUNE | REASON
 gallant-mayer    | 35    | GqGA0             | 34    | Same health check fix iterated 35 times
 pensive-rubin    | 5     | 4jhgF             | 4     | Strict superset progression
 relaxed-hamilton | 8     | eRBVA             | 7     | LOT Mail iterations (SUPERSEDED by determined-turing)
-determined-turing| 6     | f6bw7r            | 5     | LOT Mail iterations (latest series)
+determined-turing| 7     | b2ckxl            | 6     | LOT Mail iterations (b2ckxl supersedes f6bw7r — rebuilt against current master 2026-09-21)
 dazzling-shannon | 9     | ykKT5             | 8     | COSMO hardware iterations (SUPERSEDED by brave-lamport)
 brave-lamport    | 5     | t9z5u8            | 4     | COSMO hardware iterations (latest series)
 gifted-lovelace  | 6     | cZOWR             | 5     | Calendar alert iterations
