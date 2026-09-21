@@ -967,8 +967,10 @@ export const System = React.memo(function SystemInner() {
           {/* Micro Calculator - appears at magical number times */}
           <MicroCalculatorWidget />
 
-          {/* Micro Game - 2×2cm monochromatic pixel game screen */}
-          <MicroGameWidget />
+          {/* Micro Game - 2×2cm monochromatic pixel game screen — lazy-mounted: 988-line component, subscriptions deferred until in viewport */}
+          <LazyMount>
+            <MicroGameWidget />
+          </LazyMount>
 
           {/* Micro Image - 2×2cm procedural pixel image, responds to user's punctuation */}
           <MicroImageWidget />
@@ -1027,8 +1029,10 @@ export const System = React.memo(function SystemInner() {
           {/* Correlated Indexes - Four-dimensional weekly tracking */}
           <CorrelatedIndexesWidget />
 
-          {/* System Progress - Deployment info with feedback */}
-          <SystemProgressWidget />
+          {/* System Progress - Deployment info with feedback — lazy-mounted: 2500+ line component, heaviest widget in the stack */}
+          <LazyMount>
+            <SystemProgressWidget />
+          </LazyMount>
 
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />
