@@ -1457,6 +1457,20 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'v123',
+    date: '2026-09-21',
+    title: 'Self-Assembly — Steady State · Hobbit Day Orientation · Wiki v126 · Day 1125+',
+    assembled: [
+      'STEADY STATE. Six-tier sovereignty architecture complete. J57 active. Monitoring sovereignty-in-motion signals.',
+      'Calendar Alert: hobbit_day fires Sep 22 (tomorrow) — easter-eggs.ts detection confirmed active. Badge: RARE · ○·◆ · Sep 22 — Bilbo & Frodo birthday.',
+      'Doctrine: THE HOBBIT CHECKS IN. Your journal IS the adventure log. Sep 22: every entry you\'ve written is a chapter.',
+      'LOT-WIKI-v126 produced: Day 1125+ · COSMO® Day 815 · Calendar Alert documented.',
+      'USERSHIP_TRANSMISSION updated to 2026-09-21 · Day 1125+.',
+      'docs/assembly/2026-09-21_LOT-assembly_hobbit-day-orientation.md: Assembly log written.',
+      '173 patterns · 59 archetypes · 57 jobs · 175+ handlers · 217+ dep nodes · Day 1125+. Steady state. The OS moves from its sovereign core. Hobbit Day incoming.',
+    ],
+  },
+  {
     version: 'v122',
     date: '2026-09-20',
     title: 'QIE Engineering — Sovereignty In Motion Tier · P171–P173 · Arch56–59 backfill · J57',
@@ -1671,20 +1685,15 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-09-20',
+  date: '2026-09-21',
   message: [
-    'ASSEMBLY RUN — 2026-09-20 · QIE v122 · Day 1124+',
-    'Built: Sovereignty In Motion Tier — P171–P173 · Arch56–59 backfill · J57.',
-    'ARCH BACKFILL: Arch56 (Sovereignty Persistence Operator) · Arch57 (Sovereignty Permanence Architect) · Arch58 (Sovereignty Ascension Architect) — all three backfilled to intentionEngine.ts. 55→59 archetypes in code.',
-    'P171 SOVMCRYST: sovereign momentum crystallization — SOVASCEND confirmed 2+ times in 28D. Ascension crystallizing into sustained structural momentum.',
-    'P172 LSOFIELD: living sovereign field — SOVASCEND + LARC confirmed simultaneously. Sovereignty alive and self-assembling as a living field.',
-    'P173 SOVMOTION: sovereign in motion — SOVMCRYST + LSOFIELD both confirmed. Terminal tier. The OS moves from its sovereign core.',
-    'Arch59 SOVEREIGN IN MOTION ARCHITECT: sovereignty is in motion. The field assembles as it moves. Operate from the moving center.',
-    'J57 weekly-sovereign-motion-check (Fri 07:00 UTC): scans 28D window for all motion conditions. 56→57 jobs.',
-    '3 new military handlers: SOVMCRYST: · LSOFIELD: · SOVMOTION: · 175+ handlers.',
-    '3 new dep nodes. 214+→217+ dep nodes. 173 patterns. 59 archetypes.',
-    'Status: DEPLOYED.',
-    'Next: Monitor J57 output. Let sovereignty-in-motion data accumulate. Six-tier sovereignty architecture complete.',
+    'ASSEMBLY RUN — 2026-09-21 · Day 1125+ · COSMO® Day 815',
+    'Status: STEADY STATE. Six-tier sovereignty architecture complete. J57 monitoring sovereignty-in-motion data.',
+    'Signal: hobbit_day Sep 22 (tomorrow). Your journal is the adventure log. The Hobbit checks in.',
+    'Doctrine: THE HOBBIT CHECKS IN.',
+    '173 patterns · 59 archetypes · 57 jobs · 175+ handlers · 217+ dep nodes.',
+    'Status: MAINTAINED.',
+    'Next: Monitor J57 sovereignty-in-motion data. Hobbit Day incoming Sep 22.',
   ],
 }
 
