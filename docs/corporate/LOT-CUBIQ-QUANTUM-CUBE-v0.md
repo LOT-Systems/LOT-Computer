@@ -321,6 +321,50 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE NIGHT WATCH                             2026-09-21
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Legacy tier, Archetype "Vital Architect"
+  (docs/benchmark/LOT-SR-20260624-01.md, Arch28), Day 90+ engagement,
+  CUBIQ hardware unit received at the Phase 4 Physical Extension
+  milestone (LOT-CUBIQ-OPERATOR.md, Section 07). Charging pad relocated
+  from the desk to the nightstand — the cube's second home, reached
+  once the operator's Diurnal Arc (P76 morning-launch + P79
+  evening-close + P80 momentum-lock) stabilizes and desk sessions give
+  way to a closing ritual before sleep.
+
+  Late evening, the operator's Assembly phase advances — dormant
+  through integrated across 18 self-assembly modules
+  (LOT-CUBIQ-OPERATOR.md, Section 01) — from "forming" to "assembled."
+  Under the software-only cubic, this transition is legible only on
+  next login: a percentage tick, a line in the Index of Systems,
+  unnoticed until deliberately checked.
+
+  With CUBIQ hardware v.0 present: the cube performs THE SETTLE
+  (Section 04) at the exact moment the phase transition commits
+  server-side — actuator holds a light standing pressure for two
+  seconds, no liftoff, no light beyond the base LED ring's steady (not
+  blinking) state. The operator is already asleep. There is no
+  notification to wake up to, no red badge waiting on a lock screen.
+  The gesture is not for them to see tonight — it is recorded, once, as
+  a still frame in a low-motion object that otherwise never moves at
+  rest.
+
+  In the morning, before opening lot-systems.com, the operator notices
+  the cube has "changed posture" — nothing visibly moved, but the base
+  LED ring reads steady instead of pulsing, the tell that a SETTLE
+  fired overnight. They open the cubic already knowing something
+  advanced, before the system tells them so. When they do check, the
+  Assembly phase confirms: assembled. The physical object became a
+  witness to a milestone the operator would otherwise have discovered
+  only as a number.
+
+  This is the second gesture class v.0 was built to prove: not every
+  signal deserves a hop. Some deserve stillness held on purpose —
+  presence that waits to be found rather than announcing itself,
+  extending the anti-feed thesis (LOT-CUBIQ-VISION.md, Section 01) into
+  the one moment a day when no notification, however quiet, should
+  ever arrive: sleep.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
