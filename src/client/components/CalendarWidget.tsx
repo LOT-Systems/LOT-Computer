@@ -25,6 +25,36 @@ type CalendarEntry = {
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
+function formatTrackedTime(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000)
+  const hours = `0${Math.floor(totalSeconds / 3600)}`.slice(-2)
+  const minutes = `0${Math.floor((totalSeconds % 3600) / 60)}`.slice(-2)
+  const seconds = `0${totalSeconds % 60}`.slice(-2)
+  return `${hours}:${minutes}:${seconds}`
+}
+
+type CalendarAlert = {
+  code: string
+  text: string
+  time: string
+}
+
+if (typeof document !== 'undefined' && !document.getElementById('calendar-alert-keyframes')) {
+  const style = document.createElement('style')
+  style.id = 'calendar-alert-keyframes'
+  style.textContent = `
+    @keyframes calendarAlertIn {
+      from { opacity: 0; transform: translate(-50%, 10px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+    @keyframes calendarAlertOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+  `
+  document.head.appendChild(style)
+}
+
 function getMonthWeeks(year: number, month: number): Dayjs[][] {
   const first = dayjs().year(year).month(month).startOf('month')
   const last = dayjs().year(year).month(month).endOf('month')
@@ -59,6 +89,15 @@ export function CalendarWidget() {
   const [isAddingEntry, setIsAddingEntry] = React.useState(false)
   const [entryText, setEntryText] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
+
+  const [isTrackingPanelOpen, setIsTrackingPanelOpen] = React.useState(false)
+  const [isTracking, setIsTracking] = React.useState(false)
+  const [trackedMs, setTrackedMs] = React.useState(0)
+  const trackingStartRef = React.useRef(0)
+  const trackingFrameRef = React.useRef<number>()
+
+  const [alert, setAlert] = React.useState<CalendarAlert | null>(null)
+  const alertTimeoutRef = React.useRef<ReturnType<typeof setTimeout>>()
 
   const entries = React.useMemo<CalendarEntry[]>(() => {
     return logs
@@ -105,6 +144,19 @@ export function CalendarWidget() {
     }
   }
 
+  const fireAlert = React.useCallback((code: string, text: string) => {
+    clearTimeout(alertTimeoutRef.current)
+    setAlert({ code, text, time: dayjs().format('HH:mm:ss') })
+    alertTimeoutRef.current = setTimeout(() => setAlert(null), 4200)
+  }, [])
+
+  React.useEffect(() => {
+    return () => {
+      clearTimeout(alertTimeoutRef.current)
+      cancelAnimationFrame(trackingFrameRef.current!)
+    }
+  }, [])
+
   const handleAddEntry = () => {
     if (!selectedDate || !entryText.trim()) return
 
@@ -122,11 +174,62 @@ export function CalendarWidget() {
       onSuccess: () => {
         queryClient.refetchQueries(['/api/logs'])
         try { recordCalendarSignal(entryType, selectedDate!) } catch (_) {}
+        fireAlert('CAL-LOG', `${entryType.toUpperCase()} · ${dayjs(selectedDate).format('MMM D')}`)
       },
     })
 
     setEntryText('')
     setIsAddingEntry(false)
+  }
+
+  const trackingTick = (now: number) => {
+    setTrackedMs(now - trackingStartRef.current)
+    trackingFrameRef.current = requestAnimationFrame(trackingTick)
+  }
+
+  const startTracking = () => {
+    if (isTracking) return
+    setIsTracking(true)
+    trackingStartRef.current = performance.now() - trackedMs
+    trackingFrameRef.current = requestAnimationFrame(trackingTick)
+  }
+
+  const pauseTracking = () => {
+    setIsTracking(false)
+    cancelAnimationFrame(trackingFrameRef.current!)
+  }
+
+  const discardTracking = () => {
+    setIsTracking(false)
+    setTrackedMs(0)
+    cancelAnimationFrame(trackingFrameRef.current!)
+  }
+
+  const handleLogTrackedTime = () => {
+    if (!selectedDate || trackedMs < 1000) return
+
+    const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
+    const label = entryText.trim() || undefined
+    const durationMs = Math.round(trackedMs)
+
+    createLog({
+      text: `[TIME] ${formatTrackedTime(durationMs)} logged (${dateLabel})${label ? ` — ${label}` : ''}`,
+      event: 'calendar_time_session',
+      metadata: {
+        date: selectedDate,
+        durationMs,
+        label,
+      },
+    }, {
+      onSuccess: () => {
+        queryClient.refetchQueries(['/api/logs'])
+        fireAlert('CAL-TIME', `${formatTrackedTime(durationMs)} · ${dayjs(selectedDate).format('MMM D')}`)
+      },
+    })
+
+    setIsTracking(false)
+    setTrackedMs(0)
+    cancelAnimationFrame(trackingFrameRef.current!)
   }
 
   const handleToggleCalendar = () => {
@@ -137,6 +240,7 @@ export function CalendarWidget() {
   }
 
   return (
+    <>
     <Block label="Calendar:" blockView onLabelClick={handleToggleCalendar}>
       <div className="w-full">
         <div className="mb-16">
@@ -196,13 +300,21 @@ export function CalendarWidget() {
                   })}
 
                   {wi === 0 && (
-                    <div className="text-acc/30 flex items-center ml-4 whitespace-nowrap">
+                    <div className="text-acc/30 flex items-center gap-8 ml-4 whitespace-nowrap">
                       {selectedDate && !isAddingEntry && (
                         <button
                           className="text-acc/30 hover:text-acc/60 transition-opacity"
                           onClick={() => setIsAddingEntry(true)}
                         >
                           Note / Task / Call
+                        </button>
+                      )}
+                      {selectedDate && !isTrackingPanelOpen && (
+                        <button
+                          className="text-acc/30 hover:text-acc/60 transition-opacity"
+                          onClick={() => setIsTrackingPanelOpen(true)}
+                        >
+                          Track time
                         </button>
                       )}
                     </div>
@@ -242,6 +354,46 @@ export function CalendarWidget() {
               </div>
             )}
 
+            {isTrackingPanelOpen && selectedDate && (
+              <div className="mt-8">
+                <div className="flex items-center gap-16">
+                  <span className="text-acc tabular-nums tracking-widest">
+                    {formatTrackedTime(trackedMs)}
+                  </span>
+                  <div className="flex gap-8">
+                    {!isTracking ? (
+                      <button
+                        className="text-acc/40 hover:text-acc transition-opacity"
+                        onClick={startTracking}
+                      >
+                        Start
+                      </button>
+                    ) : (
+                      <button
+                        className="text-acc/40 hover:text-acc transition-opacity"
+                        onClick={pauseTracking}
+                      >
+                        Pause
+                      </button>
+                    )}
+                    <button
+                      className="text-acc/40 hover:text-acc transition-opacity"
+                      onClick={handleLogTrackedTime}
+                      disabled={trackedMs < 1000}
+                    >
+                      Log
+                    </button>
+                    <button
+                      className="text-acc/30 hover:text-acc/60 transition-opacity"
+                      onClick={() => { discardTracking(); setIsTrackingPanelOpen(false) }}
+                    >
+                      Discard
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {selectedDate && entriesOnDate.length > 0 && (
               <div className="mt-8">
                 <div className="text-acc/40 mb-4">
@@ -277,5 +429,20 @@ export function CalendarWidget() {
         )}
       </div>
     </Block>
+
+    {alert && (
+      <div
+        className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50
+                   px-16 py-8 border border-acc/20 bg-[var(--base-color)] grid-fill-light"
+        style={{ animation: 'calendarAlertIn 0.3s ease-out, calendarAlertOut 0.4s ease-in 3.8s forwards' }}
+      >
+        <div className="flex items-center gap-16 whitespace-nowrap">
+          <span className="text-acc uppercase tracking-widest">{alert.code}</span>
+          <span className="text-acc/60 tabular-nums">{alert.text}</span>
+          <span className="text-acc/30 tabular-nums">{alert.time}</span>
+        </div>
+      </div>
+    )}
+    </>
   )
 }

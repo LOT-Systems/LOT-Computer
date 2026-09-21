@@ -42,6 +42,14 @@ const localStore = {
   logIds: atom<string[]>([]),
 }
 
+function formatLogDuration(ms: number): string {
+  const totalSeconds = Math.round(ms / 1000)
+  const hours = `0${Math.floor(totalSeconds / 3600)}`.slice(-2)
+  const minutes = `0${Math.floor((totalSeconds % 3600) / 60)}`.slice(-2)
+  const seconds = `0${totalSeconds % 60}`.slice(-2)
+  return `${hours}:${minutes}:${seconds}`
+}
+
 export const Logs: React.FC = React.memo(function LogsInner() {
   const inputContainerRef = React.useRef<HTMLDivElement>(null)
   const containerRef = React.useRef<HTMLDivElement>(null)
@@ -2084,6 +2092,23 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               <Block label="CAL:" blockView>
                 <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
                 {date && <div className="opacity-40 mt-8">{date}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_time_session') {
+          const durationMs = log.metadata?.durationMs as number | undefined
+          const date = log.metadata?.date as string | undefined
+          const label = log.metadata?.label as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL-TIME:" blockView>
+                {durationMs !== undefined && (
+                  <div className="uppercase tracking-widest tabular-nums">
+                    {formatLogDuration(durationMs)}
+                  </div>
+                )}
+                {date && <div className="opacity-40 mt-8">{date}</div>}
+                {label && <div className="opacity-60 mt-4">{label}</div>}
               </Block>
             </LogContainer>
           )
