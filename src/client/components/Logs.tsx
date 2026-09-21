@@ -4380,6 +4380,126 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sovereign_field_broadcast') {
+          const sovmotionConf    = log.metadata?.sovmotionConf as number | undefined
+          const intentionsCount  = log.metadata?.intentionsCount as number | undefined
+          const broadcastStrength = log.metadata?.broadcastStrength as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SFBCAST:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">BROADCASTING</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">SOVMOTION</span>
+                  <span className="opacity-60">INTENTIONS</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-30">FIELD ACTIVE</span>
+                  <span className="opacity-30">OUTWARD</span>
+                </div>
+                {sovmotionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVMOTION CONF</span>
+                    <span className="tabular-nums opacity-60">{sovmotionConf}%</span>
+                  </div>
+                )}
+                {intentionsCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENTIONS 14D</span>
+                    <span className="tabular-nums opacity-60">{intentionsCount}</span>
+                  </div>
+                )}
+                {broadcastStrength !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">BROADCAST STR</span>
+                    <span className="tabular-nums opacity-60">{broadcastStrength}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'identity_transmission_lock') {
+          const qidsovConf   = log.metadata?.qidsovConf as number | undefined
+          const sovmotionConf = log.metadata?.sovmotionConf as number | undefined
+          const lockDepth    = log.metadata?.lockDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="IDTLOCK:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">IDENTITY LOCKED</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">QIDSOV</span>
+                  <span className="opacity-60">SOVMOTION</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-30">BOTH CONFIRMED</span>
+                  <span className="opacity-30">28D</span>
+                </div>
+                {qidsovConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">QIDSOV CONF</span>
+                    <span className="tabular-nums opacity-60">{qidsovConf}%</span>
+                  </div>
+                )}
+                {sovmotionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVMOTION CONF</span>
+                    <span className="tabular-nums opacity-60">{sovmotionConf}%</span>
+                  </div>
+                )}
+                {lockDepth !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">LOCK DEPTH</span>
+                    <span className="tabular-nums opacity-60">{lockDepth}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_sovereign_transmission') {
+          const sfbcastConf       = log.metadata?.sfbcastConf as number | undefined
+          const idtlockConf       = log.metadata?.idtlockConf as number | undefined
+          const transmissionDepth = log.metadata?.transmissionDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QSOVTX:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">QUANTUM TX ACTIVE</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">SFBCAST</span>
+                  <span className="opacity-60">IDTLOCK</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-30">BOTH CONFIRMED</span>
+                  <span className="opacity-30">28D</span>
+                </div>
+                {sfbcastConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SFBCAST CONF</span>
+                    <span className="tabular-nums opacity-60">{sfbcastConf}%</span>
+                  </div>
+                )}
+                {idtlockConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">IDTLOCK CONF</span>
+                    <span className="tabular-nums opacity-60">{idtlockConf}%</span>
+                  </div>
+                )}
+                {transmissionDepth !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">TX DEPTH</span>
+                    <span className="tabular-nums opacity-60">{transmissionDepth}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

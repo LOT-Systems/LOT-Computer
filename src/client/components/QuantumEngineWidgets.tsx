@@ -133,6 +133,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'sovereign-momentum-crystallization': 'SOVMCRYST',
   'living-sovereign-field':            'LSOFIELD',
   'sovereign-in-motion':               'SOVMOTION',
+  'sovereign-field-broadcast':         'SFBCAST',
+  'identity-transmission-lock':        'IDTLOCK',
+  'quantum-sovereign-transmission':    'QSOVTX',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

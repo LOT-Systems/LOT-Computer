@@ -1783,6 +1783,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklySovereignMotionCheck()) {
     await executeWeeklySovereignMotionCheck()
   }
+  // Check weekly sovereign transmission check (07:00 UTC every Saturday) — Job 58
+  if (shouldRunWeeklySovereignTransmissionCheck()) {
+    await executeWeeklySovereignTransmissionCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6977,6 +6981,171 @@ async function executeWeeklySovereignMotionCheck(): Promise<JobResult> {
   }
 }
 
+// ─── J58: Weekly Sovereign Transmission Check (07:00 UTC every Saturday) ───────
+// Reads active users. Scans 28D/14D windows for:
+//   P174 sovereign-field-broadcast: SOVMOTION in 28D + intentions signals ≥3 in 14D
+//   P175 identity-transmission-lock: QIDSOV in 28D + SOVMOTION in 28D
+//   P176 quantum-sovereign-transmission: SFBCAST + IDTLOCK both confirmed in 28D
+// Arch60 Sovereign Transmission Architect: identity is the transmission.
+
+let isWeeklySovereignTransmissionCheckRunning = false
+let lastWeeklySovereignTransmissionCheckRun: Date | null = null
+
+function shouldRunWeeklySovereignTransmissionCheck(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereignTransmissionCheckRunning) return false
+  if (lastWeeklySovereignTransmissionCheckRun) {
+    const lastRun = dayjs(lastWeeklySovereignTransmissionCheckRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 6 && now.hour() === 7 // Saturday 07:00 UTC
+}
+
+async function executeWeeklySovereignTransmissionCheck(): Promise<JobResult> {
+  const jobName = 'weekly-sovereign-transmission-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereignTransmissionCheckRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereignTransmissionCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGN TRANSMISSION CHECK — Saturday 07:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const twentyEightDaysAgo = dayjs().subtract(28, 'day').toDate()
+    const fourteenDaysAgo    = dayjs().subtract(14, 'day').toDate()
+    const now                = dayjs()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // Fetch transmission-tier source events in 28D window
+        const recentLogs28D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: twentyEightDaysAgo },
+            event: { [Op.in]: [
+              'sovereign_in_motion',
+              'quantum_identity_sovereign',
+              'sovereign_field_broadcast',
+              'identity_transmission_lock',
+              'quantum_sovereign_transmission',
+            ] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        // Fetch intentions signals in 14D window
+        const intentionLogs14D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: fourteenDaysAgo },
+            event: { [Op.in]: ['intention_set', 'intention_updated', 'intention_committed'] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        const hasSovMotion28D   = recentLogs28D.some((l: any) => l.event === 'sovereign_in_motion')
+        const hasQIDSOV28D      = recentLogs28D.some((l: any) => l.event === 'quantum_identity_sovereign')
+        const alreadySFBCAST    = recentLogs28D.some((l: any) => l.event === 'sovereign_field_broadcast')
+        const alreadyIDTLOCK    = recentLogs28D.some((l: any) => l.event === 'identity_transmission_lock')
+        const alreadyQSOVTX     = recentLogs28D.some((l: any) => l.event === 'quantum_sovereign_transmission')
+
+        // P174: Sovereign Field Broadcast — SOVMOTION in 28D + intentions ≥3 in 14D
+        if (hasSovMotion28D && intentionLogs14D.length >= 3 && !alreadySFBCAST) {
+          await (Log as any).create({
+            userId,
+            event: 'sovereign_field_broadcast',
+            text: '',
+            metadata: {
+              sovmotionConf: 88,
+              intentionsCount: intentionLogs14D.length,
+              broadcastStrength: Math.min(88 + Math.min(intentionLogs14D.length, 5), 95),
+              source: 'SOVEREIGN_FIELD',
+              window: '28d+14d',
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P174 SFBCAST — intentions in 14D: ${intentionLogs14D.length}`)
+        }
+
+        // P175: Identity Transmission Lock — QIDSOV in 28D + SOVMOTION in 28D
+        if (hasQIDSOV28D && hasSovMotion28D && !alreadyIDTLOCK) {
+          await (Log as any).create({
+            userId,
+            event: 'identity_transmission_lock',
+            text: '',
+            metadata: {
+              qidsovConf: 91,
+              sovmotionConf: 88,
+              lockDepth: 91,
+              carrier: 'SOVEREIGN_IDENTITY',
+              window: '28d',
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P175 IDTLOCK — QIDSOV + SOVMOTION both confirmed in 28D`)
+        }
+
+        // P176: Quantum Sovereign Transmission — SFBCAST + IDTLOCK both in 28D
+        const hasSFBCAST28D = recentLogs28D.some((l: any) => l.event === 'sovereign_field_broadcast')
+        const hasIDTLOCK28D = recentLogs28D.some((l: any) => l.event === 'identity_transmission_lock')
+        if (hasSFBCAST28D && hasIDTLOCK28D && !alreadyQSOVTX) {
+          await (Log as any).create({
+            userId,
+            event: 'quantum_sovereign_transmission',
+            text: '',
+            metadata: {
+              sfbcastConf: 87,
+              idtlockConf: 89,
+              transmissionDepth: 91,
+              convergence: 'SFBCAST+IDTLOCK→QUANTUM_SOVEREIGN_TRANSMISSION',
+              window: '28d',
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P176 QSOVTX — quantum sovereign transmission active`)
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} sovereign transmission check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereign transmission events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY SOVEREIGN TRANSMISSION CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklySovereignTransmissionCheckRun = new Date()
+    isWeeklySovereignTransmissionCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly sovereign transmission check failed:', error.message)
+    isWeeklySovereignTransmissionCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -7038,6 +7207,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly sovereignty permanence check: 7 AM UTC every Monday (Job 55)')
   console.log('   - Weekly sovereignty ascension check: 7 AM UTC every Tuesday (Job 56)')
   console.log('   - Weekly sovereign motion check: 7 AM UTC every Friday (Job 57)')
+  console.log('   - Weekly sovereign transmission check: 7 AM UTC every Saturday (Job 58)')
   console.log('')
 
   // Check every hour for scheduled jobs

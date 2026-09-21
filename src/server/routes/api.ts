@@ -1245,6 +1245,10 @@ export default async (fastify: FastifyInstance) => {
       'sovereign_momentum_crystallization',
       'living_sovereign_field',
       'sovereign_in_motion',
+      // v123: sovereign transmission tier (J58 weekly check — P174–P176)
+      'sovereign_field_broadcast',
+      'identity_transmission_lock',
+      'quantum_sovereign_transmission',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

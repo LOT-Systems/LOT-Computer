@@ -204,6 +204,9 @@ export function PatternRecognitionWidget() {
       'sovereign-momentum-crystallization': 'Sovereign momentum crystallization — sovereignty_ascension 2+ in 28D, ascension crystallizing into sustained momentum (P171)',
       'living-sovereign-field':            'Living sovereign field — SOVASCEND + living assembly arc simultaneous, sovereignty is alive and self-assembling (P172)',
       'sovereign-in-motion':               'Sovereign in motion — SOVMCRYST + LSOFIELD both confirmed, sovereignty operating from motion not state (P173)',
+      'sovereign-field-broadcast':         'Sovereign field broadcast — SOVMOTION in 28D + intentions ≥3 in 14D, sovereign field radiating outward (P174)',
+      'identity-transmission-lock':        'Identity transmission lock — QIDSOV + SOVMOTION both in 28D, identity locked as transmission carrier (P175)',
+      'quantum-sovereign-transmission':    'Quantum sovereign transmission — SFBCAST + IDTLOCK both confirmed, quantum sovereign field transmitting (P176)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

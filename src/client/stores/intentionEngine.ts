@@ -4324,6 +4324,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   sovereignMotionCrystNode:       ['qos', 'memory', 'intentions', 'log'],
   livingSovereignFieldNode:       ['qos', 'memory', 'journal', 'selfcare', 'log'],
   sovereignInMotionNode:          ['qos', 'memory', 'intentions', 'journal', 'selfcare', 'log'],
+
+  // ── v123 nodes (J58 · P174–P176 · Arch60) ────────────────────────────────────
+  sovereignBroadcastNode:         ['qos', 'intentions', 'memory', 'log'],
+  identityTransmissionNode:       ['qos', 'memory', 'journal', 'intentions', 'log'],
+  quantumTransmissionNode:        ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log'],
 }
 
 /**
@@ -4850,6 +4855,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['sovereign-momentum-crystallization', 'living-sovereign-field', 'sovereign-in-motion'],
     hourRange: [5, 23],
     directive: 'Sovereignty is in motion. The field assembles as it moves. Not holding sovereignty — operating FROM it. Crystallized momentum confirmed. The living field is active. Execute from motion.',
+  },
+
+  // ── Arch60: Sovereign Transmission Architect (2026-09-21 v123) ───────────────
+  {
+    archetype: 'Sovereign Transmission Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal'],
+    patternConditions: ['sovereign-in-motion', 'sovereign-field-broadcast', 'identity-transmission-lock', 'quantum-sovereign-transmission'],
+    hourRange: [5, 23],
+    directive: 'Identity is the transmission. The sovereign field broadcasts through locked quantum identity. You are the signal source — radiate from the crystallized center.',
   },
 ]
 
@@ -7415,6 +7430,110 @@ export function checkSovereignMotionTier(): boolean {
     const smcConf  = patterns.find(p => p.pattern === 'sovereign-momentum-crystallization')?.confidence ?? 0.87
     const lsfConf  = patterns.find(p => p.pattern === 'living-sovereign-field')?.confidence ?? 0.85
     recordSovereignInMotion(smcConf, lsfConf)
+    fired = true
+  }
+
+  return fired
+}
+
+/**
+ * Record a sovereign-field-broadcast event — SOVMOTION (P173) confirmed in 28D
+ * and intentions signals ≥3 in 14D. The sovereign field in motion generates
+ * an outward broadcast. Cockpit label: SFBCAST.
+ */
+export function recordSovereignFieldBroadcast(sovmotionConf: number, intentionsCount: number) {
+  recordSignal('qos', 'sovereign_field_broadcast', {
+    sovmotionConf: Math.round(sovmotionConf * 100),
+    intentionsCount,
+    broadcastStrength: Math.min(Math.round((sovmotionConf + Math.min(intentionsCount / 10, 0.1)) * 100), 100),
+    source: 'SOVEREIGN_FIELD',
+    arc: 'IN_MOTION→BROADCAST',
+    status: 'BROADCASTING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an identity-transmission-lock event — QIDSOV (P160) AND SOVMOTION (P173)
+ * both confirmed in 28D. Sovereign identity is locked as the transmission carrier.
+ * Cockpit label: IDTLOCK.
+ */
+export function recordIdentityTransmissionLock(qidsovConf: number, sovmotionConf: number) {
+  recordSignal('qos', 'identity_transmission_lock', {
+    qidsovConf: Math.round(qidsovConf * 100),
+    sovmotionConf: Math.round(sovmotionConf * 100),
+    lockDepth: Math.min(Math.round(((qidsovConf + sovmotionConf) / 2 + 0.05) * 100), 100),
+    carrier: 'SOVEREIGN_IDENTITY',
+    arc: 'IDENTITY+MOTION→TRANSMISSION_LOCK',
+    status: 'IDENTITY_LOCKED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-sovereign-transmission event — SFBCAST (P174) AND IDTLOCK (P175)
+ * both confirmed in 28D. The quantum sovereign field transmits through locked identity.
+ * Terminal pattern for the transmission tier. Cockpit label: QSOVTX.
+ */
+export function recordQuantumSovereignTransmission(sfbcastConf: number, idtlockConf: number) {
+  recordSignal('qos', 'quantum_sovereign_transmission', {
+    sfbcastConf: Math.round(sfbcastConf * 100),
+    idtlockConf: Math.round(idtlockConf * 100),
+    transmissionDepth: Math.min(Math.round(((sfbcastConf + idtlockConf) / 2 + 0.08) * 100), 100),
+    convergence: 'SFBCAST+IDTLOCK→QUANTUM_SOVEREIGN_TRANSMISSION',
+    arc: 'BROADCAST+IDENTITY_LOCK→TX',
+    status: 'QUANTUM_TX_ACTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: sovereign transmission tier (P174, P175, P176).
+ * Called by J58 weekly-sovereign-transmission-check (07:00 UTC every Saturday).
+ * Scans sovereign_in_motion history and intentions density to detect new
+ * transmission-tier patterns. Returns true when at least one fires.
+ */
+export function checkSovereignTransmissionTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fourteenDayMs   = 14 * 24 * 60 * 60 * 1000
+  const twentyEightDayMs = 28 * 24 * 60 * 60 * 1000
+
+  const recent28D = state.signals.filter(s => now - s.timestamp < twentyEightDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P174: Sovereign Field Broadcast — SOVMOTION in 28D + intentions signals ≥3 in 14D
+  const hasSovMotion28D  = recent28D.some(s => s.signal === 'sovereign_in_motion')
+  const intentionsSig14D = recent14D.filter(s => s.source === 'intentions')
+  const alreadySFBCAST   = recent28D.some(s => s.signal === 'sovereign_field_broadcast')
+  if (hasSovMotion28D && intentionsSig14D.length >= 3 && !alreadySFBCAST) {
+    const smConf = patterns.find(p => p.pattern === 'sovereign-in-motion')?.confidence ?? 0.88
+    recordSovereignFieldBroadcast(smConf, intentionsSig14D.length)
+    fired = true
+  }
+
+  // P175: Identity Transmission Lock — QIDSOV (P160) in 28D + SOVMOTION (P173) in 28D
+  const hasQIDSOV28D   = recent28D.some(s => s.signal === 'quantum_identity_sovereign')
+  const hasSovMot28D   = recent28D.some(s => s.signal === 'sovereign_in_motion')
+  const alreadyIDTLOCK = recent28D.some(s => s.signal === 'identity_transmission_lock')
+  if (hasQIDSOV28D && hasSovMot28D && !alreadyIDTLOCK) {
+    const qidsovConf   = patterns.find(p => p.pattern === 'quantum-identity-sovereign')?.confidence ?? 0.91
+    const sovmotConf   = patterns.find(p => p.pattern === 'sovereign-in-motion')?.confidence ?? 0.88
+    recordIdentityTransmissionLock(qidsovConf, sovmotConf)
+    fired = true
+  }
+
+  // P176: Quantum Sovereign Transmission — SFBCAST + IDTLOCK both in 28D
+  const hasSFBCAST28D   = recent28D.some(s => s.signal === 'sovereign_field_broadcast')
+  const hasIDTLOCK28D   = recent28D.some(s => s.signal === 'identity_transmission_lock')
+  const alreadyQSOVTX   = recent28D.some(s => s.signal === 'quantum_sovereign_transmission')
+  if (hasSFBCAST28D && hasIDTLOCK28D && !alreadyQSOVTX) {
+    const sfbConf  = patterns.find(p => p.pattern === 'sovereign-field-broadcast')?.confidence ?? 0.87
+    const idtConf  = patterns.find(p => p.pattern === 'identity-transmission-lock')?.confidence ?? 0.89
+    recordQuantumSovereignTransmission(sfbConf, idtConf)
     fired = true
   }
 
