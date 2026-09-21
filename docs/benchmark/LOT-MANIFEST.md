@@ -25,7 +25,7 @@ STATUS KEY:
 FEATURE          | BEST BRANCH                   | HASH     | ITER  | STATUS | FILES | LINES  | SUMMARY
 ──────────────     ─────────────────────────────   ────────   ─────   ──────   ─────   ──────   ──────────────────────
 LOT Mail         | determined-turing-f6bw7r     | fa622a25 | 11/11 | BEST   | 11    | +504   | In-app email: /email trigger, Sync inbox, Cohort integration, yarn.lock
-Basics Tab       | beautiful-johnson-6e9nr4      | (pending)| 9/~77 | BEST   | 6     | +9~    | BASICS M1: OPEN TAB restored from 56p7ov + wired to router/Layout/app.tsx (was a disabled nav stub on master); M2/M3 roadmap documented, not built
+Basics Tab       | beautiful-johnson-w7uxef      | 342a94e8 | 10/~78| BEST   | 9     | +472   | BASICS M1: OPEN TAB — identical content re-verified green on 20260921 base, cherry-picked from 6e9nr4 (not re-authored); STILL NOT SHIPPED — needs explicit "Ship Basics Tab" from S-2 to end the recurrence
 Calendar Alerts  | gifted-lovelace-cZOWR         | 978cf52  | 6/6   | BEST   | 3     | +359   | Live clock, T-minus countdown, military alert overlay, today panel
 QI-46 Engine     | cool-tesla-f8j0mr            | 36ef4dde | 8/8   | BEST   | 8     | +2050  | QI·46 Node 3 engine integration + Soul Upload + Being Calibration
 COSMO Hardware   | brave-lamport-t9z5u8         | c7d353ef | 14/14 | BEST   | 7     | +2610  | COSMO® Cube — complete hardware computer design v1.0
@@ -89,7 +89,7 @@ dazzling-shannon | 9     | ykKT5             | 8     | COSMO hardware iterations
 brave-lamport    | 5     | t9z5u8            | 4     | COSMO hardware iterations (latest series)
 gifted-lovelace  | 6     | cZOWR             | 5     | Calendar alert iterations
 nifty-allen      | 6     | jWyOe             | 5     | Basics Tab iterations (SUPERSEDED by beautiful-johnson)
-beautiful-johnson| ~77   | 6e9nr4            | ~76   | Basics Tab iterations — AUDIT 20260920 found ~76 branches via ls-remote (prior count of 2 was stale). AWAITING S-2 CONFIRMATION TO PRUNE — do not auto-delete.
+beautiful-johnson| ~79   | w7uxef            | ~77   | Basics Tab iterations — AUDIT 20260920 found ~76 branches; scheduled run fired AGAIN 20260921 and cut a 78th (w7uxef) despite the 20260920 flag. Yesterday's fix was never shipped to master, so the trigger condition still reads "Basics tab missing" each run. AWAITING S-2 CONFIRMATION TO PRUNE and to SHIP — do not auto-delete, do not auto-merge.
 gracious-gauss   | 7     | WnL0k             | 6     | QI-46 Engine iterations (SUPERSEDED by cool-tesla)
 upbeat-faraday   | 2     | xviFF             | 1     | Badge RPG iterations (SUPERSEDED by cool-hypatia)
 inspiring-volta  | 6     | 2hmidy            | 5     | Health check iterations

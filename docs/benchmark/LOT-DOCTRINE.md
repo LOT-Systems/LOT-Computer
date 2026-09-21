@@ -68,6 +68,16 @@ merge (avoids dragging divergent branch history into the main line).
 (SR-20260605-01: 115 branches across 23 clusters; 69 redundant
 iterations identified; 8 features ready for ship-mode merge.)
 
+Cataloging without shipping does not stop the recurrence: a scheduled
+directive that checks live repo state (not the MANIFEST) for "is the
+feature built" will re-trigger every run once the feature exists only on an
+unshipped branch, since master never changed. Basics Tab: built and marked
+BEST 20260612 (56p7ov); still unshipped, flagged as a ~76-branch cluster
+20260920 (6e9nr4); scheduled run fired again 20260921 and cut a 78th branch
+before this report, because the fix that day restored the branch content but
+did not merge to master. The loop only breaks at the merge, not at the flag.
+(SR-20260920-01, SR-20260921-01.)
+
 ## Operator RFI Pattern
 
 The system prompts the operator (Memory Engine: daily questions based on signal
