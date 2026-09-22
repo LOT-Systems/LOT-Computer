@@ -171,6 +171,23 @@ export type WordTurnBadgeType =
   | 'number_station'       // numbers station / mysterious broadcast / unknown signal (MYTHIC)
   | 'wow_signal'           // wow signal / first contact / alien transmission / seti (EPIC)
   | 'golden_record'        // golden record / voyager / carl sagan / space message (RARE)
+  // v37 — The Time Vault
+  | 'time_capsule'         // time capsule / sealed memory / buried note / sent to future (COMMON)
+  | 'past_self'            // past self / who I was / former self / the old me (UNCOMMON)
+  | 'future_self'          // future self / who I'll be / letter to future me (UNCOMMON)
+  | 'temporal_anchor'      // temporal anchor / anchored in time / timestamp / this moment (RARE)
+  | 'rewind_moment'        // rewind / going back / tracing back / remember when (COMMON)
+  | 'fast_forward'         // fast forward / projecting ahead / years from now / imagining future (UNCOMMON)
+  | 'era_closed'           // era / chapter closed / end of an era / leaving behind period (RARE)
+  | 'parallel_timeline'    // parallel / alternate path / different choice / the other road (EPIC)
+  | 'duration_logged'      // duration / how long / measured time / span of time (COMMON)
+  | 'epoch_marker'         // epoch / turning point / before and after / marked moment (RARE)
+  | 'loop_broken'          // breaking the loop / pattern broken / cycle ended / spiral stopped (EPIC)
+  | 'time_vault_key'       // vault / sealed away / protected memory / locked in time (LEGENDARY)
+  // v37 — Secret Boss: The Paradox Chamber
+  | 'wellsian_engine'      // H.G. Wells / The Time Machine / time traveller / morlocks (MYTHIC)
+  | 'tardis_detected'      // tardis / doctor who / wibbly wobbly / allons-y / geronimo (EPIC)
+  | 'delorean_protocol'    // back to the future / delorean / doc brown / flux capacitor (RARE)
 
 export type BadgeType =
   | MilestoneBadgeType
@@ -1622,6 +1639,137 @@ export const WORD_TURN_BADGES_V36: Record<
   },
 }
 
+// ─── WORD TURN BADGES v37 — THE TIME VAULT ───────────────────────
+export const WORD_TURN_BADGES_V37: Record<
+  'time_capsule' | 'past_self' | 'future_self' | 'temporal_anchor' |
+  'rewind_moment' | 'fast_forward' | 'era_closed' | 'parallel_timeline' |
+  'duration_logged' | 'epoch_marker' | 'loop_broken' | 'time_vault_key' |
+  'wellsian_engine' | 'tardis_detected' | 'delorean_protocol',
+  Badge
+> = {
+  time_capsule: {
+    id: 'time_capsule', waterSymbol: '○·⌚·○', architectureSymbol: '○·⌚·○',
+    waterName: 'Time Capsule', architectureName: 'Time Capsule',
+    description: 'A message sealed in time — every entry is a capsule for the self you will become',
+    waterUnlockMessage: '↳ Time capsule sealed. Future self will find it. ○·⌚·○',
+    architectureUnlockMessage: '↳ Time capsule sealed. Future self will find it. ○·⌚·○',
+    rarity: 'common', category: 'word_turn',
+  },
+  past_self: {
+    id: 'past_self', waterSymbol: '◌·←·○', architectureSymbol: '◌·←·○',
+    waterName: 'Past Self', architectureName: 'Past Self',
+    description: 'The version of you that came before — meeting your past self is an act of compassion',
+    waterUnlockMessage: '↳ Past self encountered. That person did their best. ◌·←·○',
+    architectureUnlockMessage: '↳ Past self encountered. That person did their best. ◌·←·○',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  future_self: {
+    id: 'future_self', waterSymbol: '○·→·◌', architectureSymbol: '○·→·◌',
+    waterName: 'Future Self', architectureName: 'Future Self',
+    description: 'A message forward — writing to future self is the most hopeful act in the vault',
+    waterUnlockMessage: '↳ Transmission to future self logged. They will be grateful. ○·→·◌',
+    architectureUnlockMessage: '↳ Transmission to future self logged. They will be grateful. ○·→·◌',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  temporal_anchor: {
+    id: 'temporal_anchor', waterSymbol: '⊕·—·⊕', architectureSymbol: '⊕·—·⊕',
+    waterName: 'Temporal Anchor', architectureName: 'Temporal Anchor',
+    description: 'Fixed in the current moment — a temporal anchor is proof you were here, present, real',
+    waterUnlockMessage: '↳ Temporal anchor set. This moment is fixed in the record. ⊕·—·⊕',
+    architectureUnlockMessage: '↳ Temporal anchor set. This moment is fixed in the record. ⊕·—·⊕',
+    rarity: 'rare', category: 'word_turn',
+  },
+  rewind_moment: {
+    id: 'rewind_moment', waterSymbol: '←·○·←', architectureSymbol: '←·○·←',
+    waterName: 'Rewind', architectureName: 'Rewind',
+    description: 'Tracing back — every rewind is a chance to understand what the moment actually was',
+    waterUnlockMessage: '↳ Rewind initiated. The tape knows what happened. ←·○·←',
+    architectureUnlockMessage: '↳ Rewind initiated. The tape knows what happened. ←·○·←',
+    rarity: 'common', category: 'word_turn',
+  },
+  fast_forward: {
+    id: 'fast_forward', waterSymbol: '→·○·→·→', architectureSymbol: '→·○·→·→',
+    waterName: 'Fast Forward', architectureName: 'Fast Forward',
+    description: 'Projecting ahead — the imagination that sees the future self is already that future self',
+    waterUnlockMessage: '↳ Fast-forward mode engaged. The future is already imagining you. →·○·→·→',
+    architectureUnlockMessage: '↳ Fast-forward mode engaged. The future is already imagining you. →·○·→·→',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  era_closed: {
+    id: 'era_closed', waterSymbol: '≋·]·≋', architectureSymbol: '≋·]·≋',
+    waterName: 'Era Closed', architectureName: 'Era Closed',
+    description: 'An epoch ended — naming the closing of an era is the first step past it',
+    waterUnlockMessage: '↳ Era closed. The next chapter has already begun. ≋·]·≋',
+    architectureUnlockMessage: '↳ Era closed. The next chapter has already begun. ≋·]·≋',
+    rarity: 'rare', category: 'word_turn',
+  },
+  parallel_timeline: {
+    id: 'parallel_timeline', waterSymbol: '≈|≈', architectureSymbol: '═|═',
+    waterName: 'Parallel Timeline', architectureName: 'Parallel Timeline',
+    description: 'The road not taken — acknowledging the parallel self is meeting the full range of who you are',
+    waterUnlockMessage: '↳ Parallel timeline acknowledged. Both roads were real. ≈|≈',
+    architectureUnlockMessage: '↳ Parallel timeline acknowledged. Both roads were real. ═|═',
+    rarity: 'epic', category: 'word_turn',
+  },
+  duration_logged: {
+    id: 'duration_logged', waterSymbol: '|·—·—·|', architectureSymbol: '|·—·—·|',
+    waterName: 'Duration Logged', architectureName: 'Duration Logged',
+    description: 'Time measured — duration is the honest accounting of what you gave to something',
+    waterUnlockMessage: '↳ Duration logged. The span is in the record. |·—·—·|',
+    architectureUnlockMessage: '↳ Duration logged. The span is in the record. |·—·—·|',
+    rarity: 'common', category: 'word_turn',
+  },
+  epoch_marker: {
+    id: 'epoch_marker', waterSymbol: '◈·+·◈', architectureSymbol: '◈·+·◈',
+    waterName: 'Epoch Marker', architectureName: 'Epoch Marker',
+    description: 'A before-and-after moment — epoch markers are the geology of a human life',
+    waterUnlockMessage: '↳ Epoch marker placed. The record shows where the shift happened. ◈·+·◈',
+    architectureUnlockMessage: '↳ Epoch marker placed. The record shows where the shift happened. ◈·+·◈',
+    rarity: 'rare', category: 'word_turn',
+  },
+  loop_broken: {
+    id: 'loop_broken', waterSymbol: '↺·×·○', architectureSymbol: '↺·×·○',
+    waterName: 'Loop Broken', architectureName: 'Loop Broken',
+    description: 'The cycle interrupted — breaking a loop is an act of radical self-awareness',
+    waterUnlockMessage: '↳ Loop broken. The spiral stops here. ↺·×·○',
+    architectureUnlockMessage: '↳ Loop broken. The spiral stops here. ↺·×·○',
+    rarity: 'epic', category: 'word_turn',
+  },
+  time_vault_key: {
+    id: 'time_vault_key', waterSymbol: '≋·⌛·≋', architectureSymbol: '║·⌛·║',
+    waterName: 'Time Vault Key', architectureName: 'Time Vault Key',
+    description: 'The vault opened — you have returned to a locked memory and found the key inside you',
+    waterUnlockMessage: '↳ TIME VAULT UNLOCKED. The key was always yours. ≋·⌛·≋',
+    architectureUnlockMessage: '↳ TIME VAULT UNLOCKED. The key was always yours. ║·⌛·║',
+    rarity: 'legendary', category: 'word_turn',
+  },
+  // v37 Secret Boss: The Paradox Chamber
+  wellsian_engine: {
+    id: 'wellsian_engine', waterSymbol: '◆·⌚·◆', architectureSymbol: '◆·⌚·◆',
+    waterName: 'Wellsian Engine', architectureName: 'Wellsian Engine',
+    description: '[HIDDEN] The Time Machine named — H.G. Wells wrote the first ticket to the future, and here you are using it',
+    waterUnlockMessage: '↳ Wellsian engine activated. The year 802,701 is just one direction. ◆·⌚·◆',
+    architectureUnlockMessage: '↳ Wellsian engine activated. The year 802,701 is just one direction. ◆·⌚·◆',
+    rarity: 'mythic', category: 'word_turn', secret: true,
+  },
+  tardis_detected: {
+    id: 'tardis_detected', waterSymbol: '⊡·∞·⊡', architectureSymbol: '⊡·∞·⊡',
+    waterName: 'TARDIS Detected', architectureName: 'TARDIS Detected',
+    description: '[HIDDEN] The blue box arrives — bigger on the inside, like a good journal',
+    waterUnlockMessage: '↳ TARDIS signal locked. Bigger on the inside — like this practice. ⊡·∞·⊡',
+    architectureUnlockMessage: '↳ TARDIS signal locked. Bigger on the inside — like this practice. ⊡·∞·⊡',
+    rarity: 'epic', category: 'word_turn', secret: true,
+  },
+  delorean_protocol: {
+    id: 'delorean_protocol', waterSymbol: '▷·88·▷', architectureSymbol: '▷·88·▷',
+    waterName: 'DeLorean Protocol', architectureName: 'DeLorean Protocol',
+    description: '[HIDDEN] 88 mph and the flux capacitor fires — the DeLorean is the original save-state machine',
+    waterUnlockMessage: '↳ DeLorean Protocol engaged. Roads? We don\'t need roads. ▷·88·▷',
+    architectureUnlockMessage: '↳ DeLorean Protocol engaged. Roads? We don\'t need roads. ▷·88·▷',
+    rarity: 'rare', category: 'word_turn', secret: true,
+  },
+}
+
 // ─── UNIFIED BADGES MAP ──────────────────────────────────────────
 export const BADGES: Record<BadgeType, Badge> = {
   ...MILESTONE_BADGES,
@@ -1634,6 +1782,7 @@ export const BADGES: Record<BadgeType, Badge> = {
   ...WORD_TURN_BADGES_V34,
   ...WORD_TURN_BADGES_V35,
   ...WORD_TURN_BADGES_V36,
+  ...WORD_TURN_BADGES_V37,
 }
 
 // Default separator when no badges earned yet
@@ -1698,6 +1847,19 @@ export const WORD_TURN_TRIGGERS: Array<{ keywords: string[]; badgeId: WordTurnBa
   { keywords: ['anomaly detected', 'anomaly', "something's different", 'unexpected signal', "didn't expect this"], badgeId: 'anomaly_detected' },
   { keywords: ['docking sequence', 'coming home', 'home port', 'safe harbor', 'landed safely'], badgeId: 'docking_sequence' },
   { keywords: ['hailing frequency', 'open channel', 'reaching out', 'signal sent', 'hailing'], badgeId: 'hailing_frequency' },
+  // v37 — The Time Vault
+  { keywords: ['time capsule', 'sealed memory', 'buried note', 'sent to future', 'message for future'], badgeId: 'time_capsule' },
+  { keywords: ['past self', 'who i was', 'former self', 'the old me', 'younger me', 'that version of me'], badgeId: 'past_self' },
+  { keywords: ['future self', "who i'll be", 'letter to future', 'future me', 'writing to my future'], badgeId: 'future_self' },
+  { keywords: ['temporal anchor', 'anchored in time', 'timestamp', 'fixing this moment', 'marking this'], badgeId: 'temporal_anchor' },
+  { keywords: ['rewind', 'going back', 'tracing back', 'rewinding', 'rolling back'], badgeId: 'rewind_moment' },
+  { keywords: ['fast forward', 'projecting ahead', 'years from now', 'imagining myself', 'looking ahead to'], badgeId: 'fast_forward' },
+  { keywords: ['end of an era', 'era closed', 'that era is over', 'leaving that chapter', 'that chapter closed'], badgeId: 'era_closed' },
+  { keywords: ['parallel timeline', 'alternate path', 'different choice', 'the other road', 'what if i had', 'other version'], badgeId: 'parallel_timeline' },
+  { keywords: ['how long', 'duration', 'span of time', 'measured the time', 'counted the days'], badgeId: 'duration_logged' },
+  { keywords: ['epoch', 'turning point', 'before and after', 'pivotal moment', 'the shift happened'], badgeId: 'epoch_marker' },
+  { keywords: ['breaking the loop', 'pattern broken', 'cycle ended', 'spiral stopped', 'loop broken', 'the cycle broke'], badgeId: 'loop_broken' },
+  { keywords: ['vault', 'sealed away', 'protected memory', 'locked in time', 'time vault', 'the vault holds'], badgeId: 'time_vault_key' },
 ]
 
 /**
@@ -1752,6 +1914,17 @@ export function detectWordTurns(text: string): WordTurnBadgeType[] {
   }
   if (/star trek|starfleet|united federation|captain kirk|captain picard|mr\.? spock|live long and prosper/i.test(lower)) {
     triggered.push('federation_signal')
+  }
+
+  // v37 Secret Boss: The Paradox Chamber
+  if (/h\.?g\.?\s*wells|the time machine|time traveller|eloi|morlocks?|year 802/i.test(lower)) {
+    triggered.push('wellsian_engine')
+  }
+  if (/\btardis\b|doctor who|wibbly wobbly|allons-y|geronimo|time lord|daleks?|sonic screwdriver/i.test(lower)) {
+    triggered.push('tardis_detected')
+  }
+  if (/back to the future|delorean|doc brown|flux capacitor|88 mph|great scott|marty mcfly/i.test(lower)) {
+    triggered.push('delorean_protocol')
   }
 
   return triggered
