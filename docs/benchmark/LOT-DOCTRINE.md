@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
 
 ## Render Isolation
 
@@ -226,3 +226,25 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Log-Posting Duality
+
+Interactive widgets reach server persistence through one of two coexisting
+paths, not one canonical path:
+
+1. useCreateLog() → POST /api/logs — synchronous, per-action (Planner,
+   Calendar, Memory). Use when the widget's own action IS the loggable event.
+2. recordSignal() → local intentionEngine buffer → batched
+   POST /api/quantum-intent/sync every 10 signals or on a 5-minute cooldown,
+   whichever comes first (QuantumState, Intentions, cross-widget cascades).
+   Use when many small signals accumulate faster than they're individually
+   worth a network round trip; batching trades per-click log latency for
+   interaction responsiveness — this is deliberate, not a wiring gap.
+
+A widget using only recordSignal() is not "unwired from the Log" — it is
+wired to the batched path. Do not add useCreateLog() calls to a widget
+already on the signal path without a reason beyond "it should log directly";
+that doubles persistence for the same event.
+
+(SR-20260922-01: widget-health scan; ten-widget wiring sample traced end to
+end; both paths confirmed still live and non-overlapping.)
