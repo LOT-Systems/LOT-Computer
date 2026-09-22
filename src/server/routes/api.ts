@@ -5479,10 +5479,24 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   )
 
   // ============================================================================
-  // STORY — Contextual AI Story
-  // Generates a 1-2 paragraph story based on recent logs, self-care events,
-  // and widget data. The story reflects the operator's recent journey.
+  // STORY — Compressed Period Story (/story, /story week, /story month, /story year)
+  // Generates a narrative compressed to the requested window (day/week/month/
+  // year) from the operator's own logs, self-care events, and widget data —
+  // the LOT Quantum Intent Engine state — routed through an AI vendor
+  // processor (Together AI). The previous story generated for the SAME
+  // period is fed back in as prior compression, so each new story further
+  // compresses the loop instead of restating it, and the result is stored
+  // back as LOT personalized data (a `generated_story` Log row).
+  // Data flow: LOT User data -> LOT Quantum Intent Engine -> AI vendor
+  // processor (Together AI) -> LOT personalized data stored.
   // ============================================================================
+  const STORY_PERIOD_WINDOWS: Record<string, number> = {
+    day: 1,
+    week: 7,
+    month: 30,
+    year: 365,
+  }
+
   fastify.post(
     '/story',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
@@ -5490,6 +5504,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: 'day' | 'week' | 'month' | 'year'
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5509,16 +5524,21 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       if (!hasUsership) {
         return reply.code(403).send({
           story: 'Story generation is available for Usership members.',
+          period: 'day',
           logId: null,
         })
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period: 'day' | 'week' | 'month' | 'year' =
+        req.body.period && STORY_PERIOD_WINDOWS[req.body.period] ? req.body.period : 'day'
+      const windowDays = STORY_PERIOD_WINDOWS[period]
+      const since = dayjs().subtract(windowDays, 'day').toDate()
 
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: { userId: req.user.id, createdAt: { [Op.gte]: since } },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 500,
       })
 
       const recentEntries = logs
@@ -5539,6 +5559,18 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         return q && a ? `${q}: ${a}` : ''
       }).filter(Boolean)
 
+      // Compression loop: pull the last story generated for THIS SAME period
+      // so the new story builds on — and further compresses — the last one,
+      // instead of re-deriving the person from raw logs every time.
+      const priorStoryLog = await fastify.models.Log.findOne({
+        where: { userId: req.user.id, event: 'generated_story' },
+        order: [['createdAt', 'DESC']],
+      })
+      const priorStory =
+        priorStoryLog && (priorStoryLog.metadata?.period as string) === period
+          ? (priorStoryLog.metadata?.story as string) || priorStoryLog.text || ''
+          : ''
+
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
         stateBlock = `OPERATOR STATE: ${quantumState.energy} energy, ${quantumState.clarity} clarity, ${quantumState.alignment} alignment`
@@ -5547,22 +5579,33 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const PERIOD_LABEL: Record<string, string> = {
+        day: 'day',
+        week: 'week',
+        month: 'month',
+        year: 'year',
+      }
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's ${PERIOD_LABEL[period]} of data into a short narrative.
+
+The operator typed a log entry and invoked /story ${period === 'day' ? '' : period}. Your task: write 1-2 paragraphs (100-200 words) that compress their ${PERIOD_LABEL[period]} — the mood trajectory, self-care patterns, and any log entries below — into one dense narrative. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
 - Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
+- Reference specific details from their data — make it feel like THEIR ${PERIOD_LABEL[period]}
+- Surface the real high and low peaks of the period — don't flatten it to one mood
 - If they've been consistent with check-ins, acknowledge the discipline
 - If there are gaps or struggle, acknowledge that with compassion
 - The tone should match their current energy: reflective if low, energized if high
+${priorStory ? '- A PRIOR COMPRESSED STORY for this same period is included below. Build on it and compress further — do not simply repeat it. Note what changed, what deepened, what resolved.' : ''}
 - End with a single forward-looking sentence — not a pep talk, just a quiet truth
 - Return ONLY the story paragraphs. No title. No commentary. No preamble.
 - Keep it under 200 words.`
 
       const dataBlock = `
+PERIOD: ${PERIOD_LABEL[period].toUpperCase()} (last ${windowDays} day${windowDays === 1 ? '' : 's'})
+
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
@@ -5573,7 +5616,8 @@ RECENT LOG ENTRIES:
 ${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
 
 SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
+${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}
+${priorStory ? `\nPRIOR COMPRESSED STORY (${PERIOD_LABEL[period]}):\n${priorStory}` : ''}`
 
       const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
 
@@ -5581,7 +5625,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
 
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
+        console.log(`📖 Story generation (${period}) for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
 
         const story = await engine.generateCompletion(fullPrompt, 512)
 
@@ -5595,20 +5639,24 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           context,
           metadata: {
             story: cleaned,
+            period,
             logText: (logText || '').substring(0, 500),
             quantumState: quantumState || null,
+            compressedFrom: priorStoryLog ? priorStoryLog.id : null,
             timestamp: new Date().toISOString(),
           },
         })
 
         return {
           story: cleaned,
+          period,
           logId: storyLog.id,
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
         return {
           story: 'The system holds your data quietly. When the engine returns, your story will be here.',
+          period,
           logId: null,
         }
       }

@@ -28,7 +28,7 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, parseStoryPeriod, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -1974,6 +1974,18 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               <Block label="PRAY:" blockView>
                 {scripture && (
                   <div className="opacity-60">{scripture}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'generated_story') {
+          const story = log.metadata?.story as string | undefined
+          const period = log.metadata?.period as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label={`STORY${period ? ` [${period.toUpperCase()}]` : ''}:`} blockView>
+                {story && (
+                  <div className="opacity-60">{story}</div>
                 )}
               </Block>
             </LogContainer>
@@ -4125,7 +4137,10 @@ const NoteEditor = ({
           'AVAILABLE COMMANDS',
           '',
           '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
+          '/story        Compressed story of your day (default)',
+          '/story week   Compressed story of your week',
+          '/story month  Compressed story of your month',
+          '/story year   Compressed story of your year',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
@@ -4152,16 +4167,18 @@ const NoteEditor = ({
           setStoryLoading(true)
           setStoryResponse(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const period = parseStoryPeriod(value)
+            const logText = value.replace(/\/story(\s+(day|week|month|year))?/i, '').replace(/📖/g, '').trim()
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              period,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: value, period: 'day' })
           }
         }
       }

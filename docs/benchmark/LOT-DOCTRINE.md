@@ -226,3 +226,34 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Story Command Period Compression (STORY-LOOP)
+
+/story is a Log-entry slash command distinct from the Memory Engine's own
+story generator (generateMemoryStory in story-generator.ts, which narrates
+Memory answers). /story narrates the Log stream itself, windowed to an
+explicit period: /story (bare) = day, /story week, /story month, /story
+year. The period token is parsed client-side (parseStoryPeriod in
+logTriggers.ts) and passed to POST /api/story, which filters the user's
+Log rows to `createdAt >= now - windowDays` before building the prompt —
+it does not scan the unbounded log history.
+
+The compression loop: each /story call looks up the operator's most
+recent `generated_story` Log row. If that row's `metadata.period` matches
+the period just requested, its `metadata.story` text is injected into the
+prompt as "PRIOR COMPRESSED STORY" and the system prompt instructs the
+engine to build on it and compress further rather than re-derive the
+person from raw logs every time — the story of a week should get denser
+across weeks, not longer. Cross-period rows are never fed forward (a
+month story must not compress into a day story); a period boundary is a
+hard filter, not a soft preference. Each new `generated_story` row stores
+`compressedFrom: <priorStoryLog.id>` so the compression chain is walkable
+even though the ledger stays append-only — this is a data-layer chain
+distinct from the ledger/lexicon compression convention.
+
+Together AI is the vendor processor, matching PLANNER-CONTEXT precedent:
+this stays an AI-vendor-independent function — the compression logic and
+period windowing are LOT's own code, not offloaded to the model.
+
+(SR-20260922-01: period parameter + STORY-LOOP compression added to
+POST /api/story; parseStoryPeriod minted in logTriggers.ts.)

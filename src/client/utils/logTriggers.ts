@@ -115,3 +115,16 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+export type StoryPeriod = 'day' | 'week' | 'month' | 'year'
+
+/**
+ * Extracts the requested compression period from a /story invocation,
+ * e.g. "/story week" -> 'week'. Defaults to 'day' — the tightest,
+ * most frequent compression — when no period is named or the named
+ * token doesn't match one of the four supported windows.
+ */
+export function parseStoryPeriod(text: string): StoryPeriod {
+  const match = text.match(/\/story\s+(day|week|month|year)\b/i)
+  return (match ? match[1].toLowerCase() : 'day') as StoryPeriod
+}
