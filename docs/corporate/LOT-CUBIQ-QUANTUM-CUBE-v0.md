@@ -5,8 +5,9 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
-STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
+VERSION:  0.2 — DEVELOPMENT CYCLE 2 (DESIGN LOCK CLOSED, v.1 BRIEF OPENED)
+STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (DESIGN LOCKED, BOM SPECIFIED)
+UPDATED:  2026-09-22 — see Section 00b, Section 09, Section 10, Use Case 02
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -57,6 +58,52 @@ read in full:
 
 No prior document specified jump mechanics, surface locomotion, or a
 levitation roadmap. This document is that specification, v.0.
+
+--------------------------------------------------------------------------------
+00b // READING LOG — CYCLE 2 (2026-09-22)
+--------------------------------------------------------------------------------
+
+Second development pass on this document, per its own instruction in
+Section 07 ("future sessions read this document first and append the next
+entry"). Re-read in full before writing a line of new spec:
+
+  This document, LOT-CUBIQ-QUANTUM-CUBE-v0.md, in its entirety (v.0.1,
+  2026-07-28) — no prior section is edited or removed; this cycle only
+  appends Section 00b, Section 09, Section 10, and Use Case 02 below.
+
+  docs/corporate/LOT-CUBIQ-VISION.md, Section 05 — confirms the physical
+  arc ("digital cubic extends into the physical") is still the operative
+  thesis; nothing in the two months since v.0.1 shipped changes it.
+
+  docs/corporate/LOT-CUBIQ-OPERATOR.md, Sections 04 and 07 — the AI
+  physical-delivery decision logic and the Phase 4 timeline this hardware
+  answers to.
+
+  docs/corporate/LOT_QI46_ENGINE.md — re-checked for drift against the
+  Section 05 signal loop. No structural change to the haptic-preference
+  input contract (pressure, duration, cadence) since v.0.1; the loop this
+  document specified still matches.
+
+  docs/corporate/LOT_ROBOTICS_COSMO.md — re-checked the COSMO® naming
+  boundary. COSMO® remains a distinct, general-purpose robotics division
+  (father/son brand split, "a robot that carries the behavioral
+  fingerprint of its owner"). CUBIQ™ continues to be scoped narrower and
+  differently: a single-purpose notification body, not a general robot.
+  No naming or scope collision found; none introduced here.
+
+  docs/benchmark/LOT-MANIFEST.md — the COSMO Hardware row (line 31,
+  "COSMO® Cube — complete hardware computer design v1.0") is unchanged
+  and remains the sibling, textually distinct hardware track noted in
+  Section 00 above.
+
+This cycle's work: (1) close the v.0 design lock opened in Section 02-04
+with a concrete bill of materials (Section 09), since "DESIGN LOCK
+PENDING" is no longer an accurate status once real part classes are
+named; (2) open, not close, the v.1 Long Jump engineering brief
+(Section 10) — advancing the roadmap item from a one-paragraph forward
+reference (old Section 06) into real numbers, without pulling forward the
+v.0 gate criteria or claiming v.1 hardware exists; (3) append Use Case 02
+to Section 07, per that section's standing instruction.
 
 --------------------------------------------------------------------------------
 01 // WHAT v.0 IS AND WHAT IT IS NOT
@@ -321,6 +368,40 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE SHARED DESK                              2026-09-22
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, Archetype "Evening Integrator"
+  (LOT-WIKI Arch43 class), cohort-active, shares a two-person desk with a
+  partner who is not a LOT® operator. The CUBIQ charging pad sits at the
+  operator's half of the desk, in the partner's peripheral vision.
+
+  A cohort resonance ping fires (LOT-CUBIQ-OPERATOR.md, Section 03) — a
+  signal class that, until now, has only ever been demonstrated on a
+  single-operator desk (Use Case 01). Here the same THE HOP gesture
+  (Section 04) fires with a second person seated eighteen inches away.
+
+  The non-operator partner sees a matte-black cube lift ten millimeters
+  and resettle, once, with no light, no sound, no screen. They ask what
+  it was. The operator explains it in one sentence: a badge unlocked.
+  Nothing more is said, because nothing more is asked — the gesture reads
+  as a private, contained event, not a broadcast. This is the load-bearing
+  design requirement Section 03's edge-detection and Section 02's
+  light-as-secondary choices were made to satisfy, and Use Case 02 is the
+  first entry in this document to test them against a witness who is not
+  the intended recipient of the signal.
+
+  Two weeks later, the telemetry loop (Section 05) shows a measurable
+  change unique to this profile: THE HOP's landing displacement variance
+  tightens over successive cohort pings — not because the actuator
+  changed, but because the operator has started leaving a folded cloth
+  coaster under the cube, unprompted, quieting the resettle. The cube did
+  not ask for this. The operator's own care pattern extended the object's
+  behavior, the same way a person adjusts a chair for someone else's
+  comfort without being told to. This is the use case that establishes
+  the cube can be present on a shared surface without becoming a shared
+  notification — it stays legible to one operator, one signal source,
+  even when someone else is close enough to feel it too.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
@@ -329,6 +410,128 @@ LOT® Quantum Cube             The object
 CUBIQ™                        The experience — software and hardware,
                                one name, one system
 LOT®† CUBIQ®                  The combined mark
+
+--------------------------------------------------------------------------------
+09 // DESIGN LOCK — v.0 BILL OF MATERIALS (CYCLE 2 CLOSE-OUT)
+--------------------------------------------------------------------------------
+
+The document header no longer needs to read "design lock pending." This
+cycle names real, sourceable part classes against every functional block
+specified in Sections 02-04, closing v.0's design lock:
+
+  BLOCK               PART CLASS                       NOTE
+  ─────               ──────────                       ────
+  Primary actuator     Voice-coil linear actuator,       Chosen in v.0.1 for
+                        ~8mm stroke, closed-shell         controllability and
+                        (e.g. LRA/voice-coil hybrid       quiet operation;
+                        class, not off-the-shelf ERM)     stroke class is the
+                                                          v.1 lever (Sec 10).
+  Directional bias      PZT piezoelectric bimorph         Reuses Institute-
+                        strip, angle-mounted 5-15°        named component
+                        off the actuator's primary axis   class (Sec 03).
+  Motion sensing        6-axis IMU (accel + gyro),        Single part serves
+                        I2C, geometric-center mount       both landing-
+                                                          recovery (Sec 03)
+                                                          and QI·46 haptic-
+                                                          preference telemetry
+                                                          (Sec 05).
+  Edge safety           Time-of-flight distance           Hard safety gate,
+                        sensor, forward-facing, base       Sec 03 — 100/100
+                        face, <30mm dead zone              trial requirement
+                                                          is unchanged by
+                                                          part selection.
+  Compute + driver      Low-power MCU with a single        Runs the gesture
+                        motor-driver channel and I2C       vocabulary (Sec 04)
+                        sensor bus; no display driver,     as fixed firmware
+                        no radio beyond charge-pairing     states, not a
+                                                          general compute
+                                                          load — keeps mass
+                                                          and power budget
+                                                          honest.
+  Power                 Small-format LiPo cell sized       Charged only
+                        to the <120g mass target (Sec      through the base
+                        02); no user-accessible port       face (Sec 02) —
+                                                          no cable, no port,
+                                                          no attack surface
+                                                          on the shell.
+  Charge/pairing        Qi-class inductive receiver,       Base face — same
+                        base face                         face referenced as
+                                                          "the table" in
+                                                          Sec 02.
+  Shell                 Nano-ceramic composite, matte      Unchanged from
+                        LOT® black, single-piece with      v.0.1; no shell
+                        four elastomer feet bonded at      redesign needed
+                        the base corners                  to close design
+                                                          lock.
+
+  WHAT "DESIGN LOCK" MEANS HERE
+    Every block above names a sourceable part class, not a finished bill
+    of materials with vendor part numbers — that step belongs to hardware
+    procurement, outside this document's scope. Design lock means: no
+    functional block in Sections 02-04 still depends on an unnamed or
+    undecided technology. The 500/500 hop-and-recover gate in Section 06
+    is unchanged; this section closes the design question the gate was
+    waiting on, it does not relax the gate itself.
+
+--------------------------------------------------------------------------------
+10 // v.1 LONG JUMP — ENGINEERING BRIEF (DEVELOPMENT OPENED, NOT CLOSED)
+--------------------------------------------------------------------------------
+
+Section 06 named v.1's deliverable (>150mm single-bound displacement,
+60mm landing accuracy) without opening the engineering question of how
+the v.0 actuator gets there. This section opens it — a brief, not a
+closed spec. v.1 remains a future build milestone; nothing here is a
+claim that v.1 hardware exists.
+
+  THE TWO LEVERS
+    v.0's controlled hop (Section 03) trades range for reliability: short
+    stroke, conservative piezoelectric bias angle, four passive feet to
+    absorb an imperfect landing. v.1 has exactly two levers to pull
+    against the same single-actuator architecture, and both are already
+    implied by v.0's design choices rather than requiring a new
+    mechanism:
+
+      LEVER 1 — STROKE LENGTH
+        The v.0 voice-coil actuator (Section 09) is specified with an
+        ~8mm stroke. Longer stroke means more impulse transferred to the
+        shell per hop, at the cost of a taller actuator housing and a
+        longer minimum gesture duration (the actuator needs the full
+        stroke to build impulse before release). v.1's engineering task:
+        find the longest stroke that still fits the 45mm cube envelope
+        (Section 02) without redesigning the shell — because a shell
+        redesign would break the "nothing in v.0 is thrown away" promise
+        Section 01 makes.
+
+      LEVER 2 — MASS
+        Section 06 already names the v.1 mass target: <90g, down from
+        v.0's <120g. Every gram removed from the shell or the reaction
+        mass increases hop height for the same actuator impulse. The
+        nano-ceramic shell (Section 02) is not the place to cut mass —
+        it is the part of the object an operator touches and it stays
+        as specified. The mass budget instead comes from the MCU/driver
+        board (Section 09) and battery: a smaller cell, charged more
+        often, is an acceptable v.1 trade if it buys jump range; a
+        thinner shell is not.
+
+  WHY THE PIEZOELECTRIC BIAS ELEMENT DOES NOT CHANGE
+    v.0's forward-bias angle (5-15° off vertical, Section 03) is tuned
+    for a short in-place hop where landing inside a 40mm radius matters
+    more than distance. v.1 re-tunes the same PZT bimorph's timing and
+    angle for reach rather than containment — a wider bias angle and an
+    earlier fire point relative to actuator release. This is calibration
+    work on an existing part (Section 09), not a new component. It keeps
+    faith with Section 03's original reasoning: reuse Institute-named
+    technology rather than inventing new material science.
+
+  WHAT v.1 STILL HAS OPEN
+    Landing accuracy at range is the harder half of v.1, not distance.
+    A 150mm bound with a 60mm accuracy window (Section 06) needs the IMU
+    (Section 09) to characterize launch angle variance across many hops
+    before the corrective-pulse landing recovery (Section 03) can be
+    re-tuned for a longer flight path — that characterization work has
+    not started and is not claimed as done here. v.1 is not gated by
+    this document; it is gated by trial data this document does not yet
+    have.
 
 ================================================================================
 AUTHORIZED BY: S-2 // VADIK MARMELADOV
