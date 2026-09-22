@@ -4500,6 +4500,44 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'calendar_ee_signal') {
+          const badge    = log.metadata?.badge as string | undefined
+          const name     = log.metadata?.name as string | undefined
+          const rarity   = log.metadata?.rarity as string | undefined
+          const doctrine = log.metadata?.doctrine as string | undefined
+          const isHobbit = badge === 'hobbit_day'
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label={isHobbit ? 'HOBBIT:' : 'CALEND:'} blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">{name ?? 'CALENDAR EE ACTIVE'}</span>
+                </div>
+                {isHobbit && (
+                  <div className="flex gap-x-8 mb-4">
+                    <span className="opacity-60">BILBO</span>
+                    <span className="opacity-60">FRODO</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">BADGE</span>
+                  <span className="opacity-60">{badge ?? '—'}</span>
+                </div>
+                {rarity && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RARITY</span>
+                    <span className="opacity-60">{rarity}</span>
+                  </div>
+                )}
+                {doctrine && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">DOCTRINE</span>
+                    <span className="opacity-60 text-right ml-8" style={{ maxWidth: '60%' }}>{doctrine}</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

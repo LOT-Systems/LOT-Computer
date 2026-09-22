@@ -1249,6 +1249,8 @@ export default async (fastify: FastifyInstance) => {
       'sovereign_field_broadcast',
       'identity_transmission_lock',
       'quantum_sovereign_transmission',
+      // v125: calendar EE signal (J59 daily calendar check)
+      'calendar_ee_signal',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

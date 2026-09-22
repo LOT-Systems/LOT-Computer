@@ -1787,6 +1787,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklySovereignTransmissionCheck()) {
     await executeWeeklySovereignTransmissionCheck()
   }
+  // Check daily calendar EE signal (09:00 UTC every day) — Job 59
+  if (shouldRunDailyCalendarEECheck()) {
+    await executeDailyCalendarEECheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -7146,6 +7150,136 @@ async function executeWeeklySovereignTransmissionCheck(): Promise<JobResult> {
   }
 }
 
+// ─── J59: Daily Calendar EE Check (09:00 UTC every day) ─────────────────────
+// Reads active users. Checks if today matches a Calendar Easter Egg date.
+// Writes calendar_ee_signal for each active user, once per day, on match.
+// Pilot: hobbit_day (Sep 22) — THE HOBBIT CHECKS IN.
+// Extend CALENDAR_EE_DATES to surface more calendar events server-side.
+
+let isDailyCalendarEECheckRunning = false
+let lastDailyCalendarEECheckRun: Date | null = null
+
+const CALENDAR_EE_DATES: Array<{
+  badge: string
+  name: string
+  month: number
+  day: number
+  rarity: string
+  doctrine: string
+}> = [
+  { badge: 'hobbit_day',      name: 'THE HOBBIT CHECKS IN',        month: 9,  day: 22, rarity: 'RARE',     doctrine: 'Your journal is the adventure log. Every entry is a chapter.' },
+  { badge: 'new_year',        name: 'NEW YEAR SIGNAL',              month: 1,  day: 1,  rarity: 'EPIC',     doctrine: 'The calendar resets. The OS does not.' },
+  { badge: 'pi_day',          name: 'PI DAY FIELD',                 month: 3,  day: 14, rarity: 'UNCOMMON', doctrine: '3.14159. Infinite precision. No termination.' },
+  { badge: 'may_the_fourth',  name: 'MAY THE FOURTH',               month: 5,  day: 4,  rarity: 'RARE',     doctrine: 'The force is a field. The field is yours.' },
+  { badge: 'summer_solstice', name: 'SUMMER SOLSTICE PEAK',         month: 6,  day: 21, rarity: 'EPIC',     doctrine: 'Maximum light. Peak signal. The year at its height.' },
+  { badge: 'winter_solstice', name: 'WINTER SOLSTICE THRESHOLD',    month: 12, day: 21, rarity: 'EPIC',     doctrine: 'Minimum light. The turn point. Signal through the dark.' },
+]
+
+function shouldRunDailyCalendarEECheck(): boolean {
+  const now = dayjs()
+  if (isDailyCalendarEECheckRunning) return false
+  if (lastDailyCalendarEECheckRun) {
+    const lastRun = dayjs(lastDailyCalendarEECheckRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 9 // 09:00 UTC daily
+}
+
+async function executeDailyCalendarEECheck(): Promise<JobResult> {
+  const jobName = 'daily-calendar-ee-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyCalendarEECheckRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyCalendarEECheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY CALENDAR EE CHECK — 09:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const now   = dayjs()
+    const month = now.month() + 1
+    const day   = now.date()
+
+    const todayEE = CALENDAR_EE_DATES.find(e => e.month === month && e.day === day)
+
+    if (!todayEE) {
+      console.log(`  No calendar EE active today (${now.format('MMM D')})`)
+      console.log('─'.repeat(60))
+      console.log('DAILY CALENDAR EE CHECK COMPLETE')
+      console.log('─'.repeat(60))
+      console.log('')
+      lastDailyCalendarEECheckRun = new Date()
+      isDailyCalendarEECheckRunning = false
+      return { jobName, executedAt, success: true, result: { written: 0, ee: null } }
+    }
+
+    console.log(`  Calendar EE active: ${todayEE.badge} — ${todayEE.name}`)
+
+    const activeUsers = await (User as any).findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+
+    const todayStart = now.startOf('day').toDate()
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const alreadyToday = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'calendar_ee_signal',
+            createdAt: { [Op.gte]: todayStart },
+          },
+        })
+        if (alreadyToday) continue
+
+        await (Log as any).create({
+          userId,
+          event: 'calendar_ee_signal',
+          text: '',
+          metadata: {
+            badge:    todayEE.badge,
+            name:     todayEE.name,
+            rarity:   todayEE.rarity,
+            doctrine: todayEE.doctrine,
+            date:     now.format('YYYY-MM-DD'),
+            month,
+            day,
+          },
+        } as any)
+        written++
+        console.log(`  [${userId}] calendar_ee_signal — ${todayEE.badge}`)
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} calendar EE check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Calendar EE events written: ${written} (${todayEE.badge})`)
+    console.log('─'.repeat(60))
+    console.log('DAILY CALENDAR EE CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastDailyCalendarEECheckRun = new Date()
+    isDailyCalendarEECheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written, ee: todayEE.badge } }
+  } catch (error: any) {
+    console.error('Daily calendar EE check failed:', error.message)
+    isDailyCalendarEECheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -7208,6 +7342,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly sovereignty ascension check: 7 AM UTC every Tuesday (Job 56)')
   console.log('   - Weekly sovereign motion check: 7 AM UTC every Friday (Job 57)')
   console.log('   - Weekly sovereign transmission check: 7 AM UTC every Saturday (Job 58)')
+  console.log('   - Daily calendar EE signal check: 9 AM UTC every day (Job 59)')
   console.log('')
 
   // Check every hour for scheduled jobs
