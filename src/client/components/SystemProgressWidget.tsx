@@ -1457,6 +1457,23 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'v125',
+    date: '2026-09-22',
+    title: 'Self-Assembly — Hobbit Day Signal · J59 Daily Calendar EE Check · HOBBIT:/CALEND: Handler · Day 1126+',
+    assembled: [
+      'J59 DAILY CALENDAR EE CHECK: 09:00 UTC every day. Checks CALENDAR_EE_DATES array (month/day) against current date. Writes calendar_ee_signal log event per active user once/day. Dedup: findOne check for same-day calendar_ee_signal. 58→59 jobs.',
+      'CALENDAR_EE_DATES: hobbit_day (Sep 22, RARE) · new_year (Jan 1, EPIC) · pi_day (Mar 14, UNCOMMON) · may_the_fourth (May 4, RARE) · summer_solstice (Jun 21, EPIC) · winter_solstice (Dec 21, EPIC). Extensible array for all calendar EEs.',
+      'calendar_ee_signal metadata: badge · name · rarity · doctrine · month · day. Written to Log table. Pilot: hobbit_day Sep 22.',
+      'Logs.tsx: HOBBIT: handler (badge=hobbit_day) and CALEND: handler (all other calendar EEs). STATUS/name row · BILBO+FRODO row (hobbit only) · BADGE · RARITY · DOCTRINE. Handler count: 178+.',
+      'routes/api.ts: displayableEvents + calendar_ee_signal (v125 block).',
+      'scheduled-jobs.ts: J59 full block — CALENDAR_EE_DATES array · shouldRunDailyCalendarEECheck() · executeDailyCalendarEECheck() · wiring in checkAndRunScheduledJobs() · initializeScheduledJobs log entry.',
+      'About.tsx: FM v124→v125 · 58→59 jobs · Day 1125+→1126+ · Self-Assembly phase v125 prepended.',
+      'SESSION_REPORTS: v125 entry prepended · USERSHIP_TRANSMISSION updated to v125 Hobbit Day.',
+      'docs/assembly/2026-09-22_LOT-assembly_v125-hobbit-day-signal.md: Assembly log written.',
+      '176 patterns · 60 archetypes · 59 jobs · 178+ handlers · 220+ dep nodes · Day 1126+. QIE v125 deployed. Hobbit Day signal active. Calendar EE surface live.',
+    ],
+  },
+  {
     version: 'v124',
     date: '2026-09-21',
     title: 'QIE Engineering — Sovereign Transmission Tier · P174–P176 · Arch60 · J58 · Day 1125+',
@@ -1707,15 +1724,15 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-09-21',
+  date: '2026-09-22',
   message: [
-    'ASSEMBLY RUN — 2026-09-21 · Day 1125+ · COSMO® Day 815',
-    'Status: STEADY STATE. Six-tier sovereignty architecture complete. J57 monitoring sovereignty-in-motion data.',
-    'Signal: hobbit_day Sep 22 (tomorrow). Your journal is the adventure log. The Hobbit checks in.',
-    'Doctrine: THE HOBBIT CHECKS IN.',
-    '173 patterns · 59 archetypes · 57 jobs · 175+ handlers · 217+ dep nodes.',
-    'Status: MAINTAINED.',
-    'Next: Monitor J57 sovereignty-in-motion data. Hobbit Day incoming Sep 22.',
+    'ASSEMBLY RUN — 2026-09-22 · Day 1126+ · COSMO® Day 816',
+    'HOBBIT: ACTIVE TODAY. Sep 22 — Bilbo and Frodo Baggins. Your journal is the adventure log. Every entry is a chapter.',
+    'Build: J59 Daily Calendar EE Check. Server-side calendar event detection. HOBBIT:/CALEND: log handler live.',
+    'calendar_ee_signal fires at 09:00 UTC. Surfaces in Logs view. RARE badge acknowledged in cockpit.',
+    '176 patterns · 60 archetypes · 59 jobs · 178+ handlers · 220+ dep nodes.',
+    'Status: HOBBIT DAY SIGNAL ACTIVE.',
+    'Next: Monitor J59 calendar_ee_signal output. Extend CALENDAR_EE_DATES for next calendar event.',
   ],
 }
 
