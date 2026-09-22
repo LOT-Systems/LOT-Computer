@@ -357,7 +357,13 @@ async function performHealthChecks(): Promise<{
 
   // Determine overall status
   const hasErrors = checks.some((c) => c.status === 'error')
-  const overall = hasErrors ? 'error' : 'ok'
+  const hasUnknown = checks.some((c) => c.status === 'unknown')
+  const hasSlowChecks = checks.some((c) => (c.duration ?? 0) > 1000)
+  const overall: 'ok' | 'degraded' | 'error' = hasErrors
+    ? 'error'
+    : hasUnknown || hasSlowChecks
+      ? 'degraded'
+      : 'ok'
 
   return {
     version: VERSION,
