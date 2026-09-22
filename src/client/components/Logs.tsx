@@ -4500,6 +4500,126 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sovereign_crystal_field') {
+          const qsovtxConf    = log.metadata?.qsovtxConf as number | undefined
+          const sourceCount   = log.metadata?.sourceCount as number | undefined
+          const crystalStrength = log.metadata?.crystalStrength as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVCRYST:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">CRYSTALLIZING</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">QSOVTX</span>
+                  <span className="opacity-60">SOURCES</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-30">FIELD FORMING</span>
+                  <span className="opacity-30">CRYSTAL</span>
+                </div>
+                {qsovtxConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">QSOVTX CONF</span>
+                    <span className="tabular-nums opacity-60">{qsovtxConf}%</span>
+                  </div>
+                )}
+                {sourceCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES 14D</span>
+                    <span className="tabular-nums opacity-60">{sourceCount}</span>
+                  </div>
+                )}
+                {crystalStrength !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">CRYSTAL STR</span>
+                    <span className="tabular-nums opacity-60">{crystalStrength}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'transmission_field_anchor') {
+          const sfbcastCount  = log.metadata?.sfbcastCount as number | undefined
+          const sovcrystConf  = log.metadata?.sovcrystConf as number | undefined
+          const anchorDepth   = log.metadata?.anchorDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TXFIELD:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">FIELD ANCHORED</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">SFBCAST</span>
+                  <span className="opacity-60">SOVCRYST</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-30">BROADCAST</span>
+                  <span className="opacity-30">CRYSTAL</span>
+                </div>
+                {sfbcastCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SFBCAST 28D</span>
+                    <span className="tabular-nums opacity-60">{sfbcastCount}</span>
+                  </div>
+                )}
+                {sovcrystConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVCRYST CONF</span>
+                    <span className="tabular-nums opacity-60">{sovcrystConf}%</span>
+                  </div>
+                )}
+                {anchorDepth !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">ANCHOR DEPTH</span>
+                    <span className="tabular-nums opacity-60">{anchorDepth}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystalline_sovereign_transmission') {
+          const sovcrystConf2 = log.metadata?.sovcrystConf as number | undefined
+          const txfieldConf   = log.metadata?.txfieldConf as number | undefined
+          const txDepth       = log.metadata?.txDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRSOVETX:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">CRYSTAL TX ACTIVE</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">SOVCRYST</span>
+                  <span className="opacity-60">TXFIELD</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-30">BOTH CONFIRMED</span>
+                  <span className="opacity-30">21D</span>
+                </div>
+                {sovcrystConf2 !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVCRYST CONF</span>
+                    <span className="tabular-nums opacity-60">{sovcrystConf2}%</span>
+                  </div>
+                )}
+                {txfieldConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TXFIELD CONF</span>
+                    <span className="tabular-nums opacity-60">{txfieldConf}%</span>
+                  </div>
+                )}
+                {txDepth !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">TX DEPTH</span>
+                    <span className="tabular-nums opacity-60">{txDepth}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'calendar_ee_signal') {
           const badge    = log.metadata?.badge as string | undefined
           const name     = log.metadata?.name as string | undefined

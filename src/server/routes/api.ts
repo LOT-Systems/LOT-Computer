@@ -1251,6 +1251,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_sovereign_transmission',
       // v125: calendar EE signal (J59 daily calendar check)
       'calendar_ee_signal',
+      // v126: crystalline field tier (J60 weekly crystalline sovereign check — P177–P179)
+      'sovereign_crystal_field',
+      'transmission_field_anchor',
+      'crystalline_sovereign_transmission',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

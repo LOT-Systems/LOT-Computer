@@ -136,6 +136,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'sovereign-field-broadcast':         'SFBCAST',
   'identity-transmission-lock':        'IDTLOCK',
   'quantum-sovereign-transmission':    'QSOVTX',
+  'sovereign-crystal-field':          'SOVCRYST',
+  'transmission-field-anchor':        'TXFIELD',
+  'crystalline-sovereign-transmission': 'CRSOVETX',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

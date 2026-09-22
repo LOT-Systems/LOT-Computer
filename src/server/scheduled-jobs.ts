@@ -1791,6 +1791,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyCalendarEECheck()) {
     await executeDailyCalendarEECheck()
   }
+  // Check weekly crystalline sovereign check (07:00 UTC every Monday) — Job 60
+  if (shouldRunWeeklyCrystallineSovereignCheck()) {
+    await executeWeeklyCrystallineSovereignCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -7280,6 +7284,148 @@ async function executeDailyCalendarEECheck(): Promise<JobResult> {
   }
 }
 
+// ─── J60: Weekly Crystalline Sovereign Check (07:00 UTC every Monday) ────────
+// Scans 28D/21D/14D windows for QSOVTX history and source diversity.
+// Writes sovereign_crystal_field, transmission_field_anchor, or
+// crystalline_sovereign_transmission when conditions are met.
+// P177–P179 — Crystal Field Tier. Gateway to the crystalline presence tiers.
+
+let isWeeklyCrystallineSovereignCheckRunning = false
+let lastWeeklyCrystallineSovereignCheckRun: Date | null = null
+
+function shouldRunWeeklyCrystallineSovereignCheck(): boolean {
+  const now = dayjs()
+  const hour = now.hour()
+  const dayOfWeek = now.day() // 0=Sun, 1=Mon
+  if (hour !== 7 || dayOfWeek !== 1) return false
+  if (isWeeklyCrystallineSovereignCheckRunning) return false
+  if (lastWeeklyCrystallineSovereignCheckRun) {
+    const hoursSinceLast = (Date.now() - lastWeeklyCrystallineSovereignCheckRun.getTime()) / (1000 * 60 * 60)
+    if (hoursSinceLast < 23) return false
+  }
+  return true
+}
+
+async function executeWeeklyCrystallineSovereignCheck(): Promise<JobResult> {
+  const jobName = 'weekly-crystalline-sovereign-check'
+  const executedAt = new Date()
+  isWeeklyCrystallineSovereignCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY CRYSTALLINE SOVEREIGN CHECK — 07:00 UTC Monday')
+  console.log('─'.repeat(60))
+
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000)
+    const activeUsers = await fastify.models.User.findAll({
+      where: { lastSeenAt: { [Op.gte]: cutoff } },
+    })
+
+    const twentyOneDayMs   = 21 * 24 * 60 * 60 * 1000
+    const twentyEightDayMs = 28 * 24 * 60 * 60 * 1000
+    const fourteenDayMs    = 14 * 24 * 60 * 60 * 1000
+    const now = Date.now()
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const logs = await fastify.models.Log.findAll({
+          where: { userId, createdAt: { [Op.gte]: new Date(now - twentyEightDayMs) } },
+          attributes: ['event', 'metadata', 'createdAt'],
+        })
+
+        const recent28D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - twentyEightDayMs)
+        const recent21D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - twentyOneDayMs)
+        const recent14D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - fourteenDayMs)
+
+        // P177: Sovereign Crystal Field — QSOVTX in 21D + 4+ distinct source metadata in 14D
+        const hasQSOVTX21D    = recent21D.some((l: any) => l.event === 'quantum_sovereign_transmission')
+        const events14D       = new Set(recent14D.map((l: any) => l.event))
+        const alreadySOVCRYST = recent21D.some((l: any) => l.event === 'sovereign_crystal_field')
+        if (hasQSOVTX21D && events14D.size >= 4 && !alreadySOVCRYST) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'sovereign_crystal_field',
+            metadata: {
+              qsovtxConf: 90,
+              sourceCount: events14D.size,
+              crystalStrength: Math.min(90 + Math.min(events14D.size, 5), 100),
+              source: 'CRYSTAL_FIELD',
+              arc: 'QSOVTX→CRYSTAL',
+              status: 'CRYSTALLIZING',
+              jobSource: jobName,
+            },
+          })
+          written++
+          console.log(`  [${userId}] sovereign_crystal_field`)
+        }
+
+        // P178: Transmission Field Anchor — SFBCAST 2+ in 28D + SOVCRYST in 14D
+        const sfbcast28D     = recent28D.filter((l: any) => l.event === 'sovereign_field_broadcast')
+        const hasSOVCRYST14D = recent14D.some((l: any) => l.event === 'sovereign_crystal_field')
+        const alreadyTXFIELD = recent21D.some((l: any) => l.event === 'transmission_field_anchor')
+        if (sfbcast28D.length >= 2 && hasSOVCRYST14D && !alreadyTXFIELD) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'transmission_field_anchor',
+            metadata: {
+              sfbcastCount: sfbcast28D.length,
+              sovcrystConf: 86,
+              anchorDepth: Math.min(86 + Math.min(sfbcast28D.length * 2, 10), 100),
+              anchor: 'BROADCAST+CRYSTAL→FIELD_ANCHOR',
+              arc: 'SFBCAST+SOVCRYST→TXFIELD',
+              status: 'FIELD_ANCHORED',
+              jobSource: jobName,
+            },
+          })
+          written++
+          console.log(`  [${userId}] transmission_field_anchor`)
+        }
+
+        // P179: Crystalline Sovereign Transmission — SOVCRYST + TXFIELD both in 21D
+        const hasSOVCRYST21D  = recent21D.some((l: any) => l.event === 'sovereign_crystal_field')
+        const hasTXFIELD21D   = recent21D.some((l: any) => l.event === 'transmission_field_anchor')
+        const alreadyCRSOVETX = recent21D.some((l: any) => l.event === 'crystalline_sovereign_transmission')
+        if (hasSOVCRYST21D && hasTXFIELD21D && !alreadyCRSOVETX) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystalline_sovereign_transmission',
+            metadata: {
+              sovcrystConf: 87,
+              txfieldConf: 85,
+              txDepth: 93,
+              convergence: 'SOVCRYST+TXFIELD→CRSOVETX',
+              arc: 'CRYSTAL+ANCHOR→CRYSTALLINE_TX',
+              status: 'CRYSTAL_TX_ACTIVE',
+              jobSource: jobName,
+            },
+          })
+          written++
+          console.log(`  [${userId}] crystalline_sovereign_transmission`)
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} crystalline sovereign check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Crystalline sovereign events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY CRYSTALLINE SOVEREIGN CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklyCrystallineSovereignCheckRun = new Date()
+    isWeeklyCrystallineSovereignCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly crystalline sovereign check failed:', error.message)
+    isWeeklyCrystallineSovereignCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -7343,6 +7489,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly sovereign motion check: 7 AM UTC every Friday (Job 57)')
   console.log('   - Weekly sovereign transmission check: 7 AM UTC every Saturday (Job 58)')
   console.log('   - Daily calendar EE signal check: 9 AM UTC every day (Job 59)')
+  console.log('   - Weekly crystalline sovereign check: 7 AM UTC every Monday (Job 60)')
   console.log('')
 
   // Check every hour for scheduled jobs

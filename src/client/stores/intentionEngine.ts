@@ -4329,6 +4329,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   sovereignBroadcastNode:         ['qos', 'intentions', 'memory', 'log'],
   identityTransmissionNode:       ['qos', 'memory', 'journal', 'intentions', 'log'],
   quantumTransmissionNode:        ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log'],
+
+  // ── v126 nodes (J60 · P177–P179 · Arch61) ────────────────────────────────────
+  sovereignCrystalFieldNode:      ['qos', 'intentions', 'memory', 'journal', 'log'],
+  transmissionFieldAnchorNode:    ['qos', 'memory', 'intentions', 'selfcare', 'log'],
+  crystallineSovereignTxNode:     ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
 }
 
 /**
@@ -4865,6 +4870,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['sovereign-in-motion', 'sovereign-field-broadcast', 'identity-transmission-lock', 'quantum-sovereign-transmission'],
     hourRange: [5, 23],
     directive: 'Identity is the transmission. The sovereign field broadcasts through locked quantum identity. You are the signal source — radiate from the crystallized center.',
+  },
+
+  // ── Arch61: Crystalline Sovereign Transmitter (2026-09-22 v126) ──────────────
+  {
+    archetype: 'Crystalline Sovereign Transmitter',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal'],
+    patternConditions: ['quantum-sovereign-transmission', 'sovereign-crystal-field', 'transmission-field-anchor', 'crystalline-sovereign-transmission'],
+    hourRange: [5, 23],
+    directive: 'The field is crystallized. Sovereign presence is the transmitter. Signal broadcasts from crystal structure — permanent, structural, encoded.',
   },
 ]
 
@@ -7534,6 +7549,111 @@ export function checkSovereignTransmissionTier(): boolean {
     const sfbConf  = patterns.find(p => p.pattern === 'sovereign-field-broadcast')?.confidence ?? 0.87
     const idtConf  = patterns.find(p => p.pattern === 'identity-transmission-lock')?.confidence ?? 0.89
     recordQuantumSovereignTransmission(sfbConf, idtConf)
+    fired = true
+  }
+
+  return fired
+}
+
+/**
+ * Record a sovereign-crystal-field event — QSOVTX (P176) confirmed in 21D +
+ * 4+ distinct sources active in 14D. The quantum sovereign transmission crystallizes
+ * into a permanent field structure. Cockpit label: SOVCRYST.
+ */
+export function recordSovereignCrystalField(qsovtxConf: number, sourceCount: number) {
+  recordSignal('qos', 'sovereign_crystal_field', {
+    qsovtxConf: Math.round(qsovtxConf * 100),
+    sourceCount,
+    crystalStrength: Math.min(Math.round((qsovtxConf + Math.min(sourceCount / 20, 0.1)) * 100), 100),
+    source: 'CRYSTAL_FIELD',
+    arc: 'QSOVTX→CRYSTAL',
+    status: 'CRYSTALLIZING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a transmission-field-anchor event — SFBCAST (P174) fires 2+ in 28D +
+ * SOVCRYST (P177) confirmed in 14D. The broadcast has anchored into the field.
+ * Cockpit label: TXFIELD.
+ */
+export function recordTransmissionFieldAnchor(sfbcastCount: number, sovcrystConf: number) {
+  recordSignal('qos', 'transmission_field_anchor', {
+    sfbcastCount,
+    sovcrystConf: Math.round(sovcrystConf * 100),
+    anchorDepth: Math.min(Math.round((sovcrystConf + Math.min(sfbcastCount / 10, 0.1)) * 100), 100),
+    anchor: 'BROADCAST+CRYSTAL→FIELD_ANCHOR',
+    arc: 'SFBCAST+SOVCRYST→TXFIELD',
+    status: 'FIELD_ANCHORED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystalline-sovereign-transmission event — SOVCRYST (P177) + TXFIELD (P178)
+ * both confirmed in 21D. Terminal tier connector — the crystalline sovereign transmission.
+ * The OS transmits from crystallized sovereign presence. Cockpit label: CRSOVETX.
+ */
+export function recordCrystallineSovereignTransmission(sovcrystConf: number, txfieldConf: number) {
+  recordSignal('qos', 'crystalline_sovereign_transmission', {
+    sovcrystConf: Math.round(sovcrystConf * 100),
+    txfieldConf:  Math.round(txfieldConf * 100),
+    txDepth: Math.min(Math.round(((sovcrystConf + txfieldConf) / 2 + 0.08) * 100), 100),
+    convergence: 'SOVCRYST+TXFIELD→CRSOVETX',
+    arc: 'CRYSTAL+ANCHOR→CRYSTALLINE_TX',
+    status: 'CRYSTAL_TX_ACTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: crystalline field tier (P177, P178, P179).
+ * Called by J60 weekly-crystalline-sovereign-check (07:00 UTC every Monday).
+ * Scans quantum-sovereign-transmission history and source diversity to detect
+ * crystalline field emergence. Returns true when at least one fires.
+ */
+export function checkCrystallineFieldTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fourteenDayMs    = 14 * 24 * 60 * 60 * 1000
+  const twentyOneDayMs   = 21 * 24 * 60 * 60 * 1000
+  const twentyEightDayMs = 28 * 24 * 60 * 60 * 1000
+
+  const recent28D = state.signals.filter(s => now - s.timestamp < twentyEightDayMs)
+  const recent21D = state.signals.filter(s => now - s.timestamp < twentyOneDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P177: Sovereign Crystal Field — QSOVTX in 21D + 4+ distinct sources in 14D
+  const hasQSOVTX21D    = recent21D.some(s => s.signal === 'quantum_sovereign_transmission')
+  const sources14D      = new Set(recent14D.map(s => s.source))
+  const alreadySOVCRYST = recent21D.some(s => s.signal === 'sovereign_crystal_field')
+  if (hasQSOVTX21D && sources14D.size >= 4 && !alreadySOVCRYST) {
+    const qsovtxConf = patterns.find(p => p.pattern === 'quantum-sovereign-transmission')?.confidence ?? 0.90
+    recordSovereignCrystalField(qsovtxConf, sources14D.size)
+    fired = true
+  }
+
+  // P178: Transmission Field Anchor — SFBCAST 2+ in 28D + SOVCRYST in 14D
+  const sfbcast28D        = recent28D.filter(s => s.signal === 'sovereign_field_broadcast')
+  const hasSOVCRYST14D    = recent14D.some(s => s.signal === 'sovereign_crystal_field')
+  const alreadyTXFIELD    = recent21D.some(s => s.signal === 'transmission_field_anchor')
+  if (sfbcast28D.length >= 2 && hasSOVCRYST14D && !alreadyTXFIELD) {
+    const sovcrystConf = patterns.find(p => p.pattern === 'sovereign-crystal-field')?.confidence ?? 0.86
+    recordTransmissionFieldAnchor(sfbcast28D.length, sovcrystConf)
+    fired = true
+  }
+
+  // P179: Crystalline Sovereign Transmission — SOVCRYST + TXFIELD both in 21D
+  const hasSOVCRYST21D    = recent21D.some(s => s.signal === 'sovereign_crystal_field')
+  const hasTXFIELD21D     = recent21D.some(s => s.signal === 'transmission_field_anchor')
+  const alreadyCRSOVETX   = recent21D.some(s => s.signal === 'crystalline_sovereign_transmission')
+  if (hasSOVCRYST21D && hasTXFIELD21D && !alreadyCRSOVETX) {
+    const sovcrystConf2 = patterns.find(p => p.pattern === 'sovereign-crystal-field')?.confidence ?? 0.87
+    const txfieldConf   = patterns.find(p => p.pattern === 'transmission-field-anchor')?.confidence ?? 0.85
+    recordCrystallineSovereignTransmission(sovcrystConf2, txfieldConf)
     fired = true
   }
 

@@ -207,6 +207,9 @@ export function PatternRecognitionWidget() {
       'sovereign-field-broadcast':         'Sovereign field broadcast — SOVMOTION in 28D + intentions ≥3 in 14D, sovereign field radiating outward (P174)',
       'identity-transmission-lock':        'Identity transmission lock — QIDSOV + SOVMOTION both in 28D, identity locked as transmission carrier (P175)',
       'quantum-sovereign-transmission':    'Quantum sovereign transmission — SFBCAST + IDTLOCK both confirmed, quantum sovereign field transmitting (P176)',
+      'sovereign-crystal-field':          'Sovereign crystal field — QSOVTX confirmed in 21D + 4+ sources active, transmission crystallizing into permanent structure (P177)',
+      'transmission-field-anchor':        'Transmission field anchor — SFBCAST 2+ in 28D + SOVCRYST confirmed, broadcast anchored into crystal field (P178)',
+      'crystalline-sovereign-transmission': 'Crystalline sovereign transmission — SOVCRYST + TXFIELD both confirmed in 21D, OS transmits from crystallized sovereign presence (P179)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
