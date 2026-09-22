@@ -10,6 +10,7 @@ import * as React from 'react'
 import { useLogs } from '#client/queries'
 import dayjs from '#client/utils/dayjs'
 import type { Log } from '#shared/types'
+import { getRokuyo, getMoonPhase, getHourlyZodiac, getWesternZodiac } from '#shared/utils/astrology'
 
 /**
  * useLogContext - CQGS Bioethics analytics hook for cross-widget correlation
@@ -34,8 +35,44 @@ export function useLogContext() {
       currentHour >= 14 && currentHour < 18 ? 'afternoon' :
       currentHour >= 18 && currentHour < 22 ? 'evening' : 'night'
 
+    // Ambient astrology — today's live reading (pure functions, always available even
+    // with zero logs) plus a real per-user correlation from persisted Logs.context.astroRokuyo,
+    // attached server-side at write time (see server/utils/logs.ts getLogContext). This is the
+    // one place all 15+ useLogContext consumers can read the ambient layer without recomputing
+    // it, and the one place the System astrology widget's daily reading is grounded against the
+    // user's own logged history. Descriptive co-occurrence only — not a natal chart, no causal
+    // claim about rokuyo/moon phase influencing activity.
+    const nowDate = now.toDate()
+    const todayMoon = getMoonPhase(nowDate)
+    const todayAstrology = {
+      rokuyo: getRokuyo(nowDate),
+      moonPhase: todayMoon.phase,
+      moonIllumination: todayMoon.illumination,
+      hourlyZodiac: getHourlyZodiac(nowDate),
+      westernZodiac: getWesternZodiac(nowDate),
+    }
+    const auspiciousToday = todayAstrology.rokuyo === 'Taian'
+
+    const rokuyoActivityCounts: Record<string, number> = {}
+    logs.forEach(log => {
+      const r = (log.context as Record<string, any> | undefined)?.astroRokuyo
+      if (r) rokuyoActivityCounts[r] = (rokuyoActivityCounts[r] || 0) + 1
+    })
+    const rokuyoEntries = Object.entries(rokuyoActivityCounts)
+    const totalRokuyoLogged = rokuyoEntries.reduce((sum, [, c]) => sum + c, 0)
+    const mostLoggedRokuyo = rokuyoEntries.length > 0
+      ? rokuyoEntries.sort(([, a], [, b]) => b - a)[0][0]
+      : null
+    const auspiciousEntryCount = rokuyoActivityCounts['Taian'] || 0
+
     if (logs.length === 0) {
       return {
+        todayAstrology,
+        auspiciousToday,
+        rokuyoActivityCounts,
+        mostLoggedRokuyo,
+        auspiciousEntryCount,
+        totalRokuyoLogged,
         isEmpty: true,
         totalEntries: 0,
         activeDays: 0,
@@ -317,6 +354,12 @@ export function useLogContext() {
 
     return {
       isEmpty: false,
+      todayAstrology,
+      auspiciousToday,
+      rokuyoActivityCounts,
+      mostLoggedRokuyo,
+      auspiciousEntryCount,
+      totalRokuyoLogged,
       totalEntries: logs.length,
       activeDays,
       streak,

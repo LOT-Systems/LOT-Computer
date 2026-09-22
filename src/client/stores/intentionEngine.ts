@@ -3428,6 +3428,33 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Ambient Signal Resonance — the day's ambient astrology reading (rokuyo + moon
+  // phase, recorded once/day by recordAstrologySignal) co-occurs with 3+ other distinct signal
+  // sources active in the same 24h window. Closes a real gap: WIDGET_DEPENDENCY_MAP has declared
+  // 'astrology' an upstream dependency of 'system' and 'cosmic' since the 2026-07-27 audit, but
+  // no pattern actually read the source — it was a leaf that fed nothing. Descriptive only: notes
+  // that the ambient layer and daily engagement breadth are co-present; makes no causal claim
+  // about rokuyo or moon phase influencing activity (per doctrine: honest engineering, no
+  // fabricated meaning).
+  const p152Cut = now - 24 * 60 * 60 * 1000
+  const p152Astro = signals.filter(s => s.source === 'astrology' && s.timestamp > p152Cut)
+  if (p152Astro.length >= 1) {
+    const p152OtherSources = new Set(
+      signals.filter(s => s.source !== 'astrology' && s.timestamp > p152Cut).map(s => s.source)
+    )
+    if (p152OtherSources.size >= 3) {
+      const p152Meta = p152Astro[0].metadata as { rokuyo?: string; moonPhase?: string } | undefined
+      const p152Conf = Math.min(0.55 + p152OtherSources.size * 0.03, 0.80)
+      patterns.push({
+        pattern: 'ambient-signal-resonance',
+        confidence: p152Conf,
+        suggestedWidget: 'cosmic',
+        suggestedTiming: 'passive',
+        reason: `AMBRES: Ambient reading (${p152Meta?.rokuyo ?? 'rokuyo'} · ${p152Meta?.moonPhase ?? 'moon phase'}) recorded alongside ${p152OtherSources.size} other active source(s) today. Descriptive co-presence only — no causal claim.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 

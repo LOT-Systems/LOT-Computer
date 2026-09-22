@@ -26,6 +26,7 @@ import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#sha
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
+import { useLogContext } from '#client/hooks/useLogContext'
 import { UserTag } from '#shared/types'
 import { TimeWidget } from './TimeWidget'
 import { QuantumRandomWidget } from './QuantumRandomWidget'
@@ -220,6 +221,11 @@ export const System = React.memo(function SystemInner() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [astrologyTick])
+
+  // Cross-widget analytics hook — also carries the astrology personalization stats
+  // (rokuyoActivityCounts, mostLoggedRokuyo) derived from this user's own persisted
+  // Logs.context.astroRokuyo history, shared with the other 15+ widgets that read it.
+  const logCtx = useLogContext()
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
@@ -671,7 +677,14 @@ export const System = React.memo(function SystemInner() {
         >
           {astrologyView === 'astrology' ? (
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              <div>
+                {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              </div>
+              {logCtx.totalRokuyoLogged >= 5 && logCtx.mostLoggedRokuyo && (
+                <div className="opacity-60">
+                  Most logged: {logCtx.mostLoggedRokuyo} ({logCtx.rokuyoActivityCounts[logCtx.mostLoggedRokuyo]}/{logCtx.totalRokuyoLogged})
+                </div>
+              )}
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>
