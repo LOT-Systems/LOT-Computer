@@ -70,7 +70,7 @@ export function ChatCatalystWidget() {
       cohortMember: catalyst.action.cohortMember.name,
       hour: new Date().getHours()
     })
-    stores.goTo('log')
+    stores.goTo('logs')
     // Pre-populate the Log with an email compose command
     setTimeout(() => {
       const ta = document.querySelector<HTMLTextAreaElement>('textarea')

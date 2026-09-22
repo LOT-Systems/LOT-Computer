@@ -24,7 +24,10 @@ STATUS KEY:
 
 FEATURE          | BEST BRANCH                   | HASH     | ITER  | STATUS | FILES | LINES  | SUMMARY
 ──────────────     ─────────────────────────────   ────────   ─────   ──────   ─────   ──────   ──────────────────────
-LOT Mail         | determined-turing-f6bw7r     | fa622a25 | 11/11 | BEST   | 11    | +504   | In-app email: /email trigger, Sync inbox, Cohort integration, yarn.lock
+LOT Mail         | determined-turing-zl0j44     | 2f887311 | 12/12 | BEST*  | 12    | +554   | In-app email: /email trigger, Sync inbox, Cohort integration — LOT-SR-20260922-01
+* BEST verified GREEN (build + typecheck parity) on claude/determined-turing-zl0j44,
+  the ship branch assigned to that session. Not yet merged to master — no PR was
+  requested; master merge is a deferred manual/PR step for S-2.
 Basics Tab       | beautiful-johnson-56p7ov      | 6815f550 | 8/8   | BEST   | 5     | +293   | BASICS M1: OPEN TAB live — 23-item ration ledger, doctrine, status line
 Calendar Alerts  | gifted-lovelace-cZOWR         | 978cf52  | 6/6   | BEST   | 3     | +359   | Live clock, T-minus countdown, military alert overlay, today panel
 QI-46 Engine     | cool-tesla-f8j0mr            | 36ef4dde | 8/8   | BEST   | 8     | +2050  | QI·46 Node 3 engine integration + Soul Upload + Being Calibration
