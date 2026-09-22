@@ -17,6 +17,7 @@ export enum UserTag {
   Pro = 'Pro',
   Suspended = 'Suspended',
   Legacy = 'Legacy',
+  Basic = 'Basic', // LOT-FM-001 — ON STRENGTH, BASIC ration roster (issued M2 build cycle)
 }
 
 // User Types
