@@ -19,6 +19,7 @@ type EntryType = 'note' | 'task' | 'call'
 
 type CalendarEntry = {
   date: string
+  time: string | null
   text: string
   type: EntryType
 }
@@ -58,6 +59,7 @@ export function CalendarWidget() {
   const [selectedDate, setSelectedDate] = React.useState<string | null>(null)
   const [isAddingEntry, setIsAddingEntry] = React.useState(false)
   const [entryText, setEntryText] = React.useState('')
+  const [entryTime, setEntryTime] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
 
   const entries = React.useMemo<CalendarEntry[]>(() => {
@@ -65,17 +67,25 @@ export function CalendarWidget() {
       .filter(log => log.event === 'calendar_entry' && log.metadata)
       .map(log => ({
         date: log.metadata?.date as string,
+        time: (log.metadata?.time as string) || null,
         text: log.metadata?.text as string || log.text || '',
         type: (log.metadata?.entryType as EntryType) || 'note',
       }))
       .filter(e => e.date && e.text)
-      .sort((a, b) => a.date.localeCompare(b.date))
+      .sort((a, b) => `${a.date} ${a.time || '00:00'}`.localeCompare(`${b.date} ${b.time || '00:00'}`))
   }, [logs])
 
   const upcomingEntries = React.useMemo(() => {
-    const today = dayjs().format('YYYY-MM-DD')
+    const now = dayjs()
+    const today = now.format('YYYY-MM-DD')
     return entries
-      .filter(e => e.date >= today)
+      .filter(e => {
+        if (e.date > today) return true
+        if (e.date < today) return false
+        // Today: drop entries whose scheduled time has already passed
+        if (!e.time) return true
+        return dayjs(`${e.date} ${e.time}`).isAfter(now)
+      })
       .slice(0, 10)
   }, [entries])
 
@@ -102,19 +112,27 @@ export function CalendarWidget() {
       setSelectedDate(null)
     } else {
       setSelectedDate(key)
+      // Switching dates invalidates any in-progress entry for the old one
+      setIsAddingEntry(false)
+      setEntryText('')
+      setEntryTime('')
     }
   }
 
   const handleAddEntry = () => {
     if (!selectedDate || !entryText.trim()) return
 
-    const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
+    const time = entryTime.trim() || null
+    const dateLabel = time
+      ? dayjs(`${selectedDate} ${time}`).format('dddd, MMMM D, YYYY [at] HH:mm')
+      : dayjs(selectedDate).format('dddd, MMMM D, YYYY')
 
     createLog({
       text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel})`,
       event: 'calendar_entry',
       metadata: {
         date: selectedDate,
+        time,
         text: entryText.trim(),
         entryType,
       },
@@ -126,6 +144,7 @@ export function CalendarWidget() {
     })
 
     setEntryText('')
+    setEntryTime('')
     setIsAddingEntry(false)
   }
 
@@ -237,6 +256,13 @@ export function CalendarWidget() {
                     className="bg-transparent border border-acc/20 text-acc px-4 py-2 flex-1 outline-none focus:border-acc/40"
                     autoFocus
                   />
+                  <input
+                    type="time"
+                    value={entryTime}
+                    onChange={e => setEntryTime(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleAddEntry() }}
+                    className="bg-transparent border border-acc/20 text-acc/60 px-4 py-2 outline-none focus:border-acc/40 focus:text-acc"
+                  />
                   <Button onClick={handleAddEntry}>Add</Button>
                 </div>
               </div>
@@ -249,6 +275,7 @@ export function CalendarWidget() {
                 </div>
                 {entriesOnDate.map((e, i) => (
                   <div key={i} className="text-acc/80 mb-1">
+                    {e.time && <span className="text-acc/40">{e.time} — </span>}
                     {e.text}
                   </div>
                 ))}
@@ -263,6 +290,7 @@ export function CalendarWidget() {
               <div key={i} className="flex justify-between gap-16">
                 <span className="text-acc whitespace-nowrap">
                   {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
+                  {entry.time && <span className="text-acc/40"> {entry.time}</span>}
                 </span>
                 <span className="text-acc text-right">
                   {entry.text}
