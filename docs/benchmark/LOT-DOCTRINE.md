@@ -258,3 +258,19 @@ as `??`/`A` — an absent line is not "nothing changed," it may be "ignored."
 (SR-20260923-01: `.gitignore` line 50 `server/` silently shadowed
 src/server/models/lot-mail.ts; removed as redundant with the existing
 `dist/` rule on line 2.)
+
+## Tag Push Can 403 While Branch Push Succeeds — Not a Retry Bug
+
+Some session credentials can push to `refs/heads/*` but get HTTP 403 on
+`refs/tags/*` against the identical remote, in the same push session. This
+is a token/App scope restriction, not a flaky network — retrying with
+backoff (the standard push protocol) will not fix it. When this happens:
+push the branch/commits (that succeeds and is what CI/deploy watches), then
+create the benchmark tag locally anyway and record `TAG: ... PUSH BLOCKED`
+in the report rather than looping. A later session with broader push scope,
+or S-2 pushing tags directly, can backfill it — the local tag is not lost
+as long as no one force-deletes the branch's working copy.
+
+(SR-20260923-01: `git push origin refs/tags/benchmark-20260923-01` 403'd
+4/4 attempts while `git push origin claude/determined-turing-cfzlwf` on the
+same command run succeeded immediately.)
