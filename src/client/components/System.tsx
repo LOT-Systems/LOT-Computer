@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo, toWallClockDate } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -203,9 +203,14 @@ export const System = React.memo(function SystemInner() {
   }, [])
 
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
-  // rokuyo), not a personal natal chart.
+  // rokuyo), not a personal natal chart. Personalized to the user's saved
+  // timeZone when known (falls back to device-local time), matching the
+  // wall-clock trick getLogContext() already uses server-side — so the
+  // dashboard and Logs entries read the same ambient conditions instead of
+  // drifting when the viewing device's clock differs from the profile.
   const astrology = React.useMemo(() => {
-    const now = new Date()
+    const localMoment = profile?.timeZone ? dayjs().tz(profile.timeZone) : dayjs()
+    const now = toWallClockDate(localMoment)
     const hourlyZodiac = getHourlyZodiac(now)
     const westernZodiac = getWesternZodiac(now)
     const moonPhase = getMoonPhase(now)
@@ -217,9 +222,10 @@ export const System = React.memo(function SystemInner() {
       moonPhase: moonPhase.phase,
       moonIllumination: moonPhase.illumination,
       rokuyo,
+      auspicious: rokuyo === 'Taian',
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+  }, [astrologyTick, profile?.timeZone])
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
@@ -464,8 +470,9 @@ export const System = React.memo(function SystemInner() {
 
         <div>
           <Block label="Astrology:">
-            <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+            <div className="flex flex-wrap items-center gap-8">
+              <span>{astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)</span>
+              {astrology.auspicious && <Tag fill>Auspicious</Tag>}
             </div>
           </Block>
         </div>
@@ -670,8 +677,9 @@ export const System = React.memo(function SystemInner() {
           }}
         >
           {astrologyView === 'astrology' ? (
-            <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+            <div className="flex flex-wrap items-center gap-8">
+              <span>{astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)</span>
+              {astrology.auspicious && <Tag fill>Auspicious</Tag>}
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>

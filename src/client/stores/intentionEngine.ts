@@ -3428,6 +3428,27 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Auspicious Alignment — today's ambient astrology reading is auspicious
+  // (rokuyo === Taian) AND the operator set an intention or advanced a goal the same day.
+  // Deferred from the 2026-07-27 astrology session, which wired the astrology signal into
+  // the bus but intentionally left pattern-authoring to a dedicated pass. The ambient
+  // reading is never treated as causal here — the reason text records that the operator
+  // acted on a traditionally favorable day, not that the day produced the action.
+  const p152DayStart   = new Date(now); p152DayStart.setHours(0, 0, 0, 0)
+  const p152Astrology  = signals.filter(s => s.source === 'astrology' && s.metadata?.auspicious === true && s.timestamp >= p152DayStart.getTime())
+  const p152Goals      = signals.filter(s => s.source === 'goals'      && s.timestamp >= p152DayStart.getTime())
+  const p152Intentions = signals.filter(s => s.source === 'intentions' && s.timestamp >= p152DayStart.getTime())
+  if (p152Astrology.length >= 1 && (p152Goals.length >= 1 || p152Intentions.length >= 1)) {
+    const p152Conf = Math.min(0.60 + (p152Goals.length + p152Intentions.length) * 0.05, 0.78)
+    patterns.push({
+      pattern: 'auspicious-alignment',
+      confidence: p152Conf,
+      suggestedWidget: 'astrology',
+      suggestedTiming: 'passive',
+      reason: `AUSPICE: Taian (auspicious rokuyo) today + ${p152Goals.length} goal action(s) + ${p152Intentions.length} intention(s) set. Ambient reading noted, not causal — the operator acted regardless of the day's traditional favorability.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 

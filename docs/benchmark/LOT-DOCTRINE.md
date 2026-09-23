@@ -226,3 +226,24 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Ambient Reading Personalization (Wall-Clock TZ Trick)
+
+Any ambient/environmental reading derived from `new Date()` — astrology,
+weather, or similar — must be computed from the user's saved `timeZone`
+wherever a user context is available, not from wherever the code happens to
+execute (server process TZ or the viewing device's TZ). The trick: construct
+a plain `Date` from a `.tz()`'d dayjs moment's wall-clock fields (`new
+Date(m.year(), m.month(), m.date(), m.hour(), m.minute(), m.second())`) —
+every reader that calls `.getHours()`/`.getMonth()`/`.getDate()` on the
+result then sees the target timeZone's local time, regardless of runtime TZ.
+Keep this helper in `shared/`, not duplicated per environment — client and
+server dayjs wrappers differ (only server loaded the `timezone` plugin
+originally), so the single shared function is the reuse boundary, not a
+copy-pasted local one.
+(SR-20260727 [docs/assembly]: trick introduced server-side in
+getLogContext() for astrology context on Log rows. SR-20260923-01: trick
+promoted to shared/utils/astrology.ts as toWallClockDate(); client dayjs
+gained the timezone plugin; System.tsx's astrology block now reads
+profile.timeZone instead of device-local time, closing the gap the prior
+session flagged as pending.)

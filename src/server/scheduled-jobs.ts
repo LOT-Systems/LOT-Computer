@@ -7,6 +7,7 @@
  */
 
 import dayjs from '#server/utils/dayjs'
+import { getLogContext } from '#server/utils/logs'
 
 /**
  * Scheduled Jobs - Automated Monthly Email System
@@ -3570,12 +3571,17 @@ async function executeDailyOSSnapshotJob(): Promise<JobResult> {
         const snapshotMeta: Record<string, any> = {}
         if (metadata.theme) snapshotMeta.theme = { theme: metadata.theme }
         if (metadata.sound) snapshotMeta.sound = metadata.sound
+        // context was previously always {} here, so the ASTRO:/POS:/TMP:/HUM: lines
+        // Logs.tsx renders for system_snapshot entries never had data to show —
+        // getLogContext() is the same weather+location+astrology snapshot every
+        // other log-creation site already uses.
+        const context = await getLogContext(user as any)
         await Log.create({
           userId: (user as any).id,
           event: 'system_snapshot' as any,
           text: `OS midnight snapshot — ${dayjs().format('YYYY-MM-DD')}`,
           metadata: snapshotMeta,
-          context: {},
+          context,
         })
         created++
       } catch (err: any) {
