@@ -72,4 +72,11 @@ COMINTEL:          Community Intelligence Peak — log block label; cohort + jou
 EMBODIED-COGNITION-ARC   QIE P110 — selfcare + journal 150+w + memory capture all in 24h; biological grounding and cognitive expression confirmed simultaneously; body feeding mind  B  20260706
 INTENTION-COMPLETION-LOOP QIE P111 — intention set + planner + goal action all in 24h; direction→structure→outcome arc closed in one day; rare single-day loop  B  20260706
 COMMUNITY-INTELLIGENCE-PEAK  QIE P112 — cohort signal + journal + memory + intentions all in 48h; external social signal anchored internally through writing, capture, and direction-setting  B  20260706
+QI-46              LOT® proprietary AI engine — bioelectric self-care inference, Quantum          B  20260923
+                   Intelligence Engine Gen 46; Node 1 = corpus/infra/self-assembly spec
+                   (LOT_QI46_ENGINE.md), Node 2 = humanoid output calibration spec
+                   (LOT_QI-46_ENGINE-2.md)
+COSMO              Kuzya's brand; also QI-46's ethics/safety screening node — classifies every    B  20260923
+                   generated response before delivery (child-safe, stress-safe, honest, and as of
+                   Node 2: not a personhood/consciousness-upload claim)
 ```
