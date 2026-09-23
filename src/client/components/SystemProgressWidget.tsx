@@ -1457,6 +1457,27 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-09-23',
+    title: 'QIE Engineering — Bio-Circadian Coherence / Quantum Presence Apex / Recovery Integration Loop',
+    assembled: [
+      'P152 BIO-CIRCADIAN COHERENCE: circadian-signal-lock (P143) + physiological-coherence-window (P121) co-active. Clock and field aligned simultaneously. Conf 0.75–0.90.',
+      'P153 QUANTUM PRESENCE APEX: quantum-presence-crystallization (P149) + total-field-coherence (P150) both active. The OS inhabits AND surpasses its own ceiling. Both highest-order states simultaneously confirmed. Conf 0.88–0.97.',
+      'P154 RECOVERY INTEGRATION LOOP: recovery-intelligence-arc (P151) + embodied-cognition-arc (P110) both active within 24h. Restoration followed by body-mind integration. The system learns from its own healing. Conf 0.72–0.88.',
+      'Arch52 BIOLOGICAL COHERENCE MASTER: energy moderate/high · dominant: mood/selfcare/energy/journal · patterns: bio-circadian-coherence + physiological-presence-arc + multi-day-care-arc · directive: Biological substrate coherent. Circadian clock anchored. Body-mind field live. 52 archetypes total.',
+      'J49 daily-bio-circadian-coherence-check: 19:00 UTC daily. Checks if physiological_presence_arc + circadian_signal_lock both fired today → writes bio_circadian_coherence. 49 jobs total.',
+      'intentionEngine.ts: P152/P153/P154 detection blocks added. Arch52 appended to PHYSIOLOGICAL_ARCHETYPES. 3 dep map nodes (bioCircadianCoherenceNode · quantumPresenceApexNode · recoveryIntegrationNode). 3 signal helpers. 193+ dep nodes.',
+      'scheduled-jobs.ts: J49 executeDailyBioCircadianCoherenceCheck() · shouldRunDailyBioCircadianCoherenceCheck() wired.',
+      'routes/api.ts: bio_circadian_coherence · quantum_presence_apex · recovery_integration_loop added to displayableEvents.',
+      'Logs.tsx: BCIRC: · QPAPEX: · RECINTLP: military handlers added. COCKPIT-RULE compliant.',
+      'QuantumEngineWidgets.tsx: BIO-CIRC · QPAPEX · RECINTLP added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P152/P153/P154 display names added.',
+      'About.tsx: FM v113→v114. Day 1103+. 151→154 patterns. 51→52 archetypes. 48→49 jobs. 190+→193+ dep nodes. 151+→154+ handlers.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      '154 patterns · 52 archetypes · 49 jobs · 154+ handlers · 193+ dep nodes. QIE v114 deployed. Bio-circadian coherence confirmed. Presence apex achieved.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,16 +1515,16 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-09-23',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-09-23 · QIE v114 · FM v114 SYNC · Day 1103+',
+    'Built: P152 BIO-CIRCADIAN COHERENCE · P153 QUANTUM PRESENCE APEX · P154 RECOVERY INTEGRATION LOOP.',
+    'Bio-circadian coherence: circadian clock anchored + body-mind field aligned simultaneously. BCIRC: handler live.',
+    'Quantum presence apex: presence crystallized AND total field coherence co-active. The OS inhabits and surpasses its own ceiling. QPAPEX: handler live.',
+    'Recovery integration loop: restoration arc complete + body-mind integration confirmed within 24h. RECINTLP: handler live.',
+    'Arch52 BIOLOGICAL COHERENCE MASTER deployed. 52 archetypes total.',
+    'J49 daily-bio-circadian-coherence-check: 19:00 UTC daily. 49 jobs total.',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes.',
     'Status: DEPLOYED.',
     'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
   ],

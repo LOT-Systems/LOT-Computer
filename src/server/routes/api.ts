@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: bio-circadian coherence · quantum presence apex · recovery integration loop (P152/P153/P154)
+      'bio_circadian_coherence',
+      'quantum_presence_apex',
+      'recovery_integration_loop',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

@@ -3629,6 +3629,79 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'bio_circadian_coherence') {
+          const morningArcs = log.metadata?.morningArcs as number | undefined
+          const biofieldState = log.metadata?.biofieldState as string | undefined
+          const syncStatus = log.metadata?.syncStatus as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="BCIRC:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">MORNING ARC</span>
+                  <span className="tabular-nums">{morningArcs !== undefined ? `${morningArcs} windows` : '—'}</span>
+                </div>
+                {biofieldState && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BODY-MIND</span>
+                    <span className="tabular-nums uppercase">{biofieldState}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CLOCK ANCHORED · FIELD ALIGNED · {syncStatus ?? 'LOCKED'}</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_presence_apex') {
+          const presenceCrystConf = log.metadata?.presenceCrystConf as number | undefined
+          const totalFieldConf = log.metadata?.totalFieldConf as number | undefined
+          const composite = log.metadata?.composite as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QPAPEX:" blockView>
+                {presenceCrystConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INHABIT CONF</span>
+                    <span className="tabular-nums">{presenceCrystConf}%</span>
+                  </div>
+                )}
+                {totalFieldConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CEILING CONF</span>
+                    <span className="tabular-nums">{totalFieldConf}%</span>
+                  </div>
+                )}
+                {composite !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">APEX</span>
+                    <span className="tabular-nums">{composite}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PRESENCE CRYSTALLIZED · CEILING SURPASSED · BOTH HIGHEST STATES OPEN</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'recovery_integration_loop') {
+          const careCount = log.metadata?.careCount as number | undefined
+          const journalWords = log.metadata?.journalWords as number | undefined
+          const loopStatus = log.metadata?.loopStatus as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RECINTLP:" blockView>
+                {careCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CARE 24H</span>
+                    <span className="tabular-nums">{careCount}</span>
+                  </div>
+                )}
+                {journalWords !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">WORDS</span>
+                    <span className="tabular-nums">{journalWords}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">RESTORE → INTEGRATE · BODY-MIND LOOP · {loopStatus ?? 'COMPLETE'}</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

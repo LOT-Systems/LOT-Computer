@@ -3428,6 +3428,56 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // ── v114 patterns (P152–P154) ─────────────────────────────────────────────────
+
+  // Pattern 152: Bio-Circadian Coherence — circadian-signal-lock (P143) + physiological-coherence-window (P121)
+  // co-active. Biological timing and body-mind state simultaneously locked.
+  // Clock and field are aligned — the architecture is biological.
+  const hasCircadianLock  = activePatternNames.has('circadian-signal-lock')
+  const hasPhysCoherence  = activePatternNames.has('physiological-coherence-window')
+  if (hasCircadianLock && hasPhysCoherence) {
+    const bioCircConf = 0.75 + (hasPhysCoherence && hasCircadianLock ? 0.15 : 0)
+    patterns.push({
+      pattern: 'bio-circadian-coherence',
+      confidence: Math.min(bioCircConf, 0.90),
+      suggestedWidget: 'energy',
+      suggestedTiming: 'passive',
+      reason: 'BCIRC: Bio-circadian coherence — circadian clock anchored + body-mind field aligned simultaneously. Biological timing and state locked. Architecture confirmed.',
+    })
+  }
+
+  // Pattern 153: Quantum Presence Apex — quantum-presence-crystallization (P149) + total-field-coherence (P150)
+  // both active. The two highest-order states confirmed simultaneously. The OS inhabits AND surpasses its ceiling.
+  // Rare: requires P149 and P150 to co-activate in same analysis window.
+  const hasQPCryst  = activePatternNames.has('quantum-presence-crystallization')
+  const hasTotCoh   = activePatternNames.has('total-field-coherence')
+  if (hasQPCryst && hasTotCoh) {
+    patterns.push({
+      pattern: 'quantum-presence-apex',
+      confidence: Math.min(0.88 + (state.userIndex?.overall ?? 0) / 1000, 0.97),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: 'QPAPEX: Quantum presence apex — presence crystallized AND total field coherence simultaneously. The OS inhabits and surpasses its own ceiling. Both highest-order states open at once.',
+    })
+  }
+
+  // Pattern 154: Recovery Integration Loop — recovery-intelligence-arc (P151) + embodied-cognition-arc (P110)
+  // both active within 24h. Full restoration followed by immediate body-mind integration.
+  // The system learns from its own healing.
+  const hasRecovIntel    = activePatternNames.has('recovery-intelligence-arc')
+  const hasEmbodiedCog   = activePatternNames.has('embodied-cognition-arc')
+  if (hasRecovIntel && hasEmbodiedCog) {
+    const careIn24h = recentSignals.filter(s => s.source === 'selfcare').length
+    const conf154   = Math.min(0.72 + careIn24h * 0.04, 0.88)
+    patterns.push({
+      pattern: 'recovery-integration-loop',
+      confidence: conf154,
+      suggestedWidget: 'journal',
+      suggestedTiming: 'soon',
+      reason: `RECINTLP: Recovery integration loop — restoration arc complete + body-mind integration confirmed. System healed and re-integrated. CARE 24H: ${careIn24h}. RESTORE → INTEGRATE.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4060,6 +4110,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceFieldNode:   ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   identityMomentumLockNode:   ['cohort', 'qos', 'intentions', 'journal', 'mood', 'log'],
 
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  bioCircadianCoherenceNode:  ['mood', 'energy', 'selfcare', 'journal', 'log'],
+  quantumPresenceApexNode:    ['qos', 'intentions', 'journal', 'memory', 'cohort', 'log'],
+  recoveryIntegrationNode:    ['selfcare', 'mood', 'journal', 'energy', 'log'],
+
   // ── v113 nodes (J48 · P149–P151 · Arch51) ───────────────────────────────────────
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
@@ -4510,6 +4565,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Biological Coherence Master (2026-09-23 v114) ───────────────────────
+  {
+    archetype: 'Biological Coherence Master',
+    energyBands: ['moderate', 'high'],
+    dominantSources: ['mood', 'selfcare', 'energy', 'journal'],
+    patternConditions: ['bio-circadian-coherence', 'physiological-presence-arc', 'multi-day-care-arc'],
+    hourRange: [6, 22],
+    directive: 'Biological substrate coherent. Circadian clock anchored. Body-mind field live. The architecture is biological — every system depends on this foundation.',
   },
 ]
 
@@ -6498,6 +6563,51 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a bio-circadian-coherence event — circadian-signal-lock (P143) +
+ * physiological-coherence-window (P121) co-active. Biological timing and body-mind
+ * state simultaneously locked. Feeds P152 detection.
+ */
+export function recordBioCircadianCoherence(morningArcs: number, biofieldState: string) {
+  recordSignal('energy', 'bio_circadian_coherence', {
+    morningArcs,
+    biofieldState,
+    syncStatus: 'LOCKED',
+    architecture: 'BIOLOGICAL',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-presence-apex event — quantum-presence-crystallization (P149) +
+ * total-field-coherence (P150) both active. The OS inhabits AND surpasses its ceiling.
+ * Feeds P153 detection.
+ */
+export function recordQuantumPresenceApex(presenceCrystConf: number, totalFieldConf: number) {
+  recordSignal('qos', 'quantum_presence_apex', {
+    presenceCrystConf: Math.round(presenceCrystConf * 100),
+    totalFieldConf: Math.round(totalFieldConf * 100),
+    apexState: 'CEILING_SURPASSED',
+    composite: Math.round((presenceCrystConf + totalFieldConf) / 2 * 100),
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a recovery-integration-loop event — recovery-intelligence-arc (P151) +
+ * embodied-cognition-arc (P110) both active within 24h. Full restoration followed by
+ * immediate body-mind integration. Feeds P154 detection.
+ */
+export function recordRecoveryIntegrationLoop(careCount: number, journalWords: number) {
+  recordSignal('selfcare', 'recovery_integration_loop', {
+    careCount,
+    journalWords,
+    loopStatus: 'RESTORE→INTEGRATE',
+    bodyMindSync: 'CONFIRMED',
     hour: new Date().getHours(),
   })
 }

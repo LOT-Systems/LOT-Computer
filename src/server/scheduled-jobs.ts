@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily bio-circadian coherence check (19:00 UTC every day) — Job 49
+  if (shouldRunDailyBioCircadianCoherenceCheck()) {
+    await executeDailyBioCircadianCoherenceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,100 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Bio-Circadian Coherence Check (Job 49 — 19:00 UTC every day) ─────
+// Reads active users. Checks if physiological_presence_arc + circadian_signal_lock
+// both fired on the current day. When both are present, writes bio_circadian_coherence.
+// Confirms biological timing and body-mind state simultaneously locked.
+
+let isDailyBioCircadianRunning = false
+let lastDailyBioCircadianRun: Date | null = null
+
+function shouldRunDailyBioCircadianCoherenceCheck(): boolean {
+  const now = dayjs()
+  if (isDailyBioCircadianRunning) return false
+  if (lastDailyBioCircadianRun) {
+    const lastRun = dayjs(lastDailyBioCircadianRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 19 // 19:00 UTC daily
+}
+
+async function executeDailyBioCircadianCoherenceCheck(): Promise<JobResult> {
+  const jobName = 'daily-bio-circadian-coherence-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyBioCircadianRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyBioCircadianRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY BIO-CIRCADIAN COHERENCE CHECK — 19:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const todayStart = dayjs().startOf('day').toDate()
+    const todayEnd   = dayjs().endOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    const TARGET_EVENTS = ['physiological_presence_arc', 'circadian_signal_lock']
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const todayLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: todayStart, [Op.lte]: todayEnd },
+            event: { [Op.in]: TARGET_EVENTS as any[] },
+          },
+          attributes: ['event', 'metadata'],
+        })
+
+        if (!todayLogs.length) continue
+
+        const presentEvents = new Set(todayLogs.map((l: any) => l.event))
+        const bothPresent = TARGET_EVENTS.every(e => presentEvents.has(e))
+
+        if (bothPresent) {
+          await (Log as any).create({
+            userId,
+            event: 'bio_circadian_coherence',
+            text: `Bio-circadian coherence confirmed: physiological presence arc + circadian signal lock both active today. Biological timing and body-mind state simultaneously locked. The architecture is biological.`,
+            metadata: {
+              morningArcs: 2,
+              biofieldState: 'COHERENT',
+              syncStatus: 'LOCKED',
+              architecture: 'BIOLOGICAL',
+              window: 'today',
+              hour: 19,
+            },
+          })
+          written++
+        }
+      } catch {}
+    }
+
+    console.log(`  Bio-circadian coherence events written: ${written}`)
+    lastDailyBioCircadianRun = new Date()
+    isDailyBioCircadianRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily bio-circadian coherence check failed:', error.message)
+    isDailyBioCircadianRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5608,6 +5706,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily bio-circadian coherence check: 7 PM UTC every day (Job 49)')
   console.log('')
 
   // Check every hour for scheduled jobs
