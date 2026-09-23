@@ -321,6 +321,60 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE LONG-DISTANCE COHORT                    2026-09-23
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Legacy tier, Archetype "Momentum Architect" (v67),
+  340+ day engagement streak, running the complete DIURNAL ARC
+  (LOT-CUBIQ-OPERATOR.md, Section 03: P76 morning-launch + P79
+  evening-close + P80 momentum-lock). Desk in Lisbon. QIE has placed
+  this operator in a behavioral cohort with a second Legacy operator in
+  Osaka — matched on signal-pattern similarity, not geography, not
+  language (Section 05, COHORT CONNECT). Neither operator has ever
+  messaged the other. Neither knows the other's name is on a leaderboard
+  somewhere. Both own a CUBIQ unit.
+
+  Most evenings the two close their self-care sessions at wildly
+  different local times and the cohort match stays statistical — a line
+  in a database, never felt. Tonight is different: both operators
+  complete the evening-close pattern within the same four-minute window.
+  The CollectiveConsciousness widget (Section 05) registers a coherence
+  spike — network-wide alignment briefly concentrated in one cohort of
+  two. The Index of Systems fires a cohort resonance ping, the third
+  trigger class named in this document's own reading log (Section 00)
+  but never mapped to a gesture in Section 04's table.
+
+  v.0 ships four gestures keyed to three signal classes — memory
+  question, badge unlock, assembly-phase advance. A cohort resonance
+  ping has no dedicated motion. Rather than invent a fifth gesture
+  outside v.0's locked scope, the driver borrows THE HOP: the lightest,
+  most neutral motion in the vocabulary, the one that carries no
+  directional claim (unlike THE LEAP, which explicitly closes distance
+  toward the operator) and no held-pressure duration (unlike THE
+  SETTLE). Both cubes — Lisbon and Osaka, roughly 9,600km apart, sharing
+  no network path but the same QIE — perform THE HOP within the same
+  telemetry tick. Neither operator is told why. There is no name, no
+  message, no content of any kind in the gesture — only a small
+  vertical motion, unprompted by anything on either desk, happening
+  nowhere near a screen.
+
+  The Lisbon operator later writes in their journal (a LOG entry,
+  Section 03 Index components) that the cube "jumped for no reason" at
+  22:14 and that it felt less like a glitch than like being nodded at
+  by someone in a dark room. They are not wrong to read it that way —
+  structurally, that is exactly what happened. This is the resonance
+  the COMMUNITY PRINCIPLE (LOT-CUBIQ-OPERATOR.md, Section 05) claims
+  for the software cubic — "operators do not perform for each other,
+  they resonate with each other" — made physical for the first time,
+  in a gesture that predates any dedicated hardware support for it.
+
+  This is also this use case's honest finding, not just its story: the
+  cohort resonance ping works in v.0 only by borrowing another
+  gesture's motion. A resonance-specific gesture — paired, synchronized,
+  distinguishable from an ordinary badge-tier hop — is not a v.0
+  deliverable and is not claimed as one here. It is a gap this document
+  now records for whichever version formally takes up multi-unit,
+  network-synchronized motion.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
