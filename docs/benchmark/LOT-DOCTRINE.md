@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
 
 ## Render Isolation
 
@@ -226,3 +226,35 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Stale Branch as Spec, Not as Source
+
+When the manifest lists a BEST feature branch whose fork point predates a
+large share of current master (check via `git diff --stat <base> <branch> |
+tail -1`; tens of thousands of changed lines against a single feature commit
+means the branch is stale, not the feature being large), do not cherry-pick
+or merge it — a stale branch's unrelated file states will fight every commit
+master has taken since. Read its feature commit as a design spec (schema,
+routes, trigger shape, UI pattern) and re-implement it fresh against current
+master's actual files. The old commit remains valid provenance for what was
+already decided; only its diff base is untrustworthy.
+
+(SR-20260923-01: LOT Mail's determined-turing-f6bw7r [BEST, 11/11, June 2026]
+was 147K lines diverged from current master. Re-implemented from its commit
+message and diff as spec rather than cherry-picking.)
+
+## .gitignore Rules Without a Leading Slash Match Any Depth
+
+A bare directory pattern like `server/` (no leading `/`, trailing `/`) matches
+a directory of that name ANYWHERE in the tree — including `src/server/`, not
+just the intended `dist/server/` compiled-output path it was written for.
+When `dist/` is already ignored elsewhere, a second same-named rule aimed at
+"compiled output" is redundant at best and a silent new-file blackhole at
+worst: `git add` on a genuinely new file under the shadowed path succeeds
+with no error and no staged file. Before trusting a green `git status` after
+adding new source files, spot-check `git status --short` actually lists them
+as `??`/`A` — an absent line is not "nothing changed," it may be "ignored."
+
+(SR-20260923-01: `.gitignore` line 50 `server/` silently shadowed
+src/server/models/lot-mail.ts; removed as redundant with the existing
+`dist/` rule on line 2.)

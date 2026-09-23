@@ -47,7 +47,6 @@ postcss.config.*.backup
 *.working-backup
 
 # Compiled output (should not be in repo)
-server/
 *.js.map
 
 # Archive files

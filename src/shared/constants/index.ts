@@ -18,6 +18,8 @@ export const SYNC_CHAT_MESSAGES_TO_SHOW = 12
 
 export const MAX_SYNC_CHAT_MESSAGE_LENGTH = 300
 
+export const MAX_LOT_MAIL_LENGTH = 2000
+
 // Characters that render as blank/invisible: all standard whitespace (\s
 // already covers space, tab, newline, NBSP U+00A0, BOM U+FEFF, U+2028/9) plus
 // zero-width code points that a naive trim() misses — zero-width space/joiners

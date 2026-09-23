@@ -24,7 +24,8 @@ STATUS KEY:
 
 FEATURE          | BEST BRANCH                   | HASH     | ITER  | STATUS | FILES | LINES  | SUMMARY
 ──────────────     ─────────────────────────────   ────────   ─────   ──────   ─────   ──────   ──────────────────────
-LOT Mail         | determined-turing-f6bw7r     | fa622a25 | 11/11 | BEST   | 11    | +504   | In-app email: /email trigger, Sync inbox, Cohort integration, yarn.lock
+LOT Mail         | determined-turing-f6bw7r     | fa622a25 | 11/11 | SUPERSEDED | 11 | +504   | June 2026 iteration — 147K lines diverged from master, unsafe to cherry-pick (see determined-turing-cfzlwf)
+LOT Mail         | determined-turing-cfzlwf     | (pending)| 12/12 | BEST   | 12    | +579   | Re-implemented against current master: /email + /mail trigger, Mail tab in Sync, ✉ button on ChatCatalystWidget cohort matches, fixed .gitignore server/ shadow bug
 Basics Tab       | beautiful-johnson-56p7ov      | 6815f550 | 8/8   | BEST   | 5     | +293   | BASICS M1: OPEN TAB live — 23-item ration ledger, doctrine, status line
 Calendar Alerts  | gifted-lovelace-cZOWR         | 978cf52  | 6/6   | BEST   | 3     | +359   | Live clock, T-minus countdown, military alert overlay, today panel
 QI-46 Engine     | cool-tesla-f8j0mr            | 36ef4dde | 8/8   | BEST   | 8     | +2050  | QI·46 Node 3 engine integration + Soul Upload + Being Calibration
