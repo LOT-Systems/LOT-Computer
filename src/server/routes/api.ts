@@ -1213,6 +1213,8 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // Calendar due-alert — fired when a timed calendar_entry reaches its moment
+      'calendar_alert',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
