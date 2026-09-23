@@ -1,573 +1,417 @@
 #!/usr/bin/env python3
-"""
-LOT Systems — Badge & Achievement Master Codex v40 PDF Generator
-Generates LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v40.pdf
-Theme: Quantum Arcade — Retro Gaming · Self-Care · RPG
-"""
+"""Generate LOT Badges & Achievements Master Codex v40 PDF"""
 
 import os
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.lib.colors import HexColor
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
-    PageBreak, HRFlowable, Preformatted
+try:
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import mm
+    from reportlab.lib import colors
+    from reportlab.platypus import (
+        SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
+        HRFlowable, PageBreak
+    )
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    REPORTLAB = True
+except ImportError:
+    REPORTLAB = False
+
+if not REPORTLAB:
+    print("reportlab not installed. Run: pip install reportlab")
+    exit(1)
+
+OUT_PATH = os.path.join(
+    os.path.dirname(__file__), '..', 'docs', 'badges',
+    'LOT-BADGES-ACHIEVEMENTS-MASTER-CODEX-v40.pdf'
 )
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
 
-# Color palette — LOT Systems dark terminal aesthetic
-BG_DARK      = HexColor('#0a0a0f')
-BG_PANEL     = HexColor('#12121e')
-NEON_CYAN    = HexColor('#00f0f0')
-NEON_GREEN   = HexColor('#00ff88')
-NEON_AMBER   = HexColor('#ffb300')
-NEON_RED     = HexColor('#ff3355')
-NEON_PURPLE  = HexColor('#cc44ff')
-NEON_BLUE    = HexColor('#4488ff')
-NEON_PINK    = HexColor('#ff44aa')
-SOFT_WHITE   = HexColor('#e8e8e8')
-DIM_GREY     = HexColor('#666677')
-PANEL_BORDER = HexColor('#223344')
+# ── Colours ──────────────────────────────────────────────────────
+BG    = colors.HexColor('#0a0a0a')
+FG    = colors.HexColor('#e8e8e8')
+ACC   = colors.HexColor('#00ff99')    # terminal green
+ACC2  = colors.HexColor('#00ccff')    # cyan
+ACC3  = colors.HexColor('#ff6600')    # orange
+RARE_C  = colors.HexColor('#4488ff')
+EPIC_C  = colors.HexColor('#aa44ff')
+LEG_C   = colors.HexColor('#ffdd00')
+MYT_C   = colors.HexColor('#ff4488')
+COMMON_C = colors.HexColor('#88aa88')
+UNC_C   = colors.HexColor('#66bbbb')
+DIM   = colors.HexColor('#444444')
+MID   = colors.HexColor('#888888')
 
-OUTPUT_DIR  = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'docs', 'badges')
-OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v40.pdf')
+RARITY_COLORS = {
+    'COMMON': COMMON_C, 'UNCOMMON': UNC_C, 'RARE': RARE_C,
+    'EPIC': EPIC_C, 'LEGENDARY': LEG_C, 'MYTHIC': MYT_C,
+}
 
+doc = SimpleDocTemplate(
+    OUT_PATH, pagesize=A4,
+    leftMargin=18*mm, rightMargin=18*mm,
+    topMargin=18*mm, bottomMargin=18*mm,
+)
 
-def make_styles():
-    base = getSampleStyleSheet()
-    S = {}
-    S['cover_title'] = ParagraphStyle('cover_title', parent=base['Normal'],
-        fontSize=22, fontName='Courier-Bold', textColor=NEON_CYAN,
-        alignment=TA_CENTER, spaceAfter=8, leading=28)
-    S['cover_sub'] = ParagraphStyle('cover_sub', parent=base['Normal'],
-        fontSize=11, fontName='Courier', textColor=NEON_GREEN,
-        alignment=TA_CENTER, spaceAfter=4, leading=16)
-    S['cover_meta'] = ParagraphStyle('cover_meta', parent=base['Normal'],
-        fontSize=8.5, fontName='Courier', textColor=DIM_GREY,
-        alignment=TA_CENTER, spaceAfter=2, leading=12)
-    S['h1'] = ParagraphStyle('h1', parent=base['Normal'],
-        fontSize=15, fontName='Courier-Bold', textColor=NEON_CYAN,
-        spaceAfter=6, spaceBefore=14, leading=20)
-    S['h2'] = ParagraphStyle('h2', parent=base['Normal'],
-        fontSize=11, fontName='Courier-Bold', textColor=NEON_GREEN,
-        spaceAfter=4, spaceBefore=10, leading=16)
-    S['h3'] = ParagraphStyle('h3', parent=base['Normal'],
-        fontSize=9.5, fontName='Courier-Bold', textColor=NEON_AMBER,
-        spaceAfter=3, spaceBefore=8, leading=14)
-    S['body'] = ParagraphStyle('body', parent=base['Normal'],
-        fontSize=8.5, fontName='Courier', textColor=SOFT_WHITE,
-        spaceAfter=3, leading=12)
-    S['body_small'] = ParagraphStyle('body_small', parent=base['Normal'],
-        fontSize=7.5, fontName='Courier', textColor=SOFT_WHITE,
-        spaceAfter=2, leading=11)
-    S['mono'] = ParagraphStyle('mono', parent=base['Normal'],
-        fontSize=7.5, fontName='Courier', textColor=NEON_GREEN,
-        spaceAfter=2, leading=11, leftIndent=12)
-    S['quote'] = ParagraphStyle('quote', parent=base['Normal'],
-        fontSize=8, fontName='Courier-Oblique', textColor=DIM_GREY,
-        leftIndent=18, spaceAfter=4, leading=12)
-    S['badge_id'] = ParagraphStyle('badge_id', parent=base['Normal'],
-        fontSize=8, fontName='Courier-Bold', textColor=NEON_CYAN,
-        spaceAfter=1, leading=11)
-    S['footer'] = ParagraphStyle('footer', parent=base['Normal'],
-        fontSize=7, fontName='Courier', textColor=DIM_GREY,
-        alignment=TA_CENTER, leading=10)
-    # Rarity styles
-    for name, color in [
-        ('common', SOFT_WHITE), ('uncommon', NEON_GREEN), ('rare', NEON_CYAN),
-        ('epic', NEON_AMBER), ('legendary', NEON_PURPLE), ('mythic', NEON_RED),
-        ('cosmic', NEON_BLUE),
-    ]:
-        S[f'rarity_{name}'] = ParagraphStyle(f'rarity_{name}', parent=base['Normal'],
-            fontSize=7.5, fontName='Courier', textColor=color, leading=10)
-    return S
+W, H = A4
+CW = W - 36*mm
 
+styles = getSampleStyleSheet()
 
-def hr(color=PANEL_BORDER):
-    return HRFlowable(width='100%', thickness=0.5, color=color, spaceAfter=6, spaceBefore=6)
+def sty(name, **kw):
+    s = styles['Normal'].clone(name)
+    for k, v in kw.items():
+        setattr(s, k, v)
+    return s
 
+TITLE   = sty('T', fontSize=22, textColor=ACC,   fontName='Courier-Bold',
+               alignment=TA_CENTER, spaceAfter=4)
+SUB     = sty('S', fontSize=13, textColor=ACC2,  fontName='Courier-Bold',
+               alignment=TA_CENTER, spaceAfter=3)
+BODY    = sty('B', fontSize=8,  textColor=FG,    fontName='Courier',
+               leading=12, spaceAfter=2)
+MONO    = sty('M', fontSize=7,  textColor=ACC,   fontName='Courier',
+               leading=11, spaceAfter=1)
+HEAD2   = sty('H2', fontSize=11, textColor=ACC3,  fontName='Courier-Bold',
+               spaceBefore=8, spaceAfter=3)
+HEAD3   = sty('H3', fontSize=9,  textColor=ACC2,  fontName='Courier-Bold',
+               spaceBefore=5, spaceAfter=2)
+QUOTE   = sty('Q', fontSize=7.5, textColor=MID,  fontName='Courier-Oblique',
+               leading=11, leftIndent=8)
+SMALL   = sty('SM', fontSize=6.5, textColor=FG,  fontName='Courier', leading=10)
 
-def rarity_color(rarity):
-    return {
-        'common': SOFT_WHITE, 'uncommon': NEON_GREEN, 'rare': NEON_CYAN,
-        'epic': NEON_AMBER, 'legendary': NEON_PURPLE, 'mythic': NEON_RED,
-        'cosmic': NEON_BLUE,
-    }.get(rarity.lower(), SOFT_WHITE)
+def hr():
+    return HRFlowable(width='100%', thickness=0.5, color=DIM, spaceAfter=4)
 
+def badge_table(rows):
+    col_w = [CW*0.26, CW*0.10, CW*0.22, CW*0.12, CW*0.30]
+    data  = [['Badge ID', 'Symbol', 'Name', 'Rarity', 'Trigger']]
+    for r in rows:
+        bid, sym, name, rar, trigger = r
+        data.append([bid, sym, name, rar, trigger])
+    ts = TableStyle([
+        ('BACKGROUND',  (0,0), (-1,0),  colors.HexColor('#001a00')),
+        ('TEXTCOLOR',   (0,0), (-1,0),  ACC),
+        ('FONTNAME',    (0,0), (-1,0),  'Courier-Bold'),
+        ('FONTSIZE',    (0,0), (-1,-1), 6.5),
+        ('FONTNAME',    (0,1), (-1,-1), 'Courier'),
+        ('TEXTCOLOR',   (0,1), (-1,-1), FG),
+        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.HexColor('#111111'), BG]),
+        ('GRID',        (0,0), (-1,-1), 0.3, DIM),
+        ('TOPPADDING',  (0,0), (-1,-1), 2),
+        ('BOTTOMPADDING',(0,0), (-1,-1), 2),
+        ('LEFTPADDING', (0,0), (-1,-1), 3),
+    ])
+    for i, r in enumerate(rows, 1):
+        rar = r[3]
+        c = RARITY_COLORS.get(rar, FG)
+        ts.add('TEXTCOLOR', (3,i), (3,i), c)
+    return Table(data, colWidths=col_w, style=ts, repeatRows=1)
 
-def badge_table(data, col_widths):
-    t = Table(data, colWidths=col_widths)
-    t.setStyle(TableStyle([
-        ('BACKGROUND',    (0,0), (-1,0),   PANEL_BORDER),
-        ('TEXTCOLOR',     (0,0), (-1,0),   NEON_CYAN),
-        ('FONTNAME',      (0,0), (-1,0),   'Courier-Bold'),
-        ('FONTSIZE',      (0,0), (-1,-1),  7.5),
-        ('FONTNAME',      (0,1), (-1,-1),  'Courier'),
-        ('TEXTCOLOR',     (0,1), (-1,-1),  SOFT_WHITE),
-        ('ROWBACKGROUNDS',(0,1), (-1,-1),  [BG_DARK, BG_PANEL]),
-        ('GRID',          (0,0), (-1,-1),  0.3, PANEL_BORDER),
-        ('TOPPADDING',    (0,0), (-1,-1),  3),
-        ('BOTTOMPADDING', (0,0), (-1,-1),  3),
-        ('LEFTPADDING',   (0,0), (-1,-1),  5),
-    ]))
-    return t
+story = []
 
+# ── Cover ─────────────────────────────────────────────────────────
+story.append(Spacer(1, 12*mm))
+for line in [
+    'LOT SYSTEMS CORPORATION',
+    'BADGES & ACHIEVEMENTS MASTER CODEX',
+    'v40 — THE SOURCE CODE',
+]:
+    story.append(Paragraph(line, TITLE))
 
-def build_pdf():
-    doc = SimpleDocTemplate(
-        OUTPUT_FILE,
-        pagesize=letter,
-        leftMargin=0.65*inch, rightMargin=0.65*inch,
-        topMargin=0.75*inch, bottomMargin=0.75*inch,
-        title='LOT Badges & Achievements Master Codex v40 — The Quantum Arcade',
-        author='Vadik Marmeladov — LOT Systems',
-        subject='RPG · Arcade · Retro Gaming · Self-Care Badge Universe',
-    )
+story.append(Spacer(1, 4*mm))
+story.append(Paragraph('Word Turn Engine v30  ·  September 2026', SUB))
+story.append(Paragraph('RPG · Arcade · Self-Care · Software Engineering · Computational History', SUB))
+story.append(Spacer(1, 4*mm))
+story.append(hr())
 
-    S = make_styles()
-    story = []
+for line in [
+    '"THE JOURNAL IS THE CODEBASE.',
+    ' THE ENTRY IS THE COMMIT.',
+    ' THE SELF IS THE PROGRAM."',
+]:
+    story.append(Paragraph(line, QUOTE))
 
-    # ─── COVER PAGE ───────────────────────────────────────────────────────
-    story.append(Spacer(1, 0.4*inch))
-    story.append(Paragraph('L  ·  O  ·  T     S Y S T E M S', S['cover_title']))
-    story.append(Paragraph('BADGES &amp; ACHIEVEMENTS MASTER CODEX', S['cover_title']))
-    story.append(Paragraph('VERSION 40 — THE QUANTUM ARCADE', S['cover_title']))
-    story.append(Spacer(1, 0.15*inch))
+story.append(Spacer(1, 4*mm))
+story.append(hr())
 
-    cover_art = (
-        '[ INSERT COIN TO CONTINUE ]\n\n'
-        '  ¢·○·¢   INSERT COIN        [COMMON]\n'
-        '  ▲·◈·▲   LEVEL UP           [UNCOMMON]\n'
-        '  ■·○·■   SAVE POINT         [UNCOMMON]\n'
-        '  ◉·!·◉   BOSS FIGHT         [RARE]\n'
-        '  ∞·○·∞   NEW GAME PLUS      [EPIC]\n'
-        '  ○·∅·○   GAME OVER          [EPIC]\n'
-        '  ↑↑↓↓·◉  KONAMI SIGNAL      [MYTHIC] [HIDDEN]\n'
-        '  ◈·■·◈·∞·○  THIRTY REGISTERS  [COSMIC]\n\n'
-        '  v39 → v40: +31 badges   (1029 → 1060 total)'
-    )
-    story.append(Preformatted(cover_art, S['mono']))
-    story.append(Spacer(1, 0.12*inch))
+stats = [
+    ['Session', '2026-09-23'],
+    ['Branch',  'claude/quantum-engine-widgets-RgFfC'],
+    ['v38 +15', 'THE DREAM JOURNAL  (12 word turns + 3 secret bosses)'],
+    ['v39 +15', "THE OPERATOR'S HANDBOOK  (12 word turns + 3 secret bosses)"],
+    ['v40 +15', 'THE SOURCE CODE  (12 word turns + 3 secret bosses)'],
+    ['Session total', '+45 new badges implemented'],
+    ['Source total',  '1012 badges (967 → 1012)'],
+    ['Spec total',    '1074 badges (full spec with calendar/behavioral/achievement)'],
+]
+ts = TableStyle([
+    ('FONTNAME',  (0,0),(-1,-1),'Courier'),
+    ('FONTSIZE',  (0,0),(-1,-1),7),
+    ('TEXTCOLOR', (0,0),(0,-1), ACC2),
+    ('TEXTCOLOR', (1,0),(1,-1), FG),
+    ('BACKGROUND',(0,0),(-1,-1),colors.HexColor('#0d0d0d')),
+    ('GRID',      (0,0),(-1,-1),0.3, DIM),
+    ('TOPPADDING',(0,0),(-1,-1),2),
+    ('BOTTOMPADDING',(0,0),(-1,-1),2),
+    ('LEFTPADDING',(0,0),(-1,-1),4),
+])
+story.append(Table(stats, colWidths=[CW*0.22, CW*0.78], style=ts))
+story.append(Spacer(1, 6*mm))
+story.append(PageBreak())
 
-    story.append(Paragraph('RPG · ARCADE · RETRO GAMING · QUANTUM · SELF-CARE OPS', S['cover_sub']))
+# ── Overview table ────────────────────────────────────────────────
+story.append(Paragraph('BADGE SYSTEM OVERVIEW — v40', HEAD2))
+story.append(hr())
+ov = [
+    ['Category',         'Count', 'Description'],
+    ['Milestone',          '22', 'Streak days (v1–v4)'],
+    ['Time Easter Eggs',   '31', 'Check-in at special hours (v1–v22)'],
+    ['Calendar Easter',    '94', 'Check-in on special dates (v1–v28)'],
+    ['Word Turns',        '372', 'Words detected in journals (v1–v30)'],
+    ['Behavioral',        '105', 'Patterns over time (v1–v27)'],
+    ['Achievement RPG',   '168', 'Milestone combinations (v1–v28)'],
+    ['Mastery Tiers',     '120', 'Epic depth milestones (v1–v30)'],
+    ['Secret Boss',       '110', 'Hidden LEGENDARY/MYTHIC triggers (v1–v27)'],
+    ['TOTAL',            '1074', 'The complete LOT Badge Universe — v40'],
+]
+ts2 = TableStyle([
+    ('BACKGROUND',(0,0),(-1,0),colors.HexColor('#001a00')),
+    ('TEXTCOLOR', (0,0),(-1,0),ACC),
+    ('FONTNAME',  (0,0),(-1,0),'Courier-Bold'),
+    ('FONTNAME',  (0,1),(-1,-1),'Courier'),
+    ('FONTSIZE',  (0,0),(-1,-1),7.5),
+    ('TEXTCOLOR', (0,1),(-1,-1),FG),
+    ('TEXTCOLOR', (0,-1),(-1,-1),ACC),
+    ('FONTNAME',  (0,-1),(-1,-1),'Courier-Bold'),
+    ('ROWBACKGROUNDS',(0,1),(-1,-2),[colors.HexColor('#111111'),BG]),
+    ('BACKGROUND',(0,-1),(-1,-1),colors.HexColor('#001100')),
+    ('GRID',      (0,0),(-1,-1),0.3,DIM),
+    ('TOPPADDING',(0,0),(-1,-1),2),
+    ('BOTTOMPADDING',(0,0),(-1,-1),2),
+    ('LEFTPADDING',(0,0),(-1,-1),4),
+])
+story.append(Table(ov, colWidths=[CW*0.28,CW*0.10,CW*0.62], style=ts2))
+story.append(Spacer(1, 6*mm))
+
+# ── v38 ───────────────────────────────────────────────────────────
+story.append(Paragraph('WORD TURN v38 — THE DREAM JOURNAL', HEAD2))
+story.append(Paragraph(
+    'The oldest technology for self-examination is sleep. '
+    'The dream journal is the interface between the waking mind and the machine underneath.',
+    QUOTE))
+story.append(Spacer(1,2*mm))
+story.append(Paragraph('Word Turn v28 Badges', HEAD3))
+story.append(badge_table([
+    ['lucid_dreamer',    '◐·◐',    'Lucid Dreamer',    'RARE',     'lucid dreamer / aware in dream'],
+    ['dream_recall',     '○·~·○',  'Dream Recall',     'COMMON',   'dream recall / remembered my dream'],
+    ['nightmare_named',  '×·◉·×',  'Nightmare Named',  'EPIC',     'nightmare / named the nightmare'],
+    ['sleep_temple',     '≋·Δ·≋',  'Sleep Temple',     'UNCOMMON', 'sleep ritual / sleep hygiene'],
+    ['hypnagogic_state', '─·◑·─',  'Hypnagogic State', 'RARE',     'hypnagogic / threshold of sleep'],
+    ['symbol_decoded',   '◈·*·◈',  'Symbol Decoded',   'UNCOMMON', 'dream symbol / decoded symbol'],
+    ['shadow_dream',     '◌·▪·◌',  'Shadow Dream',     'RARE',     'shadow dream / dark figure'],
+    ['recurring_pattern','↺·↺·↺',  'Recurring Pattern','EPIC',     'recurring / keeps coming back'],
+    ['waking_vision',    '○·|·○',  'Waking Vision',    'UNCOMMON', 'waking vision / half-awake'],
+    ['oneiric_map',      '◈·.·◈',  'Oneiric Map',      'RARE',     'oneiric / dream map / dreamscape'],
+    ['the_threshold',    '◁·|·▷',  'The Threshold',    'RARE',     'the threshold / crossing over'],
+    ['dream_logged',     '≡·⊙·≡',  'Dream Logged',     'COMMON',   'dream logged / wrote the dream'],
+]))
+story.append(Spacer(1,3*mm))
+story.append(Paragraph('v38 Secret Boss Badges — THE DREAM VAULT', HEAD3))
+story.append(badge_table([
+    ['jung_signal',   '◆·◐·◆', 'Jung Signal',    'MYTHIC', '[HIDDEN] Carl Jung / collective unconscious'],
+    ['freud_couch',   '─·⊙·─', "Freud's Couch",  'EPIC',   '[HIDDEN] Freud / psychoanalysis / couch'],
+    ['morpheus_word', '◉·z·◉', 'Morpheus Word',  'RARE',   '[HIDDEN] Morpheus / god of dreams'],
+]))
+story.append(Spacer(1,6*mm))
+
+# ── v39 ───────────────────────────────────────────────────────────
+story.append(Paragraph("WORD TURN v39 — THE OPERATOR'S HANDBOOK", HEAD2))
+story.append(Paragraph(
+    'The self-care practitioner is a field operative. '
+    'The journal is the mission log. Every entry is a sitrep that keeps you from going dark.',
+    QUOTE))
+story.append(Spacer(1,2*mm))
+story.append(Paragraph('Word Turn v29 Badges', HEAD3))
+story.append(badge_table([
+    ['deep_cover',      '●·─·●', 'Deep Cover',       'RARE',     'deep cover / undercover'],
+    ['field_report',    '≡·→·≡', 'Field Report',     'COMMON',   'field report / sitrep'],
+    ['assets_secured',  '○·■·○', 'Assets Secured',   'UNCOMMON', 'assets secured / protected'],
+    ['blown_cover',     '×·●·○', 'Blown Cover',      'EPIC',     'cover blown / exposed'],
+    ['exfil_route',     '→·◁·→', 'Exfil Route',      'UNCOMMON', 'exfil / extraction / exit route'],
+    ['handler_brief',   '─·≡·→', 'Handler Brief',    'UNCOMMON', 'handler / briefing / intel'],
+    ['need_to_know',    '■·?·■', 'Need to Know',     'RARE',     'need to know / classified'],
+    ['dead_drop',       '↓·○·↓', 'Dead Drop',        'UNCOMMON', 'dead drop / left a message'],
+    ['clean_slate',     '○·—·○', 'Clean Slate',      'COMMON',   'clean slate / wiped clean'],
+    ['burn_notice',     '~·×·~', 'Burn Notice',      'RARE',     'burn notice / disavowed'],
+    ['ghost_protocol',  '·◌·',   'Ghost Protocol',   'EPIC',     'ghost protocol / off the grid'],
+    ['mission_complete','○·+·■', 'Mission Complete',  'UNCOMMON', 'mission complete / achieved'],
+]))
+story.append(Spacer(1,3*mm))
+story.append(Paragraph('v39 Secret Boss Badges — THE BLACK OPS VAULT', HEAD3))
+story.append(badge_table([
+    ['fleming_signal', '◆·7·◆', 'Fleming Signal', 'MYTHIC', '[HIDDEN] Ian Fleming / James Bond / 007'],
+    ['le_carre_word',  '◇·■·◇', 'Le Carré Word',  'EPIC',   '[HIDDEN] le Carré / George Smiley'],
+    ['eyes_only',      '◐·|·◐', 'Eyes Only',      'RARE',   '[HIDDEN] for your eyes only / top secret'],
+]))
+story.append(PageBreak())
+
+# ── v40 ───────────────────────────────────────────────────────────
+story.append(Paragraph('WORD TURN v40 — THE SOURCE CODE', HEAD2))
+story.append(Paragraph(
+    'Every entry is a commit. Every check-in is a deployment. '
+    'The self is a program that ships to production every single day.',
+    QUOTE))
+story.append(Spacer(1,2*mm))
+story.append(Paragraph('Word Turn v30 Badges', HEAD3))
+story.append(badge_table([
+    ['debug_mode',      '×·○·×', 'Debug Mode',       'RARE',      'debug / debugging / hunting the bug'],
+    ['compile_self',    '▷·▷·○', 'Compile Self',     'UNCOMMON',  'compile / compiling / assembling'],
+    ['stack_trace',     '≡·↕·≡', 'Stack Trace',      'EPIC',      'stack trace / traceback / thread'],
+    ['runtime_check',   '●·→·●', 'Runtime Check',    'COMMON',    'runtime / while running'],
+    ['fork_path',       '↑·◇·↓', 'Fork Path',        'UNCOMMON',  'forked / fork in the road'],
+    ['merge_complete',  '←·◆·→', 'Merge Complete',   'RARE',      'merged / the merge / brought together'],
+    ['patch_applied',   '○·+·○', 'Patch Applied',    'COMMON',    'patch / patched / fix applied'],
+    ['deploy_self',     '→·→·→', 'Deploy Self',      'LEGENDARY', 'deployed / shipped it / went live'],
+    ['commit_logged',   '◈·■·◈', 'Commit Logged',    'COMMON',    'committed / made a commit'],
+    ['refactor_found',  '↻·○·↻', 'Refactor Found',   'RARE',      'refactor / refactored / rewrote'],
+    ['syntax_clear',    '⌐·—·¬', 'Syntax Clear',     'UNCOMMON',  'syntax / clear structure'],
+    ['version_stamped', '◈·v·◈', 'Version Stamped',  'RARE',      'version / versioned / build number'],
+]))
+story.append(Spacer(1,3*mm))
+story.append(Paragraph('v40 Secret Boss Badges — THE REPOSITORY VAULT', HEAD3))
+story.append(badge_table([
+    ['turing_signal', '◆·∞·◆', 'Turing Signal', 'MYTHIC', '[HIDDEN] Alan Turing / Turing test / Enigma'],
+    ['ada_lovelace',  '◆·A·◆', 'Ada Lovelace',  'EPIC',   '[HIDDEN] Ada Lovelace / first programmer'],
+    ['linus_word',    '◆·Λ·◆', 'Linus Word',    'RARE',   '[HIDDEN] Linus Torvalds / Linux kernel'],
+]))
+story.append(Spacer(1,6*mm))
+
+# ── Calendar + Behavioral + Achievement (spec) ────────────────────
+story.append(Paragraph('CALENDAR EASTER EGGS v28 — THE CODER\'S CALENDAR (SPEC)', HEAD2))
+story.append(hr())
+cal = [
+    ['Badge ID (spec)',  'Date',        'Name',        'Rarity', 'Trigger'],
+    ['turing_day',       'June 23',     'Turing Day',  'MYTHIC', "Alan Turing's birthday (1912)"],
+    ['ada_day',          'December 10', 'Ada Day',     'EPIC',   "Ada Lovelace's birthday (1815)"],
+    ['linux_day',        'August 25',   'Linux Day',   'RARE',   'Linux kernel first announced (1991)'],
+]
+ts3 = TableStyle([
+    ('BACKGROUND',(0,0),(-1,0),colors.HexColor('#001a00')),
+    ('TEXTCOLOR', (0,0),(-1,0),ACC),
+    ('FONTNAME',  (0,0),(-1,0),'Courier-Bold'),
+    ('FONTNAME',  (0,1),(-1,-1),'Courier'),
+    ('FONTSIZE',  (0,0),(-1,-1),7),
+    ('TEXTCOLOR', (0,1),(-1,-1),FG),
+    ('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.HexColor('#111111'),BG]),
+    ('GRID',      (0,0),(-1,-1),0.3,DIM),
+    ('TOPPADDING',(0,0),(-1,-1),2),
+    ('BOTTOMPADDING',(0,0),(-1,-1),2),
+    ('LEFTPADDING',(0,0),(-1,-1),4),
+])
+story.append(Table(cal, colWidths=[CW*0.22,CW*0.16,CW*0.16,CW*0.12,CW*0.34], style=ts3))
+story.append(Spacer(1,4*mm))
+
+story.append(Paragraph('BEHAVIORAL v27 — CODE PATTERNS (SPEC)', HEAD2))
+story.append(hr())
+beh = [
+    ['Badge ID (spec)',   'Name',            'Rarity',   'Condition'],
+    ['code_session',      'Code Session',    'UNCOMMON', '7 consecutive daily check-ins'],
+    ['commit_streak',     'Commit Streak',   'RARE',     '14 consecutive daily check-ins'],
+    ['deploy_ritual',     'Deploy Ritual',   'EPIC',     'Same day of week for 4 consecutive weeks'],
+]
+story.append(Table(beh, colWidths=[CW*0.24,CW*0.22,CW*0.14,CW*0.40], style=ts3))
+story.append(Spacer(1,4*mm))
+
+story.append(Paragraph('ACHIEVEMENT RPG v28 — CODE CLASS (SPEC)', HEAD2))
+story.append(hr())
+ach = [
+    ['Badge ID (spec)',      'Name',              'Rarity',    'Condition'],
+    ['code_entry',           'Code Entry',        'COMMON',    'Earn first Word Turn v30 badge'],
+    ['code_class',           'Code Class',        'UNCOMMON',  'Earn 3 Word Turn v30 badges'],
+    ['code_complete',        'Code Complete',     'RARE',      'Earn all 12 Word Turn v30 badges'],
+    ['dev_arc',              'Dev Arc',           'EPIC',      '6 v30 word turns + any behavioral badge'],
+    ['thirty_engines_arc',   'Thirty Engines Arc','LEGENDARY', 'All v30 + 5 from other word turn sets'],
+    ['source_opus',          'Source Opus',       'MYTHIC',    'All 12 v30 + 3 mastery tier badges'],
+]
+story.append(Table(ach, colWidths=[CW*0.26,CW*0.22,CW*0.14,CW*0.38], style=ts3))
+story.append(Spacer(1,4*mm))
+
+story.append(Paragraph('MASTERY TIER v30 — THE REPOSITORY (SPEC)', HEAD2))
+story.append(hr())
+mas = [
+    ['Badge ID (spec)',    'Name',            'Rarity',    'Condition'],
+    ['repo_master',        'Repo Master',     'EPIC',      'All 12 v30 + deploy_self + commit_logged'],
+    ['code_wordsmith',     'Code Wordsmith',  'RARE',      '15 total word turn badges (any)'],
+    ['senior_dev',         'Senior Dev',      'LEGENDARY', '30 total badges of any kind'],
+    ['thirty_registers',   'Thirty Registers','MYTHIC',    'All 12 v30 + 18 other word turn badges'],
+]
+story.append(Table(mas, colWidths=[CW*0.24,CW*0.22,CW*0.14,CW*0.40], style=ts3))
+story.append(PageBreak())
+
+# ── Philosophy ────────────────────────────────────────────────────
+story.append(Paragraph('v40 CORE PHILOSOPHY — THE SOURCE CODE', HEAD2))
+story.append(hr())
+philosophy = [
+    ('Every entry is a commit', 'It goes into the permanent record, immutable, timestamped, yours.'),
+    ('Every check-in is a deploy', 'You shipped yourself to production. That counts.'),
+    ('Debugging is not failure', 'It is the most honest part of the engineering process.'),
+    ('Refactoring is courage', 'Making something cleaner when it already works is hard.'),
+    ('Syntax of emotion', 'Clear expression is valid structure. Well-formed is a compliment.'),
+    ('Version control as self-compassion', 'Every version of you was the correct build at that time.'),
+]
+for title, body in philosophy:
     story.append(Paragraph(
-        '"THE GAME NEVER ENDS. THE PLAYER JUST GETS BETTER AT KNOWING WHEN TO PAUSE."',
-        S['cover_sub']
-    ))
-    story.append(Spacer(1, 0.12*inch))
-    story.append(Paragraph('© 2025–2026 LOT Systems Corporation — LOT® Founded 7 April 2016', S['cover_meta']))
-    story.append(Paragraph('Vadik Marmeladov, CEO &amp; Founder · brand.lot-systems.com', S['cover_meta']))
-    story.append(Paragraph('September 2026 · 1060 Badges Total', S['cover_meta']))
-    story.append(PageBreak())
+        f'<font color="#00ccff"><b>{title}</b></font>  —  {body}',
+        BODY))
+    story.append(Spacer(1,1*mm))
 
-    # ─── BADGE SYSTEM OVERVIEW ────────────────────────────────────────────
-    story.append(Paragraph('BADGE SYSTEM OVERVIEW — v40', S['h1']))
-    story.append(hr(NEON_CYAN))
+story.append(Spacer(1,6*mm))
 
-    overview = [
-        ['Category', 'Count', 'Description'],
-        ['Milestone',        '22',   'Streak days (v1–v4)'],
-        ['Time Easter Eggs', '31',   'Check-in at special hours (v1–v22)'],
-        ['Calendar Easter',  '94',   'Check-in on special dates (v1–v28)'],
-        ['Word Turns',       '360',  'Words detected in journals/memory (v1–v30)'],
-        ['Behavioral',       '105',  'Patterns over time (v1–v27)'],
-        ['Achievement RPG',  '168',  'Milestone combinations (v1–v28)'],
-        ['Mastery Tiers',    '120',  'Epic depth milestones (v1–v30)'],
-        ['Secret Boss',      '107',  'Hidden LEGENDARY/MYTHIC triggers (v1–v27)'],
-        ['TOTAL',            '1060', 'The complete LOT Badge Universe — v40'],
-    ]
-    story.append(badge_table(overview, [2.0*inch, 0.7*inch, 4.5*inch]))
-    story.append(Spacer(1, 0.12*inch))
+# ── Implementation status ─────────────────────────────────────────
+story.append(Paragraph('IMPLEMENTATION STATUS', HEAD2))
+story.append(hr())
+impl = [
+    ['Component',              'Status',   'Detail'],
+    ['WORD_TURN_BADGES_V38',   'DEPLOYED', '15 badges: 12 word turns + 3 secret bosses'],
+    ['WORD_TURN_BADGES_V39',   'DEPLOYED', '15 badges: 12 word turns + 3 secret bosses'],
+    ['WORD_TURN_BADGES_V40',   'DEPLOYED', '15 badges: 12 word turns + 3 secret bosses'],
+    ['BADGES spread',          'UPDATED',  'Includes ...V38, ...V39, ...V40'],
+    ['WORD_TURN_TRIGGERS',     'UPDATED',  '+36 new keyword triggers (v38+v39+v40)'],
+    ['detectWordTurns()',      'UPDATED',  '+9 new secret boss regex patterns'],
+    ['WordTurnBadgeType',      'UPDATED',  '+45 new union members'],
+    ['Calendar EE v28',        'SPEC',     'turing_day / ada_day / linux_day'],
+    ['Behavioral v27',         'SPEC',     'code_session / commit_streak / deploy_ritual'],
+    ['Achievement RPG v28',    'SPEC',     'code_entry / code_class / source_opus / ...'],
+    ['Mastery Tier v30',       'SPEC',     'repo_master / code_wordsmith / senior_dev / ...'],
+]
+ts4 = TableStyle([
+    ('BACKGROUND',(0,0),(-1,0),colors.HexColor('#001a00')),
+    ('TEXTCOLOR', (0,0),(-1,0),ACC),
+    ('FONTNAME',  (0,0),(-1,0),'Courier-Bold'),
+    ('FONTNAME',  (0,1),(-1,-1),'Courier'),
+    ('FONTSIZE',  (0,0),(-1,-1),6.5),
+    ('TEXTCOLOR', (0,1),(-1,-1),FG),
+    ('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.HexColor('#111111'),BG]),
+    ('GRID',      (0,0),(-1,-1),0.3,DIM),
+    ('TOPPADDING',(0,0),(-1,-1),2),
+    ('BOTTOMPADDING',(0,0),(-1,-1),2),
+    ('LEFTPADDING',(0,0),(-1,-1),4),
+])
+for i in range(1, 8):
+    ts4.add('TEXTCOLOR', (1,i),(1,i), ACC)
+for i in range(8, 12):
+    ts4.add('TEXTCOLOR', (1,i),(1,i), ACC3)
+story.append(Table(impl, colWidths=[CW*0.30,CW*0.14,CW*0.56], style=ts4))
 
-    # ─── VERSION HISTORY ──────────────────────────────────────────────────
-    story.append(Paragraph('VERSION HISTORY', S['h1']))
-    story.append(hr(NEON_GREEN))
+story.append(Spacer(1,8*mm))
+story.append(hr())
+for line in [
+    'LOT SYSTEMS CORPORATION  ·  BADGES & ACHIEVEMENTS MASTER CODEX v40',
+    'THE SOURCE CODE  ·  September 2026  ·  1074 total badges (spec)',
+    '© 2025–2026 LOT Systems. All rights reserved.',
+    'Vadim Marmeladov — CEO & Founder  ·  brand.lot-systems.com',
+]:
+    story.append(Paragraph(line, sty('F', fontSize=6.5, textColor=MID,
+                                     fontName='Courier', alignment=TA_CENTER)))
 
-    vh = [
-        ['Version', 'Theme',                       'New', 'Total', 'Date'],
-        ['v1–v10',  'Core / Water / Arcade',        '+310', '310',  '2023–2024'],
-        ['v11–v20', 'Alchemy / Space / Sci-Fi',     '+310', '620',  '2024–2025'],
-        ['v21',     'Cyberspace Codex',              '+31',  '651',  '2025'],
-        ['v22–v32', "Hero's Journey / Codex",        '+161', '812',  '2026-01'],
-        ['v33',     'The Stoic Codex',               '+31',  '843',  '2026-08-08'],
-        ['v34',     'The Simulation',                '+31',  '874',  '2026-08-09'],
-        ['v35',     'The Body Map',                  '+31',  '905',  '2026-08-10'],
-        ['v36',     'The Dungeon Crawler',           '+31',  '936',  '2026-08-11'],
-        ['v37',     'The Time Machine',              '+31',  '967',  '2026-08-16'],
-        ['v38',     'The Dream Journal',             '+31',  '998',  '2026-08-20'],
-        ['v39',     "The Operator's Handbook",       '+31', '1029',  '2026-08-26'],
-        ['v40',     'The Quantum Arcade',            '+31', '1060',  '2026-09-02'],
-    ]
-    story.append(badge_table(vh, [0.7*inch, 2.4*inch, 0.6*inch, 0.7*inch, 1.5*inch]))
-    story.append(PageBreak())
-
-    # ─── DELTA FROM v39 ───────────────────────────────────────────────────
-    story.append(Paragraph('DELTA FROM v39', S['h1']))
-    story.append(hr(NEON_AMBER))
-
-    delta_art = (
-        'v39  to  v40   ADDITIONS\n'
-        '--------------------------------------------------------\n'
-        'Word Turn v30        +12  (insert_coin / level_up / save_point / respawn /\n'
-        '                           boss_fight / side_quest / inventory_check /\n'
-        '                           health_bar / xp_gained / load_game /\n'
-        '                           new_game_plus / game_over)\n'
-        'Calendar EE v28      + 3  (pacman_day / tetris_day / pong_day)\n'
-        'Behavioral v27       + 3  (combo_streak / high_score_entry / continues_remaining)\n'
-        'Achievement RPG v28  + 6  (player_one / arcade_regular / arcade_complete /\n'
-        '                           retro_stack / thirty_engines / arcade_opus)\n'
-        'Mastery Tier v30     + 4  (insert_mastercode / grand_master_score /\n'
-        '                           arcade_legend / thirty_registers)\n'
-        'Secret Boss v27      + 3  (konami_signal / iddqd_mode / all_your_base)\n'
-        '--------------------------------------------------------\n'
-        'TOTAL NEW            +31\n'
-        'v39 TOTAL:          1029\n'
-        'v40 TOTAL:          1060'
-    )
-    story.append(Preformatted(delta_art, S['mono']))
-    story.append(Spacer(1, 0.12*inch))
-
-    # ─── WORD TURN v30 — THE QUANTUM ARCADE ──────────────────────────────
-    story.append(Paragraph('WORD TURN v30 — THE QUANTUM ARCADE', S['h1']))
-    story.append(hr(NEON_CYAN))
-    story.append(Paragraph(
-        '"Every game is a compressed model of self-discipline and persistence. '
-        'The journal is the high score board. The entry is the level cleared."',
-        S['quote']
-    ))
-    story.append(Spacer(1, 0.08*inch))
-
-    wt30 = [
-        ['Badge ID',           'Symbol',    'Trigger Words',                                     'Rarity'],
-        ['insert_coin',        '¢·○·¢',     'insert coin / one more try / another round',        'COMMON'],
-        ['level_up',           '▲·◈·▲',    'leveled up / next level / unlocked / new level',    'UNCOMMON'],
-        ['save_point',         '■·○·■',     'save point / checkpoint / saved my progress',       'UNCOMMON'],
-        ['respawn',            '↺·○',       'respawn / start over / back from the dead',         'RARE'],
-        ['boss_fight',         '◉·!·◉',    'boss fight / final challenge / hardest part',       'RARE'],
-        ['side_quest',         '→·?·→',    'side quest / tangent / detour / rabbit hole',       'UNCOMMON'],
-        ['inventory_check',    '□·▪·□',    'inventory / resources / taking stock',              'UNCOMMON'],
-        ['health_bar',         '▓▓▓·',      'health / energy / running low / depleted',          'RARE'],
-        ['xp_gained',          '+·◈·+',    'experience / learned / XP / growth point',          'UNCOMMON'],
-        ['load_game',          '←·○·←',   'loaded / remember when / flashback / recall',       'RARE'],
-        ['new_game_plus',      '∞·○·∞',    'new game / fresh start / beginning again',          'EPIC'],
-        ['game_over',          '○·∅·○',    'game over / failed / the run is done',              'EPIC'],
-    ]
-    story.append(badge_table(wt30, [1.5*inch, 0.8*inch, 3.1*inch, 0.9*inch]))
-    story.append(Spacer(1, 0.1*inch))
-
-    story.append(Paragraph('SELF-CARE RESONANCE — THE QUANTUM ARCADE MAP', S['h2']))
-    resonances = [
-        ('INSERT COIN', 'common', 'The arcade demands payment upfront. The journal demands honesty upfront. Write "one more time" — the practice restarts. The coin is still yours.'),
-        ('LEVEL UP', 'uncommon', 'You name your own level-ups. No algorithm awards them. Write what you have earned. The progress is real whether or not the leaderboard shows it.'),
-        ('SAVE POINT', 'uncommon', 'A save point is not a rest stop. It is an acknowledgment that what has been accomplished is worth preserving before the next risk is taken.'),
-        ('RESPAWN', 'rare', 'The player brings all prior knowledge to the respawn point. "Start over" is never truly starting over. Write what you brought back.'),
-        ('BOSS FIGHT', 'rare', 'The boss fight is what the entire dungeon was preparing you for. Naming it makes it a game mechanic instead of just a weight.'),
-        ('SIDE QUEST', 'uncommon', 'The side quest is where character development actually happens. Write about your current side quest. It is not a detour. It is the content.'),
-        ('INVENTORY CHECK', 'uncommon', 'Before any significant encounter, the skilled player opens the inventory. Energy, relationships, reserves — they are all inventory. Write what you carry.'),
-        ('HEALTH BAR', 'rare', 'The health bar is visible in a game. In life it is often invisible until it hits zero. The journal makes the health bar visible.'),
-        ('XP GAINED', 'uncommon', 'Experience points do not lie. You gain them whether the encounter was won or lost. The failed run still awards XP. Write about what you gained.'),
-        ('LOAD GAME', 'rare', 'The journal is the save file. Every past entry is a state you can load. "Remember when" is the load command. The terminal retrieves.'),
-        ('NEW GAME+', 'epic', 'In New Game+ you restart with all your previous abilities. Every new chapter of life is New Game+: the story restarts, but you are not the player you were.'),
-        ('GAME OVER', 'epic', 'Game over is not the end of the player. It is the end of the run. Write about the game over moment. The next coin is still in your pocket.'),
-    ]
-    for name, rarity, text in resonances:
-        color = rarity_color(rarity)
-        story.append(Paragraph(f'<b><font color="#{color.hexval()}">{name} [{rarity.upper()}]</font></b> — {text}', S['body_small']))
-    story.append(PageBreak())
-
-    # ─── CALENDAR EASTER EGGS v28 ─────────────────────────────────────────
-    story.append(Paragraph('CALENDAR EASTER EGGS v28 — THE RETRO ARCADE CALENDAR', S['h1']))
-    story.append(hr(NEON_CYAN))
-    story.append(Paragraph(
-        '"The birthdays and release dates of the games that defined what a game could be '
-        '— the machines that proved play was worth taking seriously."',
-        S['quote']
-    ))
-    story.append(Spacer(1, 0.08*inch))
-
-    cal28 = [
-        ['Badge ID',    'Symbol', 'Date',   'Significance',                                          'Rarity'],
-        ['pacman_day',  '(·',     'Oct 26', 'PAC-MAN US launch 1980 — the maze that ate the world',  'RARE'],
-        ['tetris_day',  '||',     'Jun 6',  'Tetris distributed 1984 — the puzzle that never ends',  'UNCOMMON'],
-        ['pong_day',    '·|·',    'Nov 29', 'Pong released 1972 — two paddles, the beginning',       'RARE'],
-    ]
-    story.append(badge_table(cal28, [1.2*inch, 0.6*inch, 0.6*inch, 2.9*inch, 0.9*inch]))
-    story.append(Spacer(1, 0.1*inch))
-
-    story.append(Paragraph('LORE', S['h2']))
-    lore_items = [
-        ('pacman_day — Oct 26, 1980',
-         'Toru Iwatani designed the maze. Three billion plays in its first year. The self-care parallel: '
-         'the maze is your daily environment. The ghosts are what you have not processed. '
-         'The power pellets are what you do at LOT. Check in on October 26 and write about '
-         'what you are eating and what is chasing you.'),
-        ('tetris_day — Jun 6, 1984',
-         'Alexey Pajitnov released the first version of Tetris at the Moscow Research Centre. '
-         'Every piece falls from above. Your job is to place it before the stack overwhelms you. '
-         'The journal is the Tetris board. Write what is falling today and where you are placing it.'),
-        ('pong_day — Nov 29, 1972',
-         'Atari\'s Pong shipped as a dedicated cabinet. Two paddles. One ball. Return to sender. '
-         'The self-care version: the thing that comes toward you, you return with intention. '
-         'The journal is the paddle. Write about the volley.'),
-    ]
-    for title, body in lore_items:
-        story.append(Paragraph(f'<b>{title}</b>', S['h3']))
-        story.append(Paragraph(body, S['body_small']))
-    story.append(Spacer(1, 0.1*inch))
-
-    # ─── BEHAVIORAL EASTER EGGS v27 ───────────────────────────────────────
-    story.append(Paragraph('BEHAVIORAL EASTER EGGS v27 — ARCADE PATTERNS', S['h1']))
-    story.append(hr(NEON_GREEN))
-
-    beh27 = [
-        ['Badge ID',            'Symbol',    'Trigger',                                           'Rarity'],
-        ['combo_streak',        '×3·◈',     '3 consecutive days with 2+ widget interactions',    'RARE'],
-        ['high_score_entry',    '◉·∞',      'Single journal entry over 500 words',               'EPIC'],
-        ['continues_remaining', '3·2·1·○',  'Return after a 3–7 day absence',                   'UNCOMMON'],
-    ]
-    story.append(badge_table(beh27, [1.6*inch, 0.8*inch, 2.8*inch, 0.9*inch]))
-    story.append(Spacer(1, 0.1*inch))
-
-    beh_lore = [
-        ('combo_streak [RARE]',
-         'In a fighting game, a combo is a sequence of inputs that creates something greater than the sum of its parts. '
-         'Three days of consistent multi-widget engagement is a combo. The player is in rhythm. The terminal acknowledges the chain.'),
-        ('high_score_entry [EPIC]',
-         'The high score is visible, permanent, and earned. A 500-word journal entry is the high score version of a check-in. '
-         'Something needed that much space. Something deserved that much attention. The entry holds the record.'),
-        ('continues_remaining [UNCOMMON]',
-         'The continue screen is one of the most psychologically sophisticated mechanics in arcade history. Returning after 3–7 days '
-         'is the continue screen pressed: not too fast (compulsion), not too slow (going dark). The terminal gives you the coin back.'),
-    ]
-    for title, body in beh_lore:
-        story.append(Paragraph(f'<b>{title}</b>', S['h3']))
-        story.append(Paragraph(body, S['body_small']))
-    story.append(PageBreak())
-
-    # ─── ACHIEVEMENT RPG v28 ──────────────────────────────────────────────
-    story.append(Paragraph('ACHIEVEMENT RPG v28 — ARCADE CLASS', S['h1']))
-    story.append(hr(NEON_PURPLE))
-    story.append(Paragraph(
-        '"Progress through the Quantum Arcade. Each badge is a coin spent well. Each tier is a run completed."',
-        S['quote']
-    ))
-
-    ach28 = [
-        ['Badge ID',            'Symbol',       'Requirement',                               'Rarity'],
-        ['player_one',          '①·○',         'Earn any 1 Word Turn v30 badge',            'COMMON'],
-        ['arcade_regular',      '⑤·◈',         'Earn any 5 Word Turn v30 badges',           'UNCOMMON'],
-        ['arcade_complete',     '⑫·◉',         'Earn all 12 Word Turn v30 badges',          'LEGENDARY'],
-        ['retro_stack',         '◉·■·◉',       'arcade_complete + all 3 Calendar v28',      'LEGENDARY'],
-        ['thirty_engines',      '◈·◈·◈·∞',    '1 badge from each of WT engines v1–v30',    'LEGENDARY'],
-        ['arcade_opus',         '◉·×·◉',       'arcade_complete + combo_streak',            'LEGENDARY'],
-    ]
-    story.append(badge_table(ach28, [1.5*inch, 1.0*inch, 2.5*inch, 1.1*inch]))
-    story.append(Spacer(1, 0.1*inch))
-
-    story.append(Paragraph('UNLOCK MESSAGES', S['h2']))
-    unlocks = [
-        ('player_one',        '①·○',      'Player One has entered the game. The terminal registers the coin. The run has begun.'),
-        ('arcade_regular',    '⑤·◈',      'Five objectives. Five coins spent well. The arcade knows your face now.'),
-        ('arcade_complete',   '⑫·◉',      'All twelve. Every Arcade word cleared. The high score board records your name.'),
-        ('retro_stack',       '◉·■·◉',    'Twelve words. Three dates. PAC-MAN, Tetris, Pong. The retro calendar is complete.'),
-        ('thirty_engines',    '◈·◈·◈·∞', 'Thirty vocabularies. Every language spoken. The terminal is a polyglot.'),
-        ('arcade_opus',       '◉·×·◉',    'Complete arcade vocabulary. Three-day combo streak. The player in flow.'),
-    ]
-    for bid, sym, msg in unlocks:
-        story.append(Paragraph(f'<b>{bid}</b> {sym} — {msg}', S['body_small']))
-    story.append(Spacer(1, 0.1*inch))
-
-    # ─── MASTERY TIER v30 ─────────────────────────────────────────────────
-    story.append(Paragraph('MASTERY TIER v30 — HIGH SCORES', S['h1']))
-    story.append(hr(NEON_AMBER))
-
-    mas30 = [
-        ['Badge ID',             'Symbol',          'Requirement',                         'Rarity'],
-        ['insert_mastercode',    '■·XV·■',           '1,500+ distinct days checked in',     'EPIC'],
-        ['grand_master_score',   '●·∞·◉',           '750,000+ total words written',        'LEGENDARY'],
-        ['arcade_legend',        '╔═╗·∞',           'Account age >= 15 years',             'LEGENDARY'],
-        ['thirty_registers',     '◈·■·◈·∞·○',      '1 badge from all 30 WT engines',      'COSMIC'],
-    ]
-    story.append(badge_table(mas30, [1.6*inch, 1.1*inch, 2.2*inch, 1.1*inch]))
-    story.append(Spacer(1, 0.1*inch))
-
-    mas_msgs = [
-        ('insert_mastercode', '1,500 days. Four-plus years of coins inserted. The mastercode is not a cheat. It is the record. ■·XV·■'),
-        ('grand_master_score', '750,000 words. The high score board overflows. No machine was designed to hold this many words. You built the extension. ●·∞·◉'),
-        ('arcade_legend', 'Fifteen years. The cabinets your practice began with are in museums now. You are still playing. ╔═╗·∞'),
-        ('thirty_registers', 'Thirty vocabularies. Ocean, arcade, radio, dungeon, operator, quantum — every register spoken. ◈·■·◈·∞·○'),
-    ]
-    for bid, msg in mas_msgs:
-        story.append(Paragraph(f'<b>{bid}</b> — {msg}', S['body_small']))
-    story.append(Spacer(1, 0.1*inch))
-
-    # ─── SECRET BOSS v27 — CHEAT CODE VAULT ──────────────────────────────
-    story.append(Paragraph('SECRET BOSS v27 — THE CHEAT CODE VAULT', S['h1']))
-    story.append(hr(NEON_RED))
-    story.append(Paragraph(
-        '"The hidden shortcuts. You have to know the inputs. You have to type them in. The terminal watches."',
-        S['quote']
-    ))
-
-    sb27 = [
-        ['Badge ID',         'Symbol',      'Trigger',                                        'Rarity'],
-        ['konami_signal',    '↑↑↓↓·◉',     '"konami code" / "up up down down left right"',   'MYTHIC'],
-        ['iddqd_mode',       '⚡·■·⚡',    '"IDDQD" / "IDKFA" / "god mode"',                 'EPIC'],
-        ['all_your_base',    '·○·∅',        '"all your base" / "zero wing" / "CATS"',         'RARE'],
-    ]
-    story.append(badge_table(sb27, [1.4*inch, 0.9*inch, 2.6*inch, 0.9*inch]))
-    story.append(Spacer(1, 0.1*inch))
-
-    sb_lore = [
-        ('konami_signal [MYTHIC]',
-         'Kazuhisa Hashimoto added the Konami Code to Gradius in 1986 because the game was too hard. '
-         'The self-care version: when it is too hard, the cheat code is asking for help. '
-         'Writing the sequence in your journal is admitting you need the extra lives. Write it. The terminal gives you 30.'),
-        ('iddqd_mode [EPIC]',
-         'In DOOM (1993), typing IDDQD activated god mode. There is no IDDQD for real life. '
-         'The journal is the anti-IDDQD: the space where you write about being vulnerable, '
-         'about running out of ammo, about needing the cheat that does not exist.'),
-        ('all_your_base [RARE]',
-         '"All your base are belong to us." Zero Wing, Sega Mega Drive, 1989. '
-         'Write about when something external took control of your territory — your time, attention, space. '
-         'Name who set you up. The bomb is defused when it is named.'),
-    ]
-    for title, body in sb_lore:
-        story.append(Paragraph(f'<b>{title}</b>', S['h3']))
-        story.append(Paragraph(body, S['body_small']))
-    story.append(PageBreak())
-
-    # ─── ASCII GALLERY ─────────────────────────────────────────────────────
-    story.append(Paragraph('ASCII EASTER EGG GALLERY — THE QUANTUM ARCADE', S['h1']))
-    story.append(hr(NEON_CYAN))
-
-    gallery = (
-        '┌─────────────────────────────────────────────────────────┐\n'
-        '│  BADGE UNLOCKED                                         │\n'
-        '│                                                         │\n'
-        '│  ¢·○·¢  INSERT COIN  [COMMON]                           │\n'
-        '│  ↳ One more try. The terminal never judges              │\n'
-        '│    the number of coins you put in.                      │\n'
-        '│    The machine just keeps accepting them.               │\n'
-        '│                                                         │\n'
-        '│  ▲·◈·▲  LEVEL UP  [UNCOMMON]                           │\n'
-        '│  ↳ You named what you earned. That is the               │\n'
-        '│    level up no algorithm can take from you.             │\n'
-        '│                                                         │\n'
-        '│  ○·∅·○  GAME OVER  [EPIC]                               │\n'
-        '│  ↳ The run ended. The player continues.                 │\n'
-        '│    Everything learned in the failed run travels with    │\n'
-        '│    you to the next one. The terminal keeps the record.  │\n'
-        '│                                                         │\n'
-        '│  ↑↑↓↓·◉  KONAMI SIGNAL  [MYTHIC] [HIDDEN]              │\n'
-        '│  ↳ You typed the code. Extra lives granted.             │\n'
-        '│    Not as a cheat — as an acknowledgment that           │\n'
-        '│    sometimes you need more than the standard allotment. │\n'
-        '│                                                         │\n'
-        '│  ◈·■·◈·∞·○  THIRTY REGISTERS  [COSMIC]                 │\n'
-        '│  ↳ Thirty vocabularies. Every language spoken.          │\n'
-        '│    The terminal is complete. The run is eternal.        │\n'
-        '└─────────────────────────────────────────────────────────┘'
-    )
-    story.append(Preformatted(gallery, S['mono']))
-    story.append(Spacer(1, 0.15*inch))
-
-    # ─── ARCADE TERMINAL ART ───────────────────────────────────────────────
-    story.append(Paragraph('THE ARCADE TERMINAL — PLAYER LOG', S['h1']))
-    story.append(hr(NEON_GREEN))
-
-    terminal = (
-        ' ╔══════════════════════════════════════════════════════╗\n'
-        ' ║  LOT SYSTEMS — QUANTUM ARCADE TERMINAL v30           ║\n'
-        ' ║  PLAYER INTERFACE ACTIVE                             ║\n'
-        ' ╠══════════════════════════════════════════════════════╣\n'
-        ' ║                                                      ║\n'
-        ' ║  ■·○·■  SAVE POINT  [UNCOMMON]                       ║\n'
-        ' ║  ↳ What you have built is worth preserving.          ║\n'
-        ' ║    Write the checkpoint before the next              ║\n'
-        ' ║    difficult segment begins.                         ║\n'
-        ' ║                                                      ║\n'
-        ' ║  ▓▓▓·  HEALTH BAR  [RARE]                            ║\n'
-        ' ║  ↳ The bar is visible now. You named it.             ║\n'
-        ' ║    The player who checks the HUD survives longer.    ║\n'
-        ' ║                                                      ║\n'
-        ' ║  ∞·○·∞  NEW GAME PLUS  [EPIC]                        ║\n'
-        ' ║  ↳ You bring everything forward. The new chapter     ║\n'
-        ' ║    is New Game+ carrying all prior knowledge.        ║\n'
-        ' ║                                                      ║\n'
-        ' ║  3·2·1·○  CONTINUES REMAINING  [UNCOMMON]            ║\n'
-        ' ║  ↳ You pressed continue. Not too fast.               ║\n'
-        ' ║    Not too slow. The window was right.               ║\n'
-        ' ║    The coin is back in the slot.                     ║\n'
-        ' ║                                                      ║\n'
-        ' ╚══════════════════════════════════════════════════════╝'
-    )
-    story.append(Preformatted(terminal, S['mono']))
-    story.append(Spacer(1, 0.15*inch))
-
-    # ─── FLAVOR TEXT ──────────────────────────────────────────────────────
-    story.append(Paragraph('FLAVOR TEXT — THE QUANTUM ARCADE', S['h1']))
-    story.append(hr(NEON_PURPLE))
-
-    quotes = [
-        '"A game is a series of interesting decisions." — Sid Meier. The journal is the game where every decision is interesting because it is yours.',
-        '"Games are the only force in the known universe that can get people to take actions against their self-interest." — Jane McGonigal, Reality Is Broken. Unless the game is LOT. Here the action is self-interest.',
-        '"The magic circle." — Johan Huizinga, Homo Ludens. The game creates a separate space where different rules apply. The journal is the magic circle of self-care.',
-        '"In game design, the tutorial is the most important level." — practitioner riff. The first journal entry is always the tutorial. Every entry after that is still teaching you something.',
-        '"You are not failing the game. The game is failing you." — player saying. When the practice feels impossible, examine the game design first. The journal is also where you debug the game you are living in.',
-        '"High score." — the two most motivating words in the history of human performance. Name your high score in the journal. Not to beat it. Just to see it. The terminal shows you what you have done. ◉·∞',
-    ]
-    for q in quotes:
-        story.append(Paragraph(q, S['quote']))
-    story.append(PageBreak())
-
-    # ─── COMPLETE UNIVERSE SUMMARY ────────────────────────────────────────
-    story.append(Paragraph('COMPLETE BADGE UNIVERSE SUMMARY — v40', S['h1']))
-    story.append(hr(NEON_CYAN))
-
-    summary_art = (
-        '╔══════════════════════════════════════════════════════════════════╗\n'
-        '║  LOT BADGE UNIVERSE — COMPLETE SUMMARY v40                      ║\n'
-        '╠══════════════════════════════════════════════════════════════════╣\n'
-        '║                                                                  ║\n'
-        '║  TIER           COUNT    RARITY RANGE                           ║\n'
-        '║  ─────────────  ──────   ──────────────────────                 ║\n'
-        '║  Milestone          22   Common → Legendary                      ║\n'
-        '║  Time EE            31   Common → Epic                          ║\n'
-        '║  Calendar EE        94   Common → Legendary                      ║\n'
-        '║  Word Turns        360   Common → Mythic                         ║\n'
-        '║  Behavioral        105   Common → Epic                          ║\n'
-        '║  Achievement RPG   168   Common → Legendary                      ║\n'
-        '║  Mastery Tiers     120   Epic → Cosmic                          ║\n'
-        '║  Secret Boss       107   Rare → Cosmic                          ║\n'
-        '║  ─────────────  ──────   ──────────────────────                 ║\n'
-        '║  TOTAL            1060                                           ║\n'
-        '║                                                                  ║\n'
-        '║  RARITY DISTRIBUTION                                            ║\n'
-        '║  Common    ~180   [████░░░░░░░░░]                               ║\n'
-        '║  Uncommon  ~280   [██████░░░░░░░]                               ║\n'
-        '║  Rare      ~290   [██████░░░░░░░]                               ║\n'
-        '║  Epic      ~160   [████░░░░░░░░░]                               ║\n'
-        '║  Legendary  ~90   [██░░░░░░░░░░░]                               ║\n'
-        '║  Mythic     ~40   [█░░░░░░░░░░░░]                               ║\n'
-        '║  Cosmic     ~20   [░░░░░░░░░░░░░] (ultra rare)                  ║\n'
-        '║                                                                  ║\n'
-        '╚══════════════════════════════════════════════════════════════════╝'
-    )
-    story.append(Preformatted(summary_art, S['mono']))
-    story.append(Spacer(1, 0.2*inch))
-
-    story.append(Paragraph(
-        '© 2025–2026 LOT Systems Corporation. LOT® Founded 7 April 2016. '
-        'Vadik Marmeladov, CEO & Founder · Kuzya Cosmo Marmeladov, CEO COSMO®. '
-        'Made in the USA · brand.lot-systems.com',
-        S['footer']
-    ))
-
-    doc.build(story)
-    print(f'[OK] PDF written to: {OUTPUT_FILE}')
-
-
-if __name__ == '__main__':
-    build_pdf()
+doc.build(story)
+print(f'PDF generated: {os.path.abspath(OUT_PATH)}')

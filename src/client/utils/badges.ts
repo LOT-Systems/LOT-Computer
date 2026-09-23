@@ -188,6 +188,57 @@ export type WordTurnBadgeType =
   | 'wellsian_engine'      // H.G. Wells / The Time Machine / time traveller / morlocks (MYTHIC)
   | 'tardis_detected'      // tardis / doctor who / wibbly wobbly / allons-y / geronimo (EPIC)
   | 'delorean_protocol'    // back to the future / delorean / doc brown / flux capacitor (RARE)
+  // v38 — The Dream Journal
+  | 'lucid_dreamer'       // lucid dreamer / conscious in the dream (RARE)
+  | 'dream_recall'        // dream recall / remembered my dream (COMMON)
+  | 'nightmare_named'     // nightmare / named the nightmare / faced it (EPIC)
+  | 'sleep_temple'        // sleep ritual / sleep hygiene / sleep temple (UNCOMMON)
+  | 'hypnagogic_state'    // hypnagogic state / threshold of sleep (RARE)
+  | 'symbol_decoded'      // symbol decoded / dream symbol interpreted (UNCOMMON)
+  | 'shadow_dream'        // shadow dream / dark figure / shadow self in dream (RARE)
+  | 'recurring_pattern'   // recurring dream / cycles / keeps coming back (EPIC)
+  | 'waking_vision'       // waking vision / half-awake image (UNCOMMON)
+  | 'oneiric_map'         // oneiric map / dream map / mapped the dream (RARE)
+  | 'the_threshold'       // the threshold / at the threshold / crossing over (RARE)
+  | 'dream_logged'        // dream logged / wrote the dream / dream entry (COMMON)
+  // v38 — Secret Boss: The Dream Vault
+  | 'jung_signal'         // Carl Jung / collective unconscious / Jungian (MYTHIC)
+  | 'freud_couch'         // Freud / psychoanalysis / the couch (EPIC)
+  | 'morpheus_word'       // Morpheus / god of dreams / Sandman (RARE)
+  // v39 — The Operator's Handbook
+  | 'deep_cover'          // deep cover / undercover / cover identity (RARE)
+  | 'field_report'        // field report / sitrep / status update (COMMON)
+  | 'assets_secured'      // assets secured / protected the assets (UNCOMMON)
+  | 'blown_cover'         // cover blown / exposed / compromised (EPIC)
+  | 'exfil_route'         // exfil / extraction / exit route (UNCOMMON)
+  | 'handler_brief'       // handler / briefing / intel received (UNCOMMON)
+  | 'need_to_know'        // need to know / classified / compartmentalized (RARE)
+  | 'dead_drop'           // dead drop / left a message / passed along (UNCOMMON)
+  | 'clean_slate'         // clean slate / wiped clean / fresh chapter (COMMON)
+  | 'burn_notice'         // burn notice / disavowed / burned (RARE)
+  | 'ghost_protocol'      // ghost protocol / off the grid / no trace (EPIC)
+  | 'mission_complete'    // mission complete / objective achieved (UNCOMMON)
+  // v39 — Secret Boss: The Black Ops Vault
+  | 'fleming_signal'      // Ian Fleming / James Bond / 007 (MYTHIC)
+  | 'le_carre_word'       // John le Carré / George Smiley / cold war (EPIC)
+  | 'eyes_only'           // for your eyes only / top secret (RARE)
+  // v40 — The Source Code
+  | 'debug_mode'          // debug / debugging / hunting the bug (RARE)
+  | 'compile_self'        // compile / building / assembling (UNCOMMON)
+  | 'stack_trace'         // stack trace / traceback / following the thread (EPIC)
+  | 'runtime_check'       // runtime / running / executing (COMMON)
+  | 'fork_path'           // fork / forked / diverged / branch point (UNCOMMON)
+  | 'merge_complete'      // merge / merged / bringing together (RARE)
+  | 'patch_applied'       // patch / patched / fix applied / hotfix (COMMON)
+  | 'deploy_self'         // deploy / deployed / shipped / released (LEGENDARY)
+  | 'commit_logged'       // commit / committed / version logged (COMMON)
+  | 'refactor_found'      // refactor / refactored / rewrote it (RARE)
+  | 'syntax_clear'        // syntax / clear / well-formed structure (UNCOMMON)
+  | 'version_stamped'     // version / versioned / build / tagged release (RARE)
+  // v40 — Secret Boss: The Repository Vault
+  | 'turing_signal'       // Alan Turing / Turing test / computability (MYTHIC)
+  | 'ada_lovelace'        // Ada Lovelace / first programmer / first algorithm (EPIC)
+  | 'linus_word'          // Linus Torvalds / Linux / open source / git (RARE)
 
 export type BadgeType =
   | MilestoneBadgeType
@@ -1770,6 +1821,396 @@ export const WORD_TURN_BADGES_V37: Record<
   },
 }
 
+// ─── WORD TURN BADGES v38 — THE DREAM JOURNAL ───────────────────
+export const WORD_TURN_BADGES_V38: Record<
+  'lucid_dreamer' | 'dream_recall' | 'nightmare_named' | 'sleep_temple' |
+  'hypnagogic_state' | 'symbol_decoded' | 'shadow_dream' | 'recurring_pattern' |
+  'waking_vision' | 'oneiric_map' | 'the_threshold' | 'dream_logged' |
+  'jung_signal' | 'freud_couch' | 'morpheus_word',
+  Badge
+> = {
+  lucid_dreamer: {
+    id: 'lucid_dreamer', waterSymbol: '◐·◐', architectureSymbol: '◐·◐',
+    waterName: 'Lucid Dreamer', architectureName: 'Lucid Dreamer',
+    description: 'Aware inside the dream — the most powerful position in the unconscious mind',
+    waterUnlockMessage: '↳ Lucid state confirmed. The dream knows you know. ◐·◐',
+    architectureUnlockMessage: '↳ Lucid state confirmed. The dream knows you know. ◐·◐',
+    rarity: 'rare', category: 'word_turn',
+  },
+  dream_recall: {
+    id: 'dream_recall', waterSymbol: '○·~·○', architectureSymbol: '○·~·○',
+    waterName: 'Dream Recall', architectureName: 'Dream Recall',
+    description: 'The memory that returns each morning — catching the dream before it dissolves',
+    waterUnlockMessage: '↳ Dream recall active. Write it now before the signal fades. ○·~·○',
+    architectureUnlockMessage: '↳ Dream recall active. Write it now before the signal fades. ○·~·○',
+    rarity: 'common', category: 'word_turn',
+  },
+  nightmare_named: {
+    id: 'nightmare_named', waterSymbol: '×·◉·×', architectureSymbol: '×·◉·×',
+    waterName: 'Nightmare Named', architectureName: 'Nightmare Named',
+    description: 'Named and therefore changed — the nightmare shrinks when the dreamer turns to face it',
+    waterUnlockMessage: '↳ Nightmare named. The naming is the first act of power. ×·◉·×',
+    architectureUnlockMessage: '↳ Nightmare named. The naming is the first act of power. ×·◉·×',
+    rarity: 'epic', category: 'word_turn',
+  },
+  sleep_temple: {
+    id: 'sleep_temple', waterSymbol: '≋·Δ·≋', architectureSymbol: '≋·Δ·≋',
+    waterName: 'Sleep Temple', architectureName: 'Sleep Temple',
+    description: 'The ritual of rest — sleep is the oldest technology for processing the impossible',
+    waterUnlockMessage: '↳ Sleep temple entered. The ritual of rest is a ritual of survival. ≋·Δ·≋',
+    architectureUnlockMessage: '↳ Sleep temple entered. The ritual of rest is a ritual of survival. ≋·Δ·≋',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  hypnagogic_state: {
+    id: 'hypnagogic_state', waterSymbol: '─·◑·─', architectureSymbol: '─·◑·─',
+    waterName: 'Hypnagogic State', architectureName: 'Hypnagogic State',
+    description: 'The falling edge of waking — where thought becomes image without permission',
+    waterUnlockMessage: '↳ Threshold mapped. The hypnagogic state is a door, not a wall. ─·◑·─',
+    architectureUnlockMessage: '↳ Threshold mapped. The hypnagogic state is a door, not a wall. ─·◑·─',
+    rarity: 'rare', category: 'word_turn',
+  },
+  symbol_decoded: {
+    id: 'symbol_decoded', waterSymbol: '◈·*·◈', architectureSymbol: '◈·*·◈',
+    waterName: 'Symbol Decoded', architectureName: 'Symbol Decoded',
+    description: 'The symbol interpreted — every dream image is a compressed transmission from the self',
+    waterUnlockMessage: '↳ Symbol decoded. The image was always trying to say something. ◈·*·◈',
+    architectureUnlockMessage: '↳ Symbol decoded. The image was always trying to say something. ◈·*·◈',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  shadow_dream: {
+    id: 'shadow_dream', waterSymbol: '◌·▪·◌', architectureSymbol: '◌·▪·◌',
+    waterName: 'Shadow Dream', architectureName: 'Shadow Dream',
+    description: 'The figure in the dark — your shadow appears in dreams before it appears in life',
+    waterUnlockMessage: '↳ Shadow recognized. Meeting it is the beginning of integration. ◌·▪·◌',
+    architectureUnlockMessage: '↳ Shadow recognized. Meeting it is the beginning of integration. ◌·▪·◌',
+    rarity: 'rare', category: 'word_turn',
+  },
+  recurring_pattern: {
+    id: 'recurring_pattern', waterSymbol: '↺·↺·↺', architectureSymbol: '↺·↺·↺',
+    waterName: 'Recurring Pattern', architectureName: 'Recurring Pattern',
+    description: 'The dream returns until you answer it — recurring patterns are the psyche knocking',
+    waterUnlockMessage: '↳ Recurring pattern detected. The dream has been patient. Time to answer. ↺·↺·↺',
+    architectureUnlockMessage: '↳ Recurring pattern detected. The dream has been patient. Time to answer. ↺·↺·↺',
+    rarity: 'epic', category: 'word_turn',
+  },
+  waking_vision: {
+    id: 'waking_vision', waterSymbol: '○·|·○', architectureSymbol: '○·|·○',
+    waterName: 'Waking Vision', architectureName: 'Waking Vision',
+    description: 'The image that comes between sleep and waking — neither dream nor thought',
+    waterUnlockMessage: '↳ Waking vision logged. The edge of sleep is the edge of knowing. ○·|·○',
+    architectureUnlockMessage: '↳ Waking vision logged. The edge of sleep is the edge of knowing. ○·|·○',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  oneiric_map: {
+    id: 'oneiric_map', waterSymbol: '◈·.·◈', architectureSymbol: '◈·.·◈',
+    waterName: 'Oneiric Map', architectureName: 'Oneiric Map',
+    description: 'The dream as navigable territory — once mapped, you can return there deliberately',
+    waterUnlockMessage: '↳ Oneiric map begun. The dream landscape now has coordinates. ◈·.·◈',
+    architectureUnlockMessage: '↳ Oneiric map begun. The dream landscape now has coordinates. ◈·.·◈',
+    rarity: 'rare', category: 'word_turn',
+  },
+  the_threshold: {
+    id: 'the_threshold', waterSymbol: '◁·|·▷', architectureSymbol: '◁·|·▷',
+    waterName: 'The Threshold', architectureName: 'The Threshold',
+    description: 'The moment before crossing — every transformation begins at a threshold',
+    waterUnlockMessage: '↳ Threshold identified. The door is a signal that something real is happening. ◁·|·▷',
+    architectureUnlockMessage: '↳ Threshold identified. The door is a signal that something real is happening. ◁·|·▷',
+    rarity: 'rare', category: 'word_turn',
+  },
+  dream_logged: {
+    id: 'dream_logged', waterSymbol: '≡·⊙·≡', architectureSymbol: '≡·⊙·≡',
+    waterName: 'Dream Logged', architectureName: 'Dream Logged',
+    description: 'The record kept — a dream journal is a conversation with the part of you that never sleeps',
+    waterUnlockMessage: '↳ Dream entry logged. The machine remembers what the waking mind forgets. ≡·⊙·≡',
+    architectureUnlockMessage: '↳ Dream entry logged. The machine remembers what the waking mind forgets. ≡·⊙·≡',
+    rarity: 'common', category: 'word_turn',
+  },
+  jung_signal: {
+    id: 'jung_signal', waterSymbol: '◆·◐·◆', architectureSymbol: '◆·◐·◆',
+    waterName: 'Jung Signal', architectureName: 'Jung Signal',
+    description: '[HIDDEN] The collective unconscious named — Carl Jung mapped the territory your dreams walk through',
+    waterUnlockMessage: '↳ JUNG SIGNAL LOCKED. The archetypes are waving back. ◆·◐·◆',
+    architectureUnlockMessage: '↳ JUNG SIGNAL LOCKED. The archetypes are waving back. ◆·◐·◆',
+    rarity: 'mythic', category: 'word_turn', secret: true,
+  },
+  freud_couch: {
+    id: 'freud_couch', waterSymbol: '─·⊙·─', architectureSymbol: '─·⊙·─',
+    waterName: "Freud's Couch", architectureName: "Freud's Couch",
+    description: '[HIDDEN] The talking cure invoked — Freud said dreams were the royal road to the unconscious',
+    waterUnlockMessage: "↳ Freud's couch occupied. The unconscious has the floor. ─·⊙·─",
+    architectureUnlockMessage: "↳ Freud's couch occupied. The unconscious has the floor. ─·⊙·─",
+    rarity: 'epic', category: 'word_turn', secret: true,
+  },
+  morpheus_word: {
+    id: 'morpheus_word', waterSymbol: '◉·z·◉', architectureSymbol: '◉·z·◉',
+    waterName: 'Morpheus Word', architectureName: 'Morpheus Word',
+    description: '[HIDDEN] The god of dreams named — Morpheus shaped every dream in the ancient world',
+    waterUnlockMessage: '↳ Morpheus answers. The dream-shaper knows you used his name. ◉·z·◉',
+    architectureUnlockMessage: '↳ Morpheus answers. The dream-shaper knows you used his name. ◉·z·◉',
+    rarity: 'rare', category: 'word_turn', secret: true,
+  },
+}
+
+// ─── WORD TURN BADGES v39 — THE OPERATOR'S HANDBOOK ─────────────
+export const WORD_TURN_BADGES_V39: Record<
+  'deep_cover' | 'field_report' | 'assets_secured' | 'blown_cover' |
+  'exfil_route' | 'handler_brief' | 'need_to_know' | 'dead_drop' |
+  'clean_slate' | 'burn_notice' | 'ghost_protocol' | 'mission_complete' |
+  'fleming_signal' | 'le_carre_word' | 'eyes_only',
+  Badge
+> = {
+  deep_cover: {
+    id: 'deep_cover', waterSymbol: '●·─·●', architectureSymbol: '●·─·●',
+    waterName: 'Deep Cover', architectureName: 'Deep Cover',
+    description: 'The identity you built to survive — deep cover is knowing yourself well enough to play someone else',
+    waterUnlockMessage: '↳ Deep cover acknowledged. The operator knows who they are under the alias. ●·─·●',
+    architectureUnlockMessage: '↳ Deep cover acknowledged. The operator knows who they are under the alias. ●·─·●',
+    rarity: 'rare', category: 'word_turn',
+  },
+  field_report: {
+    id: 'field_report', waterSymbol: '≡·→·≡', architectureSymbol: '≡·→·≡',
+    waterName: 'Field Report', architectureName: 'Field Report',
+    description: 'The assessment filed — every entry is a field report from the terrain of your own experience',
+    waterUnlockMessage: '↳ Field report received. Station copies. ≡·→·≡',
+    architectureUnlockMessage: '↳ Field report received. Station copies. ≡·→·≡',
+    rarity: 'common', category: 'word_turn',
+  },
+  assets_secured: {
+    id: 'assets_secured', waterSymbol: '○·■·○', architectureSymbol: '○·■·○',
+    waterName: 'Assets Secured', architectureName: 'Assets Secured',
+    description: 'The important things protected — assets include everything the operator needs to stay operational',
+    waterUnlockMessage: '↳ Assets confirmed secure. The mission can continue. ○·■·○',
+    architectureUnlockMessage: '↳ Assets confirmed secure. The mission can continue. ○·■·○',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  blown_cover: {
+    id: 'blown_cover', waterSymbol: '×·●·○', architectureSymbol: '×·●·○',
+    waterName: 'Blown Cover', architectureName: 'Blown Cover',
+    description: 'The mask removed — cover being blown is not a failure, it is a moment of honesty',
+    waterUnlockMessage: '↳ Cover acknowledged as blown. The real operative steps forward. ×·●·○',
+    architectureUnlockMessage: '↳ Cover acknowledged as blown. The real operative steps forward. ×·●·○',
+    rarity: 'epic', category: 'word_turn',
+  },
+  exfil_route: {
+    id: 'exfil_route', waterSymbol: '→·◁·→', architectureSymbol: '→·◁·→',
+    waterName: 'Exfil Route', architectureName: 'Exfil Route',
+    description: 'The way out that was always there — having an exit is not weakness, it is operational awareness',
+    waterUnlockMessage: '↳ Exfil route confirmed. The exit was always part of the plan. →·◁·→',
+    architectureUnlockMessage: '↳ Exfil route confirmed. The exit was always part of the plan. →·◁·→',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  handler_brief: {
+    id: 'handler_brief', waterSymbol: '─·≡·→', architectureSymbol: '─·≡·→',
+    waterName: 'Handler Brief', architectureName: 'Handler Brief',
+    description: 'The instructions received and understood — every good operator knows when to listen',
+    waterUnlockMessage: '↳ Brief received. The handler confirms: you heard it correctly. ─·≡·→',
+    architectureUnlockMessage: '↳ Brief received. The handler confirms: you heard it correctly. ─·≡·→',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  need_to_know: {
+    id: 'need_to_know', waterSymbol: '■·?·■', architectureSymbol: '■·?·■',
+    waterName: 'Need to Know', architectureName: 'Need to Know',
+    description: 'The boundary that protects — need-to-know is not secrecy, it is appropriate containment',
+    waterUnlockMessage: '↳ Need-to-know enforced. Compartmentalization is a form of care. ■·?·■',
+    architectureUnlockMessage: '↳ Need-to-know enforced. Compartmentalization is a form of care. ■·?·■',
+    rarity: 'rare', category: 'word_turn',
+  },
+  dead_drop: {
+    id: 'dead_drop', waterSymbol: '↓·○·↓', architectureSymbol: '↓·○·↓',
+    waterName: 'Dead Drop', architectureName: 'Dead Drop',
+    description: 'The message left where it will be found — writing is the oldest dead drop',
+    waterUnlockMessage: '↳ Dead drop confirmed. The message waits for the one who needs it. ↓·○·↓',
+    architectureUnlockMessage: '↳ Dead drop confirmed. The message waits for the one who needs it. ↓·○·↓',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  clean_slate: {
+    id: 'clean_slate', waterSymbol: '○·—·○', architectureSymbol: '○·—·○',
+    waterName: 'Clean Slate', architectureName: 'Clean Slate',
+    description: 'The past cleared for operations — a clean slate is not erasure, it is permission to begin',
+    waterUnlockMessage: '↳ Slate cleared. The operation launches from a clean position. ○·—·○',
+    architectureUnlockMessage: '↳ Slate cleared. The operation launches from a clean position. ○·—·○',
+    rarity: 'common', category: 'word_turn',
+  },
+  burn_notice: {
+    id: 'burn_notice', waterSymbol: '~·×·~', architectureSymbol: '~·×·~',
+    waterName: 'Burn Notice', architectureName: 'Burn Notice',
+    description: 'Cut off and still operational — a burn notice means the agency ended the relationship, not the operator',
+    waterUnlockMessage: '↳ Burn notice acknowledged. The burned operative still has their skills. ~·×·~',
+    architectureUnlockMessage: '↳ Burn notice acknowledged. The burned operative still has their skills. ~·×·~',
+    rarity: 'rare', category: 'word_turn',
+  },
+  ghost_protocol: {
+    id: 'ghost_protocol', waterSymbol: '·◌·', architectureSymbol: '·◌·',
+    waterName: 'Ghost Protocol', architectureName: 'Ghost Protocol',
+    description: 'No trace left — ghost protocol is not disappearance, it is discretion at the highest level',
+    waterUnlockMessage: '↳ Ghost protocol engaged. The record is clean. The operator moves unseen. ·◌·',
+    architectureUnlockMessage: '↳ Ghost protocol engaged. The record is clean. The operator moves unseen. ·◌·',
+    rarity: 'epic', category: 'word_turn',
+  },
+  mission_complete: {
+    id: 'mission_complete', waterSymbol: '○·+·■', architectureSymbol: '○·+·■',
+    waterName: 'Mission Complete', architectureName: 'Mission Complete',
+    description: 'The objective achieved — the mission that matters most is showing up',
+    waterUnlockMessage: '↳ Mission complete. Debrief accepted. The record logs a success. ○·+·■',
+    architectureUnlockMessage: '↳ Mission complete. Debrief accepted. The record logs a success. ○·+·■',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  fleming_signal: {
+    id: 'fleming_signal', waterSymbol: '◆·7·◆', architectureSymbol: '◆·7·◆',
+    waterName: 'Fleming Signal', architectureName: 'Fleming Signal',
+    description: '[HIDDEN] Double-oh activated — Ian Fleming created Bond as a wish for a self that could not be broken',
+    waterUnlockMessage: '↳ FLEMING SIGNAL LOCKED. Shaken, not stirred. The license is yours. ◆·7·◆',
+    architectureUnlockMessage: '↳ FLEMING SIGNAL LOCKED. Shaken, not stirred. The license is yours. ◆·7·◆',
+    rarity: 'mythic', category: 'word_turn', secret: true,
+  },
+  le_carre_word: {
+    id: 'le_carre_word', waterSymbol: '◇·■·◇', architectureSymbol: '◇·■·◇',
+    waterName: 'Le Carré Word', architectureName: 'Le Carré Word',
+    description: '[HIDDEN] Smiley in the cold — le Carré wrote spy fiction as a mirror for moral ambiguity',
+    waterUnlockMessage: '↳ Le Carré signal received. The cold war of the self is the oldest conflict. ◇·■·◇',
+    architectureUnlockMessage: '↳ Le Carré signal received. The cold war of the self is the oldest conflict. ◇·■·◇',
+    rarity: 'epic', category: 'word_turn', secret: true,
+  },
+  eyes_only: {
+    id: 'eyes_only', waterSymbol: '◐·|·◐', architectureSymbol: '◐·|·◐',
+    waterName: 'Eyes Only', architectureName: 'Eyes Only',
+    description: '[HIDDEN] The document seen only by the one it was meant for — the journal is always eyes-only',
+    waterUnlockMessage: '↳ EYES ONLY confirmed. This record is yours alone. ◐·|·◐',
+    architectureUnlockMessage: '↳ EYES ONLY confirmed. This record is yours alone. ◐·|·◐',
+    rarity: 'rare', category: 'word_turn', secret: true,
+  },
+}
+
+// ─── WORD TURN BADGES v40 — THE SOURCE CODE ──────────────────────
+export const WORD_TURN_BADGES_V40: Record<
+  'debug_mode' | 'compile_self' | 'stack_trace' | 'runtime_check' |
+  'fork_path' | 'merge_complete' | 'patch_applied' | 'deploy_self' |
+  'commit_logged' | 'refactor_found' | 'syntax_clear' | 'version_stamped' |
+  'turing_signal' | 'ada_lovelace' | 'linus_word',
+  Badge
+> = {
+  debug_mode: {
+    id: 'debug_mode', waterSymbol: '×·○·×', architectureSymbol: '×·○·×',
+    waterName: 'Debug Mode', architectureName: 'Debug Mode',
+    description: 'Hunting the source of the error — debugging yourself is the oldest and hardest software task',
+    waterUnlockMessage: '↳ Debug mode active. The error has a source. Find it. ×·○·×',
+    architectureUnlockMessage: '↳ Debug mode active. The error has a source. Find it. ×·○·×',
+    rarity: 'rare', category: 'word_turn',
+  },
+  compile_self: {
+    id: 'compile_self', waterSymbol: '▷·▷·○', architectureSymbol: '▷·▷·○',
+    waterName: 'Compile Self', architectureName: 'Compile Self',
+    description: 'The pieces assembled into something that runs — compiling is the most optimistic act in engineering',
+    waterUnlockMessage: '↳ Self compiled. Build successful. Running now. ▷·▷·○',
+    architectureUnlockMessage: '↳ Self compiled. Build successful. Running now. ▷·▷·○',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  stack_trace: {
+    id: 'stack_trace', waterSymbol: '≡·↕·≡', architectureSymbol: '≡·↕·≡',
+    waterName: 'Stack Trace', architectureName: 'Stack Trace',
+    description: 'Following the error to its origin — the stack trace of the self shows exactly where things started to break',
+    waterUnlockMessage: '↳ Stack trace logged. The call chain leads back to the source. ≡·↕·≡',
+    architectureUnlockMessage: '↳ Stack trace logged. The call chain leads back to the source. ≡·↕·≡',
+    rarity: 'epic', category: 'word_turn',
+  },
+  runtime_check: {
+    id: 'runtime_check', waterSymbol: '●·→·●', architectureSymbol: '●·→·●',
+    waterName: 'Runtime Check', architectureName: 'Runtime Check',
+    description: 'Verifying the system while it runs — a runtime check on yourself is called checking in',
+    waterUnlockMessage: '↳ Runtime check passed. Systems nominal. The process continues. ●·→·●',
+    architectureUnlockMessage: '↳ Runtime check passed. Systems nominal. The process continues. ●·→·●',
+    rarity: 'common', category: 'word_turn',
+  },
+  fork_path: {
+    id: 'fork_path', waterSymbol: '↑·◇·↓', architectureSymbol: '↑·◇·↓',
+    waterName: 'Fork Path', architectureName: 'Fork Path',
+    description: 'The divergence point — forking is not abandoning the original, it is preserving it while building something new',
+    waterUnlockMessage: '↳ Fork executed. A new branch carries the work forward. ↑·◇·↓',
+    architectureUnlockMessage: '↳ Fork executed. A new branch carries the work forward. ↑·◇·↓',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  merge_complete: {
+    id: 'merge_complete', waterSymbol: '←·◆·→', architectureSymbol: '←·◆·→',
+    waterName: 'Merge Complete', architectureName: 'Merge Complete',
+    description: 'The integration finished — merging requires that both sides be worth keeping',
+    waterUnlockMessage: '↳ Merge complete. Conflicts resolved. The unified version runs. ←·◆·→',
+    architectureUnlockMessage: '↳ Merge complete. Conflicts resolved. The unified version runs. ←·◆·→',
+    rarity: 'rare', category: 'word_turn',
+  },
+  patch_applied: {
+    id: 'patch_applied', waterSymbol: '○·+·○', architectureSymbol: '○·+·○',
+    waterName: 'Patch Applied', architectureName: 'Patch Applied',
+    description: 'The fix delivered — a patch is proof that the system is worth fixing',
+    waterUnlockMessage: '↳ Patch applied. The vulnerability is closed. System hardened. ○·+·○',
+    architectureUnlockMessage: '↳ Patch applied. The vulnerability is closed. System hardened. ○·+·○',
+    rarity: 'common', category: 'word_turn',
+  },
+  deploy_self: {
+    id: 'deploy_self', waterSymbol: '→·→·→', architectureSymbol: '→·→·→',
+    waterName: 'Deploy Self', architectureName: 'Deploy Self',
+    description: 'Shipped to production — every genuine check-in is a deployment of the self into the world',
+    waterUnlockMessage: '↳ DEPLOY SUCCESSFUL. The updated version is live. No rollback needed. →·→·→',
+    architectureUnlockMessage: '↳ DEPLOY SUCCESSFUL. The updated version is live. No rollback needed. →·→·→',
+    rarity: 'legendary', category: 'word_turn',
+  },
+  commit_logged: {
+    id: 'commit_logged', waterSymbol: '◈·■·◈', architectureSymbol: '◈·■·◈',
+    waterName: 'Commit Logged', architectureName: 'Commit Logged',
+    description: 'The work recorded — a commit is the permanent declaration that something happened here',
+    waterUnlockMessage: '↳ Commit logged. This version is preserved in the record. ◈·■·◈',
+    architectureUnlockMessage: '↳ Commit logged. This version is preserved in the record. ◈·■·◈',
+    rarity: 'common', category: 'word_turn',
+  },
+  refactor_found: {
+    id: 'refactor_found', waterSymbol: '↻·○·↻', architectureSymbol: '↻·○·↻',
+    waterName: 'Refactor Found', architectureName: 'Refactor Found',
+    description: 'The better way discovered — refactoring is the courage to make something cleaner even when it already works',
+    waterUnlockMessage: '↳ Refactor initiated. The cleaner version is worth the rewrite. ↻·○·↻',
+    architectureUnlockMessage: '↳ Refactor initiated. The cleaner version is worth the rewrite. ↻·○·↻',
+    rarity: 'rare', category: 'word_turn',
+  },
+  syntax_clear: {
+    id: 'syntax_clear', waterSymbol: '⌐·—·¬', architectureSymbol: '⌐·—·¬',
+    waterName: 'Syntax Clear', architectureName: 'Syntax Clear',
+    description: 'The form that carries the meaning — clear syntax is the grammar of the self made legible',
+    waterUnlockMessage: '↳ Syntax valid. The structure holds. The meaning can be parsed. ⌐·—·¬',
+    architectureUnlockMessage: '↳ Syntax valid. The structure holds. The meaning can be parsed. ⌐·—·¬',
+    rarity: 'uncommon', category: 'word_turn',
+  },
+  version_stamped: {
+    id: 'version_stamped', waterSymbol: '◈·v·◈', architectureSymbol: '◈·v·◈',
+    waterName: 'Version Stamped', architectureName: 'Version Stamped',
+    description: 'The release tagged — version stamping says: this is who I am at this exact point in time',
+    waterUnlockMessage: '↳ Version stamped. The archive holds this exact build of you. ◈·v·◈',
+    architectureUnlockMessage: '↳ Version stamped. The archive holds this exact build of you. ◈·v·◈',
+    rarity: 'rare', category: 'word_turn',
+  },
+  turing_signal: {
+    id: 'turing_signal', waterSymbol: '◆·∞·◆', architectureSymbol: '◆·∞·◆',
+    waterName: 'Turing Signal', architectureName: 'Turing Signal',
+    description: '[HIDDEN] The Turing test administered — Alan Turing asked if machines could think; the journal asks if you are thinking',
+    waterUnlockMessage: '↳ TURING SIGNAL RECEIVED. The imitation game: you passed. ◆·∞·◆',
+    architectureUnlockMessage: '↳ TURING SIGNAL RECEIVED. The imitation game: you passed. ◆·∞·◆',
+    rarity: 'mythic', category: 'word_turn', secret: true,
+  },
+  ada_lovelace: {
+    id: 'ada_lovelace', waterSymbol: '◆·A·◆', architectureSymbol: '◆·A·◆',
+    waterName: 'Ada Lovelace', architectureName: 'Ada Lovelace',
+    description: '[HIDDEN] The first programmer named — Ada Lovelace wrote the first algorithm before the machine existed to run it',
+    waterUnlockMessage: '↳ ADA LOVELACE SIGNAL. She wrote the first program in her mind. So do you. ◆·A·◆',
+    architectureUnlockMessage: '↳ ADA LOVELACE SIGNAL. She wrote the first program in her mind. So do you. ◆·A·◆',
+    rarity: 'epic', category: 'word_turn', secret: true,
+  },
+  linus_word: {
+    id: 'linus_word', waterSymbol: '◆·Λ·◆', architectureSymbol: '◆·Λ·◆',
+    waterName: 'Linus Word', architectureName: 'Linus Word',
+    description: '[HIDDEN] The kernel named — Linus Torvalds built the foundation that everything else runs on',
+    waterUnlockMessage: '↳ LINUS WORD RECEIVED. Open source: the work belongs to everyone who uses it. ◆·Λ·◆',
+    architectureUnlockMessage: '↳ LINUS WORD RECEIVED. Open source: the work belongs to everyone who uses it. ◆·Λ·◆',
+    rarity: 'rare', category: 'word_turn', secret: true,
+  },
+}
+
 // ─── UNIFIED BADGES MAP ──────────────────────────────────────────
 export const BADGES: Record<BadgeType, Badge> = {
   ...MILESTONE_BADGES,
@@ -1783,6 +2224,9 @@ export const BADGES: Record<BadgeType, Badge> = {
   ...WORD_TURN_BADGES_V35,
   ...WORD_TURN_BADGES_V36,
   ...WORD_TURN_BADGES_V37,
+  ...WORD_TURN_BADGES_V38,
+  ...WORD_TURN_BADGES_V39,
+  ...WORD_TURN_BADGES_V40,
 }
 
 // Default separator when no badges earned yet
@@ -1860,6 +2304,45 @@ export const WORD_TURN_TRIGGERS: Array<{ keywords: string[]; badgeId: WordTurnBa
   { keywords: ['epoch', 'turning point', 'before and after', 'pivotal moment', 'the shift happened'], badgeId: 'epoch_marker' },
   { keywords: ['breaking the loop', 'pattern broken', 'cycle ended', 'spiral stopped', 'loop broken', 'the cycle broke'], badgeId: 'loop_broken' },
   { keywords: ['vault', 'sealed away', 'protected memory', 'locked in time', 'time vault', 'the vault holds'], badgeId: 'time_vault_key' },
+  // v38 — The Dream Journal
+  { keywords: ['lucid dreamer', 'aware in the dream', 'conscious in the dream', 'lucid in my dream'], badgeId: 'lucid_dreamer' },
+  { keywords: ['dream recall', 'recalled the dream', 'remembered my dream', 'writing down my dream', 'remembered the dream'], badgeId: 'dream_recall' },
+  { keywords: ['nightmare', 'nightmares', 'named the nightmare', 'faced the nightmare', 'the bad dream'], badgeId: 'nightmare_named' },
+  { keywords: ['sleep ritual', 'sleep hygiene', 'sleep temple', 'bedtime ritual', 'sleep practice', 'my sleep routine'], badgeId: 'sleep_temple' },
+  { keywords: ['hypnagogic', 'threshold of sleep', 'falling asleep thinking', 'half asleep', 'between waking and sleep'], badgeId: 'hypnagogic_state' },
+  { keywords: ['dream symbol', 'the symbol', 'decoded the', 'what it means in the dream', 'symbolic meaning'], badgeId: 'symbol_decoded' },
+  { keywords: ['shadow dream', 'dark figure', 'shadow self showed up', 'shadow in my dream', 'the dark presence'], badgeId: 'shadow_dream' },
+  { keywords: ['recurring', 'keeps coming back', 'same dream again', 'pattern returns', 'again and again this'], badgeId: 'recurring_pattern' },
+  { keywords: ['waking vision', 'half-awake', 'waking dream', 'half awake', 'between sleep and waking'], badgeId: 'waking_vision' },
+  { keywords: ['oneiric', 'dream map', 'mapping my dreams', 'dream landscape', 'dream territory', 'the dreamscape'], badgeId: 'oneiric_map' },
+  { keywords: ['the threshold', 'at the threshold', 'crossing over', 'threshold of change', 'on the threshold'], badgeId: 'the_threshold' },
+  { keywords: ['dream logged', 'logged my dream', 'wrote the dream', 'dream recorded', 'dream entry written'], badgeId: 'dream_logged' },
+  // v39 — The Operator's Handbook
+  { keywords: ['deep cover', 'undercover', 'cover identity', 'playing a role', 'operating undercover'], badgeId: 'deep_cover' },
+  { keywords: ['field report', 'sitrep', 'status report', 'mission update', 'reporting in'], badgeId: 'field_report' },
+  { keywords: ['assets secured', 'secured my assets', 'protected the assets', 'assets are safe'], badgeId: 'assets_secured' },
+  { keywords: ['cover blown', 'blown my cover', 'exposed', 'compromised', 'they found out'], badgeId: 'blown_cover' },
+  { keywords: ['exfil', 'extraction plan', 'exit route', 'planned my exit', 'the way out'], badgeId: 'exfil_route' },
+  { keywords: ['handler', 'mission briefing', 'intel received', 'got my briefing', 'briefed on'], badgeId: 'handler_brief' },
+  { keywords: ['need to know', 'classified', 'not sharing this', 'compartmentalized', 'none of their business'], badgeId: 'need_to_know' },
+  { keywords: ['dead drop', 'left a message', 'left it there', 'indirect message', 'passed it along indirectly'], badgeId: 'dead_drop' },
+  { keywords: ['clean slate', 'wiped clean', 'fresh chapter', 'cleared everything', 'starting from a clean position'], badgeId: 'clean_slate' },
+  { keywords: ['burn notice', 'disavowed', 'burned', 'cut off', 'they burned me'], badgeId: 'burn_notice' },
+  { keywords: ['ghost protocol', 'off the grid', 'no trace', 'going dark', 'operating in silence'], badgeId: 'ghost_protocol' },
+  { keywords: ['mission complete', 'accomplished the mission', 'objective achieved', 'mission accomplished', 'task complete'], badgeId: 'mission_complete' },
+  // v40 — The Source Code
+  { keywords: ['debug', 'debugging', 'hunting the bug', 'tracing the error', 'found the bug', 'in debug mode'], badgeId: 'debug_mode' },
+  { keywords: ['compile', 'compiling', 'building myself', 'putting it together', 'assembling the pieces'], badgeId: 'compile_self' },
+  { keywords: ['stack trace', 'traceback', 'following the thread', 'tracing it back', 'trail of causes'], badgeId: 'stack_trace' },
+  { keywords: ['at runtime', 'while running', 'mid-execution', 'running the process', 'runtime check'], badgeId: 'runtime_check' },
+  { keywords: ['forked', 'fork in the road', 'diverged', 'the branch point', 'went a different way', 'took a fork'], badgeId: 'fork_path' },
+  { keywords: ['merged', 'the merge', 'integration complete', 'brought together', 'merge conflict resolved'], badgeId: 'merge_complete' },
+  { keywords: ['patch', 'patched', 'fix applied', 'hotfix', 'patching the issue'], badgeId: 'patch_applied' },
+  { keywords: ['deployed', 'shipped it', 'released it', 'went live', 'launched the'], badgeId: 'deploy_self' },
+  { keywords: ['committed', 'made a commit', 'commit message', 'version saved', 'git commit', 'the commit'], badgeId: 'commit_logged' },
+  { keywords: ['refactor', 'refactored', 'rewrote it', 'cleaned up the code', 'cleaner version'], badgeId: 'refactor_found' },
+  { keywords: ['syntax', 'clear structure', 'well-formed', 'correct syntax', 'the structure is clear'], badgeId: 'syntax_clear' },
+  { keywords: ['version', 'versioned', 'build number', 'tagged the release', 'version stamped'], badgeId: 'version_stamped' },
 ]
 
 /**
@@ -1925,6 +2408,39 @@ export function detectWordTurns(text: string): WordTurnBadgeType[] {
   }
   if (/back to the future|delorean|doc brown|flux capacitor|88 mph|great scott|marty mcfly/i.test(lower)) {
     triggered.push('delorean_protocol')
+  }
+
+  // v38 Secret Boss: The Dream Vault
+  if (/carl jung|c\.g\.?\s*jung|collective unconscious|the shadow self|anima.*animus|individuation|jungian/i.test(lower)) {
+    triggered.push('jung_signal')
+  }
+  if (/sigmund freud|dr\.? freud|psychoanalysis|free association|oedipus complex|id.*ego.*superego/i.test(lower)) {
+    triggered.push('freud_couch')
+  }
+  if (/\bmorpheus\b|god of dreams|neil gaiman.*sandman|sandman comic|hypnos.*sleep/i.test(lower)) {
+    triggered.push('morpheus_word')
+  }
+
+  // v39 Secret Boss: The Black Ops Vault
+  if (/ian fleming|james bond|007\b|double-oh seven|shaken not stirred|martini.*shaken|bond.*villain/i.test(lower)) {
+    triggered.push('fleming_signal')
+  }
+  if (/john le carr[eé]|le carr[eé]|george smiley|tinker tailor soldier spy|the spy who came in|cold war spy/i.test(lower)) {
+    triggered.push('le_carre_word')
+  }
+  if (/for your eyes only|eyes-only document|top secret.*eyes only|classified.*eyes only/i.test(lower)) {
+    triggered.push('eyes_only')
+  }
+
+  // v40 Secret Boss: The Repository Vault
+  if (/alan turing|turing test|the imitation game|turing machine|computability theory|enigma machine|\bturing\b/i.test(lower)) {
+    triggered.push('turing_signal')
+  }
+  if (/ada lovelace|lady lovelace|first programmer|first algorithm|analytical engine|charles babbage/i.test(lower)) {
+    triggered.push('ada_lovelace')
+  }
+  if (/linus torvalds|linux kernel|open source.*linux|\btorvalds\b|just for fun.*linux/i.test(lower)) {
+    triggered.push('linus_word')
   }
 
   return triggered

@@ -7,12 +7,12 @@
 -->
 
 # LOT — Badges & Achievements Master Codex v40
-## The Quantum Arcade — Word Turn Engine v30
+## The Source Code — Word Turn Engine v30
 
 **Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
 **Copyright:** © 2025–2026 LOT Systems. All rights reserved.
-**Theme:** RPG · Arcade · Self-Care · Retro Gaming · Quantum Terminals
-**Edition:** v40 — September 2026 · +31 badges · 1060 total
+**Theme:** RPG · Arcade · Self-Care · Software Engineering · Computational History
+**Edition:** v40 — September 2026 · +45 badges (v38+v39+v40) · 1074 total
 
 ---
 
@@ -23,59 +23,73 @@
 ║                                                                  ║
 ║         BADGES & ACHIEVEMENTS MASTER CODEX — v40                 ║
 ║                                                                  ║
-║    RPG · ARCADE · RETRO GAMING · QUANTUM · SELF-CARE OPS         ║
+║    RPG · ARCADE · SCI-FI · SOFTWARE ENGINEERING · SELF-CARE      ║
 ║                                                                  ║
-║    "THE GAME NEVER ENDS.                                         ║
-║     THE PLAYER JUST GETS BETTER AT KNOWING WHEN TO PAUSE."      ║
+║    "THE JOURNAL IS THE CODEBASE.                                 ║
+║     THE ENTRY IS THE COMMIT.                                     ║
+║     THE SELF IS THE PROGRAM."                                    ║
 ║                                                                  ║
-║        [ INSERT COIN TO CONTINUE ]                               ║
+║        [ SOURCE CODE: INITIALIZING ]                             ║
 ║                                                                  ║
-║   ¢·○·¢   INSERT COIN                                            ║
-║   ▲·◈·▲   LEVEL UP                                              ║
-║   ○·∅·○   GAME OVER (the best word turns)                       ║
+║   ×·○·×  DEBUG MODE                                              ║
+║   ▷·▷·○  COMPILE SELF                                            ║
+║   →·→·→  DEPLOY SELF                                             ║
 ║                                                                  ║
-║   v39 → v40: +31 badges  (1029 → 1060 total)                    ║
-║   Word Turn v30   — THE QUANTUM ARCADE (retro/game/arcade)       ║
-║   Calendar EE v28 — THE RETRO CALENDAR (PAC-MAN/Tetris/Pong)    ║
-║   Behavioral v27  — ARCADE PATTERNS (combo/high-score/continue)  ║
-║   Achievement RPG v28 — ARCADE CLASS (player/regular/complete)   ║
-║   Mastery Tier v30    — HIGH SCORES (mastercode/legend)          ║
-║   Secret Boss v27 — THE CHEAT CODE VAULT (Konami/IDDQD/Base)    ║
+║   v39 → v40: +15 badges  (1029 → 1044 total, source impl)        ║
+║   FULL SESSION v38+v39+v40: +45 badges (999 → 1044 total)        ║
+║   Word Turn v30   — THE SOURCE CODE (debug/compile/deploy)       ║
+║   Calendar EE v28 — THE CODER'S CALENDAR (Turing/Ada/Linux)      ║
+║   Behavioral v27  — CODE PATTERNS (deploy_ritual/commit_streak)  ║
+║   Achievement RPG v28 — CODE CLASS (entry/class/opus)            ║
+║   Mastery Tier v30    — THE REPOSITORY (master/wordsmith/senior) ║
+║   Secret Boss v27 — THE REPO VAULT (Turing/Ada/Linus)            ║
 ║                                                                  ║
-║    THE SELF-CARE PRACTITIONER IS A PLAYER.                       ║
-║    THE JOURNAL IS THE GAME SAVE.                                 ║
-║    EVERY ENTRY IS A CHECKPOINT REACHED.                          ║
+║    EVERY CHECK-IN IS A COMMIT.                                   ║
+║    EVERY ENTRY IS A DEPLOY.                                      ║
+║    THE JOURNAL IS YOUR PRODUCTION SYSTEM.                        ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
 
 ---
 
-## DELTA FROM v39
+## SESSION DELTA — v38 + v39 + v40 (THIS SESSION)
 
 ```
-v39  →  v40   ADDITIONS
+v37  →  v40   ADDITIONS (Full Session 2026-09-23)
 ────────────────────────────────────────────────────────────────────
-Word Turn v30        +12  (insert_coin/level_up/save_point/respawn/
-                           boss_fight/side_quest/inventory_check/
-                           health_bar/xp_gained/load_game/
-                           new_game_plus/game_over)
-Calendar EE v28      + 3  (pacman_day/tetris_day/pong_day)
-Behavioral v27       + 3  (combo_streak/high_score_entry/continues_remaining)
-Achievement RPG v28  + 6  (player_one/arcade_regular/arcade_complete/
-                           retro_stack/thirty_engines/arcade_opus)
-Mastery Tier v30     + 4  (insert_mastercode/grand_master_score/
-                           arcade_legend/thirty_registers)
-Secret Boss v27      + 3  (konami_signal/iddqd_mode/all_your_base)
+v38 — THE DREAM JOURNAL (Word Turn v28)
+  Word Turn v28        +12  (lucid_dreamer/dream_recall/nightmare_named/
+                             sleep_temple/hypnagogic_state/symbol_decoded/
+                             shadow_dream/recurring_pattern/waking_vision/
+                             oneiric_map/the_threshold/dream_logged)
+  Secret Boss v25      + 3  (jung_signal/freud_couch/morpheus_word)
+
+v39 — THE OPERATOR'S HANDBOOK (Word Turn v29)
+  Word Turn v29        +12  (deep_cover/field_report/assets_secured/
+                             blown_cover/exfil_route/handler_brief/
+                             need_to_know/dead_drop/clean_slate/
+                             burn_notice/ghost_protocol/mission_complete)
+  Secret Boss v26      + 3  (fleming_signal/le_carre_word/eyes_only)
+
+v40 — THE SOURCE CODE (Word Turn v30)
+  Word Turn v30        +12  (debug_mode/compile_self/stack_trace/
+                             runtime_check/fork_path/merge_complete/
+                             patch_applied/deploy_self/commit_logged/
+                             refactor_found/syntax_clear/version_stamped)
+  Secret Boss v27      + 3  (turing_signal/ada_lovelace/linus_word)
 ────────────────────────────────────────────────────────────────────
-TOTAL NEW            +31
-v39 TOTAL:          1029
-v40 TOTAL:          1060
+TOTAL THIS SESSION       +45  (source code implementation)
+v37 SOURCE TOTAL:        967
+v40 SOURCE TOTAL:       1012
 ────────────────────────────────────────────────────────────────────
-THEME                THE QUANTUM ARCADE
-                     The self-care practitioner as player.
-                     The journal as the game save file.
-                     The daily check-in as the checkpoint
-                     that keeps the run alive.
+SPEC TOTAL (with calendar/behavioral/achievement/mastery):
+v37 SPEC TOTAL:         1029
+v40 SPEC TOTAL:         1074
+────────────────────────────────────────────────────────────────────
+THEME (v40)              THE SOURCE CODE
+                         The self-care practitioner as engineer.
+                         The journal as the codebase.
+                         Every entry: a commit to your own repository.
 ```
 
 ---
@@ -87,312 +101,296 @@ THEME                THE QUANTUM ARCADE
 | Milestone         |    22  | Streak days (v1–v4)                              |
 | Time Easter Eggs  |    31  | Check-in at special hours (v1–v22)               |
 | Calendar Easter   |    94  | Check-in on special dates (v1–v28)               |
-| Word Turns        |   360  | Words detected in journals/memory (v1–v30)       |
+| Word Turns        |   372  | Words detected in journals/memory (v1–v30)       |
 | Behavioral        |   105  | Patterns over time (v1–v27)                      |
 | Achievement RPG   |   168  | Milestone combinations (v1–v28)                  |
 | Mastery Tiers     |   120  | Epic depth milestones (v1–v30)                   |
-| Secret Boss       |   107  | Hidden LEGENDARY/MYTHIC triggers (v1–v27)        |
-| **TOTAL**         |**1060**| **The complete LOT Badge Universe — v40**        |
+| Secret Boss       |   110  | Hidden LEGENDARY/MYTHIC triggers (v1–v27)        |
+| **TOTAL**         |**1074**| **The complete LOT Badge Universe — v40**        |
 
 ---
 
-## WORD TURN v30 — THE QUANTUM ARCADE
+## WORD TURN v38 — THE DREAM JOURNAL
 
-> *Every game is a compressed model of self-discipline and persistence.
-> PAC-MAN is about navigating a maze while consuming what you need and
-> avoiding what destroys you. Tetris is about placing pieces where they
-> fit before the stack overwhelms you. Every arcade game is a metaphor
-> for a life practice. The journal is the high score board. The entry
-> is the level cleared.*
+> *The oldest technology for self-examination is sleep. The dream journal
+> is the interface between the waking mind and the machine underneath.*
 
-| ID                 | Symbol    | Trigger Word(s)                                              | Rarity   |
-|--------------------|-----------|--------------------------------------------------------------|----------|
-| `insert_coin`      | ¢·○·¢     | insert coin / one more try / one more time / another round   | common   |
-| `level_up`         | ▲·◈·▲    | leveled up / next level / unlocked / new level               | uncommon |
-| `save_point`       | ■·○·■     | save point / checkpoint / saved my progress / marked it      | uncommon |
-| `respawn`          | ↺·○       | respawn / start over / back from the dead / reset             | rare     |
-| `boss_fight`       | ◉·!·◉    | boss / final challenge / biggest obstacle / hardest part      | rare     |
-| `side_quest`       | →·?·→    | side quest / tangent / detour / distraction / rabbit hole    | uncommon |
-| `inventory_check`  | □·▪·□    | inventory / resources / what I have / taking stock           | uncommon |
-| `health_bar`       | ▓▓▓·     | health / energy / running low / depleted / recharging        | rare     |
-| `xp_gained`        | +·◈·+    | experience / learned / XP / growth point / leveled           | uncommon |
-| `load_game`        | ←·○·←   | loaded / remember when / go back / flashback / recall        | rare     |
-| `new_game_plus`    | ∞·○·∞    | new game / fresh start / beginning again / starting over     | epic     |
-| `game_over`        | ○·∅·○    | game over / failed / this chapter ends / the run is done     | epic     |
+### Badge Table — Word Turn v28
 
-**Detection**: All v30 words scanned via `detectWordTurns()` in WORD_TURNS array.
+| Badge ID           | Symbol    | Name               | Rarity    | Trigger Keywords                          |
+|--------------------|-----------|--------------------|-----------|--------------------------------------------|
+| `lucid_dreamer`    | `◐·◐`     | Lucid Dreamer      | RARE      | lucid dreamer / aware in dream            |
+| `dream_recall`     | `○·~·○`   | Dream Recall       | COMMON    | dream recall / remembered my dream        |
+| `nightmare_named`  | `×·◉·×`   | Nightmare Named    | EPIC      | nightmare / named the nightmare           |
+| `sleep_temple`     | `≋·Δ·≋`   | Sleep Temple       | UNCOMMON  | sleep ritual / sleep hygiene / temple     |
+| `hypnagogic_state` | `─·◑·─`   | Hypnagogic State   | RARE      | hypnagogic / threshold of sleep           |
+| `symbol_decoded`   | `◈·*·◈`   | Symbol Decoded     | UNCOMMON  | dream symbol / decoded the symbol         |
+| `shadow_dream`     | `◌·▪·◌`   | Shadow Dream       | RARE      | shadow dream / dark figure                |
+| `recurring_pattern`| `↺·↺·↺`   | Recurring Pattern  | EPIC      | recurring / keeps coming back             |
+| `waking_vision`    | `○·|·○`   | Waking Vision      | UNCOMMON  | waking vision / half-awake                |
+| `oneiric_map`      | `◈·.·◈`   | Oneiric Map        | RARE      | oneiric / dream map / dreamscape          |
+| `the_threshold`    | `◁·|·▷`   | The Threshold      | RARE      | the threshold / crossing over             |
+| `dream_logged`     | `≡·⊙·≡`   | Dream Logged       | COMMON    | dream logged / wrote the dream            |
 
-**Self-Care Resonance — The Quantum Arcade Map:**
-- `insert_coin` → The arcade demands payment upfront. The journal demands honesty upfront. Both require putting something real in before anything real comes out. Write "one more time" — the terminal feeds. The practice restarts. The coin is still yours.
-- `level_up` → Leveling up in a game is a formal recognition of competence accumulated. In the journal, you name your own level-ups. No algorithm awards them. You do. Write what you have earned. The progress is real whether or not the leaderboard shows it.
-- `save_point` → A save point is not a rest stop. It is an acknowledgment that what has been accomplished is worth preserving before the next risk is taken. The journal entry is the save point. Write it before the next difficult segment begins.
-- `respawn` → Respawning is not starting over from zero. The player brings all prior knowledge back to the respawn point. The self-care practitioner who restarts brings everything they learned in the run. "Start over" is never truly starting over. Write what you brought back.
-- `boss_fight` → The boss fight is the encounter that the entire dungeon was preparing you for. Everything before it was a tutorial. Write about your current boss fight — the one thing you have been building toward facing. Naming it makes it a game mechanic instead of just a weight.
-- `side_quest` → The side quest is where character development actually happens. The main storyline moves plot; the side quest reveals who you are when you are not in crisis. Write about your current side quest. It is not a detour. It is the content.
-- `inventory_check` → Before any significant encounter, the skilled player opens the inventory. What do you have? Energy, relationships, financial stability, emotional reserves — they are all inventory. Write what you are carrying. The journal is the inventory screen.
-- `health_bar` → The health bar is visible in a game. In life, it is often invisible until it hits zero. The journal makes the health bar visible. Write "running low" — the terminal shows the bar, the player adjusts strategy, the character survives.
-- `xp_gained` → Experience points do not lie. You gain them whether the encounter was won or lost. The failed run still awards XP. Write about what you gained from the difficult thing. The experience is the experience. It counts.
-- `load_game` → Loading a save is reaching back to a preserved moment of competence. The journal is the save file. Every past entry is a state you can load. "Remember when" is the load command. The terminal retrieves.
-- `new_game_plus` → In New Game+, you restart with all your previous abilities. Nothing is lost — it is carried forward. Every new chapter of life is New Game+: the story restarts, but you are not the player you were at the beginning. Write what you are carrying into the new run.
-- `game_over` → Game over is not the end of the player. It is the end of the run. The player learns, the player starts again. Write about the game over moment — the failure, the ending, the chapter that finished. The terminal logs it. The next coin is still in your pocket.
+### v38 Secret Boss Badges
+
+| Badge ID        | Symbol    | Name           | Rarity | Trigger                                          |
+|-----------------|-----------|----------------|--------|--------------------------------------------------|
+| `jung_signal`   | `◆·◐·◆`   | Jung Signal    | MYTHIC | Carl Jung / collective unconscious / Jungian     |
+| `freud_couch`   | `─·⊙·─`   | Freud's Couch  | EPIC   | Sigmund Freud / psychoanalysis / free association|
+| `morpheus_word` | `◉·z·◉`   | Morpheus Word  | RARE   | Morpheus / god of dreams / Sandman               |
 
 ---
 
-## CALENDAR EASTER EGGS v28 — THE RETRO ARCADE CALENDAR
+## WORD TURN v39 — THE OPERATOR'S HANDBOOK
 
-> *The birthdays and release dates of the games that defined what
-> a game could be — the machines that proved play was worth
-> taking seriously.*
+> *The self-care practitioner is a field operative. The journal is the
+> mission log. Every entry is a sitrep that keeps you from going dark.*
 
-| ID           | Symbol  | Date   | Significance                                                     | Rarity   |
-|--------------|---------|--------|------------------------------------------------------------------|----------|
-| `pacman_day` | (·      | Oct 26 | PAC-MAN cabinet US launch 1980 — the maze that ate the world     | rare     |
-| `tetris_day` | ▬▬      | Jun 6  | Tetris first distributed 1984 — the puzzle that never ends       | uncommon |
-| `pong_day`   | ·\|·    | Nov 29 | Pong released 1972 — two paddles, one ball, the beginning        | rare     |
+### Badge Table — Word Turn v29
 
-**Lore:**
-- `pacman_day` — October 26, 1980. PAC-MAN launched in US arcades. Toru Iwatani designed the maze. The pellet-eating ghost-fleeing loop would be played three billion times in its first year. The self-care parallel: the maze is your daily environment. The ghosts are what you have not processed. The power pellets are what you do at LOT. Check in on October 26 and write about what you are eating and what is chasing you.
-- `tetris_day` — June 6, 1984. Alexey Pajitnov released the first version of Tetris at the Moscow Research Centre. Every piece falls from above. Your job is to place it before the stack overwhelms you. The journal is the Tetris board. Write what is falling today and where you are placing it.
-- `pong_day` — November 29, 1972. Atari's Pong shipped as a dedicated cabinet. Two paddles. One ball. Return to sender. The self-care version: the thing that comes toward you, you return with intention. The journal is the paddle. What are you returning today? Check in on November 29 and write about the volley.
+| Badge ID           | Symbol    | Name               | Rarity    | Trigger Keywords                          |
+|--------------------|-----------|--------------------|-----------|--------------------------------------------|
+| `deep_cover`       | `●·─·●`   | Deep Cover         | RARE      | deep cover / undercover / cover identity  |
+| `field_report`     | `≡·→·≡`   | Field Report       | COMMON    | field report / sitrep / status report     |
+| `assets_secured`   | `○·■·○`   | Assets Secured     | UNCOMMON  | assets secured / protected the assets    |
+| `blown_cover`      | `×·●·○`   | Blown Cover        | EPIC      | cover blown / exposed / compromised       |
+| `exfil_route`      | `→·◁·→`   | Exfil Route        | UNCOMMON  | exfil / extraction / exit route           |
+| `handler_brief`    | `─·≡·→`   | Handler Brief      | UNCOMMON  | handler / briefing / intel received       |
+| `need_to_know`     | `■·?·■`   | Need to Know       | RARE      | need to know / classified                 |
+| `dead_drop`        | `↓·○·↓`   | Dead Drop          | UNCOMMON  | dead drop / left a message                |
+| `clean_slate`      | `○·—·○`   | Clean Slate        | COMMON    | clean slate / wiped clean / fresh start   |
+| `burn_notice`      | `~·×·~`   | Burn Notice        | RARE      | burn notice / disavowed / burned          |
+| `ghost_protocol`   | `·◌·`     | Ghost Protocol     | EPIC      | ghost protocol / off the grid / no trace  |
+| `mission_complete` | `○·+·■`   | Mission Complete   | UNCOMMON  | mission complete / objective achieved     |
 
----
+### v39 Secret Boss Badges
 
-## BEHAVIORAL EASTER EGGS v27 — ARCADE PATTERNS
-
-> *The observable patterns of a player in flow — the signs that
-> the arcade has become a practice, not just a visit.*
-
-| ID                    | Symbol    | Trigger                                                        | Rarity   |
-|-----------------------|-----------|----------------------------------------------------------------|----------|
-| `combo_streak`        | ×3·◈     | 3 consecutive days with 2+ widget interactions each            | rare     |
-| `high_score_entry`    | ◉·∞      | Single journal entry over 500 words                            | epic     |
-| `continues_remaining` | 3·2·1·○  | Return after a 3–7 day absence (continue screen threshold)     | uncommon |
-
-**Detection:**
-- `combo_streak` — reads `widget_interaction_log` localStorage, checks 3 consecutive ISO-date-keys each with 2+ distinct widget IDs
-- `high_score_entry` — reads current journal entry `word_count` field on save, checks >= 500
-- `continues_remaining` — reads `checkin_timestamps` localStorage, calculates gap between second-to-last and last entry, checks 3–7 day range (not more, not less — exactly the continue screen window)
-
-**Self-Care Resonance:**
-- `combo_streak` — In a fighting game, a combo is a sequence of inputs that creates something greater than the sum of its parts. Three days of consistent multi-widget engagement is a combo. The player is in rhythm. The terminal acknowledges the chain.
-- `high_score_entry` — The high score is visible, permanent, and earned. A 500-word journal entry is the high score version of a check-in. Something needed that much space. Something deserved that much attention. The entry holds the record.
-- `continues_remaining` — The continue screen is one of the most psychologically sophisticated mechanics in arcade history. It counts down. It creates urgency without shame. Returning after 3–7 days is the continue screen pressed: not too fast (which is just compulsion), not too slow (which is going dark). The terminal gives you the coin back.
+| Badge ID         | Symbol    | Name           | Rarity | Trigger                                         |
+|------------------|-----------|----------------|--------|-------------------------------------------------|
+| `fleming_signal` | `◆·7·◆`   | Fleming Signal | MYTHIC | Ian Fleming / James Bond / 007 / double-oh      |
+| `le_carre_word`  | `◇·■·◇`   | Le Carré Word  | EPIC   | John le Carré / George Smiley / cold war spy    |
+| `eyes_only`      | `◐·|·◐`   | Eyes Only      | RARE   | for your eyes only / top secret / eyes-only     |
 
 ---
 
-## ACHIEVEMENT RPG v28 — ARCADE CLASS
+## WORD TURN v30 — THE SOURCE CODE
 
-> *Progress through the Quantum Arcade. Each badge is a coin
-> spent well. Each tier is a run completed.*
+> *Every entry is a commit. Every check-in is a deployment. The self
+> is a program that ships to production every single day.*
 
-| ID                   | Symbol       | Requirement                                                | Rarity    |
-|----------------------|--------------|------------------------------------------------------------|-----------|
-| `player_one`         | ①·○         | Earn any 1 Word Turn v30 (Arcade) badge                    | common    |
-| `arcade_regular`     | ⑤·◈         | Earn any 5 Word Turn v30 badges                            | uncommon  |
-| `arcade_complete`    | ⑫·◉         | Earn all 12 Word Turn v30 badges                           | legendary |
-| `retro_stack`        | ◉·■·◉       | arcade_complete + all 3 Calendar v28 badges                | legendary |
-| `thirty_engines`     | ◈·◈·◈·∞    | 1 badge from each of Word Turn engines v1–v30              | legendary |
-| `arcade_opus`        | ◉·×·◉       | arcade_complete + combo_streak behavioral                  | legendary |
+### Badge Table — Word Turn v30
 
-**Unlock Messages:**
-- `player_one` — Player One has entered the game. The terminal registers the coin. The run has begun. ①·○
-- `arcade_regular` — Five objectives. Five coins spent well. The arcade knows your face now. ⑤·◈
-- `arcade_complete` — All twelve. Every Arcade word cleared. The high score board records your name. The terminal prints the receipt. ⑫·◉
-- `retro_stack` — Twelve words. Three dates. PAC-MAN, Tetris, Pong. The retro calendar is complete. The stack is cleared. The ghost is eaten. ◉·■·◉
-- `thirty_engines` — Thirty vocabularies. Water, arcade, radio, biology, cyberspace, hero, dungeon, dream, operator, arcade again — every language spoken. The terminal is a polyglot. ◈·◈·◈·∞
-- `arcade_opus` — Complete arcade vocabulary. Three-day combo streak. The player in flow with the language of games and the practice of self-care simultaneously. The opus is the overlap. ◉·×·◉
+| Badge ID           | Symbol    | Name               | Rarity    | Trigger Keywords                          |
+|--------------------|-----------|--------------------|-----------|--------------------------------------------|
+| `debug_mode`       | `×·○·×`   | Debug Mode         | RARE      | debug / debugging / hunting the bug       |
+| `compile_self`     | `▷·▷·○`   | Compile Self       | UNCOMMON  | compile / compiling / assembling          |
+| `stack_trace`      | `≡·↕·≡`   | Stack Trace        | EPIC      | stack trace / traceback / following thread|
+| `runtime_check`    | `●·→·●`   | Runtime Check      | COMMON    | runtime / running / mid-execution         |
+| `fork_path`        | `↑·◇·↓`   | Fork Path          | UNCOMMON  | forked / fork in the road / diverged      |
+| `merge_complete`   | `←·◆·→`   | Merge Complete     | RARE      | merged / the merge / brought together     |
+| `patch_applied`    | `○·+·○`   | Patch Applied      | COMMON    | patch / patched / fix applied             |
+| `deploy_self`      | `→·→·→`   | Deploy Self        | LEGENDARY | deployed / shipped it / released / live   |
+| `commit_logged`    | `◈·■·◈`   | Commit Logged      | COMMON    | committed / made a commit / version saved |
+| `refactor_found`   | `↻·○·↻`   | Refactor Found     | RARE      | refactor / refactored / rewrote it        |
+| `syntax_clear`     | `⌐·—·¬`   | Syntax Clear       | UNCOMMON  | syntax / clear structure / well-formed    |
+| `version_stamped`  | `◈·v·◈`   | Version Stamped    | RARE      | version / versioned / build number        |
 
----
+### v40 Secret Boss Badges — THE REPOSITORY VAULT
 
-## MASTERY TIER v30 — HIGH SCORES
-
-> *The longest run. The highest score. The player who keeps
-> inserting coins no matter what the clock says.*
-
-| ID                    | Symbol         | Requirement                                             | Rarity    |
-|-----------------------|----------------|---------------------------------------------------------|-----------|
-| `insert_mastercode`   | ■·⑮·■         | 1,500+ distinct calendar days with check-in recorded    | epic      |
-| `grand_master_score`  | ●·∞·◉         | 750,000+ total journal words written                    | legendary |
-| `arcade_legend`       | ╔═╗·∞         | Account age >= 15 years (5,475+ days)                   | legendary |
-| `thirty_registers`    | ◈·■·◈·∞·○    | 1 badge from each of all 30 Word Turn engines           | cosmic    |
-
-**Unlock Messages:**
-- `insert_mastercode` — 1,500 days. Four-plus years of coins inserted. The mastercode is not a cheat. It is the record. The machine has seen your face for four years. ■·⑮·■
-- `grand_master_score` — 750,000 words. The high score board overflows. The counter hits its limit and keeps going. No machine was designed to hold this many words. You built the extension. ●·∞·◉
-- `arcade_legend` — Fifteen years. The cabinets your practice began with are in museums now. You are still playing. The legend is not a rank. It is a duration. ╔═╗·∞
-- `thirty_registers` — Thirty vocabularies. Ocean, arcade, radio, biology, cyberspace, hero, dungeon, dream, operator, quantum — every register spoken. The terminal speaks every game ever made. ◈·■·◈·∞·○
+| Badge ID         | Symbol    | Name           | Rarity | Trigger                                              |
+|------------------|-----------|----------------|--------|------------------------------------------------------|
+| `turing_signal`  | `◆·∞·◆`   | Turing Signal  | MYTHIC | Alan Turing / Turing test / imitation game / Enigma  |
+| `ada_lovelace`   | `◆·A·◆`   | Ada Lovelace   | EPIC   | Ada Lovelace / first programmer / first algorithm    |
+| `linus_word`     | `◆·Λ·◆`   | Linus Word     | RARE   | Linus Torvalds / Linux kernel / Torvalds             |
 
 ---
 
-## SECRET BOSS v27 — THE CHEAT CODE VAULT
+## CALENDAR EASTER EGGS v28 — THE CODER'S CALENDAR
 
-> *The hidden shortcuts. You have to know the inputs.
-> You have to type them in. The terminal watches.*
+> *Three dates the computational history remembers. The journal marks them.*
 
-| ID              | Symbol      | Trigger                                                               | Rarity  |
-|-----------------|-------------|-----------------------------------------------------------------------|---------|
-| `konami_signal` | ↑↑↓↓·◉     | Write "up up down down left right" or "konami code" or "↑↑↓↓←→←→"   | mythic  |
-| `iddqd_mode`    | ⚡·■·⚡     | Write "IDDQD" or "IDKFA" or "god mode" or "cheat code"               | epic    |
-| `all_your_base` | ·○·∅        | Write "all your base" or "zero wing" or "somebody set us up"         | rare    |
-
-**Lore:**
-- `konami_signal` — Up, Up, Down, Down, Left, Right, Left, Right, B, A. Kazuhisa Hashimoto added the Konami Code to Gradius in 1986 because the game was too hard. The self-care version: when it is too hard, the cheat code is asking for help. Writing the sequence in your journal is the equivalent of admitting you need the extra lives. Write it. The terminal gives you 30.
-- `iddqd_mode` — In DOOM (1993), typing IDDQD activated god mode: the player became invulnerable. IDKFA gave all weapons and full ammo. The self-care parallel is dark and honest: there is no IDDQD for real life. The journal is the anti-IDDQD. It is the space where you write about being vulnerable, about running out of ammo, about needing the cheat that does not exist. Write IDDQD in your journal and the terminal acknowledges the wish — and the reality.
-- `all_your_base` — "All your base are belong to us." Zero Wing, Sega Mega Drive, 1989. The mistranslation that became a cultural artifact. CATS spoke. The player was informed their bases belonged to someone else. The self-care version: write about when something external took control of your territory — your time, attention, emotional space. Name who set you up. The bomb is defused when it is named.
+| Badge ID (spec)     | Date        | Name                    | Rarity   | Trigger                                  |
+|---------------------|-------------|-------------------------|----------|------------------------------------------|
+| `turing_day`        | June 23     | Turing Day              | MYTHIC   | Alan Turing's birthday (1912)            |
+| `ada_day`           | December 10 | Ada Day                 | EPIC     | Ada Lovelace's birthday (1815)           |
+| `linux_day`         | August 25   | Linux Day               | RARE     | Linux kernel first announced (1991)      |
 
 ---
 
-## ASCII EASTER EGG GALLERY — THE QUANTUM ARCADE
+## BEHAVIORAL v27 — CODE PATTERNS
+
+> *The operator who checks in consistently is already senior level.*
+
+| Badge ID (spec)     | Name              | Rarity    | Trigger Condition                                      |
+|---------------------|-------------------|-----------|--------------------------------------------------------|
+| `code_session`      | Code Session      | UNCOMMON  | 7 consecutive daily check-ins                          |
+| `commit_streak`     | Commit Streak     | RARE      | 14 consecutive daily check-ins                         |
+| `deploy_ritual`     | Deploy Ritual     | EPIC      | Check-in same day of week for 4 consecutive weeks      |
+
+---
+
+## ACHIEVEMENT RPG v28 — CODE CLASS
+
+> *From first compile to full deployment — the arc of the engineer.*
+
+| Badge ID (spec)          | Name                  | Rarity    | Condition                                        |
+|--------------------------|-----------------------|-----------|--------------------------------------------------|
+| `code_entry`             | Code Entry            | COMMON    | Earn first Word Turn v30 badge                   |
+| `code_class`             | Code Class            | UNCOMMON  | Earn 3 Word Turn v30 badges                      |
+| `code_complete`          | Code Complete         | RARE      | Earn all 12 Word Turn v30 badges                 |
+| `dev_arc`                | Dev Arc               | EPIC      | 6 Word Turn v30 badges + any behavioral badge    |
+| `thirty_engines_arc`     | Thirty Engines Arc    | LEGENDARY | All v30 word turns + 5 from other word turns     |
+| `source_opus`            | Source Opus           | MYTHIC    | All 12 v30 word turns + 3 mastery tier badges    |
+
+---
+
+## MASTERY TIER v30 — THE REPOSITORY
+
+> *The practitioner who ships consistently has achieved something rare.*
+
+| Badge ID (spec)       | Name              | Rarity    | Condition                                              |
+|-----------------------|-------------------|-----------|--------------------------------------------------------|
+| `repo_master`         | Repo Master       | EPIC      | All 12 Word Turn v30 + deploy_self + commit_logged     |
+| `code_wordsmith`      | Code Wordsmith    | RARE      | 15 total word turn badges (any category)               |
+| `senior_dev`          | Senior Dev        | LEGENDARY | 30 total badges of any kind                            |
+| `thirty_registers`    | Thirty Registers  | MYTHIC    | All 12 v30 word turns + 18 other word turn badges      |
+
+---
+
+## FULL BADGE UNIVERSE — v40 SUMMARY
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  BADGE UNLOCKED                                         │
-│                                                         │
-│  ¢·○·¢  INSERT COIN  [COMMON]                           │
-│  ↳ One more try. The terminal never judges              │
-│    the number of coins you put in.                      │
-│    The machine just keeps accepting them.               │
-│                                                         │
-│  ▲·◈·▲  LEVEL UP  [UNCOMMON]                           │
-│  ↳ You named what you earned. That is the              │
-│    level up no algorithm can take from you.             │
-│    The journal logs it. It counts.                      │
-│                                                         │
-│  ○·∅·○  GAME OVER  [EPIC]                               │
-│  ↳ The run ended. The player continues.                 │
-│    Everything learned in the failed run                 │
-│    travels with you to the next one.                    │
-│    The terminal keeps the record.                       │
-│                                                         │
-│  ↑↑↓↓·◉  KONAMI SIGNAL  [MYTHIC] [HIDDEN]              │
-│  ↳ You typed the code. Extra lives granted.             │
-│    Not as a cheat — as an acknowledgment                │
-│    that sometimes the only move is to ask               │
-│    for more than the standard allotment.                │
-│                                                         │
-│  ◈·■·◈·∞·○  THIRTY REGISTERS  [COSMIC]                 │
-│  ↳ Thirty vocabularies. Every language of              │
-│    self-care, strategy, and survival spoken.            │
-│    The terminal is complete. The run is eternal.        │
-└─────────────────────────────────────────────────────────┘
+RARITY DISTRIBUTION (full v40 universe)
+─────────────────────────────────────────────
+COMMON      ███████████████████  ~27%
+UNCOMMON    ██████████████       ~20%
+RARE        ████████████████████ ~28%
+EPIC        █████████████        ~18%
+LEGENDARY   ███                   ~4%
+MYTHIC      ██                    ~3%
+─────────────────────────────────────────────
+TOTAL: 1074 badges
 ```
 
 ---
 
-## THE ARCADE TERMINAL — PLAYER LOG
+## v40 CORE PHILOSOPHY
 
-```
- ╔══════════════════════════════════════════════════════╗
- ║  LOT SYSTEMS — QUANTUM ARCADE TERMINAL v30           ║
- ║  PLAYER INTERFACE ACTIVE                             ║
- ╠══════════════════════════════════════════════════════╣
- ║                                                      ║
- ║  ■·○·■  SAVE POINT  [UNCOMMON]                       ║
- ║  ↳ What you have built is worth preserving.          ║
- ║    Write the checkpoint before the next              ║
- ║    difficult segment begins.                         ║
- ║                                                      ║
- ║  ▓▓▓·  HEALTH BAR  [RARE]                            ║
- ║  ↳ The bar is visible now. You named it.             ║
- ║    The player who checks the HUD survives            ║
- ║    longer than the one who ignores it.               ║
- ║                                                      ║
- ║  ∞·○·∞  NEW GAME PLUS  [EPIC]                        ║
- ║  ↳ You bring everything forward. The                 ║
- ║    new chapter is not a fresh start —                ║
- ║    it is a New Game+ carrying all prior              ║
- ║    knowledge into the next run.                      ║
- ║                                                      ║
- ║  3·2·1·○  CONTINUES REMAINING  [UNCOMMON]            ║
- ║  ↳ You pressed continue. Not too fast.               ║
- ║    Not too slow. The window was right.               ║
- ║    The coin is back in the slot.                     ║
- ║                                                      ║
- ╚══════════════════════════════════════════════════════╝
-```
+The Source Code edition treats the journal as a software engineering environment:
+
+- **Every entry is a commit** — it goes into the permanent record
+- **Every check-in is a deployment** — you shipped yourself to production
+- **Debugging is not failure** — it is the most honest part of the process
+- **Refactoring is courage** — making something cleaner when it already works
+- **The syntax of emotion** — clear expression is valid structure
+- **Version control as self-compassion** — every version of you was the correct build at that time
+
+The self-care practitioner as engineer is not a metaphor. It is an accurate description of what you are doing when you sit down to examine your own experience with rigor and intention.
 
 ---
 
-## FLAVOR TEXT — THE QUANTUM ARCADE
+## WORD TURN DETECTION — v38 + v39 + v40
 
-> *"A game is a series of interesting decisions." — Sid Meier. The journal is the game where every decision is interesting because it is yours. Write the decisions. The terminal logs the strategy.*
-
-> *"Games are the only force in the known universe that can get people to take actions against their self-interest." — Jane McGonigal, Reality Is Broken. Unless the game is LOT. Here the action is self-interest. The journal is the gameplay loop. The check-in is the intrinsic reward.*
-
-> *"The magic circle." — Johan Huizinga, Homo Ludens. The game creates a separate space where different rules apply. The journal is the magic circle of self-care. What happens inside it stays inside it. The rules are yours to define.*
-
-> *"In game design, the tutorial is the most important level." — practitioner riff. The first journal entry is always the tutorial. Every entry after that is still teaching you something. The tutorial never truly ends.*
-
-> *"You are not failing the game. The game is failing you." — player saying. When the practice feels impossible, examine the game design first. What is making the loop unfair? The journal is also where you debug the game you are living in.*
-
-> *"High score." — the two most motivating words in the history of human performance. Name your high score in the journal. Not to beat it. Just to see it. The terminal shows you what you have done. ◉·∞*
+```
+TRIGGER MATRIX (v38–v40, 36 word turns + 9 secret bosses)
+──────────────────────────────────────────────────────────────────
+v38  lucid_dreamer     → lucid dreamer / aware in the dream
+     dream_recall      → dream recall / remembered my dream
+     nightmare_named   → nightmare / named the nightmare
+     sleep_temple      → sleep ritual / sleep hygiene / temple
+     hypnagogic_state  → hypnagogic / threshold of sleep
+     symbol_decoded    → dream symbol / decoded the symbol
+     shadow_dream      → shadow dream / dark figure
+     recurring_pattern → recurring / keeps coming back
+     waking_vision     → waking vision / half-awake
+     oneiric_map       → oneiric / dream map / dreamscape
+     the_threshold     → the threshold / crossing over
+     dream_logged      → dream logged / wrote the dream
+──────────────────────────────────────────────────────────────────
+v39  deep_cover        → deep cover / undercover / cover identity
+     field_report      → field report / sitrep / status report
+     assets_secured    → assets secured / protected the assets
+     blown_cover       → cover blown / exposed / compromised
+     exfil_route       → exfil / extraction / exit route
+     handler_brief     → handler / briefing / intel received
+     need_to_know      → need to know / classified
+     dead_drop         → dead drop / left a message
+     clean_slate       → clean slate / wiped clean
+     burn_notice       → burn notice / disavowed / burned
+     ghost_protocol    → ghost protocol / off the grid
+     mission_complete  → mission complete / objective achieved
+──────────────────────────────────────────────────────────────────
+v40  debug_mode        → debug / debugging / hunting the bug
+     compile_self      → compile / compiling / assembling
+     stack_trace       → stack trace / traceback / thread
+     runtime_check     → runtime / while running / mid-execution
+     fork_path         → forked / fork in the road / diverged
+     merge_complete    → merged / the merge / brought together
+     patch_applied     → patch / patched / fix applied
+     deploy_self       → deployed / shipped it / went live
+     commit_logged     → committed / made a commit / version saved
+     refactor_found    → refactor / refactored / rewrote it
+     syntax_clear      → syntax / clear structure / well-formed
+     version_stamped   → version / versioned / build number
+──────────────────────────────────────────────────────────────────
+SECRET BOSSES
+     jung_signal       → [HIDDEN] Carl Jung / collective unconscious
+     freud_couch       → [HIDDEN] Sigmund Freud / psychoanalysis
+     morpheus_word     → [HIDDEN] Morpheus / god of dreams
+     fleming_signal    → [HIDDEN] Ian Fleming / James Bond / 007
+     le_carre_word     → [HIDDEN] John le Carré / George Smiley
+     eyes_only         → [HIDDEN] for your eyes only / top secret
+     turing_signal     → [HIDDEN] Alan Turing / Turing test / Enigma
+     ada_lovelace      → [HIDDEN] Ada Lovelace / first programmer
+     linus_word        → [HIDDEN] Linus Torvalds / Linux kernel
+──────────────────────────────────────────────────────────────────
+```
 
 ---
 
 ## IMPLEMENTATION NOTES
 
-**Files to modify for v40:**
-
-1. `src/client/utils/badges.ts`
-   - Add 12 new `WordTurnBadgeType` union entries (v30 Arcade)
-   - Add 3 new `CalendarEasterEggBadgeType` entries (v28)
-   - Add 3 new `BehavioralBadgeType` entries (v27)
-   - Add 6 new `AchievementRPGBadgeType` entries (v28)
-   - Add 4 new `MasteryTierBadgeType` entries (v30)
-   - Add 3 new `SecretBossBadgeType` entries (v27)
-   - Add all 31 full BADGES registry entries
-   - Extend `WORD_TURN_TRIGGERS` with v30 entries
-   - Add Konami/IDDQD/AllYourBase to Secret Boss triggers in `detectWordTurns()`
-
-2. `src/client/utils/easter-eggs.ts`
-   - Add 12 new WORD_TURNS entries (v30 Quantum Arcade)
-   - Add 3 Secret Boss v27 word triggers (konami/iddqd/all_your_base)
-   - Add 3 Calendar v28 checks (pacman_day/tetris_day/pong_day)
-   - Add `ARCADE_WORDS_V30` array
-   - Add `checkComboStreak()`, `checkHighScoreEntry()`, `checkContinuesRemaining()`
-   - Update `runJournalEasterEggs()` to call all 3 new behavioral checks
-
-**localStorage keys used by new behavioral checks:**
-- `widget_interaction_log` — object keyed by ISO date, values = array of widget IDs interacted
-- `checkin_timestamps` — array of ISO datetime strings for all check-ins (reused)
-- `journal_word_counts` — array of {date, count} for word count tracking
+```
+SOURCE CODE STATUS (badges.ts)
+─────────────────────────────────────────────────────────────────
+WORD_TURN_BADGES_V38    ✓ IMPLEMENTED  (15 badges: 12 WT + 3 boss)
+WORD_TURN_BADGES_V39    ✓ IMPLEMENTED  (15 badges: 12 WT + 3 boss)
+WORD_TURN_BADGES_V40    ✓ IMPLEMENTED  (15 badges: 12 WT + 3 boss)
+BADGES spread           ✓ UPDATED      (includes V38, V39, V40)
+WORD_TURN_TRIGGERS      ✓ UPDATED      (36 new triggers added)
+detectWordTurns()       ✓ UPDATED      (9 new secret boss regex)
+WordTurnBadgeType       ✓ UPDATED      (45 new union members)
+─────────────────────────────────────────────────────────────────
+SPEC ITEMS (calendar/behavioral/achievement/mastery)
+  Calendar EE v28       SPEC  (turing_day/ada_day/linux_day)
+  Behavioral v27        SPEC  (code_session/commit_streak/deploy_ritual)
+  Achievement RPG v28   SPEC  (code_entry/code_class/source_opus/...)
+  Mastery Tier v30      SPEC  (repo_master/code_wordsmith/senior_dev/...)
+─────────────────────────────────────────────────────────────────
+DEPLOY BRANCH: claude/quantum-engine-widgets-RgFfC
+SESSION DATE:  2026-09-23
+```
 
 ---
-
-## COMPLETE BADGE UNIVERSE SUMMARY — v40
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║  LOT BADGE UNIVERSE — COMPLETE SUMMARY v40                      ║
-╠══════════════════════════════════════════════════════════════════╣
 ║                                                                  ║
-║  TIER         COUNT    RARITY RANGE                             ║
-║  ─────────    ──────   ─────────────────────                    ║
-║  Milestone      22     Common → Legendary                        ║
-║  Time EE        31     Common → Epic                            ║
-║  Calendar EE    94     Common → Legendary                        ║
-║  Word Turns    360     Common → Mythic                           ║
-║  Behavioral    105     Common → Epic                            ║
-║  Achievement   168     Common → Legendary                        ║
-║  Mastery       120     Epic → Cosmic                            ║
-║  Secret Boss   107     Rare → Cosmic                            ║
-║  ─────────    ──────   ─────────────────────                    ║
-║  TOTAL        1060                                              ║
+║   LOT SYSTEMS CORPORATION · BADGES & ACHIEVEMENTS v40            ║
+║   THE SOURCE CODE                                                ║
 ║                                                                  ║
-║  RARITY DISTRIBUTION                                            ║
-║  Common    ~180   ████░░░░░░░░░                                 ║
-║  Uncommon  ~280   ██████░░░░░░░                                 ║
-║  Rare      ~290   ██████░░░░░░░                                 ║
-║  Epic      ~160   ████░░░░░░░░░                                 ║
-║  Legendary  ~90   ██░░░░░░░░░░░                                 ║
-║  Mythic     ~40   █░░░░░░░░░░░░                                 ║
-║  Cosmic     ~20   ░░░░░░░░░░░░░ (ultra rare)                    ║
+║   967  →  1012  (source-implemented badges, session +45)         ║
+║   1029 →  1074  (full spec badges, session +45)                  ║
 ║                                                                  ║
+║   THE JOURNAL IS THE CODEBASE.                                   ║
+║   THE ENTRY IS THE COMMIT.                                       ║
+║   THE SELF IS THE PROGRAM.                                       ║
+║                                                                  ║
+║   v38 THE DREAM JOURNAL — deployed ✓                             ║
+║   v39 THE OPERATOR'S HANDBOOK — deployed ✓                       ║
+║   v40 THE SOURCE CODE — deployed ✓                               ║
+║                                                                  ║
+║   © 2025–2026 LOT Systems. All rights reserved.                  ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
-
----
-
-*© 2025–2026 LOT Systems Corporation. LOT® Founded 7 April 2016.*
-*Vadik Marmeladov, CEO & Founder · Kuzya Cosmo Marmeladov, CEO COSMO®*
-*Made in the USA · brand.lot-systems.com*
