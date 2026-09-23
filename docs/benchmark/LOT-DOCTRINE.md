@@ -226,3 +226,18 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Environment-As-Texture (/story context weaving)
+
+A context snapshot (weather/astrology/location) exists on every Log row via
+getLogContext() whether or not the consuming feature reads it. When wiring
+a new AI-narrative route, fetch it once at the top of the handler and reuse
+the same value for both the prompt and the row's own `context` field — do
+not call getLogContext() twice per request. Feed it to the model as
+optional texture with an explicit "at most one detail, only if it fits"
+instruction, never as required content: the operator's actual log/mood/
+self-care data is the subject; environment is set dressing. A narrative
+feature that leads with the weather has inverted the priority.
+
+(SR-20260923-01: /story wired to context snapshot; single getLogContext()
+call reused for both prompt and stored row.)

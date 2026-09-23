@@ -17,7 +17,7 @@ import {
   UserTag,
 } from '#shared/types'
 import config from '#server/config'
-import { fp } from '#shared/utils'
+import { fp, toCelsius } from '#shared/utils'
 import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
@@ -5515,6 +5515,8 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
       const { logText, quantumState, userIndex } = req.body
 
+      const context = await getLogContext(req.user)
+
       const logs = await fastify.models.Log.findAll({
         where: { userId: req.user.id },
         order: [['createdAt', 'DESC']],
@@ -5547,6 +5549,24 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
+      // Every log entry already carries a context snapshot (weather, time,
+      // location, astrology) — see getLogContext(). /story is the moment
+      // that data gets woven back into language, so surface *this* moment's
+      // snapshot as optional texture rather than raw metadata.
+      const envParts: string[] = []
+      if (context.city) {
+        envParts.push(`LOCATION: ${context.city}${context.country ? `, ${context.country}` : ''}`)
+      }
+      if (context.temperature != null) {
+        const celsius = Math.round(toCelsius(context.temperature))
+        envParts.push(`WEATHER: ${celsius}°C${context.weatherDescription ? `, ${context.weatherDescription}` : ''}${context.humidity != null ? `, ${Math.round(context.humidity)}% humidity` : ''}`)
+      }
+      if (context.astroWesternZodiac || context.astroMoonPhase) {
+        const moonIllum = context.astroMoonIllumination != null ? ` (${Math.round(context.astroMoonIllumination * 100)}% illuminated)` : ''
+        envParts.push(`ASTROLOGY: ${context.astroWesternZodiac || '—'} sun · ${context.astroHourlyZodiac || '—'} hour · Moon ${context.astroMoonPhase || '—'}${moonIllum} · ${context.astroRokuyo || '—'}`)
+      }
+      const envBlock = envParts.length > 0 ? envParts.join('\n') : ''
+
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
 The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
@@ -5558,6 +5578,7 @@ RULES:
 - If they've been consistent with check-ins, acknowledge the discipline
 - If there are gaps or struggle, acknowledge that with compassion
 - The tone should match their current energy: reflective if low, energized if high
+- The ENVIRONMENT SNAPSHOT below (weather, astrology, location) is optional texture, not the subject — weave in at most one detail from it only if it genuinely fits the mood; never force it, never lead with it
 - End with a single forward-looking sentence — not a pep talk, just a quiet truth
 - Return ONLY the story paragraphs. No title. No commentary. No preamble.
 - Keep it under 200 words.`
@@ -5566,6 +5587,8 @@ RULES:
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
+
+${envBlock ? `ENVIRONMENT SNAPSHOT (this moment):\n${envBlock}` : 'ENVIRONMENT SNAPSHOT: unavailable'}
 
 RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
 
@@ -5587,7 +5610,6 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
 
         const cleaned = story.trim().replace(/^["']|["']$/g, '')
 
-        const context = await getLogContext(req.user)
         const storyLog = await fastify.models.Log.create({
           userId: req.user.id,
           text: cleaned,
