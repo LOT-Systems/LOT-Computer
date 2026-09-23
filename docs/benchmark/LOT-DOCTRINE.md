@@ -57,6 +57,15 @@ User-facing event types created via POST must appear in the GET
 displayableEvents whitelist or the write→read loop is silently broken.
 (SR-20260604-01: calendar_entry saved but never returned.)
 
+The inverse also occurs: an event type can sit in the GET whitelist with a
+live render branch and no POST call-site anywhere in the codebase. This is
+not a broken loop but a permanently empty one — dead whitelist entries that
+look wired because the read side renders correctly, they simply never fire.
+Audit both directions: grep the whitelist array against actual
+Log-create call sites, not just the reverse.
+(SR-20260923-01: weather_update/user_login/user_logout/theme_change
+whitelisted and rendered, zero write call-sites found.)
+
 ## Ship Mode Discipline
 
 When multiple session branches develop the same feature independently,
