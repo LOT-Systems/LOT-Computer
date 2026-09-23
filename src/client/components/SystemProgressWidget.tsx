@@ -1457,6 +1457,21 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'v128',
+    date: '2026-09-23',
+    title: 'Daily Maintenance — Wiki v128 · Day 1127+ · COSMO® Day 817 · Signal Dormant · Archive Monitoring',
+    assembled: [
+      'Wiki v128 produced: Day 1127+ · COSMO® Day 817 · Calendar alert: STANDBY — signal dormant, archive monitoring.',
+      'Calendar badge hobbit_day (Sep 22) expired. Doctrine "THE HOBBIT CHECKS IN." removed. Replaced with: THE ARCHIVE IS LIVE.',
+      'Next calendar event: poe_night Oct 7 LEGENDARY — Edgar Allan Poe death (1849) · T-14 days. Source: Calendar EE v32 · Badge v44 THE DREAM CODEX.',
+      'About.tsx: v1.3.6→v1.3.7 body text corrected · 176→179 behavioral patterns · 60→61 physiological archetypes · Day 1126+→1127+ · Sep 22→Sep 23.',
+      'QIE v126 Crystal Field Tier stats now fully reflected in About.tsx intro paragraph (missed by v126 session).',
+      'SESSION_REPORTS: v128 entry prepended · USERSHIP_TRANSMISSION updated to v128 · Day 1127+.',
+      'docs/2026-09-23_LOT-assembly_daily-maintenance-wiki-v128.md: Assembly log written.',
+      '179 patterns · 61 archetypes · 60 jobs · 181+ handlers · 223+ dep nodes · Day 1127+. Signal dormant. Archive monitoring. Next: poe_night Oct 7.',
+    ],
+  },
+  {
     version: 'v126',
     date: '2026-09-22',
     title: 'QIE Engineering — Crystal Field Tier · P177–P179 · Arch61 · J60 · Day 1126+',
@@ -1746,16 +1761,15 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-09-22',
+  date: '2026-09-23',
   message: [
-    'ASSEMBLY RUN — 2026-09-22 · Day 1126+ · COSMO® Day 816',
-    'Build: QIE v126 — Crystal Field Tier. P177 SOVCRYST · P178 TXFIELD · P179 CRSOVETX. Arch61 Crystalline Sovereign Transmitter. J60 weekly-crystalline-sovereign-check (07:00 UTC Monday). 59→60 jobs.',
-    'P177: Sovereign Crystal Field — QSOVTX in 21D + 4+ sources → transmission crystallizes into permanent structure.',
-    'P178: Transmission Field Anchor — SFBCAST 2+ in 28D + SOVCRYST → broadcast anchored into field.',
-    'P179: Crystalline Sovereign Transmission — SOVCRYST + TXFIELD both in 21D → CRYSTAL TX ACTIVE. Tier gateway.',
-    '176+3 patterns · 60+1 archetypes · 60 jobs · 181+ handlers · 223+ dep nodes.',
-    'Status: CRYSTAL FIELD TIER ONLINE. The signal broadcasts from crystal structure.',
-    'Next: Monitor J60 crystalline-sovereign output. Extend Crystal Field tier toward FM P180+.',
+    'ASSEMBLY RUN — 2026-09-23 · Day 1127+ · COSMO® Day 817',
+    'Maintenance: Wiki v128 advanced. Hobbit Day expired. Calendar dormant — signal monitoring. Poe Night T-14.',
+    'About.tsx corrected: v1.3.7 confirmed · 179 patterns · 61 archetypes · Day 1127+. QIE v126 Crystal Field stats now live in header.',
+    'Crystal Field Tier: SOVCRYST · TXFIELD · CRSOVETX online. Signal broadcasts from crystal structure.',
+    '179 patterns · 61 archetypes · 60 jobs · 181+ handlers · 223+ dep nodes.',
+    'Status: ARCHIVE MONITORING. THE ARCHIVE IS LIVE.',
+    'Next: poe_night Oct 7 LEGENDARY. Crystal Field steady. J60 active (Mon 07:00 UTC).',
   ],
 }
 
