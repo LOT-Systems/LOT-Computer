@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev O
+# LOT-DOCTRINE  rev P
 
 ## Render Isolation
 
@@ -240,3 +240,25 @@ concluding Plan B is unavailable or that this is a first run.
 (SR-20260924-01 misread LAST_GREEN as NONE and claimed "first benchmark tag
 in the repo" from a shallow clone that had not fetched tags; ~90+ benchmark
 tags already existed on origin back to 2026-06. Corrected in SR-20260924-02.)
+
+## Tag-Push Verification (--follow-tags Skips Lightweight Tags; Scoped Credentials Can Reject Tag Refs)
+
+`git push --follow-tags` pushes only ANNOTATED tags reachable from the
+pushed ref — a lightweight tag (`git tag NAME`, no `-a`) is silently
+skipped, and the push still reports success. Always create benchmark tags
+annotated (`git tag -a NAME -m "..."`) so --follow-tags actually carries
+them, matching the existing lattice convention.
+
+Separately, a session's push credentials can be scoped to a specific branch
+ref and reject `refs/tags/*` pushes with a 403 even though the branch push
+itself succeeds. STEP 07 must verify tag presence on origin with
+`git ls-remote origin refs/tags/<tag>` — not just "no error from git push"
+— before a report claims `PUSH: ... PUSHED` for a tag. On rejection, record
+`TAG: LOCAL ONLY — push rejected (403, credential scope)` and leave tag
+creation for a session with fuller repo access, rather than overwriting the
+claim to something false.
+
+(SR-20260924-01 and -02 both claimed their tags were pushed; neither tag
+reached origin — 01's lightweight tags were silently skipped by
+--follow-tags, and 02's re-created annotated tags were rejected outright
+with a 403 on this session's scoped credentials. Corrected in SR-20260924-03.)
