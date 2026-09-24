@@ -28,12 +28,12 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, parseEmailCommand, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useSendLotEmail } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3707,6 +3707,20 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [emailResult, setEmailResult] = React.useState<string | null>(null)
+  const [emailSending, setEmailSending] = React.useState(false)
+  const lastEmailSentRef = React.useRef<string | null>(null)
+  const { mutate: submitLotEmail } = useSendLotEmail({
+    onSuccess: (data) => {
+      setEmailResult(`LOT EMAIL → ${data.recipientName.toUpperCase()}: SENT`)
+      setEmailSending(false)
+    },
+    onError: (error: any) => {
+      const apiMessage = error?.response?.data?.message as string | undefined
+      setEmailResult(apiMessage ? apiMessage.toUpperCase() : 'LOT EMAIL FAILED — Delivery unavailable.')
+      setEmailSending(false)
+    },
+  })
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -4139,6 +4153,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to <Name> <message>   Send a LOT Email (delivered via Sync)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4147,6 +4162,14 @@ const NoteEditor = ({
         setSystemHelp(lines.join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
+      } else if (trigger === 'lot-email') {
+        const parsed = parseEmailCommand(value)
+        if (parsed && !emailSending && lastEmailSentRef.current !== `${parsed.recipientName}:${parsed.message}`) {
+          lastEmailSentRef.current = `${parsed.recipientName}:${parsed.message}`
+          setEmailSending(true)
+          setEmailResult(null)
+          submitLotEmail(parsed)
+        }
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
@@ -4274,6 +4297,18 @@ const NoteEditor = ({
           )}
           rows={primary ? 10 : 1}
         />
+        {(emailSending || emailResult) && (
+          <div className="mt-8">
+            <Block label="LOT EMAIL:" blockView>
+              {emailSending && !emailResult && (
+                <div className="opacity-40 uppercase tracking-widest">Transmitting...</div>
+              )}
+              {emailResult && (
+                <div className="opacity-60">{emailResult}</div>
+              )}
+            </Block>
+          </div>
+        )}
         {(qiLoading || qiResponse) && (
           <div className="mt-8">
             <Block label="QI [INTSUM]:" blockView>

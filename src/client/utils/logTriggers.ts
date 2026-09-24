@@ -41,6 +41,7 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'lot-email'         // /email to <Name> — compose a LOT Email, delivered via Sync
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -67,7 +68,25 @@ const RULES: TriggerRule[] = [
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'lot-email',      emojis: [],        keywords: ['email'] },
 ]
+
+/**
+ * Parses "/email to <Name> <message>" out of a log entry. Returns null
+ * when the text doesn't contain a well-formed command — the call site
+ * decides how to surface that (e.g. only once the name + a message body
+ * are both present, mirroring the /qi minimum-length gate).
+ */
+export function parseEmailCommand(
+  text: string
+): { recipientName: string; message: string } | null {
+  const match = text.match(/\/email\s+to\s+([a-zA-Z][a-zA-Z'-]*)\s*([\s\S]*)/i)
+  if (!match) return null
+  const recipientName = match[1].trim()
+  const message = match[2].trim()
+  if (!recipientName || !message) return null
+  return { recipientName, message }
+}
 
 /**
  * Returns every trigger present in `text`. An empty array means the

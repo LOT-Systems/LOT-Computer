@@ -4086,6 +4086,101 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   })
 
   // ============================================================================
+  // LOT EMAIL — composed in the LOG via "/email to <Name> <message>"
+  // Resolves the recipient by first name and delivers as a DirectMessage
+  // over the same Sync/Lot Chat channel as /direct-messages, so the
+  // message appears live in the recipient's Sync inbox. Cohort Connect
+  // ("LOT Community") routes its own "Send message" action into this
+  // same DirectMessage thread, so all person-to-person mail in LOT —
+  // Log-composed or Cohort-initiated — flows through one engine.
+  // ============================================================================
+  fastify.post(
+    '/lot-email',
+    async (
+      req: FastifyRequest<{
+        Body: { recipientName: string; message: string }
+      }>,
+      reply
+    ) => {
+      try {
+        const recipientName = (req.body.recipientName || '').trim()
+        const message = (req.body.message || '').trim().slice(0, 2000)
+
+        if (!recipientName) return reply.throw.badParams('Recipient name is required')
+        if (!message) return reply.throw.badParams('Email message is required')
+
+        const matches = await fastify.models.User.findAll({
+          where: {
+            firstName: { [Op.iLike]: recipientName },
+            id: { [Op.ne]: req.user.id },
+          },
+          limit: 2,
+        })
+
+        if (matches.length === 0) {
+          return reply.throw.notFound(`No LOT operator named "${recipientName}" found`)
+        }
+        if (matches.length > 1) {
+          return reply.throw.rejected(
+            `Multiple operators named "${recipientName}" — send from their profile instead`
+          )
+        }
+
+        const recipient = matches[0]
+
+        const directMessage = await fastify.models.DirectMessage.create({
+          senderId: req.user.id,
+          receiverId: recipient.id,
+          message,
+        })
+
+        // Emit over the same Sync channel /direct-messages uses — the
+        // recipient's DirectMessageThread (reached from Sync) picks this
+        // up live via SSE, no separate email inbox needed.
+        sync.emit('direct_message', {
+          id: directMessage.id,
+          senderId: req.user.id,
+          receiverId: recipient.id,
+          message: directMessage.message,
+          senderName: `${req.user.firstName} ${req.user.lastName}`.trim(),
+          createdAt: directMessage.createdAt,
+        })
+
+        process.nextTick(async () => {
+          try {
+            const context = await getLogContext(req.user)
+            await fastify.models.Log.create({
+              userId: req.user.id,
+              event: 'lot_email_sent',
+              text: '',
+              metadata: {
+                directMessageId: directMessage.id,
+                recipientId: recipient.id,
+                recipientName: recipient.firstName,
+                message: directMessage.message,
+              },
+              context,
+            })
+          } catch (logError) {
+            console.error('Error logging LOT Email:', logError)
+          }
+        })
+
+        return {
+          id: directMessage.id,
+          recipientId: recipient.id,
+          recipientName: recipient.firstName,
+          message: directMessage.message,
+          createdAt: directMessage.createdAt,
+        }
+      } catch (error) {
+        console.error('Error sending LOT Email:', error)
+        return reply.status(500).send({ error: 'Failed to send LOT Email' })
+      }
+    }
+  )
+
+  // ============================================================================
   // STATS API - Real-time metrics and community insights
   // ============================================================================
 

@@ -123,7 +123,10 @@ export const CohortConnectWidget: React.FC = () => {
       connectionReadiness,
       hour: new Date().getHours()
     })
-    stores.goTo('sync')
+    // Cohort matches message each other through the same LOT Email /
+    // Sync engine as a Log-composed "/email to <Name>" — one channel,
+    // whether the conversation starts from Community or the Log.
+    window.location.href = `/dm/${userId}`
   }
 
   const handleToggleExpand = (userId: string) => {

@@ -120,6 +120,21 @@ export const useSendDirectMessage = createMutation<
   void
 >('post', '/api/direct-messages')
 
+// ============================================================================
+// LOT EMAIL — /email to <Name> command composed from the LOG
+// ============================================================================
+
+export const useSendLotEmail = createMutation<
+  { recipientName: string; message: string },
+  {
+    id: string
+    recipientId: string
+    recipientName: string
+    message: string
+    createdAt: string
+  }
+>('post', '/api/lot-email')
+
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
 })
