@@ -2715,3 +2715,87 @@ export function checkThresholdMoment(): BadgeType | null {
   return null
 }
 
+// ── v23 — THE ROGUE TERMINAL ───────────────────────────────────────────────────
+
+const ROGUE_WORDS_V23 = [
+  /\bdungeon\b|\bgoing[\s-]?deeper\b|\bdown[\s-]?the[\s-]?rabbit\b|\babyss[\s-]?awaits\b/i,
+  /\bstarting[\s-]?fresh\b|\bnew[\s-]?run\b|\bstarting[\s-]?over\b|\btabula[\s-]?rasa\b/i,
+  /\bpermadeath\b|\bno[\s-]?second[\s-]?chances\b|\bthis[\s-]?life[\s-]?only\b|\birreversible\b/i,
+  /\bfound[\s-]?treasure\b|\bfound[\s-]?my[\s-]?reward\b|\bgift[\s-]?to[\s-]?myself\b/i,
+  /\bboss[\s-]?fight\b|\bfinal[\s-]?challenge\b|\bhardest[\s-]?part\b|\bbiggest[\s-]?obstacle\b/i,
+  /\blevel[\s-]?up\b|\bleveled[\s-]?up\b|\bcleared[\s-]?the[\s-]?level\b|\bpassed[\s-]?the[\s-]?test\b/i,
+  /\bprocedural\b|\brandom[\s-]?encounter\b|\bunexpected\b|\bcouldn.t[\s-]?predict\b/i,
+  /\bmapping\b|\bfound[\s-]?my[\s-]?bearings\b|\boriented[\s-]?myself\b|\bmental[\s-]?map\b/i,
+  /\brogue\b|\bgoing[\s-]?off[\s-]?script\b|\bmy[\s-]?own[\s-]?rules\b|\brebel[\s-]?path\b/i,
+  /\benergy\b|\bstamina\b|\blife[\s-]?force\b|\brecharging\b|\brefueling\b/i,
+  /\bfound[\s-]?my[\s-]?role\b|\bmy[\s-]?class\b|\bcharacter[\s-]?class\b|\bmy[\s-]?archetype\b/i,
+  /\bfinal[\s-]?floor\b|\bdeepest[\s-]?level\b|\bend[\s-]?game\b|\bultimate[\s-]?challenge\b/i,
+]
+
+const ROGUE_BADGE_MAP_V23: BadgeType[] = [
+  'dungeon_dive', 'new_run', 'permadeath_mode', 'loot_found', 'boss_room',
+  'level_clear', 'proc_gen_mind', 'floor_map', 'rogue_heart', 'health_bar',
+  'class_chosen', 'final_floor',
+]
+
+/**
+ * Check and award individual Rogue Terminal (v23) word-turn badges based on journal text.
+ */
+export function checkRogueTerminalWords(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  ROGUE_WORDS_V23.forEach((regex, i) => {
+    const badgeId = ROGUE_BADGE_MAP_V23[i]
+    if (!hasBadge(badgeId) && regex.test(journalText)) {
+      if (awardBadge(badgeId)) awarded.push(badgeId)
+    }
+  })
+  return awarded
+}
+
+/**
+ * Award rogue_session badge if 3+ Rogue Terminal (v23) words appear in one journal entry.
+ */
+export function checkRogueSession(journalText: string): BadgeType | null {
+  if (hasBadge('rogue_session')) return null
+  const matchCount = ROGUE_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('rogue_session')
+    return 'rogue_session'
+  }
+  return null
+}
+
+/**
+ * Award long_floor badge if journal entry is 600+ words.
+ */
+export function checkLongFloor(journalText: string): BadgeType | null {
+  if (hasBadge('long_floor')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 600) {
+    awardBadge('long_floor')
+    return 'long_floor'
+  }
+  return null
+}
+
+/**
+ * Check and award Rogue Terminal secret boss badges based on journal text.
+ */
+export function checkRogueSecretBoss(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+
+  if (!hasBadge('zork_word') && /\bzork\b|\bgrue\b|\bit[\s-]?is[\s-]?pitch[\s-]?dark\b|\beaten[\s-]?by[\s-]?a[\s-]?grue\b/i.test(journalText)) {
+    if (awardBadge('zork_word')) awarded.push('zork_word')
+  }
+
+  if (!hasBadge('nethack_secret') && /\bnethack\b|\belbereth\b|\bdungeon[\s-]?level\b|\bberserker\b/i.test(journalText)) {
+    if (awardBadge('nethack_secret')) awarded.push('nethack_secret')
+  }
+
+  if (!hasBadge('ultima_code') && /\bultima\b|\bavatar\b|\bvirtue\b|\bshrine[\s-]?of\b|\bbritannian\b/i.test(journalText)) {
+    if (awardBadge('ultima_code')) awarded.push('ultima_code')
+  }
+
+  return awarded
+}
+

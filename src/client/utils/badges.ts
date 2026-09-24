@@ -782,6 +782,43 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE ROGUE TERMINAL ───────────────────────────────────────
+  | 'dungeon_dive'           // ≋·■·≋  "dungeon/going deeper/down the rabbit/abyss awaits" detected (UNCOMMON)
+  | 'new_run'                // ∘→∘    "starting fresh/new run/starting over/tabula rasa" detected (COMMON)
+  | 'permadeath_mode'        // ×·■    "permadeath/no second chances/this life only/irreversible" detected (RARE)
+  | 'loot_found'             // ∘·◆·∘  "found treasure/found my reward/gift to myself/something good" detected (COMMON)
+  | 'boss_room'              // ◈·█    "boss fight/final challenge/hardest part/biggest obstacle" detected (EPIC)
+  | 'level_clear'            // →·◉    "level up/leveled up/cleared the level/passed the test" detected (UNCOMMON)
+  | 'proc_gen_mind'          // ≋·∞    "procedural/random encounter/unexpected/couldn't predict" detected (RARE)
+  | 'floor_map'              // □·□·□  "mapping/found my bearings/oriented myself/mental map" detected (UNCOMMON)
+  | 'rogue_heart'            // ◆·●·◆  "rogue/going off-script/my own rules/rebel path" detected (RARE)
+  | 'health_bar'             // ≈·◉    "energy/stamina/hit points/life force/recharging/refueling" detected (COMMON)
+  | 'class_chosen'           // ∘·◈·∘  "found my role/my class/character class/my archetype" detected (RARE)
+  | 'final_floor'            // ■·∞·■  "final floor/deepest level/end game/ultimate challenge" detected (LEGENDARY)
+  // ── Calendar Easter Egg v21 — THE ROGUELIKE CALENDAR ─────────────────────────
+  | 'rogue_birthday'         // □·∘    Oct 31 — Rogue released 1980 (RARE)
+  | 'nethack_day'            // ◈·≋    Nov 4 — NetHack 1.3d released 1987 (RARE)
+  | 'binding_day'            // ●·□    Jan 4 — Binding of Isaac released 2011 (EPIC)
+  // ── Behavioral v20 — TERMINAL PATTERNS ───────────────────────────────────────
+  | 'rogue_session'          // ◆·●·◆  3+ Rogue Terminal words in one journal entry (RARE)
+  | 'long_floor'             // ≋≋·◉   Journal entry >= 600 words (EPIC)
+  | 'marathon_run'           // ≋·∞·≋  7+ consecutive days checking in (EPIC)
+  // ── Achievement RPG v21 — THE ROGUE CLASS ────────────────────────────────────
+  | 'rogue_entry'            // ∘→■    Any 1 Word Turn v23 badge (COMMON)
+  | 'rogue_class'            // ≈→■    Any 5 Word Turn v23 badges (UNCOMMON)
+  | 'dungeon_clear'          // ≋→■    All 12 Word Turn v23 badges (LEGENDARY)
+  | 'rogue_arc'              // ■·◈    dungeon_clear + all 3 Calendar v21 badges (LEGENDARY)
+  | 'twenty_three_engines_arc' // ◈·◈·■  1 badge from each Word Turn v1–v23 (LEGENDARY)
+  | 'rogue_opus'             // ■·◉·■  dungeon_clear + rogue_session behavioral (LEGENDARY)
+  // ── Mastery Tier v23 — THE ENDLESS RUN ───────────────────────────────────────
+  | 'endless_floor'          // ∿·∞·∿  1000+ distinct calendar check-in days (EPIC)
+  | 'tome_of_runs'           // ●·∞·■  200,000+ total journal words (LEGENDARY)
+  | 'ancient_rogue'          // ╔═╗·■  Account age >= 6 years (2,190+ days) (LEGENDARY)
+  | 'twenty_three_registers' // ◈·◈·■·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE DUNGEON VAULT ──────────────────────────────────────
+  | 'zork_word'              // ∿·□·∿  "zork/grue/it is pitch dark/eaten by a grue" detected (RARE)
+  | 'nethack_secret'         // ◆·□·◆  "nethack/elbereth/dungeon level/berserker" detected (EPIC)
+  | 'ultima_code'            // ∞·◈·∞  "ultima/avatar/virtue/shrine of/britannian" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7168,300 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+
+  // ── Word Turn v23 — THE ROGUE TERMINAL ────────────────────────────────────────
+  dungeon_dive: {
+    id: 'dungeon_dive',
+    symbol: '≋·■·≋',
+    name: 'Dungeon Dive',
+    description: 'Write "dungeon", "going deeper", "down the rabbit", or "abyss awaits" in any journal',
+    unlockMessage: '↳ Every dungeon dive is a willingness to go deeper. Not all floors are dark — some hide the most useful things you\'ve ever found. ≋·■·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  new_run: {
+    id: 'new_run',
+    symbol: '∘→∘',
+    name: 'New Run',
+    description: 'Write "starting fresh", "new run", "starting over", or "tabula rasa" in any journal',
+    unlockMessage: '↳ In roguelikes, every death is also a new beginning — carrying the knowledge of what killed you last time. The clean slate is the greatest power-up. ∘→∘',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  permadeath_mode: {
+    id: 'permadeath_mode',
+    symbol: '×·■',
+    name: 'Permadeath Mode',
+    description: 'Write "permadeath", "no second chances", "this life only", or "irreversible" in any journal',
+    unlockMessage: '↳ Permadeath is not cruelty — it is clarity. Every moment of this run is the only moment it will ever be. No save state. No reload. Only now. ×·■',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  loot_found: {
+    id: 'loot_found',
+    symbol: '∘·◆·∘',
+    name: 'Loot Found',
+    description: 'Write "found treasure", "found my reward", "gift to myself", or "something good" in any journal',
+    unlockMessage: '↳ The best loot is never what you came for. The side quest drops the legendary item. Name what you found today. ∘·◆·∘',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  boss_room: {
+    id: 'boss_room',
+    symbol: '◈·█',
+    name: 'Boss Room',
+    description: 'Write "boss fight", "final challenge", "hardest part", or "biggest obstacle" in any journal',
+    unlockMessage: '↳ Boss rooms exist so the player can prove what they have learned. You know this pattern. You have defeated smaller versions of this enemy before. ◈·█',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  level_clear: {
+    id: 'level_clear',
+    symbol: '→·◉',
+    name: 'Level Clear',
+    description: 'Write "level up", "leveled up", "cleared the level", or "passed the test" in any journal',
+    unlockMessage: '↳ The level cleared itself when you stopped running from it. You stood there long enough. That is the entire mechanic. →·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  proc_gen_mind: {
+    id: 'proc_gen_mind',
+    symbol: '≋·∞',
+    name: 'Proc-Gen Mind',
+    description: 'Write "procedural", "random encounter", "unexpected", or "couldn\'t predict" in any journal',
+    unlockMessage: '↳ Procedural generation is the universe\'s algorithm. No two days are the same floor. The unexpected room always holds something you needed. ≋·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  floor_map: {
+    id: 'floor_map',
+    symbol: '□·□·□',
+    name: 'Floor Map',
+    description: 'Write "mapping", "found my bearings", "oriented myself", or "mental map" in any journal',
+    unlockMessage: '↳ The dungeon reveals itself as you move through it. You cannot map it from outside. Each journal entry adds a room to the map. □·□·□',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  rogue_heart: {
+    id: 'rogue_heart',
+    symbol: '◆·●·◆',
+    name: 'Rogue Heart',
+    description: 'Write "rogue", "going off-script", "my own rules", or "rebel path" in any journal',
+    unlockMessage: '↳ The rogue class survives by adaptation, not by brute force. Knowing when to break the rule is the highest form of understanding it. ◆·●·◆',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  health_bar: {
+    id: 'health_bar',
+    symbol: '≈·◉',
+    name: 'Health Bar',
+    description: 'Write "energy", "stamina", "life force", "recharging", or "refueling" in any journal',
+    unlockMessage: '↳ Watching the health bar is the whole game. You cannot fight bosses on empty. Tending the bar is not weakness — it is strategy. ≈·◉',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  class_chosen: {
+    id: 'class_chosen',
+    symbol: '∘·◈·∘',
+    name: 'Class Chosen',
+    description: 'Write "found my role", "my class", "character class", or "my archetype" in any journal',
+    unlockMessage: '↳ Every class has a different playstyle. None is the wrong choice. The class that fits your actual strengths clears faster than the "optimal" one played wrong. ∘·◈·∘',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  final_floor: {
+    id: 'final_floor',
+    symbol: '■·∞·■',
+    name: 'Final Floor',
+    description: 'Write "final floor", "deepest level", "end game", or "ultimate challenge" in any journal',
+    unlockMessage: '↳ The final floor is not the end — it is proof you reached it once. The next run starts with that knowledge. The dungeon remembers your attempt. ■·∞·■',
+    rarity: 'legendary',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v21 — THE ROGUELIKE CALENDAR ──────────────────────────
+  rogue_birthday: {
+    id: 'rogue_birthday',
+    symbol: '□·∘',
+    name: 'Rogue Birthday',
+    description: 'Check in on October 31 — the day Rogue was released in 1980',
+    unlockMessage: '↳ October 31, 1980: Rogue was released on Halloween. A dungeon crawler that gave us the word "roguelike". Every run since has been a tribute. □·∘',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  nethack_day: {
+    id: 'nethack_day',
+    symbol: '◈·≋',
+    name: 'NetHack Day',
+    description: 'Check in on November 4 — the day NetHack 1.3d was released in 1987',
+    unlockMessage: '↳ November 4, 1987: NetHack 1.3d. The most complex dungeon ever generated by a computer. 35+ years of active play. The dungeon never ends. ◈·≋',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  binding_day: {
+    id: 'binding_day',
+    symbol: '●·□',
+    name: 'Binding Day',
+    description: 'Check in on January 4 — the day The Binding of Isaac was released in 2011',
+    unlockMessage: '↳ January 4, 2011: The Binding of Isaac. A roguelike about trauma, self-examination, and survival. Edmund McMillen made grief into a game worth playing. ●·□',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v20 — TERMINAL PATTERNS ────────────────────────────────────────
+  rogue_session: {
+    id: 'rogue_session',
+    symbol: '◆·●·◆',
+    name: 'Rogue Session',
+    description: '3+ Rogue Terminal words in one journal entry',
+    unlockMessage: '↳ This session went deep. The Rogue Terminal vocabulary flows through the entry — dungeon awareness engaged. ◆·●·◆',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  long_floor: {
+    id: 'long_floor',
+    symbol: '≋≋·◉',
+    name: 'Long Floor',
+    description: 'Journal entry of 600+ words — the deepest dungeon dive in writing',
+    unlockMessage: '↳ Six hundred words is a complete floor. You mapped every room, noted every enemy, found every secret passage. Long floors hide the best loot. ≋≋·◉',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  marathon_run: {
+    id: 'marathon_run',
+    symbol: '≋·∞·≋',
+    name: 'Marathon Run',
+    description: '7+ consecutive daily check-ins — a full week unbroken',
+    unlockMessage: '↳ Seven days. A full week of consecutive runs. This is how the legendary build starts — not one heroic session but seven ordinary ones, all showing up. ≋·∞·≋',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v21 — THE ROGUE CLASS ──────────────────────────────────────
+  rogue_entry: {
+    id: 'rogue_entry',
+    symbol: '∘→■',
+    name: 'Rogue Entry',
+    description: 'Earn any 1 Word Turn v23 (Rogue Terminal) badge',
+    unlockMessage: '↳ The dungeon door is open. First room cleared. The run has begun. ∘→■',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  rogue_class: {
+    id: 'rogue_class',
+    symbol: '≈→■',
+    name: 'Rogue Class',
+    description: 'Earn any 5 Word Turn v23 (Rogue Terminal) badges',
+    unlockMessage: '↳ Character class confirmed. Five Rogue Terminal words in the lexicon. The build is taking shape. ≈→■',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  dungeon_clear: {
+    id: 'dungeon_clear',
+    symbol: '≋→■',
+    name: 'Dungeon Clear',
+    description: 'Earn all 12 Word Turn v23 (Rogue Terminal) badges',
+    unlockMessage: '↳ All twelve Rogue Terminal words unlocked. The dungeon is fully mapped. The final floor reached. The vocabulary of the run is complete. ≋→■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  rogue_arc: {
+    id: 'rogue_arc',
+    symbol: '■·◈',
+    name: 'Rogue Arc',
+    description: 'dungeon_clear + all 3 Calendar v21 (Roguelike Calendar) badges',
+    unlockMessage: '↳ The full arc: twelve words, three dates, the history and language of roguelikes absorbed. The run is now a canon. ■·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·■',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each Word Turn engine v1–v23',
+    unlockMessage: '↳ Twenty-three word turn engines. Water. Seasons. Architecture. Mountains. Tech. Space. Alchemy. Quantum. Arcade. Radio. Biology. Codex. Cyberspace. Hero. Rogue. Every language of the self, spoken once. ◈·◈·■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  rogue_opus: {
+    id: 'rogue_opus',
+    symbol: '■·◉·■',
+    name: 'Rogue Opus',
+    description: 'dungeon_clear + rogue_session behavioral badge',
+    unlockMessage: '↳ The opus run: twelve words in the permanent record and a session deep enough to hold three of them in one sitting. This run was complete. ■·◉·■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v23 — THE ENDLESS RUN ────────────────────────────────────────
+  endless_floor: {
+    id: 'endless_floor',
+    symbol: '∿·∞·∿',
+    name: 'Endless Floor',
+    description: '1,000+ distinct calendar days with a check-in',
+    unlockMessage: '↳ One thousand distinct days. The dungeon of daily practice has no true final floor — it simply keeps generating. You have played 1,000 levels of your own life. ∿·∞·∿',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  tome_of_runs: {
+    id: 'tome_of_runs',
+    symbol: '●·∞·■',
+    name: 'Tome of Runs',
+    description: '200,000+ cumulative journal words across all entries',
+    unlockMessage: '↳ 200,000 words. A full tome. Every run logged, every boss named, every treasure catalogued. The dungeon history is now a library. ●·∞·■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  ancient_rogue: {
+    id: 'ancient_rogue',
+    symbol: '╔═╗·■',
+    name: 'Ancient Rogue',
+    description: 'Account age >= 6 years (2,190+ days since signup)',
+    unlockMessage: '↳ Six years of the practice. In roguelike terms: a seasoned runner who has cleared every floor configuration. The dungeon has nothing left to surprise you — and still you descend. ╔═╗·■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·■·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from each of the 23 Word Turn engines',
+    unlockMessage: '↳ All twenty-three registers active. Every word-turn vocabulary spoken. The terminal accepts input in every known language of the self. ◈·◈·■·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v20 — THE DUNGEON VAULT ───────────────────────────────────────
+  zork_word: {
+    id: 'zork_word',
+    symbol: '∿·□·∿',
+    name: 'Zork Word',
+    description: 'Write "zork", "grue", "it is pitch dark", or "eaten by a grue" in any journal entry',
+    unlockMessage: '↳ It is pitch dark. You are likely to be eaten by a grue. The first great text adventure. The original dungeon was made of words. Your journal is not so different. ∿·□·∿',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  nethack_secret: {
+    id: 'nethack_secret',
+    symbol: '◆·□·◆',
+    name: 'NetHack Secret',
+    description: 'Write "nethack", "elbereth", "dungeon level", or "berserker" in any journal entry',
+    unlockMessage: '↳ Elbereth: the single word that makes monsters flee in NetHack. Some truths work the same way in real dungeons — speak them and the threat recedes. ◆·□·◆',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  ultima_code: {
+    id: 'ultima_code',
+    symbol: '∞·◈·∞',
+    name: 'Ultima Code',
+    description: 'Write "ultima", "avatar", "virtue", "shrine of", or "britannian" in any journal entry',
+    unlockMessage: '↳ The Ultima series invented the moral RPG. The Avatar was not asked to defeat a villain — only to embody eight virtues. Self-care as the highest quest. ∞·◈·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8424,105 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 (v23) — THE ROGUE TERMINAL ──────────────────────────────────────────
+    const rogueV23Badges: BadgeType[] = [
+      'dungeon_dive', 'new_run', 'permadeath_mode', 'loot_found', 'boss_room',
+      'level_clear', 'proc_gen_mind', 'floor_map', 'rogue_heart', 'health_bar',
+      'class_chosen', 'final_floor',
+    ]
+    const rogueV23Earned = rogueV23Badges.filter(b => hasBadge(b))
+
+    // rogue_entry: any 1 v23 badge
+    if (rogueV23Earned.length >= 1 && !hasBadge('rogue_entry')) {
+      if (awardBadge('rogue_entry')) newBadges.push('rogue_entry')
+    }
+
+    // rogue_class: any 5 v23 badges
+    if (rogueV23Earned.length >= 5 && !hasBadge('rogue_class')) {
+      if (awardBadge('rogue_class')) newBadges.push('rogue_class')
+    }
+
+    // dungeon_clear: all 12 v23 badges
+    const dungeonClear = rogueV23Earned.length >= 12
+    if (dungeonClear && !hasBadge('dungeon_clear')) {
+      if (awardBadge('dungeon_clear')) newBadges.push('dungeon_clear')
+    }
+
+    // rogue_arc: dungeon_clear + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['rogue_birthday', 'nethack_day', 'binding_day']
+    if (dungeonClear && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('rogue_arc')) {
+      if (awardBadge('rogue_arc')) newBadges.push('rogue_arc')
+    }
+
+    // rogue_opus: dungeon_clear + rogue_session behavioral
+    if (dungeonClear && hasBadge('rogue_session') && !hasBadge('rogue_opus')) {
+      if (awardBadge('rogue_opus')) newBadges.push('rogue_opus')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = rogueV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: endless_floor — 1000+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('endless_floor')) {
+        if (awardBadge('endless_floor')) newBadges.push('endless_floor')
+      }
+    }
+
+    // Mastery v23: tome_of_runs — 200,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('tome_of_runs')) {
+        if (awardBadge('tome_of_runs')) newBadges.push('tome_of_runs')
+      }
+    }
+
+    // Mastery v23: ancient_rogue — Account age >= 6 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupAncient = new Date(stats.signupDate)
+      const yearsAncient = (new Date().getTime() - signupAncient.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsAncient >= 6 && !hasBadge('ancient_rogue')) {
+        if (awardBadge('ancient_rogue')) newBadges.push('ancient_rogue')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
+    }
+
+    // Calendar v21: rogue_birthday — Oct 31
+    if (!hasBadge('rogue_birthday')) {
+      const nowRogue = new Date()
+      if (nowRogue.getMonth() === 9 && nowRogue.getDate() === 31) {
+        if (awardBadge('rogue_birthday')) newBadges.push('rogue_birthday')
+      }
+    }
+
+    // Calendar v21: nethack_day — Nov 4
+    if (!hasBadge('nethack_day')) {
+      const nowNethack = new Date()
+      if (nowNethack.getMonth() === 10 && nowNethack.getDate() === 4) {
+        if (awardBadge('nethack_day')) newBadges.push('nethack_day')
+      }
+    }
+
+    // Calendar v21: binding_day — Jan 4
+    if (!hasBadge('binding_day')) {
+      const nowBinding = new Date()
+      if (nowBinding.getMonth() === 0 && nowBinding.getDate() === 4) {
+        if (awardBadge('binding_day')) newBadges.push('binding_day')
+      }
+    }
+
+    // Behavioral v20: marathon_run — 7+ consecutive days streak
+    if (typeof stats.streak === 'number' && stats.streak >= 7 && !hasBadge('marathon_run')) {
+      if (awardBadge('marathon_run')) newBadges.push('marathon_run')
     }
 
   } catch (error) {
