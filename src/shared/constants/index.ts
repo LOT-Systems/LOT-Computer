@@ -370,3 +370,50 @@ export const COUNTRY_BY_ALPHA3 = COUNTRIES.reduce<Record<string, Country>>(
   (acc, x) => ({ ...acc, [x.alpha3]: x }),
   {}
 )
+
+// ============================================================================
+// LOT-FM-001 — BASIC RATION MANIFEST
+// Single source of truth for the 23-item ration load. Server (public-api) and
+// client (Basics tab) both read this array directly — the doctrine is "the
+// ledger is the marketing; no layer between public and manifest." COGS is
+// deliberately absent from this file; the internal cost model lives only in
+// docs/corporate/LOT-FM-001-BASIC-RATION-DIRECTIVE.md.
+// ============================================================================
+
+export type RationCadence = 'MONTHLY' | 'QUARTERLY' | 'SEMI-ANNUAL'
+
+export type RationItem = {
+  line: number
+  nsn: string // LOT nomenclature stock number, e.g. LOT-BR-01
+  nomenclature: string
+  category: 'HYGIENE' | 'APPAREL' | 'HOUSEHOLD' | 'FIELD-SUNDRY'
+  cadence: RationCadence
+}
+
+export const BASIC_RATION_PRICE_USD = 100
+
+export const BASIC_RATION_MANIFEST: RationItem[] = [
+  { line: 1, nsn: 'LOT-BR-01', nomenclature: 'TOOTHBRUSH, SOFT-BRISTLE', category: 'HYGIENE', cadence: 'MONTHLY' },
+  { line: 2, nsn: 'LOT-BR-02', nomenclature: 'TOOTHPASTE, FLUORIDE, 4.6OZ', category: 'HYGIENE', cadence: 'MONTHLY' },
+  { line: 3, nsn: 'LOT-BR-03', nomenclature: 'FLOSS, WAXED, 50M', category: 'HYGIENE', cadence: 'MONTHLY' },
+  { line: 4, nsn: 'LOT-BR-04', nomenclature: 'DEODORANT, UNSCENTED, STICK', category: 'HYGIENE', cadence: 'MONTHLY' },
+  { line: 5, nsn: 'LOT-BR-05', nomenclature: 'SOAP, BAR, UNSCENTED, 4OZ', category: 'HYGIENE', cadence: 'MONTHLY' },
+  { line: 6, nsn: 'LOT-BR-06', nomenclature: 'RAZOR, SAFETY, BLADE PACK-5', category: 'HYGIENE', cadence: 'MONTHLY' },
+  { line: 7, nsn: 'LOT-BR-07', nomenclature: 'SANITIZER, HAND, 2OZ', category: 'HYGIENE', cadence: 'MONTHLY' },
+  { line: 8, nsn: 'LOT-BR-08', nomenclature: 'MULTIVITAMIN, 30-CT', category: 'HYGIENE', cadence: 'MONTHLY' },
+  { line: 9, nsn: 'LOT-BR-09', nomenclature: 'UNDERWEAR, COTTON, PR', category: 'APPAREL', cadence: 'MONTHLY' },
+  { line: 10, nsn: 'LOT-BR-10', nomenclature: 'SOCKS, CREW, COTTON, PR', category: 'APPAREL', cadence: 'MONTHLY' },
+  { line: 11, nsn: 'LOT-BR-11', nomenclature: 'T-SHIRT, COTTON, CREW-NECK', category: 'APPAREL', cadence: 'QUARTERLY' },
+  { line: 12, nsn: 'LOT-BR-12', nomenclature: 'TOWEL, BATH, COTTON', category: 'APPAREL', cadence: 'SEMI-ANNUAL' },
+  { line: 13, nsn: 'LOT-BR-13', nomenclature: 'TISSUE, BATH, ROLL PACK-4', category: 'HOUSEHOLD', cadence: 'MONTHLY' },
+  { line: 14, nsn: 'LOT-BR-14', nomenclature: 'TOWEL, PAPER, ROLL PACK-2', category: 'HOUSEHOLD', cadence: 'MONTHLY' },
+  { line: 15, nsn: 'LOT-BR-15', nomenclature: 'DETERGENT, LAUNDRY, POD-12', category: 'HOUSEHOLD', cadence: 'MONTHLY' },
+  { line: 16, nsn: 'LOT-BR-16', nomenclature: 'SOAP, DISH, 12OZ', category: 'HOUSEHOLD', cadence: 'MONTHLY' },
+  { line: 17, nsn: 'LOT-BR-17', nomenclature: 'BAG, TRASH, 13GAL, CT-20', category: 'HOUSEHOLD', cadence: 'MONTHLY' },
+  { line: 18, nsn: 'LOT-BR-18', nomenclature: 'CARTRIDGE, WATER FILTER', category: 'HOUSEHOLD', cadence: 'QUARTERLY' },
+  { line: 19, nsn: 'LOT-BR-19', nomenclature: 'COFFEE, GROUND, 12OZ', category: 'HOUSEHOLD', cadence: 'MONTHLY' },
+  { line: 20, nsn: 'LOT-BR-20', nomenclature: 'NOTEBOOK, POCKET, RULED', category: 'FIELD-SUNDRY', cadence: 'QUARTERLY' },
+  { line: 21, nsn: 'LOT-BR-21', nomenclature: 'PEN, BLACK INK, PACK-2', category: 'FIELD-SUNDRY', cadence: 'QUARTERLY' },
+  { line: 22, nsn: 'LOT-BR-22', nomenclature: 'BATTERY, AA, PACK-4', category: 'FIELD-SUNDRY', cadence: 'QUARTERLY' },
+  { line: 23, nsn: 'LOT-BR-23', nomenclature: 'KIT, FIRST-AID, POCKET', category: 'FIELD-SUNDRY', cadence: 'SEMI-ANNUAL' },
+]

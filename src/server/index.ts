@@ -231,6 +231,18 @@ fastify.get('/status', async (req, reply) => {
   })
 })
 
+// LOT-FM-001 OPEN TAB — public Basics ledger route (no authentication
+// required). A stranger loading /basics directly gets this standalone
+// bundle; an already-authenticated user clicking the in-app "Basics" nav
+// tab instead stays client-routed inside entries/app.tsx.
+fastify.get('/basics', async (req, reply) => {
+  return reply.view('generic-spa', {
+    scriptName: 'basics',
+    scriptNonce: reply.cspNonce.script,
+    styleNonce: reply.cspNonce.style,
+  })
+})
+
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 

@@ -26,7 +26,7 @@ import {
   WeatherRecord,
 } from '#shared/types'
 import dayjs from '#client/utils/dayjs'
-import { DATE_TIME_FORMAT } from '#shared/constants'
+import { DATE_TIME_FORMAT, RationItem } from '#shared/constants'
 
 const api = axios.create({
   baseURL: '/',
@@ -129,6 +129,23 @@ export const useVisitorStats = createQuery<{
   userProfileVisits: number
 }>('/api/visitor-stats', {
   refetchOnWindowFocus: false,
+})
+
+// LOT-FM-001 OPEN TAB — public, unauthenticated ledger. Server caches the
+// payload for an hour, so keep the client stale time matched to that.
+export const useBasicsManifest = createQuery<{
+  doctrine: string
+  priceUsd: number
+  priceUnit: string
+  manifest: RationItem[]
+  itemCount: number
+  status: string
+  upgradePath: string
+  timestamp: string
+  cached: boolean
+}>('/api/public/basics', {
+  refetchOnWindowFocus: false,
+  staleTime: 60 * 60 * 1000,
 })
 
 export const useLogs = createQuery<Log[]>('/api/logs', {

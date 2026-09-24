@@ -17,6 +17,7 @@ import { aiEngineManager } from '#server/utils/ai-engines'
 import { AI_ENGINE_PREFERENCE } from '#server/utils/memory/constants'
 import config from '#server/config'
 import { toCelsius } from '#shared/utils'
+import { BASIC_RATION_MANIFEST, BASIC_RATION_PRICE_USD } from '#shared/constants'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
@@ -34,6 +35,12 @@ let machiavelliProfileVisits = 1469
 let statusCache: any = null
 let lastCheck = 0
 const CACHE_DURATION = 2 * 60 * 1000 // 2 minutes
+
+// LOT-FM-001 OPEN TAB — the ledger never changes at request time, so this is
+// a long cache (1 hour) rather than a health-check-style short one.
+let basicsCache: any = null
+let basicsLastBuilt = 0
+const BASICS_CACHE_DURATION = 60 * 60 * 1000 // 1 hour
 
 interface SystemCheck {
   name: string
@@ -527,6 +534,32 @@ export default async (fastify: FastifyInstance) => {
       ...status,
       cached: false,
     }
+  })
+
+  // LOT-FM-001 OPEN TAB — public, unauthenticated, read-only. The ledger IS
+  // the marketing: this returns the same manifest the Basics tab renders,
+  // nomenclature + cadence only. COGS is withheld by construction — the cost
+  // model never enters this file (see docs/corporate/LOT-FM-001-BASIC-RATION-DIRECTIVE.md).
+  fastify.get('/basics', async (req, reply) => {
+    const now = Date.now()
+    if (basicsCache && (now - basicsLastBuilt) < BASICS_CACHE_DURATION) {
+      return { ...basicsCache, cached: true }
+    }
+
+    const payload = {
+      doctrine: 'LOT-FM-001. Issue, not sale. Fixed monthly ration of 23 lines across hygiene, apparel, household, and field-sundry categories, shipped on the cadence printed against each line. This ledger is the full manifest — no undisclosed substitutions, no marketing layer between what is public and what is issued.',
+      priceUsd: BASIC_RATION_PRICE_USD,
+      priceUnit: 'MONTH',
+      manifest: BASIC_RATION_MANIFEST,
+      itemCount: BASIC_RATION_MANIFEST.length,
+      status: 'SYSTEM OPEN — READ-ONLY — MONTH 1 OF 3',
+      upgradePath: 'USERSHIP/AI -> BASIC RATION: not yet operational. Target: Month 2.',
+      timestamp: new Date().toISOString(),
+    }
+
+    basicsCache = payload
+    basicsLastBuilt = now
+    return { ...payload, cached: false }
   })
 
   // Admin configuration diagnostic endpoint
