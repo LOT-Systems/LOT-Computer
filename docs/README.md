@@ -48,6 +48,12 @@ Version history, release notes, and changelogs.
 - Stable Versions
 - Changelogs
 
+### [Product Documentation](./product/)
+Product design brainstorms and UX evolution proposals.
+
+**Key Documents:**
+- Usership 12-Month Evolution - Month-by-month UI/UX evolution proposal from Day 1 (barebone) to LOT® AI
+
 ### [Badge Documentation](./badges/)
 Documentation about the badge system design and implementation.
 
