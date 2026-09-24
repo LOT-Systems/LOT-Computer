@@ -4,8 +4,8 @@ DOCUMENT: LOT-CUBIQ-QUANTUM-CUBE-v0
 TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Device
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
-DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+DATE:     2026-07-28 (CREATED) — 2026-09-24 (CYCLE 02 UPDATE)
+VERSION:  0.2 — DEVELOPMENT CYCLE 02
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -57,6 +57,17 @@ read in full:
 
 No prior document specified jump mechanics, surface locomotion, or a
 levitation roadmap. This document is that specification, v.0.
+
+  CYCLE 02 RE-READ — 2026-09-24
+    Before extending this document, this cycle re-read the full v.0 spec
+    (this file, in its 0.1 form) and docs/corporate/LOT-CUBIQ-OPERATOR.md
+    Section 02, the widget inventory — specifically PatternRecognitionWidget
+    (80 named behavioral patterns) and EnergyCapacitor (real-time energy
+    level visualization), neither of which had a dedicated CUBIQ hardware
+    gesture mapped to them yet. Cycle 02 closes that gap (Section 09) and
+    grounds Use Case 02 (Section 07) in the EnergyCapacitor signal path.
+    No section written in Cycle 01 is edited or removed — this document's
+    own rule, restated: append, never overwrite.
 
 --------------------------------------------------------------------------------
 01 // WHAT v.0 IS AND WHAT IT IS NOT
@@ -321,8 +332,102 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE ENERGY CAPACITOR TELL                    2026-09-24
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: R&D tier, Archetype not yet fully classified (Day
+  40-something, still in the "forming" assembly phase per LOT-CUBIQ-
+  OPERATOR.md Section 01), works odd hours, self-reports poor awareness
+  of their own fatigue until well past the point they should have stopped.
+
+  The EnergyCapacitor widget (LOT-CUBIQ-OPERATOR.md Section 02, Core
+  Widgets) already tracks real-time energy level from the operator's
+  signal history — sleep gaps, session-entry cadence, log tone, time of
+  day. Today it has no physical expression: the number sits on a screen
+  the operator has already learned to stop reading closely, exactly the
+  kind of ambient-metric blindness the anti-feed thesis (LOT-CUBIQ-VISION,
+  Section 01) exists to prevent.
+
+  With CUBIQ hardware v.0 present, cycle 02 wires PatternRecognitionWidget's
+  detection of a specific pattern — sustained low EnergyCapacitor reading
+  across three consecutive sessions, a pattern the QIE already names
+  internally but has never before had a body to speak through — to THE
+  SETTLE gesture (Section 04): the cube holds a light standing pressure
+  for two seconds, unprompted, the next time the operator sits at the desk.
+  No pop-up, no reminder banner, no guilt-shaped copy. Just an object that
+  visibly plants itself and stays still a moment longer than usual.
+
+  The operator, who has spent years learning to override every digital
+  fatigue prompt their other apps produce, has no learned dismissal
+  gesture for a cube pressing itself into the desk. They notice it because
+  it is new, not because it is loud. Where a banner would have been
+  swiped away in the same motion as opening the app, THE SETTLE simply
+  sits there being noticed. The operator later logs, unprompted, that they
+  took a five-minute break they would not otherwise have taken — not
+  because the system told them to rest, but because something in the room
+  changed and they looked up.
+
+  This is the use case Cycle 02's power-budget work (Section 08) makes
+  affordable: THE SETTLE's 250mW sustained hold is the cheapest gesture
+  in the vocabulary, which is exactly why it is the right one to spend on
+  a signal — low energy — that the operator most needs delivered gently,
+  not urgently.
+
 --------------------------------------------------------------------------------
-08 // BRAND
+08 // CYCLE 02 ENGINEERING ADVANCE — POWER BUDGET & ACTUATOR SHORTLIST
+--------------------------------------------------------------------------------
+
+Cycle 01 named the actuator CLASS (voice-coil, spring-loaded reaction mass,
+piezoelectric bias strip) without committing to a power or component
+shortlist. Cycle 02 is the first pass at closing that gap. Nothing here
+moves v.0 out of PRE-HARDWARE / DESIGN LOCK PENDING — it narrows the
+design space the eventual lock will choose from.
+
+  POWER BUDGET (v.0 REFERENCE, PER-HOP)
+    THE NUDGE      ~40mW peak, <30ms pulse   — sub-threshold, no liftoff
+    THE HOP        ~1.8W peak, ~90ms pulse   — <10mm rise
+    THE LEAP       ~4.2W peak, ~140ms pulse  — ~40mm displacement
+    THE SETTLE     ~250mW sustained, 2s hold — standing pressure only
+    IDLE (LISTENING FOR SIGNAL)    <8mW — IMU + radio in low-power poll
+
+    At an assumed operator cadence of 15-25 gestures/day (weighted toward
+    THE NUDGE and THE HOP per the Section 04 vocabulary), a 380mAh
+    solid-state cell sized to the 45mm shell clears a 3-4 day interval
+    between wireless charges — the base-face inductive pad (Section 02)
+    makes "topping up overnight on the same pad the cube already lives on"
+    the default behavior rather than a chore, so the exact interval matters
+    less than the habit it replaces (no cable, no port, no reason to ever
+    let it die mid-week).
+
+  ACTUATOR SHORTLIST (RESEARCH CANDIDATES, NOT YET LOCKED)
+    A — Voice-coil linear actuator, custom-wound, 6-8mm stroke.
+        Best controllability (continuous force curve, not just on/off),
+        best fit for THE SETTLE's sustained-pressure gesture. Highest
+        part cost and assembly complexity of the three.
+    B — Solenoid-class actuator, off-the-shelf push-type, fixed stroke.
+        Cheapest, fastest to source, but binary force output makes THE
+        NUDGE's sub-threshold pulse harder to tune finely — risks the
+        gesture reading as a HOP when it should read as a tremor.
+    C — Hybrid: solenoid for THE HOP / THE LEAP (gross vertical impulse),
+        piezoelectric bimorph alone (no solenoid fire) for THE NUDGE and
+        THE SETTLE (fine, low-amplitude control already proven in Section
+        03's forward-bias role). Two components already in the v.0 BOM
+        doing double duty instead of a third being added.
+    CYCLE 02 LEAN: Candidate C. It reuses Section 03's piezoelectric
+    element for a second job rather than sourcing a fourth part, which
+    matches the "v.0 must be mechanically boring" principle (Section 03).
+    This is a lean, not a lock — Section 03's mechanism description is
+    unchanged until a physical prototype validates candidate C's dual-use
+    piezoelectric timing.
+
+  OPEN QUESTION CARRIED TO CYCLE 03
+    Candidate C's piezoelectric element does double duty (forward-bias
+    during THE LEAP, fine actuation during THE NUDGE/THE SETTLE). Whether
+    one element class can serve both roles without a redesign of the
+    mounting geometry is unresolved — first physical bench test question
+    for whichever cycle receives fabrication authorization.
+
+--------------------------------------------------------------------------------
+09 // BRAND
 --------------------------------------------------------------------------------
 
 LOT® Quantum Cube             The object
