@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
 
 ## Render Isolation
 
@@ -226,3 +226,17 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Shallow-Clone Tag Blindness
+
+A session's working copy may be a shallow clone. `git tag --list` against a
+shallow clone reports only tags reachable within the fetched depth/refs — it
+can read as completely empty while origin holds a full tag lattice. STEP 00
+PREFLIGHT must run `git fetch origin --tags` (or equivalent) before trusting
+`LAST_GREEN` as empty. An empty local tag list is a fetch-completeness
+question, not evidence of an empty remote tag list — check the remote before
+concluding Plan B is unavailable or that this is a first run.
+
+(SR-20260924-01 misread LAST_GREEN as NONE and claimed "first benchmark tag
+in the repo" from a shallow clone that had not fetched tags; ~90+ benchmark
+tags already existed on origin back to 2026-06. Corrected in SR-20260924-02.)
