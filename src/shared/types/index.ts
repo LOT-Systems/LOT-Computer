@@ -73,6 +73,9 @@ export type UserProfile = {
   timeChime?: boolean;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
+  // User's saved IANA timeZone, so client-side ambient readings (astrology
+  // block) can match the timeZone-aware Logs snapshot instead of device-local time.
+  timeZone?: string | null;
 };
 
 export type User = {

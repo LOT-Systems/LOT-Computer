@@ -56,6 +56,7 @@ export class User
       'tags',
       'hideActivityLogs',
       'timeChime',
+      'timeZone',
     ])(this.toJSON())
 
     // Add memory engine status based on tags
