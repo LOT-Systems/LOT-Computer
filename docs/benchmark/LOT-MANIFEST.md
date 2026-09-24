@@ -3,7 +3,7 @@ LOT SYSTEMS / SELF-ASSEMBLY MANIFEST
 DOCUMENT: LOT-MANIFEST
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
-DATE:     2026-06-27 (updated)
+DATE:     2026-06-27 (updated 2026-09-24 — see Calendar Alerts NOTE after §01 table)
 ================================================================================
 
 Central catalog of all self-assembly routines across all branches.
@@ -26,7 +26,7 @@ FEATURE          | BEST BRANCH                   | HASH     | ITER  | STATUS | F
 ──────────────     ─────────────────────────────   ────────   ─────   ──────   ─────   ──────   ──────────────────────
 LOT Mail         | determined-turing-f6bw7r     | fa622a25 | 11/11 | BEST   | 11    | +504   | In-app email: /email trigger, Sync inbox, Cohort integration, yarn.lock
 Basics Tab       | beautiful-johnson-56p7ov      | 6815f550 | 8/8   | BEST   | 5     | +293   | BASICS M1: OPEN TAB live — 23-item ration ledger, doctrine, status line
-Calendar Alerts  | gifted-lovelace-cZOWR         | 978cf52  | 6/6   | BEST   | 3     | +359   | Live clock, T-minus countdown, military alert overlay, today panel
+Calendar Alerts  | claude/dreamy-babbage-hx1xmc  | (SR-20260924-01) | 3rd  | READY  | 3     | +332  | Time-of-day field, EXECUTE/ALERT/ELAPSED engine, military alert overlay, calendar_alert Log write, OS Notification opt-in, build-verified — SEE NOTE BELOW
 QI-46 Engine     | cool-tesla-f8j0mr            | 36ef4dde | 8/8   | BEST   | 8     | +2050  | QI·46 Node 3 engine integration + Soul Upload + Being Calibration
 COSMO Hardware   | brave-lamport-t9z5u8         | c7d353ef | 14/14 | BEST   | 7     | +2610  | COSMO® Cube — complete hardware computer design v1.0
 Health/Security  | inspiring-volta-2hmidy        | e5a2d668 | 41/41 | BEST   | 2     | +2     | Monitoring exports fixed, component quality, health report
@@ -42,6 +42,28 @@ LOG Terminals v56| quantum-engine-widgets-RgFfC  | d7535a1d | 1/1   | READY  | 1
 Perf Optimization| quantum-engine-widgets-RgFfC  | 5126e09  | 1/1   | SHIPPED| 4     | +200   | Router isolation, subscription reduction, memoization
 Bug Fixes        | quantum-engine-widgets-RgFfC  | d609978  | 1/1   | SHIPPED| 3     | +30    | Biofield lag fix, calendar whitelist fix, sync type widening
 Cross-Device Sync| quantum-engine-widgets-RgFfC  | bea4cefb | 1/1   | SHIPPED| 6     | +393   | SSE sync + Settings crash fix + v1.3.0 version sync
+
+--------------------------------------------------------------------------------
+NOTE — CALENDAR ALERTS REINVENTION LOOP (read before touching this feature)
+--------------------------------------------------------------------------------
+A scheduled task ("continue Calendar widget: time tracking + military-grade Log
+notifications") has fired roughly daily since 2026-05-27 across `dreamy-babbage-*`
+and `gifted-lovelace-*` branches — 80+ branches observed on the remote as of
+2026-09-24. Each firing starts fresh from master, which never has the feature
+(because no session has merged it), so each one reinvents the same widget from
+scratch. Two prior sessions already found and consolidated the best lineage —
+2026-08-12 (c682aede) and 2026-08-29 (65690aa1, itself noting 61 duplicates) —
+and both explicitly deferred the actual merge to master, correctly, because
+neither had S-2 authorization to ship and one had no working build environment.
+20+ more duplicate branches were created after each consolidation anyway, since
+the manifest note recording the finding lived only on an unmerged branch and so
+was never read by the next day's fresh session. This 2026-09-24 session (report
+SR-20260924-01) is the third consolidation. The loop will keep repeating until
+one of: (a) S-2 runs "Ship Calendar Alerts" so this lands on master once, or
+(b) the scheduled task is pointed at a persistent branch instead of restarting
+from master, or (c) the schedule is retired now that the feature is complete.
+This note is written directly into this table (not just the session report) so
+it survives even if this branch itself is never merged — read this note first.
 
 ================================================================================
 02 // SELF-ASSEMBLY ENGINE (loving-goldberg progression)
@@ -87,7 +109,8 @@ relaxed-hamilton | 8     | eRBVA             | 7     | LOT Mail iterations (SUPE
 determined-turing| 6     | f6bw7r            | 5     | LOT Mail iterations (latest series)
 dazzling-shannon | 9     | ykKT5             | 8     | COSMO hardware iterations (SUPERSEDED by brave-lamport)
 brave-lamport    | 5     | t9z5u8            | 4     | COSMO hardware iterations (latest series)
-gifted-lovelace  | 6     | cZOWR             | 5     | Calendar alert iterations
+gifted-lovelace  | 6     | cZOWR             | 5     | Calendar alert iterations (SUPERSEDED by dreamy-babbage consolidation, see NOTE §01)
+dreamy-babbage   | 80+   | hx1xmc (this SR)  | 79+   | Calendar time-tracking/alerts daily reinvention — see NOTE after §01 table
 nifty-allen      | 6     | jWyOe             | 5     | Basics Tab iterations (SUPERSEDED by beautiful-johnson)
 beautiful-johnson| 2     | 56p7ov            | 1     | Basics Tab iterations (latest series)
 gracious-gauss   | 7     | WnL0k             | 6     | QI-46 Engine iterations (SUPERSEDED by cool-tesla)

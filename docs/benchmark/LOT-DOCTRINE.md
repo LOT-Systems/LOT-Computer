@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
 
 ## Render Isolation
 
@@ -226,3 +226,30 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## REINVENT-LOOP — Branch-Scoped Scheduled Task Reinvention
+
+A scheduled task that always starts from a fresh branch off master cannot see
+what a prior firing built, unless that prior work reached master. If the
+gating decision to merge belongs to S-2 (correctly — see Sunday Self-Assembly
+Protocol, §06 of the MANIFEST), and S-2 has not triggered it, the work sits on
+an orphan branch and the next firing rebuilds it from zero. A note recording
+this only in a session report or only in a feature branch's own MANIFEST edit
+does not break the cycle, because the next firing never reads that branch —
+docs/benchmark/LOT-MANIFEST.md is itself "session-managed, never merge from
+branch" by its own Sunday-protocol rule, so a finding written there dies with
+the branch unless a human explicitly carries it forward.
+
+The only artifacts durable enough to break the loop are: (1) the human
+noticing (a report is not self-executing), (2) the scheduled task itself being
+changed to target a persistent branch or to stop, or (3) an explicit "Ship
+<feature>" pass landing the work on master once. Consolidating the branch
+again — the natural first instinct — treats the symptom each time and never
+touches the cause. Check for this pattern before rebuilding anything a
+recurring scheduled task claims to be "continuing": search
+`git log --all --oneline -- <path>` for near-duplicate commit messages across
+many branches before writing new code.
+
+(SR-20260924-01: REINVENT-LOOP minted; 3rd Calendar Alerts consolidation,
+80+ duplicate branches since 2026-05-27, first two consolidations at
+c682aede 2026-08-12 and 65690aa1 2026-08-29 both correctly deferred to S-2.)
