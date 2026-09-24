@@ -210,6 +210,9 @@ export function PatternRecognitionWidget() {
       'sovereign-crystal-field':          'Sovereign crystal field — QSOVTX confirmed in 21D + 4+ sources active, transmission crystallizing into permanent structure (P177)',
       'transmission-field-anchor':        'Transmission field anchor — SFBCAST 2+ in 28D + SOVCRYST confirmed, broadcast anchored into crystal field (P178)',
       'crystalline-sovereign-transmission': 'Crystalline sovereign transmission — SOVCRYST + TXFIELD both confirmed in 21D, OS transmits from crystallized sovereign presence (P179)',
+      'crystal-field-continuity':         'Crystal field continuity — CRSOVETX held in 30D + 5+ unique sources in 21D, crystal transmission is a standing field (P180)',
+      'crystal-broadcast-expansion':      'Crystal broadcast expansion — CRSOVETX active in 21D + 7+ unique sources in 14D, broadcast expanding into new channels (P181)',
+      'crystal-temporal-lock':            'Crystal temporal lock — crystal field confirmed + sovereign temporal lock active, crystal presence anchored in time (P182)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

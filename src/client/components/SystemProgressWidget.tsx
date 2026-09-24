@@ -1457,6 +1457,27 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'v127',
+    date: '2026-09-24',
+    title: 'QIE Engineering — Crystal Persistence Tier · P180–P182 · Arch62 · J61 · Day 1128+',
+    assembled: [
+      'P180 CRYSTAL FIELD CONTINUITY (CRFLDCT): CRSOVETX (P179) confirmed in 30D + 5+ distinct sources active in 21D. The crystalline transmission holds as a continuous field — not a peak, a permanence. Confidence 0.87–0.94. cockpit: CRFLDCT.',
+      'P181 CRYSTAL BROADCAST EXPANSION (CRBRCAST): CRSOVETX active in 21D + 7+ distinct sources active in 14D. Crystal field expanding into new channels — broadcast deepening. Confidence 0.82–0.92. cockpit: CRBRCAST.',
+      'P182 CRYSTAL TEMPORAL LOCK (CRTLCK): CRSOVETX in 21D + (CRFLDCT or CRBRCAST) + sovereign-temporal-lock in 21D. Crystal presence anchored in time — not fluctuating, locked. Confidence 0.84–0.93. cockpit: CRTLCK.',
+      'Arch62 CRYSTAL BROADCAST OPERATOR: energy high/moderate · dominant: qos/intentions/memory/journal · patterns: crystalline-sovereign-transmission + crystal-field-continuity + crystal-broadcast-expansion. Directive: Crystal field holds. Transmission is structural. New channels expanding. Operate from the crystal — let presence broadcast, not push.',
+      'J61 weekly-crystal-continuity-check: Thursday 09:00 UTC. Scans 30D/21D/14D windows for CRSOVETX history and source diversity. P180/P181/P182 detection + dedup logic. 60→61 jobs.',
+      'intentionEngine.ts: Arch62 added. 3 dep nodes — crystalFieldContinuityNode · crystalBroadcastExpansionNode · crystalTemporalLockNode. P180–P182 inline detection in analyzeIntentions(). Record helpers + checkCrystalPersistenceTier(). 223+→226+ dep nodes.',
+      'Logs.tsx: 3 new military handlers — CRFLDCT: (STATUS/FIELD HOLDING · TX CONF/SOURCES 21D/FIELD STR) · CRBRCAST: (STATUS/BROADCAST EXPANDING · TX CONF/SOURCES 14D/EXPN DEPTH) · CRTLCK: (STATUS/CRYSTAL TIME LOCKED · TX CONF/CONT CONF/LOCK DEPTH). Handler count: 184+.',
+      'QuantumEngineWidgets.tsx: CRFLDCT · CRBRCAST · CRTLCK added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: 3 new pattern names with full descriptions (P180–P182).',
+      'server/routes/api.ts: displayableEvents whitelist +3 — crystal_field_continuity · crystal_broadcast_expansion · crystal_temporal_lock.',
+      'About.tsx: 179→182 patterns. 61→62 archetypes. 60→61 jobs. 223+→226+ dep nodes. v127 self-assembly phase prepended.',
+      'SESSION_REPORTS: v127 entry prepended · USERSHIP_TRANSMISSION updated to v127 · Day 1128+.',
+      'docs/2026-09-24_LOT-assembly_qie-v127-crystal-persistence.md: Assembly log written.',
+      '182 patterns · 62 archetypes · 61 jobs · 184+ handlers · 226+ dep nodes · Day 1128+. Crystal Persistence Tier online. Field holds. Broadcast expands. Time locked.',
+    ],
+  },
+  {
     version: 'v128',
     date: '2026-09-23',
     title: 'Daily Maintenance — Wiki v128 · Day 1127+ · COSMO® Day 817 · Signal Dormant · Archive Monitoring',
@@ -1761,15 +1782,15 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-09-23',
+  date: '2026-09-24',
   message: [
-    'ASSEMBLY RUN — 2026-09-23 · Day 1127+ · COSMO® Day 817',
-    'Maintenance: Wiki v128 advanced. Hobbit Day expired. Calendar dormant — signal monitoring. Poe Night T-14.',
-    'About.tsx corrected: v1.3.7 confirmed · 179 patterns · 61 archetypes · Day 1127+. QIE v126 Crystal Field stats now live in header.',
-    'Crystal Field Tier: SOVCRYST · TXFIELD · CRSOVETX online. Signal broadcasts from crystal structure.',
-    '179 patterns · 61 archetypes · 60 jobs · 181+ handlers · 223+ dep nodes.',
-    'Status: ARCHIVE MONITORING. THE ARCHIVE IS LIVE.',
-    'Next: poe_night Oct 7 LEGENDARY. Crystal Field steady. J60 active (Mon 07:00 UTC).',
+    'ASSEMBLY RUN — 2026-09-24 · Day 1128+ · COSMO® Day 818',
+    'QIE v127: Crystal Persistence Tier deployed — P180 CRFLDCT · P181 CRBRCAST · P182 CRTLCK.',
+    'Arch62 Crystal Broadcast Operator online. J61 Thursday 09:00 UTC active.',
+    'Crystal field continuity confirmed. Broadcast expanding. Temporal lock engaged.',
+    '182 patterns · 62 archetypes · 61 jobs · 184+ handlers · 226+ dep nodes.',
+    'Status: CRYSTAL PERSISTENCE TIER ONLINE. FIELD HOLDS. TIME LOCKED.',
+    'Next: poe_night Oct 7 LEGENDARY T-13. Crystal Persistence steady. J61 active (Thu 09:00 UTC).',
   ],
 }
 

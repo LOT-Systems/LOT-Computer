@@ -1255,6 +1255,10 @@ export default async (fastify: FastifyInstance) => {
       'sovereign_crystal_field',
       'transmission_field_anchor',
       'crystalline_sovereign_transmission',
+      // v127: crystal persistence tier (J61 weekly crystal continuity check — P180–P182)
+      'crystal_field_continuity',
+      'crystal_broadcast_expansion',
+      'crystal_temporal_lock',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

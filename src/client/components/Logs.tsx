@@ -4620,6 +4620,114 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'crystal_field_continuity') {
+          const crsovetxConf  = log.metadata?.crsovetxConf as number | undefined
+          const sourceCount   = log.metadata?.sourceCount as number | undefined
+          const fieldStrength = log.metadata?.fieldStrength as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRFLDCT:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">FIELD HOLDING</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRSOVETX</span>
+                  <span className="opacity-60">30D</span>
+                </div>
+                {crsovetxConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TX CONF</span>
+                    <span className="tabular-nums opacity-60">{crsovetxConf}%</span>
+                  </div>
+                )}
+                {sourceCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES 21D</span>
+                    <span className="tabular-nums opacity-60">{sourceCount}</span>
+                  </div>
+                )}
+                {fieldStrength !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">FIELD STR</span>
+                    <span className="tabular-nums opacity-60">{fieldStrength}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystal_broadcast_expansion') {
+          const crsovetxConf2  = log.metadata?.crsovetxConf as number | undefined
+          const sourceCount2   = log.metadata?.sourceCount as number | undefined
+          const expansionDepth = log.metadata?.expansionDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRBRCAST:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">BROADCAST EXPANDING</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRSOVETX</span>
+                  <span className="opacity-60">21D</span>
+                </div>
+                {crsovetxConf2 !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TX CONF</span>
+                    <span className="tabular-nums opacity-60">{crsovetxConf2}%</span>
+                  </div>
+                )}
+                {sourceCount2 !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES 14D</span>
+                    <span className="tabular-nums opacity-60">{sourceCount2}</span>
+                  </div>
+                )}
+                {expansionDepth !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">EXPN DEPTH</span>
+                    <span className="tabular-nums opacity-60">{expansionDepth}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystal_temporal_lock') {
+          const crsovetxConf3   = log.metadata?.crsovetxConf as number | undefined
+          const continuityConf3 = log.metadata?.continuityConf as number | undefined
+          const lockDepth       = log.metadata?.lockDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRTLCK:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">CRYSTAL TIME LOCKED</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRSOVETX</span>
+                  <span className="opacity-60">TEMPORAL</span>
+                </div>
+                {crsovetxConf3 !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TX CONF</span>
+                    <span className="tabular-nums opacity-60">{crsovetxConf3}%</span>
+                  </div>
+                )}
+                {continuityConf3 !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONT CONF</span>
+                    <span className="tabular-nums opacity-60">{continuityConf3}%</span>
+                  </div>
+                )}
+                {lockDepth !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">LOCK DEPTH</span>
+                    <span className="tabular-nums opacity-60">{lockDepth}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'calendar_ee_signal') {
           const badge    = log.metadata?.badge as string | undefined
           const name     = log.metadata?.name as string | undefined

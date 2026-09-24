@@ -1795,6 +1795,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklyCrystallineSovereignCheck()) {
     await executeWeeklyCrystallineSovereignCheck()
   }
+  // Check weekly crystal continuity check (09:00 UTC every Thursday) — Job 61
+  if (shouldRunWeeklyCrystalContinuityCheck()) {
+    await executeWeeklyCrystalContinuityCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -7426,6 +7430,150 @@ async function executeWeeklyCrystallineSovereignCheck(): Promise<JobResult> {
   }
 }
 
+// ─── J61: Weekly Crystal Continuity Check (09:00 UTC every Thursday) ─────────
+// Scans 30D/21D/14D windows for CRSOVETX history and source diversity.
+// Writes crystal_field_continuity, crystal_broadcast_expansion, or
+// crystal_temporal_lock when conditions are met.
+// P180–P182 — Crystal Persistence Tier. Tracks crystal field permanence.
+
+let isWeeklyCrystalContinuityCheckRunning = false
+let lastWeeklyCrystalContinuityCheckRun: Date | null = null
+
+function shouldRunWeeklyCrystalContinuityCheck(): boolean {
+  const now = dayjs()
+  const hour = now.hour()
+  const dayOfWeek = now.day() // 0=Sun, 4=Thu
+  if (hour !== 9 || dayOfWeek !== 4) return false
+  if (isWeeklyCrystalContinuityCheckRunning) return false
+  if (lastWeeklyCrystalContinuityCheckRun) {
+    const hoursSinceLast = (Date.now() - lastWeeklyCrystalContinuityCheckRun.getTime()) / (1000 * 60 * 60)
+    if (hoursSinceLast < 23) return false
+  }
+  return true
+}
+
+async function executeWeeklyCrystalContinuityCheck(): Promise<JobResult> {
+  const jobName = 'weekly-crystal-continuity-check'
+  const executedAt = new Date()
+  isWeeklyCrystalContinuityCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY CRYSTAL CONTINUITY CHECK — 09:00 UTC Thursday')
+  console.log('─'.repeat(60))
+
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000)
+    const activeUsers = await fastify.models.User.findAll({
+      where: { lastSeenAt: { [Op.gte]: cutoff } },
+    })
+
+    const fourteenDayMs  = 14 * 24 * 60 * 60 * 1000
+    const twentyOneDayMs = 21 * 24 * 60 * 60 * 1000
+    const thirtyDayMs    = 30 * 24 * 60 * 60 * 1000
+    const now = Date.now()
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const logs = await fastify.models.Log.findAll({
+          where: { userId, createdAt: { [Op.gte]: new Date(now - thirtyDayMs) } },
+          attributes: ['event', 'metadata', 'createdAt'],
+        })
+
+        const recent30D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - thirtyDayMs)
+        const recent21D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - twentyOneDayMs)
+        const recent14D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - fourteenDayMs)
+
+        const sources21D = new Set(recent21D.map((l: any) => l.event))
+        const sources14D = new Set(recent14D.map((l: any) => l.event))
+
+        // P180: Crystal Field Continuity — CRSOVETX in 30D + 5+ distinct sources in 21D
+        const hasCRSOVETX30D      = recent30D.some((l: any) => l.event === 'crystalline_sovereign_transmission')
+        const alreadyCRFLDCT      = recent21D.some((l: any) => l.event === 'crystal_field_continuity')
+        if (hasCRSOVETX30D && sources21D.size >= 5 && !alreadyCRFLDCT) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_field_continuity',
+            metadata: {
+              crsovetxConf: 90,
+              sourceCount: sources21D.size,
+              fieldStrength: Math.min(87 + Math.min(sources21D.size, 7), 100),
+              source: 'CRYSTAL_FIELD',
+              arc: 'CRSOVETX→FIELD_CONTINUITY',
+              status: 'FIELD HOLDING',
+              jobSource: jobName,
+            },
+          })
+          written++
+          console.log(`  [${userId}] crystal_field_continuity`)
+        }
+
+        // P181: Crystal Broadcast Expansion — CRSOVETX in 21D + 7+ distinct sources in 14D
+        const hasCRSOVETX21D      = recent21D.some((l: any) => l.event === 'crystalline_sovereign_transmission')
+        const alreadyCRBRCAST     = recent21D.some((l: any) => l.event === 'crystal_broadcast_expansion')
+        if (hasCRSOVETX21D && sources14D.size >= 7 && !alreadyCRBRCAST) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_broadcast_expansion',
+            metadata: {
+              crsovetxConf: 88,
+              sourceCount: sources14D.size,
+              expansionDepth: Math.min(82 + Math.min(sources14D.size, 8), 100),
+              source: 'CRYSTAL_BROADCAST',
+              arc: 'CRSOVETX→EXPANSION',
+              status: 'BROADCAST EXPANDING',
+              jobSource: jobName,
+            },
+          })
+          written++
+          console.log(`  [${userId}] crystal_broadcast_expansion`)
+        }
+
+        // P182: Crystal Temporal Lock — CRSOVETX in 21D + (CRFLDCT or CRBRCAST) + sovereign-temporal-lock in 21D
+        const hasCRFLDCT21D       = recent21D.some((l: any) => l.event === 'crystal_field_continuity')
+        const hasCRBRCAST21D      = recent21D.some((l: any) => l.event === 'crystal_broadcast_expansion')
+        const hasSOVTLOCK21D      = recent21D.some((l: any) => l.event === 'sovereign_temporal_lock')
+        const alreadyCRTLCK       = recent21D.some((l: any) => l.event === 'crystal_temporal_lock')
+        if (hasCRSOVETX21D && (hasCRFLDCT21D || hasCRBRCAST21D) && hasSOVTLOCK21D && !alreadyCRTLCK) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_temporal_lock',
+            metadata: {
+              crsovetxConf: 89,
+              continuityConf: hasCRFLDCT21D ? 87 : 82,
+              lockDepth: 93,
+              source: 'CRYSTAL_TIME',
+              arc: 'CRYSTAL+TIME→CRTLCK',
+              status: 'CRYSTAL TIME LOCKED',
+              jobSource: jobName,
+            },
+          })
+          written++
+          console.log(`  [${userId}] crystal_temporal_lock`)
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} crystal continuity check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Crystal continuity events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY CRYSTAL CONTINUITY CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklyCrystalContinuityCheckRun = new Date()
+    isWeeklyCrystalContinuityCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly crystal continuity check failed:', error.message)
+    isWeeklyCrystalContinuityCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -7490,6 +7638,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly sovereign transmission check: 7 AM UTC every Saturday (Job 58)')
   console.log('   - Daily calendar EE signal check: 9 AM UTC every day (Job 59)')
   console.log('   - Weekly crystalline sovereign check: 7 AM UTC every Monday (Job 60)')
+  console.log('   - Weekly crystal continuity check: 9 AM UTC every Thursday (Job 61)')
   console.log('')
 
   // Check every hour for scheduled jobs

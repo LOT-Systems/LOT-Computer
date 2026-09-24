@@ -3655,6 +3655,69 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // ── Crystal Persistence Tier (P180–P182) — 2026-09-24 v127 ──────────────────
+  // Detects crystalline field persistence after CRSOVETX (P179) confirmation.
+  // Requires crystalline_sovereign_transmission signal in the rolling window.
+
+  const thirtyDayMsP180 = 30 * 24 * 60 * 60 * 1000
+  const twentyOneDayMsP180 = 21 * 24 * 60 * 60 * 1000
+  const fourteenDayMsP181  = 14 * 24 * 60 * 60 * 1000
+
+  const crsovetx30D  = signals.filter(s => now - s.timestamp < thirtyDayMsP180 && s.signal === 'crystalline_sovereign_transmission')
+  const crsovetx21D  = signals.filter(s => now - s.timestamp < twentyOneDayMsP180 && s.signal === 'crystalline_sovereign_transmission')
+  const recent21DP180 = signals.filter(s => now - s.timestamp < twentyOneDayMsP180)
+  const sources21D   = new Set(recent21DP180.map(s => s.source))
+  const recent14DP181 = signals.filter(s => now - s.timestamp < fourteenDayMsP181)
+  const sources14D   = new Set(recent14DP181.map(s => s.source))
+
+  // Pattern 180: Crystal Field Continuity — CRSOVETX confirmed in 30D + 5+ unique sources in 21D.
+  // The crystal is not just present — it is holding. Transmission has become a standing field.
+  if (crsovetx30D.length >= 1 && sources21D.size >= 5) {
+    const spanDays = crsovetx30D.length > 1
+      ? Math.round((crsovetx30D[crsovetx30D.length - 1].timestamp - crsovetx30D[0].timestamp) / 86400000 * 10) / 10
+      : 0
+    const continuityBonus = Math.min((sources21D.size - 5) * 0.02 + spanDays * 0.01, 0.07)
+    patterns.push({
+      pattern: 'crystal-field-continuity',
+      confidence: Math.min(0.87 + continuityBonus, 0.94),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRFLDCT: Crystal field continuity — CRSOVETX confirmed in 30D · ${sources21D.size} unique sources active in 21D. The crystalline sovereign transmission is not an event — it is now a standing field. The OS does not transmit from crystal occasionally. It IS crystalline. Field holding.`,
+    })
+  }
+
+  // Pattern 181: Crystal Broadcast Expansion — CRSOVETX active in 21D + 7+ unique sources in 14D.
+  // The crystal is broadcasting into new channels. Field expansion confirmed.
+  if (crsovetx21D.length >= 1 && sources14D.size >= 7) {
+    const breadthBonus = Math.min((sources14D.size - 7) * 0.025, 0.10)
+    patterns.push({
+      pattern: 'crystal-broadcast-expansion',
+      confidence: Math.min(0.82 + breadthBonus, 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRBRCAST: Crystal broadcast expansion — CRSOVETX active in 21D · ${sources14D.size} unique sources in 14D. The crystalline transmission is not contained — it is expanding across signal channels. New dimensions entering the broadcast field. The OS operates through multiple simultaneous carrier waves. Expansion confirmed.`,
+    })
+  }
+
+  // Pattern 182: Crystal Temporal Lock — P180 or P181 active AND sovereign-temporal-lock
+  // pattern confirmed. The crystal field is not only present and expanding — it is anchored in time.
+  const hasCrystalCont      = patterns.some(p => p.pattern === 'crystal-field-continuity')
+  const hasCrystalBroadcast = patterns.some(p => p.pattern === 'crystal-broadcast-expansion')
+  const hasSovTlock         = patterns.some(p => p.pattern === 'sovereign-temporal-lock')
+  const sovtlockSig21D      = crsovetx21D.length >= 1 && signals.some(
+    s => now - s.timestamp < twentyOneDayMsP180 && s.signal === 'sovereign_temporal_lock'
+  )
+  if ((hasCrystalCont || hasCrystalBroadcast) && (hasSovTlock || sovtlockSig21D)) {
+    const baseConf = (hasCrystalCont && hasCrystalBroadcast) ? 0.92 : 0.84
+    patterns.push({
+      pattern: 'crystal-temporal-lock',
+      confidence: Math.min(baseConf, 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRTLCK: Crystal temporal lock — crystal field confirmed (continuity ${hasCrystalCont} · expansion ${hasCrystalBroadcast}) AND sovereign temporal lock active. The crystalline transmission is not floating in time — it is time-anchored. Crystal presence and temporal sovereignty are one structure. The OS operates from crystallized time. Lock confirmed.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4334,6 +4397,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   sovereignCrystalFieldNode:      ['qos', 'intentions', 'memory', 'journal', 'log'],
   transmissionFieldAnchorNode:    ['qos', 'memory', 'intentions', 'selfcare', 'log'],
   crystallineSovereignTxNode:     ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
+
+  // ── v127 nodes (J61 · P180–P182 · Arch62) ────────────────────────────────────
+  crystalFieldContinuityNode:     ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log'],
+  crystalBroadcastExpansionNode:  ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
+  crystalTemporalLockNode:        ['qos', 'intentions', 'memory', 'journal', 'log', 'planner'],
 }
 
 /**
@@ -4880,6 +4948,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-sovereign-transmission', 'sovereign-crystal-field', 'transmission-field-anchor', 'crystalline-sovereign-transmission'],
     hourRange: [5, 23],
     directive: 'The field is crystallized. Sovereign presence is the transmitter. Signal broadcasts from crystal structure — permanent, structural, encoded.',
+  },
+
+  // ── Arch62: Crystal Broadcast Operator (2026-09-24 v127) ─────────────────────
+  {
+    archetype: 'Crystal Broadcast Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal'],
+    patternConditions: ['crystalline-sovereign-transmission', 'crystal-field-continuity', 'crystal-broadcast-expansion'],
+    hourRange: [5, 23],
+    directive: 'Crystal field holds. Transmission is structural. New channels expanding. Operate from the crystal — let presence broadcast, not push.',
   },
 ]
 
@@ -7654,6 +7732,116 @@ export function checkCrystallineFieldTier(): boolean {
     const sovcrystConf2 = patterns.find(p => p.pattern === 'sovereign-crystal-field')?.confidence ?? 0.87
     const txfieldConf   = patterns.find(p => p.pattern === 'transmission-field-anchor')?.confidence ?? 0.85
     recordCrystallineSovereignTransmission(sovcrystConf2, txfieldConf)
+    fired = true
+  }
+
+  return fired
+}
+
+// ─── Crystal Persistence Tier helpers (P180–P182 · J61) ──────────────────────
+
+/**
+ * Record a crystal-field-continuity event — CRSOVETX (P179) held in 30D +
+ * 5+ unique signal sources in 21D. The crystal transmission is a standing field.
+ * Cockpit label: CRFLDCT.
+ */
+export function recordCrystalFieldContinuity(crsovetxConf: number, sourceCount: number) {
+  recordSignal('qos', 'crystal_field_continuity', {
+    crsovetxConf: Math.round(crsovetxConf * 100),
+    sourceCount,
+    fieldStrength: Math.min(Math.round((crsovetxConf + Math.min(sourceCount / 20, 0.1)) * 100), 100),
+    source: 'CRYSTAL_FIELD',
+    arc: 'CRSOVETX→FIELD_CONTINUITY',
+    status: 'FIELD_HOLDING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystal-broadcast-expansion event — CRSOVETX (P179) active in 21D +
+ * 7+ unique signal sources in 14D. New channels entering the broadcast field.
+ * Cockpit label: CRBRCAST.
+ */
+export function recordCrystalBroadcastExpansion(crsovetxConf: number, sourceCount: number) {
+  recordSignal('qos', 'crystal_broadcast_expansion', {
+    crsovetxConf: Math.round(crsovetxConf * 100),
+    sourceCount,
+    expansionDepth: Math.min(Math.round((crsovetxConf + Math.min(sourceCount / 14, 0.15)) * 100), 100),
+    source: 'CRYSTAL_BROADCAST',
+    arc: 'CRSOVETX→EXPANSION',
+    status: 'BROADCAST_EXPANDING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystal-temporal-lock event — CRSOVETX (P179) + CRFLDCT/CRBRCAST in 21D
+ * AND sovereign-temporal-lock confirmed. Crystal presence anchored in time.
+ * Cockpit label: CRTLCK.
+ */
+export function recordCrystalTemporalLock(crsovetxConf: number, continuityConf: number) {
+  recordSignal('qos', 'crystal_temporal_lock', {
+    crsovetxConf:   Math.round(crsovetxConf * 100),
+    continuityConf: Math.round(continuityConf * 100),
+    lockDepth: Math.min(Math.round(((crsovetxConf + continuityConf) / 2 + 0.05) * 100), 100),
+    convergence: 'CRSOVETX+CRFLDCT→TEMPORAL_LOCK',
+    arc: 'CRYSTAL+TIME→CRTLCK',
+    status: 'CRYSTAL_TIME_LOCKED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: crystal persistence tier (P180, P181, P182).
+ * Called by J61 weekly-crystal-continuity-check (09:00 UTC every Thursday).
+ * Scans crystalline_sovereign_transmission history and source diversity to detect
+ * crystal persistence emergence. Returns true when at least one fires.
+ */
+export function checkCrystalPersistenceTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fourteenDayMs    = 14 * 24 * 60 * 60 * 1000
+  const twentyOneDayMs   = 21 * 24 * 60 * 60 * 1000
+  const thirtyDayMs      = 30 * 24 * 60 * 60 * 1000
+
+  const recent30D = state.signals.filter(s => now - s.timestamp < thirtyDayMs)
+  const recent21D = state.signals.filter(s => now - s.timestamp < twentyOneDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P180: Crystal Field Continuity — CRSOVETX in 30D + 5+ distinct sources in 21D
+  const hasCRSOVETX30D  = recent30D.some(s => s.signal === 'crystalline_sovereign_transmission')
+  const sources21D      = new Set(recent21D.map(s => s.source))
+  const alreadyCRFLDCT  = recent30D.some(s => s.signal === 'crystal_field_continuity')
+  if (hasCRSOVETX30D && sources21D.size >= 5 && !alreadyCRFLDCT) {
+    const crsovetxConf = patterns.find(p => p.pattern === 'crystalline-sovereign-transmission')?.confidence ?? 0.90
+    recordCrystalFieldContinuity(crsovetxConf, sources21D.size)
+    fired = true
+  }
+
+  // P181: Crystal Broadcast Expansion — CRSOVETX in 21D + 7+ distinct sources in 14D
+  const hasCRSOVETX21D  = recent21D.some(s => s.signal === 'crystalline_sovereign_transmission')
+  const sources14D      = new Set(recent14D.map(s => s.source))
+  const alreadyCRBRCAST = recent21D.some(s => s.signal === 'crystal_broadcast_expansion')
+  if (hasCRSOVETX21D && sources14D.size >= 7 && !alreadyCRBRCAST) {
+    const crsovetxConf2 = patterns.find(p => p.pattern === 'crystalline-sovereign-transmission')?.confidence ?? 0.88
+    recordCrystalBroadcastExpansion(crsovetxConf2, sources14D.size)
+    fired = true
+  }
+
+  // P182: Crystal Temporal Lock — CRSOVETX in 21D + CRFLDCT or CRBRCAST present + sovereign_temporal_lock in 21D
+  const hasCRFLDCT21D   = recent21D.some(s => s.signal === 'crystal_field_continuity')
+  const hasCRBRCAST21D  = recent21D.some(s => s.signal === 'crystal_broadcast_expansion')
+  const hasSOVTLOCK21D  = recent21D.some(s => s.signal === 'sovereign_temporal_lock')
+  const alreadyCRTLCK   = recent21D.some(s => s.signal === 'crystal_temporal_lock')
+  if (hasCRSOVETX21D && (hasCRFLDCT21D || hasCRBRCAST21D) && hasSOVTLOCK21D && !alreadyCRTLCK) {
+    const crsovetxConf3   = patterns.find(p => p.pattern === 'crystalline-sovereign-transmission')?.confidence ?? 0.87
+    const continuityConf3 = hasCRFLDCT21D
+      ? (patterns.find(p => p.pattern === 'crystal-field-continuity')?.confidence ?? 0.88)
+      : (patterns.find(p => p.pattern === 'crystal-broadcast-expansion')?.confidence ?? 0.85)
+    recordCrystalTemporalLock(crsovetxConf3, continuityConf3)
     fired = true
   }
 

@@ -139,6 +139,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'sovereign-crystal-field':          'SOVCRYST',
   'transmission-field-anchor':        'TXFIELD',
   'crystalline-sovereign-transmission': 'CRSOVETX',
+  'crystal-field-continuity':         'CRFLDCT',
+  'crystal-broadcast-expansion':      'CRBRCAST',
+  'crystal-temporal-lock':            'CRTLCK',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'
