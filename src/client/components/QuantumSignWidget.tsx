@@ -11,6 +11,7 @@ import { Block } from '#client/components/ui'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { useLogs } from '#client/queries'
+import { getRokuyo, getMoonPhase } from '#shared/utils/astrology'
 
 /**
  * Quantum Sign Widget — For subscribers whose payment is their last money
@@ -65,12 +66,31 @@ export function QuantumSignWidget() {
     const today = new Date()
     const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000)
 
-    const astrologyPatches = [
-      { id: 'lunar-reset', name: 'Lunar Reset', desc: 'Moon phase alignment for emotional recalibration' },
-      { id: 'solar-return', name: 'Solar Return', desc: 'Birthday energy cycle — annual self-renewal' },
-      { id: 'mercury-direct', name: 'Mercury Direct', desc: 'Communication clarity restored' },
-      { id: 'venus-transit', name: 'Venus Transit', desc: 'Relationship pattern recognition active' },
-    ]
+    // Astrology patch reads the same ambient reading (rokuyo, moon phase) as
+    // the System dashboard's Astrology block and the Logs context stamp —
+    // one ambient truth across all widgets, not an independent rotation.
+    const rokuyo = getRokuyo(today)
+    const { phase: moonPhase } = getMoonPhase(today)
+
+    const rokuyoPatch: Record<string, { name: string; desc: string }> = {
+      Taian: { name: 'Auspicious Window', desc: 'Taian — the most favorable day of the six-day cycle' },
+      Tomobiki: { name: 'Shared Momentum', desc: 'Tomobiki — good day, ties carry both ways' },
+      Sensho: { name: 'Morning Window', desc: 'Sensho — act early, the morning favors you' },
+      Senpu: { name: 'Afternoon Window', desc: 'Senpu — ease in, act after midday' },
+      Shakku: { name: 'Caution Held', desc: 'Shakku — move carefully, midday is safest' },
+      Butsumetsu: { name: 'Rest Cycle', desc: 'Butsumetsu — a quiet day, better for rest than launch' },
+    }
+
+    const moonPatch: Record<string, { name: string; desc: string }> = {
+      'New Moon': { name: 'Lunar Reset', desc: 'New Moon — a clean slate for intention-setting' },
+      'Waxing Crescent': { name: 'Lunar Build', desc: 'Waxing Crescent — early momentum, keep going' },
+      'First Quarter': { name: 'Lunar Push', desc: 'First Quarter — friction is normal here, push through' },
+      'Waxing Gibbous': { name: 'Lunar Refine', desc: 'Waxing Gibbous — refine what you started' },
+      'Full Moon': { name: 'Lunar Peak', desc: 'Full Moon — peak illumination, patterns surface' },
+      'Waning Gibbous': { name: 'Lunar Share', desc: 'Waning Gibbous — share what you learned' },
+      'Last Quarter': { name: 'Lunar Release', desc: 'Last Quarter — release what no longer serves' },
+      'Waning Crescent': { name: 'Lunar Rest', desc: 'Waning Crescent — rest before the next cycle' },
+    }
 
     const psychologyPatches = [
       { id: 'shadow-work', name: 'Shadow Integration', desc: 'Unconscious pattern surfacing protocol' },
@@ -79,12 +99,16 @@ export function QuantumSignWidget() {
       { id: 'growth-edge', name: 'Growth Edge', desc: 'Comfort zone expansion calibration' },
     ]
 
-    // Rotate patches based on day of year
-    const astroIdx = dayOfYear % astrologyPatches.length
+    // Psychology patch has no ambient source of truth to synchronize
+    // against — keep its own day-of-year rotation.
     const psychIdx = dayOfYear % psychologyPatches.length
 
     return {
-      astrology: astrologyPatches[astroIdx],
+      astrology: {
+        id: `${rokuyo}-${moonPhase}`.toLowerCase().replace(/\s+/g, '-'),
+        name: `${rokuyoPatch[rokuyo]?.name ?? rokuyo} • ${moonPatch[moonPhase]?.name ?? moonPhase}`,
+        desc: `${rokuyoPatch[rokuyo]?.desc ?? rokuyo}. ${moonPatch[moonPhase]?.desc ?? moonPhase}.`,
+      },
       psychology: psychologyPatches[psychIdx],
     }
   }, [])

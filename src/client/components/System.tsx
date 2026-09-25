@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo, getPersonalAstrologyAffinity } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -220,6 +220,11 @@ export const System = React.memo(function SystemInner() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [astrologyTick])
+
+  // Personalize the ambient reading against the user's own Logs history —
+  // every log already carries its day's rokuyo/moon-phase (stamped
+  // server-side, see getLogContext). Null below the sample-size floor.
+  const astrologyAffinity = React.useMemo(() => getPersonalAstrologyAffinity(logs), [logs])
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
@@ -467,6 +472,11 @@ export const System = React.memo(function SystemInner() {
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
+            {astrologyAffinity && (
+              <div className="opacity-30">
+                Most logged on {astrologyAffinity.rokuyo.value} days ({astrologyAffinity.rokuyo.count}/{astrologyAffinity.sampleSize})
+              </div>
+            )}
           </Block>
         </div>
 
@@ -671,7 +681,14 @@ export const System = React.memo(function SystemInner() {
         >
           {astrologyView === 'astrology' ? (
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              <div>
+                {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              </div>
+              {astrologyAffinity && (
+                <div className="opacity-30">
+                  Most logged on {astrologyAffinity.rokuyo.value} days ({astrologyAffinity.rokuyo.count}/{astrologyAffinity.sampleSize}) • {astrologyAffinity.moonPhase.value} ({astrologyAffinity.moonPhase.count}/{astrologyAffinity.sampleSize})
+                </div>
+              )}
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>

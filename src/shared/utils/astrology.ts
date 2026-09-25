@@ -177,3 +177,60 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/** A single log's ambient astrology stamp, as recorded in LogContext at creation time. */
+export type AstrologyLogContext = {
+  astroRokuyo?: string | null
+  astroMoonPhase?: string | null
+}
+
+export type AstrologyAffinity = {
+  rokuyo: { value: string; count: number }
+  moonPhase: { value: string; count: number }
+  sampleSize: number
+}
+
+// Below this many stamped logs, a "most active day type" claim is noise, not
+// personalization — the six-way (rokuyo) / eight-way (moon phase) split needs
+// enough draws to mean anything.
+const MIN_AFFINITY_SAMPLE = 12
+
+/**
+ * Personalize the ambient astrology reading against a user's own Logs history.
+ * Every log already carries the day's rokuyo/moon-phase in its context
+ * (stamped server-side by getLogContext at creation time). This is a plain
+ * frequency count of which reading co-occurred most often with the user's
+ * own activity — a real, countable pattern from their history, not a claim
+ * about causation.
+ *
+ * Returns null below MIN_AFFINITY_SAMPLE stamped logs (honest silence over a
+ * fabricated read on too little data).
+ */
+export function getPersonalAstrologyAffinity(
+  logs: Array<{ context?: AstrologyLogContext | null }>
+): AstrologyAffinity | null {
+  const rokuyoCounts: Record<string, number> = {}
+  const moonCounts: Record<string, number> = {}
+  let sampleSize = 0
+
+  for (const log of logs) {
+    const rokuyo = log.context?.astroRokuyo
+    const moonPhase = log.context?.astroMoonPhase
+    if (!rokuyo && !moonPhase) continue
+    sampleSize++
+    if (rokuyo) rokuyoCounts[rokuyo] = (rokuyoCounts[rokuyo] || 0) + 1
+    if (moonPhase) moonCounts[moonPhase] = (moonCounts[moonPhase] || 0) + 1
+  }
+
+  if (sampleSize < MIN_AFFINITY_SAMPLE) return null
+
+  const topRokuyo = Object.entries(rokuyoCounts).sort((a, b) => b[1] - a[1])[0]
+  const topMoon = Object.entries(moonCounts).sort((a, b) => b[1] - a[1])[0]
+  if (!topRokuyo || !topMoon) return null
+
+  return {
+    rokuyo: { value: topRokuyo[0], count: topRokuyo[1] },
+    moonPhase: { value: topMoon[0], count: topMoon[1] },
+    sampleSize,
+  }
+}

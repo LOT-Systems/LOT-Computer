@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
 
 ## Render Isolation
 
@@ -226,3 +226,23 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Missing node_modules Masquerades As a tsconfig Defect
+
+On a fresh container, `npm run server:build` (`tsc --project tsconfig.server.json`)
+can fail with TS5107/TS5101 ("ignoreDeprecations" deprecation errors) even
+though `tsconfig.server.json` is correct. Cause: with no local `node_modules`,
+`npx tsc` silently fetches the latest TypeScript from the registry instead of
+the project's pinned version — a newer major (e.g. 6.0.2 vs. the pinned 5.9.3)
+accepts different `ignoreDeprecations` values, so the pinned config reads as
+broken. The fix is `npm ci --legacy-peer-deps` (not editing tsconfig): this
+repo's `yarn.lock` pins per-package resolved URLs to `registry.yarnpkg.com`,
+which the sandbox network policy blocks, while npm's default
+`registry.npmjs.org` is allow-listed, and `--legacy-peer-deps` is needed
+because `@nanostores/react@0.4.1`'s peer range predates the pinned
+`nanostores@0.9.5`. CHECK A must confirm `node_modules` exists (or run the
+install) before trusting any tsc/build error as a real code defect — a
+fix-and-recheck loop that edits tsconfig here is chasing a phantom.
+
+(SR-20260925-01: discovered and folded same-session — no prior report hit
+this because it requires a container with no pre-existing install.)
