@@ -1457,6 +1457,22 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'wiki-v130',
+    date: '2026-09-25',
+    title: 'Daily Maintenance — Wiki v130 · Badge Engine v38–v40 · FM v126→v127 · Day 1129+ · COSMO® Day 819',
+    assembled: [
+      'Wiki v130 produced: Day 1129+ · COSMO® Day 819 · captures QIE v127 Crystal Persistence Tier deployed Sep 24.',
+      'Badge Engine v38+v39+v40 deployed (2026-09-23): +45 source badges. 967→1012 source badges total.',
+      'v38 THE DREAM JOURNAL (Word Turn v28): +15 badges · lucid_dreamer/dream_recall/nightmare_named/sleep_temple/hypnagogic_state/symbol_decoded/shadow_dream/recurring_pattern/waking_vision/oneiric_map/the_threshold/dream_logged/jung_signal(MYTHIC)/freud_couch(EPIC)/morpheus_word(RARE).',
+      'v39 THE OPERATOR\'S HANDBOOK (Word Turn v29): +15 badges · deep_cover/field_report/assets_secured/blown_cover/exfil_route/handler_brief/need_to_know/dead_drop/clean_slate/burn_notice/ghost_protocol/mission_complete/fleming_signal(MYTHIC)/le_carre_word(EPIC)/eyes_only(RARE).',
+      'v40 THE SOURCE CODE (Word Turn v30): +15 badges · debug_mode/compile_self/stack_trace/runtime_check/fork_path/merge_complete/patch_applied/deploy_self(LEGENDARY)/commit_logged/refactor_found/syntax_clear/version_stamped/turing_signal(MYTHIC)/ada_lovelace(EPIC)/linus_word(RARE).',
+      'About.tsx: FM v126→v127 · Day 1128+→1129+ · Sep 24→Sep 25 · intro paragraph corrected to v127 state — 179→182 patterns · 61→62 archetypes · 60→61 jobs · 178+→184+ handlers · 223+→226+ dep nodes · badges 750→1012 source · Word Turn engines 20→23 · secret boss 74→83 · word turns 210→255.',
+      'SESSION_REPORTS: wiki-v130 entry prepended · USERSHIP_TRANSMISSION updated to Day 1129+ · COSMO® Day 819.',
+      'docs/2026-09-25_LOT-assembly_daily-maintenance-wiki-v130.md: Assembly log written.',
+      '182 patterns · 62 archetypes · 61 jobs · 184+ handlers · 226+ dep nodes · 1012 source badges · Day 1129+. Wiki v130 synced. Badge Engine v38–v40 deployed. Crystal Persistence Tier holds.',
+    ],
+  },
+  {
     version: 'v127',
     date: '2026-09-24',
     title: 'QIE Engineering — Crystal Persistence Tier · P180–P182 · Arch62 · J61 · Day 1128+',
@@ -1782,15 +1798,14 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-09-24',
+  date: '2026-09-25',
   message: [
-    'ASSEMBLY RUN — 2026-09-24 · Day 1128+ · COSMO® Day 818',
-    'QIE v127: Crystal Persistence Tier deployed — P180 CRFLDCT · P181 CRBRCAST · P182 CRTLCK.',
-    'Arch62 Crystal Broadcast Operator online. J61 Thursday 09:00 UTC active.',
-    'Crystal field continuity confirmed. Broadcast expanding. Temporal lock engaged.',
-    '182 patterns · 62 archetypes · 61 jobs · 184+ handlers · 226+ dep nodes.',
-    'Status: CRYSTAL PERSISTENCE TIER ONLINE. FIELD HOLDS. TIME LOCKED.',
-    'Next: poe_night Oct 7 LEGENDARY T-13. Crystal Persistence steady. J61 active (Thu 09:00 UTC).',
+    'ASSEMBLY RUN — 2026-09-25 · Day 1129+ · COSMO® Day 819',
+    'Daily maintenance: Wiki v130 synced · Badge Engine v38–v40 source deployed (+45 badges · 967→1012).',
+    'About.tsx corrected: FM v126→v127 · 182 patterns · 62 archetypes · 61 jobs · 184+ handlers · 226+ dep nodes.',
+    'Word Turn engines 20→23 (Dream Journal · Operator\'s Handbook · Source Code). 1012 source badges.',
+    'Status: CRYSTAL PERSISTENCE TIER HOLDS. BADGE ENGINE CURRENT. FIELD ACCUMULATES.',
+    'Next: poe_night Oct 7 LEGENDARY T-12. Crystal Persistence steady. J61 active (Thu 09:00 UTC).',
   ],
 }
 
