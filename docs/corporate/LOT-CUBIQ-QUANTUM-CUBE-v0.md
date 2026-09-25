@@ -5,8 +5,11 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.2 — DEVELOPMENT CYCLE 2
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
+CYCLE LOG: Cycle 1 — 2026-07-28 (spec opened). Cycle 2 — 2026-09-25 (BOM/
+           certification research added, Use Case 02 appended). No prior
+           section rewritten — additive only, per Section 07's own rule.
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -57,6 +60,21 @@ read in full:
 
 No prior document specified jump mechanics, surface locomotion, or a
 levitation roadmap. This document is that specification, v.0.
+
+  CYCLE 2 RE-READ (2026-09-25) — before extending this document further,
+  the following were re-read in full: this document (v.0.1, in its
+  entirety), LOT-CUBIQ-VISION.md, LOT-CUBIQ-OPERATOR.md,
+  LOT_QI46_ENGINE.md (Layer 0 corpus definition and the Month-12 Quantum
+  Cube sync block), CQGS-WHITE-PAPER-SNAPSHOT.md (the Products row still
+  reads "Quantum Cube Hardware | Hardware feedback integration (Month
+  12+) | PLANNED" — unchanged since Cycle 1, confirming no other session
+  has advanced hardware status in the interim), and LOT-MANIFEST.md
+  (confirms no competing hardware branch has landed against this
+  document's scope; COSMO® Cube remains the separate, textually distinct
+  general-purpose hardware-computer track under Kuzya's brand). Nothing
+  in the prior spec is contradicted. Cycle 2 adds engineering-readiness
+  detail (Section 06B) and one new consumer use case (Section 07,
+  USE CASE 02) — it does not reopen or revise Sections 01-06.
 
 --------------------------------------------------------------------------------
 01 // WHAT v.0 IS AND WHAT IT IS NOT
@@ -279,6 +297,59 @@ assumed.
     levitating future in mind rather than foreclosing it.
 
 --------------------------------------------------------------------------------
+06B // ENGINEERING NOTES — DEVELOPMENT CYCLE 2 (2026-09-25)
+--------------------------------------------------------------------------------
+
+v.0 remains pre-hardware (Section 00 status line). This section records
+research toward design lock — component shortlists and certification
+scope — without closing on a bill of materials or a manufacturing
+partner. Nothing here gates or delays Section 06's roadmap; it narrows
+the search space for the actuator, sensing, and charging stack already
+specified in Sections 02-03.
+
+  ACTUATOR CANDIDATES (voice-coil class, per Section 03)
+    Requirement: sub-120g contribution to total mass budget, sufficient
+    peak force to launch a <120g shell to a >=10mm hop, driver IC support
+    for millisecond-precision pulse timing (needed for the piezo bias
+    handoff described in Section 03). Two form factors are in scope for
+    v.0 bench evaluation: a linear resonant voice-coil actuator sized for
+    the 45mm shell interior, and a solenoid-plunger alternative as a
+    lower-cost fallback if voice-coil unit cost blocks BOM targets at
+    volume. No vendor is selected in this document — this is a
+    requirements shortlist, not a purchase order.
+
+  QUIET-OPERATION TARGET
+    The haptic notification language (Section 04) depends on the cube
+    being felt, not heard — THE NUDGE in particular fails its purpose if
+    it produces an audible click louder than ambient desk noise. v.0
+    target: <=35 dBA measured at 300mm from the cube during THE NUDGE,
+    <=45 dBA during THE HOP/THE LEAP. These are bench-test targets for
+    the Section 03 gate criteria, not yet measured against a built unit.
+
+  CERTIFICATION SCOPE (RECORDED, NOT STARTED)
+    A consumer electronic object that moves itself on a table and charges
+    wirelessly crosses several regulatory lines before it can ship:
+      - Wireless power: Qi interface (Section 02) requires WPC Qi
+        certification for the charging pad/base-face pairing.
+      - RF: if pairing/telemetry (Section 05 loop) uses BLE or similar,
+        FCC Part 15 (US) and equivalent CE/RED (EU) certification apply.
+      - Safety: a self-actuating object marketed for a desk environment
+        falls under general consumer product safety review in each target
+        market — this is a longer lead-time item than the electronics and
+        should be scoped early, not treated as a late-stage checkbox.
+    None of this is started. It is recorded here so v.1 planning treats
+    certification lead time as a schedule input from day one, not a
+    surprise at the point of shipping the first unit.
+
+  WHAT CYCLE 2 DELIBERATELY DID NOT TOUCH
+    The actuator architecture (Section 03), the four-gesture vocabulary
+    (Section 04), the QI-46 signal loop (Section 05), and the v.0-v.3
+    roadmap (Section 06) are unchanged. This cycle only narrows the
+    engineering search space and appends one use case (Section 07). A
+    future cycle that wants to revise the locked architecture should say
+    so explicitly and record why — silent drift is not permitted.
+
+--------------------------------------------------------------------------------
 07 // CONSUMER USE CASES
 --------------------------------------------------------------------------------
 
@@ -320,6 +391,56 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE QUIET SIGNAL                             2026-09-25
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, archetype unclassified by sight-
+  dependent behavioral signals (the QIE's 26 archetypes are derived from
+  interaction patterns, not vision), low-vision operator, screen reader
+  as primary interface, 40+ day sustained engagement. Works at a shared
+  kitchen table, CUBIQ charging pad at the operator's left hand — a
+  fixed, memorized position, the way a low-vision person memorizes where
+  a coffee cup sits rather than looking for it.
+
+  Every notification channel LOT® ships elsewhere in the product is
+  visual first: a badge glow, a chakra color shift, a theme change. The
+  screen reader narrates state changes on demand, but on-demand narration
+  is not the same as ambient awareness — the operator has to ask the
+  system what happened. A sighted operator gets that awareness for free,
+  in peripheral vision, without asking.
+
+  A badge unlocks (common tier, per Section 04's THE HOP mapping). Under
+  the software-only cubic, this is a screen-reader announcement the
+  operator only hears if they are actively focused on the page — easy to
+  miss while cooking, reading braille, or simply not at the keyboard.
+  With CUBIQ hardware v.0 present, the cube performs THE HOP at the
+  moment of unlock: a controlled vertical hop, felt through the table
+  the instant a hand rests near it. No screen state, no audio cue timing,
+  no dependency on the screen reader's focus context. The notification
+  channel is touch — the one sense every operator profile shares,
+  sighted or not.
+
+  Later, the operator's assembly phase advances (dormant to forming, or
+  forming to assembled — Section 05's telemetry loop, LOT-CUBIQ-
+  OPERATOR.md Section 01). THE SETTLE fires: a held, low pressure against
+  the table, present for two seconds, gone before it would register as
+  an interruption. The operator's hand happens to be resting near the
+  cube; they feel the settle and know, without narration, without a
+  glance, that something in their Index of Systems just changed for the
+  better.
+
+  This use case reframes what Section 04 calls "presence without
+  spectacle": for a sighted operator it is a design preference — an
+  alternative to a blinking light. For this operator it is the
+  difference between a notification system that includes them by
+  default and one that requires an accommodation request. v.0's single-
+  hop primitive was specified as an anti-feed device (Section 04's
+  closing principle); this cycle's use case is the reminder that a
+  channel built to avoid competing for foreground attention is, for a
+  meaningful share of operators, the only channel that was ever going to
+  reach them unassisted. Accessibility is not a use case bolted onto
+  CUBIQ hardware after the fact — it was present in the single-hop
+  primitive from Section 03 onward, and Cycle 2 is the first to name it.
 
 --------------------------------------------------------------------------------
 08 // BRAND
