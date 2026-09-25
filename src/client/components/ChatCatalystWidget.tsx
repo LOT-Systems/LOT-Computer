@@ -65,6 +65,22 @@ export function ChatCatalystWidget() {
     }
   }
 
+  const handleMail = () => {
+    const name = catalyst.action.cohortMember?.name
+    if (name) {
+      try {
+        window.sessionStorage.setItem('lot_mail_draft_to', name)
+      } catch {}
+    }
+    recordSignal('journal', 'connection_accepted', {
+      type: catalyst.type,
+      cohortMember: name || 'community',
+      hour: new Date().getHours(),
+      channel: 'lot_mail'
+    })
+    stores.goTo('logs')
+  }
+
   return (
     <Block
       label="Connect:"
@@ -88,10 +104,15 @@ export function ChatCatalystWidget() {
         </div>
 
         {/* Action button */}
-        <div className="mb-8">
+        <div className="mb-8 flex items-center gap-x-8">
           <Button onClick={handleAction}>
             {catalyst.action.label}
           </Button>
+          {catalyst.action.cohortMember && (
+            <Button kind="secondary" onClick={handleMail} title="Compose a LOT Mail to this cohort member">
+              ✉ Mail
+            </Button>
+          )}
         </div>
 
         {/* Conversation starters if available */}

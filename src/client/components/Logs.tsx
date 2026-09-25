@@ -9,7 +9,7 @@
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
-import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
+import { Block, Button, GhostButton, ResizibleGhostInput, Unknown } from '#client/components/ui'
 import { useLogs, useUpdateLog } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
@@ -33,7 +33,7 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useSendMail } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3707,6 +3707,32 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [mailComposeOpen, setMailComposeOpen] = React.useState(false)
+  const [mailTo, setMailTo] = React.useState('')
+  const [mailBody, setMailBody] = React.useState('')
+  const [mailStatus, setMailStatus] = React.useState<string | null>(null)
+  React.useEffect(() => {
+    if (!primary) return
+    try {
+      const draftTo = window.sessionStorage.getItem('lot_mail_draft_to')
+      if (draftTo) {
+        window.sessionStorage.removeItem('lot_mail_draft_to')
+        setMailTo(draftTo)
+        setMailComposeOpen(true)
+      }
+    } catch {}
+  }, [primary])
+  const { mutate: submitMail, isLoading: mailSending } = useSendMail({
+    onSuccess: (data) => {
+      const name = `${data.toUser.firstName || ''} ${data.toUser.lastName || ''}`.trim()
+      setMailStatus(`SENT — ${name || 'recipient'} will see it in Sync.`)
+      setMailTo('')
+      setMailBody('')
+    },
+    onError: (err: any) => {
+      setMailStatus(err?.response?.data?.hint || err?.response?.data?.error || 'MAIL FAILED — could not send.')
+    },
+  })
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -4128,6 +4154,7 @@ const NoteEditor = ({
           '/story        Generate a personal story from recent data',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
+          '/email to [Name] [msg]  Send a LOT Mail — appears in Sync',
           '/assembly     Self-assembly module status',
           '/phys         Physiological cohort report',
           '/qos          Quantum OS state analysis',
@@ -4145,6 +4172,14 @@ const NoteEditor = ({
           'Ctrl+Enter    Save log immediately',
         ]
         setSystemHelp(lines.join('\n'))
+      } else if (trigger === 'email-compose') {
+        const cmdMatch = value.match(/\/(?:email|mail)\s+(?:to\s+)?([A-Za-z][A-Za-z'-]*(?:\s[A-Za-z][A-Za-z'-]*)?)\s*([\s\S]*)/i)
+        if (cmdMatch) {
+          if (cmdMatch[1]) setMailTo((prev) => prev || cmdMatch[1].trim())
+          if (cmdMatch[2]?.trim()) setMailBody((prev) => prev || cmdMatch[2].trim())
+        }
+        setMailStatus(null)
+        setMailComposeOpen(true)
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4411,6 +4446,51 @@ const NoteEditor = ({
                   )
                 })}
               </div>
+            </Block>
+          </div>
+        )}
+        {mailComposeOpen && (
+          <div className="mt-8">
+            <Block label="MAIL:" blockView>
+              <div className="flex items-center gap-x-8 mb-8">
+                <span className="opacity-40 whitespace-nowrap">To:</span>
+                <ResizibleGhostInput
+                  direction="v"
+                  value={mailTo}
+                  onChange={setMailTo}
+                  placeholder="Recipient name"
+                  containerClassName="flex-grow"
+                />
+              </div>
+              <ResizibleGhostInput
+                direction="vh"
+                value={mailBody}
+                onChange={setMailBody}
+                placeholder="Message..."
+                containerClassName="mb-8"
+                rows={3}
+              />
+              <div className="flex items-center gap-x-8">
+                <Button
+                  kind="secondary"
+                  size="small"
+                  disabled={!mailTo.trim() || !mailBody.trim() || mailSending}
+                  onClick={() => submitMail({ toName: mailTo.trim(), body: mailBody.trim() })}
+                >
+                  {mailSending ? 'Sending...' : 'Send'}
+                </Button>
+                <GhostButton
+                  onClick={() => {
+                    setMailComposeOpen(false)
+                    setMailStatus(null)
+                  }}
+                >
+                  Cancel
+                </GhostButton>
+              </div>
+              {mailStatus && (
+                <div className="mt-8 opacity-60">{mailStatus}</div>
+              )}
             </Block>
           </div>
         )}
