@@ -46,27 +46,35 @@ interface TriggerRule {
   trigger: LogTrigger
   emojis: string[]
   keywords: string[] // lower-case slash commands (without leading slash)
+  /**
+   * One-line help text for /system. `help: null` means the trigger is
+   * intentionally omitted from the printed command list (e.g. a bare
+   * punctuation trigger with no `/keyword` form). Every trigger with at
+   * least one keyword MUST carry help text — this is enforced by
+   * `getCommandHelpLines()` below rather than left to hand-sync.
+   */
+  help: string | null
 }
 
 const RULES: TriggerRule[] = [
-  { trigger: 'toggle-synth',   emojis: ['🎹'],    keywords: ['synth', 'keyboard'] },
-  { trigger: 'ai-scan',        emojis: [],       keywords: ['scan', 'ai'] },
-  { trigger: 'silent-mode',    emojis: [],       keywords: ['silent', 'quiet'] },
-  { trigger: 'breathe',        emojis: [],       keywords: ['breathe', 'breath'] },
-  { trigger: 'force-fast',     emojis: [],       keywords: ['fast'] },
-  { trigger: 'radio-toggle',   emojis: ['🎧'],    keywords: ['radio'] },
-  { trigger: 'night-mode',     emojis: ['🌙'],    keywords: ['night'] },
-  { trigger: 'prayer-mode',    emojis: ['🕯️', '🕯'], keywords: ['prayer', 'candle'] },
-  { trigger: 'freeze-widgets', emojis: ['🧊'],    keywords: ['freeze', 'pause'] },
-  { trigger: 'cohort-support', emojis: ['❗', '‼️', '‼'], keywords: [] },
-  { trigger: 'qos-report',     emojis: [],        keywords: ['qos', 'os-report'] },
-  { trigger: 'assembly-check', emojis: [],        keywords: ['assembly', 'assemble'] },
-  { trigger: 'phys-report',    emojis: [],        keywords: ['phys', 'cohort-report'] },
-  { trigger: 'sil-check',      emojis: [],        keywords: ['sil', 'silence-check'] },
-  { trigger: 'qi-rfi',         emojis: [],        keywords: ['qi'] },
-  { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
-  { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
-  { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'prayer-mode',    emojis: ['🕯️', '🕯'], keywords: ['prayer', 'candle'], help: 'Generate contextual scripture' },
+  { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'],              help: 'Generate a personal story from recent data' },
+  { trigger: 'ai-scan',        emojis: [],       keywords: ['scan', 'ai'],          help: 'System status overview' },
+  { trigger: 'qi-rfi',         emojis: [],        keywords: ['qi'],                 help: 'Ask the Quantum Intelligence engine — /qi [query]' },
+  { trigger: 'assembly-check', emojis: [],        keywords: ['assembly', 'assemble'], help: 'Self-assembly module status' },
+  { trigger: 'phys-report',    emojis: [],        keywords: ['phys', 'cohort-report'], help: 'Physiological cohort report' },
+  { trigger: 'qos-report',     emojis: [],        keywords: ['qos', 'os-report'],   help: 'Quantum OS state analysis' },
+  { trigger: 'force-fast',     emojis: [],       keywords: ['fast'],                help: 'Orthodox fasting calendar' },
+  { trigger: 'breathe',        emojis: [],       keywords: ['breathe', 'breath'],   help: '4-2-6 breathing exercise' },
+  { trigger: 'freeze-widgets', emojis: ['🧊'],    keywords: ['freeze', 'pause'],     help: 'Pause and reflect protocol' },
+  { trigger: 'silent-mode',    emojis: [],       keywords: ['silent', 'quiet'],     help: 'Signal silence check' },
+  { trigger: 'sil-check',      emojis: [],        keywords: ['sil', 'silence-check'], help: 'Signal silence pattern check' },
+  { trigger: 'toggle-synth',   emojis: ['🎹'],    keywords: ['synth', 'keyboard'],   help: 'Toggle keyboard sound' },
+  { trigger: 'radio-toggle',   emojis: ['🎧'],    keywords: ['radio'],               help: 'Toggle radio' },
+  { trigger: 'night-mode',     emojis: ['🌙'],    keywords: ['night'],               help: 'Dark mode' },
+  { trigger: 'how-checkin',    emojis: [],        keywords: ['how'],                help: 'Open LOT AI check-in (System tab)' },
+  { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'], help: 'This help screen' },
+  { trigger: 'cohort-support', emojis: ['❗', '‼️', '‼'], keywords: [],              help: null },
 ]
 
 /**
@@ -114,4 +122,26 @@ export function detectNewTriggers(
   const fresh: LogTrigger[] = []
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
+}
+
+/**
+ * Renders the /system help screen from RULES — the single source of
+ * truth for slash commands. A command added to RULES with `help` set
+ * appears here automatically; nothing to hand-sync in Logs.tsx.
+ * Triggers with `help: null` (punctuation-only, no `/keyword`) are
+ * skipped since they have nothing to type.
+ */
+export function getCommandHelpLines(): string[] {
+  const commandLines = RULES
+    .filter(r => r.help !== null && r.keywords.length > 0)
+    .map(r => `/${r.keywords[0]}`.padEnd(14) + r.help)
+
+  return [
+    'AVAILABLE COMMANDS',
+    '',
+    ...commandLines,
+    '',
+    'SHORTCUTS',
+    'Ctrl+Enter    Save log immediately',
+  ]
 }

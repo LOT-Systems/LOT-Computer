@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
 
 ## Render Isolation
 
@@ -226,3 +226,35 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Fresh-Sandbox Preflight (node_modules + tsconfig drift)
+
+A clean checkout of this repo (no prior `node_modules/`) fails CHECK A/B two
+ways that are environment drift, not code defects — diagnose both before
+touching source:
+
+1. `yarn install --frozen-lockfile` (the Dockerfile's own install command)
+   ECONNRESETs in a sandboxed network: `yarn.lock` pins resolved URLs against
+   `registry.yarnpkg.com`, which agent-proxy network policy does not allow,
+   even with `--registry` overridden (yarn ignores it once a lockfile has
+   resolved URLs). `registry.npmjs.org` IS allowed. Fix: `npm ci --no-audit
+   --no-fund --legacy-peer-deps` (package-lock.json resolves against npmjs;
+   `--legacy-peer-deps` is required because `@nanostores/react@0.4.1` and
+   `@nanostores/persistent@0.9.1` declare conflicting `nanostores` peer
+   ranges against the pinned `nanostores@0.9.5` — a real but harmless
+   pre-existing peer mismatch, not a version to "fix" by bumping).
+2. `tsconfig.server.json`'s `ignoreDeprecations` value is coupled to the
+   *locally installed* TypeScript minor, not the repo's pinned `^5.9.3`
+   range: some environments resolve a newer global `tsc` that only accepts
+   `"6.0"`; once local `node_modules/typescript@5.9.3` is installed via (1),
+   only `"5.0"` is valid and `"6.0"` hard-fails with TS5103. Diagnose which
+   `tsc` actually ran (`./node_modules/.bin/tsc --version` after install)
+   before changing this value — do not "fix" it without installing deps
+   first, or you will flip it back and forth chasing the wrong `tsc`.
+
+Corollary: always run CHECK A on a truly clean state comparison (`git stash`
++ re-run) before attributing a preflight failure to the artifact under
+benchmark — both failures above reproduce identically on unmodified HEAD.
+
+(SR-20260925-01: first fresh-sandbox run to hit both; node_modules absent,
+yarn registry policy-blocked, tsc version mismatch traced and resolved.)
