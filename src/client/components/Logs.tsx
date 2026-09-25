@@ -4728,6 +4728,118 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'crystal_resonance_convergence') {
+          const contConf       = log.metadata?.contConf as number | undefined
+          const broadConf      = log.metadata?.broadConf as number | undefined
+          const resonanceDepth = log.metadata?.resonanceDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRRCONV:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">RESONANCE CONVERGING</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRFLDCT</span>
+                  <span className="opacity-60">CRBRCAST</span>
+                </div>
+                {contConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONT CONF</span>
+                    <span className="tabular-nums opacity-60">{contConf}%</span>
+                  </div>
+                )}
+                {broadConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BROAD CONF</span>
+                    <span className="tabular-nums opacity-60">{broadConf}%</span>
+                  </div>
+                )}
+                {resonanceDepth !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">RESONANCE</span>
+                    <span className="tabular-nums opacity-60">{resonanceDepth}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystal_full_coherence') {
+          const resonanceConf  = log.metadata?.resonanceConf as number | undefined
+          const lockConf       = log.metadata?.lockConf as number | undefined
+          const coherenceDepth = log.metadata?.coherenceDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRFULLCOH:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">FULL COHERENCE</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRRCONV</span>
+                  <span className="opacity-60">CRTLCK</span>
+                </div>
+                {resonanceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RES CONF</span>
+                    <span className="tabular-nums opacity-60">{resonanceConf}%</span>
+                  </div>
+                )}
+                {lockConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LOCK CONF</span>
+                    <span className="tabular-nums opacity-60">{lockConf}%</span>
+                  </div>
+                )}
+                {coherenceDepth !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">COHERENCE</span>
+                    <span className="tabular-nums opacity-60">{coherenceDepth}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystal_resonance_sovereignty') {
+          const coherenceConf   = log.metadata?.coherenceConf as number | undefined
+          const sovTlockConf    = log.metadata?.sovTlockConf as number | undefined
+          const sovereigntyDepth = log.metadata?.sovereigntyDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRRESOV:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">CRYSTAL SOVEREIGN</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRFULLCOH</span>
+                  <span className="opacity-60">SOVTLOCK</span>
+                </div>
+                {coherenceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COH CONF</span>
+                    <span className="tabular-nums opacity-60">{coherenceConf}%</span>
+                  </div>
+                )}
+                {sovTlockConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOV CONF</span>
+                    <span className="tabular-nums opacity-60">{sovTlockConf}%</span>
+                  </div>
+                )}
+                {sovereigntyDepth !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVEREIGNTY</span>
+                    <span className="tabular-nums opacity-60">{sovereigntyDepth}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">LEGENDARY</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'calendar_ee_signal') {
           const badge    = log.metadata?.badge as string | undefined
           const name     = log.metadata?.name as string | undefined

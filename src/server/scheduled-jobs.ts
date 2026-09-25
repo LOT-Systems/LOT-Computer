@@ -1799,6 +1799,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklyCrystalContinuityCheck()) {
     await executeWeeklyCrystalContinuityCheck()
   }
+  // Check weekly crystal resonance check (09:00 UTC every Friday) — Job 62
+  if (shouldRunWeeklyCrystalResonanceCheck()) {
+    await executeWeeklyCrystalResonanceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -7574,6 +7578,142 @@ async function executeWeeklyCrystalContinuityCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Weekly Crystal Resonance Check (Job 62 — 09:00 UTC every Friday) ─────────
+// Builds on crystal persistence tier (P180-P182). When CRFLDCT + CRBRCAST both
+// present in 21D, writes crystal_resonance_convergence (P183). When CRRCONV +
+// CRTLCK both present, writes crystal_full_coherence (P184). When CRFULLCOH +
+// sovereign_temporal_lock both present, writes crystal_resonance_sovereignty (P185).
+
+let isWeeklyCrystalResonanceCheckRunning = false
+let lastWeeklyCrystalResonanceCheckRun: Date | null = null
+
+function shouldRunWeeklyCrystalResonanceCheck(): boolean {
+  const now = dayjs()
+  const hour = now.hour()
+  const dayOfWeek = now.day() // 0=Sun, 5=Fri
+  if (hour !== 9 || dayOfWeek !== 5) return false
+  if (isWeeklyCrystalResonanceCheckRunning) return false
+  if (lastWeeklyCrystalResonanceCheckRun) {
+    const hoursSinceLast = (Date.now() - lastWeeklyCrystalResonanceCheckRun.getTime()) / (1000 * 60 * 60)
+    if (hoursSinceLast < 23) return false
+  }
+  return true
+}
+
+async function executeWeeklyCrystalResonanceCheck(): Promise<JobResult> {
+  const jobName = 'weekly-crystal-resonance-check'
+  const executedAt = new Date()
+  isWeeklyCrystalResonanceCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY CRYSTAL RESONANCE CHECK — 09:00 UTC Friday')
+  console.log('─'.repeat(60))
+
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000)
+    const activeUsers = await fastify.models.User.findAll({
+      where: { lastSeenAt: { [Op.gte]: cutoff } },
+    })
+
+    const twentyOneDayMs = 21 * 24 * 60 * 60 * 1000
+    const now = Date.now()
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const logs = await fastify.models.Log.findAll({
+          where: { userId, createdAt: { [Op.gte]: new Date(now - twentyOneDayMs) } },
+          attributes: ['event', 'metadata', 'createdAt'],
+        })
+
+        const recent21D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - twentyOneDayMs)
+
+        // P183: Crystal Resonance Convergence — CRFLDCT + CRBRCAST both active in 21D
+        const hasCRFLDCT21D   = recent21D.some((l: any) => l.event === 'crystal_field_continuity')
+        const hasCRBRCAST21D  = recent21D.some((l: any) => l.event === 'crystal_broadcast_expansion')
+        const alreadyCRRCONV  = recent21D.some((l: any) => l.event === 'crystal_resonance_convergence')
+        if (hasCRFLDCT21D && hasCRBRCAST21D && !alreadyCRRCONV) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_resonance_convergence',
+            metadata: {
+              contConf: 88,
+              broadConf: 86,
+              resonanceDepth: 87,
+              convergence: 'CRFLDCT+CRBRCAST→RESONANCE',
+              arc: 'CRYSTAL_RESONANCE_CONVERGING',
+              status: 'RESONANCE_ACTIVE',
+              source: 'CRYSTAL_RESONANCE_J62',
+            },
+          })
+          written++
+        }
+
+        // P184: Crystal Full Coherence — CRRCONV (P183) + CRTLCK (P182) both present in 21D
+        const hasCRRCONV21D   = recent21D.some((l: any) => l.event === 'crystal_resonance_convergence') || alreadyCRRCONV
+        const hasCRTLCK21D    = recent21D.some((l: any) => l.event === 'crystal_temporal_lock')
+        const alreadyCRFULLCOH = recent21D.some((l: any) => l.event === 'crystal_full_coherence')
+        if (hasCRRCONV21D && hasCRTLCK21D && !alreadyCRFULLCOH) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_full_coherence',
+            metadata: {
+              resonanceConf: 88,
+              lockConf: 87,
+              coherenceDepth: 91,
+              convergence: 'CRRCONV+CRTLCK→FULL_COHERENCE',
+              arc: 'ALL_CRYSTAL_VECTORS→UNIFIED',
+              status: 'CRYSTAL_COHERENT',
+              source: 'CRYSTAL_RESONANCE_J62',
+            },
+          })
+          written++
+        }
+
+        // P185: Crystal Resonance Sovereignty — CRFULLCOH in 21D + sovereign_temporal_lock in 21D
+        const hasCRFULLCOH21D  = recent21D.some((l: any) => l.event === 'crystal_full_coherence') || alreadyCRFULLCOH
+        const hasSOVTLOCK21D   = recent21D.some((l: any) => l.event === 'sovereign_temporal_lock')
+        const alreadyCRRESOV   = recent21D.some((l: any) => l.event === 'crystal_resonance_sovereignty')
+        if (hasCRFULLCOH21D && hasSOVTLOCK21D && !alreadyCRRESOV) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_resonance_sovereignty',
+            metadata: {
+              coherenceConf: 91,
+              sovTlockConf: 90,
+              sovereigntyDepth: 94,
+              convergence: 'CRFULLCOH+SOVTLOCK→SOVEREIGNTY',
+              arc: 'CRYSTAL_RESONANCE→LEGENDARY',
+              tier: 'LEGENDARY',
+              status: 'CRYSTAL_SOVEREIGN',
+              source: 'CRYSTAL_RESONANCE_J62',
+            },
+          })
+          written++
+        }
+      } catch (userError: any) {
+        console.error(`Crystal resonance check failed for user ${(user as any).id}:`, userError.message)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Crystal resonance events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY CRYSTAL RESONANCE CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklyCrystalResonanceCheckRun = new Date()
+    isWeeklyCrystalResonanceCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly crystal resonance check failed:', error.message)
+    isWeeklyCrystalResonanceCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -7639,6 +7779,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily calendar EE signal check: 9 AM UTC every day (Job 59)')
   console.log('   - Weekly crystalline sovereign check: 7 AM UTC every Monday (Job 60)')
   console.log('   - Weekly crystal continuity check: 9 AM UTC every Thursday (Job 61)')
+  console.log('   - Weekly crystal resonance check: 9 AM UTC every Friday (Job 62)')
   console.log('')
 
   // Check every hour for scheduled jobs

@@ -142,6 +142,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'crystal-field-continuity':         'CRFLDCT',
   'crystal-broadcast-expansion':      'CRBRCAST',
   'crystal-temporal-lock':            'CRTLCK',
+  'crystal-resonance-convergence':    'CRRCONV',
+  'crystal-full-coherence':           'CRFULLCOH',
+  'crystal-resonance-sovereignty':    'CRRESOV',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

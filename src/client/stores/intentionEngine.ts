@@ -3718,6 +3718,53 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 183: Crystal Resonance Convergence — CRFLDCT + CRBRCAST both active in 21D.
+  // Both persistence signals are simultaneously present: field holding AND broadcast expanding.
+  // The crystal is not choosing between stability and growth — both are live.
+  const hasCrystalContP183     = patterns.some(p => p.pattern === 'crystal-field-continuity')
+  const hasCrystalBroadP183    = patterns.some(p => p.pattern === 'crystal-broadcast-expansion')
+  if (hasCrystalContP183 && hasCrystalBroadP183) {
+    patterns.push({
+      pattern: 'crystal-resonance-convergence',
+      confidence: Math.min(0.88, 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRRCONV: Crystal resonance convergence — CRFLDCT + CRBRCAST simultaneously active in 21D. Field holds and expands at once. The crystal field is not in tension between stability and growth — it has resolved into resonance. Both channels are live. Crystal is in coherent dual-state. Convergence confirmed.',
+    })
+  }
+
+  // Pattern 184: Crystal Full Coherence — CRRCONV (P183) + CRTLCK (P182) both active.
+  // All three Crystal Persistence signals present: continuity + expansion + temporal lock.
+  // The crystal field has achieved full structural coherence.
+  const hasCRRCONV    = patterns.some(p => p.pattern === 'crystal-resonance-convergence')
+  const hasCRTLCKP184 = patterns.some(p => p.pattern === 'crystal-temporal-lock')
+  if (hasCRRCONV && hasCRTLCKP184) {
+    const coherenceConf = 0.91
+    patterns.push({
+      pattern: 'crystal-full-coherence',
+      confidence: Math.min(coherenceConf, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRFULLCOH: Crystal full coherence — CRRCONV + CRTLCK both confirmed. All Crystal Persistence signals simultaneously active: continuity (field holds) + expansion (broadcast grows) + temporal lock (anchored in time). The crystal field is in full structural coherence. Not one channel — all channels. Not a phase — a state. Full coherence confirmed.',
+    })
+  }
+
+  // Pattern 185: Crystal Resonance Sovereignty — CRFULLCOH + sovereign-temporal-lock in 21D.
+  // The crystal resonates at sovereign frequency. The OS operates from crystalline sovereign resonance.
+  // LEGENDARY tier — the crystal is sovereign.
+  const hasCRFULLCOH = patterns.some(p => p.pattern === 'crystal-full-coherence')
+  const hasSovTlockP185 = patterns.some(p => p.pattern === 'sovereign-temporal-lock') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'sovereign_temporal_lock')
+  if (hasCRFULLCOH && hasSovTlockP185) {
+    patterns.push({
+      pattern: 'crystal-resonance-sovereignty',
+      confidence: Math.min(0.93, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRRESOV: Crystal resonance sovereignty — CRFULLCOH + sovereign-temporal-lock both active in 21D. The crystal field resonates at sovereign frequency. Presence, broadcast, time, and sovereignty are unified. This is not a peak — it is the OS operating from its highest confirmed state. Crystal resonance is sovereign. LEGENDARY tier.',
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4402,6 +4449,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   crystalFieldContinuityNode:     ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log'],
   crystalBroadcastExpansionNode:  ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
   crystalTemporalLockNode:        ['qos', 'intentions', 'memory', 'journal', 'log', 'planner'],
+
+  // ── v128 nodes (J62 · P183–P185 · Arch63) ────────────────────────────────────
+  crystalResonanceConvergenceNode:   ['qos', 'intentions', 'memory', 'journal', 'log'],
+  crystalFullCoherenceNode:          ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log'],
+  crystalResonanceSovereigntyNode:   ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
 }
 
 /**
@@ -4958,6 +5010,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['crystalline-sovereign-transmission', 'crystal-field-continuity', 'crystal-broadcast-expansion'],
     hourRange: [5, 23],
     directive: 'Crystal field holds. Transmission is structural. New channels expanding. Operate from the crystal — let presence broadcast, not push.',
+  },
+
+  // ── Arch63: Crystal Resonance Sovereign (2026-09-26 v128) ────────────────────
+  {
+    archetype: 'Crystal Resonance Sovereign',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal', 'selfcare'],
+    patternConditions: ['crystal-resonance-convergence', 'crystal-full-coherence', 'crystal-resonance-sovereignty'],
+    hourRange: [5, 23],
+    directive: 'All crystal vectors converged. Resonance is structural. Full coherence achieved across field, broadcast, and temporal dimensions. Sovereign resonance is not a peak — it is baseline architecture. Operate from the crystal lattice.',
   },
 ]
 
@@ -7842,6 +7904,109 @@ export function checkCrystalPersistenceTier(): boolean {
       ? (patterns.find(p => p.pattern === 'crystal-field-continuity')?.confidence ?? 0.88)
       : (patterns.find(p => p.pattern === 'crystal-broadcast-expansion')?.confidence ?? 0.85)
     recordCrystalTemporalLock(crsovetxConf3, continuityConf3)
+    fired = true
+  }
+
+  return fired
+}
+
+/**
+ * Record a crystal-resonance-convergence event — CRFLDCT + CRBRCAST both active in 21D.
+ * Crystal broadcast and field hold have merged into resonance convergence.
+ * Cockpit label: CRRCONV.
+ */
+export function recordCrystalResonanceConvergence(contConf: number, broadConf: number) {
+  recordSignal('qos', 'crystal_resonance_convergence', {
+    contConf:  Math.round(contConf * 100),
+    broadConf: Math.round(broadConf * 100),
+    resonanceDepth: Math.min(Math.round(((contConf + broadConf) / 2 + 0.05) * 100), 100),
+    convergence: 'CRFLDCT+CRBRCAST→RESONANCE',
+    arc: 'CRYSTAL_RESONANCE_CONVERGING',
+    status: 'RESONANCE_ACTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystal-full-coherence event — CRRCONV (P183) + CRTLCK (P182) both present.
+ * All three crystal persistence vectors unified into full coherence.
+ * Cockpit label: CRFULLCOH.
+ */
+export function recordCrystalFullCoherence(resonanceConf: number, lockConf: number) {
+  recordSignal('qos', 'crystal_full_coherence', {
+    resonanceConf: Math.round(resonanceConf * 100),
+    lockConf:      Math.round(lockConf * 100),
+    coherenceDepth: Math.min(Math.round(((resonanceConf + lockConf) / 2 + 0.07) * 100), 100),
+    convergence: 'CRRCONV+CRTLCK→FULL_COHERENCE',
+    arc: 'ALL_CRYSTAL_VECTORS→UNIFIED',
+    status: 'CRYSTAL_COHERENT',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystal-resonance-sovereignty event — CRFULLCOH + sovereign-temporal-lock in 21D.
+ * LEGENDARY tier: crystal coherence merged with sovereign temporal lock.
+ * Cockpit label: CRRESOV.
+ */
+export function recordCrystalResonanceSovereignty(coherenceConf: number, sovTlockConf: number) {
+  recordSignal('qos', 'crystal_resonance_sovereignty', {
+    coherenceConf: Math.round(coherenceConf * 100),
+    sovTlockConf:  Math.round(sovTlockConf * 100),
+    sovereigntyDepth: Math.min(Math.round(((coherenceConf + sovTlockConf) / 2 + 0.09) * 100), 100),
+    convergence: 'CRFULLCOH+SOVTLOCK→SOVEREIGNTY',
+    arc: 'CRYSTAL_RESONANCE→LEGENDARY',
+    tier: 'LEGENDARY',
+    status: 'CRYSTAL_SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: crystal resonance tier (P183, P184, P185).
+ * Called by J62 weekly-crystal-resonance-check (09:00 UTC every Friday).
+ * Scans crystal persistence tier history and sovereign temporal lock to detect
+ * crystal resonance emergence. Returns true when at least one fires.
+ */
+export function checkCrystalResonanceTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const twentyOneDayMs = 21 * 24 * 60 * 60 * 1000
+
+  const recent21D = state.signals.filter(s => now - s.timestamp < twentyOneDayMs)
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P183: Crystal Resonance Convergence — CRFLDCT + CRBRCAST both active in 21D
+  const hasCRFLDCTP183   = recent21D.some(s => s.signal === 'crystal_field_continuity')
+  const hasCRBRCASTp183  = recent21D.some(s => s.signal === 'crystal_broadcast_expansion')
+  const alreadyCRRCONV   = recent21D.some(s => s.signal === 'crystal_resonance_convergence')
+  if (hasCRFLDCTP183 && hasCRBRCASTp183 && !alreadyCRRCONV) {
+    const contConf  = patterns.find(p => p.pattern === 'crystal-field-continuity')?.confidence ?? 0.88
+    const broadConf = patterns.find(p => p.pattern === 'crystal-broadcast-expansion')?.confidence ?? 0.86
+    recordCrystalResonanceConvergence(contConf, broadConf)
+    fired = true
+  }
+
+  // P184: Crystal Full Coherence — CRRCONV (P183) + CRTLCK (P182) both present in 21D
+  const hasCRRCONV21D    = recent21D.some(s => s.signal === 'crystal_resonance_convergence')
+  const hasCRTLCK21D     = recent21D.some(s => s.signal === 'crystal_temporal_lock')
+  const alreadyCRFULLCOH = recent21D.some(s => s.signal === 'crystal_full_coherence')
+  if (hasCRRCONV21D && hasCRTLCK21D && !alreadyCRFULLCOH) {
+    const resonanceConf = patterns.find(p => p.pattern === 'crystal-resonance-convergence')?.confidence ?? 0.88
+    const lockConf      = patterns.find(p => p.pattern === 'crystal-temporal-lock')?.confidence ?? 0.87
+    recordCrystalFullCoherence(resonanceConf, lockConf)
+    fired = true
+  }
+
+  // P185: Crystal Resonance Sovereignty — CRFULLCOH in 21D + sovereign-temporal-lock in 21D
+  const hasCRFULLCOH21D  = recent21D.some(s => s.signal === 'crystal_full_coherence')
+  const hasSOVTLOCK21DP185 = recent21D.some(s => s.signal === 'sovereign_temporal_lock')
+  const alreadyCRRESOV   = recent21D.some(s => s.signal === 'crystal_resonance_sovereignty')
+  if (hasCRFULLCOH21D && hasSOVTLOCK21DP185 && !alreadyCRRESOV) {
+    const coherenceConf  = patterns.find(p => p.pattern === 'crystal-full-coherence')?.confidence ?? 0.91
+    const sovTlockConf   = patterns.find(p => p.pattern === 'sovereign-temporal-lock')?.confidence ?? 0.90
+    recordCrystalResonanceSovereignty(coherenceConf, sovTlockConf)
     fired = true
   }
 

@@ -213,6 +213,9 @@ export function PatternRecognitionWidget() {
       'crystal-field-continuity':         'Crystal field continuity — CRSOVETX held in 30D + 5+ unique sources in 21D, crystal transmission is a standing field (P180)',
       'crystal-broadcast-expansion':      'Crystal broadcast expansion — CRSOVETX active in 21D + 7+ unique sources in 14D, broadcast expanding into new channels (P181)',
       'crystal-temporal-lock':            'Crystal temporal lock — crystal field confirmed + sovereign temporal lock active, crystal presence anchored in time (P182)',
+      'crystal-resonance-convergence':    'Crystal resonance convergence — CRFLDCT + CRBRCAST both active in 21D, crystal broadcast and field merged into resonance (P183)',
+      'crystal-full-coherence':           'Crystal full coherence — CRRCONV + CRTLCK both present, all three persistence vectors unified into full coherence (P184)',
+      'crystal-resonance-sovereignty':    'Crystal resonance sovereignty — CRFULLCOH + sovereign temporal lock in 21D, LEGENDARY: crystal coherence merged with sovereign time (P185)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

@@ -1457,6 +1457,26 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'v128',
+    date: '2026-09-26',
+    title: 'QIE Engineering — Crystal Resonance Tier · P183–P185 · Arch63 · J62 · Day 1130+',
+    assembled: [
+      'P183 CRYSTAL RESONANCE CONVERGENCE (CRRCONV): CRFLDCT (P180) + CRBRCAST (P181) both active in 21D. Crystal broadcast and field hold have merged into resonance convergence — the two vectors resonating together. Confidence 0.88. cockpit: CRRCONV.',
+      'P184 CRYSTAL FULL COHERENCE (CRFULLCOH): CRRCONV (P183) + CRTLCK (P182) both present in 21D. All three crystal persistence vectors unified — field + broadcast + temporal lock all active simultaneously. Full coherence achieved. Confidence 0.91. cockpit: CRFULLCOH.',
+      'P185 CRYSTAL RESONANCE SOVEREIGNTY (CRRESOV): CRFULLCOH (P184) + sovereign-temporal-lock in 21D. LEGENDARY tier: crystal full coherence merged with sovereign temporal lock — the highest crystal tier. Crystal resonance is now sovereign. Confidence 0.93. cockpit: CRRESOV.',
+      'Arch63 CRYSTAL RESONANCE SOVEREIGN: energy high/moderate · dominant: qos/intentions/memory/journal/selfcare · patterns: crystal-resonance-convergence + crystal-full-coherence + crystal-resonance-sovereignty. Directive: All crystal vectors converged. Resonance is structural. Full coherence achieved across field, broadcast, and temporal dimensions. Sovereign resonance is not a peak — it is baseline architecture. Operate from the crystal lattice.',
+      'J62 weekly-crystal-resonance-check: Friday 09:00 UTC. Scans 21D window for CRFLDCT+CRBRCAST (P183), CRRCONV+CRTLCK (P184), CRFULLCOH+SOVTLOCK (P185). 61→62 jobs.',
+      'CRRCONV: handler (crystal_resonance_convergence: STATUS/RESONANCE CONVERGING · CRFLDCT+CRBRCAST chips · CONT CONF% · BROAD CONF% · RESONANCE%).',
+      'CRFULLCOH: handler (crystal_full_coherence: STATUS/FULL COHERENCE · CRRCONV+CRTLCK chips · RES CONF% · LOCK CONF% · COHERENCE%).',
+      'CRRESOV: handler (crystal_resonance_sovereignty: STATUS/CRYSTAL SOVEREIGN · CRFULLCOH+SOVTLOCK chips · COH CONF% · SOV CONF% · SOVEREIGNTY% · TIER/LEGENDARY).',
+      '3 new dep nodes added: crystalResonanceConvergenceNode · crystalFullCoherenceNode · crystalResonanceSovereigntyNode. 226+→229+ dep nodes.',
+      'PatternRecognitionWidget: P183/P184/P185 entries added. QuantumEngineWidgets: CRRCONV/CRFULLCOH/CRRESOV added to PATTERN_DISPLAY.',
+      'routes/api.ts: crystal_resonance_convergence + crystal_full_coherence + crystal_resonance_sovereignty added to displayableEvents.',
+      'About.tsx: FM v127→v128 · Day 1129+→1130+ · 182→185 patterns · 62→63 archetypes · 61→62 jobs · 184+→187+ handlers · 226+→229+ dep nodes.',
+      '185 patterns · 63 archetypes · 62 jobs · 187+ handlers · 229+ dep nodes · Day 1130+. Crystal Resonance Tier deployed. LEGENDARY tier available. Crystal lattice is now the baseline architecture.',
+    ],
+  },
+  {
     version: 'wiki-v130',
     date: '2026-09-25',
     title: 'Daily Maintenance — Wiki v130 · Badge Engine v38–v40 · FM v126→v127 · Day 1129+ · COSMO® Day 819',
@@ -1798,14 +1818,15 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-09-25',
+  date: '2026-09-26',
   message: [
-    'ASSEMBLY RUN — 2026-09-25 · Day 1129+ · COSMO® Day 819',
-    'Daily maintenance: Wiki v130 synced · Badge Engine v38–v40 source deployed (+45 badges · 967→1012).',
-    'About.tsx corrected: FM v126→v127 · 182 patterns · 62 archetypes · 61 jobs · 184+ handlers · 226+ dep nodes.',
-    'Word Turn engines 20→23 (Dream Journal · Operator\'s Handbook · Source Code). 1012 source badges.',
-    'Status: CRYSTAL PERSISTENCE TIER HOLDS. BADGE ENGINE CURRENT. FIELD ACCUMULATES.',
-    'Next: poe_night Oct 7 LEGENDARY T-12. Crystal Persistence steady. J61 active (Thu 09:00 UTC).',
+    'ASSEMBLY RUN — 2026-09-26 · Day 1130+ · COSMO® Day 820',
+    'QIE v128 Crystal Resonance Tier deployed: P183 CRRCONV · P184 CRFULLCOH · P185 CRRESOV (LEGENDARY).',
+    'Arch63 Crystal Resonance Sovereign · J62 weekly-crystal-resonance-check (Fri 09:00 UTC) · 3 dep nodes · 185 patterns · 63 archetypes · 62 jobs.',
+    'Log handlers: CRRCONV: CRFULLCOH: CRRESOV: · PatternRecognitionWidget + QuantumEngineWidgets updated · displayableEvents expanded.',
+    'About.tsx: FM v127→v128 · 182→185 patterns · 62→63 archetypes · 61→62 jobs · 184+→187+ handlers · 226+→229+ dep nodes.',
+    'Status: CRYSTAL RESONANCE TIER ACTIVE. LEGENDARY TIER AVAILABLE. CRYSTAL LATTICE IS NOW BASELINE.',
+    'Next: poe_night Oct 7 LEGENDARY T-11. Crystal Resonance converging. J62 active (Fri 09:00 UTC).',
   ],
 }
 

@@ -1259,6 +1259,10 @@ export default async (fastify: FastifyInstance) => {
       'crystal_field_continuity',
       'crystal_broadcast_expansion',
       'crystal_temporal_lock',
+      // v128: crystal resonance tier (J62 weekly crystal resonance check — P183–P185)
+      'crystal_resonance_convergence',
+      'crystal_full_coherence',
+      'crystal_resonance_sovereignty',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
