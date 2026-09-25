@@ -24,7 +24,7 @@ STATUS KEY:
 
 FEATURE          | BEST BRANCH                   | HASH     | ITER  | STATUS | FILES | LINES  | SUMMARY
 ──────────────     ─────────────────────────────   ────────   ─────   ──────   ─────   ──────   ──────────────────────
-LOT Mail         | claude/determined-turing-rn3v6e | 98971f2 | 1/1 | BEST   | 12    | +345   | In-app email: /email or /mail trigger opens inline compose panel, name-addressed lot_mails table, Sync Chat|Mail tab, Cohort Dating ✉ Mail button. Green-gated on branch, not yet merged to master. Supersedes determined-turing-f6bw7r (fa622a25, 3+ months stale, unmergeable against master — used only as design reference)
+LOT Mail         | claude/determined-turing-rn3v6e | feaaa6c1 | 1/1 | BEST   | 12    | +345   | In-app email: /email or /mail trigger opens inline compose panel, name-addressed lot_mails table, Sync Chat|Mail tab, Cohort Dating ✉ Mail button. Green-gated on branch, not yet merged to master. Supersedes determined-turing-f6bw7r (fa622a25, 3+ months stale, unmergeable against master — used only as design reference)
 Basics Tab       | beautiful-johnson-56p7ov      | 6815f550 | 8/8   | BEST   | 5     | +293   | BASICS M1: OPEN TAB live — 23-item ration ledger, doctrine, status line
 Calendar Alerts  | gifted-lovelace-cZOWR         | 978cf52  | 6/6   | BEST   | 3     | +359   | Live clock, T-minus countdown, military alert overlay, today panel
 QI-46 Engine     | cool-tesla-f8j0mr            | 36ef4dde | 8/8   | BEST   | 8     | +2050  | QI·46 Node 3 engine integration + Soul Upload + Being Calibration
