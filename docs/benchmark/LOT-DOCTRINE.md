@@ -55,7 +55,13 @@ deferred to allow immediate visual response.)
 
 User-facing event types created via POST must appear in the GET
 displayableEvents whitelist or the write→read loop is silently broken.
-(SR-20260604-01: calendar_entry saved but never returned.)
+(SR-20260604-01: calendar_entry saved but never returned. SR-20260926-01:
+second occurrence — generated_story [/story command output] was created via
+POST /api/story since SR-20260622-01 but absent from displayableEvents;
+every AI story an operator generated rendered once inline then vanished on
+reload, recoverable only because the text was also appended into the
+entry's own body. Audit every new AI-backed Log event type against this
+whitelist at creation time, not after a session or two of silent loss.)
 
 ## Ship Mode Discipline
 

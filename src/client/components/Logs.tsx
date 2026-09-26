@@ -1978,6 +1978,26 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'generated_story') {
+          const story = log.metadata?.story as string | undefined
+          const storyPeriodLabel = (log.metadata?.period as string | undefined) || 'day'
+          const signalCount = log.metadata?.signalCount as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label={`STORY [${storyPeriodLabel.toUpperCase()}]:`} blockView>
+                {story && (
+                  <div className="opacity-60">
+                    {story.split('\n').map((line, idx) => (
+                      <div key={idx}>{line || <br />}</div>
+                    ))}
+                  </div>
+                )}
+                {signalCount !== undefined && (
+                  <div className="opacity-30 tabular-nums mt-4">SIGNALS: {signalCount}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'assembly_directive') {
           const directive = log.metadata?.directive as string | undefined
           const isError = log.metadata?.error as boolean | undefined
@@ -3706,6 +3726,7 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyPeriod, setStoryPeriod] = React.useState<'day' | 'week' | 'month' | 'year'>('day')
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -4125,7 +4146,10 @@ const NoteEditor = ({
           'AVAILABLE COMMANDS',
           '',
           '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
+          '/story        Compressed story of your day (default)',
+          '/story week   Compressed story of your week',
+          '/story month  Compressed story of your month',
+          '/story year   Compressed story of your year',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
@@ -4151,17 +4175,23 @@ const NoteEditor = ({
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
+          const periodMatch = value.match(/\/story\s+(day|today|week|weekly|month|monthly|year|yearly)\b/i)
+          const period: 'day' | 'week' | 'month' | 'year' = periodMatch
+            ? (periodMatch[1].toLowerCase().replace(/ly$/, '').replace('today', 'day') as 'day' | 'week' | 'month' | 'year')
+            : 'day'
+          setStoryPeriod(period)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const logText = value.replace(/\/story(\s+\w+)?/i, '').replace(/📖/g, '').trim()
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              period,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: value, period })
           }
         }
       }
@@ -4416,9 +4446,9 @@ const NoteEditor = ({
         )}
         {(storyLoading || storyResponse) && (
           <div className="mt-8">
-            <Block label="📖" blockView>
+            <Block label={`📖 [${storyPeriod.toUpperCase()}]`} blockView>
               {storyLoading && !storyResponse && (
-                <div className="opacity-40 tracking-widest">...</div>
+                <div className="opacity-40 tracking-widest">Compressing {storyPeriod}...</div>
               )}
               {storyResponse && (
                 <div className="opacity-60">
