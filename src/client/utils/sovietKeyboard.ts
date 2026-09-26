@@ -113,6 +113,32 @@ export function playSynthActivationChime() {
 }
 
 /**
+ * Two-tone alternating alert — fires when a scheduled Calendar entry
+ * comes due. Deliberately sharper than the synth chimes (square wave,
+ * higher gain, harder attack) so it reads as an alarm rather than a
+ * pleasant acknowledgement, without adding any new visual language.
+ */
+export function playCalendarAlertChime() {
+  const ac = getCtx()
+  if (!ac) return
+  const t = ac.currentTime
+  const notes = [880, 660, 880, 660] // A5 / E5 klaxon alternation
+  notes.forEach((freq, i) => {
+    const osc = ac.createOscillator()
+    const g = ac.createGain()
+    osc.type = 'square'
+    const start = t + i * 0.11
+    osc.frequency.setValueAtTime(freq, start)
+    g.gain.setValueAtTime(0, start)
+    g.gain.linearRampToValueAtTime(vol(0.1), start + 0.008)
+    g.gain.exponentialRampToValueAtTime(0.001, start + 0.1)
+    osc.connect(g).connect(ac.destination)
+    osc.start(start)
+    osc.stop(start + 0.11)
+  })
+}
+
+/**
  * Soft descending doublet played when the user toggles the synth
  * OFF — a polite "noted, going quiet" signal.
  */

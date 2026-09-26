@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
 
 ## Render Isolation
 
@@ -226,3 +226,19 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## dayjs Format-Parse Trap
+
+This repo's client dayjs instance (#client/utils/dayjs) loads utc,
+relativeTime, weekOfYear, isoWeek, advancedFormat, dayOfYear — but not
+customParseFormat. Without that plugin, dayjs(dateString, formatString)
+silently ignores the format argument and falls back to native Date
+parsing of the raw string, which is inconsistent across engines for
+non-ISO shapes (e.g. "YYYY-MM-DD HH:mm" with a space). A plain
+"YYYY-MM-DD" string is safe — dayjs special-cases it as local midnight
+even where native Date would parse it as UTC — but combining date and
+time into one string and parsing with a format is not. Build such
+moments from chained setters on a plain-date dayjs() instead:
+dayjs(dateOnlyString).hour(h).minute(m).second(0).
+(SR-20260926-01: CalendarWidget reminder engine caught this before it
+shipped — due-time construction moved to chained setters.)

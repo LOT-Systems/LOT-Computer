@@ -13,14 +13,48 @@ import { useCreateLog, useLogs } from '#client/queries'
 import { cn } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import type { Dayjs } from '#client/utils/dayjs'
-import { recordCalendarSignal } from '#client/stores/intentionEngine'
+import { recordCalendarSignal, recordCalendarAlertSignal } from '#client/stores/intentionEngine'
+import { playCalendarAlertChime } from '#client/utils/sovietKeyboard'
+import { ensureNotificationPermission, fireBrowserNotification } from '#client/utils/notifications'
 
 type EntryType = 'note' | 'task' | 'call'
 
 type CalendarEntry = {
+  id: string
   date: string
+  time: string | null
   text: string
   type: EntryType
+}
+
+// Persists which alerts have already fired so a reload never re-fires
+// a reminder the operator already saw. Capped so the list can't grow
+// without bound over a multi-year session history.
+const FIRED_ALERTS_KEY = 'lot_calendar_alerts_fired'
+const MAX_FIRED_ALERTS = 200
+// Reminders older than this are treated as stale backlog (e.g. the tab
+// was closed for days) and are marked fired without alerting — a
+// reliable reminder must not resurrect a week of missed entries at once.
+const ALERT_CATCH_UP_MS = 30 * 60 * 1000
+const ALERT_CHECK_INTERVAL_MS = 30 * 1000
+
+function getFiredAlertIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(FIRED_ALERTS_KEY)
+    if (!raw) return new Set()
+    return new Set(JSON.parse(raw) as string[])
+  } catch {
+    return new Set()
+  }
+}
+
+function markAlertFired(id: string) {
+  try {
+    const raw = localStorage.getItem(FIRED_ALERTS_KEY)
+    const arr: string[] = raw ? JSON.parse(raw) : []
+    arr.push(id)
+    localStorage.setItem(FIRED_ALERTS_KEY, JSON.stringify(arr.slice(-MAX_FIRED_ALERTS)))
+  } catch (_) {}
 }
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -59,17 +93,26 @@ export function CalendarWidget() {
   const [isAddingEntry, setIsAddingEntry] = React.useState(false)
   const [entryText, setEntryText] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
+  const [entryTime, setEntryTime] = React.useState('')
+  const [activeAlert, setActiveAlert] = React.useState<CalendarEntry | null>(null)
 
   const entries = React.useMemo<CalendarEntry[]>(() => {
     return logs
       .filter(log => log.event === 'calendar_entry' && log.metadata)
       .map(log => ({
+        id: log.id,
         date: log.metadata?.date as string,
+        time: (log.metadata?.time as string) || null,
         text: log.metadata?.text as string || log.text || '',
         type: (log.metadata?.entryType as EntryType) || 'note',
       }))
       .filter(e => e.date && e.text)
-      .sort((a, b) => a.date.localeCompare(b.date))
+      .sort((a, b) => {
+        const dateCmp = a.date.localeCompare(b.date)
+        if (dateCmp !== 0) return dateCmp
+        if (a.time && b.time) return a.time.localeCompare(b.time)
+        return a.time ? -1 : b.time ? 1 : 0
+      })
   }, [logs])
 
   const upcomingEntries = React.useMemo(() => {
@@ -109,14 +152,16 @@ export function CalendarWidget() {
     if (!selectedDate || !entryText.trim()) return
 
     const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
+    const time = entryTime || undefined
 
     createLog({
-      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel})`,
+      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel}${time ? ` ${time}` : ''})`,
       event: 'calendar_entry',
       metadata: {
         date: selectedDate,
         text: entryText.trim(),
         entryType,
+        ...(time && { time }),
       },
     }, {
       onSuccess: () => {
@@ -125,9 +170,88 @@ export function CalendarWidget() {
       },
     })
 
+    // A timed entry implies the operator wants to be alerted when it
+    // comes due — ask for notification permission right here, on a
+    // direct user action, since browsers ignore prompts fired later
+    // from the background reminder timer.
+    if (time) {
+      ensureNotificationPermission().catch(() => {})
+    }
+
     setEntryText('')
+    setEntryTime('')
     setIsAddingEntry(false)
   }
+
+  const fireAlert = React.useCallback((entry: CalendarEntry) => {
+    setActiveAlert(entry)
+    try { playCalendarAlertChime() } catch (_) {}
+    try {
+      fireBrowserNotification(
+        `ALERT — ${entry.type.toUpperCase()} DUE`,
+        entry.text
+      )
+    } catch (_) {}
+
+    createLog({
+      text: `[ALERT] ${entry.type} DUE ${entry.time} — ${entry.text}`,
+      event: 'calendar_alert',
+      metadata: {
+        date: entry.date,
+        time: entry.time,
+        text: entry.text,
+        entryType: entry.type,
+        sourceLogId: entry.id,
+      },
+    }, {
+      onSuccess: () => {
+        queryClient.refetchQueries(['/api/logs'])
+        try { recordCalendarAlertSignal(entry.type, entry.date, entry.time!) } catch (_) {}
+      },
+    })
+  }, [createLog, queryClient])
+
+  // Reminder engine: polls timed entries for the moment they come due.
+  // Fired alerts persist in localStorage so a reload never repeats one.
+  // Entries more than ALERT_CATCH_UP_MS overdue are marked fired
+  // silently — a reliability guarantee against a backlog dump after
+  // the tab has been closed for a long stretch.
+  React.useEffect(() => {
+    const checkAlerts = () => {
+      const fired = getFiredAlertIds()
+      const now = dayjs()
+
+      for (const entry of entries) {
+        if (!entry.time || fired.has(entry.id)) continue
+
+        // dayjs() here has no customParseFormat plugin loaded, so build
+        // the due moment from chained setters rather than parsing a
+        // combined date+time string — a plugin-less format parse would
+        // silently fall back to native Date parsing and drift by browser.
+        const [hour, minute] = entry.time.split(':').map(Number)
+        if (Number.isNaN(hour) || Number.isNaN(minute)) continue
+        const due = dayjs(entry.date).hour(hour).minute(minute).second(0)
+
+        const overdueMs = now.diff(due)
+        if (overdueMs < 0) continue
+
+        markAlertFired(entry.id)
+        if (overdueMs <= ALERT_CATCH_UP_MS) {
+          fireAlert(entry)
+        }
+      }
+    }
+
+    checkAlerts()
+    const interval = setInterval(checkAlerts, ALERT_CHECK_INTERVAL_MS)
+    return () => clearInterval(interval)
+  }, [entries, fireAlert])
+
+  React.useEffect(() => {
+    if (!activeAlert) return
+    const timeout = setTimeout(() => setActiveAlert(null), 30000)
+    return () => clearTimeout(timeout)
+  }, [activeAlert])
 
   const handleToggleCalendar = () => {
     if (!isCalendarOpen) {
@@ -229,6 +353,13 @@ export function CalendarWidget() {
                 </div>
                 <div className="flex gap-8 items-center">
                   <input
+                    type="time"
+                    value={entryTime}
+                    onChange={e => setEntryTime(e.target.value)}
+                    className="bg-transparent border border-acc/20 text-acc px-4 py-2 outline-none focus:border-acc/40 w-[6.5em]"
+                    aria-label="Entry time (optional)"
+                  />
+                  <input
                     type="text"
                     value={entryText}
                     onChange={e => setEntryText(e.target.value)}
@@ -249,11 +380,32 @@ export function CalendarWidget() {
                 </div>
                 {entriesOnDate.map((e, i) => (
                   <div key={i} className="text-acc/80 mb-1">
+                    {e.time && <span className="text-acc/40 tabular-nums">{e.time} · </span>}
                     {e.text}
                   </div>
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {activeAlert && (
+          <div className="mb-16">
+            <Block label="ALERT:" blockView>
+              <div className="flex justify-between items-baseline gap-16">
+                <div className="uppercase tracking-widest">{activeAlert.type} DUE</div>
+                <button
+                  className="text-acc/40 hover:text-acc transition-opacity whitespace-nowrap"
+                  onClick={() => setActiveAlert(null)}
+                >
+                  Dismiss
+                </button>
+              </div>
+              <div className="opacity-80 mt-4">{activeAlert.text}</div>
+              <div className="opacity-40 mt-8 tabular-nums">
+                {activeAlert.time} · {dayjs(activeAlert.date).format('MMM D')}
+              </div>
+            </Block>
           </div>
         )}
 
@@ -263,6 +415,7 @@ export function CalendarWidget() {
               <div key={i} className="flex justify-between gap-16">
                 <span className="text-acc whitespace-nowrap">
                   {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
+                  {entry.time && ` · ${entry.time}`}
                 </span>
                 <span className="text-acc text-right">
                   {entry.text}
