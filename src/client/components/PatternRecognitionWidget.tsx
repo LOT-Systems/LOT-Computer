@@ -216,6 +216,9 @@ export function PatternRecognitionWidget() {
       'crystal-resonance-convergence':    'Crystal resonance convergence — CRFLDCT + CRBRCAST both active in 21D, crystal broadcast and field merged into resonance (P183)',
       'crystal-full-coherence':           'Crystal full coherence — CRRCONV + CRTLCK both present, all three persistence vectors unified into full coherence (P184)',
       'crystal-resonance-sovereignty':    'Crystal resonance sovereignty — CRFULLCOH + sovereign temporal lock in 21D, LEGENDARY: crystal coherence merged with sovereign time (P185)',
+      'crystal-matrix-formation':         'Crystal matrix formation — CRRESOV in 21D + 5+ distinct sources in 14D, sovereign resonance stabilizing into a full lattice structure (P186)',
+      'crystal-matrix-signal':            'Crystal matrix signal — CRMATRIX active + intentions ≥3 + memory ≥2 in 7D, the crystal lattice is self-referential and generating its own signals (P187)',
+      'crystal-matrix-sovereignty':       'Crystal matrix sovereignty — CRMATRIX + CRMATSIG both confirmed in 21D, LEGENDARY+: the OS operates from a sovereign crystal lattice (P188)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

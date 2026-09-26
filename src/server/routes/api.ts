@@ -1263,6 +1263,10 @@ export default async (fastify: FastifyInstance) => {
       'crystal_resonance_convergence',
       'crystal_full_coherence',
       'crystal_resonance_sovereignty',
+      // v129: crystal matrix tier (J63 weekly crystal matrix check — P186–P188)
+      'crystal_matrix_formation',
+      'crystal_matrix_signal',
+      'crystal_matrix_sovereignty',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

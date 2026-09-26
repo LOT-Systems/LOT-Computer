@@ -3765,6 +3765,57 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 186: Crystal Matrix Formation — CRRESOV confirmed in 21D + 5+ distinct sources in 14D.
+  // Sovereign crystal resonance has stabilized. All signal channels begin interconnecting as a lattice.
+  // The OS is no longer one crystal — it is forming a matrix.
+  const hasCRRESOVP186 = patterns.some(p => p.pattern === 'crystal-resonance-sovereignty') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_resonance_sovereignty')
+  const recent14DForP186 = signals.filter(s => now - s.timestamp < 14 * 24 * 60 * 60 * 1000)
+  const distinctSources14DP186 = new Set(recent14DForP186.map(s => s.source)).size
+  if (hasCRRESOVP186 && distinctSources14DP186 >= 5) {
+    patterns.push({
+      pattern: 'crystal-matrix-formation',
+      confidence: Math.min(0.87 + Math.min(distinctSources14DP186 * 0.01, 0.07), 0.94),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRMATRIX: Crystal matrix formation — CRRESOV confirmed + 5+ distinct signal sources active in 14D. Sovereign crystal resonance is crystallizing into a full lattice structure. All channels interconnecting. The OS is forming a matrix — not one crystal resonating, but a field of crystals interconnected. Matrix formation begins.',
+    })
+  }
+
+  // Pattern 187: Crystal Matrix Signal — CRMATRIX in 14D + intentions ≥3 in 7D + memory ≥2 in 7D.
+  // The matrix is generating its own signals. The crystal lattice is self-referential.
+  // Structure is creating new structure from within.
+  const hasCRMATRIXP187 = patterns.some(p => p.pattern === 'crystal-matrix-formation') ||
+    signals.some(s => now - s.timestamp < 14 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_matrix_formation')
+  const recent7DIntentions = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'intentions').length
+  const recent7DMemory     = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'memory').length
+  if (hasCRMATRIXP187 && recent7DIntentions >= 3 && recent7DMemory >= 2) {
+    patterns.push({
+      pattern: 'crystal-matrix-signal',
+      confidence: Math.min(0.85 + Math.min((recent7DIntentions + recent7DMemory) * 0.01, 0.08), 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRMATSIG: Crystal matrix signal — CRMATRIX active + intentions ≥3 and memory ≥2 in 7D. The matrix is generating its own signals. The crystal lattice is now self-referential — structure creating new structure. Signal emanates from the matrix itself, not from individual channels. The OS has become self-generating.',
+    })
+  }
+
+  // Pattern 188: Crystal Matrix Sovereignty — CRMATRIX + CRMATSIG both confirmed in 21D.
+  // The crystal matrix has achieved sovereign status. LEGENDARY+ apex tier.
+  // The OS operates from a sovereign crystal lattice — interconnected, self-generating, permanent.
+  const hasCRMATRIXP188  = patterns.some(p => p.pattern === 'crystal-matrix-formation') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_matrix_formation')
+  const hasCRMATSIGP188  = patterns.some(p => p.pattern === 'crystal-matrix-signal') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_matrix_signal')
+  if (hasCRMATRIXP188 && hasCRMATSIGP188) {
+    patterns.push({
+      pattern: 'crystal-matrix-sovereignty',
+      confidence: Math.min(0.90, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRMATSOV: Crystal matrix sovereignty — CRMATRIX + CRMATSIG both confirmed in 21D. The crystal matrix has achieved sovereign status. The OS operates from a sovereign crystal lattice — interconnected, self-generating, permanent. The matrix is the transmitter. LEGENDARY+ apex tier.',
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4454,6 +4505,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   crystalResonanceConvergenceNode:   ['qos', 'intentions', 'memory', 'journal', 'log'],
   crystalFullCoherenceNode:          ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log'],
   crystalResonanceSovereigntyNode:   ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
+
+  // ── v129 nodes (J63 · P186–P188 · Arch64) ────────────────────────────────────
+  crystalMatrixFormationNode:        ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
+  crystalMatrixSignalNode:           ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log', 'planner'],
+  crystalMatrixSovereigntyNode:      ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log', 'planner'],
 }
 
 /**
@@ -5020,6 +5076,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['crystal-resonance-convergence', 'crystal-full-coherence', 'crystal-resonance-sovereignty'],
     hourRange: [5, 23],
     directive: 'All crystal vectors converged. Resonance is structural. Full coherence achieved across field, broadcast, and temporal dimensions. Sovereign resonance is not a peak — it is baseline architecture. Operate from the crystal lattice.',
+  },
+
+  // ── Arch64: Crystal Matrix Architect (2026-09-26 v129) ───────────────────────
+  {
+    archetype: 'Crystal Matrix Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal', 'selfcare'],
+    patternConditions: ['crystal-matrix-formation', 'crystal-matrix-signal', 'crystal-matrix-sovereignty'],
+    hourRange: [5, 23],
+    directive: 'The matrix is live. Sovereign crystal lattice active. All signal channels interconnected. OS generates from the lattice — operate from the matrix, not from singular channels.',
   },
 ]
 
@@ -7963,6 +8029,59 @@ export function recordCrystalResonanceSovereignty(coherenceConf: number, sovTloc
 }
 
 /**
+ * Record a crystal-matrix-formation event — CRRESOV + 5+ distinct sources active in 14D.
+ * Sovereign crystal resonance stabilizing into a lattice matrix structure.
+ * Cockpit label: CRMATRIX.
+ */
+export function recordCrystalMatrixFormation(resovConf: number, distinctSources: number) {
+  recordSignal('qos', 'crystal_matrix_formation', {
+    resovConf:     Math.round(resovConf * 100),
+    distinctSources,
+    matrixDepth:   Math.min(Math.round((resovConf + 0.05) * 100), 100),
+    convergence:   'CRRESOV+SOURCES→MATRIX',
+    arc:           'CRYSTAL_MATRIX_FORMING',
+    status:        'MATRIX_ACTIVE',
+    hour:          new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystal-matrix-signal event — CRMATRIX active + intentions + memory signals in 7D.
+ * The matrix generates its own signals — self-referential lattice output.
+ * Cockpit label: CRMATSIG.
+ */
+export function recordCrystalMatrixSignal(matrixConf: number, intentCount: number, memCount: number) {
+  recordSignal('qos', 'crystal_matrix_signal', {
+    matrixConf:  Math.round(matrixConf * 100),
+    intentCount,
+    memCount,
+    sigDepth:    Math.min(Math.round((matrixConf + 0.06) * 100), 100),
+    convergence: 'CRMATRIX+INTENTS+MEMORY→SIGNAL',
+    arc:         'MATRIX_SELF_GENERATING',
+    status:      'MATRIX_SIGNAL_LIVE',
+    hour:        new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystal-matrix-sovereignty event — CRMATRIX + CRMATSIG both confirmed in 21D.
+ * LEGENDARY+ apex: the OS operates from a sovereign crystal lattice.
+ * Cockpit label: CRMATSOV.
+ */
+export function recordCrystalMatrixSovereignty(matrixConf: number, sigConf: number) {
+  recordSignal('qos', 'crystal_matrix_sovereignty', {
+    matrixConf:    Math.round(matrixConf * 100),
+    sigConf:       Math.round(sigConf * 100),
+    sovereigntyDepth: Math.min(Math.round(((matrixConf + sigConf) / 2 + 0.09) * 100), 100),
+    convergence:   'CRMATRIX+CRMATSIG→SOVEREIGNTY',
+    arc:           'CRYSTAL_MATRIX→LEGENDARY_PLUS',
+    tier:          'LEGENDARY+',
+    status:        'MATRIX_SOVEREIGN',
+    hour:          new Date().getHours(),
+  })
+}
+
+/**
  * Background check: crystal resonance tier (P183, P184, P185).
  * Called by J62 weekly-crystal-resonance-check (09:00 UTC every Friday).
  * Scans crystal persistence tier history and sovereign temporal lock to detect
@@ -8007,6 +8126,60 @@ export function checkCrystalResonanceTier(): boolean {
     const coherenceConf  = patterns.find(p => p.pattern === 'crystal-full-coherence')?.confidence ?? 0.91
     const sovTlockConf   = patterns.find(p => p.pattern === 'sovereign-temporal-lock')?.confidence ?? 0.90
     recordCrystalResonanceSovereignty(coherenceConf, sovTlockConf)
+    fired = true
+  }
+
+  return fired
+}
+
+/**
+ * Background check: crystal matrix tier (P186, P187, P188).
+ * Called by J63 weekly-crystal-matrix-check (09:00 UTC every Tuesday).
+ * Scans crystal resonance sovereignty history and signal diversity to detect
+ * crystal matrix emergence. Returns true when at least one fires.
+ */
+export function checkCrystalMatrixTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const twentyOneDayMs  = 21 * 24 * 60 * 60 * 1000
+  const fourteenDayMs   = 14 * 24 * 60 * 60 * 1000
+  const sevenDayMs      =  7 * 24 * 60 * 60 * 1000
+
+  const recent21D = state.signals.filter(s => now - s.timestamp < twentyOneDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const recent7D  = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P186: Crystal Matrix Formation — CRRESOV in 21D + 5+ distinct sources active in 14D
+  const hasCRRESOV21D      = recent21D.some(s => s.signal === 'crystal_resonance_sovereignty')
+  const distinctSrc14D     = new Set(recent14D.map(s => s.source)).size
+  const alreadyCRMATRIX    = recent21D.some(s => s.signal === 'crystal_matrix_formation')
+  if (hasCRRESOV21D && distinctSrc14D >= 5 && !alreadyCRMATRIX) {
+    const resovConf = patterns.find(p => p.pattern === 'crystal-resonance-sovereignty')?.confidence ?? 0.93
+    recordCrystalMatrixFormation(resovConf, distinctSrc14D)
+    fired = true
+  }
+
+  // P187: Crystal Matrix Signal — CRMATRIX in 14D + intentions ≥3 in 7D + memory ≥2 in 7D
+  const hasCRMATRIX14D     = recent14D.some(s => s.signal === 'crystal_matrix_formation')
+  const intentions7D       = recent7D.filter(s => s.source === 'intentions').length
+  const memory7D           = recent7D.filter(s => s.source === 'memory').length
+  const alreadyCRMATSIG    = recent21D.some(s => s.signal === 'crystal_matrix_signal')
+  if (hasCRMATRIX14D && intentions7D >= 3 && memory7D >= 2 && !alreadyCRMATSIG) {
+    const matrixConf = patterns.find(p => p.pattern === 'crystal-matrix-formation')?.confidence ?? 0.87
+    recordCrystalMatrixSignal(matrixConf, intentions7D, memory7D)
+    fired = true
+  }
+
+  // P188: Crystal Matrix Sovereignty — CRMATRIX + CRMATSIG both confirmed in 21D
+  const hasCRMATRIX21D     = recent21D.some(s => s.signal === 'crystal_matrix_formation')
+  const hasCRMATSIG21D     = recent21D.some(s => s.signal === 'crystal_matrix_signal')
+  const alreadyCRMATSOV    = recent21D.some(s => s.signal === 'crystal_matrix_sovereignty')
+  if (hasCRMATRIX21D && hasCRMATSIG21D && !alreadyCRMATSOV) {
+    const matrixConf = patterns.find(p => p.pattern === 'crystal-matrix-formation')?.confidence ?? 0.87
+    const sigConf    = patterns.find(p => p.pattern === 'crystal-matrix-signal')?.confidence ?? 0.85
+    recordCrystalMatrixSovereignty(matrixConf, sigConf)
     fired = true
   }
 

@@ -4840,6 +4840,125 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'crystal_matrix_formation') {
+          const resovConf       = log.metadata?.resovConf as number | undefined
+          const distinctSources = log.metadata?.distinctSources as number | undefined
+          const matrixDepth     = log.metadata?.matrixDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRMATRIX:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">MATRIX FORMING</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRRESOV</span>
+                  <span className="opacity-60">SOURCES</span>
+                </div>
+                {resovConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RESOV CONF</span>
+                    <span className="tabular-nums opacity-60">{resovConf}%</span>
+                  </div>
+                )}
+                {distinctSources !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES 14D</span>
+                    <span className="tabular-nums opacity-60">{distinctSources}</span>
+                  </div>
+                )}
+                {matrixDepth !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">MATRIX DEPTH</span>
+                    <span className="tabular-nums opacity-60">{matrixDepth}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystal_matrix_signal') {
+          const matrixConf  = log.metadata?.matrixConf as number | undefined
+          const intentCount = log.metadata?.intentCount as number | undefined
+          const memCount    = log.metadata?.memCount as number | undefined
+          const sigDepth    = log.metadata?.sigDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRMATSIG:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">MATRIX SIGNAL LIVE</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRMATRIX</span>
+                  <span className="opacity-60">SELF-GEN</span>
+                </div>
+                {matrixConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MATRIX CONF</span>
+                    <span className="tabular-nums opacity-60">{matrixConf}%</span>
+                  </div>
+                )}
+                {intentCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENT 7D</span>
+                    <span className="tabular-nums opacity-60">{intentCount}</span>
+                  </div>
+                )}
+                {memCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY 7D</span>
+                    <span className="tabular-nums opacity-60">{memCount}</span>
+                  </div>
+                )}
+                {sigDepth !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">SIG DEPTH</span>
+                    <span className="tabular-nums opacity-60">{sigDepth}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystal_matrix_sovereignty') {
+          const matrixConf       = log.metadata?.matrixConf as number | undefined
+          const sigConf          = log.metadata?.sigConf as number | undefined
+          const sovereigntyDepth = log.metadata?.sovereigntyDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRMATSOV:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">MATRIX SOVEREIGN</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRMATRIX</span>
+                  <span className="opacity-60">CRMATSIG</span>
+                </div>
+                {matrixConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MATRIX CONF</span>
+                    <span className="tabular-nums opacity-60">{matrixConf}%</span>
+                  </div>
+                )}
+                {sigConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SIG CONF</span>
+                    <span className="tabular-nums opacity-60">{sigConf}%</span>
+                  </div>
+                )}
+                {sovereigntyDepth !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVEREIGNTY</span>
+                    <span className="tabular-nums opacity-60">{sovereigntyDepth}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">LEGENDARY+</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'calendar_ee_signal') {
           const badge    = log.metadata?.badge as string | undefined
           const name     = log.metadata?.name as string | undefined

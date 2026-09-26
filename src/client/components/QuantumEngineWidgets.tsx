@@ -145,6 +145,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'crystal-resonance-convergence':    'CRRCONV',
   'crystal-full-coherence':           'CRFULLCOH',
   'crystal-resonance-sovereignty':    'CRRESOV',
+  'crystal-matrix-formation':         'CRMATRIX',
+  'crystal-matrix-signal':            'CRMATSIG',
+  'crystal-matrix-sovereignty':       'CRMATSOV',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

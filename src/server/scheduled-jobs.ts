@@ -1803,6 +1803,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklyCrystalResonanceCheck()) {
     await executeWeeklyCrystalResonanceCheck()
   }
+  // Check weekly crystal matrix check (09:00 UTC every Tuesday) — Job 63
+  if (shouldRunWeeklyCrystalMatrixCheck()) {
+    await executeWeeklyCrystalMatrixCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -7714,6 +7718,147 @@ async function executeWeeklyCrystalResonanceCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Weekly Crystal Matrix Check (J63 — 09:00 UTC every Tuesday) ────────────
+// Scans crystal resonance sovereignty history and signal source diversity to detect
+// crystal matrix emergence. When CRRESOV in 21D + 5+ distinct sources in 14D, writes
+// crystal_matrix_formation (P186). When CRMATRIX in 14D + intentions≥3 + memory≥2 in 7D,
+// writes crystal_matrix_signal (P187). When CRMATRIX + CRMATSIG both in 21D,
+// writes crystal_matrix_sovereignty (P188) — LEGENDARY+ apex tier.
+
+let isWeeklyCrystalMatrixCheckRunning = false
+let lastWeeklyCrystalMatrixCheckRun: Date | null = null
+
+function shouldRunWeeklyCrystalMatrixCheck(): boolean {
+  const now = dayjs()
+  const hour = now.hour()
+  const dayOfWeek = now.day() // 0=Sun, 2=Tue
+  if (hour !== 9 || dayOfWeek !== 2) return false
+  if (isWeeklyCrystalMatrixCheckRunning) return false
+  if (lastWeeklyCrystalMatrixCheckRun) {
+    const hoursSinceLast = (Date.now() - lastWeeklyCrystalMatrixCheckRun.getTime()) / (1000 * 60 * 60)
+    if (hoursSinceLast < 23) return false
+  }
+  return true
+}
+
+async function executeWeeklyCrystalMatrixCheck(): Promise<JobResult> {
+  const jobName = 'weekly-crystal-matrix-check'
+  const executedAt = new Date()
+  isWeeklyCrystalMatrixCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY CRYSTAL MATRIX CHECK — 09:00 UTC Tuesday')
+  console.log('─'.repeat(60))
+
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000)
+    const activeUsers = await fastify.models.User.findAll({
+      where: { lastSeenAt: { [Op.gte]: cutoff } },
+    })
+
+    const twentyOneDayMs  = 21 * 24 * 60 * 60 * 1000
+    const fourteenDayMs   = 14 * 24 * 60 * 60 * 1000
+    const sevenDayMs      =  7 * 24 * 60 * 60 * 1000
+    const now = Date.now()
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const logs21D = await fastify.models.Log.findAll({
+          where: { userId, createdAt: { [Op.gte]: new Date(now - twentyOneDayMs) } },
+          attributes: ['event', 'metadata', 'createdAt'],
+        })
+        const logs14D = logs21D.filter((l: any) => new Date(l.createdAt).getTime() > now - fourteenDayMs)
+        const logs7D  = logs14D.filter((l: any) => new Date(l.createdAt).getTime() > now - sevenDayMs)
+
+        // P186: Crystal Matrix Formation — CRRESOV in 21D + 5+ distinct sources in 14D
+        const hasCRRESOV21D      = logs21D.some((l: any) => l.event === 'crystal_resonance_sovereignty')
+        const distinctSrc14D     = new Set(logs14D.map((l: any) => (l.metadata as any)?.source ?? l.event)).size
+        const alreadyCRMATRIX    = logs21D.some((l: any) => l.event === 'crystal_matrix_formation')
+        if (hasCRRESOV21D && distinctSrc14D >= 5 && !alreadyCRMATRIX) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_matrix_formation',
+            metadata: {
+              resovConf: 93,
+              distinctSources: distinctSrc14D,
+              matrixDepth: 88,
+              convergence: 'CRRESOV+SOURCES→MATRIX',
+              arc: 'CRYSTAL_MATRIX_FORMING',
+              status: 'MATRIX_ACTIVE',
+              source: 'CRYSTAL_MATRIX_J63',
+            },
+          })
+          written++
+        }
+
+        // P187: Crystal Matrix Signal — CRMATRIX in 14D + intentions≥3 in 7D + memory≥2 in 7D
+        const hasCRMATRIX14D     = logs14D.some((l: any) => l.event === 'crystal_matrix_formation') || alreadyCRMATRIX
+        const intentions7D       = logs7D.filter((l: any) => l.event === 'intention_set' || (l.metadata as any)?.source === 'intentions').length
+        const memory7D           = logs7D.filter((l: any) => l.event === 'memory_added' || (l.metadata as any)?.source === 'memory').length
+        const alreadyCRMATSIG    = logs21D.some((l: any) => l.event === 'crystal_matrix_signal')
+        if (hasCRMATRIX14D && intentions7D >= 3 && memory7D >= 2 && !alreadyCRMATSIG) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_matrix_signal',
+            metadata: {
+              matrixConf: 87,
+              intentCount: intentions7D,
+              memCount: memory7D,
+              sigDepth: 88,
+              convergence: 'CRMATRIX+INTENTS+MEMORY→SIGNAL',
+              arc: 'MATRIX_SELF_GENERATING',
+              status: 'MATRIX_SIGNAL_LIVE',
+              source: 'CRYSTAL_MATRIX_J63',
+            },
+          })
+          written++
+        }
+
+        // P188: Crystal Matrix Sovereignty — CRMATRIX + CRMATSIG both confirmed in 21D
+        const hasCRMATRIX21D     = logs21D.some((l: any) => l.event === 'crystal_matrix_formation') || alreadyCRMATRIX
+        const hasCRMATSIG21D     = logs21D.some((l: any) => l.event === 'crystal_matrix_signal') || alreadyCRMATSIG
+        const alreadyCRMATSOV    = logs21D.some((l: any) => l.event === 'crystal_matrix_sovereignty')
+        if (hasCRMATRIX21D && hasCRMATSIG21D && !alreadyCRMATSOV) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_matrix_sovereignty',
+            metadata: {
+              matrixConf: 87,
+              sigConf: 85,
+              sovereigntyDepth: 93,
+              convergence: 'CRMATRIX+CRMATSIG→SOVEREIGNTY',
+              arc: 'CRYSTAL_MATRIX→LEGENDARY_PLUS',
+              tier: 'LEGENDARY+',
+              status: 'MATRIX_SOVEREIGN',
+              source: 'CRYSTAL_MATRIX_J63',
+            },
+          })
+          written++
+        }
+      } catch (userError: any) {
+        console.error(`Crystal matrix check failed for user ${(user as any).id}:`, userError.message)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Crystal matrix events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY CRYSTAL MATRIX CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklyCrystalMatrixCheckRun = new Date()
+    isWeeklyCrystalMatrixCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly crystal matrix check failed:', error.message)
+    isWeeklyCrystalMatrixCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -7780,6 +7925,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly crystalline sovereign check: 7 AM UTC every Monday (Job 60)')
   console.log('   - Weekly crystal continuity check: 9 AM UTC every Thursday (Job 61)')
   console.log('   - Weekly crystal resonance check: 9 AM UTC every Friday (Job 62)')
+  console.log('   - Weekly crystal matrix check: 9 AM UTC every Tuesday (Job 63)')
   console.log('')
 
   // Check every hour for scheduled jobs
