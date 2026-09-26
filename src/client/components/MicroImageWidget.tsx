@@ -244,8 +244,15 @@ export const MicroImageWidget: React.FC = () => {
     }
   }, [composition, density, seed])
 
-  // Record a signal once when the widget mounts with meaningful context
-  if (!hasRecordedRef.current && punctuation.sampleSize > 0) {
+  // Record a signal once when the widget mounts with meaningful context.
+  // recordSignal() WRITES the intentionEngine atom — calling it in the render
+  // body (even ref-guarded) is a render-phase store write that cascades
+  // re-renders across every intentionEngine subscriber before the browser
+  // can paint (LOT-DOCTRINE "Render Isolation"). Defer to an effect so the
+  // write happens after paint, matching the System.tsx / MemoryWidget pattern.
+  React.useEffect(() => {
+    if (hasRecordedRef.current || punctuation.sampleSize === 0) return
+    hasRecordedRef.current = true
     recordSignal('intentions', 'microimage_rendered', {
       composition,
       tone: punctuation.aggregate.tone,
@@ -254,8 +261,7 @@ export const MicroImageWidget: React.FC = () => {
       callForHelp: punctuation.callForHelp,
       hour: new Date().getHours(),
     })
-    hasRecordedRef.current = true
-  }
+  }, [punctuation.sampleSize, composition, punctuation.aggregate.tone, punctuation.aggregate.intent, punctuation.aggregate.intensity, punctuation.callForHelp])
 
   const handleRegenerate = () => {
     setSeed(Math.floor(Math.random() * 1e6) + 1)
