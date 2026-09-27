@@ -73,6 +73,10 @@ export type UserProfile = {
   timeChime?: boolean;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
+  // Saved IANA timeZone, e.g. 'America/Los_Angeles' — lets ambient/astrology
+  // readings on the dashboard match the user's home timeZone rather than
+  // whatever device they're currently viewing from.
+  timeZone?: string | null;
 };
 
 export type User = {
