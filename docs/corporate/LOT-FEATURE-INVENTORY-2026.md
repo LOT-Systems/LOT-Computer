@@ -585,7 +585,11 @@ LOT Mail                            Email system with /email trigger. Feature   
                                     branch (8 iterations).
 
 Basics Tab                          Physical supply subscription layer                 IN-DEV
-                                    (LOT-FM-001).
+                                    (LOT-FM-001). Month 1/3: OPEN TAB public
+                                    ledger live (23-line ration manifest,
+                                    doctrine, $100/mo issue rate). Month 2
+                                    (upgrade/roster) and Month 3 (issue/
+                                    fulfillment) pending.
 
 COSMO Hardware                      Personal robotics division. Behavioral              IN-DEV
                                     signature transfer (Soul Sync Protocol).
