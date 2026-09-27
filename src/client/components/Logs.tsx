@@ -33,7 +33,7 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useSendMail } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -257,6 +257,20 @@ export const Logs: React.FC = React.memo(function LogsInner() {
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="COMM:" blockView>
                 ACK{'\n'}{log.metadata.message as string}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'email_sent') {
+          const mailTo = log.metadata?.to as string | undefined
+          const mailBody = log.metadata?.message as string | undefined
+          const mailDelivered = log.metadata?.emailDelivered as boolean | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="MAIL:" blockView>
+                <div className="uppercase tracking-widest mb-4">
+                  → {mailTo || 'UNKNOWN'}{mailDelivered && ' · DELIVERED'}
+                </div>
+                {mailBody && <div className="opacity-60">{mailBody}</div>}
               </Block>
             </LogContainer>
           )
@@ -3702,6 +3716,22 @@ const NoteEditor = ({
       setAsmLoading(false)
     },
   })
+  const [mailResult, setMailResult] = React.useState<string | null>(null)
+  const [mailLoading, setMailLoading] = React.useState(false)
+  const { mutate: submitMail } = useSendMail({
+    onSuccess: (data) => {
+      setMailLoading(false)
+      setMailResult(
+        data.success
+          ? `SENT → ${(data.to || '').toUpperCase()}${data.emailDelivered ? ' · EMAIL DELIVERED' : ''}\n"${data.preview || ''}"`
+          : (data.error || 'LOT MAIL FAILED').toUpperCase()
+      )
+    },
+    onError: () => {
+      setMailLoading(false)
+      setMailResult('LOT MAIL OFFLINE — Delivery unavailable.')
+    },
+  })
   const [prayerResponse, setPrayerResponse] = React.useState<string | null>(null)
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
@@ -4128,6 +4158,7 @@ const NoteEditor = ({
           '/story        Generate a personal story from recent data',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
+          '/email [name] [msg]  Send LOT Mail to a Cohort match',
           '/assembly     Self-assembly module status',
           '/phys         Physiological cohort report',
           '/qos          Quantum OS state analysis',
@@ -4147,6 +4178,17 @@ const NoteEditor = ({
         setSystemHelp(lines.join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
+      } else if (trigger === 'lot-mail') {
+        const mailMatch = value.match(/[/](?:email|mail)\s+(?:to\s+)?([A-Za-z][\w'-]*)[\s,:–-]*([\s\S]*)/i)
+        if (mailMatch) {
+          const recipientName = mailMatch[1].trim()
+          const body = mailMatch[2].trim()
+          if (recipientName.length >= 2 && body.length >= 2 && !mailLoading) {
+            setMailLoading(true)
+            setMailResult(null)
+            submitMail({ to: recipientName, message: body })
+          }
+        }
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
@@ -4411,6 +4453,20 @@ const NoteEditor = ({
                   )
                 })}
               </div>
+            </Block>
+          </div>
+        )}
+        {(mailLoading || mailResult) && (
+          <div className="mt-8">
+            <Block label="MAIL:" blockView>
+              {mailLoading && !mailResult && (
+                <div className="opacity-40 uppercase tracking-widest">Routing through Cohort...</div>
+              )}
+              {mailResult && (
+                <div className="opacity-60" style={{ whiteSpace: 'pre-wrap' }}>
+                  {mailResult}
+                </div>
+              )}
             </Block>
           </div>
         )}

@@ -445,9 +445,17 @@ export type ChatMessageLikeEventPayload = {
   isLiked?: boolean;
 };
 
+// LOT Mail — Sync activity announcement (never carries the letter's content)
+export type MailSentEventPayload = {
+  senderName: string;
+  receiverName: string;
+  createdAt: Date | string;
+};
+
 // Sync Events
 export type SyncEvents = {
   chatMessage: PublicChatMessage;
   chatMessageLike: ChatMessageLikeEventPayload;
   settings_updated: Record<string, never>;
+  mail_sent: MailSentEventPayload;
 };

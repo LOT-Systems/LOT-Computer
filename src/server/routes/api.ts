@@ -4086,6 +4086,159 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   })
 
   // ============================================================================
+  // LOT MAIL — the /email (or /mail) command in Logs. Reaches a person only
+  // through the sender's own Cohort — the same match pool CohortConnectWidget
+  // surfaces via LOT Community — then delivers both an in-app Direct Message
+  // and a real outbound email via Resend. Announces (not the content) in Sync.
+  // ============================================================================
+  fastify.post('/mail', async (req: FastifyRequest<{
+    Body: { to: string; message: string }
+  }>, reply) => {
+    try {
+      const recipientName = (req.body?.to || '').trim()
+      const body = (req.body?.message || '').trim().slice(0, 4000)
+
+      if (!recipientName || !body) {
+        return reply.status(400).send({ success: false, error: 'Recipient and message are required' })
+      }
+
+      const userLogs = await fastify.models.Log.findAll({
+        where: { userId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 100,
+      })
+
+      if (userLogs.length < 10) {
+        return reply.send({
+          success: false,
+          error: 'COHORT NOT YET FORMED — 10+ log entries needed before LOT Mail can find a match.',
+        })
+      }
+
+      const userPatterns = await analyzeUserPatterns(req.user, userLogs)
+
+      const allUsers = await fastify.models.User.findAll({
+        where: {
+          city: { [Op.not]: null },
+          country: { [Op.not]: null },
+          id: { [Op.not]: req.user.id },
+        },
+        attributes: ['id', 'firstName', 'lastName', 'city', 'country', 'metadata', 'email'],
+        order: [['lastSeenAt', 'DESC']],
+        limit: 200,
+      })
+
+      const patternCache = new Map<string, PatternInsight[]>()
+      const getUserPatterns = async (userId: string): Promise<PatternInsight[]> => {
+        if (patternCache.has(userId)) return patternCache.get(userId)!
+        const logs = await fastify.models.Log.findAll({
+          where: { userId },
+          order: [['createdAt', 'DESC']],
+          limit: 100,
+        })
+        const user = allUsers.find((u: any) => u.id === userId)
+        if (!user || logs.length < 5) return []
+        const patterns = await analyzeUserPatterns(user, logs)
+        patternCache.set(userId, patterns)
+        return patterns
+      }
+
+      const matches = await findCohortMatches(req.user, userPatterns, allUsers, getUserPatterns)
+      const lowerName = recipientName.toLowerCase()
+      const target =
+        matches.find((m) => m.user.firstName.toLowerCase() === lowerName) ||
+        matches.find((m) => m.user.firstName.toLowerCase().startsWith(lowerName))
+
+      if (!target) {
+        return reply.send({
+          success: false,
+          error: `NO COHORT MATCH: ${recipientName.toUpperCase()} — not yet surfaced through LOT Community.`,
+        })
+      }
+
+      const receiver: any = allUsers.find((u: any) => u.id === target.user.id)
+      if (!receiver) {
+        return reply.send({ success: false, error: 'Recipient record unavailable.' })
+      }
+
+      // In-app delivery — an ordinary Direct Message, so the same thread
+      // shows up wherever DirectMessageThread already renders it.
+      const directMessage = await fastify.models.DirectMessage.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: body,
+      })
+
+      sync.emit('direct_message', {
+        id: directMessage.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: directMessage.message,
+        senderName: `${req.user.firstName} ${req.user.lastName}`.trim(),
+        createdAt: directMessage.createdAt,
+      })
+
+      // Sync gets an activity announcement only — never the letter itself.
+      sync.emit('mail_sent', {
+        senderName: req.user.firstName || 'Someone',
+        receiverName: receiver.firstName || 'Someone',
+        createdAt: directMessage.createdAt,
+      })
+
+      // Real outbound email — the actual "LOT Email" delivery, plain and terse.
+      let emailDelivered = false
+      if (receiver.email) {
+        const { sendEmail } = await import('#server/utils/email.js')
+        const senderName = req.user.firstName || 'A LOT operator'
+        const result = await sendEmail({
+          to: receiver.email,
+          subject: `LOT Mail — ${senderName} sent you a message`,
+          text: [
+            `${senderName} sent you a message through LOT.`,
+            '',
+            body,
+            '',
+            '—',
+            'Reply inside LOT: https://lot-systems.com/sync',
+          ].join('\n'),
+        })
+        emailDelivered = !!result.success
+      }
+
+      process.nextTick(async () => {
+        try {
+          const context = await getLogContext(req.user)
+          await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'email_sent',
+            text: '',
+            metadata: {
+              directMessageId: directMessage.id,
+              to: receiver.firstName,
+              receiverId: receiver.id,
+              message: body,
+              emailDelivered,
+            },
+            context,
+          })
+        } catch (logError) {
+          console.error('Error logging LOT Mail:', logError)
+        }
+      })
+
+      return reply.send({
+        success: true,
+        to: receiver.firstName,
+        preview: body.slice(0, 80),
+        emailDelivered,
+      })
+    } catch (error: any) {
+      console.error('Error sending LOT Mail:', error)
+      return reply.status(500).send({ success: false, error: 'Failed to send LOT Mail' })
+    }
+  })
+
+  // ============================================================================
   // STATS API - Real-time metrics and community insights
   // ============================================================================
 

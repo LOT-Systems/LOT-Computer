@@ -120,6 +120,23 @@ export const useSendDirectMessage = createMutation<
   void
 >('post', '/api/direct-messages')
 
+// ============================================================================
+// LOT MAIL — /email or /mail in Logs: reaches a Cohort match through
+// LOT Community and delivers a real email via Resend.
+// ============================================================================
+export interface LotMailResult {
+  success: boolean
+  to?: string
+  preview?: string
+  emailDelivered?: boolean
+  error?: string
+}
+
+export const useSendMail = createMutation<
+  { to: string; message: string },
+  LotMailResult
+>('post', '/api/mail')
+
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
 })

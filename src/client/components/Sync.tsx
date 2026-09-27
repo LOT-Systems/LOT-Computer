@@ -117,9 +117,30 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    // LOT Mail activity — an announcement only, never the letter's content.
+    const { dispose: disposeMailSentListener } = sync.listen(
+      'mail_sent',
+      (data: any) => {
+        const announcement: PublicChatMessage = {
+          id: `mail_${data.createdAt}_${data.senderName}_${data.receiverName}`,
+          authorUserId: '',
+          author: 'LOT MAIL',
+          message: `✉ ${data.senderName} sent LOT Mail to ${data.receiverName}`,
+          createdAt: data.createdAt,
+          updatedAt: data.createdAt,
+          likesCount: 0,
+          isLiked: false,
+        } as PublicChatMessage
+        setSseMessages((prev) => {
+          if (prev.some((x) => x.id === announcement.id)) return prev
+          return [announcement, ...prev]
+        })
+      }
+    )
     return () => {
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
+      disposeMailSentListener()
     }
   }, [me?.id])
 
