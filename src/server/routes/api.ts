@@ -1084,7 +1084,7 @@ export default async (fastify: FastifyInstance) => {
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_alert', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -5183,7 +5183,7 @@ OPERATOR RFI: ${query.trim()}`
         'self_care_complete': 'selfcare', 'self_care_completed': 'selfcare',
         'intention': 'intentions', 'note': 'journal', 'chat_message': 'community',
         'goal_set': 'goals', 'goal_journey': 'goals', 'goal_complete': 'goals',
-        'recipe_viewed': 'recipe', 'calendar_entry': 'calendar',
+        'recipe_viewed': 'recipe', 'calendar_entry': 'calendar', 'calendar_alert': 'calendar',
       }
       const lastSignalByModule: Record<string, Date> = {}
       for (const log of logs) {

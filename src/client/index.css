@@ -302,6 +302,18 @@ td:last-child {
   }
 }
 
+/* Calendar widget — scheduled-entry alert toast entrance */
+@keyframes calendarAlertIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Community Convergence Pulse — ambient breathing synchronized with peak hour */
 .convergence-pulse {
   animation: convergence-breathe var(--convergence-speed, 6s) ease-in-out infinite;

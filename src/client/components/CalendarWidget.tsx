@@ -18,9 +18,20 @@ import { recordCalendarSignal } from '#client/stores/intentionEngine'
 type EntryType = 'note' | 'task' | 'call'
 
 type CalendarEntry = {
+  id: string
   date: string
   text: string
   type: EntryType
+  time?: string
+}
+
+const DEFAULT_DUE_TIME = '09:00'
+const ALERT_CATCH_UP_WINDOW_HOURS = 24
+const ALERT_CHECK_INTERVAL_MS = 20000
+const ALERT_DISPLAY_MS = 9000
+
+function getDueAt(entry: Pick<CalendarEntry, 'date' | 'time'>): Dayjs {
+  return dayjs(`${entry.date} ${entry.time || DEFAULT_DUE_TIME}`)
 }
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -59,17 +70,30 @@ export function CalendarWidget() {
   const [isAddingEntry, setIsAddingEntry] = React.useState(false)
   const [entryText, setEntryText] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
+  const [entryTime, setEntryTime] = React.useState('')
 
   const entries = React.useMemo<CalendarEntry[]>(() => {
     return logs
       .filter(log => log.event === 'calendar_entry' && log.metadata)
       .map(log => ({
+        id: log.id,
         date: log.metadata?.date as string,
         text: log.metadata?.text as string || log.text || '',
         type: (log.metadata?.entryType as EntryType) || 'note',
+        time: log.metadata?.time as string | undefined,
       }))
       .filter(e => e.date && e.text)
-      .sort((a, b) => a.date.localeCompare(b.date))
+      .sort((a, b) => a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''))
+  }, [logs])
+
+  const firedAlertSourceIds = React.useMemo(() => {
+    const set = new Set<string>()
+    logs.forEach(log => {
+      if (log.event === 'calendar_alert' && log.metadata?.sourceLogId) {
+        set.add(log.metadata.sourceLogId as string)
+      }
+    })
+    return set
   }, [logs])
 
   const upcomingEntries = React.useMemo(() => {
@@ -96,6 +120,80 @@ export function CalendarWidget() {
     [viewMonth]
   )
 
+  // --- Reliable due-time tracking: fires a [ALERT] log + banner when a
+  // scheduled entry's date/time arrives, catching up on entries missed
+  // while the tab was closed (bounded to ALERT_CATCH_UP_WINDOW_HOURS so a
+  // long-stale backlog never floods the widget on reopen).
+  const [activeAlert, setActiveAlert] = React.useState<CalendarEntry | null>(null)
+  const pendingAlertIds = React.useRef<Set<string>>(new Set())
+  const alertQueueRef = React.useRef<CalendarEntry[]>([])
+  const dismissTimerRef = React.useRef<number>()
+
+  const showNextAlert = React.useCallback(() => {
+    if (dismissTimerRef.current) window.clearTimeout(dismissTimerRef.current)
+    const next = alertQueueRef.current.shift() || null
+    setActiveAlert(next)
+    if (next) {
+      dismissTimerRef.current = window.setTimeout(showNextAlert, ALERT_DISPLAY_MS)
+    }
+  }, [])
+
+  const checkDueEntries = React.useCallback(() => {
+    const now = dayjs()
+    let queuedNew = false
+
+    entries.forEach(entry => {
+      if (firedAlertSourceIds.has(entry.id) || pendingAlertIds.current.has(entry.id)) return
+
+      const dueAt = getDueAt(entry)
+      if (!dueAt.isValid()) return
+
+      const hoursOverdue = now.diff(dueAt, 'hour', true)
+      if (hoursOverdue < 0 || hoursOverdue > ALERT_CATCH_UP_WINDOW_HOURS) return
+
+      pendingAlertIds.current.add(entry.id)
+      queuedNew = true
+      alertQueueRef.current.push(entry)
+
+      const dateLabel = dayjs(entry.date).format('dddd, MMMM D, YYYY')
+      createLog({
+        text: `[ALERT] SCHEDULE DUE — ${entry.type}: ${entry.text} (${dateLabel}${entry.time ? ` ${entry.time}` : ''})`,
+        event: 'calendar_alert',
+        metadata: {
+          sourceLogId: entry.id,
+          date: entry.date,
+          time: entry.time,
+          entryType: entry.type,
+          text: entry.text,
+        },
+      }, {
+        onSuccess: () => queryClient.refetchQueries(['/api/logs']),
+        onError: () => { pendingAlertIds.current.delete(entry.id) },
+      })
+    })
+
+    if (queuedNew && !activeAlert) showNextAlert()
+  }, [entries, firedAlertSourceIds, createLog, queryClient, activeAlert, showNextAlert])
+
+  React.useEffect(() => {
+    checkDueEntries()
+    const interval = window.setInterval(() => {
+      if (!document.hidden) checkDueEntries()
+    }, ALERT_CHECK_INTERVAL_MS)
+    const onVisibility = () => { if (!document.hidden) checkDueEntries() }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [checkDueEntries])
+
+  React.useEffect(() => {
+    return () => {
+      if (dismissTimerRef.current) window.clearTimeout(dismissTimerRef.current)
+    }
+  }, [])
+
   const handleDateClick = (d: Dayjs) => {
     const key = d.format('YYYY-MM-DD')
     if (selectedDate === key) {
@@ -109,14 +207,16 @@ export function CalendarWidget() {
     if (!selectedDate || !entryText.trim()) return
 
     const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
+    const time = entryTime || undefined
 
     createLog({
-      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel})`,
+      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel}${time ? ` ${time}` : ''})`,
       event: 'calendar_entry',
       metadata: {
         date: selectedDate,
         text: entryText.trim(),
         entryType,
+        time,
       },
     }, {
       onSuccess: () => {
@@ -126,6 +226,7 @@ export function CalendarWidget() {
     })
 
     setEntryText('')
+    setEntryTime('')
     setIsAddingEntry(false)
   }
 
@@ -229,6 +330,13 @@ export function CalendarWidget() {
                 </div>
                 <div className="flex gap-8 items-center">
                   <input
+                    type="time"
+                    value={entryTime}
+                    onChange={e => setEntryTime(e.target.value)}
+                    className="bg-transparent border border-acc/20 text-acc px-4 py-2 outline-none focus:border-acc/40"
+                    title="Due time (optional, defaults to 09:00)"
+                  />
+                  <input
                     type="text"
                     value={entryText}
                     onChange={e => setEntryText(e.target.value)}
@@ -248,8 +356,9 @@ export function CalendarWidget() {
                   {dayjs(selectedDate).format('dddd, MMMM D')}
                 </div>
                 {entriesOnDate.map((e, i) => (
-                  <div key={i} className="text-acc/80 mb-1">
-                    {e.text}
+                  <div key={i} className="text-acc/80 mb-1 flex gap-8">
+                    {e.time && <span className="text-acc/40 tabular-nums">{e.time}</span>}
+                    <span>{e.text}</span>
                   </div>
                 ))}
               </div>
@@ -263,6 +372,7 @@ export function CalendarWidget() {
               <div key={i} className="flex justify-between gap-16">
                 <span className="text-acc whitespace-nowrap">
                   {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
+                  {entry.time && <span className="text-acc/40"> {entry.time}</span>}
                 </span>
                 <span className="text-acc text-right">
                   {entry.text}
@@ -276,6 +386,33 @@ export function CalendarWidget() {
           <div className="text-acc/40">No upcoming dates.</div>
         )}
       </div>
+
+      {activeAlert && (
+        <div
+          role="alert"
+          className="fixed bottom-16 right-16 z-50 max-w-[320px] border border-acc/30 bg-bac px-16 py-12 font-mono"
+          style={{ animation: 'calendarAlertIn 0.3s ease-out' }}
+        >
+          <div className="flex items-center justify-between gap-16 mb-4">
+            <span className="uppercase tracking-widest text-acc animate-pulse">[ALERT]</span>
+            <button
+              className="text-acc/40 hover:text-acc transition-opacity"
+              onClick={showNextAlert}
+              aria-label="Dismiss"
+            >
+              ×
+            </button>
+          </div>
+          <div className="uppercase tracking-widest text-acc/60 text-xs mb-4">
+            SCHEDULE DUE — {activeAlert.type}
+          </div>
+          <div className="text-acc mb-4">{activeAlert.text}</div>
+          <div className="text-acc/40 tabular-nums">
+            {dayjs(activeAlert.date).format('YYYY-MM-DD')}
+            {activeAlert.time ? ` ${activeAlert.time}` : ''}
+          </div>
+        </div>
+      )}
     </Block>
   )
 }
