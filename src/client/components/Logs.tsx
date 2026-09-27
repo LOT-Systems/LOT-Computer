@@ -374,6 +374,49 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'context_snapshot') {
+          const source = log.metadata?.source as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SNAP:" blockView>
+                {source && (
+                  <div className="uppercase tracking-widest mb-4">{source}</div>
+                )}
+                {log.context?.city && (
+                  <div>
+                    POS: {log.context.city}
+                    {log.context.country && `, ${log.context.country}`}
+                  </div>
+                )}
+                {!!log.context?.temperature && (
+                  <div>TMP: {Math.round(toCelsius(log.context.temperature))}°C</div>
+                )}
+                {!!log.context?.humidity && (
+                  <div>HUM: {log.context.humidity}%</div>
+                )}
+                {log.context?.weatherDescription && (
+                  <div>SKY: {log.context.weatherDescription}</div>
+                )}
+                {log.context?.astroRokuyo && (
+                  <div>ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'journal_follow_up') {
+          const spikeType = log.metadata?.spikeType as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FOLLOW:" blockView>
+                <div>{log.text}</div>
+                {spikeType && (
+                  <div className="opacity-30 mt-4 uppercase tracking-widest">
+                    {spikeType.replace(/_/g, ' ')}
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'quantum_intent_signal') {
           const pattern = log.metadata?.pattern as string | undefined
           const source = log.metadata?.source as string | undefined

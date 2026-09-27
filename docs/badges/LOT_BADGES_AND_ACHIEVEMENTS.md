@@ -575,6 +575,8 @@ When a badge is unlocked, the Memory Widget displays a timed message:
 [✓] MemoryWidget        — Badge unlock notification on question display
 [✓] rpg-narrative.ts    — Full achievement registry + story arcs
 [✓] PublicProfile       — Level field display (Water or Architecture)
+[✓] context_snapshot    — Click-to-record environment moment (Log Module)
+[✓] journal_follow_up   — Passive spike/pattern-change follow-up (Log Module)
 ```
 
 ### In Design / Roadmap
@@ -587,6 +589,10 @@ When a badge is unlocked, the Memory Widget displays a timed message:
 [○] Quest tracker UI component
 [○] Badge collection gallery view
 [○] Secret/hidden badge discovery system
+[○] Observer badge line — award on context_snapshot signal density
+    (source diversity: sky/temp/humidity/astro/time in one session)
+[○] Depth badge line — award on journal_follow_up silence_break
+    recovery (returning to the log after the machine noticed the gap)
 ```
 
 ---

@@ -34,6 +34,7 @@ import {
 import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
+import { detectJournalSpike } from '#server/utils/journalSpike'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
@@ -1213,6 +1214,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // Context snapshot (click-to-record environment moment) + passive
+      // journal follow-up (spike/pattern-change nudge on a prior entry)
+      'context_snapshot',
+      'journal_follow_up',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
@@ -1614,6 +1619,30 @@ export default async (fastify: FastifyInstance) => {
           await log.set({ context }).save()
         }
       })
+
+      // Passive journal AI — no prompts while writing. After the entry
+      // saves, compare it once against the user's own recent baseline;
+      // a spike or pattern change leaves a follow-up entry for later,
+      // it never interrupts the moment of writing.
+      if (!(log.metadata as Record<string, any>)?.spikeChecked) {
+        process.nextTick(async () => {
+          try {
+            const spike = await detectJournalSpike(fastify, req.user.id, log.id, text)
+            if (spike) {
+              await fastify.models.Log.create({
+                userId: req.user.id,
+                text: spike.followUpText,
+                event: 'journal_follow_up',
+                metadata: { sourceLogId: log.id, spikeType: spike.type, reason: spike.reason },
+              })
+            }
+            await log.set({ metadata: { ...(log.metadata as Record<string, any>), spikeChecked: true } }).save()
+          } catch (err) {
+            fastify.log.error(err)
+          }
+        })
+      }
+
       return log
     }
   )

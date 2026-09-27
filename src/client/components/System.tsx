@@ -82,6 +82,7 @@ import { IntegrityWidget } from './IntegrityWidget'
 import { recomputeAssembly } from '#client/stores/selfAssembly'
 import { $layoutDensity } from '#client/stores/evolution'
 import { useInViewport } from '#client/hooks/useInViewport'
+import { useContextSnapshot } from '#client/hooks/useContextSnapshot'
 
 // Defers mount of children until element first enters the viewport.
 // Once mounted, stays mounted — no unmount on scroll away.
@@ -149,6 +150,11 @@ export const System = React.memo(function SystemInner() {
   }, [weather])
 
   const [showSunset, setShowSunset] = React.useState(defaultShowSunset)
+
+  // Click-to-record: any click on an environment widget (weather, sky,
+  // humidity, astrology, time) also leaves a passive context_snapshot
+  // Log entry — the moment, without a photo or a sound record.
+  const recordSnapshot = useContextSnapshot()
 
   // Update showSunset when weather changes or default value changes
   React.useEffect(() => {
@@ -441,20 +447,26 @@ export const System = React.memo(function SystemInner() {
         </div>
 
         <div>
-          <TimeWidget />
+          <TimeWidget onSnapshot={() => recordSnapshot('time')} />
           {!!weather && (
             <>
-              <Block label="Sky:">{weather?.description || 'Unknown'}</Block>
+              <Block label="Sky:" onClick={() => recordSnapshot('sky')}>{weather?.description || 'Unknown'}</Block>
               <Block
                 label="Temperature:"
-                onClick={() => stores.isTempFahrenheit.set(!isTempFahrenheit)}
+                onClick={() => {
+                  stores.isTempFahrenheit.set(!isTempFahrenheit)
+                  recordSnapshot('temperature')
+                }}
               >
                 {temperature}
                 {isTempFahrenheit ? '℉' : '℃'}
               </Block>
               <Block
                 label={showSunset ? 'Sunset:' : 'Sunrise:'}
-                onClick={() => setShowSunset(!showSunset)}
+                onClick={() => {
+                  setShowSunset(!showSunset)
+                  recordSnapshot('sunrise_sunset')
+                }}
               >
                 {showSunset ? sunset : sunrise}
               </Block>
@@ -463,7 +475,7 @@ export const System = React.memo(function SystemInner() {
         </div>
 
         <div>
-          <Block label="Astrology:">
+          <Block label="Astrology:" onClick={() => recordSnapshot('astrology')}>
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
@@ -613,12 +625,12 @@ export const System = React.memo(function SystemInner() {
       </div>
 
       <div>
-        <TimeWidget />
+        <TimeWidget onSnapshot={() => recordSnapshot('time')} />
         <QuantumRandomWidget />
         {!!weather && (
           <>
-            <Block label="Sky:">{weather?.description || 'Unknown'}</Block>
-            <Block label="Humidity:">
+            <Block label="Sky:" onClick={() => recordSnapshot('sky')}>{weather?.description || 'Unknown'}</Block>
+            <Block label="Humidity:" onClick={() => recordSnapshot('humidity')}>
               <span
                 className={cn(
                   !isMirrorOn && !isCustomThemeEnabled && weather?.humidity >= 50 && 'text-blue-500'
@@ -630,7 +642,10 @@ export const System = React.memo(function SystemInner() {
             <Block
               label={showWeatherSuggestion ? 'Suggestion:' : 'Temperature:'}
               onLabelClick={() => setShowWeatherSuggestion(!showWeatherSuggestion)}
-              onChildrenClick={showWeatherSuggestion ? undefined : () => stores.isTempFahrenheit.set(!isTempFahrenheit)}
+              onChildrenClick={showWeatherSuggestion ? undefined : () => {
+                stores.isTempFahrenheit.set(!isTempFahrenheit)
+                recordSnapshot('temperature')
+              }}
             >
               {showWeatherSuggestion ? (
                 <span>{weatherSuggestion || 'Beautiful day'}</span>
@@ -643,7 +658,10 @@ export const System = React.memo(function SystemInner() {
             </Block>
             <Block
               label={showSunset ? 'Sunset:' : 'Sunrise:'}
-              onClick={() => setShowSunset(!showSunset)}
+              onClick={() => {
+                setShowSunset(!showSunset)
+                recordSnapshot('sunrise_sunset')
+              }}
             >
               {showSunset ? sunset : sunrise}
             </Block>
@@ -667,6 +685,7 @@ export const System = React.memo(function SystemInner() {
               prev === 'journey' ? 'quantum' :
               'astrology'
             )
+            recordSnapshot('astrology')
           }}
         >
           {astrologyView === 'astrology' ? (

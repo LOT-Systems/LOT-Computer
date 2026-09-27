@@ -427,6 +427,42 @@ The field entry archive — every typed note, event-driven log, and QIE signal r
 - **Log Renderings:** BIOFIELD (energy state) / QOS (quantum OS state) / COHORT (physiological archetype update) / ASM (assembly milestone) / QIE (quantum intent pattern) / CARE / PLAN / INTENT / BIO / MEM / CFG / SYS / COMM / LOG
 - **Connection:** The editor detects `/synth` and 🎹 triggers inline; saves on 7s debounce, visibility change, and unmount
 
+### Context Snapshot (Click-to-Record)
+
+Any click on an environment context widget — Sky, Temperature, Sunrise/Sunset,
+Humidity, Astrology/Biofield, Time — leaves a passive `context_snapshot` Log
+entry, in addition to that widget's own click behavior (unit toggle, view
+cycle, stopwatch). No photo, no sound record; just the same
+weather/astro/location context the server already attaches to every Log
+(`getLogContext`), timestamped to the click. Rate-limited to one snapshot per
+widget per 90s (`useContextSnapshot`, `lastContextSnapshotAt` in
+`localStorage`) so repeated toggling doesn't flood the archive.
+
+- **Client Hook:** `#client/hooks/useContextSnapshot` — `recordSnapshot(source)`
+- **Wired Into:** `System.tsx` — Sky, Temperature, Sunrise/Sunset, Humidity,
+  Astrology/Biofield blocks, and `TimeWidget`'s `onSnapshot` prop
+- **Log Rendering:** `SNAP:` block — source tag, POS, TMP, HUM, SKY, ASTRO
+
+### Journal Follow-Up (Passive Spike Detection)
+
+The Log stays passive while writing — no prompts, no questions on entry. This
+is the other half: after a `note` entry saves, `detectJournalSpike`
+(`#server/utils/journalSpike`) compares it once, heuristically (no AI call),
+against the user's own last 20 note entries. Three pattern types:
+
+- **`length_spike`** — entry runs 2.5x+ longer than the user's own baseline
+- **`intensity_spike`** — charged language well above the user's baseline (a
+  small, non-clinical keyword list — noticing tone, not diagnosing)
+- **`silence_break`** — a substantial entry (15+ words) after a 5+ day gap
+
+A match leaves one gentle line as the *next* Log entry (`journal_follow_up`,
+metadata `sourceLogId`/`spikeType`/`reason`) — found later, never mid-typing.
+Guarded by `metadata.spikeChecked` on the source log so it fires once.
+
+- **Server Util:** `#server/utils/journalSpike` — `detectJournalSpike`
+- **Wired Into:** `PUT /api/logs/:id` (note save path), after context backfill
+- **Log Rendering:** `FOLLOW:` block — follow-up line + spike type
+
 ---
 
 ## Architecture Overview

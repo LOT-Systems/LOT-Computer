@@ -117,6 +117,8 @@ export type LogEvent =
   | 'note'
   | 'emotional_checkin'
   | 'system_feedback'
+  | 'context_snapshot'
+  | 'journal_follow_up'
   | 'other';
 
 // Emotional Check-in Types

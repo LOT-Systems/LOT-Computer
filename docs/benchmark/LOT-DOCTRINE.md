@@ -226,3 +226,16 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+Rule 1 has a second, compile-time-visible face: `LogEvent` (shared/types) is
+consumed by two independent `Record<LogEvent, string>` exhaustiveness maps —
+`MODULE_BY_LOG_EVENT` in both `memory.ts` and `memory/story-generator.ts`
+(the latter a parallel, not-yet-unified copy of the former). Adding a member
+to the `LogEvent` union without adding it to *both* maps fails server:build
+with TS2739 — the one case where this class of gap surfaces as a hard error
+rather than Rule 1's silent AI-invisibility. Add new event types to the
+union and both maps together, or expect the build to catch the omission but
+the doctrine to have to say so.
+
+(SR-20260927-01: context_snapshot + journal_follow_up added to LogEvent and
+both MODULE_BY_LOG_EVENT maps.)

@@ -47,7 +47,9 @@ postcss.config.*.backup
 *.working-backup
 
 # Compiled output (should not be in repo)
-server/
+# NOTE: unanchored "server/" previously matched src/server/** too,
+# silently hiding untracked source files from git status. dist/ (line 2)
+# already covers the actual compiled output this was meant to exclude.
 *.js.map
 
 # Archive files

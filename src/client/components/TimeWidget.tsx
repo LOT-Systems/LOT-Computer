@@ -13,7 +13,7 @@ import { Block, Clock } from '#client/components/ui'
 import { playSovietChime } from '#client/utils/sovietChime'
 import dayjs from '#client/utils/dayjs'
 
-export const TimeWidget = () => {
+export const TimeWidget = ({ onSnapshot }: { onSnapshot?: () => void } = {}) => {
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
   const isTimeChimeEnabled = useStore(stores.isTimeChimeEnabled)
   const startTimeRef = React.useRef(0)
@@ -75,7 +75,8 @@ export const TimeWidget = () => {
     } else {
       stores.isTimeFormat12h.set(!isTimeFormat12h)
     }
-  }, [isRunning, showStopwatch, isTimeFormat12h])
+    onSnapshot?.()
+  }, [isRunning, showStopwatch, isTimeFormat12h, onSnapshot])
 
   React.useEffect(() => {
     if (isRunning) {

@@ -867,6 +867,8 @@ const MODULE_BY_LOG_EVENT: Record<LogEvent, string> = {
   note: 'Note',
   emotional_checkin: 'Check-in',
   system_feedback: 'Feedback',
+  context_snapshot: 'Snapshot',
+  journal_follow_up: 'Follow-up',
   other: 'Other',
 }
 
