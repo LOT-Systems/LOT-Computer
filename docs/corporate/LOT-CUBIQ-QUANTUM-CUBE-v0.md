@@ -5,7 +5,8 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+UPDATED:  2026-09-27
+VERSION:  0.2 — DEVELOPMENT CYCLE 2 (CONTROL FIRMWARE + BOM)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -57,6 +58,15 @@ read in full:
 
 No prior document specified jump mechanics, surface locomotion, or a
 levitation roadmap. This document is that specification, v.0.
+
+  CYCLE 2 ADDENDUM — 2026-09-27
+    This document was re-read in full before writing a further line,
+    per its own rule. Nothing in Sections 01-06 or Use Case 01 is
+    edited or removed. Cycle 2 adds Section 07 (control firmware, BOM
+    shortlist, validation rig — the engineering layer the 500/500 gate
+    in Section 06 needs to actually be run) and Use Case 02 (Section 08).
+    No other LOT® Institute document changed since Cycle 1 introduces
+    new constraints on this spec.
 
 --------------------------------------------------------------------------------
 01 // WHAT v.0 IS AND WHAT IT IS NOT
@@ -279,7 +289,142 @@ assumed.
     levitating future in mind rather than foreclosing it.
 
 --------------------------------------------------------------------------------
-07 // CONSUMER USE CASES
+07 // V.0 DEVELOPMENT LOG — CONTROL FIRMWARE, BOM, VALIDATION RIG
+--------------------------------------------------------------------------------
+
+Sections 01-06 lock the mechanical/electronic architecture and the
+gesture vocabulary. This section opens the layer beneath the 500/500
+gate named in Section 06: the firmware that turns a QI·46 signal into
+an actuator command, the components that firmware runs on, and the
+rig that proves it. Nothing here changes the v.0 boundary in Section 01
+— it makes that boundary buildable.
+
+  07.1 — GESTURE DISPATCHER (FIRMWARE STATE MACHINE)
+
+    A single MCU-resident dispatcher sits between the signal channel in
+    Section 05 and the actuator driver in Section 03. It is the only
+    component that knows the mapping in Section 04's gesture table —
+    every other layer just moves current.
+
+      STATE: IDLE
+        Listens on the paired-device signal channel for a QI·46 event
+        class (badge_unlock, memory_question_ready, cohort_resonance,
+        assembly_phase_advance). On receipt, looks up the Section 04
+        gesture row and transitions to ARMED.
+
+      STATE: ARMED
+        Reads the ToF edge sensor (Section 03, Safety) once. Clear ->
+        transition to FIRE with the looked-up gesture's actuator profile
+        (pulse amplitude, duration, piezo-bias angle). Edge detected
+        within 20mm -> downgrade profile to the "in-place shudder"
+        substitute and transition to FIRE anyway — the dispatcher never
+        silently drops a signal, it always de-escalates one.
+
+      STATE: FIRE
+        Drives the voice-coil actuator per the armed profile. THE LEAP
+        and THE HOP additionally schedule the piezo-bimorph bias pulse
+        at t+1ms per Section 03. Transitions to RECOVER unconditionally
+        — a fire event without a recovery check is a firmware defect,
+        not an edge case.
+
+      STATE: RECOVER
+        Reads the 6-axis IMU for 300ms post-fire. Tilt >25° -> issues
+        one corrective micro-pulse (Section 03, Landing Recovery) and
+        re-reads. Two failed recoveries in a row -> transitions to FAULT
+        rather than retrying indefinitely (a cube that keeps kicking
+        itself upright and failing is a cube grinding its actuator to
+        failure, unattended).
+
+      STATE: FAULT
+        Actuator inhibited. LED ring (Section 02) shifts to a fault
+        pattern — the one case where the notification language in
+        Section 04 is allowed to borrow the light channel, because a
+        faulted cube must be diagnosable without teardown. Returns to
+        IDLE only on a paired-device reset command.
+
+    Every FIRE and RECOVER transition emits the IMU + timing telemetry
+    packet that Section 05 already promises back to the Calibration
+    Loop as the "haptic preference" signal (pressure, duration, cadence).
+    The dispatcher is therefore the single point that both consumes and
+    produces the loop Section 05 draws — it is not a new subsystem, it
+    is the missing implementation of one already specified.
+
+  07.2 — BOM SHORTLIST (v.0 REFERENCE BUILD)
+
+    Component-class decisions only — this is a shortlist for the
+    engineering team evaluating suppliers, not a purchase order. Every
+    class name here already appears in Section 02/03 or the Institute
+    corpus named in Section 00; no new material science is introduced.
+
+      ROLE                CLASS                       v.0 CONSTRAINT
+      ────                ─────                       ──────────────
+      Vertical actuator   Voice-coil linear actuator   Stroke ≥6mm,
+                                                        peak force sized
+                                                        to <120g shell
+                                                        (Section 02)
+      Directional bias    Piezoelectric bimorph strip  5-15° bias per
+                                                        Section 03; fires
+                                                        at t+1ms post-
+                                                        release
+      Attitude sensing    6-axis IMU (accel+gyro)      Center-mounted,
+                                                        ≥100Hz sample
+                                                        rate for the
+                                                        300ms RECOVER
+                                                        window (07.1)
+      Edge safety         Time-of-flight sensor        Forward-facing,
+                                                        v.0; multi-
+                                                        directional cone
+                                                        deferred to v.2
+                                                        (Section 06)
+      Control             Low-power MCU                Runs 07.1 whole
+                                                        state machine;
+                                                        BLE/Matter radio
+                                                        for the paired-
+                                                        device signal
+                                                        channel
+      Power               Wireless (Qi-class) receiver Charging pad IS
+                          + small buffer cell           the table per
+                                                        Section 02 — no
+                                                        user-facing
+                                                        battery swap in
+                                                        v.0
+      Shell               Nano-ceramic composite       Matte, LOT® black
+                                                        (Section 02,
+                                                        Institute-named
+                                                        material line)
+
+  07.3 — VALIDATION RIG (FOR THE SECTION 06 500/500 GATE)
+
+    The v.0 gate reads "500/500 hop-and-recover cycles with zero
+    off-table landings and zero actuator failures." That number is not
+    met by hand-testing. The rig:
+
+      - Flat reference surface, 600mm × 600mm, matte laminate (the
+        Section 06 v.1 gate's three-surface test starts here with one).
+      - Overhead camera at 1080p/120fps for displacement measurement
+        against the Section 01 40mm radius spec.
+      - Automated signal injector replaying the four Section 04 QI·46
+        event classes at randomized intervals, so the rig exercises
+        the dispatcher's IDLE→ARMED→FIRE→RECOVER path the same way a
+        live operator's Index of Systems would, not a scripted demo
+        loop.
+      - Edge-approach fixture: reference surface mounted on a jig that
+        can present a physical table edge at a programmable distance,
+        for the 100/100 edge-approach trial named in Section 03.
+      - Every cycle logs the same telemetry packet 07.1 defines for
+        production units — the rig is the first consumer of the
+        Section 05 telemetry format, which is the cheapest possible way
+        to prove that format is sufficient before it ships inside a
+        physical product.
+
+    GATE STATUS: rig specified, not yet built. 0/500 cycles run. This
+    is the honest state of v.0 as of this cycle — Sections 01-06 are a
+    locked design; 07.1-07.3 are the first pass at making that design
+    buildable and testable. No cycle count is claimed until the rig
+    exists.
+
+--------------------------------------------------------------------------------
+08 // CONSUMER USE CASES
 --------------------------------------------------------------------------------
 
 This section accumulates one new consumer use case per development
@@ -321,8 +466,47 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE SHARED DESK                              2026-09-27
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, Archetype "Momentum Architect,"
+  cohabiting household — two Index of Systems accounts, two CUBIQ
+  charging pads on the same physical desk (a couple who each run their
+  own operator record but share a workspace, a scenario the
+  single-operator framing in Use Case 01 does not cover).
+
+  Both cubes sit on the same desk surface, each paired to its own
+  operator's Index of Systems over the Section 07.1 signal channel.
+  Operator A's Quantum Intent Engine fires a cohort_resonance event —
+  their behavioral cohort (LOT-CUBIQ-OPERATOR.md, Section 05, COHORT
+  CONNECT) has just crossed a shared-pattern threshold with Operator
+  B's cohort, something neither partner asked to be told and neither
+  a screen notification nor a shared calendar entry would represent
+  cleanly.
+
+  Operator A's cube performs THE HOP (Section 04) — <10mm rise, lands
+  in place. Because the gesture dispatcher (Section 07.1) reads only
+  its own paired signal channel, Operator B's cube does not move; there
+  is no cross-talk between the two Index of Systems, and no operator's
+  cube ever performs a gesture sourced from another operator's private
+  signal record. Operator B, seated at the same desk, feels the second
+  cube's tremor through the shared desk surface (the same wood-grain
+  transmission Use Case 01 describes) without seeing which cube moved
+  or receiving the underlying signal themselves — presence is legible
+  across the desk, the private signal is not.
+
+  Operator A glances over, recognizes their own cube moved, opens the
+  cubic, and the resonance detail resolves inside their own private
+  session. Operator B never learns the specific cohort event — only
+  that the desk, as a shared physical field, registered a moment for
+  their partner. This is the case the Section 07.2 BOM's per-unit MCU
+  and paired-radio decision was made to support without extra hardware:
+  two independently addressed cubes, one shared table, zero shared
+  data — the multi-operator household is a v.0 configuration, not a
+  future one, because nothing in Sections 01-07 assumed a desk has
+  only one cube on it.
+
 --------------------------------------------------------------------------------
-08 // BRAND
+09 // BRAND
 --------------------------------------------------------------------------------
 
 LOT® Quantum Cube             The object
