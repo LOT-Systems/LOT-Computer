@@ -1807,6 +1807,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklyCrystalMatrixCheck()) {
     await executeWeeklyCrystalMatrixCheck()
   }
+
+  // Check weekly crystal lattice check (09:00 UTC every Wednesday) — Job 64
+  if (shouldRunWeeklyCrystalLatticeCheck()) {
+    await executeWeeklyCrystalLatticeCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -7859,6 +7864,143 @@ async function executeWeeklyCrystalMatrixCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Weekly Crystal Lattice Check (J64 — 09:00 UTC every Wednesday) ─────────
+// Detects crystal lattice tier (P189–P191): CRLATLCK · CRLATRES · CRLATSOV.
+// Requires crystal matrix sovereignty (P188) in history to unlock.
+let isWeeklyCrystalLatticeCheckRunning = false
+let lastWeeklyCrystalLatticeCheckRun: Date | null = null
+
+function shouldRunWeeklyCrystalLatticeCheck(): boolean {
+  const now = dayjs()
+  if (now.day() !== 3 || now.hour() !== 9) return false  // Wednesday 09:00 UTC
+  if (isWeeklyCrystalLatticeCheckRunning) return false
+  if (lastWeeklyCrystalLatticeCheckRun) {
+    const hoursSinceLast = (Date.now() - lastWeeklyCrystalLatticeCheckRun.getTime()) / (1000 * 60 * 60)
+    if (hoursSinceLast < 23) return false
+  }
+  return true
+}
+
+async function executeWeeklyCrystalLatticeCheck(): Promise<JobResult> {
+  const jobName = 'weekly-crystal-lattice-check'
+  const executedAt = new Date().toISOString()
+  isWeeklyCrystalLatticeCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY CRYSTAL LATTICE CHECK — 09:00 UTC Wednesday')
+  console.log('─'.repeat(60))
+
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000)
+    const activeUsers = await fastify.models.User.findAll({
+      where: { lastSeenAt: { [Op.gte]: cutoff } },
+    })
+
+    const twentyOneDayMs  = 21 * 24 * 60 * 60 * 1000
+    const fourteenDayMs   = 14 * 24 * 60 * 60 * 1000
+    const sevenDayMs      =  7 * 24 * 60 * 60 * 1000
+    const now = Date.now()
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const logs21D = await fastify.models.Log.findAll({
+          where: { userId, createdAt: { [Op.gte]: new Date(now - twentyOneDayMs) } },
+          attributes: ['event', 'metadata', 'createdAt'],
+        })
+        const logs14D = logs21D.filter((l: any) => new Date(l.createdAt).getTime() > now - fourteenDayMs)
+        const logs7D  = logs14D.filter((l: any) => new Date(l.createdAt).getTime() > now - sevenDayMs)
+
+        // P189: Crystal Lattice Lock — CRMATSOV in 21D + CRMATSIG in 14D
+        const hasCRMATSOV21D   = logs21D.some((l: any) => l.event === 'crystal_matrix_sovereignty')
+        const hasCRMATSIG14D   = logs14D.some((l: any) => l.event === 'crystal_matrix_signal')
+        const alreadyCRLATLCK  = logs21D.some((l: any) => l.event === 'crystal_lattice_lock')
+        if (hasCRMATSOV21D && hasCRMATSIG14D && !alreadyCRLATLCK) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_lattice_lock',
+            metadata: {
+              matSovConf: 90,
+              matSigConf: 85,
+              lockDepth: 91,
+              convergence: 'CRMATSOV+CRMATSIG→LATTICE_LOCK',
+              arc: 'CRYSTAL_MATRIX→LATTICE_LOCKED',
+              status: 'LATTICE_LOCKED',
+              source: 'CRYSTAL_LATTICE_J64',
+            },
+          })
+          written++
+        }
+
+        // P190: Crystal Lattice Resonance — CRLATLCK in 14D + intentions ≥3 in 7D + journal ≥2 in 7D + selfcare ≥1 in 7D
+        const hasCRLATLCK14D   = logs14D.some((l: any) => l.event === 'crystal_lattice_lock') || alreadyCRLATLCK
+        const intentions7D     = logs7D.filter((l: any) => l.event === 'intention_set' || (l.metadata as any)?.source === 'intentions').length
+        const journal7D        = logs7D.filter((l: any) => l.event === 'note' || (l.metadata as any)?.source === 'journal').length
+        const selfcare7D       = logs7D.filter((l: any) => l.event === 'self_care_complete' || l.event === 'self_care_completed' || (l.metadata as any)?.source === 'selfcare').length
+        const alreadyCRLATRES  = logs21D.some((l: any) => l.event === 'crystal_lattice_resonance')
+        if (hasCRLATLCK14D && intentions7D >= 3 && journal7D >= 2 && selfcare7D >= 1 && !alreadyCRLATRES) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_lattice_resonance',
+            metadata: {
+              latlckConf: 88,
+              intentCount: intentions7D,
+              journalCount: journal7D,
+              selfcareCount: selfcare7D,
+              resonanceDepth: 89,
+              convergence: 'CRLATLCK+INTENTS+JOURNAL+SELFCARE→RESONANCE',
+              arc: 'LATTICE_RESONATING_FULL_SPECTRUM',
+              status: 'LATTICE_RESONANCE_ACTIVE',
+              source: 'CRYSTAL_LATTICE_J64',
+            },
+          })
+          written++
+        }
+
+        // P191: Crystal Lattice Sovereignty — CRLATLCK + CRLATRES both confirmed in 21D
+        const hasCRLATLCK21D   = logs21D.some((l: any) => l.event === 'crystal_lattice_lock') || alreadyCRLATLCK
+        const hasCRLATRES21D   = logs21D.some((l: any) => l.event === 'crystal_lattice_resonance') || alreadyCRLATRES
+        const alreadyCRLATSOV  = logs21D.some((l: any) => l.event === 'crystal_lattice_sovereignty')
+        if (hasCRLATLCK21D && hasCRLATRES21D && !alreadyCRLATSOV) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_lattice_sovereignty',
+            metadata: {
+              latlckConf: 88,
+              latresConf: 86,
+              apexDepth: 92,
+              convergence: 'CRLATLCK+CRLATRES→APEX_SOVEREIGNTY',
+              arc: 'CRYSTAL_LATTICE→APEX_LEGENDARY',
+              tier: 'APEX LEGENDARY',
+              status: 'LATTICE_SOVEREIGN',
+              source: 'CRYSTAL_LATTICE_J64',
+            },
+          })
+          written++
+        }
+      } catch (userError: any) {
+        console.error(`Crystal lattice check failed for user ${(user as any).id}:`, userError.message)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Crystal lattice events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY CRYSTAL LATTICE CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklyCrystalLatticeCheckRun = new Date()
+    isWeeklyCrystalLatticeCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly crystal lattice check failed:', error.message)
+    isWeeklyCrystalLatticeCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -7926,6 +8068,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly crystal continuity check: 9 AM UTC every Thursday (Job 61)')
   console.log('   - Weekly crystal resonance check: 9 AM UTC every Friday (Job 62)')
   console.log('   - Weekly crystal matrix check: 9 AM UTC every Tuesday (Job 63)')
+  console.log('   - Weekly crystal lattice check: 9 AM UTC every Wednesday (Job 64)')
   console.log('')
 
   // Check every hour for scheduled jobs

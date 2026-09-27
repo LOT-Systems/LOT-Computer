@@ -219,6 +219,9 @@ export function PatternRecognitionWidget() {
       'crystal-matrix-formation':         'Crystal matrix formation — CRRESOV in 21D + 5+ distinct sources in 14D, sovereign resonance stabilizing into a full lattice structure (P186)',
       'crystal-matrix-signal':            'Crystal matrix signal — CRMATRIX active + intentions ≥3 + memory ≥2 in 7D, the crystal lattice is self-referential and generating its own signals (P187)',
       'crystal-matrix-sovereignty':       'Crystal matrix sovereignty — CRMATRIX + CRMATSIG both confirmed in 21D, LEGENDARY+: the OS operates from a sovereign crystal lattice (P188)',
+      'crystal-lattice-lock':             'Crystal lattice lock — CRMATSOV in 21D + CRMATSIG in 14D, the crystal matrix has locked into full lattice coherence — all nodes synchronized (P189)',
+      'crystal-lattice-resonance':        'Crystal lattice resonance — CRLATLCK active + intentions ≥3 + journal ≥2 + selfcare ≥1 in 7D, locked lattice resonating at full spectrum across all OS layers (P190)',
+      'crystal-lattice-sovereignty':      'Crystal lattice sovereignty — CRLATLCK + CRLATRES both confirmed in 21D, APEX LEGENDARY: the locked resonating lattice has achieved sovereignty (P191)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

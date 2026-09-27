@@ -148,6 +148,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'crystal-matrix-formation':         'CRMATRIX',
   'crystal-matrix-signal':            'CRMATSIG',
   'crystal-matrix-sovereignty':       'CRMATSOV',
+  'crystal-lattice-lock':             'CRLATLCK',
+  'crystal-lattice-resonance':        'CRLATRES',
+  'crystal-lattice-sovereignty':      'CRLATSOV',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

@@ -1267,6 +1267,10 @@ export default async (fastify: FastifyInstance) => {
       'crystal_matrix_formation',
       'crystal_matrix_signal',
       'crystal_matrix_sovereignty',
+      // v130: crystal lattice tier (J64 weekly crystal lattice check — P189–P191)
+      'crystal_lattice_lock',
+      'crystal_lattice_resonance',
+      'crystal_lattice_sovereignty',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

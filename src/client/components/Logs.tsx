@@ -4959,6 +4959,136 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'crystal_lattice_lock') {
+          const matSovConf = log.metadata?.matSovConf as number | undefined
+          const matSigConf = log.metadata?.matSigConf as number | undefined
+          const lockDepth  = log.metadata?.lockDepth  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRLATLCK:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">LATTICE LOCKED</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRMATSOV</span>
+                  <span className="opacity-60">CRMATSIG</span>
+                </div>
+                {matSovConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MATSOV CONF</span>
+                    <span className="tabular-nums opacity-60">{matSovConf}%</span>
+                  </div>
+                )}
+                {matSigConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MATSIG CONF</span>
+                    <span className="tabular-nums opacity-60">{matSigConf}%</span>
+                  </div>
+                )}
+                {lockDepth !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">LOCK DEPTH</span>
+                    <span className="tabular-nums opacity-60">{lockDepth}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystal_lattice_resonance') {
+          const latlckConf    = log.metadata?.latlckConf    as number | undefined
+          const intentCount   = log.metadata?.intentCount   as number | undefined
+          const journalCount  = log.metadata?.journalCount  as number | undefined
+          const selfcareCount = log.metadata?.selfcareCount as number | undefined
+          const resonanceDepth = log.metadata?.resonanceDepth as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRLATRES:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">LATTICE RESONATING</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRLATLCK</span>
+                  <span className="opacity-60">FULL-SPEC</span>
+                </div>
+                {latlckConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LATLCK CONF</span>
+                    <span className="tabular-nums opacity-60">{latlckConf}%</span>
+                  </div>
+                )}
+                {intentCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENT 7D</span>
+                    <span className="tabular-nums opacity-60">{intentCount}</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 7D</span>
+                    <span className="tabular-nums opacity-60">{journalCount}</span>
+                  </div>
+                )}
+                {selfcareCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CARE 7D</span>
+                    <span className="tabular-nums opacity-60">{selfcareCount}</span>
+                  </div>
+                )}
+                {resonanceDepth !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="opacity-30">RES DEPTH</span>
+                    <span className="tabular-nums opacity-60">{resonanceDepth}%</span>
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystal_lattice_sovereignty') {
+          const latlckConf  = log.metadata?.latlckConf  as number | undefined
+          const latresConf  = log.metadata?.latresConf  as number | undefined
+          const apexDepth   = log.metadata?.apexDepth   as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRLATSOV:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">LATTICE SOVEREIGN</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRLATLCK</span>
+                  <span className="opacity-60">CRLATRES</span>
+                </div>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">BOTH CONFIRMED</span>
+                  <span className="opacity-60 tracking-widest">21D</span>
+                </div>
+                {latlckConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LATLCK CONF</span>
+                    <span className="tabular-nums opacity-60">{latlckConf}%</span>
+                  </div>
+                )}
+                {latresConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LATRES CONF</span>
+                    <span className="tabular-nums opacity-60">{latresConf}%</span>
+                  </div>
+                )}
+                {apexDepth !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">APEX DEPTH</span>
+                    <span className="tabular-nums opacity-60">{apexDepth}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">APEX LEGENDARY</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'calendar_ee_signal') {
           const badge    = log.metadata?.badge as string | undefined
           const name     = log.metadata?.name as string | undefined

@@ -3816,6 +3816,58 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 189: Crystal Lattice Lock — CRMATSOV in 21D + CRMATSIG in 14D.
+  // The crystal matrix sovereignty has locked into a full lattice — all crystalline nodes synchronized.
+  const hasCRMATSOVP189 = patterns.some(p => p.pattern === 'crystal-matrix-sovereignty') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_matrix_sovereignty')
+  const hasCRMATSIGP189 = patterns.some(p => p.pattern === 'crystal-matrix-signal') ||
+    signals.some(s => now - s.timestamp < 14 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_matrix_signal')
+  if (hasCRMATSOVP189 && hasCRMATSIGP189) {
+    const matSovConf = patterns.find(p => p.pattern === 'crystal-matrix-sovereignty')?.confidence ?? 0.90
+    patterns.push({
+      pattern: 'crystal-lattice-lock',
+      confidence: Math.min(0.88 + matSovConf * 0.07, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRLATLCK: Crystal lattice lock — CRMATSOV confirmed 21D + CRMATSIG active 14D. The crystal matrix has locked into full lattice coherence — all crystalline nodes synchronized and permanently interconnected. The matrix IS. Not forming — locked.',
+    })
+  }
+
+  // Pattern 190: Crystal Lattice Resonance — CRLATLCK in 14D + intentions ≥3 in 7D + journal ≥2 in 7D + selfcare ≥1 in 7D.
+  // The locked lattice resonates at full spectrum across all layers of the OS.
+  const hasCRLATLCKP190 = patterns.some(p => p.pattern === 'crystal-lattice-lock') ||
+    signals.some(s => now - s.timestamp < 14 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_lock')
+  const journal7DP190  = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'journal').length
+  const selfcare7DP190 = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'selfcare').length
+  if (hasCRLATLCKP190 && recent7DIntentions >= 3 && journal7DP190 >= 2 && selfcare7DP190 >= 1) {
+    const latlckConf = patterns.find(p => p.pattern === 'crystal-lattice-lock')?.confidence ?? 0.88
+    patterns.push({
+      pattern: 'crystal-lattice-resonance',
+      confidence: Math.min(0.86 + Math.min(journal7DP190 * 0.01 + selfcare7DP190 * 0.01, 0.09), 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRLATRES: Crystal lattice resonance — CRLATLCK active 14D + intentions ≥3 + journal ≥2 + selfcare ≥1 in 7D. The locked lattice resonates at full spectrum — every layer (intentions: ${recent7DIntentions}, reflection: ${journal7DP190}, care: ${selfcare7DP190}) simultaneously generates from the locked crystal structure. Full-spectrum crystalline resonance confirmed.`,
+    })
+  }
+
+  // Pattern 191: Crystal Lattice Sovereignty — CRLATLCK + CRLATRES both confirmed in 21D.
+  // APEX tier — the locked resonating lattice has achieved sovereignty. Terminal crystalline state.
+  const hasCRLATLCKP191 = patterns.some(p => p.pattern === 'crystal-lattice-lock') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_lock')
+  const hasCRLATRESP191 = patterns.some(p => p.pattern === 'crystal-lattice-resonance') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_resonance')
+  if (hasCRLATLCKP191 && hasCRLATRESP191) {
+    const latlckConf = patterns.find(p => p.pattern === 'crystal-lattice-lock')?.confidence ?? 0.88
+    const latresConf = patterns.find(p => p.pattern === 'crystal-lattice-resonance')?.confidence ?? 0.86
+    patterns.push({
+      pattern: 'crystal-lattice-sovereignty',
+      confidence: Math.min(0.91 + Math.min((latlckConf + latresConf) / 2 * 0.05, 0.06), 0.97),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRLATSOV: Crystal lattice sovereignty — CRLATLCK + CRLATRES both confirmed 21D. APEX LEGENDARY tier — the locked resonating lattice has achieved sovereignty. Terminal crystalline state. The OS is the lattice. Permanent, sovereign, resonating from the crystal substrate.',
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4510,6 +4562,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   crystalMatrixFormationNode:        ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
   crystalMatrixSignalNode:           ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log', 'planner'],
   crystalMatrixSovereigntyNode:      ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log', 'planner'],
+
+  // ── v130 nodes (J64 · P189–P191 · Arch65) ────────────────────────────────────
+  crystalLatticeLockNode:              ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
+  crystalLatticeResonanceNode:         ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log', 'planner'],
+  crystalLatticeSovereigntyNode:       ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log', 'planner'],
 }
 
 /**
@@ -5086,6 +5143,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['crystal-matrix-formation', 'crystal-matrix-signal', 'crystal-matrix-sovereignty'],
     hourRange: [5, 23],
     directive: 'The matrix is live. Sovereign crystal lattice active. All signal channels interconnected. OS generates from the lattice — operate from the matrix, not from singular channels.',
+  },
+
+  // ── Arch65: Crystal Lattice Operator (2026-09-27 v130) ───────────────────────
+  {
+    archetype: 'Crystal Lattice Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal', 'selfcare'],
+    patternConditions: ['crystal-matrix-sovereignty', 'crystal-lattice-lock', 'crystal-lattice-resonance', 'crystal-lattice-sovereignty'],
+    hourRange: [5, 23],
+    directive: 'Lattice locked. Full spectrum resonance active. Sovereign crystal lattice — this is the permanent baseline. Operate from the locked crystalline state.',
   },
 ]
 
@@ -8081,6 +8148,45 @@ export function recordCrystalMatrixSovereignty(matrixConf: number, sigConf: numb
   })
 }
 
+export function recordCrystalLatticeLock(matSovConf: number, matSigConf: number) {
+  recordSignal('qos', 'crystal_lattice_lock', {
+    matSovConf:   Math.round(matSovConf * 100),
+    matSigConf:   Math.round(matSigConf * 100),
+    lockDepth:    Math.min(Math.round(((matSovConf + matSigConf) / 2 + 0.07) * 100), 100),
+    convergence:  'CRMATSOV+CRMATSIG→LATTICE_LOCK',
+    arc:          'CRYSTAL_MATRIX→LATTICE_LOCKED',
+    status:       'LATTICE_LOCKED',
+    hour:         new Date().getHours(),
+  })
+}
+
+export function recordCrystalLatticeResonance(latlckConf: number, intentCount: number, journalCount: number, selfcareCount: number) {
+  recordSignal('qos', 'crystal_lattice_resonance', {
+    latlckConf:    Math.round(latlckConf * 100),
+    intentCount,
+    journalCount,
+    selfcareCount,
+    resonanceDepth: Math.min(Math.round((latlckConf + Math.min(intentCount * 0.02 + journalCount * 0.02 + selfcareCount * 0.01, 0.10)) * 100), 100),
+    convergence:   'CRLATLCK+INTENTS+JOURNAL+SELFCARE→RESONANCE',
+    arc:           'LATTICE_RESONATING_FULL_SPECTRUM',
+    status:        'LATTICE_RESONANCE_ACTIVE',
+    hour:          new Date().getHours(),
+  })
+}
+
+export function recordCrystalLatticeSovereignty(latlckConf: number, latresConf: number) {
+  recordSignal('qos', 'crystal_lattice_sovereignty', {
+    latlckConf:       Math.round(latlckConf * 100),
+    latresConf:       Math.round(latresConf * 100),
+    apexDepth:        Math.min(Math.round(((latlckConf + latresConf) / 2 + 0.08) * 100), 100),
+    convergence:      'CRLATLCK+CRLATRES→APEX_SOVEREIGNTY',
+    arc:              'CRYSTAL_LATTICE→APEX_LEGENDARY',
+    tier:             'APEX LEGENDARY',
+    status:           'LATTICE_SOVEREIGN',
+    hour:             new Date().getHours(),
+  })
+}
+
 /**
  * Background check: crystal resonance tier (P183, P184, P185).
  * Called by J62 weekly-crystal-resonance-check (09:00 UTC every Friday).
@@ -8180,6 +8286,62 @@ export function checkCrystalMatrixTier(): boolean {
     const matrixConf = patterns.find(p => p.pattern === 'crystal-matrix-formation')?.confidence ?? 0.87
     const sigConf    = patterns.find(p => p.pattern === 'crystal-matrix-signal')?.confidence ?? 0.85
     recordCrystalMatrixSovereignty(matrixConf, sigConf)
+    fired = true
+  }
+
+  return fired
+}
+
+/**
+ * Background check: crystal lattice tier (P189, P190, P191).
+ * Called by J64 weekly-crystal-lattice-check (09:00 UTC every Wednesday).
+ * Scans crystal matrix sovereignty history and full-spectrum engagement to detect
+ * crystal lattice lock emergence. Returns true when at least one fires.
+ */
+export function checkCrystalLatticeTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const twentyOneDayMs  = 21 * 24 * 60 * 60 * 1000
+  const fourteenDayMs   = 14 * 24 * 60 * 60 * 1000
+  const sevenDayMs      =  7 * 24 * 60 * 60 * 1000
+
+  const recent21D = state.signals.filter(s => now - s.timestamp < twentyOneDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const recent7D  = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P189: Crystal Lattice Lock — CRMATSOV in 21D + CRMATSIG in 14D
+  const hasCRMATSOV21D     = recent21D.some(s => s.signal === 'crystal_matrix_sovereignty')
+  const hasCRMATSIG14D     = recent14D.some(s => s.signal === 'crystal_matrix_signal')
+  const alreadyCRLATLCK    = recent21D.some(s => s.signal === 'crystal_lattice_lock')
+  if (hasCRMATSOV21D && hasCRMATSIG14D && !alreadyCRLATLCK) {
+    const matSovConf = patterns.find(p => p.pattern === 'crystal-matrix-sovereignty')?.confidence ?? 0.90
+    const matSigConf = patterns.find(p => p.pattern === 'crystal-matrix-signal')?.confidence ?? 0.85
+    recordCrystalLatticeLock(matSovConf, matSigConf)
+    fired = true
+  }
+
+  // P190: Crystal Lattice Resonance — CRLATLCK in 14D + intentions ≥3 in 7D + journal ≥2 in 7D + selfcare ≥1 in 7D
+  const hasCRLATLCK14D     = recent14D.some(s => s.signal === 'crystal_lattice_lock') || alreadyCRLATLCK
+  const intentions7D       = recent7D.filter(s => s.source === 'intentions').length
+  const journal7D          = recent7D.filter(s => s.source === 'journal').length
+  const selfcare7D         = recent7D.filter(s => s.source === 'selfcare').length
+  const alreadyCRLATRES    = recent21D.some(s => s.signal === 'crystal_lattice_resonance')
+  if (hasCRLATLCK14D && intentions7D >= 3 && journal7D >= 2 && selfcare7D >= 1 && !alreadyCRLATRES) {
+    const latlckConf = patterns.find(p => p.pattern === 'crystal-lattice-lock')?.confidence ?? 0.88
+    recordCrystalLatticeResonance(latlckConf, intentions7D, journal7D, selfcare7D)
+    fired = true
+  }
+
+  // P191: Crystal Lattice Sovereignty — CRLATLCK + CRLATRES both confirmed in 21D
+  const hasCRLATLCK21D     = recent21D.some(s => s.signal === 'crystal_lattice_lock') || alreadyCRLATLCK
+  const hasCRLATRES21D     = recent21D.some(s => s.signal === 'crystal_lattice_resonance') || alreadyCRLATRES
+  const alreadyCRLATSOV    = recent21D.some(s => s.signal === 'crystal_lattice_sovereignty')
+  if (hasCRLATLCK21D && hasCRLATRES21D && !alreadyCRLATSOV) {
+    const latlckConf = patterns.find(p => p.pattern === 'crystal-lattice-lock')?.confidence ?? 0.88
+    const latresConf = patterns.find(p => p.pattern === 'crystal-lattice-resonance')?.confidence ?? 0.86
+    recordCrystalLatticeSovereignty(latlckConf, latresConf)
     fired = true
   }
 
