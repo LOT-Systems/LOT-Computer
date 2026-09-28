@@ -3857,6 +3857,7 @@ Ecosystem Synchrony signal: ecosystem_full_sync (all 5 nodes)`}</CodeBlock>
             <Row label="/fast" value="force fast mode for current session" />
             <Row label="/qos" value="trigger immediate QIE analysis — fires analyzeIntentions() on demand" />
             <Row label="/phys" value="generate physiological cohort report — surfaces current archetype and readiness state" />
+            <Row label="/email" value="LOT Email — /email to [name] [message], composed in Log · resolves recipient against LOT Community cohort matches (POST /api/cohorts) · dispatched as a message via POST /chat-messages · appears live in Sync (Lot Chat) — no separate mailbox, Sync is the inbox" />
             <Row label="/sil" value="check signal silence — fires P.51 analysis, surfaces SIL log event if silence condition met" />
             <Row label="! (in text)" value="urgency signal — detected automatically by Punctuation Engine · surfaces CohortConnect on call-for-help threshold breach" />
           </div>

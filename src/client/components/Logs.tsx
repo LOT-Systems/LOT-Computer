@@ -10,7 +10,7 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
-import { useLogs, useUpdateLog } from '#client/queries'
+import { useLogs, useUpdateLog, useCohorts, useCreateChatMessage } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
@@ -3713,6 +3713,17 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  const [emailResult, setEmailResult] = React.useState<string | null>(null)
+  const emailReceiptRef = React.useRef<string>('')
+  const { data: cohortData } = useCohorts()
+  const { mutate: dispatchLotEmail } = useCreateChatMessage({
+    onSuccess: () => {
+      setEmailResult(emailReceiptRef.current)
+    },
+    onError: () => {
+      setEmailResult('EMAIL FAILED — Sync (Lot Chat) requires Usership, Onyx, Legacy, R&D, or Admin.')
+    },
+  })
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -4139,6 +4150,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to X   Compose a LOT Email — dispatched to Sync (Lot Chat)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4147,6 +4159,25 @@ const NoteEditor = ({
         setSystemHelp(lines.join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
+      } else if (trigger === 'lot-email') {
+        const emailMatch = value.match(/\/email\s+to\s+([A-Za-z][\w'-]*)\s*[:,.]?\s*([\s\S]*)/i)
+        if (emailMatch) {
+          const recipientName = emailMatch[1].trim()
+          const body = emailMatch[2].trim()
+          if (body.length >= 2) {
+            const match = (cohortData?.matches || []).find(
+              (m) => m.user.firstName?.toLowerCase() === recipientName.toLowerCase()
+            )
+            const toLine = match
+              ? `TO: ${match.user.firstName.toUpperCase()} · COHORT MATCH ${Math.round(match.similarity * 100)}% · LOT COMMUNITY`
+              : `TO: ${recipientName.toUpperCase()} · UNVERIFIED — NOT FOUND IN LOT COMMUNITY COHORT`
+            emailReceiptRef.current = [
+              'EMAIL DISPATCHED TO SYNC',
+              toLine,
+            ].join('\n')
+            dispatchLotEmail({ message: `✉ LOT EMAIL\n${toLine}\n\n${body}` })
+          }
+        }
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
@@ -4384,6 +4415,13 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailResult && (
+          <div className="mt-8">
+            <Block label="✉ EMAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{emailResult}</div>
             </Block>
           </div>
         )}
