@@ -303,7 +303,8 @@ export type BadgeType =
   | 'high_score_badge'  // ▓→∗   New personal longest-streak record
   | 'extra_life'        // ◉→○   Return after 7+ days, prior streak 30+
   // ── Achievement RPG v6 — Arcade Class ────────────────────────────────────────
-  | 'quarter_drop'      // ○→◉  First easter egg unlocked (any type)
+  | 'first_coin'        // ○→◉  First easter egg unlocked (any type)
+  | 'quarter_drop'      // ¢·¢  Check in between midnight and 1:00 AM local time
   | 'insert_coin_badge' // ↺·○  Return after 30+ consecutive days away
   | 'arcade_champion'   // ≈·≋  Earn badge from every Word Turn engine v1–v9
   | 'game_over_retry'   // ◐→◆  3 different return-after-absence badges
@@ -495,7 +496,7 @@ export type BadgeType =
   | 'sublimation_signal'       // ∘↑∞  "sublimate/sublimation" detected in text
   | 'prima_materia_word'       // ◉··  "prima" detected in text
   | 'magnum_opus'              // ∞·∞  "opus" detected in text
-  | 'elixir_found'             // ∘∿∘  "elixir" detected in text
+  | 'elixir_prepared'          // ∘∿∘  "elixir" detected in text
   | 'chrysalis_state'          // ○→◉  "chrysalis" detected in text
   | 'refinement_active'        // ≋·≈  "refine/refinement" detected in text
   | 'annealed'                 // ─■─  "anneal/annealed" detected in text
@@ -3211,10 +3212,10 @@ export const BADGES: Record<BadgeType, Badge> = {
   },
 
   // ── Achievement RPG v6 — Arcade Class ─────────────────────────────────────
-  quarter_drop: {
-    id: 'quarter_drop',
+  first_coin: {
+    id: 'first_coin',
     symbol: '○→◉',
-    name: 'Quarter Drop',
+    name: 'First Coin',
     description: 'Unlock your first easter egg badge of any type',
     unlockMessage: '↳ First coin. First easter egg. The arcade is open for business. ○→◉',
     rarity: 'uncommon',
@@ -4822,10 +4823,10 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'word_turn',
     hidden: true,
   },
-  elixir_found: {
-    id: 'elixir_found',
+  elixir_prepared: {
+    id: 'elixir_prepared',
     symbol: '∘∿∘',
-    name: 'Elixir Found',
+    name: 'Elixir Prepared',
     description: 'Write "elixir" in a journal or memory entry',
     unlockMessage: '↳ The solution has been prepared. The elixir is not a potion — it is a state. ∘∿∘',
     rarity: 'uncommon',
@@ -7555,7 +7556,7 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     const alchemistV12Badges: BadgeType[] = [
       'transmutation_event', 'crucible_forged', 'distillation_complete', 'catalyst_detected',
       'alloy_formed', 'sublimation_signal', 'prima_materia_word', 'magnum_opus',
-      'elixir_found', 'chrysalis_state', 'refinement_active', 'annealed',
+      'elixir_prepared', 'chrysalis_state', 'refinement_active', 'annealed',
     ]
     const alchemistEarned = alchemistV12Badges.filter(b => hasBadge(b))
     if (alchemistEarned.length >= 1 && !hasBadge('alchemist_entry')) {

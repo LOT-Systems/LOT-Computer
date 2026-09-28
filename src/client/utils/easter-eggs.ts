@@ -1356,7 +1356,7 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bsublimate(d|s|ing|ion)?\b/i,         badge: 'sublimation_signal' },
   { patterns: /\bprima\b/i,                            badge: 'prima_materia_word' },
   { patterns: /\bopus\b/i,                             badge: 'magnum_opus' },
-  { patterns: /\belixir(s)?\b/i,                      badge: 'elixir_found' },
+  { patterns: /\belixir(s)?\b/i,                      badge: 'elixir_prepared' },
   { patterns: /\bchrysal(is|id)?\b/i,                 badge: 'chrysalis_state' },
   { patterns: /\brefine(d|s|r|ment|ments|ing|ry)?\b/i, badge: 'refinement_active' },
   { patterns: /\banneal(ed|s|ing)?\b/i,               badge: 'annealed' },

@@ -3329,7 +3329,7 @@ export function analyzeIntentions(): IntentionPattern[] {
   // active OS dimension contributing signal at the same time. The field is not building — it is saturated.
   const hasPresenceP142 = patterns.some(p => p.pattern === 'adaptive-signal-web')
   const hasPresenceP137 = patterns.some(p => p.pattern === 'quantum-coherence-peak')
-  const daySignals147 = signals.filter(s => now - s.timestamp < dayMs)
+  const daySignals147 = signals.filter(s => now - s.timestamp < 24 * 60 * 60 * 1000)
   const uniqueSources147 = new Set(daySignals147.map(s => s.source)).size
   if (hasPresenceP142 && hasPresenceP137 && uniqueSources147 >= 7) {
     const presenceBonus = Math.min((uniqueSources147 - 7) * 0.02, 0.14)

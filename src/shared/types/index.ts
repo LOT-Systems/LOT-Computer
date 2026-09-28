@@ -284,14 +284,17 @@ export type PublicProfile = {
   psychologicalProfile?: {
     hasUsership: boolean;
     message?: string;
+    version?: string;
     archetype?: string;
     archetypeDescription?: string;
     coreValues?: string[];
     values?: string[]; // Alias for coreValues (enhanced system uses this)
     emotionalPatterns?: string[];
     selfAwarenessLevel?: number;
+    streak?: number;
     behavioralCohort?: string;
     behavioralTraits?: string[];
+    patternStrengthIndex?: number;
     patternStrength?: Array<{ trait: string; count: number }>;
     answerCount?: number;
     noteCount?: number;
