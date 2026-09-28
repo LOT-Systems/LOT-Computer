@@ -13,6 +13,7 @@ import { getMe, useWeather } from '#client/queries'
 import * as stores from '#client/stores'
 import { Layout } from '#client/components/ui'
 import { System } from '#client/components/System'
+import { Basics } from '#client/components/Basics'
 import { Settings } from '#client/components/Settings'
 import { Logs } from '#client/components/Logs'
 import { Sync } from '#client/components/Sync'
@@ -140,7 +141,7 @@ if (typeof window !== 'undefined') {
   })
 }
 
-type PersistentRoute = 'system' | 'logs' | 'sync' | 'settings' | 'api'
+type PersistentRoute = 'system' | 'logs' | 'sync' | 'settings' | 'api' | 'basics'
 
 const TabPanel = React.memo(function TabPanel({
   active,
@@ -186,6 +187,9 @@ const TabPanels = React.memo(function TabPanels() {
     <>
       <TabPanel active={currentRoute === 'system'} unmountWhenInactive>
         <System />
+      </TabPanel>
+      <TabPanel active={currentRoute === 'basics'}>
+        <Basics />
       </TabPanel>
       <TabPanel active={currentRoute === 'logs'}>
         <Logs />
