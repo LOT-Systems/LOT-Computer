@@ -26,6 +26,7 @@ export async function getLogContext(user: User): Promise<LogContext> {
   const localMoment = user.timeZone ? dayjs().tz(user.timeZone) : dayjs()
   const localDate = toWallClockDate(localMoment)
   const moonPhase = getMoonPhase(localDate)
+  const rokuyo = getRokuyo(localDate)
 
   const context: LogContext = {
     temperature: null,
@@ -37,11 +38,12 @@ export async function getLogContext(user: User): Promise<LogContext> {
     date: user.timeZone
       ? dayjs().tz(user.timeZone).format(DATE_TIME_FORMAT)
       : null,
-    astroRokuyo: getRokuyo(localDate),
+    astroRokuyo: rokuyo,
     astroMoonPhase: moonPhase.phase,
     astroMoonIllumination: moonPhase.illumination,
     astroHourlyZodiac: getHourlyZodiac(localDate),
     astroWesternZodiac: getWesternZodiac(localDate),
+    astroAuspicious: rokuyo === 'Taian',
   }
   if (user.country && user.city) {
     const cachedWeather = await models.WeatherResponse.findOne({

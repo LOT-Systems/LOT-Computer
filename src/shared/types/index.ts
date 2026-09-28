@@ -71,6 +71,7 @@ export type UserProfile = {
   tags: string[];
   hideActivityLogs: boolean;
   timeChime?: boolean;
+  timeZone?: string | null;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
 };
@@ -170,6 +171,7 @@ export type LogContext = {
   astroMoonIllumination?: number | null;
   astroHourlyZodiac?: string | null;
   astroWesternZodiac?: string | null;
+  astroAuspicious?: boolean | null;
   [key: string]: any;
 };
 

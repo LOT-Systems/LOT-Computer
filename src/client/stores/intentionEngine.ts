@@ -3428,6 +3428,24 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Auspicious Alignment — the day's ambient astrology reading came back
+  // auspicious (rokuyo === Taian, flagged by recordAstrologySignal) AND a goal or intention
+  // was set/advanced in the same 24h window. First pattern to react to the 'astrology' Tier 0
+  // source (registered 2026-07-27) together with declared direction ('goals'/'intentions').
+  // Read as synchronization, not fate: the ambient tone and the operator's own stated direction
+  // happened to land on the same day.
+  const auspAstro152 = recentSignals.filter(s => s.source === 'astrology' && s.metadata?.auspicious === true)
+  const auspDirection152 = recentSignals.filter(s => s.source === 'goals' || s.source === 'intentions')
+  if (auspAstro152.length >= 1 && auspDirection152.length >= 1) {
+    patterns.push({
+      pattern: 'auspicious-alignment',
+      confidence: 0.55,
+      suggestedWidget: 'cosmic',
+      suggestedTiming: 'passive',
+      reason: `AUSP: Auspicious alignment — today's rokuyo reads Taian and a goal or intention was set within the same 24h window. Ambient tone and declared direction line up.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -3811,7 +3829,7 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   memory:            ['mood', 'journal'],
   intentions:        ['mood', 'memory'],
   journal:           ['mood', 'planner'],
-  goals:             ['planner', 'intentions', 'memory', 'journal'],
+  goals:             ['planner', 'intentions', 'memory', 'journal', 'astrology'], // (2026-09-28 audit) P152 auspicious-alignment reads goals/intentions against astrology
   chakra:            ['mood', 'energy', 'selfcare', 'journal'],
   cohort:            ['mood', 'memory', 'journal', 'selfcare', 'intentions'],
   narrative:         ['mood', 'memory', 'journal', 'intentions'],
@@ -4874,6 +4892,8 @@ export function recordCalendarSignal(entryType: string, date: string) {
  * zodiac hour. Ambient/environmental conditions only, not a personal
  * natal chart. Called once per calendar day from the System dashboard so
  * other widgets (cosmic, system) can synchronize against Tier 0 'astrology'.
+ * The `auspicious` flag (rokuyo === Taian) feeds P152 (auspicious-alignment)
+ * detection in analyzeIntentions() when paired with a same-day goals/intentions signal.
  */
 export function recordAstrologySignal(
   rokuyo: string,
