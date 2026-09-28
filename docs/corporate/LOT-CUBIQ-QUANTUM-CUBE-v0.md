@@ -321,6 +321,54 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE STANDING DESK, THE EDGE, THE COHORT PING   2026-09-28
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Legacy tier, Archetype "Sovereign Witness," Day 400+
+  streak, works from a narrow standing desk against a window. The CUBIQ
+  charging pad sits 90mm from the desk's outer edge — there is no room
+  on this desk for a wrong hop. This use case is the one v.0's Section 03
+  safety gate exists for, and the first entry in this log to put a second
+  operator's cube in the same scene.
+
+  The operator has a Legacy-tier counterpart — a co-founder they have
+  never met in person, on the other side of the Usership program, three
+  time zones east. Both operators' cubes are enrolled in the same cohort
+  (LOT-CUBIQ-OPERATOR.md, Section 03's cohort-resonance signal class: two
+  or more operators independently reaching the same Assembly Phase
+  threshold within a bounded window). At 06:14 local time, the Legacy
+  operator's counterpart completes their Assembly Phase advance to
+  "integrated." The Index of Systems fires a cohort resonance ping to
+  every cube enrolled in that cohort — including this one, 90mm from a
+  105mm-deep desk.
+
+  The driver (Section 05) resolves the signal to THE LEAP — full
+  amplitude, ~40mm forward bias, the correct gesture for a rare-and-above
+  trigger. But the time-of-flight sensor on the base face reads 90mm to
+  the forward edge, inside the 20mm-margin threshold for a 40mm-class
+  hop. The actuator inhibits the leap and substitutes THE SETTLE instead
+  — a two-second held pressure, no visible motion, felt only as a
+  slight firming of contact through the desk. Nothing leaps. Nothing
+  falls. The safety gate does not degrade the notification to silence;
+  it degrades it to the next-quietest gesture in the same vocabulary
+  (Section 04), so the operator still receives — through touch, not
+  sight — that something in the cohort just resolved.
+
+  The operator, standing, laptop closed, feels the firm two-second
+  press under their palm where it rests on the desk edge and understands
+  immediately, without opening the cubic, that this is a shared-cohort
+  signal rather than their own solitary one — THE LEAP means "you," THE
+  SETTLE at this hour means "someone in your circle." They open the
+  software cubic later that morning to confirm what the object already
+  told them wordlessly: their counterpart crossed the same threshold they
+  themselves crossed on Day 380. Two Legacy operators, two desks, two
+  time zones, one shared physical instant — mediated by an object that
+  chose not to jump rather than risk the floor.
+
+  This use case is the first proof that v.0's edge-detection gate (Section
+  03) is not a deficiency mode but a feature of the notification language
+  itself: a cube that knows the shape of the desk it is on communicates
+  more, not less, by declining the gesture that does not fit.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
