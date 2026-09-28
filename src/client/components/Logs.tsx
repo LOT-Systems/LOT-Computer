@@ -29,6 +29,10 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { formatSystemHelp, parseStoryPeriod } from '#shared/utils/logCommands'
+
+// Delay before /story fires so an argument ("/story week") can be typed.
+const STORY_SETTLE_MS = 800
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -4121,48 +4125,39 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        let help = formatSystemHelp()
+        try {
+          const index = getUserIndex()
+          if (index && typeof index.overall === 'number') {
+            help += `\n\nOPERATOR\nINDEX         ${Math.round(index.overall)}/100`
+          }
+        } catch {}
+        setSystemHelp(help)
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
+          // Settle: let the operator finish "/story week" before firing.
+          window.setTimeout(() => {
+            const typed = valueRef.current
+            const period = parseStoryPeriod(typed)
+            const logText = typed
+              .replace(/\/story(\s+(day|week|month|year)s?)?/i, '')
+              .replace(/📖/g, '')
+              .trim()
+            try {
+              submitStory({
+                logText,
+                period,
+                quantumState: getUserState(),
+                userIndex: getUserIndex(),
+              })
+            } catch {
+              submitStory({ logText, period })
+            }
+          }, STORY_SETTLE_MS)
         }
       }
     }

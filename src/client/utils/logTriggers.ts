@@ -22,25 +22,14 @@
  *  - Triggers are additive: a single log can contain several.
  */
 
-export type LogTrigger =
-  | 'toggle-synth'      // 🎹  or  /synth
-  | 'ai-scan'           // /scan
-  | 'silent-mode'       // /silent
-  | 'breathe'           // /breathe
-  | 'force-fast'        // /fast
-  | 'radio-toggle'      // 🎧  or  /radio
-  | 'night-mode'        // 🌙  or  /night
-  | 'prayer-mode'       // 🕯️  or  /prayer
-  | 'freeze-widgets'    // 🧊  or  /freeze
-  | 'cohort-support'    // ❗  (heavy exclamation, distinct from regular '!')
-  | 'qos-report'        // /qos — surface Quantum OS state in current log session
-  | 'assembly-check'    // /assembly — trigger self-assembly module status check
-  | 'phys-report'       // /phys — generate physiological cohort report
-  | 'sil-check'         // /sil — check for signal silence pattern
-  | 'qi-rfi'            // /qi — Quantum Intelligence RFI (Request for Information)
-  | 'system-help'       // /system — list all available slash commands
-  | 'story-mode'        // /story — generate contextual story from recent data
-  | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+import {
+  LOG_COMMANDS,
+  commandKeywords,
+  type LogCommandId,
+} from '#shared/utils/logCommands'
+
+/** Trigger ids are the command ids in the shared registry. */
+export type LogTrigger = LogCommandId
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -48,26 +37,12 @@ interface TriggerRule {
   keywords: string[] // lower-case slash commands (without leading slash)
 }
 
-const RULES: TriggerRule[] = [
-  { trigger: 'toggle-synth',   emojis: ['🎹'],    keywords: ['synth', 'keyboard'] },
-  { trigger: 'ai-scan',        emojis: [],       keywords: ['scan', 'ai'] },
-  { trigger: 'silent-mode',    emojis: [],       keywords: ['silent', 'quiet'] },
-  { trigger: 'breathe',        emojis: [],       keywords: ['breathe', 'breath'] },
-  { trigger: 'force-fast',     emojis: [],       keywords: ['fast'] },
-  { trigger: 'radio-toggle',   emojis: ['🎧'],    keywords: ['radio'] },
-  { trigger: 'night-mode',     emojis: ['🌙'],    keywords: ['night'] },
-  { trigger: 'prayer-mode',    emojis: ['🕯️', '🕯'], keywords: ['prayer', 'candle'] },
-  { trigger: 'freeze-widgets', emojis: ['🧊'],    keywords: ['freeze', 'pause'] },
-  { trigger: 'cohort-support', emojis: ['❗', '‼️', '‼'], keywords: [] },
-  { trigger: 'qos-report',     emojis: [],        keywords: ['qos', 'os-report'] },
-  { trigger: 'assembly-check', emojis: [],        keywords: ['assembly', 'assemble'] },
-  { trigger: 'phys-report',    emojis: [],        keywords: ['phys', 'cohort-report'] },
-  { trigger: 'sil-check',      emojis: [],        keywords: ['sil', 'silence-check'] },
-  { trigger: 'qi-rfi',         emojis: [],        keywords: ['qi'] },
-  { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
-  { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
-  { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
-]
+// Derived from the shared registry — /system and the detector cannot drift.
+const RULES: TriggerRule[] = LOG_COMMANDS.map(c => ({
+  trigger: c.id,
+  emojis: c.emojis,
+  keywords: commandKeywords(c),
+}))
 
 /**
  * Returns every trigger present in `text`. An empty array means the
