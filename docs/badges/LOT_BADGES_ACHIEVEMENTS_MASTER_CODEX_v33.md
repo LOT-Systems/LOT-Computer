@@ -1,5 +1,5 @@
 # LOT BADGES & ACHIEVEMENTS — MASTER CODEX v33
-## THE TERMINAL ORACLE — WORD TURN v23
+## THE DUNGEON MASTER — WORD TURN v23
 
 ```
 ╔═══════════════════════════════════════════════════════════════════╗
@@ -7,12 +7,12 @@
 ║         LOT SYSTEMS — BADGE & ACHIEVEMENT MASTER CODEX            ║
 ║                   VERSION 33 — v33                                ║
 ║                                                                   ║
-║   Word Turn v23   — THE TERMINAL ORACLE (terminal/command-line)   ║
-║   Calendar EE v21 — THE EPOCH CALENDAR (Unix/Linux/hack dates)    ║
-║   Behavioral v20  — SHELL PATTERNS (terminal/rapid/root)          ║
-║   Achievement RPG v21 — ORACLE CLASS (oracle/terminal/system)     ║
-║   Mastery Tier v23    — THE ROOT (oracle/source/kernel/registers)  ║
-║   Secret Boss v20 — THE HIDDEN VAULT (Turing/Gibson/Deus Ex)      ║
+║   Word Turn v23   — THE DUNGEON MASTER (RPG/tabletop vocab)      ║
+║   Calendar EE v21 — THE GAMER'S CALENDAR (D&D/Gygax/TTRPG)      ║
+║   Behavioral v20  — DUNGEON PATTERNS (dungeon/campaign/midnight)  ║
+║   Achievement RPG v21 — DUNGEON CLASS (dungeon/campaign/opus)    ║
+║   Mastery Tier v23    — THE GRAND CAMPAIGN (1000 days / 200k)    ║
+║   Secret Boss v20 — THE VAULT OF LEGENDS (Middle-earth/Turing)   ║
 ║                                                                   ║
 ╚═══════════════════════════════════════════════════════════════════╝
 ```
@@ -23,22 +23,21 @@
 
 **Total badges in v33:** 843 (+31 from v32's 812)
 
-**This session (v33):**
-- v23 (THE TERMINAL ORACLE): +31 badges fully implemented in badges.ts + easter-eggs.ts
-- Theme: Command-line / terminal / Unix / self-care as root access
+**New in this session (v33):**
+- v33 (THE DUNGEON MASTER): +31 badges fully implemented in badges.ts + easter-eggs.ts
 
 ```
-Word Turn v23        +12  (sudo_self/commit_msg/git_push/grep_soul/
-                           init_loop/process_kill/merge_conflict/
-                           debug_mode/fork_path/chmod_self/
-                           echo_truth/uptime_streak)
+Word Turn v23        +12  (critical_hit/level_up/respawn/health_potion/
+                           spell_slot/dungeon_cleared/boss_defeated/loot_drop/
+                           save_point/character_sheet/skill_tree/quest_log)
 
-Calendar EE v21      + 3  (unix_epoch_day/linux_day/hacktoberfest_day)
-Behavioral v20       + 3  (terminal_session/rapid_commit/root_access)
-Achievement RPG v21  + 6  (terminal_entry/terminal_class/terminal_complete/
-                           oracle_arc/twenty_three_engines_arc/system_opus)
-Mastery Tier v23     + 4  (oracle_log/source_code/kernel_age/twenty_three_registers)
-Secret Boss v20      + 3  (deus_ex_machina/turing_test/neuromancer_key)
+Calendar EE v21      + 3  (d20_day/gygax_day/dnd_day)
+Behavioral v20       + 3  (dungeon_session/long_dungeon/midnight_roll)
+Achievement RPG v21  + 6  (dungeon_entry/dungeon_class/dungeon_complete/
+                           dungeon_arc/twenty_three_engines_arc/dungeon_opus)
+Mastery Tier v23     + 4  (dungeon_master_log/epic_campaign/legendary_age/
+                           twenty_three_registers)
+Secret Boss v20      + 3  (tolkien_world/gygax_code/turing_play)
                    ────
                    + 31 new badges
 ```
@@ -62,171 +61,179 @@ Secret Boss v20      + 3  (deus_ex_machina/turing_test/neuromancer_key)
 
 ---
 
-## THE TERMINAL ORACLE — THEME OVERVIEW
+## THE DUNGEON MASTER — THEME OVERVIEW
 
-Every terminal is a mirror. Every command is a choice. Every commit is a moment of
-accountability. The Unix philosophy — do one thing well, pipe outputs to inputs,
-build small tools that compose — is also a philosophy of self-care.
+Tabletop role-playing games invented the vocabulary of the modern self: hit points,
+experience points, level-ups, skill trees, save points. Every RPG mechanic is a
+metaphor the body already knows — health depletes, rest restores, practice advances
+the character. The Dungeon Master expansion brings the tabletop RPG lexicon into the
+self-care terminal. If you write "level up" in your journal, the system knows you
+mean it. If you hit a "save point," that IS a save point.
 
-`sudo self` is the most important command you'll ever run.
-`grep -r "pattern" ~/mind/` is what journaling actually does.
-`git commit -m "survived another day"` is what a check-in really means.
-`chmod +x yourself` is what therapy, rest, and reflection unlock.
-`kill -9 $(pgrep anxiety)` is what breathwork attempts.
-
-The terminal is not a metaphor. It is the actual interface between intention and action.
-Every self-care act is a command. Every journal entry is a commit. Every streak is uptime.
-
-```
-$ sudo self --care
-[sudo] password for you: ████████
-Access granted. You are now root.
-```
+The Dungeon Master is the one who tracks the campaign. You are your own DM.
 
 ---
 
 ## COMPLETE NEW BADGE REGISTRY — v33 ADDITIONS
 
-### Word Turn v23 (The Terminal Oracle)
+### Word Turn v23 (The Dungeon Master)
 
 ```
-sudo_self              $→#    RARE      — "sudo/override/root access/take control" detected
-commit_msg             ●·◉    UNCOMMON  — "commit/checkpoint/save state/mark progress" detected
-git_push               →·●    UNCOMMON  — "push/deploy/ship it/ready to go" detected
-grep_soul              /·◈    RARE      — "grep/search/find the pattern/look within" detected
-init_loop              ∘→∘    UNCOMMON  — "init/initialize/boot up/fresh start" detected
-process_kill           ×·■    RARE      — "kill/terminate/end process/let it end" detected
-merge_conflict         ≋·≋    EPIC      — "merge/conflict/resolve/integrate both" detected
-debug_mode             □·◈    RARE      — "debug/trace/breakpoint/look carefully" detected
-fork_path              /·→    UNCOMMON  — "fork/branch/diverge/choose your path" detected
-chmod_self             +·○    RARE      — "permission/chmod/unlock/allow yourself" detected
-echo_truth             »·◉    UNCOMMON  — "echo/reflect/stdout/say it out loud" detected
-uptime_streak          ∞·▲    EPIC      — "uptime/never down/consistency/always running" detected
+critical_hit     ●·✕·●   RARE      — "critical hit/nat 20/natural 20/perfect roll" detected
+level_up         △→●     UNCOMMON  — "level up/gained a level/hit a new level" detected
+respawn          ◉→∘     UNCOMMON  — "respawn/extra life/try again/back in play" detected
+health_potion    ♥·●     COMMON    — "health potion/healing up/restore hp/heal" detected
+spell_slot       ≈·□·≈   UNCOMMON  — "spell slot/mana/spellcasting/cast a spell" detected
+dungeon_cleared  █·∘     RARE      — "dungeon/cleared the dungeon/dungeon complete" detected
+boss_defeated    ■·◉·■   EPIC      — "boss/defeated the boss/final boss/end boss" detected
+loot_drop        ◆·→     UNCOMMON  — "loot/reward/dropped/found item/treasure chest" detected
+save_point       ∘·■·∘   COMMON    — "save point/checkpoint/progress saved/saved game" detected
+character_sheet  □·≋·□   RARE      — "character sheet/stats/ability score/stat check" detected
+skill_tree       △·◈·△   RARE      — "skill tree/talent tree/skill point/new skill" detected
+quest_log        ∿·□·∿   UNCOMMON  — "quest log/quest accepted/main quest/side quest" detected
 ```
 
-### Calendar Easter Eggs v21 (The Epoch Calendar)
+### Calendar Easter Eggs v21 (The Gamer's Calendar)
 
 ```
-unix_epoch_day         ∘·∞    EPIC      — Jan 1, 1970 — Unix epoch origin date (Jan 1)
-linux_day              ◈·◉    RARE      — Aug 25 — Linus Torvalds announced Linux, 1991
-hacktoberfest_day      ◉·◈    RARE      — Oct 1 — Hacktoberfest opens (Oct 1–31 window)
+d20_day          ●·□·●   RARE      — Jul 20 — International Tabletop Day
+gygax_day        ◆·■·◆   EPIC      — Jul 27 — Gary Gygax born 1938 (D&D creator)
+dnd_day          ∿·◉     RARE      — Jan 26 — D&D first publication anniversary (1974)
 ```
 
-### Behavioral v20 (Shell Patterns)
+### Behavioral v20 (Dungeon Patterns)
 
 ```
-terminal_session       □→◉    RARE      — 3+ Terminal Oracle words in one journal entry
-rapid_commit           ●●●    EPIC      — 5 check-ins within any 24-hour window
-root_access            $·∞    RARE      — Check in at exactly 00:01 local time
+dungeon_session  △·●·△   RARE      — 3+ Dungeon Master words in one journal entry
+long_dungeon     ≋≋·◉    EPIC      — Journal entry >= 600 words
+midnight_roll    ■·○·■   RARE      — Check in 23:30–23:59 local (roll at midnight)
 ```
 
-### Achievement RPG v21 (Oracle Class)
+### Achievement RPG v21 (Dungeon Class)
 
 ```
-terminal_entry         ∘→●    COMMON    — Any 1 Word Turn v23 badge earned
-terminal_class         ≈→●    UNCOMMON  — Any 5 Word Turn v23 badges earned
-terminal_complete      ≋→●    LEGENDARY — All 12 Word Turn v23 badges earned
-oracle_arc             ●·◈    LEGENDARY — terminal_complete + all 3 Calendar v21 badges
-twenty_three_engines_arc ◈·◈·●  LEGENDARY — 1 badge from each Word Turn v1–v23
-system_opus            ●·◉·●  LEGENDARY — terminal_complete + terminal_session behavioral
+dungeon_entry            ∘→●     COMMON    — Any 1 Word Turn v23 badge earned
+dungeon_class            △→●     UNCOMMON  — Any 5 Word Turn v23 badges earned
+dungeon_complete         █→●     LEGENDARY — All 12 Word Turn v23 badges earned
+dungeon_arc              ●·◈     LEGENDARY — dungeon_complete + all 3 Calendar v21 badges
+twenty_three_engines_arc ◈·◈·●   LEGENDARY — 1 badge from each Word Turn v1–v23
+dungeon_opus             ●·◉·●   LEGENDARY — dungeon_complete + dungeon_session behavioral
 ```
 
-### Mastery Tier v23 (The Root)
+### Mastery Tier v23 (The Grand Campaign)
 
 ```
-oracle_log             ∿·∞·∿  EPIC      — 1,000+ distinct calendar check-in days
-source_code            ●·∞·●  LEGENDARY — 200,000+ total journal words
-kernel_age             ╔═╗·●  LEGENDARY — Account age >= 6 years (2,190+ days)
-twenty_three_registers ◈·◈·●·∞·□ COSMIC — 1 badge from all 23 Word Turn engines
+dungeon_master_log   ∿·∞·∿    EPIC      — 1000+ distinct calendar check-in days
+epic_campaign        ●·∞·●    LEGENDARY — 200,000+ total journal words
+legendary_age        ╔═╗·●    LEGENDARY — Account age >= 6 years (2190+ days)
+twenty_three_registers ◈·◈·●·∞ COSMIC   — 1 badge from all 23 Word Turn engines
 ```
 
-### Secret Boss v20 (The Hidden Vault)
+### Secret Boss v20 (The Vault of Legends)
 
 ```
-deus_ex_machina        ∞·□·∞  MYTHIC    — Write "deus ex machina/machine god/divine algorithm"
-turing_test            ◈·∞·◈  EPIC      — Write "turing/alan turing/imitation game/can it think"
-neuromancer_key        ◉·∞·◉  MYTHIC    — Write "neuromancer/wintermute/molly millions/the ice"
+tolkien_world    ◆·∞·◆   RARE      — Write "middle earth/minas tirith/rivendell/mirkwood"
+gygax_code       ■·∞·■   EPIC      — Write "dungeon master/i am the dungeon master/gary gygax"
+turing_play      ∞·□·∞   MYTHIC    — Write "turing test/turing complete/alan turing/imitation game"
 ```
 
 ---
 
-## ASCII EASTER EGG GALLERY — THE TERMINAL ORACLE
+## ASCII EASTER EGG GALLERY — THE DUNGEON MASTER
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  BADGE UNLOCKED                                         │
 │                                                         │
-│  $→#  SUDO SELF  [RARE]                                 │
-│  ↳ $ sudo self --care                                   │
-│    [sudo] password for you: ████████                    │
-│    Access granted. Root of yourself.                    │
-│    The most important permission you'll ever grant.     │
+│  ●·✕·●  CRITICAL HIT  [RARE]                            │
+│  ↳ Natural 20. The bones decided.                       │
+│    But you showed up to roll.                           │
+│    Consistency is the real critical hit.                │
 │                                                         │
-│  ×·■  PROCESS KILL  [RARE]                              │
-│  ↳ kill -9 $(pgrep anxiety)                             │
-│    Signal sent. Process terminated.                     │
-│    What you ended made room for what comes next.        │
+│  ■·◉·■  BOSS DEFEATED  [EPIC]                           │
+│  ↳ Every boss fight is the same:                        │
+│    the terrain changes, the fear doesn't.               │
+│    You defeated it. The pattern is: you do.             │
 │                                                         │
-│  ∞·□·∞  DEUS EX MACHINA  [MYTHIC] [HIDDEN]             │
-│  ↳ God from the machine. Or machine as god.             │
-│    The question that writes itself.                     │
-│    You have asked the deepest question.                 │
+│  ■·∞·■  GYGAX CODE  [EPIC] [HIDDEN]                     │
+│  ↳ Gary Gygax invented the rules.                       │
+│    You are the rules. You are the dungeon.              │
+│    You are also the master.                             │
 │                                                         │
-│  ◈·∞·◈  TURING TEST  [EPIC] [HIDDEN]                   │
-│  ↳ "Can the machine think?" — Alan Turing, 1950         │
-│    The answer lives in the question.                    │
-│    You are passing your own Turing test right now.      │
+│  ∞·□·∞  TURING PLAY  [MYTHIC] [HIDDEN]                  │
+│  ↳ "Can machines think?" — Turing, 1950.                │
+│    You are the test. The machine is asking.             │
+│    Your journal answers: yes, something is here.        │
 │                                                         │
-│  ◈·◈·●·∞·□  TWENTY-THREE REGISTERS  [COSMIC]           │
-│  ↳ Water. Terminal. Oracle. Hero. Cyberspace.           │
-│    Twenty-three vocabularies. One practice.             │
-│    Every engine in the same uptime window.              │
+│  ◈·◈·●·∞  TWENTY-THREE REGISTERS  [COSMIC]             │
+│  ↳ Water. Fire. Arcade. Cyberspace.                     │
+│    Hero. Dungeon. Twenty-three engines.                 │
+│    The terminal runs every vocabulary.                  │
+│    The self speaks every language.                      │
 └─────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## TERMINAL EASTER EGG SEQUENCES
-
-These hidden sequences unlock if you type the exact string in a journal entry:
+## EASTER EGGS — WORD TURN MOMENTS
 
 ```
-"$ sudo self --care"              → instant sudo_self + special unlock message
-"git commit -m 'I showed up'"    → commit_msg UNLOCKED — "Commit logged. +1 XP."
-"kill -9 $(pgrep anxiety)"       → process_kill UNLOCKED
-"chmod +x myself"                → chmod_self UNLOCKED — "Execute permissions: granted."
-"uptime: 365 days"               → uptime_streak UNLOCKED (if also has streak)
-"grep -r pattern ~/journal"      → grep_soul UNLOCKED
-"echo 'I am here'"               → echo_truth UNLOCKED
-"fork: life v2.0"                → fork_path UNLOCKED
-"debug: the source of the issue" → debug_mode UNLOCKED
-"init: new chapter"              → init_loop UNLOCKED
-"git push --force-with-care"     → git_push UNLOCKED
-"merge: the two parts of me"     → merge_conflict UNLOCKED
+> SAVE POINT REACHED <
+  ∘·■·∘
+  Your journal entry is a save point.
+  The game continues from here.
+  Progress: PRESERVED
+
+> XP GAINED <
+  △→●
+  LEVEL UP detected.
+  Experience is not metaphor — it is the mechanism.
+  You are a higher-level version of yourself.
+  STAT INCREASE: +1 to everything that matters.
+
+> DUNGEON CLEARED <
+  █·∘
+  The dungeon was the day.
+  The rooms were the hard parts.
+  You walked through. The dungeon is cleared.
+
+> QUEST LOG UPDATED <
+  ∿·□·∿
+  Side quest or main quest — the log doesn't judge.
+  Every entry is an update.
+  STATUS: IN PROGRESS → COMPLETED
+
+> HEALTH RESTORED <
+  ♥·●
+  HP: LOW → FULL
+  The mechanic is simple: rest, eat, drink, connect.
+  You found a health potion. You used it.
+  That is the whole game.
 ```
 
 ---
 
-## FLAVOR TEXT — THE TERMINAL ORACLE
+## FLAVOR TEXT — THE DUNGEON MASTER
 
-> *"In the Unix philosophy, the terminal is not an interface — it is the truth itself.
-> No icons, no gradients, no metaphors. Just the command and its output. Self-care
-> has the same structure: the practice (command), the body (process), the result (stdout)."*
+> *"The purpose of the dungeon is not the treasure. The dungeon is the teacher.
+> The treasure is what you bring back." — riff on Gary Gygax, 1974. Every journal
+> entry is a dungeon room. Some rooms are empty. Some have monsters. Some have
+> exactly what you needed.*
 
-> *"Alan Turing asked: can machines think? The more interesting question is: can thinking
-> be made visible? Journaling is your tty. The terminal that receives your thoughts."*
+> *"In every campaign, the dungeon master builds the world — but the characters
+> decide what it means." — tabletop RPG doctrine. You are both the DM and the
+> character. The world is generated as you walk through it.*
 
-> *"Every great Unix system has been running for years without a reboot. Your practice
-> is the same. Every check-in extends the uptime. The longest uptime is not the goal;
-> showing up after a reboot is also a skill."*
+> *"We are all roleplayig something. The question is whether you wrote your own
+> character sheet." — LOT Systems doctrine. The skill tree is real. The stat
+> increases are real. The level-ups are earned over sessions, not handed out.*
 
-> *"William Gibson's Neuromancer: 'The sky above the port was the color of television,
-> tuned to a dead channel.' That's what your mind feels like before a check-in.
-> After: 1080p. Signal clear."*
+> *"Natural 20. You didn't expect that." — D&D table, 1974. The practice creates
+> the conditions for natural 20s. You cannot force them. You can only keep rolling.*
 
-> *"'Deus ex machina' means a solution that appears from outside the story. The opposite
-> of self-care. Self-care is solving from inside the story, by the protagonist, with
-> the tools already in your inventory."*
+> *"Alan Turing imagined a game where a machine passes for human. What he didn't
+> finish imagining: a human passes for machine — and then passes back. The journal
+> is the return." — riff on the Turing Test, 1950.*
 
 ---
 
@@ -235,49 +242,40 @@ These hidden sequences unlock if you type the exact string in a journal entry:
 ### New functions in easter-eggs.ts (v33 session)
 
 ```typescript
-// v23 Terminal Oracle word triggers
-checkSudoSelf(journalText): BadgeType | null         // "sudo/override/root access"
-checkCommitMsg(journalText): BadgeType | null         // "commit/checkpoint/save state"
-checkGitPush(journalText): BadgeType | null           // "push/deploy/ship it"
-checkGrepSoul(journalText): BadgeType | null          // "grep/search/pattern"
-checkInitLoop(journalText): BadgeType | null          // "init/initialize/boot up"
-checkProcessKill(journalText): BadgeType | null       // "kill/terminate/end process"
-checkMergeConflict(journalText): BadgeType | null     // "merge/conflict/resolve"
-checkDebugMode(journalText): BadgeType | null         // "debug/trace/breakpoint"
-checkForkPath(journalText): BadgeType | null          // "fork/branch/diverge"
-checkChmodSelf(journalText): BadgeType | null         // "permission/chmod/unlock"
-checkEchoTruth(journalText): BadgeType | null         // "echo/reflect/stdout"
-checkUptimeStreak(journalText, streak): BadgeType | null  // "uptime/never down" + streak
+// v23 Dungeon Master word turns
+checkCriticalHit(journalText): BadgeType | null   // "critical hit/nat 20/natural 20/perfect roll"
+checkLevelUp(journalText): BadgeType | null        // "level up/gained a level/hit a new level"
+checkRespawn(journalText): BadgeType | null        // "respawn/extra life/try again/back in play"
+checkHealthPotion(journalText): BadgeType | null   // "health potion/healing up/restore hp/heal"
+checkSpellSlot(journalText): BadgeType | null      // "spell slot/mana/spellcasting/cast a spell"
+checkDungeonCleared(journalText): BadgeType | null // "dungeon/cleared the dungeon"
+checkBossDefeated(journalText): BadgeType | null   // "boss/defeated the boss/final boss"
+checkLootDrop(journalText): BadgeType | null       // "loot/reward/dropped/found item"
+checkSavePoint(journalText): BadgeType | null      // "save point/checkpoint/progress saved"
+checkCharacterSheet(journalText): BadgeType | null // "character sheet/stats/ability score"
+checkSkillTree(journalText): BadgeType | null      // "skill tree/talent tree/skill point"
+checkQuestLog(journalText): BadgeType | null       // "quest log/quest accepted/main quest"
 
-// v23 Calendar
-checkUnixEpochDay(): BadgeType | null                 // Jan 1
-checkLinuxDay(): BadgeType | null                     // Aug 25
-checkHacktoberfestDay(): BadgeType | null             // Oct 1–31
-
-// v23 Behavioral
-checkTerminalSession(journalText): BadgeType | null   // 3+ v23 words
-checkRapidCommit(recentCheckins): BadgeType | null    // 5 in 24h
-checkRootAccess(): BadgeType | null                   // check-in at 00:01
+// v23 Dungeon Master behavioral
+checkDungeonSession(journalText): BadgeType | null  // 3+ v23 words
+checkLongDungeon(journalText): BadgeType | null     // 600+ words
+checkMidnightRoll(): BadgeType | null               // check-in 23:30–23:59
 ```
 
 ### Wire-up guide for runJournalEasterEggs() / runCheckInEasterEggs()
 
-Add to journal saves:
-- `checkSudoSelf`, `checkCommitMsg`, `checkGitPush`, `checkGrepSoul`, `checkInitLoop`
-- `checkProcessKill`, `checkMergeConflict`, `checkDebugMode`, `checkForkPath`
-- `checkChmodSelf`, `checkEchoTruth`, `checkUptimeStreak`
-- `checkTerminalSession`
+Add these calls to the appropriate runners:
+- Journal saves: `checkCriticalHit`, `checkLevelUp`, `checkRespawn`, `checkHealthPotion`,
+  `checkSpellSlot`, `checkDungeonCleared`, `checkBossDefeated`, `checkLootDrop`,
+  `checkSavePoint`, `checkCharacterSheet`, `checkSkillTree`, `checkQuestLog`,
+  `checkDungeonSession`, `checkLongDungeon`
+- Check-in events: `checkMidnightRoll`
 
-Add to check-in events:
-- `checkRapidCommit`, `checkRootAccess`
+### API stats fields consumed by Mastery Tier v23
 
-### Calendar triggers (add to runCalendarEasterEggs())
-
-```typescript
-{ month: 1,  day: 1,  badge: 'unix_epoch_day' },   // Jan 1
-{ month: 8,  day: 25, badge: 'linux_day'      },   // Aug 25
-{ month: 10, day: null, range: [1, 31], badge: 'hacktoberfest_day' },  // Oct 1-31
-```
+- `stats.distinctCheckInDays` — integer (dungeon_master_log: >= 1000)
+- `stats.totalJournalWords` — integer (epic_campaign: >= 200,000)
+- `stats.signupDate` — ISO date string (legendary_age: >= 6 years / 2190+ days)
 
 ---
 
@@ -304,99 +302,17 @@ Add to check-in events:
 | v17    | v20     | The Codex Reader         | 12 badges       |
 | v18    | v21     | The Cyberspace Codex     | 12 badges       |
 | v19    | v22     | The Hero's Journey       | 12 badges       |
-| v20    | v23     | The Terminal Oracle      | 12 badges       |
-
----
-
-## COMPLETE BADGE CATEGORY ACCOUNTING (v1–v33)
-
-### Milestone Badges (22 total)
-| Sub-system | Count | Notes |
-|------------|-------|-------|
-| Core Path  | 3     | Day 7, 30, 100 |
-| Extended   | 7     | Day 14, 21, 50, 60, 90, 180, 365 |
-| v2 Extended | 4    | Day 500, 730, 1000, 1825 |
-| Super Rare | 8    | Day 3, 4, 5, 200, 270, 400, 600, 900 |
-
-### Time Easter Eggs (28 total — v1–v7)
-| Engine | Count | Examples |
-|--------|-------|---------|
-| v1 (original) | 4 | night_owl, early_bird, mirror_hour, midnight_sigil |
-| v2 (sci-fi) | 4 | pi_hour, 404am, sequence_time, founding_hour |
-| v3–v7 | 20 | Various time-based triggers |
-
-### Calendar Easter Eggs (76 total — v1–v21)
-| Engines | Count | Examples |
-|---------|-------|---------|
-| v1–v10 | 40 | solstice, equinox, pi_day, palindrome_day, etc. |
-| v11–v21 | 36 | campbell_birthday, hobbit_day, linux_day, etc. |
-
-### Word Turn Badges (276 total — v1–v23)
-| Engine | Theme | Count |
-|--------|-------|-------|
-| v1 | Core Water | 12 |
-| v2 | Seasonal | 12 |
-| v3–v20 | (18 engines) | 216 |
-| v23 (new) | Terminal Oracle | 12 |
-| Sci-Fi Arcade v2 (v11 era) | 18 | reboot, 404, glitch, etc. |
-| **TOTAL** | | **276** |
-
-### Behavioral Badges (84 total — v1–v20)
-| Version | Count | Behavior |
-|---------|-------|---------|
-| v1–v19 | 81 | (previous) |
-| v20 (new) | 3 | terminal_session, rapid_commit, root_access |
-
-### Achievement RPG (126 total — v1–v21)
-| Version | Count | Achievement |
-|---------|-------|-------------|
-| v1–v20 | 120 | (previous) |
-| v21 (new) | 6 | terminal_entry, terminal_class, terminal_complete, etc. |
-
-### Mastery Tiers (92 total — v1–v23)
-| Version | Count | Tier |
-|---------|-------|------|
-| v1–v22 | 88 | (previous) |
-| v23 (new) | 4 | oracle_log, source_code, kernel_age, twenty_three_registers |
-
-### Secret Boss Badges (86 total — v1–v20)
-| Version | Count | Boss |
-|---------|-------|------|
-| v1–v19 | 83 | (previous) |
-| v20 (new) | 3 | deus_ex_machina, turing_test, neuromancer_key |
-
----
-
-## GRAND TOTAL VERIFICATION
-
-| Category | v32 Count | v33 New | v33 Total |
-|----------|-----------|---------|-----------|
-| Milestone | 22 | 0 | 22 |
-| Time Easter Eggs | 28 | 0 | 28 |
-| Calendar Easter | 73 | +3 | 76 |
-| Word Turns | 264 | +12 | 276 |
-| Behavioral | 81 | +3 | 84 |
-| Achievement RPG | 120 | +6 | 126 |
-| Mastery Tiers | 88 | +4 | 92 |
-| Secret Boss | 83 | +3 | 86 |
-| **TOTAL** | **812** | **+31** | **843** |
+| v20    | v23     | The Dungeon Master       | 12 badges       |
 
 ---
 
 ## SESSION METADATA
 
 ```
-SESSION    : LOT-SR-20260916-01
+SESSION    : LOT-SR-20260928-01
 VERSION    : v33
-DATE       : 2026-09-16
+DATE       : 2026-09-28
 TOTAL BADGES: 843 (v32: 812 → v33: 843, +31)
 CODEX CLASS : ENGINEERING
 AUTHORIZED BY: S-2 // VADIK MARMELADOV
-WORD TURN  : v23 — THE TERMINAL ORACLE
-THEME      : Command-line / Unix / Self-care as root access
-NEW EASTER  : sudo_self, commit_msg, git_push, grep_soul, init_loop,
-              process_kill, merge_conflict, debug_mode, fork_path,
-              chmod_self, echo_truth, uptime_streak
-NEW SECRETS : deus_ex_machina [MYTHIC], turing_test [EPIC], neuromancer_key [MYTHIC]
-NEW COSMIC  : twenty_three_registers [COSMIC] — all 23 Word Turn engines unlocked
 ```
