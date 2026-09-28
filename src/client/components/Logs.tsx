@@ -3629,6 +3629,98 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sustained_coherence') {
+          const coherenceCount = log.metadata?.coherenceCount as number | undefined
+          const densityPerWeek = log.metadata?.densityPerWeek as number | undefined
+          const stabilizationLevel = log.metadata?.stabilizationLevel as string | undefined
+          const baselineStatus = log.metadata?.baselineStatus as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SUSCOHERE:" blockView>
+                <div className="uppercase tracking-widest mb-4">SUSTAINED COHERENCE FIELD</div>
+                {coherenceCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHERENCE COUNT</span>
+                    <span className="tabular-nums">{coherenceCount}× / 14d</span>
+                  </div>
+                )}
+                {densityPerWeek !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DENSITY / WEEK</span>
+                    <span className="tabular-nums">{densityPerWeek}×</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CEILING IS BASELINE · STABILIZED ABOVE PEAK</div>
+                {stabilizationLevel && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {stabilizationLevel}</div>
+                )}
+                {baselineStatus && (
+                  <div className="opacity-30 tabular-nums">{baselineStatus}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'recovery_mastery') {
+          const windowMin = log.metadata?.windowMin as number | undefined
+          const careCount = log.metadata?.careCount as number | undefined
+          const masteryClass = log.metadata?.masteryClass as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RECMASTER:" blockView>
+                <div className="uppercase tracking-widest mb-4">RECOVERY MASTERY</div>
+                {windowMin !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LOOP DURATION</span>
+                    <span className="tabular-nums">{windowMin} min</span>
+                  </div>
+                )}
+                {careCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CARE ACTIONS</span>
+                    <span className="tabular-nums">{careCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">FAST RECOVERY LOOP · SYSTEM KNOWS ITS PROTOCOL</div>
+                {masteryClass && (
+                  <div className="opacity-30 tabular-nums">CLASS: {masteryClass}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'coherence_after_recovery') {
+          const recoveryConf = log.metadata?.recoveryConf as number | undefined
+          const coherenceConf = log.metadata?.coherenceConf as number | undefined
+          const combinedSignal = log.metadata?.combinedSignal as number | undefined
+          const resilienceLevel = log.metadata?.resilienceLevel as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COHAFTREC:" blockView>
+                <div className="uppercase tracking-widest mb-4">COHERENCE AFTER RECOVERY</div>
+                {recoveryConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECOVERY CONF</span>
+                    <span className="tabular-nums">{recoveryConf}%</span>
+                  </div>
+                )}
+                {coherenceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHERENCE CONF</span>
+                    <span className="tabular-nums">{coherenceConf}%</span>
+                  </div>
+                )}
+                {combinedSignal !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COMBINED</span>
+                    <span className="tabular-nums">{combinedSignal}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">DEPLETE → RECOVER → RETURN TO CEILING</div>
+                {resilienceLevel && (
+                  <div className="opacity-30 tabular-nums">RESILIENCE: {resilienceLevel}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

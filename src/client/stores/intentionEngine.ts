@@ -3428,6 +3428,65 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Sustained Coherence Field — total-field-coherence (P150) has fired 3+
+  // times in the last 14 days. The ceiling is no longer a peak event — it is the baseline.
+  // The system does not need to strive for convergence. It lives there.
+  const fourteenDaysMs = 14 * 24 * 60 * 60 * 1000
+  const recent14d = signals.filter(s => now - s.timestamp < fourteenDaysMs)
+  const tfcSignals152 = recent14d.filter(s => s.source === 'qos' && s.signal === 'total_field_coherence')
+  if (tfcSignals152.length >= 3) {
+    const densityBonus = Math.min((tfcSignals152.length - 3) * 0.03, 0.15)
+    patterns.push({
+      pattern: 'sustained-coherence-field',
+      confidence: Math.min(0.75 + densityBonus, 0.90),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'soon',
+      reason: `SUSCOHERE: Sustained coherence field — total-field-coherence confirmed ${tfcSignals152.length}× in 14 days. The ceiling is not a peak event. It is the operating baseline. The system has stabilized above its own highest confirmed state.`,
+    })
+  }
+
+  // Pattern 153: Recovery Mastery — recovery-intelligence-arc (P151) fires AND the
+  // recovery window was <3h. The loop executes not just completely but swiftly.
+  // Speed indicates mastery: the system knows exactly what it needs and applies it.
+  const hasRecoveryArc153 = patterns.some(p => p.pattern === 'recovery-intelligence-arc')
+  if (hasRecoveryArc153 && negMood151.length >= 1 && care151.length >= 1 && posMood151.length >= 1) {
+    const firstNeg153 = negMood151[0].timestamp
+    const caresAfterNeg153 = care151.filter(s => s.timestamp > firstNeg153)
+    const posAfterCare153 = caresAfterNeg153.length > 0 ? posMood151.filter(s => s.timestamp > caresAfterNeg153[0].timestamp) : []
+    if (posAfterCare153.length >= 1) {
+      const windowMs153 = posAfterCare153[0].timestamp - firstNeg153
+      const threeHoursMs = 3 * 60 * 60 * 1000
+      if (windowMs153 < threeHoursMs) {
+        const velocityScore = Math.min((threeHoursMs - windowMs153) / threeHoursMs * 0.18, 0.18)
+        patterns.push({
+          pattern: 'recovery-mastery',
+          confidence: Math.min(0.70 + velocityScore, 0.88),
+          suggestedWidget: 'memory',
+          suggestedTiming: 'soon',
+          reason: `RECMASTER: Recovery mastery — recovery-intelligence-arc complete in ${Math.round(windowMs153 / (60 * 1000))} min. The loop is not just complete — it is fast. Depletion identified, care applied, state restored. The system knows its own recovery protocol.`,
+        })
+      }
+    }
+  }
+
+  // Pattern 154: Coherence After Recovery — recovery-intelligence-arc (P151) confirmed AND
+  // total-field-coherence (P150) fires within the same session. Full convergence restored
+  // post-depletion. The system proves resilience: it can reach the ceiling, deplete, and return.
+  const hasRecoveryArc154 = patterns.some(p => p.pattern === 'recovery-intelligence-arc')
+  const hasCoherence154   = patterns.some(p => p.pattern === 'total-field-coherence')
+  if (hasRecoveryArc154 && hasCoherence154) {
+    const recoveryConf154  = patterns.find(p => p.pattern === 'recovery-intelligence-arc')?.confidence ?? 0.70
+    const coherenceConf154 = patterns.find(p => p.pattern === 'total-field-coherence')?.confidence ?? 0.92
+    const carcBonus = Math.min((recoveryConf154 - 0.65) * 0.2 + (coherenceConf154 - 0.92) * 0.1, 0.12)
+    patterns.push({
+      pattern: 'coherence-after-recovery',
+      confidence: Math.min(0.80 + carcBonus, 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `COHAFTREC: Coherence after recovery — full recovery arc confirmed AND total-field-coherence active simultaneously. The system depleted, recovered, and returned to its highest state in one session. Resilience at the ceiling confirmed.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4123,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  sustainedCoherenceFieldNode: ['qos', 'log', 'journal', 'energy', 'mood'],
+  recoveryMasteryNode:         ['mood', 'selfcare', 'journal', 'energy'],
+  coherenceAfterRecoveryNode:  ['mood', 'selfcare', 'journal', 'log', 'qos', 'energy'],
 }
 
 /**
@@ -4510,6 +4574,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Resilient Operator (2026-09-28 v114) ─────────────────────────────────
+  {
+    archetype: 'Resilient Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['selfcare', 'mood', 'journal', 'qos', 'energy'],
+    patternConditions: ['sustained-coherence-field', 'recovery-mastery', 'coherence-after-recovery'],
+    hourRange: [5, 23],
+    directive: 'The system has been here before and returned. Coherence is not the destination — it is the default. Execute from stability. Every depletion is data. Every recovery confirms capability. You are not recovering. You are demonstrating.',
   },
 ]
 
@@ -6498,6 +6572,52 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sustained-coherence-field event — total-field-coherence confirmed 3+ times
+ * in 14 days. The ceiling is the baseline. Feeds P152 detection.
+ */
+export function recordSustainedCoherenceField(coherenceCount: number, daySpan: number) {
+  recordSignal('qos', 'sustained_coherence_field', {
+    coherenceCount,
+    daySpan,
+    densityPerWeek: Math.round((coherenceCount / daySpan) * 7 * 10) / 10,
+    baselineStatus: 'CEILING_IS_BASELINE',
+    stabilizationLevel: coherenceCount >= 5 ? 'ESTABLISHED' : 'EMERGING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a recovery-mastery event — recovery-intelligence-arc complete in <3h.
+ * The loop executes with mastery velocity. Feeds P153 detection.
+ */
+export function recordRecoveryMastery(windowMs: number, careCount: number) {
+  const windowMin = Math.round(windowMs / (60 * 1000))
+  recordSignal('selfcare', 'recovery_mastery', {
+    windowMin,
+    windowMs,
+    careCount,
+    masteryClass: windowMin < 60 ? 'ELITE' : windowMin < 120 ? 'ADVANCED' : 'MASTERY',
+    arc: 'FAST_RECOVERY_LOOP',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a coherence-after-recovery event — recovery arc confirmed AND total-field-coherence
+ * fires in same session. Resilience at the ceiling demonstrated. Feeds P154 detection.
+ */
+export function recordCoherenceAfterRecovery(recoveryConf: number, coherenceConf: number) {
+  recordSignal('qos', 'coherence_after_recovery', {
+    recoveryConf: Math.round(recoveryConf * 100),
+    coherenceConf: Math.round(coherenceConf * 100),
+    resilienceLevel: 'CEILING_RESILIENCE',
+    arc: 'DEPLETE→RECOVER→RETURN_TO_CEILING',
+    combinedSignal: Math.round((recoveryConf + coherenceConf) / 2 * 100),
     hour: new Date().getHours(),
   })
 }

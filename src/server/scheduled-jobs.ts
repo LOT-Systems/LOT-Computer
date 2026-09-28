@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily sustained coherence check (10:00 UTC every day) — Job 49
+  if (shouldRunDailySustainedCoherenceCheck()) {
+    await executeDailySustainedCoherenceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,93 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Sustained Coherence Check (Job 49 — 10:00 UTC every day) ─────────
+// Reads active users. Looks for total_field_coherence events in the last 14 days.
+// When 3+ confirmed → writes sustained_coherence (P152 feed).
+// The ceiling is no longer a peak — it is the baseline. Sustained coherence detected.
+
+let isDailySustainedCoherenceRunning = false
+let lastDailySustainedCoherenceRun: Date | null = null
+
+function shouldRunDailySustainedCoherenceCheck(): boolean {
+  const now = dayjs()
+  if (isDailySustainedCoherenceRunning) return false
+  if (lastDailySustainedCoherenceRun) {
+    const lastRun = dayjs(lastDailySustainedCoherenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily
+}
+
+async function executeDailySustainedCoherenceCheck(): Promise<JobResult> {
+  const jobName = 'daily-sustained-coherence-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySustainedCoherenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySustainedCoherenceRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SUSTAINED COHERENCE CHECK — 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const windowStart = dayjs().subtract(14, 'day').startOf('day').toDate()
+    const windowEnd   = new Date()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const tfcLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: windowStart, [Op.lte]: windowEnd },
+            event: 'total_field_coherence',
+          },
+          attributes: ['createdAt'],
+        })
+
+        if (tfcLogs.length < 3) continue
+
+        await (Log as any).create({
+          userId,
+          event: 'sustained_coherence',
+          text: `Sustained coherence field: ${tfcLogs.length} total-field-coherence events in the last 14 days. The ceiling is not a peak — it is the operating baseline. The system has stabilized above its own highest confirmed state.`,
+          metadata: {
+            coherenceCount: tfcLogs.length,
+            windowDays: 14,
+            densityPerWeek: Math.round((tfcLogs.length / 14) * 7 * 10) / 10,
+            baselineStatus: 'CEILING_IS_BASELINE',
+            stabilizationLevel: tfcLogs.length >= 5 ? 'ESTABLISHED' : 'EMERGING',
+            hour: 10,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Sustained coherence events written: ${written}`)
+    lastDailySustainedCoherenceRun = new Date()
+    isDailySustainedCoherenceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily sustained coherence check failed:', error.message)
+    isDailySustainedCoherenceRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

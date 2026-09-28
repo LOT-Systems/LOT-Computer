@@ -1213,6 +1213,9 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      'sustained_coherence',
+      'recovery_mastery',
+      'coherence_after_recovery',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

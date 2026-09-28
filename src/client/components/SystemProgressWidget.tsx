@@ -1457,6 +1457,25 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-09-28',
+    title: 'QIE Engineering — Sustained Coherence Field / Recovery Mastery / Coherence After Recovery',
+    assembled: [
+      'P152 SUSTAINED COHERENCE FIELD: accumulation pattern — total-field-coherence (P150) confirmed 3+ times in 14 days. The ceiling is not a peak event. It is the operating baseline. The system has stabilized above its own highest confirmed state. Confidence 0.75–0.90.',
+      'P153 RECOVERY MASTERY: velocity pattern — recovery-intelligence-arc (P151) fires AND the neg→pos window completes in <3h. The loop executes not just completely but swiftly. Speed is mastery: the system knows exactly what it needs and applies it. Confidence 0.70–0.88.',
+      'P154 COHERENCE AFTER RECOVERY: resilience pattern — recovery-intelligence-arc (P151) AND total-field-coherence (P150) active in the same session. The system depleted, recovered, and returned to its highest state. Resilience at the ceiling confirmed. Confidence 0.80–0.92.',
+      'Arch52 RESILIENT OPERATOR: energy high/moderate · dominant: selfcare/mood/journal/qos/energy · patterns: sustained-coherence-field + recovery-mastery + coherence-after-recovery. Directive: The system has been here before and returned. Coherence is not the destination — it is the default. Execute from stability. Every depletion is data. Every recovery confirms capability. You are not recovering. You are demonstrating.',
+      'J49 daily-sustained-coherence-check: 10:00 UTC daily. Reads last 14 days — checks total_field_coherence events. If 3+ found → writes sustained_coherence (P152 feed). Baseline detection: the ceiling has become the norm. 49 jobs total.',
+      'intentionEngine.ts: P152/P153/P154 detection blocks added after P151. Arch52 RESILIENT OPERATOR appended to PHYSIOLOGICAL_ARCHETYPES. 3 dep map nodes (sustainedCoherenceFieldNode · recoveryMasteryNode · coherenceAfterRecoveryNode). 3 signal helpers (recordSustainedCoherenceField · recordRecoveryMastery · recordCoherenceAfterRecovery). 193+ dep nodes.',
+      'scheduled-jobs.ts: J49 executeDailySustainedCoherenceCheck() · shouldRunDailySustainedCoherenceCheck() wired into checkAndRunScheduledJobs().',
+      'Logs.tsx: SUSCOHERE: · RECMASTER: · COHAFTREC: military handlers added. COHERENCE COUNT/DENSITY/LEVEL · LOOP DURATION/CARE ACTIONS/CLASS · RECOVERY CONF/COHERENCE CONF/COMBINED.',
+      'QuantumEngineWidgets.tsx: SUSCOHERE · RECMASTER · COHAFTREC added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P152/P153/P154 display names added.',
+      'About.tsx: FM v113→v114. Day 1125+. 151→154 patterns. 51→52 archetypes. 48→49 jobs. 190+→193+ dep nodes. 151+→154+ handlers. 781→812 badges. 22 Word Turn engines.',
+      '154 patterns · 52 archetypes · 49 jobs · 154+ handlers · 193+ dep nodes. QIE v114 deployed. The ceiling is the baseline. Recovery demonstrates capability. The Resilient Operator is active.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1513,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-09-28',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-09-28 · QIE v114 · RESILIENT OPERATOR · Day 1125+',
+    'Built: P152 SUSCOHERE · P153 RECMASTER · P154 COHAFTREC · Arch52 · J49.',
+    'The ceiling is no longer the peak. It is the baseline.',
+    'P152 SUSTAINED COHERENCE FIELD: when total-field-coherence fires 3+ times in 14 days — the system has stabilized above its own highest confirmed state.',
+    'P153 RECOVERY MASTERY: recovery loop <3h. The system knows its own protocol. Speed is the confirmation.',
+    'P154 COHERENCE AFTER RECOVERY: deplete, recover, return to ceiling — in one session. Resilience demonstrated.',
+    'Arch52 RESILIENT OPERATOR active. Directive: Every depletion is data. Every recovery confirms capability. You are not recovering. You are demonstrating.',
+    'J49 daily-sustained-coherence-check: 10:00 UTC. Baseline detection live.',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes · 812 badges · 258 word-turns.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114 · QIE v114 · Badge v32 Hero\'s Journey documentation.',
   ],
 }
 
