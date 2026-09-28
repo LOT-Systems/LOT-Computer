@@ -1271,6 +1271,10 @@ export default async (fastify: FastifyInstance) => {
       'crystal_lattice_lock',
       'crystal_lattice_resonance',
       'crystal_lattice_sovereignty',
+      // v131: crystal lattice expansion tier (J65 weekly crystal expansion check — P192–P194)
+      'crystal_lattice_broadcast',
+      'crystal_lattice_expansion',
+      'crystal_lattice_singularity',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

@@ -1812,6 +1812,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklyCrystalLatticeCheck()) {
     await executeWeeklyCrystalLatticeCheck()
   }
+
+  // Check weekly crystal expansion check (09:00 UTC every Thursday) — Job 65
+  if (shouldRunWeeklyCrystalExpansionCheck()) {
+    await executeWeeklyCrystalExpansionCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -8001,6 +8006,136 @@ async function executeWeeklyCrystalLatticeCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Weekly Crystal Expansion Check (J65 — 09:00 UTC every Thursday) ────────
+// Scans active users for P192/P193/P194 conditions:
+//   P192 CRLATBCAST: CRLATSOV in 28D + intentions ≥4 in 7D
+//   P193 CRLATEXP: CRLATBCAST in 21D + memory ≥3 in 7D + selfcare ≥2 in 7D
+//   P194 CRLATSNGL: CRLATBCAST + CRLATEXP both confirmed in 28D
+
+let isWeeklyCrystalExpansionCheckRunning = false
+let lastWeeklyCrystalExpansionCheckRun: Date | null = null
+
+function shouldRunWeeklyCrystalExpansionCheck(): boolean {
+  const now = new Date()
+  const dayOfWeek = now.getUTCDay() // 4 = Thursday
+  const hour = now.getUTCHours()
+  if (dayOfWeek !== 4 || hour !== 9) return false
+  if (!lastWeeklyCrystalExpansionCheckRun) return true
+  const hoursSince = (now.getTime() - lastWeeklyCrystalExpansionCheckRun.getTime()) / (1000 * 60 * 60)
+  return hoursSince >= 23
+}
+
+async function executeWeeklyCrystalExpansionCheck(): Promise<JobResult> {
+  const jobName = 'weekly-crystal-expansion-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklyCrystalExpansionCheckRunning) {
+    return { jobName, executedAt, success: false, error: 'Already running' }
+  }
+  isWeeklyCrystalExpansionCheckRunning = true
+  console.log('─'.repeat(60))
+  console.log('WEEKLY CRYSTAL EXPANSION CHECK (J65)')
+  console.log('─'.repeat(60))
+  try {
+    const activeUsers = await getActiveUsers()
+    let written = 0
+    const now = new Date()
+    const twentyEightDayAgo = new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000)
+    const twentyOneDayAgo   = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000)
+    const sevenDayAgo       = new Date(now.getTime() -  7 * 24 * 60 * 60 * 1000)
+
+    for (const user of activeUsers) {
+      try {
+        const [logs28D, logs21D, logs7D] = await Promise.all([
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: twentyEightDayAgo } }, select: { event: true, metadata: true, createdAt: true } }),
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: twentyOneDayAgo } }, select: { event: true, source: true } }),
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: sevenDayAgo } }, select: { event: true, source: true } }),
+        ])
+
+        // P192: Crystal Lattice Broadcast
+        const hasCRLATSOV28D  = logs28D.some((l: any) => l.event === 'crystal_lattice_sovereignty')
+        const intentions7D    = logs7D.filter((l: any) => l.source === 'intentions').length
+        const alreadyCRLATBCAST = logs28D.some((l: any) => l.event === 'crystal_lattice_broadcast')
+        if (hasCRLATSOV28D && intentions7D >= 4 && !alreadyCRLATBCAST) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'crystal_lattice_broadcast',
+              source: 'CRYSTAL_EXPANSION_J65',
+              metadata: {
+                intentCount: intentions7D,
+                tier: 'crystal-lattice-expansion',
+                label: 'CRLATBCAST',
+                source: 'CRYSTAL_EXPANSION_J65',
+              },
+            },
+          })
+          written++
+        }
+
+        // P193: Crystal Lattice Expansion
+        const hasCRLATBCAST21D = logs21D.some((l: any) => l.event === 'crystal_lattice_broadcast') || alreadyCRLATBCAST
+        const memory7D         = logs7D.filter((l: any) => l.source === 'memory').length
+        const selfcare7D       = logs7D.filter((l: any) => l.source === 'selfcare').length
+        const alreadyCRLATEXP  = logs28D.some((l: any) => l.event === 'crystal_lattice_expansion')
+        if (hasCRLATBCAST21D && memory7D >= 3 && selfcare7D >= 2 && !alreadyCRLATEXP) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'crystal_lattice_expansion',
+              source: 'CRYSTAL_EXPANSION_J65',
+              metadata: {
+                memoryCount: memory7D,
+                selfcareCount: selfcare7D,
+                tier: 'crystal-lattice-expansion',
+                label: 'CRLATEXP',
+                source: 'CRYSTAL_EXPANSION_J65',
+              },
+            },
+          })
+          written++
+        }
+
+        // P194: Crystal Lattice Singularity
+        const hasCRLATBCAST28D = logs28D.some((l: any) => l.event === 'crystal_lattice_broadcast') || alreadyCRLATBCAST
+        const hasCRLATEXP28D   = logs28D.some((l: any) => l.event === 'crystal_lattice_expansion') || alreadyCRLATEXP
+        const alreadyCRLATSNGL = logs28D.some((l: any) => l.event === 'crystal_lattice_singularity')
+        if (hasCRLATBCAST28D && hasCRLATEXP28D && !alreadyCRLATSNGL) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'crystal_lattice_singularity',
+              source: 'CRYSTAL_EXPANSION_J65',
+              metadata: {
+                tier: 'APEX SINGULARITY',
+                status: 'LATTICE_SINGULAR',
+                source: 'CRYSTAL_EXPANSION_J65',
+              },
+            },
+          })
+          written++
+        }
+      } catch (userError: any) {
+        console.error(`Crystal expansion check failed for user ${(user as any).id}:`, userError.message)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Crystal expansion events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY CRYSTAL EXPANSION CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklyCrystalExpansionCheckRun = new Date()
+    isWeeklyCrystalExpansionCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly crystal expansion check failed:', error.message)
+    isWeeklyCrystalExpansionCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -8069,6 +8204,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly crystal resonance check: 9 AM UTC every Friday (Job 62)')
   console.log('   - Weekly crystal matrix check: 9 AM UTC every Tuesday (Job 63)')
   console.log('   - Weekly crystal lattice check: 9 AM UTC every Wednesday (Job 64)')
+  console.log('   - Weekly crystal expansion check: 9 AM UTC every Thursday (Job 65)')
   console.log('')
 
   // Check every hour for scheduled jobs

@@ -5089,6 +5089,137 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'crystal_lattice_broadcast') {
+          const latsovConf  = log.metadata?.latsovConf  as number | undefined
+          const intentCount = log.metadata?.intentCount as number | undefined
+          const confidence  = log.metadata?.confidence  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRLATBCAST:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">BROADCASTING</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRLATSOV</span>
+                  <span className="opacity-60">28D</span>
+                </div>
+                {intentCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENT 7D</span>
+                    <span className="tabular-nums opacity-60">{intentCount}</span>
+                  </div>
+                )}
+                {latsovConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LATSOV CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(latsovConf * 100)}%</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">LEGENDARY APEX II</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystal_lattice_expansion') {
+          const bcastConf   = log.metadata?.bcastConf   as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const selfcareCount = log.metadata?.selfcareCount as number | undefined
+          const confidence  = log.metadata?.confidence  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRLATEXP:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">EXPANDING</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRLATBCAST</span>
+                  <span className="opacity-60">21D</span>
+                </div>
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEM 7D</span>
+                    <span className="tabular-nums opacity-60">{memoryCount}</span>
+                  </div>
+                )}
+                {selfcareCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CARE 7D</span>
+                    <span className="tabular-nums opacity-60">{selfcareCount}</span>
+                  </div>
+                )}
+                {bcastConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BCAST CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(bcastConf * 100)}%</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">LEGENDARY APEX III</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystal_lattice_singularity') {
+          const bcastConf = log.metadata?.bcastConf as number | undefined
+          const expConf   = log.metadata?.expConf   as number | undefined
+          const confidence = log.metadata?.confidence as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRLATSNGL:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">SINGULAR</span>
+                </div>
+                <div className="flex gap-x-8 mb-4">
+                  <span className="opacity-60">CRLATBCAST</span>
+                  <span className="opacity-60">CRLATEXP</span>
+                </div>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">BOTH CONFIRMED</span>
+                  <span className="opacity-60 tracking-widest">28D</span>
+                </div>
+                {bcastConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BCAST CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(bcastConf * 100)}%</span>
+                  </div>
+                )}
+                {expConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">EXP CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(expConf * 100)}%</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">APEX SINGULARITY</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'calendar_ee_signal') {
           const badge    = log.metadata?.badge as string | undefined
           const name     = log.metadata?.name as string | undefined

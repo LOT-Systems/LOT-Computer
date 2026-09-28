@@ -151,6 +151,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'crystal-lattice-lock':             'CRLATLCK',
   'crystal-lattice-resonance':        'CRLATRES',
   'crystal-lattice-sovereignty':      'CRLATSOV',
+  'crystal-lattice-broadcast':        'CRLATBCAST',
+  'crystal-lattice-expansion':        'CRLATEXP',
+  'crystal-lattice-singularity':      'CRLATSNGL',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

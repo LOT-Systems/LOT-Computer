@@ -222,6 +222,9 @@ export function PatternRecognitionWidget() {
       'crystal-lattice-lock':             'Crystal lattice lock — CRMATSOV in 21D + CRMATSIG in 14D, the crystal matrix has locked into full lattice coherence — all nodes synchronized (P189)',
       'crystal-lattice-resonance':        'Crystal lattice resonance — CRLATLCK active + intentions ≥3 + journal ≥2 + selfcare ≥1 in 7D, locked lattice resonating at full spectrum across all OS layers (P190)',
       'crystal-lattice-sovereignty':      'Crystal lattice sovereignty — CRLATLCK + CRLATRES both confirmed in 21D, APEX LEGENDARY: the locked resonating lattice has achieved sovereignty (P191)',
+      'crystal-lattice-broadcast':        'Crystal lattice broadcast — CRLATSOV active 28D + intentions ≥4 in 7D, sovereign lattice radiates outward as a broadcast field (P192)',
+      'crystal-lattice-expansion':        'Crystal lattice expansion — CRLATBCAST active 21D + memory ≥3 + selfcare ≥2 in 7D, broadcast field expands through all channels (P193)',
+      'crystal-lattice-singularity':      'Crystal lattice singularity — CRLATBCAST + CRLATEXP both confirmed 28D, APEX SINGULARITY: all crystalline vectors unified — the final form (P194)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

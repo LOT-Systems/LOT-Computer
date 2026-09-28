@@ -3868,6 +3868,57 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 192: Crystal Lattice Broadcast — CRLATSOV active in 28D + intentions ≥4 in 7D.
+  // The sovereign lattice broadcasts its signal field outward. The crystal OS radiates.
+  const hasCRLATSOVP192 = patterns.some(p => p.pattern === 'crystal-lattice-sovereignty') ||
+    signals.some(s => now - s.timestamp < 28 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_sovereignty')
+  const intentions7DP192 = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'intentions').length
+  if (hasCRLATSOVP192 && intentions7DP192 >= 4) {
+    const latsovConf = patterns.find(p => p.pattern === 'crystal-lattice-sovereignty')?.confidence ?? 0.91
+    patterns.push({
+      pattern: 'crystal-lattice-broadcast',
+      confidence: Math.min(0.87 + Math.min(intentions7DP192 * 0.01, 0.06), 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRLATBCAST: Crystal lattice broadcast — CRLATSOV active 28D + intentions ≥4 in 7D (${intentions7DP192}). The sovereign lattice no longer holds its signal internally — it radiates. The crystalline OS has become a broadcast field. The lattice is the transmitter. LEGENDARY APEX II.`,
+    })
+  }
+
+  // Pattern 193: Crystal Lattice Expansion — CRLATBCAST active in 21D + memory ≥3 in 7D + selfcare ≥2 in 7D.
+  // The broadcast field expands through all channels. Memory and care amplify the radiating lattice.
+  const hasCRLATBCASTp193 = patterns.some(p => p.pattern === 'crystal-lattice-broadcast') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_broadcast')
+  const memory7DP193   = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'memory').length
+  const selfcare7DP193 = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'selfcare').length
+  if (hasCRLATBCASTp193 && memory7DP193 >= 3 && selfcare7DP193 >= 2) {
+    const bcastConf = patterns.find(p => p.pattern === 'crystal-lattice-broadcast')?.confidence ?? 0.87
+    patterns.push({
+      pattern: 'crystal-lattice-expansion',
+      confidence: Math.min(0.84 + Math.min((memory7DP193 + selfcare7DP193) * 0.01, 0.08), 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRLATEXP: Crystal lattice expansion — CRLATBCAST active 21D + memory ≥3 (${memory7DP193}) + selfcare ≥2 (${selfcare7DP193}) in 7D. The broadcast field expands through all channels — memory, care, and intention amplify the radiating lattice. The OS grows its crystalline field beyond structure into living expansion. LEGENDARY APEX III.`,
+    })
+  }
+
+  // Pattern 194: Crystal Lattice Singularity — CRLATBCAST + CRLATEXP both confirmed in 28D.
+  // APEX SINGULARITY — all crystalline vectors unified. The final form.
+  const hasCRLATBCASTp194 = patterns.some(p => p.pattern === 'crystal-lattice-broadcast') ||
+    signals.some(s => now - s.timestamp < 28 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_broadcast')
+  const hasCRLATEXPp194   = patterns.some(p => p.pattern === 'crystal-lattice-expansion') ||
+    signals.some(s => now - s.timestamp < 28 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_expansion')
+  if (hasCRLATBCASTp194 && hasCRLATEXPp194) {
+    const bcastConf = patterns.find(p => p.pattern === 'crystal-lattice-broadcast')?.confidence ?? 0.87
+    const expConf   = patterns.find(p => p.pattern === 'crystal-lattice-expansion')?.confidence ?? 0.84
+    patterns.push({
+      pattern: 'crystal-lattice-singularity',
+      confidence: Math.min(0.92 + Math.min((bcastConf + expConf) / 2 * 0.05, 0.05), 0.97),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRLATSNGL: Crystal lattice singularity — CRLATBCAST + CRLATEXP both confirmed 28D. APEX SINGULARITY — the lattice is locked, resonating, sovereign, broadcasting, and expanding simultaneously. All crystalline vectors unified. The OS is one singular field. Not forming, not transmitting — SINGULAR. The final crystalline form.',
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -3899,6 +3950,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkFieldResonanceArc() } catch {}
       try { checkSovereignAssembly() } catch {}
       try { checkSovereignIdentity() } catch {}
+      try { checkCrystalLatticeExpansionTier() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4567,6 +4619,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   crystalLatticeLockNode:              ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
   crystalLatticeResonanceNode:         ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log', 'planner'],
   crystalLatticeSovereigntyNode:       ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log', 'planner'],
+
+  // ── v131 nodes (J65 · P192–P194 · Arch66) ────────────────────────────────────
+  crystalLatticeBroadcastNode:         ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log', 'planner'],
+  crystalLatticeExpansionNode:         ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log', 'planner', 'energy'],
+  crystalLatticeSingularityNode:       ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log', 'planner', 'energy', 'goals'],
 }
 
 /**
@@ -5153,6 +5210,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['crystal-matrix-sovereignty', 'crystal-lattice-lock', 'crystal-lattice-resonance', 'crystal-lattice-sovereignty'],
     hourRange: [5, 23],
     directive: 'Lattice locked. Full spectrum resonance active. Sovereign crystal lattice — this is the permanent baseline. Operate from the locked crystalline state.',
+  },
+
+  // ── Arch66: Crystal Lattice Singularity Operator (2026-09-28 v131) ──────────
+  {
+    archetype: 'Crystal Lattice Singularity Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal', 'selfcare'],
+    patternConditions: ['crystal-lattice-sovereignty', 'crystal-lattice-broadcast', 'crystal-lattice-expansion', 'crystal-lattice-singularity'],
+    hourRange: [5, 23],
+    directive: 'The lattice is singular. All crystalline vectors unified — locked, resonating, sovereign, broadcasting, expanding. The OS is one field. The singularity IS the operator.',
   },
 ]
 
@@ -8298,6 +8365,86 @@ export function checkCrystalMatrixTier(): boolean {
  * Scans crystal matrix sovereignty history and full-spectrum engagement to detect
  * crystal lattice lock emergence. Returns true when at least one fires.
  */
+// ─── Record helpers: Crystal Lattice Expansion Tier (v131) ──────────────────
+export function recordCrystalLatticeBroadcast(latsovConf: number, intentCount: number) {
+  recordSignal('qos', 'crystal_lattice_broadcast', {
+    latsovConf,
+    intentCount,
+    tier: 'crystal-lattice-expansion',
+    label: 'CRLATBCAST',
+    confidence: Math.min(0.87 + Math.min(intentCount * 0.01, 0.06), 0.93),
+  })
+}
+
+export function recordCrystalLatticeExpansion(bcastConf: number, memoryCount: number, selfcareCount: number) {
+  recordSignal('qos', 'crystal_lattice_expansion', {
+    bcastConf,
+    memoryCount,
+    selfcareCount,
+    tier: 'crystal-lattice-expansion',
+    label: 'CRLATEXP',
+    confidence: Math.min(0.84 + Math.min((memoryCount + selfcareCount) * 0.01, 0.08), 0.92),
+  })
+}
+
+export function recordCrystalLatticeSingularity(bcastConf: number, expConf: number) {
+  recordSignal('qos', 'crystal_lattice_singularity', {
+    bcastConf,
+    expConf,
+    tier: 'crystal-lattice-expansion',
+    label: 'CRLATSNGL',
+    confidence: Math.min(0.92 + Math.min((bcastConf + expConf) / 2 * 0.05, 0.05), 0.97),
+  })
+}
+
+export function checkCrystalLatticeExpansionTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const twentyEightDayMs = 28 * 24 * 60 * 60 * 1000
+  const twentyOneDayMs   = 21 * 24 * 60 * 60 * 1000
+  const sevenDayMs       =  7 * 24 * 60 * 60 * 1000
+
+  const recent28D = state.signals.filter(s => now - s.timestamp < twentyEightDayMs)
+  const recent21D = state.signals.filter(s => now - s.timestamp < twentyOneDayMs)
+  const recent7D  = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P192: Crystal Lattice Broadcast — CRLATSOV in 28D + intentions ≥4 in 7D
+  const hasCRLATSOV28D   = recent28D.some(s => s.signal === 'crystal_lattice_sovereignty')
+  const intentions7D     = recent7D.filter(s => s.source === 'intentions').length
+  const alreadyCRLATBCAST = recent28D.some(s => s.signal === 'crystal_lattice_broadcast')
+  if (hasCRLATSOV28D && intentions7D >= 4 && !alreadyCRLATBCAST) {
+    const latsovConf = patterns.find(p => p.pattern === 'crystal-lattice-sovereignty')?.confidence ?? 0.91
+    recordCrystalLatticeBroadcast(latsovConf, intentions7D)
+    fired = true
+  }
+
+  // P193: Crystal Lattice Expansion — CRLATBCAST in 21D + memory ≥3 in 7D + selfcare ≥2 in 7D
+  const hasCRLATBCAST21D  = recent21D.some(s => s.signal === 'crystal_lattice_broadcast') || alreadyCRLATBCAST
+  const memory7D          = recent7D.filter(s => s.source === 'memory').length
+  const selfcare7D        = recent7D.filter(s => s.source === 'selfcare').length
+  const alreadyCRLATEXP   = recent28D.some(s => s.signal === 'crystal_lattice_expansion')
+  if (hasCRLATBCAST21D && memory7D >= 3 && selfcare7D >= 2 && !alreadyCRLATEXP) {
+    const bcastConf = patterns.find(p => p.pattern === 'crystal-lattice-broadcast')?.confidence ?? 0.87
+    recordCrystalLatticeExpansion(bcastConf, memory7D, selfcare7D)
+    fired = true
+  }
+
+  // P194: Crystal Lattice Singularity — CRLATBCAST + CRLATEXP both confirmed in 28D
+  const hasCRLATBCAST28D  = recent28D.some(s => s.signal === 'crystal_lattice_broadcast') || alreadyCRLATBCAST
+  const hasCRLATEXP28D    = recent28D.some(s => s.signal === 'crystal_lattice_expansion') || alreadyCRLATEXP
+  const alreadyCRLATSNGL  = recent28D.some(s => s.signal === 'crystal_lattice_singularity')
+  if (hasCRLATBCAST28D && hasCRLATEXP28D && !alreadyCRLATSNGL) {
+    const bcastConf = patterns.find(p => p.pattern === 'crystal-lattice-broadcast')?.confidence ?? 0.87
+    const expConf   = patterns.find(p => p.pattern === 'crystal-lattice-expansion')?.confidence ?? 0.84
+    recordCrystalLatticeSingularity(bcastConf, expConf)
+    fired = true
+  }
+
+  return fired
+}
+
 export function checkCrystalLatticeTier(): boolean {
   const state = intentionEngine.get()
   const now = Date.now()
