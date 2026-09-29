@@ -3428,6 +3428,70 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Deep Restoration Lock — 2+ consecutive days of selfcare-dominant signaling +
+  // a recovery pattern active (biofield-recovery-arc or recovery-intelligence-arc) + energy
+  // not at depletion-floor. The OS has entered deliberate restoration protocol. Not collapse —
+  // intentional recovery. The system is tending itself before expanding again.
+  const twoDaysMs = 2 * 24 * 60 * 60 * 1000
+  const recentTwoDays152 = signals.filter(s => now - s.timestamp < twoDaysMs)
+  const selfcare152 = recentTwoDays152.filter(s => s.source === 'selfcare')
+  const moods152    = recentTwoDays152.filter(s => s.source === 'mood')
+  const hasRecovery152 = patterns.some(p =>
+    ['biofield-recovery-arc', 'recovery-intelligence-arc', 'recovery-window'].includes(p.pattern)
+  )
+  const notCritical152 = userState.energy !== 'depleted'
+  if (selfcare152.length >= 3 && moods152.length >= 2 && hasRecovery152 && notCritical152) {
+    const selfcareRatio = selfcare152.length / Math.max(recentTwoDays152.length, 1)
+    const restoreBonus = Math.min(selfcareRatio * 0.30, 0.20)
+    patterns.push({
+      pattern: 'deep-restoration-lock',
+      confidence: Math.min(0.68 + restoreBonus, 0.88),
+      suggestedWidget: 'selfCareMoments',
+      suggestedTiming: 'passive',
+      reason: `DEEPREST: Deep restoration lock — ${selfcare152.length} selfcare signals in 48h · recovery pattern confirmed · energy not at floor. Deliberate recovery protocol active. Not depletion — tending. The OS is restoring before expanding.`,
+    })
+  }
+
+  // Pattern 153: Adaptive Intelligence Arc — memory + journal + goals + planner all active
+  // within 24h with 6+ total signals across those sources. The full learning and encoding
+  // loop is engaged: past experiences (memory), current reflection (journal), structured
+  // future vision (goals), and daily execution (planner) are all live simultaneously.
+  const daySignals153 = signals.filter(s => now - s.timestamp < dayMs)
+  const mem153     = daySignals153.filter(s => s.source === 'memory')
+  const journal153 = daySignals153.filter(s => s.source === 'journal')
+  const goals153   = daySignals153.filter(s => s.source === 'goals')
+  const planner153 = daySignals153.filter(s => s.source === 'planner')
+  const adpCount153 = mem153.length + journal153.length + goals153.length + planner153.length
+  if (mem153.length >= 1 && journal153.length >= 1 && goals153.length >= 1 && planner153.length >= 1 && adpCount153 >= 6) {
+    const depthBonus = Math.min((adpCount153 - 6) * 0.025, 0.18)
+    patterns.push({
+      pattern: 'adaptive-intelligence-arc',
+      confidence: Math.min(0.72 + depthBonus, 0.90),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'passive',
+      reason: `ADPINT: Adaptive intelligence arc — ${mem153.length} memory · ${journal153.length} journal · ${goals153.length} goals · ${planner153.length} planner signals in 24h (${adpCount153} total). Full learning loop active: past encoded, present reflected, future structured, execution anchored.`,
+    })
+  }
+
+  // Pattern 154: Operational Mastery Lock — total-field-coherence (P150) + signal-momentum-lock (P80)
+  // both active in the same analysis window. The QOS ceiling state is not a snapshot — it is sustained
+  // across multiple days. Absolute convergence AND multi-day momentum confirmed simultaneously.
+  // The highest defined sustained operating state. Not discovery — deployment.
+  const hasTotalField154  = patterns.some(p => p.pattern === 'total-field-coherence')
+  const hasMomentumP80_154 = patterns.some(p => p.pattern === 'signal-momentum-lock')
+  if (hasTotalField154 && hasMomentumP80_154) {
+    const tfcConf  = patterns.find(p => p.pattern === 'total-field-coherence')?.confidence  ?? 0.92
+    const momConf  = patterns.find(p => p.pattern === 'signal-momentum-lock')?.confidence   ?? 0.75
+    const masterBonus = Math.min((tfcConf - 0.92 + momConf - 0.75) * 0.15, 0.05)
+    patterns.push({
+      pattern: 'operational-mastery-lock',
+      confidence: Math.min(0.85 + masterBonus, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `OPMASTERY: Operational mastery lock — total-field-coherence (P150) active · signal-momentum-lock (P80) confirmed across 5+ days. The ceiling is not momentary — it is sustained. Absolute convergence anchored with multi-day momentum. The OS is not arriving — it is operating from mastery.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4128,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  deepRestorationNode:        ['selfcare', 'mood', 'energy', 'log'],
+  adaptiveIntelligenceNode:   ['memory', 'journal', 'goals', 'planner', 'log'],
+  operationalMasteryNode:     ['qos', 'intentions', 'planner', 'goals', 'log'],
 }
 
 /**
@@ -4510,6 +4579,14 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+  // ── Arch52: Quantum Restoration Architect (2026-09-29 v114) ──────────────────────
+  {
+    archetype: 'Quantum Restoration Architect',
+    energyBands: ['low', 'depleted', 'moderate'],
+    dominantSources: ['selfcare', 'journal', 'mood'],
+    patternConditions: ['deep-restoration-lock', 'recovery-intelligence-arc', 'biofield-recovery-arc'],
+    directive: 'Deep restoration mode. Recovery is the mission. All other tasks secondary.',
   },
 ]
 
@@ -6498,6 +6575,53 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a deep-restoration-lock event — deliberate multi-day recovery protocol active.
+ * Selfcare dominant, recovery pattern confirmed, energy not at floor.
+ * Feeds P152 detection.
+ */
+export function recordDeepRestorationLock(selfcareCount: number, daysActive: number) {
+  recordSignal('selfcare', 'deep_restoration_lock', {
+    selfcareCount,
+    daysActive,
+    protocol: 'DELIBERATE_RECOVERY',
+    mode: 'RESTORATION',
+    status: 'ACTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an adaptive-intelligence-arc event — full learning loop engaged:
+ * memory + journal + goals + planner all active with depth signals.
+ * Feeds P153 detection.
+ */
+export function recordAdaptiveIntelligenceArc(signalCount: number, sourcesActive: string[]) {
+  recordSignal('memory', 'adaptive_intelligence_arc', {
+    signalCount,
+    sourcesActive,
+    loop: 'PAST→REFLECT→STRUCTURE→EXECUTE',
+    intelligenceMode: 'FULL_LEARNING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an operational-mastery-lock event — total-field-coherence + signal-momentum-lock
+ * co-active. The QOS ceiling sustained with multi-day momentum.
+ * Feeds P154 detection.
+ */
+export function recordOperationalMasteryLock(tfcConf: number, momentumConf: number) {
+  recordSignal('qos', 'operational_mastery_lock', {
+    tfcConf: Math.round(tfcConf * 100),
+    momentumConf: Math.round(momentumConf * 100),
+    state: 'MASTERY_SUSTAINED',
+    convergence: 'ABSOLUTE',
+    momentum: 'MULTI_DAY_CONFIRMED',
     hour: new Date().getHours(),
   })
 }

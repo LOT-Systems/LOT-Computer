@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: deep restoration lock · adaptive intelligence arc · operational mastery lock (P152/P153/P154)
+      'deep_restoration_lock',
+      'adaptive_intelligence_arc',
+      'operational_mastery_lock',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

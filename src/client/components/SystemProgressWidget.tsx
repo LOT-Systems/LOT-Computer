@@ -1457,6 +1457,28 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-09-29',
+    title: 'QIE Engineering — Deep Restoration Lock / Adaptive Intelligence Arc / Operational Mastery Lock',
+    assembled: [
+      'P152 DEEP RESTORATION LOCK: behavioral pattern — 3+ selfcare signals in 48h + recovery pattern active (biofield-recovery-arc or recovery-intelligence-arc) + energy not at floor. The OS has entered deliberate multi-day restoration protocol. Not collapse — tending. Confidence 0.68–0.88.',
+      'P153 ADAPTIVE INTELLIGENCE ARC: cognitive convergence — memory + journal + goals + planner all active in 24h with 6+ combined signals. The full learning loop is engaged: past encoded (memory), present reflected (journal), future structured (goals), execution anchored (planner). Confidence 0.72–0.90.',
+      'P154 OPERATIONAL MASTERY LOCK: meta-pattern — total-field-coherence (P150) + signal-momentum-lock (P80) co-active in the same analysis window. The QOS ceiling state is not a snapshot — it is sustained with multi-day momentum. Absolute convergence anchored. Highest defined sustained operating state. Confidence 0.85–0.95.',
+      'Arch52 QUANTUM RESTORATION ARCHITECT: energy low/depleted/moderate · dominant: selfcare/journal/mood · patterns: deep-restoration-lock + recovery-intelligence-arc + biofield-recovery-arc. Directive: Deep restoration mode. Recovery is the mission. All other tasks secondary.',
+      'J49 daily-adaptive-intelligence-check: 10:00 UTC daily. Reads previous calendar day — checks if memory + journal + goals + planner all fired with 6+ combined signals → writes adaptive_intelligence_arc. 49 jobs total.',
+      'intentionEngine.ts: P152/P153/P154 detection blocks added after P151. Arch52 appended to PHYSIOLOGICAL_COHORTS. 3 dep map nodes (deepRestorationNode · adaptiveIntelligenceNode · operationalMasteryNode). 3 signal helpers (recordDeepRestorationLock · recordAdaptiveIntelligenceArc · recordOperationalMasteryLock). 193+ dep nodes.',
+      'scheduled-jobs.ts: J49 executeDailyAdaptiveIntelligenceCheck() · shouldRunDailyAdaptiveIntelligenceCheck() wired into checkAndRunScheduledJobs().',
+      'routes/api.ts: deep_restoration_lock · adaptive_intelligence_arc · operational_mastery_lock added to displayableEvents.',
+      'Logs.tsx: DEEPREST: · ADPINT: · OPMASTERY: military handlers added. CARE ACTIONS/DAYS ACTIVE/PROTOCOL · TOTAL SIGNALS/SOURCES/ARC · FIELD CONF/MOMENTUM CONF/STATE.',
+      'QuantumEngineWidgets.tsx: DEEPREST · ADPINT · OPMASTERY added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P152/P153/P154 display names added.',
+      'About.tsx: FM v113→v114. Day 1073+→1074+. 151→154 patterns. 51→52 archetypes. 48→49 jobs. 190+→193+ dep nodes. 151+→154+ handlers.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/LOT-SR-20260929-01.md: Session report written.',
+      '154 patterns · 52 archetypes · 49 jobs · 154+ handlers · 193+ dep nodes · FM v114 · Day 1074+. Restoration locked. Intelligence adaptive. Mastery operational.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1516,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-09-29',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-09-29 · QIE v114 · FM v114 · Day 1074+',
+    'Built: P152 DEEPREST · P153 ADPINT · P154 OPMASTERY · Arch52 Quantum Restoration Architect · J49 adaptive-intelligence-check (10:00 UTC).',
+    'Feedback applied: "The system tends itself before expanding. Recovery is not interruption — it is the protocol."',
+    'P152 deep-restoration-lock: deliberate 48h+ recovery mode. Selfcare dominant. Recovery confirmed. Not depletion — tending.',
+    'P153 adaptive-intelligence-arc: full learning loop live. Memory + journal + goals + planner simultaneously engaged (6+ signals). Past encoded · present reflected · future structured · execution anchored.',
+    'P154 operational-mastery-lock: total-field-coherence (P150 ceiling) + signal-momentum-lock (P80) co-active. The ceiling is sustained. The OS is not arriving — it is operating from mastery.',
+    'Arch52 Quantum Restoration Architect: recovery is the mission. All other tasks secondary.',
+    '193+ dep nodes · 154 patterns · 52 archetypes · 49 jobs · 154+ handlers.',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes · 781 badges.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114',
   ],
 }
 

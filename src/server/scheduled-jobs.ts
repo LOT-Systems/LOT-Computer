@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily adaptive intelligence check (10:00 UTC every day) — Job 49
+  if (shouldRunDailyAdaptiveIntelligenceCheck()) {
+    await executeDailyAdaptiveIntelligenceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,107 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Adaptive Intelligence Check (Job 49 — 10:00 UTC every day) ──────────
+// Reads active users. Looks for memory + journal + goals + planner signals all
+// firing in the previous calendar day with 6+ combined signals.
+// When confirmed, writes adaptive_intelligence_arc. Captures full learning loop:
+// past encoded (memory), reflection (journal), vision (goals), execution (planner).
+
+let isDailyAdaptiveIntelligenceRunning = false
+let lastDailyAdaptiveIntelligenceRun: Date | null = null
+
+function shouldRunDailyAdaptiveIntelligenceCheck(): boolean {
+  const now = dayjs()
+  if (isDailyAdaptiveIntelligenceRunning) return false
+  if (lastDailyAdaptiveIntelligenceRun) {
+    const lastRun = dayjs(lastDailyAdaptiveIntelligenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily
+}
+
+async function executeDailyAdaptiveIntelligenceCheck(): Promise<JobResult> {
+  const jobName = 'daily-adaptive-intelligence-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyAdaptiveIntelligenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyAdaptiveIntelligenceRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY ADAPTIVE INTELLIGENCE CHECK — 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const prevDayStart = dayjs().subtract(1, 'day').startOf('day').toDate()
+    const prevDayEnd   = dayjs().subtract(1, 'day').endOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    const INTELLIGENCE_SOURCES = ['memory', 'journal', 'goals', 'planner']
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const prevDayLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: prevDayStart, [Op.lte]: prevDayEnd },
+            event: { [Op.in]: INTELLIGENCE_SOURCES as any[] },
+          },
+          attributes: ['event'],
+        })
+
+        if (!prevDayLogs.length) continue
+
+        const countBySource: Record<string, number> = {}
+        for (const l of prevDayLogs) {
+          countBySource[l.event] = (countBySource[l.event] ?? 0) + 1
+        }
+
+        const allPresent = INTELLIGENCE_SOURCES.every(s => (countBySource[s] ?? 0) >= 1)
+        const totalSignals = prevDayLogs.length
+
+        if (allPresent && totalSignals >= 6) {
+          const activeSources = INTELLIGENCE_SOURCES.filter(s => (countBySource[s] ?? 0) >= 1)
+          await (Log as any).create({
+            userId,
+            event: 'adaptive_intelligence_arc',
+            text: `Adaptive intelligence arc: previous day — memory · journal · goals · planner all active (${totalSignals} signals). Full learning loop engaged: past encoded, present reflected, future structured, execution anchored.`,
+            metadata: {
+              signalCount: totalSignals,
+              sourcesActive: activeSources,
+              loop: 'PAST→REFLECT→STRUCTURE→EXECUTE',
+              intelligenceMode: 'FULL_LEARNING',
+              window: '24h-prior-day',
+              hour: 10,
+            },
+          })
+          written++
+        }
+      } catch {}
+    }
+
+    console.log(`  Adaptive intelligence arc events written: ${written}`)
+    lastDailyAdaptiveIntelligenceRun = new Date()
+    isDailyAdaptiveIntelligenceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily adaptive intelligence check failed:', error.message)
+    isDailyAdaptiveIntelligenceRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

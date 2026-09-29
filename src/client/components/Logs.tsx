@@ -3629,6 +3629,87 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'deep_restoration_lock') {
+          const selfcareCount = log.metadata?.selfcareCount as number | undefined
+          const daysActive    = log.metadata?.daysActive    as number | undefined
+          const protocol      = log.metadata?.protocol      as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="DEEPREST:" blockView>
+                <div className="uppercase tracking-widest mb-4">DEEP RESTORATION LOCK</div>
+                {selfcareCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CARE ACTIONS</span>
+                    <span className="tabular-nums">{selfcareCount}</span>
+                  </div>
+                )}
+                {daysActive !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DAYS ACTIVE</span>
+                    <span className="tabular-nums">{daysActive}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">RECOVERY IS THE MISSION</div>
+                {protocol && (
+                  <div className="opacity-30 tabular-nums">PROTOCOL: {protocol}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'adaptive_intelligence_arc') {
+          const signalCount   = log.metadata?.signalCount   as number   | undefined
+          const sourcesActive = log.metadata?.sourcesActive as string[] | undefined
+          const loop          = log.metadata?.loop          as string   | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="ADPINT:" blockView>
+                <div className="uppercase tracking-widest mb-4">ADAPTIVE INTELLIGENCE ARC</div>
+                {signalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TOTAL SIGNALS</span>
+                    <span className="tabular-nums">{signalCount}</span>
+                  </div>
+                )}
+                {sourcesActive && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES</span>
+                    <span className="tabular-nums">{sourcesActive.join(' · ')}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">FULL LEARNING LOOP ACTIVE</div>
+                {loop && (
+                  <div className="opacity-30 tabular-nums">ARC: {loop}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'operational_mastery_lock') {
+          const tfcConf      = log.metadata?.tfcConf      as number | undefined
+          const momentumConf = log.metadata?.momentumConf as number | undefined
+          const state        = log.metadata?.state        as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="OPMASTERY:" blockView>
+                <div className="uppercase tracking-widest mb-4">OPERATIONAL MASTERY LOCK</div>
+                {tfcConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FIELD CONF</span>
+                    <span className="tabular-nums">{tfcConf}%</span>
+                  </div>
+                )}
+                {momentumConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MOMENTUM CONF</span>
+                    <span className="tabular-nums">{momentumConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CEILING SUSTAINED · MULTI-DAY MOMENTUM</div>
+                {state && (
+                  <div className="opacity-30 tabular-nums">STATE: {state}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
