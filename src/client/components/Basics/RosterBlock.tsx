@@ -20,7 +20,7 @@ type FieldDef = {
   key: keyof RosterIntakePayload
   label: string
   type: 'text' | 'select'
-  options?: string[]
+  options?: readonly string[]
   placeholder?: string
 }
 
