@@ -238,13 +238,13 @@ operator (real tier is earned via `visualRefinement`, never forced).
 
 **Month 9 — "Habit"** · dense · Seal 09
 - **VOLUME III.** Three quarters compressed; the operator can now scroll a full 9 months in about 400 words.
-- AI stage: *Guide → Steward.* First unprompted, well-timed prompt ("You usually log after training. Log now?").
+- AI stage: *Guide → Steward.* Surfaces a well-timed suggestion **inside the app when the operator opens it** ("You usually log after training. Log now?"). No push notifications (see §11).
 - Affirmation: *"Nine months. The self-care practice is a habit now."*
 
 ### PHASE IV — STEWARD → LOT® AI (M10–M12) · dense → instrument
 
 **Month 10 — "Anticipation"** · dense · Seal 10
-- AI stage: *Steward.* Anticipates depletion from signal decay (fewer check-ins, shorter notes) and offers recovery *before* the operator reports it (RESILIENCE-CASCADE precedent).
+- AI stage: *Steward.* Anticipates depletion from signal decay (fewer check-ins, shorter notes) and offers recovery in-app *before* the operator reports it (RESILIENCE-CASCADE precedent).
 - Affirmation: *"Ten months. Almost there."*
 
 **Month 11 — "Draft Portrait"** · dense → instrument · Seal 11
@@ -254,7 +254,7 @@ operator (real tier is earned via `visualRefinement`, never forced).
 **Month 12 — "LOT® AI"** · **instrument** · Seal 12 `[■■■■■■■■■■■■]` + `milestone_365` Citadel
 - **Portrait delivered**: 130–160 words in the operator's own vocabulary plus a **≤12-word line** that can be pinned to `/u/username` (`memoryStory`).
 - UI: instrument tier ("Instrument grade. The interface is yours."). Widget: **Year One** — full-width, all 12 seals, all 4 volumes, the Portrait, and the year's real totals.
-- AI stage: **LOT® AI.** Speaks in the operator's vocabulary, holds their routines, writes their weekly line unprompted. From here the year does not end; Month 13+ = **Year Two** with the Portrait as the seed of the next cycle.
+- AI stage: **LOT® AI.** Speaks in the operator's vocabulary, holds their routines, writes their weekly line on open. From here the year does not end; Month 13+ = **Year Two** with the Portrait as the seed of the next cycle.
 - Affirmation (existing): *"One year with LOT. The portrait is complete — and still evolving."*
 
 ---
@@ -367,6 +367,29 @@ Vol I *Observe* · Vol II *Pattern* · Vol III *Guide* · Vol IV *Steward*.
 6. **AI cost** — one chapter/user/month is cheap; volumes/portrait are 5 calls/user/year. No per-day generation added.
 7. **Privacy** — chapters are user data in the user's own DB (README: "Your Story, Your Data"). Export and delete must include `memory_chapter/volume/portrait`.
 8. **Branding wording** — "LOT® AI" first appears as the Month-12 stage name here. Confirm this is the user-facing name of the whole ladder or only of the final stage.
+
+## 11 // ADDENDUM — CROSS-CHECK AGAINST PRODUCT BRIEF (docs sweep, same day)
+
+Source: `docs/corporate/LOT-AI-PRODUCT-BRIEF.md`.
+
+1. **Principle conflict, resolved in this doc.** The product brief states
+   "No unprompted notifications. The system waits. It does not push." (l.120) and
+   "One question at a time" (l.122). Steward-stage behaviour (M9-M12) is therefore
+   **in-app on open only**; never push, email or badge-count nudges. Chapters and
+   the Month widget appear when the operator opens LOT, not before. The Month
+   widget must not add a second question next to the daily Memory question.
+2. **Loop alignment.** Brief loop: LOG > OBSERVE > COMPRESS > ASK > COMPRESS AGAIN.
+   CHAPTER/VOLUME/PORTRAIT are the COMPRESS AGAIN levels for the monthly horizon.
+3. **Pricing is inconsistent across docs** ($99/month in the product brief and
+   feature inventory; $50/month in older `LOT_USA_IPO.md`). This brief assumes
+   nothing about price; reconcile before any Welcome-to-Usership copy names one.
+4. **Docs gap:** `MonthlyPulseWidget` is absent from `docs/technical/WIDGETS.md`.
+   Add it when Slice 5 lands.
+5. **Style:** copy follows `docs/technical/LOT-STYLE-GUIDE.md` (no emojis,
+   regular weight, "Done." not "Done ✓"). Seal row uses glyphs, not colour.
+6. **Unverified:** the sweep reported the current story is cached in
+   `user.metadata.lastMemoryStory`; a grep of `memory.ts` did not confirm it.
+   Check before Slice 2 decides where chapters are stored.
 
 ---
 
