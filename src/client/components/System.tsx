@@ -205,7 +205,21 @@ export const System = React.memo(function SystemInner() {
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
   // rokuyo), not a personal natal chart.
   const astrology = React.useMemo(() => {
-    const now = new Date()
+    // Personalization: read the wall clock in the user's saved timeZone (the
+    // same zone the Logs snapshot uses) so dashboard and journal agree even
+    // when the device clock is set elsewhere. Falls back to device time.
+    let now = new Date()
+    if (me?.timeZone) {
+      try {
+        const p = Object.fromEntries(
+          new Intl.DateTimeFormat('en-US', {
+            timeZone: me.timeZone, hourCycle: 'h23', year: 'numeric', month: 'numeric',
+            day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric',
+          }).formatToParts(now).map(x => [x.type, x.value])
+        )
+        now = new Date(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second)
+      } catch { /* invalid zone: keep device time */ }
+    }
     const hourlyZodiac = getHourlyZodiac(now)
     const westernZodiac = getWesternZodiac(now)
     const moonPhase = getMoonPhase(now)
@@ -219,7 +233,7 @@ export const System = React.memo(function SystemInner() {
       rokuyo,
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+  }, [astrologyTick, me?.timeZone])
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
