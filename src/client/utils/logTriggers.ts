@@ -115,3 +115,29 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+/**
+ * /email to NAME — compose a LOT Email from a log entry.
+ *
+ * Unlike the toggle triggers above, this is parsed from the current
+ * text on every render (not delta-based) because the recipient and
+ * body are part of the entry. The rest of the log text is the body.
+ * A two-word recipient is written with an underscore: "Hitomi_Tanaka".
+ */
+export interface EmailCommand {
+  to: string
+  body: string
+}
+
+const EMAIL_COMMAND_RE = /(^|\s)\/email\s+to\s+([\p{L}\p{M}'’_-]+)[.,;:!?]?/iu
+
+export function parseEmailCommand(text: string): EmailCommand | null {
+  if (!text) return null
+  const m = EMAIL_COMMAND_RE.exec(text)
+  if (!m) return null
+  const to = m[2].replace(/_/g, ' ').trim()
+  const body = (text.slice(0, m.index) + ' ' + text.slice(m.index + m[0].length))
+    .replace(/\s+/g, ' ')
+    .trim()
+  return { to, body }
+}

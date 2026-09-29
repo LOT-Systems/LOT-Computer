@@ -269,6 +269,9 @@ export const CohortConnectWidget: React.FC = () => {
                       >
                         Send message
                       </Button>
+                      <span className="text-acc/40 select-none">
+                        or write <span className="text-acc/60">/email to {match.user.firstName}</span> in Log
+                      </span>
                     </div>
                   </div>
                 )}

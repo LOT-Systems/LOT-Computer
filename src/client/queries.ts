@@ -912,3 +912,26 @@ export const useStoryGeneration = createMutation<
     logId: string | null
   }
 >('post', '/api/story')
+
+export interface EmailInboxRecord {
+  id: string
+  senderId: string
+  senderName: string
+  body: string
+  isRead: boolean
+  createdAt: string
+}
+
+export const useEmails = createQuery<EmailInboxRecord[]>('/api/emails', {
+  refetchOnWindowFocus: false,
+})
+
+export const useSendEmail = createMutation<{ to: string; body: string }, { id: string; to: string }>(
+  'post',
+  '/api/emails'
+)
+
+export const useMarkEmailRead = createMutation<{ id: string }, { ok: boolean }>(
+  'post',
+  (data) => `/api/emails/${data.id}/read`
+)

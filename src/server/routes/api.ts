@@ -380,6 +380,12 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'email': {
+          if (data.receiverId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4082,6 +4088,129 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT EMAIL - composed in Log via "/email to NAME", delivered to Sync inbox.
+  // Community-gated: sender and recipient must both be Sync members.
+  // ============================================================================
+
+  const EMAIL_MAX_LENGTH = 5000
+
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { to: string; body: string }
+  }>, reply) => {
+    try {
+      if (!canAccessChat(req.user.tags || [])) {
+        return reply.status(403).send({ error: 'Email requires Usership, Onyx, Legacy, R&D, or Admin' })
+      }
+      const to = String(req.body?.to || '').trim().replace(/[.,;:!?]+$/, '')
+      const body = String(req.body?.body || '').trim().slice(0, EMAIL_MAX_LENGTH)
+      if (!to || !body) {
+        return reply.status(400).send({ error: 'Recipient and message are required' })
+      }
+
+      const needle = to.toLowerCase()
+      const candidates = await fastify.models.User.findAll({
+        where: {
+          id: { [Op.ne]: req.user.id },
+          [Op.or]: [
+            Sequelize.where(Sequelize.fn('lower', Sequelize.col('firstName')), needle.split(/\s+/)[0]),
+          ],
+        },
+        attributes: ['id', 'firstName', 'lastName', 'tags'],
+        limit: 50,
+      })
+      const members = candidates.filter((u: any) => {
+        if (!canAccessChat(u.tags || [])) return false
+        const full = `${u.firstName || ''} ${u.lastName || ''}`.trim().toLowerCase()
+        return needle.includes(' ') ? full === needle : true
+      })
+      if (members.length === 0) {
+        return reply.status(404).send({ error: `No community member named "${to}"` })
+      }
+      if (members.length > 1) {
+        return reply.status(409).send({
+          error: `Several members match "${to}" - use first and last name`,
+          matches: members.map((u: any) => `${u.firstName || ''} ${u.lastName || ''}`.trim()),
+        })
+      }
+      const receiver: any = members[0]
+
+      const email = await fastify.models.Email.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        body,
+      })
+      const senderName = `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim()
+      sync.emit('email', {
+        id: email.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        senderName,
+        body: email.body,
+        createdAt: email.createdAt,
+      })
+      return reply.send({
+        id: email.id,
+        to: `${receiver.firstName || ''} ${receiver.lastName || ''}`.trim(),
+        createdAt: email.createdAt,
+      })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  fastify.get('/emails', async (req: FastifyRequest, reply) => {
+    try {
+      if (!canAccessChat(req.user.tags || [])) {
+        return reply.status(403).send({ error: 'Email requires Usership, Onyx, Legacy, R&D, or Admin' })
+      }
+      const rows = await fastify.models.Email.findAll({
+        where: { receiverId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 50,
+      })
+      const senderIds = Array.from(new Set(rows.map((r) => r.senderId)))
+      const senders = senderIds.length
+        ? await fastify.models.User.findAll({
+            where: { id: senderIds },
+            attributes: ['id', 'firstName', 'lastName'],
+          })
+        : []
+      const names = new Map(
+        senders.map((u: any) => [u.id, `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown'])
+      )
+      return reply.send(
+        rows.map((r) => ({
+          id: r.id,
+          senderId: r.senderId,
+          senderName: names.get(r.senderId) || 'Unknown',
+          body: r.body,
+          isRead: !!r.readAt,
+          createdAt: r.createdAt,
+        }))
+      )
+    } catch (error) {
+      console.error('Error fetching emails:', error)
+      return reply.status(500).send({ error: 'Failed to fetch emails' })
+    }
+  })
+
+  fastify.post('/emails/:id/read', async (req: FastifyRequest<{
+    Params: { id: string }
+  }>, reply) => {
+    try {
+      await fastify.models.Email.update(
+        { readAt: new Date() },
+        { where: { id: req.params.id, receiverId: req.user.id, readAt: null } }
+      )
+      return reply.send({ ok: true })
+    } catch (error) {
+      console.error('Error marking email read:', error)
+      return reply.status(500).send({ error: 'Failed to update email' })
     }
   })
 

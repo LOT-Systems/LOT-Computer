@@ -10,7 +10,7 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
-import { useLogs, useUpdateLog } from '#client/queries'
+import { useLogs, useUpdateLog, useSendEmail } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
@@ -28,7 +28,7 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, parseEmailCommand, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3707,6 +3707,21 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  // LOT Email: "/email to NAME" in the entry turns the rest of the text into a message
+  const emailCommand = React.useMemo(() => parseEmailCommand(value), [value])
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const { mutate: sendEmail, isLoading: isSendingEmail } = useSendEmail({
+    onSuccess: (res) => {
+      setEmailStatus(`SENT TO ${res.to.toUpperCase()}`)
+      setValue(value.replace(/\/email\s+to\s+\S+/i, '').replace(/\s+/g, ' ').trim())
+    },
+    onError: (err: any) => {
+      const data = err?.response?.data
+      const matches = data?.matches ? ` (${data.matches.join(', ')})` : ''
+      setEmailStatus(`FAILED: ${String(data?.error || 'could not send').toUpperCase()}${matches.toUpperCase()}`)
+    },
+  })
+  React.useEffect(() => { if (emailCommand) setEmailStatus(null) }, [emailCommand?.to, emailCommand?.body])
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -4139,6 +4154,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to NAME  Send a LOT Email (arrives in Sync)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4377,6 +4393,30 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="FAST:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{fastResult}</div>
+            </Block>
+          </div>
+        )}
+        {(emailCommand || emailStatus) && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="flex items-center gap-x-8 flex-wrap">
+                {emailCommand && (
+                  <>
+                    <span className="opacity-60">TO {emailCommand.to.toUpperCase()}</span>
+                    <Button
+                      kind="secondary"
+                      size="small"
+                      disabled={!emailCommand.body || isSendingEmail}
+                      onClick={() => sendEmail({ to: emailCommand.to, body: emailCommand.body })}
+                    >
+                      Send
+                    </Button>
+                  </>
+                )}
+                <span className="opacity-60">
+                  {emailStatus || (emailCommand?.body ? 'Sends the rest of this entry. Replies land in Sync.' : 'Write your message, then send.')}
+                </span>
+              </div>
             </Block>
           </div>
         )}

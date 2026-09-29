@@ -24,6 +24,8 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  useMarkEmailRead,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -71,6 +73,11 @@ export const Sync = React.memo(function SyncInner() {
   }, [me])
 
   const { data: fetchedMessages } = useChatMessages()
+  const { data: emails } = useEmails({ enabled: canAccessChat })
+  const { mutate: markEmailRead } = useMarkEmailRead({
+    onSettled: () => queryClient.invalidateQueries(['/api/emails']),
+  })
+  const unreadEmails = React.useMemo(() => (emails || []).filter((e) => !e.isRead), [emails])
   const { mutate: createChatMessage } = useCreateChatMessage({
     onSuccess: () => setMessage(''),
   })
@@ -117,7 +124,11 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeEmailListener } = sync.listen('email', (data: any) => {
+      if (data?.receiverId === me?.id) queryClient.invalidateQueries(['/api/emails'])
+    })
     return () => {
+      disposeEmailListener()
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
     }
@@ -213,6 +224,37 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {!!emails?.length && (
+        <div className="mb-40">
+          <div className="text-acc/40 mb-8 select-none">
+            EMAIL{unreadEmails.length ? ` · ${unreadEmails.length} NEW` : ''}
+          </div>
+          {emails.slice(0, 10).map((e) => (
+            <div
+              key={e.id}
+              className="group flex items-start gap-x-8 cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded"
+              onClick={() => {
+                if (!e.isRead) markEmailRead({ id: e.id })
+              }}
+              title={`Reply: /email to ${e.senderName.split(' ')[0]} in Log`}
+            >
+              <span className={cn('whitespace-nowrap', !e.isRead && 'font-bold')}>{e.senderName}</span>
+              <div
+                className={cn('whitespace-breakspaces', e.isRead && 'text-acc/60')}
+                style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}
+              >
+                {e.body}
+              </div>
+              {!isTouchDevice && (
+                <div className="text-acc/0 transition-opacity select-none pointer-events-none whitespace-nowrap group-hover:text-acc/40">
+                  <MessageTimeLabel dateString={e.createdAt} isTimeFormat12h={isTimeFormat12h} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {
