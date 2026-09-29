@@ -788,7 +788,7 @@ export function MicroGameWidget() {
     if (!ctx) return
 
     const iv = setInterval(() => {
-      if (pausedRef.current) return
+      if (pausedRef.current || document.hidden) return
       const { fg, bg } = getMonoColors(canvas)
       clearGrid(ctx, bg, SIZE, SIZE)
 

@@ -71,12 +71,13 @@ export const MonthlyPulseWidget: React.FC = () => {
   }, [user])
 
   const monthNumber = React.useMemo(() => {
-    if (!user?.joinedAt) return 0
-    const joined = dayjs(user.joinedAt)
+    const anchor = user?.joinedAt ?? user?.createdAt
+    if (!anchor) return 0
+    const joined = dayjs(anchor)
     const now = dayjs()
     const months = now.diff(joined, 'month')
     return Math.max(0, months)
-  }, [user?.joinedAt])
+  }, [user?.joinedAt, user?.createdAt])
 
   const [visible, setVisible] = React.useState(false)
   const [isShown, setIsShown] = React.useState(false)

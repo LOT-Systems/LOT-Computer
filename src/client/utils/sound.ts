@@ -446,15 +446,14 @@ export function useSound(enabled: boolean) {
           stores.soundDescription.set(soundDesc)
 
           // Save sound description to user metadata for public profile
-          try {
-            await fetch('/api/update-current-sound', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ soundDescription: soundDesc })
-            })
-          } catch (error) {
+          // Fire-and-forget: audio must never wait on a server round trip
+          fetch('/api/update-current-sound', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ soundDescription: soundDesc })
+          }).catch((error) => {
             console.error('Failed to update current sound:', error)
-          }
+          })
 
           if (isCancelled) return
 
@@ -507,15 +506,13 @@ export function useSound(enabled: boolean) {
         stores.soundDescription.set('')
 
         // Clear sound description from user metadata
-        try {
-          await fetch('/api/update-current-sound', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ soundDescription: null })
-          })
-        } catch (error) {
+        fetch('/api/update-current-sound', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ soundDescription: null })
+        }).catch((error) => {
           console.error('Failed to clear current sound:', error)
-        }
+        })
       }
     })()
 

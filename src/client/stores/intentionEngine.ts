@@ -3752,9 +3752,10 @@ export async function syncToServer(): Promise<boolean> {
 
     const result = await response.json()
 
-    // Update last synced timestamp
+    // Update last synced timestamp — read fresh state so signals recorded
+    // while the request was in flight are not overwritten
     intentionEngine.set({
-      ...state,
+      ...intentionEngine.get(),
       lastSyncedTimestamp: now
     })
 
