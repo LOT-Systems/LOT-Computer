@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.1 — DEVELOPMENT START (see LOT-CUBIQ-CYCLE-02-REPORT.md for v0.2 revisions)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -320,6 +320,25 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE BREATH PACER                            2026-09-29
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, a parent working from a kitchen table,
+  three afternoons of logged stress, owns the LOT® Station and the CUBIQ
+  pad. Laptop closed.
+
+  The Station reports CO₂ over threshold; with no screen open, the cube
+  performs THE NUDGE twice, eight seconds apart, and the operator opens a
+  window. Later, when the stress pattern peaks, the cube does not jump —
+  the operator's palm is already on the table. They rest it on the cube;
+  contact is detected, jump-class motion is locked out, and the voice coil
+  paces a 4-2-6 breath under the palm (the /breathe cadence). Six cycles.
+  On lifting the hand the cube performs THE SETTLE once and goes quiet. No
+  score, no streak. The next Memory Question is gentler that evening.
+
+  Full narrative, added requirements (BREATH PACER gesture, contact
+  interlock I3, Station-triggered advisory, gate G5) and the actuator
+  revision this use case exposed: LOT-CUBIQ-CYCLE-02-REPORT.md.
 
 --------------------------------------------------------------------------------
 08 // BRAND
