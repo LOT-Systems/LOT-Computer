@@ -1213,7 +1213,69 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
-      // v114: deep restoration lock · adaptive intelligence arc · operational mastery lock (P152/P153/P154)
+      // v114: field resonance arc · coherence memory imprint · quantum self-regulation (P152/P153/P154)
+      'field_resonance_arc',
+      'coherence_memory_imprint',
+      'quantum_self_regulation',
+      // v115: quantum coherence trajectory · sovereign self-assembly · field presence anchor (P155/P156/P157)
+      'quantum_coherence_trajectory',
+      'sovereign_self_assembly',
+      'field_presence_anchor',
+      // v116: sovereign coherence lock · living assembly arc · quantum identity sovereign (P158/P159/P160)
+      'sovereign_coherence_lock',
+      'living_assembly_arc',
+      'quantum_identity_sovereign',
+      // v117: sovereign state report (J52 weekly band summary)
+      'sovereign_state_report',
+      // v118: sovereign continuity tier (J53 daily pulse — P161/P162/P163)
+      'sovereign_field_pulse',
+      'crystalline_identity_field',
+      'sovereign_temporal_lock',
+      // v119: sovereignty persistence tier (J54 weekly audit — P164/P165/P166)
+      'sovereignty_duration_streak',
+      'crystalline_field_sustain',
+      'sovereign_momentum_arc',
+      // v120: sovereignty permanence tier (J55 weekly check — P167/P168/P169)
+      'sovereign_permanence_lock',
+      'crystalline_permanence_field',
+      'momentum_permanence_arc',
+      // v121: sovereignty ascension tier (J56 weekly check — P170)
+      'sovereignty_ascension',
+      // v122: sovereignty in motion tier (J57 weekly check — P171–P173)
+      'sovereign_momentum_crystallization',
+      'living_sovereign_field',
+      'sovereign_in_motion',
+      // v123: sovereign transmission tier (J58 weekly check — P174–P176)
+      'sovereign_field_broadcast',
+      'identity_transmission_lock',
+      'quantum_sovereign_transmission',
+      // v125: calendar EE signal (J59 daily calendar check)
+      'calendar_ee_signal',
+      // v126: crystalline field tier (J60 weekly crystalline sovereign check — P177–P179)
+      'sovereign_crystal_field',
+      'transmission_field_anchor',
+      'crystalline_sovereign_transmission',
+      // v127: crystal persistence tier (J61 weekly crystal continuity check — P180–P182)
+      'crystal_field_continuity',
+      'crystal_broadcast_expansion',
+      'crystal_temporal_lock',
+      // v128: crystal resonance tier (J62 weekly crystal resonance check — P183–P185)
+      'crystal_resonance_convergence',
+      'crystal_full_coherence',
+      'crystal_resonance_sovereignty',
+      // v129: crystal matrix tier (J63 weekly crystal matrix check — P186–P188)
+      'crystal_matrix_formation',
+      'crystal_matrix_signal',
+      'crystal_matrix_sovereignty',
+      // v130: crystal lattice tier (J64 weekly crystal lattice check — P189–P191)
+      'crystal_lattice_lock',
+      'crystal_lattice_resonance',
+      'crystal_lattice_sovereignty',
+      // v131: crystal lattice expansion tier (J65 weekly crystal expansion check — P192–P194)
+      'crystal_lattice_broadcast',
+      'crystal_lattice_expansion',
+      'crystal_lattice_singularity',
+      // v132: deep restoration & adaptive intelligence tier (J66 daily adaptive intelligence check — P195–P197)
       'deep_restoration_lock',
       'adaptive_intelligence_arc',
       'operational_mastery_lock',

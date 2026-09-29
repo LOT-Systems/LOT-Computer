@@ -720,6 +720,19 @@ export const System = React.memo(function SystemInner() {
         </Block>
       </div>
 
+      {/* Physiological Cohort Directive — surfaces when archetype confidence ≥ 70% */}
+      {physiologicalCohort && physiologicalCohort.confidence >= 70 && (
+        <div>
+          <Block label="Arch:">
+            <div className="flex justify-between items-baseline mb-4">
+              <span className="opacity-40 uppercase tracking-widest text-xs">{physiologicalCohort.archetype}</span>
+              <span className="opacity-30 tabular-nums text-xs">{physiologicalCohort.confidence}%</span>
+            </div>
+            <div className="opacity-60 text-xs">{physiologicalCohort.directive}</div>
+          </Block>
+        </div>
+      )}
+
       {/* Temporal Planner — next scheduled entry surfaced from QIE calendar module */}
       {upcomingCalendar.next && (
         <div>

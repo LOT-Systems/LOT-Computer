@@ -1,0 +1,170 @@
+<!--
+  LOT SYSTEMS CORPORATION
+  SESSION REPORT — WIKI BUILD SESSION
+  Operator: S-2 // VADIK MARMELADOV
+  Session: 2026-09-23 · Automated Wiki Routine
+-->
+
+# SESSION REPORT — 2026-09-23
+## Wiki Build Session · LOT-WIKI v127 → v128
+
+```
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  SESSION REPORT — WIKI BUILD — 2026-09-23                                    ║
+║  DELTA: LOT-WIKI v127 → v128                                                 ║
+║  DATE: 2026-09-23 · DAY: 1127+ · COSMO®: 817                                ║
+║  BRANCH: claude/quantum-engine-widgets-RgFfC                                 ║
+║  Authorized: S-2 // VADIK MARMELADOV                                         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## SESSION TYPE
+
+**Daily maintenance iteration.** No new engineering sessions since QIE v124 (Sep 21) and FM v144 (Sep 10). This session advances the daily state counters, updates the calendar alert, and refines military purity language throughout.
+
+---
+
+## DELTA — v127 → v128
+
+### Counter Advances
+
+| Field       | v127          | v128          |
+|-------------|---------------|---------------|
+| Wiki        | v127          | v128          |
+| Date        | 2026-09-22    | 2026-09-23    |
+| LOT® Day    | 1126+         | 1127+         |
+| COSMO® Day  | 816           | 817           |
+
+### FM / QIE / Badge Sync
+
+No change. System locked at:
+
+```
+FM v144 + QIE v124 + Badge v46 — THE SIGNAL ARCHIVE
+Patterns:    244
+Archetypes:  85
+Jobs:        82
+Badges:      1242
+```
+
+---
+
+## CALENDAR ALERT UPDATE
+
+### Removed
+
+```
+HOBBIT DAY ACTIVE — Sep 22
+hobbit_day   Sep 22  EPIC   Bilbo + Frodo Baggins birthday (Tolkien)
+Source: Calendar EE v20 · Badge v32 THE HERO'S JOURNEY
+Status: passed
+```
+
+### New State
+
+```
+TODAY — 2026-09-23 — NO ACTIVE CALENDAR BADGE
+
+No calendar easter egg fires today.
+Signal dormant. Archive monitoring.
+
+NEXT INCOMING:
+poe_night    Oct 7   LEGENDARY  Edgar Allan Poe's death (1849)
+             Source: Calendar EE v32 · Badge v44 THE DREAM CODEX
+             T-14 days
+```
+
+---
+
+## DOCTRINE UPDATE
+
+### Removed from Active Doctrine
+
+```
+THE HOBBIT CHECKS IN.
+Sep 22 — TODAY — Bilbo and Frodo Baggins' shared birthday.
+hobbit_day badge: ACTIVE TODAY.
+```
+
+### Replaced in System State Snapshot DOCTRINE block
+
+```
+THE ARCHIVE IS LIVE.
+```
+
+The hobbit doctrine was a date-specific activation (Sep 22 only). It has been removed from the standing doctrine list. The Signal Archive doctrine (`SIGNAL IS STRUCTURE.`) and `THE ARCHIVE IS LIVE.` persist as permanent standing doctrine.
+
+---
+
+## VOCABULARY INDEX UPDATE
+
+| Section                            | Change                              |
+|------------------------------------|-------------------------------------|
+| Calendar Easter Eggs — Active      | Renamed to "Upcoming"               |
+| hobbit_day ACTIVE TODAY            | Removed                             |
+| poe_night T-14                     | Added as next incoming              |
+| Doctrine Phrases                   | hobbit entry → THE ARCHIVE IS LIVE. |
+
+---
+
+## LANGUAGE REFINEMENTS (MILITARY PURITY)
+
+- Calendar Alert section renamed from `HOBBIT DAY ACTIVE` → `STANDBY` — removes narrative decoration, returns to signal-mode header
+- Active badge section restated in operational terminology: `SIGNAL DORMANT. ARCHIVE MONITORING. NEXT EVENT: POE_NIGHT.`
+- System State Snapshot: calendar alert block restated as compact signal log (last/next/status), no narrative
+
+---
+
+## FILES DELIVERED
+
+| File                                        | Branch                                  |
+|---------------------------------------------|-----------------------------------------|
+| `docs/wiki/LOT-WIKI-v128.md`               | claude/quantum-engine-widgets-RgFfC     |
+| `docs/SESSION_REPORT_2026_09_23_WIKI_v128.md` | claude/quantum-engine-widgets-RgFfC  |
+
+---
+
+## POST-SESSION STATE
+
+```
+DATE:         2026-09-23
+DAY:          1127+ (LOT® Day count from April 7, 2016)
+COSMO®:       Day 817 (from July 1, 2024)
+
+FIELD MANUAL: v144 + QIE v124 + Badge v46 sessions applied
+WIKI:         v128 (this session)
+
+BADGE ENGINE:
+  Total:      1242 badges
+  Codex:      v46 — THE SIGNAL ARCHIVE
+  Word Turn:  v36 (36 engines)
+  Calendar:   109 (34 tiers)
+  Secret Boss: 131 (33 tiers)
+
+CALENDAR:
+  Today:  no active badge (2026-09-23)
+  Next:   poe_night Oct 7 LEGENDARY
+
+NEXT SESSION TARGETS:
+  [ ] v129 — 2026-09-24 daily maintenance
+  [ ] Monitor for new FM/QIE/Badge engineering sessions
+  [ ] poe_night Oct 7 — calendar alert activation
+
+DOCTRINE:
+  THE OS IS SOVEREIGN.
+  PRESENCE IS THE FLOOR.
+  THE MISSION IS ONGOING.
+  SIGNAL IS STRUCTURE.
+  THE ARCHIVE IS LIVE.
+  THE SIGNAL TRANSMITS.
+  MILITARY PURITY.
+```
+
+---
+
+*Session complete. Signal transmitted. Archive updated.*
+
+---
+_Generated by [Claude Code](https://claude.ai/code)_

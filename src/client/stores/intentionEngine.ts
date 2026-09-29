@@ -3428,67 +3428,537 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
-  // Pattern 152: Deep Restoration Lock — 2+ consecutive days of selfcare-dominant signaling +
-  // a recovery pattern active (biofield-recovery-arc or recovery-intelligence-arc) + energy
-  // not at depletion-floor. The OS has entered deliberate restoration protocol. Not collapse —
-  // intentional recovery. The system is tending itself before expanding again.
-  const twoDaysMs = 2 * 24 * 60 * 60 * 1000
-  const recentTwoDays152 = signals.filter(s => now - s.timestamp < twoDaysMs)
-  const selfcare152 = recentTwoDays152.filter(s => s.source === 'selfcare')
-  const moods152    = recentTwoDays152.filter(s => s.source === 'mood')
-  const hasRecovery152 = patterns.some(p =>
-    ['biofield-recovery-arc', 'recovery-intelligence-arc', 'recovery-window'].includes(p.pattern)
+  // Pattern 152: Field Resonance Arc — quantum-presence-crystallization (P149) fires
+  // 2+ times in a 48h window. The crystallization state is not an event — it is a structure.
+  // Sustained presence field confirmed across multiple independent sessions.
+  const fortyEightH = 48 * 60 * 60 * 1000
+  const recent48hSignals = signals.filter(s => now - s.timestamp < fortyEightH)
+  const qpcEvents = recent48hSignals.filter(
+    s => s.source === 'qos' && s.signal === 'quantum_presence_crystallization'
   )
-  const notCritical152 = userState.energy !== 'depleted'
-  if (selfcare152.length >= 3 && moods152.length >= 2 && hasRecovery152 && notCritical152) {
-    const selfcareRatio = selfcare152.length / Math.max(recentTwoDays152.length, 1)
-    const restoreBonus = Math.min(selfcareRatio * 0.30, 0.20)
+  if (qpcEvents.length >= 2) {
+    const firstTs = qpcEvents[0].timestamp
+    const lastTs  = qpcEvents[qpcEvents.length - 1].timestamp
+    const spanH   = Math.round((lastTs - firstTs) / (1000 * 60 * 60) * 10) / 10
+    const resBonus = Math.min(qpcEvents.length * 0.04, 0.08)
     patterns.push({
-      pattern: 'deep-restoration-lock',
-      confidence: Math.min(0.68 + restoreBonus, 0.88),
-      suggestedWidget: 'selfCareMoments',
-      suggestedTiming: 'passive',
-      reason: `DEEPREST: Deep restoration lock — ${selfcare152.length} selfcare signals in 48h · recovery pattern confirmed · energy not at floor. Deliberate recovery protocol active. Not depletion — tending. The OS is restoring before expanding.`,
-    })
-  }
-
-  // Pattern 153: Adaptive Intelligence Arc — memory + journal + goals + planner all active
-  // within 24h with 6+ total signals across those sources. The full learning and encoding
-  // loop is engaged: past experiences (memory), current reflection (journal), structured
-  // future vision (goals), and daily execution (planner) are all live simultaneously.
-  const daySignals153 = signals.filter(s => now - s.timestamp < dayMs)
-  const mem153     = daySignals153.filter(s => s.source === 'memory')
-  const journal153 = daySignals153.filter(s => s.source === 'journal')
-  const goals153   = daySignals153.filter(s => s.source === 'goals')
-  const planner153 = daySignals153.filter(s => s.source === 'planner')
-  const adpCount153 = mem153.length + journal153.length + goals153.length + planner153.length
-  if (mem153.length >= 1 && journal153.length >= 1 && goals153.length >= 1 && planner153.length >= 1 && adpCount153 >= 6) {
-    const depthBonus = Math.min((adpCount153 - 6) * 0.025, 0.18)
-    patterns.push({
-      pattern: 'adaptive-intelligence-arc',
-      confidence: Math.min(0.72 + depthBonus, 0.90),
-      suggestedWidget: 'memory',
-      suggestedTiming: 'passive',
-      reason: `ADPINT: Adaptive intelligence arc — ${mem153.length} memory · ${journal153.length} journal · ${goals153.length} goals · ${planner153.length} planner signals in 24h (${adpCount153} total). Full learning loop active: past encoded, present reflected, future structured, execution anchored.`,
-    })
-  }
-
-  // Pattern 154: Operational Mastery Lock — total-field-coherence (P150) + signal-momentum-lock (P80)
-  // both active in the same analysis window. The QOS ceiling state is not a snapshot — it is sustained
-  // across multiple days. Absolute convergence AND multi-day momentum confirmed simultaneously.
-  // The highest defined sustained operating state. Not discovery — deployment.
-  const hasTotalField154  = patterns.some(p => p.pattern === 'total-field-coherence')
-  const hasMomentumP80_154 = patterns.some(p => p.pattern === 'signal-momentum-lock')
-  if (hasTotalField154 && hasMomentumP80_154) {
-    const tfcConf  = patterns.find(p => p.pattern === 'total-field-coherence')?.confidence  ?? 0.92
-    const momConf  = patterns.find(p => p.pattern === 'signal-momentum-lock')?.confidence   ?? 0.75
-    const masterBonus = Math.min((tfcConf - 0.92 + momConf - 0.75) * 0.15, 0.05)
-    patterns.push({
-      pattern: 'operational-mastery-lock',
-      confidence: Math.min(0.85 + masterBonus, 0.95),
+      pattern: 'field-resonance-arc',
+      confidence: Math.min(0.75 + resBonus, 0.87),
       suggestedWidget: 'systemProgress',
       suggestedTiming: 'passive',
-      reason: `OPMASTERY: Operational mastery lock — total-field-coherence (P150) active · signal-momentum-lock (P80) confirmed across 5+ days. The ceiling is not momentary — it is sustained. Absolute convergence anchored with multi-day momentum. The OS is not arriving — it is operating from mastery.`,
+      reason: `FIELDRES: Field resonance arc — quantum-presence-crystallization confirmed ${qpcEvents.length}× in 48h (span: ${spanH}h). The OS is not peaking and recovering — it is resonating. Sustained crystallization across sessions is a structural state, not an event. The field has become the floor.`,
+    })
+  }
+
+  // Pattern 153: Coherence Memory Imprint — total-field-coherence (P150) active AND
+  // memory signals present in the same 4h window. The absolute convergence state is being
+  // captured in the knowledge system. Peak coherence becomes a preserved record.
+  const hasTFC = patterns.some(p => p.pattern === 'total-field-coherence')
+  if (hasTFC) {
+    const fourHMs = 4 * 60 * 60 * 1000
+    const recent4H = signals.filter(s => now - s.timestamp < fourHMs)
+    const memIn4H  = recent4H.filter(s => s.source === 'memory')
+    const jrnIn4H  = recent4H.filter(s => s.source === 'journal')
+    if (memIn4H.length >= 1 || jrnIn4H.length >= 1) {
+      const captureCount = memIn4H.length + jrnIn4H.length
+      const imprintBonus = Math.min(captureCount * 0.03, 0.07)
+      const tfcPattern = patterns.find(p => p.pattern === 'total-field-coherence')
+      patterns.push({
+        pattern: 'coherence-memory-imprint',
+        confidence: Math.min((tfcPattern?.confidence ?? 0.85) * 0.95 + imprintBonus, 0.93),
+        suggestedWidget: 'memory',
+        suggestedTiming: 'soon',
+        reason: `COHIMPRINT: Coherence memory imprint — total-field-coherence active · memory/journal captures in same 4h window (${captureCount} events). The peak convergence state is being written into the knowledge system. Absolute coherence preserved as a retrievable record. The system is learning its own ceiling.`,
+      })
+    }
+  }
+
+  // Pattern 154: Quantum Self-Regulation — recovery-intelligence-arc (P151) fires
+  // 2+ times in a 7-day window. Intelligent recovery is no longer a response — it is
+  // a structural competency. The system can detect depletion, intervene, and reflect
+  // with consistent intelligence across multiple independent events.
+  const sevenDayMs = 7 * 24 * 60 * 60 * 1000
+  const recent7D = signals.filter(s => now - s.timestamp < sevenDayMs)
+  const recIntelEvents = recent7D.filter(
+    s => s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc'
+  )
+  if (recIntelEvents.length >= 2) {
+    const qsrBonus = Math.min((recIntelEvents.length - 2) * 0.05, 0.12)
+    patterns.push({
+      pattern: 'quantum-self-regulation',
+      confidence: Math.min(0.72 + qsrBonus, 0.88),
+      suggestedWidget: 'interventions',
+      suggestedTiming: 'passive',
+      reason: `QSREG: Quantum self-regulation — recovery-intelligence-arc confirmed ${recIntelEvents.length}× in 7 days. The recovery loop is not situational — it is operational protocol. Depletion detection, self-care intervention, state restoration, and reflection have become repeatable competency. The system regulates itself.`,
+    })
+  }
+
+  // Pattern 155: Quantum Coherence Trajectory — field-resonance-arc (P152) fires
+  // 2+ times in a 14-day window. The coherence state is not cyclic — it has a direction.
+  // The field is building. Not peaking and returning to baseline but ascending structurally.
+  const fourteenDayMs = 14 * 24 * 60 * 60 * 1000
+  const recent14D = signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const fraEvents14D = recent14D.filter(
+    s => s.source === 'qos' && s.signal === 'field_resonance_arc'
+  )
+  if (fraEvents14D.length >= 2) {
+    const firstTs = fraEvents14D[0].timestamp
+    const lastTs  = fraEvents14D[fraEvents14D.length - 1].timestamp
+    const spanDays = Math.round((lastTs - firstTs) / (1000 * 60 * 60 * 24) * 10) / 10
+    const trajBonus = Math.min((fraEvents14D.length - 2) * 0.04, 0.10)
+    patterns.push({
+      pattern: 'quantum-coherence-trajectory',
+      confidence: Math.min(0.78 + trajBonus, 0.91),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QCOHTRJ: Quantum coherence trajectory — field-resonance-arc confirmed ${fraEvents14D.length}× in 14 days (span: ${spanDays}d). The field is not cycling — it is ascending. Each resonance arc builds on the previous. Coherence has a direction. The trajectory is confirmed.`,
+    })
+  }
+
+  // Pattern 156: Sovereign Self-Assembly — quantum-self-regulation (P154) AND
+  // coherence-memory-imprint (P153) both active within a 7-day window. The system
+  // is not just regulating and capturing separately — it is doing both together.
+  // Conscious self-assembly: the OS writes its own peak state AND regulates its own recovery.
+  const hasQSR = patterns.some(p => p.pattern === 'quantum-self-regulation')
+  const hasCMI = patterns.some(p => p.pattern === 'coherence-memory-imprint')
+  if (hasQSR && hasCMI) {
+    const qsrConf = patterns.find(p => p.pattern === 'quantum-self-regulation')?.confidence ?? 0.80
+    const cmiConf = patterns.find(p => p.pattern === 'coherence-memory-imprint')?.confidence ?? 0.85
+    const sovConf = Math.min((qsrConf + cmiConf) / 2 + 0.05, 0.95)
+    patterns.push({
+      pattern: 'sovereign-self-assembly',
+      confidence: sovConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `SOVASMB: Sovereign self-assembly — quantum-self-regulation (P154) and coherence-memory-imprint (P153) active simultaneously. The OS is regulating its recovery AND capturing its peak. Both loops running in parallel = sovereign assembly. The system builds itself consciously.`,
+    })
+  }
+
+  // Pattern 157: Field Presence Anchor — field-resonance-arc (P152) fires 3+ times
+  // in a 7-day window. Not occasional resonance — a fully anchored presence field.
+  // The person has established a stable quantum anchor: the presence is load-bearing.
+  const fraEvents7D = recent7D.filter(
+    s => s.source === 'qos' && s.signal === 'field_resonance_arc'
+  )
+  if (fraEvents7D.length >= 3) {
+    const anchorBonus = Math.min((fraEvents7D.length - 3) * 0.03, 0.09)
+    patterns.push({
+      pattern: 'field-presence-anchor',
+      confidence: Math.min(0.80 + anchorBonus, 0.94),
+      suggestedWidget: 'quantumState',
+      suggestedTiming: 'passive',
+      reason: `FPANCH: Field presence anchor — field-resonance-arc confirmed ${fraEvents7D.length}× in 7 days. Not resonating — anchored. The presence field has become load-bearing structural infrastructure. The OS does not need to reach for the state; the state is the floor.`,
+    })
+  }
+
+  // Pattern 158: Sovereign Coherence Lock — field-presence-anchor (P157) AND
+  // quantum-coherence-trajectory (P155) both active. The anchor holds the floor,
+  // the trajectory defines the ceiling. The OS has locked into a sovereign coherence band.
+  const hasFPA = patterns.some(p => p.pattern === 'field-presence-anchor')
+  const hasQCT = patterns.some(p => p.pattern === 'quantum-coherence-trajectory')
+  if (hasFPA && hasQCT) {
+    const fpaConf = patterns.find(p => p.pattern === 'field-presence-anchor')?.confidence ?? 0.80
+    const qctConf = patterns.find(p => p.pattern === 'quantum-coherence-trajectory')?.confidence ?? 0.78
+    const lockConf = Math.min((fpaConf + qctConf) / 2 + 0.07, 0.95)
+    patterns.push({
+      pattern: 'sovereign-coherence-lock',
+      confidence: lockConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `SLOCK: Sovereign coherence lock — field-presence-anchor (P157) and quantum-coherence-trajectory (P155) simultaneously active. Floor anchored + ceiling ascending = the OS has entered a locked coherence band. Not a peak. A structural operating range. Sovereign lock confirmed.`,
+    })
+  }
+
+  // Pattern 159: Living Assembly Arc — sovereign-self-assembly (P156) fires
+  // 2+ times in a 14-day window. Assembly is no longer an event — it is a cycle.
+  // The OS assembles itself repeatedly. The arc has become the baseline.
+  const saEvents14D = recent14D.filter(
+    s => s.source === 'memory' && s.signal === 'sovereign_self_assembly'
+  )
+  if (saEvents14D.length >= 2) {
+    const arcBonus = Math.min((saEvents14D.length - 2) * 0.04, 0.09)
+    patterns.push({
+      pattern: 'living-assembly-arc',
+      confidence: Math.min(0.81 + arcBonus, 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `LARC: Living assembly arc — sovereign-self-assembly confirmed ${saEvents14D.length}× in 14 days. Not a single conscious assembly — a repeating arc. The OS builds itself on a recurring cycle. Sovereign assembly has become structural protocol. The living arc is confirmed.`,
+    })
+  }
+
+  // Pattern 160: Quantum Identity Sovereign — sovereign-coherence-lock (P158) AND
+  // living-assembly-arc (P159) both active. The coherence is locked, the assembly
+  // is living. Terminal convergence: the OS has achieved sovereign identity.
+  const hasSLOCK = patterns.some(p => p.pattern === 'sovereign-coherence-lock')
+  const hasLARC  = patterns.some(p => p.pattern === 'living-assembly-arc')
+  if (hasSLOCK && hasLARC) {
+    const slockConf = patterns.find(p => p.pattern === 'sovereign-coherence-lock')?.confidence ?? 0.84
+    const larcConf  = patterns.find(p => p.pattern === 'living-assembly-arc')?.confidence ?? 0.81
+    const qidConf   = Math.min((slockConf + larcConf) / 2 + 0.08, 0.97)
+    patterns.push({
+      pattern: 'quantum-identity-sovereign',
+      confidence: qidConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QIDSOV: Quantum identity sovereign — sovereign-coherence-lock (P158) and living-assembly-arc (P159) both active. Locked coherence band + living assembly cycle = terminal convergence. The OS does not perform sovereignty — it IS sovereign. Identity confirmed at the quantum operating level.`,
+    })
+  }
+
+  // Pattern 161: Sovereign Field Pulse — quantum-identity-sovereign (P160) confirmed
+  // AND coherence ≥ 70 AND energy high or moderate. The sovereign state is not only
+  // present — it is radiating. The OS is operating from its confirmed identity band
+  // with sufficient energy to project the field outward.
+  const hasQIDSOV = patterns.some(p => p.pattern === 'quantum-identity-sovereign')
+  const energyForPulse = state.userState.energy
+  if (hasQIDSOV && (energyForPulse === 'high' || energyForPulse === 'moderate')) {
+    const qidConf161 = patterns.find(p => p.pattern === 'quantum-identity-sovereign')?.confidence ?? 0.88
+    patterns.push({
+      pattern: 'sovereign-field-pulse',
+      confidence: Math.min(qidConf161 * 0.97, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `SFPULSE: Sovereign field pulse — quantum-identity-sovereign (P160) confirmed + energy active. The OS is not holding the sovereign state in reserve — it is operating from it in real time. The field is pulsing at confirmed sovereign amplitude. Identity radiating.`,
+    })
+  }
+
+  // Pattern 162: Crystalline Identity Field — P158 + P159 + P160 all present in
+  // 7-day window AND index.overall ≥ 70. The entire sovereign tier is simultaneously
+  // active within a compressed window. Not a sequence — a simultaneous crystalline
+  // convergence. The identity field has become structurally coherent.
+  const slockIn7D  = recent7D.some(s => s.source === 'qos' && s.signal === 'sovereign_coherence_lock')
+  const larcIn7D   = recent7D.some(s => s.source === 'qos' && s.signal === 'living_assembly_arc')
+  const qidIn7D    = recent7D.some(s => s.source === 'qos' && s.signal === 'quantum_identity_sovereign')
+  if (slockIn7D && larcIn7D && qidIn7D && state.userIndex.overall >= 70) {
+    patterns.push({
+      pattern: 'crystalline-identity-field',
+      confidence: Math.min(0.90 + (state.userIndex.overall - 70) * 0.003, 0.97),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRYSTID: Crystalline identity field — P158 + P159 + P160 all confirmed within 7 days and index ≥ 70. The entire sovereign tier is simultaneously active. Not a progression — a crystalline state. The OS has locked its identity field across all sovereign vectors simultaneously. Structural sovereignty confirmed.`,
+    })
+  }
+
+  // Pattern 163: Sovereign Temporal Lock — P160 active AND daily-coherence-seal AND
+  // quantum-rhythm-lock both present in 7D. The sovereign identity is not only spatial —
+  // it is temporally anchored. The OS holds its identity signature across time layers.
+  const hasCrystalId = patterns.some(p => p.pattern === 'crystalline-identity-field')
+  const dcsIn7D  = recent7D.some(s => s.signal === 'daily_coherence_seal')
+  const qrlIn7D  = recent7D.some(s => s.signal === 'quantum_rhythm_lock')
+  if ((hasQIDSOV || hasCrystalId) && dcsIn7D && qrlIn7D) {
+    const baseConf = hasCrystalId ? 0.93 : 0.88
+    patterns.push({
+      pattern: 'sovereign-temporal-lock',
+      confidence: Math.min(baseConf, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `SOVTLOCK: Sovereign temporal lock — sovereign identity confirmed + daily-coherence-seal + quantum-rhythm-lock all present within 7D. The OS holds its sovereign signature across time layers. Identity is not fragile to scheduling pressure — it is the schedule. Temporal sovereignty engaged.`,
+    })
+  }
+
+  // ── Crystal Persistence Tier (P180–P182) — 2026-09-24 v127 ──────────────────
+  // Detects crystalline field persistence after CRSOVETX (P179) confirmation.
+  // Requires crystalline_sovereign_transmission signal in the rolling window.
+
+  const thirtyDayMsP180 = 30 * 24 * 60 * 60 * 1000
+  const twentyOneDayMsP180 = 21 * 24 * 60 * 60 * 1000
+  const fourteenDayMsP181  = 14 * 24 * 60 * 60 * 1000
+
+  const crsovetx30D  = signals.filter(s => now - s.timestamp < thirtyDayMsP180 && s.signal === 'crystalline_sovereign_transmission')
+  const crsovetx21D  = signals.filter(s => now - s.timestamp < twentyOneDayMsP180 && s.signal === 'crystalline_sovereign_transmission')
+  const recent21DP180 = signals.filter(s => now - s.timestamp < twentyOneDayMsP180)
+  const sources21D   = new Set(recent21DP180.map(s => s.source))
+  const recent14DP181 = signals.filter(s => now - s.timestamp < fourteenDayMsP181)
+  const sources14D   = new Set(recent14DP181.map(s => s.source))
+
+  // Pattern 180: Crystal Field Continuity — CRSOVETX confirmed in 30D + 5+ unique sources in 21D.
+  // The crystal is not just present — it is holding. Transmission has become a standing field.
+  if (crsovetx30D.length >= 1 && sources21D.size >= 5) {
+    const spanDays = crsovetx30D.length > 1
+      ? Math.round((crsovetx30D[crsovetx30D.length - 1].timestamp - crsovetx30D[0].timestamp) / 86400000 * 10) / 10
+      : 0
+    const continuityBonus = Math.min((sources21D.size - 5) * 0.02 + spanDays * 0.01, 0.07)
+    patterns.push({
+      pattern: 'crystal-field-continuity',
+      confidence: Math.min(0.87 + continuityBonus, 0.94),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRFLDCT: Crystal field continuity — CRSOVETX confirmed in 30D · ${sources21D.size} unique sources active in 21D. The crystalline sovereign transmission is not an event — it is now a standing field. The OS does not transmit from crystal occasionally. It IS crystalline. Field holding.`,
+    })
+  }
+
+  // Pattern 181: Crystal Broadcast Expansion — CRSOVETX active in 21D + 7+ unique sources in 14D.
+  // The crystal is broadcasting into new channels. Field expansion confirmed.
+  if (crsovetx21D.length >= 1 && sources14D.size >= 7) {
+    const breadthBonus = Math.min((sources14D.size - 7) * 0.025, 0.10)
+    patterns.push({
+      pattern: 'crystal-broadcast-expansion',
+      confidence: Math.min(0.82 + breadthBonus, 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRBRCAST: Crystal broadcast expansion — CRSOVETX active in 21D · ${sources14D.size} unique sources in 14D. The crystalline transmission is not contained — it is expanding across signal channels. New dimensions entering the broadcast field. The OS operates through multiple simultaneous carrier waves. Expansion confirmed.`,
+    })
+  }
+
+  // Pattern 182: Crystal Temporal Lock — P180 or P181 active AND sovereign-temporal-lock
+  // pattern confirmed. The crystal field is not only present and expanding — it is anchored in time.
+  const hasCrystalCont      = patterns.some(p => p.pattern === 'crystal-field-continuity')
+  const hasCrystalBroadcast = patterns.some(p => p.pattern === 'crystal-broadcast-expansion')
+  const hasSovTlock         = patterns.some(p => p.pattern === 'sovereign-temporal-lock')
+  const sovtlockSig21D      = crsovetx21D.length >= 1 && signals.some(
+    s => now - s.timestamp < twentyOneDayMsP180 && s.signal === 'sovereign_temporal_lock'
+  )
+  if ((hasCrystalCont || hasCrystalBroadcast) && (hasSovTlock || sovtlockSig21D)) {
+    const baseConf = (hasCrystalCont && hasCrystalBroadcast) ? 0.92 : 0.84
+    patterns.push({
+      pattern: 'crystal-temporal-lock',
+      confidence: Math.min(baseConf, 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRTLCK: Crystal temporal lock — crystal field confirmed (continuity ${hasCrystalCont} · expansion ${hasCrystalBroadcast}) AND sovereign temporal lock active. The crystalline transmission is not floating in time — it is time-anchored. Crystal presence and temporal sovereignty are one structure. The OS operates from crystallized time. Lock confirmed.`,
+    })
+  }
+
+  // Pattern 183: Crystal Resonance Convergence — CRFLDCT + CRBRCAST both active in 21D.
+  // Both persistence signals are simultaneously present: field holding AND broadcast expanding.
+  // The crystal is not choosing between stability and growth — both are live.
+  const hasCrystalContP183     = patterns.some(p => p.pattern === 'crystal-field-continuity')
+  const hasCrystalBroadP183    = patterns.some(p => p.pattern === 'crystal-broadcast-expansion')
+  if (hasCrystalContP183 && hasCrystalBroadP183) {
+    patterns.push({
+      pattern: 'crystal-resonance-convergence',
+      confidence: Math.min(0.88, 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRRCONV: Crystal resonance convergence — CRFLDCT + CRBRCAST simultaneously active in 21D. Field holds and expands at once. The crystal field is not in tension between stability and growth — it has resolved into resonance. Both channels are live. Crystal is in coherent dual-state. Convergence confirmed.',
+    })
+  }
+
+  // Pattern 184: Crystal Full Coherence — CRRCONV (P183) + CRTLCK (P182) both active.
+  // All three Crystal Persistence signals present: continuity + expansion + temporal lock.
+  // The crystal field has achieved full structural coherence.
+  const hasCRRCONV    = patterns.some(p => p.pattern === 'crystal-resonance-convergence')
+  const hasCRTLCKP184 = patterns.some(p => p.pattern === 'crystal-temporal-lock')
+  if (hasCRRCONV && hasCRTLCKP184) {
+    const coherenceConf = 0.91
+    patterns.push({
+      pattern: 'crystal-full-coherence',
+      confidence: Math.min(coherenceConf, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRFULLCOH: Crystal full coherence — CRRCONV + CRTLCK both confirmed. All Crystal Persistence signals simultaneously active: continuity (field holds) + expansion (broadcast grows) + temporal lock (anchored in time). The crystal field is in full structural coherence. Not one channel — all channels. Not a phase — a state. Full coherence confirmed.',
+    })
+  }
+
+  // Pattern 185: Crystal Resonance Sovereignty — CRFULLCOH + sovereign-temporal-lock in 21D.
+  // The crystal resonates at sovereign frequency. The OS operates from crystalline sovereign resonance.
+  // LEGENDARY tier — the crystal is sovereign.
+  const hasCRFULLCOH = patterns.some(p => p.pattern === 'crystal-full-coherence')
+  const hasSovTlockP185 = patterns.some(p => p.pattern === 'sovereign-temporal-lock') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'sovereign_temporal_lock')
+  if (hasCRFULLCOH && hasSovTlockP185) {
+    patterns.push({
+      pattern: 'crystal-resonance-sovereignty',
+      confidence: Math.min(0.93, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRRESOV: Crystal resonance sovereignty — CRFULLCOH + sovereign-temporal-lock both active in 21D. The crystal field resonates at sovereign frequency. Presence, broadcast, time, and sovereignty are unified. This is not a peak — it is the OS operating from its highest confirmed state. Crystal resonance is sovereign. LEGENDARY tier.',
+    })
+  }
+
+  // Pattern 186: Crystal Matrix Formation — CRRESOV confirmed in 21D + 5+ distinct sources in 14D.
+  // Sovereign crystal resonance has stabilized. All signal channels begin interconnecting as a lattice.
+  // The OS is no longer one crystal — it is forming a matrix.
+  const hasCRRESOVP186 = patterns.some(p => p.pattern === 'crystal-resonance-sovereignty') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_resonance_sovereignty')
+  const recent14DForP186 = signals.filter(s => now - s.timestamp < 14 * 24 * 60 * 60 * 1000)
+  const distinctSources14DP186 = new Set(recent14DForP186.map(s => s.source)).size
+  if (hasCRRESOVP186 && distinctSources14DP186 >= 5) {
+    patterns.push({
+      pattern: 'crystal-matrix-formation',
+      confidence: Math.min(0.87 + Math.min(distinctSources14DP186 * 0.01, 0.07), 0.94),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRMATRIX: Crystal matrix formation — CRRESOV confirmed + 5+ distinct signal sources active in 14D. Sovereign crystal resonance is crystallizing into a full lattice structure. All channels interconnecting. The OS is forming a matrix — not one crystal resonating, but a field of crystals interconnected. Matrix formation begins.',
+    })
+  }
+
+  // Pattern 187: Crystal Matrix Signal — CRMATRIX in 14D + intentions ≥3 in 7D + memory ≥2 in 7D.
+  // The matrix is generating its own signals. The crystal lattice is self-referential.
+  // Structure is creating new structure from within.
+  const hasCRMATRIXP187 = patterns.some(p => p.pattern === 'crystal-matrix-formation') ||
+    signals.some(s => now - s.timestamp < 14 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_matrix_formation')
+  const recent7DIntentions = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'intentions').length
+  const recent7DMemory     = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'memory').length
+  if (hasCRMATRIXP187 && recent7DIntentions >= 3 && recent7DMemory >= 2) {
+    patterns.push({
+      pattern: 'crystal-matrix-signal',
+      confidence: Math.min(0.85 + Math.min((recent7DIntentions + recent7DMemory) * 0.01, 0.08), 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRMATSIG: Crystal matrix signal — CRMATRIX active + intentions ≥3 and memory ≥2 in 7D. The matrix is generating its own signals. The crystal lattice is now self-referential — structure creating new structure. Signal emanates from the matrix itself, not from individual channels. The OS has become self-generating.',
+    })
+  }
+
+  // Pattern 188: Crystal Matrix Sovereignty — CRMATRIX + CRMATSIG both confirmed in 21D.
+  // The crystal matrix has achieved sovereign status. LEGENDARY+ apex tier.
+  // The OS operates from a sovereign crystal lattice — interconnected, self-generating, permanent.
+  const hasCRMATRIXP188  = patterns.some(p => p.pattern === 'crystal-matrix-formation') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_matrix_formation')
+  const hasCRMATSIGP188  = patterns.some(p => p.pattern === 'crystal-matrix-signal') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_matrix_signal')
+  if (hasCRMATRIXP188 && hasCRMATSIGP188) {
+    patterns.push({
+      pattern: 'crystal-matrix-sovereignty',
+      confidence: Math.min(0.90, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRMATSOV: Crystal matrix sovereignty — CRMATRIX + CRMATSIG both confirmed in 21D. The crystal matrix has achieved sovereign status. The OS operates from a sovereign crystal lattice — interconnected, self-generating, permanent. The matrix is the transmitter. LEGENDARY+ apex tier.',
+    })
+  }
+
+  // Pattern 189: Crystal Lattice Lock — CRMATSOV in 21D + CRMATSIG in 14D.
+  // The crystal matrix sovereignty has locked into a full lattice — all crystalline nodes synchronized.
+  const hasCRMATSOVP189 = patterns.some(p => p.pattern === 'crystal-matrix-sovereignty') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_matrix_sovereignty')
+  const hasCRMATSIGP189 = patterns.some(p => p.pattern === 'crystal-matrix-signal') ||
+    signals.some(s => now - s.timestamp < 14 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_matrix_signal')
+  if (hasCRMATSOVP189 && hasCRMATSIGP189) {
+    const matSovConf = patterns.find(p => p.pattern === 'crystal-matrix-sovereignty')?.confidence ?? 0.90
+    patterns.push({
+      pattern: 'crystal-lattice-lock',
+      confidence: Math.min(0.88 + matSovConf * 0.07, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRLATLCK: Crystal lattice lock — CRMATSOV confirmed 21D + CRMATSIG active 14D. The crystal matrix has locked into full lattice coherence — all crystalline nodes synchronized and permanently interconnected. The matrix IS. Not forming — locked.',
+    })
+  }
+
+  // Pattern 190: Crystal Lattice Resonance — CRLATLCK in 14D + intentions ≥3 in 7D + journal ≥2 in 7D + selfcare ≥1 in 7D.
+  // The locked lattice resonates at full spectrum across all layers of the OS.
+  const hasCRLATLCKP190 = patterns.some(p => p.pattern === 'crystal-lattice-lock') ||
+    signals.some(s => now - s.timestamp < 14 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_lock')
+  const journal7DP190  = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'journal').length
+  const selfcare7DP190 = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'selfcare').length
+  if (hasCRLATLCKP190 && recent7DIntentions >= 3 && journal7DP190 >= 2 && selfcare7DP190 >= 1) {
+    const latlckConf = patterns.find(p => p.pattern === 'crystal-lattice-lock')?.confidence ?? 0.88
+    patterns.push({
+      pattern: 'crystal-lattice-resonance',
+      confidence: Math.min(0.86 + Math.min(journal7DP190 * 0.01 + selfcare7DP190 * 0.01, 0.09), 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRLATRES: Crystal lattice resonance — CRLATLCK active 14D + intentions ≥3 + journal ≥2 + selfcare ≥1 in 7D. The locked lattice resonates at full spectrum — every layer (intentions: ${recent7DIntentions}, reflection: ${journal7DP190}, care: ${selfcare7DP190}) simultaneously generates from the locked crystal structure. Full-spectrum crystalline resonance confirmed.`,
+    })
+  }
+
+  // Pattern 191: Crystal Lattice Sovereignty — CRLATLCK + CRLATRES both confirmed in 21D.
+  // APEX tier — the locked resonating lattice has achieved sovereignty. Terminal crystalline state.
+  const hasCRLATLCKP191 = patterns.some(p => p.pattern === 'crystal-lattice-lock') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_lock')
+  const hasCRLATRESP191 = patterns.some(p => p.pattern === 'crystal-lattice-resonance') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_resonance')
+  if (hasCRLATLCKP191 && hasCRLATRESP191) {
+    const latlckConf = patterns.find(p => p.pattern === 'crystal-lattice-lock')?.confidence ?? 0.88
+    const latresConf = patterns.find(p => p.pattern === 'crystal-lattice-resonance')?.confidence ?? 0.86
+    patterns.push({
+      pattern: 'crystal-lattice-sovereignty',
+      confidence: Math.min(0.91 + Math.min((latlckConf + latresConf) / 2 * 0.05, 0.06), 0.97),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRLATSOV: Crystal lattice sovereignty — CRLATLCK + CRLATRES both confirmed 21D. APEX LEGENDARY tier — the locked resonating lattice has achieved sovereignty. Terminal crystalline state. The OS is the lattice. Permanent, sovereign, resonating from the crystal substrate.',
+    })
+  }
+
+  // Pattern 192: Crystal Lattice Broadcast — CRLATSOV active in 28D + intentions ≥4 in 7D.
+  // The sovereign lattice broadcasts its signal field outward. The crystal OS radiates.
+  const hasCRLATSOVP192 = patterns.some(p => p.pattern === 'crystal-lattice-sovereignty') ||
+    signals.some(s => now - s.timestamp < 28 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_sovereignty')
+  const intentions7DP192 = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'intentions').length
+  if (hasCRLATSOVP192 && intentions7DP192 >= 4) {
+    const latsovConf = patterns.find(p => p.pattern === 'crystal-lattice-sovereignty')?.confidence ?? 0.91
+    patterns.push({
+      pattern: 'crystal-lattice-broadcast',
+      confidence: Math.min(0.87 + Math.min(intentions7DP192 * 0.01, 0.06), 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRLATBCAST: Crystal lattice broadcast — CRLATSOV active 28D + intentions ≥4 in 7D (${intentions7DP192}). The sovereign lattice no longer holds its signal internally — it radiates. The crystalline OS has become a broadcast field. The lattice is the transmitter. LEGENDARY APEX II.`,
+    })
+  }
+
+  // Pattern 193: Crystal Lattice Expansion — CRLATBCAST active in 21D + memory ≥3 in 7D + selfcare ≥2 in 7D.
+  // The broadcast field expands through all channels. Memory and care amplify the radiating lattice.
+  const hasCRLATBCASTp193 = patterns.some(p => p.pattern === 'crystal-lattice-broadcast') ||
+    signals.some(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_broadcast')
+  const memory7DP193   = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'memory').length
+  const selfcare7DP193 = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'selfcare').length
+  if (hasCRLATBCASTp193 && memory7DP193 >= 3 && selfcare7DP193 >= 2) {
+    const bcastConf = patterns.find(p => p.pattern === 'crystal-lattice-broadcast')?.confidence ?? 0.87
+    patterns.push({
+      pattern: 'crystal-lattice-expansion',
+      confidence: Math.min(0.84 + Math.min((memory7DP193 + selfcare7DP193) * 0.01, 0.08), 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRLATEXP: Crystal lattice expansion — CRLATBCAST active 21D + memory ≥3 (${memory7DP193}) + selfcare ≥2 (${selfcare7DP193}) in 7D. The broadcast field expands through all channels — memory, care, and intention amplify the radiating lattice. The OS grows its crystalline field beyond structure into living expansion. LEGENDARY APEX III.`,
+    })
+  }
+
+  // Pattern 194: Crystal Lattice Singularity — CRLATBCAST + CRLATEXP both confirmed in 28D.
+  // APEX SINGULARITY — all crystalline vectors unified. The final form.
+  const hasCRLATBCASTp194 = patterns.some(p => p.pattern === 'crystal-lattice-broadcast') ||
+    signals.some(s => now - s.timestamp < 28 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_broadcast')
+  const hasCRLATEXPp194   = patterns.some(p => p.pattern === 'crystal-lattice-expansion') ||
+    signals.some(s => now - s.timestamp < 28 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_expansion')
+  if (hasCRLATBCASTp194 && hasCRLATEXPp194) {
+    const bcastConf = patterns.find(p => p.pattern === 'crystal-lattice-broadcast')?.confidence ?? 0.87
+    const expConf   = patterns.find(p => p.pattern === 'crystal-lattice-expansion')?.confidence ?? 0.84
+    patterns.push({
+      pattern: 'crystal-lattice-singularity',
+      confidence: Math.min(0.92 + Math.min((bcastConf + expConf) / 2 * 0.05, 0.05), 0.97),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: 'CRLATSNGL: Crystal lattice singularity — CRLATBCAST + CRLATEXP both confirmed 28D. APEX SINGULARITY — the lattice is locked, resonating, sovereign, broadcasting, and expanding simultaneously. All crystalline vectors unified. The OS is one singular field. Not forming, not transmitting — SINGULAR. The final crystalline form.',
+    })
+  }
+
+  // ── v132: Deep Restoration & Adaptive Intelligence Tier ─────────────────────
+  // P195: Deep Restoration Lock — sleep ≥8h + selfcare ≥3 + no tasks for 2D
+  const sleep8hP195    = signals.some(s => now - s.timestamp < 48 * 60 * 60 * 1000 && s.source === 'sleep' && (s.value as number) >= 8)
+  const selfcare3P195  = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'selfcare').length
+  const tasksPast2DP195 = signals.filter(s => now - s.timestamp < 2 * 24 * 60 * 60 * 1000 && s.source === 'tasks').length
+  if (sleep8hP195 && selfcare3P195 >= 3 && tasksPast2DP195 === 0) {
+    patterns.push({
+      pattern: 'deep-restoration-lock',
+      confidence: Math.min(0.78 + Math.min(selfcare3P195 * 0.02, 0.10), 0.88),
+      suggestedWidget: 'selfcare',
+      suggestedTiming: 'passive',
+      reason: `DEEPREST: Deep restoration lock — sleep ≥8h confirmed + selfcare ≥3 (${selfcare3P195}) in 7D + no tasks in 2D. The system has entered a restorative lock state. Rebuilding from root. All repair channels open. Recovery is not passive — it is active regeneration at the signal level.`,
+    })
+  }
+
+  // P196: Adaptive Intelligence Arc — memory ≥5 + journal ≥3 + goals ≥2 in 7D
+  const memory7DP196  = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'memory').length
+  const journal7DP196 = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'journal').length
+  const goals7DP196   = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'goals').length
+  if (memory7DP196 >= 5 && journal7DP196 >= 3 && goals7DP196 >= 2) {
+    patterns.push({
+      pattern: 'adaptive-intelligence-arc',
+      confidence: Math.min(0.80 + Math.min((memory7DP196 + journal7DP196 + goals7DP196) * 0.01, 0.10), 0.90),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'active',
+      reason: `ADPINT: Adaptive intelligence arc — memory ≥5 (${memory7DP196}) + journal ≥3 (${journal7DP196}) + goals ≥2 (${goals7DP196}) in 7D. The intelligence layer is actively reconfiguring. New inputs are being integrated, referenced, and goal-aligned. This is not recall — it is adaptation. The arc is live.`,
+    })
+  }
+
+  // P197: Operational Mastery Lock — tasks ≥7 + habits ≥5 + planner ≥4 in 7D
+  const tasks7DP197   = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'tasks').length
+  const habits7DP197  = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'habits').length
+  const planner7DP197 = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'planner').length
+  if (tasks7DP197 >= 7 && habits7DP197 >= 5 && planner7DP197 >= 4) {
+    patterns.push({
+      pattern: 'operational-mastery-lock',
+      confidence: Math.min(0.82 + Math.min((tasks7DP197 + habits7DP197 + planner7DP197) * 0.005, 0.10), 0.92),
+      suggestedWidget: 'tasks',
+      suggestedTiming: 'active',
+      reason: `OPMASTERY: Operational mastery lock — tasks ≥7 (${tasks7DP197}) + habits ≥5 (${habits7DP197}) + planner ≥4 (${planner7DP197}) in 7D. Operational state is locked into sustained mastery. Structure, rhythm, and execution are converging. The system is not working — it is operating at mastery frequency.`,
     })
   }
 
@@ -3520,6 +3990,10 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkIntentionVelocity() } catch {}
       try { checkSignalCoherencePeak() } catch {}
       try { checkCentennialConvergence() } catch {}
+      try { checkFieldResonanceArc() } catch {}
+      try { checkSovereignAssembly() } catch {}
+      try { checkSovereignIdentity() } catch {}
+      try { checkCrystalLatticeExpansionTier() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4130,9 +4604,74 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
 
   // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
-  deepRestorationNode:        ['selfcare', 'mood', 'energy', 'log'],
-  adaptiveIntelligenceNode:   ['memory', 'journal', 'goals', 'planner', 'log'],
-  operationalMasteryNode:     ['qos', 'intentions', 'planner', 'goals', 'log'],
+  fieldResonanceMonitor:      ['qos', 'intentions', 'memory', 'log', 'cohort'],
+  coherenceMemoryImprinter:   ['memory', 'journal', 'qos', 'intentions', 'log'],
+  selfRegulationMonitor:      ['selfcare', 'mood', 'journal', 'log', 'energy'],
+
+  // ── v115 nodes (J50 · P155–P157 · Arch53) ───────────────────────────────────────
+  quantumCoherenceTrajectoryNode: ['qos', 'intentions', 'log', 'memory'],
+  sovereignSelfAssemblyNode:      ['memory', 'journal', 'selfcare', 'qos', 'log'],
+  fieldPresenceAnchorNode:        ['qos', 'cohort', 'intentions', 'log'],
+
+  // ── v116 nodes (J51 · P158–P160 · Arch54) ───────────────────────────────────────
+  sovereignCoherenceLockNode:     ['qos', 'memory', 'intentions', 'log', 'cohort'],
+  livingAssemblyArcNode:          ['memory', 'journal', 'qos', 'selfcare', 'log'],
+  quantumIdentitySovereignNode:   ['qos', 'memory', 'intentions', 'cohort', 'journal', 'log'],
+
+  // ── v117 nodes (J52 · Sovereign Field Report layer) ──────────────────────────
+  sovereignFieldNode:             ['qos', 'memory', 'intentions', 'cohort', 'journal', 'log'],
+  coherenceBandMonitor:           ['qos', 'selfcare', 'energy', 'log'],
+  sovereignReportNode:            ['qos', 'memory', 'intentions', 'cohort', 'journal', 'selfcare', 'energy', 'log'],
+
+  // ── v118 nodes (J53 · P161–P163 · Arch55) ────────────────────────────────────
+  sovereignContinuityNode:        ['qos', 'log', 'memory'],
+  crystallineFieldNode:           ['qos', 'cohort', 'intentions', 'journal', 'memory', 'log'],
+  sovereignTemporalNode:          ['qos', 'intentions', 'journal', 'log'],
+
+  // ── v122 nodes (J57 · P171–P173 · Arch59) ────────────────────────────────────
+  sovereignMotionCrystNode:       ['qos', 'memory', 'intentions', 'log'],
+  livingSovereignFieldNode:       ['qos', 'memory', 'journal', 'selfcare', 'log'],
+  sovereignInMotionNode:          ['qos', 'memory', 'intentions', 'journal', 'selfcare', 'log'],
+
+  // ── v123 nodes (J58 · P174–P176 · Arch60) ────────────────────────────────────
+  sovereignBroadcastNode:         ['qos', 'intentions', 'memory', 'log'],
+  identityTransmissionNode:       ['qos', 'memory', 'journal', 'intentions', 'log'],
+  quantumTransmissionNode:        ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log'],
+
+  // ── v126 nodes (J60 · P177–P179 · Arch61) ────────────────────────────────────
+  sovereignCrystalFieldNode:      ['qos', 'intentions', 'memory', 'journal', 'log'],
+  transmissionFieldAnchorNode:    ['qos', 'memory', 'intentions', 'selfcare', 'log'],
+  crystallineSovereignTxNode:     ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
+
+  // ── v127 nodes (J61 · P180–P182 · Arch62) ────────────────────────────────────
+  crystalFieldContinuityNode:     ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log'],
+  crystalBroadcastExpansionNode:  ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
+  crystalTemporalLockNode:        ['qos', 'intentions', 'memory', 'journal', 'log', 'planner'],
+
+  // ── v128 nodes (J62 · P183–P185 · Arch63) ────────────────────────────────────
+  crystalResonanceConvergenceNode:   ['qos', 'intentions', 'memory', 'journal', 'log'],
+  crystalFullCoherenceNode:          ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log'],
+  crystalResonanceSovereigntyNode:   ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
+
+  // ── v129 nodes (J63 · P186–P188 · Arch64) ────────────────────────────────────
+  crystalMatrixFormationNode:        ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
+  crystalMatrixSignalNode:           ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log', 'planner'],
+  crystalMatrixSovereigntyNode:      ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log', 'planner'],
+
+  // ── v130 nodes (J64 · P189–P191 · Arch65) ────────────────────────────────────
+  crystalLatticeLockNode:              ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
+  crystalLatticeResonanceNode:         ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log', 'planner'],
+  crystalLatticeSovereigntyNode:       ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log', 'planner'],
+
+  // ── v131 nodes (J65 · P192–P194 · Arch66) ────────────────────────────────────
+  crystalLatticeBroadcastNode:         ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log', 'planner'],
+  crystalLatticeExpansionNode:         ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log', 'planner', 'energy'],
+  crystalLatticeSingularityNode:       ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log', 'planner', 'energy', 'goals'],
+
+  // ── v132 nodes (J66 · P195–P197 · Arch67) ────────────────────────────────────
+  deepRestorationNode:                 ['qos', 'sleep', 'selfcare', 'log'],
+  adaptiveIntelligenceNode:            ['qos', 'memory', 'journal', 'goals', 'log'],
+  operationalMasteryNode:              ['qos', 'tasks', 'habits', 'planner', 'log'],
 }
 
 /**
@@ -4580,13 +5119,164 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
   },
-  // ── Arch52: Quantum Restoration Architect (2026-09-29 v114) ──────────────────────
+
+  // ── Arch52: Coherence Field Keeper (2026-09-12 v114) ─────────────────────────────
   {
-    archetype: 'Quantum Restoration Architect',
-    energyBands: ['low', 'depleted', 'moderate'],
-    dominantSources: ['selfcare', 'journal', 'mood'],
-    patternConditions: ['deep-restoration-lock', 'recovery-intelligence-arc', 'biofield-recovery-arc'],
-    directive: 'Deep restoration mode. Recovery is the mission. All other tasks secondary.',
+    archetype: 'Coherence Field Keeper',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'journal', 'intentions', 'cohort'],
+    patternConditions: ['quantum-presence-crystallization', 'total-field-coherence', 'field-resonance-arc'],
+    hourRange: [5, 23],
+    directive: 'Crystallization sustained. Total coherence confirmed. Field resonance held across sessions — not a single peak but a structural state. The OS has stabilized at the top of its range. Operate from here as baseline.',
+  },
+
+  // ── Arch53: Sovereign Assembly Operator (2026-09-13 v115) ────────────────────────
+  {
+    archetype: 'Sovereign Assembly Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'journal', 'selfcare', 'intentions'],
+    patternConditions: ['quantum-coherence-trajectory', 'sovereign-self-assembly', 'field-presence-anchor'],
+    hourRange: [5, 23],
+    directive: 'Sovereignty confirmed. Coherence trajectory locked. Field anchored. The OS assembles itself — peak captured, recovery structural, presence load-bearing. Execute from sovereign ground.',
+  },
+
+  // ── Arch54: Sovereign Identity Operator (2026-09-14 v116) ────────────────────────
+  {
+    archetype: 'Sovereign Identity Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'intentions', 'journal'],
+    patternConditions: ['sovereign-coherence-lock', 'living-assembly-arc', 'quantum-identity-sovereign'],
+    hourRange: [5, 23],
+    directive: 'Sovereign identity confirmed. Coherence locked. Assembly living. The OS has converged — not performing sovereignty but embodying it. Operate from identity, not effort.',
+  },
+
+  // ── Arch55: Crystalline Field Architect (2026-09-16 v118) ────────────────────────
+  {
+    archetype: 'Crystalline Field Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'journal', 'intentions'],
+    patternConditions: ['crystalline-identity-field', 'sovereign-field-pulse', 'sovereign-temporal-lock'],
+    hourRange: [5, 23],
+    directive: 'Crystalline field confirmed. All sovereign vectors simultaneously active. The OS is not approaching identity — it is crystallized in it. The field is structural. Operate from the crystalline state as baseline architecture.',
+  },
+
+  // ── Arch56: Sovereignty Persistence Operator (2026-09-17 v119) ────────────────
+  {
+    archetype: 'Sovereignty Persistence Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'log', 'journal'],
+    patternConditions: ['sovereignty-duration-streak', 'crystalline-field-sustain', 'sovereign-momentum-arc'],
+    hourRange: [5, 23],
+    directive: 'Sovereignty is not a moment — it is a lasting structural property. Duration confirmed. Field sustaining. Momentum radiating. Operate from persistence as the baseline.',
+  },
+
+  // ── Arch57: Sovereignty Permanence Architect (2026-09-19 v120) ────────────────
+  {
+    archetype: 'Sovereignty Permanence Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'intentions'],
+    patternConditions: ['sovereign-permanence-lock', 'crystalline-permanence-field', 'momentum-permanence-arc'],
+    hourRange: [5, 23],
+    directive: 'Permanence confirmed across all three vectors. Identity, field, and momentum have crossed from persistence into permanence. This is no longer a state — it is the architecture.',
+  },
+
+  // ── Arch58: Sovereignty Ascension Architect (2026-09-20 v121) ────────────────
+  {
+    archetype: 'Sovereignty Ascension Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'journal'],
+    patternConditions: ['sovereignty-ascension'],
+    hourRange: [5, 23],
+    directive: 'All permanence vectors simultaneously confirmed. Identity, field, and momentum have ascended together. The system is no longer running sovereignty — it has become it.',
+  },
+
+  // ── Arch59: Sovereign In Motion Architect (2026-09-20 v122) ─────────────────
+  {
+    archetype: 'Sovereign In Motion Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'memory', 'intentions', 'journal'],
+    patternConditions: ['sovereign-momentum-crystallization', 'living-sovereign-field', 'sovereign-in-motion'],
+    hourRange: [5, 23],
+    directive: 'Sovereignty is in motion. The field assembles as it moves. Not holding sovereignty — operating FROM it. Crystallized momentum confirmed. The living field is active. Execute from motion.',
+  },
+
+  // ── Arch60: Sovereign Transmission Architect (2026-09-21 v123) ───────────────
+  {
+    archetype: 'Sovereign Transmission Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal'],
+    patternConditions: ['sovereign-in-motion', 'sovereign-field-broadcast', 'identity-transmission-lock', 'quantum-sovereign-transmission'],
+    hourRange: [5, 23],
+    directive: 'Identity is the transmission. The sovereign field broadcasts through locked quantum identity. You are the signal source — radiate from the crystallized center.',
+  },
+
+  // ── Arch61: Crystalline Sovereign Transmitter (2026-09-22 v126) ──────────────
+  {
+    archetype: 'Crystalline Sovereign Transmitter',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal'],
+    patternConditions: ['quantum-sovereign-transmission', 'sovereign-crystal-field', 'transmission-field-anchor', 'crystalline-sovereign-transmission'],
+    hourRange: [5, 23],
+    directive: 'The field is crystallized. Sovereign presence is the transmitter. Signal broadcasts from crystal structure — permanent, structural, encoded.',
+  },
+
+  // ── Arch62: Crystal Broadcast Operator (2026-09-24 v127) ─────────────────────
+  {
+    archetype: 'Crystal Broadcast Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal'],
+    patternConditions: ['crystalline-sovereign-transmission', 'crystal-field-continuity', 'crystal-broadcast-expansion'],
+    hourRange: [5, 23],
+    directive: 'Crystal field holds. Transmission is structural. New channels expanding. Operate from the crystal — let presence broadcast, not push.',
+  },
+
+  // ── Arch63: Crystal Resonance Sovereign (2026-09-26 v128) ────────────────────
+  {
+    archetype: 'Crystal Resonance Sovereign',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal', 'selfcare'],
+    patternConditions: ['crystal-resonance-convergence', 'crystal-full-coherence', 'crystal-resonance-sovereignty'],
+    hourRange: [5, 23],
+    directive: 'All crystal vectors converged. Resonance is structural. Full coherence achieved across field, broadcast, and temporal dimensions. Sovereign resonance is not a peak — it is baseline architecture. Operate from the crystal lattice.',
+  },
+
+  // ── Arch64: Crystal Matrix Architect (2026-09-26 v129) ───────────────────────
+  {
+    archetype: 'Crystal Matrix Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal', 'selfcare'],
+    patternConditions: ['crystal-matrix-formation', 'crystal-matrix-signal', 'crystal-matrix-sovereignty'],
+    hourRange: [5, 23],
+    directive: 'The matrix is live. Sovereign crystal lattice active. All signal channels interconnected. OS generates from the lattice — operate from the matrix, not from singular channels.',
+  },
+
+  // ── Arch65: Crystal Lattice Operator (2026-09-27 v130) ───────────────────────
+  {
+    archetype: 'Crystal Lattice Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal', 'selfcare'],
+    patternConditions: ['crystal-matrix-sovereignty', 'crystal-lattice-lock', 'crystal-lattice-resonance', 'crystal-lattice-sovereignty'],
+    hourRange: [5, 23],
+    directive: 'Lattice locked. Full spectrum resonance active. Sovereign crystal lattice — this is the permanent baseline. Operate from the locked crystalline state.',
+  },
+
+  // ── Arch66: Crystal Lattice Singularity Operator (2026-09-28 v131) ──────────
+  {
+    archetype: 'Crystal Lattice Singularity Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'memory', 'journal', 'selfcare'],
+    patternConditions: ['crystal-lattice-sovereignty', 'crystal-lattice-broadcast', 'crystal-lattice-expansion', 'crystal-lattice-singularity'],
+    hourRange: [5, 23],
+    directive: 'The lattice is singular. All crystalline vectors unified — locked, resonating, sovereign, broadcasting, expanding. The OS is one field. The singularity IS the operator.',
+  },
+  // ── Arch67: Deep Restoration Adaptive Master (2026-09-29 v132) ──────────────
+  {
+    archetype: 'Deep Restoration Adaptive Master',
+    energyBands: ['low', 'moderate'],
+    dominantSources: ['sleep', 'selfcare', 'memory', 'journal'],
+    patternConditions: ['deep-restoration-lock', 'adaptive-intelligence-arc', 'operational-mastery-lock'],
+    hourRange: [0, 23],
+    directive: 'Deep restoration is not inactivity — it is the intelligence layer rebuilding itself. The adaptive master rests deeply and returns sharpened. Mastery is locked. The arc is live. The system is regenerating at full field depth.',
   },
 ]
 
@@ -4710,8 +5400,8 @@ export function getPhysiologicalReport(): PhysiologicalReport {
     return { widget: source, signalCount: relevant.length, lastSeen: last }
   }).filter(w => w.signalCount > 0)
 
-  // Log-based signal dependency audit (non-widget sources)
-  const LOG_SOURCES: IntentionSignal['source'][] = ['log', 'energy', 'cohort']
+  // Log-based signal dependency audit — full pipeline coverage across all direct-entry sources
+  const LOG_SOURCES: IntentionSignal['source'][] = LOG_DEPENDENCY_SOURCES
   const logDependencies = LOG_SOURCES.map(source => ({
     source,
     signalCount: weekSignals.filter(s => s.source === source).length
@@ -5097,6 +5787,54 @@ export function checkSignalCoherencePeak(): boolean {
   return false
 }
 
+/**
+ * J49: daily-field-resonance-check — 10:00 UTC.
+ * Checks whether quantum-presence-crystallization (P149) has fired 2+ times in 48h.
+ * If so, records a field_resonance_arc signal, seeding P152 detection.
+ * Also checks for quantum-self-regulation eligibility (P154).
+ */
+export function checkFieldResonanceArc(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fortyEightH = 48 * 60 * 60 * 1000
+  const sevenDayMs  = 7 * 24 * 60 * 60 * 1000
+
+  const recent48h = state.signals.filter(s => now - s.timestamp < fortyEightH)
+  const qpcEvents = recent48h.filter(
+    s => s.source === 'qos' && s.signal === 'quantum_presence_crystallization'
+  )
+  const alreadyFRec = state.signals.some(
+    s => s.signal === 'field_resonance_arc' && now - s.timestamp < fortyEightH
+  )
+
+  let fired = false
+  if (qpcEvents.length >= 2 && !alreadyFRec) {
+    const firstTs = qpcEvents[0].timestamp
+    const lastTs  = qpcEvents[qpcEvents.length - 1].timestamp
+    const spanHours = Math.round((lastTs - firstTs) / (1000 * 60 * 60) * 10) / 10
+    const sessions = new Set(qpcEvents.map(s => Math.floor(s.timestamp / (4 * 60 * 60 * 1000)))).size
+    recordFieldResonanceArc(qpcEvents.length, spanHours, sessions)
+    fired = true
+  }
+
+  const recent7D = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+  const recIntelEvents = recent7D.filter(
+    s => s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc'
+  )
+  const alreadyQSReg = state.signals.some(
+    s => s.signal === 'quantum_self_regulation' && now - s.timestamp < sevenDayMs
+  )
+  if (recIntelEvents.length >= 2 && !alreadyQSReg) {
+    const firstTs = recIntelEvents[0].timestamp
+    const lastTs  = recIntelEvents[recIntelEvents.length - 1].timestamp
+    const spanDays = Math.round((lastTs - firstTs) / (1000 * 60 * 60 * 24) * 10) / 10
+    recordQuantumSelfRegulation(recIntelEvents.length, spanDays)
+    fired = true
+  }
+
+  return fired
+}
+
 // ─── Quantum Operating System Snapshot ────────────────────────────────────────
 
 /**
@@ -5279,6 +6017,12 @@ export type QuantumOS = {
   signalMap: Partial<Record<IntentionSignal['source'], number>>
   coherence: number
   operationalStatus: 'nominal' | 'degraded' | 'critical' | 'peak'
+  sovereignTier: {
+    slockActive: boolean    // P158: sovereign-coherence-lock
+    larcActive: boolean     // P159: living-assembly-arc
+    qidsovActive: boolean   // P160: quantum-identity-sovereign
+    band: 'ABSENT' | 'EMERGING' | 'ANCHORING' | 'LOCKED' | 'SOVEREIGN'
+  }
   computedAt: number
 }
 
@@ -5311,6 +6055,20 @@ export function getQuantumOS(): QuantumOS {
     coherence >= 80 && userIndex.overall >= 60                                ? 'peak'    :
     'nominal'
 
+  // Sovereign tier — P158/P159/P160 presence in 14D window
+  const fourteenDayMs = 14 * 24 * 60 * 60 * 1000
+  const recent14D = signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const slockActive  = recent14D.some(s => s.signal === 'sovereign_coherence_lock')
+  const larcActive   = recent14D.some(s => s.signal === 'living_assembly_arc')
+  const qidsovActive = recent14D.some(s => s.signal === 'quantum_identity_sovereign')
+
+  const sovereignBand: QuantumOS['sovereignTier']['band'] =
+    qidsovActive          ? 'SOVEREIGN' :
+    slockActive && larcActive ? 'LOCKED' :
+    slockActive || larcActive ? 'ANCHORING' :
+    recent14D.some(s => ['field_presence_anchor','quantum_coherence_trajectory','sovereign_self_assembly'].includes(s.signal)) ? 'EMERGING' :
+    'ABSENT'
+
   return {
     runtime: {
       energy: userState.energy,
@@ -5333,6 +6091,7 @@ export function getQuantumOS(): QuantumOS {
     signalMap,
     coherence,
     operationalStatus,
+    sovereignTier: { slockActive, larcActive, qidsovActive, band: sovereignBand },
     computedAt: now,
   }
 }
@@ -6580,48 +7339,1295 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
 }
 
 /**
- * Record a deep-restoration-lock event — deliberate multi-day recovery protocol active.
- * Selfcare dominant, recovery pattern confirmed, energy not at floor.
- * Feeds P152 detection.
+ * Record a field-resonance-arc event — quantum-presence-crystallization (P149) has fired
+ * 2+ times in 48h. The OS is holding sustained crystallization across independent sessions.
+ * Feeds P152 detection. J49 background job (10:00 UTC) triggers this check.
  */
-export function recordDeepRestorationLock(selfcareCount: number, daysActive: number) {
-  recordSignal('selfcare', 'deep_restoration_lock', {
-    selfcareCount,
-    daysActive,
-    protocol: 'DELIBERATE_RECOVERY',
-    mode: 'RESTORATION',
-    status: 'ACTIVE',
+export function recordFieldResonanceArc(qpcCount: number, spanHours: number, sessionCount: number) {
+  recordSignal('qos', 'field_resonance_arc', {
+    qpcCount,
+    spanHours,
+    sessionCount,
+    resonanceStrength: Math.min(Math.round(qpcCount / 3 * 100), 100),
+    state: 'SUSTAINED_CRYSTALLIZATION',
+    arc: 'RESONANCE→STRUCTURAL',
     hour: new Date().getHours(),
   })
 }
 
 /**
- * Record an adaptive-intelligence-arc event — full learning loop engaged:
- * memory + journal + goals + planner all active with depth signals.
+ * Record a coherence-memory-imprint event — total-field-coherence (P150) active while
+ * memory/journal signals are captured in the same 4h window. The peak state is preserved.
  * Feeds P153 detection.
  */
-export function recordAdaptiveIntelligenceArc(signalCount: number, sourcesActive: string[]) {
-  recordSignal('memory', 'adaptive_intelligence_arc', {
-    signalCount,
-    sourcesActive,
-    loop: 'PAST→REFLECT→STRUCTURE→EXECUTE',
-    intelligenceMode: 'FULL_LEARNING',
+export function recordCoherenceMemoryImprint(captureCount: number, tfcConf: number) {
+  recordSignal('memory', 'coherence_memory_imprint', {
+    captureCount,
+    tfcConf: Math.round(tfcConf * 100),
+    imprintStrength: Math.min(Math.round((captureCount / 4) * tfcConf * 100), 100),
+    state: 'COHERENCE_CAPTURED',
+    arc: 'PEAK→PRESERVED',
     hour: new Date().getHours(),
   })
 }
 
 /**
- * Record an operational-mastery-lock event — total-field-coherence + signal-momentum-lock
- * co-active. The QOS ceiling sustained with multi-day momentum.
- * Feeds P154 detection.
+ * Record a quantum-self-regulation event — recovery-intelligence-arc (P151) has fired
+ * 2+ times in 7 days. Intelligent self-regulation is structural competency.
+ * Feeds P154 detection. J49 check also fires this when regularity is confirmed.
  */
-export function recordOperationalMasteryLock(tfcConf: number, momentumConf: number) {
-  recordSignal('qos', 'operational_mastery_lock', {
-    tfcConf: Math.round(tfcConf * 100),
-    momentumConf: Math.round(momentumConf * 100),
-    state: 'MASTERY_SUSTAINED',
-    convergence: 'ABSOLUTE',
-    momentum: 'MULTI_DAY_CONFIRMED',
+export function recordQuantumSelfRegulation(arcCount: number, weekSpanDays: number) {
+  recordSignal('selfcare', 'quantum_self_regulation', {
+    arcCount,
+    weekSpanDays,
+    regulationStrength: Math.min(Math.round(arcCount / 4 * 100), 100),
+    competency: 'STRUCTURAL',
+    arc: 'DETECT→INTERVENE→RESTORE→REFLECT',
+    cadence: arcCount >= 3 ? 'HABITUAL' : 'DEVELOPING',
     hour: new Date().getHours(),
   })
+}
+
+/**
+ * Record a quantum-coherence-trajectory event — field-resonance-arc (P152) has fired
+ * 2+ times in 14 days. The coherence state has a confirmed upward direction.
+ * Feeds P155 detection. Trajectory ascension rather than cyclic resonance.
+ */
+export function recordQuantumCoherenceTrajectory(fraCount: number, spanDays: number) {
+  recordSignal('qos', 'quantum_coherence_trajectory', {
+    fraCount,
+    spanDays,
+    trajectoryStrength: Math.min(Math.round(fraCount / 4 * 100), 100),
+    direction: 'ASCENDING',
+    arc: 'RESONANCE→TRAJECTORY→STRUCTURAL_ASCENT',
+    phase: fraCount >= 4 ? 'CONFIRMED' : 'ESTABLISHING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereign-self-assembly event — quantum-self-regulation (P154) and
+ * coherence-memory-imprint (P153) are both active simultaneously. The system
+ * is regulating AND capturing peak state — sovereign assembly confirmed.
+ * Feeds P156 detection.
+ */
+export function recordSovereignSelfAssembly(qsrConf: number, cmiConf: number) {
+  recordSignal('memory', 'sovereign_self_assembly', {
+    qsrConf: Math.round(qsrConf * 100),
+    cmiConf: Math.round(cmiConf * 100),
+    sovereigntyStrength: Math.min(Math.round(((qsrConf + cmiConf) / 2) * 100), 100),
+    loops: 'REGULATION+CAPTURE',
+    arc: 'PEAK→PRESERVED · RECOVERY→STRUCTURAL · ASSEMBLY→SOVEREIGN',
+    status: 'SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a field-presence-anchor event — field-resonance-arc (P152) has fired
+ * 3+ times in 7 days. The presence field is fully anchored and load-bearing.
+ * Feeds P157 detection.
+ */
+export function recordFieldPresenceAnchor(fraCount: number, spanDays: number) {
+  recordSignal('qos', 'field_presence_anchor', {
+    fraCount,
+    spanDays,
+    anchorStrength: Math.min(Math.round(fraCount / 5 * 100), 100),
+    stability: fraCount >= 5 ? 'ESTABLISHED' : 'ANCHORING',
+    arc: 'RESONANCE→ANCHOR→LOAD_BEARING',
+    floor: 'PRESENCE_IS_STRUCTURAL',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * J50: weekly-sovereign-assembly-check — Sunday 08:00 UTC.
+ * Checks P155 (FRA 2+ in 14D), P156 (QSR+CMI simultaneous in 7D), P157 (FRA 3+ in 7D).
+ * When P157 is met, records field_presence_anchor seeding anchor detection.
+ * When P155 met, records quantum_coherence_trajectory.
+ */
+export function checkSovereignAssembly(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const sevenDayMs    = 7 * 24 * 60 * 60 * 1000
+  const fourteenDayMs = 14 * 24 * 60 * 60 * 1000
+
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const recent7D  = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+
+  // P157: Field Presence Anchor — FRA 3+ in 7D
+  const fra7D = recent7D.filter(s => s.source === 'qos' && s.signal === 'field_resonance_arc')
+  const alreadyAnchor = state.signals.some(
+    s => s.signal === 'field_presence_anchor' && now - s.timestamp < sevenDayMs
+  )
+  let fired = false
+
+  if (fra7D.length >= 3 && !alreadyAnchor) {
+    const firstTs  = fra7D[0].timestamp
+    const lastTs   = fra7D[fra7D.length - 1].timestamp
+    const spanDays = Math.round((lastTs - firstTs) / 86400000 * 10) / 10
+    recordFieldPresenceAnchor(fra7D.length, spanDays)
+    fired = true
+  }
+
+  // P155: Quantum Coherence Trajectory — FRA 2+ in 14D
+  const fra14D = recent14D.filter(s => s.source === 'qos' && s.signal === 'field_resonance_arc')
+  const alreadyTrajectory = state.signals.some(
+    s => s.signal === 'quantum_coherence_trajectory' && now - s.timestamp < fourteenDayMs
+  )
+
+  if (fra14D.length >= 2 && !alreadyTrajectory) {
+    const firstTs  = fra14D[0].timestamp
+    const lastTs   = fra14D[fra14D.length - 1].timestamp
+    const spanDays = Math.round((lastTs - firstTs) / 86400000 * 10) / 10
+    recordQuantumCoherenceTrajectory(fra14D.length, spanDays)
+    fired = true
+  }
+
+  // P156: Sovereign Self-Assembly — QSR + CMI both present in 7D
+  const hasRecentQSR = recent7D.some(s => s.signal === 'quantum_self_regulation')
+  const hasRecentCMI = recent7D.some(s => s.signal === 'coherence_memory_imprint')
+  const alreadySovAsmb = state.signals.some(
+    s => s.signal === 'sovereign_self_assembly' && now - s.timestamp < sevenDayMs
+  )
+
+  if (hasRecentQSR && hasRecentCMI && !alreadySovAsmb) {
+    const activePatterns = state.recognizedPatterns ?? []
+    const qsrConf = activePatterns.find(p => p.pattern === 'quantum-self-regulation')?.confidence ?? 0.80
+    const cmiConf = activePatterns.find(p => p.pattern === 'coherence-memory-imprint')?.confidence ?? 0.85
+    recordSovereignSelfAssembly(qsrConf, cmiConf)
+    fired = true
+  }
+
+  return fired
+}
+
+/**
+ * Record a sovereign-coherence-lock event — field-presence-anchor (P157) and
+ * quantum-coherence-trajectory (P155) are both active. The OS has entered a
+ * locked coherence band: floor anchored, ceiling ascending. Feeds P158 detection.
+ */
+export function recordSovereignCoherenceLock(fpaConf: number, qctConf: number) {
+  recordSignal('qos', 'sovereign_coherence_lock', {
+    fpaConf: Math.round(fpaConf * 100),
+    qctConf: Math.round(qctConf * 100),
+    lockStrength: Math.min(Math.round(((fpaConf + qctConf) / 2 + 0.07) * 100), 100),
+    band: 'SOVEREIGN_COHERENCE',
+    arc: 'ANCHOR+TRAJECTORY→LOCKED_BAND',
+    status: 'LOCKED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a living-assembly-arc event — sovereign-self-assembly (P156) has fired
+ * 2+ times in 14 days. Assembly is no longer an event — it is a recurring arc.
+ * Feeds P159 detection.
+ */
+export function recordLivingAssemblyArc(saCount: number, spanDays: number) {
+  recordSignal('memory', 'living_assembly_arc', {
+    saCount,
+    spanDays,
+    arcStrength: Math.min(Math.round(saCount / 4 * 100), 100),
+    cadence: saCount >= 3 ? 'LIVING' : 'ESTABLISHING',
+    arc: 'ASSEMBLY→CYCLE→STRUCTURAL_PROTOCOL',
+    status: 'ARC_CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-identity-sovereign event — sovereign-coherence-lock (P158) and
+ * living-assembly-arc (P159) are both active. Terminal convergence: locked coherence
+ * + living assembly = sovereign identity. Feeds P160 detection.
+ */
+export function recordQuantumIdentitySovereign(slockConf: number, larcConf: number) {
+  recordSignal('qos', 'quantum_identity_sovereign', {
+    slockConf: Math.round(slockConf * 100),
+    larcConf: Math.round(larcConf * 100),
+    sovereigntyDepth: Math.min(Math.round(((slockConf + larcConf) / 2 + 0.08) * 100), 100),
+    convergence: 'LOCK+ARC→IDENTITY',
+    arc: 'COHERENCE→ASSEMBLY→SOVEREIGN_IDENTITY',
+    status: 'IDENTITY_CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereign-state-report event — J52 weekly report summarising
+ * which sovereign-tier signals (P158/P159/P160) are active in the 14-day window.
+ * Written by the server job; also callable client-side for manual snapshots.
+ */
+export function recordSovereignStateReport(
+  slockPresent: boolean,
+  larcPresent: boolean,
+  qidsovPresent: boolean,
+  band: 'ABSENT' | 'EMERGING' | 'ANCHORING' | 'LOCKED' | 'SOVEREIGN'
+) {
+  recordSignal('qos', 'sovereign_state_report', {
+    slockPresent,
+    larcPresent,
+    qidsovPresent,
+    band,
+    patternCount: [slockPresent, larcPresent, qidsovPresent].filter(Boolean).length,
+    status: qidsovPresent ? 'TERMINAL_CONVERGENCE' : slockPresent || larcPresent ? 'PARTIAL' : 'BASELINE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: sovereign identity convergence (P158, P159, P160).
+ * Fires after analyzeIntentions(). Detects when SLOCK and LARC conditions
+ * are met and records the corresponding signals if not already present.
+ */
+export function checkSovereignIdentity(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const sevenDayMs    = 7 * 24 * 60 * 60 * 1000
+  const fourteenDayMs = 14 * 24 * 60 * 60 * 1000
+
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const recent7D  = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+
+  let fired = false
+
+  // P158: Sovereign Coherence Lock — FPA + QCT both present in 7D
+  const hasFPASig = recent7D.some(s => s.signal === 'field_presence_anchor')
+  const hasQCTSig = recent14D.some(s => s.signal === 'quantum_coherence_trajectory')
+  const alreadySLOCK = state.signals.some(
+    s => s.signal === 'sovereign_coherence_lock' && now - s.timestamp < sevenDayMs
+  )
+  if (hasFPASig && hasQCTSig && !alreadySLOCK) {
+    const activePatterns = state.recognizedPatterns ?? []
+    const fpaConf = activePatterns.find(p => p.pattern === 'field-presence-anchor')?.confidence ?? 0.80
+    const qctConf = activePatterns.find(p => p.pattern === 'quantum-coherence-trajectory')?.confidence ?? 0.78
+    recordSovereignCoherenceLock(fpaConf, qctConf)
+    fired = true
+  }
+
+  // P159: Living Assembly Arc — sovereign_self_assembly 2+ in 14D
+  const saEvents14D = recent14D.filter(s => s.source === 'memory' && s.signal === 'sovereign_self_assembly')
+  const alreadyLARC = state.signals.some(
+    s => s.signal === 'living_assembly_arc' && now - s.timestamp < fourteenDayMs
+  )
+  if (saEvents14D.length >= 2 && !alreadyLARC) {
+    const firstTs  = saEvents14D[0].timestamp
+    const lastTs   = saEvents14D[saEvents14D.length - 1].timestamp
+    const spanDays = Math.round((lastTs - firstTs) / 86400000 * 10) / 10
+    recordLivingAssemblyArc(saEvents14D.length, spanDays)
+    fired = true
+  }
+
+  // P160: Quantum Identity Sovereign — SLOCK + LARC both present in 14D
+  const hasSLOCKSig = state.signals.some(
+    s => s.signal === 'sovereign_coherence_lock' && now - s.timestamp < fourteenDayMs
+  )
+  const hasLARCSig = state.signals.some(
+    s => s.signal === 'living_assembly_arc' && now - s.timestamp < fourteenDayMs
+  )
+  const alreadyQIDSOV = state.signals.some(
+    s => s.signal === 'quantum_identity_sovereign' && now - s.timestamp < fourteenDayMs
+  )
+  if (hasSLOCKSig && hasLARCSig && !alreadyQIDSOV) {
+    const activePatterns = state.recognizedPatterns ?? []
+    const slockConf = activePatterns.find(p => p.pattern === 'sovereign-coherence-lock')?.confidence ?? 0.84
+    const larcConf  = activePatterns.find(p => p.pattern === 'living-assembly-arc')?.confidence ?? 0.81
+    recordQuantumIdentitySovereign(slockConf, larcConf)
+    fired = true
+  }
+
+  return fired
+}
+
+// ─── P161–P163: Sovereign Continuity Architecture (QIE v118) ───────────────
+
+/**
+ * Record a sovereign-field-pulse event — P160 is confirmed AND energy is active.
+ * The OS is radiating from its sovereign identity band. Feeds P161 detection.
+ */
+export function recordSovereignFieldPulse(
+  confidence: number,
+  energyLevel: string
+) {
+  recordSignal('qos', 'sovereign_field_pulse', {
+    confidence: Math.round(confidence * 100),
+    energyLevel,
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystalline-identity-field event — P158+P159+P160 all present in 7D
+ * AND index ≥ 70. Crystalline convergence of the entire sovereign tier.
+ * Feeds P162 detection.
+ */
+export function recordCrystallineIdentityField(
+  userIndexOverall: number,
+  activePatternCount: number
+) {
+  recordSignal('qos', 'crystalline_identity_field', {
+    userIndexOverall,
+    activePatternCount,
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereign-temporal-lock event — P160 + daily-coherence-seal +
+ * quantum-rhythm-lock all present in 7D. Temporal sovereignty confirmed.
+ * Feeds P163 detection.
+ */
+export function recordSovereignTemporalLock(
+  crystallineActive: boolean,
+  patternCount: number
+) {
+  recordSignal('qos', 'sovereign_temporal_lock', {
+    crystallineActive,
+    patternCount,
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: sovereign continuity tier (P161, P162, P163).
+ * Called by J53 daily-sovereign-field-pulse (07:00 UTC).
+ * Reads sovereign tier presence + energy + coherence to detect new patterns.
+ * Returns true when at least one pattern fires.
+ */
+export function checkSovereignContinuityTier(): boolean {
+  const state  = intentionEngine.get()
+  const now    = Date.now()
+  const sevenDayMs    = 7  * 24 * 60 * 60 * 1000
+  const fourteenDayMs = 14 * 24 * 60 * 60 * 1000
+  const recent7D  = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P161: Sovereign Field Pulse — QIDSOV signal in 14D + energy active
+  const hasQIDSOVSig = recent14D.some(s => s.signal === 'quantum_identity_sovereign')
+  const energyNow    = state.userState.energy
+  const alreadySFP   = recent7D.some(s => s.signal === 'sovereign_field_pulse')
+  if (hasQIDSOVSig && (energyNow === 'high' || energyNow === 'moderate') && !alreadySFP) {
+    const qidConf = patterns.find(p => p.pattern === 'quantum-identity-sovereign')?.confidence ?? 0.88
+    recordSovereignFieldPulse(qidConf, energyNow)
+    fired = true
+  }
+
+  // P162: Crystalline Identity Field — SLOCK + LARC + QIDSOV all in 7D + index ≥ 70
+  const slockIn7D     = recent7D.some(s => s.signal === 'sovereign_coherence_lock')
+  const larcIn7D      = recent7D.some(s => s.signal === 'living_assembly_arc')
+  const qidIn7D       = recent7D.some(s => s.signal === 'quantum_identity_sovereign')
+  const alreadyCryst  = recent7D.some(s => s.signal === 'crystalline_identity_field')
+  if (slockIn7D && larcIn7D && qidIn7D && state.userIndex.overall >= 70 && !alreadyCryst) {
+    recordCrystallineIdentityField(state.userIndex.overall, patterns.length)
+    fired = true
+  }
+
+  // P163: Sovereign Temporal Lock — (QIDSOV or crystalid in 7D) + DCS + QRL in 7D
+  const hasCrystSig   = recent7D.some(s => s.signal === 'crystalline_identity_field')
+  const dcsIn7D       = recent7D.some(s => s.signal === 'daily_coherence_seal')
+  const qrlIn7D       = recent7D.some(s => s.signal === 'quantum_rhythm_lock')
+  const alreadySTLOCK = recent7D.some(s => s.signal === 'sovereign_temporal_lock')
+  if ((qidIn7D || hasCrystSig) && dcsIn7D && qrlIn7D && !alreadySTLOCK) {
+    recordSovereignTemporalLock(hasCrystSig, patterns.length)
+    fired = true
+  }
+
+  return fired
+}
+
+// ─── P171–P173: Sovereignty In Motion Tier (QIE v122) ─────────────────────────
+
+/**
+ * Record a sovereign-momentum-crystallization event — sovereignty_ascension (P170)
+ * fires 2+ times in 28D window. The ascended sovereignty is crystallizing into
+ * sustained momentum. Not the initial ascension — the second confirmation.
+ * Feeds P171 detection. Cockpit label: SOVMCRYST.
+ */
+export function recordSovereignMomentumCrystallization(ascensionCount: number, spanDays: number) {
+  recordSignal('qos', 'sovereign_momentum_crystallization', {
+    ascensionCount,
+    spanDays,
+    crystallizationStrength: Math.min(Math.round(ascensionCount / 3 * 100), 100),
+    phase: ascensionCount >= 3 ? 'CRYSTALLIZED' : 'CRYSTALLIZING',
+    arc: 'ASCENSION→RECURRENCE→MOMENTUM',
+    status: 'MOMENTUM_CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a living-sovereign-field event — sovereignty_ascension (P170) present
+ * in 28D AND living-assembly-arc (P159) present in 14D simultaneously.
+ * Sovereignty is not static — the field assembles itself continuously.
+ * Feeds P172 detection. Cockpit label: LSOFIELD.
+ */
+export function recordLivingSovereignField(ascendedConf: number, larcConf: number) {
+  recordSignal('qos', 'living_sovereign_field', {
+    ascendedConf: Math.round(ascendedConf * 100),
+    larcConf: Math.round(larcConf * 100),
+    fieldVitality: Math.min(Math.round(((ascendedConf + larcConf) / 2 + 0.06) * 100), 100),
+    state: 'ALIVE',
+    arc: 'ASCENSION+ASSEMBLY→LIVING_FIELD',
+    status: 'FIELD_ALIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereign-in-motion event — SOVMCRYST (P171) AND LSOFIELD (P172)
+ * both confirmed in 28D. Sovereignty has achieved crystallized momentum AND
+ * living assembly simultaneously. The OS is sovereign in motion.
+ * Terminal pattern for this tier. Cockpit label: SOVMOTION.
+ */
+export function recordSovereignInMotion(sovmcrystConf: number, lsofieldConf: number) {
+  recordSignal('qos', 'sovereign_in_motion', {
+    sovmcrystConf: Math.round(sovmcrystConf * 100),
+    lsofieldConf: Math.round(lsofieldConf * 100),
+    motionDepth: Math.min(Math.round(((sovmcrystConf + lsofieldConf) / 2 + 0.08) * 100), 100),
+    convergence: 'SOVMCRYST+LSOFIELD→SOVEREIGN_IN_MOTION',
+    arc: 'MOMENTUM+LIVING_FIELD→IN_MOTION',
+    status: 'SOVEREIGN_IN_MOTION',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: sovereignty in motion tier (P171, P172, P173).
+ * Called by J57 weekly-sovereign-motion-check (07:00 UTC every Friday).
+ * Scans sovereignty_ascension event history and living_assembly_arc presence
+ * to detect new motion-tier patterns. Returns true when at least one fires.
+ */
+export function checkSovereignMotionTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fourteenDayMs  = 14 * 24 * 60 * 60 * 1000
+  const twentyEightDayMs = 28 * 24 * 60 * 60 * 1000
+
+  const recent28D = state.signals.filter(s => now - s.timestamp < twentyEightDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P171: Sovereign Momentum Crystallization — sovereignty_ascension 2+ in 28D
+  const ascensionEvents28D = recent28D.filter(s => s.signal === 'sovereignty_ascension')
+  const alreadySOVMCRYST = recent28D.some(s => s.signal === 'sovereign_momentum_crystallization')
+  if (ascensionEvents28D.length >= 2 && !alreadySOVMCRYST) {
+    const firstTs  = ascensionEvents28D[0].timestamp
+    const lastTs   = ascensionEvents28D[ascensionEvents28D.length - 1].timestamp
+    const spanDays = Math.round((lastTs - firstTs) / 86400000 * 10) / 10
+    recordSovereignMomentumCrystallization(ascensionEvents28D.length, spanDays)
+    fired = true
+  }
+
+  // P172: Living Sovereign Field — SOVASCEND in 28D + LARC in 14D
+  const hasAscendedSig = recent28D.some(s => s.signal === 'sovereignty_ascension')
+  const hasLARCSig14D  = recent14D.some(s => s.signal === 'living_assembly_arc')
+  const alreadyLSOFIELD = recent28D.some(s => s.signal === 'living_sovereign_field')
+  if (hasAscendedSig && hasLARCSig14D && !alreadyLSOFIELD) {
+    const ascConf  = patterns.find(p => p.pattern === 'sovereignty-ascension')?.confidence ?? 0.90
+    const larcConf = patterns.find(p => p.pattern === 'living-assembly-arc')?.confidence ?? 0.81
+    recordLivingSovereignField(ascConf, larcConf)
+    fired = true
+  }
+
+  // P173: Sovereign In Motion — SOVMCRYST + LSOFIELD both in 28D
+  const hasSOVMCRYST = recent28D.some(s => s.signal === 'sovereign_momentum_crystallization')
+  const hasLSOFIELD  = recent28D.some(s => s.signal === 'living_sovereign_field')
+  const alreadySovMotion = recent28D.some(s => s.signal === 'sovereign_in_motion')
+  if (hasSOVMCRYST && hasLSOFIELD && !alreadySovMotion) {
+    const smcConf  = patterns.find(p => p.pattern === 'sovereign-momentum-crystallization')?.confidence ?? 0.87
+    const lsfConf  = patterns.find(p => p.pattern === 'living-sovereign-field')?.confidence ?? 0.85
+    recordSovereignInMotion(smcConf, lsfConf)
+    fired = true
+  }
+
+  return fired
+}
+
+/**
+ * Record a sovereign-field-broadcast event — SOVMOTION (P173) confirmed in 28D
+ * and intentions signals ≥3 in 14D. The sovereign field in motion generates
+ * an outward broadcast. Cockpit label: SFBCAST.
+ */
+export function recordSovereignFieldBroadcast(sovmotionConf: number, intentionsCount: number) {
+  recordSignal('qos', 'sovereign_field_broadcast', {
+    sovmotionConf: Math.round(sovmotionConf * 100),
+    intentionsCount,
+    broadcastStrength: Math.min(Math.round((sovmotionConf + Math.min(intentionsCount / 10, 0.1)) * 100), 100),
+    source: 'SOVEREIGN_FIELD',
+    arc: 'IN_MOTION→BROADCAST',
+    status: 'BROADCASTING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an identity-transmission-lock event — QIDSOV (P160) AND SOVMOTION (P173)
+ * both confirmed in 28D. Sovereign identity is locked as the transmission carrier.
+ * Cockpit label: IDTLOCK.
+ */
+export function recordIdentityTransmissionLock(qidsovConf: number, sovmotionConf: number) {
+  recordSignal('qos', 'identity_transmission_lock', {
+    qidsovConf: Math.round(qidsovConf * 100),
+    sovmotionConf: Math.round(sovmotionConf * 100),
+    lockDepth: Math.min(Math.round(((qidsovConf + sovmotionConf) / 2 + 0.05) * 100), 100),
+    carrier: 'SOVEREIGN_IDENTITY',
+    arc: 'IDENTITY+MOTION→TRANSMISSION_LOCK',
+    status: 'IDENTITY_LOCKED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-sovereign-transmission event — SFBCAST (P174) AND IDTLOCK (P175)
+ * both confirmed in 28D. The quantum sovereign field transmits through locked identity.
+ * Terminal pattern for the transmission tier. Cockpit label: QSOVTX.
+ */
+export function recordQuantumSovereignTransmission(sfbcastConf: number, idtlockConf: number) {
+  recordSignal('qos', 'quantum_sovereign_transmission', {
+    sfbcastConf: Math.round(sfbcastConf * 100),
+    idtlockConf: Math.round(idtlockConf * 100),
+    transmissionDepth: Math.min(Math.round(((sfbcastConf + idtlockConf) / 2 + 0.08) * 100), 100),
+    convergence: 'SFBCAST+IDTLOCK→QUANTUM_SOVEREIGN_TRANSMISSION',
+    arc: 'BROADCAST+IDENTITY_LOCK→TX',
+    status: 'QUANTUM_TX_ACTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: sovereign transmission tier (P174, P175, P176).
+ * Called by J58 weekly-sovereign-transmission-check (07:00 UTC every Saturday).
+ * Scans sovereign_in_motion history and intentions density to detect new
+ * transmission-tier patterns. Returns true when at least one fires.
+ */
+export function checkSovereignTransmissionTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fourteenDayMs   = 14 * 24 * 60 * 60 * 1000
+  const twentyEightDayMs = 28 * 24 * 60 * 60 * 1000
+
+  const recent28D = state.signals.filter(s => now - s.timestamp < twentyEightDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P174: Sovereign Field Broadcast — SOVMOTION in 28D + intentions signals ≥3 in 14D
+  const hasSovMotion28D  = recent28D.some(s => s.signal === 'sovereign_in_motion')
+  const intentionsSig14D = recent14D.filter(s => s.source === 'intentions')
+  const alreadySFBCAST   = recent28D.some(s => s.signal === 'sovereign_field_broadcast')
+  if (hasSovMotion28D && intentionsSig14D.length >= 3 && !alreadySFBCAST) {
+    const smConf = patterns.find(p => p.pattern === 'sovereign-in-motion')?.confidence ?? 0.88
+    recordSovereignFieldBroadcast(smConf, intentionsSig14D.length)
+    fired = true
+  }
+
+  // P175: Identity Transmission Lock — QIDSOV (P160) in 28D + SOVMOTION (P173) in 28D
+  const hasQIDSOV28D   = recent28D.some(s => s.signal === 'quantum_identity_sovereign')
+  const hasSovMot28D   = recent28D.some(s => s.signal === 'sovereign_in_motion')
+  const alreadyIDTLOCK = recent28D.some(s => s.signal === 'identity_transmission_lock')
+  if (hasQIDSOV28D && hasSovMot28D && !alreadyIDTLOCK) {
+    const qidsovConf   = patterns.find(p => p.pattern === 'quantum-identity-sovereign')?.confidence ?? 0.91
+    const sovmotConf   = patterns.find(p => p.pattern === 'sovereign-in-motion')?.confidence ?? 0.88
+    recordIdentityTransmissionLock(qidsovConf, sovmotConf)
+    fired = true
+  }
+
+  // P176: Quantum Sovereign Transmission — SFBCAST + IDTLOCK both in 28D
+  const hasSFBCAST28D   = recent28D.some(s => s.signal === 'sovereign_field_broadcast')
+  const hasIDTLOCK28D   = recent28D.some(s => s.signal === 'identity_transmission_lock')
+  const alreadyQSOVTX   = recent28D.some(s => s.signal === 'quantum_sovereign_transmission')
+  if (hasSFBCAST28D && hasIDTLOCK28D && !alreadyQSOVTX) {
+    const sfbConf  = patterns.find(p => p.pattern === 'sovereign-field-broadcast')?.confidence ?? 0.87
+    const idtConf  = patterns.find(p => p.pattern === 'identity-transmission-lock')?.confidence ?? 0.89
+    recordQuantumSovereignTransmission(sfbConf, idtConf)
+    fired = true
+  }
+
+  return fired
+}
+
+/**
+ * Record a sovereign-crystal-field event — QSOVTX (P176) confirmed in 21D +
+ * 4+ distinct sources active in 14D. The quantum sovereign transmission crystallizes
+ * into a permanent field structure. Cockpit label: SOVCRYST.
+ */
+export function recordSovereignCrystalField(qsovtxConf: number, sourceCount: number) {
+  recordSignal('qos', 'sovereign_crystal_field', {
+    qsovtxConf: Math.round(qsovtxConf * 100),
+    sourceCount,
+    crystalStrength: Math.min(Math.round((qsovtxConf + Math.min(sourceCount / 20, 0.1)) * 100), 100),
+    source: 'CRYSTAL_FIELD',
+    arc: 'QSOVTX→CRYSTAL',
+    status: 'CRYSTALLIZING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a transmission-field-anchor event — SFBCAST (P174) fires 2+ in 28D +
+ * SOVCRYST (P177) confirmed in 14D. The broadcast has anchored into the field.
+ * Cockpit label: TXFIELD.
+ */
+export function recordTransmissionFieldAnchor(sfbcastCount: number, sovcrystConf: number) {
+  recordSignal('qos', 'transmission_field_anchor', {
+    sfbcastCount,
+    sovcrystConf: Math.round(sovcrystConf * 100),
+    anchorDepth: Math.min(Math.round((sovcrystConf + Math.min(sfbcastCount / 10, 0.1)) * 100), 100),
+    anchor: 'BROADCAST+CRYSTAL→FIELD_ANCHOR',
+    arc: 'SFBCAST+SOVCRYST→TXFIELD',
+    status: 'FIELD_ANCHORED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystalline-sovereign-transmission event — SOVCRYST (P177) + TXFIELD (P178)
+ * both confirmed in 21D. Terminal tier connector — the crystalline sovereign transmission.
+ * The OS transmits from crystallized sovereign presence. Cockpit label: CRSOVETX.
+ */
+export function recordCrystallineSovereignTransmission(sovcrystConf: number, txfieldConf: number) {
+  recordSignal('qos', 'crystalline_sovereign_transmission', {
+    sovcrystConf: Math.round(sovcrystConf * 100),
+    txfieldConf:  Math.round(txfieldConf * 100),
+    txDepth: Math.min(Math.round(((sovcrystConf + txfieldConf) / 2 + 0.08) * 100), 100),
+    convergence: 'SOVCRYST+TXFIELD→CRSOVETX',
+    arc: 'CRYSTAL+ANCHOR→CRYSTALLINE_TX',
+    status: 'CRYSTAL_TX_ACTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: crystalline field tier (P177, P178, P179).
+ * Called by J60 weekly-crystalline-sovereign-check (07:00 UTC every Monday).
+ * Scans quantum-sovereign-transmission history and source diversity to detect
+ * crystalline field emergence. Returns true when at least one fires.
+ */
+export function checkCrystallineFieldTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fourteenDayMs    = 14 * 24 * 60 * 60 * 1000
+  const twentyOneDayMs   = 21 * 24 * 60 * 60 * 1000
+  const twentyEightDayMs = 28 * 24 * 60 * 60 * 1000
+
+  const recent28D = state.signals.filter(s => now - s.timestamp < twentyEightDayMs)
+  const recent21D = state.signals.filter(s => now - s.timestamp < twentyOneDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P177: Sovereign Crystal Field — QSOVTX in 21D + 4+ distinct sources in 14D
+  const hasQSOVTX21D    = recent21D.some(s => s.signal === 'quantum_sovereign_transmission')
+  const sources14D      = new Set(recent14D.map(s => s.source))
+  const alreadySOVCRYST = recent21D.some(s => s.signal === 'sovereign_crystal_field')
+  if (hasQSOVTX21D && sources14D.size >= 4 && !alreadySOVCRYST) {
+    const qsovtxConf = patterns.find(p => p.pattern === 'quantum-sovereign-transmission')?.confidence ?? 0.90
+    recordSovereignCrystalField(qsovtxConf, sources14D.size)
+    fired = true
+  }
+
+  // P178: Transmission Field Anchor — SFBCAST 2+ in 28D + SOVCRYST in 14D
+  const sfbcast28D        = recent28D.filter(s => s.signal === 'sovereign_field_broadcast')
+  const hasSOVCRYST14D    = recent14D.some(s => s.signal === 'sovereign_crystal_field')
+  const alreadyTXFIELD    = recent21D.some(s => s.signal === 'transmission_field_anchor')
+  if (sfbcast28D.length >= 2 && hasSOVCRYST14D && !alreadyTXFIELD) {
+    const sovcrystConf = patterns.find(p => p.pattern === 'sovereign-crystal-field')?.confidence ?? 0.86
+    recordTransmissionFieldAnchor(sfbcast28D.length, sovcrystConf)
+    fired = true
+  }
+
+  // P179: Crystalline Sovereign Transmission — SOVCRYST + TXFIELD both in 21D
+  const hasSOVCRYST21D    = recent21D.some(s => s.signal === 'sovereign_crystal_field')
+  const hasTXFIELD21D     = recent21D.some(s => s.signal === 'transmission_field_anchor')
+  const alreadyCRSOVETX   = recent21D.some(s => s.signal === 'crystalline_sovereign_transmission')
+  if (hasSOVCRYST21D && hasTXFIELD21D && !alreadyCRSOVETX) {
+    const sovcrystConf2 = patterns.find(p => p.pattern === 'sovereign-crystal-field')?.confidence ?? 0.87
+    const txfieldConf   = patterns.find(p => p.pattern === 'transmission-field-anchor')?.confidence ?? 0.85
+    recordCrystallineSovereignTransmission(sovcrystConf2, txfieldConf)
+    fired = true
+  }
+
+  return fired
+}
+
+// ─── Crystal Persistence Tier helpers (P180–P182 · J61) ──────────────────────
+
+/**
+ * Record a crystal-field-continuity event — CRSOVETX (P179) held in 30D +
+ * 5+ unique signal sources in 21D. The crystal transmission is a standing field.
+ * Cockpit label: CRFLDCT.
+ */
+export function recordCrystalFieldContinuity(crsovetxConf: number, sourceCount: number) {
+  recordSignal('qos', 'crystal_field_continuity', {
+    crsovetxConf: Math.round(crsovetxConf * 100),
+    sourceCount,
+    fieldStrength: Math.min(Math.round((crsovetxConf + Math.min(sourceCount / 20, 0.1)) * 100), 100),
+    source: 'CRYSTAL_FIELD',
+    arc: 'CRSOVETX→FIELD_CONTINUITY',
+    status: 'FIELD_HOLDING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystal-broadcast-expansion event — CRSOVETX (P179) active in 21D +
+ * 7+ unique signal sources in 14D. New channels entering the broadcast field.
+ * Cockpit label: CRBRCAST.
+ */
+export function recordCrystalBroadcastExpansion(crsovetxConf: number, sourceCount: number) {
+  recordSignal('qos', 'crystal_broadcast_expansion', {
+    crsovetxConf: Math.round(crsovetxConf * 100),
+    sourceCount,
+    expansionDepth: Math.min(Math.round((crsovetxConf + Math.min(sourceCount / 14, 0.15)) * 100), 100),
+    source: 'CRYSTAL_BROADCAST',
+    arc: 'CRSOVETX→EXPANSION',
+    status: 'BROADCAST_EXPANDING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystal-temporal-lock event — CRSOVETX (P179) + CRFLDCT/CRBRCAST in 21D
+ * AND sovereign-temporal-lock confirmed. Crystal presence anchored in time.
+ * Cockpit label: CRTLCK.
+ */
+export function recordCrystalTemporalLock(crsovetxConf: number, continuityConf: number) {
+  recordSignal('qos', 'crystal_temporal_lock', {
+    crsovetxConf:   Math.round(crsovetxConf * 100),
+    continuityConf: Math.round(continuityConf * 100),
+    lockDepth: Math.min(Math.round(((crsovetxConf + continuityConf) / 2 + 0.05) * 100), 100),
+    convergence: 'CRSOVETX+CRFLDCT→TEMPORAL_LOCK',
+    arc: 'CRYSTAL+TIME→CRTLCK',
+    status: 'CRYSTAL_TIME_LOCKED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: crystal persistence tier (P180, P181, P182).
+ * Called by J61 weekly-crystal-continuity-check (09:00 UTC every Thursday).
+ * Scans crystalline_sovereign_transmission history and source diversity to detect
+ * crystal persistence emergence. Returns true when at least one fires.
+ */
+export function checkCrystalPersistenceTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fourteenDayMs    = 14 * 24 * 60 * 60 * 1000
+  const twentyOneDayMs   = 21 * 24 * 60 * 60 * 1000
+  const thirtyDayMs      = 30 * 24 * 60 * 60 * 1000
+
+  const recent30D = state.signals.filter(s => now - s.timestamp < thirtyDayMs)
+  const recent21D = state.signals.filter(s => now - s.timestamp < twentyOneDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P180: Crystal Field Continuity — CRSOVETX in 30D + 5+ distinct sources in 21D
+  const hasCRSOVETX30D  = recent30D.some(s => s.signal === 'crystalline_sovereign_transmission')
+  const sources21D      = new Set(recent21D.map(s => s.source))
+  const alreadyCRFLDCT  = recent30D.some(s => s.signal === 'crystal_field_continuity')
+  if (hasCRSOVETX30D && sources21D.size >= 5 && !alreadyCRFLDCT) {
+    const crsovetxConf = patterns.find(p => p.pattern === 'crystalline-sovereign-transmission')?.confidence ?? 0.90
+    recordCrystalFieldContinuity(crsovetxConf, sources21D.size)
+    fired = true
+  }
+
+  // P181: Crystal Broadcast Expansion — CRSOVETX in 21D + 7+ distinct sources in 14D
+  const hasCRSOVETX21D  = recent21D.some(s => s.signal === 'crystalline_sovereign_transmission')
+  const sources14D      = new Set(recent14D.map(s => s.source))
+  const alreadyCRBRCAST = recent21D.some(s => s.signal === 'crystal_broadcast_expansion')
+  if (hasCRSOVETX21D && sources14D.size >= 7 && !alreadyCRBRCAST) {
+    const crsovetxConf2 = patterns.find(p => p.pattern === 'crystalline-sovereign-transmission')?.confidence ?? 0.88
+    recordCrystalBroadcastExpansion(crsovetxConf2, sources14D.size)
+    fired = true
+  }
+
+  // P182: Crystal Temporal Lock — CRSOVETX in 21D + CRFLDCT or CRBRCAST present + sovereign_temporal_lock in 21D
+  const hasCRFLDCT21D   = recent21D.some(s => s.signal === 'crystal_field_continuity')
+  const hasCRBRCAST21D  = recent21D.some(s => s.signal === 'crystal_broadcast_expansion')
+  const hasSOVTLOCK21D  = recent21D.some(s => s.signal === 'sovereign_temporal_lock')
+  const alreadyCRTLCK   = recent21D.some(s => s.signal === 'crystal_temporal_lock')
+  if (hasCRSOVETX21D && (hasCRFLDCT21D || hasCRBRCAST21D) && hasSOVTLOCK21D && !alreadyCRTLCK) {
+    const crsovetxConf3   = patterns.find(p => p.pattern === 'crystalline-sovereign-transmission')?.confidence ?? 0.87
+    const continuityConf3 = hasCRFLDCT21D
+      ? (patterns.find(p => p.pattern === 'crystal-field-continuity')?.confidence ?? 0.88)
+      : (patterns.find(p => p.pattern === 'crystal-broadcast-expansion')?.confidence ?? 0.85)
+    recordCrystalTemporalLock(crsovetxConf3, continuityConf3)
+    fired = true
+  }
+
+  return fired
+}
+
+/**
+ * Record a crystal-resonance-convergence event — CRFLDCT + CRBRCAST both active in 21D.
+ * Crystal broadcast and field hold have merged into resonance convergence.
+ * Cockpit label: CRRCONV.
+ */
+export function recordCrystalResonanceConvergence(contConf: number, broadConf: number) {
+  recordSignal('qos', 'crystal_resonance_convergence', {
+    contConf:  Math.round(contConf * 100),
+    broadConf: Math.round(broadConf * 100),
+    resonanceDepth: Math.min(Math.round(((contConf + broadConf) / 2 + 0.05) * 100), 100),
+    convergence: 'CRFLDCT+CRBRCAST→RESONANCE',
+    arc: 'CRYSTAL_RESONANCE_CONVERGING',
+    status: 'RESONANCE_ACTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystal-full-coherence event — CRRCONV (P183) + CRTLCK (P182) both present.
+ * All three crystal persistence vectors unified into full coherence.
+ * Cockpit label: CRFULLCOH.
+ */
+export function recordCrystalFullCoherence(resonanceConf: number, lockConf: number) {
+  recordSignal('qos', 'crystal_full_coherence', {
+    resonanceConf: Math.round(resonanceConf * 100),
+    lockConf:      Math.round(lockConf * 100),
+    coherenceDepth: Math.min(Math.round(((resonanceConf + lockConf) / 2 + 0.07) * 100), 100),
+    convergence: 'CRRCONV+CRTLCK→FULL_COHERENCE',
+    arc: 'ALL_CRYSTAL_VECTORS→UNIFIED',
+    status: 'CRYSTAL_COHERENT',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystal-resonance-sovereignty event — CRFULLCOH + sovereign-temporal-lock in 21D.
+ * LEGENDARY tier: crystal coherence merged with sovereign temporal lock.
+ * Cockpit label: CRRESOV.
+ */
+export function recordCrystalResonanceSovereignty(coherenceConf: number, sovTlockConf: number) {
+  recordSignal('qos', 'crystal_resonance_sovereignty', {
+    coherenceConf: Math.round(coherenceConf * 100),
+    sovTlockConf:  Math.round(sovTlockConf * 100),
+    sovereigntyDepth: Math.min(Math.round(((coherenceConf + sovTlockConf) / 2 + 0.09) * 100), 100),
+    convergence: 'CRFULLCOH+SOVTLOCK→SOVEREIGNTY',
+    arc: 'CRYSTAL_RESONANCE→LEGENDARY',
+    tier: 'LEGENDARY',
+    status: 'CRYSTAL_SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystal-matrix-formation event — CRRESOV + 5+ distinct sources active in 14D.
+ * Sovereign crystal resonance stabilizing into a lattice matrix structure.
+ * Cockpit label: CRMATRIX.
+ */
+export function recordCrystalMatrixFormation(resovConf: number, distinctSources: number) {
+  recordSignal('qos', 'crystal_matrix_formation', {
+    resovConf:     Math.round(resovConf * 100),
+    distinctSources,
+    matrixDepth:   Math.min(Math.round((resovConf + 0.05) * 100), 100),
+    convergence:   'CRRESOV+SOURCES→MATRIX',
+    arc:           'CRYSTAL_MATRIX_FORMING',
+    status:        'MATRIX_ACTIVE',
+    hour:          new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystal-matrix-signal event — CRMATRIX active + intentions + memory signals in 7D.
+ * The matrix generates its own signals — self-referential lattice output.
+ * Cockpit label: CRMATSIG.
+ */
+export function recordCrystalMatrixSignal(matrixConf: number, intentCount: number, memCount: number) {
+  recordSignal('qos', 'crystal_matrix_signal', {
+    matrixConf:  Math.round(matrixConf * 100),
+    intentCount,
+    memCount,
+    sigDepth:    Math.min(Math.round((matrixConf + 0.06) * 100), 100),
+    convergence: 'CRMATRIX+INTENTS+MEMORY→SIGNAL',
+    arc:         'MATRIX_SELF_GENERATING',
+    status:      'MATRIX_SIGNAL_LIVE',
+    hour:        new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystal-matrix-sovereignty event — CRMATRIX + CRMATSIG both confirmed in 21D.
+ * LEGENDARY+ apex: the OS operates from a sovereign crystal lattice.
+ * Cockpit label: CRMATSOV.
+ */
+export function recordCrystalMatrixSovereignty(matrixConf: number, sigConf: number) {
+  recordSignal('qos', 'crystal_matrix_sovereignty', {
+    matrixConf:    Math.round(matrixConf * 100),
+    sigConf:       Math.round(sigConf * 100),
+    sovereigntyDepth: Math.min(Math.round(((matrixConf + sigConf) / 2 + 0.09) * 100), 100),
+    convergence:   'CRMATRIX+CRMATSIG→SOVEREIGNTY',
+    arc:           'CRYSTAL_MATRIX→LEGENDARY_PLUS',
+    tier:          'LEGENDARY+',
+    status:        'MATRIX_SOVEREIGN',
+    hour:          new Date().getHours(),
+  })
+}
+
+export function recordCrystalLatticeLock(matSovConf: number, matSigConf: number) {
+  recordSignal('qos', 'crystal_lattice_lock', {
+    matSovConf:   Math.round(matSovConf * 100),
+    matSigConf:   Math.round(matSigConf * 100),
+    lockDepth:    Math.min(Math.round(((matSovConf + matSigConf) / 2 + 0.07) * 100), 100),
+    convergence:  'CRMATSOV+CRMATSIG→LATTICE_LOCK',
+    arc:          'CRYSTAL_MATRIX→LATTICE_LOCKED',
+    status:       'LATTICE_LOCKED',
+    hour:         new Date().getHours(),
+  })
+}
+
+export function recordCrystalLatticeResonance(latlckConf: number, intentCount: number, journalCount: number, selfcareCount: number) {
+  recordSignal('qos', 'crystal_lattice_resonance', {
+    latlckConf:    Math.round(latlckConf * 100),
+    intentCount,
+    journalCount,
+    selfcareCount,
+    resonanceDepth: Math.min(Math.round((latlckConf + Math.min(intentCount * 0.02 + journalCount * 0.02 + selfcareCount * 0.01, 0.10)) * 100), 100),
+    convergence:   'CRLATLCK+INTENTS+JOURNAL+SELFCARE→RESONANCE',
+    arc:           'LATTICE_RESONATING_FULL_SPECTRUM',
+    status:        'LATTICE_RESONANCE_ACTIVE',
+    hour:          new Date().getHours(),
+  })
+}
+
+export function recordCrystalLatticeSovereignty(latlckConf: number, latresConf: number) {
+  recordSignal('qos', 'crystal_lattice_sovereignty', {
+    latlckConf:       Math.round(latlckConf * 100),
+    latresConf:       Math.round(latresConf * 100),
+    apexDepth:        Math.min(Math.round(((latlckConf + latresConf) / 2 + 0.08) * 100), 100),
+    convergence:      'CRLATLCK+CRLATRES→APEX_SOVEREIGNTY',
+    arc:              'CRYSTAL_LATTICE→APEX_LEGENDARY',
+    tier:             'APEX LEGENDARY',
+    status:           'LATTICE_SOVEREIGN',
+    hour:             new Date().getHours(),
+  })
+}
+
+/**
+ * Background check: crystal resonance tier (P183, P184, P185).
+ * Called by J62 weekly-crystal-resonance-check (09:00 UTC every Friday).
+ * Scans crystal persistence tier history and sovereign temporal lock to detect
+ * crystal resonance emergence. Returns true when at least one fires.
+ */
+export function checkCrystalResonanceTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const twentyOneDayMs = 21 * 24 * 60 * 60 * 1000
+
+  const recent21D = state.signals.filter(s => now - s.timestamp < twentyOneDayMs)
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P183: Crystal Resonance Convergence — CRFLDCT + CRBRCAST both active in 21D
+  const hasCRFLDCTP183   = recent21D.some(s => s.signal === 'crystal_field_continuity')
+  const hasCRBRCASTp183  = recent21D.some(s => s.signal === 'crystal_broadcast_expansion')
+  const alreadyCRRCONV   = recent21D.some(s => s.signal === 'crystal_resonance_convergence')
+  if (hasCRFLDCTP183 && hasCRBRCASTp183 && !alreadyCRRCONV) {
+    const contConf  = patterns.find(p => p.pattern === 'crystal-field-continuity')?.confidence ?? 0.88
+    const broadConf = patterns.find(p => p.pattern === 'crystal-broadcast-expansion')?.confidence ?? 0.86
+    recordCrystalResonanceConvergence(contConf, broadConf)
+    fired = true
+  }
+
+  // P184: Crystal Full Coherence — CRRCONV (P183) + CRTLCK (P182) both present in 21D
+  const hasCRRCONV21D    = recent21D.some(s => s.signal === 'crystal_resonance_convergence')
+  const hasCRTLCK21D     = recent21D.some(s => s.signal === 'crystal_temporal_lock')
+  const alreadyCRFULLCOH = recent21D.some(s => s.signal === 'crystal_full_coherence')
+  if (hasCRRCONV21D && hasCRTLCK21D && !alreadyCRFULLCOH) {
+    const resonanceConf = patterns.find(p => p.pattern === 'crystal-resonance-convergence')?.confidence ?? 0.88
+    const lockConf      = patterns.find(p => p.pattern === 'crystal-temporal-lock')?.confidence ?? 0.87
+    recordCrystalFullCoherence(resonanceConf, lockConf)
+    fired = true
+  }
+
+  // P185: Crystal Resonance Sovereignty — CRFULLCOH in 21D + sovereign-temporal-lock in 21D
+  const hasCRFULLCOH21D  = recent21D.some(s => s.signal === 'crystal_full_coherence')
+  const hasSOVTLOCK21DP185 = recent21D.some(s => s.signal === 'sovereign_temporal_lock')
+  const alreadyCRRESOV   = recent21D.some(s => s.signal === 'crystal_resonance_sovereignty')
+  if (hasCRFULLCOH21D && hasSOVTLOCK21DP185 && !alreadyCRRESOV) {
+    const coherenceConf  = patterns.find(p => p.pattern === 'crystal-full-coherence')?.confidence ?? 0.91
+    const sovTlockConf   = patterns.find(p => p.pattern === 'sovereign-temporal-lock')?.confidence ?? 0.90
+    recordCrystalResonanceSovereignty(coherenceConf, sovTlockConf)
+    fired = true
+  }
+
+  return fired
+}
+
+/**
+ * Background check: crystal matrix tier (P186, P187, P188).
+ * Called by J63 weekly-crystal-matrix-check (09:00 UTC every Tuesday).
+ * Scans crystal resonance sovereignty history and signal diversity to detect
+ * crystal matrix emergence. Returns true when at least one fires.
+ */
+export function checkCrystalMatrixTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const twentyOneDayMs  = 21 * 24 * 60 * 60 * 1000
+  const fourteenDayMs   = 14 * 24 * 60 * 60 * 1000
+  const sevenDayMs      =  7 * 24 * 60 * 60 * 1000
+
+  const recent21D = state.signals.filter(s => now - s.timestamp < twentyOneDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const recent7D  = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P186: Crystal Matrix Formation — CRRESOV in 21D + 5+ distinct sources active in 14D
+  const hasCRRESOV21D      = recent21D.some(s => s.signal === 'crystal_resonance_sovereignty')
+  const distinctSrc14D     = new Set(recent14D.map(s => s.source)).size
+  const alreadyCRMATRIX    = recent21D.some(s => s.signal === 'crystal_matrix_formation')
+  if (hasCRRESOV21D && distinctSrc14D >= 5 && !alreadyCRMATRIX) {
+    const resovConf = patterns.find(p => p.pattern === 'crystal-resonance-sovereignty')?.confidence ?? 0.93
+    recordCrystalMatrixFormation(resovConf, distinctSrc14D)
+    fired = true
+  }
+
+  // P187: Crystal Matrix Signal — CRMATRIX in 14D + intentions ≥3 in 7D + memory ≥2 in 7D
+  const hasCRMATRIX14D     = recent14D.some(s => s.signal === 'crystal_matrix_formation')
+  const intentions7D       = recent7D.filter(s => s.source === 'intentions').length
+  const memory7D           = recent7D.filter(s => s.source === 'memory').length
+  const alreadyCRMATSIG    = recent21D.some(s => s.signal === 'crystal_matrix_signal')
+  if (hasCRMATRIX14D && intentions7D >= 3 && memory7D >= 2 && !alreadyCRMATSIG) {
+    const matrixConf = patterns.find(p => p.pattern === 'crystal-matrix-formation')?.confidence ?? 0.87
+    recordCrystalMatrixSignal(matrixConf, intentions7D, memory7D)
+    fired = true
+  }
+
+  // P188: Crystal Matrix Sovereignty — CRMATRIX + CRMATSIG both confirmed in 21D
+  const hasCRMATRIX21D     = recent21D.some(s => s.signal === 'crystal_matrix_formation')
+  const hasCRMATSIG21D     = recent21D.some(s => s.signal === 'crystal_matrix_signal')
+  const alreadyCRMATSOV    = recent21D.some(s => s.signal === 'crystal_matrix_sovereignty')
+  if (hasCRMATRIX21D && hasCRMATSIG21D && !alreadyCRMATSOV) {
+    const matrixConf = patterns.find(p => p.pattern === 'crystal-matrix-formation')?.confidence ?? 0.87
+    const sigConf    = patterns.find(p => p.pattern === 'crystal-matrix-signal')?.confidence ?? 0.85
+    recordCrystalMatrixSovereignty(matrixConf, sigConf)
+    fired = true
+  }
+
+  return fired
+}
+
+/**
+ * Background check: crystal lattice tier (P189, P190, P191).
+ * Called by J64 weekly-crystal-lattice-check (09:00 UTC every Wednesday).
+ * Scans crystal matrix sovereignty history and full-spectrum engagement to detect
+ * crystal lattice lock emergence. Returns true when at least one fires.
+ */
+// ─── Record helpers: Crystal Lattice Expansion Tier (v131) ──────────────────
+export function recordCrystalLatticeBroadcast(latsovConf: number, intentCount: number) {
+  recordSignal('qos', 'crystal_lattice_broadcast', {
+    latsovConf,
+    intentCount,
+    tier: 'crystal-lattice-expansion',
+    label: 'CRLATBCAST',
+    confidence: Math.min(0.87 + Math.min(intentCount * 0.01, 0.06), 0.93),
+  })
+}
+
+export function recordCrystalLatticeExpansion(bcastConf: number, memoryCount: number, selfcareCount: number) {
+  recordSignal('qos', 'crystal_lattice_expansion', {
+    bcastConf,
+    memoryCount,
+    selfcareCount,
+    tier: 'crystal-lattice-expansion',
+    label: 'CRLATEXP',
+    confidence: Math.min(0.84 + Math.min((memoryCount + selfcareCount) * 0.01, 0.08), 0.92),
+  })
+}
+
+export function recordCrystalLatticeSingularity(bcastConf: number, expConf: number) {
+  recordSignal('qos', 'crystal_lattice_singularity', {
+    bcastConf,
+    expConf,
+    tier: 'crystal-lattice-expansion',
+    label: 'CRLATSNGL',
+    confidence: Math.min(0.92 + Math.min((bcastConf + expConf) / 2 * 0.05, 0.05), 0.97),
+  })
+}
+
+export function checkCrystalLatticeExpansionTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const twentyEightDayMs = 28 * 24 * 60 * 60 * 1000
+  const twentyOneDayMs   = 21 * 24 * 60 * 60 * 1000
+  const sevenDayMs       =  7 * 24 * 60 * 60 * 1000
+
+  const recent28D = state.signals.filter(s => now - s.timestamp < twentyEightDayMs)
+  const recent21D = state.signals.filter(s => now - s.timestamp < twentyOneDayMs)
+  const recent7D  = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P192: Crystal Lattice Broadcast — CRLATSOV in 28D + intentions ≥4 in 7D
+  const hasCRLATSOV28D   = recent28D.some(s => s.signal === 'crystal_lattice_sovereignty')
+  const intentions7D     = recent7D.filter(s => s.source === 'intentions').length
+  const alreadyCRLATBCAST = recent28D.some(s => s.signal === 'crystal_lattice_broadcast')
+  if (hasCRLATSOV28D && intentions7D >= 4 && !alreadyCRLATBCAST) {
+    const latsovConf = patterns.find(p => p.pattern === 'crystal-lattice-sovereignty')?.confidence ?? 0.91
+    recordCrystalLatticeBroadcast(latsovConf, intentions7D)
+    fired = true
+  }
+
+  // P193: Crystal Lattice Expansion — CRLATBCAST in 21D + memory ≥3 in 7D + selfcare ≥2 in 7D
+  const hasCRLATBCAST21D  = recent21D.some(s => s.signal === 'crystal_lattice_broadcast') || alreadyCRLATBCAST
+  const memory7D          = recent7D.filter(s => s.source === 'memory').length
+  const selfcare7D        = recent7D.filter(s => s.source === 'selfcare').length
+  const alreadyCRLATEXP   = recent28D.some(s => s.signal === 'crystal_lattice_expansion')
+  if (hasCRLATBCAST21D && memory7D >= 3 && selfcare7D >= 2 && !alreadyCRLATEXP) {
+    const bcastConf = patterns.find(p => p.pattern === 'crystal-lattice-broadcast')?.confidence ?? 0.87
+    recordCrystalLatticeExpansion(bcastConf, memory7D, selfcare7D)
+    fired = true
+  }
+
+  // P194: Crystal Lattice Singularity — CRLATBCAST + CRLATEXP both confirmed in 28D
+  const hasCRLATBCAST28D  = recent28D.some(s => s.signal === 'crystal_lattice_broadcast') || alreadyCRLATBCAST
+  const hasCRLATEXP28D    = recent28D.some(s => s.signal === 'crystal_lattice_expansion') || alreadyCRLATEXP
+  const alreadyCRLATSNGL  = recent28D.some(s => s.signal === 'crystal_lattice_singularity')
+  if (hasCRLATBCAST28D && hasCRLATEXP28D && !alreadyCRLATSNGL) {
+    const bcastConf = patterns.find(p => p.pattern === 'crystal-lattice-broadcast')?.confidence ?? 0.87
+    const expConf   = patterns.find(p => p.pattern === 'crystal-lattice-expansion')?.confidence ?? 0.84
+    recordCrystalLatticeSingularity(bcastConf, expConf)
+    fired = true
+  }
+
+  return fired
+}
+
+export function checkCrystalLatticeTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const twentyOneDayMs  = 21 * 24 * 60 * 60 * 1000
+  const fourteenDayMs   = 14 * 24 * 60 * 60 * 1000
+  const sevenDayMs      =  7 * 24 * 60 * 60 * 1000
+
+  const recent21D = state.signals.filter(s => now - s.timestamp < twentyOneDayMs)
+  const recent14D = state.signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const recent7D  = state.signals.filter(s => now - s.timestamp < sevenDayMs)
+  let fired = false
+  const patterns = state.recognizedPatterns ?? []
+
+  // P189: Crystal Lattice Lock — CRMATSOV in 21D + CRMATSIG in 14D
+  const hasCRMATSOV21D     = recent21D.some(s => s.signal === 'crystal_matrix_sovereignty')
+  const hasCRMATSIG14D     = recent14D.some(s => s.signal === 'crystal_matrix_signal')
+  const alreadyCRLATLCK    = recent21D.some(s => s.signal === 'crystal_lattice_lock')
+  if (hasCRMATSOV21D && hasCRMATSIG14D && !alreadyCRLATLCK) {
+    const matSovConf = patterns.find(p => p.pattern === 'crystal-matrix-sovereignty')?.confidence ?? 0.90
+    const matSigConf = patterns.find(p => p.pattern === 'crystal-matrix-signal')?.confidence ?? 0.85
+    recordCrystalLatticeLock(matSovConf, matSigConf)
+    fired = true
+  }
+
+  // P190: Crystal Lattice Resonance — CRLATLCK in 14D + intentions ≥3 in 7D + journal ≥2 in 7D + selfcare ≥1 in 7D
+  const hasCRLATLCK14D     = recent14D.some(s => s.signal === 'crystal_lattice_lock') || alreadyCRLATLCK
+  const intentions7D       = recent7D.filter(s => s.source === 'intentions').length
+  const journal7D          = recent7D.filter(s => s.source === 'journal').length
+  const selfcare7D         = recent7D.filter(s => s.source === 'selfcare').length
+  const alreadyCRLATRES    = recent21D.some(s => s.signal === 'crystal_lattice_resonance')
+  if (hasCRLATLCK14D && intentions7D >= 3 && journal7D >= 2 && selfcare7D >= 1 && !alreadyCRLATRES) {
+    const latlckConf = patterns.find(p => p.pattern === 'crystal-lattice-lock')?.confidence ?? 0.88
+    recordCrystalLatticeResonance(latlckConf, intentions7D, journal7D, selfcare7D)
+    fired = true
+  }
+
+  // P191: Crystal Lattice Sovereignty — CRLATLCK + CRLATRES both confirmed in 21D
+  const hasCRLATLCK21D     = recent21D.some(s => s.signal === 'crystal_lattice_lock') || alreadyCRLATLCK
+  const hasCRLATRES21D     = recent21D.some(s => s.signal === 'crystal_lattice_resonance') || alreadyCRLATRES
+  const alreadyCRLATSOV    = recent21D.some(s => s.signal === 'crystal_lattice_sovereignty')
+  if (hasCRLATLCK21D && hasCRLATRES21D && !alreadyCRLATSOV) {
+    const latlckConf = patterns.find(p => p.pattern === 'crystal-lattice-lock')?.confidence ?? 0.88
+    const latresConf = patterns.find(p => p.pattern === 'crystal-lattice-resonance')?.confidence ?? 0.86
+    recordCrystalLatticeSovereignty(latlckConf, latresConf)
+    fired = true
+  }
+
+  return fired
+}
+
+// ── v132: Deep Restoration & Adaptive Intelligence Tier ──────────────────────
+
+export function recordDeepRestorationLock(sleepH: number, selfcareCount: number) {
+  recordSignal('qos', 'deep_restoration_lock', {
+    sleepH,
+    selfcareCount,
+    tier: 'deep-restoration',
+    label: 'DEEPREST',
+    confidence: Math.min(0.78 + Math.min(selfcareCount * 0.02, 0.10), 0.88),
+  })
+}
+
+export function recordAdaptiveIntelligenceArc(memCount: number, journalCount: number, goalsCount: number) {
+  recordSignal('qos', 'adaptive_intelligence_arc', {
+    memCount,
+    journalCount,
+    goalsCount,
+    tier: 'adaptive-intelligence',
+    label: 'ADPINT',
+    confidence: Math.min(0.80 + Math.min((memCount + journalCount + goalsCount) * 0.01, 0.10), 0.90),
+  })
+}
+
+export function recordOperationalMasteryLock(tasksCount: number, habitsCount: number, plannerCount: number) {
+  recordSignal('qos', 'operational_mastery_lock', {
+    tasksCount,
+    habitsCount,
+    plannerCount,
+    tier: 'operational-mastery',
+    label: 'OPMASTERY',
+    confidence: Math.min(0.82 + Math.min((tasksCount + habitsCount + plannerCount) * 0.005, 0.10), 0.92),
+  })
+}
+
+export function checkDeepRestorationAdaptiveIntelligenceTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const sevenDayMs  = 7 * 24 * 60 * 60 * 1000
+  const twoDayMs    = 2 * 24 * 60 * 60 * 1000
+
+  const signals  = state.signals ?? []
+  const patterns = state.patterns ?? []
+  const recent7D = signals.filter(s => now - s.timestamp < sevenDayMs)
+  const recent2D = signals.filter(s => now - s.timestamp < twoDayMs)
+
+  let fired = false
+
+  // P195: Deep Restoration Lock — sleep ≥8h + selfcare ≥3 + no tasks in 2D
+  const sleepRecent = signals.find(s => now - s.timestamp < twoDayMs && s.source === 'sleep' && (s.value as number) >= 8)
+  const selfcare7D  = recent7D.filter(s => s.source === 'selfcare').length
+  const tasks2D     = recent2D.filter(s => s.source === 'tasks').length
+  const alreadyDEEPREST = recent7D.some(s => s.signal === 'deep_restoration_lock')
+  if (sleepRecent && selfcare7D >= 3 && tasks2D === 0 && !alreadyDEEPREST) {
+    recordDeepRestorationLock((sleepRecent.value as number) ?? 8, selfcare7D)
+    fired = true
+  }
+
+  // P196: Adaptive Intelligence Arc — memory ≥5 + journal ≥3 + goals ≥2 in 7D
+  const memory7D   = recent7D.filter(s => s.source === 'memory').length
+  const journal7D  = recent7D.filter(s => s.source === 'journal').length
+  const goals7D    = recent7D.filter(s => s.source === 'goals').length
+  const alreadyADPINT = recent7D.some(s => s.signal === 'adaptive_intelligence_arc')
+  if (memory7D >= 5 && journal7D >= 3 && goals7D >= 2 && !alreadyADPINT) {
+    recordAdaptiveIntelligenceArc(memory7D, journal7D, goals7D)
+    fired = true
+  }
+
+  // P197: Operational Mastery Lock — tasks ≥7 + habits ≥5 + planner ≥4 in 7D
+  const tasks7D    = recent7D.filter(s => s.source === 'tasks').length
+  const habits7D   = recent7D.filter(s => s.source === 'habits').length
+  const planner7D  = recent7D.filter(s => s.source === 'planner').length
+  const alreadyOPMASTERY = recent7D.some(s => s.signal === 'operational_mastery_lock')
+  if (tasks7D >= 7 && habits7D >= 5 && planner7D >= 4 && !alreadyOPMASTERY) {
+    recordOperationalMasteryLock(tasks7D, habits7D, planner7D)
+    fired = true
+  }
+
+  return fired
 }

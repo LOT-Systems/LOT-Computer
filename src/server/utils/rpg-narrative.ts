@@ -1,11 +1,3 @@
-/**
- * LOT SYSTEMS CORPORATION
- * Vadim Marmeladov — CEO, Owner LOT®
- * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
- * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
- * Made in the USA | brand.lot-systems.com
- */
-
 import type { Log, User } from '#shared/types'
 import dayjs from '#server/utils/dayjs'
 
@@ -15,9 +7,10 @@ export interface Achievement {
   description: string
   unlocked: boolean
   unlockedAt: string | null
-  category: 'exploration' | 'consistency' | 'depth' | 'connection' | 'courage' | 'care' | 'romance'
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
+  category: 'exploration' | 'consistency' | 'depth' | 'connection' | 'courage' | 'care' | 'romance' | 'easter_egg' | 'word_turn'
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic'
   icon: string
+  secret?: boolean
 }
 
 export interface StoryArc {
@@ -244,6 +237,174 @@ function defineAchievements(logs: Log[]): Achievement[] {
       category: 'courage',
       rarity: 'rare',
       icon: 'Resonance Hall'
+    },
+
+    // Extended consistency milestones
+    {
+      id: 'the_long_count',
+      title: 'The Long Count',
+      description: '365 days — a year of unbroken presence',
+      unlocked: consecutiveDays >= 365,
+      unlockedAt: consecutiveDays >= 365 ? checkIns[0].createdAt.toISOString() : null,
+      category: 'consistency',
+      rarity: 'legendary',
+      icon: 'Year Glyph'
+    },
+    {
+      id: 'half_year_voyager',
+      title: 'Half-Year Voyager',
+      description: '180 consecutive days of practice',
+      unlocked: consecutiveDays >= 180,
+      unlockedAt: consecutiveDays >= 180 ? checkIns[0].createdAt.toISOString() : null,
+      category: 'consistency',
+      rarity: 'legendary',
+      icon: 'Half-Orbit'
+    },
+    {
+      id: 'quarter_architect',
+      title: 'Quarter Architect',
+      description: '90 consecutive days — three-month arc',
+      unlocked: consecutiveDays >= 90,
+      unlockedAt: consecutiveDays >= 90 ? checkIns[0].createdAt.toISOString() : null,
+      category: 'consistency',
+      rarity: 'rare',
+      icon: 'Three-Month Arc'
+    },
+    {
+      id: 'practitioner',
+      title: 'Practitioner',
+      description: '60 consecutive days — practitioner threshold',
+      unlocked: consecutiveDays >= 60,
+      unlockedAt: consecutiveDays >= 60 ? checkIns[0].createdAt.toISOString() : null,
+      category: 'consistency',
+      rarity: 'rare',
+      icon: 'Threshold'
+    },
+    {
+      id: 'neural_groove',
+      title: 'Neural Groove',
+      description: '21 consecutive days — the groove forms',
+      unlocked: consecutiveDays >= 21,
+      unlockedAt: consecutiveDays >= 21 ? checkIns[0].createdAt.toISOString() : null,
+      category: 'consistency',
+      rarity: 'uncommon',
+      icon: '21-Day Groove'
+    },
+
+    // Easter egg achievements (secret — discovered, not listed in-app)
+    {
+      id: 'night_owl',
+      title: 'Night Owl',
+      description: 'Checked in between midnight and 4am',
+      unlocked: checkIns.some(c => {
+        const h = dayjs(c.createdAt).hour()
+        return h >= 0 && h < 4
+      }),
+      unlockedAt: checkIns.find(c => {
+        const h = dayjs(c.createdAt).hour()
+        return h >= 0 && h < 4
+      })?.createdAt.toISOString() || null,
+      category: 'easter_egg',
+      rarity: 'rare',
+      icon: ')))',
+      secret: true
+    },
+    {
+      id: 'early_bird',
+      title: 'Early Bird',
+      description: 'Checked in between 5am and 6am',
+      unlocked: checkIns.some(c => {
+        const h = dayjs(c.createdAt).hour()
+        return h >= 5 && h < 6
+      }),
+      unlockedAt: checkIns.find(c => {
+        const h = dayjs(c.createdAt).hour()
+        return h >= 5 && h < 6
+      })?.createdAt.toISOString() || null,
+      category: 'easter_egg',
+      rarity: 'rare',
+      icon: ')))·',
+      secret: true
+    },
+    {
+      id: 'solstice',
+      title: 'Solstice',
+      description: 'Checked in on June 21 or December 21',
+      unlocked: checkIns.some(c => {
+        const d = dayjs(c.createdAt)
+        return (d.month() === 5 && d.date() === 21) || (d.month() === 11 && d.date() === 21)
+      }),
+      unlockedAt: checkIns.find(c => {
+        const d = dayjs(c.createdAt)
+        return (d.month() === 5 && d.date() === 21) || (d.month() === 11 && d.date() === 21)
+      })?.createdAt.toISOString() || null,
+      category: 'easter_egg',
+      rarity: 'epic',
+      icon: '○─○',
+      secret: true
+    },
+    {
+      id: 'the_void',
+      title: 'The Void',
+      description: 'Answered a memory question at exactly midnight',
+      unlocked: answers.some(a => {
+        const d = dayjs(a.createdAt)
+        return d.hour() === 0 && d.minute() === 0
+      }),
+      unlockedAt: answers.find(a => {
+        const d = dayjs(a.createdAt)
+        return d.hour() === 0 && d.minute() === 0
+      })?.createdAt.toISOString() || null,
+      category: 'easter_egg',
+      rarity: 'epic',
+      icon: '◉',
+      secret: true
+    },
+    {
+      id: 'meta_signal',
+      title: 'Meta-Signal',
+      description: 'You named the system inside it — MYTHIC',
+      unlocked: answers.some(a => /\bLOT\b/.test(a.text || '')),
+      unlockedAt: answers.find(a => /\bLOT\b/.test(a.text || ''))?.createdAt.toISOString() || null,
+      category: 'easter_egg',
+      rarity: 'mythic',
+      icon: '◉·◉',
+      secret: true
+    },
+
+    // Word Turn achievements
+    {
+      id: 'ritual_keeper',
+      title: 'Ritual Keeper',
+      description: 'The word "ritual" appeared in your practice',
+      unlocked: notes.some(n => /\britual/i.test(n.text || '')),
+      unlockedAt: notes.find(n => /\britual/i.test(n.text || ''))?.createdAt.toISOString() || null,
+      category: 'word_turn',
+      rarity: 'uncommon',
+      icon: '◈',
+      secret: true
+    },
+    {
+      id: 'gratitude_node',
+      title: 'Gratitude Node',
+      description: 'The word "gratitude" appeared in your practice',
+      unlocked: notes.some(n => /\bgrateful|\bgratitude/i.test(n.text || '')),
+      unlockedAt: notes.find(n => /\bgrateful|\bgratitude/i.test(n.text || ''))?.createdAt.toISOString() || null,
+      category: 'word_turn',
+      rarity: 'uncommon',
+      icon: '◇◇',
+      secret: true
+    },
+    {
+      id: 'stargazer',
+      title: 'Stargazer',
+      description: 'The word "stars" appeared in your practice',
+      unlocked: notes.some(n => /\bstars|\bcosmos|\bconstellation/i.test(n.text || '')),
+      unlockedAt: notes.find(n => /\bstars|\bcosmos|\bconstellation/i.test(n.text || ''))?.createdAt.toISOString() || null,
+      category: 'word_turn',
+      rarity: 'rare',
+      icon: '✦·✦',
+      secret: true
     }
   ]
 

@@ -110,6 +110,51 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'quantum-presence-crystallization': 'QPCRYST',
   'total-field-coherence':            'TOTCOH',
   'recovery-intelligence-arc':        'RECINTEL',
+  'field-resonance-arc':              'FIELDRES',
+  'coherence-memory-imprint':         'COHIMPRINT',
+  'quantum-self-regulation':          'QSREG',
+  'quantum-coherence-trajectory':     'QCOHTRJ',
+  'sovereign-self-assembly':          'SOVASMB',
+  'field-presence-anchor':            'FPANCH',
+  'sovereign-coherence-lock':         'SLOCK',
+  'living-assembly-arc':              'LARC',
+  'quantum-identity-sovereign':       'QIDSOV',
+  'sovereign_state_report':           'SOV REPORT',
+  'sovereign-field-pulse':            'SFPULSE',
+  'crystalline-identity-field':       'CRYSTID',
+  'sovereign-temporal-lock':          'SOVTLOCK',
+  'sovereignty-duration-streak':      'SOVDUR',
+  'crystalline-field-sustain':        'CRFLDST',
+  'sovereign-momentum-arc':           'SOVMARC',
+  'sovereign-permanence-lock':        'SOVPERM',
+  'crystalline-permanence-field':     'CRPERMF',
+  'momentum-permanence-arc':          'MOMPERM',
+  'sovereignty-ascension':            'SOVASCEND',
+  'sovereign-momentum-crystallization': 'SOVMCRYST',
+  'living-sovereign-field':            'LSOFIELD',
+  'sovereign-in-motion':               'SOVMOTION',
+  'sovereign-field-broadcast':         'SFBCAST',
+  'identity-transmission-lock':        'IDTLOCK',
+  'quantum-sovereign-transmission':    'QSOVTX',
+  'sovereign-crystal-field':          'SOVCRYST',
+  'transmission-field-anchor':        'TXFIELD',
+  'crystalline-sovereign-transmission': 'CRSOVETX',
+  'crystal-field-continuity':         'CRFLDCT',
+  'crystal-broadcast-expansion':      'CRBRCAST',
+  'crystal-temporal-lock':            'CRTLCK',
+  'crystal-resonance-convergence':    'CRRCONV',
+  'crystal-full-coherence':           'CRFULLCOH',
+  'crystal-resonance-sovereignty':    'CRRESOV',
+  'crystal-matrix-formation':         'CRMATRIX',
+  'crystal-matrix-signal':            'CRMATSIG',
+  'crystal-matrix-sovereignty':       'CRMATSOV',
+  'crystal-lattice-lock':             'CRLATLCK',
+  'crystal-lattice-resonance':        'CRLATRES',
+  'crystal-lattice-sovereignty':      'CRLATSOV',
+  'crystal-lattice-broadcast':        'CRLATBCAST',
+  'crystal-lattice-expansion':        'CRLATEXP',
+  'crystal-lattice-singularity':      'CRLATSNGL',
+  // v132: deep restoration & adaptive intelligence tier
   'deep-restoration-lock':            'DEEPREST',
   'adaptive-intelligence-arc':        'ADPINT',
   'operational-mastery-lock':         'OPMASTERY',
@@ -438,6 +483,25 @@ export const QuantumEngineWidgets: React.FC = () => {
                         <div className="opacity-40">{directive}</div>
                       </div>
                     )}
+                    {(() => {
+                      const qos = getQuantumOS()
+                      const st = qos.sovereignTier
+                      if (st.band === 'ABSENT') return null
+                      return (
+                        <div className="border-t border-acc-400/20 pt-8 mt-4">
+                          <div className="opacity-30 uppercase tracking-widest mb-6">Sovereign tier</div>
+                          <div className="flex justify-between items-baseline mb-2">
+                            <span className="opacity-30">BAND</span>
+                            <span className={`uppercase tracking-widest ${st.band === 'SOVEREIGN' ? '' : 'opacity-60'}`}>{st.band}</span>
+                          </div>
+                          <div className="flex gap-x-8 opacity-40">
+                            <span className={st.slockActive  ? 'opacity-100' : 'opacity-30'}>SLOCK</span>
+                            <span className={st.larcActive   ? 'opacity-100' : 'opacity-30'}>LARC</span>
+                            <span className={st.qidsovActive ? 'opacity-100' : 'opacity-30'}>QIDSOV</span>
+                          </div>
+                        </div>
+                      )
+                    })()}
                   </>
                 ) : (
                   <div className="opacity-30">Cohort pending. Engage more widgets to surface pattern.</div>

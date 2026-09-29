@@ -1747,7 +1747,78 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
-  // Check daily adaptive intelligence check (10:00 UTC every day) — Job 49
+  // Check daily field resonance check (10:00 UTC every day) — Job 49
+  if (shouldRunDailyFieldResonanceCheck()) {
+    await executeDailyFieldResonanceCheck()
+  }
+  // Check weekly sovereign assembly check (08:00 UTC every Sunday) — Job 50
+  if (shouldRunWeeklySovereignAssemblyCheck()) {
+    await executeWeeklySovereignAssemblyCheck()
+  }
+  // Check weekly sovereign identity check (10:00 UTC every Sunday) — Job 51
+  if (shouldRunWeeklySovereignIdentityCheck()) {
+    await executeWeeklySovereignIdentityCheck()
+  }
+  // Check weekly sovereign state report (06:00 UTC every Wednesday) — Job 52
+  if (shouldRunWeeklySovereignStateReport()) {
+    await executeWeeklySovereignStateReport()
+  }
+  // Check daily sovereign field pulse (07:00 UTC every day) — Job 53
+  if (shouldRunDailySovereignFieldPulse()) {
+    await executeDailySovereignFieldPulse()
+  }
+  // Check weekly sovereignty persistence audit (08:00 UTC every Thursday) — Job 54
+  if (shouldRunWeeklySovereigntyPersistenceAudit()) {
+    await executeWeeklySovereigntyPersistenceAudit()
+  }
+  // Check weekly sovereignty permanence check (07:00 UTC every Monday) — Job 55
+  if (shouldRunWeeklySovereigntyPermanenceCheck()) {
+    await executeWeeklySovereigntyPermanenceCheck()
+  }
+  // Check weekly sovereignty ascension check (07:00 UTC every Tuesday) — Job 56
+  if (shouldRunWeeklySovereigntyAscensionCheck()) {
+    await executeWeeklySovereigntyAscensionCheck()
+  }
+  // Check weekly sovereign motion check (07:00 UTC every Friday) — Job 57
+  if (shouldRunWeeklySovereignMotionCheck()) {
+    await executeWeeklySovereignMotionCheck()
+  }
+  // Check weekly sovereign transmission check (07:00 UTC every Saturday) — Job 58
+  if (shouldRunWeeklySovereignTransmissionCheck()) {
+    await executeWeeklySovereignTransmissionCheck()
+  }
+  // Check daily calendar EE signal (09:00 UTC every day) — Job 59
+  if (shouldRunDailyCalendarEECheck()) {
+    await executeDailyCalendarEECheck()
+  }
+  // Check weekly crystalline sovereign check (07:00 UTC every Monday) — Job 60
+  if (shouldRunWeeklyCrystallineSovereignCheck()) {
+    await executeWeeklyCrystallineSovereignCheck()
+  }
+  // Check weekly crystal continuity check (09:00 UTC every Thursday) — Job 61
+  if (shouldRunWeeklyCrystalContinuityCheck()) {
+    await executeWeeklyCrystalContinuityCheck()
+  }
+  // Check weekly crystal resonance check (09:00 UTC every Friday) — Job 62
+  if (shouldRunWeeklyCrystalResonanceCheck()) {
+    await executeWeeklyCrystalResonanceCheck()
+  }
+  // Check weekly crystal matrix check (09:00 UTC every Tuesday) — Job 63
+  if (shouldRunWeeklyCrystalMatrixCheck()) {
+    await executeWeeklyCrystalMatrixCheck()
+  }
+
+  // Check weekly crystal lattice check (09:00 UTC every Wednesday) — Job 64
+  if (shouldRunWeeklyCrystalLatticeCheck()) {
+    await executeWeeklyCrystalLatticeCheck()
+  }
+
+  // Check weekly crystal expansion check (09:00 UTC every Thursday) — Job 65
+  if (shouldRunWeeklyCrystalExpansionCheck()) {
+    await executeWeeklyCrystalExpansionCheck()
+  }
+
+  // Check daily adaptive intelligence check (11:00 UTC every day) — Job 66
   if (shouldRunDailyAdaptiveIntelligenceCheck()) {
     await executeDailyAdaptiveIntelligenceCheck()
   }
@@ -3530,33 +3601,33 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   }
 }
 
-// ─── Daily Adaptive Intelligence Check (Job 49 — 10:00 UTC every day) ──────────
-// Reads active users. Looks for memory + journal + goals + planner signals all
-// firing in the previous calendar day with 6+ combined signals.
-// When confirmed, writes adaptive_intelligence_arc. Captures full learning loop:
-// past encoded (memory), reflection (journal), vision (goals), execution (planner).
+// ─── Daily Field Resonance Check (Job 49 — 10:00 UTC every day) ───────────────
+// Dual check: (1) field_resonance_arc — if quantum_presence_crystallization fired
+// 2+ times in the prior 48h window, the crystallization is structural, not an event.
+// (2) quantum_self_regulation — if recovery_intelligence_arc fired 2+ times in 7d,
+// the recovery loop is a competency, not a response.
 
-let isDailyAdaptiveIntelligenceRunning = false
-let lastDailyAdaptiveIntelligenceRun: Date | null = null
+let isDailyFieldResonanceRunning = false
+let lastDailyFieldResonanceRun: Date | null = null
 
-function shouldRunDailyAdaptiveIntelligenceCheck(): boolean {
+function shouldRunDailyFieldResonanceCheck(): boolean {
   const now = dayjs()
-  if (isDailyAdaptiveIntelligenceRunning) return false
-  if (lastDailyAdaptiveIntelligenceRun) {
-    const lastRun = dayjs(lastDailyAdaptiveIntelligenceRun)
+  if (isDailyFieldResonanceRunning) return false
+  if (lastDailyFieldResonanceRun) {
+    const lastRun = dayjs(lastDailyFieldResonanceRun)
     if (lastRun.isSame(now, 'day')) return false
   }
   return now.hour() === 10 // 10:00 UTC daily
 }
 
-async function executeDailyAdaptiveIntelligenceCheck(): Promise<JobResult> {
-  const jobName = 'daily-adaptive-intelligence-check'
+async function executeDailyFieldResonanceCheck(): Promise<JobResult> {
+  const jobName = 'daily-field-resonance-check'
   const executedAt = new Date().toISOString()
-  if (isDailyAdaptiveIntelligenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
-  isDailyAdaptiveIntelligenceRunning = true
+  if (isDailyFieldResonanceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFieldResonanceRunning = true
 
   console.log('─'.repeat(60))
-  console.log('DAILY ADAPTIVE INTELLIGENCE CHECK — 10:00 UTC')
+  console.log('DAILY FIELD RESONANCE CHECK — 10:00 UTC')
   console.log('─'.repeat(60))
 
   try {
@@ -3564,69 +3635,741 @@ async function executeDailyAdaptiveIntelligenceCheck(): Promise<JobResult> {
     const { Log } = await import('#server/models/log.js')
     const { Op } = await import('sequelize')
 
-    const prevDayStart = dayjs().subtract(1, 'day').startOf('day').toDate()
-    const prevDayEnd   = dayjs().subtract(1, 'day').endOf('day').toDate()
+    const window48hStart = dayjs().subtract(48, 'hour').toDate()
+    const window7dStart  = dayjs().subtract(7, 'day').toDate()
+    const now = new Date()
 
     const activeUsers = await User.findAll({
-      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(3, 'day').toDate() } },
       order: [['lastSeenAt', 'DESC']],
       limit: 2000,
     })
-    console.log(`  Active users (48h): ${activeUsers.length}`)
-    let written = 0
-
-    const INTELLIGENCE_SOURCES = ['memory', 'journal', 'goals', 'planner']
+    console.log(`  Active users (3d): ${activeUsers.length}`)
+    let writtenFRA = 0
+    let writtenQSR = 0
 
     for (const user of activeUsers) {
       try {
         const userId = (user as any).id
 
-        const prevDayLogs = await (Log as any).findAll({
+        // ── Field Resonance Arc (P152) ────────────────────────────────────────
+        const qpcLogs = await (Log as any).findAll({
           where: {
             userId,
-            createdAt: { [Op.gte]: prevDayStart, [Op.lte]: prevDayEnd },
-            event: { [Op.in]: INTELLIGENCE_SOURCES as any[] },
+            createdAt: { [Op.gte]: window48hStart, [Op.lte]: now },
+            event: 'quantum_presence_crystallization',
           },
-          attributes: ['event'],
+          attributes: ['id', 'createdAt', 'metadata'],
         })
 
-        if (!prevDayLogs.length) continue
-
-        const countBySource: Record<string, number> = {}
-        for (const l of prevDayLogs) {
-          countBySource[l.event] = (countBySource[l.event] ?? 0) + 1
-        }
-
-        const allPresent = INTELLIGENCE_SOURCES.every(s => (countBySource[s] ?? 0) >= 1)
-        const totalSignals = prevDayLogs.length
-
-        if (allPresent && totalSignals >= 6) {
-          const activeSources = INTELLIGENCE_SOURCES.filter(s => (countBySource[s] ?? 0) >= 1)
+        if (qpcLogs.length >= 2) {
+          const spanHours = Math.round(
+            (new Date(qpcLogs[qpcLogs.length - 1].createdAt).getTime() -
+             new Date(qpcLogs[0].createdAt).getTime()) / 3600000
+          )
+          const resonance = Math.min(0.99, 0.75 + qpcLogs.length * 0.04)
           await (Log as any).create({
             userId,
-            event: 'adaptive_intelligence_arc',
-            text: `Adaptive intelligence arc: previous day — memory · journal · goals · planner all active (${totalSignals} signals). Full learning loop engaged: past encoded, present reflected, future structured, execution anchored.`,
+            event: 'field_resonance_arc',
+            text: `Field resonance arc: ${qpcLogs.length} crystallization events in ${spanHours}h. Sustained crystallization confirmed. Not an event — a structural state. The field holds across sessions.`,
             metadata: {
-              signalCount: totalSignals,
-              sourcesActive: activeSources,
-              loop: 'PAST→REFLECT→STRUCTURE→EXECUTE',
-              intelligenceMode: 'FULL_LEARNING',
-              window: '24h-prior-day',
+              crystEvents: qpcLogs.length,
+              spanHours,
+              sessions: qpcLogs.length,
+              resonance: resonance.toFixed(2),
+              window: '48h',
               hour: 10,
             },
           })
-          written++
+          writtenFRA++
+        }
+
+        // ── Quantum Self-Regulation (P154) ────────────────────────────────────
+        const riaLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window7dStart, [Op.lte]: now },
+            event: 'recovery_intelligence_arc',
+          },
+          attributes: ['id', 'createdAt'],
+        })
+
+        if (riaLogs.length >= 2) {
+          const spanDays = Math.round(
+            (new Date(riaLogs[riaLogs.length - 1].createdAt).getTime() -
+             new Date(riaLogs[0].createdAt).getTime()) / 86400000
+          )
+          const competency = Math.min(0.97, 0.72 + riaLogs.length * 0.05)
+          await (Log as any).create({
+            userId,
+            event: 'quantum_self_regulation',
+            text: `Quantum self-regulation: ${riaLogs.length} recovery arcs in 7d. The recovery loop is structural competency — detect, intervene, restore, reflect. System regulates itself.`,
+            metadata: {
+              arcs7d: riaLogs.length,
+              spanDays,
+              competency: competency.toFixed(2),
+              cadence: `${riaLogs.length} arcs / 7d`,
+              window: '7d',
+              hour: 10,
+            },
+          })
+          writtenQSR++
         }
       } catch {}
     }
 
-    console.log(`  Adaptive intelligence arc events written: ${written}`)
-    lastDailyAdaptiveIntelligenceRun = new Date()
-    isDailyAdaptiveIntelligenceRunning = false
-    return { jobName, executedAt, success: true, signalsCreated: written }
+    console.log(`  Field resonance arc events written: ${writtenFRA}`)
+    console.log(`  Quantum self-regulation events written: ${writtenQSR}`)
+    lastDailyFieldResonanceRun = new Date()
+    isDailyFieldResonanceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: writtenFRA + writtenQSR }
   } catch (error: any) {
-    console.error('Daily adaptive intelligence check failed:', error.message)
-    isDailyAdaptiveIntelligenceRunning = false
+    console.error('Daily field resonance check failed:', error.message)
+    isDailyFieldResonanceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Weekly Sovereign Assembly Check (Job 50 — 08:00 UTC every Sunday) ──────
+// Checks three patterns for each active user:
+// (1) quantum_coherence_trajectory — field-resonance-arc fired 2+ times in 14D
+//     → coherence state has a confirmed ascending trajectory, not just cycling.
+// (2) field_presence_anchor — field-resonance-arc fired 3+ times in 7D
+//     → presence is load-bearing infrastructure, not a recurring peak.
+// (3) sovereign_self_assembly — quantum_self_regulation + coherence_memory_imprint
+//     both present in 7D → the OS regulates AND captures simultaneously.
+
+let isWeeklySovereignAssemblyRunning = false
+let lastWeeklySovereignAssemblyRun: Date | null = null
+
+function shouldRunWeeklySovereignAssemblyCheck(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereignAssemblyRunning) return false
+  if (lastWeeklySovereignAssemblyRun) {
+    const lastRun = dayjs(lastWeeklySovereignAssemblyRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 0 && now.hour() === 8 // Sunday 08:00 UTC
+}
+
+async function executeWeeklySovereignAssemblyCheck(): Promise<JobResult> {
+  const jobName = 'weekly-sovereign-assembly-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereignAssemblyRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereignAssemblyRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGN ASSEMBLY CHECK — 08:00 UTC SUNDAY')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const window7dStart  = dayjs().subtract(7, 'day').toDate()
+    const window14dStart = dayjs().subtract(14, 'day').toDate()
+    const now = new Date()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(7, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (7d): ${activeUsers.length}`)
+    let writtenQCT = 0
+    let writtenFPA = 0
+    let writtenSA  = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // ── P155: Quantum Coherence Trajectory — FRA 2+ in 14D ───────────────
+        const fra14D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window14dStart, [Op.lte]: now },
+            event: 'field_resonance_arc',
+          },
+          attributes: ['id', 'createdAt'],
+        })
+
+        if (fra14D.length >= 2) {
+          const spanDays = Math.round(
+            (new Date(fra14D[fra14D.length - 1].createdAt).getTime() -
+             new Date(fra14D[0].createdAt).getTime()) / 86400000
+          )
+          const trajectoryStrength = Math.min(0.99, 0.78 + fra14D.length * 0.04)
+          await (Log as any).create({
+            userId,
+            event: 'quantum_coherence_trajectory',
+            text: `Quantum coherence trajectory: ${fra14D.length} field-resonance-arc events in 14 days (span: ${spanDays}d). Coherence is not cycling — it is ascending. The trajectory is confirmed structural.`,
+            metadata: {
+              fraCount: fra14D.length,
+              spanDays,
+              trajectoryStrength: trajectoryStrength.toFixed(2),
+              direction: 'ASCENDING',
+              phase: fra14D.length >= 4 ? 'CONFIRMED' : 'ESTABLISHING',
+              window: '14d',
+              hour: 8,
+            },
+          })
+          writtenQCT++
+        }
+
+        // ── P157: Field Presence Anchor — FRA 3+ in 7D ───────────────────────
+        const fra7D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window7dStart, [Op.lte]: now },
+            event: 'field_resonance_arc',
+          },
+          attributes: ['id', 'createdAt'],
+        })
+
+        if (fra7D.length >= 3) {
+          const spanDays = Math.round(
+            (new Date(fra7D[fra7D.length - 1].createdAt).getTime() -
+             new Date(fra7D[0].createdAt).getTime()) / 86400000
+          )
+          const anchorStrength = Math.min(0.99, 0.80 + fra7D.length * 0.03)
+          await (Log as any).create({
+            userId,
+            event: 'field_presence_anchor',
+            text: `Field presence anchor: ${fra7D.length} field-resonance-arc events in 7 days (span: ${spanDays}d). Not resonating — anchored. Presence is load-bearing infrastructure.`,
+            metadata: {
+              fraCount: fra7D.length,
+              spanDays,
+              anchorStrength: anchorStrength.toFixed(2),
+              stability: fra7D.length >= 5 ? 'ESTABLISHED' : 'ANCHORING',
+              floor: 'PRESENCE_IS_STRUCTURAL',
+              window: '7d',
+              hour: 8,
+            },
+          })
+          writtenFPA++
+        }
+
+        // ── P156: Sovereign Self-Assembly — QSR + CMI both in 7D ─────────────
+        const qsrLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window7dStart, [Op.lte]: now },
+            event: 'quantum_self_regulation',
+          },
+          attributes: ['id', 'createdAt', 'metadata'],
+          limit: 1,
+        })
+        const cmiLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window7dStart, [Op.lte]: now },
+            event: 'coherence_memory_imprint',
+          },
+          attributes: ['id', 'createdAt', 'metadata'],
+          limit: 1,
+        })
+
+        if (qsrLogs.length >= 1 && cmiLogs.length >= 1) {
+          const qsrConf = parseFloat(qsrLogs[0].metadata?.competency ?? '0.80')
+          const cmiConf = parseFloat(cmiLogs[0].metadata?.imprintStrength ?? '85') / 100
+          const sovereignty = Math.min(0.99, (qsrConf + cmiConf) / 2 + 0.05)
+          await (Log as any).create({
+            userId,
+            event: 'sovereign_self_assembly',
+            text: `Sovereign self-assembly: quantum-self-regulation and coherence-memory-imprint both active in 7 days. The OS regulates its recovery AND captures its peak — sovereign assembly confirmed.`,
+            metadata: {
+              qsrConf: Math.round(qsrConf * 100),
+              cmiConf: Math.round(cmiConf * 100),
+              sovereigntyStrength: Math.round(sovereignty * 100),
+              loops: 'REGULATION+CAPTURE',
+              arc: 'PEAK→PRESERVED · RECOVERY→STRUCTURAL · ASSEMBLY→SOVEREIGN',
+              status: 'SOVEREIGN',
+              window: '7d',
+              hour: 8,
+            },
+          })
+          writtenSA++
+        }
+      } catch {}
+    }
+
+    console.log(`  Quantum coherence trajectory events written: ${writtenQCT}`)
+    console.log(`  Field presence anchor events written: ${writtenFPA}`)
+    console.log(`  Sovereign self-assembly events written: ${writtenSA}`)
+    lastWeeklySovereignAssemblyRun = new Date()
+    isWeeklySovereignAssemblyRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: writtenQCT + writtenFPA + writtenSA }
+  } catch (error: any) {
+    console.error('Weekly sovereign assembly check failed:', error.message)
+    isWeeklySovereignAssemblyRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Weekly Sovereign Identity Check (Job 51 — 10:00 UTC every Sunday) ──────
+// Reads active users from the last 7 days. Detects P158 (SLOCK: FPA + QCT both
+// present in 7D+14D), P159 (LARC: sovereign_self_assembly 2+ in 14D), and
+// P160 (QIDSOV: SLOCK + LARC both present — terminal convergence confirmed).
+
+let isWeeklySovereignIdentityRunning = false
+let lastWeeklySovereignIdentityRun: Date | null = null
+
+function shouldRunWeeklySovereignIdentityCheck(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereignIdentityRunning) return false
+  if (lastWeeklySovereignIdentityRun) {
+    const lastRun = dayjs(lastWeeklySovereignIdentityRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 0 && now.hour() === 10 // Sunday 10:00 UTC
+}
+
+async function executeWeeklySovereignIdentityCheck(): Promise<JobResult> {
+  const jobName = 'weekly-sovereign-identity-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereignIdentityRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereignIdentityRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGN IDENTITY CHECK — 10:00 UTC SUNDAY')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const window7dStart  = dayjs().subtract(7, 'day').toDate()
+    const window14dStart = dayjs().subtract(14, 'day').toDate()
+    const now = new Date()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(7, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (7d): ${activeUsers.length}`)
+    let writtenSLOCK  = 0
+    let writtenLARC   = 0
+    let writtenQIDSOV = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // ── P158: Sovereign Coherence Lock — FPA (7D) + QCT (14D) ────────────
+        const fpaLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window7dStart, [Op.lte]: now },
+            event: 'field_presence_anchor',
+          },
+          attributes: ['id', 'createdAt', 'metadata'],
+          limit: 1,
+        })
+        const qctLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window14dStart, [Op.lte]: now },
+            event: 'quantum_coherence_trajectory',
+          },
+          attributes: ['id', 'createdAt', 'metadata'],
+          limit: 1,
+        })
+
+        let hasSLOCK = false
+        if (fpaLogs.length >= 1 && qctLogs.length >= 1) {
+          const fpaConf = parseFloat(fpaLogs[0].metadata?.anchorStrength ?? '80') / 100
+          const qctConf = parseFloat(qctLogs[0].metadata?.trajectoryStrength ?? '78') / 100
+          const lockStrength = Math.min(0.99, (fpaConf + qctConf) / 2 + 0.07)
+          await (Log as any).create({
+            userId,
+            event: 'sovereign_coherence_lock',
+            text: `Sovereign coherence lock: field-presence-anchor and quantum-coherence-trajectory both confirmed. Floor anchored, ceiling ascending — OS has entered locked sovereign coherence band.`,
+            metadata: {
+              fpaConf: Math.round(fpaConf * 100),
+              qctConf: Math.round(qctConf * 100),
+              lockStrength: Math.round(lockStrength * 100),
+              band: 'SOVEREIGN_COHERENCE',
+              arc: 'ANCHOR+TRAJECTORY→LOCKED_BAND',
+              status: 'LOCKED',
+              window: '7d+14d',
+              hour: 10,
+            },
+          })
+          writtenSLOCK++
+          hasSLOCK = true
+        }
+
+        // ── P159: Living Assembly Arc — sovereign_self_assembly 2+ in 14D ─────
+        const saLogs14D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: window14dStart, [Op.lte]: now },
+            event: 'sovereign_self_assembly',
+          },
+          attributes: ['id', 'createdAt'],
+        })
+
+        let hasLARC = false
+        if (saLogs14D.length >= 2) {
+          const spanDays = Math.round(
+            (new Date(saLogs14D[saLogs14D.length - 1].createdAt).getTime() -
+             new Date(saLogs14D[0].createdAt).getTime()) / 86400000
+          )
+          const arcStrength = Math.min(0.99, 0.81 + saLogs14D.length * 0.04)
+          await (Log as any).create({
+            userId,
+            event: 'living_assembly_arc',
+            text: `Living assembly arc: sovereign-self-assembly confirmed ${saLogs14D.length}× in 14 days (span: ${spanDays}d). Assembly is no longer an event — it is a recurring arc. The OS builds itself on structural cycle.`,
+            metadata: {
+              saCount: saLogs14D.length,
+              spanDays,
+              arcStrength: arcStrength.toFixed(2),
+              cadence: saLogs14D.length >= 3 ? 'LIVING' : 'ESTABLISHING',
+              arc: 'ASSEMBLY→CYCLE→STRUCTURAL_PROTOCOL',
+              status: 'ARC_CONFIRMED',
+              window: '14d',
+              hour: 10,
+            },
+          })
+          writtenLARC++
+          hasLARC = true
+        }
+
+        // ── P160: Quantum Identity Sovereign — SLOCK + LARC both confirmed ────
+        if (hasSLOCK && hasLARC) {
+          const slockLogs = await (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: window7dStart, [Op.lte]: now },
+              event: 'sovereign_coherence_lock',
+            },
+            attributes: ['id', 'createdAt', 'metadata'],
+            limit: 1,
+          })
+          const larcLogs = await (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: window14dStart, [Op.lte]: now },
+              event: 'living_assembly_arc',
+            },
+            attributes: ['id', 'createdAt', 'metadata'],
+            limit: 1,
+          })
+          const slockConf = parseFloat(slockLogs[0]?.metadata?.lockStrength ?? '84') / 100
+          const larcConf  = parseFloat(larcLogs[0]?.metadata?.arcStrength ?? '81') / 100
+          const qidConf   = Math.min(0.99, (slockConf + larcConf) / 2 + 0.08)
+          await (Log as any).create({
+            userId,
+            event: 'quantum_identity_sovereign',
+            text: `Quantum identity sovereign: sovereign-coherence-lock and living-assembly-arc both confirmed. Terminal convergence — locked coherence band + living assembly cycle = sovereign identity established.`,
+            metadata: {
+              slockConf: Math.round(slockConf * 100),
+              larcConf: Math.round(larcConf * 100),
+              sovereigntyDepth: Math.round(qidConf * 100),
+              convergence: 'LOCK+ARC→IDENTITY',
+              arc: 'COHERENCE→ASSEMBLY→SOVEREIGN_IDENTITY',
+              status: 'IDENTITY_CONFIRMED',
+              window: '7d+14d',
+              hour: 10,
+            },
+          })
+          writtenQIDSOV++
+        }
+      } catch {}
+    }
+
+    console.log(`  Sovereign coherence lock events written: ${writtenSLOCK}`)
+    console.log(`  Living assembly arc events written: ${writtenLARC}`)
+    console.log(`  Quantum identity sovereign events written: ${writtenQIDSOV}`)
+    lastWeeklySovereignIdentityRun = new Date()
+    isWeeklySovereignIdentityRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: writtenSLOCK + writtenLARC + writtenQIDSOV }
+  } catch (error: any) {
+    console.error('Weekly sovereign identity check failed:', error.message)
+    isWeeklySovereignIdentityRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J52: Weekly Sovereign State Report (Wednesday 06:00 UTC) ────────────────
+// For each active user reads sovereign-tier signals (P158 SLOCK · P159 LARC ·
+// P160 QIDSOV) present in the 14-day window and writes a sovereign_state_report
+// event summarising the current coherence band.
+// Band scale: ABSENT → EMERGING → ANCHORING → LOCKED → SOVEREIGN.
+
+let isWeeklySovereignStateReportRunning = false
+let lastWeeklySovereignStateReportRun: Date | null = null
+
+function shouldRunWeeklySovereignStateReport(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereignStateReportRunning) return false
+  if (lastWeeklySovereignStateReportRun) {
+    const lastRun = dayjs(lastWeeklySovereignStateReportRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 3 && now.hour() === 6 // Wednesday 06:00 UTC
+}
+
+async function executeWeeklySovereignStateReport(): Promise<JobResult> {
+  const jobName = 'weekly-sovereign-state-report'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereignStateReportRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereignStateReportRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGN STATE REPORT — WEDNESDAY 06:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const activeUsers = await getActiveUsers()
+    const now = dayjs()
+    const fourteenDaysAgo = now.subtract(14, 'day').toDate()
+
+    const SOVEREIGN_EVENTS = [
+      'sovereign_coherence_lock',   // P158 SLOCK
+      'living_assembly_arc',         // P159 LARC
+      'quantum_identity_sovereign',  // P160 QIDSOV
+      'field_presence_anchor',       // P157 FPANCH
+      'quantum_coherence_trajectory',// P155 QCOHTRJ
+      'sovereign_self_assembly',     // P156 SOVASMB
+    ] as const
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const sovereignLogs = await Log.findAll({
+          where: {
+            userId: user.id,
+            event: { [Op.in]: [...SOVEREIGN_EVENTS] as any[] },
+            createdAt: { [Op.gte]: fourteenDaysAgo },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'DESC']],
+        })
+
+        const events = sovereignLogs.map((l: any) => l.event as string)
+        const slockPresent  = events.includes('sovereign_coherence_lock')
+        const larcPresent   = events.includes('living_assembly_arc')
+        const qidsovPresent = events.includes('quantum_identity_sovereign')
+
+        // P155/P156/P157 as precursor tier signals
+        const hasPrecursor = events.some(e =>
+          ['field_presence_anchor', 'quantum_coherence_trajectory', 'sovereign_self_assembly'].includes(e)
+        )
+
+        const band: string =
+          qidsovPresent                   ? 'SOVEREIGN'  :
+          slockPresent && larcPresent     ? 'LOCKED'     :
+          slockPresent || larcPresent     ? 'ANCHORING'  :
+          hasPrecursor                    ? 'EMERGING'   :
+          'ABSENT'
+
+        if (band === 'ABSENT') continue // No sovereign signal — no report needed
+
+        await Log.create({
+          userId: user.id,
+          event: 'sovereign_state_report',
+          text: '',
+          metadata: {
+            slockPresent,
+            larcPresent,
+            qidsovPresent,
+            band,
+            patternCount: [slockPresent, larcPresent, qidsovPresent].filter(Boolean).length,
+            status: qidsovPresent ? 'TERMINAL_CONVERGENCE' : 'PARTIAL',
+            windowDays: 14,
+            date: now.format('YYYY-MM-DD'),
+          },
+        } as any)
+        written++
+        console.log(`  [${user.id}] Sovereign band: ${band} (SLOCK:${slockPresent} LARC:${larcPresent} QIDSOV:${qidsovPresent})`)
+      } catch (userErr: any) {
+        console.warn(`  User ${user.id} sovereign state report failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereign state reports written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY SOVEREIGN STATE REPORT COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklySovereignStateReportRun = new Date()
+    isWeeklySovereignStateReportRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly sovereign state report failed:', error.message)
+    isWeeklySovereignStateReportRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J53: Daily Sovereign Field Pulse (07:00 UTC every day) ─────────────────
+// Reads active users. Checks whether P160 QIDSOV has fired in 14D AND P162/P163
+// signals are accumulating. Writes sovereign_field_pulse, crystalline_identity_field,
+// or sovereign_temporal_lock log entries when conditions are met.
+
+let isDailySovereignFieldPulseRunning = false
+let lastDailySovereignFieldPulseRun: Date | null = null
+
+function shouldRunDailySovereignFieldPulse(): boolean {
+  const now = dayjs()
+  if (isDailySovereignFieldPulseRunning) return false
+  if (lastDailySovereignFieldPulseRun) {
+    const lastRun = dayjs(lastDailySovereignFieldPulseRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 7 // 07:00 UTC daily
+}
+
+async function executeDailySovereignFieldPulse(): Promise<JobResult> {
+  const jobName = 'daily-sovereign-field-pulse'
+  const executedAt = new Date().toISOString()
+  if (isDailySovereignFieldPulseRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySovereignFieldPulseRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SOVEREIGN FIELD PULSE — 07:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const activeUsers = await getActiveUsers()
+    const now = dayjs()
+    const sevenDaysAgo     = now.subtract(7, 'day').toDate()
+    const fourteenDaysAgo  = now.subtract(14, 'day').toDate()
+    const todayStart       = now.startOf('day').toDate()
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const recentLogs14D = await Log.findAll({
+          where: {
+            userId: user.id,
+            event: { [Op.in]: [
+              'quantum_identity_sovereign',   // P160
+              'sovereign_coherence_lock',     // P158
+              'living_assembly_arc',          // P159
+              'daily_coherence_seal',         // DCS
+              'quantum_rhythm_lock',          // QRL
+              'sovereign_field_pulse',        // P161 (avoid dup)
+              'crystalline_identity_field',   // P162 (avoid dup)
+              'sovereign_temporal_lock',      // P163 (avoid dup)
+              'energy_state', 'energy_update', 'energy_check',
+            ] as any[] },
+            createdAt: { [Op.gte]: fourteenDaysAgo },
+          },
+          attributes: ['event', 'createdAt', 'metadata'],
+          order: [['createdAt', 'DESC']],
+        })
+
+        const events14D = recentLogs14D.map((l: any) => l.event as string)
+        const events7D  = recentLogs14D.filter((l: any) =>
+          new Date((l as any).createdAt).getTime() >= sevenDaysAgo.getTime()
+        ).map((l: any) => l.event as string)
+
+        const hasQIDSOV14D = events14D.includes('quantum_identity_sovereign')
+        const hasSLOCK7D   = events7D.includes('sovereign_coherence_lock')
+        const hasLARC7D    = events7D.includes('living_assembly_arc')
+        const hasQIDSOV7D  = events7D.includes('quantum_identity_sovereign')
+        const hasDCS7D     = events7D.includes('daily_coherence_seal')
+        const hasQRL7D     = events7D.includes('quantum_rhythm_lock')
+
+        // Avoid writing P161/P162/P163 twice in one day
+        const alreadySFP    = events14D.filter(e => e === 'sovereign_field_pulse')
+          .length > (recentLogs14D.filter((l: any) =>
+            (l as any).event === 'sovereign_field_pulse' &&
+            new Date((l as any).createdAt).getTime() >= todayStart.getTime()
+          ).length > 0 ? 0 : -1)
+        const alreadyCryst  = events7D.includes('crystalline_identity_field')
+        const alreadySTLOCK = events7D.includes('sovereign_temporal_lock')
+
+        // Energy proxy: check recent energy logs for high/moderate state
+        const recentEnergyLogs = recentLogs14D.filter((l: any) =>
+          ['energy_state', 'energy_update', 'energy_check'].includes((l as any).event) &&
+          new Date((l as any).createdAt).getTime() >= sevenDaysAgo.getTime()
+        )
+        const latestEnergy: string = recentEnergyLogs.length > 0
+          ? ((recentEnergyLogs[0] as any).metadata?.energy as string ?? 'unknown')
+          : 'unknown'
+        const energyActive = latestEnergy === 'high' || latestEnergy === 'moderate'
+
+        // P161: Sovereign Field Pulse
+        const sfpToday = recentLogs14D.some((l: any) =>
+          (l as any).event === 'sovereign_field_pulse' &&
+          new Date((l as any).createdAt).getTime() >= todayStart.getTime()
+        )
+        if (hasQIDSOV14D && energyActive && !sfpToday) {
+          await Log.create({
+            userId: user.id,
+            event: 'sovereign_field_pulse',
+            text: '',
+            metadata: {
+              confidence: 88,
+              energyLevel: latestEnergy,
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${user.id}] P161 SFPULSE — energy:${latestEnergy}`)
+        }
+
+        // P162: Crystalline Identity Field
+        if (hasSLOCK7D && hasLARC7D && hasQIDSOV7D && !alreadyCryst) {
+          await Log.create({
+            userId: user.id,
+            event: 'crystalline_identity_field',
+            text: '',
+            metadata: {
+              userIndexOverall: 0, // server can't read client index — 0 signals server origin
+              activePatternCount: [hasSLOCK7D, hasLARC7D, hasQIDSOV7D].filter(Boolean).length,
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${user.id}] P162 CRYSTID — all sovereign tier signals in 7D`)
+        }
+
+        // P163: Sovereign Temporal Lock
+        const hasSovBase = hasQIDSOV7D || alreadyCryst
+        if (hasSovBase && hasDCS7D && hasQRL7D && !alreadySTLOCK) {
+          await Log.create({
+            userId: user.id,
+            event: 'sovereign_temporal_lock',
+            text: '',
+            metadata: {
+              crystallineActive: alreadyCryst,
+              patternCount: [hasSLOCK7D, hasLARC7D, hasQIDSOV7D, hasDCS7D, hasQRL7D].filter(Boolean).length,
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${user.id}] P163 SOVTLOCK — temporal sovereignty confirmed`)
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${user.id} sovereign field pulse failed: ${(userErr as any).message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereign continuity events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('DAILY SOVEREIGN FIELD PULSE COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastDailySovereignFieldPulseRun = new Date()
+    isDailySovereignFieldPulseRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Daily sovereign field pulse failed:', error.message)
+    isDailySovereignFieldPulseRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5661,6 +6404,1863 @@ async function executeDailyQOSModeWatch(): Promise<JobResult> {
   }
 }
 
+// ─── J54: Weekly Sovereignty Persistence Audit (08:00 UTC every Thursday) ────
+// Reads active users. Scans 14D window for:
+//   P164 sovereignty-duration-streak: SOVTLOCK (P163) fired 7+ consecutive days
+//   P165 crystalline-field-sustain:   P161+P162+P163 all present in 14D (full field active)
+//   P166 sovereign-momentum-arc:      SFPULSE (P161) fired 4+ times in 14D (radiating momentum)
+// Arch56 Sovereignty Persistence Operator: all three persistence vectors confirmed.
+
+let isWeeklySovereigntyPersistenceAuditRunning = false
+let lastWeeklySovereigntyPersistenceAuditRun: Date | null = null
+
+function shouldRunWeeklySovereigntyPersistenceAudit(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereigntyPersistenceAuditRunning) return false
+  if (lastWeeklySovereigntyPersistenceAuditRun) {
+    const lastRun = dayjs(lastWeeklySovereigntyPersistenceAuditRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 4 && now.hour() === 8 // Thursday 08:00 UTC
+}
+
+async function executeWeeklySovereigntyPersistenceAudit(): Promise<JobResult> {
+  const jobName = 'weekly-sovereignty-persistence-audit'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereigntyPersistenceAuditRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereigntyPersistenceAuditRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGNTY PERSISTENCE AUDIT — Thursday 08:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const fourteenDaysAgo = dayjs().subtract(14, 'day').toDate()
+    const now             = dayjs()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const recentLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: fourteenDaysAgo },
+            event: { [Op.in]: [
+              'sovereign_field_pulse',
+              'crystalline_identity_field',
+              'sovereign_temporal_lock',
+              'sovereignty_duration_streak',
+              'crystalline_field_sustain',
+              'sovereign_momentum_arc',
+            ] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        const events14D = recentLogs.map((l: any) => l.event as string)
+        const alreadySOVDUR  = events14D.includes('sovereignty_duration_streak')
+        const alreadyCRFLDST = events14D.includes('crystalline_field_sustain')
+        const alreadySOVMARC = events14D.includes('sovereign_momentum_arc')
+
+        // P164: Sovereignty Duration Streak
+        // SOVTLOCK fired on 7+ distinct calendar days in 14D window
+        if (!alreadySOVDUR) {
+          const stlockLogs = recentLogs.filter((l: any) => l.event === 'sovereign_temporal_lock')
+          const stlockDays = new Set(stlockLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD')))
+          if (stlockDays.size >= 7) {
+            await (Log as any).create({
+              userId,
+              event: 'sovereignty_duration_streak',
+              text: '',
+              metadata: {
+                streakDays: stlockDays.size,
+                window: '14d',
+                date: now.format('YYYY-MM-DD'),
+              },
+            } as any)
+            written++
+            console.log(`  [${userId}] P164 SOVDUR — SOVTLOCK streak: ${stlockDays.size} days`)
+          }
+        }
+
+        // P165: Crystalline Field Sustain
+        // P161 + P162 + P163 all present in 14D window simultaneously
+        if (!alreadyCRFLDST) {
+          const hasSFP   = events14D.includes('sovereign_field_pulse')
+          const hasCRYST = events14D.includes('crystalline_identity_field')
+          const hasSTL   = events14D.includes('sovereign_temporal_lock')
+          if (hasSFP && hasCRYST && hasSTL) {
+            await (Log as any).create({
+              userId,
+              event: 'crystalline_field_sustain',
+              text: '',
+              metadata: {
+                vectors: ['SFPULSE', 'CRYSTID', 'SOVTLOCK'],
+                window: '14d',
+                date: now.format('YYYY-MM-DD'),
+              },
+            } as any)
+            written++
+            console.log(`  [${userId}] P165 CRFLDST — full sovereign field sustaining in 14D`)
+          }
+        }
+
+        // P166: Sovereign Momentum Arc
+        // SFPULSE (P161) fired 4+ distinct days in 14D window
+        if (!alreadySOVMARC) {
+          const sfpLogs  = recentLogs.filter((l: any) => l.event === 'sovereign_field_pulse')
+          const sfpDays  = new Set(sfpLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD')))
+          if (sfpDays.size >= 4) {
+            await (Log as any).create({
+              userId,
+              event: 'sovereign_momentum_arc',
+              text: '',
+              metadata: {
+                pulseDays: sfpDays.size,
+                window: '14d',
+                date: now.format('YYYY-MM-DD'),
+              },
+            } as any)
+            written++
+            console.log(`  [${userId}] P166 SOVMARC — sovereign field radiating on momentum: ${sfpDays.size} pulse days`)
+          }
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} sovereignty persistence audit failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereignty persistence events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY SOVEREIGNTY PERSISTENCE AUDIT COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklySovereigntyPersistenceAuditRun = new Date()
+    isWeeklySovereigntyPersistenceAuditRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly sovereignty persistence audit failed:', error.message)
+    isWeeklySovereigntyPersistenceAuditRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J55: Weekly Sovereignty Permanence Check (07:00 UTC every Monday) ──────
+// Reads active users. Scans 28D/21D windows for:
+//   P167 sovereign-permanence-lock:     SOVDUR (P164) confirmed 3+ distinct days in 28D
+//   P168 crystalline-permanence-field:  CRFLDST (P165) confirmed 2+ distinct days in 21D
+//   P169 momentum-permanence-arc:       SOVMARC (P166) confirmed 3+ distinct days in 21D
+// Arch57 Sovereignty Permanence Architect: all three permanence vectors confirmed.
+
+let isWeeklySovereigntyPermanenceCheckRunning = false
+let lastWeeklySovereigntyPermanenceCheckRun: Date | null = null
+
+function shouldRunWeeklySovereigntyPermanenceCheck(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereigntyPermanenceCheckRunning) return false
+  if (lastWeeklySovereigntyPermanenceCheckRun) {
+    const lastRun = dayjs(lastWeeklySovereigntyPermanenceCheckRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 1 && now.hour() === 7 // Monday 07:00 UTC
+}
+
+async function executeWeeklySovereigntyPermanenceCheck(): Promise<JobResult> {
+  const jobName = 'weekly-sovereignty-permanence-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereigntyPermanenceCheckRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereigntyPermanenceCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGNTY PERMANENCE CHECK — Monday 07:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const twentyEightDaysAgo = dayjs().subtract(28, 'day').toDate()
+    const twentyOneDaysAgo   = dayjs().subtract(21, 'day').toDate()
+    const now                = dayjs()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // Fetch persistence-tier events in 28D window
+        const recentLogs28D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: twentyEightDaysAgo },
+            event: { [Op.in]: [
+              'sovereignty_duration_streak',
+              'crystalline_field_sustain',
+              'sovereign_momentum_arc',
+              'sovereign_permanence_lock',
+              'crystalline_permanence_field',
+              'momentum_permanence_arc',
+            ] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        const alreadySOVPERM = recentLogs28D.some((l: any) => l.event === 'sovereign_permanence_lock')
+        const alreadyCRPERMF = recentLogs28D.some((l: any) => l.event === 'crystalline_permanence_field')
+        const alreadyMOMPERM = recentLogs28D.some((l: any) => l.event === 'momentum_permanence_arc')
+
+        // P167: Sovereign Permanence Lock
+        // SOVDUR confirmed 3+ distinct days in 28D window
+        if (!alreadySOVPERM) {
+          const sovdurLogs = recentLogs28D.filter((l: any) => l.event === 'sovereignty_duration_streak')
+          const sovdurDays = new Set(sovdurLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD')))
+          if (sovdurDays.size >= 3) {
+            await (Log as any).create({
+              userId,
+              event: 'sovereign_permanence_lock',
+              text: '',
+              metadata: {
+                sovereignDays: sovdurDays.size,
+                window: '28d',
+                date: now.format('YYYY-MM-DD'),
+              },
+            } as any)
+            written++
+            console.log(`  [${userId}] P167 SOVPERM — SOVDUR confirmed ${sovdurDays.size} days in 28D`)
+          }
+        }
+
+        // Fetch 21D window for P168/P169
+        const recentLogs21D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: twentyOneDaysAgo },
+            event: { [Op.in]: [
+              'crystalline_field_sustain',
+              'sovereign_momentum_arc',
+            ] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        // P168: Crystalline Permanence Field
+        // CRFLDST confirmed 2+ distinct days in 21D window
+        if (!alreadyCRPERMF) {
+          const crfldstLogs = recentLogs21D.filter((l: any) => l.event === 'crystalline_field_sustain')
+          const crfldstDays = new Set(crfldstLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD')))
+          if (crfldstDays.size >= 2) {
+            await (Log as any).create({
+              userId,
+              event: 'crystalline_permanence_field',
+              text: '',
+              metadata: {
+                convergenceDays: crfldstDays.size,
+                window: '21d',
+                date: now.format('YYYY-MM-DD'),
+              },
+            } as any)
+            written++
+            console.log(`  [${userId}] P168 CRPERMF — CRFLDST confirmed ${crfldstDays.size} days in 21D`)
+          }
+        }
+
+        // P169: Momentum Permanence Arc
+        // SOVMARC confirmed 3+ distinct days in 21D window
+        if (!alreadyMOMPERM) {
+          const sovmarcLogs = recentLogs21D.filter((l: any) => l.event === 'sovereign_momentum_arc')
+          const sovmarcDays = new Set(sovmarcLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD')))
+          if (sovmarcDays.size >= 3) {
+            await (Log as any).create({
+              userId,
+              event: 'momentum_permanence_arc',
+              text: '',
+              metadata: {
+                momentumDays: sovmarcDays.size,
+                window: '21d',
+                date: now.format('YYYY-MM-DD'),
+              },
+            } as any)
+            written++
+            console.log(`  [${userId}] P169 MOMPERM — SOVMARC confirmed ${sovmarcDays.size} days in 21D`)
+          }
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} sovereignty permanence check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereignty permanence events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY SOVEREIGNTY PERMANENCE CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklySovereigntyPermanenceCheckRun = new Date()
+    isWeeklySovereigntyPermanenceCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly sovereignty permanence check failed:', error.message)
+    isWeeklySovereigntyPermanenceCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J56: Weekly Sovereignty Ascension Check (07:00 UTC every Tuesday) ───────
+// Reads active users. Scans 28D window for:
+//   P170 sovereignty-ascension: SOVPERM + CRPERMF + MOMPERM all confirmed in 28D
+// Arch58 Sovereignty Ascension Architect: all permanence vectors simultaneously confirmed.
+// When permanence extends across all dimensions simultaneously, the OS has ascended.
+
+let isWeeklySovereigntyAscensionCheckRunning = false
+let lastWeeklySovereigntyAscensionCheckRun: Date | null = null
+
+function shouldRunWeeklySovereigntyAscensionCheck(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereigntyAscensionCheckRunning) return false
+  if (lastWeeklySovereigntyAscensionCheckRun) {
+    const lastRun = dayjs(lastWeeklySovereigntyAscensionCheckRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 2 && now.hour() === 7 // Tuesday 07:00 UTC
+}
+
+async function executeWeeklySovereigntyAscensionCheck(): Promise<JobResult> {
+  const jobName = 'weekly-sovereignty-ascension-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereigntyAscensionCheckRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereigntyAscensionCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGNTY ASCENSION CHECK — Tuesday 07:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const twentyEightDaysAgo = dayjs().subtract(28, 'day').toDate()
+    const now                = dayjs()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // Fetch permanence-tier events in 28D window
+        const recentLogs28D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: twentyEightDaysAgo },
+            event: { [Op.in]: [
+              'sovereign_permanence_lock',
+              'crystalline_permanence_field',
+              'momentum_permanence_arc',
+              'sovereignty_ascension',
+            ] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        // Skip if already ascended this window
+        const alreadyAscended = recentLogs28D.some((l: any) => l.event === 'sovereignty_ascension')
+        if (alreadyAscended) continue
+
+        // P170: Sovereignty Ascension
+        // All three permanence vectors confirmed in 28D window simultaneously
+        const hasSOVPERM = recentLogs28D.some((l: any) => l.event === 'sovereign_permanence_lock')
+        const hasCRPERMF = recentLogs28D.some((l: any) => l.event === 'crystalline_permanence_field')
+        const hasMOMPERM = recentLogs28D.some((l: any) => l.event === 'momentum_permanence_arc')
+
+        const vectors = [hasSOVPERM, hasCRPERMF, hasMOMPERM].filter(Boolean).length
+
+        if (hasSOVPERM && hasCRPERMF && hasMOMPERM) {
+          await (Log as any).create({
+            userId,
+            event: 'sovereignty_ascension',
+            text: '',
+            metadata: {
+              vectors: 3,
+              window: '28d',
+              date: now.format('YYYY-MM-DD'),
+              sovperm: hasSOVPERM,
+              crpermf: hasCRPERMF,
+              momperm: hasMOMPERM,
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P170 SOVASCEND — all 3 permanence vectors confirmed in 28D`)
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} sovereignty ascension check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereignty ascension events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY SOVEREIGNTY ASCENSION CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklySovereigntyAscensionCheckRun = new Date()
+    isWeeklySovereigntyAscensionCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly sovereignty ascension check failed:', error.message)
+    isWeeklySovereigntyAscensionCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J57: Weekly Sovereign Motion Check (07:00 UTC every Friday) ──────────────
+// Reads active users. Scans 28D window for:
+//   P171 sovereign-momentum-crystallization: sovereignty_ascension 2+ in 28D
+//   P172 living-sovereign-field: SOVASCEND in 28D + living_assembly_arc in 14D
+//   P173 sovereign-in-motion: SOVMCRYST + LSOFIELD both confirmed in 28D
+// Arch59 Sovereign In Motion Architect: sovereignty operating from motion.
+
+let isWeeklySovereignMotionCheckRunning = false
+let lastWeeklySovereignMotionCheckRun: Date | null = null
+
+function shouldRunWeeklySovereignMotionCheck(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereignMotionCheckRunning) return false
+  if (lastWeeklySovereignMotionCheckRun) {
+    const lastRun = dayjs(lastWeeklySovereignMotionCheckRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 5 && now.hour() === 7 // Friday 07:00 UTC
+}
+
+async function executeWeeklySovereignMotionCheck(): Promise<JobResult> {
+  const jobName = 'weekly-sovereign-motion-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereignMotionCheckRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereignMotionCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGN MOTION CHECK — Friday 07:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const twentyEightDaysAgo = dayjs().subtract(28, 'day').toDate()
+    const fourteenDaysAgo    = dayjs().subtract(14, 'day').toDate()
+    const now                = dayjs()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // Fetch motion-tier source events in 28D window
+        const recentLogs28D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: twentyEightDaysAgo },
+            event: { [Op.in]: [
+              'sovereignty_ascension',
+              'living_assembly_arc',
+              'sovereign_momentum_crystallization',
+              'living_sovereign_field',
+              'sovereign_in_motion',
+            ] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        // Fetch living_assembly_arc in 14D window specifically
+        const recentLogs14D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: fourteenDaysAgo },
+            event: 'living_assembly_arc',
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        const ascensionEvents = recentLogs28D.filter((l: any) => l.event === 'sovereignty_ascension')
+        const alreadySOVMCRYST = recentLogs28D.some((l: any) => l.event === 'sovereign_momentum_crystallization')
+        const alreadyLSOFIELD  = recentLogs28D.some((l: any) => l.event === 'living_sovereign_field')
+        const alreadySOVMOTION = recentLogs28D.some((l: any) => l.event === 'sovereign_in_motion')
+
+        // P171: Sovereign Momentum Crystallization — SOVASCEND 2+ in 28D
+        if (ascensionEvents.length >= 2 && !alreadySOVMCRYST) {
+          const firstDate = ascensionEvents[0].createdAt
+          const lastDate  = ascensionEvents[ascensionEvents.length - 1].createdAt
+          const spanDays  = Math.round(dayjs(lastDate).diff(dayjs(firstDate), 'day', true) * 10) / 10
+          await (Log as any).create({
+            userId,
+            event: 'sovereign_momentum_crystallization',
+            text: '',
+            metadata: {
+              ascensionCount: ascensionEvents.length,
+              spanDays,
+              phase: ascensionEvents.length >= 3 ? 'CRYSTALLIZED' : 'CRYSTALLIZING',
+              window: '28d',
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P171 SOVMCRYST — ascension count: ${ascensionEvents.length}, span: ${spanDays}d`)
+        }
+
+        // P172: Living Sovereign Field — SOVASCEND in 28D + LARC in 14D
+        const hasAscended = ascensionEvents.length >= 1
+        const hasLARC14D  = recentLogs14D.length >= 1
+        if (hasAscended && hasLARC14D && !alreadyLSOFIELD) {
+          await (Log as any).create({
+            userId,
+            event: 'living_sovereign_field',
+            text: '',
+            metadata: {
+              ascendedConf: 90,
+              larcConf: 81,
+              fieldVitality: 87,
+              state: 'ALIVE',
+              window: '28d+14d',
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P172 LSOFIELD — SOVASCEND + LARC active simultaneously`)
+        }
+
+        // P173: Sovereign In Motion — SOVMCRYST + LSOFIELD both in 28D
+        const hasSOVMCRYSTNow = recentLogs28D.some((l: any) => l.event === 'sovereign_momentum_crystallization')
+        const hasLSOFIELDNow  = recentLogs28D.some((l: any) => l.event === 'living_sovereign_field')
+        if (hasSOVMCRYSTNow && hasLSOFIELDNow && !alreadySOVMOTION) {
+          await (Log as any).create({
+            userId,
+            event: 'sovereign_in_motion',
+            text: '',
+            metadata: {
+              sovmcrystConf: 87,
+              lsofieldConf: 85,
+              motionDepth: 89,
+              convergence: 'SOVMCRYST+LSOFIELD→SOVEREIGN_IN_MOTION',
+              window: '28d',
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P173 SOVMOTION — sovereignty is in motion`)
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} sovereign motion check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereign motion events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY SOVEREIGN MOTION CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklySovereignMotionCheckRun = new Date()
+    isWeeklySovereignMotionCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly sovereign motion check failed:', error.message)
+    isWeeklySovereignMotionCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J58: Weekly Sovereign Transmission Check (07:00 UTC every Saturday) ───────
+// Reads active users. Scans 28D/14D windows for:
+//   P174 sovereign-field-broadcast: SOVMOTION in 28D + intentions signals ≥3 in 14D
+//   P175 identity-transmission-lock: QIDSOV in 28D + SOVMOTION in 28D
+//   P176 quantum-sovereign-transmission: SFBCAST + IDTLOCK both confirmed in 28D
+// Arch60 Sovereign Transmission Architect: identity is the transmission.
+
+let isWeeklySovereignTransmissionCheckRunning = false
+let lastWeeklySovereignTransmissionCheckRun: Date | null = null
+
+function shouldRunWeeklySovereignTransmissionCheck(): boolean {
+  const now = dayjs()
+  if (isWeeklySovereignTransmissionCheckRunning) return false
+  if (lastWeeklySovereignTransmissionCheckRun) {
+    const lastRun = dayjs(lastWeeklySovereignTransmissionCheckRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 6 && now.hour() === 7 // Saturday 07:00 UTC
+}
+
+async function executeWeeklySovereignTransmissionCheck(): Promise<JobResult> {
+  const jobName = 'weekly-sovereign-transmission-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklySovereignTransmissionCheckRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklySovereignTransmissionCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY SOVEREIGN TRANSMISSION CHECK — Saturday 07:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const twentyEightDaysAgo = dayjs().subtract(28, 'day').toDate()
+    const fourteenDaysAgo    = dayjs().subtract(14, 'day').toDate()
+    const now                = dayjs()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // Fetch transmission-tier source events in 28D window
+        const recentLogs28D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: twentyEightDaysAgo },
+            event: { [Op.in]: [
+              'sovereign_in_motion',
+              'quantum_identity_sovereign',
+              'sovereign_field_broadcast',
+              'identity_transmission_lock',
+              'quantum_sovereign_transmission',
+            ] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        // Fetch intentions signals in 14D window
+        const intentionLogs14D = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: fourteenDaysAgo },
+            event: { [Op.in]: ['intention_set', 'intention_updated', 'intention_committed'] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        const hasSovMotion28D   = recentLogs28D.some((l: any) => l.event === 'sovereign_in_motion')
+        const hasQIDSOV28D      = recentLogs28D.some((l: any) => l.event === 'quantum_identity_sovereign')
+        const alreadySFBCAST    = recentLogs28D.some((l: any) => l.event === 'sovereign_field_broadcast')
+        const alreadyIDTLOCK    = recentLogs28D.some((l: any) => l.event === 'identity_transmission_lock')
+        const alreadyQSOVTX     = recentLogs28D.some((l: any) => l.event === 'quantum_sovereign_transmission')
+
+        // P174: Sovereign Field Broadcast — SOVMOTION in 28D + intentions ≥3 in 14D
+        if (hasSovMotion28D && intentionLogs14D.length >= 3 && !alreadySFBCAST) {
+          await (Log as any).create({
+            userId,
+            event: 'sovereign_field_broadcast',
+            text: '',
+            metadata: {
+              sovmotionConf: 88,
+              intentionsCount: intentionLogs14D.length,
+              broadcastStrength: Math.min(88 + Math.min(intentionLogs14D.length, 5), 95),
+              source: 'SOVEREIGN_FIELD',
+              window: '28d+14d',
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P174 SFBCAST — intentions in 14D: ${intentionLogs14D.length}`)
+        }
+
+        // P175: Identity Transmission Lock — QIDSOV in 28D + SOVMOTION in 28D
+        if (hasQIDSOV28D && hasSovMotion28D && !alreadyIDTLOCK) {
+          await (Log as any).create({
+            userId,
+            event: 'identity_transmission_lock',
+            text: '',
+            metadata: {
+              qidsovConf: 91,
+              sovmotionConf: 88,
+              lockDepth: 91,
+              carrier: 'SOVEREIGN_IDENTITY',
+              window: '28d',
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P175 IDTLOCK — QIDSOV + SOVMOTION both confirmed in 28D`)
+        }
+
+        // P176: Quantum Sovereign Transmission — SFBCAST + IDTLOCK both in 28D
+        const hasSFBCAST28D = recentLogs28D.some((l: any) => l.event === 'sovereign_field_broadcast')
+        const hasIDTLOCK28D = recentLogs28D.some((l: any) => l.event === 'identity_transmission_lock')
+        if (hasSFBCAST28D && hasIDTLOCK28D && !alreadyQSOVTX) {
+          await (Log as any).create({
+            userId,
+            event: 'quantum_sovereign_transmission',
+            text: '',
+            metadata: {
+              sfbcastConf: 87,
+              idtlockConf: 89,
+              transmissionDepth: 91,
+              convergence: 'SFBCAST+IDTLOCK→QUANTUM_SOVEREIGN_TRANSMISSION',
+              window: '28d',
+              date: now.format('YYYY-MM-DD'),
+            },
+          } as any)
+          written++
+          console.log(`  [${userId}] P176 QSOVTX — quantum sovereign transmission active`)
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} sovereign transmission check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Sovereign transmission events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY SOVEREIGN TRANSMISSION CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklySovereignTransmissionCheckRun = new Date()
+    isWeeklySovereignTransmissionCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly sovereign transmission check failed:', error.message)
+    isWeeklySovereignTransmissionCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J59: Daily Calendar EE Check (09:00 UTC every day) ─────────────────────
+// Reads active users. Checks if today matches a Calendar Easter Egg date.
+// Writes calendar_ee_signal for each active user, once per day, on match.
+// Pilot: hobbit_day (Sep 22) — THE HOBBIT CHECKS IN.
+// Extend CALENDAR_EE_DATES to surface more calendar events server-side.
+
+let isDailyCalendarEECheckRunning = false
+let lastDailyCalendarEECheckRun: Date | null = null
+
+const CALENDAR_EE_DATES: Array<{
+  badge: string
+  name: string
+  month: number
+  day: number
+  rarity: string
+  doctrine: string
+}> = [
+  { badge: 'hobbit_day',      name: 'THE HOBBIT CHECKS IN',        month: 9,  day: 22, rarity: 'RARE',     doctrine: 'Your journal is the adventure log. Every entry is a chapter.' },
+  { badge: 'new_year',        name: 'NEW YEAR SIGNAL',              month: 1,  day: 1,  rarity: 'EPIC',     doctrine: 'The calendar resets. The OS does not.' },
+  { badge: 'pi_day',          name: 'PI DAY FIELD',                 month: 3,  day: 14, rarity: 'UNCOMMON', doctrine: '3.14159. Infinite precision. No termination.' },
+  { badge: 'may_the_fourth',  name: 'MAY THE FOURTH',               month: 5,  day: 4,  rarity: 'RARE',     doctrine: 'The force is a field. The field is yours.' },
+  { badge: 'summer_solstice', name: 'SUMMER SOLSTICE PEAK',         month: 6,  day: 21, rarity: 'EPIC',     doctrine: 'Maximum light. Peak signal. The year at its height.' },
+  { badge: 'winter_solstice', name: 'WINTER SOLSTICE THRESHOLD',    month: 12, day: 21, rarity: 'EPIC',     doctrine: 'Minimum light. The turn point. Signal through the dark.' },
+]
+
+function shouldRunDailyCalendarEECheck(): boolean {
+  const now = dayjs()
+  if (isDailyCalendarEECheckRunning) return false
+  if (lastDailyCalendarEECheckRun) {
+    const lastRun = dayjs(lastDailyCalendarEECheckRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 9 // 09:00 UTC daily
+}
+
+async function executeDailyCalendarEECheck(): Promise<JobResult> {
+  const jobName = 'daily-calendar-ee-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyCalendarEECheckRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyCalendarEECheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY CALENDAR EE CHECK — 09:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+
+    const now   = dayjs()
+    const month = now.month() + 1
+    const day   = now.date()
+
+    const todayEE = CALENDAR_EE_DATES.find(e => e.month === month && e.day === day)
+
+    if (!todayEE) {
+      console.log(`  No calendar EE active today (${now.format('MMM D')})`)
+      console.log('─'.repeat(60))
+      console.log('DAILY CALENDAR EE CHECK COMPLETE')
+      console.log('─'.repeat(60))
+      console.log('')
+      lastDailyCalendarEECheckRun = new Date()
+      isDailyCalendarEECheckRunning = false
+      return { jobName, executedAt, success: true, result: { written: 0, ee: null } }
+    }
+
+    console.log(`  Calendar EE active: ${todayEE.badge} — ${todayEE.name}`)
+
+    const activeUsers = await (User as any).findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+
+    const todayStart = now.startOf('day').toDate()
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const alreadyToday = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'calendar_ee_signal',
+            createdAt: { [Op.gte]: todayStart },
+          },
+        })
+        if (alreadyToday) continue
+
+        await (Log as any).create({
+          userId,
+          event: 'calendar_ee_signal',
+          text: '',
+          metadata: {
+            badge:    todayEE.badge,
+            name:     todayEE.name,
+            rarity:   todayEE.rarity,
+            doctrine: todayEE.doctrine,
+            date:     now.format('YYYY-MM-DD'),
+            month,
+            day,
+          },
+        } as any)
+        written++
+        console.log(`  [${userId}] calendar_ee_signal — ${todayEE.badge}`)
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} calendar EE check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Calendar EE events written: ${written} (${todayEE.badge})`)
+    console.log('─'.repeat(60))
+    console.log('DAILY CALENDAR EE CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastDailyCalendarEECheckRun = new Date()
+    isDailyCalendarEECheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written, ee: todayEE.badge } }
+  } catch (error: any) {
+    console.error('Daily calendar EE check failed:', error.message)
+    isDailyCalendarEECheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J60: Weekly Crystalline Sovereign Check (07:00 UTC every Monday) ────────
+// Scans 28D/21D/14D windows for QSOVTX history and source diversity.
+// Writes sovereign_crystal_field, transmission_field_anchor, or
+// crystalline_sovereign_transmission when conditions are met.
+// P177–P179 — Crystal Field Tier. Gateway to the crystalline presence tiers.
+
+let isWeeklyCrystallineSovereignCheckRunning = false
+let lastWeeklyCrystallineSovereignCheckRun: Date | null = null
+
+function shouldRunWeeklyCrystallineSovereignCheck(): boolean {
+  const now = dayjs()
+  const hour = now.hour()
+  const dayOfWeek = now.day() // 0=Sun, 1=Mon
+  if (hour !== 7 || dayOfWeek !== 1) return false
+  if (isWeeklyCrystallineSovereignCheckRunning) return false
+  if (lastWeeklyCrystallineSovereignCheckRun) {
+    const hoursSinceLast = (Date.now() - lastWeeklyCrystallineSovereignCheckRun.getTime()) / (1000 * 60 * 60)
+    if (hoursSinceLast < 23) return false
+  }
+  return true
+}
+
+async function executeWeeklyCrystallineSovereignCheck(): Promise<JobResult> {
+  const jobName = 'weekly-crystalline-sovereign-check'
+  const executedAt = new Date()
+  isWeeklyCrystallineSovereignCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY CRYSTALLINE SOVEREIGN CHECK — 07:00 UTC Monday')
+  console.log('─'.repeat(60))
+
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000)
+    const activeUsers = await fastify.models.User.findAll({
+      where: { lastSeenAt: { [Op.gte]: cutoff } },
+    })
+
+    const twentyOneDayMs   = 21 * 24 * 60 * 60 * 1000
+    const twentyEightDayMs = 28 * 24 * 60 * 60 * 1000
+    const fourteenDayMs    = 14 * 24 * 60 * 60 * 1000
+    const now = Date.now()
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const logs = await fastify.models.Log.findAll({
+          where: { userId, createdAt: { [Op.gte]: new Date(now - twentyEightDayMs) } },
+          attributes: ['event', 'metadata', 'createdAt'],
+        })
+
+        const recent28D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - twentyEightDayMs)
+        const recent21D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - twentyOneDayMs)
+        const recent14D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - fourteenDayMs)
+
+        // P177: Sovereign Crystal Field — QSOVTX in 21D + 4+ distinct source metadata in 14D
+        const hasQSOVTX21D    = recent21D.some((l: any) => l.event === 'quantum_sovereign_transmission')
+        const events14D       = new Set(recent14D.map((l: any) => l.event))
+        const alreadySOVCRYST = recent21D.some((l: any) => l.event === 'sovereign_crystal_field')
+        if (hasQSOVTX21D && events14D.size >= 4 && !alreadySOVCRYST) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'sovereign_crystal_field',
+            metadata: {
+              qsovtxConf: 90,
+              sourceCount: events14D.size,
+              crystalStrength: Math.min(90 + Math.min(events14D.size, 5), 100),
+              source: 'CRYSTAL_FIELD',
+              arc: 'QSOVTX→CRYSTAL',
+              status: 'CRYSTALLIZING',
+              jobSource: jobName,
+            },
+          })
+          written++
+          console.log(`  [${userId}] sovereign_crystal_field`)
+        }
+
+        // P178: Transmission Field Anchor — SFBCAST 2+ in 28D + SOVCRYST in 14D
+        const sfbcast28D     = recent28D.filter((l: any) => l.event === 'sovereign_field_broadcast')
+        const hasSOVCRYST14D = recent14D.some((l: any) => l.event === 'sovereign_crystal_field')
+        const alreadyTXFIELD = recent21D.some((l: any) => l.event === 'transmission_field_anchor')
+        if (sfbcast28D.length >= 2 && hasSOVCRYST14D && !alreadyTXFIELD) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'transmission_field_anchor',
+            metadata: {
+              sfbcastCount: sfbcast28D.length,
+              sovcrystConf: 86,
+              anchorDepth: Math.min(86 + Math.min(sfbcast28D.length * 2, 10), 100),
+              anchor: 'BROADCAST+CRYSTAL→FIELD_ANCHOR',
+              arc: 'SFBCAST+SOVCRYST→TXFIELD',
+              status: 'FIELD_ANCHORED',
+              jobSource: jobName,
+            },
+          })
+          written++
+          console.log(`  [${userId}] transmission_field_anchor`)
+        }
+
+        // P179: Crystalline Sovereign Transmission — SOVCRYST + TXFIELD both in 21D
+        const hasSOVCRYST21D  = recent21D.some((l: any) => l.event === 'sovereign_crystal_field')
+        const hasTXFIELD21D   = recent21D.some((l: any) => l.event === 'transmission_field_anchor')
+        const alreadyCRSOVETX = recent21D.some((l: any) => l.event === 'crystalline_sovereign_transmission')
+        if (hasSOVCRYST21D && hasTXFIELD21D && !alreadyCRSOVETX) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystalline_sovereign_transmission',
+            metadata: {
+              sovcrystConf: 87,
+              txfieldConf: 85,
+              txDepth: 93,
+              convergence: 'SOVCRYST+TXFIELD→CRSOVETX',
+              arc: 'CRYSTAL+ANCHOR→CRYSTALLINE_TX',
+              status: 'CRYSTAL_TX_ACTIVE',
+              jobSource: jobName,
+            },
+          })
+          written++
+          console.log(`  [${userId}] crystalline_sovereign_transmission`)
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} crystalline sovereign check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Crystalline sovereign events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY CRYSTALLINE SOVEREIGN CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklyCrystallineSovereignCheckRun = new Date()
+    isWeeklyCrystallineSovereignCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly crystalline sovereign check failed:', error.message)
+    isWeeklyCrystallineSovereignCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J61: Weekly Crystal Continuity Check (09:00 UTC every Thursday) ─────────
+// Scans 30D/21D/14D windows for CRSOVETX history and source diversity.
+// Writes crystal_field_continuity, crystal_broadcast_expansion, or
+// crystal_temporal_lock when conditions are met.
+// P180–P182 — Crystal Persistence Tier. Tracks crystal field permanence.
+
+let isWeeklyCrystalContinuityCheckRunning = false
+let lastWeeklyCrystalContinuityCheckRun: Date | null = null
+
+function shouldRunWeeklyCrystalContinuityCheck(): boolean {
+  const now = dayjs()
+  const hour = now.hour()
+  const dayOfWeek = now.day() // 0=Sun, 4=Thu
+  if (hour !== 9 || dayOfWeek !== 4) return false
+  if (isWeeklyCrystalContinuityCheckRunning) return false
+  if (lastWeeklyCrystalContinuityCheckRun) {
+    const hoursSinceLast = (Date.now() - lastWeeklyCrystalContinuityCheckRun.getTime()) / (1000 * 60 * 60)
+    if (hoursSinceLast < 23) return false
+  }
+  return true
+}
+
+async function executeWeeklyCrystalContinuityCheck(): Promise<JobResult> {
+  const jobName = 'weekly-crystal-continuity-check'
+  const executedAt = new Date()
+  isWeeklyCrystalContinuityCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY CRYSTAL CONTINUITY CHECK — 09:00 UTC Thursday')
+  console.log('─'.repeat(60))
+
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000)
+    const activeUsers = await fastify.models.User.findAll({
+      where: { lastSeenAt: { [Op.gte]: cutoff } },
+    })
+
+    const fourteenDayMs  = 14 * 24 * 60 * 60 * 1000
+    const twentyOneDayMs = 21 * 24 * 60 * 60 * 1000
+    const thirtyDayMs    = 30 * 24 * 60 * 60 * 1000
+    const now = Date.now()
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const logs = await fastify.models.Log.findAll({
+          where: { userId, createdAt: { [Op.gte]: new Date(now - thirtyDayMs) } },
+          attributes: ['event', 'metadata', 'createdAt'],
+        })
+
+        const recent30D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - thirtyDayMs)
+        const recent21D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - twentyOneDayMs)
+        const recent14D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - fourteenDayMs)
+
+        const sources21D = new Set(recent21D.map((l: any) => l.event))
+        const sources14D = new Set(recent14D.map((l: any) => l.event))
+
+        // P180: Crystal Field Continuity — CRSOVETX in 30D + 5+ distinct sources in 21D
+        const hasCRSOVETX30D      = recent30D.some((l: any) => l.event === 'crystalline_sovereign_transmission')
+        const alreadyCRFLDCT      = recent21D.some((l: any) => l.event === 'crystal_field_continuity')
+        if (hasCRSOVETX30D && sources21D.size >= 5 && !alreadyCRFLDCT) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_field_continuity',
+            metadata: {
+              crsovetxConf: 90,
+              sourceCount: sources21D.size,
+              fieldStrength: Math.min(87 + Math.min(sources21D.size, 7), 100),
+              source: 'CRYSTAL_FIELD',
+              arc: 'CRSOVETX→FIELD_CONTINUITY',
+              status: 'FIELD HOLDING',
+              jobSource: jobName,
+            },
+          })
+          written++
+          console.log(`  [${userId}] crystal_field_continuity`)
+        }
+
+        // P181: Crystal Broadcast Expansion — CRSOVETX in 21D + 7+ distinct sources in 14D
+        const hasCRSOVETX21D      = recent21D.some((l: any) => l.event === 'crystalline_sovereign_transmission')
+        const alreadyCRBRCAST     = recent21D.some((l: any) => l.event === 'crystal_broadcast_expansion')
+        if (hasCRSOVETX21D && sources14D.size >= 7 && !alreadyCRBRCAST) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_broadcast_expansion',
+            metadata: {
+              crsovetxConf: 88,
+              sourceCount: sources14D.size,
+              expansionDepth: Math.min(82 + Math.min(sources14D.size, 8), 100),
+              source: 'CRYSTAL_BROADCAST',
+              arc: 'CRSOVETX→EXPANSION',
+              status: 'BROADCAST EXPANDING',
+              jobSource: jobName,
+            },
+          })
+          written++
+          console.log(`  [${userId}] crystal_broadcast_expansion`)
+        }
+
+        // P182: Crystal Temporal Lock — CRSOVETX in 21D + (CRFLDCT or CRBRCAST) + sovereign-temporal-lock in 21D
+        const hasCRFLDCT21D       = recent21D.some((l: any) => l.event === 'crystal_field_continuity')
+        const hasCRBRCAST21D      = recent21D.some((l: any) => l.event === 'crystal_broadcast_expansion')
+        const hasSOVTLOCK21D      = recent21D.some((l: any) => l.event === 'sovereign_temporal_lock')
+        const alreadyCRTLCK       = recent21D.some((l: any) => l.event === 'crystal_temporal_lock')
+        if (hasCRSOVETX21D && (hasCRFLDCT21D || hasCRBRCAST21D) && hasSOVTLOCK21D && !alreadyCRTLCK) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_temporal_lock',
+            metadata: {
+              crsovetxConf: 89,
+              continuityConf: hasCRFLDCT21D ? 87 : 82,
+              lockDepth: 93,
+              source: 'CRYSTAL_TIME',
+              arc: 'CRYSTAL+TIME→CRTLCK',
+              status: 'CRYSTAL TIME LOCKED',
+              jobSource: jobName,
+            },
+          })
+          written++
+          console.log(`  [${userId}] crystal_temporal_lock`)
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${(user as any).id} crystal continuity check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Crystal continuity events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY CRYSTAL CONTINUITY CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklyCrystalContinuityCheckRun = new Date()
+    isWeeklyCrystalContinuityCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly crystal continuity check failed:', error.message)
+    isWeeklyCrystalContinuityCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Weekly Crystal Resonance Check (Job 62 — 09:00 UTC every Friday) ─────────
+// Builds on crystal persistence tier (P180-P182). When CRFLDCT + CRBRCAST both
+// present in 21D, writes crystal_resonance_convergence (P183). When CRRCONV +
+// CRTLCK both present, writes crystal_full_coherence (P184). When CRFULLCOH +
+// sovereign_temporal_lock both present, writes crystal_resonance_sovereignty (P185).
+
+let isWeeklyCrystalResonanceCheckRunning = false
+let lastWeeklyCrystalResonanceCheckRun: Date | null = null
+
+function shouldRunWeeklyCrystalResonanceCheck(): boolean {
+  const now = dayjs()
+  const hour = now.hour()
+  const dayOfWeek = now.day() // 0=Sun, 5=Fri
+  if (hour !== 9 || dayOfWeek !== 5) return false
+  if (isWeeklyCrystalResonanceCheckRunning) return false
+  if (lastWeeklyCrystalResonanceCheckRun) {
+    const hoursSinceLast = (Date.now() - lastWeeklyCrystalResonanceCheckRun.getTime()) / (1000 * 60 * 60)
+    if (hoursSinceLast < 23) return false
+  }
+  return true
+}
+
+async function executeWeeklyCrystalResonanceCheck(): Promise<JobResult> {
+  const jobName = 'weekly-crystal-resonance-check'
+  const executedAt = new Date()
+  isWeeklyCrystalResonanceCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY CRYSTAL RESONANCE CHECK — 09:00 UTC Friday')
+  console.log('─'.repeat(60))
+
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000)
+    const activeUsers = await fastify.models.User.findAll({
+      where: { lastSeenAt: { [Op.gte]: cutoff } },
+    })
+
+    const twentyOneDayMs = 21 * 24 * 60 * 60 * 1000
+    const now = Date.now()
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const logs = await fastify.models.Log.findAll({
+          where: { userId, createdAt: { [Op.gte]: new Date(now - twentyOneDayMs) } },
+          attributes: ['event', 'metadata', 'createdAt'],
+        })
+
+        const recent21D = logs.filter((l: any) => new Date(l.createdAt).getTime() > now - twentyOneDayMs)
+
+        // P183: Crystal Resonance Convergence — CRFLDCT + CRBRCAST both active in 21D
+        const hasCRFLDCT21D   = recent21D.some((l: any) => l.event === 'crystal_field_continuity')
+        const hasCRBRCAST21D  = recent21D.some((l: any) => l.event === 'crystal_broadcast_expansion')
+        const alreadyCRRCONV  = recent21D.some((l: any) => l.event === 'crystal_resonance_convergence')
+        if (hasCRFLDCT21D && hasCRBRCAST21D && !alreadyCRRCONV) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_resonance_convergence',
+            metadata: {
+              contConf: 88,
+              broadConf: 86,
+              resonanceDepth: 87,
+              convergence: 'CRFLDCT+CRBRCAST→RESONANCE',
+              arc: 'CRYSTAL_RESONANCE_CONVERGING',
+              status: 'RESONANCE_ACTIVE',
+              source: 'CRYSTAL_RESONANCE_J62',
+            },
+          })
+          written++
+        }
+
+        // P184: Crystal Full Coherence — CRRCONV (P183) + CRTLCK (P182) both present in 21D
+        const hasCRRCONV21D   = recent21D.some((l: any) => l.event === 'crystal_resonance_convergence') || alreadyCRRCONV
+        const hasCRTLCK21D    = recent21D.some((l: any) => l.event === 'crystal_temporal_lock')
+        const alreadyCRFULLCOH = recent21D.some((l: any) => l.event === 'crystal_full_coherence')
+        if (hasCRRCONV21D && hasCRTLCK21D && !alreadyCRFULLCOH) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_full_coherence',
+            metadata: {
+              resonanceConf: 88,
+              lockConf: 87,
+              coherenceDepth: 91,
+              convergence: 'CRRCONV+CRTLCK→FULL_COHERENCE',
+              arc: 'ALL_CRYSTAL_VECTORS→UNIFIED',
+              status: 'CRYSTAL_COHERENT',
+              source: 'CRYSTAL_RESONANCE_J62',
+            },
+          })
+          written++
+        }
+
+        // P185: Crystal Resonance Sovereignty — CRFULLCOH in 21D + sovereign_temporal_lock in 21D
+        const hasCRFULLCOH21D  = recent21D.some((l: any) => l.event === 'crystal_full_coherence') || alreadyCRFULLCOH
+        const hasSOVTLOCK21D   = recent21D.some((l: any) => l.event === 'sovereign_temporal_lock')
+        const alreadyCRRESOV   = recent21D.some((l: any) => l.event === 'crystal_resonance_sovereignty')
+        if (hasCRFULLCOH21D && hasSOVTLOCK21D && !alreadyCRRESOV) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_resonance_sovereignty',
+            metadata: {
+              coherenceConf: 91,
+              sovTlockConf: 90,
+              sovereigntyDepth: 94,
+              convergence: 'CRFULLCOH+SOVTLOCK→SOVEREIGNTY',
+              arc: 'CRYSTAL_RESONANCE→LEGENDARY',
+              tier: 'LEGENDARY',
+              status: 'CRYSTAL_SOVEREIGN',
+              source: 'CRYSTAL_RESONANCE_J62',
+            },
+          })
+          written++
+        }
+      } catch (userError: any) {
+        console.error(`Crystal resonance check failed for user ${(user as any).id}:`, userError.message)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Crystal resonance events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY CRYSTAL RESONANCE CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklyCrystalResonanceCheckRun = new Date()
+    isWeeklyCrystalResonanceCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly crystal resonance check failed:', error.message)
+    isWeeklyCrystalResonanceCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Weekly Crystal Matrix Check (J63 — 09:00 UTC every Tuesday) ────────────
+// Scans crystal resonance sovereignty history and signal source diversity to detect
+// crystal matrix emergence. When CRRESOV in 21D + 5+ distinct sources in 14D, writes
+// crystal_matrix_formation (P186). When CRMATRIX in 14D + intentions≥3 + memory≥2 in 7D,
+// writes crystal_matrix_signal (P187). When CRMATRIX + CRMATSIG both in 21D,
+// writes crystal_matrix_sovereignty (P188) — LEGENDARY+ apex tier.
+
+let isWeeklyCrystalMatrixCheckRunning = false
+let lastWeeklyCrystalMatrixCheckRun: Date | null = null
+
+function shouldRunWeeklyCrystalMatrixCheck(): boolean {
+  const now = dayjs()
+  const hour = now.hour()
+  const dayOfWeek = now.day() // 0=Sun, 2=Tue
+  if (hour !== 9 || dayOfWeek !== 2) return false
+  if (isWeeklyCrystalMatrixCheckRunning) return false
+  if (lastWeeklyCrystalMatrixCheckRun) {
+    const hoursSinceLast = (Date.now() - lastWeeklyCrystalMatrixCheckRun.getTime()) / (1000 * 60 * 60)
+    if (hoursSinceLast < 23) return false
+  }
+  return true
+}
+
+async function executeWeeklyCrystalMatrixCheck(): Promise<JobResult> {
+  const jobName = 'weekly-crystal-matrix-check'
+  const executedAt = new Date()
+  isWeeklyCrystalMatrixCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY CRYSTAL MATRIX CHECK — 09:00 UTC Tuesday')
+  console.log('─'.repeat(60))
+
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000)
+    const activeUsers = await fastify.models.User.findAll({
+      where: { lastSeenAt: { [Op.gte]: cutoff } },
+    })
+
+    const twentyOneDayMs  = 21 * 24 * 60 * 60 * 1000
+    const fourteenDayMs   = 14 * 24 * 60 * 60 * 1000
+    const sevenDayMs      =  7 * 24 * 60 * 60 * 1000
+    const now = Date.now()
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const logs21D = await fastify.models.Log.findAll({
+          where: { userId, createdAt: { [Op.gte]: new Date(now - twentyOneDayMs) } },
+          attributes: ['event', 'metadata', 'createdAt'],
+        })
+        const logs14D = logs21D.filter((l: any) => new Date(l.createdAt).getTime() > now - fourteenDayMs)
+        const logs7D  = logs14D.filter((l: any) => new Date(l.createdAt).getTime() > now - sevenDayMs)
+
+        // P186: Crystal Matrix Formation — CRRESOV in 21D + 5+ distinct sources in 14D
+        const hasCRRESOV21D      = logs21D.some((l: any) => l.event === 'crystal_resonance_sovereignty')
+        const distinctSrc14D     = new Set(logs14D.map((l: any) => (l.metadata as any)?.source ?? l.event)).size
+        const alreadyCRMATRIX    = logs21D.some((l: any) => l.event === 'crystal_matrix_formation')
+        if (hasCRRESOV21D && distinctSrc14D >= 5 && !alreadyCRMATRIX) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_matrix_formation',
+            metadata: {
+              resovConf: 93,
+              distinctSources: distinctSrc14D,
+              matrixDepth: 88,
+              convergence: 'CRRESOV+SOURCES→MATRIX',
+              arc: 'CRYSTAL_MATRIX_FORMING',
+              status: 'MATRIX_ACTIVE',
+              source: 'CRYSTAL_MATRIX_J63',
+            },
+          })
+          written++
+        }
+
+        // P187: Crystal Matrix Signal — CRMATRIX in 14D + intentions≥3 in 7D + memory≥2 in 7D
+        const hasCRMATRIX14D     = logs14D.some((l: any) => l.event === 'crystal_matrix_formation') || alreadyCRMATRIX
+        const intentions7D       = logs7D.filter((l: any) => l.event === 'intention_set' || (l.metadata as any)?.source === 'intentions').length
+        const memory7D           = logs7D.filter((l: any) => l.event === 'memory_added' || (l.metadata as any)?.source === 'memory').length
+        const alreadyCRMATSIG    = logs21D.some((l: any) => l.event === 'crystal_matrix_signal')
+        if (hasCRMATRIX14D && intentions7D >= 3 && memory7D >= 2 && !alreadyCRMATSIG) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_matrix_signal',
+            metadata: {
+              matrixConf: 87,
+              intentCount: intentions7D,
+              memCount: memory7D,
+              sigDepth: 88,
+              convergence: 'CRMATRIX+INTENTS+MEMORY→SIGNAL',
+              arc: 'MATRIX_SELF_GENERATING',
+              status: 'MATRIX_SIGNAL_LIVE',
+              source: 'CRYSTAL_MATRIX_J63',
+            },
+          })
+          written++
+        }
+
+        // P188: Crystal Matrix Sovereignty — CRMATRIX + CRMATSIG both confirmed in 21D
+        const hasCRMATRIX21D     = logs21D.some((l: any) => l.event === 'crystal_matrix_formation') || alreadyCRMATRIX
+        const hasCRMATSIG21D     = logs21D.some((l: any) => l.event === 'crystal_matrix_signal') || alreadyCRMATSIG
+        const alreadyCRMATSOV    = logs21D.some((l: any) => l.event === 'crystal_matrix_sovereignty')
+        if (hasCRMATRIX21D && hasCRMATSIG21D && !alreadyCRMATSOV) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_matrix_sovereignty',
+            metadata: {
+              matrixConf: 87,
+              sigConf: 85,
+              sovereigntyDepth: 93,
+              convergence: 'CRMATRIX+CRMATSIG→SOVEREIGNTY',
+              arc: 'CRYSTAL_MATRIX→LEGENDARY_PLUS',
+              tier: 'LEGENDARY+',
+              status: 'MATRIX_SOVEREIGN',
+              source: 'CRYSTAL_MATRIX_J63',
+            },
+          })
+          written++
+        }
+      } catch (userError: any) {
+        console.error(`Crystal matrix check failed for user ${(user as any).id}:`, userError.message)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Crystal matrix events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY CRYSTAL MATRIX CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklyCrystalMatrixCheckRun = new Date()
+    isWeeklyCrystalMatrixCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly crystal matrix check failed:', error.message)
+    isWeeklyCrystalMatrixCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Weekly Crystal Lattice Check (J64 — 09:00 UTC every Wednesday) ─────────
+// Detects crystal lattice tier (P189–P191): CRLATLCK · CRLATRES · CRLATSOV.
+// Requires crystal matrix sovereignty (P188) in history to unlock.
+let isWeeklyCrystalLatticeCheckRunning = false
+let lastWeeklyCrystalLatticeCheckRun: Date | null = null
+
+function shouldRunWeeklyCrystalLatticeCheck(): boolean {
+  const now = dayjs()
+  if (now.day() !== 3 || now.hour() !== 9) return false  // Wednesday 09:00 UTC
+  if (isWeeklyCrystalLatticeCheckRunning) return false
+  if (lastWeeklyCrystalLatticeCheckRun) {
+    const hoursSinceLast = (Date.now() - lastWeeklyCrystalLatticeCheckRun.getTime()) / (1000 * 60 * 60)
+    if (hoursSinceLast < 23) return false
+  }
+  return true
+}
+
+async function executeWeeklyCrystalLatticeCheck(): Promise<JobResult> {
+  const jobName = 'weekly-crystal-lattice-check'
+  const executedAt = new Date().toISOString()
+  isWeeklyCrystalLatticeCheckRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY CRYSTAL LATTICE CHECK — 09:00 UTC Wednesday')
+  console.log('─'.repeat(60))
+
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000)
+    const activeUsers = await fastify.models.User.findAll({
+      where: { lastSeenAt: { [Op.gte]: cutoff } },
+    })
+
+    const twentyOneDayMs  = 21 * 24 * 60 * 60 * 1000
+    const fourteenDayMs   = 14 * 24 * 60 * 60 * 1000
+    const sevenDayMs      =  7 * 24 * 60 * 60 * 1000
+    const now = Date.now()
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const logs21D = await fastify.models.Log.findAll({
+          where: { userId, createdAt: { [Op.gte]: new Date(now - twentyOneDayMs) } },
+          attributes: ['event', 'metadata', 'createdAt'],
+        })
+        const logs14D = logs21D.filter((l: any) => new Date(l.createdAt).getTime() > now - fourteenDayMs)
+        const logs7D  = logs14D.filter((l: any) => new Date(l.createdAt).getTime() > now - sevenDayMs)
+
+        // P189: Crystal Lattice Lock — CRMATSOV in 21D + CRMATSIG in 14D
+        const hasCRMATSOV21D   = logs21D.some((l: any) => l.event === 'crystal_matrix_sovereignty')
+        const hasCRMATSIG14D   = logs14D.some((l: any) => l.event === 'crystal_matrix_signal')
+        const alreadyCRLATLCK  = logs21D.some((l: any) => l.event === 'crystal_lattice_lock')
+        if (hasCRMATSOV21D && hasCRMATSIG14D && !alreadyCRLATLCK) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_lattice_lock',
+            metadata: {
+              matSovConf: 90,
+              matSigConf: 85,
+              lockDepth: 91,
+              convergence: 'CRMATSOV+CRMATSIG→LATTICE_LOCK',
+              arc: 'CRYSTAL_MATRIX→LATTICE_LOCKED',
+              status: 'LATTICE_LOCKED',
+              source: 'CRYSTAL_LATTICE_J64',
+            },
+          })
+          written++
+        }
+
+        // P190: Crystal Lattice Resonance — CRLATLCK in 14D + intentions ≥3 in 7D + journal ≥2 in 7D + selfcare ≥1 in 7D
+        const hasCRLATLCK14D   = logs14D.some((l: any) => l.event === 'crystal_lattice_lock') || alreadyCRLATLCK
+        const intentions7D     = logs7D.filter((l: any) => l.event === 'intention_set' || (l.metadata as any)?.source === 'intentions').length
+        const journal7D        = logs7D.filter((l: any) => l.event === 'note' || (l.metadata as any)?.source === 'journal').length
+        const selfcare7D       = logs7D.filter((l: any) => l.event === 'self_care_complete' || l.event === 'self_care_completed' || (l.metadata as any)?.source === 'selfcare').length
+        const alreadyCRLATRES  = logs21D.some((l: any) => l.event === 'crystal_lattice_resonance')
+        if (hasCRLATLCK14D && intentions7D >= 3 && journal7D >= 2 && selfcare7D >= 1 && !alreadyCRLATRES) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_lattice_resonance',
+            metadata: {
+              latlckConf: 88,
+              intentCount: intentions7D,
+              journalCount: journal7D,
+              selfcareCount: selfcare7D,
+              resonanceDepth: 89,
+              convergence: 'CRLATLCK+INTENTS+JOURNAL+SELFCARE→RESONANCE',
+              arc: 'LATTICE_RESONATING_FULL_SPECTRUM',
+              status: 'LATTICE_RESONANCE_ACTIVE',
+              source: 'CRYSTAL_LATTICE_J64',
+            },
+          })
+          written++
+        }
+
+        // P191: Crystal Lattice Sovereignty — CRLATLCK + CRLATRES both confirmed in 21D
+        const hasCRLATLCK21D   = logs21D.some((l: any) => l.event === 'crystal_lattice_lock') || alreadyCRLATLCK
+        const hasCRLATRES21D   = logs21D.some((l: any) => l.event === 'crystal_lattice_resonance') || alreadyCRLATRES
+        const alreadyCRLATSOV  = logs21D.some((l: any) => l.event === 'crystal_lattice_sovereignty')
+        if (hasCRLATLCK21D && hasCRLATRES21D && !alreadyCRLATSOV) {
+          await fastify.models.Log.create({
+            userId,
+            event: 'crystal_lattice_sovereignty',
+            metadata: {
+              latlckConf: 88,
+              latresConf: 86,
+              apexDepth: 92,
+              convergence: 'CRLATLCK+CRLATRES→APEX_SOVEREIGNTY',
+              arc: 'CRYSTAL_LATTICE→APEX_LEGENDARY',
+              tier: 'APEX LEGENDARY',
+              status: 'LATTICE_SOVEREIGN',
+              source: 'CRYSTAL_LATTICE_J64',
+            },
+          })
+          written++
+        }
+      } catch (userError: any) {
+        console.error(`Crystal lattice check failed for user ${(user as any).id}:`, userError.message)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Crystal lattice events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY CRYSTAL LATTICE CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklyCrystalLatticeCheckRun = new Date()
+    isWeeklyCrystalLatticeCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly crystal lattice check failed:', error.message)
+    isWeeklyCrystalLatticeCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Weekly Crystal Expansion Check (J65 — 09:00 UTC every Thursday) ────────
+// Scans active users for P192/P193/P194 conditions:
+//   P192 CRLATBCAST: CRLATSOV in 28D + intentions ≥4 in 7D
+//   P193 CRLATEXP: CRLATBCAST in 21D + memory ≥3 in 7D + selfcare ≥2 in 7D
+//   P194 CRLATSNGL: CRLATBCAST + CRLATEXP both confirmed in 28D
+
+let isWeeklyCrystalExpansionCheckRunning = false
+let lastWeeklyCrystalExpansionCheckRun: Date | null = null
+
+function shouldRunWeeklyCrystalExpansionCheck(): boolean {
+  const now = new Date()
+  const dayOfWeek = now.getUTCDay() // 4 = Thursday
+  const hour = now.getUTCHours()
+  if (dayOfWeek !== 4 || hour !== 9) return false
+  if (!lastWeeklyCrystalExpansionCheckRun) return true
+  const hoursSince = (now.getTime() - lastWeeklyCrystalExpansionCheckRun.getTime()) / (1000 * 60 * 60)
+  return hoursSince >= 23
+}
+
+async function executeWeeklyCrystalExpansionCheck(): Promise<JobResult> {
+  const jobName = 'weekly-crystal-expansion-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklyCrystalExpansionCheckRunning) {
+    return { jobName, executedAt, success: false, error: 'Already running' }
+  }
+  isWeeklyCrystalExpansionCheckRunning = true
+  console.log('─'.repeat(60))
+  console.log('WEEKLY CRYSTAL EXPANSION CHECK (J65)')
+  console.log('─'.repeat(60))
+  try {
+    const activeUsers = await getActiveUsers()
+    let written = 0
+    const now = new Date()
+    const twentyEightDayAgo = new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000)
+    const twentyOneDayAgo   = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000)
+    const sevenDayAgo       = new Date(now.getTime() -  7 * 24 * 60 * 60 * 1000)
+
+    for (const user of activeUsers) {
+      try {
+        const [logs28D, logs21D, logs7D] = await Promise.all([
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: twentyEightDayAgo } }, select: { event: true, metadata: true, createdAt: true } }),
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: twentyOneDayAgo } }, select: { event: true, source: true } }),
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: sevenDayAgo } }, select: { event: true, source: true } }),
+        ])
+
+        // P192: Crystal Lattice Broadcast
+        const hasCRLATSOV28D  = logs28D.some((l: any) => l.event === 'crystal_lattice_sovereignty')
+        const intentions7D    = logs7D.filter((l: any) => l.source === 'intentions').length
+        const alreadyCRLATBCAST = logs28D.some((l: any) => l.event === 'crystal_lattice_broadcast')
+        if (hasCRLATSOV28D && intentions7D >= 4 && !alreadyCRLATBCAST) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'crystal_lattice_broadcast',
+              source: 'CRYSTAL_EXPANSION_J65',
+              metadata: {
+                intentCount: intentions7D,
+                tier: 'crystal-lattice-expansion',
+                label: 'CRLATBCAST',
+                source: 'CRYSTAL_EXPANSION_J65',
+              },
+            },
+          })
+          written++
+        }
+
+        // P193: Crystal Lattice Expansion
+        const hasCRLATBCAST21D = logs21D.some((l: any) => l.event === 'crystal_lattice_broadcast') || alreadyCRLATBCAST
+        const memory7D         = logs7D.filter((l: any) => l.source === 'memory').length
+        const selfcare7D       = logs7D.filter((l: any) => l.source === 'selfcare').length
+        const alreadyCRLATEXP  = logs28D.some((l: any) => l.event === 'crystal_lattice_expansion')
+        if (hasCRLATBCAST21D && memory7D >= 3 && selfcare7D >= 2 && !alreadyCRLATEXP) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'crystal_lattice_expansion',
+              source: 'CRYSTAL_EXPANSION_J65',
+              metadata: {
+                memoryCount: memory7D,
+                selfcareCount: selfcare7D,
+                tier: 'crystal-lattice-expansion',
+                label: 'CRLATEXP',
+                source: 'CRYSTAL_EXPANSION_J65',
+              },
+            },
+          })
+          written++
+        }
+
+        // P194: Crystal Lattice Singularity
+        const hasCRLATBCAST28D = logs28D.some((l: any) => l.event === 'crystal_lattice_broadcast') || alreadyCRLATBCAST
+        const hasCRLATEXP28D   = logs28D.some((l: any) => l.event === 'crystal_lattice_expansion') || alreadyCRLATEXP
+        const alreadyCRLATSNGL = logs28D.some((l: any) => l.event === 'crystal_lattice_singularity')
+        if (hasCRLATBCAST28D && hasCRLATEXP28D && !alreadyCRLATSNGL) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'crystal_lattice_singularity',
+              source: 'CRYSTAL_EXPANSION_J65',
+              metadata: {
+                tier: 'APEX SINGULARITY',
+                status: 'LATTICE_SINGULAR',
+                source: 'CRYSTAL_EXPANSION_J65',
+              },
+            },
+          })
+          written++
+        }
+      } catch (userError: any) {
+        console.error(`Crystal expansion check failed for user ${(user as any).id}:`, userError.message)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Crystal expansion events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY CRYSTAL EXPANSION CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklyCrystalExpansionCheckRun = new Date()
+    isWeeklyCrystalExpansionCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly crystal expansion check failed:', error.message)
+    isWeeklyCrystalExpansionCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Adaptive Intelligence Check (J66 — 11:00 UTC every day) ──────────
+// Scans active users for P195/P196/P197 conditions:
+//   P195 DEEPREST: sleep ≥8h + selfcare ≥3 in 7D + no tasks in 2D
+//   P196 ADPINT: memory ≥5 + journal ≥3 + goals ≥2 in 7D
+//   P197 OPMASTERY: tasks ≥7 + habits ≥5 + planner ≥4 in 7D
+
+let isDailyAdaptiveIntelligenceRunning = false
+let lastDailyAdaptiveIntelligenceRun: Date | null = null
+
+function shouldRunDailyAdaptiveIntelligenceCheck(): boolean {
+  const now = new Date()
+  const hour = now.getUTCHours()
+  if (hour !== 11) return false
+  if (!lastDailyAdaptiveIntelligenceRun) return true
+  const hoursSince = (now.getTime() - lastDailyAdaptiveIntelligenceRun.getTime()) / (1000 * 60 * 60)
+  return hoursSince >= 23
+}
+
+async function executeDailyAdaptiveIntelligenceCheck(): Promise<JobResult> {
+  if (isDailyAdaptiveIntelligenceRunning) return { jobName: 'daily-adaptive-intelligence-check', executedAt: new Date(), success: false, error: 'Already running' }
+  isDailyAdaptiveIntelligenceRunning = true
+
+  const jobName = 'daily-adaptive-intelligence-check'
+  const executedAt = new Date()
+  let written = 0
+
+  console.log('─'.repeat(60))
+  console.log('DAILY ADAPTIVE INTELLIGENCE CHECK (J66)')
+  console.log('─'.repeat(60))
+
+  try {
+    const { Op } = await import('sequelize')
+    const models = (await import('./models/index.js')).default
+
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const twoDaysAgo   = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+
+    const activeUsers = await models.User.findAll({
+      where: { [Op.or]: [{ hideActivityLogs: false }, { hideActivityLogs: null }] },
+    })
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const recentLogs = await models.Log.findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+            event: { [Op.in]: ['sleep', 'selfcare', 'memory', 'journal', 'goals', 'tasks', 'habits', 'planner'] },
+          },
+          order: [['createdAt', 'DESC']],
+        })
+
+        const now = Date.now()
+        const recent7DMs = 7 * 24 * 60 * 60 * 1000
+        const recent2DMs = 2 * 24 * 60 * 60 * 1000
+
+        // P195: Deep Restoration Lock
+        const recentSleep = recentLogs.find(l => {
+          const ts = new Date(l.createdAt).getTime()
+          return now - ts < recent2DMs && (l as any).event === 'sleep' && ((l as any).data?.hours ?? 0) >= 8
+        })
+        const selfcare7D  = recentLogs.filter(l => (l as any).event === 'selfcare' && now - new Date(l.createdAt).getTime() < recent7DMs).length
+        const tasks2D     = recentLogs.filter(l => (l as any).event === 'tasks' && now - new Date(l.createdAt).getTime() < recent2DMs).length
+        const alreadyDEEPREST = await models.Log.findOne({ where: { userId, event: 'deep_restoration_lock', createdAt: { [Op.gte]: sevenDaysAgo } } })
+        if (recentSleep && selfcare7D >= 3 && tasks2D === 0 && !alreadyDEEPREST) {
+          await models.Log.create({
+            userId, event: 'deep_restoration_lock',
+            data: { sleepH: (recentSleep as any).data?.hours ?? 8, selfcareCount: selfcare7D, label: 'DEEPREST', source: 'ADAPTIVE_INTELLIGENCE_J66', confidence: Math.min(0.78 + selfcare7D * 0.02, 0.88) },
+          })
+          written++
+        }
+
+        // P196: Adaptive Intelligence Arc
+        const memory7D  = recentLogs.filter(l => (l as any).event === 'memory' && now - new Date(l.createdAt).getTime() < recent7DMs).length
+        const journal7D = recentLogs.filter(l => (l as any).event === 'journal' && now - new Date(l.createdAt).getTime() < recent7DMs).length
+        const goals7D   = recentLogs.filter(l => (l as any).event === 'goals' && now - new Date(l.createdAt).getTime() < recent7DMs).length
+        const alreadyADPINT = await models.Log.findOne({ where: { userId, event: 'adaptive_intelligence_arc', createdAt: { [Op.gte]: sevenDaysAgo } } })
+        if (memory7D >= 5 && journal7D >= 3 && goals7D >= 2 && !alreadyADPINT) {
+          await models.Log.create({
+            userId, event: 'adaptive_intelligence_arc',
+            data: { memCount: memory7D, journalCount: journal7D, goalsCount: goals7D, label: 'ADPINT', source: 'ADAPTIVE_INTELLIGENCE_J66', confidence: Math.min(0.80 + (memory7D + journal7D + goals7D) * 0.01, 0.90) },
+          })
+          written++
+        }
+
+        // P197: Operational Mastery Lock
+        const tasks7D   = recentLogs.filter(l => (l as any).event === 'tasks' && now - new Date(l.createdAt).getTime() < recent7DMs).length
+        const habits7D  = recentLogs.filter(l => (l as any).event === 'habits' && now - new Date(l.createdAt).getTime() < recent7DMs).length
+        const planner7D = recentLogs.filter(l => (l as any).event === 'planner' && now - new Date(l.createdAt).getTime() < recent7DMs).length
+        const alreadyOPMASTERY = await models.Log.findOne({ where: { userId, event: 'operational_mastery_lock', createdAt: { [Op.gte]: sevenDaysAgo } } })
+        if (tasks7D >= 7 && habits7D >= 5 && planner7D >= 4 && !alreadyOPMASTERY) {
+          await models.Log.create({
+            userId, event: 'operational_mastery_lock',
+            data: { tasksCount: tasks7D, habitsCount: habits7D, plannerCount: planner7D, label: 'OPMASTERY', source: 'ADAPTIVE_INTELLIGENCE_J66', confidence: Math.min(0.82 + (tasks7D + habits7D + planner7D) * 0.005, 0.92) },
+          })
+          written++
+        }
+      } catch (userError: any) {
+        console.error(`Adaptive intelligence check failed for user ${(user as any).id}:`, userError.message)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Adaptive intelligence events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('DAILY ADAPTIVE INTELLIGENCE CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastDailyAdaptiveIntelligenceRun = new Date()
+    isDailyAdaptiveIntelligenceRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Daily adaptive intelligence check failed:', error.message)
+    isDailyAdaptiveIntelligenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -5713,6 +8313,23 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily field resonance check: 10 AM UTC every day (Job 49)')
+  console.log('   - Weekly sovereign assembly check: 8 AM UTC every Sunday (Job 50)')
+  console.log('   - Weekly sovereign identity check: 10 AM UTC every Sunday (Job 51)')
+  console.log('   - Weekly sovereign state report: 6 AM UTC every Wednesday (Job 52)')
+  console.log('   - Daily sovereign field pulse: 7 AM UTC every day (Job 53)')
+  console.log('   - Weekly sovereignty persistence audit: 8 AM UTC every Thursday (Job 54)')
+  console.log('   - Weekly sovereignty permanence check: 7 AM UTC every Monday (Job 55)')
+  console.log('   - Weekly sovereignty ascension check: 7 AM UTC every Tuesday (Job 56)')
+  console.log('   - Weekly sovereign motion check: 7 AM UTC every Friday (Job 57)')
+  console.log('   - Weekly sovereign transmission check: 7 AM UTC every Saturday (Job 58)')
+  console.log('   - Daily calendar EE signal check: 9 AM UTC every day (Job 59)')
+  console.log('   - Weekly crystalline sovereign check: 7 AM UTC every Monday (Job 60)')
+  console.log('   - Weekly crystal continuity check: 9 AM UTC every Thursday (Job 61)')
+  console.log('   - Weekly crystal resonance check: 9 AM UTC every Friday (Job 62)')
+  console.log('   - Weekly crystal matrix check: 9 AM UTC every Tuesday (Job 63)')
+  console.log('   - Weekly crystal lattice check: 9 AM UTC every Wednesday (Job 64)')
+  console.log('   - Weekly crystal expansion check: 9 AM UTC every Thursday (Job 65)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -5722,7 +8339,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift, 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window+sovereign-assembly(J50·Sun), 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+total-field-coherence, 10=archetype shift+temporal-alignment+field-resonance(J49), 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()
