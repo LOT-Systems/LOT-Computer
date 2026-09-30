@@ -9,6 +9,7 @@
     "sourceMap": true,
     "outDir": "dist/server",
     "strict": true,
+    "ignoreDeprecations": "6.0",
     "baseUrl": "src",
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
