@@ -1,0 +1,20 @@
+ref,function,part,qty_per_unit,est_unit_usd_at_100,search_link,notes
+U1,MCU + Wi-Fi/BLE,ESP32-S3-MINI-1U-N8R2 (or bare ESP32-S3FN8),1,4.50,https://www.digikey.com/en/products/result?keywords=ESP32-S3-MINI-1,USB-native; camera DVP + LCD SPI; OTA capable
+U2,Weather (T/RH/P + gas),Bosch BME688 (or BME690),1,9.00,https://www.digikey.com/en/products/result?keywords=BME688,AI gas scan via BSEC; 3x3mm LGA
+U3,Motion / ML core,ST LSM6DSO16IS,1,3.00,https://www.digikey.com/en/products/result?keywords=LSM6DSO16IS,Optional; tap/orientation wake; on-chip ML
+U4,Ambient light,Vishay VEML7700,1,1.20,https://www.digikey.com/en/products/result?keywords=VEML7700,Auto screen brightness
+CAM1,Camera,OmniVision OV2640 / OV5640 bare flex module (height <=3mm),1,6.00,https://www.aliexpress.com/wholesale?SearchText=OV5640+flex+camera+module,HEIGHT IS THE RISK - see Mechanical spec
+LCD1,Screen,1.3in 240x240 IPS ST7789 bare panel (FPC),1,5.00,https://www.buydisplay.com/,Alt: Sharp memory LCD for ultra-low power
+BAT1,Battery,LiPo 3.7V 250-300mAh <=2.5mm thick (e.g. 402530 / 502530),1,3.50,https://www.digikey.com/en/products/result?keywords=lipo+402530,UN38.3 cert required for shipping
+U5,Charger IC,TI BQ25120A or BQ51013B (Qi RX + charge),1,3.50,https://www.ti.com/product/BQ51013B,Wireless RX + LiPo charge path
+L1,Qi RX coil + ferrite,Wurth 760308101 series / thin flex coil 30mm,1,2.50,https://www.we-online.com/en/components/products/WPCC_WIRELESS_POWER_RECEIVER_COIL,Needs NON-METAL window (see Mechanical)
+U6,Fuel gauge,Maxim MAX17048,1,1.80,https://www.digikey.com/en/products/result?keywords=MAX17048,
+SW1,Button (COPY),Alps SKRRAA / low-profile 1.5mm tact,1,0.40,https://www.digikey.com/en/products/result?keywords=SKRRAA,Or capacitive plunger through shell
+U7,Haptic/buzzer (pager alert),Piezo 9mm flat or LRA 8mm,1,1.00,https://www.digikey.com/en/products/result?keywords=piezo+buzzer+9mm+SMD,Pager alert
+PCB,Main board,4-layer HDI ~36x36mm ENIG 0.8mm,1,7.00,https://www.pcbway.com/,Includes assembly amortised at 100 qty (est)
+ASM,SMT assembly,PCBWay turnkey assembly (per board),1,10.00,https://www.pcbway.com/pcb-assembly.html,Both sides; est
+ENC-A,Shell top (screen/camera/button face),316L stainless CNC 40x40x2.5mm,1,22.00,https://www.pcbway.com/cnc-machining-quote.html,Est; window cutouts + sapphire/glass
+ENC-B,Shell back (polished mirror),316L stainless CNC 40x40x2.5mm + Qi window inlay,1,28.00,https://www.pcbway.com/cnc-machining-quote.html,Est; mirror polish + inlay
+WIN,Screen/camera window,Gorilla/sapphire 0.5mm cut glass,1,3.00,https://www.aliexpress.com/wholesale?SearchText=sapphire+window+cut,
+CHG,Wireless charger pad (separate SKU),5W Qi TX pad w/ 40mm pocket,1,6.00,https://www.digikey.com/en/products/result?keywords=qi+transmitter+5W,Shipped with each unit
+MISC,Passives/connectors/adhesive/pack,,1,4.00,,
