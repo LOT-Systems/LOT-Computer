@@ -321,6 +321,13 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE TWO-DESK RESONANCE                      2026-09-30
+  ─────────────────────────────────────────────────────────────────
+  Two linked operators in different cities; one finishing a CUBIQ
+  session sends the other's cube a single content-free NUDGE/HOP
+  (cohort resonance ping). Full write-up, privacy and quiet-hours
+  rules: LOT-CUBIQ-QUANTUM-CUBE-v0-DEV02.md, Section 08.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
