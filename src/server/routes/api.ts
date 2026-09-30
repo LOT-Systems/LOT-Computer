@@ -43,6 +43,12 @@ import { generateUserNarrative } from '#server/utils/rpg-narrative'
 import { generateChatCatalysts, generateConversationStarters, shouldShowChatCatalyst } from '#server/utils/cohort-chat-catalyst'
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
+import {
+  buildStoryDigest, digestToPromptBlock, composeFallbackStory, wordBudget,
+  computeStreak, STORY_SIGNAL_EVENTS, ENTRY_EVENTS, CHECKIN_EVENTS,
+} from '#server/utils/story-compression'
+import { STORY_PERIODS, type StoryPeriod } from '#shared/utils/logCommands'
+import { computeArcade, formatArcade, type ArcadeInput } from '#shared/utils/arcade'
 import { registerOSRoutes } from './os-api.js'
 
 // ============================================================================
@@ -5490,6 +5496,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: StoryPeriod
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,30 +5521,34 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period: StoryPeriod = STORY_PERIODS.includes(req.body.period as StoryPeriod)
+        ? (req.body.period as StoryPeriod)
+        : 'week'
 
+      // Compression step: the whole period becomes a small digest of computed
+      // facts. Window is capped at one year; 'yearly' is the widest story.
+      const now = new Date()
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          event: { [Op.in]: STORY_SIGNAL_EVENTS },
+          createdAt: { [Op.gte]: new Date(now.getTime() - 365 * 86_400_000) },
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 5000,
       })
-
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
+      const digest = buildStoryDigest(
+        logs.map(l => ({
+          event: l.event,
+          text: l.text,
+          createdAt: l.createdAt,
+          context: l.context,
+          metadata: l.metadata as Record<string, any> | null,
+        })),
+        period,
+        now
+      )
+      const arcade = computeArcade(arcadeInputFrom(logs, now))
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
@@ -5547,71 +5558,109 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const budget = wordBudget(period)
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's ${period} into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story ${period}. Your task: write 1-2 short paragraphs (under ${budget} words) that compress their ${period}: the high peaks, the low peaks, and what changed. It must feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
-- End with a single forward-looking sentence — not a pep talk, just a quiet truth
+- Use ONLY the facts in the PERIOD DIGEST below. Every number, date, place and mood you mention must appear there. Never invent events.
+- If SIGNALS is low, say the picture is still forming — do not pad.
+- Name the peak (HIGH PEAK, strongest mood) and the low (LONGEST SILENCE, falling trend) when present, with compassion, never judgment.
+- Tone matches their current energy: reflective if low, energized if high.
+- End with a single forward-looking sentence — not a pep talk, just a quiet truth.
 - Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Keep it under ${budget} words.`
 
       const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+OPERATOR LOG ENTRY: "${(logText || '(no text)').substring(0, 500)}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
+PERIOD DIGEST:
+${digestToPromptBlock(digest)}`
 
       const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
 
+      let story: string
+      let source: 'ai' | 'digest' = 'ai'
       try {
+        if (digest.totalSignals === 0) throw new Error('no-signal')
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
 
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
+        console.log(`📖 Story (${period}) for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
 
-        const story = await engine.generateCompletion(fullPrompt, 512)
+        const raw = await engine.generateCompletion(fullPrompt, 512)
+        story = raw.trim().replace(/^["']|["']$/g, '')
+        if (!story) throw new Error('empty-completion')
+      } catch (error: any) {
+        if (error?.message !== 'no-signal') console.error('Story generation failed:', error)
+        story = composeFallbackStory(digest)
+        source = 'digest'
+      }
 
-        const cleaned = story.trim().replace(/^["']|["']$/g, '')
-
+      try {
         const context = await getLogContext(req.user)
         const storyLog = await fastify.models.Log.create({
           userId: req.user.id,
-          text: cleaned,
+          text: story,
           event: 'generated_story',
           context,
           metadata: {
-            story: cleaned,
+            story,
+            period,
+            source,
+            digest: { ...digest, excerpts: undefined },
             logText: (logText || '').substring(0, 500),
             quantumState: quantumState || null,
-            timestamp: new Date().toISOString(),
+            timestamp: now.toISOString(),
           },
         })
-
-        return {
-          story: cleaned,
-          logId: storyLog.id,
-        }
+        return { story, period, source, arcade, logId: storyLog.id }
       } catch (error: any) {
-        console.error('Story generation failed:', error)
-        return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
-          logId: null,
-        }
+        console.error('Story persist failed:', error)
+        return { story, period, source, arcade, logId: null }
       }
     }
   )
+
+  // ============================================================================
+  // ARCADE — GET /api/arcade/rank
+  // Self-care evolution state derived from real behavior (see shared/utils/arcade).
+  // ============================================================================
+  fastify.get('/arcade/rank', async (req: FastifyRequest) => {
+    const now = new Date()
+    const logs = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: { [Op.in]: STORY_SIGNAL_EVENTS },
+      },
+      attributes: ['event', 'text', 'createdAt'],
+      order: [['createdAt', 'DESC']],
+      limit: 20000,
+    })
+    const input = arcadeInputFrom(logs, now)
+    const arcade = computeArcade(input)
+    return { arcade, input, display: formatArcade(arcade, input) }
+  })
+}
+
+/** Arcade inputs from operator-authored logs (empty notes excluded). */
+function arcadeInputFrom(
+  logs: Array<{ event: string; text?: string | null; createdAt: Date }>,
+  now: Date
+): ArcadeInput {
+  const days = new Set<string>()
+  let entries = 0
+  let checkins = 0
+  for (const l of logs) {
+    const isEntry = ENTRY_EVENTS.has(l.event)
+    if (isEntry && !String(l.text || '').trim()) continue
+    if (isEntry) entries++
+    else if (CHECKIN_EVENTS.has(l.event)) checkins++
+    days.add(new Date(l.createdAt).toISOString().slice(0, 10))
+  }
+  return { entries, checkins, activeDays: days.size, streak: computeStreak(days, now) }
 }

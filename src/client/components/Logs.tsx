@@ -29,11 +29,12 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { renderSystemHelp, suggestCommand, findUnknownCommand, parseStoryPeriod, stripStoryCommand } from '#shared/utils/logCommands'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, getArcadeRank } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3706,6 +3707,7 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const storyLoadingRef = React.useRef(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3713,6 +3715,8 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  const [rankResult, setRankResult] = React.useState<string | null>(null)
+  const [commandHint, setCommandHint] = React.useState<string | null>(null)
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -3743,6 +3747,7 @@ const NoteEditor = ({
     onSuccess: (data) => {
       setStoryResponse(data.story)
       setStoryLoading(false)
+      storyLoadingRef.current = false
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + data.story
@@ -3755,6 +3760,7 @@ const NoteEditor = ({
       const fallback = 'The system holds your data quietly. When the engine returns, your story will be here.'
       setStoryResponse(fallback)
       setStoryLoading(false)
+      storyLoadingRef.current = false
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + fallback
@@ -3931,6 +3937,19 @@ const NoteEditor = ({
   // the editor. We compare against the previous value via ref so
   // editing around an existing trigger doesn't re-fire it.
   // --------------------------------------------------------------------
+  // Unknown-command hint: debounced so "/st" mid-typing stays quiet.
+  React.useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const unknown = findUnknownCommand(value)
+      if (!unknown) return setCommandHint(null)
+      const guess = suggestCommand(unknown)
+      setCommandHint(
+        guess ? `/${unknown} is not a command. Did you mean /${guess}?` : `/${unknown} is not a command. Type /system to list commands.`
+      )
+    }, 1500)
+    return () => window.clearTimeout(timer)
+  }, [value])
+
   const lastTriggerScanRef = React.useRef(log.text || '')
   React.useEffect(() => {
     const fresh = detectNewTriggers(value, lastTriggerScanRef.current)
@@ -4121,49 +4140,34 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(renderSystemHelp())
+      } else if (trigger === 'rank-check') {
+        setRankResult('RANK            LOADING...')
+        getArcadeRank()
+          .then(r => setRankResult(r.display))
+          .catch(() => setRankResult('RANK UNAVAILABLE'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
+        // Fires as soon as "/story" is typed; wait briefly so an optional
+        // period ("/story month") can be finished, then read the latest text.
+        window.setTimeout(() => {
+          if (storyLoadingRef.current) return
+          const text = valueRef.current
+          storyLoadingRef.current = true
           setStoryLoading(true)
           setStoryResponse(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
             submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
+              logText: stripStoryCommand(text),
+              period: parseStoryPeriod(text),
+              quantumState: getUserState(),
+              userIndex: getUserIndex(),
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: text })
           }
-        }
+        }, 1200)
       }
     }
   }, [value])
@@ -4385,6 +4389,18 @@ const NoteEditor = ({
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
             </Block>
+          </div>
+        )}
+        {rankResult && (
+          <div className="mt-8">
+            <Block label="RANK:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{rankResult}</div>
+            </Block>
+          </div>
+        )}
+        {commandHint && (
+          <div className="mt-8 opacity-40" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px' }}>
+            {commandHint}
           </div>
         )}
         {systemHelp && (
