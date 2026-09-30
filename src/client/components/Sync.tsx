@@ -24,6 +24,8 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useMailInbox,
+  useMarkMailRead,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -50,6 +52,11 @@ export const Sync = React.memo(function SyncInner() {
   const queryClient = useQueryClient()
 
   const [message, setMessage] = React.useState('')
+  const [openMailId, setOpenMailId] = React.useState<string | null>(null)
+  const { data: inbox } = useMailInbox()
+  const { mutate: markMailRead } = useMarkMailRead({
+    onSuccess: () => queryClient.invalidateQueries(['/api/mail/inbox']),
+  })
   // SSE-received messages not yet reflected in the API response
   const [sseMessages, setSseMessages] = React.useState<PublicChatMessage[]>([])
 
@@ -117,7 +124,14 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeMailListener } = sync.listen(
+      'mail_received',
+      (data: { receiverId: string }) => {
+        if (data.receiverId === me?.id) queryClient.invalidateQueries(['/api/mail/inbox'])
+      }
+    )
     return () => {
+      disposeMailListener()
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
     }
@@ -170,16 +184,67 @@ export const Sync = React.memo(function SyncInner() {
     formRef.current?.querySelector('textarea')?.focus()
   }, [])
 
+  // LOT Email inbox — visible to every member, above chat
+  const mailSection = inbox && inbox.mails.length > 0 && (
+    <div className="mb-40">
+      <div className="text-acc/40 mb-8 select-none">
+        MAIL{inbox.unread > 0 ? ` · ${inbox.unread} NEW` : ''}
+      </div>
+      {inbox.mails.slice(0, 10).map((m) => {
+        const open = openMailId === m.id
+        return (
+          <div
+            key={m.id}
+            className="cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded"
+            onClick={() => {
+              setOpenMailId(open ? null : m.id)
+              if (!open && !m.readAt) markMailRead({ id: m.id })
+            }}
+          >
+            <div className="flex items-start gap-x-8">
+              <span className={cn('whitespace-nowrap', !m.readAt && 'underline')}>
+                {m.senderName}
+              </span>
+              <span className={cn('flex-1', m.readAt && 'text-acc/40')}>{m.subject}</span>
+              <span className="text-acc/40 whitespace-nowrap">
+                <MessageTimeLabel dateString={m.createdAt} isTimeFormat12h={isTimeFormat12h} />
+              </span>
+            </div>
+            {open && (
+              <div className="whitespace-breakspaces mt-4 mb-8" style={{ wordBreak: 'break-word' }}>
+                {m.body}
+                <div className="mt-4">
+                  <GhostButton
+                    onClick={(ev: React.MouseEvent) => {
+                      ev.stopPropagation()
+                      stores.goTo('dm', { userId: m.senderId })
+                    }}
+                  >
+                    Reply →
+                  </GhostButton>
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+
   if (!canAccessChat) {
     return (
-      <div className="max-w-[700px] text-acc/40 py-8">
-        Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+      <div className="max-w-[700px]">
+        {mailSection}
+        <div className="text-acc/40 py-8">
+          Sync chat is available for Usership, Onyx, Legacy, R&D, and Admin members.
+        </div>
       </div>
     )
   }
 
   return (
     <div className="max-w-[700px]">
+      {mailSection}
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}

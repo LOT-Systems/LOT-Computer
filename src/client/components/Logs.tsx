@@ -36,6 +36,8 @@ import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
+import { MailComposer } from '#client/components/MailComposer'
+import { parseEmailCommand } from '#client/utils/logTriggers'
 
 const localStore = {
   logById: map<Record<string, Log>>({}),
@@ -3713,6 +3715,19 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  const [emailActive, setEmailActive] = React.useState(false)
+  // Cohort → LOT Email handoff: prefill an empty primary log with "/email to <name>"
+  React.useEffect(() => {
+    if (!primary || log.text) return
+    try {
+      const draft = sessionStorage.getItem('lot-email-draft')
+      if (!draft) return
+      sessionStorage.removeItem('lot-email-draft')
+      setValue(draft)
+      valueRef.current = draft
+      onChangeRef.current(draft)
+    } catch {}
+  }, [])
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -4138,6 +4153,7 @@ const NoteEditor = ({
           '/synth        Toggle keyboard sound',
           '/radio        Toggle radio',
           '/night        Dark mode',
+          '/email to X   Email a member (arrives in their Sync)',
           '/how          Open LOT AI check-in (System tab)',
           '/system       This help screen',
           '',
@@ -4145,6 +4161,8 @@ const NoteEditor = ({
           'Ctrl+Enter    Save log immediately',
         ]
         setSystemHelp(lines.join('\n'))
+      } else if (trigger === 'email-compose') {
+        setEmailActive(true)
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4386,6 +4404,23 @@ const NoteEditor = ({
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
             </Block>
           </div>
+        )}
+        {emailActive && parseEmailCommand(value) && (
+          <MailComposer
+            text={value}
+            onSent={(recipient) => {
+              const cmd = parseEmailCommand(valueRef.current)
+              const updated = cmd
+                ? valueRef.current
+                    .replace(/[^\S\n]*\/(?:email|mail)[^\n]*/i, `✉ EMAIL SENT → ${recipient}`)
+                : valueRef.current
+              setEmailActive(false)
+              setValue(updated)
+              valueRef.current = updated
+              onChangeRef.current(updated)
+              setIsSaved(true)
+            }}
+          />
         )}
         {systemHelp && (
           <div className="mt-8">

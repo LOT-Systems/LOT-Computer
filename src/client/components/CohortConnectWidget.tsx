@@ -123,7 +123,13 @@ export const CohortConnectWidget: React.FC = () => {
       connectionReadiness,
       hour: new Date().getHours()
     })
-    stores.goTo('sync')
+    // Cohort dating → LOT Email: open the Log ready to compose "/email to <name>"
+    const match = cohortData?.matches?.find((m: any) => m.user.id === userId)
+    const first = (match?.user?.firstName || '').trim()
+    if (first) {
+      try { sessionStorage.setItem('lot-email-draft', `/email to ${first}\n`) } catch {}
+    }
+    stores.goTo('logs')
   }
 
   const handleToggleExpand = (userId: string) => {

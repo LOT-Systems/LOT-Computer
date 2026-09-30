@@ -40,6 +40,7 @@ export type LogTrigger =
   | 'qi-rfi'            // /qi — Quantum Intelligence RFI (Request for Information)
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
+  | 'email-compose'     // /email to <name> — compose LOT Email (delivered to Sync)
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
 
 interface TriggerRule {
@@ -66,6 +67,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'qi-rfi',         emojis: [],        keywords: ['qi'] },
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
+  { trigger: 'email-compose',  emojis: [],        keywords: ['email', 'mail'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
 ]
 
@@ -114,4 +116,17 @@ export function detectNewTriggers(
   const fresh: LogTrigger[] = []
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
+}
+
+/**
+ * Parses "/email to Hitomi" (also "/mail Hitomi"). Returns the recipient
+ * name and the body — every line of the log except the command line.
+ */
+export function parseEmailCommand(
+  text: string
+): { name: string; body: string } | null {
+  const m = /(^|\n)[^\S\n]*\/(?:email|mail)(?:[^\S\n]+to)?[^\S\n]+([^\s/]+)[^\n]*/i.exec(text || '')
+  if (!m) return null
+  const body = text.replace(m[0], m[1] || '').trim()
+  return { name: m[2].replace(/[.,;:!?]+$/, ''), body }
 }

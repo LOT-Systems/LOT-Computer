@@ -196,6 +196,8 @@ export type DirectMessage = {
   senderId: string;
   receiverId: string;
   message: string;
+  subject?: string | null;
+  readAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };
