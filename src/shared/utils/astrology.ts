@@ -177,3 +177,49 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Wall-clock Date for `timeZone` (IANA). The returned Date's local getters
+ * (getHours/getDate/...) read the target zone's clock, so the pure astrology
+ * functions above can be reused unchanged. Falls back to `now` on a missing
+ * or invalid zone. Uses Intl only — safe on client and server.
+ */
+export function getWallClockDate(now: Date, timeZone?: string | null): Date {
+  if (!timeZone) return now
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(now)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return now
+  }
+}
+
+export interface AstrologyReading {
+  hourlyZodiac: string
+  westernZodiac: string
+  moonPhase: string
+  moonIllumination: number
+  rokuyo: string
+}
+
+/**
+ * Single ambient reading, shared by the dashboard block and the Logs
+ * snapshot so both always agree for a given user timeZone.
+ */
+export function getAstrologyReading(now: Date = new Date(), timeZone?: string | null): AstrologyReading {
+  const d = getWallClockDate(now, timeZone)
+  const moon = getMoonPhase(d)
+  return {
+    hourlyZodiac: getHourlyZodiac(d),
+    westernZodiac: getWesternZodiac(d),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    rokuyo: getRokuyo(d),
+  }
+}
