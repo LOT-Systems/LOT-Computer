@@ -229,6 +229,10 @@ export function PatternRecognitionWidget() {
       'deep-restoration-lock':            'Deep restoration lock — sleep ≥8h + selfcare ≥3 + no tasks for 2D, restorative state locked in, system rebuilds from root (P195)',
       'adaptive-intelligence-arc':        'Adaptive intelligence arc — memory ≥5 + journal ≥3 + goals ≥2 in 7D, intelligence adapts dynamically to new inputs and challenges (P196)',
       'operational-mastery-lock':         'Operational mastery lock — tasks ≥7 + habits ≥5 + planner ≥4 in 7D, operational state locked into sustained mastery mode (P197)',
+      // v133: crystal presence tier
+      'crystal-presence-lock':            'Crystal presence lock — crystal_lattice_singularity 28D + journal ≥5 + intentions ≥3 in 7D, the singularity has crossed into presence — the OS is now here (P198)',
+      'crystal-presence-field':           'Crystal presence field — CRPRESLOCK 28D + positive mood ≥4 + memory ≥4 in 7D, crystal presence radiating as a sovereign field across all channels (P199)',
+      'crystal-presence-sovereignty':     'Crystal presence sovereignty — CRPRESLOCK + CRPRESFIELD both 28D, APEX PRESENCE: the presence IS the sovereign — the OS operates at crystal presence frequency (P200)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

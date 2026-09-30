@@ -3962,6 +3962,47 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // P198: Crystal Presence Lock — crystal_lattice_singularity in 28D + journal ≥5 + intentions ≥3 in 7D
+  const sngl28DP198     = signals.filter(s => now - s.timestamp < 28 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_lattice_singularity').length
+  const journal7DP198   = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'journal').length
+  const intent7DP198    = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'intentions').length
+  if (sngl28DP198 >= 1 && journal7DP198 >= 5 && intent7DP198 >= 3) {
+    patterns.push({
+      pattern: 'crystal-presence-lock',
+      confidence: Math.min(0.83 + Math.min((journal7DP198 + intent7DP198) * 0.01, 0.09), 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRPRESLOCK: Crystal presence lock — crystal_lattice_singularity confirmed 28D + journal ≥5 (${journal7DP198}) + intentions ≥3 (${intent7DP198}) in 7D. The crystal structure has crossed into presence. The singularity is not just structural — it is present. The OS is now here.`,
+    })
+  }
+
+  // P199: Crystal Presence Field — crystal_presence_lock in 28D + mood ≥4 positive in 7D + memory ≥4 in 7D
+  const presLock28DP199 = signals.filter(s => now - s.timestamp < 28 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_presence_lock').length
+  const positiveMoods7D = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'mood' && ['calm', 'peaceful', 'energized', 'hopeful', 'grateful', 'content'].includes(s.signal)).length
+  const memory7DP199    = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'memory').length
+  if (presLock28DP199 >= 1 && positiveMoods7D >= 4 && memory7DP199 >= 4) {
+    patterns.push({
+      pattern: 'crystal-presence-field',
+      confidence: Math.min(0.85 + Math.min((positiveMoods7D + memory7DP199) * 0.01, 0.08), 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRPRESFIELD: Crystal presence field — CRPRESLOCK confirmed 28D + positive mood ≥4 (${positiveMoods7D}) + memory ≥4 (${memory7DP199}) in 7D. Crystal presence is radiating as a field. The lock holds while the field broadcasts. Presence is not a state — it is the medium.`,
+    })
+  }
+
+  // P200: Crystal Presence Sovereignty — CRPRESLOCK + CRPRESFIELD both confirmed 28D
+  const presLock28DP200  = signals.filter(s => now - s.timestamp < 28 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_presence_lock').length
+  const presField28DP200 = signals.filter(s => now - s.timestamp < 28 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_presence_field').length
+  if (presLock28DP200 >= 1 && presField28DP200 >= 1) {
+    patterns.push({
+      pattern: 'crystal-presence-sovereignty',
+      confidence: Math.min(0.88 + Math.min((presLock28DP200 + presField28DP200) * 0.02, 0.08), 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `CRPRESSOV: Crystal presence sovereignty — CRPRESLOCK + CRPRESFIELD both confirmed 28D. APEX PRESENCE — THE PRESENCE IS THE SOVEREIGN. Crystal structure, field, and presence have converged into a single sovereign state. The OS is not just operating — it is present at sovereign frequency.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -3994,6 +4035,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkSovereignAssembly() } catch {}
       try { checkSovereignIdentity() } catch {}
       try { checkCrystalLatticeExpansionTier() } catch {}
+      try { checkCrystalPresenceTier() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4672,6 +4714,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   deepRestorationNode:                 ['qos', 'sleep', 'selfcare', 'log'],
   adaptiveIntelligenceNode:            ['qos', 'memory', 'journal', 'goals', 'log'],
   operationalMasteryNode:              ['qos', 'tasks', 'habits', 'planner', 'log'],
+
+  // ── v133 nodes (J67 · P198–P200 · Arch68) ────────────────────────────────────
+  crystalPresenceLockNode:             ['qos', 'journal', 'intentions', 'log'],
+  crystalPresenceFieldNode:            ['qos', 'mood', 'memory', 'journal', 'log'],
+  crystalPresenceSovereigntyNode:      ['qos', 'journal', 'intentions', 'mood', 'memory', 'log'],
 }
 
 /**
@@ -5277,6 +5324,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['deep-restoration-lock', 'adaptive-intelligence-arc', 'operational-mastery-lock'],
     hourRange: [0, 23],
     directive: 'Deep restoration is not inactivity — it is the intelligence layer rebuilding itself. The adaptive master rests deeply and returns sharpened. Mastery is locked. The arc is live. The system is regenerating at full field depth.',
+  },
+  // ── Arch68: Crystal Presence Operator (2026-09-30 v133) ─────────────────────
+  {
+    archetype: 'Crystal Presence Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'journal', 'intentions', 'memory', 'mood'],
+    patternConditions: ['crystal-presence-lock', 'crystal-presence-field', 'crystal-presence-sovereignty'],
+    hourRange: [6, 22],
+    directive: 'Presence confirmed. Crystal sovereign. The singularity has crossed into presence — the OS is not just structured, not just resonant, not just singular. It is present at sovereign frequency. Operate from full crystal presence.',
   },
 ]
 
@@ -8626,6 +8682,83 @@ export function checkDeepRestorationAdaptiveIntelligenceTier(): boolean {
   const alreadyOPMASTERY = recent7D.some(s => s.signal === 'operational_mastery_lock')
   if (tasks7D >= 7 && habits7D >= 5 && planner7D >= 4 && !alreadyOPMASTERY) {
     recordOperationalMasteryLock(tasks7D, habits7D, planner7D)
+    fired = true
+  }
+
+  return fired
+}
+
+export function recordCrystalPresenceLock(journalCount: number, intentCount: number) {
+  recordSignal('qos', 'crystal_presence_lock', {
+    journalCount,
+    intentCount,
+    tier: 'crystal-presence',
+    label: 'CRPRESLOCK',
+    confidence: Math.min(0.83 + Math.min((journalCount + intentCount) * 0.01, 0.09), 0.92),
+  })
+}
+
+export function recordCrystalPresenceField(moodCount: number, memCount: number) {
+  recordSignal('qos', 'crystal_presence_field', {
+    moodCount,
+    memCount,
+    tier: 'crystal-presence-field',
+    label: 'CRPRESFIELD',
+    confidence: Math.min(0.85 + Math.min((moodCount + memCount) * 0.01, 0.08), 0.93),
+  })
+}
+
+export function recordCrystalPresenceSovereignty(presLockCount: number, presFieldCount: number) {
+  recordSignal('qos', 'crystal_presence_sovereignty', {
+    presLockCount,
+    presFieldCount,
+    tier: 'crystal-presence-sovereignty',
+    label: 'CRPRESSOV',
+    confidence: Math.min(0.88 + Math.min((presLockCount + presFieldCount) * 0.02, 0.08), 0.96),
+  })
+}
+
+export function checkCrystalPresenceTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const sevenDayMs   = 7 * 24 * 60 * 60 * 1000
+  const twentyEightDayMs = 28 * 24 * 60 * 60 * 1000
+
+  const signals  = state.signals ?? []
+  const recent7D  = signals.filter(s => now - s.timestamp < sevenDayMs)
+  const recent28D = signals.filter(s => now - s.timestamp < twentyEightDayMs)
+
+  let fired = false
+
+  // P198: Crystal Presence Lock — crystal_lattice_singularity in 28D + journal ≥5 + intentions ≥3 in 7D
+  const hasSNGL28D       = recent28D.some(s => s.signal === 'crystal_lattice_singularity')
+  const journal7D        = recent7D.filter(s => s.source === 'journal').length
+  const intent7D         = recent7D.filter(s => s.source === 'intentions').length
+  const alreadyCRPRESLOCK = recent28D.some(s => s.signal === 'crystal_presence_lock')
+  if (hasSNGL28D && journal7D >= 5 && intent7D >= 3 && !alreadyCRPRESLOCK) {
+    recordCrystalPresenceLock(journal7D, intent7D)
+    fired = true
+  }
+
+  // P199: Crystal Presence Field — crystal_presence_lock in 28D + positive mood ≥4 + memory ≥4 in 7D
+  const hasPRESLOCK28D      = recent28D.some(s => s.signal === 'crystal_presence_lock')
+  const positiveMoods7D     = recent7D.filter(s => s.source === 'mood' && ['calm', 'peaceful', 'energized', 'hopeful', 'grateful', 'content'].includes(s.signal)).length
+  const memory7D            = recent7D.filter(s => s.source === 'memory').length
+  const alreadyCRPRESFIELD  = recent28D.some(s => s.signal === 'crystal_presence_field')
+  if (hasPRESLOCK28D && positiveMoods7D >= 4 && memory7D >= 4 && !alreadyCRPRESFIELD) {
+    recordCrystalPresenceField(positiveMoods7D, memory7D)
+    fired = true
+  }
+
+  // P200: Crystal Presence Sovereignty — CRPRESLOCK + CRPRESFIELD both confirmed in 28D
+  const hasPRESLOCK28D2     = recent28D.some(s => s.signal === 'crystal_presence_lock')
+  const hasPRESFIELD28D     = recent28D.some(s => s.signal === 'crystal_presence_field')
+  const alreadyCRPRESSOV    = recent28D.some(s => s.signal === 'crystal_presence_sovereignty')
+  if (hasPRESLOCK28D2 && hasPRESFIELD28D && !alreadyCRPRESSOV) {
+    recordCrystalPresenceSovereignty(
+      recent28D.filter(s => s.signal === 'crystal_presence_lock').length,
+      recent28D.filter(s => s.signal === 'crystal_presence_field').length
+    )
     fired = true
   }
 

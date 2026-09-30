@@ -158,6 +158,10 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'deep-restoration-lock':            'DEEPREST',
   'adaptive-intelligence-arc':        'ADPINT',
   'operational-mastery-lock':         'OPMASTERY',
+  // v133: crystal presence tier
+  'crystal-presence-lock':            'CRPRESLOCK',
+  'crystal-presence-field':           'CRPRESFIELD',
+  'crystal-presence-sovereignty':     'CRPRESSOV',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

@@ -5461,6 +5461,114 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'crystal_presence_lock') {
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const intentCount  = log.metadata?.intentCount  as number | undefined
+          const confidence   = log.metadata?.confidence   as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRPRESLOCK:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">PRESENCE LOCKED</span>
+                </div>
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 7D</span>
+                    <span className="tabular-nums opacity-60">{journalCount}</span>
+                  </div>
+                )}
+                {intentCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENT 7D</span>
+                    <span className="tabular-nums opacity-60">{intentCount}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">CRYSTAL PRESENCE</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystal_presence_field') {
+          const moodCount  = log.metadata?.moodCount  as number | undefined
+          const memCount   = log.metadata?.memCount   as number | undefined
+          const confidence = log.metadata?.confidence as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRPRESFIELD:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">FIELD ACTIVE</span>
+                </div>
+                {moodCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MOOD+ 7D</span>
+                    <span className="tabular-nums opacity-60">{moodCount}</span>
+                  </div>
+                )}
+                {memCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEM 7D</span>
+                    <span className="tabular-nums opacity-60">{memCount}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">CRYSTAL PRESENCE FIELD</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystal_presence_sovereignty') {
+          const presLockCount  = log.metadata?.presLockCount  as number | undefined
+          const presFieldCount = log.metadata?.presFieldCount as number | undefined
+          const confidence     = log.metadata?.confidence     as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRPRESSOV:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">SOVEREIGN</span>
+                </div>
+                {presLockCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PRESLOCK 28D</span>
+                    <span className="tabular-nums opacity-60">{presLockCount}</span>
+                  </div>
+                )}
+                {presFieldCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PRESFIELD 28D</span>
+                    <span className="tabular-nums opacity-60">{presFieldCount}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">APEX PRESENCE</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

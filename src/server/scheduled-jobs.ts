@@ -1822,6 +1822,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyAdaptiveIntelligenceCheck()) {
     await executeDailyAdaptiveIntelligenceCheck()
   }
+
+  // Check weekly crystal presence check (09:00 UTC every Monday) — Job 67
+  if (shouldRunWeeklyCrystalPresenceCheck()) {
+    await executeWeeklyCrystalPresenceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -8261,6 +8266,135 @@ async function executeDailyAdaptiveIntelligenceCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Weekly Crystal Presence Check (J67 — 09:00 UTC every Monday) ───────────
+// Scans active users for P198/P199/P200 conditions:
+//   P198 CRPRESLOCK: crystal_lattice_singularity 28D + journal ≥5 + intentions ≥3 in 7D
+//   P199 CRPRESFIELD: crystal_presence_lock 28D + positive mood ≥4 + memory ≥4 in 7D
+//   P200 CRPRESSOV: crystal_presence_lock + crystal_presence_field both in 28D → APEX PRESENCE
+
+let isWeeklyCrystalPresenceCheckRunning = false
+let lastWeeklyCrystalPresenceCheckRun: Date | null = null
+
+function shouldRunWeeklyCrystalPresenceCheck(): boolean {
+  const now = new Date()
+  const dayOfWeek = now.getUTCDay() // 1 = Monday
+  const hour = now.getUTCHours()
+  if (dayOfWeek !== 1 || hour !== 9) return false
+  if (!lastWeeklyCrystalPresenceCheckRun) return true
+  const hoursSince = (now.getTime() - lastWeeklyCrystalPresenceCheckRun.getTime()) / (1000 * 60 * 60)
+  return hoursSince >= 23
+}
+
+async function executeWeeklyCrystalPresenceCheck(): Promise<JobResult> {
+  const jobName = 'weekly-crystal-presence-check'
+  const executedAt = new Date().toISOString()
+  if (isWeeklyCrystalPresenceCheckRunning) {
+    return { jobName, executedAt, success: false, error: 'Already running' }
+  }
+  isWeeklyCrystalPresenceCheckRunning = true
+  console.log('─'.repeat(60))
+  console.log('WEEKLY CRYSTAL PRESENCE CHECK (J67)')
+  console.log('─'.repeat(60))
+  try {
+    const activeUsers = await getActiveUsers()
+    let written = 0
+    const now = new Date()
+    const twentyEightDayAgo = new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000)
+    const sevenDayAgo       = new Date(now.getTime() -  7 * 24 * 60 * 60 * 1000)
+
+    for (const user of activeUsers) {
+      try {
+        const [logs28D, logs7D] = await Promise.all([
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: twentyEightDayAgo } }, select: { event: true, source: true, metadata: true, createdAt: true } }),
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: sevenDayAgo } }, select: { event: true, source: true, metadata: true } }),
+        ])
+
+        // P198: Crystal Presence Lock
+        const hasCRLATSNGL28D    = logs28D.some((l: any) => l.event === 'crystal_lattice_singularity')
+        const journal7D          = logs7D.filter((l: any) => l.source === 'journal').length
+        const intentions7D       = logs7D.filter((l: any) => l.source === 'intentions').length
+        const alreadyCRPRESLOCK  = logs28D.some((l: any) => l.event === 'crystal_presence_lock')
+        if (hasCRLATSNGL28D && journal7D >= 5 && intentions7D >= 3 && !alreadyCRPRESLOCK) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'crystal_presence_lock',
+              source: 'CRYSTAL_PRESENCE_J67',
+              metadata: {
+                journalCount: journal7D,
+                intentCount: intentions7D,
+                tier: 'crystal-presence',
+                label: 'CRPRESLOCK',
+                source: 'CRYSTAL_PRESENCE_J67',
+              },
+            },
+          })
+          written++
+        }
+
+        // P199: Crystal Presence Field
+        const hasCRPRESLOCK28D   = logs28D.some((l: any) => l.event === 'crystal_presence_lock') || alreadyCRPRESLOCK
+        const positiveMood7D     = logs7D.filter((l: any) => l.source === 'mood' && (l.metadata as any)?.mood >= 4).length
+        const memory7D           = logs7D.filter((l: any) => l.source === 'memory').length
+        const alreadyCRPRESFIELD = logs28D.some((l: any) => l.event === 'crystal_presence_field')
+        if (hasCRPRESLOCK28D && positiveMood7D >= 4 && memory7D >= 4 && !alreadyCRPRESFIELD) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'crystal_presence_field',
+              source: 'CRYSTAL_PRESENCE_J67',
+              metadata: {
+                moodCount: positiveMood7D,
+                memoryCount: memory7D,
+                tier: 'crystal-presence-field',
+                label: 'CRPRESFIELD',
+                source: 'CRYSTAL_PRESENCE_J67',
+              },
+            },
+          })
+          written++
+        }
+
+        // P200: Crystal Presence Sovereignty
+        const hasCRPRESFIELD28D  = logs28D.some((l: any) => l.event === 'crystal_presence_field') || alreadyCRPRESFIELD
+        const alreadyCRPRESSOV   = logs28D.some((l: any) => l.event === 'crystal_presence_sovereignty')
+        if (hasCRPRESLOCK28D && hasCRPRESFIELD28D && !alreadyCRPRESSOV) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'crystal_presence_sovereignty',
+              source: 'CRYSTAL_PRESENCE_J67',
+              metadata: {
+                tier: 'APEX PRESENCE',
+                status: 'PRESENCE_SOVEREIGN',
+                source: 'CRYSTAL_PRESENCE_J67',
+              },
+            },
+          })
+          written++
+        }
+      } catch (userError: any) {
+        console.error(`Crystal presence check failed for user ${(user as any).id}:`, userError.message)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Crystal presence events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('WEEKLY CRYSTAL PRESENCE CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastWeeklyCrystalPresenceCheckRun = new Date()
+    isWeeklyCrystalPresenceCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Weekly crystal presence check failed:', error.message)
+    isWeeklyCrystalPresenceCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -8330,6 +8464,8 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly crystal matrix check: 9 AM UTC every Tuesday (Job 63)')
   console.log('   - Weekly crystal lattice check: 9 AM UTC every Wednesday (Job 64)')
   console.log('   - Weekly crystal expansion check: 9 AM UTC every Thursday (Job 65)')
+  console.log('   - Daily adaptive intelligence check: 11 AM UTC every day (Job 66)')
+  console.log('   - Weekly crystal presence check: 9 AM UTC every Monday (Job 67)')
   console.log('')
 
   // Check every hour for scheduled jobs
