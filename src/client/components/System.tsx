@@ -45,7 +45,6 @@ import { EnergyCapacitor } from './EnergyCapacitor'
 import { NarrativeWidget } from './NarrativeWidget'
 import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
-import { SystemProgressWidget } from './SystemProgressWidget'
 import { SystemPulseWidget } from './SystemPulseWidget'
 import { EvolutionWidget } from './EvolutionWidget'
 import { CohortConnectWidget } from './CohortConnectWidget'
@@ -58,7 +57,6 @@ import { checkPlannerWidget } from '#client/stores/plannerWidget'
 import { getOptimalWidget, shouldShowWidget, getUserState, getUserIndex, analyzeIntentions, classifyPhysiologicalCohort, intentionEngine, recordAstrologySignal, getCircadianPhase } from '#client/stores/intentionEngine'
 import { QuantumStateWidget } from './QuantumStateWidget'
 import { SignalStreamWidget } from './SignalStreamWidget'
-import { PatternRecognitionWidget } from './PatternRecognitionWidget'
 import { UserMetricsWidget } from './UserMetricsWidget'
 import { AIFeedbackWidget } from './AIFeedbackWidget'
 import { CorrelatedIndexesWidget } from './CorrelatedIndexesWidget'
@@ -71,17 +69,35 @@ import { CorporatePlanWidget } from './CorporatePlanWidget'
 import { DemoDayWidget } from './DemoDayWidget'
 import { FourDimensionalUI } from './FourDimensionalUI'
 import { QuantumSignWidget } from './QuantumSignWidget'
-import { MicroGameWidget } from './MicroGameWidget'
 import { CosmicUpdateWidget } from './CosmicUpdateWidget'
-import { QuantumEngineWidgets } from './QuantumEngineWidgets'
 import { ChakraErgonomicsWidget } from './ChakraErgonomicsWidget'
 import { CalendarWidget } from './CalendarWidget'
 import { BenchmarkWidget } from './BenchmarkWidget'
-import { ArchitectWidget } from './ArchitectWidget'
-import { IntegrityWidget } from './IntegrityWidget'
 import { recomputeAssembly } from '#client/stores/selfAssembly'
 import { $layoutDensity } from '#client/stores/evolution'
 import { useInViewport } from '#client/hooks/useInViewport'
+
+// Heavy or below-the-fold widgets are split into async chunks so they stay out of
+// the initial app bundle (SystemProgressWidget alone is ~180 KB minified, mostly
+// the embedded changelog). Suspense fallback is empty: each widget renders below
+// the fold, inside its own WidgetErrorBoundary.
+function lazyWidget<K extends string>(load: () => Promise<Record<K, React.ComponentType<any>>>, key: K) {
+  const Lazy = React.lazy<React.ComponentType<any>>(() => load().then((m) => ({ default: m[key] })))
+  return function LazyWidget() {
+    return (
+      <React.Suspense fallback={null}>
+        <Lazy />
+      </React.Suspense>
+    )
+  }
+}
+
+const SystemProgressWidget = lazyWidget(() => import('./SystemProgressWidget'), 'SystemProgressWidget')
+const ArchitectWidget = lazyWidget(() => import('./ArchitectWidget'), 'ArchitectWidget')
+const QuantumEngineWidgets = lazyWidget(() => import('./QuantumEngineWidgets'), 'QuantumEngineWidgets')
+const MicroGameWidget = lazyWidget(() => import('./MicroGameWidget'), 'MicroGameWidget')
+const IntegrityWidget = lazyWidget(() => import('./IntegrityWidget'), 'IntegrityWidget')
+const PatternRecognitionWidget = lazyWidget(() => import('./PatternRecognitionWidget'), 'PatternRecognitionWidget')
 
 // Defers mount of children until element first enters the viewport.
 // Once mounted, stays mounted — no unmount on scroll away.

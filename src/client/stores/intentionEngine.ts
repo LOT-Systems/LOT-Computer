@@ -130,10 +130,17 @@ if (typeof window !== 'undefined') {
       const recentSignals = parsed.filter((s: IntentionSignal) => s.timestamp > cutoff)
 
       if (recentSignals.length > 0) {
+        // Restore the sync watermark so a reload does not re-upload (and the
+        // server does not duplicate) signals that were already synced.
+        let lastSynced = 0
+        try {
+          lastSynced = parseInt(localStorage.getItem('intention-last-synced') || '0', 10) || 0
+        } catch { /* storage unavailable */ }
         intentionEngine.set({
           ...intentionEngine.get(),
           signals: recentSignals,
-          userIndex: loadedIndex
+          userIndex: loadedIndex,
+          lastSyncedTimestamp: lastSynced
         })
       }
     } catch (e) {
@@ -244,7 +251,11 @@ export function recordSignal(
   }
 
   // Trigger server sync periodically
-  const shouldSync = recentSignals.length % SYNC_INTERVAL === 0 &&
+  // Count-of-unsynced (not total length % N): the total length is pruned by the
+  // 7-day window and the cap, so an exact multiple of N may never coincide with
+  // an elapsed cooldown and low-volume users would never sync.
+  const unsyncedCount = recentSignals.filter(s => s.timestamp > state.lastSyncedTimestamp).length
+  const shouldSync = unsyncedCount >= SYNC_INTERVAL &&
                      (now - state.lastSyncedTimestamp >= SYNC_COOLDOWN)
 
   if (shouldSync) {
@@ -3329,6 +3340,7 @@ export function analyzeIntentions(): IntentionPattern[] {
   // active OS dimension contributing signal at the same time. The field is not building — it is saturated.
   const hasPresenceP142 = patterns.some(p => p.pattern === 'adaptive-signal-web')
   const hasPresenceP137 = patterns.some(p => p.pattern === 'quantum-coherence-peak')
+  const dayMs = 24 * 60 * 60 * 1000
   const daySignals147 = signals.filter(s => now - s.timestamp < dayMs)
   const uniqueSources147 = new Set(daySignals147.map(s => s.source)).size
   if (hasPresenceP142 && hasPresenceP137 && uniqueSources147 >= 7) {
@@ -3709,14 +3721,14 @@ export function getUserState(): UserState {
 /**
  * Sync signals to server for persistence and cross-device continuity
  */
-export async function syncToServer(): Promise<boolean> {
+export async function syncToServer(force = false): Promise<boolean> {
   if (typeof window === 'undefined') return false
 
   const state = intentionEngine.get()
   const now = Date.now()
 
   // Don't sync too frequently
-  if (now - state.lastSyncedTimestamp < SYNC_COOLDOWN) {
+  if (!force && now - state.lastSyncedTimestamp < SYNC_COOLDOWN) {
     return false
   }
 
@@ -3752,11 +3764,17 @@ export async function syncToServer(): Promise<boolean> {
 
     const result = await response.json()
 
-    // Update last synced timestamp
+    // Advance the watermark to the newest signal actually uploaded. Re-read the
+    // store: signals recorded while the request was in flight must not be
+    // overwritten by the stale pre-request snapshot, and must stay unsynced.
+    const syncedUpTo = unsyncedSignals.reduce((m, s) => Math.max(m, s.timestamp), 0)
     intentionEngine.set({
-      ...state,
-      lastSyncedTimestamp: now
+      ...intentionEngine.get(),
+      lastSyncedTimestamp: syncedUpTo
     })
+    try {
+      localStorage.setItem('intention-last-synced', String(syncedUpTo))
+    } catch { /* storage unavailable */ }
 
     console.log(`Synced ${result.savedSignals}/${result.totalSignals} signals successfully`)
     return true
@@ -3766,17 +3784,20 @@ export async function syncToServer(): Promise<boolean> {
   }
 }
 
+// Flush pending signals when the tab is hidden/closed so low-volume sessions
+// (fewer than SYNC_INTERVAL signals) still reach LOT AI, Portrait, Memory, Story.
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') void syncToServer(true)
+  })
+}
+
 /**
  * Manually trigger sync (useful for debugging or before logout)
  */
 export function forceSyncToServer(): Promise<boolean> {
-  const state = intentionEngine.get()
-  // Reset lastSyncedTimestamp to allow immediate sync
-  intentionEngine.set({
-    ...state,
-    lastSyncedTimestamp: 0
-  })
-  return syncToServer()
+  // Bypass the cooldown only; keep the watermark so nothing is re-uploaded
+  return syncToServer(true)
 }
 
 // ─── Widget Dependency Map ─────────────────────────────────────────────────
