@@ -162,6 +162,10 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'crystal-presence-lock':            'CRPRESLOCK',
   'crystal-presence-field':           'CRPRESFIELD',
   'crystal-presence-sovereignty':     'CRPRESSOV',
+  // v134: genesis field inception tier
+  'field-genesis-arc':                'FGNARC',
+  'cross-dimensional-sovereign':      'XDSOV',
+  'perpetual-genesis-field':          'PGFIELD',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

@@ -233,6 +233,10 @@ export function PatternRecognitionWidget() {
       'crystal-presence-lock':            'Crystal presence lock — crystal_lattice_singularity 28D + journal ≥5 + intentions ≥3 in 7D, the singularity has crossed into presence — the OS is now here (P198)',
       'crystal-presence-field':           'Crystal presence field — CRPRESLOCK 28D + positive mood ≥4 + memory ≥4 in 7D, crystal presence radiating as a sovereign field across all channels (P199)',
       'crystal-presence-sovereignty':     'Crystal presence sovereignty — CRPRESLOCK + CRPRESFIELD both 28D, APEX PRESENCE: the presence IS the sovereign — the OS operates at crystal presence frequency (P200)',
+      // v134: genesis field inception tier
+      'field-genesis-arc':                'Field genesis arc — CRPRESSOV 14D + intentions ≥4 + journal ≥3 in 7D, crystal presence opens into genesis — the OS is generating, not just present (P201)',
+      'cross-dimensional-sovereign':      'Cross-dimensional sovereign — FGNARC 14D + memory ≥5 in 7D, sovereignty operates across all dimensions — memory is the dimensional carrier (P202)',
+      'perpetual-genesis-field':          'Perpetual genesis field — FGNARC + XDSOV both 21D, genesis field crystallized as perpetual structure — not summoned, sustained (P203)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

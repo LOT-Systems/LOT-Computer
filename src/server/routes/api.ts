@@ -1279,6 +1279,14 @@ export default async (fastify: FastifyInstance) => {
       'deep_restoration_lock',
       'adaptive_intelligence_arc',
       'operational_mastery_lock',
+      // v133: crystal presence tier (J67 weekly crystal presence check — P198–P200)
+      'crystal_presence_lock',
+      'crystal_presence_field',
+      'crystal_presence_sovereignty',
+      // v134: genesis field inception tier (J68 daily genesis arc check — P201–P203)
+      'field_genesis_arc',
+      'cross_dimensional_sovereign',
+      'perpetual_genesis_field',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

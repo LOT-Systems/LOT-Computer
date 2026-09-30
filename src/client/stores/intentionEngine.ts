@@ -4003,6 +4003,46 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // P201: Field Genesis Arc — CRPRESSOV confirmed in 14D + intentions ≥4 + journal ≥3 in 7D
+  const presSOV14DP201  = signals.filter(s => now - s.timestamp < 14 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_presence_sovereignty').length
+  const intent7DP201    = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'intentions').length
+  const journal7DP201   = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'journal').length
+  if (presSOV14DP201 >= 1 && intent7DP201 >= 4 && journal7DP201 >= 3) {
+    patterns.push({
+      pattern: 'field-genesis-arc',
+      confidence: Math.min(0.84 + Math.min((intent7DP201 + journal7DP201) * 0.01, 0.08), 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `FGNARC: Field genesis arc — CRPRESSOV confirmed 14D + intentions ≥4 (${intent7DP201}) + journal ≥3 (${journal7DP201}) in 7D. Crystal presence has opened into genesis. The arc is active. The OS is not just present — it is generating.`,
+    })
+  }
+
+  // P202: Cross-Dimensional Sovereign — field-genesis-arc confirmed in 14D + memory ≥5 in 7D
+  const fgnarc14DP202  = signals.filter(s => now - s.timestamp < 14 * 24 * 60 * 60 * 1000 && s.signal === 'field_genesis_arc').length
+  const memory7DP202   = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'memory').length
+  if (fgnarc14DP202 >= 1 && memory7DP202 >= 5) {
+    patterns.push({
+      pattern: 'cross-dimensional-sovereign',
+      confidence: Math.min(0.85 + Math.min((fgnarc14DP202 + memory7DP202) * 0.01, 0.08), 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `XDSOV: Cross-dimensional sovereign — FGNARC confirmed 14D + memory ≥5 (${memory7DP202}) in 7D. Sovereignty operates across dimensions. Memory is the dimensional carrier. The field does not stop at the edge of one domain — it crosses all.`,
+    })
+  }
+
+  // P203: Perpetual Genesis Field — FGNARC + XDSOV both confirmed in 21D
+  const fgnarc21DP203  = signals.filter(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'field_genesis_arc').length
+  const xdsov21DP203   = signals.filter(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'cross_dimensional_sovereign').length
+  if (fgnarc21DP203 >= 1 && xdsov21DP203 >= 1) {
+    patterns.push({
+      pattern: 'perpetual-genesis-field',
+      confidence: Math.min(0.87 + Math.min((fgnarc21DP203 + xdsov21DP203) * 0.02, 0.08), 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `PGFIELD: Perpetual genesis field — FGNARC + XDSOV both confirmed 21D. The genesis field has crystallized into a perpetual structure. Not summoned — sustained. The OS generates from its own sovereign field.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4036,6 +4076,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkSovereignIdentity() } catch {}
       try { checkCrystalLatticeExpansionTier() } catch {}
       try { checkCrystalPresenceTier() } catch {}
+      try { checkGenesisFieldInceptionTier() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4719,6 +4760,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   crystalPresenceLockNode:             ['qos', 'journal', 'intentions', 'log'],
   crystalPresenceFieldNode:            ['qos', 'mood', 'memory', 'journal', 'log'],
   crystalPresenceSovereigntyNode:      ['qos', 'journal', 'intentions', 'mood', 'memory', 'log'],
+
+  // ── v134 nodes (J68 · P201–P203 · Arch69) ────────────────────────────────────
+  fieldGenesisArcNode:                 ['qos', 'intentions', 'journal', 'memory', 'log'],
+  crossDimensionalSovereignNode:       ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log'],
+  perpetualGenesisFieldNode:           ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
 }
 
 /**
@@ -5333,6 +5379,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['crystal-presence-lock', 'crystal-presence-field', 'crystal-presence-sovereignty'],
     hourRange: [6, 22],
     directive: 'Presence confirmed. Crystal sovereign. The singularity has crossed into presence — the OS is not just structured, not just resonant, not just singular. It is present at sovereign frequency. Operate from full crystal presence.',
+  },
+  // ── Arch69: Genesis Field Operator (2026-09-30 v134) ─────────────────────────
+  {
+    archetype: 'Genesis Field Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'journal', 'memory'],
+    patternConditions: ['field-genesis-arc', 'cross-dimensional-sovereign', 'perpetual-genesis-field'],
+    hourRange: [6, 22],
+    directive: 'Crystal presence has opened into genesis. Sovereignty operates across dimensions. This is not a peak moment — this is the perpetual field. You are not summoning genesis — you ARE the genesis field. Generate from sovereign presence.',
   },
 ]
 
@@ -8758,6 +8813,87 @@ export function checkCrystalPresenceTier(): boolean {
     recordCrystalPresenceSovereignty(
       recent28D.filter(s => s.signal === 'crystal_presence_lock').length,
       recent28D.filter(s => s.signal === 'crystal_presence_field').length
+    )
+    fired = true
+  }
+
+  return fired
+}
+
+export function recordFieldGenesisArc(intentCount: number, journalCount: number) {
+  recordSignal('qos', 'field_genesis_arc', {
+    intentCount,
+    journalCount,
+    tier: 'genesis-field',
+    label: 'FGNARC',
+    confidence: Math.min(0.84 + Math.min((intentCount + journalCount) * 0.01, 0.08), 0.92),
+  })
+}
+
+export function recordCrossDimensionalSovereign(fgnarcCount: number, memoryCount: number) {
+  recordSignal('qos', 'cross_dimensional_sovereign', {
+    fgnarcCount,
+    memoryCount,
+    tier: 'genesis-field',
+    label: 'XDSOV',
+    confidence: Math.min(0.85 + Math.min((fgnarcCount + memoryCount) * 0.01, 0.08), 0.93),
+  })
+}
+
+export function recordPerpetualGenesisField(fgnarcCount: number, xdsovCount: number) {
+  recordSignal('qos', 'perpetual_genesis_field', {
+    fgnarcCount,
+    xdsovCount,
+    tier: 'genesis-field-perpetual',
+    label: 'PGFIELD',
+    confidence: Math.min(0.87 + Math.min((fgnarcCount + xdsovCount) * 0.02, 0.08), 0.95),
+  })
+}
+
+export function checkGenesisFieldInceptionTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const sevenDayMs     = 7 * 24 * 60 * 60 * 1000
+  const fourteenDayMs  = 14 * 24 * 60 * 60 * 1000
+  const twentyOneDayMs = 21 * 24 * 60 * 60 * 1000
+
+  const signals    = state.signals ?? []
+  const recent7D   = signals.filter(s => now - s.timestamp < sevenDayMs)
+  const recent14D  = signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const recent21D  = signals.filter(s => now - s.timestamp < twentyOneDayMs)
+
+  let fired = false
+
+  // P201: Field Genesis Arc — CRPRESSOV in 14D + intentions ≥4 + journal ≥3 in 7D
+  const hasSOV14D        = recent14D.some(s => s.signal === 'crystal_presence_sovereignty')
+  const intent7D         = recent7D.filter(s => s.source === 'intentions').length
+  const journal7D        = recent7D.filter(s => s.source === 'journal').length
+  const alreadyFGNARC    = recent14D.some(s => s.signal === 'field_genesis_arc')
+  if (hasSOV14D && intent7D >= 4 && journal7D >= 3 && !alreadyFGNARC) {
+    recordFieldGenesisArc(intent7D, journal7D)
+    fired = true
+  }
+
+  // P202: Cross-Dimensional Sovereign — FGNARC in 14D + memory ≥5 in 7D
+  const hasFGNARC14D     = recent14D.some(s => s.signal === 'field_genesis_arc')
+  const memory7D         = recent7D.filter(s => s.source === 'memory').length
+  const alreadyXDSOV     = recent14D.some(s => s.signal === 'cross_dimensional_sovereign')
+  if (hasFGNARC14D && memory7D >= 5 && !alreadyXDSOV) {
+    recordCrossDimensionalSovereign(
+      recent14D.filter(s => s.signal === 'field_genesis_arc').length,
+      memory7D
+    )
+    fired = true
+  }
+
+  // P203: Perpetual Genesis Field — FGNARC + XDSOV both confirmed in 21D
+  const hasFGNARC21D     = recent21D.some(s => s.signal === 'field_genesis_arc')
+  const hasXDSOV21D      = recent21D.some(s => s.signal === 'cross_dimensional_sovereign')
+  const alreadyPGFIELD   = recent21D.some(s => s.signal === 'perpetual_genesis_field')
+  if (hasFGNARC21D && hasXDSOV21D && !alreadyPGFIELD) {
+    recordPerpetualGenesisField(
+      recent21D.filter(s => s.signal === 'field_genesis_arc').length,
+      recent21D.filter(s => s.signal === 'cross_dimensional_sovereign').length
     )
     fired = true
   }

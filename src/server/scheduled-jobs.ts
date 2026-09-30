@@ -1827,6 +1827,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklyCrystalPresenceCheck()) {
     await executeWeeklyCrystalPresenceCheck()
   }
+
+  // Check daily genesis arc check (11:00 UTC every day) — Job 68
+  if (shouldRunDailyGenesisArcCheck()) {
+    await executeDailyGenesisArcCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -8395,6 +8400,138 @@ async function executeWeeklyCrystalPresenceCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Genesis Arc Check (J68 — 11:00 UTC every day) ────────────────────
+// Scans active users for P201/P202/P203 conditions:
+//   P201 FGNARC: crystal_presence_sovereignty 14D + intentions ≥4 + journal ≥3 in 7D
+//   P202 XDSOV: field_genesis_arc 14D + memory ≥5 in 7D
+//   P203 PGFIELD: field_genesis_arc + cross_dimensional_sovereign both in 21D
+
+let isDailyGenesisArcCheckRunning = false
+let lastDailyGenesisArcCheckRun: Date | null = null
+
+function shouldRunDailyGenesisArcCheck(): boolean {
+  const now = new Date()
+  const hour = now.getUTCHours()
+  if (hour !== 11) return false
+  if (!lastDailyGenesisArcCheckRun) return true
+  const hoursSince = (now.getTime() - lastDailyGenesisArcCheckRun.getTime()) / (1000 * 60 * 60)
+  return hoursSince >= 23
+}
+
+async function executeDailyGenesisArcCheck(): Promise<JobResult> {
+  const jobName = 'daily-genesis-arc-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyGenesisArcCheckRunning) {
+    return { jobName, executedAt, success: false, error: 'Already running' }
+  }
+  isDailyGenesisArcCheckRunning = true
+  console.log('─'.repeat(60))
+  console.log('DAILY GENESIS ARC CHECK (J68)')
+  console.log('─'.repeat(60))
+  try {
+    const activeUsers = await getActiveUsers()
+    let written = 0
+    const now = new Date()
+    const sevenDayAgo     = new Date(now.getTime() -  7 * 24 * 60 * 60 * 1000)
+    const fourteenDayAgo  = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
+    const twentyOneDayAgo = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000)
+
+    for (const user of activeUsers) {
+      try {
+        const [logs21D, logs14D, logs7D] = await Promise.all([
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: twentyOneDayAgo } }, select: { event: true, source: true, metadata: true, createdAt: true } }),
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: fourteenDayAgo } }, select: { event: true, source: true, metadata: true } }),
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: sevenDayAgo } }, select: { event: true, source: true, metadata: true } }),
+        ])
+
+        // P201: Field Genesis Arc
+        const hasSOV14D       = logs14D.some((l: any) => l.event === 'crystal_presence_sovereignty')
+        const intentions7D    = logs7D.filter((l: any) => l.source === 'intentions').length
+        const journal7D       = logs7D.filter((l: any) => l.source === 'journal').length
+        const alreadyFGNARC   = logs14D.some((l: any) => l.event === 'field_genesis_arc')
+        if (hasSOV14D && intentions7D >= 4 && journal7D >= 3 && !alreadyFGNARC) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'field_genesis_arc',
+              source: 'GENESIS_ARC_J68',
+              metadata: {
+                intentCount: intentions7D,
+                journalCount: journal7D,
+                tier: 'genesis-field',
+                label: 'FGNARC',
+                source: 'GENESIS_ARC_J68',
+              },
+            },
+          })
+          written++
+        }
+
+        // P202: Cross-Dimensional Sovereign
+        const hasFGNARC14D    = logs14D.some((l: any) => l.event === 'field_genesis_arc') || alreadyFGNARC
+        const memory7D        = logs7D.filter((l: any) => l.source === 'memory').length
+        const alreadyXDSOV    = logs14D.some((l: any) => l.event === 'cross_dimensional_sovereign')
+        if (hasFGNARC14D && memory7D >= 5 && !alreadyXDSOV) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'cross_dimensional_sovereign',
+              source: 'GENESIS_ARC_J68',
+              metadata: {
+                fgnarcCount: logs14D.filter((l: any) => l.event === 'field_genesis_arc').length,
+                memoryCount: memory7D,
+                tier: 'genesis-field',
+                label: 'XDSOV',
+                source: 'GENESIS_ARC_J68',
+              },
+            },
+          })
+          written++
+        }
+
+        // P203: Perpetual Genesis Field
+        const hasFGNARC21D    = logs21D.some((l: any) => l.event === 'field_genesis_arc')
+        const hasXDSOV21D     = logs21D.some((l: any) => l.event === 'cross_dimensional_sovereign')
+        const alreadyPGFIELD  = logs21D.some((l: any) => l.event === 'perpetual_genesis_field')
+        if (hasFGNARC21D && hasXDSOV21D && !alreadyPGFIELD) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'perpetual_genesis_field',
+              source: 'GENESIS_ARC_J68',
+              metadata: {
+                fgnarcCount: logs21D.filter((l: any) => l.event === 'field_genesis_arc').length,
+                xdsovCount: logs21D.filter((l: any) => l.event === 'cross_dimensional_sovereign').length,
+                tier: 'genesis-field-perpetual',
+                label: 'PGFIELD',
+                source: 'GENESIS_ARC_J68',
+              },
+            },
+          })
+          written++
+        }
+      } catch (userError: any) {
+        console.error(`Genesis arc check failed for user ${(user as any).id}:`, userError.message)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Genesis arc events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('DAILY GENESIS ARC CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastDailyGenesisArcCheckRun = new Date()
+    isDailyGenesisArcCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Daily genesis arc check failed:', error.message)
+    isDailyGenesisArcCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -8466,6 +8603,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly crystal expansion check: 9 AM UTC every Thursday (Job 65)')
   console.log('   - Daily adaptive intelligence check: 11 AM UTC every day (Job 66)')
   console.log('   - Weekly crystal presence check: 9 AM UTC every Monday (Job 67)')
+  console.log('   - Daily genesis arc check: 11 AM UTC every day (Job 68)')
   console.log('')
 
   // Check every hour for scheduled jobs

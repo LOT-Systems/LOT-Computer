@@ -5569,6 +5569,114 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'field_genesis_arc') {
+          const intentCount  = log.metadata?.intentCount  as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const confidence   = log.metadata?.confidence   as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FGNARC:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">GENESIS ARC ACTIVE</span>
+                </div>
+                {intentCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENT 7D</span>
+                    <span className="tabular-nums opacity-60">{intentCount}</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 7D</span>
+                    <span className="tabular-nums opacity-60">{journalCount}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">GENESIS FIELD</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'cross_dimensional_sovereign') {
+          const fgnarcCount = log.metadata?.fgnarcCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const confidence  = log.metadata?.confidence  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="XDSOV:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">CROSS-DIM ACTIVE</span>
+                </div>
+                {fgnarcCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FGNARC 14D</span>
+                    <span className="tabular-nums opacity-60">{fgnarcCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEM 7D</span>
+                    <span className="tabular-nums opacity-60">{memoryCount}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">GENESIS FIELD</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'perpetual_genesis_field') {
+          const fgnarcCount = log.metadata?.fgnarcCount as number | undefined
+          const xdsovCount  = log.metadata?.xdsovCount  as number | undefined
+          const confidence  = log.metadata?.confidence  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="PGFIELD:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">PERPETUAL FIELD</span>
+                </div>
+                {fgnarcCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FGNARC 21D</span>
+                    <span className="tabular-nums opacity-60">{fgnarcCount}</span>
+                  </div>
+                )}
+                {xdsovCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">XDSOV 21D</span>
+                    <span className="tabular-nums opacity-60">{xdsovCount}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">GENESIS PERPETUAL</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
