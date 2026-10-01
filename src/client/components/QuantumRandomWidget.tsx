@@ -37,6 +37,8 @@ function useQuantumNumber() {
 
   React.useEffect(() => {
     const iv = setInterval(() => {
+      // Pause off-tab: no re-render, no signal emission while hidden
+      if (document.hidden) return
       setRemaining((prev) => {
         if (prev <= 1) {
           const next = quantumRandom(0, 99)
@@ -63,6 +65,7 @@ export function QuantumRandomWidget() {
 
   React.useEffect(() => {
     const iv = setInterval(() => {
+      if (document.hidden) return
       setShowPair(Math.random() < 0.5)
     }, 10000)
     return () => clearInterval(iv)

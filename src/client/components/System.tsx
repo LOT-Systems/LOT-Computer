@@ -613,8 +613,12 @@ export const System = React.memo(function SystemInner() {
       </div>
 
       <div>
-        <TimeWidget />
-        <QuantumRandomWidget />
+        <WidgetErrorBoundary name="Time">
+          <TimeWidget />
+        </WidgetErrorBoundary>
+        <WidgetErrorBoundary name="QuantumRandom">
+          <QuantumRandomWidget />
+        </WidgetErrorBoundary>
         {!!weather && (
           <>
             <Block label="Sky:">{weather?.description || 'Unknown'}</Block>
