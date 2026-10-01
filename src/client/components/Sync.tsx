@@ -24,6 +24,9 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  useSendEmail,
+  useMarkEmailRead,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -93,6 +96,49 @@ export const Sync = React.memo(function SyncInner() {
     const combined = [...fresh, ...fetched].filter((m) => !isBlankMessage(m.message))
     return canAccessUserProfiles ? combined : combined.slice(0, SYNC_CHAT_MESSAGES_TO_SHOW)
   }, [fetchedMessages, sseMessages, canAccessUserProfiles])
+
+  // LOT® Email inbox
+  const emailDraftTo = useStore(stores.emailDraftTo)
+  const { data: emailData } = useEmails()
+  const { mutate: markEmailRead } = useMarkEmailRead({
+    onSuccess: () => queryClient.invalidateQueries(['/api/emails']),
+  })
+  const [openEmailId, setOpenEmailId] = React.useState<string | null>(null)
+  const [emailTo, setEmailTo] = React.useState('')
+  const [emailBody, setEmailBody] = React.useState('')
+  const [emailError, setEmailError] = React.useState<string | null>(null)
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: () => {
+      setEmailBody('')
+      setEmailError(null)
+      stores.emailDraftTo.set(null)
+      queryClient.invalidateQueries(['/api/emails'])
+    },
+    onError: (err: any) => setEmailError(err?.response?.data?.error || 'Not sent'),
+  })
+  React.useEffect(() => {
+    if (emailDraftTo) setEmailTo(emailDraftTo.name)
+  }, [emailDraftTo])
+  const onSubmitEmail = (ev: React.FormEvent) => {
+    ev.preventDefault()
+    if (!emailTo.trim() || !emailBody.trim()) return
+    sendEmail(
+      emailDraftTo && emailDraftTo.name === emailTo
+        ? { toUserId: emailDraftTo.id, body: emailBody }
+        : { to: emailTo.trim(), body: emailBody }
+    )
+  }
+  const inbox = React.useMemo(
+    () => (emailData?.emails || []).filter((m) => !m.isMine),
+    [emailData]
+  )
+
+  React.useEffect(() => {
+    const { dispose: disposeEmailListener } = sync.listen('lot_email', () => {
+      queryClient.invalidateQueries(['/api/emails'])
+    })
+    return () => disposeEmailListener()
+  }, [])
 
   React.useEffect(() => {
     const { dispose: disposeChatMessageListener } = sync.listen(
@@ -212,6 +258,73 @@ export const Sync = React.memo(function SyncInner() {
             </Button>
           </div>
         </form>
+      </div>
+
+      <div className="mb-80">
+        <div className="text-acc/40 mb-8 select-none">
+          MAIL{emailData?.unread ? ` · ${emailData.unread} NEW` : ''}
+        </div>
+        <form onSubmit={onSubmitEmail} className="flex items-center gap-x-8 mb-8">
+          <ResizibleGhostInput
+            direction="vh"
+            value={emailTo}
+            onChange={setEmailTo}
+            placeholder="To (name)"
+            containerClassName="w-[120px] leading-normal"
+            className="leading-normal"
+          />
+          <ResizibleGhostInput
+            direction="vh"
+            value={emailBody}
+            onChange={setEmailBody}
+            placeholder="Email… (or in Log: /email to NAME. message)"
+            containerClassName="flex-grow leading-normal"
+            className="leading-normal"
+          />
+          <Button type="submit" kind="secondary" size="small" disabled={!emailTo.trim() || !emailBody.trim()}>
+            Send
+          </Button>
+        </form>
+        {emailError && <div className="text-acc/40 mb-8">{emailError}</div>}
+        {inbox.length === 0 && <div className="text-acc/40">No mail.</div>}
+        {inbox.map((m) => {
+          const isOpen = openEmailId === m.id
+          return (
+            <div
+              key={m.id}
+              className="cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded"
+              onClick={() => {
+                setOpenEmailId(isOpen ? null : m.id)
+                if (!m.readAt) markEmailRead({ id: m.id })
+              }}
+            >
+              <div className={cn('flex items-start gap-x-8', m.readAt && 'text-acc/60')}>
+                <span className="whitespace-nowrap">{m.senderName}</span>
+                <span className="flex-1 truncate">{m.subject}</span>
+                {!m.readAt && <span className="text-acc/40 select-none">NEW</span>}
+                <span className="text-acc/40 whitespace-nowrap select-none">
+                  <MessageTimeLabel dateString={m.createdAt} isTimeFormat12h={isTimeFormat12h} />
+                </span>
+              </div>
+              {isOpen && (
+                <div className="whitespace-breakspaces mt-4 mb-4" style={{ wordBreak: 'break-word' }}>
+                  {m.body}
+                  <div className="mt-4">
+                    <GhostButton
+                      onClick={(ev: React.MouseEvent) => {
+                        ev.stopPropagation()
+                        setEmailTo(m.senderName)
+                        stores.emailDraftTo.set({ id: m.senderId, name: m.senderName })
+                      }}
+                    >
+                      Reply
+                    </GhostButton>
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
 
       <div>

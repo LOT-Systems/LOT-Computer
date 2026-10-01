@@ -269,6 +269,24 @@ export const CohortConnectWidget: React.FC = () => {
                       >
                         Send message
                       </Button>
+                      <Button
+                        size="small"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation()
+                          stores.emailDraftTo.set({
+                            id: match.user.id,
+                            name: `${match.user.firstName || ''} ${match.user.lastName || ''}`.trim(),
+                          })
+                          recordSignal('mood', 'cohort_email_initiated', {
+                            userId: match.user.id,
+                            similarity: match.similarity,
+                            hour: new Date().getHours()
+                          })
+                          stores.goTo('sync')
+                        }}
+                      >
+                        Email
+                      </Button>
                     </div>
                   </div>
                 )}

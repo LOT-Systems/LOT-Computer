@@ -200,6 +200,18 @@ export type DirectMessage = {
   updatedAt: Date;
 };
 
+// LOT Email Type
+export type LotEmail = {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  subject: string;
+  body: string;
+  readAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 // Chat Message Types
 export type ChatMessage = {
   id: string;
@@ -445,9 +457,20 @@ export type ChatMessageLikeEventPayload = {
   isLiked?: boolean;
 };
 
+export type LotEmailEventPayload = {
+  id: string;
+  senderId: string;
+  senderName: string;
+  receiverId: string;
+  subject: string;
+  body: string;
+  createdAt: Date | string;
+};
+
 // Sync Events
 export type SyncEvents = {
   chatMessage: PublicChatMessage;
   chatMessageLike: ChatMessageLikeEventPayload;
   settings_updated: Record<string, never>;
+  lot_email: LotEmailEventPayload;
 };

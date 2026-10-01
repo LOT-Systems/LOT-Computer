@@ -41,6 +41,7 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'email-compose'     // /email to NAME. body — Ctrl+Enter sends to recipient's Sync inbox
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -67,6 +68,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'email-compose',  emojis: [],        keywords: ['email', 'mail'] },
 ]
 
 /**
@@ -114,4 +116,23 @@ export function detectNewTriggers(
   const fresh: LogTrigger[] = []
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
+}
+
+/**
+ * Parses `/email to NAME. body` (also `/mail`, and `,` `:` `;` or a space
+ * after the name). Returns null unless a recipient and a non-empty body
+ * are both present. Text before the command is used as the body when
+ * nothing follows it.
+ */
+export function parseEmailCommand(
+  text: string
+): { to: string; body: string } | null {
+  if (!text) return null
+  const m = /(^|\s)\/(?:email|mail)\s+to\s+([^\s.,:;!?]+(?:\s+[A-Z][^\s.,:;!?]*)?)\s*[.,:;!?]?\s*([\s\S]*)$/i.exec(text)
+  if (!m) return null
+  const before = text.slice(0, m.index).trim()
+  const body = (m[3] || '').trim() || before
+  const to = m[2].trim()
+  if (!to || !body) return null
+  return { to, body }
 }

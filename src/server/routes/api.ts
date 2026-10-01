@@ -380,6 +380,13 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'lot_email': {
+          // Private: deliver only to the addressee
+          if (data.receiverId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4082,6 +4089,164 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — composed in Log (`/email to NAME. body`), delivered to Sync
+  // ============================================================================
+
+  const EMAIL_MAX_BODY = 4000
+  const EMAIL_MAX_PER_HOUR = 20
+  const emailSendTimes = new Map<string, number[]>()
+
+  const isSuspendedUser = (u: { tags?: string[] | null }) =>
+    !!u.tags?.some((t) => t.toLowerCase() === 'suspended')
+
+  // Inbox (received) + sent, newest first
+  fastify.get('/emails', async (req: FastifyRequest, reply) => {
+    try {
+      const rows = await fastify.models.LotEmail.findAll({
+        where: {
+          [Op.or]: [{ receiverId: req.user.id }, { senderId: req.user.id }],
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 100,
+      })
+      const ids = Array.from(new Set(rows.flatMap((m) => [m.senderId, m.receiverId])))
+      const users = await fastify.models.User.findAll({
+        where: { id: ids },
+        attributes: ['id', 'firstName', 'lastName'],
+      })
+      const nameOf = new Map(
+        users.map((u) => [u.id, `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown'])
+      )
+      const emails = rows.map((m) => ({
+        id: m.id,
+        senderId: m.senderId,
+        receiverId: m.receiverId,
+        senderName: nameOf.get(m.senderId) || 'Unknown',
+        receiverName: nameOf.get(m.receiverId) || 'Unknown',
+        subject: m.subject,
+        body: m.body,
+        readAt: m.readAt,
+        createdAt: m.createdAt,
+        isMine: m.senderId === req.user.id,
+      }))
+      return reply.send({
+        emails,
+        unread: emails.filter((m) => !m.isMine && !m.readAt).length,
+      })
+    } catch (error) {
+      console.error('Error fetching emails:', error)
+      return reply.status(500).send({ error: 'Failed to fetch emails' })
+    }
+  })
+
+  // Send. `to` is a first name, "First Last", or a user id.
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { to?: string; toUserId?: string; body?: string; subject?: string }
+  }>, reply) => {
+    try {
+      const body = (req.body?.body || '').trim().slice(0, EMAIL_MAX_BODY)
+      const to = (req.body?.to || '').trim()
+      const toUserId = req.body?.toUserId
+      if ((!to && !toUserId) || !body) {
+        return reply.status(400).send({ error: 'Recipient and message are required' })
+      }
+      if (isSuspendedUser(req.user)) {
+        return reply.status(403).send({ error: 'Account suspended' })
+      }
+
+      const now = Date.now()
+      const recent = (emailSendTimes.get(req.user.id) || []).filter((t) => now - t < 3600e3)
+      if (recent.length >= EMAIL_MAX_PER_HOUR) {
+        return reply.status(429).send({ error: 'Email limit reached. Try again later.' })
+      }
+
+      // Resolve recipient
+      let receiver: any = null
+      if (toUserId) {
+        receiver = await fastify.models.User.findByPk(toUserId)
+      } else {
+        const needle = to.toLowerCase()
+        const candidates = await fastify.models.User.findAll({
+          where: {
+            id: { [Op.not]: req.user.id },
+            [Op.or]: [
+              Sequelize.where(Sequelize.fn('lower', Sequelize.col('firstName')), needle),
+              Sequelize.where(
+                Sequelize.fn('lower', Sequelize.literal(`CONCAT("firstName", ' ', "lastName")`)),
+                needle
+              ),
+            ],
+          },
+          attributes: ['id', 'firstName', 'lastName', 'city', 'tags'],
+          limit: 10,
+        })
+        const active = candidates.filter((u) => !isSuspendedUser(u))
+        if (active.length > 1) {
+          return reply.status(409).send({
+            error: `Several members named "${to}". Use full name.`,
+            candidates: active.map((u) => ({
+              id: u.id,
+              name: `${u.firstName || ''} ${u.lastName || ''}`.trim(),
+              city: u.city,
+            })),
+          })
+        }
+        receiver = active[0] || null
+      }
+      if (!receiver || receiver.id === req.user.id || isSuspendedUser(receiver)) {
+        return reply.status(404).send({ error: `No member found: ${to || toUserId}` })
+      }
+
+      const subject = (req.body?.subject || body.split('\n')[0]).trim().slice(0, 120)
+      const email = await fastify.models.LotEmail.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        subject,
+        body,
+      })
+      recent.push(now)
+      emailSendTimes.set(req.user.id, recent)
+
+      const senderName = `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim() || 'Unknown'
+      sync.emit('lot_email', {
+        id: email.id,
+        senderId: req.user.id,
+        senderName,
+        receiverId: receiver.id,
+        subject,
+        body,
+        createdAt: email.createdAt,
+      })
+
+      return reply.send({
+        id: email.id,
+        to: `${receiver.firstName || ''} ${receiver.lastName || ''}`.trim(),
+        subject,
+        createdAt: email.createdAt,
+      })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  // Mark one received email as read
+  fastify.post('/emails/:id/read', async (req: FastifyRequest<{
+    Params: { id: string }
+  }>, reply) => {
+    try {
+      await fastify.models.LotEmail.update(
+        { readAt: new Date() },
+        { where: { id: req.params.id, receiverId: req.user.id, readAt: null } }
+      )
+      return reply.send({ ok: true })
+    } catch (error) {
+      console.error('Error marking email read:', error)
+      return reply.status(500).send({ error: 'Failed to mark read' })
     }
   })
 
