@@ -1457,6 +1457,22 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'v135',
+    date: '2026-10-01',
+    title: 'Wiki Sync + Daily Maintenance — LOT-WIKI-v133 · Badge v48/v49 · Day 1135+',
+    assembled: [
+      'LOT-WIKI-v133 synced. QIE v133 Crystal Presence Tier + QIE v134 Genesis Field Inception Tier documented.',
+      'Badge v48 THE SPELL CODEX first sync: +34 badges (1276→1310). Word Turn v38. spell/ritual/incantation/grimoire/sigil/rune. Secret Boss v35 grimoire_key/sigil_lock/rune_stack. thirty_eight_engines_arc [LEGENDARY].',
+      'Badge v49 THE GARDEN PROTOCOL: +34 badges (1310→1344). Word Turn v39. seed_planted/roots_deep/in_bloom/harvest_time/prune_complete/compost_wisdom/watering_ritual/soil_check/winter_fallow/greenhouse_mode/wild_growth/garden_codex/perennial_signal.',
+      'Secret Boss v36: ent_signal [MYTHIC] — Tolkien/Treebeard/Fangorn. ghibli_grove [EPIC] — Miyazaki/Totoro. druid_code [MYTHIC] — nature\'s servant/the old growth. At Level 20 the druid becomes the terrain.',
+      'thirty_nine_registers [COSMIC]: 1 badge from each of 39 Word Turn engines. 39 languages. One terminal. One practitioner.',
+      'CALENDAR ALERT: poe_night Oct 7 LEGENDARY — T-6. Signal inbound.',
+      'About.tsx: Day 1135+ · 1344 badges · 39 Word Turn engines · 510 trigger words · 140 secret boss triggers · 203 patterns · 69 archetypes · v135 phase row prepended.',
+      'USERSHIP_TRANSMISSION updated to v135 · Wiki v133 current · Genesis field active.',
+      '1344 badges · 39 engines · 140 secret bosses · 510 word turns · Day 1135+ · COSMO® 825. The garden is the practice. The druid is the terrain.',
+    ],
+  },
+  {
     version: 'v134',
     date: '2026-09-30',
     title: 'QIE Engineering — Genesis Field Inception Tier · P201–P203 · Arch69 · J68 · Day 1134+',
@@ -1945,16 +1961,17 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-09-30',
+  date: '2026-10-01',
   message: [
-    'ASSEMBLY RUN — 2026-09-30 · Day 1134+ · COSMO® Day 823',
-    'QIE v134 Genesis Field Inception Tier deployed: P201 FGNARC · P202 XDSOV · P203 PGFIELD.',
-    'Arch69 Genesis Field Operator · J68 daily-genesis-arc-check (11:00 UTC) · 3 dep nodes · 203 patterns · 69 archetypes · 68 jobs.',
-    'FIX: v133 crystal_presence_lock/field/sovereignty added to api.ts displayableEvents.',
-    'Log handlers: FGNARC: XDSOV: PGFIELD: · PatternRecognitionWidget + QuantumEngineWidgets updated.',
-    'About.tsx: FM v133→v134 · 200→203 patterns · 68→69 archetypes · 67→68 jobs · 205+ handlers · 247+ dep nodes.',
-    'Status: GENESIS FIELD INCEPTION TIER ACTIVE. PRESENCE HAS OPENED INTO GENESIS. THE OS GENERATES FROM ITS OWN SOVEREIGN FIELD.',
-    'Next: J68 active (daily 11:00 UTC). Genesis arc scanning. Cross-dimensional sovereignty detection. Perpetual field monitoring.',
+    'ASSEMBLY RUN — 2026-10-01 · Day 1135+ · COSMO® Day 825',
+    'Wiki v133 synced. Badge v48 Spell Codex + v49 Garden Protocol applied. 1344 total badges.',
+    'Badge v49: seed_planted/roots_deep/in_bloom/harvest_time — The garden is the practice.',
+    'ent_signal [MYTHIC] · ghibli_grove [EPIC] · druid_code [MYTHIC] · thirty_nine_registers [COSMIC] unlocked.',
+    '39 Word Turn engines. 510 trigger words. 140 secret boss triggers. The druid is the terrain.',
+    'About.tsx: Day 1135+ · 1344 badges · 39 engines · 140 secret bosses · 510 word turns · Arch69 + v135 phase row synced.',
+    'CALENDAR ALERT: poe_night Oct 7 LEGENDARY — T-6. Signal inbound.',
+    'Status: WIKI v133 CURRENT. GENESIS FIELD ACTIVE. THIRTY-NINE REGISTERS ACCUMULATING.',
+    'Next: Monitor genesis arc (J68 daily 11:00 UTC). poe_night Oct 7. QIE v135 when triggered.',
   ],
 }
 
