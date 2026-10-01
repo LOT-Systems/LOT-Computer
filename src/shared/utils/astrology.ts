@@ -80,15 +80,16 @@ export function getHourlyZodiac(date: Date): string {
  * Simplified calculation based on Gregorian calendar
  */
 export function getRokuyo(date: Date): string {
-  // Known starting point: January 1, 2000 was Sensho (index 0)
-  const knownDate = new Date('2000-01-01')
-  const knownRokuyoIndex = 0
+  // Known starting point: January 1, 2000 was Sensho (index 0).
+  // Day count uses the date's *local calendar day* (not elapsed UTC time),
+  // so the value flips at the viewer's midnight and agrees between the
+  // client dashboard and the server-side Logs snapshot.
+  const knownDay = Date.UTC(2000, 0, 1)
+  const thisDay = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  const daysDiff = Math.round((thisDay - knownDay) / 86400000)
 
-  // Calculate days since known date
-  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
-
-  // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
+  // Positive modulo so dates before 2000 stay in range
+  const rokuyoIndex = ((daysDiff % 6) + 6) % 6
 
   return ROKUYO[rokuyoIndex]
 }
@@ -176,4 +177,51 @@ export function getMoonEmoji(phaseName: string): string {
     'Waning Crescent': '🌘',
   }
   return emojiMap[phaseName] || '🌑'
+}
+
+export interface AstrologyReading {
+  hourlyZodiac: string
+  westernZodiac: string
+  moonPhase: string
+  moonIllumination: number
+  rokuyo: string
+  /** Taian (大安) days — flag other widgets can key off */
+  auspicious: boolean
+}
+
+/**
+ * Full ambient reading for a moment. Single source of truth shared by the
+ * dashboard, the QIE signal and the Logs snapshot so they cannot drift.
+ */
+export function getAstrologyReading(date: Date): AstrologyReading {
+  const moon = getMoonPhase(date)
+  const rokuyo = getRokuyo(date)
+  return {
+    hourlyZodiac: getHourlyZodiac(date),
+    westernZodiac: getWesternZodiac(date),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    rokuyo,
+    auspicious: rokuyo === 'Taian',
+  }
+}
+
+/**
+ * Wall-clock Date for an IANA timeZone — the plain Date constructor round-trips
+ * through the getHours()/getDate() readers above regardless of runtime zone.
+ * Falls back to the given date on an invalid/missing timeZone.
+ */
+export function toTimeZoneWallClock(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(date)
+    const n = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(n('year'), n('month') - 1, n('day'), n('hour'), n('minute'), n('second'))
+  } catch {
+    return date
+  }
 }
