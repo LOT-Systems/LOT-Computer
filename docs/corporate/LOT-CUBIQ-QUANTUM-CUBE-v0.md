@@ -321,6 +321,26 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE EVENING PARK                            2026-10-01
+  ─────────────────────────────────────────────────────────────────
+  (Full treatment, derived requirements and acceptance criteria:
+  LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md, Section 07.)
+
+  Operator profile: Usership tier, parent of a young child, works at a
+  shared kitchen table. Evening Coherence Close (EVE) is part of the
+  routine. A toddler and a dog share the space.
+
+  At the EVE time the cube performs THE SETTLE — two seconds of light
+  standing pressure, no light, no sound. The day is closing. If ignored,
+  nothing repeats; the next signal waits until the Morning Coherence
+  Launch. The cube refuses to move when a hand is on it or the table is
+  bumped. In later tiers (v.2) it performs RETURN-TO-PAD and sleeps
+  centered on its charger.
+
+  Requirements this adds: quiet hours and rate limits (v.0), capacitive
+  freeze and shock-abort safety gates (v.0), "off duty vs broken"
+  indication (v.0), RETURN-TO-PAD (v.2 scope).
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
