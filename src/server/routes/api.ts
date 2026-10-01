@@ -18,6 +18,7 @@ import {
 } from '#shared/types'
 import config from '#server/config'
 import { fp } from '#shared/utils'
+import { compressLogs, periodWindow, renderDigestBlock, renderDigestStory, STORY_PERIODS, type StoryPeriod } from '#shared/utils/story-compression'
 import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
@@ -5457,6 +5458,8 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
             scripture: cleaned,
             reference,
             logText: (logText || '').substring(0, 500),
+            period,
+            digest,
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5490,6 +5493,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,30 +5518,41 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period: StoryPeriod = STORY_PERIODS.includes(req.body.period as StoryPeriod)
+        ? (req.body.period as StoryPeriod)
+        : 'week'
 
+      // Log tab entries are stored as event 'note'. Fetch the current window
+      // plus the equally long window before it (spike / drop detection).
+      const now = new Date()
+      const win = periodWindow(period, now)
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: win.prevStart },
+          event: { [Op.in]: ['note', 'log_entry', 'journal', 'emotional_checkin', 'energy_checkin', 'self_care_checkin'] },
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 2000,
       })
-
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
+      // Streak / rank need lifetime activity, not just the window.
+      const lifetime = await fastify.models.Log.findAll({
+        where: { userId: req.user.id, event: 'note', text: { [Op.ne]: '' } },
+        attributes: ['createdAt', 'event', 'text'],
+        order: [['createdAt', 'DESC']],
+        limit: 5000,
+      })
+      const digest = compressLogs(
+        [...logs, ...lifetime.filter(l => l.createdAt < win.prevStart)].map(l => ({
+          event: l.event,
+          text: l.text,
+          createdAt: l.createdAt,
+          metadata: l.metadata as Record<string, any> | null,
+          context: l.context as Record<string, any> | null,
+        })),
+        period,
+        now
+      )
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
@@ -5547,33 +5562,27 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const wordCap = { day: 80, week: 150, month: 200, year: 260 }[period]
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed /story. Your task: compress the window below (${digest.label}) into 1-2 paragraphs (under ${wordCap} words). The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
+- Use ONLY the facts in the DIGEST below. Never invent events, people, or numbers.
+- Name the high peak and the low peak when present; name a spike or drop in activity when the trend says so
+- If entries are few or absent, say so plainly and with compassion — do not pad
+- The tone should match the operator's state: reflective if low, energized if high
 - End with a single forward-looking sentence — not a pep talk, just a quiet truth
-- Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Return ONLY the story paragraphs. No title. No commentary. No preamble.`
 
       const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+OPERATOR NOTE: "${(logText || '(none)').substring(0, 300)}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
+DIGEST:
+${renderDigestBlock(digest)}`
 
       const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
 
@@ -5596,6 +5605,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            period,
+            digest,
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5607,8 +5618,9 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
+        // Vendor down: the deterministic compression is still a real story.
         return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
+          story: renderDigestStory(digest),
           logId: null,
         }
       }

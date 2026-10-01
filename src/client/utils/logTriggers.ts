@@ -115,3 +115,70 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+// ---------------------------------------------------------------------------
+// Command catalog — single source of truth for /system
+// ---------------------------------------------------------------------------
+
+export interface LogCommand {
+  command: string // as typed, e.g. '/story [day|week|month|year]'
+  description: string
+  category: 'MEMORY' | 'STATE' | 'RITUAL' | 'SYSTEM'
+  trigger: LogTrigger
+}
+
+export const LOG_COMMANDS: LogCommand[] = [
+  { command: '/story [day|week|month|year]', description: 'Compressed story of your window (default: week)', category: 'MEMORY', trigger: 'story-mode' },
+  { command: '/qi [query]',   description: 'Ask the Quantum Intelligence engine', category: 'MEMORY', trigger: 'qi-rfi' },
+  { command: '/how',          description: 'Open LOT AI check-in (System tab)',   category: 'MEMORY', trigger: 'how-checkin' },
+  { command: '/scan',         description: 'System status overview',              category: 'STATE',  trigger: 'ai-scan' },
+  { command: '/qos',          description: 'Quantum OS state analysis',           category: 'STATE',  trigger: 'qos-report' },
+  { command: '/phys',         description: 'Physiological cohort report',         category: 'STATE',  trigger: 'phys-report' },
+  { command: '/assembly',     description: 'Self-assembly module status',         category: 'STATE',  trigger: 'assembly-check' },
+  { command: '/silent',       description: 'Signal silence check',                category: 'STATE',  trigger: 'silent-mode' },
+  { command: '/prayer',       description: 'Generate contextual scripture',       category: 'RITUAL', trigger: 'prayer-mode' },
+  { command: '/breathe',      description: '4-2-6 breathing exercise',            category: 'RITUAL', trigger: 'breathe' },
+  { command: '/freeze',       description: 'Pause and reflect protocol',          category: 'RITUAL', trigger: 'freeze-widgets' },
+  { command: '/fast',         description: 'Orthodox fasting calendar',           category: 'RITUAL', trigger: 'force-fast' },
+  { command: '/synth',        description: 'Toggle keyboard sound',               category: 'SYSTEM', trigger: 'toggle-synth' },
+  { command: '/radio',        description: 'Toggle radio',                        category: 'SYSTEM', trigger: 'radio-toggle' },
+  { command: '/night',        description: 'Dark mode',                           category: 'SYSTEM', trigger: 'night-mode' },
+  { command: '/system',       description: 'This help screen',                    category: 'SYSTEM', trigger: 'system-help' },
+]
+
+const CATEGORY_ORDER: LogCommand['category'][] = ['MEMORY', 'STATE', 'RITUAL', 'SYSTEM']
+
+/**
+ * Text for the /system panel. Lines starting with '/' are rendered as
+ * command rows (command, 2+ spaces, description); other non-empty lines
+ * are section headers — the format Logs.tsx already renders.
+ */
+export function buildSystemHelp(): string {
+  const lines: string[] = ['AVAILABLE COMMANDS']
+  for (const cat of CATEGORY_ORDER) {
+    lines.push('', cat)
+    for (const c of LOG_COMMANDS.filter(x => x.category === cat)) {
+      lines.push(`${c.command}  ${c.description}`)
+    }
+  }
+  lines.push('', 'SHORTCUTS', 'Ctrl+Enter    Save log immediately')
+  return lines.join('\n')
+}
+
+export type StoryPeriod = 'day' | 'week' | 'month' | 'year'
+
+/** Period argument of `/story [period]`; 'week' when absent or unknown. */
+export function parseStoryPeriod(text: string): StoryPeriod {
+  const m = /(^|\s)\/story\s+(day|today|week|month|year)\b/i.exec(text || '')
+  if (!m) return 'week'
+  const p = m[2].toLowerCase()
+  return (p === 'today' ? 'day' : p) as StoryPeriod
+}
+
+/** Log text with the /story command (and optional period) removed. */
+export function stripStoryCommand(text: string): string {
+  return (text || '')
+    .replace(/\/story(\s+(day|today|week|month|year)\b)?/i, '')
+    .replace(/📖/g, '')
+    .trim()
+}
