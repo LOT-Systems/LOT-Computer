@@ -166,6 +166,10 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'field-genesis-arc':                'FGNARC',
   'cross-dimensional-sovereign':      'XDSOV',
   'perpetual-genesis-field':          'PGFIELD',
+  // v135: garden sovereignty tier
+  'garden-signal-lock':               'GARDEN',
+  'druid-terrain-convergence':        'DRUID',
+  'genesis-garden-sovereignty':       'GENSOV',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

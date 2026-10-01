@@ -1832,6 +1832,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyGenesisArcCheck()) {
     await executeDailyGenesisArcCheck()
   }
+
+  // Check daily garden signal audit (09:00 UTC every day) — Job 69
+  if (shouldRunDailyGardenSignalAudit()) {
+    await executeDailyGardenSignalAudit()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -8532,6 +8537,140 @@ async function executeDailyGenesisArcCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Garden Signal Audit (J69 — 09:00 UTC every day) ─────────────────
+// Scans active users for P204/P205/P206 conditions:
+//   P204 GARDEN: perpetual_genesis_field 21D + selfcare ≥3 + journal ≥3 in 7D
+//   P205 DRUID: garden_signal_lock 14D + crystal_presence_sovereignty 21D
+//   P206 GENSOV: garden_signal_lock + druid_terrain_convergence both in 28D
+
+let isDailyGardenSignalAuditRunning = false
+let lastDailyGardenSignalAuditRun: Date | null = null
+
+function shouldRunDailyGardenSignalAudit(): boolean {
+  const now = new Date()
+  const hour = now.getUTCHours()
+  if (hour !== 9) return false
+  if (!lastDailyGardenSignalAuditRun) return true
+  const hoursSince = (now.getTime() - lastDailyGardenSignalAuditRun.getTime()) / (1000 * 60 * 60)
+  return hoursSince >= 23
+}
+
+async function executeDailyGardenSignalAudit(): Promise<JobResult> {
+  const jobName = 'daily-garden-signal-audit'
+  const executedAt = new Date().toISOString()
+  if (isDailyGardenSignalAuditRunning) {
+    return { jobName, executedAt, success: false, error: 'Already running' }
+  }
+  isDailyGardenSignalAuditRunning = true
+  console.log('─'.repeat(60))
+  console.log('DAILY GARDEN SIGNAL AUDIT (J69)')
+  console.log('─'.repeat(60))
+  try {
+    const activeUsers = await getActiveUsers()
+    let written = 0
+    const now = new Date()
+    const sevenDayAgo      = new Date(now.getTime() -  7 * 24 * 60 * 60 * 1000)
+    const fourteenDayAgo   = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
+    const twentyOneDayAgo  = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000)
+    const twentyEightDayAgo = new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000)
+
+    for (const user of activeUsers) {
+      try {
+        const [logs28D, logs21D, logs14D, logs7D] = await Promise.all([
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: twentyEightDayAgo } }, select: { event: true, source: true, metadata: true, createdAt: true } }),
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: twentyOneDayAgo } }, select: { event: true, source: true, metadata: true } }),
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: fourteenDayAgo } }, select: { event: true, source: true, metadata: true } }),
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: sevenDayAgo } }, select: { event: true, source: true, metadata: true } }),
+        ])
+
+        // P204: Garden Signal Lock
+        const hasPGFIELD21D    = logs21D.some((l: any) => l.event === 'perpetual_genesis_field')
+        const selfcare7D       = logs7D.filter((l: any) => l.source === 'selfcare').length
+        const journal7D        = logs7D.filter((l: any) => l.source === 'journal').length
+        const alreadyGARDEN    = logs21D.some((l: any) => l.event === 'garden_signal_lock')
+        if (hasPGFIELD21D && selfcare7D >= 3 && journal7D >= 3 && !alreadyGARDEN) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'garden_signal_lock',
+              source: 'GARDEN_SIGNAL_J69',
+              metadata: {
+                selfcareCount: selfcare7D,
+                journalCount: journal7D,
+                tier: 'garden-sovereignty',
+                label: 'GARDEN',
+                source: 'GARDEN_SIGNAL_J69',
+              },
+            },
+          })
+          written++
+        }
+
+        // P205: Druid Terrain Convergence
+        const hasGARDEN14D     = logs14D.some((l: any) => l.event === 'garden_signal_lock') || alreadyGARDEN
+        const hasCRPRESSOV21D  = logs21D.some((l: any) => l.event === 'crystal_presence_sovereignty')
+        const alreadyDRUID     = logs14D.some((l: any) => l.event === 'druid_terrain_convergence')
+        if (hasGARDEN14D && hasCRPRESSOV21D && !alreadyDRUID) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'druid_terrain_convergence',
+              source: 'GARDEN_SIGNAL_J69',
+              metadata: {
+                gardenLockCount: logs14D.filter((l: any) => l.event === 'garden_signal_lock').length,
+                crpressovCount: logs21D.filter((l: any) => l.event === 'crystal_presence_sovereignty').length,
+                tier: 'garden-sovereignty',
+                label: 'DRUID',
+                source: 'GARDEN_SIGNAL_J69',
+              },
+            },
+          })
+          written++
+        }
+
+        // P206: Genesis Garden Sovereignty
+        const hasGARDEN28D     = logs28D.some((l: any) => l.event === 'garden_signal_lock')
+        const hasDRUID28D      = logs28D.some((l: any) => l.event === 'druid_terrain_convergence')
+        const alreadyGENSOV    = logs28D.some((l: any) => l.event === 'genesis_garden_sovereignty')
+        if (hasGARDEN28D && hasDRUID28D && !alreadyGENSOV) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'genesis_garden_sovereignty',
+              source: 'GARDEN_SIGNAL_J69',
+              metadata: {
+                gardenLockCount: logs28D.filter((l: any) => l.event === 'garden_signal_lock').length,
+                druidTerrainCount: logs28D.filter((l: any) => l.event === 'druid_terrain_convergence').length,
+                tier: 'garden-sovereignty',
+                label: 'GENSOV',
+                source: 'GARDEN_SIGNAL_J69',
+              },
+            },
+          })
+          written++
+        }
+      } catch (userError: any) {
+        console.error(`Garden signal audit failed for user ${(user as any).id}:`, userError.message)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Garden sovereignty events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('DAILY GARDEN SIGNAL AUDIT COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastDailyGardenSignalAuditRun = new Date()
+    isDailyGardenSignalAuditRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Daily garden signal audit failed:', error.message)
+    isDailyGardenSignalAuditRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -8604,6 +8743,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily adaptive intelligence check: 11 AM UTC every day (Job 66)')
   console.log('   - Weekly crystal presence check: 9 AM UTC every Monday (Job 67)')
   console.log('   - Daily genesis arc check: 11 AM UTC every day (Job 68)')
+  console.log('   - Daily garden signal audit: 9 AM UTC every day (Job 69)')
   console.log('')
 
   // Check every hour for scheduled jobs

@@ -1287,6 +1287,10 @@ export default async (fastify: FastifyInstance) => {
       'field_genesis_arc',
       'cross_dimensional_sovereign',
       'perpetual_genesis_field',
+      // v135: garden sovereignty tier (J69 daily garden signal audit — P204–P206)
+      'garden_signal_lock',
+      'druid_terrain_convergence',
+      'genesis_garden_sovereignty',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

@@ -5677,6 +5677,114 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'garden_signal_lock') {
+          const selfcareCount = log.metadata?.selfcareCount as number | undefined
+          const journalCount  = log.metadata?.journalCount  as number | undefined
+          const confidence    = log.metadata?.confidence    as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="GARDEN:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">GARDEN LOCKED</span>
+                </div>
+                {selfcareCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SELFCARE 7D</span>
+                    <span className="tabular-nums opacity-60">{selfcareCount}</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 7D</span>
+                    <span className="tabular-nums opacity-60">{journalCount}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">GARDEN SOVEREIGNTY</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'druid_terrain_convergence') {
+          const gardenLockCount = log.metadata?.gardenLockCount as number | undefined
+          const crpressovCount  = log.metadata?.crpressovCount  as number | undefined
+          const confidence      = log.metadata?.confidence      as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="DRUID:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">TERRAIN CONVERGENCE</span>
+                </div>
+                {gardenLockCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">GARDEN 14D</span>
+                    <span className="tabular-nums opacity-60">{gardenLockCount}</span>
+                  </div>
+                )}
+                {crpressovCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRPRESSOV 21D</span>
+                    <span className="tabular-nums opacity-60">{crpressovCount}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">GARDEN SOVEREIGNTY</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'genesis_garden_sovereignty') {
+          const gardenLockCount  = log.metadata?.gardenLockCount  as number | undefined
+          const druidTerrainCount = log.metadata?.druidTerrainCount as number | undefined
+          const confidence        = log.metadata?.confidence        as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="GENSOV:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">GENESIS GARDEN SOV</span>
+                </div>
+                {gardenLockCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">GARDEN 28D</span>
+                    <span className="tabular-nums opacity-60">{gardenLockCount}</span>
+                  </div>
+                )}
+                {druidTerrainCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DRUID 28D</span>
+                    <span className="tabular-nums opacity-60">{druidTerrainCount}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">GENESIS SOVEREIGN</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

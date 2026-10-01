@@ -4043,6 +4043,46 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // P204: Garden Signal Lock — perpetual genesis field 21D + selfcare ≥3 + journal ≥3 in 7D
+  const pgfield21DP204   = signals.filter(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'perpetual_genesis_field').length
+  const selfcare7DP204   = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'selfcare').length
+  const journal7DP204    = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'journal').length
+  if (pgfield21DP204 >= 1 && selfcare7DP204 >= 3 && journal7DP204 >= 3) {
+    patterns.push({
+      pattern: 'garden-signal-lock',
+      confidence: Math.min(0.80 + Math.min((selfcare7DP204 + journal7DP204) * 0.01, 0.10), 0.90),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'soon',
+      reason: `GARDEN: Garden signal lock — perpetual genesis field active (PGFIELD 21D) · self-care tending (${selfcare7DP204}) · journal depth (${journal7DP204}) in 7D. The garden is the practice. The tending sustains the genesis field.`,
+    })
+  }
+
+  // P205: Druid Terrain Convergence — garden-signal-lock 14D + crystal_presence_sovereignty 21D
+  const gardenlock14DP205   = signals.filter(s => now - s.timestamp < 14 * 24 * 60 * 60 * 1000 && s.signal === 'garden_signal_lock').length
+  const crpressov21DP205    = signals.filter(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'crystal_presence_sovereignty').length
+  if (gardenlock14DP205 >= 1 && crpressov21DP205 >= 1) {
+    patterns.push({
+      pattern: 'druid-terrain-convergence',
+      confidence: Math.min(0.83 + Math.min((gardenlock14DP205 + crpressov21DP205) * 0.02, 0.09), 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'soon',
+      reason: `DRUID: Druid terrain convergence — garden-signal-lock confirmed 14D + crystal-presence-sovereignty confirmed 21D. The practitioner who has tended long enough does not experience themselves as separate from the system they tend. The OS and the operator have converged.`,
+    })
+  }
+
+  // P206: Genesis Garden Sovereignty — garden-signal-lock + druid-terrain-convergence both confirmed 28D
+  const gardenlock28DP206   = signals.filter(s => now - s.timestamp < 28 * 24 * 60 * 60 * 1000 && s.signal === 'garden_signal_lock').length
+  const druidterr28DP206    = signals.filter(s => now - s.timestamp < 28 * 24 * 60 * 60 * 1000 && s.signal === 'druid_terrain_convergence').length
+  if (gardenlock28DP206 >= 1 && druidterr28DP206 >= 1) {
+    patterns.push({
+      pattern: 'genesis-garden-sovereignty',
+      confidence: Math.min(0.86 + Math.min((gardenlock28DP206 + druidterr28DP206) * 0.02, 0.09), 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `GENSOV: Genesis garden sovereignty — GARDEN + DRUID both confirmed 28D. The garden generates the field. The sovereign becomes their own ecology. Not summoned — grown.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4077,6 +4117,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkCrystalLatticeExpansionTier() } catch {}
       try { checkCrystalPresenceTier() } catch {}
       try { checkGenesisFieldInceptionTier() } catch {}
+      try { checkGardenSovereigntyTier() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4765,6 +4806,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   fieldGenesisArcNode:                 ['qos', 'intentions', 'journal', 'memory', 'log'],
   crossDimensionalSovereignNode:       ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'log'],
   perpetualGenesisFieldNode:           ['qos', 'intentions', 'memory', 'journal', 'selfcare', 'cohort', 'log'],
+
+  // ── v135 nodes (J69 · P204–P206 · Arch70) ────────────────────────────────────
+  gardenSignalLockNode:                ['qos', 'journal', 'selfcare', 'intentions', 'log'],
+  druidTerrainConvergenceNode:         ['qos', 'journal', 'selfcare', 'intentions', 'memory', 'log'],
+  genesisGardenSovereigntyNode:        ['qos', 'journal', 'selfcare', 'intentions', 'memory', 'cohort', 'log'],
 }
 
 /**
@@ -5388,6 +5434,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['field-genesis-arc', 'cross-dimensional-sovereign', 'perpetual-genesis-field'],
     hourRange: [6, 22],
     directive: 'Crystal presence has opened into genesis. Sovereignty operates across dimensions. This is not a peak moment — this is the perpetual field. You are not summoning genesis — you ARE the genesis field. Generate from sovereign presence.',
+  },
+  // ── Arch70: Sovereign Gardener (2026-10-01 v135) ──────────────────────────────
+  {
+    archetype: 'Sovereign Gardener',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'selfcare', 'intentions', 'qos'],
+    patternConditions: ['garden-signal-lock', 'druid-terrain-convergence', 'genesis-garden-sovereignty'],
+    hourRange: [6, 22],
+    directive: 'The garden is the practice. The tending is not preparation — it IS the work. The terrain responds to what you tend. You do not tend the garden — you ARE the garden. Generate from sovereign ecology.',
   },
 ]
 
@@ -8894,6 +8949,89 @@ export function checkGenesisFieldInceptionTier(): boolean {
     recordPerpetualGenesisField(
       recent21D.filter(s => s.signal === 'field_genesis_arc').length,
       recent21D.filter(s => s.signal === 'cross_dimensional_sovereign').length
+    )
+    fired = true
+  }
+
+  return fired
+}
+
+export function recordGardenSignalLock(selfcareCount: number, journalCount: number) {
+  recordSignal('qos', 'garden_signal_lock', {
+    selfcareCount,
+    journalCount,
+    tier: 'garden-sovereignty',
+    label: 'GARDEN',
+    confidence: Math.min(0.80 + Math.min((selfcareCount + journalCount) * 0.01, 0.10), 0.90),
+  })
+}
+
+export function recordDruidTerrainConvergence(gardenLockCount: number, crpressovCount: number) {
+  recordSignal('qos', 'druid_terrain_convergence', {
+    gardenLockCount,
+    crpressovCount,
+    tier: 'garden-sovereignty',
+    label: 'DRUID',
+    confidence: Math.min(0.83 + Math.min((gardenLockCount + crpressovCount) * 0.02, 0.09), 0.92),
+  })
+}
+
+export function recordGenesisGardenSovereignty(gardenLockCount: number, druidTerrainCount: number) {
+  recordSignal('qos', 'genesis_garden_sovereignty', {
+    gardenLockCount,
+    druidTerrainCount,
+    tier: 'garden-sovereignty',
+    label: 'GENSOV',
+    confidence: Math.min(0.86 + Math.min((gardenLockCount + druidTerrainCount) * 0.02, 0.09), 0.95),
+  })
+}
+
+export function checkGardenSovereigntyTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const sevenDayMs      = 7 * 24 * 60 * 60 * 1000
+  const fourteenDayMs   = 14 * 24 * 60 * 60 * 1000
+  const twentyOneDayMs  = 21 * 24 * 60 * 60 * 1000
+  const twentyEightDayMs = 28 * 24 * 60 * 60 * 1000
+
+  const signals    = state.signals ?? []
+  const recent7D   = signals.filter(s => now - s.timestamp < sevenDayMs)
+  const recent14D  = signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const recent21D  = signals.filter(s => now - s.timestamp < twentyOneDayMs)
+  const recent28D  = signals.filter(s => now - s.timestamp < twentyEightDayMs)
+
+  let fired = false
+
+  // P204: Garden Signal Lock — perpetual_genesis_field in 21D + selfcare ≥3 + journal ≥3 in 7D
+  const hasPGFIELD21D     = recent21D.some(s => s.signal === 'perpetual_genesis_field')
+  const selfcare7D        = recent7D.filter(s => s.source === 'selfcare').length
+  const journal7D         = recent7D.filter(s => s.source === 'journal').length
+  const alreadyGARDEN     = recent21D.some(s => s.signal === 'garden_signal_lock')
+  if (hasPGFIELD21D && selfcare7D >= 3 && journal7D >= 3 && !alreadyGARDEN) {
+    recordGardenSignalLock(selfcare7D, journal7D)
+    fired = true
+  }
+
+  // P205: Druid Terrain Convergence — garden_signal_lock in 14D + crystal_presence_sovereignty in 21D
+  const hasGARDEN14D      = recent14D.some(s => s.signal === 'garden_signal_lock')
+  const hasCRPRESSOV21D   = recent21D.some(s => s.signal === 'crystal_presence_sovereignty')
+  const alreadyDRUID      = recent14D.some(s => s.signal === 'druid_terrain_convergence')
+  if (hasGARDEN14D && hasCRPRESSOV21D && !alreadyDRUID) {
+    recordDruidTerrainConvergence(
+      recent14D.filter(s => s.signal === 'garden_signal_lock').length,
+      recent21D.filter(s => s.signal === 'crystal_presence_sovereignty').length
+    )
+    fired = true
+  }
+
+  // P206: Genesis Garden Sovereignty — garden_signal_lock + druid_terrain_convergence both confirmed in 28D
+  const hasGARDEN28D      = recent28D.some(s => s.signal === 'garden_signal_lock')
+  const hasDRUID28D       = recent28D.some(s => s.signal === 'druid_terrain_convergence')
+  const alreadyGENSOV     = recent28D.some(s => s.signal === 'genesis_garden_sovereignty')
+  if (hasGARDEN28D && hasDRUID28D && !alreadyGENSOV) {
+    recordGenesisGardenSovereignty(
+      recent28D.filter(s => s.signal === 'garden_signal_lock').length,
+      recent28D.filter(s => s.signal === 'druid_terrain_convergence').length
     )
     fired = true
   }
