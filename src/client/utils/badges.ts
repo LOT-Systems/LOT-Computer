@@ -782,6 +782,43 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE ARCADE MASTER ────────────────────────────────────────
+  | 'token_spent'            // ○·$·○  "token"/"coins"/"quarter" detected
+  | 'high_score_set'         // ▲·▲·◉  "high score"/"personal record" detected
+  | 'extra_life_found'       // +·◉·+  "extra life"/"second wind"/"1up" detected
+  | 'joystick_mode'          // ↑·○·↑  "joystick"/"controller"/"take control" detected
+  | 'pixel_mode'             // □·□    "pixel"/"8-bit"/"16-bit"/"pixelated" detected
+  | 'continue_signal'        // ▶·◉    "continue"/"keep going"/"don't stop" detected
+  | 'perfect_run'            // ✦—✦    "perfect run"/"flawless"/"no damage" detected
+  | 'combo_activated'        // ×·×·◉  "combo"/"chain"/"multiplier" detected
+  | 'attract_loop'           // ≈→◉    "attract"/"attractor" detected
+  | 'checkpoint_hit'         // ─◉─    "checkpoint"/"waypoint" detected
+  | 'record_smashed'         // ◉→◉    "new record"/"personal best" detected
+  | 'game_face'              // ╔·◉·╗  "game face"/"game mode" detected
+  // ── Calendar Easter Eggs v21 — THE ARCADE CALENDAR ───────────────────────────
+  | 'tetris_day'             // ■·□    Jun 6 — Tetris created 1984 (Pajitnov)
+  | 'pong_signal'            // ○—○    Nov 29 — Pong released 1972
+  | 'pacman_birthday'        // ○·○·○  May 22 — Pac-Man released 1980
+  // ── Behavioral v20 — ARCADE PATTERNS ─────────────────────────────────────────
+  | 'speedrun_day'           // ▒▒▒▒▒  5+ check-ins in one calendar day
+  | 'insert_coin_return'     // ▶·∘    Return after 3–6 day gap (insert coin)
+  | 'dawn_protocol'          // ∴·∴·∴  5+ check-ins before 06:30 in any 7-day window
+  // ── Achievement RPG v21 — ARCADE CLASS ───────────────────────────────────────
+  | 'arcade_entry'           // ○·▶    Any 1 Word Turn v23 badge earned
+  | 'arcade_rank'            // ◉·▶·◉  Any 5 Word Turn v23 badges earned
+  | 'arcade_master'          // ╔·▶·╗  All 12 Word Turn v23 badges earned
+  | 'quarter_master'         // ○·$·∞  arcade_master + all 3 Calendar v21 badges
+  | 'twenty_three_engines_arc' // ◈·◈·●·◉ 1 badge from each Word Turn v1–v23
+  | 'pixel_opus'             // □·◉·□  arcade_master + speedrun_day behavioral
+  // ── Mastery Tier v23 — THE THOUSAND DAYS ─────────────────────────────────────
+  | 'thousand_days'          // ◉·∞    1,000+ distinct check-in days (LEGENDARY)
+  | 'novelist'               // ≋→∞    200,000+ total journal words (LEGENDARY)
+  | 'decade_approach'        // ∞·◉·∞  Account age >= 9 years (COSMIC)
+  | 'twenty_three_registers' // ◈·◈·●·◉·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE ARCADE VAULT ───────────────────────────────────────
+  | 'konami_code'            // ↑↑↓↓   Write "up up down down" in any entry (RARE)
+  | 'atari_signal'           // ○·A·○  Write "Atari"/"Pong" in any entry (RARE)
+  | 'pac_ghost'              // ○·○·○  Write "Pac-Man"/"pacman"/"Inky Blinky" in any entry (EPIC)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7168,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v23 — THE ARCADE MASTER ────────────────────────────────────────
+  token_spent: {
+    id: 'token_spent',
+    symbol: '○·$·○',
+    name: 'Token Spent',
+    description: 'Noticed "token", "coins", or "quarter" in your words',
+    unlockMessage: '↳ The arcade token is the smallest act of commitment. You put one in every time you show up. The machine runs on you. ○·$·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  high_score_set: {
+    id: 'high_score_set',
+    symbol: '▲·▲·◉',
+    name: 'High Score',
+    description: 'Noticed "high score" or "personal record" in your words',
+    unlockMessage: '↳ Every high score was once an impossible number. You set a new one today. ▲·▲·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  extra_life_found: {
+    id: 'extra_life_found',
+    symbol: '+·◉·+',
+    name: 'Extra Life',
+    description: 'Noticed "extra life", "second wind", or "1up" in your words',
+    unlockMessage: '↳ +1UP. The screen flashes, the music changes, and you have one more. Self-care is the coin that buys you another life. +·◉·+',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  joystick_mode: {
+    id: 'joystick_mode',
+    symbol: '↑·○·↑',
+    name: 'Joystick Mode',
+    description: 'Noticed "joystick", "controller", or "take control" in your words',
+    unlockMessage: '↳ The joystick is yours. The character moves where you direct it. Self-care is learning you hold the stick. ↑·○·↑',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  pixel_mode: {
+    id: 'pixel_mode',
+    symbol: '□·□',
+    name: 'Pixel Mode',
+    description: 'Noticed "pixel", "8-bit", or "pixelated" in your words',
+    unlockMessage: '↳ Pixel by pixel, the picture resolves. Up close it looks like noise. At the right distance: a world. □·□',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  continue_signal: {
+    id: 'continue_signal',
+    symbol: '▶·◉',
+    name: 'Continue Signal',
+    description: 'Noticed "continue", "keep going", or "don\'t give up" in your words',
+    unlockMessage: '↳ 10... 9... 8... You always inserted the coin. The game never ended because you kept pressing continue. ▶·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  perfect_run: {
+    id: 'perfect_run',
+    symbol: '✦—✦',
+    name: 'Perfect Run',
+    description: 'Noticed "perfect run", "flawless", or "no damage" in your words',
+    unlockMessage: '↳ The perfect run isn\'t about perfection. It\'s the clarity you reach when everything falls into rhythm. ✦—✦',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  combo_activated: {
+    id: 'combo_activated',
+    symbol: '×·×·◉',
+    name: 'Combo Activated',
+    description: 'Noticed "combo", "chain", or "multiplier" in your words',
+    unlockMessage: '↳ Sleep + water + movement + journaling = COMBO. Self-care habits stack. The multiplier is real. ×·×·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  attract_loop: {
+    id: 'attract_loop',
+    symbol: '≈→◉',
+    name: 'Attract Loop',
+    description: 'Noticed "attract" or "attractor" in your words',
+    unlockMessage: '↳ Attract mode: the game plays itself beautifully, drawing you in. Some days practice calls you without effort. ≈→◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  checkpoint_hit: {
+    id: 'checkpoint_hit',
+    symbol: '─◉─',
+    name: 'Checkpoint Hit',
+    description: 'Noticed "checkpoint" or "waypoint" in your words',
+    unlockMessage: '↳ You hit the checkpoint. Progress saved. Even if you fall here, you don\'t go back to the beginning. ─◉─',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  record_smashed: {
+    id: 'record_smashed',
+    symbol: '◉→◉',
+    name: 'Record Smashed',
+    description: 'Noticed "new record" or "personal best" in your words',
+    unlockMessage: '↳ The leaderboard updated. Your name at the top — not against others, against yesterday\'s you. ◉→◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  game_face: {
+    id: 'game_face',
+    symbol: '╔·◉·╗',
+    name: 'Game Face',
+    description: 'Noticed "game face" or "game mode" in your words',
+    unlockMessage: '↳ Game face on. That specific mode of focus and readiness — when the self-care session becomes the arena. ╔·◉·╗',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Eggs v21 — THE ARCADE CALENDAR ───────────────────────────
+  tetris_day: {
+    id: 'tetris_day',
+    symbol: '■·□',
+    name: 'Tetris Day',
+    description: 'Check in on June 6 — Tetris created by Alexey Pajitnov (1984)',
+    unlockMessage: '↳ June 6, 1984. A Soviet programmer made a game about fitting pieces together on a government computer. Today it is the most-played game in history. Fit your pieces. ■·□',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  pong_signal: {
+    id: 'pong_signal',
+    symbol: '○—○',
+    name: 'Pong Signal',
+    description: 'Check in on November 29 — Pong released 1972 (first commercial arcade game)',
+    unlockMessage: '↳ November 29, 1972. Two paddles. One ball. The entire video game industry started here. The simplest rule set creates infinite variation — like practice. ○—○',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  pacman_birthday: {
+    id: 'pacman_birthday',
+    symbol: '○·○·○',
+    name: 'Pac-Man Birthday',
+    description: 'Check in on May 22 — Pac-Man released 1980',
+    unlockMessage: '↳ May 22, 1980. Toru Iwatani designed Pac-Man for people who didn\'t play games — a character eating its way through fear (the ghosts). Power pellet time. ○·○·○',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v20 — ARCADE PATTERNS ─────────────────────────────────────────
+  speedrun_day: {
+    id: 'speedrun_day',
+    symbol: '▒▒▒▒▒',
+    name: 'Speedrun Day',
+    description: '5 or more check-ins in one calendar day',
+    unlockMessage: '↳ SPEEDRUN ACTIVE. Any% completion of your daily self-care. The timer is running. This is what full engagement looks like. ▒▒▒▒▒',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  insert_coin_return: {
+    id: 'insert_coin_return',
+    symbol: '▶·∘',
+    name: 'Insert Coin',
+    description: 'Returned after a 3–6 day absence',
+    unlockMessage: '↳ The cabinet glows. The countdown was almost over. You inserted the coin. CONTINUE. ▶·∘',
+    rarity: 'uncommon',
+    category: 'easter_egg',
+  },
+  dawn_protocol: {
+    id: 'dawn_protocol',
+    symbol: '∴·∴·∴',
+    name: 'Dawn Protocol',
+    description: '5+ check-ins before 06:30 AM in any 7-day window',
+    unlockMessage: '↳ The arcade opens at dawn. You were there before the neon even warmed up. Five mornings in seven days. Dawn Protocol engaged. ∴·∴·∴',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  // ── Achievement RPG v21 — ARCADE CLASS ───────────────────────────────────────
+  arcade_entry: {
+    id: 'arcade_entry',
+    symbol: '○·▶',
+    name: 'Arcade Entry',
+    description: 'Earned any 1 Word Turn v23 (Arcade Master) badge',
+    unlockMessage: '↳ The cabinet lit up for the first time. You pressed start. ○·▶',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  arcade_rank: {
+    id: 'arcade_rank',
+    symbol: '◉·▶·◉',
+    name: 'Arcade Rank',
+    description: 'Earned any 5 Word Turn v23 (Arcade Master) badges',
+    unlockMessage: '↳ Your initials in the top five. The leaderboard knows your name. ◉·▶·◉',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  arcade_master: {
+    id: 'arcade_master',
+    symbol: '╔·▶·╗',
+    name: 'Arcade Master',
+    description: 'Earned all 12 Word Turn v23 (Arcade Master) badges',
+    unlockMessage: '↳ ALL 12 ARCADE BADGES. The machine bows. Nobody clears the board on their first visit. You kept coming back until you did. ╔·▶·╗',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  quarter_master: {
+    id: 'quarter_master',
+    symbol: '○·$·∞',
+    name: 'Quarter Master',
+    description: 'Earned arcade_master + all 3 Calendar v21 (Arcade Calendar) badges',
+    unlockMessage: '↳ You played on the days that mattered. You know the history of the cabinet. QUARTER MASTER. ○·$·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·●·◉',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each Word Turn engine v1–v23',
+    unlockMessage: '↳ Twenty-three engines. From ritual to arcade. Every vocabulary owned. The full arc of LOT\'s language completed. ◈·◈·●·◉',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  pixel_opus: {
+    id: 'pixel_opus',
+    symbol: '□·◉·□',
+    name: 'Pixel Opus',
+    description: 'Earned arcade_master + speedrun_day behavioral badge',
+    unlockMessage: '↳ You cleared the arcade AND ran it at full speed. The pixel opus: every badge, every day, every frame. □·◉·□',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v23 — THE THOUSAND DAYS ─────────────────────────────────────
+  thousand_days: {
+    id: 'thousand_days',
+    symbol: '◉·∞',
+    name: 'Thousand Days',
+    description: '1,000+ distinct check-in calendar days',
+    unlockMessage: '↳ One thousand distinct days of practice. Not a streak — a civilization. Empires have been built in less time. ◉·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  novelist: {
+    id: 'novelist',
+    symbol: '≋→∞',
+    name: 'Novelist',
+    description: '200,000+ total lifetime journal words',
+    unlockMessage: '↳ 200,000 words. That\'s two full novels. You have been writing yourself into existence, one entry at a time. ≋→∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  decade_approach: {
+    id: 'decade_approach',
+    symbol: '∞·◉·∞',
+    name: 'Decade Approach',
+    description: 'Account age >= 9 years (3,285+ days since signup)',
+    unlockMessage: '↳ Nine years. You are approaching a threshold almost no one crosses. The game has been running this long. ∞·◉·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·●·◉·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three registers. Every engine fired. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. Arcade. The terminal is complete. ◈·◈·●·◉·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v20 — THE ARCADE VAULT ───────────────────────────────────────
+  konami_code: {
+    id: 'konami_code',
+    symbol: '↑↑↓↓',
+    name: 'Konami Code',
+    description: 'Write "up up down down" in any journal entry (hidden)',
+    unlockMessage: '↳ UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A START. You know the code. The 30 extra lives appear. The wall becomes a door. ↑↑↓↓',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  atari_signal: {
+    id: 'atari_signal',
+    symbol: '○·A·○',
+    name: 'Atari Signal',
+    description: 'Write "Atari" or "Pong" in any journal entry (hidden)',
+    unlockMessage: '↳ Atari: from the Japanese Go term for a move that threatens capture. The original threat was to the whole entertainment industry. Signal detected. ○·A·○',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  pac_ghost: {
+    id: 'pac_ghost',
+    symbol: '○·○·○',
+    name: 'Pac Ghost',
+    description: 'Write "Pac-Man", "pacman", or "Inky Blinky" in any journal entry (hidden)',
+    unlockMessage: '↳ Pac-Man: the only game where you can turn the fear around. Eat the power pellet, and the thing chasing you turns blue and runs. ○·○·○',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8418,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 (v23) — THE ARCADE MASTER ────────────────────────────────────────────
+    const arcadeV23Badges: BadgeType[] = [
+      'token_spent', 'high_score_set', 'extra_life_found', 'joystick_mode',
+      'pixel_mode', 'continue_signal', 'perfect_run', 'combo_activated',
+      'attract_loop', 'checkpoint_hit', 'record_smashed', 'game_face',
+    ]
+    const arcadeV23Earned = arcadeV23Badges.filter(b => hasBadge(b))
+
+    if (arcadeV23Earned.length >= 1 && !hasBadge('arcade_entry')) {
+      if (awardBadge('arcade_entry')) newBadges.push('arcade_entry')
+    }
+    if (arcadeV23Earned.length >= 5 && !hasBadge('arcade_rank')) {
+      if (awardBadge('arcade_rank')) newBadges.push('arcade_rank')
+    }
+    const arcadeComplete = arcadeV23Earned.length >= 12
+    if (arcadeComplete && !hasBadge('arcade_master')) {
+      if (awardBadge('arcade_master')) newBadges.push('arcade_master')
+    }
+
+    // pixel_opus: arcade_master + speedrun_day
+    if (arcadeComplete && hasBadge('speedrun_day') && !hasBadge('pixel_opus')) {
+      if (awardBadge('pixel_opus')) newBadges.push('pixel_opus')
+    }
+
+    // quarter_master: arcade_master + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['tetris_day', 'pong_signal', 'pacman_birthday']
+    if (arcadeComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('quarter_master')) {
+      if (awardBadge('quarter_master')) newBadges.push('quarter_master')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = arcadeV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: thousand_days — 1,000+ distinct calendar check-in days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('thousand_days')) {
+        if (awardBadge('thousand_days')) newBadges.push('thousand_days')
+      }
+    }
+
+    // Mastery v23: novelist — 200,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('novelist')) {
+        if (awardBadge('novelist')) newBadges.push('novelist')
+      }
+    }
+
+    // Mastery v23: decade_approach — Account age >= 9 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupDA = new Date(stats.signupDate)
+      const yearsDA = (new Date().getTime() - signupDA.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsDA >= 9 && !hasBadge('decade_approach')) {
+        if (awardBadge('decade_approach')) newBadges.push('decade_approach')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
     }
 
   } catch (error) {

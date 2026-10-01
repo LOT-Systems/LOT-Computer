@@ -870,6 +870,21 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awardBadge('odyssey_day')
     awarded.push('odyssey_day')
   }
+  // Tetris Day: June 6 — Tetris created by Alexey Pajitnov (1984)
+  if (!hasBadge('tetris_day') && month === 6 && day === 6) {
+    awardBadge('tetris_day')
+    awarded.push('tetris_day')
+  }
+  // Pong Signal: November 29 — Pong released 1972 (first commercial arcade game)
+  if (!hasBadge('pong_signal') && month === 11 && day === 29) {
+    awardBadge('pong_signal')
+    awarded.push('pong_signal')
+  }
+  // Pac-Man Birthday: May 22 — Pac-Man released 1980
+  if (!hasBadge('pacman_birthday') && month === 5 && day === 22) {
+    awardBadge('pacman_birthday')
+    awarded.push('pacman_birthday')
+  }
 
   return awarded
 }
@@ -1483,6 +1498,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE ARCADE MASTER ───────────────────────────────────────────────────
+  { patterns: /\btoken(s)?\b|\bcoin(s)?\b|\bquarter(s)?\b/i,                            badge: 'token_spent' },
+  { patterns: /\bhigh[\s-]?score\b|\bpersonal[\s-]?record\b/i,                         badge: 'high_score_set' },
+  { patterns: /\bextra[\s-]?life\b|\bsecond[\s-]?wind\b|\b1[\s-]?up\b|\b1up\b/i,      badge: 'extra_life_found' },
+  { patterns: /\bjoystick\b|\bgame[\s-]?controller\b|\btake[\s-]?control\b/i,           badge: 'joystick_mode' },
+  { patterns: /\bpixel(s|ated)?\b|\b8[\s-]?bit\b|\b16[\s-]?bit\b/i,                   badge: 'pixel_mode' },
+  { patterns: /\bkeep[\s-]?going\b|\bdon'?t[\s-]?(give[\s-]?up|stop|quit)\b|\bpress[\s-]?on\b/i, badge: 'continue_signal' },
+  { patterns: /\bperfect[\s-]?run\b|\bflawless\b|\bno[\s-]?damage\b|\bclean[\s-]?run\b/i, badge: 'perfect_run' },
+  { patterns: /\bcombo\b|\bchain[\s-]?(of|reaction)?\b|\bmultiplier\b/i,               badge: 'combo_activated' },
+  { patterns: /\battr(act|acting|action|acted)\b|\battract(or)?\b/i,                   badge: 'attract_loop' },
+  { patterns: /\bcheckpoint\b|\bwaypoint\b/i,                                           badge: 'checkpoint_hit' },
+  { patterns: /\bnew[\s-]?record\b|\bpersonal[\s-]?best\b|\bpr\b/i,                   badge: 'record_smashed' },
+  { patterns: /\bgame[\s-]?face\b|\bgame[\s-]?mode\b|\bready[\s-]?player\b/i,         badge: 'game_face' },
+  // ── v20 Secret Boss — THE ARCADE VAULT word triggers ─────────────────────────
+  { patterns: /\bup[\s-]?up[\s-]?down[\s-]?down\b/i,                                  badge: 'konami_code' },
+  { patterns: /\batari\b|\bpong\b/i,                                                    badge: 'atari_signal' },
+  { patterns: /\bpac[\s-]?man\b|\bpacman\b|\binky[\s-]?blinky\b|\bpinky[\s-]?clyde\b/i, badge: 'pac_ghost' },
 ]
 
 /**
@@ -2649,6 +2681,93 @@ export function checkNightOperator(): BadgeType | null {
     if (nightCheckins.length >= 3) {
       awardBadge('night_operator')
       return 'night_operator'
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+// ── Arcade Master v23 behavioral checks ──────────────────────────────────────
+
+/**
+ * Award speedrun_day badge if 5+ check-ins occur in one calendar day.
+ */
+export function checkSpeedrunDay(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('speedrun_day')) return null
+
+  try {
+    const key = 'checkin_timestamps_v23'
+    const stored = localStorage.getItem(key)
+    const timestamps: string[] = stored ? JSON.parse(stored) : []
+    const now = new Date()
+    timestamps.push(now.toISOString())
+    localStorage.setItem(key, JSON.stringify(timestamps.slice(-200)))
+
+    const today = now.toDateString()
+    const todayCheckins = timestamps.filter(ts => new Date(ts).toDateString() === today)
+    if (todayCheckins.length >= 5) {
+      awardBadge('speedrun_day')
+      return 'speedrun_day'
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+/**
+ * Award insert_coin_return badge if the user returns after a 3–6 day absence.
+ */
+export function checkInsertCoinReturn(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('insert_coin_return')) return null
+
+  try {
+    const key = 'last_checkin_date_v23'
+    const stored = localStorage.getItem(key)
+    const now = new Date()
+    localStorage.setItem(key, now.toISOString())
+
+    if (stored) {
+      const last = new Date(stored)
+      const diffDays = (now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24)
+      if (diffDays >= 3 && diffDays < 7) {
+        awardBadge('insert_coin_return')
+        return 'insert_coin_return'
+      }
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+/**
+ * Award dawn_protocol badge if 5+ check-ins occur before 06:30 in any 7-day window.
+ */
+export function checkDawnProtocol(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_protocol')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  const minute = now.getMinutes()
+  if (hour >= 7 || (hour === 6 && minute >= 30)) return null
+
+  try {
+    const key = 'dawn_checkin_timestamps_v23'
+    const stored = localStorage.getItem(key)
+    const timestamps: string[] = stored ? JSON.parse(stored) : []
+    timestamps.push(now.toISOString())
+    localStorage.setItem(key, JSON.stringify(timestamps.slice(-100)))
+
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    const dawnCheckins = timestamps.filter(ts => {
+      const d = new Date(ts)
+      return d >= sevenDaysAgo && (d.getHours() < 6 || (d.getHours() === 6 && d.getMinutes() < 30))
+    })
+    if (dawnCheckins.length >= 5) {
+      awardBadge('dawn_protocol')
+      return 'dawn_protocol'
     }
   } catch { /* non-critical */ }
 
