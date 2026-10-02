@@ -170,6 +170,10 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'garden-signal-lock':               'GARDEN',
   'druid-terrain-convergence':        'DRUID',
   'genesis-garden-sovereignty':       'GENSOV',
+  // v136: sovereign terrain mastery tier
+  'terrain-signal-bloom':             'TRNBLOOM',
+  'living-terrain-field':             'LTVFIELD',
+  'sovereign-terrain-ecology':        'SOVECOL',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

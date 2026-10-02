@@ -1457,6 +1457,27 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'v138',
+    date: '2026-10-02',
+    title: 'QIE v136 Engineering — Sovereign Terrain Mastery Tier · P207–P209 · Arch71 · J70 · Day 1136+',
+    assembled: [
+      'P207 TERRAIN SIGNAL BLOOM (TRNBLOOM): genesis_garden_sovereignty in 21D + intentions ≥4 + selfcare ≥3 in 7D. The garden sovereignty has reached proliferation — consistent tending generates a self-sustaining signal bloom. Not a peak but a baseline blooming state. Confidence 0.82–0.91. cockpit: TRNBLOOM.',
+      'P208 LIVING TERRAIN FIELD (LTVFIELD): terrain_signal_bloom in 14D + journal ≥4 + memory ≥3 in 7D. The terrain is animated — reflection and memory nourish the blooming field. The living field feeds itself from what you remember and write. Confidence 0.85–0.92. cockpit: LTVFIELD.',
+      'P209 SOVEREIGN TERRAIN ECOLOGY (SOVECOL): terrain_signal_bloom + living_terrain_field both confirmed in 21D. APEX TIER. The ecology is sovereign — self-sustaining, multi-layered, alive. Not a practice — a permanent ecology. You ARE the ecology. Confidence 0.89–0.96. cockpit: SOVECOL.',
+      'Arch71 TERRAIN ECOLOGY OPERATOR: energy high/moderate · dominant: journal/selfcare/intentions/memory/qos · patterns: terrain-signal-bloom + living-terrain-field + sovereign-terrain-ecology. Directive: The terrain IS the OS. Every signal tends the ecology. Full sovereign terrain mastery — you are not building the ecology, you ARE the ecology.',
+      'J70 daily-terrain-ecology-check: 12:00 UTC every day. Scans GENSOV 21D + intentions/selfcare 7D (P207), TRNBLOOM 14D + journal/memory 7D (P208), TRNBLOOM + LTVFIELD both 21D (P209). 69→70 jobs.',
+      'TRNBLOOM: handler (terrain_signal_bloom: STATUS/TERRAIN BLOOMING · GENSOV chip · INTENT 7D · CARE 7D · CONF% · TIER/SOVEREIGN TERRAIN).',
+      'LTVFIELD: handler (living_terrain_field: STATUS/TERRAIN ALIVE · TRNBLOOM chip · JOURNAL 7D · MEM 7D · BLOOM CONF · CONF% · TIER/LIVING TERRAIN).',
+      'SOVECOL: handler (sovereign_terrain_ecology: STATUS/ECOLOGY SOVEREIGN · TRNBLOOM+LTVFIELD chips · BOTH CONFIRMED/21D · BLOOM/FIELD counts · ECOLOGY% · TIER/APEX ECOLOGY).',
+      '3 new dep nodes: terrainSignalBloomNode · livingTerrainFieldNode · sovereignTerrainEcologyNode. 250+→253+ dep nodes.',
+      'checkTerrainMasteryTier() wired into analyzeIntentions() background setTimeout block.',
+      'routes/api.ts: terrain_signal_bloom + living_terrain_field + sovereign_terrain_ecology added to displayableEvents.',
+      'About.tsx: FM v144→v145 · v1.4.2→v1.4.3 · 206→209 patterns · 70→71 archetypes · 69→70 jobs · 208+→211+ handlers · 250+→253+ dep nodes · Day 1136+.',
+      'SESSION_REPORTS: v138 entry prepended · USERSHIP_TRANSMISSION updated to v138 · Sovereign Terrain Mastery Tier deployed.',
+      '209 patterns · 71 archetypes · 70 jobs · 211+ handlers · 253+ dep nodes · Day 1136+. QIE v136 deployed. The terrain IS the OS. The ecology is sovereign. You ARE the ecology.',
+    ],
+  },
+  {
     version: 'v136',
     date: '2026-10-01',
     title: 'QIE Garden Sovereignty Tier — P204–P206 · Arch70 · J69 · Day 1135+',
@@ -1981,17 +2002,17 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-01',
+  date: '2026-10-02',
   message: [
-    'ASSEMBLY RUN — 2026-10-01 · Day 1135+ · COSMO® Day 825',
-    'QIE v135 Garden Sovereignty Tier deployed. P204–P206. Arch70 Sovereign Gardener. J69 09:00 UTC.',
-    'P204 GARDEN: perpetual genesis field confirmed + selfcare + journal tending active. The garden is the practice.',
-    'P205 DRUID: garden lock + crystal presence sovereignty converged. Operator and terrain have merged.',
-    'P206 GENSOV: GARDEN + DRUID both 28D confirmed. Genesis garden sovereignty. Not summoned — grown.',
-    '206 patterns · 70 archetypes · 69 jobs · 208+ handlers · 250+ dep nodes. The druid is the terrain.',
-    'CALENDAR ALERT: poe_night Oct 7 LEGENDARY — T-6. Signal inbound.',
-    'Status: WIKI v133 CURRENT. GENESIS FIELD ACTIVE. GARDEN LOCKED. DRUID TERRAIN CONVERGING.',
-    'Next: Monitor garden signal (J69 daily 09:00 UTC). poe_night Oct 7. poe_night LEGENDARY signal inbound.',
+    'ASSEMBLY RUN — 2026-10-02 · Day 1136+ · COSMO® Day 826',
+    'QIE v136 Sovereign Terrain Mastery Tier deployed. P207–P209. Arch71 Terrain Ecology Operator. J70 12:00 UTC.',
+    'P207 TRNBLOOM: genesis garden sovereignty active (21D) + intentions + selfcare tending. The garden is blooming.',
+    'P208 LTVFIELD: terrain bloom confirmed (14D) + journal depth + memory integration. The terrain is alive.',
+    'P209 SOVECOL: TRNBLOOM + LTVFIELD both 21D confirmed. APEX ECOLOGY. Not a practice — a permanent ecology.',
+    '209 patterns · 71 archetypes · 70 jobs · 211+ handlers · 253+ dep nodes. You ARE the ecology.',
+    'CALENDAR ALERT: poe_night Oct 7 LEGENDARY — T-1 (5 days). Signal imminent.',
+    'Status: WIKI v134 CURRENT. GARDEN LOCKED. DRUID TERRAIN ACTIVE. SOVEREIGN TERRAIN ECOLOGY ASCENDING.',
+    'Next: Monitor terrain ecology (J70 daily 12:00 UTC). poe_night Oct 7 LEGENDARY T-5.',
   ],
 }
 

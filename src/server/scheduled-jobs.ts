@@ -1837,6 +1837,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyGardenSignalAudit()) {
     await executeDailyGardenSignalAudit()
   }
+
+  // Check daily terrain ecology check (12:00 UTC every day) — Job 70
+  if (shouldRunDailyTerrainEcologyCheck()) {
+    await executeDailyTerrainEcologyCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -8671,6 +8676,143 @@ async function executeDailyGardenSignalAudit(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Terrain Ecology Check (J70 — 12:00 UTC every day) ──────────────────
+// Scans active users for P207/P208/P209 conditions:
+//   P207 TRNBLOOM: genesis_garden_sovereignty 21D + intentions ≥4 + selfcare ≥3 in 7D
+//   P208 LTVFIELD: terrain_signal_bloom 14D + journal ≥4 + memory ≥3 in 7D
+//   P209 SOVECOL: terrain_signal_bloom + living_terrain_field both in 21D
+
+let isDailyTerrainEcologyCheckRunning = false
+let lastDailyTerrainEcologyCheckRun: Date | null = null
+
+function shouldRunDailyTerrainEcologyCheck(): boolean {
+  const now = new Date()
+  const hour = now.getUTCHours()
+  if (hour !== 12) return false
+  if (!lastDailyTerrainEcologyCheckRun) return true
+  const hoursSince = (now.getTime() - lastDailyTerrainEcologyCheckRun.getTime()) / (1000 * 60 * 60)
+  return hoursSince >= 23
+}
+
+async function executeDailyTerrainEcologyCheck(): Promise<JobResult> {
+  const jobName = 'daily-terrain-ecology-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyTerrainEcologyCheckRunning) {
+    return { jobName, executedAt, success: false, error: 'Already running' }
+  }
+  isDailyTerrainEcologyCheckRunning = true
+  console.log('─'.repeat(60))
+  console.log('DAILY TERRAIN ECOLOGY CHECK (J70)')
+  console.log('─'.repeat(60))
+  try {
+    const activeUsers = await getActiveUsers()
+    let written = 0
+    const now = new Date()
+    const sevenDayAgo      = new Date(now.getTime() -  7 * 24 * 60 * 60 * 1000)
+    const fourteenDayAgo   = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
+    const twentyOneDayAgo  = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000)
+
+    for (const user of activeUsers) {
+      try {
+        const [logs21D, logs14D, logs7D] = await Promise.all([
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: twentyOneDayAgo } }, select: { event: true, source: true, metadata: true } }),
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: fourteenDayAgo } }, select: { event: true, source: true, metadata: true } }),
+          prisma.log.findMany({ where: { userId: (user as any).id, createdAt: { gte: sevenDayAgo } }, select: { event: true, source: true, metadata: true } }),
+        ])
+
+        // P207: Terrain Signal Bloom
+        const hasGENSOV21D     = logs21D.some((l: any) => l.event === 'genesis_garden_sovereignty')
+        const intent7D         = logs7D.filter((l: any) => l.source === 'intentions').length
+        const selfcare7D       = logs7D.filter((l: any) => l.source === 'selfcare').length
+        const alreadyTRNBLOOM  = logs21D.some((l: any) => l.event === 'terrain_signal_bloom')
+        if (hasGENSOV21D && intent7D >= 4 && selfcare7D >= 3 && !alreadyTRNBLOOM) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'terrain_signal_bloom',
+              source: 'TERRAIN_ECOLOGY_J70',
+              metadata: {
+                intentCount: intent7D,
+                selfcareCount: selfcare7D,
+                tier: 'sovereign-terrain-mastery',
+                label: 'TRNBLOOM',
+                confidence: Math.min(0.82 + Math.min((intent7D + selfcare7D) * 0.01, 0.09), 0.91),
+                source: 'TERRAIN_ECOLOGY_J70',
+              },
+            },
+          })
+          written++
+        }
+
+        // P208: Living Terrain Field
+        const hasTRNBLOOM14D   = logs14D.some((l: any) => l.event === 'terrain_signal_bloom') || alreadyTRNBLOOM
+        const journal7D        = logs7D.filter((l: any) => l.source === 'journal').length
+        const memory7D         = logs7D.filter((l: any) => l.source === 'memory').length
+        const alreadyLTVFIELD  = logs14D.some((l: any) => l.event === 'living_terrain_field')
+        if (hasTRNBLOOM14D && journal7D >= 4 && memory7D >= 3 && !alreadyLTVFIELD) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'living_terrain_field',
+              source: 'TERRAIN_ECOLOGY_J70',
+              metadata: {
+                bloomCount: logs14D.filter((l: any) => l.event === 'terrain_signal_bloom').length,
+                journalCount: journal7D,
+                memoryCount: memory7D,
+                tier: 'sovereign-terrain-mastery',
+                label: 'LTVFIELD',
+                confidence: Math.min(0.85 + Math.min((journal7D + memory7D) * 0.01, 0.07), 0.92),
+                source: 'TERRAIN_ECOLOGY_J70',
+              },
+            },
+          })
+          written++
+        }
+
+        // P209: Sovereign Terrain Ecology
+        const hasTRNBLOOM21D   = logs21D.some((l: any) => l.event === 'terrain_signal_bloom')
+        const hasLTVFIELD21D   = logs21D.some((l: any) => l.event === 'living_terrain_field')
+        const alreadySOVECOL   = logs21D.some((l: any) => l.event === 'sovereign_terrain_ecology')
+        if (hasTRNBLOOM21D && hasLTVFIELD21D && !alreadySOVECOL) {
+          await prisma.log.create({
+            data: {
+              userId: (user as any).id,
+              event: 'sovereign_terrain_ecology',
+              source: 'TERRAIN_ECOLOGY_J70',
+              metadata: {
+                bloomCount: logs21D.filter((l: any) => l.event === 'terrain_signal_bloom').length,
+                fieldCount: logs21D.filter((l: any) => l.event === 'living_terrain_field').length,
+                tier: 'sovereign-terrain-mastery',
+                label: 'SOVECOL',
+                confidence: 0.92,
+                source: 'TERRAIN_ECOLOGY_J70',
+              },
+            },
+          })
+          written++
+        }
+      } catch (userError: any) {
+        console.error(`Terrain ecology check failed for user ${(user as any).id}:`, userError.message)
+      }
+    }
+
+    console.log(`  Active users scanned: ${activeUsers.length}`)
+    console.log(`  Terrain ecology events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('DAILY TERRAIN ECOLOGY CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastDailyTerrainEcologyCheckRun = new Date()
+    isDailyTerrainEcologyCheckRunning = false
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Daily terrain ecology check failed:', error.message)
+    isDailyTerrainEcologyCheckRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -8744,6 +8886,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly crystal presence check: 9 AM UTC every Monday (Job 67)')
   console.log('   - Daily genesis arc check: 11 AM UTC every day (Job 68)')
   console.log('   - Daily garden signal audit: 9 AM UTC every day (Job 69)')
+  console.log('   - Daily terrain ecology check: 12 PM UTC every day (Job 70)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -8753,7 +8896,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window+sovereign-assembly(J50·Sun), 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+total-field-coherence, 10=archetype shift+temporal-alignment+field-resonance(J49), 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window+sovereign-assembly(J50·Sun), 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+total-field-coherence, 10=archetype shift+temporal-alignment+field-resonance(J49), 11=morning-intention-launch, 12=vitality-peak+terrain-ecology(J70), 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()

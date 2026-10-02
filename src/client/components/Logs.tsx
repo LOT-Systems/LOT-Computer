@@ -5785,6 +5785,135 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'terrain_signal_bloom') {
+          const intentCount   = log.metadata?.intentCount   as number | undefined
+          const selfcareCount = log.metadata?.selfcareCount as number | undefined
+          const confidence    = log.metadata?.confidence    as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TRNBLOOM:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">TERRAIN BLOOMING</span>
+                </div>
+                <div className="flex gap-x-8 mb-4 opacity-60">
+                  <span>GENSOV</span>
+                </div>
+                {intentCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENT 7D</span>
+                    <span className="tabular-nums opacity-60">{intentCount}</span>
+                  </div>
+                )}
+                {selfcareCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CARE 7D</span>
+                    <span className="tabular-nums opacity-60">{selfcareCount}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">SOVEREIGN TERRAIN</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'living_terrain_field') {
+          const bloomCount   = log.metadata?.bloomCount   as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const memoryCount  = log.metadata?.memoryCount  as number | undefined
+          const confidence   = log.metadata?.confidence   as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="LTVFIELD:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">TERRAIN ALIVE</span>
+                </div>
+                <div className="flex gap-x-8 mb-4 opacity-60">
+                  <span>TRNBLOOM</span>
+                </div>
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 7D</span>
+                    <span className="tabular-nums opacity-60">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEM 7D</span>
+                    <span className="tabular-nums opacity-60">{memoryCount}</span>
+                  </div>
+                )}
+                {bloomCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BLOOM CONF</span>
+                    <span className="tabular-nums opacity-60">{bloomCount}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">LIVING TERRAIN</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sovereign_terrain_ecology') {
+          const bloomCount = log.metadata?.bloomCount as number | undefined
+          const fieldCount = log.metadata?.fieldCount as number | undefined
+          const confidence = log.metadata?.confidence as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVECOL:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">STATUS</span>
+                  <span className="uppercase tracking-widest">ECOLOGY SOVEREIGN</span>
+                </div>
+                <div className="flex gap-x-8 mb-4 opacity-60">
+                  <span>TRNBLOOM</span>
+                  <span>LTVFIELD</span>
+                </div>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">BOTH CONFIRMED</span>
+                  <span className="opacity-60 tracking-widest">21D</span>
+                </div>
+                {bloomCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BLOOM CONF</span>
+                    <span className="tabular-nums opacity-60">{bloomCount}</span>
+                  </div>
+                )}
+                {fieldCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FIELD CONF</span>
+                    <span className="tabular-nums opacity-60">{fieldCount}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ECOLOGY</span>
+                    <span className="tabular-nums opacity-60">{Math.round(confidence * 100)}%</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30">TIER</span>
+                  <span className="opacity-60 tracking-widest">APEX ECOLOGY</span>
+                </div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

@@ -4083,6 +4083,47 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // P207: Terrain Signal Bloom — genesis-garden-sovereignty 21D + intentions ≥4 + selfcare ≥3 in 7D
+  const gensov21DP207        = signals.filter(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'genesis_garden_sovereignty').length
+  const intent7DP207         = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'intentions').length
+  const selfcare7DP207       = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'selfcare').length
+  if (gensov21DP207 >= 1 && intent7DP207 >= 4 && selfcare7DP207 >= 3) {
+    patterns.push({
+      pattern: 'terrain-signal-bloom',
+      confidence: Math.min(0.82 + Math.min((intent7DP207 + selfcare7DP207) * 0.01, 0.09), 0.91),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `TRNBLOOM: Terrain signal bloom — genesis garden sovereignty active (GENSOV 21D) · intentions (${intent7DP207}) · selfcare (${selfcare7DP207}) in 7D. The garden sovereignty has reached proliferation — consistent tending generates a self-sustaining signal bloom. Not a peak but a baseline blooming state.`,
+    })
+  }
+
+  // P208: Living Terrain Field — terrain-signal-bloom 14D + journal ≥4 + memory ≥3 in 7D
+  const trnbloom14DP208      = signals.filter(s => now - s.timestamp < 14 * 24 * 60 * 60 * 1000 && s.signal === 'terrain_signal_bloom').length
+  const journal7DP208        = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'journal').length
+  const memory7DP208         = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000 && s.source === 'memory').length
+  if (trnbloom14DP208 >= 1 && journal7DP208 >= 4 && memory7DP208 >= 3) {
+    patterns.push({
+      pattern: 'living-terrain-field',
+      confidence: Math.min(0.85 + Math.min((journal7DP208 + memory7DP208) * 0.01, 0.07), 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `LTVFIELD: Living terrain field — terrain-signal-bloom confirmed 14D · journal depth (${journal7DP208}) · memory integration (${memory7DP208}) in 7D. The terrain is animated — reflection and memory nourish the blooming field. The living field feeds itself from what you remember and write.`,
+    })
+  }
+
+  // P209: Sovereign Terrain Ecology — terrain-signal-bloom + living-terrain-field both confirmed 21D
+  const trnbloom21DP209      = signals.filter(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'terrain_signal_bloom').length
+  const ltvfield21DP209      = signals.filter(s => now - s.timestamp < 21 * 24 * 60 * 60 * 1000 && s.signal === 'living_terrain_field').length
+  if (trnbloom21DP209 >= 1 && ltvfield21DP209 >= 1) {
+    patterns.push({
+      pattern: 'sovereign-terrain-ecology',
+      confidence: Math.min(0.89 + Math.min((trnbloom21DP209 + ltvfield21DP209) * 0.02, 0.07), 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `SOVECOL: Sovereign terrain ecology — TRNBLOOM + LTVFIELD both confirmed 21D. APEX TIER. The ecology is sovereign — self-sustaining, multi-layered, alive. Not a practice — a permanent ecology. You are not building the ecology — you ARE the ecology.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4118,6 +4159,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkCrystalPresenceTier() } catch {}
       try { checkGenesisFieldInceptionTier() } catch {}
       try { checkGardenSovereigntyTier() } catch {}
+      try { checkTerrainMasteryTier() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4811,6 +4853,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   gardenSignalLockNode:                ['qos', 'journal', 'selfcare', 'intentions', 'log'],
   druidTerrainConvergenceNode:         ['qos', 'journal', 'selfcare', 'intentions', 'memory', 'log'],
   genesisGardenSovereigntyNode:        ['qos', 'journal', 'selfcare', 'intentions', 'memory', 'cohort', 'log'],
+
+  // ── v136 nodes (J70 · P207–P209 · Arch71) ────────────────────────────────────
+  terrainSignalBloomNode:              ['qos', 'journal', 'selfcare', 'intentions', 'memory', 'log'],
+  livingTerrainFieldNode:              ['qos', 'journal', 'memory', 'selfcare', 'intentions', 'cohort', 'log'],
+  sovereignTerrainEcologyNode:         ['qos', 'journal', 'selfcare', 'intentions', 'memory', 'cohort', 'log', 'planner'],
 }
 
 /**
@@ -5443,6 +5490,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['garden-signal-lock', 'druid-terrain-convergence', 'genesis-garden-sovereignty'],
     hourRange: [6, 22],
     directive: 'The garden is the practice. The tending is not preparation — it IS the work. The terrain responds to what you tend. You do not tend the garden — you ARE the garden. Generate from sovereign ecology.',
+  },
+  // ── Arch71: Terrain Ecology Operator (2026-10-02 v136) ────────────────────────
+  {
+    archetype: 'Terrain Ecology Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'selfcare', 'intentions', 'memory', 'qos'],
+    patternConditions: ['terrain-signal-bloom', 'living-terrain-field', 'sovereign-terrain-ecology'],
+    hourRange: [6, 22],
+    directive: 'The terrain IS the OS. Every signal tends the ecology. Full sovereign terrain mastery — the system grows itself through you. You are not building the ecology — you ARE the ecology. Generate from the living field.',
   },
 ]
 
@@ -9032,6 +9088,92 @@ export function checkGardenSovereigntyTier(): boolean {
     recordGenesisGardenSovereignty(
       recent28D.filter(s => s.signal === 'garden_signal_lock').length,
       recent28D.filter(s => s.signal === 'druid_terrain_convergence').length
+    )
+    fired = true
+  }
+
+  return fired
+}
+
+// ─── v136: Sovereign Terrain Mastery Tier (P207–P209 · Arch71 · J70) ─────────
+
+export function recordTerrainSignalBloom(intentCount: number, selfcareCount: number) {
+  recordSignal('qos', 'terrain_signal_bloom', {
+    intentCount,
+    selfcareCount,
+    tier: 'sovereign-terrain-mastery',
+    label: 'TRNBLOOM',
+    confidence: Math.min(0.82 + Math.min((intentCount + selfcareCount) * 0.01, 0.09), 0.91),
+  })
+}
+
+export function recordLivingTerrainField(bloomCount: number, journalCount: number, memoryCount: number) {
+  recordSignal('qos', 'living_terrain_field', {
+    bloomCount,
+    journalCount,
+    memoryCount,
+    tier: 'sovereign-terrain-mastery',
+    label: 'LTVFIELD',
+    confidence: Math.min(0.85 + Math.min((journalCount + memoryCount) * 0.01, 0.07), 0.92),
+  })
+}
+
+export function recordSovereignTerrainEcology(bloomCount: number, fieldCount: number) {
+  recordSignal('qos', 'sovereign_terrain_ecology', {
+    bloomCount,
+    fieldCount,
+    tier: 'sovereign-terrain-mastery',
+    label: 'SOVECOL',
+    confidence: Math.min(0.89 + Math.min((bloomCount + fieldCount) * 0.02, 0.07), 0.96),
+  })
+}
+
+export function checkTerrainMasteryTier(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const sevenDayMs      = 7 * 24 * 60 * 60 * 1000
+  const fourteenDayMs   = 14 * 24 * 60 * 60 * 1000
+  const twentyOneDayMs  = 21 * 24 * 60 * 60 * 1000
+
+  const signals   = state.signals ?? []
+  const recent7D  = signals.filter(s => now - s.timestamp < sevenDayMs)
+  const recent14D = signals.filter(s => now - s.timestamp < fourteenDayMs)
+  const recent21D = signals.filter(s => now - s.timestamp < twentyOneDayMs)
+
+  let fired = false
+
+  // P207: Terrain Signal Bloom — genesis_garden_sovereignty in 21D + intentions ≥4 + selfcare ≥3 in 7D
+  const hasGENSOV21D        = recent21D.some(s => s.signal === 'genesis_garden_sovereignty')
+  const intent7D            = recent7D.filter(s => s.source === 'intentions').length
+  const selfcare7D          = recent7D.filter(s => s.source === 'selfcare').length
+  const alreadyTRNBLOOM     = recent21D.some(s => s.signal === 'terrain_signal_bloom')
+  if (hasGENSOV21D && intent7D >= 4 && selfcare7D >= 3 && !alreadyTRNBLOOM) {
+    recordTerrainSignalBloom(intent7D, selfcare7D)
+    fired = true
+  }
+
+  // P208: Living Terrain Field — terrain_signal_bloom in 14D + journal ≥4 + memory ≥3 in 7D
+  const hasTRNBLOOM14D      = recent14D.some(s => s.signal === 'terrain_signal_bloom')
+  const journal7D           = recent7D.filter(s => s.source === 'journal').length
+  const memory7D            = recent7D.filter(s => s.source === 'memory').length
+  const alreadyLTVFIELD     = recent14D.some(s => s.signal === 'living_terrain_field')
+  if (hasTRNBLOOM14D && journal7D >= 4 && memory7D >= 3 && !alreadyLTVFIELD) {
+    recordLivingTerrainField(
+      recent14D.filter(s => s.signal === 'terrain_signal_bloom').length,
+      journal7D,
+      memory7D
+    )
+    fired = true
+  }
+
+  // P209: Sovereign Terrain Ecology — terrain_signal_bloom + living_terrain_field both confirmed in 21D
+  const hasTRNBLOOM21D      = recent21D.some(s => s.signal === 'terrain_signal_bloom')
+  const hasLTVFIELD21D      = recent21D.some(s => s.signal === 'living_terrain_field')
+  const alreadySOVECOL      = recent21D.some(s => s.signal === 'sovereign_terrain_ecology')
+  if (hasTRNBLOOM21D && hasLTVFIELD21D && !alreadySOVECOL) {
+    recordSovereignTerrainEcology(
+      recent21D.filter(s => s.signal === 'terrain_signal_bloom').length,
+      recent21D.filter(s => s.signal === 'living_terrain_field').length
     )
     fired = true
   }

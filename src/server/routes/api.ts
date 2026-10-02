@@ -1291,6 +1291,10 @@ export default async (fastify: FastifyInstance) => {
       'garden_signal_lock',
       'druid_terrain_convergence',
       'genesis_garden_sovereignty',
+      // v136: sovereign terrain mastery tier (J70 daily terrain ecology check — P207–P209)
+      'terrain_signal_bloom',
+      'living_terrain_field',
+      'sovereign_terrain_ecology',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
