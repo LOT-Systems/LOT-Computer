@@ -95,7 +95,10 @@ export function UserMetricsWidget() {
   // they only recompute when signals actually change — not on every re-render
   // this mounted widget receives from unrelated intentionEngine writes.
   const userIndex = React.useMemo(() => getUserIndex(), [engineState.signals])
-  const qieCohort = React.useMemo(() => classifyPhysiologicalCohort(), [engineState.signals])
+  const qieCohort = React.useMemo(
+    () => classifyPhysiologicalCohort(engineState.signals, engineState.userState, engineState.recognizedPatterns ?? []),
+    [engineState.signals]
+  )
 
   // Don't render while loading all data
   if (statusLoading && perfLoading && versionLoading) return null
@@ -256,7 +259,7 @@ export function UserMetricsWidget() {
           {/* Archetype: server-derived if available, otherwise client QIE classification */}
           <div className="flex justify-between items-baseline">
             <span className="opacity-30">Archetype</span>
-            <span>{cohortData?.archetype ?? qieCohort.label}</span>
+            <span>{cohortData?.archetype ?? qieCohort.archetype}</span>
           </div>
           {cohortData?.behavioralCohort && (
             <div className="flex justify-between items-baseline">
@@ -266,7 +269,7 @@ export function UserMetricsWidget() {
           )}
           <div className="flex justify-between items-baseline">
             <span className="opacity-30">Dominant</span>
-            <span className="capitalize">{qieCohort.dominant}</span>
+            <span className="capitalize">{qieCohort.dominantModule}</span>
           </div>
           <div className="opacity-30 text-xs mt-4">{qieCohort.directive}</div>
 

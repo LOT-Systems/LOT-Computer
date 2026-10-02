@@ -30,6 +30,7 @@ import { sync } from '../sync'
 import { initRecipeWidget } from '#client/stores/recipeWidget'
 import { hydrateBadgesFromServer } from '#client/utils/badges'
 import { initPerfObserver } from '#client/utils/perf'
+import { initWidgetUsage } from '#client/utils/widgetUsage'
 
 // Error boundary to prevent blank page when a widget crashes
 class AppErrorBoundary extends React.Component<
@@ -308,6 +309,7 @@ const App = () => {
 
     // Initialize interaction latency observer
     initPerfObserver()
+    initWidgetUsage()
 
     // Refetch profile when tab becomes visible (cross-device sync fallback)
     const onVisibilityChange = () => {

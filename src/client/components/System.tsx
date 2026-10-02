@@ -86,10 +86,12 @@ import { useInViewport } from '#client/hooks/useInViewport'
 // Defers mount of children until element first enters the viewport.
 // Once mounted, stays mounted — no unmount on scroll away.
 // Prevents heavy store subscriptions from running before the widget is needed.
-function LazyMount({ children }: { children: React.ReactNode }) {
+// minHeight reserves space for the placeholder so stacked LazyMounts don't all
+// sit inside the 200px pre-mount margin and mount in the same frame.
+function LazyMount({ children, minHeight = 0 }: { children: React.ReactNode; minHeight?: number }) {
   const ref = React.useRef<HTMLDivElement>(null)
   const inViewport = useInViewport(ref)
-  return <div ref={ref}>{inViewport ? children : null}</div>
+  return <div ref={ref} style={inViewport || !minHeight ? undefined : { minHeight }}>{inViewport ? children : null}</div>
 }
 
 function LoadingDots() {
@@ -1020,6 +1022,7 @@ export const System = React.memo(function SystemInner() {
 
       {/* CQGS Dashboard stack */}
       <WidgetErrorBoundary name="Dashboard">
+        <LazyMount minHeight={240}>
         <div className={cn('flex flex-col', density.stackGap)}>
           {/* CQGS Dashboard - Bioethics health, performance, version */}
           <UserMetricsWidget />
@@ -1033,6 +1036,7 @@ export const System = React.memo(function SystemInner() {
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Architect — executive self-assembly telemetry, paid users only */}
@@ -1042,6 +1046,7 @@ export const System = React.memo(function SystemInner() {
 
       {/* Stats stack */}
       <WidgetErrorBoundary name="Stats">
+        <LazyMount minHeight={240}>
         <div className={cn('flex flex-col', density.sectionGap)}>
           <IntentionPatterns />
           <CollectiveConsciousness />
@@ -1050,6 +1055,7 @@ export const System = React.memo(function SystemInner() {
           <GrowthMilestones />
           <BadgeUnlockFeed />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Calendar — Personal date planner */}

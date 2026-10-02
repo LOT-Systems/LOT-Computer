@@ -258,7 +258,7 @@ export const RecipeWidget: React.FC = () => {
     } catch (e) {}
 
     const picked = pickFarewellEntry(
-      state.mealTime,
+      state.mealTime ?? undefined,
       (weather as any)?.tempKelvin,
       (weather as any)?.description,
       state.isFasting

@@ -29,6 +29,7 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { buildSitrep, getWidgetUsage, recordWidgetUsage } from '#client/utils/widgetUsage'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -4139,6 +4140,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/sitrep       Post time · weather · users online · widget status',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4147,6 +4149,23 @@ const NoteEditor = ({
         setSystemHelp(lines.join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
+      } else if (trigger === 'sitrep') {
+        // Military-style situation report: synchronized context appended to the log.
+        recordWidgetUsage('Log', 'interact')
+        const wx = stores.weather.get()
+        const sitrep = buildSitrep({
+          now: new Date(),
+          tempC: wx?.tempKelvin != null ? wx.tempKelvin - 273.15 : null,
+          weather: wx?.description,
+          usersOnline: stores.usersOnline.get(),
+          usage: getWidgetUsage(),
+        })
+        const current = valueRef.current.replace(/\/(sitrep|report-in)\b/gi, '').trimEnd()
+        const updated = (current ? current + '\n\n' : '') + sitrep
+        setValue(updated)
+        valueRef.current = updated
+        onChangeRef.current(updated)
+        setIsSaved(true)
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
