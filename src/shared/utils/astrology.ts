@@ -177,3 +177,25 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Personal resonance — how often the user's own Logs were written under the
+ * same ambient rokuyo / moon phase as right now. Reads the astro* snapshot
+ * that getLogContext() stamps on every entry; entries without it are skipped.
+ */
+export function getAstrologyResonance(
+  logs: Array<{ context?: Record<string, any> | null }>,
+  current: { rokuyo: string; moonPhase: string }
+): { rokuyoCount: number; moonPhaseCount: number; sampled: number } {
+  let rokuyoCount = 0
+  let moonPhaseCount = 0
+  let sampled = 0
+  for (const log of logs) {
+    const ctx = log.context
+    if (!ctx?.astroRokuyo) continue
+    sampled++
+    if (ctx.astroRokuyo === current.rokuyo) rokuyoCount++
+    if (ctx.astroMoonPhase === current.moonPhase) moonPhaseCount++
+  }
+  return { rokuyoCount, moonPhaseCount, sampled }
+}
