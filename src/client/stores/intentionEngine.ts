@@ -2403,7 +2403,7 @@ export function analyzeIntentions(): IntentionPattern[] {
   const p105Cohort    = signals.filter(s => s.source === 'cohort' && s.timestamp > p105Cut)
   const p105Message   = signals.filter(s =>
     (s.source === 'cohort' || s.source === 'log') && s.timestamp > p105Cut &&
-    (s.signal === 'message_sent' || s.signal === 'chat_message' || s.signal === 'connection_accepted' || s.signal === 'direct_message_sent')
+    (s.signal === 'message_sent' || s.signal === 'chat_message' || s.signal === 'connection_accepted' || s.signal === 'direct_message_sent' || s.signal === 'email_sent')
   )
   const p105Intentions = signals.filter(s => s.source === 'intentions' && s.timestamp > p105Cut)
   if (p105Cohort.length >= 1 && p105Message.length >= 1 && p105Intentions.length >= 1) {

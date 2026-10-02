@@ -29,11 +29,12 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { parseEmailCommand } from '#client/utils/emailCommand'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useSendEmail, useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3707,6 +3708,29 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  // LOT® Email: /email to NAME … then Ctrl/⌘+Enter sends. lastSentRef blocks duplicate sends.
+  const [emailResult, setEmailResult] = React.useState<string | null>(null)
+  const lastSentEmailRef = React.useRef<string>('')
+  const { mutate: submitEmail } = useSendEmail({
+    onSuccess: (data) => {
+      setEmailResult(`SENT           ${data.receiverName.toUpperCase()}\nINBOX          SYNC`)
+    },
+    onError: (err: any) => {
+      lastSentEmailRef.current = ''
+      setEmailResult(`FAILED         ${String(err?.response?.data?.error || 'MAIL OFFLINE').toUpperCase()}`)
+    },
+  })
+  const sendEmailFromLog = () => {
+    const text = valueRef.current
+    const parsed = parseEmailCommand(text)
+    if (!parsed) return
+    if (lastSentEmailRef.current === text) return
+    lastSentEmailRef.current = text
+    setEmailResult(`SENDING        ${parsed.to.toUpperCase()}...`)
+    submitEmail(parsed)
+  }
+  const sendEmailRef = React.useRef(sendEmailFromLog)
+  sendEmailRef.current = sendEmailFromLog
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3911,6 +3935,7 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        sendEmailRef.current()
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -4139,12 +4164,15 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email        /email to NAME. Message — Ctrl+Enter sends to Sync',
           '/system       This help screen',
           '',
           'SHORTCUTS',
           'Ctrl+Enter    Save log immediately',
         ]
         setSystemHelp(lines.join('\n'))
+      } else if (trigger === 'email-compose') {
+        setEmailResult('COMPOSE        /email to NAME. Your message\nSEND           Ctrl/⌘+Enter\nINBOX          SYNC')
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4384,6 +4412,13 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailResult && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{emailResult}</div>
             </Block>
           </div>
         )}

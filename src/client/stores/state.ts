@@ -25,6 +25,9 @@ export const soundDescription = atom<string>('')
 export const isRadioOn = atom<boolean>(false)
 export const radioTrackName = atom<string>('')
 
+// LOT® Email: recipient handed from Cohort Connect / reply to the Sync mail composer
+export const emailComposeTo = atom<string>('')
+
 export const weather = atom<WeatherRecord | null>(null)
 
 // connection status

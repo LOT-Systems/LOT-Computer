@@ -26,6 +26,7 @@ import {
   useLikeChatMessage,
 } from '#client/queries'
 import { sync } from '../sync'
+import { SyncMail } from '#client/components/SyncMail'
 import { PublicChatMessage, UserTag } from '#shared/types'
 import {
   SYNC_CHAT_MESSAGES_TO_SHOW,
@@ -213,6 +214,8 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      <SyncMail />
 
       <div>
         {messages.map((x, i) => {
