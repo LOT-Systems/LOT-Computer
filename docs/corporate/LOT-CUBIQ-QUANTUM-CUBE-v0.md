@@ -321,6 +321,38 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE BREATH PACER                            2026-10-02
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, Archetype "Rhythm Architect,"
+  works a screen-heavy day, uses the Self-Care module (Breathe ·
+  Release · Ground · Observe · Connect) but routinely dismisses it
+  because it lives on a screen — the same screen causing the load.
+
+  The Energy Capacitor drops below threshold at 15:40 and the Self-Care
+  module selects BREATHE (the 4-2-6 exercise from /breathe). Under the
+  software-only cubic this is a card on a screen the operator is
+  already tired of looking at.
+
+  With CUBIQ hardware: the cube performs THE SETTLE (2s presence), then
+  THE PACER — a new gesture composed only from the existing sub-
+  threshold Nudge primitive, no new hardware. Over one 12-second cycle
+  the actuator pulses rise in amplitude for 4s (inhale), hold flat for
+  2s, then fall away over 6s (exhale). The operator rests a wrist on the
+  desk, closes their eyes, and breathes with a rhythm they feel through
+  the wood. Three cycles (36s), then silence. No screen was opened; the
+  breath exercise happened with eyes shut.
+
+  Why it is a v.0 use case and not a v.2 one: zero liftoff, zero
+  locomotion, so the edge-detection hazard of Section 03 does not apply.
+  It exercises only the actuator's low-amplitude controllability, which
+  is the property v.0 must prove anyway.
+
+  Telemetry (Section 05): whether the operator rests a hand on the desk
+  (IMU damping signature), whether they stop the cycle early, and next-
+  day Energy Capacitor recovery feed the "haptic preference" signal.
+  Boundary: wellness pacing only — no medical or clinical claim is made
+  for this gesture.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
