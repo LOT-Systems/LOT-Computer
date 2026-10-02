@@ -115,3 +115,61 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+/**
+ * Command registry — single source of truth for the /system help screen.
+ * Each entry mirrors a RULES keyword; `usage` is what the user types,
+ * `desc` is the one-line help. A unit check in docs/technical/
+ * LOG-COMMAND-SYSTEM.md requires every RULES trigger to appear here.
+ */
+export interface LogCommand {
+  trigger: LogTrigger
+  usage: string
+  desc: string
+  group: 'AI' | 'SYSTEM' | 'SELF-CARE' | 'ENVIRONMENT'
+}
+
+export const LOG_COMMANDS: LogCommand[] = [
+  { trigger: 'story-mode',     usage: '/story [day|week|month|year]', desc: 'Compressed story of your day / week / month / year (default: week)', group: 'AI' },
+  { trigger: 'qi-rfi',         usage: '/qi [query]',   desc: 'Ask the Quantum Intelligence engine', group: 'AI' },
+  { trigger: 'prayer-mode',    usage: '/prayer',       desc: 'Generate contextual scripture', group: 'AI' },
+  { trigger: 'how-checkin',    usage: '/how',          desc: 'Open LOT AI check-in (System tab)', group: 'AI' },
+  { trigger: 'ai-scan',        usage: '/scan',         desc: 'System status overview', group: 'SYSTEM' },
+  { trigger: 'assembly-check', usage: '/assembly',     desc: 'Self-assembly module status', group: 'SYSTEM' },
+  { trigger: 'qos-report',     usage: '/qos',          desc: 'Quantum OS state analysis', group: 'SYSTEM' },
+  { trigger: 'phys-report',    usage: '/phys',         desc: 'Physiological cohort report', group: 'SYSTEM' },
+  { trigger: 'sil-check',      usage: '/sil',          desc: 'Signal silence pattern check', group: 'SYSTEM' },
+  { trigger: 'system-help',    usage: '/system',       desc: 'This help screen', group: 'SYSTEM' },
+  { trigger: 'breathe',        usage: '/breathe',      desc: '4-2-6 breathing exercise', group: 'SELF-CARE' },
+  { trigger: 'freeze-widgets', usage: '/freeze',       desc: 'Pause and reflect protocol', group: 'SELF-CARE' },
+  { trigger: 'silent-mode',    usage: '/silent',       desc: 'Signal silence check', group: 'SELF-CARE' },
+  { trigger: 'force-fast',     usage: '/fast',         desc: 'Orthodox fasting calendar', group: 'SELF-CARE' },
+  { trigger: 'toggle-synth',   usage: '/synth',        desc: 'Toggle keyboard sound', group: 'ENVIRONMENT' },
+  { trigger: 'radio-toggle',   usage: '/radio',        desc: 'Toggle radio', group: 'ENVIRONMENT' },
+  { trigger: 'night-mode',     usage: '/night',        desc: 'Dark mode', group: 'ENVIRONMENT' },
+]
+
+/**
+ * Renders the registry in the line format the Log help block parses:
+ * group headers on their own line, commands as "usage␣␣desc".
+ */
+export function formatSystemHelp(): string {
+  const groups: LogCommand['group'][] = ['AI', 'SYSTEM', 'SELF-CARE', 'ENVIRONMENT']
+  const lines: string[] = ['AVAILABLE COMMANDS']
+  for (const g of groups) {
+    lines.push('', g)
+    for (const c of LOG_COMMANDS.filter(x => x.group === g)) {
+      lines.push(`${c.usage}  ${c.desc}`)
+    }
+  }
+  lines.push('', 'SHORTCUTS', 'Ctrl+Enter  Save log immediately')
+  return lines.join('\n')
+}
+
+/** Period token following /story, or null (server falls back to week). */
+export function parseStoryArg(text: string): 'day' | 'week' | 'month' | 'year' | null {
+  const m = (text || '').match(/\/story\s+(day|today|week|month|year)\b/i)
+  if (!m) return null
+  const w = m[1].toLowerCase()
+  return w === 'today' ? 'day' : (w as 'day' | 'week' | 'month' | 'year')
+}

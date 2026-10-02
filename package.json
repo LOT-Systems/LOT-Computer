@@ -46,6 +46,7 @@
     "fix": "prettier --write ./src",
     "start": "node ./dist/server/server/index.js",
     "test:cold-start": "npx esr ./scripts/tests/test-cold-start.ts",
+    "test:story": "npx tsx ./scripts/tests/test-story-compression.ts",
     "test:cold-start:prod": "APP_HOST=https://lot-systems.com npx esr ./scripts/tests/test-cold-start.ts"
   },
   "engines": {
