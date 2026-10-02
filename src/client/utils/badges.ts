@@ -782,6 +782,43 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE STOIC TERMINAL ───────────────────────────────────────
+  | 'amor_fati'              // ∿·●    "amor fati/love of fate/embrace what is" detected (RARE)
+  | 'memento_mori'           // ◉·∴·◉  "memento mori/remember death/mortality" detected (EPIC)
+  | 'ataraxia'               // ≈·○·≈  "ataraxia/tranquility of mind/inner peace found" detected (RARE)
+  | 'eudaimonia'             // ●·∿·●  "eudaimonia/flourishing/living well/full life" detected (RARE)
+  | 'premeditatio'           // □·∿·□  "premeditatio/negative visualization/worst case" detected (UNCOMMON)
+  | 'logos_aligned'          // ◉·=·◉  "logos/aligned with reason/cosmic order" detected (UNCOMMON)
+  | 'virtue_path'            // ∘→◉    "virtue/arete/excellence of character" detected (RARE)
+  | 'impermanence_signal'    // ∿·×·∿  "impermanence/transient/nothing lasts/passes away" detected (UNCOMMON)
+  | 'dichotomy_of_control'   // ─○─    "dichotomy of control/not in my control/what is mine" detected (UNCOMMON)
+  | 'present_hinge'          // ◉·∘·◉  "present moment/only moment/the hinge/now is all" detected (RARE)
+  | 'apatheia_field'         // ≋·∘·≋  "apatheia/equanimity/freedom from passion/unshaken" detected (EPIC)
+  | 'temperance_mode'        // ═·○·═  "temperance/moderation/self-control/discipline" detected (UNCOMMON)
+  // ── Calendar Easter Egg v21 — THE ANCIENT CALENDAR ───────────────────────────
+  | 'marcus_day'             // ◉·≡·◉  Apr 26 — Marcus Aurelius born 121 CE (EPIC)
+  | 'zeno_day'               // ─·∘·─  Feb 14 — Zeno of Citium, Stoicism founder (RARE)
+  | 'seneca_day'             // ∿·▲·∿  Apr 19 — Seneca's last day, died 65 CE (RARE)
+  // ── Behavioral v20 — STOIC PATTERNS ──────────────────────────────────────────
+  | 'stoic_session'          // ◉·=·◉  3+ Stoic philosophy words in one journal entry (RARE)
+  | 'evening_review'         // ∿·◐·∿  Check in between 21:00–22:00 local (RARE)
+  | 'meditations_entry'      // ≡·●·≡  Journal entry 300+ words with Stoic vocabulary (EPIC)
+  // ── Achievement RPG v21 — THE PHILOSOPHER'S CLASS ────────────────────────────
+  | 'stoic_entry'            // ∘→●    Any 1 Word Turn v23 badge (COMMON)
+  | 'stoic_practitioner'     // ≈→●    Any 5 Word Turn v23 badges (UNCOMMON)
+  | 'stoic_master'           // ≋→●    All 12 Word Turn v23 badges (LEGENDARY)
+  | 'ataraxia_arc'           // ●·≡    stoic_master + all 3 Calendar v21 badges (LEGENDARY)
+  | 'twenty_three_engines_arc' // ◈·◈·≡ 1 badge from each Word Turn v1–v23 (LEGENDARY)
+  | 'philosopher_opus'       // ●·◉·≡  stoic_master + stoic_session behavioral (LEGENDARY)
+  // ── Mastery Tier v23 — THE EXAMINED LIFE ─────────────────────────────────────
+  | 'philosopher_log'        // ≡·∞·≡  1,000+ distinct calendar check-in days (EPIC)
+  | 'great_practice'         // ●·∞·≡  200,000+ total journal words (LEGENDARY)
+  | 'decade_arc'             // ╔═╗·≡  Account age >= 10 years (LEGENDARY)
+  | 'twenty_three_registers' // ◈·◈·●·≡ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE ANCIENT MASTERS ────────────────────────────────────
+  | 'aurelius_codex'         // ≡·◉·≡  "marcus aurelius/meditations/philosopher king" detected (EPIC)
+  | 'epictetus_gate'         // ─·◉·─  "epictetus/enchiridion/discourses/slave philosopher" detected (LEGENDARY)
+  | 'zeno_stoa'              // ╔·∞·╗  "zeno of citium/stoicism founded/stoa poikile" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7168,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v23 — THE STOIC TERMINAL ──────────────────────────────────────
+  amor_fati: {
+    id: 'amor_fati',
+    symbol: '∿·●',
+    name: 'Amor Fati',
+    description: 'Write "amor fati", "love of fate", or "embrace what is" in any entry',
+    unlockMessage: '↳ Amor fati: love of fate. Nietzsche borrowed it from the Stoics. Not just accepting what happens — loving it as the only thing that could have happened. ∿·●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  memento_mori: {
+    id: 'memento_mori',
+    symbol: '◉·∴·◉',
+    name: 'Memento Mori',
+    description: 'Write "memento mori", "remember death", or "mortality" in any entry',
+    unlockMessage: '↳ Memento mori: remember you will die. Not morbid — clarifying. Marcus Aurelius kept a skull on his desk. The practice sharpens every decision. ◉·∴·◉',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  ataraxia: {
+    id: 'ataraxia',
+    symbol: '≈·○·≈',
+    name: 'Ataraxia',
+    description: 'Write "ataraxia", "tranquility of mind", or "inner peace found" in any entry',
+    unlockMessage: '↳ Ataraxia: the tranquility of mind that comes from not being disturbed by fortune. The Stoics called it the goal. You named it today. ≈·○·≈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  eudaimonia: {
+    id: 'eudaimonia',
+    symbol: '●·∿·●',
+    name: 'Eudaimonia',
+    description: 'Write "eudaimonia", "flourishing", or "living well" in any entry',
+    unlockMessage: '↳ Eudaimonia: human flourishing. Aristotle\'s word, Stoicism\'s target. Not happiness as pleasure — happiness as the full expression of a life well-lived. ●·∿·●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  premeditatio: {
+    id: 'premeditatio',
+    symbol: '□·∿·□',
+    name: 'Premeditatio',
+    description: 'Write "premeditatio", "negative visualization", or "worst case" in any entry',
+    unlockMessage: '↳ Premeditatio malorum: the pre-meditation of evils. Imagine the worst — not to fear it, but to drain it of power. The obstacle anticipated is the obstacle halved. □·∿·□',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  logos_aligned: {
+    id: 'logos_aligned',
+    symbol: '◉·=·◉',
+    name: 'Logos Aligned',
+    description: 'Write "logos", "aligned with reason", or "cosmic order" in any entry',
+    unlockMessage: '↳ Logos: the rational principle threading through everything. The Stoics believed the universe is reason itself. To act with reason is to act with the universe. ◉·=·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  virtue_path: {
+    id: 'virtue_path',
+    symbol: '∘→◉',
+    name: 'Virtue Path',
+    description: 'Write "virtue", "arete", or "excellence of character" in any entry',
+    unlockMessage: '↳ Virtue is the only true good. Wealth, fame, health — these are preferred indifferents. Character alone cannot be taken. The path is the virtue itself. ∘→◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  impermanence_signal: {
+    id: 'impermanence_signal',
+    symbol: '∿·×·∿',
+    name: 'Impermanence Signal',
+    description: 'Write "impermanence", "transient", or "nothing lasts" in any entry',
+    unlockMessage: '↳ Panta rhei: everything flows. The Stoics and the Buddhists arrived at the same terminal. Nothing is permanent — including the problem. ∿·×·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  dichotomy_of_control: {
+    id: 'dichotomy_of_control',
+    symbol: '─○─',
+    name: 'Dichotomy of Control',
+    description: 'Write "dichotomy of control", "not in my control", or "what is mine" in any entry',
+    unlockMessage: '↳ Epictetus: some things are in our power, some are not. This is the entire terminal interface. Sort everything into these two columns. ─○─',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  present_hinge: {
+    id: 'present_hinge',
+    symbol: '◉·∘·◉',
+    name: 'Present Hinge',
+    description: 'Write "present moment", "only moment", or "the hinge" in any entry',
+    unlockMessage: '↳ Marcus Aurelius: "Confine yourself to the present." The present is the hinge on which everything turns. Past is data. Future is speculation. Now is the lever. ◉·∘·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  apatheia_field: {
+    id: 'apatheia_field',
+    symbol: '≋·∘·≋',
+    name: 'Apatheia Field',
+    description: 'Write "apatheia", "equanimity", or "freedom from passion" in any entry',
+    unlockMessage: '↳ Apatheia: not the absence of feeling, but freedom from being ruled by feeling. The field is calm not because nothing happens — but because you are not moved against your will. ≋·∘·≋',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  temperance_mode: {
+    id: 'temperance_mode',
+    symbol: '═·○·═',
+    name: 'Temperance Mode',
+    description: 'Write "temperance", "moderation", or "self-control" in any entry',
+    unlockMessage: '↳ Sophrosyne: the ancient Greek virtue of self-control and moderation. One of the four cardinal Stoic virtues. Temperance is not deprivation — it is sovereignty. ═·○·═',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v21 — THE ANCIENT CALENDAR ───────────────────────────
+  marcus_day: {
+    id: 'marcus_day',
+    symbol: '◉·≡·◉',
+    name: 'Marcus Day',
+    description: 'Checked in on April 26 — Marcus Aurelius born 121 CE',
+    unlockMessage: '↳ April 26, 121 CE — Marcus Aurelius born. Emperor and philosopher. He wrote the Meditations for himself, never intending them to be published. You are reading his private journal. ◉·≡·◉',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  zeno_day: {
+    id: 'zeno_day',
+    symbol: '─·∘·─',
+    name: 'Zeno Day',
+    description: 'Checked in on February 14 — honoring Zeno of Citium, founder of Stoicism (~334–262 BCE)',
+    unlockMessage: '↳ Zeno of Citium founded Stoicism in Athens ~300 BCE, teaching in the Stoa Poikile — the Painted Porch. The school is named for a building. The practice outlasted the building by 2,300 years. ─·∘·─',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  seneca_day: {
+    id: 'seneca_day',
+    symbol: '∿·▲·∿',
+    name: 'Seneca Day',
+    description: 'Checked in on April 19 — Seneca died 65 CE, his last day of Stoic practice',
+    unlockMessage: '↳ April 19, 65 CE — Seneca forced to die by Nero. He spent his last hours discussing philosophy with his friends. "I cannot distinguish between the end of a man and the end of a day." ∿·▲·∿',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v20 — STOIC PATTERNS ──────────────────────────────────────────
+  stoic_session: {
+    id: 'stoic_session',
+    symbol: '◉·=·◉',
+    name: 'Stoic Session',
+    description: 'Write 3+ Stoic philosophy (v23) trigger words in one journal entry',
+    unlockMessage: '↳ Three Stoic concepts in one entry. You are running the philosophy terminal. Virtue, reason, fate — the ancient OS is executing. ◉·=·◉',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  evening_review: {
+    id: 'evening_review',
+    symbol: '∿·◐·∿',
+    name: 'Evening Review',
+    description: 'Check in between 21:00 and 22:00 — the Stoic evening self-examination hour',
+    unlockMessage: '↳ Seneca\'s evening review: "Where have I failed today? What have I done? What duty left undone?" The Stoics ended each day with an audit. You ran it tonight. ∿·◐·∿',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  meditations_entry: {
+    id: 'meditations_entry',
+    symbol: '≡·●·≡',
+    name: 'Meditations Entry',
+    description: 'Write a journal entry of 300+ words containing Stoic philosophy vocabulary',
+    unlockMessage: '↳ Marcus Aurelius wrote short, precise meditations — each a complete thought. You wrote 300 words with Stoic vocabulary. Your journal is your Meditations. ≡·●·≡',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v21 — THE PHILOSOPHER'S CLASS ────────────────────────────
+  stoic_entry: {
+    id: 'stoic_entry',
+    symbol: '∘→●',
+    name: 'Stoic Entry',
+    description: 'Earn any 1 Stoic Terminal (v23) word turn badge',
+    unlockMessage: '↳ The philosophy terminal is open. One concept named. The examined life has begun. ∘→●',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  stoic_practitioner: {
+    id: 'stoic_practitioner',
+    symbol: '≈→●',
+    name: 'Stoic Practitioner',
+    description: 'Earn any 5 Stoic Terminal (v23) word turn badges',
+    unlockMessage: '↳ Five Stoic concepts woven into your writing. Amor fati. Memento mori. Virtue. Control. Presence. The practice is becoming a practice. ≈→●',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  stoic_master: {
+    id: 'stoic_master',
+    symbol: '≋→●',
+    name: 'Stoic Master',
+    description: 'Earn all 12 Stoic Terminal (v23) word turn badges',
+    unlockMessage: '↳ All twelve Stoic terminal commands executed. You have run the complete philosophy OS. Marcus Aurelius, Epictetus, Seneca, Zeno — the full stack. ≋→●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  ataraxia_arc: {
+    id: 'ataraxia_arc',
+    symbol: '●·≡',
+    name: 'Ataraxia Arc',
+    description: 'Earn stoic_master + all 3 Ancient Calendar badges (marcus_day, zeno_day, seneca_day)',
+    unlockMessage: '↳ The masters and the concepts aligned. You carried the practice across their calendar. Ataraxia — tranquility as a system state — confirmed. ●·≡',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·≡',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each of the 23 Word Turn engines (v1–v23)',
+    unlockMessage: '↳ Twenty-three engines. Water. Alchemy. Quantum. Hero. Stoic. Every vocabulary the self has ever used, activated in the archive. ◈·◈·≡',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  philosopher_opus: {
+    id: 'philosopher_opus',
+    symbol: '●·◉·≡',
+    name: 'Philosopher Opus',
+    description: 'Earn stoic_master + stoic_session behavioral badge',
+    unlockMessage: '↳ All twelve concepts. And you ran three of them in a single entry. The opus is the practice making itself visible. ●·◉·≡',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v23 — THE EXAMINED LIFE ─────────────────────────────────────
+  philosopher_log: {
+    id: 'philosopher_log',
+    symbol: '≡·∞·≡',
+    name: 'Philosopher Log',
+    description: '1,000+ distinct calendar days with at least one check-in',
+    unlockMessage: '↳ 1,000 days. Socrates said the unexamined life is not worth living. You have examined yours 1,000 times. The log is the proof. ≡·∞·≡',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  great_practice: {
+    id: 'great_practice',
+    symbol: '●·∞·≡',
+    name: 'Great Practice',
+    description: '200,000+ total journal words written across all entries',
+    unlockMessage: '↳ 200,000 words. Marcus Aurelius\'s Meditations is ~60,000 words. You have written three of them. The practice is the great work. ●·∞·≡',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  decade_arc: {
+    id: 'decade_arc',
+    symbol: '╔═╗·≡',
+    name: 'Decade Arc',
+    description: 'Account age >= 10 years (3,650+ days since signup)',
+    unlockMessage: '↳ Ten years. A decade of the examined life. Seneca: "I shall resist old age and make it give back what it has taken from me." You have made it give you a decade. ╔═╗·≡',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·●·≡',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Water. Arcade. Radio. Biology. Codex. Cyberspace. Hero. Stoic. Twenty-three vocabularies. One terminal. The self speaks every language the practice has ever built. ◈·◈·●·≡',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v20 — THE ANCIENT MASTERS ────────────────────────────────────
+  aurelius_codex: {
+    id: 'aurelius_codex',
+    symbol: '≡·◉·≡',
+    name: 'Aurelius Codex',
+    description: 'Write "marcus aurelius", "meditations", or "philosopher king" in any journal entry',
+    unlockMessage: '↳ The emperor who wrote philosophy to himself at night. The Meditations were never published in his lifetime. "You have power over your mind, not outside events. Realize this, and you will find strength." ≡·◉·≡',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  epictetus_gate: {
+    id: 'epictetus_gate',
+    symbol: '─·◉·─',
+    name: 'Epictetus Gate',
+    description: 'Write "epictetus", "enchiridion", "discourses", or "slave philosopher" in any journal entry',
+    unlockMessage: '↳ Epictetus was born a slave. He became the most quoted Stoic. The Enchiridion — the handbook — is 53 paragraphs that run the entire philosophy in minimal space. The gate is always open. ─·◉·─',
+    rarity: 'legendary',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  zeno_stoa: {
+    id: 'zeno_stoa',
+    symbol: '╔·∞·╗',
+    name: 'Zeno Stoa',
+    description: 'Write "zeno of citium", "stoicism founded", or "stoa poikile" in any journal entry',
+    unlockMessage: '↳ Zeno began teaching in the Stoa Poikile — the Painted Porch — around 300 BCE. He named the school for the building. The building is gone. The Stoa is everywhere. ╔·∞·╗',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8418,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 (v23) — THE STOIC TERMINAL ──────────────────────────────────────────
+    const stoicV23Badges: BadgeType[] = [
+      'amor_fati', 'memento_mori', 'ataraxia', 'eudaimonia',
+      'premeditatio', 'logos_aligned', 'virtue_path', 'impermanence_signal',
+      'dichotomy_of_control', 'present_hinge', 'apatheia_field', 'temperance_mode',
+    ]
+    const stoicV23Earned = stoicV23Badges.filter(b => hasBadge(b))
+
+    if (stoicV23Earned.length >= 1 && !hasBadge('stoic_entry')) {
+      if (awardBadge('stoic_entry')) newBadges.push('stoic_entry')
+    }
+    if (stoicV23Earned.length >= 5 && !hasBadge('stoic_practitioner')) {
+      if (awardBadge('stoic_practitioner')) newBadges.push('stoic_practitioner')
+    }
+    const stoicComplete = stoicV23Earned.length >= 12
+    if (stoicComplete && !hasBadge('stoic_master')) {
+      if (awardBadge('stoic_master')) newBadges.push('stoic_master')
+    }
+
+    // philosopher_opus: stoic_master + stoic_session
+    if (stoicComplete && hasBadge('stoic_session') && !hasBadge('philosopher_opus')) {
+      if (awardBadge('philosopher_opus')) newBadges.push('philosopher_opus')
+    }
+
+    // ataraxia_arc: stoic_master + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['marcus_day', 'zeno_day', 'seneca_day']
+    if (stoicComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('ataraxia_arc')) {
+      if (awardBadge('ataraxia_arc')) newBadges.push('ataraxia_arc')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = stoicV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: philosopher_log — 1,000+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('philosopher_log')) {
+        if (awardBadge('philosopher_log')) newBadges.push('philosopher_log')
+      }
+    }
+
+    // Mastery v23: great_practice — 200,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('great_practice')) {
+        if (awardBadge('great_practice')) newBadges.push('great_practice')
+      }
+    }
+
+    // Mastery v23: decade_arc — Account age >= 10 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupDec = new Date(stats.signupDate)
+      const yearsDec = (new Date().getTime() - signupDec.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsDec >= 10 && !hasBadge('decade_arc')) {
+        if (awardBadge('decade_arc')) newBadges.push('decade_arc')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
     }
 
   } catch (error) {
