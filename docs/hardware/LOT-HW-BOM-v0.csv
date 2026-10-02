@@ -1,0 +1,14 @@
+block,part,qty,est_unit_usd_at_100,source
+MCU,ESP32-S3-WROOM-1-N16R8,1,6,PCBWay/LCSC
+Camera,OV2640 FPC module,1,4,Seeed/AliExpress
+Display,GC9A01 1.28in round or ST7789 1.54in,1,6,Waveshare
+Sensor,BME688,1,15,DigiKey 828-BME688CT-ND
+Sensor,VEML7700,1,1.5,DigiKey/LCSC
+Qi RX IC,BQ51050B,1,3,TI
+Qi coil,WPC 5W RX coil + ferrite,1,2,Wurth/LCSC
+Charger,BQ25185,1,1.5,TI
+Battery,LiPo 303040 400mAh PCM,1,4,Local supplier (UN38.3)
+UI,Tactile button + haptic/piezo,1,3,LCSC
+PCB+SMT,4L 0.8mm ENIG turnkey,1,12,PCBWay
+Body,316L 2-part CNC + mirror polish + glass window,1,45,PCBWay CNC/local
+Misc,passives ESD antenna packaging,1,10,various
