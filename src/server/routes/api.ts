@@ -18,6 +18,7 @@ import {
 } from '#shared/types'
 import config from '#server/config'
 import { fp } from '#shared/utils'
+import { EMAIL_MARKER, toEmailBody, fromEmailBody } from '#shared/email'
 import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
@@ -4082,6 +4083,105 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — a direct message tagged with EMAIL_MARKER. Composed in Log
+  // (/email to Hitomi. ...), received in Sync. Recipients are LOT Community
+  // members (same tiers as Sync chat), never suspended.
+  // ============================================================================
+  const EMAIL_COMMUNITY_TAGS = ['admin', 'r&d', 'usership', 'onyx', 'legacy']
+  const isEmailCommunityMember = (u: { tags?: string[] | null }) =>
+    (u.tags || []).some((t) => EMAIL_COMMUNITY_TAGS.includes(String(t).toLowerCase()))
+  const isSuspendedUser = (u: { tags?: string[] | null }) =>
+    (u.tags || []).some((t) => String(t).toLowerCase() === 'suspended')
+
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { to?: string; toUserId?: string; body: string }
+  }>, reply) => {
+    try {
+      const { to, toUserId, body } = req.body || ({} as any)
+      if (!body || !String(body).trim() || (!to && !toUserId)) {
+        return reply.status(400).send({ error: 'Recipient and body are required' })
+      }
+      if (isSuspendedUser(req.user) || !isEmailCommunityMember(req.user)) {
+        return reply.status(403).send({ error: 'Email requires LOT Community membership' })
+      }
+      let receiver: InstanceType<typeof fastify.models.User> | null = null
+      if (toUserId) {
+        receiver = await fastify.models.User.findByPk(toUserId)
+      } else {
+        const name = String(to).trim().toLowerCase()
+        const candidates = await fastify.models.User.findAll({
+          where: fastify.sequelize.where(
+            fastify.sequelize.fn('lower', fastify.sequelize.col('firstName')),
+            name
+          ),
+          limit: 50,
+        })
+        const members = candidates.filter(
+          (u) => u.id !== req.user.id && isEmailCommunityMember(u) && !isSuspendedUser(u)
+        )
+        if (members.length > 1) {
+          return reply.status(409).send({
+            error: `Several members are named ${to}. Use their full name from Sync.`,
+          })
+        }
+        receiver = members[0] || null
+      }
+      if (!receiver || receiver.id === req.user.id || !isEmailCommunityMember(receiver) || isSuspendedUser(receiver)) {
+        return reply.status(404).send({ error: `No community member found: ${to || toUserId}` })
+      }
+      const dm = await fastify.models.DirectMessage.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: toEmailBody(String(body)),
+      })
+      sync.emit('direct_message', {
+        id: dm.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: dm.message,
+        senderName: `${req.user.firstName} ${req.user.lastName}`.trim(),
+        createdAt: dm.createdAt,
+      })
+      return reply.send({ id: dm.id, to: receiver.firstName })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  // Inbox: received emails, newest first
+  fastify.get('/emails', async (req: FastifyRequest, reply) => {
+    try {
+      const rows = await fastify.models.DirectMessage.findAll({
+        where: {
+          receiverId: req.user.id,
+          message: { [Op.like]: `${EMAIL_MARKER}%` },
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 50,
+      })
+      const senders = await fastify.models.User.findAll({
+        where: { id: [...new Set(rows.map((r) => r.senderId))] },
+      })
+      const byId = new Map(senders.map((u) => [u.id, u]))
+      return reply.send(
+        rows
+          .filter((r) => !isSuspendedUser(byId.get(r.senderId) || {}))
+          .map((r) => ({
+            id: r.id,
+            senderId: r.senderId,
+            from: `${byId.get(r.senderId)?.firstName || ''} ${byId.get(r.senderId)?.lastName || ''}`.trim() || 'Unknown',
+            body: fromEmailBody(r.message),
+            createdAt: r.createdAt,
+          }))
+      )
+    } catch (error) {
+      console.error('Error fetching emails:', error)
+      return reply.status(500).send({ error: 'Failed to fetch emails' })
     }
   })
 

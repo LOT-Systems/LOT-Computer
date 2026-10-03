@@ -24,7 +24,10 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  useSendEmail,
 } from '#client/queries'
+import { isEmailMessage } from '#shared/email'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
 import {
@@ -50,6 +53,26 @@ export const Sync = React.memo(function SyncInner() {
   const queryClient = useQueryClient()
 
   const [message, setMessage] = React.useState('')
+
+  // LOT® Email: inbox (composed in Log with /email to NAME.) + Cohort handoff
+  const { data: emails } = useEmails()
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: () => {
+      setEmailDraft('')
+      setEmailTo(null)
+      queryClient.invalidateQueries(['/api/emails'])
+    },
+  })
+  const [emailTo, setEmailTo] = React.useState<{ id: string; name: string } | null>(() => {
+    try {
+      const raw = sessionStorage.getItem('lot_email_to')
+      sessionStorage.removeItem('lot_email_to')
+      return raw ? JSON.parse(raw) : null
+    } catch {
+      return null
+    }
+  })
+  const [emailDraft, setEmailDraft] = React.useState('')
   // SSE-received messages not yet reflected in the API response
   const [sseMessages, setSseMessages] = React.useState<PublicChatMessage[]>([])
 
@@ -117,7 +140,16 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeDirectMessageListener } = sync.listen(
+      'direct_message' as any,
+      (data: any) => {
+        if (data?.receiverId === me?.id && isEmailMessage(data.message || '')) {
+          queryClient.invalidateQueries(['/api/emails'])
+        }
+      }
+    )
     return () => {
+      disposeDirectMessageListener()
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
     }
@@ -213,6 +245,48 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {(emailTo || !!emails?.length) && (
+        <div className="mb-80">
+          <div className="text-acc/40 mb-8">EMAIL</div>
+          {emailTo && (
+            <form
+              className="flex items-center gap-x-8 mb-8"
+              onSubmit={(ev) => {
+                ev.preventDefault()
+                if (emailDraft.trim()) sendEmail({ toUserId: emailTo.id, body: emailDraft })
+              }}
+            >
+              <span className="whitespace-nowrap">To {emailTo.name}</span>
+              <ResizibleGhostInput
+                direction="vh"
+                value={emailDraft}
+                onChange={setEmailDraft}
+                placeholder="Write an email..."
+                containerClassName="flex-grow leading-normal"
+                className="leading-normal"
+              />
+              <Button type="submit" kind="secondary" size="small" disabled={!emailDraft.trim()}>
+                Send
+              </Button>
+            </form>
+          )}
+          {emails?.map((e) => (
+            <div key={e.id} className="flex items-start gap-x-8 py-2">
+              <span className="whitespace-nowrap">{e.from}</span>
+              <div className="whitespace-breakspaces" style={{ wordBreak: 'break-word' }}>
+                {e.body}
+              </div>
+              <span className="text-acc/40 whitespace-nowrap ml-auto">
+                {dayjs(e.createdAt).fromNow()}
+              </span>
+            </div>
+          ))}
+          {!!emails?.length && (
+            <div className="text-acc/40 mt-8">Reply in Log: /email to NAME. your message</div>
+          )}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {

@@ -29,6 +29,8 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewEmailCommands } from '#shared/email'
+import { useSendEmail } from '#client/queries'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -4139,6 +4141,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to NAME. text   Email a community member (press Enter to send)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4165,6 +4168,22 @@ const NoteEditor = ({
           }
         }
       }
+    }
+  }, [value])
+
+  // LOT® Email: "/email to Hitomi. message" + Enter sends it to Sync.
+  const [emailResult, setEmailResult] = React.useState<string | null>(null)
+  const { mutateAsync: sendEmail } = useSendEmail()
+  const lastEmailScanRef = React.useRef(log.text || '')
+  React.useEffect(() => {
+    const fresh = detectNewEmailCommands(value, lastEmailScanRef.current)
+    lastEmailScanRef.current = value
+    for (const cmd of fresh) {
+      sendEmail({ to: cmd.to, body: cmd.body })
+        .then(() => setEmailResult(`SENT TO ${cmd.to.toUpperCase()}`))
+        .catch((err: any) =>
+          setEmailResult(err?.response?.data?.error || err?.message || 'EMAIL FAILED')
+        )
     }
   }, [value])
 
@@ -4384,6 +4403,13 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailResult && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6' }}>{emailResult}</div>
             </Block>
           </div>
         )}

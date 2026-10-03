@@ -117,6 +117,14 @@ export const CohortConnectWidget: React.FC = () => {
   }
 
   const handleSendMessage = (userId: string, similarity: number) => {
+    // Cohort Dating → LOT® Email: Sync opens with a composer addressed to this match
+    const m = matches.find((x) => x.user.id === userId)
+    try {
+      sessionStorage.setItem(
+        'lot_email_to',
+        JSON.stringify({ id: userId, name: m?.user.firstName || 'member' })
+      )
+    } catch {}
     recordSignal('mood', 'cohort_message_initiated', {
       userId,
       similarity,
