@@ -18,9 +18,63 @@ import { recordCalendarSignal } from '#client/stores/intentionEngine'
 type EntryType = 'note' | 'task' | 'call'
 
 type CalendarEntry = {
+  id: string
   date: string
+  time: string | null // HH:mm local, null = all-day
   text: string
   type: EntryType
+}
+
+type AlertStage = 'T-15' | 'T-0' | 'MISSED'
+
+type ActiveAlert = {
+  key: string
+  entry: CalendarEntry
+  stage: AlertStage
+}
+
+const PRE_ALERT_MIN = 15
+const MISSED_WINDOW_MIN = 120
+const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/
+const ACK_STORAGE = 'lot-calendar-fired'
+
+const STAGE_LABEL: Record<AlertStage, string> = {
+  'T-15': 'PRE-ALERT T-15',
+  'T-0': 'ZERO HOUR',
+  'MISSED': 'MISSED',
+}
+
+function eventMoment(e: CalendarEntry): Dayjs | null {
+  if (!e.time) return null
+  const d = dayjs(`${e.date}T${e.time}:00`)
+  return d.isValid() ? d : null
+}
+
+function formatCountdown(ms: number): string {
+  const sign = ms < 0 ? '+' : '-'
+  const total = Math.floor(Math.abs(ms) / 1000)
+  const h = Math.floor(total / 3600)
+  const m = Math.floor((total % 3600) / 60)
+  const s = total % 60
+  const pad = (n: number) => String(n).padStart(2, '0')
+  if (h >= 24) return `T${sign}${Math.floor(h / 24)}D ${pad(h % 24)}H`
+  return `T${sign}${pad(h)}:${pad(m)}:${pad(s)}`
+}
+
+function readFired(): Set<string> {
+  try {
+    const raw = localStorage.getItem(ACK_STORAGE)
+    return new Set(raw ? (JSON.parse(raw) as string[]) : [])
+  } catch (_) {
+    return new Set()
+  }
+}
+
+function writeFired(set: Set<string>) {
+  try {
+    // keep the most recent 300 keys
+    localStorage.setItem(ACK_STORAGE, JSON.stringify(Array.from(set).slice(-300)))
+  } catch (_) {}
 }
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -59,25 +113,122 @@ export function CalendarWidget() {
   const [isAddingEntry, setIsAddingEntry] = React.useState(false)
   const [entryText, setEntryText] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
+  const [entryTime, setEntryTime] = React.useState('')
+  const [now, setNow] = React.useState(() => Date.now())
+  const [alerts, setAlerts] = React.useState<ActiveAlert[]>([])
+  const firedRef = React.useRef<Set<string> | null>(null)
 
   const entries = React.useMemo<CalendarEntry[]>(() => {
     return logs
       .filter(log => log.event === 'calendar_entry' && log.metadata)
       .map(log => ({
+        id: log.id,
         date: log.metadata?.date as string,
+        time: TIME_RE.test(String(log.metadata?.time ?? '')) ? (log.metadata?.time as string) : null,
         text: log.metadata?.text as string || log.text || '',
         type: (log.metadata?.entryType as EntryType) || 'note',
       }))
       .filter(e => e.date && e.text)
-      .sort((a, b) => a.date.localeCompare(b.date))
+      .sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')))
   }, [logs])
+
+  // Alerts already recorded in Log (survives reloads and other devices)
+  const loggedAlertKeys = React.useMemo(() => {
+    const set = new Set<string>()
+    logs.forEach(log => {
+      if (log.event === 'calendar_alert' && log.metadata?.entryId) {
+        set.add(`${log.metadata.entryId}:${log.metadata.stage}`)
+      }
+    })
+    return set
+  }, [logs])
+
+  // Clock: 1s when an event is near, otherwise 20s
+  const nextTimedMs = React.useMemo(() => {
+    for (const e of entries) {
+      const m = eventMoment(e)
+      if (m && m.valueOf() > now - MISSED_WINDOW_MIN * 60000) return m.valueOf() - now
+    }
+    return null
+  }, [entries, now])
+  const tickMs = nextTimedMs !== null && nextTimedMs < 3600000 ? 1000 : 20000
+  React.useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), tickMs)
+    return () => clearInterval(id)
+  }, [tickMs])
+
+  // Alert engine: fire each (entry, stage) once, record it in Log
+  React.useEffect(() => {
+    if (!firedRef.current) firedRef.current = readFired()
+    const fired = firedRef.current
+    const fresh: ActiveAlert[] = []
+
+    for (const entry of entries) {
+      const m = eventMoment(entry)
+      if (!m) continue
+      const diffMin = (m.valueOf() - now) / 60000
+      let stage: AlertStage | null = null
+      if (diffMin <= -MISSED_WINDOW_MIN) continue
+      if (diffMin <= -1) stage = 'MISSED'
+      else if (diffMin <= 0.25) stage = 'T-0'
+      else if (diffMin <= PRE_ALERT_MIN) stage = 'T-15'
+      if (!stage) continue
+
+      const key = `${entry.id}:${stage}`
+      if (fired.has(key) || loggedAlertKeys.has(key)) continue
+      fired.add(key)
+      // a later stage supersedes earlier ones that were never shown
+      if (stage !== 'T-15') fired.add(`${entry.id}:T-15`)
+      if (stage === 'MISSED') fired.add(`${entry.id}:T-0`)
+      fresh.push({ key, entry, stage })
+    }
+
+    if (fresh.length === 0) return
+    writeFired(fired)
+    setAlerts(prev => [...prev.filter(a => !fresh.some(f => f.entry.id === a.entry.id)), ...fresh])
+
+    fresh.forEach(({ entry, stage }) => {
+      createLog({
+        text: `[ALERT ${STAGE_LABEL[stage]}] ${entry.type}: ${entry.text} (${entry.date} ${entry.time})`,
+        event: 'calendar_alert',
+        metadata: {
+          entryId: entry.id,
+          stage,
+          date: entry.date,
+          time: entry.time,
+          entryType: entry.type,
+        },
+      }, {
+        onSuccess: () => { queryClient.refetchQueries(['/api/logs']) },
+      })
+      try {
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          new Notification(`${STAGE_LABEL[stage]} · ${entry.time}`, {
+            body: `${entry.type.toUpperCase()}: ${entry.text}`,
+            tag: `lot-cal-${entry.id}`,
+          })
+        }
+      } catch (_) {}
+    })
+  }, [entries, now, loggedAlertKeys, createLog, queryClient])
+
+  const dismissAlert = (key: string) => setAlerts(prev => prev.filter(a => a.key !== key))
+
+  const [notifPermission, setNotifPermission] = React.useState<string>(() =>
+    typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
+  )
+  const enableNotifications = () => {
+    try {
+      Notification.requestPermission().then(p => setNotifPermission(p))
+    } catch (_) {}
+  }
 
   const upcomingEntries = React.useMemo(() => {
     const today = dayjs().format('YYYY-MM-DD')
     return entries
       .filter(e => e.date >= today)
       .slice(0, 10)
-  }, [entries])
+  }, [entries, now])
 
   const entriesOnDate = React.useMemo(() => {
     if (!selectedDate) return []
@@ -108,7 +259,8 @@ export function CalendarWidget() {
   const handleAddEntry = () => {
     if (!selectedDate || !entryText.trim()) return
 
-    const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
+    const time = TIME_RE.test(entryTime) ? entryTime : null
+    const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY') + (time ? ` ${time}` : '')
 
     createLog({
       text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel})`,
@@ -117,6 +269,7 @@ export function CalendarWidget() {
         date: selectedDate,
         text: entryText.trim(),
         entryType,
+        ...(time ? { time } : {}),
       },
     }, {
       onSuccess: () => {
@@ -126,6 +279,7 @@ export function CalendarWidget() {
     })
 
     setEntryText('')
+    setEntryTime('')
     setIsAddingEntry(false)
   }
 
@@ -139,6 +293,33 @@ export function CalendarWidget() {
   return (
     <Block label="Calendar:" blockView onLabelClick={handleToggleCalendar}>
       <div className="w-full">
+        {alerts.length > 0 && (
+          <div className="mb-16 space-y-4" role="alert" aria-live="assertive">
+            {alerts.map(a => (
+              <div
+                key={a.key}
+                className={cn(
+                  'flex items-baseline justify-between gap-16 border-l-2 pl-8 uppercase tracking-widest',
+                  a.stage === 'MISSED' ? 'border-acc/30 text-acc/50' : 'border-acc text-acc',
+                  a.stage === 'T-0' && 'animate-pulse',
+                )}
+              >
+                <span className="min-w-0">
+                  <span className="tabular-nums">{a.entry.time}</span>
+                  {' // '}{STAGE_LABEL[a.stage]}{' // '}{a.entry.type}{' // '}
+                  <span className="normal-case tracking-normal">{a.entry.text}</span>
+                </span>
+                <button
+                  className="text-acc/60 hover:text-acc whitespace-nowrap"
+                  onClick={() => dismissAlert(a.key)}
+                >
+                  ACK
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="mb-16">
           <Button onClick={handleToggleCalendar}>
             Add date
@@ -229,6 +410,13 @@ export function CalendarWidget() {
                 </div>
                 <div className="flex gap-8 items-center">
                   <input
+                    type="time"
+                    value={entryTime}
+                    onChange={e => setEntryTime(e.target.value)}
+                    aria-label="Time (optional)"
+                    className="bg-transparent border border-acc/20 text-acc px-4 py-2 outline-none focus:border-acc/40"
+                  />
+                  <input
                     type="text"
                     value={entryText}
                     onChange={e => setEntryText(e.target.value)}
@@ -249,6 +437,7 @@ export function CalendarWidget() {
                 </div>
                 {entriesOnDate.map((e, i) => (
                   <div key={i} className="text-acc/80 mb-1">
+                    {e.time && <span className="tabular-nums text-acc/40 mr-8">{e.time}</span>}
                     {e.text}
                   </div>
                 ))}
@@ -259,16 +448,33 @@ export function CalendarWidget() {
 
         {upcomingEntries.length > 0 && (
           <div className="space-y-1">
-            {upcomingEntries.map((entry, i) => (
-              <div key={i} className="flex justify-between gap-16">
-                <span className="text-acc whitespace-nowrap">
-                  {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
-                </span>
-                <span className="text-acc text-right">
-                  {entry.text}
-                </span>
-              </div>
-            ))}
+            {upcomingEntries.map((entry, i) => {
+              const m = eventMoment(entry)
+              const diff = m ? m.valueOf() - now : null
+              const showClock = diff !== null && diff < 24 * 3600000
+              return (
+                <div key={entry.id || i} className="flex justify-between gap-16">
+                  <span className="text-acc whitespace-nowrap">
+                    {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
+                    {entry.time && <span className="text-acc/60">{' '}{entry.time}</span>}
+                  </span>
+                  <span className="text-acc text-right">
+                    {showClock && diff !== null && (
+                      <span className="text-acc/40 tabular-nums mr-8">{formatCountdown(diff)}</span>
+                    )}
+                    {entry.text}
+                  </span>
+                </div>
+              )
+            })}
+            {notifPermission === 'default' && (
+              <button
+                className="text-acc/30 hover:text-acc/60 transition-opacity mt-8"
+                onClick={enableNotifications}
+              >
+                Enable system alerts
+              </button>
+            )}
           </div>
         )}
 
