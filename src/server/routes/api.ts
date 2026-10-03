@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: restorative momentum · quantum field consolidation · temporal presence lock (P152/P153/P154)
+      'restorative_momentum',
+      'quantum_field_consolidation',
+      'temporal_presence_lock',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

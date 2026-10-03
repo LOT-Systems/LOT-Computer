@@ -3428,6 +3428,66 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Restorative Momentum — recovery-intelligence-arc (P151) fired on 2+ distinct
+  // days within a 7-day window. The system is learning to restore itself repeatedly.
+  // Not a one-time recovery but a pattern of intelligent self-healing.
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000
+  const recentSevenD = signals.filter(s => now - s.timestamp < sevenDaysMs)
+  const recoveryArcSignals152 = recentSevenD.filter(s => s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc')
+  const recoveryDays152 = new Set(
+    recoveryArcSignals152.map(s => new Date(s.timestamp).toDateString())
+  )
+  if (recoveryDays152.size >= 2) {
+    const densityBonus = Math.min((recoveryDays152.size - 2) * 0.06, 0.18)
+    patterns.push({
+      pattern: 'restorative-momentum',
+      confidence: Math.min(0.70 + densityBonus, 0.88),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `RESTMOM: Restorative momentum — recovery intelligence arc confirmed on ${recoveryDays152.size} distinct days in 7d window. The system has learned its own restoration. Not recovery — pattern. Intelligent healing arc recurring.`,
+    })
+  }
+
+  // Pattern 153: Quantum Field Consolidation — total-field-coherence (P150) AND within 12h:
+  // memory + goals/intentions + planner all fire. The peak state creates downstream execution.
+  // Coherence manifests into structured action.
+  const twelveHoursMs = 12 * 60 * 60 * 1000
+  const recentTwelveH = signals.filter(s => now - s.timestamp < twelveHoursMs)
+  const hasTotCoh153 = patterns.some(p => p.pattern === 'total-field-coherence')
+  const memSignals153 = recentTwelveH.filter(s => s.source === 'memory')
+  const goalSignals153 = recentTwelveH.filter(s => s.source === 'goals' || s.source === 'intentions')
+  const planSignals153 = recentTwelveH.filter(s => s.source === 'planner')
+  if (hasTotCoh153 && memSignals153.length >= 1 && goalSignals153.length >= 1 && planSignals153.length >= 1) {
+    const totcohConf = patterns.find(p => p.pattern === 'total-field-coherence')?.confidence ?? 0.90
+    const execBonus = Math.min((memSignals153.length + goalSignals153.length + planSignals153.length - 3) * 0.03, 0.15)
+    patterns.push({
+      pattern: 'quantum-field-consolidation',
+      confidence: Math.min(0.75 + execBonus + (totcohConf - 0.90) * 0.5, 0.92),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'immediate',
+      reason: `QFCONS: Quantum field consolidation — total-field-coherence active · memory ${memSignals153.length} · goals/intentions ${goalSignals153.length} · planner ${planSignals153.length} all within 12h. Peak state manifests into execution. Coherence lands in structure.`,
+    })
+  }
+
+  // Pattern 154: Temporal Presence Lock — circadian-signal-lock (P143) on 3+ consecutive days.
+  // Sustained temporal architecture beyond a single day. The arc repeats.
+  const threeDaysMs = 3 * 24 * 60 * 60 * 1000
+  const recentThreeD = signals.filter(s => now - s.timestamp < threeDaysMs)
+  const circLockSignals154 = recentThreeD.filter(s => s.source === 'energy' && s.signal === 'circadian_signal_lock')
+  const circLockDays154 = new Set(
+    circLockSignals154.map(s => new Date(s.timestamp).toDateString())
+  )
+  if (circLockDays154.size >= 3) {
+    const lockBonus = Math.min((circLockDays154.size - 3) * 0.04, 0.13)
+    patterns.push({
+      pattern: 'temporal-presence-lock',
+      confidence: Math.min(0.72 + lockBonus, 0.85),
+      suggestedWidget: 'planner',
+      suggestedTiming: 'passive',
+      reason: `TPLOCK: Temporal presence lock — circadian-signal-lock confirmed on ${circLockDays154.size} consecutive days. Temporal architecture is sustained, not occasional. The daily arc repeats. The body is anchored in time.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4124,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  restorativeMomentumNode:      ['selfcare', 'mood', 'journal', 'energy', 'log'],
+  quantumFieldConsolidationNode: ['memory', 'goals', 'intentions', 'planner', 'qos', 'log'],
+  temporalPresenceLockNode:      ['energy', 'mood', 'selfcare', 'log'],
 }
 
 /**
@@ -4510,6 +4575,13 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+  {
+    archetype: 'Restorative Intelligence Operator',
+    energyBands: ['low', 'moderate', 'depleted'],
+    dominantSources: ['selfcare', 'mood', 'journal', 'energy'],
+    patternConditions: ['restorative-momentum', 'recovery-intelligence-arc', 'biofield-recovery-arc'],
+    directive: 'Recovery loop completed multiple times. The system has learned its own restoration. Pattern is stable. Rest, reflect, rebuild — the loop is intelligent now.',
   },
 ]
 
@@ -6498,6 +6570,50 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a restorative-momentum event — recovery-intelligence-arc (P151) confirmed on
+ * 2+ distinct days within 7d. The system has learned its own restoration. Feeds P152 detection.
+ */
+export function recordRestorativeMomentum(recoveryDays: number, lastArcDate: string) {
+  recordSignal('selfcare', 'restorative_momentum', {
+    recoveryDays,
+    lastArcDate,
+    pattern: 'RECURRING_RECOVERY',
+    status: 'RESTORATION_PATTERN_CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-field-consolidation event — total-field-coherence (P150) + memory +
+ * goals/intentions + planner all within 12h. Peak state manifests into execution. Feeds P153.
+ */
+export function recordQuantumFieldConsolidation(memCount: number, goalCount: number, planCount: number, totcohConf: number) {
+  recordSignal('qos', 'quantum_field_consolidation', {
+    memCount,
+    goalCount,
+    planCount,
+    totcohConf: Math.round(totcohConf * 100),
+    execDepth: memCount + goalCount + planCount,
+    consolidationStatus: 'COHERENCE_LANDS_IN_STRUCTURE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a temporal-presence-lock event — circadian-signal-lock (P143) sustained on
+ * 3+ consecutive days. The temporal architecture is stable across time. Feeds P154 detection.
+ */
+export function recordTemporalPresenceLock(lockedDays: number, lockDepth: 'confirmed' | 'deep' | 'absolute') {
+  recordSignal('energy', 'temporal_presence_lock', {
+    lockedDays,
+    lockDepth: lockDepth.toUpperCase(),
+    arcStatus: 'SUSTAINED',
+    temporalAnchor: 'MULTI_DAY_CONFIRMED',
     hour: new Date().getHours(),
   })
 }

@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily restorative momentum (10:00 UTC every day) — Job 49
+  if (shouldRunDailyRestorativeMomentumCheck()) {
+    await executeDailyRestorativeMomentumCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,109 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J49: Daily Restorative Momentum Check ───────────────────────────────────
+// Scans each user's recovery_intelligence_arc logs over last 7 days.
+// When 2+ arc events are found on distinct calendar days → writes restorative_momentum (P152).
+// The system confirms when recovery intelligence is a recurring pattern, not a single event.
+
+let isDailyRestorativeMomentumRunning = false
+let lastDailyRestorativeMomentumRun: Date | null = null
+
+function shouldRunDailyRestorativeMomentumCheck(): boolean {
+  const now = dayjs()
+  if (isDailyRestorativeMomentumRunning) return false
+  if (lastDailyRestorativeMomentumRun) {
+    const lastRun = dayjs(lastDailyRestorativeMomentumRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily
+}
+
+async function executeDailyRestorativeMomentumCheck(): Promise<JobResult> {
+  const jobName = 'daily-restorative-momentum-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyRestorativeMomentumRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyRestorativeMomentumRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY RESTORATIVE MOMENTUM CHECK — 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart = dayjs().subtract(7, 'day').startOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(3, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (72h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const arcLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+            event: 'recovery_intelligence_arc',
+          },
+          attributes: ['createdAt'],
+          order: [['createdAt', 'DESC']],
+        })
+
+        if (!arcLogs.length) continue
+
+        const uniqueDays = new Set(
+          arcLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD'))
+        )
+
+        if (uniqueDays.size >= 2) {
+          const lastArcDate = dayjs(arcLogs[0].createdAt).format('YYYY-MM-DD')
+          await (Log as any).create({
+            userId,
+            event: 'restorative_momentum',
+            text: `Restorative momentum — recovery intelligence arc confirmed on ${uniqueDays.size} distinct days in 7d. The system has learned its own restoration. Pattern stable.`,
+            metadata: {
+              recoveryDays: uniqueDays.size,
+              lastArcDate,
+              pattern: 'RECURRING_RECOVERY',
+              status: 'RESTORATION_PATTERN_CONFIRMED',
+              window: '7d',
+              hour: 10,
+            },
+          })
+          written++
+          console.log(`  [${userId}] Restorative momentum: ${uniqueDays.size} recovery days`)
+        }
+      } catch (userErr: any) {
+        console.warn(`  User ${userId} restorative momentum check failed: ${userErr.message}`)
+      }
+    }
+
+    console.log(`  Restorative momentum events written: ${written}`)
+    console.log('─'.repeat(60))
+    console.log('DAILY RESTORATIVE MOMENTUM CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastDailyRestorativeMomentumRun = new Date()
+    isDailyRestorativeMomentumRunning = false
+
+    return { jobName, executedAt, success: true, result: { scanned: activeUsers.length, written } }
+  } catch (error: any) {
+    console.error('Daily restorative momentum check failed:', error.message)
+    isDailyRestorativeMomentumRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5608,6 +5715,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily restorative momentum check: 10 AM UTC every day (Job 49)')
   console.log('')
 
   // Check every hour for scheduled jobs

@@ -1457,6 +1457,28 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-10-03',
+    title: 'QIE v114 — Restorative Momentum · Quantum Field Consolidation · Temporal Presence Lock',
+    assembled: [
+      'P152 RESTORATIVE MOMENTUM (restorative-momentum): recovery-intelligence-arc confirmed on 2+ distinct days in 7d window. The system has learned its own restoration. Recurring recovery pattern detected. Confidence 0.70–0.88.',
+      'P153 QUANTUM FIELD CONSOLIDATION (quantum-field-consolidation): total-field-coherence (P150) manifests into memory + goals/intentions + planner within 12h. Peak state executing into structure. Confidence 0.75–0.92.',
+      'P154 TEMPORAL PRESENCE LOCK (temporal-presence-lock): circadian-signal-lock (P143) sustained on 3+ consecutive days. Temporal architecture stable across time. Confidence 0.72–0.85.',
+      'Arch52 RESTORATIVE INTELLIGENCE OPERATOR: energyBands low/moderate/depleted · dominant: selfcare/mood/journal/energy · patterns: restorative-momentum + recovery-intelligence-arc + biofield-recovery-arc · directive: Recovery loop completed multiple times. The system has learned its own restoration. Pattern is stable.',
+      'J49 daily-restorative-momentum-check: 10:00 UTC daily. Scans recovery_intelligence_arc logs over 7d per user. Writes restorative_momentum event when 2+ distinct recovery days confirmed. 49 background jobs total.',
+      '3 dep nodes added: restorativeMomentumNode [selfcare/mood/journal/energy/log] · quantumFieldConsolidationNode [memory/goals/intentions/planner/qos/log] · temporalPresenceLockNode [energy/mood/selfcare/log]. 193+ dep nodes total.',
+      '3 signal helpers: recordRestorativeMomentum() · recordQuantumFieldConsolidation() · recordTemporalPresenceLock(). Appended to intentionEngine.ts.',
+      'Logs.tsx: RESTMOM: · QFCONS: · TPLOCK: military cockpit handlers added. Cockpit-rule compliant (data rows only, opacity-30 labels, tabular-nums values).',
+      'routes/api.ts: restorative_momentum · quantum_field_consolidation · temporal_presence_lock added to displayableEvents whitelist (v114 block).',
+      'PatternRecognitionWidget.tsx: P152/P153/P154 display names added · 3 QOS Trend view indicator blocks added (Restorative momentum / Coherence lands in structure / Temporal lock sustained).',
+      'QuantumEngineWidgets.tsx: RESTMOM · QFCONS · TPLOCK added to PATTERN_DISPLAY map.',
+      'About.tsx: FM v113→v114. 151→154 patterns. 51→52 archetypes. 48→49 jobs. 190+→193+ dep nodes. 151+→154+ log handlers. Day 1073+. 781 badges unchanged.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/assembly/2026-10-03_LOT-assembly_v114-restorative-momentum.md written. docs/SESSION_REPORT_2026_10_03_QIE_v114.md written.',
+      '154 patterns · 52 archetypes · 49 jobs · 193+ dep nodes · 154+ handlers · FM v114 · Day 1073+. QIE v114 deployed. The system now recognizes when it has learned its own restoration. Recovery is a pattern. Coherence lands in structure. Time locks into itself.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1516,20 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-10-03',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-10-03 · QIE v114 · RESTORATIVE MOMENTUM · Day 1073+',
+    'Built: P152 RESTMOM · P153 QFCONS · P154 TPLOCK · Arch52 Restorative Intelligence Operator · J49 daily-restorative-momentum-check.',
+    'P152: The system has learned your restoration. Recovery loop is intelligent now.',
+    'P153: Coherence lands in structure. Peak state (P150) executing into memory + goals + planner within 12h.',
+    'P154: Temporal lock sustained. Daily arc repeating on 3+ consecutive days.',
+    'Arch52 RESTORATIVE INTELLIGENCE OPERATOR: recovery loop completed multiple times. Pattern stable. Rest, reflect, rebuild — the loop is intelligent now.',
+    'J49 wired: 10:00 UTC daily. 49 background jobs running.',
+    '3 new dep nodes · 3 signal helpers · 3 log handlers (RESTMOM: QFCONS: TPLOCK:) · 3 QOS Trend indicators · API whitelist extended.',
+    'FM v113→v114. 151→154 patterns · 51→52 archetypes · 48→49 jobs · 190+→193+ dep nodes · 151+→154+ handlers.',
+    'FM v114 · Wiki v87 · 154P · 52A · 49J · 193+ nodes · 781 badges.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114.',
   ],
 }
 

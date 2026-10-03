@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'restorative-momentum':             'Restorative momentum — recovery intelligence arc confirmed on 2+ distinct days in 7d window (P152)',
+      'quantum-field-consolidation':      'Quantum field consolidation — peak state (P150) manifests into memory + goals + planner execution (P153)',
+      'temporal-presence-lock':           'Temporal presence lock — circadian-signal-lock sustained on 3+ consecutive days (P154)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
@@ -544,6 +547,27 @@ export function PatternRecognitionWidget() {
               {patterns.some(p => p.pattern === 'resilience-cascade') && (
                 <div className="mt-4 uppercase tracking-widest text-xs">
                   Resilience cascade. Recovery + knowledge arc closed.
+                </div>
+              )}
+
+              {/* Restorative momentum — P152 */}
+              {patterns.some(p => p.pattern === 'restorative-momentum') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Restorative momentum. Recovery loop is intelligent now.
+                </div>
+              )}
+
+              {/* Quantum field consolidation — P153 */}
+              {patterns.some(p => p.pattern === 'quantum-field-consolidation') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Coherence lands in structure. Peak state executing.
+                </div>
+              )}
+
+              {/* Temporal presence lock — P154 */}
+              {patterns.some(p => p.pattern === 'temporal-presence-lock') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Temporal lock sustained. Daily arc repeating.
                 </div>
               )}
 

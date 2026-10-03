@@ -3629,6 +3629,94 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'restorative_momentum') {
+          const recoveryDays = log.metadata?.recoveryDays as number | undefined
+          const lastArcDate = log.metadata?.lastArcDate as string | undefined
+          const status = log.metadata?.status as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RESTMOM:" blockView>
+                {recoveryDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECOVERY DAYS 7D</span>
+                    <span className="tabular-nums">{recoveryDays}</span>
+                  </div>
+                )}
+                {lastArcDate && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LAST ARC</span>
+                    <span className="tabular-nums">{lastArcDate}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">RESTORATION PATTERN · LOOP IS INTELLIGENT</div>
+                {status && (
+                  <div className="opacity-30 tabular-nums">{status}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_field_consolidation') {
+          const memCount = log.metadata?.memCount as number | undefined
+          const goalCount = log.metadata?.goalCount as number | undefined
+          const planCount = log.metadata?.planCount as number | undefined
+          const totcohConf = log.metadata?.totcohConf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QFCONS:" blockView>
+                {totcohConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TOTCOH CONF</span>
+                    <span className="tabular-nums">{totcohConf}%</span>
+                  </div>
+                )}
+                {memCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEM 12H</span>
+                    <span className="tabular-nums">{memCount}</span>
+                  </div>
+                )}
+                {goalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">GOALS/INT 12H</span>
+                    <span className="tabular-nums">{goalCount}</span>
+                  </div>
+                )}
+                {planCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PLAN 12H</span>
+                    <span className="tabular-nums">{planCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">COHERENCE LANDS IN STRUCTURE</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'temporal_presence_lock') {
+          const lockedDays = log.metadata?.lockedDays as number | undefined
+          const lockDepth = log.metadata?.lockDepth as string | undefined
+          const temporalAnchor = log.metadata?.temporalAnchor as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TPLOCK:" blockView>
+                {lockedDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LOCKED DAYS</span>
+                    <span className="tabular-nums">{lockedDays}</span>
+                  </div>
+                )}
+                {lockDepth && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LOCK DEPTH</span>
+                    <span className="tabular-nums">{lockDepth}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">TEMPORAL ARCHITECTURE SUSTAINED</div>
+                {temporalAnchor && (
+                  <div className="opacity-30 tabular-nums">{temporalAnchor}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
