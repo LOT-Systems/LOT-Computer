@@ -20,7 +20,6 @@ import { DirectMessageThread } from '#client/components/DirectMessageThread'
 import { StatusPage } from '#client/components/StatusPage'
 import { ApiPage } from '#client/components/ApiPage'
 import { Basics } from '#client/components/Basics'
-import { Basics } from '#client/components/Basics'
 import { ConnectionStatus } from '#client/components/ConnectionStatus'
 import { render } from '#client/utils/render'
 import { listenSSE } from '#client/utils/sse'
@@ -142,7 +141,7 @@ if (typeof window !== 'undefined') {
   })
 }
 
-type PersistentRoute = 'system' | 'logs' | 'sync' | 'settings' | 'api' | 'basics' | 'basics'
+type PersistentRoute = 'system' | 'logs' | 'sync' | 'settings' | 'api' | 'basics'
 
 const TabPanel = React.memo(function TabPanel({
   active,
