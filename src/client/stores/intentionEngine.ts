@@ -4880,9 +4880,11 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  logResonance?: { sampled: number; topRokuyo: string | null; taianShare: number }
 ) {
   recordSignal('astrology', 'ambient_reading', {
+    logResonance: logResonance || null,
     rokuyo,
     moonPhase,
     moonIllumination,

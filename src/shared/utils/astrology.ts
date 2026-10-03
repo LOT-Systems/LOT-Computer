@@ -177,3 +177,64 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Build a Date whose local getters (getHours/getDate/...) read the wall-clock
+ * time in the given IANA timeZone, regardless of the runtime's own zone.
+ * Falls back to the plain current time when timeZone is missing or invalid.
+ * Isomorphic (Intl only) so client dashboard and server Logs agree.
+ */
+export function getWallClockDate(timeZone?: string | null, now: Date = new Date()): Date {
+  if (!timeZone) return now
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(now)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return now
+  }
+}
+
+export interface AstroLogResonance {
+  sampled: number
+  topRokuyo: { name: string; count: number } | null
+  topMoonPhase: { name: string; count: number } | null
+  topHourlyZodiac: { name: string; count: number } | null
+  taianShare: number // 0-100, % of sampled logs written on a Taian day
+}
+
+/**
+ * Personalization from the user's own Logs: which ambient conditions they
+ * most often write under. Reads the astro* snapshot that getLogContext
+ * stamps on each log (entries without it are ignored).
+ */
+export function summarizeAstroLogs(
+  logs: Array<{ context?: { astroRokuyo?: string | null; astroMoonPhase?: string | null; astroHourlyZodiac?: string | null } | null }>
+): AstroLogResonance {
+  const tally = (key: 'astroRokuyo' | 'astroMoonPhase' | 'astroHourlyZodiac') => {
+    const counts = new Map<string, number>()
+    for (const log of logs) {
+      const v = log.context?.[key]
+      if (v) counts.set(v, (counts.get(v) || 0) + 1)
+    }
+    let best: { name: string; count: number } | null = null
+    counts.forEach((count, name) => {
+      if (!best || count > best.count) best = { name, count }
+    })
+    return best
+  }
+  const sampled = logs.filter(l => l.context?.astroRokuyo).length
+  const taian = logs.filter(l => l.context?.astroRokuyo === 'Taian').length
+  return {
+    sampled,
+    topRokuyo: tally('astroRokuyo'),
+    topMoonPhase: tally('astroMoonPhase'),
+    topHourlyZodiac: tally('astroHourlyZodiac'),
+    taianShare: sampled ? Math.round((taian / sampled) * 100) : 0,
+  }
+}
