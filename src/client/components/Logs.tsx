@@ -23,6 +23,8 @@ import {
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
 import { toCelsius } from '#shared/utils'
+import { buildSystemHelp } from '#shared/utils/log-commands'
+import type { StoryScope } from '#shared/utils/story-compression'
 import {
   playKeyClick,
   playSynthActivationChime,
@@ -3741,7 +3743,7 @@ const NoteEditor = ({
   })
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
-      setStoryResponse(data.story)
+      setStoryResponse(data.arcadeLine ? `${data.story}\n\n${data.arcadeLine}` : data.story)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -4121,47 +4123,51 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
+        // Rendered from the shared registry — help can never drift from commands.
+        let arcadeLine: string | undefined
+        try {
+          arcadeLine = `BADGES ${getEarnedBadges().length}/${Object.keys(BADGES).length} UNLOCKED`
+        } catch {}
+        const help = buildSystemHelp(arcadeLine)
+        const lines: string[] = ['AVAILABLE COMMANDS', '']
+        for (const sec of help.sections) {
+          lines.push(sec.title)
+          for (const r of sec.rows) lines.push(`${r.usage}  ${r.description}`)
+          lines.push('')
+        }
+        lines.push('SHORTCUTS', ...help.footer)
+        if (help.header.length) lines.push('', 'ARCADE', ...help.header)
         setSystemHelp(lines.join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
-      } else if (trigger === 'story-mode') {
+      } else if (
+        trigger === 'story-mode' ||
+        trigger === 'story-day' ||
+        trigger === 'story-week' ||
+        trigger === 'story-month' ||
+        trigger === 'story-year'
+      ) {
         if (!storyLoading) {
+          const scope: StoryScope =
+            trigger === 'story-day' ? 'day'
+            : trigger === 'story-month' ? 'month'
+            : trigger === 'story-year' ? 'year'
+            : 'week'
           setStoryLoading(true)
           setStoryResponse(null)
+          const logText = value
+            .replace(/\/(story|day|week|month|year)\b/gi, '')
+            .replace(/📖/g, '')
+            .trim()
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
             submitStory({
               logText,
-              quantumState: state,
-              userIndex: index,
+              scope,
+              quantumState: getUserState(),
+              userIndex: getUserIndex(),
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText, scope })
           }
         }
       }

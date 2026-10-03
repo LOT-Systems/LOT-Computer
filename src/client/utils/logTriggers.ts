@@ -39,7 +39,11 @@ export type LogTrigger =
   | 'sil-check'         // /sil — check for signal silence pattern
   | 'qi-rfi'            // /qi — Quantum Intelligence RFI (Request for Information)
   | 'system-help'       // /system — list all available slash commands
-  | 'story-mode'        // /story — generate contextual story from recent data
+  | 'story-mode'        // /story — compressed story (default scope: week)
+  | 'story-day'         // /day   — compressed story of the day
+  | 'story-week'        // /week  — compressed story of the week
+  | 'story-month'       // /month — compressed story of the month
+  | 'story-year'        // /year  — compressed story of the year
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
 
 interface TriggerRule {
@@ -66,6 +70,10 @@ const RULES: TriggerRule[] = [
   { trigger: 'qi-rfi',         emojis: [],        keywords: ['qi'] },
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
+  { trigger: 'story-day',     emojis: [],        keywords: ['day'] },
+  { trigger: 'story-week',    emojis: [],        keywords: ['week'] },
+  { trigger: 'story-month',   emojis: [],        keywords: ['month'] },
+  { trigger: 'story-year',    emojis: [],        keywords: ['year'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
 ]
 
