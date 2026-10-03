@@ -321,6 +321,13 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE KITCHEN-COUNTER BREATH                  2026-10-03
+  ─────────────────────────────────────────────────────────────────
+  Full entry in LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md, Section 09. A parent
+  cooking in the evening feels a sub-threshold 4-2-6 pulse (THE BREATH)
+  through the counter when a Breathe moment is due: self-care delivered
+  in the body, in the room, without a screen. Needs only the voice coil.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
