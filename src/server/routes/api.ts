@@ -17,6 +17,7 @@ import {
   UserTag,
 } from '#shared/types'
 import config from '#server/config'
+import registerBasicsRoutes from './basics'
 import { fp } from '#shared/utils'
 import {
   COUNTRY_BY_ALPHA3,
@@ -134,6 +135,9 @@ function generateCompassionateResponse(
 }
 
 export default async (fastify: FastifyInstance) => {
+  // BASIC ration module (LOT-FM-001)
+  await fastify.register(registerBasicsRoutes)
+
   // Register User Operating System API routes
   registerOSRoutes(fastify)
 

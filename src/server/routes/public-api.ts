@@ -20,6 +20,7 @@ import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
+import { RATION_MANIFEST, DOCTRINE_LINES, PRICE_LINE, MANUAL_REF } from '#shared/basics/manifest'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -504,6 +505,14 @@ export default async (fastify: FastifyInstance) => {
 
   // Public status endpoint - no authentication required
   // Cached for 2 minutes to be cost-effective with Digital Ocean
+  // OPEN TAB: the ledger is the marketing. Nomenclature + cadence only; COGS withheld.
+  fastify.get('/basics', async () => ({
+    manual: MANUAL_REF,
+    price: PRICE_LINE,
+    doctrine: DOCTRINE_LINES,
+    manifest: RATION_MANIFEST,
+  }))
+
   fastify.get('/status', async (req, reply) => {
     const now = Date.now()
 
