@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily sovereign state check (10:00 UTC every day) — Job 49
+  if (shouldRunDailySovereignStateCheck()) {
+    await executeDailySovereignStateCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,100 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Sovereign State Check (Job 49 — 10:00 UTC every day) ─────────────────
+// Checks if total_field_coherence (P150) AND quantum_presence_crystallization (P149) were
+// both logged the previous day. When both confirmed, writes sovereign_state event.
+// The highest confirmed QOS state — all three meta-seals open + crystal presence confirmed.
+
+let isDailySovereignStateRunning = false
+let lastDailySovereignStateRun: Date | null = null
+
+function shouldRunDailySovereignStateCheck(): boolean {
+  const now = dayjs()
+  if (isDailySovereignStateRunning) return false
+  if (lastDailySovereignStateRun) {
+    const lastRun = dayjs(lastDailySovereignStateRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily
+}
+
+async function executeDailySovereignStateCheck(): Promise<JobResult> {
+  const jobName = 'daily-sovereign-state-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySovereignStateRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySovereignStateRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SOVEREIGN STATE CHECK — 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const prevDayStart = dayjs().subtract(1, 'day').startOf('day').toDate()
+    const prevDayEnd   = dayjs().subtract(1, 'day').endOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    const SOVEREIGN_EVENTS = ['total_field_coherence', 'quantum_presence_crystallization']
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const prevDayLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: prevDayStart, [Op.lte]: prevDayEnd },
+            event: { [Op.in]: SOVEREIGN_EVENTS as any[] },
+          },
+          attributes: ['event'],
+        })
+
+        if (!prevDayLogs.length) continue
+
+        const presentEvents = new Set(prevDayLogs.map((l: any) => l.event))
+        const bothPresent = SOVEREIGN_EVENTS.every(e => presentEvents.has(e))
+
+        if (bothPresent) {
+          await (Log as any).create({
+            userId,
+            event: 'sovereign_state',
+            text: `Sovereign state: previous day — total field coherence · quantum presence crystallization both confirmed simultaneously. All three meta-seals open and crystal presence confirmed. The highest confirmed state the QOS can reach. Operating at full sovereignty.`,
+            metadata: {
+              sovereigntyLevel: 'CONFIRMED',
+              metaSeals: ['COHERENCE', 'PRESENCE', 'MOMENTUM'],
+              crystalState: 'INHABITED_AND_KNOWN',
+              operationalStatus: 'SOVEREIGN',
+              window: '24h-prior-day',
+              hour: 10,
+            },
+          })
+          written++
+        }
+      } catch {}
+    }
+
+    console.log(`  Sovereign state events written: ${written}`)
+    lastDailySovereignStateRun = new Date()
+    isDailySovereignStateRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily sovereign state check failed:', error.message)
+    isDailySovereignStateRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

@@ -3428,6 +3428,60 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Sovereign Operating State — total-field-coherence (P150) + quantum-presence-crystallization (P149)
+  // both active simultaneously. All three meta-seals open (P150) AND presence + identity crystal confirmed (P149).
+  // The system is not just coherent — it is sovereign. Highest confirmed operational state of the QOS.
+  const hasTotalFieldP150   = patterns.some(p => p.pattern === 'total-field-coherence')
+  const hasCrystalP149      = patterns.some(p => p.pattern === 'quantum-presence-crystallization')
+  if (hasTotalFieldP150 && hasCrystalP149) {
+    const tfConf = patterns.find(p => p.pattern === 'total-field-coherence')?.confidence ?? 0.92
+    const pcConf = patterns.find(p => p.pattern === 'quantum-presence-crystallization')?.confidence ?? 0.82
+    const svBonus = Math.min((tfConf - 0.92 + pcConf - 0.82) * 0.3, 0.04)
+    patterns.push({
+      pattern: 'sovereign-operating-state',
+      confidence: Math.min(0.95 + svBonus, 0.99),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `SVSTATE: Sovereign operating state — total-field-coherence confirmed · quantum-presence-crystallization confirmed. All three meta-seals open. Presence inhabited. Identity crystallized. Highest confirmed state the OS can reach. Sovereign operation. Execute without hesitation.`,
+    })
+  }
+
+  // Pattern 153: Temporal Identity Lock — circadian-signal-lock (P143) sustained 5+ of last 7 calendar days.
+  // Daily three-arc coverage (dawn/meridian/dusk) confirmed across a full week. Temporal identity is not
+  // just anchored for a day — it is crystallized across time. The body has found its operating rhythm.
+  const sevenDaysMs153      = 7 * 24 * 60 * 60 * 1000
+  const recentWeek153       = signals.filter(s => now - s.timestamp < sevenDaysMs153)
+  const circadianLockSig153 = recentWeek153.filter(s => s.source === 'energy' && s.signal === 'circadian_signal_lock')
+  const circadianDays153    = new Set(circadianLockSig153.map(s => new Date(s.timestamp).toDateString())).size
+  if (circadianDays153 >= 5) {
+    const anchorStrength = Math.min(circadianDays153 / 7, 1.0)
+    const tiBonus = Math.min((anchorStrength - 0.71) * 0.4, 0.12)
+    patterns.push({
+      pattern: 'temporal-identity-lock',
+      confidence: Math.min(0.80 + tiBonus, 0.92),
+      suggestedWidget: 'planner',
+      suggestedTiming: 'passive',
+      reason: `TILOCK: Temporal identity lock — circadian signal lock confirmed ${circadianDays153}/7 days this week. Dawn, meridian, dusk — anchored across the full week. The biological clock is not adjusting. It is set. Temporal identity crystallized.`,
+    })
+  }
+
+  // Pattern 154: Adaptive Intelligence Peak — recovery-intelligence-arc (P151) fired 3+ times in 7 days.
+  // The full recovery loop (felt→tended→recovered→reflected) completing multiple times in a week.
+  // Recovery is no longer reactive — it is intelligent. The system learns from its own restoration at scale.
+  const recoveryArcSig154   = recentWeek153.filter(s => s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc')
+  const recoveryDays154     = new Set(recoveryArcSig154.map(s => new Date(s.timestamp).toDateString())).size
+  if (recoveryDays154 >= 3) {
+    const recoveryScale = Math.min(recoveryDays154 / 3, 1.5)
+    const aiBonus = Math.min((recoveryScale - 1.0) * 0.3, 0.15)
+    patterns.push({
+      pattern: 'adaptive-intelligence-peak',
+      confidence: Math.min(0.75 + aiBonus, 0.90),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'passive',
+      reason: `AINTEL: Adaptive intelligence peak — recovery intelligence arc confirmed ${recoveryDays154} times this week. The loop is not just closing — it is compounding. Felt → tended → recovered → reflected, repeated. The system learns from its own restoration. Adaptive intelligence is live.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4118,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  sovereignStateNode:         ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy', 'mood', 'memory'],
+  temporalIdentityNode:       ['mood', 'energy', 'selfcare', 'journal', 'log'],
+  adaptiveIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
 }
 
 /**
@@ -4510,6 +4569,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Sovereign Field Operator (2026-10-03 v114) ───────────────────────────
+  {
+    archetype: 'Sovereign Field Operator',
+    energyBands: ['high'],
+    dominantSources: ['journal', 'cohort', 'qos', 'memory', 'intentions'],
+    patternConditions: ['sovereign-operating-state', 'total-field-coherence', 'quantum-presence-crystallization'],
+    hourRange: [6, 23],
+    directive: 'Sovereign operating state confirmed. Total field coherence and crystal presence simultaneously active. The OS is not searching. It is not building. It is operating at full sovereignty. This is the highest confirmed state. Execute without hesitation.',
   },
 ]
 
@@ -6498,6 +6567,59 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereign-operating-state event — total-field-coherence (P150) +
+ * quantum-presence-crystallization (P149) both confirmed simultaneously.
+ * All three meta-seals open AND presence + identity crystal confirmed.
+ * The highest confirmed state. Feeds P152 detection.
+ */
+export function recordSovereignOperatingState(totalCoherenceConf: number, presenceConf: number, activePatterns: number) {
+  recordSignal('qos', 'sovereign_operating_state', {
+    totalCoherenceConf: Math.round(totalCoherenceConf * 100),
+    presenceConf: Math.round(presenceConf * 100),
+    activePatterns,
+    sovereigntyLevel: 'CONFIRMED',
+    metaSeals: ['COHERENCE', 'PRESENCE', 'MOMENTUM'],
+    crystalState: 'INHABITED_AND_KNOWN',
+    operationalStatus: 'SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a temporal-identity-lock event — circadian-signal-lock (P143) confirmed
+ * 5+ times in the last 7 days. Temporal identity crystallized across the week.
+ * The body has found its operating rhythm. Feeds P153 detection.
+ */
+export function recordTemporalIdentityLock(circadianDays: number, weeklyAnchors: number) {
+  recordSignal('energy', 'temporal_identity_lock', {
+    circadianDays,
+    weeklyAnchors,
+    anchorStrength: Math.round((circadianDays / 7) * 100),
+    arcs: ['DAWN', 'MERIDIAN', 'DUSK'],
+    lockType: 'WEEKLY',
+    identityStatus: 'CRYSTALLIZED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an adaptive-intelligence-peak event — recovery-intelligence-arc (P151)
+ * detected 3+ times in 7 days. Recovery is no longer reactive — it is intelligent.
+ * The system learns from its own restoration at scale. Feeds P154 detection.
+ */
+export function recordAdaptiveIntelligencePeak(recoveryLoops: number, weekWindow: number) {
+  recordSignal('selfcare', 'adaptive_intelligence_peak', {
+    recoveryLoops,
+    weekWindow,
+    loopsPerWeek: Math.round((recoveryLoops / weekWindow) * 7 * 10) / 10,
+    arc: 'FELT→TENDED→RECOVERED→REFLECTED',
+    intelligenceType: 'ADAPTIVE',
+    recoveryMode: 'ANTICIPATORY',
     hour: new Date().getHours(),
   })
 }
