@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.2 — see REPORT-02 (2026-10-04)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -320,6 +320,13 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE OPEN WINDOW                             2026-10-04
+  ─────────────────────────────────────────────────────────────────
+  Summary: during a focus block, the LOT® Station reports CO₂ > 1,200 ppm;
+  the cube performs THE SETTLE (no visible motion) pointing the operator at
+  the Air Quality widget line; resolution is met with silence. Full text,
+  physics budget and design findings: LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md
 
 --------------------------------------------------------------------------------
 08 // BRAND
