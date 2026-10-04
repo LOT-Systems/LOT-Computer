@@ -1,0 +1,23 @@
+ref,function,part,alt,qty_per_unit,qty_100_units,est_usd_each,evidence
+U1,MCU+WiFi/BLE,ESP32-S3-MINI-1-N8,ESP32-S3 chip-down,1,100,3.5,VERIFIED spec / ESTIMATE price
+DS1,Screen 1.3in 240x240 IPS SPI,ST7789-class module <=1.5mm,AMOLED/e-paper,1,100,6.5,ESTIMATE
+CAM1,Camera 2MP DVP,OV2640 (or GC2145),,1,100,4.5,ESTIMATE
+U2,Weather+gas AI,BME688,BME280,1,100,9,VERIFIED spec / ESTIMATE price
+U3,IMU,BMI270,BMA400,1,100,2.5,VERIFIED spec / ESTIMATE price
+U4,Ambient light,VEML7700-class,,1,100,1,ESTIMATE (TBD P1)
+U5,Qi receiver IC,BQ51013B,,1,100,2.5,ESTIMATE
+L1,Qi RX coil+ferrite,thin 20-25mm flex coil,,1,100,3,ESTIMATE (TBD vendor)
+U6,Li-ion charger,BQ25101 (or BQ25185),,1,100,1.5,VERIFIED spec / ESTIMATE price
+U7,3.3V regulator,low-Iq buck/LDO,,1,100,1,ESTIMATE (TBD P1)
+BT1,LiPo 3.7V 50-120mAh thin protected,custom/ultra-thin,402030 (4mm too thick),1,100,4,ESTIMATE
+SW1,Copy button,low-profile tact <=1.2mm,,1,100,0.3,ESTIMATE
+BZ1,Alert buzzer/haptic,piezo SMD <=1mm or LRA,,1,100,1.5,ESTIMATE
+X1,Passives/ESD/misc,,,1,100,2.5,ESTIMATE
+PCB1,4-layer 0.6-0.8mm 40x40mm ENIG,PCBWay,,1,100,4,ESTIMATE
+M1,Steel back plate 316L mirror polish,CNC,,1,100,14,ESTIMATE
+M2,Steel frame/bezel 316L,CNC,,1,100,27,ESTIMATE
+M3,Cover glass 0.4-0.5mm,,,1,100,3,ESTIMATE
+M4,Camera lens window,,,1,100,1,ESTIMATE
+M5,Gasket/adhesive/screws,,,1,100,1.5,ESTIMATE
+M6,Vent membrane,,,1,100,0.75,ESTIMATE
+CH1,Qi 5W charging pad,generic Qi pad,,1,100,11,ESTIMATE
