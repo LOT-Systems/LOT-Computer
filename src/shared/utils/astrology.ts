@@ -177,3 +177,25 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Wall-clock Date for a given IANA timeZone (e.g. the user's saved profile
+ * timeZone). The returned Date's local fields (hour, day, month) read as the
+ * time in that zone, which is what the hourly zodiac, western zodiac and
+ * rokuyo calculations expect. Falls back to the device clock for a missing
+ * or invalid timeZone.
+ */
+export function getWallClockDate(timeZone?: string | null, now: Date = new Date()): Date {
+  if (!timeZone) return now
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(now)
+    const n = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(n('year'), n('month') - 1, n('day'), n('hour'), n('minute'), n('second'))
+  } catch {
+    return now
+  }
+}
