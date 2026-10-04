@@ -33,13 +33,37 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, findEmailRecipients, sendEmail } from '#client/queries'
+import type { EmailRecipient } from '#shared/types'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
 const localStore = {
   logById: map<Record<string, Log>>({}),
   logIds: atom<string[]>([]),
+}
+
+
+/**
+ * LOT® Email — parse "/email to Hitomi" out of a log.
+ * Everything except the command is the message: first non-empty line =
+ * subject, the rest = body (a single line is both subject and body).
+ */
+export function parseEmailCommand(text: string): {
+  raw: string
+  name: string
+  subject: string
+  body: string
+} | null {
+  const m = text.match(/(^|\s)(\/email(?:[ \t]+to)?(?:[ \t]+([^\s.,:;!?]+))?[.]?)/i)
+  if (!m) return null
+  const raw = m[2]
+  const name = (m[3] || '').trim()
+  const rest = text.replace(raw, '').replace(/✉ SENT TO .*/g, '').trim()
+  const lines = rest.split('\n').map((l) => l.trim()).filter(Boolean)
+  const subject = (lines[0] || '').slice(0, 120)
+  const body = lines.length > 1 ? lines.slice(1).join('\n') : lines[0] || ''
+  return { raw, name, subject, body }
 }
 
 export const Logs: React.FC = React.memo(function LogsInner() {
@@ -3679,6 +3703,59 @@ const NoteEditor = ({
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
   const [qiResponse, setQiResponse] = React.useState<string | null>(null)
   const [qiLoading, setQiLoading] = React.useState(false)
+  // ---- LOT® Email: "/email to Name" composer ----
+  const emailCmd = React.useMemo(() => parseEmailCommand(value), [value])
+  const [emailMatches, setEmailMatches] = React.useState<EmailRecipient[]>([])
+  const [emailPick, setEmailPick] = React.useState<EmailRecipient | null>(null)
+  const [emailSearching, setEmailSearching] = React.useState(false)
+  const [emailStatus, setEmailStatus] = React.useState<'idle' | 'sending' | 'error'>('idle')
+  const [emailError, setEmailError] = React.useState('')
+  const emailName = emailCmd?.name || ''
+  React.useEffect(() => {
+    setEmailPick(null)
+    setEmailMatches([])
+    if (emailName.length < 2) return
+    let cancelled = false
+    setEmailSearching(true)
+    const t = setTimeout(() => {
+      findEmailRecipients(emailName)
+        .then((r) => { if (!cancelled) setEmailMatches(r) })
+        .catch(() => { if (!cancelled) setEmailMatches([]) })
+        .finally(() => { if (!cancelled) setEmailSearching(false) })
+    }, 350)
+    return () => { cancelled = true; clearTimeout(t) }
+  }, [emailName])
+  const emailTo = emailPick || (emailMatches.length === 1 ? emailMatches[0] : null)
+  const onSendEmail = React.useCallback(async () => {
+    const cmd = parseEmailCommand(valueRef.current)
+    if (!cmd || !emailTo || !cmd.body) return
+    setEmailStatus('sending')
+    try {
+      const res = await sendEmail({ receiverId: emailTo.id, subject: cmd.subject, body: cmd.body })
+      // Replace the command so it can't fire twice; keep the text in the log as a record.
+      const updated = valueRef.current.replace(cmd.raw, `✉ SENT TO ${(res.receiverName || emailTo.firstName || '').toUpperCase()}`)
+      setValue(updated)
+      valueRef.current = updated
+      onChangeRef.current(updated)
+      setIsSaved(true)
+      setEmailStatus('idle')
+    } catch (err: any) {
+      setEmailError(err?.response?.data?.error || 'Send failed')
+      setEmailStatus('error')
+    }
+  }, [emailTo])
+  // Cohort / Community surfaces can queue a recipient: seed the command once.
+  React.useEffect(() => {
+    const queued = stores.emailDraftTo.get()
+    if (!queued) return
+    stores.emailDraftTo.set(null)
+    const current = valueRef.current
+    if (parseEmailCommand(current)) return
+    const updated = `${current}${current.trim() ? '\n' : ''}/email to ${queued}\n`
+    setValue(updated)
+    valueRef.current = updated
+    onChangeRef.current(updated)
+  }, [])
   const [asmResponse, setAsmResponse] = React.useState<string | null>(null)
   const [asmLoading, setAsmLoading] = React.useState(false)
   const [scanResult, setScanResult] = React.useState<string | null>(null)
@@ -4139,6 +4216,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to [name]  Email a LOT Community member (arrives in Sync)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4274,6 +4352,59 @@ const NoteEditor = ({
           )}
           rows={primary ? 10 : 1}
         />
+        {emailCmd && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-80" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6' }}>
+                <div>
+                  <span className="opacity-40">TO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  {emailTo
+                    ? `${emailTo.firstName || ''} ${emailTo.lastName || ''}`.trim().toUpperCase()
+                    : emailSearching
+                      ? 'SEARCHING...'
+                      : emailName.length < 2
+                        ? 'TYPE A NAME — /email to Name'
+                        : emailMatches.length === 0
+                          ? 'NOT FOUND IN LOT COMMUNITY'
+                          : 'CHOOSE ONE:'}
+                </div>
+                {!emailTo && emailMatches.length > 1 && (
+                  <div className="flex flex-wrap gap-x-12">
+                    {emailMatches.map((m) => (
+                      <button key={m.id} type="button" className="underline opacity-80 hover:opacity-100" onClick={() => setEmailPick(m)}>
+                        {`${m.firstName || ''} ${m.lastName || ''}`.trim()}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {emailCmd.body && (
+                  <>
+                    <div>
+                      <span className="opacity-40">SUBJ&nbsp;&nbsp;&nbsp;</span>
+                      {emailCmd.subject || '—'}
+                    </div>
+                    <div className="opacity-60 whitespace-pre-wrap">{emailCmd.body}</div>
+                  </>
+                )}
+                {!emailCmd.body && emailTo && (
+                  <div className="opacity-40">WRITE YOUR MESSAGE IN THE LOG — FIRST LINE IS THE SUBJECT</div>
+                )}
+                {emailStatus === 'error' && <div className="text-red-500">{emailError.toUpperCase()}</div>}
+                <div className="mt-4">
+                  <Button
+                    type="button"
+                    kind="secondary"
+                    size="small"
+                    disabled={!emailTo || !emailCmd.body || emailStatus === 'sending'}
+                    onClick={onSendEmail}
+                  >
+                    {emailStatus === 'sending' ? 'Sending...' : 'Send'}
+                  </Button>
+                </div>
+              </div>
+            </Block>
+          </div>
+        )}
         {(qiLoading || qiResponse) && (
           <div className="mt-8">
             <Block label="QI [INTSUM]:" blockView>

@@ -200,6 +200,33 @@ export type DirectMessage = {
   updatedAt: Date;
 };
 
+// LOT® Email Types
+export type Email = {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  subject: string;
+  body: string;
+  readAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type EmailView = {
+  id: string;
+  subject: string;
+  body: string;
+  createdAt: string;
+  readAt: string | null;
+  from: { id: string; firstName: string | null; lastName: string | null };
+};
+
+export type EmailRecipient = {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+};
+
 // Chat Message Types
 export type ChatMessage = {
   id: string;

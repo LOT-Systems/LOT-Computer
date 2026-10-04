@@ -24,6 +24,8 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  markEmailRead,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -71,6 +73,16 @@ export const Sync = React.memo(function SyncInner() {
   }, [me])
 
   const { data: fetchedMessages } = useChatMessages()
+  // LOT® Email inbox — arrives here, composed in Log with "/email to Name"
+  const { data: inbox, refetch: refetchInbox } = useEmails({ enabled: canAccessChat })
+  const [openEmailId, setOpenEmailId] = React.useState<string | null>(null)
+  const onToggleEmail = React.useCallback(
+    (id: string, unread: boolean) => () => {
+      setOpenEmailId((cur) => (cur === id ? null : id))
+      if (unread) markEmailRead(id).then(() => refetchInbox()).catch(() => {})
+    },
+    [refetchInbox]
+  )
   const { mutate: createChatMessage } = useCreateChatMessage({
     onSuccess: () => setMessage(''),
   })
@@ -117,7 +129,11 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeEmailListener } = sync.listen('email' as any, () => {
+      refetchInbox()
+    })
     return () => {
+      disposeEmailListener()
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
     }
@@ -213,6 +229,42 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {!!inbox?.emails?.length && (
+        <div className="mb-80">
+          <div className="text-acc/40 mb-4 uppercase tracking-widest text-[11px]">
+            Email{inbox.unread ? ` · ${inbox.unread} new` : ''}
+          </div>
+          {inbox.emails.map((e) => {
+            const unread = !e.readAt
+            const from = `${e.from.firstName || ''} ${e.from.lastName || ''}`.trim() || 'Unknown'
+            const open = openEmailId === e.id
+            return (
+              <div
+                key={e.id}
+                className="cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded"
+                onClick={onToggleEmail(e.id, unread)}
+              >
+                <div className={cn('flex items-start gap-x-8', !unread && 'text-acc/60')}>
+                  <span className="whitespace-nowrap">{unread ? '● ' : ''}{from}</span>
+                  <span className="flex-1 truncate">{e.subject || e.body}</span>
+                  <span className="text-acc/40 whitespace-nowrap">
+                    <MessageTimeLabel dateString={e.createdAt} isTimeFormat12h={isTimeFormat12h} />
+                  </span>
+                </div>
+                {open && (
+                  <div className="whitespace-breakspaces py-4" style={{ wordBreak: 'break-word' }}>
+                    {e.body}
+                    <div className="text-acc/40 mt-4">
+                      Reply: write "/email to {e.from.firstName}" in Log
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {

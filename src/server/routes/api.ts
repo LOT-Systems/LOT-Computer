@@ -380,6 +380,13 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'email': {
+          // Privacy: only the addressee hears about it, and only metadata.
+          if (data.receiverId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -3968,6 +3975,162 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       console.error('Error calculating community emotion:', error)
       return reply.status(500).send({ error: 'Failed to calculate community emotion' })
     }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — simplest mailbox. Compose from Log (/email to Name),
+  // read in Sync. Same access gate as Sync chat (LOT Community members).
+  // ============================================================================
+  const isSuspendedTags = (tags?: string[]) =>
+    !!tags?.some((t) => t.toLowerCase() === 'suspended')
+
+  // Resolve "/email to Hitomi" -> community members matching the name
+  fastify.get('/emails/recipients', async (req: FastifyRequest<{
+    Querystring: { q?: string }
+  }>, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires LOT Community access' })
+    }
+    const q = String(req.query.q || '').trim().slice(0, 40).replace(/[%_\\]/g, '')
+    if (q.length < 2) return reply.send({ recipients: [] })
+    const users = await fastify.models.User.findAll({
+      where: {
+        id: { [Op.ne]: req.user.id },
+        [Op.or]: [
+          { firstName: { [Op.iLike]: `${q}%` } },
+          { lastName: { [Op.iLike]: `${q}%` } },
+        ],
+      },
+      attributes: ['id', 'firstName', 'lastName', 'tags'],
+      limit: 20,
+    })
+    const recipients = users
+      .filter((u) => canAccessChat(u.tags || []) && !isSuspendedTags(u.tags))
+      .slice(0, 5)
+      .map((u) => ({ id: u.id, firstName: u.firstName, lastName: u.lastName }))
+    return reply.send({ recipients })
+  })
+
+  // Inbox (newest first) + unread count
+  fastify.get('/emails', async (req: FastifyRequest, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires LOT Community access' })
+    }
+    const emails = await fastify.models.Email.findAll({
+      where: { receiverId: req.user.id },
+      order: [['createdAt', 'DESC']],
+      limit: 50,
+    })
+    const senderIds = Array.from(new Set(emails.map((e) => e.senderId)))
+    const senders = senderIds.length
+      ? await fastify.models.User.findAll({
+          where: { id: { [Op.in]: senderIds } },
+          attributes: ['id', 'firstName', 'lastName'],
+        })
+      : []
+    const byId = senders.reduce((acc: Record<string, any>, u) => {
+      acc[u.id] = u
+      return acc
+    }, {})
+    const unread = await fastify.models.Email.count({
+      where: { receiverId: req.user.id, readAt: null },
+    })
+    return reply.send({
+      unread,
+      emails: emails.map((e) => ({
+        id: e.id,
+        subject: e.subject,
+        body: e.body,
+        createdAt: e.createdAt,
+        readAt: e.readAt,
+        from: {
+          id: e.senderId,
+          firstName: byId[e.senderId]?.firstName ?? null,
+          lastName: byId[e.senderId]?.lastName ?? null,
+        },
+      })),
+    })
+  })
+
+  // Send
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { receiverId: string; subject?: string; body: string }
+  }>, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires LOT Community access' })
+    }
+    if (isSuspendedTags(req.user.tags)) {
+      return reply.status(403).send({ error: 'Account suspended' })
+    }
+    const receiverId = String(req.body?.receiverId || '')
+    const body = String(req.body?.body || '').trim().slice(0, 5000)
+    const subject = String(req.body?.subject || '').trim().slice(0, 120)
+    if (!receiverId || !body) {
+      return reply.status(400).send({ error: 'Receiver and body are required' })
+    }
+    if (receiverId === req.user.id) {
+      return reply.status(400).send({ error: 'Cannot email yourself' })
+    }
+    const receiver = await fastify.models.User.findByPk(receiverId)
+    if (!receiver || !canAccessChat(receiver.tags || []) || isSuspendedTags(receiver.tags)) {
+      return reply.status(404).send({ error: 'Recipient not found' })
+    }
+    // Simple abuse guard: 20 emails / hour / sender
+    const recent = await fastify.models.Email.count({
+      where: {
+        senderId: req.user.id,
+        createdAt: { [Op.gte]: dayjs().subtract(1, 'hour').toDate() },
+      },
+    })
+    if (recent >= 20) {
+      return reply.status(429).send({ error: 'Email rate limit reached. Try again later.' })
+    }
+
+    const email = await fastify.models.Email.create({
+      senderId: req.user.id,
+      receiverId,
+      subject,
+      body,
+    })
+
+    sync.emit('email', {
+      id: email.id,
+      receiverId,
+      subject: email.subject,
+      senderName: `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim(),
+      createdAt: email.createdAt,
+    })
+
+    process.nextTick(async () => {
+      try {
+        const context = await getLogContext(req.user)
+        await fastify.models.Log.create({
+          userId: req.user.id,
+          event: 'email_sent',
+          text: '',
+          metadata: { emailId: email.id, receiverId, subject: email.subject },
+          context,
+        })
+      } catch (logError) {
+        console.error('Error logging email:', logError)
+      }
+    })
+
+    return reply.send({
+      id: email.id,
+      receiverName: `${receiver.firstName || ''} ${receiver.lastName || ''}`.trim(),
+    })
+  })
+
+  // Mark read
+  fastify.post('/emails/:id/read', async (req: FastifyRequest<{
+    Params: { id: string }
+  }>, reply) => {
+    await fastify.models.Email.update(
+      { readAt: new Date() },
+      { where: { id: req.params.id, receiverId: req.user.id, readAt: null } }
+    )
+    return reply.ok()
   })
 
   // Get direct message thread with another user
