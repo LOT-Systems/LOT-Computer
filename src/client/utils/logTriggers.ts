@@ -64,7 +64,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'phys-report',    emojis: [],        keywords: ['phys', 'cohort-report'] },
   { trigger: 'sil-check',      emojis: [],        keywords: ['sil', 'silence-check'] },
   { trigger: 'qi-rfi',         emojis: [],        keywords: ['qi'] },
-  { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
+  { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands', 'help'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
 ]

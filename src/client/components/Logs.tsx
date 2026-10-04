@@ -29,6 +29,7 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { renderSystemHelp, parseStoryCommand, loadDiscovered, markDiscovered } from '#client/utils/logCommands'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3706,6 +3707,7 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const storyInFlightRef = React.useRef(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3743,6 +3745,7 @@ const NoteEditor = ({
     onSuccess: (data) => {
       setStoryResponse(data.story)
       setStoryLoading(false)
+      storyInFlightRef.current = false
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + data.story
@@ -3755,6 +3758,7 @@ const NoteEditor = ({
       const fallback = 'The system holds your data quietly. When the engine returns, your story will be here.'
       setStoryResponse(fallback)
       setStoryLoading(false)
+      storyInFlightRef.current = false
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + fallback
@@ -3938,6 +3942,7 @@ const NoteEditor = ({
     if (fresh.length === 0) return
 
     for (const trigger of fresh as LogTrigger[]) {
+      markDiscovered(trigger) // arcade: first use of a command = discovery
       if (trigger === 'toggle-synth') {
         const next = !stores.isKeyboardSoundOn.get()
         stores.isKeyboardSoundOn.set(next)
@@ -4121,48 +4126,36 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        // Generated from the command registry (logCommands.ts) — never hand-edit here.
+        setSystemHelp(renderSystemHelp(loadDiscovered()))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
-          setStoryLoading(true)
-          setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
+        // Fires on the keystroke that completes "/story", before an optional
+        // scope word (day|week|month|year) can be typed — wait for a pause,
+        // then parse the final text.
+        if (!storyInFlightRef.current) {
+          storyInFlightRef.current = true
+          window.setTimeout(() => {
+            const text = valueRef.current
+            if (!/(^|\s)\/story(\s|$|[^a-z0-9_])/i.test(text) && !text.includes('📖')) {
+              storyInFlightRef.current = false // command removed before it ran
+              return
+            }
+            setStoryLoading(true)
+            setStoryResponse(null)
+            const { scope, rest } = parseStoryCommand(text)
+            try {
+              submitStory({
+                logText: rest,
+                scope,
+                quantumState: getUserState(),
+                userIndex: getUserIndex(),
+              })
+            } catch {
+              submitStory({ logText: rest, scope })
+            }
+          }, 1500)
         }
       }
     }
