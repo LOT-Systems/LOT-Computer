@@ -35,7 +35,7 @@ const fastify = Fastify({
   logger: false  // Temporarily disable logging for development
 })
 
-const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/api', '/sync', '/log']
+const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/api', '/sync', '/log', '/basics']
 
 // Plugins
 fastify.register(fastifyCookie)
@@ -267,7 +267,8 @@ fastify.register(async (fastify: FastifyInstance) => {
             })
           }
           return reply.view('generic-spa', {
-            scriptName: 'login',
+            // /basics is the public OPEN TAB (LOT-FM-001): readable without login
+            scriptName: route === '/basics' ? 'basics' : 'login',
             scriptNonce: reply.cspNonce.script,
             styleNonce: reply.cspNonce.style,
           })

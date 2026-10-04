@@ -23,6 +23,7 @@
     "#shared": "./dist/server/shared/index.js"
   },
   "scripts": {
+    "basics:envelope": "npx tsx scripts/basics-envelope.ts",
     "db:admin": "tsx scripts/db-admin.ts",
     "db:backup": "tsx scripts/db-backup.ts",
     "db:backup:encrypted": "bash scripts/backup-to-github.sh",
