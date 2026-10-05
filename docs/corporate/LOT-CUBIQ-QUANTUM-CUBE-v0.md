@@ -321,6 +321,12 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE BEDSIDE CLOSE                           2026-10-05
+  ─────────────────────────────────────────────────────────────────
+  Full entry in LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md §11 (SETTLE gesture as a
+  silent evening-close signal on a shared nightstand). Design-review errata
+  E1–E5 against this document are logged in R02 §04; this text is unedited.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
