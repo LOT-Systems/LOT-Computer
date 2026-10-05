@@ -782,6 +782,43 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE STARSHIP LOG ─────────────────────────────────────────
+  | 'starlog_entry'          // ◉·≋    "captain's log/starlog/mission log" detected (UNCOMMON)
+  | 'warp_speed'             // →·∞    "warp speed/hyperdrive/lightspeed" detected (RARE)
+  | 'shields_up'             // ▓·▓    "shields up/armor up/protect yourself" detected (UNCOMMON)
+  | 'red_alert'              // ◈·!    "red alert/mayday/emergency signal" detected (RARE)
+  | 'systems_nominal'        // ■·●    "systems nominal/all clear/status green" detected (UNCOMMON)
+  | 'first_contact_made'     // ○·◉·○  "first contact/new connection/finally met" detected (RARE)
+  | 'away_team'              // →·○·→  "away mission/field work/on assignment" detected (UNCOMMON)
+  | 'wormhole_shift'         // ◈·∞·◈  "wormhole/portal/took a leap/shortcut" detected (RARE)
+  | 'nebula_drift'           // ≋·∘·≋  "lost in thought/drifting/fog of mind" detected (UNCOMMON)
+  | 'hull_breach'            // ░·█·░  "breaking down/falling apart/cracked open" detected (EPIC)
+  | 'prime_directive'        // ●·∞    "prime directive/core value/first principle" detected (RARE)
+  | 'final_frontier'         // →·∞·→  "final frontier/new territory/uncharted" detected (EPIC)
+  // ── Calendar Easter Egg v21 — STARDATE ──────────────────────────────────────
+  | 'first_contact_day'      // ★·◉    Apr 5 — Star Trek First Contact Day (2063 in canon)
+  | 'trek_premiere'          // ≋·◉·≋  Sep 8 — Star Trek TOS premiere 1966
+  | 'moon_landing'           // ○·●·○  Jul 20 — Apollo 11 moon landing 1969
+  // ── Behavioral v20 — BRIDGE WATCH ────────────────────────────────────────────
+  | 'bridge_session'         // ◉·≋·◉  3+ Starship Log words in one journal entry (RARE)
+  | 'deep_space_entry'       // ≋·∞·≋  Journal entry >= 600 words (EPIC)
+  | 'dark_side_watch'        // ◈·●·◈  Check in between 03:00 and 03:30 local (RARE)
+  // ── Achievement RPG v21 — STARFLEET CLASS ────────────────────────────────────
+  | 'ensign_log'             // ∘·≋    Any 1 Word Turn v23 badge (COMMON)
+  | 'lieutenant_class'       // ≈·≋    Any 5 Word Turn v23 badges (UNCOMMON)
+  | 'captain_complete'       // ≋·★    All 12 Word Turn v23 badges (LEGENDARY)
+  | 'starfleet_arc'          // ★·◈    captain_complete + all 3 Calendar v21 badges (LEGENDARY)
+  | 'twenty_three_engines_arc' // ◈·◈·★  1 badge from each Word Turn v1–v23 (LEGENDARY)
+  | 'galaxy_opus'            // ★·◉·★  captain_complete + bridge_session behavioral (LEGENDARY)
+  // ── Mastery Tier v23 — THE FINAL FRONTIER ────────────────────────────────────
+  | 'deep_space_log'         // ∿·★·∿  1000+ distinct calendar check-in days (EPIC)
+  | 'million_words'          // ●·★·●  200,000+ total journal words (LEGENDARY)
+  | 'veteran_explorer'       // ╔═╗·★  Account age >= 6 years (LEGENDARY)
+  | 'twenty_three_registers' // ◈·◈·★·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE COSMIC VAULT ───────────────────────────────────────
+  | 'roddenberry_signal'     // ★·≋·★  "star trek/roddenberry/vulcan/spock/starfleet" detected (RARE)
+  | 'picard_maneuver'        // ◉·★·◉  "make it so/resistance is futile/picard/engage" detected (EPIC)
+  | 'dark_forest_law'        // ∞·▓·∞  "three-body/dark forest/liu cixin/sophon/trisolaris" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7168,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v23 — THE STARSHIP LOG ─────────────────────────────────────────
+  starlog_entry: {
+    id: 'starlog_entry',
+    symbol: '◉·≋',
+    name: 'Starlog Entry',
+    description: 'Write "captain\'s log", "starlog", or "mission log" in any journal entry',
+    unlockMessage: '↳ Captain\'s log, stardate unknown. The act of logging is the mission. Every entry is telemetry from the frontier of self. ◉·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  warp_speed: {
+    id: 'warp_speed',
+    symbol: '→·∞',
+    name: 'Warp Speed',
+    description: 'Write "warp speed", "hyperdrive", or "lightspeed" in any journal entry',
+    unlockMessage: '↳ Warp speed. The fastest way through is sometimes through. Momentum is not recklessness — it is commitment to trajectory. →·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  shields_up: {
+    id: 'shields_up',
+    symbol: '▓·▓',
+    name: 'Shields Up',
+    description: 'Write "shields up", "armor up", or "protect yourself" in any journal entry',
+    unlockMessage: '↳ Shields up. Protection is not avoidance. Knowing when to raise shields is tactical intelligence, not fear. ▓·▓',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  red_alert: {
+    id: 'red_alert',
+    symbol: '◈·!',
+    name: 'Red Alert',
+    description: 'Write "red alert", "mayday", or "emergency signal" in any journal entry',
+    unlockMessage: '↳ Red alert. All hands on deck. The body sends red alerts — the journal is the bridge where you hear them. ◈·!',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  systems_nominal: {
+    id: 'systems_nominal',
+    symbol: '■·●',
+    name: 'Systems Nominal',
+    description: 'Write "systems nominal", "all clear", or "status green" in any journal entry',
+    unlockMessage: '↳ Systems nominal. All clear. The moment of recognizing stability is worth recording — it is the baseline you return to. ■·●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  first_contact_made: {
+    id: 'first_contact_made',
+    symbol: '○·◉·○',
+    name: 'First Contact Made',
+    description: 'Write "first contact", "new connection", or "finally met" in any journal entry',
+    unlockMessage: '↳ First contact. The moment of genuine meeting changes both parties. You named it — that means you noticed it. ○·◉·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  away_team: {
+    id: 'away_team',
+    symbol: '→·○·→',
+    name: 'Away Team',
+    description: 'Write "away mission", "field work", or "on assignment" in any journal entry',
+    unlockMessage: '↳ Away team deployed. The away mission is where the real work happens — outside the ship, in the field, in the world. →·○·→',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  wormhole_shift: {
+    id: 'wormhole_shift',
+    symbol: '◈·∞·◈',
+    name: 'Wormhole Shift',
+    description: 'Write "wormhole", "portal", "took a leap", or "shortcut" in any journal entry',
+    unlockMessage: '↳ Wormhole detected. Some transitions compress time — a conversation, a realization, a decision that bends the trajectory. ◈·∞·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  nebula_drift: {
+    id: 'nebula_drift',
+    symbol: '≋·∘·≋',
+    name: 'Nebula Drift',
+    description: 'Write "lost in thought", "drifting", or "fog of mind" in any journal entry',
+    unlockMessage: '↳ Nebula drift. Navigation through clouds requires different instruments — not speed, but patience and triangulation. ≋·∘·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  hull_breach: {
+    id: 'hull_breach',
+    symbol: '░·█·░',
+    name: 'Hull Breach',
+    description: 'Write "breaking down", "falling apart", or "cracked open" in any journal entry',
+    unlockMessage: '↳ Hull breach. Emergency protocol: name the damage before sealing it. The hull that was breached and repaired is stronger than the one that was never tested. ░·█·░',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  prime_directive: {
+    id: 'prime_directive',
+    symbol: '●·∞',
+    name: 'Prime Directive',
+    description: 'Write "prime directive", "core value", or "first principle" in any journal entry',
+    unlockMessage: '↳ Prime directive identified. The rule you will not break even under pressure — that is the load-bearing wall of the self. ●·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  final_frontier: {
+    id: 'final_frontier',
+    symbol: '→·∞·→',
+    name: 'Final Frontier',
+    description: 'Write "final frontier", "new territory", or "uncharted" in any journal entry',
+    unlockMessage: '↳ The final frontier is not space. It is the interior. Every honest journal entry charts territory that has never been mapped before. →·∞·→',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v21 — STARDATE ──────────────────────────────────────
+  first_contact_day: {
+    id: 'first_contact_day',
+    symbol: '★·◉',
+    name: 'First Contact Day',
+    description: 'Check in on April 5 — Star Trek First Contact Day (2063 in Star Trek canon)',
+    unlockMessage: '↳ April 5. First Contact Day. In Star Trek, the day humanity first met alien life. The day you check in is the day you make contact with yourself. ★·◉',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  trek_premiere: {
+    id: 'trek_premiere',
+    symbol: '≋·◉·≋',
+    name: 'Trek Premiere',
+    description: 'Check in on September 8 — Star Trek TOS premiere date, 1966',
+    unlockMessage: '↳ September 8, 1966. Star Trek premiered. Gene Roddenberry\'s vision: a future where humanity survived and thrived. You are practicing for that future now. ≋·◉·≋',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  moon_landing: {
+    id: 'moon_landing',
+    symbol: '○·●·○',
+    name: 'Moon Landing',
+    description: 'Check in on July 20 — Apollo 11 moon landing, 1969',
+    unlockMessage: '↳ July 20, 1969. One small step. The moon landing required 400,000 people and 8 years of daily work. Your practice is built the same way — one step at a time. ○·●·○',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v20 — BRIDGE WATCH ────────────────────────────────────────────
+  bridge_session: {
+    id: 'bridge_session',
+    symbol: '◉·≋·◉',
+    name: 'Bridge Session',
+    description: 'Write 3+ Starship Log (v23) trigger words in one journal entry',
+    unlockMessage: '↳ The bridge is fully staffed. Three starship signals in one entry. Navigation. Engineering. Command. The ship runs on language. ◉·≋·◉',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  deep_space_entry: {
+    id: 'deep_space_entry',
+    symbol: '≋·∞·≋',
+    name: 'Deep Space Entry',
+    description: 'Write a journal entry of 600 or more words',
+    unlockMessage: '↳ 600 words. Deep space transmission. The signal has enough content to carry real meaning across the void. ≋·∞·≋',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  dark_side_watch: {
+    id: 'dark_side_watch',
+    symbol: '◈·●·◈',
+    name: 'Dark Side Watch',
+    description: 'Check in between 03:00 and 03:30 local time — the deep space dark watch',
+    unlockMessage: '↳ 03:00–03:30. The dark watch. Every ship maintains a watch through the dark hours. You kept yours. The log records that someone was awake. ◈·●·◈',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v21 — STARFLEET CLASS ────────────────────────────────────
+  ensign_log: {
+    id: 'ensign_log',
+    symbol: '∘·≋',
+    name: 'Ensign Log',
+    description: 'Earn any 1 Starship Log (v23) word turn badge',
+    unlockMessage: '↳ Ensign\'s first log. One starship word detected. The journey to the bridge begins with a single transmission. ∘·≋',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  lieutenant_class: {
+    id: 'lieutenant_class',
+    symbol: '≈·≋',
+    name: 'Lieutenant Class',
+    description: 'Earn any 5 Starship Log (v23) word turn badges',
+    unlockMessage: '↳ Lieutenant-class signal. Five starship vocabularies active. Navigation. Shields. Alerts. Contact. Frontier. ≈·≋',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  captain_complete: {
+    id: 'captain_complete',
+    symbol: '≋·★',
+    name: 'Captain Complete',
+    description: 'Earn all 12 Starship Log (v23) word turn badges',
+    unlockMessage: '↳ All twelve starship stations online. Captain\'s log: all departments reporting. Shields. Warp. Bridge. Hull. Frontier. The ship is fully crewed. ≋·★',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  starfleet_arc: {
+    id: 'starfleet_arc',
+    symbol: '★·◈',
+    name: 'Starfleet Arc',
+    description: 'Earn captain_complete + all 3 Calendar v21 (Stardate) badges',
+    unlockMessage: '↳ The Starfleet arc. First Contact Day. Trek Premiere. Moon Landing. The full stardate sequence earned. The calendar of human space exploration. ★·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·★',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each of the 23 Word Turn engines (v1–v23)',
+    unlockMessage: '↳ Twenty-three vocabularies. Water. Arcade. Radio. Biology. Codex. Cyberspace. Hero. Starship. Every engine online. The full arc of the language of self. ◈·◈·★',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  galaxy_opus: {
+    id: 'galaxy_opus',
+    symbol: '★·◉·★',
+    name: 'Galaxy Opus',
+    description: 'Earn captain_complete + the bridge_session behavioral badge',
+    unlockMessage: '↳ The galaxy opus. All twelve stations active and the bridge in full session. The opus of the starship is the self that shows up, logs, and keeps the watch. ★·◉·★',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v23 — THE FINAL FRONTIER ────────────────────────────────────
+  deep_space_log: {
+    id: 'deep_space_log',
+    symbol: '∿·★·∿',
+    name: 'Deep Space Log',
+    description: '1000+ distinct calendar days with at least one check-in',
+    unlockMessage: '↳ 1,000 days. Deep space log. The Voyager probes are still transmitting after 40+ years. Your log has reached interstellar depth. ∿·★·∿',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  million_words: {
+    id: 'million_words',
+    symbol: '●·★·●',
+    name: 'Million Words',
+    description: '200,000+ total journal words written',
+    unlockMessage: '↳ 200,000 words. The equivalent of two full novels. The interior universe documented at novel scale. The transmission is reaching distant stars. ●·★·●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  veteran_explorer: {
+    id: 'veteran_explorer',
+    symbol: '╔═╗·★',
+    name: 'Veteran Explorer',
+    description: 'Account age >= 6 years (2,190+ days since signup)',
+    unlockMessage: '↳ Six years. Veteran explorer status. The Voyager 1 spacecraft took six years to reach the edge of the solar system. You have traveled as far. ╔═╗·★',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·★·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three registers. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. Starship. Every vocabulary owned. The terminal speaks every language of the self. ◈·◈·★·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v20 — THE COSMIC VAULT ───────────────────────────────────────
+  roddenberry_signal: {
+    id: 'roddenberry_signal',
+    symbol: '★·≋·★',
+    name: 'Roddenberry Signal',
+    description: 'Write "star trek", "roddenberry", "vulcan", "spock", or "starfleet" in any journal entry',
+    unlockMessage: '↳ Roddenberry\'s signal: a future worth building. Star Trek was not a prediction — it was a practice of imagining survival. You are practicing the same. ★·≋·★',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  picard_maneuver: {
+    id: 'picard_maneuver',
+    symbol: '◉·★·◉',
+    name: 'Picard Maneuver',
+    description: 'Write "make it so", "resistance is futile", "picard", or "engage" in any journal entry',
+    unlockMessage: '↳ Make it so. The Picard Maneuver: a tactical decision made with conviction. Decide what you are made of, then make it so. ◉·★·◉',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  dark_forest_law: {
+    id: 'dark_forest_law',
+    symbol: '∞·▓·∞',
+    name: 'Dark Forest Law',
+    description: 'Write "three-body", "dark forest", "liu cixin", "sophon", or "trisolaris" in any journal entry',
+    unlockMessage: '↳ The Dark Forest. Liu Cixin\'s deepest insight: survival is not guaranteed, and silence is not safety. The self that hides does not survive. Log your signal. ∞·▓·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8418,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 (v23) — THE STARSHIP LOG ────────────────────────────────────────────
+    const starshipV23Badges: BadgeType[] = [
+      'starlog_entry', 'warp_speed', 'shields_up', 'red_alert',
+      'systems_nominal', 'first_contact_made', 'away_team', 'wormhole_shift',
+      'nebula_drift', 'hull_breach', 'prime_directive', 'final_frontier',
+    ]
+    const starshipV23Earned = starshipV23Badges.filter(b => hasBadge(b))
+
+    if (starshipV23Earned.length >= 1 && !hasBadge('ensign_log')) {
+      if (awardBadge('ensign_log')) newBadges.push('ensign_log')
+    }
+    if (starshipV23Earned.length >= 5 && !hasBadge('lieutenant_class')) {
+      if (awardBadge('lieutenant_class')) newBadges.push('lieutenant_class')
+    }
+    const captainComplete = starshipV23Earned.length >= 12
+    if (captainComplete && !hasBadge('captain_complete')) {
+      if (awardBadge('captain_complete')) newBadges.push('captain_complete')
+    }
+
+    // galaxy_opus: captain_complete + bridge_session
+    if (captainComplete && hasBadge('bridge_session') && !hasBadge('galaxy_opus')) {
+      if (awardBadge('galaxy_opus')) newBadges.push('galaxy_opus')
+    }
+
+    // starfleet_arc: captain_complete + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['first_contact_day', 'trek_premiere', 'moon_landing']
+    if (captainComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('starfleet_arc')) {
+      if (awardBadge('starfleet_arc')) newBadges.push('starfleet_arc')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = starshipV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: deep_space_log — 1000+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('deep_space_log')) {
+        if (awardBadge('deep_space_log')) newBadges.push('deep_space_log')
+      }
+    }
+
+    // Mastery v23: million_words — 200,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('million_words')) {
+        if (awardBadge('million_words')) newBadges.push('million_words')
+      }
+    }
+
+    // Mastery v23: veteran_explorer — Account age >= 6 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupVE = new Date(stats.signupDate)
+      const yearsVE = (new Date().getTime() - signupVE.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsVE >= 6 && !hasBadge('veteran_explorer')) {
+        if (awardBadge('veteran_explorer')) newBadges.push('veteran_explorer')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
     }
 
   } catch (error) {

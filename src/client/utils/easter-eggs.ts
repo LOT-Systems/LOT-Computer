@@ -870,6 +870,22 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awardBadge('odyssey_day')
     awarded.push('odyssey_day')
   }
+  // ── Calendar v21 — STARDATE ──────────────────────────────────────────────────
+  // First Contact Day: April 5 — Star Trek First Contact Day (2063 in canon)
+  if (!hasBadge('first_contact_day') && month === 4 && day === 5) {
+    awardBadge('first_contact_day')
+    awarded.push('first_contact_day')
+  }
+  // Trek Premiere: September 8 — Star Trek TOS first aired, 1966
+  if (!hasBadge('trek_premiere') && month === 9 && day === 8) {
+    awardBadge('trek_premiere')
+    awarded.push('trek_premiere')
+  }
+  // Moon Landing: July 20 — Apollo 11 lunar landing, 1969
+  if (!hasBadge('moon_landing') && month === 7 && day === 20) {
+    awardBadge('moon_landing')
+    awarded.push('moon_landing')
+  }
 
   return awarded
 }
@@ -1483,6 +1499,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE STARSHIP LOG word turns ────────────────────────────────────────
+  { patterns: /captain['']?s[\s-]?log|starlog|\bmission[\s-]?log\b/i,                  badge: 'starlog_entry' },
+  { patterns: /\bwarp[\s-]?speed\b|\bhyperdrive\b|\blightspeed\b/i,                    badge: 'warp_speed' },
+  { patterns: /\bshields[\s-]?up\b|\barmor[\s-]?up\b|\bprotect[\s-]?yourself\b/i,     badge: 'shields_up' },
+  { patterns: /\bred[\s-]?alert\b|\bmayday\b|\bemergency[\s-]?signal\b/i,              badge: 'red_alert' },
+  { patterns: /\bsystems[\s-]?nominal\b|\ball[\s-]?clear\b|\bstatus[\s-]?green\b/i,   badge: 'systems_nominal' },
+  { patterns: /\bfirst[\s-]?contact\b|\bnew[\s-]?connection\b|\bfinally[\s-]?met\b/i, badge: 'first_contact_made' },
+  { patterns: /\baway[\s-]?mission\b|\bfield[\s-]?work\b|\bon[\s-]?assignment\b/i,    badge: 'away_team' },
+  { patterns: /\bwormhole\b|\bportal\b|\btook[\s-]?a[\s-]?leap\b|\bshortcut\b/i,      badge: 'wormhole_shift' },
+  { patterns: /\blost[\s-]?in[\s-]?thought\b|\bdrifting\b|\bfog[\s-]?of[\s-]?mind\b/i, badge: 'nebula_drift' },
+  { patterns: /\bbreaking[\s-]?down\b|\bfalling[\s-]?apart\b|\bcracked[\s-]?open\b/i, badge: 'hull_breach' },
+  { patterns: /\bprime[\s-]?directive\b|\bcore[\s-]?value\b|\bfirst[\s-]?principle\b/i, badge: 'prime_directive' },
+  { patterns: /\bfinal[\s-]?frontier\b|\bnew[\s-]?territory\b|\buncharted\b/i,         badge: 'final_frontier' },
+  // ── v20 Secret Boss — THE COSMIC VAULT word triggers ─────────────────────────
+  { patterns: /\b(star[\s-]?trek|roddenberry|vulcan[\s-]?mind|spock|starfleet)\b/i,    badge: 'roddenberry_signal' },
+  { patterns: /\bmake[\s-]?it[\s-]?so\b|\bresistance[\s-]?is[\s-]?futile\b|\bpicard\b|\bengage[\s-]?warp\b/i, badge: 'picard_maneuver' },
+  { patterns: /\b(three[\s-]?body|dark[\s-]?forest|liu[\s-]?cixin|sophon|trisolaris)\b/i, badge: 'dark_forest_law' },
 ]
 
 /**
@@ -2711,6 +2744,56 @@ export function checkThresholdMoment(): BadgeType | null {
   if (hour === 0 && minute <= 30) {
     awardBadge('threshold_moment')
     return 'threshold_moment'
+  }
+  return null
+}
+
+// ── v23 — THE STARSHIP LOG behavioral functions ───────────────────────────────
+
+const STARSHIP_WORDS_V23 = [
+  /captain['']?s[\s-]?log|starlog|\bmission[\s-]?log\b/i,
+  /\bwarp[\s-]?speed\b|\bhyperdrive\b|\blightspeed\b/i,
+  /\bshields[\s-]?up\b|\barmor[\s-]?up\b|\bprotect[\s-]?yourself\b/i,
+  /\bred[\s-]?alert\b|\bmayday\b|\bemergency[\s-]?signal\b/i,
+  /\bsystems[\s-]?nominal\b|\ball[\s-]?clear\b|\bstatus[\s-]?green\b/i,
+  /\bfirst[\s-]?contact\b|\bnew[\s-]?connection\b|\bfinally[\s-]?met\b/i,
+  /\baway[\s-]?mission\b|\bfield[\s-]?work\b|\bon[\s-]?assignment\b/i,
+  /\bwormhole\b|\bportal\b|\btook[\s-]?a[\s-]?leap\b|\bshortcut\b/i,
+  /\blost[\s-]?in[\s-]?thought\b|\bdrifting\b|\bfog[\s-]?of[\s-]?mind\b/i,
+  /\bbreaking[\s-]?down\b|\bfalling[\s-]?apart\b|\bcracked[\s-]?open\b/i,
+  /\bprime[\s-]?directive\b|\bcore[\s-]?value\b|\bfirst[\s-]?principle\b/i,
+  /\bfinal[\s-]?frontier\b|\bnew[\s-]?territory\b|\buncharted\b/i,
+]
+
+export function checkBridgeSession(journalText: string): BadgeType | null {
+  if (hasBadge('bridge_session')) return null
+  const matchCount = STARSHIP_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('bridge_session')
+    return 'bridge_session'
+  }
+  return null
+}
+
+export function checkDeepSpaceEntry(journalText: string): BadgeType | null {
+  if (hasBadge('deep_space_entry')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 600) {
+    awardBadge('deep_space_entry')
+    return 'deep_space_entry'
+  }
+  return null
+}
+
+export function checkDarkSideWatch(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dark_side_watch')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  const minute = now.getMinutes()
+  if (hour === 3 && minute <= 30) {
+    awardBadge('dark_side_watch')
+    return 'dark_side_watch'
   }
   return null
 }
