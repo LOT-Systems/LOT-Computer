@@ -34,6 +34,8 @@ import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntenti
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { buildSystemHelp } from '#client/utils/logCommands'
+import { parseStoryPeriod, stripStoryCommand, formatArcadeLine, type ArcadeRank } from '#shared/utils/storyCompression'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3706,6 +3708,15 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyMeta, setStoryMeta] = React.useState<{ period: string; arcadeLine: string } | null>(null)
+  // Last Arcade standing returned by /story, cached so /system can show it offline.
+  const arcadeRef = React.useRef<ArcadeRank | null>(null)
+  if (arcadeRef.current === null) {
+    try {
+      const raw = window.localStorage.getItem('lot_arcade_rank')
+      if (raw) arcadeRef.current = JSON.parse(raw)
+    } catch {}
+  }
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3743,6 +3754,11 @@ const NoteEditor = ({
     onSuccess: (data) => {
       setStoryResponse(data.story)
       setStoryLoading(false)
+      if (data.arcade) {
+        arcadeRef.current = data.arcade
+        try { window.localStorage.setItem('lot_arcade_rank', JSON.stringify(data.arcade)) } catch {}
+        setStoryMeta({ period: (data.period || 'week').toUpperCase(), arcadeLine: formatArcadeLine(data.arcade) })
+      }
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + data.story
@@ -4121,30 +4137,11 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        let arcadeLine: string | undefined
+        try {
+          arcadeLine = arcadeRef.current ? formatArcadeLine(arcadeRef.current) : undefined
+        } catch {}
+        setSystemHelp(buildSystemHelp({ arcadeLine }))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4152,11 +4149,13 @@ const NoteEditor = ({
           setStoryLoading(true)
           setStoryResponse(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const logText = stripStoryCommand(value)
+            const period = parseStoryPeriod(value)
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              period,
               quantumState: state,
               userIndex: index,
             })
@@ -4399,7 +4398,7 @@ const NoteEditor = ({
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                        <span style={{ minWidth: '230px', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )
@@ -4422,6 +4421,11 @@ const NoteEditor = ({
               )}
               {storyResponse && (
                 <div className="opacity-60">
+                  {storyMeta && (
+                    <div className="mb-2 text-[11px] tracking-widest opacity-60">
+                      {storyMeta.period} · {storyMeta.arcadeLine}
+                    </div>
+                  )}
                   {storyResponse.split('\n').map((line, idx) => (
                     <div key={idx}>{line || <br />}</div>
                   ))}

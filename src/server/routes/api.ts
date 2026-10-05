@@ -19,6 +19,15 @@ import {
 import config from '#server/config'
 import { fp } from '#shared/utils'
 import {
+  STORY_PERIODS,
+  DEFAULT_STORY_PERIOD,
+  buildStoryDigest,
+  buildLocalStory,
+  computeLifetimeXp,
+  digestToPromptBlock,
+  type StoryPeriod,
+} from '#shared/utils/storyCompression'
+import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
   DATE_TIME_FORMAT,
@@ -5480,8 +5489,11 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
   // ============================================================================
   // STORY — Contextual AI Story
-  // Generates a 1-2 paragraph story based on recent logs, self-care events,
-  // and widget data. The story reflects the operator's recent journey.
+  // /story [day|week|month|year] — compressed story of the operator's period.
+  // Pipeline: Log rows -> StoryDigest (shared/utils/storyCompression, pure)
+  //           -> Together AI -> persisted as 'generated_story'.
+  // The vendor sees the DIGEST, never raw history. If the vendor fails the
+  // deterministic local story (same digest) is returned — /story always answers.
   // ============================================================================
   fastify.post(
     '/story',
@@ -5490,6 +5502,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,30 +5527,24 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period: StoryPeriod = STORY_PERIODS.includes(req.body.period as StoryPeriod)
+        ? (req.body.period as StoryPeriod)
+        : DEFAULT_STORY_PERIOD
 
+      // Lifetime rows (for Arcade XP) — capped; the digest filters to the window itself.
       const logs = await fastify.models.Log.findAll({
         where: { userId: req.user.id },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 1000,
       })
-
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
+      const rows = logs.map(l => ({
+        event: l.event,
+        text: l.text,
+        createdAt: l.createdAt as Date,
+        context: (l.context || null) as any,
+        metadata: (l.metadata || null) as any,
+      }))
+      const digest = buildStoryDigest(rows, period, new Date(), computeLifetimeXp(rows))
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
@@ -5547,33 +5554,27 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const wordBudget = { day: '60-120', week: '100-200', month: '150-250', year: '200-300' }[period]
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's ${period} into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story ${period}. You receive a DIGEST of their records (counts, moods, environment, spikes, short excerpts), not their full history. Write ${wordBudget} words that compress this ${period}: where it rose, where it dipped, what changed.
 
 RULES:
 - Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
+- Use only facts present in the digest; never invent events, people or numbers
+- Name any SPIKES plainly (mood shift, quiet gap, volume peak) with compassion, not diagnosis
+- Weave in the environment (weather, place) only where it helps
+- Match tone to the operator's current energy: reflective if low, energized if high
 - End with a single forward-looking sentence — not a pep talk, just a quiet truth
-- Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- This is self-care, not medicine: no diagnoses, no medical advice
+- Return ONLY the story. No title. No commentary. No preamble.`
 
       const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+OPERATOR LOG ENTRY: "${(logText || '(no text)').substring(0, 500)}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
+${digestToPromptBlock(digest)}`
 
       const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
 
@@ -5583,7 +5584,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
 
         console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
 
-        const story = await engine.generateCompletion(fullPrompt, 512)
+        const story = await engine.generateCompletion(fullPrompt, period === 'day' ? 400 : 640)
 
         const cleaned = story.trim().replace(/^["']|["']$/g, '')
 
@@ -5596,6 +5597,9 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            period,
+            arcade: digest.arcade,
+            digest: { entries: digest.entries, checkins: digest.checkins, activeDays: digest.activeDays, streakDays: digest.streakDays, spikes: digest.spikes },
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5604,12 +5608,16 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          period,
+          arcade: digest.arcade,
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
         return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
+          story: buildLocalStory(digest),
           logId: null,
+          period,
+          arcade: digest.arcade,
         }
       }
     }
