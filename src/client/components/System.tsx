@@ -376,6 +376,17 @@ export const System = React.memo(function SystemInner() {
 
   const optimalWidget = React.useMemo(() => getOptimalWidget(), [logs])
 
+  // Visibility gates for probabilistic/cooldown widgets are decided ONCE per
+  // mount. Previously these ran inside render: Math.random() re-rolled on every
+  // System re-render (Subscribe flicker) and 'intentions-last-shown' was stamped
+  // during render, so the next re-render saw an active cooldown and unmounted
+  // the Intentions widget the user was just shown.
+  const [stableGates] = React.useState(() => ({
+    subscribeRoll: Math.random() < 0.2,
+    intentionsCooldownRoll: Math.random(),
+  }))
+  const intentionsShown = React.useRef(false)
+
   // Community pulse — atmosphere layer
   const convergence = React.useMemo(() => getConvergenceSignal(), [])
   const ambientIntensity = React.useMemo(() => getAmbientIntensity(), [])
@@ -621,7 +632,7 @@ export const System = React.memo(function SystemInner() {
             <Block label="Humidity:">
               <span
                 className={cn(
-                  !isMirrorOn && !isCustomThemeEnabled && weather?.humidity >= 50 && 'text-blue-500'
+                  !isMirrorOn && !isCustomThemeEnabled && (weather?.humidity ?? 0) >= 50 && 'text-blue-500'
                 )}
               >
                 {weather?.humidity}%
@@ -867,6 +878,7 @@ export const System = React.memo(function SystemInner() {
           if (!shouldShow) return null
 
           // Store quantum reasoning for widget to display
+          // Idempotent write; must land before SelfCareMoments reads it in its own render
           if (intentionSuggestsSelfCare && optimalWidget?.reason) {
             localStorage.setItem('selfcare-quantum-reason', optimalWidget.reason)
           } else {
@@ -887,8 +899,8 @@ export const System = React.memo(function SystemInner() {
           const twoDaysMs = 2 * 24 * 60 * 60 * 1000
           const threeDaysMs = 3 * 24 * 60 * 60 * 1000
 
-          // Random cooldown between 2-3 days
-          const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
+          // Random cooldown between 2-3 days (rolled once per mount)
+          const cooldownPeriod = twoDaysMs + stableGates.intentionsCooldownRoll * (threeDaysMs - twoDaysMs)
           const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
 
           const intentionSuggestsIntentions = optimalWidget?.widget === 'intentions'
@@ -897,17 +909,21 @@ export const System = React.memo(function SystemInner() {
           // 1. User has an existing intention to display, OR
           // 2. Intention engine detects seeking-direction or morning-clarity patterns, OR
           // 3. Cooldown passed (fallback for periodic prompting)
-          if (hasIntention || intentionSuggestsIntentions || cooldownPassed) {
-            // Update last shown time
-            if (!lastShown || cooldownPassed || intentionSuggestsIntentions) {
-              localStorage.setItem('intentions-last-shown', Date.now().toString())
-            }
-
-            // Store quantum reasoning for widget to display
+          // Once shown in this mount it stays shown (the stamp below would
+          // otherwise hide it on the next re-render).
+          if (intentionsShown.current || hasIntention || intentionSuggestsIntentions || cooldownPassed) {
+            // Idempotent write; IntentionsWidget reads it in its own render
             if (intentionSuggestsIntentions && optimalWidget?.reason) {
               localStorage.setItem('intentions-quantum-reason', optimalWidget.reason)
             } else {
               localStorage.removeItem('intentions-quantum-reason')
+            }
+            if (!intentionsShown.current) {
+              intentionsShown.current = true
+              // Non-idempotent cooldown stamp: deferred out of the render pass
+              queueMicrotask(() => {
+                try { localStorage.setItem('intentions-last-shown', Date.now().toString()) } catch {}
+              })
             }
 
             return <div><IntentionsWidget /></div>
@@ -936,9 +952,8 @@ export const System = React.memo(function SystemInner() {
             return null
           }
 
-          // Random 20% chance to show when all conditions met
-          const shouldShow = Math.random() < 0.2
-          return shouldShow && <div><SubscribeWidget /></div>
+          // Random 20% chance to show when all conditions met (rolled once per mount)
+          return stableGates.subscribeRoll && <div><SubscribeWidget /></div>
         })()}
       </WidgetErrorBoundary>
 

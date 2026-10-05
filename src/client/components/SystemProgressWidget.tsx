@@ -6,6 +6,7 @@
  * Made in the USA | brand.lot-systems.com
  */
 
+import { fetchUserProfileCohort } from '#client/utils/userProfileCache'
 import React from 'react'
 import { Block, Button } from '#client/components/ui'
 import { useStore } from '@nanostores/react'
@@ -1574,14 +1575,11 @@ export function SystemProgressWidget() {
 
   // Load physiological cohort classification from user-profile (server-derived archetype)
   React.useEffect(() => {
-    fetch('/api/user-profile')
-      .then(res => res.json())
-      .then(data => {
-        if (data.archetype || data.behavioralCohort) {
-          setCohortData({ archetype: data.archetype, behavioralCohort: data.behavioralCohort })
-        }
-      })
-      .catch(() => {})
+    let cancelled = false
+    fetchUserProfileCohort().then(data => {
+      if (!cancelled && data) setCohortData(data)
+    })
+    return () => { cancelled = true }
   }, [])
 
   // Load OS journal (vitals snapshots + signal reports) when view is active

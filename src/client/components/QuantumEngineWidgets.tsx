@@ -6,6 +6,7 @@
  * Made in the USA | brand.lot-systems.com
  */
 
+import { fetchUserProfileCohort } from '#client/utils/userProfileCache'
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import { Block, Button } from '#client/components/ui'
@@ -176,14 +177,11 @@ export const QuantumEngineWidgets: React.FC = () => {
 
   // Load cohort/archetype from user-profile (server-derived)
   React.useEffect(() => {
-    fetch('/api/user-profile')
-      .then(res => res.json())
-      .then(data => {
-        if (data.archetype || data.behavioralCohort) {
-          setCohortData({ archetype: data.archetype, behavioralCohort: data.behavioralCohort })
-        }
-      })
-      .catch(() => {})
+    let cancelled = false
+    fetchUserProfileCohort().then(data => {
+      if (!cancelled && data) setCohortData(data)
+    })
+    return () => { cancelled = true }
   }, [])
 
   // Compute readiness from physiological report
@@ -469,7 +467,7 @@ export const QuantumEngineWidgets: React.FC = () => {
                   </div>
                   <div className="flex justify-between items-baseline">
                     <span className="opacity-30 uppercase">CARE</span>
-                    <span className="tabular-nums">{userIndex.dimensions.selfcare}</span>
+                    <span className="tabular-nums">{userIndex.dimensions.selfCare}</span>
                   </div>
                   <div className="flex justify-between items-baseline">
                     <span className="opacity-30 uppercase">COG</span>
