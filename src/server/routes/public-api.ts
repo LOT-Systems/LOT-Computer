@@ -20,7 +20,7 @@ import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
-import { RATION_MANIFEST, DOCTRINE_LINES, PRICE_LINE, MANUAL_REF } from '#shared/basics/manifest'
+import { RATION_MANIFEST, cadenceLabel, DOCTRINE_LINES, PRICE_LINE, MANUAL_REF } from '#shared/basics/manifest'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -510,7 +510,7 @@ export default async (fastify: FastifyInstance) => {
     manual: MANUAL_REF,
     price: PRICE_LINE,
     doctrine: DOCTRINE_LINES,
-    manifest: RATION_MANIFEST,
+    manifest: RATION_MANIFEST.map((i) => ({ ...i, cadence: cadenceLabel(i.everyMonths) })),
   }))
 
   fastify.get('/status', async (req, reply) => {

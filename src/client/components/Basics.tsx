@@ -21,13 +21,16 @@ import {
   PRICE_LINE,
   MANUAL_REF,
   RATION_COUNT,
+  SCHEDULE_HORIZON,
+  cadenceLabel,
+  issueLoad,
   type RationCategory,
 } from '#shared/basics/manifest'
 import { STATE_LABEL, baselineState } from '#shared/basics/engine'
 import { useBasic } from './basics/useBasic'
 import { Enroll } from './basics/Enroll'
 
-const CATEGORIES: RationCategory[] = ['NUTRITION', 'HEALTH', 'HYGIENE', 'EQUIPMENT']
+const CATEGORIES: RationCategory[] = ['HYGIENE', 'GROOMING', 'GARMENT', 'SUSTENANCE', 'RECORD']
 const COLS = '28px 1fr auto 96px'
 
 // Inversion bar: the only hierarchy device.
@@ -41,7 +44,7 @@ export const Basics: React.FC = () => {
   const hasUsership = !!me?.tags?.some(
     (t) => t.toLowerCase() === UserTag.Usership.toLowerCase()
   )
-  const { basic, busy, errors, act } = useBasic(!!me)
+  const { basic, card, busy, errors, act } = useBasic(!!me)
   // Until the server record loads, fall back to the tag-derived baseline.
   const state = basic?.state ?? baselineState(hasUsership)
 
@@ -88,6 +91,25 @@ export const Basics: React.FC = () => {
         </div>
       </div>
 
+      {basic?.nextIssue && (
+        <div>
+          <Bar>NEXT ISSUE {String(basic.issuesDispatched + 1).padStart(2, '0')} — {basic.nextIssue}</Bar>
+          <pre className="pt-8 overflow-x-auto leading-[1.5rem]">{card}</pre>
+          {basic.dispatches.length > 0 && (
+            <div className="pt-8">
+              <div className="uppercase font-bold">ISSUE LOG ({basic.dispatches.length})</div>
+              {basic.dispatches.map((d) => (
+                <div key={d.issue} className="grid gap-x-8 py-4 border-b border-acc" style={{ gridTemplateColumns: '48px 96px 1fr' }}>
+                  <span className="tabular-nums">{String(d.issue).padStart(2, '0')}</span>
+                  <span>{d.ts.slice(0, 10)}</span>
+                  <span className="text-right">{d.tracking}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {me && basic && (
         <div>
           <Bar>UPGRADE / ROSTER</Bar>
@@ -119,12 +141,22 @@ export const Basics: React.FC = () => {
                   <span className="tabular-nums">{i.line}</span>
                   <span className="uppercase">{i.nomenclature}</span>
                   <span className="text-right whitespace-nowrap">{i.spec}</span>
-                  <span className="text-right">{i.cadence}</span>
+                  <span className="text-right">{cadenceLabel(i.everyMonths)}</span>
                 </div>
               ))}
             </div>
           )
         })}
+      </div>
+
+      <div>
+        <Bar>ISSUE SCHEDULE — {SCHEDULE_HORIZON} MO</Bar>
+        {Array.from({ length: SCHEDULE_HORIZON }, (_, k) => k + 1).map((n) => (
+          <div key={n} className="grid gap-x-8 py-4 border-b border-acc" style={{ gridTemplateColumns: '48px 1fr' }}>
+            <span className="tabular-nums">{String(n).padStart(2, '0')}</span>
+            <span>{issueLoad(n).length} / {RATION_COUNT} LINES</span>
+          </div>
+        ))}
       </div>
     </div>
   )

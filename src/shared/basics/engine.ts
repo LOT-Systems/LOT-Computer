@@ -162,13 +162,41 @@ export type IssueLogEntry = {
 
 export const ISSUE_LOG_MAX = 200
 
+export type Dispatch = {
+  /** Ration issue number, 1-based from cadence start */
+  issue: number
+  /** Scheduled issue date (YYYY-MM-DD) this dispatch satisfied */
+  due: string
+  ts: string
+  tracking: string
+}
+
+export const DISPATCH_MAX = 36
+
 export type BasicRecord = {
   state: RationState
   roster: Roster | null
   billing: Billing
   issueLog: IssueLogEntry[]
-  /** Next scheduled issue date, or null when not on strength. Advanced by M3 dispatch. */
+  /** Next scheduled issue date, or null when not on strength. Advanced by each dispatch. */
   nextIssue: string | null
+  /** Issues dispatched since the current roster went ON STRENGTH. NEXT ISSUE number = issuesDispatched + 1. */
+  issuesDispatched: number
+  dispatches: Dispatch[]
+}
+
+/** Fill fields missing from records stored before M3. */
+export const normalizeRecord = (r: Partial<BasicRecord> | null | undefined, fallback: RationState): BasicRecord => ({
+  ...emptyRecord(fallback),
+  ...(r ?? {}),
+  issuesDispatched: r?.issuesDispatched ?? 0,
+  dispatches: r?.dispatches ?? [],
+})
+
+/** Add one calendar month to a YYYY-MM-01 date. */
+export const addMonth = (ymd: string): string => {
+  const [y, m] = ymd.split('-').map(Number)
+  return m === 12 ? `${y + 1}-01-01` : `${y}-${String(m + 1).padStart(2, '0')}-01`
 }
 
 export const emptyRecord = (state: RationState): BasicRecord => ({
@@ -183,6 +211,8 @@ export const emptyRecord = (state: RationState): BasicRecord => ({
   },
   issueLog: [],
   nextIssue: null,
+  issuesDispatched: 0,
+  dispatches: [],
 })
 
 /** Baseline state implied by the user's tags when no record exists yet. */
@@ -200,12 +230,17 @@ export type ApplyResult =
 export const applyEvent = (
   record: BasicRecord,
   event: RationEvent,
-  ctx: { now: Date; hasUsership: boolean; roster?: Roster; note?: string }
+  ctx: { now: Date; hasUsership: boolean; roster?: Roster; note?: string; tracking?: string }
 ): ApplyResult => {
   if (event === 'UPGRADE' && !ctx.hasUsership)
     return { ok: false, error: 'USERSHIP / AI REQUIRED AS BASE LAYER' }
   if (event === 'ROSTER_COMPLETE' && !ctx.roster)
     return { ok: false, error: 'ROSTER REQUIRED' }
+  if (event === 'ISSUE_DISPATCHED') {
+    if (!record.nextIssue || ctx.now.toISOString().slice(0, 10) < record.nextIssue)
+      return { ok: false, error: `NOT DUE: NEXT ISSUE ${record.nextIssue ?? 'NONE'}` }
+    if (!ctx.tracking?.trim()) return { ok: false, error: 'TRACKING REQUIRED' }
+  }
   const to = transition(record.state, event)
   if (!to)
     return {
@@ -219,6 +254,8 @@ export const applyEvent = (
       ...next,
       roster: ctx.roster!,
       nextIssue: ctx.roster!.cadenceStart,
+      issuesDispatched: 0,
+      dispatches: [],
       billing: {
         amountCents: BASIC_PRICE_CENTS,
         interval: 'MONTH',
@@ -226,6 +263,20 @@ export const applyEvent = (
         processor: record.billing.processor,
         since: ts,
       },
+    }
+  }
+  if (event === 'ISSUE_DISPATCHED') {
+    const d: Dispatch = {
+      issue: record.issuesDispatched + 1,
+      due: record.nextIssue!,
+      ts,
+      tracking: ctx.tracking!.trim().slice(0, 40),
+    }
+    next = {
+      ...next,
+      issuesDispatched: d.issue,
+      nextIssue: addMonth(record.nextIssue!),
+      dispatches: [...record.dispatches, d].slice(-DISPATCH_MAX),
     }
   }
   if (event === 'STAND_DOWN') {
@@ -241,7 +292,11 @@ export const applyEvent = (
     event,
     from: record.state,
     to,
-    ...(ctx.note ? { note: ctx.note.slice(0, 120) } : {}),
+    ...(event === 'ISSUE_DISPATCHED'
+      ? { note: `ISSUE ${next.issuesDispatched} ${ctx.tracking!.trim().slice(0, 40)}` }
+      : ctx.note
+      ? { note: ctx.note.slice(0, 120) }
+      : {}),
   }
   next.issueLog = [...record.issueLog, entry].slice(-ISSUE_LOG_MAX)
   return { ok: true, record: next }

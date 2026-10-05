@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BasicRecord } from '#shared/basics/engine'
 
-type Result = { ok: boolean; error?: string; errors?: string[]; basic?: BasicRecord }
+type Result = { ok: boolean; error?: string; errors?: string[]; basic?: BasicRecord; card?: string | null }
 
 const call = async (path: string, body?: unknown): Promise<Result> => {
   try {
@@ -12,7 +12,7 @@ const call = async (path: string, body?: unknown): Promise<Result> => {
       body: body === undefined ? undefined : JSON.stringify(body),
     })
     const data = await res.json().catch(() => ({}))
-    if (path === '' && res.ok) return { ok: true, basic: data.basic }
+    if (path === '' && res.ok) return { ok: true, basic: data.basic, card: data.card }
     return { ...data, ok: res.ok && data.ok !== false }
   } catch {
     return { ok: false, error: 'LINK DOWN' }
@@ -21,12 +21,16 @@ const call = async (path: string, body?: unknown): Promise<Result> => {
 
 export const useBasic = (enabled: boolean) => {
   const [basic, setBasic] = React.useState<BasicRecord | null>(null)
+  const [card, setCard] = React.useState<string | null>(null)
   const [busy, setBusy] = React.useState(false)
   const [errors, setErrors] = React.useState<string[]>([])
 
   React.useEffect(() => {
     if (!enabled) return
-    call('').then((r) => r.basic && setBasic(r.basic))
+    call('').then((r) => {
+      if (r.basic) setBasic(r.basic)
+      setCard(r.card ?? null)
+    })
   }, [enabled])
 
   const act = React.useCallback(async (path: string, body?: unknown) => {
@@ -34,10 +38,11 @@ export const useBasic = (enabled: boolean) => {
     setErrors([])
     const r = await call(path, body ?? {})
     if (r.basic) setBasic(r.basic)
+    if (r.basic) setCard(r.card ?? null)
     if (!r.ok) setErrors(r.errors ?? [r.error ?? 'REJECTED'])
     setBusy(false)
     return r.ok
   }, [])
 
-  return { basic, busy, errors, act }
+  return { basic, card, busy, errors, act }
 }
