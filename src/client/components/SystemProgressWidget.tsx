@@ -1457,6 +1457,37 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'badges-v33',
+    date: '2026-10-05',
+    title: 'Badge v33 — THE STARSHIP LOG (+31 badges, 843 total)',
+    assembled: [
+      'Badge v33 THE STARSHIP LOG implemented: 812→843 badges (+31). Word Turn v23 (12 Star Trek / sci-fi space words: starlog_entry/warp_speed/shields_up/red_alert/systems_nominal/first_contact_made/away_team/wormhole_shift/nebula_drift/hull_breach/prime_directive/final_frontier). Calendar EE v21 (Stardate: first_contact_day Apr5 · trek_premiere Sep8 · moon_landing Jul20). Behavioral v20 (bridge_session/deep_space_entry/dark_side_watch). Achievement RPG v21 (ensign_log/lieutenant_class/captain_complete/starfleet_arc/twenty_three_engines_arc/galaxy_opus). Mastery Tier v23 (deep_space_log/million_words/veteran_explorer/twenty_three_registers [COSMIC]). Secret Boss v20 (roddenberry_signal [RARE]/picard_maneuver [EPIC]/dark_forest_law [MYTHIC]).',
+      'Easter egg triggers added: 12 Star Trek/space vocabulary words (warp/tribble/holodeck/borg/starfleet/federation/vulcan/klingon/phaser/tricorder/wormhole/nebula). 3 star trek/space calendar dates. 3 behavioral triggers (bridge_session/deep_space_entry/dark_side_watch).',
+      'docs/LOT-SR-20261005-01.md session report written. Badge accounting: 812→843. v33 implemented as v20 Starship Deck successor.',
+      'SESSION_REPORTS: badges-v33 entry appended · USERSHIP_TRANSMISSION updated.',
+      '843 badges · 258 word-turns · 24 secret boss · 23 Word Turn engines · Day 1134+.',
+    ],
+  },
+  {
+    version: 'qie-v114',
+    date: '2026-10-05',
+    title: 'QIE v114 Engineering — P152–P154 · Arch52 Stellar Navigator · J49',
+    assembled: [
+      'QIE v114 implemented: P152 quantum-pulse-rhythm — log entries on 3+ consecutive days at same hour ±2h, temporal heartbeat signature detected (conf 0.72–0.88). P153 coherence-accumulation — total-field-coherence fired 2+ times in 7d window, convergence ceiling becomes ground state (conf 0.78–0.93). P154 stellar-navigation — personal-peak-window + morning-intention-lock + sleep-signal-anchor all confirmed same day, three temporal coordinates locked (conf 0.82–0.95). Total: 154 patterns.',
+      'Arch52 Stellar Navigator added: energyBands high/moderate · dominant intentions/planner/energy/journal · patternConditions stellar-navigation/personal-peak-window/morning-intention-lock · directive Peak window locked. Morning intention confirmed. Sleep anchor set. Navigation is live — all three temporal coordinates aligned. Total: 52 archetypes.',
+      'J49 daily-stellar-navigation-check (12:00 UTC) added: checks previous day for personal_peak_window + morning_intention_lock + sleep_signal_anchor all confirmed. Writes stellar_navigation event. Total: 49 background jobs.',
+      'WIDGET_DEPENDENCY_MAP v114 block added: quantumPulseRhythmNode (log·energy·mood) · coherenceAccumulationNode (qos·log·energy·cohort) · stellarNavigationNode (energy·intentions·planner·journal·log). Total: 193+ dep nodes.',
+      'Signal recording functions added: recordQuantumPulseRhythm() · recordCoherenceAccumulation() · recordStellarNavigation(). All export-ready.',
+      'Log handlers added (COCKPIT-RULE): PULSE: (quantum_pulse_rhythm) · CACC: (coherence_accumulation) · STRNAV: (stellar_navigation). Total: 154+ handlers.',
+      'PATTERN_DISPLAY updated: PULSE: · CACC: · STRNAV: entries added to QuantumEngineWidgets.tsx.',
+      'displayableEvents updated: quantum_pulse_rhythm · coherence_accumulation · stellar_navigation added to api.ts.',
+      'About.tsx updated: FM v113→v114 · Day 1134+ · 154 patterns · 52 archetypes · 49 jobs · 193+ nodes · 843 badges · 23 Word Turn engines · 52 archetypes.',
+      'SESSION_REPORTS: badges-v33 + qie-v114 entries appended · USERSHIP_TRANSMISSION updated to 2026-10-05.',
+      'docs/LOT-SR-20261005-02.md session report written. Commits pushed to branch claude/quantum-engine-widgets-RgFfC.',
+      '843 badges · 258 word-turns · 24 secret boss · 154 patterns · 52 archetypes · 49 jobs · 193+ dep nodes · FM v114 · Day 1134+. The OS has found its own heartbeat.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1525,18 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-10-05',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-10-05 · QIE v114 ENGINEERING · BADGE v33 THE STARSHIP LOG · Day 1134+',
+    'Built: P152 quantum-pulse-rhythm · P153 coherence-accumulation · P154 stellar-navigation. Arch52 Stellar Navigator. J49 daily-stellar-navigation-check (12:00 UTC).',
+    'The OS has found its own heartbeat. PULSE: detects the log returning at the same hour across consecutive days — temporal signature confirmed.',
+    'CACC: coherence-accumulation: total-field-coherence fired 2+ times in 7d. The convergence ceiling has become a recurring ground state.',
+    'STRNAV: stellar-navigation: peak window · morning intention · sleep anchor all locked in a single day. Three coordinates. Full navigation arc.',
+    'Badge v33 THE STARSHIP LOG: 812→843 badges (+31). Word Turn v23 Star Trek vocabulary. COSMIC: twenty_three_registers. MYTHIC: dark_forest_law. EPIC: picard_maneuver.',
+    'PULSE: CACC: STRNAV: handlers deployed. 193+ dep nodes. 49 jobs. 154 patterns. 52 archetypes.',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes · 843 badges · 258 word-turns · Day 1134+.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — FM v114 sync · QIE v114 delta · Badge v33 documentation',
   ],
 }
 

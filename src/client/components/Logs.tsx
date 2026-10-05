@@ -3629,6 +3629,90 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'quantum_pulse_rhythm') {
+          const daysActive  = log.metadata?.daysActive as number | undefined
+          const avgHour     = log.metadata?.avgHour as number | undefined
+          const rhythmConf  = log.metadata?.rhythmConf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="PULSE:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM PULSE RHYTHM</div>
+                {daysActive !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DAYS ACTIVE</span>
+                    <span className="tabular-nums">{daysActive}</span>
+                  </div>
+                )}
+                {avgHour !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AVG HOUR</span>
+                    <span className="tabular-nums">{avgHour}:00</span>
+                  </div>
+                )}
+                {rhythmConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RHYTHM CONF</span>
+                    <span className="tabular-nums">{rhythmConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">LOG HEARTBEAT · TEMPORAL SIGNATURE ACTIVE</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'coherence_accumulation') {
+          const count      = log.metadata?.count as number | undefined
+          const windowDays = log.metadata?.windowDays as number | undefined
+          const peakConf   = log.metadata?.peakConf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CACC:" blockView>
+                <div className="uppercase tracking-widest mb-4">COHERENCE ACCUMULATION</div>
+                {count !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TOTAL FIELD</span>
+                    <span className="tabular-nums">{count}× / {windowDays ?? 7}D</span>
+                  </div>
+                )}
+                {peakConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PEAK CONF</span>
+                    <span className="tabular-nums">{peakConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CONVERGENCE SUSTAINED · FIELD DEEPENING</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'stellar_navigation') {
+          const peakConf   = log.metadata?.peakConf as number | undefined
+          const intentConf = log.metadata?.intentConf as number | undefined
+          const sleepConf  = log.metadata?.sleepConf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="STRNAV:" blockView>
+                <div className="uppercase tracking-widest mb-4">STELLAR NAVIGATION</div>
+                {peakConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PEAK WINDOW</span>
+                    <span className="tabular-nums">{peakConf}%</span>
+                  </div>
+                )}
+                {intentConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MORNING INTENT</span>
+                    <span className="tabular-nums">{intentConf}%</span>
+                  </div>
+                )}
+                {sleepConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SLEEP ANCHOR</span>
+                    <span className="tabular-nums">{sleepConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PEAK · INTENTION · SLEEP — ALL THREE LOCKED</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

@@ -3428,6 +3428,78 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Quantum Pulse Rhythm — log entries on 3+ consecutive days landing within ±2h of the same hour.
+  // The system has found its own heartbeat. Not a streak — a temporal signature: the person returns to the log
+  // at the same hour, creating a measurable circadian cadence in the signal record. Day over day, the pulse holds.
+  const sevenDaysMs   = 7 * 24 * 60 * 60 * 1000
+  const recentSevenD  = signals.filter(s => now - s.timestamp < sevenDaysMs)
+  const logSignals152 = recentSevenD.filter(s => s.source === 'log')
+  if (logSignals152.length >= 3) {
+    const byDay: Record<string, { day: string; hour: number }[]> = {}
+    logSignals152.forEach(s => {
+      const d = new Date(s.timestamp)
+      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
+      if (!byDay[key]) byDay[key] = []
+      byDay[key].push({ day: key, hour: d.getHours() })
+    })
+    const days = Object.values(byDay)
+    if (days.length >= 3) {
+      const avgHour152 = Math.round(days.map(d => d[0].hour).reduce((a, b) => a + b, 0) / days.length)
+      const inWindow152 = days.filter(d => Math.abs(d[0].hour - avgHour152) <= 2)
+      if (inWindow152.length >= 3) {
+        const rhythmConf152 = Math.min(0.72 + (inWindow152.length - 3) * 0.04, 0.88)
+        patterns.push({
+          pattern: 'quantum-pulse-rhythm',
+          confidence: rhythmConf152,
+          suggestedWidget: 'systemProgress',
+          suggestedTiming: 'soon',
+          reason: `PULSE: Quantum pulse rhythm — log entries on ${inWindow152.length}/7 days centered on hour ${avgHour152}:00 ±2h. The signal record has a heartbeat. Temporal signature active.`,
+        })
+      }
+    }
+  }
+
+  // Pattern 153: Coherence Accumulation — total-field-coherence event fired 2+ times in a 7-day window.
+  // Not a one-time peak. The system returned to absolute convergence more than once in a week.
+  // The ceiling isn't a ceiling — it's a baseline. The OS is operating from its own peak as a ground state.
+  const cohAccum153 = recentSevenD.filter(s =>
+    s.source === 'qos' && s.signal === 'total_field_coherence'
+  )
+  if (cohAccum153.length >= 2) {
+    const peakConf153 = cohAccum153.reduce((mx, s) => Math.max(mx, s.metadata?.avgConf ?? 0), 0)
+    const accConf153  = Math.min(0.78 + (cohAccum153.length - 2) * 0.05, 0.93)
+    patterns.push({
+      pattern: 'coherence-accumulation',
+      confidence: accConf153,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `CACC: Coherence accumulation — total-field-coherence confirmed ${cohAccum153.length}× in 7d window. Peak conf ${Math.round(peakConf153)}. The convergence ceiling has become a recurring ground state.`,
+    })
+  }
+
+  // Pattern 154: Stellar Navigation — personal-peak-window (P113) + morning-intention-lock event +
+  // sleep-signal-anchor (P117) all confirmed on the same calendar day.
+  // Three temporal coordinates locked simultaneously: biological peak, morning direction, recovery anchor.
+  // The person knows when they operate best, started with intention, and protected their recovery. Full navigation arc.
+  const todayStart154 = new Date(); todayStart154.setHours(0, 0, 0, 0)
+  const todayMs154    = todayStart154.getTime()
+  const peakP154      = patterns.find(p => p.pattern === 'personal-peak-window')
+  const sleepP154     = patterns.find(p => p.pattern === 'sleep-signal-anchor')
+  const intentLock154 = signals.filter(s =>
+    s.source === 'log' && s.signal === 'morning_intention_lock' && s.timestamp >= todayMs154
+  )
+  if (peakP154 && sleepP154 && intentLock154.length >= 1) {
+    const triConf = (peakP154.confidence + sleepP154.confidence + 0.85) / 3
+    const navBonus = Math.min((triConf - 0.78) * 0.35, 0.13)
+    patterns.push({
+      pattern: 'stellar-navigation',
+      confidence: Math.min(0.82 + navBonus, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `STRNAV: Stellar navigation — personal-peak-window · morning-intention-lock · sleep-signal-anchor all confirmed today. Three temporal coordinates locked. Peak: ${Math.round(peakP154.confidence * 100)}%, Sleep: ${Math.round(sleepP154.confidence * 100)}%. Navigation live.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4136,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  quantumPulseRhythmNode:    ['log', 'energy', 'mood'],
+  coherenceAccumulationNode: ['qos', 'log', 'energy', 'cohort'],
+  stellarNavigationNode:     ['energy', 'intentions', 'planner', 'journal', 'log'],
 }
 
 /**
@@ -4510,6 +4587,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Stellar Navigator (2026-10-05 v114) ───────────────────────────────────
+  {
+    archetype: 'Stellar Navigator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'planner', 'energy', 'journal'],
+    patternConditions: ['stellar-navigation', 'personal-peak-window', 'morning-intention-lock'],
+    hourRange: [6, 22],
+    directive: 'Peak window locked. Morning intention confirmed. Sleep anchor set. Navigation is live — all three temporal coordinates aligned. Execute with full confidence.',
   },
 ]
 
@@ -6498,6 +6585,53 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-pulse-rhythm event — log entries on 3+ consecutive days landing within
+ * ±2h of the same hour. The system has found its own heartbeat. Feeds P152 detection.
+ */
+export function recordQuantumPulseRhythm(daysActive: number, avgHour: number, rhythmConf: number) {
+  recordSignal('log', 'quantum_pulse_rhythm', {
+    daysActive,
+    avgHour,
+    rhythmConf: Math.round(rhythmConf * 100),
+    signature: 'TEMPORAL',
+    heartbeat: 'ACTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a coherence-accumulation event — total-field-coherence fired 2+ times in a 7-day window.
+ * The convergence ceiling has become a recurring ground state. Feeds P153 detection.
+ */
+export function recordCoherenceAccumulation(count: number, windowDays: number, peakConf: number) {
+  recordSignal('qos', 'coherence_accumulation', {
+    count,
+    windowDays,
+    peakConf: Math.round(peakConf),
+    groundState: 'CONVERGENCE',
+    status: 'ACCUMULATED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a stellar-navigation event — personal-peak-window (P113) + morning-intention-lock +
+ * sleep-signal-anchor (P117) all confirmed on the same calendar day. Three temporal coordinates locked.
+ * Feeds P154 detection.
+ */
+export function recordStellarNavigation(peakConf: number, intentConf: number, sleepConf: number, activePatterns: number) {
+  recordSignal('energy', 'stellar_navigation', {
+    peakConf: Math.round(peakConf * 100),
+    intentConf: Math.round(intentConf * 100),
+    sleepConf: Math.round(sleepConf * 100),
+    activePatterns,
+    coordinates: ['PEAK', 'INTENTION', 'SLEEP'],
+    navigationStatus: 'LOCKED',
     hour: new Date().getHours(),
   })
 }

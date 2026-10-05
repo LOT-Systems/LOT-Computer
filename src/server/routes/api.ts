@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: quantum pulse rhythm · coherence accumulation · stellar navigation (P152/P153/P154)
+      'quantum_pulse_rhythm',
+      'coherence_accumulation',
+      'stellar_navigation',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
