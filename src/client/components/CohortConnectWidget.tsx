@@ -116,6 +116,20 @@ export const CohortConnectWidget: React.FC = () => {
     window.location.href = `/users/${userId}`
   }
 
+  const handleSendEmail = (match: { user: { id: string; firstName: string; lastName: string } }, similarity: number) => {
+    recordSignal('mood', 'cohort_email_initiated', {
+      userId: match.user.id,
+      similarity,
+      connectionReadiness,
+      hour: new Date().getHours()
+    })
+    stores.emailCompose.set({
+      toId: match.user.id,
+      toName: `${match.user.firstName || ''} ${match.user.lastName || ''}`.trim() || 'member',
+    })
+    stores.goTo('sync')
+  }
+
   const handleSendMessage = (userId: string, similarity: number) => {
     recordSignal('mood', 'cohort_message_initiated', {
       userId,
@@ -268,6 +282,15 @@ export const CohortConnectWidget: React.FC = () => {
                         }}
                       >
                         Send message
+                      </Button>
+                      <Button
+                        size="small"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation()
+                          handleSendEmail(match, match.similarity)
+                        }}
+                      >
+                        Email
                       </Button>
                     </div>
                   </div>

@@ -3931,6 +3931,15 @@ const NoteEditor = ({
   // the editor. We compare against the previous value via ref so
   // editing around an existing trigger doesn't re-fire it.
   // --------------------------------------------------------------------
+  // LOT® Email status: draft hint while composing, result once the server has sent.
+  const emailStatus = React.useMemo(() => {
+    const sent = (log.metadata as any)?.email
+    if (sent?.status === 'sent') return `SENT → ${String(sent.to).toUpperCase()}`
+    if (sent?.status === 'failed') return `NOT SENT — ${String(sent.error).toUpperCase()}`
+    const m = /^\s*\/email\s+to\s+([^.:\n]{1,60})[.:]?/i.exec(value)
+    if (m) return `DRAFT → ${m[1].trim().toUpperCase()} · END WITH /send TO DELIVER`
+    return null
+  }, [value, log.metadata])
   const lastTriggerScanRef = React.useRef(log.text || '')
   React.useEffect(() => {
     const fresh = detectNewTriggers(value, lastTriggerScanRef.current)
@@ -4139,6 +4148,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to NAME. text /send   LOT Email — lands in Sync',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4384,6 +4394,15 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailStatus && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px' }}>
+                {emailStatus}
+              </div>
             </Block>
           </div>
         )}

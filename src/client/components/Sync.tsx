@@ -25,6 +25,7 @@ import {
   useChatMessages,
   useLikeChatMessage,
 } from '#client/queries'
+import { EmailInbox } from '#client/components/EmailInbox'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
 import {
@@ -172,14 +173,18 @@ export const Sync = React.memo(function SyncInner() {
 
   if (!canAccessChat) {
     return (
-      <div className="max-w-[700px] text-acc/40 py-8">
-        Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+      <div className="max-w-[700px]">
+        <EmailInbox />
+        <div className="text-acc/40 py-8">
+          Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+        </div>
       </div>
     )
   }
 
   return (
     <div className="max-w-[700px]">
+      <EmailInbox />
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}
