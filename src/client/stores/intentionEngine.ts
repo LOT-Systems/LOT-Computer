@@ -4880,7 +4880,8 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  resonance?: { moonPhase: string; rokuyo: string; sample: number } | null
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4890,10 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    // Personal layer derived from the user's own Logs (null until enough entries)
+    resonantMoonPhase: resonance?.moonPhase ?? null,
+    resonantRokuyo: resonance?.rokuyo ?? null,
+    inResonance: resonance ? (resonance.moonPhase === moonPhase || resonance.rokuyo === rokuyo) : false,
   })
 }
 

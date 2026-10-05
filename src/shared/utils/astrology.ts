@@ -88,7 +88,7 @@ export function getRokuyo(date: Date): string {
   const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
 
   // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
+  const rokuyoIndex = (((knownRokuyoIndex + daysDiff) % 6) + 6) % 6
 
   return ROKUYO[rokuyoIndex]
 }
@@ -176,4 +176,69 @@ export function getMoonEmoji(phaseName: string): string {
     'Waning Crescent': '🌘',
   }
   return emojiMap[phaseName] || '🌑'
+}
+
+/**
+ * Convert an instant into a Date whose local getters (getHours/getDate/...)
+ * read the wall-clock fields of the given IANA timeZone. Falls back to the
+ * instant itself for a missing/invalid zone. Isomorphic (Intl only).
+ */
+export function toWallClockInZone(instant: Date, timeZone?: string | null): Date {
+  if (!timeZone) return instant
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(instant)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'))
+  } catch {
+    return instant
+  }
+}
+
+export type AstrologyReading = {
+  hourlyZodiac: string
+  westernZodiac: string
+  moonPhase: string
+  moonIllumination: number
+  rokuyo: string
+}
+
+/** Full ambient reading for a (wall-clock) date — single source for client + server. */
+export function getAstrologyReading(date: Date): AstrologyReading {
+  const moon = getMoonPhase(date)
+  return {
+    hourlyZodiac: getHourlyZodiac(date),
+    westernZodiac: getWesternZodiac(date),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    rokuyo: getRokuyo(date),
+  }
+}
+
+/**
+ * Personal resonance from the user's own log history: which moon phase and
+ * rokuyo their entries cluster under (read from each log's saved astro*
+ * context snapshot). Returns null until there are enough tagged entries.
+ */
+export function getLogResonance(
+  logs: Array<{ context?: { astroMoonPhase?: string | null; astroRokuyo?: string | null } | null }>,
+  minEntries = 5
+): { moonPhase: string; rokuyo: string; sample: number } | null {
+  const moon: Record<string, number> = {}
+  const roku: Record<string, number> = {}
+  let sample = 0
+  for (const log of logs) {
+    const c = log.context
+    if (!c?.astroMoonPhase || !c?.astroRokuyo) continue
+    sample++
+    moon[c.astroMoonPhase] = (moon[c.astroMoonPhase] || 0) + 1
+    roku[c.astroRokuyo] = (roku[c.astroRokuyo] || 0) + 1
+  }
+  if (sample < minEntries) return null
+  const top = (m: Record<string, number>) => Object.entries(m).sort((a, b) => b[1] - a[1])[0][0]
+  return { moonPhase: top(moon), rokuyo: top(roku), sample }
 }
