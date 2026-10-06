@@ -98,11 +98,13 @@ export function useBreathe(enabled: boolean) {
       const label = PHASE_LABELS[currentPhase]
       const display = `${ascii} ${label} ${countdown}s`
 
-      setState({
-        phase: currentPhase,
-        count: countdown,
-        display,
-      })
+      // Bail out when nothing visible changed — System re-renders on every
+      // setState, so a fresh object every 100ms re-rendered the whole tab 10×/s.
+      setState((prev) =>
+        prev.phase === currentPhase && prev.count === countdown && prev.display === display
+          ? prev
+          : { phase: currentPhase, count: countdown, display }
+      )
     }
 
     // Update immediately
