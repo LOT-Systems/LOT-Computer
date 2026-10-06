@@ -886,6 +886,22 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awardBadge('moon_landing')
     awarded.push('moon_landing')
   }
+  // ── Calendar v22 — THE ARCADE CALENDAR ──────────────────────────────────────
+  // Rogue Day: October 5 — Rogue first distributed at UC San Diego, 1980
+  if (!hasBadge('rogue_day') && month === 10 && day === 5) {
+    awardBadge('rogue_day')
+    awarded.push('rogue_day')
+  }
+  // Tetris Day: June 6 — Tetris created by Alexey Pajitnov, 1984
+  if (!hasBadge('tetris_day') && month === 6 && day === 6) {
+    awardBadge('tetris_day')
+    awarded.push('tetris_day')
+  }
+  // Pac-Man Day: May 22 — Pac-Man arcade release, 1980
+  if (!hasBadge('pac_man_day') && month === 5 && day === 22) {
+    awardBadge('pac_man_day')
+    awarded.push('pac_man_day')
+  }
 
   return awarded
 }
@@ -1516,6 +1532,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\b(star[\s-]?trek|roddenberry|vulcan[\s-]?mind|spock|starfleet)\b/i,    badge: 'roddenberry_signal' },
   { patterns: /\bmake[\s-]?it[\s-]?so\b|\bresistance[\s-]?is[\s-]?futile\b|\bpicard\b|\bengage[\s-]?warp\b/i, badge: 'picard_maneuver' },
   { patterns: /\b(three[\s-]?body|dark[\s-]?forest|liu[\s-]?cixin|sophon|trisolaris)\b/i, badge: 'dark_forest_law' },
+  // ── v24 — THE ROGUE RUN word turns ───────────────────────────────────────────
+  { patterns: /\bpermadeath\b|\bcan'?t[\s-]?go[\s-]?back\b|\bno[\s-]?undo\b/i,         badge: 'permadeath' },
+  { patterns: /\bleveled[\s-]?up\b|\bnew[\s-]?level\b|\bskills[\s-]?unlocked\b/i,      badge: 'level_up' },
+  { patterns: /\bcritical[\s-]?hit\b|\bbreakthrough\b|\blanded[\s-]?perfectly\b/i,     badge: 'critical_hit' },
+  { patterns: /\bboss[\s-]?battle\b|\bfinal[\s-]?challenge\b|\bbiggest[\s-]?fear\b/i,  badge: 'boss_battle' },
+  { patterns: /\brespawn\b|\bstarting[\s-]?over\b|\bback[\s-]?again\b/i,               badge: 'respawn_point' },
+  { patterns: /\bunexpected[\s-]?insight\b|\bfound[\s-]?something\b|\bloot\b/i,        badge: 'loot_drop' },
+  { patterns: /\bexperience[\s-]?gained\b|\bexp[\s-]?gained\b|\bi[\s-]?learned\b/i,   badge: 'exp_gained' },
+  { patterns: /\btoo[\s-]?much\b|\boverwhelmed\b|\bcarrying[\s-]?too[\s-]?much\b/i,   badge: 'inventory_full' },
+  { patterns: /\benergy[\s-]?level\b|\bhealth[\s-]?check\b|\bhow[\s-]?i'?m[\s-]?doing\b/i, badge: 'health_bar' },
+  { patterns: /\bsaved[\s-]?(my[\s-]?)?progress\b|\bcheckpoint\b|\blogged\b/i,         badge: 'save_state' },
+  { patterns: /\bstarting[\s-]?a[\s-]?run\b|\bnew[\s-]?attempt\b|\bbeginning[\s-]?again\b/i, badge: 'rogue_run' },
+  { patterns: /\bgame[\s-]?over\b|\bstarting[\s-]?fresh\b|\bnew[\s-]?game[\s-]?plus\b/i, badge: 'game_over_screen' },
+  // ── v21 Secret Boss — THE ROGUE VAULT word triggers ──────────────────────────
+  { patterns: /\b(sid[\s-]?meier|civilization|civ[\s-]?\d|one[\s-]?more[\s-]?turn)\b/i, badge: 'sid_meier_signal' },
+  { patterns: /\b(miyamoto|mario|zelda|donkey[\s-]?kong|nintendo[\s-]?design)\b/i,     badge: 'miyamoto_secret' },
+  { patterns: /\b(pajitnov|tetris[\s-]?piece|l[\s-]?tetromino|clearing[\s-]?lines)\b/i, badge: 'pajitnov_key' },
 ]
 
 /**
@@ -1987,6 +2020,18 @@ export function runJournalEasterEggs(journalText: string): BadgeType[] {
   // Behavioral v16: body signal (journal entry >= 300 words)
   const bodySignal = checkBodySignal(journalText)
   if (bodySignal) awarded.push(bodySignal)
+
+  // Behavioral v21: speedrun session (check-in + journal within 5 min + rogue word)
+  const speedrun = checkSpeedrunSession(journalText)
+  if (speedrun) awarded.push(speedrun)
+
+  // Behavioral v21: grind session (7+ consecutive daily check-ins)
+  const grind = checkGrindSession()
+  if (grind) awarded.push(grind)
+
+  // Behavioral v21: boss day check (check-in on Monday)
+  const bossDay = checkBossDayCheck()
+  if (bossDay) awarded.push(bossDay)
 
   // Word turns from journal text
   const wordTurns = detectWordTurns(journalText)
@@ -2794,6 +2839,71 @@ export function checkDarkSideWatch(): BadgeType | null {
   if (hour === 3 && minute <= 30) {
     awardBadge('dark_side_watch')
     return 'dark_side_watch'
+  }
+  return null
+}
+
+// ── v24 — THE ROGUE RUN behavioral functions ──────────────────────────────────
+
+const ROGUE_WORDS_V24 = [
+  /\bpermadeath\b|\bcan'?t[\s-]?go[\s-]?back\b|\bno[\s-]?undo\b/i,
+  /\bleveled[\s-]?up\b|\bnew[\s-]?level\b|\bskills[\s-]?unlocked\b/i,
+  /\bcritical[\s-]?hit\b|\bbreakthrough\b|\blanded[\s-]?perfectly\b/i,
+  /\bboss[\s-]?battle\b|\bfinal[\s-]?challenge\b|\bbiggest[\s-]?fear\b/i,
+  /\brespawn\b|\bstarting[\s-]?over\b|\bback[\s-]?again\b/i,
+  /\bunexpected[\s-]?insight\b|\bfound[\s-]?something\b|\bloot\b/i,
+  /\bexperience[\s-]?gained\b|\bexp[\s-]?gained\b|\bi[\s-]?learned\b/i,
+  /\btoo[\s-]?much\b|\boverwhelmed\b|\bcarrying[\s-]?too[\s-]?much\b/i,
+  /\benergy[\s-]?level\b|\bhealth[\s-]?check\b|\bhow[\s-]?i'?m[\s-]?doing\b/i,
+  /\bsaved[\s-]?(my[\s-]?)?progress\b|\bcheckpoint\b|\blogged\b/i,
+  /\bstarting[\s-]?a[\s-]?run\b|\bnew[\s-]?attempt\b|\bbeginning[\s-]?again\b/i,
+  /\bgame[\s-]?over\b|\bstarting[\s-]?fresh\b|\bnew[\s-]?game[\s-]?plus\b/i,
+]
+
+export function checkSpeedrunSession(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('speedrun_session')) return null
+  const lastCheckIn = localStorage.getItem('last_check_in_time')
+  if (!lastCheckIn) return null
+  const elapsed = Date.now() - parseInt(lastCheckIn, 10)
+  const hasRogueWord = ROGUE_WORDS_V24.some(r => r.test(journalText))
+  if (elapsed <= 5 * 60 * 1000 && hasRogueWord) {
+    awardBadge('speedrun_session')
+    return 'speedrun_session'
+  }
+  return null
+}
+
+export function checkGrindSession(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('grind_session')) return null
+  try {
+    const checkInDays: string[] = JSON.parse(localStorage.getItem('check_in_days') || '[]')
+    if (checkInDays.length < 7) return null
+    const sorted = [...checkInDays].sort().reverse()
+    let streak = 0
+    for (let i = 0; i < sorted.length; i++) {
+      const expected = new Date()
+      expected.setDate(expected.getDate() - i)
+      const expectedStr = expected.toISOString().slice(0, 10)
+      if (sorted[i] === expectedStr) streak++
+      else break
+    }
+    if (streak >= 7) {
+      awardBadge('grind_session')
+      return 'grind_session'
+    }
+  } catch { /* non-critical */ }
+  return null
+}
+
+export function checkBossDayCheck(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('boss_day_check')) return null
+  const now = new Date()
+  if (now.getDay() === 1) {
+    awardBadge('boss_day_check')
+    return 'boss_day_check'
   }
   return null
 }

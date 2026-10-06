@@ -1217,6 +1217,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_pulse_rhythm',
       'coherence_accumulation',
       'stellar_navigation',
+      // v115: sustained stellar arc · weekly coherence seal · longitudinal signal mastery (P155/P156/P157)
+      'sustained_stellar_arc',
+      'weekly_coherence_seal',
+      'longitudinal_signal_mastery',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

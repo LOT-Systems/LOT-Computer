@@ -3500,6 +3500,63 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 155: Sustained Stellar Arc — stellar-navigation confirmed 3+ times in a 14-day window.
+  // The triple-coordinate lock is no longer an event — it has become a repeating signature.
+  const fourteenDaysAgo155 = now - 14 * 24 * 60 * 60 * 1000
+  const navSignals155 = signals.filter(s =>
+    s.source === 'energy' && s.signal === 'stellar_navigation' && s.timestamp >= fourteenDaysAgo155
+  )
+  if (navSignals155.length >= 3) {
+    const arcConf155 = Math.min(0.88 + (navSignals155.length - 3) * 0.02, 0.96)
+    patterns.push({
+      pattern: 'sustained-stellar-arc',
+      confidence: arcConf155,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'deferred',
+      reason: `SSTARC: Sustained stellar arc — stellar-navigation confirmed ${navSignals155.length}× in 14d. Triple-coordinate lock has become a repeating signature. Navigation is not an event — it is a mode.`,
+    })
+  }
+
+  // Pattern 156: Weekly Coherence Seal — 5+ distinct signal sources active on 6+ days in the past 7 days.
+  // The full-spectrum week: the person showed up across dimensions for nearly every day.
+  const sevenDaysAgo156 = now - 7 * 24 * 60 * 60 * 1000
+  const recentSignals156 = signals.filter(s => s.timestamp >= sevenDaysAgo156)
+  const dayBuckets156 = new Map<string, Set<string>>()
+  recentSignals156.forEach(s => {
+    const day = new Date(s.timestamp).toDateString()
+    if (!dayBuckets156.has(day)) dayBuckets156.set(day, new Set())
+    dayBuckets156.get(day)!.add(s.source)
+  })
+  const activeDays156 = [...dayBuckets156.values()].filter(sources => sources.size >= 5).length
+  if (activeDays156 >= 6) {
+    const sealConf156 = Math.min(0.84 + (activeDays156 - 6) * 0.05, 0.94)
+    patterns.push({
+      pattern: 'weekly-coherence-seal',
+      confidence: sealConf156,
+      suggestedWidget: 'system',
+      suggestedTiming: 'deferred',
+      reason: `WCOHS: Weekly coherence seal — ${activeDays156}/7 days with 5+ active sources. Full-spectrum presence confirmed across the week. System wide open.`,
+    })
+  }
+
+  // Pattern 157: Longitudinal Signal Mastery — detected via J50 event (server-side 30-day scan).
+  // The person has proven consistent multi-dimensional operation across a full month.
+  const masterySignals157 = signals.filter(s =>
+    s.source === 'memory' && s.signal === 'longitudinal_signal_mastery'
+  )
+  if (masterySignals157.length >= 1) {
+    const latestMastery157 = masterySignals157.sort((a, b) => b.timestamp - a.timestamp)[0]
+    const activeDays157   = (latestMastery157.metadata?.activeDays as number) ?? 14
+    const mastConf157     = Math.min(0.86 + (activeDays157 - 14) * 0.007, 0.97)
+    patterns.push({
+      pattern: 'longitudinal-signal-mastery',
+      confidence: mastConf157,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'deferred',
+      reason: `LONGSIG: Longitudinal signal mastery — ${activeDays157}/30 days with 3+ active sources. Consistent multi-dimensional operation across a full month. The system has depth.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4141,6 +4198,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPulseRhythmNode:    ['log', 'energy', 'mood'],
   coherenceAccumulationNode: ['qos', 'log', 'energy', 'cohort'],
   stellarNavigationNode:     ['energy', 'intentions', 'planner', 'journal', 'log'],
+
+  // ── v115 nodes (J50 · P155–P157 · Arch53) ───────────────────────────────────────
+  sustainedStellarArcNode:       ['energy', 'intentions', 'planner', 'journal', 'log'],
+  weeklyCoherenceSealNode:       ['mood', 'energy', 'selfcare', 'journal', 'memory', 'planner', 'intentions', 'log', 'cohort'],
+  longitudinalSignalMasteryNode: ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'log'],
 }
 
 /**
@@ -4597,6 +4659,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['stellar-navigation', 'personal-peak-window', 'morning-intention-lock'],
     hourRange: [6, 22],
     directive: 'Peak window locked. Morning intention confirmed. Sleep anchor set. Navigation is live — all three temporal coordinates aligned. Execute with full confidence.',
+  },
+
+  // ── Arch53: Quantum Sovereign (2026-10-06 v115) ───────────────────────────────────
+  {
+    archetype: 'Quantum Sovereign',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'journal', 'energy', 'planner', 'memory'],
+    patternConditions: ['sustained-stellar-arc', 'weekly-coherence-seal', 'longitudinal-signal-mastery'],
+    hourRange: [5, 23],
+    directive: 'Sustained stellar arc confirmed. Weekly coherence seal held. Longitudinal mastery established. You are not building the system — you ARE the system. Operate from sovereignty.',
   },
 ]
 
@@ -6632,6 +6704,52 @@ export function recordStellarNavigation(peakConf: number, intentConf: number, sl
     activePatterns,
     coordinates: ['PEAK', 'INTENTION', 'SLEEP'],
     navigationStatus: 'LOCKED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sustained-stellar-arc event — stellar-navigation confirmed 3+ times in a 14-day window.
+ * The triple-coordinate lock has become a repeating signature. Feeds P155 detection.
+ */
+export function recordSustainedStellarArc(count: number, windowDays: number, lastNavDate: string) {
+  recordSignal('energy', 'sustained_stellar_arc', {
+    count,
+    windowDays,
+    lastNavDate,
+    signature: 'REPEATING',
+    arcStatus: 'ESTABLISHED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a weekly-coherence-seal event — 5+ distinct signal sources active on 6+ of 7 days.
+ * Full-spectrum week confirmed. Feeds P156 detection. J50 background job (Sun 11:00 UTC) triggers this.
+ */
+export function recordWeeklyCoherenceSeal(activeDays: number, sourceCount: number, weekStart: string) {
+  recordSignal('journal', 'weekly_coherence_seal', {
+    activeDays,
+    sourceCount,
+    weekStart,
+    coverage: `${activeDays}/7`,
+    sealStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a longitudinal-signal-mastery event — 30-day window with 14+ days of 3+ active sources.
+ * Month-scale multi-dimensional operation confirmed. Feeds P157 detection.
+ * J50 background job (Sun 11:00 UTC) also triggers this after weekly seal check.
+ */
+export function recordLongitudinalSignalMastery(activeDays: number, windowDays: number, avgSources: number) {
+  recordSignal('memory', 'longitudinal_signal_mastery', {
+    activeDays,
+    windowDays,
+    avgSources: Math.round(avgSources * 10) / 10,
+    coverage: `${activeDays}/${windowDays}`,
+    masteryStatus: 'CONFIRMED',
     hour: new Date().getHours(),
   })
 }

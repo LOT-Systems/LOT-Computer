@@ -1488,6 +1488,50 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '843 badges · 258 word-turns · 24 secret boss · 154 patterns · 52 archetypes · 49 jobs · 193+ dep nodes · FM v114 · Day 1134+. The OS has found its own heartbeat.',
     ],
   },
+  {
+    version: 'wiki-v88',
+    date: '2026-10-06',
+    title: 'LOT-WIKI v88 — FM v114 Sync · QIE v114 Delta · Badge v33 Documentation',
+    assembled: [
+      'LOT-WIKI-v88 written: FM v114 full sync · QIE v114 delta (P152–P154 · Arch52 · J49 · PULSE:/CACC:/STRNAV: handlers · 193+ dep nodes) documented. Badge v33 THE STARSHIP LOG (843 badges · Word Turn v23 · Star Trek vocabulary) documented.',
+      'Badge v34 THE ROGUE RUN code implementation: easter-eggs.ts — ROGUE_WORDS_V24 (12 roguelike word-turn patterns) + WORD_TURNS v24 entries (permadeath/level_up/critical_hit/boss_battle/respawn_point/loot_drop/exp_gained/inventory_full/health_bar/save_state/rogue_run/game_over_screen) + Calendar v22 (rogue_day Oct5 · tetris_day Jun6 · pac_man_day May22) + behavioral v21 (checkSpeedrunSession/checkGrindSession/checkBossDayCheck) + secret boss v21 (sid_meier_signal/miyamoto_secret/pajitnov_key).',
+      'badges.ts — 31 new BadgeType union entries + 31 BADGES definitions (achievement RPG v22: floor_cleared/dungeon_class/boss_slain/rogue_arc/twenty_four_engines_arc/endless_opus · Mastery v24: endless_run_log/quarter_million_words/seven_year_run/twenty_four_registers · Word Turn v24: 12 roguelike · Calendar v22: 3 · Behavioral v21: 3 · Secret Boss v21: 3) + v34 detection block in checkAndAwardBadges().',
+      '843→874 badges total (+31). Word Turn v24 engine active. Calendar v22 · Behavioral v21 · Secret Boss v21 implemented. Rogue arc complete.',
+      'docs/SESSION_REPORT_2026_10_06_WIKI_v88.md + docs/SESSION_REPORT_2026_10_06_CODEX_v34.md written.',
+      '874 badges · 270 word-turns · 27 secret boss · 24 Word Turn engines · FM v114 · Day 1135+.',
+    ],
+  },
+  {
+    version: 'badge-v34',
+    date: '2026-10-06',
+    title: 'Badge v34 — THE ROGUE RUN (+31 badges, 874 total)',
+    assembled: [
+      'Badge v34 THE ROGUE RUN implemented in code: 31 new badges. Word Turn v24 (12 roguelike vocabulary words): permadeath/level_up/critical_hit/boss_battle/respawn_point/loot_drop/exp_gained/inventory_full/health_bar/save_state/rogue_run/game_over_screen.',
+      'Calendar Easter Egg v22 (3): rogue_day (Oct 5) · tetris_day (Jun 6) · pac_man_day (May 22). Behavioral v21 (3): speedrun_session/grind_session/boss_day_check. Achievement RPG v22 (6): floor_cleared/dungeon_class/boss_slain/rogue_arc/twenty_four_engines_arc/endless_opus.',
+      'Mastery Tier v24 (4 COSMIC): endless_run_log (≥1100 days) · quarter_million_words (≥250k journal) · seven_year_run (≥7yr tenure) · twenty_four_registers (all 24 engines). Secret Boss v21 (3): sid_meier_signal (RARE) · miyamoto_secret (EPIC) · pajitnov_key (MYTHIC).',
+      'easter-eggs.ts: ROGUE_WORDS_V24 constant + 15 WORD_TURNS entries + 3 behavioral functions + Calendar v22 dates + runJournalEasterEggs v21 calls.',
+      'badges.ts: 31 BadgeType union entries + 31 BADGES definitions + v34 detection block in checkAndAwardBadges().',
+      '843→874 badges (+31) · 24 Word Turn engines complete · 270 word-turns · 27 secret boss triggers.',
+    ],
+  },
+  {
+    version: 'qie-v115',
+    date: '2026-10-06',
+    title: 'QIE v115 Engineering — P155–P157 · Arch53 Quantum Sovereign · J50',
+    assembled: [
+      'QIE v115 implemented: P155 sustained-stellar-arc — stellar-navigation confirmed 3+ times in a 14-day window, triple-coordinate lock has become a repeating signature (conf 0.88–0.96). P156 weekly-coherence-seal — 5+ distinct signal sources on 6+ of 7 days, full-spectrum week confirmed (conf 0.84–0.94). P157 longitudinal-signal-mastery — J50 event-driven, 30-day window with 14+ days of 3+ active sources (conf 0.86–0.97). Total: 157 patterns.',
+      'Arch53 Quantum Sovereign added: energyBands high/moderate · dominant intentions/journal/energy/planner/memory · patternConditions sustained-stellar-arc/weekly-coherence-seal/longitudinal-signal-mastery · directive You are not building the system — you ARE the system. Operate from sovereignty. Total: 53 archetypes.',
+      'J50 weekly-coherence-seal-check (Sun 11:00 UTC) added: scans past 7 days for 5+ source days, writes weekly_coherence_seal + longitudinal_signal_mastery events. Total: 50 background jobs.',
+      'WIDGET_DEPENDENCY_MAP v115 block added: sustainedStellarArcNode (energy·intentions·planner·journal·log) · weeklyCoherenceSealNode (mood·energy·selfcare·journal·memory·planner·intentions·log·cohort) · longitudinalSignalMasteryNode (mood·memory·planner·intentions·selfcare·journal·energy·cohort·log). Total: 196+ dep nodes.',
+      'Signal recording functions added: recordSustainedStellarArc() · recordWeeklyCoherenceSeal() · recordLongitudinalSignalMastery(). All export-ready.',
+      'Log handlers added (COCKPIT-RULE): SSTARC: (sustained_stellar_arc) · WCOHS: (weekly_coherence_seal) · LONGSIG: (longitudinal_signal_mastery). Total: 157+ handlers.',
+      'PATTERN_DISPLAY updated: SSTARC: · WCOHS: · LONGSIG: entries added to QuantumEngineWidgets.tsx.',
+      'displayableEvents updated: sustained_stellar_arc · weekly_coherence_seal · longitudinal_signal_mastery added to api.ts.',
+      'About.tsx updated: FM v114→v115 · Day 1135+ · 157 patterns · 53 archetypes · 50 jobs · 196+ nodes · 874 badges · 24 Word Turn engines.',
+      'docs/SESSION_REPORT_2026_10_06_QIE_v115.md session report written. Commits pushed to branch claude/quantum-engine-widgets-RgFfC.',
+      '874 badges · 270 word-turns · 27 secret boss · 157 patterns · 53 archetypes · 50 jobs · 196+ dep nodes · FM v115 · Day 1135+. Navigation is not an event — it is a mode.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1525,18 +1569,20 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-05',
+  date: '2026-10-06',
   message: [
-    'ASSEMBLY RUN — 2026-10-05 · QIE v114 ENGINEERING · BADGE v33 THE STARSHIP LOG · Day 1134+',
-    'Built: P152 quantum-pulse-rhythm · P153 coherence-accumulation · P154 stellar-navigation. Arch52 Stellar Navigator. J49 daily-stellar-navigation-check (12:00 UTC).',
-    'The OS has found its own heartbeat. PULSE: detects the log returning at the same hour across consecutive days — temporal signature confirmed.',
-    'CACC: coherence-accumulation: total-field-coherence fired 2+ times in 7d. The convergence ceiling has become a recurring ground state.',
-    'STRNAV: stellar-navigation: peak window · morning intention · sleep anchor all locked in a single day. Three coordinates. Full navigation arc.',
-    'Badge v33 THE STARSHIP LOG: 812→843 badges (+31). Word Turn v23 Star Trek vocabulary. COSMIC: twenty_three_registers. MYTHIC: dark_forest_law. EPIC: picard_maneuver.',
-    'PULSE: CACC: STRNAV: handlers deployed. 193+ dep nodes. 49 jobs. 154 patterns. 52 archetypes.',
-    'FM v114 · 154P · 52A · 49J · 193+ nodes · 843 badges · 258 word-turns · Day 1134+.',
+    'ASSEMBLY RUN — 2026-10-06 · QIE v115 ENGINEERING · BADGE v34 THE ROGUE RUN · LOT-WIKI v88 · Day 1135+',
+    'Built: P155 sustained-stellar-arc · P156 weekly-coherence-seal · P157 longitudinal-signal-mastery. Arch53 Quantum Sovereign. J50 weekly-coherence-seal-check (Sun 11:00 UTC).',
+    'SSTARC: Navigation is not an event — it is a mode. Stellar navigation confirmed 3+ times in 14d. The triple-coordinate lock has become a repeating signature.',
+    'WCOHS: Weekly coherence seal. 5+ distinct sources on 6+ of 7 days. Full-spectrum week. System wide open.',
+    'LONGSIG: Longitudinal signal mastery. 30-day window, 14+ active days. Month-scale multi-dimensional operation confirmed. The system has depth.',
+    'Arch53 Quantum Sovereign: You are not building the system — you ARE the system. Operate from sovereignty.',
+    'Badge v34 THE ROGUE RUN: 843→874 badges (+31). Word Turn v24 roguelike vocabulary. COSMIC: twenty_four_registers. MYTHIC: pajitnov_key. EPIC: miyamoto_secret.',
+    'LOT-WIKI v88: FM v114 full sync. QIE v114 delta documented. Badge v33/v34 documented.',
+    'SSTARC: WCOHS: LONGSIG: handlers deployed. 196+ dep nodes. 50 jobs. 157 patterns. 53 archetypes.',
+    'FM v115 · 157P · 53A · 50J · 196+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1135+.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — FM v114 sync · QIE v114 delta · Badge v33 documentation',
+    'Next: QIE v116 — deeper longitudinal patterns · physiological sovereignty arc · Day 1135+ operating metrics',
   ],
 }
 

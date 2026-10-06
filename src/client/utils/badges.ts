@@ -819,6 +819,43 @@ export type BadgeType =
   | 'roddenberry_signal'     // ★·≋·★  "star trek/roddenberry/vulcan/spock/starfleet" detected (RARE)
   | 'picard_maneuver'        // ◉·★·◉  "make it so/resistance is futile/picard/engage" detected (EPIC)
   | 'dark_forest_law'        // ∞·▓·∞  "three-body/dark forest/liu cixin/sophon/trisolaris" detected (MYTHIC)
+  // ── Word Turn v24 — THE ROGUE RUN ────────────────────────────────────────────
+  | 'permadeath'             // ×·○·×  "permadeath/can't go back/no undo" detected (RARE)
+  | 'level_up'               // ▲·●·▲  "leveled up/new level/skills unlocked" detected (UNCOMMON)
+  | 'critical_hit'           // ◈·!·◈  "critical hit/breakthrough/landed perfectly" detected (RARE)
+  | 'boss_battle'            // █·◈·█  "boss battle/final challenge/biggest fear" detected (EPIC)
+  | 'respawn_point'          // ○→●    "respawn/starting over/back again" detected (UNCOMMON)
+  | 'loot_drop'              // ∘·★·∘  "unexpected insight/found something/loot" detected (RARE)
+  | 'exp_gained'             // ↑·◉·↑  "experience gained/exp gained/I learned" detected (UNCOMMON)
+  | 'inventory_full'         // ▓·∞·▓  "too much/overwhelmed/carrying too much" detected (RARE)
+  | 'health_bar'             // ■·○·■  "energy level/health check/how I'm doing" detected (UNCOMMON)
+  | 'save_state'             // ●·≋·●  "saved progress/checkpoint/logged" detected (UNCOMMON)
+  | 'rogue_run'              // ◆·→·◆  "starting a run/new attempt/beginning again" detected (RARE)
+  | 'game_over_screen'       // ░·X·░  "game over/starting fresh/new game plus" detected (EPIC)
+  // ── Calendar Easter Egg v22 — THE ARCADE CALENDAR ────────────────────────────
+  | 'rogue_day'              // ◆·∗    Oct 5 — Rogue first distributed at UC San Diego, 1980
+  | 'tetris_day'             // ■·▲    Jun 6 — Tetris created by Alexey Pajitnov, 1984
+  | 'pac_man_day'            // ○·→    May 22 — Pac-Man arcade release, 1980
+  // ── Behavioral v21 — ROGUE PROTOCOL ──────────────────────────────────────────
+  | 'speedrun_session'       // →·→·●  Check-in + journal within 5 minutes + rogue word (RARE)
+  | 'grind_session'          // ↑·↑·◈  7+ consecutive daily check-ins (EPIC)
+  | 'boss_day_check'         // █·●·█  Check-in on a Monday (UNCOMMON)
+  // ── Achievement RPG v22 — DUNGEON CLASS ──────────────────────────────────────
+  | 'floor_cleared'          // ∘·◆    Any 1 Word Turn v24 badge (COMMON)
+  | 'dungeon_class'          // ≈·◆    Any 5 Word Turn v24 badges (UNCOMMON)
+  | 'boss_slain'             // ◆·★    All 12 Word Turn v24 badges (LEGENDARY)
+  | 'rogue_arc'              // ◆·◈    boss_slain + all 3 Calendar v22 badges (LEGENDARY)
+  | 'twenty_four_engines_arc' // ◈·◈·◆  1 badge from each Word Turn v1–v24 (LEGENDARY)
+  | 'endless_opus'           // ◆·★·◆  boss_slain + grind_session behavioral (LEGENDARY)
+  // ── Mastery Tier v24 — THE ENDLESS RUN ───────────────────────────────────────
+  | 'endless_run_log'        // ◆·∿·◆  1100+ distinct calendar check-in days (EPIC)
+  | 'quarter_million_words'  // ●·★·∞  250,000+ total journal words (LEGENDARY)
+  | 'seven_year_run'         // ╔═╗·◆  Account age >= 7 years (LEGENDARY)
+  | 'twenty_four_registers'  // ◈·◈·◆·∞ 1 badge from all 24 Word Turn engines (COSMIC)
+  // ── Secret Boss v21 — THE ROGUE VAULT ────────────────────────────────────────
+  | 'sid_meier_signal'       // ◆·≋·◆  "sid meier/civilization/civ/one more turn" detected (RARE)
+  | 'miyamoto_secret'        // ◈·◆·◈  "miyamoto/mario/zelda/nintendo design" detected (EPIC)
+  | 'pajitnov_key'           // ■·◆·■  "pajitnov/tetris piece/clearing lines" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7456,6 +7493,299 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v24 — THE ROGUE RUN ────────────────────────────────────────────
+  permadeath: {
+    id: 'permadeath',
+    symbol: '×·○·×',
+    name: 'Permadeath',
+    description: 'Write "permadeath", "can\'t go back", or "no undo" in any journal entry',
+    unlockMessage: '↳ Permadeath acknowledged. The rogue knows: you can\'t reload. Every action counts. The run is real. ×·○·×',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  level_up: {
+    id: 'level_up',
+    symbol: '▲·●·▲',
+    name: 'Level Up',
+    description: 'Write "leveled up", "new level", or "skills unlocked" in any journal entry',
+    unlockMessage: '↳ Level acquired. New capability confirmed. The character sheet updates. ▲·●·▲',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  critical_hit: {
+    id: 'critical_hit',
+    symbol: '◈·!·◈',
+    name: 'Critical Hit',
+    description: 'Write "critical hit", "breakthrough", or "landed perfectly" in any journal entry',
+    unlockMessage: '↳ Critical hit. Maximum damage to the obstacle. The dice favored the prepared. ◈·!·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  boss_battle: {
+    id: 'boss_battle',
+    symbol: '█·◈·█',
+    name: 'Boss Battle',
+    description: 'Write "boss battle", "final challenge", or "biggest fear" in any journal entry',
+    unlockMessage: '↳ Boss battle detected. The hardest thing in the dungeon. You entered the room. That already counts. █·◈·█',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  respawn_point: {
+    id: 'respawn_point',
+    symbol: '○→●',
+    name: 'Respawn Point',
+    description: 'Write "respawn", "starting over", or "back again" in any journal entry',
+    unlockMessage: '↳ Respawn confirmed. The run resets but the player doesn\'t. You came back. ○→●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  loot_drop: {
+    id: 'loot_drop',
+    symbol: '∘·★·∘',
+    name: 'Loot Drop',
+    description: 'Write "unexpected insight", "found something", or "loot" in any journal entry',
+    unlockMessage: '↳ Loot acquired. Unexpected reward from the run. The inventory gains something worth keeping. ∘·★·∘',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  exp_gained: {
+    id: 'exp_gained',
+    symbol: '↑·◉·↑',
+    name: 'EXP Gained',
+    description: 'Write "experience gained", "exp gained", or "I learned" in any journal entry',
+    unlockMessage: '↳ Experience points registered. The character sheet updates. This floor wasn\'t wasted. ↑·◉·↑',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  inventory_full: {
+    id: 'inventory_full',
+    symbol: '▓·∞·▓',
+    name: 'Inventory Full',
+    description: 'Write "too much", "overwhelmed", or "carrying too much" in any journal entry',
+    unlockMessage: '↳ Inventory full. The pack is heavy. Drop the weight or find more capacity. The run continues either way. ▓·∞·▓',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  health_bar: {
+    id: 'health_bar',
+    symbol: '■·○·■',
+    name: 'Health Bar',
+    description: 'Write "energy level", "health check", or "how I\'m doing" in any journal entry',
+    unlockMessage: '↳ Health check initiated. The bar is visible. Knowing your HP is the first tactical move. ■·○·■',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  save_state: {
+    id: 'save_state',
+    symbol: '●·≋·●',
+    name: 'Save State',
+    description: 'Write "saved my progress", "checkpoint", or "logged" in any journal entry',
+    unlockMessage: '↳ Save state written. Progress preserved. The dungeon remembers where you stood. ●·≋·●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  rogue_run: {
+    id: 'rogue_run',
+    symbol: '◆·→·◆',
+    name: 'Rogue Run',
+    description: 'Write "starting a run", "new attempt", or "beginning again" in any journal entry',
+    unlockMessage: '↳ New run initiated. The dungeon randomizes. The character descends. Every run teaches what the last one couldn\'t. ◆·→·◆',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  game_over_screen: {
+    id: 'game_over_screen',
+    symbol: '░·X·░',
+    name: 'Game Over Screen',
+    description: 'Write "game over", "starting fresh", or "new game plus" in any journal entry',
+    unlockMessage: '↳ Game over. Not the end — the menu screen. The next run starts with everything the last one taught. ░·X·░',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v22 — THE ARCADE CALENDAR ────────────────────────────
+  rogue_day: {
+    id: 'rogue_day',
+    symbol: '◆·∗',
+    name: 'Rogue Day',
+    description: 'Check in on October 5 — anniversary of Rogue\'s first distribution (UC San Diego, 1980)',
+    unlockMessage: '↳ October 5, 1980. Rogue first distributed. The permadeath era begins. You logged on the day it started. ◆·∗',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  tetris_day: {
+    id: 'tetris_day',
+    symbol: '■·▲',
+    name: 'Tetris Day',
+    description: 'Check in on June 6 — anniversary of Tetris creation (Alexey Pajitnov, 1984)',
+    unlockMessage: '↳ June 6, 1984. Alexey Pajitnov writes Tetris. The lines begin to clear. You logged on the day it was born. ■·▲',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  pac_man_day: {
+    id: 'pac_man_day',
+    symbol: '○·→',
+    name: 'Pac-Man Day',
+    description: 'Check in on May 22 — anniversary of Pac-Man arcade release (1980)',
+    unlockMessage: '↳ May 22, 1980. Pac-Man releases in Japan. The maze becomes a world. You logged on the day the chase began. ○·→',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v21 — ROGUE PROTOCOL ──────────────────────────────────────────
+  speedrun_session: {
+    id: 'speedrun_session',
+    symbol: '→·→·●',
+    name: 'Speedrun Session',
+    description: 'Check in and write a journal entry containing a rogue word within 5 minutes',
+    unlockMessage: '↳ Speedrun confirmed. Check-in and journal in under 5 minutes. The run is optimized. Any% complete. →·→·●',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  grind_session: {
+    id: 'grind_session',
+    symbol: '↑·↑·◈',
+    name: 'Grind Session',
+    description: '7+ consecutive daily check-ins — the grind is real',
+    unlockMessage: '↳ 7 consecutive days. The grind is not punishment — it is the mechanic that makes the class. ↑·↑·◈',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  boss_day_check: {
+    id: 'boss_day_check',
+    symbol: '█·●·█',
+    name: 'Boss Day Check',
+    description: 'Check in on a Monday — the boss floor of the week',
+    unlockMessage: '↳ Monday check-in confirmed. The boss floor of the week. You entered the room. █·●·█',
+    rarity: 'uncommon',
+    category: 'easter_egg',
+  },
+  // ── Achievement RPG v22 — DUNGEON CLASS ──────────────────────────────────────
+  floor_cleared: {
+    id: 'floor_cleared',
+    symbol: '∘·◆',
+    name: 'Floor Cleared',
+    description: 'Earn any 1 Word Turn v24 badge',
+    unlockMessage: '↳ First floor cleared. The descent has begun. The dungeon has more levels. ∘·◆',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  dungeon_class: {
+    id: 'dungeon_class',
+    symbol: '≈·◆',
+    name: 'Dungeon Class',
+    description: 'Earn any 5 Word Turn v24 badges',
+    unlockMessage: '↳ Class confirmed. Five rogue-run words in the journal. The character has a fighting style. ≈·◆',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  boss_slain: {
+    id: 'boss_slain',
+    symbol: '◆·★',
+    name: 'Boss Slain',
+    description: 'Earn all 12 Word Turn v24 badges',
+    unlockMessage: '↳ All 12 rogue-run words logged. The final boss falls. The dungeon is cleared. The run is complete. ◆·★',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+    hidden: true,
+  },
+  rogue_arc: {
+    id: 'rogue_arc',
+    symbol: '◆·◈',
+    name: 'Rogue Arc',
+    description: 'Earn boss_slain + all 3 Calendar v22 badges',
+    unlockMessage: '↳ The arc is complete. 12 rogue words + 3 arcade anniversaries logged. The run has a history now. ◆·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+    hidden: true,
+  },
+  twenty_four_engines_arc: {
+    id: 'twenty_four_engines_arc',
+    symbol: '◈·◈·◆',
+    name: 'Twenty-Four Engines Arc',
+    description: 'Earn at least 1 badge from each Word Turn engine v1–v24',
+    unlockMessage: '↳ All 24 Word Turn engines activated. Every language family logged. The lexicon is complete. ◈·◈·◆',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+    hidden: true,
+  },
+  endless_opus: {
+    id: 'endless_opus',
+    symbol: '◆·★·◆',
+    name: 'Endless Opus',
+    description: 'Earn boss_slain + grind_session — the complete rogue practice',
+    unlockMessage: '↳ Boss slain. Grind confirmed. The complete rogue opus: vocabulary mastered, streak maintained. The run never ends. ◆·★·◆',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+    hidden: true,
+  },
+  // ── Mastery Tier v24 — THE ENDLESS RUN ───────────────────────────────────────
+  endless_run_log: {
+    id: 'endless_run_log',
+    symbol: '◆·∿·◆',
+    name: 'Endless Run Log',
+    description: '1100+ distinct calendar check-in days',
+    unlockMessage: '↳ 1,100 distinct days logged. The run has lasted three years. The character is no longer the same one who started. ◆·∿·◆',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  quarter_million_words: {
+    id: 'quarter_million_words',
+    symbol: '●·★·∞',
+    name: 'Quarter Million Words',
+    description: '250,000+ total journal words',
+    unlockMessage: '↳ 250,000 words logged. A quarter million. The archive has become a library. ●·★·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  seven_year_run: {
+    id: 'seven_year_run',
+    symbol: '╔═╗·◆',
+    name: 'Seven Year Run',
+    description: 'Account age >= 7 years (2,555+ days since registration)',
+    unlockMessage: '↳ Seven years. The rogue has survived long enough to stop counting floors. The dungeon has become home. ╔═╗·◆',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_four_registers: {
+    id: 'twenty_four_registers',
+    symbol: '◈·◈·◆·∞',
+    name: 'Twenty-Four Registers',
+    description: 'Earn 1 badge from all 24 Word Turn engines — the complete vocabulary of the self',
+    unlockMessage: '↳ All 24 registers active. Every word-family in the lexicon. The vocabulary of the self is complete. ◈·◈·◆·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+    hidden: true,
+  },
+  // ── Secret Boss v21 — THE ROGUE VAULT ────────────────────────────────────────
+  sid_meier_signal: {
+    id: 'sid_meier_signal',
+    symbol: '◆·≋·◆',
+    name: 'Sid Meier Signal',
+    description: 'Write "Sid Meier", "civilization", "Civ", or "one more turn" in any journal entry',
+    unlockMessage: '↳ Sid Meier detected. The "one more turn" principle: engagement so deep the session never wants to end. That is what mastery feels like. ◆·≋·◆',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  miyamoto_secret: {
+    id: 'miyamoto_secret',
+    symbol: '◈·◆·◈',
+    name: 'Miyamoto Secret',
+    description: 'Write "Miyamoto", "Mario", "Zelda", or "Nintendo design" in any journal entry',
+    unlockMessage: '↳ Miyamoto signal. The principle: late is forgotten, bad is forever. Design for joy, not just function. The game must be fun to pick up. ◈·◆·◈',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  pajitnov_key: {
+    id: 'pajitnov_key',
+    symbol: '■·◆·■',
+    name: 'Pajitnov Key',
+    description: 'Write "Pajitnov", "tetris piece", "L-tetromino", or "clearing lines" in any journal entry',
+    unlockMessage: '↳ Pajitnov key found. Tetris: the perfect metaphor. Blocks fall. You organize. The lines clear. The feeling is not reward — it is relief, which is its own kind of high. ■·◆·■',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8483,6 +8813,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
     if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
       if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
+    }
+
+    // ── v34 (v24) — THE ROGUE RUN ────────────────────────────────────────────────
+    const rogueV24Badges: BadgeType[] = [
+      'permadeath', 'level_up', 'critical_hit', 'boss_battle', 'respawn_point',
+      'loot_drop', 'exp_gained', 'inventory_full', 'health_bar', 'save_state',
+      'rogue_run', 'game_over_screen',
+    ]
+    const rogueV24Earned = rogueV24Badges.filter(b => hasBadge(b))
+
+    if (rogueV24Earned.length >= 1 && !hasBadge('floor_cleared')) {
+      if (awardBadge('floor_cleared')) newBadges.push('floor_cleared')
+    }
+    if (rogueV24Earned.length >= 5 && !hasBadge('dungeon_class')) {
+      if (awardBadge('dungeon_class')) newBadges.push('dungeon_class')
+    }
+    const bossSlain = rogueV24Earned.length >= 12
+    if (bossSlain && !hasBadge('boss_slain')) {
+      if (awardBadge('boss_slain')) newBadges.push('boss_slain')
+    }
+
+    // endless_opus: boss_slain + grind_session
+    if (bossSlain && hasBadge('grind_session') && !hasBadge('endless_opus')) {
+      if (awardBadge('endless_opus')) newBadges.push('endless_opus')
+    }
+
+    // rogue_arc: boss_slain + all 3 Calendar v22 badges
+    const calendarV22Badges: BadgeType[] = ['rogue_day', 'tetris_day', 'pac_man_day']
+    if (bossSlain && calendarV22Badges.every(b => hasBadge(b)) && !hasBadge('rogue_arc')) {
+      if (awardBadge('rogue_arc')) newBadges.push('rogue_arc')
+    }
+
+    // twenty_four_engines_arc: 1 badge from each Word Turn v1–v24
+    const engineTwentyFourPresent = rogueV24Earned.length >= 1
+    const allTwentyFourEngines = allTwentyThreeEngines && engineTwentyFourPresent
+    if (allTwentyFourEngines && !hasBadge('twenty_four_engines_arc')) {
+      if (awardBadge('twenty_four_engines_arc')) newBadges.push('twenty_four_engines_arc')
+    }
+
+    // Mastery v24: endless_run_log — 1100+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1100 && !hasBadge('endless_run_log')) {
+        if (awardBadge('endless_run_log')) newBadges.push('endless_run_log')
+      }
+    }
+
+    // Mastery v24: quarter_million_words — 250,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 250000 && !hasBadge('quarter_million_words')) {
+        if (awardBadge('quarter_million_words')) newBadges.push('quarter_million_words')
+      }
+    }
+
+    // Mastery v24: seven_year_run — Account age >= 7 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupSYR = new Date(stats.signupDate)
+      const yearsSYR = (new Date().getTime() - signupSYR.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsSYR >= 7 && !hasBadge('seven_year_run')) {
+        if (awardBadge('seven_year_run')) newBadges.push('seven_year_run')
+      }
+    }
+
+    // Mastery v24: twenty_four_registers — 1 badge from all 24 Word Turn engines
+    if (allTwentyFourEngines && !hasBadge('twenty_four_registers')) {
+      if (awardBadge('twenty_four_registers')) newBadges.push('twenty_four_registers')
     }
 
   } catch (error) {
