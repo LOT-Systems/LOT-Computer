@@ -1,0 +1,2926 @@
+{
+ "docs": [
+  {
+   "path": "docs/SESSION_REPORT_2026_07_27_WIKI_v82.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1447,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/LOT-SR-20260727-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1509,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/SESSION_REPORT_2026_07_22_WIKI_v80.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2554,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/LOT-SR-20260803-CODEX-v30.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2957,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/LOT-SR-20260801-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1725,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/SESSION_REPORT_2026_07_20_NEON_ARCADE_v80.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2963,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/SESSION_REPORT_2026_07_19_WIKI_v78.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1975,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/SESSION_REPORT_2026_08_02_WIKI_v84.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1726,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/SESSION_REPORT_2026_08_03_WIKI_v85.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3137,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/SESSION_REPORT_2026_08_05_WIKI_v87.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3545,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/LOT-SR-20260804-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2563,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/SESSION_REPORT_2026_07_17_WIKI_v76.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1361,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/SESSION_REPORT_2026_08_04_WIKI_v86.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3816,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/SESSION_REPORT_2026_07_20_WIKI_v79.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2260,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/LOT-SR-20260805-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1896,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/SESSION_REPORT_2026_07_18_WIKI_v77.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1785,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/LOT-SR-20260725-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2489,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/LOT-SR-20260804-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2591,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/LOT-SR-20260721-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3289,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/SESSION_REPORT_2026_08_01_WIKI_v83.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2182,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/SESSION_REPORT_2026_07_07_ALCHEMIST_v25.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1464,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/SESSION_REPORT_2026_07_26_WIKI_v81.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 762,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/LOT-SR-20260803-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3024,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/LOT-SR-20260726-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 944,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/BADGE_MAYAN_WATER.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1896,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v31.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 8347,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v25.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 4353,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v17.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 10651,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v10.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 10620,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v28.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 6538,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v12.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 12109,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v14.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 16220,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_AND_ACHIEVEMENTS.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 5579,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v15.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 16233,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v23.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 12585,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/BADGE_PROGRESSION_PREVIEW.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1410,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v18.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 11312,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/BADGE_LEVEL_DESIGN.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2457,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/BADGE_IMPLEMENTATION_GUIDE.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2274,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/BADGE_PREVIEW.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1255,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/BADGE_MAYAN_VISUAL.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2710,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v20.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 13486,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v26.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 5426,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v29.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 7540,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v27.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 6250,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v21.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 14644,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v13.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 13332,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v32.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3266,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/BADGE_MAYAN_EVOLUTION.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1960,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v16.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 10485,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v24.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 10248,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v11.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 9370,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v19.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 12177,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v30.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 8237,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/BADGE_OPTIONS.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1551,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v22.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 15512,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v66.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 19878,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v80.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 22986,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v82.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 25482,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v55.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 7463,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v85.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 22382,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v75.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 18605,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v58.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 16566,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v87.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 26645,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v61.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 13605,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v74.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 10131,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v72.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 15868,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v84.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 19492,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v73.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 17399,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v59.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 19292,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v71.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 23077,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v56.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 10030,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v78.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 17857,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v67.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 20868,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v57.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 13934,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v77.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 18819,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v69.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 16327,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v86.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 24862,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v76.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 18788,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v70.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 18581,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v83.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 28485,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v65.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 16269,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v63.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 12280,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v81.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 29997,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v68.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 20732,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v60.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 12450,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v64.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 17104,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v79.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 15245,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/wiki/LOT-WIKI-v62.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 11155,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-25_LOT-assembly-v42.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2318,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-28_LOT-assembly-wiki-v67.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2061,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-08-04_LOT-assembly_qie-v113.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2517,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-01_LOT-assembly-wiki-v69.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2671,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-04-28_LOT-assembly_v10-widget-deps-qos-coherence.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 909,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-04-26_LOT-assembly_os-journal-readiness.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2073,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-03_LOT-assembly_badge-engine-v23-starship.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2211,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-11_LOT-assembly-v54.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3390,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-13_LOT-assembly-v58.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1613,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-02_LOT-assembly_qie-v82-centennial.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1732,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-22_LOT-assembly_qie-v102.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2861,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-12_LOT-assembly-v54.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2380,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-11_LOT-assembly_v24-deep-work-cascade.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2395,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-27_LOT-assembly-v74.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1262,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-17_LOT-assembly_v33-intention-follow-through.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2128,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-21_LOT-assembly_v66-evening-coherence-close.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1213,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-22_LOT-assembly_transmission-layer.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1456,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-08-05_LOT-assembly_wiki-v87.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1486,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-01_LOT-assembly-v46.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1100,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-15_LOT-assembly_v29-temporal-coherence.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1591,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-19_LOT-assembly_qie-v97.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2108,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-22_LOT-assembly-v68.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1612,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-30_LOT-assembly_widget-memory-engine-compression-loop.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 4059,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-04_LOT-assembly-v48.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1309,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-10_LOT-assembly_v22-cascade-detection.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1927,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-26_LOT-assembly_wiki-v81-fm-v105.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3040,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-30_LOT-assembly-badges-v21.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2768,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-25_LOT-assembly-v71.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1184,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-06_LOT-assembly_v18-qos-assembly-deep-pass.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2285,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-17_LOT-assembly_badge-engine-v26-quantum-library.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2561,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-05_LOT-assembly-wiki-v73.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2200,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-23_LOT-assembly_wiki-audit-v39.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2145,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-04-19_LOT-assembly_feedback-fix-deploy-features.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1508,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/LOT-LEDGER.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1004,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-12_LOT-assembly-v57.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1123,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-30_LOT-assembly-v45.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2923,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-23_LOT-assembly-wiki-v63.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1411,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-08-01_LOT-assembly_qie-v110.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1193,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-07_LOT-assembly-wiki-v75.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1763,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-09_LOT-assembly-v52.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2789,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-21_LOT-assembly_v37-badge-stream-os-snapshot.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1281,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-16_LOT-assembly_v31-recovery-velocity.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1553,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-14_LOT-assembly-v60.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2345,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-26_LOT-assembly-wiki-v65.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2179,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-07_LOT-assembly_v19-reflection-velocity.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2940,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-30_LOT-assembly-wiki-v68.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2657,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-12_LOT-assembly_v27-cognitive-load-release.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3139,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-21_LOT-assembly-wiki-v61.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1241,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-10_LOT-assembly-v53.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2055,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-12_LOT-wiki-v55.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1665,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-03_LOT-assembly-wiki-v71.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1742,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-01_LOT-assembly-badge-engine-v20.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1715,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-11_LOT-assembly-v54b.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2050,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-05_LOT-assembly_v17-qos-trend.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2672,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-29_LOT-assembly-v76.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1791,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-04_LOT-assembly-wiki-v72.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1586,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-15_LOT-assembly-v61.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3208,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-12_LOT-assembly_v26-social-resonance-arc.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2819,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-27_LOT-assembly-wiki-v66.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1387,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-20_LOT-wiki-v60.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 985,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-30_S2_eating-disorder-medical-cohort.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3133,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-27_LOT-assembly_astrology-widget-personalization-sync.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2598,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-04-29_LOT-assembly_v11-journal-depth-calendar-gap.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2166,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-26_LOT-assembly_qie-v106.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3246,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-17_LOT-assembly_fm-v92-sync.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1699,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-02_LOT-assembly_v14-temporal-planner-surface.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1939,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-04-27_LOT-assembly_os-journal-field-entries.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2018,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-08-02_LOT-assembly_qie-v111.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2625,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-17_LOT-assembly_v32-care-momentum.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1818,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-24_LOT-assembly-v40.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2000,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-18_LOT-assembly_badge-activation-wiring.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1702,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-04_LOT-assembly-v49.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1826,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-29_LOT-session_tab-switching-fix.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 806,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-21_LOT-assembly_qie-v100.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2306,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-25_LOT-assembly-v72.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1221,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-21_LOT-assembly_v36-circadian-anchor-loss.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2439,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-16_LOT-wiki-v58.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1818,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-26_LOT-assembly_v43-production-cleanup-profile-fix.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1098,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-25_LOT-assembly-v70.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2667,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-02_LOT-assembly-wiki-v70.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2117,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-15_LOT-assembly-v59.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2538,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-14_LOT-assembly-v59.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1871,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-04-21_LOT-assembly_v5-accuracy-narrative.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2029,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-06_LOT-assembly-wiki-v74.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1515,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-03_LOT-assembly-v47.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1894,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-18_LOT-assembly_quantum-engine-upgrade-v95.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1644,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-18_LOT-assembly_badge-engine-v15.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1300,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/LOT-GENESIS-v1.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 8386,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-02_LOT-assembly-v83.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1107,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-27_LOT-assembly_wiki-v82-fm-v107.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1176,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-25_LOT-assembly_qie-v104.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2756,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-22_LOT-assembly_qie-v101.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2046,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-12_LOT-assembly-v56.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1001,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-05_LOT-assembly-qie-v86.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2199,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-06-21_LOT-assembly-v67.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1032,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-23_LOT-assembly-v39.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2127,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-05-22_LOT-assembly_v38-resend-recovery-benchmark-arbitrage.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2001,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/assembly/2026-07-27_LOT-assembly_qie-v108.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1605,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_DESIGN_LAB_SUMMER_2026.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 699,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT-FEATURE-INVENTORY-2026.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 8317,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_BENCHMARK_COLOR_SYSTEM.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 3058,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_Integrated_Resilience_System.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 3120,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT-CUBIQ-OPERATOR.md",
+   "source": "institute",
+   "type": "technical",
+   "est_tokens": 6300,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0.md",
+   "source": "institute",
+   "type": "technical",
+   "est_tokens": 4439,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT-AMBIENT-AI-VISION.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 1570,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_SUCCESS_BENCHMARK.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 2034,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_QI46_ENGINE.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 8997,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_FMCG_SUBSCRIPTION_PLAN_2027.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 1082,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_Medical_Records.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 1531,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT-LENT-DIET-OUTCOME-2026.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 559,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_ROBOTICS_COSMO.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 3072,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_W3C_PUBLIC_APPEAL.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 487,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/CQGS-WHITE-PAPER-SNAPSHOT.md",
+   "source": "institute",
+   "type": "philosophy",
+   "est_tokens": 3002,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT-TERMINAL-SYNC.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 2479,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT-AI-PRODUCT-BRIEF.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 1631,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT-TERMINAL-VISION.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 1623,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_USA_IPO.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 8179,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT-CUBIQ-VISION.md",
+   "source": "institute",
+   "type": "technical",
+   "est_tokens": 1127,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_QUANTUM_AI_SYSTEM_PROMPT.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 5156,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_Autonomous_AI_Server.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 2784,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_PRODUCT_BENCHMARK.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 5144,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT_PTSD_Protocol.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 3127,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/corporate/LOT-TERMINAL-M2M.md",
+   "source": "brand",
+   "type": "voice",
+   "est_tokens": 1723,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260706-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2821,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260607-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1462,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260703-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1798,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260623-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1953,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260617-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1652,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260626-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2438,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260606-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1285,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260622-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1727,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260612-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1847,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260613-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1403,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260701-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2515,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260616-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3543,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SYSTEM-OUTLINE.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3145,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260611-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2307,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-LEXICON.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2211,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260702-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3435,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260610-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1809,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260628-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 877,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260629-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1227,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260621-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1579,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260614-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1388,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260630-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3811,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260719-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1937,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260612-06.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1543,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260610-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1186,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260612-07.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1072,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-LEDGER.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3565,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260612-05.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1640,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260707-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1293,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260619-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1973,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260629-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3029,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260612-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1207,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260623-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2920,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260622-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1956,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260621-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1009,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260613-03.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1336,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260612-03.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 612,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260603-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1130,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260614-03.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1015,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260615-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1623,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260615-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2209,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260627-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1356,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260607-04.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2158,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260622-03.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2174,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260606-03.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1593,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260614-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1599,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260605-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1543,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260605-04.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1347,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-DOCTRINE.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3123,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260706-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1151,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/2026-07-20_LOT-assembly_qie-v99.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3086,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260607-03.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1432,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260624-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3288,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260611-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1240,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260601-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1828,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260609-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2414,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260603-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1138,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260602-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1117,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260609-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1220,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260606-04.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1195,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-WEEKLY-2026-W23.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3167,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260612-08.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1446,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260625-03.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1994,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260624-03.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1143,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260618-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2135,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260613-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2083,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260605-05.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1523,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260605-03.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1905,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260620-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1704,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260604-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1157,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260612-04.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 901,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260605-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1955,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260618-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1979,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260702-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 2074,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260617-01.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 4140,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260625-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1300,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-MANIFEST.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3730,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260606-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 1087,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/benchmark/LOT-SR-20260624-02.md",
+   "source": "platform",
+   "type": "example",
+   "est_tokens": 3370,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/INTERFACE_EVOLUTION.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 2046,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/LOT-FIELD-MANUAL-v53-SNAPSHOT.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 2964,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/AI-ENGINE-GUIDE.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 2321,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/MEMORY-ENGINE-CORE-PRINCIPLES-VERIFIED.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 3195,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/MEMORY-ENGINE-INTEGRATION-CHECK.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 2995,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/PSYCHOLOGICAL-DEPTH-ANALYSIS.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 7568,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/MEMORY-ENGINE-WORKING-CONFIG.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 849,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/LOT_SYSTEMS_BRIEF.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 5249,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/WIDGETS.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 7124,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/MEMORY-ENGINE-WHITE-PAPER.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 9972,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/ORGANIZATION-SUMMARY.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 940,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/ORGANIZATION-COMPLETE.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 1355,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/LOT-STYLE-GUIDE.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 3884,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/MEMORY_ENGINE_FIXES.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 1297,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/LOT-NODE-0-RIG-SPEC.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 2243,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/MEMORY-ENGINE-SETUP.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 949,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/CONFIGURATION.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 381,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/MEMORY-AND-QUANTUM-INTENT-ENGINES.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 5711,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/FEBRUARY-2025-MEMORY-ENGINE-IMPROVEMENTS.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 3455,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/REPOSITORY-ORGANIZATION.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 1454,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/LOT-PWA-WEBAUTHN-DEPLOYMENT-2026.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 3227,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/MEMORY-ENGINE-TIMELINE.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 1379,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/MEMORY-ENGINE-CRITICAL-FIX.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 1009,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/MEMORY-ENGINE-COMPRESSION-ARCHITECTURE.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 4336,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/QUANTUM-INTENT-ENGINE-WHITE-PAPER.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 14512,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/AI-ENGINE-SWITCHING-TEST.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 2208,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/CODE-ORGANIZATION-PROPOSAL.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 2921,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/OS_API.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 2347,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/technical/MEMORY_ENGINE_TESTING_PLAN.md",
+   "source": "bioelectric",
+   "type": "technical",
+   "est_tokens": 2500,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/security/SECURITY.md",
+   "source": "cosmo",
+   "type": "technical",
+   "est_tokens": 1955,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/security/SECURITY-FIXES.md",
+   "source": "cosmo",
+   "type": "technical",
+   "est_tokens": 1314,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  },
+  {
+   "path": "docs/security/REPO-ISSUES-SUMMARY.md",
+   "source": "cosmo",
+   "type": "technical",
+   "est_tokens": 861,
+   "arc_position": null,
+   "body_state": null,
+   "cosmo_cleared": false
+  }
+ ],
+ "counts": {
+  "platform": 233,
+  "brand": 54,
+  "institute": 4,
+  "bioelectric": 29,
+  "cosmo": 3
+ },
+ "est_tokens": {
+  "platform": 666038,
+  "brand": 669026,
+  "institute": 14868,
+  "bioelectric": 100391,
+  "cosmo": 4130
+ },
+ "total": 323
+}
