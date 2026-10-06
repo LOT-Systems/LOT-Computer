@@ -18,7 +18,8 @@ async function buildClient() {
         './src/client/entries/us.tsx',
         './src/client/entries/status.tsx',
         './src/client/entries/public-profile.tsx',
-        './src/client/entries/about.tsx'
+        './src/client/entries/about.tsx',
+        './src/client/entries/open-tab.tsx'
       ],
       outdir: './dist/client/js',
       splitting: true,
