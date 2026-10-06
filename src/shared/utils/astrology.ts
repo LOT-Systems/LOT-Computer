@@ -177,3 +177,64 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Re-express an instant as a Date whose local getters (getHours/getDate/...)
+ * return the wall-clock fields of `timeZone`. Isomorphic (Intl only), so the
+ * client dashboard and the server Logs snapshot read the same sky for a user.
+ * Falls back to the input on a missing/invalid zone.
+ */
+export function toWallClockInZone(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(date)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return date
+  }
+}
+
+export type AstrologyReading = {
+  hourlyZodiac: string
+  westernZodiac: string
+  moonPhase: string
+  moonIllumination: number
+  rokuyo: string
+}
+
+/** One ambient reading (not a natal chart) for the given wall-clock moment. */
+export function getAstrologyReading(date: Date): AstrologyReading {
+  const moon = getMoonPhase(date)
+  return {
+    hourlyZodiac: getHourlyZodiac(date),
+    westernZodiac: getWesternZodiac(date),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    rokuyo: getRokuyo(date),
+  }
+}
+
+/**
+ * Personal resonance: how many of the user's own logs were written under the
+ * same rokuyo / moon phase as `reading`. Reads the astro* snapshot that
+ * getLogContext stamps on every log, so Logs and the widget share one source.
+ */
+export function getLogResonance(
+  logs: Array<{ context?: { astroRokuyo?: string | null; astroMoonPhase?: string | null } | null }>,
+  reading: Pick<AstrologyReading, 'rokuyo' | 'moonPhase'>
+): { sameRokuyo: number; sameMoonPhase: number; stamped: number } {
+  let sameRokuyo = 0, sameMoonPhase = 0, stamped = 0
+  for (const log of logs) {
+    const c = log.context
+    if (!c?.astroRokuyo) continue
+    stamped++
+    if (c.astroRokuyo === reading.rokuyo) sameRokuyo++
+    if (c.astroMoonPhase === reading.moonPhase) sameMoonPhase++
+  }
+  return { sameRokuyo, sameMoonPhase, stamped }
+}
