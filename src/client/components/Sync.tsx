@@ -24,6 +24,7 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useLotEmails,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -79,6 +80,27 @@ export const Sync = React.memo(function SyncInner() {
       queryClient.invalidateQueries(['/api/chat-messages'])
     }
   })
+
+  // LOT Email inbox: new mail arrives via a body-less SSE ping, then refetch
+  const { data: inbox } = useLotEmails()
+  const [openEmailId, setOpenEmailId] = React.useState<string | null>(null)
+  React.useEffect(() => {
+    const { dispose } = sync.listen('lot_email', (data: any) => {
+      if (data.receiverId === me?.id) queryClient.invalidateQueries(['/api/mail'])
+    })
+    return () => dispose()
+  }, [me?.id])
+  const onToggleEmail = React.useCallback(
+    (id: string, isUnread: boolean) => () => {
+      setOpenEmailId((cur) => (cur === id ? null : id))
+      if (isUnread) {
+        fetch(`/api/mail/${id}/read`, { method: 'POST', credentials: 'include' })
+          .then(() => queryClient.invalidateQueries(['/api/mail']))
+          .catch(() => {})
+      }
+    },
+    []
+  )
 
   // Ensure fresh data on mount (filters suspended users)
   React.useEffect(() => {
@@ -213,6 +235,44 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {!!inbox?.emails?.length && (
+        <div className="mb-80">
+          <div className="text-acc/40 mb-8">
+            Email{inbox.unread > 0 && ` · ${inbox.unread} new`}
+          </div>
+          {inbox.emails.slice(0, 20).map((e) => {
+            const isUnread = !e.readAt
+            const isOpen = openEmailId === e.id
+            return (
+              <div
+                key={e.id}
+                className="cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded"
+                onClick={onToggleEmail(e.id, isUnread)}
+              >
+                <div className="flex items-start gap-x-8">
+                  <span className={cn('whitespace-nowrap', !isUnread && 'text-acc/60')}>
+                    {isUnread && '● '}
+                    {e.senderName || 'Unknown'}
+                  </span>
+                  <span className={cn('flex-1 truncate', !isOpen ? 'text-acc/60' : 'hidden')}>
+                    {e.subject || e.body.split('\n')[0]}
+                  </span>
+                  <span className="text-acc/40 whitespace-nowrap">
+                    <MessageTimeLabel dateString={e.createdAt} isTimeFormat12h={isTimeFormat12h} />
+                  </span>
+                </div>
+                {isOpen && (
+                  <div className="whitespace-breakspaces mt-4 break-words">
+                    {e.subject && <div className="text-acc/60">{e.subject}</div>}
+                    {e.body}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {

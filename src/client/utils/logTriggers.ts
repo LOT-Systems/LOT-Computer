@@ -41,6 +41,7 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'email-compose'     // /email to <name> — compose LOT Email (⌘↵ sends)
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -67,6 +68,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'email-compose',  emojis: [],        keywords: ['email'] },
 ]
 
 /**
@@ -114,4 +116,34 @@ export function detectNewTriggers(
   const fresh: LogTrigger[] = []
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
+}
+
+/**
+ * Parses a LOT Email draft from log text:
+ *   /email to Hitomi: first line of body     (":" lets the name be "First Last")
+ *   /email to Hitomi
+ *   ...more body lines
+ * Returns null when there is no "/email to <name>" line or the body is empty.
+ */
+export function parseEmailCommand(
+  text: string
+): { to: string; body: string } | null {
+  const lines = text.split('\n')
+  const idx = lines.findIndex((l) => /^\s*\/email\s+to\s+\S/i.test(l))
+  if (idx < 0) return null
+  const rest = lines[idx].replace(/^\s*\/email\s+to\s+@?/i, '')
+  const sep = rest.search(/[:,]/)
+  let to: string
+  let inline: string
+  if (sep > -1) {
+    to = rest.slice(0, sep).trim()
+    inline = rest.slice(sep + 1).trim()
+  } else {
+    const [name, ...more] = rest.trim().split(/\s+/)
+    to = name
+    inline = more.join(' ')
+  }
+  const body = [inline, ...lines.slice(idx + 1)].join('\n').trim()
+  if (!to || !body) return null
+  return { to, body }
 }
