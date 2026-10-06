@@ -29,6 +29,9 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { renderSystemHelp } from '#client/utils/logCommands'
+import { compressLogs, renderStory, digestForPrompt, parseStoryScope } from '#shared/utils/logStory'
+import { computeArcade, renderArcade } from '#shared/utils/logArcade'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3707,6 +3710,9 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [rankResult, setRankResult] = React.useState<string | null>(null)
+  // Local compressed story (offline, deterministic) shown with — or instead of — the AI narration
+  const storyDigestRef = React.useRef('')
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3741,18 +3747,21 @@ const NoteEditor = ({
   })
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
-      setStoryResponse(data.story)
+      const full = storyDigestRef.current ? storyDigestRef.current + '\n\n' + data.story : data.story
+      setStoryResponse(full)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
-      const updated = current + separator + '📖 ' + data.story
+      const updated = current + separator + '📖 ' + full
       setValue(updated)
       valueRef.current = updated
       onChangeRef.current(updated)
       setIsSaved(true)
     },
     onError: () => {
-      const fallback = 'The system holds your data quietly. When the engine returns, your story will be here.'
+      // Offline / non-Usership: the local compression is the story
+      const fallback = storyDigestRef.current ||
+        'The system holds your data quietly. When the engine returns, your story will be here.'
       setStoryResponse(fallback)
       setStoryLoading(false)
       const current = valueRef.current
@@ -4121,48 +4130,48 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        let rankLine: string | undefined
+        try {
+          const a = computeArcade(Object.values(localStore.logById.get()) as Log[])
+          rankLine = `RANK ${a.rank} · ${a.xp} XP · STREAK ${a.streak}D`
+        } catch {}
+        setSystemHelp(renderSystemHelp(rankLine))
+      } else if (trigger === 'rank-report') {
+        try {
+          setRankResult(renderArcade(computeArcade(Object.values(localStore.logById.get()) as Log[])))
+        } catch {
+          setRankResult('RANK UNAVAILABLE')
+        }
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
+          // Wait for the optional scope word (/story week) to finish being typed
+          setTimeout(() => {
+            const typed = valueRef.current
+            const scope = parseStoryScope(typed)
+            let digestText = ''
+            try {
+              const digest = compressLogs(Object.values(localStore.logById.get()) as Log[], scope)
+              storyDigestRef.current = renderStory(digest)
+              digestText = digestForPrompt(digest)
+            } catch {
+              storyDigestRef.current = ''
+            }
+            const own = typed.split(/📖/)[0].replace(/(^|\s)\/story(\s+(day|week|month|year))?/i, ' ').trim()
+            const logText = [own, digestText].filter(Boolean).join('\n')
+            try {
+              submitStory({
+                logText,
+                quantumState: getUserState(),
+                userIndex: getUserIndex(),
+              })
+            } catch {
+              submitStory({ logText })
+            }
+          }, 900)
         }
       }
     }
@@ -4399,7 +4408,7 @@ const NoteEditor = ({
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                        <span style={{ minWidth: '190px', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )
@@ -4411,6 +4420,13 @@ const NoteEditor = ({
                   )
                 })}
               </div>
+            </Block>
+          </div>
+        )}
+        {rankResult && (
+          <div className="mt-8">
+            <Block label="RANK:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{rankResult}</div>
             </Block>
           </div>
         )}

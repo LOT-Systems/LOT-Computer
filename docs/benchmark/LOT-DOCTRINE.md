@@ -226,3 +226,13 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Generated Output Isolation
+
+Machine output written into an operator's entry (story, prayer) must be
+excluded from every metric derived from that entry. Cut at the first
+generated-block marker and strip command tokens before counting words,
+streaks or XP; otherwise the system compresses its own output and rewards
+itself. Arcade XP caps per-entry depth so showing up outweighs volume.
+(SR-20261006-01: cleanJournalText() in logStory.ts; test asserts a story
+block adds zero words.)
