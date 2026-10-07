@@ -3752,10 +3752,14 @@ export async function syncToServer(): Promise<boolean> {
 
     const result = await response.json()
 
-    // Update last synced timestamp
+    // Advance the sync watermark to the newest signal actually sent, and merge
+    // into the *current* store state. Writing back the pre-request snapshot
+    // would drop signals/patterns recorded during the network round trip, and
+    // stamping `now` would skip signals recorded while the request was in flight.
+    const sentUpTo = unsyncedSignals.reduce((m, s) => Math.max(m, s.timestamp), state.lastSyncedTimestamp)
     intentionEngine.set({
-      ...state,
-      lastSyncedTimestamp: now
+      ...intentionEngine.get(),
+      lastSyncedTimestamp: sentUpTo
     })
 
     console.log(`Synced ${result.savedSignals}/${result.totalSignals} signals successfully`)

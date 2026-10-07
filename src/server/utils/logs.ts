@@ -22,6 +22,22 @@ function toWallClockDate(moment: dayjs.Dayjs): Date {
   return new Date(moment.year(), moment.month(), moment.date(), moment.hour(), moment.minute(), moment.second())
 }
 
+// Users-online snapshot for the log context. Every log write calls
+// getLogContext, so cache the count briefly instead of querying per write.
+const USERS_ONLINE_CACHE_MS = 30 * 1000
+let usersOnlineCache: { value: number | null; at: number } = { value: null, at: 0 }
+
+async function getUsersOnlineSnapshot(): Promise<number | null> {
+  const now = Date.now()
+  if (now - usersOnlineCache.at < USERS_ONLINE_CACHE_MS) return usersOnlineCache.value
+  try {
+    usersOnlineCache = { value: await models.User.countOnline(), at: now }
+  } catch {
+    usersOnlineCache = { value: usersOnlineCache.value, at: now }
+  }
+  return usersOnlineCache.value
+}
+
 export async function getLogContext(user: User): Promise<LogContext> {
   const localMoment = user.timeZone ? dayjs().tz(user.timeZone) : dayjs()
   const localDate = toWallClockDate(localMoment)
@@ -42,6 +58,7 @@ export async function getLogContext(user: User): Promise<LogContext> {
     astroMoonIllumination: moonPhase.illumination,
     astroHourlyZodiac: getHourlyZodiac(localDate),
     astroWesternZodiac: getWesternZodiac(localDate),
+    usersOnline: await getUsersOnlineSnapshot(),
   }
   if (user.country && user.city) {
     const cachedWeather = await models.WeatherResponse.findOne({

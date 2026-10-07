@@ -170,6 +170,8 @@ export type LogContext = {
   astroMoonIllumination?: number | null;
   astroHourlyZodiac?: string | null;
   astroWesternZodiac?: string | null;
+  // Platform-wide users online at log time (30s cached snapshot)
+  usersOnline?: number | null;
   [key: string]: any;
 };
 
