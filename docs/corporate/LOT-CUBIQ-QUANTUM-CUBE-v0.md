@@ -321,6 +321,27 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE EVENING CLOSE                           2026-10-07
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier with Cube sync, archetype "Diurnal
+  Operator," a father of a young child. Pad on the kitchen counter, 90mm
+  from the edge. Child asleep, phones out of the room after 21:00.
+
+  The evening close is due. A push notification would light a dark
+  kitchen; the cube instead holds a SETTLE until it is touched (cycle 02
+  redefines SETTLE as contact-answered). When the operator rests a hand on
+  it while the kettle boils, it answers with two seconds of low standing
+  pressure — no light, no sound. A memory question arrives under quiet
+  hours: the cube performs one soft NUDGE through the counter and no hop;
+  the badge-unlock HOP degrades to a NUDGE per the degradation ladder. The
+  next morning, testing with quiet hours off, a LEAP triggered 30mm from
+  the counter edge becomes an in-place shudder: the edge guard refused.
+
+  This is the night counterpart to Use Case 01: presence without a screen
+  in a room where a screen would be wrong, and a cube that refuses by
+  design. Full scenario, acceptance criteria and the design review that
+  produced it: docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
