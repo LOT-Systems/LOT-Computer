@@ -136,6 +136,13 @@ export const useLogs = createQuery<Log[]>('/api/logs', {
   staleTime: 5 * 60 * 1000, // Cache for 5 minutes — /api/logs has no LIMIT so keep fetches infrequent
 })
 
+export const useCalendarEvents = createQuery<
+  Pick<Log, 'id' | 'event' | 'text' | 'metadata' | 'createdAt'>[]
+>('/api/calendar', {
+  refetchOnWindowFocus: true,
+  staleTime: 60 * 1000,
+})
+
 export const useCreateLog = createMutation<{ text: string; event?: string; metadata?: Record<string, any> }, Log>(
   'post',
   '/api/logs'

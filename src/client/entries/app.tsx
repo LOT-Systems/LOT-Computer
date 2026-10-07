@@ -27,6 +27,7 @@ import { useMirror } from '#client/utils/mirror'
 import { useSound } from '#client/utils/sound'
 import { useRadio } from '#client/utils/radio'
 import { sync } from '../sync'
+import { CalendarAlerts } from '#client/components/CalendarAlerts'
 import { initRecipeWidget } from '#client/stores/recipeWidget'
 import { hydrateBadgesFromServer } from '#client/utils/badges'
 import { initPerfObserver } from '#client/utils/perf'
@@ -344,6 +345,7 @@ const App = () => {
   return (
     <>
       <ConnectionStatus />
+      <CalendarAlerts />
       <Layout>
         <TabPanels />
         <DynamicRoutes />

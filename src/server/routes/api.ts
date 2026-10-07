@@ -1079,12 +1079,29 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
+  // Calendar state stream. Separate from /logs (LIMIT 500) so scheduled
+  // entries and their alert/done/cancel events never age out of the window.
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    const since = new Date(Date.now() - 400 * 24 * 60 * 60 * 1000)
+    return fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: { [Op.in]: ['calendar_entry', 'calendar_alert', 'calendar_done', 'calendar_cancel'] },
+        createdAt: { [Op.gte]: since },
+      },
+      attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
+      order: [['createdAt', 'DESC']],
+      limit: 2000,
+    })
+  })
+
   fastify.get('/logs', async (req: FastifyRequest, reply) => {
     // Only return user-facing log events (exclude raw QIE signal events)
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
       'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'calendar_alert', 'calendar_done', 'calendar_cancel',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
