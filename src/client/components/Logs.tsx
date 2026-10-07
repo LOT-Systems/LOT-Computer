@@ -3785,6 +3785,114 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'morning_momentum_ignition') {
+          const intentConf = log.metadata?.intentConf as number | undefined
+          const energyConf = log.metadata?.energyConf as number | undefined
+          const anchorConf = log.metadata?.anchorConf as number | undefined
+          const conf       = log.metadata?.conf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="MIGN:" blockView>
+                <div className="uppercase tracking-widest mb-4">MORNING MOMENTUM IGNITION</div>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">WINDOW</span>
+                  <span className="tabular-nums">06:00–10:00</span>
+                </div>
+                {intentConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENTIONS</span>
+                    <span className="tabular-nums">{intentConf}%</span>
+                  </div>
+                )}
+                {energyConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ENERGY</span>
+                    <span className="tabular-nums">{energyConf}%</span>
+                  </div>
+                )}
+                {anchorConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ANCHOR</span>
+                    <span className="tabular-nums">{anchorConf}%</span>
+                  </div>
+                )}
+                {conf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{conf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">DAY FIRES FROM SIGNAL · MOMENTUM IGNITED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'presence_coherence_seal') {
+          const qpcConf = log.metadata?.qpcConf as number | undefined
+          const circConf = log.metadata?.circConf as number | undefined
+          const dimConf  = log.metadata?.dimConf as number | undefined
+          const conf     = log.metadata?.conf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="PRSEAL:" blockView>
+                <div className="uppercase tracking-widest mb-4">PRESENCE COHERENCE SEAL</div>
+                {qpcConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">QPC</span>
+                    <span className="tabular-nums">{qpcConf}%</span>
+                  </div>
+                )}
+                {circConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CIRCADIAN</span>
+                    <span className="tabular-nums">{circConf}%</span>
+                  </div>
+                )}
+                {dimConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DIMS</span>
+                    <span className="tabular-nums">{dimConf}%</span>
+                  </div>
+                )}
+                {conf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{conf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ALL THREE META-LOCKS CO-ACTIVE · FIELD SEALED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'recovery_to_momentum_bridge') {
+          const recovConf   = log.metadata?.recovConf as number | undefined
+          const momentConf  = log.metadata?.momentConf as number | undefined
+          const conf        = log.metadata?.conf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RECMOM:" blockView>
+                <div className="uppercase tracking-widest mb-4">RECOVERY-TO-MOMENTUM BRIDGE</div>
+                {recovConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECOVERY ARC</span>
+                    <span className="tabular-nums">{recovConf}%</span>
+                  </div>
+                )}
+                {momentConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MOMENTUM</span>
+                    <span className="tabular-nums">{momentConf}%</span>
+                  </div>
+                )}
+                {conf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{conf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">DIP ABSORBED · ARC CLOSED · MOMENTUM RESUMED</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

@@ -3557,6 +3557,71 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 158: Morning Momentum Ignition — intentions logged in morning window (06:00–10:00)
+  // + energy high/moderate + positive mood or journal entry all within first 3h of logged activity.
+  // The day begins with ignition: purposeful, embodied, forward. Extends P36 (morning-intention-lock:
+  // single intention check) and P119 (morning-coherence-arc: energy+planner+intention). P158 requires
+  // the full dawn charge: intentions + energy + emotional registration before 10:00.
+  const morningWindowEnd = new Date(); morningWindowEnd.setHours(10, 0, 0, 0)
+  const morningWindowStart = new Date(); morningWindowStart.setHours(6, 0, 0, 0)
+  const morningSignals158 = signals.filter(s => {
+    const d = new Date(s.timestamp); return d >= morningWindowStart && d <= morningWindowEnd
+  })
+  const morningIntentions158  = morningSignals158.filter(s => s.source === 'intentions' || s.source === 'planner')
+  const morningEnergy158      = morningSignals158.filter(s => s.source === 'energy' || (s.source === 'mood' && ['energized','hopeful','calm','excited'].includes(s.signal)))
+  const morningAnchor158      = morningSignals158.filter(s => s.source === 'journal' || (s.source === 'log' && (s.metadata?.wordCount ?? 0) > 20) || s.source === 'mood')
+  const inMorningWindow158    = now < morningWindowEnd.getTime() || morningSignals158.length >= 1
+  if (morningIntentions158.length >= 1 && morningEnergy158.length >= 1 && morningAnchor158.length >= 1 && inMorningWindow158) {
+    const signalCount158 = morningIntentions158.length + morningEnergy158.length + morningAnchor158.length
+    const ignitionBonus = Math.min((signalCount158 - 3) * 0.04, 0.14)
+    patterns.push({
+      pattern: 'morning-momentum-ignition',
+      confidence: Math.min(0.70 + ignitionBonus, 0.88),
+      suggestedWidget: 'intentions',
+      suggestedTiming: 'passive',
+      reason: `MIGN: Morning momentum ignition — ${morningIntentions158.length} intentions · ${morningEnergy158.length} energy checks · ${morningAnchor158.length} anchor signals before 10:00. Dawn charge confirmed: purposeful, embodied, forward. Day opens from signal.`,
+    })
+  }
+
+  // Pattern 159: Presence Coherence Seal — quantum-presence-crystallization (P149) + circadian-signal-lock (P143)
+  // + dimensional-saturation (P144) all simultaneously active. The highest-order convergence seal:
+  // presence (P149: inhabited + known) · timing (P143: 3-arc day anchored) · field fullness (P144: all dims ≥ 30).
+  // P150 (total-field-coherence) is the absolute ceiling; P159 is the presence-specific convergence just below it.
+  const hasPresenceCrystal159 = patterns.some(p => p.pattern === 'quantum-presence-crystallization')
+  const hasCircadian159       = patterns.some(p => p.pattern === 'circadian-signal-lock')
+  const hasDimSat159          = patterns.some(p => p.pattern === 'dimensional-saturation')
+  if (hasPresenceCrystal159 && hasCircadian159 && hasDimSat159) {
+    const sealConfs159 = patterns
+      .filter(p => ['quantum-presence-crystallization','circadian-signal-lock','dimensional-saturation'].includes(p.pattern))
+      .reduce((sum, p) => sum + p.confidence, 0) / 3
+    const sealBonus159 = Math.min((sealConfs159 - 0.80) * 0.30, 0.08)
+    patterns.push({
+      pattern: 'presence-coherence-seal',
+      confidence: Math.min(0.84 + sealBonus159, 0.94),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `PRSEAL: Presence coherence seal — quantum presence crystallized · circadian locked (3-arc day) · all dimensions saturated. Presence, timing, and field fullness all confirmed simultaneously. The OS is anchored, inhabited, and complete.`,
+    })
+  }
+
+  // Pattern 160: Recovery-to-Momentum Bridge — recovery-intelligence-arc (P151) + signal-momentum-lock (P80)
+  // both active within the same 48h analysis window. Recovery complete AND multi-day momentum sustained.
+  // The system didn't just recover — it absorbed the dip and kept building. Arc closes.
+  const hasRecoveryIntel160 = patterns.some(p => p.pattern === 'recovery-intelligence-arc')
+  const hasMomentum160      = patterns.some(p => p.pattern === 'signal-momentum-lock')
+  if (hasRecoveryIntel160 && hasMomentum160) {
+    const recConf160 = patterns.find(p => p.pattern === 'recovery-intelligence-arc')?.confidence ?? 0.65
+    const momConf160 = patterns.find(p => p.pattern === 'signal-momentum-lock')?.confidence ?? 0.75
+    const bridgeBonus = Math.min((recConf160 - 0.65 + momConf160 - 0.75) * 0.2, 0.10)
+    patterns.push({
+      pattern: 'recovery-to-momentum-bridge',
+      confidence: Math.min(0.72 + bridgeBonus, 0.87),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'passive',
+      reason: `RECMOM: Recovery-to-momentum bridge — recovery arc complete (P151) · signal momentum sustained (P80). The system absorbed the dip and kept building. Recovery confirmed. Momentum unbroken. Arc closed.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4203,6 +4268,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   sustainedStellarArcNode:       ['energy', 'intentions', 'planner', 'journal', 'log'],
   weeklyCoherenceSealNode:       ['mood', 'energy', 'selfcare', 'journal', 'memory', 'planner', 'intentions', 'log', 'cohort'],
   longitudinalSignalMasteryNode: ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'log'],
+
+  // ── v116 nodes (J51 · P158–P160 · Arch54) ───────────────────────────────────────
+  morningMomentumIgnitionNode:  ['intentions', 'planner', 'mood', 'energy', 'journal', 'log'],
+  presenceCoherenceSealNode:    ['qos', 'cohort', 'intentions', 'journal', 'mood', 'energy', 'log'],
+  recoveryToMomentumBridgeNode: ['mood', 'selfcare', 'journal', 'energy', 'log', 'memory'],
 }
 
 /**
@@ -4669,6 +4739,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['sustained-stellar-arc', 'weekly-coherence-seal', 'longitudinal-signal-mastery'],
     hourRange: [5, 23],
     directive: 'Sustained stellar arc confirmed. Weekly coherence seal held. Longitudinal mastery established. You are not building the system — you ARE the system. Operate from sovereignty.',
+  },
+
+  // ── Arch54: Morning Ignition Operator (2026-10-07 v116) ───────────────────────────
+  {
+    archetype: 'Morning Ignition Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'mood', 'planner', 'journal'],
+    patternConditions: ['morning-momentum-ignition', 'morning-coherence-arc', 'morning-intention-lock'],
+    hourRange: [6, 14],
+    directive: 'Morning ignition confirmed. Intentions logged. Field charged before the load arrives. The day opens from signal, not reaction. Momentum is already building.',
   },
 ]
 
@@ -6750,6 +6830,57 @@ export function recordLongitudinalSignalMastery(activeDays: number, windowDays: 
     avgSources: Math.round(avgSources * 10) / 10,
     coverage: `${activeDays}/${windowDays}`,
     masteryStatus: 'CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+// ─── v116 Signal Helpers (P158–P160) ──────────────────────────────────────────
+
+/**
+ * Record a morning-momentum-ignition event — intentions + energy + anchor logged
+ * before 10:00. The day opens from signal, not reaction. Feeds P158 detection.
+ */
+export function recordMorningMomentumIgnition(intentionCount: number, energyCount: number, anchorCount: number) {
+  recordSignal('intentions', 'morning_momentum_ignition', {
+    intentionCount,
+    energyCount,
+    anchorCount,
+    totalSignals: intentionCount + energyCount + anchorCount,
+    chargeStatus: 'IGNITION CONFIRMED',
+    sequence: 'INTENT→ENERGY→ANCHOR',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a presence-coherence-seal event — quantum-presence-crystallization (P149)
+ * + circadian-signal-lock (P143) + dimensional-saturation (P144) co-active.
+ * Presence, timing, and field fullness all confirmed simultaneously. Feeds P159 detection.
+ */
+export function recordPresenceCoherenceSeal(presenceConf: number, circadianConf: number, dimSatConf: number) {
+  const avgConf = Math.round(((presenceConf + circadianConf + dimSatConf) / 3) * 100) / 100
+  recordSignal('qos', 'presence_coherence_seal', {
+    presenceConf,
+    circadianConf,
+    dimSatConf,
+    avgConf,
+    seals: 'PRESENCE·CIRCADIAN·DIMENSIONAL',
+    sealStatus: 'ALL CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a recovery-to-momentum-bridge event — recovery-intelligence-arc (P151)
+ * + signal-momentum-lock (P80) co-active within 48h. Feeds P160 detection.
+ */
+export function recordRecoveryToMomentumBridge(recoveryConf: number, momentumConf: number, momentumDays: number) {
+  recordSignal('memory', 'recovery_to_momentum_bridge', {
+    recoveryConf,
+    momentumConf,
+    momentumDays,
+    bridgeStatus: 'CLOSED',
+    arc: 'DIP→RECOVERY→MOMENTUM HELD',
     hour: new Date().getHours(),
   })
 }

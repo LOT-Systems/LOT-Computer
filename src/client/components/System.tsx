@@ -277,6 +277,12 @@ export const System = React.memo(function SystemInner() {
     return classifyPhysiologicalCohort(eng.signals, quantumState, eng.recognizedPatterns ?? [])
   }, [quantumState])
 
+  // Active patterns count for cohort panel
+  const activePatternCount = React.useMemo(() => {
+    const eng = intentionEngine.get()
+    return (eng.recognizedPatterns ?? []).length
+  }, [quantumState])
+
   // Accumulative User Index - holistic score from all widget signals
   const userIndex = React.useMemo(() => {
     return getUserIndex()
@@ -694,6 +700,7 @@ export const System = React.memo(function SystemInner() {
                 { metric: 'Cohort', value: physiologicalCohort?.dominantModule ?? '—' },
                 { metric: 'Phase', value: getCircadianPhase() },
                 { metric: 'Confidence', value: physiologicalCohort ? `${physiologicalCohort.confidence}%` : '—' },
+                { metric: 'Patterns', value: activePatternCount > 0 ? `${activePatternCount} active` : '—' },
                 { metric: 'ATP', value: quantumState.energy },
                 { metric: 'Clarity', value: quantumState.clarity },
                 { metric: 'Alignment', value: quantumState.alignment },

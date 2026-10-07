@@ -116,6 +116,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'sustained-stellar-arc':            'SSTARC',
   'weekly-coherence-seal':            'WCOHS',
   'longitudinal-signal-mastery':      'LONGSIG',
+  'morning-momentum-ignition':        'MIGN',
+  'presence-coherence-seal':          'PRSEAL',
+  'recovery-to-momentum-bridge':      'RECMOM',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

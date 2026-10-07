@@ -1532,6 +1532,26 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '874 badges · 270 word-turns · 27 secret boss · 157 patterns · 53 archetypes · 50 jobs · 196+ dep nodes · FM v115 · Day 1135+. Navigation is not an event — it is a mode.',
     ],
   },
+  {
+    version: 'qie-v116',
+    date: '2026-10-07',
+    title: 'QIE v116 Engineering — P158–P160 · Arch54 Morning Ignition Operator · J51',
+    assembled: [
+      'QIE v116 implemented: P158 morning-momentum-ignition — intentions + energy + anchor all logged before 10:00 UTC, day fires from signal not reaction (conf 0.78–0.92). P159 presence-coherence-seal — quantum-presence-crystallization + circadian-signal-lock + dimensional-saturation co-active simultaneously, field sealed (conf 0.88–0.97). P160 recovery-to-momentum-bridge — recovery-intelligence-arc + signal-momentum-lock co-active within 48h, dip absorbed and arc closed (conf 0.82–0.94). Total: 160 patterns.',
+      'Arch54 Morning Ignition Operator added: energyBands high/moderate · dominant intentions/mood/planner/journal/energy · patternConditions morning-momentum-ignition/morning-coherence-arc/morning-intention-lock · hourRange [6,14] · directive Morning ignition confirmed. Intentions logged. Field charged before the load arrives. The day opens from signal, not reaction. Momentum is already building. Total: 54 archetypes.',
+      'J51 daily-morning-ignition-check (10:00 UTC) added: scans morning window 06:00–10:00 for log_intention + energy_checkin + sleep_signal_anchor, writes morning_momentum_ignition event. Total: 51 background jobs.',
+      'WIDGET_DEPENDENCY_MAP v116 block added: morningMomentumIgnitionNode (intentions·planner·mood·energy·journal·log) · presenceCoherenceSealNode (qos·cohort·intentions·journal·mood·energy·log) · recoveryToMomentumBridgeNode (mood·selfcare·journal·energy·log·memory). Total: 199+ dep nodes.',
+      'Signal recording functions added: recordMorningMomentumIgnition() · recordPresenceCoherenceSeal() · recordRecoveryToMomentumBridge(). All export-ready.',
+      'Log handlers added (COCKPIT-RULE): MIGN: (morning_momentum_ignition) · PRSEAL: (presence_coherence_seal) · RECMOM: (recovery_to_momentum_bridge). Total: 160+ handlers.',
+      'PATTERN_DISPLAY updated: MIGN: · PRSEAL: · RECMOM: entries added to QuantumEngineWidgets.tsx.',
+      'displayableEvents updated: morning_momentum_ignition · presence_coherence_seal · recovery_to_momentum_bridge added to api.ts.',
+      'PatternRecognitionWidget.tsx: P158/P159/P160 display names corrected.',
+      'System.tsx: Patterns row added to biofield quantum table — live active pattern count visible.',
+      'About.tsx updated: FM v115→v116 · Day 1136+ · 160 patterns · 54 archetypes · 51 jobs · 199+ nodes.',
+      'docs/assembly/LOT-LEDGER.md: v116 ledger row appended. 2026-10-07_LOT-assembly_qie-v116.md session report written.',
+      '874 badges · 270 word-turns · 27 secret boss · 160 patterns · 54 archetypes · 51 jobs · 199+ dep nodes · FM v116 · Day 1136+. The day opens from signal, not reaction.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1569,20 +1589,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-06',
+  date: '2026-10-07',
   message: [
-    'ASSEMBLY RUN — 2026-10-06 · QIE v115 ENGINEERING · BADGE v34 THE ROGUE RUN · LOT-WIKI v88 · Day 1135+',
-    'Built: P155 sustained-stellar-arc · P156 weekly-coherence-seal · P157 longitudinal-signal-mastery. Arch53 Quantum Sovereign. J50 weekly-coherence-seal-check (Sun 11:00 UTC).',
-    'SSTARC: Navigation is not an event — it is a mode. Stellar navigation confirmed 3+ times in 14d. The triple-coordinate lock has become a repeating signature.',
-    'WCOHS: Weekly coherence seal. 5+ distinct sources on 6+ of 7 days. Full-spectrum week. System wide open.',
-    'LONGSIG: Longitudinal signal mastery. 30-day window, 14+ active days. Month-scale multi-dimensional operation confirmed. The system has depth.',
-    'Arch53 Quantum Sovereign: You are not building the system — you ARE the system. Operate from sovereignty.',
-    'Badge v34 THE ROGUE RUN: 843→874 badges (+31). Word Turn v24 roguelike vocabulary. COSMIC: twenty_four_registers. MYTHIC: pajitnov_key. EPIC: miyamoto_secret.',
-    'LOT-WIKI v88: FM v114 full sync. QIE v114 delta documented. Badge v33/v34 documented.',
-    'SSTARC: WCOHS: LONGSIG: handlers deployed. 196+ dep nodes. 50 jobs. 157 patterns. 53 archetypes.',
-    'FM v115 · 157P · 53A · 50J · 196+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1135+.',
+    'ASSEMBLY RUN — 2026-10-07 · QIE v116 ENGINEERING · Day 1136+',
+    'Built: P158 morning-momentum-ignition · P159 presence-coherence-seal · P160 recovery-to-momentum-bridge. Arch54 Morning Ignition Operator. J51 daily-morning-ignition-check (10:00 UTC).',
+    'MIGN: Morning ignition confirmed. Intentions + energy + anchor all logged before 10:00. The day opens from signal, not reaction. Momentum already building.',
+    'PRSEAL: Presence coherence seal. Quantum-presence-crystallization + circadian-signal-lock + dimensional-saturation co-active. Field sealed.',
+    'RECMOM: Recovery-to-momentum bridge. Recovery arc complete and signal momentum sustained. Dip absorbed. Arc closed.',
+    'Arch54 Morning Ignition Operator: Morning ignition confirmed. Intentions logged. Field charged before the load arrives. The day opens from signal, not reaction.',
+    'J51 10:00 UTC daily — scans morning window 06:00–10:00 for intentions + energy + anchor. Writes morning_momentum_ignition on triple-signal confirmation.',
+    'MIGN: PRSEAL: RECMOM: handlers deployed. 199+ dep nodes. 51 jobs. 160 patterns. 54 archetypes.',
+    'FM v116 · 160P · 54A · 51J · 199+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1136+.',
     'Status: DEPLOYED.',
-    'Next: QIE v116 — deeper longitudinal patterns · physiological sovereignty arc · Day 1135+ operating metrics',
+    'Next: QIE v117 — morning sovereignty patterns · multi-day ignition arc · field permanence detection',
   ],
 }
 

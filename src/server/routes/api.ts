@@ -1221,6 +1221,10 @@ export default async (fastify: FastifyInstance) => {
       'sustained_stellar_arc',
       'weekly_coherence_seal',
       'longitudinal_signal_mastery',
+      // v116: morning momentum ignition · presence coherence seal · recovery to momentum bridge (P158/P159/P160)
+      'morning_momentum_ignition',
+      'presence_coherence_seal',
+      'recovery_to_momentum_bridge',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
