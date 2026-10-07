@@ -29,6 +29,8 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { formatSystemHelp, getDiscovered, recordCommandUse } from '#client/utils/logCommands'
+import { buildStoryDigest, renderDigestLines, type StoryPeriod, type StoryLogLike } from '#shared/utils/logStory'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3706,7 +3708,9 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyDigest, setStoryDigest] = React.useState<{ period: StoryPeriod; text: string } | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const { data: allLogs } = useLogs()
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -4053,7 +4057,7 @@ const NoteEditor = ({
         }
       } else if (trigger === 'breathe') {
         setBreatheEnabled(prev => !prev)
-      } else if (trigger === 'silent-mode') {
+      } else if (trigger === 'silent-mode' || trigger === 'sil-check') {
         try {
           const eng = intentionEngine.get()
           const signals = (eng as any).signals || []
@@ -4121,50 +4125,52 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        // Render from the registry (logCommands.ts) so help never drifts from
+        // the detector table. Discovery is recorded after render so the first
+        // /system call shows the pre-use state.
+        setSystemHelp(formatSystemHelp(getDiscovered()))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
-      } else if (trigger === 'story-mode') {
+      } else if (
+        trigger === 'story-mode' ||
+        trigger === 'story-week' ||
+        trigger === 'story-month' ||
+        trigger === 'story-year'
+      ) {
         if (!storyLoading) {
+          const period: StoryPeriod =
+            trigger === 'story-week' ? 'week' :
+            trigger === 'story-month' ? 'month' :
+            trigger === 'story-year' ? 'year' : 'day'
           setStoryLoading(true)
           setStoryResponse(null)
+          // Instant, offline compression from the cached log record
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const digest = buildStoryDigest((allLogs || []) as unknown as StoryLogLike[], period)
+            setStoryDigest({ period, text: renderDigestLines(digest).join('\n') })
+          } catch {
+            setStoryDigest(null)
+          }
+          try {
+            const logText = value
+              .replace(/(^|\s)\/(story|week|month|year)(?![a-z0-9_])/gi, ' ')
+              .replace(/📖/g, '')
+              .trim()
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              period,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: value, period })
           }
         }
       }
+      // Arcade: first use of a command is a discovery
+      try { recordCommandUse(trigger) } catch {}
     }
   }, [value])
 
@@ -4411,6 +4417,13 @@ const NoteEditor = ({
                   )
                 })}
               </div>
+            </Block>
+          </div>
+        )}
+        {storyDigest && (
+          <div className="mt-8">
+            <Block label="STORY:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{storyDigest.text}</div>
             </Block>
           </div>
         )}

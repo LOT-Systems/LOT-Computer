@@ -19,6 +19,13 @@ import {
 import config from '#server/config'
 import { fp } from '#shared/utils'
 import {
+  buildStoryDigest,
+  digestToPromptBlock,
+  isStoryPeriod,
+  STORY_WINDOW_DAYS,
+  type StoryPeriod,
+} from '#shared/utils/logStory'
+import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
   DATE_TIME_FORMAT,
@@ -5490,6 +5497,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,15 +5522,22 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period: StoryPeriod = isStoryPeriod(req.body.period) ? req.body.period : 'day'
 
+      // Window + equal-length prior window (for spike / pattern-change detection)
+      const since = new Date(Date.now() - 2 * STORY_WINDOW_DAYS[period] * 24 * 60 * 60 * 1000)
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: { userId: req.user.id, createdAt: { [Op.gte]: since } },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 5000,
       })
 
+      const digest = buildStoryDigest(logs as any, period)
+      const digestBlock = digestToPromptBlock(digest)
+
+      // Log-tab entries are stored with event 'note'
       const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
+        .filter(l => l.event === 'note' && l.text && !l.text.trim().startsWith('📖'))
         .slice(0, 10)
         .map(l => (l.text || '').substring(0, 200))
         .filter(Boolean)
@@ -5549,7 +5564,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked a story command. Your task: write 1-2 paragraphs (100-200 words) that compress the last ${period.toUpperCase()} of their record — their journey, mood trajectory, and self-care patterns. Anchor on the COMPRESSED RECORD numbers (entry counts, streaks, spikes, drops, moods) — a spike or a drop is a pattern change worth naming gently. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
@@ -5563,6 +5578,9 @@ RULES:
 - Keep it under 200 words.`
 
       const dataBlock = `
+COMPRESSED RECORD (${period.toUpperCase()}):
+${digestBlock}
+
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
@@ -5596,6 +5614,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            period,
+            digest: { ...digest },
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },

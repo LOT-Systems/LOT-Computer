@@ -39,6 +39,9 @@ Step-by-step guides for initial setup and configuration.
 - Memory Engine Setup - Memory Engine configuration
 - API Key Setup - Production API key configuration
 
+### [Log Entry System](./log/LOT-LOG-COMMANDS.md)
+Slash-command layer of the Log: `/system` index, `/story` `/week` `/month` `/year` compression, arcade rank.
+
 ### [Release Notes](./releases/)
 Version history, release notes, and changelogs.
 
