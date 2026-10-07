@@ -4109,16 +4109,27 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       const firstName = nameParts[0]
       const lastName = nameParts.slice(1).join(' ')
 
-      const whereConditions: any[] = [
-        { firstName: { [Op.iLike]: firstName } },
-      ]
-      if (lastName) {
-        whereConditions.push({ lastName: { [Op.iLike]: lastName } })
+      // Full name (first AND last) wins; otherwise fall back to first name alone.
+      // The client sends up to two words after "to", so the second may be message text.
+      let candidates = lastName
+        ? await fastify.models.User.findAll({
+            where: { [Op.and]: [
+              { firstName: { [Op.iLike]: firstName } },
+              { lastName: { [Op.iLike]: lastName } },
+            ] },
+            limit: 2,
+          })
+        : []
+      if (candidates.length === 0) {
+        candidates = await fastify.models.User.findAll({
+          where: { firstName: { [Op.iLike]: firstName } },
+          limit: 2,
+        })
       }
-
-      const recipient = await fastify.models.User.findOne({
-        where: { [Op.or]: whereConditions },
-      })
+      if (candidates.length > 1) {
+        return reply.status(409).send({ error: 'Ambiguous name', hint: `More than one "${firstName}" — use first and last name` })
+      }
+      const recipient = candidates[0]
 
       if (!recipient) {
         return reply.status(404).send({ error: 'User not found', hint: `No user named "${toName}" in LOT Community` })

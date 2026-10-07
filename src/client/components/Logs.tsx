@@ -4178,6 +4178,7 @@ const NoteEditor = ({
           } catch {
             submitStory({ logText: value })
           }
+        }
       } else if (trigger === 'email-compose') {
         const emailMatch = value.match(/\/(?:email|mail)\s+to\s+(\S+(?:\s+\S+)?)\s*([\s\S]*)/i)
         if (emailMatch) {

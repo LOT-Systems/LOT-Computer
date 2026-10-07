@@ -70,13 +70,14 @@ export function ChatCatalystWidget() {
       cohortMember: catalyst.action.cohortMember.name,
       hour: new Date().getHours()
     })
-    stores.goTo('log')
+    stores.goTo('logs')
     // Pre-populate the Log with an email compose command
     setTimeout(() => {
       const ta = document.querySelector<HTMLTextAreaElement>('textarea')
       if (ta) {
         const name = catalyst.action.cohortMember!.name
-        ta.value = `/email to ${name} `
+        const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set
+        setter?.call(ta, `/email to ${name} `)
         ta.dispatchEvent(new Event('input', { bubbles: true }))
         ta.focus()
         ta.setSelectionRange(ta.value.length, ta.value.length)
