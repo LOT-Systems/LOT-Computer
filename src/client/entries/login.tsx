@@ -14,6 +14,7 @@ import { render } from '#client/utils/render'
 import config from '#client/config'
 import '#client/stores/theme'
 import { Layout } from '#client/components/ui'
+import { Basics } from '#client/components/Basics'
 
 const LOT_ONELINERS = [
   'LOT is the subscription for basic essentials.',
@@ -41,6 +42,13 @@ function LotOneliner() {
 }
 
 const App = () => {
+  if (window.location.pathname === '/basics') {
+    return (
+      <Layout>
+        <Basics />
+      </Layout>
+    )
+  }
   return (
     <Layout>
       <div className="mb-24">

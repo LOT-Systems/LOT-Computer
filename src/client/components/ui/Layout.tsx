@@ -20,9 +20,9 @@ import { Button } from './Button'
 import { Page } from './Page'
 import { cn } from '#client/utils'
 
-type RouteName = 'sync' | 'logs' | 'system' | 'api' | 'settings'
+type RouteName = 'sync' | 'logs' | 'system' | 'basics' | 'api' | 'settings'
 
-type NavItem = { label: string | null; spacer?: boolean; route?: RouteName }
+type NavItem = { label: string | null; spacer?: boolean; route?: RouteName; href?: string }
 
 const NavButton = React.memo(function NavButton({
   link,
@@ -38,7 +38,7 @@ const NavButton = React.memo(function NavButton({
       kind="secondary-rounded"
       className={cn(
         'mb-4 flex-shrink-0',
-        !link.route && 'opacity-30 pointer-events-none',
+        !link.route && !link.href && 'opacity-30 pointer-events-none',
         // Active tab: solid fill, no hover effect. before:!hidden fully
         // disables the grid-fill-hover ::before (grid + opaque backdrop) so
         // hovering the active button never overpaints its solid fill.
@@ -46,8 +46,14 @@ const NavButton = React.memo(function NavButton({
           ? 'bg-white/20 hover:bg-white/20 before:!hidden'
           : 'bg-acc text-bac before:!hidden')
       )}
-      onClick={link.route ? () => goTo(link.route!) : undefined}
-      disabled={!link.route}
+      onClick={
+        link.route
+          ? () => goTo(link.route!)
+          : link.href
+            ? () => window.location.assign(link.href!)
+            : undefined
+      }
+      disabled={!link.route && !link.href}
     >
       {link.label}
     </Button>
@@ -71,7 +77,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
           { label: 'Sync', route: 'sync' },
           { label: 'Log', route: 'logs' },
           { label: 'System', route: 'system' },
-          { label: 'Basics' },
+          { label: 'Basics', route: 'basics' },
           { label: 'Self-care' },
           { label: 'Kids' },
           { label: 'Home' },
@@ -83,7 +89,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
           { label: 'Sync' },
           { label: 'Logs' },
           { label: 'System', route: 'system' },
-          { label: 'Basics' },
+          { label: 'Basics', href: '/basics' },
           { label: 'Self-care' },
           { label: 'Kids' },
           { label: 'Home' },
