@@ -8,12 +8,12 @@
 
 # LOT-WIKI-v88
 ## Layers of Time — Operator Reference Manual
-### Revision: v88 · Field Manual Sync: v113 · Date: 2026-10-07 · Day 1135+
+### Revision: v88 · Field Manual Sync: v114 · Date: 2026-10-06 · Day 1135+
 
 ---
 
-> *"The call to adventure interrupts. The threshold must be crossed. The shadow must be faced. The return carries the elixir. This is the structure beneath every practice that lasts. Campbell named it. LOT measures it."*
-> — Badge Codex v32, THE HERO'S JOURNEY · Word Turn Engine v22
+> *"Peak window locked. Morning intention confirmed. Sleep anchor set. Navigation is live — all three temporal coordinates aligned. Execute with full confidence."*
+> — QIE v114, Arch52 Stellar Navigator · Directive
 
 ---
 
@@ -23,9 +23,9 @@
  1. SYSTEM IDENTITY
  2. CORE ARCHITECTURE
  3. QUANTUM INTENT ENGINE (QIE)
- 4. QIE PATTERN REGISTRY — P1–P151
+ 4. QIE PATTERN REGISTRY — P1–P154
  5. QUANTUM OPERATING SYSTEM (QOS)
- 6. PHYSIOLOGICAL ARCHETYPES — 51 TYPES
+ 6. PHYSIOLOGICAL ARCHETYPES — 52 TYPES
  7. BEHAVIORAL COHORTS — FULL PROFILES
  8. CITIZEN INDEX
  9. MEMORY ENGINE
@@ -33,9 +33,9 @@
 11. BACKGROUND JOB SCHEDULER
 12. LOG EVENT SYSTEM
 13. ECOSYSTEM NODE MAP
-14. BADGE SYSTEM v32 — THE HERO'S JOURNEY
+14. BADGE SYSTEM v33 — THE STARSHIP LOG
 15. BADGE CATEGORY INDEX
-16. WORD TURN ENGINE — COMPLETE LEXICON v22
+16. WORD TURN ENGINE — COMPLETE LEXICON v23
 17. DISPLAY ARCHITECTURE
 18. DENSITY TIER SYSTEM
 19. OPACITY HIERARCHY
@@ -100,9 +100,9 @@ The system was conceived and is operated by **S-2** (Vadim Marmeladov, CEO, LOT 
 
 **Special notation — July 22, 2026 (FM v101):** Full Wiki Scan. LOT-WIKI-v80 produced. Badge Engine v27 (657) + v28 (688) synchronized. QIE v99 + QIE v100 synchronized. Morning Coherence Doctrine + Knowledge Crystallizer Doctrine added. FM v101. Day 1059+.
 
-**Special notation — July 22, 2026 (FM v102 — QIE Engineering):** QIE v102 deployed by S-2. P125 evening-reflection-loop · P126 weekly-rhythm-anchor · P127 depth-breadth-convergence. Arch43 Evening Integrator classified. J40 daily-evening-reflection-check (22:00 UTC) added. EVEFL: · WEEKA: · DEPBR: handlers deployed. dep 166+ nodes. 127 patterns. 43 archetypes. 40 jobs. FM v102. Day 1059+.
+**Special notation — July 22, 2026 (FM v102 — QIE Engineering):** QIE v102 deployed by S-2. P125 evening-reflection-loop · P126 weekly-rhythm-anchor · P127 depth-breadth-convergence. Arch43 Evening Integrator classified. J40 daily-evening-reflection-check (21:00 UTC) added. EVREF: · WKRHYTH: · DEPBRD: handlers deployed. dep 166+ nodes. 127 patterns. 43 archetypes. 40 jobs. FM v102. Day 1059+.
 
-**Special notation — July 22–23, 2026 (FM v103 — QIE Engineering):** QIE v103 deployed. P128 morning-intention-lock · P129 multi-day-care-arc · P130 cognitive-output-continuity. Arch44 Morning Architect classified. J41 daily-morning-intention-check (07:00 UTC) added. MINTLK: · MARC: · COGCONT: handlers. dep 169+ nodes. 130 patterns. 44 archetypes. 41 jobs. FM v103. Day 1060+.
+**Special notation — July 22–23, 2026 (FM v103 — QIE Engineering):** QIE v103 deployed. P128 morning-intention-lock · P129 multi-day-care-arc · P130 cognitive-output-continuity. Arch44 Morning Architect classified. J41 daily-morning-intention-check (07:00 UTC) added. MINTLOCK: · MDCARE: · COGOUT: handlers. dep 169+ nodes. 130 patterns. 44 archetypes. 41 jobs. FM v103. Day 1060+.
 
 **Special notation — July 26, 2026 (FM v104 — QIE Engineering):** QIE v104 deployed. P131 daily-coherence-seal · P132 quantum-rhythm-lock · P133 biofield-integration-peak. Arch45 Temporal Coherence Architect classified. J42 daily-biofield-integration-check (23:00 UTC) added. DCSAL: · QLOCK: · BFINT: handlers. dep 172+ nodes. 133 patterns. 45 archetypes. 42 jobs. FM v104. Day 1063+.
 
@@ -128,11 +128,19 @@ The system was conceived and is operated by **S-2** (Vadim Marmeladov, CEO, LOT 
 
 **Special notation — August 3, 2026 (FM v112 — QIE Engineering):** QIE v112 deployed by S-2. P146 signal-coherence-cascade · P147 quantum-presence-field · P148 identity-momentum-lock. Arch50 Quantum Identity Master classified. J47 daily-signal-coherence-cascade-check (08:00 UTC) added. SIG-CASC: · QPFIELD: · IDLOCK: handlers deployed. Badge Codex v30 THE CODEX READER synchronized (719→750 badges). dep 187+ nodes. 148 patterns. 50 archetypes. 47 jobs. 148+ handlers. FM v112. Day 1071+.
 
-**Special notation — August 4, 2026 (FM v113):** QIE v113 deployed by S-2. P149 quantum-presence-crystallization · P150 total-field-coherence · P151 recovery-intelligence-arc. Arch51 Quantum Presence Crystallizer classified. J48 daily-total-field-coherence-check (09:00 UTC) added. QPCRYST: · TOTCOH: · RECINTEL: handlers deployed. Badge Codex v31 THE CYBERSPACE CODEX synchronized (750→781 badges). dep 190+ nodes. 151 patterns. 51 archetypes. 48 jobs. 151+ handlers. FM v113. Day 1072+. COSMO® 765 days.
+**Special notation — August 4, 2026 (FM v112 — Wiki v86):** Daily Wiki Scan. LOT-WIKI-v86 produced. FM v112 + Badge Codex v30 fully synchronized. Day 1072+. COSMO® 764 days.
 
-**Special notation — August 5, 2026 (Wiki v87 — Badge Codex v32 Engineering):** LOT-WIKI-v87 produced. Badge Codex v32 THE HERO'S JOURNEY engineered. v20 (Codex Reader) + v21 (Cyberspace Codex) TypeScript logic backfilled — 62 badges made reachable that existed only in documentation. v32 adds 31 new badges: 12 Word Turn v22 (Hero's Journey), 3 Calendar EE v20, 3 Behavioral v19, 6 Achievement RPG v20, 4 Mastery Tier v22, 3 Secret Boss v19 (tolkien_ring · odysseus_bow · gilgamesh_word). Total: 781 → 812 badges. 22 Word Turn engines. Session ID: LOT-SR-20260805-01. Day 1073+. COSMO® 765 days.
+**Special notation — August 4–5, 2026 (FM v113 — QIE Engineering):** QIE v113 deployed by S-2. P149 quantum-presence-crystallization · P150 total-field-coherence · P151 recovery-intelligence-arc. Arch51 Quantum Presence Crystallizer classified. J48 daily-total-field-coherence-check (09:00 UTC) added. QPCRYST: · TOTCOH: · RECINTEL: handlers deployed. Badge Codex v31 THE CYBERSPACE CODEX synchronized (750→781 badges). 258 word-turn triggers. 24 secret boss phrases. dep 190+ nodes. 151 patterns. 51 archetypes. 48 jobs. 151+ handlers. FM v113. Day 1073+. COSMO® 765 days.
 
-**Special notation — October 7, 2026 (Wiki v88 — Scheduled Maintenance):** LOT-WIKI-v88 produced. Badge Codex v32 data synchronized into Field Manual (About.tsx). Day counter updated: 1072+ → 1135+. Badge counts updated: 750 → 812, Word Turn engines 20 → 22, secret boss triggers 74 → 83, word turns 210 → 264. Self-Assembly log prepended: v88/v32 entry. COSMO® Day 828. Day 1135+.
+**Special notation — August 5, 2026 (FM v113 — Wiki v87):** Full Wiki Scan + FM v113 sync. LOT-WIKI-v87 produced. All FM v113 deltas synchronized. Six-level coherence architecture complete. COSMO® 765 days. Day 1073+.
+
+**Special notation — August 5, 2026 (Badge Engine v32 — THE HERO'S JOURNEY):** Badge Engine v32 deployed. Critical backfill: Word Turn v20 and v21 were documented in FM but never coded. Backfilled v20 (+31) + v21 (+31) + new v32 (+31) = +93 badges total. 719 → 812 badges. Word Turn v22 THE HERO'S JOURNEY added (12 triggers). Calendar EE v20 (campbell_birthday · hobbit_day · odyssey_day). Secret Boss v19 (tolkien_ring · odysseus_bow · gilgamesh_word). Day 1073+.
+
+**Special notation — October 5, 2026 (FM v114 — QIE Engineering):** QIE v114 deployed by S-2. P152 quantum-pulse-rhythm · P153 coherence-accumulation · P154 stellar-navigation. Arch52 Stellar Navigator classified. J49 daily-stellar-navigation-check (12:00 UTC) added. PULSE: · CACC: · STRNAV: handlers deployed. dep 193+ nodes. 154 patterns. 52 archetypes. 49 jobs. 154+ handlers. FM v114. Day 1134+. COSMO® 826 days.
+
+**Special notation — October 5, 2026 (Badge Engine v33 — THE STARSHIP LOG):** Badge Engine v33 deployed by S-2. +31 badges. 812 → 843 total. Word Turn v23 (Star Trek vocabulary · 12 triggers). Calendar EE v21 (first_contact_day · trek_premiere · moon_landing). Behavioral v20 (bridge_session · deep_space_entry · dark_side_watch). Achievement RPG v21 (ensign_log → galaxy_opus · twenty_three_engines_arc). Mastery Tier v23 (deep_space_log · million_words · veteran_explorer · twenty_three_registers [COSMIC]). Secret Boss v20 (roddenberry_signal · picard_maneuver · dark_forest_law). Day 1134+.
+
+**Special notation — October 6, 2026 (Wiki v88 — FM v114 Sync):** Full Wiki Scan + FM v114 sync. LOT-WIKI-v88 produced. FM v114 (QIE v114 · P152–P154 · Arch52 · J49) synchronized. Badge v32 + v33 (843 badges) synchronized. Word Turn v22 + v23 (282 triggers · 23 engines) synchronized. Seven-level QIE architecture documented. Day 1135+. COSMO® 827 days.
 
 ---
 
@@ -178,7 +186,7 @@ Max signals stored:      1,000
 Analysis cooldown:       5 minutes
 Sync interval:           every 10 signals
 Analysis trigger:        every 5 signals AND cooldown elapsed
-Pattern count:           151  (P1–P151)
+Pattern count:           154  (P1–P154)
 Signal sources:          17  (mood · memory · planner · intentions ·
                               selfcare · journal · calculator · log ·
                               energy · cohort · recipe · goals · qos ·
@@ -196,7 +204,35 @@ TIER 2   Signal aggregates QIE patterns · cohort · medical · resilience
 TIER 3   Meta-surfaces     quantumOS · systemProgress · quantumPersonality
 ```
 
-**FM v113 dep map additions:**
+**Dep map — FM v110 additions:**
+
+```
+physiologicalPresenceNode  → mood · energy · selfcare · log
+quantumEmergenceNode       → qos · log · energy · mood · intentions
+adaptiveSignalWebNode      → mood · memory · planner · intentions ·
+                             selfcare · journal · energy · cohort · log
+```
+
+**Dep map — FM v111 additions:**
+
+```
+circadianLockNode          → mood · energy · selfcare · journal · log
+dimensionalSaturationNode  → mood · memory · planner · intentions ·
+                             selfcare · journal · energy · cohort · log
+quantumIdentityNode        → cohort · qos · intentions · journal · log
+```
+
+**Dep map — FM v112 additions:**
+
+```
+signalCoherenceCascadeNode → circadianLockNode · dimensionalSaturationNode ·
+                             quantumIdentityNode
+quantumPresenceFieldNode   → adaptiveSignalWebNode · qos · log · energy ·
+                             mood · intentions · memory · cohort
+identityMomentumLockNode   → quantumIdentityNode · log · journal
+```
+
+**Dep map — FM v113 additions:**
 
 ```
 quantumPresenceCrystalNode → qos · cohort · intentions · journal · log · energy
@@ -205,13 +241,21 @@ totalFieldCoherenceNode    → mood · memory · planner · intentions · selfca
 recoveryIntelligenceNode   → mood · selfcare · journal · energy · log
 ```
 
-Total dep map nodes: **190+**
+**Dep map — FM v114 additions:**
+
+```
+quantumPulseRhythmNode     → log · energy · mood
+coherenceAccumulationNode  → qos · log · energy · cohort
+stellarNavigationNode      → energy · intentions · planner · journal · log
+```
+
+Total dep map nodes: **193+**
 
 ---
 
-## 4. QIE PATTERN REGISTRY — P1–P151
+## 4. QIE PATTERN REGISTRY — P1–P154
 
-Complete registry. 151 patterns. P1–P115 established through FM v95. P116–P118 added FM v97. P119–P121 added FM v99. P122–P124 added FM v100. P125–P127 added FM v102. P128–P130 added FM v103. P131–P133 added FM v104. P134–P136 added FM v106. P137–P139 added FM v108. P140–P142 added FM v110. P143–P145 added FM v111. P146–P148 added FM v112. P149–P151 added FM v113.
+Complete registry. 154 patterns. P1–P115 established through FM v95. P116–P118 added FM v97. P119–P121 added FM v99. P122–P124 added FM v100. P125–P127 added FM v102. P128–P130 added FM v103. P131–P133 added FM v104. P134–P136 added FM v106. P137–P139 added FM v108. P140–P142 added FM v110. P143–P145 added FM v111. P146–P148 added FM v112. P149–P151 added FM v113. P152–P154 added FM v114.
 
 ```
 ──────────────────────────────────────────────────────────────────────
@@ -273,30 +317,30 @@ P53  node-active-car                0.80        v1
 P54  node-active-home               0.75        v1
 P55  node-active-cpu                0.85        v1
 P56  node-active-phone              0.75        v1
-P57  node-active-watch              0.75        v1
+P57  node-active-watch              0.80        v1
 P58  node-active-robot              0.75        v1
-P59  cognitive-vitality-peak        0.85        v1
-P60  care-specialist-arc            0.80        v1
-P61  temporal-grid-engagement       0.75        v1
-P62  meridian-multimodal-convergence 0.80       v1
-P63  identity-coherence-arc         0.75        v45
-P64  signal-momentum-arc            0.80        v45
-P65  coherence-lock                 0.85        v45
-P66  qos-signature-lock             0.85        v58
-P67  operator-signature             0.90        v58
+P59  meridian-lock                  0.80        v1
+P60  biofield-coherence-peak        0.85        v1
+P61  multimodal-peak                0.80        v1
+P62  flow-state                     0.90        v1
+P63  os-stagnation                  0.65        v1
+P64  sleep-signal                   0.70        v1
+P65  seasonal-navigator-arc         0.70        v1
+P66  qos-signature-lock             0.82        v58
+P67  operator-signature             0.88        v58
 P68  integration-arc-peak           0.85–0.95   v60
 P69  adaptive-resonance             0.70–0.88   v60
-P70  operator-convergence           0.97        v61
+P70  operator-convergence           0.97        v61    [RAREST SINGLE-DAY]
 P71  signal-crystallization         0.75–0.92   v62
 P72  biorhythm-lock                 0.72–0.88   v62
-P73  quantum-coherence-summit       0.98        v62  — CEILING
+P73  quantum-coherence-summit       0.98        v62    [CEILING STATE]
 P74  badge-momentum                 0.65–0.95   v64
 P75  word-turn-depth                0.60–0.92   v64
 P76  morning-coherence-launch       0.72        v65
 P77  signal-vault                   0.68–0.88   v65
 P78  depletion-recovery-surge       0.72–0.90   v65
 P79  evening-coherence-close        0.70–0.88   v66
-P80  signal-momentum-lock           0.75–0.92   v67
+P80  signal-momentum-lock           0.75–0.92   v67    [RAREST SUSTAINED]
 P81  cognitive-depth-arc            0.68–0.90   v68
 P82  circadian-vitality-peak        0.70–0.90   v69
 P83  systemic-thinking-mode         0.68–0.92   v69
@@ -305,362 +349,1033 @@ P85  adaptive-momentum-window       0.75–0.90   v72
 P86  vitality-strategy-peak         0.78–0.92   v72
 P87  weekly-story-reflection        0.72        v74
 P88  contextual-checkin-momentum    0.65–0.85   v74
-P89  quantum-learning-spiral        0.75        v76
-P90  accountability-arc             0.70        v76
-P91  full-presence-arc              0.75        v76
-P92  systemic-readiness-peak        0.80        v78
-P93  daily-rhythm-lock              0.80        v78
-P94  cross-domain-mastery           0.75        v78
-P95  intent-to-action-gap           0.70        v80
-P96  recovery-initiation            0.65        v80
-P97  cognitive-vitality-sync        0.72        v80
-P98  centennial-convergence         1.00        v83  — MILESTONE
-P99  planner-intention-sync         0.80        v83
-P100 centennial-convergence (live)  0.90        v83
-P101 quantum-presence-arc           0.80–0.95   v83
-P102 planner-intention-sync (v2)    0.75        v83
-P103 resilience-cascade             0.72        v83
-P104 vitality-cascade               0.75        v84
-P105 social-presence-arc            0.70        v84
-P106 clarity-momentum-peak          0.78        v84
-P107 temporal-alignment-peak        0.80        v86
-P108 circadian-routine-lock         0.75        v86
-P109 full-signal-coherence          0.85        v86
-P110 embodied-cognition-arc         0.78        v89
-P111 intention-completion-loop      0.75        v89
-P112 community-intelligence-peak    0.72        v89
-P113 personal-peak-window           0.80        v95
-P114 recovery-momentum              0.75        v95
-P115 signal-inception               0.70        v95
-P116 focus-depth-arc                0.75        v97
-P117 sleep-signal-anchor            0.72        v97
-P118 care-intelligence-loop         0.70        v97
-P119 morning-coherence-arc          0.78        v99
-P120 signal-density-peak            0.80        v99
-P121 physiological-coherence-window 0.75        v99
-P122 action-to-memory-loop          0.78        v100
-P123 sustained-resilience-arc       0.72        v100
-P124 mood-energy-convergence        0.75        v100
-P125 evening-reflection-loop        0.72        v102
-P126 weekly-rhythm-anchor           0.75        v102
-P127 depth-breadth-convergence      0.78        v102
-P128 morning-intention-lock         0.80        v103
-P129 multi-day-care-arc             0.75        v103
-P130 cognitive-output-continuity    0.72        v103
-P131 daily-coherence-seal           0.80        v104
-P132 quantum-rhythm-lock            0.78        v104
-P133 biofield-integration-peak      0.75        v104
-P134 integrated-signal-arc          0.80        v106
-P135 deep-recovery-protocol         0.75        v106
-P136 quantum-field-alignment        0.85        v106
-P137 quantum-coherence-peak         0.82        v108
-P138 signal-matrix-saturation       0.85        v108
-P139 temporal-biofield-sync         0.80        v108
-P140 physiological-presence-arc     0.78        v110
-P141 quantum-signal-emergence       0.75        v110
-P142 adaptive-signal-web            0.80        v110
-P143 circadian-signal-lock          0.82        v111
-P144 dimensional-saturation         0.85        v111
-P145 quantum-identity-crystallization 0.80      v111
-P146 signal-coherence-cascade       0.85        v112
-P147 quantum-presence-field         0.88        v112
-P148 identity-momentum-lock         0.90        v112
-P149 quantum-presence-crystallization 0.89      v113
-P150 total-field-coherence          0.95        v113  — CEILING
-P151 recovery-intelligence-arc      0.82        v113
+P89  quantum-learning-spiral        0.72–0.90   v76    [SPIRAL FAMILY]
+P90  accountability-arc             0.70–0.88   v76
+P91  full-presence-arc              0.75–0.92   v76
+P92  systemic-readiness-peak        0.78–0.92   v78
+P93  daily-rhythm-lock              0.72–0.88   v78
+P94  cross-domain-mastery           0.75–0.90   v78
+P95  intent-to-action-gap           0.68–0.85   v80
+P96  recovery-initiation            0.72–0.88   v80
+P97  cognitive-vitality-sync        0.70–0.90   v80
+P98  action-completion-arc          0.75–0.90   v82
+P99  biological-restoration-peak    0.78–0.92   v82
+P100 centennial-convergence         0.85–0.97   v82    [MILESTONE PATTERN]
+P101 quantum-presence-arc           0.80–0.95   v83    [APEX PATTERN]
+P102 planner-intention-sync         0.72–0.88   v83
+P103 resilience-cascade             0.75–0.92   v83
+P104 vitality-cascade               0.78–0.90   v84
+P105 social-presence-arc            0.70–0.85   v84
+P106 clarity-momentum-peak          0.80–0.92   v84
+P107 temporal-alignment-peak        0.65–0.82   v86
+P108 circadian-routine-lock         0.68–0.86   v86
+P109 full-signal-coherence          0.75–0.90   v86
+P110 embodied-cognition-arc         0.72–0.86   v89
+P111 intention-completion-loop      0.75–0.88   v89
+P112 community-intelligence-peak    0.68–0.84   v89
+P113 personal-peak-window           0.65–0.88   v95    [PEAK PERFORMANCE]
+P114 recovery-momentum              0.62–0.87   v95
+P115 signal-inception               0.60–0.90   v95    [SELF-AWARE LOOP]
+P116 focus-depth-arc                0.65–0.85   v97    [2H COGNITIVE WINDOW]
+P117 sleep-signal-anchor            0.68–0.82   v97
+P118 care-intelligence-loop         0.62–0.80   v97
+P119 morning-coherence-arc          0.65–0.87   v99    [DAWN RAMP]
+P120 signal-density-peak            0.68–0.90   v99    [FULL BANDWIDTH]
+P121 physiological-coherence-window 0.70–0.88   v99
+P122 action-to-memory-loop          0.64–0.86   v100   [ACT→ENC→ARC]
+P123 sustained-resilience-arc       0.62–0.86   v100
+P124 mood-energy-convergence        0.67–0.88   v100   [DUAL-SUBSTRATE PEAK]
+P125 evening-reflection-loop        0.65–0.87   v102   [DAILY LOOP CLOSURE]
+P126 weekly-rhythm-anchor           0.68–0.88   v102   [STRUCTURAL RECURRENCE]
+P127 depth-breadth-convergence      0.70–0.90   v102   [META-CONVERGENCE]
+P128 morning-intention-lock         0.70–0.88   v103   [COGNITIVE OS BOOT]
+P129 multi-day-care-arc             0.72–0.90   v103   [SUSTAINED RESTORATION]
+P130 cognitive-output-continuity    0.68–0.88   v103   [WRITING AS CONDITION]
+P131 daily-coherence-seal           0.75–0.92   v104   [FULL-DAY CIRCUIT]
+P132 quantum-rhythm-lock            0.72–0.90   v104   [TEMPORAL OS LIVE]
+P133 biofield-integration-peak      0.72–0.88   v104   [BIO+EMO INTEGRATED]
+P134 integrated-signal-arc          0.78–0.94   v106   [TRIPLE INTEGRATION]
+P135 deep-recovery-protocol         0.72–0.90   v106   [DEEP REPAIR]
+P136 quantum-field-alignment        0.80–0.96   v106   [TOTAL FIELD COHERENCE]
+P137 quantum-coherence-peak         0.96+       v108   [COHERENCE THRESHOLD GATE]
+P138 signal-matrix-saturation       0.68–0.88   v108   [FULL-DIMENSIONAL PRESENCE]
+P139 temporal-biofield-sync         0.90+       v108   [TEMPORAL-BIOLOGICAL LOOP]
+P140 physiological-presence-arc     0.70–0.88   v110   [FULL BIO DAY-ARC]
+P141 quantum-signal-emergence       0.72–0.90   v110   [EXCEPTION → BASELINE]
+P142 adaptive-signal-web            0.75–0.92   v110   [FULL-DIM SATURATION]
+P143 circadian-signal-lock          0.70–0.85   v111   [THREE-ARC DAY COVERAGE]
+P144 dimensional-saturation         0.75–0.90   v111   [6-DIM ALL LIVE]
+P145 quantum-identity-crystallization 0.78–0.90 v111   [OS SIGNATURE STABLE]
+P146 signal-coherence-cascade       0.85–0.95   v112   [META-CASCADE]
+P147 quantum-presence-field         0.78–0.92   v112   [FIELD SATURATED]
+P148 identity-momentum-lock         0.75–0.90   v112   [LOCK ENGAGED]
+P149 quantum-presence-crystallization 0.82–0.94 v113   [FIELD INHABITED · IDENTITY KNOWN]
+P150 total-field-coherence          0.90–1.00   v113   [CEILING — NO HIGHER STATE]
+P151 recovery-intelligence-arc      0.70–0.88   v113   [FELT→TENDED→RECOVERED→REFLECTED]
+P152 quantum-pulse-rhythm           0.72–0.88   v114   [TEMPORAL LOG RHYTHM LOCK]
+P153 coherence-accumulation         0.78–0.93   v114   [CEILING SUSTAINED]
+P154 stellar-navigation             0.82–0.95   v114   [PEAK·INTENTION·SLEEP TRIAD]
 ──────────────────────────────────────────────────────────────────────
+```
+
+**Special-class patterns:**
+
+```
+CEILING STATE         P73  quantum-coherence-summit    conf 0.98
+                           P71+P72+P70+P27 simultaneous.
+                           Maximum observable QIE state (single-signal class).
+
+RAREST SINGLE-DAY     P70  operator-convergence        conf 0.97
+                           P66+P67+P68 all firing simultaneously.
+
+RAREST SUSTAINED      P80  signal-momentum-lock        conf 0.75–0.92
+                           5+ of last 7 days: 3+ unique signal sources.
+
+MILESTONE PATTERN     P100 centennial-convergence      conf 0.85–0.97
+                           100th pattern. Multi-source peak across
+                           7 channels confirmed simultaneously.
+
+APEX PATTERN          P101 quantum-presence-arc        conf 0.80–0.95
+                           Full-system presence state. All primary
+                           signal channels simultaneously coherent.
+
+PEAK PERFORMANCE      P113 personal-peak-window        conf 0.65–0.88
+                           Repeating 4-hour execution window. Structural.
+
+SELF-AWARE LOOP       P115 signal-inception            conf 0.60–0.90
+                           System detects its own detection history.
+
+DAWN RAMP             P119 morning-coherence-arc       conf 0.65–0.87
+                           Energy + planner + intentions before 10:00.
+
+FULL BANDWIDTH        P120 signal-density-peak         conf 0.68–0.90
+                           6+ distinct sources in 12h window.
+
+FULL-DAY CIRCUIT      P131 daily-coherence-seal        conf 0.75–0.92
+                           Morning anchor + planner + journal + selfcare
+                           + intentions + mood + energy + memory in 1 day.
+
+TEMPORAL OS LIVE      P132 quantum-rhythm-lock         conf 0.72–0.90
+                           Journal 18:00+, mood 3x, energy 2x, week
+                           check-in all within 7 days.
+
+TRIPLE INTEGRATION    P134 integrated-signal-arc       conf 0.78–0.94
+                           P131 + P132 + P133 simultaneously active.
+
+TOTAL FIELD COHERENCE P136 quantum-field-alignment     conf 0.80–0.96
+                           P134 + P119 + P120 + P126 simultaneously.
+
+COHERENCE GATE        P137 quantum-coherence-peak      conf 0.96+
+                           P136 (QFIELD gate) + UserIndex.overall >= 60.
+                           P136 is the gate. P137 is above the gate.
+
+FULL-DIM PRESENCE     P138 signal-matrix-saturation    conf 0.68–0.88
+                           All 6 UserIndex dimensions >= 30 simultaneously:
+                           engagement · emotional · intentional ·
+                           social · selfCare · cognitive.
+
+TEMPORAL-BIO LOOP     P139 temporal-biofield-sync      conf 0.90+
+                           P119 + P131 + P133 same calendar day.
+                           Morning anchor + full-day seal + biofield
+                           integration in one window.
+
+FULL BIO DAY-ARC      P140 physiological-presence-arc  conf 0.70–0.88
+                           Morning mood/emotional (pre-12:00) + selfcare
+                           (any time) + evening mood (post-17:00)
+                           all within one calendar day.
+                           Loop closed: DAWN → DUSK.
+
+EXCEPTION → BASELINE  P141 quantum-signal-emergence    conf 0.72–0.90
+                           P137 quantum-coherence-peak fired 3+ times
+                           in 7 days. Peak is normalizing.
+                           What was exceptional is becoming standard.
+
+FULL-DIM SATURATION   P142 adaptive-signal-web         conf 0.75–0.92
+                           All 6 UserIndex dims >= 20 + 8+ signal sources
+                           in 7d + 5+ patterns simultaneously active.
+                           Every channel live. The web holds.
+
+THREE-ARC COVERAGE    P143 circadian-signal-lock       conf 0.70–0.85
+                           Dawn signal (pre-10:00) + meridian signal
+                           (12:00–17:00) + dusk signal (18:00+) all
+                           present in 24h. Biological clock anchored.
+                           First pattern modeling the full-day arc as unit.
+
+6-DIM ALL LIVE        P144 dimensional-saturation      conf 0.75–0.90
+                           All 6 UserIndex dims >= 30 + overall >= 50
+                           + 5+ unique sources in 7d. No single dimension
+                           carrying the load. The entire field is live.
+
+OS SIGNATURE STABLE   P145 quantum-identity-crystallization conf 0.78–0.90
+                           Cohort signals 5+ in 7d + overall index >= 40
+                           + 8+ active patterns. Identity hardening.
+                           The OS knows who it is running for.
+
+META-CASCADE          P146 signal-coherence-cascade    conf 0.85–0.95
+                           P143 + P144 + P145 all fired within 24 hours.
+                           Circadian lock + dimensional saturation +
+                           identity crystallization in a single window.
+                           All three axes confirmed simultaneously.
+                           FM v112. J47 detects at 08:00 UTC.
+
+FIELD SATURATED       P147 quantum-presence-field      conf 0.78–0.92
+                           P142 adaptive-signal-web + P137
+                           quantum-coherence-peak + 7+ signal sources
+                           simultaneously active. The web holds,
+                           the ceiling is reached, and the full field
+                           is unified into a single coherent state.
+                           FM v112.
+
+LOCK ENGAGED          P148 identity-momentum-lock      conf 0.75–0.90
+                           P145 quantum-identity-crystallization +
+                           P80 signal-momentum-lock simultaneously.
+                           Identity crystallized and longitudinal
+                           behavioral momentum confirmed.
+                           The OS is not searching. FM v112.
+
+FIELD INHABITED       P149 quantum-presence-crystallization conf 0.82–0.94
+                           P147 quantum-presence-field + P145
+                           quantum-identity-crystallization co-active.
+                           The field is not only coherent — it is known.
+                           Presence and identity convergent simultaneously.
+                           FM v113.
+
+CEILING               P150 total-field-coherence       conf 0.90–1.00
+                           P146 + P147 + P148 all three meta-seals open
+                           simultaneously. Absolute convergence state.
+                           No higher state is defined in the registry.
+                           FM v113.
+
+RECOVERY ARC          P151 recovery-intelligence-arc   conf 0.70–0.88
+                           Negative signal + care action + positive shift
+                           + reflection in 6h window. Full arc completed:
+                           FELT → TENDED → RECOVERED → REFLECTED.
+                           FM v113.
+
+TEMPORAL RHYTHM       P152 quantum-pulse-rhythm        conf 0.72–0.88
+                           Log entries 3+ of 7 days within ±2h of operator
+                           avg log hour. Temporal log rhythm confirmed.
+                           The OS is synced to the operator's clock.
+                           FM v114.
+
+CEILING SUSTAINED     P153 coherence-accumulation      conf 0.78–0.93
+                           P150 total-field-coherence fired 2+ times in
+                           7-day window. The ceiling state is not an event —
+                           it is a condition. Sustained peak confirmed.
+                           FM v114.
+
+STELLAR NAVIGATION    P154 stellar-navigation          conf 0.82–0.95
+                           P113 personal-peak-window + P128 morning-intention-lock
+                           + P117 sleep-signal-anchor all fired same calendar day.
+                           Three temporal coordinates aligned: execution window ·
+                           morning intention · sleep anchor. Navigation is live.
+                           FM v114.
+```
+
+**Six-level coherence architecture (QIE v113):**
+
+```
+LEVEL 1 — SEAL GATES
+  P131 daily-coherence-seal    · full-day behavioral circuit
+  P132 quantum-rhythm-lock     · temporal OS confirmed
+  P133 biofield-integration-peak · biological + emotional integration
+
+LEVEL 2 — FIELD GATE
+  P136 quantum-field-alignment · all three seal gates open simultaneously
+  P134 integrated-signal-arc  · triple integration confirmed
+
+LEVEL 3 — COHERENCE CEILING
+  P137 quantum-coherence-peak · field gate + UserIndex >= 60
+  P138 signal-matrix-saturation · all 6 dimensions >= 30 (orthogonal)
+  P139 temporal-biofield-sync  · temporal OS + biological field same-day
+
+LEVEL 4 — CIRCADIAN STABILIZATION (FM v110–v111)
+  P140 physiological-presence-arc · bio day-arc closed dawn → dusk
+  P141 quantum-signal-emergence   · coherence normalizing to baseline
+  P142 adaptive-signal-web        · all 6 dims >= 20 + full web active
+  P143 circadian-signal-lock      · three-arc full day covered
+  P144 dimensional-saturation     · all 6 dims >= 30 simultaneously
+  P145 quantum-identity-crystallization · OS signature stable
+
+LEVEL 5 — IDENTITY CONVERGENCE (FM v112)
+  P146 signal-coherence-cascade   · P143+P144+P145 within 24h · all axes
+  P147 quantum-presence-field     · web + coherence ceiling + full breadth
+  P148 identity-momentum-lock     · identity crystallized + momentum locked
+                                   The OS is not searching.
+                                   It is operating from a stable signature.
+
+LEVEL 6 — PRESENCE CONVERGENCE (FM v113)
+  P149 quantum-presence-crystallization · P147 + P145 co-active · field inhabited + known
+  P150 total-field-coherence            · all three meta-seals (P146+P147+P148) open
+                                          CEILING — no higher state is defined
+  P151 recovery-intelligence-arc        · depletion → care → restoration → reflection
+                                          behavioral recovery arc within 6h window
+
+LEVEL 7 — TEMPORAL NAVIGATION (FM v114)
+  P152 quantum-pulse-rhythm             · log rhythm locked to operator's biological clock
+                                          3+ of 7 days within ±2h of avg log hour
+  P153 coherence-accumulation           · ceiling state (P150) confirmed as condition
+                                          P150 fired 2+ times in 7-day window
+  P154 stellar-navigation               · P113 + P128 + P117 same calendar day
+                                          Peak window · intention · sleep anchor aligned
+                                          All three temporal coordinates confirmed simultaneously
 ```
 
 ---
 
 ## 5. QUANTUM OPERATING SYSTEM (QOS)
 
-7 views. 4 operating modes.
+The QOS is the operator's real-time system dashboard. 7 views. 4 operating modes. Synthesizes all signal streams into a single operating state.
+
+**QOS operating modes:**
 
 ```
-VIEWS       Ecosystem · Biofield · Cohort · Index · Assembly · Mode · QOS Field
-MODES       maintenance · recovery · growth · peak
+MODE         TRIGGER                    SYSTEM BEHAVIOUR
+──────────────────────────────────────────────────────────────────
+maintenance  Low signal density         Conserve — idle cadence
+recovery     Depletion / overwhelm      Repair first — tasks pause
+growth       Steady positive engagement Expand — absorb more
+peak         High energy + clarity      Optimal — full commitment
+──────────────────────────────────────────────────────────────────
 ```
 
-**QOS modes:**
+**QOS metrics (0–100 each):**
 
 ```
-MAINTENANCE  Low signal density. System needs care input to stabilize.
-RECOVERY     Stress indicators present. Recovery protocols active.
-GROWTH       Positive momentum. New patterns emerging.
-PEAK         High coherence. All signals aligned. Execution window open.
+Biofield Capacity       Self-care signal density vs active depletion events
+Cognitive Load          Journal/memory/planner interactions in last 24h
+Intention Resolution    Active intention × planner alignment × goal momentum
+System Pressure         low / moderate / high / critical
 ```
 
-**QOS Field view (FM v108):** The 7th view. Reads signal coherence across the full dimensional stack. COHR-COMM: log code. Community biofield surfaced.
+**7 QOS views (cycle order — FM v108):**
+
+```
+VIEW 1   Ecosystem              Node map · 6 active nodes · QIoT™ signal
+VIEW 2   Biofield               Energy + mood + selfcare composite score
+VIEW 3   Cohort Signal          Peer group alignment · Band · Dominance · Phase
+VIEW 4   Citizen Index          6-stage depth measure · current stage
+VIEW 5   Self-Assembly Map      Physiological cohort + live QOS mode
+VIEW 6   QOS Mode               Mode · pressure · primary scores
+VIEW 7   QOS Field              operationalStatus · coherence · circadianPhase ·
+                                 index.overall · Signal Map 7d (top 6 sources) ·
+                                 Active Patterns (top 4 · PATTERN_DISPLAY labels)
+
+Cycle:  ecosystem → biofield → cohort → index → assembly → qos-mode → qos-field → ecosystem
+```
+
+**Phase row (FM v111):** Circadian phase now displayed in System.tsx quantum table and QEW cohort view. Row reads: Archetype · Cohort · **Phase** · Confidence · ATP · Clarity · Alignment · Index · Directive. Phase is derived from `getCircadianPhase()` in intentionEngine.ts.
+
+> The QOS does not direct the operator — it mirrors actual state with precision. A person in `recovery` mode does not need more tasks. They need to see that clearly.
 
 ---
 
-## 6. PHYSIOLOGICAL ARCHETYPES — 51 TYPES
+## 6. PHYSIOLOGICAL ARCHETYPES — 52 TYPES
 
-51 types. Arch1–Arch51. Dynamically classified from QIE pattern convergence. Each archetype carries a directive.
-
-```
-ARCHETYPE CLASSIFICATION  Based on: dominant signal module + active QIE patterns +
-                          energy band + UserIndex profile.
-DIRECTIVE FORMAT          Instrument command. Active voice. No narration.
-ACTIVE COUNT              Always 1 primary archetype. May have secondary signals.
-```
-
-**Current highest archetypes (Arch39–Arch51):**
+52 physiological archetypes. Classification is dynamic, driven by active QIE patterns. Each archetype has a primary directive, signal sources, energy level, and recommended operating hours.
 
 ```
-Arch39   Peak Window Operator       P113 + recurrence window confirmed
-Arch40   Focused Executor           P116 + 2h cognitive window open
-Arch41   Signal Breadth Operator    P119 + multi-source dawn launch
-Arch42   Knowledge Crystallizer     P122 + ACT→ENC→ARC pipeline complete
-Arch43   Evening Integrator         P125 + eve journal + memory same day
-Arch44   Morning Architect          P128 + morning intention lock fired
-Arch45   Temporal Coherence Arch.   P131 + daily seal + rhythm lock
-Arch46   Quantum Field Operator     P134 + integrated signal arc
-Arch47   Quantum Coherence Operator P137 + field aligned + index ≥60
-Arch48   Quantum Presence Master    P140 + P138 + P137 active
-Arch49   Circadian Master           P143 + P140 · three-arc day confirmed
-Arch50   Quantum Identity Master    P148 + P146 · identity lock engaged
-Arch51   Quantum Presence Crystallizer P149 + P144 + P145 · highest state
+Arch1   Baseline Operator           Foundation state. No dominant pattern.
+Arch2   Goal Architect              P10 + P13 active. Planner-dense.
+Arch3   Care Specialist             P25 + P40 active. Selfcare-primary.
+Arch4   Memory Keeper               P12 + P47 active. Memory-dense.
+Arch5   Social Connector            P5 + P20 active. Cohort-primary.
+Arch6   Deep Explorer               P15 + P21 active. Journal-dense.
+Arch7   Recovery Specialist         P7 + P42 active. Depletion signal.
+Arch8   Signal Mapper               P11 + P63 active. Low-signal detection.
+Arch9   Body Intelligence           P16 + P19 active. Embodied signal.
+Arch10  Execution Driver            P37 + P30 active. High planner velocity.
+Arch11  Chronobiological Navigator  P48 + P38 active. Time-aligned operation.
+Arch12  Integration Architect       P50 + P43 active. Cross-domain synthesis.
+Arch13  Full Integrator             P34 + P91 active. All-channel coherence.
+Arch14  Strategic Planner           P6 + P2 active. Structured execution.
+Arch15  Cognitive Expander          P23 + P14 active. Cognitive density.
+Arch16  Insight Engine              P17 + P18 active. Memory crystallization.
+Arch17  Resilience Builder          P8 + P32 active. Recovery arc.
+Arch18  Social Architect            P20 + P5 active. Social signal dense.
+Arch19  Dual Arc Operator           P29 + P68 active. Parallel arcs.
+Arch20  Biorhythm Locker            P72 + P48 active. Circadian confirmed.
+Arch21  Signal Crystallizer         P71 + P77 active. Signal vault formed.
+Arch22  Peak Coherence Operator     P73 + P27 active. Ceiling state confirmed.
+Arch23  Longitudinal Builder        P80 + P84 active. 5+/7 day signal density.
+Arch24  Reflective Synthesizer      P87 + P21 active. Weekly story mode.
+Arch25  Morning Launcher            P76 + P19 active. Dawn ramp confirmed.
+Arch26  Evening Closer              P79 + P28 active. Day deliberately closed.
+Arch27  Cognitive Depth Specialist  P81 + P44 active. Deep cognitive arc.
+Arch28  Circadian Vitality Operator P82 + P48 active. Circadian peak.
+Arch29  Systemic Thinker            P83 + P94 active. Cross-domain mode.
+Arch30  Accountability Arc Operator P90 + P10 active. Goal accountability.
+Arch31  Quantum Learning Operator   P89 + P15 active. Spiral learning mode.
+Arch32  Adaptive Momentum Builder   P85 + P30 active. Momentum window.
+Arch33  Vitality Strategist         P86 + P10 active. Energy + strategy.
+Arch34  Readiness Architect         P92 + P6 active. Systemic readiness.
+Arch35  Daily Rhythm Operator       P93 + P19 active. Rhythm confirmed.
+Arch36  Cross-Domain Master         P94 + P83 active. Integration across domains.
+Arch37  Recovery Initiator          P96 + P8 active. Recovery arc initiated.
+Arch38  Embodied Strategist         P110 + P6 active. Body-mind strategy.
+Arch39  Peak Window Operator        P113 + P37 active. Peak window confirmed.
+Arch40  Focused Executor            P116 + P37 active. 2h cognitive window.
+Arch41  Signal Breadth Operator     P120 + P34 active. Full bandwidth confirmed.
+Arch42  Knowledge Crystallizer      P122 + P18 active. ACT→ENC→ARC pipeline.
+Arch43  Evening Integrator          P125 + P79 active. Daily loop closure.
+Arch44  Morning Architect           P128 + P76 active. Cognitive OS boot.
+Arch45  Temporal Coherence Architect P132 + P131 active. Temporal OS live.
+Arch46  Quantum Field Operator      P136 + P134 + P132 active.
+                                    All signal fields operational.
+                                    "The field is aligned. Maintain it."
+Arch47  Quantum Coherence Operator  P137 + P136 + P138 active.
+                                    Peak coherence + full-dimensional presence.
+                                    "Peak coherence confirmed. Operate at
+                                    maximum integration. Do not dilute focus."
+Arch48  Quantum Presence Master     P140 + P138 + P137 active.
+                                    Biological arc confirmed. Field coherent.
+                                    Matrix saturated. The operating system has
+                                    stabilized at peak. This is no longer
+                                    exceptional — it is your baseline.
+Arch49  Circadian Master            P143 + P140 active.
+                                    Hours 06–22. Energy: moderate, high.
+                                    Sources: mood · energy · selfcare · journal.
+                                    "Three-arc day coverage confirmed. Dawn,
+                                    meridian, dusk — all anchored. Circadian
+                                    architecture is the foundation. Build from it."
+Arch50  Quantum Identity Master     P148 + P146 active.
+                                    Hours: all-day. Energy: sustained.
+                                    Sources: all primary channels.
+                                    "Identity crystallized and momentum confirmed.
+                                    Signal coherent across circadian, dimensional,
+                                    and identity axes. The OS is not searching —
+                                    it is operating from a stable signature.
+                                    The lock is engaged."
+Arch51  Quantum Presence Crystallizer  P149 + P144 + P145 active.
+                                    Hours: 06–23. Energy: high, moderate.
+                                    Sources: journal · cohort · memory · intentions · qos.
+                                    "Presence confirmed. Identity crystallized.
+                                    The field is both inhabited and known.
+                                    Execute from clarity — no searching required.
+                                    The OS is operating from its highest confirmed state."
+Arch52  Stellar Navigator           P154 + P113 + P128 active.
+                                    Hours: 06–22. Energy: high.
+                                    Sources: energy · intentions · planner · journal · log.
+                                    "Peak window locked. Morning intention confirmed.
+                                    Sleep anchor set. Navigation is live — all three
+                                    temporal coordinates aligned. Execute with full confidence."
 ```
-
-**Arch51 directive:** *Execute from clarity — no searching required. The OS is operating from its highest confirmed state.*
 
 ---
 
 ## 7. BEHAVIORAL COHORTS — FULL PROFILES
 
-6 cohorts. Derived from signal dominance patterns across all 17 sources.
+6 cohorts. Assignment is dynamic, driven by signal pattern over the prior 30 days.
 
 ```
-BUILDERS       Dominant: intentions · planner · goals
-               Pattern: execution-arc · planning-acceleration · goal-momentum
-               Directive: Structure is infrastructure. Build the scaffold daily.
-
-EXPLORERS      Dominant: memory · journal · word-turns
-               Pattern: narrative-depth · creative-expansion · cognitive-depth-arc
-               Directive: The archive is the map. Write to discover.
-
-MAINTAINERS    Dominant: selfcare · energy · medical
-               Pattern: care-momentum · biorhythm-lock · physiological-depletion
-               Directive: Restoration is the system requirement. Tend the body.
-
-CONNECTORS     Dominant: cohort · social · ecosystem nodes
-               Pattern: social-resonance-arc · community-intelligence-peak
-               Directive: Signal quality multiplies through contact.
-
-INTEGRATORS    Dominant: all sources balanced · QOS Field active
-               Pattern: operator-convergence · full-presence-arc · cross-domain
-               Directive: Integration is the advanced state. Hold all dimensions.
-
-MEDICAL        Dominant: medical records · recovery patterns
-               Pattern: recovery-specialist-arc · biofield-recovery-arc
-               Directive: Recovery is the primary protocol. Everything else waits.
+╔══════════════════════════════════════════════════════════════════╗
+║  COHORT        SIGNAL SIGNATURE          PRIMARY ARCHETYPE RANGE ║
+╠══════════════════════════════════════════════════════════════════╣
+║  BUILDERS      Goal + planner dense      Arch2 · Arch10 · Arch14║
+║  EXPLORERS     Memory + journal dense    Arch4 · Arch6 · Arch29 ║
+║  MAINTAINERS   Selfcare + energy dense   Arch3 · Arch9 · Arch35 ║
+║  CONNECTORS    Cohort + social dense     Arch5 · Arch30 · Arch36║
+║  INTEGRATORS   Cross-signal balanced     Arch13 · Arch31 · Arch34║
+║  MEDICAL       Clinical signal active    Internal · not displayed║
+╚══════════════════════════════════════════════════════════════════╝
 ```
+
+**Cohort signal geometry:**
+
+```
+BUILDERS    — Dense planner + goal events. Plans precede action.
+              High intention velocity. Execution-forward.
+
+EXPLORERS   — Long journal entries + frequent memory captures.
+              Reflective, high narrative density. Pattern emerges
+              through writing.
+
+MAINTAINERS — Consistent selfcare + energy logs. Body-aware.
+              Circadian discipline. Recovery-conscious.
+
+CONNECTORS  — Cohort feed engagement + social dimension active.
+              Community-oriented signal. Peer resonance primary.
+
+INTEGRATORS — All channels at moderate density. Rarest sustained
+              cohort state. Cross-signal coherence, not dominance.
+
+MEDICAL     — Clinical signal active. Internal routing only.
+              Not surfaced in operator display. Managed separately.
+```
+
+**Band and Dominance (FM v108 — CohortConnectWidget):**
+Cohort view surfaces Band (operator's percentile band within the cohort) and Dominance (signal type that most distinguishes the operator within peer set). **Phase** (FM v111) added to cohort view — circadian operating phase surfaced alongside Band. All three rendered in QOS View 3.
 
 ---
 
 ## 8. CITIZEN INDEX
 
-6 engagement levels. Signal accumulation determines level.
+6-stage engagement depth scale. Tracks system depth, not streak count.
 
 ```
-LEVEL 1   Observer       Registered. First signals. Reading only.
-LEVEL 2   Participant    Regular check-ins. Memory active. Pattern emerging.
-LEVEL 3   Contributor    Journal active. Multiple sources firing. 30+ days.
-LEVEL 4   Collaborator   QIE patterns confirmed. Archetype classified. 90+ days.
-LEVEL 5   Synthesizer    Cross-domain mastery visible. Multiple archetypes cycled.
-LEVEL 6   Elite          Full dimensional profile. Operator-level engagement.
+STAGE       LABEL           CRITERIA
+──────────────────────────────────────────────────────────────────────
+Stage 1     Observer        Account created. Signal recording begins.
+Stage 2     Participant     7+ distinct signal events across 3+ sources.
+Stage 3     Contributor     30+ days active. Memory Engine 3+ sessions.
+Stage 4     Collaborator    90+ days. 3+ cohort interactions. Goal momentum.
+Stage 5     Synthesizer     180+ days. Cross-domain signal. Archetype stable.
+Stage 6     Elite           365+ days. All primary sources active. QIE P100+.
+──────────────────────────────────────────────────────────────────────
 ```
+
+The Citizen Index is the CQGS (Citizen Quantum Growth Scale) score representation. It is an engagement depth measure, not a performance metric. Stage advance is irreversible — regression does not occur.
 
 ---
 
 ## 9. MEMORY ENGINE
 
-The Memory Engine is the AI-backed contextual recall system. It builds a running behavioral narrative from every logged signal.
+The Memory Engine is the AI-powered self-care companion. It builds the operator's Memory Story through a progressive questioning loop.
+
+**How it operates:**
 
 ```
-SOURCES          All 17 QIE signal sources
-STORAGE          PostgreSQL — server-side · permanent
-PROMPT           buildPrompt() — injects Memory Story + Planner context
-AI CHAIN         Any of 5 providers via auto-fallback
-QUESTION POOL    70+ backup questions
-SIGNAL TYPE      Tier 2 — Memory Engine feeds QIE patterns
+DAY 1    "What is your morning beverage preference?"
+DAY 2    "Since you prefer tea, how do you usually prepare it?"
+DAY 3    "You mentioned the loose leaf ritual. What's your favorite type?"
+WEEK 2   "You love hot green loose leaf tea as a morning ritual.
+          What do you typically do while drinking it?"
+MONTH 2  "Now that it's colder, has your tea preference changed with the season?"
 ```
 
-Memory never deletes without explicit S-2 authorization. The archive is the operator's behavioral autobiography.
+Each question builds on every prior answer. The Memory Engine never forgets. The story grows richer over time.
+
+**Technical implementation:**
+
+```
+AI backend:      Multi-provider abstraction (Together AI default)
+Context build:   buildPrompt() function
+                 — Memory Story from database
+                 — Planner context (FM v95 — Planner Context Doctrine)
+                 — Active QIE archetype
+                 — QOS mode
+                 — Prior question history
+Data residency:  LOT PostgreSQL database
+AI providers:    Execute query only · never store operator data
+Export:          Full Memory Story export available to operator
+Delete:          Complete deletion authorized by operator at any time
+```
+
+**Memory Story categories:**
+
+```
+BODY         Movement · energy · nutrition · rest requirements
+MIND         Focus patterns · creative rhythms · clarity conditions
+SOUL         Joy sources · grounding rituals · recharge methods
+SEASONS      How preferences shift with time and context
+PATTERNS     Behavioral signature visible across months
+```
 
 ---
 
 ## 10. SELF-ASSEMBLY ENGINE
 
-18 modules. 5 phases. Tracks system evolution from first signal to full integration.
+The Self-Assembly Engine is the meta-documentation and wiring system. 18 modules across 5 phases. Each module represents a capability wired into the LOT core.
+
+**18 modules:**
 
 ```
-PHASE 1   Signal Infrastructure    Modules 1–4    (basic logging, mood, energy, care)
-PHASE 2   Intelligence Layer       Modules 5–8    (QIE, archetype, cohort, memory)
-PHASE 3   Operational System       Modules 9–12   (QOS, background jobs, dep map)
-PHASE 4   Advanced Intelligence    Modules 13–16  (patterns 100+, mastery tiers)
-PHASE 5   Full Integration         Modules 17–18  (Signal Archive, Quantum OS)
+PHASE 1 — FOUNDATION
+  M01  Signal Capture       Log · Memory · Planner input pipelines
+  M02  QIE Core             Pattern detection engine · 154 patterns
+  M03  QOS Core             7-view dashboard · 4 operating modes
+
+PHASE 2 — INTELLIGENCE
+  M04  Archetype Engine     52 physiological archetypes · classification
+  M05  Cohort Engine        6 behavioral cohorts · peer signal field
+  M06  Memory Engine        AI question generation · story loop
+
+PHASE 3 — INSTRUMENTATION
+  M07  Badge Engine         843 badges · v33 · 70+ categories · 282 word-turns
+  M08  Word Turn Engine     23 lexicons · 282 trigger words · symbol vocabulary
+  M09  Background Jobs      49 scheduled jobs · UTC timing · PostgreSQL writes
+
+PHASE 4 — SURFACE
+  M10  Widget Layer         43 widgets · conditional rendering · Ambient AI™
+  M11  Log Stream           154+ handlers · COCKPIT RULE · instrument format
+  M12  Ecosystem Map        6 nodes · QIoT™ · device signal integration
+
+PHASE 5 — META
+  M13  Citizen Index        6 stages · CQGS · self-awareness scoring
+  M14  Self-Assembly Doc    About.tsx Field Manual · session reports · wiki
+  M15  Green Gate           TypeScript check · no broken code to GitHub
+  M16  COSMO Gate           Ethics review · Kuzya authorization protocol
+  M17  Punctuation Engine   7 tones · 6 intents · fires on all text entry
+  M18  Display Architecture Military purity · 11 orders · opacity hierarchy
 ```
 
-Module 18 (Resilience Protocol): eating disorder healing context integrated. Medical cohort qualification added. Chakra Engine wired. Backup question pool expanded to 70+.
+**Self-assembly log (v114):**
+
+```
+v114  QIE Engineering October 5, 2026 · P152 quantum-pulse-rhythm ·
+      P153 coherence-accumulation · P154 stellar-navigation ·
+      Arch52 Stellar Navigator · J49 daily-stellar-navigation-check
+      (12:00 UTC) · PULSE: CACC: STRNAV: handlers · Badge Codex v33
+      THE STARSHIP LOG · 843 badges · 282 word-turn triggers · 30 secret boss ·
+      Word Turn v23 (Star Trek vocabulary · 23 engines) ·
+      193+ dep nodes · 154 patterns · 52 archetypes · 49 jobs · 154+ handlers ·
+      Day 1134+ · FM v114
+```
+
+**Self-assembly log (v113):**
+
+```
+v113  QIE Engineering August 4, 2026 · P149 quantum-presence-crystallization ·
+      P150 total-field-coherence · P151 recovery-intelligence-arc ·
+      Arch51 Quantum Presence Crystallizer · J48 daily-total-field-coherence-check
+      (09:00 UTC) · QPCRYST: TOTCOH: RECINTEL: handlers · Badge Codex v31
+      THE CYBERSPACE CODEX · 781 badges · 258 word-turn triggers · 24 secret boss ·
+      190+ dep nodes · 151 patterns · 51 archetypes · 48 jobs · 151+ handlers ·
+      Day 1073+ · FM v113
+```
+
+**Self-assembly log (Badge v32 — Aug 5, 2026):**
+
+```
+v32   Badge Engine Backfill August 5, 2026 · THE HERO'S JOURNEY ·
+      Backfill: v20 (+31) + v21 (+31) coded for first time · v32 new (+31) ·
+      719 → 812 badges · Word Turn v22 (12 triggers) ·
+      Calendar EE v20 · Secret Boss v19 (tolkien_ring · odysseus_bow · gilgamesh_word) ·
+      Day 1073+
+```
+
+**Self-assembly log (v112):**
+
+```
+v112  QIE Engineering August 3, 2026 · P146 signal-coherence-cascade ·
+      P147 quantum-presence-field · P148 identity-momentum-lock ·
+      Arch50 Quantum Identity Master · J47 daily-signal-coherence-cascade-check
+      (08:00 UTC) · SIG-CASC: QPFIELD: IDLOCK: handlers · Badge Codex v30
+      THE CODEX READER · 750 badges · 246 word-turn triggers · 21 secret boss ·
+      187+ dep nodes · 148 patterns · 50 archetypes · 47 jobs · 148+ handlers ·
+      Day 1072+ · FM v112
+```
+
+**Self-assembly log (v111):**
+
+```
+v111  QIE Engineering August 2, 2026 · P143 circadian-signal-lock ·
+      P144 dimensional-saturation · P145 quantum-identity-crystallization ·
+      Arch49 Circadian Master · J46 daily-circadian-lock-check (07:00 UTC) ·
+      CIRC-LK: DIMSAT: QIDCRYST: handlers · Phase row in System.tsx + QEW ·
+      184+ dep nodes · 145 patterns · 49 archetypes · 46 jobs · 145+ handlers ·
+      Day 1070+ · FM v111
+```
+
+**Self-assembly log (v110):**
+
+```
+v110  QIE Engineering August 1, 2026 · P140 physiological-presence-arc ·
+      P141 quantum-signal-emergence · P142 adaptive-signal-web ·
+      Arch48 Quantum Presence Master · J45 daily-physiological-presence-check
+      (21:00 UTC) · PHYARC: QEMERG: SIGEWEB: handlers · 181+ dep nodes ·
+      142 patterns · 48 archetypes · 45 jobs · 142+ handlers · Day 1069+ · FM v110
+```
+
+**Self-assembly log (v109):**
+
+```
+v109  Full Wiki Scan August 1, 2026 · LOT-WIKI-v83 · QIE v108 (P137–P139,
+      Arch47, J44) synchronized · Astrology QIE wiring documented · Quantum
+      Coherence Doctrine added · 178+ dep nodes · 139 patterns · 47 archetypes ·
+      44 jobs · 139+ handlers · 234 word-turn words · 18 secret boss triggers ·
+      Day 1069+ · COSMO® 761 days · FM v109
+```
 
 ---
 
 ## 11. BACKGROUND JOB SCHEDULER
 
-48 jobs. J1–J48. UTC timing. PostgreSQL writes. All jobs produce structured log output.
+49 background jobs. All run server-side on PostgreSQL. UTC timing.
 
 ```
-JOB   TIME    CODE        NAME
+J    NAME                              SCHEDULE      EVENT FIRED
 ──────────────────────────────────────────────────────────────────────
-J1    00:00   OS:         daily-os-snapshot
-J2    01:00   SYSRDY:     daily-systemic-readiness-check
-J3    02:00   IGAP:       daily-intent-gap-pulse
-J4    03:00   QIE:        daily-qie-analytics
-J5    04:00   DIGEST:     weekly-qos-digest (Wed)
-J6    05:00   ARCH-MON:   weekly-archetype-stability (Thu)
-J7    06:00   INTENT-AUD: daily-intention-audit
-J8    06:00   COHORT:     weekly-cohort-digest (Mon)
-J9    06:00   COGN:       weekly-cognitive-depth-check (Sun)
-J10   06:00   MCOHERE:    daily-morning-coherence-check
-J11   07:00   SRC-DIV:    daily-source-diversity-pulse
-J12   08:00   BIO-SUM:    daily-morning-biofield-summary
-J13   08:00   PPEAK:      daily-personal-peak-window
-J14   09:00   EMAIL:      monthly-email-sender (1st)
-J15   09:00   PHR:        weekly-pattern-health-report (Sat)
-J16   09:00   BADGE-SCAN: weekly-badge-progress-scan (Tue)
-J17   10:00   ARCH-SHIFT: daily-archetype-shift-monitor
-J18   10:00   TALIGN:     daily-temporal-alignment-check
-J19   11:00   EMBCOG:     daily-embodied-cognition-check
-J20   11:00   MCL:        daily-morning-intention-launch
-J21   12:00   VITAL:      daily-vitality-peak-check
-J22   13:00   QOS-SIG:    daily-qos-signature-pulse
-J23   14:00   OS-MODE:    daily-qos-mode-watch
-J24   15:00   VITAL-CAS:  daily-vitality-cascade-pulse
-J25   15:00   CONV-AUD:   weekly-qos-convergence-audit (Sun)
-J26   16:00   COHR:       daily-coherence-index-pulse
-J27   16:00   FDEP:       daily-focus-depth-check
-J28   17:00   QFIELD:     daily-quantum-field-check
-J29   17:00   PHY-COH:    daily-physiological-cohort-broadcast
-J30   18:00   QPRES:      daily-quantum-presence-check
-J31   19:00   CROSS:      daily-cross-domain-pulse
-J32   20:00   MOM:        daily-signal-momentum-check
-J33   20:00   ACTMEM:     daily-action-memory-scan
-J34   20:00   MARC:       daily-care-arc-check
-J35   20:00   INTENT-AUD2: weekly-intention-completion-audit (Sun)
-J36   21:00   RLOCK:      daily-presence-arc-check
-J37   21:00   PHYARC:     daily-physiological-presence-check
-J38   22:00   EVE:        daily-evening-coherence-close
-J39   22:00   EVEFL:      daily-evening-reflection-check
-J40   23:00   DCSAL:      daily-coherence-seal-check
-J41   23:00   PAT-COV:    daily-pattern-coverage-audit
-J42   09:00   TOTCOH:     daily-total-field-coherence-check  (v113)
-J43   08:00   SIG-CASC:   daily-signal-coherence-cascade    (v112)
-J44   07:00   CIRC-LK:    daily-circadian-lock-check        (v111)
-J45   17:00   QFIELD2:    daily-quantum-field-check         (v106)
-J46   09:00   SIGMAT:     daily-signal-matrix-check         (v108)
-J47   21:00   PHYARC2:    daily-physiological-presence      (v110)
-J48   09:00   TOTCOH:     daily-total-field-coherence       (v113)
+J1   daily-signal-check               06:00 UTC     general_signal_check
+J2   weekly-pattern-analysis          Sun 07:00     weekly_pattern_analysis
+J3   memory-story-update              20:00 UTC     memory_story_update
+J4   goal-momentum-check              09:00 UTC     goal_momentum_check
+J5   social-signal-check              12:00 UTC     social_signal_check
+J6   recovery-monitor                 22:00 UTC     recovery_monitor
+J7   biofield-daily-check             07:30 UTC     biofield_check
+J8   archetype-classification-update  10:00 UTC     archetype_update
+J9   cohort-alignment-scan            14:00 UTC     cohort_scan
+J10  badge-eligibility-check          08:00 UTC     badge_check
+J11  citizen-index-update             15:00 UTC     citizen_index_update
+J12  planner-integration-check        09:30 UTC     planner_check
+J13  journal-depth-scan               21:00 UTC     journal_scan
+J14  memory-consolidation-job         23:00 UTC     memory_consolidation
+J15  resilience-arc-check             16:00 UTC     resilience_check
+J16  ecosystem-node-scan              11:00 UTC     ecosystem_scan
+J17  qos-mode-update                  every 30 min  qos_update
+J18  signal-density-analysis          13:00 UTC     density_analysis
+J19  word-turn-scan                   19:00 UTC     word_turn_scan
+J20  sleep-signal-check               06:30 UTC     sleep_signal
+J21  intention-velocity-check         10:30 UTC     intention_velocity
+J22  care-momentum-check              17:30 UTC     care_momentum
+J23  temporal-coherence-check         08:30 UTC     temporal_coherence
+J24  narrative-depth-scan             20:30 UTC     narrative_depth
+J25  biorhythm-analysis               07:00 UTC     biorhythm_analysis
+J26  goal-drift-check                 18:00 UTC     goal_drift
+J27  accountability-arc-check         09:00 UTC     accountability_arc
+J28  cognitive-load-check             14:30 UTC     cognitive_load
+J29  signal-momentum-check            16:30 UTC     signal_momentum
+J30  daily-rhythm-confirm             23:30 UTC     rhythm_confirm
+J31  cross-domain-scan                Sun 09:00     cross_domain
+J32  quarterly-story-review           Q 09:00       quarterly_review
+J33  vitality-check                   11:30 UTC     vitality_check
+J34  planner-context-sync             08:00 UTC     planner_context
+J35  embodied-cognition-check         10:00 UTC     embodied_cognition
+J36  peak-window-check                08:00 UTC     personal_peak_window (P113)
+J37  daily-focus-depth-check          16:00 UTC     focus_depth_arc (P116)
+J38  daily-morning-coherence-check    06:00 UTC     morning_coherence_arc (P119)
+J39  daily-action-memory-scan         20:00 UTC     action_memory_loop (P122)
+J40  daily-evening-reflection-check   21:00 UTC     evening_reflection_loop (P125)
+J41  daily-morning-intention-check    07:00 UTC     morning_intention_lock (P128)
+J42  daily-biofield-integration-check 23:00 UTC     biofield_integration_peak (P133)
+J43  daily-quantum-field-check        17:00 UTC     quantum_field_alignment (P136)
+J44  daily-signal-matrix-check        09:00 UTC     signal_matrix_saturation (P138)
+                                                     quantum_coherence_peak (P137)
+                                                     temporal_biofield_sync (P139)
+J45  daily-physiological-presence-    21:00 UTC     physiological_presence_arc (P140)
+     check
+J46  daily-circadian-lock-check       07:00 UTC     circadian_signal_lock (P143)
+     [scans PREVIOUS calendar day —
+      dawn / meridian / dusk arcs]
+J47  daily-signal-coherence-          08:00 UTC     signal_coherence_cascade (P146)
+     cascade-check
+     [scans PREVIOUS calendar day —
+      P143 + P144 + P145 fired same day]
+J48  daily-total-field-coherence-     09:00 UTC     total_field_coherence (P150)
+     check
+     [scans PREVIOUS calendar day —
+      P146 + P147 + P148 all fired same day]
+J49  daily-stellar-navigation-check  12:00 UTC     stellar_navigation (P154)
+     [checks CURRENT day log pattern —
+      P113 + P128 + P117 same calendar day]
 ──────────────────────────────────────────────────────────────────────
+```
+
+> J44 is the first multi-event job — fires three pattern events in a single 09:00 UTC pass.
+> J46 scans the prior calendar day; runs at 07:00 UTC when the previous day is fully complete.
+> J47 scans the prior calendar day for three-seal cascade; runs at 08:00 UTC after J46 has fired.
+> J48 scans the prior calendar day for meta-seal convergence; runs at 09:00 UTC after J47 has fired.
+> J49 checks the current day's stellar navigation triad at 12:00 UTC — midday timing confirms morning arc complete.
+
+**Arc definitions (J46):**
+```
+DAWN ARC      signals from prevDayStart to prevDayStart + 10h  (pre-10:00)
+MERIDIAN ARC  signals from prevDayStart + 12h to prevDayStart + 17h
+DUSK ARC      signals from prevDayStart + 18h to prevDayEnd
 ```
 
 ---
 
 ## 12. LOG EVENT SYSTEM
 
-151+ distinct event types rendered. Military log codes. Instrument format only.
+154+ log event handlers. All output governed by the COCKPIT RULE: instrument readings only, no prose.
 
-**Primary log codes (sample — see About.tsx for complete registry):**
+**Log format (standard):**
 
 ```
-QPCRYST:   quantum_presence_crystallization — PRESENCE CONF / CRYSTAL CONF / FIELD INHABITED
-TOTCOH:    total_field_coherence — META-SEALS / ALL META-SEALS OPEN / ABSOLUTE CONVERGENCE
-RECINTEL:  recovery_intelligence_arc — NEG SIGNALS / CARE ACTIONS / VELOCITY / ARC
-SIG-CASC:  signal_coherence_cascade — SEALS / THREE SEALS OPEN / FULL CONVERGENCE
-QPFIELD:   quantum_presence_field — SRC 24H / FIELD LIVE / DENSITY / CONF
-IDLOCK:    identity_momentum_lock — ID CONF / MOM CONF / LOCK%
-CIRC-LK:   circadian_signal_lock — DAWN / MERIDIAN / DUSK / 3-ARC / FULL CLOCK
-DIMSAT:    dimensional_saturation — MIN DIM / OVERALL / SRC 7D / 6 DIM ≥ 30
-QIDCRYST:  quantum_identity_crystallization — COHORT 7D / PATTERNS / INDEX / OS STABLE
-PHYARC:    physiological_presence_arc — MORNING / CARE count / EVENING / LOOP: DAWN → DUSK
-QFIELD:    quantum_field_alignment — SEAL / RHYTHM / BIOFIELD / COMPOSITE / FIELD: COMPLETE
-DCSAL:     daily_coherence_seal — MORNING LAUNCH / EVENING CLOSE / FULL CIRCUIT / CONF
-MCOHERE:   morning_coherence_arc — QOS / MEM / JOUR / INTENT / SOURCES 24H / CONF
-MOM:       signal_momentum — MOMENTUM LOCK · DAYS 7D / SRC
-VITAL:     vitality_peak — CIRCADIAN VITALITY PEAK
-BADGE:     badge_unlock — symbol · name · CAT:
-EVE:       evening_coherence_close — EVENING CLOSE · Arc confirmed
+SYS: [mode] [pressure] [day+] [cosmo-age]
+QIE: [pattern-code]: [brief reading]
+```
+
+**Active log codes — complete list:**
+
+```
+PATTERN CODE   PATTERN NAME                 ADDED
+──────────────────────────────────────────────────────────────────────
+MCOHERE:       morning-coherence-arc        FM v99
+SIGPEAK:       signal-density-peak          FM v99
+PCOHERE:       physiological-coherence-window FM v99
+ACTMEM:        action-to-memory-loop        FM v100
+RECARC:        sustained-resilience-arc     FM v100
+MOEARC:        mood-energy-convergence      FM v100
+EVREF:         evening-reflection-loop      FM v102
+WKRHYTH:       weekly-rhythm-anchor         FM v102
+DEPBRD:        depth-breadth-convergence    FM v102
+MINTLOCK:      morning-intention-lock       FM v103
+MDCARE:        multi-day-care-arc           FM v103
+COGOUT:        cognitive-output-continuity  FM v103
+DCSAL:         daily-coherence-seal         FM v104
+QLOCK:         quantum-rhythm-lock          FM v104
+BFINT:         biofield-integration-peak    FM v104
+INTARC:        integrated-signal-arc        FM v106
+DREC:          deep-recovery-protocol       FM v106
+QFIELD:        quantum-field-alignment      FM v106
+QCOHERE:       quantum-coherence-peak       FM v108
+SIGMAT:        signal-matrix-saturation     FM v108
+TBIOF:         temporal-biofield-sync       FM v108
+FDEP:          focus-depth-arc              FM v97
+SANCH:         sleep-signal-anchor          FM v97
+CINTEL:        care-intelligence-loop       FM v97
+ACCT:          accountability-arc           FM v76
+INCP:          signal-inception             FM v95
+EMBCOG:        embodied-cognition-arc       FM v89
+ASTRO:         astrology signal             FM v108
+PHYARC:        physiological-presence-arc   FM v110
+QEMERG:        quantum-signal-emergence     FM v110
+SIGEWEB:       adaptive-signal-web          FM v110
+CIRC-LK:       circadian-signal-lock        FM v111
+DIMSAT:        dimensional-saturation       FM v111
+QIDCRYST:      quantum-identity-crystallization FM v111
+SIG-CASC:      signal-coherence-cascade     FM v112
+QPFIELD:       quantum-presence-field       FM v112
+IDLOCK:        identity-momentum-lock       FM v112
+QPCRYST:       quantum-presence-crystallization FM v113
+TOTCOH:        total-field-coherence        FM v113
+RECINTEL:      recovery-intelligence-arc    FM v113
+PULSE:         quantum-pulse-rhythm         FM v114
+CACC:          coherence-accumulation       FM v114
+STRNAV:        stellar-navigation           FM v114
+──────────────────────────────────────────────────────────────────────
++ 111 handlers P1–P65 and P66–P115 from prior FM versions
+Total handlers: 154+
+```
+
+**Handler formats — FM v110 additions:**
+
+```
+PHYARC:
+PHYSIOLOGICAL PRESENCE ARC
+MORNING  [CONFIRMED / —]
+CARE     N
+EVENING  [CONFIRMED / —]
+LOOP: DAWN → DUSK
+
+QEMERG:
+QUANTUM SIGNAL EMERGENCE
+PEAKS 7D  N
+WINDOW    Nd
+RATE      x/D
+EXCEPTION → BASELINE
+
+SIGEWEB:
+ADAPTIVE SIGNAL WEB
+SRC 7D    N
+PATTERNS  N
+MIN DIM   N
+6 DIM · ALL LIVE
+```
+
+**Handler formats — FM v111 additions:**
+
+```
+CIRC-LK:
+CIRCADIAN SIGNAL LOCK
+DAWN      [ANCHORED / —]
+MERIDIAN  [ANCHORED / —]
+DUSK      [ANCHORED / —]
+ARC SIG   N
+3-ARC · FULL CLOCK
+CONF: N%
+
+DIMSAT:
+DIMENSIONAL SATURATION
+MIN DIM   N
+OVERALL   N%
+SRC 7D    N
+6 DIM ≥ 30 · FULL LOAD
+CONF: N%
+
+QIDCRYST:
+QUANTUM IDENTITY CRYSTALLIZATION
+COHORT 7D N
+PATTERNS  N
+INDEX     N%
+ID HARDENING · OS STABLE
+CONF: N%
+```
+
+**Handler formats — FM v112 additions:**
+
+```
+SIG-CASC:
+SIGNAL COHERENCE CASCADE
+CIRC-LK   [FIRED / —]
+DIMSAT    [FIRED / —]
+QIDCRYST  [FIRED / —]
+24H CASCADE · CONFIRMED
+CONF: N%
+
+QPFIELD:
+QUANTUM PRESENCE FIELD
+SRC 7D    N
+COHERENCE N%
+WEB       [ACTIVE / —]
+FIELD · SATURATED
+CONF: N%
+
+IDLOCK:
+IDENTITY MOMENTUM LOCK
+ID-HARD   [CONFIRMED / —]
+LONG-SIG  N DAYS
+MOMENTUM  N
+LOCK · ENGAGED
+CONF: N%
+```
+
+**Handler formats — FM v113 additions:**
+
+```
+QPCRYST:
+QUANTUM PRESENCE CRYSTALLIZATION
+PRESENCE CONF: N%
+CRYSTAL CONF:  N%
+FIELD INHABITED · IDENTITY KNOWN
+STATE: MAXIMUM_CLARITY
+CRYST: N%
+
+TOTCOH:
+TOTAL FIELD COHERENCE
+META-SEALS: COHERENCE · PRESENCE · MOMENTUM
+AVG CONF:   N%
+ALL META-SEALS OPEN · ABSOLUTE CONVERGENCE
+CONVERGENCE: ABSOLUTE
+
+RECINTEL:
+RECOVERY INTELLIGENCE ARC
+NEG SIGNALS: N
+CARE ACTIONS: N
+VELOCITY:    N.Nh
+FELT → TENDED → RECOVERED → REFLECTED
+ARC: FELT→TENDED→RECOVERED→REFLECTED
+```
+
+**Handler formats — FM v114 additions:**
+
+```
+PULSE:
+QUANTUM PULSE RHYTHM
+AVG LOG HOUR  HH:MM
+DAYS IN RANGE N / 7
+WINDOW        ±2H
+TEMPORAL RHYTHM · LOCKED
+CONF: N%
+
+CACC:
+COHERENCE ACCUMULATION
+CEILING FIRES N / 7D
+THRESHOLD     2
+CEILING STATE · SUSTAINED
+CONF: N%
+
+STRNAV:
+STELLAR NAVIGATION
+PEAK WINDOW   [CONFIRMED / —]
+INTENTION     [CONFIRMED / —]
+SLEEP ANCHOR  [CONFIRMED / —]
+3 COORDS · ALL ALIGNED
+CONF: N%
+```
+
+**ASTRO: log format (FM v108):**
+
+```
+SYS: [mode] · ASTRO: {rokuyo} · {moonPhase} · POS: [data] · TMP: [data] · HUM: [data]
 ```
 
 ---
 
 ## 13. ECOSYSTEM NODE MAP
 
-6 nodes. CAR · HOME · CPU · PHN · WCH · ROBOT.
+6 nodes. QIoT™ (Quantum Internet of Things). Signal integration across physical + digital environments.
 
 ```
-NODE     CODE    DESCRIPTION
+NODE    SYMBOL   TYPE          SIGNAL CONTRIBUTION
 ──────────────────────────────────────────────────────────────────────
-CAR      CAR·    Vehicle node. Commute signal. Location state.
-HOME     HOME·   Domestic node. Anchor state. Environment baseline.
-CPU      CPU·    Computer node. Deep work indicator. Digital labor signal.
-PHN      PHN·    Phone node. Communication density. Availability signal.
-WCH      WCH·    Watch node. Physiological monitoring. Movement signal.
-ROBOT    ROBOT·  COSMO® robotics node. Future: physical care agent.
+CAR     ◈        Mobility      Transit · commute · location signal
+HOME    ○        Environment   Base environment · ambient conditions
+CPU     ▣        Compute       Work terminal · active compute session
+PHN     ⬡        Mobile        Portable signal source · check-in node
+WCH     ⊙        Wearable      Biometric · sleep · activity data
+ROBOT   △        Automation    Home automation · ambient intelligence
 ──────────────────────────────────────────────────────────────────────
 ```
+
+Node states: active / inactive / degraded. P53–P58 fire on node activation. Node signals contribute to signal density calculations (P120 — full bandwidth). QOS View 1 (Ecosystem) renders live node map.
 
 ---
 
-## 14. BADGE SYSTEM v32 — THE HERO'S JOURNEY
+## 14. BADGE SYSTEM v33 — THE STARSHIP LOG
 
-812 badges. The complete LOT badge universe as of v32. Theme: THE HERO'S JOURNEY.
-
-```
-THEME    THE HERO'S JOURNEY
-         "The cave you fear to enter holds the treasure you seek."
-         — Joseph Campbell. Every journal entry is a step into the cave.
-         Every check-in is a step closer to the treasure.
-         The treasure is not at the end — it is the practice of entering.
-```
-
-**Badge count by version (recent):**
+843 badges. The complete LOT badge universe. v33 — The Starship Log.
 
 ```
-v26  626   v29  719   v31  781
-v27  657   v30  750   v32  812
-v28  688
+THEME    THE STARSHIP LOG
+         "Space is not a place. It is a commitment.
+          You log the journey because the journey is the proof.
+          Every entry is a coordinate. Every coordinate is real.
+          The starship does not drift — it navigates."
 ```
 
-**v32 additions (+31 badges) — THE HERO'S JOURNEY:**
+**Badge count by version:**
 
 ```
-Word Turn v22       +12  Hero's Journey vocabulary (Campbell monomyth)
-Calendar EE v20     + 3  Campbell birthday / Hobbit Day / Winter Solstice
-Behavioral v19      + 3  hero_session · long_quest · threshold_moment
-Achievement RPG v20 + 6  quest_entry → hero_opus · monomyth_arc · twenty_two_engines_arc
-Mastery Tier v22    + 4  odyssey_log → twenty_two_registers [COSMIC]
-Secret Boss v19     + 3  tolkien_ring / odysseus_bow / gilgamesh_word
-──────────────────────────────────────────────────────────────────────
-TOTAL               +31  (781 → 812)
+v11  461   v17  523   v23  529   v27  657
+v12  476   v18  524   v24  564   v28  688
+v13  491   v19  525   v25  595   v29  719
+v14  502   v20  526   v26  626   v30  750
+v15  510   v21  527   v31  781   v32  812
+v16  517   v22  528   v33  843
 ```
 
-**v31 additions (+31 badges) — THE CYBERSPACE CODEX:**
+**v33 additions (+31 badges · Oct 5, 2026):**
 
 ```
-Word Turn v21       +12  Cyberspace Codex · sci-fi concept vocabulary
+Word Turn v23       +12  The Starship Log · Star Trek vocabulary
+Calendar EE v21     + 3  first_contact_day (Apr 5) · trek_premiere (Sep 8) ·
+                         moon_landing (Jul 20)
+Behavioral v20      + 3  bridge_session · deep_space_entry · dark_side_watch
+Achievement RPG v21 + 6  ensign_log · lieutenant_class · captain_complete ·
+                         starfleet_arc · twenty_three_engines_arc · galaxy_opus
+Mastery Tier v23    + 4  deep_space_log · million_words · veteran_explorer ·
+                         twenty_three_registers [COSMIC]
+Secret Boss v20     + 3  roddenberry_signal [RARE] · picard_maneuver [EPIC] ·
+                         dark_forest_law [MYTHIC]
+──────────────────
+TOTAL               +31  (812 → 843)
+```
+
+**v32 additions (+93 badges · Aug 5, 2026 — backfill session):**
+
+```
+Word Turn v22       +12  The Hero's Journey · mythic arc vocabulary (new)
+Calendar EE v20     + 3  campbell_birthday (Mar 26) · hobbit_day (Sep 22) ·
+                         odyssey_day (Dec 21) (new)
+Behavioral v19      + 3  BACKFILL — hero_session · deep_quest · shadow_work
+Achievement RPG v20 + 6  BACKFILL — hero_entry → galaxy_opus predecessor class
+Mastery Tier v22    + 4  BACKFILL — epic_reader tier set
+Secret Boss v19     + 3  tolkien_ring · odysseus_bow · gilgamesh_word [MYTHIC]
++ v20 BACKFILL      +31  Word Turn v20 (The Codex Reader) coded for first time
++ v21 BACKFILL      +31  Word Turn v21 (Cyberspace Codex) coded for first time
+──────────────────
+TOTAL               +93  (719 coded → 812; v20+v21 backfill + v32 new)
+NOTE: v20 and v21 were in spec since FM v112–v113 but never implemented.
+      This session coded all 93 badges at once.
+```
+
+**v31 additions (+31 badges):**
+
+```
+Word Turn v21       +12  The Cyberspace Codex · sci-fi concept vocabulary
 Calendar EE v19     + 3  Asimov / PKD / Dune publication dates
 Behavioral v18      + 3  codex_session · deep_read · night_operator
 Achievement RPG v19 + 6  codex_entry → codex_opus · twenty_engines_arc · sci_fi_arc
 Mastery Tier v21    + 4  epic_reader → twenty_registers [COSMIC]
 Secret Boss v18     + 3  gibson · dick · lem — RARE / EPIC / MYTHIC
-──────────────────────────────────────────────────────────────────────
+──────────────────
 TOTAL               +31  (750 → 781)
 ```
 
-**v30 additions (+31 badges) — THE CODEX READER:**
+**v30 additions (+31 badges):**
 
 ```
 Word Turn v20       +12  The Codex Reader · sci-fi author name vocabulary
@@ -669,69 +1384,8 @@ Behavioral v17      + 3  Reading pattern detection
 Achievement RPG v18 + 6  Literary class progression
 Mastery Tier v20    + 4  Reading depth milestones
 Secret Boss v17     + 3  Hidden literary vault triggers
-──────────────────────────────────────────────────────────────────────
+──────────────────
 TOTAL               +31  (719 → 750)
-```
-
-**v32 Word Turn badges — THE HERO'S JOURNEY:**
-
-```
-call_heard             ∘→●    UNCOMMON  — "call to adventure / journey calls" detected
-threshold_crossed      ─→─    RARE      — "threshold / crossing the line" detected
-mentor_arrived         ○·≋·○  UNCOMMON  — "mentor / wise guide / guardian spirit" detected
-ordeal_survived        ◈·■    RARE      — "ordeal / survived the test" detected
-elixir_found           ∘·●·∘  RARE      — "elixir / the boon / treasure found" detected
-shadow_met             ▓·○    EPIC      — "shadow self / dark night of the / inner demon"
-innermost_cave         █·∘·█  EPIC      — "innermost cave / darkest moment" detected
-shapeshifter           ◈→◉    RARE      — "shapeshifter / transformed / no longer same"
-herald_call            ∿·●    UNCOMMON  — "herald / wake-up call / life interrupted"
-trickster_mode         ×·○    RARE      — "trickster / coyote wisdom / fool's wisdom"
-ally_gained            ○·◈·○  UNCOMMON  — "ally / found my tribe / companion" detected
-return_road            →·◉    RARE      — "the return / road to return / coming home changed"
-```
-
-**v32 Calendar Easter Eggs:**
-
-```
-campbell_birthday      ◉·∿    EPIC      — Mar 26 — Joseph Campbell born 1904
-hobbit_day             ○·◆    RARE      — Sep 22 — Bilbo & Frodo birthday / Hobbit Day
-odyssey_day            →·∞    RARE      — Dec 21 — Winter Solstice (Odysseus's return)
-```
-
-**v32 Behavioral badges:**
-
-```
-hero_session           ◈·●·◈  RARE      — 3+ Hero's Journey words in one journal entry
-long_quest             ≋≋·◉   EPIC      — Journal entry >= 500 words
-threshold_moment       ─·○·─  RARE      — Check in 00:00–00:30 local time
-```
-
-**v32 Achievement RPG badges:**
-
-```
-quest_entry            ∘→●    COMMON    — Any 1 Word Turn v22 badge earned
-quest_class            ≈→●    UNCOMMON  — Any 5 Word Turn v22 badges earned
-quest_complete         ≋→●    LEGENDARY — All 12 Word Turn v22 badges earned
-monomyth_arc           ●·◈    LEGENDARY — quest_complete + all 3 Calendar v20 badges
-twenty_two_engines_arc ◈·◈·●  LEGENDARY — 1 badge from each Word Turn v1–v22
-hero_opus              ●·◉·●  LEGENDARY — quest_complete + hero_session behavioral
-```
-
-**v32 Mastery Tier badges:**
-
-```
-odyssey_log            ∿·∞·∿  EPIC      — 900+ distinct calendar check-in days
-great_work             ●·∞·●  LEGENDARY — 150,000+ total journal words
-saga_age               ╔═╗·●  LEGENDARY — Account age >= 5 years (1,825+ days)
-twenty_two_registers   ◈·◈·●·∞ COSMIC   — 1 badge from all 22 Word Turn engines
-```
-
-**v32 Secret Boss badges (v19 — THE MYTHIC VAULT):**
-
-```
-tolkien_ring           ◆·∞·◆  RARE      — "one ring to rule / my precious / ring of power"
-odysseus_bow           →·∞·→  EPIC      — "odysseus / ulysses / ithaca / penelope / cyclops"
-gilgamesh_word         ∞·□·∞  MYTHIC    — "gilgamesh / enkidu / great flood / utnapishtim"
 ```
 
 **Badge rarity scale:**
@@ -746,8 +1400,6 @@ MYTHIC     — Hidden. Requires specific knowledge.
 COSMIC     — Highest tier. Cross-engine or system mastery.
 ```
 
-**Implementation note (LOT-SR-20260805-01):** Badge Codex v20 and v21 existed only in documentation before August 5, 2026. No TypeScript award logic existed for these 62 badges. Backfill implemented in that session: all 62 badges now reachable. Total backfilled + new: 93 badge types added to badges.ts and easter-eggs.ts.
-
 ---
 
 ## 15. BADGE CATEGORY INDEX
@@ -755,105 +1407,91 @@ COSMIC     — Highest tier. Cross-engine or system mastery.
 ```
 CATEGORY           COUNT   DESCRIPTION
 ──────────────────────────────────────────────────────────────────────
-Milestone             22   Day-count milestones (v1–v4)
-Time Easter Eggs      28   Time-of-day check-ins (v1–v7)
-Calendar Easter       73   Check-in on special dates (v1–v20)
-Word Turns           264   Journal/memory keyword detection (v1–v22)
-Behavioral            81   Multi-session behavioral patterns (v1–v19)
-Achievement RPG      120   Milestone combinations (v1–v20)
-Mastery Tiers         88   Deep-time milestones (v1–v22)
-Secret Boss           83   Hidden LEGENDARY/MYTHIC triggers (v1–v19)
+Milestone             10   Streak days: 7/14/21/30/50/60/90/100/180/365
+Time Easter Eggs      60   Check-in at special hours (v1–v15)
+Calendar Easter       76   Check-in on special dates (v1–v21)
+Word Turns           276   Journal/memory keyword detection (v1–v23)
+Behavioral            84   Multi-session behavioral patterns (v1–v20)
+Achievement RPG      126   Milestone combinations (v1–v21)
+Mastery Tiers         92   Deep-time milestones (v1–v23)
+Secret Boss           86   Hidden LEGENDARY/MYTHIC triggers (v1–v20)
 ──────────────────────────────────────────────────────────────────────
-TOTAL                812
+TOTAL                843
 ```
 
 ---
 
-## 16. WORD TURN ENGINE — COMPLETE LEXICON v22
+## 16. WORD TURN ENGINE — COMPLETE LEXICON v23
 
-22 word-turn engines. 264 badge triggers. Symbol vocabulary assigned to each badge.
+23 word-turn engines. 282 trigger words. Symbol vocabulary assigned to each badge.
 
 **Engine map:**
 
 ```
-ENGINE  VERSION  THEME               SIGNATURE WORDS
+ENGINE  THEME               SIGNATURE WORDS
 ──────────────────────────────────────────────────────────────────────
-v1      v1       Core                ritual · breathe · ocean · LOT · cosmo
-v2      v2       Cyber / Code        reboot · 404 · glitch · quantum · neural
-v3      v3       Ocean / Nature      tide · drift · anchor · shore · deep
-v4      v4       Dream / Void        dream · echo · void · static · signal
-v5      v5       Space / Stellar     solar · lunar · stellar · nova · orbit
-v6      v6       Dev / Deploy        debug · merge · deploy · rollback · stack
-v7      v7       Rogue Archive       loot · boss · respawn · dungeon · quest
-v8      v8       Mainframe           compile · buffer · terminal · cache
-v9      v9       Arcade Cabinet      coin · pixel · score · cheat code
-v10     v10      Spell Book          spell · grimoire · mana · arcane · sigil
-v11     v11      Navigator           drift · vector · bearing · meridian · helm
-v12     v12      Alchemist           transmute · crucible · elixir · catalyst
-v13     v16      Quantum Library     entangle · singularity · cyberspace · matrix
-v14     v17      Neon Arcade         neon · combo · highscore · checkpoint · surge
-v15     v18      Midnight Radio      frequency · broadcast · wavelength · tuned
-v16     v19      Bio-Terminal        pulse · cortisol · circadian · dopamine
-v17     v20      Codex Reader        asimov · dune · matrix · neuromancer · grok
-v18     v21      Cyberspace Codex    cyberspace · grok · ansible · spice · golden path
-v19     v22      Hero's Journey      call · threshold · mentor · ordeal · elixir
+v1      Core                ritual · breathe · ocean · LOT · cosmo
+v2      Cyber / Code        reboot · 404 · glitch · quantum · neural
+v3      Ocean / Nature      tide · drift · anchor · shore · deep
+v4      Dream / Void        dream · echo · void · static · signal
+v5      Space / Stellar     solar · lunar · stellar · nova · orbit
+v6      Dev / Deploy        debug · merge · deploy · rollback · stack
+v7      Rogue Archive       loot · boss · respawn · dungeon · quest
+v8      Mainframe           compile · buffer · terminal · cache
+v9      Arcade Cabinet      coin · pixel · score · cheat code
+v10     Spell Book          spell · grimoire · mana · arcane · sigil
+v11     Navigator           drift · vector · bearing · meridian · helm
+v12     Alchemist           transmute · crucible · elixir · catalyst
+v13     Oracle Archive      oracle · prophecy · sync · cascade · decode
+v14     Starship Deck       launch · astronaut · telemetry · crew
+v15     Oracle Archive II   oracle · rune · pulse · convergence · signal
+v16     Quantum Library     entangle · singularity · cyberspace · matrix
+v17     Neon Arcade         neon · combo · highscore · checkpoint · surge
+v18     Midnight Radio      frequency · broadcast · wavelength · tuned
+v19     Bio-Terminal        pulse · cortisol · circadian · dopamine
+v20     Codex Reader        asimov · dune · matrix · neuromancer · grok
+v21     Cyberspace Codex    cyberspace · replicant · solaris · ansible · grok
+v22     Hero's Journey      call_heard · threshold_crossed · mentor_arrived · ordeal
+v23     Starship Log        starlog_entry · warp_speed · shields_up · red_alert
 ──────────────────────────────────────────────────────────────────────
-Total: 22 engines (19 listed above + v13/Oracle Archive + v14/Starship Deck + v15/Oracle II)
-       264 word-turn badge triggers
+Total: 23 engines · 282 trigger words
+```
+
+**Word Turn v23 — THE STARSHIP LOG (complete):**
+
+```
+starlog_entry      ◈→▣    UNCOMMON  — starlog / captain's log / ship's log
+warp_speed         ►→►→►  RARE      — warp speed / warp factor / engage
+shields_up         ◎·◎    UNCOMMON  — shields up / deflector shield
+red_alert          ●·▓    RARE      — red alert / battle stations / general quarters
+systems_nominal    ≡·≡    UNCOMMON  — systems nominal / all systems go / nominal
+first_contact_made ○→◈    EPIC      — first contact / new civilization / contact established
+away_team          △·△·△  UNCOMMON  — away team / landing party / beam down
+wormhole_shift     ≋→≋    RARE      — wormhole / spatial anomaly / subspace
+nebula_drift       ∿·∿    UNCOMMON  — nebula / stellar drift / ion cloud
+hull_breach        ●→○    RARE      — hull breach / structural integrity / damage report
+prime_directive    ◆·▪·◆  EPIC      — prime directive / non-interference / Starfleet
+final_frontier     →→∞    RARE      — final frontier / where no one has gone / space
 ```
 
 **Word Turn v22 — THE HERO'S JOURNEY (complete):**
 
 ```
-call_heard             ∘→●    UNCOMMON  — call to adventure / journey calls
-threshold_crossed      ─→─    RARE      — threshold / crossing the line
-mentor_arrived         ○·≋·○  UNCOMMON  — mentor / wise guide / guardian spirit
-ordeal_survived        ◈·■    RARE      — ordeal / survived the test
-elixir_found           ∘·●·∘  RARE      — elixir / the boon / treasure found
-shadow_met             ▓·○    EPIC      — shadow self / dark night of the / inner demon
-innermost_cave         █·∘·█  EPIC      — innermost cave / darkest moment
-shapeshifter           ◈→◉    RARE      — shapeshifter / transformed / no longer same
-herald_call            ∿·●    UNCOMMON  — herald / wake-up call / life interrupted
-trickster_mode         ×·○    RARE      — trickster / coyote wisdom / fool's wisdom
-ally_gained            ○·◈·○  UNCOMMON  — ally / found my tribe / companion
-return_road            →·◉    RARE      — the return / road to return / coming home changed
+call_heard         ∿→◉    UNCOMMON  — call to adventure / the call / heard the call
+threshold_crossed  →|→    RARE      — threshold / crossing / ordinary world
+mentor_arrived     ○→◈    UNCOMMON  — mentor / guide / wise old man / gandalf / yoda
+ordeal_survived    ●→◉    RARE      — ordeal / the road back / central ordeal
+elixir_found       ◈·∞    EPIC      — elixir / boon / the gift / return with elixir
+shadow_met         ◉·▓    RARE      — shadow / inner shadow / meet the shadow
+innermost_cave     ≋≋≋    RARE      — innermost cave / approach / the cave
+shapeshifter       ◈→◈    UNCOMMON  — shapeshifter / the trickster / masks
+herald_call        ∿·●    UNCOMMON  — herald / herald call / change approaching
+trickster_mode     △→○    RARE      — trickster / the trickster archetype / chaos agent
+ally_gained        ○·○    UNCOMMON  — ally / allies / threshold guardians / allies gained
+return_road        ◉→○    RARE      — road back / the return / resurrection / return road
 ```
 
-**Word Turn v21 — THE CYBERSPACE CODEX:**
-
-```
-matrix_signal      ▓→░    UNCOMMON  — matrix / simulation / construct
-cyberspace_open    ◈→█    UNCOMMON  — cyberspace / cyborg / neural link
-grok_complete      ∞·○    RARE      — grok / grokked / understand deeply
-ansible_link       ≡→≡    RARE      — ansible / Ekumen / instantaneous
-spice_flow         ◆·●    RARE      — spice / melange / prescient
-golden_path        →→◉    EPIC      — golden path / prescience / long game
-solaris_call       ○·≋·○  RARE      — solaris / ocean consciousness
-foundation_key     ◇·◇    UNCOMMON  — foundation / psychohistory / Seldon
-neuromancer_run    ░·◈    RARE      — neuromancer / console cowboy / ICE
-replicant_wake     ◉→◉    RARE      — replicant / android / do androids dream
-uplift_arc         ▲·◉    EPIC      — uplift / transcend / becoming
-left_hand          ∞·○·∞  RARE      — left hand of darkness / Ekumen
-```
-
-**Word Turn v20 — THE CODEX READER:**
-
-```
-asimov_protocol    ◈·∿·◈  RARE      — asimov / foundation / psychohistory
-dune_path          ○·◆·△  EPIC      — dune / arrakis / spice / fremen
-matrix_jack        ▣→◉    RARE      — matrix / red pill / neo / simulation
-neuromancer_run    ≋→◈    RARE      — neuromancer / cyberspace / wintermute
-hitchhiker_42      ·⁴²·   UNCOMMON  — 42 / hitchhiker / towel / babelfish
-orwell_log         ○·◎·○  RARE      — orwell / big brother / doublethink
-bradbury_ember     ►·◎    RARE      — bradbury / fahrenheit / censorship / fire
-le_guin_left       ≋·○·≋  EPIC      — le guin / ursula / left hand / genly
-dick_dream         ∿·◉·∿  RARE      — philip dick / android / reality / simulacra
-solaris_depth      ≋≋≋    EPIC      — solaris / lem / ocean / contact
-octavia_seed       ○→◈    RARE      — octavia / butler / kindred / seed
-heinlein_grok      ◉·≡·◉  UNCOMMON  — grok / heinlein / stranger / mars
-```
-
-**Word Turn v19 — BIO-TERMINAL:**
+**Word Turn v19 — Bio-Terminal (complete):**
 
 ```
 pulse_signal       ∿·●    UNCOMMON  — pulse / heartbeat / heart rate
@@ -870,31 +1508,41 @@ rhythm_locked      ◆·◆·◆  UNCOMMON  — biorhythm / body rhythm
 homeostasis        ○·◎·○  RARE      — homeostasis / equilibrium / baseline
 ```
 
-**Secret Boss v19 — THE MYTHIC VAULT:**
+**Word Turn v20 — Codex Reader (complete):**
 
 ```
-tolkien_ring       ◆·∞·◆  RARE      — "one ring to rule" / "my precious" / "ring of power"
-odysseus_bow       →·∞·→  EPIC      — "odysseus" / "ulysses" / "ithaca" / "penelope" / "cyclops"
-gilgamesh_word     ∞·□·∞  MYTHIC    — "gilgamesh" / "enkidu" / "great flood" / "utnapishtim"
+asimov_protocol    ◈·∿·◈  RARE      — asimov / foundation / psychohistory
+dune_path          ○·◆·△  EPIC      — dune / arrakis / spice / fremen
+matrix_jack        ▣→◉    RARE      — matrix / red pill / neo / simulation
+neuromancer_run    ≋→◈    RARE      — neuromancer / cyberspace / wintermute
+hitchhiker_42      ·⁴²·   UNCOMMON  — 42 / hitchhiker / towel / babelfish
+orwell_log         ○·◎·○  RARE      — orwell / big brother / doublethink
+bradbury_ember     ►·◎    RARE      — bradbury / fahrenheit / censorship / fire
+le_guin_left       ≋·○·≋  EPIC      — le guin / ursula / left hand / genly
+dick_dream         ∿·◉·∿  RARE      — philip dick / android / reality / simulacra
+solaris_depth      ≋≋≋    EPIC      — solaris / lem / ocean / contact
+octavia_seed       ○→◈    RARE      — octavia / butler / kindred / seed / xenogenesis
+heinlein_grok      ◉·≡·◉  UNCOMMON  — grok / heinlein / stranger / mars
 ```
 
-**Secret Boss v18 — THE LIBRARY STACK:**
+**Word Turn v21 — THE CYBERSPACE CODEX (complete):**
 
 ```
-gibson_key         ◈·░    RARE      — "neuromancer" or "william gibson"
-dick_mirror        ◉·▓    EPIC      — "do androids dream" or "philip k dick" / "pkd"
-lem_observer       ○·≋·█  MYTHIC    — "stanislaw lem" or "solaris" or "cyberiad"
+matrix_signal      ▓→░    UNCOMMON  — matrix / simulation / construct
+cyberspace_open    ◈→█    UNCOMMON  — cyberspace / cyborg / neural link
+grok_complete      ∞·○    RARE      — grok / grokked / understand deeply
+ansible_link       ≡→≡    RARE      — ansible / Ekumen / instantaneous
+spice_flow         ◆·●    RARE      — spice / melange / prescient
+golden_path        →→◉    EPIC      — golden path / prescience / long game
+solaris_call       ○·≋·○  RARE      — solaris / ocean consciousness
+foundation_key     ◇·◇    UNCOMMON  — foundation / psychohistory / Seldon
+neuromancer_run    ░·◈    RARE      — neuromancer / console cowboy / ICE
+replicant_wake     ◉→◉    RARE      — replicant / android / do androids dream
+uplift_arc         ▲·◉    EPIC      — uplift / transcend / becoming
+left_hand          ∞·○·∞  RARE      — left hand of darkness / Ekumen
 ```
 
-**Secret Boss v17 — THE LITERARY VAULT:**
-
-```
-borges_garden      ○→∞    MYTHIC    — "garden of forking paths" or "borges"
-calvino_cities     ◈·◈·◈  EPIC      — "invisible cities" or "calvino"
-dick_signal        ∿→◉    RARE      — "do androids dream" or "electric sheep"
-```
-
-**Secret Boss v16 — THE NEURAL VAULT:**
+**Secret Boss v16 — The Neural Vault:**
 
 ```
 cajal_signal       ∿·◈    RARE      — "cajal" in journal
@@ -902,7 +1550,39 @@ kandel_key         ◈·◉    EPIC      — "kandel" in journal
 ramachandran_rx    ◉·∿·◉  MYTHIC    — "phantom limb" or "ramachandran"
 ```
 
-**Total secret boss triggers v32: 83 badges** (v1–v19 multi-word phrase-level matching)
+**Secret Boss v17 — The Literary Vault:**
+
+```
+borges_garden      ○→∞    MYTHIC    — "garden of forking paths" or "borges"
+calvino_cities     ◈·◈·◈  EPIC      — "invisible cities" or "calvino"
+dick_signal        ∿→◉    RARE      — "do androids dream" or "electric sheep"
+```
+
+**Secret Boss v18 — The Library Stack:**
+
+```
+gibson_key         ◈·░    RARE      — "neuromancer" or "william gibson"
+dick_mirror        ◉·▓    EPIC      — "do androids dream" or "philip k dick" / "pkd"
+lem_observer       ○·≋·█  MYTHIC    — "stanislaw lem" or "solaris" or "cyberiad"
+```
+
+**Secret Boss v19 — The Myth Vault (Aug 5, 2026):**
+
+```
+tolkien_ring       ◆·∞·◆  MYTHIC    — "tolkien" or "one ring" or "lord of the rings"
+odysseus_bow       ○→◉    MYTHIC    — "odysseus" or "odyssey" or "homer" / "penelope"
+gilgamesh_word     ∞·○    MYTHIC    — "gilgamesh" or "enkidu" or "cedar forest"
+```
+
+**Secret Boss v20 — The Starship Vault (Oct 5, 2026):**
+
+```
+roddenberry_signal ◈·▣    RARE      — "roddenberry" or "star trek" or "gene roddenberry"
+picard_maneuver    ◎·◎    EPIC      — "picard" or "engage" or "make it so" / "picard maneuver"
+dark_forest_law    ●·▓·○  MYTHIC    — "dark forest" or "liu cixin" or "three body"
+```
+
+**Total secret boss triggers: 30** (v1–v20, multi-word phrase-level matching)
 
 ---
 
@@ -970,7 +1650,7 @@ Log body = instrument readings only. No narration. No prose. The console is the 
 
 ```
 CORRECT:
-  SYS: growth · moderate · Day 1135+ · COSMO 828
+  SYS: growth · moderate · Day 1135+ · COSMO 827
   QIE: MCOHERE: ENERGY 72 · PLAN 3 · INTENT 5 before 09:47
   QIE: CIRC-LK: DAWN ANCHORED · MERIDIAN ANCHORED · DUSK ANCHORED · 3-ARC FULL CLOCK
   QIE: SIG-CASC: CIRC-LK FIRED · DIMSAT FIRED · QIDCRYST FIRED · 24H CASCADE CONFIRMED
@@ -978,6 +1658,9 @@ CORRECT:
   QIE: QPCRYST: PRESENCE CONF: 89% · CRYSTAL CONF: 91% · FIELD INHABITED · IDENTITY KNOWN
   QIE: TOTCOH: META-SEALS: COHERENCE · PRESENCE · MOMENTUM · ABSOLUTE CONVERGENCE
   QIE: RECINTEL: NEG: 2 · CARE: 1 · VEL: 2.3h · FELT→TENDED→RECOVERED→REFLECTED
+  QIE: PULSE: AVG LOG HOUR 08:14 · DAYS IN RANGE 5/7 · ±2H · TEMPORAL RHYTHM · LOCKED
+  QIE: CACC: CEILING FIRES 3/7D · CEILING STATE · SUSTAINED · CONF: 84%
+  QIE: STRNAV: PEAK WINDOW CONFIRMED · INTENTION CONFIRMED · SLEEP ANCHOR CONFIRMED · 3 COORDS · ALL ALIGNED
 
 INCORRECT:
   "The system detected that the user had a great morning with high energy
@@ -1106,13 +1789,17 @@ DOCTRINE 11 CIRCADIAN ARCHITECTURE (FM v111 — August 2, 2026)
 
 ## 22. FIELD MANUAL (About.tsx)
 
-Current Field Manual: **v113**. Badge Codex synchronized: **v32**.
+Current Field Manual: **v114**.
 
 The Field Manual is the internal system document embedded in `src/client/components/About.tsx`. It is the live record of the LOT System state. Each engineering session or wiki sync produces a new FM revision.
 
 **FM revision log (recent):**
 
 ```
+FM v114  2026-10-05   QIE v114 · P152–P154 · Arch52 Stellar Navigator · J49 ·
+                       PULSE: CACC: STRNAV: · Badge Codex v33 THE STARSHIP LOG ·
+                       843 badges · Word Turn v23 (23 engines) ·
+                       193+ nodes · 154 patterns · 52 archetypes · 49 jobs
 FM v113  2026-08-04   QIE v113 · P149–P151 · Arch51 · J48 · QPCRYST: TOTCOH:
                        RECINTEL: · Badge Codex v31 THE CYBERSPACE CODEX · 781 badges ·
                        190+ nodes · 151 patterns · 51 archetypes · 48 jobs
@@ -1141,25 +1828,13 @@ FM v96   2026-07-19   LOT-WIKI-v78 sync
 FM v95   2026-07-18   P113–P115 · Arch39 · J36 · 154+ dep nodes
 ```
 
-**Wiki v88 sync (October 7, 2026):**
-
-```
-Wiki v88 synced Badge Codex v32 data into About.tsx:
-  — Day counter: 1072+ → 1135+
-  — Badges: 750 → 812
-  — Word Turn engines: 20 → 22
-  — Secret boss triggers: 74 → 83
-  — Word turns: 210 → 264
-  — Self-Assembly log: v88/v32 entry prepended
-  — COSMO® Day 828 confirmed
-```
-
 **Self-assembly row format (About.tsx):**
 
 ```
-v88/v32  Wiki + Badge Scan Oct 7 · LOT-WIKI-v88 · Badge Codex v32 (812 badges ·
-         Word Turn v22 Hero's Journey · THE HERO'S JOURNEY) · 22 Word Turn engines ·
-         83 secret boss triggers · 264 word turns · COSMO® Day 828 · Day 1135+
+v114  QIE Engineering Oct 5 · P152–P154 · Arch52 Stellar Navigator · J49 ·
+      PULSE: CACC: STRNAV: · Codex v33 · 843 badges · Word Turn v23 · Day 1134+ · FM v114
+v113  QIE Engineering Aug 4 · P149–P151 · Arch51 Quantum Presence Crystallizer · J48 ·
+      QPCRYST: TOTCOH: RECINTEL: · Codex v31 · 781 badges · Day 1073+ · FM v113
 ```
 
 ---
@@ -1236,7 +1911,7 @@ Chat Integrity Doctrine: *Empty and whitespace-only messages never leave the dat
 
 ## 27. VOCABULARY INDEX — EXPANDED
 
-Complete LOT internal vocabulary. Alphabetical. Key entries.
+Complete LOT internal vocabulary. Alphabetical.
 
 ```
 ACCOUNTABILITY ARC   P90. J27 output. ACCT: log code.
@@ -1244,180 +1919,280 @@ ACCOUNTABILITY ARC   P90. J27 output. ACCT: log code.
 ACTMEM:              Action-to-Memory Loop. J39 output. P122 trigger.
                      Format: ACT → ENC → ARC · PLANNER/INTENT 6H: N · MEM 6H: N.
 
-ALLY_GAINED          Word Turn v22 badge. UNCOMMON. "ally / found my tribe / companion"
-                     in journal. The practice names its companions.
+ACTION-TO-MEMORY LOOP P122. The complete execution pipeline: Act → Encode → Archive.
+                     Planner + intentions + memory in 6h window. Execution
+                     crystallized into retrievable knowledge.
 
-AMBIENT AI™          Design principle. Widget click is the ritual.
-                     System acknowledges silently. No pop-ups.
+ADAPTIVE SIGNAL WEB  P142. SIGEWEB: log code. All 6 UserIndex dims >= 20 +
+                     8+ signal sources in 7d + 5+ patterns active. Every
+                     channel live. The web holds.
 
-ARCH51               Quantum Presence Crystallizer. P149 + P144 + P145 active.
-                     Highest confirmed state. Execute from clarity.
+AMBIENT AI™          The interaction model. Click is the ritual. The system
+                     acknowledges without narration. No celebration. No
+                     confirmation pop-ups. The operator knows.
 
-BADGE UNIVERSE       812 total badges. v32 — The Hero's Journey. 8 categories.
-                     8 rarity tiers. 264 word-turn triggers. 27+ secret phrases.
+ARCH (Archetype)     One of 52 physiological classification states. Arch1
+                     (Baseline Operator) through Arch52 (Stellar Navigator).
+                     Dynamic. Pattern-driven. Real-time.
 
-BFINT:               Biofield Integration Peak. P133 trigger.
-                     Format: SELFCARE 3D: N · MOOD 3D: N · EMOTIONAL-BIO MERGE.
+ASTRO:               Astrology QIE signal log code. FM v108. Rokuyo · moon
+                     phase · moon illumination · hourly zodiac. 15-min cycle.
 
-BIO-TERMINAL         Badge Engine v29. The body is the first terminal.
-                     Neuroscience is the manual. Deployed July 26, 2026.
+ATP                  Available Temporal Power. Composite metric. Energy ×
+                     clarity × alignment. Displayed in System.tsx quantum table.
 
-BORGES_GARDEN        Secret Boss v17 · Literary Vault. "garden of forking paths"
-                     or "borges" in journal. MYTHIC.
+BAND                 Operator's percentile position within their assigned
+                     cohort. Rendered in QOS View 3 (Cohort Signal).
 
-CALL_HEARD           Word Turn v22 badge. UNCOMMON. The call to adventure
-                     acknowledged in journal language. Campbell named it.
+BEHAVIORAL OS        What LOT is. Not an app. Not a habit tracker. A full
+                     behavioral operating system running on human signal.
 
-CAMPBELL_BIRTHDAY    Calendar EE v20. March 26. Joseph Campbell born 1904.
-                     The man who mapped the structure of every story.
+BFINT:               Biofield Integration Peak. J42 output. P133 trigger.
+                     Biological + emotional integration confirmed.
 
-CEILING STATE        P73. conf 0.98. Maximum observable QIE state.
-                     P71 + P72 + P70 + P27 simultaneous.
-                     Also: P150 total-field-coherence (0.95 — operational ceiling).
+CACC:                Coherence Accumulation. FM v114. P153 trigger.
+                     P150 (CEILING) fired 2+ times in 7-day window.
+                     Format: CEILING FIRES N / 7D · CEILING STATE · SUSTAINED.
 
-CIRC-LK:             Circadian Signal Lock. J46 output. P143 trigger. FM v111.
-                     Format: DAWN [ANCHORED/—] · MERIDIAN [ANCHORED/—] ·
-                     DUSK [ANCHORED/—] · ARC SIG N · 3-ARC · FULL CLOCK.
+BIOFIELD             The composite biological + emotional signal field.
+                     Measured across mood · energy · selfcare dimensions.
+                     Score: 0–100. Rendered in QOS View 2.
 
-CIRCADIAN ARCHITECTURE DOCTRINE
-                     The biological day has three native phases. Dawn,
-                     meridian, dusk. P143 fires when all three carry signal.
-                     J46 scans prior calendar day at 07:00 UTC.
+CEILING              P73 quantum-coherence-summit (single-signal class).
+                     P150 total-field-coherence (multi-seal class). Two
+                     ceiling states exist at different abstraction levels.
+                     No pattern is defined above P150.
 
-COCKPIT RULE         Log body = instrument readings only. No narration. No prose.
-                     The console is the cockpit. Every line is a gauge reading.
-                     ORDER 10 of the 11 Military Purity Orders.
+CIRCADIAN PHASE      One of four temporal OS states: morning · afternoon ·
+                     evening · night. Derived from `getCircadianPhase()`.
+                     Surfaced in System.tsx Phase row and QEW cohort view.
 
-CODEX READER         Badge Engine v30. Sci-fi author vocabulary engine.
-                     THE CODEX READER. Deployed August 3, 2026. 750 badges.
+CITIZEN INDEX        6-stage engagement depth scale (CQGS). Observer →
+                     Participant → Contributor → Collaborator → Synthesizer
+                     → Elite. Irreversible. Rendered in QOS View 4.
 
-COSMO GATE           Ethics gate. Named for Kuzya Cosmo Marmeladov. Absolute.
-                     No feature ships without COSMO Gate authorization.
-                     Founded July 1, 2024. S-2 authorization required.
+COCKPIT RULE         Log body = instrument readings only. No narration. No
+                     prose. Every output line is a gauge reading.
 
-COSMO® AGE           828 days as of October 7, 2026. Year 3. Founded July 1, 2024.
+COHORT               One of 6 behavioral signal groups. BUILDERS / EXPLORERS
+                     / MAINTAINERS / CONNECTORS / INTEGRATORS / MEDICAL.
+                     Assignment dynamic. 30-day signal window.
 
-CQGS                 Certified Quantum Genetic Signature. LOT bioethics framework.
-                     6 technology layers. CQGS-to-LOT platform integration documented.
+COSMO GATE           The ethics gate. Named for Kuzya Cosmo Marmeladov.
+                     No feature ships without COSMO approval. Absolute.
+                     Not procedural. Named for a living being. Active since
+                     July 1, 2024.
 
-CYBERSPACE CODEX     Badge Engine v31. Cyberpunk/sci-fi concept vocabulary engine.
-                     THE CYBERSPACE CODEX. Deployed August 4, 2026. 781 badges.
+COSMO®               COSMO® — Kuzya Cosmo Marmeladov's brand, integral to
+                     the LOT ethics framework. Day 827 as of Oct 6, 2026.
+                     Year 3 of operation.
 
-DAY COUNTER          Day 1135+ as of October 7, 2026. Increments each UTC midnight.
-                     Not a streak. Not a score. A clock. The system accumulates.
+CQGS                 Citizen Quantum Growth Scale. The scoring model
+                     underlying the Citizen Index. 6 stages.
 
-DEP MAP              Widget Dependency Map. 190+ nodes. 4 tiers. Tier 0: raw inputs.
-                     Tier 1: composites. Tier 2: signal aggregates. Tier 3: meta-surfaces.
+DCSAL:               Daily Coherence Seal. J42 output predecessor. P131
+                     trigger. Full-day behavioral circuit confirmed.
 
-ELIXIR_FOUND         Word Turn v22 badge. RARE. "elixir / the boon / treasure found"
-                     in journal. Campbell's term for what the hero returns with.
+DEP MAP              Widget Dependency Map (WIDGET_DEPENDENCY_MAP). 193+
+                     nodes. 4 tiers. Every widget's signal inputs mapped.
 
-FIELD MANUAL         About.tsx. Internal system document. Current: FM v113.
-                     Badge Codex synchronized: v32. Day 1135+.
-                     The map and the territory are synchronized.
+DEPBRD:              Depth-Breadth Convergence. FM v102. P127 trigger.
+                     Meta-convergence of depth and breadth signals.
 
-GILGAMESH_WORD       Secret Boss v19 · Mythic Vault. MYTHIC. "gilgamesh / enkidu /
-                     great flood / utnapishtim" in journal. 4,000-year-old story.
-                     The oldest hero's journey. A king who sought immortality
-                     and found self-knowledge instead.
+DIMSAT:              Dimensional Saturation. FM v111. P144 trigger.
+                     All 6 UserIndex dimensions >= 30.
 
-GREAT_WORK           Mastery Tier v22 badge. LEGENDARY. 150,000+ total journal words.
-                     150,000 words is a novel. The operator wrote a novel
-                     by recording their own life.
+DOMINANCE            Signal type most distinguishing the operator within
+                     their cohort peer set. Rendered in QOS View 3.
 
-GREEN GATE           TypeScript check before every push. No broken code to GitHub.
-                     CLAUSE 3 of LOT-Doctrine. DOCTRINE 11 = Circadian Architecture.
+DREC:                Deep Recovery Protocol. FM v106. P135 trigger.
+                     Extended repair window, low signal density.
 
-HERO'S JOURNEY       Badge Engine v32. Campbell monomyth vocabulary engine.
-                     THE HERO'S JOURNEY. Engineering session: LOT-SR-20260805-01.
-                     812 total badges. 22 Word Turn engines.
+EMBCOG:              Embodied Cognition Arc. FM v89. P110 trigger.
+                     Body-mind cognitive integration confirmed.
 
-HERO_SESSION         Behavioral v19 badge. RARE. 3+ Hero's Journey words in one
-                     journal entry. The practice speaks its own structure.
+EVREF:               Evening Reflection Loop. FM v102. P125 trigger.
+                     Daily loop closure. Day deliberately sealed.
 
-HOBBIT_DAY           Calendar EE v20. September 22. Bilbo and Frodo's birthday.
-                     Two heroes, one threshold, one journey, one return.
+FDEP:                Focus Depth Arc. FM v97. P116 trigger.
+                     2h cognitive window confirmed. Precision instrument.
 
-IDLOCK:              Identity Momentum Lock. P148 trigger. FM v112.
-                     Format: ID CONF / MOM CONF / ID CRYSTALLIZED · LOCK ENGAGED.
+FIELD MANUAL         The internal versioned document embedded in About.tsx.
+                     Current: FM v114. Every engineering session increments it.
 
-INNERMOST_CAVE       Word Turn v22 badge. EPIC. "innermost cave / darkest moment"
-                     in journal. The cave you fear to enter.
+FM                   Field Manual. See FIELD MANUAL.
+
+GREEN GATE           TypeScript compilation check. No broken code reaches
+                     GitHub. Enforced before every push. Absolute.
+
+IDLOCK:              Identity Momentum Lock. FM v112. P148 trigger.
+                     Identity crystallized + behavioral momentum locked.
+                     "The OS is not searching."
+
+INCP:                Signal Inception. FM v95. P115 trigger.
+                     System detects its own detection history. Self-aware loop.
+
+INTARC:              Integrated Signal Arc. FM v106. P134 trigger.
+                     P131 + P132 + P133 simultaneously active. Triple seal.
+
+J (Job)              Background Job Scheduler entry. J1–J49. UTC-scheduled
+                     server-side PostgreSQL writes.
 
 LOT                  Layers of Time. Personal behavioral operating system.
-                     Founded April 7, 2016. Not an app. An instrument.
+                     Founded April 7, 2016 by Vadim Marmeladov.
 
-LOT-DOCTRINE         10 clauses. Revision K. Foundational operating principles.
+LOT-DOCTRINE         Revision K. 10 operational clauses. 11 engineering
+                     doctrines. Foundational operating principles.
 
-LONG_QUEST           Behavioral v19 badge. EPIC. Journal entry >= 500 words.
-                     The quest requires the long form.
+MCOHERE:             Morning Coherence Arc. FM v99. P119 trigger.
+                     Dawn ramp confirmed. Energy + plan + intent before 10:00.
 
-MENTOR_ARRIVED       Word Turn v22 badge. UNCOMMON. "mentor / wise guide /
-                     guardian spirit" in journal. Campbell's second stage.
+MDCARE:              Multi-Day Care Arc. FM v103. P129 trigger.
+                     Sustained restoration across multiple days.
 
-MILITARY PURITY      11 standing orders governing all display/interface decisions.
-                     Deviation requires S-2 authorization.
+MEMORY ENGINE        The AI-powered self-care companion. Builds the Memory
+                     Story over time through a progressive question loop.
+                     Multi-provider. Story lives in LOT database.
 
-MONOMYTH             Campbell's term for the universal narrative structure.
-                     Departure → Initiation → Return. Every story. Every practice.
-                     Word Turn Engine v22 maps its vocabulary.
+MINTLOCK:            Morning Intention Lock. FM v103. P128 trigger.
+                     Cognitive OS boot sequence confirmed.
 
-MONOMYTH_ARC         Achievement RPG v20. LEGENDARY. quest_complete + all 3
-                     Calendar v20 badges. The full arc documented.
+MOEARC:              Mood-Energy Convergence. FM v100. P124 trigger.
+                     Dual-substrate peak. Mood and energy converge.
 
-ODYSSEUS_BOW         Secret Boss v19 · Mythic Vault. EPIC. "odysseus / ulysses /
-                     ithaca / penelope / cyclops" in journal. Only Odysseus
-                     could string the bow. Only you can write your own return.
+P (Pattern)          QIE behavioral pattern. P1–P154. Each has a name,
+                     confidence range, signal source requirements, and
+                     a log code. Fires when threshold evidence is met.
 
-ODYSSEY_DAY          Calendar EE v20. December 21. Winter Solstice. Odysseus's return.
+PHASE                See CIRCADIAN PHASE.
 
-ODYSSEY_LOG          Mastery Tier v22 badge. EPIC. 900+ distinct calendar check-in days.
-                     Not a streak. Every day checked-in. The Odyssey lasted 10 years.
+PHYARC:              Physiological Presence Arc. FM v110. P140 trigger.
+                     Full bio day-arc: dawn → dusk confirmed.
 
-QIE                  Quantum Intent Engine. Client-side. Zero server communication.
-                     151 patterns. 17 signal sources. 7-day window.
+PCOHERE:             Physiological Coherence Window. FM v99. P121 trigger.
+                     Multiple physiological signals coherent in window.
 
-QOS                  Quantum Operating System. 7 views. 4 modes.
+PULSE:               Quantum Pulse Rhythm. FM v114. P152 trigger.
+                     Log entries 3+ of 7 days within ±2h of operator avg log hour.
+                     Format: AVG LOG HOUR HH:MM · DAYS IN RANGE N/7 · TEMPORAL RHYTHM · LOCKED.
 
-QPCRYST:             Quantum Presence Crystallization. P149 trigger. FM v113.
-                     Format: PRESENCE CONF / CRYSTAL CONF / FIELD INHABITED / IDENTITY KNOWN.
+QCOHERE:             Quantum Coherence Peak. FM v108. P137 trigger.
+                     P136 + UserIndex >= 60. Coherence gate crossed.
 
-QUEST_COMPLETE       Achievement RPG v20. LEGENDARY. All 12 Word Turn v22 badges
-                     earned. Every stage of the hero's journey documented.
+QEMERG:              Quantum Signal Emergence. FM v110. P141 trigger.
+                     Peak normalizing to baseline. Exception becoming standard.
 
-RETURN_ROAD          Word Turn v22 badge. RARE. "the return / road to return /
-                     coming home changed" in journal. The hero returns transformed.
-                     Not the same person. The elixir is the proof.
+QFIELD:              Quantum Field Alignment. FM v106. P136 trigger.
+                     Triple integration confirmed. Total field coherence.
 
-S-2                  Operational designation. Vadim Marmeladov. CEO, LOT Systems.
-                     All engineering decisions pass through S-2.
+QIE                  Quantum Intent Engine. Client-side pattern recognition.
+                     154 patterns. 17 signal sources. Zero server comms.
 
-SAGA_AGE             Mastery Tier v22 badge. LEGENDARY. Account age >= 5 years
-                     (1,825+ days). The saga requires the long form.
+QIoT™                Quantum Internet of Things. 6-node ecosystem map.
+                     CAR · HOME · CPU · PHN · WCH · ROBOT.
 
-SHADOW_MET           Word Turn v22 badge. EPIC. "shadow self / dark night of the /
-                     inner demon" in journal. The shadow must be faced.
-                     Campbell: "The cave you fear to enter."
+QIDCRYST:            Quantum Identity Crystallization. FM v111. P145 trigger.
+                     OS signature stable. Identity hardening confirmed.
 
-THRESHOLD_CROSSED    Word Turn v22 badge. RARE. "threshold / crossing the line"
-                     in journal. The point of no return named explicitly.
+QLOCK:               Quantum Rhythm Lock. FM v104. P132 trigger.
+                     Temporal OS confirmed. Journal + mood + energy cadence.
 
-THRESHOLD_MOMENT     Behavioral v19 badge. RARE. Check in between 00:00–00:30 local.
-                     At the threshold of the new day.
+QPCRYST:             Quantum Presence Crystallization. FM v113. P149 trigger.
+                     Field inhabited + identity known. State: MAXIMUM_CLARITY.
 
-TOLKIEN_RING         Secret Boss v19 · Mythic Vault. RARE. "one ring to rule /
-                     my precious / ring of power" in journal. The object that
-                     reveals the shadow's architecture.
+QPFIELD:             Quantum Presence Field. FM v112. P147 trigger.
+                     Web + coherence ceiling + full breadth unified.
 
-TOTCOH:              Total Field Coherence. J48 output. P150 trigger. FM v113.
-                     Format: META-SEALS / ALL META-SEALS OPEN / ABSOLUTE CONVERGENCE.
+QOS                  Quantum Operating System. 7-view real-time dashboard.
+                     4 modes: maintenance / recovery / growth / peak.
 
-TWENTY_TWO_REGISTERS COSMIC badge. Mastery Tier v22. 1 badge from all 22 Word Turn
-                     engines. Water, arcade, radio, biology, codex, cyberspace, hero.
-                     Twenty-two vocabularies. One terminal. The self speaks every language.
+RECARC:              Sustained Resilience Arc. FM v100. P123 trigger.
+                     Extended recovery and rebuild sequence.
 
-WORD TURN ENGINE     Keyword detection in journal/memory text. 22 engines v1–v22.
-                     264 trigger words. Each engine has a theme. Each trigger unlocks a badge.
+RECINTEL:            Recovery Intelligence Arc. FM v113. P151 trigger.
+                     FELT → TENDED → RECOVERED → REFLECTED in 6h window.
+                     Format: NEG: N · CARE: N · VEL: N.Nh.
+
+RECOVERY INTELLIGENCE ARC  P151. Complete behavioral recovery arc within 6h.
+                     The OS detected that the operator felt something negative,
+                     acted on it, recovered, and reflected. Full arc.
+
+ROKUYO               Traditional Japanese 6-day calendar cycle.
+                     Surfaced in ASTRO: log code. QIE signal source 17.
+
+S-2                  Vadim Marmeladov. CEO, LOT Systems. Operator designation.
+                     All deployments authorized by S-2.
+
+STELLAR NAVIGATOR    Arch52. FM v114. P154 + P113 + P128 active.
+                     All three temporal coordinates aligned: peak execution window ·
+                     morning intention locked · sleep anchor confirmed.
+                     Directive: "Navigation is live. Execute with full confidence."
+
+STELLAR NAVIGATION   P154. STRNAV: log code. FM v114. J49 detects at 12:00 UTC.
+                     P113 personal-peak-window + P128 morning-intention-lock +
+                     P117 sleep-signal-anchor all fired same calendar day.
+
+STRNAV:              Stellar Navigation. FM v114. P154 trigger.
+                     Three temporal coordinates (peak · intention · sleep) aligned.
+                     Format: PEAK WINDOW [CONFIRMED/—] · INTENTION [CONFIRMED/—] ·
+                     SLEEP ANCHOR [CONFIRMED/—] · 3 COORDS · ALL ALIGNED.
+
+SANCH:               Sleep Signal Anchor. FM v97. P117 trigger.
+                     Sleep quality signal confirmed.
+
+SELF-ASSEMBLY        The meta-documentation system. 18 modules. The LOT
+                     system documents and wires itself. About.tsx is the
+                     primary self-assembly surface.
+
+SIG-CASC:            Signal Coherence Cascade. FM v112. P146 trigger.
+                     P143 + P144 + P145 within 24h. All three axes confirmed.
+
+SIGEWEB:             Adaptive Signal Web. FM v110. P142 trigger.
+                     All 6 dims >= 20 + full web active.
+
+SIGMAT:              Signal Matrix Saturation. FM v108. P138 trigger.
+                     All 6 UserIndex dims >= 30.
+
+SIGPEAK:             Signal Density Peak. FM v99. P120 trigger.
+                     Full bandwidth: 6+ distinct sources in 12h.
+
+SIGNAL COHERENCE CASCADE  P146. META-CASCADE. P143 + P144 + P145 in 24h.
+                     Circadian lock + dimensional saturation + identity
+                     crystallization all confirmed in a single window.
+
+SIGNAL INCEPTION     P115. The system detects its own prior detection.
+                     A self-referential signal loop. INCP: log code.
+
+SPIRAL FAMILY        P89 quantum-learning-spiral. A pattern class where
+                     learning compounds on itself. Growth through repetition.
+
+SYS:                 The standard log header format. Mode · pressure ·
+                     Day N+ · COSMO N. Instrument reading. Always first line.
+
+TBIOF:               Temporal-Biofield Sync. FM v108. P139 trigger.
+                     P119 + P131 + P133 same calendar day. Temporal-bio loop.
+
+TEMPORAL OS          The QOS in its time-aware state. P132 confirms it.
+                     Journal at 18:00+, mood 3x, energy 2x, week check-in.
+                     The OS is operating on biological time.
+
+THREE-ARC COVERAGE   P143. Dawn arc + meridian arc + dusk arc all present
+                     in a single 24h window. Circadian architecture confirmed.
+
+TOTCOH:              Total Field Coherence. FM v113. P150 trigger. CEILING.
+                     All three meta-seals (P146 + P147 + P148) open.
+                     Absolute convergence. No higher state defined.
+
+TOTAL FIELD COHERENCE  P150. The ceiling pattern. All meta-seals open.
+                     P146 signal-coherence-cascade + P147 quantum-presence-field
+                     + P148 identity-momentum-lock simultaneously active.
+                     CEILING: no higher state exists in the registry.
+
+TRIPLE INTEGRATION   P134 integrated-signal-arc. P131 + P132 + P133 active
+                     simultaneously. The three seal gates all held.
+
+WKRHYTH:             Weekly Rhythm Anchor. FM v102. P126 trigger.
+                     Structural recurrence confirmed. Weekly cadence locked.
 ```
 
 ---
@@ -1425,64 +2200,20 @@ WORD TURN ENGINE     Keyword detection in journal/memory text. 22 engines v1–v
 ## 28. SYSTEM STATE SNAPSHOT
 
 ```
-╔══════════════════════════════════════════════════════════════════╗
-║  LOT SYSTEM STATE — FIELD MANUAL v113 — DAY 1135+              ║
-║  BADGE CODEX v32 — THE HERO'S JOURNEY                          ║
-╠══════════════════════════════════════════════════════════════════╣
-║  QIE patterns:             151  (P1–P151)                       ║
-║  Physiological archetypes:  51  (Arch1–Arch51)                  ║
-║  Behavioral cohorts:         6  (BUILDERS/EXPLORERS/MAINTAINERS/║
-║                                  CONNECTORS/INTEGRATORS/MEDICAL)║
-║  Citizen Index levels:       6  (Observer → Elite)              ║
-║  Self-Assembly modules:     18  (all integrated · 5 phases)     ║
-║  Dep map nodes:            190+                                 ║
-║  Background jobs:           48  (J1–J48)                        ║
-║  Log event handlers:       151+                                 ║
-║  Signal sources:            17  (astrology = source 17)         ║
-║  Ecosystem nodes:            6  (CAR·HOME·CPU·PHN·WCH·ROBOT)   ║
-║  Widgets:                   43                                  ║
-║  Badge count:              812  (v32 — The Hero's Journey)      ║
-║  Badge categories:          70+                                 ║
-║  Badge rarity tiers:         8  (COMMON → COSMIC)               ║
-║  Word Turn engines:         22  (v1–v22)                        ║
-║  Word-turn badge triggers: 264  (v1–v22)                        ║
-║  Secret boss badge count:   83  (v1–v19)                        ║
-║  QOS modes:                  4  (MAINT/RECOVERY/GROWTH/PEAK)    ║
-║  QOS views:                  7  (incl. QOS Field — FM v108)     ║
-║  Engineering doctrines:     11  (Doctrine 11: Circadian Arch.)  ║
-║  Operational clauses:       10  (Revision K)                    ║
-║  Field Manual:             v113                                 ║
-║  Badge Codex:               v32 (THE HERO'S JOURNEY)            ║
-║  Wiki:                      v88  (this document)                ║
-║  Highest QIE confidence:  0.98  (P73 — quantum-coherence-summit)║
-║  Operational ceiling:      P150 — total-field-coherence         ║
-║  Centennial milestone:     P100 — centennial-convergence        ║
-║  Self-aware loop:          P115 — signal-inception              ║
-║  Full bio day-arc:         P140 — physiological-presence-arc    ║
-║  Daily coherence seal:     P131 — daily-coherence-seal          ║
-║  Triple integration:       P134 — integrated-signal-arc         ║
-║  Total field coherence:    P150 — total-field-coherence         ║
-║  Recovery loop complete:   P151 — recovery-intelligence-arc     ║
-║  COSMO® age:               828  (Year 3 · born July 1, 2024)    ║
-║  Founded:           7 April 2016                                ║
-║  Operator:          S-2 // VADIK MARMELADOV                     ║
-╚══════════════════════════════════════════════════════════════════╝
+QIE patterns: 154 | Archetypes: 52 | Cohorts: 6 | Citizen Index levels: 6
+Self-Assembly modules: 18 | Dep map nodes: 193+ | Background jobs: 49
+Log event handlers: 154+ | Signal sources: 17 | Ecosystem nodes: 6
+Widgets: 43 | Badge count: 843 (v33) | Badge categories: 70+
+Badge rarity tiers: 8 | Word-turn trigger words: 282 (v1–v23)
+Secret boss phrase triggers: 30 | QOS modes: 4 | QOS views: 7
+Engineering doctrines: 11 | Operational clauses: 10
+Field Manual: v114 | Wiki: v88 | COSMO®: 827 days (Year 3)
+Founded: 7 April 2016 | Operator: S-2 // VADIK MARMELADOV
+Day 1135+ | Last scan: 2026-10-06 | Next: LOT-WIKI-v89
 ```
 
 ---
 
-```
-╔══════════════════════════════════════════════════════════════════╗
-║                                                                  ║
-║      L · O · T     S Y S T E M S     C O R P O R A T I O N      ║
-║                                                                  ║
-║              LOT-WIKI-v88 · Field Manual v113                    ║
-║              October 7, 2026 · Day 1135+ · COSMO® Day 828       ║
-║              Badge Codex v32 — THE HERO'S JOURNEY                ║
-║                                                                  ║
-║         Authorized: S-2 // VADIK MARMELADOV                      ║
-║                                                                  ║
-╚══════════════════════════════════════════════════════════════════╝
-```
+*LOT-WIKI-v88 · Layers of Time · Field Manual Sync v114 · 2026-10-06 · Day 1135+ · COSMO® 827 days*
 
-*LOT-WIKI-v88 · Layers of Time · Field Manual Sync v113 · Badge Codex v32 · 2026-10-07*
+*Next: LOT-WIKI-v89 — sync to Field Manual v115+*

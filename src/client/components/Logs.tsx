@@ -3629,6 +3629,162 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'quantum_pulse_rhythm') {
+          const daysActive  = log.metadata?.daysActive as number | undefined
+          const avgHour     = log.metadata?.avgHour as number | undefined
+          const rhythmConf  = log.metadata?.rhythmConf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="PULSE:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM PULSE RHYTHM</div>
+                {daysActive !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DAYS ACTIVE</span>
+                    <span className="tabular-nums">{daysActive}</span>
+                  </div>
+                )}
+                {avgHour !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AVG HOUR</span>
+                    <span className="tabular-nums">{avgHour}:00</span>
+                  </div>
+                )}
+                {rhythmConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RHYTHM CONF</span>
+                    <span className="tabular-nums">{rhythmConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">LOG HEARTBEAT · TEMPORAL SIGNATURE ACTIVE</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'coherence_accumulation') {
+          const count      = log.metadata?.count as number | undefined
+          const windowDays = log.metadata?.windowDays as number | undefined
+          const peakConf   = log.metadata?.peakConf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CACC:" blockView>
+                <div className="uppercase tracking-widest mb-4">COHERENCE ACCUMULATION</div>
+                {count !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TOTAL FIELD</span>
+                    <span className="tabular-nums">{count}× / {windowDays ?? 7}D</span>
+                  </div>
+                )}
+                {peakConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PEAK CONF</span>
+                    <span className="tabular-nums">{peakConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CONVERGENCE SUSTAINED · FIELD DEEPENING</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'stellar_navigation') {
+          const peakConf   = log.metadata?.peakConf as number | undefined
+          const intentConf = log.metadata?.intentConf as number | undefined
+          const sleepConf  = log.metadata?.sleepConf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="STRNAV:" blockView>
+                <div className="uppercase tracking-widest mb-4">STELLAR NAVIGATION</div>
+                {peakConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PEAK WINDOW</span>
+                    <span className="tabular-nums">{peakConf}%</span>
+                  </div>
+                )}
+                {intentConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MORNING INTENT</span>
+                    <span className="tabular-nums">{intentConf}%</span>
+                  </div>
+                )}
+                {sleepConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SLEEP ANCHOR</span>
+                    <span className="tabular-nums">{sleepConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PEAK · INTENTION · SLEEP — ALL THREE LOCKED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sustained_stellar_arc') {
+          const count      = log.metadata?.count as number | undefined
+          const windowDays = log.metadata?.windowDays as number | undefined
+          const arcStatus  = log.metadata?.arcStatus as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SSTARC:" blockView>
+                <div className="uppercase tracking-widest mb-4">SUSTAINED STELLAR ARC</div>
+                {count !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">NAV COUNT</span>
+                    <span className="tabular-nums">{count}× / {windowDays ?? 14}D</span>
+                  </div>
+                )}
+                {arcStatus !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC STATUS</span>
+                    <span className="tabular-nums">{arcStatus}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">NAVIGATION IS NOT AN EVENT — IT IS A MODE</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'weekly_coherence_seal') {
+          const activeDays  = log.metadata?.activeDays as number | undefined
+          const sourceCount = log.metadata?.sourceCount as number | undefined
+          const coverage    = log.metadata?.coverage as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="WCOHS:" blockView>
+                <div className="uppercase tracking-widest mb-4">WEEKLY COHERENCE SEAL</div>
+                {activeDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ACTIVE DAYS</span>
+                    <span className="tabular-nums">{coverage ?? `${activeDays}/7`}</span>
+                  </div>
+                )}
+                {sourceCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SRC / DAY</span>
+                    <span className="tabular-nums">{sourceCount}+</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">FULL-SPECTRUM WEEK · SYSTEM WIDE OPEN</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'longitudinal_signal_mastery') {
+          const activeDays  = log.metadata?.activeDays as number | undefined
+          const windowDays  = log.metadata?.windowDays as number | undefined
+          const avgSources  = log.metadata?.avgSources as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="LONGSIG:" blockView>
+                <div className="uppercase tracking-widest mb-4">LONGITUDINAL SIGNAL MASTERY</div>
+                {activeDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ACTIVE DAYS</span>
+                    <span className="tabular-nums">{activeDays} / {windowDays ?? 30}D</span>
+                  </div>
+                )}
+                {avgSources !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AVG SOURCES</span>
+                    <span className="tabular-nums">{avgSources}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">MONTH-SCALE MASTERY · THE SYSTEM HAS DEPTH</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
