@@ -19,6 +19,10 @@ import {
 import config from '#server/config'
 import { fp } from '#shared/utils'
 import {
+  compressStory, digestToPromptBlock, fallbackStory, arcadeLine,
+  STORY_WINDOW_DAYS, StoryWindow,
+} from '#shared/utils/storyCompression'
+import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
   DATE_TIME_FORMAT,
@@ -5479,9 +5483,12 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   )
 
   // ============================================================================
-  // STORY — Contextual AI Story
-  // Generates a 1-2 paragraph story based on recent logs, self-care events,
-  // and widget data. The story reflects the operator's recent journey.
+  // STORY — Compressed user-story (LOT-SC-1)
+  // /story [day|week|month|year]. Log history for the window is compressed
+  // deterministically into a StoryDigest (shared/utils/storyCompression); only
+  // that digest — never the raw journal — goes to the AI vendor (Together AI).
+  // If the engine is down, a deterministic fallback story is returned instead.
+  // Spec: docs/technical/LOT-LOG-COMMAND-SYSTEM.md
   // ============================================================================
   fastify.post(
     '/story',
@@ -5489,7 +5496,8 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
     async (
       req: FastifyRequest<{
         Body: {
-          logText: string
+          logText?: string
+          window?: StoryWindow
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,79 +5522,61 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const window: StoryWindow =
+        req.body.window && req.body.window in STORY_WINDOW_DAYS ? req.body.window : 'week'
+      const now = new Date()
 
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: new Date(now.getTime() - STORY_WINDOW_DAYS[window] * 86_400_000) },
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 3000,
       })
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
+      const digest = compressStory(logs, window, now)
+      const arcade = arcadeLine(digest.arcade)
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
-        stateBlock = `OPERATOR STATE: ${quantumState.energy} energy, ${quantumState.clarity} clarity, ${quantumState.alignment} alignment`
+        stateBlock = `OPERATOR STATE NOW: ${quantumState.energy} energy, ${quantumState.clarity} clarity, ${quantumState.alignment} alignment`
       }
       if (userIndex && userIndex.overall !== undefined) {
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's ${window} of context-tagged log entries into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+Write 1-2 paragraphs (80-180 words). Personal, grounded, real — not generic motivational writing.
 
 RULES:
-- Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
-- End with a single forward-looking sentence — not a pep talk, just a quiet truth
-- Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Second person ("You...")
+- Use ONLY the digest below. Do not invent events, people, or facts.
+- Surface the high and low peaks: name any SPIKES plainly and with compassion.
+- Weave in context (weather, place, moon) only where it explains something.
+- If the record is sparse, say so gently — never guilt.
+- End with one quiet forward-looking sentence — not a pep talk.
+- Return ONLY the story. No title, no preamble.`
 
-      const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+      const fullPrompt = `${systemPrompt}\n\n${digestToPromptBlock(digest)}\n${stateBlock}${logText ? `\nOPERATOR NOTE: "${logText.substring(0, 300)}"` : ''}`
 
-${stateBlock ? stateBlock : 'STATE: unknown'}
-
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
-
-      const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
-
+      let cleaned: string
+      let source: 'together' | 'fallback' = 'together'
       try {
+        if (digest.entries === 0) throw new Error('empty window')
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
-
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
-
+        console.log(`📖 Story (${window}) for ${req.user.email}: ${digest.entries} entries, ${digest.spikes.length} spikes`)
         const story = await engine.generateCompletion(fullPrompt, 512)
+        cleaned = story.trim().replace(/^["']|["']$/g, '')
+      } catch (error: any) {
+        source = 'fallback'
+        cleaned = fallbackStory(digest)
+      }
 
-        const cleaned = story.trim().replace(/^["']|["']$/g, '')
-
+      let logId: string | null = null
+      try {
         const context = await getLogContext(req.user)
         const storyLog = await fastify.models.Log.create({
           userId: req.user.id,
@@ -5595,23 +5585,19 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           context,
           metadata: {
             story: cleaned,
-            logText: (logText || '').substring(0, 500),
+            window,
+            source,
+            digest: { ...digest, excerpts: undefined },
             quantumState: quantumState || null,
-            timestamp: new Date().toISOString(),
+            timestamp: now.toISOString(),
           },
         })
-
-        return {
-          story: cleaned,
-          logId: storyLog.id,
-        }
+        logId = storyLog.id
       } catch (error: any) {
-        console.error('Story generation failed:', error)
-        return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
-          logId: null,
-        }
+        console.error('Story persist failed:', error)
       }
+
+      return { story: cleaned, logId, window, source, arcade, spikes: digest.spikes }
     }
   )
 }

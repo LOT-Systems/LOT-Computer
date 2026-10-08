@@ -29,6 +29,7 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { parseStoryWindow } from '#shared/utils/storyCompression'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3706,6 +3707,7 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyMeta, setStoryMeta] = React.useState<string | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3743,6 +3745,13 @@ const NoteEditor = ({
     onSuccess: (data) => {
       setStoryResponse(data.story)
       setStoryLoading(false)
+      setStoryMeta(
+        [
+          data.window ? `WINDOW ${data.window.toUpperCase()}` : '',
+          data.arcade || '',
+          ...(data.spikes || []).slice(0, 3).map(s => `${s.day} ${s.kind.toUpperCase()} · ${s.detail}`),
+        ].filter(Boolean).join('\n') || null
+      )
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + data.story
@@ -4125,7 +4134,7 @@ const NoteEditor = ({
           'AVAILABLE COMMANDS',
           '',
           '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
+          '/story        Compressed story of your log  [day|week|month|year]',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
@@ -4151,18 +4160,27 @@ const NoteEditor = ({
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
+          setStoryMeta(null)
+          // Defer so the user can finish typing the window: /story [day|week|month|year].
+          // Re-read the live text via ref when the timer fires.
+          window.setTimeout(() => {
+            const text = valueRef.current
+            try {
+              const storyWindow = parseStoryWindow(text)
+              const logText = text
+                .replace(/\/story(\s+(day|today|week|month|year))?/i, '')
+                .replace(/📖/g, '')
+                .trim()
+              submitStory({
+                logText,
+                window: storyWindow,
+                quantumState: getUserState(),
+                userIndex: getUserIndex(),
+              })
+            } catch {
+              submitStory({ logText: text })
+            }
+          }, 1200)
         }
       }
     }
@@ -4425,6 +4443,11 @@ const NoteEditor = ({
                   {storyResponse.split('\n').map((line, idx) => (
                     <div key={idx}>{line || <br />}</div>
                   ))}
+                </div>
+              )}
+              {storyResponse && storyMeta && (
+                <div className="opacity-30 mt-8" style={{ fontSize: '11px', letterSpacing: '0.08em', whiteSpace: 'pre-wrap' }}>
+                  {storyMeta}
                 </div>
               )}
             </Block>
