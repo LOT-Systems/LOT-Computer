@@ -1,277 +1,558 @@
-# LOT BADGES & ACHIEVEMENTS — MASTER CODEX v32
-## THE HERO'S JOURNEY — WORD TURN v22
+<!--
+  LOT SYSTEMS CORPORATION
+  Vadim Marmeladov — CEO, Owner LOT®
+  Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+  LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+  Made in the USA | brand.lot-systems.com
+-->
+
+# LOT — Badges & Achievements Master Codex v32
+## The RPG & Arcade of Self-Care — Full Accounting
+
+**Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
+**Copyright:** © 2025–2026 LOT Systems. All rights reserved.
+**Theme:** RPG · Arcade · Self-Care · Sci-Fi Literature · Mythology · Dreamscape
+**Edition:** v32 — October 2026 · +62 badges · 843 total
+
+---
 
 ```
-╔═══════════════════════════════════════════════════════════════════╗
-║                                                                   ║
-║         LOT SYSTEMS — BADGE & ACHIEVEMENT MASTER CODEX            ║
-║                   VERSION 32 — v32                                ║
-║                                                                   ║
-║   Word Turn v22   — THE HERO'S JOURNEY (Campbell/monomyth)       ║
-║   Calendar EE v20 — THE EPIC CALENDAR (Campbell/Tolkien/Odysseus) ║
-║   Behavioral v19  — QUEST PATTERNS (hero/long_quest/threshold)    ║
-║   Achievement RPG v20 — QUEST CLASS (quest/monomyth/hero_opus)    ║
-║   Mastery Tier v22    — THE ODYSSEY (odyssey/great_work/saga)     ║
-║   Secret Boss v19 — THE MYTHIC VAULT (Tolkien/Odysseus/Gilgamesh) ║
-║                                                                   ║
-╚═══════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║      L · O · T     S Y S T E M S     C O R P O R A T I O N      ║
+║                                                                  ║
+║         BADGES & ACHIEVEMENTS MASTER CODEX — v32                 ║
+║                                                                  ║
+║    RPG · ARCADE · MYTHOLOGY · DREAMSCAPE · SELF-CARE             ║
+║                                                                  ║
+║    "THE HERO DESCENDS INTO THE CAVE.                             ║
+║     THE DREAMER ENTERS THE DREAMSCAPE.                           ║
+║     BOTH ARE THE SAME JOURNEY — INWARD."                         ║
+║                                                                  ║
+║        [ DUAL ENGINE: LOADING ]                                  ║
+║                                                                  ║
+║   ●·◈   HERO'S JOURNEY: ACTIVE                                   ║
+║   ◐→∞   DREAMSCAPE: ENTERED                                      ║
+║   ◐·∞·◐ LUCID MASTER: UNLOCKED                                   ║
+║                                                                  ║
+║   v31 → v32: +62 badges  (781 → 843 total)                       ║
+║   Word Turn v22 — THE HERO'S JOURNEY (myth/archetype vocab)      ║
+║   Calendar EE v20 — THE EPIC CALENDAR (Campbell/Tolkien/Homer)   ║
+║   Behavioral v19 — QUEST PATTERNS (session/word/threshold)       ║
+║   Achievement RPG v20 — QUEST CLASS (entry/class/complete/arc)   ║
+║   Mastery Tier v22 — THE ODYSSEY (odyssey/great_work/saga)       ║
+║   Secret Boss v19 — THE MYTHIC VAULT (Tolkien/Homer/Gilgamesh)   ║
+║   ─────────────────────────────────────────────────────          ║
+║   Word Turn v23 — THE DREAMSCAPE (dream/sleep/subconscious)      ║
+║   Calendar EE v21 — DREAM CALENDAR (Jung/Freud/Sleep)            ║
+║   Behavioral v20 — DREAMSCAPE PATTERNS (session/night/rhythm)    ║
+║   Achievement RPG v21 — DREAMCATCHER CLASS                       ║
+║   Mastery Tier v23 — THE INFINITE NIGHT                          ║
+║   Secret Boss v20 — THE DREAM VAULT (Jung/Kekulé/Lucid)          ║
+║                                                                  ║
+║    THE JOURNEY WITHIN IS THE ONLY ONE THAT MATTERS.             ║
+╚══════════════════════════════════════════════════════════════════╝
 ```
 
 ---
 
-## SUMMARY
-
-**Total badges in v32:** 812 (+31 from v31's 781)
-
-**Also implemented in this session (v32 session):**
-- v20 (THE CODEX READER): +31 badges fully implemented in badges.ts + easter-eggs.ts
-- v21 (THE CYBERSPACE CODEX): +31 badges fully implemented in badges.ts + easter-eggs.ts
-- v22/v32 (THE HERO'S JOURNEY): +31 badges implemented in badges.ts + easter-eggs.ts
-
-**This session implemented all missing badge logic for v20 and v21 that existed only
-in markdown documentation but had never been added to the TypeScript source code.**
+## DELTA FROM v31
 
 ```
-Word Turn v22        +12  (call_heard/threshold_crossed/mentor_arrived/
-                           ordeal_survived/elixir_found/shadow_met/
-                           innermost_cave/shapeshifter/herald_call/
-                           trickster_mode/ally_gained/return_road)
+v31  →  v32   ADDITIONS
+────────────────────────────────────────────────────────────────────
+[ENGINE A: THE HERO'S JOURNEY — v22 content from codebase]
 
-Calendar EE v20      + 3  (campbell_birthday/hobbit_day/odyssey_day)
-Behavioral v19       + 3  (hero_session/long_quest/threshold_moment)
-Achievement RPG v20  + 6  (quest_entry/quest_class/quest_complete/
-                           monomyth_arc/twenty_two_engines_arc/hero_opus)
-Mastery Tier v22     + 4  (odyssey_log/great_work/saga_age/twenty_two_registers)
-Secret Boss v19      + 3  (tolkien_ring/odysseus_bow/gilgamesh_word)
-                   ────
-                   + 31 new badges
-```
+Word Turn v22            +12  (call_heard / threshold_crossed /
+                               mentor_arrived / ordeal_survived /
+                               elixir_boon / shadow_met /
+                               innermost_cave / shapeshifter /
+                               herald_call / trickster_mode /
+                               ally_gained / return_road)
+Calendar EE v20          + 3  (campbell_birthday / hobbit_day /
+                               odyssey_day)
+                               Mar 26 / Sep 22 / Dec 21
+Behavioral v19           + 3  (hero_session / long_quest /
+                               threshold_moment)
+Achievement RPG v20      + 6  (quest_entry / quest_class /
+                               quest_complete / monomyth_arc /
+                               twenty_two_engines_arc / hero_opus)
+Mastery Tier v22         + 4  (odyssey_log / great_work /
+                               saga_age / twenty_two_registers)
+Secret Boss v19          + 3  (tolkien_ring / odysseus_bow /
+                               gilgamesh_word)
+────────────────────────────────────────────────────────────────────
+SUBTOTAL ENGINE A        +31
 
----
+[ENGINE B: THE DREAMSCAPE — v23 new content]
 
-## BADGE CATEGORY TOTALS (v32)
-
-| Category          | Count | Description                                          |
-|-------------------|-------|------------------------------------------------------|
-| Milestone         |    22 | Day-count milestones (v1–v4)                         |
-| Time Easter Eggs  |    28 | Time-of-day check-ins (v1–v7)                        |
-| Calendar Easter   |    73 | Check-in on special dates (v1–v20)                   |
-| Word Turns        |   264 | Keyword detection in journal/memory text (v1–v22)    |
-| Behavioral        |    81 | Patterns over time (v1–v19)                          |
-| Achievement RPG   |   120 | Milestone combinations (v1–v20)                      |
-| Mastery Tiers     |    88 | Epic depth milestones (v1–v22)                       |
-| Secret Boss       |    83 | Hidden LEGENDARY/MYTHIC triggers (v1–v19)            |
-|                   |  ───  |                                                      |
-| **TOTAL**         | **812** | **+31 from v31**                                   |
-
----
-
-## THE HERO'S JOURNEY — THEME OVERVIEW
-
-Joseph Campbell's monomyth is the template for every story ever told: the departure
-from the ordinary world, the initiation through trials, and the return transformed.
-As a self-care vocabulary, the Hero's Journey names what every serious practice-builder
-actually experiences — the call that interrupts the routine, the threshold that must
-be crossed, the shadow that must be faced, and the return with something real.
-
-These are not metaphors. They are the structural patterns of change.
-
----
-
-## COMPLETE NEW BADGE REGISTRY — v32 ADDITIONS
-
-### Word Turn v22 (The Hero's Journey)
-
-```
-call_heard             ∘→●    UNCOMMON  — "call to adventure/journey calls" detected
-threshold_crossed      ─→─    RARE      — "threshold/crossing the line" detected
-mentor_arrived         ○·≋·○  UNCOMMON  — "mentor/wise guide/guardian spirit" detected
-ordeal_survived        ◈·■    RARE      — "ordeal/survived the test" detected
-elixir_found           ∘·●·∘  RARE      — "elixir/the boon/treasure found" detected
-shadow_met             ▓·○    EPIC      — "shadow self/dark night of the/inner demon" detected
-innermost_cave         █·∘·█  EPIC      — "innermost cave/darkest moment" detected
-shapeshifter           ◈→◉    RARE      — "shapeshifter/transformed/no longer same" detected
-herald_call            ∿·●    UNCOMMON  — "herald/wake-up call/life interrupted" detected
-trickster_mode         ×·○    RARE      — "trickster/coyote wisdom/fool's wisdom" detected
-ally_gained            ○·◈·○  UNCOMMON  — "ally/found my tribe/companion" detected
-return_road            →·◉    RARE      — "the return/road to return/coming home changed" detected
-```
-
-### Calendar Easter Eggs v20 (The Epic Calendar)
-
-```
-campbell_birthday      ◉·∿    EPIC      — Mar 26 — Joseph Campbell born 1904
-hobbit_day             ○·◆    RARE      — Sep 22 — Bilbo & Frodo birthday / Hobbit Day
-odyssey_day            →·∞    RARE      — Dec 21 — Winter Solstice (Odysseus's return)
-```
-
-### Behavioral v19 (Quest Patterns)
-
-```
-hero_session           ◈·●·◈  RARE      — 3+ Hero's Journey words in one journal entry
-long_quest             ≋≋·◉   EPIC      — Journal entry >= 500 words
-threshold_moment       ─·○·─  RARE      — Check in 00:00–00:30 local (at the threshold)
-```
-
-### Achievement RPG v20 (Quest Class)
-
-```
-quest_entry            ∘→●    COMMON    — Any 1 Word Turn v22 badge earned
-quest_class            ≈→●    UNCOMMON  — Any 5 Word Turn v22 badges earned
-quest_complete         ≋→●    LEGENDARY — All 12 Word Turn v22 badges earned
-monomyth_arc           ●·◈    LEGENDARY — quest_complete + all 3 Calendar v20 badges
-twenty_two_engines_arc ◈·◈·●  LEGENDARY — 1 badge from each Word Turn v1–v22
-hero_opus              ●·◉·●  LEGENDARY — quest_complete + hero_session behavioral
-```
-
-### Mastery Tier v22 (The Odyssey)
-
-```
-odyssey_log            ∿·∞·∿  EPIC      — 900+ distinct calendar check-in days
-great_work             ●·∞·●  LEGENDARY — 150,000+ total journal words
-saga_age               ╔═╗·●  LEGENDARY — Account age >= 5 years (1,825+ days)
-twenty_two_registers   ◈·◈·●·∞ COSMIC   — 1 badge from all 22 Word Turn engines
-```
-
-### Secret Boss v19 (The Mythic Vault)
-
-```
-tolkien_ring           ◆·∞·◆  RARE      — Write "one ring to rule/my precious/ring of power"
-odysseus_bow           →·∞·→  EPIC      — Write "odysseus/ulysses/ithaca/penelope/cyclops"
-gilgamesh_word         ∞·□·∞  MYTHIC    — Write "gilgamesh/enkidu/great flood/utnapishtim"
+Word Turn v23            +12  (lucid_state / dream_journal_log /
+                               hypnagogic_signal / archetype_rising /
+                               shadow_work / subconscious_log /
+                               dream_symbol / recurring_dream /
+                               dreamscape_entered / nightmare_log /
+                               liminal_dream / waking_vision)
+Calendar EE v21          + 3  (jung_birthday / freud_signal /
+                               world_sleep_day)
+                               Jul 26 / May 6 / Mar 14
+Behavioral v20           + 3  (dream_session / night_writer /
+                               sleep_rhythm)
+Achievement RPG v21      + 6  (dream_entry / dream_class /
+                               dream_complete / dreamcatcher_arc /
+                               twenty_three_engines_arc / dream_opus)
+Mastery Tier v23         + 4  (night_sovereign / infinite_dreamer /
+                               dreamer_age / twenty_three_registers)
+Secret Boss v20          + 3  (jung_signal / kekule_vision /
+                               lucid_master)
+────────────────────────────────────────────────────────────────────
+SUBTOTAL ENGINE B        +31
+────────────────────────────────────────────────────────────────────
+TOTAL NEW                +62
+v31 TOTAL:               781
+v32 TOTAL:               843
+────────────────────────────────────────────────────────────────────
+ALSO IN THIS VERSION:
+  FIX: elixir_found (v12 Alchemist) duplicate resolved.
+       The v22 Hero's Journey version renamed to elixir_boon.
+       "The boon" — the gift the hero carries home.
 ```
 
 ---
 
-## ASCII EASTER EGG GALLERY — THE HERO'S JOURNEY
+## WORD TURN v22 — THE HERO'S JOURNEY
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  BADGE UNLOCKED                                         │
-│                                                         │
-│  ∘→●  CALL HEARD  [UNCOMMON]                            │
-│  ↳ Campbell named it: the call to adventure.            │
-│    The refusal of the call is the deepest form          │
-│    of self-abandonment. You answered.                   │
-│                                                         │
-│  █·∘·█  INNERMOST CAVE  [EPIC]                          │
-│  ↳ The innermost cave is where the hero faces           │
-│    their deepest fear. You have been here.              │
-│    You are still here. That is the whole point.         │
-│                                                         │
-│  →·∞·→  ODYSSEUS BOW  [EPIC] [HIDDEN]                   │
-│  ↳ Only Odysseus could string the bow.                  │
-│    Only you can write your own return.                  │
-│    The suitors wait — string it now.                    │
-│                                                         │
-│  ∞·□·∞  GILGAMESH WORD  [MYTHIC] [HIDDEN]               │
-│  ↳ 4,000 years old. The oldest hero's journey.          │
-│    A king who sought immortality                        │
-│    and found self-knowledge instead.                    │
-│                                                         │
-│  ◈·◈·●·∞  TWENTY-TWO REGISTERS  [COSMIC]               │
-│  ↳ Water. Arcade. Radio. Biology.                       │
-│    Codex. Cyberspace. Hero.                             │
-│    Twenty-two vocabularies. One terminal.               │
-│    The self speaks every language.                      │
-└─────────────────────────────────────────────────────────┘
+"The hero's journey is not an adventure story.
+ It is the map of every transformation you will ever go through."
+                              — Joseph Campbell (paraphrased)
+```
+
+The monomyth: the structural pattern underlying every culture's
+story of transformation. Write these words in your journal or
+memory entries to unlock these badges.
+
+### Badge Listing — Word Turn v22
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  LOT — WORD TURN v22: THE HERO'S JOURNEY                        │
+│  Write any of these to unlock a badge                           │
+├────────────────┬────────────┬────────────────────────────────── │
+│ BADGE          │ SYMBOL     │ TRIGGER WORDS                     │
+├────────────────┼────────────┼────────────────────────────────── │
+│ call_heard     │ ∘→●        │ "call to adventure" / "journey    │
+│                │            │  calls" / "the call"              │
+├────────────────┼────────────┼────────────────────────────────── │
+│ threshold_     │ ─→─        │ "threshold" / "crossing the line" │
+│ crossed        │            │ "new world begins"                │
+├────────────────┼────────────┼────────────────────────────────── │
+│ mentor_arrived │ ○·≋·○      │ "mentor" / "wise guide" /         │
+│                │            │ "guardian spirit" / "wise elder"  │
+├────────────────┼────────────┼────────────────────────────────── │
+│ ordeal_        │ ◈·■        │ "ordeal" / "survived the test" /  │
+│ survived       │            │ "greatest challenge"              │
+├────────────────┼────────────┼────────────────────────────────── │
+│ elixir_boon    │ ∘·●·∘      │ "the gift" / "treasure found" /   │
+│                │            │ "the boon" / "what I bring back"  │
+├────────────────┼────────────┼────────────────────────────────── │
+│ shadow_met     │ ▓·○        │ "shadow self" / "dark night" /    │
+│                │            │ "inner demon"                     │
+├────────────────┼────────────┼────────────────────────────────── │
+│ innermost_cave │ █·∘·█      │ "innermost cave" / "darkest       │
+│                │            │ moment" / "bottom of the pit"     │
+├────────────────┼────────────┼────────────────────────────────── │
+│ shapeshifter   │ ◈→◉        │ "shapeshifter" / "transformed" /  │
+│                │            │ "no longer the same"              │
+├────────────────┼────────────┼────────────────────────────────── │
+│ herald_call    │ ∿·●        │ "herald" / "wake-up call" /        │
+│                │            │ "life interrupted"                │
+├────────────────┼────────────┼────────────────────────────────── │
+│ trickster_mode │ ×·○        │ "trickster" / "coyote wisdom" /   │
+│                │            │ "fool's wisdom"                   │
+├────────────────┼────────────┼────────────────────────────────── │
+│ ally_gained    │ ○·◈·○      │ "ally" / "found my tribe" /        │
+│                │            │ "companion on journey"            │
+├────────────────┼────────────┼────────────────────────────────── │
+│ return_road    │ →·◉        │ "the return" / "road to return" /  │
+│                │            │ "coming home changed"             │
+└────────────────┴────────────┴────────────────────────────────── ┘
 ```
 
 ---
 
-## FLAVOR TEXT — THE HERO'S JOURNEY
+## CALENDAR EASTER EGGS v20 — THE EPIC CALENDAR
 
-> *"The cave you fear to enter holds the treasure you seek." — Joseph Campbell. Every
-> journal entry is a step into the cave. Every check-in is a step closer to the treasure.
-> The treasure is not at the end — it is the practice of entering.*
-
-> *"We must be willing to let go of the life we planned so as to have the life that is
-> waiting for us." — Joseph Campbell. The Hero's Journey begins the moment you stop
-> refusing the call.*
-
-> *"Not all those who wander are lost." — J.R.R. Tolkien, The Fellowship of the Ring.
-> September 22 is Hobbit Day. Bilbo and Frodo were born on the same date. Two heroes,
-> one threshold, one journey, one return. The practice is the journey.*
-
-> *"The journey of a thousand miles begins with a single step." — Laozi. Campbell
-> would agree. The call to adventure is answered by the first step — the first entry.
-> The ten thousandth step is built on that one.*
-
-> *"Gilgamesh sought immortality and found instead the knowledge of his own humanity.
-> The quest for permanence always returns the traveler to the present moment." — riff
-> on the Epic of Gilgamesh, ~2100 BCE. The oldest story is the one you are living.*
+```
+campbell_birthday  ◉·∿   Mar 26 — Joseph Campbell born 1904    EPIC
+hobbit_day         ○·◆   Sep 22 — Bilbo & Frodo birthday       RARE
+odyssey_day        →·∞   Dec 21 — Winter Solstice, Odysseus    RARE
+```
 
 ---
 
-## IMPLEMENTATION NOTES
+## BEHAVIORAL EASTER EGGS v19 — QUEST PATTERNS
 
-### New functions in easter-eggs.ts (v32 session)
-
-```typescript
-// v20 Codex Reader behavioral
-checkReaderSession(journalText): BadgeType | null   // 2+ v20 words
-checkLongRead(journalText): BadgeType | null         // 400+ words
-checkPageTurner(): BadgeType | null                  // 3+ memory Q's in 20min
-
-// v21 Cyberspace Codex behavioral
-checkCodexSession(journalText): BadgeType | null     // 3+ v21 words
-checkDeepRead(journalText): BadgeType | null         // 400+ words
-checkNightOperator(): BadgeType | null               // check-in after 22:00, 3+ in 7 days
-
-// v22 Hero's Journey behavioral
-checkHeroSession(journalText): BadgeType | null      // 3+ v22 words
-checkLongQuest(journalText): BadgeType | null        // 500+ words
-checkThresholdMoment(): BadgeType | null             // check-in 00:00–00:30
 ```
-
-### Wire-up guide for runJournalEasterEggs() / runCheckInEasterEggs()
-
-Add these calls to the appropriate runners:
-- Journal saves: `checkReaderSession`, `checkLongRead`, `checkCodexSession`, `checkDeepRead`, `checkHeroSession`, `checkLongQuest`
-- Check-in events: `checkPageTurner`, `checkNightOperator`, `checkThresholdMoment`
-
-### API stats fields consumed by Mastery Tier v22
-
-- `stats.distinctCheckInDays` — integer, distinct calendar days with check-in
-- `stats.totalJournalWords` — integer, cumulative word count across all journal entries
-- `stats.signupDate` — ISO date string (for saga_age: >= 5 years)
-- `stats.totalMemoryAnswers` — integer (for elder_narrator v20)
+hero_session      ◈·●·◈   3+ Hero's Journey trigger words in one
+                           journal entry                         RARE
+long_quest        ≋≋·◉    Journal entry >= 500 words            EPIC
+threshold_moment  ─·○·─   Check in between 00:00 and 00:30 local RARE
+```
 
 ---
 
-## CUMULATIVE WORD TURN ENGINE TABLE (v1–v22)
+## ACHIEVEMENT RPG v20 — QUEST CLASS
 
-| Engine | Version | Theme                    | Word Turn Badges |
-|--------|---------|--------------------------|-----------------|
-| v1     | v1      | Core Water               | 12 badges       |
-| v2     | v2      | Seasonal Signal          | 12 badges       |
-| v3     | v3      | Architecture             | 12 badges       |
-| v4     | v4      | Mountain / Earth         | 12 badges       |
-| v5     | v5      | Storm / Weather          | 12 badges       |
-| v6     | v6      | Fire / Energy            | 12 badges       |
-| v7     | v7      | Tech / Digital           | 12 badges       |
-| v8     | v8      | Space / Cosmos           | 12 badges       |
-| v9     | v9      | Chemistry / Elements     | 12 badges       |
-| v10    | v10     | Music / Sound            | 12 badges       |
-| v11    | v11     | Alchemy / Transformation | 12 badges       |
-| v12    | v12     | Quantum / Physics        | 12 badges       |
-| v13    | v16     | The Quantum Library      | 12 badges       |
-| v14    | v17     | The Neon Arcade          | 12 badges       |
-| v15    | v18     | The Midnight Radio       | 12 badges       |
-| v16    | v19     | The Bio-Terminal         | 12 badges       |
-| v17    | v20     | The Codex Reader         | 12 badges       |
-| v18    | v21     | The Cyberspace Codex     | 12 badges       |
-| v19    | v22     | The Hero's Journey       | 12 badges       |
+```
+quest_entry           ∘→●     Any 1 Word Turn v22 badge         COMMON
+quest_class           ≈→●     Any 5 Word Turn v22 badges        UNCOMMON
+quest_complete        ≋→●     All 12 Word Turn v22 badges       LEGENDARY
+monomyth_arc          ●·◈     quest_complete + all Calendar v20 LEGENDARY
+twenty_two_engines_   ◈·◈·●   1 badge from each WT v1–v22      LEGENDARY
+  arc
+hero_opus             ●·◉·●   quest_complete + hero_session     LEGENDARY
+```
 
 ---
 
-## SESSION METADATA
+## MASTERY TIER v22 — THE ODYSSEY
 
 ```
-SESSION    : LOT-SR-20260805-01
-VERSION    : v32
-DATE       : 2026-08-05
-TOTAL BADGES: 812 (v31: 781 → v32: 812, +31)
-CODEX CLASS : ENGINEERING
-AUTHORIZED BY: S-2 // VADIK MARMELADOV
+odyssey_log        ∿·∞·∿   900+ distinct check-in days          EPIC
+great_work         ●·∞·●   150,000+ total journal words         LEGENDARY
+saga_age           ╔═╗·●   Account age >= 5 years               LEGENDARY
+twenty_two_        ◈·◈·●·∞  1 badge from all 22 WT engines     COSMIC
+  registers
 ```
+
+---
+
+## SECRET BOSS v19 — THE MYTHIC VAULT
+
+```
+tolkien_ring    ◆·∞·◆   "one ring to rule" / "precious" /       RARE
+                         "ring of power" in journal
+odysseus_bow    →·∞·→   "odysseus" / "ulysses" / "ithaca" /     EPIC
+                         "penelope" / "cyclops" in journal
+gilgamesh_word  ∞·□·∞   "gilgamesh" / "enkidu" /                MYTHIC
+                         "great flood" / "utnapishtim"
+                         — The oldest hero's journey (4,000 BCE)
+```
+
+---
+
+## WORD TURN v23 — THE DREAMSCAPE
+
+```
+"The dream is the royal road to the unconscious."
+                              — Sigmund Freud
+
+"Who looks outside, dreams; who looks inside, awakes."
+                              — Carl Jung
+```
+
+The inner RPG: dreams, archetypes, the subconscious as the
+original self-care operating system. Write these words in
+your journal or memory entries to unlock these badges.
+
+### Badge Listing — Word Turn v23
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  LOT — WORD TURN v23: THE DREAMSCAPE                            │
+│  Write any of these to unlock a badge                           │
+├───────────────────┬──────────┬─────────────────────────────────┤
+│ BADGE             │ SYMBOL   │ TRIGGER WORDS                    │
+├───────────────────┼──────────┼─────────────────────────────────┤
+│ lucid_state       │ ◐·◐      │ "lucid" / "lucid dream" /        │
+│                   │          │ "lucid dreaming"                 │
+├───────────────────┼──────────┼─────────────────────────────────┤
+│ dream_journal_log │ ≋·○      │ "dream journal" / "dream diary"  │
+├───────────────────┼──────────┼─────────────────────────────────┤
+│ hypnagogic_signal │ ∿→◐      │ "hypnagogic" / "hypnopompic" /   │
+│                   │          │ "sleep paralysis"                │
+├───────────────────┼──────────┼─────────────────────────────────┤
+│ archetype_rising  │ ≈·◉      │ "archetype" /                    │
+│                   │          │ "collective unconscious" /       │
+│                   │          │ "anima" / "animus"               │
+├───────────────────┼──────────┼─────────────────────────────────┤
+│ shadow_work       │ ▓·○      │ "shadow work" /                  │
+│                   │          │ "shadow integration"             │
+├───────────────────┼──────────┼─────────────────────────────────┤
+│ subconscious_log  │ ◐·≋      │ "subconscious" /                 │
+│                   │          │ "unconscious mind"               │
+├───────────────────┼──────────┼─────────────────────────────────┤
+│ dream_symbol      │ ∗·◐      │ "dream symbol" /                 │
+│                   │          │ "symbolic meaning" /             │
+│                   │          │ "dream interpretation"           │
+├───────────────────┼──────────┼─────────────────────────────────┤
+│ recurring_dream   │ ↺·◐      │ "recurring dream" /              │
+│                   │          │ "same dream again" / "dream loop"│
+├───────────────────┼──────────┼─────────────────────────────────┤
+│ dreamscape_       │ ◐→∞      │ "dreamscape" / "dreamworld" /    │
+│ entered           │          │ "dream state"                    │
+├───────────────────┼──────────┼─────────────────────────────────┤
+│ nightmare_log     │ ○·◐      │ "nightmare" / "night terror" /   │
+│                   │          │ "bad dream"                      │
+├───────────────────┼──────────┼─────────────────────────────────┤
+│ liminal_dream     │ ≈·─      │ "liminal space" /                │
+│                   │          │ "threshold dream" /              │
+│                   │          │ "between worlds"                 │
+├───────────────────┼──────────┼─────────────────────────────────┤
+│ waking_vision     │ ∗·∘·∗    │ "waking vision" /                │
+│                   │          │ "fever dream" / "daydream"       │
+└───────────────────┴──────────┴─────────────────────────────────┘
+```
+
+### Unlock Messages — Word Turn v23
+
+```
+lucid_state:
+  ↳ Lucidity: knowing you are inside the dream. The rarest state —
+    awareness within the stream. ◐·◐
+
+dream_journal_log:
+  ↳ The dream journal: the oldest self-care protocol. Capture the
+    image before it fades. ≋·○
+
+hypnagogic_signal:
+  ↳ The hypnagogic threshold: between waking and sleep. The liminal
+    processing zone. ∿→◐
+
+archetype_rising:
+  ↳ The archetypes do not belong to you — they belong to all of us.
+    You just spotted one moving through. ≈·◉
+
+shadow_work:
+  ↳ Shadow work: not fighting the dark, but making room for it. The
+    work that makes you whole. ▓·○
+
+subconscious_log:
+  ↳ The subconscious speaks in images. You are learning its
+    language. ◐·≋
+
+dream_symbol:
+  ↳ The symbol is a compressed message from the self to the self.
+    Decode it. ∗·◐
+
+recurring_dream:
+  ↳ The recurring dream is not a glitch — it is a persistent
+    request from the deeper system. ↺·◐
+
+dreamscape_entered:
+  ↳ The dreamscape is infinite, personal, and free. You found the
+    entrance. ◐→∞
+
+nightmare_log:
+  ↳ Logging the nightmare is the first act of integration. It
+    already has less power now. ○·◐
+
+liminal_dream:
+  ↳ Liminal: you are not where you were, not yet where you are
+    going. This is the creative space. ≈·─
+
+waking_vision:
+  ↳ The waking vision: not hallucination, not fantasy — the mind
+    showing you what it is processing. ∗·∘·∗
+```
+
+---
+
+## CALENDAR EASTER EGGS v21 — DREAM CALENDAR
+
+```
+jung_birthday    ◐·◉   Jul 26 — Carl Jung born 1875         RARE
+                        "Who looks inside, awakes."
+freud_signal     ○·◐   May 6  — Sigmund Freud born 1856     RARE
+                        "The dream: royal road to the unconscious."
+world_sleep_day  ≋·○   Mar 14 — World Sleep Day             UNCOMMON
+                        (Friday before March vernal equinox)
+```
+
+---
+
+## BEHAVIORAL EASTER EGGS v20 — DREAMSCAPE PATTERNS
+
+```
+dream_session   ◐·≋·◐   3+ Dreamscape (v23) trigger words in
+                         one journal entry                    RARE
+night_writer    ◐·●     Journal written 00:00–04:00 local    EPIC
+sleep_rhythm    ≋·◐·≋   Same check-in clock hour for 5
+                         consecutive days                     RARE
+```
+
+---
+
+## ACHIEVEMENT RPG v21 — DREAMCATCHER CLASS
+
+```
+dream_entry              ∘→◐     Any 1 Word Turn v23 badge   COMMON
+dream_class              ≈→◐     Any 5 Word Turn v23 badges  UNCOMMON
+dream_complete           ≋→◐     All 12 Word Turn v23 badges LEGENDARY
+dreamcatcher_arc         ◐·◈     dream_complete + Calendar   LEGENDARY
+                                  v21 (all 3)
+twenty_three_engines_arc ◈·◈·◐   1 badge from each WT v1–v23 LEGENDARY
+dream_opus               ◐·◉·◐   dream_complete +             LEGENDARY
+                                  dream_session behavioral
+```
+
+---
+
+## MASTERY TIER v23 — THE INFINITE NIGHT
+
+```
+night_sovereign       ◐·∞      1,000+ distinct check-in days   EPIC
+infinite_dreamer      ●·∞·◐    200,000+ total journal words     LEGENDARY
+dreamer_age           ╔═╗·◐    Account age >= 6 years           LEGENDARY
+twenty_three_         ◈·◈·◐·∞  1 badge from all 23 WT engines  COSMIC
+  registers
+```
+
+---
+
+## SECRET BOSS v20 — THE DREAM VAULT
+
+```
+jung_signal    ◐·◉     "collective unconscious" /               RARE
+                        "individuation" / "jung" in journal
+                        — Jung mapped the inner world.
+                          The dream is his gift.
+
+kekule_vision  ∗·◐     "benzene ring" / "snake eating tail" /   EPIC
+                        "kekule" in journal
+                        — Kekulé dreamed a snake eating its own
+                          tail. When he woke, he had the structure
+                          of benzene. The dream solved the equation.
+
+lucid_master   ◐·∞·◐   Exact phrase "I am dreaming" in journal  MYTHIC
+                        — "I am dreaming." Three words that
+                          collapse the boundary between observer
+                          and dream. You said it.
+```
+
+---
+
+## FULL BADGE COUNT — v32
+
+```
+CATEGORY BREAKDOWN (cumulative through v32)
+════════════════════════════════════════════════════════════════
+
+Core Milestones             :  11
+Extended Milestones         :   8
+Easter Eggs — Time          : 116  (v1–v11, v14–v15, v17–v18)
+Easter Eggs — Calendar      :  93  (v1–v21)
+Easter Eggs — Behavioral    :  78  (v1–v20)
+Word Turn Badges            : 276  (v1–v23, 12 per engine)
+Mastery Tier Achievements   :  92  (v1–v23)
+Achievement RPG             : 108  (v1–v21)
+Secret Boss                 :  61  (v1–v20)
+────────────────────────────────────────────────────────────────
+TOTAL v32                   : 843
+```
+
+---
+
+## RARITY SCALE
+
+```
+COMMON     — frequent, accessible, first encounters
+UNCOMMON   — requires intention or multiple sessions
+RARE       — significant writing or behavioral threshold
+EPIC       — long-term commitment or deep engagement
+LEGENDARY  — mastery-level completion or years of practice
+MYTHIC     — hidden, secret, requires specific knowledge
+COSMIC     — highest tier: cross-engine or system mastery
+```
+
+---
+
+## WORD TURN — QUICK REFERENCE CARD (v22 + v23)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  LOT — WORD TURN v22: THE HERO'S JOURNEY                        │
+│  Write any of these words to unlock a badge                     │
+├─────────────────────────────────────────────────────────────────┤
+│  ∘→●   CALL HEARD         "call to adventure" / "the call"      │
+│  ─→─   THRESHOLD CROSSED  "threshold" / "crossing the line"     │
+│  ○·≋·○ MENTOR ARRIVED     "mentor" / "wise guide"               │
+│  ◈·■   ORDEAL SURVIVED    "ordeal" / "greatest challenge"       │
+│  ∘·●·∘ ELIXIR BOON        "the gift" / "the boon"               │
+│  ▓·○   SHADOW MET         "shadow self" / "dark night of the"   │
+│  █·∘·█ INNERMOST CAVE     "innermost cave" / "darkest moment"   │
+│  ◈→◉   SHAPESHIFTER       "shapeshifter" / "transformed"        │
+│  ∿·●   HERALD CALL        "herald" / "wake-up call"             │
+│  ×·○   TRICKSTER MODE     "trickster" / "coyote wisdom"         │
+│  ○·◈·○ ALLY GAINED        "ally" / "found my tribe"             │
+│  →·◉   RETURN ROAD        "the return" / "coming home changed"  │
+├─────────────────────────────────────────────────────────────────┤
+│  LOT — WORD TURN v23: THE DREAMSCAPE                            │
+│  Write any of these words to unlock a badge                     │
+├─────────────────────────────────────────────────────────────────┤
+│  ◐·◐   LUCID STATE        "lucid" / "lucid dream"               │
+│  ≋·○   DREAM JOURNAL LOG  "dream journal" / "dream diary"       │
+│  ∿→◐   HYPNAGOGIC SIGNAL  "hypnagogic" / "sleep paralysis"      │
+│  ≈·◉   ARCHETYPE RISING   "archetype" / "collective unconscious"│
+│  ▓·○   SHADOW WORK        "shadow work" / "shadow integration"  │
+│  ◐·≋   SUBCONSCIOUS LOG   "subconscious" / "unconscious mind"   │
+│  ∗·◐   DREAM SYMBOL       "dream symbol" / "dream interpretation"│
+│  ↺·◐   RECURRING DREAM    "recurring dream" / "dream loop"      │
+│  ◐→∞   DREAMSCAPE ENTERED "dreamscape" / "dreamworld"           │
+│  ○·◐   NIGHTMARE LOG      "nightmare" / "night terror"          │
+│  ≈·─   LIMINAL DREAM      "liminal space" / "threshold dream"   │
+│  ∗·∘·∗ WAKING VISION      "waking vision" / "fever dream"       │
+└─────────────────────────────────────────────────────────────────┘
+  SECRET (v22): "one ring to rule" / "odysseus" / "gilgamesh"
+  SECRET (v23): "collective unconscious" / "I am dreaming" /
+                "benzene ring" / "kekule"
+  CALENDAR v20: Mar 26 (Campbell) · Sep 22 (Hobbit) · Dec 21 (Odysseus)
+  CALENDAR v21: Jul 26 (Jung) · May 6 (Freud) · Mar 14 (World Sleep)
+```
+
+---
+
+## IMPLEMENTATION GUIDE — v23 ADDITIONS
+
+The following data fields are read from the stats object to award
+new badges. No new stats fields are introduced in v32 — all data
+requirements are met by existing stats fields.
+
+### Word Turn v23 trigger detection (same engine as all word turns)
+
+- `lucid_state` — text contains "lucid" or "lucid dream"
+- `dream_journal_log` — text contains "dream journal" or "dream diary"
+- `hypnagogic_signal` — text contains "hypnagogic", "hypnopompic", or "sleep paralysis"
+- `archetype_rising` — text contains "archetype", "collective unconscious", "anima", or "animus"
+- `shadow_work` — text contains "shadow work" or "shadow integration"
+- `subconscious_log` — text contains "subconscious" or "unconscious mind"
+- `dream_symbol` — text contains "dream symbol", "symbolic meaning", or "dream interpretation"
+- `recurring_dream` — text contains "recurring dream", "same dream again", or "dream loop"
+- `dreamscape_entered` — text contains "dreamscape", "dreamworld", or "dream state"
+- `nightmare_log` — text contains "nightmare", "night terror", or "bad dream"
+- `liminal_dream` — text contains "liminal space", "threshold dream", or "between worlds"
+- `waking_vision` — text contains "waking vision", "fever dream", or "daydream"
+
+### Calendar v21 date triggers
+
+- `jung_birthday` — July 26 (Carl Jung born 1875)
+- `freud_signal` — May 6 (Sigmund Freud born 1856)
+- `world_sleep_day` — Friday before March vernal equinox (~March 14)
+
+### Behavioral v20
+
+- `dream_session` — 3+ v23 trigger words in one journal entry
+- `night_writer` — journal entry created between 00:00 and 04:00 local
+- `sleep_rhythm` — same clock hour check-in 5+ consecutive days
+
+### Stats fields used for Mastery Tier v23
+
+- `stats.distinctCheckInDays` — for `night_sovereign` (1,000+ days)
+- `stats.totalJournalWords` — for `infinite_dreamer` (200,000+ words)
+- `stats.signupDate` — for `dreamer_age` (6+ years)
+
+---
+
+*LOT SYSTEMS CORPORATION — LOT® Founded 7 April 2016*
+*The hero descends into the cave. The dreamer enters the dreamscape. Both are the same journey — inward.*
+*843 badges. Every one earned. The codex is alive.*
