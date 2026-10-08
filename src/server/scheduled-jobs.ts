@@ -1747,6 +1747,14 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily stellar navigation check (12:00 UTC every day) — Job 49
+  if (shouldRunDailyStellarNavigationCheck()) {
+    await executeDailyStellarNavigationCheck()
+  }
+  // Check daily morning ignition check (10:00 UTC every day) — J51
+  if (shouldRunDailyMorningIgnitionCheck()) {
+    await executeDailyMorningIgnitionCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3530,109 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Stellar Navigation Check (Job 49 — 12:00 UTC every day) ──────────
+// Reads active users. Looks for personal_peak_window + morning_intention_lock +
+// sleep_signal_anchor all confirmed same calendar day yesterday.
+// When all three temporal coordinates are locked in a single day, writes stellar_navigation.
+
+let isDailyStellarNavigationRunning = false
+let lastDailyStellarNavigationRun: Date | null = null
+
+function shouldRunDailyStellarNavigationCheck(): boolean {
+  const now = dayjs()
+  if (isDailyStellarNavigationRunning) return false
+  if (lastDailyStellarNavigationRun) {
+    const lastRun = dayjs(lastDailyStellarNavigationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 12 // 12:00 UTC daily
+}
+
+async function executeDailyStellarNavigationCheck(): Promise<JobResult> {
+  const jobName = 'daily-stellar-navigation-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyStellarNavigationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyStellarNavigationRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY STELLAR NAVIGATION CHECK — 12:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const prevDayStart = dayjs().subtract(1, 'day').startOf('day').toDate()
+    const prevDayEnd   = dayjs().subtract(1, 'day').endOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    const NAV_COORD_EVENTS = ['personal_peak_window', 'morning_intention_lock', 'sleep_signal_anchor']
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const prevDayLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: prevDayStart, [Op.lte]: prevDayEnd },
+            event: { [Op.in]: NAV_COORD_EVENTS as any[] },
+          },
+          attributes: ['event', 'metadata'],
+        })
+
+        if (!prevDayLogs.length) continue
+
+        const presentEvents = new Set(prevDayLogs.map((l: any) => l.event))
+        const allThreePresent = NAV_COORD_EVENTS.every(e => presentEvents.has(e))
+
+        if (allThreePresent) {
+          const peakLog  = prevDayLogs.find((l: any) => l.event === 'personal_peak_window')
+          const intentLog = prevDayLogs.find((l: any) => l.event === 'morning_intention_lock')
+          const sleepLog = prevDayLogs.find((l: any) => l.event === 'sleep_signal_anchor')
+
+          const peakConf  = (peakLog?.metadata?.conf ?? 75)
+          const intentConf = (intentLog?.metadata?.conf ?? 80)
+          const sleepConf = (sleepLog?.metadata?.conf ?? 78)
+
+          await (Log as any).create({
+            userId,
+            event: 'stellar_navigation',
+            text: `Stellar navigation: previous day — personal peak window · morning intention lock · sleep signal anchor all confirmed. Three temporal coordinates locked simultaneously. Navigation live.`,
+            metadata: {
+              peakConf,
+              intentConf,
+              sleepConf,
+              coordinates: ['PEAK', 'INTENTION', 'SLEEP'],
+              navigationStatus: 'LOCKED',
+              window: '24h-prior-day',
+              hour: 12,
+            },
+          })
+          written++
+        }
+      } catch {}
+    }
+
+    console.log(`  Stellar navigation events written: ${written}`)
+    lastDailyStellarNavigationRun = new Date()
+    isDailyStellarNavigationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily stellar navigation check failed:', error.message)
+    isDailyStellarNavigationRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5556,6 +5667,110 @@ async function executeDailyQOSModeWatch(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Morning Ignition Check (J51 — 10:00 UTC every day) ───────────────
+// Scans the morning window 06:00–10:00 UTC for intentions + energy + anchor.
+// When all three are present before 10:00, writes morning_momentum_ignition (P158).
+
+let isDailyMorningIgnitionRunning = false
+let lastDailyMorningIgnitionRun: Date | null = null
+
+function shouldRunDailyMorningIgnitionCheck(): boolean {
+  const now = dayjs()
+  if (isDailyMorningIgnitionRunning) return false
+  if (lastDailyMorningIgnitionRun) {
+    const lastRun = dayjs(lastDailyMorningIgnitionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily
+}
+
+async function executeDailyMorningIgnitionCheck(): Promise<JobResult> {
+  const jobName = 'daily-morning-ignition-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyMorningIgnitionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyMorningIgnitionRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY MORNING IGNITION CHECK — 10:00 UTC (J51)')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const morningStart = dayjs().startOf('day').add(6, 'hour').toDate()
+    const morningEnd   = dayjs().startOf('day').add(10, 'hour').toDate()
+
+    const IGNITION_EVENTS = ['log_intention', 'energy_checkin', 'sleep_signal_anchor']
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const morningLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: morningStart, [Op.lte]: morningEnd },
+            event: { [Op.in]: IGNITION_EVENTS as any[] },
+          },
+          attributes: ['event', 'metadata'],
+        })
+
+        if (!morningLogs.length) continue
+
+        const presentEvents = new Set(morningLogs.map((l: any) => l.event))
+        const allThreePresent = IGNITION_EVENTS.every(e => presentEvents.has(e))
+
+        if (allThreePresent) {
+          const intentLog  = morningLogs.find((l: any) => l.event === 'log_intention')
+          const energyLog  = morningLogs.find((l: any) => l.event === 'energy_checkin')
+          const anchorLog  = morningLogs.find((l: any) => l.event === 'sleep_signal_anchor')
+
+          const intentConf = (intentLog?.metadata?.conf ?? 82)
+          const energyConf = (energyLog?.metadata?.conf ?? 78)
+          const anchorConf = (anchorLog?.metadata?.conf ?? 80)
+          const conf = Math.round((intentConf + energyConf + anchorConf) / 3)
+
+          await (Log as any).create({
+            userId,
+            event: 'morning_momentum_ignition',
+            text: `Morning momentum ignition: intentions + energy + anchor all logged before 10:00. Day fires from signal, not reaction. Momentum ignited.`,
+            metadata: {
+              intentConf,
+              energyConf,
+              anchorConf,
+              conf,
+              window: '06:00–10:00',
+              signals: ['INTENTIONS', 'ENERGY', 'ANCHOR'],
+              ignitionStatus: 'LIVE',
+              hour: 10,
+            },
+          })
+          written++
+        }
+      } catch {}
+    }
+
+    console.log(`  Morning ignition events written: ${written}`)
+    lastDailyMorningIgnitionRun = new Date()
+    isDailyMorningIgnitionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily morning ignition check failed:', error.message)
+    isDailyMorningIgnitionRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -5608,6 +5823,10 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily signal coherence cascade check: 8 AM UTC every day (Job 47)')
+  console.log('   - Daily total field coherence check: 9 AM UTC every day (Job 48)')
+  console.log('   - Daily stellar navigation check: 12 PM UTC every day (Job 49)')
+  console.log('   - Daily morning ignition check: 10 AM UTC every day (J51)')
   console.log('')
 
   // Check every hour for scheduled jobs

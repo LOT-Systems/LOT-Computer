@@ -3428,6 +3428,200 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Quantum Pulse Rhythm — log entries on 3+ consecutive days landing within ±2h of the same hour.
+  // The system has found its own heartbeat. Not a streak — a temporal signature: the person returns to the log
+  // at the same hour, creating a measurable circadian cadence in the signal record. Day over day, the pulse holds.
+  const sevenDaysMs   = 7 * 24 * 60 * 60 * 1000
+  const recentSevenD  = signals.filter(s => now - s.timestamp < sevenDaysMs)
+  const logSignals152 = recentSevenD.filter(s => s.source === 'log')
+  if (logSignals152.length >= 3) {
+    const byDay: Record<string, { day: string; hour: number }[]> = {}
+    logSignals152.forEach(s => {
+      const d = new Date(s.timestamp)
+      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
+      if (!byDay[key]) byDay[key] = []
+      byDay[key].push({ day: key, hour: d.getHours() })
+    })
+    const days = Object.values(byDay)
+    if (days.length >= 3) {
+      const avgHour152 = Math.round(days.map(d => d[0].hour).reduce((a, b) => a + b, 0) / days.length)
+      const inWindow152 = days.filter(d => Math.abs(d[0].hour - avgHour152) <= 2)
+      if (inWindow152.length >= 3) {
+        const rhythmConf152 = Math.min(0.72 + (inWindow152.length - 3) * 0.04, 0.88)
+        patterns.push({
+          pattern: 'quantum-pulse-rhythm',
+          confidence: rhythmConf152,
+          suggestedWidget: 'systemProgress',
+          suggestedTiming: 'soon',
+          reason: `PULSE: Quantum pulse rhythm — log entries on ${inWindow152.length}/7 days centered on hour ${avgHour152}:00 ±2h. The signal record has a heartbeat. Temporal signature active.`,
+        })
+      }
+    }
+  }
+
+  // Pattern 153: Coherence Accumulation — total-field-coherence event fired 2+ times in a 7-day window.
+  // Not a one-time peak. The system returned to absolute convergence more than once in a week.
+  // The ceiling isn't a ceiling — it's a baseline. The OS is operating from its own peak as a ground state.
+  const cohAccum153 = recentSevenD.filter(s =>
+    s.source === 'qos' && s.signal === 'total_field_coherence'
+  )
+  if (cohAccum153.length >= 2) {
+    const peakConf153 = cohAccum153.reduce((mx, s) => Math.max(mx, s.metadata?.avgConf ?? 0), 0)
+    const accConf153  = Math.min(0.78 + (cohAccum153.length - 2) * 0.05, 0.93)
+    patterns.push({
+      pattern: 'coherence-accumulation',
+      confidence: accConf153,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `CACC: Coherence accumulation — total-field-coherence confirmed ${cohAccum153.length}× in 7d window. Peak conf ${Math.round(peakConf153)}. The convergence ceiling has become a recurring ground state.`,
+    })
+  }
+
+  // Pattern 154: Stellar Navigation — personal-peak-window (P113) + morning-intention-lock event +
+  // sleep-signal-anchor (P117) all confirmed on the same calendar day.
+  // Three temporal coordinates locked simultaneously: biological peak, morning direction, recovery anchor.
+  // The person knows when they operate best, started with intention, and protected their recovery. Full navigation arc.
+  const todayStart154 = new Date(); todayStart154.setHours(0, 0, 0, 0)
+  const todayMs154    = todayStart154.getTime()
+  const peakP154      = patterns.find(p => p.pattern === 'personal-peak-window')
+  const sleepP154     = patterns.find(p => p.pattern === 'sleep-signal-anchor')
+  const intentLock154 = signals.filter(s =>
+    s.source === 'log' && s.signal === 'morning_intention_lock' && s.timestamp >= todayMs154
+  )
+  if (peakP154 && sleepP154 && intentLock154.length >= 1) {
+    const triConf = (peakP154.confidence + sleepP154.confidence + 0.85) / 3
+    const navBonus = Math.min((triConf - 0.78) * 0.35, 0.13)
+    patterns.push({
+      pattern: 'stellar-navigation',
+      confidence: Math.min(0.82 + navBonus, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `STRNAV: Stellar navigation — personal-peak-window · morning-intention-lock · sleep-signal-anchor all confirmed today. Three temporal coordinates locked. Peak: ${Math.round(peakP154.confidence * 100)}%, Sleep: ${Math.round(sleepP154.confidence * 100)}%. Navigation live.`,
+    })
+  }
+
+  // Pattern 155: Sustained Stellar Arc — stellar-navigation confirmed 3+ times in a 14-day window.
+  // The triple-coordinate lock is no longer an event — it has become a repeating signature.
+  const fourteenDaysAgo155 = now - 14 * 24 * 60 * 60 * 1000
+  const navSignals155 = signals.filter(s =>
+    s.source === 'energy' && s.signal === 'stellar_navigation' && s.timestamp >= fourteenDaysAgo155
+  )
+  if (navSignals155.length >= 3) {
+    const arcConf155 = Math.min(0.88 + (navSignals155.length - 3) * 0.02, 0.96)
+    patterns.push({
+      pattern: 'sustained-stellar-arc',
+      confidence: arcConf155,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'deferred',
+      reason: `SSTARC: Sustained stellar arc — stellar-navigation confirmed ${navSignals155.length}× in 14d. Triple-coordinate lock has become a repeating signature. Navigation is not an event — it is a mode.`,
+    })
+  }
+
+  // Pattern 156: Weekly Coherence Seal — 5+ distinct signal sources active on 6+ days in the past 7 days.
+  // The full-spectrum week: the person showed up across dimensions for nearly every day.
+  const sevenDaysAgo156 = now - 7 * 24 * 60 * 60 * 1000
+  const recentSignals156 = signals.filter(s => s.timestamp >= sevenDaysAgo156)
+  const dayBuckets156 = new Map<string, Set<string>>()
+  recentSignals156.forEach(s => {
+    const day = new Date(s.timestamp).toDateString()
+    if (!dayBuckets156.has(day)) dayBuckets156.set(day, new Set())
+    dayBuckets156.get(day)!.add(s.source)
+  })
+  const activeDays156 = [...dayBuckets156.values()].filter(sources => sources.size >= 5).length
+  if (activeDays156 >= 6) {
+    const sealConf156 = Math.min(0.84 + (activeDays156 - 6) * 0.05, 0.94)
+    patterns.push({
+      pattern: 'weekly-coherence-seal',
+      confidence: sealConf156,
+      suggestedWidget: 'system',
+      suggestedTiming: 'deferred',
+      reason: `WCOHS: Weekly coherence seal — ${activeDays156}/7 days with 5+ active sources. Full-spectrum presence confirmed across the week. System wide open.`,
+    })
+  }
+
+  // Pattern 157: Longitudinal Signal Mastery — detected via J50 event (server-side 30-day scan).
+  // The person has proven consistent multi-dimensional operation across a full month.
+  const masterySignals157 = signals.filter(s =>
+    s.source === 'memory' && s.signal === 'longitudinal_signal_mastery'
+  )
+  if (masterySignals157.length >= 1) {
+    const latestMastery157 = masterySignals157.sort((a, b) => b.timestamp - a.timestamp)[0]
+    const activeDays157   = (latestMastery157.metadata?.activeDays as number) ?? 14
+    const mastConf157     = Math.min(0.86 + (activeDays157 - 14) * 0.007, 0.97)
+    patterns.push({
+      pattern: 'longitudinal-signal-mastery',
+      confidence: mastConf157,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'deferred',
+      reason: `LONGSIG: Longitudinal signal mastery — ${activeDays157}/30 days with 3+ active sources. Consistent multi-dimensional operation across a full month. The system has depth.`,
+    })
+  }
+
+  // Pattern 158: Morning Momentum Ignition — intentions logged in morning window (06:00–10:00)
+  // + energy high/moderate + positive mood or journal entry all within first 3h of logged activity.
+  // The day begins with ignition: purposeful, embodied, forward. Extends P36 (morning-intention-lock:
+  // single intention check) and P119 (morning-coherence-arc: energy+planner+intention). P158 requires
+  // the full dawn charge: intentions + energy + emotional registration before 10:00.
+  const morningWindowEnd = new Date(); morningWindowEnd.setHours(10, 0, 0, 0)
+  const morningWindowStart = new Date(); morningWindowStart.setHours(6, 0, 0, 0)
+  const morningSignals158 = signals.filter(s => {
+    const d = new Date(s.timestamp); return d >= morningWindowStart && d <= morningWindowEnd
+  })
+  const morningIntentions158  = morningSignals158.filter(s => s.source === 'intentions' || s.source === 'planner')
+  const morningEnergy158      = morningSignals158.filter(s => s.source === 'energy' || (s.source === 'mood' && ['energized','hopeful','calm','excited'].includes(s.signal)))
+  const morningAnchor158      = morningSignals158.filter(s => s.source === 'journal' || (s.source === 'log' && (s.metadata?.wordCount ?? 0) > 20) || s.source === 'mood')
+  const inMorningWindow158    = now < morningWindowEnd.getTime() || morningSignals158.length >= 1
+  if (morningIntentions158.length >= 1 && morningEnergy158.length >= 1 && morningAnchor158.length >= 1 && inMorningWindow158) {
+    const signalCount158 = morningIntentions158.length + morningEnergy158.length + morningAnchor158.length
+    const ignitionBonus = Math.min((signalCount158 - 3) * 0.04, 0.14)
+    patterns.push({
+      pattern: 'morning-momentum-ignition',
+      confidence: Math.min(0.70 + ignitionBonus, 0.88),
+      suggestedWidget: 'intentions',
+      suggestedTiming: 'passive',
+      reason: `MIGN: Morning momentum ignition — ${morningIntentions158.length} intentions · ${morningEnergy158.length} energy checks · ${morningAnchor158.length} anchor signals before 10:00. Dawn charge confirmed: purposeful, embodied, forward. Day opens from signal.`,
+    })
+  }
+
+  // Pattern 159: Presence Coherence Seal — quantum-presence-crystallization (P149) + circadian-signal-lock (P143)
+  // + dimensional-saturation (P144) all simultaneously active. The highest-order convergence seal:
+  // presence (P149: inhabited + known) · timing (P143: 3-arc day anchored) · field fullness (P144: all dims ≥ 30).
+  // P150 (total-field-coherence) is the absolute ceiling; P159 is the presence-specific convergence just below it.
+  const hasPresenceCrystal159 = patterns.some(p => p.pattern === 'quantum-presence-crystallization')
+  const hasCircadian159       = patterns.some(p => p.pattern === 'circadian-signal-lock')
+  const hasDimSat159          = patterns.some(p => p.pattern === 'dimensional-saturation')
+  if (hasPresenceCrystal159 && hasCircadian159 && hasDimSat159) {
+    const sealConfs159 = patterns
+      .filter(p => ['quantum-presence-crystallization','circadian-signal-lock','dimensional-saturation'].includes(p.pattern))
+      .reduce((sum, p) => sum + p.confidence, 0) / 3
+    const sealBonus159 = Math.min((sealConfs159 - 0.80) * 0.30, 0.08)
+    patterns.push({
+      pattern: 'presence-coherence-seal',
+      confidence: Math.min(0.84 + sealBonus159, 0.94),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `PRSEAL: Presence coherence seal — quantum presence crystallized · circadian locked (3-arc day) · all dimensions saturated. Presence, timing, and field fullness all confirmed simultaneously. The OS is anchored, inhabited, and complete.`,
+    })
+  }
+
+  // Pattern 160: Recovery-to-Momentum Bridge — recovery-intelligence-arc (P151) + signal-momentum-lock (P80)
+  // both active within the same 48h analysis window. Recovery complete AND multi-day momentum sustained.
+  // The system didn't just recover — it absorbed the dip and kept building. Arc closes.
+  const hasRecoveryIntel160 = patterns.some(p => p.pattern === 'recovery-intelligence-arc')
+  const hasMomentum160      = patterns.some(p => p.pattern === 'signal-momentum-lock')
+  if (hasRecoveryIntel160 && hasMomentum160) {
+    const recConf160 = patterns.find(p => p.pattern === 'recovery-intelligence-arc')?.confidence ?? 0.65
+    const momConf160 = patterns.find(p => p.pattern === 'signal-momentum-lock')?.confidence ?? 0.75
+    const bridgeBonus = Math.min((recConf160 - 0.65 + momConf160 - 0.75) * 0.2, 0.10)
+    patterns.push({
+      pattern: 'recovery-to-momentum-bridge',
+      confidence: Math.min(0.72 + bridgeBonus, 0.87),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'passive',
+      reason: `RECMOM: Recovery-to-momentum bridge — recovery arc complete (P151) · signal momentum sustained (P80). The system absorbed the dip and kept building. Recovery confirmed. Momentum unbroken. Arc closed.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4258,21 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  quantumPulseRhythmNode:    ['log', 'energy', 'mood'],
+  coherenceAccumulationNode: ['qos', 'log', 'energy', 'cohort'],
+  stellarNavigationNode:     ['energy', 'intentions', 'planner', 'journal', 'log'],
+
+  // ── v115 nodes (J50 · P155–P157 · Arch53) ───────────────────────────────────────
+  sustainedStellarArcNode:       ['energy', 'intentions', 'planner', 'journal', 'log'],
+  weeklyCoherenceSealNode:       ['mood', 'energy', 'selfcare', 'journal', 'memory', 'planner', 'intentions', 'log', 'cohort'],
+  longitudinalSignalMasteryNode: ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'log'],
+
+  // ── v116 nodes (J51 · P158–P160 · Arch54) ───────────────────────────────────────
+  morningMomentumIgnitionNode:  ['intentions', 'planner', 'mood', 'energy', 'journal', 'log'],
+  presenceCoherenceSealNode:    ['qos', 'cohort', 'intentions', 'journal', 'mood', 'energy', 'log'],
+  recoveryToMomentumBridgeNode: ['mood', 'selfcare', 'journal', 'energy', 'log', 'memory'],
 }
 
 /**
@@ -4510,6 +4719,36 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Stellar Navigator (2026-10-05 v114) ───────────────────────────────────
+  {
+    archetype: 'Stellar Navigator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'planner', 'energy', 'journal'],
+    patternConditions: ['stellar-navigation', 'personal-peak-window', 'morning-intention-lock'],
+    hourRange: [6, 22],
+    directive: 'Peak window locked. Morning intention confirmed. Sleep anchor set. Navigation is live — all three temporal coordinates aligned. Execute with full confidence.',
+  },
+
+  // ── Arch53: Quantum Sovereign (2026-10-06 v115) ───────────────────────────────────
+  {
+    archetype: 'Quantum Sovereign',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'journal', 'energy', 'planner', 'memory'],
+    patternConditions: ['sustained-stellar-arc', 'weekly-coherence-seal', 'longitudinal-signal-mastery'],
+    hourRange: [5, 23],
+    directive: 'Sustained stellar arc confirmed. Weekly coherence seal held. Longitudinal mastery established. You are not building the system — you ARE the system. Operate from sovereignty.',
+  },
+
+  // ── Arch54: Morning Ignition Operator (2026-10-07 v116) ───────────────────────────
+  {
+    archetype: 'Morning Ignition Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'mood', 'planner', 'journal'],
+    patternConditions: ['morning-momentum-ignition', 'morning-coherence-arc', 'morning-intention-lock'],
+    hourRange: [6, 14],
+    directive: 'Morning ignition confirmed. Intentions logged. Field charged before the load arrives. The day opens from signal, not reaction. Momentum is already building.',
   },
 ]
 
@@ -6498,6 +6737,150 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-pulse-rhythm event — log entries on 3+ consecutive days landing within
+ * ±2h of the same hour. The system has found its own heartbeat. Feeds P152 detection.
+ */
+export function recordQuantumPulseRhythm(daysActive: number, avgHour: number, rhythmConf: number) {
+  recordSignal('log', 'quantum_pulse_rhythm', {
+    daysActive,
+    avgHour,
+    rhythmConf: Math.round(rhythmConf * 100),
+    signature: 'TEMPORAL',
+    heartbeat: 'ACTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a coherence-accumulation event — total-field-coherence fired 2+ times in a 7-day window.
+ * The convergence ceiling has become a recurring ground state. Feeds P153 detection.
+ */
+export function recordCoherenceAccumulation(count: number, windowDays: number, peakConf: number) {
+  recordSignal('qos', 'coherence_accumulation', {
+    count,
+    windowDays,
+    peakConf: Math.round(peakConf),
+    groundState: 'CONVERGENCE',
+    status: 'ACCUMULATED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a stellar-navigation event — personal-peak-window (P113) + morning-intention-lock +
+ * sleep-signal-anchor (P117) all confirmed on the same calendar day. Three temporal coordinates locked.
+ * Feeds P154 detection.
+ */
+export function recordStellarNavigation(peakConf: number, intentConf: number, sleepConf: number, activePatterns: number) {
+  recordSignal('energy', 'stellar_navigation', {
+    peakConf: Math.round(peakConf * 100),
+    intentConf: Math.round(intentConf * 100),
+    sleepConf: Math.round(sleepConf * 100),
+    activePatterns,
+    coordinates: ['PEAK', 'INTENTION', 'SLEEP'],
+    navigationStatus: 'LOCKED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sustained-stellar-arc event — stellar-navigation confirmed 3+ times in a 14-day window.
+ * The triple-coordinate lock has become a repeating signature. Feeds P155 detection.
+ */
+export function recordSustainedStellarArc(count: number, windowDays: number, lastNavDate: string) {
+  recordSignal('energy', 'sustained_stellar_arc', {
+    count,
+    windowDays,
+    lastNavDate,
+    signature: 'REPEATING',
+    arcStatus: 'ESTABLISHED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a weekly-coherence-seal event — 5+ distinct signal sources active on 6+ of 7 days.
+ * Full-spectrum week confirmed. Feeds P156 detection. J50 background job (Sun 11:00 UTC) triggers this.
+ */
+export function recordWeeklyCoherenceSeal(activeDays: number, sourceCount: number, weekStart: string) {
+  recordSignal('journal', 'weekly_coherence_seal', {
+    activeDays,
+    sourceCount,
+    weekStart,
+    coverage: `${activeDays}/7`,
+    sealStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a longitudinal-signal-mastery event — 30-day window with 14+ days of 3+ active sources.
+ * Month-scale multi-dimensional operation confirmed. Feeds P157 detection.
+ * J50 background job (Sun 11:00 UTC) also triggers this after weekly seal check.
+ */
+export function recordLongitudinalSignalMastery(activeDays: number, windowDays: number, avgSources: number) {
+  recordSignal('memory', 'longitudinal_signal_mastery', {
+    activeDays,
+    windowDays,
+    avgSources: Math.round(avgSources * 10) / 10,
+    coverage: `${activeDays}/${windowDays}`,
+    masteryStatus: 'CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+// ─── v116 Signal Helpers (P158–P160) ──────────────────────────────────────────
+
+/**
+ * Record a morning-momentum-ignition event — intentions + energy + anchor logged
+ * before 10:00. The day opens from signal, not reaction. Feeds P158 detection.
+ */
+export function recordMorningMomentumIgnition(intentionCount: number, energyCount: number, anchorCount: number) {
+  recordSignal('intentions', 'morning_momentum_ignition', {
+    intentionCount,
+    energyCount,
+    anchorCount,
+    totalSignals: intentionCount + energyCount + anchorCount,
+    chargeStatus: 'IGNITION CONFIRMED',
+    sequence: 'INTENT→ENERGY→ANCHOR',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a presence-coherence-seal event — quantum-presence-crystallization (P149)
+ * + circadian-signal-lock (P143) + dimensional-saturation (P144) co-active.
+ * Presence, timing, and field fullness all confirmed simultaneously. Feeds P159 detection.
+ */
+export function recordPresenceCoherenceSeal(presenceConf: number, circadianConf: number, dimSatConf: number) {
+  const avgConf = Math.round(((presenceConf + circadianConf + dimSatConf) / 3) * 100) / 100
+  recordSignal('qos', 'presence_coherence_seal', {
+    presenceConf,
+    circadianConf,
+    dimSatConf,
+    avgConf,
+    seals: 'PRESENCE·CIRCADIAN·DIMENSIONAL',
+    sealStatus: 'ALL CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a recovery-to-momentum-bridge event — recovery-intelligence-arc (P151)
+ * + signal-momentum-lock (P80) co-active within 48h. Feeds P160 detection.
+ */
+export function recordRecoveryToMomentumBridge(recoveryConf: number, momentumConf: number, momentumDays: number) {
+  recordSignal('memory', 'recovery_to_momentum_bridge', {
+    recoveryConf,
+    momentumConf,
+    momentumDays,
+    bridgeStatus: 'CLOSED',
+    arc: 'DIP→RECOVERY→MOMENTUM HELD',
     hour: new Date().getHours(),
   })
 }

@@ -110,6 +110,15 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'quantum-presence-crystallization': 'QPCRYST',
   'total-field-coherence':            'TOTCOH',
   'recovery-intelligence-arc':        'RECINTEL',
+  'quantum-pulse-rhythm':             'PULSE',
+  'coherence-accumulation':           'CACC',
+  'stellar-navigation':               'STRNAV',
+  'sustained-stellar-arc':            'SSTARC',
+  'weekly-coherence-seal':            'WCOHS',
+  'longitudinal-signal-mastery':      'LONGSIG',
+  'morning-momentum-ignition':        'MIGN',
+  'presence-coherence-seal':          'PRSEAL',
+  'recovery-to-momentum-bridge':      'RECMOM',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

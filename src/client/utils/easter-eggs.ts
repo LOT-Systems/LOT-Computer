@@ -870,6 +870,54 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awardBadge('odyssey_day')
     awarded.push('odyssey_day')
   }
+  // ── Calendar v21 — STARDATE ──────────────────────────────────────────────────
+  // First Contact Day: April 5 — Star Trek First Contact Day (2063 in canon)
+  if (!hasBadge('first_contact_day') && month === 4 && day === 5) {
+    awardBadge('first_contact_day')
+    awarded.push('first_contact_day')
+  }
+  // Trek Premiere: September 8 — Star Trek TOS first aired, 1966
+  if (!hasBadge('trek_premiere') && month === 9 && day === 8) {
+    awardBadge('trek_premiere')
+    awarded.push('trek_premiere')
+  }
+  // Moon Landing: July 20 — Apollo 11 lunar landing, 1969
+  if (!hasBadge('moon_landing') && month === 7 && day === 20) {
+    awardBadge('moon_landing')
+    awarded.push('moon_landing')
+  }
+  // ── Calendar v22 — THE ARCADE CALENDAR ──────────────────────────────────────
+  // Rogue Day: October 5 — Rogue first distributed at UC San Diego, 1980
+  if (!hasBadge('rogue_day') && month === 10 && day === 5) {
+    awardBadge('rogue_day')
+    awarded.push('rogue_day')
+  }
+  // Tetris Day: June 6 — Tetris created by Alexey Pajitnov, 1984
+  if (!hasBadge('tetris_day') && month === 6 && day === 6) {
+    awardBadge('tetris_day')
+    awarded.push('tetris_day')
+  }
+  // Pac-Man Day: May 22 — Pac-Man arcade release, 1980
+  if (!hasBadge('pac_man_day') && month === 5 && day === 22) {
+    awardBadge('pac_man_day')
+    awarded.push('pac_man_day')
+  }
+  // ── Calendar v23 — THE DREAM CALENDAR ──────────────────────────────────────
+  // Jung Birthday: July 26 — Carl Jung born 1875
+  if (!hasBadge('jung_birthday') && month === 7 && day === 26) {
+    awardBadge('jung_birthday')
+    awarded.push('jung_birthday')
+  }
+  // Freud Signal: May 6 — Sigmund Freud born 1856
+  if (!hasBadge('freud_signal') && month === 5 && day === 6) {
+    awardBadge('freud_signal')
+    awarded.push('freud_signal')
+  }
+  // World Sleep Day: March 14
+  if (!hasBadge('world_sleep_day') && month === 3 && day === 14) {
+    awardBadge('world_sleep_day')
+    awarded.push('world_sleep_day')
+  }
 
   return awarded
 }
@@ -1483,6 +1531,57 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE STARSHIP LOG word turns ────────────────────────────────────────
+  { patterns: /captain['']?s[\s-]?log|starlog|\bmission[\s-]?log\b/i,                  badge: 'starlog_entry' },
+  { patterns: /\bwarp[\s-]?speed\b|\bhyperdrive\b|\blightspeed\b/i,                    badge: 'warp_speed' },
+  { patterns: /\bshields[\s-]?up\b|\barmor[\s-]?up\b|\bprotect[\s-]?yourself\b/i,     badge: 'shields_up' },
+  { patterns: /\bred[\s-]?alert\b|\bmayday\b|\bemergency[\s-]?signal\b/i,              badge: 'red_alert' },
+  { patterns: /\bsystems[\s-]?nominal\b|\ball[\s-]?clear\b|\bstatus[\s-]?green\b/i,   badge: 'systems_nominal' },
+  { patterns: /\bfirst[\s-]?contact\b|\bnew[\s-]?connection\b|\bfinally[\s-]?met\b/i, badge: 'first_contact_made' },
+  { patterns: /\baway[\s-]?mission\b|\bfield[\s-]?work\b|\bon[\s-]?assignment\b/i,    badge: 'away_team' },
+  { patterns: /\bwormhole\b|\bportal\b|\btook[\s-]?a[\s-]?leap\b|\bshortcut\b/i,      badge: 'wormhole_shift' },
+  { patterns: /\blost[\s-]?in[\s-]?thought\b|\bdrifting\b|\bfog[\s-]?of[\s-]?mind\b/i, badge: 'nebula_drift' },
+  { patterns: /\bbreaking[\s-]?down\b|\bfalling[\s-]?apart\b|\bcracked[\s-]?open\b/i, badge: 'hull_breach' },
+  { patterns: /\bprime[\s-]?directive\b|\bcore[\s-]?value\b|\bfirst[\s-]?principle\b/i, badge: 'prime_directive' },
+  { patterns: /\bfinal[\s-]?frontier\b|\bnew[\s-]?territory\b|\buncharted\b/i,         badge: 'final_frontier' },
+  // ── v20 Secret Boss — THE COSMIC VAULT word triggers ─────────────────────────
+  { patterns: /\b(star[\s-]?trek|roddenberry|vulcan[\s-]?mind|spock|starfleet)\b/i,    badge: 'roddenberry_signal' },
+  { patterns: /\bmake[\s-]?it[\s-]?so\b|\bresistance[\s-]?is[\s-]?futile\b|\bpicard\b|\bengage[\s-]?warp\b/i, badge: 'picard_maneuver' },
+  { patterns: /\b(three[\s-]?body|dark[\s-]?forest|liu[\s-]?cixin|sophon|trisolaris)\b/i, badge: 'dark_forest_law' },
+  // ── v24 — THE ROGUE RUN word turns ───────────────────────────────────────────
+  { patterns: /\bpermadeath\b|\bcan'?t[\s-]?go[\s-]?back\b|\bno[\s-]?undo\b/i,         badge: 'permadeath' },
+  { patterns: /\bleveled[\s-]?up\b|\bnew[\s-]?level\b|\bskills[\s-]?unlocked\b/i,      badge: 'level_up' },
+  { patterns: /\bcritical[\s-]?hit\b|\bbreakthrough\b|\blanded[\s-]?perfectly\b/i,     badge: 'critical_hit' },
+  { patterns: /\bboss[\s-]?battle\b|\bfinal[\s-]?challenge\b|\bbiggest[\s-]?fear\b/i,  badge: 'boss_battle' },
+  { patterns: /\brespawn\b|\bstarting[\s-]?over\b|\bback[\s-]?again\b/i,               badge: 'respawn_point' },
+  { patterns: /\bunexpected[\s-]?insight\b|\bfound[\s-]?something\b|\bloot\b/i,        badge: 'loot_drop' },
+  { patterns: /\bexperience[\s-]?gained\b|\bexp[\s-]?gained\b|\bi[\s-]?learned\b/i,   badge: 'exp_gained' },
+  { patterns: /\btoo[\s-]?much\b|\boverwhelmed\b|\bcarrying[\s-]?too[\s-]?much\b/i,   badge: 'inventory_full' },
+  { patterns: /\benergy[\s-]?level\b|\bhealth[\s-]?check\b|\bhow[\s-]?i'?m[\s-]?doing\b/i, badge: 'health_bar' },
+  { patterns: /\bsaved[\s-]?(my[\s-]?)?progress\b|\bcheckpoint\b|\blogged\b/i,         badge: 'save_state' },
+  { patterns: /\bstarting[\s-]?a[\s-]?run\b|\bnew[\s-]?attempt\b|\bbeginning[\s-]?again\b/i, badge: 'rogue_run' },
+  { patterns: /\bgame[\s-]?over\b|\bstarting[\s-]?fresh\b|\bnew[\s-]?game[\s-]?plus\b/i, badge: 'game_over_screen' },
+  // ── v21 Secret Boss — THE ROGUE VAULT word triggers ──────────────────────────
+  { patterns: /\b(sid[\s-]?meier|civilization|civ[\s-]?\d|one[\s-]?more[\s-]?turn)\b/i, badge: 'sid_meier_signal' },
+  { patterns: /\b(miyamoto|mario|zelda|donkey[\s-]?kong|nintendo[\s-]?design)\b/i,     badge: 'miyamoto_secret' },
+  { patterns: /\b(pajitnov|tetris[\s-]?piece|l[\s-]?tetromino|clearing[\s-]?lines)\b/i, badge: 'pajitnov_key' },
+  // ── v25 — THE DREAMSCAPE word turns ──────────────────────────────────────────
+  { patterns: /\blucid[\s-]?dream(?:ing)?\b|\blucid\b/i,                               badge: 'lucid_state' },
+  { patterns: /\bdream[\s-]?(?:journal|diary)\b/i,                                     badge: 'dream_journal_log' },
+  { patterns: /\bhypnagogic\b|\bhypnopompic\b|\bsleep[\s-]?paralysis\b/i,              badge: 'hypnagogic_signal' },
+  { patterns: /\barchetype\b|\bcollective[\s-]?unconscious\b|\banima\b|\banimus\b/i,   badge: 'archetype_rising' },
+  { patterns: /\bshadow[\s-]?work\b|\bshadow[\s-]?integration\b/i,                    badge: 'shadow_work' },
+  { patterns: /\bsubconscious\b|\bunconscious[\s-]?mind\b/i,                           badge: 'subconscious_log' },
+  { patterns: /\bdream[\s-]?symbol\b|\bsymbolic[\s-]?meaning\b|\bdream[\s-]?interpretation\b/i, badge: 'dream_symbol' },
+  { patterns: /\brecurring[\s-]?dream\b|\bsame[\s-]?dream[\s-]?again\b|\bdream[\s-]?loop\b/i, badge: 'recurring_dream' },
+  { patterns: /\bdreamscape\b|\bdreamworld\b|\bdream[\s-]?state\b/i,                   badge: 'dreamscape_entered' },
+  { patterns: /\bnightmare\b|\bnight[\s-]?terror\b|\bbad[\s-]?dream\b/i,               badge: 'nightmare_log' },
+  { patterns: /\bliminal[\s-]?space\b|\bthreshold[\s-]?dream\b|\bbetween[\s-]?worlds\b/i, badge: 'liminal_dream' },
+  { patterns: /\bwaking[\s-]?vision\b|\bfever[\s-]?dream\b|\bdaydream\b/i,            badge: 'waking_vision' },
+  // ── v22 Secret Boss — THE DREAM VAULT word triggers ──────────────────────────
+  { patterns: /\bcollective[\s-]?unconscious\b|\bindividuation\b|\bjung\b/i,           badge: 'jung_signal' },
+  { patterns: /\bbenzene[\s-]?ring\b|\bsnake[\s-]?eating[\s-]?(?:its[\s-]?)?tail\b|\bkekule\b/i, badge: 'kekule_vision' },
+  { patterns: /\bi[\s-]?am[\s-]?dreaming\b/i,                                         badge: 'lucid_master' },
 ]
 
 /**
@@ -1954,6 +2053,30 @@ export function runJournalEasterEggs(journalText: string): BadgeType[] {
   // Behavioral v16: body signal (journal entry >= 300 words)
   const bodySignal = checkBodySignal(journalText)
   if (bodySignal) awarded.push(bodySignal)
+
+  // Behavioral v21: speedrun session (check-in + journal within 5 min + rogue word)
+  const speedrun = checkSpeedrunSession(journalText)
+  if (speedrun) awarded.push(speedrun)
+
+  // Behavioral v21: grind session (7+ consecutive daily check-ins)
+  const grind = checkGrindSession()
+  if (grind) awarded.push(grind)
+
+  // Behavioral v21: boss day check (check-in on Monday)
+  const bossDay = checkBossDayCheck()
+  if (bossDay) awarded.push(bossDay)
+
+  // Behavioral v25: dream session (3+ Dreamscape words in one entry)
+  const dreamSess = checkDreamSession(journalText)
+  if (dreamSess) awarded.push(dreamSess)
+
+  // Behavioral v25: night writer (journal written 00:00–04:00)
+  const nightWriter = checkNightWriter()
+  if (nightWriter) awarded.push(nightWriter)
+
+  // Behavioral v25: sleep rhythm (same check-in hour for 5+ consecutive days)
+  const sleepRhythm = checkSleepRhythm()
+  if (sleepRhythm) awarded.push(sleepRhythm)
 
   // Word turns from journal text
   const wordTurns = detectWordTurns(journalText)
@@ -2712,6 +2835,179 @@ export function checkThresholdMoment(): BadgeType | null {
     awardBadge('threshold_moment')
     return 'threshold_moment'
   }
+  return null
+}
+
+// ── v23 — THE STARSHIP LOG behavioral functions ───────────────────────────────
+
+const STARSHIP_WORDS_V23 = [
+  /captain['']?s[\s-]?log|starlog|\bmission[\s-]?log\b/i,
+  /\bwarp[\s-]?speed\b|\bhyperdrive\b|\blightspeed\b/i,
+  /\bshields[\s-]?up\b|\barmor[\s-]?up\b|\bprotect[\s-]?yourself\b/i,
+  /\bred[\s-]?alert\b|\bmayday\b|\bemergency[\s-]?signal\b/i,
+  /\bsystems[\s-]?nominal\b|\ball[\s-]?clear\b|\bstatus[\s-]?green\b/i,
+  /\bfirst[\s-]?contact\b|\bnew[\s-]?connection\b|\bfinally[\s-]?met\b/i,
+  /\baway[\s-]?mission\b|\bfield[\s-]?work\b|\bon[\s-]?assignment\b/i,
+  /\bwormhole\b|\bportal\b|\btook[\s-]?a[\s-]?leap\b|\bshortcut\b/i,
+  /\blost[\s-]?in[\s-]?thought\b|\bdrifting\b|\bfog[\s-]?of[\s-]?mind\b/i,
+  /\bbreaking[\s-]?down\b|\bfalling[\s-]?apart\b|\bcracked[\s-]?open\b/i,
+  /\bprime[\s-]?directive\b|\bcore[\s-]?value\b|\bfirst[\s-]?principle\b/i,
+  /\bfinal[\s-]?frontier\b|\bnew[\s-]?territory\b|\buncharted\b/i,
+]
+
+export function checkBridgeSession(journalText: string): BadgeType | null {
+  if (hasBadge('bridge_session')) return null
+  const matchCount = STARSHIP_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('bridge_session')
+    return 'bridge_session'
+  }
+  return null
+}
+
+export function checkDeepSpaceEntry(journalText: string): BadgeType | null {
+  if (hasBadge('deep_space_entry')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 600) {
+    awardBadge('deep_space_entry')
+    return 'deep_space_entry'
+  }
+  return null
+}
+
+export function checkDarkSideWatch(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dark_side_watch')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  const minute = now.getMinutes()
+  if (hour === 3 && minute <= 30) {
+    awardBadge('dark_side_watch')
+    return 'dark_side_watch'
+  }
+  return null
+}
+
+// ── v24 — THE ROGUE RUN behavioral functions ──────────────────────────────────
+
+const ROGUE_WORDS_V24 = [
+  /\bpermadeath\b|\bcan'?t[\s-]?go[\s-]?back\b|\bno[\s-]?undo\b/i,
+  /\bleveled[\s-]?up\b|\bnew[\s-]?level\b|\bskills[\s-]?unlocked\b/i,
+  /\bcritical[\s-]?hit\b|\bbreakthrough\b|\blanded[\s-]?perfectly\b/i,
+  /\bboss[\s-]?battle\b|\bfinal[\s-]?challenge\b|\bbiggest[\s-]?fear\b/i,
+  /\brespawn\b|\bstarting[\s-]?over\b|\bback[\s-]?again\b/i,
+  /\bunexpected[\s-]?insight\b|\bfound[\s-]?something\b|\bloot\b/i,
+  /\bexperience[\s-]?gained\b|\bexp[\s-]?gained\b|\bi[\s-]?learned\b/i,
+  /\btoo[\s-]?much\b|\boverwhelmed\b|\bcarrying[\s-]?too[\s-]?much\b/i,
+  /\benergy[\s-]?level\b|\bhealth[\s-]?check\b|\bhow[\s-]?i'?m[\s-]?doing\b/i,
+  /\bsaved[\s-]?(my[\s-]?)?progress\b|\bcheckpoint\b|\blogged\b/i,
+  /\bstarting[\s-]?a[\s-]?run\b|\bnew[\s-]?attempt\b|\bbeginning[\s-]?again\b/i,
+  /\bgame[\s-]?over\b|\bstarting[\s-]?fresh\b|\bnew[\s-]?game[\s-]?plus\b/i,
+]
+
+export function checkSpeedrunSession(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('speedrun_session')) return null
+  const lastCheckIn = localStorage.getItem('last_check_in_time')
+  if (!lastCheckIn) return null
+  const elapsed = Date.now() - parseInt(lastCheckIn, 10)
+  const hasRogueWord = ROGUE_WORDS_V24.some(r => r.test(journalText))
+  if (elapsed <= 5 * 60 * 1000 && hasRogueWord) {
+    awardBadge('speedrun_session')
+    return 'speedrun_session'
+  }
+  return null
+}
+
+export function checkGrindSession(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('grind_session')) return null
+  try {
+    const checkInDays: string[] = JSON.parse(localStorage.getItem('check_in_days') || '[]')
+    if (checkInDays.length < 7) return null
+    const sorted = [...checkInDays].sort().reverse()
+    let streak = 0
+    for (let i = 0; i < sorted.length; i++) {
+      const expected = new Date()
+      expected.setDate(expected.getDate() - i)
+      const expectedStr = expected.toISOString().slice(0, 10)
+      if (sorted[i] === expectedStr) streak++
+      else break
+    }
+    if (streak >= 7) {
+      awardBadge('grind_session')
+      return 'grind_session'
+    }
+  } catch { /* non-critical */ }
+  return null
+}
+
+export function checkBossDayCheck(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('boss_day_check')) return null
+  const now = new Date()
+  if (now.getDay() === 1) {
+    awardBadge('boss_day_check')
+    return 'boss_day_check'
+  }
+  return null
+}
+
+// ── v25 — THE DREAMSCAPE behavioral functions ─────────────────────────────────
+
+const DREAM_WORDS_V25 = [
+  /\blucid[\s-]?dream(?:ing)?\b|\blucid\b/i,
+  /\bdream[\s-]?(?:journal|diary)\b/i,
+  /\bhypnagogic\b|\bhypnopompic\b|\bsleep[\s-]?paralysis\b/i,
+  /\barchetype\b|\bcollective[\s-]?unconscious\b|\banima\b|\banimus\b/i,
+  /\bshadow[\s-]?work\b|\bshadow[\s-]?integration\b/i,
+  /\bsubconscious\b|\bunconscious[\s-]?mind\b/i,
+  /\bdream[\s-]?symbol\b|\bsymbolic[\s-]?meaning\b|\bdream[\s-]?interpretation\b/i,
+  /\brecurring[\s-]?dream\b|\bsame[\s-]?dream[\s-]?again\b|\bdream[\s-]?loop\b/i,
+  /\bdreamscape\b|\bdreamworld\b|\bdream[\s-]?state\b/i,
+  /\bnightmare\b|\bnight[\s-]?terror\b|\bbad[\s-]?dream\b/i,
+  /\bliminal[\s-]?space\b|\bthreshold[\s-]?dream\b|\bbetween[\s-]?worlds\b/i,
+  /\bwaking[\s-]?vision\b|\bfever[\s-]?dream\b|\bdaydream\b/i,
+]
+
+/** dream_session: 3+ Dreamscape (v25) words in one journal entry */
+export function checkDreamSession(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dream_session')) return null
+  const matchCount = DREAM_WORDS_V25.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('dream_session')
+    return 'dream_session'
+  }
+  return null
+}
+
+/** night_writer: Journal entry written between 00:00 and 04:00 local */
+export function checkNightWriter(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('night_writer')) return null
+  const hour = new Date().getHours()
+  if (hour >= 0 && hour < 4) {
+    awardBadge('night_writer')
+    return 'night_writer'
+  }
+  return null
+}
+
+/** sleep_rhythm: Same check-in hour for 5+ consecutive days */
+export function checkSleepRhythm(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('sleep_rhythm')) return null
+  try {
+    const logs: string[] = JSON.parse(localStorage.getItem('check_in_hour_log') || '[]')
+    const currentHour = new Date().getHours()
+    const updated = [String(currentHour), ...logs].slice(0, 7)
+    localStorage.setItem('check_in_hour_log', JSON.stringify(updated))
+    if (updated.length >= 5 && updated.slice(0, 5).every(h => h === String(currentHour))) {
+      awardBadge('sleep_rhythm')
+      return 'sleep_rhythm'
+    }
+  } catch { /* non-critical */ }
   return null
 }
 

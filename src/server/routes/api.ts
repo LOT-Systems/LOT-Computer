@@ -1213,6 +1213,18 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: quantum pulse rhythm · coherence accumulation · stellar navigation (P152/P153/P154)
+      'quantum_pulse_rhythm',
+      'coherence_accumulation',
+      'stellar_navigation',
+      // v115: sustained stellar arc · weekly coherence seal · longitudinal signal mastery (P155/P156/P157)
+      'sustained_stellar_arc',
+      'weekly_coherence_seal',
+      'longitudinal_signal_mastery',
+      // v116: morning momentum ignition · presence coherence seal · recovery to momentum bridge (P158/P159/P160)
+      'morning_momentum_ignition',
+      'presence_coherence_seal',
+      'recovery_to_momentum_bridge',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

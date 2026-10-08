@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'morning-momentum-ignition':        'Morning momentum ignition — intentions + energy + anchor logged before 10:00, day fires from signal (P158)',
+      'presence-coherence-seal':          'Presence coherence seal — quantum presence crystallized + circadian locked + all dims saturated co-active (P159)',
+      'recovery-to-momentum-bridge':      'Recovery-to-momentum bridge — recovery arc complete and signal momentum sustained, dip absorbed and arc closed (P160)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

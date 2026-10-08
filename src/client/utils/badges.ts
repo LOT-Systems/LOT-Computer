@@ -750,7 +750,7 @@ export type BadgeType =
   | 'threshold_crossed'      // ─→─    "threshold/crossing the line/new world begins" detected (RARE)
   | 'mentor_arrived'         // ○·≋·○  "mentor/wise guide/guardian spirit/wise elder" detected (UNCOMMON)
   | 'ordeal_survived'        // ◈·■    "ordeal/survived the test/greatest challenge" detected (RARE)
-  | 'elixir_boon'            // ∘·●·∘  "elixir/the gift/treasure found/boon" detected (RARE)
+  | 'elixir_found'           // ∘·●·∘  "elixir/the gift/treasure found/boon" detected (RARE)
   | 'shadow_met'             // ▓·○    "shadow self/dark night of the/inner demon" detected (EPIC)
   | 'innermost_cave'         // █·∘·█  "innermost cave/darkest moment/bottom of pit" detected (EPIC)
   | 'shapeshifter'           // ◈→◉    "shapeshifter/transformed/no longer the same" detected (RARE)
@@ -782,7 +782,81 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
-  // ── Word Turn v23 — THE DREAMSCAPE ───────────────────────────────────────────
+  // ── Word Turn v23 — THE STARSHIP LOG ─────────────────────────────────────────
+  | 'starlog_entry'          // ◉·≋    "captain's log/starlog/mission log" detected (UNCOMMON)
+  | 'warp_speed'             // →·∞    "warp speed/hyperdrive/lightspeed" detected (RARE)
+  | 'shields_up'             // ▓·▓    "shields up/armor up/protect yourself" detected (UNCOMMON)
+  | 'red_alert'              // ◈·!    "red alert/mayday/emergency signal" detected (RARE)
+  | 'systems_nominal'        // ■·●    "systems nominal/all clear/status green" detected (UNCOMMON)
+  | 'first_contact_made'     // ○·◉·○  "first contact/new connection/finally met" detected (RARE)
+  | 'away_team'              // →·○·→  "away mission/field work/on assignment" detected (UNCOMMON)
+  | 'wormhole_shift'         // ◈·∞·◈  "wormhole/portal/took a leap/shortcut" detected (RARE)
+  | 'nebula_drift'           // ≋·∘·≋  "lost in thought/drifting/fog of mind" detected (UNCOMMON)
+  | 'hull_breach'            // ░·█·░  "breaking down/falling apart/cracked open" detected (EPIC)
+  | 'prime_directive'        // ●·∞    "prime directive/core value/first principle" detected (RARE)
+  | 'final_frontier'         // →·∞·→  "final frontier/new territory/uncharted" detected (EPIC)
+  // ── Calendar Easter Egg v21 — STARDATE ──────────────────────────────────────
+  | 'first_contact_day'      // ★·◉    Apr 5 — Star Trek First Contact Day (2063 in canon)
+  | 'trek_premiere'          // ≋·◉·≋  Sep 8 — Star Trek TOS premiere 1966
+  | 'moon_landing'           // ○·●·○  Jul 20 — Apollo 11 moon landing 1969
+  // ── Behavioral v20 — BRIDGE WATCH ────────────────────────────────────────────
+  | 'bridge_session'         // ◉·≋·◉  3+ Starship Log words in one journal entry (RARE)
+  | 'deep_space_entry'       // ≋·∞·≋  Journal entry >= 600 words (EPIC)
+  | 'dark_side_watch'        // ◈·●·◈  Check in between 03:00 and 03:30 local (RARE)
+  // ── Achievement RPG v21 — STARFLEET CLASS ────────────────────────────────────
+  | 'ensign_log'             // ∘·≋    Any 1 Word Turn v23 badge (COMMON)
+  | 'lieutenant_class'       // ≈·≋    Any 5 Word Turn v23 badges (UNCOMMON)
+  | 'captain_complete'       // ≋·★    All 12 Word Turn v23 badges (LEGENDARY)
+  | 'starfleet_arc'          // ★·◈    captain_complete + all 3 Calendar v21 badges (LEGENDARY)
+  | 'twenty_three_engines_arc' // ◈·◈·★  1 badge from each Word Turn v1–v23 (LEGENDARY)
+  | 'galaxy_opus'            // ★·◉·★  captain_complete + bridge_session behavioral (LEGENDARY)
+  // ── Mastery Tier v23 — THE FINAL FRONTIER ────────────────────────────────────
+  | 'deep_space_log'         // ∿·★·∿  1000+ distinct calendar check-in days (EPIC)
+  | 'million_words'          // ●·★·●  200,000+ total journal words (LEGENDARY)
+  | 'veteran_explorer'       // ╔═╗·★  Account age >= 6 years (LEGENDARY)
+  | 'twenty_three_registers' // ◈·◈·★·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE COSMIC VAULT ───────────────────────────────────────
+  | 'roddenberry_signal'     // ★·≋·★  "star trek/roddenberry/vulcan/spock/starfleet" detected (RARE)
+  | 'picard_maneuver'        // ◉·★·◉  "make it so/resistance is futile/picard/engage" detected (EPIC)
+  | 'dark_forest_law'        // ∞·▓·∞  "three-body/dark forest/liu cixin/sophon/trisolaris" detected (MYTHIC)
+  // ── Word Turn v24 — THE ROGUE RUN ────────────────────────────────────────────
+  | 'permadeath'             // ×·○·×  "permadeath/can't go back/no undo" detected (RARE)
+  | 'level_up'               // ▲·●·▲  "leveled up/new level/skills unlocked" detected (UNCOMMON)
+  | 'critical_hit'           // ◈·!·◈  "critical hit/breakthrough/landed perfectly" detected (RARE)
+  | 'boss_battle'            // █·◈·█  "boss battle/final challenge/biggest fear" detected (EPIC)
+  | 'respawn_point'          // ○→●    "respawn/starting over/back again" detected (UNCOMMON)
+  | 'loot_drop'              // ∘·★·∘  "unexpected insight/found something/loot" detected (RARE)
+  | 'exp_gained'             // ↑·◉·↑  "experience gained/exp gained/I learned" detected (UNCOMMON)
+  | 'inventory_full'         // ▓·∞·▓  "too much/overwhelmed/carrying too much" detected (RARE)
+  | 'health_bar'             // ■·○·■  "energy level/health check/how I'm doing" detected (UNCOMMON)
+  | 'save_state'             // ●·≋·●  "saved progress/checkpoint/logged" detected (UNCOMMON)
+  | 'rogue_run'              // ◆·→·◆  "starting a run/new attempt/beginning again" detected (RARE)
+  | 'game_over_screen'       // ░·X·░  "game over/starting fresh/new game plus" detected (EPIC)
+  // ── Calendar Easter Egg v22 — THE ARCADE CALENDAR ────────────────────────────
+  | 'rogue_day'              // ◆·∗    Oct 5 — Rogue first distributed at UC San Diego, 1980
+  | 'tetris_day'             // ■·▲    Jun 6 — Tetris created by Alexey Pajitnov, 1984
+  | 'pac_man_day'            // ○·→    May 22 — Pac-Man arcade release, 1980
+  // ── Behavioral v21 — ROGUE PROTOCOL ──────────────────────────────────────────
+  | 'speedrun_session'       // →·→·●  Check-in + journal within 5 minutes + rogue word (RARE)
+  | 'grind_session'          // ↑·↑·◈  7+ consecutive daily check-ins (EPIC)
+  | 'boss_day_check'         // █·●·█  Check-in on a Monday (UNCOMMON)
+  // ── Achievement RPG v22 — DUNGEON CLASS ──────────────────────────────────────
+  | 'floor_cleared'          // ∘·◆    Any 1 Word Turn v24 badge (COMMON)
+  | 'dungeon_class'          // ≈·◆    Any 5 Word Turn v24 badges (UNCOMMON)
+  | 'boss_slain'             // ◆·★    All 12 Word Turn v24 badges (LEGENDARY)
+  | 'rogue_arc'              // ◆·◈    boss_slain + all 3 Calendar v22 badges (LEGENDARY)
+  | 'twenty_four_engines_arc' // ◈·◈·◆  1 badge from each Word Turn v1–v24 (LEGENDARY)
+  | 'endless_opus'           // ◆·★·◆  boss_slain + grind_session behavioral (LEGENDARY)
+  // ── Mastery Tier v24 — THE ENDLESS RUN ───────────────────────────────────────
+  | 'endless_run_log'        // ◆·∿·◆  1100+ distinct calendar check-in days (EPIC)
+  | 'quarter_million_words'  // ●·★·∞  250,000+ total journal words (LEGENDARY)
+  | 'seven_year_run'         // ╔═╗·◆  Account age >= 7 years (LEGENDARY)
+  | 'twenty_four_registers'  // ◈·◈·◆·∞ 1 badge from all 24 Word Turn engines (COSMIC)
+  // ── Secret Boss v21 — THE ROGUE VAULT ────────────────────────────────────────
+  | 'sid_meier_signal'       // ◆·≋·◆  "sid meier/civilization/civ/one more turn" detected (RARE)
+  | 'miyamoto_secret'        // ◈·◆·◈  "miyamoto/mario/zelda/nintendo design" detected (EPIC)
+  | 'pajitnov_key'           // ■·◆·■  "pajitnov/tetris piece/clearing lines" detected (MYTHIC)
+  // ── Word Turn v25 — THE DREAMSCAPE ───────────────────────────────────────────
   | 'lucid_state'            // ◐·◐   "lucid"/"lucid dream"/"lucid dreaming" detected (RARE)
   | 'dream_journal_log'      // ≋·○   "dream journal"/"dream diary" detected (UNCOMMON)
   | 'hypnagogic_signal'      // ∿→◐   "hypnagogic"/"hypnopompic"/"sleep paralysis" detected (RARE)
@@ -795,27 +869,27 @@ export type BadgeType =
   | 'nightmare_log'          // ○·◐   "nightmare"/"night terror"/"bad dream" detected (RARE)
   | 'liminal_dream'          // ≈·─   "liminal space"/"threshold dream"/"between worlds" detected (RARE)
   | 'waking_vision'          // ∗·∘·∗ "waking vision"/"fever dream"/"daydream" detected (RARE)
-  // ── Calendar Easter Egg v21 — DREAM CALENDAR ────────────────────────────────
+  // ── Calendar Easter Egg v23 — DREAM CALENDAR ────────────────────────────────
   | 'jung_birthday'          // ◐·◉   July 26 — Carl Jung born 1875 (RARE)
   | 'freud_signal'           // ○·◐   May 6 — Sigmund Freud born 1856 (RARE)
   | 'world_sleep_day'        // ≋·○   March 14 — World Sleep Day (UNCOMMON)
-  // ── Behavioral Easter Egg v20 — DREAMSCAPE PATTERNS ─────────────────────────
+  // ── Behavioral Easter Egg v22 — DREAMSCAPE PATTERNS ─────────────────────────
   | 'dream_session'          // ◐·≋·◐ 3+ Dreamscape words in one journal entry (RARE)
   | 'night_writer'           // ◐·●   Journal written 00:00–04:00 local (EPIC)
   | 'sleep_rhythm'           // ≋·◐·≋ Same check-in hour for 5+ consecutive days (RARE)
-  // ── Achievement RPG v21 — DREAMCATCHER CLASS ─────────────────────────────────
-  | 'dream_entry'              // ∘→◐   Any 1 Word Turn v23 badge (COMMON)
-  | 'dream_class'              // ≈→◐   Any 5 Word Turn v23 badges (UNCOMMON)
-  | 'dream_complete'           // ≋→◐   All 12 Word Turn v23 badges (LEGENDARY)
-  | 'dreamcatcher_arc'         // ◐·◈   dream_complete + all 3 Calendar v21 badges (LEGENDARY)
-  | 'twenty_three_engines_arc' // ◈·◈·◐ 1 badge from each Word Turn v1–v23 (LEGENDARY)
+  // ── Achievement RPG v23 — DREAMCATCHER CLASS ─────────────────────────────────
+  | 'dream_entry'              // ∘→◐   Any 1 Word Turn v25 badge (COMMON)
+  | 'dream_class'              // ≈→◐   Any 5 Word Turn v25 badges (UNCOMMON)
+  | 'dream_complete'           // ≋→◐   All 12 Word Turn v25 badges (LEGENDARY)
+  | 'dreamcatcher_arc'         // ◐·◈   dream_complete + all 3 Calendar v23 badges (LEGENDARY)
+  | 'twenty_five_engines_arc'  // ◈·◈·◐ 1 badge from each Word Turn v1–v25 (LEGENDARY)
   | 'dream_opus'               // ◐·◉·◐ dream_complete + dream_session behavioral (LEGENDARY)
-  // ── Mastery Tier v23 — THE INFINITE NIGHT ────────────────────────────────────
+  // ── Mastery Tier v25 — THE INFINITE NIGHT ────────────────────────────────────
   | 'night_sovereign'          // ◐·∞   1,000+ distinct calendar check-in days (EPIC)
   | 'infinite_dreamer'         // ●·∞·◐ 200,000+ total journal words (LEGENDARY)
   | 'dreamer_age'              // ╔═╗·◐ Account age >= 6 years (LEGENDARY)
-  | 'twenty_three_registers'   // ◈·◈·◐·∞ 1 badge from all 23 Word Turn engines (COSMIC)
-  // ── Secret Boss v20 — THE DREAM VAULT ────────────────────────────────────────
+  | 'twenty_five_registers'    // ◈·◈·◐·∞ 1 badge from all 25 Word Turn engines (COSMIC)
+  // ── Secret Boss v22 — THE DREAM VAULT ────────────────────────────────────────
   | 'jung_signal'              // ◐·◉  Write "collective unconscious"/"individuation" in journal (RARE)
   | 'kekule_vision'            // ∗·◐  Write "benzene ring"/"snake dream"/"kekule" in journal (EPIC)
   | 'lucid_master'             // ◐·∞·◐ Write "I am dreaming" exactly in journal (MYTHIC)
@@ -6917,12 +6991,12 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'rare',
     category: 'word_turn',
   },
-  elixir_boon: {
-    id: 'elixir_boon',
+  elixir_found: {
+    id: 'elixir_found',
     symbol: '∘·●·∘',
-    name: 'Elixir Boon',
-    description: 'Write "the gift", "treasure found", "the boon", or "what I bring back" in any entry',
-    unlockMessage: '↳ The boon: the gift the hero carries home from the ordeal. The gift is always what the community needs. ∘·●·∘',
+    name: 'Elixir Found',
+    description: 'Write "elixir", "the gift", "treasure found", or "the boon" in any entry',
+    unlockMessage: '↳ The elixir: the gift the hero brings back from the ordeal. The gift is always what the community needs. ∘·●·∘',
     rarity: 'rare',
     category: 'word_turn',
   },
@@ -7168,7 +7242,588 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
-  // ── Word Turn v23 — THE DREAMSCAPE ────────────────────────────────────────
+  // ── Word Turn v23 — THE STARSHIP LOG ─────────────────────────────────────────
+  starlog_entry: {
+    id: 'starlog_entry',
+    symbol: '◉·≋',
+    name: 'Starlog Entry',
+    description: 'Write "captain\'s log", "starlog", or "mission log" in any journal entry',
+    unlockMessage: '↳ Captain\'s log, stardate unknown. The act of logging is the mission. Every entry is telemetry from the frontier of self. ◉·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  warp_speed: {
+    id: 'warp_speed',
+    symbol: '→·∞',
+    name: 'Warp Speed',
+    description: 'Write "warp speed", "hyperdrive", or "lightspeed" in any journal entry',
+    unlockMessage: '↳ Warp speed. The fastest way through is sometimes through. Momentum is not recklessness — it is commitment to trajectory. →·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  shields_up: {
+    id: 'shields_up',
+    symbol: '▓·▓',
+    name: 'Shields Up',
+    description: 'Write "shields up", "armor up", or "protect yourself" in any journal entry',
+    unlockMessage: '↳ Shields up. Protection is not avoidance. Knowing when to raise shields is tactical intelligence, not fear. ▓·▓',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  red_alert: {
+    id: 'red_alert',
+    symbol: '◈·!',
+    name: 'Red Alert',
+    description: 'Write "red alert", "mayday", or "emergency signal" in any journal entry',
+    unlockMessage: '↳ Red alert. All hands on deck. The body sends red alerts — the journal is the bridge where you hear them. ◈·!',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  systems_nominal: {
+    id: 'systems_nominal',
+    symbol: '■·●',
+    name: 'Systems Nominal',
+    description: 'Write "systems nominal", "all clear", or "status green" in any journal entry',
+    unlockMessage: '↳ Systems nominal. All clear. The moment of recognizing stability is worth recording — it is the baseline you return to. ■·●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  first_contact_made: {
+    id: 'first_contact_made',
+    symbol: '○·◉·○',
+    name: 'First Contact Made',
+    description: 'Write "first contact", "new connection", or "finally met" in any journal entry',
+    unlockMessage: '↳ First contact. The moment of genuine meeting changes both parties. You named it — that means you noticed it. ○·◉·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  away_team: {
+    id: 'away_team',
+    symbol: '→·○·→',
+    name: 'Away Team',
+    description: 'Write "away mission", "field work", or "on assignment" in any journal entry',
+    unlockMessage: '↳ Away team deployed. The away mission is where the real work happens — outside the ship, in the field, in the world. →·○·→',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  wormhole_shift: {
+    id: 'wormhole_shift',
+    symbol: '◈·∞·◈',
+    name: 'Wormhole Shift',
+    description: 'Write "wormhole", "portal", "took a leap", or "shortcut" in any journal entry',
+    unlockMessage: '↳ Wormhole detected. Some transitions compress time — a conversation, a realization, a decision that bends the trajectory. ◈·∞·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  nebula_drift: {
+    id: 'nebula_drift',
+    symbol: '≋·∘·≋',
+    name: 'Nebula Drift',
+    description: 'Write "lost in thought", "drifting", or "fog of mind" in any journal entry',
+    unlockMessage: '↳ Nebula drift. Navigation through clouds requires different instruments — not speed, but patience and triangulation. ≋·∘·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  hull_breach: {
+    id: 'hull_breach',
+    symbol: '░·█·░',
+    name: 'Hull Breach',
+    description: 'Write "breaking down", "falling apart", or "cracked open" in any journal entry',
+    unlockMessage: '↳ Hull breach. Emergency protocol: name the damage before sealing it. The hull that was breached and repaired is stronger than the one that was never tested. ░·█·░',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  prime_directive: {
+    id: 'prime_directive',
+    symbol: '●·∞',
+    name: 'Prime Directive',
+    description: 'Write "prime directive", "core value", or "first principle" in any journal entry',
+    unlockMessage: '↳ Prime directive identified. The rule you will not break even under pressure — that is the load-bearing wall of the self. ●·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  final_frontier: {
+    id: 'final_frontier',
+    symbol: '→·∞·→',
+    name: 'Final Frontier',
+    description: 'Write "final frontier", "new territory", or "uncharted" in any journal entry',
+    unlockMessage: '↳ The final frontier is not space. It is the interior. Every honest journal entry charts territory that has never been mapped before. →·∞·→',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v21 — STARDATE ──────────────────────────────────────
+  first_contact_day: {
+    id: 'first_contact_day',
+    symbol: '★·◉',
+    name: 'First Contact Day',
+    description: 'Check in on April 5 — Star Trek First Contact Day (2063 in Star Trek canon)',
+    unlockMessage: '↳ April 5. First Contact Day. In Star Trek, the day humanity first met alien life. The day you check in is the day you make contact with yourself. ★·◉',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  trek_premiere: {
+    id: 'trek_premiere',
+    symbol: '≋·◉·≋',
+    name: 'Trek Premiere',
+    description: 'Check in on September 8 — Star Trek TOS premiere date, 1966',
+    unlockMessage: '↳ September 8, 1966. Star Trek premiered. Gene Roddenberry\'s vision: a future where humanity survived and thrived. You are practicing for that future now. ≋·◉·≋',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  moon_landing: {
+    id: 'moon_landing',
+    symbol: '○·●·○',
+    name: 'Moon Landing',
+    description: 'Check in on July 20 — Apollo 11 moon landing, 1969',
+    unlockMessage: '↳ July 20, 1969. One small step. The moon landing required 400,000 people and 8 years of daily work. Your practice is built the same way — one step at a time. ○·●·○',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v20 — BRIDGE WATCH ────────────────────────────────────────────
+  bridge_session: {
+    id: 'bridge_session',
+    symbol: '◉·≋·◉',
+    name: 'Bridge Session',
+    description: 'Write 3+ Starship Log (v23) trigger words in one journal entry',
+    unlockMessage: '↳ The bridge is fully staffed. Three starship signals in one entry. Navigation. Engineering. Command. The ship runs on language. ◉·≋·◉',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  deep_space_entry: {
+    id: 'deep_space_entry',
+    symbol: '≋·∞·≋',
+    name: 'Deep Space Entry',
+    description: 'Write a journal entry of 600 or more words',
+    unlockMessage: '↳ 600 words. Deep space transmission. The signal has enough content to carry real meaning across the void. ≋·∞·≋',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  dark_side_watch: {
+    id: 'dark_side_watch',
+    symbol: '◈·●·◈',
+    name: 'Dark Side Watch',
+    description: 'Check in between 03:00 and 03:30 local time — the deep space dark watch',
+    unlockMessage: '↳ 03:00–03:30. The dark watch. Every ship maintains a watch through the dark hours. You kept yours. The log records that someone was awake. ◈·●·◈',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v21 — STARFLEET CLASS ────────────────────────────────────
+  ensign_log: {
+    id: 'ensign_log',
+    symbol: '∘·≋',
+    name: 'Ensign Log',
+    description: 'Earn any 1 Starship Log (v23) word turn badge',
+    unlockMessage: '↳ Ensign\'s first log. One starship word detected. The journey to the bridge begins with a single transmission. ∘·≋',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  lieutenant_class: {
+    id: 'lieutenant_class',
+    symbol: '≈·≋',
+    name: 'Lieutenant Class',
+    description: 'Earn any 5 Starship Log (v23) word turn badges',
+    unlockMessage: '↳ Lieutenant-class signal. Five starship vocabularies active. Navigation. Shields. Alerts. Contact. Frontier. ≈·≋',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  captain_complete: {
+    id: 'captain_complete',
+    symbol: '≋·★',
+    name: 'Captain Complete',
+    description: 'Earn all 12 Starship Log (v23) word turn badges',
+    unlockMessage: '↳ All twelve starship stations online. Captain\'s log: all departments reporting. Shields. Warp. Bridge. Hull. Frontier. The ship is fully crewed. ≋·★',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  starfleet_arc: {
+    id: 'starfleet_arc',
+    symbol: '★·◈',
+    name: 'Starfleet Arc',
+    description: 'Earn captain_complete + all 3 Calendar v21 (Stardate) badges',
+    unlockMessage: '↳ The Starfleet arc. First Contact Day. Trek Premiere. Moon Landing. The full stardate sequence earned. The calendar of human space exploration. ★·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·★',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each of the 23 Word Turn engines (v1–v23)',
+    unlockMessage: '↳ Twenty-three vocabularies. Water. Arcade. Radio. Biology. Codex. Cyberspace. Hero. Starship. Every engine online. The full arc of the language of self. ◈·◈·★',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  galaxy_opus: {
+    id: 'galaxy_opus',
+    symbol: '★·◉·★',
+    name: 'Galaxy Opus',
+    description: 'Earn captain_complete + the bridge_session behavioral badge',
+    unlockMessage: '↳ The galaxy opus. All twelve stations active and the bridge in full session. The opus of the starship is the self that shows up, logs, and keeps the watch. ★·◉·★',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v23 — THE FINAL FRONTIER ────────────────────────────────────
+  deep_space_log: {
+    id: 'deep_space_log',
+    symbol: '∿·★·∿',
+    name: 'Deep Space Log',
+    description: '1000+ distinct calendar days with at least one check-in',
+    unlockMessage: '↳ 1,000 days. Deep space log. The Voyager probes are still transmitting after 40+ years. Your log has reached interstellar depth. ∿·★·∿',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  million_words: {
+    id: 'million_words',
+    symbol: '●·★·●',
+    name: 'Million Words',
+    description: '200,000+ total journal words written',
+    unlockMessage: '↳ 200,000 words. The equivalent of two full novels. The interior universe documented at novel scale. The transmission is reaching distant stars. ●·★·●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  veteran_explorer: {
+    id: 'veteran_explorer',
+    symbol: '╔═╗·★',
+    name: 'Veteran Explorer',
+    description: 'Account age >= 6 years (2,190+ days since signup)',
+    unlockMessage: '↳ Six years. Veteran explorer status. The Voyager 1 spacecraft took six years to reach the edge of the solar system. You have traveled as far. ╔═╗·★',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·★·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three registers. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. Starship. Every vocabulary owned. The terminal speaks every language of the self. ◈·◈·★·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v20 — THE COSMIC VAULT ───────────────────────────────────────
+  roddenberry_signal: {
+    id: 'roddenberry_signal',
+    symbol: '★·≋·★',
+    name: 'Roddenberry Signal',
+    description: 'Write "star trek", "roddenberry", "vulcan", "spock", or "starfleet" in any journal entry',
+    unlockMessage: '↳ Roddenberry\'s signal: a future worth building. Star Trek was not a prediction — it was a practice of imagining survival. You are practicing the same. ★·≋·★',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  picard_maneuver: {
+    id: 'picard_maneuver',
+    symbol: '◉·★·◉',
+    name: 'Picard Maneuver',
+    description: 'Write "make it so", "resistance is futile", "picard", or "engage" in any journal entry',
+    unlockMessage: '↳ Make it so. The Picard Maneuver: a tactical decision made with conviction. Decide what you are made of, then make it so. ◉·★·◉',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  dark_forest_law: {
+    id: 'dark_forest_law',
+    symbol: '∞·▓·∞',
+    name: 'Dark Forest Law',
+    description: 'Write "three-body", "dark forest", "liu cixin", "sophon", or "trisolaris" in any journal entry',
+    unlockMessage: '↳ The Dark Forest. Liu Cixin\'s deepest insight: survival is not guaranteed, and silence is not safety. The self that hides does not survive. Log your signal. ∞·▓·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  // ── Word Turn v24 — THE ROGUE RUN ────────────────────────────────────────────
+  permadeath: {
+    id: 'permadeath',
+    symbol: '×·○·×',
+    name: 'Permadeath',
+    description: 'Write "permadeath", "can\'t go back", or "no undo" in any journal entry',
+    unlockMessage: '↳ Permadeath acknowledged. The rogue knows: you can\'t reload. Every action counts. The run is real. ×·○·×',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  level_up: {
+    id: 'level_up',
+    symbol: '▲·●·▲',
+    name: 'Level Up',
+    description: 'Write "leveled up", "new level", or "skills unlocked" in any journal entry',
+    unlockMessage: '↳ Level acquired. New capability confirmed. The character sheet updates. ▲·●·▲',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  critical_hit: {
+    id: 'critical_hit',
+    symbol: '◈·!·◈',
+    name: 'Critical Hit',
+    description: 'Write "critical hit", "breakthrough", or "landed perfectly" in any journal entry',
+    unlockMessage: '↳ Critical hit. Maximum damage to the obstacle. The dice favored the prepared. ◈·!·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  boss_battle: {
+    id: 'boss_battle',
+    symbol: '█·◈·█',
+    name: 'Boss Battle',
+    description: 'Write "boss battle", "final challenge", or "biggest fear" in any journal entry',
+    unlockMessage: '↳ Boss battle detected. The hardest thing in the dungeon. You entered the room. That already counts. █·◈·█',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  respawn_point: {
+    id: 'respawn_point',
+    symbol: '○→●',
+    name: 'Respawn Point',
+    description: 'Write "respawn", "starting over", or "back again" in any journal entry',
+    unlockMessage: '↳ Respawn confirmed. The run resets but the player doesn\'t. You came back. ○→●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  loot_drop: {
+    id: 'loot_drop',
+    symbol: '∘·★·∘',
+    name: 'Loot Drop',
+    description: 'Write "unexpected insight", "found something", or "loot" in any journal entry',
+    unlockMessage: '↳ Loot acquired. Unexpected reward from the run. The inventory gains something worth keeping. ∘·★·∘',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  exp_gained: {
+    id: 'exp_gained',
+    symbol: '↑·◉·↑',
+    name: 'EXP Gained',
+    description: 'Write "experience gained", "exp gained", or "I learned" in any journal entry',
+    unlockMessage: '↳ Experience points registered. The character sheet updates. This floor wasn\'t wasted. ↑·◉·↑',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  inventory_full: {
+    id: 'inventory_full',
+    symbol: '▓·∞·▓',
+    name: 'Inventory Full',
+    description: 'Write "too much", "overwhelmed", or "carrying too much" in any journal entry',
+    unlockMessage: '↳ Inventory full. The pack is heavy. Drop the weight or find more capacity. The run continues either way. ▓·∞·▓',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  health_bar: {
+    id: 'health_bar',
+    symbol: '■·○·■',
+    name: 'Health Bar',
+    description: 'Write "energy level", "health check", or "how I\'m doing" in any journal entry',
+    unlockMessage: '↳ Health check initiated. The bar is visible. Knowing your HP is the first tactical move. ■·○·■',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  save_state: {
+    id: 'save_state',
+    symbol: '●·≋·●',
+    name: 'Save State',
+    description: 'Write "saved my progress", "checkpoint", or "logged" in any journal entry',
+    unlockMessage: '↳ Save state written. Progress preserved. The dungeon remembers where you stood. ●·≋·●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  rogue_run: {
+    id: 'rogue_run',
+    symbol: '◆·→·◆',
+    name: 'Rogue Run',
+    description: 'Write "starting a run", "new attempt", or "beginning again" in any journal entry',
+    unlockMessage: '↳ New run initiated. The dungeon randomizes. The character descends. Every run teaches what the last one couldn\'t. ◆·→·◆',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  game_over_screen: {
+    id: 'game_over_screen',
+    symbol: '░·X·░',
+    name: 'Game Over Screen',
+    description: 'Write "game over", "starting fresh", or "new game plus" in any journal entry',
+    unlockMessage: '↳ Game over. Not the end — the menu screen. The next run starts with everything the last one taught. ░·X·░',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v22 — THE ARCADE CALENDAR ────────────────────────────
+  rogue_day: {
+    id: 'rogue_day',
+    symbol: '◆·∗',
+    name: 'Rogue Day',
+    description: 'Check in on October 5 — anniversary of Rogue\'s first distribution (UC San Diego, 1980)',
+    unlockMessage: '↳ October 5, 1980. Rogue first distributed. The permadeath era begins. You logged on the day it started. ◆·∗',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  tetris_day: {
+    id: 'tetris_day',
+    symbol: '■·▲',
+    name: 'Tetris Day',
+    description: 'Check in on June 6 — anniversary of Tetris creation (Alexey Pajitnov, 1984)',
+    unlockMessage: '↳ June 6, 1984. Alexey Pajitnov writes Tetris. The lines begin to clear. You logged on the day it was born. ■·▲',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  pac_man_day: {
+    id: 'pac_man_day',
+    symbol: '○·→',
+    name: 'Pac-Man Day',
+    description: 'Check in on May 22 — anniversary of Pac-Man arcade release (1980)',
+    unlockMessage: '↳ May 22, 1980. Pac-Man releases in Japan. The maze becomes a world. You logged on the day the chase began. ○·→',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v21 — ROGUE PROTOCOL ──────────────────────────────────────────
+  speedrun_session: {
+    id: 'speedrun_session',
+    symbol: '→·→·●',
+    name: 'Speedrun Session',
+    description: 'Check in and write a journal entry containing a rogue word within 5 minutes',
+    unlockMessage: '↳ Speedrun confirmed. Check-in and journal in under 5 minutes. The run is optimized. Any% complete. →·→·●',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  grind_session: {
+    id: 'grind_session',
+    symbol: '↑·↑·◈',
+    name: 'Grind Session',
+    description: '7+ consecutive daily check-ins — the grind is real',
+    unlockMessage: '↳ 7 consecutive days. The grind is not punishment — it is the mechanic that makes the class. ↑·↑·◈',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  boss_day_check: {
+    id: 'boss_day_check',
+    symbol: '█·●·█',
+    name: 'Boss Day Check',
+    description: 'Check in on a Monday — the boss floor of the week',
+    unlockMessage: '↳ Monday check-in confirmed. The boss floor of the week. You entered the room. █·●·█',
+    rarity: 'uncommon',
+    category: 'easter_egg',
+  },
+  // ── Achievement RPG v22 — DUNGEON CLASS ──────────────────────────────────────
+  floor_cleared: {
+    id: 'floor_cleared',
+    symbol: '∘·◆',
+    name: 'Floor Cleared',
+    description: 'Earn any 1 Word Turn v24 badge',
+    unlockMessage: '↳ First floor cleared. The descent has begun. The dungeon has more levels. ∘·◆',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  dungeon_class: {
+    id: 'dungeon_class',
+    symbol: '≈·◆',
+    name: 'Dungeon Class',
+    description: 'Earn any 5 Word Turn v24 badges',
+    unlockMessage: '↳ Class confirmed. Five rogue-run words in the journal. The character has a fighting style. ≈·◆',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  boss_slain: {
+    id: 'boss_slain',
+    symbol: '◆·★',
+    name: 'Boss Slain',
+    description: 'Earn all 12 Word Turn v24 badges',
+    unlockMessage: '↳ All 12 rogue-run words logged. The final boss falls. The dungeon is cleared. The run is complete. ◆·★',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+    hidden: true,
+  },
+  rogue_arc: {
+    id: 'rogue_arc',
+    symbol: '◆·◈',
+    name: 'Rogue Arc',
+    description: 'Earn boss_slain + all 3 Calendar v22 badges',
+    unlockMessage: '↳ The arc is complete. 12 rogue words + 3 arcade anniversaries logged. The run has a history now. ◆·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+    hidden: true,
+  },
+  twenty_four_engines_arc: {
+    id: 'twenty_four_engines_arc',
+    symbol: '◈·◈·◆',
+    name: 'Twenty-Four Engines Arc',
+    description: 'Earn at least 1 badge from each Word Turn engine v1–v24',
+    unlockMessage: '↳ All 24 Word Turn engines activated. Every language family logged. The lexicon is complete. ◈·◈·◆',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+    hidden: true,
+  },
+  endless_opus: {
+    id: 'endless_opus',
+    symbol: '◆·★·◆',
+    name: 'Endless Opus',
+    description: 'Earn boss_slain + grind_session — the complete rogue practice',
+    unlockMessage: '↳ Boss slain. Grind confirmed. The complete rogue opus: vocabulary mastered, streak maintained. The run never ends. ◆·★·◆',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+    hidden: true,
+  },
+  // ── Mastery Tier v24 — THE ENDLESS RUN ───────────────────────────────────────
+  endless_run_log: {
+    id: 'endless_run_log',
+    symbol: '◆·∿·◆',
+    name: 'Endless Run Log',
+    description: '1100+ distinct calendar check-in days',
+    unlockMessage: '↳ 1,100 distinct days logged. The run has lasted three years. The character is no longer the same one who started. ◆·∿·◆',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  quarter_million_words: {
+    id: 'quarter_million_words',
+    symbol: '●·★·∞',
+    name: 'Quarter Million Words',
+    description: '250,000+ total journal words',
+    unlockMessage: '↳ 250,000 words logged. A quarter million. The archive has become a library. ●·★·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  seven_year_run: {
+    id: 'seven_year_run',
+    symbol: '╔═╗·◆',
+    name: 'Seven Year Run',
+    description: 'Account age >= 7 years (2,555+ days since registration)',
+    unlockMessage: '↳ Seven years. The rogue has survived long enough to stop counting floors. The dungeon has become home. ╔═╗·◆',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_four_registers: {
+    id: 'twenty_four_registers',
+    symbol: '◈·◈·◆·∞',
+    name: 'Twenty-Four Registers',
+    description: 'Earn 1 badge from all 24 Word Turn engines — the complete vocabulary of the self',
+    unlockMessage: '↳ All 24 registers active. Every word-family in the lexicon. The vocabulary of the self is complete. ◈·◈·◆·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+    hidden: true,
+  },
+  // ── Secret Boss v21 — THE ROGUE VAULT ────────────────────────────────────────
+  sid_meier_signal: {
+    id: 'sid_meier_signal',
+    symbol: '◆·≋·◆',
+    name: 'Sid Meier Signal',
+    description: 'Write "Sid Meier", "civilization", "Civ", or "one more turn" in any journal entry',
+    unlockMessage: '↳ Sid Meier detected. The "one more turn" principle: engagement so deep the session never wants to end. That is what mastery feels like. ◆·≋·◆',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  miyamoto_secret: {
+    id: 'miyamoto_secret',
+    symbol: '◈·◆·◈',
+    name: 'Miyamoto Secret',
+    description: 'Write "Miyamoto", "Mario", "Zelda", or "Nintendo design" in any journal entry',
+    unlockMessage: '↳ Miyamoto signal. The principle: late is forgotten, bad is forever. Design for joy, not just function. The game must be fun to pick up. ◈·◆·◈',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  pajitnov_key: {
+    id: 'pajitnov_key',
+    symbol: '■·◆·■',
+    name: 'Pajitnov Key',
+    description: 'Write "Pajitnov", "tetris piece", "L-tetromino", or "clearing lines" in any journal entry',
+    unlockMessage: '↳ Pajitnov key found. Tetris: the perfect metaphor. Blocks fall. You organize. The lines clear. The feeling is not reward — it is relief, which is its own kind of high. ■·◆·■',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  // ── Word Turn v25 — THE DREAMSCAPE ────────────────────────────────────────
   lucid_state: {
     id: 'lucid_state',
     symbol: '◐·◐',
@@ -7289,7 +7944,7 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'word_turn',
     hidden: true,
   },
-  // ── Calendar Easter Egg v21 — DREAM CALENDAR ──────────────────────────────
+  // ── Calendar Easter Egg v23 — DREAM CALENDAR ──────────────────────────────
   jung_birthday: {
     id: 'jung_birthday',
     symbol: '◐·◉',
@@ -7312,18 +7967,18 @@ export const BADGES: Record<BadgeType, Badge> = {
     id: 'world_sleep_day',
     symbol: '≋·○',
     name: 'World Sleep Day',
-    description: 'Check in on the Friday before the March vernal equinox — World Sleep Day',
+    description: 'Check in on World Sleep Day (Friday before March vernal equinox)',
     unlockMessage: '↳ World Sleep Day. The planet stops and remembers: rest is the original self-care protocol. ≋·○',
     rarity: 'uncommon',
     category: 'easter_egg',
   },
-  // ── Behavioral Easter Egg v20 — DREAMSCAPE PATTERNS ──────────────────────
+  // ── Behavioral Easter Egg v22 — DREAMSCAPE PATTERNS ──────────────────────
   dream_session: {
     id: 'dream_session',
     symbol: '◐·≋·◐',
     name: 'Dream Session',
-    description: 'Write 3 or more Dreamscape (v23) trigger words in a single journal entry',
-    unlockMessage: '↳ The Dreamscape vocabulary is fully active. The inner language is speaking clearly. ◐·≋·◐',
+    description: 'Write 3+ Dreamscape (v25) trigger words in a single journal entry',
+    unlockMessage: '↳ The Dreamscape vocabulary fully active. The inner language is speaking clearly. ◐·≋·◐',
     rarity: 'rare',
     category: 'easter_egg',
   },
@@ -7345,12 +8000,12 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'rare',
     category: 'pattern',
   },
-  // ── Achievement RPG v21 — DREAMCATCHER CLASS ──────────────────────────────
+  // ── Achievement RPG v23 — DREAMCATCHER CLASS ──────────────────────────────
   dream_entry: {
     id: 'dream_entry',
     symbol: '∘→◐',
     name: 'Dream Entry',
-    description: 'Earn any 1 Word Turn v23 (Dreamscape) badge',
+    description: 'Earn any 1 Word Turn v25 (Dreamscape) badge',
     unlockMessage: '↳ The Dreamscape opens. First signal received. ∘→◐',
     rarity: 'common',
     category: 'achievement_rpg',
@@ -7359,7 +8014,7 @@ export const BADGES: Record<BadgeType, Badge> = {
     id: 'dream_class',
     symbol: '≈→◐',
     name: 'Dream Class',
-    description: 'Earn any 5 Word Turn v23 (Dreamscape) badges',
+    description: 'Earn any 5 Word Turn v25 (Dreamscape) badges',
     unlockMessage: '↳ The Dreamcatcher is training. Five signals in the net. ≈→◐',
     rarity: 'uncommon',
     category: 'achievement_rpg',
@@ -7368,7 +8023,7 @@ export const BADGES: Record<BadgeType, Badge> = {
     id: 'dream_complete',
     symbol: '≋→◐',
     name: 'Dream Complete',
-    description: 'Earn all 12 Word Turn v23 (Dreamscape) badges',
+    description: 'Earn all 12 Word Turn v25 (Dreamscape) badges',
     unlockMessage: '↳ The full Dreamscape mapped. All 12 signal types captured. The inner atlas is complete. ≋→◐',
     rarity: 'legendary',
     category: 'achievement_rpg',
@@ -7377,17 +8032,17 @@ export const BADGES: Record<BadgeType, Badge> = {
     id: 'dreamcatcher_arc',
     symbol: '◐·◈',
     name: 'Dreamcatcher Arc',
-    description: 'Earn all 12 Word Turn v23 badges AND all 3 Calendar v21 (Dream Calendar) badges',
+    description: 'Earn all 12 Word Turn v25 badges AND all 3 Calendar v23 (Dream Calendar) badges',
     unlockMessage: '↳ The Dreamcatcher Arc: the full system — word, calendar, and pattern — locked in. ◐·◈',
     rarity: 'legendary',
     category: 'achievement_rpg',
   },
-  twenty_three_engines_arc: {
-    id: 'twenty_three_engines_arc',
+  twenty_five_engines_arc: {
+    id: 'twenty_five_engines_arc',
     symbol: '◈·◈·◐',
-    name: 'Twenty-Three Engines Arc',
-    description: 'Earn at least 1 badge from each of all 23 Word Turn engines',
-    unlockMessage: '↳ Twenty-three signal engines active. The full vocabulary of the LOT system: online. ◈·◈·◐',
+    name: 'Twenty-Five Engines Arc',
+    description: 'Earn at least 1 badge from each of all 25 Word Turn engines',
+    unlockMessage: '↳ Twenty-five signal engines active. The full LOT vocabulary spectrum: online. ◈·◈·◐',
     rarity: 'legendary',
     category: 'achievement_rpg',
   },
@@ -7400,7 +8055,7 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'legendary',
     category: 'achievement_rpg',
   },
-  // ── Mastery Tier v23 — THE INFINITE NIGHT ─────────────────────────────────
+  // ── Mastery Tier v25 — THE INFINITE NIGHT ─────────────────────────────────
   night_sovereign: {
     id: 'night_sovereign',
     symbol: '◐·∞',
@@ -7428,16 +8083,16 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'legendary',
     category: 'milestone',
   },
-  twenty_three_registers: {
-    id: 'twenty_three_registers',
+  twenty_five_registers: {
+    id: 'twenty_five_registers',
     symbol: '◈·◈·◐·∞',
-    name: 'Twenty-Three Registers',
-    description: 'Earn at least 1 badge from each of all 23 Word Turn engines',
-    unlockMessage: '↳ Twenty-three registers active. The full LOT frequency spectrum: complete. ◈·◈·◐·∞',
+    name: 'Twenty-Five Registers',
+    description: 'Earn at least 1 badge from each of all 25 Word Turn engines',
+    unlockMessage: '↳ Twenty-five registers active. The full LOT frequency spectrum: complete. ◈·◈·◐·∞',
     rarity: 'cosmic',
     category: 'milestone',
   },
-  // ── Secret Boss v20 — THE DREAM VAULT ────────────────────────────────────
+  // ── Secret Boss v22 — THE DREAM VAULT ────────────────────────────────────
   jung_signal: {
     id: 'jung_signal',
     symbol: '◐·◉',
@@ -8370,7 +9025,7 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // ── v32 (v22) — THE HERO'S JOURNEY ──────────────────────────────────────────
     const heroV22Badges: BadgeType[] = [
       'call_heard', 'threshold_crossed', 'mentor_arrived', 'ordeal_survived',
-      'elixir_boon', 'shadow_met', 'innermost_cave', 'shapeshifter',
+      'elixir_found', 'shadow_met', 'innermost_cave', 'shapeshifter',
       'herald_call', 'trickster_mode', 'ally_gained', 'return_road',
     ]
     const heroV22Earned = heroV22Badges.filter(b => hasBadge(b))
@@ -8432,61 +9087,188 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
     }
 
-    // ── v23 — THE DREAMSCAPE ──────────────────────────────────────────────────
-    const dreamV23Badges: BadgeType[] = [
-      'lucid_state', 'dream_journal_log', 'hypnagogic_signal', 'archetype_rising',
-      'shadow_work', 'subconscious_log', 'dream_symbol', 'recurring_dream',
-      'dreamscape_entered', 'nightmare_log', 'liminal_dream', 'waking_vision',
+    // ── v33 (v23) — THE STARSHIP LOG ────────────────────────────────────────────
+    const starshipV23Badges: BadgeType[] = [
+      'starlog_entry', 'warp_speed', 'shields_up', 'red_alert',
+      'systems_nominal', 'first_contact_made', 'away_team', 'wormhole_shift',
+      'nebula_drift', 'hull_breach', 'prime_directive', 'final_frontier',
     ]
-    const dreamV23Earned = dreamV23Badges.filter(b => hasBadge(b))
+    const starshipV23Earned = starshipV23Badges.filter(b => hasBadge(b))
 
-    // Word turn v23 checks (text-based — handled in word-turn engine)
-
-    // dream_entry, dream_class, dream_complete
-    if (dreamV23Earned.length >= 1 && !hasBadge('dream_entry')) {
-      if (awardBadge('dream_entry')) newBadges.push('dream_entry')
+    if (starshipV23Earned.length >= 1 && !hasBadge('ensign_log')) {
+      if (awardBadge('ensign_log')) newBadges.push('ensign_log')
     }
-    if (dreamV23Earned.length >= 5 && !hasBadge('dream_class')) {
-      if (awardBadge('dream_class')) newBadges.push('dream_class')
+    if (starshipV23Earned.length >= 5 && !hasBadge('lieutenant_class')) {
+      if (awardBadge('lieutenant_class')) newBadges.push('lieutenant_class')
     }
-    const dreamComplete = dreamV23Earned.length >= 12
-    if (dreamComplete && !hasBadge('dream_complete')) {
-      if (awardBadge('dream_complete')) newBadges.push('dream_complete')
+    const captainComplete = starshipV23Earned.length >= 12
+    if (captainComplete && !hasBadge('captain_complete')) {
+      if (awardBadge('captain_complete')) newBadges.push('captain_complete')
     }
 
-    // dream_opus: dream_complete + dream_session behavioral
-    if (dreamComplete && hasBadge('dream_session') && !hasBadge('dream_opus')) {
-      if (awardBadge('dream_opus')) newBadges.push('dream_opus')
+    // galaxy_opus: captain_complete + bridge_session
+    if (captainComplete && hasBadge('bridge_session') && !hasBadge('galaxy_opus')) {
+      if (awardBadge('galaxy_opus')) newBadges.push('galaxy_opus')
     }
 
-    // dreamcatcher_arc: dream_complete + all 3 Calendar v21 badges
-    const calendarV21Badges: BadgeType[] = ['jung_birthday', 'freud_signal', 'world_sleep_day']
-    if (dreamComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('dreamcatcher_arc')) {
-      if (awardBadge('dreamcatcher_arc')) newBadges.push('dreamcatcher_arc')
+    // starfleet_arc: captain_complete + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['first_contact_day', 'trek_premiere', 'moon_landing']
+    if (captainComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('starfleet_arc')) {
+      if (awardBadge('starfleet_arc')) newBadges.push('starfleet_arc')
     }
 
     // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
-    const engineTwentyThreePresent = dreamV23Earned.length >= 1
+    const engineTwentyThreePresent = starshipV23Earned.length >= 1
     const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
     if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
       if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
     }
 
-    // Mastery v23: night_sovereign — 1,000+ distinct calendar days
+    // Mastery v23: deep_space_log — 1000+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('deep_space_log')) {
+        if (awardBadge('deep_space_log')) newBadges.push('deep_space_log')
+      }
+    }
+
+    // Mastery v23: million_words — 200,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('million_words')) {
+        if (awardBadge('million_words')) newBadges.push('million_words')
+      }
+    }
+
+    // Mastery v23: veteran_explorer — Account age >= 6 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupVE = new Date(stats.signupDate)
+      const yearsVE = (new Date().getTime() - signupVE.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsVE >= 6 && !hasBadge('veteran_explorer')) {
+        if (awardBadge('veteran_explorer')) newBadges.push('veteran_explorer')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
+    }
+
+    // ── v34 (v24) — THE ROGUE RUN ────────────────────────────────────────────────
+    const rogueV24Badges: BadgeType[] = [
+      'permadeath', 'level_up', 'critical_hit', 'boss_battle', 'respawn_point',
+      'loot_drop', 'exp_gained', 'inventory_full', 'health_bar', 'save_state',
+      'rogue_run', 'game_over_screen',
+    ]
+    const rogueV24Earned = rogueV24Badges.filter(b => hasBadge(b))
+
+    if (rogueV24Earned.length >= 1 && !hasBadge('floor_cleared')) {
+      if (awardBadge('floor_cleared')) newBadges.push('floor_cleared')
+    }
+    if (rogueV24Earned.length >= 5 && !hasBadge('dungeon_class')) {
+      if (awardBadge('dungeon_class')) newBadges.push('dungeon_class')
+    }
+    const bossSlain = rogueV24Earned.length >= 12
+    if (bossSlain && !hasBadge('boss_slain')) {
+      if (awardBadge('boss_slain')) newBadges.push('boss_slain')
+    }
+
+    // endless_opus: boss_slain + grind_session
+    if (bossSlain && hasBadge('grind_session') && !hasBadge('endless_opus')) {
+      if (awardBadge('endless_opus')) newBadges.push('endless_opus')
+    }
+
+    // rogue_arc: boss_slain + all 3 Calendar v22 badges
+    const calendarV22Badges: BadgeType[] = ['rogue_day', 'tetris_day', 'pac_man_day']
+    if (bossSlain && calendarV22Badges.every(b => hasBadge(b)) && !hasBadge('rogue_arc')) {
+      if (awardBadge('rogue_arc')) newBadges.push('rogue_arc')
+    }
+
+    // twenty_four_engines_arc: 1 badge from each Word Turn v1–v24
+    const engineTwentyFourPresent = rogueV24Earned.length >= 1
+    const allTwentyFourEngines = allTwentyThreeEngines && engineTwentyFourPresent
+    if (allTwentyFourEngines && !hasBadge('twenty_four_engines_arc')) {
+      if (awardBadge('twenty_four_engines_arc')) newBadges.push('twenty_four_engines_arc')
+    }
+
+    // Mastery v24: endless_run_log — 1100+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1100 && !hasBadge('endless_run_log')) {
+        if (awardBadge('endless_run_log')) newBadges.push('endless_run_log')
+      }
+    }
+
+    // Mastery v24: quarter_million_words — 250,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 250000 && !hasBadge('quarter_million_words')) {
+        if (awardBadge('quarter_million_words')) newBadges.push('quarter_million_words')
+      }
+    }
+
+    // Mastery v24: seven_year_run — Account age >= 7 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupSYR = new Date(stats.signupDate)
+      const yearsSYR = (new Date().getTime() - signupSYR.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsSYR >= 7 && !hasBadge('seven_year_run')) {
+        if (awardBadge('seven_year_run')) newBadges.push('seven_year_run')
+      }
+    }
+
+    // Mastery v24: twenty_four_registers — 1 badge from all 24 Word Turn engines
+    if (allTwentyFourEngines && !hasBadge('twenty_four_registers')) {
+      if (awardBadge('twenty_four_registers')) newBadges.push('twenty_four_registers')
+    }
+
+    // ── v25 — THE DREAMSCAPE ────────────────────────────────────────────────────
+    const dreamV25Badges: BadgeType[] = [
+      'lucid_state', 'dream_journal_log', 'hypnagogic_signal', 'archetype_rising',
+      'shadow_work', 'subconscious_log', 'dream_symbol', 'recurring_dream',
+      'dreamscape_entered', 'nightmare_log', 'liminal_dream', 'waking_vision',
+    ]
+    const dreamV25Earned = dreamV25Badges.filter(b => hasBadge(b))
+
+    if (dreamV25Earned.length >= 1 && !hasBadge('dream_entry')) {
+      if (awardBadge('dream_entry')) newBadges.push('dream_entry')
+    }
+    if (dreamV25Earned.length >= 5 && !hasBadge('dream_class')) {
+      if (awardBadge('dream_class')) newBadges.push('dream_class')
+    }
+    const dreamComplete = dreamV25Earned.length >= 12
+    if (dreamComplete && !hasBadge('dream_complete')) {
+      if (awardBadge('dream_complete')) newBadges.push('dream_complete')
+    }
+
+    // dream_opus: dream_complete + dream_session
+    if (dreamComplete && hasBadge('dream_session') && !hasBadge('dream_opus')) {
+      if (awardBadge('dream_opus')) newBadges.push('dream_opus')
+    }
+
+    // dreamcatcher_arc: dream_complete + all 3 Calendar v23 badges
+    const calendarV23Badges: BadgeType[] = ['jung_birthday', 'freud_signal', 'world_sleep_day']
+    if (dreamComplete && calendarV23Badges.every(b => hasBadge(b)) && !hasBadge('dreamcatcher_arc')) {
+      if (awardBadge('dreamcatcher_arc')) newBadges.push('dreamcatcher_arc')
+    }
+
+    // twenty_five_engines_arc: 1 badge from each Word Turn v1–v25
+    const engineTwentyFivePresent = dreamV25Earned.length >= 1
+    const allTwentyFiveEngines = allTwentyFourEngines && engineTwentyFivePresent
+    if (allTwentyFiveEngines && !hasBadge('twenty_five_engines_arc')) {
+      if (awardBadge('twenty_five_engines_arc')) newBadges.push('twenty_five_engines_arc')
+    }
+
+    // Mastery v25: night_sovereign — 1000+ distinct calendar check-in days
     if (typeof stats.distinctCheckInDays === 'number') {
       if (stats.distinctCheckInDays >= 1000 && !hasBadge('night_sovereign')) {
         if (awardBadge('night_sovereign')) newBadges.push('night_sovereign')
       }
     }
 
-    // Mastery v23: infinite_dreamer — 200,000+ total journal words
+    // Mastery v25: infinite_dreamer — 200,000+ total journal words
     if (typeof stats.totalJournalWords === 'number') {
       if (stats.totalJournalWords >= 200000 && !hasBadge('infinite_dreamer')) {
         if (awardBadge('infinite_dreamer')) newBadges.push('infinite_dreamer')
       }
     }
 
-    // Mastery v23: dreamer_age — Account age >= 6 years
+    // Mastery v25: dreamer_age — Account age >= 6 years
     if (typeof stats.signupDate === 'string' && stats.signupDate) {
       const signupDream = new Date(stats.signupDate)
       const yearsDream = (new Date().getTime() - signupDream.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
@@ -8495,9 +9277,9 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
       }
     }
 
-    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
-    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
-      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
+    // Mastery v25: twenty_five_registers — 1 badge from all 25 Word Turn engines
+    if (allTwentyFiveEngines && !hasBadge('twenty_five_registers')) {
+      if (awardBadge('twenty_five_registers')) newBadges.push('twenty_five_registers')
     }
 
   } catch (error) {
