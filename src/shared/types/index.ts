@@ -14,6 +14,7 @@ export enum UserTag {
   Mala = 'Mala',
   Onyx = 'Onyx',
   Usership = 'Usership',
+  Basic = 'Basic',
   Pro = 'Pro',
   Suspended = 'Suspended',
   Legacy = 'Legacy',
