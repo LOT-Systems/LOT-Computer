@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.2 — DEVELOPMENT START (see REPORT-02 for cycle-02 amendments)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -320,6 +320,18 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE NIGHTSTAND, SILENT                      2026-10-08
+  ─────────────────────────────────────────────────────────────────
+  Full text in LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md, Section 07.
+  Summary: late-evening Assembly event, sleeping partner, small
+  nightstand. The cube's gate refuses Leap/Hop/Nudge and performs only THE
+  SETTLE (pressure, no sound/light); the Hop is deferred to first morning
+  touch. The product is its restraint.
+
+  AMENDMENT (cycle 02): the Leap is a ~15° high-bias gesture with ~37 mm
+  rise (not <10 mm); the piezo bimorph is a sensor, not the bias source.
+  See REPORT-02 Sections 01-03.
 
 --------------------------------------------------------------------------------
 08 // BRAND
