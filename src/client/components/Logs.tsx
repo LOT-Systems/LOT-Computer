@@ -10,7 +10,7 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
-import { useLogs, useUpdateLog } from '#client/queries'
+import { useLogs, useUpdateLog, useSendEmail } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
@@ -29,6 +29,7 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { parseEmailCommand } from '#client/utils/emailCommand'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3682,6 +3683,19 @@ const NoteEditor = ({
   const [asmResponse, setAsmResponse] = React.useState<string | null>(null)
   const [asmLoading, setAsmLoading] = React.useState(false)
   const [scanResult, setScanResult] = React.useState<string | null>(null)
+  const [emailResult, setEmailResult] = React.useState<string | null>(null)
+  const sentEmailTextRef = React.useRef<string | null>(null)
+  const sendEmailRef = React.useRef<(c: { to: string; body: string }) => void>(() => {})
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: (data) => setEmailResult(`SENT TO ${String(data.to || '').toUpperCase()}`),
+    onError: (err: any) => {
+      sentEmailTextRef.current = null
+      const d = err?.response?.data
+      const names = Array.isArray(d?.candidates) ? ` (${d.candidates.join(', ')})` : ''
+      setEmailResult(`NOT SENT — ${String(d?.error || 'FAILED').toUpperCase()}${names}`)
+    },
+  })
+  sendEmailRef.current = sendEmail
   const { mutate: submitQi } = useQiQuery({
     onSuccess: (data) => {
       setQiResponse(data.assessment)
@@ -3911,6 +3925,13 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        // /email to Name. body — explicit send only (autosave never sends)
+        const emailCmd = parseEmailCommand(valueRef.current)
+        if (emailCmd && sentEmailTextRef.current !== valueRef.current) {
+          sentEmailTextRef.current = valueRef.current
+          setEmailResult('SENDING...')
+          sendEmailRef.current(emailCmd)
+        }
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -4139,6 +4160,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email        /email to Name. Message — Ctrl+Enter sends to their Sync',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4384,6 +4406,13 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailResult && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{emailResult}</div>
             </Block>
           </div>
         )}

@@ -380,6 +380,12 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'email': {
+          if (data.receiverId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4082,6 +4088,161 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — compose with `/email to Name.` in Log, read in Sync
+  // Community-only (same tags as Sync chat); one row per message.
+  // ============================================================================
+
+  const MAX_EMAIL_LENGTH = 2000
+  const isSuspendedUser = (tags: string[] = []) =>
+    tags.some((t) => t.toLowerCase() === 'suspended')
+
+  // Send: { to: "Hitomi", body } — resolves recipient by first name
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { to?: string; toId?: string; body: string }
+  }>, reply) => {
+    try {
+      if (!canAccessChat(req.user.tags || [])) {
+        return reply.status(403).send({ error: 'Email requires Usership, Onyx, Legacy, R&D, or Admin' })
+      }
+      const to = String(req.body?.to || '').trim().slice(0, 100)
+      const toId = String(req.body?.toId || '').trim()
+      const body = String(req.body?.body || '').trim().slice(0, MAX_EMAIL_LENGTH)
+      if ((!to && !toId) || !body) {
+        return reply.status(400).send({ error: 'Recipient and body are required' })
+      }
+      if (toId && !/^[0-9a-f-]{36}$/i.test(toId)) {
+        return reply.status(400).send({ error: 'Invalid recipient' })
+      }
+      if (toId && toId === req.user.id) {
+        return reply.status(400).send({ error: 'Cannot email yourself' })
+      }
+
+      // toId (reply / Cohort button) is exact; `to` resolves by first name
+      const candidates = (await fastify.models.User.findAll({
+        where: toId
+          ? { id: toId }
+          : {
+              firstName: { [Op.iLike]: to.replace(/[\\%_]/g, '\\$&') },
+              id: { [Op.ne]: req.user.id },
+            },
+        attributes: ['id', 'firstName', 'lastName', 'tags'],
+        limit: 20,
+      })).filter((u) => canAccessChat(u.tags || []) && !isSuspendedUser(u.tags))
+
+      if (candidates.length === 0) {
+        return reply.status(404).send({ error: `No community member named ${to}` })
+      }
+      if (candidates.length > 1) {
+        return reply.status(409).send({
+          error: `More than one ${to} in the community`,
+          candidates: candidates.map((u) => `${u.firstName} ${u.lastName || ''}`.trim()),
+        })
+      }
+      const receiver = candidates[0]
+
+      const email = await fastify.models.LotEmail.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        body,
+        readAt: null,
+      })
+
+      // Delivered only to the receiver's SSE stream (see /sync)
+      sync.emit('email', {
+        id: email.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        senderName: `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim(),
+        body: email.body,
+        readAt: null,
+        createdAt: email.createdAt,
+      })
+
+      process.nextTick(async () => {
+        try {
+          const context = await getLogContext(req.user)
+          await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'email_sent',
+            text: '',
+            metadata: { emailId: email.id, receiverId: receiver.id },
+            context,
+          })
+        } catch (logError) {
+          console.error('Error logging email:', logError)
+        }
+      })
+
+      return reply.send({
+        id: email.id,
+        to: `${receiver.firstName || ''} ${receiver.lastName || ''}`.trim(),
+        createdAt: email.createdAt,
+      })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  // Inbox: latest 50 received + unread count
+  fastify.get('/emails', async (req: FastifyRequest, reply) => {
+    try {
+      if (!canAccessChat(req.user.tags || [])) {
+        return reply.status(403).send({ error: 'Email requires Usership, Onyx, Legacy, R&D, or Admin' })
+      }
+      const rows = await fastify.models.LotEmail.findAll({
+        where: { receiverId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 50,
+      })
+      const senderIds = Array.from(new Set(rows.map((r) => r.senderId)))
+      const senders = senderIds.length
+        ? await fastify.models.User.findAll({
+            where: { id: senderIds },
+            attributes: ['id', 'firstName', 'lastName'],
+          })
+        : []
+      const nameById = new Map(
+        senders.map((u) => [u.id, `${u.firstName || ''} ${u.lastName || ''}`.trim()])
+      )
+      const unread = await fastify.models.LotEmail.count({
+        where: { receiverId: req.user.id, readAt: null },
+      })
+      return reply.send({
+        unread,
+        emails: rows.map((r) => ({
+          id: r.id,
+          senderId: r.senderId,
+          senderName: nameById.get(r.senderId) || 'Unknown',
+          receiverId: r.receiverId,
+          body: r.body,
+          readAt: r.readAt,
+          createdAt: r.createdAt,
+        })),
+      })
+    } catch (error) {
+      console.error('Error fetching emails:', error)
+      return reply.status(500).send({ error: 'Failed to fetch emails' })
+    }
+  })
+
+  // Mark one received email as read
+  fastify.post('/emails/read', async (req: FastifyRequest<{
+    Body: { id: string }
+  }>, reply) => {
+    try {
+      const [count] = await fastify.models.LotEmail.update(
+        { readAt: new Date() },
+        { where: { id: req.body?.id, receiverId: req.user.id, readAt: null } }
+      )
+      return reply.send({ updated: count })
+    } catch (error) {
+      console.error('Error marking email read:', error)
+      return reply.status(500).send({ error: 'Failed to mark email read' })
     }
   })
 

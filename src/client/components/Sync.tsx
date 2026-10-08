@@ -24,6 +24,10 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  useSendEmail,
+  useMarkEmailRead,
+  EmailRecord,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -80,6 +84,43 @@ export const Sync = React.memo(function SyncInner() {
     }
   })
 
+  // ---- LOT® Email -------------------------------------------------------
+  const { data: emailData } = useEmails({ enabled: canAccessChat })
+  const { mutate: markEmailRead } = useMarkEmailRead({
+    onSuccess: () => queryClient.invalidateQueries(['/api/emails']),
+  })
+  // Reply target: set by an email's "Reply" or by the Cohort "Send email" button
+  const [emailTarget, setEmailTarget] = React.useState<{ id: string; name: string } | null>(
+    () => {
+      try {
+        const raw = sessionStorage.getItem('lot.emailDraft')
+        sessionStorage.removeItem('lot.emailDraft')
+        return raw ? JSON.parse(raw) : null
+      } catch {
+        return null
+      }
+    }
+  )
+  const [emailBody, setEmailBody] = React.useState('')
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: (data) => {
+      setEmailStatus(`Sent to ${data.to}`)
+      setEmailBody('')
+      setEmailTarget(null)
+    },
+    onError: (err: any) => setEmailStatus(err?.response?.data?.error || 'Email failed'),
+  })
+  const onSubmitEmail = React.useCallback(
+    (ev: React.FormEvent) => {
+      ev.preventDefault()
+      if (!emailTarget || !emailBody.trim()) return
+      setEmailStatus(null)
+      sendEmail({ toId: emailTarget.id, body: emailBody })
+    },
+    [emailTarget, emailBody, sendEmail]
+  )
+
   // Ensure fresh data on mount (filters suspended users)
   React.useEffect(() => {
     queryClient.invalidateQueries(['/api/chat-messages'])
@@ -117,9 +158,13 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeEmailListener } = sync.listen('email' as any, () => {
+      queryClient.invalidateQueries(['/api/emails'])
+    })
     return () => {
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
+      disposeEmailListener()
     }
   }, [me?.id])
 
@@ -180,6 +225,65 @@ export const Sync = React.memo(function SyncInner() {
 
   return (
     <div className="max-w-[700px]">
+      {(emailTarget || emailStatus || !!emailData?.emails?.length) && (
+        <div className="mb-40">
+          <div className="text-acc/40 mb-8">
+            Email{!!emailData?.unread && ` · ${emailData.unread} new`}
+            {' · '}
+            <span title="In Log: /email to Name. Message — then Ctrl+Enter">/email to Name.</span>
+          </div>
+          {emailTarget && (
+            <form onSubmit={onSubmitEmail} className="flex items-center gap-x-8 mb-8">
+              <span className="whitespace-nowrap">To {emailTarget.name}</span>
+              <ResizibleGhostInput
+                direction="vh"
+                value={emailBody}
+                onChange={(v: string) => setEmailBody(v.slice(0, 2000))}
+                placeholder="Write an email..."
+                containerClassName="flex-grow leading-normal"
+                className="leading-normal"
+              />
+              <Button type="submit" kind="secondary" size="small" disabled={!emailBody.trim()}>
+                Send
+              </Button>
+              <GhostButton onClick={() => setEmailTarget(null)}>Cancel</GhostButton>
+            </form>
+          )}
+          {emailStatus && <div className="text-acc/40 mb-8">{emailStatus}</div>}
+          {(emailData?.emails || []).slice(0, 10).map((e: EmailRecord) => (
+            <div
+              key={e.id}
+              className="group flex items-start gap-x-8 py-2"
+              onMouseEnter={() => { if (!e.readAt) markEmailRead({ id: e.id }) }}
+            >
+              <span className={cn('whitespace-nowrap', e.readAt && 'text-acc/40')}>
+                {e.senderName}
+              </span>
+              <div
+                className={cn('whitespace-breakspaces flex-1', e.readAt && 'text-acc/40')}
+                style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}
+              >
+                {e.body}
+              </div>
+              <GhostButton
+                className="whitespace-nowrap"
+                onClick={() => {
+                  setEmailStatus(null)
+                  setEmailTarget({ id: e.senderId, name: e.senderName.split(' ')[0] })
+                }}
+              >
+                Reply
+              </GhostButton>
+              {!isTouchDevice && (
+                <div className="text-acc/0 select-none whitespace-nowrap group-hover:text-acc/40">
+                  <MessageTimeLabel dateString={e.createdAt} isTimeFormat12h={isTimeFormat12h} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}
