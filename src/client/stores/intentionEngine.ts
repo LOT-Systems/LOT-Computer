@@ -3622,6 +3622,64 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 161: Morning Sovereignty Lock — P158 (morning-momentum-ignition) confirmed on 3+ of the last 5 days.
+  // Multi-day ignition arc. The charge is not occasional — it is structural. Morning sovereignty established.
+  // Distinct from P158 (single-day ignition): P161 requires the arc to recur, confirming it as an operating mode.
+  const fiveDaysCut161 = now - 5 * 24 * 60 * 60 * 1000
+  const recentIgnitionDays161 = new Set(
+    signals
+      .filter(s => s.source === 'intentions' && s.signal === 'morning_momentum_ignition' && s.timestamp > fiveDaysCut161)
+      .map(s => new Date(s.timestamp).toDateString())
+  ).size
+  if (recentIgnitionDays161 >= 3) {
+    const sovBonus161 = Math.min((recentIgnitionDays161 - 3) * 0.04, 0.14)
+    patterns.push({
+      pattern: 'morning-sovereignty-lock',
+      confidence: Math.min(0.78 + sovBonus161, 0.94),
+      suggestedWidget: 'intentions',
+      suggestedTiming: 'passive',
+      reason: `MSOV: Morning sovereignty lock — ${recentIgnitionDays161}/5 days with confirmed morning ignition. Multi-day arc established. The charge is structural. Morning sovereignty operational.`,
+    })
+  }
+
+  // Pattern 162: Field Permanence Detection — P159 (presence-coherence-seal) confirmed on 3+ of the last 7 days.
+  // The presence seal is not occasional — it recurs across the week. Field permanence established.
+  // Distinct from P159 (single-day seal): P162 confirms the seal as a structural feature of the week.
+  const sevenDaysCut162 = now - 7 * 24 * 60 * 60 * 1000
+  const recentSealDays162 = new Set(
+    signals
+      .filter(s => s.source === 'qos' && s.signal === 'presence_coherence_seal' && s.timestamp > sevenDaysCut162)
+      .map(s => new Date(s.timestamp).toDateString())
+  ).size
+  if (recentSealDays162 >= 3) {
+    const permBonus162 = Math.min((recentSealDays162 - 3) * 0.03, 0.11)
+    patterns.push({
+      pattern: 'field-permanence-detection',
+      confidence: Math.min(0.83 + permBonus162, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `FPER: Field permanence detected — ${recentSealDays162}/7 days with confirmed presence seal. The field holds across the week. Permanence is structural, not emergent.`,
+    })
+  }
+
+  // Pattern 163: Ignition Velocity Peak — P158 (morning-momentum-ignition) + P159 (presence-coherence-seal) both active
+  // on the same calendar day. Same-day co-activation: the day ignited AND the field sealed in a single cycle.
+  // The fastest path from day-start to full field seal. Ignition velocity peak confirmed.
+  const hasMornIgn163  = patterns.some(p => p.pattern === 'morning-momentum-ignition')
+  const hasPrSeal163   = patterns.some(p => p.pattern === 'presence-coherence-seal')
+  if (hasMornIgn163 && hasPrSeal163) {
+    const ignConf163  = patterns.find(p => p.pattern === 'morning-momentum-ignition')?.confidence ?? 0.78
+    const sealConf163 = patterns.find(p => p.pattern === 'presence-coherence-seal')?.confidence ?? 0.84
+    const velBonus163 = Math.min((ignConf163 - 0.78 + sealConf163 - 0.84) * 0.25, 0.09)
+    patterns.push({
+      pattern: 'ignition-velocity-peak',
+      confidence: Math.min(0.86 + velBonus163, 0.97),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `IGVEL: Ignition velocity peak — morning ignition (P158) AND presence seal (P159) both confirmed today. Day ignited. Field sealed. Same-cycle convergence — fastest path to full operational state.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4273,6 +4331,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   morningMomentumIgnitionNode:  ['intentions', 'planner', 'mood', 'energy', 'journal', 'log'],
   presenceCoherenceSealNode:    ['qos', 'cohort', 'intentions', 'journal', 'mood', 'energy', 'log'],
   recoveryToMomentumBridgeNode: ['mood', 'selfcare', 'journal', 'energy', 'log', 'memory'],
+
+  // ── v117 nodes (J52 · P161–P163 · Arch55) ───────────────────────────────────────
+  morningSovereigntyNode:       ['intentions', 'planner', 'energy', 'journal', 'log'],
+  fieldPermanenceNode:          ['qos', 'cohort', 'intentions', 'journal', 'mood', 'energy', 'log'],
+  ignitionVelocityNode:         ['intentions', 'energy', 'qos', 'cohort', 'journal', 'log'],
 }
 
 /**
@@ -4749,6 +4812,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['morning-momentum-ignition', 'morning-coherence-arc', 'morning-intention-lock'],
     hourRange: [6, 14],
     directive: 'Morning ignition confirmed. Intentions logged. Field charged before the load arrives. The day opens from signal, not reaction. Momentum is already building.',
+  },
+
+  // ── Arch55: Field Permanence Architect (2026-10-08 v117) ──────────────────────────
+  {
+    archetype: 'Field Permanence Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'energy', 'journal', 'planner', 'qos'],
+    patternConditions: ['morning-sovereignty-lock', 'field-permanence-detection', 'ignition-velocity-peak'],
+    hourRange: [6, 22],
+    directive: 'Field permanence confirmed. Morning sovereignty established over multiple days. The ignition is structural now — not a practice, but an operating mode. Execute from architecture.',
   },
 ]
 
@@ -6881,6 +6954,55 @@ export function recordRecoveryToMomentumBridge(recoveryConf: number, momentumCon
     momentumDays,
     bridgeStatus: 'CLOSED',
     arc: 'DIP→RECOVERY→MOMENTUM HELD',
+    hour: new Date().getHours(),
+  })
+}
+
+// ─── v117 Signal Helpers (P161–P163) ──────────────────────────────────────────
+
+/**
+ * Record a morning-sovereignty-lock event — P158 confirmed on 3+ of last 5 days.
+ * Multi-day ignition arc established. Morning sovereignty is structural. Feeds P161 detection.
+ */
+export function recordMorningSovereigntyLock(ignitionDays: number, windowDays: number) {
+  recordSignal('intentions', 'morning_sovereignty_lock', {
+    ignitionDays,
+    windowDays,
+    arc: `${ignitionDays}/${windowDays} DAYS CONFIRMED`,
+    sovereigntyStatus: 'STRUCTURAL',
+    sequence: 'IGNITION→ARC→SOVEREIGNTY',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a field-permanence-detection event — P159 confirmed on 3+ of last 7 days.
+ * The presence seal recurs across the week. Field permanence is structural. Feeds P162 detection.
+ */
+export function recordFieldPermanenceDetection(sealDays: number, windowDays: number) {
+  recordSignal('qos', 'field_permanence_detection', {
+    sealDays,
+    windowDays,
+    arc: `${sealDays}/${windowDays} DAYS SEALED`,
+    permanenceStatus: 'CONFIRMED',
+    field: 'PRESENCE·CIRCADIAN·DIMENSIONAL',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an ignition-velocity-peak event — P158 (morning-momentum-ignition) + P159
+ * (presence-coherence-seal) both active on the same day. Fastest path to full field seal.
+ * Feeds P163 detection.
+ */
+export function recordIgnitionVelocityPeak(ignitionConf: number, sealConf: number) {
+  const avgConf = Math.round(((ignitionConf + sealConf) / 2) * 100) / 100
+  recordSignal('intentions', 'ignition_velocity_peak', {
+    ignitionConf,
+    sealConf,
+    avgConf,
+    convergence: 'IGNITION→SEAL SAME-DAY',
+    velocityStatus: 'PEAK',
     hour: new Date().getHours(),
   })
 }

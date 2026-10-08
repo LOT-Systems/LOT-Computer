@@ -119,6 +119,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'morning-momentum-ignition':        'MIGN',
   'presence-coherence-seal':          'PRSEAL',
   'recovery-to-momentum-bridge':      'RECMOM',
+  'morning-sovereignty-lock':         'MSOV',
+  'field-permanence-detection':       'FPER',
+  'ignition-velocity-peak':           'IGVEL',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

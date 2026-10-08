@@ -1552,6 +1552,25 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '874 badges · 270 word-turns · 27 secret boss · 160 patterns · 54 archetypes · 51 jobs · 199+ dep nodes · FM v116 · Day 1136+. The day opens from signal, not reaction.',
     ],
   },
+  {
+    version: 'qie-v117',
+    date: '2026-10-08',
+    title: 'QIE v117 Engineering — P161–P163 · Arch55 Field Permanence Architect · J52',
+    assembled: [
+      'QIE v117 implemented: P161 morning-sovereignty-lock — P158 confirmed 3+ of last 5 days, multi-day ignition arc established, morning sovereignty structural (conf 0.78–0.94). P162 field-permanence-detection — P159 confirmed 3+ of last 7 days, presence seal recurs across week, field permanence structural (conf 0.83–0.96). P163 ignition-velocity-peak — P158 + P159 co-active same day, day ignited and field sealed in single cycle (conf 0.86–0.97). Total: 163 patterns.',
+      'Arch55 Field Permanence Architect added: energyBands high/moderate · dominant intentions/energy/journal/planner/qos · patternConditions morning-sovereignty-lock/field-permanence-detection/ignition-velocity-peak · hourRange [6,22] · directive Field permanence confirmed. Morning sovereignty established over multiple days. The ignition is structural now — not a practice, but an operating mode. Execute from architecture. Total: 55 archetypes.',
+      'J52 weekly-morning-sovereignty-audit (Sun 08:00 UTC) added: scans last 5 days for morning_momentum_ignition events (3+ days → writes morning_sovereignty_lock), scans last 7 days for presence_coherence_seal events (3+ days → writes field_permanence_detection). Total: 52 background jobs.',
+      'WIDGET_DEPENDENCY_MAP v117 block added: morningSovereigntyNode (intentions·planner·energy·journal·log) · fieldPermanenceNode (qos·cohort·intentions·journal·mood·energy·log) · ignitionVelocityNode (intentions·energy·qos·cohort·journal·log). Total: 202+ dep nodes.',
+      'Signal recording functions added: recordMorningSovereigntyLock() · recordFieldPermanenceDetection() · recordIgnitionVelocityPeak(). All export-ready.',
+      'Log handlers added (COCKPIT-RULE): MSOV: (morning_sovereignty_lock) · FPER: (field_permanence_detection) · IGVEL: (ignition_velocity_peak). Total: 163+ handlers.',
+      'PATTERN_DISPLAY updated: MSOV: · FPER: · IGVEL: entries added to QuantumEngineWidgets.tsx.',
+      'displayableEvents updated: morning_sovereignty_lock · field_permanence_detection · ignition_velocity_peak added to api.ts.',
+      'PatternRecognitionWidget.tsx: P161/P162/P163 display names added.',
+      'About.tsx updated: FM v116→v117 · Day 1137+ · 163 patterns · 55 archetypes · 52 jobs · 202+ nodes.',
+      'docs/assembly/LOT-LEDGER.md: v117 ledger row appended. 2026-10-08_LOT-assembly_qie-v117.md session report written.',
+      '874 badges · 270 word-turns · 27 secret boss · 163 patterns · 55 archetypes · 52 jobs · 202+ dep nodes · FM v117 · Day 1137+. Field permanence confirmed. The ignition is structural.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1589,19 +1608,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-07',
+  date: '2026-10-08',
   message: [
-    'ASSEMBLY RUN — 2026-10-07 · QIE v116 ENGINEERING · Day 1136+',
-    'Built: P158 morning-momentum-ignition · P159 presence-coherence-seal · P160 recovery-to-momentum-bridge. Arch54 Morning Ignition Operator. J51 daily-morning-ignition-check (10:00 UTC).',
-    'MIGN: Morning ignition confirmed. Intentions + energy + anchor all logged before 10:00. The day opens from signal, not reaction. Momentum already building.',
-    'PRSEAL: Presence coherence seal. Quantum-presence-crystallization + circadian-signal-lock + dimensional-saturation co-active. Field sealed.',
-    'RECMOM: Recovery-to-momentum bridge. Recovery arc complete and signal momentum sustained. Dip absorbed. Arc closed.',
-    'Arch54 Morning Ignition Operator: Morning ignition confirmed. Intentions logged. Field charged before the load arrives. The day opens from signal, not reaction.',
-    'J51 10:00 UTC daily — scans morning window 06:00–10:00 for intentions + energy + anchor. Writes morning_momentum_ignition on triple-signal confirmation.',
-    'MIGN: PRSEAL: RECMOM: handlers deployed. 199+ dep nodes. 51 jobs. 160 patterns. 54 archetypes.',
-    'FM v116 · 160P · 54A · 51J · 199+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1136+.',
+    'ASSEMBLY RUN — 2026-10-08 · QIE v117 ENGINEERING · Day 1137+',
+    'Built: P161 morning-sovereignty-lock · P162 field-permanence-detection · P163 ignition-velocity-peak. Arch55 Field Permanence Architect. J52 weekly-morning-sovereignty-audit (Sun 08:00 UTC).',
+    'MSOV: Morning sovereignty lock. P158 confirmed 3+ of last 5 days. Multi-day ignition arc established. The charge is not occasional — it is structural.',
+    'FPER: Field permanence detected. P159 confirmed 3+ of last 7 days. The seal recurs across the week. Permanence is structural, not emergent.',
+    'IGVEL: Ignition velocity peak. P158 + P159 co-active same day. Day ignited and field sealed in single cycle. Fastest path to full operational state.',
+    'Arch55 Field Permanence Architect: Field permanence confirmed. Morning sovereignty established over multiple days. The ignition is structural now — not a practice, but an operating mode. Execute from architecture.',
+    'J52 Sun 08:00 UTC — scans 5d for ignition arc (3+ days → morning_sovereignty_lock) + 7d for seal arc (3+ days → field_permanence_detection). Two sovereign patterns per weekly audit.',
+    'MSOV: FPER: IGVEL: handlers deployed. 202+ dep nodes. 52 jobs. 163 patterns. 55 archetypes.',
+    'FM v117 · 163P · 55A · 52J · 202+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1137+.',
     'Status: DEPLOYED.',
-    'Next: QIE v117 — morning sovereignty patterns · multi-day ignition arc · field permanence detection',
+    'Next: QIE v118 — sovereignty continuity · permanent field elevation · ignition sovereignty lock',
   ],
 }
 

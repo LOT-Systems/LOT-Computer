@@ -1225,6 +1225,10 @@ export default async (fastify: FastifyInstance) => {
       'morning_momentum_ignition',
       'presence_coherence_seal',
       'recovery_to_momentum_bridge',
+      // v117: morning sovereignty lock · field permanence detection · ignition velocity peak (P161/P162/P163)
+      'morning_sovereignty_lock',
+      'field_permanence_detection',
+      'ignition_velocity_peak',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

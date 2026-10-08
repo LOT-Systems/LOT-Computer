@@ -3893,6 +3893,92 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'morning_sovereignty_lock') {
+          const ignitionDays = log.metadata?.ignitionDays as number | undefined
+          const windowDays   = log.metadata?.windowDays   as number | undefined
+          const conf         = log.metadata?.conf         as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="MSOV:" blockView>
+                <div className="uppercase tracking-widest mb-4">MORNING SOVEREIGNTY LOCK</div>
+                {ignitionDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">IGNITION DAYS</span>
+                    <span className="tabular-nums">{ignitionDays}/{windowDays ?? 5}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">ARC</span>
+                  <span className="tabular-nums">MULTI-DAY</span>
+                </div>
+                {conf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{conf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">SOVEREIGNTY STRUCTURAL · NOT A PRACTICE · AN OPERATING MODE</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'field_permanence_detection') {
+          const sealDays   = log.metadata?.sealDays   as number | undefined
+          const windowDays = log.metadata?.windowDays as number | undefined
+          const conf       = log.metadata?.conf       as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FPER:" blockView>
+                <div className="uppercase tracking-widest mb-4">FIELD PERMANENCE DETECTION</div>
+                {sealDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SEAL DAYS</span>
+                    <span className="tabular-nums">{sealDays}/{windowDays ?? 7}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">FIELD</span>
+                  <span className="tabular-nums">PRESENCE·CIRCADIAN·DIMENSIONAL</span>
+                </div>
+                {conf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{conf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">SEAL RECURS ACROSS WEEK · PERMANENCE CONFIRMED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'ignition_velocity_peak') {
+          const ignitionConf = log.metadata?.ignitionConf as number | undefined
+          const sealConf     = log.metadata?.sealConf     as number | undefined
+          const avgConf      = log.metadata?.avgConf      as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="IGVEL:" blockView>
+                <div className="uppercase tracking-widest mb-4">IGNITION VELOCITY PEAK</div>
+                {ignitionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">IGNITION</span>
+                    <span className="tabular-nums">{ignitionConf}%</span>
+                  </div>
+                )}
+                {sealConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SEAL</span>
+                    <span className="tabular-nums">{sealConf}%</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{avgConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">DAY IGNITED · FIELD SEALED · SAME-CYCLE CONVERGENCE</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

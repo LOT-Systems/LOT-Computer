@@ -1755,6 +1755,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyMorningIgnitionCheck()) {
     await executeDailyMorningIgnitionCheck()
   }
+  // Check weekly morning sovereignty audit (Sunday 08:00 UTC) — J52
+  if (shouldRunWeeklyMorningSovereigntyAudit()) {
+    await executeWeeklyMorningSovereigntyAudit()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -5771,6 +5775,129 @@ async function executeDailyMorningIgnitionCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Weekly Morning Sovereignty Audit (J52 — Sunday 08:00 UTC) ───────────────
+// Scans the last 7 days for morning_momentum_ignition events per user.
+// When 3+ ignition days found → writes morning_sovereignty_lock (P161).
+// Also scans for presence_coherence_seal events in last 7 days.
+// When 3+ seal days found → writes field_permanence_detection (P162).
+
+let isWeeklyMorningSovereigntyRunning = false
+let lastWeeklyMorningSovereigntyRun: Date | null = null
+
+function shouldRunWeeklyMorningSovereigntyAudit(): boolean {
+  const now = dayjs()
+  if (isWeeklyMorningSovereigntyRunning) return false
+  if (lastWeeklyMorningSovereigntyRun) {
+    const lastRun = dayjs(lastWeeklyMorningSovereigntyRun)
+    if (lastRun.isSame(now, 'week')) return false
+  }
+  return now.day() === 0 && now.hour() === 8 // Sunday 08:00 UTC
+}
+
+async function executeWeeklyMorningSovereigntyAudit(): Promise<JobResult> {
+  const jobName = 'weekly-morning-sovereignty-audit'
+  const executedAt = new Date().toISOString()
+  if (isWeeklyMorningSovereigntyRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklyMorningSovereigntyRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY MORNING SOVEREIGNTY AUDIT — Sunday 08:00 UTC (J52)')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+    const fiveDaysAgo  = dayjs().subtract(5, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(3, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (72h): ${activeUsers.length}`)
+    let sovereigntyWritten = 0
+    let permanenceWritten  = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // Check morning sovereignty — 3+ ignition events in last 5 days (distinct days)
+        const ignitionLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: fiveDaysAgo },
+            event: 'morning_momentum_ignition',
+          },
+          attributes: ['createdAt'],
+        })
+        const ignitionDays = new Set(ignitionLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD'))).size
+
+        if (ignitionDays >= 3) {
+          const conf = Math.min(78 + (ignitionDays - 3) * 4, 94)
+          await (Log as any).create({
+            userId,
+            event: 'morning_sovereignty_lock',
+            text: `Morning sovereignty lock: ${ignitionDays}/5 days with confirmed morning ignition. Multi-day arc established. Morning sovereignty is structural.`,
+            metadata: {
+              ignitionDays,
+              windowDays: 5,
+              arc: `${ignitionDays}/5 DAYS CONFIRMED`,
+              sovereigntyStatus: 'STRUCTURAL',
+              conf,
+              auditType: 'weekly',
+            },
+          })
+          sovereigntyWritten++
+        }
+
+        // Check field permanence — 3+ presence seal events in last 7 days (distinct days)
+        const sealLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+            event: 'presence_coherence_seal',
+          },
+          attributes: ['createdAt'],
+        })
+        const sealDays = new Set(sealLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD'))).size
+
+        if (sealDays >= 3) {
+          const conf = Math.min(83 + (sealDays - 3) * 3, 96)
+          await (Log as any).create({
+            userId,
+            event: 'field_permanence_detection',
+            text: `Field permanence detected: ${sealDays}/7 days with confirmed presence seal. The seal recurs across the week. Field permanence is structural.`,
+            metadata: {
+              sealDays,
+              windowDays: 7,
+              arc: `${sealDays}/7 DAYS SEALED`,
+              permanenceStatus: 'CONFIRMED',
+              field: 'PRESENCE·CIRCADIAN·DIMENSIONAL',
+              conf,
+              auditType: 'weekly',
+            },
+          })
+          permanenceWritten++
+        }
+      } catch {}
+    }
+
+    console.log(`  Morning sovereignty events written: ${sovereigntyWritten}`)
+    console.log(`  Field permanence events written:   ${permanenceWritten}`)
+    lastWeeklyMorningSovereigntyRun = new Date()
+    isWeeklyMorningSovereigntyRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: sovereigntyWritten + permanenceWritten }
+  } catch (error: any) {
+    console.error('Weekly morning sovereignty audit failed:', error.message)
+    isWeeklyMorningSovereigntyRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -5827,6 +5954,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily total field coherence check: 9 AM UTC every day (Job 48)')
   console.log('   - Daily stellar navigation check: 12 PM UTC every day (Job 49)')
   console.log('   - Daily morning ignition check: 10 AM UTC every day (J51)')
+  console.log('   - Weekly morning sovereignty audit: 8 AM UTC every Sunday (J52)')
   console.log('')
 
   // Check every hour for scheduled jobs
