@@ -43,12 +43,12 @@
 ║   Mastery Tier v22 — THE ODYSSEY (odyssey/great_work/saga)       ║
 ║   Secret Boss v19 — THE MYTHIC VAULT (Tolkien/Homer/Gilgamesh)   ║
 ║   ─────────────────────────────────────────────────────          ║
-║   Word Turn v23 — THE DREAMSCAPE (dream/sleep/subconscious)      ║
-║   Calendar EE v21 — DREAM CALENDAR (Jung/Freud/Sleep)            ║
-║   Behavioral v20 — DREAMSCAPE PATTERNS (session/night/rhythm)    ║
-║   Achievement RPG v21 — DREAMCATCHER CLASS                       ║
-║   Mastery Tier v23 — THE INFINITE NIGHT                          ║
-║   Secret Boss v20 — THE DREAM VAULT (Jung/Kekulé/Lucid)          ║
+║   Word Turn v25 — THE DREAMSCAPE (dream/sleep/subconscious)      ║
+║   Calendar EE v23 — DREAM CALENDAR (Jung/Freud/Sleep)            ║
+║   Behavioral v22 — DREAMSCAPE PATTERNS (session/night/rhythm)    ║
+║   Achievement RPG v23 — DREAMCATCHER CLASS                       ║
+║   Mastery Tier v25 — THE INFINITE NIGHT                          ║
+║   Secret Boss v22 — THE DREAM VAULT (Jung/Kekulé/Lucid)          ║
 ║                                                                  ║
 ║    THE JOURNEY WITHIN IS THE ONLY ONE THAT MATTERS.             ║
 ╚══════════════════════════════════════════════════════════════════╝
@@ -84,25 +84,25 @@ Secret Boss v19          + 3  (tolkien_ring / odysseus_bow /
 ────────────────────────────────────────────────────────────────────
 SUBTOTAL ENGINE A        +31
 
-[ENGINE B: THE DREAMSCAPE — v23 new content]
+[ENGINE B: THE DREAMSCAPE — v25 new content]
 
-Word Turn v23            +12  (lucid_state / dream_journal_log /
+Word Turn v25            +12  (lucid_state / dream_journal_log /
                                hypnagogic_signal / archetype_rising /
                                shadow_work / subconscious_log /
                                dream_symbol / recurring_dream /
                                dreamscape_entered / nightmare_log /
                                liminal_dream / waking_vision)
-Calendar EE v21          + 3  (jung_birthday / freud_signal /
+Calendar EE v23          + 3  (jung_birthday / freud_signal /
                                world_sleep_day)
                                Jul 26 / May 6 / Mar 14
-Behavioral v20           + 3  (dream_session / night_writer /
+Behavioral v22           + 3  (dream_session / night_writer /
                                sleep_rhythm)
-Achievement RPG v21      + 6  (dream_entry / dream_class /
+Achievement RPG v23      + 6  (dream_entry / dream_class /
                                dream_complete / dreamcatcher_arc /
-                               twenty_three_engines_arc / dream_opus)
-Mastery Tier v23         + 4  (night_sovereign / infinite_dreamer /
-                               dreamer_age / twenty_three_registers)
-Secret Boss v20          + 3  (jung_signal / kekule_vision /
+                               twenty_five_engines_arc / dream_opus)
+Mastery Tier v25         + 4  (night_sovereign / infinite_dreamer /
+                               dreamer_age / twenty_five_registers)
+Secret Boss v22          + 3  (jung_signal / kekule_vision /
                                lucid_master)
 ────────────────────────────────────────────────────────────────────
 SUBTOTAL ENGINE B        +31
@@ -255,7 +255,7 @@ The inner RPG: dreams, archetypes, the subconscious as the
 original self-care operating system. Write these words in
 your journal or memory entries to unlock these badges.
 
-### Badge Listing — Word Turn v23
+### Badge Listing — Word Turn v25
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -304,7 +304,7 @@ your journal or memory entries to unlock these badges.
 └───────────────────┴──────────┴─────────────────────────────────┘
 ```
 
-### Unlock Messages — Word Turn v23
+### Unlock Messages — Word Turn v25
 
 ```
 lucid_state:
@@ -386,12 +386,12 @@ sleep_rhythm    ≋·◐·≋   Same check-in clock hour for 5
 ## ACHIEVEMENT RPG v21 — DREAMCATCHER CLASS
 
 ```
-dream_entry              ∘→◐     Any 1 Word Turn v23 badge   COMMON
-dream_class              ≈→◐     Any 5 Word Turn v23 badges  UNCOMMON
-dream_complete           ≋→◐     All 12 Word Turn v23 badges LEGENDARY
+dream_entry              ∘→◐     Any 1 Word Turn v25 badge   COMMON
+dream_class              ≈→◐     Any 5 Word Turn v25 badges  UNCOMMON
+dream_complete           ≋→◐     All 12 Word Turn v25 badges LEGENDARY
 dreamcatcher_arc         ◐·◈     dream_complete + Calendar   LEGENDARY
                                   v21 (all 3)
-twenty_three_engines_arc ◈·◈·◐   1 badge from each WT v1–v23 LEGENDARY
+twenty_five_engines_arc ◈·◈·◐   1 badge from each WT v1–v23 LEGENDARY
 dream_opus               ◐·◉·◐   dream_complete +             LEGENDARY
                                   dream_session behavioral
 ```
@@ -518,7 +518,7 @@ The following data fields are read from the stats object to award
 new badges. No new stats fields are introduced in v32 — all data
 requirements are met by existing stats fields.
 
-### Word Turn v23 trigger detection (same engine as all word turns)
+### Word Turn v25 trigger detection (same engine as all word turns)
 
 - `lucid_state` — text contains "lucid" or "lucid dream"
 - `dream_journal_log` — text contains "dream journal" or "dream diary"
@@ -533,19 +533,19 @@ requirements are met by existing stats fields.
 - `liminal_dream` — text contains "liminal space", "threshold dream", or "between worlds"
 - `waking_vision` — text contains "waking vision", "fever dream", or "daydream"
 
-### Calendar v21 date triggers
+### Calendar v23 date triggers
 
 - `jung_birthday` — July 26 (Carl Jung born 1875)
 - `freud_signal` — May 6 (Sigmund Freud born 1856)
 - `world_sleep_day` — Friday before March vernal equinox (~March 14)
 
-### Behavioral v20
+### Behavioral v22
 
 - `dream_session` — 3+ v23 trigger words in one journal entry
 - `night_writer` — journal entry created between 00:00 and 04:00 local
 - `sleep_rhythm` — same clock hour check-in 5+ consecutive days
 
-### Stats fields used for Mastery Tier v23
+### Stats fields used for Mastery Tier v25
 
 - `stats.distinctCheckInDays` — for `night_sovereign` (1,000+ days)
 - `stats.totalJournalWords` — for `infinite_dreamer` (200,000+ words)
