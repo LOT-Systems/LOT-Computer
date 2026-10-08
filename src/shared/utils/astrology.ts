@@ -177,3 +177,47 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Build a Date whose local getters (getHours/getDate/...) read the wall-clock
+ * time in the given IANA timeZone, so the pure functions above can be reused
+ * for any user timeZone regardless of the runtime's own zone. Falls back to
+ * the instant itself on a missing/invalid timeZone.
+ */
+export function toWallClockDate(instant: Date, timeZone?: string | null): Date {
+  if (!timeZone) return instant
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(instant)
+    const get = (type: string) => Number(parts.find(p => p.type === type)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return instant
+  }
+}
+
+/**
+ * Log synchronization: how many of the user's logs were written under the
+ * same rokuyo / moon phase as the given reading (from LogContext snapshots).
+ */
+export function countAstroLogMatches(
+  logs: Array<{ context?: Record<string, any> | null }>,
+  rokuyo: string,
+  moonPhase: string
+): { rokuyo: number; moonPhase: number; both: number } {
+  let r = 0, m = 0, b = 0
+  for (const log of logs) {
+    const c = log.context
+    if (!c) continue
+    const hitR = c.astroRokuyo === rokuyo
+    const hitM = c.astroMoonPhase === moonPhase
+    if (hitR) r++
+    if (hitM) m++
+    if (hitR && hitM) b++
+  }
+  return { rokuyo: r, moonPhase: m, both: b }
+}
