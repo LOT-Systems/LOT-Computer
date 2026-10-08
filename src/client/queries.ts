@@ -141,6 +141,11 @@ export const useCreateLog = createMutation<{ text: string; event?: string; metad
   '/api/logs'
 )
 
+export const useDeleteCalendarEntry = createMutation<{ id: string }, { id: string; deleted: boolean }>(
+  'delete',
+  (data) => `/api/logs/${data.id}`
+)
+
 export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
   'put',
   (data) => `/api/logs/${data.id}`

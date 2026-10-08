@@ -1084,7 +1084,7 @@ export default async (fastify: FastifyInstance) => {
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_alert', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -1583,6 +1583,18 @@ export default async (fastify: FastifyInstance) => {
       })
 
       return log
+    }
+  )
+
+  // Calendar entries are the only non-note logs a user may delete themselves.
+  fastify.delete(
+    '/logs/:id',
+    async (req: FastifyRequest<{ Params: { id: string } }>, reply) => {
+      const log = await fastify.models.Log.findByPk(req.params.id)
+      if (!log || log.userId !== req.user.id) return reply.throw.notFound()
+      if (log.event !== 'calendar_entry') return reply.throw.badParams('Only calendar entries can be deleted')
+      await log.destroy()
+      return { id: log.id, deleted: true }
     }
   )
 
