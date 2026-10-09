@@ -33,7 +33,8 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useArcade } from '#client/queries'
+import { renderSystemHelp, parseStoryPeriod, stripStoryCommand } from '#shared/utils/logCommands'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3707,6 +3708,9 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [storyMeta, setStoryMeta] = React.useState<string | null>(null)
+  const [rankResult, setRankResult] = React.useState<string | null>(null)
+  const arcadeQuery = useArcade()
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3743,6 +3747,13 @@ const NoteEditor = ({
     onSuccess: (data) => {
       setStoryResponse(data.story)
       setStoryLoading(false)
+      setStoryMeta(
+        [
+          data.period ? `PERIOD ${data.period.toUpperCase()}` : '',
+          ...(data.signals || []),
+          data.arcade ? `RANK ${data.arcade.rank} LV ${data.arcade.level} · ${data.arcade.xp} XP` : '',
+        ].filter(Boolean).join('\n') || null
+      )
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + data.story
@@ -4121,47 +4132,41 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        // Rendered from the shared command registry so /system never drifts.
+        setSystemHelp(renderSystemHelp())
+        arcadeQuery.refetch().then(r => {
+          if (r.data?.line) setSystemHelp(renderSystemHelp({ rankLine: r.data.line }))
+        }).catch(() => { /* rank line is optional */ })
+      } else if (trigger === 'rank-report') {
+        setRankResult('RANK            LOADING...')
+        arcadeQuery.refetch().then(r => {
+          const a = r.data?.arcade
+          setRankResult(a ? [
+            r.data!.line,
+            `NEXT RANK       ${a.nextRank || 'MAX — LOT MASTER'}`,
+            'EARN XP        +10 entry · +25 active day · +15 streak day · +20 story',
+          ].join('\n') : 'RANK UNAVAILABLE')
+        }).catch(() => setRankResult('RANK UNAVAILABLE'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
+          setStoryMeta(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const logText = stripStoryCommand(value)
+            const period = parseStoryPeriod(value)
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              period,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: stripStoryCommand(value), period: parseStoryPeriod(value) })
           }
         }
       }
@@ -4387,6 +4392,13 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        {rankResult && (
+          <div className="mt-8">
+            <Block label="RANK:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{rankResult}</div>
+            </Block>
+          </div>
+        )}
         {systemHelp && (
           <div className="mt-8">
             <Block label="SYSTEM:" blockView>
@@ -4425,6 +4437,9 @@ const NoteEditor = ({
                   {storyResponse.split('\n').map((line, idx) => (
                     <div key={idx}>{line || <br />}</div>
                   ))}
+                  {storyMeta && (
+                    <div style={{ marginTop: '1rem', fontSize: '11px', letterSpacing: '0.08em', opacity: 0.6, whiteSpace: 'pre-wrap' }}>{storyMeta}</div>
+                  )}
                 </div>
               )}
             </Block>

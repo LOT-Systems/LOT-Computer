@@ -895,6 +895,7 @@ export const usePrayerScripture = createMutation<
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    period?: 'day' | 'week' | 'month' | 'year'
     quantumState?: {
       energy?: string
       clarity?: string
@@ -910,5 +911,24 @@ export const useStoryGeneration = createMutation<
   {
     story: string
     logId: string | null
+    period?: 'day' | 'week' | 'month' | 'year'
+    signals?: string[]
+    arcade?: ArcadeStateDto
   }
 >('post', '/api/story')
+
+export type ArcadeStateDto = {
+  xp: number
+  level: number
+  rank: string
+  xpToNext: number
+  nextRank: string | null
+  progress: number
+}
+
+// ARCADE — rank / XP (/rank, /system header)
+export const useArcade = () =>
+  createQuery<{ arcade: ArcadeStateDto; line: string }>('/api/arcade', {
+    enabled: false, // fetched on demand by /rank and /system via refetch()
+    refetchOnWindowFocus: false,
+  })()

@@ -44,6 +44,17 @@ import { generateChatCatalysts, generateConversationStarters, shouldShowChatCata
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
 import { registerOSRoutes } from './os-api.js'
+import { STORY_PERIODS, type StoryPeriod } from '#shared/utils/logCommands'
+import {
+  buildDigest,
+  composeLocalStory,
+  computeArcade,
+  computeStreak,
+  digestToPromptBlock,
+  formatArcadeLine,
+  JOURNAL_EVENTS,
+  periodStart,
+} from '#shared/utils/storyCompression'
 
 // ============================================================================
 // Helper Functions
@@ -5490,6 +5501,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: StoryPeriod
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,6 +5526,29 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period: StoryPeriod = STORY_PERIODS.includes(req.body.period as StoryPeriod)
+        ? (req.body.period as StoryPeriod)
+        : 'day'
+      const now = new Date()
+      const tz = req.user.timeZone || null
+      const windowLogs = await fastify.models.Log.findAll({
+        where: { userId: req.user.id, createdAt: { [Op.gte]: periodStart(period, now) } },
+        order: [['createdAt', 'DESC']],
+        limit: period === 'year' ? 5000 : 1500,
+      })
+      const digest = buildDigest(
+        windowLogs.map(l => ({
+          event: l.event,
+          text: l.text,
+          createdAt: l.createdAt,
+          context: l.context as any,
+          metadata: l.metadata as any,
+        })),
+        period,
+        now,
+        tz
+      )
+      const arcade = await getArcadeState(req.user.id, now, tz)
 
       const logs = await fastify.models.Log.findAll({
         where: { userId: req.user.id },
@@ -5553,6 +5588,8 @@ The operator typed a log entry and invoked /story. Your task: write 1-2 paragrap
 
 RULES:
 - Write in second person ("You...")
+- The PERIOD DIGEST below is a pre-computed compression of the whole period. Narrate it — do not recount numbers mechanically.
+- If SIGNALS lists a spike or pattern change, name it gently and ask nothing — just notice it.
 - Draw from their actual log entries, moods, and self-care answers below
 - Reference specific details from their data — make it feel like THEIR story
 - If they've been consistent with check-ins, acknowledge the discipline
@@ -5563,6 +5600,9 @@ RULES:
 - Keep it under 200 words.`
 
       const dataBlock = `
+PERIOD DIGEST:
+${digestToPromptBlock(digest)}
+
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
@@ -5583,7 +5623,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
 
         console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
 
-        const story = await engine.generateCompletion(fullPrompt, 512)
+        const story = await engine.generateCompletion(fullPrompt, period === 'day' ? 512 : 768)
 
         const cleaned = story.trim().replace(/^["']|["']$/g, '')
 
@@ -5596,6 +5636,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            period,
+            digest,
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5604,14 +5646,50 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          period,
+          signals: digest.signals,
+          arcade,
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
         return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
+          story: composeLocalStory(digest),
           logId: null,
+          period,
+          signals: digest.signals,
+          arcade,
         }
       }
     }
   )
+
+  // ============================================================================
+  // ARCADE — rank / XP derived from journal activity (/rank)
+  // ============================================================================
+  fastify.get('/arcade', async (req) => {
+    const arcade = await getArcadeState(req.user.id, new Date(), req.user.timeZone || null)
+    return { arcade, line: formatArcadeLine(arcade) }
+  })
+
+  async function getArcadeState(userId: string, now: Date, tz: string | null) {
+    const yearAgo = periodStart('year', now)
+    const rows = await fastify.models.Log.findAll({
+      attributes: ['event', 'createdAt'],
+      where: {
+        userId,
+        event: [...JOURNAL_EVENTS, 'generated_story'],
+        createdAt: { [Op.gte]: yearAgo },
+      },
+      order: [['createdAt', 'DESC']],
+      limit: 10000,
+    })
+    const journal = rows.filter(r => JOURNAL_EVENTS.includes(r.event))
+    const days = new Set(journal.map(r => new Date(r.createdAt).toISOString().slice(0, 10)))
+    return computeArcade({
+      totalEntries: journal.length,
+      activeDays: days.size,
+      streak: computeStreak(journal.map(r => r.createdAt), now, tz),
+      storiesRead: rows.length - journal.length,
+    })
+  }
 }
