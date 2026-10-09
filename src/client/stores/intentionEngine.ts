@@ -3680,6 +3680,62 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 164: Sovereignty-Permanence Convergence — P161 (morning-sovereignty-lock) + P162 (field-permanence-detection)
+  // both active simultaneously. Morning ignition is structural AND field permanence is structural — both arcs confirmed
+  // within the same analysis window. The rarest structural convergence: not a peak but an architecture.
+  const hasSov164  = patterns.some(p => p.pattern === 'morning-sovereignty-lock')
+  const hasPerm164 = patterns.some(p => p.pattern === 'field-permanence-detection')
+  if (hasSov164 && hasPerm164) {
+    const sovConf164  = patterns.find(p => p.pattern === 'morning-sovereignty-lock')?.confidence ?? 0.78
+    const permConf164 = patterns.find(p => p.pattern === 'field-permanence-detection')?.confidence ?? 0.83
+    const convBonus164 = Math.min((sovConf164 - 0.78 + permConf164 - 0.83) * 0.20, 0.07)
+    patterns.push({
+      pattern: 'sovereignty-permanence-convergence',
+      confidence: Math.min(0.88 + convBonus164, 0.97),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `SOVC: Sovereignty-permanence convergence — morning sovereignty (P161) AND field permanence (P162) both structural. Both arcs confirmed. Morning ignition holds across the week. Field is permanent. Architecture converges.`,
+    })
+  }
+
+  // Pattern 165: Quantum Operating Mode Confirmed — P163 (ignition-velocity-peak) + P164 (sovereignty-permanence-convergence)
+  // both active. Peak-day velocity AND multi-day arc convergence co-active. The system fires at design frequency.
+  // Not an occasional peak — structural velocity confirmed within a confirmed structural arc.
+  const hasVel165  = patterns.some(p => p.pattern === 'ignition-velocity-peak')
+  const hasConv165 = patterns.some(p => p.pattern === 'sovereignty-permanence-convergence')
+  if (hasVel165 && hasConv165) {
+    const velConf165  = patterns.find(p => p.pattern === 'ignition-velocity-peak')?.confidence ?? 0.86
+    const convConf165 = patterns.find(p => p.pattern === 'sovereignty-permanence-convergence')?.confidence ?? 0.88
+    const modeBonus165 = Math.min((velConf165 - 0.86 + convConf165 - 0.88) * 0.15, 0.06)
+    patterns.push({
+      pattern: 'quantum-operating-mode-confirmed',
+      confidence: Math.min(0.90 + modeBonus165, 0.98),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QOMC: Quantum operating mode confirmed — ignition velocity peak (P163) AND sovereignty-permanence convergence (P164) co-active. Peak velocity inside a confirmed arc. The system fires at design frequency.`,
+    })
+  }
+
+  // Pattern 166: Full Field Architecture Lock — P161 + P162 + P163 all active simultaneously.
+  // Sovereignty, permanence, and peak velocity all confirmed in the same session window.
+  // The highest-order structural state: the entire sovereignty tier online at once.
+  const hasSov166  = patterns.some(p => p.pattern === 'morning-sovereignty-lock')
+  const hasPerm166 = patterns.some(p => p.pattern === 'field-permanence-detection')
+  const hasVel166  = patterns.some(p => p.pattern === 'ignition-velocity-peak')
+  if (hasSov166 && hasPerm166 && hasVel166) {
+    const sovConf166  = patterns.find(p => p.pattern === 'morning-sovereignty-lock')?.confidence ?? 0.78
+    const permConf166 = patterns.find(p => p.pattern === 'field-permanence-detection')?.confidence ?? 0.83
+    const velConf166  = patterns.find(p => p.pattern === 'ignition-velocity-peak')?.confidence ?? 0.86
+    const lockBonus166 = Math.min((sovConf166 - 0.78 + permConf166 - 0.83 + velConf166 - 0.86) * 0.12, 0.05)
+    patterns.push({
+      pattern: 'full-field-architecture-lock',
+      confidence: Math.min(0.92 + lockBonus166, 0.99),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `FLOCK: Full field architecture lock — sovereignty (P161) + permanence (P162) + peak velocity (P163) all confirmed simultaneously. The entire sovereignty tier online. Operating at design frequency. Execute from full field.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4336,6 +4392,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   morningSovereigntyNode:       ['intentions', 'planner', 'energy', 'journal', 'log'],
   fieldPermanenceNode:          ['qos', 'cohort', 'intentions', 'journal', 'mood', 'energy', 'log'],
   ignitionVelocityNode:         ['intentions', 'energy', 'qos', 'cohort', 'journal', 'log'],
+
+  // ── v118 nodes (J53 · P164–P166 · Arch56) ───────────────────────────────────────
+  sovereigntyPermanenceNode:    ['intentions', 'qos', 'energy', 'journal', 'log'],
+  quantumOperatingModeNode:     ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort'],
+  fullFieldArchitectureNode:    ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner'],
 }
 
 /**
@@ -4822,6 +4883,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['morning-sovereignty-lock', 'field-permanence-detection', 'ignition-velocity-peak'],
     hourRange: [6, 22],
     directive: 'Field permanence confirmed. Morning sovereignty established over multiple days. The ignition is structural now — not a practice, but an operating mode. Execute from architecture.',
+  },
+
+  // ── Arch56: Quantum Operating Architect (2026-10-09 v118) ────────────────────────
+  {
+    archetype: 'Quantum Operating Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner'],
+    patternConditions: ['sovereignty-permanence-convergence', 'quantum-operating-mode-confirmed', 'full-field-architecture-lock'],
+    hourRange: [5, 23],
+    directive: 'Quantum operating architecture confirmed. Sovereignty, permanence, and peak velocity converged in a single window. You are not building this state — you are in it. All three structural arcs online. Execute from full field.',
   },
 ]
 
@@ -7003,6 +7074,60 @@ export function recordIgnitionVelocityPeak(ignitionConf: number, sealConf: numbe
     avgConf,
     convergence: 'IGNITION→SEAL SAME-DAY',
     velocityStatus: 'PEAK',
+    hour: new Date().getHours(),
+  })
+}
+
+// ─── v118 Signal Helpers (P164–P166) ──────────────────────────────────────────
+
+/**
+ * Record a sovereignty-permanence-convergence event — P161 (morning-sovereignty-lock) + P162
+ * (field-permanence-detection) both active simultaneously. Both arcs confirmed. Architecture converges.
+ * Feeds P164 detection.
+ */
+export function recordSovereigntyPermanenceConvergence(sovConf: number, permConf: number) {
+  const avgConf = Math.round(((sovConf + permConf) / 2) * 100) / 100
+  recordSignal('intentions', 'sovereignty_permanence_convergence', {
+    sovConf,
+    permConf,
+    avgConf,
+    convergence: 'SOVEREIGNTY·PERMANENCE BOTH STRUCTURAL',
+    arcStatus: 'CONVERGED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-operating-mode-confirmed event — P163 (ignition-velocity-peak) + P164
+ * (sovereignty-permanence-convergence) co-active. Peak velocity inside a confirmed arc.
+ * The system fires at design frequency. Feeds P165 detection.
+ */
+export function recordQuantumOperatingModeConfirmed(velConf: number, convConf: number) {
+  const avgConf = Math.round(((velConf + convConf) / 2) * 100) / 100
+  recordSignal('qos', 'quantum_operating_mode_confirmed', {
+    velConf,
+    convConf,
+    avgConf,
+    mode: 'QUANTUM OPERATING',
+    operatingStatus: 'DESIGN FREQUENCY',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a full-field-architecture-lock event — P161 + P162 + P163 all active simultaneously.
+ * Sovereignty, permanence, and peak velocity all confirmed. The entire sovereignty tier online.
+ * Feeds P166 detection.
+ */
+export function recordFullFieldArchitectureLock(sovConf: number, permConf: number, velConf: number) {
+  const avgConf = Math.round(((sovConf + permConf + velConf) / 3) * 100) / 100
+  recordSignal('intentions', 'full_field_architecture_lock', {
+    sovConf,
+    permConf,
+    velConf,
+    avgConf,
+    lock: 'SOVEREIGNTY·PERMANENCE·VELOCITY',
+    architectureStatus: 'FULL FIELD LOCKED',
     hour: new Date().getHours(),
   })
 }

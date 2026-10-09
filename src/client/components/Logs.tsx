@@ -3979,6 +3979,103 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sovereignty_permanence_convergence') {
+          const sovConf  = log.metadata?.sovConf  as number | undefined
+          const permConf = log.metadata?.permConf as number | undefined
+          const avgConf  = log.metadata?.avgConf  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVC:" blockView>
+                <div className="uppercase tracking-widest mb-4">SOVEREIGNTY-PERMANENCE CONVERGENCE</div>
+                {sovConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVEREIGNTY</span>
+                    <span className="tabular-nums">{sovConf}%</span>
+                  </div>
+                )}
+                {permConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PERMANENCE</span>
+                    <span className="tabular-nums">{permConf}%</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{avgConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">SOVEREIGNTY MEETS PERMANENCE · BOTH ARCS STRUCTURAL · ARCHITECTURE CONVERGES</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_operating_mode_confirmed') {
+          const velConf  = log.metadata?.velConf  as number | undefined
+          const convConf = log.metadata?.convConf as number | undefined
+          const avgConf  = log.metadata?.avgConf  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QOMC:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM OPERATING MODE CONFIRMED</div>
+                {velConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PEAK VELOCITY</span>
+                    <span className="tabular-nums">{velConf}%</span>
+                  </div>
+                )}
+                {convConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC CONVERGENCE</span>
+                    <span className="tabular-nums">{convConf}%</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{avgConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PEAK VELOCITY INSIDE CONFIRMED ARC · SYSTEM AT DESIGN FREQUENCY</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'full_field_architecture_lock') {
+          const sovConf  = log.metadata?.sovConf  as number | undefined
+          const permConf = log.metadata?.permConf as number | undefined
+          const velConf  = log.metadata?.velConf  as number | undefined
+          const avgConf  = log.metadata?.avgConf  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FLOCK:" blockView>
+                <div className="uppercase tracking-widest mb-4">FULL FIELD ARCHITECTURE LOCK</div>
+                {sovConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVEREIGNTY</span>
+                    <span className="tabular-nums">{sovConf}%</span>
+                  </div>
+                )}
+                {permConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PERMANENCE</span>
+                    <span className="tabular-nums">{permConf}%</span>
+                  </div>
+                )}
+                {velConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">VELOCITY</span>
+                    <span className="tabular-nums">{velConf}%</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{avgConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">SOVEREIGNTY · PERMANENCE · VELOCITY · FULL SOVEREIGNTY TIER ONLINE</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

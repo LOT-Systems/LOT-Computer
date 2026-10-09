@@ -122,6 +122,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'morning-sovereignty-lock':         'MSOV',
   'field-permanence-detection':       'FPER',
   'ignition-velocity-peak':           'IGVEL',
+  'sovereignty-permanence-convergence': 'SOVC',
+  'quantum-operating-mode-confirmed': 'QOMC',
+  'full-field-architecture-lock':     'FLOCK',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

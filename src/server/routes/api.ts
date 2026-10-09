@@ -1229,6 +1229,10 @@ export default async (fastify: FastifyInstance) => {
       'morning_sovereignty_lock',
       'field_permanence_detection',
       'ignition_velocity_peak',
+      // v118: sovereignty-permanence convergence · quantum operating mode · full field architecture lock (P164/P165/P166)
+      'sovereignty_permanence_convergence',
+      'quantum_operating_mode_confirmed',
+      'full_field_architecture_lock',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

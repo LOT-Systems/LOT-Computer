@@ -188,6 +188,9 @@ export function PatternRecognitionWidget() {
       'morning-sovereignty-lock':         'Morning sovereignty lock — P158 confirmed 3+ of last 5 days, multi-day ignition arc, morning sovereignty structural (P161)',
       'field-permanence-detection':       'Field permanence detection — P159 confirmed 3+ of last 7 days, presence seal recurs across week, permanence structural (P162)',
       'ignition-velocity-peak':           'Ignition velocity peak — P158 + P159 co-active same day, day ignited and field sealed in single cycle (P163)',
+      'sovereignty-permanence-convergence': 'Sovereignty-permanence convergence — P161 + P162 both structural simultaneously, both arcs confirmed, architecture converges (P164)',
+      'quantum-operating-mode-confirmed': 'Quantum operating mode confirmed — P163 + P164 co-active, peak velocity inside confirmed arc, system at design frequency (P165)',
+      'full-field-architecture-lock':     'Full field architecture lock — P161 + P162 + P163 all active, sovereignty tier fully online, operating at design frequency (P166)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

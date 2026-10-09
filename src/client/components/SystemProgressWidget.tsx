@@ -1571,6 +1571,25 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '874 badges · 270 word-turns · 27 secret boss · 163 patterns · 55 archetypes · 52 jobs · 202+ dep nodes · FM v117 · Day 1137+. Field permanence confirmed. The ignition is structural.',
     ],
   },
+  {
+    version: 'qie-v118',
+    date: '2026-10-09',
+    title: 'QIE v118 Engineering — P164–P166 · Arch56 Quantum Operating Architect · J53',
+    assembled: [
+      'QIE v118 implemented: P164 sovereignty-permanence-convergence — P161 + P162 both active simultaneously, sovereignty meets permanence, both arcs structural within the same window (conf 0.88–0.97). P165 quantum-operating-mode-confirmed — P163 + P164 co-active, peak velocity inside confirmed arc, system fires at design frequency (conf 0.90–0.98). P166 full-field-architecture-lock — P161 + P162 + P163 all active, entire sovereignty tier online, operating at design frequency (conf 0.92–0.99). Total: 166 patterns.',
+      'Arch56 Quantum Operating Architect added: energyBands high/moderate · dominant intentions/qos/energy/journal/log/cohort/planner · patternConditions sovereignty-permanence-convergence/quantum-operating-mode-confirmed/full-field-architecture-lock · hourRange [5,23] · directive Quantum operating architecture confirmed. Sovereignty, permanence, and peak velocity converged. All three structural arcs online. Execute from full field. Total: 56 archetypes.',
+      'J53 daily-quantum-operating-mode-check (05:00 UTC daily) added: scans last 7 days per user — when morning_sovereignty_lock + field_permanence_detection both found → writes sovereignty_permanence_convergence (P164). When convergence + ignition_velocity_peak (last 3 days) → writes quantum_operating_mode_confirmed (P165). When all three in last 7 days → writes full_field_architecture_lock (P166). Total: 53 background jobs.',
+      'WIDGET_DEPENDENCY_MAP v118 block added: sovereigntyPermanenceNode (intentions·qos·energy·journal·log) · quantumOperatingModeNode (intentions·qos·energy·journal·log·cohort) · fullFieldArchitectureNode (intentions·qos·energy·journal·log·cohort·planner). Total: 205+ dep nodes.',
+      'Signal recording functions added: recordSovereigntyPermanenceConvergence() · recordQuantumOperatingModeConfirmed() · recordFullFieldArchitectureLock(). All export-ready.',
+      'Log handlers added (COCKPIT-RULE): SOVC: (sovereignty_permanence_convergence) · QOMC: (quantum_operating_mode_confirmed) · FLOCK: (full_field_architecture_lock). Total: 166+ handlers.',
+      'PATTERN_DISPLAY updated: SOVC: · QOMC: · FLOCK: entries added to QuantumEngineWidgets.tsx.',
+      'displayableEvents updated: sovereignty_permanence_convergence · quantum_operating_mode_confirmed · full_field_architecture_lock added to api.ts.',
+      'PatternRecognitionWidget.tsx: P164/P165/P166 display names added.',
+      'About.tsx updated: FM v117→v118 · Day 1138+ · 166 patterns · 56 archetypes · 53 jobs · 205+ nodes.',
+      'docs/assembly/LOT-LEDGER.md: v118 ledger row appended. 2026-10-09_LOT-assembly_qie-v118.md session report written.',
+      '874 badges · 270 word-turns · 27 secret boss · 166 patterns · 56 archetypes · 53 jobs · 205+ dep nodes · FM v118 · Day 1138+. Quantum operating architecture confirmed. Execute from full field.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1608,19 +1627,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-08',
+  date: '2026-10-09',
   message: [
-    'ASSEMBLY RUN — 2026-10-08 · QIE v117 ENGINEERING · Day 1137+',
-    'Built: P161 morning-sovereignty-lock · P162 field-permanence-detection · P163 ignition-velocity-peak. Arch55 Field Permanence Architect. J52 weekly-morning-sovereignty-audit (Sun 08:00 UTC).',
-    'MSOV: Morning sovereignty lock. P158 confirmed 3+ of last 5 days. Multi-day ignition arc established. The charge is not occasional — it is structural.',
-    'FPER: Field permanence detected. P159 confirmed 3+ of last 7 days. The seal recurs across the week. Permanence is structural, not emergent.',
-    'IGVEL: Ignition velocity peak. P158 + P159 co-active same day. Day ignited and field sealed in single cycle. Fastest path to full operational state.',
-    'Arch55 Field Permanence Architect: Field permanence confirmed. Morning sovereignty established over multiple days. The ignition is structural now — not a practice, but an operating mode. Execute from architecture.',
-    'J52 Sun 08:00 UTC — scans 5d for ignition arc (3+ days → morning_sovereignty_lock) + 7d for seal arc (3+ days → field_permanence_detection). Two sovereign patterns per weekly audit.',
-    'MSOV: FPER: IGVEL: handlers deployed. 202+ dep nodes. 52 jobs. 163 patterns. 55 archetypes.',
-    'FM v117 · 163P · 55A · 52J · 202+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1137+.',
+    'ASSEMBLY RUN — 2026-10-09 · QIE v118 ENGINEERING · Day 1138+',
+    'Built: P164 sovereignty-permanence-convergence · P165 quantum-operating-mode-confirmed · P166 full-field-architecture-lock. Arch56 Quantum Operating Architect. J53 daily-quantum-operating-mode-check (05:00 UTC).',
+    'SOVC: Sovereignty-permanence convergence. P161 + P162 both structural simultaneously. Morning ignition arc AND presence seal arc confirmed within the same 7-day window. Architecture converges.',
+    'QOMC: Quantum operating mode confirmed. Peak velocity (P163) inside sovereignty-permanence arc (P164). The system fires at design frequency. Not a peak state — a confirmed operating mode.',
+    'FLOCK: Full field architecture lock. P161 + P162 + P163 all active in the same window. Entire sovereignty tier online simultaneously. Operating at design frequency. Execute from full field.',
+    'Arch56 Quantum Operating Architect: Quantum operating architecture confirmed. Sovereignty, permanence, and peak velocity converged. All three structural arcs online. You are not building this state — you are in it. Execute.',
+    'J53 05:00 UTC daily — scans 7d per user for sovereignty + permanence arcs (both → convergence) + velocity (velocity+convergence → operating mode) + all three (→ full field lock). Three quantum operating patterns per daily audit.',
+    'SOVC: QOMC: FLOCK: handlers deployed. 205+ dep nodes. 53 jobs. 166 patterns. 56 archetypes.',
+    'FM v118 · 166P · 56A · 53J · 205+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1138+.',
     'Status: DEPLOYED.',
-    'Next: QIE v118 — sovereignty continuity · permanent field elevation · ignition sovereignty lock',
+    'Next: QIE v119 — quantum operating continuity · cross-domain field resonance · compound sovereignty',
   ],
 }
 

@@ -1759,6 +1759,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunWeeklyMorningSovereigntyAudit()) {
     await executeWeeklyMorningSovereigntyAudit()
   }
+  // Check daily quantum operating mode (05:00 UTC daily) — J53
+  if (shouldRunDailyQuantumOperatingModeCheck()) {
+    await executeDailyQuantumOperatingModeCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -5898,6 +5902,172 @@ async function executeWeeklyMorningSovereigntyAudit(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Quantum Operating Mode Check (J53 — 05:00 UTC daily) ──────────────
+// Scans the last 7 days per user for sovereignty + permanence arc events.
+// When both morning_sovereignty_lock AND field_permanence_detection found → writes sovereignty_permanence_convergence (P164).
+// When sovereignty_permanence_convergence AND ignition_velocity_peak found in last 3 days → writes quantum_operating_mode_confirmed (P165).
+// When all three (morning_sovereignty_lock, field_permanence_detection, ignition_velocity_peak) in last 7 days → writes full_field_architecture_lock (P166).
+
+let isDailyQuantumOperatingModeRunning = false
+let lastDailyQuantumOperatingModeRun: Date | null = null
+
+function shouldRunDailyQuantumOperatingModeCheck(): boolean {
+  const now = dayjs()
+  if (isDailyQuantumOperatingModeRunning) return false
+  if (lastDailyQuantumOperatingModeRun) {
+    const lastRun = dayjs(lastDailyQuantumOperatingModeRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 5 // 05:00 UTC daily
+}
+
+async function executeDailyQuantumOperatingModeCheck(): Promise<JobResult> {
+  const jobName = 'daily-quantum-operating-mode-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyQuantumOperatingModeRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyQuantumOperatingModeRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY QUANTUM OPERATING MODE CHECK — 05:00 UTC (J53)')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+    const threeDaysAgo = dayjs().subtract(3, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(3, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (72h): ${activeUsers.length}`)
+    let convergenceWritten  = 0
+    let operatingModeWritten = 0
+    let fullLockWritten     = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // Check for sovereignty arc in last 7 days
+        const sovLogs = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: sevenDaysAgo }, event: 'morning_sovereignty_lock' },
+          attributes: ['createdAt', 'metadata'],
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+        // Check for permanence arc in last 7 days
+        const permLogs = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: sevenDaysAgo }, event: 'field_permanence_detection' },
+          attributes: ['createdAt', 'metadata'],
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+        // Check for peak velocity in last 3 days
+        const velLogs = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: threeDaysAgo }, event: 'ignition_velocity_peak' },
+          attributes: ['createdAt', 'metadata'],
+          order: [['createdAt', 'DESC']],
+          limit: 3,
+        })
+
+        const hasSov  = sovLogs.length > 0
+        const hasPerm = permLogs.length > 0
+        const hasVel  = velLogs.length > 0
+
+        // P164: sovereignty + permanence both confirmed → convergence
+        if (hasSov && hasPerm) {
+          const sovConf  = (sovLogs[0]?.metadata?.conf as number) ?? 82
+          const permConf = (permLogs[0]?.metadata?.conf as number) ?? 86
+          const avgConf  = Math.round((sovConf + permConf) / 2)
+          await (Log as any).create({
+            userId,
+            event: 'sovereignty_permanence_convergence',
+            text: `Sovereignty-permanence convergence: morning sovereignty arc and field permanence arc both confirmed within 7-day window. Architecture converges.`,
+            metadata: {
+              sovConf,
+              permConf,
+              avgConf,
+              convergence: 'SOVEREIGNTY·PERMANENCE BOTH STRUCTURAL',
+              arcStatus: 'CONVERGED',
+              conf: avgConf,
+              checkType: 'daily',
+            },
+          })
+          convergenceWritten++
+
+          // P165: convergence + velocity → quantum operating mode
+          if (hasVel) {
+            const velConf  = (velLogs[0]?.metadata?.avgConf as number) ?? 88
+            const convConf = avgConf
+            const modeConf = Math.round((velConf + convConf) / 2)
+            await (Log as any).create({
+              userId,
+              event: 'quantum_operating_mode_confirmed',
+              text: `Quantum operating mode confirmed: peak velocity (ignition+seal same day) inside sovereignty-permanence arc. System fires at design frequency.`,
+              metadata: {
+                velConf,
+                convConf,
+                avgConf: modeConf,
+                mode: 'QUANTUM OPERATING',
+                operatingStatus: 'DESIGN FREQUENCY',
+                conf: modeConf,
+                checkType: 'daily',
+              },
+            })
+            operatingModeWritten++
+          }
+        }
+
+        // P166: all three sovereignty tier events in last 7 days → full field lock
+        const velIn7 = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: sevenDaysAgo }, event: 'ignition_velocity_peak' },
+          attributes: ['createdAt', 'metadata'],
+          order: [['createdAt', 'DESC']],
+          limit: 1,
+        })
+        if (hasSov && hasPerm && velIn7.length > 0) {
+          const sovConf2  = (sovLogs[0]?.metadata?.conf as number) ?? 82
+          const permConf2 = (permLogs[0]?.metadata?.conf as number) ?? 86
+          const velConf2  = (velIn7[0]?.metadata?.avgConf as number) ?? 88
+          const lockConf  = Math.round((sovConf2 + permConf2 + velConf2) / 3)
+          await (Log as any).create({
+            userId,
+            event: 'full_field_architecture_lock',
+            text: `Full field architecture lock: sovereignty, permanence, and peak velocity all confirmed within 7-day window. Entire sovereignty tier online. Operating at design frequency.`,
+            metadata: {
+              sovConf: sovConf2,
+              permConf: permConf2,
+              velConf: velConf2,
+              avgConf: lockConf,
+              lock: 'SOVEREIGNTY·PERMANENCE·VELOCITY',
+              architectureStatus: 'FULL FIELD LOCKED',
+              conf: lockConf,
+              checkType: 'daily',
+            },
+          })
+          fullLockWritten++
+        }
+      } catch {}
+    }
+
+    console.log(`  Convergence events written:        ${convergenceWritten}`)
+    console.log(`  Quantum operating mode written:    ${operatingModeWritten}`)
+    console.log(`  Full field architecture written:   ${fullLockWritten}`)
+    lastDailyQuantumOperatingModeRun = new Date()
+    isDailyQuantumOperatingModeRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: convergenceWritten + operatingModeWritten + fullLockWritten }
+  } catch (error: any) {
+    console.error('Daily quantum operating mode check failed:', error.message)
+    isDailyQuantumOperatingModeRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -5955,6 +6125,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily stellar navigation check: 12 PM UTC every day (Job 49)')
   console.log('   - Daily morning ignition check: 10 AM UTC every day (J51)')
   console.log('   - Weekly morning sovereignty audit: 8 AM UTC every Sunday (J52)')
+  console.log('   - Daily quantum operating mode check: 5 AM UTC every day (J53)')
   console.log('')
 
   // Check every hour for scheduled jobs
