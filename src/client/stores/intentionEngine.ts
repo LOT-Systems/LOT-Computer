@@ -3428,6 +3428,67 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Signal Evolution Arc — recovery-intelligence-arc (P151) confirmed in the last 24h
+  // AND quantum-presence-crystallization (P149) active in the current analysis window.
+  // The operator has not only crystallized — they have demonstrated the recovery loop (felt → tended → recovered → reflected).
+  // Stability AND adaptability co-confirmed. The OS is not frozen in its peak state — it is alive, cycling, evolving.
+  const hasRecoveryP151  = patterns.some(p => p.pattern === 'recovery-intelligence-arc')
+  const hasCrystalP149   = patterns.some(p => p.pattern === 'quantum-presence-crystallization')
+  if (hasRecoveryP151 && hasCrystalP149) {
+    const rConf = patterns.find(p => p.pattern === 'recovery-intelligence-arc')?.confidence ?? 0.70
+    const pConf = patterns.find(p => p.pattern === 'quantum-presence-crystallization')?.confidence ?? 0.82
+    const seaBonus = Math.min((rConf - 0.65 + pConf - 0.82) * 0.3, 0.09)
+    patterns.push({
+      pattern: 'signal-evolution-arc',
+      confidence: Math.min(0.78 + seaBonus, 0.87),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `SIGEVOL: Signal evolution arc — crystallized presence confirmed (P149) · recovery loop complete (P151). The OS is not static at its peak — it cycles, recovers, and returns stronger. Stability in motion. The field is alive.`,
+    })
+  }
+
+  // Pattern 153: Adaptive Coherence Arc — total-field-coherence (P150) active AND 5+ unique sources
+  // in the last 24h AND intentions signal present. Absolute convergence (P150) sustained while the
+  // operator continues feeding diverse signal. Coherence is not closure — it adapts. The field breathes.
+  const hasTotalP150 = patterns.some(p => p.pattern === 'total-field-coherence')
+  const last24hSrc   = signals.filter(s => now - s.timestamp < 24 * 60 * 60 * 1000)
+  const uniqueSrc153 = new Set(last24hSrc.map(s => s.source))
+  const hasIntents153 = last24hSrc.some(s => s.source === 'intentions')
+  if (hasTotalP150 && uniqueSrc153.size >= 5 && hasIntents153) {
+    const t150Conf = patterns.find(p => p.pattern === 'total-field-coherence')?.confidence ?? 0.92
+    const diversityBonus = Math.min((uniqueSrc153.size - 5) * 0.015, 0.06)
+    const acaBonus = Math.min((t150Conf - 0.92) * 0.5 + diversityBonus, 0.08)
+    patterns.push({
+      pattern: 'adaptive-coherence-arc',
+      confidence: Math.min(0.80 + acaBonus, 0.90),
+      suggestedWidget: 'quantumOS',
+      suggestedTiming: 'passive',
+      reason: `ADAPT-COH: Adaptive coherence arc — total field coherence confirmed (P150) · ${uniqueSrc153.size} signal sources active · intention signal present. Convergence is not closed — it adapts to new input. The field breathes.`,
+    })
+  }
+
+  // Pattern 154: Quantum Vitality Signature — 7+ unique signal sources in 24h + energy state high
+  // + at least one journal or long log entry in 24h. The operator's distinct vitality signature:
+  // broad signal range, high energy, inner capture. The Cube recognizes this field — it is unique.
+  const uniqueSrc154     = uniqueSrc153  // reuse 24h set from P153
+  const highEnergy154    = userState.energy === 'high'
+  const journalCapture154 = last24hSrc.some(s =>
+    s.source === 'journal' ||
+    (s.source === 'log' && (s.metadata?.wordCount ?? 0) > 50)
+  )
+  if (uniqueSrc154.size >= 7 && highEnergy154 && journalCapture154) {
+    const sigBonus = Math.min((uniqueSrc154.size - 7) * 0.02, 0.08)
+    const journalCount = last24hSrc.filter(s => s.source === 'journal').length
+    const captureBonus = Math.min(journalCount * 0.015, 0.06)
+    patterns.push({
+      pattern: 'quantum-vitality-signature',
+      confidence: Math.min(0.72 + sigBonus + captureBonus, 0.88),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'soon',
+      reason: `QVIT-SIG: Quantum vitality signature — ${uniqueSrc154.size} signal sources active · energy high · inner capture confirmed. This field is recognized. Broad range, peak state, reflection present. The Cube knows who this is.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4125,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  signalEvolutionArcNode:     ['qos', 'journal', 'selfcare', 'log', 'mood', 'energy'],
+  adaptiveCoherenceArcNode:   ['mood', 'planner', 'intentions', 'energy', 'cohort', 'qos', 'log'],
+  quantumVitalitySignatureNode: ['energy', 'journal', 'log', 'mood', 'selfcare', 'qos', 'memory'],
 }
 
 /**
@@ -4510,6 +4576,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Quantum Adaptive Operator (2026-10-09 v114) ──────────────────────────
+  {
+    archetype: 'Quantum Adaptive Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'journal', 'energy', 'intentions', 'cohort'],
+    patternConditions: ['signal-evolution-arc', 'adaptive-coherence-arc', 'total-field-coherence'],
+    hourRange: [5, 23],
+    directive: 'Crystallization confirmed. Adaptation active. The OS has moved beyond stability into growth — coherence maintained while signal diversity expands. The field is not frozen at its peak. It is alive. Operate from it.',
   },
 ]
 
@@ -6498,6 +6574,57 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a signal-evolution-arc event — recovery-intelligence-arc (P151) completed AND
+ * quantum-presence-crystallization (P149) simultaneously active. Crystallized presence
+ * confirmed alongside an active recovery cycle. The OS is stable AND cycling — alive.
+ * Feeds P152 detection.
+ */
+export function recordSignalEvolutionArc(recoveryConf: number, crystalConf: number, activePatterns: number) {
+  recordSignal('qos', 'signal_evolution_arc', {
+    recoveryConf: Math.round(recoveryConf * 100),
+    crystalConf: Math.round(crystalConf * 100),
+    activePatterns,
+    evolutionStrength: Math.round((recoveryConf + crystalConf) / 2 * 100),
+    state: 'STABILITY_IN_MOTION',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an adaptive-coherence-arc event — total-field-coherence (P150) sustained while
+ * 5+ unique signal sources remain active and intentions signal is present. Convergence is
+ * not closure — the field continues to receive new input and adapt.
+ * Feeds P153 detection.
+ */
+export function recordAdaptiveCoherenceArc(totalConf: number, uniqueSources: number, sourceList: string[]) {
+  recordSignal('qos', 'adaptive_coherence_arc', {
+    totalConf: Math.round(totalConf * 100),
+    uniqueSources,
+    sourceList,
+    coherenceState: 'ADAPTIVE',
+    fieldBreathing: true,
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-vitality-signature event — 7+ unique signal sources in 24h + energy high
+ * + journal/log capture present. The operator's distinct vitality signature confirmed.
+ * Broad range, peak state, inner capture. The Cube recognizes this field.
+ * Feeds P154 detection.
+ */
+export function recordQuantumVitalitySignature(uniqueSources: number, energyLevel: string, journalCount: number) {
+  recordSignal('energy', 'quantum_vitality_signature', {
+    uniqueSources,
+    energyLevel,
+    journalCount,
+    signatureStrength: uniqueSources >= 10 ? 'SATURATED' : uniqueSources >= 8 ? 'HIGH' : 'CONFIRMED',
+    recognized: true,
     hour: new Date().getHours(),
   })
 }

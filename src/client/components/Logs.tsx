@@ -3629,6 +3629,102 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'signal_evolution_arc') {
+          const recoveryConf = log.metadata?.recoveryConf as number | undefined
+          const crystalConf = log.metadata?.crystalConf as number | undefined
+          const evolutionStrength = log.metadata?.evolutionStrength as number | undefined
+          const state = log.metadata?.state as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SIGEVOL:" blockView>
+                <div className="uppercase tracking-widest mb-4">SIGNAL EVOLUTION ARC</div>
+                {crystalConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRYSTAL CONF</span>
+                    <span className="tabular-nums">{crystalConf}%</span>
+                  </div>
+                )}
+                {recoveryConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECOVERY CONF</span>
+                    <span className="tabular-nums">{recoveryConf}%</span>
+                  </div>
+                )}
+                {evolutionStrength !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">EVOLUTION STR</span>
+                    <span className="tabular-nums">{evolutionStrength}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">STABILITY IN MOTION</div>
+                {state && <div className="opacity-30 tabular-nums">{state}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'adaptive_coherence_arc') {
+          const totalConf = log.metadata?.totalConf as number | undefined
+          const uniqueSources = log.metadata?.uniqueSources as number | undefined
+          const sourceList = log.metadata?.sourceList as string[] | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="ADAPT-COH:" blockView>
+                <div className="uppercase tracking-widest mb-4">ADAPTIVE COHERENCE ARC</div>
+                {totalConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TOTAL FIELD CONF</span>
+                    <span className="tabular-nums">{totalConf}%</span>
+                  </div>
+                )}
+                {uniqueSources !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SIGNAL SOURCES</span>
+                    <span className="tabular-nums">{uniqueSources}</span>
+                  </div>
+                )}
+                {sourceList && sourceList.length > 0 && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES</span>
+                    <span className="tabular-nums text-right">{sourceList.slice(0, 5).join(' · ')}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">COHERENCE IS NOT CLOSURE — THE FIELD BREATHES</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_vitality_signature') {
+          const uniqueSources = log.metadata?.uniqueSources as number | undefined
+          const energyLevel = log.metadata?.energyLevel as string | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const signatureStrength = log.metadata?.signatureStrength as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QVIT-SIG:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM VITALITY SIGNATURE</div>
+                {uniqueSources !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SIGNAL SOURCES</span>
+                    <span className="tabular-nums">{uniqueSources}</span>
+                  </div>
+                )}
+                {energyLevel && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ENERGY</span>
+                    <span className="tabular-nums uppercase">{energyLevel}</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL CAPTURE</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {signatureStrength && (
+                  <div className="opacity-40 tabular-nums uppercase">SIGNATURE: {signatureStrength}</div>
+                )}
+                <div className="opacity-30 tabular-nums">THE CUBE RECOGNIZES THIS FIELD</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

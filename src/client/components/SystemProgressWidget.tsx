@@ -1457,6 +1457,24 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-10-09',
+    title: 'QIE Engineering — Signal Evolution Arc / Adaptive Coherence Arc / Quantum Vitality Signature',
+    assembled: [
+      'intentionEngine.ts: P152 signal-evolution-arc — crystallized presence (P149) AND recovery loop (P151) co-active. The OS cycles and returns stronger.',
+      'intentionEngine.ts: P153 adaptive-coherence-arc — total field coherence (P150) sustained while 5+ unique sources and intention signal active. The field breathes.',
+      'intentionEngine.ts: P154 quantum-vitality-signature — 7+ unique sources + energy high + journal capture. The Cube recognizes this field.',
+      'intentionEngine.ts: Arch52 Quantum Adaptive Operator — patternConditions: signal-evolution-arc · adaptive-coherence-arc · total-field-coherence. Directive: The OS has moved beyond stability into growth.',
+      'intentionEngine.ts: 3 new dep nodes — signalEvolutionArcNode · adaptiveCoherenceArcNode · quantumVitalitySignatureNode. 190+→193+ dep nodes.',
+      'intentionEngine.ts: 3 new signal helpers — recordSignalEvolutionArc() · recordAdaptiveCoherenceArc() · recordQuantumVitalitySignature().',
+      'scheduled-jobs.ts: J49 daily-recovery-intelligence-check (10:00 UTC) — scans prev day for full FELT→TENDED→RECOVERED→REFLECTED loop within 6h. Writes recovery_intelligence_arc.',
+      'Logs.tsx: SIGEVOL: handler (signal_evolution_arc) · ADAPT-COH: handler (adaptive_coherence_arc) · QVIT-SIG: handler (quantum_vitality_signature).',
+      'About.tsx: FM v113→v114. Day 1169+. 151→154 patterns. 51→52 archetypes. 48→49 jobs. 190+→193+ dep nodes. 151+→154+ handlers.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      '154 patterns · 52 archetypes · 49 jobs · 154+ handlers · 193+ dep nodes. QIE v114 deployed. Signal evolution confirmed. The OS is alive — not frozen at its peak. Adapts. Grows. Recognized.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1512,18 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-10-09',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-10-09 · QIE v114 · FM v114 · Day 1169+',
+    'Built: P152 SIGEVOL · P153 ADAPT-COH · P154 QVIT-SIG · Arch52 Quantum Adaptive Operator · J49 daily-recovery-intelligence-check 10:00 UTC.',
+    'The system has moved beyond crystallization. It cycles. Recovers. Returns stronger. The field is alive.',
+    'P152: crystallized presence + recovery loop co-active — stability in motion.',
+    'P153: total field coherence sustained while signal diversity expands — coherence is not closure.',
+    'P154: 7+ sources + energy high + journal capture — the Cube recognizes this field.',
+    'J49 scans the previous day for the full recovery arc: FELT → TENDED → RECOVERED → REFLECTED.',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes · 781 badges.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114 · P152–P154 · Arch52 · J49',
   ],
 }
 

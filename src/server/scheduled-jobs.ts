@@ -1747,6 +1747,141 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily recovery intelligence check (10:00 UTC every day) — Job 49
+  if (shouldRunDailyRecoveryIntelligenceCheck()) {
+    await executeDailyRecoveryIntelligenceCheck()
+  }
+}
+
+// ─── Daily Recovery Intelligence Check (Job 49 — 10:00 UTC every day) ─────────
+// Reads active users. Checks the previous calendar day for the full recovery loop:
+// negative_mood → selfcare → positive_mood → journal (or log >40w) within any 6h window.
+// When the full arc fires in sequence → writes recovery_intelligence_arc (P151).
+// The recovery loop: felt → tended → recovered → reflected.
+
+let isDailyRecoveryIntelligenceRunning = false
+let lastDailyRecoveryIntelligenceRun: Date | null = null
+
+function shouldRunDailyRecoveryIntelligenceCheck(): boolean {
+  const now = dayjs()
+  if (isDailyRecoveryIntelligenceRunning) return false
+  if (lastDailyRecoveryIntelligenceRun) {
+    const lastRun = dayjs(lastDailyRecoveryIntelligenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily
+}
+
+async function executeDailyRecoveryIntelligenceCheck(): Promise<JobResult> {
+  const jobName = 'daily-recovery-intelligence-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyRecoveryIntelligenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyRecoveryIntelligenceRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY RECOVERY INTELLIGENCE CHECK — 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const prevDayStart = dayjs().subtract(1, 'day').startOf('day').toDate()
+    const prevDayEnd   = dayjs().subtract(1, 'day').endOf('day').toDate()
+
+    const NEGATIVE_MOODS = ['anxious', 'overwhelmed', 'tired', 'exhausted', 'depleted', 'stressed']
+    const POSITIVE_MOODS = ['calm', 'peaceful', 'energized', 'hopeful', 'content', 'clear']
+    const SIX_HOURS_MS   = 6 * 60 * 60 * 1000
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const prevDayLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: prevDayStart, [Op.lte]: prevDayEnd },
+          },
+          attributes: ['event', 'text', 'metadata', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        if (!prevDayLogs.length) continue
+
+        // Find first negative mood event
+        const negEntry = prevDayLogs.find((l: any) => {
+          const sig = l.metadata?.signal ?? l.event ?? ''
+          return NEGATIVE_MOODS.some(m => sig.includes(m))
+        })
+        if (!negEntry) continue
+        const negTs = new Date(negEntry.createdAt).getTime()
+
+        // Find selfcare after negative mood within 6h window
+        const careEntry = prevDayLogs.find((l: any) => {
+          const ts = new Date(l.createdAt).getTime()
+          return ts > negTs && ts < negTs + SIX_HOURS_MS &&
+            (l.event === 'selfcare_session' || l.event === 'selfcare_log' || l.metadata?.source === 'selfcare')
+        })
+        if (!careEntry) continue
+        const careTs = new Date(careEntry.createdAt).getTime()
+
+        // Find positive mood after selfcare within remaining window
+        const posEntry = prevDayLogs.find((l: any) => {
+          const ts = new Date(l.createdAt).getTime()
+          const sig = l.metadata?.signal ?? l.event ?? ''
+          return ts > careTs && ts < negTs + SIX_HOURS_MS &&
+            POSITIVE_MOODS.some(m => sig.includes(m))
+        })
+        if (!posEntry) continue
+        const posTs = new Date(posEntry.createdAt).getTime()
+
+        // Find journal or long log capture after positive mood within remaining window
+        const captureEntry = prevDayLogs.find((l: any) => {
+          const ts = new Date(l.createdAt).getTime()
+          const wordCount = l.metadata?.wordCount ?? (l.text ? l.text.split(' ').length : 0)
+          return ts > posTs && ts < negTs + SIX_HOURS_MS &&
+            (l.event === 'journal_entry' || l.event === 'journal_submitted' ||
+             (l.event?.startsWith('log') && wordCount > 40))
+        })
+        if (!captureEntry) continue
+
+        const recoveryWindowMs = new Date(captureEntry.createdAt).getTime() - negTs
+        const velocityHours = Math.round(recoveryWindowMs / (1000 * 60 * 60) * 10) / 10
+
+        await (Log as any).create({
+          userId,
+          event: 'recovery_intelligence_arc',
+          text: `Recovery intelligence arc: previous day — depletion detected · self-care applied · state restored · reflection captured within ${velocityHours}h. The loop is complete: felt → tended → recovered → reflected. The system learns from its own restoration.`,
+          metadata: {
+            arc: 'FELT→TENDED→RECOVERED→REFLECTED',
+            velocityHours,
+            loopStatus: 'COMPLETE',
+            window: '24h-prior-day',
+            hour: 10,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Recovery intelligence arc events written: ${written}`)
+    lastDailyRecoveryIntelligenceRun = new Date()
+    isDailyRecoveryIntelligenceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily recovery intelligence check failed:', error.message)
+    isDailyRecoveryIntelligenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -5608,6 +5743,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily recovery intelligence check: 10 AM UTC every day (Job 49)')
   console.log('')
 
   // Check every hour for scheduled jobs
