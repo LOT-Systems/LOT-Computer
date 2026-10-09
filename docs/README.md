@@ -20,6 +20,7 @@ Core technical documentation about system architecture, engines, and implementat
 - Memory Engine Documentation - Complete Memory Engine system docs
 - Psychological Depth Analysis - User analysis engine documentation
 - Quantum Intent Engine - Intent pattern recognition system
+- [Usership 12-Month Evolution](./technical/LOT-USERSHIP-12-MONTH-EVOLUTION.md) - Month-by-month UI, Memory Chapter compression, Machiavelli calibration
 
 ### [Deployment Documentation](./deployment/)
 Guides for deploying and managing the application in production.
