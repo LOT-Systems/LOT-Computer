@@ -380,6 +380,10 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'mail': {
+          if (data.receiverId === req.user.id) write({ event, data })
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4082,6 +4086,115 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — "/email to Hitomi." in Log → arrives in Sync (inbox)
+  // Recipients resolve inside the LOT Community: first name (or email),
+  // cohort neighbours (same city/country) win ties.
+  // ============================================================================
+
+  fastify.post('/mail', async (req: FastifyRequest<{
+    Body: { to: string; body: string }
+  }>, reply) => {
+    try {
+      const to = String(req.body?.to || '').trim()
+      const body = String(req.body?.body || '').trim().slice(0, 2000)
+      if (!to || !body) return reply.status(400).send({ error: 'Recipient and message are required' })
+
+      const candidates = await fastify.models.User.findAll({
+        where: {
+          id: { [Op.not]: req.user.id },
+          [Op.or]: [
+            Sequelize.where(Sequelize.fn('lower', Sequelize.col('firstName')), to.toLowerCase()),
+            Sequelize.where(Sequelize.fn('lower', Sequelize.col('email')), to.toLowerCase()),
+          ],
+        },
+        limit: 10,
+      })
+      if (candidates.length === 0) return reply.status(404).send({ error: `No LOT member named "${to}"` })
+
+      let receiver = candidates[0]
+      if (candidates.length > 1) {
+        const near = candidates.filter(
+          (u: any) => u.city && u.city === (req.user as any).city && u.country === (req.user as any).country
+        )
+        if (near.length !== 1) {
+          return reply.status(409).send({
+            error: `Several members named "${to}" — use their email`,
+            matches: candidates.map((u: any) => ({ id: u.id, firstName: u.firstName, lastName: u.lastName, city: u.city })),
+          })
+        }
+        receiver = near[0]
+      }
+
+      const mail = await fastify.models.Mail.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        body,
+      })
+      const senderName = `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim()
+      sync.emit('mail', {
+        id: mail.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        senderName,
+        body: mail.body,
+        readAt: null,
+        createdAt: mail.createdAt,
+      })
+      return reply.send({
+        id: mail.id,
+        to: { id: receiver.id, firstName: receiver.firstName, lastName: receiver.lastName },
+      })
+    } catch (error) {
+      console.error('Error sending mail:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  fastify.get('/mail', async (req, reply) => {
+    try {
+      const rows = await fastify.models.Mail.findAll({
+        where: { receiverId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 50,
+      })
+      const senders = await fastify.models.User.findAll({
+        where: { id: Array.from(new Set(rows.map((r) => r.senderId))) },
+        attributes: ['id', 'firstName', 'lastName'],
+      })
+      const byId = new Map(senders.map((u) => [u.id, u]))
+      return reply.send(
+        rows.map((r) => {
+          const u: any = byId.get(r.senderId)
+          return {
+            id: r.id,
+            senderId: r.senderId,
+            senderName: u ? `${u.firstName || ''} ${u.lastName || ''}`.trim() : 'Unknown',
+            body: r.body,
+            readAt: r.readAt,
+            createdAt: r.createdAt,
+          }
+        })
+      )
+    } catch (error) {
+      console.error('Error fetching mail:', error)
+      return reply.status(500).send({ error: 'Failed to fetch email' })
+    }
+  })
+
+  fastify.post('/mail/read', async (req: FastifyRequest<{ Body: { id: string } }>, reply) => {
+    try {
+      await fastify.models.Mail.update(
+        { readAt: new Date() },
+        { where: { id: req.body?.id, receiverId: req.user.id, readAt: null } }
+      )
+      return reply.send({ ok: true })
+    } catch (error) {
+      console.error('Error marking mail read:', error)
+      return reply.status(500).send({ error: 'Failed to mark read' })
     }
   })
 

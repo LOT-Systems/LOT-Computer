@@ -24,6 +24,8 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useMail,
+  useMarkMailRead,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -71,6 +73,10 @@ export const Sync = React.memo(function SyncInner() {
   }, [me])
 
   const { data: fetchedMessages } = useChatMessages()
+  const { data: inbox } = useMail()
+  const { mutate: markMailRead } = useMarkMailRead({
+    onSuccess: () => queryClient.invalidateQueries(['/api/mail']),
+  })
   const { mutate: createChatMessage } = useCreateChatMessage({
     onSuccess: () => setMessage(''),
   })
@@ -117,7 +123,11 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeMailListener } = sync.listen('mail', () => {
+      queryClient.invalidateQueries(['/api/mail'])
+    })
     return () => {
+      disposeMailListener()
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
     }
@@ -213,6 +223,28 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {!!inbox?.length && (
+        <div className="mb-40">
+          <div className="text-acc/40 mb-8">
+            EMAIL · {inbox.filter((m) => !m.readAt).length} NEW
+          </div>
+          {inbox.slice(0, 10).map((m) => (
+            <div
+              key={m.id}
+              className={cn(
+                'flex items-start gap-x-8 cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded',
+                m.readAt && 'text-acc/40'
+              )}
+              onClick={() => !m.readAt && markMailRead({ id: m.id })}
+            >
+              <span className="whitespace-nowrap">{m.readAt ? '✉' : '●'} {m.senderName}</span>
+              <div className="whitespace-breakspaces" style={{ wordBreak: 'break-word' }}>{m.body}</div>
+              <span className="ml-auto whitespace-nowrap text-acc/40">{dayjs(m.createdAt).format('MMM D, HH:mm')}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {

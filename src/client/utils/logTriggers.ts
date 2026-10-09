@@ -40,6 +40,7 @@ export type LogTrigger =
   | 'qi-rfi'            // /qi — Quantum Intelligence RFI (Request for Information)
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
+  | 'email-compose'     // /email to Name. message — LOT® Email (Ctrl+Enter sends)
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
 
 interface TriggerRule {
@@ -66,6 +67,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'qi-rfi',         emojis: [],        keywords: ['qi'] },
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
+  { trigger: 'email-compose', emojis: [],        keywords: ['email'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
 ]
 

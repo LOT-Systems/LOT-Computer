@@ -10,7 +10,8 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
-import { useLogs, useUpdateLog } from '#client/queries'
+import { useLogs, useUpdateLog, useSendMail } from '#client/queries'
+import { parseEmailCommand } from '#shared/email-command'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
@@ -3707,6 +3708,15 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const { mutate: sendMail } = useSendMail({
+    onSuccess: (res) => {
+      setEmailStatus(`SENT → ${`${res.to.firstName || ''} ${res.to.lastName || ''}`.trim().toUpperCase()}\nDELIVERED TO SYNC`)
+    },
+    onError: (err: any) => {
+      setEmailStatus(`FAILED — ${String(err?.response?.data?.error || 'EMAIL OFFLINE').toUpperCase()}`)
+    },
+  })
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3911,6 +3921,11 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        const mailCmd = parseEmailCommand(valueRef.current)
+        if (mailCmd) {
+          if (mailCmd.body) sendMail({ to: mailCmd.to, body: mailCmd.body })
+          else setEmailStatus('EMPTY MESSAGE — /email to Name. Message')
+        }
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -3921,7 +3936,7 @@ const NoteEditor = ({
       }
       // Regular Enter key creates newline (default behavior)
     },
-    [primary]
+    [primary, sendMail]
   )
 
   // --------------------------------------------------------------------
@@ -4138,6 +4153,7 @@ const NoteEditor = ({
           '/synth        Toggle keyboard sound',
           '/radio        Toggle radio',
           '/night        Dark mode',
+          '/email to Name.  Send LOT Email (Ctrl+Enter) — arrives in Sync',
           '/how          Open LOT AI check-in (System tab)',
           '/system       This help screen',
           '',
@@ -4145,6 +4161,8 @@ const NoteEditor = ({
           'Ctrl+Enter    Save log immediately',
         ]
         setSystemHelp(lines.join('\n'))
+      } else if (trigger === 'email-compose') {
+        setEmailStatus('COMPOSE — /email to Name. Message\nCTRL+ENTER TO SEND')
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4384,6 +4402,13 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailStatus && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-80" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{emailStatus}</div>
             </Block>
           </div>
         )}
