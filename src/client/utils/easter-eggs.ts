@@ -918,6 +918,22 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awardBadge('world_sleep_day')
     awarded.push('world_sleep_day')
   }
+  // ── Calendar v24 — THE CODE CALENDAR ────────────────────────────────────────
+  // UNIX Epoch Day: January 1 — UNIX time origin (1970)
+  if (!hasBadge('unix_epoch_day') && month === 1 && day === 1) {
+    awardBadge('unix_epoch_day')
+    awarded.push('unix_epoch_day')
+  }
+  // Turing Birthday: June 23 — Alan Turing born 1912
+  if (!hasBadge('turing_birthday') && month === 6 && day === 23) {
+    awardBadge('turing_birthday')
+    awarded.push('turing_birthday')
+  }
+  // Ada Lovelace Day: December 10 — Ada Lovelace born 1815
+  if (!hasBadge('ada_lovelace_day') && month === 12 && day === 10) {
+    awardBadge('ada_lovelace_day')
+    awarded.push('ada_lovelace_day')
+  }
 
   return awarded
 }
@@ -1582,6 +1598,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bcollective[\s-]?unconscious\b|\bindividuation\b|\bjung\b/i,           badge: 'jung_signal' },
   { patterns: /\bbenzene[\s-]?ring\b|\bsnake[\s-]?eating[\s-]?(?:its[\s-]?)?tail\b|\bkekule\b/i, badge: 'kekule_vision' },
   { patterns: /\bi[\s-]?am[\s-]?dreaming\b/i,                                         badge: 'lucid_master' },
+  // ── v26 — THE CONSOLE LOG word turns ──────────────────────────────────────────
+  { patterns: /\bsudo\b|\broot[\s-]?access\b|\boverride[\s-]?mode\b/i,                badge: 'sudo_moment' },
+  { patterns: /\bdebugging\b|\bfound[\s-]?the[\s-]?bug\b|\btraced[\s-]?the[\s-]?error\b/i, badge: 'debug_complete' },
+  { patterns: /\bcommitted\b|\bmerged[\s-]?(?:into|the|my)\b|\bdeployed\b/i,          badge: 'commit_made' },
+  { patterns: /\bcompiled\b|\bit[\s-]?builds\b|\bbuild[\s-]?passed\b|\bbuilds[\s-]?clean\b/i, badge: 'compile_success' },
+  { patterns: /\bkernel[\s-]?panic\b|\bsystem[\s-]?crash(?:ed)?\b|\beverything[\s-]?broke\b/i, badge: 'kernel_panic' },
+  { patterns: /\buptime\b|\brunning[\s-]?clean\b|\bno[\s-]?crashes\b/i,               badge: 'uptime_record' },
+  { patterns: /\breceived[\s-]?your[\s-]?message\b|\bgot[\s-]?through\b|\bcopy[\s-]?that\b/i, badge: 'packet_received' },
+  { patterns: /\bflush(?:ing)?\b|\bclearing[\s-]?(?:my[\s-]?)?cache\b|\bempty[\s-]?cache\b/i, badge: 'buffer_flush' },
+  { patterns: /\broot[\s-]?cause\b|\bcore[\s-]?issue\b|\btraced[\s-]?it[\s-]?to[\s-]?(?:the[\s-]?)?source\b/i, badge: 'root_cause' },
+  { patterns: /\bforking\b|\btaking[\s-]?a[\s-]?different[\s-]?path\b|\bbranching[\s-]?off\b/i, badge: 'fork_process' },
+  { patterns: /\bmemory[\s-]?leak\b|\bholding[\s-]?old[\s-]?patterns\b|\bcan'?t[\s-]?let[\s-]?go\b/i, badge: 'memory_leak' },
+  { patterns: /\bstack[\s-]?trace\b|\bretracing[\s-]?my[\s-]?steps\b|\btracing[\s-]?back\b/i, badge: 'stack_trace' },
+  // ── v23 Secret Boss — THE MACHINE VAULT word triggers ─────────────────────────
+  { patterns: /\bturing[\s-]?test\b|\bturing[\s-]?complete\b|\bimitation[\s-]?game\b/i, badge: 'turing_signal' },
+  { patterns: /\bada[\s-]?lovelace\b|\bfirst[\s-]?algorithm\b|\bfirst[\s-]?programmer\b/i, badge: 'lovelace_key' },
+  { patterns: /\bvon[\s-]?neumann\b|\bstored[\s-]?program\b|\bself[\s-]?replication\b/i, badge: 'von_neumann_code' },
 ]
 
 /**
@@ -3006,6 +3039,64 @@ export function checkSleepRhythm(): BadgeType | null {
     if (updated.length >= 5 && updated.slice(0, 5).every(h => h === String(currentHour))) {
       awardBadge('sleep_rhythm')
       return 'sleep_rhythm'
+    }
+  } catch { /* non-critical */ }
+  return null
+}
+
+// ── v26 — THE CONSOLE LOG behavioral functions ─────────────────────────────────
+
+const CONSOLE_WORDS_V26 = [
+  /\bsudo\b|\broot[\s-]?access\b|\boverride[\s-]?mode\b/i,
+  /\bdebugging\b|\bfound[\s-]?the[\s-]?bug\b|\btraced[\s-]?the[\s-]?error\b/i,
+  /\bcommitted\b|\bmerged[\s-]?(?:into|the|my)\b|\bdeployed\b/i,
+  /\bcompiled\b|\bit[\s-]?builds\b|\bbuild[\s-]?passed\b/i,
+  /\bkernel[\s-]?panic\b|\bsystem[\s-]?crash(?:ed)?\b|\beverything[\s-]?broke\b/i,
+  /\buptime\b|\brunning[\s-]?clean\b|\bno[\s-]?crashes\b/i,
+  /\breceived[\s-]?your[\s-]?message\b|\bgot[\s-]?through\b|\bcopy[\s-]?that\b/i,
+  /\bflush(?:ing)?\b|\bclearing[\s-]?(?:my[\s-]?)?cache\b|\bempty[\s-]?cache\b/i,
+  /\broot[\s-]?cause\b|\bcore[\s-]?issue\b|\btraced[\s-]?it[\s-]?to[\s-]?(?:the[\s-]?)?source\b/i,
+  /\bforking\b|\btaking[\s-]?a[\s-]?different[\s-]?path\b|\bbranching[\s-]?off\b/i,
+  /\bmemory[\s-]?leak\b|\bholding[\s-]?old[\s-]?patterns\b|\bcan'?t[\s-]?let[\s-]?go\b/i,
+  /\bstack[\s-]?trace\b|\bretracing[\s-]?my[\s-]?steps\b|\btracing[\s-]?back\b/i,
+]
+
+/** terminal_session: 3+ Console Log (v26) words in one journal entry */
+export function checkTerminalSession(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('terminal_session')) return null
+  const matchCount = CONSOLE_WORDS_V26.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('terminal_session')
+    return 'terminal_session'
+  }
+  return null
+}
+
+/** clean_boot: Journal entry written before 08:00 local */
+export function checkCleanBoot(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('clean_boot')) return null
+  const hour = new Date().getHours()
+  if (hour >= 0 && hour < 8) {
+    awardBadge('clean_boot')
+    return 'clean_boot'
+  }
+  return null
+}
+
+/** cron_job: Check in at same hour for 5+ consecutive days */
+export function checkCronJob(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('cron_job')) return null
+  try {
+    const logs: string[] = JSON.parse(localStorage.getItem('cron_hour_log') || '[]')
+    const currentHour = new Date().getHours()
+    const updated = [String(currentHour), ...logs].slice(0, 7)
+    localStorage.setItem('cron_hour_log', JSON.stringify(updated))
+    if (updated.length >= 5 && updated.slice(0, 5).every(h => h === String(currentHour))) {
+      awardBadge('cron_job')
+      return 'cron_job'
     }
   } catch { /* non-critical */ }
   return null

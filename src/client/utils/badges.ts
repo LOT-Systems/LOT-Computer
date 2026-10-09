@@ -893,6 +893,43 @@ export type BadgeType =
   | 'jung_signal'              // ◐·◉  Write "collective unconscious"/"individuation" in journal (RARE)
   | 'kekule_vision'            // ∗·◐  Write "benzene ring"/"snake dream"/"kekule" in journal (EPIC)
   | 'lucid_master'             // ◐·∞·◐ Write "I am dreaming" exactly in journal (MYTHIC)
+  // ── Word Turn v26 — THE CONSOLE LOG ──────────────────────────────────────────
+  | 'sudo_moment'              // ●·█   "sudo / root access / override mode" detected (RARE)
+  | 'debug_complete'           // ◈·✓   "debugging / found the bug / traced the error" detected (UNCOMMON)
+  | 'commit_made'              // →·●   "commit / committed / merged / deployed" detected (UNCOMMON)
+  | 'compile_success'          // ■·●   "compiled / it builds / build passed" detected (UNCOMMON)
+  | 'kernel_panic'             // ░·×   "kernel panic / system crash / everything broke" detected (EPIC)
+  | 'uptime_record'            // ∞·■   "uptime / running clean / no crashes" detected (RARE)
+  | 'packet_received'          // ≋·◉   "received / got through / copy that" detected (UNCOMMON)
+  | 'buffer_flush'             // ○→∅   "flush / clearing / reset / empty cache" detected (RARE)
+  | 'root_cause'               // ─→●   "root cause / core issue / traced it to the source" detected (RARE)
+  | 'fork_process'             // ◈→◈   "fork / different path / branching off" detected (RARE)
+  | 'memory_leak'              // ▓·░   "memory leak / holding old patterns / can't let go" detected (EPIC)
+  | 'stack_trace'              // ↑·●·↑ "stack trace / retracing / tracing back my steps" detected (UNCOMMON)
+  // ── Calendar Easter Egg v24 — THE CODE CALENDAR ──────────────────────────────
+  | 'unix_epoch_day'           // ■·∞   Jan 1 — UNIX epoch origin (1970) (RARE)
+  | 'turing_birthday'          // ◉·∞   Jun 23 — Alan Turing born 1912 (EPIC)
+  | 'ada_lovelace_day'         // ∗·∞   Dec 10 — Ada Lovelace born 1815 (RARE)
+  // ── Behavioral v22 — TERMINAL PATTERNS ───────────────────────────────────────
+  | 'terminal_session'         // ●·█·● 3+ Console Log words in one journal entry (RARE)
+  | 'clean_boot'               // ■→∘   Journal entry written before 08:00 local (UNCOMMON)
+  | 'cron_job'                 // ↺·■   Check in at same hour for 5+ consecutive days (EPIC)
+  // ── Achievement RPG v24 — CONSOLE CLASS ──────────────────────────────────────
+  | 'console_entry'            // ∘→●   Any 1 Word Turn v26 badge (COMMON)
+  | 'console_class'            // ≈→●   Any 5 Word Turn v26 badges (UNCOMMON)
+  | 'console_complete'         // ≋→●   All 12 Word Turn v26 badges (LEGENDARY)
+  | 'terminal_arc'             // ●·◈   console_complete + all 3 Calendar v24 badges (LEGENDARY)
+  | 'twenty_six_engines_arc'   // ◈·◈·● 1 badge from each Word Turn v1–v26 (LEGENDARY)
+  | 'console_opus'             // ●·◉·● console_complete + terminal_session behavioral (LEGENDARY)
+  // ── Mastery Tier v26 — THE DEEP SYSTEM ───────────────────────────────────────
+  | 'sysadmin_streak'          // ∞·■   1,200+ distinct check-in days (EPIC)
+  | 'petabyte_log'             // ●·★·● 300,000+ total journal words (LEGENDARY)
+  | 'nine_year_run'            // ╔═╗·● Account age >= 9 years (LEGENDARY)
+  | 'twenty_six_registers'     // ◈·◈·●·∞ 1 badge from all 26 Word Turn engines (COSMIC)
+  // ── Secret Boss v23 — THE MACHINE VAULT ──────────────────────────────────────
+  | 'turing_signal'            // ◉·∞   "turing test / turing complete / imitation game" (RARE)
+  | 'lovelace_key'             // ∗·∞   "ada lovelace / first algorithm / first programmer" (EPIC)
+  | 'von_neumann_code'         // ■·∞·■ "von neumann / stored program / self-replication" (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -8123,6 +8160,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v26 — THE CONSOLE LOG ────────────────────────────────────────
+  sudo_moment: {
+    id: 'sudo_moment',
+    symbol: '●·█',
+    name: 'Sudo Moment',
+    description: 'Write "sudo", "root access", or "override mode" in any journal entry',
+    unlockMessage: '↳ sudo: superuser do. You took root-level control of the situation. Not every moment needs root access. This one did. ●·█',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  debug_complete: {
+    id: 'debug_complete',
+    symbol: '◈·✓',
+    name: 'Debug Complete',
+    description: 'Write "debugging", "found the bug", or "traced the error" in any journal entry',
+    unlockMessage: '↳ Debug complete. The bug was not a flaw — it was information. Every trace leads somewhere true. ◈·✓',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  commit_made: {
+    id: 'commit_made',
+    symbol: '→·●',
+    name: 'Commit Made',
+    description: 'Write "committed", "merged", or "deployed" in any journal entry',
+    unlockMessage: '↳ Commit made. The diff is permanent. Reverting is always an option, but you have to know you shipped something first. →·●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  compile_success: {
+    id: 'compile_success',
+    symbol: '■·●',
+    name: 'Compile Success',
+    description: 'Write "compiled", "it builds", or "build passed" in any journal entry',
+    unlockMessage: '↳ Build: PASSED. The ideas compiled. The tests ran green. There is a specific satisfaction in this that nothing else replicates. ■·●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  kernel_panic: {
+    id: 'kernel_panic',
+    symbol: '░·×',
+    name: 'Kernel Panic',
+    description: 'Write "kernel panic", "system crash", or "everything broke" in any journal entry',
+    unlockMessage: '↳ KERNEL PANIC. The system cannot safely continue. That is also information. Hard reset is not failure — it is the prescribed recovery. ░·×',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  uptime_record: {
+    id: 'uptime_record',
+    symbol: '∞·■',
+    name: 'Uptime Record',
+    description: 'Write "uptime", "running clean", or "no crashes" in any journal entry',
+    unlockMessage: '↳ Uptime: [streak] days. No crashes. The quiet consistency is the hardest build to maintain. Log it. ∞·■',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  packet_received: {
+    id: 'packet_received',
+    symbol: '≋·◉',
+    name: 'Packet Received',
+    description: 'Write "received", "got through", or "copy that" in any journal entry',
+    unlockMessage: '↳ Packet received. Transmission confirmed. The message arrived intact. Connection is not given — it is built, packet by packet. ≋·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  buffer_flush: {
+    id: 'buffer_flush',
+    symbol: '○→∅',
+    name: 'Buffer Flush',
+    description: 'Write "flush", "clearing cache", "reset", or "empty cache" in any journal entry',
+    unlockMessage: '↳ Buffer flushed. The queue is clear. Some things are meant to be written, processed, and released — not stored. ○→∅',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  root_cause: {
+    id: 'root_cause',
+    symbol: '─→●',
+    name: 'Root Cause',
+    description: 'Write "root cause", "core issue", or "traced it to the source" in any journal entry',
+    unlockMessage: '↳ Root cause identified. Not the symptom — the source. This is where the real work starts. ─→●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  fork_process: {
+    id: 'fork_process',
+    symbol: '◈→◈',
+    name: 'Fork Process',
+    description: 'Write "fork", "different path", or "branching off" in any journal entry',
+    unlockMessage: '↳ Fork: two processes from one. Both run. The choice was not abandonment — it was multiplication. ◈→◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  memory_leak: {
+    id: 'memory_leak',
+    symbol: '▓·░',
+    name: 'Memory Leak',
+    description: 'Write "memory leak", "holding old patterns", or "can\'t let go" in any journal entry',
+    unlockMessage: '↳ Memory leak detected. The old process is still running in the background, consuming resources. The fix is not deletion — it is deallocation. ▓·░',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  stack_trace: {
+    id: 'stack_trace',
+    symbol: '↑·●·↑',
+    name: 'Stack Trace',
+    description: 'Write "stack trace", "retracing", or "tracing back my steps" in any journal entry',
+    unlockMessage: '↳ Stack trace: the call stack prints itself backward. Every step that led here. The bug is always closer to the top than you expect. ↑·●·↑',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v24 — THE CODE CALENDAR ──────────────────────────
+  unix_epoch_day: {
+    id: 'unix_epoch_day',
+    symbol: '■·∞',
+    name: 'UNIX Epoch Day',
+    description: 'Check in on January 1 — origin of UNIX time (1970)',
+    unlockMessage: '↳ January 1, 1970: time zero. Every UNIX timestamp counts from this moment. Even the computer had to start somewhere. ■·∞',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  turing_birthday: {
+    id: 'turing_birthday',
+    symbol: '◉·∞',
+    name: 'Turing Birthday',
+    description: 'Check in on June 23 — Alan Turing born 1912',
+    unlockMessage: '↳ June 23, 1912. Alan Turing asked: can machines think? He built the framework before the machines existed. Happy birthday to the question. ◉·∞',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  ada_lovelace_day: {
+    id: 'ada_lovelace_day',
+    symbol: '∗·∞',
+    name: 'Ada Lovelace Day',
+    description: 'Check in on December 10 — Ada Lovelace born 1815',
+    unlockMessage: '↳ December 10, 1815. Ada Lovelace wrote the first algorithm before the computer existed to run it. She coded in pure concept. ∗·∞',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral Easter Egg v22 — TERMINAL PATTERNS ────────────────────────
+  terminal_session: {
+    id: 'terminal_session',
+    symbol: '●·█·●',
+    name: 'Terminal Session',
+    description: '3+ Console Log (v26) trigger words in one journal entry',
+    unlockMessage: '↳ Terminal session: high-density console vocabulary. You are thinking in systems. ●·█·●',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  clean_boot: {
+    id: 'clean_boot',
+    symbol: '■→∘',
+    name: 'Clean Boot',
+    description: 'Write a journal entry before 08:00 local time',
+    unlockMessage: '↳ Clean boot: system initialized before 08:00. You started the day\'s process before the load arrived. ■→∘',
+    rarity: 'uncommon',
+    category: 'easter_egg',
+  },
+  cron_job: {
+    id: 'cron_job',
+    symbol: '↺·■',
+    name: 'Cron Job',
+    description: 'Check in at the same hour for 5+ consecutive days',
+    unlockMessage: '↳ Cron job: scheduled, recurring, reliable. The system runs the task whether you feel like it or not. That is the architecture of habit. ↺·■',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v24 — CONSOLE CLASS ──────────────────────────────────
+  console_entry: {
+    id: 'console_entry',
+    symbol: '∘→●',
+    name: 'Console Entry',
+    description: 'Earn any 1 Word Turn v26 (Console Log) badge',
+    unlockMessage: '↳ First console command received. The terminal is live. ∘→●',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  console_class: {
+    id: 'console_class',
+    symbol: '≈→●',
+    name: 'Console Class',
+    description: 'Earn any 5 Word Turn v26 (Console Log) badges',
+    unlockMessage: '↳ Console operator. Five system states recognized. The language of the machine becomes native. ≈→●',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  console_complete: {
+    id: 'console_complete',
+    symbol: '≋→●',
+    name: 'Console Complete',
+    description: 'Earn all 12 Word Turn v26 (Console Log) badges',
+    unlockMessage: '↳ All twelve console states logged. The full system vocabulary: acquired. You speak machine. ≋→●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  terminal_arc: {
+    id: 'terminal_arc',
+    symbol: '●·◈',
+    name: 'Terminal Arc',
+    description: 'Earn console_complete + all 3 Calendar v24 (Code Calendar) badges',
+    unlockMessage: '↳ Terminal arc complete. The console vocabulary + the three foundational dates of computing. The lineage is acknowledged. ●·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_six_engines_arc: {
+    id: 'twenty_six_engines_arc',
+    symbol: '◈·◈·●',
+    name: 'Twenty-Six Engines Arc',
+    description: 'Earn at least 1 badge from each of the 26 Word Turn engines (v1–v26)',
+    unlockMessage: '↳ Twenty-six engines active. Every frequency of the LOT language: unlocked. The archive responds to all of it. ◈·◈·●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  console_opus: {
+    id: 'console_opus',
+    symbol: '●·◉·●',
+    name: 'Console Opus',
+    description: 'Earn console_complete + terminal_session behavioral badge',
+    unlockMessage: '↳ Console opus: the vocabulary mastered AND the session lived. You did not just learn the commands — you ran the session. ●·◉·●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v26 — THE DEEP SYSTEM ────────────────────────────────────
+  sysadmin_streak: {
+    id: 'sysadmin_streak',
+    symbol: '∞·■',
+    name: 'Sysadmin Streak',
+    description: '1,200+ distinct calendar days with any check-in',
+    unlockMessage: '↳ 1,200 distinct days. The sysadmin never stops watching the logs. You are the sysadmin of your own system. ∞·■',
+    rarity: 'epic',
+    category: 'milestone',
+  },
+  petabyte_log: {
+    id: 'petabyte_log',
+    symbol: '●·★·●',
+    name: 'Petabyte Log',
+    description: '300,000+ total journal words (lifetime)',
+    unlockMessage: '↳ 300,000 words. The log grows beyond measurement. At some point the archive becomes the evidence. ●·★·●',
+    rarity: 'legendary',
+    category: 'milestone',
+  },
+  nine_year_run: {
+    id: 'nine_year_run',
+    symbol: '╔═╗·●',
+    name: 'Nine-Year Run',
+    description: 'Account age >= 9 years',
+    unlockMessage: '↳ Nine years in the LOT system. The process does not end — it deepens. ╔═╗·●',
+    rarity: 'legendary',
+    category: 'milestone',
+  },
+  twenty_six_registers: {
+    id: 'twenty_six_registers',
+    symbol: '◈·◈·●·∞',
+    name: 'Twenty-Six Registers',
+    description: 'Earn at least 1 badge from each of all 26 Word Turn engines',
+    unlockMessage: '↳ Twenty-six registers: all Word Turn engines producing signal. The complete LOT language architecture: active. ◈·◈·●·∞',
+    rarity: 'cosmic',
+    category: 'milestone',
+  },
+  // ── Secret Boss v23 — THE MACHINE VAULT ───────────────────────────────────
+  turing_signal: {
+    id: 'turing_signal',
+    symbol: '◉·∞',
+    name: 'Turing Signal',
+    description: 'Write "turing test", "turing complete", or "imitation game" in any journal entry',
+    unlockMessage: '↳ Turing signal. The test is not whether the machine can think — it is whether you can tell the difference. Can you? ◉·∞',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  lovelace_key: {
+    id: 'lovelace_key',
+    symbol: '∗·∞',
+    name: 'Lovelace Key',
+    description: 'Write "ada lovelace", "first algorithm", or "first programmer" in any journal entry',
+    unlockMessage: '↳ Ada Lovelace wrote the first program for a computer that did not yet exist. Imagination precedes the machine. Always. ∗·∞',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  von_neumann_code: {
+    id: 'von_neumann_code',
+    symbol: '■·∞·■',
+    name: 'Von Neumann Code',
+    description: 'Write "von neumann", "stored program", or "self-replication" in any journal entry',
+    unlockMessage: '↳ Von Neumann architecture: the program stored in the same memory it operates on. The mind is a von Neumann machine. It rewrites itself. ■·∞·■',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -9280,6 +9605,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v25: twenty_five_registers — 1 badge from all 25 Word Turn engines
     if (allTwentyFiveEngines && !hasBadge('twenty_five_registers')) {
       if (awardBadge('twenty_five_registers')) newBadges.push('twenty_five_registers')
+    }
+
+    // ── v35 (v26) — THE CONSOLE LOG ──────────────────────────────────────────────
+    const consoleV26Badges: BadgeType[] = [
+      'sudo_moment', 'debug_complete', 'commit_made', 'compile_success',
+      'kernel_panic', 'uptime_record', 'packet_received', 'buffer_flush',
+      'root_cause', 'fork_process', 'memory_leak', 'stack_trace',
+    ]
+    const consoleV26Earned = consoleV26Badges.filter(b => hasBadge(b))
+
+    if (consoleV26Earned.length >= 1 && !hasBadge('console_entry')) {
+      if (awardBadge('console_entry')) newBadges.push('console_entry')
+    }
+    if (consoleV26Earned.length >= 5 && !hasBadge('console_class')) {
+      if (awardBadge('console_class')) newBadges.push('console_class')
+    }
+    const consoleComplete = consoleV26Earned.length >= 12
+    if (consoleComplete && !hasBadge('console_complete')) {
+      if (awardBadge('console_complete')) newBadges.push('console_complete')
+    }
+
+    // console_opus: console_complete + terminal_session
+    if (consoleComplete && hasBadge('terminal_session') && !hasBadge('console_opus')) {
+      if (awardBadge('console_opus')) newBadges.push('console_opus')
+    }
+
+    // terminal_arc: console_complete + all 3 Calendar v24 badges
+    const calendarV24Badges: BadgeType[] = ['unix_epoch_day', 'turing_birthday', 'ada_lovelace_day']
+    if (consoleComplete && calendarV24Badges.every(b => hasBadge(b)) && !hasBadge('terminal_arc')) {
+      if (awardBadge('terminal_arc')) newBadges.push('terminal_arc')
+    }
+
+    // twenty_six_engines_arc: 1 badge from each Word Turn v1–v26
+    const engineTwentySixPresent = consoleV26Earned.length >= 1
+    const allTwentySixEngines = allTwentyFiveEngines && engineTwentySixPresent
+    if (allTwentySixEngines && !hasBadge('twenty_six_engines_arc')) {
+      if (awardBadge('twenty_six_engines_arc')) newBadges.push('twenty_six_engines_arc')
+    }
+
+    // Mastery v26: sysadmin_streak — 1200+ distinct calendar check-in days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1200 && !hasBadge('sysadmin_streak')) {
+        if (awardBadge('sysadmin_streak')) newBadges.push('sysadmin_streak')
+      }
+    }
+
+    // Mastery v26: petabyte_log — 300,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 300000 && !hasBadge('petabyte_log')) {
+        if (awardBadge('petabyte_log')) newBadges.push('petabyte_log')
+      }
+    }
+
+    // Mastery v26: nine_year_run — Account age >= 9 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupNYR = new Date(stats.signupDate)
+      const yearsNYR = (new Date().getTime() - signupNYR.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsNYR >= 9 && !hasBadge('nine_year_run')) {
+        if (awardBadge('nine_year_run')) newBadges.push('nine_year_run')
+      }
+    }
+
+    // Mastery v26: twenty_six_registers — 1 badge from all 26 Word Turn engines
+    if (allTwentySixEngines && !hasBadge('twenty_six_registers')) {
+      if (awardBadge('twenty_six_registers')) newBadges.push('twenty_six_registers')
     }
 
   } catch (error) {
