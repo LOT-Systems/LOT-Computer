@@ -177,3 +177,51 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Wall-clock Date for an IANA timeZone (isomorphic, Intl-based). The returned
+ * Date's local getters (getHours/getMonth/getDate) read the zone's wall clock,
+ * which is what the functions above expect. Falls back to `now` on a bad zone.
+ */
+export function getWallClockDate(timeZone?: string | null, now: Date = new Date()): Date {
+  if (!timeZone) return now
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+    }).formatToParts(now)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return now
+  }
+}
+
+/**
+ * Personal resonance: how many of the user's own log entries were created
+ * under the same rokuyo / moon phase as the current reading (from the
+ * `astro*` fields snapshotted into each log's context). Ambient, not natal.
+ */
+export function getAstrologyResonance(
+  logs: Array<{ context?: { astroRokuyo?: string | null; astroMoonPhase?: string | null } | null }>,
+  rokuyo: string,
+  moonPhase: string
+): { rokuyoCount: number; moonCount: number; tracked: number } {
+  let rokuyoCount = 0
+  let moonCount = 0
+  let tracked = 0
+  for (const log of logs) {
+    const c = log.context
+    if (!c?.astroRokuyo) continue
+    tracked++
+    if (c.astroRokuyo === rokuyo) rokuyoCount++
+    if (c.astroMoonPhase === moonPhase) moonCount++
+  }
+  return { rokuyoCount, moonCount, tracked }
+}
