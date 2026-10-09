@@ -20,6 +20,11 @@ import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
+import {
+  BASICS_DOCTRINE,
+  BASICS_MANIFEST,
+  BASICS_PRICE_USD,
+} from '#shared/constants/basics'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -374,6 +379,13 @@ let analyticsLastCheck = 0
 const ANALYTICS_CACHE_DURATION = 60 * 1000 // 1 minute
 
 export default async (fastify: FastifyInstance) => {
+  // BASICS OPEN TAB: public manifest. COGS is never served.
+  fastify.get('/basics', async () => ({
+    doctrine: BASICS_DOCTRINE,
+    priceUsdPerMonth: BASICS_PRICE_USD,
+    items: BASICS_MANIFEST,
+  }))
+
   fastify.get('/analytics', async (req, reply) => {
     const now = Date.now()
     if (analyticsCache && (now - analyticsLastCheck) < ANALYTICS_CACHE_DURATION) {
