@@ -19,8 +19,45 @@ type EntryType = 'note' | 'task' | 'call'
 
 type CalendarEntry = {
   date: string
+  time?: string // HH:mm, optional
   text: string
   type: EntryType
+}
+
+type Alert = {
+  id: string
+  label: string
+  entry: CalendarEntry
+}
+
+// Alert thresholds in minutes before the event. Untimed entries alert once
+// at DEFAULT_ALERT_TIME on the day (T-0 only).
+const THRESHOLDS = [15, 5, 0]
+const DEFAULT_ALERT_TIME = '09:00'
+const STALE_MINUTES = 60 // events older than this are not alerted on late load
+const TICK_MS = 15_000
+const FIRED_KEY = 'lot.calendar.fired'
+const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/
+
+const thresholdLabel = (m: number) => (m === 0 ? 'T-0 NOW' : `T-${m} MIN`)
+const entryId = (e: CalendarEntry) => `${e.date}|${e.time || ''}|${e.type}|${e.text}`
+const entryStart = (e: CalendarEntry) =>
+  dayjs(`${e.date} ${e.time || DEFAULT_ALERT_TIME}`)
+
+function loadFired(): Set<string> {
+  try {
+    const raw = localStorage.getItem(FIRED_KEY)
+    return new Set(raw ? (JSON.parse(raw) as string[]) : [])
+  } catch (_) {
+    return new Set()
+  }
+}
+
+function saveFired(set: Set<string>) {
+  try {
+    // keep the set bounded
+    localStorage.setItem(FIRED_KEY, JSON.stringify(Array.from(set).slice(-500)))
+  } catch (_) {}
 }
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -59,25 +96,37 @@ export function CalendarWidget() {
   const [isAddingEntry, setIsAddingEntry] = React.useState(false)
   const [entryText, setEntryText] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
+  const [entryTime, setEntryTime] = React.useState('')
+  const [alerts, setAlerts] = React.useState<Alert[]>([])
+
+  const createLogRef = React.useRef(createLog)
+  createLogRef.current = createLog
+  const entriesRef = React.useRef<CalendarEntry[]>([])
+  const firedRef = React.useRef<Set<string> | null>(null)
 
   const entries = React.useMemo<CalendarEntry[]>(() => {
     return logs
       .filter(log => log.event === 'calendar_entry' && log.metadata)
       .map(log => ({
         date: log.metadata?.date as string,
+        time: TIME_RE.test(String(log.metadata?.time || '')) ? (log.metadata?.time as string) : undefined,
         text: log.metadata?.text as string || log.text || '',
         type: (log.metadata?.entryType as EntryType) || 'note',
       }))
       .filter(e => e.date && e.text)
-      .sort((a, b) => a.date.localeCompare(b.date))
+      .sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')))
   }, [logs])
 
+  // Re-evaluate "upcoming" as time passes
+  const [now, setNow] = React.useState(() => dayjs())
+
   const upcomingEntries = React.useMemo(() => {
-    const today = dayjs().format('YYYY-MM-DD')
+    const today = now.format('YYYY-MM-DD')
+    const hhmm = now.format('HH:mm')
     return entries
-      .filter(e => e.date >= today)
+      .filter(e => e.date > today || (e.date === today && (!e.time || e.time >= hhmm)))
       .slice(0, 10)
-  }, [entries])
+  }, [entries, now])
 
   const entriesOnDate = React.useMemo(() => {
     if (!selectedDate) return []
@@ -90,7 +139,72 @@ export function CalendarWidget() {
     return set
   }, [entries])
 
-  const today = dayjs().format('YYYY-MM-DD')
+  entriesRef.current = entries
+
+  // Clock + alert engine. Runs every TICK_MS and on tab re-focus (timers are
+  // throttled in background tabs). Each (entry, threshold) fires exactly once,
+  // persisted in localStorage so reloads never re-alert.
+  React.useEffect(() => {
+    const check = () => {
+      const t = dayjs()
+      setNow(t)
+      if (!firedRef.current) firedRef.current = loadFired()
+      const fired = firedRef.current
+      const fresh: Alert[] = []
+
+      for (const e of entriesRef.current) {
+        const start = entryStart(e)
+        if (!start.isValid()) continue
+        const minsUntil = start.diff(t, 'second') / 60
+        if (minsUntil < -STALE_MINUTES) continue
+        const thresholds = e.time ? THRESHOLDS : [0]
+        // thresholds already crossed, most urgent last
+        const crossed = thresholds.filter(m => minsUntil <= m)
+        if (crossed.length === 0) continue
+        const latest = Math.min(...crossed)
+        for (const m of crossed) {
+          const key = `${entryId(e)}#${m}`
+          if (fired.has(key)) continue
+          fired.add(key)
+          // catch-up: only surface the most urgent crossed threshold
+          if (m !== latest) continue
+          const label = thresholdLabel(m)
+          const alert: Alert = { id: key, label, entry: e }
+          fresh.push(alert)
+          try {
+            createLogRef.current({
+              text: `[ALERT] ${label} — ${e.type.toUpperCase()}: ${e.text}${e.time ? ` @ ${e.time}` : ''} (${e.date})`,
+              event: 'calendar_alert',
+              metadata: { date: e.date, time: e.time, text: e.text, entryType: e.type, threshold: m },
+            })
+          } catch (_) {}
+          try {
+            if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+              new Notification(`${label} · ${e.type.toUpperCase()}`, { body: e.text })
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (fresh.length > 0) {
+        saveFired(fired)
+        setAlerts(prev => [...prev, ...fresh])
+      }
+    }
+
+    check()
+    const id = window.setInterval(check, TICK_MS)
+    const onVisible = () => { if (!document.hidden) check() }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      window.clearInterval(id)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }, [entries])
+
+  const handleAck = (id: string) => setAlerts(prev => prev.filter(a => a.id !== id))
+
+  const today = now.format('YYYY-MM-DD')
   const weeks = React.useMemo(
     () => getMonthWeeks(viewMonth.year(), viewMonth.month()),
     [viewMonth]
@@ -109,12 +223,14 @@ export function CalendarWidget() {
     if (!selectedDate || !entryText.trim()) return
 
     const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
+    const time = TIME_RE.test(entryTime) ? entryTime : undefined
 
     createLog({
-      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel})`,
+      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel}${time ? ` ${time}` : ''})`,
       event: 'calendar_entry',
       metadata: {
         date: selectedDate,
+        time,
         text: entryText.trim(),
         entryType,
       },
@@ -126,7 +242,15 @@ export function CalendarWidget() {
     })
 
     setEntryText('')
+    setEntryTime('')
     setIsAddingEntry(false)
+
+    // one-time opt-in for system notifications, on a user gesture
+    try {
+      if (time && typeof Notification !== 'undefined' && Notification.permission === 'default') {
+        Notification.requestPermission()
+      }
+    } catch (_) {}
   }
 
   const handleToggleCalendar = () => {
@@ -139,6 +263,25 @@ export function CalendarWidget() {
   return (
     <Block label="Calendar:" blockView onLabelClick={handleToggleCalendar}>
       <div className="w-full">
+        {alerts.length > 0 && (
+          <div className="mb-16 space-y-1">
+            {alerts.map(a => (
+              <div key={a.id} className="flex justify-between gap-16 text-acc border border-acc/40 px-4 py-2 animate-pulse">
+                <span className="whitespace-nowrap">
+                  ▲ {a.label} · {a.entry.type.toUpperCase()}{a.entry.time ? ` · ${a.entry.time}` : ''}
+                </span>
+                <span className="text-right flex-1">{a.entry.text}</span>
+                <button
+                  className="text-acc/60 hover:text-acc whitespace-nowrap"
+                  onClick={() => handleAck(a.id)}
+                >
+                  ACK
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="mb-16">
           <Button onClick={handleToggleCalendar}>
             Add date
@@ -229,6 +372,13 @@ export function CalendarWidget() {
                 </div>
                 <div className="flex gap-8 items-center">
                   <input
+                    type="time"
+                    value={entryTime}
+                    onChange={e => setEntryTime(e.target.value)}
+                    aria-label="Time (optional)"
+                    className="bg-transparent border border-acc/20 text-acc px-4 py-2 outline-none focus:border-acc/40"
+                  />
+                  <input
                     type="text"
                     value={entryText}
                     onChange={e => setEntryText(e.target.value)}
@@ -249,7 +399,7 @@ export function CalendarWidget() {
                 </div>
                 {entriesOnDate.map((e, i) => (
                   <div key={i} className="text-acc/80 mb-1">
-                    {e.text}
+                    {e.time ? `${e.time} ` : ''}{e.text}
                   </div>
                 ))}
               </div>
@@ -262,7 +412,7 @@ export function CalendarWidget() {
             {upcomingEntries.map((entry, i) => (
               <div key={i} className="flex justify-between gap-16">
                 <span className="text-acc whitespace-nowrap">
-                  {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
+                  {dayjs(entry.date).format('dddd, MMMM D, YYYY')}{entry.time ? ` ${entry.time}` : ''}
                 </span>
                 <span className="text-acc text-right">
                   {entry.text}
