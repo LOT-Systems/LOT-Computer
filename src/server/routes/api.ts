@@ -17,7 +17,11 @@ import {
   UserTag,
 } from '#shared/types'
 import config from '#server/config'
-import { fp } from '#shared/utils'
+import { fp, toCelsius } from '#shared/utils'
+import {
+  parseStoryPeriod, periodDays, periodLabel, compressPeriod, computeArcade, formatArcadeLine,
+  buildStoryDataBlock, buildFallbackStory, type StoryEntry,
+} from '#shared/utils/lotStory'
 import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
@@ -5479,9 +5483,12 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   )
 
   // ============================================================================
-  // STORY — Contextual AI Story
-  // Generates a 1-2 paragraph story based on recent logs, self-care events,
-  // and widget data. The story reflects the operator's recent journey.
+  // STORY — Compressed personal story (day | week | month | year)
+  // LOT User data -> compression (lotStory) -> AI vendor (Together AI)
+  //   -> LOT personalized data stored (Log event 'generated_story').
+  // The vendor only receives the aggregate block, never raw logs. If the
+  // vendor fails, a deterministic story is built from the same compression.
+  // Doc: docs/technical/LOG-COMMANDS-AND-STORY.md
   // ============================================================================
   fastify.post(
     '/story',
@@ -5490,6 +5497,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          tzOffsetMin?: number
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,30 +5522,63 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const tzOffsetMin =
+        typeof req.body.tzOffsetMin === 'number' && Math.abs(req.body.tzOffsetMin) <= 14 * 60
+          ? req.body.tzOffsetMin
+          : 0
+      const period = parseStoryPeriod(logText)
+      const now = Date.now()
 
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: new Date(now - periodDays('year') * 24 * 60 * 60 * 1000) },
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 5000,
       })
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
+      const entries: StoryEntry[] = []
+      let stories = 0
+      for (const l of logs) {
+        const at = new Date(l.createdAt).getTime()
+        const ctx = (l.context || {}) as any
+        const context = {
+          city: ctx.city || undefined,
+          temperatureC: ctx.temperature ? toCelsius(ctx.temperature) : undefined,
+          humidity: ctx.humidity || undefined,
+        }
+        if (l.event === 'generated_story') {
+          stories++
+        } else if (l.event === 'log_entry' || l.event === 'journal' || l.event === 'note') {
+          // Exclude previous /story output echoed into the entry text.
+          const text = (l.text || '').split('📖')[0].trim()
+          if (text) entries.push({ at, kind: 'log', text, context })
+        } else if (l.event === 'emotional_checkin') {
+          const mood = ((l.metadata?.emotionalState as string) || '').toLowerCase()
+          if (mood) entries.push({ at, kind: 'mood', text: mood, mood, context })
+        } else if (l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin') {
+          const q = (l.metadata?.question as string) || ''
+          const ans = (l.metadata?.option as string) || (l.metadata?.answer as string) || ''
+          if (q && ans) entries.push({ at, kind: 'selfcare', text: `${q}: ${ans}`, context })
+        }
+      }
 
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
+      const compression = compressPeriod(entries, period, now, tzOffsetMin)
+      const yearView = compressPeriod(entries, 'year', now, tzOffsetMin)
+      const arcade = computeArcade({
+        logs: yearView.logs,
+        moodCheckins: yearView.moodCheckins + yearView.selfCareAnswers,
+        activeDays: yearView.activeDays,
+        streak: yearView.streak,
+        stories,
+      })
 
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
+      const recentExcerpts = entries
+        .filter(e => e.kind === 'log' && e.at >= compression.from)
+        .sort((a, b) => b.at - a.at)
+        .slice(0, 3)
+        .map(e => e.text.substring(0, 200))
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
@@ -5547,46 +5588,48 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const wordTarget = period === 'day' ? '100-150' : period === 'week' ? '120-180' : '150-220'
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator invoked /story for ${periodLabel(period)}. Write ${wordTarget} words that compress that period: the shape of it, the high and low peaks, the pattern or break in pattern. It must feel personal, grounded and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
+- Use only the compressed data below; reference specific peaks and excerpts when present
+- Never invent events, people or numbers that are not in the data
+- If there are gaps or heavy moods, acknowledge them with compassion
+- Match the tone to the operator's energy: reflective if low, energized if high
 - End with a single forward-looking sentence — not a pep talk, just a quiet truth
-- Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Return ONLY the story paragraphs. No title. No commentary. No preamble.`
 
-      const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+      const fullPrompt = `${systemPrompt}\n\n${buildStoryDataBlock(compression, arcade, recentExcerpts)}\n${stateBlock}`
 
-${stateBlock ? stateBlock : 'STATE: unknown'}
-
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
-
-      const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
-
+      let cleaned: string
+      let source: 'ai' | 'fallback' = 'ai'
       try {
+        if (compression.entries === 0) throw new Error('no-signal')
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
-
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
-
+        console.log(`📖 Story (${period}) for user ${req.user.id}: ${compression.entries} entries`)
         const story = await engine.generateCompletion(fullPrompt, 512)
+        cleaned = story.trim().replace(/^["']|["']$/g, '')
+        if (!cleaned) throw new Error('empty-completion')
+      } catch (error: any) {
+        if (error?.message !== 'no-signal') console.error('Story generation failed, using fallback:', error)
+        cleaned = buildFallbackStory(compression, arcade)
+        source = 'fallback'
+      }
 
-        const cleaned = story.trim().replace(/^["']|["']$/g, '')
+      const stats = {
+        entries: compression.entries,
+        activeDays: compression.activeDays,
+        totalDays: compression.totalDays,
+        streak: compression.streak,
+        words: compression.words,
+        moodTrend: compression.moodTrend,
+      }
 
+      try {
         const context = await getLogContext(req.user)
         const storyLog = await fastify.models.Log.create({
           userId: req.user.id,
@@ -5595,22 +5638,19 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           context,
           metadata: {
             story: cleaned,
+            period,
+            source,
+            stats,
+            arcade: { xp: arcade.xp, level: arcade.level, rank: arcade.rank },
             logText: (logText || '').substring(0, 500),
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
         })
-
-        return {
-          story: cleaned,
-          logId: storyLog.id,
-        }
+        return { story: cleaned, logId: storyLog.id, period, source, stats, arcade, arcadeLine: formatArcadeLine(arcade) }
       } catch (error: any) {
-        console.error('Story generation failed:', error)
-        return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
-          logId: null,
-        }
+        console.error('Story persistence failed:', error)
+        return { story: cleaned, logId: null, period, source, stats, arcade, arcadeLine: formatArcadeLine(arcade) }
       }
     }
   )

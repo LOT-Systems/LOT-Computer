@@ -869,6 +869,7 @@ export const useAssemblyDirective = createMutation<
 export const usePrayerScripture = createMutation<
   {
     logText: string
+    tzOffsetMin?: number
     quantumState?: {
       energy?: string
       clarity?: string
@@ -910,5 +911,9 @@ export const useStoryGeneration = createMutation<
   {
     story: string
     logId: string | null
+    period?: 'day' | 'week' | 'month' | 'year'
+    source?: 'ai' | 'fallback'
+    stats?: { entries: number; activeDays: number; totalDays: number; streak: number; words: number; moodTrend: string }
+    arcadeLine?: string
   }
 >('post', '/api/story')
