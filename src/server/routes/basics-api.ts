@@ -16,7 +16,7 @@ import { FastifyInstance, FastifyRequest } from 'fastify'
 import { RationSubscription } from '#server/models/ration-subscription.js'
 import { RationIssue } from '#server/models/ration-issue.js'
 import { computeIssueLoad, nextScheduledDate, verifyMarginOrThrow, COGS_CEILING_USD } from '#server/utils/issue-engine.js'
-import { RATION_MANIFEST } from '#client/components/Basics/rationManifest.js'
+import { RATION_MANIFEST } from '#server/utils/ration-cogs.js'
 
 type SubscribeBody = {
   shippingLine1: string
@@ -94,16 +94,22 @@ export default async (fastify: FastifyInstance) => {
     let stripeSubscriptionItemId: string | null = null
     if (process.env.STRIPE_SECRET_KEY && req.user.stripeCustomerId) {
       try {
-        const stripe = (await import('stripe')).default
-        const client = new stripe(process.env.STRIPE_SECRET_KEY)
+        // 'stripe' is not yet a package dependency — specifier kept dynamic so
+        // the build holds without it. Billing is inert until it is installed.
+        const pkg = 'stripe'
+        const Stripe = (await import(pkg)).default
+        const client = new Stripe(process.env.STRIPE_SECRET_KEY)
+        const active = await client.subscriptions.list({ customer: req.user.stripeCustomerId, status: 'active', limit: 1 })
+        if (!active.data[0]) throw new Error('NO ACTIVE USERSHIP SUBSCRIPTION')
         const item = await client.subscriptionItems.create({
-          subscription: req.user.stripeCustomerId,
+          subscription: active.data[0].id,
           price_data: {
             currency: 'usd',
             product_data: { name: 'LOT BASICS / Ration Subscription' },
             recurring: { interval: 'month' },
             unit_amount: 10000,
           },
+          proration_behavior: 'none',
         })
         stripeSubscriptionItemId = item.id
       } catch (err: any) {
@@ -161,8 +167,9 @@ export default async (fastify: FastifyInstance) => {
 
     if (sub.stripeSubscriptionItemId && process.env.STRIPE_SECRET_KEY) {
       try {
-        const stripe = (await import('stripe')).default
-        const client = new stripe(process.env.STRIPE_SECRET_KEY)
+        const pkg = 'stripe'
+        const Stripe = (await import(pkg)).default
+        const client = new Stripe(process.env.STRIPE_SECRET_KEY)
         await client.subscriptionItems.del(sub.stripeSubscriptionItemId, { proration_behavior: 'none' })
       } catch (err: any) {
         fastify.log.warn('[basics] Stripe cancellation error:', err.message)

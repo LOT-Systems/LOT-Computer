@@ -10,7 +10,7 @@
  */
 
 import * as React from 'react'
-import { RATION_MANIFEST, ISSUE_PRICE_USD, LOT_FM_REF } from './rationManifest'
+import { RATION_MANIFEST, ISSUE_PRICE_USD, LOT_FM_REF } from '#shared/ration-manifest'
 import { UpgradeControl } from './UpgradeControl'
 import { RosterForm } from './RosterForm'
 import { IssueLog } from './IssueLog'

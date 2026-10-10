@@ -7,17 +7,15 @@
  * Calculates per-issue load based on cadence, validates COGS ceiling.
  */
 
-import { RATION_MANIFEST, RationItem, ISSUE_PRICE_USD } from '#client/components/Basics/rationManifest.js'
-
-// Shared between server and client — imports from client/ intentionally.
-// Source of truth for manifest is the client-facing spec.
+import { ISSUE_PRICE_USD } from '#shared/ration-manifest.js'
+import { RATION_MANIFEST, CostedItem } from '#server/utils/ration-cogs.js'
 
 export const COGS_CEILING_USD   = 40.00
 export const MARGIN_FLOOR_PCT   = 0.60
 
 export type IssueLoad = {
   issueNumber: number
-  items: RationItem[]
+  items: CostedItem[]
   itemNos: string[]
   cogsTotal: number
   marginPct: number
