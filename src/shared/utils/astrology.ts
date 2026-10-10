@@ -177,3 +177,36 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Personal resonance — how many of the user's own past log entries were
+ * written under the same moon phase / rokuyo as the current reading.
+ * Uses the ambient snapshot stored on each log's context (see getLogContext),
+ * so it is derived from the user's own history, not a natal chart.
+ */
+export function getAstrologyResonance(
+  logs: Array<{ context?: { astroMoonPhase?: string | null; astroRokuyo?: string | null } | null }>,
+  current: { moonPhase: string; rokuyo: string }
+): { samePhase: number; sameRokuyo: number; sampled: number } {
+  let samePhase = 0
+  let sameRokuyo = 0
+  let sampled = 0
+  for (const log of logs) {
+    const ctx = log.context
+    if (!ctx || !ctx.astroMoonPhase) continue
+    sampled++
+    if (ctx.astroMoonPhase === current.moonPhase) samePhase++
+    if (ctx.astroRokuyo === current.rokuyo) sameRokuyo++
+  }
+  return { samePhase, sameRokuyo, sampled }
+}
+
+/** Shift a date into a timeZone's wall clock so the Date getters read local-to-zone values. */
+export function toZonedWallClock(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    return new Date(date.toLocaleString('en-US', { timeZone }))
+  } catch {
+    return date
+  }
+}
