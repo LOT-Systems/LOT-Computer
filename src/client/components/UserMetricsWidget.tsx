@@ -39,7 +39,7 @@ export function UserMetricsWidget() {
 
   React.useEffect(() => {
     // Load physiological cohort from server API
-    fetch('/api/cohorts')
+    fetch('/api/user-profile')
       .then(res => res.json())
       .then(data => {
         if (data.archetype || data.behavioralCohort) {

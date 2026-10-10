@@ -8,6 +8,7 @@
 
 import * as React from 'react'
 import { Block } from './Block'
+import { recordWidgetEvent } from '#client/utils/widgetUsage'
 
 const widgetTimings: Record<string, number> = {}
 
@@ -44,12 +45,14 @@ export class WidgetErrorBoundary extends React.Component<
     const elapsed = Math.round((performance.now() - this.mountStart) * 100) / 100
     const name = this.props.name || 'Widget'
     widgetTimings[name] = elapsed
+    recordWidgetEvent(name, 'mount', elapsed)
     if (elapsed > 50) {
       console.warn(`[Perf] ${name} took ${elapsed}ms to mount`)
     }
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
+    recordWidgetEvent(this.props.name || 'Widget', 'crash')
     console.error(
       `[WidgetErrorBoundary] ${this.props.name || 'Widget'} crashed:`,
       error,
@@ -64,7 +67,10 @@ export class WidgetErrorBoundary extends React.Component<
           <div className="opacity-30">
             Failed to load.{' '}
             <button
-              onClick={() => this.setState({ hasError: false, error: null })}
+              onClick={() => {
+                recordWidgetEvent(this.props.name || 'Widget', 'retry')
+                this.setState({ hasError: false, error: null })
+              }}
               className="underline cursor-pointer"
               style={{ background: 'none', border: 'none', color: 'inherit', font: 'inherit', padding: 0 }}
             >
