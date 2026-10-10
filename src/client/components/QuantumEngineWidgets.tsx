@@ -125,6 +125,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'sovereignty-permanence-convergence': 'SOVC',
   'quantum-operating-mode-confirmed': 'QOMC',
   'full-field-architecture-lock':     'FLOCK',
+  'quantum-operating-continuity':     'QCONT',
+  'cross-domain-field-resonance':     'CDRES',
+  'compound-sovereignty-stack':       'CSOVS',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

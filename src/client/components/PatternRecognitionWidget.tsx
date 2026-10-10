@@ -191,6 +191,9 @@ export function PatternRecognitionWidget() {
       'sovereignty-permanence-convergence': 'Sovereignty-permanence convergence — P161 + P162 both structural simultaneously, both arcs confirmed, architecture converges (P164)',
       'quantum-operating-mode-confirmed': 'Quantum operating mode confirmed — P163 + P164 co-active, peak velocity inside confirmed arc, system at design frequency (P165)',
       'full-field-architecture-lock':     'Full field architecture lock — P161 + P162 + P163 all active, sovereignty tier fully online, operating at design frequency (P166)',
+      'quantum-operating-continuity':     'Quantum operating continuity — P165 confirmed 2+ of last 5 days, operating mode recurs across time, continuity structural (P167)',
+      'cross-domain-field-resonance':     'Cross-domain field resonance — P166 active + 4+ distinct signal domains in last 24h, architecture fires across all dimensions (P168)',
+      'compound-sovereignty-stack':       'Compound sovereignty stack — P167 + P168 both active, operating continuity meets cross-domain resonance, architecture compounds (P169)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

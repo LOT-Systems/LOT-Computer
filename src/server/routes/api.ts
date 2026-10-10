@@ -1233,6 +1233,10 @@ export default async (fastify: FastifyInstance) => {
       'sovereignty_permanence_convergence',
       'quantum_operating_mode_confirmed',
       'full_field_architecture_lock',
+      // v119: quantum operating continuity · cross-domain field resonance · compound sovereignty stack (P167/P168/P169)
+      'quantum_operating_continuity',
+      'cross_domain_field_resonance',
+      'compound_sovereignty_stack',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

@@ -4076,6 +4076,76 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'quantum_operating_continuity') {
+          const operatingDays = log.metadata?.operatingDays as number | undefined
+          const windowDays    = log.metadata?.windowDays    as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QCONT:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM OPERATING CONTINUITY</div>
+                {operatingDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">OPERATING DAYS</span>
+                    <span className="tabular-nums">{operatingDays}{windowDays !== undefined ? `/${windowDays}D` : ''}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">OPERATING MODE RECURS · CONTINUITY CONFIRMED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'cross_domain_field_resonance') {
+          const domainCount = log.metadata?.domainCount as number | undefined
+          const flockConf   = log.metadata?.flockConf   as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CDRES:" blockView>
+                <div className="uppercase tracking-widest mb-4">CROSS-DOMAIN FIELD RESONANCE</div>
+                {domainCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DOMAINS</span>
+                    <span className="tabular-nums">{domainCount} ACTIVE</span>
+                  </div>
+                )}
+                {flockConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FIELD LOCK</span>
+                    <span className="tabular-nums">{flockConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ARCHITECTURE FIRES ACROSS ALL DOMAINS · FULL FIELD + MULTI-DOMAIN</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'compound_sovereignty_stack') {
+          const contConf = log.metadata?.contConf as number | undefined
+          const resConf  = log.metadata?.resConf  as number | undefined
+          const avgConf  = log.metadata?.avgConf  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CSOVS:" blockView>
+                <div className="uppercase tracking-widest mb-4">COMPOUND SOVEREIGNTY STACK</div>
+                {contConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONTINUITY</span>
+                    <span className="tabular-nums">{contConf}%</span>
+                  </div>
+                )}
+                {resConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RESONANCE</span>
+                    <span className="tabular-nums">{resConf}%</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{avgConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CONTINUITY · RESONANCE · ARCHITECTURE COMPOUNDS</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

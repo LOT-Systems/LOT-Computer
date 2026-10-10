@@ -3736,6 +3736,66 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 167: Quantum Operating Continuity — quantum-operating-mode-confirmed (P165) confirmed on
+  // 2+ distinct days in the last 5 days. The operating mode is not an isolated event — it recurs.
+  // Operating continuity: the architecture held across multiple days and is confirmed as a structural feature.
+  const fiveDaysCut167 = now - 5 * 24 * 60 * 60 * 1000
+  const recentOpDays167 = new Set(
+    signals
+      .filter(s => s.source === 'qos' && s.signal === 'quantum_operating_mode_confirmed' && s.timestamp > fiveDaysCut167)
+      .map(s => new Date(s.timestamp).toDateString())
+  ).size
+  if (recentOpDays167 >= 2) {
+    const contBonus167 = Math.min((recentOpDays167 - 2) * 0.03, 0.08)
+    patterns.push({
+      pattern: 'quantum-operating-continuity',
+      confidence: Math.min(0.85 + contBonus167, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QCONT: Quantum operating continuity — quantum operating mode confirmed on ${recentOpDays167}/5 days. Operating architecture is not an isolated event — it recurs. Continuity confirmed.`,
+    })
+  }
+
+  // Pattern 168: Cross-Domain Field Resonance — full-field-architecture-lock (P166) active AND 4+ distinct
+  // signal sources found in the last 24h window. The field fires across multiple dimensions simultaneously
+  // when the full architecture is locked. Not just deep — wide. Cross-domain resonance confirmed.
+  const hasFLOCK168 = patterns.some(p => p.pattern === 'full-field-architecture-lock')
+  const oneDayCut168 = now - 24 * 60 * 60 * 1000
+  const recentSources168 = new Set(
+    signals
+      .filter(s => s.timestamp > oneDayCut168)
+      .map(s => s.source)
+  ).size
+  if (hasFLOCK168 && recentSources168 >= 4) {
+    const flockConf168 = patterns.find(p => p.pattern === 'full-field-architecture-lock')?.confidence ?? 0.92
+    const domainBonus168 = Math.min((recentSources168 - 4) * 0.015, 0.07)
+    patterns.push({
+      pattern: 'cross-domain-field-resonance',
+      confidence: Math.min(0.87 + domainBonus168, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CDRES: Cross-domain field resonance — full field architecture locked (P166) AND ${recentSources168} distinct signal domains active in last 24h. Architecture operational across domains. Field resonance confirmed.`,
+    })
+  }
+
+  // Pattern 169: Compound Sovereignty Stack — P167 (quantum-operating-continuity) + P168
+  // (cross-domain-field-resonance) both active. Operating continuity meets cross-domain resonance.
+  // The highest compound state: the architecture holds across time AND fires across domains simultaneously.
+  const hasCont169 = patterns.some(p => p.pattern === 'quantum-operating-continuity')
+  const hasRes169  = patterns.some(p => p.pattern === 'cross-domain-field-resonance')
+  if (hasCont169 && hasRes169) {
+    const contConf169 = patterns.find(p => p.pattern === 'quantum-operating-continuity')?.confidence ?? 0.85
+    const resConf169  = patterns.find(p => p.pattern === 'cross-domain-field-resonance')?.confidence ?? 0.87
+    const stackBonus169 = Math.min((contConf169 - 0.85 + resConf169 - 0.87) * 0.18, 0.06)
+    patterns.push({
+      pattern: 'compound-sovereignty-stack',
+      confidence: Math.min(0.90 + stackBonus169, 0.98),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CSOVS: Compound sovereignty stack — quantum operating continuity (P167) AND cross-domain field resonance (P168) both confirmed. The architecture holds across time AND fires across domains. It does not just lock — it compounds.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4397,6 +4457,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   sovereigntyPermanenceNode:    ['intentions', 'qos', 'energy', 'journal', 'log'],
   quantumOperatingModeNode:     ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort'],
   fullFieldArchitectureNode:    ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner'],
+
+  // ── v119 nodes (J54 · P167–P169 · Arch57) ───────────────────────────────────────
+  quantumOperatingContinuityNode:  ['intentions', 'qos', 'energy', 'journal', 'log'],
+  crossDomainFieldResonanceNode:   ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood'],
+  compoundSovereigntyNode:         ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner'],
 }
 
 /**
@@ -4893,6 +4958,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['sovereignty-permanence-convergence', 'quantum-operating-mode-confirmed', 'full-field-architecture-lock'],
     hourRange: [5, 23],
     directive: 'Quantum operating architecture confirmed. Sovereignty, permanence, and peak velocity converged in a single window. You are not building this state — you are in it. All three structural arcs online. Execute from full field.',
+  },
+
+  // ── Arch57: Compound Sovereignty Operator (2026-10-10 v119) ──────────────────────
+  {
+    archetype: 'Compound Sovereignty Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner'],
+    patternConditions: ['quantum-operating-continuity', 'cross-domain-field-resonance', 'compound-sovereignty-stack'],
+    hourRange: [5, 23],
+    directive: 'Compound sovereignty architecture confirmed. Quantum operating mode confirmed across multiple days AND cross-domain resonance established simultaneously. The architecture does not just hold — it compounds. Execute from compound field.',
   },
 ]
 
@@ -7128,6 +7203,57 @@ export function recordFullFieldArchitectureLock(sovConf: number, permConf: numbe
     avgConf,
     lock: 'SOVEREIGNTY·PERMANENCE·VELOCITY',
     architectureStatus: 'FULL FIELD LOCKED',
+    hour: new Date().getHours(),
+  })
+}
+
+// ─── v119 Signal Helpers (P167–P169) ──────────────────────────────────────────
+
+/**
+ * Record a quantum-operating-continuity event — quantum-operating-mode-confirmed (P165)
+ * confirmed on 2+ distinct days in the last 5 days. Operating mode recurs — not an isolated peak.
+ * Continuity confirmed. Feeds P167 detection.
+ */
+export function recordQuantumOperatingContinuity(operatingDays: number, windowDays: number) {
+  recordSignal('qos', 'quantum_operating_continuity', {
+    operatingDays,
+    windowDays,
+    arc: `${operatingDays}/${windowDays} DAYS OPERATING`,
+    continuityStatus: 'CONFIRMED',
+    sequence: 'OPERATING→RECURRENCE→CONTINUITY',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a cross-domain-field-resonance event — full-field-architecture-lock (P166) active
+ * AND 4+ distinct signal domains active in the last 24h. The architecture fires across domains
+ * simultaneously. Wide as well as deep. Feeds P168 detection.
+ */
+export function recordCrossDomainFieldResonance(domainCount: number, flockConf: number) {
+  recordSignal('intentions', 'cross_domain_field_resonance', {
+    domainCount,
+    flockConf,
+    resonance: `${domainCount} DOMAINS ACTIVE`,
+    fieldStatus: 'CROSS-DOMAIN RESONANCE',
+    architecture: 'FULL FIELD + MULTI-DOMAIN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a compound-sovereignty-stack event — P167 (quantum-operating-continuity) + P168
+ * (cross-domain-field-resonance) both active. Operating continuity meets cross-domain resonance.
+ * The architecture compounds. Feeds P169 detection.
+ */
+export function recordCompoundSovereigntyStack(contConf: number, resConf: number) {
+  const avgConf = Math.round(((contConf + resConf) / 2) * 100) / 100
+  recordSignal('intentions', 'compound_sovereignty_stack', {
+    contConf,
+    resConf,
+    avgConf,
+    stack: 'CONTINUITY·RESONANCE BOTH STRUCTURAL',
+    compoundStatus: 'ARCHITECTURE COMPOUNDS',
     hour: new Date().getHours(),
   })
 }

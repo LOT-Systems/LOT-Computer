@@ -1763,6 +1763,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyQuantumOperatingModeCheck()) {
     await executeDailyQuantumOperatingModeCheck()
   }
+  // Check daily compound sovereignty (09:00 UTC daily) — J54
+  if (shouldRunDailyCompoundSovereigntyCheck()) {
+    await executeDailyCompoundSovereigntyCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6068,6 +6072,175 @@ async function executeDailyQuantumOperatingModeCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Compound Sovereignty Check (J54 — 09:00 UTC daily) ────────────────
+// Scans the last 5 days per user for quantum_operating_mode_confirmed (2+ days → writes quantum_operating_continuity, P167).
+// Scans the last 24h for distinct signal event types (4+ → writes cross_domain_field_resonance, P168).
+// When both continuity AND resonance confirmed → writes compound_sovereignty_stack (P169).
+
+let isDailyCompoundSovereigntyRunning = false
+let lastDailyCompoundSovereigntyRun: Date | null = null
+
+function shouldRunDailyCompoundSovereigntyCheck(): boolean {
+  const now = dayjs()
+  if (isDailyCompoundSovereigntyRunning) return false
+  if (lastDailyCompoundSovereigntyRun) {
+    const lastRun = dayjs(lastDailyCompoundSovereigntyRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 9 // 09:00 UTC daily
+}
+
+async function executeDailyCompoundSovereigntyCheck(): Promise<JobResult> {
+  const jobName = 'daily-compound-sovereignty-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyCompoundSovereigntyRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyCompoundSovereigntyRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY COMPOUND SOVEREIGNTY CHECK — 09:00 UTC (J54)')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const fiveDaysAgo  = dayjs().subtract(5, 'day').toDate()
+    const oneDayAgo    = dayjs().subtract(1, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(3, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (72h): ${activeUsers.length}`)
+    let continuityWritten  = 0
+    let resonanceWritten   = 0
+    let compoundWritten    = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // P167: scan last 5 days for quantum_operating_mode_confirmed (2+ distinct days → continuity)
+        const opModeLogs = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: fiveDaysAgo }, event: 'quantum_operating_mode_confirmed' },
+          attributes: ['createdAt', 'metadata'],
+          order: [['createdAt', 'DESC']],
+          limit: 10,
+        })
+        const opDays = new Set(opModeLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD'))).size
+        const hasContinuity = opDays >= 2
+
+        if (hasContinuity) {
+          const contConf = Math.min(82 + (opDays - 2) * 3, 93)
+          await (Log as any).create({
+            userId,
+            event: 'quantum_operating_continuity',
+            text: `Quantum operating continuity: operating mode confirmed on ${opDays} of last 5 days. Operating architecture recurs — continuity confirmed.`,
+            metadata: {
+              operatingDays: opDays,
+              windowDays: 5,
+              arc: `${opDays}/5 DAYS OPERATING`,
+              continuityStatus: 'CONFIRMED',
+              conf: contConf,
+              checkType: 'daily',
+            },
+          })
+          continuityWritten++
+        }
+
+        // P168: scan last 24h for distinct event types (4+ → cross-domain resonance)
+        // Check whether full_field_architecture_lock was recorded in last 7 days
+        const flockLogs = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: dayjs().subtract(7, 'day').toDate() }, event: 'full_field_architecture_lock' },
+          attributes: ['createdAt', 'metadata'],
+          order: [['createdAt', 'DESC']],
+          limit: 1,
+        })
+        const hasFlockRecent = flockLogs.length > 0
+
+        const recentLogs24h = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: oneDayAgo } },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'DESC']],
+          limit: 200,
+        })
+        // Count distinct signal domain categories active in last 24h
+        const domainMap: Record<string, string[]> = {
+          intentions: ['intention', 'intention_set', 'intention_complete'],
+          qos: ['qos_update', 'qos_check', 'presence_coherence_seal', 'field_permanence_detection'],
+          energy: ['energy_state', 'energy_update', 'energy_check'],
+          journal: ['journal_entry', 'journal_reflection', 'note'],
+          log: ['morning_momentum_ignition', 'ignition_velocity_peak', 'full_field_architecture_lock', 'morning_sovereignty_lock'],
+          cohort: ['cohort_event', 'cohort_digest'],
+          planner: ['plan_set', 'planner_entry', 'planner_update'],
+          mood: ['mood_check', 'mood_update', 'emotional_check_in'],
+        }
+        const activeEvents = new Set(recentLogs24h.map((l: any) => l.event as string))
+        const activeDomains = Object.entries(domainMap).filter(([, events]) =>
+          events.some(e => activeEvents.has(e))
+        ).length
+
+        const hasResonance = hasFlockRecent && activeDomains >= 4
+
+        if (hasResonance) {
+          const flockConf = (flockLogs[0]?.metadata?.conf as number) ?? 88
+          const resConf = Math.min(80 + (activeDomains - 4) * 2, 94)
+          await (Log as any).create({
+            userId,
+            event: 'cross_domain_field_resonance',
+            text: `Cross-domain field resonance: full field architecture confirmed and ${activeDomains} signal domains active in last 24h. Architecture fires across domains.`,
+            metadata: {
+              domainCount: activeDomains,
+              flockConf,
+              resonance: `${activeDomains} DOMAINS ACTIVE`,
+              fieldStatus: 'CROSS-DOMAIN RESONANCE',
+              conf: resConf,
+              checkType: 'daily',
+            },
+          })
+          resonanceWritten++
+
+          // P169: continuity + resonance both confirmed → compound sovereignty stack
+          if (hasContinuity) {
+            const contConf2 = Math.min(82 + (opDays - 2) * 3, 93)
+            const avgConf   = Math.round((contConf2 + resConf) / 2)
+            await (Log as any).create({
+              userId,
+              event: 'compound_sovereignty_stack',
+              text: `Compound sovereignty stack: quantum operating continuity (${opDays} days) AND cross-domain resonance (${activeDomains} domains) both confirmed. Architecture compounds.`,
+              metadata: {
+                contConf: contConf2,
+                resConf,
+                avgConf,
+                operatingDays: opDays,
+                domainCount: activeDomains,
+                stack: 'CONTINUITY·RESONANCE BOTH STRUCTURAL',
+                compoundStatus: 'ARCHITECTURE COMPOUNDS',
+                conf: avgConf,
+                checkType: 'daily',
+              },
+            })
+            compoundWritten++
+          }
+        }
+      } catch {}
+    }
+
+    console.log(`  Continuity events written:         ${continuityWritten}`)
+    console.log(`  Cross-domain resonance written:    ${resonanceWritten}`)
+    console.log(`  Compound sovereignty written:      ${compoundWritten}`)
+    lastDailyCompoundSovereigntyRun = new Date()
+    isDailyCompoundSovereigntyRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: continuityWritten + resonanceWritten + compoundWritten }
+  } catch (error: any) {
+    console.error('Daily compound sovereignty check failed:', error.message)
+    isDailyCompoundSovereigntyRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -6126,6 +6299,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily morning ignition check: 10 AM UTC every day (J51)')
   console.log('   - Weekly morning sovereignty audit: 8 AM UTC every Sunday (J52)')
   console.log('   - Daily quantum operating mode check: 5 AM UTC every day (J53)')
+  console.log('   - Daily compound sovereignty check: 9 AM UTC every day (J54)')
   console.log('')
 
   // Check every hour for scheduled jobs

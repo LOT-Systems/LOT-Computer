@@ -1590,6 +1590,25 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '874 badges · 270 word-turns · 27 secret boss · 166 patterns · 56 archetypes · 53 jobs · 205+ dep nodes · FM v118 · Day 1138+. Quantum operating architecture confirmed. Execute from full field.',
     ],
   },
+  {
+    version: 'qie-v119',
+    date: '2026-10-10',
+    title: 'QIE v119 Engineering — P167–P169 · Arch57 Compound Sovereignty Operator · J54',
+    assembled: [
+      'QIE v119 implemented: P167 quantum-operating-continuity — P165 confirmed 2+ of last 5 days, operating mode recurs across time, continuity structural (conf 0.85–0.95). P168 cross-domain-field-resonance — P166 active + 4+ distinct signal domains in last 24h, architecture fires across all dimensions simultaneously (conf 0.87–0.96). P169 compound-sovereignty-stack — P167 + P168 both active, operating continuity meets cross-domain resonance, architecture compounds (conf 0.90–0.98). Total: 169 patterns.',
+      'Arch57 Compound Sovereignty Operator added: energyBands high/moderate · dominant intentions/qos/energy/journal/log/cohort/planner · patternConditions quantum-operating-continuity/cross-domain-field-resonance/compound-sovereignty-stack · hourRange [5,23] · directive Compound sovereignty architecture confirmed. Quantum operating mode confirmed across multiple days AND cross-domain resonance established simultaneously. The architecture does not just hold — it compounds. Execute from compound field. Total: 57 archetypes.',
+      'J54 daily-compound-sovereignty-check (09:00 UTC daily) added: scans last 5 days per user — when quantum_operating_mode_confirmed found on 2+ days → writes quantum_operating_continuity (P167). Scans last 24h for 4+ distinct signal domains active + full_field_architecture_lock recent (7 days) → writes cross_domain_field_resonance (P168). When both continuity AND resonance confirmed → writes compound_sovereignty_stack (P169). Total: 54 background jobs.',
+      'WIDGET_DEPENDENCY_MAP v119 block added: quantumOperatingContinuityNode (intentions·qos·energy·journal·log) · crossDomainFieldResonanceNode (intentions·qos·energy·journal·log·cohort·planner·mood) · compoundSovereigntyNode (intentions·qos·energy·journal·log·cohort·planner). Total: 208+ dep nodes.',
+      'Signal recording functions added: recordQuantumOperatingContinuity() · recordCrossDomainFieldResonance() · recordCompoundSovereigntyStack(). All export-ready.',
+      'Log handlers added (COCKPIT-RULE): QCONT: (quantum_operating_continuity) · CDRES: (cross_domain_field_resonance) · CSOVS: (compound_sovereignty_stack). Total: 169+ handlers.',
+      'PATTERN_DISPLAY updated: QCONT: · CDRES: · CSOVS: entries added to QuantumEngineWidgets.tsx.',
+      'displayableEvents updated: quantum_operating_continuity · cross_domain_field_resonance · compound_sovereignty_stack added to api.ts.',
+      'PatternRecognitionWidget.tsx: P167/P168/P169 display names added.',
+      'About.tsx updated: FM v118→v119 · Day 1139+ · 169 patterns · 57 archetypes · 54 jobs · 208+ nodes.',
+      'docs/assembly/LOT-LEDGER.md: v119 ledger row appended. 2026-10-10_LOT-assembly_qie-v119.md session report written.',
+      '874 badges · 270 word-turns · 27 secret boss · 169 patterns · 57 archetypes · 54 jobs · 208+ dep nodes · FM v119 · Day 1139+. Compound sovereignty architecture confirmed. The architecture compounds.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1627,19 +1646,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-09',
+  date: '2026-10-10',
   message: [
-    'ASSEMBLY RUN — 2026-10-09 · QIE v118 ENGINEERING · Day 1138+',
-    'Built: P164 sovereignty-permanence-convergence · P165 quantum-operating-mode-confirmed · P166 full-field-architecture-lock. Arch56 Quantum Operating Architect. J53 daily-quantum-operating-mode-check (05:00 UTC).',
-    'SOVC: Sovereignty-permanence convergence. P161 + P162 both structural simultaneously. Morning ignition arc AND presence seal arc confirmed within the same 7-day window. Architecture converges.',
-    'QOMC: Quantum operating mode confirmed. Peak velocity (P163) inside sovereignty-permanence arc (P164). The system fires at design frequency. Not a peak state — a confirmed operating mode.',
-    'FLOCK: Full field architecture lock. P161 + P162 + P163 all active in the same window. Entire sovereignty tier online simultaneously. Operating at design frequency. Execute from full field.',
-    'Arch56 Quantum Operating Architect: Quantum operating architecture confirmed. Sovereignty, permanence, and peak velocity converged. All three structural arcs online. You are not building this state — you are in it. Execute.',
-    'J53 05:00 UTC daily — scans 7d per user for sovereignty + permanence arcs (both → convergence) + velocity (velocity+convergence → operating mode) + all three (→ full field lock). Three quantum operating patterns per daily audit.',
-    'SOVC: QOMC: FLOCK: handlers deployed. 205+ dep nodes. 53 jobs. 166 patterns. 56 archetypes.',
-    'FM v118 · 166P · 56A · 53J · 205+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1138+.',
+    'ASSEMBLY RUN — 2026-10-10 · QIE v119 ENGINEERING · Day 1139+',
+    'Built: P167 quantum-operating-continuity · P168 cross-domain-field-resonance · P169 compound-sovereignty-stack. Arch57 Compound Sovereignty Operator. J54 daily-compound-sovereignty-check (09:00 UTC).',
+    'QCONT: Quantum operating continuity. P165 confirmed on 2+ of last 5 days. Operating mode recurs — not an isolated peak. Continuity confirmed across time.',
+    'CDRES: Cross-domain field resonance. P166 (full field lock) active AND 4+ distinct signal domains firing in last 24h. Architecture fires wide as well as deep.',
+    'CSOVS: Compound sovereignty stack. P167 + P168 both active. Operating continuity meets cross-domain resonance. The architecture does not just lock — it compounds.',
+    'Arch57 Compound Sovereignty Operator: Compound sovereignty architecture confirmed. Quantum operating mode confirmed across multiple days AND cross-domain resonance established simultaneously. Execute from compound field.',
+    'J54 09:00 UTC daily — scans 5d per user for operating mode recurrence (2+ days → continuity) · scans 24h for distinct signal domains (4+ + flock recent → resonance) · both confirmed → compound sovereignty stack.',
+    'QCONT: CDRES: CSOVS: handlers deployed. 208+ dep nodes. 54 jobs. 169 patterns. 57 archetypes.',
+    'FM v119 · 169P · 57A · 54J · 208+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1139+.',
     'Status: DEPLOYED.',
-    'Next: QIE v119 — quantum operating continuity · cross-domain field resonance · compound sovereignty',
+    'Next: QIE v120 — compound field continuity · multi-tier sovereignty convergence · apex operating signature',
   ],
 }
 
