@@ -380,6 +380,13 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'direct_message': {
+          // LOT Email: deliver only to the two parties of the message
+          if (data.senderId === req.user.id || data.receiverId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4082,6 +4089,121 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — simplest mail: a direct message addressed by name.
+  // Composed in Log with "/email to Hitomi", read in Sync.
+  // ============================================================================
+
+  // Resolve a first name ("Hitomi") or "First_Last" to a user
+  const resolveEmailRecipient = async (to: string, selfId: string) => {
+    const parts = to.trim().replace(/_/g, ' ').split(/\s+/).filter(Boolean)
+    if (!parts.length || parts.length > 2) return []
+    const where: any = {
+      id: { [Op.ne]: selfId },
+      [Op.and]: [
+        Sequelize.where(Sequelize.fn('lower', Sequelize.col('firstName')), parts[0].toLowerCase()),
+      ],
+    }
+    if (parts[1]) {
+      where[Op.and].push(
+        Sequelize.where(Sequelize.fn('lower', Sequelize.col('lastName')), parts[1].toLowerCase())
+      )
+    }
+    return fastify.models.User.findAll({
+      where,
+      attributes: ['id', 'firstName', 'lastName'],
+      limit: 5,
+    })
+  }
+
+  fastify.post('/email', async (req: FastifyRequest<{
+    Body: { to?: string; toUserId?: string; message: string }
+  }>, reply) => {
+    try {
+      const { to, toUserId, message } = req.body || ({} as any)
+      if (!message || !message.trim() || (!to && !toUserId)) {
+        return reply.status(400).send({ error: 'Recipient and message are required' })
+      }
+
+      let receiver: any = null
+      if (toUserId) {
+        receiver = await fastify.models.User.findByPk(toUserId)
+      } else {
+        const matches = await resolveEmailRecipient(String(to), req.user.id)
+        if (matches.length > 1) {
+          return reply.status(409).send({
+            error: 'Several members match — use First_Last',
+            candidates: matches.map((m: any) => ({
+              id: m.id,
+              name: `${m.firstName || ''} ${m.lastName || ''}`.trim(),
+            })),
+          })
+        }
+        receiver = matches[0] || null
+      }
+      if (!receiver || receiver.id === req.user.id) {
+        return reply.status(404).send({ error: 'Recipient not found' })
+      }
+
+      const mail = await fastify.models.DirectMessage.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: message.trim().slice(0, 2000),
+      })
+      const senderName = `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim()
+      sync.emit('direct_message', {
+        id: mail.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: mail.message,
+        senderName,
+        createdAt: mail.createdAt,
+      })
+      return reply.send({
+        id: mail.id,
+        to: { id: receiver.id, name: `${receiver.firstName || ''} ${receiver.lastName || ''}`.trim() },
+        createdAt: mail.createdAt,
+      })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  // Inbox + sent (latest 50), newest first
+  fastify.get('/email/inbox', async (req, reply) => {
+    try {
+      const rows = await fastify.models.DirectMessage.findAll({
+        where: { [Op.or]: [{ senderId: req.user.id }, { receiverId: req.user.id }] },
+        order: [['createdAt', 'DESC']],
+        limit: 50,
+      })
+      const ids = Array.from(new Set(rows.flatMap((m: any) => [m.senderId, m.receiverId])))
+      const users = await fastify.models.User.findAll({
+        where: { id: { [Op.in]: ids } },
+        attributes: ['id', 'firstName', 'lastName'],
+      })
+      const nameOf = new Map<string, string>(
+        users.map((u: any) => [u.id, `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown'])
+      )
+      return reply.send({
+        mail: rows.map((m: any) => ({
+          id: m.id,
+          senderId: m.senderId,
+          receiverId: m.receiverId,
+          senderName: nameOf.get(m.senderId) || 'Unknown',
+          receiverName: nameOf.get(m.receiverId) || 'Unknown',
+          message: m.message,
+          createdAt: m.createdAt,
+          isMine: m.senderId === req.user.id,
+        })),
+      })
+    } catch (error) {
+      console.error('Error fetching inbox:', error)
+      return reply.status(500).send({ error: 'Failed to fetch inbox' })
     }
   })
 

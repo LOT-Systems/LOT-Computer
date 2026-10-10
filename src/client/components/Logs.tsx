@@ -6,6 +6,7 @@
  * Made in the USA | brand.lot-systems.com
  */
 
+import { EmailCompose } from '#client/components/EmailCompose'
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
@@ -4139,6 +4140,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to Name  Write LOT Email — reads in Sync',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4387,6 +4389,7 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        <EmailCompose text={value} />
         {systemHelp && (
           <div className="mt-8">
             <Block label="SYSTEM:" blockView>
