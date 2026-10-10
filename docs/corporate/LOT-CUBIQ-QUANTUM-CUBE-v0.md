@@ -321,6 +321,15 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE EDGE OF THE NIGHT                       2026-10-10
+  ─────────────────────────────────────────────────────────────────
+  Full write-up: LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md, Section 07.
+  A bedside cube receives an air-quality signal from the LOT® Station at
+  03:40. Quiet hours cap it at THE NUDGE and the edge gate would refuse a
+  hop anyway; the missed signal is not replayed, and the next morning THE
+  SETTLE plus one honest line in the OS reports the poor night. The
+  cube's refusal to move is the feature.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
