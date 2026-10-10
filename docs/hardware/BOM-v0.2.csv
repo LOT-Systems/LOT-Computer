@@ -1,0 +1,29 @@
+ref,function,part,key_spec,vendor_search_link,est_unit_usd_at_100,confidence,v0.2_note
+U1,MCU+WiFi+BLE+camera interface,ESP32-S3-MINI-1U-N8R2 (or bare ESP32-S3R8 on custom PCB),"Xtensa LX7 dual core, DVP camera, USB",https://www.digikey.com/en/products/search?keywords=ESP32-S3-MINI-1,3.5,medium,N8R2 quad PSRAM = GPIO33-37 free
+U2,Environmental sensor (AI-grade),Bosch BME688,"T/H/P/gas + BSEC AI classification, 3x3mm",https://www.digikey.com/en/products/search?keywords=BME688,12,medium,
+U3,Ambient light + UV,Lite-On LTR-390UV-01,I2C UV/ALS,https://www.digikey.com/en/products/search?keywords=LTR-390UV,1.5,medium,
+U4,IMU / motion (tilt-wake),Bosch BMI270,6-axis low power,https://www.digikey.com/en/products/search?keywords=BMI270,2,medium,
+U5,Fuel gauge,Maxim MAX17048,1-cell ModelGauge I2C,https://www.digikey.com/en/products/search?keywords=MAX17048,1.5,medium,
+U6,Li-ion charger,TI BQ25185 (or MCP73831),1-cell linear charger,https://www.digikey.com/en/products/search?keywords=BQ25185,1.2,medium,keep
+U7,Qi wireless RX,TI BQ51003 (or STWLC38),5W Qi RX IC,https://www.digikey.com/en/products/search?keywords=BQ51003,3,low,
+L1,Qi RX coil + ferrite,Wurth 760308101104 class (thin RX coil),<=1mm coil+ferrite,https://www.we-online.com/en/components/products/WCCT,4,low,
+U8,Haptic driver,TI DRV2605L,LRA/ERM driver,https://www.digikey.com/en/products/search?keywords=DRV2605L,1.5,medium,
+M1,Haptic motor (pager buzz),Coin LRA 8mm (thin <=2.5mm),vibration,https://www.digikey.com/en/products/search?keywords=LRA+coin,1.5,low,
+BZ1,Piezo buzzer (pager beep),Thin SMD piezo 9mm,audible alert,https://www.digikey.com/en/products/search?keywords=piezo+buzzer+SMD,0.8,medium,
+DS1,Display,"1.3in 240x240 IPS, ST7789, FPC",square-friendly; ~23mm active,https://www.aliexpress.com/w/wholesale-1.3-inch-240x240-IPS-ST7789-FPC.html,3.5,low,
+CAM1,Camera,OV2640 2MP FPC module (alt OV5640 5MP),DVP; thin module,https://www.aliexpress.com/w/wholesale-OV2640-camera-module-FPC.html,3,low,power-gate; add privacy shutter/LED (+$0.5)
+SW1,"Button (""Copy"")",SMD tactile 3x3x1.5mm (low-profile),1 click -> log event,https://www.digikey.com/en/products/search?keywords=SMD+tactile+switch+low+profile,0.3,medium,
+B1,Battery,LiPo ~150-250mAh pouch <=2.5mm thick,3.7V w/ protection,https://www.aliexpress.com/w/wholesale-lipo-battery-402030.html,3.5,low,"402530 class; protected cell, UN38.3 cert needed for shipping"
+J1,Programming/charge fallback,USB-C via pogo pads (no connector),test pads,N/A (custom PCB),0.5,high,
+PCB1,Main PCB,4-6 layer 0.8mm,"~36x36mm, ENIG, HDI optional",https://www.pcbway.com/,6,medium,
+PCB2,SMT assembly,PCBWay assembly service,100 pcs turnkey,https://www.pcbway.com/pcb-assembly.html,8,low,
+BODY1,Steel top part,316L CNC/MIM,"40x40mm, polished mirror, 2-part",https://www.pcbway.com/cnc-machining-quote.html,14,low,
+BODY2,Steel bottom part,316L CNC/MIM,"40x40mm, window insert for RF/Qi",https://www.pcbway.com/cnc-machining-quote.html,12,low,
+WIN1,RF/Qi window,Glass / zirconia / PEEK insert,non-metallic,https://www.pcbway.com/cnc-machining-quote.html,2,low,
+G1,Cover glass,Gorilla-type / sapphire 0.5mm,over display + camera,https://www.aliexpress.com/w/wholesale-0.5mm-cover-glass-custom.html,3,low,
+CH1,Charging dock (Qi TX),Off-the-shelf Qi TX pad + custom dock cradle,5W,https://www.digikey.com/en/products/search?keywords=Qi+transmitter+5W,6,low,
+PKG1,Box + manual card,Printed PDF manual + box,,https://www.pcbway.com/,2,low,
+LDO1,3.3V buck,TPS62840 class,60nA Iq,https://www.ti.com/product/TPS62840,1.0,medium,new in v0.2
+LS1,Camera load switch,TPS22916 class,power-gate camera,https://www.ti.com/product/TPS22916,0.4,medium,new in v0.2
+JIG1,Test jig (one-off),Pogo fixture + PCB,NRE amortised over 100,https://www.pcbway.com/,8.0,low,new in v0.2: $800 NRE/100
+CERT1,FCC Part 15 / CE-RED pre-scan,third-party lab,NRE amortised over 100,n/a,60.0,low,"new in v0.2: $6k/100, intentional radiator via module reuse may lower this"
