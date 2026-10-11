@@ -82,6 +82,12 @@ input:-webkit-autofill {
   *:focus {
     @apply outline-none;
   }
+
+  *:focus-visible {
+    outline: 2px solid rgb(var(--acc-color-default) / 0.5);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 }
 
 @layer components {
@@ -120,7 +126,8 @@ input:-webkit-autofill {
     will-change: opacity;
   }
 
-  .grid-fill-hover:hover::before {
+  .grid-fill-hover:hover::before,
+  .grid-fill-hover:focus-visible::before {
     opacity: 1;
   }
 
