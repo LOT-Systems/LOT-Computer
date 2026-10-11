@@ -191,6 +191,38 @@ export type Answer = {
 };
 
 // Direct Message Type
+// LOT® Email — the simplest mail: one sender, one receiver, subject + body.
+export type Mail = {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  subject: string;
+  body: string;
+  readAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PublicMail = {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  fromName: string;
+  toName: string;
+  subject: string;
+  body: string;
+  isRead: boolean;
+  isMine: boolean;
+  createdAt: string;
+};
+
+export type MailEventPayload = {
+  id: string;
+  receiverId: string;
+  fromName: string;
+  subject: string;
+};
+
 export type DirectMessage = {
   id: string;
   senderId: string;
@@ -449,5 +481,6 @@ export type ChatMessageLikeEventPayload = {
 export type SyncEvents = {
   chatMessage: PublicChatMessage;
   chatMessageLike: ChatMessageLikeEventPayload;
+  mail: MailEventPayload;
   settings_updated: Record<string, never>;
 };

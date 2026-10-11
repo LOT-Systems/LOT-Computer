@@ -26,6 +26,12 @@ import {
   useLikeChatMessage,
 } from '#client/queries'
 import { sync } from '../sync'
+import {
+  SyncMail,
+  readMailPrefill,
+  useMailLiveRefresh,
+  useUnreadMail,
+} from '#client/components/SyncMail'
 import { PublicChatMessage, UserTag } from '#shared/types'
 import {
   SYNC_CHAT_MESSAGES_TO_SHOW,
@@ -50,6 +56,11 @@ export const Sync = React.memo(function SyncInner() {
   const queryClient = useQueryClient()
 
   const [message, setMessage] = React.useState('')
+  // LOT® Email lives beside chat; Cohort Connect can deep-link into a draft
+  const [mailPrefill] = React.useState(() => readMailPrefill())
+  const [view, setView] = React.useState<'chat' | 'mail'>(mailPrefill ? 'mail' : 'chat')
+  const unreadMail = useUnreadMail()
+  useMailLiveRefresh()
   // SSE-received messages not yet reflected in the API response
   const [sseMessages, setSseMessages] = React.useState<PublicChatMessage[]>([])
 
@@ -178,8 +189,29 @@ export const Sync = React.memo(function SyncInner() {
     )
   }
 
+  const tabs = (
+    <div className="flex gap-x-16 mb-32">
+      <GhostButton className={cn(view !== 'chat' && 'text-acc/40')} onClick={() => setView('chat')}>
+        Chat
+      </GhostButton>
+      <GhostButton className={cn(view !== 'mail' && 'text-acc/40')} onClick={() => setView('mail')}>
+        Mail{unreadMail ? ` (${unreadMail})` : ''}
+      </GhostButton>
+    </div>
+  )
+
+  if (view === 'mail') {
+    return (
+      <div className="max-w-[700px]">
+        {tabs}
+        <SyncMail prefill={mailPrefill} />
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-[700px]">
+      {tabs}
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}

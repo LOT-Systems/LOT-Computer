@@ -380,6 +380,13 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'mail': {
+          // Deliver only to the recipient
+          if (data.receiverId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4082,6 +4089,204 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — the simplest mail. Composed in Log (`/email to Name`),
+  // delivered to Sync, scoped to LOT Community (Sync-eligible members, which
+  // is also the pool Cohort Connect draws matches from).
+  // ============================================================================
+
+  const MAIL_COMMUNITY_TAGS = ['admin', 'rnd', 'usership', 'onyx', 'legacy']
+  const MAIL_HOURLY_LIMIT = 20
+  const MAIL_MAX_BODY = 5000
+  const MAIL_MAX_SUBJECT = 200
+
+  const isMailCommunityMember = (u: {
+    tags: string[]
+    isAdmin: () => boolean
+  }): boolean => {
+    const tags = (u.tags || []).map((t) => t.toLowerCase())
+    if (tags.includes('suspended')) return false
+    return u.isAdmin() || tags.some((t) => MAIL_COMMUNITY_TAGS.includes(t))
+  }
+
+  const mailDisplayName = (u: { firstName?: string | null; lastName?: string | null } | null | undefined) =>
+    `${u?.firstName || ''} ${u?.lastName || ''}`.trim() || 'Unknown'
+
+  // Escape LIKE wildcards in user-supplied name queries
+  const escapeLike = (s: string) => s.replace(/[\\%_]/g, (c) => `\\${c}`)
+
+  // Resolve a typed name ("Hitomi" / "Hitomi Tanaka") to community members
+  fastify.get('/mail/resolve', async (req: FastifyRequest<{
+    Querystring: { name?: string }
+  }>, reply) => {
+    if (!req.user) return reply.throw.authException()
+    const name = String(req.query.name || '').trim().slice(0, 80)
+    if (name.length < 2) return reply.send({ matches: [] })
+    try {
+      const like = `${escapeLike(name)}%`
+      const parts = name.split(/\s+/)
+      const candidates = await fastify.models.User.findAll({
+        where: {
+          id: { [Op.ne]: req.user.id },
+          [Op.or]: [
+            { firstName: { [Op.iLike]: like } },
+            Sequelize.where(
+              Sequelize.fn('concat_ws', ' ', Sequelize.col('firstName'), Sequelize.col('lastName')),
+              { [Op.iLike]: like }
+            ),
+            ...(parts.length > 1
+              ? [{
+                  firstName: { [Op.iLike]: `${escapeLike(parts[0])}%` },
+                  lastName: { [Op.iLike]: `${escapeLike(parts.slice(1).join(' '))}%` },
+                }]
+              : []),
+          ],
+        },
+        limit: 25,
+      })
+      const matches = candidates
+        .filter((u) => isMailCommunityMember(u))
+        .slice(0, 5)
+        .map((u) => ({ id: u.id, name: mailDisplayName(u) }))
+      return reply.send({ matches })
+    } catch (error) {
+      console.error('Error resolving mail recipient:', error)
+      return reply.status(500).send({ error: 'Failed to resolve recipient' })
+    }
+  })
+
+  // Send mail: { toUserId | to (name), subject?, body }
+  fastify.post('/mail', async (req: FastifyRequest<{
+    Body: { toUserId?: string; to?: string; subject?: string; body?: string }
+  }>, reply) => {
+    if (!req.user) return reply.throw.authException()
+    try {
+      const body = String(req.body?.body || '').trim().slice(0, MAIL_MAX_BODY)
+      const subject = String(req.body?.subject || '').trim().slice(0, MAIL_MAX_SUBJECT)
+      if (!body) return reply.status(400).send({ error: 'Message body is required' })
+
+      if (!isMailCommunityMember(req.user)) {
+        return reply.status(403).send({ error: 'LOT Email is available to LOT Community members' })
+      }
+
+      let receiver = null as InstanceType<typeof fastify.models.User> | null
+      if (req.body?.toUserId) {
+        receiver = await fastify.models.User.findByPk(String(req.body.toUserId))
+      } else if (req.body?.to) {
+        const name = String(req.body.to).trim().slice(0, 80)
+        const found = await fastify.models.User.findAll({
+          where: {
+            id: { [Op.ne]: req.user.id },
+            firstName: { [Op.iLike]: escapeLike(name) },
+          },
+          limit: 25,
+        })
+        const members = found.filter((u) => isMailCommunityMember(u))
+        if (members.length > 1) {
+          return reply.status(409).send({
+            error: 'Several members match — choose one',
+            matches: members.slice(0, 5).map((u) => ({ id: u.id, name: mailDisplayName(u) })),
+          })
+        }
+        receiver = members[0] || null
+      }
+      if (!receiver || !isMailCommunityMember(receiver)) {
+        return reply.status(404).send({ error: 'Recipient not found in LOT Community' })
+      }
+      if (receiver.id === req.user.id) {
+        return reply.status(400).send({ error: 'Cannot email yourself' })
+      }
+
+      const hourAgo = dayjs().subtract(1, 'hour').toDate()
+      const recent = await fastify.models.Mail.count({
+        where: { senderId: req.user.id, createdAt: { [Op.gte]: hourAgo } },
+      })
+      if (recent >= MAIL_HOURLY_LIMIT) {
+        return reply.status(429).send({ error: 'Hourly mail limit reached' })
+      }
+
+      const mail = await fastify.models.Mail.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        subject,
+        body,
+      })
+
+      // Receiver-only SSE (no body on the wire — Sync refetches the inbox)
+      sync.emit('mail', {
+        id: mail.id,
+        receiverId: receiver.id,
+        fromName: mailDisplayName(req.user),
+        subject: mail.subject,
+      })
+
+      return reply.send({
+        id: mail.id,
+        toName: mailDisplayName(receiver),
+        createdAt: mail.createdAt,
+      })
+    } catch (error) {
+      console.error('Error sending mail:', error)
+      return reply.status(500).send({ error: 'Failed to send mail' })
+    }
+  })
+
+  // Inbox + sent for the current user (latest 50 each) and unread count
+  fastify.get('/mail', async (req, reply) => {
+    if (!req.user) return reply.throw.authException()
+    try {
+      const rows = await fastify.models.Mail.findAll({
+        where: { [Op.or]: [{ receiverId: req.user.id }, { senderId: req.user.id }] },
+        order: [['createdAt', 'DESC']],
+        limit: 100,
+      })
+      const ids = Array.from(new Set(rows.flatMap((m) => [m.senderId, m.receiverId])))
+      const users = await fastify.models.User.findAll({
+        where: { id: { [Op.in]: ids } },
+        attributes: ['id', 'firstName', 'lastName'],
+      })
+      const names = new Map(users.map((u) => [u.id, mailDisplayName(u)]))
+      const mails = rows.map((m) => ({
+        id: m.id,
+        senderId: m.senderId,
+        receiverId: m.receiverId,
+        fromName: names.get(m.senderId) || 'Unknown',
+        toName: names.get(m.receiverId) || 'Unknown',
+        subject: m.subject,
+        body: m.body,
+        isRead: m.senderId === req.user.id || !!m.readAt,
+        isMine: m.senderId === req.user.id,
+        createdAt: m.createdAt,
+      }))
+      const unread = await fastify.models.Mail.count({
+        where: { receiverId: req.user.id, readAt: null },
+      })
+      return reply.send({ mails, unread })
+    } catch (error) {
+      console.error('Error fetching mail:', error)
+      return reply.status(500).send({ error: 'Failed to fetch mail' })
+    }
+  })
+
+  // Mark one received mail as read
+  fastify.post('/mail/read', async (req: FastifyRequest<{
+    Body: { id?: string }
+  }>, reply) => {
+    if (!req.user) return reply.throw.authException()
+    try {
+      const id = String(req.body?.id || '')
+      if (!id) return reply.status(400).send({ error: 'id is required' })
+      await fastify.models.Mail.update(
+        { readAt: new Date() },
+        { where: { id, receiverId: req.user.id, readAt: null } }
+      )
+      return reply.send({ ok: true })
+    } catch (error) {
+      console.error('Error marking mail read:', error)
+      return reply.status(500).send({ error: 'Failed to update mail' })
     }
   })
 

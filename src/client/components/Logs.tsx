@@ -36,6 +36,7 @@ import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
+import { MailComposer } from '#client/components/MailComposer'
 
 const localStore = {
   logById: map<Record<string, Log>>({}),
@@ -4126,6 +4127,7 @@ const NoteEditor = ({
           '',
           '/prayer       Generate contextual scripture',
           '/story        Generate a personal story from recent data',
+          '/email to X   Compose LOT Email — appears in X\'s Sync',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
@@ -4386,6 +4388,12 @@ const NoteEditor = ({
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
             </Block>
           </div>
+        )}
+        {primary && (
+          <MailComposer
+            text={value}
+            onSent={(toName) => setValue(`✉ Mail sent to ${toName}`)}
+          />
         )}
         {systemHelp && (
           <div className="mt-8">

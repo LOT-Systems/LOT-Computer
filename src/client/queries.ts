@@ -19,6 +19,7 @@ import {
   DefaultQuestion,
   Log,
   Paginated,
+  PublicMail,
   PublicChatMessage,
   User,
   UserProfile,
@@ -119,6 +120,31 @@ export const useSendDirectMessage = createMutation<
   { receiverId: string; message: string },
   void
 >('post', '/api/direct-messages')
+
+// LOT® Email
+export const useMail = createQuery<{ mails: PublicMail[]; unread: number }>(
+  '/api/mail',
+  { refetchOnWindowFocus: false }
+)
+
+export type MailMatch = { id: string; name: string }
+
+export const useSendMail = createMutation<
+  { toUserId?: string; to?: string; subject?: string; body: string },
+  { id: string; toName: string; createdAt: string }
+>('post', '/api/mail')
+
+export const useMarkMailRead = createMutation<{ id: string }, { ok: boolean }>(
+  'post',
+  '/api/mail/read'
+)
+
+export async function resolveMailRecipient(name: string): Promise<MailMatch[]> {
+  const { data } = await api.get<{ matches: MailMatch[] }>('/api/mail/resolve', {
+    params: { name },
+  })
+  return data.matches
+}
 
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
