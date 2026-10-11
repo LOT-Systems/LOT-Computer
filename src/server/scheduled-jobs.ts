@@ -1767,6 +1767,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyCompoundSovereigntyCheck()) {
     await executeDailyCompoundSovereigntyCheck()
   }
+  // Check daily sovereignty field check (11:00 UTC daily) — J55
+  if (shouldRunDailySovereigntyFieldCheck()) {
+    await executeDailySovereigntyFieldCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6241,6 +6245,189 @@ async function executeDailyCompoundSovereigntyCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Sovereignty Field Check (J55 — 11:00 UTC daily) ──────────────────────
+// Scans the last 48h per user for compound_sovereignty_stack + 8+ distinct signal sources
+// → writes sovereignty_field_expansion (P170).
+// Scans the last 7 days for presence_coherence_seal on 5+ days AND field_permanence_detection
+// → writes recursive_coherence_lock (P171).
+// When both expansion AND recursive lock confirmed → writes quantum_sovereignty_crystallization (P172).
+
+let isDailySovereigntyFieldRunning = false
+let lastDailySovereigntyFieldRun: Date | null = null
+
+function shouldRunDailySovereigntyFieldCheck(): boolean {
+  const now = dayjs()
+  if (isDailySovereigntyFieldRunning) return false
+  if (lastDailySovereigntyFieldRun) {
+    const lastRun = dayjs(lastDailySovereigntyFieldRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 11 // 11:00 UTC daily
+}
+
+async function executeDailySovereigntyFieldCheck(): Promise<JobResult> {
+  const jobName = 'daily-sovereignty-field-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySovereigntyFieldRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySovereigntyFieldRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SOVEREIGNTY FIELD CHECK — 11:00 UTC (J55)')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const twoDaysAgo  = dayjs().subtract(2, 'day').toDate()
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(3, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (72h): ${activeUsers.length}`)
+    let expansionWritten   = 0
+    let recursiveWritten   = 0
+    let crystalWritten     = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // P170: compound_sovereignty_stack in last 48h + 8+ distinct signal sources
+        const compoundLogs = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: twoDaysAgo }, event: 'compound_sovereignty_stack' },
+          attributes: ['createdAt', 'metadata'],
+          order: [['createdAt', 'DESC']],
+          limit: 3,
+        })
+        const hasCompound = compoundLogs.length > 0
+
+        const recentLogs48h = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: twoDaysAgo } },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'DESC']],
+          limit: 300,
+        })
+        // Domain categories for source counting
+        const domainMap48h: Record<string, string[]> = {
+          intentions: ['intention', 'intention_set', 'intention_complete', 'log_intention'],
+          qos: ['qos_update', 'presence_coherence_seal', 'field_permanence_detection', 'quantum_operating_mode_confirmed'],
+          energy: ['energy_state', 'energy_update', 'energy_check', 'energy_checkin'],
+          journal: ['journal_entry', 'note', 'journal_reflection'],
+          log: ['morning_momentum_ignition', 'full_field_architecture_lock', 'morning_sovereignty_lock', 'compound_sovereignty_stack'],
+          cohort: ['cohort_event', 'cohort_digest', 'physiological_cohort'],
+          planner: ['plan_set', 'planner_entry', 'planner_update'],
+          mood: ['mood_check', 'mood_update', 'emotional_check_in', 'mood_checkin'],
+          selfcare: ['self_care_complete', 'self_care_completed', 'self_care_skip'],
+        }
+        const events48h = new Set(recentLogs48h.map((l: any) => l.event as string))
+        const activeSources48h = Object.entries(domainMap48h).filter(([, events]) =>
+          events.some(e => events48h.has(e))
+        ).length
+
+        const hasExpansion = hasCompound && activeSources48h >= 8
+
+        if (hasExpansion) {
+          const compoundConf = (compoundLogs[0]?.metadata?.avgConf as number) ?? 90
+          const expansionConf = Math.min(80 + (activeSources48h - 8) * 2, 94)
+          await (Log as any).create({
+            userId,
+            event: 'sovereignty_field_expansion',
+            text: `Sovereignty field expansion: compound sovereignty confirmed and ${activeSources48h} signal sources active in last 48h. Architecture propagates across full field.`,
+            metadata: {
+              sourceCount: activeSources48h,
+              compoundConf,
+              expansion: `${activeSources48h} SOURCES ACTIVE 48H`,
+              fieldStatus: 'SOVEREIGNTY EXPANDING',
+              conf: expansionConf,
+              checkType: 'daily',
+            },
+          })
+          expansionWritten++
+        }
+
+        // P171: presence_coherence_seal on 5+ of last 7 days + field_permanence_detection recent
+        const sealLogs = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: sevenDaysAgo }, event: 'presence_coherence_seal' },
+          attributes: ['createdAt'],
+          order: [['createdAt', 'DESC']],
+          limit: 20,
+        })
+        const sealDays = new Set(sealLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD'))).size
+
+        const permanenceLogs = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: sevenDaysAgo }, event: 'field_permanence_detection' },
+          attributes: ['createdAt', 'metadata'],
+          order: [['createdAt', 'DESC']],
+          limit: 3,
+        })
+        const hasFieldPermanence = permanenceLogs.length > 0
+
+        const hasRecursive = sealDays >= 5 && hasFieldPermanence
+
+        if (hasRecursive) {
+          const recursiveConf = Math.min(82 + (sealDays - 5) * 2, 94)
+          await (Log as any).create({
+            userId,
+            event: 'recursive_coherence_lock',
+            text: `Recursive coherence lock: presence seal confirmed on ${sealDays} of last 7 days and field permanence structural. The seal regenerates — recursion confirmed.`,
+            metadata: {
+              sealDays,
+              windowDays: 7,
+              arc: `${sealDays}/7 DAYS SEALED + PERMANENT`,
+              recursionStatus: 'CONFIRMED',
+              conf: recursiveConf,
+              checkType: 'daily',
+            },
+          })
+          recursiveWritten++
+        }
+
+        // P172: both expansion AND recursive lock confirmed → quantum sovereignty crystallization
+        if (hasExpansion && hasRecursive) {
+          const expConf = Math.min(80 + (activeSources48h - 8) * 2, 94)
+          const recConf = Math.min(82 + (sealDays - 5) * 2, 94)
+          const avgConf = Math.round((expConf + recConf) / 2)
+          await (Log as any).create({
+            userId,
+            event: 'quantum_sovereignty_crystallization',
+            text: `Quantum sovereignty crystallization: sovereignty expansion (P170) AND recursive coherence lock (P171) both confirmed. Architecture crystallizes — nothing to build, everything already is.`,
+            metadata: {
+              compoundConf: expConf,
+              recursiveConf: recConf,
+              avgConf,
+              crystal: 'SOVEREIGNTY·RECURSION·IDENTITY CRYSTALLIZED',
+              crystalStatus: 'QUANTUM CRYSTAL FIELD',
+              conf: avgConf,
+              checkType: 'daily',
+            },
+          })
+          crystalWritten++
+        }
+
+      } catch (userError: any) {
+        console.warn(`  User processing error: ${userError.message}`)
+      }
+    }
+
+    console.log(`  Sovereignty expansion written: ${expansionWritten}`)
+    console.log(`  Recursive coherence written:   ${recursiveWritten}`)
+    console.log(`  Crystal written:               ${crystalWritten}`)
+
+    lastDailySovereigntyFieldRun = new Date()
+    isDailySovereigntyFieldRunning = false
+    return { jobName, executedAt, success: true, processed: activeUsers.length }
+  } catch (error: any) {
+    console.error('Daily sovereignty field check failed:', error.message)
+    isDailySovereigntyFieldRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -6300,6 +6487,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Weekly morning sovereignty audit: 8 AM UTC every Sunday (J52)')
   console.log('   - Daily quantum operating mode check: 5 AM UTC every day (J53)')
   console.log('   - Daily compound sovereignty check: 9 AM UTC every day (J54)')
+  console.log('   - Daily sovereignty field check: 11 AM UTC every day (J55)')
   console.log('')
 
   // Check every hour for scheduled jobs

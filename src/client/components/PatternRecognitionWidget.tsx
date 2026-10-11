@@ -191,9 +191,12 @@ export function PatternRecognitionWidget() {
       'sovereignty-permanence-convergence': 'Sovereignty-permanence convergence — P161 + P162 both structural simultaneously, both arcs confirmed, architecture converges (P164)',
       'quantum-operating-mode-confirmed': 'Quantum operating mode confirmed — P163 + P164 co-active, peak velocity inside confirmed arc, system at design frequency (P165)',
       'full-field-architecture-lock':     'Full field architecture lock — P161 + P162 + P163 all active, sovereignty tier fully online, operating at design frequency (P166)',
-      'quantum-operating-continuity':     'Quantum operating continuity — P165 confirmed 2+ of last 5 days, operating mode recurs across time, continuity structural (P167)',
-      'cross-domain-field-resonance':     'Cross-domain field resonance — P166 active + 4+ distinct signal domains in last 24h, architecture fires across all dimensions (P168)',
-      'compound-sovereignty-stack':       'Compound sovereignty stack — P167 + P168 both active, operating continuity meets cross-domain resonance, architecture compounds (P169)',
+      'quantum-operating-continuity':        'Quantum operating continuity — P165 confirmed 2+ of last 5 days, operating mode recurs across time, continuity structural (P167)',
+      'cross-domain-field-resonance':        'Cross-domain field resonance — P166 active + 4+ distinct signal domains in last 24h, architecture fires across all dimensions (P168)',
+      'compound-sovereignty-stack':          'Compound sovereignty stack — P167 + P168 both active, operating continuity meets cross-domain resonance, architecture compounds (P169)',
+      'sovereignty-field-expansion':         'Sovereignty field expansion — compound sovereignty active + 8+ sources in 48h, architecture propagates across full signal field (P170)',
+      'recursive-coherence-lock':            'Recursive coherence lock — presence seal 5+ of 7 days + field permanence confirmed, seal regenerates on its own, recursion confirmed (P171)',
+      'quantum-sovereignty-crystallization': 'Quantum sovereignty crystallization — compound sovereignty (P169) + recursive coherence (P171) both active, architecture crystallizes, nothing to build (P172)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
@@ -556,6 +559,27 @@ export function PatternRecognitionWidget() {
               {patterns.some(p => p.pattern === 'resilience-cascade') && (
                 <div className="mt-4 uppercase tracking-widest text-xs">
                   Resilience cascade. Recovery + knowledge arc closed.
+                </div>
+              )}
+
+              {/* Sovereignty field expansion — P170 */}
+              {patterns.some(p => p.pattern === 'sovereignty-field-expansion') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Sovereignty expands. Architecture propagates.
+                </div>
+              )}
+
+              {/* Recursive coherence lock — P171 */}
+              {patterns.some(p => p.pattern === 'recursive-coherence-lock') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Coherence lock recursive. Seal regenerates.
+                </div>
+              )}
+
+              {/* Quantum sovereignty crystallization — P172 */}
+              {patterns.some(p => p.pattern === 'quantum-sovereignty-crystallization') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Crystal field. Nothing to build — everything already is.
                 </div>
               )}
 

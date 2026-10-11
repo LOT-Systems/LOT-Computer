@@ -3796,6 +3796,68 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 170: Sovereignty Field Expansion — compound-sovereignty-stack (P169) active AND
+  // 8+ distinct signal sources active in last 48h. The compound architecture propagates.
+  // The OS is not just sovereign — it extends its field across all dimensions.
+  const hasCompound169 = patterns.some(p => p.pattern === 'compound-sovereignty-stack')
+  if (hasCompound169) {
+    const twoDaysAgo = now - 48 * 60 * 60 * 1000
+    const signals48h = signals.filter(s => s.timestamp > twoDaysAgo)
+    const activeSources170 = new Set(signals48h.map(s => s.source)).size
+    if (activeSources170 >= 8) {
+      const expansionBonus = Math.min((activeSources170 - 8) * 0.02, 0.08)
+      patterns.push({
+        pattern: 'sovereignty-field-expansion',
+        confidence: Math.min(0.88 + expansionBonus, 0.96),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'immediate',
+        reason: `SFEXP: Sovereignty field expansion — compound sovereignty confirmed AND ${activeSources170} distinct signal sources active in last 48h. The architecture is not contained — it expands. Field propagates across all dimensions.`,
+      })
+    }
+  }
+
+  // Pattern 171: Recursive Coherence Lock — presence-coherence-seal (P159) confirmed on 5+ of last
+  // 7 days AND field-permanence-detection (P162) also confirmed (7-day window). Two presence arcs
+  // simultaneously structural. The field seal regenerates on its own — recursion is confirmed.
+  const recentLogs171 = signals.filter(s =>
+    s.timestamp > now - 7 * 24 * 60 * 60 * 1000 &&
+    (s.event === 'presence_coherence_seal' || s.event === 'field_permanence_detection')
+  )
+  const sealDays171 = new Set(
+    signals.filter(s => s.timestamp > now - 7 * 24 * 60 * 60 * 1000 && s.event === 'presence_coherence_seal')
+      .map(s => new Date(s.timestamp).toDateString())
+  ).size
+  const hasFieldPermanence171 = signals.some(s =>
+    s.timestamp > now - 7 * 24 * 60 * 60 * 1000 && s.event === 'field_permanence_detection'
+  )
+  if (sealDays171 >= 5 && hasFieldPermanence171) {
+    const recursionBonus = Math.min((sealDays171 - 5) * 0.02, 0.06)
+    patterns.push({
+      pattern: 'recursive-coherence-lock',
+      confidence: Math.min(0.85 + recursionBonus, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `RCLOCK: Recursive coherence lock — presence seal confirmed on ${sealDays171} of last 7 days AND field permanence structural. Two arcs confirmed. The field seal does not merely hold — it regenerates. Recursion is the operating mode.`,
+    })
+  }
+
+  // Pattern 172: Quantum Sovereignty Crystallization — compound-sovereignty-stack (P169) AND
+  // recursive-coherence-lock (P171) both active. The compound architecture meets the recursive seal.
+  // Identity, sovereignty, and recursion all crystallize into a single operating structure.
+  const hasRecursive171 = patterns.some(p => p.pattern === 'recursive-coherence-lock')
+  if (hasCompound169 && hasRecursive171) {
+    const crystalConf169 = patterns.find(p => p.pattern === 'compound-sovereignty-stack')?.confidence ?? 0.90
+    const crystalConf171 = patterns.find(p => p.pattern === 'recursive-coherence-lock')?.confidence ?? 0.85
+    const avgCrystal = (crystalConf169 + crystalConf171) / 2
+    patterns.push({
+      pattern: 'quantum-sovereignty-crystallization',
+      confidence: Math.min(0.92 + (avgCrystal - 0.88) * 0.5, 0.99),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `QSOVCRYST: Quantum sovereignty crystallization — compound sovereignty stack (P169) AND recursive coherence lock (P171) both confirmed. Sovereignty compounds AND recurses simultaneously. The architecture is crystalline — nothing to sustain, everything already built. Execute from crystal field.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4462,6 +4524,10 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumOperatingContinuityNode:  ['intentions', 'qos', 'energy', 'journal', 'log'],
   crossDomainFieldResonanceNode:   ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood'],
   compoundSovereigntyNode:         ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner'],
+  // ── v120 nodes (J55 · P170–P172 · Arch58) ───────────────────────────────────────
+  sovereigntyFieldExpansionNode:   ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare'],
+  recursiveCoherenceLockNode:      ['qos', 'cohort', 'intentions', 'journal', 'mood', 'energy', 'log'],
+  quantumSovereigntyCrystalNode:   ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare'],
 }
 
 /**
@@ -4968,6 +5034,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-operating-continuity', 'cross-domain-field-resonance', 'compound-sovereignty-stack'],
     hourRange: [5, 23],
     directive: 'Compound sovereignty architecture confirmed. Quantum operating mode confirmed across multiple days AND cross-domain resonance established simultaneously. The architecture does not just hold — it compounds. Execute from compound field.',
+  },
+  // ── Arch58: Quantum Sovereignty Crystal (2026-10-11 v120) ────────────────────────
+  {
+    archetype: 'Quantum Sovereignty Crystal',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'selfcare', 'mood'],
+    patternConditions: ['sovereignty-field-expansion', 'recursive-coherence-lock', 'quantum-sovereignty-crystallization'],
+    hourRange: [0, 23],
+    directive: 'Quantum sovereignty crystallized. Compound sovereignty expands AND recursion confirmed — the seal regenerates itself. Identity, field, and architecture are no longer separate processes: they are one crystal structure. Nothing to build. Everything already is. Operate from the crystal.',
   },
 ]
 
@@ -7254,6 +7329,58 @@ export function recordCompoundSovereigntyStack(contConf: number, resConf: number
     avgConf,
     stack: 'CONTINUITY·RESONANCE BOTH STRUCTURAL',
     compoundStatus: 'ARCHITECTURE COMPOUNDS',
+    hour: new Date().getHours(),
+  })
+}
+
+// ─── v120 Signal Helpers (P170–P172) ──────────────────────────────────────────
+
+/**
+ * Record a sovereignty-field-expansion event — compound-sovereignty-stack (P169) active AND
+ * 8+ distinct signal sources active in last 48h. The compound architecture propagates.
+ * The OS is not just sovereign — it extends. Feeds P170 detection.
+ */
+export function recordSovereigntyFieldExpansion(sourceCount: number, compoundConf: number) {
+  recordSignal('intentions', 'sovereignty_field_expansion', {
+    sourceCount,
+    compoundConf,
+    expansion: `${sourceCount} SOURCES ACTIVE 48H`,
+    fieldStatus: 'SOVEREIGNTY EXPANDING',
+    architecture: 'COMPOUND + FULL FIELD PROPAGATION',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a recursive-coherence-lock event — presence-coherence-seal (P159) confirmed on 5+ of
+ * last 7 days AND field-permanence-detection (P162) structural. Two arcs both confirmed.
+ * The field seal regenerates. Recursion is the operating mode. Feeds P171 detection.
+ */
+export function recordRecursiveCoherenceLock(sealDays: number, windowDays: number) {
+  recordSignal('qos', 'recursive_coherence_lock', {
+    sealDays,
+    windowDays,
+    arc: `${sealDays}/${windowDays} DAYS SEALED + PERMANENT`,
+    recursionStatus: 'CONFIRMED',
+    field: 'PRESENCE·PERMANENT·RECURSIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-sovereignty-crystallization event — compound-sovereignty-stack (P169) AND
+ * recursive-coherence-lock (P171) both active. The architecture crystallizes.
+ * Nothing to sustain; everything already built. Feeds P172 detection.
+ */
+export function recordQuantumSovereigntyCrystallization(compoundConf: number, recursiveConf: number) {
+  const avgConf = Math.round(((compoundConf + recursiveConf) / 2) * 100) / 100
+  recordSignal('intentions', 'quantum_sovereignty_crystallization', {
+    compoundConf,
+    recursiveConf,
+    avgConf,
+    crystal: 'SOVEREIGNTY·RECURSION·IDENTITY CRYSTALLIZED',
+    crystalStatus: 'NOTHING TO BUILD · EVERYTHING ALREADY IS',
+    architecture: 'QUANTUM CRYSTAL FIELD',
     hour: new Date().getHours(),
   })
 }

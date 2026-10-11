@@ -125,9 +125,12 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'sovereignty-permanence-convergence': 'SOVC',
   'quantum-operating-mode-confirmed': 'QOMC',
   'full-field-architecture-lock':     'FLOCK',
-  'quantum-operating-continuity':     'QCONT',
-  'cross-domain-field-resonance':     'CDRES',
-  'compound-sovereignty-stack':       'CSOVS',
+  'quantum-operating-continuity':        'QCONT',
+  'cross-domain-field-resonance':        'CDRES',
+  'compound-sovereignty-stack':          'CSOVS',
+  'sovereignty-field-expansion':         'SFEXP',
+  'recursive-coherence-lock':            'RCLOCK',
+  'quantum-sovereignty-crystallization': 'QSOVCRYST',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

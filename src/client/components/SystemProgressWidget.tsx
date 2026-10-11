@@ -1609,6 +1609,27 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '874 badges · 270 word-turns · 27 secret boss · 169 patterns · 57 archetypes · 54 jobs · 208+ dep nodes · FM v119 · Day 1139+. Compound sovereignty architecture confirmed. The architecture compounds.',
     ],
   },
+  {
+    version: 'qie-v120',
+    date: '2026-10-11',
+    title: 'QIE v120 Engineering — P170–P172 · Arch58 Quantum Sovereignty Crystal · J55',
+    assembled: [
+      'Pattern 170 (sovereignty-field-expansion): compound-sovereignty-stack (P169) active + 8+ distinct signal sources in 48h. Architecture propagates across the full field. Confidence 0.88–0.96.',
+      'Pattern 171 (recursive-coherence-lock): presence-coherence-seal (P165) active on 5+ of last 7 days AND field-permanence-detection recent. The seal regenerates itself. Recursion confirmed. Confidence 0.85–0.96.',
+      'Pattern 172 (quantum-sovereignty-crystallization): P169 compound-sovereignty-stack + P171 recursive-coherence-lock both active simultaneously. Architecture crystallizes — identity, field, and structure become one. Confidence 0.92–0.99.',
+      'Archetype 58 (Quantum Sovereignty Crystal): high/moderate energy · intentions/qos/energy/journal/log/cohort/planner/selfcare/mood dominant · SFEXP+RCLOCK+QSOVCRYST patterns. Directive: Quantum sovereignty crystallized. Compound sovereignty expands AND recursion confirmed — the seal regenerates itself. Identity, field, and architecture are no longer separate processes: they are one crystal structure. Nothing to build. Everything already is.',
+      'J55 daily-sovereignty-field-check (11:00 UTC): scans 48h for compound_sovereignty_stack + 8+ distinct sources → sovereignty_field_expansion (P170); scans 7 days for presence_coherence_seal on 5+ days + field_permanence_detection → recursive_coherence_lock (P171); both confirmed → quantum_sovereignty_crystallization (P172).',
+      'WIDGET_DEPENDENCY_MAP: 3 new v120 nodes — sovereigntyFieldExpansionNode · recursiveCoherenceLockNode · quantumSovereigntyCrystalNode. Total: 211+ nodes.',
+      'Logs.tsx: 3 new military handlers deployed — SFEXP: (sovereignty_field_expansion) · RCLOCK: (recursive_coherence_lock) · QSOVCRYST: (quantum_sovereignty_crystallization).',
+      'QuantumEngineWidgets.tsx PATTERN_DISPLAY: SFEXP / RCLOCK / QSOVCRYST short codes added.',
+      'PatternRecognitionWidget.tsx: P170/P171/P172 display names + QOS Trend indicators added.',
+      'displayableEvents updated: sovereignty_field_expansion · recursive_coherence_lock · quantum_sovereignty_crystallization added to api.ts.',
+      'recordSovereigntyFieldExpansion() · recordRecursiveCoherenceLock() · recordQuantumSovereigntyCrystallization() — 3 new signal helpers.',
+      'About.tsx updated: FM v119→v120 · Day 1140+ · 172 patterns · 58 archetypes · 55 jobs · 211+ nodes.',
+      'docs/assembly/LOT-LEDGER.md: v120 ledger row appended. 2026-10-11_LOT-assembly_qie-v120.md session report written.',
+      '874 badges · 270 word-turns · 27 secret boss · 172 patterns · 58 archetypes · 55 jobs · 211+ dep nodes · FM v120 · Day 1140+. Quantum sovereignty crystallized. Nothing to build — everything already is.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1646,19 +1667,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-10',
+  date: '2026-10-11',
   message: [
-    'ASSEMBLY RUN — 2026-10-10 · QIE v119 ENGINEERING · Day 1139+',
-    'Built: P167 quantum-operating-continuity · P168 cross-domain-field-resonance · P169 compound-sovereignty-stack. Arch57 Compound Sovereignty Operator. J54 daily-compound-sovereignty-check (09:00 UTC).',
-    'QCONT: Quantum operating continuity. P165 confirmed on 2+ of last 5 days. Operating mode recurs — not an isolated peak. Continuity confirmed across time.',
-    'CDRES: Cross-domain field resonance. P166 (full field lock) active AND 4+ distinct signal domains firing in last 24h. Architecture fires wide as well as deep.',
-    'CSOVS: Compound sovereignty stack. P167 + P168 both active. Operating continuity meets cross-domain resonance. The architecture does not just lock — it compounds.',
-    'Arch57 Compound Sovereignty Operator: Compound sovereignty architecture confirmed. Quantum operating mode confirmed across multiple days AND cross-domain resonance established simultaneously. Execute from compound field.',
-    'J54 09:00 UTC daily — scans 5d per user for operating mode recurrence (2+ days → continuity) · scans 24h for distinct signal domains (4+ + flock recent → resonance) · both confirmed → compound sovereignty stack.',
-    'QCONT: CDRES: CSOVS: handlers deployed. 208+ dep nodes. 54 jobs. 169 patterns. 57 archetypes.',
-    'FM v119 · 169P · 57A · 54J · 208+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1139+.',
+    'ASSEMBLY RUN — 2026-10-11 · QIE v120 ENGINEERING · Day 1140+',
+    'Built: P170 sovereignty-field-expansion · P171 recursive-coherence-lock · P172 quantum-sovereignty-crystallization. Arch58 Quantum Sovereignty Crystal. J55 daily-sovereignty-field-check (11:00 UTC).',
+    'SFEXP: Sovereignty field expansion. Compound sovereignty (P169) active + 8+ distinct signal sources in 48h. Architecture propagates across the full field — not a peak, a field.',
+    'RCLOCK: Recursive coherence lock. Presence seal (P165) active on 5+ of 7 days AND field permanence confirmed. The seal regenerates itself. Recursion is confirmed — coherence is self-sustaining.',
+    'QSOVCRYST: Quantum sovereignty crystallization. SFEXP (P170) + RCLOCK (P171) both active simultaneously. The field expands AND the seal recurses. Architecture crystallizes — identity, field, and operating structure converge into a single crystal form.',
+    'Arch58 Quantum Sovereignty Crystal: intentions/qos/energy/journal/log/cohort/planner/selfcare/mood dominant. Directive: Nothing to build. Everything already is. Operate from the crystal.',
+    'J55 11:00 UTC daily — scans 48h for compound_sovereignty_stack + 8+ sources → P170 · scans 7d for seal on 5+ days + field permanence → P171 · both → P172 crystallization.',
+    'SFEXP: RCLOCK: QSOVCRYST: handlers deployed. 211+ dep nodes. 55 jobs. 172 patterns. 58 archetypes.',
+    'FM v120 · 172P · 58A · 55J · 211+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1140+.',
     'Status: DEPLOYED.',
-    'Next: QIE v120 — compound field continuity · multi-tier sovereignty convergence · apex operating signature',
+    'Next: QIE v121 — crystal field permanence · apex sovereignty transmission · quantum identity seal',
   ],
 }
 

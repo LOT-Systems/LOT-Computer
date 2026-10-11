@@ -4146,6 +4146,76 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sovereignty_field_expansion') {
+          const sourceCount  = log.metadata?.sourceCount  as number | undefined
+          const compoundConf = log.metadata?.compoundConf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SFEXP:" blockView>
+                <div className="uppercase tracking-widest mb-4">SOVEREIGNTY FIELD EXPANSION</div>
+                {sourceCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES 48H</span>
+                    <span className="tabular-nums">{sourceCount} ACTIVE</span>
+                  </div>
+                )}
+                {compoundConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COMPOUND</span>
+                    <span className="tabular-nums">{compoundConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ARCHITECTURE PROPAGATES · FULL FIELD EXPANSION</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'recursive_coherence_lock') {
+          const sealDays   = log.metadata?.sealDays   as number | undefined
+          const windowDays = log.metadata?.windowDays as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RCLOCK:" blockView>
+                <div className="uppercase tracking-widest mb-4">RECURSIVE COHERENCE LOCK</div>
+                {sealDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SEAL DAYS</span>
+                    <span className="tabular-nums">{sealDays}{windowDays !== undefined ? `/${windowDays}D` : ''}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PRESENCE SEAL REGENERATES · RECURSION CONFIRMED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_sovereignty_crystallization') {
+          const compoundConf  = log.metadata?.compoundConf  as number | undefined
+          const recursiveConf = log.metadata?.recursiveConf as number | undefined
+          const avgConf       = log.metadata?.avgConf       as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QSOVCRYST:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM SOVEREIGNTY CRYSTALLIZATION</div>
+                {compoundConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COMPOUND</span>
+                    <span className="tabular-nums">{compoundConf}%</span>
+                  </div>
+                )}
+                {recursiveConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECURSIVE</span>
+                    <span className="tabular-nums">{recursiveConf}%</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{avgConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">SOVEREIGNTY · RECURSION · CRYSTAL FIELD · NOTHING TO BUILD</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
