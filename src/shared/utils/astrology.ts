@@ -177,3 +177,43 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Build a Date whose local getters reflect the given IANA timeZone's
+ * wall-clock, so the date-math readers above follow the user's saved
+ * timeZone rather than the device/server runtime zone. Falls back to `now`.
+ */
+export function toZonedWallClock(timeZone?: string | null, now: Date = new Date()): Date {
+  if (!timeZone) return now
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(now)
+    const g = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(g('year'), g('month') - 1, g('day'), g('hour'), g('minute'), g('second'))
+  } catch {
+    return now
+  }
+}
+
+/**
+ * Logs <-> astrology resonance: how many of the user's past log entries
+ * were written under the same rokuyo / moon phase as the current reading
+ * (uses the ambient snapshot stored on each log's context).
+ */
+export function getAstrologyLogResonance(
+  logs: Array<{ context?: Record<string, any> | null }>,
+  reading: { rokuyo: string; moonPhase: string }
+): { sameRokuyo: number; sameMoonPhase: number; total: number } {
+  let sameRokuyo = 0, sameMoonPhase = 0, total = 0
+  for (const log of logs) {
+    const c = log.context
+    if (!c?.astroRokuyo) continue
+    total++
+    if (c.astroRokuyo === reading.rokuyo) sameRokuyo++
+    if (c.astroMoonPhase === reading.moonPhase) sameMoonPhase++
+  }
+  return { sameRokuyo, sameMoonPhase, total }
+}
