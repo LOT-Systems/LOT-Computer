@@ -321,6 +321,29 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE QUIET HOUR                              2026-10-11
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership $399 tier, Month 13, Archetype "Rhythm
+  Architect," shares a bedroom with a light sleeper; CUBIQ pad on the
+  bedside table. A phone lights the ceiling at 23:10 and buzzes the
+  table at 06:40; airplane mode silences the one signal they want, the
+  morning memory question.
+
+  With CUBIQ v.0: the 23:10 rare-badge Leap is REFUSED by the firmware
+  gate (Quiet Hours 22:00-07:00) — no motion, light or sound — and the
+  signal waits in the software cubic. At 06:52 the operator lifts the
+  cube once (IMU-detected), which lifts Quiet Hours for 90 minutes; the
+  memory question then arrives as THE NUDGE, felt through the wood,
+  inaudible from the pillow. The best haptic notification is often a
+  refusal. Full write-up, gate logic and telemetry: see
+  LOT-CUBIQ-QUANTUM-CUBE-v0.2-REPORT.md, Sections 04 and 09.
+
+  NOTE (v0.2): Section 03's forward-facing ToF cannot detect a table
+  edge and the 20mm inhibit distance is too short for a 40mm Leap.
+  Corrected to a downward-canted cliff sensor and a 50mm inhibit in
+  LOT-CUBIQ-QUANTUM-CUBE-v0.2-REPORT.md, Findings F1/F2. Text above
+  left unedited per the append-only rule.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
