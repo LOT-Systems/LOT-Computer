@@ -17,6 +17,7 @@ import { Settings } from '#client/components/Settings'
 import { Logs } from '#client/components/Logs'
 import { Sync } from '#client/components/Sync'
 import { DirectMessageThread } from '#client/components/DirectMessageThread'
+import { Basics } from '#client/components/Basics'
 import { StatusPage } from '#client/components/StatusPage'
 import { ApiPage } from '#client/components/ApiPage'
 import { ConnectionStatus } from '#client/components/ConnectionStatus'
@@ -189,6 +190,9 @@ const TabPanels = React.memo(function TabPanels() {
       </TabPanel>
       <TabPanel active={currentRoute === 'logs'}>
         <Logs />
+      </TabPanel>
+      <TabPanel active={currentRoute === 'basics'}>
+        <Basics />
       </TabPanel>
       <TabPanel active={currentRoute === 'sync'}>
         <Sync />
