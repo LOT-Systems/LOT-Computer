@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getAstrologyReading, getWallClockDate } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -204,28 +204,20 @@ export const System = React.memo(function SystemInner() {
 
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
   // rokuyo), not a personal natal chart.
+  // Uses the saved profile timeZone so the block matches what Logs snapshot,
+  // even when viewed from a device set to another zone.
+  const astrologyTimeZone = me?.timeZone
   const astrology = React.useMemo(() => {
-    const now = new Date()
-    const hourlyZodiac = getHourlyZodiac(now)
-    const westernZodiac = getWesternZodiac(now)
-    const moonPhase = getMoonPhase(now)
-    const rokuyo = getRokuyo(now)
-
-    return {
-      hourlyZodiac,
-      westernZodiac,
-      moonPhase: moonPhase.phase,
-      moonIllumination: moonPhase.illumination,
-      rokuyo,
-    }
+    return getAstrologyReading(getWallClockDate(astrologyTimeZone))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+  }, [astrologyTick, astrologyTimeZone])
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
   React.useEffect(() => {
     if (typeof window === 'undefined') return
-    const today = dayjs().format('YYYY-MM-DD')
+    const t = getWallClockDate(astrologyTimeZone)
+    const today = `${t.getFullYear()}-${t.getMonth() + 1}-${t.getDate()}`
     const lastRecordedKey = 'astrology_signal_date'
     if (localStorage.getItem(lastRecordedKey) === today) return
     recordAstrologySignal(
