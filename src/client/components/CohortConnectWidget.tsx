@@ -14,6 +14,7 @@ import { useCohorts, useEnergy, useProfile } from '#client/queries'
 import { useLogContext } from '#client/hooks/useLogContext'
 import { usePunctuationContext } from '#client/hooks/usePunctuationContext'
 import { recordSignal, getUserState } from '#client/stores/intentionEngine'
+import { $emailDraftTo } from '#client/stores/email'
 
 /**
  * Cohort Connect Widget - Find and connect with cohort members
@@ -116,13 +117,14 @@ export const CohortConnectWidget: React.FC = () => {
     window.location.href = `/users/${userId}`
   }
 
-  const handleSendMessage = (userId: string, similarity: number) => {
+  const handleSendMessage = (userId: string, similarity: number, name: string) => {
     recordSignal('mood', 'cohort_message_initiated', {
       userId,
       similarity,
       connectionReadiness,
       hour: new Date().getHours()
     })
+    $emailDraftTo.set({ id: userId, name })
     stores.goTo('sync')
   }
 
@@ -264,10 +266,10 @@ export const CohortConnectWidget: React.FC = () => {
                         size="small"
                         onClick={(e: React.MouseEvent) => {
                           e.stopPropagation()
-                          handleSendMessage(match.user.id, match.similarity)
+                          handleSendMessage(match.user.id, match.similarity, match.user.firstName)
                         }}
                       >
-                        Send message
+                        Send email
                       </Button>
                     </div>
                   </div>

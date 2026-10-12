@@ -173,6 +173,7 @@ export type SyncEvents = {
   users_online: { value: number }
   chat_message: PublicChatMessage
   chat_message_like: ChatMessageLikeEventPayload
+  email: { id: string; fromName: string; createdAt: string }
   live_message: { message: string }
 }
 

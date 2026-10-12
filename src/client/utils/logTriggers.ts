@@ -115,3 +115,20 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+/**
+ * `/email to Hitomi.` — compose an email from Log.
+ * The addressee ends at a period/colon/newline; everything after is the body.
+ * Returns null until the addressee is terminated, so half-typed names
+ * ("/email to Hit") never trigger a lookup.
+ */
+export function parseEmailCommand(
+  text: string
+): { name: string; body: string } | null {
+  if (!text) return null
+  const m = text.match(
+    /(?:^|\s)\/email\s+to\s+([\p{L}][\p{L}'’-]*)\s*(?:[.:]|\n)\s*([\s\S]*)$/iu
+  )
+  if (!m) return null
+  return { name: m[1], body: m[2].trim() }
+}

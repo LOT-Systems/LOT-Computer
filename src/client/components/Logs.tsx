@@ -29,6 +29,7 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { EmailCompose } from '#client/components/EmailCompose'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -4128,6 +4129,7 @@ const NoteEditor = ({
           '/story        Generate a personal story from recent data',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
+          '/email to Name.  Email a community member (arrives in Sync)',
           '/assembly     Self-assembly module status',
           '/phys         Physiological cohort report',
           '/qos          Quantum OS state analysis',
@@ -4387,6 +4389,7 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        <EmailCompose text={value} />
         {systemHelp && (
           <div className="mt-8">
             <Block label="SYSTEM:" blockView>

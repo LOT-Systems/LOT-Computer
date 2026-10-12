@@ -20,6 +20,7 @@ import {
   Log,
   Paginated,
   PublicChatMessage,
+  EmailRecord,
   User,
   UserProfile,
   UserSettings,
@@ -119,6 +120,36 @@ export const useSendDirectMessage = createMutation<
   { receiverId: string; message: string },
   void
 >('post', '/api/direct-messages')
+
+export interface EmailCandidate {
+  id: string
+  firstName: string | null
+  lastName: string | null
+  city: string | null
+  country: string | null
+}
+
+export async function resolveEmailRecipient(name: string): Promise<EmailCandidate[]> {
+  const { data } = await api.get<{ candidates: EmailCandidate[] }>('/api/emails/resolve', {
+    params: { name },
+  })
+  return data.candidates
+}
+
+export const useEmails = createQuery<{ emails: EmailRecord[]; unread: number }>(
+  '/api/emails',
+  { refetchOnWindowFocus: true }
+)
+
+export const useSendEmail = createMutation<
+  { receiverId: string; body: string },
+  { id: string; createdAt: string }
+>('post', '/api/emails')
+
+export const useMarkEmailRead = createMutation<{ id: string }, { updated: number }>(
+  'post',
+  (data) => `/api/emails/${data.id}/read`
+)
 
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,

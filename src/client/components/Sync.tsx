@@ -26,6 +26,7 @@ import {
   useLikeChatMessage,
 } from '#client/queries'
 import { sync } from '../sync'
+import { SyncMail } from '#client/components/SyncMail'
 import { PublicChatMessage, UserTag } from '#shared/types'
 import {
   SYNC_CHAT_MESSAGES_TO_SHOW,
@@ -180,6 +181,7 @@ export const Sync = React.memo(function SyncInner() {
 
   return (
     <div className="max-w-[700px]">
+      <SyncMail />
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}
