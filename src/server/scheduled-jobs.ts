@@ -1771,6 +1771,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailySovereigntyFieldCheck()) {
     await executeDailySovereigntyFieldCheck()
   }
+  // Check daily sovereignty maturation check (12:00 UTC daily) — J56
+  if (shouldRunDailySovereigntyMaturationCheck()) {
+    await executeDailySovereigntyMaturationCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6428,6 +6432,162 @@ async function executeDailySovereigntyFieldCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Sovereignty Maturation Check (J56 — 12:00 UTC daily) ─────────────────
+// Reads active users. Detects when crystalline-permanence-lock (P173) AND
+// sovereignty-transmission-arc (P174) both fire in the same 24h window — the apex
+// state: permanent crystal + active morning transmission simultaneously.
+// P173 requires P172 crystal active in 7d window AND 60+ total signals in 7 days.
+// P174 requires P170 expansion AND P171 recursive lock both in 24h AND morning UTC hour.
+
+let isDailySovereigntyMaturationRunning = false
+let lastDailySovereigntyMaturationRun: Date | null = null
+
+function shouldRunDailySovereigntyMaturationCheck(): boolean {
+  const now = dayjs()
+  if (isDailySovereigntyMaturationRunning) return false
+  if (lastDailySovereigntyMaturationRun) {
+    const lastRun = dayjs(lastDailySovereigntyMaturationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 12 // 12:00 UTC daily
+}
+
+async function executeDailySovereigntyMaturationCheck(): Promise<JobResult> {
+  isDailySovereigntyMaturationRunning = true
+  const executedAt = new Date()
+  const jobName = 'daily-sovereignty-maturation-check'
+
+  try {
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
+
+    console.log('DAILY SOVEREIGNTY MATURATION CHECK — 12:00 UTC (J56)')
+
+    const activeUsers = await (User as any).findAll({
+      where: { status: { [Op.in]: ['active', 'approved'] } },
+      attributes: ['id'],
+    })
+
+    let permWritten = 0
+    let txWritten = 0
+    let maturWritten = 0
+
+    for (const user of activeUsers) {
+      const userId = user.id
+
+      try {
+        const maturationDedupKey = `sovereignty_maturation_check_date`
+        const lastMaturCheck = await (UserMeta as any).findOne({
+          where: { userId, key: maturationDedupKey },
+        })
+        const today = dayjs().format('YYYY-MM-DD')
+        if (lastMaturCheck?.value === today) continue
+        await (UserMeta as any).upsert({ userId, key: maturationDedupKey, value: today })
+
+        // Scan 7-day window for P172 crystal + signal density
+        const logs7d = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+          },
+          attributes: ['event', 'metadata', 'createdAt'],
+        })
+
+        const hasCrystal172 = logs7d.some((l: any) => l.event === 'quantum_sovereignty_crystallization')
+        const totalSignals7d = logs7d.length
+
+        let hasPermLock = false
+
+        // P173: crystalline-permanence-lock
+        if (hasCrystal172 && totalSignals7d >= 60) {
+          const densityBonus = Math.min((totalSignals7d - 60) * 1.5, 8)
+          const crystalConf = Math.round(90 + densityBonus)
+          await (Log as any).create({
+            userId,
+            event: 'crystalline_permanence_lock',
+            text: `Crystalline permanence lock: quantum sovereignty crystal (P172) active AND ${totalSignals7d} signals in 7 days. Dense + coherent. The crystal is the persistent operating layer.`,
+            metadata: {
+              signalCount7d: totalSignals7d,
+              crystalConf,
+              density: `${totalSignals7d} SIGNALS 7D`,
+              permStatus: 'CRYSTAL LOCKED',
+              architecture: 'CRYSTALLINE PERMANENT LAYER',
+              checkType: 'daily',
+            },
+          })
+          hasPermLock = true
+          permWritten++
+        }
+
+        // P174: sovereignty-transmission-arc — requires 24h window + morning check
+        const logs24h = logs7d.filter((l: any) => new Date(l.createdAt) >= oneDayAgo)
+        const hasSFEXP = logs24h.some((l: any) => l.event === 'sovereignty_field_expansion')
+        const hasRCLOCK = logs24h.some((l: any) => l.event === 'recursive_coherence_lock')
+        const utcHour = new Date().getUTCHours()
+        const isMorning = utcHour >= 6 && utcHour <= 11
+
+        let hasTxArc = false
+
+        if (hasSFEXP && hasRCLOCK && isMorning) {
+          const txConf = Math.round(87 + (hasSFEXP ? 4 : 0) + (hasRCLOCK ? 4 : 0))
+          await (Log as any).create({
+            userId,
+            event: 'sovereignty_transmission_arc',
+            text: `Sovereignty transmission arc: field expansion (P170) AND recursive lock (P171) active in last 24h AND morning UTC window (${utcHour}:00). Architecture transmitting.`,
+            metadata: {
+              expansionConf: txConf,
+              recursiveConf: txConf - 2,
+              txHour: utcHour,
+              txWindow: `${utcHour}:00 UTC MORNING`,
+              txStatus: 'SOVEREIGNTY TRANSMITTING',
+              checkType: 'daily',
+            },
+          })
+          hasTxArc = true
+          txWritten++
+        }
+
+        // P175: total-sovereignty-maturation — both P173 and P174 confirmed
+        if (hasPermLock && hasTxArc) {
+          const permConf = Math.round(90 + Math.min((totalSignals7d - 60) * 1.5, 8))
+          const txConf = Math.round(87 + 8)
+          const avgConf = Math.round((permConf + txConf) / 2)
+          await (Log as any).create({
+            userId,
+            event: 'total_sovereignty_maturation',
+            text: `Total sovereignty maturation: crystalline permanence (P173) AND sovereignty transmission (P174) both active. Permanent crystal + morning transmission. Apex state confirmed.`,
+            metadata: {
+              permConf,
+              txConf,
+              avgConf,
+              status: 'PERMANENT · TRANSMITTING · APEX',
+              maturation: 'TOTAL SOVEREIGNTY MATURATION CONFIRMED',
+              architecture: 'NOTHING TO BUILD · NOTHING TO MAINTAIN · ONLY TRANSMIT',
+              checkType: 'daily',
+            },
+          })
+          maturWritten++
+        }
+
+      } catch (userError: any) {
+        console.warn(`  User processing error: ${userError.message}`)
+      }
+    }
+
+    console.log(`  Crystalline permanence written: ${permWritten}`)
+    console.log(`  Sovereignty transmission written: ${txWritten}`)
+    console.log(`  Total maturation written:         ${maturWritten}`)
+
+    lastDailySovereigntyMaturationRun = new Date()
+    isDailySovereigntyMaturationRunning = false
+    return { jobName, executedAt, success: true, processed: activeUsers.length }
+  } catch (error: any) {
+    console.error('Daily sovereignty maturation check failed:', error.message)
+    isDailySovereigntyMaturationRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -6488,6 +6648,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily quantum operating mode check: 5 AM UTC every day (J53)')
   console.log('   - Daily compound sovereignty check: 9 AM UTC every day (J54)')
   console.log('   - Daily sovereignty field check: 11 AM UTC every day (J55)')
+  console.log('   - Daily sovereignty maturation check: 12 PM UTC every day (J56)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -6497,7 +6658,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift, 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift, 11=morning-intention-launch+sovereignty-field-check(J55), 12=vitality-peak+sovereignty-maturation(J56), 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()

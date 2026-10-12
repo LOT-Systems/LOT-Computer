@@ -131,6 +131,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'sovereignty-field-expansion':         'SFEXP',
   'recursive-coherence-lock':            'RCLOCK',
   'quantum-sovereignty-crystallization': 'QSOVCRYST',
+  'crystalline-permanence-lock':         'CRPERM',
+  'sovereignty-transmission-arc':        'SOVTX',
+  'total-sovereignty-maturation':        'TOTMATUR',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

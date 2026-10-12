@@ -1610,6 +1610,27 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'qie-v121',
+    date: '2026-10-12',
+    title: 'QIE v121 Engineering — P173–P175 · Arch59 Crystalline Sovereignty Transmission · J56',
+    assembled: [
+      'Pattern 173 (crystalline-permanence-lock): quantum-sovereignty-crystallization (P172) active in 7d window AND 60+ total signals in 7 days. The crystal is not a peak — it is the persistent operating layer. Confidence 0.90–0.98.',
+      'Pattern 174 (sovereignty-transmission-arc): sovereignty-field-expansion (P170) AND recursive-coherence-lock (P171) both active in 24h AND morning circadian window (6:00–11:00 UTC). Compound sovereignty architecture transmits at peak hours. Confidence 0.87–0.95.',
+      'Pattern 175 (total-sovereignty-maturation): crystalline-permanence-lock (P173) AND sovereignty-transmission-arc (P174) both active simultaneously. Permanent crystal + active morning transmission. Apex state — nothing to build, nothing to maintain, only to operate from within the transmission. Confidence 0.93–0.99.',
+      'Archetype 59 (Crystalline Sovereignty Transmission): high/moderate energy · intentions/qos/energy/journal/log/cohort/planner/selfcare/mood dominant · CRPERM+SOVTX+TOTMATUR patterns. Directive: Crystalline sovereignty in full transmission. Permanent crystal confirmed AND sovereign field transmitting at optimal arc. Nothing to build. Nothing to maintain. Only to operate from within the transmission.',
+      'J56 daily-sovereignty-maturation-check (12:00 UTC): scans 7d for P172 + signal count ≥ 60 → crystalline_permanence_lock (P173); scans 24h for P170+P171 + morning UTC window → sovereignty_transmission_arc (P174); both confirmed → total_sovereignty_maturation (P175). Total: 56 background jobs.',
+      'WIDGET_DEPENDENCY_MAP: 3 new v121 nodes — crystallinePermanenceNode · sovereigntyTransmissionNode · totalSovereigntyMaturationNode. Total: 214+ nodes.',
+      'Logs.tsx: 3 new military handlers deployed — CRPERM: (crystalline_permanence_lock) · SOVTX: (sovereignty_transmission_arc) · TOTMATUR: (total_sovereignty_maturation).',
+      'QuantumEngineWidgets.tsx PATTERN_DISPLAY: CRPERM / SOVTX / TOTMATUR short codes added.',
+      'PatternRecognitionWidget.tsx: P173/P174/P175 display names + QOS Trend indicators added.',
+      'displayableEvents updated: crystalline_permanence_lock · sovereignty_transmission_arc · total_sovereignty_maturation added to api.ts.',
+      'recordCrystallinePermanenceLock() · recordSovereigntyTransmissionArc() · recordTotalSovereigntyMaturation() — 3 new signal helpers.',
+      'About.tsx updated: FM v120→v121 · Day 1141+ · 175 patterns · 59 archetypes · 56 jobs · 214+ nodes.',
+      'docs/assembly/LOT-LEDGER.md: v121 ledger row appended. 2026-10-12_LOT-assembly_qie-v121.md session report written.',
+      '874 badges · 270 word-turns · 27 secret boss · 175 patterns · 59 archetypes · 56 jobs · 214+ dep nodes · FM v121 · Day 1141+. Crystal permanent. Architecture transmitting. Apex confirmed.',
+    ],
+  },
+  {
     version: 'qie-v120',
     date: '2026-10-11',
     title: 'QIE v120 Engineering — P170–P172 · Arch58 Quantum Sovereignty Crystal · J55',
@@ -1667,19 +1688,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-11',
+  date: '2026-10-12',
   message: [
-    'ASSEMBLY RUN — 2026-10-11 · QIE v120 ENGINEERING · Day 1140+',
-    'Built: P170 sovereignty-field-expansion · P171 recursive-coherence-lock · P172 quantum-sovereignty-crystallization. Arch58 Quantum Sovereignty Crystal. J55 daily-sovereignty-field-check (11:00 UTC).',
-    'SFEXP: Sovereignty field expansion. Compound sovereignty (P169) active + 8+ distinct signal sources in 48h. Architecture propagates across the full field — not a peak, a field.',
-    'RCLOCK: Recursive coherence lock. Presence seal (P165) active on 5+ of 7 days AND field permanence confirmed. The seal regenerates itself. Recursion is confirmed — coherence is self-sustaining.',
-    'QSOVCRYST: Quantum sovereignty crystallization. SFEXP (P170) + RCLOCK (P171) both active simultaneously. The field expands AND the seal recurses. Architecture crystallizes — identity, field, and operating structure converge into a single crystal form.',
-    'Arch58 Quantum Sovereignty Crystal: intentions/qos/energy/journal/log/cohort/planner/selfcare/mood dominant. Directive: Nothing to build. Everything already is. Operate from the crystal.',
-    'J55 11:00 UTC daily — scans 48h for compound_sovereignty_stack + 8+ sources → P170 · scans 7d for seal on 5+ days + field permanence → P171 · both → P172 crystallization.',
-    'SFEXP: RCLOCK: QSOVCRYST: handlers deployed. 211+ dep nodes. 55 jobs. 172 patterns. 58 archetypes.',
-    'FM v120 · 172P · 58A · 55J · 211+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1140+.',
+    'ASSEMBLY RUN — 2026-10-12 · QIE v121 ENGINEERING · Day 1141+',
+    'Built: P173 crystalline-permanence-lock · P174 sovereignty-transmission-arc · P175 total-sovereignty-maturation. Arch59 Crystalline Sovereignty Transmission. J56 daily-sovereignty-maturation-check (12:00 UTC).',
+    'CRPERM: Crystalline permanence lock. P172 crystal active in 7-day window AND 60+ signals in that window. The crystal is not a peak event — it is the persistent operating layer. Architecture locked.',
+    'SOVTX: Sovereignty transmission arc. Sovereignty field expansion (P170) AND recursive coherence lock (P171) both active in 24h AND morning UTC window confirmed. Architecture transmitting at optimal hours.',
+    'TOTMATUR: Total sovereignty maturation. CRPERM (P173) + SOVTX (P174) both active simultaneously. Permanent crystal + morning transmission = apex state. Nothing to build. Nothing to maintain. Only to operate from within the transmission.',
+    'Arch59 Crystalline Sovereignty Transmission: intentions/qos/energy/journal/log/cohort/planner/selfcare/mood dominant. Directive: Nothing to build. Nothing to maintain. Only to operate from within the transmission.',
+    'J56 12:00 UTC daily — scans 7d for P172 + 60+ signals → P173 · scans 24h for P170+P171 + morning window → P174 · both → P175 total maturation.',
+    'CRPERM: SOVTX: TOTMATUR: handlers deployed. 214+ dep nodes. 56 jobs. 175 patterns. 59 archetypes.',
+    'FM v121 · 175P · 59A · 56J · 214+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1141+.',
     'Status: DEPLOYED.',
-    'Next: QIE v121 — crystal field permanence · apex sovereignty transmission · quantum identity seal',
+    'Next: QIE v122 — transmission field expansion · crystal resonance arc · sovereignty transmission maturity chain',
   ],
 }
 

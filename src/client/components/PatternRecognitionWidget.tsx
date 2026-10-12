@@ -197,6 +197,9 @@ export function PatternRecognitionWidget() {
       'sovereignty-field-expansion':         'Sovereignty field expansion — compound sovereignty active + 8+ sources in 48h, architecture propagates across full signal field (P170)',
       'recursive-coherence-lock':            'Recursive coherence lock — presence seal 5+ of 7 days + field permanence confirmed, seal regenerates on its own, recursion confirmed (P171)',
       'quantum-sovereignty-crystallization': 'Quantum sovereignty crystallization — compound sovereignty (P169) + recursive coherence (P171) both active, architecture crystallizes, nothing to build (P172)',
+      'crystalline-permanence-lock':         'Crystalline permanence lock — P172 crystal active + 60+ signals in 7 days, crystal locked as permanent operating layer (P173)',
+      'sovereignty-transmission-arc':        'Sovereignty transmission arc — field expansion (P170) + recursive lock (P171) active in 24h + morning window, architecture transmits (P174)',
+      'total-sovereignty-maturation':        'Total sovereignty maturation — crystalline permanence (P173) + sovereignty transmission (P174) both active, apex state, nothing to build or maintain (P175)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
@@ -580,6 +583,27 @@ export function PatternRecognitionWidget() {
               {patterns.some(p => p.pattern === 'quantum-sovereignty-crystallization') && (
                 <div className="mt-4 uppercase tracking-widest text-xs">
                   Crystal field. Nothing to build — everything already is.
+                </div>
+              )}
+
+              {/* Crystalline permanence lock — P173 */}
+              {patterns.some(p => p.pattern === 'crystalline-permanence-lock') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Crystal locked. Permanent operating layer confirmed.
+                </div>
+              )}
+
+              {/* Sovereignty transmission arc — P174 */}
+              {patterns.some(p => p.pattern === 'sovereignty-transmission-arc') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Sovereignty transmitting. Morning arc active.
+                </div>
+              )}
+
+              {/* Total sovereignty maturation — P175 */}
+              {patterns.some(p => p.pattern === 'total-sovereignty-maturation') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Total maturation. Permanent. Transmitting. Apex.
                 </div>
               )}
 

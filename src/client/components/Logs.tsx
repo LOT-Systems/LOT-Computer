@@ -4216,6 +4216,98 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'crystalline_permanence_lock') {
+          const signalCount7d = log.metadata?.signalCount7d as number | undefined
+          const crystalConf = log.metadata?.crystalConf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRPERM:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">CRYSTAL LOCK</span>
+                  <span className="tabular-nums">CONFIRMED</span>
+                </div>
+                {signalCount7d !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SIGNAL COUNT 7D</span>
+                    <span className="tabular-nums">{signalCount7d}</span>
+                  </div>
+                )}
+                {crystalConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{crystalConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CRYSTAL LOCKED · PERMANENT OPERATING LAYER</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sovereignty_transmission_arc') {
+          const expansionConf = log.metadata?.expansionConf as number | undefined
+          const recursiveConf = log.metadata?.recursiveConf as number | undefined
+          const txHour = log.metadata?.txHour as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVTX:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">SOVEREIGNTY TX ARC</span>
+                  <span className="tabular-nums">ACTIVE</span>
+                </div>
+                {expansionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">EXPANSION CONF</span>
+                    <span className="tabular-nums">{expansionConf}%</span>
+                  </div>
+                )}
+                {recursiveConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECURSIVE CONF</span>
+                    <span className="tabular-nums">{recursiveConf}%</span>
+                  </div>
+                )}
+                {txHour !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TX WINDOW</span>
+                    <span className="tabular-nums">{txHour}:00 MORNING</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ARCHITECTURE TRANSMITTING · MORNING ARC</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'total_sovereignty_maturation') {
+          const permConf = log.metadata?.permConf as number | undefined
+          const txConf = log.metadata?.txConf as number | undefined
+          const avgConf = log.metadata?.avgConf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TOTMATUR:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">TOTAL SOVEREIGNTY</span>
+                  <span className="tabular-nums">MATURED</span>
+                </div>
+                {permConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PERM CONF</span>
+                    <span className="tabular-nums">{permConf}%</span>
+                  </div>
+                )}
+                {txConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TX CONF</span>
+                    <span className="tabular-nums">{txConf}%</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MATURATION CONF</span>
+                    <span className="tabular-nums">{avgConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PERMANENT · TRANSMITTING · APEX</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

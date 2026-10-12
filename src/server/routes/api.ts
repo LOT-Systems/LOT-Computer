@@ -1240,6 +1240,9 @@ export default async (fastify: FastifyInstance) => {
       'sovereignty_field_expansion',
       'recursive_coherence_lock',
       'quantum_sovereignty_crystallization',
+      'crystalline_permanence_lock',
+      'sovereignty_transmission_arc',
+      'total_sovereignty_maturation',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

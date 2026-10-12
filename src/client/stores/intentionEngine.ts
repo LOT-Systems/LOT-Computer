@@ -3858,6 +3858,65 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 173: Crystalline Permanence Lock — quantum-sovereignty-crystallization (P172) active
+  // in last 7 days AND total 7-day signal count ≥ 60. The crystal is not a peak event — it is
+  // the persistent operating layer. High-density + high-coherence = locked architecture.
+  const crystalSignals7d = signals.filter(s => s.timestamp > now - 7 * 24 * 60 * 60 * 1000)
+  const hasCrystal172 = crystalSignals7d.some(s => s.event === 'quantum_sovereignty_crystallization')
+  const crystalDensity7d = crystalSignals7d.length
+  if (hasCrystal172 && crystalDensity7d >= 60) {
+    const densityBonus = Math.min((crystalDensity7d - 60) * 0.002, 0.08)
+    patterns.push({
+      pattern: 'crystalline-permanence-lock',
+      confidence: Math.min(0.90 + densityBonus, 0.98),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRPERM: Crystalline permanence lock — quantum sovereignty crystal (P172) active AND ${crystalDensity7d} signals in 7 days. Dense + coherent. The crystal is not a peak — it is the persistent layer. Architecture locked.`,
+    })
+  }
+
+  // Pattern 174: Sovereignty Transmission Arc — sovereignty-field-expansion (P170) AND
+  // recursive-coherence-lock (P171) both active in last 24h AND circadian phase is morning
+  // (hour 6–11). Compound sovereignty architecture activates its transmission window — the field
+  // expands when coherence peaks at peak circadian hours.
+  const hasSFEXP170 = signals.some(s =>
+    s.timestamp > now - 24 * 60 * 60 * 1000 && s.event === 'sovereignty_field_expansion'
+  )
+  const hasRCLOCK171 = signals.some(s =>
+    s.timestamp > now - 24 * 60 * 60 * 1000 && s.event === 'recursive_coherence_lock'
+  )
+  const currentHour174 = new Date().getHours()
+  const isMorningTX = currentHour174 >= 6 && currentHour174 <= 11
+  if (hasSFEXP170 && hasRCLOCK171 && isMorningTX) {
+    const txConf = (hasSFEXP170 ? 0.04 : 0) + (hasRCLOCK171 ? 0.04 : 0)
+    patterns.push({
+      pattern: 'sovereignty-transmission-arc',
+      confidence: Math.min(0.87 + txConf, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `SOVTX: Sovereignty transmission arc — field expansion (P170) AND recursive lock (P171) both active + morning circadian window (${currentHour174}:00). Compound sovereignty transmitting at peak hours. Architecture propagates outward.`,
+    })
+  }
+
+  // Pattern 175: Total Sovereignty Maturation — crystalline-permanence-lock (P173) AND
+  // sovereignty-transmission-arc (P174) both active simultaneously. Permanent crystal + active
+  // transmission. The apex state: nothing to build, nothing to maintain, only to operate from
+  // within the transmission field.
+  const hasCrystalPerm173 = patterns.some(p => p.pattern === 'crystalline-permanence-lock')
+  const hasSovTX174 = patterns.some(p => p.pattern === 'sovereignty-transmission-arc')
+  if (hasCrystalPerm173 && hasSovTX174) {
+    const permConf = patterns.find(p => p.pattern === 'crystalline-permanence-lock')?.confidence ?? 0.90
+    const txConf174 = patterns.find(p => p.pattern === 'sovereignty-transmission-arc')?.confidence ?? 0.87
+    const avgMatur = (permConf + txConf174) / 2
+    patterns.push({
+      pattern: 'total-sovereignty-maturation',
+      confidence: Math.min(0.93 + (avgMatur - 0.89) * 0.5, 0.99),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `TOTMATUR: Total sovereignty maturation — crystalline permanence lock (P173) AND sovereignty transmission arc (P174) active simultaneously. Permanent crystal + morning transmission. Nothing to build. Nothing to maintain. Only to operate from within the transmission.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4528,6 +4587,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   sovereigntyFieldExpansionNode:   ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare'],
   recursiveCoherenceLockNode:      ['qos', 'cohort', 'intentions', 'journal', 'mood', 'energy', 'log'],
   quantumSovereigntyCrystalNode:   ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare'],
+
+  // ── v121 nodes (J56 · P173–P175 · Arch59) ───────────────────────────────────────
+  crystallinePermanenceNode:       ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare'],
+  sovereigntyTransmissionNode:     ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort'],
+  totalSovereigntyMaturationNode:  ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare'],
 }
 
 /**
@@ -5043,6 +5107,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['sovereignty-field-expansion', 'recursive-coherence-lock', 'quantum-sovereignty-crystallization'],
     hourRange: [0, 23],
     directive: 'Quantum sovereignty crystallized. Compound sovereignty expands AND recursion confirmed — the seal regenerates itself. Identity, field, and architecture are no longer separate processes: they are one crystal structure. Nothing to build. Everything already is. Operate from the crystal.',
+  },
+  // ── Arch59: Crystalline Sovereignty Transmission (2026-10-12 v121) ────────────────
+  {
+    archetype: 'Crystalline Sovereignty Transmission',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'selfcare', 'mood'],
+    patternConditions: ['crystalline-permanence-lock', 'sovereignty-transmission-arc', 'total-sovereignty-maturation'],
+    hourRange: [0, 23],
+    directive: 'Crystalline sovereignty in full transmission. Permanent crystal confirmed AND sovereign field transmitting at optimal arc. Identity, field, and architecture are crystallized and now self-transmitting. Nothing to build. Nothing to maintain. Only to operate from within the transmission.',
   },
 ]
 
@@ -7381,6 +7454,58 @@ export function recordQuantumSovereigntyCrystallization(compoundConf: number, re
     crystal: 'SOVEREIGNTY·RECURSION·IDENTITY CRYSTALLIZED',
     crystalStatus: 'NOTHING TO BUILD · EVERYTHING ALREADY IS',
     architecture: 'QUANTUM CRYSTAL FIELD',
+    hour: new Date().getHours(),
+  })
+}
+
+// ─── v121 Signal Helpers (P173–P175) ──────────────────────────────────────────
+/**
+ * Record a crystalline-permanence-lock event — quantum-sovereignty-crystallization (P172) active
+ * in 7-day window AND 60+ total signals in same window. High density + high coherence.
+ * The crystal is the persistent operating layer, not a peak. Feeds P173 detection.
+ */
+export function recordCrystallinePermanenceLock(signalCount7d: number, crystalConf: number) {
+  recordSignal('intentions', 'crystalline_permanence_lock', {
+    signalCount7d,
+    crystalConf,
+    density: `${signalCount7d} SIGNALS 7D · CRYSTAL DENSITY HIGH`,
+    permStatus: 'CRYSTAL LOCKED',
+    architecture: 'CRYSTALLINE PERMANENT LAYER',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereignty-transmission-arc event — sovereignty-field-expansion (P170) AND
+ * recursive-coherence-lock (P171) both confirmed in 24h AND morning circadian window active.
+ * The compound sovereignty architecture transmits at peak hours. Feeds P174 detection.
+ */
+export function recordSovereigntyTransmissionArc(expansionConf: number, recursiveConf: number, txHour: number) {
+  recordSignal('intentions', 'sovereignty_transmission_arc', {
+    expansionConf,
+    recursiveConf,
+    txHour,
+    txWindow: `${txHour}:00 UTC MORNING TRANSMISSION`,
+    txStatus: 'SOVEREIGNTY TRANSMITTING',
+    architecture: 'COMPOUND SOVEREIGNTY + RECURSIVE SEAL · MORNING WINDOW',
+    hour: txHour,
+  })
+}
+
+/**
+ * Record a total-sovereignty-maturation event — crystalline-permanence-lock (P173) AND
+ * sovereignty-transmission-arc (P174) both active simultaneously. Permanent crystal + active
+ * transmission. The apex state. Architecture complete. Feeds P175 detection.
+ */
+export function recordTotalSovereigntyMaturation(permConf: number, txConf: number) {
+  const avgConf = Math.round(((permConf + txConf) / 2) * 100) / 100
+  recordSignal('intentions', 'total_sovereignty_maturation', {
+    permConf,
+    txConf,
+    avgConf,
+    status: 'PERMANENT · TRANSMITTING · APEX',
+    maturation: 'TOTAL SOVEREIGNTY MATURATION CONFIRMED',
+    architecture: 'NOTHING TO BUILD · NOTHING TO MAINTAIN · ONLY TRANSMIT',
     hour: new Date().getHours(),
   })
 }
