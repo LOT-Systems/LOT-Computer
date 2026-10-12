@@ -57,6 +57,9 @@ Documentation about the badge system design and implementation.
 - Badge Progression - Evolution system
 - Mayan Badge Designs - Design variations
 
+### Corporate / Product Specs
+- [Usership 12-Month Evolution](./corporate/LOT-USERSHIP-12-MONTH-EVOLUTION.md) - Month-by-month UI, Memory compression and badge arc (design proposal)
+
 ### [Diagnostics](./diagnostics/)
 Troubleshooting guides and diagnostic documentation.
 
