@@ -29,6 +29,9 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { renderSystemHelp } from '#client/utils/logCommands'
+import { computeArcade } from '#client/utils/logArcade'
+import { compressLogs, parseStoryPeriod, renderStory } from '#client/utils/logStory'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3706,6 +3709,8 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyLocal, setStoryLocal] = React.useState<string | null>(null)
+  const storyLoadingRef = React.useRef(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3743,6 +3748,7 @@ const NoteEditor = ({
     onSuccess: (data) => {
       setStoryResponse(data.story)
       setStoryLoading(false)
+      storyLoadingRef.current = false
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + data.story
@@ -3755,6 +3761,7 @@ const NoteEditor = ({
       const fallback = 'The system holds your data quietly. When the engine returns, your story will be here.'
       setStoryResponse(fallback)
       setStoryLoading(false)
+      storyLoadingRef.current = false
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + fallback
@@ -4121,49 +4128,47 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        let arcade = null
+        try {
+          arcade = computeArcade(Object.values(localStore.logById.get()))
+        } catch {}
+        setSystemHelp(renderSystemHelp(arcade))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
+        // The trigger fires the moment "/story" is typed, before an optional
+        // period argument ("/story month") can be typed. Wait briefly, then
+        // read the latest text from the ref.
+        window.setTimeout(() => {
+          const text = valueRef.current
+          // Instant local compression of the record (no network)...
+          try {
+            const period = parseStoryPeriod(text)
+            const records = Object.values(localStore.logById.get())
+            const arcade = computeArcade(records)
+            setStoryLocal(
+              renderStory(compressLogs(records, period)) +
+                `\n\nRANK            L${arcade.rank.level} ${arcade.rank.name} · ${arcade.xp} XP · ${arcade.currentStreak}D STREAK`
+            )
+          } catch {
+            setStoryLocal(null)
+          }
+          // ...then the AI narrative layered on top.
+          if (storyLoadingRef.current) return
+          storyLoadingRef.current = true
           setStoryLoading(true)
           setStoryResponse(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
+            const logText = text.replace(/\/story(\s+(day|week|month|year))?/i, '').replace(/📖/g, '').trim()
             submitStory({
               logText,
-              quantumState: state,
-              userIndex: index,
+              quantumState: getUserState(),
+              userIndex: getUserIndex(),
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: text })
           }
-        }
+        }, 1200)
       }
     }
   }, [value])
@@ -4399,7 +4404,7 @@ const NoteEditor = ({
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                        <span style={{ minWidth: '190px', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )
@@ -4411,6 +4416,13 @@ const NoteEditor = ({
                   )
                 })}
               </div>
+            </Block>
+          </div>
+        )}
+        {storyLocal && (
+          <div className="mt-8">
+            <Block label="STORY:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{storyLocal}</div>
             </Block>
           </div>
         )}

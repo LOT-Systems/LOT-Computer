@@ -115,3 +115,11 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+/**
+ * Read-only view of the slash keywords per trigger. Used by the command
+ * registry test to keep /system in lockstep with the live trigger rules.
+ */
+export function getTriggerKeywords(): Array<{ trigger: LogTrigger; keywords: string[] }> {
+  return RULES.map(r => ({ trigger: r.trigger, keywords: [...r.keywords] }))
+}

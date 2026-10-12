@@ -5522,7 +5522,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       })
 
       const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
+        .filter(l => l.event === 'note' || l.event === 'log_entry' || l.event === 'journal')
         .slice(0, 10)
         .map(l => (l.text || '').substring(0, 200))
         .filter(Boolean)
