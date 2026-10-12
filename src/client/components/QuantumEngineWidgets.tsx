@@ -131,6 +131,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'sovereignty-field-expansion':         'SFEXP',
   'recursive-coherence-lock':            'RCLOCK',
   'quantum-sovereignty-crystallization': 'QSOVCRYST',
+  'crystal-field-permanence':            'CRYST-PERM',
+  'apex-sovereignty-transmission':       'APEX-XMIT',
+  'quantum-identity-seal':               'QIDSEAL',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

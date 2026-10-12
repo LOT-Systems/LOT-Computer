@@ -1240,6 +1240,10 @@ export default async (fastify: FastifyInstance) => {
       'sovereignty_field_expansion',
       'recursive_coherence_lock',
       'quantum_sovereignty_crystallization',
+      // v121: crystal field permanence · apex sovereignty transmission · quantum identity seal (P173/P174/P175)
+      'crystal_field_permanence',
+      'apex_sovereignty_transmission',
+      'quantum_identity_seal',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

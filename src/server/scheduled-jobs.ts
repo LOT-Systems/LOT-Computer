@@ -1771,6 +1771,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailySovereigntyFieldCheck()) {
     await executeDailySovereigntyFieldCheck()
   }
+  // Check daily crystal permanence check (12:00 UTC daily) — J56
+  if (shouldRunDailyCrystalPermanenceCheck()) {
+    await executeDailyCrystalPermanenceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6428,6 +6432,171 @@ async function executeDailySovereigntyFieldCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Crystal Permanence Check (J56 — 12:00 UTC daily) ─────────────────────
+// Scans the last 5 days per user for quantum_sovereignty_crystallization on 2+ distinct days
+// → writes crystal_field_permanence (P173).
+// When P173 fires AND 6+ distinct signal domains active in last 24h
+// → writes apex_sovereignty_transmission (P174).
+// When P173 AND P174 both confirmed → writes quantum_identity_seal (P175).
+
+let isDailyCrystalPermanenceRunning = false
+let lastDailyCrystalPermanenceRun: Date | null = null
+
+function shouldRunDailyCrystalPermanenceCheck(): boolean {
+  const now = dayjs()
+  if (isDailyCrystalPermanenceRunning) return false
+  if (lastDailyCrystalPermanenceRun) {
+    const lastRun = dayjs(lastDailyCrystalPermanenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 12 // 12:00 UTC daily
+}
+
+async function executeDailyCrystalPermanenceCheck(): Promise<JobResult> {
+  const jobName = 'daily-crystal-permanence-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyCrystalPermanenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyCrystalPermanenceRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY CRYSTAL PERMANENCE CHECK — 12:00 UTC (J56)')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const fiveDaysAgo = dayjs().subtract(5, 'day').toDate()
+    const oneDayAgo  = dayjs().subtract(1, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(3, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (72h): ${activeUsers.length}`)
+    let permanenceWritten  = 0
+    let transmissionWritten = 0
+    let sealWritten        = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // P173: quantum_sovereignty_crystallization in last 5 days on 2+ distinct days
+        const crystalLogs5d = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: fiveDaysAgo }, event: 'quantum_sovereignty_crystallization' },
+          attributes: ['createdAt', 'metadata'],
+          order: [['createdAt', 'DESC']],
+          limit: 10,
+        })
+        const crystalDaySet = new Set(
+          crystalLogs5d.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD'))
+        )
+        const crystalDayCount = crystalDaySet.size
+        const hasPermanence = crystalDayCount >= 2
+
+        if (hasPermanence) {
+          const latestConf = (crystalLogs5d[0]?.metadata?.avgConf as number) ?? 92
+          const permanenceConf = Math.min(87 + (crystalDayCount - 2) * 3, 96)
+          await (Log as any).create({
+            userId,
+            event: 'crystal_field_permanence',
+            metadata: {
+              crystalDays: crystalDayCount,
+              windowDays: 5,
+              latestCrystalConf: latestConf,
+              permanence: `${crystalDayCount}/5 DAYS CRYSTALLIZED`,
+              fieldStatus: 'CRYSTAL PERMANENT',
+              architecture: 'QUANTUM CRYSTAL · PERSISTENT FIELD',
+              confidence: permanenceConf,
+              hour: 12,
+            },
+          })
+          permanenceWritten++
+
+          // P174: P173 confirmed AND 6+ distinct signal domains in last 24h
+          const recentLogs24h = await (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: oneDayAgo } },
+            attributes: ['event', 'createdAt'],
+            order: [['createdAt', 'DESC']],
+            limit: 300,
+          })
+          const domainMap24h: Record<string, string[]> = {
+            intentions: ['intention', 'intention_set', 'intention_complete', 'log_intention'],
+            qos: ['qos_update', 'presence_coherence_seal', 'quantum_sovereignty_crystallization', 'crystal_field_permanence'],
+            energy: ['energy_state', 'energy_update', 'energy_check', 'energy_checkin'],
+            journal: ['journal_entry', 'note', 'journal_reflection'],
+            log: ['morning_momentum_ignition', 'sovereignty_field_expansion', 'recursive_coherence_lock'],
+            cohort: ['cohort_event', 'cohort_digest', 'physiological_cohort'],
+            planner: ['plan_set', 'planner_entry', 'planner_update'],
+            mood: ['mood_check', 'mood_update', 'emotional_check_in', 'mood_checkin'],
+            selfcare: ['self_care_complete', 'self_care_completed', 'self_care_skip'],
+            resilience: ['resilience_check', 'recovery_arc', 'recovery_to_momentum_bridge'],
+          }
+          const events24h = new Set(recentLogs24h.map((l: any) => l.event as string))
+          const activeDomains24h = Object.entries(domainMap24h).filter(([, evts]) =>
+            evts.some(e => events24h.has(e))
+          ).length
+
+          const hasTransmission = activeDomains24h >= 6
+
+          if (hasTransmission) {
+            const transmitConf = Math.min(89 + (activeDomains24h - 6) * 2, 97)
+            await (Log as any).create({
+              userId,
+              event: 'apex_sovereignty_transmission',
+              metadata: {
+                domainCount: activeDomains24h,
+                crystalConf: permanenceConf,
+                transmission: `${activeDomains24h} DOMAINS RECEIVING 24H`,
+                fieldStatus: 'APEX TRANSMISSION ACTIVE',
+                architecture: 'CRYSTAL FIELD · BROADCASTING OUTWARD',
+                confidence: transmitConf,
+                hour: 12,
+              },
+            })
+            transmissionWritten++
+
+            // P175: P173 AND P174 both confirmed → quantum identity seal
+            const avgSealConf = Math.round(((permanenceConf + transmitConf) / 2) * 10) / 10
+            await (Log as any).create({
+              userId,
+              event: 'quantum_identity_seal',
+              metadata: {
+                permanenceConf,
+                transmissionConf: transmitConf,
+                avgConf: avgSealConf,
+                seal: 'IDENTITY SEALED AT QUANTUM LEVEL',
+                sealStatus: 'PERMANENT · TRANSMITTING · COMPLETE',
+                architecture: 'QUANTUM IDENTITY · SEALED STRUCTURE',
+                confidence: Math.min(92 + (avgSealConf - 88) * 0.5, 99),
+                hour: 12,
+              },
+            })
+            sealWritten++
+          }
+        }
+      } catch (userError: any) {
+        console.error(`  Error processing user: ${userError.message}`)
+      }
+    }
+
+    console.log(`  Crystal permanence written: ${permanenceWritten}`)
+    console.log(`  Apex transmission written:  ${transmissionWritten}`)
+    console.log(`  Identity seal written:      ${sealWritten}`)
+
+    lastDailyCrystalPermanenceRun = new Date()
+    isDailyCrystalPermanenceRunning = false
+    return { jobName, executedAt, success: true, processed: activeUsers.length }
+  } catch (error: any) {
+    console.error('Daily crystal permanence check failed:', error.message)
+    isDailyCrystalPermanenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -6488,6 +6657,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily quantum operating mode check: 5 AM UTC every day (J53)')
   console.log('   - Daily compound sovereignty check: 9 AM UTC every day (J54)')
   console.log('   - Daily sovereignty field check: 11 AM UTC every day (J55)')
+  console.log('   - Daily crystal permanence check: 12 PM UTC every day (J56)')
   console.log('')
 
   // Check every hour for scheduled jobs

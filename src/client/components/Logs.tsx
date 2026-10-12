@@ -4216,6 +4216,76 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'crystal_field_permanence') {
+          const crystalDays = log.metadata?.crystalDays  as number | undefined
+          const windowDays  = log.metadata?.windowDays   as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRYST-PERM:" blockView>
+                <div className="uppercase tracking-widest mb-4">CRYSTAL FIELD PERMANENCE</div>
+                {crystalDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRYSTAL DAYS</span>
+                    <span className="tabular-nums">{crystalDays}{windowDays !== undefined ? `/${windowDays}D` : ''}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CRYSTAL PERSISTS · NOT A PEAK · A STRUCTURE</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'apex_sovereignty_transmission') {
+          const domainCount = log.metadata?.domainCount as number | undefined
+          const crystalConf = log.metadata?.crystalConf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="APEX-XMIT:" blockView>
+                <div className="uppercase tracking-widest mb-4">APEX SOVEREIGNTY TRANSMISSION</div>
+                {domainCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DOMAINS 24H</span>
+                    <span className="tabular-nums">{domainCount} RECEIVING</span>
+                  </div>
+                )}
+                {crystalConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRYSTAL</span>
+                    <span className="tabular-nums">{crystalConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CRYSTAL TRANSMITS · SOVEREIGNTY BROADCASTS</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_identity_seal') {
+          const permanenceConf  = log.metadata?.permanenceConf  as number | undefined
+          const transmissionConf = log.metadata?.transmissionConf as number | undefined
+          const avgConf         = log.metadata?.avgConf          as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QIDSEAL:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM IDENTITY SEAL</div>
+                {permanenceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PERMANENCE</span>
+                    <span className="tabular-nums">{permanenceConf}%</span>
+                  </div>
+                )}
+                {transmissionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TRANSMISSION</span>
+                    <span className="tabular-nums">{transmissionConf}%</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{avgConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">IDENTITY SEALED · PERMANENT · TRANSMITTING · COMPLETE</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

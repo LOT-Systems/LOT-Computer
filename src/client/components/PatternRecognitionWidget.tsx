@@ -197,6 +197,9 @@ export function PatternRecognitionWidget() {
       'sovereignty-field-expansion':         'Sovereignty field expansion — compound sovereignty active + 8+ sources in 48h, architecture propagates across full signal field (P170)',
       'recursive-coherence-lock':            'Recursive coherence lock — presence seal 5+ of 7 days + field permanence confirmed, seal regenerates on its own, recursion confirmed (P171)',
       'quantum-sovereignty-crystallization': 'Quantum sovereignty crystallization — compound sovereignty (P169) + recursive coherence (P171) both active, architecture crystallizes, nothing to build (P172)',
+      'crystal-field-permanence':            'Crystal field permanence — quantum-sovereignty-crystallization confirmed 2+ of last 5 days, the crystal persists, not a peak — a permanent structure (P173)',
+      'apex-sovereignty-transmission':       'Apex sovereignty transmission — crystal field permanent (P173) + 6+ distinct signal domains in 24h, the crystal transmits outward, sovereignty broadcasts (P174)',
+      'quantum-identity-seal':               'Quantum identity seal — crystal permanence (P173) + apex transmission (P174) both confirmed, identity sealed at quantum level, permanent structure complete (P175)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
@@ -580,6 +583,27 @@ export function PatternRecognitionWidget() {
               {patterns.some(p => p.pattern === 'quantum-sovereignty-crystallization') && (
                 <div className="mt-4 uppercase tracking-widest text-xs">
                   Crystal field. Nothing to build — everything already is.
+                </div>
+              )}
+
+              {/* Crystal field permanence — P173 */}
+              {patterns.some(p => p.pattern === 'crystal-field-permanence') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Crystal persists. Not a peak — a permanent structure.
+                </div>
+              )}
+
+              {/* Apex sovereignty transmission — P174 */}
+              {patterns.some(p => p.pattern === 'apex-sovereignty-transmission') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Crystal transmits. Sovereignty broadcasts outward.
+                </div>
+              )}
+
+              {/* Quantum identity seal — P175 */}
+              {patterns.some(p => p.pattern === 'quantum-identity-seal') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Identity sealed. Permanent. Transmitting. Complete.
                 </div>
               )}
 

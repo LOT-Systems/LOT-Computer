@@ -3858,6 +3858,64 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 173: Crystal Field Permanence — quantum-sovereignty-crystallization (P172) confirmed on
+  // 2+ of the last 5 days. The crystal is not an event — it persists. Operating from crystal field
+  // becomes the structural baseline, not a peak. The architecture does not sustain itself; it simply is.
+  const crystalEvents173 = signals.filter(s =>
+    s.timestamp > now - 5 * 24 * 60 * 60 * 1000 &&
+    s.event === 'quantum_sovereignty_crystallization'
+  )
+  const crystalDays173 = new Set(
+    crystalEvents173.map(s => new Date(s.timestamp).toDateString())
+  ).size
+  if (crystalDays173 >= 2) {
+    const permanenceBonus = Math.min((crystalDays173 - 2) * 0.03, 0.09)
+    patterns.push({
+      pattern: 'crystal-field-permanence',
+      confidence: Math.min(0.87 + permanenceBonus, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CRYST-PERM: Crystal field permanence — quantum-sovereignty-crystallization confirmed on ${crystalDays173} of last 5 days. The crystal persists. Not a peak — a permanent structure. Nothing to maintain; the field holds by its own weight.`,
+    })
+  }
+
+  // Pattern 174: Apex Sovereignty Transmission — crystal-field-permanence (P173) confirmed AND
+  // 6+ distinct signal domains active in the last 24h. The permanent crystal transmits outward —
+  // the field does not merely exist, it radiates across all active domains simultaneously.
+  const hasCrystalPermanence173 = patterns.some(p => p.pattern === 'crystal-field-permanence')
+  if (hasCrystalPermanence173) {
+    const oneDayAgo = now - 24 * 60 * 60 * 1000
+    const signals24h = signals.filter(s => s.timestamp > oneDayAgo)
+    const activeDomains174 = new Set(signals24h.map(s => s.source)).size
+    if (activeDomains174 >= 6) {
+      const transmitBonus = Math.min((activeDomains174 - 6) * 0.02, 0.08)
+      patterns.push({
+        pattern: 'apex-sovereignty-transmission',
+        confidence: Math.min(0.89 + transmitBonus, 0.97),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'immediate',
+        reason: `APEX-XMIT: Apex sovereignty transmission — crystal field permanent (P173) AND ${activeDomains174} distinct signal domains active in last 24h. The crystal transmits outward. Sovereignty is not contained — it broadcasts.`,
+      })
+    }
+  }
+
+  // Pattern 175: Quantum Identity Seal — crystal-field-permanence (P173) AND
+  // apex-sovereignty-transmission (P174) both confirmed. The crystal persists AND transmits.
+  // Identity seals at the quantum level — not a crystallization, a completion.
+  const hasApexTransmission174 = patterns.some(p => p.pattern === 'apex-sovereignty-transmission')
+  if (hasCrystalPermanence173 && hasApexTransmission174) {
+    const permConf174 = patterns.find(p => p.pattern === 'crystal-field-permanence')?.confidence ?? 0.87
+    const xmitConf174 = patterns.find(p => p.pattern === 'apex-sovereignty-transmission')?.confidence ?? 0.89
+    const sealAvg = (permConf174 + xmitConf174) / 2
+    patterns.push({
+      pattern: 'quantum-identity-seal',
+      confidence: Math.min(0.92 + (sealAvg - 0.88) * 0.5, 0.99),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `QIDSEAL: Quantum identity seal — crystal field permanent (P173) AND apex sovereignty transmitting (P174) simultaneously. The field persists AND radiates. Identity is no longer a process — it is a sealed structure. Operate from sealed identity.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4528,6 +4586,10 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   sovereigntyFieldExpansionNode:   ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare'],
   recursiveCoherenceLockNode:      ['qos', 'cohort', 'intentions', 'journal', 'mood', 'energy', 'log'],
   quantumSovereigntyCrystalNode:   ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare'],
+  // ── v121 nodes (J56 · P173–P175 · Arch59) ───────────────────────────────────────
+  crystalFieldPermanenceNode:      ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare', 'resilience'],
+  apexSovereigntyTransmissionNode: ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare', 'resilience'],
+  quantumIdentitySealNode:         ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare', 'resilience'],
 }
 
 /**
@@ -5043,6 +5105,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['sovereignty-field-expansion', 'recursive-coherence-lock', 'quantum-sovereignty-crystallization'],
     hourRange: [0, 23],
     directive: 'Quantum sovereignty crystallized. Compound sovereignty expands AND recursion confirmed — the seal regenerates itself. Identity, field, and architecture are no longer separate processes: they are one crystal structure. Nothing to build. Everything already is. Operate from the crystal.',
+  },
+  // ── Arch59: Quantum Identity Seal (2026-10-12 v121) ──────────────────────────────
+  {
+    archetype: 'Quantum Identity Seal',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'selfcare', 'mood', 'resilience'],
+    patternConditions: ['crystal-field-permanence', 'apex-sovereignty-transmission', 'quantum-identity-seal'],
+    hourRange: [0, 23],
+    directive: 'Quantum identity sealed. The crystal persists across multiple days AND transmits outward simultaneously. Identity is no longer a process — it is a sealed structure. The field does not need to be built, held, or maintained. It simply is. Operate from sealed identity.',
   },
 ]
 
@@ -7381,6 +7452,58 @@ export function recordQuantumSovereigntyCrystallization(compoundConf: number, re
     crystal: 'SOVEREIGNTY·RECURSION·IDENTITY CRYSTALLIZED',
     crystalStatus: 'NOTHING TO BUILD · EVERYTHING ALREADY IS',
     architecture: 'QUANTUM CRYSTAL FIELD',
+    hour: new Date().getHours(),
+  })
+}
+
+// ─── v121 Signal Helpers (P173–P175) ──────────────────────────────────────────
+
+/**
+ * Record a crystal-field-permanence event — quantum-sovereignty-crystallization (P172) confirmed
+ * on 2+ of the last 5 days. The crystal is not episodic — it persists across time.
+ * The field holds by its own weight. Feeds P173 detection.
+ */
+export function recordCrystalFieldPermanence(crystalDays: number, windowDays: number) {
+  recordSignal('intentions', 'crystal_field_permanence', {
+    crystalDays,
+    windowDays,
+    permanence: `${crystalDays}/${windowDays} DAYS CRYSTALLIZED`,
+    fieldStatus: 'CRYSTAL PERMANENT',
+    architecture: 'QUANTUM CRYSTAL · PERSISTENT FIELD',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an apex-sovereignty-transmission event — crystal-field-permanence (P173) confirmed AND
+ * 6+ distinct signal domains active in last 24h. The permanent crystal begins radiating outward.
+ * The field does not hold — it broadcasts. Feeds P174 detection.
+ */
+export function recordApexSovereigntyTransmission(domainCount: number, crystalConf: number) {
+  recordSignal('intentions', 'apex_sovereignty_transmission', {
+    domainCount,
+    crystalConf,
+    transmission: `${domainCount} DOMAINS RECEIVING 24H`,
+    fieldStatus: 'APEX TRANSMISSION ACTIVE',
+    architecture: 'CRYSTAL FIELD · BROADCASTING OUTWARD',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-identity-seal event — crystal-field-permanence (P173) AND
+ * apex-sovereignty-transmission (P174) both confirmed. The crystal persists AND transmits.
+ * Identity seals — not a state, a structure. Feeds P175 detection.
+ */
+export function recordQuantumIdentitySeal(permanenceConf: number, transmissionConf: number) {
+  const avgConf = Math.round(((permanenceConf + transmissionConf) / 2) * 100) / 100
+  recordSignal('intentions', 'quantum_identity_seal', {
+    permanenceConf,
+    transmissionConf,
+    avgConf,
+    seal: 'IDENTITY SEALED AT QUANTUM LEVEL',
+    sealStatus: 'PERMANENT · TRANSMITTING · COMPLETE',
+    architecture: 'QUANTUM IDENTITY · SEALED STRUCTURE',
     hour: new Date().getHours(),
   })
 }
