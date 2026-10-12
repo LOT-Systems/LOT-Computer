@@ -14,6 +14,7 @@ import * as stores from '#client/stores'
 import { Layout } from '#client/components/ui'
 import { System } from '#client/components/System'
 import { Settings } from '#client/components/Settings'
+import { Basics } from '#client/components/Basics'
 import { Logs } from '#client/components/Logs'
 import { Sync } from '#client/components/Sync'
 import { DirectMessageThread } from '#client/components/DirectMessageThread'
@@ -140,7 +141,7 @@ if (typeof window !== 'undefined') {
   })
 }
 
-type PersistentRoute = 'system' | 'logs' | 'sync' | 'settings' | 'api'
+type PersistentRoute = 'system' | 'logs' | 'sync' | 'settings' | 'api' | 'basics'
 
 const TabPanel = React.memo(function TabPanel({
   active,
@@ -198,6 +199,9 @@ const TabPanels = React.memo(function TabPanels() {
       </TabPanel>
       <TabPanel active={currentRoute === 'api'}>
         <ApiPage />
+      </TabPanel>
+      <TabPanel active={currentRoute === 'basics'}>
+        <Basics />
       </TabPanel>
     </>
   )
