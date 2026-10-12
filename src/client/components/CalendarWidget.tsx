@@ -14,13 +14,59 @@ import { cn } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import type { Dayjs } from '#client/utils/dayjs'
 import { recordCalendarSignal } from '#client/stores/intentionEngine'
+import {
+  AlertStage,
+  STAGE_CODE,
+  STAGE_LABEL,
+  countdown,
+  dueStage,
+  eventMoment,
+  isValidTime,
+} from '#client/utils/calendarAlerts'
 
 type EntryType = 'note' | 'task' | 'call'
 
 type CalendarEntry = {
+  id: string
   date: string
+  time: string | null
+  done: boolean
   text: string
   type: EntryType
+}
+
+type ActiveAlert = { key: string; stage: AlertStage; text: string; time: string | null }
+
+const TICK_MS = 15_000
+
+function beep(stage: AlertStage) {
+  try {
+    const Ctx = window.AudioContext || (window as any).webkitAudioContext
+    if (!Ctx) return
+    const ctx = new Ctx()
+    const pulses = stage === 'execute' || stage === 'overdue' ? 3 : stage === 'imminent' ? 2 : 1
+    for (let i = 0; i < pulses; i++) {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.type = 'square'
+      osc.frequency.value = stage === 'overdue' ? 440 : 880
+      gain.gain.value = 0.03
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      const t = ctx.currentTime + i * 0.2
+      osc.start(t)
+      osc.stop(t + 0.1)
+    }
+    setTimeout(() => ctx.close().catch(() => {}), 1500)
+  } catch (_) {}
+}
+
+function systemNotify(title: string, body: string) {
+  try {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      new Notification(title, { body })
+    }
+  } catch (_) {}
 }
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -59,23 +105,45 @@ export function CalendarWidget() {
   const [isAddingEntry, setIsAddingEntry] = React.useState(false)
   const [entryText, setEntryText] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
+  const [entryTime, setEntryTime] = React.useState('')
+  const [now, setNow] = React.useState(() => dayjs())
+  const [alerts, setAlerts] = React.useState<ActiveAlert[]>([])
+  const firedRef = React.useRef<Set<string>>(new Set())
+
+  const doneIds = React.useMemo(() => {
+    const set = new Set<string>()
+    logs.forEach(log => {
+      if (log.event === 'calendar_done' && log.metadata?.entryId) {
+        set.add(log.metadata.entryId as string)
+      }
+    })
+    return set
+  }, [logs])
 
   const entries = React.useMemo<CalendarEntry[]>(() => {
     return logs
       .filter(log => log.event === 'calendar_entry' && log.metadata)
-      .map(log => ({
-        date: log.metadata?.date as string,
-        text: log.metadata?.text as string || log.text || '',
-        type: (log.metadata?.entryType as EntryType) || 'note',
-      }))
+      .map(log => {
+        const time = log.metadata?.time as string | undefined
+        return {
+          id: log.id,
+          date: log.metadata?.date as string,
+          time: isValidTime(time) ? time : null,
+          done: doneIds.has(log.id),
+          text: log.metadata?.text as string || log.text || '',
+          type: (log.metadata?.entryType as EntryType) || 'note',
+        }
+      })
       .filter(e => e.date && e.text)
-      .sort((a, b) => a.date.localeCompare(b.date))
-  }, [logs])
+      .sort((a, b) =>
+        a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || '')
+      )
+  }, [logs, doneIds])
 
   const upcomingEntries = React.useMemo(() => {
     const today = dayjs().format('YYYY-MM-DD')
     return entries
-      .filter(e => e.date >= today)
+      .filter(e => e.date >= today && !e.done)
       .slice(0, 10)
   }, [entries])
 
@@ -96,6 +164,73 @@ export function CalendarWidget() {
     [viewMonth]
   )
 
+  // Seed dedupe set from persisted alert logs so reloads never re-fire.
+  React.useEffect(() => {
+    logs.forEach(log => {
+      if (log.event === 'calendar_alert' && log.metadata?.entryId && log.metadata?.stage) {
+        firedRef.current.add(`${log.metadata.entryId}:${log.metadata.stage}`)
+      }
+    })
+  }, [logs])
+
+  // Clock tick + alert evaluation.
+  React.useEffect(() => {
+    const tick = () => {
+      const t = dayjs()
+      setNow(t)
+      // Wait for logs so persisted alerts are known before evaluating.
+      if (!logs.length) return
+      const fresh: ActiveAlert[] = []
+      entries.forEach(e => {
+        const stage = dueStage(
+          { key: e.id, date: e.date, time: e.time, done: e.done },
+          t,
+          firedRef.current
+        )
+        if (!stage) return
+        firedRef.current.add(`${e.id}:${stage}`)
+        fresh.push({ key: e.id, stage, text: e.text, time: e.time })
+        createLog({
+          text: `[ALERT] ${STAGE_CODE[stage]} ${STAGE_LABEL[stage]}: ${e.text}${e.time ? ` (${e.time})` : ''}`,
+          event: 'calendar_alert',
+          metadata: { entryId: e.id, stage, date: e.date, time: e.time, text: e.text },
+        })
+      })
+      if (fresh.length) {
+        setAlerts(prev => [
+          ...prev.filter(a => !fresh.some(f => f.key === a.key)),
+          ...fresh,
+        ])
+        const top = fresh[fresh.length - 1]
+        beep(top.stage)
+        systemNotify(`${STAGE_CODE[top.stage]} ${STAGE_LABEL[top.stage]}`, top.text)
+      }
+    }
+    tick()
+    const id = setInterval(tick, TICK_MS)
+    return () => clearInterval(id)
+  }, [entries, logs.length, createLog])
+
+  const dismissAlert = (key: string) => setAlerts(prev => prev.filter(a => a.key !== key))
+
+  const handleDone = (entry: CalendarEntry) => {
+    createLog({
+      text: `[DONE] ${entry.text}${entry.time ? ` (${entry.time})` : ''}`,
+      event: 'calendar_done',
+      metadata: { entryId: entry.id, date: entry.date, time: entry.time, text: entry.text },
+    }, {
+      onSuccess: () => { queryClient.refetchQueries(['/api/logs']) },
+    })
+    dismissAlert(entry.id)
+  }
+
+  const nextTimed = React.useMemo(() => {
+    return entries.find(e => {
+      if (e.done || !e.time) return false
+      return eventMoment(e.date, e.time).isAfter(now.subtract(15, 'minute'))
+    })
+  }, [entries, now])
+
   const handleDateClick = (d: Dayjs) => {
     const key = d.format('YYYY-MM-DD')
     if (selectedDate === key) {
@@ -109,14 +244,16 @@ export function CalendarWidget() {
     if (!selectedDate || !entryText.trim()) return
 
     const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
+    const time = isValidTime(entryTime) ? entryTime : null
 
     createLog({
-      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel})`,
+      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel}${time ? ` ${time}` : ''})`,
       event: 'calendar_entry',
       metadata: {
         date: selectedDate,
         text: entryText.trim(),
         entryType,
+        time,
       },
     }, {
       onSuccess: () => {
@@ -125,7 +262,11 @@ export function CalendarWidget() {
       },
     })
 
+    if (time && typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      try { Notification.requestPermission() } catch (_) {}
+    }
     setEntryText('')
+    setEntryTime('')
     setIsAddingEntry(false)
   }
 
@@ -139,6 +280,41 @@ export function CalendarWidget() {
   return (
     <Block label="Calendar:" blockView onLabelClick={handleToggleCalendar}>
       <div className="w-full">
+        {alerts.length > 0 && (
+          <div className="mb-16 space-y-1" role="alert">
+            {alerts.map(a => (
+              <div
+                key={a.key}
+                className={cn(
+                  'flex justify-between gap-16 border-l-2 pl-8 uppercase tracking-widest',
+                  a.stage === 'overdue' || a.stage === 'execute'
+                    ? 'border-acc text-acc animate-pulse'
+                    : 'border-acc/40 text-acc/80'
+                )}
+              >
+                <span className="whitespace-nowrap">
+                  {STAGE_CODE[a.stage]} {STAGE_LABEL[a.stage]}
+                  {a.time ? ` ${a.time}` : ''} — {a.text}
+                </span>
+                <span className="flex gap-8 whitespace-nowrap">
+                  <button className="hover:underline" onClick={() => { const en = entries.find(x => x.id === a.key); if (en) handleDone(en) }}>
+                    DONE
+                  </button>
+                  <button className="text-acc/50 hover:text-acc" onClick={() => dismissAlert(a.key)}>
+                    ACK
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {nextTimed && (
+          <div className="mb-16 text-acc/60 uppercase tracking-widest tabular-nums">
+            NEXT {countdown(eventMoment(nextTimed.date, nextTimed.time), now)} · {nextTimed.time} · {nextTimed.text}
+          </div>
+        )}
+
         <div className="mb-16">
           <Button onClick={handleToggleCalendar}>
             Add date
@@ -237,6 +413,13 @@ export function CalendarWidget() {
                     className="bg-transparent border border-acc/20 text-acc px-4 py-2 flex-1 outline-none focus:border-acc/40"
                     autoFocus
                   />
+                  <input
+                    type="time"
+                    value={entryTime}
+                    onChange={e => setEntryTime(e.target.value)}
+                    className="bg-transparent border border-acc/20 text-acc px-4 py-2 outline-none focus:border-acc/40"
+                    aria-label="Time (optional)"
+                  />
                   <Button onClick={handleAddEntry}>Add</Button>
                 </div>
               </div>
@@ -248,8 +431,8 @@ export function CalendarWidget() {
                   {dayjs(selectedDate).format('dddd, MMMM D')}
                 </div>
                 {entriesOnDate.map((e, i) => (
-                  <div key={i} className="text-acc/80 mb-1">
-                    {e.text}
+                  <div key={i} className={cn('text-acc/80 mb-1', e.done && 'line-through opacity-50')}>
+                    {e.time ? `${e.time} · ` : ''}{e.text}
                   </div>
                 ))}
               </div>
@@ -263,9 +446,17 @@ export function CalendarWidget() {
               <div key={i} className="flex justify-between gap-16">
                 <span className="text-acc whitespace-nowrap">
                   {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
+                  {entry.time ? ` · ${entry.time}` : ''}
                 </span>
                 <span className="text-acc text-right">
-                  {entry.text}
+                  {entry.text}{' '}
+                  <button
+                    className="text-acc/30 hover:text-acc transition-opacity"
+                    onClick={() => handleDone(entry)}
+                    title="Mark done"
+                  >
+                    [ ]
+                  </button>
                 </span>
               </div>
             ))}
