@@ -154,6 +154,7 @@ export type UserProfile = Pick<
   | 'phone'
   | 'tags'
   | 'hideActivityLogs'
+  | 'joinedAt'
 > & { isAdmin?: boolean }
 
 export type UserSettings = Pick<

@@ -73,6 +73,7 @@ export function useBreathe(enabled: boolean) {
     const totalCycleDuration = PHASE_DURATIONS.inhale + PHASE_DURATIONS.hold + PHASE_DURATIONS.exhale
 
     const updateState = () => {
+      if (document.hidden) return
       const elapsed = (performance.now() - startTime) / 1000 // seconds
       const cyclePosition = elapsed % totalCycleDuration
 
@@ -98,11 +99,13 @@ export function useBreathe(enabled: boolean) {
       const label = PHASE_LABELS[currentPhase]
       const display = `${ascii} ${label} ${countdown}s`
 
-      setState({
-        phase: currentPhase,
-        count: countdown,
-        display,
-      })
+      // Bail out when nothing visible changed — a fresh object every 100ms
+      // re-rendered every consumer (System.tsx) ten times a second.
+      setState((prev) =>
+        prev.display === display && prev.phase === currentPhase
+          ? prev
+          : { phase: currentPhase, count: countdown, display }
+      )
     }
 
     // Update immediately
