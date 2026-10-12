@@ -321,6 +321,12 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — see LOT-CUBIQ-QUANTUM-CUBE-v0-CYCLE-02.md §09     2026-10-12
+  "THE NIGHT-SHIFT RETURN" — quiet-hours SETTLE and an edge-gate downgrade
+  on a narrow bedside table. Cycle 02 also corrects §03/§04 numbers
+  (LEAP geometry, edge margin 20 -> 40 mm, capacitor-discharge driver);
+  see that document, Section 01.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
