@@ -930,6 +930,43 @@ export type BadgeType =
   | 'turing_signal'            // ◉·∞   "turing test / turing complete / imitation game" (RARE)
   | 'lovelace_key'             // ∗·∞   "ada lovelace / first algorithm / first programmer" (EPIC)
   | 'von_neumann_code'         // ■·∞·■ "von neumann / stored program / self-replication" (MYTHIC)
+  // ── Word Turn v27 — THE ENCHANTER'S SCROLL ───────────────────────────────────
+  | 'cast_intention'           // ✦·∘   "cast my intention / setting intention / casting for" (UNCOMMON)
+  | 'potion_brewed'            // ∿·●   "brewed / concocted / the recipe / mixed my ritual" (RARE)
+  | 'grimoire_entry'           // ▓·∞   "grimoire / spell book / book of shadows / ancient tome" (RARE)
+  | 'mana_restored'            // ≈·◈   "mana / energy restored / recharged fully / recharge complete" (UNCOMMON)
+  | 'scroll_penned'            // →·∞   "penned / wrote the scroll / for the record / logging this" (UNCOMMON)
+  | 'crystal_clear'            // ◈·∘·◈ "crystal clear / clarity crystallized / clear as crystal" (RARE)
+  | 'arcane_insight'           // ∗·◈   "arcane / esoteric / hidden knowledge / the deep knowing" (EPIC)
+  | 'enchanted_self'           // ◉·∿   "enchanted / under the spell / bewitched by / the spell holds" (RARE)
+  | 'ward_placed'              // ─·█   "ward / boundary holds / protection in place / set a ward" (UNCOMMON)
+  | 'familiar_bond'            // ○·◉·○ "familiar / animal companion / my cat / my dog" (UNCOMMON)
+  | 'sigil_complete'           // ✦·◈   "sigil / made the mark / sealed it / the symbol drawn" (RARE)
+  | 'ritual_cast'              // ∘·∿·∘ "ritual / the ritual / performing ritual / ritual complete" (EPIC)
+  // ── Calendar Easter Egg v25 — THE ARCANE CALENDAR ────────────────────────────
+  | 'beltane_eve'              // ✦·∘   May 1 — Beltane fire festival (RARE)
+  | 'imbolc_day'               // ∘·∿   Feb 1 — Imbolc, return of light (RARE)
+  | 'le_guin_birthday'         // ∗·✦   Oct 21 — Ursula K. Le Guin born 1929 (EPIC)
+  // ── Behavioral v23 — SPELLCASTING PATTERNS ───────────────────────────────────
+  | 'enchanter_session'        // ✦·▓   3+ Enchanter (v27) words in one journal entry (RARE)
+  | 'ritual_writer'            // ∘·∿·● Journal entry written between 21:00–23:59 (UNCOMMON)
+  | 'spell_caster'             // ✦·↺   5+ check-ins in a single Mon–Sun calendar week (EPIC)
+  // ── Achievement RPG v25 — ENCHANTER CLASS ─────────────────────────────────────
+  | 'enchanter_entry'          // ∘→✦   Any 1 Word Turn v27 badge (COMMON)
+  | 'enchanter_class'          // ≈→✦   Any 5 Word Turn v27 badges (UNCOMMON)
+  | 'enchanter_complete'       // ≋→✦   All 12 Word Turn v27 badges (LEGENDARY)
+  | 'mystical_arc'             // ✦·◈   enchanter_complete + all 3 Calendar v25 badges (LEGENDARY)
+  | 'twenty_seven_engines_arc' // ◈·◈·✦ 1 badge from each Word Turn v1–v27 (LEGENDARY)
+  | 'enchanter_opus'           // ✦·◉·✦ enchanter_complete + enchanter_session behavioral (LEGENDARY)
+  // ── Mastery Tier v27 — THE GRAND GRIMOIRE ─────────────────────────────────────
+  | 'archmage_streak'          // ✦·∞   1,300+ distinct calendar check-in days (EPIC)
+  | 'tome_of_ages'             // ●·✦·● 350,000+ total journal words (LEGENDARY)
+  | 'decade_mage'              // ╔═╗·✦ Account age >= 10 years (LEGENDARY)
+  | 'twenty_seven_registers'   // ◈·◈·✦·∞ 1 badge from all 27 Word Turn engines (COSMIC)
+  // ── Secret Boss v24 — THE ENCHANTER'S VAULT ──────────────────────────────────
+  | 'pratchett_word'           // ∗·≈   "discworld / pratchett / ankh-morpork / death of rats" (RARE)
+  | 'gaiman_dream'             // ∘·◉·∘ "neil gaiman / sandman / american gods / neverwhere" (EPIC)
+  | 'narnia_door'              // ◈·∞·◈ "narnia / through the wardrobe / aslan / always winter" (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -8448,6 +8485,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v27 — THE ENCHANTER'S SCROLL ─────────────────────────────────
+  cast_intention: {
+    id: 'cast_intention',
+    symbol: '✦·∘',
+    name: 'Cast Intention',
+    description: 'Write "cast my intention", "setting intention", or "casting for" in any journal entry',
+    unlockMessage: '↳ Intention cast. The spell is not the wand — it is the clarity about what you are directing energy toward. ✦·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  potion_brewed: {
+    id: 'potion_brewed',
+    symbol: '∿·●',
+    name: 'Potion Brewed',
+    description: 'Write "brewed", "concocted", "the recipe", or "mixed my ritual" in any journal entry',
+    unlockMessage: '↳ Potion brewed. Every ritual is a recipe: ingredients, sequence, intention. The consistency of preparation is the magic. ∿·●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  grimoire_entry: {
+    id: 'grimoire_entry',
+    symbol: '▓·∞',
+    name: 'Grimoire Entry',
+    description: 'Write "grimoire", "spell book", "book of shadows", or "ancient tome" in any journal entry',
+    unlockMessage: '↳ The grimoire records what the mind cannot hold alone. The journal is the grimoire. Every entry is a spell. ▓·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  mana_restored: {
+    id: 'mana_restored',
+    symbol: '≈·◈',
+    name: 'Mana Restored',
+    description: 'Write "mana", "energy restored", "recharged fully", or "recharge complete" in any journal entry',
+    unlockMessage: '↳ Mana: MP restored. The pool refills from rest, ritual, and solitude. You cannot cast from an empty pool. ≈·◈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  scroll_penned: {
+    id: 'scroll_penned',
+    symbol: '→·∞',
+    name: 'Scroll Penned',
+    description: 'Write "penned", "wrote the scroll", "for the record", or "logging this" in any journal entry',
+    unlockMessage: '↳ Scroll penned. The written word is a spell that outlasts the moment it was cast. You have recorded the present so the future can read it. →·∞',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  crystal_clear: {
+    id: 'crystal_clear',
+    symbol: '◈·∘·◈',
+    name: 'Crystal Clear',
+    description: 'Write "crystal clear", "clarity crystallized", or "clear as crystal" in any journal entry',
+    unlockMessage: '↳ Crystal clear. Clarity is not the absence of complexity — it is the ability to see through it. The crystal does not remove what is there. It organizes it. ◈·∘·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  arcane_insight: {
+    id: 'arcane_insight',
+    symbol: '∗·◈',
+    name: 'Arcane Insight',
+    description: 'Write "arcane", "esoteric", "hidden knowledge", or "the deep knowing" in any journal entry',
+    unlockMessage: '↳ Arcane: that which is understood only by those who have done the work. The insight is not hidden from others — it was built in you. ∗·◈',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  enchanted_self: {
+    id: 'enchanted_self',
+    symbol: '◉·∿',
+    name: 'Enchanted Self',
+    description: 'Write "enchanted", "under the spell", "bewitched by", or "the spell holds" in any journal entry',
+    unlockMessage: '↳ Enchanted. The spell you are under is the spell you cast on your own attention. What you attend to grows. Attend carefully. ◉·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  ward_placed: {
+    id: 'ward_placed',
+    symbol: '─·█',
+    name: 'Ward Placed',
+    description: 'Write "ward", "boundary holds", "protection in place", or "set a ward" in any journal entry',
+    unlockMessage: '↳ Ward placed. The boundary is not a wall — it is a declaration of what the protected space is for. ─·█',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  familiar_bond: {
+    id: 'familiar_bond',
+    symbol: '○·◉·○',
+    name: 'Familiar Bond',
+    description: 'Write "familiar", "animal companion", "my cat", or "my dog" in any journal entry',
+    unlockMessage: '↳ Familiar bond. The animal companion is not a pet — it is the part of the practice that requires no justification. Pure presence. ○·◉·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  sigil_complete: {
+    id: 'sigil_complete',
+    symbol: '✦·◈',
+    name: 'Sigil Complete',
+    description: 'Write "sigil", "made the mark", "sealed it", or "the symbol drawn" in any journal entry',
+    unlockMessage: '↳ Sigil complete. The mark is made. The intention is encoded in a form the subconscious can read directly. The symbol carries the spell. ✦·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  ritual_cast: {
+    id: 'ritual_cast',
+    symbol: '∘·∿·∘',
+    name: 'Ritual Cast',
+    description: 'Write "ritual", "the ritual", "performing ritual", or "ritual complete" in any journal entry',
+    unlockMessage: '↳ Ritual cast. A ritual is a sequence of actions that produces a reliable internal state. You have built one. You ran it today. ∘·∿·∘',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v25 — THE ARCANE CALENDAR ──────────────────────────
+  beltane_eve: {
+    id: 'beltane_eve',
+    symbol: '✦·∘',
+    name: 'Beltane Eve',
+    description: 'Check in on May 1 — Beltane, the Celtic fire festival',
+    unlockMessage: '↳ Beltane: the fire between. May 1 — the midpoint between spring equinox and summer solstice. The ancient calendar marks today as a threshold. ✦·∘',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  imbolc_day: {
+    id: 'imbolc_day',
+    symbol: '∘·∿',
+    name: 'Imbolc Day',
+    description: 'Check in on February 1 — Imbolc, the return of light',
+    unlockMessage: '↳ Imbolc: February 1. Halfway between solstice and equinox. The light is returning. The ground is not yet thawed, but the direction has changed. ∘·∿',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  le_guin_birthday: {
+    id: 'le_guin_birthday',
+    symbol: '∗·✦',
+    name: 'Le Guin Birthday',
+    description: 'Check in on October 21 — Ursula K. Le Guin born 1929',
+    unlockMessage: '↳ October 21, 1929. Ursula K. Le Guin asked: what if the left hand and the right hand were the same hand? What if gender was a choice? What if the alien was you? Happy birthday to the question. ∗·✦',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  // ── Behavioral Easter Egg v23 — SPELLCASTING PATTERNS ──────────────────────
+  enchanter_session: {
+    id: 'enchanter_session',
+    symbol: '✦·▓',
+    name: 'Enchanter Session',
+    description: '3+ Enchanter\'s Scroll (v27) trigger words in one journal entry',
+    unlockMessage: '↳ Enchanter session: high-density arcane vocabulary in one entry. You are thinking in spells. ✦·▓',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  ritual_writer: {
+    id: 'ritual_writer',
+    symbol: '∘·∿·●',
+    name: 'Ritual Writer',
+    description: 'Write a journal entry between 21:00 and 23:59 local time',
+    unlockMessage: '↳ Ritual writer: the evening scroll. 21:00–23:59 — the liminal hour before sleep. The day reviewed. The spell completed. ∘·∿·●',
+    rarity: 'uncommon',
+    category: 'easter_egg',
+  },
+  spell_caster: {
+    id: 'spell_caster',
+    symbol: '✦·↺',
+    name: 'Spell Caster',
+    description: '5+ check-ins in a single Monday–Sunday calendar week',
+    unlockMessage: '↳ Spell caster: 5 of 7 days in a single week. The spell is not a single cast — it is the sustained will. ✦·↺',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v25 — ENCHANTER CLASS ──────────────────────────────────
+  enchanter_entry: {
+    id: 'enchanter_entry',
+    symbol: '∘→✦',
+    name: 'Enchanter Entry',
+    description: 'Earn any 1 Word Turn v27 (Enchanter\'s Scroll) badge',
+    unlockMessage: '↳ First spell cast. The scroll is open. ∘→✦',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  enchanter_class: {
+    id: 'enchanter_class',
+    symbol: '≈→✦',
+    name: 'Enchanter Class',
+    description: 'Earn any 5 Word Turn v27 (Enchanter\'s Scroll) badges',
+    unlockMessage: '↳ Enchanter class. Five arcane states recognized. The vocabulary of transformation becomes native. ≈→✦',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  enchanter_complete: {
+    id: 'enchanter_complete',
+    symbol: '≋→✦',
+    name: 'Enchanter Complete',
+    description: 'Earn all 12 Word Turn v27 (Enchanter\'s Scroll) badges',
+    unlockMessage: '↳ All twelve spells cast. The enchanter\'s scroll: complete. The full arcane vocabulary: acquired. ≋→✦',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  mystical_arc: {
+    id: 'mystical_arc',
+    symbol: '✦·◈',
+    name: 'Mystical Arc',
+    description: 'Earn enchanter_complete + all 3 Calendar v25 (Arcane Calendar) badges',
+    unlockMessage: '↳ Mystical arc complete. The arcane vocabulary + the three threshold dates of the ancient calendar. The lineage is acknowledged. ✦·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_seven_engines_arc: {
+    id: 'twenty_seven_engines_arc',
+    symbol: '◈·◈·✦',
+    name: 'Twenty-Seven Engines Arc',
+    description: 'Earn at least 1 badge from each of the 27 Word Turn engines (v1–v27)',
+    unlockMessage: '↳ Twenty-seven engines active. Every frequency of the LOT language: unlocked. The archive responds to all of it. ◈·◈·✦',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  enchanter_opus: {
+    id: 'enchanter_opus',
+    symbol: '✦·◉·✦',
+    name: 'Enchanter Opus',
+    description: 'Earn enchanter_complete + enchanter_session behavioral badge',
+    unlockMessage: '↳ Enchanter opus: the vocabulary mastered AND the session lived. You did not just learn the spells — you cast the session. ✦·◉·✦',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v27 — THE GRAND GRIMOIRE ──────────────────────────────────
+  archmage_streak: {
+    id: 'archmage_streak',
+    symbol: '✦·∞',
+    name: 'Archmage Streak',
+    description: '1,300+ distinct calendar days with any check-in',
+    unlockMessage: '↳ 1,300 distinct days. The archmage does not measure time in years — in spells cast, in pages turned, in days entered. ✦·∞',
+    rarity: 'epic',
+    category: 'milestone',
+  },
+  tome_of_ages: {
+    id: 'tome_of_ages',
+    symbol: '●·✦·●',
+    name: 'Tome of Ages',
+    description: '350,000+ total journal words (lifetime)',
+    unlockMessage: '↳ 350,000 words. The tome of ages grows beyond the span of a single practice. At this scale the archive IS the practitioner. ●·✦·●',
+    rarity: 'legendary',
+    category: 'milestone',
+  },
+  decade_mage: {
+    id: 'decade_mage',
+    symbol: '╔═╗·✦',
+    name: 'Decade Mage',
+    description: 'Account age >= 10 years',
+    unlockMessage: '↳ Decade mage: ten years on the path. The practice that survives a decade becomes the architecture of the self. ╔═╗·✦',
+    rarity: 'legendary',
+    category: 'milestone',
+  },
+  twenty_seven_registers: {
+    id: 'twenty_seven_registers',
+    symbol: '◈·◈·✦·∞',
+    name: 'Twenty-Seven Registers',
+    description: '1 badge from all 27 Word Turn engines (complete frequency map)',
+    unlockMessage: '↳ Twenty-seven registers unlocked. The complete LOT vocabulary: active. Every frequency the system understands: heard. ◈·◈·✦·∞',
+    rarity: 'cosmic',
+    category: 'milestone',
+  },
+  // ── Secret Boss v24 — THE ENCHANTER'S VAULT ────────────────────────────────
+  pratchett_word: {
+    id: 'pratchett_word',
+    symbol: '∗·≈',
+    name: 'Pratchett Word',
+    description: 'Write "discworld", "pratchett", "ankh-morpork", or "death of rats" in any journal entry',
+    unlockMessage: '↳ DEATH: "I DO NOT UNDERSTAND THE FASCINATION WITH UPPER CASE. IT IS STILL JUST LETTERS." — Terry Pratchett understood the joke AND the truth in the same sentence. ∗·≈',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  gaiman_dream: {
+    id: 'gaiman_dream',
+    symbol: '∘·◉·∘',
+    name: 'Gaiman Dream',
+    description: 'Write "neil gaiman", "sandman", "american gods", or "neverwhere" in any journal entry',
+    unlockMessage: '↳ Dream: "You have a place where you go, inside your mind, and you close the door." Neil Gaiman built entire worlds from the premise that the inner life is the actual life. ∘·◉·∘',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  narnia_door: {
+    id: 'narnia_door',
+    symbol: '◈·∞·◈',
+    name: 'Narnia Door',
+    description: 'Write "narnia", "through the wardrobe", "aslan", or "always winter never christmas" in any journal entry',
+    unlockMessage: '↳ "Wrong will be right, when Aslan comes in sight." C.S. Lewis. The door at the back of the wardrobe is not a fantasy — it is the discovery that the world is larger than the one you were shown. ◈·∞·◈',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -9671,6 +9996,108 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     if (allTwentySixEngines && !hasBadge('twenty_six_registers')) {
       if (awardBadge('twenty_six_registers')) newBadges.push('twenty_six_registers')
     }
+
+    // ── v27 — THE ENCHANTER'S SCROLL ─────────────────────────────────────────────
+
+    // Calendar EE v25: beltane_eve — May 1
+    if (month === 4 && day === 1 && !hasBadge('beltane_eve')) {
+      if (awardBadge('beltane_eve')) newBadges.push('beltane_eve')
+    }
+
+    // Calendar EE v25: imbolc_day — Feb 1
+    if (month === 1 && day === 1 && !hasBadge('imbolc_day')) {
+      if (awardBadge('imbolc_day')) newBadges.push('imbolc_day')
+    }
+
+    // Calendar EE v25: le_guin_birthday — Oct 21
+    if (month === 9 && day === 21 && !hasBadge('le_guin_birthday')) {
+      if (awardBadge('le_guin_birthday')) newBadges.push('le_guin_birthday')
+    }
+
+    // v27 Word Turn achievement arcs
+    const enchanterV27Badges: BadgeType[] = [
+      'cast_intention', 'potion_brewed', 'grimoire_entry', 'mana_restored',
+      'scroll_penned', 'crystal_clear', 'arcane_insight', 'enchanted_self',
+      'ward_placed', 'familiar_bond', 'sigil_complete', 'ritual_cast',
+    ]
+    const enchanterV27Earned = enchanterV27Badges.filter(b => hasBadge(b))
+    const enchanterComplete = enchanterV27Earned.length === 12
+
+    if (enchanterV27Earned.length >= 1 && !hasBadge('enchanter_entry')) {
+      if (awardBadge('enchanter_entry')) newBadges.push('enchanter_entry')
+    }
+    if (enchanterV27Earned.length >= 5 && !hasBadge('enchanter_class')) {
+      if (awardBadge('enchanter_class')) newBadges.push('enchanter_class')
+    }
+    if (enchanterComplete && !hasBadge('enchanter_complete')) {
+      if (awardBadge('enchanter_complete')) newBadges.push('enchanter_complete')
+    }
+
+    // enchanter_opus: enchanter_complete + enchanter_session
+    if (enchanterComplete && hasBadge('enchanter_session') && !hasBadge('enchanter_opus')) {
+      if (awardBadge('enchanter_opus')) newBadges.push('enchanter_opus')
+    }
+
+    // mystical_arc: enchanter_complete + all 3 Calendar v25 badges
+    const calendarV25Badges: BadgeType[] = ['beltane_eve', 'imbolc_day', 'le_guin_birthday']
+    if (enchanterComplete && calendarV25Badges.every(b => hasBadge(b)) && !hasBadge('mystical_arc')) {
+      if (awardBadge('mystical_arc')) newBadges.push('mystical_arc')
+    }
+
+    // twenty_seven_engines_arc: 1 badge from each Word Turn v1–v27
+    const engineTwentySevenPresent = enchanterV27Earned.length >= 1
+    const allTwentySevenEngines = allTwentySixEngines && engineTwentySevenPresent
+    if (allTwentySevenEngines && !hasBadge('twenty_seven_engines_arc')) {
+      if (awardBadge('twenty_seven_engines_arc')) newBadges.push('twenty_seven_engines_arc')
+    }
+
+    // Mastery v27: archmage_streak — 1,300+ distinct calendar check-in days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1300 && !hasBadge('archmage_streak')) {
+        if (awardBadge('archmage_streak')) newBadges.push('archmage_streak')
+      }
+    }
+
+    // Mastery v27: tome_of_ages — 350,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 350000 && !hasBadge('tome_of_ages')) {
+        if (awardBadge('tome_of_ages')) newBadges.push('tome_of_ages')
+      }
+    }
+
+    // Mastery v27: decade_mage — Account age >= 10 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupDM = new Date(stats.signupDate)
+      const yearsDM = (new Date().getTime() - signupDM.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsDM >= 10 && !hasBadge('decade_mage')) {
+        if (awardBadge('decade_mage')) newBadges.push('decade_mage')
+      }
+    }
+
+    // Mastery v27: twenty_seven_registers — 1 badge from all 27 Word Turn engines
+    if (allTwentySevenEngines && !hasBadge('twenty_seven_registers')) {
+      if (awardBadge('twenty_seven_registers')) newBadges.push('twenty_seven_registers')
+    }
+
+    // Spell Caster: 5+ check-ins in a single Mon–Sun calendar week
+    // (tracked via spell_caster_week_log in localStorage)
+    try {
+      const spellLog: string[] = JSON.parse(localStorage.getItem('spell_caster_week_log') || '[]')
+      const todayISO = new Date().toISOString().slice(0, 10)
+      const updated = Array.from(new Set([todayISO, ...spellLog])).slice(0, 10)
+      localStorage.setItem('spell_caster_week_log', JSON.stringify(updated))
+      const thisWeekMonday = (() => {
+        const d = new Date(); const dow = d.getDay(); const diff = (dow + 6) % 7
+        d.setDate(d.getDate() - diff); return d.toISOString().slice(0, 10)
+      })()
+      const thisWeekSunday = (() => {
+        const d = new Date(thisWeekMonday); d.setDate(d.getDate() + 6); return d.toISOString().slice(0, 10)
+      })()
+      const thisWeekCount = updated.filter(d => d >= thisWeekMonday && d <= thisWeekSunday).length
+      if (thisWeekCount >= 5 && !hasBadge('spell_caster')) {
+        if (awardBadge('spell_caster')) newBadges.push('spell_caster')
+      }
+    } catch { /* non-critical */ }
 
   } catch (error) {
     console.warn('Badge check failed:', error)

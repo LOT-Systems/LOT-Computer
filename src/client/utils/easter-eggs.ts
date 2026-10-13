@@ -1615,6 +1615,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bturing[\s-]?test\b|\bturing[\s-]?complete\b|\bimitation[\s-]?game\b/i, badge: 'turing_signal' },
   { patterns: /\bada[\s-]?lovelace\b|\bfirst[\s-]?algorithm\b|\bfirst[\s-]?programmer\b/i, badge: 'lovelace_key' },
   { patterns: /\bvon[\s-]?neumann\b|\bstored[\s-]?program\b|\bself[\s-]?replication\b/i, badge: 'von_neumann_code' },
+  // ── v27 — THE ENCHANTER'S SCROLL word turns ───────────────────────────────────
+  { patterns: /\bcast(?:ing)?[\s-]?(?:my[\s-]?)?intention\b|\bsetting[\s-]?intention\b|\bcasting[\s-]?for\b/i, badge: 'cast_intention' },
+  { patterns: /\bbrewed\b|\bconcocted\b|\bthe[\s-]?recipe\b|\bmixed[\s-]?my[\s-]?ritual\b/i, badge: 'potion_brewed' },
+  { patterns: /\bgrimoire\b|\bspell[\s-]?book\b|\bbook[\s-]?of[\s-]?shadows\b|\bancient[\s-]?tome\b/i, badge: 'grimoire_entry' },
+  { patterns: /\bmana\b|\benergy[\s-]?restored\b|\brecharged[\s-]?fully\b|\brecharge[\s-]?complete\b/i, badge: 'mana_restored' },
+  { patterns: /\bpenned\b|\bwrote[\s-]?the[\s-]?scroll\b|\bfor[\s-]?the[\s-]?record\b|\blogging[\s-]?this\b/i, badge: 'scroll_penned' },
+  { patterns: /\bcrystal[\s-]?clear\b|\bclarity[\s-]?crystallized\b|\bclear[\s-]?as[\s-]?crystal\b/i, badge: 'crystal_clear' },
+  { patterns: /\barcane\b|\besoteric\b|\bhidden[\s-]?knowledge\b|\bthe[\s-]?deep[\s-]?knowing\b/i, badge: 'arcane_insight' },
+  { patterns: /\benchanted\b|\bunder[\s-]?the[\s-]?spell\b|\bbewitched[\s-]?by\b|\bthe[\s-]?spell[\s-]?holds\b/i, badge: 'enchanted_self' },
+  { patterns: /\bward\b|\bboundary[\s-]?holds\b|\bprotection[\s-]?in[\s-]?place\b|\bset[\s-]?a[\s-]?ward\b/i, badge: 'ward_placed' },
+  { patterns: /\bfamiliar\b|\banimal[\s-]?companion\b|\bmy[\s-]?cat\b|\bmy[\s-]?dog\b/i, badge: 'familiar_bond' },
+  { patterns: /\bsigil\b|\bmade[\s-]?the[\s-]?mark\b|\bsealed[\s-]?it\b|\bthe[\s-]?symbol[\s-]?drawn\b/i, badge: 'sigil_complete' },
+  { patterns: /\britual\b|\bthe[\s-]?ritual\b|\bperforming[\s-]?ritual\b|\britual[\s-]?complete\b/i, badge: 'ritual_cast' },
+  // ── v24 Secret Boss — THE ENCHANTER'S VAULT word triggers ─────────────────────
+  { patterns: /\bdiscworld\b|\bpratchett\b|\bankh[\s-]?morpork\b|\bdeath[\s-]?of[\s-]?rats\b/i, badge: 'pratchett_word' },
+  { patterns: /\bneil[\s-]?gaiman\b|\bsandman\b|\bamerican[\s-]?gods\b|\bneverwhere\b/i, badge: 'gaiman_dream' },
+  { patterns: /\bnarnia\b|\bthrough[\s-]?the[\s-]?wardrobe\b|\baslan\b|\balways[\s-]?winter\b/i, badge: 'narnia_door' },
 ]
 
 /**
@@ -3099,6 +3116,47 @@ export function checkCronJob(): BadgeType | null {
       return 'cron_job'
     }
   } catch { /* non-critical */ }
+  return null
+}
+
+// ── v27 — THE ENCHANTER'S SCROLL behavioral functions ─────────────────────────
+
+const ENCHANTER_WORDS_V27 = [
+  /\bcast(?:ing)?[\s-]?(?:my[\s-]?)?intention\b|\bsetting[\s-]?intention\b|\bcasting[\s-]?for\b/i,
+  /\bbrewed\b|\bconcocted\b|\bthe[\s-]?recipe\b|\bmixed[\s-]?my[\s-]?ritual\b/i,
+  /\bgrimoire\b|\bspell[\s-]?book\b|\bbook[\s-]?of[\s-]?shadows\b|\bancient[\s-]?tome\b/i,
+  /\bmana\b|\benergy[\s-]?restored\b|\brecharged[\s-]?fully\b|\brecharge[\s-]?complete\b/i,
+  /\bpenned\b|\bwrote[\s-]?the[\s-]?scroll\b|\bfor[\s-]?the[\s-]?record\b|\blogging[\s-]?this\b/i,
+  /\bcrystal[\s-]?clear\b|\bclarity[\s-]?crystallized\b|\bclear[\s-]?as[\s-]?crystal\b/i,
+  /\barcane\b|\besoteric\b|\bhidden[\s-]?knowledge\b|\bthe[\s-]?deep[\s-]?knowing\b/i,
+  /\benchanted\b|\bunder[\s-]?the[\s-]?spell\b|\bbewitched[\s-]?by\b|\bthe[\s-]?spell[\s-]?holds\b/i,
+  /\bward\b|\bboundary[\s-]?holds\b|\bprotection[\s-]?in[\s-]?place\b|\bset[\s-]?a[\s-]?ward\b/i,
+  /\bfamiliar\b|\banimal[\s-]?companion\b|\bmy[\s-]?cat\b|\bmy[\s-]?dog\b/i,
+  /\bsigil\b|\bmade[\s-]?the[\s-]?mark\b|\bsealed[\s-]?it\b|\bthe[\s-]?symbol[\s-]?drawn\b/i,
+  /\britual\b|\bthe[\s-]?ritual\b|\bperforming[\s-]?ritual\b|\britual[\s-]?complete\b/i,
+]
+
+/** enchanter_session: 3+ Enchanter's Scroll (v27) words in one journal entry */
+export function checkEnchanterSession(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('enchanter_session')) return null
+  const matchCount = ENCHANTER_WORDS_V27.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('enchanter_session')
+    return 'enchanter_session'
+  }
+  return null
+}
+
+/** ritual_writer: Journal entry written between 21:00 and 23:59 local */
+export function checkRitualWriter(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('ritual_writer')) return null
+  const hour = new Date().getHours()
+  if (hour >= 21 && hour <= 23) {
+    awardBadge('ritual_writer')
+    return 'ritual_writer'
+  }
   return null
 }
 
