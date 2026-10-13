@@ -29,6 +29,8 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { buildSystemHelp, parseStoryScope } from '#client/utils/slashCommands'
+import { compressLogs, formatDigest, digestForPrompt } from '#client/utils/storyCompression'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3706,6 +3708,9 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  // Compressed local story shown instantly; kept so the AI-error path can fall back to it
+  const storyLocalRef = React.useRef<string>('')
+  const { data: storyLogs = [] } = useLogs()
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3752,7 +3757,8 @@ const NoteEditor = ({
       setIsSaved(true)
     },
     onError: () => {
-      const fallback = 'The system holds your data quietly. When the engine returns, your story will be here.'
+      const fallback = storyLocalRef.current ||
+        'The system holds your data quietly. When the engine returns, your story will be here.'
       setStoryResponse(fallback)
       setStoryLoading(false)
       const current = valueRef.current
@@ -4121,47 +4127,42 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(buildSystemHelp())
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
+          // 1) Compress the period locally — instant, offline, no raw entries leave the device
+          const scope = parseStoryScope(value)
+          let digestText = ''
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const written = storyLogs.filter(l => (l.text || '').trim() && l.event !== 'generated_story')
+            const digest = compressLogs(storyLogs, scope, new Date(), {
+              badgeCount: getEarnedBadges().length,
+              allTimeEntries: written.length,
+            })
+            storyLocalRef.current = formatDigest(digest)
+            digestText = digestForPrompt(digest)
+            setStoryResponse(storyLocalRef.current)
+          } catch {
+            storyLocalRef.current = ''
+          }
+          // 2) Ask the engine to narrate the digest
+          try {
+            const logText = value.replace(/\/story(\s+[a-z]+)?/i, '').replace(/📖/g, '').trim()
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
               quantumState: state,
               userIndex: index,
+              scope,
+              digest: digestText,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: value, scope, digest: digestText })
           }
         }
       }
@@ -4399,7 +4400,7 @@ const NoteEditor = ({
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                        <span style={{ minWidth: '230px', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )

@@ -895,6 +895,10 @@ export const usePrayerScripture = createMutation<
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    /** Period to compress: day | week | month | year */
+    scope?: 'day' | 'week' | 'month' | 'year'
+    /** Client-side compressed digest of the period (see storyCompression.ts) */
+    digest?: string
     quantumState?: {
       energy?: string
       clarity?: string

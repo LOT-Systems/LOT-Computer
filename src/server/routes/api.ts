@@ -5490,6 +5490,8 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          scope?: string
+          digest?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,6 +5516,11 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const storyScope = ['day', 'week', 'month', 'year'].includes(req.body.scope || '')
+        ? (req.body.scope as string)
+        : 'day'
+      // Compressed digest is client-built from the user's own logs; bound it and strip control chars
+      const periodDigest = (req.body.digest || '').replace(/[\u0000-\u001f]/g, ' ').slice(0, 800)
 
       const logs = await fastify.models.Log.findAll({
         where: { userId: req.user.id },
@@ -5549,10 +5556,11 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story for the ${storyScope.toUpperCase()}. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
+- A PERIOD DIGEST (compressed counts, mood, pattern, themes) is provided: narrate its high and low points and any pattern change; never invent numbers it does not contain
 - Draw from their actual log entries, moods, and self-care answers below
 - Reference specific details from their data — make it feel like THEIR story
 - If they've been consistent with check-ins, acknowledge the discipline
@@ -5566,6 +5574,8 @@ RULES:
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
+
+PERIOD DIGEST (${storyScope}): ${periodDigest || 'none'}
 
 RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
 
