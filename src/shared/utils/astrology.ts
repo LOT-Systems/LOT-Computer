@@ -177,3 +177,64 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Convert an instant to a Date whose local getters (getHours, getDate, ...)
+ * read the wall-clock time in `timeZone`. Lets the pure astrology functions
+ * (which read local getters) reflect a user's saved timeZone on either side
+ * of the wire. Falls back to the instant itself for a missing/invalid zone.
+ */
+export function toWallClockDate(instant: Date, timeZone?: string | null): Date {
+  if (!timeZone) return instant
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+    }).formatToParts(instant)
+    const get = (type: string) => Number(parts.find(p => p.type === type)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return instant
+  }
+}
+
+export type RokuyoResonance = {
+  state: string
+  count: number
+  total: number
+}
+
+/**
+ * Personal resonance: which emotional state the user most often logged on
+ * days sharing today's rokuyo. Reads the astroRokuyo snapshot that
+ * getLogContext stamps on every log. Needs >= minSamples check-ins on this
+ * rokuyo and a state that leads (>= 2 occurrences) — otherwise null, so the
+ * widget stays silent rather than inventing a pattern.
+ */
+export function getRokuyoResonance(
+  logs: Array<{ event: string; metadata?: any; context?: any }>,
+  rokuyo: string,
+  minSamples = 3
+): RokuyoResonance | null {
+  const counts = new Map<string, number>()
+  let total = 0
+  for (const log of logs) {
+    if (log.event !== 'emotional_checkin') continue
+    if (log.context?.astroRokuyo !== rokuyo) continue
+    const state = log.metadata?.emotionalState
+    if (typeof state !== 'string' || !state) continue
+    counts.set(state, (counts.get(state) || 0) + 1)
+    total++
+  }
+  if (total < minSamples) return null
+  let best: [string, number] | null = null
+  for (const entry of counts) if (!best || entry[1] > best[1]) best = entry
+  if (!best || best[1] < 2) return null
+  return { state: best[0], count: best[1], total }
+}
