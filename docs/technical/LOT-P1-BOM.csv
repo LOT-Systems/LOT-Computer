@@ -1,0 +1,20 @@
+block,part,qty,est_unit_usd,vendor,link,status
+MCU,ESP32-S3-MINI-1,1,3.5,Espressif/DigiKey,https://www.espressif.com/en/products/socs/esp32-s3,verify MPN
+Camera,OV2640 module (EVT stock; custom flex DVT),1,4.0,OmniVision/DigiKey,https://www.ovt.com/,verify MPN
+Screen,1.54in 200x200 e-paper,1,6.0,Good Display/Waveshare,https://www.good-display.com/,decision pending (OLED alt)
+Env sensor,Bosch BME688,1,5.0,Bosch/DigiKey,https://www.bosch-sensortec.com/products/environmental-sensors/gas-sensors/bme688/,verify MPN
+IMU,Bosch BMI270,1,2.5,Bosch/DigiKey,https://www.bosch-sensortec.com/products/motion-sensors/imus/bmi270/,verify MPN
+Light,Vishay VEML7700,1,1.2,Vishay/DigiKey,https://www.vishay.com/en/product/84286/,verify MPN
+Haptic driver,TI DRV2605L,1,1.5,TI,https://www.ti.com/product/DRV2605L,verify MPN
+Haptic actuator,Thin LRA/piezo <=2mm,1,1.5,TBD,,select
+Qi receiver,TI BQ51013B,1,3.0,TI,https://www.ti.com/product/BQ51013B,verify MPN
+Qi coil,Wurth WE-WPCC FPC Rx coil,1,2.0,Wurth,https://www.we-online.com/en/components/products/WPCC,select size
+Charger IC,TI BQ25185,1,1.5,TI,https://www.ti.com/product/BQ25185,verify MPN
+Battery,3.0mm LiPo 150-200mAh (UN38.3),1,4.0,custom,,cert required
+Fuel gauge,Analog Devices MAX17048,1,1.5,Analog Devices,https://www.analog.com/en/products/max17048.html,verify MPN
+Button,Low-profile side tact <=1.2mm,1,0.4,DigiKey,https://www.digikey.com/,select
+Privacy LED,0402 LED on camera rail,1,0.1,DigiKey,,
+Body,316L 2-part CNC + mirror polish,1,75.0,PCBWay CNC,https://www.pcbway.com/cnc-machining-quote.html,quote needed
+RF window,PEEK/ceramic ring,1,3.0,TBD,,design
+PCB,6-layer rigid + FPC ENIG,1,11.0,PCBWay,https://www.pcbway.com/,quote needed
+Misc,passives/connectors,1,5.0,PCBWay turnkey,https://www.pcbway.com/,
