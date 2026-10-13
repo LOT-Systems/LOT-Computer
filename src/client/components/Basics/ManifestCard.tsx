@@ -7,7 +7,7 @@
  */
 
 import * as React from 'react'
-import { RATION_MANIFEST } from './constants'
+import { itemsForIssue } from './constants'
 import type { BasicSubscription, BasicIssue } from '#shared/types'
 
 type Props = {
@@ -16,20 +16,8 @@ type Props = {
   onClose: () => void
 }
 
-function getItemsForIssue(issueNumber: number) {
-  const n = ((issueNumber - 1) % 6) + 1
-  const quarterly   = [1, 3, 5].includes(n)
-  const semiAnnual  = n === 1
-  return RATION_MANIFEST.filter(item => {
-    if (item.cadence === 'MONTHLY')       return true
-    if (item.cadence === 'QUARTERLY')     return quarterly
-    if (item.cadence === 'SEMI-ANNUALLY') return semiAnnual
-    return false
-  })
-}
-
 export const ManifestCard: React.FC<Props> = ({ subscription, issue, onClose }) => {
-  const items = getItemsForIssue(issue.issueNumber)
+  const items = itemsForIssue(issue.issueNumber)
 
   const handlePrint = () => window.print()
 

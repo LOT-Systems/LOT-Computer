@@ -7,7 +7,7 @@
  */
 
 import * as React from 'react'
-import { RATION_MANIFEST, RationCadence } from './constants'
+import { itemsForIssue } from './constants'
 import type { BasicSubscription, BasicIssue } from '#shared/types'
 
 type Props = {
@@ -16,24 +16,10 @@ type Props = {
   onPrintManifest: () => void
 }
 
-function getItemsForIssue(issueNumber: number): typeof RATION_MANIFEST {
-  const cadenceMap: Record<number, RationCadence[]> = {
-    1: ['MONTHLY', 'QUARTERLY', 'SEMI-ANNUALLY', 'ANNUALLY'],
-    2: ['MONTHLY'],
-    3: ['MONTHLY', 'QUARTERLY'],
-    4: ['MONTHLY'],
-    5: ['MONTHLY'],
-    6: ['MONTHLY', 'QUARTERLY', 'SEMI-ANNUALLY'],
-  }
-  const n = ((issueNumber - 1) % 6) + 1
-  const activeCadences = cadenceMap[n] ?? ['MONTHLY']
-  return RATION_MANIFEST.filter(item => activeCadences.includes(item.cadence))
-}
-
 export const NextIssueBlock: React.FC<Props> = ({ subscription, nextIssue, onPrintManifest }) => {
   if (!subscription || !nextIssue) return null
 
-  const issueItems = getItemsForIssue(nextIssue.issueNumber)
+  const issueItems = itemsForIssue(nextIssue.issueNumber)
 
   return (
     <div className="lb-border" style={{ marginBottom: '1.5rem' }}>

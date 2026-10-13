@@ -6,6 +6,7 @@
  * Made in the USA | brand.lot-systems.com
  */
 
+import { itemsForIssue } from '#shared/utils/ration'
 import { Op, Sequelize } from 'sequelize'
 import { FastifyInstance, FastifyRequest } from 'fastify'
 import seedrandom from 'seedrandom'
@@ -45,8 +46,10 @@ import { generateCompassionateInterventions, shouldShowIntervention } from '#ser
 import dayjs from '#server/utils/dayjs'
 import { registerOSRoutes } from './os-api.js'
 
-// =====================================================================// Helper Functions
-// =====================================================================
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
 /**
  * Generate compassionate response based on emotional state
  */
@@ -1616,8 +1619,10 @@ export default async (fastify: FastifyInstance) => {
     }
   )
 
-  // =====================================================================  // EMOTIONAL CHECK-IN ENDPOINT
-  // =====================================================================  fastify.post(
+  // ============================================================================
+  // EMOTIONAL CHECK-IN ENDPOINT
+  // ============================================================================
+  fastify.post(
     '/emotional-checkin',
     async (
       req: FastifyRequest<{
@@ -2086,8 +2091,10 @@ export default async (fastify: FastifyInstance) => {
         }
       })
 
-      // =====================================================================      // WEEKLY SUMMARY CHECK (Priority over regular questions)
-      // =====================================================================      // Check if it's time for weekly summary (Sunday or Monday, once per week)
+      // ============================================================================
+      // WEEKLY SUMMARY CHECK (Priority over regular questions)
+      // ============================================================================
+      // Check if it's time for weekly summary (Sunday or Monday, once per week)
       let lastWeeklySummary = null
       try {
         lastWeeklySummary = await fastify.models.Answer.findOne({
@@ -2246,9 +2253,11 @@ export default async (fastify: FastifyInstance) => {
         }
       }
 
-      // =====================================================================      // DEFAULT QUESTIONS FALLBACK
+      // ============================================================================
+      // DEFAULT QUESTIONS FALLBACK
       // Used for non-Usership users OR when AI generation fails
-      // =====================================================================      console.log(`📋 Using default questions for user ${req.user.id}`, {
+      // ============================================================================
+      console.log(`📋 Using default questions for user ${req.user.id}`, {
         reason: hasUsershipTag ? 'AI generation failed' : 'Non-Usership user',
         hasUsershipTag
       })
@@ -2454,8 +2463,10 @@ export default async (fastify: FastifyInstance) => {
         context,
       })
 
-      // =====================================================================      // ENHANCED INSIGHT RESPONSE SYSTEM
-      // =====================================================================
+      // ============================================================================
+      // ENHANCED INSIGHT RESPONSE SYSTEM
+      // ============================================================================
+
       // Get user's recent answers and logs for psychological analysis
       const recentLogs = await fastify.models.Log.findAll({
         where: { userId: req.user.id },
@@ -4075,8 +4086,10 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     }
   })
 
-  // =====================================================================  // STATS API - Real-time metrics and community insights
-  // =====================================================================
+  // ============================================================================
+  // STATS API - Real-time metrics and community insights
+  // ============================================================================
+
   // In-memory cache for hot endpoints (shared across all users)
   const statsCache = new Map<string, { data: any; expiresAt: number }>()
   function getCached(key: string, ttlMs: number, compute: () => Promise<any>): Promise<any> {
@@ -4856,8 +4869,10 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     }
   })
 
-  // =====================================================================  // Cosmic Update — Together AI image generation
-  // =====================================================================  fastify.post(
+  // ============================================================================
+  // Cosmic Update — Together AI image generation
+  // ============================================================================
+  fastify.post(
     '/cosmic-update',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
     async (req: FastifyRequest<{ Body: { prompt?: string } }>, reply) => {
@@ -4902,10 +4917,12 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     }
   )
 
-  // =====================================================================  // QI — Quantum Intelligence RFI (Request for Information)
+  // ============================================================================
+  // QI — Quantum Intelligence RFI (Request for Information)
   // Operator queries their own intelligence apparatus via /qi in the LOG.
   // Engine: Together AI. Response format: military INTSUM (intelligence summary).
-  // =====================================================================  fastify.post(
+  // ============================================================================
+  fastify.post(
     '/qi',
     { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } },
     async (
@@ -5108,10 +5125,12 @@ OPERATOR RFI: ${query.trim()}`
     }
   )
 
-  // =====================================================================  // ASSEMBLY — Self-Assembly Directive
+  // ============================================================================
+  // ASSEMBLY — Self-Assembly Directive
   // System scans operator's signal record and generates a long-term directive.
   // Not a response to a question — a proactive instruction from the machine.
-  // =====================================================================  fastify.post(
+  // ============================================================================
+  fastify.post(
     '/assembly',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
     async (
@@ -5323,10 +5342,12 @@ ${qieLogs.length > 0 ? qieLogs.map(l => `${(l.metadata?.pattern as string || '')
     }
   )
 
-  // =====================================================================  // PRAYER — Contextual Scripture
+  // ============================================================================
+  // PRAYER — Contextual Scripture
   // System reads the operator's log entry + biofield state and returns
   // a Bible verse that resonates. The scripture finds the operator.
-  // =====================================================================  fastify.post(
+  // ============================================================================
+  fastify.post(
     '/prayer',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
     async (
@@ -5458,10 +5479,12 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
     }
   )
 
-  // =====================================================================  // STORY — Contextual AI Story
+  // ============================================================================
+  // STORY — Contextual AI Story
   // Generates a 1-2 paragraph story based on recent logs, self-care events,
   // and widget data. The story reflects the operator's recent journey.
-  // =====================================================================  fastify.post(
+  // ============================================================================
+  fastify.post(
     '/story',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
     async (
@@ -5590,11 +5613,16 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           logId: null,
         }
       }
+    }
+  )
+
+  // ============================================================================
   // LOT-FM-001 — BASIC RATION MODULE
   // Month 1: read-only manifest (public)
   // Month 2: upgrade/stand-down state machine + roster intake
   // Month 3: issue log + next issue
-  // =====================================================================
+  // ============================================================================
+
   // GET /api/basic/subscription — current subscriber status
   fastify.get('/basic/subscription', async (req: FastifyRequest, reply) => {
     const sub = await fastify.models.BasicSubscription.findOne({
@@ -5643,6 +5671,11 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
       if (sub.status !== 'PENDING') {
         return reply.status(409).send({ error: 'ROSTER ALREADY CONFIRMED' })
       }
+      const b = req.body ?? ({} as any)
+      const required = ['shippingName','shippingLine1','shippingCity','shippingState','shippingZip','shippingCountry','shirtSize','shoeSize'] as const
+      if (required.some(k => typeof b[k] !== 'string' || !b[k].trim() || b[k].length > 200)) {
+        return reply.status(400).send({ error: 'ROSTER INCOMPLETE' })
+      }
 
       const now = new Date()
       // First issue: 1st of next month
@@ -5650,13 +5683,16 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
       const periodLabel = cadenceStart.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()
 
       await sub.update({
-        ...req.body,
+        shippingName: b.shippingName, shippingLine1: b.shippingLine1,
+        shippingLine2: b.shippingLine2 ?? null, shippingCity: b.shippingCity,
+        shippingState: b.shippingState, shippingZip: b.shippingZip,
+        shippingCountry: b.shippingCountry, shirtSize: b.shirtSize, shoeSize: b.shoeSize,
         status: 'ON_STRENGTH',
         cadenceStart,
       })
 
       // Count monthly items for first issue (cadences: MONTHLY + QUARTERLY + SEMI-ANNUALLY + ANNUALLY)
-      const firstIssueItemCount = 23 // all items ship in issue #1 per LOT-FM-001
+      const firstIssueItemCount = itemsForIssue(1).length // full load (23)
 
       await fastify.models.BasicIssue.create({
         subscriptionId: sub.id,
@@ -5727,6 +5763,10 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
   fastify.post<{ Params: { id: string }; Body: { status: string; trackingNumber?: string } }>(
     '/basic/issues/:id/advance',
     async (req, reply) => {
+      // Fulfillment action: admin only (subscribers must not self-mark DELIVERED)
+      if (!req.user.isAdmin()) {
+        return reply.status(403).send({ error: 'FORBIDDEN' })
+      }
       const issue = await fastify.models.BasicIssue.findByPk(req.params.id)
       if (!issue) return reply.status(404).send({ error: 'ISSUE NOT FOUND' })
 
@@ -5755,11 +5795,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           issueDate.setMonth(issueDate.getMonth() + 1, 1)
           const periodLabel = issueDate.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()
 
-          // Monthly items: 17; quarterly: add 4 on months 3,6,9,12; semi-annual: add 1 on months 1,7
-          const n = ((nextIssueNumber - 1) % 6) + 1
-          const itemCount = 17 +
-            ([1, 3, 5].includes(n) ? 4 : 0) +
-            (n === 1 ? 2 : 0)
+          const itemCount = itemsForIssue(nextIssueNumber).length
 
           await fastify.models.BasicIssue.create({
             subscriptionId: sub.id,
