@@ -126,6 +126,13 @@ export const CohortConnectWidget: React.FC = () => {
     stores.goTo('sync')
   }
 
+  const handleEmail = (userId: string, name: string) => {
+    try {
+      sessionStorage.setItem('lot:email-to', JSON.stringify({ id: userId, name }))
+    } catch {}
+    stores.goTo('sync')
+  }
+
   const handleToggleExpand = (userId: string) => {
     const willExpand = expandedMemberId !== userId
     if (willExpand) {
@@ -268,6 +275,18 @@ export const CohortConnectWidget: React.FC = () => {
                         }}
                       >
                         Send message
+                      </Button>
+                      <Button
+                        size="small"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation()
+                          handleEmail(
+                            match.user.id,
+                            `${match.user.firstName || ''} ${match.user.lastName || ''}`.trim() || 'member'
+                          )
+                        }}
+                      >
+                        Email
                       </Button>
                     </div>
                   </div>

@@ -380,6 +380,13 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'email': {
+          // Private: only the receiver's connection gets the event
+          if (data.receiverId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4082,6 +4089,147 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — simplest mail: composed in Log (/email to Name), read in Sync
+  // ============================================================================
+
+  const fullName = (u: { firstName: string | null; lastName: string | null }) =>
+    `${u.firstName || ''} ${u.lastName || ''}`.trim()
+
+  // Resolve a recipient among joined community members by first name,
+  // full name, or email. Ambiguous names return candidates (409).
+  async function resolveEmailRecipient(to: string, selfId: string) {
+    const q = to.trim().toLowerCase()
+    const users = await fastify.models.User.findAll({
+      where: { joinedAt: { [Op.ne]: null }, id: { [Op.ne]: selfId } },
+      attributes: ['id', 'firstName', 'lastName', 'email', 'city'],
+    })
+    return users.filter(
+      (u) =>
+        (u.firstName || '').toLowerCase() === q ||
+        fullName(u).toLowerCase() === q ||
+        u.email.toLowerCase() === q
+    )
+  }
+
+  // Inbox + sent (latest 100 each) and unread count
+  fastify.get('/emails', async (req, reply) => {
+    try {
+      const [inbox, sent] = await Promise.all([
+        fastify.models.Email.findAll({
+          where: { receiverId: req.user.id },
+          order: [['createdAt', 'DESC']],
+          limit: 100,
+        }),
+        fastify.models.Email.findAll({
+          where: { senderId: req.user.id },
+          order: [['createdAt', 'DESC']],
+          limit: 100,
+        }),
+      ])
+      const ids = [...new Set([...inbox.map((m) => m.senderId), ...sent.map((m) => m.receiverId)])]
+      const people = ids.length
+        ? await fastify.models.User.findAll({
+            where: { id: { [Op.in]: ids } },
+            attributes: ['id', 'firstName', 'lastName'],
+          })
+        : []
+      const nameOf = new Map(people.map((u) => [u.id, fullName(u) || 'Unknown']))
+      const shape = (m: any) => ({
+        id: m.id,
+        senderId: m.senderId,
+        receiverId: m.receiverId,
+        from: m.senderId === req.user.id ? 'me' : nameOf.get(m.senderId) || 'Unknown',
+        to: m.receiverId === req.user.id ? 'me' : nameOf.get(m.receiverId) || 'Unknown',
+        body: m.body,
+        source: m.source,
+        readAt: m.readAt,
+        createdAt: m.createdAt,
+      })
+      return reply.send({
+        inbox: inbox.map(shape),
+        sent: sent.map(shape),
+        unread: inbox.filter((m) => !m.readAt).length,
+      })
+    } catch (error) {
+      console.error('Error fetching emails:', error)
+      return reply.status(500).send({ error: 'Failed to fetch emails' })
+    }
+  })
+
+  // Send an email: body { to: "Hitomi", body: "..." } or { receiverId, body }
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { to?: string; receiverId?: string; body: string; source?: 'log' | 'cohort' }
+  }>, reply) => {
+    try {
+      const { to, receiverId, body, source } = req.body || ({} as any)
+      const text = (body || '').trim().slice(0, 5000)
+      if (!text || (!to && !receiverId)) {
+        return reply.status(400).send({ error: 'Recipient and message are required' })
+      }
+
+      let recipientId = receiverId
+      if (!recipientId) {
+        const matches = await resolveEmailRecipient(to!, req.user.id)
+        if (matches.length === 0) {
+          return reply.status(404).send({ error: `No community member named "${to}"` })
+        }
+        if (matches.length > 1) {
+          return reply.status(409).send({
+            error: `Several members match "${to}" — use full name or email`,
+            candidates: matches.slice(0, 5).map((u) => fullName(u)),
+          })
+        }
+        recipientId = matches[0].id
+      }
+      if (recipientId === req.user.id) {
+        return reply.status(400).send({ error: 'Cannot email yourself' })
+      }
+      const receiver = await fastify.models.User.findByPk(recipientId)
+      if (!receiver || !receiver.joinedAt) {
+        return reply.status(404).send({ error: 'Recipient not found' })
+      }
+
+      const email = await fastify.models.Email.create({
+        senderId: req.user.id,
+        receiverId: recipientId,
+        body: text,
+        source: source === 'cohort' ? 'cohort' : 'log',
+      })
+
+      sync.emit('email', {
+        id: email.id,
+        receiverId: recipientId,
+        senderName: fullName(req.user) || 'Unknown',
+        body: email.body,
+        createdAt: email.createdAt as any,
+      })
+
+      return reply.send({
+        id: email.id,
+        to: fullName(receiver) || 'Unknown',
+        createdAt: email.createdAt,
+      })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  // Mark an email in my inbox as read
+  fastify.post('/emails/:id/read', async (req: FastifyRequest<{ Params: { id: string } }>, reply) => {
+    try {
+      await fastify.models.Email.update(
+        { readAt: new Date() },
+        { where: { id: req.params.id, receiverId: req.user.id, readAt: null } }
+      )
+      return reply.send({ ok: true })
+    } catch (error) {
+      console.error('Error marking email read:', error)
+      return reply.status(500).send({ error: 'Failed to mark email read' })
     }
   })
 

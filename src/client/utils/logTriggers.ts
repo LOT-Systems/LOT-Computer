@@ -42,6 +42,19 @@ export type LogTrigger =
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
 
+/**
+ * LOT® Email — "/email to Hitomi. Hello" (also "/email to Hitomi: Hello").
+ * Deliberately NOT a LogTrigger: it must only send on an explicit
+ * Ctrl/Cmd+Enter, never while the recipient is still being typed.
+ */
+export function parseEmailCommand(
+  text: string
+): { to: string; body: string } | null {
+  const m = text.match(/(?:^|\s)\/email\s+to\s+([^\s.,:;!?]+)[.,:;!?]?\s*([\s\S]*)$/i)
+  if (!m) return null
+  return { to: m[1], body: m[2].trim() }
+}
+
 interface TriggerRule {
   trigger: LogTrigger
   emojis: string[]

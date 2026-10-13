@@ -24,6 +24,9 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  useSendEmail,
+  useMarkEmailRead,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -69,6 +72,39 @@ export const Sync = React.memo(function SyncInner() {
     if (me.isAdmin) return true
     return me.tags.some((tag) => CHAT_ALLOWED_TAGS.includes(tag.toLowerCase()))
   }, [me])
+
+  const { data: emailData } = useEmails()
+  const [emailTo, setEmailTo] = React.useState<{ id: string; name: string } | null>(null)
+  const [emailBody, setEmailBody] = React.useState('')
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: () => {
+      setEmailBody('')
+      setEmailTo(null)
+      queryClient.invalidateQueries(['/api/emails'])
+    },
+  })
+
+  // Cohort Dating hand-off: "Email" on a cohort match opens a compose row here
+  React.useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('lot:email-to')
+      if (raw) {
+        sessionStorage.removeItem('lot:email-to')
+        setEmailTo(JSON.parse(raw))
+      }
+    } catch {}
+  }, [])
+
+  const { mutate: markEmailRead } = useMarkEmailRead({
+    onSuccess: () => queryClient.invalidateQueries(['/api/emails']),
+  })
+  const onOpenEmail = React.useCallback(
+    (id: string, unread: boolean) => () => {
+      if (!unread) return
+      markEmailRead({ id })
+    },
+    [markEmailRead]
+  )
 
   const { data: fetchedMessages } = useChatMessages()
   const { mutate: createChatMessage } = useCreateChatMessage({
@@ -117,7 +153,11 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeEmailListener } = sync.listen('email', () => {
+      queryClient.invalidateQueries(['/api/emails'])
+    })
     return () => {
+      disposeEmailListener()
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
     }
@@ -178,8 +218,63 @@ export const Sync = React.memo(function SyncInner() {
     )
   }
 
+  const inbox = emailData?.inbox || []
+
   return (
     <div className="max-w-[700px]">
+      {(inbox.length > 0 || emailTo) && (
+        <div className="mb-40">
+          <div className="text-acc/40 mb-8">
+            Email{!!emailData?.unread && ` · ${emailData.unread} new`}
+          </div>
+          {emailTo && (
+            <form
+              className="flex items-center gap-x-8 mb-16"
+              onSubmit={(ev) => {
+                ev.preventDefault()
+                if (emailBody.trim()) {
+                  sendEmail({ receiverId: emailTo.id, body: emailBody, source: 'cohort' })
+                }
+              }}
+            >
+              <span className="whitespace-nowrap">To {emailTo.name}</span>
+              <ResizibleGhostInput
+                direction="vh"
+                value={emailBody}
+                onChange={setEmailBody}
+                placeholder="Write an email..."
+                containerClassName="flex-grow leading-normal"
+                className="leading-normal"
+              />
+              <Button type="submit" kind="secondary" size="small" disabled={!emailBody.trim()}>
+                Send
+              </Button>
+            </form>
+          )}
+          {inbox.slice(0, 10).map((m) => (
+            <div
+              key={m.id}
+              className={cn(
+                'flex items-start gap-x-8 -mx-4 px-4 py-2 rounded grid-fill-hover cursor-pointer',
+                m.readAt && 'text-acc/60'
+              )}
+              onClick={onOpenEmail(m.id, !m.readAt)}
+            >
+              <span className="whitespace-nowrap">
+                {!m.readAt && '● '}
+                {m.from}
+              </span>
+              <div className="whitespace-breakspaces" style={{ wordBreak: 'break-word' }}>
+                {m.body}
+              </div>
+              <span className="text-acc/40 whitespace-nowrap ml-auto">
+                {dayjs(m.createdAt).fromNow()}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}
