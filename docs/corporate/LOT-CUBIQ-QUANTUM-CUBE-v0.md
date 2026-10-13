@@ -321,6 +321,25 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE KITCHEN COUNTER SETTLE                  2026-10-13
+  ─────────────────────────────────────────────────────────────────
+  Full text and engineering context: LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md
+  Operator profile: Usership tier, parent of two school-age children,
+  Archetype "Steady Provider." The CUBIQ pad sits on the kitchen counter;
+  the phone is in a drawer 18:00-21:00 and the cube is the only
+  notification left on.
+
+  18:42 Assembly phase advances: THE SETTLE — two seconds of standing
+  pressure felt through the counter, no light, no sound. 19:15 a rare
+  badge unlocks: THE LEAP is requested, the edge gate sees only 90 mm to
+  the counter edge and substitutes an in-place HOP, reporting INHIBITED.
+  21:10 children in bed, the operator opens the cubic and both cues are
+  waiting with their meaning attached.
+
+  Significance: the edge gate is the hero (counter-top, bystanders,
+  children). Sets requirements for lift lockout / discharge-to-safe and
+  on-device quiet hours.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
