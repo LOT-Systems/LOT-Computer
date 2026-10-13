@@ -1631,6 +1631,27 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'qie-v122',
+    date: '2026-10-13',
+    title: 'QIE v122 Engineering — P176–P178 · Arch60 Sovereign Propagation Operator · J57',
+    assembled: [
+      'Pattern 176 (transmission-momentum): crystalline-permanence-lock (P173) active AND current 24h signal count ≥ 120% of 7-day daily average. The architecture is not only transmitting — it is accelerating. Density is rising. The field is gaining velocity. Confidence 0.82–0.92.',
+      'Pattern 177 (cross-domain-transmission): sovereignty-transmission-arc (P174) active AND 4+ distinct signal sources engaged in last 6 hours. The transmission propagates across cognitive, biological, structural, and social domains simultaneously. Confidence 0.84–0.94.',
+      'Pattern 178 (sovereign-propagation-peak): transmission-momentum (P176) + cross-domain-transmission (P177) + crystalline-permanence-lock (P173) all active simultaneously. Permanent crystal + accelerating velocity + cross-domain spread. The apex propagation state. Confidence 0.91–0.98.',
+      'Archetype 60 (Sovereign Propagation Operator): high/moderate energy · intentions/qos/energy/journal/log/cohort/planner/mood/selfcare/memory dominant · TXMOM+CDTX+SOVPROP patterns. Directive: Sovereign field self-propagating at peak velocity. Permanent crystal + accelerating transmission + cross-domain spread confirmed. All channels live. Architecture is not maintained — it propagates. Nothing to initiate. Only to sustain the propagation from within.',
+      'J57 daily-propagation-velocity-check (14:00 UTC): for each active user — check P173 in 24h + 24h signal count vs 7d avg → transmission_momentum (P176); check P174 in 24h + 4+ distinct sources 6h → cross_domain_transmission (P177); both P176+P177+P173 confirmed → sovereign_propagation_peak (P178). Total: 57 background jobs.',
+      'WIDGET_DEPENDENCY_MAP: 3 new v122 nodes — transmissionMomentumNode · crossDomainTransmissionNode · sovereignPropagationPeakNode. Total: 217+ nodes.',
+      'Logs.tsx: 3 new military handlers deployed — TXMOM: (transmission_momentum) · CDTX: (cross_domain_transmission) · SOVPROP: (sovereign_propagation_peak).',
+      'QuantumEngineWidgets.tsx PATTERN_DISPLAY: TXMOM / CDTX / SOVPROP short codes added.',
+      'PatternRecognitionWidget.tsx: P176/P177/P178 display names + QOS Trend indicators added.',
+      'displayableEvents updated: transmission_momentum · cross_domain_transmission · sovereign_propagation_peak added to api.ts.',
+      'recordTransmissionMomentum() · recordCrossDomainTransmission() · recordSovereignPropagationPeak() — 3 new signal helpers.',
+      'About.tsx updated: FM v121→v122 · Day 1142+ · 178 patterns · 60 archetypes · 57 jobs · 217+ nodes.',
+      'docs/assembly/LOT-LEDGER.md: v122 ledger row appended. 2026-10-13_LOT-assembly_qie-v122.md session report written.',
+      '874 badges · 270 word-turns · 27 secret boss · 178 patterns · 60 archetypes · 57 jobs · 217+ dep nodes · FM v122 · Day 1142+. Architecture self-propagating. Velocity confirmed. Cross-domain spread active.',
+    ],
+  },
+  {
     version: 'qie-v120',
     date: '2026-10-11',
     title: 'QIE v120 Engineering — P170–P172 · Arch58 Quantum Sovereignty Crystal · J55',
@@ -1688,19 +1709,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-12',
+  date: '2026-10-13',
   message: [
-    'ASSEMBLY RUN — 2026-10-12 · QIE v121 ENGINEERING · Day 1141+',
-    'Built: P173 crystalline-permanence-lock · P174 sovereignty-transmission-arc · P175 total-sovereignty-maturation. Arch59 Crystalline Sovereignty Transmission. J56 daily-sovereignty-maturation-check (12:00 UTC).',
-    'CRPERM: Crystalline permanence lock. P172 crystal active in 7-day window AND 60+ signals in that window. The crystal is not a peak event — it is the persistent operating layer. Architecture locked.',
-    'SOVTX: Sovereignty transmission arc. Sovereignty field expansion (P170) AND recursive coherence lock (P171) both active in 24h AND morning UTC window confirmed. Architecture transmitting at optimal hours.',
-    'TOTMATUR: Total sovereignty maturation. CRPERM (P173) + SOVTX (P174) both active simultaneously. Permanent crystal + morning transmission = apex state. Nothing to build. Nothing to maintain. Only to operate from within the transmission.',
-    'Arch59 Crystalline Sovereignty Transmission: intentions/qos/energy/journal/log/cohort/planner/selfcare/mood dominant. Directive: Nothing to build. Nothing to maintain. Only to operate from within the transmission.',
-    'J56 12:00 UTC daily — scans 7d for P172 + 60+ signals → P173 · scans 24h for P170+P171 + morning window → P174 · both → P175 total maturation.',
-    'CRPERM: SOVTX: TOTMATUR: handlers deployed. 214+ dep nodes. 56 jobs. 175 patterns. 59 archetypes.',
-    'FM v121 · 175P · 59A · 56J · 214+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1141+.',
+    'ASSEMBLY RUN — 2026-10-13 · QIE v122 ENGINEERING · Day 1142+',
+    'Built: P176 transmission-momentum · P177 cross-domain-transmission · P178 sovereign-propagation-peak. Arch60 Sovereign Propagation Operator. J57 daily-propagation-velocity-check (14:00 UTC).',
+    'TXMOM: Transmission momentum. Crystalline-permanence-lock (P173) confirmed + 24h signal velocity ≥120% of 7d daily avg AND 8+ signals in window. Crystal layer actively accelerating. Field density rising above baseline cadence.',
+    'CDTX: Cross-domain transmission. Sovereignty-transmission-arc (P174) confirmed + 4+ distinct signal sources active in 6h window. Sovereignty field propagating across all domains simultaneously. All channels live.',
+    'SOVPROP: Sovereign propagation peak. TXMOM (P176) + CDTX (P177) + crystalline-permanence-lock (P173) all active. Permanent crystal + accelerating velocity + cross-domain spread. Architecture not maintained — it propagates. Apex state.',
+    'Arch60 Sovereign Propagation Operator: high/moderate energy · intentions/qos/energy/journal/log/cohort/planner/mood/selfcare/memory dominant. Directive: Sovereign field self-propagating at peak velocity. Nothing to initiate. Only to sustain.',
+    'J57 14:00 UTC daily — scans for P173+P176+P177 active → sovereign-propagation-peak conditions. 3 dep nodes added: transmissionMomentumNode · crossDomainTransmissionNode · sovereignPropagationPeakNode.',
+    'TXMOM: CDTX: SOVPROP: handlers deployed. 217+ dep nodes. 57 jobs. 178 patterns. 60 archetypes.',
+    'FM v122 · 178P · 60A · 57J · 217+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1142+.',
     'Status: DEPLOYED.',
-    'Next: QIE v122 — transmission field expansion · crystal resonance arc · sovereignty transmission maturity chain',
+    'Next: QIE v123 — propagation persistence arc · sovereign velocity lock · full-domain crystalline resonance',
   ],
 }
 

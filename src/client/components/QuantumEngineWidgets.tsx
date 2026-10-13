@@ -134,6 +134,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'crystalline-permanence-lock':         'CRPERM',
   'sovereignty-transmission-arc':        'SOVTX',
   'total-sovereignty-maturation':        'TOTMATUR',
+  'transmission-momentum':               'TXMOM',
+  'cross-domain-transmission':           'CDTX',
+  'sovereign-propagation-peak':          'SOVPROP',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

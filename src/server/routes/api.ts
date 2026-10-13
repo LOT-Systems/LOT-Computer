@@ -1243,6 +1243,9 @@ export default async (fastify: FastifyInstance) => {
       'crystalline_permanence_lock',
       'sovereignty_transmission_arc',
       'total_sovereignty_maturation',
+      'transmission_momentum',
+      'cross_domain_transmission',
+      'sovereign_propagation_peak',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

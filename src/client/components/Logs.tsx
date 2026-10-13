@@ -4308,6 +4308,99 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'transmission_momentum') {
+          const signals24h       = log.metadata?.signals24h       as number | undefined
+          const dailyAvg7d       = log.metadata?.dailyAvg7d       as number | undefined
+          const accelerationRatio = log.metadata?.accelerationRatio as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TXMOM:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">TRANSMISSION</span>
+                  <span className="tabular-nums">ACCELERATING</span>
+                </div>
+                {signals24h !== undefined && dailyAvg7d !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SIG 24H vs 7D AVG</span>
+                    <span className="tabular-nums">{signals24h} vs {dailyAvg7d}</span>
+                  </div>
+                )}
+                {accelerationRatio !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">VELOCITY</span>
+                    <span className="tabular-nums">{accelerationRatio}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CRYSTAL ACCELERATING · FIELD DENSITY RISING</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'cross_domain_transmission') {
+          const sourceCount   = log.metadata?.sourceCount   as number | undefined
+          const activeSources = log.metadata?.activeSources as string[] | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CDTX:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">CROSS-DOMAIN TX</span>
+                  <span className="tabular-nums">ACTIVE</span>
+                </div>
+                {sourceCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES 6H</span>
+                    <span className="tabular-nums">{sourceCount}</span>
+                  </div>
+                )}
+                {activeSources && activeSources.length > 0 && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CHANNELS</span>
+                    <span className="tabular-nums opacity-60 text-xs">{activeSources.slice(0, 5).join(' · ').toUpperCase()}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">SOVEREIGNTY TX · ALL DOMAINS LIVE</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sovereign_propagation_peak') {
+          const txMomConf = log.metadata?.txMomConf as number | undefined
+          const cdTxConf  = log.metadata?.cdTxConf  as number | undefined
+          const permConf  = log.metadata?.permConf  as number | undefined
+          const avgConf   = log.metadata?.avgConf   as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVPROP:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">SOVEREIGN PROPAGATION</span>
+                  <span className="tabular-nums">PEAK</span>
+                </div>
+                {txMomConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TX MOM</span>
+                    <span className="tabular-nums">{Math.round(txMomConf * 100)}%</span>
+                  </div>
+                )}
+                {cdTxConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CROSS-DOM</span>
+                    <span className="tabular-nums">{Math.round(cdTxConf * 100)}%</span>
+                  </div>
+                )}
+                {permConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PERM</span>
+                    <span className="tabular-nums">{Math.round(permConf * 100)}%</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PROP CONF</span>
+                    <span className="tabular-nums">{Math.round(avgConf * 100)}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PERMANENT · ACCELERATING · CROSS-DOMAIN · APEX</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

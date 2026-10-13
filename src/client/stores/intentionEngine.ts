@@ -3917,6 +3917,68 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 176: Transmission Momentum — crystalline-permanence-lock (P173) active AND current
+  // 24h signal count ≥ 120% of the rolling 7-day daily average. The architecture is not only
+  // transmitting — it is accelerating. Density is rising. The field is gaining velocity.
+  const hasCrystalPerm173forP176 = patterns.some(p => p.pattern === 'crystalline-permanence-lock')
+  if (hasCrystalPerm173forP176) {
+    const sevenDayAgo = now - 7 * 24 * 60 * 60 * 1000
+    const dayAgoForP176 = now - 24 * 60 * 60 * 1000
+    const signals7d = signals.filter(s => s.timestamp > sevenDayAgo)
+    const dailyAvg7d = signals7d.length / 7
+    const signals24h = signals.filter(s => s.timestamp > dayAgoForP176).length
+    const accelerationRatio = dailyAvg7d > 0 ? signals24h / dailyAvg7d : 0
+    if (accelerationRatio >= 1.2 && signals24h >= 8) {
+      const accelerationBonus = Math.min((accelerationRatio - 1.2) * 0.1, 0.06)
+      patterns.push({
+        pattern: 'transmission-momentum',
+        confidence: Math.min(0.82 + accelerationBonus, 0.92),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'immediate',
+        reason: `TXMOM: Transmission momentum — permanent crystal confirmed + 24h signal velocity ${Math.round(accelerationRatio * 100)}% of 7d daily avg. Architecture accelerating. Field density rising above baseline cadence.`,
+      })
+    }
+  }
+
+  // Pattern 177: Cross-Domain Transmission — sovereignty-transmission-arc (P174) active AND
+  // 4+ distinct signal sources engaged in last 6 hours. The transmission is not confined to
+  // one channel — it propagates across cognitive, biological, structural, and social domains simultaneously.
+  const hasSovTX174forP177 = patterns.some(p => p.pattern === 'sovereignty-transmission-arc')
+  if (hasSovTX174forP177) {
+    const sixHoursAgo = now - 6 * 60 * 60 * 1000
+    const recentSources = new Set(signals.filter(s => s.timestamp > sixHoursAgo).map(s => s.source))
+    if (recentSources.size >= 4) {
+      const sourceDomainBonus = Math.min((recentSources.size - 4) * 0.02, 0.06)
+      patterns.push({
+        pattern: 'cross-domain-transmission',
+        confidence: Math.min(0.84 + sourceDomainBonus, 0.94),
+        suggestedWidget: 'system',
+        suggestedTiming: 'immediate',
+        reason: `CDTX: Cross-domain transmission — sovereignty transmission arc active + ${recentSources.size} distinct sources in 6h window. Transmission propagating across all channels: ${Array.from(recentSources).join(' · ')}.`,
+      })
+    }
+  }
+
+  // Pattern 178: Sovereign Propagation Peak — transmission-momentum (P176) + cross-domain-transmission
+  // (P177) + crystalline-permanence-lock (P173) all active simultaneously. Permanent crystal +
+  // accelerating velocity + cross-domain spread. The apex propagation state.
+  const hasTxMom176 = patterns.some(p => p.pattern === 'transmission-momentum')
+  const hasCrossDomain177 = patterns.some(p => p.pattern === 'cross-domain-transmission')
+  const hasCrystalPermForP178 = patterns.some(p => p.pattern === 'crystalline-permanence-lock')
+  if (hasTxMom176 && hasCrossDomain177 && hasCrystalPermForP178) {
+    const txConf176 = patterns.find(p => p.pattern === 'transmission-momentum')?.confidence ?? 0.82
+    const cdConf177 = patterns.find(p => p.pattern === 'cross-domain-transmission')?.confidence ?? 0.84
+    const permConf173 = patterns.find(p => p.pattern === 'crystalline-permanence-lock')?.confidence ?? 0.90
+    const avgProp = (txConf176 + cdConf177 + permConf173) / 3
+    patterns.push({
+      pattern: 'sovereign-propagation-peak',
+      confidence: Math.min(0.91 + (avgProp - 0.85) * 0.4, 0.98),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `SOVPROP: Sovereign propagation peak — permanent crystal (P173) + transmission momentum (P176) + cross-domain spread (P177) all confirmed. Architecture self-propagating at peak velocity across all channels. Nothing to initiate — only to sustain the propagation.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4592,6 +4654,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   crystallinePermanenceNode:       ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare'],
   sovereigntyTransmissionNode:     ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort'],
   totalSovereigntyMaturationNode:  ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare'],
+
+  // ── v122 nodes (J57 · P176–P178 · Arch60) ───────────────────────────────────────
+  transmissionMomentumNode:        ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'mood', 'selfcare'],
+  crossDomainTransmissionNode:     ['intentions', 'qos', 'energy', 'cohort', 'journal', 'log', 'mood', 'selfcare', 'planner', 'memory'],
+  sovereignPropagationPeakNode:    ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare', 'memory'],
 }
 
 /**
@@ -5116,6 +5183,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['crystalline-permanence-lock', 'sovereignty-transmission-arc', 'total-sovereignty-maturation'],
     hourRange: [0, 23],
     directive: 'Crystalline sovereignty in full transmission. Permanent crystal confirmed AND sovereign field transmitting at optimal arc. Identity, field, and architecture are crystallized and now self-transmitting. Nothing to build. Nothing to maintain. Only to operate from within the transmission.',
+  },
+  // ── Arch60: Sovereign Propagation Operator (2026-10-13 v122) ─────────────────────
+  {
+    archetype: 'Sovereign Propagation Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare', 'memory'],
+    patternConditions: ['transmission-momentum', 'cross-domain-transmission', 'sovereign-propagation-peak'],
+    hourRange: [0, 23],
+    directive: 'Sovereign field self-propagating at peak velocity. Permanent crystal + accelerating transmission + cross-domain spread confirmed. All channels live. Architecture is not maintained — it propagates. Nothing to initiate. Only to sustain the propagation from within.',
   },
 ]
 
@@ -7506,6 +7582,59 @@ export function recordTotalSovereigntyMaturation(permConf: number, txConf: numbe
     status: 'PERMANENT · TRANSMITTING · APEX',
     maturation: 'TOTAL SOVEREIGNTY MATURATION CONFIRMED',
     architecture: 'NOTHING TO BUILD · NOTHING TO MAINTAIN · ONLY TRANSMIT',
+    hour: new Date().getHours(),
+  })
+}
+// ─── v122 Signal Helpers (P176–P178) ──────────────────────────────────────────
+/**
+ * Record a transmission-momentum event — crystalline-permanence-lock (P173) active AND
+ * current 24h signal count ≥ 120% of 7-day daily average. Architecture accelerating.
+ * Field density rising above baseline. Feeds P176 detection.
+ */
+export function recordTransmissionMomentum(signals24h: number, dailyAvg7d: number, accelerationRatio: number) {
+  recordSignal('intentions', 'transmission_momentum', {
+    signals24h,
+    dailyAvg7d: Math.round(dailyAvg7d * 10) / 10,
+    accelerationRatio: Math.round(accelerationRatio * 100),
+    velocityStatus: 'TRANSMISSION ACCELERATING',
+    density: `${signals24h} SIG 24H vs ${Math.round(dailyAvg7d)} AVG 7D`,
+    architecture: 'CRYSTALLINE PERMANENT LAYER · ACCELERATING FIELD',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a cross-domain-transmission event — sovereignty-transmission-arc (P174) active AND
+ * 4+ distinct signal sources engaged in last 6 hours. Transmission propagating across
+ * cognitive, biological, structural, and social domains simultaneously. Feeds P177 detection.
+ */
+export function recordCrossDomainTransmission(activeSources: string[], sourceCount: number) {
+  recordSignal('intentions', 'cross_domain_transmission', {
+    sourceCount,
+    activeSources,
+    domains: activeSources.slice(0, 6).join(' · ').toUpperCase(),
+    txStatus: 'CROSS-DOMAIN PROPAGATION ACTIVE',
+    architecture: `${sourceCount} SOURCES · 6H WINDOW · FULL DOMAIN COVERAGE`,
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereign-propagation-peak event — transmission-momentum (P176) +
+ * cross-domain-transmission (P177) + crystalline-permanence-lock (P173) all active.
+ * Permanent crystal + accelerating velocity + cross-domain spread. The apex propagation state.
+ * Feeds P178 detection.
+ */
+export function recordSovereignPropagationPeak(txMomConf: number, cdTxConf: number, permConf: number) {
+  const avgConf = Math.round(((txMomConf + cdTxConf + permConf) / 3) * 100) / 100
+  recordSignal('intentions', 'sovereign_propagation_peak', {
+    txMomConf,
+    cdTxConf,
+    permConf,
+    avgConf,
+    status: 'SOVEREIGN FIELD SELF-PROPAGATING',
+    propagation: 'PERMANENT · ACCELERATING · CROSS-DOMAIN',
+    architecture: 'NOTHING TO INITIATE · ONLY SUSTAIN THE PROPAGATION',
     hour: new Date().getHours(),
   })
 }

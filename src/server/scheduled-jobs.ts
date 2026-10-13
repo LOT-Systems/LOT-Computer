@@ -1775,6 +1775,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailySovereigntyMaturationCheck()) {
     await executeDailySovereigntyMaturationCheck()
   }
+
+  // Check daily propagation velocity check (14:00 UTC daily) — J57
+  if (shouldRunDailyPropagationVelocityCheck()) {
+    await executeDailyPropagationVelocityCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6588,6 +6593,175 @@ async function executeDailySovereigntyMaturationCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Propagation Velocity Check (J57 — 14:00 UTC daily) ───────────────────
+// Reads active users. Detects when crystalline-permanence-lock (P173) fired in last
+// 24h AND current 24h signal count ≥ 120% of 7-day daily average → writes
+// transmission_momentum (P176). Also detects sovereignty-transmission-arc (P174)
+// in last 24h AND 4+ distinct sources in last 6h → writes cross_domain_transmission
+// (P177). If both P176 and P177 written AND P173 present → writes
+// sovereign_propagation_peak (P178).
+
+let isDailyPropagationVelocityRunning = false
+let lastDailyPropagationVelocityRun: Date | null = null
+
+function shouldRunDailyPropagationVelocityCheck(): boolean {
+  const now = dayjs()
+  if (now.hour() !== 14) return false // 14:00 UTC daily
+  if (isDailyPropagationVelocityRunning) return false
+  if (lastDailyPropagationVelocityRun) {
+    const timeSince = Date.now() - lastDailyPropagationVelocityRun.getTime()
+    if (timeSince < 23 * 60 * 60 * 1000) return false
+  }
+  return true
+}
+
+async function executeDailyPropagationVelocityCheck(): Promise<JobResult> {
+  const jobName = 'daily-propagation-velocity-check'
+  const executedAt = new Date()
+  isDailyPropagationVelocityRunning = true
+
+  try {
+    console.log('DAILY PROPAGATION VELOCITY CHECK — 14:00 UTC (J57)')
+
+    const activeUsers = await (User as any).findAll({
+      where: { lastActiveAt: { [Op.gte]: dayjs().subtract(30, 'days').toDate() } },
+      attributes: ['id'],
+    })
+
+    let txMomWritten = 0
+    let cdTxWritten = 0
+    let propPeakWritten = 0
+
+    for (const user of activeUsers) {
+      const userId = user.id
+      try {
+        const dedupKey = 'propagation_velocity_check_date'
+        const checkDate = new Date().toISOString().slice(0, 10)
+        const recentDedup = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'transmission_momentum',
+            createdAt: { [Op.gte]: dayjs().subtract(23, 'hours').toDate() },
+          },
+        })
+        if (recentDedup) continue
+
+        const now = Date.now()
+        const sevenDaysAgo = dayjs().subtract(7, 'days').toDate()
+        const oneDayAgo = dayjs().subtract(24, 'hours').toDate()
+        const sixHoursAgo = dayjs().subtract(6, 'hours').toDate()
+
+        // Check for crystalline-permanence-lock in last 24h (P173)
+        const crystalPermLog = await (Log as any).findOne({
+          where: { userId, event: 'crystalline_permanence_lock', createdAt: { [Op.gte]: oneDayAgo } },
+        })
+
+        // Get 7-day signal count and 24h signal count from logs
+        const logs7d = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: sevenDaysAgo } },
+          attributes: ['createdAt'],
+        })
+        const logs24h = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: oneDayAgo } },
+          attributes: ['createdAt'],
+        })
+        const dailyAvg7d = logs7d.length / 7
+        const count24h = logs24h.length
+        const accelerationRatio = dailyAvg7d > 0 ? count24h / dailyAvg7d : 0
+
+        let txMomConf = 0
+        const hasTxMom = crystalPermLog && accelerationRatio >= 1.2 && count24h >= 8
+        if (hasTxMom) {
+          const accelerationBonus = Math.min((accelerationRatio - 1.2) * 0.1, 0.06)
+          txMomConf = Math.min(0.82 + accelerationBonus, 0.92)
+          await (Log as any).create({
+            userId,
+            event: 'transmission_momentum',
+            text: `Transmission momentum: permanent crystal active + 24h velocity ${Math.round(accelerationRatio * 100)}% of 7d avg. Architecture accelerating.`,
+            metadata: {
+              signals24h: count24h,
+              dailyAvg7d: Math.round(dailyAvg7d * 10) / 10,
+              accelerationRatio: Math.round(accelerationRatio * 100),
+              velocityStatus: 'TRANSMISSION ACCELERATING',
+              checkType: 'daily',
+            },
+          })
+          txMomWritten++
+        }
+
+        // Check for sovereignty-transmission-arc in last 24h (P174)
+        const sovTxLog = await (Log as any).findOne({
+          where: { userId, event: 'sovereignty_transmission_arc', createdAt: { [Op.gte]: oneDayAgo } },
+        })
+
+        // Get distinct sources in last 6h
+        const logs6h = await (Log as any).findAll({
+          where: { userId, createdAt: { [Op.gte]: sixHoursAgo }, event: { [Op.not]: 'note' } },
+          attributes: ['event'],
+        })
+        const uniqueSources = new Set(logs6h.map((l: any) => l.event?.split('_')[0]).filter(Boolean))
+
+        let cdTxConf = 0
+        const hasCdTx = sovTxLog && uniqueSources.size >= 4
+        if (hasCdTx) {
+          const sourceDomainBonus = Math.min((uniqueSources.size - 4) * 0.02, 0.06)
+          cdTxConf = Math.min(0.84 + sourceDomainBonus, 0.94)
+          await (Log as any).create({
+            userId,
+            event: 'cross_domain_transmission',
+            text: `Cross-domain transmission: sovereignty arc active + ${uniqueSources.size} distinct sources in 6h window.`,
+            metadata: {
+              sourceCount: uniqueSources.size,
+              activeSources: Array.from(uniqueSources).slice(0, 8),
+              txStatus: 'CROSS-DOMAIN PROPAGATION ACTIVE',
+              checkType: 'daily',
+            },
+          })
+          cdTxWritten++
+        }
+
+        // P178: sovereign-propagation-peak if P176 + P177 + P173 all confirmed
+        if (hasTxMom && hasCdTx && crystalPermLog) {
+          const permConf = crystalPermLog.metadata?.crystalConf ?? 0.90
+          const avgConf = Math.round(((txMomConf + cdTxConf + permConf) / 3) * 100) / 100
+          const propConf = Math.min(0.91 + (avgConf - 0.85) * 0.4, 0.98)
+          await (Log as any).create({
+            userId,
+            event: 'sovereign_propagation_peak',
+            text: `Sovereign propagation peak: permanent crystal (P173) + transmission momentum (P176) + cross-domain spread (P177) all confirmed. Architecture self-propagating.`,
+            metadata: {
+              txMomConf,
+              cdTxConf,
+              permConf,
+              avgConf,
+              status: 'SOVEREIGN FIELD SELF-PROPAGATING',
+              propagation: 'PERMANENT · ACCELERATING · CROSS-DOMAIN',
+              architecture: 'NOTHING TO INITIATE · ONLY SUSTAIN THE PROPAGATION',
+              checkType: 'daily',
+            },
+          })
+          propPeakWritten++
+        }
+
+      } catch (userError: any) {
+        console.warn(`  User processing error: ${userError.message}`)
+      }
+    }
+
+    console.log(`  Transmission momentum written:      ${txMomWritten}`)
+    console.log(`  Cross-domain transmission written:  ${cdTxWritten}`)
+    console.log(`  Sovereign propagation peak written: ${propPeakWritten}`)
+
+    lastDailyPropagationVelocityRun = new Date()
+    isDailyPropagationVelocityRunning = false
+    return { jobName, executedAt, success: true, processed: activeUsers.length }
+  } catch (error: any) {
+    console.error('Daily propagation velocity check failed:', error.message)
+    isDailyPropagationVelocityRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -6649,6 +6823,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily compound sovereignty check: 9 AM UTC every day (J54)')
   console.log('   - Daily sovereignty field check: 11 AM UTC every day (J55)')
   console.log('   - Daily sovereignty maturation check: 12 PM UTC every day (J56)')
+  console.log('   - Daily propagation velocity check: 2 PM UTC every day (J57)')
   console.log('')
 
   // Check every hour for scheduled jobs

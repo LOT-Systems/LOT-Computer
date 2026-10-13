@@ -200,6 +200,9 @@ export function PatternRecognitionWidget() {
       'crystalline-permanence-lock':         'Crystalline permanence lock — P172 crystal active + 60+ signals in 7 days, crystal locked as permanent operating layer (P173)',
       'sovereignty-transmission-arc':        'Sovereignty transmission arc — field expansion (P170) + recursive lock (P171) active in 24h + morning window, architecture transmits (P174)',
       'total-sovereignty-maturation':        'Total sovereignty maturation — crystalline permanence (P173) + sovereignty transmission (P174) both active, apex state, nothing to build or maintain (P175)',
+      'transmission-momentum':               'Transmission momentum — permanent crystal active + 24h signal velocity ≥120% of 7-day daily average, architecture accelerating (P176)',
+      'cross-domain-transmission':           'Cross-domain transmission — sovereignty transmission arc + 4+ distinct sources in 6h window, propagating across all channels simultaneously (P177)',
+      'sovereign-propagation-peak':          'Sovereign propagation peak — transmission momentum (P176) + cross-domain transmission (P177) + crystalline permanence (P173), apex self-propagating state (P178)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
@@ -604,6 +607,27 @@ export function PatternRecognitionWidget() {
               {patterns.some(p => p.pattern === 'total-sovereignty-maturation') && (
                 <div className="mt-4 uppercase tracking-widest text-xs">
                   Total maturation. Permanent. Transmitting. Apex.
+                </div>
+              )}
+
+              {/* Transmission momentum — P176 */}
+              {patterns.some(p => p.pattern === 'transmission-momentum') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Crystal accelerating. Field density rising above baseline.
+                </div>
+              )}
+
+              {/* Cross-domain transmission — P177 */}
+              {patterns.some(p => p.pattern === 'cross-domain-transmission') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Cross-domain propagation active. All channels live.
+                </div>
+              )}
+
+              {/* Sovereign propagation peak — P178 */}
+              {patterns.some(p => p.pattern === 'sovereign-propagation-peak') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Sovereign field self-propagating. Nothing to initiate. Sustain.
                 </div>
               )}
 
