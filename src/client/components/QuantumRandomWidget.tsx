@@ -9,6 +9,7 @@
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { isRouteActive } from '#client/stores'
 
 /**
  * QuantumRandomWidget - Real-time quantum-random number generator.
@@ -37,6 +38,8 @@ function useQuantumNumber() {
 
   React.useEffect(() => {
     const iv = setInterval(() => {
+      // 1 Hz setState x2 instances: pause while the tab/route is not visible
+      if (document.hidden || !isRouteActive('system')) return
       setRemaining((prev) => {
         if (prev <= 1) {
           const next = quantumRandom(0, 99)
@@ -63,6 +66,7 @@ export function QuantumRandomWidget() {
 
   React.useEffect(() => {
     const iv = setInterval(() => {
+      if (document.hidden || !isRouteActive('system')) return
       setShowPair(Math.random() < 0.5)
     }, 10000)
     return () => clearInterval(iv)
