@@ -321,6 +321,15 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE EVENING CLOSE                           2026-10-14
+  ─────────────────────────────────────────────────────────────────
+  Appended by R02. Full text, derived requirements (UC02-R1..R6) and
+  the physics corrections that accompany it: see
+  docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md, Section 07.
+  Summary: a parent's bedside cube performs THE SETTLE at the chosen
+  wind-down hour (and at most one THE NUDGE, <=30 dBA) to signal the
+  Evening Close without a lit screen; it never hops after sunset.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
