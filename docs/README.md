@@ -13,7 +13,7 @@ Welcome to the LOT Systems documentation. This directory contains all project do
 ## 📚 Documentation Structure
 
 ### [Technical Documentation](./technical/)
-Core technical documentation about system architecture, engines, and implementation details.
+Core technical documentation about system architecture, engines, and implementation details. Latest: [Log commands · Story compression · Arcade](./technical/LOT-LOG-COMMANDS-STORY-ARCADE.md).
 
 **Key Documents:**
 - AI Engine Guide - Setup and configuration for AI providers

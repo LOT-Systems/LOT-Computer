@@ -29,11 +29,12 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { renderSystemHelp, parseStoryPeriod } from '#shared/utils/logStory'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useArcadeStatus } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3713,6 +3714,7 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  const [arcadeResult, setArcadeResult] = React.useState<string | null>(null)
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -3738,6 +3740,10 @@ const NoteEditor = ({
       onChangeRef.current(updated)
       setIsSaved(true)
     },
+  })
+  const { mutate: submitArcade } = useArcadeStatus({
+    onSuccess: (data) => setArcadeResult(data.display),
+    onError: () => setArcadeResult('ARCADE OFFLINE'),
   })
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
@@ -4121,49 +4127,36 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        // Single source of truth: shared command registry (logStory.ts)
+        setSystemHelp(renderSystemHelp())
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
+      } else if (trigger === 'arcade-status') {
+        submitArcade({})
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
+        // Deferred so "/story week" can finish typing; the period argument is
+        // read from the live text once the user pauses.
+        window.setTimeout(() => {
+          if (storyLoading) return
+          const live = valueRef.current
+          const period = parseStoryPeriod(live)
+          const logText = live
+            .replace(/\/story(\s+(day|today|week|month|year))?/i, '')
+            .replace(/📖/g, '')
+            .trim()
           setStoryLoading(true)
           setStoryResponse(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
             submitStory({
               logText,
-              quantumState: state,
-              userIndex: index,
+              period,
+              quantumState: getUserState(),
+              userIndex: getUserIndex(),
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText, period })
           }
-        }
+        }, 700)
       }
     }
   }, [value])
@@ -4384,6 +4377,13 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {arcadeResult && (
+          <div className="mt-8">
+            <Block label="ARCADE:" blockView>
+              <div className="opacity-80" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{arcadeResult}</div>
             </Block>
           </div>
         )}

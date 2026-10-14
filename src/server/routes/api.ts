@@ -18,6 +18,7 @@ import {
 } from '#shared/types'
 import config from '#server/config'
 import { fp } from '#shared/utils'
+import { compressLogs, renderCompression, fallbackStory, periodStart, computeArcade, renderArcade, type StoryPeriod } from '#shared/utils/logStory'
 import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
@@ -5490,6 +5491,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: StoryPeriod
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,30 +5516,22 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period: StoryPeriod = ['day', 'week', 'month', 'year'].includes(req.body.period as string)
+        ? (req.body.period as StoryPeriod)
+        : 'day'
 
+      // Window query (not "latest N"): the period defines the evidence.
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: periodStart(period) },
+          event: { [Op.in]: ['note', 'emotional_checkin', 'memory_answer', 'self_care_checkin', 'energy_checkin'] },
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 1000,
       })
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
+      const compression = compressLogs(logs as any, period)
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
@@ -5549,11 +5543,11 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator invoked /story. Your task: write a compressed story of their {PERIOD} in 1-2 paragraphs (100-200 words), built from the COMPRESSED DATA below: mood trajectory, the highest and lowest moments, and any shift in their environment. If a pattern changed, name it once, gently. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
+- Draw ONLY from the data below; never invent events, numbers or feelings
 - Reference specific details from their data — make it feel like THEIR story
 - If they've been consistent with check-ins, acknowledge the discipline
 - If there are gaps or struggle, acknowledge that with compassion
@@ -5563,19 +5557,14 @@ RULES:
 - Keep it under 200 words.`
 
       const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+OPERATOR NOTE: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
+COMPRESSED DATA:
+${renderCompression(compression)}`
 
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
-
-      const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
+      const fullPrompt = `${systemPrompt.replace('{PERIOD}', period)}\n\n${dataBlock}`
 
       try {
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
@@ -5596,6 +5585,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            period,
+            compression,
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5608,10 +5599,31 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
       } catch (error: any) {
         console.error('Story generation failed:', error)
         return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
+          story: fallbackStory(compression),
           logId: null,
         }
       }
+    }
+  )
+
+  // ============================================================================
+  // ARCADE — gamified evolution. XP/rank derived from Log activity (/arcade)
+  // ============================================================================
+  fastify.post(
+    '/arcade',
+    { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } },
+    async (req: FastifyRequest) => {
+      const logs = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: { [Op.in]: ['note', 'emotional_checkin', 'generated_story'] },
+        },
+        attributes: ['event', 'text', 'createdAt'],
+        order: [['createdAt', 'DESC']],
+        limit: 5000,
+      })
+      const status = computeArcade(logs as any)
+      return { ...status, display: renderArcade(status) }
     }
   )
 }
