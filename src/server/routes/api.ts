@@ -4963,7 +4963,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       const intentionLogs = logs.filter(l => l.event === 'intention').slice(0, 5)
       const careLogs = logs.filter(l => l.event === 'self_care_complete' || l.event === 'self_care_completed').slice(0, 10)
       const goalLogs = logs.filter(l => l.event === 'goal_set' || l.event === 'goal_journey' || l.event === 'goal_complete').slice(0, 5)
-      const calendarLogs = logs.filter(l => l.event === 'calendar_entry').slice(0, 10)
+      const calendarLogs = logs.filter(l => l.event === 'calendar_entry' && (!l.metadata?.kind || l.metadata.kind === 'event')).slice(0, 10)
       const qieLogs = logs.filter(l => l.event === 'quantum_intent_signal' || l.event === 'pattern_detected').slice(0, 10)
 
       // Build mood timeline

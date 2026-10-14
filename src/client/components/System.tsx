@@ -76,6 +76,7 @@ import { CosmicUpdateWidget } from './CosmicUpdateWidget'
 import { QuantumEngineWidgets } from './QuantumEngineWidgets'
 import { ChakraErgonomicsWidget } from './ChakraErgonomicsWidget'
 import { CalendarWidget } from './CalendarWidget'
+import { buildEntries } from '#client/utils/calendar'
 import { BenchmarkWidget } from './BenchmarkWidget'
 import { ArchitectWidget } from './ArchitectWidget'
 import { IntegrityWidget } from './IntegrityWidget'
@@ -383,13 +384,9 @@ export const System = React.memo(function SystemInner() {
   // Temporal Planner — next scheduled calendar entry, from QIE signal pipeline
   const upcomingCalendar = React.useMemo(() => {
     const today = dayjs().format('YYYY-MM-DD')
-    const entries = logs
-      .filter(log => log.event === 'calendar_entry' && log.metadata?.date && (log.metadata.date as string) >= today)
-      .map(log => ({
-        date: log.metadata!.date as string,
-        text: (log.metadata!.text as string) || log.text || '',
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date))
+    const entries = buildEntries(logs as any)
+      .filter(e => e.status === 'open' && e.date >= today)
+      .map(e => ({ date: e.date, text: e.text }))
     return { next: entries[0] ?? null, count: entries.length }
   }, [logs])
 

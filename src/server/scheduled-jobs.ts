@@ -1428,7 +1428,7 @@ async function executeDailyCrossDomainPulse(): Promise<JobResult> {
         const journalWords = journalLogs.reduce((sum: number, l: any) => sum + ((l.metadata?.wordCount as number) ?? 0), 0)
         const badgeCount   = weekLogs.filter((l: any) => l.event === 'badge_unlock').length
         const goalCount    = weekLogs.filter((l: any) => ['goal_created', 'goal_updated', 'goal_completed'].includes(l.event)).length
-        const plannerCount = weekLogs.filter((l: any) => ['planner_entry', 'calendar_entry'].includes(l.event)).length
+        const plannerCount = weekLogs.filter((l: any) => ['planner_entry', 'calendar_entry'].includes(l.event) && !['alert', 'status'].includes(l.metadata?.kind)).length
 
         if (memoryCount >= 5 && journalWords >= 200 && badgeCount >= 2 && goalCount >= 2 && plannerCount >= 2) {
           await (Log as any).create({
@@ -2382,7 +2382,7 @@ async function executeDailyTemporalAlignmentCheck(): Promise<JobResult> {
 
         const plannerLogs    = recentLogs.filter((l: any) => PLANNER_EVENTS.includes(l.event))
         const intentionLogs  = recentLogs.filter((l: any) => INTENTION_EVENTS.includes(l.event))
-        const calendarLogs   = recentLogs.filter((l: any) => CALENDAR_EVENTS.includes(l.event))
+        const calendarLogs   = recentLogs.filter((l: any) => CALENDAR_EVENTS.includes(l.event) && !['alert', 'status'].includes(l.metadata?.kind))
 
         if (plannerLogs.length >= 2 && intentionLogs.length >= 2 && calendarLogs.length >= 1) {
           const confidence = Math.min(0.65 + plannerLogs.length * 0.04 + intentionLogs.length * 0.03, 0.82)
