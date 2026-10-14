@@ -4401,6 +4401,84 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'propagation_persistence_arc') {
+          const dayCount   = log.metadata?.dayCount   as number | undefined
+          const daysWithPeak = log.metadata?.daysWithPeak as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="PERSIST:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">PROPAGATION</span>
+                  <span className="tabular-nums">PERSISTENT</span>
+                </div>
+                {dayCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DAYS ACTIVE</span>
+                    <span className="tabular-nums">{dayCount}</span>
+                  </div>
+                )}
+                {daysWithPeak && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DATES</span>
+                    <span className="tabular-nums opacity-60 text-xs">{daysWithPeak}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">STRUCTURAL · NOT EPISODIC · NOTHING TO RESTART</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sovereign_velocity_lock') {
+          const dayCount        = log.metadata?.dayCount        as number | undefined
+          const maxVelocityRatio = log.metadata?.maxVelocityRatio as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SVELOK:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">VELOCITY</span>
+                  <span className="tabular-nums">LOCKED</span>
+                </div>
+                {dayCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DAYS LOCKED</span>
+                    <span className="tabular-nums">{dayCount}</span>
+                  </div>
+                )}
+                {maxVelocityRatio !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">VELOCITY RATIO</span>
+                    <span className="tabular-nums">{maxVelocityRatio}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CRYSTALLINE VELOCITY LOCK · SUSTAINED ACCELERATION</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'full_domain_crystalline_resonance') {
+          const sourceCount = log.metadata?.sourceCount as number | undefined
+          const avgConf     = log.metadata?.avgConf     as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FDCRES:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">RESONANCE</span>
+                  <span className="tabular-nums">FULL DOMAIN</span>
+                </div>
+                {sourceCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES 24H</span>
+                    <span className="tabular-nums">{sourceCount}</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FIELD CONF</span>
+                    <span className="tabular-nums">{Math.round(avgConf * 100)}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ALL CHANNELS · THE FIELD RINGS</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

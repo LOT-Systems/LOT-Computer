@@ -203,6 +203,9 @@ export function PatternRecognitionWidget() {
       'transmission-momentum':               'Transmission momentum — permanent crystal active + 24h signal velocity ≥120% of 7-day daily average, architecture accelerating (P176)',
       'cross-domain-transmission':           'Cross-domain transmission — sovereignty transmission arc + 4+ distinct sources in 6h window, propagating across all channels simultaneously (P177)',
       'sovereign-propagation-peak':          'Sovereign propagation peak — transmission momentum (P176) + cross-domain transmission (P177) + crystalline permanence (P173), apex self-propagating state (P178)',
+      'propagation-persistence-arc':         'Propagation persistence arc — sovereign-propagation-peak (P178) confirmed on 2+ of last 3 days, structural recurrence, persistence locked (P179)',
+      'sovereign-velocity-lock':             'Sovereign velocity lock — transmission-momentum (P176) confirmed on 2+ of last 3 days at ≥150% velocity, crystalline acceleration sustained (P180)',
+      'full-domain-crystalline-resonance':   'Full-domain crystalline resonance — P178 + P179 co-active + 10+ distinct signal sources in 24h, full crystalline architecture simultaneously resonating across all domains (P181)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

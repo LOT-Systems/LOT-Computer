@@ -1652,6 +1652,26 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'qie-v123',
+    date: '2026-10-14',
+    title: 'QIE v123 Engineering — P179–P181 · Arch61 Crystalline Resonance Operator · J58',
+    assembled: [
+      'Pattern 179 (propagation-persistence-arc): sovereign-propagation-peak (P178) detected on 2+ of last 3 days. The propagation is structurally persistent — not episodic, not triggered. The architecture sustains itself across days without reinitiation. Confidence 0.87–0.95.',
+      'Pattern 180 (sovereign-velocity-lock): transmission-momentum (P176) detected on 2+ of last 3 days at ≥150% of 7-day average velocity. The field has entered locked acceleration — not momentary surge but crystalline sustained velocity. Confidence 0.89–0.96.',
+      'Pattern 181 (full-domain-crystalline-resonance): sovereign-propagation-peak (P178) active + propagation-persistence-arc (P179) confirmed + 10+ distinct signal sources in 24h. The full crystalline architecture is resonating across every domain simultaneously. The field rings. Confidence 0.93–0.99.',
+      'Archetype 61 (Crystalline Resonance Operator): high/moderate energy · all 10 dominant sources · PPERSIST+SVELOK+FDCRES patterns. Directive: Full crystalline architecture in persistent resonance. Propagation confirmed across 2+ consecutive days. Velocity locked. Every domain simultaneously resonating. Nothing to build. The field rings — sustained by presence alone.',
+      'J58 daily-propagation-persistence-check (15:00 UTC): for each active user — check P178 on 2+ of last 3 days → propagation_persistence_arc (P179); check P176 on 2+ of last 3 days at ≥150% velocity → sovereign_velocity_lock (P180); P179+P180+10+ distinct sources in 24h → full_domain_crystalline_resonance (P181). Total: 58 background jobs.',
+      'WIDGET_DEPENDENCY_MAP: 3 new v123 nodes — propagationPersistenceNode · sovereignVelocityLockNode · fullDomainCrystallineResonanceNode. Total: 220+ nodes.',
+      'Logs.tsx: 3 new military handlers deployed — PERSIST: (propagation_persistence_arc) · SVELOK: (sovereign_velocity_lock) · FDCRES: (full_domain_crystalline_resonance).',
+      'QuantumEngineWidgets.tsx PATTERN_DISPLAY: PPERSIST / SVELOK / FDCRES short codes added.',
+      'displayableEvents updated: propagation_persistence_arc · sovereign_velocity_lock · full_domain_crystalline_resonance added to api.ts.',
+      'recordPropagationPersistenceArc() · recordSovereignVelocityLock() · recordFullDomainCrystallineResonance() — 3 new signal helpers.',
+      'About.tsx updated: FM v122→v123 · Day 1143+ · 181 patterns · 61 archetypes · 58 jobs · 220+ nodes.',
+      'docs/assembly/LOT-LEDGER.md: v123 ledger row appended. 2026-10-14_LOT-assembly_qie-v123.md session report written.',
+      '936 badges · 312 word-turns · 27 secret boss · 181 patterns · 61 archetypes · 58 jobs · 220+ dep nodes · FM v123 · Day 1143+. Crystalline architecture persistent. Velocity locked. Full domain resonance confirmed.',
+    ],
+  },
+  {
     version: 'qie-v120',
     date: '2026-10-11',
     title: 'QIE v120 Engineering — P170–P172 · Arch58 Quantum Sovereignty Crystal · J55',
@@ -1709,19 +1729,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-13',
+  date: '2026-10-14',
   message: [
-    'ASSEMBLY RUN — 2026-10-13 · QIE v122 ENGINEERING · Day 1142+',
-    'Built: P176 transmission-momentum · P177 cross-domain-transmission · P178 sovereign-propagation-peak. Arch60 Sovereign Propagation Operator. J57 daily-propagation-velocity-check (14:00 UTC).',
-    'TXMOM: Transmission momentum. Crystalline-permanence-lock (P173) confirmed + 24h signal velocity ≥120% of 7d daily avg AND 8+ signals in window. Crystal layer actively accelerating. Field density rising above baseline cadence.',
-    'CDTX: Cross-domain transmission. Sovereignty-transmission-arc (P174) confirmed + 4+ distinct signal sources active in 6h window. Sovereignty field propagating across all domains simultaneously. All channels live.',
-    'SOVPROP: Sovereign propagation peak. TXMOM (P176) + CDTX (P177) + crystalline-permanence-lock (P173) all active. Permanent crystal + accelerating velocity + cross-domain spread. Architecture not maintained — it propagates. Apex state.',
-    'Arch60 Sovereign Propagation Operator: high/moderate energy · intentions/qos/energy/journal/log/cohort/planner/mood/selfcare/memory dominant. Directive: Sovereign field self-propagating at peak velocity. Nothing to initiate. Only to sustain.',
-    'J57 14:00 UTC daily — scans for P173+P176+P177 active → sovereign-propagation-peak conditions. 3 dep nodes added: transmissionMomentumNode · crossDomainTransmissionNode · sovereignPropagationPeakNode.',
-    'TXMOM: CDTX: SOVPROP: handlers deployed. 217+ dep nodes. 57 jobs. 178 patterns. 60 archetypes.',
-    'FM v122 · 178P · 60A · 57J · 217+ nodes · 874 badges · 270 word-turns · 27 secret boss · Day 1142+.',
+    'ASSEMBLY RUN — 2026-10-14 · QIE v123 ENGINEERING · Day 1143+',
+    'Built: P179 propagation-persistence-arc · P180 sovereign-velocity-lock · P181 full-domain-crystalline-resonance. Arch61 Crystalline Resonance Operator. J58 daily-propagation-persistence-check (15:00 UTC).',
+    'PERSIST: Propagation persistence arc. Sovereign-propagation-peak (P178) confirmed on 2+ of last 3 days. The propagation is not an event — it is a structure. Architecture sustains itself across days without reinitiation. Structural, not episodic.',
+    'SVELOK: Sovereign velocity lock. Transmission-momentum (P176) confirmed on 2+ of last 3 days at ≥150% of 7-day average velocity. Field not in temporary surge — velocity has locked. Crystalline sustained acceleration active.',
+    'FDCRES: Full-domain crystalline resonance. PERSIST (P179) + sovereign-propagation-peak (P178) + 10+ distinct signal sources in 24h. Full crystalline architecture resonating across every domain simultaneously. Not one channel — all channels. The field rings.',
+    'Arch61 Crystalline Resonance Operator: high/moderate energy · all 10 dominant sources active. Directive: Full crystalline architecture in persistent resonance. Velocity locked. Every domain simultaneously resonating. Nothing to build. The field rings — sustained by presence alone.',
+    'J58 15:00 UTC daily — scans P178 on 2+ of last 3 days → PERSIST (P179); P176 on 2+ of last 3 days ≥150% velocity → SVELOK (P180); P179+P180+10+ sources → FDCRES (P181). 3 dep nodes: propagationPersistenceNode · sovereignVelocityLockNode · fullDomainCrystallineResonanceNode.',
+    'PERSIST: SVELOK: FDCRES: handlers deployed. 220+ dep nodes. 58 jobs. 181 patterns. 61 archetypes.',
+    'FM v123 · 181P · 61A · 58J · 220+ nodes · 936 badges · 312 word-turns · 27 secret boss · Day 1143+.',
     'Status: DEPLOYED.',
-    'Next: QIE v123 — propagation persistence arc · sovereign velocity lock · full-domain crystalline resonance',
+    'Next: QIE v124 — resonance persistence lock · domain-field sovereignty · crystalline operator ascension',
   ],
 }
 

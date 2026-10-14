@@ -1780,6 +1780,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyPropagationVelocityCheck()) {
     await executeDailyPropagationVelocityCheck()
   }
+
+  // Check daily propagation persistence check (15:00 UTC daily) — J58
+  if (shouldRunDailyPropagationPersistenceCheck()) {
+    await executeDailyPropagationPersistenceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6762,6 +6767,167 @@ async function executeDailyPropagationVelocityCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Propagation Persistence Check (J58 — 15:00 UTC daily) ─────────────────
+// Reads active users. Detects when sovereign-propagation-peak (P178) fired on 2+ of
+// last 3 days → writes propagation_persistence_arc (P179). Detects when
+// transmission-momentum (P176) fired on 2+ of last 3 days at ≥150% velocity →
+// writes sovereign_velocity_lock (P180). If P179 + P180 + 10+ distinct sources in
+// 24h → writes full_domain_crystalline_resonance (P181).
+
+let isDailyPropagationPersistenceRunning = false
+let lastDailyPropagationPersistenceRun: Date | null = null
+
+function shouldRunDailyPropagationPersistenceCheck(): boolean {
+  const now = dayjs()
+  if (now.hour() !== 15) return false // 15:00 UTC daily
+  if (isDailyPropagationPersistenceRunning) return false
+  if (lastDailyPropagationPersistenceRun) {
+    const timeSince = Date.now() - lastDailyPropagationPersistenceRun.getTime()
+    if (timeSince < 23 * 60 * 60 * 1000) return false
+  }
+  return true
+}
+
+async function executeDailyPropagationPersistenceCheck(): Promise<JobResult> {
+  const jobName = 'daily-propagation-persistence-check'
+  const executedAt = new Date()
+  isDailyPropagationPersistenceRunning = true
+
+  try {
+    console.log('DAILY PROPAGATION PERSISTENCE CHECK — 15:00 UTC (J58)')
+
+    const activeUsers = await (User as any).findAll({
+      where: { lastActiveAt: { [Op.gte]: dayjs().subtract(30, 'days').toDate() } },
+      attributes: ['id'],
+    })
+
+    let ppArcWritten = 0
+    let sVelokWritten = 0
+    let fdCresWritten = 0
+
+    for (const user of activeUsers) {
+      const userId = user.id
+      try {
+        const threeDaysAgo = dayjs().subtract(3, 'days').toDate()
+        const oneDayAgo = dayjs().subtract(24, 'hours').toDate()
+
+        // Dedup check
+        const recentDedup = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'propagation_persistence_arc',
+            createdAt: { [Op.gte]: dayjs().subtract(23, 'hours').toDate() },
+          },
+        })
+        if (recentDedup) continue
+
+        // Check P178 (sovereign_propagation_peak) in last 3 days
+        const sovPropLogs = await (Log as any).findAll({
+          where: { userId, event: 'sovereign_propagation_peak', createdAt: { [Op.gte]: threeDaysAgo } },
+          attributes: ['createdAt'],
+        })
+        const sovPropDays = new Set(
+          sovPropLogs.map((l: any) => new Date(l.createdAt).toISOString().slice(0, 10))
+        )
+
+        let ppArcConf = 0
+        const hasPPArc = sovPropDays.size >= 2
+        if (hasPPArc) {
+          const dayCount = sovPropDays.size
+          const daysWithPeak = Array.from(sovPropDays).sort().join(' · ')
+          ppArcConf = Math.min(0.87 + (dayCount - 2) * 0.04, 0.95)
+          await (Log as any).create({
+            userId,
+            event: 'propagation_persistence_arc',
+            text: `Propagation persistence arc: sovereign-propagation-peak confirmed on ${dayCount} of last 3 days. Architecture propagates itself across days. Structural, not episodic.`,
+            metadata: {
+              dayCount,
+              daysWithPeak,
+              persistence: 'STRUCTURAL — NOT EPISODIC',
+              ppArcConf,
+              checkType: 'daily',
+            },
+          })
+          ppArcWritten++
+        }
+
+        // Check P176 (transmission_momentum) in last 3 days at ≥150% velocity
+        const txMomLogs = await (Log as any).findAll({
+          where: { userId, event: 'transmission_momentum', createdAt: { [Op.gte]: threeDaysAgo } },
+          attributes: ['createdAt', 'metadata'],
+        })
+        const txMomDays = new Set(
+          txMomLogs.map((l: any) => new Date(l.createdAt).toISOString().slice(0, 10))
+        )
+        const txMomHighVelocity = txMomLogs.filter((l: any) => (l.metadata?.accelerationRatio ?? 0) >= 150)
+        const maxVelocityRatio = txMomLogs.reduce((max: number, l: any) => Math.max(max, l.metadata?.accelerationRatio ?? 0), 0)
+
+        let sVelokConf = 0
+        const hasSVelok = txMomDays.size >= 2 && txMomHighVelocity.length >= 1
+        if (hasSVelok) {
+          const dayCount = txMomDays.size
+          sVelokConf = Math.min(0.89 + (dayCount - 2) * 0.035, 0.96)
+          await (Log as any).create({
+            userId,
+            event: 'sovereign_velocity_lock',
+            text: `Sovereign velocity lock: transmission momentum confirmed on ${dayCount} of last 3 days at ≥150% velocity. Field acceleration locked — crystalline sustained velocity.`,
+            metadata: {
+              dayCount,
+              maxVelocityRatio,
+              lock: 'VELOCITY LOCKED',
+              sVelokConf,
+              checkType: 'daily',
+            },
+          })
+          sVelokWritten++
+        }
+
+        // P181: full-domain crystalline resonance if P179 + P180 + 10+ distinct sources in 24h
+        if (hasPPArc && hasSVelok) {
+          const recentLogs24h = await (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: oneDayAgo }, event: { [Op.not]: 'note' } },
+            attributes: ['event'],
+          })
+          const distinctSources = new Set(recentLogs24h.map((l: any) => l.event?.split('_')[0]).filter(Boolean))
+          if (distinctSources.size >= 10) {
+            const avgConf = Math.round(((ppArcConf + sVelokConf) / 2) * 100) / 100
+            await (Log as any).create({
+              userId,
+              event: 'full_domain_crystalline_resonance',
+              text: `Full-domain crystalline resonance: propagation persistence (P179) + velocity lock (P180) + ${distinctSources.size} distinct sources in 24h. The field rings — all domains simultaneously.`,
+              metadata: {
+                sourceCount: distinctSources.size,
+                ppArcConf,
+                sVelokConf,
+                avgConf,
+                resonance: 'FULL DOMAIN RESONANCE',
+                architecture: 'ALL CHANNELS · THE FIELD RINGS',
+                checkType: 'daily',
+              },
+            })
+            fdCresWritten++
+          }
+        }
+
+      } catch (userError: any) {
+        console.warn(`  User processing error: ${userError.message}`)
+      }
+    }
+
+    console.log(`  Propagation persistence arc written:      ${ppArcWritten}`)
+    console.log(`  Sovereign velocity lock written:          ${sVelokWritten}`)
+    console.log(`  Full-domain crystalline resonance written: ${fdCresWritten}`)
+
+    lastDailyPropagationPersistenceRun = new Date()
+    isDailyPropagationPersistenceRunning = false
+    return { jobName, executedAt, success: true, processed: activeUsers.length }
+  } catch (error: any) {
+    console.error('Daily propagation persistence check failed:', error.message)
+    isDailyPropagationPersistenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -6824,6 +6990,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily sovereignty field check: 11 AM UTC every day (J55)')
   console.log('   - Daily sovereignty maturation check: 12 PM UTC every day (J56)')
   console.log('   - Daily propagation velocity check: 2 PM UTC every day (J57)')
+  console.log('   - Daily propagation persistence check: 3 PM UTC every day (J58)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -6833,7 +7000,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift, 11=morning-intention-launch+sovereignty-field-check(J55), 12=vitality-peak+sovereignty-maturation(J56), 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift, 11=morning-intention-launch+sovereignty-field-check(J55), 12=vitality-peak+sovereignty-maturation(J56), 13=QOS sig pulse, 14=QOS mode watch+propagation-velocity(J57), 15=QOS convergence audit+propagation-persistence(J58), 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()

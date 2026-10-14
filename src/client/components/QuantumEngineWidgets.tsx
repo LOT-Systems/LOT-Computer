@@ -137,6 +137,10 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'transmission-momentum':               'TXMOM',
   'cross-domain-transmission':           'CDTX',
   'sovereign-propagation-peak':          'SOVPROP',
+  // ── v123 ───────────────────────────────────────────────────────────────────────
+  'propagation-persistence-arc':         'PPERSIST',
+  'sovereign-velocity-lock':             'SVELOK',
+  'full-domain-crystalline-resonance':   'FDCRES',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

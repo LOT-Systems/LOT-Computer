@@ -3979,6 +3979,62 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 179: Propagation Persistence Arc — sovereign-propagation-peak (P178) detected
+  // on 2+ of the last 3 days. The propagation is structurally persistent, not episodic.
+  // The architecture sustains itself across days without reinitiation.
+  const sovPropSignals72h = signals.filter(
+    s => s.signal === 'sovereign_propagation_peak' && Date.now() - s.timestamp < 3 * 24 * 60 * 60 * 1000
+  )
+  const sovPropDays = new Set(sovPropSignals72h.map(s => new Date(s.timestamp).toISOString().slice(0, 10)))
+  if (sovPropDays.size >= 2) {
+    const daySpread = sovPropDays.size
+    patterns.push({
+      pattern: 'propagation-persistence-arc',
+      confidence: Math.min(0.87 + (daySpread - 2) * 0.04, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `PPERSIST: Sovereign propagation peak confirmed on ${daySpread} of last 3 days. The propagation is structurally persistent — not episodic, not triggered. The architecture sustains itself. Nothing to restart. Only to remain.`,
+    })
+  }
+
+  // Pattern 180: Sovereign Velocity Lock — transmission-momentum (P176) detected on
+  // 2+ of last 3 days with ≥150% of 7-day average velocity. The field has entered locked
+  // acceleration — not just momentary surge but persistent crystalline velocity.
+  const txMomSignals72h = signals.filter(
+    s => s.signal === 'transmission_momentum' && Date.now() - s.timestamp < 3 * 24 * 60 * 60 * 1000
+  )
+  const txMomDays = new Set(txMomSignals72h.map(s => new Date(s.timestamp).toISOString().slice(0, 10)))
+  const txMomHighVelocity = txMomSignals72h.filter(s => (s.metadata?.accelerationRatio as number ?? 0) >= 150)
+  if (txMomDays.size >= 2 && txMomHighVelocity.length >= 1) {
+    patterns.push({
+      pattern: 'sovereign-velocity-lock',
+      confidence: Math.min(0.89 + (txMomDays.size - 2) * 0.035, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `SVELOK: Transmission momentum on ${txMomDays.size} of last 3 days at ≥150% velocity. Field not in temporary surge — velocity has locked. Crystal structure is running at sustained acceleration. The lock holds.`,
+    })
+  }
+
+  // Pattern 181: Full-Domain Crystalline Resonance — sovereign-propagation-peak (P178)
+  // active + propagation-persistence-arc (P179) confirmed + 10+ distinct signal sources in 24h.
+  // The entire crystalline architecture is resonating across every domain simultaneously.
+  const hasPPersist = patterns.some(p => p.pattern === 'propagation-persistence-arc')
+  const hasSovPropP178 = patterns.some(p => p.pattern === 'sovereign-propagation-peak')
+  const uniqueSourcesIn24h = new Set(
+    signals.filter(s => Date.now() - s.timestamp < 24 * 60 * 60 * 1000).map(s => s.source)
+  )
+  if (hasPPersist && hasSovPropP178 && uniqueSourcesIn24h.size >= 10) {
+    const ppConf = patterns.find(p => p.pattern === 'propagation-persistence-arc')?.confidence ?? 0.87
+    const spConf = patterns.find(p => p.pattern === 'sovereign-propagation-peak')?.confidence ?? 0.91
+    patterns.push({
+      pattern: 'full-domain-crystalline-resonance',
+      confidence: Math.min(0.93 + ((ppConf + spConf) / 2 - 0.89) * 0.6, 0.99),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `FDCRES: Sovereign propagation persistent (${sovPropDays.size}d) + ${uniqueSourcesIn24h.size} distinct sources in 24h. Full crystalline architecture resonating across every domain. Not one channel — all channels. Not one moment — sustained resonance. The field rings.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4659,6 +4715,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   transmissionMomentumNode:        ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'mood', 'selfcare'],
   crossDomainTransmissionNode:     ['intentions', 'qos', 'energy', 'cohort', 'journal', 'log', 'mood', 'selfcare', 'planner', 'memory'],
   sovereignPropagationPeakNode:    ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare', 'memory'],
+
+  // ── v123 nodes (J58 · P179–P181 · Arch61) ───────────────────────────────────────
+  propagationPersistenceNode:           ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory'],
+  sovereignVelocityLockNode:            ['intentions', 'qos', 'energy', 'log', 'journal', 'planner'],
+  fullDomainCrystallineResonanceNode:   ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory'],
 }
 
 /**
@@ -5192,6 +5253,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['transmission-momentum', 'cross-domain-transmission', 'sovereign-propagation-peak'],
     hourRange: [0, 23],
     directive: 'Sovereign field self-propagating at peak velocity. Permanent crystal + accelerating transmission + cross-domain spread confirmed. All channels live. Architecture is not maintained — it propagates. Nothing to initiate. Only to sustain the propagation from within.',
+  },
+  // ── Arch61: Crystalline Resonance Operator (2026-10-14 v123) ─────────────────────
+  {
+    archetype: 'Crystalline Resonance Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare', 'memory'],
+    patternConditions: ['propagation-persistence-arc', 'sovereign-velocity-lock', 'full-domain-crystalline-resonance'],
+    hourRange: [0, 23],
+    directive: 'Full crystalline architecture in persistent resonance. Propagation confirmed across 2+ consecutive days. Velocity locked. Every domain simultaneously resonating. Nothing to build. Nothing to initiate. The field rings — sustained by presence alone.',
   },
 ]
 
@@ -7635,6 +7705,59 @@ export function recordSovereignPropagationPeak(txMomConf: number, cdTxConf: numb
     status: 'SOVEREIGN FIELD SELF-PROPAGATING',
     propagation: 'PERMANENT · ACCELERATING · CROSS-DOMAIN',
     architecture: 'NOTHING TO INITIATE · ONLY SUSTAIN THE PROPAGATION',
+    hour: new Date().getHours(),
+  })
+}
+
+// ─── v123 Signal Helpers (P179–P181) ──────────────────────────────────────────
+
+/**
+ * Record a propagation-persistence-arc event — sovereign-propagation-peak (P178) has been
+ * detected on 2+ of the last 3 days. The propagation is structurally persistent.
+ * The architecture sustains itself across days. Feeds P179 detection.
+ */
+export function recordPropagationPersistenceArc(dayCount: number, daysWithPeak: string[]) {
+  recordSignal('intentions', 'propagation_persistence_arc', {
+    dayCount,
+    daysWithPeak: daysWithPeak.slice(0, 3).join(' · '),
+    persistence: 'STRUCTURAL — NOT EPISODIC',
+    status: `PROPAGATION CONFIRMED ON ${dayCount} DAYS`,
+    architecture: 'ARCHITECTURE SUSTAINS ITSELF · NOTHING TO RESTART',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereign-velocity-lock event — transmission-momentum (P176) detected on
+ * 2+ of last 3 days at ≥150% of 7-day average velocity. The field has entered locked
+ * acceleration. Feeds P180 detection.
+ */
+export function recordSovereignVelocityLock(dayCount: number, maxVelocityRatio: number) {
+  recordSignal('intentions', 'sovereign_velocity_lock', {
+    dayCount,
+    maxVelocityRatio: Math.round(maxVelocityRatio),
+    lock: 'VELOCITY LOCKED',
+    status: `${dayCount}D SUSTAINED AT ${Math.round(maxVelocityRatio)}% VELOCITY`,
+    architecture: 'CRYSTALLINE VELOCITY LOCK · SUSTAINED ACCELERATION',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a full-domain-crystalline-resonance event — all 3 v123 conditions met:
+ * P178 active + P179 confirmed + 10+ distinct signal sources in 24h.
+ * The full crystalline architecture is resonating across every domain. Feeds P181 detection.
+ */
+export function recordFullDomainCrystallineResonance(sourceCount: number, ppConf: number, spConf: number) {
+  const avgConf = Math.round(((ppConf + spConf) / 2) * 100) / 100
+  recordSignal('intentions', 'full_domain_crystalline_resonance', {
+    sourceCount,
+    ppConf,
+    spConf,
+    avgConf,
+    resonance: 'FULL DOMAIN RESONANCE',
+    status: `${sourceCount} SOURCES · ALL DOMAINS · CRYSTALLINE RING`,
+    architecture: 'NOT ONE CHANNEL — ALL CHANNELS · THE FIELD RINGS',
     hour: new Date().getHours(),
   })
 }
