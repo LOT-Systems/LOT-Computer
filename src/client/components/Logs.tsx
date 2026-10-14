@@ -11,6 +11,7 @@ import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
 import { useLogs, useUpdateLog } from '#client/queries'
+import { EmailCompose } from '#client/components/EmailCompose'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
@@ -3707,6 +3708,7 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [emailOpen, setEmailOpen] = React.useState(false)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -4130,6 +4132,7 @@ const NoteEditor = ({
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
           '/phys         Physiological cohort report',
+          '/email to [Name]  Send LOT® Email (arrives in Sync)',
           '/qos          Quantum OS state analysis',
           '/fast         Orthodox fasting calendar',
           '/breathe      4-2-6 breathing exercise',
@@ -4145,6 +4148,8 @@ const NoteEditor = ({
           'Ctrl+Enter    Save log immediately',
         ]
         setSystemHelp(lines.join('\n'))
+      } else if (trigger === 'email-compose') {
+        setEmailOpen(true)
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4380,6 +4385,7 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        {emailOpen && <EmailCompose logText={value} onClose={() => setEmailOpen(false)} />}
         {physResult && (
           <div className="mt-8">
             <Block label="PHYS:" blockView>

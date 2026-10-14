@@ -6,7 +6,7 @@
  * Made in the USA | brand.lot-systems.com
  */
 
-import { Op, Sequelize } from 'sequelize'
+import { Op, Sequelize, where, fn, col } from 'sequelize'
 import { FastifyInstance, FastifyRequest } from 'fastify'
 import seedrandom from 'seedrandom'
 import {
@@ -366,6 +366,11 @@ export default async (fastify: FastifyInstance) => {
         case 'chat_message': {
           // TODO: check if user is allowed to use chat
           write({ event, data })
+          break
+        }
+        case 'lot_email': {
+          // LOT® Email: deliver only to the addressee
+          if (data?.receiverId === req.user.id) write({ event, data })
           break
         }
         case 'chat_message_like': {
@@ -4082,6 +4087,131 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — simplest internal mail. Composed via "/email to <Name>" in Log,
+  // delivered to Sync. Recipients are LOT Community members (chat-allowed tags);
+  // same-cohort members (shared city/country) are preferred on name collisions.
+  // ============================================================================
+
+  const resolveEmailRecipient = async (me: any, to: string) => {
+    const name = to.trim().replace(/^@/, '')
+    if (!name) return { error: 'Recipient required', status: 400 as const }
+    const candidates = await fastify.models.User.findAll({
+      where: {
+        id: { [Op.not]: me.id },
+        [Op.or]: [
+          where(fn('lower', col('firstName')), name.toLowerCase()),
+          where(fn('lower', fn('concat', col('firstName'), ' ', col('lastName'))), name.toLowerCase()),
+        ],
+      },
+      limit: 20,
+    })
+    const community = candidates.filter((u: any) => canAccessChat(u.tags || []) || u.isAdmin?.())
+    if (community.length === 0) return { error: `No LOT Community member named "${name}"`, status: 404 as const }
+    if (community.length === 1) return { user: community[0] }
+    const cohort = community.filter((u: any) => u.city && u.city === me.city && u.country === me.country)
+    if (cohort.length === 1) return { user: cohort[0] }
+    return {
+      error: `Several members named "${name}" — use full name`,
+      status: 409 as const,
+      candidates: community.map((u: any) => `${u.firstName || ''} ${u.lastName || ''}`.trim()),
+    }
+  }
+
+  fastify.post('/mail', async (req: FastifyRequest<{
+    Body: { to: string; subject?: string; body: string }
+  }>, reply) => {
+    try {
+      if (!canAccessChat(req.user.tags || [])) {
+        return reply.status(403).send({ error: 'LOT Email requires LOT Community membership' })
+      }
+      const { to, subject, body } = req.body || ({} as any)
+      if (typeof body !== 'string' || !body.trim()) {
+        return reply.status(400).send({ error: 'Message body is required' })
+      }
+      const r: any = await resolveEmailRecipient(req.user, String(to || ''))
+      if (r.error) return reply.status(r.status).send({ error: r.error, candidates: r.candidates })
+      const mail = await fastify.models.LotEmail.create({
+        senderId: req.user.id,
+        receiverId: r.user.id,
+        subject: String(subject || '').trim().slice(0, 200),
+        body: body.trim().slice(0, 5000),
+      })
+      const senderName = `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim()
+      sync.emit('lot_email', {
+        id: mail.id,
+        senderId: req.user.id,
+        receiverId: r.user.id,
+        senderName,
+        subject: mail.subject,
+        body: mail.body,
+        readAt: null,
+        createdAt: mail.createdAt,
+      })
+      process.nextTick(async () => {
+        try {
+          const context = await getLogContext(req.user)
+          await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'email_sent',
+            text: '',
+            metadata: { emailId: mail.id, receiverId: r.user.id },
+            context,
+          })
+        } catch (logError) {
+          console.error('Error logging email:', logError)
+        }
+      })
+      return reply.send({ id: mail.id, to: `${r.user.firstName || ''} ${r.user.lastName || ''}`.trim() })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  fastify.get('/mail', async (req: FastifyRequest, reply) => {
+    try {
+      if (!canAccessChat(req.user.tags || [])) return reply.send({ emails: [], unread: 0 })
+      const mails = await fastify.models.LotEmail.findAll({
+        where: { receiverId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 50,
+      })
+      const senders = await fastify.models.User.findAll({
+        where: { id: Array.from(new Set(mails.map((m) => m.senderId))) },
+        attributes: ['id', 'firstName', 'lastName'],
+      })
+      const nameOf = new Map(senders.map((u: any) => [u.id, `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown']))
+      return reply.send({
+        emails: mails.map((m) => ({
+          id: m.id,
+          senderId: m.senderId,
+          senderName: nameOf.get(m.senderId) || 'Unknown',
+          subject: m.subject,
+          body: m.body,
+          readAt: m.readAt,
+          createdAt: m.createdAt,
+        })),
+        unread: mails.filter((m) => !m.readAt).length,
+      })
+    } catch (error) {
+      console.error('Error fetching emails:', error)
+      return reply.status(500).send({ error: 'Failed to fetch emails' })
+    }
+  })
+
+  fastify.post('/mail/:id/read', async (req: FastifyRequest<{ Params: { id: string } }>, reply) => {
+    try {
+      await fastify.models.LotEmail.update(
+        { readAt: new Date() },
+        { where: { id: req.params.id, receiverId: req.user.id, readAt: null } }
+      )
+      return reply.send({ ok: true })
+    } catch (error) {
+      return reply.status(500).send({ error: 'Failed to mark read' })
     }
   })
 

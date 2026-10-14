@@ -24,6 +24,8 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useMail,
+  useMarkMailRead,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -71,6 +73,11 @@ export const Sync = React.memo(function SyncInner() {
   }, [me])
 
   const { data: fetchedMessages } = useChatMessages()
+  const { data: mailData } = useMail()
+  const { mutate: markMailRead } = useMarkMailRead({
+    onSuccess: () => queryClient.invalidateQueries(['/api/mail']),
+  })
+  const [openMailId, setOpenMailId] = React.useState<string | null>(null)
   const { mutate: createChatMessage } = useCreateChatMessage({
     onSuccess: () => setMessage(''),
   })
@@ -117,7 +124,11 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeMailListener } = sync.listen('lot_email', () => {
+      queryClient.invalidateQueries(['/api/mail'])
+    })
     return () => {
+      disposeMailListener()
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
     }
@@ -213,6 +224,43 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {!!mailData?.emails?.length && (
+        <div className="mb-40">
+          <div className="text-acc/40 mb-4">
+            MAIL{mailData.unread > 0 ? ` · ${mailData.unread} NEW` : ''}
+          </div>
+          {mailData.emails.slice(0, 10).map((m) => {
+            const isOpen = openMailId === m.id
+            return (
+              <div
+                key={m.id}
+                className="cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded"
+                onClick={() => {
+                  setOpenMailId(isOpen ? null : m.id)
+                  if (!m.readAt) markMailRead({ id: m.id })
+                }}
+              >
+                <div className="flex items-start gap-x-8">
+                  <span className="whitespace-nowrap">{m.senderName}</span>
+                  <span className={cn('flex-1', m.readAt && 'text-acc/40')}>
+                    {!m.readAt && '● '}
+                    {m.subject || m.body.slice(0, 60)}
+                  </span>
+                  <span className="text-acc/40 whitespace-nowrap">
+                    <MessageTimeLabel dateString={m.createdAt} isTimeFormat12h={isTimeFormat12h} />
+                  </span>
+                </div>
+                {isOpen && (
+                  <div className="whitespace-breakspaces text-acc/80 mt-4" style={{ wordBreak: 'break-word' }}>
+                    {m.body}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {

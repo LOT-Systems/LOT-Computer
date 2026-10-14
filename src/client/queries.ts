@@ -912,3 +912,29 @@ export const useStoryGeneration = createMutation<
     logId: string | null
   }
 >('post', '/api/story')
+
+// LOT® Email
+export interface LotEmailRecord {
+  id: string
+  senderId: string
+  senderName: string
+  subject: string
+  body: string
+  readAt: string | null
+  createdAt: string
+}
+
+export const useMail = createQuery<{ emails: LotEmailRecord[]; unread: number }>(
+  '/api/mail',
+  { refetchOnWindowFocus: false }
+)
+
+export const useSendMail = createMutation<
+  { to: string; subject?: string; body: string },
+  { id: string; to: string }
+>('post', '/api/mail')
+
+export const useMarkMailRead = createMutation<{ id: string }, void>(
+  'post',
+  (d) => `/api/mail/${d.id}/read`
+)
