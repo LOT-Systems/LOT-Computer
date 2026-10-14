@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getAstrologyReading } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -131,7 +131,22 @@ export const System = React.memo(function SystemInner() {
   const [isBreatheOn, setIsBreatheOn] = React.useState(false)
   const breatheState = useBreathe(isBreatheOn)
   const [showRadio, setShowRadio] = React.useState(false)
-  const [astrologyView, setAstrologyView] = React.useState<'astrology' | 'psychology' | 'journey' | 'quantum'>('astrology')
+  type AstrologyView = 'astrology' | 'psychology' | 'journey' | 'quantum'
+  const [astrologyView, setAstrologyViewState] = React.useState<AstrologyView>(() => {
+    try {
+      const saved = localStorage.getItem('astrology_view')
+      if (saved === 'astrology' || saved === 'psychology' || saved === 'journey' || saved === 'quantum') return saved
+    } catch {}
+    return 'astrology'
+  })
+  // Remember the user's last-viewed block across sessions
+  const setAstrologyView = (update: (prev: AstrologyView) => AstrologyView) => {
+    setAstrologyViewState(prev => {
+      const next = update(prev)
+      try { localStorage.setItem('astrology_view', next) } catch {}
+      return next
+    })
+  }
   const [showWeatherSuggestion, setShowWeatherSuggestion] = React.useState(false)
   const [isSoundToggling, setIsSoundToggling] = React.useState(false)
   const [showSharedEmotion, setShowSharedEmotion] = React.useState(false)
@@ -204,22 +219,13 @@ export const System = React.memo(function SystemInner() {
 
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
   // rokuyo), not a personal natal chart.
-  const astrology = React.useMemo(() => {
-    const now = new Date()
-    const hourlyZodiac = getHourlyZodiac(now)
-    const westernZodiac = getWesternZodiac(now)
-    const moonPhase = getMoonPhase(now)
-    const rokuyo = getRokuyo(now)
-
-    return {
-      hourlyZodiac,
-      westernZodiac,
-      moonPhase: moonPhase.phase,
-      moonIllumination: moonPhase.illumination,
-      rokuyo,
-    }
+  // Uses the saved profile timeZone so the reading matches Logs snapshots
+  // even when viewed from a device set to a different zone.
+  const astrology = React.useMemo(
+    () => getAstrologyReading(new Date(), me?.timeZone),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+    [astrologyTick, me?.timeZone]
+  )
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
