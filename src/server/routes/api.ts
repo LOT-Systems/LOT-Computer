@@ -1213,6 +1213,8 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // Intention audit notice (daily 06:00 UTC job) — Logs.tsx renders it as INTENT-DECAY:
+      'intention_decay_notice',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
