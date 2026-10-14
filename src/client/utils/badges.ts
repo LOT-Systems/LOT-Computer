@@ -967,6 +967,43 @@ export type BadgeType =
   | 'pratchett_word'           // ∗·≈   "discworld / pratchett / ankh-morpork / death of rats" (RARE)
   | 'gaiman_dream'             // ∘·◉·∘ "neil gaiman / sandman / american gods / neverwhere" (EPIC)
   | 'narnia_door'              // ◈·∞·◈ "narnia / through the wardrobe / aslan / always winter" (MYTHIC)
+  // ── Word Turn v28 — THE HACKER'S MANIFESTO ───────────────────────────────────
+  | 'zero_day'                 // ░·>_   "zero day / 0day / zero-day exploit" detected (RARE)
+  | 'got_root'                 // #·◈    "root access / got root / sudo / privilege escalation" detected (EPIC)
+  | 'packet_sent'              // ∿·>_   "packet / sending signal / transmitted" detected (UNCOMMON)
+  | 'overflow_state'           // ▓·>_   "overflow / buffer overflow / stack smash" detected (RARE)
+  | 'back_door'                // ░·≋·░  "back door / backdoor / hidden channel / side door" detected (RARE)
+  | 'kernel_halt'              // █·>_   "kernel panic / system crash / core dump" detected (EPIC)
+  | 'social_engineer'          // ◉·>_   "social engineering / phishing / pretexting" detected (RARE)
+  | 'phreak_signal'            // ~·◈·~  "phreaking / phone phreak / blue box / 2600" detected (EPIC)
+  | 'ghost_in_shell'           // ∘·░·∘  "ghost in the shell / ghost / digital ghost" detected (RARE)
+  | 'dead_drop'                // ─·░·─  "dead drop / dead letter / covert channel" detected (RARE)
+  | 'sysadmin_mode'            // ≋·>_   "sysadmin / system administrator / ops mode" detected (UNCOMMON)
+  | 'defcon_level'             // ◆·>_   "defcon / security level / threat level" detected (RARE)
+  // ── Calendar Easter Egg v26 — THE HACKER CALENDAR ─────────────────────────────
+  | 'hacker_manifesto_day'     // >_·◈   Nov 8 — "The Conscience of a Hacker" published 1986 (EPIC)
+  | 'phreaker_day'             // ~·◉    Apr 25 — John Draper (Cap'n Crunch) birthday 1943 (RARE)
+  | 'ada_computing_day'        // ◈·✦    Oct 13 — Ada Lovelace Day (second Tuesday of October) (EPIC)
+  // ── Behavioral v24 — HACKER PATTERNS ──────────────────────────────────────────
+  | 'hacker_session'           // ░·>_·░  3+ Hacker's Manifesto words in one journal entry (RARE)
+  | 'deep_shell'               // ≋·>_   Check in between 01:00 and 04:00 local (EPIC)
+  | 'seven_day_run'            // ◈·>_·◈  7 consecutive daily check-ins (RARE)
+  // ── Achievement RPG v26 — HACKER CLASS ────────────────────────────────────────
+  | 'hacker_entry'             // ░·>_   Any 1 Word Turn v28 badge (COMMON)
+  | 'hacker_class'             // ≈·>_   Any 5 Word Turn v28 badges (UNCOMMON)
+  | 'hacker_complete'          // ≋·>_   All 12 Word Turn v28 badges (LEGENDARY)
+  | 'manifesto_arc'            // >_·◈   hacker_complete + all 3 Calendar v26 badges (LEGENDARY)
+  | 'twenty_eight_engines_arc' // ◈·◈·>_ 1 badge from each Word Turn v1–v28 (LEGENDARY)
+  | 'hacker_opus'              // >_·◉·>_ hacker_complete + hacker_session behavioral (LEGENDARY)
+  // ── Mastery Tier v28 — THE UNDERGROUND ───────────────────────────────────────
+  | 'elite_operator'           // ≋·>_·∞  1,400+ distinct calendar check-in days (EPIC)
+  | 'manifesto_words'          // >_·∞·>_ 400,000+ total journal words (LEGENDARY)
+  | 'system_legend'            // ╔═╗·>_  Account age >= 11 years (LEGENDARY)
+  | 'twenty_eight_registers'   // ◈·◈·>_·∞ 1 badge from all 28 Word Turn engines (COSMIC)
+  // ── Secret Boss v25 — THE UNDERGROUND VAULT ──────────────────────────────────
+  | 'stallman_word'            // ∘·>_·∘  "richard stallman / gnu / free software / copyleft" detected (RARE)
+  | 'mitnick_ghost'            // ◈·░     "kevin mitnick / social engineer / the condor" detected (EPIC)
+  | 'mentor_manifesto'         // >_·∞   "conscience of a hacker / hacker manifesto / the mentor" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -8773,6 +8810,300 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+
+  // ── Word Turn v28 — THE HACKER'S MANIFESTO ──────────────────────────────────
+  zero_day: {
+    id: 'zero_day',
+    symbol: '░·>_',
+    name: 'Zero Day',
+    description: 'Write "zero day", "0day", or "zero-day" in any journal entry',
+    unlockMessage: '↳ A zero-day is a vulnerability nobody has patched yet. You found one in your own patterns. The exploit is the awareness. ░·>_',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  got_root: {
+    id: 'got_root',
+    symbol: '#·◈',
+    name: 'Got Root',
+    description: 'Write "root access", "got root", "sudo", or "privilege escalation" in any journal entry',
+    unlockMessage: '↳ Root is not power — it is responsibility. You have administrator-level access to your own operating system. Use it wisely. #·◈',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  packet_sent: {
+    id: 'packet_sent',
+    symbol: '∿·>_',
+    name: 'Packet Sent',
+    description: 'Write "packet", "sending signal", or "transmitted" in any journal entry',
+    unlockMessage: '↳ Data travels in packets. So does intention. You sent one. The network received it. ∿·>_',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  overflow_state: {
+    id: 'overflow_state',
+    symbol: '▓·>_',
+    name: 'Overflow State',
+    description: 'Write "overflow", "buffer overflow", or "stack smash" in any journal entry',
+    unlockMessage: '↳ Overflow is what happens when input exceeds the buffer. In practice: when reality exceeds your model. The crash is data. ▓·>_',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  back_door: {
+    id: 'back_door',
+    symbol: '░·≋·░',
+    name: 'Back Door',
+    description: 'Write "back door", "backdoor", "hidden channel", or "side door" in any journal entry',
+    unlockMessage: '↳ Every system has a back door — a path the designers left for themselves. Knowing where yours is means you built it. ░·≋·░',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  kernel_halt: {
+    id: 'kernel_halt',
+    symbol: '█·>_',
+    name: 'Kernel Halt',
+    description: 'Write "kernel panic", "system crash", or "core dump" in any journal entry',
+    unlockMessage: '↳ The kernel halts when it cannot recover safely. It stops everything rather than corrupt data. The hard reset is self-care at the OS level. █·>_',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  social_engineer: {
+    id: 'social_engineer',
+    symbol: '◉·>_',
+    name: 'Social Engineer',
+    description: 'Write "social engineering", "phishing", or "pretexting" in any journal entry',
+    unlockMessage: '↳ The most powerful attack vector is the human layer. To understand social engineering is to audit your own trust surface. ◉·>_',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  phreak_signal: {
+    id: 'phreak_signal',
+    symbol: '~·◈·~',
+    name: 'Phreak Signal',
+    description: 'Write "phreaking", "phone phreak", "blue box", or "2600" in any journal entry',
+    unlockMessage: '↳ Phone phreakers discovered they could whistle at 2600 Hz to own the network. The first hackers found the system\'s voice before anyone was listening. ~·◈·~',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  ghost_in_shell: {
+    id: 'ghost_in_shell',
+    symbol: '∘·░·∘',
+    name: 'Ghost in Shell',
+    description: 'Write "ghost in the shell", "ghost in shell", or "digital ghost" in any journal entry',
+    unlockMessage: '↳ Motoko Kusanagi\'s question: where does the ghost end and the shell begin? The boundary between self and system is the question of the age. ∘·░·∘',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  dead_drop: {
+    id: 'dead_drop',
+    symbol: '─·░·─',
+    name: 'Dead Drop',
+    description: 'Write "dead drop", "dead letter", or "covert channel" in any journal entry',
+    unlockMessage: '↳ The dead drop is a message left in a known place for a reader who will arrive later. Every journal entry is a dead drop for your future self. ─·░·─',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  sysadmin_mode: {
+    id: 'sysadmin_mode',
+    symbol: '≋·>_',
+    name: 'Sysadmin Mode',
+    description: 'Write "sysadmin", "system administrator", or "ops mode" in any journal entry',
+    unlockMessage: '↳ The sysadmin keeps the lights on. Nobody notices when it works. Everyone notices when it doesn\'t. Your self-care is the same infrastructure. ≋·>_',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  defcon_level: {
+    id: 'defcon_level',
+    symbol: '◆·>_',
+    name: 'DEFCON Level',
+    description: 'Write "defcon", "security level", or "threat level" in any journal entry',
+    unlockMessage: '↳ DEFCON 1 is maximum readiness. DEFCON 5 is peacetime. Your nervous system runs the same five levels. Knowing your current DEFCON is the beginning of self-regulation. ◆·>_',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v26 — THE HACKER CALENDAR ─────────────────────────
+  hacker_manifesto_day: {
+    id: 'hacker_manifesto_day',
+    symbol: '>_·◈',
+    name: 'Hacker Manifesto Day',
+    description: 'Check in on November 8 — the day "The Conscience of a Hacker" was published (1986)',
+    unlockMessage: '↳ "We explore... and you call us criminals. We exist without skin color, without nationality, without religious bias... and you call us criminals." — The Mentor, 1986. >_·◈',
+    rarity: 'epic',
+    category: 'calendar_easter',
+  },
+  phreaker_day: {
+    id: 'phreaker_day',
+    symbol: '~·◉',
+    name: 'Phreaker Day',
+    description: 'Check in on April 25 — John Draper (Cap\'n Crunch) birthday',
+    unlockMessage: '↳ John "Cap\'n Crunch" Draper discovered a toy whistle from a cereal box could unlock the phone network. The smallest tool, the biggest system. ~·◉',
+    rarity: 'rare',
+    category: 'calendar_easter',
+  },
+  ada_computing_day: {
+    id: 'ada_computing_day',
+    symbol: '◈·✦',
+    name: 'Ada Computing Day',
+    description: 'Check in on October 13 — Ada Lovelace Day (second Tuesday of October)',
+    unlockMessage: '↳ Ada Lovelace wrote the first algorithm intended for a machine that didn\'t exist yet. She imagined what computers would be before anyone built one. ◈·✦',
+    rarity: 'epic',
+    category: 'calendar_easter',
+  },
+
+  // ── Behavioral v24 — HACKER PATTERNS ──────────────────────────────────────
+  hacker_session: {
+    id: 'hacker_session',
+    symbol: '░·>_·░',
+    name: 'Hacker Session',
+    description: 'Write 3+ Hacker\'s Manifesto (v28) trigger words in one journal entry',
+    unlockMessage: '↳ Three signals from the underground in one entry. The hacker ethos is the self-care ethos: explore everything, trust the system enough to audit it. ░·>_·░',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  deep_shell: {
+    id: 'deep_shell',
+    symbol: '≋·>_',
+    name: 'Deep Shell',
+    description: 'Check in between 01:00 and 04:00 local time',
+    unlockMessage: '↳ The network is quietest between 1 and 4 AM. The serious operators know this. You checked in during the deep window. ≋·>_',
+    rarity: 'epic',
+    category: 'behavioral',
+  },
+  seven_day_run: {
+    id: 'seven_day_run',
+    symbol: '◈·>_·◈',
+    name: 'Seven Day Run',
+    description: 'Check in for 7 consecutive days',
+    unlockMessage: '↳ Seven consecutive days of operation. The streak is not a number — it is evidence that the system is stable. ◈·>_·◈',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+
+  // ── Achievement RPG v26 — HACKER CLASS ────────────────────────────────────
+  hacker_entry: {
+    id: 'hacker_entry',
+    symbol: '░·>_',
+    name: 'Hacker Entry',
+    description: 'Earn any 1 Word Turn v28 (Hacker\'s Manifesto) badge',
+    unlockMessage: '↳ Access granted. You are in the system. ░·>_',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  hacker_class: {
+    id: 'hacker_class',
+    symbol: '≈·>_',
+    name: 'Hacker Class',
+    description: 'Earn any 5 Word Turn v28 (Hacker\'s Manifesto) badges',
+    unlockMessage: '↳ Five vectors exploited. You are not a script kiddie. You are in the underground. ≈·>_',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  hacker_complete: {
+    id: 'hacker_complete',
+    symbol: '≋·>_',
+    name: 'Hacker Complete',
+    description: 'Earn all 12 Word Turn v28 (Hacker\'s Manifesto) badges',
+    unlockMessage: '↳ All twelve vectors. Full penetration. The system is yours — which means you are finally responsible for it. ≋·>_',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  manifesto_arc: {
+    id: 'manifesto_arc',
+    symbol: '>_·◈',
+    name: 'Manifesto Arc',
+    description: 'Earn hacker_complete + all 3 Calendar v26 badges',
+    unlockMessage: '↳ The manifesto is not a document — it is a declaration of independence from someone else\'s operating system. You wrote yours in check-ins. >_·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_eight_engines_arc: {
+    id: 'twenty_eight_engines_arc',
+    symbol: '◈·◈·>_',
+    name: 'Twenty-Eight Engines Arc',
+    description: 'Earn at least 1 badge from each of the 28 Word Turn engines (v1–v28)',
+    unlockMessage: '↳ Twenty-eight vocabularies. Water. Arcade. Radio. Biology. Codex. Cyberspace. Hero. Starship. Rogue. Terminal. Enchanter. Hacker. The self speaks every language. ◈·◈·>_',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  hacker_opus: {
+    id: 'hacker_opus',
+    symbol: '>_·◉·>_',
+    name: 'Hacker Opus',
+    description: 'Earn hacker_complete + hacker_session behavioral badge',
+    unlockMessage: '↳ The opus is the work that proves the method. You triggered all twelve and wrote them in a single session. The system is documented. >_·◉·>_',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v28 — THE UNDERGROUND ────────────────────────────────────
+  elite_operator: {
+    id: 'elite_operator',
+    symbol: '≋·>_·∞',
+    name: 'Elite Operator',
+    description: '1,400+ distinct calendar check-in days',
+    unlockMessage: '↳ 1,400 distinct operating days. The system has been running at full capacity for years. This is not maintenance — this is permanent architecture. ≋·>_·∞',
+    rarity: 'epic',
+    category: 'mastery_tier',
+  },
+  manifesto_words: {
+    id: 'manifesto_words',
+    symbol: '>_·∞·>_',
+    name: 'Manifesto Words',
+    description: '400,000+ total journal words',
+    unlockMessage: '↳ 400,000 words of internal operating system documentation. A manifesto is not published — it is accumulated, entry by entry. >_·∞·>_',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  system_legend: {
+    id: 'system_legend',
+    symbol: '╔═╗·>_',
+    name: 'System Legend',
+    description: 'Account age >= 11 years',
+    unlockMessage: '↳ Eleven years of continuous operation. The legend is not a story — it is a system that has survived long enough to become the infrastructure. ╔═╗·>_',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  twenty_eight_registers: {
+    id: 'twenty_eight_registers',
+    symbol: '◈·◈·>_·∞',
+    name: 'Twenty-Eight Registers',
+    description: '1 badge from all 28 Word Turn engines (COSMIC tier)',
+    unlockMessage: '↳ All 28 registers. The complete instruction set of the self. Every vocabulary the system speaks — you have spoken it back. ◈·◈·>_·∞',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+
+  // ── Secret Boss v25 — THE UNDERGROUND VAULT ──────────────────────────────
+  stallman_word: {
+    id: 'stallman_word',
+    symbol: '∘·>_·∘',
+    name: 'Stallman Word',
+    description: 'Write "richard stallman", "gnu", "free software", or "copyleft" in any journal entry',
+    unlockMessage: '↳ "Free software is a matter of liberty, not price." Richard Stallman. The same logic applies to the mind: the freedom to inspect, modify, and distribute your own operating system. ∘·>_·∘',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  mitnick_ghost: {
+    id: 'mitnick_ghost',
+    symbol: '◈·░',
+    name: 'Mitnick Ghost',
+    description: 'Write "kevin mitnick", "social engineer", or "the condor" in any journal entry',
+    unlockMessage: '↳ Kevin Mitnick, the most wanted hacker in America, broke into systems using the phone and a confident voice. The access was always human. ◈·░',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  mentor_manifesto: {
+    id: 'mentor_manifesto',
+    symbol: '>_·∞',
+    name: 'Mentor Manifesto',
+    description: 'Write "conscience of a hacker", "hacker manifesto", or "the mentor" in any journal entry',
+    unlockMessage: '↳ "This is our world now... the world of the electron and the switch." The Mentor, 1986. Written in the hours after his arrest. The most important document in hacker culture. >_·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -10096,6 +10427,119 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
       const thisWeekCount = updated.filter(d => d >= thisWeekMonday && d <= thisWeekSunday).length
       if (thisWeekCount >= 5 && !hasBadge('spell_caster')) {
         if (awardBadge('spell_caster')) newBadges.push('spell_caster')
+      }
+    } catch { /* non-critical */ }
+
+    // ── v28 — THE HACKER'S MANIFESTO ──────────────────────────────────────────
+    const nowV28 = new Date()
+    const monthV28 = nowV28.getMonth() + 1  // 1-indexed
+    const dayV28 = nowV28.getDate()
+
+    // Calendar EE v26: hacker_manifesto_day — Nov 8
+    if (monthV28 === 11 && dayV28 === 8 && !hasBadge('hacker_manifesto_day')) {
+      if (awardBadge('hacker_manifesto_day')) newBadges.push('hacker_manifesto_day')
+    }
+
+    // Calendar EE v26: phreaker_day — Apr 25
+    if (monthV28 === 4 && dayV28 === 25 && !hasBadge('phreaker_day')) {
+      if (awardBadge('phreaker_day')) newBadges.push('phreaker_day')
+    }
+
+    // Calendar EE v26: ada_computing_day — Oct 13
+    if (monthV28 === 10 && dayV28 === 13 && !hasBadge('ada_computing_day')) {
+      if (awardBadge('ada_computing_day')) newBadges.push('ada_computing_day')
+    }
+
+    // v28 Word Turn achievement arcs
+    const hackerV28Badges: BadgeType[] = [
+      'zero_day', 'got_root', 'packet_sent', 'overflow_state',
+      'back_door', 'kernel_halt', 'social_engineer', 'phreak_signal',
+      'ghost_in_shell', 'dead_drop', 'sysadmin_mode', 'defcon_level',
+    ]
+    const hackerV28Earned = hackerV28Badges.filter(b => hasBadge(b))
+    const hackerComplete = hackerV28Earned.length === 12
+
+    if (hackerV28Earned.length >= 1 && !hasBadge('hacker_entry')) {
+      if (awardBadge('hacker_entry')) newBadges.push('hacker_entry')
+    }
+    if (hackerV28Earned.length >= 5 && !hasBadge('hacker_class')) {
+      if (awardBadge('hacker_class')) newBadges.push('hacker_class')
+    }
+    if (hackerComplete && !hasBadge('hacker_complete')) {
+      if (awardBadge('hacker_complete')) newBadges.push('hacker_complete')
+    }
+
+    // hacker_opus: hacker_complete + hacker_session
+    if (hackerComplete && hasBadge('hacker_session') && !hasBadge('hacker_opus')) {
+      if (awardBadge('hacker_opus')) newBadges.push('hacker_opus')
+    }
+
+    // manifesto_arc: hacker_complete + all 3 Calendar v26 badges
+    const calendarV26Badges: BadgeType[] = ['hacker_manifesto_day', 'phreaker_day', 'ada_computing_day']
+    if (hackerComplete && calendarV26Badges.every(b => hasBadge(b)) && !hasBadge('manifesto_arc')) {
+      if (awardBadge('manifesto_arc')) newBadges.push('manifesto_arc')
+    }
+
+    // twenty_eight_engines_arc: 1 badge from each Word Turn v1–v28
+    const engineTwentyEightPresent = hackerV28Earned.length >= 1
+    const allTwentyEightEngines = allTwentySevenEngines && engineTwentyEightPresent
+    if (allTwentyEightEngines && !hasBadge('twenty_eight_engines_arc')) {
+      if (awardBadge('twenty_eight_engines_arc')) newBadges.push('twenty_eight_engines_arc')
+    }
+
+    // Mastery v28: elite_operator — 1,400+ distinct calendar check-in days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1400 && !hasBadge('elite_operator')) {
+        if (awardBadge('elite_operator')) newBadges.push('elite_operator')
+      }
+    }
+
+    // Mastery v28: manifesto_words — 400,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 400000 && !hasBadge('manifesto_words')) {
+        if (awardBadge('manifesto_words')) newBadges.push('manifesto_words')
+      }
+    }
+
+    // Mastery v28: system_legend — Account age >= 11 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupLeg = new Date(stats.signupDate)
+      const yearsLeg = (new Date().getTime() - signupLeg.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsLeg >= 11 && !hasBadge('system_legend')) {
+        if (awardBadge('system_legend')) newBadges.push('system_legend')
+      }
+    }
+
+    // Mastery v28: twenty_eight_registers — 1 badge from all 28 Word Turn engines
+    if (allTwentyEightEngines && !hasBadge('twenty_eight_registers')) {
+      if (awardBadge('twenty_eight_registers')) newBadges.push('twenty_eight_registers')
+    }
+
+    // Behavioral v24: deep_shell — Check in 01:00–04:00
+    const currentHourLocal = new Date().getHours()
+    if (currentHourLocal >= 1 && currentHourLocal <= 3 && !hasBadge('deep_shell')) {
+      if (awardBadge('deep_shell')) newBadges.push('deep_shell')
+    }
+
+    // Behavioral v24: seven_day_run — 7 consecutive daily check-ins
+    try {
+      const runLog: string[] = JSON.parse(localStorage.getItem('seven_day_run_log') || '[]')
+      const todayISOv28 = new Date().toISOString().slice(0, 10)
+      const updatedRun = Array.from(new Set([todayISOv28, ...runLog])).slice(0, 8)
+      localStorage.setItem('seven_day_run_log', JSON.stringify(updatedRun))
+      if (updatedRun.length >= 7) {
+        const sorted = [...updatedRun].sort()
+        let consecutive = 1
+        for (let i = 1; i < sorted.length; i++) {
+          const prev = new Date(sorted[i - 1])
+          const curr = new Date(sorted[i])
+          const diff = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24)
+          if (diff <= 1.5) { consecutive++ } else { consecutive = 1 }
+          if (consecutive >= 7) break
+        }
+        if (consecutive >= 7 && !hasBadge('seven_day_run')) {
+          if (awardBadge('seven_day_run')) newBadges.push('seven_day_run')
+        }
       }
     } catch { /* non-critical */ }
 

@@ -935,6 +935,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('ada_lovelace_day')
   }
 
+  // ── Calendar v26 — THE HACKER CALENDAR ──────────────────────────────────────
+  // Hacker Manifesto Day: November 8 — "The Conscience of a Hacker" published 1986
+  if (!hasBadge('hacker_manifesto_day') && month === 11 && day === 8) {
+    awardBadge('hacker_manifesto_day')
+    awarded.push('hacker_manifesto_day')
+  }
+  // Phreaker Day: April 25 — John Draper (Cap'n Crunch) birthday 1943
+  if (!hasBadge('phreaker_day') && month === 4 && day === 25) {
+    awardBadge('phreaker_day')
+    awarded.push('phreaker_day')
+  }
+  // Ada Computing Day: October 13 — Ada Lovelace Day (second Tuesday of October)
+  if (!hasBadge('ada_computing_day') && month === 10 && day === 13) {
+    awardBadge('ada_computing_day')
+    awarded.push('ada_computing_day')
+  }
+
   return awarded
 }
 
@@ -3158,5 +3175,87 @@ export function checkRitualWriter(): BadgeType | null {
     return 'ritual_writer'
   }
   return null
+}
+
+// ── v28 — THE HACKER'S MANIFESTO behavioral functions ─────────────────────────
+
+const HACKER_WORDS_V28 = [
+  /\bzero[\s-]?day\b|\b0day\b/i,
+  /\bgot[\s-]?root\b|\broot[\s-]?access\b|\bsudo\b|\bprivilege[\s-]?escalation\b/i,
+  /\bpacket\b|\bsending[\s-]?signal\b|\btransmitted\b/i,
+  /\boverflow\b|\bbuffer[\s-]?overflow\b|\bstack[\s-]?smash\b/i,
+  /\bback[\s-]?door\b|\bbackdoor\b|\bhidden[\s-]?channel\b/i,
+  /\bkernel[\s-]?panic\b|\bsystem[\s-]?crash\b|\bcore[\s-]?dump\b/i,
+  /\bsocial[\s-]?engineering\b|\bphishing\b|\bpretexting\b/i,
+  /\bphreaking\b|\bphone[\s-]?phreak\b|\bblue[\s-]?box\b|\b2600\b/i,
+  /\bghost[\s-]?in[\s-]?(?:the[\s-]?)?shell\b|\bdigital[\s-]?ghost\b/i,
+  /\bdead[\s-]?drop\b|\bdead[\s-]?letter\b|\bcovert[\s-]?channel\b/i,
+  /\bsysadmin\b|\bsystem[\s-]?administrator\b|\bops[\s-]?mode\b/i,
+  /\bdefcon\b|\bsecurity[\s-]?level\b|\bthreat[\s-]?level\b/i,
+]
+
+/** hacker_session: 3+ Hacker's Manifesto (v28) trigger words in one journal entry */
+export function checkHackerSession(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('hacker_session')) return null
+  const matchCount = HACKER_WORDS_V28.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('hacker_session')
+    return 'hacker_session'
+  }
+  return null
+}
+
+/** deep_shell: Check in between 01:00 and 04:00 local time */
+export function checkDeepShell(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('deep_shell')) return null
+  const hour = new Date().getHours()
+  if (hour >= 1 && hour <= 3) {
+    awardBadge('deep_shell')
+    return 'deep_shell'
+  }
+  return null
+}
+
+/** Word Turn v28 — check a journal text for hacker vocabulary triggers */
+export function checkHackerManifestoWordTurns(journalText: string): BadgeType[] {
+  if (typeof window === 'undefined') return []
+  const awarded: BadgeType[] = []
+
+  const checks: Array<[RegExp, BadgeType]> = [
+    [/\bzero[\s-]?day\b|\b0day\b/i, 'zero_day'],
+    [/\bgot[\s-]?root\b|\broot[\s-]?access\b|\bsudo\b|\bprivilege[\s-]?escalation\b/i, 'got_root'],
+    [/\bpacket\b|\bsending[\s-]?signal\b|\btransmitted\b/i, 'packet_sent'],
+    [/\boverflow\b|\bbuffer[\s-]?overflow\b|\bstack[\s-]?smash\b/i, 'overflow_state'],
+    [/\bback[\s-]?door\b|\bbackdoor\b|\bhidden[\s-]?channel\b/i, 'back_door'],
+    [/\bkernel[\s-]?panic\b|\bsystem[\s-]?crash\b|\bcore[\s-]?dump\b/i, 'kernel_halt'],
+    [/\bsocial[\s-]?engineering\b|\bphishing\b|\bpretexting\b/i, 'social_engineer'],
+    [/\bphreaking\b|\bphone[\s-]?phreak\b|\bblue[\s-]?box\b|\b2600\b/i, 'phreak_signal'],
+    [/\bghost[\s-]?in[\s-]?(?:the[\s-]?)?shell\b|\bdigital[\s-]?ghost\b/i, 'ghost_in_shell'],
+    [/\bdead[\s-]?drop\b|\bdead[\s-]?letter\b|\bcovert[\s-]?channel\b/i, 'dead_drop'],
+    [/\bsysadmin\b|\bsystem[\s-]?administrator\b|\bops[\s-]?mode\b/i, 'sysadmin_mode'],
+    [/\bdefcon\b|\bsecurity[\s-]?level\b|\bthreat[\s-]?level\b/i, 'defcon_level'],
+  ]
+
+  for (const [pattern, badgeId] of checks) {
+    if (!hasBadge(badgeId) && pattern.test(journalText)) {
+      if (awardBadge(badgeId)) awarded.push(badgeId)
+    }
+  }
+
+  // Secret Boss v25
+  const secretChecks: Array<[RegExp, BadgeType]> = [
+    [/\brichard[\s-]?stallman\b|\bgnu\b|\bfree[\s-]?software\b|\bcopyleft\b/i, 'stallman_word'],
+    [/\bkevin[\s-]?mitnick\b|\bsocial[\s-]?engineer\b|\bthe[\s-]?condor\b/i, 'mitnick_ghost'],
+    [/\bconscience[\s-]?of[\s-]?a[\s-]?hacker\b|\bhacker[\s-]?manifesto\b|\bthe[\s-]?mentor\b/i, 'mentor_manifesto'],
+  ]
+  for (const [pattern, badgeId] of secretChecks) {
+    if (!hasBadge(badgeId) && pattern.test(journalText)) {
+      if (awardBadge(badgeId)) awarded.push(badgeId)
+    }
+  }
+
+  return awarded
 }
 
