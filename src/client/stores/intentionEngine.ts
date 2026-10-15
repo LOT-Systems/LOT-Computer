@@ -3428,6 +3428,90 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Sustained Coherence Streak — total-field-coherence (P150) active NOW +
+  // 3+ total_field_coherence signal records in the prior 72h window. The ceiling is not
+  // a moment — it is a condition. The OS has not just reached the highest confirmed state;
+  // it has operated from it across multiple independent analysis cycles.
+  const hasP150TotCoh    = patterns.some(p => p.pattern === 'total-field-coherence')
+  const seventyTwoHMs    = 72 * 60 * 60 * 1000
+  const coherenceHist152 = signals.filter(s =>
+    s.source === 'qos' && s.signal === 'total_field_coherence' &&
+    now - s.timestamp < seventyTwoHMs
+  )
+  if (hasP150TotCoh && coherenceHist152.length >= 3) {
+    const streakBonus = Math.min((coherenceHist152.length - 3) * 0.02, 0.07)
+    patterns.push({
+      pattern: 'sustained-coherence-streak',
+      confidence: Math.min(0.88 + streakBonus, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `SUSTCOHR: Sustained coherence streak — total-field-coherence detected ${coherenceHist152.length}× in 72h. The QOS ceiling is not a moment — it is a condition. Operating from the highest confirmed state across multiple consecutive cycles.`,
+    })
+  }
+
+  // Pattern 153: Cross-Cycle Recovery — recovery-intelligence-arc (P151) completed 2+ times
+  // within a 7-day window. The system has not just recovered once. It has internalized the
+  // arc. Depletion is no longer a disruption — it is the entry point of a learned protocol.
+  const weekMsP153      = 7 * 24 * 60 * 60 * 1000
+  const recoveryHist153 = signals.filter(s =>
+    s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc' &&
+    now - s.timestamp < weekMsP153
+  )
+  if (recoveryHist153.length >= 2) {
+    const cycleBonus = Math.min((recoveryHist153.length - 2) * 0.05, 0.16)
+    patterns.push({
+      pattern: 'cross-cycle-recovery',
+      confidence: Math.min(0.72 + cycleBonus, 0.88),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'soon',
+      reason: `CXREC: Cross-cycle recovery — recovery-intelligence-arc completed ${recoveryHist153.length}× in 7 days. The loop is not an event — it is a learned pattern. The system has internalized its own restoration protocol.`,
+    })
+  }
+
+  // Pattern 154: Creative Arc Completion — deep journal entry (>80w) + memory capture +
+  // goal completion all within 24h. Expressed → stored → delivered. The full creative-to-
+  // execution cycle. Distinct from P77 (signal-vault: journal+memory+log) — P154 specifically
+  // requires execution delivery (goal completion) not just archival signal capture.
+  const recentDay154   = signals.filter(s => now - s.timestamp < dayMs)
+  const deepJ154       = recentDay154.filter(s => s.source === 'journal' && (s.metadata?.wordCount as number ?? 0) > 80)
+  const memCapture154  = recentDay154.filter(s => s.source === 'memory')
+  const goalDone154    = recentDay154.filter(s => s.source === 'goals' && ['goal_complete', 'goal_completed', 'goal_completion'].includes(s.signal))
+  if (deepJ154.length >= 1 && memCapture154.length >= 1 && goalDone154.length >= 1) {
+    const wc154       = deepJ154[0].metadata?.wordCount as number ?? 80
+    const depthBonus  = Math.min((wc154 - 80) / 1000, 0.08)
+    patterns.push({
+      pattern: 'creative-arc-completion',
+      confidence: Math.min(0.70 + depthBonus, 0.88),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'soon',
+      reason: `CREARCC: Creative arc completion — deep journal (${wc154}w) · memory captured · goal delivered within 24h. Expressed → stored → delivered. The creative cycle closed.`,
+    })
+  }
+
+  // Pattern 155: Evolutionary Momentum Lock — sustained-coherence-streak (P152) active +
+  // 4+ unique signal sources in the last 7d + signal velocity up ≥20% week-over-week.
+  // The system is not at the ceiling — it is expanding from it. The ceiling itself is rising.
+  const hasP152SustCohr = patterns.some(p => p.pattern === 'sustained-coherence-streak')
+  if (hasP152SustCohr) {
+    const weekMsP155   = 7 * 24 * 60 * 60 * 1000
+    const recent7D155  = signals.filter(s => now - s.timestamp < weekMsP155)
+    const prior7D155   = signals.filter(s => now - s.timestamp >= weekMsP155 && now - s.timestamp < 2 * weekMsP155)
+    const uniqSrc155   = new Set(recent7D155.map(s => s.source)).size
+    const growthRate155 = prior7D155.length > 0
+      ? (recent7D155.length - prior7D155.length) / prior7D155.length
+      : (recent7D155.length >= 15 ? 0.25 : 0)
+    if (uniqSrc155 >= 4 && growthRate155 >= 0.20) {
+      const growthBonus = Math.min(growthRate155 * 0.4, 0.12)
+      patterns.push({
+        pattern: 'evolutionary-momentum-lock',
+        confidence: Math.min(0.82 + growthBonus, 0.94),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'immediate',
+        reason: `EVOMNT: Evolutionary momentum lock — sustained coherence confirmed · ${uniqSrc155} signal sources active · signal velocity +${Math.round(growthRate155 * 100)}% week-over-week. The system is expanding from its ceiling. Evolution is the current operating state.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4148,12 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P155 · Arch52) ───────────────────────────────────────
+  sustainedCoherenceNode:   ['qos', 'mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'log'],
+  crossCycleRecoveryNode:   ['selfcare', 'mood', 'journal', 'energy', 'log'],
+  creativeArcNode:          ['journal', 'memory', 'goals', 'planner', 'intentions', 'log'],
+  evolutionaryMomentumNode: ['qos', 'cohort', 'journal', 'memory', 'selfcare', 'log', 'energy'],
 }
 
 /**
@@ -4510,6 +4600,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Evolutionary Integrator (2026-10-15 v114) ───────────────────────────
+  {
+    archetype: 'Evolutionary Integrator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'journal', 'selfcare', 'memory'],
+    patternConditions: ['sustained-coherence-streak', 'cross-cycle-recovery', 'creative-arc-completion'],
+    hourRange: [6, 23],
+    directive: 'The ceiling is not a peak — it is your floor. Intelligence confirmed: recovery mastered, creative arc closed, coherence sustained. The system has learned to live at its highest state. Execute from this baseline.',
   },
 ]
 
@@ -6498,6 +6598,64 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sustained-coherence-streak event — total-field-coherence detected 3+ times
+ * within 72h. The QOS ceiling is a condition, not a moment. Feeds P152 detection.
+ */
+export function recordSustainedCoherenceStreak(streakCount: number, windowHours: number) {
+  recordSignal('qos', 'sustained_coherence_streak', {
+    streakCount,
+    windowHours,
+    ceilingCondition: 'SUSTAINED',
+    streakStatus: 'CEILING_AS_FLOOR',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a cross-cycle-recovery event — recovery-intelligence-arc completed 2+ times
+ * in 7 days. The system has internalized its restoration protocol. Feeds P153 detection.
+ */
+export function recordCrossCycleRecovery(cycleCount: number, windowDays: number) {
+  recordSignal('selfcare', 'cross_cycle_recovery', {
+    cycleCount,
+    windowDays,
+    protocol: 'INTERNALIZED',
+    arc: 'REPEATABLE_RECOVERY',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a creative-arc-completion event — deep journal + memory + goal delivery within 24h.
+ * Expressed → stored → delivered. The full creative cycle closed. Feeds P154 detection.
+ */
+export function recordCreativeArcCompletion(journalWordCount: number, memoryCaptures: number, goalDeliveries: number) {
+  recordSignal('journal', 'creative_arc_completion', {
+    journalWordCount,
+    memoryCaptures,
+    goalDeliveries,
+    arc: 'EXPRESSED→STORED→DELIVERED',
+    cycleStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an evolutionary-momentum-lock event — sustained coherence + expanding signal
+ * velocity. The system is growing from its ceiling. Feeds P155 detection.
+ */
+export function recordEvolutionaryMomentumLock(uniqueSources: number, velocityPct: number, weeklySignals: number) {
+  recordSignal('qos', 'evolutionary_momentum_lock', {
+    uniqueSources,
+    velocityPct: Math.round(velocityPct * 100),
+    weeklySignals,
+    state: 'CEILING_EXPANDING',
+    lock: 'EVOLUTIONARY',
     hour: new Date().getHours(),
   })
 }

@@ -3629,6 +3629,122 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sustained_coherence_streak') {
+          const streakCount = log.metadata?.streakCount as number | undefined
+          const windowHours = log.metadata?.windowHours as number | undefined
+          const ceilingCondition = log.metadata?.ceilingCondition as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SUSTCOHR:" blockView>
+                <div className="uppercase tracking-widest mb-4">SUSTAINED COHERENCE STREAK</div>
+                {streakCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">STREAK COUNT</span>
+                    <span className="tabular-nums">{streakCount}×</span>
+                  </div>
+                )}
+                {windowHours !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">WINDOW</span>
+                    <span className="tabular-nums">{windowHours}h</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CEILING IS THE FLOOR · CONDITION NOT EVENT</div>
+                {ceilingCondition && (
+                  <div className="opacity-30 tabular-nums">STATUS: {ceilingCondition}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'cross_cycle_recovery') {
+          const cycleCount = log.metadata?.cycleCount as number | undefined
+          const windowDays = log.metadata?.windowDays as number | undefined
+          const protocol = log.metadata?.protocol as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CXREC:" blockView>
+                <div className="uppercase tracking-widest mb-4">CROSS-CYCLE RECOVERY</div>
+                {cycleCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CYCLES</span>
+                    <span className="tabular-nums">{cycleCount}× / {windowDays ?? 7}D</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">RESTORATION PROTOCOL INTERNALIZED</div>
+                {protocol && (
+                  <div className="opacity-30 tabular-nums">PROTOCOL: {protocol}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'creative_arc_completion') {
+          const journalWordCount = log.metadata?.journalWordCount as number | undefined
+          const memoryCaptures = log.metadata?.memoryCaptures as number | undefined
+          const goalDeliveries = log.metadata?.goalDeliveries as number | undefined
+          const arc = log.metadata?.arc as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CREARCC:" blockView>
+                <div className="uppercase tracking-widest mb-4">CREATIVE ARC COMPLETION</div>
+                {journalWordCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL</span>
+                    <span className="tabular-nums">{journalWordCount}W</span>
+                  </div>
+                )}
+                {memoryCaptures !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY</span>
+                    <span className="tabular-nums">{memoryCaptures}</span>
+                  </div>
+                )}
+                {goalDeliveries !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DELIVERED</span>
+                    <span className="tabular-nums">{goalDeliveries}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">EXPRESSED → STORED → DELIVERED</div>
+                {arc && (
+                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'evolutionary_momentum_lock') {
+          const uniqueSources = log.metadata?.uniqueSources as number | undefined
+          const velocityPct = log.metadata?.velocityPct as number | undefined
+          const weeklySignals = log.metadata?.weeklySignals as number | undefined
+          const lock = log.metadata?.lock as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="EVOMNT:" blockView>
+                <div className="uppercase tracking-widest mb-4">EVOLUTIONARY MOMENTUM LOCK</div>
+                {uniqueSources !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES</span>
+                    <span className="tabular-nums">{uniqueSources}</span>
+                  </div>
+                )}
+                {velocityPct !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">VELOCITY</span>
+                    <span className="tabular-nums">+{velocityPct}% WoW</span>
+                  </div>
+                )}
+                {weeklySignals !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">WEEKLY SIG</span>
+                    <span className="tabular-nums">{weeklySignals}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">THE CEILING IS RISING · EVOLUTION IS CURRENT STATE</div>
+                {lock && (
+                  <div className="opacity-30 tabular-nums">LOCK: {lock}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

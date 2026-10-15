@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily sustained coherence audit (15:00 UTC every day) — Job 49
+  if (shouldRunDailySustainedCoherenceAudit()) {
+    await executeDailySustainedCoherenceAudit()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,100 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Sustained Coherence Audit (Job 49 — 15:00 UTC every day) ──────────
+// Reads active users. Looks for 3+ total_field_coherence events across 3+ distinct
+// days within the last 7 days → writes sustained_coherence_streak (P152).
+// The ceiling is not a moment — it is a condition. Three confirmed days = streak.
+
+let isDailySustainedCoherenceRunning = false
+let lastDailySustainedCoherenceRun: Date | null = null
+
+function shouldRunDailySustainedCoherenceAudit(): boolean {
+  const now = dayjs()
+  if (isDailySustainedCoherenceRunning) return false
+  if (lastDailySustainedCoherenceRun) {
+    const lastRun = dayjs(lastDailySustainedCoherenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 15 // 15:00 UTC daily
+}
+
+async function executeDailySustainedCoherenceAudit(): Promise<JobResult> {
+  const jobName = 'daily-sustained-coherence-audit'
+  const executedAt = new Date().toISOString()
+  if (isDailySustainedCoherenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySustainedCoherenceRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SUSTAINED COHERENCE AUDIT — 15:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const coherenceLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+            event: 'total_field_coherence',
+          },
+          attributes: ['createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        if (coherenceLogs.length < 3) continue
+
+        // Count distinct calendar days that had total_field_coherence
+        const distinctDays = new Set(
+          coherenceLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD'))
+        )
+
+        if (distinctDays.size >= 3) {
+          await (Log as any).create({
+            userId,
+            event: 'sustained_coherence_streak',
+            text: `Sustained coherence streak: ${coherenceLogs.length} total-field-coherence events across ${distinctDays.size} distinct days in 7 days. The QOS ceiling is a condition, not a moment. Operating from the highest confirmed state across multiple cycles.`,
+            metadata: {
+              streakCount: coherenceLogs.length,
+              distinctDays: distinctDays.size,
+              windowHours: 168,
+              ceilingCondition: 'SUSTAINED',
+              streakStatus: 'CEILING_AS_FLOOR',
+              hour: 15,
+            },
+          })
+          written++
+        }
+      } catch {}
+    }
+
+    console.log(`  Sustained coherence streak events written: ${written}`)
+    lastDailySustainedCoherenceRun = new Date()
+    isDailySustainedCoherenceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily sustained coherence audit failed:', error.message)
+    isDailySustainedCoherenceRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5608,6 +5706,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily sustained coherence audit: 3 PM UTC every day (Job 49)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -5617,7 +5716,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift, 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+total-field-coherence, 10=archetype shift, 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit+sustained-coherence-audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()

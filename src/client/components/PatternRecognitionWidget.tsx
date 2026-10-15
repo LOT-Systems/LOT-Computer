@@ -182,6 +182,10 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'sustained-coherence-streak':       'Sustained coherence streak — total-field-coherence ceiling held across 3+ cycles in 72h (P152)',
+      'cross-cycle-recovery':             'Cross-cycle recovery — recovery-intelligence-arc completed 2+ times in 7 days, protocol internalized (P153)',
+      'creative-arc-completion':          'Creative arc completion — deep journal + memory + goal delivery within 24h, expressed → stored → delivered (P154)',
+      'evolutionary-momentum-lock':       'Evolutionary momentum lock — sustained coherence + expanding signal velocity, ceiling is rising (P155)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
@@ -544,6 +548,34 @@ export function PatternRecognitionWidget() {
               {patterns.some(p => p.pattern === 'resilience-cascade') && (
                 <div className="mt-4 uppercase tracking-widest text-xs">
                   Resilience cascade. Recovery + knowledge arc closed.
+                </div>
+              )}
+
+              {/* Sustained coherence streak — P152 */}
+              {patterns.some(p => p.pattern === 'sustained-coherence-streak') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Ceiling sustained. Total coherence is the baseline.
+                </div>
+              )}
+
+              {/* Cross-cycle recovery — P153 */}
+              {patterns.some(p => p.pattern === 'cross-cycle-recovery') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Recovery protocol internalized. The loop repeats.
+                </div>
+              )}
+
+              {/* Creative arc completion — P154 */}
+              {patterns.some(p => p.pattern === 'creative-arc-completion') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Creative arc closed. Expressed → stored → delivered.
+                </div>
+              )}
+
+              {/* Evolutionary momentum lock — P155 */}
+              {patterns.some(p => p.pattern === 'evolutionary-momentum-lock') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  EVOLUTIONARY LOCK. The ceiling is rising.
                 </div>
               )}
 

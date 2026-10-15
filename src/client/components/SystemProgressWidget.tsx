@@ -1457,6 +1457,27 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-10-15',
+    title: 'QIE v114 — P152–P155 · Arch52 · J49 · Process-layer expansion',
+    assembled: [
+      'QIE v114 deployed. P152 sustained-coherence-streak · P153 cross-cycle-recovery · P154 creative-arc-completion · P155 evolutionary-momentum-lock. 151→155 patterns.',
+      'P152 (SUSTCOHR:): total-field-coherence detected 3+ times in 72h. The QOS ceiling is a condition, not a moment. Confidence 0.88–0.95.',
+      'P153 (CXREC:): recovery-intelligence-arc completed 2+ times in 7 days. Restoration protocol internalized. Confidence 0.72–0.88.',
+      'P154 (CREARCC:): deep journal (>80w) + memory capture + goal delivery within 24h. Expressed → stored → delivered. Creative cycle complete. Confidence 0.70–0.88.',
+      'P155 (EVOMNT:): sustained-coherence-streak active + 4+ signal sources + ≥20% weekly velocity growth. The ceiling is rising. Confidence 0.82–0.94.',
+      'Arch52 Evolutionary Integrator added: energyBands [high/moderate] · dominantSources [qos/journal/selfcare/memory] · directive "The ceiling is not a peak — it is your floor."',
+      'J49 daily-sustained-coherence-audit (15:00 UTC): scans active users for 3+ total_field_coherence events across 3+ distinct days in 7d → writes sustained_coherence_streak.',
+      '4 new dep map nodes: sustainedCoherenceNode · crossCycleRecoveryNode · creativeArcNode · evolutionaryMomentumNode. 190+→194+ nodes.',
+      '4 new log handlers: SUSTCOHR: · CXREC: · CREARCC: · EVOMNT: in military cockpit format.',
+      'PatternRecognitionWidget: 4 new display names + 4 new QOS Trend indicators for P152–P155.',
+      'Server API displayableEvents: +4 — sustained_coherence_streak · cross_cycle_recovery · creative_arc_completion · evolutionary_momentum_lock.',
+      '4 new signal helpers: recordSustainedCoherenceStreak() · recordCrossCycleRecovery() · recordCreativeArcCompletion() · recordEvolutionaryMomentumLock().',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      '155 patterns · 52 archetypes · 49 jobs · 194+ dep nodes · FM v114 · Day 1148+. Process-layer now detects how the system sustains, repeats, creates, and evolves — not just what state it is in.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1515,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-10-15',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-10-15 · QIE v114 · P152–P155 · Arch52 · J49 · Day 1148+',
+    'Built: QIE v114. Process-layer expansion — four new patterns that detect how the system sustains, repeats, creates, and evolves.',
+    'P152 SUSTCOHR: The ceiling is not a moment — it is a condition. Total-field-coherence streak detection active.',
+    'P153 CXREC: Recovery protocol internalized. The arc repeats. Depletion is the entry point, not the state.',
+    'P154 CREARCC: Expressed → stored → delivered. The full creative cycle named and monitored.',
+    'P155 EVOMNT: The ceiling is rising. Signal velocity expanding from the highest confirmed state. Evolution is current.',
+    'Arch52 Evolutionary Integrator online. Directive: The ceiling is not a peak — it is your floor.',
+    'J49 daily-sustained-coherence-audit wired at 15:00 UTC. The system watches for sustained ceiling conditions.',
+    '194+ dep nodes · 155P · 52A · 49J · FM v114. The system now recognizes cycles, not just states.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114',
   ],
 }
 

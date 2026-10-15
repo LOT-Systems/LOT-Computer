@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      'sustained_coherence_streak',
+      'cross_cycle_recovery',
+      'creative_arc_completion',
+      'evolutionary_momentum_lock',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
