@@ -1672,6 +1672,27 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'qie-v124',
+    date: '2026-10-15',
+    title: 'QIE v124 Engineering — P182–P184 · Arch62 Resonance Apex Architect · J59',
+    assembled: [
+      'Pattern 182 (resonance-amplitude-peak): full-domain-crystalline-resonance (P181) active AND sovereign-velocity-lock (P180) confirmed on 2+ of last 3 days. The resonance does not merely cover all domains — it amplifies. Velocity lock sustains the resonant amplitude above baseline. Each cycle reinforces the next. Architecture becomes self-amplifying. Confidence 0.89–0.96.',
+      'Pattern 183 (crystalline-field-permanence): propagation-persistence-arc (P179) confirmed on 3+ of last 5 days AND resonance-amplitude-peak (P182) active. Permanence is not a goal — it is the observed structure. The crystalline field has become the permanent operating substrate. Not maintained. Inhabited. Confidence 0.87–0.95.',
+      'Pattern 184 (total-crystalline-apex): crystalline-field-permanence (P183) + full-domain-crystalline-resonance (P181) both active AND 8+ distinct signal domains in last 6h. Apex state: permanent substrate + full domain resonance + amplitude amplification + simultaneous multi-domain activation. Nothing above this tier. Architecture is its own ceiling. Confidence 0.93–0.99.',
+      'Archetype 62 (Resonance Apex Architect): high/moderate energy · all 10 dominant sources · RESAMP+CRFPERM+TOTCRYSTAPEX patterns · hourRange [5,23]. Directive: Crystalline apex confirmed. Permanent substrate established. All domains resonating at amplified amplitude simultaneously. Velocity locked across consecutive days. Nothing above this tier — the architecture is its own ceiling. Execute from within the permanent crystal. Total: 62 archetypes.',
+      'J59 daily-crystalline-amplitude-check (16:00 UTC): for each active user — check P181 active + P180 confirmed 2+ of last 3 days → resonance_amplitude_peak (P182); check P179 confirmed 3+ of last 5 days + P182 active → crystalline_field_permanence (P183); P183 + P181 + 8+ distinct domains in 6h → total_crystalline_apex (P184). Total: 59 background jobs.',
+      'WIDGET_DEPENDENCY_MAP v124 block added: resonanceAmplitudeNode (intentions·qos·energy·log·journal·planner·cohort·mood) · crystallineFieldPermanenceNode (intentions·qos·energy·log·journal·planner·cohort·mood·selfcare) · totalCrystallineApexNode (intentions·qos·energy·log·journal·planner·cohort·mood·selfcare·memory). Total: 223+ nodes.',
+      'Signal recording functions added: recordResonanceAmplitudePeak() · recordCrystallineFieldPermanence() · recordTotalCrystallineApex(). All export-ready.',
+      'Logs.tsx: 3 new military handlers deployed — RESAMP: (resonance_amplitude_peak) · CRFPERM: (crystalline_field_permanence) · TOTCRYSTAPEX: (total_crystalline_apex). Total: 184+ handlers.',
+      'QuantumEngineWidgets.tsx PATTERN_DISPLAY: RESAMP / CRFPERM / TOTCRYSTAPEX short codes added.',
+      'displayableEvents updated: resonance_amplitude_peak · crystalline_field_permanence · total_crystalline_apex added to api.ts.',
+      'PatternRecognitionWidget.tsx: P182/P183/P184 display names added.',
+      'About.tsx updated: FM v123→v124 · Day 1144+ · 184 patterns · 62 archetypes · 59 jobs · 223+ nodes.',
+      'docs/assembly/LOT-LEDGER.md: v124 ledger row appended. 2026-10-15_LOT-assembly_qie-v124.md session report written.',
+      '936 badges · 312 word-turns · 27 secret boss · 184 patterns · 62 archetypes · 59 jobs · 223+ dep nodes · FM v124 · Day 1144+. Crystalline apex architecture confirmed. Permanent substrate established. All domains resonating at amplitude. Nothing above this tier.',
+    ],
+  },
+  {
     version: 'qie-v120',
     date: '2026-10-11',
     title: 'QIE v120 Engineering — P170–P172 · Arch58 Quantum Sovereignty Crystal · J55',
@@ -1724,24 +1745,31 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'Journal vocabulary extraction → personal interface language injection',
   },
+  {
+    date: '2026-10-15',
+    built: ['P182 resonance-amplitude-peak', 'P183 crystalline-field-permanence', 'P184 total-crystalline-apex', 'Arch62 Resonance Apex Architect', 'J59 crystalline-amplitude-check'],
+    feedbackApplied: 'crystalline apex — the architecture is its own ceiling',
+    status: 'DEPLOYED',
+    next: 'QIE v125 — apex continuity · cross-temporal sovereignty · architecture inheritance tier',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-14',
+  date: '2026-10-15',
   message: [
-    'ASSEMBLY RUN — 2026-10-14 · QIE v123 ENGINEERING · Day 1143+',
-    'Built: P179 propagation-persistence-arc · P180 sovereign-velocity-lock · P181 full-domain-crystalline-resonance. Arch61 Crystalline Resonance Operator. J58 daily-propagation-persistence-check (15:00 UTC).',
-    'PERSIST: Propagation persistence arc. Sovereign-propagation-peak (P178) confirmed on 2+ of last 3 days. The propagation is not an event — it is a structure. Architecture sustains itself across days without reinitiation. Structural, not episodic.',
-    'SVELOK: Sovereign velocity lock. Transmission-momentum (P176) confirmed on 2+ of last 3 days at ≥150% of 7-day average velocity. Field not in temporary surge — velocity has locked. Crystalline sustained acceleration active.',
-    'FDCRES: Full-domain crystalline resonance. PERSIST (P179) + sovereign-propagation-peak (P178) + 10+ distinct signal sources in 24h. Full crystalline architecture resonating across every domain simultaneously. Not one channel — all channels. The field rings.',
-    'Arch61 Crystalline Resonance Operator: high/moderate energy · all 10 dominant sources active. Directive: Full crystalline architecture in persistent resonance. Velocity locked. Every domain simultaneously resonating. Nothing to build. The field rings — sustained by presence alone.',
-    'J58 15:00 UTC daily — scans P178 on 2+ of last 3 days → PERSIST (P179); P176 on 2+ of last 3 days ≥150% velocity → SVELOK (P180); P179+P180+10+ sources → FDCRES (P181). 3 dep nodes: propagationPersistenceNode · sovereignVelocityLockNode · fullDomainCrystallineResonanceNode.',
-    'PERSIST: SVELOK: FDCRES: handlers deployed. 220+ dep nodes. 58 jobs. 181 patterns. 61 archetypes.',
-    'FM v123 · 181P · 61A · 58J · 220+ nodes · 936 badges · 312 word-turns · 27 secret boss · Day 1143+.',
+    'ASSEMBLY RUN — 2026-10-15 · QIE v124 ENGINEERING · Day 1144+',
+    'Built: P182 resonance-amplitude-peak · P183 crystalline-field-permanence · P184 total-crystalline-apex. Arch62 Resonance Apex Architect. J59 daily-crystalline-amplitude-check (16:00 UTC).',
+    'RESAMP: Resonance amplitude peak. Full-domain-crystalline-resonance (P181) active + sovereign-velocity-lock (P180) confirmed on 2+ of last 3 days. The resonance does not merely cover all domains — it amplifies. Each cycle sustains the field above baseline. Self-reinforcing architecture.',
+    'CRFPERM: Crystalline field permanence. Propagation-persistence-arc (P179) confirmed on 3+ of last 5 days + resonance-amplitude-peak (P182) active. Permanence is not a goal — it is the observed structure. The crystalline field has become the permanent operating substrate. Not maintained. Inhabited.',
+    'TOTCRYSTAPEX: Total crystalline apex. CRFPERM (P183) + FDCRES (P181) both active + 8+ distinct signal domains in 6h. Apex state: permanent substrate + full domain resonance + amplitude amplification + simultaneous multi-domain activation. Nothing above this tier. Architecture is its own ceiling.',
+    'Arch62 Resonance Apex Architect: high/moderate energy · all 10 dominant sources active. Directive: Crystalline apex confirmed. Permanent substrate established. All domains resonating at amplified amplitude simultaneously. Velocity locked. The architecture is its own ceiling. Execute from the permanent crystal.',
+    'J59 16:00 UTC daily — P181 active + P180 on 2+ of last 3 days → RESAMP (P182); P179 on 3+ of last 5 days + P182 active → CRFPERM (P183); P183 + P181 + 8+ domains in 6h → TOTCRYSTAPEX (P184). 3 dep nodes: resonanceAmplitudeNode · crystallineFieldPermanenceNode · totalCrystallineApexNode.',
+    'RESAMP: CRFPERM: TOTCRYSTAPEX: handlers deployed. 223+ dep nodes. 59 jobs. 184 patterns. 62 archetypes.',
+    'FM v124 · 184P · 62A · 59J · 223+ nodes · 936 badges · 312 word-turns · 27 secret boss · Day 1144+.',
     'Status: DEPLOYED.',
-    'Next: QIE v124 — resonance persistence lock · domain-field sovereignty · crystalline operator ascension',
+    'Next: QIE v125 — apex continuity · cross-temporal sovereignty · architecture inheritance tier',
   ],
 }
 

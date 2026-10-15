@@ -141,6 +141,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'propagation-persistence-arc':         'PPERSIST',
   'sovereign-velocity-lock':             'SVELOK',
   'full-domain-crystalline-resonance':   'FDCRES',
+  'resonance-amplitude-peak':            'RESAMP',
+  'crystalline-field-permanence':        'CRFPERM',
+  'total-crystalline-apex':              'TOTCRYSTAPEX',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

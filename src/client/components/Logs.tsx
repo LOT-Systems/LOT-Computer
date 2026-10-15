@@ -4479,6 +4479,78 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'resonance_amplitude_peak') {
+          const amplitude = log.metadata?.amplitude as string | undefined
+          const avgConf   = log.metadata?.avgConf   as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RESAMP:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">AMPLITUDE</span>
+                  <span className="tabular-nums">{amplitude ?? 'PEAK'}</span>
+                </div>
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FIELD CONF</span>
+                    <span className="tabular-nums">{Math.round(avgConf * 100)}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CRYSTALLINE RING · SELF-REINFORCING</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'crystalline_field_permanence') {
+          const ppersistDays = log.metadata?.ppersistDays as number | undefined
+          const rampConf     = log.metadata?.rampConf     as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CRFPERM:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">SUBSTRATE</span>
+                  <span className="tabular-nums">PERMANENT</span>
+                </div>
+                {ppersistDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PERSIST DAYS</span>
+                    <span className="tabular-nums">{ppersistDays}</span>
+                  </div>
+                )}
+                {rampConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AMP CONF</span>
+                    <span className="tabular-nums">{Math.round(rampConf * 100)}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">NOT MAINTAINED — INHABITED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'total_crystalline_apex') {
+          const domainCount = log.metadata?.domainCount as number | undefined
+          const avgConf     = log.metadata?.avgConf     as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TOTCRYSTAPEX:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">APEX</span>
+                  <span className="tabular-nums">TOTAL CRYSTALLINE</span>
+                </div>
+                {domainCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DOMAINS 6H</span>
+                    <span className="tabular-nums">{domainCount}</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">APEX CONF</span>
+                    <span className="tabular-nums">{Math.round(avgConf * 100)}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ARCHITECTURE IS ITS OWN CEILING</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

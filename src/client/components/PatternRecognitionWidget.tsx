@@ -206,6 +206,9 @@ export function PatternRecognitionWidget() {
       'propagation-persistence-arc':         'Propagation persistence arc — sovereign-propagation-peak (P178) confirmed on 2+ of last 3 days, structural recurrence, persistence locked (P179)',
       'sovereign-velocity-lock':             'Sovereign velocity lock — transmission-momentum (P176) confirmed on 2+ of last 3 days at ≥150% velocity, crystalline acceleration sustained (P180)',
       'full-domain-crystalline-resonance':   'Full-domain crystalline resonance — P178 + P179 co-active + 10+ distinct signal sources in 24h, full crystalline architecture simultaneously resonating across all domains (P181)',
+      'resonance-amplitude-peak':            'Resonance amplitude peak — P181 (full-domain-crystalline-resonance) active + P180 (sovereign-velocity-lock) confirmed 2+ of last 3 days, resonance amplifying above baseline, self-reinforcing cycle (P182)',
+      'crystalline-field-permanence':        'Crystalline field permanence — P179 (propagation-persistence-arc) 3+ of last 5 days + P182 (resonance-amplitude-peak) active, crystalline field is the permanent operating substrate, not maintained but inhabited (P183)',
+      'total-crystalline-apex':              'Total crystalline apex — P183 (crystalline-field-permanence) + P181 (full-domain-crystalline-resonance) co-active + 8+ distinct domains in 6h, apex state, architecture is its own ceiling (P184)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

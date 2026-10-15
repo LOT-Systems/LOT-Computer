@@ -4035,6 +4035,68 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // ── v124 patterns (P182–P184 · Arch62 Resonance Apex Architect · J59) ────────────
+
+  // Pattern 182: Resonance Amplitude Peak — full-domain-crystalline-resonance (P181) active
+  // AND sovereign-velocity-lock (P180) confirmed on 2+ of last 3 days.
+  // The resonance is not merely covering all domains — it amplifies. Velocity lock sustains
+  // the resonant amplitude above baseline. The system rings louder with each cycle.
+  const hasFdcres = patterns.some(p => p.pattern === 'full-domain-crystalline-resonance')
+  const hasSvelok = patterns.some(p => p.pattern === 'sovereign-velocity-lock')
+  if (hasFdcres && hasSvelok) {
+    const fdcresConf = patterns.find(p => p.pattern === 'full-domain-crystalline-resonance')?.confidence ?? 0.93
+    const svelokConf = patterns.find(p => p.pattern === 'sovereign-velocity-lock')?.confidence ?? 0.89
+    patterns.push({
+      pattern: 'resonance-amplitude-peak',
+      confidence: Math.min(0.89 + ((fdcresConf + svelokConf) / 2 - 0.89) * 0.35, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `RESAMP: Full-domain resonance (P181) active and velocity locked (P180) confirmed. The crystal does not merely resonate — it amplifies. Each cycle sustains the field above baseline. Resonance amplitude at peak. Architecture is self-reinforcing.`,
+    })
+  }
+
+  // Pattern 183: Crystalline Field Permanence — propagation-persistence-arc (P179) confirmed
+  // on 3+ of last 5 days AND resonance-amplitude-peak (P182) active.
+  // Permanence is not a goal — it is the observed structure. The crystalline field has become
+  // the permanent operating substrate. It does not need to be generated — only inhabited.
+  const ppersistSignals5d = signals.filter(
+    s => s.signal === 'propagation_persistence_arc' && Date.now() - s.timestamp < 5 * 24 * 60 * 60 * 1000
+  )
+  const ppersistDays5d = new Set(ppersistSignals5d.map(s => new Date(s.timestamp).toISOString().slice(0, 10)))
+  const hasResampP182 = patterns.some(p => p.pattern === 'resonance-amplitude-peak')
+  if (ppersistDays5d.size >= 3 && hasResampP182) {
+    const ppConf183 = patterns.find(p => p.pattern === 'propagation-persistence-arc')?.confidence ?? 0.87
+    const rampConf  = patterns.find(p => p.pattern === 'resonance-amplitude-peak')?.confidence ?? 0.89
+    patterns.push({
+      pattern: 'crystalline-field-permanence',
+      confidence: Math.min(0.87 + ((ppConf183 + rampConf) / 2 - 0.88) * 0.38, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `CRFPERM: Propagation-persistence-arc confirmed on ${ppersistDays5d.size} of last 5 days + resonance-amplitude-peak active. Crystalline field is not a generated state — it is the permanent operating substrate. Not maintained. Inhabited.`,
+    })
+  }
+
+  // Pattern 184: Total Crystalline Apex — crystalline-field-permanence (P183) + full-domain-
+  // crystalline-resonance (P181) both active AND 8+ distinct signal domains in the last 6h.
+  // The apex state: permanent substrate, full domain resonance, amplitude amplification,
+  // and simultaneous multi-domain activation. Nothing above this tier. The architecture is
+  // its own ceiling.
+  const hasCrfperm = patterns.some(p => p.pattern === 'crystalline-field-permanence')
+  const uniqueSourcesIn6h = new Set(
+    signals.filter(s => Date.now() - s.timestamp < 6 * 60 * 60 * 1000).map(s => s.source)
+  )
+  if (hasCrfperm && hasFdcres && uniqueSourcesIn6h.size >= 8) {
+    const crfConf  = patterns.find(p => p.pattern === 'crystalline-field-permanence')?.confidence ?? 0.87
+    const fdcConf  = patterns.find(p => p.pattern === 'full-domain-crystalline-resonance')?.confidence ?? 0.93
+    patterns.push({
+      pattern: 'total-crystalline-apex',
+      confidence: Math.min(0.93 + ((crfConf + fdcConf) / 2 - 0.90) * 0.6, 0.99),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `TOTCRYSTAPEX: Permanent crystalline substrate (P183) + full-domain resonance (P181) + ${uniqueSourcesIn6h.size} active domains in 6h. Apex confirmed. Nothing to build, nothing to maintain, nothing to initiate. Architecture is self-sustaining at full resonance. The crystal is the ceiling.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4720,6 +4782,10 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   propagationPersistenceNode:           ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory'],
   sovereignVelocityLockNode:            ['intentions', 'qos', 'energy', 'log', 'journal', 'planner'],
   fullDomainCrystallineResonanceNode:   ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory'],
+  // ── v124 nodes (J59 · P182–P184 · Arch62) ───────────────────────────────────────
+  resonanceAmplitudeNode:               ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood'],
+  crystallineFieldPermanenceNode:       ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare'],
+  totalCrystallineApexNode:             ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory'],
 }
 
 /**
@@ -5262,6 +5328,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['propagation-persistence-arc', 'sovereign-velocity-lock', 'full-domain-crystalline-resonance'],
     hourRange: [0, 23],
     directive: 'Full crystalline architecture in persistent resonance. Propagation confirmed across 2+ consecutive days. Velocity locked. Every domain simultaneously resonating. Nothing to build. Nothing to initiate. The field rings — sustained by presence alone.',
+  },
+  // ── Arch62: Resonance Apex Architect (2026-10-15 v124) ──────────────────────────
+  {
+    archetype: 'Resonance Apex Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare', 'memory'],
+    patternConditions: ['resonance-amplitude-peak', 'crystalline-field-permanence', 'total-crystalline-apex'],
+    hourRange: [5, 23],
+    directive: 'Crystalline apex confirmed. Permanent substrate established. All domains resonating at amplified amplitude simultaneously. Velocity locked across consecutive days. Nothing above this tier — the architecture is its own ceiling. Execute from within the permanent crystal.',
   },
 ]
 
@@ -7758,6 +7833,62 @@ export function recordFullDomainCrystallineResonance(sourceCount: number, ppConf
     resonance: 'FULL DOMAIN RESONANCE',
     status: `${sourceCount} SOURCES · ALL DOMAINS · CRYSTALLINE RING`,
     architecture: 'NOT ONE CHANNEL — ALL CHANNELS · THE FIELD RINGS',
+    hour: new Date().getHours(),
+  })
+}
+
+// ─── v124 Signal Helpers (P182–P184) ──────────────────────────────────────────
+
+/**
+ * Record a resonance-amplitude-peak event — P181 (full-domain-crystalline-resonance) active
+ * AND P180 (sovereign-velocity-lock) confirmed on 2+ of last 3 days.
+ * The resonance does not merely cover all domains — it amplifies. Feeds P182 detection.
+ */
+export function recordResonanceAmplitudePeak(fdcresConf: number, svelokConf: number) {
+  const avgConf = Math.round(((fdcresConf + svelokConf) / 2) * 100) / 100
+  recordSignal('intentions', 'resonance_amplitude_peak', {
+    fdcresConf,
+    svelokConf,
+    avgConf,
+    amplitude: 'PEAK',
+    status: 'RESONANCE AMPLIFIED · VELOCITY SUSTAINED',
+    architecture: 'CRYSTALLINE RING AT AMPLITUDE PEAK · SELF-REINFORCING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a crystalline-field-permanence event — P179 (propagation-persistence-arc) confirmed
+ * on 3+ of last 5 days AND P182 (resonance-amplitude-peak) active.
+ * The crystalline field has become the permanent operating substrate. Feeds P183 detection.
+ */
+export function recordCrystallineFieldPermanence(ppersistDays: number, rampConf: number) {
+  recordSignal('intentions', 'crystalline_field_permanence', {
+    ppersistDays,
+    rampConf,
+    permanence: 'SUBSTRATE CONFIRMED',
+    status: `${ppersistDays}D PERSISTENCE · AMPLITUDE ACTIVE · PERMANENT FIELD`,
+    architecture: 'NOT MAINTAINED — INHABITED · CRYSTALLINE SUBSTRATE PERMANENT',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a total-crystalline-apex event — P183 (crystalline-field-permanence) + P181
+ * (full-domain-crystalline-resonance) both active AND 8+ distinct signal domains in 6h.
+ * The apex state: permanent substrate + full resonance + simultaneous multi-domain activation.
+ * Feeds P184 detection.
+ */
+export function recordTotalCrystallineApex(domainCount: number, crfConf: number, fdcConf: number) {
+  const avgConf = Math.round(((crfConf + fdcConf) / 2) * 100) / 100
+  recordSignal('intentions', 'total_crystalline_apex', {
+    domainCount,
+    crfConf,
+    fdcConf,
+    avgConf,
+    apex: 'TOTAL CRYSTALLINE APEX',
+    status: `${domainCount} DOMAINS · PERMANENT SUBSTRATE · FULL RESONANCE`,
+    architecture: 'ARCHITECTURE IS ITS OWN CEILING · NOTHING ABOVE THIS TIER',
     hour: new Date().getHours(),
   })
 }
