@@ -13,9 +13,11 @@ import dayjsWeekOfYear from 'dayjs/plugin/weekOfYear.js'
 import dayjsIsoWeek from 'dayjs/plugin/isoWeek.js'
 import dayjsAdvancedFormat from 'dayjs/plugin/advancedFormat.js'
 import dayjsDayOfYear from 'dayjs/plugin/dayOfYear.js'
+import dayjsTimezone from 'dayjs/plugin/timezone.js'
 import { Dayjs as _Dayjs } from 'dayjs'
 
 _dayjs.extend(dayjsUtc)
+_dayjs.extend(dayjsTimezone)
 _dayjs.extend(dayjsRelativeTime)
 _dayjs.extend(dayjsWeekOfYear)
 _dayjs.extend(dayjsIsoWeek)
