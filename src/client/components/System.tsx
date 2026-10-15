@@ -621,7 +621,7 @@ export const System = React.memo(function SystemInner() {
             <Block label="Humidity:">
               <span
                 className={cn(
-                  !isMirrorOn && !isCustomThemeEnabled && weather?.humidity >= 50 && 'text-blue-500'
+                  !isMirrorOn && !isCustomThemeEnabled && (weather?.humidity ?? 0) >= 50 && 'text-blue-500'
                 )}
               >
                 {weather?.humidity}%

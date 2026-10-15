@@ -28,6 +28,9 @@ const MONTH_MESSAGES: Record<number, string> = {
   10: 'Ten months. Almost there.',
   11: 'Eleven months. One more.',
   12: 'One year with LOT. The portrait is complete — and still evolving.',
+  13: 'Thirteen months. Past the first year; the practice is the portrait.',
+  14: 'Fourteen months. One month remains in the arc.',
+  15: 'Fifteen months. The reveal is complete. The system knows you.',
 }
 
 const DISMISS_PHRASES = [
@@ -103,9 +106,9 @@ export const MonthlyPulseWidget: React.FC = () => {
 
   if (!visible) return null
 
-  const message = MONTH_MESSAGES[Math.min(monthNumber, 12)] ??
+  const message = MONTH_MESSAGES[Math.min(monthNumber, 15)] ??
     `Month ${monthNumber}. The journey continues.`
-  const capped = Math.min(monthNumber, 12)
+  const capped = Math.min(monthNumber, 15)
   const label = `Month ${capped}:`
 
   return (
