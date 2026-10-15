@@ -20,7 +20,7 @@ import { Button } from './Button'
 import { Page } from './Page'
 import { cn } from '#client/utils'
 
-type RouteName = 'sync' | 'logs' | 'system' | 'api' | 'settings'
+type RouteName = 'sync' | 'logs' | 'system' | 'api' | 'settings' | 'basics'
 
 type NavItem = { label: string | null; spacer?: boolean; route?: RouteName }
 
@@ -71,7 +71,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
           { label: 'Sync', route: 'sync' },
           { label: 'Log', route: 'logs' },
           { label: 'System', route: 'system' },
-          { label: 'Basics' },
+          { label: 'Basics', route: 'basics' },
           { label: 'Self-care' },
           { label: 'Kids' },
           { label: 'Home' },
@@ -83,7 +83,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
           { label: 'Sync' },
           { label: 'Logs' },
           { label: 'System', route: 'system' },
-          { label: 'Basics' },
+          { label: 'Basics', route: 'basics' },
           { label: 'Self-care' },
           { label: 'Kids' },
           { label: 'Home' },

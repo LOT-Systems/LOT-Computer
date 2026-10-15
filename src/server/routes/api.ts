@@ -18,6 +18,7 @@ import {
 } from '#shared/types'
 import config from '#server/config'
 import { fp } from '#shared/utils'
+import { verifyIssue } from '#server/utils/ration-cogs'
 import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
@@ -5612,6 +5613,228 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           logId: null,
         }
       }
+    }
+  )
+
+  // ============================================================================
+  // LOT-FM-001 — BASIC RATION MODULE
+  // Month 1: read-only manifest (public)
+  // Month 2: upgrade/stand-down state machine + roster intake
+  // Month 3: issue log + next issue
+  // ============================================================================
+
+  // GET /api/basic/subscription — current subscriber status
+  fastify.get('/basic/subscription', async (req: FastifyRequest, reply) => {
+    const sub = await fastify.models.BasicSubscription.findOne({
+      where: { userId: req.user.id },
+    })
+    return sub ?? null
+  })
+
+  // POST /api/basic/upgrade — USERSHIP → PENDING
+  fastify.post('/basic/upgrade', async (req: FastifyRequest, reply) => {
+    if (!req.user.tags.some(t => ['usership', 'admin'].includes(t.toLowerCase()))) {
+      return reply.status(403).send({ error: 'USERSHIP REQUIRED' })
+    }
+    const existing = await fastify.models.BasicSubscription.findOne({
+      where: { userId: req.user.id },
+    })
+    if (existing) {
+      return reply.status(409).send({ error: 'SUBSCRIPTION ALREADY EXISTS' })
+    }
+    const sub = await fastify.models.BasicSubscription.create({
+      userId: req.user.id,
+      status: 'PENDING',
+    })
+    const context = await getLogContext(req.user)
+    await fastify.models.Log.create({
+      userId: req.user.id,
+      event: 'other',
+      text: 'Basic ration upgrade initiated — PENDING',
+      metadata: { type: 'basic_upgrade', subscriptionId: sub.id },
+      context,
+    })
+    return sub
+  })
+
+  // POST /api/basic/roster — roster intake → ON_STRENGTH + schedule first issue
+  fastify.post<{ Body: {
+    shippingName: string; shippingLine1: string; shippingLine2?: string
+    shippingCity: string; shippingState: string; shippingZip: string
+    shippingCountry: string; shirtSize: string; shoeSize: string
+  } }>(
+    '/basic/roster',
+    async (req, reply) => {
+      const sub = await fastify.models.BasicSubscription.findOne({
+        where: { userId: req.user.id },
+      })
+      if (!sub) {
+        return reply.status(404).send({ error: 'NO SUBSCRIPTION FOUND' })
+      }
+      if (sub.status !== 'PENDING') {
+        return reply.status(409).send({ error: 'ROSTER ALREADY CONFIRMED' })
+      }
+
+      const REQUIRED = ['shippingName', 'shippingLine1', 'shippingCity', 'shippingState', 'shippingZip', 'shippingCountry', 'shirtSize', 'shoeSize'] as const
+      const body = (req.body ?? {}) as Record<string, unknown>
+      const clean = (v: unknown) => (typeof v === 'string' ? v.trim().slice(0, 200) : '')
+      const roster = {
+        shippingName: clean(body.shippingName),
+        shippingLine1: clean(body.shippingLine1),
+        shippingLine2: clean(body.shippingLine2),
+        shippingCity: clean(body.shippingCity),
+        shippingState: clean(body.shippingState),
+        shippingZip: clean(body.shippingZip),
+        shippingCountry: clean(body.shippingCountry),
+        shirtSize: clean(body.shirtSize),
+        shoeSize: clean(body.shoeSize),
+      }
+      const missing = REQUIRED.filter(k => !roster[k])
+      if (missing.length) {
+        return reply.status(400).send({ error: `MISSING FIELDS: ${missing.join(', ')}` })
+      }
+
+      const now = new Date()
+      // First issue: 1st of next month
+      const cadenceStart = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+      const periodLabel = cadenceStart.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()
+
+      await sub.update({
+        ...roster,
+        status: 'ON_STRENGTH',
+        cadenceStart,
+      })
+
+      const firstIssue = verifyIssue(1)
+      if (!firstIssue.ok) {
+        return reply.status(500).send({ error: 'MARGIN GATE: ISSUE 1 BREACHES ENVELOPE' })
+      }
+
+      await fastify.models.BasicIssue.create({
+        subscriptionId: sub.id,
+        userId: req.user.id,
+        issueNumber: 1,
+        periodLabel,
+        itemCount: firstIssue.items,
+        marginOk: firstIssue.ok,
+        status: 'SCHEDULED',
+        issuedAt: cadenceStart,
+      })
+
+      const context = await getLogContext(req.user)
+      await fastify.models.Log.create({
+        userId: req.user.id,
+        event: 'other',
+        text: `Basic ration roster confirmed — ON STRENGTH. First issue: ${periodLabel}`,
+        metadata: { type: 'basic_roster', subscriptionId: sub.id },
+        context,
+      })
+
+      return sub
+    }
+  )
+
+  // POST /api/basic/stand-down — ON_STRENGTH → USERSHIP (drops ration, retains AI)
+  fastify.post('/basic/stand-down', async (req: FastifyRequest, reply) => {
+    const sub = await fastify.models.BasicSubscription.findOne({
+      where: { userId: req.user.id },
+    })
+    if (!sub) {
+      return reply.status(404).send({ error: 'NO SUBSCRIPTION FOUND' })
+    }
+
+    // Cancel any scheduled issues
+    await fastify.models.BasicIssue.update(
+      { status: 'CANCELLED' },
+      { where: { subscriptionId: sub.id, status: 'SCHEDULED' } }
+    )
+
+    await sub.destroy()
+
+    const context = await getLogContext(req.user)
+    await fastify.models.Log.create({
+      userId: req.user.id,
+      event: 'other',
+      text: 'Basic ration stand-down — ration dropped, AI plan retained',
+      metadata: { type: 'basic_stand_down' },
+      context,
+    })
+
+    return { ok: true }
+  })
+
+  // GET /api/basic/issues — issue log for this subscriber
+  fastify.get('/basic/issues', async (req: FastifyRequest, reply) => {
+    const sub = await fastify.models.BasicSubscription.findOne({
+      where: { userId: req.user.id },
+    })
+    if (!sub) return []
+    const issues = await fastify.models.BasicIssue.findAll({
+      where: { subscriptionId: sub.id },
+      order: [['issueNumber', 'ASC']],
+    })
+    return issues
+  })
+
+  // POST /api/basic/issues/:id/advance — advance issue status (admin/fulfillment)
+  fastify.post<{ Params: { id: string }; Body: { status: string; trackingNumber?: string } }>(
+    '/basic/issues/:id/advance',
+    async (req, reply) => {
+      if (!req.user.isAdmin()) {
+        return reply.status(403).send({ error: 'FULFILLMENT ACCESS ONLY' })
+      }
+      const issue = await fastify.models.BasicIssue.findByPk(req.params.id)
+      if (!issue) return reply.status(404).send({ error: 'ISSUE NOT FOUND' })
+
+      // SCHEDULED → PACKED → SHIPPED → DELIVERED; CANCELLED from any non-terminal state.
+      const NEXT: Record<string, string[]> = {
+        SCHEDULED: ['PACKED', 'CANCELLED'],
+        PACKED: ['SHIPPED', 'CANCELLED'],
+        SHIPPED: ['DELIVERED'],
+        DELIVERED: [],
+        CANCELLED: [],
+      }
+      if (!(NEXT[issue.status] ?? []).includes(req.body.status)) {
+        return reply.status(409).send({ error: `INVALID TRANSITION ${issue.status} → ${req.body.status}` })
+      }
+
+      const updates: Record<string, any> = { status: req.body.status }
+      if (req.body.trackingNumber) updates.trackingNumber = req.body.trackingNumber
+      if (req.body.status === 'SHIPPED')   updates.shippedAt   = new Date()
+      if (req.body.status === 'DELIVERED') updates.deliveredAt = new Date()
+
+      await issue.update(updates)
+
+      // When issue is delivered, schedule next issue and advance to STEADY_STATE
+      if (req.body.status === 'DELIVERED') {
+        const sub = await fastify.models.BasicSubscription.findByPk(issue.subscriptionId)
+        if (sub && sub.status === 'ON_STRENGTH') {
+          await sub.update({ status: 'STEADY_STATE' })
+        }
+
+        if (sub) {
+          const nextIssueNumber = issue.issueNumber + 1
+          const issueDate = new Date()
+          issueDate.setMonth(issueDate.getMonth() + 1, 1)
+          const periodLabel = issueDate.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()
+
+          const margin = verifyIssue(nextIssueNumber)
+          const itemCount = margin.items
+
+          await fastify.models.BasicIssue.create({
+            subscriptionId: sub.id,
+            userId: sub.userId,
+            issueNumber: nextIssueNumber,
+            periodLabel,
+            itemCount,
+            marginOk: margin.ok,
+            status: 'SCHEDULED',
+            issuedAt: issueDate,
+          })
+        }
+      }
+
+      return issue
     }
   )
 }

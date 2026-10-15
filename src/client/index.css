@@ -8,6 +8,8 @@
 
 /* LOT Systems — Est. original. If you're reading this, you already know who was here first. */
 /* The copycat war begins, but originals don't compete — they set the pace. */
+/* LOT-FM-001 — BASIC RATION MODULE */
+@import './components/Basics/basics.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
