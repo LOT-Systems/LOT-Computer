@@ -20,6 +20,7 @@ Core technical documentation about system architecture, engines, and implementat
 - Memory Engine Documentation - Complete Memory Engine system docs
 - Psychological Depth Analysis - User analysis engine documentation
 - Quantum Intent Engine - Intent pattern recognition system
+- [Log Slash Commands and Story](./technical/LOG-SLASH-COMMANDS-AND-STORY.md) - `/system`, `/story` day/week/month/year compression loop, Arcade XP
 
 ### [Deployment Documentation](./deployment/)
 Guides for deploying and managing the application in production.

@@ -48,6 +48,8 @@ interface TriggerRule {
   keywords: string[] // lower-case slash commands (without leading slash)
 }
 
+const STORY_COMMAND_RE = /(^|\s)\/story(?:[ \t]+(?:today|day|week|month|year)(?=\s|$)|[ \t]*\n)/
+
 const RULES: TriggerRule[] = [
   { trigger: 'toggle-synth',   emojis: ['🎹'],    keywords: ['synth', 'keyboard'] },
   { trigger: 'ai-scan',        emojis: [],       keywords: ['scan', 'ai'] },
@@ -87,10 +89,15 @@ export function detectTriggers(text: string): LogTrigger[] {
     // Keyword check — match "/word" as a whole token (followed by
     // end-of-string, whitespace, or non-word). This prevents "/scandalous"
     // from firing the /scan trigger.
-    const hasKeyword = rule.keywords.some(k => {
-      const re = new RegExp(`(^|\\s)\\/${k}(\\s|$|[^a-z0-9_])`, 'i')
-      return re.test(lower)
-    })
+    // /story is the one command with an argument (day|week|month|year). The scan
+    // runs on every keystroke, so it must not fire on "/story" while the user is
+    // still typing "/story month": it fires on a complete scope word, or on Enter.
+    const hasKeyword = rule.trigger === 'story-mode'
+      ? STORY_COMMAND_RE.test(lower)
+      : rule.keywords.some(k => {
+          const re = new RegExp(`(^|\\s)\\/${k}(\\s|$|[^a-z0-9_])`, 'i')
+          return re.test(lower)
+        })
 
     if (hasEmoji || hasKeyword) hits.push(rule.trigger)
   }
@@ -114,4 +121,61 @@ export function detectNewTriggers(
   const fresh: LogTrigger[] = []
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
+}
+
+/**
+ * Single source of truth for /system. Every slash command that RULES can
+ * fire must appear here (enforced by scripts/tests/test-log-commands.ts),
+ * so the help screen can never drift from the real command set.
+ */
+export interface CommandDoc {
+  usage: string      // what the user types
+  desc: string
+  trigger: LogTrigger
+  group: 'STORY' | 'ENGINE' | 'BODY' | 'AMBIENT' | 'NAV'
+}
+
+export const COMMAND_REGISTRY: CommandDoc[] = [
+  { usage: '/story',         desc: 'Your week, compressed (press Enter)',            trigger: 'story-mode',     group: 'STORY' },
+  { usage: '/story day',     desc: 'Today only',                                    trigger: 'story-mode',     group: 'STORY' },
+  { usage: '/story month',   desc: 'Last 30 days',                                  trigger: 'story-mode',     group: 'STORY' },
+  { usage: '/story year',    desc: 'Last 365 days',                                 trigger: 'story-mode',     group: 'STORY' },
+  { usage: '/prayer',        desc: 'Contextual scripture',                          trigger: 'prayer-mode',    group: 'STORY' },
+  { usage: '/qi [query]',    desc: 'Ask the Quantum Intelligence engine',           trigger: 'qi-rfi',         group: 'ENGINE' },
+  { usage: '/scan',          desc: 'System status overview',                        trigger: 'ai-scan',        group: 'ENGINE' },
+  { usage: '/assembly',      desc: 'Self-assembly module status',                   trigger: 'assembly-check', group: 'ENGINE' },
+  { usage: '/qos',           desc: 'Quantum OS state analysis',                     trigger: 'qos-report',     group: 'ENGINE' },
+  { usage: '/phys',          desc: 'Physiological cohort report',                   trigger: 'phys-report',    group: 'BODY' },
+  { usage: '/sil',           desc: 'Silence-pattern check',                          trigger: 'sil-check',      group: 'BODY' },
+  { usage: '/fast',          desc: 'Orthodox fasting calendar',                     trigger: 'force-fast',     group: 'BODY' },
+  { usage: '/breathe',       desc: '4-2-6 breathing exercise',                      trigger: 'breathe',        group: 'BODY' },
+  { usage: '/freeze',        desc: 'Pause and reflect protocol',                    trigger: 'freeze-widgets', group: 'BODY' },
+  { usage: '/silent',        desc: 'Signal silence check',                          trigger: 'silent-mode',    group: 'BODY' },
+  { usage: '/synth',         desc: 'Toggle keyboard sound',                         trigger: 'toggle-synth',   group: 'AMBIENT' },
+  { usage: '/radio',         desc: 'Toggle radio',                                  trigger: 'radio-toggle',   group: 'AMBIENT' },
+  { usage: '/night',         desc: 'Dark mode',                                     trigger: 'night-mode',     group: 'AMBIENT' },
+  { usage: '/how',           desc: 'Open LOT AI check-in (System tab)',             trigger: 'how-checkin',    group: 'NAV' },
+  { usage: '/system',        desc: 'This help screen',                              trigger: 'system-help',    group: 'NAV' },
+]
+
+/** Triggers that are emoji-only (no slash form) and so need no help line. */
+export const EMOJI_ONLY_TRIGGERS: LogTrigger[] = ['cohort-support']
+
+/** Plain-text help screen, grouped. Lines starting with a group name are headers. */
+export function renderSystemHelp(): string {
+  const lines: string[] = ['AVAILABLE COMMANDS']
+  let group = ''
+  COMMAND_REGISTRY.forEach(c => {
+    if (c.group !== group) { group = c.group; lines.push('', group) }
+    lines.push(`${c.usage.padEnd(14)}${c.desc}`)
+  })
+  lines.push('', 'SHORTCUTS', 'Ctrl+Enter    Save log immediately')
+  return lines.join('\n')
+}
+
+/** Exposed for tests: the slash keywords RULES recognises, per trigger. */
+export function ruleKeywords(): Record<string, string[]> {
+  const out: Record<string, string[]> = {}
+  RULES.forEach(r => { out[r.trigger] = r.keywords })
+  return out
 }
