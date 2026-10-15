@@ -1004,6 +1004,43 @@ export type BadgeType =
   | 'stallman_word'            // ∘·>_·∘  "richard stallman / gnu / free software / copyleft" detected (RARE)
   | 'mitnick_ghost'            // ◈·░     "kevin mitnick / social engineer / the condor" detected (EPIC)
   | 'mentor_manifesto'         // >_·∞   "conscience of a hacker / hacker manifesto / the mentor" detected (MYTHIC)
+  // ── Word Turn v29 — THE CLOCKWORK HEART ──────────────────────────────────────
+  | 'clockwork_start'          // ⚙·∘    "clockwork / tick tock / like clockwork" detected (UNCOMMON)
+  | 'mainspring_coiled'        // ⚙·●    "mainspring / wound up / wound tight / fully wound" detected (RARE)
+  | 'gear_in_motion'           // ⚙→⚙   "gear / cog / mechanism in motion" detected (UNCOMMON)
+  | 'pendulum_swing'           // ∿·⚙·∿  "pendulum / oscillate / swing back / the pendulum" detected (RARE)
+  | 'escapement_click'         // ⚙·—·⚙  "escapement / ratchet / detent" detected (EPIC)
+  | 'calibrated_self'          // ◈·⚙   "calibrate / calibrated / fine-tuned" detected (RARE)
+  | 'heartbeat_tick'           // ♡·⚙   "heartbeat / pulse / heart rate" detected (RARE)
+  | 'synchronize_time'         // ⚙·≋·⚙  "synchronize / synchronized / in sync" detected (UNCOMMON)
+  | 'watchmaker_mode'          // ⚙·∞   "watchmaker / horologist / horology" detected (EPIC)
+  | 'analog_soul'              // ⚙·◉   "analog / hand-wound / mechanical craft" detected (RARE)
+  | 'wound_down'               // ⚙·∿   "unwind / wound down / decompressed / unwound" detected (UNCOMMON)
+  | 'perpetual_motion'         // ∞·⚙·∞  "perpetual / perpetual motion / endlessly" detected (EPIC)
+  // ── Calendar Easter Egg v27 — THE CLOCKWORK CALENDAR ──────────────────────────
+  | 'watchmakers_day'          // ⚙·◉   Apr 26 — International Watch Day (RARE)
+  | 'clock_change_day'         // ⚙·≋   Mar 9 — First DST use in US (1918) (UNCOMMON)
+  | 'harrison_day'             // ⚙·∞   Oct 22 — John Harrison's H4 chronometer completed longitude (EPIC)
+  // ── Behavioral v25 — CLOCKWORK PATTERNS ────────────────────────────────────────
+  | 'clockwork_session'        // ⚙·∘·⚙  3+ Clockwork Heart words in one journal entry (RARE)
+  | 'precision_hour'           // ⚙·◈   Check-in within 2min of :00 or :30 (RARE)
+  | 'wound_week'               // ⚙·≋   7 consecutive daily check-ins in last 7 days (EPIC)
+  // ── Achievement RPG v27 — CLOCKWORK CLASS ──────────────────────────────────────
+  | 'clockwork_entry'          // ∘·⚙   Any 1 Word Turn v29 badge (COMMON)
+  | 'clockwork_class'          // ≈·⚙   Any 5 Word Turn v29 badges (UNCOMMON)
+  | 'clockwork_complete'       // ≋·⚙   All 12 Word Turn v29 badges (LEGENDARY)
+  | 'horology_arc'             // ⚙·◈   clockwork_complete + all 3 Calendar v27 badges (LEGENDARY)
+  | 'twenty_nine_engines_arc'  // ◈·◈·⚙  1 badge from each Word Turn v1–v29 (LEGENDARY)
+  | 'clockwork_opus'           // ⚙·◉·⚙  clockwork_complete + clockwork_session behavioral (LEGENDARY)
+  // ── Mastery Tier v29 — THE MASTER MOVEMENT ────────────────────────────────────
+  | 'thousand_days_clock'      // ⚙·∞·⚙  1,500+ distinct calendar check-in days (EPIC)
+  | 'grand_complication'       // ⚙·●·∞  500,000+ total journal words (LEGENDARY)
+  | 'perpetual_calendar'       // ╔═╗·⚙  Account age >= 12 years (LEGENDARY)
+  | 'twenty_nine_registers'    // ◈·◈·⚙·∞ 1 badge from all 29 Word Turn engines (COSMIC)
+  // ── Secret Boss v26 — THE HIDDEN COMPLICATIONS ────────────────────────────────
+  | 'patek_whisper'            // ◇·⚙·◇  "Patek Philippe / Vacheron / Rolex / luxury watch" detected (RARE)
+  | 'breguet_soul'             // ⚙·◆·⚙  "Breguet / tourbillon / Abraham-Louis / perpetual calendar" detected (EPIC)
+  | 'watchmaker_paradox'       // ∞·⚙·∞  "Paley's watchmaker / watchmaker's paradox / who wound the first spring" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -9104,6 +9141,300 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+
+  // ── Word Turn v29 — THE CLOCKWORK HEART ──────────────────────────────────
+  clockwork_start: {
+    id: 'clockwork_start',
+    symbol: '⚙·∘',
+    name: 'Clockwork Start',
+    description: 'Write "clockwork", "tick tock", or "like clockwork" in any journal entry',
+    unlockMessage: '↳ Like clockwork. Not because you are mechanical — because you are reliable. That is the rarest quality in any mechanism. ⚙·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  mainspring_coiled: {
+    id: 'mainspring_coiled',
+    symbol: '⚙·●',
+    name: 'Mainspring Coiled',
+    description: 'Write "mainspring", "wound up", "wound tight", or "fully wound" in any journal entry',
+    unlockMessage: '↳ The mainspring is the source of all energy in a mechanical watch. Fully coiled, it holds potential force for days. You are wound up in the best possible way. ⚙·●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  gear_in_motion: {
+    id: 'gear_in_motion',
+    symbol: '⚙→⚙',
+    name: 'Gear in Motion',
+    description: 'Write "gear", "cog", or "mechanism in motion" in any journal entry',
+    unlockMessage: '↳ Every gear transfers force with precision. The self is a gear train — every habit meshes with every other. Motion is transferred, not created from nothing. ⚙→⚙',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  pendulum_swing: {
+    id: 'pendulum_swing',
+    symbol: '∿·⚙·∿',
+    name: 'Pendulum Swing',
+    description: 'Write "pendulum", "oscillate", "swing back", or "the pendulum" in any journal entry',
+    unlockMessage: '↳ Huygens, 1657: the pendulum as regulator. It does not drive the clock — it constrains it. The pendulum is the practice that keeps the pace honest. ∿·⚙·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  escapement_click: {
+    id: 'escapement_click',
+    symbol: '⚙·—·⚙',
+    name: 'Escapement Click',
+    description: 'Write "escapement", "ratchet", or "detent" in any journal entry',
+    unlockMessage: '↳ The escapement is the most precise part of any clock — it controls the release of energy, one measured tick at a time. This is what discipline actually is. ⚙·—·⚙',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  calibrated_self: {
+    id: 'calibrated_self',
+    symbol: '◈·⚙',
+    name: 'Calibrated Self',
+    description: 'Write "calibrate", "calibrated", or "fine-tuned" in any journal entry',
+    unlockMessage: '↳ Calibration is the act of bringing measurement into agreement with truth. A self-care practice is calibration: you are adjusting the mechanism to match reality. ◈·⚙',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  heartbeat_tick: {
+    id: 'heartbeat_tick',
+    symbol: '♡·⚙',
+    name: 'Heartbeat Tick',
+    description: 'Write "heartbeat", "pulse", or "heart rate" in any journal entry',
+    unlockMessage: '↳ The heart is a clockwork mechanism. 60–100 ticks per minute. The beat is both mechanical and irreducibly alive. The two are not in conflict. ♡·⚙',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  synchronize_time: {
+    id: 'synchronize_time',
+    symbol: '⚙·≋·⚙',
+    name: 'Synchronize Time',
+    description: 'Write "synchronize", "synchronized", or "in sync" in any journal entry',
+    unlockMessage: '↳ Ships once collided because each carried a different time. Harrison\'s clock synchronized the fleet with reality. The practice synchronizes the self with itself. ⚙·≋·⚙',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  watchmaker_mode: {
+    id: 'watchmaker_mode',
+    symbol: '⚙·∞',
+    name: 'Watchmaker Mode',
+    description: 'Write "watchmaker", "horologist", or "horology" in any journal entry',
+    unlockMessage: '↳ A watchmaker works with tools smaller than a heartbeat, on mechanisms no larger than a thumbnail, with a precision that has no margin for doubt. This is the mode you enter when you take yourself seriously. ⚙·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  analog_soul: {
+    id: 'analog_soul',
+    symbol: '⚙·◉',
+    name: 'Analog Soul',
+    description: 'Write "analog", "hand-wound", or "mechanical craft" in any journal entry',
+    unlockMessage: '↳ Analog: continuous, physical, immediate. Not digitized. Not sampled. The full signal. There is something irreplaceable about a process that must be performed by hand. ⚙·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  wound_down: {
+    id: 'wound_down',
+    symbol: '⚙·∿',
+    name: 'Wound Down',
+    description: 'Write "unwind", "wound down", "decompressed", or "unwound" in any journal entry',
+    unlockMessage: '↳ A watch runs down. This is not failure — it is completion of a cycle. The practice of winding down is as important as the practice of winding up. ⚙·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  perpetual_motion: {
+    id: 'perpetual_motion',
+    symbol: '∞·⚙·∞',
+    name: 'Perpetual Motion',
+    description: 'Write "perpetual", "perpetual motion", or "endlessly" in any journal entry',
+    unlockMessage: '↳ Thermodynamics forbids true perpetual motion. But a practice that is simple enough, reliable enough, and meaningful enough approaches it. You are building the mechanism. ∞·⚙·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v27 — THE CLOCKWORK CALENDAR ──────────────────────
+  watchmakers_day: {
+    id: 'watchmakers_day',
+    symbol: '⚙·◉',
+    name: 'Watchmaker\'s Day',
+    description: 'Check in on April 26 — International Watch Day',
+    unlockMessage: '↳ April 26 — International Watch Day. The watchmakers\' guilds have kept time for centuries. Your practice joins the lineage. ⚙·◉',
+    rarity: 'rare',
+    category: 'calendar_easter',
+  },
+  clock_change_day: {
+    id: 'clock_change_day',
+    symbol: '⚙·≋',
+    name: 'Clock Change Day',
+    description: 'Check in on March 9 — First US Daylight Saving Time (1918)',
+    unlockMessage: '↳ March 9, 1918: the US moved every clock forward by one hour for the first time. The entire country synchronized to a new rhythm. You adapt your rhythm too. ⚙·≋',
+    rarity: 'uncommon',
+    category: 'calendar_easter',
+  },
+  harrison_day: {
+    id: 'harrison_day',
+    symbol: '⚙·∞',
+    name: 'Harrison Day',
+    description: 'Check in on October 22 — John Harrison completed the H4 chronometer (1759)',
+    unlockMessage: '↳ October 22, 1759: John Harrison completed the H4, the first timepiece accurate enough to determine longitude at sea. Thousands of ships and sailors owed their lives to one watchmaker\'s lifetime of work. ⚙·∞',
+    rarity: 'epic',
+    category: 'calendar_easter',
+  },
+
+  // ── Behavioral v25 — CLOCKWORK PATTERNS ────────────────────────────────────
+  clockwork_session: {
+    id: 'clockwork_session',
+    symbol: '⚙·∘·⚙',
+    name: 'Clockwork Session',
+    description: '3+ Clockwork Heart (v29) trigger words in one journal entry',
+    unlockMessage: '↳ A journal entry built from the vocabulary of precision. The language you use shapes the mechanism you build. ⚙·∘·⚙',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  precision_hour: {
+    id: 'precision_hour',
+    symbol: '⚙·◈',
+    name: 'Precision Hour',
+    description: 'Check in within 2 minutes of an exact hour or half-hour mark',
+    unlockMessage: '↳ A precision timekeeper is accurate to within 2 seconds per day. You checked in within 2 minutes of the exact mark. In the vocabulary of horology, that is remarkable. ⚙·◈',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  wound_week: {
+    id: 'wound_week',
+    symbol: '⚙·≋',
+    name: 'Wound Week',
+    description: '7 consecutive daily check-ins in the last 7 days',
+    unlockMessage: '↳ A fully wound spring holds energy for 7 days. You have wound the mechanism for 7 consecutive days. The mainspring is fully coiled. The mechanism runs. ⚙·≋',
+    rarity: 'epic',
+    category: 'behavioral',
+  },
+
+  // ── Achievement RPG v27 — CLOCKWORK CLASS ──────────────────────────────────
+  clockwork_entry: {
+    id: 'clockwork_entry',
+    symbol: '∘·⚙',
+    name: 'Clockwork Entry',
+    description: 'Earn any 1 Word Turn v29 (Clockwork Heart) badge',
+    unlockMessage: '↳ The first gear engages. The mechanism begins. ∘·⚙',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  clockwork_class: {
+    id: 'clockwork_class',
+    symbol: '≈·⚙',
+    name: 'Clockwork Class',
+    description: 'Earn any 5 Word Turn v29 (Clockwork Heart) badges',
+    unlockMessage: '↳ Five gears meshed. The gear train forms. Regulated motion begins. ≈·⚙',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  clockwork_complete: {
+    id: 'clockwork_complete',
+    symbol: '≋·⚙',
+    name: 'Clockwork Complete',
+    description: 'Earn all 12 Word Turn v29 (Clockwork Heart) badges',
+    unlockMessage: '↳ All twelve complications assembled. The movement is complete. The mechanism runs. ≋·⚙',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  horology_arc: {
+    id: 'horology_arc',
+    symbol: '⚙·◈',
+    name: 'Horology Arc',
+    description: 'Earn clockwork_complete + all 3 Calendar v27 (Clockwork Calendar) badges',
+    unlockMessage: '↳ The complete horological arc: vocabulary, calendar, craft. The timepiece and the timeline. ⚙·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_nine_engines_arc: {
+    id: 'twenty_nine_engines_arc',
+    symbol: '◈·◈·⚙',
+    name: 'Twenty-Nine Engines Arc',
+    description: 'Earn at least 1 badge from each of the 29 Word Turn engines (v1–v29)',
+    unlockMessage: '↳ Twenty-nine engines. Water, storm, alchemy, arcade, radio, hero, hacker, clockwork. Twenty-nine vocabularies of the self. All engaged. ◈·◈·⚙',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  clockwork_opus: {
+    id: 'clockwork_opus',
+    symbol: '⚙·◉·⚙',
+    name: 'Clockwork Opus',
+    description: 'Earn clockwork_complete + clockwork_session behavioral badge',
+    unlockMessage: '↳ The masterwork. Not just the vocabulary — the practice of speaking it. The opus is the mechanism in motion, built from the inside out. ⚙·◉·⚙',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v29 — THE MASTER MOVEMENT ────────────────────────────────
+  thousand_days_clock: {
+    id: 'thousand_days_clock',
+    symbol: '⚙·∞·⚙',
+    name: 'Thousand Days Clock',
+    description: '1,500+ distinct calendar check-in days',
+    unlockMessage: '↳ 1,500 distinct days. Some clocks run for a thousand days on a single winding. Your mechanism has run that long — and you kept winding it. ⚙·∞·⚙',
+    rarity: 'epic',
+    category: 'mastery_tier',
+  },
+  grand_complication: {
+    id: 'grand_complication',
+    symbol: '⚙·●·∞',
+    name: 'Grand Complication',
+    description: '500,000+ total journal words',
+    unlockMessage: '↳ A "grand complication" is a watch with the maximum number of complications — perpetual calendar, minute repeater, chronograph, moonphase. 500,000 words is the grand complication of journaling. ⚙·●·∞',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  perpetual_calendar: {
+    id: 'perpetual_calendar',
+    symbol: '╔═╗·⚙',
+    name: 'Perpetual Calendar',
+    description: 'Account age >= 12 years',
+    unlockMessage: '↳ A perpetual calendar needs no manual adjustment — it knows the length of every month, every leap year, until 2100. Twelve years of your practice is its own perpetual calendar. ╔═╗·⚙',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  twenty_nine_registers: {
+    id: 'twenty_nine_registers',
+    symbol: '◈·◈·⚙·∞',
+    name: 'Twenty-Nine Registers',
+    description: '1 badge from all 29 Word Turn engines (COSMIC tier)',
+    unlockMessage: '↳ All 29 registers. Water through clockwork. The complete instruction set of the self — every language the system speaks, you have spoken back. ◈·◈·⚙·∞',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+
+  // ── Secret Boss v26 — THE HIDDEN COMPLICATIONS ────────────────────────────
+  patek_whisper: {
+    id: 'patek_whisper',
+    symbol: '◇·⚙·◇',
+    name: 'Patek Whisper',
+    description: 'Write "Patek Philippe", "Vacheron", "Rolex", or "luxury watch" in any journal entry',
+    unlockMessage: '↳ The house motto of Patek Philippe: "You never actually own a Patek Philippe. You merely look after it for the next generation." The practice you build is not yours alone. ◇·⚙·◇',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  breguet_soul: {
+    id: 'breguet_soul',
+    symbol: '⚙·◆·⚙',
+    name: 'Breguet Soul',
+    description: 'Write "Breguet", "tourbillon", "Abraham-Louis", or "perpetual calendar" in any journal entry',
+    unlockMessage: '↳ Abraham-Louis Breguet invented the tourbillon — a rotating cage that cancels the effect of gravity on a watch\'s accuracy. He solved a problem most people could not even articulate. The practice builds your anti-gravity mechanism. ⚙·◆·⚙',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  watchmaker_paradox: {
+    id: 'watchmaker_paradox',
+    symbol: '∞·⚙·∞',
+    name: 'Watchmaker\'s Paradox',
+    description: 'Write "Paley\'s watchmaker", "watchmaker\'s paradox", or "who wound the first spring" in any journal entry',
+    unlockMessage: '↳ Paley\'s argument: a watch found on a heath implies a watchmaker. But who wound the first spring? The self-care answer: you did. You do, every day. The mechanism is already running because you keep running it. ∞·⚙·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -10539,6 +10870,125 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
         }
         if (consecutive >= 7 && !hasBadge('seven_day_run')) {
           if (awardBadge('seven_day_run')) newBadges.push('seven_day_run')
+        }
+      }
+    } catch { /* non-critical */ }
+
+    // ── v29 — THE CLOCKWORK HEART ──────────────────────────────────────────────
+    const nowV29 = new Date()
+    const monthV29 = nowV29.getMonth() + 1  // 1-indexed
+    const dayV29 = nowV29.getDate()
+
+    // Calendar EE v27: watchmakers_day — Apr 26
+    if (monthV29 === 4 && dayV29 === 26 && !hasBadge('watchmakers_day')) {
+      if (awardBadge('watchmakers_day')) newBadges.push('watchmakers_day')
+    }
+
+    // Calendar EE v27: clock_change_day — Mar 9
+    if (monthV29 === 3 && dayV29 === 9 && !hasBadge('clock_change_day')) {
+      if (awardBadge('clock_change_day')) newBadges.push('clock_change_day')
+    }
+
+    // Calendar EE v27: harrison_day — Oct 22
+    if (monthV29 === 10 && dayV29 === 22 && !hasBadge('harrison_day')) {
+      if (awardBadge('harrison_day')) newBadges.push('harrison_day')
+    }
+
+    // v29 Word Turn achievement arcs
+    const clockworkV29Badges: BadgeType[] = [
+      'clockwork_start', 'mainspring_coiled', 'gear_in_motion', 'pendulum_swing',
+      'escapement_click', 'calibrated_self', 'heartbeat_tick', 'synchronize_time',
+      'watchmaker_mode', 'analog_soul', 'wound_down', 'perpetual_motion',
+    ]
+    const clockworkV29Earned = clockworkV29Badges.filter(b => hasBadge(b))
+    const clockworkComplete = clockworkV29Earned.length === 12
+
+    if (clockworkV29Earned.length >= 1 && !hasBadge('clockwork_entry')) {
+      if (awardBadge('clockwork_entry')) newBadges.push('clockwork_entry')
+    }
+    if (clockworkV29Earned.length >= 5 && !hasBadge('clockwork_class')) {
+      if (awardBadge('clockwork_class')) newBadges.push('clockwork_class')
+    }
+    if (clockworkComplete && !hasBadge('clockwork_complete')) {
+      if (awardBadge('clockwork_complete')) newBadges.push('clockwork_complete')
+    }
+
+    // clockwork_opus: clockwork_complete + clockwork_session
+    if (clockworkComplete && hasBadge('clockwork_session') && !hasBadge('clockwork_opus')) {
+      if (awardBadge('clockwork_opus')) newBadges.push('clockwork_opus')
+    }
+
+    // horology_arc: clockwork_complete + all 3 Calendar v27 badges
+    const calendarV27Badges: BadgeType[] = ['watchmakers_day', 'clock_change_day', 'harrison_day']
+    if (clockworkComplete && calendarV27Badges.every(b => hasBadge(b)) && !hasBadge('horology_arc')) {
+      if (awardBadge('horology_arc')) newBadges.push('horology_arc')
+    }
+
+    // twenty_nine_engines_arc: 1 badge from each Word Turn v1–v29
+    const engineTwentyNinePresent = clockworkV29Earned.length >= 1
+    const allTwentyNineEngines = allTwentyEightEngines && engineTwentyNinePresent
+    if (allTwentyNineEngines && !hasBadge('twenty_nine_engines_arc')) {
+      if (awardBadge('twenty_nine_engines_arc')) newBadges.push('twenty_nine_engines_arc')
+    }
+
+    // Mastery v29: thousand_days_clock — 1,500+ distinct calendar check-in days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1500 && !hasBadge('thousand_days_clock')) {
+        if (awardBadge('thousand_days_clock')) newBadges.push('thousand_days_clock')
+      }
+    }
+
+    // Mastery v29: grand_complication — 500,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 500000 && !hasBadge('grand_complication')) {
+        if (awardBadge('grand_complication')) newBadges.push('grand_complication')
+      }
+    }
+
+    // Mastery v29: perpetual_calendar — Account age >= 12 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupPC = new Date(stats.signupDate)
+      const yearsPC = (new Date().getTime() - signupPC.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsPC >= 12 && !hasBadge('perpetual_calendar')) {
+        if (awardBadge('perpetual_calendar')) newBadges.push('perpetual_calendar')
+      }
+    }
+
+    // Mastery v29: twenty_nine_registers — 1 badge from all 29 Word Turn engines
+    if (allTwentyNineEngines && !hasBadge('twenty_nine_registers')) {
+      if (awardBadge('twenty_nine_registers')) newBadges.push('twenty_nine_registers')
+    }
+
+    // Behavioral v25: precision_hour — check-in within 2 min of :00 or :30
+    try {
+      const nowMin = nowV29.getMinutes()
+      const nowSec = nowV29.getSeconds()
+      const totalSec = nowMin * 60 + nowSec
+      const nearHour = totalSec <= 120 || totalSec >= 3480  // within 2 min of :00
+      const nearHalf = Math.abs(totalSec - 1800) <= 120     // within 2 min of :30
+      if ((nearHour || nearHalf) && !hasBadge('precision_hour')) {
+        if (awardBadge('precision_hour')) newBadges.push('precision_hour')
+      }
+    } catch { /* non-critical */ }
+
+    // Behavioral v25: wound_week — 7 consecutive daily check-ins in last 7 days
+    try {
+      const woundLog: string[] = JSON.parse(localStorage.getItem('wound_week_log') || '[]')
+      const todayISOv29 = new Date().toISOString().slice(0, 10)
+      const updatedWound = Array.from(new Set([todayISOv29, ...woundLog])).slice(0, 8)
+      localStorage.setItem('wound_week_log', JSON.stringify(updatedWound))
+      if (updatedWound.length >= 7) {
+        const sorted = [...updatedWound].sort()
+        let consecutive = 1
+        for (let i = 1; i < sorted.length; i++) {
+          const prev = new Date(sorted[i - 1])
+          const curr = new Date(sorted[i])
+          const diff = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24)
+          if (diff <= 1.5) { consecutive++ } else { consecutive = 1 }
+          if (consecutive >= 7) break
+        }
+        if (consecutive >= 7 && !hasBadge('wound_week')) {
+          if (awardBadge('wound_week')) newBadges.push('wound_week')
         }
       }
     } catch { /* non-critical */ }

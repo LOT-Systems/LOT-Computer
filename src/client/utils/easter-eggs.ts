@@ -3259,3 +3259,88 @@ export function checkHackerManifestoWordTurns(journalText: string): BadgeType[] 
   return awarded
 }
 
+// ── v29 — THE CLOCKWORK HEART behavioral functions ─────────────────────────────
+
+const CLOCKWORK_WORDS_V29 = [
+  /\bclockwork\b|\btick[\s-]?tock\b|\blike[\s-]?clockwork\b/i,
+  /\bmainspring\b|\bwound[\s-]?up\b|\bwound[\s-]?tight\b|\bfully[\s-]?wound\b/i,
+  /\bgear\b|\bcog\b|\bmechanism[\s-]?in[\s-]?motion\b|\bturning[\s-]?gear\b/i,
+  /\bpendulum\b|\boscillate\b|\bswing[\s-]?back\b|\bthe[\s-]?pendulum\b/i,
+  /\bescapement\b|\bratchet\b|\bdetent\b/i,
+  /\bcalibrate\b|\bcalibrated\b|\bfine[\s-]?tuned\b/i,
+  /\bheartbeat\b|\bpulse\b|\bheart[\s-]?rate\b|\bheartrate\b/i,
+  /\bsynchronize\b|\bsynchronized\b|\bin[\s-]?sync\b|\bsync\b/i,
+  /\bwatchmaker\b|\bhorologist\b|\bhorology\b/i,
+  /\banalog\b|\bhand[\s-]?wound\b|\bmechanical[\s-]?craft\b/i,
+  /\bunwind\b|\bwound[\s-]?down\b|\bdecompressed\b|\bunwound\b/i,
+  /\bperpetual\b|\bperpetual[\s-]?motion\b|\bendlessly\b/i,
+]
+
+/** clockwork_session: 3+ Clockwork Heart (v29) trigger words in one journal entry */
+export function checkClockworkSession(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('clockwork_session')) return null
+  const matchCount = CLOCKWORK_WORDS_V29.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('clockwork_session')
+    return 'clockwork_session'
+  }
+  return null
+}
+
+/** precision_hour: Check-in within 2 minutes of exact :00 or :30 mark */
+export function checkPrecisionHour(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('precision_hour')) return null
+  const now = new Date()
+  const totalSec = now.getMinutes() * 60 + now.getSeconds()
+  const nearHour = totalSec <= 120 || totalSec >= 3480
+  const nearHalf = Math.abs(totalSec - 1800) <= 120
+  if (nearHour || nearHalf) {
+    awardBadge('precision_hour')
+    return 'precision_hour'
+  }
+  return null
+}
+
+/** Word Turn v29 — check a journal text for clockwork vocabulary triggers */
+export function checkClockworkHeartWordTurns(journalText: string): BadgeType[] {
+  if (typeof window === 'undefined') return []
+  const awarded: BadgeType[] = []
+
+  const checks: Array<[RegExp, BadgeType]> = [
+    [/\bclockwork\b|\btick[\s-]?tock\b|\blike[\s-]?clockwork\b/i, 'clockwork_start'],
+    [/\bmainspring\b|\bwound[\s-]?up\b|\bwound[\s-]?tight\b|\bfully[\s-]?wound\b/i, 'mainspring_coiled'],
+    [/\bgear\b|\bcog\b|\bmechanism[\s-]?in[\s-]?motion\b/i, 'gear_in_motion'],
+    [/\bpendulum\b|\boscillate\b|\bswing[\s-]?back\b|\bthe[\s-]?pendulum\b/i, 'pendulum_swing'],
+    [/\bescapement\b|\bratchet\b|\bdetent\b/i, 'escapement_click'],
+    [/\bcalibrate\b|\bcalibrated\b|\bfine[\s-]?tuned\b/i, 'calibrated_self'],
+    [/\bheartbeat\b|\bpulse\b|\bheart[\s-]?rate\b|\bheartrate\b/i, 'heartbeat_tick'],
+    [/\bsynchronize\b|\bsynchronized\b|\bin[\s-]?sync\b/i, 'synchronize_time'],
+    [/\bwatchmaker\b|\bhorologist\b|\bhorology\b/i, 'watchmaker_mode'],
+    [/\banalog\b|\bhand[\s-]?wound\b|\bmechanical[\s-]?craft\b/i, 'analog_soul'],
+    [/\bunwind\b|\bwound[\s-]?down\b|\bdecompressed\b|\bunwound\b/i, 'wound_down'],
+    [/\bperpetual\b|\bperpetual[\s-]?motion\b|\bendlessly\b/i, 'perpetual_motion'],
+  ]
+
+  for (const [pattern, badgeId] of checks) {
+    if (!hasBadge(badgeId) && pattern.test(journalText)) {
+      if (awardBadge(badgeId)) awarded.push(badgeId)
+    }
+  }
+
+  // Secret Boss v26
+  const secretChecksV29: Array<[RegExp, BadgeType]> = [
+    [/\bpatek[\s-]?philippe\b|\bvacheron\b|\brolex\b|\bluxury[\s-]?watch\b/i, 'patek_whisper'],
+    [/\bbreguet\b|\btourbillon\b|\babraham[\s-]?louis\b|\bperpetual[\s-]?calendar\b/i, 'breguet_soul'],
+    [/\bpaley[\s-']?s[\s-]?watchmaker\b|\bwatchmaker[\s-']?s[\s-]?paradox\b|\bwho[\s-]?wound[\s-]?the[\s-]?first[\s-]?spring\b/i, 'watchmaker_paradox'],
+  ]
+  for (const [pattern, badgeId] of secretChecksV29) {
+    if (!hasBadge(badgeId) && pattern.test(journalText)) {
+      if (awardBadge(badgeId)) awarded.push(badgeId)
+    }
+  }
+
+  return awarded
+}
+
