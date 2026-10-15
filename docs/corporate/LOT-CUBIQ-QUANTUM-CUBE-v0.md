@@ -321,6 +321,15 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE KITCHEN-TABLE WIND-DOWN                  2026-10-15
+  ─────────────────────────────────────────────────────────────────
+  Summary (full entry in LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md, Section 07):
+  A parent at a shared kitchen table, phone face-down to stay present with
+  their child, feels THE SETTLE through the table at their chosen evening
+  wind-down time (circadian engine signal). The cube goes inert when picked
+  up, only nudges after 22:00, and ignores the child — a physical cue that
+  is private to the parent's body in a shared room.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
