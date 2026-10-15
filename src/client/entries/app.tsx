@@ -16,6 +16,7 @@ import { System } from '#client/components/System'
 import { Settings } from '#client/components/Settings'
 import { Logs } from '#client/components/Logs'
 import { Sync } from '#client/components/Sync'
+import { MailBridge } from '#client/components/Mail'
 import { DirectMessageThread } from '#client/components/DirectMessageThread'
 import { StatusPage } from '#client/components/StatusPage'
 import { ApiPage } from '#client/components/ApiPage'
@@ -184,6 +185,7 @@ const TabPanels = React.memo(function TabPanels() {
 
   return (
     <>
+      <MailBridge />
       <TabPanel active={currentRoute === 'system'} unmountWhenInactive>
         <System />
       </TabPanel>

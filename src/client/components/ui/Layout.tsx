@@ -64,11 +64,12 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
   const layoutView = useStore(stores.layoutView)
   const isMirrorOn = useStore(stores.isMirrorOn)
   const routerState = useStore(stores.router)
+  const mailUnread = useStore(stores.$mailUnread)
   const currentRoute = routerState?.route ?? 'system'
   const navLinks = React.useMemo<NavItem[]>(() => {
     const result: NavItem[] = isLoggedIn
       ? [
-          { label: 'Sync', route: 'sync' },
+          { label: mailUnread > 0 ? `Sync (${mailUnread})` : 'Sync', route: 'sync' },
           { label: 'Log', route: 'logs' },
           { label: 'System', route: 'system' },
           { label: 'Basics' },
@@ -91,7 +92,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
           { label: 'Settings' },
         ]
     return layoutView === 'desktop' ? result : result.reverse()
-  }, [layoutView, isLoggedIn])
+  }, [layoutView, isLoggedIn, mailUnread])
 
   return (
     <div className="min-h-[100dvh] grid leading-[1.5rem]" data-lot-genesis="true">

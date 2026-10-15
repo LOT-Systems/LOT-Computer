@@ -26,6 +26,7 @@ import {
   useLikeChatMessage,
 } from '#client/queries'
 import { sync } from '../sync'
+import { MailPanel } from '#client/components/Mail'
 import { PublicChatMessage, UserTag } from '#shared/types'
 import {
   SYNC_CHAT_MESSAGES_TO_SHOW,
@@ -48,6 +49,14 @@ export const Sync = React.memo(function SyncInner() {
   const isTimeFormat12h = useStore(stores.isTimeFormat12h)
   const featureUnlocks = useStore($featureUnlocks)
   const queryClient = useQueryClient()
+
+  const mailUnread = useStore(stores.$mailUnread)
+  const mailDraft = useStore(stores.$mailDraft)
+  const [tab, setTab] = React.useState<'chat' | 'mail'>('chat')
+  // Open Mail when another surface (Log, Cohort) hands over a draft
+  React.useEffect(() => {
+    if (mailDraft) setTab('mail')
+  }, [mailDraft])
 
   const [message, setMessage] = React.useState('')
   // SSE-received messages not yet reflected in the API response
@@ -178,8 +187,29 @@ export const Sync = React.memo(function SyncInner() {
     )
   }
 
+  const tabs = (
+    <div className="flex items-center gap-x-8 mb-40">
+      <GhostButton className={tab === 'chat' ? '' : 'text-acc/40'} onClick={() => setTab('chat')}>
+        Chat
+      </GhostButton>
+      <GhostButton className={tab === 'mail' ? '' : 'text-acc/40'} onClick={() => setTab('mail')}>
+        Mail{mailUnread > 0 ? ` (${mailUnread})` : ''}
+      </GhostButton>
+    </div>
+  )
+
+  if (tab === 'mail') {
+    return (
+      <div className="max-w-[700px]">
+        {tabs}
+        <MailPanel />
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-[700px]">
+      {tabs}
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}

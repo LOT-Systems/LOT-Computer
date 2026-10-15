@@ -120,6 +120,42 @@ export const useSendDirectMessage = createMutation<
   void
 >('post', '/api/direct-messages')
 
+export interface MailRecord {
+  id: string
+  senderId: string
+  receiverId: string
+  senderName: string
+  receiverName: string
+  subject: string
+  body: string
+  replyToId: string | null
+  isRead: boolean
+  createdAt: string
+}
+
+export const useMail = createQuery<{
+  unread: number
+  inbox: MailRecord[]
+  sent: MailRecord[]
+}>('/api/mail', { refetchOnWindowFocus: true, retry: false })
+
+export const useSendMail = createMutation<
+  { receiverId: string; body: string; subject?: string; replyToId?: string },
+  MailRecord
+>('post', '/api/mail')
+
+export const useMarkMailRead = createMutation<{ id: string }, void>(
+  'post',
+  '/api/mail/read'
+)
+
+export async function resolveMailRecipients(
+  q: string
+): Promise<{ id: string; name: string }[]> {
+  const { data } = await api.get('/api/mail/recipients', { params: { q } })
+  return data
+}
+
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
 })

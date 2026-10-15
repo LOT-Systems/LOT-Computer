@@ -380,6 +380,12 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'mail': {
+          if (data.receiverId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4082,6 +4088,146 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® MAIL - simplest in-app email. Composed from Log ("/email to Name")
+  // or Sync > Mail. Delivered to the receiver's Sync inbox via SSE.
+  // ============================================================================
+
+  const MAIL_ALLOWED_TAGS = ['admin', 'rnd', 'usership', 'onyx', 'legacy']
+  const canUseMail = (u: { tags?: string[]; isAdmin: () => boolean }) => {
+    if (u.isAdmin()) return true
+    const tags = (u.tags || []).map((t) => t.toLowerCase())
+    if (tags.includes('suspended')) return false
+    return tags.some((t) => MAIL_ALLOWED_TAGS.includes(t))
+  }
+  const mailName = (u: any) =>
+    `${u?.firstName || ''} ${u?.lastName || ''}`.trim() || 'Unknown'
+  const mailView = (m: any, users: Map<string, any>, myId: string) => ({
+    id: m.id,
+    senderId: m.senderId,
+    receiverId: m.receiverId,
+    senderName: mailName(users.get(m.senderId)),
+    receiverName: mailName(users.get(m.receiverId)),
+    subject: m.subject,
+    body: m.body,
+    replyToId: m.replyToId,
+    isRead: !!m.readAt || m.senderId === myId,
+    createdAt: m.createdAt,
+  })
+
+  // Inbox + sent (last 100 each) with unread count
+  fastify.get('/mail', async (req: FastifyRequest, reply) => {
+    try {
+      if (!canUseMail(req.user)) return reply.status(403).send({ error: 'Mail is not available' })
+      const [inbox, sent, unread] = await Promise.all([
+        fastify.models.Mail.findAll({ where: { receiverId: req.user.id }, order: [['createdAt', 'DESC']], limit: 100 }),
+        fastify.models.Mail.findAll({ where: { senderId: req.user.id }, order: [['createdAt', 'DESC']], limit: 100 }),
+        fastify.models.Mail.count({ where: { receiverId: req.user.id, readAt: null } }),
+      ])
+      const ids = Array.from(new Set([...inbox, ...sent].flatMap((m) => [m.senderId, m.receiverId])))
+      const users = new Map<string, any>(
+        (await fastify.models.User.findAll({ where: { id: ids }, attributes: ['id', 'firstName', 'lastName'] }))
+          .map((u) => [u.id, u])
+      )
+      return reply.send({
+        unread,
+        inbox: inbox.map((m) => mailView(m, users, req.user.id)),
+        sent: sent.map((m) => mailView(m, users, req.user.id)),
+      })
+    } catch (error) {
+      console.error('Error fetching mail:', error)
+      return reply.status(500).send({ error: 'Failed to fetch mail' })
+    }
+  })
+
+  // Resolve a recipient name (first name / full name) to candidate users
+  fastify.get('/mail/recipients', async (req: FastifyRequest<{ Querystring: { q?: string } }>, reply) => {
+    try {
+      if (!canUseMail(req.user)) return reply.status(403).send({ error: 'Mail is not available' })
+      const q = String(req.query.q || '').trim().slice(0, 60).replace(/[%_\\]/g, '')
+      if (!q) return reply.send([])
+      const parts = q.split(/\s+/)
+      const users = await fastify.models.User.findAll({
+        where: {
+          id: { [Op.ne]: req.user.id },
+          [Op.and]: parts.map((p) => ({
+            [Op.or]: [{ firstName: { [Op.iLike]: `${p}%` } }, { lastName: { [Op.iLike]: `${p}%` } }],
+          })),
+        },
+        attributes: ['id', 'firstName', 'lastName', 'tags'],
+        limit: 20,
+      })
+      return reply.send(
+        users
+          .filter((u) => canUseMail(u))
+          .slice(0, 8)
+          .map((u) => ({ id: u.id, name: mailName(u) }))
+      )
+    } catch (error) {
+      console.error('Error resolving mail recipients:', error)
+      return reply.status(500).send({ error: 'Failed to resolve recipient' })
+    }
+  })
+
+  // Send mail
+  fastify.post('/mail', async (req: FastifyRequest<{
+    Body: { receiverId: string; body: string; subject?: string; replyToId?: string }
+  }>, reply) => {
+    try {
+      if (!canUseMail(req.user)) return reply.status(403).send({ error: 'Mail is not available' })
+      const { receiverId, replyToId } = req.body || ({} as any)
+      const body = String(req.body?.body || '').trim().slice(0, 10000)
+      if (!receiverId || !body) return reply.status(400).send({ error: 'Receiver and body are required' })
+      if (receiverId === req.user.id) return reply.status(400).send({ error: 'Cannot mail yourself' })
+      const receiver = await fastify.models.User.findByPk(receiverId)
+      if (!receiver || !canUseMail(receiver)) return reply.status(404).send({ error: 'Receiver not found' })
+
+      const subject = (String(req.body.subject || '').trim() || body.split('\n')[0]).slice(0, 120)
+      const mail = await fastify.models.Mail.create({
+        senderId: req.user.id,
+        receiverId,
+        subject,
+        body,
+        replyToId: replyToId || null,
+      })
+      const view = mailView(mail, new Map([[req.user.id, req.user], [receiver.id, receiver]]), req.user.id)
+      sync.emit('mail', { ...view, isRead: false })
+
+      process.nextTick(async () => {
+        try {
+          const context = await getLogContext(req.user)
+          await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'mail_sent',
+            text: '',
+            metadata: { mailId: mail.id, receiverId },
+            context,
+          })
+        } catch (logError) {
+          console.error('Error logging mail:', logError)
+        }
+      })
+      return reply.send(view)
+    } catch (error) {
+      console.error('Error sending mail:', error)
+      return reply.status(500).send({ error: 'Failed to send mail' })
+    }
+  })
+
+  // Mark as read (receiver only)
+  fastify.post('/mail/read', async (req: FastifyRequest<{ Body: { id: string } }>, reply) => {
+    try {
+      await fastify.models.Mail.update(
+        { readAt: new Date() },
+        { where: { id: req.body?.id, receiverId: req.user.id, readAt: null } }
+      )
+      return reply.send({ ok: true })
+    } catch (error) {
+      console.error('Error marking mail read:', error)
+      return reply.status(500).send({ error: 'Failed to mark read' })
     }
   })
 

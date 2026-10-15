@@ -28,7 +28,8 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, parseEmailCommand, type LogTrigger } from '#client/utils/logTriggers'
+import { resolveMailRecipients, useSendMail } from '#client/queries'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3707,6 +3708,26 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  // LOT® Mail: "/email to Name" in a log composes mail; Send delivers to Sync.
+  const emailCmd = React.useMemo(() => parseEmailCommand(value), [value])
+  const [mailStatus, setMailStatus] = React.useState('')
+  const [mailChoices, setMailChoices] = React.useState<{ id: string; name: string }[]>([])
+  const { mutate: sendMail, isLoading: isMailSending } = useSendMail({
+    onSuccess: (m) => { setMailStatus(`SENT to ${m.receiverName}`); setMailChoices([]) },
+    onError: () => setMailStatus('FAILED — try again'),
+  })
+  const onSendMail = React.useCallback(async () => {
+    if (!emailCmd || !emailCmd.body) return
+    setMailStatus('')
+    try {
+      const found = await resolveMailRecipients(emailCmd.to)
+      if (found.length === 0) { setMailStatus(`No member named "${emailCmd.to}"`); setMailChoices([]); return }
+      if (found.length > 1) { setMailChoices(found); setMailStatus('Pick a recipient'); return }
+      sendMail({ receiverId: found[0].id, body: emailCmd.body })
+    } catch {
+      setMailStatus('Mail is not available for this account')
+    }
+  }, [emailCmd, sendMail])
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -4139,6 +4160,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to X   Send LOT® Mail to a member (arrives in Sync)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4384,6 +4406,33 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailCmd && (
+          <div className="mt-8">
+            <Block label="MAIL:" blockView>
+              <div className="opacity-80" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6' }}>
+                <div>TO&nbsp;&nbsp;{emailCmd.to}</div>
+                <div className="opacity-60" style={{ whiteSpace: 'pre-wrap' }}>
+                  {emailCmd.body || 'Write your message, then press Send.'}
+                </div>
+                <div className="mt-8 flex items-center gap-x-8 flex-wrap">
+                  <Button size="small" onClick={onSendMail} disabled={!emailCmd.body || isMailSending}>
+                    Send
+                  </Button>
+                  {mailChoices.map((c) => (
+                    <Button
+                      key={c.id}
+                      size="small"
+                      onClick={() => sendMail({ receiverId: c.id, body: emailCmd.body })}
+                    >
+                      {c.name}
+                    </Button>
+                  ))}
+                  {mailStatus && <span className="opacity-60">{mailStatus}</span>}
+                </div>
+              </div>
             </Block>
           </div>
         )}
