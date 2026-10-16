@@ -115,3 +115,49 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+/**
+ * Command registry — single source of truth for the /system help screen.
+ * Every slash command the Log understands is listed here with its group,
+ * so the help output cannot drift from the detectors above.
+ */
+export interface LogCommand {
+  usage: string
+  description: string
+  group: 'AI' | 'STATE' | 'SENSORY' | 'NAVIGATION'
+}
+
+export const LOG_COMMANDS: LogCommand[] = [
+  { usage: '/story',         description: 'Compressed story of your day',                  group: 'AI' },
+  { usage: '/story week',    description: 'Story of your week (also: month, year)',        group: 'AI' },
+  { usage: '/qi [query]',    description: 'Ask the Quantum Intelligence engine',           group: 'AI' },
+  { usage: '/prayer',        description: 'Generate contextual scripture',                 group: 'AI' },
+  { usage: '/scan',          description: 'System status overview',                        group: 'STATE' },
+  { usage: '/assembly',      description: 'Self-assembly module status',                   group: 'STATE' },
+  { usage: '/phys',          description: 'Physiological cohort report',                   group: 'STATE' },
+  { usage: '/qos',           description: 'Quantum OS state analysis',                     group: 'STATE' },
+  { usage: '/fast',          description: 'Orthodox fasting calendar',                     group: 'STATE' },
+  { usage: '/silent',        description: 'Signal silence check',                          group: 'STATE' },
+  { usage: '/breathe',       description: '4-2-6 breathing exercise',                      group: 'SENSORY' },
+  { usage: '/freeze',        description: 'Pause and reflect protocol',                    group: 'SENSORY' },
+  { usage: '/synth',         description: 'Toggle keyboard sound',                         group: 'SENSORY' },
+  { usage: '/radio',         description: 'Toggle radio',                                  group: 'SENSORY' },
+  { usage: '/night',         description: 'Dark mode',                                     group: 'SENSORY' },
+  { usage: '/how',           description: 'Open LOT AI check-in (System tab)',             group: 'NAVIGATION' },
+  { usage: '/system',        description: 'This help screen',                              group: 'NAVIGATION' },
+]
+
+/** Plain-text help body consumed by the Log's SYSTEM block renderer. */
+export function renderSystemHelp(): string {
+  const groups: LogCommand['group'][] = ['AI', 'STATE', 'SENSORY', 'NAVIGATION']
+  const lines: string[] = []
+  groups.forEach(g => {
+    if (lines.length) lines.push('')
+    lines.push(g)
+    LOG_COMMANDS.filter(c => c.group === g).forEach(c => {
+      lines.push(`${c.usage.padEnd(14)}  ${c.description}`)
+    })
+  })
+  lines.push('', 'SHORTCUTS', 'Ctrl+Enter    Save log immediately')
+  return lines.join('\n')
+}

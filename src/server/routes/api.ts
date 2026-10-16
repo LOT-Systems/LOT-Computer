@@ -19,6 +19,14 @@ import {
 import config from '#server/config'
 import { fp } from '#shared/utils'
 import {
+  STORY_PERIODS,
+  buildStoryDigest,
+  computeArcadeRank,
+  periodWindowMs,
+  renderDigest,
+  type StoryPeriod,
+} from '#shared/utils/story-compression'
+import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
   DATE_TIME_FORMAT,
@@ -5490,6 +5498,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: StoryPeriod
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,12 +5523,28 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period: StoryPeriod = STORY_PERIODS.includes(req.body.period as StoryPeriod)
+        ? (req.body.period as StoryPeriod)
+        : 'day'
 
+      // Window by period (day/week/month/year); cap rows to bound the query.
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: new Date(Date.now() - periodWindowMs(period)) },
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 2000,
       })
+      const digest = buildStoryDigest(logs as any, period)
+
+      // Arcade rank is lifetime XP, so count all-time events by type.
+      const lifetime = await fastify.models.Log.findAll({
+        where: { userId: req.user.id },
+        attributes: ['event'],
+        raw: true,
+      })
+      const rank = computeArcadeRank(lifetime as any)
 
       const recentEntries = logs
         .filter(l => l.event === 'log_entry' || l.event === 'journal')
@@ -5549,7 +5574,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story for the ${period.toUpperCase()} window. Your task: write 1-2 paragraphs (100-200 words) that compress that window into a story — mood trajectory, self-care patterns, places and weather they moved through, and any pattern change (rising/falling volume, mood shift). Their Arcade rank is context only: mention progress at most once, in one short clause. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
@@ -5566,6 +5591,11 @@ RULES:
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
+
+COMPRESSED WINDOW:
+${renderDigest(digest)}
+
+ARCADE: ${rank.rank} (level ${rank.level}, ${rank.xp} XP${rank.nextRank ? `, ${rank.xpToNext} XP to ${rank.nextRank}` : ''})
 
 RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
 
@@ -5596,6 +5626,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            period,
+            digest,
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5604,6 +5636,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          period,
+          rank,
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
