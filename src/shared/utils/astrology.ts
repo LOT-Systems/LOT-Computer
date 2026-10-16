@@ -177,3 +177,36 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+export interface AstrologyReading {
+  hourlyZodiac: string
+  westernZodiac: string
+  moonPhase: string
+  moonIllumination: number
+  rokuyo: string
+}
+
+/**
+ * Build a Date whose local getters (getHours/getDate/...) return the given
+ * wall-clock fields, regardless of the runtime's own timeZone.
+ */
+export function toWallClockDate(fields: {
+  year: number; month: number; date: number; hour: number; minute: number; second: number
+}): Date {
+  return new Date(fields.year, fields.month, fields.date, fields.hour, fields.minute, fields.second)
+}
+
+/**
+ * Single ambient reading (zodiac hour, sign, moon, rokuyo) for a moment.
+ * Shared by the dashboard block, the QIE signal and Logs context snapshots.
+ */
+export function getAstrologyReading(date: Date): AstrologyReading {
+  const moon = getMoonPhase(date)
+  return {
+    hourlyZodiac: getHourlyZodiac(date),
+    westernZodiac: getWesternZodiac(date),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    rokuyo: getRokuyo(date),
+  }
+}
