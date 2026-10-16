@@ -108,14 +108,26 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
     return () => clearInterval(interval)
   }, [fetchStatus])
 
-  const getStatusIcon = (checkStatus: 'ok' | 'error' | 'unknown') => {
+  const getStatusDot = (checkStatus: 'ok' | 'error' | 'unknown') => {
+    const base = 'inline-block w-8 h-8 rounded-full flex-shrink-0'
     switch (checkStatus) {
       case 'ok':
-        return '✓'
+        return <span className={`${base} bg-green-500`} aria-label="operational" />
       case 'error':
-        return '✕'
+        return <span className={`${base} bg-red-500`} aria-label="error" />
       case 'unknown':
-        return '?'
+        return <span className={`${base} bg-acc/30`} aria-label="unknown" />
+    }
+  }
+
+  const getOverallBadge = (overall: 'ok' | 'degraded' | 'error') => {
+    switch (overall) {
+      case 'ok':
+        return <span className="inline-flex items-center gap-x-6 px-10 py-4 rounded text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">● All systems operational</span>
+      case 'degraded':
+        return <span className="inline-flex items-center gap-x-6 px-10 py-4 rounded text-xs font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">◐ Degraded performance</span>
+      case 'error':
+        return <span className="inline-flex items-center gap-x-6 px-10 py-4 rounded text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">● System issues detected</span>
     }
   }
 
@@ -160,9 +172,7 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
         <>
           <div className="mb-16">
             <Block label="Status:" labelClassName="!pl-0">
-              {status.overall === 'ok' ? 'All systems operational' :
-               status.overall === 'degraded' ? 'Degraded performance' :
-               'System issues detected'}
+              {getOverallBadge(status.overall)}
             </Block>
             <Block label="Version:" labelClassName="!pl-0">v{status.version}</Block>
             <Block label="Environment:" labelClassName="!pl-0">{status.environment}</Block>
@@ -198,12 +208,13 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
                 className="mb-8"
               >
                 <div className="flex items-center gap-x-8">
-                  <span>{getStatusIcon(check.status)}</span>
+                  {getStatusDot(check.status)}
                   <span className={cn(
-                    check.status === 'ok' && 'text-acc',
-                    check.status === 'error' && 'text-acc/60'
+                    check.status === 'ok' && 'text-green-400',
+                    check.status === 'error' && 'text-red-400',
+                    check.status === 'unknown' && 'text-acc/50'
                   )}>
-                    {check.status === 'ok' ? 'Ok' :
+                    {check.status === 'ok' ? 'Operational' :
                      check.status === 'error' ? 'Error' :
                      'Unknown'}
                   </span>
@@ -212,7 +223,7 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
                   )}
                 </div>
                 {check.message && (
-                  <div className="text-acc/60 mt-4">{check.message}</div>
+                  <div className="text-red-400/80 mt-4 text-sm">{check.message}</div>
                 )}
               </Block>
             ))}
