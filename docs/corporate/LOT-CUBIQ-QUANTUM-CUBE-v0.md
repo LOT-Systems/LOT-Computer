@@ -321,6 +321,33 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE SHARED-ROOM NUDGE                       2026-10-16
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, night-shift ICU nurse, sleeps by day
+  in a one-bedroom flat with a partner who wakes at 06:30. Phone on
+  do-not-disturb; a buzzing phone wakes the partner, a silent phone
+  is invisible.
+
+  The CUBIQ pad on the nightstand identifies itself as a small surface,
+  so Hop and Leap are disabled and only THE NUDGE and THE SETTLE are
+  available. Twenty minutes before the operator's learned wake window
+  (circadian phase from the Index), the cube performs THE NUDGE: two
+  sub-threshold pulses under 30 dBA, felt through the nightstand, not
+  heard across the room. It repeats once, ten minutes later, never a
+  third time. On the first morning of the week it performs THE SETTLE
+  instead — standing pressure, no motion — to mark an assembly phase.
+
+  Telemetry shows time-to-open falling from 14 to 4 minutes over three
+  weeks; QI·46 shortens the lead from 20 to 12 minutes without the
+  operator setting a preference. The same Nudge serves anyone who cannot
+  rely on sound, light or a worn device.
+
+  Forces into the spec: surface-class mode, circadian quiet-hours logic,
+  a two-Nudge cap per signal, a noise gate. Full write-up and spec
+  errata: LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md (supersedes the Leap
+  displacement, the piezo bias element and the shell material in this
+  document — see its Section 03).
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
