@@ -4551,6 +4551,91 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'cross_temporal_resonance_arc') {
+          const apexDayCount = log.metadata?.apexDayCount as number | undefined
+          const apexConf     = log.metadata?.apexConf     as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CXTRES:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">RESONANCE</span>
+                  <span className="tabular-nums">CROSS-TEMPORAL</span>
+                </div>
+                {apexDayCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">APEX DAYS</span>
+                    <span className="tabular-nums">{apexDayCount}</span>
+                  </div>
+                )}
+                {apexConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">APEX CONF</span>
+                    <span className="tabular-nums">{Math.round(apexConf * 100)}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">APEX IS NOT A MOMENT — IT IS A TEMPORAL ARC</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'architecture_inheritance_peak') {
+          const crfPermDays = log.metadata?.crfPermDays as number | undefined
+          const cxtresConf  = log.metadata?.cxtresConf  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="ARCHINHER:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">INHERITANCE</span>
+                  <span className="tabular-nums">CONFIRMED</span>
+                </div>
+                {crfPermDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PERM DAYS</span>
+                    <span className="tabular-nums">{crfPermDays} / 5</span>
+                  </div>
+                )}
+                {cxtresConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TEMPORAL CONF</span>
+                    <span className="tabular-nums">{Math.round(cxtresConf * 100)}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PRIOR CYCLES INFORM CURRENT STRUCTURE</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_legacy_lock') {
+          const indexOverall   = log.metadata?.indexOverall   as number | undefined
+          const archInherConf  = log.metadata?.archInherConf  as number | undefined
+          const apexConf       = log.metadata?.apexConf       as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QLEGACY:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">LEGACY</span>
+                  <span className="tabular-nums">LOCKED</span>
+                </div>
+                {indexOverall !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX</span>
+                    <span className="tabular-nums">{indexOverall}</span>
+                  </div>
+                )}
+                {archInherConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INHER CONF</span>
+                    <span className="tabular-nums">{Math.round(archInherConf * 100)}%</span>
+                  </div>
+                )}
+                {apexConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">APEX CONF</span>
+                    <span className="tabular-nums">{Math.round(apexConf * 100)}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">NOT MASTERY — HERITAGE · THE CRYSTAL IS ANCESTRAL</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

@@ -1785,6 +1785,16 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyPropagationPersistenceCheck()) {
     await executeDailyPropagationPersistenceCheck()
   }
+
+  // Check daily crystalline amplitude check (16:00 UTC daily) — J59
+  if (shouldRunDailyCrystallineAmplitudeCheck()) {
+    await executeDailyCrystallineAmplitudeCheck()
+  }
+
+  // Check daily cross-temporal resonance check (18:00 UTC daily) — J60
+  if (shouldRunDailyCrossTemporalResonanceCheck()) {
+    await executeDailyCrossTemporalResonanceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6928,6 +6938,232 @@ async function executeDailyPropagationPersistenceCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Crystalline Amplitude Check (J59 — 16:00 UTC daily) ───────────────────
+// Reads active users. Checks if full_domain_crystalline_resonance (P181) is active AND
+// sovereign_velocity_lock (P180) confirmed on 2+ of last 3 days → writes
+// resonance_amplitude_peak (P182). Checks propagation_persistence_arc (P179) on 3+ of
+// last 5 days + P182 active → writes crystalline_field_permanence (P183). P183 + P181 +
+// 8+ distinct domains in last 6h → writes total_crystalline_apex (P184).
+
+let isDailyCrystallineAmplitudeRunning = false
+let lastDailyCrystallineAmplitudeRun: Date | null = null
+
+function shouldRunDailyCrystallineAmplitudeCheck(): boolean {
+  const now = dayjs()
+  if (now.hour() !== 16) return false // 16:00 UTC daily (co-located with coherence index)
+  if (isDailyCrystallineAmplitudeRunning) return false
+  if (lastDailyCrystallineAmplitudeRun) {
+    const timeSince = Date.now() - lastDailyCrystallineAmplitudeRun.getTime()
+    if (timeSince < 23 * 60 * 60 * 1000) return false
+  }
+  return true
+}
+
+async function executeDailyCrystallineAmplitudeCheck(): Promise<JobResult> {
+  const jobName = 'daily-crystalline-amplitude-check'
+  const executedAt = new Date()
+  isDailyCrystallineAmplitudeRunning = true
+
+  try {
+    console.log('DAILY CRYSTALLINE AMPLITUDE CHECK — 16:00 UTC (J59)')
+
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const activeUsers = await (User as any).findAll({
+      where: { lastActiveAt: { [Op.gte]: dayjs().subtract(30, 'days').toDate() } },
+    })
+
+    let rampWritten = 0
+    let crfPermWritten = 0
+    let totApexWritten = 0
+
+    for (const user of activeUsers) {
+      const logs = await (Log as any).findAll({
+        where: {
+          userId: user.id,
+          event: { [Op.in]: ['full_domain_crystalline_resonance', 'sovereign_velocity_lock', 'propagation_persistence_arc', 'resonance_amplitude_peak', 'crystalline_field_permanence'] },
+          createdAt: { [Op.gte]: dayjs().subtract(7, 'days').toDate() },
+        },
+        order: [['createdAt', 'DESC']],
+      })
+
+      const now7 = Date.now()
+      const hasFdcres = logs.some((l: any) => l.event === 'full_domain_crystalline_resonance' && Date.now() - new Date(l.createdAt).getTime() < 24 * 60 * 60 * 1000)
+      const svelokLogs3d = logs.filter((l: any) => l.event === 'sovereign_velocity_lock' && Date.now() - new Date(l.createdAt).getTime() < 3 * 24 * 60 * 60 * 1000)
+      const svelokDays = new Set(svelokLogs3d.map((l: any) => new Date(l.createdAt).toISOString().slice(0, 10)))
+
+      // P182: resonance-amplitude-peak
+      if (hasFdcres && svelokDays.size >= 2) {
+        await (Log as any).create({
+          userId: user.id,
+          event: 'resonance_amplitude_peak',
+          metadata: { amplitude: 'PEAK', avgConf: 0.92, source: 'j59-amplitude-check' },
+        })
+        rampWritten++
+      }
+
+      const hasResamp = rampWritten > 0 || logs.some((l: any) => l.event === 'resonance_amplitude_peak' && Date.now() - new Date(l.createdAt).getTime() < 12 * 60 * 60 * 1000)
+      const ppersistLogs5d = logs.filter((l: any) => l.event === 'propagation_persistence_arc' && Date.now() - new Date(l.createdAt).getTime() < 5 * 24 * 60 * 60 * 1000)
+      const ppersistDays = new Set(ppersistLogs5d.map((l: any) => new Date(l.createdAt).toISOString().slice(0, 10)))
+
+      // P183: crystalline-field-permanence
+      if (ppersistDays.size >= 3 && hasResamp) {
+        await (Log as any).create({
+          userId: user.id,
+          event: 'crystalline_field_permanence',
+          metadata: { ppersistDays: ppersistDays.size, rampConf: 0.89, source: 'j59-amplitude-check' },
+        })
+        crfPermWritten++
+      }
+
+      const hasCrfperm = crfPermWritten > 0 || logs.some((l: any) => l.event === 'crystalline_field_permanence' && Date.now() - new Date(l.createdAt).getTime() < 12 * 60 * 60 * 1000)
+      const recentSrcLogs = await (Log as any).findAll({
+        where: {
+          userId: user.id,
+          createdAt: { [Op.gte]: dayjs().subtract(6, 'hours').toDate() },
+          event: { [Op.ne]: 'note' },
+        },
+      })
+      const uniqueSources6h = new Set(recentSrcLogs.map((l: any) => l.event?.split('_')[0] ?? 'log'))
+
+      // P184: total-crystalline-apex
+      if (hasCrfperm && hasFdcres && uniqueSources6h.size >= 8) {
+        await (Log as any).create({
+          userId: user.id,
+          event: 'total_crystalline_apex',
+          metadata: { domainCount: uniqueSources6h.size, avgConf: 0.94, source: 'j59-amplitude-check' },
+        })
+        totApexWritten++
+      }
+    }
+
+    console.log(`  Resonance amplitude peak written:         ${rampWritten}`)
+    console.log(`  Crystalline field permanence written:     ${crfPermWritten}`)
+    console.log(`  Total crystalline apex written:           ${totApexWritten}`)
+
+    lastDailyCrystallineAmplitudeRun = new Date()
+    isDailyCrystallineAmplitudeRunning = false
+    return { jobName, executedAt: executedAt.toISOString(), success: true, processed: activeUsers.length }
+  } catch (error: any) {
+    console.error('Daily crystalline amplitude check failed:', error.message)
+    isDailyCrystallineAmplitudeRunning = false
+    return { jobName, executedAt: executedAt.toISOString(), success: false, error: error.message }
+  }
+}
+
+// ─── Daily Cross-Temporal Resonance Check (J60 — 18:00 UTC daily) ────────────────
+// Reads active users. Checks if total_crystalline_apex (P184) fired on 3+ consecutive
+// days → writes cross_temporal_resonance_arc (P185). Checks crystalline_field_permanence
+// (P183) on 4+ of last 5 days + P185 active → writes architecture_inheritance_peak (P186).
+// P186 + P184 + all 6 UserIndex dims ≥ 40 → writes quantum_legacy_lock (P187).
+
+let isDailyCrossTemporalRunning = false
+let lastDailyCrossTemporalRun: Date | null = null
+
+function shouldRunDailyCrossTemporalResonanceCheck(): boolean {
+  const now = dayjs()
+  if (now.hour() !== 18) return false // 18:00 UTC daily (co-located with LOT AI story slot)
+  if (isDailyCrossTemporalRunning) return false
+  if (lastDailyCrossTemporalRun) {
+    const timeSince = Date.now() - lastDailyCrossTemporalRun.getTime()
+    if (timeSince < 23 * 60 * 60 * 1000) return false
+  }
+  return true
+}
+
+async function executeDailyCrossTemporalResonanceCheck(): Promise<JobResult> {
+  const jobName = 'daily-cross-temporal-resonance-check'
+  const executedAt = new Date()
+  isDailyCrossTemporalRunning = true
+
+  try {
+    console.log('DAILY CROSS-TEMPORAL RESONANCE CHECK — 18:00 UTC (J60)')
+
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const activeUsers = await (User as any).findAll({
+      where: { lastActiveAt: { [Op.gte]: dayjs().subtract(30, 'days').toDate() } },
+    })
+
+    let cxtresWritten = 0
+    let archInherWritten = 0
+    let qLegacyWritten = 0
+
+    for (const user of activeUsers) {
+      const logs = await (Log as any).findAll({
+        where: {
+          userId: user.id,
+          event: { [Op.in]: ['total_crystalline_apex', 'crystalline_field_permanence', 'cross_temporal_resonance_arc', 'architecture_inheritance_peak'] },
+          createdAt: { [Op.gte]: dayjs().subtract(7, 'days').toDate() },
+        },
+        order: [['createdAt', 'DESC']],
+      })
+
+      // P185: cross-temporal-resonance-arc
+      const apexLogs3d = logs.filter((l: any) => l.event === 'total_crystalline_apex' && Date.now() - new Date(l.createdAt).getTime() < 3 * 24 * 60 * 60 * 1000)
+      const apexDays = new Set(apexLogs3d.map((l: any) => new Date(l.createdAt).toISOString().slice(0, 10)))
+      const hasTodayApex = logs.some((l: any) => l.event === 'total_crystalline_apex' && Date.now() - new Date(l.createdAt).getTime() < 24 * 60 * 60 * 1000)
+
+      if (hasTodayApex && apexDays.size >= 3) {
+        await (Log as any).create({
+          userId: user.id,
+          event: 'cross_temporal_resonance_arc',
+          metadata: { apexDayCount: apexDays.size, apexConf: 0.93, source: 'j60-cross-temporal-check' },
+        })
+        cxtresWritten++
+      }
+
+      // P186: architecture-inheritance-peak
+      const hasCxtres = cxtresWritten > 0 || logs.some((l: any) => l.event === 'cross_temporal_resonance_arc' && Date.now() - new Date(l.createdAt).getTime() < 12 * 60 * 60 * 1000)
+      const crfPermLogs5d = logs.filter((l: any) => l.event === 'crystalline_field_permanence' && Date.now() - new Date(l.createdAt).getTime() < 5 * 24 * 60 * 60 * 1000)
+      const crfPermDays = new Set(crfPermLogs5d.map((l: any) => new Date(l.createdAt).toISOString().slice(0, 10)))
+
+      if (crfPermDays.size >= 4 && hasCxtres) {
+        await (Log as any).create({
+          userId: user.id,
+          event: 'architecture_inheritance_peak',
+          metadata: { crfPermDays: crfPermDays.size, cxtresConf: 0.92, source: 'j60-cross-temporal-check' },
+        })
+        archInherWritten++
+      }
+
+      // P187: quantum-legacy-lock (requires server-side UserIndex proxy — use signal density)
+      const hasArchInher = archInherWritten > 0 || logs.some((l: any) => l.event === 'architecture_inheritance_peak' && Date.now() - new Date(l.createdAt).getTime() < 12 * 60 * 60 * 1000)
+      const recentLogs7d = await (Log as any).findAll({
+        where: {
+          userId: user.id,
+          createdAt: { [Op.gte]: dayjs().subtract(7, 'days').toDate() },
+          event: { [Op.ne]: 'note' },
+        },
+      })
+      // Proxy for 6-dim index ≥ 40: require 8+ distinct sources and 20+ total signals in 7d
+      const distinctSrc7d = new Set(recentLogs7d.map((l: any) => l.event?.split('_')[0] ?? 'log'))
+      const totalSig7d = recentLogs7d.length
+
+      if (hasArchInher && hasTodayApex && distinctSrc7d.size >= 8 && totalSig7d >= 20) {
+        await (Log as any).create({
+          userId: user.id,
+          event: 'quantum_legacy_lock',
+          metadata: { indexOverall: Math.min(100, Math.round(totalSig7d * 1.5)), archInherConf: 0.93, apexConf: 0.94, source: 'j60-cross-temporal-check' },
+        })
+        qLegacyWritten++
+      }
+    }
+
+    console.log(`  Cross-temporal resonance arc written:     ${cxtresWritten}`)
+    console.log(`  Architecture inheritance peak written:    ${archInherWritten}`)
+    console.log(`  Quantum legacy lock written:              ${qLegacyWritten}`)
+
+    lastDailyCrossTemporalRun = new Date()
+    isDailyCrossTemporalRunning = false
+    return { jobName, executedAt: executedAt.toISOString(), success: true, processed: activeUsers.length }
+  } catch (error: any) {
+    console.error('Daily cross-temporal resonance check failed:', error.message)
+    isDailyCrossTemporalRunning = false
+    return { jobName, executedAt: executedAt.toISOString(), success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -6991,6 +7227,8 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily sovereignty maturation check: 12 PM UTC every day (J56)')
   console.log('   - Daily propagation velocity check: 2 PM UTC every day (J57)')
   console.log('   - Daily propagation persistence check: 3 PM UTC every day (J58)')
+  console.log('   - Daily crystalline amplitude check: 4 PM UTC every day (J59)')
+  console.log('   - Daily cross-temporal resonance check: 6 PM UTC every day (J60)')
   console.log('')
 
   // Check every hour for scheduled jobs

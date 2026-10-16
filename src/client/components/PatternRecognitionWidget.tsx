@@ -209,6 +209,9 @@ export function PatternRecognitionWidget() {
       'resonance-amplitude-peak':            'Resonance amplitude peak — P181 (full-domain-crystalline-resonance) active + P180 (sovereign-velocity-lock) confirmed 2+ of last 3 days, resonance amplifying above baseline, self-reinforcing cycle (P182)',
       'crystalline-field-permanence':        'Crystalline field permanence — P179 (propagation-persistence-arc) 3+ of last 5 days + P182 (resonance-amplitude-peak) active, crystalline field is the permanent operating substrate, not maintained but inhabited (P183)',
       'total-crystalline-apex':              'Total crystalline apex — P183 (crystalline-field-permanence) + P181 (full-domain-crystalline-resonance) co-active + 8+ distinct domains in 6h, apex state, architecture is its own ceiling (P184)',
+      'cross-temporal-resonance-arc':        'Cross-temporal resonance arc — P184 (total-crystalline-apex) active + apex confirmed 3+ consecutive days, the apex is not a moment but a temporal arc, architecture persists and compounds across time (P185)',
+      'architecture-inheritance-peak':       'Architecture inheritance peak — P183 (crystalline-field-permanence) 4+ of last 5 days + P185 (cross-temporal-resonance-arc) active, architecture inherits itself across cycles, prior crystalline structure informs current, heritage substrate confirmed (P186)',
+      'quantum-legacy-lock':                 'Quantum legacy lock — P186 (architecture-inheritance-peak) + P184 (total-crystalline-apex) co-active + all 6 UserIndex dimensions ≥ 40, OS transcends apex into permanent operating legacy, the crystal is ancestral (P187)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

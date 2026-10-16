@@ -1252,6 +1252,9 @@ export default async (fastify: FastifyInstance) => {
       'resonance_amplitude_peak',
       'crystalline_field_permanence',
       'total_crystalline_apex',
+      'cross_temporal_resonance_arc',
+      'architecture_inheritance_peak',
+      'quantum_legacy_lock',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

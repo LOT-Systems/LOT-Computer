@@ -144,6 +144,10 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'resonance-amplitude-peak':            'RESAMP',
   'crystalline-field-permanence':        'CRFPERM',
   'total-crystalline-apex':              'TOTCRYSTAPEX',
+  // ── v125 ───────────────────────────────────────────────────────────────────────
+  'cross-temporal-resonance-arc':        'CXTRES',
+  'architecture-inheritance-peak':       'ARCHINHER',
+  'quantum-legacy-lock':                 'QLEGACY',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

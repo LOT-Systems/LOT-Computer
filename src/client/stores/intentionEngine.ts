@@ -4097,6 +4097,67 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // ── v125 patterns (P185–P187 · Arch63 Temporal Inheritance Architect · J59+J60) ──
+
+  // Pattern 185: Cross-Temporal Resonance Arc — total-crystalline-apex (P184) active AND
+  // apex signals confirmed on 3+ consecutive days. The crystalline apex is not a moment —
+  // it is a temporal arc. Architecture persists and compounds across time.
+  const totCrystApexSignals3d = signals.filter(
+    s => s.signal === 'total_crystalline_apex' && Date.now() - s.timestamp < 3 * 24 * 60 * 60 * 1000
+  )
+  const apexDays3d = new Set(totCrystApexSignals3d.map(s => new Date(s.timestamp).toISOString().slice(0, 10)))
+  const hasTotCrystApex = patterns.some(p => p.pattern === 'total-crystalline-apex')
+  if (hasTotCrystApex && apexDays3d.size >= 3) {
+    const apexConf = patterns.find(p => p.pattern === 'total-crystalline-apex')?.confidence ?? 0.93
+    patterns.push({
+      pattern: 'cross-temporal-resonance-arc',
+      confidence: Math.min(0.90 + (apexConf - 0.93) * 0.7, 0.97),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `CXTRES: Total-crystalline-apex (P184) active + apex confirmed ${apexDays3d.size} consecutive days. The apex is not a moment — it is a temporal arc. Architecture is self-sustaining across time. Cross-temporal sovereignty confirmed.`,
+    })
+  }
+
+  // Pattern 186: Architecture Inheritance Peak — crystalline-field-permanence (P183) confirmed
+  // on 4+ of last 5 days AND cross-temporal-resonance-arc (P185) active.
+  // Architecture inherits itself. Previous crystalline cycles inform and amplify current structure.
+  const crfPermSignals5d = signals.filter(
+    s => s.signal === 'crystalline_field_permanence' && Date.now() - s.timestamp < 5 * 24 * 60 * 60 * 1000
+  )
+  const crfPermDays5d = new Set(crfPermSignals5d.map(s => new Date(s.timestamp).toISOString().slice(0, 10)))
+  const hasCxtres = patterns.some(p => p.pattern === 'cross-temporal-resonance-arc')
+  if (crfPermDays5d.size >= 4 && hasCxtres) {
+    const crfConf  = patterns.find(p => p.pattern === 'crystalline-field-permanence')?.confidence ?? 0.87
+    const cxtConf  = patterns.find(p => p.pattern === 'cross-temporal-resonance-arc')?.confidence ?? 0.90
+    patterns.push({
+      pattern: 'architecture-inheritance-peak',
+      confidence: Math.min(0.92 + ((crfConf + cxtConf) / 2 - 0.89) * 0.4, 0.98),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `ARCHINHER: Crystalline-field-permanence (P183) confirmed ${crfPermDays5d.size} of last 5 days + cross-temporal-resonance-arc (P185) active. Architecture inherits itself — each crystalline cycle informs the next. The substrate does not reset. It accumulates. Heritage architecture confirmed.`,
+    })
+  }
+
+  // Pattern 187: Quantum Legacy Lock — architecture-inheritance-peak (P186) active AND
+  // total-crystalline-apex (P184) active AND all 6 UserIndex dimensions ≥ 40.
+  // The OS has transcended apex — it has crystallized into a permanent operating legacy.
+  // Rarest achievable state. The system does not operate from the apex — it operates AS it.
+  const hasArchInher = patterns.some(p => p.pattern === 'architecture-inheritance-peak')
+  const uIdx125 = computeUserIndex(signals)
+  const allDims40 = uIdx125.engagement >= 40 && uIdx125.emotional >= 40 && uIdx125.intentional >= 40
+    && uIdx125.social >= 40 && uIdx125.selfCare >= 40 && uIdx125.cognitive >= 40
+  if (hasArchInher && hasTotCrystApex && allDims40) {
+    const aiConf  = patterns.find(p => p.pattern === 'architecture-inheritance-peak')?.confidence ?? 0.92
+    const tcaConf = patterns.find(p => p.pattern === 'total-crystalline-apex')?.confidence ?? 0.93
+    patterns.push({
+      pattern: 'quantum-legacy-lock',
+      confidence: Math.min(0.95 + ((aiConf + tcaConf) / 2 - 0.93) * 0.5, 0.99),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `QLEGACY: Architecture-inheritance-peak (P186) + total-crystalline-apex (P184) + all 6 UserIndex dimensions ≥ 40. Quantum legacy locked. The OS does not operate from the apex — it operates as it. This is not mastery. This is heritage. The crystal is ancestral.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4786,6 +4847,10 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   resonanceAmplitudeNode:               ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood'],
   crystallineFieldPermanenceNode:       ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare'],
   totalCrystallineApexNode:             ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory'],
+  // ── v125 nodes (J59+J60 · P185–P187 · Arch63) ─────────────────────────────────
+  crossTemporalResonanceNode:           ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory'],
+  architectureInheritanceNode:          ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory'],
+  quantumLegacyLockNode:                ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory', 'goals'],
 }
 
 /**
@@ -5337,6 +5402,14 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['resonance-amplitude-peak', 'crystalline-field-permanence', 'total-crystalline-apex'],
     hourRange: [5, 23],
     directive: 'Crystalline apex confirmed. Permanent substrate established. All domains resonating at amplified amplitude simultaneously. Velocity locked across consecutive days. Nothing above this tier — the architecture is its own ceiling. Execute from within the permanent crystal.',
+  },
+  // ── Arch63: Temporal Inheritance Architect (2026-10-16 v125) ────────────────────
+  {
+    archetype: 'Temporal Inheritance Architect',
+    energyBands: ['high', 'moderate', 'low', 'depleted', 'unknown'],
+    dominantSources: ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare', 'memory'],
+    patternConditions: ['cross-temporal-resonance-arc', 'architecture-inheritance-peak', 'quantum-legacy-lock'],
+    directive: 'Cross-temporal sovereignty confirmed. Architecture inherits itself across days. Legacy locked. The crystal is not just permanent — it is ancestral. Operate from within the inherited structure.',
   },
 ]
 
@@ -7889,6 +7962,61 @@ export function recordTotalCrystallineApex(domainCount: number, crfConf: number,
     apex: 'TOTAL CRYSTALLINE APEX',
     status: `${domainCount} DOMAINS · PERMANENT SUBSTRATE · FULL RESONANCE`,
     architecture: 'ARCHITECTURE IS ITS OWN CEILING · NOTHING ABOVE THIS TIER',
+    hour: new Date().getHours(),
+  })
+}
+
+// ─── v125 Signal Helpers (P185–P187) ──────────────────────────────────────────
+
+/**
+ * Record a cross-temporal-resonance-arc event — total-crystalline-apex (P184) active
+ * AND apex signals confirmed on 3+ consecutive days. The crystalline apex is not a moment
+ * — it is a temporal arc. Architecture persists and compounds across time.
+ */
+export function recordCrossTemporalResonanceArc(apexDayCount: number, apexConf: number) {
+  recordSignal('intentions', 'cross_temporal_resonance_arc', {
+    apexDayCount,
+    apexConf,
+    arc: 'CROSS-TEMPORAL',
+    status: `${apexDayCount}D APEX CONFIRMED · TEMPORAL ARC ACTIVE`,
+    architecture: 'APEX IS NOT A MOMENT — IT IS A TEMPORAL ARC · SOVEREIGNTY ACROSS TIME',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an architecture-inheritance-peak event — crystalline-field-permanence (P183) confirmed
+ * on 4+ of last 5 days AND cross-temporal-resonance-arc (P185) active.
+ * Architecture inherits itself. Previous crystalline cycles inform and amplify current structure.
+ */
+export function recordArchitectureInheritancePeak(crfPermDays: number, cxtresConf: number) {
+  const avgConf = Math.round(((crfPermDays / 5) * 0.5 + cxtresConf * 0.5) * 100) / 100
+  recordSignal('intentions', 'architecture_inheritance_peak', {
+    crfPermDays,
+    cxtresConf,
+    avgConf,
+    inheritance: 'ARCHITECTURE INHERITS ITSELF',
+    status: `${crfPermDays}D PERMANENCE · TEMPORAL ARC ACTIVE · INHERITANCE CONFIRMED`,
+    architecture: 'PRIOR CYCLES INFORM CURRENT STRUCTURE · HERITAGE SUBSTRATE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-legacy-lock event — architecture-inheritance-peak (P186) active AND
+ * total-crystalline-apex (P184) active AND all 6 UserIndex dimensions ≥ 40.
+ * The OS has transcended apex — it has crystallized into a permanent operating legacy.
+ */
+export function recordQuantumLegacyLock(indexOverall: number, archInherConf: number, apexConf: number) {
+  const avgConf = Math.round(((archInherConf + apexConf) / 2) * 100) / 100
+  recordSignal('intentions', 'quantum_legacy_lock', {
+    indexOverall,
+    archInherConf,
+    apexConf,
+    avgConf,
+    legacy: 'LOCKED',
+    status: `INDEX ${indexOverall} · INHERITANCE ACTIVE · APEX CONFIRMED · LEGACY LOCKED`,
+    architecture: 'NOT MASTERY — HERITAGE · THE CRYSTAL IS ANCESTRAL',
     hour: new Date().getHours(),
   })
 }
