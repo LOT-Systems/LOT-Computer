@@ -120,6 +120,36 @@ export const useSendDirectMessage = createMutation<
   void
 >('post', '/api/direct-messages')
 
+// LOT Email — compose in Log (/email to Name), read in Sync
+export interface EmailRecord {
+  id: string
+  senderId: string
+  receiverId: string
+  senderName: string
+  receiverName: string
+  subject: string
+  body: string
+  source: 'log' | 'sync' | 'community'
+  isMine: boolean
+  isUnread: boolean
+  createdAt: string
+}
+
+export const useEmails = createQuery<{ emails: EmailRecord[]; unread: number }>(
+  '/api/emails',
+  { refetchOnWindowFocus: true }
+)
+
+export const useSendEmail = createMutation<
+  { to?: string; toUserId?: string; body: string; subject?: string; source?: 'log' | 'sync' | 'community' },
+  EmailRecord
+>('post', '/api/emails')
+
+export const useMarkEmailRead = createMutation<{ id: string }, void>(
+  'post',
+  '/api/emails/read'
+)
+
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
 })

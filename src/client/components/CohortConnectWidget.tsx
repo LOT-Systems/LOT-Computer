@@ -10,7 +10,7 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button } from '#client/components/ui'
-import { useCohorts, useEnergy, useProfile } from '#client/queries'
+import { useCohorts, useEnergy, useProfile, useSendEmail } from '#client/queries'
 import { useLogContext } from '#client/hooks/useLogContext'
 import { usePunctuationContext } from '#client/hooks/usePunctuationContext'
 import { recordSignal, getUserState } from '#client/stores/intentionEngine'
@@ -31,6 +31,11 @@ export const CohortConnectWidget: React.FC = () => {
   const logCtx = useLogContext()
   const punctuation = usePunctuationContext()
   const hasRecordedRef = React.useRef(false)
+  // LOT Email from Community (cohort dating): write to a match, lands in their Sync
+  const [emailingId, setEmailingId] = React.useState<string | null>(null)
+  const [emailDraft, setEmailDraft] = React.useState('')
+  const [emailNote, setEmailNote] = React.useState<string | null>(null)
+  const { mutate: sendEmail, isLoading: isEmailSending } = useSendEmail()
 
   // Resolved physiological classification from profile (server-derived archetype)
   const physiologicalArchetype = profileData?.archetype
@@ -269,7 +274,55 @@ export const CohortConnectWidget: React.FC = () => {
                       >
                         Send message
                       </Button>
+                      <Button
+                        size="small"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation()
+                          setEmailNote(null)
+                          setEmailingId(emailingId === match.user.id ? null : match.user.id)
+                        }}
+                      >
+                        Email
+                      </Button>
                     </div>
+                    {emailingId === match.user.id && (
+                      <div className="space-y-4" onClick={(e) => e.stopPropagation()}>
+                        <textarea
+                          className="w-full bg-transparent border border-acc/20 rounded p-4 outline-none"
+                          rows={3}
+                          maxLength={5000}
+                          value={emailDraft}
+                          placeholder={`Email to ${match.user.firstName || 'member'}…`}
+                          onChange={(e) => setEmailDraft(e.target.value)}
+                        />
+                        <Button
+                          size="small"
+                          disabled={!emailDraft.trim() || isEmailSending}
+                          onClick={() => {
+                            recordSignal('mood', 'cohort_email_sent', {
+                              userId: match.user.id,
+                              similarity: match.similarity,
+                              hour: new Date().getHours(),
+                            })
+                            sendEmail(
+                              { toUserId: match.user.id, body: emailDraft, source: 'community' },
+                              {
+                                onSuccess: () => {
+                                  setEmailDraft('')
+                                  setEmailingId(null)
+                                  setEmailNote(`Email sent to ${match.user.firstName || 'member'}`)
+                                },
+                                onError: (err: any) =>
+                                  setEmailNote(err?.response?.data?.error || 'Email failed to send'),
+                              }
+                            )
+                          }}
+                        >
+                          Send email
+                        </Button>
+                      </div>
+                    )}
+                    {emailNote && <div className="opacity-60">{emailNote}</div>}
                   </div>
                 )}
               </div>

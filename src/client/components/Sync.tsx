@@ -24,6 +24,9 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  useMarkEmailRead,
+  EmailRecord,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -172,14 +175,18 @@ export const Sync = React.memo(function SyncInner() {
 
   if (!canAccessChat) {
     return (
-      <div className="max-w-[700px] text-acc/40 py-8">
-        Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+      <div className="max-w-[700px]">
+        <EmailInbox />
+        <div className="text-acc/40 py-8">
+          Sync chat is available for Usership, Onyx, Legacy, R&D, and Admin members.
+        </div>
       </div>
     )
   }
 
   return (
     <div className="max-w-[700px]">
+      <EmailInbox />
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}
@@ -292,5 +299,68 @@ const MessageTimeLabel: React.FC<{ dateString: string | Date; isTimeFormat12h: b
       {date.format(timeFormat)}
       {isPast && `, ${fromNow}`}
     </span>
+  )
+}
+
+/**
+ * LOT Email inbox — new mail lands here. Compose from Log with
+ * `/email to Name. message` or from a Community card. Click to open
+ * (marks read); unread mail is bold with a dot.
+ */
+const EmailInbox: React.FC = () => {
+  const me = useStore(stores.me)
+  const queryClient = useQueryClient()
+  const { data } = useEmails()
+  const { mutate: markRead } = useMarkEmailRead({
+    onSuccess: () => queryClient.invalidateQueries(['/api/emails']),
+  })
+  const [openId, setOpenId] = React.useState<string | null>(null)
+  const [showSent, setShowSent] = React.useState(false)
+
+  React.useEffect(() => {
+    const { dispose } = sync.listen('email', () => {
+      queryClient.invalidateQueries(['/api/emails'])
+    })
+    return () => dispose()
+  }, [me?.id])
+
+  const emails = (data?.emails || []).filter((m) => (showSent ? m.isMine : !m.isMine))
+  const unread = data?.unread || 0
+  if (!data?.emails?.length) return null
+
+  const onOpen = (m: EmailRecord) => () => {
+    setOpenId((cur) => (cur === m.id ? null : m.id))
+    if (m.isUnread) markRead({ id: m.id })
+  }
+
+  return (
+    <div className="mb-40">
+      <div className="flex items-center gap-x-8 mb-8 text-acc/40 select-none">
+        <span>EMAIL{unread ? ` (${unread})` : ''}</span>
+        <GhostButton onClick={() => setShowSent((v) => !v)}>
+          {showSent ? 'Inbox' : 'Sent'}
+        </GhostButton>
+      </div>
+      {emails.length === 0 && <div className="text-acc/40">Nothing here yet.</div>}
+      {emails.map((m) => (
+        <div key={m.id} className="-mx-4 px-4 py-2 rounded cursor-pointer grid-fill-hover" onClick={onOpen(m)}>
+          <div className="flex items-start gap-x-8">
+            <span className="whitespace-nowrap">
+              {m.isUnread && '● '}
+              {m.isMine ? `To ${m.receiverName}` : m.senderName}
+            </span>
+            <span className={cn('flex-1 truncate', !m.isUnread && 'text-acc/60')}>
+              {m.subject}
+            </span>
+            <span className="text-acc/40 whitespace-nowrap">{dayjs(m.createdAt).fromNow()}</span>
+          </div>
+          {openId === m.id && (
+            <div className="whitespace-breakspaces mt-4 mb-8 text-acc/80" style={{ wordBreak: 'break-word' }}>
+              {m.body}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
   )
 }
