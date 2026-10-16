@@ -1079,12 +1079,24 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
+  // Calendar widget feed: dedicated query so entries never fall off the 500-row /logs window
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    return fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: { [Op.in]: ['calendar_entry', 'calendar_start', 'calendar_done', 'calendar_alert'] },
+      },
+      order: [['createdAt', 'DESC']],
+      limit: 2000,
+    })
+  })
+
   fastify.get('/logs', async (req: FastifyRequest, reply) => {
     // Only return user-facing log events (exclude raw QIE signal events)
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_start', 'calendar_done', 'calendar_alert', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
