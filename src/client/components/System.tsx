@@ -45,7 +45,6 @@ import { EnergyCapacitor } from './EnergyCapacitor'
 import { NarrativeWidget } from './NarrativeWidget'
 import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
-import { SystemProgressWidget } from './SystemProgressWidget'
 import { SystemPulseWidget } from './SystemPulseWidget'
 import { EvolutionWidget } from './EvolutionWidget'
 import { CohortConnectWidget } from './CohortConnectWidget'
@@ -77,11 +76,21 @@ import { QuantumEngineWidgets } from './QuantumEngineWidgets'
 import { ChakraErgonomicsWidget } from './ChakraErgonomicsWidget'
 import { CalendarWidget } from './CalendarWidget'
 import { BenchmarkWidget } from './BenchmarkWidget'
-import { ArchitectWidget } from './ArchitectWidget'
 import { IntegrityWidget } from './IntegrityWidget'
 import { recomputeAssembly } from '#client/stores/selfAssembly'
 import { $layoutDensity } from '#client/stores/evolution'
 import { useInViewport } from '#client/hooks/useInViewport'
+
+// Code-split heavy, below-the-fold widgets out of the initial app bundle.
+// SystemProgressWidget carries ~180KB of build-record text; ArchitectWidget
+// imports from it, so both are split together. Mounted immediately once the
+// chunk arrives (not viewport-gated) so startBackgroundQOSMonitor() still starts.
+const SystemProgressWidget = React.lazy(() =>
+  import('./SystemProgressWidget').then((m) => ({ default: m.SystemProgressWidget }))
+)
+const ArchitectWidget = React.lazy(() =>
+  import('./ArchitectWidget').then((m) => ({ default: m.ArchitectWidget }))
+)
 
 // Defers mount of children until element first enters the viewport.
 // Once mounted, stays mounted — no unmount on scroll away.
@@ -400,6 +409,15 @@ export const System = React.memo(function SystemInner() {
   }, [])
 
   // Sound is now managed globally in app.tsx via useSound hook
+
+  // Intentions visibility is latched once decided: the decision used to run in
+  // render and write 'intentions-last-shown' as a side effect, so the very next
+  // re-render saw a fresh cooldown and unmounted the widget (flicker). The
+  // 2–3 day jitter is also rolled once per mount instead of on every render.
+  const intentionsLatchRef = React.useRef(false)
+  const intentionsCooldownRef = React.useRef(
+    2 * 24 * 60 * 60 * 1000 + Math.random() * 24 * 60 * 60 * 1000
+  )
 
   // Paid account check — R&D and Usership get the full condensed pro layout
   const isPaidAccount = React.useMemo(() => {
@@ -881,28 +899,24 @@ export const System = React.memo(function SystemInner() {
       <WidgetErrorBoundary name="Intentions">
         {(() => {
           const hasIntention = !!localStorage.getItem('current-intention')
-
-          // Check cooldown (2-3 days since last shown)
-          const lastShown = localStorage.getItem('intentions-last-shown')
-          const twoDaysMs = 2 * 24 * 60 * 60 * 1000
-          const threeDaysMs = 3 * 24 * 60 * 60 * 1000
-
-          // Random cooldown between 2-3 days
-          const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
-          const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
-
           const intentionSuggestsIntentions = optimalWidget?.widget === 'intentions'
 
-          // Show if:
-          // 1. User has an existing intention to display, OR
-          // 2. Intention engine detects seeking-direction or morning-clarity patterns, OR
-          // 3. Cooldown passed (fallback for periodic prompting)
-          if (hasIntention || intentionSuggestsIntentions || cooldownPassed) {
-            // Update last shown time
-            if (!lastShown || cooldownPassed || intentionSuggestsIntentions) {
+          if (!intentionsLatchRef.current) {
+            const lastShown = localStorage.getItem('intentions-last-shown')
+            const cooldownPassed = !lastShown ||
+              (Date.now() - parseInt(lastShown)) >= intentionsCooldownRef.current
+
+            // Show if:
+            // 1. User has an existing intention to display, OR
+            // 2. Intention engine detects seeking-direction or morning-clarity patterns, OR
+            // 3. Cooldown passed (fallback for periodic prompting)
+            if (hasIntention || intentionSuggestsIntentions || cooldownPassed) {
+              intentionsLatchRef.current = true
               localStorage.setItem('intentions-last-shown', Date.now().toString())
             }
+          }
 
+          if (intentionsLatchRef.current) {
             // Store quantum reasoning for widget to display
             if (intentionSuggestsIntentions && optimalWidget?.reason) {
               localStorage.setItem('intentions-quantum-reason', optimalWidget.reason)
@@ -1028,7 +1042,9 @@ export const System = React.memo(function SystemInner() {
           <CorrelatedIndexesWidget />
 
           {/* System Progress - Deployment info with feedback */}
-          <SystemProgressWidget />
+          <React.Suspense fallback={null}>
+            <SystemProgressWidget />
+          </React.Suspense>
 
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />
@@ -1037,7 +1053,9 @@ export const System = React.memo(function SystemInner() {
 
       {/* Architect — executive self-assembly telemetry, paid users only */}
       <WidgetErrorBoundary name="Architect">
-        <ArchitectWidget />
+        <React.Suspense fallback={null}>
+          <ArchitectWidget />
+        </React.Suspense>
       </WidgetErrorBoundary>
 
       {/* Stats stack */}
