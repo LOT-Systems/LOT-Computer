@@ -28,7 +28,15 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, detectTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import {
+  buildSystemHelp,
+  parseStoryScope,
+  parseSystemFilter,
+  extractSlashTokens,
+  suggestLogCommand,
+  arcadeRank,
+} from '#shared/utils/logCommands'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3743,6 +3751,7 @@ const NoteEditor = ({
     onSuccess: (data) => {
       setStoryResponse(data.story)
       setStoryLoading(false)
+      storyLoadingRef.current = false
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + data.story
@@ -3755,6 +3764,7 @@ const NoteEditor = ({
       const fallback = 'The system holds your data quietly. When the engine returns, your story will be here.'
       setStoryResponse(fallback)
       setStoryLoading(false)
+      storyLoadingRef.current = false
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + fallback
@@ -3931,6 +3941,28 @@ const NoteEditor = ({
   // the editor. We compare against the previous value via ref so
   // editing around an existing trigger doesn't re-fire it.
   // --------------------------------------------------------------------
+  // Commands that take an argument wait for the user to finish typing it.
+  const storyLoadingRef = React.useRef(false)
+  const deferTimers = React.useRef<number[]>([])
+  const deferArgCommand = React.useCallback((fn: () => void) => {
+    deferTimers.current.push(window.setTimeout(fn, 1200))
+  }, [])
+  React.useEffect(() => () => deferTimers.current.forEach(t => window.clearTimeout(t)), [])
+
+  // Unknown "/word" → "did you mean". Debounced so partial typing stays quiet.
+  React.useEffect(() => {
+    const t = window.setTimeout(() => {
+      for (const tok of extractSlashTokens(value)) {
+        const guess = tok.length >= 3 ? suggestLogCommand(tok) : null
+        if (guess) {
+          setSystemHelp(`UNKNOWN COMMAND  /${tok}\n\n/${guess}  Did you mean this? Type /system for all commands.`)
+          return
+        }
+      }
+    }, 1800)
+    return () => window.clearTimeout(t)
+  }, [value])
+
   const lastTriggerScanRef = React.useRef(log.text || '')
   React.useEffect(() => {
     const fresh = detectNewTriggers(value, lastTriggerScanRef.current)
@@ -4121,49 +4153,45 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        // Deferred so an argument ("/system radio") typed right after the
+        // command is part of the text when the screen is built.
+        deferArgCommand(() => {
+          if (!detectTriggers(valueRef.current).includes('system-help')) return
+          setSystemHelp(buildSystemHelp(parseSystemFilter(valueRef.current)))
+        })
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
+        // Deferred so "/story month" is read after the scope word is typed.
+        deferArgCommand(() => {
+          const text = valueRef.current
+          if (!detectTriggers(text).includes('story-mode') || storyLoadingRef.current) return
+          const scope = parseStoryScope(text)
+          storyLoadingRef.current = true
           setStoryLoading(true)
           setStoryResponse(null)
+          const logText = text
+            .replace(/\/story(\s+(?:day|today|daily|week|weekly|month|monthly|year|yearly|annual)\b)?/i, '')
+            .replace(/📖/g, '')
+            .trim()
+          let arcade: { title: string; level: number; badges: number } | undefined
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
+            const badges = getEarnedBadges().length
+            const r = arcadeRank(badges)
+            arcade = { title: r.title, level: r.level, badges }
+          } catch {}
+          try {
             submitStory({
               logText,
-              quantumState: state,
-              userIndex: index,
+              scope,
+              arcade,
+              quantumState: getUserState(),
+              userIndex: getUserIndex(),
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText, scope })
           }
-        }
+        })
       }
     }
   }, [value])
