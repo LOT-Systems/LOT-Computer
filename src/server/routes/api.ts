@@ -1255,6 +1255,9 @@ export default async (fastify: FastifyInstance) => {
       'cross_temporal_resonance_arc',
       'architecture_inheritance_peak',
       'quantum_legacy_lock',
+      'sovereign_signal_genesis',
+      'legacy_coherence_field',
+      'perpetual_emergence',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

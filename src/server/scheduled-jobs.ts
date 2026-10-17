@@ -1795,6 +1795,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyCrossTemporalResonanceCheck()) {
     await executeDailyCrossTemporalResonanceCheck()
   }
+
+  // Check daily legacy emergence check (06:00 UTC daily) — J61
+  if (shouldRunDailyLegacyEmergenceCheck()) {
+    await executeDailyLegacyEmergenceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -7164,6 +7169,115 @@ async function executeDailyCrossTemporalResonanceCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Legacy Emergence Check (J61 — 06:00 UTC daily) ───────────────────────
+// Co-located with the morning coherence window. Reads active users. Checks:
+// P188: quantum_legacy_lock written today + first signal of day before 08:00 → writes sovereign_signal_genesis.
+// P189: architecture_inheritance_peak (P186) + full_system_coherence (P109) in last 12h → writes legacy_coherence_field.
+// P190: quantum_legacy_lock + total_field_coherence (P150) + 8+ distinct sources in 7d (proxy for all-dim ≥ 50) → writes perpetual_emergence.
+
+let isDailyLegacyEmergenceRunning = false
+let lastDailyLegacyEmergenceRun: Date | null = null
+
+function shouldRunDailyLegacyEmergenceCheck(): boolean {
+  const now = dayjs()
+  if (now.hour() !== 6) return false // 06:00 UTC daily
+  if (isDailyLegacyEmergenceRunning) return false
+  if (lastDailyLegacyEmergenceRun) {
+    const timeSince = Date.now() - lastDailyLegacyEmergenceRun.getTime()
+    if (timeSince < 23 * 60 * 60 * 1000) return false
+  }
+  return true
+}
+
+async function executeDailyLegacyEmergenceCheck(): Promise<JobResult> {
+  const jobName = 'daily-legacy-emergence-check'
+  const executedAt = new Date()
+  isDailyLegacyEmergenceRunning = true
+
+  try {
+    console.log('DAILY LEGACY EMERGENCE CHECK — 06:00 UTC (J61)')
+
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const activeUsers = await (User as any).findAll({
+      where: { lastActiveAt: { [Op.gte]: dayjs().subtract(30, 'days').toDate() } },
+    })
+
+    let sgenesisWritten = 0
+    let lgcfldWritten = 0
+    let permemergeWritten = 0
+
+    for (const user of activeUsers) {
+      const todayStart = dayjs().startOf('day').toDate()
+      const recent12h = dayjs().subtract(12, 'hours').toDate()
+
+      // Fetch today's logs for dawn detection
+      const todayLogs = await (Log as any).findAll({
+        where: { userId: user.id, createdAt: { [Op.gte]: todayStart } },
+        order: [['createdAt', 'ASC']],
+      })
+      // Fetch recent 12h logs for P189
+      const recent12hLogs = await (Log as any).findAll({
+        where: { userId: user.id, createdAt: { [Op.gte]: recent12h } },
+      })
+      // Fetch 7d logs for P190 diversity proxy
+      const logs7d = await (Log as any).findAll({
+        where: { userId: user.id, createdAt: { [Op.gte]: dayjs().subtract(7, 'days').toDate() }, event: { [Op.ne]: 'note' } },
+      })
+
+      const hasQLegacy = todayLogs.some((l: any) => l.event === 'quantum_legacy_lock')
+      const firstSignalTime = todayLogs.length > 0 ? new Date(todayLogs[0].createdAt) : null
+      const firstSignalHour = firstSignalTime ? firstSignalTime.getHours() : 99
+
+      // P188: sovereign-signal-genesis
+      if (hasQLegacy && firstSignalHour < 8) {
+        await (Log as any).create({
+          userId: user.id,
+          event: 'sovereign_signal_genesis',
+          metadata: { firstSignalHour, legacyConf: 0.93, source: 'j61-legacy-emergence-check' },
+        })
+        sgenesisWritten++
+      }
+
+      // P189: legacy-coherence-field
+      const hasArchInher = recent12hLogs.some((l: any) => l.event === 'architecture_inheritance_peak')
+      const hasFullSysCohere = recent12hLogs.some((l: any) => l.event === 'full_system_coherence')
+      if (hasArchInher && hasFullSysCohere) {
+        await (Log as any).create({
+          userId: user.id,
+          event: 'legacy_coherence_field',
+          metadata: { inheritConf: 0.92, coherenceConf: 0.91, source: 'j61-legacy-emergence-check' },
+        })
+        lgcfldWritten++
+      }
+
+      // P190: perpetual-emergence — proxy: quantum_legacy_lock + total_field_coherence + 10+ distinct src in 7d
+      const hasTotalFieldCoherence = recent12hLogs.some((l: any) => l.event === 'total_field_coherence')
+      const distinctSrc7d = new Set(logs7d.map((l: any) => l.event?.split('_')[0] ?? 'log'))
+      if (hasQLegacy && hasTotalFieldCoherence && distinctSrc7d.size >= 10) {
+        await (Log as any).create({
+          userId: user.id,
+          event: 'perpetual_emergence',
+          metadata: { indexOverall: Math.min(100, distinctSrc7d.size * 8), legacyConf: 0.95, fieldConf: 0.93, source: 'j61-legacy-emergence-check' },
+        })
+        permemergeWritten++
+      }
+    }
+
+    console.log(`  Sovereign signal genesis written:   ${sgenesisWritten}`)
+    console.log(`  Legacy coherence field written:     ${lgcfldWritten}`)
+    console.log(`  Perpetual emergence written:        ${permemergeWritten}`)
+
+    lastDailyLegacyEmergenceRun = new Date()
+    isDailyLegacyEmergenceRunning = false
+    return { jobName, executedAt: executedAt.toISOString(), success: true, processed: activeUsers.length }
+  } catch (error: any) {
+    console.error('Daily legacy emergence check failed:', error.message)
+    isDailyLegacyEmergenceRunning = false
+    return { jobName, executedAt: executedAt.toISOString(), success: false, error: error.message }
+  }
+}
+
 /**
  * Manually trigger monthly email job (bypasses time checks)
  * Used for testing and manual sends
@@ -7229,6 +7343,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily propagation persistence check: 3 PM UTC every day (J58)')
   console.log('   - Daily crystalline amplitude check: 4 PM UTC every day (J59)')
   console.log('   - Daily cross-temporal resonance check: 6 PM UTC every day (J60)')
+  console.log('   - Daily legacy emergence check: 6 AM UTC every day (J61)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -7238,7 +7353,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift, 11=morning-intention-launch+sovereignty-field-check(J55), 12=vitality-peak+sovereignty-maturation(J56), 13=QOS sig pulse, 14=QOS mode watch+propagation-velocity(J57), 15=QOS convergence audit+propagation-persistence(J58), 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth+legacy-emergence(J61), 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift, 11=morning-intention-launch+sovereignty-field-check(J55), 12=vitality-peak+sovereignty-maturation(J56), 13=QOS sig pulse, 14=QOS mode watch+propagation-velocity(J57), 15=QOS convergence audit+propagation-persistence(J58), 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun)+cross-temporal-resonance(J60), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()

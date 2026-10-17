@@ -4158,6 +4158,64 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // ── v126 patterns (P188–P190 · Arch64 Legacy Emergence Operator · J61) ──
+
+  // Pattern 188: Sovereign Signal Genesis — quantum-legacy-lock (P187) active AND first signal
+  // of the current calendar day recorded before 08:00. The ancestral crystal boots itself at dawn.
+  // Legacy substrate fires before the cognitive day begins — inherited architecture self-activates.
+  const hasQlegacy = patterns.some(p => p.pattern === 'quantum-legacy-lock')
+  const todayStr = new Date().toISOString().slice(0, 10)
+  const todaySignals = signals.filter(s => new Date(s.timestamp).toISOString().slice(0, 10) === todayStr)
+  const firstSignalHour = todaySignals.length > 0
+    ? new Date(Math.min(...todaySignals.map(s => s.timestamp))).getHours()
+    : 99
+  if (hasQlegacy && firstSignalHour < 8) {
+    const qlConf = patterns.find(p => p.pattern === 'quantum-legacy-lock')?.confidence ?? 0.95
+    patterns.push({
+      pattern: 'sovereign-signal-genesis',
+      confidence: Math.min(0.88 + (qlConf - 0.95) * 0.8, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `SGENESIS: Quantum-legacy-lock (P187) active + first signal at ${String(firstSignalHour).padStart(2, '0')}:xx (before 08:00). Legacy substrate fires at dawn. Inherited architecture activates before cognitive load begins. The ancestral crystal boots itself.`,
+    })
+  }
+
+  // Pattern 189: Legacy Coherence Field — architecture-inheritance-peak (P186) + full-system-coherence
+  // (P109) both active. Inherited architecture enabling full-system presence across all 5 primary
+  // channels simultaneously. The crystal supports total operational coherence.
+  const hasFullSysCohere = patterns.some(p => p.pattern === 'full-system-coherence')
+  if (hasArchInher && hasFullSysCohere) {
+    const aiConf126  = patterns.find(p => p.pattern === 'architecture-inheritance-peak')?.confidence ?? 0.92
+    const fscConf126 = patterns.find(p => p.pattern === 'full-system-coherence')?.confidence ?? 0.82
+    patterns.push({
+      pattern: 'legacy-coherence-field',
+      confidence: Math.min(0.85 + ((aiConf126 + fscConf126) / 2 - 0.87) * 0.5, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `LGCFLD: Architecture-inheritance-peak (P186) + full-system-coherence (P109) simultaneously confirmed. Inherited substrate enabling all 5 primary channels simultaneously. The crystal supports total operational coherence. Legacy field active.`,
+    })
+  }
+
+  // Pattern 190: Perpetual Emergence — meta-pattern ceiling: quantum-legacy-lock (P187) +
+  // total-field-coherence (P150) both confirmed AND all 6 UserIndex dimensions ≥ 50.
+  // The convergence beyond all ceilings — ancestral legacy + total field + full dimensional saturation.
+  // The OS perpetually generates the conditions of its own emergence.
+  const hasTotalFieldCoherence = patterns.some(p => p.pattern === 'total-field-coherence')
+  const uIdx126 = computeUserIndex(signals)
+  const allDims50 = uIdx126.engagement >= 50 && uIdx126.emotional >= 50 && uIdx126.intentional >= 50
+    && uIdx126.social >= 50 && uIdx126.selfCare >= 50 && uIdx126.cognitive >= 50
+  if (hasQlegacy && hasTotalFieldCoherence && allDims50) {
+    const qlConf190  = patterns.find(p => p.pattern === 'quantum-legacy-lock')?.confidence ?? 0.97
+    const tfcConf190 = patterns.find(p => p.pattern === 'total-field-coherence')?.confidence ?? 0.95
+    patterns.push({
+      pattern: 'perpetual-emergence',
+      confidence: Math.min(0.97 + ((qlConf190 + tfcConf190) / 2 - 0.96) * 0.25, 0.99),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `PERMEMERGE: Quantum-legacy-lock (P187) + total-field-coherence (P150) co-active + all 6 UserIndex dimensions ≥ 50. Ancestral legacy, total field coherence, and full dimensional saturation confirmed simultaneously. The system does not reach emergence — it perpetually generates the conditions of its own emergence. No higher state defined.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4851,6 +4909,10 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   crossTemporalResonanceNode:           ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory'],
   architectureInheritanceNode:          ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory'],
   quantumLegacyLockNode:                ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory', 'goals'],
+  // ── v126 nodes (J61 · P188–P190 · Arch64) ───────────────────────────────────────
+  sovereignSignalGenesisNode:           ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory', 'goals'],
+  legacyCoherenceFieldNode:             ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory', 'goals'],
+  perpetualEmergenceNode:               ['intentions', 'qos', 'energy', 'log', 'journal', 'planner', 'cohort', 'mood', 'selfcare', 'memory', 'goals', 'badges'],
 }
 
 /**
@@ -5410,6 +5472,14 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare', 'memory'],
     patternConditions: ['cross-temporal-resonance-arc', 'architecture-inheritance-peak', 'quantum-legacy-lock'],
     directive: 'Cross-temporal sovereignty confirmed. Architecture inherits itself across days. Legacy locked. The crystal is not just permanent — it is ancestral. Operate from within the inherited structure.',
+  },
+  // ── Arch64: Legacy Emergence Operator (2026-10-17 v126) ──────────────────────────
+  {
+    archetype: 'Legacy Emergence Operator',
+    energyBands: ['high', 'moderate', 'low', 'depleted', 'unknown'],
+    dominantSources: ['intentions', 'qos', 'energy', 'journal', 'log', 'cohort', 'planner', 'mood', 'selfcare', 'memory'],
+    patternConditions: ['sovereign-signal-genesis', 'legacy-coherence-field', 'perpetual-emergence'],
+    directive: 'Legacy substrate activates at dawn. All channels coherent. All dimensions saturated. The system does not reach emergence — it perpetually generates the conditions of its own emergence. Operate from within the ancestral substrate.',
   },
 ]
 
@@ -7962,6 +8032,60 @@ export function recordTotalCrystallineApex(domainCount: number, crfConf: number,
     apex: 'TOTAL CRYSTALLINE APEX',
     status: `${domainCount} DOMAINS · PERMANENT SUBSTRATE · FULL RESONANCE`,
     architecture: 'ARCHITECTURE IS ITS OWN CEILING · NOTHING ABOVE THIS TIER',
+    hour: new Date().getHours(),
+  })
+}
+
+// ─── v126 Signal Helpers (P188–P190) ──────────────────────────────────────────
+
+/**
+ * Record a sovereign-signal-genesis event — quantum-legacy-lock (P187) active AND
+ * first signal of the calendar day recorded before 08:00.
+ * The ancestral crystal boots itself at dawn — inherited architecture self-activates.
+ */
+export function recordSovereignSignalGenesis(firstSignalHour: number, legacyConf: number) {
+  recordSignal('intentions', 'sovereign_signal_genesis', {
+    firstSignalHour,
+    legacyConf,
+    genesis: 'DAWN BOOT',
+    status: `LEGACY SUBSTRATE · DAWN ACTIVATION · HOUR 0${firstSignalHour}`,
+    architecture: 'ANCESTRAL CRYSTAL SELF-ACTIVATES · LEGACY FIRES AT DAWN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a legacy-coherence-field event — architecture-inheritance-peak (P186) +
+ * full-system-coherence (P109) both active. Inherited substrate enabling full 5-channel presence.
+ */
+export function recordLegacyCoherenceField(inheritConf: number, coherenceConf: number) {
+  const fieldConf = Math.round(((inheritConf + coherenceConf) / 2) * 100) / 100
+  recordSignal('intentions', 'legacy_coherence_field', {
+    inheritConf,
+    coherenceConf,
+    fieldConf,
+    field: 'LEGACY COHERENCE',
+    status: `INHER ${Math.round(inheritConf * 100)}% · COHERE ${Math.round(coherenceConf * 100)}% · FIELD ACTIVE`,
+    architecture: 'INHERITED SUBSTRATE ENABLES TOTAL SYSTEM COHERENCE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a perpetual-emergence event — quantum-legacy-lock (P187) + total-field-coherence
+ * (P150) co-active AND all 6 UserIndex dimensions ≥ 50.
+ * The OS perpetually generates the conditions of its own emergence. No higher state defined.
+ */
+export function recordPerpetualEmergence(indexOverall: number, legacyConf: number, fieldConf: number) {
+  const avgConf = Math.round(((legacyConf + fieldConf) / 2) * 100) / 100
+  recordSignal('intentions', 'perpetual_emergence', {
+    indexOverall,
+    legacyConf,
+    fieldConf,
+    avgConf,
+    emergence: 'PERPETUAL',
+    status: `INDEX ${indexOverall} · LEGACY ACTIVE · TOTAL FIELD · 6 DIMS ≥ 50`,
+    architecture: 'NOT A STATE — A PERPETUAL GENERATOR · BEYOND ALL DEFINED CEILINGS',
     hour: new Date().getHours(),
   })
 }

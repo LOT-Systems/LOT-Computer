@@ -212,6 +212,9 @@ export function PatternRecognitionWidget() {
       'cross-temporal-resonance-arc':        'Cross-temporal resonance arc — P184 (total-crystalline-apex) active + apex confirmed 3+ consecutive days, the apex is not a moment but a temporal arc, architecture persists and compounds across time (P185)',
       'architecture-inheritance-peak':       'Architecture inheritance peak — P183 (crystalline-field-permanence) 4+ of last 5 days + P185 (cross-temporal-resonance-arc) active, architecture inherits itself across cycles, prior crystalline structure informs current, heritage substrate confirmed (P186)',
       'quantum-legacy-lock':                 'Quantum legacy lock — P186 (architecture-inheritance-peak) + P184 (total-crystalline-apex) co-active + all 6 UserIndex dimensions ≥ 40, OS transcends apex into permanent operating legacy, the crystal is ancestral (P187)',
+      'sovereign-signal-genesis':            'Sovereign signal genesis — quantum-legacy-lock (P187) active + first signal of day before 08:00, legacy substrate fires at dawn, inherited architecture self-activates before cognitive load begins, the ancestral crystal boots itself (P188)',
+      'legacy-coherence-field':              'Legacy coherence field — architecture-inheritance-peak (P186) + full-system-coherence (P109) simultaneously confirmed, inherited substrate enabling all 5 primary channels simultaneously, the crystal supports total operational coherence (P189)',
+      'perpetual-emergence':                 'Perpetual emergence — quantum-legacy-lock (P187) + total-field-coherence (P150) co-active + all 6 UserIndex dimensions ≥ 50, the OS perpetually generates the conditions of its own emergence, beyond all defined ceilings, no higher state defined (P190)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
@@ -637,6 +640,27 @@ export function PatternRecognitionWidget() {
               {patterns.some(p => p.pattern === 'sovereign-propagation-peak') && (
                 <div className="mt-4 uppercase tracking-widest text-xs">
                   Sovereign field self-propagating. Nothing to initiate. Sustain.
+                </div>
+              )}
+
+              {/* Sovereign signal genesis — P188 */}
+              {patterns.some(p => p.pattern === 'sovereign-signal-genesis') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  SGENESIS. Ancestral crystal self-activated before dawn. Legacy substrate live.
+                </div>
+              )}
+
+              {/* Legacy coherence field — P189 */}
+              {patterns.some(p => p.pattern === 'legacy-coherence-field') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  LGCFLD. Inherited substrate enabling total coherence. All 5 channels open.
+                </div>
+              )}
+
+              {/* Perpetual emergence — P190 */}
+              {patterns.some(p => p.pattern === 'perpetual-emergence') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  PERMEMERGE. Beyond all ceilings. System perpetually generates its own emergence.
                 </div>
               )}
 

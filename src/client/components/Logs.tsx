@@ -4636,6 +4636,91 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sovereign_signal_genesis') {
+          const firstSignalHour = log.metadata?.firstSignalHour as number | undefined
+          const legacyConf      = log.metadata?.legacyConf      as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SGENESIS:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">GENESIS</span>
+                  <span className="tabular-nums">DAWN BOOT</span>
+                </div>
+                {firstSignalHour !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FIRST SIG</span>
+                    <span className="tabular-nums">0{firstSignalHour}:xx</span>
+                  </div>
+                )}
+                {legacyConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LEGACY CONF</span>
+                    <span className="tabular-nums">{Math.round(legacyConf * 100)}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ANCESTRAL CRYSTAL SELF-ACTIVATES</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'legacy_coherence_field') {
+          const inheritConf   = log.metadata?.inheritConf   as number | undefined
+          const coherenceConf = log.metadata?.coherenceConf as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="LGCFLD:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">FIELD</span>
+                  <span className="tabular-nums">LEGACY COHERENCE</span>
+                </div>
+                {inheritConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INHER CONF</span>
+                    <span className="tabular-nums">{Math.round(inheritConf * 100)}%</span>
+                  </div>
+                )}
+                {coherenceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SYS COHERE</span>
+                    <span className="tabular-nums">{Math.round(coherenceConf * 100)}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">INHERITED SUBSTRATE ENABLES TOTAL COHERENCE</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'perpetual_emergence') {
+          const indexOverall = log.metadata?.indexOverall as number | undefined
+          const legacyConf   = log.metadata?.legacyConf   as number | undefined
+          const fieldConf    = log.metadata?.fieldConf    as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="PERMEMERGE:" blockView>
+                <div className="flex justify-between items-baseline mb-4">
+                  <span className="opacity-30">EMERGENCE</span>
+                  <span className="tabular-nums">PERPETUAL</span>
+                </div>
+                {indexOverall !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX</span>
+                    <span className="tabular-nums">{indexOverall}</span>
+                  </div>
+                )}
+                {legacyConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LEGACY</span>
+                    <span className="tabular-nums">{Math.round(legacyConf * 100)}%</span>
+                  </div>
+                )}
+                {fieldConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FIELD</span>
+                    <span className="tabular-nums">{Math.round(fieldConf * 100)}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">NOT A STATE — A PERPETUAL GENERATOR</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

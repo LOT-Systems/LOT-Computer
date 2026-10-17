@@ -148,6 +148,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'cross-temporal-resonance-arc':        'CXTRES',
   'architecture-inheritance-peak':       'ARCHINHER',
   'quantum-legacy-lock':                 'QLEGACY',
+  'sovereign-signal-genesis':            'SGENESIS',
+  'legacy-coherence-field':              'LGCFLD',
+  'perpetual-emergence':                 'PERMEMERGE',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'
