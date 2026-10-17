@@ -469,7 +469,7 @@ export const QuantumEngineWidgets: React.FC = () => {
                   </div>
                   <div className="flex justify-between items-baseline">
                     <span className="opacity-30 uppercase">CARE</span>
-                    <span className="tabular-nums">{userIndex.dimensions.selfcare}</span>
+                    <span className="tabular-nums">{userIndex.dimensions.selfCare}</span>
                   </div>
                   <div className="flex justify-between items-baseline">
                     <span className="opacity-30 uppercase">COG</span>
