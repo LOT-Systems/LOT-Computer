@@ -28,12 +28,14 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
+import { useQueryClient } from 'react-query'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { parseEmailCommand } from '#client/utils/emailCommand'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useSendEmail } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3707,6 +3709,30 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const queryClient = useQueryClient()
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: (data, vars) => {
+      const first = data.to.split(' ')[0]
+      const sent = `✉ SENT to ${first}. ${vars.body}`
+      const cmd = parseEmailCommand(valueRef.current)
+      const updated = cmd ? valueRef.current.replace(cmd.raw, sent) : valueRef.current
+      setValue(updated)
+      valueRef.current = updated
+      onChangeRef.current(updated)
+      setIsSaved(true)
+      setEmailStatus(
+        `SENT → ${data.to.toUpperCase()}${data.cohort ? ` · COHORT MATCH (${data.cohort})` : ''}`
+      )
+      queryClient.invalidateQueries(['/api/emails'])
+    },
+    onError: (err: any) => {
+      const cands: string[] | undefined = err?.response?.data?.candidates
+      setEmailStatus(
+        `NOT SENT — ${err?.response?.data?.error || 'email unavailable'}${cands ? ` (${cands.join(', ')})` : ''}`
+      )
+    },
+  })
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3911,6 +3937,11 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        const emailCmd = parseEmailCommand(valueRef.current)
+        if (emailCmd) {
+          setEmailStatus('SENDING...')
+          sendEmail({ to: emailCmd.to, body: emailCmd.body })
+        }
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -4138,6 +4169,7 @@ const NoteEditor = ({
           '/synth        Toggle keyboard sound',
           '/radio        Toggle radio',
           '/night        Dark mode',
+          '/email        /email to Name. message — Ctrl+Enter sends (inbox in Sync)',
           '/how          Open LOT AI check-in (System tab)',
           '/system       This help screen',
           '',
@@ -4145,6 +4177,8 @@ const NoteEditor = ({
           'Ctrl+Enter    Save log immediately',
         ]
         setSystemHelp(lines.join('\n'))
+      } else if (trigger === 'email-compose') {
+        setEmailStatus('EMAIL — write "/email to Name. message", then Ctrl+Enter to send')
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4384,6 +4418,13 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailStatus && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6' }}>{emailStatus}</div>
             </Block>
           </div>
         )}

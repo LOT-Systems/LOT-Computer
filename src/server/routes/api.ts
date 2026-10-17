@@ -368,6 +368,12 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data })
           break
         }
+        case 'email': {
+          if (data.receiverId === req.user.id) {
+            write({ event, data: { id: data.id, senderName: data.senderName } })
+          }
+          break
+        }
         case 'chat_message_like': {
           const payload = data as ChatMessageLikeEventPayload
           // likes/likesCount are already computed by the POST handler.
@@ -4082,6 +4088,134 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL - /email to <name> in Log, inbox in Sync, scoped to LOT Community
+  // ============================================================================
+
+  const EMAIL_MAX_LENGTH = 5000
+  const EMAIL_LIST_LIMIT = 50
+
+  // LOT Community = members who can use Sync (same gate as chat)
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { to: string; body: string }
+  }>, reply) => {
+    try {
+      if (!canAccessChat(req.user.tags || [])) {
+        return reply.status(403).send({ error: 'Email requires LOT Community membership' })
+      }
+      const to = String(req.body?.to || '').trim().toLowerCase()
+      const body = String(req.body?.body || '').trim().slice(0, EMAIL_MAX_LENGTH)
+      if (!to || !body) {
+        return reply.status(400).send({ error: 'Recipient and message are required' })
+      }
+
+      const users = await fastify.models.User.findAll({
+        where: { id: { [Op.ne]: req.user.id } },
+        attributes: ['id', 'firstName', 'lastName', 'tags', 'city', 'country', 'metadata'],
+      })
+      const candidates = users.filter((u) => {
+        if (!canAccessChat(u.tags || [])) return false
+        const first = (u.firstName || '').trim().toLowerCase()
+        const full = `${u.firstName || ''} ${u.lastName || ''}`.trim().toLowerCase()
+        return first === to || full === to
+      })
+      if (candidates.length === 0) {
+        return reply.status(404).send({ error: `No community member named "${req.body.to}"` })
+      }
+      if (candidates.length > 1) {
+        return reply.status(409).send({
+          error: `Several members named "${req.body.to}" — use full name`,
+          candidates: candidates.map((u) => `${u.firstName || ''} ${u.lastName || ''}`.trim()),
+        })
+      }
+      const receiver = candidates[0]
+
+      const email = await fastify.models.Email.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        body,
+      })
+      const senderName = `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim()
+      // Notify only — the body is fetched by the receiver through GET /emails
+      sync.emit('email', { id: email.id, receiverId: receiver.id, senderName })
+
+      // Cohort Dating hook: flag a shared archetype or city so Sync can surface it
+      const myArchetype = (req.user.metadata as any)?.archetype
+      const theirArchetype = (receiver.metadata as any)?.archetype
+      const cohort =
+        myArchetype && myArchetype === theirArchetype
+          ? 'ARCHETYPE'
+          : req.user.city && req.user.city === receiver.city && req.user.country === receiver.country
+            ? 'CITY'
+            : null
+
+      return reply.send({
+        id: email.id,
+        to: `${receiver.firstName || ''} ${receiver.lastName || ''}`.trim(),
+        cohort,
+        createdAt: email.createdAt,
+      })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  fastify.get('/emails', async (req: FastifyRequest, reply) => {
+    try {
+      if (!canAccessChat(req.user.tags || [])) {
+        return reply.status(403).send({ error: 'Email requires LOT Community membership' })
+      }
+      const rows = await fastify.models.Email.findAll({
+        where: {
+          [Op.or]: [{ senderId: req.user.id }, { receiverId: req.user.id }],
+        },
+        order: [['createdAt', 'DESC']],
+        limit: EMAIL_LIST_LIMIT,
+      })
+      const ids = Array.from(new Set(rows.flatMap((r) => [r.senderId, r.receiverId])))
+      const people = await fastify.models.User.findAll({
+        where: { id: { [Op.in]: ids } },
+        attributes: ['id', 'firstName', 'lastName'],
+      })
+      const nameOf = new Map(
+        people.map((u) => [u.id, `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown'])
+      )
+      const emails = rows.map((r) => ({
+        id: r.id,
+        from: nameOf.get(r.senderId) || 'Unknown',
+        to: nameOf.get(r.receiverId) || 'Unknown',
+        senderId: r.senderId,
+        body: r.body,
+        isMine: r.senderId === req.user.id,
+        isRead: !!r.readAt,
+        createdAt: r.createdAt,
+      }))
+      return reply.send({
+        emails,
+        unread: rows.filter((r) => r.receiverId === req.user.id && !r.readAt).length,
+      })
+    } catch (error) {
+      console.error('Error fetching emails:', error)
+      return reply.status(500).send({ error: 'Failed to fetch emails' })
+    }
+  })
+
+  fastify.post('/emails/read', async (req: FastifyRequest<{
+    Body: { id: string }
+  }>, reply) => {
+    try {
+      await fastify.models.Email.update(
+        { readAt: new Date() },
+        { where: { id: req.body.id, receiverId: req.user.id, readAt: null } }
+      )
+      return reply.send({})
+    } catch (error) {
+      console.error('Error marking email read:', error)
+      return reply.status(500).send({ error: 'Failed to mark email read' })
     }
   })
 
