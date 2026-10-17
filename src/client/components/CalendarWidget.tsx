@@ -14,14 +14,17 @@ import { cn } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import type { Dayjs } from '#client/utils/dayjs'
 import { recordCalendarSignal } from '#client/stores/intentionEngine'
-
-type EntryType = 'note' | 'task' | 'call'
-
-type CalendarEntry = {
-  date: string
-  text: string
-  type: EntryType
-}
+import {
+  type CalendarEntry,
+  type EntryType,
+  activeStage,
+  alertLogText,
+  buildEntries,
+  dueStage,
+  formatCountdown,
+  nextTimedEntry,
+  normalizeTime,
+} from '#client/utils/calendar'
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
@@ -60,24 +63,58 @@ export function CalendarWidget() {
   const [entryText, setEntryText] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
 
-  const entries = React.useMemo<CalendarEntry[]>(() => {
-    return logs
-      .filter(log => log.event === 'calendar_entry' && log.metadata)
-      .map(log => ({
-        date: log.metadata?.date as string,
-        text: log.metadata?.text as string || log.text || '',
-        type: (log.metadata?.entryType as EntryType) || 'note',
-      }))
-      .filter(e => e.date && e.text)
-      .sort((a, b) => a.date.localeCompare(b.date))
-  }, [logs])
+  const [entryTime, setEntryTime] = React.useState('')
+  const [now, setNow] = React.useState(() => dayjs())
+  const sentAlerts = React.useRef<Set<string>>(new Set())
+
+  const entries = React.useMemo<CalendarEntry[]>(() => buildEntries(logs), [logs])
+
+  // Clock: 1s while a timed entry is upcoming (live countdown), 30s otherwise
+  const hasTimed = entries.some(e => e.time && !e.done && e.date >= now.format('YYYY-MM-DD'))
+  React.useEffect(() => {
+    const id = setInterval(() => setNow(dayjs()), hasTimed ? 1000 : 30000)
+    return () => clearInterval(id)
+  }, [hasTimed])
+
+  // Alert engine: each stage is logged once per entry (deduped by logs + ref)
+  React.useEffect(() => {
+    let fired = false
+    for (const e of entries) {
+      const stage = dueStage(e, now)
+      if (!stage) continue
+      const key = `${e.id}:${stage}`
+      if (sentAlerts.current.has(key)) continue
+      sentAlerts.current.add(key)
+      fired = true
+      const text = alertLogText(e, stage)
+      createLog({
+        text,
+        event: 'calendar_alert',
+        metadata: { entryId: e.id, stage, date: e.date, time: e.time, entryType: e.type },
+      }, {
+        onError: () => sentAlerts.current.delete(key),
+      })
+      try {
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          new Notification(`LOT // ${stage}`, { body: `${e.type.toUpperCase()} ${e.time} — ${e.text}`, tag: key })
+        }
+      } catch (_) {}
+    }
+    if (fired) setTimeout(() => queryClient.refetchQueries(['/api/logs']), 1500)
+  }, [entries, now])
 
   const upcomingEntries = React.useMemo(() => {
     const today = dayjs().format('YYYY-MM-DD')
     return entries
-      .filter(e => e.date >= today)
+      .filter(e => e.date >= today && !e.done)
       .slice(0, 10)
   }, [entries])
+
+  const alerting = entries.filter(e => {
+    const st = activeStage(e, now)
+    return st === 'T-15' || st === 'T-0' || st === 'OVERDUE'
+  })
+  const nextEntry = nextTimedEntry(entries.filter(e => !alerting.includes(e)), now)
 
   const entriesOnDate = React.useMemo(() => {
     if (!selectedDate) return []
@@ -108,15 +145,19 @@ export function CalendarWidget() {
   const handleAddEntry = () => {
     if (!selectedDate || !entryText.trim()) return
 
+    const time = entryTime.trim() ? normalizeTime(entryTime) : null
+    if (entryTime.trim() && !time) return // invalid time: keep form open
+
     const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
 
     createLog({
-      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel})`,
+      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel}${time ? ` ${time}` : ''})`,
       event: 'calendar_entry',
       metadata: {
         date: selectedDate,
         text: entryText.trim(),
         entryType,
+        ...(time ? { time } : {}),
       },
     }, {
       onSuccess: () => {
@@ -125,8 +166,27 @@ export function CalendarWidget() {
       },
     })
 
+    if (time) {
+      try {
+        if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+          Notification.requestPermission()
+        }
+      } catch (_) {}
+    }
+
     setEntryText('')
+    setEntryTime('')
     setIsAddingEntry(false)
+  }
+
+  const handleDone = (e: CalendarEntry) => {
+    createLog({
+      text: `[DONE] ${e.type.toUpperCase()}: ${e.text} (${e.date}${e.time ? ` ${e.time}` : ''})`,
+      event: 'calendar_done',
+      metadata: { entryId: e.id, date: e.date, time: e.time, entryType: e.type },
+    }, {
+      onSuccess: () => queryClient.refetchQueries(['/api/logs']),
+    })
   }
 
   const handleToggleCalendar = () => {
@@ -144,6 +204,39 @@ export function CalendarWidget() {
             Add date
           </Button>
         </div>
+
+        {alerting.length > 0 && (
+          <div className="mb-16 space-y-1">
+            {alerting.map(e => {
+              const st = activeStage(e, now)!
+              return (
+                <div
+                  key={e.id}
+                  className={cn(
+                    'flex justify-between gap-16 border-l-2 border-acc pl-8',
+                    st !== 'T-15' && 'animate-pulse'
+                  )}
+                >
+                  <span className="text-acc uppercase tracking-widest whitespace-nowrap tabular-nums">
+                    {st === 'OVERDUE' ? 'OVERDUE' : st === 'T-0' ? 'NOW' : 'T-15'} · {e.time} · {e.type}
+                  </span>
+                  <span className="text-acc text-right">
+                    {e.text}{' '}
+                    <button className="text-acc/40 hover:text-acc" onClick={() => handleDone(e)}>
+                      [done]
+                    </button>
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {nextEntry && (
+          <div className="mb-16 text-acc/60 tabular-nums">
+            NEXT {formatCountdown(nextEntry, now)} · {nextEntry.time} · {nextEntry.text}
+          </div>
+        )}
 
         {isCalendarOpen && (
           <div className="mb-16">
@@ -230,6 +323,18 @@ export function CalendarWidget() {
                 <div className="flex gap-8 items-center">
                   <input
                     type="text"
+                    value={entryTime}
+                    onChange={e => setEntryTime(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleAddEntry() }}
+                    placeholder="HH:MM"
+                    maxLength={5}
+                    className={cn(
+                      'bg-transparent border text-acc px-4 py-2 w-[5em] outline-none tabular-nums',
+                      entryTime.trim() && !normalizeTime(entryTime) ? 'border-red-500/60' : 'border-acc/20 focus:border-acc/40'
+                    )}
+                  />
+                  <input
+                    type="text"
                     value={entryText}
                     onChange={e => setEntryText(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') handleAddEntry() }}
@@ -247,9 +352,13 @@ export function CalendarWidget() {
                 <div className="text-acc/40 mb-4">
                   {dayjs(selectedDate).format('dddd, MMMM D')}
                 </div>
-                {entriesOnDate.map((e, i) => (
-                  <div key={i} className="text-acc/80 mb-1">
+                {entriesOnDate.map(e => (
+                  <div key={e.id} className={cn('text-acc/80 mb-1', e.done && 'line-through text-acc/30')}>
+                    {e.time && <span className="tabular-nums">{e.time} </span>}
                     {e.text}
+                    {!e.done && (
+                      <>{' '}<button className="text-acc/30 hover:text-acc" onClick={() => handleDone(e)}>[done]</button></>
+                    )}
                   </div>
                 ))}
               </div>
@@ -259,10 +368,11 @@ export function CalendarWidget() {
 
         {upcomingEntries.length > 0 && (
           <div className="space-y-1">
-            {upcomingEntries.map((entry, i) => (
-              <div key={i} className="flex justify-between gap-16">
+            {upcomingEntries.map(entry => (
+              <div key={entry.id} className="flex justify-between gap-16">
                 <span className="text-acc whitespace-nowrap">
                   {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
+                  {entry.time && <span className="tabular-nums"> {entry.time}</span>}
                 </span>
                 <span className="text-acc text-right">
                   {entry.text}
