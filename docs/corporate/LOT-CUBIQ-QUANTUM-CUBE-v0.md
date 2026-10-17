@@ -321,6 +321,14 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE OPEN WINDOW                             2026-10-17
+  ─────────────────────────────────────────────────────────────────
+  Summary: the LOT® Station reports CO₂ rising during a closed-lid deep-work
+  session. The cube performs THE LEAN (three-beat NUDGE pattern, then one HOP
+  if unresolved), the operator opens the window, and a SETTLE confirms the
+  air has recovered. Advisory only; life-safety alerts never ride the cube.
+  Full write-up: LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md §08.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
