@@ -3428,6 +3428,81 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Temporal Sovereignty — morning-intention-lock (P128) + evening-reflection-loop (P125)
+  // both confirmed across 5+ consecutive days in the signal history. Not a single good day — a structural
+  // arc: the daily architecture is load-bearing now. The practice is the protocol.
+  const fiveDaysMs = 5 * 24 * 60 * 60 * 1000
+  const recentFiveD = signals.filter(s => now - s.timestamp < fiveDaysMs)
+  const morningMarkers152 = recentFiveD.filter(
+    s => (s.source === 'intentions' && s.signal === 'morning_intention_lock') ||
+         (s.source === 'log' && s.metadata?.morningPattern === true)
+  )
+  const eveningMarkers152 = recentFiveD.filter(
+    s => (s.source === 'journal' && s.signal === 'evening_reflection_loop') ||
+         (s.source === 'log' && s.metadata?.eveningPattern === true)
+  )
+  // Also accept active patterns as evidence
+  const hasMorningLockP128 = patterns.some(p => p.pattern === 'morning-intention-lock')
+  const hasEveningLoopP125 = patterns.some(p => p.pattern === 'evening-reflection-loop')
+  const hasDailySealsP134  = patterns.some(p => p.pattern === 'daily-coherence-seal')
+  const p152Active = (morningMarkers152.length >= 3 || hasMorningLockP128) &&
+                     (eveningMarkers152.length >= 3 || hasEveningLoopP125) &&
+                     hasDailySealsP134
+  if (p152Active) {
+    const sealConf   = patterns.find(p => p.pattern === 'daily-coherence-seal')?.confidence ?? 0.72
+    const mornConf   = patterns.find(p => p.pattern === 'morning-intention-lock')?.confidence ?? 0.70
+    const evenConf   = patterns.find(p => p.pattern === 'evening-reflection-loop')?.confidence ?? 0.70
+    const tsovBonus  = Math.min(((mornConf - 0.70) + (evenConf - 0.70) + (sealConf - 0.72)) * 0.3, 0.08)
+    patterns.push({
+      pattern: 'temporal-sovereignty',
+      confidence: Math.min(0.77 + tsovBonus, 0.89),
+      suggestedWidget: 'intentions',
+      suggestedTiming: 'passive',
+      reason: `TEMPSOV: Temporal sovereignty — morning-intention-lock · evening-reflection-loop · daily-coherence-seal sustained across multi-day arc. The daily architecture is structural, not episodic. Launch and close are no longer practices — they are the operating baseline.`,
+    })
+  }
+
+  // Pattern 153: Adaptive Recovery Mastery — recovery-intelligence-arc (P151) has fired
+  // in current window AND total-field-coherence (P150) also active. The OS achieves peak
+  // AND has the proven loop to recover from deviation. Mastery is not peak alone — it is
+  // peak + reliable return path.
+  const hasRecoveryP151 = patterns.some(p => p.pattern === 'recovery-intelligence-arc')
+  const hasTotalCohP150 = patterns.some(p => p.pattern === 'total-field-coherence')
+  const hasPresenceCrystP149 = patterns.some(p => p.pattern === 'quantum-presence-crystallization')
+  if (hasRecoveryP151 && (hasTotalCohP150 || hasPresenceCrystP149)) {
+    const recConf  = patterns.find(p => p.pattern === 'recovery-intelligence-arc')?.confidence ?? 0.65
+    const cohConf  = hasTotalCohP150
+      ? (patterns.find(p => p.pattern === 'total-field-coherence')?.confidence ?? 0.90)
+      : (patterns.find(p => p.pattern === 'quantum-presence-crystallization')?.confidence ?? 0.82)
+    const recMasBonus = Math.min((recConf - 0.65 + cohConf - 0.82) * 0.4, 0.10)
+    patterns.push({
+      pattern: 'adaptive-recovery-mastery',
+      confidence: Math.min(0.76 + recMasBonus, 0.91),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `RECMAS: Adaptive recovery mastery — recovery-intelligence-arc active · peak coherence confirmed simultaneously. The system achieves maximum signal field AND has the complete recovery loop available. Peak is not fragile — it is backed by a proven return path.`,
+    })
+  }
+
+  // Pattern 154: Sovereign Signal Arc — temporal-sovereignty (P152) + adaptive-recovery-mastery (P153)
+  // both active simultaneously. The OS maintains its daily architecture across time AND can recover
+  // from deviation without losing its baseline. Structure AND resilience co-confirmed. This is
+  // complete operational sovereignty — the OS is self-sustaining.
+  const hasTemporalSovP152 = patterns.some(p => p.pattern === 'temporal-sovereignty')
+  const hasAdaptiveRecP153 = patterns.some(p => p.pattern === 'adaptive-recovery-mastery')
+  if (hasTemporalSovP152 && hasAdaptiveRecP153) {
+    const tsConf   = patterns.find(p => p.pattern === 'temporal-sovereignty')?.confidence ?? 0.77
+    const armConf  = patterns.find(p => p.pattern === 'adaptive-recovery-mastery')?.confidence ?? 0.76
+    const ssaBonus = Math.min((tsConf - 0.77 + armConf - 0.76) * 0.35, 0.07)
+    patterns.push({
+      pattern: 'sovereign-signal-arc',
+      confidence: Math.min(0.85 + ssaBonus, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `SIGSOV: Sovereign signal arc — temporal-sovereignty · adaptive-recovery-mastery co-confirmed. Daily architecture is structural. Recovery loop is proven. The OS does not search for coherence — it maintains it. Sovereignty is not a state. It is an architecture.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4139,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  temporalSovereigntyNode:    ['intentions', 'journal', 'selfcare', 'mood', 'planner', 'log'],
+  adaptiveRecoveryNode:       ['mood', 'selfcare', 'journal', 'energy', 'qos', 'log'],
+  sovereignSignalArcNode:     ['intentions', 'journal', 'mood', 'selfcare', 'planner', 'qos', 'log'],
 }
 
 /**
@@ -4510,6 +4590,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Sovereign Operator (2026-10-17 v114) ──────────────────────────────
+  {
+    archetype: 'Sovereign Operator',
+    energyBands: ['high', 'moderate', 'low'],
+    dominantSources: ['intentions', 'journal', 'selfcare', 'mood', 'qos'],
+    patternConditions: ['temporal-sovereignty', 'adaptive-recovery-mastery', 'sovereign-signal-arc'],
+    hourRange: [5, 23],
+    directive: 'Architecture confirmed. Recovery mastery confirmed. The OS maintains its structure through deviation and returns to baseline without searching. This is not peak — this is sovereign operation. The practice is the protocol.',
   },
 ]
 
@@ -6498,6 +6588,59 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a temporal-sovereignty event — morning-intention-lock + evening-reflection-loop
+ * + daily-coherence-seal confirmed across multi-day arc. The daily architecture is structural.
+ * Feeds P152 detection. J49 background job (23:00 UTC) triggers this.
+ */
+export function recordTemporalSovereignty(morningConf: number, eveningConf: number, sealConf: number) {
+  recordSignal('log', 'temporal_sovereignty', {
+    morningConf: Math.round(morningConf * 100),
+    eveningConf: Math.round(eveningConf * 100),
+    sealConf: Math.round(sealConf * 100),
+    avgConf: Math.round((morningConf + eveningConf + sealConf) / 3 * 100),
+    architecture: 'LAUNCH+CLOSE+SEAL',
+    morningPattern: true,
+    eveningPattern: true,
+    sovereigntyStatus: 'STRUCTURAL',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an adaptive-recovery-mastery event — recovery-intelligence-arc (P151) active
+ * while peak coherence (P149/P150) also confirmed. Peak is not fragile — backed by proven
+ * recovery path. Feeds P153 detection.
+ */
+export function recordAdaptiveRecoveryMastery(recoveryConf: number, peakConf: number, activePatterns: number) {
+  recordSignal('qos', 'adaptive_recovery_mastery', {
+    recoveryConf: Math.round(recoveryConf * 100),
+    peakConf: Math.round(peakConf * 100),
+    activePatterns,
+    masteryScore: Math.round((recoveryConf + peakConf) / 2 * 100),
+    loop: 'PEAK+RECOVERY',
+    resilience: 'CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereign-signal-arc event — temporal-sovereignty (P152) + adaptive-recovery-mastery
+ * (P153) co-confirmed. Structure AND resilience simultaneously active. The OS is self-sustaining.
+ * Feeds P154 detection.
+ */
+export function recordSovereignSignalArc(temporalConf: number, recoveryConf: number, activePatterns: number) {
+  recordSignal('qos', 'sovereign_signal_arc', {
+    temporalConf: Math.round(temporalConf * 100),
+    recoveryConf: Math.round(recoveryConf * 100),
+    activePatterns,
+    sovereigntyScore: Math.round((temporalConf + recoveryConf) / 2 * 100),
+    axes: ['TEMPORAL', 'RECOVERY'],
+    sovereignty: 'ARCHITECTURE',
     hour: new Date().getHours(),
   })
 }

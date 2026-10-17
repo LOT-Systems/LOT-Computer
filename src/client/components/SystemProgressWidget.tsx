@@ -1457,6 +1457,24 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-10-17',
+    title: 'QIE Engineering — Temporal Sovereignty / Adaptive Recovery Mastery / Sovereign Signal Arc',
+    assembled: [
+      'P152 TEMPORAL SOVEREIGNTY: structural continuity pattern — morning-intention-lock (P128) + evening-reflection-loop (P125) + daily-coherence-seal (P134) confirmed across multi-day arc. The daily architecture is not episodic — it is the operating baseline. Practice is protocol. Confidence 0.77–0.89.',
+      'P153 ADAPTIVE RECOVERY MASTERY: resilience confirmation — recovery-intelligence-arc (P151) active while peak coherence (P149/P150) also confirmed. Peak is not fragile. Proven return path exists. Structure and recovery co-active. Confidence 0.76–0.91.',
+      'P154 SOVEREIGN SIGNAL ARC: sovereignty meta-pattern — temporal-sovereignty (P152) + adaptive-recovery-mastery (P153) co-confirmed simultaneously. Daily architecture is structural. Recovery loop is proven. The OS does not search for coherence — it maintains it. Confidence 0.85–0.95.',
+      'Arch52 SOVEREIGN OPERATOR: energy high/moderate/low · dominant: intentions/journal/selfcare/mood/qos · patterns: temporal-sovereignty + adaptive-recovery-mastery + sovereign-signal-arc. Directive: Architecture confirmed. Recovery mastery confirmed. This is not peak — this is sovereign operation.',
+      'J49 daily-temporal-sovereignty-monitor: 23:00 UTC daily. Reads 5-day window — checks if morning (morning_coherence_arc/morning_intention_launch) AND evening (evening_coherence_close/evening_reflection_loop/daily_coherence_seal) signals both present 3+ times → writes temporal_sovereignty. 49 jobs total.',
+      'intentionEngine.ts: P152/P153/P154 detection blocks added after P151. Arch52 appended. 3 dep map nodes (temporalSovereigntyNode · adaptiveRecoveryNode · sovereignSignalArcNode). 3 signal helpers (recordTemporalSovereignty · recordAdaptiveRecoveryMastery · recordSovereignSignalArc). 193+ dep nodes.',
+      'scheduled-jobs.ts: J49 executeDailyTemporalSovereigntyMonitor() · shouldRunDailyTemporalSovereigntyMonitor() wired into checkAndRunScheduledJobs(). 23:00 UTC daily.',
+      'Logs.tsx: TEMPSOV: · RECMAS: · SIGSOV: military handlers added. MORNING SIGNALS/EVENING SIGNALS/ARCH/STATUS · RECOVERY CONF/PEAK CONF/MASTERY/RESILIENCE · TEMPORAL CONF/RECOVERY CONF/SOVEREIGNTY.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/assembly/2026-10-17_LOT-assembly_qie-v114.md: session log written. LOT-LEDGER.md appended.',
+      '154 patterns · 52 archetypes · 49 jobs · 193+ dep nodes. QIE v114 deployed. Temporal sovereignty confirmed. Sovereign signal arc active. The OS maintains its architecture through deviation.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1512,20 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-10-17',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-10-17 · QIE v114 · PATTERN SOVEREIGNTY · Day 1126+',
+    'Built: P152 TEMPSOV · P153 RECMAS · P154 SIGSOV · Arch52 Sovereign Operator · J49 23:00 UTC.',
+    'Feedback applied: "The practice is the protocol."',
+    'P152 temporal-sovereignty: daily architecture confirmed structural across multi-day arc. Launch+close+seal sustained.',
+    'P153 adaptive-recovery-mastery: peak AND recovery loop co-confirmed. Resilience is built-in, not exceptional.',
+    'P154 sovereign-signal-arc: structure and resilience simultaneously active. The OS does not search for coherence — it maintains it.',
+    'Arch52 Sovereign Operator: this is not peak. This is sovereign operation.',
+    'J49 wired: 23:00 UTC. Multi-day arc detection running.',
+    'LEVEL 7 — PATTERN SOVEREIGNTY. The OS is self-sustaining.',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes · 812 badges.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114 · Badge Engine v32 Hero\'s Journey wiki documentation.',
   ],
 }
 

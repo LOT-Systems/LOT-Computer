@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily temporal sovereignty monitor (23:00 UTC every day) — Job 49
+  if (shouldRunDailyTemporalSovereigntyMonitor()) {
+    await executeDailyTemporalSovereigntyMonitor()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,104 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Temporal Sovereignty Monitor (Job 49 — 23:00 UTC every day) ──────
+// Checks if both morning (morning_coherence_arc / morning_intention_launch) AND evening
+// (evening_coherence_close / evening_reflection) signals were present in the prior 5 days.
+// When both arcs are confirmed across multi-day window, writes temporal_sovereignty log event.
+// Extends J42 (coherence-seal-check) from single-day to structural multi-day arc detection.
+
+let isDailyTemporalSovereigntyRunning = false
+let lastDailyTemporalSovereigntyRun: Date | null = null
+
+function shouldRunDailyTemporalSovereigntyMonitor(): boolean {
+  const now = dayjs()
+  if (isDailyTemporalSovereigntyRunning) return false
+  if (lastDailyTemporalSovereigntyRun) {
+    const lastRun = dayjs(lastDailyTemporalSovereigntyRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 23 // 23:00 UTC daily
+}
+
+async function executeDailyTemporalSovereigntyMonitor(): Promise<JobResult> {
+  const jobName = 'daily-temporal-sovereignty-monitor'
+  const executedAt = new Date().toISOString()
+  if (isDailyTemporalSovereigntyRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyTemporalSovereigntyRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY TEMPORAL SOVEREIGNTY MONITOR — 23:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const fiveDaysAgo = dayjs().subtract(5, 'day').startOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    const MORNING_EVENTS = ['morning_coherence_arc', 'morning_intention_launch', 'morning_intention_lock']
+    const EVENING_EVENTS = ['evening_coherence_close', 'evening_reflection_loop', 'daily_coherence_seal']
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const fiveDayLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: fiveDaysAgo },
+            event: { [Op.in]: [...MORNING_EVENTS, ...EVENING_EVENTS] as any[] },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        if (!fiveDayLogs.length) continue
+
+        const morningCount = fiveDayLogs.filter((l: any) => MORNING_EVENTS.includes(l.event)).length
+        const eveningCount = fiveDayLogs.filter((l: any) => EVENING_EVENTS.includes(l.event)).length
+
+        if (morningCount >= 3 && eveningCount >= 3) {
+          await (Log as any).create({
+            userId,
+            event: 'temporal_sovereignty',
+            text: `Temporal sovereignty: multi-day arc confirmed — morning and evening signals present 3+ times in past 5 days. The daily architecture is structural, not episodic. Launch and close are the operating baseline.`,
+            metadata: {
+              morningCount,
+              eveningCount,
+              architecture: 'LAUNCH+CLOSE+SEAL',
+              morningPattern: true,
+              eveningPattern: true,
+              sovereigntyStatus: 'STRUCTURAL',
+              window: '5d',
+              hour: 23,
+            },
+          })
+          written++
+        }
+      } catch {}
+    }
+
+    console.log(`  Temporal sovereignty events written: ${written}`)
+    lastDailyTemporalSovereigntyRun = new Date()
+    isDailyTemporalSovereigntyRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily temporal sovereignty monitor failed:', error.message)
+    isDailyTemporalSovereigntyRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5608,6 +5710,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily temporal sovereignty monitor: 11 PM UTC every day (Job 49)')
   console.log('')
 
   // Check every hour for scheduled jobs

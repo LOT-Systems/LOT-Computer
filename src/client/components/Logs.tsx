@@ -3629,6 +3629,99 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'temporal_sovereignty') {
+          const morningCount = log.metadata?.morningCount as number | undefined
+          const eveningCount = log.metadata?.eveningCount as number | undefined
+          const sovereigntyStatus = log.metadata?.sovereigntyStatus as string | undefined
+          const architecture = log.metadata?.architecture as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TEMPSOV:" blockView>
+                <div className="uppercase tracking-widest mb-4">TEMPORAL SOVEREIGNTY</div>
+                {morningCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MORNING SIGNALS</span>
+                    <span className="tabular-nums">{morningCount}</span>
+                  </div>
+                )}
+                {eveningCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">EVENING SIGNALS</span>
+                    <span className="tabular-nums">{eveningCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">LAUNCH+CLOSE · STRUCTURAL ARC</div>
+                {architecture && (
+                  <div className="opacity-30 tabular-nums">ARCH: {architecture}</div>
+                )}
+                {sovereigntyStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {sovereigntyStatus}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'adaptive_recovery_mastery') {
+          const masteryScore = log.metadata?.masteryScore as number | undefined
+          const recoveryConf = log.metadata?.recoveryConf as number | undefined
+          const peakConf = log.metadata?.peakConf as number | undefined
+          const resilience = log.metadata?.resilience as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RECMAS:" blockView>
+                <div className="uppercase tracking-widest mb-4">ADAPTIVE RECOVERY MASTERY</div>
+                {recoveryConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECOVERY CONF</span>
+                    <span className="tabular-nums">{recoveryConf}%</span>
+                  </div>
+                )}
+                {peakConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PEAK CONF</span>
+                    <span className="tabular-nums">{peakConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PEAK+RECOVERY · LOOP CONFIRMED</div>
+                {masteryScore !== undefined && (
+                  <div className="opacity-30 tabular-nums">MASTERY: {masteryScore}%</div>
+                )}
+                {resilience && (
+                  <div className="opacity-30 tabular-nums">RESILIENCE: {resilience}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sovereign_signal_arc') {
+          const sovereigntyScore = log.metadata?.sovereigntyScore as number | undefined
+          const temporalConf = log.metadata?.temporalConf as number | undefined
+          const recoveryConf = log.metadata?.recoveryConf as number | undefined
+          const sovereignty = log.metadata?.sovereignty as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SIGSOV:" blockView>
+                <div className="uppercase tracking-widest mb-4">SOVEREIGN SIGNAL ARC</div>
+                {temporalConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TEMPORAL CONF</span>
+                    <span className="tabular-nums">{temporalConf}%</span>
+                  </div>
+                )}
+                {recoveryConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECOVERY CONF</span>
+                    <span className="tabular-nums">{recoveryConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">STRUCTURE+RESILIENCE · SELF-SUSTAINING</div>
+                {sovereigntyScore !== undefined && (
+                  <div className="opacity-30 tabular-nums">SOVEREIGNTY: {sovereigntyScore}%</div>
+                )}
+                {sovereignty && (
+                  <div className="opacity-30 tabular-nums">TYPE: {sovereignty}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
