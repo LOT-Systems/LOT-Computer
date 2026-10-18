@@ -20,6 +20,7 @@ import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
+import { RATION_MANIFEST, DOCTRINE_LINES, PRICE_USD, MANUAL_REF } from '#shared/basics/index'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -374,6 +375,15 @@ let analyticsLastCheck = 0
 const ANALYTICS_CACHE_DURATION = 60 * 1000 // 1 minute
 
 export default async (fastify: FastifyInstance) => {
+  // OPEN TAB ledger: nomenclature + cadence. COGS is never exposed.
+  fastify.get('/basics', async () => ({
+    ref: MANUAL_REF,
+    priceUsd: PRICE_USD,
+    interval: 'MONTH',
+    doctrine: DOCTRINE_LINES,
+    manifest: RATION_MANIFEST,
+  }))
+
   fastify.get('/analytics', async (req, reply) => {
     const now = Date.now()
     if (analyticsCache && (now - analyticsLastCheck) < ANALYTICS_CACHE_DURATION) {

@@ -65,6 +65,15 @@ function createMutation<R, T>(
   }
 }
 
+// Basics (LOT-FM-001)
+export type BasicsStatus = import('#shared/basics/index').BasicRecord & { nextIssue: string | null }
+export const useBasicsStatus = createQuery<BasicsStatus>('/api/basics/status')
+export const useBasicsUpgrade = createMutation<import('#shared/basics/index').Roster, BasicsStatus>(
+  'post',
+  '/api/basics/upgrade'
+)
+export const useBasicsStandDown = createMutation<void, BasicsStatus>('post', '/api/basics/stand-down')
+
 // User API
 export async function getMe(): Promise<UserProfile> {
   const { data } = await api.get<UserProfile>('/api/me')
