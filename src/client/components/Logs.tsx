@@ -29,6 +29,7 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { buildSystemHelpLines, parseStoryPeriod } from '#shared/utils/log-commands'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3741,7 +3742,10 @@ const NoteEditor = ({
   })
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
-      setStoryResponse(data.story)
+      const arcadeLine = data.arcade
+        ? `\n\nARCADE  LVL ${data.arcade.level} ${data.arcade.rank}  ${data.arcade.xp}/${data.arcade.nextLevelXp} XP`
+        : ''
+      setStoryResponse(data.story + arcadeLine)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -4121,29 +4125,7 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
+        const lines = buildSystemHelpLines()
         setSystemHelp(lines.join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
@@ -4152,16 +4134,17 @@ const NoteEditor = ({
           setStoryLoading(true)
           setStoryResponse(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const logText = value.replace(/\/story(\s+[a-z]+)?/i, '').replace(/📖/g, '').trim()
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              period: parseStoryPeriod(value),
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: value, period: parseStoryPeriod(value) })
           }
         }
       }
