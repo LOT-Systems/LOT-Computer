@@ -2076,14 +2076,22 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
-        } else if (log.event === 'calendar_entry') {
+        } else if (log.event === 'calendar_entry' || log.event === 'calendar_alert' || log.event === 'calendar_status') {
           const entryType = log.metadata?.entryType as string | undefined
           const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const stage = log.metadata?.stage as string | undefined
+          const status = log.metadata?.status as string | undefined
+          const label = log.event === 'calendar_alert' ? 'CAL ALERT:' : log.event === 'calendar_status' ? 'CAL STATUS:' : 'CAL:'
+          const head = stage || status?.toUpperCase() || entryType || 'ENTRY'
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
-              <Block label="CAL:" blockView>
-                <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+              <Block label={label} blockView>
+                <div className="uppercase tracking-widest">
+                  {head}{stage && entryType ? ` // ${entryType}` : ''}
+                </div>
+                {(date || time) && <div className="opacity-40 mt-8 tabular-nums">{[date, time].filter(Boolean).join(' ')}</div>}
+                {log.event !== 'calendar_entry' && log.text && <div className="opacity-60 mt-8">{log.text}</div>}
               </Block>
             </LogContainer>
           )
