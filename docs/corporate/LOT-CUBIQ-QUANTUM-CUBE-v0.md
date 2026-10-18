@@ -321,6 +321,13 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE ENTANGLED PAIR                          2026-10-18
+  ─────────────────────────────────────────────────────────────────
+  Recorded in full in LOT-CUBIQ-QUANTUM-CUBE-v0-R02-ENGINEERING.md §10.
+  That report also audits this document's actuation, bias and edge-
+  detection numbers (R02 §01); v0.1 is left as written pending S-2
+  ratification.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
