@@ -177,3 +177,61 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Build a Date whose local getters (getHours/getDate/...) read the wall-clock
+ * time in the given IANA timeZone. Lets the astrology functions above reflect
+ * the user's saved profile timeZone instead of the device's. Falls back to
+ * `date` unchanged when timeZone is empty or invalid.
+ */
+export function toWallClockDate(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+    }).formatToParts(date)
+    const get = (type: string) => Number(parts.find(p => p.type === type)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return date
+  }
+}
+
+export interface AstrologyLogAffinity {
+  /** Logs created under today's rokuyo */
+  rokuyoCount: number
+  /** Logs created under today's moon phase */
+  moonPhaseCount: number
+  /** Logs carrying an astrology snapshot at all */
+  total: number
+}
+
+/**
+ * Personalization from the user's own history: how many of their logs were
+ * written under the same rokuyo / moon phase as right now. Reads the
+ * `astro*` snapshot that getLogContext stamps on every log's context.
+ */
+export function getAstrologyLogAffinity(
+  logs: Array<{ context?: { astroRokuyo?: string | null; astroMoonPhase?: string | null } | null }>,
+  rokuyo: string,
+  moonPhase: string
+): AstrologyLogAffinity {
+  let rokuyoCount = 0
+  let moonPhaseCount = 0
+  let total = 0
+  for (const log of logs) {
+    const ctx = log.context
+    if (!ctx?.astroRokuyo) continue
+    total++
+    if (ctx.astroRokuyo === rokuyo) rokuyoCount++
+    if (ctx.astroMoonPhase === moonPhase) moonPhaseCount++
+  }
+  return { rokuyoCount, moonPhaseCount, total }
+}
