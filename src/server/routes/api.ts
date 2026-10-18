@@ -380,6 +380,13 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'email_received': {
+          // Private: only the addressee's connections get the event
+          if (data.receiverId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4083,6 +4090,142 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
     }
+  })
+
+  // ============================================================================
+  // LOT EMAIL - composed in Log (/email to <name>), delivered to Sync
+  // Community-only: sender and receiver must both have Sync (chat) access.
+  // ============================================================================
+
+  const isSuspendedUser = (tags: string[] = []) =>
+    tags.some((t) => t.toLowerCase() === 'suspended')
+
+  const publicEmail = (
+    m: any,
+    names: Map<string, { firstName: string | null; lastName: string | null }>
+  ) => ({
+    id: m.id,
+    senderId: m.senderId,
+    receiverId: m.receiverId,
+    subject: m.subject,
+    body: m.body,
+    readAt: m.readAt,
+    createdAt: m.createdAt,
+    senderName: `${names.get(m.senderId)?.firstName || ''} ${names.get(m.senderId)?.lastName || ''}`.trim() || 'Unknown',
+    receiverName: `${names.get(m.receiverId)?.firstName || ''} ${names.get(m.receiverId)?.lastName || ''}`.trim() || 'Unknown',
+  })
+
+  // Find community members by first name (for "/email to Hitomi")
+  fastify.get('/emails/recipients', async (req: FastifyRequest<{
+    Querystring: { q?: string }
+  }>, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires Usership, Onyx, Legacy, R&D, or Admin' })
+    }
+    const q = (req.query.q || '').trim().slice(0, 40).replace(/[%_\\]/g, '')
+    if (!q) return reply.send([])
+    const users = await fastify.models.User.findAll({
+      where: {
+        firstName: { [Op.iLike]: `${q}%` },
+        id: { [Op.ne]: req.user.id },
+      },
+      attributes: ['id', 'firstName', 'lastName', 'tags'],
+      limit: 25,
+    })
+    return reply.send(
+      users
+        .filter((u) => canAccessChat(u.tags || []) && !isSuspendedUser(u.tags))
+        .slice(0, 5)
+        .map((u) => ({ id: u.id, firstName: u.firstName, lastName: u.lastName }))
+    )
+  })
+
+  // Inbox + sent (latest 50 each)
+  fastify.get('/emails', async (req, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires Usership, Onyx, Legacy, R&D, or Admin' })
+    }
+    const [inbox, sent] = await Promise.all([
+      fastify.models.Email.findAll({ where: { receiverId: req.user.id }, order: [['createdAt', 'DESC']], limit: 50 }),
+      fastify.models.Email.findAll({ where: { senderId: req.user.id }, order: [['createdAt', 'DESC']], limit: 50 }),
+    ])
+    const ids = Array.from(new Set([...inbox, ...sent].flatMap((m) => [m.senderId, m.receiverId])))
+    const users = ids.length
+      ? await fastify.models.User.findAll({ where: { id: ids }, attributes: ['id', 'firstName', 'lastName'] })
+      : []
+    const names = new Map(users.map((u) => [u.id, { firstName: u.firstName, lastName: u.lastName }]))
+    return reply.send({
+      inbox: inbox.map((m) => publicEmail(m, names)),
+      sent: sent.map((m) => publicEmail(m, names)),
+      unread: inbox.filter((m) => !m.readAt).length,
+    })
+  })
+
+  // Send an email
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { receiverId: string; subject?: string; body: string }
+  }>, reply) => {
+    if (isSuspendedUser(req.user.tags)) {
+      return reply.status(403).send({ error: 'Account suspended' })
+    }
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires Usership, Onyx, Legacy, R&D, or Admin' })
+    }
+    const { receiverId } = req.body
+    const body = (req.body.body || '').trim().slice(0, 5000)
+    const subject = (req.body.subject || '').trim().slice(0, 200)
+    if (!receiverId || !body) {
+      return reply.status(400).send({ error: 'Receiver and body are required' })
+    }
+    if (receiverId === req.user.id) {
+      return reply.status(400).send({ error: 'Cannot email yourself' })
+    }
+    const receiver = await fastify.models.User.findByPk(receiverId)
+    if (!receiver || !canAccessChat(receiver.tags || []) || isSuspendedUser(receiver.tags)) {
+      return reply.status(404).send({ error: 'Recipient not found' })
+    }
+    const email = await fastify.models.Email.create({
+      senderId: req.user.id,
+      receiverId,
+      subject,
+      body,
+    })
+    const senderName = `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim()
+    sync.emit('email_received', {
+      id: email.id,
+      senderId: req.user.id,
+      receiverId,
+      subject,
+      senderName,
+      createdAt: email.createdAt,
+    })
+    process.nextTick(async () => {
+      try {
+        const context = await getLogContext(req.user)
+        await fastify.models.Log.create({
+          userId: req.user.id,
+          event: 'email_sent',
+          text: '',
+          metadata: { emailId: email.id, receiverId, subject },
+          context,
+        })
+      } catch (logError) {
+        console.error('Error logging email:', logError)
+      }
+    })
+    return reply.send({ id: email.id, createdAt: email.createdAt })
+  })
+
+  // Mark an inbox email as read
+  fastify.post('/emails/read', async (req: FastifyRequest<{
+    Body: { id: string }
+  }>, reply) => {
+    const email = await fastify.models.Email.findOne({
+      where: { id: req.body.id, receiverId: req.user.id },
+    })
+    if (!email) return reply.status(404).send({ error: 'Email not found' })
+    if (!email.readAt) await email.update({ readAt: new Date() })
+    return reply.ok()
   })
 
   // ============================================================================

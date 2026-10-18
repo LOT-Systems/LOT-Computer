@@ -18,6 +18,7 @@ import {
   ResizibleGhostInput,
   Tag,
 } from '#client/components/ui'
+import { EmailInbox } from '#client/components/EmailInbox'
 import dayjs from '#client/utils/dayjs'
 import { cn } from '#client/utils'
 import {
@@ -213,6 +214,8 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      <EmailInbox />
 
       <div>
         {messages.map((x, i) => {

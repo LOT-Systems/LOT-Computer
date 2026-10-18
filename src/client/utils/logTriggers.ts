@@ -41,6 +41,7 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'email-compose'     // /email to <name> — open the LOT Email composer
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -67,6 +68,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'email-compose',  emojis: [],        keywords: ['email', 'mail'] },
 ]
 
 /**
@@ -114,4 +116,14 @@ export function detectNewTriggers(
   const fresh: LogTrigger[] = []
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
+}
+
+/**
+ * Extracts the addressee from "/email to Hitomi". Only the first word
+ * after "to" is used as the lookup key — anything typed after it is
+ * treated as ordinary log text. Returns null when no name is present.
+ */
+export function parseEmailRecipient(text: string): string | null {
+  const m = /(?:^|\s)\/(?:email|mail)\s+to\s+([\p{L}][\p{L}'’-]*)/iu.exec(text || '')
+  return m ? m[1] : null
 }

@@ -28,7 +28,8 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, detectTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { EmailComposer } from '#client/components/EmailComposer'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3931,6 +3932,7 @@ const NoteEditor = ({
   // the editor. We compare against the previous value via ref so
   // editing around an existing trigger doesn't re-fire it.
   // --------------------------------------------------------------------
+  const emailDraft = useStore(stores.emailDraft)
   const lastTriggerScanRef = React.useRef(log.text || '')
   React.useEffect(() => {
     const fresh = detectNewTriggers(value, lastTriggerScanRef.current)
@@ -4139,6 +4141,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to X   Compose LOT Email (delivered to Sync)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4387,6 +4390,7 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        {(detectTriggers(value).includes('email-compose') || !!emailDraft) && <EmailComposer logText={value} />}
         {systemHelp && (
           <div className="mt-8">
             <Block label="SYSTEM:" blockView>

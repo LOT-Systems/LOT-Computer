@@ -85,3 +85,7 @@ export const lastAnsweredMemoryQuestionId = persistentAtom<string | null>(
 
 // computed
 export const isLoggedIn = computed(me, (m) => !!m)
+
+// LOT Email: recipient handed over from Cohort/Sync (reply, "Email" button)
+// to the Log composer. Consumed once by EmailComposer.
+export const emailDraft = atom<{ id: string; name: string } | null>(null)

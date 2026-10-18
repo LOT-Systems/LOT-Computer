@@ -126,6 +126,17 @@ export const CohortConnectWidget: React.FC = () => {
     stores.goTo('sync')
   }
 
+  const handleSendEmail = (userId: string, name: string, similarity: number) => {
+    recordSignal('mood', 'cohort_email_initiated', {
+      userId,
+      similarity,
+      connectionReadiness,
+      hour: new Date().getHours()
+    })
+    stores.emailDraft.set({ id: userId, name })
+    stores.goTo('logs')
+  }
+
   const handleToggleExpand = (userId: string) => {
     const willExpand = expandedMemberId !== userId
     if (willExpand) {
@@ -268,6 +279,15 @@ export const CohortConnectWidget: React.FC = () => {
                         }}
                       >
                         Send message
+                      </Button>
+                      <Button
+                        size="small"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation()
+                          handleSendEmail(match.user.id, `${match.user.firstName} ${match.user.lastName}`.trim(), match.similarity)
+                        }}
+                      >
+                        Email
                       </Button>
                     </div>
                   </div>
