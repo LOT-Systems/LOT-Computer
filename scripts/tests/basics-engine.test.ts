@@ -53,4 +53,19 @@ assert(!applyEvent(emptyRecord('PENDING'), 'ROSTER_COMPLETE', { now, hasUsership
 
 // envelope
 assert(withinEnvelope(4000)); assert(!withinEnvelope(4001)); assert.equal(marginOf(10000, 4000), 0.6)
+
+// quotes: live quote overrides estimate; status QUOTED only when all 23 are live
+import { envelope, cogsStatus, unquotedLines, UNIT_COGS_CENTS } from '../../src/server/basics/cogs.ts'
+import { isLive, type Quote } from '../../src/server/basics/quotes.ts'
+const t0 = new Date('2026-10-20T00:00:00Z')
+const mk = (u: number, on = '2026-10-19'): Quote => ({ supplier: 'S', unitCents: u, moq: 100, quotedOn: on, validDays: 30 })
+assert.equal(cogsStatus(t0, {}), 'ESTIMATE'); assert.equal(unquotedLines(t0, {}).length, 23)
+const all: Record<string, Quote> = {}
+for (const i of RATION_MANIFEST) all[i.line] = mk(UNIT_COGS_CENTS[i.line])
+assert.equal(cogsStatus(t0, all), 'QUOTED'); assert(envelope(t0, all).ok)
+assert.equal(envelope(t0, all).worst.margin, envelope(t0, {}).worst.margin) // same unit costs -> same margin
+assert(!isLive(mk(100, '2026-01-01'), t0)); assert.equal(cogsStatus(t0, { ...all, '12': mk(500, '2026-01-01') }), 'ESTIMATE') // expired
+const hot = envelope(t0, { ...all, '12': mk(9000) }) // underwear quoted at 90.00 breaches ceiling
+assert(!hot.ok && /LANDED|MARGIN/.test(hot.breach!))
+assert(!isLive(mk(0), t0))
 console.log('basics-engine: ALL PASS')

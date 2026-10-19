@@ -9,9 +9,18 @@
  */
 import { RATION_MANIFEST, issueLoad, SCHEDULE_HORIZON } from '#shared/basics/manifest'
 import { BASIC_PRICE_CENTS, COGS_CEILING_CENTS, MARGIN_FLOOR } from '#shared/basics/engine'
+import { QUOTES, liveQuote, type Quote } from '#server/basics/quotes'
 
 export type CogsStatus = 'ESTIMATE' | 'QUOTED'
-export const COGS_STATUS: CogsStatus = 'ESTIMATE'
+
+/** QUOTED only when every one of the 23 lines holds a live supplier quote. */
+export const cogsStatus = (now: Date = new Date(), quotes: Record<string, Quote> = QUOTES): CogsStatus =>
+  RATION_MANIFEST.every((i) => liveQuote(i.line, now, quotes)) ? 'QUOTED' : 'ESTIMATE'
+export const COGS_STATUS: CogsStatus = cogsStatus()
+
+/** Lines still running on an estimate (no live quote). */
+export const unquotedLines = (now: Date = new Date(), quotes: Record<string, Quote> = QUOTES): string[] =>
+  RATION_MANIFEST.filter((i) => !liveQuote(i.line, now, quotes)).map((i) => i.line)
 
 /** Landed unit cost per line, USD cents (goods delivered to the fulfillment dock). */
 export const UNIT_COGS_CENTS: Record<string, number> = {
@@ -35,9 +44,14 @@ export type IssueCost = {
   margin: number
 }
 
-export const issueCost = (issue: number): IssueCost => {
+export const issueCost = (
+  issue: number,
+  now: Date = new Date(),
+  quotes: Record<string, Quote> = QUOTES
+): IssueCost => {
   const load = issueLoad(issue)
-  const goodsCents = load.reduce((s, i) => s + UNIT_COGS_CENTS[i.line], 0)
+  const unit = (line: string) => liveQuote(line, now, quotes)?.unitCents ?? UNIT_COGS_CENTS[line]
+  const goodsCents = load.reduce((s, i) => s + unit(i.line), 0)
   const landedCents = goodsCents + PACK_FREIGHT_CENTS
   const allInCents = landedCents + PROCESSING_CENTS
   return {
@@ -60,8 +74,8 @@ export type Envelope = {
   breach?: string
 }
 
-export const envelope = (): Envelope => {
-  const rows = Array.from({ length: SCHEDULE_HORIZON }, (_, k) => issueCost(k + 1))
+export const envelope = (now: Date = new Date(), quotes: Record<string, Quote> = QUOTES): Envelope => {
+  const rows = Array.from({ length: SCHEDULE_HORIZON }, (_, k) => issueCost(k + 1, now, quotes))
   const worst = rows.reduce((a, b) => (b.allInCents > a.allInCents ? b : a))
   const meanMargin = rows.reduce((s, r) => s + r.margin, 0) / rows.length
   const missing = RATION_MANIFEST.filter((i) => UNIT_COGS_CENTS[i.line] === undefined)
@@ -71,5 +85,5 @@ export const envelope = (): Envelope => {
     breach = `ISSUE ${worst.issue} LANDED ${(worst.landedCents / 100).toFixed(2)} > CEILING`
   else if (worst.margin < MARGIN_FLOOR)
     breach = `ISSUE ${worst.issue} MARGIN ${(worst.margin * 100).toFixed(1)}% < FLOOR`
-  return { ok: !breach, status: COGS_STATUS, rows, worst, meanMargin, breach }
+  return { ok: !breach, status: cogsStatus(now, quotes), rows, worst, meanMargin, breach }
 }
