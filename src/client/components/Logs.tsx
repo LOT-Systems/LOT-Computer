@@ -2083,7 +2083,23 @@ export const Logs: React.FC = React.memo(function LogsInner() {
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
                 <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                {date && <div className="opacity-40 mt-8">{date}{log.metadata?.time ? ` ${log.metadata.time}` : ''}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_alert') {
+          const stage = log.metadata?.stage as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const entryType = log.metadata?.entryType as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL-ALERT:" blockView>
+                <div className="uppercase tracking-widest">
+                  {stage === 'ack' ? 'ACK' : stage === 'now' ? 'EXECUTE' : stage || 'ALERT'}
+                  {entryType && ` · ${entryType}`}
+                  {time && ` ${time}`}
+                </div>
+                <div className="opacity-60 mt-8">{log.text.replace(/^\[CAL\][^·]*·[^·]*· /, '')}</div>
               </Block>
             </LogContainer>
           )
