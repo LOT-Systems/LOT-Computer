@@ -1,0 +1,7 @@
+body { font: 11pt/1.45 Helvetica, Arial, sans-serif; max-width: 180mm; margin: 0 auto; color: #111; }
+h1, h2, h3 { letter-spacing: 0.02em; }
+table { border-collapse: collapse; width: 100%; font-size: 9pt; }
+th, td { border: 1px solid #999; padding: 3px 6px; vertical-align: top; }
+th { background: #eee; }
+code, pre { font-size: 9pt; background: #f4f4f4; }
+pre { padding: 6px; white-space: pre-wrap; }
