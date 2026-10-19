@@ -14,6 +14,7 @@ import { useCohorts, useEnergy, useProfile } from '#client/queries'
 import { useLogContext } from '#client/hooks/useLogContext'
 import { usePunctuationContext } from '#client/hooks/usePunctuationContext'
 import { recordSignal, getUserState } from '#client/stores/intentionEngine'
+import { EMAIL_DRAFT_KEY } from '#client/utils/emailCommand'
 
 /**
  * Cohort Connect Widget - Find and connect with cohort members
@@ -114,6 +115,15 @@ export const CohortConnectWidget: React.FC = () => {
       hour: new Date().getHours()
     })
     window.location.href = `/users/${userId}`
+  }
+
+  // LOT® Email: hand a "/email to Name" draft to the Log composer
+  const handleEmail = (firstName: string | null, lastName: string | null, similarity: number) => {
+    recordSignal('mood', 'cohort_email_initiated', { similarity, hour: new Date().getHours() })
+    try {
+      localStorage.setItem(EMAIL_DRAFT_KEY, `/email to ${[firstName, lastName].filter(Boolean).join(' ')}\n`)
+    } catch {}
+    stores.goTo('logs')
   }
 
   const handleSendMessage = (userId: string, similarity: number) => {
@@ -268,6 +278,15 @@ export const CohortConnectWidget: React.FC = () => {
                         }}
                       >
                         Send message
+                      </Button>
+                      <Button
+                        size="small"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation()
+                          handleEmail(match.user.firstName, match.user.lastName, match.similarity)
+                        }}
+                      >
+                        Email
                       </Button>
                     </div>
                   </div>

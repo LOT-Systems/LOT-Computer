@@ -24,9 +24,11 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  useMarkEmailRead,
 } from '#client/queries'
 import { sync } from '../sync'
-import { PublicChatMessage, UserTag } from '#shared/types'
+import { PublicChatMessage, PublicEmail, UserTag } from '#shared/types'
 import {
   SYNC_CHAT_MESSAGES_TO_SHOW,
   MAX_SYNC_CHAT_MESSAGE_LENGTH,
@@ -172,14 +174,18 @@ export const Sync = React.memo(function SyncInner() {
 
   if (!canAccessChat) {
     return (
-      <div className="max-w-[700px] text-acc/40 py-8">
-        Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+      <div className="max-w-[700px]">
+        <EmailInbox canOpenProfiles={canAccessUserProfiles} isTimeFormat12h={isTimeFormat12h} />
+        <div className="text-acc/40 py-8">
+          Sync chat is available for Usership, Onyx, Legacy, R&D, and Admin members.
+        </div>
       </div>
     )
   }
 
   return (
     <div className="max-w-[700px]">
+      <EmailInbox canOpenProfiles={canAccessUserProfiles} isTimeFormat12h={isTimeFormat12h} />
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}
@@ -280,6 +286,77 @@ export const Sync = React.memo(function SyncInner() {
     </div>
   )
 })
+
+// LOT® Email inbox — composed in Log with "/email to Name", read here.
+// Unread mail is listed first-class; click a message to mark it read.
+const EmailInbox: React.FC<{ canOpenProfiles: boolean; isTimeFormat12h: boolean }> = ({
+  canOpenProfiles,
+  isTimeFormat12h,
+}) => {
+  const queryClient = useQueryClient()
+  const { data: emails } = useEmails()
+  const { mutate: markRead } = useMarkEmailRead({
+    onSuccess: () => queryClient.invalidateQueries(['/api/emails']),
+  })
+
+  React.useEffect(() => {
+    const { dispose } = sync.listen('email', (data: PublicEmail) => {
+      queryClient.setQueryData<PublicEmail[]>(['/api/emails'], (prev) =>
+        prev?.some((x) => x.id === data.id) ? prev : [data, ...(prev || [])]
+      )
+    })
+    return () => dispose()
+  }, [])
+
+  const unread = (emails || []).filter((x) => !x.read)
+  if (!emails || emails.length === 0) return null
+
+  // Unread first, then the 5 most recent read ones
+  const shown = [...unread, ...emails.filter((x) => x.read).slice(0, 5)]
+
+  return (
+    <div className="mb-80">
+      <div className="text-acc/40 mb-8">
+        EMAIL{unread.length ? ` · ${unread.length} NEW` : ''}
+      </div>
+      {shown.map((x) => {
+        const name = `${x.sender.firstName || ''} ${x.sender.lastName || ''}`.trim() || 'Unknown'
+        return (
+          <div
+            key={x.id}
+            className={cn(
+              'group flex items-start gap-x-8 cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded',
+              x.read && 'text-acc/40'
+            )}
+            onClick={() => !x.read && markRead({ id: x.id })}
+          >
+            <span className="whitespace-nowrap">
+              {!x.read && '● '}
+              {canOpenProfiles ? (
+                <GhostButton
+                  onClick={(ev: React.MouseEvent) => {
+                    ev.stopPropagation()
+                    window.location.href = `/us/u/${x.sender.id}`
+                  }}
+                >
+                  {name}
+                </GhostButton>
+              ) : (
+                name
+              )}
+            </span>
+            <div className="whitespace-breakspaces" style={{ wordBreak: 'break-word' }}>
+              {x.body}
+            </div>
+            <div className="text-acc/40 whitespace-nowrap select-none">
+              <MessageTimeLabel dateString={x.createdAt} isTimeFormat12h={isTimeFormat12h} />
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 const MessageTimeLabel: React.FC<{ dateString: string | Date; isTimeFormat12h: boolean }> = ({ dateString, isTimeFormat12h }) => {
   const date = dayjs(dateString)

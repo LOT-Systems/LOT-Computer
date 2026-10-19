@@ -380,6 +380,13 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'email': {
+          if (data.receiverId === req.user.id) {
+            const { receiverId: _r, ...payload } = data
+            write({ event, data: payload })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4082,6 +4089,152 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — composed in Log ("/email to Name"), delivered to Sync
+  // ============================================================================
+
+  const isSuspendedUser = (u: { tags?: string[] | null }) =>
+    !!u.tags?.some((t) => t.toLowerCase() === 'suspended')
+
+  // Send an email. `to` is a first name ("Hitomi") or full name ("Hitomi Tanaka").
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { to?: string; body?: string }
+  }>, reply) => {
+    try {
+      const to = (req.body?.to || '').trim().slice(0, 100)
+      const body = (req.body?.body || '').trim().slice(0, 5000)
+      if (!to || !body) {
+        return reply.status(400).send({ error: 'Recipient and message are required' })
+      }
+      if (isSuspendedUser(req.user)) {
+        return reply.status(403).send({ error: 'Not allowed' })
+      }
+
+      // "Hitomi" matches first names; "Hitomi Tanaka" also pins the last name
+      const [first, ...rest] = to.split(/\s+/)
+      const esc = (v: string) => v.replace(/[\\%_]/g, '\\$&')
+      const matches = (
+        await fastify.models.User.findAll({
+          where: {
+            id: { [Op.not]: req.user.id },
+            firstName: { [Op.iLike]: esc(first) },
+            ...(rest.length ? { lastName: { [Op.iLike]: esc(rest.join(' ')) } } : {}),
+          },
+          attributes: ['id', 'firstName', 'lastName', 'tags'],
+          limit: 10,
+        })
+      ).filter((u) => !isSuspendedUser(u))
+
+      if (matches.length === 0) {
+        return reply.status(404).send({ error: `No member named "${to}"` })
+      }
+      if (matches.length > 1) {
+        return reply.status(409).send({
+          error: `${matches.length} members named "${to}" — use the full name`,
+          candidates: matches.map((u) => `${u.firstName || ''} ${u.lastName || ''}`.trim()),
+        })
+      }
+
+      const receiver = matches[0]
+      const email = await fastify.models.Email.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        body,
+      })
+
+      const sender = {
+        id: req.user.id,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+      }
+      sync.emit('email', {
+        id: email.id,
+        body: email.body,
+        read: false,
+        createdAt: email.createdAt,
+        sender,
+        receiverId: receiver.id,
+      })
+
+      process.nextTick(async () => {
+        try {
+          const context = await getLogContext(req.user)
+          await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'email_sent',
+            text: '',
+            metadata: { emailId: email.id, receiverId: receiver.id },
+            context,
+          })
+        } catch (logError) {
+          console.error('Error logging email:', logError)
+        }
+      })
+
+      return reply.send({
+        id: email.id,
+        to: `${receiver.firstName || ''} ${receiver.lastName || ''}`.trim(),
+        createdAt: email.createdAt,
+      })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  // Inbox — newest first
+  fastify.get('/emails', async (req: FastifyRequest, reply) => {
+    try {
+      const rows = await fastify.models.Email.findAll({
+        where: { receiverId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 50,
+      })
+      const senders = await fastify.models.User.findAll({
+        where: { id: { [Op.in]: Array.from(new Set(rows.map((r) => r.senderId))) } },
+        attributes: ['id', 'firstName', 'lastName'],
+      })
+      const byId = new Map(senders.map((u) => [u.id, u]))
+      return reply.send(
+        rows.map((r) => {
+          const u = byId.get(r.senderId)
+          return {
+            id: r.id,
+            body: r.body,
+            read: !!r.readAt,
+            createdAt: r.createdAt,
+            sender: {
+              id: r.senderId,
+              firstName: u?.firstName ?? null,
+              lastName: u?.lastName ?? null,
+            },
+          }
+        })
+      )
+    } catch (error) {
+      console.error('Error fetching emails:', error)
+      return reply.status(500).send({ error: 'Failed to fetch emails' })
+    }
+  })
+
+  // Mark one email read
+  fastify.post('/emails/read', async (req: FastifyRequest<{
+    Body: { id?: string }
+  }>, reply) => {
+    try {
+      const id = req.body?.id
+      if (!id) return reply.status(400).send({ error: 'id is required' })
+      await fastify.models.Email.update(
+        { readAt: new Date() },
+        { where: { id, receiverId: req.user.id, readAt: null } }
+      )
+      return reply.send({ ok: true })
+    } catch (error) {
+      console.error('Error marking email read:', error)
+      return reply.status(500).send({ error: 'Failed to update email' })
     }
   })
 

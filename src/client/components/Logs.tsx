@@ -33,7 +33,8 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useSendEmail } from '#client/queries'
+import { parseEmailCommand, emailReceipt, EMAIL_DRAFT_KEY } from '#client/utils/emailCommand'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3713,6 +3714,21 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: (data, vars) => {
+      setEmailStatus(`SENT → ${data.to}`)
+      const updated = emailReceipt(data.to, vars.body)
+      setValue(updated)
+      valueRef.current = updated
+      onChangeRef.current(updated)
+      setIsSaved(true)
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.error || 'Email failed — check connection'
+      setEmailStatus(`NOT SENT — ${msg}`)
+    },
+  })
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -3911,6 +3927,17 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        // "/email to Name" + Ctrl+Enter sends instead of just saving
+        const cmd = parseEmailCommand(valueRef.current)
+        if (cmd) {
+          if (!cmd.body) {
+            setEmailStatus('NOT SENT — write a message under "/email to Name"')
+          } else {
+            setEmailStatus('SENDING...')
+            sendEmail(cmd)
+          }
+          return
+        }
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -3921,7 +3948,7 @@ const NoteEditor = ({
       }
       // Regular Enter key creates newline (default behavior)
     },
-    [primary]
+    [primary, sendEmail]
   )
 
   // --------------------------------------------------------------------
@@ -3931,6 +3958,20 @@ const NoteEditor = ({
   // the editor. We compare against the previous value via ref so
   // editing around an existing trigger doesn't re-fire it.
   // --------------------------------------------------------------------
+  // Draft handed over by Cohort/Community ("Email" button): prefill an empty primary log
+  React.useEffect(() => {
+    if (!primary) return
+    try {
+      const draft = localStorage.getItem(EMAIL_DRAFT_KEY)
+      if (!draft) return
+      localStorage.removeItem(EMAIL_DRAFT_KEY)
+      if (valueRef.current.trim()) return
+      setValue(draft)
+      valueRef.current = draft
+      containerRef.current?.querySelector('textarea')?.focus()
+    } catch {}
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+
   const lastTriggerScanRef = React.useRef(log.text || '')
   React.useEffect(() => {
     const fresh = detectNewTriggers(value, lastTriggerScanRef.current)
@@ -4139,6 +4180,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to Name  Compose an email (Ctrl+Enter sends; arrives in Sync)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4384,6 +4426,13 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailStatus && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px' }}>{emailStatus}</div>
             </Block>
           </div>
         )}
