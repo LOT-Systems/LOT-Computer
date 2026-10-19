@@ -177,3 +177,46 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Wall-clock Date for `timeZone` (falls back to the device zone when absent or
+ * invalid), so the date-reading getters above reflect the user's saved zone.
+ */
+export function toZonedWallClock(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(date)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return date
+  }
+}
+
+/**
+ * Personal resonance: among the user's mood check-ins logged under the same
+ * rokuyo (snapshotted in log.context by the server), the most frequent state.
+ * Returns null until there are enough samples to say anything honest.
+ */
+export function getAstrologyResonance(
+  logs: Array<{ event: string; metadata?: Record<string, any> | null; context?: Record<string, any> | null }>,
+  rokuyo: string,
+  minSamples = 3
+): { state: string; count: number; total: number } | null {
+  const counts: Record<string, number> = {}
+  let total = 0
+  for (const log of logs) {
+    if (log.event !== 'emotional_checkin' || log.context?.astroRokuyo !== rokuyo) continue
+    const state = log.metadata?.emotionalState
+    if (!state) continue
+    counts[state] = (counts[state] || 0) + 1
+    total++
+  }
+  if (total < minSamples) return null
+  const [state, count] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]
+  return { state, count, total }
+}
