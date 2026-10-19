@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.2 — SEE REPORT-02 (CYCLE 02 SUPERSEDES §03/§04 WHERE THEY CONFLICT)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -320,6 +320,14 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE EVENING CLOSE                           2026-10-19
+  ─────────────────────────────────────────────────────────────────
+  Nightstand, phone charging in the hallway. At 22:00 (Job 18 / P79) the
+  cube performs THE SETTLE if the day's arc is closed, or ONE Nudge if a
+  question is left — never repeated, never a hop at night. Face-down on the
+  pad puts the cube to sleep. Full write-up, plus corrections to this
+  document's launch physics and edge gate: LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md
 
 --------------------------------------------------------------------------------
 08 // BRAND
