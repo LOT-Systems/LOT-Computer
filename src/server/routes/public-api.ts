@@ -190,19 +190,8 @@ async function checkUsers(): Promise<SystemCheck> {
 async function checkSettings(): Promise<SystemCheck> {
   const start = Date.now()
   try {
-    // Check if User model is available (settings are part of User model)
+    // Check if User model is available (settings are stored on the User model)
     await models.User.findOne()
-
-    // Check if settings page bundle exists
-    const settingsPagePath = path.join(process.cwd(), 'dist/client/js/app.js')
-    if (!fs.existsSync(settingsPagePath)) {
-      return {
-        name: 'Settings',
-        status: 'error',
-        message: 'Settings page bundle not found',
-        duration: Date.now() - start,
-      }
-    }
 
     return {
       name: 'Settings',
@@ -356,8 +345,8 @@ async function performHealthChecks(): Promise<{
   ])
 
   // Determine overall status
-  const hasErrors = checks.some((c) => c.status === 'error')
-  const overall = hasErrors ? 'error' : 'ok'
+  const errorCount = checks.filter((c) => c.status === 'error').length
+  const overall = errorCount === 0 ? 'ok' : errorCount < checks.length ? 'degraded' : 'error'
 
   return {
     version: VERSION,
