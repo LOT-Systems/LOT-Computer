@@ -43,6 +43,8 @@ import { generateUserNarrative } from '#server/utils/rpg-narrative'
 import { generateChatCatalysts, generateConversationStarters, shouldShowChatCatalyst } from '#server/utils/cohort-chat-catalyst'
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
+import { buildStoryDigest, buildStorySystemPrompt, digestToPromptBlock, fallbackStory, periodDays } from '#server/utils/story-compression'
+import { DEFAULT_STORY_PERIOD, STORY_PERIODS, type StoryPeriod } from '#shared/utils/log-commands'
 import { registerOSRoutes } from './os-api.js'
 
 // ============================================================================
@@ -5490,6 +5492,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,30 +5517,24 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period: StoryPeriod = STORY_PERIODS.includes(req.body.period as StoryPeriod)
+        ? (req.body.period as StoryPeriod)
+        : DEFAULT_STORY_PERIOD
 
+      // Window + previous equal window for pattern-change detection; the year
+      // lookback also feeds arcade XP. Bounded so a heavy writer cannot blow memory.
+      const now = new Date()
+      const lookbackMs = Math.max(2 * periodDays(period), 365) * 86_400_000
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: new Date(now.getTime() - lookbackMs) },
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 5000,
       })
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
+      const digest = buildStoryDigest(logs as any, period, now)
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
@@ -5547,71 +5544,64 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const fullPrompt = `${buildStorySystemPrompt(period)}
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+DIGEST:
+${digestToPromptBlock(digest)}
 
-RULES:
-- Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
-- End with a single forward-looking sentence — not a pep talk, just a quiet truth
-- Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+${stateBlock || 'STATE: unknown'}
+${logText ? `OPERATOR NOTE WITH COMMAND: "${logText.substring(0, 300)}"` : ''}`
 
-      const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
-
-${stateBlock ? stateBlock : 'STATE: unknown'}
-
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
-
-      const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
-
+      let story: string
+      let source: 'ai' | 'fallback' = 'ai'
       try {
+        // Nothing to compress: skip the vendor call (no tokens spent, nothing to invent from).
+        if (digest.entryCount === 0) throw new Error('no entries in window')
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
+        console.log(`📖 Story (${period}) for ${req.user.email}: ${digest.entryCount} entries, ${digest.signals.length} signals`)
+        story = (await engine.generateCompletion(fullPrompt, 512)).trim().replace(/^["']|["']$/g, '')
+        if (!story) throw new Error('empty completion')
+      } catch (error: any) {
+        console.error('Story generation failed, using deterministic fallback:', error)
+        story = fallbackStory(digest)
+        source = 'fallback'
+      }
 
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
+      const summary = {
+        period,
+        entryCount: digest.entryCount,
+        activeDays: digest.activeDays,
+        windowDays: digest.windowDays,
+        currentStreak: digest.currentStreak,
+        dominantMood: digest.dominantMood,
+        signals: digest.signals,
+        rank: digest.rank,
+      }
 
-        const story = await engine.generateCompletion(fullPrompt, 512)
-
-        const cleaned = story.trim().replace(/^["']|["']$/g, '')
-
+      let logId: string | null = null
+      try {
         const context = await getLogContext(req.user)
         const storyLog = await fastify.models.Log.create({
           userId: req.user.id,
-          text: cleaned,
+          text: story,
           event: 'generated_story',
           context,
           metadata: {
-            story: cleaned,
+            story,
+            source,
             logText: (logText || '').substring(0, 500),
             quantumState: quantumState || null,
-            timestamp: new Date().toISOString(),
+            digest: summary,
+            timestamp: now.toISOString(),
           },
         })
-
-        return {
-          story: cleaned,
-          logId: storyLog.id,
-        }
+        logId = storyLog.id
       } catch (error: any) {
-        console.error('Story generation failed:', error)
-        return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
-          logId: null,
-        }
+        console.error('Story persistence failed:', error)
       }
+
+      return { story, logId, period, source, rank: digest.rank, signals: digest.signals }
     }
   )
 }

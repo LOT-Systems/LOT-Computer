@@ -29,6 +29,7 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { renderSystemHelp, parseStoryPeriod } from '#shared/utils/log-commands'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3706,6 +3707,9 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const storyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const storyLoadingRef = React.useRef(false)
+  const [storyMeta, setStoryMeta] = React.useState<string | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3739,29 +3743,25 @@ const NoteEditor = ({
       setIsSaved(true)
     },
   })
+  // The story is shown in its own block and persisted server-side as a
+  // `generated_story` log; it is never appended to the journal entry, which
+  // stays the user's own words.
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      const bits: string[] = []
+      if (data.period) bits.push(data.period.toUpperCase())
+      if (data.rank) bits.push(`LV ${data.rank.level} ${data.rank.title}`, `${data.rank.xp} XP`)
+      const signals = (data.signals || []).map(sig => sig.detail.toUpperCase())
+      setStoryMeta([bits.join('  ·  '), ...signals].filter(Boolean).join('\n') || null)
+      storyLoadingRef.current = false
       setStoryLoading(false)
-      const current = valueRef.current
-      const separator = current.trim() ? '\n\n' : ''
-      const updated = current + separator + '📖 ' + data.story
-      setValue(updated)
-      valueRef.current = updated
-      onChangeRef.current(updated)
-      setIsSaved(true)
     },
     onError: () => {
-      const fallback = 'The system holds your data quietly. When the engine returns, your story will be here.'
-      setStoryResponse(fallback)
+      setStoryResponse('The system holds your data quietly. When the engine returns, your story will be here.')
+      setStoryMeta(null)
+      storyLoadingRef.current = false
       setStoryLoading(false)
-      const current = valueRef.current
-      const separator = current.trim() ? '\n\n' : ''
-      const updated = current + separator + '📖 ' + fallback
-      setValue(updated)
-      valueRef.current = updated
-      onChangeRef.current(updated)
-      setIsSaved(true)
     },
   })
   const debounceTime = 7000  // 7s for all logs
@@ -4121,49 +4121,33 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(renderSystemHelp())
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
+        // `/story` fires the moment it is typed; wait briefly so an argument
+        // (`/story month`) typed right after it is read from the final text.
+        if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+        storyTimerRef.current = setTimeout(() => {
+          const text = valueRef.current
+          if (storyLoadingRef.current) return
+          storyLoadingRef.current = true
           setStoryLoading(true)
           setStoryResponse(null)
+          setStoryMeta(null)
+          const period = parseStoryPeriod(text)
+          const logText = text.replace(/\/story(\s+[a-z]+)?/i, '').replace(/📖/g, '').trim()
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
             submitStory({
+              period,
               logText,
-              quantumState: state,
-              userIndex: index,
+              quantumState: getUserState(),
+              userIndex: getUserIndex(),
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText, period })
           }
-        }
+        }, 1200)
       }
     }
   }, [value])
@@ -4399,7 +4383,7 @@ const NoteEditor = ({
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                        <span style={{ minWidth: '210px', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )
@@ -4419,6 +4403,11 @@ const NoteEditor = ({
             <Block label="📖" blockView>
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
+              )}
+              {storyMeta && (
+                <div className="opacity-40 mb-3" style={{ fontSize: '11px', letterSpacing: '0.08em', whiteSpace: 'pre-wrap' }}>
+                  {storyMeta}
+                </div>
               )}
               {storyResponse && (
                 <div className="opacity-60">
