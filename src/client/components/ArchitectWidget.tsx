@@ -18,7 +18,6 @@ import {
   type AssemblyPhase,
 } from '#client/stores/selfAssembly'
 import { intentionEngine } from '#client/stores/intentionEngine'
-import { USERSHIP_TRANSMISSION } from '#client/components/SystemProgressWidget'
 import { UserTag } from '#shared/types'
 
 const PHASE_ORDER: AssemblyPhase[] = ['integrated', 'assembled', 'forming', 'awakening', 'dormant']
@@ -50,6 +49,16 @@ export function ArchitectWidget() {
   const me = useStore(stores.me)
   const assembly = useStore(selfAssembly)
   const [expanded, setExpanded] = React.useState<Set<string>>(new Set())
+  // Transmission lives in SystemProgressWidget (the assembly routine appends it
+  // there). Dynamic import keeps that ~180KB module off the initial bundle.
+  const [transmission, setTransmission] = React.useState<string[]>([])
+  React.useEffect(() => {
+    let alive = true
+    import('#client/components/SystemProgressWidget').then((m) => {
+      if (alive) setTransmission(m.USERSHIP_TRANSMISSION.message)
+    })
+    return () => { alive = false }
+  }, [])
 
   const isPaid = React.useMemo(() => {
     if (!me?.tags) return false
@@ -281,7 +290,7 @@ export function ArchitectWidget() {
         <div className="border-t border-acc-400/30 pt-16 text-xs leading-relaxed">
           <div className="opacity-30 mb-4 uppercase tracking-widest">Transmission:</div>
           <div className="flex flex-col gap-y-1">
-            {USERSHIP_TRANSMISSION.message.map((line, i) => (
+            {transmission.map((line, i) => (
               <div key={i} className={i === 0 ? 'opacity-50' : 'opacity-30'}>
                 {line}
               </div>
