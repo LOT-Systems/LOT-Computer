@@ -29,6 +29,7 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { buildSystemHelp, parseStoryCommand, type SystemHelpSection } from '#shared/utils/logCommands'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3706,7 +3707,8 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
-  const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [systemHelp, setSystemHelp] = React.useState<SystemHelpSection[] | null>(null)
+  const [storyMeta, setStoryMeta] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3743,6 +3745,16 @@ const NoteEditor = ({
     onSuccess: (data) => {
       setStoryResponse(data.story)
       setStoryLoading(false)
+      setStoryMeta(
+        data.arcade
+          ? [
+              data.period ? data.period.toUpperCase() : '',
+              `LVL ${data.arcade.level} ${data.arcade.rank}`,
+              `${data.arcade.xp}/${data.arcade.nextLevelXp} XP`,
+              ...(data.spikes || []).map(sp => `SPIKE: ${sp}`),
+            ].filter(Boolean).join('  ·  ')
+          : null
+      )
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + data.story
@@ -4121,42 +4133,21 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(buildSystemHelp())
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
+          setStoryMeta(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const { period, rest: logText } = parseStoryCommand(value)
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              period,
               quantumState: state,
               userIndex: index,
             })
@@ -4391,25 +4382,19 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="SYSTEM:" blockView>
               <div className="opacity-80" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                {systemHelp.split('\n').map((line, idx) => {
-                  if (!line.trim()) return <div key={idx} style={{ height: '0.75rem' }} />
-                  if (line.startsWith('/')) {
-                    const spaceIdx = line.search(/\s{2,}/)
-                    const cmd = spaceIdx > -1 ? line.slice(0, spaceIdx) : line
-                    const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
-                    return (
-                      <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
-                        <span style={{ opacity: 0.6 }}>{desc}</span>
-                      </div>
-                    )
-                  }
-                  return (
-                    <div key={idx} style={{ fontSize: '11px', letterSpacing: '0.08em', opacity: 0.4, paddingBottom: '4px', paddingTop: idx > 0 ? '12px' : '0' }}>
-                      {line}
+                {systemHelp.map((section, sIdx) => (
+                  <div key={section.title}>
+                    <div style={{ fontSize: '11px', letterSpacing: '0.08em', opacity: 0.4, paddingBottom: '4px', paddingTop: sIdx > 0 ? '12px' : '0' }}>
+                      {section.title}
                     </div>
-                  )
-                })}
+                    {section.rows.map(row => (
+                      <div key={row.usage} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
+                        <span style={{ minWidth: '210px', opacity: 1 }}>{row.usage}</span>
+                        <span style={{ opacity: 0.6 }}>{row.description}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
             </Block>
           </div>
@@ -4425,6 +4410,9 @@ const NoteEditor = ({
                   {storyResponse.split('\n').map((line, idx) => (
                     <div key={idx}>{line || <br />}</div>
                   ))}
+                  {storyMeta && (
+                    <div className="mt-3 text-[11px] tracking-widest opacity-60">{storyMeta}</div>
+                  )}
                 </div>
               )}
             </Block>

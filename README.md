@@ -166,6 +166,7 @@ All documentation has been organized into the [`docs/`](./docs/) directory. See 
 **Key Documentation:**
 
 - **Technical Documentation:** [`docs/technical/`](./docs/technical/)
+- **Log Entry System (`/system`, `/story`, Arcade):** [`docs/technical/LOG-ENTRY-SYSTEM.md`](./docs/technical/LOG-ENTRY-SYSTEM.md)
   - AI Engine Guide - Setup for all 5 AI engines
   - Memory Engine Documentation - Complete system docs
   - Psychological Depth Analysis - User analysis engine
