@@ -151,8 +151,9 @@ export function CalendarWidget() {
               <button
                 className="text-acc/40 hover:text-acc transition-opacity"
                 onClick={() => setViewMonth(viewMonth.subtract(1, 'month'))}
+                aria-label="Previous month"
               >
-                {'<—'}
+                {'←'}
               </button>
               <span className="text-acc">
                 {viewMonth.format('MMMM, YYYY')}
@@ -160,8 +161,9 @@ export function CalendarWidget() {
               <button
                 className="text-acc/40 hover:text-acc transition-opacity"
                 onClick={() => setViewMonth(viewMonth.add(1, 'month'))}
+                aria-label="Next month"
               >
-                {'—>'}
+                {'→'}
               </button>
             </div>
 

@@ -11,6 +11,7 @@ import { Block } from '#client/components/ui'
 import { useLogs } from '#client/queries'
 import { getUserState, getUserIndex } from '#client/stores/intentionEngine'
 import dayjs from '#client/utils/dayjs'
+import type { Log } from '#shared/types'
 
 type BenchmarkTier = 'White' | 'Green' | 'Yellow' | 'Purple' | 'Black'
 
@@ -22,7 +23,7 @@ const TIER_COLORS: Record<BenchmarkTier, string> = {
   Black: '#000000',
 }
 
-function computeBenchmark(logs: any[]): { tier: BenchmarkTier; score: number } {
+function computeBenchmark(logs: Log[]): { tier: BenchmarkTier; score: number } {
   const now = dayjs()
   const answerLogs = logs.filter(l => l.event === 'answer')
   const noteLogs = logs.filter(l => l.event === 'note')
