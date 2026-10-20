@@ -177,3 +177,84 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Wall-clock Date for a moment in the given IANA timeZone. The returned Date's
+ * local getters (getHours/getDate/...) read the zone's wall-clock fields, which
+ * is what the functions above consume. Falls back to the input on a bad zone.
+ */
+export function toZonedWallClock(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const p = Object.fromEntries(
+      new Intl.DateTimeFormat('en-US', {
+        timeZone, hourCycle: 'h23', year: 'numeric', month: 'numeric',
+        day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric',
+      }).formatToParts(date).map(x => [x.type, x.value])
+    )
+    return new Date(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second)
+  } catch {
+    return date
+  }
+}
+
+export type AstrologyReading = {
+  hourlyZodiac: string
+  westernZodiac: string
+  moonPhase: string
+  moonIllumination: number
+  rokuyo: string
+}
+
+/** Full ambient reading (not a natal chart) for a moment in the user's timeZone. */
+export function getAstrologyReading(date: Date, timeZone?: string | null): AstrologyReading {
+  const d = toZonedWallClock(date, timeZone)
+  const moon = getMoonPhase(d)
+  return {
+    hourlyZodiac: getHourlyZodiac(d),
+    westernZodiac: getWesternZodiac(d),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    rokuyo: getRokuyo(d),
+  }
+}
+
+// Events that reflect a deliberate user act (not system snapshots/background jobs)
+const RESONANCE_EVENTS = new Set([
+  'note', 'answer', 'emotional_checkin', 'intention', 'goal_set',
+  'self_care_complete', 'self_care_completed', 'plan_set',
+])
+export const RESONANCE_MIN_SAMPLES = 12
+const RESONANCE_MIN_LIFT = 1.25
+
+export type AstroResonance = {
+  rokuyo: string
+  lift: number
+  samples: number
+  todayAligned: boolean
+}
+
+/**
+ * Personal resonance: which rokuyo day the user's deliberate Logs entries
+ * (stamped with context.astroRokuyo at creation) cluster on. Lift is the share
+ * of entries on that rokuyo relative to the uniform 1/6 expectation. Returns
+ * null until there are enough stamped entries and a clear lift.
+ */
+export function computeAstroResonance(
+  logs: Array<{ event?: string; context?: Record<string, any> | null }>,
+  todayRokuyo?: string
+): AstroResonance | null {
+  const counts: Record<string, number> = {}
+  let samples = 0
+  for (const l of logs) {
+    const r = l.context?.astroRokuyo
+    if (!r || !l.event || !RESONANCE_EVENTS.has(l.event)) continue
+    counts[r] = (counts[r] || 0) + 1
+    samples++
+  }
+  if (samples < RESONANCE_MIN_SAMPLES) return null
+  const [rokuyo, n] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]
+  const lift = Math.round((n / samples) * 6 * 10) / 10
+  if (lift < RESONANCE_MIN_LIFT) return null
+  return { rokuyo, lift, samples, todayAligned: rokuyo === todayRokuyo }
+}

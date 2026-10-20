@@ -4880,9 +4880,13 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  resonance?: { rokuyo: string; lift: number; todayAligned: boolean } | null
 ) {
   recordSignal('astrology', 'ambient_reading', {
+    resonanceRokuyo: resonance?.rokuyo ?? null,
+    resonanceLift: resonance?.lift ?? null,
+    resonanceAligned: resonance?.todayAligned ?? false,
     rokuyo,
     moonPhase,
     moonIllumination,
