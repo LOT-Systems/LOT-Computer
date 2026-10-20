@@ -818,6 +818,12 @@ function formatLog(log: Log): string {
       body = log.text || ''
       break
     }
+    case 'self_care_complete':
+    case 'self_care_skip':
+    case 'calendar_entry': {
+      body = log.text || ''
+      break
+    }
     case 'emotional_checkin': {
       const state = (log.metadata as any)?.emotionalState
       if (state) body = `Biofield check-in: ${state}`
