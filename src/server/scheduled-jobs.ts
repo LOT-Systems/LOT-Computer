@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily presence momentum check (10:00 UTC every day) — Job 49
+  if (shouldRunDailyPresenceMomentumCheck()) {
+    await executeDailyPresenceMomentumCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,104 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Presence Momentum Check (Job 49 — 10:00 UTC every day) ────────────
+// Reads active users. Scans 7-day window for quantum_presence_crystallization signals.
+// When 2+ distinct calendar days present, writes presence_momentum_arc.
+// P152: temporal persistence of Level 6 presence across multi-day arcs.
+
+let isDailyPresenceMomentumRunning = false
+let lastDailyPresenceMomentumRun: Date | null = null
+
+function shouldRunDailyPresenceMomentumCheck(): boolean {
+  const now = dayjs()
+  if (isDailyPresenceMomentumRunning) return false
+  if (lastDailyPresenceMomentumRun) {
+    const lastRun = dayjs(lastDailyPresenceMomentumRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily
+}
+
+async function executeDailyPresenceMomentumCheck(): Promise<JobResult> {
+  const jobName = 'daily-presence-momentum-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyPresenceMomentumRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyPresenceMomentumRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY PRESENCE MOMENTUM CHECK — 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart = dayjs().subtract(7, 'day').startOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const recentLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+            event: 'quantum_presence_crystallization',
+          },
+          attributes: ['createdAt'],
+        })
+
+        if (!recentLogs.length) continue
+
+        const presenceDays = new Set<string>()
+        for (const log of recentLogs) {
+          const d = dayjs(log.createdAt)
+          presenceDays.add(d.format('YYYY-MM-DD'))
+        }
+
+        if (presenceDays.size < 2) continue
+
+        const dayCount = presenceDays.size
+        const streakBonus = Math.min((dayCount - 2) * 7, 14)
+
+        await (Log as any).create({
+          userId,
+          event: 'presence_momentum_arc',
+          text: `Presence momentum arc: ${dayCount} distinct days of quantum presence crystallization in the past 7 days. Sustained Level 6 presence across a multi-day arc. Temporal persistence confirmed.`,
+          metadata: {
+            dayCount,
+            streak: dayCount,
+            sustainedPresence: dayCount >= 3 ? 'EXTENDED' : 'CONFIRMED',
+            arc: 'MULTI-DAY',
+            streakBonus,
+            window: '7d',
+            hour: 10,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Presence momentum arc events written: ${written}`)
+    lastDailyPresenceMomentumRun = new Date()
+    isDailyPresenceMomentumRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily presence momentum check failed:', error.message)
+    isDailyPresenceMomentumRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

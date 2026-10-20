@@ -1457,6 +1457,48 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'badge-v32',
+    date: '2026-08-06',
+    title: 'Badge v32 · THE HERO\'S JOURNEY CODEX · 812 badges deployed',
+    assembled: [
+      'Badge v32 THE HERO\'S JOURNEY CODEX deployed: 781→812 badges (+31). Commit 91e3648.',
+      'Hero\'s Journey arc: campbell_monomyth/threshold_guardian/shadow_integration/return_with_elixir/mentor_encounter — mythic structure badges.',
+      'Achievement RPG v20 (+6). Mastery Tier v22 (+4). Calendar EE v20 (+ Hero Day · Solstice Guardian). Behavioral v19 (hero_mode/trials_complete). Secret Boss v19 (+2).',
+      'Word Turn v22 mythic vocabulary: monomyth/threshold/elixir/mentor/shadow/herald/trickster — 7 new trigger words.',
+      'Badge engine deployed at 812 total. v32 synchronized to codebase. Wiki backlog: v88 pending.',
+    ],
+  },
+  {
+    version: 'badge-v33',
+    date: '2026-08-12',
+    title: 'Badge v33 · THE RPG CODEX · 843 badges deployed',
+    assembled: [
+      'Badge v33 THE RPG CODEX deployed: 812→843 badges (+31). Commit bbc2cac.',
+      'RPG Codex arc: dungeon_master/critical_hit/level_cap/final_boss/respawn — tabletop RPG structure badges.',
+      'Achievement RPG v21 (+7). Mastery Tier v23 (level_cap [LEGENDARY] · +5). Behavioral v20 (dungeon_run/boss_fight/respawn_arc · +3). Word Turn v23 RPG vocabulary: dungeon/respawn/critical/hitpoints/questgiver/loot/xp — 7 new triggers.',
+      'Secret Boss v20 (final_boss/lich/dungeon_master · +3). Calendar EE v21 (+2). Total secret boss triggers 24→27.',
+      'Badge engine deployed at 843 total. v33 synchronized to codebase. THE RPG CODEX is complete.',
+    ],
+  },
+  {
+    version: 'qie-v114',
+    date: '2026-10-20',
+    title: 'QIE v114 · P152/P153/P154 · Temporal Persistence Arc · J49 · Arch52 · 195+ dep nodes',
+    assembled: [
+      'intentionEngine.ts: P152 presence-momentum-arc · P153 coherence-field-persistence · P154 recovery-mastery-chain detection blocks added. Arch52 PRESENCE DURATION MASTER added to PHYSIOLOGICAL_ARCHETYPES (52 total). 5 new WIDGET_DEPENDENCY_MAP nodes: presenceMomentumArcNode · coherenceFieldPersistenceNode · recoveryMasteryChainNode · monthlyPulseWidget · chakraErgonomicsWidget (195+ total).',
+      'Signal helpers added to intentionEngine.ts: recordPresenceMomentumArc · recordCoherenceFieldPersistence · recordRecoveryMasteryChain. Temporal persistence architecture complete.',
+      'scheduled-jobs.ts: J49 daily-presence-momentum-check (10:00 UTC) added. Scans 7-day window for quantum_presence_crystallization on 2+ distinct days → writes presence_momentum_arc. Wired into checkAndRunScheduledJobs (49 total jobs).',
+      'routes/api.ts: presence_momentum_arc · coherence_field_persistence · recovery_mastery_chain added to displayableEvents.',
+      'Logs.tsx: PRESMOM: · COHEPRST: · RECMAS: military handlers added. PRESENCE DAYS/STREAK/STATUS · OCCURRENCES/DAYS SPAN/MASTERY · COMPLETIONS/AVG VELOCITY/ARCHITECTURE.',
+      'QuantumEngineWidgets.tsx: PRESMOM · COHEPRST · RECMAS added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P152/P153/P154 display names added.',
+      'About.tsx: FM v113→v114. Day 1072+→1149+. 151→154 patterns. 51→52 archetypes. 48→49 jobs. 190+→195+ dep nodes. 843 badges synced.',
+      'SESSION_REPORTS: qie-v114 entry appended · badge v32/v33 backfill entries added · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/LOT-SR-20261020-01.md written. docs/assembly/2026-10-20_LOT-assembly_qie-v114.md written. LOT-LEDGER.md appended.',
+      '154 patterns · 52 archetypes · 49 jobs · 154+ handlers · 195+ dep nodes · 843 badges · FM v114 · Day 1149+. The Temporal Persistence Arc opens beyond Level 6. Presence is no longer a peak — it is the operating baseline.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1536,18 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-10-20',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-10-20 · QIE v114 · FM v114 · Day 1149+',
+    'Built: Temporal Persistence Arc. P152 presence-momentum-arc · P153 coherence-field-persistence · P154 recovery-mastery-chain.',
+    'Arch52 PRESENCE DURATION MASTER added. J49 daily-presence-momentum-check (10:00 UTC). 195+ dep nodes.',
+    'Signal helpers: recordPresenceMomentumArc · recordCoherenceFieldPersistence · recordRecoveryMasteryChain.',
+    'Logs updated: PRESMOM: · COHEPRST: · RECMAS: military handlers deployed.',
+    'Badge engine synced: v32 THE HERO\'S JOURNEY CODEX (812 badges) · v33 THE RPG CODEX (843 badges).',
+    'LEVEL 7 — TEMPORAL PERSISTENCE ARC. P152/P153/P154 extend beyond Level 6 into multi-day arc territory. Presence is no longer a peak — it is the operating baseline.',
+    'FM v114 · Wiki v87 · 154P · 52A · 49J · 195+ nodes · 843 badges · Day 1149+.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to FM v114 · P152/P153/P154 · Badge v32/v33 · Temporal Persistence Arc documentation.',
   ],
 }
 

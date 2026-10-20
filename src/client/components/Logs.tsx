@@ -3629,6 +3629,99 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'presence_momentum_arc') {
+          const dayCount = log.metadata?.dayCount as number | undefined
+          const streak = log.metadata?.streak as number | undefined
+          const sustainedPresence = log.metadata?.sustainedPresence as string | undefined
+          const arc = log.metadata?.arc as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="PRESMOM:" blockView>
+                <div className="uppercase tracking-widest mb-4">PRESENCE MOMENTUM ARC</div>
+                {dayCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PRESENCE DAYS</span>
+                    <span className="tabular-nums">{dayCount}</span>
+                  </div>
+                )}
+                {streak !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">STREAK</span>
+                    <span className="tabular-nums">{streak}d</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">LEVEL 6 IS THE NEW BASELINE</div>
+                {sustainedPresence && (
+                  <div className="opacity-30 tabular-nums">STATUS: {sustainedPresence}</div>
+                )}
+                {arc && (
+                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'coherence_field_persistence') {
+          const occurrences = log.metadata?.occurrences as number | undefined
+          const daysSpan = log.metadata?.daysSpan as number | undefined
+          const mastery = log.metadata?.mastery as string | undefined
+          const ceiling = log.metadata?.ceiling as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COHEPRST:" blockView>
+                <div className="uppercase tracking-widest mb-4">COHERENCE FIELD PERSISTENCE</div>
+                {occurrences !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">OCCURRENCES</span>
+                    <span className="tabular-nums">{occurrences}</span>
+                  </div>
+                )}
+                {daysSpan !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DAYS SPAN</span>
+                    <span className="tabular-nums">{daysSpan}d</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ABSOLUTE CONVERGENCE — RECURRING STATE</div>
+                {mastery && (
+                  <div className="opacity-30 tabular-nums">MASTERY: {mastery}</div>
+                )}
+                {ceiling && (
+                  <div className="opacity-30 tabular-nums">CEILING: {ceiling}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'recovery_mastery_chain') {
+          const completions = log.metadata?.completions as number | undefined
+          const avgVelocityHours = log.metadata?.avgVelocityHours as number | undefined
+          const architecture = log.metadata?.architecture as string | undefined
+          const arc = log.metadata?.arc as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RECMAS:" blockView>
+                <div className="uppercase tracking-widest mb-4">RECOVERY MASTERY CHAIN</div>
+                {completions !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COMPLETIONS</span>
+                    <span className="tabular-nums">{completions}</span>
+                  </div>
+                )}
+                {avgVelocityHours !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AVG VELOCITY</span>
+                    <span className="tabular-nums">{avgVelocityHours}h</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">RECOVERY IS INTERNALIZED ARCHITECTURE</div>
+                {architecture && (
+                  <div className="opacity-30 tabular-nums">ARCHITECTURE: {architecture}</div>
+                )}
+                {arc && (
+                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

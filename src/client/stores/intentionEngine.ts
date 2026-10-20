@@ -3428,6 +3428,64 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Presence Momentum Arc — quantum-presence-crystallization (P149) confirmed on 2+ distinct
+  // calendar days within a 7-day window. Sustained presence detected as multi-day arc, not singular peak.
+  const p152SevenDays = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000)
+  const p152PresenceDays = new Set<string>()
+  p152SevenDays.forEach(s => {
+    if (s.source === 'qos' && s.signal === 'quantum_presence_crystallization') {
+      const d = new Date(s.timestamp)
+      p152PresenceDays.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
+    }
+  })
+  if (p152PresenceDays.size >= 2) {
+    const dayCount = p152PresenceDays.size
+    const streakBonus = Math.min((dayCount - 2) * 0.07, 0.14)
+    patterns.push({
+      pattern: 'presence-momentum-arc',
+      confidence: Math.min(0.78 + streakBonus, 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `PRESMOM: Presence momentum arc — quantum-presence-crystallization confirmed on ${dayCount} of last 7 calendar days. Sustained presence detected. The field is not a peak — it is the operating baseline.`,
+    })
+  }
+
+  // Pattern 153: Coherence Field Persistence — total-field-coherence (P150) observed on 2+ distinct
+  // calendar days within 7 days. The absolute ceiling state is demonstrably repeatable.
+  const p153CoherenceDays = new Set<string>()
+  p152SevenDays.forEach(s => {
+    if (s.source === 'qos' && s.signal === 'total_field_coherence') {
+      const d = new Date(s.timestamp)
+      p153CoherenceDays.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
+    }
+  })
+  if (p153CoherenceDays.size >= 2) {
+    const occurrences = p153CoherenceDays.size
+    const bonus = Math.min((occurrences - 2) * 0.03, 0.09)
+    patterns.push({
+      pattern: 'coherence-field-persistence',
+      confidence: Math.min(0.88 + bonus, 0.97),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `COHEPRST: Coherence field persistence — total-field-coherence (P150) confirmed on ${occurrences} separate calendar days in the past 7 days. The QIE ceiling state is not singular — it is repeatable. Structural peak mastery confirmed.`,
+    })
+  }
+
+  // Pattern 154: Recovery Mastery Chain — recovery-intelligence-arc (P151) fires on 3+ separate occasions
+  // within 7 days. Self-healing protocol internalized. Recovery is architecturally reliable.
+  const p154RecoveryOccurrences = p152SevenDays.filter(s => s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc')
+  if (p154RecoveryOccurrences.length >= 3) {
+    const count = p154RecoveryOccurrences.length
+    const bonus = Math.min((count - 3) * 0.07, 0.20)
+    patterns.push({
+      pattern: 'recovery-mastery-chain',
+      confidence: Math.min(0.72 + bonus, 0.92),
+      suggestedWidget: 'selfcare',
+      suggestedTiming: 'soon',
+      reason: `RECMAS: Recovery mastery chain — recovery-intelligence-arc (P151) completed ${count} times in the past 7 days. Self-restoration is no longer reactive — it is architecturally reliable. The system has learned its own healing pattern.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4122,15 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  presenceMomentumArcNode:         ['qos', 'cohort', 'journal', 'intentions', 'log'],
+  coherenceFieldPersistenceNode:   ['qos', 'cohort', 'intentions', 'journal', 'mood', 'selfcare', 'energy', 'log'],
+  recoveryMasteryChainNode:        ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── Missing component nodes (v114 dep map audit) ─────────────────────────────────
+  monthlyPulseWidget:              ['mood', 'energy', 'memory', 'planner', 'journal', 'intentions'],
+  chakraErgonomicsWidget:          ['mood', 'energy', 'selfcare', 'journal'],
 }
 
 /**
@@ -4510,6 +4577,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Presence Duration Master (2026-10-20 v114) ────────────────────────
+  {
+    archetype: 'Presence Duration Master',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'journal', 'intentions'],
+    patternConditions: ['presence-momentum-arc', 'quantum-presence-crystallization', 'total-field-coherence'],
+    hourRange: [6, 23],
+    directive: 'Presence is not a moment — it is the new baseline. The system has sustained its peak state across multiple days. Operate from established clarity.',
   },
 ]
 
@@ -6498,6 +6575,51 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a presence-momentum-arc event — quantum_presence_crystallization detected on 2+ distinct
+ * days within a 7-day window. Level 6 presence is no longer a peak — it is the new baseline arc.
+ * Feeds P152 detection.
+ */
+export function recordPresenceMomentumArc(dayCount: number, streak: number) {
+  recordSignal('qos', 'presence_momentum_arc', {
+    dayCount,
+    streak,
+    sustainedPresence: dayCount >= 3 ? 'EXTENDED' : 'CONFIRMED',
+    arc: 'MULTI-DAY',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a coherence-field-persistence event — total_field_coherence achieved 2+ times within
+ * a 7-day window. Absolute convergence is not an event — it is a recurring field state.
+ * Feeds P153 detection.
+ */
+export function recordCoherenceFieldPersistence(occurrences: number, daysSpan: number) {
+  recordSignal('qos', 'coherence_field_persistence', {
+    occurrences,
+    daysSpan,
+    mastery: occurrences >= 3 ? 'ADVANCED' : 'CONFIRMED',
+    ceiling: 'P150',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a recovery-mastery-chain event — recovery_intelligence_arc completed 3+ times within
+ * a 7-day window. The recovery loop is not a response — it is internalized architecture.
+ * Feeds P154 detection.
+ */
+export function recordRecoveryMasteryChain(completions: number, avgVelocityHours: number) {
+  recordSignal('selfcare', 'recovery_mastery_chain', {
+    completions,
+    avgVelocityHours: Math.round(avgVelocityHours * 10) / 10,
+    architecture: 'INTERNALIZED',
+    arc: 'SYSTEMATIC',
     hour: new Date().getHours(),
   })
 }
