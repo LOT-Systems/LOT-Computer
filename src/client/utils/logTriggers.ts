@@ -41,6 +41,7 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'email-compose'     // /email to NAME. body — Ctrl+Enter sends LOT® Email (inbox in Sync)
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -67,6 +68,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'email-compose',  emojis: [],        keywords: ['email', 'mail'] },
 ]
 
 /**
@@ -114,4 +116,24 @@ export function detectNewTriggers(
   const fresh: LogTrigger[] = []
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
+}
+
+/**
+ * Parses "/email to NAME. body" (also "/email to NAME: body" or body on the
+ * following lines). Returns null when no complete email command is present.
+ */
+export function parseEmailCommand(
+  text: string
+): { to: string; body: string; index: number } | null {
+  const m = /(?:^|\s)\/(?:email|mail)\s+to\s+([^\s.,:;!]+(?:\s+[^\s.,:;!]+)?)\s*[.,:;!]?\s*([\s\S]*)$/i.exec(text)
+  if (!m) return null
+  let to = m[1].trim()
+  let body = m[2].trim()
+  // Two-word capture only counts as a full name when the 2nd word starts uppercase.
+  const parts = to.split(/\s+/)
+  if (parts.length === 2 && !/^[A-Z\u00C0-\u024F]/.test(parts[1])) {
+    body = `${parts[1]} ${m[2]}`.trim()
+    to = parts[0]
+  }
+  return to && body ? { to, body, index: m.index + (/^\s/.test(m[0]) ? 1 : 0) } : null
 }

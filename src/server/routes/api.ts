@@ -380,6 +380,11 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'email': {
+          // Only the receiver gets the notification
+          if (data.receiverId === req.user.id) write({ event, data })
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4082,6 +4087,141 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — simplest internal mailbox. Compose in Log: "/email to Hitomi."
+  // Inbox surfaces in Sync. Recipients resolve by name; cohort matches pass userId.
+  // ============================================================================
+  const EMAIL_BODY_MAX = 5000
+  const EMAIL_SUBJECT_MAX = 120
+
+  const isSuspendedUser = (u: { tags?: string[] | null }) =>
+    !!u.tags?.some((t) => t.toLowerCase() === 'suspended')
+
+  fastify.get('/emails', async (req, reply) => {
+    try {
+      const [inbox, sent] = await Promise.all([
+        fastify.models.Email.findAll({ where: { receiverId: req.user.id }, order: [['createdAt', 'DESC']], limit: 100 }),
+        fastify.models.Email.findAll({ where: { senderId: req.user.id }, order: [['createdAt', 'DESC']], limit: 50 }),
+      ])
+      const ids = Array.from(new Set([...inbox.map((m) => m.senderId), ...sent.map((m) => m.receiverId)]))
+      const users = ids.length
+        ? await fastify.models.User.findAll({ where: { id: ids }, attributes: ['id', 'firstName', 'lastName'] })
+        : []
+      const nameOf = (id: string) => {
+        const u = users.find((x) => x.id === id)
+        return u ? `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown' : 'Unknown'
+      }
+      const shape = (m: any) => ({
+        id: m.id,
+        senderId: m.senderId,
+        receiverId: m.receiverId,
+        senderName: nameOf(m.senderId),
+        receiverName: nameOf(m.receiverId),
+        subject: m.subject,
+        body: m.body,
+        readAt: m.readAt,
+        createdAt: m.createdAt,
+      })
+      return reply.send({
+        inbox: inbox.map(shape),
+        sent: sent.map(shape),
+        unread: inbox.filter((m) => !m.readAt).length,
+      })
+    } catch (error) {
+      console.error('Error fetching emails:', error)
+      return reply.status(500).send({ error: 'Failed to fetch emails' })
+    }
+  })
+
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { to?: string; receiverId?: string; subject?: string; body: string }
+  }>, reply) => {
+    try {
+      const { to, receiverId, subject } = req.body || ({} as any)
+      const body = (req.body?.body || '').trim().slice(0, EMAIL_BODY_MAX)
+      if (!body) return reply.status(400).send({ error: 'Email body is required' })
+      if (!to?.trim() && !receiverId) return reply.status(400).send({ error: 'Recipient is required' })
+
+      let receiver: any = null
+      if (receiverId) {
+        receiver = await fastify.models.User.findByPk(receiverId)
+      } else {
+        const name = to!.trim().replace(/[.,:;!]+$/, '').toLowerCase()
+        const all = await fastify.models.User.findAll({ attributes: ['id', 'firstName', 'lastName', 'tags'] })
+        const matches = all.filter((u) => {
+          if (isSuspendedUser(u)) return false
+          const first = (u.firstName || '').trim().toLowerCase()
+          const full = `${u.firstName || ''} ${u.lastName || ''}`.trim().toLowerCase()
+          return name === first || name === full
+        })
+        if (matches.length > 1) {
+          return reply.status(409).send({
+            error: 'Several members match — use a full name',
+            candidates: matches.map((u) => `${u.firstName || ''} ${u.lastName || ''}`.trim()),
+          })
+        }
+        receiver = matches[0] || null
+      }
+      if (!receiver || isSuspendedUser(receiver)) return reply.status(404).send({ error: 'Recipient not found' })
+      if (receiver.id === req.user.id) return reply.status(400).send({ error: 'Cannot email yourself' })
+
+      const email = await fastify.models.Email.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        subject: (subject || '').trim().slice(0, EMAIL_SUBJECT_MAX),
+        body,
+      })
+      const senderName = `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim()
+      sync.emit('email', {
+        id: email.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        senderName,
+        subject: email.subject,
+        body: email.body,
+        createdAt: email.createdAt,
+      } as any)
+
+      process.nextTick(async () => {
+        try {
+          const context = await getLogContext(req.user)
+          await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'email_sent',
+            text: '',
+            metadata: { emailId: email.id, receiverId: receiver.id },
+            context,
+          })
+        } catch (logError) {
+          console.error('Error logging email:', logError)
+        }
+      })
+
+      return reply.send({
+        id: email.id,
+        receiverId: receiver.id,
+        receiverName: `${receiver.firstName || ''} ${receiver.lastName || ''}`.trim(),
+        createdAt: email.createdAt,
+      })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  fastify.post('/emails/:id/read', async (req: FastifyRequest<{ Params: { id: string } }>, reply) => {
+    try {
+      await fastify.models.Email.update(
+        { readAt: new Date() },
+        { where: { id: req.params.id, receiverId: req.user.id, readAt: null } }
+      )
+      return reply.send({ ok: true })
+    } catch (error) {
+      console.error('Error marking email read:', error)
+      return reply.status(500).send({ error: 'Failed to update email' })
     }
   })
 

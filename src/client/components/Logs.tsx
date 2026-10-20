@@ -10,7 +10,7 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
-import { useLogs, useUpdateLog } from '#client/queries'
+import { useLogs, useUpdateLog, sendEmail } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
@@ -28,7 +28,7 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, parseEmailCommand, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3713,6 +3713,7 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  const [emailResult, setEmailResult] = React.useState<string | null>(null)
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -3911,6 +3912,30 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        // LOT® Email: "/email to NAME. body" + Ctrl+Enter sends instead of just saving
+        const mail = parseEmailCommand(valueRef.current)
+        if (mail) {
+          setEmailResult(`TO              ${mail.to.toUpperCase()}\nSTATUS          SENDING...`)
+          sendEmail({ to: mail.to, body: mail.body })
+            .then((res) => {
+              setEmailResult(`TO              ${res.receiverName.toUpperCase()}\nSTATUS          DELIVERED\nINBOX           SYNC`)
+              const text = valueRef.current
+              const updated = `${text.slice(0, mail.index)}✉ sent to ${res.receiverName}`
+              setValue(updated)
+              valueRef.current = updated
+              onChangeRef.current(updated)
+              setIsSaved(true)
+            })
+            .catch((err: any) => {
+              const cands = err?.response?.data?.candidates as string[] | undefined
+              const reason = err?.response?.data?.error || 'EMAIL FAILED'
+              setEmailResult(
+                `TO              ${mail.to.toUpperCase()}\nSTATUS          ${String(reason).toUpperCase()}` +
+                  (cands?.length ? `\nMATCHES         ${cands.join(', ').toUpperCase()}` : '')
+              )
+            })
+          return
+        }
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -4134,6 +4159,7 @@ const NoteEditor = ({
           '/fast         Orthodox fasting calendar',
           '/breathe      4-2-6 breathing exercise',
           '/freeze       Pause and reflect protocol',
+          '/email to X.  Send LOT® Email (Ctrl+Enter) — inbox in Sync',
           '/silent       Signal silence check',
           '/synth        Toggle keyboard sound',
           '/radio        Toggle radio',
@@ -4145,6 +4171,8 @@ const NoteEditor = ({
           'Ctrl+Enter    Save log immediately',
         ]
         setSystemHelp(lines.join('\n'))
+      } else if (trigger === 'email-compose') {
+        setEmailResult('EMAIL           /email to NAME. message\nSEND            CTRL+ENTER\nINBOX           SYNC')
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4384,6 +4412,13 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailResult && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{emailResult}</div>
             </Block>
           </div>
         )}

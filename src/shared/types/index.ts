@@ -200,6 +200,18 @@ export type DirectMessage = {
   updatedAt: Date;
 };
 
+// Email Type (LOT® Email — internal mailbox)
+export type Email = {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  subject: string;
+  body: string;
+  readAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 // Chat Message Types
 export type ChatMessage = {
   id: string;
@@ -450,4 +462,5 @@ export type SyncEvents = {
   chatMessage: PublicChatMessage;
   chatMessageLike: ChatMessageLikeEventPayload;
   settings_updated: Record<string, never>;
+  email: Pick<Email, 'id' | 'senderId' | 'receiverId' | 'subject' | 'body' | 'createdAt'> & { senderName: string };
 };

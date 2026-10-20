@@ -24,6 +24,9 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  sendEmail,
+  markEmailRead,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -40,6 +43,90 @@ const CHAT_ALLOWED_TAGS: string[] = [
   UserTag.Onyx,
   UserTag.Legacy,
 ].map((t) => t.toLowerCase())
+
+const EmailInbox: React.FC = () => {
+  const queryClient = useQueryClient()
+  const draftTo = useStore(stores.emailDraftTo)
+  const { data } = useEmails()
+  const [openId, setOpenId] = React.useState<string | null>(null)
+  const [body, setBody] = React.useState('')
+  const [status, setStatus] = React.useState('')
+
+  React.useEffect(() => {
+    const { dispose } = sync.listen('email', () => {
+      queryClient.invalidateQueries(['/api/emails'])
+    })
+    return () => dispose()
+  }, [])
+
+  const onOpen = (id: string, unread: boolean) => () => {
+    setOpenId(openId === id ? null : id)
+    if (unread) {
+      markEmailRead(id).then(() => queryClient.invalidateQueries(['/api/emails']))
+    }
+  }
+
+  const onSend = async (ev: React.FormEvent) => {
+    ev.preventDefault()
+    if (!draftTo || !body.trim()) return
+    try {
+      const res = await sendEmail({ receiverId: draftTo.id, body })
+      setStatus(`Sent to ${res.receiverName}`)
+      setBody('')
+      stores.emailDraftTo.set(null)
+      queryClient.invalidateQueries(['/api/emails'])
+    } catch {
+      setStatus('Email failed')
+    }
+  }
+
+  const inbox = data?.inbox || []
+  if (!inbox.length && !draftTo && !status) return null
+
+  return (
+    <div className="mb-40">
+      <div className="text-acc/40 mb-8">
+        Email{data?.unread ? ` · ${data.unread} new` : ''}
+        <span className="ml-8">— compose in Log: /email to Name.</span>
+      </div>
+      {draftTo && (
+        <form onSubmit={onSend} className="flex items-center gap-x-8 mb-8">
+          <span className="whitespace-nowrap">To {draftTo.name}</span>
+          <ResizibleGhostInput
+            direction="vh"
+            value={body}
+            onChange={setBody}
+            placeholder="Write an email..."
+            containerClassName="flex-grow leading-normal"
+            className="leading-normal"
+          />
+          <Button type="submit" kind="secondary" size="small" disabled={!body.trim()}>
+            Send
+          </Button>
+        </form>
+      )}
+      {status && <div className="text-acc/40 mb-8">{status}</div>}
+      {inbox.slice(0, 20).map((m) => {
+        const unread = !m.readAt
+        return (
+          <div
+            key={m.id}
+            className="cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded"
+            onClick={onOpen(m.id, unread)}
+          >
+            <div className="flex items-start gap-x-8">
+              <span className="whitespace-nowrap">{unread ? '● ' : ''}{m.senderName}</span>
+              <span className={cn(!unread && 'text-acc/60', openId === m.id ? 'whitespace-breakspaces' : 'truncate')}>
+                {openId === m.id ? m.body : m.subject || m.body}
+              </span>
+              <span className="ml-auto text-acc/40 whitespace-nowrap">{dayjs(m.createdAt).fromNow()}</span>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 export const Sync = React.memo(function SyncInner() {
   const formRef = React.useRef<HTMLFormElement>(null)
@@ -172,14 +259,18 @@ export const Sync = React.memo(function SyncInner() {
 
   if (!canAccessChat) {
     return (
-      <div className="max-w-[700px] text-acc/40 py-8">
-        Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+      <div className="max-w-[700px] py-8">
+        <EmailInbox />
+        <div className="text-acc/40">
+          Chat in Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+        </div>
       </div>
     )
   }
 
   return (
     <div className="max-w-[700px]">
+      <EmailInbox />
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}
