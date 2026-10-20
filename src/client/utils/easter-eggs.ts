@@ -871,6 +871,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('odyssey_day')
   }
 
+  // ── Calendar v21 — THE GAME CALENDAR ─────────────────────────────────────────
+  // Mario Day: March 10 — MAR10 = MARIO
+  if (!hasBadge('mario_day') && month === 3 && day === 10) {
+    awardBadge('mario_day')
+    awarded.push('mario_day')
+  }
+  // Zelda Day: February 21 — The Legend of Zelda original release, Japan 1986
+  if (!hasBadge('zelda_day') && month === 2 && day === 21) {
+    awardBadge('zelda_day')
+    awarded.push('zelda_day')
+  }
+  // Game Day: September 12 — National Video Game Day
+  if (!hasBadge('game_day') && month === 9 && day === 12) {
+    awardBadge('game_day')
+    awarded.push('game_day')
+  }
+
   return awarded
 }
 
@@ -2655,6 +2672,19 @@ export function checkNightOperator(): BadgeType | null {
   return null
 }
 
+// ── L33T Hour — time check ────────────────────────────────────────────────────
+
+/** Award leet_hour badge if current time is 13:37 (1337 — l33t time). */
+export function checkLeetHour(): BadgeType | null {
+  if (hasBadge('leet_hour')) return null
+  const now = new Date()
+  if (now.getHours() === 13 && now.getMinutes() === 37) {
+    awardBadge('leet_hour')
+    return 'leet_hour'
+  }
+  return null
+}
+
 // ── Hero's Journey v22 behavioral checks ─────────────────────────────────────
 
 const HERO_WORDS_V22 = [
@@ -2713,5 +2743,99 @@ export function checkThresholdMoment(): BadgeType | null {
     return 'threshold_moment'
   }
   return null
+}
+
+// ── RPG Codex v23 — word detection and behavioral checks ─────────────────────
+
+const RPG_WORDS_V23 = [
+  /\blevel[\s-]?up\b|\bleveled[\s-]?up\b|\bgained[\s-]?a[\s-]?level\b/i,
+  /\bexperience[\s-]?points\b|\b[Xx][Pp]\b|\bgrinding\b|\bgrind[\s-]?session\b/i,
+  /\bquest[\s-]?log\b|\bside[\s-]?quest\b|\bmain[\s-]?quest\b|\bnew[\s-]?quest\b/i,
+  /\bdungeon\b|\bdungeon[\s-]?crawl\b|\bboss[\s-]?room\b|\blevel[\s-]?boss\b/i,
+  /\bcast[\s-]?a[\s-]?spell\b|\bmana\b|\bspellbook\b|\bincantation\b/i,
+  /\bloot[\s-]?drop\b|\btreasure[\s-]?chest\b|\brave[\s-]?item\b|\blegendary[\s-]?drop\b/i,
+  /\brespawn\b|\bsecond[\s-]?chance\b|\bcheckpoint[\s-]?saved\b|\bnew[\s-]?life[\s-]?begins\b/i,
+  /\bguild\b|\braid[\s-]?party\b|\bjoin[\s-]?the[\s-]?guild\b|\bparty[\s-]?member\b/i,
+  /\bboss[\s-]?fight\b|\bfinal[\s-]?boss\b|\bendgame[\s-]?boss\b|\bboss[\s-]?battle\b/i,
+  /\bcharacter[\s-]?class\b|\bmy[\s-]?class\b|\bskill[\s-]?build\b|\barchetype[\s-]?choice\b/i,
+  /\binventory[\s-]?full\b|\bbackpack\b|\bloadout\b|\bitem[\s-]?slots\b/i,
+  /\bskill[\s-]?tree\b|\btalent[\s-]?tree\b|\bpassive[\s-]?ability\b|\bunlock[\s-]?skill\b/i,
+]
+
+/**
+ * Award rpg_session badge if 3+ RPG Codex (v23) words appear in one journal entry.
+ */
+export function checkRPGSession(journalText: string): BadgeType | null {
+  if (hasBadge('rpg_session')) return null
+  const matchCount = RPG_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('rpg_session')
+    return 'rpg_session'
+  }
+  return null
+}
+
+/**
+ * Award marathon_log badge if journal entry is 600+ words.
+ */
+export function checkMarathonLog(journalText: string): BadgeType | null {
+  if (hasBadge('marathon_log')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 600) {
+    awardBadge('marathon_log')
+    return 'marathon_log'
+  }
+  return null
+}
+
+/**
+ * Check word-turn badges for RPG Codex v23 keywords in journal text.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkRPGCodexWordTurns(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  const text = journalText
+
+  const checks: Array<[RegExp, BadgeType]> = [
+    [/\blevel[\s-]?up\b|\bleveled[\s-]?up\b|\bgained[\s-]?a[\s-]?level\b/i, 'levelup_signal'],
+    [/\bexperience[\s-]?points\b|\b[Xx][Pp]\b|\bgrinding\b|\bgrind[\s-]?session\b/i, 'xp_earned'],
+    [/\bquest[\s-]?log\b|\bside[\s-]?quest\b|\bmain[\s-]?quest\b|\bnew[\s-]?quest\b/i, 'quest_log_entry'],
+    [/\bdungeon\b|\bdungeon[\s-]?crawl\b|\bboss[\s-]?room\b|\blevel[\s-]?boss\b/i, 'dungeon_dive'],
+    [/\bcast[\s-]?a[\s-]?spell\b|\bmana\b|\bspellbook\b|\bincantation\b/i, 'spell_cast'],
+    [/\bloot[\s-]?drop\b|\btreasure[\s-]?chest\b|\brave[\s-]?item\b|\blegendary[\s-]?drop\b/i, 'loot_drop'],
+    [/\brespawn\b|\bsecond[\s-]?chance\b|\bcheckpoint[\s-]?saved\b|\bnew[\s-]?life[\s-]?begins\b/i, 'respawn_signal'],
+    [/\bguild\b|\braid[\s-]?party\b|\bjoin[\s-]?the[\s-]?guild\b|\bparty[\s-]?member\b/i, 'guild_protocol'],
+    [/\bboss[\s-]?fight\b|\bfinal[\s-]?boss\b|\bendgame[\s-]?boss\b|\bboss[\s-]?battle\b/i, 'boss_encounter'],
+    [/\bcharacter[\s-]?class\b|\bmy[\s-]?class\b|\bskill[\s-]?build\b|\barchetype[\s-]?choice\b/i, 'character_class'],
+    [/\binventory[\s-]?full\b|\bbackpack\b|\bloadout\b|\bitem[\s-]?slots\b/i, 'inventory_check'],
+    [/\bskill[\s-]?tree\b|\btalent[\s-]?tree\b|\bpassive[\s-]?ability\b|\bunlock[\s-]?skill\b/i, 'skill_tree_node'],
+  ]
+
+  for (const [pattern, badgeId] of checks) {
+    if (!hasBadge(badgeId) && pattern.test(text)) {
+      if (awardBadge(badgeId)) awarded.push(badgeId)
+    }
+  }
+  return awarded
+}
+
+/**
+ * Check secret boss v20 — hidden RPG/Gaming triggers.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkFinalBossVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+
+  if (!hasBadge('zelda_triforce') && /\btriforce\b|\bhyrule\b|\blink's[\s-]?journey\b|\bganondorf\b/i.test(journalText)) {
+    if (awardBadge('zelda_triforce')) awarded.push('zelda_triforce')
+  }
+  if (!hasBadge('pac_ghost') && /\bpac[\s-]?man\b|\bwaka[\s-]?waka\b|\bblinky\b|\bpower[\s-]?pellet\b|\binky[\s-]?pinky\b/i.test(journalText)) {
+    if (awardBadge('pac_ghost')) awarded.push('pac_ghost')
+  }
+  if (!hasBadge('konami_code') && /\bkonami[\s-]?code\b|\bup[\s-]?up[\s-]?down[\s-]?down\b|\bb[\s-]?a[\s-]?start\b|\bbarrel[\s-]?roll\b/i.test(journalText)) {
+    if (awardBadge('konami_code')) awarded.push('konami_code')
+  }
+
+  return awarded
 }
 

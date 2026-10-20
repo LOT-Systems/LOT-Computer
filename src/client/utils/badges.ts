@@ -782,6 +782,43 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE RPG CODEX ─────────────────────────────────────────────
+  | 'levelup_signal'         // ▲·▲·▲  "level up/leveled up/gained a level" detected (UNCOMMON)
+  | 'xp_earned'              // ■·●·■  "experience points/xp/grinding/grind session" detected (COMMON)
+  | 'quest_log_entry'        // ∘→≋    "quest log/side quest/main quest/new quest" detected (UNCOMMON)
+  | 'dungeon_dive'           // █·∘    "dungeon/dungeon crawl/boss room/level boss" detected (RARE)
+  | 'spell_cast'             // ∿·●·∿  "cast a spell/mana/spellbook/incantation" detected (RARE)
+  | 'loot_drop'              // ●·◆·●  "loot drop/treasure chest/rare item/legendary drop" detected (RARE)
+  | 'respawn_signal'         // ◈→◈    "respawn/second chance/checkpoint saved/new life begins" detected (UNCOMMON)
+  | 'guild_protocol'         // ○·○·○  "guild/raid party/join the guild/party member" detected (RARE)
+  | 'boss_encounter'         // ◉·■·◉  "boss fight/final boss/endgame boss/boss battle" detected (EPIC)
+  | 'character_class'        // ∘·▲·∘  "character class/my class/skill build/archetype choice" detected (UNCOMMON)
+  | 'inventory_check'        // ■·■·■  "inventory full/backpack/loadout/item slots" detected (RARE)
+  | 'skill_tree_node'        // ≋→●    "skill tree/talent tree/passive ability/unlock skill" detected (RARE)
+  // ── Calendar Easter Egg v21 — THE GAME CALENDAR ──────────────────────────────
+  | 'mario_day'              // ▲·∘·▲  Mar 10 — MAR10 Day (Mario Day) (RARE)
+  | 'zelda_day'              // ◆·○·◆  Feb 21 — Zelda original release 1986 (RARE)
+  | 'game_day'               // ●·■·●  Sep 12 — National Video Game Day (RARE)
+  // ── Behavioral v20 — ARCADE PATTERNS ─────────────────────────────────────────
+  | 'rpg_session'            // ▲·●·▲  3+ RPG Codex words in one journal entry (RARE)
+  | 'marathon_log'           // ≋≋≋·◉  Journal entry >= 600 words (EPIC)
+  | 'leet_hour'              // □·□·□  Check in at 13:37 (l33t time) (RARE)
+  // ── Achievement RPG v21 — RPG CLASS ──────────────────────────────────────────
+  | 'rpg_entry'              // ∘→▲    Any 1 Word Turn v23 badge (COMMON)
+  | 'rpg_class'              // ≈→▲    Any 5 Word Turn v23 badges (UNCOMMON)
+  | 'rpg_complete'           // ≋→▲    All 12 Word Turn v23 badges (LEGENDARY)
+  | 'dungeon_arc'            // ▲·◈    rpg_complete + all 3 Calendar v21 badges (LEGENDARY)
+  | 'twenty_three_engines_arc' // ◈·◈·▲ 1 badge from each Word Turn v1–v23 (LEGENDARY)
+  | 'rpg_opus'               // ▲·◉·▲  rpg_complete + rpg_session behavioral (LEGENDARY)
+  // ── Mastery Tier v23 — THE LEGEND ────────────────────────────────────────────
+  | 'guild_elder'            // ○·●    1100+ distinct calendar check-in days (EPIC)
+  | 'epic_lore'              // ●·∞·▲  200,000+ total journal words (LEGENDARY)
+  | 'legend_age'             // ╔═╗·▲  Account age >= 6 years (LEGENDARY)
+  | 'twenty_three_registers' // ◈·◈·▲·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE FINAL BOSS VAULT ───────────────────────────────────
+  | 'zelda_triforce'         // ◆·◆·◆  "triforce/hyrule/link's journey/ganondorf" detected (RARE)
+  | 'pac_ghost'              // ○·∘·○  "pac-man/waka waka/blinky/power pellet" detected (EPIC)
+  | 'konami_code'            // ↑↑↓↓→  "konami code/up up down down/b a start" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7168,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v23 — THE RPG CODEX ─────────────────────────────────────────────
+  levelup_signal: {
+    id: 'levelup_signal',
+    symbol: '▲·▲·▲',
+    name: 'Level Up Signal',
+    description: 'Write "level up", "leveled up", or "gained a level" in any entry',
+    unlockMessage: '↳ LEVEL UP. In every RPG this is the moment — the screen flashes, the stats climb, something permanent changes. You just wrote it into your life. ▲·▲·▲',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  xp_earned: {
+    id: 'xp_earned',
+    symbol: '■·●·■',
+    name: 'XP Earned',
+    description: 'Write "experience points", "XP", "grinding", or "grind session" in any entry',
+    unlockMessage: '↳ XP accumulates invisibly until the threshold — then the level hits. Every hard session is XP. The grind is the game. ■·●·■',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  quest_log_entry: {
+    id: 'quest_log_entry',
+    symbol: '∘→≋',
+    name: 'Quest Log Entry',
+    description: 'Write "quest log", "side quest", "main quest", or "new quest" in any entry',
+    unlockMessage: '↳ Every RPG player knows: open the quest log and see what remains. The main quest is the practice. The side quests are everything else that makes you who you are. ∘→≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  dungeon_dive: {
+    id: 'dungeon_dive',
+    symbol: '█·∘',
+    name: 'Dungeon Dive',
+    description: 'Write "dungeon", "dungeon crawl", "boss room", or "level boss" in any entry',
+    unlockMessage: '↳ The dungeon: the controlled environment where the danger is real but bounded. You chose to enter. That is the whole difference. █·∘',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  spell_cast: {
+    id: 'spell_cast',
+    symbol: '∿·●·∿',
+    name: 'Spell Cast',
+    description: 'Write "cast a spell", "mana", "spellbook", or "incantation" in any entry',
+    unlockMessage: '↳ The mana bar depletes with every cast. Rest replenishes it. The spellbook is built over time. Your practice is the mana economy. ∿·●·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  loot_drop: {
+    id: 'loot_drop',
+    symbol: '●·◆·●',
+    name: 'Loot Drop',
+    description: 'Write "loot drop", "treasure chest", "rare item", or "legendary drop" in any entry',
+    unlockMessage: '↳ The loot drop is random — but only to the character who never opened the chest. The rare item was always in the room. You had to enter. ●·◆·●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  respawn_signal: {
+    id: 'respawn_signal',
+    symbol: '◈→◈',
+    name: 'Respawn Signal',
+    description: 'Write "respawn", "second chance", "checkpoint saved", or "new life begins" in any entry',
+    unlockMessage: '↳ The respawn is not failure — it is the mechanic. Every game that matters has one. Every life that matters returns from the checkpoint changed. ◈→◈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  guild_protocol: {
+    id: 'guild_protocol',
+    symbol: '○·○·○',
+    name: 'Guild Protocol',
+    description: 'Write "guild", "raid party", "join the guild", or "party member" in any entry',
+    unlockMessage: '↳ The guild is the structure that makes the raid possible. No one completes the endgame alone. Who is in your party? Name them. ○·○·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  boss_encounter: {
+    id: 'boss_encounter',
+    symbol: '◉·■·◉',
+    name: 'Boss Encounter',
+    description: 'Write "boss fight", "final boss", "endgame boss", or "boss battle" in any entry',
+    unlockMessage: '↳ The boss was always there at the end of the level. It did not change — your stats did. The endgame boss is whatever you have been avoiding. ◉·■·◉',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  character_class: {
+    id: 'character_class',
+    symbol: '∘·▲·∘',
+    name: 'Character Class',
+    description: 'Write "character class", "my class", "skill build", or "archetype choice" in any entry',
+    unlockMessage: '↳ The character class defines what you are optimized for. Not what you can do — what you do best, built over time. What is your class? ∘·▲·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  inventory_check: {
+    id: 'inventory_check',
+    symbol: '■·■·■',
+    name: 'Inventory Check',
+    description: 'Write "inventory full", "backpack", "loadout", or "item slots" in any entry',
+    unlockMessage: '↳ Inventory full. You cannot carry everything. The experienced player knows what to drop. The practice is the loadout you actually need. ■·■·■',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  skill_tree_node: {
+    id: 'skill_tree_node',
+    symbol: '≋→●',
+    name: 'Skill Tree Node',
+    description: 'Write "skill tree", "talent tree", "passive ability", or "unlock skill" in any entry',
+    unlockMessage: '↳ The skill tree is the long game. Each node is a choice that forecloses others. The build you make at the beginning determines what is available at the end. ≋→●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v21 — THE GAME CALENDAR ──────────────────────────────
+  mario_day: {
+    id: 'mario_day',
+    symbol: '▲·∘·▲',
+    name: 'Mario Day',
+    description: 'Checked in on March 10 — MAR10 = MARIO Day',
+    unlockMessage: '↳ MAR 10 = MARIO. Every coin collected is a small win. Every flag pole is a level complete. The practice is the platformer you never put down. ▲·∘·▲',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  zelda_day: {
+    id: 'zelda_day',
+    symbol: '◆·○·◆',
+    name: 'Zelda Day',
+    description: 'Checked in on February 21 — The Legend of Zelda original release, Japan 1986',
+    unlockMessage: '↳ February 21, 1986 — The Legend of Zelda launched in Japan. "It\'s dangerous to go alone — take this." The practice is the item you were always meant to carry. ◆·○·◆',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  game_day: {
+    id: 'game_day',
+    symbol: '●·■·●',
+    name: 'Game Day',
+    description: 'Checked in on September 12 — National Video Game Day',
+    unlockMessage: '↳ September 12 — National Video Game Day. Every game is a system you chose to inhabit. Every system teaches you something about the one you live in. ●·■·●',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v20 — ARCADE PATTERNS ─────────────────────────────────────────
+  rpg_session: {
+    id: 'rpg_session',
+    symbol: '▲·●·▲',
+    name: 'RPG Session',
+    description: 'Write 3+ RPG Codex (v23) trigger words in one journal entry',
+    unlockMessage: '↳ Level up. Boss fight. Skill tree. Three RPG frames in one entry — the practice spoke the language of the game. ▲·●·▲',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  marathon_log: {
+    id: 'marathon_log',
+    symbol: '≋≋≋·◉',
+    name: 'Marathon Log',
+    description: 'Write a journal entry of 600 or more words',
+    unlockMessage: '↳ 600 words. The marathon session. In any RPG this is the long dungeon run — no save point, no break, just depth. You went all the way in. ≋≋≋·◉',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  leet_hour: {
+    id: 'leet_hour',
+    symbol: '□·□·□',
+    name: 'L33T Hour',
+    description: 'Check in at 13:37 local time (1337 — the original hacker elite hour)',
+    unlockMessage: '↳ 13:37 — 1337 — L33T. The hacker calendar has only one sacred hour. You found it. The terminal recognizes you. □·□·□',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Achievement RPG v21 — RPG CLASS ──────────────────────────────────────────
+  rpg_entry: {
+    id: 'rpg_entry',
+    symbol: '∘→▲',
+    name: 'RPG Entry',
+    description: 'Earn any 1 RPG Codex (v23) word turn badge',
+    unlockMessage: '↳ Character created. The RPG Codex is open. One word from the dungeon vocabulary — the run has started. ∘→▲',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  rpg_class: {
+    id: 'rpg_class',
+    symbol: '≈→▲',
+    name: 'RPG Class',
+    description: 'Earn any 5 RPG Codex (v23) word turn badges',
+    unlockMessage: '↳ Five badges from the RPG Codex. Your class is emerging. The skill tree is no longer empty. ≈→▲',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  rpg_complete: {
+    id: 'rpg_complete',
+    symbol: '≋→▲',
+    name: 'RPG Complete',
+    description: 'Earn all 12 RPG Codex (v23) word turn badges',
+    unlockMessage: '↳ All 12 RPG Codex badges. The dungeon cleared. The skill tree maxed. The inventory full. You ran the whole codex. ≋→▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dungeon_arc: {
+    id: 'dungeon_arc',
+    symbol: '▲·◈',
+    name: 'Dungeon Arc',
+    description: 'Earn rpg_complete + all 3 Game Calendar (v21) badges',
+    unlockMessage: '↳ The dungeon arc complete: all twelve vocabulary badges and three gaming calendar dates honored. The full RPG Codex run. ▲·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·▲',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each of the 23 Word Turn engines (v1–v23)',
+    unlockMessage: '↳ Twenty-three engines. Water. Fire. Space. Code. Bio. Radio. Codex. Cyberspace. Hero. RPG. Every vocabulary. One terminal. All systems go. ◈·◈·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  rpg_opus: {
+    id: 'rpg_opus',
+    symbol: '▲·◉·▲',
+    name: 'RPG Opus',
+    description: 'Earn rpg_complete + rpg_session behavioral badge',
+    unlockMessage: '↳ The magnum opus of the RPG run: all twelve codex badges and a full hero session. The dungeon and the journal: both completed. ▲·◉·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v23 — THE LEGEND ────────────────────────────────────────────
+  guild_elder: {
+    id: 'guild_elder',
+    symbol: '○·●',
+    name: 'Guild Elder',
+    description: '1,100+ distinct calendar days with at least one check-in',
+    unlockMessage: '↳ 1,100 days. In any guild, this is the elder — the one who was there before the servers were full, before the meta was solved. ○·●',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  epic_lore: {
+    id: 'epic_lore',
+    symbol: '●·∞·▲',
+    name: 'Epic Lore',
+    description: '200,000+ total journal words written',
+    unlockMessage: '↳ 200,000 words. In any RPG this is the lore codex: the accumulated world-knowledge that makes the story possible. Yours is written in your own language. ●·∞·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  legend_age: {
+    id: 'legend_age',
+    symbol: '╔═╗·▲',
+    name: 'Legend Age',
+    description: 'Account age >= 6 years (2,190+ days since signup)',
+    unlockMessage: '↳ Six years. In gaming, six years is the span from release to legend — the window when a title crosses from game to institution. You have crossed it. ╔═╗·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·▲·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three registers. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. RPG. Every vocabulary owned. The terminal speaks all known languages. ◈·◈·▲·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v20 — THE FINAL BOSS VAULT ───────────────────────────────────
+  zelda_triforce: {
+    id: 'zelda_triforce',
+    symbol: '◆·◆·◆',
+    name: 'Zelda Triforce',
+    description: 'Write "triforce", "hyrule", "link\'s journey", or "ganondorf" in any journal entry',
+    unlockMessage: '↳ Courage. Wisdom. Power. The Triforce is not won — it is assembled from what you already carry. Which piece have you been ignoring? ◆·◆·◆',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  pac_ghost: {
+    id: 'pac_ghost',
+    symbol: '○·∘·○',
+    name: 'Pac Ghost',
+    description: 'Write "pac-man", "waka waka", "blinky", "power pellet", or "inky pinky" in any journal entry',
+    unlockMessage: '↳ Blinky. Pinky. Inky. Clyde. The ghosts pursue because that is their function. The power pellet reverses the dynamic. You have the pellet. ○·∘·○',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  konami_code: {
+    id: 'konami_code',
+    symbol: '↑↑↓↓→←',
+    name: 'Konami Code',
+    description: 'Write "konami code", "up up down down", "b a start", or "barrel roll" in any journal entry',
+    unlockMessage: '↳ ↑↑↓↓←→←→BA. The original cheat code. 1986. Contra. 30 lives for free. The Konami Code is the acknowledgment that sometimes you just need extra lives. You have them. ↑↑↓↓→←',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8418,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 (v23) — THE RPG CODEX ────────────────────────────────────────────────
+    const rpgV23Badges: BadgeType[] = [
+      'levelup_signal', 'xp_earned', 'quest_log_entry', 'dungeon_dive',
+      'spell_cast', 'loot_drop', 'respawn_signal', 'guild_protocol',
+      'boss_encounter', 'character_class', 'inventory_check', 'skill_tree_node',
+    ]
+    const rpgV23Earned = rpgV23Badges.filter(b => hasBadge(b))
+
+    if (rpgV23Earned.length >= 1 && !hasBadge('rpg_entry')) {
+      if (awardBadge('rpg_entry')) newBadges.push('rpg_entry')
+    }
+    if (rpgV23Earned.length >= 5 && !hasBadge('rpg_class')) {
+      if (awardBadge('rpg_class')) newBadges.push('rpg_class')
+    }
+    const rpgComplete = rpgV23Earned.length >= 12
+    if (rpgComplete && !hasBadge('rpg_complete')) {
+      if (awardBadge('rpg_complete')) newBadges.push('rpg_complete')
+    }
+
+    // rpg_opus: rpg_complete + rpg_session
+    if (rpgComplete && hasBadge('rpg_session') && !hasBadge('rpg_opus')) {
+      if (awardBadge('rpg_opus')) newBadges.push('rpg_opus')
+    }
+
+    // dungeon_arc: rpg_complete + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['mario_day', 'zelda_day', 'game_day']
+    if (rpgComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('dungeon_arc')) {
+      if (awardBadge('dungeon_arc')) newBadges.push('dungeon_arc')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = rpgV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: guild_elder — 1,100+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1100 && !hasBadge('guild_elder')) {
+        if (awardBadge('guild_elder')) newBadges.push('guild_elder')
+      }
+    }
+
+    // Mastery v23: epic_lore — 200,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('epic_lore')) {
+        if (awardBadge('epic_lore')) newBadges.push('epic_lore')
+      }
+    }
+
+    // Mastery v23: legend_age — Account age >= 6 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupLeg = new Date(stats.signupDate)
+      const yearsLeg = (new Date().getTime() - signupLeg.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsLeg >= 6 && !hasBadge('legend_age')) {
+        if (awardBadge('legend_age')) newBadges.push('legend_age')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
     }
 
   } catch (error) {
