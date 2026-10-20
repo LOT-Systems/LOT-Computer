@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.1 — DEVELOPMENT START (see DEV-REPORT-02 for audit + amendments A-01..A-05)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -320,6 +320,16 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE TWO-MINUTE HOP                          2026-10-20
+  ─────────────────────────────────────────────────────────────────
+  Full entry, constraints and test T-9: LOT-CUBIQ-QUANTUM-CUBE-v0-DEV-REPORT-02.md,
+  Section 10. Summary: a parent with a child (5-8) who owns the LOT® Brush.
+  The cube on the bathroom counter gives THE NUDGE at 60 s of brushing and
+  THE HOP at the 120 s target — no screen, no sound, no punishment for a
+  short session (it simply stays still). Uses only the v.0 in-place hop.
+  Raises: child-data/parental opt-in, wet-surface traction + IPX4, and a
+  mandatory pad lip at the counter edge.
 
 --------------------------------------------------------------------------------
 08 // BRAND
