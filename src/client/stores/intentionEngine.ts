@@ -3428,6 +3428,59 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Recovery Cadence — recovery-intelligence-arc (P151) detected 3+ times in the last 7 days.
+  // The loop is not an incident — it is a learned behavioral pattern. The system recognizes its own rhythm:
+  // depletion rises, care responds, state restores, reflection captures. Cadence confirmed.
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000
+  const recentSevenD = signals.filter(s => now - s.timestamp < sevenDaysMs)
+  const recoveryArcs7d = recentSevenD.filter(s => s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc')
+  if (recoveryArcs7d.length >= 3) {
+    const arcCount = recoveryArcs7d.length
+    const cadenceBonus = Math.min((arcCount - 3) * 0.04, 0.12)
+    patterns.push({
+      pattern: 'recovery-cadence',
+      confidence: Math.min(0.72 + cadenceBonus, 0.84),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'passive',
+      reason: `RECCAD: Recovery cadence — arc detected ${arcCount} times in 7d. The loop is not incident — it is pattern. The system has learned how you restore.`,
+    })
+  }
+
+  // Pattern 153: Coherence After Recovery — recovery-intelligence-arc (P151) + total-field-coherence (P150)
+  // both detected in the same analysis run. The full arc: depletion → care → restoration → reflection,
+  // then absolute convergence. The recovery did not interrupt the peak — it preceded it.
+  const hasRecoveryArcP151 = patterns.some(p => p.pattern === 'recovery-intelligence-arc')
+  const hasTotalCoherenceP150 = patterns.some(p => p.pattern === 'total-field-coherence')
+  if (hasRecoveryArcP151 && hasTotalCoherenceP150) {
+    const recConf = patterns.find(p => p.pattern === 'recovery-intelligence-arc')?.confidence ?? 0.65
+    const tfcConf = patterns.find(p => p.pattern === 'total-field-coherence')?.confidence ?? 0.92
+    patterns.push({
+      pattern: 'coherence-after-recovery',
+      confidence: Math.min((recConf + tfcConf) / 2 * 0.96, 0.88),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `COHRECOV: Coherence after recovery — depletion arc detected and completed · total field coherence confirmed in the same window. The restoration preceded the peak. Depletion fed the convergence.`,
+    })
+  }
+
+  // Pattern 154: Temporal Coherence Memory — total-field-coherence events on 3+ distinct calendar days
+  // in a 30-day window. The peak is not a singular event — it is recurring. The system now has memory
+  // of its own convergence: it has been here before, and it knows the way back.
+  const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000
+  const recentThirtyD = signals.filter(s => now - s.timestamp < thirtyDaysMs)
+  const tfcEvents30d = recentThirtyD.filter(s => s.source === 'qos' && s.signal === 'total_field_coherence')
+  const tfcDistinctDays = new Set(tfcEvents30d.map(s => new Date(s.timestamp).toDateString())).size
+  if (tfcDistinctDays >= 3) {
+    const memBonus = Math.min((tfcDistinctDays - 3) * 0.025, 0.10)
+    patterns.push({
+      pattern: 'temporal-coherence-memory',
+      confidence: Math.min(0.80 + memBonus, 0.90),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `TOTCMEM: Temporal coherence memory — total field coherence confirmed on ${tfcDistinctDays} distinct days in 30d. The peak is not an event — it is a place the system returns to.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4117,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  recoveryCadenceNode:         ['selfcare', 'mood', 'journal', 'log'],
+  coherenceAfterRecoveryNode:  ['qos', 'selfcare', 'mood', 'journal', 'memory', 'log'],
+  temporalCoherenceMemoryNode: ['qos', 'log', 'energy', 'cohort'],
 }
 
 /**
@@ -4510,6 +4568,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Recovery-to-Peak Operator (2026-10-20 v114) ──────────────────────────
+  {
+    archetype: 'Recovery-to-Peak Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['mood', 'selfcare', 'journal', 'qos', 'memory'],
+    patternConditions: ['recovery-cadence', 'coherence-after-recovery'],
+    hourRange: [5, 23],
+    directive: 'Depletion is not the obstacle. It is the launch sequence. You recover — you peak. The cadence is confirmed. The system has memory of your restoration arc.',
   },
 ]
 
@@ -6498,6 +6566,39 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a recovery-cadence event — recovery-intelligence-arc (P151) confirmed 3+ times
+ * in a 7-day window. The recovery loop has become a learned behavioral pattern.
+ * Feeds P152 detection.
+ */
+export function recordRecoveryCadence(arcCount: number, arcVelocityAvgHours: number | null) {
+  recordSignal('selfcare', 'recovery_cadence', {
+    arcCount,
+    arcVelocityAvgHours,
+    cadenceStrength: arcCount >= 5 ? 'HIGH' : arcCount >= 4 ? 'MODERATE' : 'ESTABLISHED',
+    pattern: 'FELT→TENDED→RECOVERED→REFLECTED',
+    cadenceStatus: 'CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a coherence-after-recovery event — recovery-intelligence-arc (P151) +
+ * total-field-coherence (P150) both active in the same analysis window. Depletion
+ * arc completed, then absolute convergence confirmed. The restoration preceded the peak.
+ * Feeds P153 detection.
+ */
+export function recordCoherenceAfterRecovery(recConf: number, tfcConf: number) {
+  recordSignal('qos', 'coherence_after_recovery', {
+    recConf: Math.round(recConf * 100),
+    tfcConf: Math.round(tfcConf * 100),
+    avgConf: Math.round((recConf + tfcConf) / 2 * 100),
+    arc: 'DEPLETION→CARE→PEAK',
+    recoveryFedPeak: true,
     hour: new Date().getHours(),
   })
 }

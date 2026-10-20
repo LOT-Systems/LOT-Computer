@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily recovery cadence check (10:00 UTC every day) — Job 49
+  if (shouldRunDailyRecoveryCadenceCheck()) {
+    await executeDailyRecoveryCadenceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,103 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Recovery Cadence Check (Job 49 — 10:00 UTC every day) ─────────────
+// Counts recovery_intelligence_arc events in the prior 7 days per active user.
+// Writes recovery_cadence event with arcCount + avg velocity when cadence >= 3 arcs.
+
+let isDailyRecoveryCadenceRunning = false
+let lastDailyRecoveryCadenceRun: Date | null = null
+
+function shouldRunDailyRecoveryCadenceCheck(): boolean {
+  const now = dayjs()
+  if (isDailyRecoveryCadenceRunning) return false
+  if (lastDailyRecoveryCadenceRun) {
+    const lastRun = dayjs(lastDailyRecoveryCadenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily
+}
+
+async function executeDailyRecoveryCadenceCheck(): Promise<JobResult> {
+  const jobName = 'daily-recovery-cadence-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyRecoveryCadenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyRecoveryCadenceRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY RECOVERY CADENCE CHECK — 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDaysAgo = dayjs().subtract(7, 'day').startOf('day').toDate()
+    const yesterday    = dayjs().subtract(1, 'day').endOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const arcLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo, [Op.lte]: yesterday },
+            event: 'recovery_intelligence_arc',
+          },
+          attributes: ['metadata', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        if (arcLogs.length < 3) continue
+
+        const arcCount = arcLogs.length
+        const velocities: number[] = arcLogs
+          .map((l: any) => l.metadata?.velocityHours)
+          .filter((v: any): v is number => typeof v === 'number')
+        const arcVelocityAvgHours = velocities.length > 0
+          ? Math.round(velocities.reduce((a: number, b: number) => a + b, 0) / velocities.length * 10) / 10
+          : null
+        const cadenceStrength = arcCount >= 5 ? 'HIGH' : arcCount >= 4 ? 'MODERATE' : 'ESTABLISHED'
+
+        await (Log as any).create({
+          userId,
+          event: 'recovery_cadence',
+          text: `Recovery cadence: ${arcCount} recovery arcs in 7 days — the loop is not incident, it is pattern. Depletion recognized, care applied, state restored, reflection captured. Cadence: ${cadenceStrength}.`,
+          metadata: {
+            arcCount,
+            arcVelocityAvgHours,
+            cadenceStrength,
+            pattern: 'FELT→TENDED→RECOVERED→REFLECTED',
+            cadenceStatus: 'CONFIRMED',
+            window: '7d',
+            hour: 10,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Recovery cadence events written: ${written}`)
+    lastDailyRecoveryCadenceRun = new Date()
+    isDailyRecoveryCadenceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily recovery cadence check failed:', error.message)
+    isDailyRecoveryCadenceRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

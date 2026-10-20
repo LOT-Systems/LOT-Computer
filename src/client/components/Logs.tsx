@@ -3629,6 +3629,87 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'recovery_cadence') {
+          const arcCount = log.metadata?.arcCount as number | undefined
+          const arcVelocityAvgHours = log.metadata?.arcVelocityAvgHours as number | undefined
+          const cadenceStrength = log.metadata?.cadenceStrength as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RECCAD:" blockView>
+                <div className="uppercase tracking-widest mb-4">RECOVERY CADENCE</div>
+                {arcCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC COUNT</span>
+                    <span className="tabular-nums">{arcCount}</span>
+                  </div>
+                )}
+                {arcVelocityAvgHours !== undefined && arcVelocityAvgHours !== null && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AVG VELOCITY</span>
+                    <span className="tabular-nums">{arcVelocityAvgHours}h</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">FELT → TENDED → RECOVERED → REFLECTED</div>
+                {cadenceStrength && (
+                  <div className="opacity-30 tabular-nums">CADENCE: {cadenceStrength}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'coherence_after_recovery') {
+          const recConf = log.metadata?.recConf as number | undefined
+          const tfcConf = log.metadata?.tfcConf as number | undefined
+          const arc = log.metadata?.arc as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COHRECOV:" blockView>
+                <div className="uppercase tracking-widest mb-4">COHERENCE AFTER RECOVERY</div>
+                {recConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECOVERY CONF</span>
+                    <span className="tabular-nums">{recConf}%</span>
+                  </div>
+                )}
+                {tfcConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHERENCE CONF</span>
+                    <span className="tabular-nums">{tfcConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">DEPLETION → CARE → PEAK</div>
+                {arc && (
+                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'temporal_coherence_memory') {
+          const distinctDays = log.metadata?.distinctDays as number | undefined
+          const windowDays = log.metadata?.windowDays as number | undefined
+          const peakStatus = log.metadata?.peakStatus as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TOTCMEM:" blockView>
+                <div className="uppercase tracking-widest mb-4">TEMPORAL COHERENCE MEMORY</div>
+                {distinctDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PEAK DAYS</span>
+                    <span className="tabular-nums">{distinctDays}</span>
+                  </div>
+                )}
+                {windowDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">WINDOW</span>
+                    <span className="tabular-nums">{windowDays}d</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">THE PEAK IS NOT AN EVENT · IT IS A PLACE</div>
+                {peakStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {peakStatus}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
