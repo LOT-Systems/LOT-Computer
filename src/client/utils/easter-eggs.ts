@@ -888,6 +888,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('game_day')
   }
 
+  // ── Calendar v22 — THE ROGUE CALENDAR ─────────────────────────────────────
+  // Hades Day: September 17 — Hades left Early Access (2020)
+  if (!hasBadge('hades_day') && month === 9 && day === 17) {
+    awardBadge('hades_day')
+    awarded.push('hades_day')
+  }
+  // Spelunky Day: July 4 — Spelunky HD PC release (2012)
+  if (!hasBadge('spelunky_day') && month === 7 && day === 4) {
+    awardBadge('spelunky_day')
+    awarded.push('spelunky_day')
+  }
+  // Binding Day: September 28 — The Binding of Isaac original release (2011)
+  if (!hasBadge('binding_day') && month === 9 && day === 28) {
+    awardBadge('binding_day')
+    awarded.push('binding_day')
+  }
+
   return awarded
 }
 
@@ -1500,6 +1517,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v24 — THE ROGUELITE CODEX word turns ─────────────────────────────────────
+  { patterns: /\bpermadeath\b|\bpermanent[\s-]?death\b|\bone[\s-]?life\b|\bno[\s-]?continues\b/i,                badge: 'permadeath_accepted' },
+  { patterns: /\bprocgen\b|\brandom[\s-]?seed\b|\bprocedurally[\s-]?generated\b|\bnew[\s-]?run\b/i,              badge: 'procedural_run' },
+  { patterns: /\brng\b|\bgod[\s-]?roll\b|\blucky[\s-]?run\b|\bblessed[\s-]?rng\b/i,                              badge: 'rng_blessed' },
+  { patterns: /\bbiome\b|\bnew[\s-]?biome\b|\bfloor[\s-]?biome\b|\benvironment[\s-]?zone\b/i,                    badge: 'biome_entered' },
+  { patterns: /\bmeta[\s-]?progression\b|\bpersistent[\s-]?upgrade\b|\bbetween[\s-]?runs\b|\bmetaprogress\b/i,   badge: 'meta_progress' },
+  { patterns: /\bsynergy\b|\bbuild[\s-]?synergy\b|\bitem[\s-]?synergy\b|\bcombination[\s-]?discovered\b/i,       badge: 'synergy_found' },
+  { patterns: /\bfloor[\s-]?cleared\b|\broom[\s-]?cleared\b|\bfloor[\s-]?complete\b|\bdungeon[\s-]?floor\b/i,   badge: 'floor_cleared' },
+  { patterns: /\bmutation\b|\bpassive[\s-]?upgrade\b|\bpicked[\s-]?a[\s-]?passive\b|\bselected[\s-]?upgrade\b/i, badge: 'mutation_chosen' },
+  { patterns: /\bheat[\s-]?level\b|\bheat[\s-]?gauge\b|\bdifficulty[\s-]?dial\b|\binfernal[\s-]?arms\b/i,       badge: 'heat_level' },
+  { patterns: /\bdivine[\s-]?boon\b|\bboon\b|\bnectar[\s-]?offered\b|\bgods?[\s-]?blessings?\b/i,               badge: 'boon_accepted' },
+  { patterns: /\bendless[\s-]?mode\b|\binfinite[\s-]?run\b|\bno[\s-]?escape\b|\bkeep[\s-]?going[\s-]?forever\b/i, badge: 'endless_mode' },
+  { patterns: /\bascension\b|\bfinal[\s-]?ascension\b|\btrue[\s-]?ending\b|\bascended\b/i,                       badge: 'ascension_run' },
+  // ── v21 Secret Boss — THE ROGUE VAULT word triggers ──────────────────────────
+  { patterns: /\bshade\b|\bcharon\b|\bnyx\b|\bthanatos\b|\bhypnos\b|\belysium\b/i,                               badge: 'hades_shade' },
+  { patterns: /\bnethack\b|\bascended\b|\byasd\b|\badom\b|\brogue[\s-]?variant\b/i,                              badge: 'nethack_rune' },
+  { patterns: /\bgreedier[\s-]?mode\b|\bmega[\s-]?satan\b|\bafterbirth\b|\brepentance\b|\bbinding[\s-]?of\b/i,  badge: 'isaac_secret' },
 ]
 
 /**
@@ -2834,6 +2868,117 @@ export function checkFinalBossVault(journalText: string): BadgeType[] {
   }
   if (!hasBadge('konami_code') && /\bkonami[\s-]?code\b|\bup[\s-]?up[\s-]?down[\s-]?down\b|\bb[\s-]?a[\s-]?start\b|\bbarrel[\s-]?roll\b/i.test(journalText)) {
     if (awardBadge('konami_code')) awarded.push('konami_code')
+  }
+
+  return awarded
+}
+
+// ── v34 — THE ROGUELITE CODEX ─────────────────────────────────────────────────
+
+const ROGUE_WORDS_V24 = [
+  /\bpermadeath\b|\bpermanent[\s-]?death\b|\bone[\s-]?life\b|\bno[\s-]?continues\b/i,
+  /\bprocgen\b|\brandom[\s-]?seed\b|\bprocedurally[\s-]?generated\b|\bnew[\s-]?run\b/i,
+  /\brng\b|\bgod[\s-]?roll\b|\blucky[\s-]?run\b|\bblessed[\s-]?rng\b/i,
+  /\bbiome\b|\bnew[\s-]?biome\b|\bfloor[\s-]?biome\b|\benvironment[\s-]?zone\b/i,
+  /\bmeta[\s-]?progression\b|\bpersistent[\s-]?upgrade\b|\bbetween[\s-]?runs\b|\bmetaprogress\b/i,
+  /\bsynergy\b|\bbuild[\s-]?synergy\b|\bitem[\s-]?synergy\b|\bcombination[\s-]?discovered\b/i,
+  /\bfloor[\s-]?cleared\b|\broom[\s-]?cleared\b|\bfloor[\s-]?complete\b|\bdungeon[\s-]?floor\b/i,
+  /\bmutation\b|\bpassive[\s-]?upgrade\b|\bpicked[\s-]?a[\s-]?passive\b|\bselected[\s-]?upgrade\b/i,
+  /\bheat[\s-]?level\b|\bheat[\s-]?gauge\b|\bdifficulty[\s-]?dial\b|\binfernal[\s-]?arms\b/i,
+  /\bdivine[\s-]?boon\b|\bboon\b|\bnectar[\s-]?offered\b|\bgods?[\s-]?blessings?\b/i,
+  /\bendless[\s-]?mode\b|\binfinite[\s-]?run\b|\bno[\s-]?escape\b|\bkeep[\s-]?going[\s-]?forever\b/i,
+  /\bascension\b|\bfinal[\s-]?ascension\b|\btrue[\s-]?ending\b|\bascended\b/i,
+]
+
+/**
+ * Award roguelite_session badge if 3+ Roguelite Codex (v24) words appear in one journal entry.
+ */
+export function checkRogueliteSession(journalText: string): BadgeType | null {
+  if (hasBadge('roguelite_session')) return null
+  const matchCount = ROGUE_WORDS_V24.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('roguelite_session')
+    return 'roguelite_session'
+  }
+  return null
+}
+
+/**
+ * Award nine_nine_hour badge if check-in occurs at 09:09 local time.
+ */
+export function checkNineNineHour(): BadgeType | null {
+  if (hasBadge('nine_nine_hour')) return null
+  const now = new Date()
+  if (now.getHours() === 9 && now.getMinutes() === 9) {
+    awardBadge('nine_nine_hour')
+    return 'nine_nine_hour'
+  }
+  return null
+}
+
+/**
+ * Award fresh_start badge if this is the first check-in after a 14+ day gap.
+ * Requires lastCheckInDate from stats.
+ */
+export function checkFreshStart(lastCheckInDate: string | null | undefined): BadgeType | null {
+  if (hasBadge('fresh_start')) return null
+  if (!lastCheckInDate) return null
+  const last = new Date(lastCheckInDate)
+  const now = new Date()
+  const dayGap = (now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24)
+  if (dayGap >= 14) {
+    awardBadge('fresh_start')
+    return 'fresh_start'
+  }
+  return null
+}
+
+/**
+ * Check word-turn badges for Roguelite Codex v24 keywords in journal text.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkRogueliteCodexWordTurns(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  const text = journalText
+
+  const checks: Array<[RegExp, BadgeType]> = [
+    [/\bpermadeath\b|\bpermanent[\s-]?death\b|\bone[\s-]?life\b|\bno[\s-]?continues\b/i, 'permadeath_accepted'],
+    [/\bprocgen\b|\brandom[\s-]?seed\b|\bprocedurally[\s-]?generated\b|\bnew[\s-]?run\b/i, 'procedural_run'],
+    [/\brng\b|\bgod[\s-]?roll\b|\blucky[\s-]?run\b|\bblessed[\s-]?rng\b/i, 'rng_blessed'],
+    [/\bbiome\b|\bnew[\s-]?biome\b|\bfloor[\s-]?biome\b|\benvironment[\s-]?zone\b/i, 'biome_entered'],
+    [/\bmeta[\s-]?progression\b|\bpersistent[\s-]?upgrade\b|\bbetween[\s-]?runs\b|\bmetaprogress\b/i, 'meta_progress'],
+    [/\bsynergy\b|\bbuild[\s-]?synergy\b|\bitem[\s-]?synergy\b|\bcombination[\s-]?discovered\b/i, 'synergy_found'],
+    [/\bfloor[\s-]?cleared\b|\broom[\s-]?cleared\b|\bfloor[\s-]?complete\b|\bdungeon[\s-]?floor\b/i, 'floor_cleared'],
+    [/\bmutation\b|\bpassive[\s-]?upgrade\b|\bpicked[\s-]?a[\s-]?passive\b|\bselected[\s-]?upgrade\b/i, 'mutation_chosen'],
+    [/\bheat[\s-]?level\b|\bheat[\s-]?gauge\b|\bdifficulty[\s-]?dial\b|\binfernal[\s-]?arms\b/i, 'heat_level'],
+    [/\bdivine[\s-]?boon\b|\bboon\b|\bnectar[\s-]?offered\b|\bgods?[\s-]?blessings?\b/i, 'boon_accepted'],
+    [/\bendless[\s-]?mode\b|\binfinite[\s-]?run\b|\bno[\s-]?escape\b|\bkeep[\s-]?going[\s-]?forever\b/i, 'endless_mode'],
+    [/\bascension\b|\bfinal[\s-]?ascension\b|\btrue[\s-]?ending\b|\bascended\b/i, 'ascension_run'],
+  ]
+
+  for (const [pattern, badgeId] of checks) {
+    if (!hasBadge(badgeId) && pattern.test(text)) {
+      if (awardBadge(badgeId)) awarded.push(badgeId)
+    }
+  }
+  return awarded
+}
+
+/**
+ * Check secret boss v21 — hidden Roguelite vault triggers.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkRogueVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+
+  if (!hasBadge('hades_shade') && /\bshade\b|\bcharon\b|\bnyx\b|\bthanatos\b|\bhypnos\b|\belysium\b/i.test(journalText)) {
+    if (awardBadge('hades_shade')) awarded.push('hades_shade')
+  }
+  if (!hasBadge('nethack_rune') && /\bnethack\b|\byasd\b|\badom\b|\brogue[\s-]?variant\b/i.test(journalText)) {
+    if (awardBadge('nethack_rune')) awarded.push('nethack_rune')
+  }
+  if (!hasBadge('isaac_secret') && /\bgreedier[\s-]?mode\b|\bmega[\s-]?satan\b|\bafterbirth\b|\brepentance\b|\bbinding[\s-]?of\b/i.test(journalText)) {
+    if (awardBadge('isaac_secret')) awarded.push('isaac_secret')
   }
 
   return awarded

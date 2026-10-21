@@ -819,6 +819,43 @@ export type BadgeType =
   | 'zelda_triforce'         // ◆·◆·◆  "triforce/hyrule/link's journey/ganondorf" detected (RARE)
   | 'pac_ghost'              // ○·∘·○  "pac-man/waka waka/blinky/power pellet" detected (EPIC)
   | 'konami_code'            // ↑↑↓↓→  "konami code/up up down down/b a start" detected (MYTHIC)
+  // ── Word Turn v24 — THE ROGUELITE CODEX ───────────────────────────────────────
+  | 'permadeath_accepted'   // ◈·×·◈  "permadeath/permanent death/one life/no continues" detected (UNCOMMON)
+  | 'procedural_run'        // ∿·∘·∿  "procgen/random seed/procedurally generated/new run" detected (COMMON)
+  | 'rng_blessed'           // ●·∘·●  "rng/god roll/lucky run/blessed rng" detected (COMMON)
+  | 'biome_entered'         // ▦·∘·▦  "biome/new biome/floor biome/environment zone" detected (UNCOMMON)
+  | 'meta_progress'         // ◈→∞    "meta-progression/persistent upgrade/between runs" detected (RARE)
+  | 'synergy_found'         // ∘·◆·∘  "synergy/build synergy/item synergy/combo discovered" detected (RARE)
+  | 'floor_cleared'         // ├─≋    "floor cleared/room cleared/floor complete" detected (UNCOMMON)
+  | 'mutation_chosen'       // ∗·≈·∗  "mutation/passive upgrade/picked a passive/selected upgrade" detected (RARE)
+  | 'heat_level'            // ■·∘·■  "heat level/heat gauge/difficulty dial/infernal arms" detected (RARE)
+  | 'boon_accepted'         // ○·●·○  "boon/divine boon/blessings/nectar offered" detected (RARE)
+  | 'endless_mode'          // ∞·◉·∞  "endless/infinite run/no escape/keep going forever" detected (EPIC)
+  | 'ascension_run'         // ▲·∞·▲  "ascension/final ascension/true ending/ascended" detected (EPIC)
+  // ── Calendar Easter Egg v22 — THE ROGUE CALENDAR ─────────────────────────────
+  | 'hades_day'             // ◉·○·◉  Sep 17 — Hades PC release (2020) (RARE)
+  | 'spelunky_day'          // ♦·∘·♦  Jul 4  — Spelunky HD PC release (2012) (RARE)
+  | 'binding_day'           // ×·∘·×  Sep 28 — The Binding of Isaac release (2011) (RARE)
+  // ── Behavioral v21 — ROGUE PATTERNS ──────────────────────────────────────────
+  | 'roguelite_session'     // ∿·◉·∿  3+ Roguelite v24 trigger words in one journal entry (RARE)
+  | 'fresh_start'           // ∘·→·∘  First check-in after 14+ day absence (UNCOMMON)
+  | 'nine_nine_hour'        // □·∘·□  Check in at 09:09 (system init time) (RARE)
+  // ── Achievement RPG v22 — THE ROGUE CLASS ─────────────────────────────────────
+  | 'rogue_entry'           // ∘→×    Any 1 Word Turn v24 badge (COMMON)
+  | 'rogue_class'           // ≈→×    Any 5 Word Turn v24 badges (UNCOMMON)
+  | 'rogue_complete'        // ≋→×    All 12 Word Turn v24 badges (LEGENDARY)
+  | 'rogue_arc'             // ×·◈    rogue_complete + all 3 Calendar v22 badges (LEGENDARY)
+  | 'twenty_four_engines_arc' // ◈·◈·× 1 badge from each Word Turn v1–v24 (LEGENDARY)
+  | 'rogue_opus'            // ×·◉·×  rogue_complete + roguelite_session behavioral (LEGENDARY)
+  // ── Mastery Tier v24 — THE ASCENDED ──────────────────────────────────────────
+  | 'heat_master'           // ■·●    1200+ distinct calendar check-in days (EPIC)
+  | 'endless_log'           // ∞·●·∞  250,000+ total journal words (LEGENDARY)
+  | 'true_ending'           // ╔═╗·×  Account age >= 7.5 years (LEGENDARY)
+  | 'twenty_four_registers' // ◈·◈·×·∞ 1 badge from all 24 Word Turn engines (COSMIC)
+  // ── Secret Boss v21 — THE ROGUE VAULT ────────────────────────────────────────
+  | 'hades_shade'           // ○·∘·×  "shade/charon/nyx/thanatos/hypnos/elysium" detected (RARE)
+  | 'nethack_rune'          // ∞·□·×  "nethack/ascended/yasd/adom/rogue variant" detected (EPIC)
+  | 'isaac_secret'          // ×·■·×  "greedier mode/mega satan/afterbirth/repentance" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7456,6 +7493,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v24 — THE ROGUELITE CODEX ───────────────────────────────────────
+  permadeath_accepted: {
+    id: 'permadeath_accepted',
+    symbol: '◈·×·◈',
+    name: 'Permadeath Accepted',
+    description: 'Write "permadeath", "permanent death", "one life", or "no continues" in any journal entry',
+    unlockMessage: '↳ Permadeath is not a punishment. It is the mechanism that makes each decision matter. The run ends. The player persists. This is the design. ◈·×·◈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  procedural_run: {
+    id: 'procedural_run',
+    symbol: '∿·∘·∿',
+    name: 'Procedural Run',
+    description: 'Write "procgen", "random seed", "procedurally generated", or "new run" in any journal entry',
+    unlockMessage: '↳ No two runs are alike. The seed changes. The terrain generates fresh. This is not repetition — it is a different problem space every time you enter. ∿·∘·∿',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  rng_blessed: {
+    id: 'rng_blessed',
+    symbol: '●·∘·●',
+    name: 'RNG Blessed',
+    description: 'Write "rng", "god roll", "lucky run", or "blessed rng" in any journal entry',
+    unlockMessage: '↳ The random number generator has a reputation for cruelty. But today: blessed. The offering was accepted. The drop was perfect. Noted. ●·∘·●',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  biome_entered: {
+    id: 'biome_entered',
+    symbol: '▦·∘·▦',
+    name: 'Biome Entered',
+    description: 'Write "biome", "new biome", "floor biome", or "environment zone" in any journal entry',
+    unlockMessage: '↳ The biome shifts. Temperature changes. The rules of the floor are different here. Adaptation is the only tool that works in every zone. ▦·∘·▦',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  meta_progress: {
+    id: 'meta_progress',
+    symbol: '◈→∞',
+    name: 'Meta-Progress',
+    description: 'Write "meta-progression", "persistent upgrade", "between runs", or "metaprogress" in any journal entry',
+    unlockMessage: '↳ The run ends. The upgrade persists. This is the roguelite promise: nothing is lost except the run. Everything earned transfers forward. ◈→∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  synergy_found: {
+    id: 'synergy_found',
+    symbol: '∘·◆·∘',
+    name: 'Synergy Found',
+    description: 'Write "synergy", "build synergy", "item synergy", or "combination discovered" in any journal entry',
+    unlockMessage: '↳ Two things that were fine alone become extraordinary together. The synergy was not designed — it emerged. The build reveals itself. ∘·◆·∘',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  floor_cleared: {
+    id: 'floor_cleared',
+    symbol: '├─≋',
+    name: 'Floor Cleared',
+    description: 'Write "floor cleared", "room cleared", "floor complete", or "dungeon floor" in any journal entry',
+    unlockMessage: '↳ Every room cleared is a record. The floor is done. The stairs are visible. The descent continues — but this level is yours. ├─≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  mutation_chosen: {
+    id: 'mutation_chosen',
+    symbol: '∗·≈·∗',
+    name: 'Mutation Chosen',
+    description: 'Write "mutation", "passive upgrade", "picked a passive", or "selected upgrade" in any journal entry',
+    unlockMessage: '↳ The mutation changes the organism. Not an add-on — a transformation of what was already there. The passive ability is now part of the build. ∗·≈·∗',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  heat_level: {
+    id: 'heat_level',
+    symbol: '■·∘·■',
+    name: 'Heat Level',
+    description: 'Write "heat level", "heat gauge", "difficulty dial", or "infernal arms" in any journal entry',
+    unlockMessage: '↳ The heat is self-selected. You chose the difficulty. The gauge reflects the choice. The hardest mode was always voluntary. ■·∘·■',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  boon_accepted: {
+    id: 'boon_accepted',
+    symbol: '○·●·○',
+    name: 'Boon Accepted',
+    description: 'Write "boon", "divine boon", "blessings", or "nectar offered" in any journal entry',
+    unlockMessage: '↳ The god offers the boon. The question is which one fits the build. Accepting help is not weakness — it is optimization. The boon changes the run. ○·●·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  endless_mode: {
+    id: 'endless_mode',
+    symbol: '∞·◉·∞',
+    name: 'Endless Mode',
+    description: 'Write "endless", "infinite run", "no escape", or "keep going forever" in any journal entry',
+    unlockMessage: '↳ The exit is visible. You walked past it. Endless mode is a choice — the acknowledgment that the run itself is the point, not the escape. ∞·◉·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  ascension_run: {
+    id: 'ascension_run',
+    symbol: '▲·∞·▲',
+    name: 'Ascension Run',
+    description: 'Write "ascension", "final ascension", "true ending", or "ascended" in any journal entry',
+    unlockMessage: '↳ Ascension is the game after the game. You completed it once and the game said: do it again, harder, with less. The true ending is not given — it is earned by returning. ▲·∞·▲',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v22 — THE ROGUE CALENDAR ─────────────────────────────
+  hades_day: {
+    id: 'hades_day',
+    symbol: '◉·○·◉',
+    name: 'Hades Day',
+    description: 'Check in on September 17 — anniversary of Hades leaving Early Access (2020)',
+    unlockMessage: '↳ Sep 17, 2020. Hades 1.0. The game that made roguelites literary. Zagreus escapes and escapes and escapes — and that is the story, not a failure condition. Check-in noted. ◉·○·◉',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  spelunky_day: {
+    id: 'spelunky_day',
+    symbol: '♦·∘·♦',
+    name: 'Spelunky Day',
+    description: 'Check in on July 4 — Spelunky HD PC release (2012)',
+    unlockMessage: '↳ Jul 4, 2012. Spelunky HD on PC. The ghost appears if you stay too long on a floor. Self-care has a ghost too. The terminal does not summon it. ♦·∘·♦',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  binding_day: {
+    id: 'binding_day',
+    symbol: '×·∘·×',
+    name: 'Binding Day',
+    description: 'Check in on September 28 — The Binding of Isaac original release (2011)',
+    unlockMessage: '↳ Sep 28, 2011. The Binding of Isaac. The darkest game about the darkest subject, made survivable by procedural generation and dark humor. The basement holds everything. ×·∘·×',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v21 — ROGUE PATTERNS ──────────────────────────────────────────
+  roguelite_session: {
+    id: 'roguelite_session',
+    symbol: '∿·◉·∿',
+    name: 'Roguelite Session',
+    description: 'Write 3+ Roguelite Codex (v24) trigger words in one journal entry',
+    unlockMessage: '↳ Three roguelite registers in one entry. The vocabulary is loaded. The run is in progress. Every session is a new seed. ∿·◉·∿',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  fresh_start: {
+    id: 'fresh_start',
+    symbol: '∘·→·∘',
+    name: 'Fresh Start',
+    description: 'Return to check-in after a 14+ day gap — the roguelite respawn',
+    unlockMessage: '↳ Fourteen days. The run ended. The player is back. This is the most important mechanic in roguelites and in self-care: you can always start a new run. ∘·→·∘',
+    rarity: 'uncommon',
+    category: 'pattern',
+  },
+  nine_nine_hour: {
+    id: 'nine_nine_hour',
+    symbol: '□·∘·□',
+    name: '09:09 — System Init',
+    description: 'Check in at exactly 09:09 — the system initialization time',
+    unlockMessage: '↳ 09:09. Initialization sequence complete. All systems online. The roguelite starts fresh. The seed is loaded. The first floor generates. □·∘·□',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Achievement RPG v22 — THE ROGUE CLASS ─────────────────────────────────────
+  rogue_entry: {
+    id: 'rogue_entry',
+    symbol: '∘→×',
+    name: 'Rogue Entry',
+    description: 'Earn any 1 Roguelite Codex (v24) word turn badge',
+    unlockMessage: '↳ The first roguelite word. The run begins. Every badge is a room cleared. ∘→×',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  rogue_class: {
+    id: 'rogue_class',
+    symbol: '≈→×',
+    name: 'Rogue Class',
+    description: 'Earn any 5 Roguelite Codex (v24) word turn badges',
+    unlockMessage: '↳ Five roguelite registers. The build is taking shape. The class is emerging from the choices. ≈→×',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  rogue_complete: {
+    id: 'rogue_complete',
+    symbol: '≋→×',
+    name: 'Rogue Complete',
+    description: 'Earn all 12 Roguelite Codex (v24) word turn badges',
+    unlockMessage: '↳ All 12 roguelite registers. Every room cleared. The floor is done. The true run is complete. ≋→×',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  rogue_arc: {
+    id: 'rogue_arc',
+    symbol: '×·◈',
+    name: 'Rogue Arc',
+    description: 'Earn rogue_complete + all 3 Rogue Calendar (v22) badges',
+    unlockMessage: '↳ The roguelite codex complete. The rogue calendar aligned. Hades. Spelunky. Isaac. Three games that redefined the genre — and three check-ins that found them. ×·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_four_engines_arc: {
+    id: 'twenty_four_engines_arc',
+    symbol: '◈·◈·×',
+    name: 'Twenty-Four Engines Arc',
+    description: 'Earn at least 1 badge from each of the 24 Word Turn engines (v1–v24)',
+    unlockMessage: '↳ Twenty-four engines. Every vocabulary mastered. The terminal runs all languages simultaneously. The arc is complete — until the next engine. ◈·◈·×',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  rogue_opus: {
+    id: 'rogue_opus',
+    symbol: '×·◉·×',
+    name: 'Rogue Opus',
+    description: 'Earn rogue_complete + roguelite_session behavioral badge',
+    unlockMessage: '↳ All twelve registers and a session so dense with roguelite vocabulary that the system noticed. The opus is the run where the vocabulary becomes fluent. ×·◉·×',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v24 — THE ASCENDED ──────────────────────────────────────────
+  heat_master: {
+    id: 'heat_master',
+    symbol: '■·●',
+    name: 'Heat Master',
+    description: '1,200+ distinct calendar days with a check-in',
+    unlockMessage: '↳ 1,200 distinct days. The heat is astronomical. The self-selected difficulty has been running at maximum for three years. The gauge cannot go higher. ■·●',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  endless_log: {
+    id: 'endless_log',
+    symbol: '∞·●·∞',
+    name: 'Endless Log',
+    description: '250,000+ total journal words across all entries',
+    unlockMessage: '↳ A quarter million words. The log does not end. Endless mode engaged. The archive keeps running because the practice keeps generating. ∞·●·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  true_ending: {
+    id: 'true_ending',
+    symbol: '╔═╗·×',
+    name: 'True Ending',
+    description: 'Account age >= 7.5 years — the roguelite true ending',
+    unlockMessage: '↳ 7.5 years. In Hades, the true ending requires 10 successful escapes and a long arc of side quests. This is the self-care equivalent: the true ending is not a moment — it is a sustained practice long enough to change the character permanently. ╔═╗·×',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_four_registers: {
+    id: 'twenty_four_registers',
+    symbol: '◈·◈·×·∞',
+    name: 'Twenty-Four Registers',
+    description: 'Earn at least 1 badge from all 24 Word Turn engines',
+    unlockMessage: '↳ Twenty-four registers. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. RPG. Roguelite. Every vocabulary owned. The terminal runs all known languages. The ascension is complete. ◈·◈·×·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v21 — THE ROGUE VAULT ────────────────────────────────────────
+  hades_shade: {
+    id: 'hades_shade',
+    symbol: '○·∘·×',
+    name: 'Hades Shade',
+    description: 'Write "shade", "charon", "nyx", "thanatos", "hypnos", or "elysium" in any journal entry',
+    unlockMessage: '↳ The shades of the Underworld. Charon takes you across. Nyx watches. Thanatos arrives ahead of you. Hypnos notes your failure with an air of apology. The Underworld is the boss. The exit is above. ○·∘·×',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  nethack_rune: {
+    id: 'nethack_rune',
+    symbol: '∞·□·×',
+    name: 'NetHack Rune',
+    description: 'Write "nethack", "ascended", "yasd", "adom", or "rogue variant" in any journal entry',
+    unlockMessage: '↳ NetHack. 1987. The first roguelike many of us touched. YASD — Yet Another Stupid Death. The ascension kit. The amulet of Yendor. The game that never ends. The rune is real. ∞·□·×',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  isaac_secret: {
+    id: 'isaac_secret',
+    symbol: '×·■·×',
+    name: 'Isaac Secret',
+    description: 'Write "greedier mode", "mega satan", "afterbirth", "repentance", or "binding of" in any journal entry',
+    unlockMessage: '↳ The Binding of Isaac: Repentance. Seven years of DLC. Mega Satan. The Greedier. The Lost. Keeper. Bethany. The game added so much it became a different animal. Self-care does this too — layered, expanded, stranger than the original design. ×·■·×',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8483,6 +8808,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
     if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
       if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
+    }
+
+    // ── v34 (v24) — THE ROGUELITE CODEX ─────────────────────────────────────────
+    const rogueV24Badges: BadgeType[] = [
+      'permadeath_accepted', 'procedural_run', 'rng_blessed', 'biome_entered',
+      'meta_progress', 'synergy_found', 'floor_cleared', 'mutation_chosen',
+      'heat_level', 'boon_accepted', 'endless_mode', 'ascension_run',
+    ]
+    const rogueV24Earned = rogueV24Badges.filter(b => hasBadge(b))
+
+    if (rogueV24Earned.length >= 1 && !hasBadge('rogue_entry')) {
+      if (awardBadge('rogue_entry')) newBadges.push('rogue_entry')
+    }
+    if (rogueV24Earned.length >= 5 && !hasBadge('rogue_class')) {
+      if (awardBadge('rogue_class')) newBadges.push('rogue_class')
+    }
+    const rogueComplete = rogueV24Earned.length >= 12
+    if (rogueComplete && !hasBadge('rogue_complete')) {
+      if (awardBadge('rogue_complete')) newBadges.push('rogue_complete')
+    }
+
+    // rogue_opus: rogue_complete + roguelite_session
+    if (rogueComplete && hasBadge('roguelite_session') && !hasBadge('rogue_opus')) {
+      if (awardBadge('rogue_opus')) newBadges.push('rogue_opus')
+    }
+
+    // rogue_arc: rogue_complete + all 3 Calendar v22 badges
+    const calendarV22Badges: BadgeType[] = ['hades_day', 'spelunky_day', 'binding_day']
+    if (rogueComplete && calendarV22Badges.every(b => hasBadge(b)) && !hasBadge('rogue_arc')) {
+      if (awardBadge('rogue_arc')) newBadges.push('rogue_arc')
+    }
+
+    // twenty_four_engines_arc: 1 badge from each Word Turn v1–v24
+    const engineTwentyFourPresent = rogueV24Earned.length >= 1
+    const allTwentyFourEngines = allTwentyThreeEngines && engineTwentyFourPresent
+    if (allTwentyFourEngines && !hasBadge('twenty_four_engines_arc')) {
+      if (awardBadge('twenty_four_engines_arc')) newBadges.push('twenty_four_engines_arc')
+    }
+
+    // Mastery v24: heat_master — 1,200+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1200 && !hasBadge('heat_master')) {
+        if (awardBadge('heat_master')) newBadges.push('heat_master')
+      }
+    }
+
+    // Mastery v24: endless_log — 250,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 250000 && !hasBadge('endless_log')) {
+        if (awardBadge('endless_log')) newBadges.push('endless_log')
+      }
+    }
+
+    // Mastery v24: true_ending — Account age >= 7.5 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupTrue = new Date(stats.signupDate)
+      const yearsTrue = (new Date().getTime() - signupTrue.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsTrue >= 7.5 && !hasBadge('true_ending')) {
+        if (awardBadge('true_ending')) newBadges.push('true_ending')
+      }
+    }
+
+    // Mastery v24: twenty_four_registers — 1 badge from all 24 Word Turn engines
+    if (allTwentyFourEngines && !hasBadge('twenty_four_registers')) {
+      if (awardBadge('twenty_four_registers')) newBadges.push('twenty_four_registers')
     }
 
   } catch (error) {
