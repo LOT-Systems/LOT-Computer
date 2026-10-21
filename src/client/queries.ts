@@ -24,6 +24,7 @@ import {
   UserProfile,
   UserSettings,
   WeatherRecord,
+  PublicMail,
 } from '#shared/types'
 import dayjs from '#client/utils/dayjs'
 import { DATE_TIME_FORMAT } from '#shared/constants'
@@ -119,6 +120,22 @@ export const useSendDirectMessage = createMutation<
   { receiverId: string; message: string },
   void
 >('post', '/api/direct-messages')
+
+export const useMail = createQuery<{
+  inbox: PublicMail[]
+  sent: PublicMail[]
+  unread: number
+}>('/api/mail', { refetchOnWindowFocus: true, staleTime: 30 * 1000 })
+
+export const useSendMail = createMutation<
+  { toUserId?: string; toName?: string; body: string },
+  PublicMail
+>('post', '/api/mail')
+
+export const useMarkMailRead = createMutation<{ id: string }, void>(
+  'post',
+  '/api/mail/read'
+)
 
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,

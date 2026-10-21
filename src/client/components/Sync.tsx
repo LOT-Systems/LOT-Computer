@@ -26,6 +26,7 @@ import {
   useLikeChatMessage,
 } from '#client/queries'
 import { sync } from '../sync'
+import { MailBox } from '#client/components/MailBox'
 import { PublicChatMessage, UserTag } from '#shared/types'
 import {
   SYNC_CHAT_MESSAGES_TO_SHOW,
@@ -172,14 +173,18 @@ export const Sync = React.memo(function SyncInner() {
 
   if (!canAccessChat) {
     return (
-      <div className="max-w-[700px] text-acc/40 py-8">
-        Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+      <div className="max-w-[700px]">
+        <MailBox />
+        <div className="text-acc/40 py-8">
+          Sync chat is available for Usership, Onyx, Legacy, R&D, and Admin members.
+        </div>
       </div>
     )
   }
 
   return (
     <div className="max-w-[700px]">
+      <MailBox />
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}

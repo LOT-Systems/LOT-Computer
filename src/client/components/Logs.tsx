@@ -10,7 +10,7 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
-import { useLogs, useUpdateLog } from '#client/queries'
+import { useLogs, useUpdateLog, useSendMail } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
@@ -28,7 +28,7 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, parseEmailCommand, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3707,6 +3707,20 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [mailOpen, setMailOpen] = React.useState(false)
+  const [mailStatus, setMailStatus] = React.useState<string | null>(null)
+  const { mutate: sendMail, isLoading: mailSending } = useSendMail({
+    onSuccess: (data) => {
+      const to = `${data.to.firstName || ''} ${data.to.lastName || ''}`.trim()
+      setMailStatus(`SENT  ${to.toUpperCase()}`)
+      setMailOpen(false)
+    },
+    onError: (err: any) => {
+      const d = err?.response?.data
+      const hint = d?.candidates?.length ? ` (${d.candidates.join(', ')})` : ''
+      setMailStatus(`FAILED  ${d?.error || 'Unable to send'}${hint}`)
+    },
+  })
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -4139,12 +4153,16 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to Name.  Write LOT Email (arrives in Sync)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
           'Ctrl+Enter    Save log immediately',
         ]
         setSystemHelp(lines.join('\n'))
+      } else if (trigger === 'email-compose') {
+        setMailStatus(null)
+        setMailOpen(true)
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4387,6 +4405,37 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        {(mailOpen || mailStatus) && (() => {
+          const cmd = mailOpen ? parseEmailCommand(value) : null
+          return (
+            <div className="mt-8">
+              <Block label="MAIL:" blockView>
+                <div className="opacity-80" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6' }}>
+                  {cmd ? (
+                    <>
+                      <div>TO  {cmd.name.toUpperCase()}</div>
+                      <div className="opacity-60 whitespace-pre-wrap">
+                        {cmd.body || 'Write the message after the command, then press Send.'}
+                      </div>
+                      <div className="mt-8">
+                        <Button
+                          size="small"
+                          disabled={!cmd.body || mailSending}
+                          onClick={() => sendMail({ toName: cmd.name, body: cmd.body })}
+                        >
+                          {mailSending ? 'Sending...' : 'Send'}
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <div>{mailStatus}</div>
+                  )}
+                  {cmd && mailStatus && <div className="mt-8 opacity-60">{mailStatus}</div>}
+                </div>
+              </Block>
+            </div>
+          )
+        })()}
         {systemHelp && (
           <div className="mt-8">
             <Block label="SYSTEM:" blockView>

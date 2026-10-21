@@ -41,6 +41,7 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'email-compose'     // /email to Name.  — fires once the closing period is typed
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -67,7 +68,21 @@ const RULES: TriggerRule[] = [
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'email-compose',  emojis: [],        keywords: [] },
 ]
+
+/**
+ * Parses "/email to Hitomi." (optionally "First Last"). `body` is whatever
+ * the user wrote after the command; null when the command is incomplete.
+ */
+export function parseEmailCommand(
+  text: string
+): { name: string; body: string } | null {
+  const m = text.match(/(?:^|\s)\/email\s+to\s+([^\s.,!?]+(?:\s+[^\s.,!?]+)?)\.(?:\s|$)/i)
+  if (!m || m.index === undefined) return null
+  const body = text.slice(m.index + m[0].length).trim()
+  return { name: m[1].trim(), body }
+}
 
 /**
  * Returns every trigger present in `text`. An empty array means the
@@ -92,7 +107,11 @@ export function detectTriggers(text: string): LogTrigger[] {
       return re.test(lower)
     })
 
-    if (hasEmoji || hasKeyword) hits.push(rule.trigger)
+    // /email to <Name>.  — the closing period completes the command so a
+    // half-typed name never fires it.
+    const hasEmail = rule.trigger === 'email-compose' && parseEmailCommand(text) !== null
+
+    if (hasEmoji || hasKeyword || hasEmail) hits.push(rule.trigger)
   }
 
   return hits
