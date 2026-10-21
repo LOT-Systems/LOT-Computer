@@ -29,6 +29,7 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { buildSitrep } from '#client/utils/widgetUsage'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3711,6 +3712,7 @@ const NoteEditor = ({
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
+  const [sitrepResult, setSitrepResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
   const { mutate: submitPrayer } = usePrayerScripture({
@@ -4139,12 +4141,29 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/sitrep       Synced time, weather, operators + widget log',
           '/system       This help screen',
           '',
           'SHORTCUTS',
           'Ctrl+Enter    Save log immediately',
         ]
         setSystemHelp(lines.join('\n'))
+      } else if (trigger === 'sitrep') {
+        try {
+          const wx = stores.weather.get()
+          setSitrepResult(
+            buildSitrep({
+              city: stores.me.get()?.city,
+              sky: wx?.description,
+              temperatureC: typeof wx?.temperature === 'number' ? toCelsius(wx.temperature) : null,
+              usersOnline: stores.usersOnline.get(),
+              usersTotal: stores.usersTotal.get(),
+              connected: stores.isConnected.get(),
+            })
+          )
+        } catch {
+          setSitrepResult('SITREP UNAVAILABLE')
+        }
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4370,6 +4389,13 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="FREEZE:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{freezeResult}</div>
+            </Block>
+          </div>
+        )}
+        {sitrepResult && (
+          <div className="mt-8">
+            <Block label="SITREP:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{sitrepResult}</div>
             </Block>
           </div>
         )}

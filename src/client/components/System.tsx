@@ -86,10 +86,11 @@ import { useInViewport } from '#client/hooks/useInViewport'
 // Defers mount of children until element first enters the viewport.
 // Once mounted, stays mounted — no unmount on scroll away.
 // Prevents heavy store subscriptions from running before the widget is needed.
-function LazyMount({ children }: { children: React.ReactNode }) {
+// Pass className to make the wrapper the stack container itself (keeps flex gaps).
+function LazyMount({ children, className }: { children: React.ReactNode; className?: string }) {
   const ref = React.useRef<HTMLDivElement>(null)
   const inViewport = useInViewport(ref)
-  return <div ref={ref}>{inViewport ? children : null}</div>
+  return <div ref={ref} className={className}>{inViewport ? children : null}</div>
 }
 
 function LoadingDots() {
@@ -1009,18 +1010,18 @@ export const System = React.memo(function SystemInner() {
 
       {/* CQGS Biofield Engine Widgets */}
       <WidgetErrorBoundary name="Biofield Engine">
-        <div className={cn('flex flex-col', density.sectionGap)}>
+        <LazyMount className={cn('flex flex-col', density.sectionGap)}>
           <QuantumStateWidget />
           <PatternRecognitionWidget />
           <AIFeedbackWidget />
           <SignalStreamWidget />
           <IntegrityWidget />
-        </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* CQGS Dashboard stack */}
       <WidgetErrorBoundary name="Dashboard">
-        <div className={cn('flex flex-col', density.stackGap)}>
+        <LazyMount className={cn('flex flex-col', density.stackGap)}>
           {/* CQGS Dashboard - Bioethics health, performance, version */}
           <UserMetricsWidget />
 
@@ -1032,7 +1033,7 @@ export const System = React.memo(function SystemInner() {
 
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />
-        </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Architect — executive self-assembly telemetry, paid users only */}
@@ -1042,14 +1043,14 @@ export const System = React.memo(function SystemInner() {
 
       {/* Stats stack */}
       <WidgetErrorBoundary name="Stats">
-        <div className={cn('flex flex-col', density.sectionGap)}>
+        <LazyMount className={cn('flex flex-col', density.sectionGap)}>
           <IntentionPatterns />
           <CollectiveConsciousness />
           <WellnessPulse />
           <MemoryEngineStats />
           <GrowthMilestones />
           <BadgeUnlockFeed />
-        </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Calendar — Personal date planner */}

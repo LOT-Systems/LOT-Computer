@@ -8,6 +8,7 @@
 
 import * as React from 'react'
 import { Block } from './Block'
+import { trackWidget } from '#client/utils/widgetUsage'
 
 const widgetTimings: Record<string, number> = {}
 
@@ -44,12 +45,14 @@ export class WidgetErrorBoundary extends React.Component<
     const elapsed = Math.round((performance.now() - this.mountStart) * 100) / 100
     const name = this.props.name || 'Widget'
     widgetTimings[name] = elapsed
+    trackWidget(name, 'mount', elapsed)
     if (elapsed > 50) {
       console.warn(`[Perf] ${name} took ${elapsed}ms to mount`)
     }
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
+    trackWidget(this.props.name || 'Widget', 'error')
     console.error(
       `[WidgetErrorBoundary] ${this.props.name || 'Widget'} crashed:`,
       error,
