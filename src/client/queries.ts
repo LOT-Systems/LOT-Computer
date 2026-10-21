@@ -15,11 +15,14 @@ import {
 } from 'react-query'
 import {
   AdminUsersSort,
+  BasicIssue,
+  BasicSubscription,
   ChatMessageLikePayload,
   DefaultQuestion,
   Log,
   Paginated,
   PublicChatMessage,
+  RosterIntakePayload,
   User,
   UserProfile,
   UserSettings,
@@ -912,3 +915,41 @@ export const useStoryGeneration = createMutation<
     logId: string | null
   }
 >('post', '/api/story')
+
+// ============================================================================
+// LOT-FM-001 — BASIC RATION
+// ============================================================================
+export const useBasicSubscription = createQuery<BasicSubscription | null>(
+  '/api/basic/subscription',
+  { refetchOnWindowFocus: false, staleTime: 30_000 }
+)
+
+export const useBasicIssues = createQuery<BasicIssue[]>(
+  '/api/basic/issues',
+  { refetchOnWindowFocus: false, staleTime: 30_000 }
+)
+
+export const useUpgradeToBasic = (
+  config?: Partial<UseMutationOptions<BasicSubscription, AxiosError, undefined>>
+) =>
+  useMutation<BasicSubscription, AxiosError, undefined>({
+    mutationFn: () => api.post<BasicSubscription>('/api/basic/upgrade').then(r => r.data),
+    ...config,
+  })
+
+export const useStandDown = (
+  config?: Partial<UseMutationOptions<{ ok: boolean }, AxiosError, undefined>>
+) =>
+  useMutation<{ ok: boolean }, AxiosError, undefined>({
+    mutationFn: () => api.post<{ ok: boolean }>('/api/basic/stand-down').then(r => r.data),
+    ...config,
+  })
+
+export const useRosterIntake = (
+  config?: Partial<UseMutationOptions<BasicSubscription, AxiosError, RosterIntakePayload>>
+) =>
+  useMutation<BasicSubscription, AxiosError, RosterIntakePayload>({
+    mutationFn: (data) =>
+      api.post<BasicSubscription>('/api/basic/roster', data).then(r => r.data),
+    ...config,
+  })
