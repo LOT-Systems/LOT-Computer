@@ -1751,6 +1751,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyPresenceMomentumCheck()) {
     await executeDailyPresenceMomentumCheck()
   }
+
+  // Check daily sustained coherence check (11:00 UTC every day) — Job 50
+  if (shouldRunDailySustainedCoherenceCheck()) {
+    await executeDailySustainedCoherenceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3624,6 +3629,98 @@ async function executeDailyPresenceMomentumCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily presence momentum check failed:', error.message)
     isDailyPresenceMomentumRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Sustained Coherence Check (Job 50 — 11:00 UTC every day) ──────────
+// Reads active users. Scans 7-day window for both presence_momentum_arc and
+// coherence_field_persistence signals per user. When both found, writes
+// sustained_coherence_baseline — Level 7 dual-arc state confirmed.
+// P155: two temporal persistence arcs co-active, the peak is the sustained floor.
+
+let isDailySustainedCoherenceRunning = false
+let lastDailySustainedCoherenceRun: Date | null = null
+
+function shouldRunDailySustainedCoherenceCheck(): boolean {
+  const now = dayjs()
+  if (isDailySustainedCoherenceRunning) return false
+  if (lastDailySustainedCoherenceRun) {
+    const lastRun = dayjs(lastDailySustainedCoherenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 11 // 11:00 UTC daily
+}
+
+async function executeDailySustainedCoherenceCheck(): Promise<JobResult> {
+  const jobName = 'daily-sustained-coherence-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySustainedCoherenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySustainedCoherenceRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SUSTAINED COHERENCE CHECK — 11:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart = dayjs().subtract(7, 'day').startOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const [presenceLogs, coherenceLogs] = await Promise.all([
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: sevenDayStart }, event: 'presence_momentum_arc' },
+            attributes: ['createdAt', 'metadata'],
+          }),
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: sevenDayStart }, event: 'coherence_field_persistence' },
+            attributes: ['createdAt', 'metadata'],
+          }),
+        ])
+
+        if (!presenceLogs.length || !coherenceLogs.length) continue
+
+        const presenceDays = presenceLogs.reduce((max: number, log: any) => Math.max(max, log.metadata?.dayCount ?? 2), 2)
+        const coherenceOccurrences = coherenceLogs.reduce((max: number, log: any) => Math.max(max, log.metadata?.occurrences ?? 2), 2)
+
+        await (Log as any).create({
+          userId,
+          event: 'sustained_coherence_baseline',
+          text: `Sustained coherence baseline: presence-momentum-arc (${presenceDays} days) and coherence-field-persistence (${coherenceOccurrences} occurrences) both confirmed in 7-day window. Two Level 7 temporal arcs co-active. The peak is the floor.`,
+          metadata: {
+            presenceDays,
+            coherenceOccurrences,
+            baselineStatus: 'CONFIRMED',
+            temporalArcs: ['PRESENCE-SUSTAINED', 'COHERENCE-RECURRING'],
+            level: 'L7-DUAL',
+            hour: 11,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Sustained coherence baseline events written: ${written}`)
+    lastDailySustainedCoherenceRun = new Date()
+    isDailySustainedCoherenceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily sustained coherence check failed:', error.message)
+    isDailySustainedCoherenceRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

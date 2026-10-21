@@ -113,6 +113,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'presence-momentum-arc':            'PRESMOM',
   'coherence-field-persistence':      'COHEPRST',
   'recovery-mastery-chain':           'RECMAS',
+  'sustained-coherence-baseline':     'COHBASE',
+  'mastery-integration-triad':        'MASTTRIAD',
+  'temporal-sovereignty':             'TSOV',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

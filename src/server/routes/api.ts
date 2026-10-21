@@ -1217,6 +1217,10 @@ export default async (fastify: FastifyInstance) => {
       'presence_momentum_arc',
       'coherence_field_persistence',
       'recovery_mastery_chain',
+      // v115: sustained coherence baseline · mastery integration triad · temporal sovereignty (P155/P156/P157)
+      'sustained_coherence_baseline',
+      'mastery_integration_triad',
+      'temporal_sovereignty',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

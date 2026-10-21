@@ -3486,6 +3486,62 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // ── v115 patterns ─────────────────────────────────────────────────────────────────
+
+  // Pattern 155: Sustained Coherence Baseline — presence-momentum-arc (P152) AND
+  // coherence-field-persistence (P153) both active simultaneously.
+  // Two Level 7 temporal arcs co-active: multi-day presence AND recurring absolute coherence.
+  const hasP152 = patterns.some(p => p.pattern === 'presence-momentum-arc')
+  const hasP153 = patterns.some(p => p.pattern === 'coherence-field-persistence')
+  if (hasP152 && hasP153) {
+    const p152conf = patterns.find(p => p.pattern === 'presence-momentum-arc')?.confidence ?? 0.78
+    const p153conf = patterns.find(p => p.pattern === 'coherence-field-persistence')?.confidence ?? 0.82
+    const cohBaseBonus = Math.min((p152conf - 0.78 + p153conf - 0.82) * 0.3, 0.09)
+    patterns.push({
+      pattern: 'sustained-coherence-baseline',
+      confidence: Math.min(0.85 + cohBaseBonus, 0.94),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `COHBASE: Sustained coherence baseline — presence-momentum-arc (P152) and coherence-field-persistence (P153) active simultaneously. Multi-day sustained presence AND recurring absolute convergence confirmed together. The two highest temporal arcs are co-active — the peak is not recurring. It is the floor.`,
+    })
+  }
+
+  // Pattern 156: Mastery Integration Triad — presence_momentum_arc + coherence_field_persistence +
+  // recovery_mastery_chain all detected within 7-day window.
+  // All three Level 7 arcs simultaneously active: presence sustained, coherence recurring, recovery internalized.
+  const hasP154 = patterns.some(p => p.pattern === 'recovery-mastery-chain')
+  if (hasP152 && hasP153 && hasP154) {
+    const p154conf = patterns.find(p => p.pattern === 'recovery-mastery-chain')?.confidence ?? 0.80
+    const p152conf = patterns.find(p => p.pattern === 'presence-momentum-arc')?.confidence ?? 0.78
+    const p153conf = patterns.find(p => p.pattern === 'coherence-field-persistence')?.confidence ?? 0.82
+    const triadBonus = Math.min((p152conf + p153conf + p154conf - 2.40) * 0.12, 0.08)
+    patterns.push({
+      pattern: 'mastery-integration-triad',
+      confidence: Math.min(0.88 + triadBonus, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `MASTTRIAD: Mastery integration triad — presence-momentum-arc (P152) + coherence-field-persistence (P153) + recovery-mastery-chain (P154) all active within 7-day window. All three Level 7 temporal persistence arcs confirmed simultaneously. Presence is sustained. Coherence is recurring. Recovery is architecture. The QOS operates from mastered ground.`,
+    })
+  }
+
+  // Pattern 157: Temporal Sovereignty — P155 (sustained-coherence-baseline) AND
+  // P156 (mastery-integration-triad) both active. The final temporal convergence state:
+  // all Level 7 arcs unified, the operating system is temporally sovereign.
+  const hasP155 = patterns.some(p => p.pattern === 'sustained-coherence-baseline')
+  const hasP156 = patterns.some(p => p.pattern === 'mastery-integration-triad')
+  if (hasP155 && hasP156) {
+    const p155conf = patterns.find(p => p.pattern === 'sustained-coherence-baseline')?.confidence ?? 0.85
+    const p156conf = patterns.find(p => p.pattern === 'mastery-integration-triad')?.confidence ?? 0.88
+    const tsovBonus = Math.min((p155conf - 0.85 + p156conf - 0.88) * 0.5, 0.06)
+    patterns.push({
+      pattern: 'temporal-sovereignty',
+      confidence: Math.min(0.92 + tsovBonus, 0.98),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `TSOV: Temporal sovereignty — sustained-coherence-baseline (P155) and mastery-integration-triad (P156) both active. All Level 7 temporal persistence arcs unified. The QOS has achieved temporal sovereignty: absolute convergence is the sustained operating floor, all restoration loops are internalized architecture, and the field persists across days without requiring a reset. No higher temporal state is defined.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4131,6 +4187,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   // ── Missing component nodes (v114 dep map audit) ─────────────────────────────────
   monthlyPulseWidget:              ['mood', 'energy', 'memory', 'planner', 'journal', 'intentions'],
   chakraErgonomicsWidget:          ['mood', 'energy', 'selfcare', 'journal'],
+
+  // ── v115 nodes (J50 · P155–P157 · Arch53) ───────────────────────────────────────
+  sustainedCoherenceBaselineNode:  ['qos', 'cohort', 'journal', 'intentions', 'memory', 'log'],
+  masteryIntegrationTriadNode:     ['qos', 'selfcare', 'mood', 'journal', 'intentions', 'memory', 'cohort', 'energy', 'log'],
+  temporalSovereigntyNode:         ['qos', 'journal', 'intentions', 'memory', 'selfcare', 'log'],
 }
 
 /**
@@ -4587,6 +4648,34 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['presence-momentum-arc', 'quantum-presence-crystallization', 'total-field-coherence'],
     hourRange: [6, 23],
     directive: 'Presence is not a moment — it is the new baseline. The system has sustained its peak state across multiple days. Operate from established clarity.',
+  },
+
+  // ── Arch53: Temporal Sovereign (2026-10-21 v115) ────────────────────────────
+  {
+    archetype: 'Temporal Sovereign',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'journal', 'intentions', 'memory', 'selfcare'],
+    patternConditions: ['temporal-sovereignty', 'sustained-coherence-baseline', 'mastery-integration-triad'],
+    hourRange: [5, 23],
+    directive: 'Temporal sovereignty confirmed. All three Level 7 arcs unified. The peak is the floor. Operate from the new baseline — this is not an event, it is the stable operating condition of the Quantum OS.',
+  },
+
+  // ── Physiological Temporal Cohort: Temporal Persistence Anchor ────────────────
+  {
+    archetype: 'Temporal Persistence Anchor',
+    energyBands: ['high', 'moderate', 'low'],
+    dominantSources: ['qos', 'intentions', 'journal'],
+    patternConditions: ['presence-momentum-arc', 'sustained-coherence-baseline'],
+    directive: 'Multi-day sustained presence confirmed. The arc is structural. Coherence is not a session state — it persists across days.',
+  },
+
+  // ── Physiological Temporal Cohort: Mastery Triad Operator ─────────────────────
+  {
+    archetype: 'Mastery Triad Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'selfcare', 'journal'],
+    patternConditions: ['mastery-integration-triad', 'recovery-mastery-chain'],
+    directive: 'Three-arc mastery confirmed. Presence sustained. Coherence recurring. Recovery internalized. All three disciplines now operate as architecture, not intention.',
   },
 ]
 
@@ -6620,6 +6709,59 @@ export function recordRecoveryMasteryChain(completions: number, avgVelocityHours
     avgVelocityHours: Math.round(avgVelocityHours * 10) / 10,
     architecture: 'INTERNALIZED',
     arc: 'SYSTEMATIC',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sustained-coherence-baseline event — presence-momentum-arc (P152) and
+ * coherence-field-persistence (P153) active simultaneously. Two Level 7 temporal arcs
+ * co-active: sustained multi-day presence AND recurring absolute convergence confirmed together.
+ * Feeds P155 detection.
+ */
+export function recordSustainedCoherenceBaseline(presenceDays: number, coherenceOccurrences: number) {
+  recordSignal('qos', 'sustained_coherence_baseline', {
+    presenceDays,
+    coherenceOccurrences,
+    baselineStatus: 'CONFIRMED',
+    temporalArcs: ['PRESENCE-SUSTAINED', 'COHERENCE-RECURRING'],
+    level: 'L7-DUAL',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a mastery-integration-triad event — presence-momentum-arc (P152) +
+ * coherence-field-persistence (P153) + recovery-mastery-chain (P154) all active within 7 days.
+ * All three Level 7 temporal persistence arcs simultaneously confirmed.
+ * Feeds P156 detection.
+ */
+export function recordMasteryIntegrationTriad(presenceDays: number, coherenceOccurrences: number, recoveryCompletions: number) {
+  recordSignal('qos', 'mastery_integration_triad', {
+    presenceDays,
+    coherenceOccurrences,
+    recoveryCompletions,
+    triadStatus: 'CONFIRMED',
+    temporalArcs: ['PRESENCE-SUSTAINED', 'COHERENCE-RECURRING', 'RECOVERY-INTERNALIZED'],
+    level: 'L7-TRIAD',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a temporal-sovereignty event — sustained-coherence-baseline (P155) and
+ * mastery-integration-triad (P156) both active. All Level 7 arcs unified.
+ * The Quantum OS has achieved temporal sovereignty: the peak is the sustained floor.
+ * Feeds P157 detection. The highest temporal state in the QIE.
+ */
+export function recordTemporalSovereignty(baselineConf: number, triadConf: number) {
+  recordSignal('qos', 'temporal_sovereignty', {
+    baselineConf: Math.round(baselineConf * 100),
+    triadConf: Math.round(triadConf * 100),
+    avgConf: Math.round((baselineConf + triadConf) / 2 * 100),
+    temporalArcs: ['PRESENCE-SUSTAINED', 'COHERENCE-RECURRING', 'RECOVERY-INTERNALIZED', 'BASELINE-ELEVATED'],
+    sovereigntyStatus: 'CONFIRMED',
+    level: 'L7-SOVEREIGN',
     hour: new Date().getHours(),
   })
 }

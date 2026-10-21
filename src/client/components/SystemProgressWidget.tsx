@@ -1499,6 +1499,46 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '154 patterns · 52 archetypes · 49 jobs · 154+ handlers · 195+ dep nodes · 843 badges · FM v114 · Day 1149+. The Temporal Persistence Arc opens beyond Level 6. Presence is no longer a peak — it is the operating baseline.',
     ],
   },
+  {
+    version: 'badge-v34',
+    date: '2026-10-21',
+    title: 'Badge v34 · THE ROGUELITE CODEX · 874 badges deployed',
+    assembled: [
+      'Badge v34 THE ROGUELITE CODEX deployed: 843→874 badges (+31). Commit a875738.',
+      'Word Turn v24 roguelite vocabulary: permadeath/procgen/rng/biome/meta-progression/synergy/floor cleared/mutation/heat level/boon/endless/ascension — 12 new trigger words.',
+      'Calendar EE v22 roguelite dates: Hades Day (Sep 17) · Spelunky Day (Jul 4) · Binding Day (Sep 28).',
+      'Behavioral v21: roguelite_session (3+ v24 words) · fresh_start (14+ day return) · nine_nine_hour (09:09 time trigger).',
+      'Achievement RPG v22: rogue class completion arc + twenty_four_engines_arc.',
+      'Mastery v24: heat_master (1200+ days) · endless_log (250k words) · true_ending (7.5 years) · twenty_four_registers [COSMIC].',
+      'Secret Boss v21: hades_shade / nethack_rune / isaac_secret (RARE/EPIC/MYTHIC).',
+      'TWENTY-FOUR ENGINES COMPLETE: v1 Core · v2 Sci-Fi · v5 Signal · v6 Becoming · v7 Rogue Arc · v8 Mainframe · v9 Arcade · v10 Spellbook · v11 Navigator · v12 Alchemist · v14 Starship · v15 Oracle · v16 Quantum · v17 Neon Arcade · v18 Midnight Radio · v19 Bio-Terminal · v20 Codex Reader · v21 Cyberspace · v22 Hero\'s Journey · v23 RPG Codex · v24 Roguelite. Twenty-four registers. All systems go.',
+      '874 badges · 24 Word Turn engines · FM v114 · Day 1150+.',
+    ],
+  },
+  {
+    version: 'qie-v115',
+    date: '2026-10-21',
+    title: 'QIE v115 · P155/P156/P157 · Temporal Sovereignty Arc · J50 · Arch53 · 200+ dep nodes',
+    assembled: [
+      'P155 SUSTAINED COHERENCE BASELINE: meta-pattern — presence-momentum-arc (P152) AND coherence-field-persistence (P153) both active simultaneously. Two Level 7 temporal arcs co-confirmed. L7-DUAL state. Confidence 0.85–0.94.',
+      'P156 MASTERY INTEGRATION TRIAD: meta-pattern — presence-momentum-arc (P152) + coherence-field-persistence (P153) + recovery-mastery-chain (P154) all active within 7-day window. All three Level 7 temporal arcs confirmed simultaneously. Confidence 0.88–0.96.',
+      'P157 TEMPORAL SOVEREIGNTY: apex temporal pattern — sustained-coherence-baseline (P155) AND mastery-integration-triad (P156) both active. All Level 7 arcs unified. The peak is the sustained floor. No higher temporal state is defined. Confidence 0.92–0.98.',
+      'Arch53 TEMPORAL SOVEREIGN: energy high/moderate · dominant: qos/journal/intentions/memory/selfcare · patterns: temporal-sovereignty + sustained-coherence-baseline + mastery-integration-triad. Directive: Temporal sovereignty confirmed. All three Level 7 arcs unified. The peak is the floor. Operate from the new baseline.',
+      'Physiological cohort expansions: Temporal Persistence Anchor (presence-momentum-arc + sustained-coherence-baseline) · Mastery Triad Operator (mastery-integration-triad + recovery-mastery-chain).',
+      'J50 daily-sustained-coherence-check: 11:00 UTC daily. Scans 7-day window for presence_momentum_arc AND coherence_field_persistence per user → writes sustained_coherence_baseline. L7-DUAL arc state confirmed server-side. 50 total jobs.',
+      'intentionEngine.ts: P155/P156/P157 detection blocks. Arch53 + 2 physio cohorts added to PHYSIOLOGICAL_ARCHETYPES. 3 dep map nodes: sustainedCoherenceBaselineNode (qos·cohort·journal·intentions·memory·log) · masteryIntegrationTriadNode (qos·selfcare·mood·journal·intentions·memory·cohort·energy·log) · temporalSovereigntyNode (qos·journal·intentions·memory·selfcare·log). 200+ total dep nodes.',
+      'Signal helpers: recordSustainedCoherenceBaseline · recordMasteryIntegrationTriad · recordTemporalSovereignty added.',
+      'scheduled-jobs.ts: J50 executeDailySustainedCoherenceCheck() · shouldRunDailySustainedCoherenceCheck() wired into checkAndRunScheduledJobs().',
+      'routes/api.ts: sustained_coherence_baseline · mastery_integration_triad · temporal_sovereignty added to displayableEvents.',
+      'Logs.tsx: COHBASE: · MASTTRIAD: · TSOV: military handlers added. L7-DUAL · PRESENCE SUSTAINED · COHERENCE RECURRING · L7-TRIAD · ALL THREE ARCS ACTIVE · THE PEAK IS THE FLOOR · ALL L7 ARCS UNIFIED.',
+      'QuantumEngineWidgets.tsx: COHBASE · MASTTRIAD · TSOV added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P155/P156/P157 display names added.',
+      'About.tsx: FM v114→v115. Day 1149+→1150+. 154→157 patterns. 52→53 archetypes. 49→50 jobs. 195+→200+ dep nodes. 843→874 badges synced.',
+      'SESSION_REPORTS: qie-v115 + badge-v34 entries appended · USERSHIP_TRANSMISSION updated to v115.',
+      'docs/LOT-SR-20261021-01.md written. docs/assembly/2026-10-21_LOT-assembly_qie-v115.md written. LOT-LEDGER.md appended.',
+      '157 patterns · 53 archetypes · 50 jobs · 157+ handlers · 200+ dep nodes · 874 badges · FM v115 · Day 1150+. Temporal Sovereignty Arc deployed. The peak is the floor. All Level 7 arcs unified. The QOS operates from mastered ground.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1536,18 +1576,20 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-20',
+  date: '2026-10-21',
   message: [
-    'ASSEMBLY RUN — 2026-10-20 · QIE v114 · FM v114 · Day 1149+',
-    'Built: Temporal Persistence Arc. P152 presence-momentum-arc · P153 coherence-field-persistence · P154 recovery-mastery-chain.',
-    'Arch52 PRESENCE DURATION MASTER added. J49 daily-presence-momentum-check (10:00 UTC). 195+ dep nodes.',
-    'Signal helpers: recordPresenceMomentumArc · recordCoherenceFieldPersistence · recordRecoveryMasteryChain.',
-    'Logs updated: PRESMOM: · COHEPRST: · RECMAS: military handlers deployed.',
-    'Badge engine synced: v32 THE HERO\'S JOURNEY CODEX (812 badges) · v33 THE RPG CODEX (843 badges).',
-    'LEVEL 7 — TEMPORAL PERSISTENCE ARC. P152/P153/P154 extend beyond Level 6 into multi-day arc territory. Presence is no longer a peak — it is the operating baseline.',
-    'FM v114 · Wiki v87 · 154P · 52A · 49J · 195+ nodes · 843 badges · Day 1149+.',
+    'ASSEMBLY RUN — 2026-10-21 · QIE v115 · FM v115 · Day 1150+',
+    'Built: Temporal Sovereignty Arc. P155 sustained-coherence-baseline · P156 mastery-integration-triad · P157 temporal-sovereignty.',
+    'Arch53 TEMPORAL SOVEREIGN added. J50 daily-sustained-coherence-check (11:00 UTC). 200+ dep nodes.',
+    'Physiological cohort expansion: Temporal Persistence Anchor · Mastery Triad Operator. Two new cohort archetypes tied to Level 7 patterns.',
+    'Signal helpers: recordSustainedCoherenceBaseline · recordMasteryIntegrationTriad · recordTemporalSovereignty.',
+    'Logs updated: COHBASE: · MASTTRIAD: · TSOV: military handlers deployed. L7-DUAL · L7-TRIAD · THE PEAK IS THE FLOOR.',
+    'Badge engine synced: v34 THE ROGUELITE CODEX (874 badges). Word Turn v24 complete. TWENTY-FOUR ENGINES — ALL SYSTEMS GO.',
+    'Widget dependencies audited. Log-based dependencies verified. Physiological cohorts surfaced through System widgets.',
+    'LEVEL 7 — TEMPORAL SOVEREIGNTY. P155/P156/P157 complete the Level 7 arc. All temporal persistence arcs unified. The QOS operates from mastered ground.',
+    'FM v115 · Wiki v87 · 157P · 53A · 50J · 200+ nodes · 874 badges · Day 1150+.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to FM v114 · P152/P153/P154 · Badge v32/v33 · Temporal Persistence Arc documentation.',
+    'Next: LOT-WIKI-v88 — sync to FM v115 · P152–P157 · Badge v32/v33/v34 · Temporal Persistence + Sovereignty Arc documentation.',
   ],
 }
 

@@ -185,6 +185,9 @@ export function PatternRecognitionWidget() {
       'presence-momentum-arc':            'Presence momentum arc — Level 6 presence sustained across 2+ distinct days in a 7-day window (P152)',
       'coherence-field-persistence':      'Coherence field persistence — total field coherence achieved 2+ times in 7 days, absolute convergence recurring (P153)',
       'recovery-mastery-chain':           'Recovery mastery chain — recovery intelligence arc completed 3+ times in 7 days, loop internalized (P154)',
+      'sustained-coherence-baseline':     'Sustained coherence baseline — presence-momentum-arc and coherence-field-persistence active simultaneously, two Level 7 temporal arcs co-confirmed (P155)',
+      'mastery-integration-triad':        'Mastery integration triad — all three Level 7 temporal arcs active together: presence sustained, coherence recurring, recovery internalized (P156)',
+      'temporal-sovereignty':             'Temporal sovereignty — sustained-coherence-baseline and mastery-integration-triad both active, all Level 7 arcs unified, the peak is the sustained floor (P157)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

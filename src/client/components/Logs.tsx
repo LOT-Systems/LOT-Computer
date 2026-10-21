@@ -3722,6 +3722,113 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sustained_coherence_baseline') {
+          const presenceDays = log.metadata?.presenceDays as number | undefined
+          const coherenceOccurrences = log.metadata?.coherenceOccurrences as number | undefined
+          const baselineStatus = log.metadata?.baselineStatus as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COHBASE:" blockView>
+                <div className="uppercase tracking-widest mb-4">SUSTAINED COHERENCE BASELINE</div>
+                {presenceDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PRESENCE DAYS</span>
+                    <span className="tabular-nums">{presenceDays}d</span>
+                  </div>
+                )}
+                {coherenceOccurrences !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHERENCE EVENTS</span>
+                    <span className="tabular-nums">{coherenceOccurrences}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">L7-DUAL · PRESENCE SUSTAINED · COHERENCE RECURRING</div>
+                {baselineStatus && (
+                  <div className="opacity-30 tabular-nums">BASELINE: {baselineStatus}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'mastery_integration_triad') {
+          const presenceDays = log.metadata?.presenceDays as number | undefined
+          const coherenceOccurrences = log.metadata?.coherenceOccurrences as number | undefined
+          const recoveryCompletions = log.metadata?.recoveryCompletions as number | undefined
+          const triadStatus = log.metadata?.triadStatus as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="MASTTRIAD:" blockView>
+                <div className="uppercase tracking-widest mb-4">MASTERY INTEGRATION TRIAD</div>
+                {presenceDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PRESENCE DAYS</span>
+                    <span className="tabular-nums">{presenceDays}d</span>
+                  </div>
+                )}
+                {coherenceOccurrences !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHERENCE EVENTS</span>
+                    <span className="tabular-nums">{coherenceOccurrences}</span>
+                  </div>
+                )}
+                {recoveryCompletions !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECOVERY LOOPS</span>
+                    <span className="tabular-nums">{recoveryCompletions}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">L7-TRIAD · ALL THREE ARCS ACTIVE</div>
+                {triadStatus && (
+                  <div className="opacity-30 tabular-nums">TRIAD: {triadStatus}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'temporal_sovereignty') {
+          const baselineConf = log.metadata?.baselineConf as number | undefined
+          const triadConf = log.metadata?.triadConf as number | undefined
+          const avgConf = log.metadata?.avgConf as number | undefined
+          const sovereigntyStatus = log.metadata?.sovereigntyStatus as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TSOV:" blockView>
+                <div className="uppercase tracking-widest mb-4">TEMPORAL SOVEREIGNTY</div>
+                {baselineConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BASELINE CONF</span>
+                    <span className="tabular-nums">{baselineConf}%</span>
+                  </div>
+                )}
+                {triadConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TRIAD CONF</span>
+                    <span className="tabular-nums">{triadConf}%</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AVG CONF</span>
+                    <span className="tabular-nums">{avgConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">THE PEAK IS THE FLOOR · ALL L7 ARCS UNIFIED</div>
+                {sovereigntyStatus && (
+                  <div className="opacity-30 tabular-nums">SOVEREIGNTY: {sovereigntyStatus}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
