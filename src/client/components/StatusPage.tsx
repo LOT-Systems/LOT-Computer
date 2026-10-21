@@ -10,7 +10,7 @@ import * as React from 'react'
 import { Block, Button, GhostButton, Page } from '#client/components/ui'
 import { cn } from '#client/utils'
 import { useDocumentTitle } from '#client/utils/hooks'
-import dayjs from 'dayjs'
+import dayjs from '#client/utils/dayjs'
 import { DATE_TIME_FORMAT } from '#shared/constants'
 
 interface SystemCheck {

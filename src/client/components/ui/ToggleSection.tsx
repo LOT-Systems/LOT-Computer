@@ -31,6 +31,25 @@ export function ToggleSection({
   onToggle,
 }: ToggleSectionProps) {
   const [isOpen, setIsOpen] = React.useState(defaultOpen)
+  const contentRef = React.useRef<HTMLDivElement>(null)
+  const [height, setHeight] = React.useState<number | undefined>(defaultOpen ? undefined : 0)
+
+  React.useLayoutEffect(() => {
+    if (!contentRef.current) return
+    if (isOpen) {
+      const measured = contentRef.current.scrollHeight
+      setHeight(measured)
+      // After transition ends, switch to auto so content can resize freely
+      const id = setTimeout(() => setHeight(undefined), 300)
+      return () => clearTimeout(id)
+    } else {
+      // Snapshot current height before collapsing so the transition has a start value
+      setHeight(contentRef.current.scrollHeight)
+      // Force a reflow so the browser registers the explicit height before we set it to 0
+      contentRef.current.getBoundingClientRect()
+      setHeight(0)
+    }
+  }, [isOpen])
 
   const handleToggle = () => {
     const newState = !isOpen
@@ -40,31 +59,30 @@ export function ToggleSection({
 
   return (
     <div className={cn('w-full', className)}>
-      {/* Header */}
       <button
         onClick={handleToggle}
         className={cn(
           'w-full text-left flex items-center gap-8 py-8 transition-opacity hover:opacity-30',
-          indent > 0 && 'pl-' + (indent * 16)
         )}
         style={{ paddingLeft: indent > 0 ? `${indent * 16}px` : undefined }}
       >
-        <span className="transition-transform duration-200" style={{
-          transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-          display: 'inline-block',
-          width: '8px'
-        }}>
+        <span
+          className="transition-transform duration-200"
+          style={{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)', display: 'inline-block', width: '8px' }}
+        >
           ›
         </span>
         <span>{label}</span>
       </button>
 
-      {/* Content */}
       <div
-        className={cn(
-          'overflow-hidden transition-all duration-300',
-          isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
-        )}
+        ref={contentRef}
+        className="overflow-hidden"
+        style={{
+          height: height === undefined ? 'auto' : `${height}px`,
+          transition: 'height 300ms ease, opacity 300ms ease',
+          opacity: isOpen ? 1 : 0,
+        }}
       >
         <div className="py-4">
           {children}
