@@ -7,6 +7,17 @@
  */
 
 import { Op, Sequelize } from 'sequelize'
+import {
+  STORY_CHECKIN_EVENTS,
+  STORY_ENTRY_EVENTS,
+  STORY_RANGES,
+  STORY_RANGE_DAYS,
+  compressLogs,
+  composeOfflineStory,
+  computeArcadeFromCounts,
+  formatDigest,
+  type StoryRange,
+} from '#shared/utils/logStory'
 import { FastifyInstance, FastifyRequest } from 'fastify'
 import seedrandom from 'seedrandom'
 import {
@@ -5490,6 +5501,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          range?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,30 +5526,25 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const range: StoryRange = (STORY_RANGES as string[]).includes(req.body.range || '')
+        ? (req.body.range as StoryRange)
+        : 'week'
 
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 1000,
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: new Date(Date.now() - 2 * STORY_RANGE_DAYS[range] * 86400000) },
+        },
       })
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
+      const digest = compressLogs(logs as any, range)
+      const [entryTotal, checkinTotal] = await Promise.all([
+        fastify.models.Log.count({ where: { userId: req.user.id, event: STORY_ENTRY_EVENTS } }),
+        fastify.models.Log.count({ where: { userId: req.user.id, event: STORY_CHECKIN_EVENTS } }),
+      ])
+      const arcade = computeArcadeFromCounts(entryTotal, checkinTotal)
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
@@ -5547,33 +5554,25 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's journal into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed /story ${range}. The DIGEST below is a compressed record of that window: entry counts, places, weather, moods and excerpts, each entry captured with its context. Write 1-2 paragraphs (80-200 words) that reflect the shape of the ${range}, any change of pace, and what stood out.
 
 RULES:
 - Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
-- End with a single forward-looking sentence — not a pep talk, just a quiet truth
-- Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Use only facts present in the DIGEST. Never invent events, numbers or feelings.
+- Name a real shift in pace or mood if the digest shows one; if it does not, say the ${range} was steady.
+- If data is thin, say so plainly and with compassion.
+- End with one quiet forward-looking sentence, not a pep talk.
+- Return ONLY the story paragraphs. No title. No commentary.`
 
       const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+OPERATOR NOTE: "${logText || '(none)'}"
 
-${stateBlock ? stateBlock : 'STATE: unknown'}
+${stateBlock || 'STATE: unknown'}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
+DIGEST:
+${formatDigest(digest)}`
 
       const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
 
@@ -5596,6 +5595,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            range,
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5604,12 +5604,14 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          arcade,
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
         return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
+          story: composeOfflineStory(digest),
           logId: null,
+          arcade,
         }
       }
     }
