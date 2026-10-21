@@ -321,6 +321,19 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+
+  USE CASE 02 — THE OPEN WINDOW                              2026-10-21
+  ─────────────────────────────────────────────────────────────────
+  Operator owns the LOT® Station and Brush. As room CO2 climbs during
+  an afternoon of closed-door work, the cube performs THE KNOCK — two
+  faint taps through the desk — and the LOT® screen shows one line:
+  "Air quality: open a window for 30 minutes." The operator opens the
+  window and rests a hand on the cube (logged as "touched"). The cube
+  is the physical voice of the Station. Gestures the operator learns to
+  ignore are retired automatically: fewer notifications as the
+  relationship matures. Full detail: LOT-CUBIQ-QUANTUM-CUBE-v0-CYCLE-02.md
+  Section 10.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
