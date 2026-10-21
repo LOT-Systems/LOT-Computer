@@ -10,7 +10,7 @@ import { Op } from 'sequelize'
 import dayjs from '#server/utils/dayjs'
 import { LogContext, User } from '#shared/types'
 import { DATE_TIME_FORMAT, WEATHER_STALE_TIME_MINUTES } from '#shared/constants'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getAstrologyReading } from '#shared/utils/astrology'
 import { models } from '../models/index.js'
 
 // Building a Date from a moment's local (timeZone-aware) wall-clock fields
@@ -25,7 +25,7 @@ function toWallClockDate(moment: dayjs.Dayjs): Date {
 export async function getLogContext(user: User): Promise<LogContext> {
   const localMoment = user.timeZone ? dayjs().tz(user.timeZone) : dayjs()
   const localDate = toWallClockDate(localMoment)
-  const moonPhase = getMoonPhase(localDate)
+  const astro = getAstrologyReading(localDate)
 
   const context: LogContext = {
     temperature: null,
@@ -37,11 +37,11 @@ export async function getLogContext(user: User): Promise<LogContext> {
     date: user.timeZone
       ? dayjs().tz(user.timeZone).format(DATE_TIME_FORMAT)
       : null,
-    astroRokuyo: getRokuyo(localDate),
-    astroMoonPhase: moonPhase.phase,
-    astroMoonIllumination: moonPhase.illumination,
-    astroHourlyZodiac: getHourlyZodiac(localDate),
-    astroWesternZodiac: getWesternZodiac(localDate),
+    astroRokuyo: astro.rokuyo,
+    astroMoonPhase: astro.moonPhase,
+    astroMoonIllumination: astro.moonIllumination,
+    astroHourlyZodiac: astro.hourlyZodiac,
+    astroWesternZodiac: astro.westernZodiac,
   }
   if (user.country && user.city) {
     const cachedWeather = await models.WeatherResponse.findOne({

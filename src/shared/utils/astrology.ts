@@ -177,3 +177,64 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+export type AstrologyReading = {
+  hourlyZodiac: string
+  westernZodiac: string
+  moonPhase: string
+  moonIllumination: number
+  rokuyo: string
+}
+
+/**
+ * Wall-clock Date for an IANA timeZone, so the getHours()/getMonth()/getDate()
+ * readers above reflect the user's saved zone rather than the device's.
+ * Falls back to the instant itself on a missing or invalid zone.
+ */
+export function toWallClockDate(timeZone?: string | null, now: Date = new Date()): Date {
+  if (!timeZone) return now
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(now)
+    const get = (type: string) => Number(parts.find(p => p.type === type)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return now
+  }
+}
+
+/** Full ambient reading (zodiac hour, sign, moon, rokuyo) for one moment. */
+export function getAstrologyReading(date: Date): AstrologyReading {
+  const moon = getMoonPhase(date)
+  return {
+    hourlyZodiac: getHourlyZodiac(date),
+    westernZodiac: getWesternZodiac(date),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    rokuyo: getRokuyo(date),
+  }
+}
+
+/**
+ * "Astro echo": how many of the user's own past log entries were written
+ * under today's rokuyo / moon phase (from the context snapshot each log
+ * carries). Personal history against ambient conditions — no birth data.
+ */
+export function getAstroEcho(
+  logs: Array<{ context?: { astroRokuyo?: string | null; astroMoonPhase?: string | null } | null }>,
+  reading: Pick<AstrologyReading, 'rokuyo' | 'moonPhase'>
+): { rokuyoCount: number; moonCount: number; tracked: number } {
+  let rokuyoCount = 0, moonCount = 0, tracked = 0
+  for (const log of logs) {
+    const c = log.context
+    if (!c?.astroRokuyo) continue
+    tracked++
+    if (c.astroRokuyo === reading.rokuyo) rokuyoCount++
+    if (c.astroMoonPhase === reading.moonPhase) moonCount++
+  }
+  return { rokuyoCount, moonCount, tracked }
+}
