@@ -1,0 +1,377 @@
+diff --git a/src/client/components/Basics.tsx b/src/client/components/Basics.tsx
+new file mode 100644
+index 000000000..8dbfa184e
+--- /dev/null
++++ b/src/client/components/Basics.tsx
+@@ -0,0 +1,227 @@
++/**
++ * LOT SYSTEMS CORPORATION
++ * Vadim Marmeladov — CEO, Owner LOT®
++ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
++ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
++ * Made in the USA | brand.lot-systems.com
++ */
++
++import * as React from 'react'
++import { useStore } from '@nanostores/react'
++import * as stores from '#client/stores'
++import { cn } from '#client/utils'
++import { UserTag } from '#shared/types'
++import {
++  RATION_MANIFEST,
++  DOCTRINE_LINES,
++  PRICE_LINE,
++  MANUAL_REF,
++  RATION_COUNT,
++  type RationItem,
++  type RationCadence,
++} from './basics/doctrine'
++
++// ─── terminal grid constants ──────────────────────────────────────────────────
++const RULE = '─'
++const HEAVY = '━'
++const ruleOf = (n: number) => Array(n).fill(RULE).join('')
++const heavyOf = (n: number) => Array(n).fill(HEAVY).join('')
++
++// ─── sub-components ───────────────────────────────────────────────────────────
++
++const HeavyRule: React.FC<{ className?: string }> = ({ className }) => (
++  <div className={cn('text-acc tracking-[0] leading-none select-none overflow-hidden', className)}>
++    <div className="border-t-2 border-acc w-full" />
++  </div>
++)
++
++const ThinRule: React.FC<{ className?: string }> = ({ className }) => (
++  <div className={cn('border-t border-acc/30 w-full', className)} />
++)
++
++const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
++  <div className="font-mono text-[11px] tracking-widest uppercase text-acc/50 py-8">
++    {children}
++  </div>
++)
++
++const cadenceBadge = (cadence: RationCadence) => {
++  const cls = cadence === 'MONTHLY'
++    ? 'text-acc'
++    : cadence === 'QUARTERLY'
++    ? 'text-acc/60'
++    : 'text-acc/40'
++  return <span className={cn('font-mono text-[11px]', cls)}>{cadence}</span>
++}
++
++const LedgerRow: React.FC<{ item: RationItem; isLast: boolean }> = ({ item, isLast }) => (
++  <div
++    className={cn(
++      'grid font-mono text-[12px] phone:text-[13px] py-[5px] gap-x-8',
++      'grid-cols-[28px_1fr_auto_auto]',
++      !isLast && 'border-b border-acc/10'
++    )}
++    style={{ gridTemplateColumns: '28px 1fr auto auto' }}
++  >
++    <span className="text-acc/40 tabular-nums">{item.line}</span>
++    <span className="text-acc uppercase tracking-wide leading-snug">{item.nomenclature}</span>
++    <span className="text-acc/50 text-right whitespace-nowrap">{item.spec}</span>
++    <span className="text-right w-[80px] phone:w-[90px]">{cadenceBadge(item.cadence)}</span>
++  </div>
++)
++
++const StatusLine: React.FC<{ plan: string; rationsStatus: string }> = ({ plan, rationsStatus }) => (
++  <div className="font-mono text-[12px] phone:text-[13px] flex flex-col gap-y-4">
++    <div className="grid gap-x-16" style={{ gridTemplateColumns: '120px 1fr' }}>
++      <span className="text-acc/50 uppercase tracking-wider">PLAN</span>
++      <span className="text-acc uppercase">{plan}</span>
++    </div>
++    <div className="grid gap-x-16" style={{ gridTemplateColumns: '120px 1fr' }}>
++      <span className="text-acc/50 uppercase tracking-wider">RATION</span>
++      <span className="text-acc/60 uppercase">{rationsStatus}</span>
++    </div>
++  </div>
++)
++
++// ─── main component ───────────────────────────────────────────────────────────
++
++export const Basics: React.FC = () => {
++  const me = useStore(stores.me)
++  const isMirrorOn = useStore(stores.isMirrorOn)
++
++  const isOnStrength = (me?.tags as string[] | undefined)?.includes('Basic') ?? false
++  const isUsership = me?.tags?.includes(UserTag.Usership) ?? false
++
++  const planLabel = isOnStrength
++    ? 'BASIC / ON STRENGTH'
++    : isUsership
++    ? 'USERSHIP / AI'
++    : 'NONE'
++
++  const rationStatus = isOnStrength
++    ? 'ACTIVE — NEXT ISSUE PENDING'
++    : 'NOT ON STRENGTH'
++
++  const monthlyItems = RATION_MANIFEST.filter((i) => i.cadence === 'MONTHLY')
++  const quarterlyItems = RATION_MANIFEST.filter((i) => i.cadence === 'QUARTERLY')
++  const annualItems = RATION_MANIFEST.filter((i) => i.cadence === 'ANNUALLY')
++
++  return (
++    <div
++      className={cn(
++        'min-h-[100dvh] flex flex-col',
++        'px-16 phone:px-32 tablet:px-48 desktop:px-64',
++        'pt-24 phone:pt-32 pb-[120px]',
++        isMirrorOn && 'text-white'
++      )}
++    >
++      {/* ── HEADER ────────────────────────────────────────── */}
++      <div className="flex items-baseline justify-between mb-2">
++        <h1 className="font-mono text-[13px] phone:text-[14px] uppercase tracking-[0.15em] text-acc font-bold">
++          BASICS
++        </h1>
++        <span className="font-mono text-[11px] text-acc/40 tracking-widest">
++          {MANUAL_REF}
++        </span>
++      </div>
++      <HeavyRule className="mb-16" />
++
++      {/* ── DOCTRINE + PRICE ──────────────────────────────── */}
++      <div className="mb-16 flex flex-col gap-y-4">
++        {DOCTRINE_LINES.map((line, i) => (
++          <p key={i} className="font-mono text-[12px] phone:text-[13px] text-acc leading-snug">
++            {line}
++          </p>
++        ))}
++        <p className="font-mono text-[13px] phone:text-[15px] text-acc font-bold mt-8 tracking-wide">
++          {PRICE_LINE}
++        </p>
++      </div>
++
++      <ThinRule className="mb-16" />
++
++      {/* ── MANIFEST LEDGER ───────────────────────────────── */}
++      <SectionLabel>SECTION 1 — RATION MANIFEST ({RATION_COUNT} ITEMS)</SectionLabel>
++
++      {/* Ledger column headers */}
++      <div
++        className="grid font-mono text-[10px] uppercase tracking-widest text-acc/40 pb-6 border-b-2 border-acc/20 mb-4 gap-x-8"
++        style={{ gridTemplateColumns: '28px 1fr auto auto' }}
++      >
++        <span>NO.</span>
++        <span>NOMENCLATURE</span>
++        <span className="text-right">SPEC</span>
++        <span className="text-right w-[80px] phone:w-[90px]">CADENCE</span>
++      </div>
++
++      {/* Monthly items */}
++      <div className="mb-12">
++        <div className="font-mono text-[10px] uppercase tracking-widest text-acc/30 pb-4">
++          NUTRITION ({monthlyItems.filter(i => i.category === 'NUTRITION').length})
++        </div>
++        {RATION_MANIFEST.filter(i => i.category === 'NUTRITION').map((item, idx, arr) => (
++          <LedgerRow key={item.line} item={item} isLast={idx === arr.length - 1} />
++        ))}
++      </div>
++
++      <div className="mb-12">
++        <div className="font-mono text-[10px] uppercase tracking-widest text-acc/30 pb-4">
++          HEALTH ({RATION_MANIFEST.filter(i => i.category === 'HEALTH').length})
++        </div>
++        {RATION_MANIFEST.filter(i => i.category === 'HEALTH').map((item, idx, arr) => (
++          <LedgerRow key={item.line} item={item} isLast={idx === arr.length - 1} />
++        ))}
++      </div>
++
++      <div className="mb-12">
++        <div className="font-mono text-[10px] uppercase tracking-widest text-acc/30 pb-4">
++          HYGIENE ({RATION_MANIFEST.filter(i => i.category === 'HYGIENE').length})
++        </div>
++        {RATION_MANIFEST.filter(i => i.category === 'HYGIENE').map((item, idx, arr) => (
++          <LedgerRow key={item.line} item={item} isLast={idx === arr.length - 1} />
++        ))}
++      </div>
++
++      <div className="mb-4">
++        <div className="font-mono text-[10px] uppercase tracking-widest text-acc/30 pb-4">
++          EQUIPMENT ({RATION_MANIFEST.filter(i => i.category === 'EQUIPMENT').length})
++        </div>
++        {RATION_MANIFEST.filter(i => i.category === 'EQUIPMENT').map((item, idx, arr) => (
++          <LedgerRow key={item.line} item={item} isLast={idx === arr.length - 1} />
++        ))}
++      </div>
++
++      <ThinRule className="mb-16 mt-8" />
++
++      {/* ── STATUS LINE ───────────────────────────────────── */}
++      <SectionLabel>SECTION 2 — STATUS</SectionLabel>
++      <div className="mb-16">
++        <StatusLine plan={planLabel} rationsStatus={rationStatus} />
++      </div>
++
++      {/* ── UPGRADE PROMPT (Month 2 will activate) ────────── */}
++      {!isOnStrength && (
++        <div className="mt-4">
++          <div
++            className={cn(
++              'border-2 border-acc/20 p-16 font-mono text-[12px]',
++              'flex flex-col gap-y-8'
++            )}
++          >
++            <div className="text-acc/50 uppercase tracking-widest text-[10px]">
++              UPGRADE PATH — USERSHIP → BASIC
++            </div>
++            <div className="text-acc leading-snug">
++              {isUsership
++                ? 'USERSHIP AI confirmed. BASIC ration available as additive layer (+USD 100.00/MO).'
++                : 'Requires USERSHIP / AI plan as base layer.'}
++            </div>
++            <div className="text-acc/40 text-[11px] mt-4">
++              ENROLLMENT OPENS — M2 BUILD CYCLE
++            </div>
++          </div>
++        </div>
++      )}
++    </div>
++  )
++}
+diff --git a/src/client/components/basics/doctrine.ts b/src/client/components/basics/doctrine.ts
+new file mode 100644
+index 000000000..d39dcc940
+--- /dev/null
++++ b/src/client/components/basics/doctrine.ts
+@@ -0,0 +1,56 @@
++/**
++ * LOT SYSTEMS CORPORATION
++ * Vadim Marmeladov — CEO, Owner LOT®
++ * LOT-FM-001 / BASIC RATION MODULE
++ * SECTION 1 — RATION MANIFEST + DOCTRINE
++ */
++
++export type RationCadence = 'MONTHLY' | 'QUARTERLY' | 'ANNUALLY'
++export type RationCategory = 'NUTRITION' | 'HEALTH' | 'HYGIENE' | 'EQUIPMENT'
++
++export type RationItem = {
++  line: string
++  nomenclature: string
++  spec: string
++  cadence: RationCadence
++  category: RationCategory
++}
++
++// 23-item civilian ration load per LOT-FM-001.
++// COGS ceiling: USD 40.00 landed. Margin floor: 60%.
++export const RATION_MANIFEST: RationItem[] = [
++  { line: '01', nomenclature: 'ROLLED OATS',                     spec: '40 OZ',           cadence: 'MONTHLY',   category: 'NUTRITION'  },
++  { line: '02', nomenclature: 'LENTILS, RED',                     spec: '2 LB',            cadence: 'MONTHLY',   category: 'NUTRITION'  },
++  { line: '03', nomenclature: 'RICE, BROWN LONG GRAIN',           spec: '3 LB',            cadence: 'MONTHLY',   category: 'NUTRITION'  },
++  { line: '04', nomenclature: 'COFFEE, DARK ROAST GROUND',        spec: '12 OZ',           cadence: 'MONTHLY',   category: 'NUTRITION'  },
++  { line: '05', nomenclature: 'HONEY, RAW WILDFLOWER',            spec: '12 OZ',           cadence: 'MONTHLY',   category: 'NUTRITION'  },
++  { line: '06', nomenclature: 'OLIVE OIL, COLD-PRESSED EVOO',     spec: '750 ML',          cadence: 'MONTHLY',   category: 'NUTRITION'  },
++  { line: '07', nomenclature: 'SALT, KOSHER',                     spec: '1 LB',            cadence: 'MONTHLY',   category: 'NUTRITION'  },
++  { line: '08', nomenclature: 'BLACK PEPPER, WHOLE',              spec: '2 OZ',            cadence: 'MONTHLY',   category: 'NUTRITION'  },
++  { line: '09', nomenclature: 'APPLE CIDER VINEGAR, RAW',         spec: '16 OZ',           cadence: 'MONTHLY',   category: 'NUTRITION'  },
++  { line: '10', nomenclature: 'SEEDS, MIXED (HEMP/CHIA/FLAX)',    spec: '12 OZ',           cadence: 'MONTHLY',   category: 'NUTRITION'  },
++  { line: '11', nomenclature: 'VITAMIN D3',                       spec: '2000 IU / 90 CT', cadence: 'MONTHLY',   category: 'HEALTH'     },
++  { line: '12', nomenclature: 'VITAMIN C',                        spec: '500 MG / 90 CT',  cadence: 'MONTHLY',   category: 'HEALTH'     },
++  { line: '13', nomenclature: 'ELECTROLYTE POWDER',               spec: '30 SRV',          cadence: 'MONTHLY',   category: 'HEALTH'     },
++  { line: '14', nomenclature: 'OMEGA-3, FISH OIL',                spec: '1000 MG / 60 CT', cadence: 'MONTHLY',   category: 'HEALTH'     },
++  { line: '15', nomenclature: 'PROBIOTIC, MULTI-STRAIN',          spec: '30 CT',           cadence: 'MONTHLY',   category: 'HEALTH'     },
++  { line: '16', nomenclature: 'MAGNESIUM GLYCINATE',              spec: '400 MG / 60 CT',  cadence: 'MONTHLY',   category: 'HEALTH'     },
++  { line: '17', nomenclature: 'ZINC, CHELATED',                   spec: '15 MG / 60 CT',   cadence: 'MONTHLY',   category: 'HEALTH'     },
++  { line: '18', nomenclature: 'SOAP, CASTILE UNSCENTED',          spec: '2 BAR',           cadence: 'MONTHLY',   category: 'HYGIENE'    },
++  { line: '19', nomenclature: 'RAZOR, SAFETY + BLADES',           spec: '1 HDL / 10 BL',   cadence: 'MONTHLY',   category: 'HYGIENE'    },
++  { line: '20', nomenclature: 'FLOSS, UNWAXED',                   spec: '2 CT',            cadence: 'MONTHLY',   category: 'HYGIENE'    },
++  { line: '21', nomenclature: 'TOOTHPASTE, FLUORIDE-FREE',        spec: '4 OZ',            cadence: 'QUARTERLY', category: 'HYGIENE'    },
++  { line: '22', nomenclature: 'DEODORANT, CRYSTAL MINERAL',       spec: '3.5 OZ',          cadence: 'QUARTERLY', category: 'HYGIENE'    },
++  { line: '23', nomenclature: 'JOURNAL, FIELD (LOT-FM)',          spec: '1 EA',            cadence: 'QUARTERLY', category: 'EQUIPMENT'  },
++]
++
++export const DOCTRINE_LINES = [
++  'BASIC is the physical layer of the LOT® System.',
++  'One ration per operator per month. Issued. Not sold.',
++  'The ledger is the marketing. No layer between public and manifest.',
++  'COGS ceiling: USD 40.00 landed. Margin floor: 60%. Never breached.',
++]
++
++export const PRICE_LINE = 'USD 100.00 / MO.'
++export const MANUAL_REF = 'LOT-FM-001'
++export const RATION_COUNT = 23
+diff --git a/src/client/components/ui/Layout.tsx b/src/client/components/ui/Layout.tsx
+index 83547a762..e8373bb68 100644
+--- a/src/client/components/ui/Layout.tsx
++++ b/src/client/components/ui/Layout.tsx
+@@ -20,7 +20,7 @@ import { Button } from './Button'
+ import { Page } from './Page'
+ import { cn } from '#client/utils'
+ 
+-type RouteName = 'sync' | 'logs' | 'system' | 'api' | 'settings'
++type RouteName = 'sync' | 'logs' | 'system' | 'api' | 'settings' | 'basics'
+ 
+ type NavItem = { label: string | null; spacer?: boolean; route?: RouteName }
+ 
+@@ -71,7 +71,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
+           { label: 'Sync', route: 'sync' },
+           { label: 'Log', route: 'logs' },
+           { label: 'System', route: 'system' },
+-          { label: 'Basics' },
++          { label: 'Basics', route: 'basics' },
+           { label: 'Self-care' },
+           { label: 'Kids' },
+           { label: 'Home' },
+@@ -83,7 +83,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
+           { label: 'Sync' },
+           { label: 'Logs' },
+           { label: 'System', route: 'system' },
+-          { label: 'Basics' },
++          { label: 'Basics', route: 'basics' },
+           { label: 'Self-care' },
+           { label: 'Kids' },
+           { label: 'Home' },
+diff --git a/src/client/entries/app.tsx b/src/client/entries/app.tsx
+index 97e91d979..f86565c35 100644
+--- a/src/client/entries/app.tsx
++++ b/src/client/entries/app.tsx
+@@ -19,6 +19,7 @@ import { Sync } from '#client/components/Sync'
+ import { DirectMessageThread } from '#client/components/DirectMessageThread'
+ import { StatusPage } from '#client/components/StatusPage'
+ import { ApiPage } from '#client/components/ApiPage'
++import { Basics } from '#client/components/Basics'
+ import { ConnectionStatus } from '#client/components/ConnectionStatus'
+ import { render } from '#client/utils/render'
+ import { listenSSE } from '#client/utils/sse'
+@@ -140,7 +141,7 @@ if (typeof window !== 'undefined') {
+   })
+ }
+ 
+-type PersistentRoute = 'system' | 'logs' | 'sync' | 'settings' | 'api'
++type PersistentRoute = 'system' | 'logs' | 'sync' | 'settings' | 'api' | 'basics'
+ 
+ const TabPanel = React.memo(function TabPanel({
+   active,
+@@ -199,6 +200,9 @@ const TabPanels = React.memo(function TabPanels() {
+       <TabPanel active={currentRoute === 'api'}>
+         <ApiPage />
+       </TabPanel>
++      <TabPanel active={currentRoute === 'basics'}>
++        <Basics />
++      </TabPanel>
+     </>
+   )
+ })
+diff --git a/src/client/stores/router.ts b/src/client/stores/router.ts
+index d139db7b8..3550a0bfc 100644
+--- a/src/client/stores/router.ts
++++ b/src/client/stores/router.ts
+@@ -18,6 +18,7 @@ type Routes = {
+   adminUser: 'userId'
+   logs: void
+   dm: 'userId'
++  basics: void
+ }
+ 
+ export const router = createRouter<Routes>({
+@@ -30,6 +31,7 @@ export const router = createRouter<Routes>({
+   adminUser: '/us/:userId',
+   logs: '/log',
+   dm: '/dm/:userId',
++  basics: '/basics',
+ })
+ 
+ export const goTo = <P extends keyof Routes>(
