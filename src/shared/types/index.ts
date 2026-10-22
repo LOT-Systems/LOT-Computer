@@ -200,6 +200,32 @@ export type DirectMessage = {
   updatedAt: Date;
 };
 
+// LOT Email (in-system mail: composed in Log, delivered to Sync)
+export type MailMessage = {
+  id: string;
+  senderId: string;
+  recipientId: string;
+  body: string;
+  source: 'log' | 'sync' | 'cohort';
+  readAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type MailInboxItem = {
+  id: string;
+  senderId: string;
+  senderName: string;
+  body: string;
+  isRead: boolean;
+  createdAt: string | Date;
+};
+
+export type MailRecipient = {
+  id: string;
+  name: string;
+};
+
 // Chat Message Types
 export type ChatMessage = {
   id: string;

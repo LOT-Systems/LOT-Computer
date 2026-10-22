@@ -380,6 +380,13 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'mail_message': {
+          // Private: deliver only to the addressee's connections
+          if (data.recipientId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4083,6 +4090,140 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
     }
+  })
+
+  // ============================================================================
+  // LOT EMAIL - in-system mail. Composed in Log (/email to <name>.),
+  // delivered to Sync. Same audience as Sync chat (Admin/R&D/Usership/Onyx/Legacy).
+  // ============================================================================
+  const MAIL_MAX_LENGTH = 2000
+
+  // Resolve a typed name to recipients
+  fastify.get('/mail/recipients', async (req: FastifyRequest<{
+    Querystring: { q?: string }
+  }>, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Mail requires Sync access' })
+    }
+    const q = String(req.query.q || '').trim().slice(0, 40)
+    if (!q) return []
+    const like = `${q.replace(/[%_\\]/g, '')}%`
+    const users = await fastify.models.User.findAll({
+      where: {
+        id: { [Op.ne]: req.user.id },
+        [Op.or]: [
+          { firstName: { [Op.iLike]: like } },
+          { lastName: { [Op.iLike]: like } },
+        ],
+      },
+      attributes: ['id', 'firstName', 'lastName', 'tags'],
+      limit: 20,
+    })
+    return users
+      .filter((u) => {
+        const tags = u.tags || []
+        return canAccessChat(tags) && !tags.includes('Suspended')
+      })
+      .slice(0, 5)
+      .map((u) => ({
+        id: u.id,
+        name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown',
+      }))
+  })
+
+  // Inbox (received mail, newest first)
+  fastify.get('/mail', async (req: FastifyRequest, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Mail requires Sync access' })
+    }
+    const rows = await fastify.models.MailMessage.findAll({
+      where: { recipientId: req.user.id },
+      order: [['createdAt', 'DESC']],
+      limit: 50,
+    })
+    const senderIds = [...new Set(rows.map((m) => m.senderId))]
+    const senders = senderIds.length
+      ? await fastify.models.User.findAll({
+          where: { id: senderIds },
+          attributes: ['id', 'firstName', 'lastName'],
+        })
+      : []
+    const names = new Map(
+      senders.map((u) => [u.id, `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown'])
+    )
+    return rows.map((m) => ({
+      id: m.id,
+      senderId: m.senderId,
+      senderName: names.get(m.senderId) || 'Unknown',
+      body: m.body,
+      isRead: !!m.readAt,
+      createdAt: m.createdAt,
+    }))
+  })
+
+  // Send mail
+  fastify.post('/mail', async (req: FastifyRequest<{
+    Body: { recipientId: string; body: string; source?: string }
+  }>, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Mail requires Sync access' })
+    }
+    const { recipientId } = req.body || ({} as any)
+    const body = String(req.body?.body || '').trim().slice(0, MAIL_MAX_LENGTH)
+    if (!recipientId || !body) {
+      return reply.status(400).send({ error: 'Recipient and body are required' })
+    }
+    if (recipientId === req.user.id) {
+      return reply.status(400).send({ error: 'Cannot mail yourself' })
+    }
+    const recipient = await fastify.models.User.findByPk(recipientId)
+    if (!recipient || !canAccessChat(recipient.tags || []) || (recipient.tags || []).includes('Suspended')) {
+      return reply.status(404).send({ error: 'Recipient not found' })
+    }
+    const source = ['log', 'sync', 'cohort'].includes(String(req.body.source))
+      ? (req.body.source as 'log' | 'sync' | 'cohort')
+      : 'log'
+    const mail = await fastify.models.MailMessage.create({
+      senderId: req.user.id,
+      recipientId,
+      body,
+      source,
+    })
+    sync.emit('mail_message', {
+      id: mail.id,
+      senderId: req.user.id,
+      senderName: `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim() || 'Unknown',
+      recipientId,
+      body: mail.body,
+      isRead: false,
+      createdAt: mail.createdAt,
+    })
+    process.nextTick(async () => {
+      try {
+        const context = await getLogContext(req.user)
+        await fastify.models.Log.create({
+          userId: req.user.id,
+          event: 'mail_sent',
+          text: '',
+          metadata: { mailId: mail.id, recipientId, source },
+          context,
+        })
+      } catch (logError) {
+        console.error('Error logging mail:', logError)
+      }
+    })
+    return { id: mail.id, createdAt: mail.createdAt }
+  })
+
+  // Mark mail read (recipient only)
+  fastify.post('/mail/:id/read', async (req: FastifyRequest<{
+    Params: { id: string }
+  }>, reply) => {
+    const [count] = await fastify.models.MailMessage.update(
+      { readAt: new Date() },
+      { where: { id: req.params.id, recipientId: req.user.id, readAt: null } }
+    )
+    return { updated: count }
   })
 
   // ============================================================================

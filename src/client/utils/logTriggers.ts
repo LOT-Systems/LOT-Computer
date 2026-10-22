@@ -41,6 +41,7 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'email-compose'     // /email to <name>.  — open LOT Email composer (terminated by a period)
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -70,6 +71,16 @@ const RULES: TriggerRule[] = [
 ]
 
 /**
+ * `/email to Hitomi.` — the closing period commits the recipient so a
+ * half-typed name never fires. Returns the typed name or null.
+ */
+const EMAIL_RE = /(?:^|\s)\/email\s+to\s+([^\n.]{1,40}?)\s*\.(?:\s|$)/i
+export function parseEmailCommand(text: string): string | null {
+  const m = EMAIL_RE.exec(text || '')
+  return m ? m[1].trim() : null
+}
+
+/**
  * Returns every trigger present in `text`. An empty array means the
  * text is ordinary. Order reflects the order of `RULES`, not the
  * text — call sites that need "first occurrence" can scan manually.
@@ -94,6 +105,8 @@ export function detectTriggers(text: string): LogTrigger[] {
 
     if (hasEmoji || hasKeyword) hits.push(rule.trigger)
   }
+
+  if (parseEmailCommand(text)) hits.push('email-compose')
 
   return hits
 }

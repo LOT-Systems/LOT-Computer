@@ -17,6 +17,8 @@ import {
   AdminUsersSort,
   ChatMessageLikePayload,
   DefaultQuestion,
+  MailInboxItem,
+  MailRecipient,
   Log,
   Paginated,
   PublicChatMessage,
@@ -119,6 +121,28 @@ export const useSendDirectMessage = createMutation<
   { receiverId: string; message: string },
   void
 >('post', '/api/direct-messages')
+
+// LOT Email
+export async function findMailRecipients(q: string): Promise<MailRecipient[]> {
+  const { data } = await api.get<MailRecipient[]>('/api/mail/recipients', {
+    params: { q },
+  })
+  return data
+}
+
+export const useMailInbox = createQuery<MailInboxItem[]>('/api/mail', {
+  refetchOnWindowFocus: true,
+})
+
+export const useSendMail = createMutation<
+  { recipientId: string; body: string; source: 'log' | 'sync' | 'cohort' },
+  { id: string }
+>('post', '/api/mail')
+
+export const useMarkMailRead = createMutation<{ id: string }, void>(
+  'post',
+  (data) => `/api/mail/${data.id}/read`
+)
 
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
