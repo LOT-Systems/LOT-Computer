@@ -102,6 +102,8 @@ function LoadingDots() {
 }
 
 export const System = React.memo(function SystemInner() {
+  // One 20% roll per mount — a Math.random() in render made Subscribe flicker on every re-render
+  const subscribeRoll = React.useRef(Math.random())
   const me = useStore(stores.me)
   const weather = useStore(stores.weather)
   const theme = useStore(stores.theme)
@@ -937,7 +939,7 @@ export const System = React.memo(function SystemInner() {
           }
 
           // Random 20% chance to show when all conditions met
-          const shouldShow = Math.random() < 0.2
+          const shouldShow = subscribeRoll.current < 0.2
           return shouldShow && <div><SubscribeWidget /></div>
         })()}
       </WidgetErrorBoundary>
