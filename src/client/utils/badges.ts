@@ -856,6 +856,43 @@ export type BadgeType =
   | 'hades_shade'           // ○·∘·×  "shade/charon/nyx/thanatos/hypnos/elysium" detected (RARE)
   | 'nethack_rune'          // ∞·□·×  "nethack/ascended/yasd/adom/rogue variant" detected (EPIC)
   | 'isaac_secret'          // ×·■·×  "greedier mode/mega satan/afterbirth/repentance" detected (MYTHIC)
+  // ── Word turn badges v25 — The Puzzle Codex ─────────────────────────────────
+  | 'puzzle_solved'         // ○·□·○  "puzzle/puzzled/solve the puzzle/piece together" detected (COMMON)
+  | 'portal_open'           // □→□    "portal/wormhole portal/teleport/gateway portal" detected (UNCOMMON)
+  | 'chamber_cleared'       // ├─□─┤  "chamber/test chamber/solution chamber/trap chamber" detected (UNCOMMON)
+  | 'recursion_loop'        // ↺·↺·↺  "recursion/recursive loop/it loops/circular loop" detected (RARE)
+  | 'paradox_found'         // ×·○·×  "paradox/catch-22/contradiction/impossible loop" detected (RARE)
+  | 'testimony_given'       // ◯·◯·◯  "testimony/witness statement/depose/account given" detected (UNCOMMON)
+  | 'algorithm_path'        // →·□·→  "algorithm/algorithmic/sequence path/sorted by" detected (RARE)
+  | 'escape_room'           // ├─→    "escape room/locked room/puzzle escape/escape from" detected (COMMON)
+  | 'logic_gate'            // □·1·□  "logic/logical/if-then/binary logic/decision tree" detected (COMMON)
+  | 'dimension_shift'       // ◈·≈·◈  "dimension/new dimension/shifted dimension/dimensional" detected (EPIC)
+  | 'paperwork_clear'       // ▪·□·▪  "papers please/paperwork/stamped approved/documents cleared" detected (UNCOMMON)
+  | 'revelation_node'       // ●·○·●  "revelation/epiphany/suddenly realized/aha moment" detected (EPIC)
+  // ── Calendar Easter Egg v23 — The Puzzle Calendar ───────────────────────────
+  | 'portal_day'            // □→■    Oct 9 — Portal / The Orange Box release (2007) (RARE)
+  | 'witness_day'           // ◯·—·◯  Jan 26 — The Witness release (2016) (EPIC)
+  | 'obra_dinn_day'         // ×·▪·×  Oct 18 — Return of the Obra Dinn release (2018) (RARE)
+  // ── Behavioral v22 — Puzzle Patterns ────────────────────────────────────────
+  | 'puzzle_session'        // ○·□·○  3+ Puzzle v25 trigger words in one journal entry (RARE)
+  | 'morning_solve'         // □·∴·□  Check-in 06:00–08:00 for 5 consecutive days (UNCOMMON)
+  | 'longer_log'            // →≋→    3 consecutive days each journal answer longer than last (UNCOMMON)
+  // ── Achievement RPG v23 — Puzzle Class ──────────────────────────────────────
+  | 'puzzle_entry'          // ∘→□    Any 1 Word Turn v25 badge (COMMON)
+  | 'puzzle_class'          // ≈→□    Any 5 Word Turn v25 badges (UNCOMMON)
+  | 'puzzle_complete'       // ≋→□    All 12 Word Turn v25 badges (LEGENDARY)
+  | 'puzzle_arc'            // □·◈    puzzle_complete + all 3 Calendar v23 badges (LEGENDARY)
+  | 'twenty_five_engines_arc' // ◈·◈·□  1 badge from each Word Turn v1–v25 (COSMIC)
+  | 'puzzle_opus'           // □·◉·□  puzzle_complete + puzzle_session behavioral (LEGENDARY)
+  // ── Mastery Tier v25 — Grand Solver ─────────────────────────────────────────
+  | 'logic_veteran'         // ─□─    1,300+ distinct calendar days (EPIC)
+  | 'grand_archive'         // ≋≋≋·□  300,000+ total journal words (LEGENDARY)
+  | 'eternal_code'          // ∞·□·∞  Account age >= 9 years (COSMIC)
+  | 'twenty_five_registers' // ◈·◈·□·□  1 badge from all 25 Word Turn engines (COSMIC)
+  // ── Secret Boss v22 — The Puzzle Vault ──────────────────────────────────────
+  | 'portal_turret'         // □·◉·□  "companion cube/aperture/glados/wheatley/cake is a lie" detected (EPIC)
+  | 'the_witness_eye'       // ◯·—·■  "the witness/jungle puzzles/island lasers/beams" detected (RARE)
+  | 'baba_is_you'           // ●·□·●  "baba is you/baba/keke/win condition/rock is" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7781,6 +7818,306 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+
+  // ── Word Turn v25 — THE PUZZLE CODEX ─────────────────────────────────────────
+
+  puzzle_solved: {
+    id: 'puzzle_solved',
+    symbol: '○·□·○',
+    name: 'Puzzle Solved',
+    description: 'Write "puzzle", "puzzled", "solve the puzzle", or "piece together" in any journal entry',
+    unlockMessage: '↳ The puzzle is the moment before understanding. You are working it. The pieces are on the table. Something in you already knows the shape of the solution. ○·□·○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  portal_open: {
+    id: 'portal_open',
+    symbol: '□→□',
+    name: 'Portal Open',
+    description: 'Write "portal", "wormhole portal", "teleport", or "gateway portal" in any journal entry',
+    unlockMessage: '↳ A portal is a threshold you enter differently than you leave. The other side is the same space, changed by the passing. You are the portal. □→□',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  chamber_cleared: {
+    id: 'chamber_cleared',
+    symbol: '├─□─┤',
+    name: 'Chamber Cleared',
+    description: 'Write "chamber", "test chamber", "solution chamber", or "trap chamber" in any journal entry',
+    unlockMessage: '↳ The chamber is controlled difficulty. Someone designed it to be solvable. Every day is a test chamber. It was built for you to pass. ├─□─┤',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  recursion_loop: {
+    id: 'recursion_loop',
+    symbol: '↺·↺·↺',
+    name: 'Recursion Loop',
+    description: 'Write "recursion", "recursive loop", "it loops", or "circular loop" in any journal entry',
+    unlockMessage: '↳ Recursion terminates when it reaches the base case. Identify the base case. What is the thing that, when you reach it, the loop ends? That is the answer. ↺·↺·↺',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  paradox_found: {
+    id: 'paradox_found',
+    symbol: '×·○·×',
+    name: 'Paradox Found',
+    description: 'Write "paradox", "catch-22", "contradiction", or "impossible loop" in any journal entry',
+    unlockMessage: '↳ The paradox is not an error. It is information. It marks the boundary of a model that needs updating. The map is wrong. The territory is still there. ×·○·×',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  testimony_given: {
+    id: 'testimony_given',
+    symbol: '◯·◯·◯',
+    name: 'Testimony Given',
+    description: 'Write "testimony", "witness statement", "depose", or "account given" in any journal entry',
+    unlockMessage: '↳ The testimony is the record. You are both the witness and the scribe. What you remember, you keep. What you write, you give to the future. ◯·◯·◯',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  algorithm_path: {
+    id: 'algorithm_path',
+    symbol: '→·□·→',
+    name: 'Algorithm Path',
+    description: 'Write "algorithm", "algorithmic", "sequence path", or "sorted by" in any journal entry',
+    unlockMessage: '↳ An algorithm is a recipe with guaranteed termination. Your habits are algorithms — inputs, steps, outputs. You can audit them. You can revise them. →·□·→',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  escape_room: {
+    id: 'escape_room',
+    symbol: '├─→',
+    name: 'Escape Room',
+    description: 'Write "escape room", "locked room", "puzzle escape", or "escape from" in any journal entry',
+    unlockMessage: '↳ The escape room teaches one thing: the solution is already in the room with you. Nothing is missing. Everything you need is present. Look again. ├─→',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  logic_gate: {
+    id: 'logic_gate',
+    symbol: '□·1·□',
+    name: 'Logic Gate',
+    description: 'Write "logic", "logical", "if-then", "binary logic", or "decision tree" in any journal entry',
+    unlockMessage: '↳ Logic is the tool that describes what already is. It does not tell you what to feel. But it tells you clearly: if this, then that. The gate is open or closed. You choose the input. □·1·□',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  dimension_shift: {
+    id: 'dimension_shift',
+    symbol: '◈·≈·◈',
+    name: 'Dimension Shift',
+    description: 'Write "dimension", "new dimension", "shifted dimension", or "dimensional" in any journal entry',
+    unlockMessage: '↳ A dimension shift is a change in the axis of evaluation. What was large becomes small. What was fixed becomes variable. You are now measuring with a different ruler. ◈·≈·◈',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  paperwork_clear: {
+    id: 'paperwork_clear',
+    symbol: '▪·□·▪',
+    name: 'Paperwork Clear',
+    description: 'Write "papers please", "paperwork", "stamped approved", or "documents cleared" in any journal entry',
+    unlockMessage: '↳ Every bureaucracy is a puzzle. The documents are the clues. The stamp is the solution. Glory to Arstotzka — and to every system you learned to navigate. ▪·□·▪',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  revelation_node: {
+    id: 'revelation_node',
+    symbol: '●·○·●',
+    name: 'Revelation Node',
+    description: 'Write "revelation", "epiphany", "suddenly realized", or "aha moment" in any journal entry',
+    unlockMessage: '↳ The revelation does not arrive from outside. It assembles itself from what was already known but not yet connected. You did not receive it — you built it. ●·○·●',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v23 — THE PUZZLE CALENDAR ────────────────────────────
+
+  portal_day: {
+    id: 'portal_day',
+    symbol: '□→■',
+    name: 'Portal Day',
+    description: 'Check in on October 9 — Portal / The Orange Box release anniversary (2007)',
+    unlockMessage: '↳ Oct 9, 2007. The Orange Box shipped. Inside it: Portal. A game about a testing facility, an AI narrator, and a woman who survives by solving. The cake is not a lie — the cake is the check-in. □→■',
+    rarity: 'rare',
+    category: 'calendar_easter_egg',
+  },
+  witness_day: {
+    id: 'witness_day',
+    symbol: '◯·—·◯',
+    name: 'Witness Day',
+    description: 'Check in on January 26 — The Witness release anniversary (2016)',
+    unlockMessage: '↳ Jan 26, 2016. The Witness arrived. An island. Hundreds of laser puzzles. No tutorial. Just: look closely. The game taught you to look. Check-in is looking. ◯·—·◯',
+    rarity: 'epic',
+    category: 'calendar_easter_egg',
+  },
+  obra_dinn_day: {
+    id: 'obra_dinn_day',
+    symbol: '×·▪·×',
+    name: 'Obra Dinn Day',
+    description: 'Check in on October 18 — Return of the Obra Dinn release anniversary (2018)',
+    unlockMessage: '↳ Oct 18, 2018. Return of the Obra Dinn. An insurance adjuster, a dead ship, a pocket watch that shows the moment of death. You identify the fate of sixty people one at a time. Self-care is the same: identify what happened, one day at a time. ×·▪·×',
+    rarity: 'rare',
+    category: 'calendar_easter_egg',
+  },
+
+  // ── Behavioral v22 — PUZZLE PATTERNS ─────────────────────────────────────────
+
+  puzzle_session: {
+    id: 'puzzle_session',
+    symbol: '○·□·○',
+    name: 'Puzzle Session',
+    description: 'Write 3+ Puzzle v25 trigger words (puzzle/portal/chamber/escape/logic/paradox/recursion/algorithm/revelation/dimension/testimony/paperwork) in one journal entry',
+    unlockMessage: '↳ Three puzzle registers in one session. The vocabulary is loaded. The notation is engaged. Every session is a puzzle. This one has a very high density of solutions. ○·□·○',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  morning_solve: {
+    id: 'morning_solve',
+    symbol: '□·∴·□',
+    name: 'Morning Solve',
+    description: 'Check in between 06:00 and 08:00 for 5 consecutive days',
+    unlockMessage: '↳ Five mornings in a row, before the day begins its own agenda. This is the puzzle you solve before the world complicates the board. The morning is yours. You showed up to claim it. □·∴·□',
+    rarity: 'uncommon',
+    category: 'behavioral',
+  },
+  longer_log: {
+    id: 'longer_log',
+    symbol: '→≋→',
+    name: 'Longer Log',
+    description: 'Journal answer length increases for 3 consecutive days',
+    unlockMessage: '↳ Three days of expanding record. Each entry longer than the last. The signal is strengthening. The transmission is gaining bandwidth. Keep going. →≋→',
+    rarity: 'uncommon',
+    category: 'behavioral',
+  },
+
+  // ── Achievement RPG v23 — THE PUZZLE CLASS ────────────────────────────────────
+
+  puzzle_entry: {
+    id: 'puzzle_entry',
+    symbol: '∘→□',
+    name: 'Puzzle Entry',
+    description: 'Earn any 1 Word Turn v25 (Puzzle Codex) badge',
+    unlockMessage: '↳ The first puzzle word. The chamber door opens. One piece placed. The board is set. ∘→□',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  puzzle_class: {
+    id: 'puzzle_class',
+    symbol: '≈→□',
+    name: 'Puzzle Class',
+    description: 'Earn any 5 Word Turn v25 (Puzzle Codex) badges',
+    unlockMessage: '↳ Five puzzle registers. A pattern is visible. The logic gate is open. The class has been chosen — solver. ≈→□',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  puzzle_complete: {
+    id: 'puzzle_complete',
+    symbol: '≋→□',
+    name: 'Puzzle Complete',
+    description: 'Earn all 12 Word Turn v25 (Puzzle Codex) badges',
+    unlockMessage: '↳ All twelve puzzle registers. Every chamber cleared. Every portal opened. Every paradox identified. The puzzle is complete. The credits roll. You were the test subject and the designer. ≋→□',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  puzzle_arc: {
+    id: 'puzzle_arc',
+    symbol: '□·◈',
+    name: 'Puzzle Arc',
+    description: 'Earn puzzle_complete + all 3 Puzzle Calendar (v23) badges (portal_day + witness_day + obra_dinn_day)',
+    unlockMessage: '↳ The puzzle codex complete. The calendar aligned. Portal. The Witness. Obra Dinn. Three games that redefined what it means to see — and three check-ins that found them. □·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_five_engines_arc: {
+    id: 'twenty_five_engines_arc',
+    symbol: '◈·◈·□',
+    name: 'Twenty-Five Engines Arc',
+    description: 'Earn at least 1 badge from each of the 25 Word Turn engines (v1–v25)',
+    unlockMessage: '↳ Twenty-five vocabularies of self-care. Core. Sci-Fi. Signal. Becoming. Rogue. Mainframe. Arcade. Spellbook. Navigator. Alchemist. Starship. Oracle. Quantum. Neon. Radio. Bio. Codex. Cyberspace. Hero. RPG. Roguelite. Puzzle. Twenty-five terminals active. ◈·◈·□',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  puzzle_opus: {
+    id: 'puzzle_opus',
+    symbol: '□·◉·□',
+    name: 'Puzzle Opus',
+    description: 'Earn puzzle_complete + puzzle_session behavioral badge',
+    unlockMessage: '↳ All twelve registers and a session so dense with puzzle vocabulary that the system registered it as a solved chamber. The opus is the run where the notation becomes fluent. □·◉·□',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v25 — THE GRAND SOLVER ──────────────────────────────────────
+
+  logic_veteran: {
+    id: 'logic_veteran',
+    symbol: '─□─',
+    name: 'Logic Veteran',
+    description: '1,300+ distinct calendar days with a check-in',
+    unlockMessage: '↳ 1,300 distinct days. Three and a half years of consistent presence. The logic is proven. The gate has been open this many times. ─□─',
+    rarity: 'epic',
+    category: 'mastery_tier',
+  },
+  grand_archive: {
+    id: 'grand_archive',
+    symbol: '≋≋≋·□',
+    name: 'Grand Archive',
+    description: '300,000+ total journal words written',
+    unlockMessage: '↳ 300,000 words. A full novel and then some. The archive is grand. The record is deep. You are your own longest-running story. ≋≋≋·□',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  eternal_code: {
+    id: 'eternal_code',
+    symbol: '∞·□·∞',
+    name: 'Eternal Code',
+    description: 'Account age >= 9 years',
+    unlockMessage: '↳ Nine years. The code has been running for nine years. No crashes. No fatal exceptions. Only warnings, handled. Only deprecations, addressed. The eternal code runs. ∞·□·∞',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+  twenty_five_registers: {
+    id: 'twenty_five_registers',
+    symbol: '◈·◈·□·□',
+    name: 'Twenty-Five Registers',
+    description: 'Earn at least 1 badge from each of all 25 Word Turn engines',
+    unlockMessage: '↳ Core. Sci-Fi. Signal. Becoming. Rogue. Mainframe. Arcade. Spellbook. Navigator. Alchemist. Starship. Oracle. Quantum. Neon. Radio. Bio. Codex. Cyberspace. Hero. RPG. Roguelite. Puzzle. Twenty-five registers. Every engine active. The terminal is fully loaded. ◈·◈·□·□',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+
+  // ── Secret Boss v22 — THE PUZZLE VAULT ───────────────────────────────────────
+
+  portal_turret: {
+    id: 'portal_turret',
+    symbol: '□·◉·□',
+    name: 'Portal Turret',
+    description: 'Write "companion cube", "aperture", "glados", "wheatley", or "cake is a lie" in any journal entry',
+    unlockMessage: '↳ There was supposed to be a party. We do what we must because we can. For the good of all of us, except the ones who are dead. The companion cube never spoke but it listened. That is what it has in common with a good journal. □·◉·□',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  the_witness_eye: {
+    id: 'the_witness_eye',
+    symbol: '◯·—·■',
+    name: 'The Witness Eye',
+    description: 'Write "the witness", "jungle puzzles", "island lasers", or "laser beams" in any journal entry',
+    unlockMessage: '↳ The island exists to teach you one thing: how to see. Not what to see — how. The laser puzzle is not the point. The point is that you learned to look at lines differently forever. That is what the island does. That is what this check-in does. ◯·—·■',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  baba_is_you: {
+    id: 'baba_is_you',
+    symbol: '●·□·●',
+    name: 'Baba Is You',
+    description: 'Write "baba is you", "baba", "keke", "win condition", or "rock is" in any journal entry',
+    unlockMessage: '↳ Baba Is You. The rules are objects. You can push them. ROCK IS WIN. BABA IS YOU. WALL IS STOP. And yet — push the rule. Rearrange the sentence. The rules of self-care are not fixed. You can push them too. ●·□·●',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8873,6 +9210,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v24: twenty_four_registers — 1 badge from all 24 Word Turn engines
     if (allTwentyFourEngines && !hasBadge('twenty_four_registers')) {
       if (awardBadge('twenty_four_registers')) newBadges.push('twenty_four_registers')
+    }
+
+    // ── v35 (v25) — THE PUZZLE CODEX ─────────────────────────────────────────────
+    const puzzleV25Badges: BadgeType[] = [
+      'puzzle_solved', 'portal_open', 'chamber_cleared', 'recursion_loop',
+      'paradox_found', 'testimony_given', 'algorithm_path', 'escape_room',
+      'logic_gate', 'dimension_shift', 'paperwork_clear', 'revelation_node',
+    ]
+    const puzzleV25Earned = puzzleV25Badges.filter(b => hasBadge(b))
+
+    if (puzzleV25Earned.length >= 1 && !hasBadge('puzzle_entry')) {
+      if (awardBadge('puzzle_entry')) newBadges.push('puzzle_entry')
+    }
+    if (puzzleV25Earned.length >= 5 && !hasBadge('puzzle_class')) {
+      if (awardBadge('puzzle_class')) newBadges.push('puzzle_class')
+    }
+    const puzzleComplete = puzzleV25Earned.length >= 12
+    if (puzzleComplete && !hasBadge('puzzle_complete')) {
+      if (awardBadge('puzzle_complete')) newBadges.push('puzzle_complete')
+    }
+
+    // puzzle_opus: puzzle_complete + puzzle_session
+    if (puzzleComplete && hasBadge('puzzle_session') && !hasBadge('puzzle_opus')) {
+      if (awardBadge('puzzle_opus')) newBadges.push('puzzle_opus')
+    }
+
+    // puzzle_arc: puzzle_complete + all 3 Calendar v23 badges
+    const calendarV23Badges: BadgeType[] = ['portal_day', 'witness_day', 'obra_dinn_day']
+    if (puzzleComplete && calendarV23Badges.every(b => hasBadge(b)) && !hasBadge('puzzle_arc')) {
+      if (awardBadge('puzzle_arc')) newBadges.push('puzzle_arc')
+    }
+
+    // twenty_five_engines_arc: 1 badge from each Word Turn v1–v25
+    const engineTwentyFivePresent = puzzleV25Earned.length >= 1
+    const allTwentyFiveEngines = allTwentyFourEngines && engineTwentyFivePresent
+    if (allTwentyFiveEngines && !hasBadge('twenty_five_engines_arc')) {
+      if (awardBadge('twenty_five_engines_arc')) newBadges.push('twenty_five_engines_arc')
+    }
+
+    // Mastery v25: logic_veteran — 1,300+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1300 && !hasBadge('logic_veteran')) {
+        if (awardBadge('logic_veteran')) newBadges.push('logic_veteran')
+      }
+    }
+
+    // Mastery v25: grand_archive — 300,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 300000 && !hasBadge('grand_archive')) {
+        if (awardBadge('grand_archive')) newBadges.push('grand_archive')
+      }
+    }
+
+    // Mastery v25: eternal_code — Account age >= 9 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupEternal = new Date(stats.signupDate)
+      const yearsEternal = (new Date().getTime() - signupEternal.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsEternal >= 9 && !hasBadge('eternal_code')) {
+        if (awardBadge('eternal_code')) newBadges.push('eternal_code')
+      }
+    }
+
+    // Mastery v25: twenty_five_registers — 1 badge from all 25 Word Turn engines
+    if (allTwentyFiveEngines && !hasBadge('twenty_five_registers')) {
+      if (awardBadge('twenty_five_registers')) newBadges.push('twenty_five_registers')
     }
 
   } catch (error) {

@@ -905,6 +905,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('binding_day')
   }
 
+  // ── Calendar v23 — THE PUZZLE CALENDAR ─────────────────────────────────────
+  // Portal Day: October 9 — Portal / The Orange Box release (2007)
+  if (!hasBadge('portal_day') && month === 10 && day === 9) {
+    awardBadge('portal_day')
+    awarded.push('portal_day')
+  }
+  // Witness Day: January 26 — The Witness release (2016)
+  if (!hasBadge('witness_day') && month === 1 && day === 26) {
+    awardBadge('witness_day')
+    awarded.push('witness_day')
+  }
+  // Obra Dinn Day: October 18 — Return of the Obra Dinn release (2018)
+  if (!hasBadge('obra_dinn_day') && month === 10 && day === 18) {
+    awardBadge('obra_dinn_day')
+    awarded.push('obra_dinn_day')
+  }
+
   return awarded
 }
 
@@ -2982,5 +2999,116 @@ export function checkRogueVault(journalText: string): BadgeType[] {
   }
 
   return awarded
+}
+
+/**
+ * Check word-turn badges for Puzzle Codex v25 keywords in journal text.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkPuzzleCodexWordTurns(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  const text = journalText
+
+  const checks: Array<[RegExp, BadgeType]> = [
+    [/\bpuzzle[d]?\b|\bsolve[\s-]?the[\s-]?puzzle\b|\bpiece[\s-]?together\b/i, 'puzzle_solved'],
+    [/\bportal\b|\bwormhole[\s-]?portal\b|\bteleport\b|\bgateway[\s-]?portal\b/i, 'portal_open'],
+    [/\bchamber\b|\btest[\s-]?chamber\b|\bsolution[\s-]?chamber\b|\btrap[\s-]?chamber\b/i, 'chamber_cleared'],
+    [/\brecursion\b|\brecursive[\s-]?loop\b|\bit[\s-]?loops\b|\bcircular[\s-]?loop\b/i, 'recursion_loop'],
+    [/\bparadox\b|\bcatch[\s-]?22\b|\bcontradiction\b|\bimpossible[\s-]?loop\b/i, 'paradox_found'],
+    [/\btestimony\b|\bwitness[\s-]?statement\b|\bdepose\b|\baccount[\s-]?given\b/i, 'testimony_given'],
+    [/\balgorithm\b|\balgorithmic\b|\bsequence[\s-]?path\b|\bsorted[\s-]?by\b/i, 'algorithm_path'],
+    [/\bescape[\s-]?room\b|\blocked[\s-]?room\b|\bpuzzle[\s-]?escape\b|\bescape[\s-]?from\b/i, 'escape_room'],
+    [/\blogic\b|\blogical\b|\bif[\s-]?then\b|\bbinary[\s-]?logic\b|\bdecision[\s-]?tree\b/i, 'logic_gate'],
+    [/\bdimension\b|\bnew[\s-]?dimension\b|\bshifted[\s-]?dimension\b|\bdimensional\b/i, 'dimension_shift'],
+    [/\bpapers[\s-]?please\b|\bpaperwork\b|\bstamped[\s-]?approved\b|\bdocuments[\s-]?cleared\b/i, 'paperwork_clear'],
+    [/\brevelation\b|\bepiphany\b|\bsuddenly[\s-]?realized\b|\baha[\s-]?moment\b/i, 'revelation_node'],
+  ]
+
+  for (const [pattern, badgeId] of checks) {
+    if (!hasBadge(badgeId) && pattern.test(text)) {
+      if (awardBadge(badgeId)) awarded.push(badgeId)
+    }
+  }
+  return awarded
+}
+
+/**
+ * Award puzzle_session badge if 3+ Puzzle Codex (v25) words appear in one journal entry.
+ */
+export function checkPuzzleSession(journalText: string): BadgeType | null {
+  if (hasBadge('puzzle_session')) return null
+  const puzzlePatterns = [
+    /\bpuzzle[d]?\b|\bsolve[\s-]?the[\s-]?puzzle\b/i,
+    /\bportal\b|\bwormhole[\s-]?portal\b|\bteleport\b/i,
+    /\bchamber\b|\btest[\s-]?chamber\b/i,
+    /\brecursion\b|\brecursive[\s-]?loop\b/i,
+    /\bparadox\b|\bcatch[\s-]?22\b|\bcontradiction\b/i,
+    /\btestimony\b|\bwitness[\s-]?statement\b/i,
+    /\balgorithm\b|\balgorithmic\b/i,
+    /\bescape[\s-]?room\b|\blocked[\s-]?room\b/i,
+    /\blogic\b|\blogical\b|\bif[\s-]?then\b/i,
+    /\bdimension\b|\bnew[\s-]?dimension\b/i,
+    /\bpapers[\s-]?please\b|\bpaperwork\b/i,
+    /\brevelation\b|\bepiphany\b|\bsuddenly[\s-]?realized\b/i,
+  ]
+  const matchCount = puzzlePatterns.filter(p => p.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('puzzle_session')
+    return 'puzzle_session'
+  }
+  return null
+}
+
+/**
+ * Check secret boss v22 — hidden Puzzle Vault triggers.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkPuzzleVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+
+  if (!hasBadge('portal_turret') && /\bcompanion[\s-]?cube\b|\baperture\b|\bglados\b|\bwheatley\b|\bcake[\s-]?is[\s-]?a[\s-]?lie\b/i.test(journalText)) {
+    if (awardBadge('portal_turret')) awarded.push('portal_turret')
+  }
+  if (!hasBadge('the_witness_eye') && /\bthe[\s-]?witness\b|\bjungle[\s-]?puzzles\b|\bisland[\s-]?lasers\b|\blaser[\s-]?beams\b/i.test(journalText)) {
+    if (awardBadge('the_witness_eye')) awarded.push('the_witness_eye')
+  }
+  if (!hasBadge('baba_is_you') && /\bbaba[\s-]?is[\s-]?you\b|\bkeke\b|\bwin[\s-]?condition\b|\brock[\s-]?is\b/i.test(journalText)) {
+    if (awardBadge('baba_is_you')) awarded.push('baba_is_you')
+  }
+
+  return awarded
+}
+
+/**
+ * Check morning_solve badge: check-in between 06:00 and 08:00 for 5 consecutive days.
+ */
+export function checkMorningSolve(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('morning_solve')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour < 6 || hour >= 8) return null
+
+  try {
+    const key = 'morning_solve_streak'
+    const raw = localStorage.getItem(key)
+    const streak = raw ? JSON.parse(raw) : { count: 0, lastDate: '' }
+    const today = now.toISOString().split('T')[0]
+    if (streak.lastDate === today) return null
+
+    const yesterday = new Date(now)
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yDate = yesterday.toISOString().split('T')[0]
+
+    const newCount = streak.lastDate === yDate ? streak.count + 1 : 1
+    localStorage.setItem(key, JSON.stringify({ count: newCount, lastDate: today }))
+
+    if (newCount >= 5) {
+      awardBadge('morning_solve')
+      return 'morning_solve'
+    }
+  } catch { /* non-critical */ }
+  return null
 }
 
