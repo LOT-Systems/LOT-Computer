@@ -177,3 +177,47 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Build a Date whose local getters (getHours/getDate/...) read the wall-clock
+ * of `timeZone`, so the readers above reflect a user's saved timeZone rather
+ * than the device's. Falls back to the input on a missing/invalid timeZone.
+ */
+export function toZonedWallClockDate(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(date)
+    const get = (type: string) => Number(parts.find(p => p.type === type)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return date
+  }
+}
+
+/**
+ * Cross-reference the ambient reading with the astrology snapshots already
+ * stored on log entries (context.astro*): how many entries were written
+ * under today's rokuyo and moon phase. Pure, so System and future widgets
+ * can share it.
+ */
+export function summarizeAstroLogs(
+  logs: Array<{ context?: Record<string, any> | null }>,
+  reading: { rokuyo: string; moonPhase: string }
+): { sameRokuyo: number; sameMoonPhase: number; total: number } {
+  let sameRokuyo = 0
+  let sameMoonPhase = 0
+  let total = 0
+  for (const log of logs) {
+    const ctx = log.context
+    if (!ctx?.astroRokuyo) continue
+    total++
+    if (ctx.astroRokuyo === reading.rokuyo) sameRokuyo++
+    if (ctx.astroMoonPhase === reading.moonPhase) sameMoonPhase++
+  }
+  return { sameRokuyo, sameMoonPhase, total }
+}

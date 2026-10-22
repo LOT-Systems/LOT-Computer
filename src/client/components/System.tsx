@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo, toZonedWallClockDate, summarizeAstroLogs } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -205,7 +205,8 @@ export const System = React.memo(function SystemInner() {
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
   // rokuyo), not a personal natal chart.
   const astrology = React.useMemo(() => {
-    const now = new Date()
+    // Honor the user's saved timeZone so the dashboard matches their Logs snapshots
+    const now = toZonedWallClockDate(new Date(), me?.timeZone)
     const hourlyZodiac = getHourlyZodiac(now)
     const westernZodiac = getWesternZodiac(now)
     const moonPhase = getMoonPhase(now)
@@ -219,7 +220,13 @@ export const System = React.memo(function SystemInner() {
       rokuyo,
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+  }, [astrologyTick, me?.timeZone])
+
+  // Logs sync: entries already written under today's rokuyo / moon phase
+  const astrologyLogSync = React.useMemo(
+    () => summarizeAstroLogs(logs, astrology),
+    [logs, astrology.rokuyo, astrology.moonPhase]
+  )
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
@@ -467,6 +474,11 @@ export const System = React.memo(function SystemInner() {
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
+            {astrologyLogSync.sameRokuyo > 0 && (
+              <div className="opacity-60">
+                {astrologyLogSync.sameRokuyo} log{astrologyLogSync.sameRokuyo === 1 ? '' : 's'} under {astrology.rokuyo}
+              </div>
+            )}
           </Block>
         </div>
 
@@ -670,9 +682,16 @@ export const System = React.memo(function SystemInner() {
           }}
         >
           {astrologyView === 'astrology' ? (
+            <>
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
+            {astrologyLogSync.sameRokuyo > 0 && (
+              <div className="opacity-60">
+                {astrologyLogSync.sameRokuyo} log{astrologyLogSync.sameRokuyo === 1 ? '' : 's'} under {astrology.rokuyo}
+              </div>
+            )}
+            </>
           ) : astrologyView === 'psychology' ? (
             <div>
               {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}
