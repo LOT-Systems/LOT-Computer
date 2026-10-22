@@ -321,6 +321,16 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+
+  USE CASE 02 — THE SILENT ALARM                            2026-10-22
+  ─────────────────────────────────────────────────────────────────
+  A hard-of-hearing operator uses the cube on a nightstand as a
+  touch-only alarm: nightly Settle, then Nudge -> Hop -> Leap
+  escalation, edge-gated, dismissed only by docking the cube.
+  Full entry: LOT-CUBIQ-QUANTUM-CUBE-v0-SR-20261022-01.md, Section 09.
+  Note: that report also amends the Leap (Section 03 there): ~45°
+  launch, ~40mm range, ~10mm rise.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
