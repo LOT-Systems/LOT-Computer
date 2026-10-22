@@ -116,6 +116,8 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'sustained-coherence-baseline':     'COHBASE',
   'mastery-integration-triad':        'MASTTRIAD',
   'temporal-sovereignty':             'TSOV',
+  'coherence-signal-transmission':    'COHTRANS',
+  'mastery-field-expansion':          'MASTEXP',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

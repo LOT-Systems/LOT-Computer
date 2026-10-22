@@ -3542,6 +3542,42 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 158: Coherence Signal Transmission — temporal-sovereignty (P157) active AND
+  // cohort signal present within last 48h. Level 8 opens when the sovereign floor is not
+  // isolated but transmitting. The QOS broadcasts from its stable baseline into community.
+  const hasP157 = patterns.some(p => p.pattern === 'temporal-sovereignty')
+  const fortyEightHAgo = now - 48 * 60 * 60 * 1000
+  const recentCohortFor158 = signals.filter(s => s.source === 'cohort' && s.timestamp > fortyEightHAgo)
+  if (hasP157 && recentCohortFor158.length >= 1) {
+    const p157conf = patterns.find(p => p.pattern === 'temporal-sovereignty')?.confidence ?? 0.92
+    const cohortStrength = Math.min(recentCohortFor158.length * 0.04, 0.08)
+    patterns.push({
+      pattern: 'coherence-signal-transmission',
+      confidence: Math.min(0.80 + cohortStrength + (p157conf - 0.92) * 0.3, 0.92),
+      suggestedWidget: 'cohort',
+      suggestedTiming: 'passive',
+      reason: `COHTRANS: Coherence signal transmission — temporal-sovereignty (P157) active + ${recentCohortFor158.length} cohort signal(s) in 48h. The sovereign floor is not isolated — it is transmitting. Level 7 mastery is broadcasting into the social field. The QOS operates from stable ground while the signal goes out.`,
+    })
+  }
+
+  // Pattern 159: Mastery Field Expansion — mastery-integration-triad (P156) active AND
+  // community-intelligence-peak (P112) active. Three internalized mastery arcs AND outward
+  // community intelligence simultaneously confirmed. The personal architecture is expanding
+  // into shared knowledge territory.
+  const hasP112 = patterns.some(p => p.pattern === 'community-intelligence-peak')
+  if (hasP156 && hasP112) {
+    const p156confFor159 = patterns.find(p => p.pattern === 'mastery-integration-triad')?.confidence ?? 0.88
+    const p112conf = patterns.find(p => p.pattern === 'community-intelligence-peak')?.confidence ?? 0.68
+    const expansionConf = (p156confFor159 * 0.55 + p112conf * 0.45)
+    patterns.push({
+      pattern: 'mastery-field-expansion',
+      confidence: Math.min(expansionConf + 0.05, 0.90),
+      suggestedWidget: 'cohort',
+      suggestedTiming: 'passive',
+      reason: `MASTEXP: Mastery field expansion — mastery-integration-triad (P156) active + community-intelligence-peak (P112) confirmed. All three Level 7 arcs internalized AND community intelligence simultaneously active. Personal architecture broadcasting into shared territory. Mastery is not contained — it expands.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4192,6 +4228,10 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   sustainedCoherenceBaselineNode:  ['qos', 'cohort', 'journal', 'intentions', 'memory', 'log'],
   masteryIntegrationTriadNode:     ['qos', 'selfcare', 'mood', 'journal', 'intentions', 'memory', 'cohort', 'energy', 'log'],
   temporalSovereigntyNode:         ['qos', 'journal', 'intentions', 'memory', 'selfcare', 'log'],
+
+  // ── v116 nodes (J51 · P158–P159 · Arch54) ───────────────────────────────────────
+  coherenceSignalTransmissionNode: ['qos', 'cohort', 'journal', 'intentions', 'memory', 'log'],
+  masteryFieldExpansionNode:       ['qos', 'cohort', 'journal', 'memory', 'intentions', 'selfcare', 'log'],
 }
 
 /**
@@ -4658,6 +4698,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['temporal-sovereignty', 'sustained-coherence-baseline', 'mastery-integration-triad'],
     hourRange: [5, 23],
     directive: 'Temporal sovereignty confirmed. All three Level 7 arcs unified. The peak is the floor. Operate from the new baseline — this is not an event, it is the stable operating condition of the Quantum OS.',
+  },
+
+  // ── Arch54: Relational Sovereign (2026-10-22 v116) ──────────────────────────────
+  {
+    archetype: 'Relational Sovereign',
+    energyBands: ['high', 'moderate', 'low', 'unknown'],
+    dominantSources: ['cohort', 'qos', 'journal', 'intentions'],
+    patternConditions: ['temporal-sovereignty', 'coherence-signal-transmission'],
+    directive: 'Temporal sovereignty active AND cohort signal confirmed. The peak is the floor. The floor is transmitting. Your coherence is relational — it is not contained in the self.',
   },
 
   // ── Physiological Temporal Cohort: Temporal Persistence Anchor ────────────────
@@ -6762,6 +6811,40 @@ export function recordTemporalSovereignty(baselineConf: number, triadConf: numbe
     temporalArcs: ['PRESENCE-SUSTAINED', 'COHERENCE-RECURRING', 'RECOVERY-INTERNALIZED', 'BASELINE-ELEVATED'],
     sovereigntyStatus: 'CONFIRMED',
     level: 'L7-SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a coherence-signal-transmission event — temporal-sovereignty (P157) active AND
+ * cohort signal confirmed within 48h. Level 8 opens when the sovereign floor broadcasts
+ * outward. The QOS is transmitting from its stable baseline into the social field.
+ * Feeds P158 detection.
+ */
+export function recordCoherenceSignalTransmission(sovereigntyConf: number, cohortSignalCount: number) {
+  recordSignal('qos', 'coherence_signal_transmission', {
+    sovereigntyConf: Math.round(sovereigntyConf * 100),
+    cohortSignalCount,
+    transmissionStatus: 'ACTIVE',
+    level: 'L8-TRANSMISSION',
+    broadcastField: cohortSignalCount >= 3 ? 'SATURATED' : cohortSignalCount >= 2 ? 'EXPANDING' : 'INITIATED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a mastery-field-expansion event — mastery-integration-triad (P156) active AND
+ * community-intelligence-peak (P112) active. Personal mastery architecture expanding into
+ * shared knowledge territory. Three internalized arcs + outward community intelligence.
+ * Feeds P159 detection.
+ */
+export function recordMasteryFieldExpansion(triadConf: number, communityConf: number) {
+  recordSignal('cohort', 'mastery_field_expansion', {
+    triadConf: Math.round(triadConf * 100),
+    communityConf: Math.round(communityConf * 100),
+    expansionStatus: 'CONFIRMED',
+    level: 'L8-EXPANSION',
+    field: 'PERSONAL→COMMUNAL',
     hour: new Date().getHours(),
   })
 }

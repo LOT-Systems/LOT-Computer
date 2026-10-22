@@ -1221,6 +1221,9 @@ export default async (fastify: FastifyInstance) => {
       'sustained_coherence_baseline',
       'mastery_integration_triad',
       'temporal_sovereignty',
+      // v116: coherence signal transmission · mastery field expansion (P158/P159)
+      'coherence_signal_transmission',
+      'mastery_field_expansion',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

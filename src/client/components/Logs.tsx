@@ -3829,6 +3829,76 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'coherence_signal_transmission') {
+          const sovereigntyConf = log.metadata?.sovereigntyConf as number | undefined
+          const cohortSignalCount = log.metadata?.cohortSignalCount as number | undefined
+          const transmissionStatus = log.metadata?.transmissionStatus as string | undefined
+          const broadcastField = log.metadata?.broadcastField as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COHTRANS:" blockView>
+                <div className="uppercase tracking-widest mb-4">COHERENCE SIGNAL TRANSMISSION</div>
+                {sovereigntyConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVEREIGNTY CONF</span>
+                    <span className="tabular-nums">{sovereigntyConf}%</span>
+                  </div>
+                )}
+                {cohortSignalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS</span>
+                    <span className="tabular-nums">{cohortSignalCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">L7 FLOOR IS TRANSMITTING · SOVEREIGN STATE RELATIONAL</div>
+                {transmissionStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {transmissionStatus}</div>
+                )}
+                {broadcastField && (
+                  <div className="opacity-30 tabular-nums">BROADCAST: {broadcastField}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'mastery_field_expansion') {
+          const triadConf = log.metadata?.triadConf as number | undefined
+          const communityConf = log.metadata?.communityConf as number | undefined
+          const expansionStatus = log.metadata?.expansionStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="MASTEXP:" blockView>
+                <div className="uppercase tracking-widest mb-4">MASTERY FIELD EXPANSION</div>
+                {triadConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TRIAD CONF</span>
+                    <span className="tabular-nums">{triadConf}%</span>
+                  </div>
+                )}
+                {communityConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COMMUNITY CONF</span>
+                    <span className="tabular-nums">{communityConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">MASTERY IS NOT CONTAINED · IT EXPANDS</div>
+                {expansionStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {expansionStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
