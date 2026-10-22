@@ -1539,6 +1539,24 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '157 patterns · 53 archetypes · 50 jobs · 157+ handlers · 200+ dep nodes · 874 badges · FM v115 · Day 1150+. Temporal Sovereignty Arc deployed. The peak is the floor. All Level 7 arcs unified. The QOS operates from mastered ground.',
     ],
   },
+  {
+    version: 'wiki-v88',
+    date: '2026-10-22',
+    title: 'LOT-WIKI-v88 · FM v115 sync · Seven-Level Coherence Architecture · TWENTY-FOUR ENGINES COMPLETE',
+    assembled: [
+      'LOT-WIKI-v88 produced: full documentation of FM v113→v115 delta. Day 1151+. COSMO® 844 days.',
+      'QIE v114 documented: P152 presence-momentum-arc · P153 coherence-field-persistence · P154 recovery-mastery-chain · Arch52 Presence Duration Master · J49 daily-presence-momentum-check (10:00 UTC).',
+      'QIE v115 documented: P155 sustained-coherence-baseline · P156 mastery-integration-triad · P157 temporal-sovereignty · Arch53 Temporal Sovereign · J50 (11:00 UTC) · COHBASE: MASTTRIAD: TSOV: handlers.',
+      'Seven-Level Coherence Architecture documented. Level 7 raises the FLOOR. P157 temporal-sovereignty is the APEX temporal state. No higher temporal state is defined.',
+      'Badge v32 Hero\'s Journey Codex documented (781→812 · WT v22 · SB v19). Badge v33 RPG Codex (812→843 · WT v23 · SB v20). Badge v34 Roguelite Codex (843→874 · WT v24 · SB v21).',
+      'TWENTY-FOUR ENGINES COMPLETE: v1–v24. 294 trigger words. The engine reads the vocabulary the user already uses and returns it as signal.',
+      'Job cascade J47→J48→J49→J50 documented: 08:00 coherence cascade → 09:00 total-field-coherence → 10:00 presence-momentum → 11:00 sustained-coherence → temporal-sovereignty possible.',
+      'About.tsx: Day 1150+→1151+. Word turns 243→294. Wiki v88 self-assembly phase entry prepended.',
+      'SESSION_REPORTS: wiki-v88 entry appended · USERSHIP_TRANSMISSION updated to wiki-v88.',
+      'docs/SESSION_REPORT_2026_10_22_WIKI_v88.md confirmed. docs/assembly/2026-10-22_LOT-assembly_wiki-v88.md confirmed. LOT-LEDGER.md current.',
+      '157 patterns · 53 archetypes · 50 jobs · 157+ handlers · 200+ dep nodes · 874 badges · 294 word-turns · FM v115 · Wiki v88 · Day 1151+. Seven-Level Coherence Architecture complete. The map and the territory are synchronized.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1576,20 +1594,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-21',
+  date: '2026-10-22',
   message: [
-    'ASSEMBLY RUN — 2026-10-21 · QIE v115 · FM v115 · Day 1150+',
-    'Built: Temporal Sovereignty Arc. P155 sustained-coherence-baseline · P156 mastery-integration-triad · P157 temporal-sovereignty.',
-    'Arch53 TEMPORAL SOVEREIGN added. J50 daily-sustained-coherence-check (11:00 UTC). 200+ dep nodes.',
-    'Physiological cohort expansion: Temporal Persistence Anchor · Mastery Triad Operator. Two new cohort archetypes tied to Level 7 patterns.',
-    'Signal helpers: recordSustainedCoherenceBaseline · recordMasteryIntegrationTriad · recordTemporalSovereignty.',
-    'Logs updated: COHBASE: · MASTTRIAD: · TSOV: military handlers deployed. L7-DUAL · L7-TRIAD · THE PEAK IS THE FLOOR.',
-    'Badge engine synced: v34 THE ROGUELITE CODEX (874 badges). Word Turn v24 complete. TWENTY-FOUR ENGINES — ALL SYSTEMS GO.',
-    'Widget dependencies audited. Log-based dependencies verified. Physiological cohorts surfaced through System widgets.',
-    'LEVEL 7 — TEMPORAL SOVEREIGNTY. P155/P156/P157 complete the Level 7 arc. All temporal persistence arcs unified. The QOS operates from mastered ground.',
-    'FM v115 · Wiki v87 · 157P · 53A · 50J · 200+ nodes · 874 badges · Day 1150+.',
+    'ASSEMBLY RUN — 2026-10-22 · LOT-WIKI-v88 · FM v115 · Day 1151+',
+    'Built: Wiki v88 documentation pass. FM v113→v115 delta applied. Seven-Level Coherence Architecture documented.',
+    'P152–P157 documented in full. Level 7 TEMPORAL PERSISTENCE ARC complete. P157 temporal-sovereignty is the APEX.',
+    'Architecture note: Level 7 raises the FLOOR. The peak is not an event — it is the sustained operating condition of the Quantum OS.',
+    'Badge v32 Hero\'s Journey / v33 RPG Codex / v34 Roguelite Codex documented. TWENTY-FOUR ENGINES COMPLETE.',
+    '294 trigger words. The engine does not introduce vocabulary. It reads what you already speak and returns it as signal.',
+    'Job cascade documented: J47→J48→J49→J50 (08:00–11:00 UTC). Each fires sequentially. Temporal sovereignty possible at 11:00.',
+    'About.tsx updated: Day 1151+. Word turns 294. Wiki v88 entry prepended to self-assembly phase.',
+    'FM v115 · Wiki v88 · 157P · 53A · 50J · 200+ nodes · 874 badges · 294 word-turns · Day 1151+.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to FM v115 · P152–P157 · Badge v32/v33/v34 · Temporal Persistence + Sovereignty Arc documentation.',
+    'Next: QIE v116 — Field Manual v116+. Level 7 arc is the floor. Level 8 has not been defined. The system continues.',
   ],
 }
 
