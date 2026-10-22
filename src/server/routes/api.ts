@@ -18,6 +18,8 @@ import {
 } from '#shared/types'
 import config from '#server/config'
 import { fp } from '#shared/utils'
+import { STORY_RANGE_DAYS, computeArcadeXp, getArcadeStatus, type StoryRange } from '#shared/utils/logCommands'
+import { buildStoryDigest, formatDigestForPrompt } from '#shared/utils/storyCompression'
 import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
@@ -5479,6 +5481,32 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   )
 
   // ============================================================================
+  // ARCADE — gamified evolution (XP / rank) derived from Log activity.
+  // Read-only and recomputed on demand: no new table, nothing to migrate.
+  // ============================================================================
+  const computeArcade = async (userId: string) => {
+    const logs = await fastify.models.Log.findAll({
+      where: { userId },
+      attributes: ['event', 'text', 'createdAt'],
+      order: [['createdAt', 'DESC']],
+      limit: 5000,
+    })
+    const rows = logs.map(l => ({ event: l.event, text: l.text, createdAt: l.createdAt }))
+    const { streakDays } = buildStoryDigest(rows, 'year')
+    const xp = computeArcadeXp({
+      logEntries: rows.filter(r => r.event === 'note' && (r.text || '').trim()).length,
+      checkins: rows.filter(r =>
+        r.event === 'emotional_checkin' || r.event === 'self_care_checkin' || r.event === 'energy_checkin'
+      ).length,
+      storiesRead: rows.filter(r => r.event === 'generated_story').length,
+      streakDays,
+    })
+    return { ...getArcadeStatus(xp), streakDays }
+  }
+
+  fastify.get('/arcade', async (req: FastifyRequest) => computeArcade(req.user.id))
+
+  // ============================================================================
   // STORY — Contextual AI Story
   // Generates a 1-2 paragraph story based on recent logs, self-care events,
   // and widget data. The story reflects the operator's recent journey.
@@ -5490,6 +5518,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          range?: StoryRange
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,21 +5543,35 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const range: StoryRange =
+        req.body.range && Object.prototype.hasOwnProperty.call(STORY_RANGE_DAYS, req.body.range)
+          ? req.body.range
+          : 'recent'
 
+      // Ranged stories read the whole window (capped); legacy 'recent' reads 200 rows.
+      const windowDays = range === 'recent' ? null : STORY_RANGE_DAYS[range as Exclude<StoryRange, 'recent'>]
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          ...(windowDays
+            ? { createdAt: { [Op.gte]: new Date(Date.now() - windowDays * 86_400_000) } }
+            : {}),
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: windowDays ? 2000 : 200,
       })
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
+      // Compress BEFORE the vendor call: the model sees a digest, not raw history.
+      const digest = buildStoryDigest(
+        logs.map(l => ({
+          event: l.event,
+          text: l.text,
+          createdAt: l.createdAt,
+          context: l.context as Record<string, any> | null,
+          metadata: l.metadata as Record<string, any> | null,
+        })),
+        range
+      )
 
       const selfCareLogs = logs.filter(l =>
         l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
@@ -5549,7 +5592,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that compress their journey over the requested WINDOW — mood trajectory, daily rhythm, environment (weather, place, moon) and self-care patterns. Surface any FLAGS (spikes, silences, mood shifts) gently, as noticed things, never as alarms. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
@@ -5567,10 +5610,8 @@ OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
+COMPRESSED DIGEST:
+${formatDigestForPrompt(digest)}
 
 SELF-CARE DATA:
 ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
@@ -5596,6 +5637,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            range,
+            digest: { ...digest, excerpts: [] },
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5604,6 +5647,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          range,
+          arcade: await computeArcade(req.user.id).catch(() => null),
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)

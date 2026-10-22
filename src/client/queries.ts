@@ -892,9 +892,23 @@ export const usePrayerScripture = createMutation<
 // STORY — Contextual AI Story
 // ============================================================================
 
+export type ArcadeStatusDTO = {
+  xp: number
+  rank: { level: number; title: string; minXp: number }
+  next: { level: number; title: string; minXp: number } | null
+  progressPct: number
+  streakDays: number
+}
+
+export const useArcade = createQuery<ArcadeStatusDTO>('/api/arcade', {
+  staleTime: 60_000,
+  enabled: false, // fetched on demand via /system and /rank
+})
+
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    range?: 'day' | 'week' | 'month' | 'year' | 'recent'
     quantumState?: {
       energy?: string
       clarity?: string
@@ -910,5 +924,7 @@ export const useStoryGeneration = createMutation<
   {
     story: string
     logId: string | null
+    range?: string
+    arcade?: ArcadeStatusDTO | null
   }
 >('post', '/api/story')

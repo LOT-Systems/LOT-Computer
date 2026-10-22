@@ -33,7 +33,8 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useArcade } from '#client/queries'
+import { buildSystemHelpLines, parseStoryRange, getArcadeStatus, formatArcadeLine } from '#shared/utils/logCommands'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3739,6 +3740,9 @@ const NoteEditor = ({
       setIsSaved(true)
     },
   })
+  const { refetch: refetchArcade } = useArcade()
+  const arcadeLine = (a?: { xp: number } | null) =>
+    a ? formatArcadeLine(getArcadeStatus(a.xp)) : undefined
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
@@ -4121,30 +4125,24 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        // Registry-driven: one row in logCommands.ts adds a line here.
+        setSystemHelp(buildSystemHelpLines().join('\n'))
+        // Arcade rank is fetched on demand and patched in when it lands.
+        refetchArcade().then(r => {
+          const line = arcadeLine(r.data)
+          if (line) setSystemHelp(buildSystemHelpLines({ rankLine: line }).join('\n'))
+        }).catch(() => {})
+      } else if (trigger === 'arcade-rank') {
+        refetchArcade().then(r => {
+          const a = r.data
+          if (!a) return setSystemHelp('RANK  UNAVAILABLE')
+          setSystemHelp([
+            'ARCADE',
+            formatArcadeLine(getArcadeStatus(a.xp)),
+            `STREAK  ${a.streakDays} DAY(S)`,
+            'XP  Entry +10 · Check-in +5 · Story +15 · Streak day +20',
+          ].join('\n'))
+        }).catch(() => setSystemHelp('RANK  UNAVAILABLE'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4152,11 +4150,13 @@ const NoteEditor = ({
           setStoryLoading(true)
           setStoryResponse(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const range = parseStoryRange(value)
+            const logText = value.replace(/\/story(\s+(day|today|daily|week|weekly|month|monthly|year|yearly))?/i, '').replace(/📖/g, '').trim()
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              range,
               quantumState: state,
               userIndex: index,
             })
@@ -4399,7 +4399,7 @@ const NoteEditor = ({
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                        <span style={{ minWidth: '230px', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )

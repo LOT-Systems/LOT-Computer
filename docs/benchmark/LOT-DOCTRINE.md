@@ -226,3 +226,19 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Compress Before The Vendor
+
+Anything sent to an external model is first reduced by deterministic code
+into a DIGEST (counts, streak, context aggregates, flagged spikes, a few
+short excerpts). The model narrates; it does not index. This bounds what
+the vendor sees, makes the signal unit-testable, and keeps cost flat as
+history grows. A story that reads the wrong event type silently looks
+fine — assert on the SOURCE rows, not on the prose. (SR-20261022-01:
+/story read `log_entry`/`journal` while the editor writes `note`.)
+
+## Single Source For Commands
+
+A user-facing command list is generated from one registry, and a test
+asserts every registry row reaches a trigger. Hand-written help drifts.
+(SR-20261022-01.)

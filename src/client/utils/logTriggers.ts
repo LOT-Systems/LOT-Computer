@@ -41,6 +41,7 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'arcade-rank'       // /rank — Arcade rank, XP and next unlock
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -67,6 +68,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'arcade-rank',    emojis: [],        keywords: ['rank', 'arcade', 'level'] },
 ]
 
 /**
