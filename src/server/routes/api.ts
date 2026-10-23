@@ -368,6 +368,11 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data })
           break
         }
+        case 'email': {
+          // Private: only the recipient's stream receives it
+          if (data.receiverId === req.user.id) write({ event, data })
+          break
+        }
         case 'chat_message_like': {
           const payload = data as ChatMessageLikeEventPayload
           // likes/likesCount are already computed by the POST handler.
@@ -4083,6 +4088,154 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
     }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — composed in Log (/email to Name.), delivered in Sync.
+  // Community-gated: sender and recipient must both have chat access.
+  // ============================================================================
+  const toEmailView = (m: any, names: Map<string, string>, myId: string) => ({
+    id: m.id,
+    senderId: m.senderId,
+    receiverId: m.receiverId,
+    senderName: names.get(m.senderId) || 'Unknown',
+    receiverName: names.get(m.receiverId) || 'Unknown',
+    subject: m.subject,
+    body: m.body,
+    readAt: m.readAt,
+    createdAt: m.createdAt,
+    isMine: m.senderId === myId,
+  })
+
+  const nameMap = async (ids: string[]) => {
+    const users = await fastify.models.User.findAll({
+      where: { id: { [Op.in]: Array.from(new Set(ids)) } },
+      attributes: ['id', 'firstName', 'lastName'],
+    })
+    return new Map(
+      users.map((u) => [u.id, `${u.firstName || ''} ${u.lastName || ''}`.trim()])
+    )
+  }
+
+  // Inbox + sent (latest 50 each), unread count
+  fastify.get('/emails', async (req: FastifyRequest, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires LOT Community access' })
+    }
+    const [inbox, sent, unread] = await Promise.all([
+      fastify.models.LotEmail.findAll({
+        where: { receiverId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 50,
+      }),
+      fastify.models.LotEmail.findAll({
+        where: { senderId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 50,
+      }),
+      fastify.models.LotEmail.count({
+        where: { receiverId: req.user.id, readAt: null },
+      }),
+    ])
+    const names = await nameMap([...inbox, ...sent].flatMap((m) => [m.senderId, m.receiverId]))
+    return reply.send({
+      unread,
+      inbox: inbox.map((m) => toEmailView(m, names, req.user.id)),
+      sent: sent.map((m) => toEmailView(m, names, req.user.id)),
+    })
+  })
+
+  // Send: recipient addressed by name ("Hitomi" or "Hitomi Tanaka")
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { to: string; subject?: string; body: string }
+  }>, reply) => {
+    try {
+      if (!canAccessChat(req.user.tags || [])) {
+        return reply.status(403).send({ error: 'Email requires LOT Community access' })
+      }
+      const to = String(req.body?.to || '').trim().slice(0, 80)
+      const body = String(req.body?.body || '').trim().slice(0, 5000)
+      if (!to || !body) {
+        return reply.status(400).send({ error: 'Recipient and message are required' })
+      }
+      const subject = (String(req.body?.subject || '').trim() || body.split('\n')[0])
+        .slice(0, 120)
+
+      const [first, ...rest] = to.split(/\s+/)
+      const last = rest.join(' ')
+      const matches = (await fastify.models.User.findAll({
+        where: {
+          id: { [Op.ne]: req.user.id },
+          firstName: { [Op.iLike]: first.replace(/[%_\\]/g, '') },
+          ...(last ? { lastName: { [Op.iLike]: last.replace(/[%_\\]/g, '') } } : {}),
+        },
+        limit: 10,
+      })).filter((u) => canAccessChat(u.tags || []))
+
+      if (matches.length === 0) {
+        return reply.status(404).send({ error: `No one named "${to}" in LOT Community` })
+      }
+      if (matches.length > 1) {
+        return reply.status(409).send({
+          error: `Several people named "${to}" — use the full name`,
+        })
+      }
+      const receiver = matches[0]
+
+      const email = await fastify.models.LotEmail.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        subject,
+        body,
+      })
+      const senderName = `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim()
+
+      sync.emit('email', {
+        id: email.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        senderName,
+        subject,
+        createdAt: email.createdAt,
+      })
+
+      // Social-signal log (feeds Cohort Dating via LOT Community)
+      process.nextTick(async () => {
+        try {
+          const context = await getLogContext(req.user)
+          await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'email_sent',
+            text: '',
+            metadata: { emailId: email.id, receiverId: receiver.id },
+            context,
+          })
+        } catch (logError) {
+          console.error('Error logging email:', logError)
+        }
+      })
+
+      return reply.send({
+        id: email.id,
+        to: `${receiver.firstName || ''} ${receiver.lastName || ''}`.trim(),
+        subject,
+        createdAt: email.createdAt,
+      })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  // Mark as read (recipient only)
+  fastify.post('/emails/read', async (req: FastifyRequest<{
+    Body: { id: string }
+  }>, reply) => {
+    await fastify.models.LotEmail.update(
+      { readAt: new Date() },
+      { where: { id: String(req.body?.id || ''), receiverId: req.user.id, readAt: null } }
+    )
+    return reply.send({ ok: true })
   })
 
   // ============================================================================

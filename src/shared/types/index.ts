@@ -117,6 +117,7 @@ export type LogEvent =
   | 'note'
   | 'emotional_checkin'
   | 'system_feedback'
+  | 'email_sent'
   | 'other';
 
 // Emotional Check-in Types
@@ -196,6 +197,18 @@ export type DirectMessage = {
   senderId: string;
   receiverId: string;
   message: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+// LOT Email Type
+export type LotEmail = {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  subject: string;
+  body: string;
+  readAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };

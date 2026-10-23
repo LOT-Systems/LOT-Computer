@@ -174,6 +174,14 @@ export type SyncEvents = {
   chat_message: PublicChatMessage
   chat_message_like: ChatMessageLikeEventPayload
   live_message: { message: string }
+  email: {
+    id: string
+    receiverId: string
+    senderId: string
+    senderName: string
+    subject: string
+    createdAt: Date
+  }
 }
 
 export type PublicChatMessage = {

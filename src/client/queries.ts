@@ -120,6 +120,34 @@ export const useSendDirectMessage = createMutation<
   void
 >('post', '/api/direct-messages')
 
+export interface LotEmailRecord {
+  id: string
+  senderId: string
+  receiverId: string
+  senderName: string
+  receiverName: string
+  subject: string
+  body: string
+  readAt: string | null
+  createdAt: string
+  isMine: boolean
+}
+
+export const useEmails = createQuery<{
+  unread: number
+  inbox: LotEmailRecord[]
+  sent: LotEmailRecord[]
+}>('/api/emails', { refetchOnWindowFocus: true, retry: false })
+
+export const sendEmail = async (data: {
+  to: string
+  subject?: string
+  body: string
+}) => api.post<{ id: string; to: string }>('/api/emails', data).then((r) => r.data)
+
+export const markEmailRead = async (id: string) =>
+  api.post('/api/emails/read', { id }).then((r) => r.data)
+
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
 })

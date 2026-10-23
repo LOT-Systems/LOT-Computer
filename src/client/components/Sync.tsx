@@ -24,6 +24,9 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  markEmailRead,
+  LotEmailRecord,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -71,6 +74,15 @@ export const Sync = React.memo(function SyncInner() {
   }, [me])
 
   const { data: fetchedMessages } = useChatMessages()
+  const { data: mail, refetch: refetchMail } = useEmails({ enabled: canAccessChat })
+  const [openMailId, setOpenMailId] = React.useState<string | null>(null)
+  const onOpenMail = React.useCallback(
+    (m: LotEmailRecord) => () => {
+      setOpenMailId((cur) => (cur === m.id ? null : m.id))
+      if (!m.isMine && !m.readAt) markEmailRead(m.id).then(() => refetchMail())
+    },
+    [refetchMail]
+  )
   const { mutate: createChatMessage } = useCreateChatMessage({
     onSuccess: () => setMessage(''),
   })
@@ -117,7 +129,11 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeEmailListener } = sync.listen('email', () => {
+      refetchMail()
+    })
     return () => {
+      disposeEmailListener()
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
     }
@@ -213,6 +229,34 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {!!mail?.inbox.length && (
+        <div className="mb-40">
+          <div className="text-acc/40 mb-4">
+            MAIL{mail.unread ? ` · ${mail.unread} NEW` : ''} — reply in Log: /email to Name.
+          </div>
+          {mail.inbox.slice(0, 10).map((m) => (
+            <div
+              key={m.id}
+              className="cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded"
+              onClick={onOpenMail(m)}
+            >
+              <div className={cn('flex gap-x-8', m.readAt && 'text-acc/40')}>
+                <span className="whitespace-nowrap">{m.senderName}</span>
+                <span className="flex-1 truncate">{m.subject}</span>
+                <span className="text-acc/40 whitespace-nowrap">
+                  <MessageTimeLabel dateString={m.createdAt} isTimeFormat12h={isTimeFormat12h} />
+                </span>
+              </div>
+              {openMailId === m.id && (
+                <div className="whitespace-breakspaces py-4 text-acc/80" style={{ wordBreak: 'break-word' }}>
+                  {m.body}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {

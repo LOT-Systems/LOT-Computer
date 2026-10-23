@@ -29,6 +29,8 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { parseEmailCommand } from '#client/utils/emailCommand'
+import { sendEmail } from '#client/queries'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3679,6 +3681,14 @@ const NoteEditor = ({
   const [isSaved, setIsSaved] = React.useState(true) // Track if current content is saved
   const [qiResponse, setQiResponse] = React.useState<string | null>(null)
   const [qiLoading, setQiLoading] = React.useState(false)
+  // LOT® Email: "/email to Name. subject\nbody" + Ctrl/Cmd+Enter sends
+  const emailDraft = React.useMemo(() => parseEmailCommand(value), [value])
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const emailSendingRef = React.useRef(false)
+  const emailLastSentRef = React.useRef('')
+  React.useEffect(() => {
+    if (value !== emailLastSentRef.current) setEmailStatus(null)
+  }, [value])
   const [asmResponse, setAsmResponse] = React.useState<string | null>(null)
   const [asmLoading, setAsmLoading] = React.useState(false)
   const [scanResult, setScanResult] = React.useState<string | null>(null)
@@ -3911,6 +3921,23 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        const draft = parseEmailCommand(valueRef.current)
+        if (draft && !emailSendingRef.current && valueRef.current !== emailLastSentRef.current) {
+          emailSendingRef.current = true
+          const sentText = valueRef.current
+          setEmailStatus('SENDING...')
+          sendEmail(draft)
+            .then((r) => {
+              emailLastSentRef.current = sentText
+              setEmailStatus(`SENT TO ${r.to.toUpperCase()}`)
+            })
+            .catch((err) =>
+              setEmailStatus(
+                `NOT SENT — ${String(err?.response?.data?.error || 'try again').toUpperCase()}`
+              )
+            )
+            .finally(() => { emailSendingRef.current = false })
+        }
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -4139,6 +4166,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to Name.  Compose LOT Email (Ctrl+Enter sends, read in Sync)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4384,6 +4412,17 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailDraft && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6' }}>
+                <div>TO       {emailDraft.to.toUpperCase()}</div>
+                <div>SUBJECT  {emailDraft.subject}</div>
+                <div>{emailStatus || 'CTRL+ENTER TO SEND'}</div>
+              </div>
             </Block>
           </div>
         )}
