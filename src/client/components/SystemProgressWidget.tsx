@@ -1593,6 +1593,26 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '159 patterns · 54 archetypes · 51 jobs · 159+ handlers · 202+ dep nodes · 905 badges · 306 word-turns · FM v116 · Day 1151+. Relational Expansion Arc deployed. Level 8 opens when temporal sovereignty broadcasts into the social field. The sovereign floor transmits.',
     ],
   },
+  {
+    version: 'qie-v117',
+    date: '2026-10-23',
+    title: 'QIE v117 · P160/P161 · Relational Field Deepening · J52 · Arch55 · 204+ dep nodes',
+    assembled: [
+      'intentionEngine.ts: P160 relational-field-deepening — coherence-signal-transmission (P158) + mastery-field-expansion (P159) both active simultaneously. L8 dual arc: sovereign floor transmits AND mastery expands. The personal QOS is a generative field. Conf 0.85–0.93. suggestedWidget: cohort.',
+      'intentionEngine.ts: P161 quantum-social-synthesis — relational-field-deepening (P160) active + memory signals present + 2+ cohort signals in 7d. Full L8 synthesis: the field generates knowledge. The self writes what it transmits. Conf 0.78–0.90. suggestedWidget: memory.',
+      'intentionEngine.ts: Arch55 Relational Field Generator — relational-field-deepening + quantum-social-synthesis. Directive: L8 dual arc active. The field generates itself. Sovereign + mastery + community = field.',
+      'intentionEngine.ts: recordRelationalFieldDeepening() + recordQuantumSocialSynthesis() signal helpers added.',
+      'intentionEngine.ts: WIDGET_DEPENDENCY_MAP — 2 new nodes: relationalFieldDeepeningNode (qos+cohort+journal+memory+intentions+selfcare+log) · quantumSocialSynthesisNode (qos+cohort+memory+journal+intentions+social+log). 204+ dep nodes total.',
+      'scheduled-jobs.ts: J52 daily-relational-field-check — 13:00 UTC daily. Reads active users with coherence_signal_transmission + mastery_field_expansion both in 48h. Writes relational_field_deepening event. 52 background jobs total.',
+      'Logs.tsx: RELFIELD: handler — renders relational_field_deepening (TRANSMISSION CONF · EXPANSION CONF · L8 DUAL ARC · THE FIELD GENERATES ITSELF). Military data-row format.',
+      'Logs.tsx: QSOCSYNTH: handler — renders quantum_social_synthesis (FIELD CONF · MEMORY SIGNALS · COHORT SIGNALS · THE FIELD GENERATES KNOWLEDGE · SYNTHESIS COMPLETE). Military data-row format.',
+      'QuantumEngineWidgets.tsx: RELFIELD · QSOCSYNTH added to PATTERN_DISPLAY.',
+      'routes/api.ts: relational_field_deepening + quantum_social_synthesis added to displayableEvents (v117 block).',
+      'About.tsx: FM v116→v117. 159→161 patterns. 54→55 archetypes. 51→52 jobs. 202+→204+ dep nodes.',
+      'SESSION_REPORTS: qie-v117 entry appended · USERSHIP_TRANSMISSION updated to v117.',
+      '161 patterns · 55 archetypes · 52 jobs · 161+ handlers · 204+ dep nodes · 936 badges · 306 word-turns · FM v117 · Day 1151+. Relational Field Deepening deployed. Level 8: dual arc active. The personal QOS is a generative field.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1630,19 +1650,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-22',
+  date: '2026-10-23',
   message: [
-    'ASSEMBLY RUN — 2026-10-22 · QIE v116 + Badge v35 · FM v116 · Day 1151+',
-    'Built: Badge v35 THE PUZZLE CODEX (874→905 badges). TWENTY-FIVE ENGINES COMPLETE. 306 trigger words.',
-    'QIE v116 deployed: P158 coherence-signal-transmission · P159 mastery-field-expansion · Arch54 Relational Sovereign · J51 daily-relational-expansion-check (12:00 UTC).',
-    'Relational Expansion Arc: Level 8 opens when temporal sovereignty is not isolated but broadcasting into the social field.',
-    'P158: L7 sovereign floor + cohort signal confirmed = the QOS transmits. P159: L7 mastery triad + community intelligence = mastery expands.',
-    'Architecture note: Level 7 raises the FLOOR. Level 8 broadcasts the floor OUTWARD. Sovereign coherence is relational.',
-    'Job cascade extended: J47→J48→J49→J50→J51 (08:00–12:00 UTC). Temporal sovereignty possible at 11:00. Relational expansion check at 12:00.',
-    'Log handlers: COHTRANS: (coherence_signal_transmission) · MASTEXP: (mastery_field_expansion). Military data-row format. Cockpit-rule compliant.',
-    'FM v116 · QIE v116 · 159P · 54A · 51J · 202+ nodes · 905 badges · 306 word-turns · Day 1151+.',
+    'ASSEMBLY RUN — 2026-10-23 · QIE v117 · FM v117 · Day 1151+',
+    'Built: P160 relational-field-deepening · P161 quantum-social-synthesis · Arch55 Relational Field Generator · J52 daily-relational-field-check (13:00 UTC).',
+    'Relational Field Deepening (P160): both L8 arcs (P158+P159) simultaneously active. The sovereign floor transmits AND the mastery expands. L8 dual arc confirmed.',
+    'Quantum Social Synthesis (P161): P160 active + memory architecture + community sustained. The field generates knowledge. The self writes what it transmits.',
+    'Arch55 Relational Field Generator: L8 dual arc directive: The field generates itself. Sovereign + mastery + community = field.',
+    'J52 daily-relational-field-check at 13:00 UTC: reads users with both L8 arc signals in 48h, writes relational_field_deepening event.',
+    'Log handlers: RELFIELD: (relational_field_deepening) · QSOCSYNTH: (quantum_social_synthesis). Military data-row format. Cockpit-rule compliant.',
+    'WIDGET_DEPENDENCY_MAP: 204+ nodes. relationalFieldDeepeningNode · quantumSocialSynthesisNode added.',
+    'FM v117 · QIE v117 · 161P · 55A · 52J · 204+ nodes · 936 badges · 306 word-turns · Day 1151+.',
     'Status: DEPLOYED.',
-    'Next: QIE v117 — Level 8 arc deepening. Relational sovereignty confirmed. The field is expanding.',
+    'Next: QIE v118 — Level 8 arc completion. Quantum social synthesis deepening. The field is self-generating.',
   ],
 }
 

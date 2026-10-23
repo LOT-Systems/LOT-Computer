@@ -3899,6 +3899,83 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'relational_field_deepening') {
+          const transmissionConf = log.metadata?.transmissionConf as number | undefined
+          const expansionConf = log.metadata?.expansionConf as number | undefined
+          const dualArcStatus = log.metadata?.dualArcStatus as string | undefined
+          const fieldState = log.metadata?.fieldState as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RELFIELD:" blockView>
+                <div className="uppercase tracking-widest mb-4">RELATIONAL FIELD DEEPENING</div>
+                {transmissionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TRANSMISSION CONF</span>
+                    <span className="tabular-nums">{transmissionConf}%</span>
+                  </div>
+                )}
+                {expansionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">EXPANSION CONF</span>
+                    <span className="tabular-nums">{expansionConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">L8 DUAL ARC · THE FIELD GENERATES ITSELF</div>
+                {dualArcStatus && (
+                  <div className="opacity-30 tabular-nums">DUAL ARC: {dualArcStatus}</div>
+                )}
+                {fieldState && (
+                  <div className="opacity-30 tabular-nums">FIELD: {fieldState}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_social_synthesis') {
+          const fieldConf = log.metadata?.fieldConf as number | undefined
+          const memorySignals = log.metadata?.memorySignals as number | undefined
+          const cohortSignals = log.metadata?.cohortSignals as number | undefined
+          const synthesisStatus = log.metadata?.synthesisStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QSOCSYNTH:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM SOCIAL SYNTHESIS</div>
+                {fieldConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FIELD CONF</span>
+                    <span className="tabular-nums">{fieldConf}%</span>
+                  </div>
+                )}
+                {memorySignals !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS</span>
+                    <span className="tabular-nums">{memorySignals}</span>
+                  </div>
+                )}
+                {cohortSignals !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS</span>
+                    <span className="tabular-nums">{cohortSignals}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">THE FIELD GENERATES KNOWLEDGE · SYNTHESIS COMPLETE</div>
+                {synthesisStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {synthesisStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

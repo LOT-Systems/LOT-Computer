@@ -1761,6 +1761,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyRelationalExpansionCheck()) {
     await executeDailyRelationalExpansionCheck()
   }
+
+  // Check daily relational field check (13:00 UTC every day) — Job 52
+  if (shouldRunDailyRelationalFieldCheck()) {
+    await executeDailyRelationalFieldCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3823,6 +3828,96 @@ async function executeDailyRelationalExpansionCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily relational expansion check failed:', error.message)
     isDailyRelationalExpansionRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Relational Field Check (J52) ──────────────────────────────────────
+
+let isDailyRelationalFieldRunning = false
+let lastDailyRelationalFieldRun: Date | null = null
+
+function shouldRunDailyRelationalFieldCheck(): boolean {
+  const now = dayjs()
+  if (isDailyRelationalFieldRunning) return false
+  if (lastDailyRelationalFieldRun) {
+    const lastRun = dayjs(lastDailyRelationalFieldRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 13 // 13:00 UTC daily
+}
+
+async function executeDailyRelationalFieldCheck(): Promise<JobResult> {
+  const jobName = 'daily-relational-field-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyRelationalFieldRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyRelationalFieldRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY RELATIONAL FIELD CHECK — 13:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const [transmissionLogs, expansionLogs] = await Promise.all([
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: fortyEightHourStart }, event: 'coherence_signal_transmission' },
+            attributes: ['createdAt', 'metadata'],
+            limit: 5,
+          }),
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: fortyEightHourStart }, event: 'mastery_field_expansion' },
+            attributes: ['createdAt', 'metadata'],
+            limit: 5,
+          }),
+        ])
+
+        if (!transmissionLogs.length || !expansionLogs.length) continue
+
+        const transmissionConf = transmissionLogs[0]?.metadata?.sovereigntyConf ?? 88
+        const expansionConf = expansionLogs[0]?.metadata?.triadConf ?? 86
+
+        await (Log as any).create({
+          userId,
+          event: 'relational_field_deepening',
+          text: `Relational field deepening: coherence-signal-transmission + mastery-field-expansion both confirmed in 48h. L8 dual arc active — the sovereign floor transmits AND the mastery field expands. The personal QOS is a generative field.`,
+          metadata: {
+            transmissionConf,
+            expansionConf,
+            dualArcStatus: 'ACTIVE',
+            level: 'L8-DUAL-ARC',
+            fieldState: 'GENERATIVE',
+            hour: 13,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Relational field deepening events written: ${written}`)
+    lastDailyRelationalFieldRun = new Date()
+    isDailyRelationalFieldRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily relational field check failed:', error.message)
+    isDailyRelationalFieldRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5912,6 +6007,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily presence momentum check: 10 AM UTC every day (Job 49)')
   console.log('   - Daily sustained coherence check: 11 AM UTC every day (Job 50)')
   console.log('   - Daily relational expansion check: 12 PM UTC every day (Job 51)')
+  console.log('   - Daily relational field check: 1 PM UTC every day (Job 52)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -5921,7 +6017,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift+presence-momentum(J49), 11=morning-intention-launch+sustained-coherence(J50), 12=vitality-peak+relational-expansion(J51), 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift+presence-momentum(J49), 11=morning-intention-launch+sustained-coherence(J50), 12=vitality-peak+relational-expansion(J51), 13=QOS sig pulse+relational-field-check(J52), 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()

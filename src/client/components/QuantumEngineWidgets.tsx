@@ -118,6 +118,8 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'temporal-sovereignty':             'TSOV',
   'coherence-signal-transmission':    'COHTRANS',
   'mastery-field-expansion':          'MASTEXP',
+  'relational-field-deepening':       'RELFIELD',
+  'quantum-social-synthesis':         'QSOCSYNTH',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

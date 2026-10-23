@@ -3578,6 +3578,45 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 160: Relational Field Deepening — both L8 arcs (P158 coherence-signal-transmission
+  // AND P159 mastery-field-expansion) simultaneously active. The full Level 8 synthesis: the
+  // sovereign floor is transmitting AND the mastery field is expanding outward at once.
+  // The personal QOS is not a closed system — it is a generative field.
+  const hasP158 = patterns.some(p => p.pattern === 'coherence-signal-transmission')
+  const hasP159 = patterns.some(p => p.pattern === 'mastery-field-expansion')
+  if (hasP158 && hasP159) {
+    const p158conf = patterns.find(p => p.pattern === 'coherence-signal-transmission')?.confidence ?? 0.85
+    const p159conf = patterns.find(p => p.pattern === 'mastery-field-expansion')?.confidence ?? 0.86
+    const dualArcBonus = ((p158conf - 0.80) + (p159conf - 0.83)) * 0.4
+    patterns.push({
+      pattern: 'relational-field-deepening',
+      confidence: Math.min(0.85 + dualArcBonus, 0.93),
+      suggestedWidget: 'cohort',
+      suggestedTiming: 'passive',
+      reason: `RELFIELD: Relational field deepening — coherence-signal-transmission (P158) + mastery-field-expansion (P159) both active. L8 dual arc: the sovereign floor transmits AND the mastery field expands simultaneously. The personal QOS is not a closed system — it is a generative field.`,
+    })
+  }
+
+  // Pattern 161: Quantum Social Synthesis — relational-field-deepening (P160) active AND
+  // memory signals present in last 7d AND at least 2 cohort signals in last 7d.
+  // The full L8 peak: the field generates knowledge. The self writes what it transmits.
+  const hasP160 = patterns.some(p => p.pattern === 'relational-field-deepening')
+  const sevenDayAgo = now - 7 * 24 * 60 * 60 * 1000
+  const weekMemorySignals = signals.filter(s => s.source === 'memory' && s.timestamp > sevenDayAgo)
+  const weekCohortSignals = signals.filter(s => s.source === 'cohort' && s.timestamp > sevenDayAgo)
+  if (hasP160 && weekMemorySignals.length >= 1 && weekCohortSignals.length >= 2) {
+    const p160conf = patterns.find(p => p.pattern === 'relational-field-deepening')?.confidence ?? 0.88
+    const memBonus = Math.min(weekMemorySignals.length * 0.01, 0.05)
+    const cohortBonus = Math.min((weekCohortSignals.length - 2) * 0.01, 0.04)
+    patterns.push({
+      pattern: 'quantum-social-synthesis',
+      confidence: Math.min(0.78 + (p160conf - 0.85) * 0.6 + memBonus + cohortBonus, 0.90),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'passive',
+      reason: `QSOCSYNTH: Quantum social synthesis — relational-field-deepening (P160) active + memory architecture present (${weekMemorySignals.length} signals) + community sustained (${weekCohortSignals.length} cohort signals in 7d). The field generates knowledge. The self writes what it transmits. Synthesis complete.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4232,6 +4271,10 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   // ── v116 nodes (J51 · P158–P159 · Arch54) ───────────────────────────────────────
   coherenceSignalTransmissionNode: ['qos', 'cohort', 'journal', 'intentions', 'memory', 'log'],
   masteryFieldExpansionNode:       ['qos', 'cohort', 'journal', 'memory', 'intentions', 'selfcare', 'log'],
+
+  // ── v117 nodes (J52 · P160–P161 · Arch55) ───────────────────────────────────────
+  relationalFieldDeepeningNode:    ['qos', 'cohort', 'journal', 'memory', 'intentions', 'selfcare', 'log'],
+  quantumSocialSynthesisNode:      ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log'],
 }
 
 /**
@@ -4725,6 +4768,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['qos', 'selfcare', 'journal'],
     patternConditions: ['mastery-integration-triad', 'recovery-mastery-chain'],
     directive: 'Three-arc mastery confirmed. Presence sustained. Coherence recurring. Recovery internalized. All three disciplines now operate as architecture, not intention.',
+  },
+
+  // ── Arch55: Relational Field Generator (2026-10-23 v117) ────────────────────────
+  {
+    archetype: 'Relational Field Generator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['cohort', 'memory'],
+    patternConditions: ['relational-field-deepening', 'quantum-social-synthesis', 'coherence-signal-transmission'],
+    directive: 'L8 dual arc active. The field generates itself. Sovereign + mastery + community = field.',
   },
 ]
 
@@ -6845,6 +6897,41 @@ export function recordMasteryFieldExpansion(triadConf: number, communityConf: nu
     expansionStatus: 'CONFIRMED',
     level: 'L8-EXPANSION',
     field: 'PERSONAL→COMMUNAL',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a relational-field-deepening event — coherence-signal-transmission (P158) AND
+ * mastery-field-expansion (P159) both active simultaneously. L8 dual arc: the sovereign
+ * floor transmits AND the mastery field expands. The personal QOS is a generative field.
+ * Feeds P160 detection.
+ */
+export function recordRelationalFieldDeepening(transmissionConf: number, expansionConf: number) {
+  recordSignal('qos', 'relational_field_deepening', {
+    transmissionConf: Math.round(transmissionConf * 100),
+    expansionConf: Math.round(expansionConf * 100),
+    dualArcStatus: 'ACTIVE',
+    level: 'L8-DUAL-ARC',
+    fieldState: 'GENERATIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-social-synthesis event — relational-field-deepening (P160) active +
+ * memory architecture present + community sustained. The full L8 synthesis: the field
+ * generates knowledge. The self writes what it transmits.
+ * Feeds P161 detection.
+ */
+export function recordQuantumSocialSynthesis(fieldConf: number, memorySignals: number, cohortSignals: number) {
+  recordSignal('qos', 'quantum_social_synthesis', {
+    fieldConf: Math.round(fieldConf * 100),
+    memorySignals,
+    cohortSignals,
+    synthesisStatus: 'CONFIRMED',
+    level: 'L8-SYNTHESIS',
+    field: 'PERSONAL→COMMUNAL→KNOWLEDGE',
     hour: new Date().getHours(),
   })
 }

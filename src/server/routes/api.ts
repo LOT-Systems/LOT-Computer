@@ -1224,6 +1224,9 @@ export default async (fastify: FastifyInstance) => {
       // v116: coherence signal transmission · mastery field expansion (P158/P159)
       'coherence_signal_transmission',
       'mastery_field_expansion',
+      // v117: relational field deepening · quantum social synthesis (P160/P161)
+      'relational_field_deepening',
+      'quantum_social_synthesis',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
