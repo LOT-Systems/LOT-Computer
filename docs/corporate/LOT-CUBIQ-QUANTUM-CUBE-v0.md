@@ -321,6 +321,11 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE BRUSH RELAY                              2026-10-23
+  Recorded in full in LOT-CUBIQ-QUANTUM-CUBE-v0.2-ENGINEERING-REPORT.md §09.
+  Cycle 02 also amends v0.1 §03 (actuator topology, Amendment A-1) and
+  records Findings F-1/F-2 against §04 and §06 — see that report.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
