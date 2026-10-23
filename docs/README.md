@@ -21,6 +21,12 @@ Core technical documentation about system architecture, engines, and implementat
 - Psychological Depth Analysis - User analysis engine documentation
 - Quantum Intent Engine - Intent pattern recognition system
 
+### [Usership](./usership/)
+Paid-tier product design.
+
+**Key Documents:**
+- Usership 12-Month Evolution - Month-by-month UI, AI voice, Memory Story compression, and Chronicle badges
+
 ### [Deployment Documentation](./deployment/)
 Guides for deploying and managing the application in production.
 
