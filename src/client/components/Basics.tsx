@@ -18,6 +18,7 @@ import { UserTag } from '#shared/types'
 import { STATE_LABEL, baselineState } from '#shared/basics/engine'
 import { useBasic } from './basics/useBasic'
 import { Enroll } from './basics/Enroll'
+import { AdminQueue } from './basics/AdminQueue'
 import { Bar, Doctrine, IssueSchedule, LedgerHead, ManifestLedger } from './basics/Ledger'
 
 export const Basics: React.FC = () => {
@@ -92,6 +93,8 @@ export const Basics: React.FC = () => {
 
       <ManifestLedger />
       <IssueSchedule />
+      <a href="/open-tab" className="underline uppercase">OPEN TAB — PUBLIC LEDGER</a>
+      {me?.isAdmin && <AdminQueue />}
     </div>
   )
 }

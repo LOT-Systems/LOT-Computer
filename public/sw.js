@@ -1,7 +1,7 @@
 // Service Worker for LOT Systems PWA
 // Version: 2026-07-25-001
 
-const CACHE_VERSION = 'v2026-07-25-001';
+const CACHE_VERSION = 'v2026-10-23-001';
 const CACHE_NAME = `lot-cache-${CACHE_VERSION}`;
 
 // Files to cache initially (only static assets)
