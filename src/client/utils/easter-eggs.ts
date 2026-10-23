@@ -922,6 +922,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('obra_dinn_day')
   }
 
+  // ── Calendar v24 — THE MAP CALENDAR ───────────────────────────────────────
+  // Doom Day: December 10 — DOOM release (1993)
+  if (!hasBadge('doom_day') && month === 12 && day === 10) {
+    awardBadge('doom_day')
+    awarded.push('doom_day')
+  }
+  // Minecraft Day: November 18 — Minecraft full release (2011)
+  if (!hasBadge('minecraft_day') && month === 11 && day === 18) {
+    awardBadge('minecraft_day')
+    awarded.push('minecraft_day')
+  }
+  // Diablo Day: January 3 — Diablo original release (1996)
+  if (!hasBadge('diablo_day') && month === 1 && day === 3) {
+    awardBadge('diablo_day')
+    awarded.push('diablo_day')
+  }
+
   return awarded
 }
 
@@ -1551,6 +1568,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bshade\b|\bcharon\b|\bnyx\b|\bthanatos\b|\bhypnos\b|\belysium\b/i,                               badge: 'hades_shade' },
   { patterns: /\bnethack\b|\bascended\b|\byasd\b|\badom\b|\brogue[\s-]?variant\b/i,                              badge: 'nethack_rune' },
   { patterns: /\bgreedier[\s-]?mode\b|\bmega[\s-]?satan\b|\bafterbirth\b|\brepentance\b|\bbinding[\s-]?of\b/i,  badge: 'isaac_secret' },
+  // ── v26 THE MAP ROOM — word turns ─────────────────────────────────────────
+  { patterns: /\bfog[\s-]?of[\s-]?war\b|\bfog[\s-]?lifted\b|\bclarity[\s-]?came\b|\bemerged[\s-]?from[\s-]?the[\s-]?fog\b/i, badge: 'fog_lifted' },
+  { patterns: /\btreasure[\s-]?room\b|\bunexpected[\s-]?find\b|\bfound[\s-]?gold\b|\bjackpot\b|\bthe[\s-]?motherlode\b/i,      badge: 'treasure_room' },
+  { patterns: /\bsecret[\s-]?passage\b|\bhidden[\s-]?door\b|\bfound[\s-]?a[\s-]?secret\b|\bsecret[\s-]?room\b/i,              badge: 'secret_passage' },
+  { patterns: /\btrap\b|\bdisarmed\b|\bsaw[\s-]?it[\s-]?coming\b|\bdefused[\s-]?it\b/i,                                       badge: 'trap_disarmed' },
+  { patterns: /\bupdated[\s-]?my[\s-]?map\b|\bcharted\b|\bnew[\s-]?territory\b|\bmental[\s-]?map\b/i,                         badge: 'map_updated' },
+  { patterns: /\blow[\s-]?hp\b|\brunning[\s-]?on[\s-]?empty\b|\bdepleted\b|\btank[\s-]?nearly[\s-]?empty\b/i,                 badge: 'low_hp' },
+  { patterns: /\blit[\s-]?a[\s-]?candle\b|\bshed[\s-]?light[\s-]?on\b|\bbrought[\s-]?clarity\b|\billuminated\b/i,            badge: 'torch_lit' },
+  { patterns: /\blocked[\s-]?door\b|\bblocked\b|\bnot[\s-]?ready[\s-]?yet\b|\bgated\b/i,                                      badge: 'locked_room' },
+  { patterns: /\bfound[\s-]?the[\s-]?key\b|\bthat[\s-]?s[\s-]?the[\s-]?key\b|\bkey[\s-]?insight\b|\bunlocked[\s-]?it\b/i,   badge: 'key_drop' },
+  { patterns: /\bfinal[\s-]?room\b|\blast[\s-]?door\b|\bendgame[\s-]?moment\b|\bthis[\s-]?is[\s-]?it\b/i,                    badge: 'final_room' },
+  { patterns: /\brest[\s-]?point\b|\bsafe[\s-]?room\b|\btook[\s-]?a[\s-]?rest\b|\brest[\s-]?and[\s-]?recharge\b/i,          badge: 'rest_point' },
+  { patterns: /\bfound[\s-]?the[\s-]?path\b|\bway[\s-]?forward\b|\bpath[\s-]?forward\b|\bnext[\s-]?level\b/i,                badge: 'path_found' },
+  // ── v23 Secret Boss — THE ANCIENT VAULT word triggers ─────────────────────
+  { patterns: /\bdark[\s-]?souls\b|\byou[\s-]?died\b|\bbonfire[\s-]?lit\b|\bestus[\s-]?flask\b|\bpraise[\s-]?the[\s-]?sun\b/i, badge: 'dark_souls_echo' },
+  { patterns: /\bd[\s-]?n[\s-]?d\b|\bdungeons?[\s-]?and[\s-]?dragons?\b|\bnat[\s-]?20\b|\bnatural[\s-]?twenty\b|\bdungeon[\s-]?master\b/i, badge: 'd_n_d_roll' },
+  { patterns: /\bmyst\b|\briven\b|\batrus\b|\bd[\s-]?ni\b|\blinking[\s-]?book\b/i,                                            badge: 'myst_island' },
 ]
 
 /**
@@ -3112,3 +3146,94 @@ export function checkMorningSolve(): BadgeType | null {
   return null
 }
 
+
+// ── v26 MAP ROOM — behavioral detection ──────────────────────────────────────
+
+const MAP_WORDS_V26: RegExp[] = [
+  /\bfog[\s-]?of[\s-]?war\b|\bfog[\s-]?lifted\b|\bclarity[\s-]?came\b/i,
+  /\btreasure[\s-]?room\b|\bunexpected[\s-]?find\b|\bfound[\s-]?gold\b/i,
+  /\bsecret[\s-]?passage\b|\bhidden[\s-]?door\b|\bsecret[\s-]?room\b/i,
+  /\btrap\b|\bdisarmed\b|\bsaw[\s-]?it[\s-]?coming\b/i,
+  /\bupdated[\s-]?my[\s-]?map\b|\bcharted\b|\bnew[\s-]?territory\b/i,
+  /\blow[\s-]?hp\b|\brunning[\s-]?on[\s-]?empty\b|\bdepleted\b/i,
+  /\blit[\s-]?a[\s-]?candle\b|\bshed[\s-]?light[\s-]?on\b|\billuminated\b/i,
+  /\blocked[\s-]?door\b|\bnot[\s-]?ready[\s-]?yet\b|\bgated\b/i,
+  /\bfound[\s-]?the[\s-]?key\b|\bkey[\s-]?insight\b|\bunlocked[\s-]?it\b/i,
+  /\bfinal[\s-]?room\b|\blast[\s-]?door\b|\bendgame[\s-]?moment\b/i,
+  /\brest[\s-]?point\b|\bsafe[\s-]?room\b|\brest[\s-]?and[\s-]?recharge\b/i,
+  /\bfound[\s-]?the[\s-]?path\b|\bway[\s-]?forward\b|\bpath[\s-]?forward\b/i,
+]
+
+/**
+ * Award map_session if 3+ Map Room (v26) words appear in one journal entry.
+ */
+export function checkMapSession(journalText: string): BadgeType | null {
+  if (hasBadge('map_session')) return null
+  const matchCount = MAP_WORDS_V26.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('map_session')
+    return 'map_session'
+  }
+  return null
+}
+
+/**
+ * Award illuminated if journal entry is 700+ words (the cartographer's log).
+ */
+export function checkIlluminated(journalText: string): BadgeType | null {
+  if (hasBadge('illuminated')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 700) {
+    awardBadge('illuminated')
+    return 'illuminated'
+  }
+  return null
+}
+
+/**
+ * Award dawn_patrol if check-in happens before 06:00 local on 2 separate days.
+ */
+export function checkDawnPatrol(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_patrol')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour >= 6) return null
+
+  try {
+    const key = 'dawn_patrol_dates'
+    const raw = localStorage.getItem(key)
+    const dates: string[] = raw ? JSON.parse(raw) : []
+    const today = now.toISOString().split('T')[0]
+    if (!dates.includes(today)) {
+      dates.push(today)
+      localStorage.setItem(key, JSON.stringify(dates.slice(-30)))
+    }
+    if (dates.length >= 2) {
+      awardBadge('dawn_patrol')
+      return 'dawn_patrol'
+    }
+  } catch { /* non-critical */ }
+  return null
+}
+
+/**
+ * Check secret boss v23 — hidden Ancient Vault triggers.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkAncientVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+
+  if (!hasBadge('dark_souls_echo') && /\bdark[\s-]?souls\b|\byou[\s-]?died\b|\bbonfire[\s-]?lit\b|\bestus[\s-]?flask\b|\bpraise[\s-]?the[\s-]?sun\b/i.test(journalText)) {
+    if (awardBadge('dark_souls_echo')) awarded.push('dark_souls_echo')
+  }
+  if (!hasBadge('d_n_d_roll') && /\bd[\s-]?n[\s-]?d\b|\bdungeons?[\s-]?and[\s-]?dragons?\b|\bnat[\s-]?20\b|\bnatural[\s-]?twenty\b/i.test(journalText)) {
+    if (awardBadge('d_n_d_roll')) awarded.push('d_n_d_roll')
+  }
+  if (!hasBadge('myst_island') && /\bmyst\b|\briven\b|\batrus\b|\bd[\s-]?ni\b|\blinking[\s-]?book\b/i.test(journalText)) {
+    if (awardBadge('myst_island')) awarded.push('myst_island')
+  }
+
+  return awarded
+}

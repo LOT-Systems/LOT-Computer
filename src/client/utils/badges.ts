@@ -893,6 +893,43 @@ export type BadgeType =
   | 'portal_turret'         // □·◉·□  "companion cube/aperture/glados/wheatley/cake is a lie" detected (EPIC)
   | 'the_witness_eye'       // ◯·—·■  "the witness/jungle puzzles/island lasers/beams" detected (RARE)
   | 'baba_is_you'           // ●·□·●  "baba is you/baba/keke/win condition/rock is" detected (MYTHIC)
+  // ── Word Turn v26 — THE MAP ROOM ─────────────────────────────────────────────
+  | 'fog_lifted'            // ≈·○·≈  "fog of war/fog lifted/clarity came/emerged from the fog" detected (RARE)
+  | 'treasure_room'         // ◇·■·◇  "treasure room/unexpected find/found gold/jackpot/the motherlode" detected (COMMON)
+  | 'secret_passage'        // ░→◉    "secret passage/hidden door/found a secret/secret room" detected (RARE)
+  | 'trap_disarmed'         // ×·○·×  "trap/disarmed/saw it coming/defused it/dodged that one" detected (UNCOMMON)
+  | 'map_updated'           // ■·+·■  "updated my map/charted/new territory/mental map/mapped this" detected (COMMON)
+  | 'low_hp'                // ▼·○·▼  "low hp/running on empty/depleted/tank nearly empty" detected (UNCOMMON)
+  | 'torch_lit'             // ○·★·○  "lit a candle/shed light on/brought clarity/illuminated/light at the end" detected (UNCOMMON)
+  | 'locked_room'           // □·×·□  "locked door/blocked/not ready yet/gated/behind a wall" detected (RARE)
+  | 'key_drop'              // ◆·→·□  "found the key/that's the key/key insight/unlocked it" detected (COMMON)
+  | 'final_room'            // █·◉·█  "final room/last door/endgame moment/this is it/the final room" detected (EPIC)
+  | 'rest_point'            // ○·─·○  "rest point/safe room/took a rest/rest and recharge/resting now" detected (COMMON)
+  | 'path_found'            // →·▲·→  "found the path/way forward/path forward/next level/clear the way" detected (RARE)
+  // ── Calendar Easter Egg v24 — DUNGEON BIRTHDAYS ───────────────────────────────
+  | 'doom_day'              // ▓·□·▓  Dec 10 — DOOM released (December 10, 1993) (RARE)
+  | 'minecraft_day'         // ■·◆·■  Nov 18 — Minecraft 1.0 release (November 18, 2011) (RARE)
+  | 'diablo_day'            // ◆·▓·◆  Jan 3  — Diablo released (January 3, 1997) (RARE)
+  // ── Behavioral v23 — MAP ROOM PATTERNS ────────────────────────────────────────
+  | 'map_session'           // ≈·≋·≈  3+ Map Room (v26) trigger words in one journal entry (RARE)
+  | 'illuminated'           // ●·∞·●  Journal entry >= 700 words (EPIC)
+  | 'dawn_patrol'           // ∴·▲·∴  Check in before 6 AM on 2 consecutive days (UNCOMMON)
+  // ── Achievement RPG v24 — MAP CLASS ──────────────────────────────────────────
+  | 'map_entry'             // ∘→≋    Any 1 Word Turn v26 badge (COMMON)
+  | 'map_class'             // ≈→≋    Any 5 Word Turn v26 badges (UNCOMMON)
+  | 'map_complete'          // ≋→≋    All 12 Word Turn v26 badges (LEGENDARY)
+  | 'map_arc'               // ≋·◆    map_complete + all 3 Calendar v24 badges (LEGENDARY)
+  | 'twenty_six_engines_arc' // ◈·◈·≋  1 badge from each Word Turn v1–v26 (LEGENDARY)
+  | 'map_opus'              // ≋·◉·≋  map_complete + map_session behavioral (LEGENDARY)
+  // ── Mastery Tier v26 — THE CARTOGRAPHER ──────────────────────────────────────
+  | 'dungeon_master'        // ◉·≋·◉  1400+ distinct calendar check-in days (LEGENDARY)
+  | 'legendary_scroll'      // ≋·∞·≋  400,000+ total journal words (MYTHIC)
+  | 'dungeon_age'           // ╔═╗·≋  Account age >= 10 years (LEGENDARY)
+  | 'twenty_six_registers'  // ◈·◈·≋·∞ 1 badge from all 26 Word Turn engines (COSMIC)
+  // ── Secret Boss v23 — THE ANCIENT VAULT ──────────────────────────────────────
+  | 'dark_souls_echo'       // ☐·▓·☐  "dark souls/you died/bonfire lit/estus flask/praise the sun" detected (RARE)
+  | 'd_n_d_roll'            // ●·□·●  "dungeons and dragons/d&d/d20/nat 20/roll for initiative" detected (EPIC)
+  | 'myst_island'           // ○·≋·○  "myst/riven/linking book/ages of myst/myst island" detected (RARE)
 
 export interface Badge {
   id: BadgeType
@@ -8118,6 +8155,300 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+
+  // ── Word Turn v26 — THE MAP ROOM ─────────────────────────────────────────────────
+  fog_lifted: {
+    id: 'fog_lifted',
+    symbol: '≈·○·≈',
+    name: 'Fog Lifted',
+    description: 'Write "fog of war", "fog lifted", "clarity came", or "emerged from the fog" in any journal entry',
+    unlockMessage: '↳ FOG LIFTED. In dungeon games the fog of war hides what you haven\'t mapped yet. In real life it\'s the same — until you walk into it. You walked in. ≈·○·≈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  treasure_room: {
+    id: 'treasure_room',
+    symbol: '◇·■·◇',
+    name: 'Treasure Room',
+    description: 'Write "treasure room", "unexpected find", "found gold", "jackpot", or "the motherlode" in any journal entry',
+    unlockMessage: '↳ TREASURE ROOM. The dungeon\'s best rooms are the ones you didn\'t expect. Unexpected find. Jackpot. The motherlode. The self-care treasure room is always the insight you didn\'t plan to have. ◇·■·◇',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  secret_passage: {
+    id: 'secret_passage',
+    symbol: '░→◉',
+    name: 'Secret Passage',
+    description: 'Write "secret passage", "hidden door", "found a secret", or "secret room" in any journal entry',
+    unlockMessage: '↳ SECRET PASSAGE. In every dungeon there are walls that open if you press them. Most people walk past them. You found one. The hidden door always leads somewhere the main path skips. ░→◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  trap_disarmed: {
+    id: 'trap_disarmed',
+    symbol: '×·○·×',
+    name: 'Trap Disarmed',
+    description: 'Write "trap", "disarmed", "saw it coming", "defused it", or "dodged that one" in any journal entry',
+    unlockMessage: '↳ TRAP DISARMED. You saw it coming. The dungeon is full of traps — and so is the mind. The ones you name are the ones you can step around. ×·○·×',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  map_updated: {
+    id: 'map_updated',
+    symbol: '■·+·■',
+    name: 'Map Updated',
+    description: 'Write "updated my map", "charted", "new territory", "mental map", or "mapped this" in any journal entry',
+    unlockMessage: '↳ MAP UPDATED. Every session adds to the map. You can\'t chart the whole dungeon in one run. But you can add one room. One corridor. One marked exit. ■·+·■',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  low_hp: {
+    id: 'low_hp',
+    symbol: '▼·○·▼',
+    name: 'Low HP',
+    description: 'Write "low hp", "running on empty", "depleted", or "tank nearly empty" in any journal entry',
+    unlockMessage: '↳ LOW HP. The health bar isn\'t zero — it\'s low. In the dungeon, low HP is the moment you play most carefully. It\'s also when you find the rest room. ▼·○·▼',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  torch_lit: {
+    id: 'torch_lit',
+    symbol: '○·★·○',
+    name: 'Torch Lit',
+    description: 'Write "lit a candle", "shed light on", "brought clarity", "illuminated", or "light at the end" in any journal entry',
+    unlockMessage: '↳ TORCH LIT. The dungeon is dark by default. Every time you write, you light a torch. The room you can see is bigger than you thought. ○·★·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  locked_room: {
+    id: 'locked_room',
+    symbol: '□·×·□',
+    name: 'Locked Room',
+    description: 'Write "locked door", "blocked", "not ready yet", "gated", or "behind a wall" in any journal entry',
+    unlockMessage: '↳ LOCKED ROOM. Not every door opens today. The dungeoneer who respects a locked room comes back with the key. There\'s no shame in noting what you\'re not through yet. □·×·□',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  key_drop: {
+    id: 'key_drop',
+    symbol: '◆·→·□',
+    name: 'Key Drop',
+    description: 'Write "found the key", "that\'s the key", "key insight", or "unlocked it" in any journal entry',
+    unlockMessage: '↳ KEY DROP. In the dungeon the key always drops from the thing you were already fighting. The insight comes from the work you were already doing. ◆·→·□',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  final_room: {
+    id: 'final_room',
+    symbol: '█·◉·█',
+    name: 'Final Room',
+    description: 'Write "final room", "last door", "endgame moment", "this is it", or "the final room" in any journal entry',
+    unlockMessage: '↳ FINAL ROOM. The last door before the boss. You\'ve been here before — and it\'s different every time. The final room is always the one you weren\'t sure you\'d reach. █·◉·█',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  rest_point: {
+    id: 'rest_point',
+    symbol: '○·─·○',
+    name: 'Rest Point',
+    description: 'Write "rest point", "safe room", "took a rest", "rest and recharge", or "resting now" in any journal entry',
+    unlockMessage: '↳ REST POINT. The safe room. In dungeon design, rest points exist because they understand that the run continues after. Rest is not the end — it\'s the preparation for the next room. ○·─·○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  path_found: {
+    id: 'path_found',
+    symbol: '→·▲·→',
+    name: 'Path Found',
+    description: 'Write "found the path", "way forward", "path forward", "next level", or "clear the way" in any journal entry',
+    unlockMessage: '↳ PATH FOUND. The dungeon always has a path forward. Sometimes it\'s hidden. Sometimes it\'s a key. Sometimes it\'s a door you needed to be ready for. You found it. →·▲·→',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v24 — DUNGEON BIRTHDAYS ───────────────────────────────────
+  doom_day: {
+    id: 'doom_day',
+    symbol: '▓·□·▓',
+    name: 'DOOM Day',
+    description: 'Check in on December 10 — DOOM release date (December 10, 1993)',
+    unlockMessage: '↳ December 10, 1993 — DOOM was released. The first great dungeon shooter. The spawn point for an entire genre. E1M1. The shotgun. The imp around the corner. RIP AND TEAR. ▓·□·▓',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  minecraft_day: {
+    id: 'minecraft_day',
+    symbol: '■·◆·■',
+    name: 'Minecraft Day',
+    description: 'Check in on November 18 — Minecraft 1.0 release (November 18, 2011)',
+    unlockMessage: '↳ November 18, 2011 — Minecraft 1.0 was released. The dungeon you build yourself. The map is always unexplored. The torch you place is always yours. A blocky infinity. ■·◆·■',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  diablo_day: {
+    id: 'diablo_day',
+    symbol: '◆·▓·◆',
+    name: 'Diablo Day',
+    description: 'Check in on January 3 — Diablo release date (January 3, 1997)',
+    unlockMessage: '↳ January 3, 1997 — Diablo was released. The dungeon that goes 16 floors deep. The clicking. The loot. The town portal. You always said one more level. One more run. ◆·▓·◆',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v23 — MAP ROOM PATTERNS ───────────────────────────────────────────
+  map_session: {
+    id: 'map_session',
+    symbol: '≈·≋·≈',
+    name: 'Map Session',
+    description: 'Write 3+ Map Room (v26) trigger words in one journal entry',
+    unlockMessage: '↳ MAP SESSION. Fog lifted. Treasure found. Path forward. Three map moves in one entry. You ran the whole dungeon in a single session. ≈·≋·≈',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  illuminated: {
+    id: 'illuminated',
+    symbol: '●·∞·●',
+    name: 'Illuminated',
+    description: 'Write a journal entry of 700+ words',
+    unlockMessage: '↳ ILLUMINATED. 700 words. The torch reached every corner of this room. That\'s what a fully lit dungeon room feels like — everything visible, nothing hidden. ●·∞·●',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  dawn_patrol: {
+    id: 'dawn_patrol',
+    symbol: '∴·▲·∴',
+    name: 'Dawn Patrol',
+    description: 'Check in before 6 AM on 2 consecutive days',
+    unlockMessage: '↳ DAWN PATROL. Two mornings before 6 AM. The dungeon\'s early hours are always the quietest. The torches are brighter before the world is loud. You ran the dawn patrol. ∴·▲·∴',
+    rarity: 'uncommon',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v24 — MAP CLASS ───────────────────────────────────────────────
+  map_entry: {
+    id: 'map_entry',
+    symbol: '∘→≋',
+    name: 'Map Entry',
+    description: 'Earn any 1 Word Turn v26 (Map Room) badge',
+    unlockMessage: '↳ MAP ENTRY. The first room charted. Every dungeon starts with this one — the one you actually enter. ∘→≋',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  map_class: {
+    id: 'map_class',
+    symbol: '≈→≋',
+    name: 'Map Class',
+    description: 'Earn any 5 Word Turn v26 (Map Room) badges',
+    unlockMessage: '↳ MAP CLASS. Five rooms charted. Fog. Treasure. Secret. Key. Path. The shape of the dungeon is becoming clear. ≈→≋',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  map_complete: {
+    id: 'map_complete',
+    symbol: '≋→≋',
+    name: 'Map Complete',
+    description: 'Earn all 12 Word Turn v26 (Map Room) badges',
+    unlockMessage: '↳ MAP COMPLETE. All 12 rooms. Fog. Treasure. Secret Passage. Trap. Map. Low HP. Torch. Locked Room. Key. Final Room. Rest Point. Path Found. Every room of the dungeon, mapped. ≋→≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  map_arc: {
+    id: 'map_arc',
+    symbol: '≋·◆',
+    name: 'Map Arc',
+    description: 'Earn map_complete + all 3 Calendar v24 (Dungeon Birthday) badges',
+    unlockMessage: '↳ MAP ARC. DOOM. Diablo. Minecraft. The three dungeons that defined the genre, plus the 12 rooms of your own dungeon. The arc is complete. ≋·◆',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_six_engines_arc: {
+    id: 'twenty_six_engines_arc',
+    symbol: '◈·◈·≋',
+    name: 'Twenty-Six Engines Arc',
+    description: 'Earn at least 1 badge from each of the 26 Word Turn engines (v1–v26)',
+    unlockMessage: '↳ TWENTY-SIX ENGINES. Every word engine fired. Ritual. Sci-fi. Myth. Cyberspace. Hero. RPG. Rogue. Puzzle. Map Room. Twenty-six vocabularies of self, all active. ◈·◈·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  map_opus: {
+    id: 'map_opus',
+    symbol: '≋·◉·≋',
+    name: 'Map Opus',
+    description: 'Earn map_complete + the map_session behavioral badge',
+    unlockMessage: '↳ MAP OPUS. The dungeon fully mapped, and a full map session played in one day. The opus of the cartographer: every room, every corridor, one complete run. ≋·◉·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v26 — THE CARTOGRAPHER ──────────────────────────────────────────
+  dungeon_master: {
+    id: 'dungeon_master',
+    symbol: '◉·≋·◉',
+    name: 'Dungeon Master',
+    description: '1400+ distinct calendar days with check-ins',
+    unlockMessage: '↳ DUNGEON MASTER. 1,400 distinct days. The dungeon master has seen every room. You have been running this dungeon long enough to understand its patterns. ◉·≋·◉',
+    rarity: 'legendary',
+    category: 'easter_egg',
+  },
+  legendary_scroll: {
+    id: 'legendary_scroll',
+    symbol: '≋·∞·≋',
+    name: 'Legendary Scroll',
+    description: '400,000+ total journal words written',
+    unlockMessage: '↳ LEGENDARY SCROLL. 400,000 words. The ancient library. The dungeon lore complete. This is not a run — this is a campaign that lasted years, and the scroll that records it. ≋·∞·≋',
+    rarity: 'mythic',
+    category: 'easter_egg',
+  },
+  dungeon_age: {
+    id: 'dungeon_age',
+    symbol: '╔═╗·≋',
+    name: 'Dungeon Age',
+    description: 'Account age >= 10 years',
+    unlockMessage: '↳ DUNGEON AGE. Ten years. The dungeon has been running since before most people started their first character. You are not a new player. The ancient ones remember. ╔═╗·≋',
+    rarity: 'legendary',
+    category: 'easter_egg',
+  },
+  twenty_six_registers: {
+    id: 'twenty_six_registers',
+    symbol: '◈·◈·≋·∞',
+    name: 'Twenty-Six Registers',
+    description: '1 badge from all 26 Word Turn engines (v1–v26)',
+    unlockMessage: '↳ TWENTY-SIX REGISTERS. Every word engine represented. Every vocabulary of self touched. Twenty-six floors of the dungeon, each one charted. The complete map. ◈·◈·≋·∞',
+    rarity: 'cosmic',
+    category: 'easter_egg',
+  },
+
+  // ── Secret Boss v23 — THE ANCIENT VAULT ──────────────────────────────────────────
+  dark_souls_echo: {
+    id: 'dark_souls_echo',
+    symbol: '☐·▓·☐',
+    name: 'Bonfire Lit',
+    description: 'Write "dark souls", "you died", "bonfire lit", "estus flask", or "praise the sun" in any journal entry',
+    unlockMessage: '↳ BONFIRE LIT. YOU DIED. But you re-lit the bonfire. Dark Souls\' real mechanic is persistence: you lose everything but the knowledge. You keep the knowledge. Run again. ☐·▓·☐',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  d_n_d_roll: {
+    id: 'd_n_d_roll',
+    symbol: '●·□·●',
+    name: 'Roll for Initiative',
+    description: 'Write "dungeons and dragons", "d&d", "d20", "nat 20", or "roll for initiative" in any journal entry',
+    unlockMessage: '↳ ROLL FOR INITIATIVE. The d20 is the core of the dungeon. But the real dice are your choices. Roll for initiative every morning. Nat 20 is when you show up. ●·□·●',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  myst_island: {
+    id: 'myst_island',
+    symbol: '○·≋·○',
+    name: 'Myst Island',
+    description: 'Write "myst", "riven", "linking book", "ages of myst", or "myst island" in any journal entry',
+    unlockMessage: '↳ MYST ISLAND. The game where the dungeon is an island you cannot explain to anyone who hasn\'t been there. The linking book takes you to another age. Every journal entry is a linking book. ○·≋·○',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -9275,6 +9606,57 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v25: twenty_five_registers — 1 badge from all 25 Word Turn engines
     if (allTwentyFiveEngines && !hasBadge('twenty_five_registers')) {
       if (awardBadge('twenty_five_registers')) newBadges.push('twenty_five_registers')
+    }
+
+    // ── v36 (v26) — THE MAP ROOM ──────────────────────────────────────────────
+    const mapV26Badges: BadgeType[] = [
+      'fog_lifted', 'treasure_room', 'secret_passage', 'trap_disarmed',
+      'map_updated', 'low_hp', 'torch_lit', 'locked_room',
+      'key_drop', 'final_room', 'rest_point', 'path_found',
+    ]
+    const mapV26Earned = mapV26Badges.filter(b => hasBadge(b))
+
+    if (mapV26Earned.length >= 1 && !hasBadge('map_entry')) {
+      if (awardBadge('map_entry')) newBadges.push('map_entry')
+    }
+    if (mapV26Earned.length >= 5 && !hasBadge('map_class')) {
+      if (awardBadge('map_class')) newBadges.push('map_class')
+    }
+    const mapComplete = mapV26Earned.length >= 12
+    if (mapComplete && !hasBadge('map_complete')) {
+      if (awardBadge('map_complete')) newBadges.push('map_complete')
+    }
+    if (mapComplete && hasBadge('map_session') && !hasBadge('map_opus')) {
+      if (awardBadge('map_opus')) newBadges.push('map_opus')
+    }
+    const calendarV24Badges: BadgeType[] = ['doom_day', 'minecraft_day', 'diablo_day']
+    if (mapComplete && calendarV24Badges.every(b => hasBadge(b)) && !hasBadge('map_arc')) {
+      if (awardBadge('map_arc')) newBadges.push('map_arc')
+    }
+    const engineTwentySixPresent = mapV26Earned.length >= 1
+    const allTwentySixEngines = allTwentyFiveEngines && engineTwentySixPresent
+    if (allTwentySixEngines && !hasBadge('twenty_six_engines_arc')) {
+      if (awardBadge('twenty_six_engines_arc')) newBadges.push('twenty_six_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1400 && !hasBadge('dungeon_master')) {
+        if (awardBadge('dungeon_master')) newBadges.push('dungeon_master')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 400000 && !hasBadge('legendary_scroll')) {
+        if (awardBadge('legendary_scroll')) newBadges.push('legendary_scroll')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupDA = new Date(stats.signupDate)
+      const yearsDA = (new Date().getTime() - signupDA.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsDA >= 10 && !hasBadge('dungeon_age')) {
+        if (awardBadge('dungeon_age')) newBadges.push('dungeon_age')
+      }
+    }
+    if (allTwentySixEngines && !hasBadge('twenty_six_registers')) {
+      if (awardBadge('twenty_six_registers')) newBadges.push('twenty_six_registers')
     }
 
   } catch (error) {
