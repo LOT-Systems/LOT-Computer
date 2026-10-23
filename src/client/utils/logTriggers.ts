@@ -115,3 +115,19 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+/**
+ * Parse the optional scope word following `/story` ("/story week").
+ * Defaults to 'day'. Accepts a few natural aliases. Mirrors the server's
+ * StoryScope (src/server/utils/story-compression.ts).
+ */
+export function parseStoryScope(text: string): 'day' | 'week' | 'month' | 'year' {
+  const m = /(?:^|\s)\/story\s+(day|today|week|weekly|month|monthly|year|yearly)\b/i.exec(text || '')
+  if (!m) return 'day'
+  const w = m[1].toLowerCase()
+  if (w.startsWith('week')) return 'week'
+  if (w.startsWith('month')) return 'month'
+  if (w.startsWith('year')) return 'year'
+  return 'day'
+}
+

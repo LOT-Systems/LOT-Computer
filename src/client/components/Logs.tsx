@@ -28,7 +28,7 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, parseStoryScope, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3745,7 +3745,11 @@ const NoteEditor = ({
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
-      const updated = current + separator + '📖 ' + data.story
+      const arcadeLine = data.arcade
+        ? `\n[${data.arcade.rank} · LV${data.arcade.level} · ${data.arcade.xp} XP` +
+          (data.arcade.nextRank ? ` · ${data.arcade.xpToNext} to ${data.arcade.nextRank}` : '') + ']'
+        : ''
+      const updated = current + separator + '📖 ' + data.story + arcadeLine
       setValue(updated)
       valueRef.current = updated
       onChangeRef.current(updated)
@@ -4122,27 +4126,39 @@ const NoteEditor = ({
         }
       } else if (trigger === 'system-help') {
         const lines = [
-          'AVAILABLE COMMANDS',
+          'LOT® SYSTEM — COMMANDS',
           '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
+          'STORY (compressed from your context-tagged log)',
+          '/story          Today',
+          '/story week     Last 7 days',
+          '/story month    Last 30 days',
+          '/story year     Last 365 days',
+          '                Ends with your Arcade rank [RANK · LV · XP]',
           '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
+          'INTELLIGENCE',
+          '/qi [query]     Ask the Quantum Intelligence engine',
+          '/scan           System status overview',
+          '/assembly       Self-assembly module status',
+          '/phys           Physiological cohort report',
+          '/qos            Quantum OS state analysis',
+          '/silent         Signal silence check',
+          '',
+          'SELF-CARE',
+          '/prayer         Contextual scripture',
+          '/breathe        4-2-6 breathing exercise',
+          '/freeze         Pause and reflect protocol',
+          '/fast           Orthodox fasting calendar',
+          '/how            LOT AI check-in (System tab)',
+          '',
+          'ENVIRONMENT',
+          '/synth          Toggle keyboard sound',
+          '/radio          Toggle radio',
+          '/night          Dark mode',
+          '',
+          '/system         This screen',
+          'Ctrl+Enter      Save log immediately',
+          '',
+          'No prompts. Just write — every entry carries its context.',
         ]
         setSystemHelp(lines.join('\n'))
       } else if (trigger === 'how-checkin') {
@@ -4151,18 +4167,27 @@ const NoteEditor = ({
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
+          // Grace period: "/story" fires the moment it is typed, but the
+          // operator may still be typing the scope ("/story week"). Re-read
+          // the live value after a beat so the scope word is not lost.
+          window.setTimeout(() => {
+            const live = valueRef.current
+            const scope = parseStoryScope(live)
+            const logText = live
+              .replace(/\/story(\s+(day|today|week|weekly|month|monthly|year|yearly)\b)?/i, '')
+              .replace(/📖/g, '')
+              .trim()
+            try {
+              submitStory({
+                logText,
+                scope,
+                quantumState: getUserState(),
+                userIndex: getUserIndex(),
+              })
+            } catch {
+              submitStory({ logText: live, scope })
+            }
+          }, 1500)
         }
       }
     }

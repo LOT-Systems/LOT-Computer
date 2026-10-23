@@ -35,6 +35,7 @@ import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
+import { buildStoryDigest, formatDigestForPrompt, composeFallbackStory, computeArcadeStanding, STORY_SCOPES, type StoryScope } from '#server/utils/story-compression'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
 import { generateContextualPrompts, generatePatternAwareQuestion, analyzePatternEvolution } from '#server/utils/contextual-prompts'
@@ -5490,6 +5491,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          scope?: StoryScope
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,12 +5516,20 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const scope: StoryScope = STORY_SCOPES.includes(req.body.scope as StoryScope)
+        ? (req.body.scope as StoryScope)
+        : 'day'
 
+      // Newest-first. Capped so a year-scope story stays cheap; the digest
+      // (not the raw rows) is what reaches the LLM.
       const logs = await fastify.models.Log.findAll({
         where: { userId: req.user.id },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: scope === 'year' ? 3000 : 1000,
       })
+
+      const digest = buildStoryDigest(logs as any, scope)
+      const arcade = computeArcadeStanding(logs as any)
 
       const recentEntries = logs
         .filter(l => l.event === 'log_entry' || l.event === 'journal')
@@ -5549,7 +5559,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story (scope: ${scope.toUpperCase()}). Your task: write 1-2 paragraphs (100-200 words) compressing that ${scope} into a story — mood trajectory, self-care patterns, and any spike or pattern change in the DIGEST. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
@@ -5560,10 +5570,16 @@ RULES:
 - The tone should match their current energy: reflective if low, energized if high
 - End with a single forward-looking sentence — not a pep talk, just a quiet truth
 - Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Keep it under 200 words.
+- Treat the DIGEST as ground truth. Never invent events, numbers or places it does not contain.`
 
       const dataBlock = `
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+
+DIGEST:
+${formatDigestForPrompt(digest)}
+
+ARCADE: rank ${arcade.rank} (level ${arcade.level}, ${arcade.xp} XP)
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 
@@ -5596,6 +5612,9 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            scope,
+            digest: { ...digest, excerpts: undefined },
+            arcade,
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5604,12 +5623,16 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          scope,
+          arcade,
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
         return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
+          story: composeFallbackStory(digest),
           logId: null,
+          scope,
+          arcade,
         }
       }
     }
