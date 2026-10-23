@@ -177,3 +177,59 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Build a Date whose local getters (getHours/getDate/...) read the wall-clock
+ * of `timeZone`, so the astrology functions above reflect the user's saved
+ * timeZone rather than the device/server timeZone. Falls back to `date`
+ * itself when timeZone is missing or invalid.
+ */
+export function getWallClockDate(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(date)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return date
+  }
+}
+
+export interface AstrologyLogResonance {
+  /** Logs that carry an astrology snapshot */
+  total: number
+  /** Rokuyo under which the user logs most often (null if no data) */
+  topRokuyo: string | null
+  topRokuyoCount: number
+  /** Logs created under today's rokuyo */
+  underCurrentRokuyo: number
+}
+
+/**
+ * Personalization from Logs: tally the ambient astrology snapshots stored on
+ * the user's own log entries (LogContext.astro*). Still ambient — no natal data.
+ */
+export function summarizeAstrologyLogs(
+  logs: Array<{ context?: { astroRokuyo?: string | null } | null }>,
+  currentRokuyo: string
+): AstrologyLogResonance {
+  const counts: Record<string, number> = {}
+  let total = 0
+  for (const log of logs) {
+    const r = log.context?.astroRokuyo
+    if (!r) continue
+    counts[r] = (counts[r] || 0) + 1
+    total++
+  }
+  let topRokuyo: string | null = null
+  let topRokuyoCount = 0
+  for (const [r, n] of Object.entries(counts)) {
+    if (n > topRokuyoCount) { topRokuyo = r; topRokuyoCount = n }
+  }
+  return { total, topRokuyo, topRokuyoCount, underCurrentRokuyo: counts[currentRokuyo] || 0 }
+}

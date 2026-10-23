@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo, getWallClockDate, summarizeAstrologyLogs } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -205,7 +205,8 @@ export const System = React.memo(function SystemInner() {
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
   // rokuyo), not a personal natal chart.
   const astrology = React.useMemo(() => {
-    const now = new Date()
+    // Read the clock in the user's saved timeZone (falls back to device time)
+    const now = getWallClockDate(new Date(), me?.timeZone)
     const hourlyZodiac = getHourlyZodiac(now)
     const westernZodiac = getWesternZodiac(now)
     const moonPhase = getMoonPhase(now)
@@ -219,7 +220,18 @@ export const System = React.memo(function SystemInner() {
       rokuyo,
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+  }, [astrologyTick, me?.timeZone])
+
+  // Personalization from Logs: how the user's own entries distribute across
+  // the ambient rokuyo cycle (snapshots stored by getLogContext).
+  const astrologyResonance = React.useMemo(
+    () => summarizeAstrologyLogs(logs as any[], astrology.rokuyo),
+    [logs, astrology.rokuyo]
+  )
+  const astrologyResonanceLabel = astrologyResonance.total > 0
+    ? `${astrologyResonance.underCurrentRokuyo} logs under ${astrology.rokuyo}` +
+      (astrologyResonance.topRokuyo ? ` • most active: ${astrologyResonance.topRokuyo}` : '')
+    : null
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
@@ -467,6 +479,9 @@ export const System = React.memo(function SystemInner() {
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
+            {astrologyResonanceLabel && (
+              <div className="opacity-40">{astrologyResonanceLabel}</div>
+            )}
           </Block>
         </div>
 
@@ -670,9 +685,14 @@ export const System = React.memo(function SystemInner() {
           }}
         >
           {astrologyView === 'astrology' ? (
-            <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
-            </div>
+            <>
+              <div>
+                {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              </div>
+              {astrologyResonanceLabel && (
+                <div className="opacity-40">{astrologyResonanceLabel}</div>
+              )}
+            </>
           ) : astrologyView === 'psychology' ? (
             <div>
               {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}
