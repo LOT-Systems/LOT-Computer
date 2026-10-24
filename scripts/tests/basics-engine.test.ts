@@ -69,3 +69,13 @@ const hot = envelope(t0, { ...all, '12': mk(9000) }) // underwear quoted at 90.0
 assert(!hot.ok && /LANDED|MARGIN/.test(hot.breach!))
 assert(!isLive(mk(0), t0))
 console.log('basics-engine: ALL PASS')
+
+// Route guard: every hard-loadable client route must be served by the SPA shell,
+// else a reload of /basics redirects to / (the OPEN TAB ENTER link breaks).
+import { readFileSync } from 'node:fs'
+{
+  const idx = readFileSync(new URL('../../src/server/index.ts', import.meta.url), 'utf8')
+  const m = idx.match(/KNOWN_CLIENT_ROUTES = \[([^\]]*)\]/)
+  if (!m || !m[1].includes("'/basics'")) throw new Error('KNOWN_CLIENT_ROUTES missing /basics')
+  console.log('basics-route: PASS')
+}
