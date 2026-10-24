@@ -40,6 +40,7 @@ import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#se
 import { generateContextualPrompts, generatePatternAwareQuestion, analyzePatternEvolution } from '#server/utils/contextual-prompts'
 import { analyzeEnergyState, generateEnergySuggestions } from '#server/utils/energy'
 import { generateUserNarrative } from '#server/utils/rpg-narrative'
+import { isStoryPeriod, storyWindowStart, summarizeEntries, computeArcade, renderArcadeLine, composeCompressedStory, type StoryPeriod } from '#shared/utils/logCommands'
 import { generateChatCatalysts, generateConversationStarters, shouldShowChatCatalyst } from '#server/utils/cohort-chat-catalyst'
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
@@ -5490,6 +5491,8 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: StoryPeriod
+          badges?: number
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,12 +5517,26 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period: StoryPeriod = isStoryPeriod(req.body.period) ? req.body.period : 'day'
+      const badgeCount = Math.max(0, Math.min(2000, Math.floor(Number(req.body.badges) || 0)))
+      const since = storyWindowStart(period)
 
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: { userId: req.user.id, createdAt: { [Op.gte]: since } },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: period === 'year' ? 3000 : 600,
       })
+
+      const stats = summarizeEntries(
+        logs
+          .filter(l => l.event === 'log_entry' || l.event === 'journal' || l.event === 'emotional_checkin')
+          .map(l => ({
+            createdAt: l.createdAt as Date,
+            mood: l.event === 'emotional_checkin' ? (l.metadata?.emotionalState as string | undefined) : undefined,
+          }))
+      )
+      const arcade = computeArcade(stats, badgeCount)
+      const arcadeLine = renderArcadeLine(arcade)
 
       const recentEntries = logs
         .filter(l => l.event === 'log_entry' || l.event === 'journal')
@@ -5549,7 +5566,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story for the PERIOD given below (day, week, month or year). Your task: write a compressed story (1 paragraph for a day, up to 2 for longer periods; 100-200 words) that reflects their journey over that period, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
@@ -5563,6 +5580,9 @@ RULES:
 - Keep it under 200 words.`
 
       const dataBlock = `
+PERIOD: ${period.toUpperCase()}
+PERIOD STATS: ${stats.entries} entries over ${stats.activeDays} active days, current streak ${stats.streak}
+ARCADE: level ${arcade.level} ${arcade.rank} (${arcade.xp} XP) — mention only if it fits naturally
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
@@ -5596,6 +5616,9 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            period,
+            stats,
+            arcade,
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5604,12 +5627,18 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          period,
+          arcade,
+          arcadeLine,
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
         return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
+          story: composeCompressedStory(period, stats),
           logId: null,
+          period,
+          arcade,
+          arcadeLine,
         }
       }
     }
