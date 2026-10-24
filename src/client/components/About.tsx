@@ -288,7 +288,7 @@ export function About() {
               6 index dimensions. 6 ecosystem nodes. 51 physiological archetypes.
               190+ dependency nodes. 48 background jobs.
               151+ log event handlers. 125 active branches scanned.
-              750 badges catalogued. 20 Word Turn engines. 74 secret boss triggers. 210 word turns. The system does not sleep. It accumulates.
+              812 badges catalogued. 22 Word Turn engines. 27 secret boss triggers. 264 word turns. The system does not sleep. It accumulates.
             </P>
             <P>
               Field Manual v113. Not marketing copy. Not documentation for external audiences.
