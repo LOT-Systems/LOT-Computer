@@ -177,3 +177,45 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Re-express an instant as a Date whose local getters (getHours/getDate/...)
+ * return the wall-clock fields of `timeZone`. Falls back to the input on a
+ * missing or invalid zone. Isomorphic (Intl only), so the dashboard reads the
+ * same moment the server stamps onto Logs.
+ */
+export function toWallClockInZone(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23', year: 'numeric', month: 'numeric',
+      day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(date)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return date
+  }
+}
+
+/**
+ * Sync the ambient reading with Logs: how many of the user's past entries were
+ * written under today's rokuyo / moon phase (from the context snapshot each log
+ * carries). Entries from today are excluded so the count means "history".
+ */
+export function getAstrologyLogAlignment(
+  logs: Array<{ createdAt?: string | Date; context?: Record<string, any> | null }>,
+  reading: { rokuyo: string; moonPhase: string },
+  todayStart: Date
+): { sameMoon: number; sameRokuyo: number; stamped: number } {
+  let sameMoon = 0, sameRokuyo = 0, stamped = 0
+  for (const log of logs) {
+    const ctx = log.context
+    if (!ctx?.astroMoonPhase) continue
+    if (log.createdAt && new Date(log.createdAt) >= todayStart) continue
+    stamped++
+    if (ctx.astroMoonPhase === reading.moonPhase) sameMoon++
+    if (ctx.astroRokuyo === reading.rokuyo) sameRokuyo++
+  }
+  return { sameMoon, sameRokuyo, stamped }
+}
