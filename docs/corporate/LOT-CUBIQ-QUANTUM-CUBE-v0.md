@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.2 — SEE LOT-CUBIQ-QUANTUM-CUBE-v0.2-REPORT (ERRATA E1-E5)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -320,6 +320,27 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE NIGHTSTAND SETTLE                       2026-10-24
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, evening user retiring the phone-in-bed
+  habit; CUBIQ pad on a small nightstand, phone charging in another room.
+
+  At the chosen wind-down time, when the evening close advances the
+  Assembly phase, the cube performs THE SETTLE (Section 04) — two seconds
+  of standing pressure felt through the nightstand, no light, no sound. It
+  means "the day is closed; nothing is owed." If an item is still open, a
+  Nudge follows ten minutes later, never a Hop or Leap.
+
+  Rules enforced: quiet hours disable Hop and Leap by default; the edge
+  inhibit makes the cube shudder instead of leaping on a small surface;
+  the LED ring stays dark. Whether a hand rests on the cube during the
+  Settle is a non-invasive "haptic preference" signal for QI·46.
+
+  Full text, rationale and the physics corrections that shaped it:
+  docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0.2-REPORT.md, Section 09.
+  NOTE: the report's errata E1-E5 (Section 03) correct targets in
+  Sections 03, 04 and 06 above; those sections are left unedited.
 
 --------------------------------------------------------------------------------
 08 // BRAND
