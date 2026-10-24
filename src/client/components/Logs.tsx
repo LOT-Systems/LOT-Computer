@@ -10,7 +10,7 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
-import { useLogs, useUpdateLog } from '#client/queries'
+import { useLogs, useUpdateLog, useSendEmail } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
@@ -28,7 +28,7 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, parseEmailDraft, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3682,6 +3682,17 @@ const NoteEditor = ({
   const [asmResponse, setAsmResponse] = React.useState<string | null>(null)
   const [asmLoading, setAsmLoading] = React.useState(false)
   const [scanResult, setScanResult] = React.useState<string | null>(null)
+  const [emailResult, setEmailResult] = React.useState<string | null>(null)
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: (res) => setEmailResult(`SENT            TO ${res.to.toUpperCase()}\nDELIVERY        SYNC INBOX`),
+    onError: (err: any) => {
+      const d = err?.response?.data
+      setEmailResult(
+        `FAILED          ${String(d?.error || 'EMAIL NOT SENT').toUpperCase()}` +
+          (d?.candidates ? `\nMATCHES         ${d.candidates.join(', ').toUpperCase()}` : '')
+      )
+    },
+  })
   const { mutate: submitQi } = useQiQuery({
     onSuccess: (data) => {
       setQiResponse(data.assessment)
@@ -4051,6 +4062,13 @@ const NoteEditor = ({
             submitQi({ query })
           }
         }
+      } else if (trigger === 'email-send') {
+        const draft = parseEmailDraft(value)
+        if (draft) {
+          sendEmail(draft)
+        } else {
+          setEmailResult('DRAFT           NONE\nFORMAT          /email to Name. message /send')
+        }
       } else if (trigger === 'breathe') {
         setBreatheEnabled(prev => !prev)
       } else if (trigger === 'silent-mode') {
@@ -4139,6 +4157,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to Name. text   Compose email — finish with /send',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4323,6 +4342,15 @@ const NoteEditor = ({
                   })}
                 </div>
               )}
+            </Block>
+          </div>
+        )}
+        {emailResult && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                {emailResult}
+              </div>
             </Block>
           </div>
         )}

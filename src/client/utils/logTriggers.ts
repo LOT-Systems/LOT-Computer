@@ -40,6 +40,7 @@ export type LogTrigger =
   | 'qi-rfi'            // /qi — Quantum Intelligence RFI (Request for Information)
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
+  | 'email-send'        // /send — deliver the "/email to Name." draft in this log
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
 
 interface TriggerRule {
@@ -66,6 +67,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'qi-rfi',         emojis: [],        keywords: ['qi'] },
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
+  { trigger: 'email-send',     emojis: [],        keywords: ['send'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
 ]
 
@@ -114,4 +116,21 @@ export function detectNewTriggers(
   const fresh: LogTrigger[] = []
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
+}
+
+/**
+ * LOT® Email draft parser. A draft is a log whose text contains
+ * "/email to <Name>." followed by the message body, e.g.
+ *
+ *   /email to Hitomi. Dinner at 8?
+ *   /send
+ *
+ * Returns null when the text is not an email draft or has no body.
+ */
+export function parseEmailDraft(text: string): { to: string; body: string } | null {
+  const m = text.match(/(?:^|\s)\/email\s+to\s+([^\s.:,]+(?:\s+[^\s.:,]+)?)\s*[.:,]\s*([\s\S]*)/i)
+  if (!m) return null
+  const body = m[2].replace(/(^|\s)\/send(?=\s|$)/gi, ' ').trim()
+  if (!body) return null
+  return { to: m[1].trim(), body }
 }

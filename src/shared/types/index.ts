@@ -200,6 +200,17 @@ export type DirectMessage = {
   updatedAt: Date;
 };
 
+// Email Type (LOT® Email — Log compose, Sync inbox)
+export type Email = {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  body: string;
+  readAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 // Chat Message Types
 export type ChatMessage = {
   id: string;
