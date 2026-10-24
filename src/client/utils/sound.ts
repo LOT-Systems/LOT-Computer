@@ -1,7 +1,14 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
-import { useExternalScript } from './hooks'
 
 /**
  * Enhanced Hemi-Sync Context-Based Sound System
@@ -378,13 +385,17 @@ export function useSound(enabled: boolean) {
     return () => clearInterval(interval)
   }, [enabled, weather, usersOnline, currentDate, context.period, context.dailySeed, context.usersOnline])
 
-  // Update context when weather or usersOnline changes
+  // Update context when weather changes or users cross the click-symphony threshold
   React.useEffect(() => {
     if (!enabled) return
     const newContext = getTimeContext(weather, usersOnline)
-    const today = new Date().toDateString()
-    setCurrentDate(today)
-    setContext(newContext)
+    const crossedThreshold = (context.usersOnline <= 5 && newContext.usersOnline > 5) ||
+                             (context.usersOnline > 5 && newContext.usersOnline <= 5)
+    if (newContext.weather !== context.weather || crossedThreshold) {
+      const today = new Date().toDateString()
+      setCurrentDate(today)
+      setContext(newContext)
+    }
   }, [weather, usersOnline, enabled])
 
   React.useEffect(() => {

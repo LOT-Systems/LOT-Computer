@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { useStore } from '@nanostores/react'
@@ -30,10 +38,14 @@ export function SignalStreamWidget() {
   // Don't show if fewer than 3 signals
   if (engine.signals.length < 3) return null
 
-  // Get last 12 signals, newest first
-  const recentSignals = [...engine.signals]
-    .sort((a, b) => b.timestamp - a.timestamp)
-    .slice(0, 12)
+  // Get last 12 signals, newest first. Memoized on engine.signals so the
+  // full copy+sort of up to 1000 signals only runs when signals actually
+  // change — not on every re-render this mounted widget receives from other
+  // intentionEngine writes (analyzeIntentions keeps the same signals ref).
+  const recentSignals = React.useMemo(
+    () => [...engine.signals].sort((a, b) => b.timestamp - a.timestamp).slice(0, 12),
+    [engine.signals]
+  )
 
   const formatTimestamp = (ts: number): string => {
     const date = new Date(ts)

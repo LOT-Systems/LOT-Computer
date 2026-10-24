@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import * as React from 'react'
 import { Block, Button, GhostButton, Tag, TagsContainer } from '#client/components/ui'
 import { PublicProfile as PublicProfileType, WeatherStation, Wallet } from '#shared/types'
@@ -5,6 +13,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { joinWithDots, getLevelSymbol, getBadgeProgressionDisplay } from '#client/utils/badges'
+import { ProfileQRCode } from './ProfileQRCode'
 
 export const PublicProfile = () => {
   const [profile, setProfile] = React.useState<PublicProfileType | null>(null)
@@ -598,6 +607,60 @@ export const PublicProfile = () => {
             This is a demo account. Legacy level features shown as preview.
           </div>
         )}
+
+        {/* QR Code — Usership + assembly stage gate */}
+        {(() => {
+          const isUsership = profile.tags?.some(
+            t => t.toLowerCase() === 'usership'
+          )
+          if (!isUsership) return null
+
+          if (profile.assemblyPhase) {
+            const PHASE_ORDER = ['dormant', 'awakening', 'forming', 'assembled', 'integrated']
+            const phaseRank = PHASE_ORDER.indexOf(profile.assemblyPhase)
+            const formingRank = PHASE_ORDER.indexOf('forming')
+            if (phaseRank >= 0 && phaseRank < formingRank) return null
+          }
+
+          const THEMES: Record<string, { base: string; acc: string }> = {
+            light: { base: '#ffffff', acc: '#000000' },
+            dark: { base: '#000000', acc: '#ffffff' },
+            sunrise: { base: '#ffd266', acc: '#ffffff' },
+            sunset: { base: '#FF8758', acc: '#ffffff' },
+            fill_blue: { base: '#82CBF8', acc: '#ffffff' },
+            light_red: { base: '#FFF9F9', acc: '#E86575' },
+          }
+
+          let fgColor = '#000000'
+          let bgColor = '#ffffff'
+          if (profile.theme) {
+            const { theme: themeName, baseColor, accentColor } = profile.theme
+            if (themeName === 'custom' && baseColor && accentColor) {
+              fgColor = accentColor
+              bgColor = baseColor
+            } else {
+              const t = THEMES[themeName] || THEMES.light
+              fgColor = t.acc
+              bgColor = t.base
+            }
+          }
+
+          const profileUrl = `https://lot-systems.com/u/${userIdOrUsername}`
+
+          return (
+            <div className="flex flex-col items-center gap-y-4">
+              <ProfileQRCode
+                url={profileUrl}
+                fgColor={fgColor}
+                bgColor={bgColor}
+                size={80}
+              />
+              <div className="opacity-20" style={{ fontSize: '0.7em' }}>
+                {profileUrl.replace('https://', '')}
+              </div>
+            </div>
+          )
+        })()}
 
         {/* Footer */}
         <div>

@@ -1,4 +1,12 @@
 /**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
+/**
  * Log-text triggers
  *
  * Pure detectors for secret codes, keywords and emojis that the user
@@ -29,6 +37,10 @@ export type LogTrigger =
   | 'assembly-check'    // /assembly — trigger self-assembly module status check
   | 'phys-report'       // /phys — generate physiological cohort report
   | 'sil-check'         // /sil — check for signal silence pattern
+  | 'qi-rfi'            // /qi — Quantum Intelligence RFI (Request for Information)
+  | 'system-help'       // /system — list all available slash commands
+  | 'story-mode'        // /story — generate contextual story from recent data
+  | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -51,6 +63,10 @@ const RULES: TriggerRule[] = [
   { trigger: 'assembly-check', emojis: [],        keywords: ['assembly', 'assemble'] },
   { trigger: 'phys-report',    emojis: [],        keywords: ['phys', 'cohort-report'] },
   { trigger: 'sil-check',      emojis: [],        keywords: ['sil', 'silence-check'] },
+  { trigger: 'qi-rfi',         emojis: [],        keywords: ['qi'] },
+  { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
+  { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
+  { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
 ]
 
 /**

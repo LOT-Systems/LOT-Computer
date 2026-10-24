@@ -1,0 +1,27 @@
+# LOT SYSTEMS CORPORATION — NODE-0 Reverse Proxy
+# Automatic HTTPS via Let's Encrypt
+# Replace lot-systems.com with your domain
+
+lot-systems.com {
+	reverse_proxy app:8080
+
+	header {
+		Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 100mb
+			roll_keep 10
+		}
+	}
+}
+
+# Gitea — internal only (behind Cloudflare Tunnel or VPN)
+git.lot-systems.com {
+	reverse_proxy gitea:3000
+}

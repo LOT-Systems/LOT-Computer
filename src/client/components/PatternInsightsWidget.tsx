@@ -1,16 +1,38 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import * as React from 'react'
+import { useStore } from '@nanostores/react'
 import { Block, GhostButton, Button } from '#client/components/ui'
 import { usePatterns, useCohorts, usePatternEvolution } from '#client/queries'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { $featureUnlocks } from '#client/stores/evolution'
 import * as stores from '#client/stores'
 import dayjs from '#client/utils/dayjs'
 
 export const PatternInsightsWidget = () => {
+  const featureUnlocks = useStore($featureUnlocks)
   const { data: patternsData } = usePatterns()
   const { data: cohortsData } = useCohorts()
   const { data: evolutionData } = usePatternEvolution()
   const [view, setView] = React.useState<'patterns' | 'cohorts' | 'evolution'>('patterns')
   const [selectedInsight, setSelectedInsight] = React.useState<number | null>(null)
+
+  // Gate: patternInsights must be unlocked to see full analysis
+  if (!featureUnlocks?.patternInsights) {
+    return (
+      <Block label="Pattern Compiler:" blockView>
+        <div className="opacity-30">
+          Pattern recognition is compiling. Continue building your streak to unlock full insights.
+        </div>
+      </Block>
+    )
+  }
 
   // Don't show if no data
   if (!patternsData && !cohortsData && !evolutionData) return null
@@ -132,7 +154,7 @@ export const PatternInsightsWidget = () => {
                 {selectedInsight === idx && (
                   <div className="mt-8 flex gap-8">
                     {getPatternActions(insight).map((action, aidx) => (
-                      <Button key={aidx} onClick={action.handler}>
+                      <Button key={aidx} size="small" onClick={action.handler}>
                         {action.label}
                       </Button>
                     ))}

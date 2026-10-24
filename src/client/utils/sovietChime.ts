@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 // Soviet-era inspired digital coo-coo chime
 // Inspired by 1960s-70s Soviet electronic music - simple, pure tones with minimal ornamentation
 // Each hour has unique sonic characteristics for variety
@@ -27,6 +35,13 @@ function getAudioContext(): AudioContext {
     sharedAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
   }
   return sharedAudioContext
+}
+
+export function warmAudioContext() {
+  const ctx = getAudioContext()
+  if (ctx.state === 'suspended') {
+    ctx.resume().catch(() => {})
+  }
 }
 
 export async function playSovietChime(hour: number) {

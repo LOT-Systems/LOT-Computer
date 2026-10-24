@@ -1,8 +1,17 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { useCosmicUpdate } from '#client/queries'
+import { shouldShowRewardWidget } from '#client/stores/rewardWidgets'
 
 /**
  * Cosmic Update Widget — Together AI image generation token
@@ -86,6 +95,7 @@ export function CosmicUpdateWidget() {
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
   const [generated, setGenerated] = React.useState(false)
+  const [visible] = React.useState(() => shouldShowRewardWidget('cosmic_update'))
 
   const cosmicUpdate = useCosmicUpdate()
 
@@ -94,7 +104,7 @@ export function CosmicUpdateWidget() {
     return t === 'usership' || t === 'rnd' || t === 'legacy'
   })
 
-  if (!hasAccess) return null
+  if (!hasAccess || !visible) return null
 
   const drawImageToCanvas = (imageUrl: string) => {
     const canvas = canvasRef.current

@@ -1,7 +1,16 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import { Op, Sequelize, Filterable } from 'sequelize'
 import { Literal } from 'sequelize/types/utils'
 import { FastifyInstance, FastifyRequest } from 'fastify'
 import { AdminUsersSort, LogEvent, Paginated, User } from '#shared/types'
+import { blankStrippedSql } from '#shared/constants'
 import { fp } from '#shared/utils'
 import { buildPrompt, completeAndExtractQuestion, generateUserSummary, generateMemoryStory } from '#server/utils/memory'
 import { sync } from '../sync.js'
@@ -2161,6 +2170,201 @@ export default async (fastify: FastifyInstance) => {
       })
     }
   })
+
+  // Chat spam inspector — view empty-message senders and suspend + delete in one click
+  fastify.get('/chat-spam', async (req: FastifyRequest, reply) => {
+    const [rows] = await fastify.sequelize.query(`
+      SELECT
+        cm."authorUserId",
+        u."firstName",
+        u."lastName",
+        u.email,
+        u.tags,
+        COUNT(*)::int AS empty_count,
+        MIN(cm."createdAt") AS first_at,
+        MAX(cm."createdAt") AS last_at
+      FROM chat_messages cm
+      JOIN users u ON u.id = cm."authorUserId"
+      WHERE ${blankStrippedSql('cm.message')} = ''
+      GROUP BY cm."authorUserId", u."firstName", u."lastName", u.email, u.tags
+      ORDER BY empty_count DESC
+    `) as any[]
+
+    // Burst posters — the same user sending many messages in a short window is
+    // another spam signal (even when the messages aren't empty). Surfaces the
+    // largest same-user run within any 5-minute window.
+    const [burstRows] = await fastify.sequelize.query(`
+      WITH ordered AS (
+        SELECT
+          cm."authorUserId",
+          cm."createdAt",
+          COUNT(*) OVER (
+            PARTITION BY cm."authorUserId"
+            ORDER BY cm."createdAt"
+            RANGE BETWEEN INTERVAL '5 minutes' PRECEDING AND CURRENT ROW
+          ) AS run_len
+        FROM chat_messages cm
+      )
+      SELECT
+        o."authorUserId",
+        u."firstName",
+        u."lastName",
+        u.email,
+        u.tags,
+        MAX(o.run_len)::int AS max_burst,
+        COUNT(*)::int AS total_msgs
+      FROM ordered o
+      JOIN users u ON u.id = o."authorUserId"
+      GROUP BY o."authorUserId", u."firstName", u."lastName", u.email, u.tags
+      HAVING MAX(o.run_len) >= 6
+      ORDER BY max_burst DESC
+    `) as any[]
+
+    const total = (rows as any[]).reduce((s: number, r: any) => s + r.empty_count, 0)
+
+    const rowsHtml = (rows as any[]).map((r: any) => {
+      const name = [r.firstName, r.lastName].filter(Boolean).join(' ') || '(no name)'
+      const tags: string[] = r.tags || []
+      const isSuspended = tags.some((t: string) => t.toLowerCase() === 'suspended')
+      return `
+        <tr>
+          <td>${escapeHtml(name)}</td>
+          <td>${escapeHtml(r.email)}</td>
+          <td style="text-align:center;font-weight:bold;color:#dc3545">${r.empty_count}</td>
+          <td style="font-size:12px;color:#666">${new Date(r.first_at).toISOString().slice(0,19).replace('T',' ')}</td>
+          <td style="font-size:12px;color:#666">${new Date(r.last_at).toISOString().slice(0,19).replace('T',' ')}</td>
+          <td>${isSuspended ? '<span style="color:orange">Already suspended</span>' : `
+            <form method="POST" action="/admin-api/chat-spam/suspend-and-delete" style="display:inline"
+              onsubmit="return confirm('Suspend ${escapeHtml(name)} and delete their ${r.empty_count} empty messages?')">
+              <input type="hidden" name="userId" value="${r.authorUserId}">
+              <button type="submit" style="background:#dc3545;color:white;border:none;padding:6px 14px;border-radius:4px;cursor:pointer">
+                Suspend + Delete
+              </button>
+            </form>
+          `}</td>
+        </tr>`
+    }).join('')
+
+    const burstHtml = (burstRows as any[]).map((r: any) => {
+      const name = [r.firstName, r.lastName].filter(Boolean).join(' ') || '(no name)'
+      const tags: string[] = r.tags || []
+      const isSuspended = tags.some((t: string) => t.toLowerCase() === 'suspended')
+      return `
+        <tr>
+          <td>${escapeHtml(name)}</td>
+          <td>${escapeHtml(r.email)}</td>
+          <td style="text-align:center;font-weight:bold;color:#dc3545">${r.max_burst}</td>
+          <td style="text-align:center;color:#666">${r.total_msgs}</td>
+          <td>${isSuspended ? '<span style="color:orange">Already suspended</span>' : `
+            <form method="POST" action="/admin-api/chat-spam/suspend-and-delete" style="display:inline"
+              onsubmit="return confirm('Suspend ${escapeHtml(name)}? They posted a burst of ${r.max_burst} messages within 5 minutes.')">
+              <input type="hidden" name="userId" value="${r.authorUserId}">
+              <button type="submit" style="background:#dc3545;color:white;border:none;padding:6px 14px;border-radius:4px;cursor:pointer">
+                Suspend
+              </button>
+            </form>
+          `}</td>
+        </tr>`
+    }).join('')
+
+    reply.type('text/html').send(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin: Chat Spam</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; max-width: 960px; margin: 30px auto; padding: 20px; }
+    h1 { color: #dc3545; margin: 0 0 6px 0; }
+    .meta { color: #666; font-size: 14px; margin-bottom: 24px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #f8f9fa; text-align: left; padding: 10px 12px; border-bottom: 2px solid #dee2e6; font-size: 13px; }
+    td { padding: 10px 12px; border-bottom: 1px solid #dee2e6; font-size: 14px; vertical-align: middle; }
+    .empty { color: #999; padding: 30px; text-align: center; }
+    a { color: #007bff; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>Chat Spam Inspector</h1>
+  <p class="meta">
+    ${total > 0 ? `<strong>${total}</strong> empty chat message${total === 1 ? '' : 's'} from <strong>${(rows as any[]).length}</strong> user${(rows as any[]).length === 1 ? '' : 's'}.`
+      : 'No empty messages found — database is clean.'}
+    &nbsp;|&nbsp; <a href="/admin-api/chat-spam">Refresh</a>
+    &nbsp;|&nbsp; <a href="/admin-api/status">System Status</a>
+  </p>
+  ${total > 0 ? `
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th><th>Email</th><th>Empty msgs</th><th>First at</th><th>Last at</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody>${rowsHtml}</tbody>
+  </table>` : '<p class="empty">No empty messages.</p>'}
+
+  <h1 style="margin-top:40px">Burst Posters</h1>
+  <p class="meta">Users who sent 6+ messages within a 5-minute window — a possible spam signal even when messages aren't empty.</p>
+  ${(burstRows as any[]).length > 0 ? `
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th><th>Email</th><th>Max burst (5 min)</th><th>Total msgs</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody>${burstHtml}</tbody>
+  </table>` : '<p class="empty">No burst posters detected.</p>'}
+</body>
+</html>`)
+  })
+
+  // Suspend user and delete their empty messages in one step
+  fastify.post('/chat-spam/suspend-and-delete',
+    async (req: FastifyRequest<{ Body: { userId?: string } }>, reply) => {
+      const userId = (req.body as any)?.userId
+      if (!userId) return reply.status(400).send({ error: 'userId required' })
+
+      const user = await fastify.models.User.findByPk(userId)
+      if (!user) return reply.throw.notFound()
+
+      // Add suspended tag (preserve existing tags)
+      const existingTags: string[] = user.tags || []
+      if (!existingTags.some((t: string) => t.toLowerCase() === 'suspended')) {
+        await user.set({ tags: [...existingTags, 'suspended'] }).save()
+      }
+
+      // Delete this user's empty messages
+      const [result] = await fastify.sequelize.query(
+        `DELETE FROM chat_messages WHERE "authorUserId" = :userId AND ${blankStrippedSql('message')} = '' RETURNING id`,
+        { replacements: { userId } }
+      )
+      const deleted = (result as any[]).length
+
+      const name = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email
+
+      reply.type('text/html').send(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Done</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; max-width: 600px; margin: 60px auto; padding: 20px; text-align: center; }
+    .box { background: #d4edda; border: 2px solid #28a745; padding: 30px; border-radius: 8px; }
+    h1 { color: #28a745; margin: 0 0 16px 0; }
+    a { color: #007bff; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Done</h1>
+    <p><strong>${escapeHtml(name)}</strong> has been suspended.</p>
+    <p><strong>${deleted}</strong> empty message${deleted === 1 ? '' : 's'} deleted.</p>
+    <p style="margin-top:24px"><a href="/admin-api/chat-spam">← Back to spam inspector</a></p>
+  </div>
+</body>
+</html>`)
+    }
+  )
 
   // Manually trigger scheduled jobs (for testing)
   fastify.post('/trigger-scheduled-jobs', async (req: FastifyRequest, reply) => {

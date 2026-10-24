@@ -1,4 +1,12 @@
 /**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
+/**
  * AI Engine Abstraction Layer
  *
  * Purpose: Keep memory densification logic on LOT's side, not tied to any AI provider.
@@ -27,6 +35,75 @@ export interface ImageGenerationOptions {
   height?: number
   steps?: number
   model?: string
+}
+
+// ============================================================================
+// Ollama Engine (Local Inference — NODE-0)
+// ============================================================================
+
+export class OllamaEngine implements AIEngine {
+  name = 'Ollama (Local)'
+  private client: OpenAI | null = null
+  private baseURL: string
+
+  private modelFallbackChain = [
+    'llama3.3:70b-instruct-q4_K_M',
+    'qwen2.5:72b-instruct-q4_K_M',
+    'llama3.3:70b',
+    'qwen2.5:72b',
+    'llama3.1:70b',
+    'mixtral:8x7b',
+    'llama3.1:8b',
+  ]
+
+  constructor() {
+    this.baseURL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434'
+    const enabled = process.env.OLLAMA_ENABLED === 'true' || process.env.OLLAMA_BASE_URL
+    if (enabled) {
+      try {
+        this.client = new OpenAI({
+          apiKey: 'ollama',
+          baseURL: `${this.baseURL}/v1`,
+        })
+      } catch (error) {
+        console.error('Failed to initialize Ollama engine:', error)
+      }
+    }
+  }
+
+  isAvailable(): boolean {
+    return !!this.client
+  }
+
+  async generateCompletion(prompt: string, maxTokens: number = 1024): Promise<string> {
+    if (!this.client) {
+      throw new Error('Ollama engine not available')
+    }
+
+    let lastError: Error | null = null
+
+    for (const model of this.modelFallbackChain) {
+      try {
+        const response = await this.client.chat.completions.create({
+          model,
+          max_tokens: maxTokens,
+          messages: [{ role: 'user', content: prompt }],
+        })
+
+        const content = response.choices[0]?.message?.content
+        if (!content) {
+          throw new Error(`No response from Ollama model: ${model}`)
+        }
+
+        aiUsageTracker.trackCompletion('Ollama', prompt.length, content.length)
+        return content
+      } catch (error: any) {
+        lastError = error
+      }
+    }
+
+    throw new Error(`All Ollama models failed. Last error: ${lastError?.message}`)
+  }
 }
 
 // ============================================================================
@@ -373,7 +450,7 @@ export class MistralEngine implements AIEngine {
 // Engine Manager - Handles fallback logic
 // ============================================================================
 
-export type EnginePreference = 'together' | 'gemini' | 'mistral' | 'claude' | 'openai' | 'auto'
+export type EnginePreference = 'ollama' | 'together' | 'gemini' | 'mistral' | 'claude' | 'openai' | 'auto'
 
 // ============================================================================
 // AI Usage Tracker - Non-monetary usage metrics
@@ -483,7 +560,8 @@ export class AIEngineManager {
   constructor() {
     this.engines = new Map()
 
-    // Register available engines
+    // Register available engines — local inference first when available
+    this.engines.set('ollama', new OllamaEngine())
     this.engines.set('together', new TogetherAIEngine())
     this.engines.set('gemini', new GeminiEngine())
     this.engines.set('mistral', new MistralEngine())
@@ -506,9 +584,8 @@ export class AIEngineManager {
       console.warn(`Preferred engine '${preference}' not available, trying fallback`)
     }
 
-    // Auto mode or fallback: try Together AI, Gemini, Mistral, Claude, then OpenAI
-    // Ordered by cost-effectiveness and speed
-    const fallbackOrder: string[] = ['together', 'gemini', 'mistral', 'claude', 'openai']
+    // Auto mode or fallback: local first, then cloud by cost-effectiveness
+    const fallbackOrder: string[] = ['ollama', 'together', 'gemini', 'mistral', 'claude', 'openai']
 
     for (const engineName of fallbackOrder) {
       const engine = this.engines.get(engineName)

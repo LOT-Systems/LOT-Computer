@@ -1,7 +1,16 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import * as React from 'react'
 import { Block, Button } from '#client/components/ui'
 import { cn } from '#client/utils'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { shouldShowRewardWidget } from '#client/stores/rewardWidgets'
 import { usePunctuationContext } from '#client/hooks/usePunctuationContext'
 
 /**
@@ -176,6 +185,7 @@ const COMPOSITION_LABEL: Record<Composition, string> = {
 // --- Component --------------------------------------------------------------
 
 export const MicroImageWidget: React.FC = () => {
+  const [visible] = React.useState(() => shouldShowRewardWidget('micro_image'))
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   const punctuation = usePunctuationContext()
   const [seed, setSeed] = React.useState(() => Math.floor(Math.random() * 1e6) + 1)
@@ -254,6 +264,8 @@ export const MicroImageWidget: React.FC = () => {
       tone: punctuation.aggregate.tone,
     })
   }
+
+  if (!visible) return null
 
   const subtitle = punctuation.callForHelp
     ? 'Listening.'

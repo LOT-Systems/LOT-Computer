@@ -1,10 +1,16 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import dayjs from '#server/utils/dayjs'
-import config from '#server/config'
 import { COUNTRY_BY_ALPHA3, DATE_TIME_FORMAT, USER_SETTING_NAME_BY_ID } from '#shared/constants'
 import type { Log, LogEvent, LogSettingsChangeMetadata, User, UserSettings } from '#shared/types'
 import { getLogContext } from '../logs.js'
 import { aiEngineManager } from '../ai-engines.js'
-import { anthropic, AI_ENGINE_PREFERENCE } from './constants.js'
 import { toCelsius } from '#shared/utils'
 
 const MODULE_BY_LOG_EVENT: Record<LogEvent, string> = {
@@ -150,56 +156,59 @@ Key insights into their daily routines and preferences include:
 – They have [characteristic or goal], using [method or approach].`
 
   try {
-    // Use AI engine abstraction - try Claude, then OpenAI, whichever works
-    console.log('Attempting to get AI engine with preference:', AI_ENGINE_PREFERENCE)
-    const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
+    console.log('Attempting Together AI for Memory Story generation')
+    const engine = aiEngineManager.getEngine('together')
     console.log(`🤖 Using ${engine.name} for Memory Story generation`)
 
     const story = await engine.generateCompletion(prompt, 1000)
     console.log(`Story generated successfully with ${engine.name} (${story?.length || 0} chars)`)
-    return story || 'Unable to generate story.'
+    return story || composeLocalStory(user, answerLogs)
   } catch (error: any) {
-    console.error('AI Engine failed for Memory Story:', {
+    console.error('Together AI failed for Memory Story:', {
       message: error.message,
-      stack: error.stack,
-      preference: AI_ENGINE_PREFERENCE
+      preference: 'together'
     })
-
-    // FALLBACK: Try legacy Claude if new system fails
-    console.log('Attempting legacy Claude fallback...')
-    try {
-      if (!anthropic || !config.anthropic?.apiKey) {
-        throw new Error('Legacy Claude client not configured - API key missing')
-      }
-
-      const response = await anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: prompt
-        }],
-      })
-
-      const textContent = response.content.find((block) => block.type === 'text')
-      if (!textContent || textContent.type !== 'text') {
-        console.error('Legacy Claude returned no text content')
-        return 'Unable to generate story.'
-      }
-
-      console.log(`Story generated with legacy Claude fallback (${textContent.text?.length || 0} chars)`)
-      return textContent.text || 'Unable to generate story.'
-    } catch (fallbackError: any) {
-      console.error('Legacy Claude also failed:', {
-        message: fallbackError.message,
-        stack: fallbackError.stack,
-        hasAnthropicClient: !!anthropic,
-        hasApiKey: !!config.anthropic?.apiKey,
-        apiKeyLength: config.anthropic?.apiKey?.length || 0
-      })
-      return 'Unable to generate story at this time. Please try again later.'
-    }
+    console.log('Using local story composition fallback')
+    return composeLocalStory(user, answerLogs)
   }
+}
+
+function composeLocalStory(user: User, answerLogs: Log[]): string {
+  const name = user.firstName || 'This person'
+  const answers = answerLogs
+    .slice(0, 20)
+    .map((log) => ({
+      question: (log.metadata.question as string) || '',
+      answer: (log.metadata.answer as string) || '',
+      date: log.context.timeZone
+        ? dayjs(log.createdAt).tz(log.context.timeZone).format('D MMM YYYY')
+        : dayjs(log.createdAt).format('D MMM YYYY'),
+    }))
+    .filter((a) => a.question && a.answer)
+
+  const count = answers.length
+  if (count === 0) return `${name} has begun their journey. The first questions await.`
+
+  const first = answers[answers.length - 1]
+  const lines: string[] = []
+
+  lines.push(`${name} — a portrait in ${count} answer${count !== 1 ? 's' : ''}.`)
+  lines.push('')
+
+  const sample = answers.slice(0, 6)
+  for (const a of sample) {
+    lines.push(`– "${a.question}" — ${a.answer}.`)
+  }
+
+  if (count > 6) {
+    lines.push('')
+    lines.push(`…and ${count - 6} more, woven in since ${first.date}.`)
+  }
+
+  lines.push('')
+  lines.push('Each answer sharpens the portrait. The story continues.')
+
+  return lines.join('\n')
 }
 
 export async function generateUserSummary(user: User, logs: Log[]): Promise<string> {
@@ -252,21 +261,12 @@ ${answerCount === 0 ? '\nNote: This user has not yet answered any Memory prompts
 
 Provide a warm, insightful summary that helps admins understand this user's self-care journey and engagement with LOT Systems.`
 
-  // Use Claude API instead of OpenAI
-  if (!anthropic) throw new Error('Anthropic client not initialized')
-  const response = await anthropic.messages.create({
-    model: 'claude-3-5-sonnet-20241022',
-    max_tokens: 2000,
-    messages: [{
-      role: 'user',
-      content: prompt
-    }],
-  })
-
-  const textContent = response.content.find((block) => block.type === 'text')
-  if (!textContent || textContent.type !== 'text') {
-    return 'Unable to generate summary.'
+  try {
+    const engine = aiEngineManager.getEngine('together')
+    const summary = await engine.generateCompletion(prompt, 2000)
+    return summary || 'Unable to generate summary.'
+  } catch (error: any) {
+    console.error('Together AI failed for user summary:', error.message)
+    return 'Unable to generate summary at this time.'
   }
-
-  return textContent.text || 'Unable to generate summary.'
 }

@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import { UserTag, UserSettings, Color } from '#shared/types'
 
 // LOT Systems — Shared constants since the beginning.
@@ -9,6 +17,22 @@ export const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 export const SYNC_CHAT_MESSAGES_TO_SHOW = 12
 
 export const MAX_SYNC_CHAT_MESSAGE_LENGTH = 300
+
+// Characters that render as blank/invisible: all standard whitespace (\s
+// already covers space, tab, newline, NBSP U+00A0, BOM U+FEFF, U+2028/9) plus
+// zero-width code points that a naive trim() misses — zero-width space/joiners
+// (U+200B–U+200D), word joiner (U+2060), Mongolian vowel separator (U+180E).
+// A chat message is "blank" when nothing remains after stripping these.
+export const BLANK_CHARS_REGEX = /[\s\u200B\u200C\u200D\u2060\uFEFF\u180E]/g
+
+export const isBlankMessage = (s?: string | null): boolean =>
+  !s || s.replace(BLANK_CHARS_REGEX, '') === ''
+
+// Postgres expression mirroring isBlankMessage(): reduces `col` to '' when it
+// holds only blank/invisible characters. Keep the char set in sync with
+// BLANK_CHARS_REGEX above.
+export const blankStrippedSql = (col: string): string =>
+  `regexp_replace(${col}, '[[:space:]\\u200B\\u200C\\u200D\\u2060\\uFEFF\\u00A0\\u180E]', '', 'g')`
 
 export const MAX_LOG_TEXT_LENGTH = 3000
 

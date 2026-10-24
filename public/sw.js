@@ -1,17 +1,22 @@
 // Service Worker for LOT Systems PWA
-// Version: 2026-01-26-002 - February updates: monthly emails, evolution widget, cohort-connect, UI improvements
+// Version: 2026-07-25-001
 
-const CACHE_VERSION = 'v2026-01-26-002';
+const CACHE_VERSION = 'v2026-07-25-001';
 const CACHE_NAME = `lot-cache-${CACHE_VERSION}`;
 
 // Files to cache initially (only static assets)
 const STATIC_CACHE = [
   '/icon/icon-192.png',
   '/icon/icon-512.png',
+  '/icon/apple-touch-icon.png',
+  '/manifest.webmanifest',
   '/og.jpg'
 ];
 
-// Install event - cache static assets
+// Install event - cache static assets and immediately activate the new version.
+// skipWaiting() ensures that when a new SW is deployed, it takes over right
+// away rather than waiting for all tabs to close. The client reloads on
+// controllerchange (see app.tsx) so users always run the latest code.
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing service worker version:', CACHE_VERSION);
 
@@ -21,10 +26,8 @@ self.addEventListener('install', (event) => {
         console.log('[SW] Caching static assets');
         return cache.addAll(STATIC_CACHE);
       })
-      // Don't call skipWaiting() here — let the page decide when to activate
-      // via the SKIP_WAITING message. Calling it unconditionally causes
-      // controllerchange reloads on every install, even first-time visits.
   );
+  self.skipWaiting();
 });
 
 // Activate event - clean up old caches
@@ -62,8 +65,11 @@ self.addEventListener('fetch', (event) => {
     return; // Pass through to network, don't intercept
   }
 
-  // Network-first for all JavaScript files (including bundles)
-  if (url.pathname.endsWith('.js') || url.pathname.includes('/js/')) {
+  // Network-first for JS and CSS. Both are served at fixed, unhashed URLs
+  // (/js/... and /css/index.css) that change contents on each deploy, so
+  // cache-first would serve stale code/styles until the cache is manually
+  // busted. Network-first keeps them fresh, with cache as an offline fallback.
+  if (url.pathname.endsWith('.js') || url.pathname.includes('/js/') || url.pathname.endsWith('.css')) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
@@ -112,8 +118,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first for CSS and static assets
-  if (url.pathname.endsWith('.css') || url.pathname.includes('/icon/') ||
+  // Cache-first for immutable static assets (icons, images) only
+  if (url.pathname.includes('/icon/') ||
       url.pathname.endsWith('.png') || url.pathname.endsWith('.jpg')) {
     event.respondWith(
       caches.match(event.request)

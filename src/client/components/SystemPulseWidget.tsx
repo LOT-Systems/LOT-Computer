@@ -1,17 +1,35 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { ProgressBars } from '#client/utils/progressBars'
 import { useLogContext } from '#client/hooks/useLogContext'
+import { useStore } from '@nanostores/react'
+import { intentionEngine, classifyPhysiologicalCohort, getCircadianPhase, getUserState, getUserIndex } from '#client/stores/intentionEngine'
+import { isRouteActive } from '#client/stores/router'
+
+interface CommunityPulse {
+  index: number | null
+  topMood: string | null
+  activeCount: number | null
+}
 
 interface PulseData {
   eventsPerMinute: number
   quantumFlux: number
   neuralActivity: number
   resonanceHz: number
+  community: CommunityPulse | null
   lastUpdate: number
 }
 
-type PulseView = 'metrics' | 'activity' | 'userload'
+type PulseView = 'metrics' | 'activity' | 'userload' | 'cohort' | 'community'
 
 /**
  * SystemPulseWidget - Real-time system heartbeat + user activity telemetry
@@ -25,17 +43,33 @@ export function SystemPulseWidget() {
   const intervalRef = React.useRef<NodeJS.Timeout>()
   const lastFetchRef = React.useRef<number>(Date.now())
   const logCtx = useLogContext()
+  const engineState = useStore(intentionEngine)
 
   const cycleView = () => {
     setView(prev => {
       switch (prev) {
-        case 'metrics': return 'activity'
-        case 'activity': return 'userload'
-        case 'userload': return 'metrics'
-        default: return 'metrics'
+        case 'metrics':   return 'activity'
+        case 'activity':  return 'userload'
+        case 'userload':  return 'cohort'
+        case 'cohort':    return 'community'
+        case 'community': return 'metrics'
+        default:          return 'metrics'
       }
     })
   }
+
+  // Derive cohort from live engine state
+  const cohortClassification = React.useMemo(() => {
+    if (engineState.signals.length === 0) return null
+    return classifyPhysiologicalCohort(
+      engineState.signals,
+      engineState.userState,
+      engineState.recognizedPatterns
+    )
+  }, [engineState.signals.length, engineState.userState.energy])
+
+  const circadianPhase = React.useMemo(() => getCircadianPhase(), [])
+  const userIndex = React.useMemo(() => getUserIndex(), [engineState.userIndex?.overall])
 
   // Fetch pulse data
   const fetchPulse = React.useCallback(async () => {
@@ -58,6 +92,10 @@ export function SystemPulseWidget() {
     fetchPulse()
 
     intervalRef.current = setInterval(() => {
+      // Pause polling (each fetch setStates → re-renders this hidden widget)
+      // when the browser tab is hidden or the user is on another in-app tab.
+      if (document.hidden) return
+      if (!isRouteActive('system')) return
       fetchPulse()
     }, 10_000)
 
@@ -69,9 +107,11 @@ export function SystemPulseWidget() {
   }, [fetchPulse])
 
   const label =
-    view === 'metrics' ? 'System Pulse:' :
-    view === 'activity' ? 'System Load:' :
-    'User Telemetry:'
+    view === 'metrics'   ? 'System Pulse:' :
+    view === 'activity'  ? 'System Load:' :
+    view === 'userload'  ? 'User Telemetry:' :
+    view === 'cohort'    ? 'Biofield:' :
+    'Community Biofield:'
 
   if (!pulse) {
     return (
@@ -184,6 +224,74 @@ export function SystemPulseWidget() {
                 </div>
               )}
             </>
+          )}
+        </div>
+      )}
+
+      {view === 'cohort' && (
+        <div className="flex flex-col gap-y-8 font-mono text-xs">
+          {cohortClassification ? (
+            <>
+              <div className="flex justify-between items-baseline">
+                <span className="opacity-30 uppercase tracking-widest">Archetype</span>
+                <span>{cohortClassification.archetype}</span>
+              </div>
+              <div className="flex justify-between items-baseline">
+                <span className="opacity-30 uppercase tracking-widest">Conf</span>
+                <span className="tabular-nums">{Math.round(cohortClassification.confidence * 100)}%</span>
+              </div>
+              <div className="flex justify-between items-baseline">
+                <span className="opacity-30 uppercase tracking-widest">ATP</span>
+                <span className="capitalize">{engineState.userState.energy}</span>
+              </div>
+              <div className="flex justify-between items-baseline">
+                <span className="opacity-30 uppercase tracking-widest">Circadian</span>
+                <span className="capitalize">{circadianPhase}</span>
+              </div>
+              {userIndex.overall > 0 && (
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30 uppercase tracking-widest">Index</span>
+                  <span className="tabular-nums">{userIndex.overall}</span>
+                </div>
+              )}
+              <div className="border-t border-acc-400/20 pt-8 mt-4">
+                <div className="opacity-40">{cohortClassification.directive}</div>
+              </div>
+            </>
+          ) : (
+            <div className="opacity-30">Cohort pending. Engage widgets to surface archetype.</div>
+          )}
+        </div>
+      )}
+
+      {view === 'community' && (
+        <div className="flex flex-col gap-y-8 font-mono text-xs">
+          {pulse.community ? (
+            <>
+              {pulse.community.index !== null && (
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30 uppercase tracking-widest">COHR</span>
+                  <span className="tabular-nums">{pulse.community.index}%</span>
+                </div>
+              )}
+              {pulse.community.topMood && (
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30 uppercase tracking-widest">Signal</span>
+                  <span className="uppercase">{pulse.community.topMood}</span>
+                </div>
+              )}
+              {pulse.community.activeCount !== null && (
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30 uppercase tracking-widest">Active</span>
+                  <span className="tabular-nums">{pulse.community.activeCount}</span>
+                </div>
+              )}
+              <div className="border-t border-acc-400/20 pt-8 mt-4">
+                <div className="opacity-40">Community coherence — 16:00 UTC pulse.</div>
+              </div>
+            </>
+          ) : (
+            <div className="opacity-30">No community pulse in last 24h. Job 14 fires at 16:00 UTC.</div>
           )}
         </div>
       )}

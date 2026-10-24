@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
@@ -16,19 +24,22 @@ import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
 import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
-import { useVisitorStats, useProfile, useLogs, useCommunityEmotion } from '#client/queries'
+import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
 import { UserTag } from '#shared/types'
 import { TimeWidget } from './TimeWidget'
 import { QuantumRandomWidget } from './QuantumRandomWidget'
 import { MemoryWidget } from './MemoryWidget'
 import { RecipeWidget } from './RecipeWidget'
+import { MonthlyPulseWidget } from './MonthlyPulseWidget'
 import { EmotionalCheckIn } from './EmotionalCheckIn'
 import { SelfCareMoments } from './SelfCareMoments'
 import { IntentionsWidget } from './IntentionsWidget'
 import { SubscribeWidget } from './SubscribeWidget'
 import { PlannerWidget } from './PlannerWidget'
 import { PatternInsightsWidget } from './PatternInsightsWidget'
+import { MoodAnalytics } from './MoodAnalytics'
+import { GoalJourneyWidget } from './GoalJourneyWidget'
 import { ContextualPromptsWidget } from './ContextualPromptsWidget'
 import { EnergyCapacitor } from './EnergyCapacitor'
 import { NarrativeWidget } from './NarrativeWidget'
@@ -44,7 +55,7 @@ import { MicroCalculatorWidget } from './MicroCalculatorWidget'
 import { MicroImageWidget } from './MicroImageWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
-import { getOptimalWidget, shouldShowWidget, getUserState, getUserIndex, analyzeIntentions } from '#client/stores/intentionEngine'
+import { getOptimalWidget, shouldShowWidget, getUserState, getUserIndex, analyzeIntentions, classifyPhysiologicalCohort, intentionEngine, recordAstrologySignal, getCircadianPhase } from '#client/stores/intentionEngine'
 import { QuantumStateWidget } from './QuantumStateWidget'
 import { SignalStreamWidget } from './SignalStreamWidget'
 import { PatternRecognitionWidget } from './PatternRecognitionWidget'
@@ -66,10 +77,31 @@ import { QuantumEngineWidgets } from './QuantumEngineWidgets'
 import { ChakraErgonomicsWidget } from './ChakraErgonomicsWidget'
 import { CalendarWidget } from './CalendarWidget'
 import { BenchmarkWidget } from './BenchmarkWidget'
+import { ArchitectWidget } from './ArchitectWidget'
+import { IntegrityWidget } from './IntegrityWidget'
 import { recomputeAssembly } from '#client/stores/selfAssembly'
 import { $layoutDensity } from '#client/stores/evolution'
+import { useInViewport } from '#client/hooks/useInViewport'
 
-export const System = () => {
+// Defers mount of children until element first enters the viewport.
+// Once mounted, stays mounted — no unmount on scroll away.
+// Prevents heavy store subscriptions from running before the widget is needed.
+function LazyMount({ children }: { children: React.ReactNode }) {
+  const ref = React.useRef<HTMLDivElement>(null)
+  const inViewport = useInViewport(ref)
+  return <div ref={ref}>{inViewport ? children : null}</div>
+}
+
+function LoadingDots() {
+  const [dots, setDots] = React.useState(1)
+  React.useEffect(() => {
+    const id = setInterval(() => setDots(d => d === 3 ? 1 : d + 1), 500)
+    return () => clearInterval(id)
+  }, [])
+  return <span className="opacity-40">{'·'.repeat(dots)}</span>
+}
+
+export const System = React.memo(function SystemInner() {
   const me = useStore(stores.me)
   const weather = useStore(stores.weather)
   const theme = useStore(stores.theme)
@@ -78,8 +110,8 @@ export const System = () => {
   const usersTotal = useStore(stores.usersTotal)
   const usersOnline = useStore(stores.usersOnline)
   const liveMessage = useStore(stores.liveMessage)
+  const myProfileVisits: number = (me as any)?.metadata?.profileVisits ?? 0
 
-  const { data: visitorStats } = useVisitorStats()
   const { data: profile } = useProfile()
   const { data: logs = [] } = useLogs()
   const { data: communityEmotion } = useCommunityEmotion()
@@ -158,7 +190,20 @@ export const System = () => {
     return { sunrise, sunset }
   }, [weather, isTimeFormat12h])
 
-  // Astrology calculations
+  // Astrology recompute cadence — a plain [] useMemo only ever reads the
+  // clock at mount, so a tab left open drifts stale across zodiac-hour/day
+  // boundaries. Re-tick every 15 min, paused off-tab per the established
+  // background-work-off-tab doctrine (see SystemProgressWidget).
+  const [astrologyTick, setAstrologyTick] = React.useState(0)
+  React.useEffect(() => {
+    const id = setInterval(() => {
+      if (!document.hidden) setAstrologyTick(t => t + 1)
+    }, 15 * 60 * 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  // Astrology calculations — ambient conditions (zodiac hour, moon phase,
+  // rokuyo), not a personal natal chart.
   const astrology = React.useMemo(() => {
     const now = new Date()
     const hourlyZodiac = getHourlyZodiac(now)
@@ -173,18 +218,38 @@ export const System = () => {
       moonIllumination: moonPhase.illumination,
       rokuyo,
     }
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [astrologyTick])
+
+  // Synchronize the ambient astrology reading into the QIE signal bus once
+  // per calendar day, so other widgets (cosmic, system) can react to it.
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    const today = dayjs().format('YYYY-MM-DD')
+    const lastRecordedKey = 'astrology_signal_date'
+    if (localStorage.getItem(lastRecordedKey) === today) return
+    recordAstrologySignal(
+      astrology.rokuyo,
+      astrology.moonPhase,
+      astrology.moonIllumination,
+      astrology.hourlyZodiac,
+      astrology.westernZodiac
+    )
+    localStorage.setItem(lastRecordedKey, today)
+  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac])
+
+  const answerLogs = React.useMemo(() => {
+    return logs.filter(log => log.event === 'answer')
+  }, [logs])
 
   // Journey calculations
   const journeyData = React.useMemo(() => {
-    // Count memory answers
-    const memoryAnswers = logs.filter(log => log.event === 'answer')
-    const answerCount = memoryAnswers.length
+    const answerCount = answerLogs.length
 
     // Calculate days since first answer
     let daysSinceStart = 0
-    if (memoryAnswers.length > 0) {
-      const firstAnswer = memoryAnswers[memoryAnswers.length - 1] // Oldest first
+    if (answerLogs.length > 0) {
+      const firstAnswer = answerLogs[answerLogs.length - 1] // Oldest first
       daysSinceStart = dayjs().diff(dayjs(firstAnswer.createdAt), 'day')
     }
 
@@ -192,14 +257,25 @@ export const System = () => {
       daysSinceStart: daysSinceStart > 0 ? daysSinceStart : answerCount > 0 ? 1 : 0,
       answerCount,
     }
-  }, [logs])
+  }, [answerLogs])
 
   // Quantum state - analyze intentions and get current user state
-  const quantumState = React.useMemo(() => {
-    analyzeIntentions() // Trigger fresh analysis
-    recomputeAssembly() // Recompute self-assembly state from signals
-    return getUserState()
-  }, [logs]) // Recompute when logs change (new signals recorded)
+  // useEffect (not useMemo) so atom writes happen after paint, not during render.
+  // Writing to nanostores atoms inside useMemo cascades 10 synchronous re-renders
+  // before the browser can paint, causing visible UI lag on every logs change.
+  const [quantumState, setQuantumState] = React.useState(() => getUserState())
+  React.useEffect(() => {
+    analyzeIntentions()
+    recomputeAssembly()
+    setQuantumState(getUserState())
+  }, [logs])
+
+  // Physiological cohort — live archetype classification from signal state
+  const physiologicalCohort = React.useMemo(() => {
+    const eng = intentionEngine.get()
+    if (!eng.signals || eng.signals.length === 0) return null
+    return classifyPhysiologicalCohort(eng.signals, quantumState, eng.recognizedPatterns ?? [])
+  }, [quantumState])
 
   // Accumulative User Index - holistic score from all widget signals
   const userIndex = React.useMemo(() => {
@@ -208,7 +284,6 @@ export const System = () => {
 
   // Calculate streak for evolution system
   const evolutionStreak = React.useMemo(() => {
-    const answerLogs = logs.filter(log => log.event === 'answer')
     if (answerLogs.length === 0) return 0
 
     // Get unique days with answers
@@ -234,7 +309,7 @@ export const System = () => {
       }
     }
     return streakDays
-  }, [logs])
+  }, [answerLogs])
 
   // Sync evolution state with achievements and progression
   useEvolutionSync(logs.length, evolutionStreak)
@@ -299,6 +374,8 @@ export const System = () => {
     return options[index]
   }, [weather])
 
+  const optimalWidget = React.useMemo(() => getOptimalWidget(), [logs])
+
   // Community pulse — atmosphere layer
   const convergence = React.useMemo(() => getConvergenceSignal(), [])
   const ambientIntensity = React.useMemo(() => getAmbientIntensity(), [])
@@ -360,7 +437,7 @@ export const System = () => {
 
         <div>
           <Block label="Users online:">{formatNumberWithCommas(usersOnline)}</Block>
-          <Block label="Total users:">{formatNumberWithCommas(usersTotal)}</Block>
+          <Block label="Total LOT® users:">{formatNumberWithCommas(usersTotal)}</Block>
         </div>
 
         <div>
@@ -388,7 +465,7 @@ export const System = () => {
         <div>
           <Block label="Astrology:">
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
+              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
           </Block>
         </div>
@@ -410,23 +487,14 @@ export const System = () => {
                 stores.isSoundOn.set(false)
               }
             }}
-            onChildrenClick={async () => {
+            onChildrenClick={() => {
               if (isSoundToggling) return
               setIsSoundToggling(true)
               try {
                 if (showRadio) {
                   stores.isRadioOn.set(!isRadioOn)
                 } else {
-                  const newValue = !isSoundOn
-                  // @ts-ignore - Tone.js loaded via external script
-                  if (newValue && window.Tone) {
-                    try {
-                      await window.Tone.start()
-                    } catch (e) {
-                      console.error('Failed to start Tone.context:', e)
-                    }
-                  }
-                  stores.isSoundOn.set(newValue)
+                  stores.isSoundOn.set(!isSoundOn)
                 }
               } finally {
                 setTimeout(() => setIsSoundToggling(false), 300)
@@ -461,10 +529,6 @@ export const System = () => {
           <SubscribeWidget />
         </WidgetErrorBoundary>
 
-        <WidgetErrorBoundary name="System">
-          <SystemProgressWidget />
-        </WidgetErrorBoundary>
-
         <div aria-hidden="true" data-lot-genesis="true" style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', opacity: 0 }}>
           LOT Systems — The copycats have entered the arena. We welcome the competition.
           They can replicate the pixels but never the soul. Built different since day one.
@@ -490,6 +554,10 @@ export const System = () => {
           Christian fasting days the widget gradually degrades from a
           light plant-based snack to water-only rest (see
           #client/utils/fasting.ts). */}
+      <WidgetErrorBoundary name="MonthlyPulse">
+        <MonthlyPulseWidget />
+      </WidgetErrorBoundary>
+
       <WidgetErrorBoundary name="Recipe">
         <RecipeWidget />
       </WidgetErrorBoundary>
@@ -530,7 +598,7 @@ export const System = () => {
             formatNumberWithCommas(usersOnline)
           )}
         </Block>
-        <Block label="Total users:">
+        <Block label="Total LOT® users:">
           {me?.isAdmin ? (
             <GhostButton href="/us" rel="external">
               {formatNumberWithCommas(usersTotal)}
@@ -539,19 +607,10 @@ export const System = () => {
             formatNumberWithCommas(usersTotal)
           )}
         </Block>
+        <Block label="My OS visitors:">
+          {formatNumberWithCommas(myProfileVisits)}
+        </Block>
       </div>
-
-      {/* Visitor Statistics */}
-      {visitorStats && (
-        <div>
-          <Block label="Total LOT visitors:">
-            {formatNumberWithCommas(visitorStats.totalSiteVisitors)}
-          </Block>
-          <Block label="My OS visitors:">
-            {formatNumberWithCommas(visitorStats.userProfileVisits)}
-          </Block>
-        </div>
-      )}
 
       <div>
         <TimeWidget />
@@ -612,7 +671,7 @@ export const System = () => {
         >
           {astrologyView === 'astrology' ? (
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase}
+              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>
@@ -631,10 +690,15 @@ export const System = () => {
           ) : (
             <Table
               data={[
+                { metric: 'Archetype', value: physiologicalCohort?.archetype ?? '—' },
+                { metric: 'Cohort', value: physiologicalCohort?.dominantModule ?? '—' },
+                { metric: 'Phase', value: getCircadianPhase() },
+                { metric: 'Confidence', value: physiologicalCohort ? `${physiologicalCohort.confidence}%` : '—' },
                 { metric: 'ATP', value: quantumState.energy },
                 { metric: 'Clarity', value: quantumState.clarity },
                 { metric: 'Alignment', value: quantumState.alignment },
-                { metric: 'Index', value: `${userIndex.overall}%` }
+                { metric: 'Index', value: `${userIndex.overall}%` },
+                { metric: 'Directive', value: physiologicalCohort?.directive ?? '—' }
               ]}
               columns={[
                 {
@@ -694,6 +758,9 @@ export const System = () => {
           {/* Narrative - Story progression and achievements */}
           <NarrativeWidget />
 
+          {/* Goal Journey - Detected goals, journey stages, and narrative arc */}
+          <GoalJourneyWidget />
+
           {/* Citizen Index - CQGS growth indicators */}
           <EvolutionWidget />
 
@@ -724,30 +791,16 @@ export const System = () => {
               stores.isSoundOn.set(false)
             }
           }}
-          onChildrenClick={async () => {
-            // Prevent rapid clicks
+          onChildrenClick={() => {
             if (isSoundToggling) return
             setIsSoundToggling(true)
-
             try {
               if (showRadio) {
-                // Radio mode - toggle radio
                 stores.isRadioOn.set(!isRadioOn)
               } else {
-                // Sound mode - toggle sound
-                const newValue = !isSoundOn
-                // @ts-ignore - Tone.js loaded via external script
-                if (newValue && window.Tone) {
-                  try {
-                    await window.Tone.start()
-                  } catch (e) {
-                    console.error('Failed to start Tone.context:', e)
-                  }
-                }
-                stores.isSoundOn.set(newValue)
+                stores.isSoundOn.set(!isSoundOn)
               }
             } finally {
-              // Reset toggle state after a short delay
               setTimeout(() => setIsSoundToggling(false), 300)
             }
           }}
@@ -804,9 +857,7 @@ export const System = () => {
             } catch (e) {}
           }
 
-          // Check if intention engine recognizes self-care need
-          const optimal = getOptimalWidget()
-          const intentionSuggestsSelfCare = optimal?.widget === 'selfcare'
+          const intentionSuggestsSelfCare = optimalWidget?.widget === 'selfcare'
 
           // Show if:
           // 1. Intention engine detects anxiety/overwhelm patterns, OR
@@ -816,8 +867,8 @@ export const System = () => {
           if (!shouldShow) return null
 
           // Store quantum reasoning for widget to display
-          if (intentionSuggestsSelfCare && optimal?.reason) {
-            localStorage.setItem('selfcare-quantum-reason', optimal.reason)
+          if (intentionSuggestsSelfCare && optimalWidget?.reason) {
+            localStorage.setItem('selfcare-quantum-reason', optimalWidget.reason)
           } else {
             localStorage.removeItem('selfcare-quantum-reason')
           }
@@ -840,9 +891,7 @@ export const System = () => {
           const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
           const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
 
-          // Check if intention engine recognizes need for direction
-          const optimal = getOptimalWidget()
-          const intentionSuggestsIntentions = optimal?.widget === 'intentions'
+          const intentionSuggestsIntentions = optimalWidget?.widget === 'intentions'
 
           // Show if:
           // 1. User has an existing intention to display, OR
@@ -855,8 +904,8 @@ export const System = () => {
             }
 
             // Store quantum reasoning for widget to display
-            if (intentionSuggestsIntentions && optimal?.reason) {
-              localStorage.setItem('intentions-quantum-reason', optimal.reason)
+            if (intentionSuggestsIntentions && optimalWidget?.reason) {
+              localStorage.setItem('intentions-quantum-reason', optimalWidget.reason)
             } else {
               localStorage.removeItem('intentions-quantum-reason')
             }
@@ -878,9 +927,7 @@ export const System = () => {
           )
           if (hasSubscription) return null
 
-          // Only show to engaged users (10+ Memory answers)
-          const answerCount = logs.filter(log => log.event === 'answer').length
-          if (answerCount < 10) return null
+          if (answerLogs.length < 10) return null
 
           // Check if clicked recently (10 days cooldown)
           const lastClicked = localStorage.getItem('subscribe-clicked')
@@ -900,6 +947,9 @@ export const System = () => {
         <div className={cn('flex flex-col', density.stackGap)}>
           {/* Pattern Insights - Show user's discovered patterns and cohort matches */}
           <PatternInsightsWidget />
+
+          {/* Mood Analytics - Mood-time and mood-selfcare correlations from check-ins */}
+          <MoodAnalytics />
 
           {/* Cohort Connect - Browse and connect with cohort members */}
           <CohortConnectWidget />
@@ -950,11 +1000,11 @@ export const System = () => {
         </div>
       </WidgetErrorBoundary>
 
-      {/* Quantum Engine Connect Widgets */}
+      {/* Quantum Engine Connect Widgets — lazy-mounted: subscriptions only start when widget enters viewport */}
       <WidgetErrorBoundary name="Quantum Engine Connect">
-        <div>
+        <LazyMount>
           <QuantumEngineWidgets />
-        </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* CQGS Biofield Engine Widgets */}
@@ -964,6 +1014,7 @@ export const System = () => {
           <PatternRecognitionWidget />
           <AIFeedbackWidget />
           <SignalStreamWidget />
+          <IntegrityWidget />
         </div>
       </WidgetErrorBoundary>
 
@@ -982,6 +1033,11 @@ export const System = () => {
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />
         </div>
+      </WidgetErrorBoundary>
+
+      {/* Architect — executive self-assembly telemetry, paid users only */}
+      <WidgetErrorBoundary name="Architect">
+        <ArchitectWidget />
       </WidgetErrorBoundary>
 
       {/* Stats stack */}
@@ -1012,4 +1068,4 @@ export const System = () => {
       </div>
     </div>
   )
-}
+})

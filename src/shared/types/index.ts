@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 // Enums
 export enum UserTag {
   Admin = 'Admin',
@@ -156,6 +164,12 @@ export type LogContext = {
   city?: string | null;
   timeZone?: string | null;
   date?: string | null;
+  // Ambient astrology reading at log time (user's timeZone), not a natal chart
+  astroRokuyo?: string | null;
+  astroMoonPhase?: string | null;
+  astroMoonIllumination?: number | null;
+  astroHourlyZodiac?: string | null;
+  astroWesternZodiac?: string | null;
   [key: string]: any;
 };
 
@@ -315,6 +329,8 @@ export type PublicProfile = {
   };
   // Correlated indexes (four-dimensional long-term tracking)
   correlatedIndexes?: CorrelatedIndexes;
+  // Self-assembly phase (server-computed from engagement data)
+  assemblyPhase?: 'dormant' | 'awakening' | 'forming' | 'assembled' | 'integrated';
   // Demo account flag
   isDemo?: boolean;
   // Legacy level unlock widgets
@@ -433,4 +449,5 @@ export type ChatMessageLikeEventPayload = {
 export type SyncEvents = {
   chatMessage: PublicChatMessage;
   chatMessageLike: ChatMessageLikeEventPayload;
+  settings_updated: Record<string, never>;
 };

@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { useStore } from '@nanostores/react'
@@ -9,6 +17,7 @@ import {
 } from '#client/stores/chakraErgonomics'
 import type { ChakraLevel } from '#client/stores/chakraErgonomics'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { isRouteActive } from '#client/stores/router'
 
 type ChakraView = 'status' | 'session' | 'recommendations'
 
@@ -40,7 +49,12 @@ export function ChakraErgonomicsWidget() {
   // Recompute on mount and every 2 minutes
   React.useEffect(() => {
     recomputeChakras()
-    const interval = setInterval(() => recomputeChakras(), 2 * 60 * 1000)
+    const interval = setInterval(() => {
+      // recomputeChakras() writes the chakraErgonomics atom → re-renders
+      // subscribers. Skip while this widget's tab is not the one being viewed.
+      if (document.hidden || !isRouteActive('system')) return
+      recomputeChakras()
+    }, 2 * 60 * 1000)
     return () => clearInterval(interval)
   }, [])
 

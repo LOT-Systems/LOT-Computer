@@ -1,4 +1,12 @@
 /**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
+/**
  * Evolution Milestone Toast
  *
  * Displays subtle notifications when user crosses evolution milestones
@@ -8,6 +16,7 @@
 import React from 'react';
 import { useStore } from '@nanostores/react';
 import { $featureUnlocks } from '#client/stores/evolution';
+import { isRouteActive } from '#client/stores/router';
 
 interface Milestone {
   message: string;
@@ -47,7 +56,11 @@ export function EvolutionMilestoneToast() {
 
     // Check on mount and every 30 seconds
     checkMilestones();
-    const interval = setInterval(checkMilestones, 30000);
+    const interval = setInterval(() => {
+      // Reads localStorage + may setState; skip while on a hidden tab.
+      if (document.hidden || !isRouteActive('system')) return
+      checkMilestones();
+    }, 30000);
     return () => clearInterval(interval);
   }, [seenMilestones]);
 

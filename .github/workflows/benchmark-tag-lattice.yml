@@ -1,0 +1,72 @@
+name: Benchmark Tag Lattice
+
+# Restores the LOT Benchmark rollback lattice on GitHub.
+#
+# Benchmark tags (benchmark-YYYYMMDD-NN) are the Plan-B rollback targets the
+# LOT Benchmark protocol depends on. They cannot be pushed from the agent
+# sandboxes that run the self-assembly sessions — those environments' git relay
+# rejects tag-ref pushes (HTTP 403), so `git push --follow-tags` silently drops
+# them. This workflow runs on GitHub, where the GITHUB_TOKEN can create tags,
+# and back-fills a tag for every `BENCHMARK:` commit that does not have one yet.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# Needed to push tag refs with the default GITHUB_TOKEN.
+permissions:
+  contents: write
+
+concurrency:
+  group: benchmark-tag-lattice
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    name: Tag untagged BENCHMARK commits
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history + tags
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Create benchmark tags
+        run: |
+          set -uo pipefail
+          git config user.name "lot-benchmark-bot"
+          git config user.email "actions@github.com"
+
+          created=0
+          # Oldest -> newest so per-day NN increments in commit order.
+          for sha in $(git log --reverse --format='%H' -n 300 --grep='^BENCHMARK:'); do
+            # Skip if a benchmark tag already points at this commit.
+            if git tag --points-at "$sha" | grep -q '^benchmark-'; then
+              continue
+            fi
+
+            # Commit date in UTC -> YYYYMMDD.
+            date=$(TZ=UTC git show -s --format='%cd' --date=format-local:'%Y%m%d' "$sha")
+
+            # Next free NN for that date (local tags include ones just created
+            # earlier in this same loop, so same-day commits sequence correctly).
+            n=1
+            while git rev-parse -q --verify "refs/tags/benchmark-${date}-$(printf '%02d' "$n")" >/dev/null 2>&1; do
+              n=$((n + 1))
+            done
+            tag="benchmark-${date}-$(printf '%02d' "$n")"
+
+            subject=$(git show -s --format='%s' "$sha")
+            git tag -a "$tag" -m "Benchmark checkpoint: ${subject}" "$sha"
+            if git push origin "refs/tags/${tag}"; then
+              echo "Tagged ${sha:0:9} -> ${tag}"
+              created=$((created + 1))
+            else
+              echo "::warning::Failed to push ${tag} for ${sha:0:9}"
+              git tag -d "$tag" >/dev/null 2>&1 || true
+            fi
+          done
+
+          echo "Created ${created} benchmark tag(s)."

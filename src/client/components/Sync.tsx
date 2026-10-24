@@ -1,7 +1,16 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import { useQueryClient } from 'react-query'
 import * as stores from '#client/stores'
+import { $featureUnlocks } from '#client/stores/evolution'
 import {
   Button,
   Clock,
@@ -21,17 +30,28 @@ import { PublicChatMessage, UserTag } from '#shared/types'
 import {
   SYNC_CHAT_MESSAGES_TO_SHOW,
   MAX_SYNC_CHAT_MESSAGE_LENGTH,
+  isBlankMessage,
 } from '#shared/constants'
 
-export const Sync = () => {
+const CHAT_ALLOWED_TAGS: string[] = [
+  UserTag.Admin,
+  UserTag.RND,
+  UserTag.Usership,
+  UserTag.Onyx,
+  UserTag.Legacy,
+].map((t) => t.toLowerCase())
+
+export const Sync = React.memo(function SyncInner() {
   const formRef = React.useRef<HTMLFormElement>(null)
   const me = useStore(stores.me)
   const isTouchDevice = useStore(stores.isTouchDevice)
+  const isTimeFormat12h = useStore(stores.isTimeFormat12h)
+  const featureUnlocks = useStore($featureUnlocks)
   const queryClient = useQueryClient()
 
   const [message, setMessage] = React.useState('')
-  const [messages, setMessages] = React.useState<PublicChatMessage[]>([])
-  const hasInitiallyLoaded = React.useRef(false)
+  // SSE-received messages not yet reflected in the API response
+  const [sseMessages, setSseMessages] = React.useState<PublicChatMessage[]>([])
 
   // Check if current user can access /us section (admin-level access)
   const canAccessUserProfiles = React.useMemo(() => {
@@ -43,72 +63,58 @@ export const Sync = () => {
     )
   }, [me])
 
+  // Chat is restricted to Admin / R&D / Usership / Onyx / Legacy
+  const canAccessChat = React.useMemo(() => {
+    if (!me) return false
+    if (me.isAdmin) return true
+    return me.tags.some((tag) => CHAT_ALLOWED_TAGS.includes(tag.toLowerCase()))
+  }, [me])
+
   const { data: fetchedMessages } = useChatMessages()
   const { mutate: createChatMessage } = useCreateChatMessage({
     onSuccess: () => setMessage(''),
   })
   const { mutate: likeChatMessage } = useLikeChatMessage({
     onSuccess: () => {
-      // Invalidate chat messages cache to ensure likes persist across tab switches
       queryClient.invalidateQueries(['/api/chat-messages'])
     }
   })
 
-  const onChangeMessage = React.useCallback((value: string) => {
-    setMessage(
-      value.length <= MAX_SYNC_CHAT_MESSAGE_LENGTH
-        ? value
-        : value.slice(0, MAX_SYNC_CHAT_MESSAGE_LENGTH)
-    )
-  }, [])
-
-  // Only load messages from API on initial mount, not on refetches
-  // SSE events will handle updates after initial load
-  React.useEffect(() => {
-    if (fetchedMessages?.length && !hasInitiallyLoaded.current) {
-      setMessages(fetchedMessages)
-      hasInitiallyLoaded.current = true
-    }
-  }, [fetchedMessages])
-
-  // Invalidate cache on mount to ensure fresh data (filters suspended users)
-  // Reset hasInitiallyLoaded when component unmounts so data reloads on return
+  // Ensure fresh data on mount (filters suspended users)
   React.useEffect(() => {
     queryClient.invalidateQueries(['/api/chat-messages'])
-    return () => {
-      hasInitiallyLoaded.current = false
-    }
   }, [])
+
+  // Merge: SSE-only messages (not yet in API response) prepended to API list
+  const messages = React.useMemo(() => {
+    const fetched = fetchedMessages || []
+    const fetchedIds = new Set(fetched.map((m) => m.id))
+    const fresh = sseMessages.filter((m) => !fetchedIds.has(m.id))
+    const combined = [...fresh, ...fetched].filter((m) => !isBlankMessage(m.message))
+    return canAccessUserProfiles ? combined : combined.slice(0, SYNC_CHAT_MESSAGES_TO_SHOW)
+  }, [fetchedMessages, sseMessages, canAccessUserProfiles])
 
   React.useEffect(() => {
     const { dispose: disposeChatMessageListener } = sync.listen(
       'chat_message',
       (data) => {
-        setMessages((prev) => {
+        setSseMessages((prev) => {
           if (prev.some((x) => x.id === data.id)) return prev
-          const newValue = [data, ...prev]
-          return canAccessUserProfiles
-            ? newValue
-            : newValue.slice(0, SYNC_CHAT_MESSAGES_TO_SHOW)
+          return [data, ...prev]
         })
       }
     )
     const { dispose: disposeChatMessageLikeListener } = sync.listen(
       'chat_message_like',
       (data) => {
-        setMessages((prev) => {
-          return prev.map((x) => {
-            if (x.id === data.messageId) {
-              // Update likes count for all users
-              // Update isLiked only if this user performed the action
-              if (data.userId === me?.id) {
-                return { ...x, likes: data.likes, isLiked: data.isLiked }
-              }
-              return { ...x, likes: data.likes }
-            }
-            return x
+        setSseMessages((prev) =>
+          prev.map((x) => {
+            if (x.id !== data.messageId) return x
+            if (data.userId === me?.id) return { ...x, likes: data.likes, isLiked: data.isLiked }
+            return { ...x, likes: data.likes }
           })
-        })
+        )
+        queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
     return () => {
@@ -116,6 +122,8 @@ export const Sync = () => {
       disposeChatMessageLikeListener()
     }
   }, [me?.id])
+
+  const onChangeMessage = React.useCallback((value: string) => setMessage(value), [])
 
   const onSubmitMessage = React.useCallback(
     (ev?: React.FormEvent) => {
@@ -129,19 +137,6 @@ export const Sync = () => {
     (messageId: string) => (ev: React.MouseEvent) => {
       ev?.preventDefault()
       ev?.stopPropagation()
-
-      // Optimistically update isLiked state for current user
-      setMessages((prev) => {
-        return prev.map((x) => {
-          if (x.id === messageId) {
-            const newIsLiked = !x.isLiked
-            const newLikes = newIsLiked ? (x.likes || 0) + 1 : Math.max(0, (x.likes || 0) - 1)
-            return { ...x, likes: newLikes, isLiked: newIsLiked }
-          }
-          return x
-        })
-      })
-
       likeChatMessage({ messageId })
     },
     [likeChatMessage]
@@ -174,6 +169,14 @@ export const Sync = () => {
   React.useEffect(() => {
     formRef.current?.querySelector('textarea')?.focus()
   }, [])
+
+  if (!canAccessChat) {
+    return (
+      <div className="max-w-[700px] text-acc/40 py-8">
+        Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-[700px]">
@@ -230,7 +233,7 @@ export const Sync = () => {
               )}
               onClick={onToggleLike(x.id)}
             >
-              {authorId ? (
+              {authorId && (featureUnlocks?.socialMentions || canAccessUserProfiles) ? (
                 <GhostButton
                   className="whitespace-nowrap pr-4"
                   onClick={onNavigateToUserProfile(authorId)}
@@ -267,7 +270,7 @@ export const Sync = () => {
 
               {!isTouchDevice && (
                 <div className="text-acc/0 transition-opacity select-none pointer-events-none whitespace-nowrap group-hover:text-acc/40">
-                  <MessageTimeLabel dateString={x.createdAt} />
+                  <MessageTimeLabel dateString={x.createdAt} isTimeFormat12h={isTimeFormat12h} />
                 </div>
               )}
             </div>
@@ -276,10 +279,9 @@ export const Sync = () => {
       </div>
     </div>
   )
-}
+})
 
-const MessageTimeLabel: React.FC<{ dateString: string }> = ({ dateString }) => {
-  const isTimeFormat12h = useStore(stores.isTimeFormat12h)
+const MessageTimeLabel: React.FC<{ dateString: string | Date; isTimeFormat12h: boolean }> = ({ dateString, isTimeFormat12h }) => {
   const date = dayjs(dateString)
   const now = dayjs()
   const isPast = now.diff(date, 'day') >= 1

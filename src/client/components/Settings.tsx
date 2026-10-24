@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import { useUpdateSettings, useMyMemoryStory } from '#client/queries'
@@ -10,22 +18,19 @@ import {
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
 import { cn } from '#client/utils'
-import { WorldCanvas } from './WorldCanvas'
+import { warmAudioContext } from '#client/utils/sovietChime'
 import { GrowthMilestones, BadgeUnlockFeed } from './stats'
 import { InvestmentSwitch } from './InvestmentSwitch'
+import { ProfileQRCode } from './ProfileQRCode'
 
-interface StatusData {
-  version: string
-  overall: 'ok' | 'degraded' | 'error'
-}
-
-export const Settings = () => {
+export const Settings = React.memo(function SettingsInner() {
   const me = useStore(stores.me)
   const baseColor = useStore(stores.baseColor)
   const accentColor = useStore(stores.accentColor)
   const isCustomThemeEnabled = useStore(stores.isCustomThemeEnabled)
   const isTimeChimeEnabled = useStore(stores.isTimeChimeEnabled)
   const isKeyboardSoundOn = useStore(stores.isKeyboardSoundOn)
+  const appVersion = useStore(stores.appVersion)
   const { data: storyData } = useMyMemoryStory()
 
   const { mutate: updateSettings } = useUpdateSettings({
@@ -46,7 +51,6 @@ export const Settings = () => {
   })
 
   const [changed, setChanged] = React.useState(false)
-  const [statusData, setStatusData] = React.useState<StatusData | null>(null)
   const [state, setState] = React.useState<UserSettings>({
     firstName: me?.firstName || '',
     lastName: me?.lastName || '',
@@ -144,6 +148,10 @@ export const Settings = () => {
       timeChime: newValue,
     }))
     stores.isTimeChimeEnabled.set(newValue)
+
+    if (newValue) {
+      warmAudioContext()
+    }
 
     // Save immediately to database
     try {
@@ -270,28 +278,8 @@ export const Settings = () => {
     [state]
   )
 
-  // Fetch live status data from the API
-  React.useEffect(() => {
-    fetch('/api/public/status')
-      .then(res => res.json())
-      .then(data => {
-        setStatusData({
-          version: data.version || '1.2.0',
-          overall: data.overall || 'ok',
-        })
-      })
-      .catch(() => {
-        setStatusData({
-          version: '1.2.0',
-          overall: 'error',
-        })
-      })
-  }, [])
-
-  const statusText = statusData
-    ? statusData.overall === 'ok'
-      ? `Status page (v${statusData.version})`
-      : `Status page (v${statusData.version}) - System issues detected`
+  const statusText = appVersion
+    ? `Status page (v${appVersion})`
     : 'Status page'
 
   return (
@@ -419,7 +407,7 @@ export const Settings = () => {
           <Block label="Activity log:" onChildrenClick={onToggleActivityLogs}>
             {state.hideActivityLogs ? 'Off' : 'On'}
           </Block>
-          <Block label="Hourly chime:" onChildrenClick={onToggleTimeChime}>
+          <Block label="Hourly chime:" onClick={onToggleTimeChime}>
             {state.timeChime ? 'On' : 'Off'}
           </Block>
           <Block
@@ -490,6 +478,24 @@ export const Settings = () => {
                 )}
               </Block>
             </div>
+
+            {privacySettings.isPublicProfile && userTagIds.includes(UserTag.Usership) && (
+              <div className="mb-8">
+                <Block label="QR Code:" blockView>
+                  <div className="flex items-center gap-x-12">
+                    <ProfileQRCode
+                      url={`https://lot-systems.com/u/${privacySettings.customUrl || me?.id}`}
+                      fgColor={accentColor}
+                      bgColor={baseColor}
+                      size={80}
+                    />
+                    <div className="opacity-30" style={{ fontSize: '0.8em' }}>
+                      Scan to open profile
+                    </div>
+                  </div>
+                </Block>
+              </div>
+            )}
 
             {privacySettings.isPublicProfile && (
               <>
@@ -607,7 +613,8 @@ export const Settings = () => {
             ) : (
               <>
                 <div className="mb-8">
-                  Subscribe to Usership to unlock generative Memory Story feature.
+                  Answer questions over time and the system builds your portrait from what you share.
+                  Available with LOT Usership — $99/month, 12 months.
                 </div>
                 <Link
                   href="https://brand.lot-systems.com"
@@ -615,7 +622,7 @@ export const Settings = () => {
                   rel="external"
                   className="underline block"
                 >
-                  Visit brand.lot-systems.com
+                  brand.lot-systems.com
                 </Link>
               </>
             )}
@@ -629,4 +636,4 @@ export const Settings = () => {
 
     </div>
   )
-}
+})

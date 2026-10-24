@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import * as React from 'react'
 import { Block, Button } from '#client/components/ui'
 import { useContextualPrompts } from '#client/queries'
@@ -15,6 +23,8 @@ export const ContextualPromptsWidget = () => {
   // Quantum variation: subtle shift on mount and every 15 seconds
   React.useEffect(() => {
     const interval = setInterval(() => {
+      // setState re-renders this widget; skip while it's on a hidden tab.
+      if (document.hidden || !stores.isRouteActive('system')) return
       setQuantumShift(prev => (prev + 1) % 5)
     }, 15000)
     return () => clearInterval(interval)

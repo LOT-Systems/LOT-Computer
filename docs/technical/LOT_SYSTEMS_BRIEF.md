@@ -1,3 +1,11 @@
+<!--
+  LOT SYSTEMS CORPORATION
+  Vadim Marmeladov — CEO, Owner LOT®
+  Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+  LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+  Made in the USA | brand.lot-systems.com
+-->
+
 # LOT SYSTEMS: Technical Brief & Strategic Overview
 
 **Author:** Vadik Marmeladov, CEO & Founder, LOT Systems
@@ -5,9 +13,9 @@
 **License:** Proprietary - All intellectual property rights reserved by Vadik Marmeladov
 
 **Classification:** Public
-**Document Version:** 1.0
-**Last Updated:** January 15, 2026
-**Status:** Production Active
+**Document Version:** 3.2
+**Last Updated:** June 11, 2026
+**Status:** Production Active · Phase v54
 
 ---
 
@@ -19,10 +27,10 @@ LOT (Layers of Time) Systems is an advanced personal operating system that combi
 Transform fragmented self-tracking into a unified, intelligent system that recognizes what users need before they articulate it.
 
 **Key Differentiators:**
-- Quantum Intent Engine™ - Predictive pattern recognition across all user interactions
+- Quantum Intent Engine™ (QIE v54) — 65 behavioral patterns, 19 physiological archetypes, 93-node dependency graph
 - Context-aware AI question generation using Claude (Anthropic)
-- Real-time psychological profiling with 8 distinct archetypes
-- Zero-configuration intelligence - system learns passively from natural usage
+- Real-time physiological cohort classification — live archetype surfaced across 3 System widgets
+- Zero-configuration intelligence — system self-assembles from natural usage into 15 cognitive modules
 
 ---
 
@@ -41,9 +49,10 @@ Transform fragmented self-tracking into a unified, intelligent system that recog
 - **vs. Notion/Obsidian:** LOT has intelligent curation vs. manual organization
 
 **Market Validation:**
-- 814 days of continuous operation (Day 814 as of January 15, 2026)
+- 1000+ days of continuous operation (Day 1008+ as of June 11, 2026)
 - Active user base with measurable engagement metrics
 - Proven retention through badge/streak mechanics
+- Self-assembling QOS: 15 cognitive modules, 65 behavioral patterns, 19 physiological archetypes live
 
 ---
 
@@ -60,14 +69,14 @@ Transform fragmented self-tracking into a unified, intelligent system that recog
 **Backend:**
 - Node.js with Fastify (high-performance routing)
 - PostgreSQL with Sequelize ORM
-- Redis for caching and real-time features
-- Anthropic Claude API (Claude Opus 4.5) for AI generation
+- Anthropic Claude API (Sonnet 4.6) for AI generation
+- 11 scheduled background jobs (cron-style hourly interval)
 
 **Infrastructure:**
-- Server-side rendering for optimal SEO
-- WebSocket support for real-time updates
+- SSE for real-time event streaming (no WebSocket)
 - Comprehensive backup systems (automated daily)
 - Security: CSRF protection, rate limiting, session management
+- Digital Ocean App Platform (encrypted env vars)
 
 ### Key Subsystems
 
@@ -95,47 +104,58 @@ Historical Logs (120 entries) ────────────────�
 - Cached responses with 12-hour TTL
 - Graceful degradation on API failures
 
-#### 2. Quantum Intent Engine™
+#### 2. Quantum Intent Engine™ (QIE v54)
 **Purpose:** Multi-dimensional pattern recognition that predicts user needs across all widgets.
 
 **Architecture:**
 ```
 Widget Signals → Signal Recording → Pattern Analysis → Widget Recommendations
      ↓                                      ↓
-(mood, planner,                    (7 pattern types)
- memory, journal,                          ↓
- selfcare, intentions)          User State Calculation
+(93-node dep graph)               (65 behavioral patterns)
+(8 signal sources)                         ↓
+(10 background jobs)            User State + Physiological Cohort
                                 (energy, clarity, alignment, support needs)
+                                          ↓
+                              Quantum Operating System (QOS)
+                              (runtime + index + coherence + operational status)
 ```
 
-**Signal Types:**
-- Mood check-ins (8 emotions tracked)
-- Planning activities (4 dimensions: intent, today, how, feeling)
-- Memory answers (question ID, option, timestamp)
-- Self-care completions (practice type, duration)
-- Intention setting/completion
-- Journal entries
+**Signal Sources (8 active pipelines):**
+- mood, memory, planner, intentions, selfcare, journal (primary 6)
+- energy, cohort (derived state)
+- log, recipe, goals, qos (direct field-entry pipelines)
 
-**Pattern Recognition (7 Types):**
-1. **Anxiety Pattern** - Multiple anxious moods → Suggest self-care (confidence: 0.66-1.0)
-2. **Lack of Structure** - Tired + no planning → Suggest planner (confidence: 0.7)
-3. **Seeking Direction** - No intention for weeks → Suggest intentions (confidence: 0.8)
-4. **Flow Potential** - Energized + planning → Passive memory prompts (confidence: 0.9)
-5. **Evening Overwhelm** - Evening + overwhelmed → Immediate self-care (confidence: 0.85)
-6. **Surface Awareness** - Consistent moods + no journaling → Suggest deeper reflection (confidence: 0.6)
-7. **Morning Clarity** - Calm morning state → Set intention (confidence: 0.75)
+**Pattern Recognition (65 patterns active):**
+- Biofield patterns: anxiety, circadian drift, sleep debt, meridian lock, biofield coherence peak
+- Physiological arcs: recovery velocity, care momentum, biofield recovery arc, cognitive load release
+- Cognitive patterns: deep work cascade, cognitive expansion, resonant synthesis, full-stack session
+- Intention arcs: intention follow-through, intention decay, intention velocity, temporal coherence
+- Social patterns: social resonance arc, signal silence, ecosystem synchrony
+- QOS meta-patterns: os-vitals-convergence, full-coherence, qos-acceleration, signal drought
+
+**Physiological Cohort Classifier (19 archetypes):**
+- Real-time classification from energy × behavior × temporal context
+- Surfaced across 3 System widgets: QOS widget · System Progress report · System Pulse (Biofield view)
+- Week-over-week stability tracked by background job 10 (weekly-archetype-stability-monitor)
+
+**Self-Assembly (15 cognitive modules):**
+- Biofield Engine · Reflection Layer · Temporal Planner · Nutrition Protocol
+- Goal Architecture · Archetype Classifier · OS Vitals Monitor · Quantum OS
+- Community Bridge · Signal Archive · Quantum Substrate · and 4 more
 
 **Technical Specs:**
-- Signal retention: 7 days
-- Max signals: 1,000 (prevents memory leaks)
+- Signal retention: 7 days rolling (localStorage + server sync)
+- Max signals: 1,000 per session (GC on overflow)
 - Analysis cooldown: 5 minutes
-- localStorage-based persistence with comprehensive error handling
+- Background QOS monitor: 30-minute passive snapshot interval
+- Dep graph: 88+ nodes across 5 tiers (Tier 0 raw input → Tier 4 meta-layer)
 
 **User State Calculation:**
-- **Energy:** depleted/low/moderate/high/unknown (based on mood scoring)
-- **Clarity:** confused/uncertain/clear/focused/unknown (based on planning + intentions)
-- **Alignment:** disconnected/searching/aligned/flowing (based on positive signals + planning)
-- **Needs Support:** none/low/moderate/critical (based on anxiety signal count)
+- **Energy:** depleted/low/moderate/high/unknown
+- **Clarity:** confused/uncertain/clear/focused/unknown
+- **Alignment:** disconnected/searching/aligned/flowing
+- **Needs Support:** none/low/moderate/critical
+- **User Index:** 6D composite (engagement/emotional/intentional/social/selfcare/cognitive)
 
 #### 3. Psychological Profiling System
 **Purpose:** Dynamic archetype classification and trait extraction from user behavior.

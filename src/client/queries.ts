@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import axios, { AxiosError } from 'axios'
 import {
   useQuery,
@@ -125,7 +133,7 @@ export const useVisitorStats = createQuery<{
 
 export const useLogs = createQuery<Log[]>('/api/logs', {
   refetchOnWindowFocus: false, // Prevent refetching on tab switch (was creating duplicate empty logs)
-  staleTime: 30 * 1000, // Cache for 30 seconds to prevent excessive refetching
+  staleTime: 5 * 60 * 1000, // Cache for 5 minutes — /api/logs has no LIMIT so keep fetches infrequent
 })
 
 export const useCreateLog = createMutation<{ text: string; event?: string; metadata?: Record<string, any> }, Log>(
@@ -590,7 +598,8 @@ export const useCollectiveStats = () =>
     careMoments: number
     lastUpdated: number
   }>('/api/stats/collective', {
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 120000, // Refetch every 2 minutes
+    refetchIntervalInBackground: false,
   })()
 
 export const useGrowthStats = () =>
@@ -609,7 +618,8 @@ export const useGrowthStats = () =>
     }
     lastUpdated: number
   }>('/api/stats/growth', {
-    refetchInterval: 60000, // Refetch every minute
+    refetchInterval: 120000, // Refetch every 2 minutes
+    refetchIntervalInBackground: false,
   })()
 
 export const usePatternStats = () =>
@@ -618,7 +628,8 @@ export const usePatternStats = () =>
     mostActive: string
     lastUpdated: number
   }>('/api/stats/patterns', {
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 120000, // Refetch every 2 minutes
+    refetchIntervalInBackground: false,
   })()
 
 export const useWellnessStats = () =>
@@ -631,7 +642,8 @@ export const useWellnessStats = () =>
     quietestHour: string
     lastUpdated: number
   }>('/api/stats/wellness', {
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 120000, // Refetch every 2 minutes
+    refetchIntervalInBackground: false,
   })()
 
 export const useBadgeStats = () =>
@@ -644,7 +656,8 @@ export const useBadgeStats = () =>
     totalToday: number
     lastUpdated: number
   }>('/api/stats/badges', {
-    refetchInterval: 60000, // Refetch every minute
+    refetchInterval: 120000, // Refetch every 2 minutes
+    refetchIntervalInBackground: false,
   })()
 
 export const useMemoryEngineStats = () =>
@@ -656,7 +669,8 @@ export const useMemoryEngineStats = () =>
     aiDiversityScore: number
     lastUpdated: number
   }>('/api/stats/memory-engine', {
-    refetchInterval: 60000, // Refetch every minute
+    refetchInterval: 120000, // Refetch every 2 minutes
+    refetchIntervalInBackground: false,
     retry: false, // Don't retry if user doesn't have access
   })()
 
@@ -676,7 +690,8 @@ export const useAIUsageStats = () =>
       startedAt: number
     }
   }>('/api/stats/ai-usage', {
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 120000, // Refetch every 2 minutes
+    refetchIntervalInBackground: false,
     retry: false,
   })()
 
@@ -789,3 +804,111 @@ export const useCosmicUpdate = createMutation<
   { prompt?: string },
   { imageUrl: string; prompt: string }
 >('post', '/api/cosmic-update')
+
+// ============================================================================
+// QI — Quantum Intelligence RFI
+// ============================================================================
+
+export const useQiQuery = createMutation<
+  {
+    query: string
+    quantumState?: {
+      energy?: string
+      clarity?: string
+      alignment?: string
+      needsSupport?: string
+    }
+    userIndex?: {
+      overall?: number
+      dimensions?: Record<string, number>
+      trend?: string
+    }
+  },
+  {
+    assessment: string
+    logId: string | null
+  }
+>('post', '/api/qi')
+
+// ============================================================================
+// ASSEMBLY — Self-Assembly Directive
+// ============================================================================
+
+export const useAssemblyDirective = createMutation<
+  {
+    quantumState?: {
+      energy?: string
+      clarity?: string
+      alignment?: string
+      needsSupport?: string
+    }
+    userIndex?: {
+      overall?: number
+      dimensions?: Record<string, number>
+      trend?: string
+    }
+    assemblyState?: {
+      overallAssembly?: number
+      assembledCount?: number
+      totalModules?: number
+      phase?: string
+      dormantModules?: string[]
+      activeModules?: string[]
+    }
+  },
+  {
+    directive: string
+    logId: string | null
+  }
+>('post', '/api/assembly')
+
+// ============================================================================
+// PRAYER — Contextual Scripture
+// ============================================================================
+
+export const usePrayerScripture = createMutation<
+  {
+    logText: string
+    quantumState?: {
+      energy?: string
+      clarity?: string
+      alignment?: string
+      needsSupport?: string
+    }
+    userIndex?: {
+      overall?: number
+      dimensions?: Record<string, number>
+      trend?: string
+    }
+  },
+  {
+    scripture: string
+    reference: string
+    logId: string | null
+  }
+>('post', '/api/prayer')
+
+// ============================================================================
+// STORY — Contextual AI Story
+// ============================================================================
+
+export const useStoryGeneration = createMutation<
+  {
+    logText: string
+    quantumState?: {
+      energy?: string
+      clarity?: string
+      alignment?: string
+      needsSupport?: string
+    }
+    userIndex?: {
+      overall?: number
+      dimensions?: Record<string, number>
+      trend?: string
+    }
+  },
+  {
+    story: string
+    logId: string | null
+  }
+>('post', '/api/story')

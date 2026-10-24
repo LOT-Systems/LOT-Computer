@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import { createRouter, openPage } from '@nanostores/router'
 
 type Routes = {
@@ -24,23 +32,18 @@ export const router = createRouter<Routes>({
   dm: '/dm/:userId',
 })
 
-// Debounce navigation to prevent rapid clicks causing issues
-let navigationTimeout: NodeJS.Timeout | null = null
-const NAVIGATION_DEBOUNCE_MS = 200
-
 export const goTo = <P extends keyof Routes>(
   page: P,
   params: Record<string, string> = {}
   // @ts-ignore FIXME:
 ) => {
-  // Clear any pending navigation
-  if (navigationTimeout) {
-    clearTimeout(navigationTimeout)
-  }
-
-  // Debounce navigation to prevent rapid clicks
-  navigationTimeout = setTimeout(() => {
-    openPage(router, page, params)
-    navigationTimeout = null
-  }, NAVIGATION_DEBOUNCE_MS)
+  openPage(router, page, params)
 }
+
+// Cheap, subscription-free check of the current route. Read inside interval
+// callbacks to pause heavy background work when its tab is not the one being
+// viewed. NOTE: this is stronger than document.hidden — switching between
+// in-app tabs keeps the browser tab visible (document.hidden === false), so
+// document.hidden alone does not pause work when the user leaves this tab.
+export const isRouteActive = (route: keyof Routes): boolean =>
+  router.get()?.route === route

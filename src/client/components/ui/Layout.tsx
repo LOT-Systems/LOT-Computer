@@ -1,10 +1,58 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
-import { Button, Page } from '#client/components/ui'
+import { goTo } from '#client/stores/router'
+// Import directly from the component files, NOT the barrel (#client/components/ui).
+// Layout is itself re-exported by that barrel, so importing the barrel here
+// creates a circular dependency (ui/index -> Layout -> ui/index). With esbuild
+// code-splitting that cycle can initialize a chunk binding out of order and
+// throw "Cannot access uninitialized variable" at render — and since Layout
+// wraps every page, it takes down the whole app.
+import { Button } from './Button'
+import { Page } from './Page'
 import { cn } from '#client/utils'
 
-type NavItem = { href: string | null; label: string | null; spacer?: boolean }
+type RouteName = 'sync' | 'logs' | 'system' | 'api' | 'settings'
+
+type NavItem = { label: string | null; spacer?: boolean; route?: RouteName }
+
+const NavButton = React.memo(function NavButton({
+  link,
+  isActive,
+  isMirrorOn,
+}: {
+  link: NavItem
+  isActive: boolean
+  isMirrorOn: boolean
+}) {
+  return (
+    <Button
+      kind="secondary-rounded"
+      className={cn(
+        'mb-4 flex-shrink-0',
+        !link.route && 'opacity-30 pointer-events-none',
+        // Active tab: solid fill, no hover effect. before:!hidden fully
+        // disables the grid-fill-hover ::before (grid + opaque backdrop) so
+        // hovering the active button never overpaints its solid fill.
+        isActive && (isMirrorOn
+          ? 'bg-white/20 hover:bg-white/20 before:!hidden'
+          : 'bg-acc text-bac before:!hidden')
+      )}
+      onClick={link.route ? () => goTo(link.route!) : undefined}
+      disabled={!link.route}
+    >
+      {link.label}
+    </Button>
+  )
+})
 
 type Props = {
   children: React.ReactNode
@@ -12,38 +60,38 @@ type Props = {
 }
 
 export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
-  const me = useStore(stores.me)
+  const isLoggedIn = useStore(stores.isLoggedIn)
   const layoutView = useStore(stores.layoutView)
   const isMirrorOn = useStore(stores.isMirrorOn)
-  const none = React.useMemo(() => () => {}, [])
-  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/'
+  const routerState = useStore(stores.router)
+  const currentRoute = routerState?.route ?? 'system'
   const navLinks = React.useMemo<NavItem[]>(() => {
-    const result: NavItem[] = me
+    const result: NavItem[] = isLoggedIn
       ? [
-          { href: '/sync', label: 'Sync' },
-          { href: '/log', label: 'Log' },
-          { href: '/', label: 'System' },
-          { href: null, label: 'Basics' },
-          { href: null, label: 'Self-care' },
-          { href: null, label: 'Kids' },
-          { href: null, label: 'Home' },
-          { href: null, label: null, spacer: true },
-          { href: '/api', label: 'API' },
-          { href: '/settings', label: 'Settings' },
+          { label: 'Sync', route: 'sync' },
+          { label: 'Log', route: 'logs' },
+          { label: 'System', route: 'system' },
+          { label: 'Basics' },
+          { label: 'Self-care' },
+          { label: 'Kids' },
+          { label: 'Home' },
+          { label: null, spacer: true },
+          { label: 'API', route: 'api' },
+          { label: 'Settings', route: 'settings' },
         ]
       : [
-          { href: null, label: 'Sync' },
-          { href: null, label: 'Logs' },
-          { href: '/', label: 'System' },
-          { href: null, label: 'Basics' },
-          { href: null, label: 'Self-care' },
-          { href: null, label: 'Kids' },
-          { href: null, label: 'Home' },
-          { href: null, label: null, spacer: true },
-          { href: null, label: 'Settings' },
+          { label: 'Sync' },
+          { label: 'Logs' },
+          { label: 'System', route: 'system' },
+          { label: 'Basics' },
+          { label: 'Self-care' },
+          { label: 'Kids' },
+          { label: 'Home' },
+          { label: null, spacer: true },
+          { label: 'Settings' },
         ]
     return layoutView === 'desktop' ? result : result.reverse()
-  }, [layoutView, me])
+  }, [layoutView, isLoggedIn])
 
   return (
     <div className="min-h-[100dvh] grid leading-[1.5rem]" data-lot-genesis="true">
@@ -51,7 +99,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
       {!hideNav && (
         <div
           id="nav"
-          className="sticky bottom-0 left-0 right-0 self-end transition-opacity"
+          className="sticky bottom-0 left-0 right-0 self-end transition-opacity z-10"
         >
           <div className="px-16 phone:px-32 tablet:px-48 desktop:px-64 mb-16 phone:mb-32 tablet:mb-48 desktop:mb-64">
             <nav
@@ -62,31 +110,21 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
                 'justify-end tablet:justify-start'
               )}
             >
-              {navLinks.map((link, i) => {
-                const isActive = link.href === currentPath
-                return link.spacer ? (
+              {navLinks.map((link, i) =>
+                link.spacer ? (
                   <div
                     key={link.label ?? i}
                     className="flex-grow tablet:block hidden"
                   />
                 ) : (
-                  <Button
+                  <NavButton
                     key={link.label}
-                    href={link.href ?? undefined}
-                    kind="secondary-rounded"
-                    className={cn(
-                      'mb-4 flex-shrink-0',
-                      isActive && (isMirrorOn
-                        ? 'bg-white/20 hover:bg-white/30'
-                        : 'bg-acc text-bac hover:bg-acc/90')
-                    )}
-                    onClick={!link.href ? none : undefined}
-                    disabled={!link.href}
-                  >
-                    {link.label}
-                  </Button>
+                    link={link}
+                    isActive={link.route === currentRoute}
+                    isMirrorOn={isMirrorOn}
+                  />
                 )
-              })}
+              )}
             </nav>
           </div>
         </div>

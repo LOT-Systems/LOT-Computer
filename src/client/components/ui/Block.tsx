@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
@@ -21,8 +29,6 @@ type Props = {
 export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
   const theme = useStore(stores.theme)
   const isMirrorOn = useStore(stores.isMirrorOn)
-  const baseColor = useStore(stores.baseColor)
-  const accentColor = useStore(stores.accentColor)
 
   const hoverClassName = isMirrorOn
     ? 'hover:bg-white/10 group-hover:bg-white/10'
@@ -39,7 +45,7 @@ export const Block: React.FC<Props> = ({ blockView = false, ...props }) => {
       color = `rgb(var(--acc-color-300) / 0.5)`
     }
     return { '--widget-progress-color': color } as React.CSSProperties
-  }, [props.inProgress, theme, isMirrorOn, baseColor, accentColor])
+  }, [props.inProgress, theme, isMirrorOn])
 
   return (
     <div

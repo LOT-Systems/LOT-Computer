@@ -1,4 +1,12 @@
 /**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
+/**
  * LOT Systems - Centralized Security Configuration
  *
  * All security-related constants and policies in one auditable location.
@@ -24,6 +32,10 @@ export const SECURITY = {
     global: { max: 100, timeWindow: '1 minute' },
     /** Auth route rate limit per IP */
     auth: { max: 10, timeWindow: '1 minute' },
+    /** AI-calling endpoints (Together AI budget protection) */
+    ai: { max: 10, timeWindow: '1 minute' },
+    /** Image/heavy AI endpoints */
+    aiHeavy: { max: 5, timeWindow: '1 minute' },
   },
 
   /** Brute force protection */

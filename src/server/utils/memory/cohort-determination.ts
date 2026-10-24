@@ -1,4 +1,52 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import type { CohortClassification, PsychologicalDepth } from './types.js'
+
+export type MedicalProfile = {
+  hasBloodType: boolean
+  hasAllergies: boolean
+  hasMedications: boolean
+  hasChronicConditions: boolean
+  medicalAnswerCount: number
+}
+
+export function assessMedicalProfile(logs: Array<{ event: string; metadata: any }>): MedicalProfile {
+  const medicalLogs = logs.filter(l => l.event === 'medical_record')
+  const profile: MedicalProfile = {
+    hasBloodType: false,
+    hasAllergies: false,
+    hasMedications: false,
+    hasChronicConditions: false,
+    medicalAnswerCount: medicalLogs.length,
+  }
+
+  for (const log of medicalLogs) {
+    const q = ((log.metadata?.question || '') as string).toLowerCase()
+    const a = ((log.metadata?.answer || '') as string).toLowerCase()
+    if (q.includes('blood type') && a !== 'not sure') profile.hasBloodType = true
+    if ((q.includes('allergy') || q.includes('allergies')) && a !== 'none') profile.hasAllergies = true
+    if (q.includes('medication') && a !== 'none') profile.hasMedications = true
+    if (q.includes('chronic') && a !== 'none') profile.hasChronicConditions = true
+  }
+  return profile
+}
+
+export function qualifiesForPaidCohort(medicalProfile: MedicalProfile, answerCount: number): boolean {
+  const medicalDepth = [
+    medicalProfile.hasBloodType,
+    medicalProfile.hasAllergies,
+    medicalProfile.hasMedications,
+    medicalProfile.hasChronicConditions,
+  ].filter(Boolean).length
+
+  return answerCount >= 10 && (medicalProfile.medicalAnswerCount >= 3 || medicalDepth >= 2)
+}
 
 /**
  * Determine user cohort based on psychological depth and behavioral patterns

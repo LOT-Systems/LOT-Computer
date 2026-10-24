@@ -2,6 +2,9 @@ import { build } from 'esbuild'
 import type { Loader } from 'esbuild'
 import { commonConfig } from './build.config.ts'
 import path from 'path'
+import { readFileSync } from 'fs'
+
+const { version: APP_VERSION } = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
 async function buildClient() {
   try {
@@ -33,6 +36,7 @@ async function buildClient() {
         'process.env.APP_HOST': JSON.stringify(process.env.APP_HOST || ''),
         'process.env.APP_NAME': JSON.stringify(process.env.APP_NAME || ''),
         'process.env.APP_DESCRIPTION': JSON.stringify(process.env.APP_DESCRIPTION || ''),
+        'process.env.APP_VERSION': JSON.stringify(APP_VERSION),
       },
       loader: {
         '.ts': 'ts',

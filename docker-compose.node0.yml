@@ -1,0 +1,145 @@
+# LOT SYSTEMS CORPORATION
+# NODE-0 — Autonomous Transparent AI Server
+# Self-Hosted / Local-Inference / Audit-by-Default
+#
+# Usage:
+#   docker compose -f docker-compose.node0.yml up -d
+#
+# Build order (matches spec):
+#   01  Metal assembled, OS installed on 2TB NVMe
+#   02  ZFS mirror on 8TB drives (OS-level, not Docker)
+#   03  This file — Docker + Caddy + Tunnel
+#   04  Postgres + ledger table (runs via migrations on first start)
+#   05  Ollama + model pull (see below)
+#   06  App starts with INPUT → CLASSIFY → ACTION → RECORD loop
+#   07  Human gate on irreversible actions (ledger.ts)
+#   08  Gitea mirrors GitHub
+
+services:
+
+  # ──────────────────────────────────────────────────────
+  # DATABASE — State + the ledger live here
+  # ──────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: lot-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: lotdb
+      POSTGRES_USER: lot
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env.node0}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lot -d lotdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ──────────────────────────────────────────────────────
+  # MODEL SERVE — Local LLM inference
+  # ──────────────────────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: lot-ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_models:/root/.ollama
+    ports:
+      - "127.0.0.1:11434:11434"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ──────────────────────────────────────────────────────
+  # APPLICATION — LOT Computer
+  # ──────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lot-app
+    restart: unless-stopped
+    env_file: .env.node0
+    environment:
+      NODE_ENV: production
+      PORT: "8080"
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: lotdb
+      DB_USER: lot
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_SSL: "false"
+      OLLAMA_ENABLED: "true"
+      OLLAMA_BASE_URL: http://ollama:11434
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+
+  # ──────────────────────────────────────────────────────
+  # PROXY — Automatic HTTPS, one config file
+  # ──────────────────────────────────────────────────────
+  caddy:
+    image: caddy:2-alpine
+    container_name: lot-caddy
+    restart: unless-stopped
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
+
+  # ──────────────────────────────────────────────────────
+  # GIT — Self-hosted, mirrors GitHub
+  # ──────────────────────────────────────────────────────
+  gitea:
+    image: gitea/gitea:latest
+    container_name: lot-gitea
+    restart: unless-stopped
+    environment:
+      USER_UID: "1000"
+      USER_GID: "1000"
+      GITEA__database__DB_TYPE: postgres
+      GITEA__database__HOST: postgres:5432
+      GITEA__database__NAME: lotdb
+      GITEA__database__USER: lot
+      GITEA__database__PASSWD: ${DB_PASSWORD}
+    volumes:
+      - gitea_data:/data
+    ports:
+      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:2222:22"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pg_data:
+    driver: local
+  ollama_models:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local
+  gitea_data:
+    driver: local

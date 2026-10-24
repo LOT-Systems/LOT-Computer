@@ -1,9 +1,19 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import React from 'react'
+import { useStore } from '@nanostores/react'
 import { Block } from '#client/components/ui'
 import { useNarrative } from '#client/queries'
 import { useLogContext } from '#client/hooks/useLogContext'
 import { ProgressBars } from '#client/utils/progressBars'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { $featureUnlocks } from '#client/stores/evolution'
 
 type NarrativeView = 'story' | 'achievements' | 'quests' | 'context'
 
@@ -16,12 +26,14 @@ export function NarrativeWidget() {
   const [view, setView] = React.useState<NarrativeView>('story')
   const { data, isLoading } = useNarrative()
   const logCtx = useLogContext()
+  const featureUnlocks = useStore($featureUnlocks)
+  const hasNarrativeReflection = featureUnlocks?.narrativeReflection ?? false
 
   const cycleView = () => {
     setView(prev => {
       const next = prev === 'story' ? 'achievements'
         : prev === 'achievements' ? 'quests'
-        : prev === 'quests' ? 'context'
+        : prev === 'quests' ? (hasNarrativeReflection ? 'context' : 'story')
         : 'story'
       try { recordSignal('journal', 'narrative_explored', { view: next, hour: new Date().getHours() }) } catch (e) {}
       return next

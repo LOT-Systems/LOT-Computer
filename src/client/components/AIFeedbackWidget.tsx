@@ -1,7 +1,15 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { useStore } from '@nanostores/react'
-import { intentionEngine, getUserState, analyzeIntentions, type UserState } from '#client/stores/intentionEngine'
+import { intentionEngine, getUserState, type UserState } from '#client/stores/intentionEngine'
 import { useOSDiagnostics, useProfile, useLogs } from '#client/queries'
 import { useLogContext } from '#client/hooks/useLogContext'
 
@@ -20,11 +28,6 @@ export function AIFeedbackWidget() {
   const { data: profile } = useProfile()
   const { data: logs = [] } = useLogs()
   const logCtx = useLogContext()
-
-  // Trigger analysis when logs change
-  React.useEffect(() => {
-    analyzeIntentions()
-  }, [logs])
 
   const userState = getUserState()
 

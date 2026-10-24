@@ -1,9 +1,18 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import { FastifyInstance } from 'fastify'
 import { Op } from 'sequelize'
 import { sequelize } from '#server/utils/db'
 import { models } from '#server/models'
 import * as weather from '#server/utils/weather'
 import { extractUserTraits, determineUserCohort, calculateCorrelatedIndexes } from '#server/utils/memory'
+import { generateMemoryStory } from '#server/utils/memory/story-generator'
 import { aiEngineManager } from '#server/utils/ai-engines'
 import { AI_ENGINE_PREFERENCE } from '#server/utils/memory/constants'
 import config from '#server/config'
@@ -375,53 +384,39 @@ export default async (fastify: FastifyInstance) => {
       const totalUsers = await models.User.countJoined()
       const usersOnline = await models.User.countOnline()
 
-      const allUsers = await models.User.findAll({
-        attributes: ['id', 'createdAt', 'lastSeenAt', 'joinedAt', 'tags'],
-      })
-
       const thirtyDaysAgo = dayjs().subtract(30, 'day').toDate()
       const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
 
-      const activeUsers30d = allUsers.filter(
-        u => u.lastSeenAt && new Date(u.lastSeenAt) >= thirtyDaysAgo
-      ).length
-
-      const activeUsers7d = allUsers.filter(
-        u => u.lastSeenAt && new Date(u.lastSeenAt) >= sevenDaysAgo
-      ).length
+      const [activeUsers30d, activeUsers7d, totalLogs, recentLogs, sessionRows, distinctEventTypes] = await Promise.all([
+        models.User.count({ where: { lastSeenAt: { [Op.gte]: thirtyDaysAgo } } }),
+        models.User.count({ where: { lastSeenAt: { [Op.gte]: sevenDaysAgo } } }),
+        models.Log.count(),
+        models.Log.count({ where: { createdAt: { [Op.gte]: sevenDaysAgo } } }),
+        models.Session.findAll({
+          attributes: ['userId', 'createdAt', 'lastUsedAt'],
+          where: { lastUsedAt: { [Op.not]: null } },
+          order: [['createdAt', 'DESC']],
+          limit: 500,
+          raw: true,
+        }) as Promise<Array<{ userId: string; createdAt: Date; lastUsedAt: Date | null }>>,
+        models.Log.findAll({
+          attributes: [[sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('event'))), 'count']],
+          where: { createdAt: { [Op.gte]: thirtyDaysAgo } },
+          raw: true,
+        }),
+      ])
 
       const returnRate = totalUsers > 0
         ? Math.round((activeUsers30d / totalUsers) * 100)
         : 0
 
-      const userIds = allUsers.map(u => u.id)
-
-      const totalLogs = await models.Log.count({
-        where: { userId: { [Op.in]: userIds } },
-      })
-
       const avgLogsPerUser = totalUsers > 0
         ? Math.round(totalLogs / totalUsers)
         : 0
 
-      const recentLogs = await models.Log.count({
-        where: {
-          createdAt: { [Op.gte]: sevenDaysAgo },
-          userId: { [Op.in]: userIds },
-        },
-      })
-
       const avgDailyLogs = activeUsers7d > 0
         ? Math.round((recentLogs / 7) / activeUsers7d * 10) / 10
         : 0
-
-      const sessionRows: Array<{ userId: string; createdAt: Date; lastUsedAt: Date | null }> = await models.Session.findAll({
-        attributes: ['userId', 'createdAt', 'lastUsedAt'],
-        where: { lastUsedAt: { [Op.not]: null } },
-        order: [['createdAt', 'DESC']],
-        limit: 500,
-        raw: true,
-      })
 
       let avgSessionMinutes = 0
       if (sessionRows.length > 0) {
@@ -439,31 +434,37 @@ export default async (fastify: FastifyInstance) => {
         }
       }
 
-      const distinctEventTypes = await models.Log.findAll({
-        attributes: [[sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('event'))), 'count']],
-        where: {
-          createdAt: { [Op.gte]: thirtyDaysAgo },
-          userId: { [Op.in]: userIds },
-        },
-        raw: true,
-      })
       const featuresBreadth = (distinctEventTypes[0] as any)?.count || 0
 
+      // Batch streak calculation: single query for recent answers across active users
+      const recentUsers = await models.User.findAll({
+        attributes: ['id'],
+        where: { lastSeenAt: { [Op.gte]: thirtyDaysAgo } },
+        limit: 50,
+        order: [['lastSeenAt', 'DESC']],
+        raw: true,
+      })
+      const recentUserIds = recentUsers.map((u: any) => u.id)
+      const allAnswers = recentUserIds.length > 0 ? await models.Answer.findAll({
+        where: { userId: { [Op.in]: recentUserIds } },
+        attributes: ['userId', 'createdAt'],
+        order: [['createdAt', 'DESC']],
+        raw: true,
+      }) : []
+      const answersByUser = new Map<string, string[]>()
+      for (const a of allAnswers as any[]) {
+        const day = dayjs(a.createdAt).format('YYYY-MM-DD')
+        const list = answersByUser.get(a.userId) || []
+        list.push(day)
+        answersByUser.set(a.userId, list)
+      }
       const streaks: number[] = []
-      for (const user of allUsers.slice(0, 50)) {
-        const answers = await models.Answer.findAll({
-          where: { userId: user.id },
-          attributes: ['createdAt'],
-          order: [['createdAt', 'DESC']],
-          limit: 120,
-          raw: true,
-        })
-        if (answers.length === 0) continue
-        const days = new Set(answers.map((a: any) => dayjs(a.createdAt).format('YYYY-MM-DD')))
+      for (const [, days] of answersByUser) {
+        const daySet = new Set(days)
         let streak = 0
         let d = dayjs()
-        if (!days.has(d.format('YYYY-MM-DD'))) d = d.subtract(1, 'day')
-        while (days.has(d.format('YYYY-MM-DD'))) {
+        if (!daySet.has(d.format('YYYY-MM-DD'))) d = d.subtract(1, 'day')
+        while (daySet.has(d.format('YYYY-MM-DD'))) {
           streak++
           d = d.subtract(1, 'day')
         }
@@ -1065,12 +1066,26 @@ export default async (fastify: FastifyInstance) => {
       const hasUsershipTag = user.tags?.some((tag: string) => tag.toLowerCase() === 'usership')
       if (privacy.showMemoryStory && hasUsershipTag) {
         try {
-          // Get latest memory story from user metadata
-          if (user.metadata?.memoryStory) {
-            profile.memoryStory = user.metadata.memoryStory
+          const meta = user.metadata as any || {}
+          if (meta.lastMemoryStory) {
+            profile.memoryStory = meta.lastMemoryStory
+          } else {
+            const answerLogs = await models.Log.findAll({
+              where: { userId: user.id, event: 'answer' },
+              order: [['createdAt', 'DESC']],
+              limit: 30,
+            })
+            if (answerLogs.length >= 3) {
+              const story = await generateMemoryStory(user, answerLogs)
+              profile.memoryStory = story
+              await models.User.update(
+                { metadata: { ...meta, lastMemoryStory: story, lastMemoryStoryDate: new Date().toISOString(), memoryStoryVersion: (meta.memoryStoryVersion || 0) + 1, memoryStoryAnswerCount: answerLogs.length } },
+                { where: { id: user.id } }
+              )
+            }
           }
-        } catch (error) {
-          // Story not available, skip
+        } catch (error: any) {
+          console.error('[PUBLIC-PROFILE-API] Memory story generation failed:', error.message)
         }
       }
 
@@ -1102,6 +1117,7 @@ export default async (fastify: FastifyInstance) => {
               where: { userId: user.id },
               order: [['createdAt', 'DESC']],
               attributes: ['createdAt'],
+              limit: 365,
             })
 
             if (answers.length > 0) {
@@ -1288,6 +1304,39 @@ export default async (fastify: FastifyInstance) => {
         } catch (boardError: any) {
           console.error('[PUBLIC-PROFILE-API] Board profile error:', boardError.message)
         }
+      }
+
+      // Compute assembly phase from server-side engagement data
+      try {
+        const distinctEvents = await models.Log.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('event')), 'event']],
+          where: { userId: user.id },
+          raw: true,
+        })
+        const eventTypeCount = distinctEvents.length
+        const totalLogs = await models.Log.count({ where: { userId: user.id } })
+        const [activeDaysRow] = await sequelize.query(
+          `SELECT COUNT(DISTINCT DATE("createdAt")) as count FROM "Logs" WHERE "userId" = :userId`,
+          { replacements: { userId: user.id }, type: 'SELECT' as any }
+        ) as any[]
+        const activeDays = activeDaysRow?.count ? Number(activeDaysRow.count) : 0
+
+        let assemblyPhase: 'dormant' | 'awakening' | 'forming' | 'assembled' | 'integrated' = 'dormant'
+        if (totalLogs === 0) {
+          assemblyPhase = 'dormant'
+        } else if (eventTypeCount >= 8 && totalLogs >= 150 && activeDays >= 30) {
+          assemblyPhase = 'integrated'
+        } else if (eventTypeCount >= 5 && totalLogs >= 50 && activeDays >= 14) {
+          assemblyPhase = 'assembled'
+        } else if (eventTypeCount >= 3 && totalLogs >= 10 && activeDays >= 3) {
+          assemblyPhase = 'forming'
+        } else {
+          assemblyPhase = 'awakening'
+        }
+
+        profile.assemblyPhase = assemblyPhase
+      } catch (asmError: any) {
+        console.error('[PUBLIC-PROFILE-API] Assembly phase error:', asmError.message)
       }
 
       // Add theme settings if available

@@ -1,4 +1,12 @@
 /**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
+/**
  * Chakra Ergonomics Engine
  *
  * Maps session activity to the seven-chakra model for holistic
@@ -234,7 +242,7 @@ export function recomputeChakras(): ChakraErgonomicsState {
     )
   })()
 
-  // ── Solar Plexus (Manipura) — core energy / willpower ──
+  // ── Solar Plexus (Manipura) — core energy / willpower / nourishment ──
   const solarPlexusCharge = (() => {
     const energyScore =
       userState.energy === 'high' ? 90 :
@@ -244,7 +252,12 @@ export function recomputeChakras(): ChakraErgonomicsState {
       50
     // Long sessions deplete core
     const fatiguePenalty = Math.max(0, (durationMinutes - 30) * 0.8)
-    return Math.round(Math.max(10, energyScore - fatiguePenalty))
+    // Eating recovery signals strengthen solar plexus (nourishment = core energy)
+    const nutritionSignals = recentSignals.filter(s =>
+      s.source === 'resilience' && (s.signal === 'eating_recovery_answer' || s.signal === 'nutrition_signal')
+    )
+    const nutritionBoost = Math.min(nutritionSignals.length * 5, 15)
+    return Math.round(Math.max(10, energyScore - fatiguePenalty + nutritionBoost))
   })()
 
   // ── Sacral (Svadhisthana) — creativity / flow engagement ──
@@ -260,17 +273,23 @@ export function recomputeChakras(): ChakraErgonomicsState {
     )
   })()
 
-  // ── Root (Muladhara) — grounding / session stability ──
+  // ── Root (Muladhara) — grounding / session stability / body safety ──
   const rootCharge = (() => {
     const selfCareScore = userIndex.dimensions.selfCare
     // Consistent daily use = grounding
     const hasRecentSignals = recentSignals.length > 0
     const sessionStability = hasRecentSignals ? 80 : 30
+    // Resilience and medical signals ground the root (body awareness = grounding)
+    const bodySignals = recentSignals.filter(s =>
+      s.source === 'medical' || s.source === 'resilience'
+    )
+    const bodyGrounding = Math.min(bodySignals.length * 3, 12)
     // Root is stable when there's consistency
     return Math.round(
-      selfCareScore * 0.3 +
-      sessionStability * 0.4 +
-      Math.min(durationMinutes / 60, 1) * 100 * 0.3
+      selfCareScore * 0.25 +
+      sessionStability * 0.35 +
+      Math.min(durationMinutes / 60, 1) * 100 * 0.25 +
+      bodyGrounding
     )
   })()
 

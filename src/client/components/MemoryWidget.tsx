@@ -1,4 +1,13 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import React from 'react'
+import { useStore } from '@nanostores/react'
 import { useQueryClient } from 'react-query'
 import { Block, Button } from '#client/components/ui'
 import { useMemory, useCreateMemory } from '#client/queries'
@@ -6,12 +15,15 @@ import { cn } from '#client/utils'
 import { fp } from '#shared/utils'
 import { MemoryQuestion } from '#shared/types'
 import * as stores from '#client/stores'
+import { $featureUnlocks } from '#client/stores/evolution'
 import { recordSignal, getUserState, analyzeIntentions } from '#client/stores/intentionEngine'
 import { getMemoryReflectionPrompt, getStoicReflection } from '#client/utils/narrative'
 import dayjs from '#client/utils/dayjs'
 import { getNextBadgeUnlock, checkAndAwardBadges } from '#client/utils/badges'
+import { runMemoryAnswerEasterEggs } from '#client/utils/easter-eggs'
 
-export function MemoryWidget() {
+export const MemoryWidget = React.memo(function MemoryWidget() {
+  const featureUnlocks = useStore($featureUnlocks)
   const [isDisplayed, setIsDisplayed] = React.useState(false)
   const [isShown, setIsShown] = React.useState(false)
   const [isQuestionShown, setIsQuestionShown] = React.useState(false)
@@ -56,9 +68,7 @@ export function MemoryWidget() {
         markQuestionAnswered(question.id)
       }
 
-      // Invalidate the memory query cache so answered question won't reappear
       const date = btoa(dayjs().format('YYYY-MM-DD'))
-      queryClient.removeQueries(['/api/memory', date])
 
       setIsQuestionShown(false)
       setTimeout(() => {
@@ -70,7 +80,7 @@ export function MemoryWidget() {
         })
 
         let fullResponse = response
-        if (insight) {
+        if (insight && featureUnlocks?.advancedMemory) {
           fullResponse += `\n\n${insight}`
         }
         fullResponse += `\n\n${stoicReflection}`
@@ -84,6 +94,12 @@ export function MemoryWidget() {
               setIsDisplayed(false)
               setIsResponseShown(false)
               setResponse(null)
+              // Only now allow the next question to load — after the widget
+              // has fully dismissed. Moving this earlier caused the next
+              // question's show-timer to race with the response display and
+              // the old auto-hide timer to tear down the new question.
+              shownQuestionId.current = null
+              queryClient.invalidateQueries(['/api/memory', date])
             }, 1500)
           }, insight ? 8000 : 6000)
         }, 100)
@@ -104,23 +120,40 @@ export function MemoryWidget() {
 
       setClickedButtonIndex(buttonIndex)
 
-      try {
-        recordSignal('memory', 'answer_given', {
-          questionId: question.id,
-          option,
-          question: question.question,
-          hour: new Date().getHours()
-        })
-      } catch (e) {
-        console.warn('Failed to record intention signal:', e)
-      }
-
       createMemory({
         questionId: question.id,
         option,
         question: question.question,
         options: question.options,
       })
+
+      // Run memory answer easter eggs
+      try {
+        runMemoryAnswerEasterEggs(option)
+      } catch (e) {
+        console.warn('Memory easter egg check failed:', e)
+      }
+
+      // Deferred: record signal after React commits the visual update
+      setTimeout(() => {
+        try {
+          const lowerQ = (question.question || '').toLowerCase()
+          const isMedical = ['blood type', 'allergy', 'allergies', 'medication', 'chronic', 'vision', 'dental', 'vaccination', 'heart rate', 'skin type', 'recurring pain', 'hearing', 'drug allergy', 'checkup', 'dominant hand', 'appetite', 'digestion', 'food sensitivity', 'eating habits'].some(kw => lowerQ.includes(kw))
+          const isTraumaInformed = ['sleep most nights', 'sudden loud noise', 'physically tense', 'easy is it for you to relax', 'go out of your way to avoid', 'difficult memory', 'cancel plans', 'feel about yourself', 'emotionally numb', 'feel joy', 'unwanted memories', 'vivid dreams', 'emotions become intense', 'trust new people', 'push people away', 'talk to when things feel heavy', 'going through a hard time', 'recover from difficult', 'relationship with food', 'regular are your meals', 'sit down to eat', 'feel about your body', 'check your weight', 'nourish your body', 'eating well', 'appetite been recently'].some(kw => lowerQ.includes(kw))
+
+          const signalSource = isMedical ? 'medical' : isTraumaInformed ? 'resilience' : 'memory'
+          const signalName = isMedical ? 'medical_answer' : isTraumaInformed ? 'trauma_informed_answer' : 'answer_given'
+
+          recordSignal(signalSource, signalName, {
+            questionId: question.id,
+            option,
+            question: question.question,
+            hour: new Date().getHours()
+          })
+        } catch (e) {
+          console.warn('Failed to record intention signal:', e)
+        }
+      }, 0)
     },
     [question]
   )
@@ -217,9 +250,8 @@ export function MemoryWidget() {
   }, [response])
 
   // Quantum state for reflection prompt
-  const getQuantumState = () => {
+  const readQuantumState = () => {
     try {
-      analyzeIntentions()
       return getUserState()
     } catch (e) {
       return {
@@ -232,7 +264,16 @@ export function MemoryWidget() {
     }
   }
 
-  const quantumState = React.useMemo(getQuantumState, [question?.id])
+  // analyzeIntentions() WRITES the intentionEngine atom. Running it inside a
+  // useMemo (render phase) cascaded re-renders across every subscriber before
+  // the browser could paint (LOT-DOCTRINE "Render Isolation"). Seed state for
+  // an identical first paint, then run the analysis in an effect (after paint)
+  // keyed on the question — matching the System.tsx quantumState pattern.
+  const [quantumState, setQuantumState] = React.useState(readQuantumState)
+  React.useEffect(() => {
+    try { analyzeIntentions() } catch (e) { /* ignore */ }
+    setQuantumState(readQuantumState())
+  }, [question?.id])
 
   const hasError = !!error && !isLoading && !loadedQuestion
 
@@ -356,4 +397,4 @@ export function MemoryWidget() {
       )}
     </Block>
   )
-}
+})

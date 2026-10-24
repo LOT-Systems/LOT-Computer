@@ -1,5 +1,13 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import type { Log } from '#shared/types'
-import type { TraitExtractionResult, PsychologicalDepth, CorrelatedIndexSnapshot } from './types.js'
+import type { TraitExtractionResult, PsychologicalDepth, CorrelatedIndexSnapshot, TraumaIndicatorProfile } from './types.js'
 
 /**
  * Extract user traits from their answer logs for cohort analysis
@@ -415,4 +423,271 @@ export function calculateCorrelatedIndexes(
   const composite = Number(((selfAwareness + userScore + personScore + longevityScore) / 4).toFixed(1))
 
   return { selfAwareness, userScore, personScore, longevityScore, composite }
+}
+
+/**
+ * PTSD/C-PTSD Trauma Indicator Detection
+ *
+ * Based on:
+ * - PCL-5 (PTSD Checklist for DSM-5) — 4 symptom clusters
+ * - ICD-11 C-PTSD criteria — 3 additional disturbance-in-self-organization domains
+ * - ACE (Adverse Childhood Experiences) — childhood trauma indicators
+ * - VA behavioral marker research — daily life impact patterns
+ *
+ * This is NOT a diagnostic tool. It detects behavioral language patterns
+ * that may indicate trauma exposure, to guide the Memory engine toward
+ * supportive, trauma-informed questioning.
+ *
+ * Civilian trauma sources detected: abandonment, divorce, job loss, grief,
+ * abuse, neglect, domestic violence, accident, illness, displacement.
+ */
+export function detectTraumaIndicators(logs: Log[]): TraumaIndicatorProfile {
+  const answerLogs = logs.filter(l => l.event === 'answer' || l.event === 'medical_record')
+  const noteLogs = logs.filter(l => l.event === 'note' && l.text && l.text.length > 20)
+  const checkinLogs = logs.filter(l => l.event === 'emotional_checkin')
+
+  if (answerLogs.length < 3 && noteLogs.length < 2) {
+    return {
+      score: 0,
+      clusters: { hyperarousal: 0, avoidance: 0, negativeAlterations: 0, reExperiencing: 0 },
+      cptsdIndicators: { affectDysregulation: 0, negativeSelfConcept: 0, interpersonalDifficulty: 0 },
+      eatingDisorder: { restriction: 0, bingeing: 0, purging: 0, bodyDissatisfaction: 0, foodAnxiety: 0, recoverySignals: 0 },
+      possibleSources: [],
+      trajectory: 'unknown',
+      recoveryIndicators: [],
+      riskLevel: 'none',
+    }
+  }
+
+  const allText = [
+    ...answerLogs.map(l => `${l.metadata.question || ''} ${l.metadata.answer || ''}`),
+    ...noteLogs.map(l => l.text || ''),
+    ...checkinLogs.map(l => `${l.metadata.mood || ''} ${l.metadata.state || ''} ${l.text || ''}`),
+  ].join(' ').toLowerCase()
+
+  // ─── PCL-5 CLUSTER B: Re-experiencing ─────────────────────────────────
+  const reExperiencingKeywords = [
+    'nightmare', 'nightmares', 'flashback', 'flashbacks', 'intrusive',
+    'can\'t stop thinking', 'keeps coming back', 'haunted', 'reliving',
+    'triggered', 'reminder', 'sudden memory', 'out of nowhere',
+    'dream about', 'wake up scared', 'feels like it\'s happening again',
+  ]
+
+  // ─── PCL-5 CLUSTER C: Avoidance ───────────────────────────────────────
+  const avoidanceKeywords = [
+    'avoid', 'avoiding', 'can\'t face', 'don\'t want to think about',
+    'push away', 'numb', 'shut down', 'withdrawn', 'isolate', 'isolation',
+    'hide', 'hiding', 'don\'t go there', 'stay away', 'can\'t talk about',
+    'block it out', 'pretend', 'distract myself', 'don\'t want to feel',
+  ]
+
+  // ─── PCL-5 CLUSTER D: Negative alterations in cognition/mood ──────────
+  const negativeAlterationsKeywords = [
+    'worthless', 'hopeless', 'broken', 'damaged', 'nothing matters',
+    'can\'t trust', 'don\'t trust', 'blame myself', 'my fault',
+    'no one understands', 'empty', 'hollow', 'detached', 'numb',
+    'lost interest', 'don\'t enjoy', 'nothing feels good', 'pointless',
+    'what\'s the point', 'doesn\'t matter', 'never get better',
+    'guilt', 'guilty', 'shame', 'ashamed', 'deserve',
+  ]
+
+  // ─── PCL-5 CLUSTER E: Hyperarousal ────────────────────────────────────
+  const hyperarousalKeywords = [
+    'can\'t sleep', 'insomnia', 'startle', 'jumpy', 'on edge',
+    'hypervigilant', 'watching', 'alert', 'angry', 'rage', 'irritable',
+    'explosive', 'snapped', 'restless', 'can\'t relax', 'tense',
+    'racing thoughts', 'racing heart', 'panic', 'anxious all the time',
+    'always tired', 'exhausted', 'wired', 'can\'t concentrate',
+  ]
+
+  // ─── ICD-11 C-PTSD: Affect Dysregulation ──────────────────────────────
+  const affectDysregulationKeywords = [
+    'out of control', 'can\'t control', 'overwhelmed', 'meltdown',
+    'emotional outburst', 'crying for no reason', 'sudden anger',
+    'mood swings', 'unpredictable', 'erupted', 'lost control',
+    'can\'t calm down', 'spiraling', 'dissociate', 'dissociation',
+    'shut down completely', 'frozen', 'went blank', 'checked out',
+  ]
+
+  // ─── ICD-11 C-PTSD: Negative Self-Concept ─────────────────────────────
+  const negativeSelfConceptKeywords = [
+    'i\'m broken', 'i\'m damaged', 'something wrong with me', 'unlovable',
+    'defective', 'i deserve this', 'my fault', 'i\'m the problem',
+    'never good enough', 'failure', 'i ruin everything', 'toxic',
+    'burden', 'i\'m a burden', 'they\'d be better without me',
+    'permanently changed', 'not who i used to be', 'lost myself',
+  ]
+
+  // ─── ICD-11 C-PTSD: Interpersonal Difficulties ────────────────────────
+  const interpersonalDifficultyKeywords = [
+    'can\'t trust anyone', 'everyone leaves', 'abandoned', 'abandonment',
+    'push people away', 'alone', 'isolated', 'no real friends',
+    'relationships fail', 'scared of getting close', 'betrayed',
+    'used', 'manipulated', 'afraid of being hurt', 'don\'t let people in',
+    'walls up', 'guard up', 'can\'t connect', 'feel disconnected',
+  ]
+
+  // ─── Eating Disorder Detection (PTSD-comorbid) ─────────────────────────
+  const restrictionKeywords = [
+    'skip meals', 'skipping meals', 'don\'t eat', 'not eating', 'restrict',
+    'restricting', 'fast', 'fasting', 'calories', 'counting calories',
+    'afraid to eat', 'fear of food', 'won\'t eat', 'barely eat', 'starving',
+    'thin enough', 'too much food', 'eat less', 'cutting food', 'food rules',
+  ]
+  const bingeingKeywords = [
+    'binge', 'bingeing', 'can\'t stop eating', 'ate too much', 'lost control',
+    'overate', 'overeating', 'stuffed', 'eat everything', 'emotional eating',
+    'comfort eating', 'eat my feelings', 'food is my comfort', 'eat when stressed',
+    'secret eating', 'hide food', 'eat alone', 'shame about eating',
+  ]
+  const purgingKeywords = [
+    'purge', 'purging', 'throw up', 'vomit', 'make myself sick',
+    'laxative', 'exercise to burn', 'compensate', 'undo eating',
+    'over-exercise', 'excessive exercise', 'punish myself for eating',
+  ]
+  const bodyDissatisfactionKeywords = [
+    'hate my body', 'body image', 'fat', 'too big', 'too small', 'ugly',
+    'disgusting', 'mirror', 'avoid mirrors', 'weigh myself', 'scale',
+    'weight', 'don\'t like how i look', 'body dysmorphia', 'wish i looked',
+    'body shame', 'comparing my body', 'not thin enough', 'body checking',
+  ]
+  const foodAnxietyKeywords = [
+    'anxious about food', 'food anxiety', 'scared to eat', 'meal stress',
+    'dread eating', 'panic at meals', 'can\'t eat around people',
+    'nervous about food', 'safe foods', 'fear of gaining', 'afraid of weight',
+    'obsess about food', 'food obsession', 'think about food all the time',
+  ]
+  const nutritionRecoveryKeywords = [
+    'nourish', 'nourishing', 'fuel my body', 'regular meals', 'balanced meal',
+    'enjoying food', 'food is fuel', 'healthy relationship with food',
+    'eat when hungry', 'intuitive eating', 'body acceptance', 'body kindness',
+    'feeding myself', 'three meals', 'nutrition', 'grateful for food',
+  ]
+
+  // ─── Trauma Source Detection ───────────────────────────────────────────
+  const traumaSourceKeywords: Record<string, string[]> = {
+    'childhood adversity': ['childhood', 'growing up', 'parents', 'parent', 'raised', 'abused', 'neglected', 'foster', 'orphan'],
+    'abandonment': ['abandoned', 'left me', 'walked out', 'left behind', 'rejected', 'unwanted', 'alone as a child'],
+    'divorce or separation': ['divorce', 'divorced', 'separated', 'custody', 'split up', 'marriage ended', 'ex-partner', 'ex-wife', 'ex-husband'],
+    'job loss or financial': ['fired', 'laid off', 'lost my job', 'bankrupt', 'debt', 'homeless', 'can\'t afford', 'financial ruin'],
+    'grief or loss': ['died', 'death', 'lost someone', 'funeral', 'grief', 'grieving', 'passed away', 'gone forever'],
+    'domestic violence': ['hit me', 'abusive', 'domestic', 'violent partner', 'controlled me', 'trapped', 'escape'],
+    'accident or injury': ['accident', 'crash', 'injured', 'hospital', 'surgery', 'almost died', 'near death'],
+    'military or combat': ['combat', 'deployment', 'war', 'military', 'service', 'veteran', 'active duty', 'firefight'],
+    'sexual trauma': ['assault', 'violated', 'rape', 'molested', 'coerced', 'inappropriate', 'boundary crossed'],
+    'displacement': ['refugee', 'displaced', 'lost home', 'moved constantly', 'nowhere to go', 'uprooted', 'immigration'],
+    'eating disorder': ['anorexia', 'bulimia', 'eating disorder', 'binge eating', 'purging', 'restriction', 'body dysmorphia', 'disordered eating'],
+  }
+
+  // ─── Recovery Indicators ───────────────────────────────────────────────
+  const recoveryKeywords: Record<string, string[]> = {
+    'therapy engagement': ['therapy', 'therapist', 'counseling', 'counselor', 'session', 'treatment', 'processing'],
+    'self-awareness growing': ['realize', 'understand now', 'learning', 'healing', 'recovery', 'getting better', 'progress'],
+    'social reconnection': ['reconnecting', 'opened up', 'support group', 'trusted someone', 'let someone in', 'community'],
+    'routine stabilization': ['routine', 'structure', 'consistent', 'stable', 'predictable', 'safe space', 'grounded'],
+    'emotional regulation': ['breathing', 'meditation', 'grounding', 'coping', 'regulate', 'managing', 'tools'],
+    'meaning-making': ['purpose', 'meaning', 'growth', 'stronger', 'survived', 'resilient', 'learned from'],
+    'nutrition recovery': ['nourish', 'regular meals', 'balanced meal', 'intuitive eating', 'body acceptance', 'healthy relationship with food', 'fuel my body'],
+  }
+
+  // ─── Count matches ─────────────────────────────────────────────────────
+  function countMatches(text: string, keywords: string[]): number {
+    return keywords.filter(kw => text.includes(kw)).length
+  }
+
+  const reExperiencing = countMatches(allText, reExperiencingKeywords)
+  const avoidance = countMatches(allText, avoidanceKeywords)
+  const negativeAlterations = countMatches(allText, negativeAlterationsKeywords)
+  const hyperarousal = countMatches(allText, hyperarousalKeywords)
+
+  const affectDysregulation = countMatches(allText, affectDysregulationKeywords)
+  const negativeSelfConcept = countMatches(allText, negativeSelfConceptKeywords)
+  const interpersonalDifficulty = countMatches(allText, interpersonalDifficultyKeywords)
+
+  const restriction = countMatches(allText, restrictionKeywords)
+  const bingeing = countMatches(allText, bingeingKeywords)
+  const purging = countMatches(allText, purgingKeywords)
+  const bodyDissatisfaction = countMatches(allText, bodyDissatisfactionKeywords)
+  const foodAnxiety = countMatches(allText, foodAnxietyKeywords)
+  const nutritionRecovery = countMatches(allText, nutritionRecoveryKeywords)
+
+  // Normalize cluster scores to 0-100
+  const maxPerCluster = 8
+  const clusters = {
+    hyperarousal: Math.min(100, Math.round((hyperarousal / maxPerCluster) * 100)),
+    avoidance: Math.min(100, Math.round((avoidance / maxPerCluster) * 100)),
+    negativeAlterations: Math.min(100, Math.round((negativeAlterations / maxPerCluster) * 100)),
+    reExperiencing: Math.min(100, Math.round((reExperiencing / maxPerCluster) * 100)),
+  }
+
+  const cptsdIndicators = {
+    affectDysregulation: Math.min(100, Math.round((affectDysregulation / 6) * 100)),
+    negativeSelfConcept: Math.min(100, Math.round((negativeSelfConcept / 6) * 100)),
+    interpersonalDifficulty: Math.min(100, Math.round((interpersonalDifficulty / 6) * 100)),
+  }
+
+  // Detect possible sources
+  const possibleSources: string[] = []
+  Object.entries(traumaSourceKeywords).forEach(([source, keywords]) => {
+    if (countMatches(allText, keywords) >= 2) {
+      possibleSources.push(source)
+    }
+  })
+
+  // Detect recovery indicators
+  const recoveryIndicators: string[] = []
+  Object.entries(recoveryKeywords).forEach(([indicator, keywords]) => {
+    if (countMatches(allText, keywords) >= 2) {
+      recoveryIndicators.push(indicator)
+    }
+  })
+
+  const edMaxPerDim = 6
+  const eatingDisorder = {
+    restriction: Math.min(100, Math.round((restriction / edMaxPerDim) * 100)),
+    bingeing: Math.min(100, Math.round((bingeing / edMaxPerDim) * 100)),
+    purging: Math.min(100, Math.round((purging / edMaxPerDim) * 100)),
+    bodyDissatisfaction: Math.min(100, Math.round((bodyDissatisfaction / edMaxPerDim) * 100)),
+    foodAnxiety: Math.min(100, Math.round((foodAnxiety / edMaxPerDim) * 100)),
+    recoverySignals: Math.min(100, Math.round((nutritionRecovery / edMaxPerDim) * 100)),
+  }
+
+  // Composite score (weighted: clusters + C-PTSD + eating disorder indicators)
+  const clusterAvg = (clusters.hyperarousal + clusters.avoidance + clusters.negativeAlterations + clusters.reExperiencing) / 4
+  const cptsdAvg = (cptsdIndicators.affectDysregulation + cptsdIndicators.negativeSelfConcept + cptsdIndicators.interpersonalDifficulty) / 3
+  const edAvg = (eatingDisorder.restriction + eatingDisorder.bingeing + eatingDisorder.purging + eatingDisorder.bodyDissatisfaction + eatingDisorder.foodAnxiety) / 5
+  const score = Math.round(clusterAvg * 0.5 + cptsdAvg * 0.3 + edAvg * 0.2)
+
+  // Determine trajectory from mood check-in patterns over time
+  let trajectory: TraumaIndicatorProfile['trajectory'] = 'unknown'
+  if (checkinLogs.length >= 5) {
+    const recentMoods = checkinLogs.slice(0, 5).map(l => (l.metadata.mood || l.metadata.state || '').toString().toLowerCase())
+    const olderMoods = checkinLogs.slice(5, 10).map(l => (l.metadata.mood || l.metadata.state || '').toString().toLowerCase())
+    const negativeMoods = ['anxious', 'overwhelmed', 'exhausted', 'restless', 'uncertain', 'tired', 'numb', 'detached']
+    const recentNeg = recentMoods.filter(m => negativeMoods.some(nm => m.includes(nm))).length
+    const olderNeg = olderMoods.length > 0 ? olderMoods.filter(m => negativeMoods.some(nm => m.includes(nm))).length : recentNeg
+    if (recentNeg < olderNeg) trajectory = 'improving'
+    else if (recentNeg > olderNeg) trajectory = 'declining'
+    else if (score > 20) trajectory = 'stable'
+    else trajectory = 'stable'
+  } else if (score > 15) {
+    trajectory = 'emerging'
+  }
+
+  // Risk level determination
+  let riskLevel: TraumaIndicatorProfile['riskLevel'] = 'none'
+  if (score >= 60) riskLevel = 'elevated'
+  else if (score >= 35) riskLevel = 'moderate'
+  else if (score >= 15) riskLevel = 'low'
+
+  return {
+    score,
+    clusters,
+    cptsdIndicators,
+    eatingDisorder,
+    possibleSources,
+    trajectory,
+    recoveryIndicators,
+    riskLevel,
+  }
 }

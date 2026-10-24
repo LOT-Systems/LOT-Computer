@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fff">
+<title>LOT — System Status</title>
+<style>
+:root {
+  --base-color: #fff;
+  --acc-color: 0 0 0;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--base-color);
+  color: rgb(var(--acc-color));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+.container {
+  max-width: 512px;
+  width: 100%;
+}
+.grid-fill {
+  background-image:
+    linear-gradient(to right, rgb(var(--acc-color) / 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(var(--acc-color) / 0.15) 1px, transparent 1px);
+  background-size: 2px 2px;
+  border: 1px solid rgb(var(--acc-color) / 0.15);
+  padding: 32px;
+}
+h1 {
+  font-size: 48px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin-bottom: 24px;
+}
+.status-line {
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.6;
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.message {
+  font-size: 16px;
+  line-height: 1.5;
+  opacity: 0.75;
+  margin: 24px 0;
+}
+.resources {
+  margin-top: 24px;
+  padding: 16px;
+  background-image:
+    linear-gradient(to right, rgb(var(--acc-color) / 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(var(--acc-color) / 0.08) 1px, transparent 1px);
+  background-size: 2px 2px;
+  border: 1px solid rgb(var(--acc-color) / 0.1);
+  font-size: 14px;
+}
+.resources-title {
+  opacity: 0.5;
+  margin-bottom: 12px;
+}
+.resources a {
+  display: block;
+  color: rgb(var(--acc-color));
+  text-decoration: none;
+  opacity: 0.7;
+  padding: 4px 0;
+  transition: opacity 0.15s;
+}
+.resources a:hover {
+  opacity: 1;
+}
+.contact {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgb(var(--acc-color) / 0.15);
+  font-size: 13px;
+  opacity: 0.45;
+}
+.contact a {
+  color: rgb(var(--acc-color));
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.pulse {
+  display: inline-block;
+  animation: pulse 2s ease-in-out infinite;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="grid-fill">
+    <h1>LOT</h1>
+    <div class="status-line">ERROR: <span id="error-code">503</span></div>
+    <div class="status-line">VERSION: v1.3.0</div>
+    <div class="status-line">TIMESTAMP: <span id="timestamp"></span></div>
+    <div class="message">
+      The site is under maintenance <span class="pulse">.</span>
+    </div>
+    <div class="resources">
+      <div class="resources-title">Visit these resources to learn more about LOT®:</div>
+      <a href="https://institute.lot-systems.com" target="_blank" rel="noopener">institute.lot-systems.com</a>
+      <a href="https://lot-systems.com/about">lot-systems.com/about</a>
+    </div>
+    <div class="contact">
+      Contact / Feedback — Vadim Marmeladov, CEO<br>
+      <a href="mailto:vadik.marmeladov@gmail.com">vadik.marmeladov@gmail.com</a>
+    </div>
+  </div>
+</div>
+<script>
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var code = params.get('code') || '503';
+  document.getElementById('error-code').textContent = code;
+  document.title = 'LOT — ' + code;
+  var now = new Date();
+  document.getElementById('timestamp').textContent =
+    now.getUTCFullYear() + '-' +
+    String(now.getUTCMonth() + 1).padStart(2, '0') + '-' +
+    String(now.getUTCDate()).padStart(2, '0') + ' ' +
+    String(now.getUTCHours()).padStart(2, '0') + ':' +
+    String(now.getUTCMinutes()).padStart(2, '0') + ' UTC';
+})();
+</script>
+</body>
+</html>

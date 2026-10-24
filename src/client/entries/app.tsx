@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import * as React from 'react'
 import { QueryClientProvider, QueryClient } from 'react-query'
 import { useStore } from '@nanostores/react'
@@ -20,6 +28,8 @@ import { useSound } from '#client/utils/sound'
 import { useRadio } from '#client/utils/radio'
 import { sync } from '../sync'
 import { initRecipeWidget } from '#client/stores/recipeWidget'
+import { hydrateBadgesFromServer } from '#client/utils/badges'
+import { initPerfObserver } from '#client/utils/perf'
 
 // Error boundary to prevent blank page when a widget crashes
 class AppErrorBoundary extends React.Component<
@@ -85,6 +95,14 @@ class AppErrorBoundary extends React.Component<
   }
 }
 
+// When a new service worker takes control (after a version bump + skipWaiting),
+// reload the page so the fresh JS bundle is used immediately.
+if (typeof window !== 'undefined' && navigator.serviceWorker) {
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload()
+  })
+}
+
 sync.listen('users_total', (data) => {
   stores.usersTotal.set(data.value)
 })
@@ -93,6 +111,9 @@ sync.listen('users_online', (data) => {
 })
 sync.listen('live_message', (data) => {
   stores.liveMessage.set(data.message)
+})
+sync.listen('settings_updated', () => {
+  getMe().then((user) => stores.me.set(user)).catch(() => {})
 })
 
 const queryClient = new QueryClient()
@@ -119,10 +140,85 @@ if (typeof window !== 'undefined') {
   })
 }
 
+type PersistentRoute = 'system' | 'logs' | 'sync' | 'settings' | 'api'
+
+const TabPanel = React.memo(function TabPanel({
+  active,
+  children,
+  unmountWhenInactive = false,
+}: {
+  active: boolean
+  children: React.ReactNode
+  unmountWhenInactive?: boolean
+}) {
+  const visitedRef = React.useRef(active)
+  if (active) visitedRef.current = true
+  // Heavy tabs (System) fully UNMOUNT when inactive. Keeping them mounted with
+  // display:none left their ~7 intentionEngine-subscriber widgets alive, so any
+  // recordSignal from any tab re-rendered them in the background until the main
+  // thread saturated and navigation froze (needing a hard reload). Unmounting
+  // stops all that background work; signal data lives in a module-level atom, so
+  // nothing is lost — the tab re-renders fresh when reopened.
+  if (unmountWhenInactive) {
+    return active ? <>{children}</> : null
+  }
+  if (!visitedRef.current) return null
+  return (
+    <div style={{ display: active ? 'contents' : 'none' }}>
+      {children}
+    </div>
+  )
+}, (prev, next) => prev.active === next.active)
+
+const TabPanels = React.memo(function TabPanels() {
+  const router = useStore(stores.router)
+  const currentRoute = router?.route ?? 'system'
+
+  // Scroll to top when switching tabs so users don't end up past the new tab's
+  // content (System is tall — leaving it scrolled down makes other tabs blank).
+  // useLayoutEffect fires synchronously after DOM mutations but before the
+  // browser paints, eliminating the blank frame that useEffect would cause.
+  React.useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+  }, [currentRoute])
+
+  return (
+    <>
+      <TabPanel active={currentRoute === 'system'} unmountWhenInactive>
+        <System />
+      </TabPanel>
+      <TabPanel active={currentRoute === 'logs'}>
+        <Logs />
+      </TabPanel>
+      <TabPanel active={currentRoute === 'sync'}>
+        <Sync />
+      </TabPanel>
+      <TabPanel active={currentRoute === 'settings'}>
+        <Settings />
+      </TabPanel>
+      <TabPanel active={currentRoute === 'api'}>
+        <ApiPage />
+      </TabPanel>
+    </>
+  )
+})
+
+const DynamicRoutes = React.memo(function DynamicRoutes() {
+  const router = useStore(stores.router)
+  const currentRoute = router?.route ?? 'system'
+  return (
+    <>
+      {currentRoute === 'dm' && router?.params?.userId && (
+        <DirectMessageThread userId={router.params.userId} />
+      )}
+      {currentRoute === 'status' && <StatusPage noWrapper />}
+    </>
+  )
+})
+
 const App = () => {
   const mirrorRef = React.useRef<HTMLVideoElement>(null)
   const user = useStore(stores.me)
-  const router = useStore(stores.router)
   const isMirrorOn = useStore(stores.isMirrorOn)
   const isSoundOn = useStore(stores.isSoundOn)
   const isRadioOn = useStore(stores.isRadioOn)
@@ -130,8 +226,6 @@ const App = () => {
   const { data: weather, refetch: refetchWeather } = useWeather()
 
   const isLoaded = React.useMemo(() => {
-    // Only require user data to load - weather is optional
-    // Weather is only used in System and SelfCareMoments components
     return !!user
   }, [user])
 
@@ -153,6 +247,10 @@ const App = () => {
     getMe().then((user) => {
       stores.me.set(user)
 
+      // Seed counters immediately so System widget never shows 0 on first paint
+      if ((user as any).usersTotal) stores.usersTotal.set((user as any).usersTotal)
+      if ((user as any).usersOnline) stores.usersOnline.set((user as any).usersOnline)
+
       // Sync theme from user metadata (server) to local stores
       if (user.metadata?.theme) {
         const { theme: themeName, baseColor, accentColor, customThemeEnabled } = user.metadata.theme
@@ -173,6 +271,11 @@ const App = () => {
       if (user.timeChime !== undefined) {
         stores.isTimeChimeEnabled.set(user.timeChime)
         console.log('[App] Syncing timeChime from server:', user.timeChime)
+      }
+
+      // Sync badges from server metadata to localStorage (multi-device support)
+      if (user.metadata?.badges) {
+        hydrateBadgesFromServer(user.metadata.badges as any)
       }
 
       if (!user.firstName && !user.lastName) {
@@ -203,8 +306,20 @@ const App = () => {
     // Initialize recipe widget periodic checking
     initRecipeWidget()
 
+    // Initialize interaction latency observer
+    initPerfObserver()
+
+    // Refetch profile when tab becomes visible (cross-device sync fallback)
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        getMe().then((user) => stores.me.set(user)).catch(() => {})
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+
     return () => {
       unbindRouter()
+      document.removeEventListener('visibilitychange', onVisibilityChange)
     }
   }, [])
 
@@ -230,15 +345,8 @@ const App = () => {
     <>
       <ConnectionStatus />
       <Layout>
-        {(!router || router.route === 'system') && <System />}
-        {router?.route === 'settings' && <Settings />}
-        {router?.route === 'api' && <ApiPage />}
-        {router?.route === 'sync' && <Sync />}
-        {router?.route === 'dm' && router.params?.userId && (
-          <DirectMessageThread userId={router.params.userId} />
-        )}
-        {router?.route === 'status' && <StatusPage noWrapper />}
-        {router?.route === 'logs' && <Logs />}
+        <TabPanels />
+        <DynamicRoutes />
         {isMirrorOn && (
           <video
             ref={mirrorRef}

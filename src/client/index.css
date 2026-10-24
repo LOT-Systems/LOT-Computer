@@ -1,3 +1,11 @@
+/*
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 /* LOT Systems — Est. original. If you're reading this, you already know who was here first. */
 /* The copycat war begins, but originals don't compete — they set the pace. */
 @tailwind base;
@@ -92,14 +100,61 @@ input:-webkit-autofill {
   }
 
   .grid-fill-hover {
-    transition: background-image var(--evolution-transition-speed);
+    position: relative;
+    isolation: isolate;
   }
 
-  .grid-fill-hover:hover {
+  .grid-fill-hover::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0;
     background-image:
       linear-gradient(to right, rgb(var(--acc-color-400) / calc(var(--evolution-grid-opacity) * 1.2)) 1px, transparent 1px),
       linear-gradient(to bottom, rgb(var(--acc-color-400) / calc(var(--evolution-grid-opacity) * 1.2)) 1px, transparent 1px);
     background-size: var(--evolution-grid-size) var(--evolution-grid-size);
+    border-radius: inherit;
+    transition: opacity 180ms ease;
+    pointer-events: none;
+    will-change: opacity;
+  }
+
+  .grid-fill-hover:hover::before {
+    opacity: 1;
+  }
+
+  /* Density-evolved pattern fills — progression from sparse to dense */
+  [data-density="breathable"] .grid-fill-hover::before {
+    background-image:
+      radial-gradient(circle, rgb(var(--acc-color-400) / calc(var(--evolution-grid-opacity) * 1.2)) 0.5px, transparent 0.5px);
+    background-size: 12px 12px;
+  }
+
+  [data-density="comfortable"] .grid-fill-hover::before {
+    background-image:
+      linear-gradient(to bottom, rgb(var(--acc-color-400) / calc(var(--evolution-grid-opacity) * 1.2)) 1px, transparent 1px);
+    background-size: 100% 8px;
+  }
+
+  [data-density="dense"] .grid-fill-hover::before {
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        rgb(var(--acc-color-400) / calc(var(--evolution-grid-opacity) * 1.2)) 0px,
+        rgb(var(--acc-color-400) / calc(var(--evolution-grid-opacity) * 1.2)) 1px,
+        transparent 1px,
+        transparent 5px
+      );
+    background-size: 7px 7px;
+  }
+
+  [data-density="instrument"] .grid-fill-hover::before {
+    background-image:
+      linear-gradient(to right, rgb(var(--acc-color-400) / calc(var(--evolution-grid-opacity) * 1.2)) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--acc-color-400) / calc(var(--evolution-grid-opacity) * 1.2)) 1px, transparent 1px),
+      linear-gradient(45deg, rgb(var(--acc-color-400) / calc(var(--evolution-grid-opacity) * 0.6)) 1px, transparent 1px);
+    background-size: 4px 4px, 4px 4px, 5.66px 5.66px;
   }
 
   /* Lighter grid pattern for subtle backgrounds */

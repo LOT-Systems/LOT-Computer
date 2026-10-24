@@ -1,6 +1,16 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import React from 'react'
+import { useStore } from '@nanostores/react'
 import { Block } from '#client/components/ui'
 import { useEmotionalCheckIns, useLogs } from '#client/queries'
+import { $featureUnlocks } from '#client/stores/evolution'
 
 type AnalyticsView = 'time' | 'selfcare' | 'summary'
 
@@ -11,14 +21,17 @@ type AnalyticsView = 'time' | 'selfcare' | 'summary'
  */
 export function MoodAnalytics() {
   const [view, setView] = React.useState<AnalyticsView>('time')
+  const featureUnlocks = useStore($featureUnlocks)
 
   const { data: checkInsData } = useEmotionalCheckIns(30) // Last 30 days
   const { data: logs = [] } = useLogs()
 
+  const hasMoodPatterns = featureUnlocks?.moodPatterns ?? false
+
   const cycleView = () => {
     setView(prev => {
       switch (prev) {
-        case 'time': return 'selfcare'
+        case 'time': return hasMoodPatterns ? 'selfcare' : 'time'
         case 'selfcare': return 'summary'
         case 'summary': return 'time'
         default: return 'time'
@@ -156,7 +169,7 @@ export function MoodAnalytics() {
   }, [checkInsData])
 
   const label =
-    view === 'time' ? 'Time:' :
+    view === 'time' ? (hasMoodPatterns ? 'Time:' : 'Insights:') :
     view === 'selfcare' ? 'Self-care:' :
     'Summary:'
 

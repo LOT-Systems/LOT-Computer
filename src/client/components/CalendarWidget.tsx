@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import * as React from 'react'
 import { useQueryClient } from 'react-query'
 import { Block, Button } from '#client/components/ui'
@@ -103,7 +111,7 @@ export function CalendarWidget() {
     const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
 
     createLog({
-      text: `${entryType}: ${entryText.trim()} (${dateLabel})`,
+      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel})`,
       event: 'calendar_entry',
       metadata: {
         date: selectedDate,
@@ -112,7 +120,7 @@ export function CalendarWidget() {
       },
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(['/api/logs'])
+        queryClient.refetchQueries(['/api/logs'])
         try { recordCalendarSignal(entryType, selectedDate!) } catch (_) {}
       },
     })
@@ -141,23 +149,23 @@ export function CalendarWidget() {
           <div className="mb-16">
             <div className="flex items-center gap-8 mb-8">
               <button
-                className="text-acc/40 hover:text-acc text-sm transition-opacity"
+                className="text-acc/40 hover:text-acc transition-opacity"
                 onClick={() => setViewMonth(viewMonth.subtract(1, 'month'))}
               >
                 {'<—'}
               </button>
-              <span className="text-acc text-sm">
+              <span className="text-acc">
                 {viewMonth.format('MMMM, YYYY')}
               </span>
               <button
-                className="text-acc/40 hover:text-acc text-sm transition-opacity"
+                className="text-acc/40 hover:text-acc transition-opacity"
                 onClick={() => setViewMonth(viewMonth.add(1, 'month'))}
               >
                 {'—>'}
               </button>
             </div>
 
-            <div className="text-sm space-y-1">
+            <div className="space-y-1">
               {weeks.map((week, wi) => (
                 <div key={wi} className="flex gap-0">
                   {week.map((d, di) => {
@@ -172,7 +180,7 @@ export function CalendarWidget() {
                         key={key}
                         onClick={() => handleDateClick(d)}
                         className={cn(
-                          'text-sm py-0.5 px-0.5 transition-opacity whitespace-nowrap',
+                          'py-0.5 px-0.5 transition-opacity whitespace-nowrap',
                           'min-w-[2.5em] text-left',
                           isToday && 'font-bold',
                           isSelected && 'underline',
@@ -188,7 +196,7 @@ export function CalendarWidget() {
                   })}
 
                   {wi === 0 && (
-                    <div className="text-acc/30 text-sm flex items-center ml-4 whitespace-nowrap">
+                    <div className="text-acc/30 flex items-center ml-4 whitespace-nowrap">
                       {selectedDate && !isAddingEntry && (
                         <button
                           className="text-acc/30 hover:text-acc/60 transition-opacity"
@@ -211,7 +219,7 @@ export function CalendarWidget() {
                       key={t}
                       onClick={() => setEntryType(t)}
                       className={cn(
-                        'text-xs transition-opacity capitalize',
+                        'transition-opacity capitalize',
                         entryType === t ? 'text-acc' : 'text-acc/40 hover:text-acc/60'
                       )}
                     >
@@ -226,7 +234,7 @@ export function CalendarWidget() {
                     onChange={e => setEntryText(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') handleAddEntry() }}
                     placeholder={`Add ${entryType}...`}
-                    className="bg-transparent border border-acc/20 text-acc text-sm px-4 py-2 flex-1 outline-none focus:border-acc/40"
+                    className="bg-transparent border border-acc/20 text-acc px-4 py-2 flex-1 outline-none focus:border-acc/40"
                     autoFocus
                   />
                   <Button onClick={handleAddEntry}>Add</Button>
@@ -236,11 +244,11 @@ export function CalendarWidget() {
 
             {selectedDate && entriesOnDate.length > 0 && (
               <div className="mt-8">
-                <div className="text-acc/40 text-xs mb-4">
+                <div className="text-acc/40 mb-4">
                   {dayjs(selectedDate).format('dddd, MMMM D')}
                 </div>
                 {entriesOnDate.map((e, i) => (
-                  <div key={i} className="text-acc/80 text-sm mb-1">
+                  <div key={i} className="text-acc/80 mb-1">
                     {e.text}
                   </div>
                 ))}
@@ -252,7 +260,7 @@ export function CalendarWidget() {
         {upcomingEntries.length > 0 && (
           <div className="space-y-1">
             {upcomingEntries.map((entry, i) => (
-              <div key={i} className="flex justify-between text-sm gap-16">
+              <div key={i} className="flex justify-between gap-16">
                 <span className="text-acc whitespace-nowrap">
                   {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
                 </span>
@@ -265,7 +273,7 @@ export function CalendarWidget() {
         )}
 
         {upcomingEntries.length === 0 && !isCalendarOpen && (
-          <div className="text-acc/40 text-sm">No upcoming dates.</div>
+          <div className="text-acc/40">No upcoming dates.</div>
         )}
       </div>
     </Block>

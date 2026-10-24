@@ -1,3 +1,11 @@
+<!--
+  LOT SYSTEMS CORPORATION
+  Vadim Marmeladov — CEO, Owner LOT®
+  Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+  LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+  Made in the USA | brand.lot-systems.com
+-->
+
 # 🌟 Revolutionary Psychological Depth Analysis System
 
 This PR introduces a groundbreaking **soul-level personalization engine** that transforms LOT Systems from a self-care platform into a **psychological empathy system** that truly understands users at their deepest level.

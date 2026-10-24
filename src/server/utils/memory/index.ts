@@ -1,4 +1,12 @@
 /**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
+/**
  * Memory Engine - Main Entry Point
  *
  * This module provides a unified interface to the Memory Engine system,
@@ -21,12 +29,15 @@ export {
 // Trait extraction
 export {
   extractUserTraits,
-  calculateCorrelatedIndexes
+  calculateCorrelatedIndexes,
+  detectTraumaIndicators
 } from './trait-extraction.js'
 
 // Cohort determination
 export {
-  determineUserCohort
+  determineUserCohort,
+  assessMedicalProfile,
+  qualifiesForPaidCohort,
 } from './cohort-determination.js'
 
 // Recipe suggestions
@@ -42,6 +53,9 @@ export {
 // Constants
 export {
   BACKUP_SELFCARE_QUESTIONS,
+  BACKUP_MEDICAL_QUESTIONS,
+  BACKUP_TRAUMA_INFORMED_QUESTIONS,
+  BACKUP_EATING_RECOVERY_QUESTIONS,
   AI_ENGINE_PREFERENCE,
   questionSchema,
   userSummarySchema,
@@ -56,5 +70,7 @@ export type {
   CorrelatedIndexSnapshot,
   CohortClassification,
   PacingResult,
-  QuantumState
+  QuantumState,
+  TraumaIndicatorProfile,
+  EatingDisorderProfile
 } from './types.js'

@@ -1,3 +1,11 @@
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import path from 'path'
 import fs from 'fs'
 import crypto from 'crypto'
@@ -246,10 +254,9 @@ fastify.get('/u/:userIdOrUsername', async function (req, reply) {
 // END PUBLIC PROFILE ROUTES
 // ==============================================================================
 
-// About page (public wiki)
+// About page — standalone template, loads independently from main app
 fastify.get('/about', async (req, reply) => {
-  return reply.view('generic-spa', {
-    scriptName: 'about',
+  return reply.view('about-standalone', {
     scriptNonce: reply.cspNonce.script,
     styleNonce: reply.cspNonce.style,
   })
@@ -403,22 +410,22 @@ fastify.setErrorHandler((error, req, reply) => {
   let message: string = error.message || defaultMessage
 
   if (statusCode >= 500) {
-    // Log full error server-side for debugging (never sent to client)
     console.error(`[error] ${req.id} ${req.method} ${req.url}:`, error.message)
     if (config.env === 'development') {
       console.error(error.stack)
     }
-    // Never leak internal error details to clients in production
     message = defaultMessage
+  }
+
+  if (req.headers.accept?.includes('text/html')) {
+    return reply.status(statusCode).redirect(`/error.html?code=${statusCode}`)
   }
 
   return reply.status(statusCode).send({ statusCode, message })
 })
 
 fastify.setNotFoundHandler(async (req, res) => {
-  // Don't redirect API routes - return proper 404
   if (req.url.startsWith('/api/') || req.url.startsWith('/admin-api/')) {
-    // Don't echo back the URL to prevent reflected content injection
     return res.code(404).send({ statusCode: 404, message: 'Not found' })
   }
 

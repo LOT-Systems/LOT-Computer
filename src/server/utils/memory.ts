@@ -1,5 +1,11 @@
-import Instructor from '@instructor-ai/instructor'
-import OpenAI from 'openai'
+/**
+ * LOT SYSTEMS CORPORATION
+ * Vadim Marmeladov — CEO, Owner LOT®
+ * Kuzya Cosmo Marmeladov — CEO, Owner COSMO®
+ * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
+ * Made in the USA | brand.lot-systems.com
+ */
+
 import Anthropic from '@anthropic-ai/sdk'
 import { Op } from 'sequelize'
 import { randomUUID } from 'crypto'
@@ -26,17 +32,7 @@ import { getLogContext } from './logs.js'
 import { aiEngineManager, type EnginePreference } from './ai-engines.js'
 import { extractGoals, type ExtractedGoal } from './goal-understanding.js'
 
-// OpenAI client (for non-Usership users - LEGACY fallback)
-let oai: OpenAI | null = null
-let oaiClient: ReturnType<typeof Instructor> | null = null
 let anthropicClient: Anthropic | null = null
-
-try {
-  oai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  oaiClient = Instructor({ client: oai, mode: 'TOOLS' })
-} catch (err) {
-  console.error('[memory] Failed to initialize OpenAI client:', (err as Error).message)
-}
 
 try {
   anthropicClient = new Anthropic({ apiKey: config.anthropic.apiKey })
@@ -52,6 +48,7 @@ const anthropic = anthropicClient
 // ============================================================================
 // Switch between 'together', 'claude', 'openai', or 'auto'
 // This is where YOU control which AI engine to use - LOT owns the decision!
+// Primary: Together AI (Llama-3.3-70B). Falls back to Claude if key missing.
 const AI_ENGINE_PREFERENCE: EnginePreference = 'together'
 
 const questionSchema = z.object({
@@ -184,41 +181,14 @@ Make sure the question is personalized, relevant to self-care habits, and the op
       ...validatedQuestion,
     }
   } catch (error: any) {
-    console.error('AI Engine failed, falling back to legacy OpenAI:', {
+    console.error('AI Engine failed, using backup questions:', {
       message: error.message,
-      stack: error.stack,
       user: user.email,
     })
 
-    try {
-      // FALLBACK 1: Use legacy OpenAI with Instructor if new system fails
-      if (!oaiClient) throw new Error('OpenAI client not initialized')
-      const extractedQuestion = await oaiClient.chat.completions.create({
-        messages: [{ role: 'user', content: prompt }],
-        model: 'gpt-4o-mini',
-        response_model: {
-          schema: questionSchema,
-          name: 'Question',
-        },
-      })
-      const validatedQuestion = questionSchema.parse(extractedQuestion)
-      return {
-        id: randomUUID(),
-        ...validatedQuestion,
-      }
-    } catch (openaiError: any) {
-      // FALLBACK 2: All AI engines failed - use hardcoded backup questions
-      console.error('OpenAI fallback also failed, using backup questions:', {
-        message: openaiError.message,
-        user: user.email,
-      })
-
-      // Use day of year to rotate through backup questions (provides variety without DB dependency)
-      const dayOfYear = dayjs().dayOfYear()
-
-      console.log(`🆘 EMERGENCY FALLBACK: Using backup question bank (day ${dayOfYear})`)
-      return getBackupQuestion(dayOfYear, promptsShownToday)
-    }
+    const dayOfYear = dayjs().dayOfYear()
+    console.log(`🆘 FALLBACK: Using backup question bank (day ${dayOfYear})`)
+    return getBackupQuestion(dayOfYear, promptsShownToday)
   }
 }
 
@@ -331,6 +301,19 @@ ${quantumState.needsSupport === 'critical' || quantumState.needsSupport === 'mod
   : ''}
 
 Match your question to their quantum state. The engine recognizes patterns they may not consciously see.`
+  }
+
+  // Planner context — user's declared daily intention
+  let plannerContext = ''
+  const recentPlanLog = logs.find(log => log.event === 'plan_set')
+  if (recentPlanLog?.text) {
+    const planDate = recentPlanLog.context?.timeZone
+      ? dayjs(recentPlanLog.createdAt).tz(recentPlanLog.context.timeZone).format('D MMM')
+      : dayjs(recentPlanLog.createdAt).format('D MMM')
+    plannerContext = `\n\n**User's Declared Daily Intention (${planDate}):**
+${recentPlanLog.text}
+
+**Planner-Aligned Guidance:** The user declared this intention today. Consider probing how they're experiencing the pursuit of it, what their "feeling" state reveals, or whether their daily approach (their "how") is serving their intent. Connect Memory questions back to what they consciously chose to focus on.`
   }
 
   // Goal context - understand what user is working toward
@@ -784,11 +767,12 @@ Recent activity logs (for additional context):
   `.trim()
   const formattedLogs = logs.map(formatLog).filter(Boolean).join('\n\n')
 
-  const fullPrompt = head + quantumContext + goalContext + '\n\n' + formattedLogs
+  const fullPrompt = head + quantumContext + plannerContext + goalContext + '\n\n' + formattedLogs
 
   console.log(`📨 Prompt built: ${fullPrompt.length} chars total`)
   console.log(`   - Head section: ${head.length} chars`)
   console.log(`   - Quantum context: ${quantumContext.length} chars`)
+  console.log(`   - Planner context: ${plannerContext.length} chars${recentPlanLog ? ' (plan found)' : ''}`)
   console.log(`   - Goal context: ${goalContext.length} chars`)
   console.log(`   - Formatted logs: ${formattedLogs.length} chars (${logs.map(formatLog).filter(Boolean).length} logs)`)
   console.log(`   - User story included: ${userStory.length > 0 ? 'YES' : 'NO'}`)
@@ -828,6 +812,15 @@ function formatLog(log: Log): string {
         return ''
       })
       body = changes.filter(Boolean).join('\n').trim()
+      break
+    }
+    case 'plan_set': {
+      body = log.text || ''
+      break
+    }
+    case 'emotional_checkin': {
+      const state = (log.metadata as any)?.emotionalState
+      if (state) body = `Biofield check-in: ${state}`
       break
     }
   }
@@ -940,56 +933,110 @@ Key insights into their daily routines and preferences include:
 – They have [characteristic or goal], using [method or approach].`
 
   try {
-    // Use AI engine abstraction - try Claude, then OpenAI, whichever works
-    console.log('Attempting to get AI engine with preference:', AI_ENGINE_PREFERENCE)
-    const engine = aiEngineManager.getEngine(AI_ENGINE_PREFERENCE)
+    console.log('Attempting Together AI for Memory Story generation')
+    const engine = aiEngineManager.getEngine('together')
     console.log(`🤖 Using ${engine.name} for Memory Story generation`)
 
     const story = await engine.generateCompletion(prompt, 1000)
     console.log(`Story generated successfully with ${engine.name} (${story?.length || 0} chars)`)
-    return story || 'Unable to generate story.'
+    return story || composeLocalStory(user, answerLogs)
   } catch (error: any) {
-    console.error('AI Engine failed for Memory Story:', {
+    console.error('Together AI failed for Memory Story:', {
       message: error.message,
-      stack: error.stack,
-      preference: AI_ENGINE_PREFERENCE
+      preference: 'together'
     })
-
-    // FALLBACK: Try legacy Claude if new system fails
-    console.log('Attempting legacy Claude fallback...')
-    try {
-      if (!anthropic || !config.anthropic?.apiKey) {
-        throw new Error('Legacy Claude client not configured - API key missing')
-      }
-
-      const response = await anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: prompt
-        }],
-      })
-
-      const textContent = response.content.find((block) => block.type === 'text')
-      if (!textContent || textContent.type !== 'text') {
-        console.error('Legacy Claude returned no text content')
-        return 'Unable to generate story.'
-      }
-
-      console.log(`Story generated with legacy Claude fallback (${textContent.text?.length || 0} chars)`)
-      return textContent.text || 'Unable to generate story.'
-    } catch (fallbackError: any) {
-      console.error('Legacy Claude also failed:', {
-        message: fallbackError.message,
-        stack: fallbackError.stack,
-        hasAnthropicClient: !!anthropic,
-        hasApiKey: !!config.anthropic?.apiKey,
-        apiKeyLength: config.anthropic?.apiKey?.length || 0
-      })
-      return 'Unable to generate story at this time. Please try again later.'
-    }
+    console.log('Using local story composition fallback')
+    return composeLocalStory(user, answerLogs)
   }
+}
+
+function capFirst(s: string): string {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s
+}
+
+function composeLocalStory(user: User, answerLogs: Log[]): string {
+  const name = user.firstName || 'This person'
+
+  const answers = answerLogs
+    .slice(0, 30)
+    .map((log) => ({
+      question: ((log.metadata.question as string) || '').trim(),
+      answer: ((log.metadata.answer as string) || '').trim(),
+      date: log.context.timeZone
+        ? dayjs(log.createdAt).tz(log.context.timeZone)
+        : dayjs(log.createdAt),
+    }))
+    .filter((a) => a.question && a.answer)
+
+  if (answers.length === 0) {
+    return `${name}. The first questions await. Each answer begins the portrait.`
+  }
+
+  // Time span
+  const newest = answers[0].date
+  const oldest = answers[answers.length - 1].date
+  const days = newest.diff(oldest, 'day')
+  const timeSpan =
+    days > 365 ? 'over a year' :
+    days > 60  ? `${Math.round(days / 30)} months` :
+    days > 14  ? `${Math.round(days / 7)} weeks` :
+    days > 0   ? `${days} days` : 'one sitting'
+
+  // Theme detection — assign each answer to the first matching theme
+  const hits = (a: typeof answers[0], kw: string[]) =>
+    kw.some((k) => `${a.question} ${a.answer}`.toLowerCase().includes(k))
+
+  const THEMES: Array<{ label: string; prefix: string; kw: string[] }> = [
+    { label: 'morning', prefix: 'Mornings',   kw: ['morning', 'wake', 'coffee', 'tea', 'breakfast', 'start the day', 'early'] },
+    { label: 'food',    prefix: 'At the table', kw: ['eat', 'meal', 'dinner', 'lunch', 'cook', 'food', 'recipe', 'hungry', 'salmon', 'vegetables', 'fruit'] },
+    { label: 'water',   prefix: 'Water',       kw: ['water', 'drink', 'hydrat', 'glass', 'thirst'] },
+    { label: 'move',    prefix: 'Movement',    kw: ['walk', 'run', 'gym', 'exercise', 'workout', 'stretch', 'yoga', 'swim', 'sport', 'active', 'move'] },
+    { label: 'sleep',   prefix: 'Rest',        kw: ['sleep', 'rest', 'bed', 'night', 'tired', 'dream', 'nap', 'insomnia'] },
+    { label: 'focus',   prefix: 'Focus',       kw: ['work', 'focus', 'productive', 'creat', 'build', 'project', 'goal', 'task', 'energy'] },
+  ]
+
+  const usedIdx = new Set<number>()
+  const insights: string[] = []
+
+  for (const theme of THEMES) {
+    if (insights.length >= 5) break
+    const idx = answers.findIndex((a, i) => !usedIdx.has(i) && hits(a, theme.kw))
+    if (idx === -1) continue
+    usedIdx.add(idx)
+    const a = capFirst(answers[idx].answer.replace(/\.$/, ''))
+    insights.push(`${theme.prefix}: ${a}.`)
+  }
+
+  // Fill remaining slots from uncategorised answers
+  for (let i = 0; i < answers.length && insights.length < 5; i++) {
+    if (usedIdx.has(i)) continue
+    usedIdx.add(i)
+    const entry = answers[i]
+    const q = capFirst(
+      entry.question
+        .replace(/\?$/, '')
+        .replace(/^(What|How|When|Do you|Are you|Have you|Tell me)\s+/i, '')
+    )
+    const a = capFirst(entry.answer.replace(/\.$/, ''))
+    insights.push(`${q}: ${a}.`)
+  }
+
+  // Compose
+  const lines: string[] = []
+  lines.push(`${name}. ${answers.length} answer${answers.length !== 1 ? 's' : ''}, across ${timeSpan}.`)
+  lines.push('')
+  for (const ins of insights) lines.push(`– ${ins}`)
+  lines.push('')
+
+  if (answers.length >= 20) {
+    lines.push('The portrait is clear. The system has been listening.')
+  } else if (answers.length >= 10) {
+    lines.push('The portrait is taking shape. Each answer adds definition.')
+  } else {
+    lines.push('The portrait has begun. More answers, more depth.')
+  }
+
+  return lines.join('\n')
 }
 
 export async function generateUserSummary(user: User, logs: Log[]): Promise<string> {
