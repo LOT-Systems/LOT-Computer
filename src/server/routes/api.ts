@@ -1430,17 +1430,20 @@ export default async (fastify: FastifyInstance) => {
         result.style.display = 'block';
         if (data.deleted === 0) {
           result.className = 'info';
-          result.innerHTML = '' + data.message;
+          result.textContent = '' + data.message;
         } else {
           result.className = 'success';
-          result.innerHTML = '' + data.message + '<br><br>Refresh your Logs page to see the results.';
+          result.textContent = '' + data.message;
+          const br = document.createElement('br');
+          result.appendChild(br);
+          result.appendChild(document.createTextNode('Refresh your Logs page to see the results.'));
         }
 
         btn.textContent = 'Cleanup Complete';
       } catch (error) {
         result.style.display = 'block';
         result.className = 'error';
-        result.innerHTML = 'Error: ' + error.message;
+        result.textContent = 'Error: ' + error.message;
         btn.disabled = false;
         btn.textContent = 'Try Again';
       }
