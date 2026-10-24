@@ -42,10 +42,12 @@ export function MicroCalculatorWidget() {
   const [magicTime, setMagicTime] = React.useState<string | null>(null)
   const [fading, setFading] = React.useState(false)
   const signaledRef = React.useRef(false)
+  const resetTimerRef = React.useRef<ReturnType<typeof setTimeout>>()
 
   // Poll for magic time every 10 seconds
   React.useEffect(() => {
     const check = () => {
+      if (document.hidden) return
       const mt = detectMagicTime()
       if (mt && !magicTime) {
         setMagicTime(mt)
@@ -56,7 +58,7 @@ export function MicroCalculatorWidget() {
         }
       } else if (!mt && magicTime && !fading) {
         setFading(true)
-        setTimeout(() => {
+        resetTimerRef.current = setTimeout(() => {
           setMagicTime(null)
           setFading(false)
           signaledRef.current = false
@@ -71,6 +73,12 @@ export function MicroCalculatorWidget() {
     const iv = setInterval(check, 10000)
     return () => clearInterval(iv)
   }, [magicTime, fading])
+
+  // The fade-out reset must survive the effect re-run that setFading triggers,
+  // so it is cleared on unmount only.
+  React.useEffect(() => () => {
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current)
+  }, [])
 
   if (!magicTime) return null
 
