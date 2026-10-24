@@ -3428,6 +3428,71 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Intention Momentum Cascade — quantum-presence-crystallization (P149) active
+  // AND 3+ intention signals in 24h AND 1+ goal completion. Crystallized presence fuels execution.
+  // The OS is inhabited, known, and converting state into committed action.
+  const dayMs152 = 24 * 60 * 60 * 1000
+  const recent24h152 = signals.filter(s => now - s.timestamp < dayMs152)
+  const hasQPCryst152 = patterns.some(p => p.pattern === 'quantum-presence-crystallization')
+  const intentions152 = recent24h152.filter(s => s.source === 'intentions')
+  const goals152 = recent24h152.filter(s => s.source === 'goals' && ['goal_complete', 'goal_set'].includes(s.signal))
+  if (hasQPCryst152 && intentions152.length >= 3 && goals152.length >= 1) {
+    const cascadeStrength = Math.min((intentions152.length - 3) * 0.04, 0.16)
+    patterns.push({
+      pattern: 'intention-momentum-cascade',
+      confidence: Math.min(0.72 + cascadeStrength, 0.88),
+      suggestedWidget: 'intentionsWidget',
+      suggestedTiming: 'immediate',
+      reason: `INTMOM: Intention momentum cascade — crystallized presence (P149) + ${intentions152.length} intention signals + ${goals152.length} goal completion(s) in 24h. The OS is inhabited, known, and converting state into committed action. Execute while the cascade is live.`,
+    })
+  }
+
+  // Pattern 153: Biofield Signal Mastery — recovery-intelligence-arc (P151) completed within 48h
+  // AND 5+ mood signals with ascending trajectory (more positive moods than negative in 24h).
+  // The system has completed a full intelligence loop and demonstrates sustained emotional literacy.
+  const twoDay153 = 48 * 60 * 60 * 1000
+  const recent48h153 = signals.filter(s => now - s.timestamp < twoDay153)
+  const hasRecIntel153 = recent48h153.some(s => s.signal === 'recovery_intelligence_arc' || s.signal === 'RECINTEL')
+  const mood153 = recent24h152.filter(s => s.source === 'mood')
+  const posMoods153 = ['calm', 'peaceful', 'energized', 'hopeful', 'content', 'joyful', 'grateful', 'focused']
+  const negMoods153 = ['anxious', 'overwhelmed', 'tired', 'exhausted', 'sad', 'frustrated']
+  const posCount153 = mood153.filter(s => posMoods153.includes(s.signal)).length
+  const negCount153 = mood153.filter(s => negMoods153.includes(s.signal)).length
+  if (hasRecIntel153 && mood153.length >= 5 && posCount153 > negCount153) {
+    const masteryBonus = Math.min((posCount153 - negCount153) * 0.03, 0.17)
+    patterns.push({
+      pattern: 'biofield-signal-mastery',
+      confidence: Math.min(0.68 + masteryBonus, 0.85),
+      suggestedWidget: 'emotionalCheckIn',
+      suggestedTiming: 'soon',
+      reason: `BFMASTER: Biofield signal mastery — recovery intelligence loop complete (P151 · 48h) + ${mood153.length} mood signals (${posCount153} positive / ${negCount153} negative) in 24h. Biofield self-regulating. Emotional literacy confirmed.`,
+    })
+  }
+
+  // Pattern 154: Quantum Coherence Transmission — total-field-coherence (P150) confirmed
+  // AND journal depth >80 words AND intention signal — all within 4h.
+  // Peak OS state transmits itself forward through action and language. Highest output state.
+  const fourHour154 = 4 * 60 * 60 * 1000
+  const recent4h154 = signals.filter(s => now - s.timestamp < fourHour154)
+  const hasTFC154 = recent4h154.some(s => s.signal === 'total_field_coherence' || s.signal === 'TOTCOH')
+    || patterns.some(p => p.pattern === 'total-field-coherence')
+  const deepJournal154 = recent4h154.filter(s =>
+    (s.source === 'journal' && (s.metadata?.wordCount ?? 0) > 80) ||
+    (s.source === 'log' && (s.metadata?.wordCount ?? 0) > 80)
+  )
+  const intentions154 = recent4h154.filter(s => s.source === 'intentions')
+  if (hasTFC154 && deepJournal154.length >= 1 && intentions154.length >= 1) {
+    const totalWords = deepJournal154.reduce((sum, s) => sum + (s.metadata?.wordCount ?? 0), 0)
+    const transmissionBonus = Math.min((totalWords - 80) / 1000, 0.15)
+    patterns.push({
+      pattern: 'quantum-coherence-transmission',
+      confidence: Math.min(0.75 + transmissionBonus, 0.90),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `QCTRANS: Quantum coherence transmission — total field coherence (P150) + deep journal (${totalWords}w) + intention signal all within 4h. Peak OS state transmitting. This moment writes the next arc. The state speaks — commit intention and reflection while the field is open.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4129,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  intentionMomentumCascadeNode:      ['qos', 'intentions', 'goals', 'journal', 'cohort', 'log'],
+  biofieldSignalMasteryNode:         ['mood', 'selfcare', 'journal', 'energy', 'log'],
+  quantumCoherenceTransmissionNode:  ['qos', 'intentions', 'journal', 'cohort', 'energy', 'log'],
 }
 
 /**
@@ -4510,6 +4580,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+  // ── Arch52: Quantum Transmission Master (2026-10-24 v114) ────────────────────────
+  {
+    archetype: 'Quantum Transmission Master',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['intentions', 'journal', 'qos', 'energy'],
+    patternConditions: ['quantum-coherence-transmission', 'intention-momentum-cascade', 'total-field-coherence'],
+    hourRange: [6, 22],
+    directive: 'Peak OS state transmitting. Commit intention and reflection while the field is open. This moment writes the next arc.',
   },
 ]
 
@@ -6499,5 +6578,54 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
     hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an intention momentum cascade event — crystallized presence (P149) active
+ * + 3+ intention signals + 1+ goal completion in 24h.
+ * Feeds P152 detection. Presence converts to committed action.
+ */
+export function recordIntentionMomentumCascade(intentionCount: number, goalCount: number) {
+  recordSignal('intentions', 'intention_momentum_cascade', {
+    intentionCount,
+    goalCount,
+    cascadeStatus: 'ACTIVE',
+    presenceConfirmed: true,
+    hour: new Date().getHours(),
+    timestamp: Date.now(),
+  })
+}
+
+/**
+ * Record a biofield signal mastery event — recovery intelligence loop complete (P151 within 48h)
+ * + 5+ mood signals with ascending trajectory in 24h.
+ * Feeds P153 detection. The system has learned the user's restoration cadence.
+ */
+export function recordBiofieldSignalMastery(moodSignals: number, arcCompleted: boolean) {
+  recordSignal('mood', 'biofield_signal_mastery', {
+    moodSignals,
+    arcCompleted,
+    masteryStatus: arcCompleted ? 'CONFIRMED' : 'FORMING',
+    selfRegulating: true,
+    hour: new Date().getHours(),
+    timestamp: Date.now(),
+  })
+}
+
+/**
+ * Record a quantum coherence transmission event — total-field-coherence (P150) confirmed
+ * + deep journal (>80 words) + intention signal — all within 4h.
+ * Feeds P154 detection. Peak OS state transmits itself forward through action and language.
+ */
+export function recordQuantumCoherenceTransmission(journalWordCount: number, intentionCount: number) {
+  recordSignal('qos', 'quantum_coherence_transmission', {
+    journalWordCount,
+    intentionCount,
+    transmissionStatus: 'LIVE',
+    fieldOpen: true,
+    window: '4h',
+    hour: new Date().getHours(),
+    timestamp: Date.now(),
   })
 }

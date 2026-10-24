@@ -3629,6 +3629,87 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'intention_momentum_cascade') {
+          const intentionCount = log.metadata?.intentionCount as number | undefined
+          const goalCount = log.metadata?.goalCount as number | undefined
+          const cascadeStatus = log.metadata?.cascadeStatus as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="INTMOM:" blockView>
+                <div className="uppercase tracking-widest mb-4">INTENTION MOMENTUM CASCADE</div>
+                {intentionCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENTIONS</span>
+                    <span className="tabular-nums">{intentionCount}</span>
+                  </div>
+                )}
+                {goalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">GOAL OPS</span>
+                    <span className="tabular-nums">{goalCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CRYSTALLIZED PRESENCE → COMMITTED ACTION</div>
+                {cascadeStatus && (
+                  <div className="opacity-30 tabular-nums">CASCADE: {cascadeStatus}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'biofield_signal_mastery') {
+          const moodSignals = log.metadata?.moodSignals as number | undefined
+          const masteryStatus = log.metadata?.masteryStatus as string | undefined
+          const arcCompleted = log.metadata?.arcCompleted as boolean | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="BFMASTER:" blockView>
+                <div className="uppercase tracking-widest mb-4">BIOFIELD SIGNAL MASTERY</div>
+                {moodSignals !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MOOD SIGNALS</span>
+                    <span className="tabular-nums">{moodSignals}</span>
+                  </div>
+                )}
+                {arcCompleted !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTEL ARC</span>
+                    <span className="tabular-nums">{arcCompleted ? 'COMPLETE' : 'FORMING'}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">BIOFIELD SELF-REGULATING · MASTERY CONFIRMED</div>
+                {masteryStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {masteryStatus}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_coherence_transmission') {
+          const journalWordCount = log.metadata?.journalWordCount as number | undefined
+          const transmissionStatus = log.metadata?.transmissionStatus as string | undefined
+          const fieldOpen = log.metadata?.fieldOpen as boolean | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QCTRANS:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM COHERENCE TRANSMISSION</div>
+                {journalWordCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL</span>
+                    <span className="tabular-nums">{journalWordCount}w</span>
+                  </div>
+                )}
+                {fieldOpen !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FIELD</span>
+                    <span className="tabular-nums">{fieldOpen ? 'OPEN' : 'CLOSED'}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PEAK OS STATE TRANSMITTING · THIS MOMENT WRITES THE NEXT ARC</div>
+                {transmissionStatus && (
+                  <div className="opacity-30 tabular-nums">TRANSMISSION: {transmissionStatus}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

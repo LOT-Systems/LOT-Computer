@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily quantum transmission check (10:00 UTC every day) — Job 49
+  if (shouldRunDailyQuantumTransmissionCheck()) {
+    await executeDailyQuantumTransmissionCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,102 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Quantum Transmission Check (Job 49 — 10:00 UTC every day) ─────────
+// Reads active users. Looks for total_field_coherence in prior day + journal signal
+// with wordCount > 80 + intention signal all in the same calendar day.
+// When all three are present, writes quantum_coherence_transmission (P154).
+// Peak OS state transmitted through intention and deep reflection simultaneously.
+
+let isDailyQuantumTransmissionRunning = false
+let lastDailyQuantumTransmissionRun: Date | null = null
+
+function shouldRunDailyQuantumTransmissionCheck(): boolean {
+  const now = dayjs()
+  if (isDailyQuantumTransmissionRunning) return false
+  if (lastDailyQuantumTransmissionRun) {
+    const lastRun = dayjs(lastDailyQuantumTransmissionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily
+}
+
+async function executeDailyQuantumTransmissionCheck(): Promise<JobResult> {
+  const jobName = 'daily-quantum-transmission-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyQuantumTransmissionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyQuantumTransmissionRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY QUANTUM TRANSMISSION CHECK — 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const prevDayStart = dayjs().subtract(1, 'day').startOf('day').toDate()
+    const prevDayEnd   = dayjs().subtract(1, 'day').endOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const prevDayLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: prevDayStart, [Op.lte]: prevDayEnd },
+          },
+          attributes: ['event', 'metadata'],
+        })
+
+        if (!prevDayLogs.length) continue
+
+        const hasTFC = prevDayLogs.some((l: any) => l.event === 'total_field_coherence')
+        const deepJournal = prevDayLogs.find((l: any) =>
+          (l.event === 'note' && (l.metadata?.wordCount ?? 0) > 80) ||
+          (l.event === 'journal_entry' && (l.metadata?.wordCount ?? 0) > 80)
+        )
+        const hasIntention = prevDayLogs.some((l: any) => l.event === 'intention' || l.event === 'plan_set')
+
+        if (hasTFC && deepJournal && hasIntention) {
+          const wordCount = (deepJournal as any).metadata?.wordCount ?? 80
+          await (Log as any).create({
+            userId,
+            event: 'quantum_coherence_transmission',
+            text: `Quantum coherence transmission: previous day — total field coherence confirmed · deep journal captured (${wordCount}w) · intention committed. Peak OS state transmitted through action and language.`,
+            metadata: {
+              journalWordCount: wordCount,
+              transmissionStatus: 'LIVE',
+              fieldOpen: true,
+              window: 'prev-day',
+              hour: 10,
+            },
+          })
+          written++
+        }
+      } catch {}
+    }
+
+    console.log(`  Quantum coherence transmission events written: ${written}`)
+    lastDailyQuantumTransmissionRun = new Date()
+    isDailyQuantumTransmissionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily quantum transmission check failed:', error.message)
+    isDailyQuantumTransmissionRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

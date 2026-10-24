@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: intention momentum cascade · biofield signal mastery · quantum coherence transmission (P152/P153/P154)
+      'intention_momentum_cascade',
+      'biofield_signal_mastery',
+      'quantum_coherence_transmission',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

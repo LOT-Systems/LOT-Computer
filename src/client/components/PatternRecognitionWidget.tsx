@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'intention-momentum-cascade':       'Intention momentum cascade — crystallized presence fuels 3+ intentions and goal completion in 24h (P152)',
+      'biofield-signal-mastery':          'Biofield signal mastery — full recovery loop complete + 5+ mood signals ascending (P153)',
+      'quantum-coherence-transmission':   'Quantum coherence transmission — peak OS field transmits through intention and deep journal within 4h (P154)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

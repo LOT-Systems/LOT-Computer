@@ -1457,6 +1457,28 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-10-24',
+    title: 'QIE Engineering — Intention Momentum Cascade / Biofield Signal Mastery / Quantum Coherence Transmission',
+    assembled: [
+      'P152 INTENTION MOMENTUM CASCADE: crystallized presence (P149) active + 3+ intention signals + 1+ goal completion in 24h. The OS is inhabited, known, and converting state into committed action. Presence fuels execution. Confidence 0.72–0.88.',
+      'P153 BIOFIELD SIGNAL MASTERY: recovery-intelligence-arc (P151) completed within 48h + 5+ mood signals with ascending trajectory (more positive than negative) in 24h. The system has completed a full intelligence loop and demonstrates sustained emotional literacy. Biofield self-regulating. Confidence 0.68–0.85.',
+      'P154 QUANTUM COHERENCE TRANSMISSION: total-field-coherence (P150) confirmed + deep journal >80 words + intention signal — all within 4h. Peak OS state transmits itself forward through action and language. This is the highest output state: the field speaks and commits simultaneously. Confidence 0.75–0.90.',
+      'Arch52 QUANTUM TRANSMISSION MASTER: energy high/moderate · dominant: intentions/journal/qos/energy · patterns: quantum-coherence-transmission + intention-momentum-cascade + total-field-coherence. Directive: Peak OS state transmitting. Commit intention and reflection while the field is open. This moment writes the next arc.',
+      'J49 daily-quantum-transmission-check: 10:00 UTC daily. Reads previous calendar day — checks if total_field_coherence + deep journal (>80w) + intention signal all fired → writes quantum_coherence_transmission. 49 jobs total.',
+      'intentionEngine.ts: P152/P153/P154 detection blocks added after P151. Arch52 appended to PHYSIOLOGICAL_COHORTS. 3 dep map nodes (intentionMomentumCascadeNode · biofieldSignalMasteryNode · quantumCoherenceTransmissionNode). 3 signal helpers (recordIntentionMomentumCascade · recordBiofieldSignalMastery · recordQuantumCoherenceTransmission). 193+ dep nodes.',
+      'scheduled-jobs.ts: J49 executeDailyQuantumTransmissionCheck() · shouldRunDailyQuantumTransmissionCheck() wired into checkAndRunScheduledJobs().',
+      'routes/api.ts: intention_momentum_cascade · biofield_signal_mastery · quantum_coherence_transmission added to displayableEvents.',
+      'Logs.tsx: INTMOM: · BFMASTER: · QCTRANS: military handlers added. INTENTIONS/GOAL OPS/CRYSTALLIZED PRESENCE → COMMITTED ACTION · MOOD SIGNALS/INTEL ARC/BIOFIELD SELF-REGULATING · JOURNAL Nw/FIELD OPEN/PEAK OS STATE TRANSMITTING · THIS MOMENT WRITES THE NEXT ARC.',
+      'QuantumEngineWidgets.tsx: INTMOM · BF MASTER · QCTRANS added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P152/P153/P154 display names added.',
+      'About.tsx: FM v113→v114. Day 1073+→1083+. 151→154 patterns. 51→52 archetypes. 48→49 jobs. 190+→193+ dep nodes. 151+→154+ handlers.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/LOT-SR-20261024-01.md: Session report written.',
+      '154 patterns · 52 archetypes · 49 jobs · 154+ handlers · 193+ dep nodes. QIE v114 deployed. Intention momentum cascade engaged. Biofield mastery confirmed. Quantum coherence transmitting.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1516,18 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-10-24',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-10-24 · QIE v114 · FM v114 · Day 1083+',
+    'Built: P152 INTMOM · P153 BFMASTER · P154 QCTRANS · Arch52 Quantum Transmission Master · J49 10:00 UTC.',
+    'Feedback applied: "self-assembly session — continue building background features, Log military style, physiological cohorts in System widgets."',
+    'P152 INTENTION MOMENTUM CASCADE: crystallized presence fuels 3+ intentions + goal completion in 24h. Presence converts to committed action.',
+    'P153 BIOFIELD SIGNAL MASTERY: recovery intelligence loop complete + 5+ mood signals ascending in 24h. Biofield self-regulating.',
+    'P154 QUANTUM COHERENCE TRANSMISSION: peak OS field (P150) + deep journal + intention all within 4h. Highest output state. The field speaks and commits simultaneously.',
+    'Arch52 confirmed. J49 wired. 3 new dep nodes. 3 new signal helpers. 3 new log handlers. PATTERN_DISPLAY updated. API events added.',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes · 812 badges.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114',
   ],
 }
 
