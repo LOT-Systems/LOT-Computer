@@ -268,7 +268,7 @@ export function About() {
         <aside className="hidden lg:block w-56 shrink-0 sticky top-0 h-screen overflow-y-auto py-16 pr-16">
           <div className="mb-16">
             <div className="text-acc/90 text-sm mb-4">LOT Systems</div>
-            <Meta>Field Manual v115 · v1.3.0</Meta>
+            <Meta>Field Manual v117 · v1.3.0</Meta>
           </div>
           <Sidebar activeId={activeId} />
         </aside>
@@ -288,7 +288,7 @@ export function About() {
               6 index dimensions. 6 ecosystem nodes. 55 physiological archetypes.
               204+ dependency nodes. 52 background jobs.
               161+ log event handlers. 125 active branches scanned.
-              936 badges catalogued. 25 Word Turn engines. 80 secret boss triggers. 306 word turns. The system does not sleep. It accumulates.
+              936 badges catalogued. 26 Word Turn engines. 83 secret boss triggers. 318 word turns. The system does not sleep. It accumulates.
             </P>
             <P>
               Field Manual v117. Not marketing copy. Not documentation for external audiences.
