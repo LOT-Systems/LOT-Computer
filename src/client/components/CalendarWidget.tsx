@@ -14,14 +14,22 @@ import { cn } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import type { Dayjs } from '#client/utils/dayjs'
 import { recordCalendarSignal } from '#client/stores/intentionEngine'
+import {
+  buildEntries,
+  normalizeTime,
+  alertLevel,
+  alertKey,
+  formatCountdown,
+  formatDuration,
+  loadFired,
+  saveFired,
+  loadTracker,
+  saveTracker,
+  playAlertTone,
+} from '#client/utils/calendar'
+import type { EntryType, AlertLevel, CalendarEntry, ActiveTracker } from '#client/utils/calendar'
 
-type EntryType = 'note' | 'task' | 'call'
-
-type CalendarEntry = {
-  date: string
-  text: string
-  type: EntryType
-}
+type ActiveAlert = { entry: CalendarEntry; level: AlertLevel }
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
@@ -59,23 +67,53 @@ export function CalendarWidget() {
   const [isAddingEntry, setIsAddingEntry] = React.useState(false)
   const [entryText, setEntryText] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
+  const [entryTime, setEntryTime] = React.useState('')
+  const [now, setNow] = React.useState(() => Date.now())
+  const [tracker, setTracker] = React.useState<ActiveTracker | null>(() => loadTracker())
+  const [dismissed, setDismissed] = React.useState<Set<string>>(() => new Set())
+  const firedRef = React.useRef<Set<string>>(loadFired())
 
-  const entries = React.useMemo<CalendarEntry[]>(() => {
-    return logs
-      .filter(log => log.event === 'calendar_entry' && log.metadata)
-      .map(log => ({
-        date: log.metadata?.date as string,
-        text: log.metadata?.text as string || log.text || '',
-        type: (log.metadata?.entryType as EntryType) || 'note',
-      }))
-      .filter(e => e.date && e.text)
-      .sort((a, b) => a.date.localeCompare(b.date))
-  }, [logs])
+  const entries = React.useMemo<CalendarEntry[]>(() => buildEntries(logs), [logs])
+
+  // Clock tick — 1s while tracking (live timer), 15s otherwise (alert polling)
+  React.useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), tracker ? 1000 : 15000)
+    return () => clearInterval(id)
+  }, [tracker])
+
+  // Alert engine — each (entry, level) fires once per browser: tone + Log record
+  const activeAlerts = React.useMemo<ActiveAlert[]>(() => {
+    const out: ActiveAlert[] = []
+    for (const entry of entries) {
+      const level = alertLevel(entry, now)
+      if (level) out.push({ entry, level })
+    }
+    return out
+  }, [entries, now])
+
+  React.useEffect(() => {
+    let changed = false
+    for (const { entry, level } of activeAlerts) {
+      const key = alertKey(entry, level)
+      if (firedRef.current.has(key)) continue
+      firedRef.current.add(key)
+      changed = true
+      playAlertTone(level)
+      createLog({
+        text: `[ALERT ${level}] ${entry.type}: ${entry.text} (${entry.time})`,
+        event: 'calendar_alert',
+        metadata: { entryId: entry.id, level, date: entry.date, time: entry.time, entryType: entry.type },
+      })
+    }
+    if (changed) saveFired(firedRef.current)
+  }, [activeAlerts])
+
+  const visibleAlerts = activeAlerts.filter(a => !dismissed.has(alertKey(a.entry, a.level)))
 
   const upcomingEntries = React.useMemo(() => {
     const today = dayjs().format('YYYY-MM-DD')
     return entries
-      .filter(e => e.date >= today)
+      .filter(e => e.date >= today && !e.done)
       .slice(0, 10)
   }, [entries])
 
@@ -108,13 +146,17 @@ export function CalendarWidget() {
   const handleAddEntry = () => {
     if (!selectedDate || !entryText.trim()) return
 
+    const time = entryTime.trim() ? normalizeTime(entryTime) : null
+    if (entryTime.trim() && !time) return // invalid HH:mm — keep the form open
+
     const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
 
     createLog({
-      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel})`,
+      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel}${time ? ` ${time}` : ''})`,
       event: 'calendar_entry',
       metadata: {
         date: selectedDate,
+        time,
         text: entryText.trim(),
         entryType,
       },
@@ -126,7 +168,44 @@ export function CalendarWidget() {
     })
 
     setEntryText('')
+    setEntryTime('')
     setIsAddingEntry(false)
+  }
+
+  const logDone = (entry: CalendarEntry, completed: boolean, trackedMin: number) => {
+    createLog({
+      text: `[${completed ? 'DONE' : 'TRACKED'}] ${entry.type}: ${entry.text}${trackedMin ? ` (${trackedMin} min)` : ''}`,
+      event: 'calendar_done',
+      metadata: { entryId: entry.id, completed, trackedMin, date: entry.date, entryType: entry.type },
+    }, {
+      onSuccess: () => queryClient.refetchQueries(['/api/logs']),
+    })
+  }
+
+  const handleStartTracking = (entry: CalendarEntry) => {
+    const t = { entryId: entry.id, startedAt: Date.now() }
+    saveTracker(t)
+    setTracker(t)
+  }
+
+  const handleStopTracking = () => {
+    if (!tracker) return
+    const entry = entries.find(e => e.id === tracker.entryId)
+    const minutes = Math.round((Date.now() - tracker.startedAt) / 60000)
+    saveTracker(null)
+    setTracker(null)
+    if (entry && minutes > 0) logDone(entry, false, minutes)
+  }
+
+  const handleComplete = (entry: CalendarEntry) => {
+    // Completing the entry being tracked also banks its running time
+    let minutes = 0
+    if (tracker?.entryId === entry.id) {
+      minutes = Math.round((Date.now() - tracker.startedAt) / 60000)
+      saveTracker(null)
+      setTracker(null)
+    }
+    logDone(entry, true, minutes)
   }
 
   const handleToggleCalendar = () => {
@@ -139,6 +218,34 @@ export function CalendarWidget() {
   return (
     <Block label="Calendar:" blockView onLabelClick={handleToggleCalendar}>
       <div className="w-full">
+        {visibleAlerts.length > 0 && (
+          <div className="mb-16 space-y-1">
+            {visibleAlerts.map(({ entry, level }) => (
+              <div
+                key={alertKey(entry, level)}
+                className={cn(
+                  'flex justify-between gap-16 uppercase tracking-widest border-l-2 pl-8',
+                  level === 'T-15' ? 'border-acc/40 text-acc/60' : 'border-acc text-acc',
+                  level !== 'T-15' && level !== 'T-05' && 'font-bold',
+                )}
+              >
+                <span className="whitespace-nowrap tabular-nums">
+                  {level === 'OVERDUE' ? '!!' : '▌'} {formatCountdown(entry, now)} · {entry.type} · {entry.time}
+                </span>
+                <span className="flex gap-8 items-baseline">
+                  <span className="text-right normal-case tracking-normal">{entry.text}</span>
+                  <button
+                    className="text-acc/40 hover:text-acc transition-opacity"
+                    onClick={() => setDismissed(new Set(dismissed).add(alertKey(entry, level)))}
+                  >
+                    ACK
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="mb-16">
           <Button onClick={handleToggleCalendar}>
             Add date
@@ -237,6 +344,15 @@ export function CalendarWidget() {
                     className="bg-transparent border border-acc/20 text-acc px-4 py-2 flex-1 outline-none focus:border-acc/40"
                     autoFocus
                   />
+                  <input
+                    type="text"
+                    value={entryTime}
+                    onChange={e => setEntryTime(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleAddEntry() }}
+                    placeholder="HH:MM"
+                    maxLength={5}
+                    className="bg-transparent border border-acc/20 text-acc px-4 py-2 w-[5.5em] outline-none focus:border-acc/40 tabular-nums"
+                  />
                   <Button onClick={handleAddEntry}>Add</Button>
                 </div>
               </div>
@@ -248,7 +364,8 @@ export function CalendarWidget() {
                   {dayjs(selectedDate).format('dddd, MMMM D')}
                 </div>
                 {entriesOnDate.map((e, i) => (
-                  <div key={i} className="text-acc/80 mb-1">
+                  <div key={e.id || i} className={cn('text-acc/80 mb-1', e.done && 'line-through opacity-50')}>
+                    {e.time && <span className="tabular-nums text-acc/40">{e.time} </span>}
                     {e.text}
                   </div>
                 ))}
@@ -259,16 +376,39 @@ export function CalendarWidget() {
 
         {upcomingEntries.length > 0 && (
           <div className="space-y-1">
-            {upcomingEntries.map((entry, i) => (
-              <div key={i} className="flex justify-between gap-16">
-                <span className="text-acc whitespace-nowrap">
-                  {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
-                </span>
-                <span className="text-acc text-right">
-                  {entry.text}
-                </span>
-              </div>
-            ))}
+            {upcomingEntries.map((entry, i) => {
+              const isTracking = tracker?.entryId === entry.id
+              return (
+                <div key={entry.id || i} className="flex justify-between gap-16">
+                  <span className="text-acc whitespace-nowrap">
+                    {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
+                    {entry.time && <span className="tabular-nums"> · {entry.time}</span>}
+                  </span>
+                  <span className="text-acc text-right">
+                    {entry.text}
+                    {entry.trackedMin > 0 && (
+                      <span className="text-acc/40 tabular-nums"> {entry.trackedMin}m</span>
+                    )}
+                    <span className="text-acc/40 whitespace-nowrap">
+                      {isTracking ? (
+                        <button className="ml-8 text-acc hover:text-acc/60 tabular-nums" onClick={handleStopTracking}>
+                          ■ {formatDuration((now - tracker!.startedAt) / 1000)}
+                        </button>
+                      ) : (
+                        !tracker && (
+                          <button className="ml-8 hover:text-acc transition-opacity" onClick={() => handleStartTracking(entry)}>
+                            ▶
+                          </button>
+                        )
+                      )}
+                      <button className="ml-8 hover:text-acc transition-opacity" onClick={() => handleComplete(entry)}>
+                        ✓
+                      </button>
+                    </span>
+                  </span>
+                </div>
+              )
+            })}
           </div>
         )}
 
