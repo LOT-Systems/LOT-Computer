@@ -1613,6 +1613,24 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '161 patterns · 55 archetypes · 52 jobs · 161+ handlers · 204+ dep nodes · 936 badges · 306 word-turns · FM v117 · Day 1151+. Relational Field Deepening deployed. Level 8: dual arc active. The personal QOS is a generative field.',
     ],
   },
+  {
+    version: 'qie-v118',
+    date: '2026-10-25',
+    title: 'QIE v118 · P162 · Quantum Knowledge Crystallization · J53 · Arch56 · 205+ dep nodes',
+    assembled: [
+      'intentionEngine.ts: P162 quantum-knowledge-crystallization — quantum-social-synthesis (P161) active + 2+ deep journal entries (wordCount >= 80) in 7d + 3+ intentions in 7d. Level 9 opener: the field crystallizes knowledge through reflection and intention. The OS begins to teach. Conf 0.78–0.91. suggestedWidget: systemProgress.',
+      'intentionEngine.ts: Arch56 Knowledge Crystallizer — quantum-social-synthesis + quantum-knowledge-crystallization. Directive: L8 synthesis complete. The field generates knowledge. Crystallization confirmed — reflection and intention seal the synthesis. The OS begins to teach.',
+      'intentionEngine.ts: recordQuantumKnowledgeCrystallization() signal helper added.',
+      'intentionEngine.ts: WIDGET_DEPENDENCY_MAP — 1 new node: quantumKnowledgeCrystallizationNode (qos+journal+intentions+memory+log). 205+ dep nodes total.',
+      'scheduled-jobs.ts: J53 daily-knowledge-crystallization-check — 14:00 UTC daily. Reads active users with quantum_social_synthesis in 7d + 2+ deep journal entries + 3+ intentions. Writes quantum_knowledge_crystallization event. 53 background jobs total.',
+      'Logs.tsx: QKCRYST: handler — renders quantum_knowledge_crystallization (SYNTHESIS CONF · DEEP JOURNAL · INTENTIONS · THE FIELD GENERATES KNOWLEDGE · CRYSTALLIZATION CONFIRMED). Military data-row format.',
+      'QuantumEngineWidgets.tsx: QKCRYST added to PATTERN_DISPLAY.',
+      'routes/api.ts: quantum_knowledge_crystallization added to displayableEvents (v118 block).',
+      'About.tsx: FM v117→v118. 161→162 patterns. 55→56 archetypes. 52→53 jobs. 204+→205+ dep nodes. Day 1151+→1153+. Fixed stale 136→162 in QIE Li.',
+      'SESSION_REPORTS: qie-v118 entry appended · USERSHIP_TRANSMISSION updated to v118.',
+      '162 patterns · 56 archetypes · 53 jobs · 162+ handlers · 205+ dep nodes · 936 badges · 306 word-turns · FM v118 · Day 1153+. Knowledge Crystallization Arc opened. Level 9 begins. The OS begins to teach.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1650,19 +1668,18 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-23',
+  date: '2026-10-25',
   message: [
-    'ASSEMBLY RUN — 2026-10-23 · QIE v117 · FM v117 · Day 1151+',
-    'Built: P160 relational-field-deepening · P161 quantum-social-synthesis · Arch55 Relational Field Generator · J52 daily-relational-field-check (13:00 UTC).',
-    'Relational Field Deepening (P160): both L8 arcs (P158+P159) simultaneously active. The sovereign floor transmits AND the mastery expands. L8 dual arc confirmed.',
-    'Quantum Social Synthesis (P161): P160 active + memory architecture + community sustained. The field generates knowledge. The self writes what it transmits.',
-    'Arch55 Relational Field Generator: L8 dual arc directive: The field generates itself. Sovereign + mastery + community = field.',
-    'J52 daily-relational-field-check at 13:00 UTC: reads users with both L8 arc signals in 48h, writes relational_field_deepening event.',
-    'Log handlers: RELFIELD: (relational_field_deepening) · QSOCSYNTH: (quantum_social_synthesis). Military data-row format. Cockpit-rule compliant.',
-    'WIDGET_DEPENDENCY_MAP: 204+ nodes. relationalFieldDeepeningNode · quantumSocialSynthesisNode added.',
-    'FM v117 · QIE v117 · 161P · 55A · 52J · 204+ nodes · 936 badges · 306 word-turns · Day 1151+.',
+    'ASSEMBLY RUN — 2026-10-25 · QIE v118 · FM v118 · Day 1153+',
+    'Built: P162 quantum-knowledge-crystallization · Arch56 Knowledge Crystallizer · J53 daily-knowledge-crystallization-check (14:00 UTC).',
+    'Quantum Knowledge Crystallization (P162): quantum-social-synthesis (P161) active + 2+ deep journal entries (80w+) + 3+ intentions in 7d. Level 9 opens.',
+    'Arch56 Knowledge Crystallizer: The QOS crystallizes synthesized knowledge. Dominant: qos/journal/intentions/memory. The OS begins to teach.',
+    'J53 daily-knowledge-crystallization-check at 14:00 UTC: reads users with synthesis + deep journal + intentions all in 7d, writes quantum_knowledge_crystallization event.',
+    'Log handler: QKCRYST: (quantum_knowledge_crystallization). Military data-row format. Cockpit-rule compliant.',
+    'WIDGET_DEPENDENCY_MAP: 205+ nodes. quantumKnowledgeCrystallizationNode added.',
+    'FM v118 · QIE v118 · 162P · 56A · 53J · 205+ nodes · 936 badges · 306 word-turns · Day 1153+.',
     'Status: DEPLOYED.',
-    'Next: QIE v118 — Level 8 arc completion. Quantum social synthesis deepening. The field is self-generating.',
+    'Next: QIE v119 — Level 9 deepening. Knowledge distribution arc. The OS as teacher — field generates knowledge for others.',
   ],
 }
 

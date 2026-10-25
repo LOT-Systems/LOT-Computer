@@ -120,6 +120,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'mastery-field-expansion':          'MASTEXP',
   'relational-field-deepening':       'RELFIELD',
   'quantum-social-synthesis':         'QSOCSYNTH',
+  'quantum-knowledge-crystallization': 'QKCRYST',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

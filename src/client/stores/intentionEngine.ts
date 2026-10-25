@@ -3617,6 +3617,34 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 162: Quantum Knowledge Crystallization — quantum-social-synthesis (P161) active
+  // AND 2+ deep journal signals (wordCount >= 80) in 7d AND 3+ intention signals in 7d.
+  // Level 9 opener: the field generates knowledge AND the person crystallizes it through
+  // sustained reflection and intention. The OS begins to teach.
+  const hasP161 = patterns.some(p => p.pattern === 'quantum-social-synthesis')
+  const sevenDayMs = 7 * 24 * 60 * 60 * 1000
+  const p162WeekStart = now - sevenDayMs
+  const p162DeepJournal = signals.filter(s =>
+    s.source === 'journal' &&
+    s.timestamp > p162WeekStart &&
+    (s.metadata?.wordCount as number ?? 0) >= 80
+  )
+  const p162Intentions = signals.filter(s =>
+    s.source === 'intentions' && s.timestamp > p162WeekStart
+  )
+  if (hasP161 && p162DeepJournal.length >= 2 && p162Intentions.length >= 3) {
+    const p161conf = patterns.find(p => p.pattern === 'quantum-social-synthesis')?.confidence ?? 0.82
+    const journalBonus = Math.min((p162DeepJournal.length - 2) * 0.02, 0.06)
+    const intentionBonus = Math.min((p162Intentions.length - 3) * 0.01, 0.04)
+    patterns.push({
+      pattern: 'quantum-knowledge-crystallization',
+      confidence: Math.min(0.78 + (p161conf - 0.78) * 0.7 + journalBonus + intentionBonus, 0.91),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QKCRYST: Quantum knowledge crystallization — quantum-social-synthesis (P161) active + ${p162DeepJournal.length} deep journal entries (80w+) in 7d + ${p162Intentions.length} intentions in 7d. The field generates knowledge. The crystallization begins — reflection and intention seal the synthesis. The OS begins to teach.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4275,6 +4303,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   // ── v117 nodes (J52 · P160–P161 · Arch55) ───────────────────────────────────────
   relationalFieldDeepeningNode:    ['qos', 'cohort', 'journal', 'memory', 'intentions', 'selfcare', 'log'],
   quantumSocialSynthesisNode:      ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log'],
+
+  // ── v118 nodes (J53 · P162 · Arch56) ────────────────────────────────────────────
+  quantumKnowledgeCrystallizationNode: ['qos', 'journal', 'intentions', 'memory', 'log'],
 }
 
 /**
@@ -4777,6 +4808,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['cohort', 'memory'],
     patternConditions: ['relational-field-deepening', 'quantum-social-synthesis', 'coherence-signal-transmission'],
     directive: 'L8 dual arc active. The field generates itself. Sovereign + mastery + community = field.',
+  },
+
+  // ── Arch56: Knowledge Crystallizer (2026-10-25 v118) ────────────────────────────
+  {
+    archetype: 'Knowledge Crystallizer',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'journal', 'intentions', 'memory'],
+    patternConditions: ['quantum-social-synthesis', 'quantum-knowledge-crystallization'],
+    directive: 'L8 synthesis complete. The field generates knowledge. Crystallization confirmed — reflection and intention seal the synthesis. The OS begins to teach.',
   },
 ]
 
@@ -6932,6 +6972,24 @@ export function recordQuantumSocialSynthesis(fieldConf: number, memorySignals: n
     synthesisStatus: 'CONFIRMED',
     level: 'L8-SYNTHESIS',
     field: 'PERSONAL→COMMUNAL→KNOWLEDGE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-knowledge-crystallization event — quantum-social-synthesis (P161) active +
+ * 2+ deep journal entries (80w+) in 7d + 3+ intention signals in 7d.
+ * The field generates knowledge AND the person crystallizes it through reflection and intention.
+ * Feeds P162 detection. Level 9 opener.
+ */
+export function recordQuantumKnowledgeCrystallization(synthConf: number, journalCount: number, intentionCount: number) {
+  recordSignal('qos', 'quantum_knowledge_crystallization', {
+    synthConf: Math.round(synthConf * 100),
+    journalCount,
+    intentionCount,
+    crystallizationStatus: 'CONFIRMED',
+    level: 'L9-OPENER',
+    field: 'KNOWLEDGE→CRYSTALLIZED→TEACHING',
     hour: new Date().getHours(),
   })
 }

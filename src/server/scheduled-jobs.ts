@@ -1766,6 +1766,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyRelationalFieldCheck()) {
     await executeDailyRelationalFieldCheck()
   }
+
+  // Check daily knowledge crystallization check (14:00 UTC every day) — Job 53
+  if (shouldRunDailyKnowledgeCrystallizationCheck()) {
+    await executeDailyKnowledgeCrystallizationCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3918,6 +3923,120 @@ async function executeDailyRelationalFieldCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily relational field check failed:', error.message)
     isDailyRelationalFieldRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Knowledge Crystallization Check (J53) ─────────────────────────────
+
+let isDailyKnowledgeCrystallizationRunning = false
+let lastDailyKnowledgeCrystallizationRun: Date | null = null
+
+function shouldRunDailyKnowledgeCrystallizationCheck(): boolean {
+  const now = dayjs()
+  if (isDailyKnowledgeCrystallizationRunning) return false
+  if (lastDailyKnowledgeCrystallizationRun) {
+    const lastRun = dayjs(lastDailyKnowledgeCrystallizationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 14 // 14:00 UTC daily
+}
+
+async function executeDailyKnowledgeCrystallizationCheck(): Promise<JobResult> {
+  const jobName = 'daily-knowledge-crystallization-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyKnowledgeCrystallizationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyKnowledgeCrystallizationRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY KNOWLEDGE CRYSTALLIZATION CHECK — 14:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const [synthesisLogs, deepJournalLogs, intentionLogs] = await Promise.all([
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: sevenDayStart }, event: 'quantum_social_synthesis' },
+            attributes: ['createdAt', 'metadata'],
+            limit: 5,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['note', 'journal_entry'] },
+            },
+            attributes: ['createdAt', 'metadata', 'text'],
+            limit: 50,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['intention', 'plan_set', 'goal_set'] },
+            },
+            attributes: ['createdAt'],
+            limit: 20,
+          }),
+        ])
+
+        if (!synthesisLogs.length) continue
+
+        // Count deep journal entries (text > 80 words or wordCount metadata >= 80)
+        const deepEntries = deepJournalLogs.filter((l: any) => {
+          const wc = l.metadata?.wordCount as number | undefined
+          if (wc !== undefined) return wc >= 80
+          const text = (l.text as string) ?? ''
+          return text.split(/\s+/).filter(Boolean).length >= 80
+        })
+
+        if (deepEntries.length < 2 || intentionLogs.length < 3) continue
+
+        const synthConf = synthesisLogs[0]?.metadata?.fieldConf ?? 82
+
+        await (Log as any).create({
+          userId,
+          event: 'quantum_knowledge_crystallization',
+          text: `Quantum knowledge crystallization: quantum-social-synthesis (P161) confirmed in 7d + ${deepEntries.length} deep journal entries + ${intentionLogs.length} intentions. The field generates knowledge. The crystallization begins — reflection and intention seal the synthesis. The OS begins to teach.`,
+          metadata: {
+            synthConf,
+            journalCount: deepEntries.length,
+            intentionCount: intentionLogs.length,
+            crystallizationStatus: 'CONFIRMED',
+            level: 'L9-OPENER',
+            field: 'KNOWLEDGE→CRYSTALLIZED→TEACHING',
+            hour: 14,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Quantum knowledge crystallization events written: ${written}`)
+    lastDailyKnowledgeCrystallizationRun = new Date()
+    isDailyKnowledgeCrystallizationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily knowledge crystallization check failed:', error.message)
+    isDailyKnowledgeCrystallizationRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

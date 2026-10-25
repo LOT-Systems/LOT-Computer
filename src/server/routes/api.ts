@@ -1227,6 +1227,8 @@ export default async (fastify: FastifyInstance) => {
       // v117: relational field deepening · quantum social synthesis (P160/P161)
       'relational_field_deepening',
       'quantum_social_synthesis',
+      // v118: quantum knowledge crystallization (P162)
+      'quantum_knowledge_crystallization',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

@@ -3976,6 +3976,48 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'quantum_knowledge_crystallization') {
+          const synthConf = log.metadata?.synthConf as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const intentionCount = log.metadata?.intentionCount as number | undefined
+          const crystallizationStatus = log.metadata?.crystallizationStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QKCRYST:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM KNOWLEDGE CRYSTALLIZATION</div>
+                {synthConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SYNTHESIS CONF</span>
+                    <span className="tabular-nums">{synthConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DEEP JOURNAL</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {intentionCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENTIONS</span>
+                    <span className="tabular-nums">{intentionCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">THE FIELD GENERATES KNOWLEDGE · CRYSTALLIZATION CONFIRMED</div>
+                {crystallizationStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {crystallizationStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
