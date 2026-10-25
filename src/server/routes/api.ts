@@ -7,6 +7,14 @@
  */
 
 import { Op, Sequelize } from 'sequelize'
+import {
+  compressLogs,
+  buildStoryPrompt,
+  storyWindow,
+  STORY_PERIODS,
+  DEFAULT_STORY_PERIOD,
+  type StoryPeriod,
+} from '#shared/utils/story-compression'
 import { FastifyInstance, FastifyRequest } from 'fastify'
 import seedrandom from 'seedrandom'
 import {
@@ -5457,6 +5465,8 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
             scripture: cleaned,
             reference,
             logText: (logText || '').substring(0, 500),
+            period,
+            entryCount: digest.entryCount,
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5490,6 +5500,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,30 +5525,30 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const rawPeriod = String(req.body.period || '').toLowerCase()
+      const period: StoryPeriod = (STORY_PERIODS as string[]).includes(rawPeriod)
+        ? (rawPeriod as StoryPeriod)
+        : DEFAULT_STORY_PERIOD
 
+      const { start } = storyWindow(period)
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: { userId: req.user.id, createdAt: { [Op.gte]: start } },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 1000,
       })
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
+      // Compress the window into a bounded digest — only the digest leaves LOT.
+      const digest = compressLogs(logs.map(l => l.get({ plain: true })), period)
+
+      const selfCareNotes = logs
+        .filter(l => ['memory_answer', 'self_care_checkin', 'energy_checkin'].includes(l.event))
         .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
+        .map(l => {
+          const q = (l.metadata?.question as string || '')
+          const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
+          return q && a ? `${q}: ${a}` : ''
+        })
         .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
@@ -5547,35 +5558,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
-
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
-
-RULES:
-- Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
-- End with a single forward-looking sentence — not a pep talk, just a quiet truth
-- Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
-
-      const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
-
-${stateBlock ? stateBlock : 'STATE: unknown'}
-
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
-
-      const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
+      const fullPrompt = buildStoryPrompt(digest, { stateBlock, selfCare: selfCareNotes })
 
       try {
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
