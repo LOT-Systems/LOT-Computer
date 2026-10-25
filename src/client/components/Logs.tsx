@@ -2087,6 +2087,22 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'calendar_alert' || log.event === 'calendar_done') {
+          const isAlert = log.event === 'calendar_alert'
+          const stage = log.metadata?.stage as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const entryType = log.metadata?.entryType as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label={isAlert ? 'CAL ALERT:' : 'CAL DONE:'} blockView>
+                <div className="uppercase tracking-widest">
+                  {isAlert ? (stage === 't15' ? 'T-15 MIN' : stage === 'overdue' ? 'OVERDUE' : 'NOW') : 'DONE'}
+                  {entryType ? ` · ${entryType}` : ''}{time ? ` · ${time}` : ''}
+                </div>
+                {log.text && <div className="opacity-40 mt-8">{log.text.replace(/^\[[A-Z]+\]\s*/, '')}</div>}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'qos_coherence') {
           const diversityScore = log.metadata?.diversityScore as number | undefined
           const sourceCount = log.metadata?.sourceCount as number | undefined
