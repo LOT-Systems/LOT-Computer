@@ -1438,6 +1438,26 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'v114',
+    date: '2026-10-25',
+    title: 'QIE v114 · P152–P154 · Arch52 · J49 · COCKPIT-RULE compression',
+    assembled: [
+      'P152 longitudinal-coherence-arc: 5+ signal sources active on 7+ consecutive days. Structural field permanence. Confidence 0.70–0.88.',
+      'P153 presence-field-continuity: quantum-presence-crystallization (P149) confirmed on 3+ consecutive days in 7d window. Confidence 0.75–0.90.',
+      'P154 recovery-mastery-arc: recovery-intelligence-arc (P151) detected 3+ times in 7d with decreasing velocity. Confidence 0.72–0.88.',
+      'Arch52 Sustained Presence Architect: journal/memory/planner dominant · longitudinal-coherence-arc + presence-field-continuity patterns. Directive: coherence is metabolic now.',
+      'J49 daily-longitudinal-coherence-check: 06:00 UTC daily. Scans users with 5+ sources for 7+ consecutive days.',
+      'COCKPIT-RULE compression: verbose title divs removed from P146–P151 Log handlers (SIG-CASC: QPFIELD: IDLOCK: QPCRYST: TOTCOH: RECINTEL:).',
+      'New Log handlers: LNGCOH: PRSCONT: RECMAST: (military minimalism, no verbose headers).',
+      'Signal helpers: recordLongitudinalCoherenceArc() · recordPresenceFieldContinuity() · recordRecoveryMasteryArc().',
+      'Dep map v114 nodes: longitudinalCoherenceNode · presenceContinuityNode · recoveryMasteryNode.',
+      'PatternRecognitionWidget: P152/P153/P154 added to getPatternName() map.',
+      'J47/J48 added to scheduled-jobs init log (were missing). J49 registered: 06:00 UTC daily.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      '154 patterns · 52 archetypes · 49 jobs · 193+ dep nodes · 781 badges · FM v114 · Day 1177+.',
+    ],
+  },
+  {
     version: 'wiki-v87',
     date: '2026-08-05',
     title: 'LOT-WIKI-v87 · FM v113 Sync · QIE v113 + Badge v31 documentation',
@@ -1494,18 +1514,18 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-10-25',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-10-25 · QIE v114 · P152–P154 · Day 1177+',
+    'Built: P152 LNGCOH · P153 PRSCONT · P154 RECMAST. The OS now tracks multi-week coherence arcs.',
+    'Arch52 Sustained Presence Architect added. Coherence is metabolic now.',
+    'J49 daily-longitudinal-coherence-check: 06:00 UTC daily. Multi-week field tracking active.',
+    'COCKPIT-RULE applied: verbose headers stripped from P146–P151 Log handlers.',
+    'New handlers: LNGCOH: · PRSCONT: · RECMAST: — all military minimalism, no verbose headers.',
+    'Signal helpers: recordLongitudinalCoherenceArc() · recordPresenceFieldContinuity() · recordRecoveryMasteryArc().',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes · 781 badges.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync Field Manual v114 · Badge audit · longitudinal cohort intelligence',
   ],
 }
 

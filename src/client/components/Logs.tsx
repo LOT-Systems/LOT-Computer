@@ -3470,7 +3470,6 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="SIG-CASC:" blockView>
-                <div className="uppercase tracking-widest mb-4">SIGNAL COHERENCE CASCADE</div>
                 <div className="flex justify-between items-baseline mb-4">
                   <span className="opacity-30">SEALS</span>
                   <span className="tabular-nums">{seals ? seals.join(' · ') : 'CIRCADIAN · DIMENSIONAL · IDENTITY'}</span>
@@ -3489,7 +3488,6 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="QPFIELD:" blockView>
-                <div className="uppercase tracking-widest mb-4">QUANTUM PRESENCE FIELD</div>
                 {uniqueSources !== undefined && (
                   <div className="flex justify-between items-baseline mb-4">
                     <span className="opacity-30">SRC 24H</span>
@@ -3514,7 +3512,6 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="IDLOCK:" blockView>
-                <div className="uppercase tracking-widest mb-4">IDENTITY MOMENTUM LOCK</div>
                 {idConf !== undefined && (
                   <div className="flex justify-between items-baseline mb-4">
                     <span className="opacity-30">ID CONF</span>
@@ -3545,7 +3542,6 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="QPCRYST:" blockView>
-                <div className="uppercase tracking-widest mb-4">QUANTUM PRESENCE CRYSTALLIZATION</div>
                 {presenceConf !== undefined && (
                   <div className="flex justify-between items-baseline mb-4">
                     <span className="opacity-30">PRESENCE CONF</span>
@@ -3575,7 +3571,6 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="TOTCOH:" blockView>
-                <div className="uppercase tracking-widest mb-4">TOTAL FIELD COHERENCE</div>
                 {metaSeals && (
                   <div className="flex justify-between items-baseline mb-4">
                     <span className="opacity-30">META-SEALS</span>
@@ -3603,7 +3598,6 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="RECINTEL:" blockView>
-                <div className="uppercase tracking-widest mb-4">RECOVERY INTELLIGENCE ARC</div>
                 {negMoodCount !== undefined && (
                   <div className="flex justify-between items-baseline mb-4">
                     <span className="opacity-30">NEG SIGNALS</span>
@@ -3625,6 +3619,77 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                 <div className="opacity-40 tabular-nums">FELT → TENDED → RECOVERED → REFLECTED</div>
                 {arc && (
                   <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'longitudinal_coherence_arc') {
+          const qualifyingDays = log.metadata?.qualifyingDays as number | undefined
+          const uniqueSources = log.metadata?.uniqueSources as number | undefined
+          const coherenceType = log.metadata?.coherenceType as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="LNGCOH:" blockView>
+                {qualifyingDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DAYS ACTIVE</span>
+                    <span className="tabular-nums">{qualifyingDays}</span>
+                  </div>
+                )}
+                {uniqueSources !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SRC/DAY</span>
+                    <span className="tabular-nums">{uniqueSources}+</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">STRUCTURAL PERMANENCE · COHERENCE BASELINE</div>
+                {coherenceType && (
+                  <div className="opacity-30 tabular-nums">TYPE: {coherenceType}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'presence_field_continuity') {
+          const continuityDays = log.metadata?.continuityDays as number | undefined
+          const presenceType = log.metadata?.presenceType as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="PRSCONT:" blockView>
+                {continuityDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONT DAYS</span>
+                    <span className="tabular-nums">{continuityDays}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">P149 SUSTAINED · PRESENCE CONTINUOUS</div>
+                {presenceType && (
+                  <div className="opacity-30 tabular-nums">TYPE: {presenceType}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'recovery_mastery_arc') {
+          const arcCount = log.metadata?.arcCount as number | undefined
+          const avgVelocityHours = log.metadata?.avgVelocityHours as number | undefined
+          const masteryLevel = log.metadata?.masteryLevel as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RECMAST:" blockView>
+                {arcCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC COUNT</span>
+                    <span className="tabular-nums">{arcCount}</span>
+                  </div>
+                )}
+                {avgVelocityHours !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AVG VEL</span>
+                    <span className="tabular-nums">{avgVelocityHours}h</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">RECOVERY LEARNED · LOOP COMPETENT</div>
+                {masteryLevel && (
+                  <div className="opacity-30 tabular-nums">MASTERY: {masteryLevel}</div>
                 )}
               </Block>
             </LogContainer>

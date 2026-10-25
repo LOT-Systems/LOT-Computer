@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily longitudinal coherence check (06:00 UTC every day) — Job 49
+  if (shouldRunDailyLongitudinalCoherenceCheck()) {
+    await executeDailyLongitudinalCoherenceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,119 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Longitudinal Coherence Check (Job 49 — 06:00 UTC every day) ───────
+// Reads active users. Scans last 7 days of logs per user.
+// When a user has 5+ unique signal source types on every one of the last 7 days
+// → writes longitudinal_coherence_arc. Structural field permanence confirmed.
+// First job operating at multi-week scale (vs. the single-day P150 ceiling).
+
+let isDailyLongitudinalCoherenceRunning = false
+let lastDailyLongitudinalCoherenceRun: Date | null = null
+
+function shouldRunDailyLongitudinalCoherenceCheck(): boolean {
+  const now = dayjs()
+  if (isDailyLongitudinalCoherenceRunning) return false
+  if (lastDailyLongitudinalCoherenceRun) {
+    const lastRun = dayjs(lastDailyLongitudinalCoherenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 6 // 06:00 UTC daily
+}
+
+async function executeDailyLongitudinalCoherenceCheck(): Promise<JobResult> {
+  const jobName = 'daily-longitudinal-coherence-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyLongitudinalCoherenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyLongitudinalCoherenceRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY LONGITUDINAL COHERENCE CHECK — 06:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDaysAgo = dayjs().subtract(7, 'day').startOf('day').toDate()
+    const now7 = dayjs().toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(7, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (7d): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const weekLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo, [Op.lte]: now7 },
+          },
+          attributes: ['event', 'createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        if (!weekLogs.length) continue
+
+        // Build day → unique source-category set map
+        const dayBuckets: Record<string, Set<string>> = {}
+        for (const l of weekLogs) {
+          const dayKey = dayjs(l.createdAt).format('YYYY-MM-DD')
+          if (!dayBuckets[dayKey]) dayBuckets[dayKey] = new Set()
+          const ev: string = l.event ?? ''
+          if (ev.startsWith('energy')) dayBuckets[dayKey].add('energy')
+          else if (ev.startsWith('mood') || ev.startsWith('emotional')) dayBuckets[dayKey].add('mood')
+          else if (ev.startsWith('journal') || ev.startsWith('log')) dayBuckets[dayKey].add('journal')
+          else if (ev.startsWith('selfcare') || ev.startsWith('care')) dayBuckets[dayKey].add('selfcare')
+          else if (ev.startsWith('planner') || ev.startsWith('plan')) dayBuckets[dayKey].add('planner')
+          else if (ev.startsWith('intention')) dayBuckets[dayKey].add('intentions')
+          else if (ev.startsWith('memory') || ev.startsWith('insight')) dayBuckets[dayKey].add('memory')
+          else if (ev.startsWith('qos') || ev.includes('coherence') || ev.includes('field')) dayBuckets[dayKey].add('qos')
+          else if (ev.startsWith('badge')) dayBuckets[dayKey].add('badges')
+          else dayBuckets[dayKey].add('log')
+        }
+
+        const qualifyingDays = Object.values(dayBuckets).filter(srcs => srcs.size >= 5).length
+        if (qualifyingDays < 7) continue
+
+        const allSources = new Set<string>()
+        Object.values(dayBuckets).forEach(srcs => srcs.forEach(s => allSources.add(s)))
+
+        await (Log as any).create({
+          userId,
+          event: 'longitudinal_coherence_arc',
+          text: `Longitudinal coherence arc: ${qualifyingDays} consecutive days with 5+ unique signal source types active. Structural field permanence confirmed — coherence is the baseline, not an event.`,
+          metadata: {
+            qualifyingDays,
+            uniqueSources: allSources.size,
+            arc: 'MULTI-WEEK',
+            permanence: 'STRUCTURAL',
+            coherenceType: 'BASELINE',
+            window: '7d',
+            hour: 6,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Longitudinal coherence arc events written: ${written}`)
+    lastDailyLongitudinalCoherenceRun = new Date()
+    isDailyLongitudinalCoherenceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily longitudinal coherence check failed:', error.message)
+    isDailyLongitudinalCoherenceRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5608,6 +5725,9 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily signal coherence cascade check: 8 AM UTC every day (Job 47)')
+  console.log('   - Daily total field coherence check: 9 AM UTC every day (Job 48)')
+  console.log('   - Daily longitudinal coherence check: 6 AM UTC every day (Job 49)')
   console.log('')
 
   // Check every hour for scheduled jobs

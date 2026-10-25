@@ -3428,6 +3428,73 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Longitudinal Coherence Arc — 5+ unique signal sources active on 7+ consecutive days.
+  // Structural field permanence: the OS is no longer coherent in flashes — coherence is the baseline.
+  // Extends P150 (instantaneous ceiling) into the temporal dimension: multi-week sustained field.
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000
+  const recentSevenDays = signals.filter(s => now - s.timestamp < sevenDaysMs)
+  const dayBuckets152: Record<string, Set<string>> = {}
+  recentSevenDays.forEach(s => {
+    const dayKey = new Date(s.timestamp).toISOString().split('T')[0]
+    if (!dayBuckets152[dayKey]) dayBuckets152[dayKey] = new Set()
+    dayBuckets152[dayKey].add(s.source)
+  })
+  const qualifyingDays152 = Object.values(dayBuckets152).filter(srcs => srcs.size >= 5).length
+  if (qualifyingDays152 >= 7) {
+    const extraDays = Math.max(0, qualifyingDays152 - 7)
+    const lngBonus = Math.min(extraDays * 0.03, 0.18)
+    patterns.push({
+      pattern: 'longitudinal-coherence-arc',
+      confidence: Math.min(0.70 + lngBonus, 0.88),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `LNGCOH: Longitudinal coherence arc — 5+ signal sources active on ${qualifyingDays152} consecutive days. Structural field permanence confirmed. Coherence is no longer an event — it is the baseline architecture.`,
+    })
+  }
+
+  // Pattern 153: Presence Field Continuity — quantum-presence-crystallization (P149) detected
+  // on 3+ separate days within a 7d window. Presence is not a peak — it is the operating state.
+  const recentP149Firings = signals.filter(s =>
+    s.source === 'qos' && s.signal === 'quantum_presence_crystallization' &&
+    now - s.timestamp < sevenDaysMs
+  )
+  const p149DayBuckets = new Set(recentP149Firings.map(s => new Date(s.timestamp).toISOString().split('T')[0]))
+  if (p149DayBuckets.size >= 3) {
+    const extraP149 = Math.max(0, p149DayBuckets.size - 3)
+    const contBonus = Math.min(extraP149 * 0.05, 0.15)
+    patterns.push({
+      pattern: 'presence-field-continuity',
+      confidence: Math.min(0.75 + contBonus, 0.90),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `PRSCONT: Presence field continuity — quantum-presence-crystallization (P149) confirmed on ${p149DayBuckets.size} of last 7 days. Presence is sustained, not intermittent. Operating from a continuously inhabited state.`,
+    })
+  }
+
+  // Pattern 154: Recovery Mastery Arc — recovery-intelligence-arc (P151) detected 3+ times
+  // in 7d with non-increasing velocity (each recovery faster or same as the last). The loop is learned.
+  const recentRecoveryArcs = signals.filter(s =>
+    s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc' &&
+    now - s.timestamp < sevenDaysMs
+  ).sort((a, b) => a.timestamp - b.timestamp)
+  if (recentRecoveryArcs.length >= 3) {
+    const velocities = recentRecoveryArcs
+      .map(s => (s.metadata?.recoveryVelocityMs as number) ?? 0)
+      .filter(v => v > 0)
+    const isDecelerating = velocities.length >= 2 &&
+      velocities.every((v, i) => i === 0 || v <= velocities[i - 1] * 1.1)
+    if (isDecelerating) {
+      const masteryBonus = Math.min((recentRecoveryArcs.length - 3) * 0.04, 0.16)
+      patterns.push({
+        pattern: 'recovery-mastery-arc',
+        confidence: Math.min(0.72 + masteryBonus, 0.88),
+        suggestedWidget: 'memory',
+        suggestedTiming: 'passive',
+        reason: `RECMAST: Recovery mastery arc — recovery-intelligence-arc (P151) confirmed ${recentRecoveryArcs.length}× in last 7 days with decreasing velocity. The recovery loop is not reactive — it is a learned competency. The OS knows how to restore itself.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4131,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  longitudinalCoherenceNode:  ['mood', 'selfcare', 'journal', 'energy', 'log', 'qos', 'cohort', 'intentions', 'planner', 'memory'],
+  presenceContinuityNode:     ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
+  recoveryMasteryNode:        ['selfcare', 'mood', 'journal', 'energy', 'log'],
 }
 
 /**
@@ -4510,6 +4582,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Sustained Presence Architect (2026-10-25 v114) ──────────────────────
+  {
+    archetype: 'Sustained Presence Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'planner'],
+    patternConditions: ['longitudinal-coherence-arc', 'presence-field-continuity'],
+    hourRange: [5, 23],
+    directive: 'Sustained field architecture confirmed. Coherence is metabolic now. The arc spans weeks, not hours. Build from the structure that already holds.',
   },
 ]
 
@@ -6498,6 +6580,50 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a longitudinal-coherence-arc event — 5+ unique signal sources active on 7+ consecutive days.
+ * Structural field permanence: coherence is the baseline, not an event. Feeds P152 detection.
+ */
+export function recordLongitudinalCoherenceArc(qualifyingDays: number, uniqueSources: number) {
+  recordSignal('journal', 'longitudinal_coherence_arc', {
+    qualifyingDays,
+    uniqueSources,
+    arc: 'MULTI-WEEK',
+    permanence: 'STRUCTURAL',
+    coherenceType: 'BASELINE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a presence-field-continuity event — quantum-presence-crystallization (P149)
+ * confirmed on 3+ separate days in 7d. Presence is sustained, not intermittent. Feeds P153 detection.
+ */
+export function recordPresenceFieldContinuity(continuityDays: number) {
+  recordSignal('qos', 'presence_field_continuity', {
+    continuityDays,
+    arc: 'SUSTAINED',
+    presenceType: 'CONTINUOUS',
+    operatingState: 'INHABITED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a recovery-mastery-arc event — recovery-intelligence-arc (P151) detected 3+ times
+ * in 7d with decreasing velocity. The loop is learned — not reactive but competent. Feeds P154 detection.
+ */
+export function recordRecoveryMasteryArc(arcCount: number, avgVelocityHours: number) {
+  recordSignal('selfcare', 'recovery_mastery_arc', {
+    arcCount,
+    avgVelocityHours: Math.round(avgVelocityHours * 10) / 10,
+    arc: 'FELT→TENDED→RECOVERED→REFLECTED',
+    masteryLevel: 'LEARNED',
+    loopStatus: 'COMPETENCY',
     hour: new Date().getHours(),
   })
 }
