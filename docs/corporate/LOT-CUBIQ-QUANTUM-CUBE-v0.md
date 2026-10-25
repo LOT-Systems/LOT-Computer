@@ -321,6 +321,14 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE MORNING HANDSHAKE                       2026-10-25
+  ─────────────────────────────────────────────────────────────────
+  Added in R02 (see LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md, Section 11 for the
+  full entry). A LOT® Brush event (or its absence by 10:00) drives THE
+  SETTLE / THE NUDGE / THE HOP on a kitchen-counter cube; the morning
+  self-care loop closes with no screen lit. First hardware-to-hardware
+  trigger path (Brush -> QIoT -> Cube).
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
