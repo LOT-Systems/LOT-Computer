@@ -177,3 +177,45 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Shift an instant to the wall-clock fields of an IANA timeZone, so the
+ * getHours()/getDate() readers above reflect the user's saved timeZone
+ * rather than the device's. Falls back to the input on a missing/invalid zone.
+ */
+export function toZonedWallClock(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    return new Date(date.toLocaleString('en-US', { timeZone }))
+  } catch {
+    return date
+  }
+}
+
+/**
+ * Personal resonance between today's ambient reading and the user's own
+ * Logs (entries carry the astro* context snapshot written by getLogContext).
+ * Pure counting over existing entries — no birth data involved.
+ */
+export function summarizeAstroLogs(
+  logs: Array<{ createdAt: Date | string; context?: Record<string, any> | null }>,
+  current: { rokuyo: string; moonPhase: string },
+  today: Date = new Date()
+): { todayCount: number; sameRokuyoCount: number; sameMoonCount: number; topRokuyo: string | null } {
+  const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
+  const todayKey = dayKey(today)
+  const byRokuyo: Record<string, number> = {}
+  let todayCount = 0
+  let sameRokuyoCount = 0
+  let sameMoonCount = 0
+  for (const log of logs) {
+    const ctx = log.context
+    if (!ctx?.astroRokuyo) continue
+    if (dayKey(new Date(log.createdAt)) === todayKey) todayCount++
+    byRokuyo[ctx.astroRokuyo] = (byRokuyo[ctx.astroRokuyo] || 0) + 1
+    if (ctx.astroRokuyo === current.rokuyo) sameRokuyoCount++
+    if (ctx.astroMoonPhase === current.moonPhase) sameMoonCount++
+  }
+  const top = Object.entries(byRokuyo).sort((a, b) => b[1] - a[1])[0]
+  return { todayCount, sameRokuyoCount, sameMoonCount, topRokuyo: top ? top[0] : null }
+}
