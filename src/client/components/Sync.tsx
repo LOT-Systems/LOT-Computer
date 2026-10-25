@@ -24,6 +24,9 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  useSendEmail,
+  useMarkEmailRead,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -69,6 +72,24 @@ export const Sync = React.memo(function SyncInner() {
     if (me.isAdmin) return true
     return me.tags.some((tag) => CHAT_ALLOWED_TAGS.includes(tag.toLowerCase()))
   }, [me])
+
+  // LOT® Email — inbox lives at the top of Sync
+  const emailTarget = useStore(stores.emailComposeTo)
+  const { data: emails } = useEmails()
+  const [replyBody, setReplyBody] = React.useState('')
+  const [emailNote, setEmailNote] = React.useState('')
+  const { mutate: markEmailRead } = useMarkEmailRead({
+    onSuccess: () => queryClient.invalidateQueries(['/api/emails']),
+  })
+  const { mutate: sendEmail, isLoading: emailSending } = useSendEmail({
+    onSuccess: (res) => {
+      setReplyBody('')
+      setEmailNote(`Sent to ${[res.to.firstName, res.to.lastName].filter(Boolean).join(' ')}`)
+      stores.emailComposeTo.set(null)
+    },
+    onError: (err: any) => setEmailNote(err?.response?.data?.error || 'Not sent'),
+  })
+  const unreadEmails = (emails || []).filter((e) => e.unread).length
 
   const { data: fetchedMessages } = useChatMessages()
   const { mutate: createChatMessage } = useCreateChatMessage({
@@ -117,7 +138,11 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeEmailListener } = sync.listen('email', () => {
+      queryClient.invalidateQueries(['/api/emails'])
+    })
     return () => {
+      disposeEmailListener()
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
     }
@@ -213,6 +238,64 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {(emailTarget || (emails && emails.length > 0)) && (
+        <div className="mb-80">
+          <div className="text-acc/40 mb-4">
+            EMAIL{unreadEmails > 0 ? ` · ${unreadEmails} new` : ''}
+          </div>
+          {emailTarget && (
+            <form
+              className="flex items-center gap-x-8 mb-8"
+              onSubmit={(ev) => {
+                ev.preventDefault()
+                if (replyBody.trim()) sendEmail({ toUserId: emailTarget.id, body: replyBody })
+              }}
+            >
+              <span className="whitespace-nowrap">to {emailTarget.name}</span>
+              <ResizibleGhostInput
+                direction="vh"
+                value={replyBody}
+                onChange={setReplyBody}
+                placeholder="Write an email..."
+                containerClassName="flex-grow leading-normal"
+                className="leading-normal"
+              />
+              <Button type="submit" kind="secondary" size="small" disabled={!replyBody.trim() || emailSending}>
+                Send
+              </Button>
+              <GhostButton onClick={() => stores.emailComposeTo.set(null)}>×</GhostButton>
+            </form>
+          )}
+          {emailNote && <div className="text-acc/40 mb-8">{emailNote}</div>}
+          {(emails || []).slice(0, 10).map((e) => {
+            const name = `${e.from.firstName || ''} ${e.from.lastName || ''}`.trim() || 'Unknown'
+            return (
+              <div
+                key={e.id}
+                className="group flex items-start gap-x-8 cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded"
+                onClick={() => e.unread && markEmailRead({ id: e.id })}
+              >
+                <span className={cn('whitespace-nowrap', !e.unread && 'text-acc/60')}>
+                  {e.unread ? '● ' : ''}{name}
+                </span>
+                <div className="whitespace-breakspaces" style={{ wordBreak: 'break-word' }}>
+                  {e.body}
+                </div>
+                <GhostButton
+                  className="whitespace-nowrap ml-auto"
+                  onClick={(ev: React.MouseEvent) => {
+                    ev.stopPropagation()
+                    stores.emailComposeTo.set({ id: e.from.id, name })
+                  }}
+                >
+                  Reply
+                </GhostButton>
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {

@@ -15,6 +15,8 @@ export const me = atom<UserProfile | null>(null)
 export const isTouchDevice = atom<boolean>(
   'ontouchstart' in window || navigator.maxTouchPoints > 0
 )
+// LOT® Email: recipient handed from Cohort/Community to the Sync mailbox
+export const emailComposeTo = atom<{ id: string; name: string } | null>(null)
 export const usersTotal = atom<number>(0)
 export const usersOnline = atom<number>(0)
 export const liveMessage = atom<string>('')

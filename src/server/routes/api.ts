@@ -380,6 +380,11 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'email': {
+          // Private: only the receiver's stream gets the event
+          if (data.receiverId === req.user.id) write({ event, data })
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4083,6 +4088,117 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
     }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — composed in Log ("/email to Name."), read in Sync
+  // ============================================================================
+
+  const toEmailRecord = (e: any, from: any, viewerId: string) => ({
+    id: e.id,
+    body: e.body,
+    createdAt: e.createdAt,
+    unread: e.receiverId === viewerId && !e.readAt,
+    from: { id: from.id, firstName: from.firstName, lastName: from.lastName },
+  })
+
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { to?: string; toUserId?: string; body: string }
+  }>, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires Usership, Onyx, Legacy, R&D, or Admin' })
+    }
+    const { to, toUserId } = req.body || {}
+    const body = String(req.body?.body || '').trim().slice(0, 5000)
+    if (!body) return reply.status(400).send({ error: 'Message is empty' })
+
+    // Resolve recipient: explicit id (cohort widget) or name typed in Log
+    let candidates: any[] = []
+    if (toUserId) {
+      const u = await fastify.models.User.findByPk(toUserId)
+      if (u) candidates = [u]
+    } else if (to && to.trim()) {
+      const name = to.trim().replace(/[.\s]+$/, '').toLowerCase()
+      const pool = await fastify.models.User.findAll({
+        where: Sequelize.where(
+          Sequelize.fn('lower', Sequelize.col('firstName')),
+          name.split(/\s+/)[0]
+        ),
+        limit: 50,
+      })
+      candidates = pool.filter((u: any) => {
+        const full = `${u.firstName || ''} ${u.lastName || ''}`.trim().toLowerCase()
+        return name.includes(' ') ? full === name : true
+      })
+    }
+    candidates = candidates.filter(
+      (u: any) => u.id !== req.user.id && canAccessChat(u.tags || [])
+    )
+    if (candidates.length === 0) {
+      return reply.status(404).send({ error: 'No such member in LOT Community' })
+    }
+    if (candidates.length > 1) {
+      return reply.status(409).send({
+        error: 'Several members match — use full name',
+        matches: candidates.map((u: any) => `${u.firstName || ''} ${u.lastName || ''}`.trim()),
+      })
+    }
+    const receiver = candidates[0]
+
+    const email = await fastify.models.Email.create({
+      senderId: req.user.id,
+      receiverId: receiver.id,
+      body,
+    })
+    const record = toEmailRecord(email, req.user, receiver.id)
+    sync.emit('email', { ...record, receiverId: receiver.id })
+
+    process.nextTick(async () => {
+      try {
+        const context = await getLogContext(req.user)
+        await fastify.models.Log.create({
+          userId: req.user.id,
+          event: 'email_sent',
+          text: '',
+          metadata: { emailId: email.id, receiverId: receiver.id },
+          context,
+        })
+      } catch (logError) {
+        console.error('Error logging email:', logError)
+      }
+    })
+
+    return reply.send({
+      id: email.id,
+      to: { id: receiver.id, firstName: receiver.firstName, lastName: receiver.lastName },
+    })
+  })
+
+  fastify.get('/emails', async (req: FastifyRequest, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires Usership, Onyx, Legacy, R&D, or Admin' })
+    }
+    const rows = await fastify.models.Email.findAll({
+      where: { receiverId: req.user.id },
+      order: [['createdAt', 'DESC']],
+      limit: 50,
+    })
+    const senders = await fastify.models.User.findAll({
+      where: { id: [...new Set(rows.map((r: any) => r.senderId))] },
+      attributes: ['id', 'firstName', 'lastName'],
+    })
+    const byId = new Map(senders.map((u: any) => [u.id, u]))
+    return rows
+      .filter((r: any) => byId.has(r.senderId))
+      .map((r: any) => toEmailRecord(r, byId.get(r.senderId), req.user.id))
+  })
+
+  fastify.post('/emails/read', async (req: FastifyRequest<{ Body: { id: string } }>, reply) => {
+    await fastify.models.Email.update(
+      { readAt: new Date() },
+      { where: { id: req.body.id, receiverId: req.user.id, readAt: null } }
+    )
+    return reply.send({})
   })
 
   // ============================================================================
