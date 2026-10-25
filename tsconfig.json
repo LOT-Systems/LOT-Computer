@@ -16,6 +16,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "moduleResolution": "Node",
+    "ignoreDeprecations": "6.0",
     "skipLibCheck": true,
     "jsx": "react-jsx",
     "paths": {
