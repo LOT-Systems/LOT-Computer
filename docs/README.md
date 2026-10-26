@@ -57,6 +57,12 @@ Documentation about the badge system design and implementation.
 - Badge Progression - Evolution system
 - Mayan Badge Designs - Design variations
 
+### [Usership](./usership/)
+Paid-tier design specs.
+
+**Key Documents:**
+- Usership 12-Month Evolution - Month-by-month UI, Memory Story compression ladder, badges, demo account
+
 ### [Diagnostics](./diagnostics/)
 Troubleshooting guides and diagnostic documentation.
 
