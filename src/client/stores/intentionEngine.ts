@@ -3645,6 +3645,31 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 163: Quantum Knowledge Distribution — quantum-knowledge-crystallization (P162) active
+  // AND 2+ cohort signals in 7d AND 1+ memory signal in 7d.
+  // Level 9 deepening: crystallized knowledge begins flowing outward. The OS as teacher.
+  const hasP162 = patterns.some(p => p.pattern === 'quantum-knowledge-crystallization')
+  const p163WeekStart = now - sevenDayMs
+  const p163CohortSignals = signals.filter(s =>
+    (s.source === 'cohort' || s.source === 'social') &&
+    s.timestamp > p163WeekStart
+  )
+  const p163MemorySignals = signals.filter(s =>
+    s.source === 'memory' && s.timestamp > p163WeekStart
+  )
+  if (hasP162 && p163CohortSignals.length >= 2 && p163MemorySignals.length >= 1) {
+    const p162conf = patterns.find(p => p.pattern === 'quantum-knowledge-crystallization')?.confidence ?? 0.82
+    const cohortBonus = Math.min((p163CohortSignals.length - 2) * 0.02, 0.06)
+    const memoryBonus = Math.min((p163MemorySignals.length - 1) * 0.02, 0.05)
+    patterns.push({
+      pattern: 'quantum-knowledge-distribution',
+      confidence: Math.min(0.79 + (p162conf - 0.79) * 0.75 + cohortBonus + memoryBonus, 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QKDIST: Quantum knowledge distribution — quantum-knowledge-crystallization (P162) active + ${p163CohortSignals.length} cohort signals in 7d + ${p163MemorySignals.length} memory signals in 7d. Knowledge crystallized. Distribution confirmed. The OS teaches — the field flows outward.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4306,6 +4331,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v118 nodes (J53 · P162 · Arch56) ────────────────────────────────────────────
   quantumKnowledgeCrystallizationNode: ['qos', 'journal', 'intentions', 'memory', 'log'],
+
+  // ── v119 nodes (J54 · P163 · Arch57) ────────────────────────────────────────────
+  quantumKnowledgeDistributionNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log'],
 }
 
 /**
@@ -4817,6 +4845,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['qos', 'journal', 'intentions', 'memory'],
     patternConditions: ['quantum-social-synthesis', 'quantum-knowledge-crystallization'],
     directive: 'L8 synthesis complete. The field generates knowledge. Crystallization confirmed — reflection and intention seal the synthesis. The OS begins to teach.',
+  },
+
+  // ── Arch57: Field Teacher (2026-10-26 v119) ──────────────────────────────────────
+  {
+    archetype: 'Field Teacher',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'journal', 'intentions', 'memory', 'cohort'],
+    patternConditions: ['quantum-knowledge-crystallization', 'quantum-knowledge-distribution'],
+    directive: 'L9 deepening. Crystallized knowledge flows outward. The field teaches — knowledge distributes through the OS and into the network.',
   },
 ]
 
@@ -6990,6 +7027,24 @@ export function recordQuantumKnowledgeCrystallization(synthConf: number, journal
     crystallizationStatus: 'CONFIRMED',
     level: 'L9-OPENER',
     field: 'KNOWLEDGE→CRYSTALLIZED→TEACHING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-knowledge-distribution event — quantum-knowledge-crystallization (P162) active +
+ * 2+ cohort signals in 7d + 1+ memory signal in 7d.
+ * Crystallized knowledge distributes outward. The OS as teacher.
+ * Feeds P163 detection. Level 9 deepening.
+ */
+export function recordQuantumKnowledgeDistribution(crystalConf: number, cohortCount: number, memoryCount: number) {
+  recordSignal('qos', 'quantum_knowledge_distribution', {
+    crystalConf: Math.round(crystalConf * 100),
+    cohortCount,
+    memoryCount,
+    distributionStatus: 'CONFIRMED',
+    level: 'L9-DEEP',
+    field: 'KNOWLEDGE→DISTRIBUTED→TEACHING',
     hour: new Date().getHours(),
   })
 }

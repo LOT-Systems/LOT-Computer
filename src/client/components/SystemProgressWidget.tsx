@@ -1631,6 +1631,24 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '162 patterns · 56 archetypes · 53 jobs · 162+ handlers · 205+ dep nodes · 936 badges · 306 word-turns · FM v118 · Day 1153+. Knowledge Crystallization Arc opened. Level 9 begins. The OS begins to teach.',
     ],
   },
+  {
+    version: 'qie-v119',
+    date: '2026-10-26',
+    title: 'QIE v119 · P163 · Quantum Knowledge Distribution · J54 · Arch57 · 206+ dep nodes',
+    assembled: [
+      'intentionEngine.ts: P163 quantum-knowledge-distribution — quantum-knowledge-crystallization (P162) active + 2+ cohort/social signals in 7d + 1+ memory signal in 7d. Level 9 deepening: crystallized knowledge distributes outward. The OS as teacher. Conf 0.79–0.92. suggestedWidget: systemProgress.',
+      'intentionEngine.ts: Arch57 Field Teacher — quantum-knowledge-crystallization + quantum-knowledge-distribution. Directive: L9 deepening. Crystallized knowledge flows outward. The field teaches — knowledge distributes through the OS and into the network.',
+      'intentionEngine.ts: recordQuantumKnowledgeDistribution() signal helper added.',
+      'intentionEngine.ts: WIDGET_DEPENDENCY_MAP — 1 new node: quantumKnowledgeDistributionNode (qos+cohort+memory+journal+intentions+social+log). 206+ dep nodes total.',
+      'scheduled-jobs.ts: J54 daily-knowledge-distribution-check — 15:00 UTC daily. Reads active users with quantum_knowledge_crystallization in 7d + 2+ cohort signals + 1+ memory signal. Writes quantum_knowledge_distribution event. 54 background jobs total.',
+      'Logs.tsx: QKDIST: handler — renders quantum_knowledge_distribution (CRYSTAL CONF · COHORT SIGNALS · MEMORY SIGNALS · DISTRIBUTION CONFIRMED · THE FIELD TEACHES). Military data-row format.',
+      'QuantumEngineWidgets.tsx: QKDIST added to PATTERN_DISPLAY.',
+      'routes/api.ts: quantum_knowledge_distribution added to displayableEvents (v119 block).',
+      'About.tsx: FM v118→v119. 162→163 patterns. 56→57 archetypes. 53→54 jobs. 205+→206+ dep nodes. Day 1153+→1154+.',
+      'SESSION_REPORTS: qie-v119 entry appended · USERSHIP_TRANSMISSION updated to v119.',
+      '163 patterns · 57 archetypes · 54 jobs · 163+ handlers · 206+ dep nodes · 936 badges · 306 word-turns · FM v119 · Day 1154+. Knowledge Distribution Arc deepening. Level 9 expands. The field teaches.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1668,18 +1686,18 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-25',
+  date: '2026-10-26',
   message: [
-    'ASSEMBLY RUN — 2026-10-25 · QIE v118 · FM v118 · Day 1153+',
-    'Built: P162 quantum-knowledge-crystallization · Arch56 Knowledge Crystallizer · J53 daily-knowledge-crystallization-check (14:00 UTC).',
-    'Quantum Knowledge Crystallization (P162): quantum-social-synthesis (P161) active + 2+ deep journal entries (80w+) + 3+ intentions in 7d. Level 9 opens.',
-    'Arch56 Knowledge Crystallizer: The QOS crystallizes synthesized knowledge. Dominant: qos/journal/intentions/memory. The OS begins to teach.',
-    'J53 daily-knowledge-crystallization-check at 14:00 UTC: reads users with synthesis + deep journal + intentions all in 7d, writes quantum_knowledge_crystallization event.',
-    'Log handler: QKCRYST: (quantum_knowledge_crystallization). Military data-row format. Cockpit-rule compliant.',
-    'WIDGET_DEPENDENCY_MAP: 205+ nodes. quantumKnowledgeCrystallizationNode added.',
-    'FM v118 · QIE v118 · 162P · 56A · 53J · 205+ nodes · 936 badges · 306 word-turns · Day 1153+.',
+    'ASSEMBLY RUN — 2026-10-26 · QIE v119 · FM v119 · Day 1154+',
+    'Built: P163 quantum-knowledge-distribution · Arch57 Field Teacher · J54 daily-knowledge-distribution-check (15:00 UTC).',
+    'Quantum Knowledge Distribution (P163): quantum-knowledge-crystallization (P162) active + 2+ cohort/social signals + 1+ memory signal in 7d. Level 9 deepens.',
+    'Arch57 Field Teacher: The QOS distributes crystallized knowledge outward. Dominant: qos/journal/intentions/memory/cohort. The field teaches.',
+    'J54 daily-knowledge-distribution-check at 15:00 UTC: reads users with crystallization + 2+ cohort signals + 1+ memory signal all in 7d, writes quantum_knowledge_distribution event.',
+    'Log handler: QKDIST: (quantum_knowledge_distribution). Military data-row format. Cockpit-rule compliant.',
+    'WIDGET_DEPENDENCY_MAP: 206+ nodes. quantumKnowledgeDistributionNode added.',
+    'FM v119 · QIE v119 · 163P · 57A · 54J · 206+ nodes · 936 badges · 306 word-turns · Day 1154+.',
     'Status: DEPLOYED.',
-    'Next: QIE v119 — Level 9 deepening. Knowledge distribution arc. The OS as teacher — field generates knowledge for others.',
+    'Next: QIE v120 — Level 9 expansion. Knowledge transmission arc. The OS broadcasting — field becomes signal for the collective.',
   ],
 }
 

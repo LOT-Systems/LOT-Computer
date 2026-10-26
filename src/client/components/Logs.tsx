@@ -4018,6 +4018,48 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'quantum_knowledge_distribution') {
+          const crystalConf = log.metadata?.crystalConf as number | undefined
+          const cohortCount = log.metadata?.cohortCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const distributionStatus = log.metadata?.distributionStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QKDIST:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM KNOWLEDGE DISTRIBUTION</div>
+                {crystalConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRYSTAL CONF</span>
+                    <span className="tabular-nums">{crystalConf}%</span>
+                  </div>
+                )}
+                {cohortCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS</span>
+                    <span className="tabular-nums">{cohortCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">DISTRIBUTION CONFIRMED · THE FIELD TEACHES</div>
+                {distributionStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {distributionStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

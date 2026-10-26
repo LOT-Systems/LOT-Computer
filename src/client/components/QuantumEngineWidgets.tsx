@@ -121,6 +121,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'relational-field-deepening':       'RELFIELD',
   'quantum-social-synthesis':         'QSOCSYNTH',
   'quantum-knowledge-crystallization': 'QKCRYST',
+  'quantum-knowledge-distribution':    'QKDIST',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'
