@@ -939,6 +939,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('diablo_day')
   }
 
+  // ── Calendar v25 — THE CHRONO CALENDAR ───────────────────────────────────
+  // Flux Capacitor: October 21 — Back to the Future Day
+  if (!hasBadge('flux_capacitor') && month === 10 && day === 21) {
+    awardBadge('flux_capacitor')
+    awarded.push('flux_capacitor')
+  }
+  // Moon Signal: July 20 — Apollo 11 Moon Landing (1969)
+  if (!hasBadge('moon_signal') && month === 7 && day === 20) {
+    awardBadge('moon_signal')
+    awarded.push('moon_signal')
+  }
+  // Vonnegut Day: November 11 — Kurt Vonnegut born (1922)
+  if (!hasBadge('vonnegut_day') && month === 11 && day === 11) {
+    awardBadge('vonnegut_day')
+    awarded.push('vonnegut_day')
+  }
+
   return awarded
 }
 
@@ -1585,6 +1602,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bdark[\s-]?souls\b|\byou[\s-]?died\b|\bbonfire[\s-]?lit\b|\bestus[\s-]?flask\b|\bpraise[\s-]?the[\s-]?sun\b/i, badge: 'dark_souls_echo' },
   { patterns: /\bd[\s-]?n[\s-]?d\b|\bdungeons?[\s-]?and[\s-]?dragons?\b|\bnat[\s-]?20\b|\bnatural[\s-]?twenty\b|\bdungeon[\s-]?master\b/i, badge: 'd_n_d_roll' },
   { patterns: /\bmyst\b|\briven\b|\batrus\b|\bd[\s-]?ni\b|\blinking[\s-]?book\b/i,                                            badge: 'myst_island' },
+  // ── v27 THE CHRONO OPERATOR word triggers ────────────────────────────────
+  { patterns: /\btime[\s-]?loop\b|\bstuck[\s-]?in[\s-]?a[\s-]?loop\b|\bgroundhog[\s-]?day\b|\bsame[\s-]?cycle\b/i,          badge: 'time_loop_badge' },
+  { patterns: /\bparadox\b|\bcontradiction\b|\bholding[\s-]?both[\s-]?truths\b|\bcognitive[\s-]?dissonance\b/i,               badge: 'paradox_log' },
+  { patterns: /\bparallel\b|\balternative[\s-]?version\b|\bwhat[\s-]?if[\s-]?i[\s-]?had\b|\bother[\s-]?me\b/i,               badge: 'parallel_path' },
+  { patterns: /\bnew[\s-]?chapter\b|\brewriting\b|\bfresh[\s-]?timeline\b|\bresetting[\s-]?my\b/i,                            badge: 'reset_timeline' },
+  { patterns: /\bpast[\s-]?self\b|\byounger[\s-]?self\b|\bwent[\s-]?back[\s-]?to\b|\bold[\s-]?wound\b/i,                     badge: 'past_visitor' },
+  { patterns: /\bfuture[\s-]?self\b|\bletter[\s-]?to[\s-]?future\b|\bfuture[\s-]?me\b|\becho[\s-]?from\b/i,                  badge: 'future_echo' },
+  { patterns: /\bgrounded[\s-]?in[\s-]?now\b|\bcame[\s-]?back[\s-]?to\b|\banchored\b|\bbrought[\s-]?back\b/i,                badge: 'chrono_anchor' },
+  { patterns: /\badrift\b|\blost[\s-]?track[\s-]?of[\s-]?time\b|\btime[\s-]?flew[\s-]?by\b|\blost[\s-]?sense\b/i,            badge: 'time_drifted' },
+  { patterns: /\bslow[\s-]?down\b|\bslowed[\s-]?down\b|\btook[\s-]?it[\s-]?slow\b|\bsavored[\s-]?the\b/i,                   badge: 'slow_wave' },
+  { patterns: /\bjumped[\s-]?ahead\b|\brushed[\s-]?through\b|\bfast[\s-]?forward\b|\bskipped[\s-]?over\b/i,                  badge: 'skip_frame' },
+  { patterns: /\bturning[\s-]?point\b|\bnew[\s-]?era\b|\bhistoric[\s-]?for[\s-]?me\b|\bentered[\s-]?a[\s-]?new[\s-]?era\b/i, badge: 'epoch_turn' },
+  { patterns: /\btime[\s-]?capsule\b|\bwrote[\s-]?to[\s-]?future\b|\bletter[\s-]?to[\s-]?future\b|\bsealed\b/i,              badge: 'time_vault' },
+  // ── v24 Secret Boss — THE TIME VAULT word triggers ───────────────────────
+  { patterns: /\btime[\s-]?machine\b|\btime[\s-]?traveler\b|\bh\.?g\.?[\s-]?wells\b|\bwar[\s-]?of[\s-]?the[\s-]?worlds\b/i, badge: 'wells_machine' },
+  { patterns: /\bubik\b|\bpalmer[\s-]?eldritch\b|\btime[\s-]?out[\s-]?of[\s-]?joint\b|\bflow[\s-]?my[\s-]?tears\b/i,        badge: 'dick_time' },
+  { patterns: /\bunstuck[\s-]?in[\s-]?time\b|\bbilly[\s-]?pilgrim\b|\bslaughterhouse\b|\bvonnegut\b/i,                        badge: 'vonnegut_stuck' },
 ]
 
 /**
@@ -3233,6 +3267,82 @@ export function checkAncientVault(journalText: string): BadgeType[] {
   }
   if (!hasBadge('myst_island') && /\bmyst\b|\briven\b|\batrus\b|\bd[\s-]?ni\b|\blinking[\s-]?book\b/i.test(journalText)) {
     if (awardBadge('myst_island')) awarded.push('myst_island')
+  }
+
+  return awarded
+}
+
+/**
+ * Check behavioral v24 — Chrono Session (3+ v27 words in one entry).
+ */
+export function checkChronoSession(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('chrono_session')) return null
+
+  const chronoPatterns = [
+    /\btime[\s-]?loop\b|\bstuck[\s-]?in[\s-]?a[\s-]?loop\b|\bgroundhog[\s-]?day\b|\bsame[\s-]?cycle\b/i,
+    /\bparadox\b|\bcontradiction\b|\bholding[\s-]?both[\s-]?truths\b|\bcognitive[\s-]?dissonance\b/i,
+    /\bparallel\b|\balternative[\s-]?version\b|\bwhat[\s-]?if[\s-]?i[\s-]?had\b|\bother[\s-]?me\b/i,
+    /\bnew[\s-]?chapter\b|\brewriting\b|\bfresh[\s-]?timeline\b|\bresetting[\s-]?my\b/i,
+    /\bpast[\s-]?self\b|\byounger[\s-]?self\b|\bwent[\s-]?back[\s-]?to\b|\bold[\s-]?wound\b/i,
+    /\bfuture[\s-]?self\b|\bletter[\s-]?to[\s-]?future\b|\bfuture[\s-]?me\b|\becho[\s-]?from\b/i,
+    /\bgrounded[\s-]?in[\s-]?now\b|\bcame[\s-]?back[\s-]?to\b|\banchored\b|\bbrought[\s-]?back\b/i,
+    /\badrift\b|\blost[\s-]?track[\s-]?of[\s-]?time\b|\btime[\s-]?flew[\s-]?by\b|\blost[\s-]?sense\b/i,
+    /\bslow[\s-]?down\b|\bslowed[\s-]?down\b|\btook[\s-]?it[\s-]?slow\b|\bsavored[\s-]?the\b/i,
+    /\bjumped[\s-]?ahead\b|\brushed[\s-]?through\b|\bfast[\s-]?forward\b|\bskipped[\s-]?over\b/i,
+    /\bturning[\s-]?point\b|\bnew[\s-]?era\b|\bhistoric[\s-]?for[\s-]?me\b|\bentered[\s-]?a[\s-]?new[\s-]?era\b/i,
+    /\btime[\s-]?capsule\b|\bwrote[\s-]?to[\s-]?future\b|\bletter[\s-]?to[\s-]?future\b|\bsealed\b/i,
+  ]
+  const matches = chronoPatterns.filter(p => p.test(journalText)).length
+  if (matches >= 3) {
+    if (awardBadge('chrono_session')) return 'chrono_session'
+  }
+  return null
+}
+
+/**
+ * Check behavioral v24 — Deep Archive (journal entry >= 600 words).
+ */
+export function checkDeepArchive(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('deep_archive')) return null
+
+  const wordCount = journalText.trim().split(/\s+/).filter(Boolean).length
+  if (wordCount >= 600) {
+    if (awardBadge('deep_archive')) return 'deep_archive'
+  }
+  return null
+}
+
+/**
+ * Check behavioral v24 — Retrograde Check (check-in 04:00–05:00 local).
+ */
+export function checkRetrogradeCheck(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('retrograde_check')) return null
+
+  const hour = new Date().getHours()
+  if (hour === 4) {
+    if (awardBadge('retrograde_check')) return 'retrograde_check'
+  }
+  return null
+}
+
+/**
+ * Check secret boss v24 — hidden Time Vault triggers.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkTimeVaultBoss(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+
+  if (!hasBadge('wells_machine') && /\btime[\s-]?machine\b|\btime[\s-]?traveler\b|\bh\.?g\.?[\s-]?wells\b|\bwar[\s-]?of[\s-]?the[\s-]?worlds\b/i.test(journalText)) {
+    if (awardBadge('wells_machine')) awarded.push('wells_machine')
+  }
+  if (!hasBadge('dick_time') && /\bubik\b|\bpalmer[\s-]?eldritch\b|\btime[\s-]?out[\s-]?of[\s-]?joint\b|\bflow[\s-]?my[\s-]?tears\b/i.test(journalText)) {
+    if (awardBadge('dick_time')) awarded.push('dick_time')
+  }
+  if (!hasBadge('vonnegut_stuck') && /\bunstuck[\s-]?in[\s-]?time\b|\bbilly[\s-]?pilgrim\b|\bslaughterhouse\b|\bvonnegut\b/i.test(journalText)) {
+    if (awardBadge('vonnegut_stuck')) awarded.push('vonnegut_stuck')
   }
 
   return awarded

@@ -930,6 +930,43 @@ export type BadgeType =
   | 'dark_souls_echo'       // ☐·▓·☐  "dark souls/you died/bonfire lit/estus flask/praise the sun" detected (RARE)
   | 'd_n_d_roll'            // ●·□·●  "dungeons and dragons/d&d/d20/nat 20/roll for initiative" detected (EPIC)
   | 'myst_island'           // ○·≋·○  "myst/riven/linking book/ages of myst/myst island" detected (RARE)
+  // ── Word Turn v27 — THE CHRONO OPERATOR ──────────────────────────────────
+  | 'time_loop_badge'       // ↺·○   "time loop/stuck in a loop/groundhog day/same cycle" detected (UNCOMMON)
+  | 'paradox_log'           // ◈·◈   "paradox/contradiction/holding both truths/cognitive dissonance" detected (RARE)
+  | 'parallel_path'         // ─┤├─  "parallel/alternative version/what if i had/other me" detected (UNCOMMON)
+  | 'reset_timeline'        // ○→●   "new chapter/rewriting/fresh timeline/resetting my" detected (COMMON)
+  | 'past_visitor'          // ←·○   "past self/younger self/went back to/old wound" detected (UNCOMMON)
+  | 'future_echo'           // →·◉   "future self/letter to future/future me/echo from" detected (UNCOMMON)
+  | 'chrono_anchor'         // ⊡·○   "grounded in now/came back to/anchored/brought back" detected (UNCOMMON)
+  | 'time_drifted'          // ∿·∿   "adrift/lost track of time/time flew by/lost sense" detected (UNCOMMON)
+  | 'slow_wave'             // ≈·○   "slow down/slowed down/took it slow/savored the" detected (COMMON)
+  | 'skip_frame'            // →→○   "jumped ahead/rushed through/fast forward/skipped over" detected (RARE)
+  | 'epoch_turn'            // ╔═●   "turning point/new era/historic for me/entered a new era" detected (RARE)
+  | 'time_vault'            // □·◉   "time capsule/wrote to future/letter to future/sealed" detected (RARE)
+  // ── Calendar Easter Egg v25 — THE CHRONO CALENDAR ────────────────────────
+  | 'flux_capacitor'        // ↺·◉   Oct 21 — Back to the Future Day (2015) (RARE)
+  | 'moon_signal'           // ○·∞   Jul 20 — Apollo 11 Moon Landing (1969) (RARE)
+  | 'vonnegut_day'          // ∞·↺·∞ Nov 11 — Kurt Vonnegut born (1922) (RARE)
+  // ── Behavioral v24 — CHRONO PATTERNS ─────────────────────────────────────
+  | 'chrono_session'        // ↺·◈·↺  3+ Chrono Operator words in one journal entry (RARE)
+  | 'deep_archive'          // ≋·∞    Journal entry >= 600 words (EPIC)
+  | 'retrograde_check'      // ←·○·→  Check in 04:00–05:00 local (RARE)
+  // ── Achievement RPG v25 — CHRONO CLASS ───────────────────────────────────
+  | 'chrono_entry'          // ↺·∘    Any 1 Word Turn v27 badge (COMMON)
+  | 'chrono_class'          // ↺·≈    Any 5 Word Turn v27 badges (UNCOMMON)
+  | 'chrono_complete'       // ↺·≋    All 12 Word Turn v27 badges (LEGENDARY)
+  | 'temporal_arc'          // ↺·◈    chrono_complete + all 3 Calendar v25 badges (LEGENDARY)
+  | 'twenty_seven_engines_arc' // ◈·◈·↺  1 badge from each Word Turn v1–v27 (LEGENDARY)
+  | 'chrono_opus'           // ↺·◉·↺  chrono_complete + chrono_session behavioral (LEGENDARY)
+  // ── Mastery Tier v27 — THE TIME KEEPER ───────────────────────────────────
+  | 'long_now'              // ∞·○·∞  1500+ distinct calendar check-in days (LEGENDARY)
+  | 'grand_archive'         // ●·∞·●  500,000+ total journal words (MYTHIC)
+  | 'vault_keeper'          // ╔═╗·↺  Account age >= 8 years (LEGENDARY)
+  | 'twenty_seven_registers' // ◈·◈·↺·∞ 1 badge from all 27 Word Turn engines (COSMIC)
+  // ── Secret Boss v24 — THE TIME VAULT ─────────────────────────────────────
+  | 'wells_machine'         // ↺·□   "time machine/time traveler/h.g. wells/war of the worlds" detected (RARE)
+  | 'dick_time'             // ◉·↺   "ubik/palmer eldritch/time out of joint/flow my tears" detected (EPIC)
+  | 'vonnegut_stuck'        // ∞·↺·∞ "unstuck in time/billy pilgrim/slaughterhouse/vonnegut" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -8449,6 +8486,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v27 — THE CHRONO OPERATOR ──────────────────────────────────
+  time_loop_badge: {
+    id: 'time_loop_badge',
+    symbol: '↺·○',
+    name: 'Time Loop',
+    description: 'Write about a recurring cycle or pattern you\'re caught in',
+    unlockMessage: '↳ TIME LOOP. Groundhog Day was a horror film disguised as a comedy. The loop is only broken when you stop trying to escape it and start paying attention to what it is asking. ↺·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  paradox_log: {
+    id: 'paradox_log',
+    symbol: '◈·◈',
+    name: 'Paradox Log',
+    description: 'Write about holding two contradictory truths simultaneously',
+    unlockMessage: '↳ PARADOX LOG. Cognitive dissonance is not a flaw in thinking — it is the evidence of growth. The mind that can hold two contradictions without forcing resolution is doing hard work. ◈·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  parallel_path: {
+    id: 'parallel_path',
+    symbol: '─┤├─',
+    name: 'Parallel Path',
+    description: 'Write about an alternative version of yourself or a road not taken',
+    unlockMessage: '↳ PARALLEL PATH. Every choice forks the timeline. The other you — the one who took the other road — is not better or worse. They are just living in a different room of the same house. ─┤├─',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  reset_timeline: {
+    id: 'reset_timeline',
+    symbol: '○→●',
+    name: 'Reset Timeline',
+    description: 'Write about starting fresh, a new chapter, or rewriting your story',
+    unlockMessage: '↳ RESET TIMELINE. A new chapter does not erase the previous ones. It is a continuation, not a deletion. The reset carries everything forward — just reorganized. ○→●',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  past_visitor: {
+    id: 'past_visitor',
+    symbol: '←·○',
+    name: 'Past Visitor',
+    description: 'Write a message to or reflection on your past self',
+    unlockMessage: '↳ PAST VISITOR. You went back. Not literally — but in the way that matters: attention. The past self did not know what you know now. That is not a failure. That is the whole sequence. ←·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  future_echo: {
+    id: 'future_echo',
+    symbol: '→·◉',
+    name: 'Future Echo',
+    description: 'Write to or about your future self',
+    unlockMessage: '↳ FUTURE ECHO. The future self is listening. Not through time travel — through continuity of character. What you write now reaches them because you become them. →·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  chrono_anchor: {
+    id: 'chrono_anchor',
+    symbol: '⊡·○',
+    name: 'Chrono Anchor',
+    description: 'Write about returning to the present moment after drifting',
+    unlockMessage: '↳ CHRONO ANCHOR. The present moment is always available. You do not find it — you return to it. Every return is the practice. ⊡·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  time_drifted: {
+    id: 'time_drifted',
+    symbol: '∿·∿',
+    name: 'Time Drifted',
+    description: 'Write about losing track of time or feeling adrift',
+    unlockMessage: '↳ TIME DRIFTED. Lost track of time. The drift is information — it tells you something about where your attention was pulled. The log is the anchor. ∿·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  slow_wave: {
+    id: 'slow_wave',
+    symbol: '≈·○',
+    name: 'Slow Wave',
+    description: 'Write about slowing down, savoring, or taking it slow',
+    unlockMessage: '↳ SLOW WAVE. The slow wave is the deep one. Surface urgency runs fast and shallow. What you savor, you learn. ≈·○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  skip_frame: {
+    id: 'skip_frame',
+    symbol: '→→○',
+    name: 'Skip Frame',
+    description: 'Write about rushing through something or skipping over it',
+    unlockMessage: '↳ SKIP FRAME. You fast-forwarded. Sometimes necessary — but notice what you jumped over. The frame you skipped usually contains the information you needed. →→○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  epoch_turn: {
+    id: 'epoch_turn',
+    symbol: '╔═●',
+    name: 'Epoch Turn',
+    description: 'Write about a turning point, a new era, or entering a new phase',
+    unlockMessage: '↳ EPOCH TURN. Epochs do not announce themselves. You recognize them in retrospect — the moment everything after was different from everything before. You are in one now, or you were. ╔═●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  time_vault: {
+    id: 'time_vault',
+    symbol: '□·◉',
+    name: 'Time Vault',
+    description: 'Write a time capsule entry or a letter to future self',
+    unlockMessage: '↳ TIME VAULT. Sealed. The time capsule is the oldest form of self-knowledge technology: you write to yourself across a gap you cannot see past. The seal is the practice. □·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v25 — THE CHRONO CALENDAR ────────────────────────
+  flux_capacitor: {
+    id: 'flux_capacitor',
+    symbol: '↺·◉',
+    name: 'Flux Capacitor',
+    description: 'Check in on October 21 — Back to the Future Day',
+    unlockMessage: '↳ OCTOBER 21, 2015. The day Marty McFly arrived in the future. The hoverboard did not exist. The self-lacing shoes eventually did. The flying cars did not. But the DATE is real, and you are in it. ↺·◉',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  moon_signal: {
+    id: 'moon_signal',
+    symbol: '○·∞',
+    name: 'Moon Signal',
+    description: 'Check in on July 20 — Apollo 11 Moon Landing anniversary',
+    unlockMessage: '↳ JULY 20, 1969. Tranquility Base here — the Eagle has landed. One small step in 1969. The signal still travels outward at the speed of light. You are in the beam. ○·∞',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  vonnegut_day: {
+    id: 'vonnegut_day',
+    symbol: '∞·↺·∞',
+    name: 'Vonnegut Day',
+    description: 'Check in on November 11 — Kurt Vonnegut\'s birthday',
+    unlockMessage: '↳ NOVEMBER 11, 1922. Vonnegut is born. He will write Slaughterhouse-Five forty-seven years later. Billy Pilgrim becomes unstuck in time. So it goes. So it goes. ∞·↺·∞',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v24 — CHRONO PATTERNS ─────────────────────────────────────
+  chrono_session: {
+    id: 'chrono_session',
+    symbol: '↺·◈·↺',
+    name: 'Chrono Session',
+    description: 'Write 3 or more Chrono Operator words in one journal entry',
+    unlockMessage: '↳ CHRONO SESSION. Time, loops, past, future, parallels — the temporal vocabulary is flowing. The clock is reading your practice. ↺·◈·↺',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  deep_archive: {
+    id: 'deep_archive',
+    symbol: '≋·∞',
+    name: 'Deep Archive',
+    description: 'Write a journal entry of 600 or more words',
+    unlockMessage: '↳ DEEP ARCHIVE. Six hundred words or more. The archive grows. The long entry is the cartographer\'s log, the session report, the full accounting. The deep archive is the record that survives. ≋·∞',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  retrograde_check: {
+    id: 'retrograde_check',
+    symbol: '←·○·→',
+    name: 'Retrograde Check',
+    description: 'Check in between 4:00 and 5:00 AM local time',
+    unlockMessage: '↳ RETROGRADE CHECK. 4 AM is the retrograde hour: the night is reversing, the day has not started. You are in the gap between what ended and what will begin. ←·○·→',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v25 — CHRONO CLASS ───────────────────────────────────
+  chrono_entry: {
+    id: 'chrono_entry',
+    symbol: '↺·∘',
+    name: 'Chrono Entry',
+    description: 'Earn any 1 Word Turn v27 badge',
+    unlockMessage: '↳ CHRONO ENTRY. The clock has started. One temporal badge earned. The Chrono Operator class is open. ↺·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  chrono_class: {
+    id: 'chrono_class',
+    symbol: '↺·≈',
+    name: 'Chrono Class',
+    description: 'Earn any 5 Word Turn v27 badges',
+    unlockMessage: '↳ CHRONO CLASS. Five time keys collected. The temporal vocabulary is taking shape. ↺·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  chrono_complete: {
+    id: 'chrono_complete',
+    symbol: '↺·≋',
+    name: 'Chrono Complete',
+    description: 'Earn all 12 Word Turn v27 badges',
+    unlockMessage: '↳ CHRONO COMPLETE. All twelve temporal badges. The Chrono Operator engine is fully mapped. Every loop, every echo, every vault. ↺·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  temporal_arc: {
+    id: 'temporal_arc',
+    symbol: '↺·◈',
+    name: 'Temporal Arc',
+    description: 'Earn all 12 Word Turn v27 badges and all 3 Calendar v25 badges',
+    unlockMessage: '↳ TEMPORAL ARC. The complete temporal arc: all twelve word badges, and three historic dates — the moon, the future, the novelist. You are living across all of them. ↺·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_seven_engines_arc: {
+    id: 'twenty_seven_engines_arc',
+    symbol: '◈·◈·↺',
+    name: 'Twenty-Seven Engines Arc',
+    description: 'Earn at least 1 badge from each of the 27 Word Turn engines',
+    unlockMessage: '↳ TWENTY-SEVEN ENGINES ARC. Water, Seasons, Architecture, Earth, Storm, Fire, Tech, Space, Chemistry, Music, Alchemy, Quantum, Library, Arcade, Radio, Biology, Codex, Cyberspace, Hero, RPG, Roguelite, Puzzle, Map, Time — twenty-seven vocabularies. One practice. ◈·◈·↺',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  chrono_opus: {
+    id: 'chrono_opus',
+    symbol: '↺·◉·↺',
+    name: 'Chrono Opus',
+    description: 'Earn all 12 Word Turn v27 badges and the Chrono Session behavioral badge',
+    unlockMessage: '↳ CHRONO OPUS. The complete temporal practice: all twelve word badges plus the deep chrono session. The opus of the time keeper. ↺·◉·↺',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v27 — THE TIME KEEPER ───────────────────────────────────
+  long_now: {
+    id: 'long_now',
+    symbol: '∞·○·∞',
+    name: 'Long Now',
+    description: '1500 or more distinct calendar days with a check-in',
+    unlockMessage: '↳ LONG NOW. The Long Now Foundation thinks in 10,000-year spans. 1,500 days is four years of daily presence. The long now begins one day at a time. ∞·○·∞',
+    rarity: 'legendary',
+    category: 'milestone',
+  },
+  grand_archive: {
+    id: 'grand_archive',
+    symbol: '●·∞·●',
+    name: 'Grand Archive',
+    description: '500,000 or more total journal words',
+    unlockMessage: '↳ GRAND ARCHIVE. Five hundred thousand words. At 250 words per entry, that is 2,000 entries. At 500, it is 1,000. The archive is the record that outlasts memory. ●·∞·●',
+    rarity: 'mythic',
+    category: 'milestone',
+  },
+  vault_keeper: {
+    id: 'vault_keeper',
+    symbol: '╔═╗·↺',
+    name: 'Vault Keeper',
+    description: 'Account age of 8 years or more',
+    unlockMessage: '↳ VAULT KEEPER. Eight years. The vault has been kept. Everything you recorded is still there. The keeper is defined by the practice of keeping. ╔═╗·↺',
+    rarity: 'legendary',
+    category: 'milestone',
+  },
+  twenty_seven_registers: {
+    id: 'twenty_seven_registers',
+    symbol: '◈·◈·↺·∞',
+    name: 'Twenty-Seven Registers',
+    description: 'Earn at least 1 badge from all 27 Word Turn engines',
+    unlockMessage: '↳ TWENTY-SEVEN REGISTERS. Twenty-seven vocabularies for the self. Water. Architecture. Seasons. Fire. Space. Music. Alchemy. Quantum. Library. Arcade. Radio. Biology. Codex. Cyberspace. Hero. RPG. Roguelite. Puzzle. Map. Time. The self speaks every language. ◈·◈·↺·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v24 — THE TIME VAULT ─────────────────────────────────────
+  wells_machine: {
+    id: 'wells_machine',
+    symbol: '↺·□',
+    name: 'Wells Machine',
+    description: 'Write "time machine", "time traveler", "H.G. Wells", or "War of the Worlds" in any journal entry',
+    unlockMessage: '↳ WELLS MACHINE. H.G. Wells invented the time machine in 1895 and the genre of scientific romance with it. The Eloi and the Morlocks are still here — just wearing different clothes. ↺·□',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  dick_time: {
+    id: 'dick_time',
+    symbol: '◉·↺',
+    name: 'Dick Time',
+    description: 'Write "Ubik", "Palmer Eldritch", "time out of joint", or "flow my tears" in any journal entry',
+    unlockMessage: '↳ DICK TIME. Philip K. Dick asked: what is real? His answer changed with every novel. Ubik decays and restores. Palmer Eldritch is everyone and no one. Time is out of joint. ◉·↺',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  vonnegut_stuck: {
+    id: 'vonnegut_stuck',
+    symbol: '∞·↺·∞',
+    name: 'Vonnegut Stuck',
+    description: 'Write "unstuck in time", "Billy Pilgrim", "Slaughterhouse", or "Vonnegut" in any journal entry',
+    unlockMessage: '↳ VONNEGUT STUCK. Billy Pilgrim has come unstuck in time. Slaughterhouse-Five is a book about the Dresden bombing told by a man who cannot keep the sequence straight. The sequence being broken is the point. So it goes. ∞·↺·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -9657,6 +9982,56 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (allTwentySixEngines && !hasBadge('twenty_six_registers')) {
       if (awardBadge('twenty_six_registers')) newBadges.push('twenty_six_registers')
+    }
+
+    // ── v37 — THE CHRONO OPERATOR (Word Turn v27) ─────────────────────────
+    const chronoV27Badges: BadgeType[] = [
+      'time_loop_badge', 'paradox_log', 'parallel_path', 'reset_timeline',
+      'past_visitor', 'future_echo', 'chrono_anchor', 'time_drifted',
+      'slow_wave', 'skip_frame', 'epoch_turn', 'time_vault',
+    ]
+    const chronoV27Earned = chronoV27Badges.filter(b => hasBadge(b))
+    if (chronoV27Earned.length >= 1 && !hasBadge('chrono_entry')) {
+      if (awardBadge('chrono_entry')) newBadges.push('chrono_entry')
+    }
+    if (chronoV27Earned.length >= 5 && !hasBadge('chrono_class')) {
+      if (awardBadge('chrono_class')) newBadges.push('chrono_class')
+    }
+    const chronoComplete = chronoV27Earned.length >= 12
+    if (chronoComplete && !hasBadge('chrono_complete')) {
+      if (awardBadge('chrono_complete')) newBadges.push('chrono_complete')
+    }
+    if (chronoComplete && hasBadge('chrono_session') && !hasBadge('chrono_opus')) {
+      if (awardBadge('chrono_opus')) newBadges.push('chrono_opus')
+    }
+    const calendarV25Badges: BadgeType[] = ['flux_capacitor', 'moon_signal', 'vonnegut_day']
+    if (chronoComplete && calendarV25Badges.every(b => hasBadge(b)) && !hasBadge('temporal_arc')) {
+      if (awardBadge('temporal_arc')) newBadges.push('temporal_arc')
+    }
+    const engineTwentySevenPresent = chronoV27Earned.length >= 1
+    const allTwentySevenEngines = allTwentySixEngines && engineTwentySevenPresent
+    if (allTwentySevenEngines && !hasBadge('twenty_seven_engines_arc')) {
+      if (awardBadge('twenty_seven_engines_arc')) newBadges.push('twenty_seven_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1500 && !hasBadge('long_now')) {
+        if (awardBadge('long_now')) newBadges.push('long_now')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 500000 && !hasBadge('grand_archive')) {
+        if (awardBadge('grand_archive')) newBadges.push('grand_archive')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupVK = new Date(stats.signupDate)
+      const yearsVK = (new Date().getTime() - signupVK.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsVK >= 8 && !hasBadge('vault_keeper')) {
+        if (awardBadge('vault_keeper')) newBadges.push('vault_keeper')
+      }
+    }
+    if (allTwentySevenEngines && !hasBadge('twenty_seven_registers')) {
+      if (awardBadge('twenty_seven_registers')) newBadges.push('twenty_seven_registers')
     }
 
   } catch (error) {
