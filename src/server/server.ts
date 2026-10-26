@@ -32,7 +32,7 @@ import publicApiRoutes from './routes/public-api.js'
 const CWD = process.cwd()
 
 const fastify = Fastify({
-  logger: false  // Temporarily disable logging for development
+  logger: config.env === 'production' ? logger : false,
 })
 
 const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/api', '/sync', '/log']
@@ -121,13 +121,6 @@ if (config.env === 'production') {
   })
 }
 
-// Global request logger for debugging
-fastify.addHook('onRequest', async (req, reply) => {
-  if (req.url.startsWith('/u/')) {
-    console.log('[GLOBAL] Request to:', req.method, req.url)
-  }
-})
-
 // Prevent HTML caching to ensure fresh CSP headers on every load
 fastify.addHook('onSend', async (req, reply, payload) => {
   const contentType = reply.getHeader('content-type')
@@ -147,41 +140,9 @@ fastify.addHook('onClose', () => sequelize.close())
 // These MUST be registered before ANY other routes to avoid conflicts
 // ==============================================================================
 
-console.log('[SERVER-STARTUP] Registering /u/ routes at top level!')
-
-// Diagnostic test route
-fastify.get('/u/test-route-works', async function (req, reply) {
-  console.log('🟢 [DIAGNOSTIC] Test route hit!')
-  reply.type('text/html')
-  return `
-    <!DOCTYPE html>
-    <html>
-      <head><title>Route Test</title></head>
-      <body style="font-family: monospace; padding: 40px;">
-        <h1 style="color: green;">✓ Route is working!</h1>
-        <p>Timestamp: ${new Date().toISOString()}</p>
-        <p>The /u/ route is being matched correctly.</p>
-      </body>
-    </html>
-  `
-})
-
-// Alternative diagnostic at /api/diagnostic
-fastify.get('/api/diagnostic', async function (req, reply) {
-  console.log('🟢 [API-DIAGNOSTIC] Route hit!')
-  return {
-    success: true,
-    message: 'Server code is running with latest changes',
-    timestamp: new Date().toISOString(),
-    commit: '0e839b6e',
-    uRoutesRegistered: true
-  }
-})
-
 // Public profile route - serve the React app
 fastify.get('/u/:userIdOrUsername', async function (req, reply) {
   const { userIdOrUsername } = req.params as { userIdOrUsername: string }
-  console.log('🟢 [PUBLIC-PROFILE-ROUTE] Serving profile page for:', userIdOrUsername)
 
   return reply.view('generic-spa', {
     scriptName: 'public-profile',
@@ -328,22 +289,13 @@ fastify.setErrorHandler((error, req, reply) => {
 })
 
 fastify.setNotFoundHandler(async (req, res) => {
-  console.log('[NOT-FOUND] URL:', req.url)
-  console.log('[NOT-FOUND] Method:', req.method)
-  console.log('[NOT-FOUND] Headers Accept:', req.headers.accept)
-  console.log('[NOT-FOUND] Is HTML request:', req.headers.accept?.includes('text/html'))
-
-  // Don't redirect API routes - let them return proper 404 or handle authentication
   if (req.url.startsWith('/api/') || req.url.startsWith('/admin-api/')) {
-    console.log('[NOT-FOUND] API route not found, returning 404')
     return res.code(404).send('API endpoint not found: ' + req.url)
   }
 
   if (req.headers.accept?.includes('text/html')) {
-    console.log('[NOT-FOUND] Redirecting HTML request to /')
     return res.redirect('/')
   }
-  console.log('[NOT-FOUND] Returning 404')
   res.code(404).send('Not found')
 })
 
