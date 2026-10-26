@@ -4,8 +4,8 @@ DOCUMENT: LOT-CUBIQ-QUANTUM-CUBE-v0
 TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Device
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
-DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+DATE:     2026-07-28 (rev 0.2: 2026-10-26)
+VERSION:  0.2 — ENERGY BUDGET + BILL OF MATERIALS + TEST PLAN
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -54,6 +54,13 @@ read in full:
     LOT®'s object: a notification body, not a computer. The two are
     related by lineage (father/son, LOT®/COSMO®) and should share no
     naming collision going forward.
+
+REV 0.2 ADDITIONS (2026-10-26) — re-read in full before writing:
+  - this document (rev 0.1), unchanged except where marked
+  - docs/corporate/LOT-AMBIENT-AI-VISION.md — LOT® Station and LOT® Brush
+    as QIoT™ hardware signal sources (used by Use Case 02)
+  - docs/wiki/LOT-WIKI-v87.md (latest wiki) — confirms no later CUBIQ
+    hardware entry exists; software CUBIQ™ lifecycle unchanged
 
 No prior document specified jump mechanics, surface locomotion, or a
 levitation roadmap. This document is that specification, v.0.
@@ -320,6 +327,108 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE AIR AT THE DESK                         2026-10-26
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier with the LOT® Station (PM2.5 / CO2 /
+  VOC) already in the room. Works in a small closed-door home office;
+  has never once opened the air-quality widget unprompted.
+
+  QIoT™ (LOT-AMBIENT-AI-VISION.md) fuses Station data with behavioral
+  signal. At 14:10 the Station reports CO2 crossing ~1,400 ppm while the
+  operator's reflection velocity has dropped for the third afternoon in
+  a row. The system concludes the room, not the person, is the cause.
+  A phone alert ("open a window") would be one more feed item.
+
+  The cube instead performs THE SETTLE (Section 04), then a single
+  in-place HOP, once, and nothing more. The operator has learned this
+  pairing: a settle-then-hop is the room speaking. They stand, crack the
+  window, sit back down. When CO2 falls under 900 ppm the cube performs
+  a lone NUDGE, "resolved," and goes still. Nothing is logged by hand;
+  the IMU-timed response (Section 05 telemetry) records that the
+  operator reacted within 90 seconds, which calibrates how often the
+  cube should speak about air at all.
+
+  New requirement raised by this use case: gesture COMPOSITION. Two
+  primitives chained (SETTLE + HOP) carry a meaning neither carries
+  alone. Added as G5 in Section 10.
+
+--------------------------------------------------------------------------------
+09 // ENERGY BUDGET (REV 0.2)  — first-principles, to be bench-verified
+--------------------------------------------------------------------------------
+
+  Ideal ballistic energy E = m·g·h (losses ignored; real drivetrain
+  efficiency for a voice-coil + spring reaction-mass hopper is assumed
+  15-30%, UNVERIFIED — first bench task is to measure it).
+
+    CASE                          m      rise/range   E_ideal   launch v
+    THE HOP  (v.0 gate)          120 g   10 mm        11.8 mJ   0.44 m/s
+    Stretch hop                  120 g   30 mm        35.3 mJ   0.77 m/s
+    v.1 apex target               90 g   50 mm        44.1 mJ   0.99 m/s
+    v.1 long jump (150 mm, 45°)   90 g   150 mm range ~66 mJ    1.21 m/s
+    v.1 stretch (250 mm, 45°)     90 g   250 mm range ~110 mJ   1.57 m/s
+
+  Implications:
+    - At 20% efficiency the 150 mm jump needs ~330 mJ electrical per
+      hop. A 400 mAh / 3.7 V cell holds ~5.3 kJ, so battery is not the
+      constraint; PEAK POWER is. A 20 ms drive pulse at 330 mJ is ~16 W,
+      requiring a supercapacitor or a low-ESR cell plus a boost stage.
+    - The 120 g v.0 mass target is adequate for the 10 mm hop. The v.1
+      long jump is only reachable if mass drops to ~90 g AND the spring
+      stores energy slowly then releases it fast (latch-and-release),
+      since a direct-drive voice coil of this size will not deliver it.
+    - Therefore rev 0.2 changes the v.0 candidate: voice-coil for the
+      NUDGE/SETTLE (fine control), spring + latch released by the coil
+      for HOP/LEAP. Same single actuator envelope, one added latch.
+    - Levitation (v.3) energy is continuous, not impulsive; it is a
+      different budget and remains unscoped.
+
+--------------------------------------------------------------------------------
+10 // BILL OF MATERIALS, TEST PLAN, GESTURE G5 (REV 0.2)
+--------------------------------------------------------------------------------
+
+  BOM (v.0 prototype, no costs asserted — to be quoted)
+    Voice-coil actuator + latch/spring stage     1
+    Piezo bimorph bias strip                     1
+    6-axis IMU                                   1
+    ToF edge sensor (forward)                    1
+    MCU with BLE, low-power                      1
+    Li-poly cell ~400 mAh + supercap bank        1
+    Qi-class receive coil, base                  1
+    LED ring (pair/charge only)                  1
+    Elastomer feet                               4
+    Nano-ceramic shell, 45 mm                    1
+
+  BENCH TEST PLAN (ordered; each must pass before the next starts)
+    T1  Drivetrain efficiency: instrumented drop-test equivalent, high-
+        speed video, measured rise vs. electrical input (replaces the
+        15-30% assumption above).
+    T2  Single hop repeatability: 100 hops, rise 10 mm +/- 2 mm.
+    T3  Landing recovery: 100 forced off-axis landings (>25 deg), cube
+        rights itself within two micro-pulses.
+    T4  Edge gate: 100/100 approach trials, zero off-table (carried over
+        from Section 03, hard gate).
+    T5  Gesture legibility: 10 non-engineers must correctly rank NUDGE /
+        HOP / LEAP by urgency without instruction.
+    T6  500/500 closure run (Section 06 v.0 gate).
+
+  G5 — GESTURE COMPOSITION (new)
+    Gestures may be chained with a fixed 400 ms gap. Reserved v.0
+    compositions: SETTLE+HOP = environmental (room) signal;
+    NUDGE alone after a composition = "resolved". Compositions must be
+    user-learnable in one sentence or they are cut.
+
+  OPEN RISKS
+    - Noise: a hop on a hard table is audible; may fail the "edge of
+      awareness" thesis. T5 should include a sound-level reading.
+    - Sleep/shared spaces: need a quiet-hours lockout in the driver.
+    - Pets and children: unattended moving object; edge gate plus a
+      lift-detect shutdown (IMU free-fall/grab) is mandatory.
+
+  CHANGELOG
+    0.1  2026-07-28  Initial v.0 spec, Use Case 01.
+    0.2  2026-10-26  Energy budget, latch-and-release candidate, BOM,
+                     bench test plan, gesture composition, Use Case 02.
 
 --------------------------------------------------------------------------------
 08 // BRAND
