@@ -226,3 +226,12 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Event Provenance
+
+Before querying logs by `event`, confirm the value the writer actually stores.
+Operator journal entries are `event = 'note'` (GET /logs creates them); a
+reader filtering on assumed names ('log_entry', 'journal') fails silently and
+yields empty context with no error. Pair every new reader with a unit check
+or a grep of the writer. (SR-20261026-01: /api/story read nonexistent event
+names, so stories never saw the journal.)

@@ -43,6 +43,14 @@ import { generateUserNarrative } from '#server/utils/rpg-narrative'
 import { generateChatCatalysts, generateConversationStarters, shouldShowChatCatalyst } from '#server/utils/cohort-chat-catalyst'
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
+import {
+  compressEntries,
+  composeLocalStory,
+  digestToPromptBlock,
+  PERIOD_DAYS,
+  STORY_PERIODS,
+  type StoryPeriod,
+} from '#shared/utils/log-story'
 import { registerOSRoutes } from './os-api.js'
 
 // ============================================================================
@@ -5490,6 +5498,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: StoryPeriod
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,6 +5523,9 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period: StoryPeriod = STORY_PERIODS.includes(req.body.period as StoryPeriod)
+        ? (req.body.period as StoryPeriod)
+        : 'week'
 
       const logs = await fastify.models.Log.findAll({
         where: { userId: req.user.id },
@@ -5521,11 +5533,25 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         limit: 200,
       })
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
+      // Journal entries are stored with event 'note' (see GET /logs).
+      const journalRows = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: 'note',
+          createdAt: { [Op.gte]: dayjs().subtract(PERIOD_DAYS[period], 'day').toDate() },
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 1000,
+      })
+      const digest = compressEntries(
+        journalRows.map(l => ({ text: l.text || '', createdAt: l.createdAt, context: l.context })),
+        period
+      )
+
+      const recentEntries = journalRows
         .slice(0, 10)
         .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
+        .filter(t => t.trim())
 
       const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
       const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
@@ -5549,7 +5575,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that compress their ${period} — the highs, the lows, and any pattern change — from the digest, mood trajectory, and self-care patterns below. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
@@ -5566,6 +5592,9 @@ RULES:
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
+
+DIGEST (compressed from the operator's journal):
+${digestToPromptBlock(digest)}
 
 RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
 
@@ -5596,6 +5625,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            period,
+            digest,
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5608,7 +5639,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
       } catch (error: any) {
         console.error('Story generation failed:', error)
         return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
+          story: composeLocalStory(digest),
           logId: null,
         }
       }

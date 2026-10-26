@@ -28,6 +28,12 @@ But more importantly, LOT features the **Memory Engine** - a revolutionary AI-po
 
 ---
 
+## Log Commands & Story
+
+Type `/system` in the Log for the command list and your Arcade rank; `/story`
+(or `/story day|month|year`) returns a compressed story of that period.
+See [docs/technical/LOT-LOG-COMMANDS-AND-STORY.md](docs/technical/LOT-LOG-COMMANDS-AND-STORY.md).
+
 ## 💎 The Memory Engine: Your Personal Self-care Vault
 
 ### Unlike Any Other Wellness App
