@@ -20,6 +20,7 @@ import {
   Log,
   Paginated,
   PublicChatMessage,
+  PublicMail,
   User,
   UserProfile,
   UserSettings,
@@ -119,6 +120,21 @@ export const useSendDirectMessage = createMutation<
   { receiverId: string; message: string },
   void
 >('post', '/api/direct-messages')
+
+export const useMail = createQuery<{ mails: PublicMail[]; unread: number }>(
+  '/api/mail',
+  { refetchOnWindowFocus: true, refetchInterval: 60e3 }
+)
+
+export const useSendMail = createMutation<
+  { to?: string; toUserId?: string; body: string },
+  PublicMail
+>('post', '/api/mail')
+
+export const useMarkMailRead = createMutation<{ ids?: string[] }, void>(
+  'post',
+  '/api/mail/read'
+)
 
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,

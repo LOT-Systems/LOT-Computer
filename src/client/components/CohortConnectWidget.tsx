@@ -123,6 +123,9 @@ export const CohortConnectWidget: React.FC = () => {
       connectionReadiness,
       hour: new Date().getHours()
     })
+    const match = matches.find((m) => m.user.id === userId)
+    const name = match ? `${match.user.firstName} ${match.user.lastName || ''}`.trim() : ''
+    stores.mailComposeTarget.set({ id: userId, name })
     stores.goTo('sync')
   }
 
@@ -267,7 +270,7 @@ export const CohortConnectWidget: React.FC = () => {
                           handleSendMessage(match.user.id, match.similarity)
                         }}
                       >
-                        Send message
+                        Send mail
                       </Button>
                     </div>
                   </div>

@@ -28,12 +28,13 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
+import { parseMailCommand } from '#shared/utils'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useSendMail, useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3739,6 +3740,40 @@ const NoteEditor = ({
       setIsSaved(true)
     },
   })
+  // LOT® Mail: "/email to Hitomi. message" — send with Cmd/Ctrl+Enter or the SEND button
+  const [mailStatus, setMailStatus] = React.useState<string | null>(null)
+  const mailCommand = React.useMemo(() => parseMailCommand(value), [value])
+  const { mutate: submitMail, isLoading: mailSending } = useSendMail({
+    onSuccess: (mail) => {
+      const name = `${mail.to.firstName || ''} ${mail.to.lastName || ''}`.trim()
+      const current = valueRef.current
+      const at = current.search(/(^|\s)\/(?:email|mail)\s+to\s/i)
+      const head = at > -1 ? current.slice(0, at).trimEnd() : current
+      const updated = `${head}${head ? '\n' : ''}✉ MAIL → ${name}: ${mail.body}`
+      setValue(updated)
+      valueRef.current = updated
+      onChangeRef.current(updated)
+      setIsSaved(true)
+      setMailStatus(`SENT → ${name}`)
+    },
+    onError: (err: any) =>
+      setMailStatus(err?.response?.data?.error || 'MAIL FAILED — try again'),
+  })
+  const sendMailNow = React.useCallback(() => {
+    const cmd = parseMailCommand(valueRef.current)
+    if (!cmd || !cmd.body) {
+      setMailStatus(cmd ? 'Add a message after the name' : null)
+      return false
+    }
+    setMailStatus(null)
+    submitMail({ to: cmd.to, body: cmd.body })
+    return true
+  }, [submitMail])
+  const sendMailRef = React.useRef(sendMailNow)
+  sendMailRef.current = sendMailNow
+  React.useEffect(() => {
+    if (!mailCommand) setMailStatus(null)
+  }, [mailCommand])
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
@@ -3911,6 +3946,7 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        if (parseMailCommand(valueRef.current)?.body && sendMailRef.current()) return
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -4124,6 +4160,7 @@ const NoteEditor = ({
         const lines = [
           'AVAILABLE COMMANDS',
           '',
+          '/email        Send mail: /email to Name. Text — Cmd+Enter · inbox in Sync',
           '/prayer       Generate contextual scripture',
           '/story        Generate a personal story from recent data',
           '/scan         System status overview',
@@ -4384,6 +4421,26 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {mailCommand && (
+          <div className="mt-8">
+            <Block label="MAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                {`TO  ${mailCommand.to}\n${mailCommand.body || 'Type your message after the name.'}`}
+              </div>
+              <div className="mt-8 flex items-center gap-x-8">
+                <Button
+                  size="small"
+                  kind="secondary"
+                  disabled={!mailCommand.body || mailSending}
+                  onClick={() => sendMailNow()}
+                >
+                  Send ✉
+                </Button>
+                <span className="opacity-40">{mailStatus || 'or Cmd/Ctrl+Enter'}</span>
+              </div>
             </Block>
           </div>
         )}

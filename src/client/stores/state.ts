@@ -23,6 +23,9 @@ export const isMirrorOn = atom<boolean>(false)
 export const isSoundOn = atom<boolean>(false)
 export const soundDescription = atom<string>('')
 export const isRadioOn = atom<boolean>(false)
+
+// LOT Mail: recipient preselected from Cohort (opens compose in Sync)
+export const mailComposeTarget = atom<{ id: string; name: string } | null>(null)
 export const radioTrackName = atom<string>('')
 
 export const weather = atom<WeatherRecord | null>(null)
