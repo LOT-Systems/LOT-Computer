@@ -20,6 +20,9 @@ import {
   type RationItem,
   type RationCadence,
 } from './basics/doctrine'
+import { RosterControl, IssueLog } from './basics/Roster'
+import { STATE_LABEL, RationState } from '#shared/basics/ration-state'
+import { useBasicsRosterQuery } from '#client/queries'
 
 // ─── terminal grid constants ──────────────────────────────────────────────────
 const RULE = '─'
@@ -89,17 +92,25 @@ export const Basics: React.FC = () => {
   const me = useStore(stores.me)
   const isMirrorOn = useStore(stores.isMirrorOn)
 
-  const isOnStrength = me?.tags?.includes('Basic') ?? false
   const isUsership = me?.tags?.includes(UserTag.Usership) ?? false
+  const rosterQ = useBasicsRosterQuery({ enabled: !!me, refetchOnWindowFocus: false })
+  const state: RationState = rosterQ.data
+    ? rosterQ.data.roster?.state ?? 'USERSHIP'
+    : me?.tags?.includes('Basic')
+    ? 'ON_STRENGTH'
+    : 'USERSHIP'
+  const isOnStrength = state === 'ON_STRENGTH' || state === 'STEADY_STATE'
 
-  const planLabel = isOnStrength
-    ? 'BASIC / ON STRENGTH'
+  const planLabel = isOnStrength || state === 'PENDING'
+    ? STATE_LABEL[state]
     : isUsership
-    ? 'USERSHIP / AI'
+    ? STATE_LABEL.USERSHIP
     : 'NONE'
 
   const rationStatus = isOnStrength
     ? 'ACTIVE — NEXT ISSUE PENDING'
+    : state === 'PENDING'
+    ? 'PENDING — INTAKE / BILLING OPEN'
     : 'NOT ON STRENGTH'
 
   const monthlyItems = RATION_MANIFEST.filter((i) => i.cadence === 'MONTHLY')
@@ -199,28 +210,19 @@ export const Basics: React.FC = () => {
         <StatusLine plan={planLabel} rationsStatus={rationStatus} />
       </div>
 
-      {/* ── UPGRADE PROMPT (Month 2 will activate) ────────── */}
-      {!isOnStrength && (
+      {/* ── UPGRADE / ROSTER ──────────────────────────────── */}
+      {me && (
         <div className="mt-4">
-          <div
-            className={cn(
-              'border-2 border-acc/20 p-16 font-mono text-[12px]',
-              'flex flex-col gap-y-8'
-            )}
-          >
-            <div className="text-acc/50 uppercase tracking-widest text-[10px]">
-              UPGRADE PATH — USERSHIP → BASIC
-            </div>
-            <div className="text-acc leading-snug">
-              {isUsership
-                ? 'USERSHIP AI confirmed. BASIC ration available as additive layer (+USD 100.00/MO).'
-                : 'Requires USERSHIP / AI plan as base layer.'}
-            </div>
-            <div className="text-acc/40 text-[11px] mt-4">
-              ENROLLMENT OPENS — M2 BUILD CYCLE
-            </div>
-          </div>
+          <RosterControl state={state} isUsership={isUsership} data={rosterQ.data} />
         </div>
+      )}
+
+      {/* ── ISSUE LOG ─────────────────────────────────────── */}
+      {me && rosterQ.data && (
+        <>
+          <SectionLabel>SECTION 3 — ISSUE LOG</SectionLabel>
+          <IssueLog rows={rosterQ.data.issues} />
+        </>
       )}
     </div>
   )

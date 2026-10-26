@@ -6,6 +6,7 @@
  * Made in the USA | brand.lot-systems.com
  */
 
+import basicsRoutes from './basics-api.js'
 import { Op, Sequelize } from 'sequelize'
 import { FastifyInstance, FastifyRequest } from 'fastify'
 import seedrandom from 'seedrandom'
@@ -136,6 +137,7 @@ function generateCompassionateResponse(
 export default async (fastify: FastifyInstance) => {
   // Register User Operating System API routes
   registerOSRoutes(fastify)
+  fastify.register(basicsRoutes)
 
   // Admin diagnostic ping endpoint
   fastify.get('/ping', async (req, reply) => {

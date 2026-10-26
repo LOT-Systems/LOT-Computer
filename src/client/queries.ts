@@ -912,3 +912,18 @@ export const useStoryGeneration = createMutation<
     logId: string | null
   }
 >('post', '/api/story')
+
+// Basics (BASIC ration)
+export type BasicsRosterResponse = {
+  roster: {
+    state: 'USERSHIP' | 'PENDING' | 'ON_STRENGTH' | 'STEADY_STATE'
+    billingConfirmed: boolean
+    intake: Record<string, string> | null
+    cadenceStart: string | null
+  } | null
+  issues: { id: number; timestamp: string; kind: string; detail: string }[]
+}
+export const useBasicsRosterQuery = createQuery<BasicsRosterResponse>('/api/basics/roster')
+export const useBasicsUpgrade = createMutation<void, unknown>('post', '/api/basics/upgrade')
+export const useBasicsIntake = createMutation<Record<string, string>, unknown>('post', '/api/basics/intake')
+export const useBasicsStandDown = createMutation<void, unknown>('post', '/api/basics/stand-down')
