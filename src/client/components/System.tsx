@@ -410,6 +410,14 @@ export const System = React.memo(function SystemInner() {
     )
   }, [me])
 
+  // Render-stable rolls. These used to be re-rolled (Math.random) and re-gated
+  // inside the render IIFEs below, so any System re-render (weather, logs, SSE)
+  // could pop the Subscribe / Intentions widgets in and out. Roll once per mount
+  // and latch visibility for the life of the mount.
+  const intentionsCooldownRoll = React.useRef(Math.random())
+  const intentionsLatched = React.useRef(false)
+  const subscribeRoll = React.useRef(Math.random() < 0.2)
+
   // Simple, clean layout for non-paid accounts — no AI, just essentials
   if (!isPaidAccount) {
     return (
@@ -441,7 +449,9 @@ export const System = React.memo(function SystemInner() {
         </div>
 
         <div>
-          <TimeWidget />
+          <WidgetErrorBoundary name="Time">
+            <TimeWidget />
+          </WidgetErrorBoundary>
           {!!weather && (
             <>
               <Block label="Sky:">{weather?.description || 'Unknown'}</Block>
@@ -613,8 +623,12 @@ export const System = React.memo(function SystemInner() {
       </div>
 
       <div>
-        <TimeWidget />
-        <QuantumRandomWidget />
+        <WidgetErrorBoundary name="Time">
+          <TimeWidget />
+        </WidgetErrorBoundary>
+        <WidgetErrorBoundary name="Number">
+          <QuantumRandomWidget />
+        </WidgetErrorBoundary>
         {!!weather && (
           <>
             <Block label="Sky:">{weather?.description || 'Unknown'}</Block>
@@ -888,7 +902,7 @@ export const System = React.memo(function SystemInner() {
           const threeDaysMs = 3 * 24 * 60 * 60 * 1000
 
           // Random cooldown between 2-3 days
-          const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
+          const cooldownPeriod = twoDaysMs + intentionsCooldownRoll.current * (threeDaysMs - twoDaysMs)
           const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
 
           const intentionSuggestsIntentions = optimalWidget?.widget === 'intentions'
@@ -897,9 +911,10 @@ export const System = React.memo(function SystemInner() {
           // 1. User has an existing intention to display, OR
           // 2. Intention engine detects seeking-direction or morning-clarity patterns, OR
           // 3. Cooldown passed (fallback for periodic prompting)
-          if (hasIntention || intentionSuggestsIntentions || cooldownPassed) {
-            // Update last shown time
-            if (!lastShown || cooldownPassed || intentionSuggestsIntentions) {
+          if (intentionsLatched.current || hasIntention || intentionSuggestsIntentions || cooldownPassed) {
+            // Update last shown time (once per mount — the latch keeps the widget
+            // visible on re-render even though the cooldown now reads as unpassed)
+            if (!intentionsLatched.current && (!lastShown || cooldownPassed || intentionSuggestsIntentions)) {
               localStorage.setItem('intentions-last-shown', Date.now().toString())
             }
 
@@ -910,6 +925,7 @@ export const System = React.memo(function SystemInner() {
               localStorage.removeItem('intentions-quantum-reason')
             }
 
+            intentionsLatched.current = true
             return <div><IntentionsWidget /></div>
           }
 
@@ -937,8 +953,7 @@ export const System = React.memo(function SystemInner() {
           }
 
           // Random 20% chance to show when all conditions met
-          const shouldShow = Math.random() < 0.2
-          return shouldShow && <div><SubscribeWidget /></div>
+          return subscribeRoll.current && <div><SubscribeWidget /></div>
         })()}
       </WidgetErrorBoundary>
 
@@ -1010,11 +1025,11 @@ export const System = React.memo(function SystemInner() {
       {/* CQGS Biofield Engine Widgets */}
       <WidgetErrorBoundary name="Biofield Engine">
         <div className={cn('flex flex-col', density.sectionGap)}>
-          <QuantumStateWidget />
-          <PatternRecognitionWidget />
-          <AIFeedbackWidget />
-          <SignalStreamWidget />
-          <IntegrityWidget />
+          <LazyMount><QuantumStateWidget /></LazyMount>
+          <LazyMount><PatternRecognitionWidget /></LazyMount>
+          <LazyMount><AIFeedbackWidget /></LazyMount>
+          <LazyMount><SignalStreamWidget /></LazyMount>
+          <LazyMount><IntegrityWidget /></LazyMount>
         </div>
       </WidgetErrorBoundary>
 
@@ -1028,10 +1043,10 @@ export const System = React.memo(function SystemInner() {
           <CorrelatedIndexesWidget />
 
           {/* System Progress - Deployment info with feedback */}
-          <SystemProgressWidget />
+          <LazyMount><SystemProgressWidget /></LazyMount>
 
           {/* System Pulse - Real-time system metrics */}
-          <SystemPulseWidget />
+          <LazyMount><SystemPulseWidget /></LazyMount>
         </div>
       </WidgetErrorBoundary>
 

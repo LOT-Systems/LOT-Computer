@@ -24,11 +24,19 @@ export const Clock: React.FC<Props> = ({ format, interval }) => {
     if (interval) {
       // @ts-ignore
       loop.current = setInterval(
-        () => setState(dayjs().format(format)),
+        () => {
+          if (!document.hidden) setState(dayjs().format(format))
+        },
         interval
       )
     }
+    // Resync immediately when the tab returns instead of showing a stale time
+    const onVisible = () => {
+      if (!document.hidden) setState(dayjs().format(format))
+    }
+    document.addEventListener('visibilitychange', onVisible)
     return () => {
+      document.removeEventListener('visibilitychange', onVisible)
       if (loop.current) {
         clearInterval(loop.current)
       }
