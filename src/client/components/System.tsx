@@ -1009,17 +1009,20 @@ export const System = React.memo(function SystemInner() {
 
       {/* CQGS Biofield Engine Widgets */}
       <WidgetErrorBoundary name="Biofield Engine">
-        <div className={cn('flex flex-col', density.sectionGap)}>
-          <QuantumStateWidget />
-          <PatternRecognitionWidget />
-          <AIFeedbackWidget />
-          <SignalStreamWidget />
-          <IntegrityWidget />
-        </div>
+        <LazyMount>
+          <div className={cn('flex flex-col', density.sectionGap)}>
+            <QuantumStateWidget />
+            <PatternRecognitionWidget />
+            <AIFeedbackWidget />
+            <SignalStreamWidget />
+            <IntegrityWidget />
+          </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* CQGS Dashboard stack */}
       <WidgetErrorBoundary name="Dashboard">
+        <LazyMount>
         <div className={cn('flex flex-col', density.stackGap)}>
           {/* CQGS Dashboard - Bioethics health, performance, version */}
           <UserMetricsWidget />
@@ -1033,6 +1036,7 @@ export const System = React.memo(function SystemInner() {
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Architect — executive self-assembly telemetry, paid users only */}
