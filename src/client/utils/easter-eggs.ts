@@ -956,6 +956,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('vonnegut_day')
   }
 
+  // ── Calendar v26 — THE DUNGEON CALENDAR ──────────────────────────────────
+  // Gygax Day: July 27 — Gary Gygax born 1938
+  if (!hasBadge('gygax_day') && month === 7 && day === 27) {
+    awardBadge('gygax_day')
+    awarded.push('gygax_day')
+  }
+  // Tolkien Signal: January 3 — J.R.R. Tolkien born 1892
+  if (!hasBadge('tolkien_signal') && month === 1 && day === 3) {
+    awardBadge('tolkien_signal')
+    awarded.push('tolkien_signal')
+  }
+  // Dragon Signal: June 1 — Dragon Magazine Vol. 1 (1976)
+  if (!hasBadge('dragon_signal') && month === 6 && day === 1) {
+    awardBadge('dragon_signal')
+    awarded.push('dragon_signal')
+  }
+
   return awarded
 }
 
@@ -1619,6 +1636,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\btime[\s-]?machine\b|\btime[\s-]?traveler\b|\bh\.?g\.?[\s-]?wells\b|\bwar[\s-]?of[\s-]?the[\s-]?worlds\b/i, badge: 'wells_machine' },
   { patterns: /\bubik\b|\bpalmer[\s-]?eldritch\b|\btime[\s-]?out[\s-]?of[\s-]?joint\b|\bflow[\s-]?my[\s-]?tears\b/i,        badge: 'dick_time' },
   { patterns: /\bunstuck[\s-]?in[\s-]?time\b|\bbilly[\s-]?pilgrim\b|\bslaughterhouse\b|\bvonnegut\b/i,                        badge: 'vonnegut_stuck' },
+  // ── v28 THE DUNGEON DELVER word triggers ──────────────────────────────────
+  { patterns: /\bcritical[\s-]?success\b|\bscored[\s-]?a[\s-]?critical\b|\bperfect[\s-]?execution\b|\brolled[\s-]?perfectly\b|\bcrits?\b/i, badge: 'nat_twenty' },
+  { patterns: /\bsaving[\s-]?throw\b|\bmade[\s-]?the[\s-]?save\b|\bresist[\s-]?the[\s-]?pull\b|\bdodged[\s-]?the[\s-]?blow\b/i,              badge: 'saving_throw' },
+  { patterns: /\bleveled[\s-]?up\b|\bgained[\s-]?experience\b|\bnext[\s-]?level\b|\bcharacter[\s-]?growth\b|\bupgraded[\s-]?my\b/i,          badge: 'level_up_check' },
+  { patterns: /\brolling[\s-]?the[\s-]?dice\b|\bleft[\s-]?it[\s-]?to[\s-]?chance\b|\bdice[\s-]?fall\b|\brisk[\s-]?the[\s-]?roll\b/i,        badge: 'roll_for_it' },
+  { patterns: /\bdark[\s-]?corridor\b|\bwinding[\s-]?path[\s-]?down\b|\bcarved[\s-]?my[\s-]?way\b|\binto[\s-]?the[\s-]?depths\b|\blost[\s-]?in[\s-]?the\b/i, badge: 'dungeon_crawl' },
+  { patterns: /\blong[\s-]?arc\b|\bcharacter[\s-]?arc\b|\bstory[\s-]?arc\b|\brunning[\s-]?campaign\b|\bthe[\s-]?long[\s-]?campaign\b/i,       badge: 'campaign_log_badge' },
+  { patterns: /\bwearing[\s-]?many[\s-]?hats\b|\btwo[\s-]?paths[\s-]?at[\s-]?once\b|\bhybrid[\s-]?skill\b|\bboth[\s-]?roles\b|\bhyphenated[\s-]?identity\b/i, badge: 'multiclass_moment' },
+  { patterns: /\bnoticed[\s-]?something\b|\bpaying[\s-]?closer[\s-]?attention\b|\blooked[\s-]?closer\b|\bsituational[\s-]?awareness\b/i,      badge: 'perception_check' },
+  { patterns: /\bhit[\s-]?points\b|\brunning[\s-]?on[\s-]?fumes\b|\benergy[\s-]?depleted\b|\blow[\s-]?on[\s-]?reserves\b|\brunning[\s-]?empty\b/i, badge: 'hit_points_low' },
+  { patterns: /\bfull[\s-]?recovery\b|\brestorative[\s-]?sleep\b|\bdeep[\s-]?sleep[\s-]?night\b|\brested[\s-]?and[\s-]?restored\b|\blong[\s-]?rest\b/i, badge: 'long_rest_badge' },
+  { patterns: /\bkept[\s-]?going[\s-]?despite\b|\bendured[\s-]?the\b|\bstamina[\s-]?to\b|\bsheer[\s-]?persistence\b|\bconstitution[\s-]?to\b/i, badge: 'constitution_save' },
+  { patterns: /\bfinal[\s-]?encounter\b|\bdecisive[\s-]?moment\b|\bmoment[\s-]?of[\s-]?truth\b|\bnow[\s-]?or[\s-]?never\b|\bthis[\s-]?is[\s-]?the[\s-]?one\b/i, badge: 'final_encounter' },
+  // ── v25 Secret Boss — THE DRAGON'S VAULT word triggers ───────────────────
+  { patterns: /\bmoria\b|\bmines[\s-]?of[\s-]?moria\b|\byou[\s-]?shall[\s-]?not[\s-]?pass\b|\bbalrog\b|\bkhazad[\s-]?dum\b/i,               badge: 'tolkien_dungeon' },
+  { patterns: /\bgary[\s-]?gygax\b|\bpen[\s-]?and[\s-]?paper[\s-]?rpg\b|\btabletop[\s-]?rpg\b|\bdave[\s-]?arneson\b|\bpen[\s-]?and[\s-]?paper\b/i, badge: 'gygax_voice' },
+  { patterns: /\bdragon[\s-]?hoard\b|\bsmaug\b|\bancient[\s-]?dragon\b|\bfirebreather\b|\bye[\s-]?olde[\s-]?dragon\b/i,                     badge: 'dragon_hoard' },
 ]
 
 /**
@@ -3343,6 +3377,70 @@ export function checkTimeVaultBoss(journalText: string): BadgeType[] {
   }
   if (!hasBadge('vonnegut_stuck') && /\bunstuck[\s-]?in[\s-]?time\b|\bbilly[\s-]?pilgrim\b|\bslaughterhouse\b|\bvonnegut\b/i.test(journalText)) {
     if (awardBadge('vonnegut_stuck')) awarded.push('vonnegut_stuck')
+  }
+
+  return awarded
+}
+
+// ── v28 DUNGEON DELVER — behavioral detection ─────────────────────────────
+
+const DUNGEON_WORDS_V28: RegExp[] = [
+  /\bcritical[\s-]?success\b|\bscored[\s-]?a[\s-]?critical\b|\bperfect[\s-]?execution\b|\brolled[\s-]?perfectly\b/i,
+  /\bsaving[\s-]?throw\b|\bmade[\s-]?the[\s-]?save\b|\bresist[\s-]?the[\s-]?pull\b|\bdodged[\s-]?the[\s-]?blow\b/i,
+  /\bleveled[\s-]?up\b|\bgained[\s-]?experience\b|\bnext[\s-]?level\b|\bcharacter[\s-]?growth\b/i,
+  /\brolling[\s-]?the[\s-]?dice\b|\bleft[\s-]?it[\s-]?to[\s-]?chance\b|\bdice[\s-]?fall\b/i,
+  /\bdark[\s-]?corridor\b|\bwinding[\s-]?path[\s-]?down\b|\bcarved[\s-]?my[\s-]?way\b|\binto[\s-]?the[\s-]?depths\b/i,
+  /\blong[\s-]?arc\b|\bcharacter[\s-]?arc\b|\bstory[\s-]?arc\b|\brunning[\s-]?campaign\b/i,
+  /\bwearing[\s-]?many[\s-]?hats\b|\btwo[\s-]?paths[\s-]?at[\s-]?once\b|\bhybrid[\s-]?skill\b/i,
+  /\bnoticed[\s-]?something\b|\bpaying[\s-]?closer[\s-]?attention\b|\blooked[\s-]?closer\b/i,
+  /\bhit[\s-]?points\b|\brunning[\s-]?on[\s-]?fumes\b|\benergy[\s-]?depleted\b|\blow[\s-]?on[\s-]?reserves\b/i,
+  /\bfull[\s-]?recovery\b|\brestorative[\s-]?sleep\b|\bdeep[\s-]?sleep[\s-]?night\b|\brested[\s-]?and[\s-]?restored\b/i,
+  /\bkept[\s-]?going[\s-]?despite\b|\bendured[\s-]?the\b|\bstamina[\s-]?to\b|\bsheer[\s-]?persistence\b/i,
+  /\bfinal[\s-]?encounter\b|\bdecisive[\s-]?moment\b|\bmoment[\s-]?of[\s-]?truth\b|\bnow[\s-]?or[\s-]?never\b/i,
+]
+
+export function checkDungeonSession(journalText: string): BadgeType | null {
+  if (hasBadge('dungeon_session')) return null
+  const matchCount = DUNGEON_WORDS_V28.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('dungeon_session')
+    return 'dungeon_session'
+  }
+  return null
+}
+
+export function checkMarathonQuest(journalText: string): BadgeType | null {
+  if (hasBadge('marathon_quest')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 750) {
+    awardBadge('marathon_quest')
+    return 'marathon_quest'
+  }
+  return null
+}
+
+export function checkMidnightCampaign(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('midnight_campaign')) return null
+
+  const hour = new Date().getHours()
+  if (hour === 22) {
+    if (awardBadge('midnight_campaign')) return 'midnight_campaign'
+  }
+  return null
+}
+
+export function checkDragonVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+
+  if (!hasBadge('tolkien_dungeon') && /\bmoria\b|\bmines[\s-]?of[\s-]?moria\b|\byou[\s-]?shall[\s-]?not[\s-]?pass\b|\bbalrog\b|\bkhazad[\s-]?dum\b/i.test(journalText)) {
+    if (awardBadge('tolkien_dungeon')) awarded.push('tolkien_dungeon')
+  }
+  if (!hasBadge('gygax_voice') && /\bgary[\s-]?gygax\b|\bpen[\s-]?and[\s-]?paper[\s-]?rpg\b|\btabletop[\s-]?rpg\b|\bdave[\s-]?arneson\b/i.test(journalText)) {
+    if (awardBadge('gygax_voice')) awarded.push('gygax_voice')
+  }
+  if (!hasBadge('dragon_hoard') && /\bdragon[\s-]?hoard\b|\bsmaug\b|\bancient[\s-]?dragon\b|\bfirebreather\b|\bye[\s-]?olde[\s-]?dragon\b/i.test(journalText)) {
+    if (awardBadge('dragon_hoard')) awarded.push('dragon_hoard')
   }
 
   return awarded

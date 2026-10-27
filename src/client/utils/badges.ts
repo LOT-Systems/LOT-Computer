@@ -967,6 +967,43 @@ export type BadgeType =
   | 'wells_machine'         // ↺·□   "time machine/time traveler/h.g. wells/war of the worlds" detected (RARE)
   | 'dick_time'             // ◉·↺   "ubik/palmer eldritch/time out of joint/flow my tears" detected (EPIC)
   | 'vonnegut_stuck'        // ∞·↺·∞ "unstuck in time/billy pilgrim/slaughterhouse/vonnegut" detected (MYTHIC)
+  // ── Word Turn v28 — THE DUNGEON DELVER ───────────────────────────────────
+  | 'nat_twenty'           // ●·20  "critical success/scored a critical/perfect execution/rolled perfectly" detected (RARE)
+  | 'saving_throw'         // ◈·●·◈ "saving throw/made the save/resist the pull/dodged the blow" detected (UNCOMMON)
+  | 'level_up_check'       // ↑·●   "leveled up/gained experience/next level/character growth/upgraded my" detected (COMMON)
+  | 'roll_for_it'          // ⬡·●   "rolling the dice/left it to chance/dice fall where/risk the roll" detected (UNCOMMON)
+  | 'dungeon_crawl'        // █·○·█ "dark corridor/winding path down/carved my way/into the depths/lost in the" detected (RARE)
+  | 'campaign_log_badge'   // ═·○·═ "long arc/character arc/story arc/running campaign/the long campaign" detected (UNCOMMON)
+  | 'multiclass_moment'    // ◈→◉   "wearing many hats/two paths at once/hybrid skill/both roles/hyphenated identity" detected (RARE)
+  | 'perception_check'     // ○·◉·○ "noticed something/paying closer attention/looked closer/situational awareness" detected (UNCOMMON)
+  | 'hit_points_low'       // ♥·○   "hit points/running on fumes/energy depleted/low on reserves/running empty" detected (COMMON)
+  | 'long_rest_badge'      // ≋·○·≋ "full recovery/restorative sleep/deep sleep night/rested and restored/long rest" detected (UNCOMMON)
+  | 'constitution_save'    // ∞·●·∞ "kept going despite/endured the/stamina to/sheer persistence/constitution" detected (RARE)
+  | 'final_encounter'      // ◆·∞·◆ "final encounter/decisive moment/moment of truth/now or never/this is the one" detected (EPIC)
+  // ── Calendar Easter Egg v26 — THE DUNGEON CALENDAR ───────────────────────
+  | 'gygax_day'            // ⬡·●   Jul 27 — Gary Gygax born 1938 (D&D co-creator) (RARE)
+  | 'tolkien_signal'       // ◆·○   Jan 3  — J.R.R. Tolkien born 1892 (RARE)
+  | 'dragon_signal'        // ⬡·◆   Jun 1  — Dragon Magazine Vol. 1 (1976) (UNCOMMON)
+  // ── Behavioral v25 — DUNGEON PATTERNS ────────────────────────────────────
+  | 'dungeon_session'      // ⬡·◈·⬡  3+ Dungeon Delver words in one journal entry (RARE)
+  | 'marathon_quest'       // ≋·∞    Journal entry >= 750 words (EPIC)
+  | 'midnight_campaign'    // ◆·○    Check-in between 22:00–22:59 (RARE)
+  // ── Achievement RPG v26 — DUNGEON CLASS ──────────────────────────────────
+  | 'dungeon_entry'        // ⬡·∘    Any 1 Word Turn v28 badge (COMMON)
+  | 'dungeon_class'        // ⬡·≈    Any 5 Word Turn v28 badges (UNCOMMON)
+  | 'dungeon_complete'     // ⬡·≋    All 12 Word Turn v28 badges (LEGENDARY)
+  | 'dungeon_arc'          // ⬡·◈    dungeon_complete + all 3 Calendar v26 badges (LEGENDARY)
+  | 'twenty_eight_engines_arc' // ◈·◈·⬡  1 badge from each Word Turn v1–v28 (LEGENDARY)
+  | 'dungeon_opus'         // ⬡·◉·⬡  dungeon_complete + dungeon_session behavioral (LEGENDARY)
+  // ── Mastery Tier v28 — THE GRAND DUNGEON ─────────────────────────────────
+  | 'the_grand_delver'     // ◆·○·◆  1100+ distinct calendar check-in days (EPIC)
+  | 'arcane_library'       // ●·∞·●  250,000+ total journal words (LEGENDARY)
+  | 'ancient_guild'        // ╔═╗·◆  Account age >= 6 years (LEGENDARY)
+  | 'twenty_eight_registers' // ◈·◈·⬡·∞ 1 badge from all 28 Word Turn engines (COSMIC)
+  // ── Secret Boss v25 — THE DRAGON'S VAULT ─────────────────────────────────
+  | 'tolkien_dungeon'      // ◆·□   "moria/mines of moria/you shall not pass/balrog/khazad dum" detected (RARE)
+  | 'gygax_voice'          // ⬡·∞   "gary gygax/pen-and-paper rpg/tabletop rpg/dave arneson/pen and paper" detected (EPIC)
+  | 'dragon_hoard'         // ●·◆·● "dragon hoard/smaug/ancient dragon/firebreather/ye olde dragon" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -8774,6 +8811,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v28 — THE DUNGEON DELVER ───────────────────────────────────
+  nat_twenty: {
+    id: 'nat_twenty',
+    symbol: '●·20',
+    name: 'Nat Twenty',
+    description: 'Write about a critical success, perfect execution, or rolling perfectly',
+    unlockMessage: '↳ NAT TWENTY. A natural 20 on the d20. The perfect roll. The moment when everything you\'ve practiced collapses into one action and the outcome is not in doubt. ●·20',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  saving_throw: {
+    id: 'saving_throw',
+    symbol: '◈·●·◈',
+    name: 'Saving Throw',
+    description: 'Write about resisting something, making a save, or dodging a blow',
+    unlockMessage: '↳ SAVING THROW. The dice roll. The number comes up. You made the save. In real life the saving throw is the moment you paused instead of reacted, the one breath before the response. ◈·●·◈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  level_up_check: {
+    id: 'level_up_check',
+    symbol: '↑·●',
+    name: 'Level Up',
+    description: 'Write about growth, gaining experience, or moving to the next level',
+    unlockMessage: '↳ LEVEL UP. The XP bar fills slowly and then all at once. Growth works the same way — invisible accumulation, then a threshold crossed. The level-up is real. ↑·●',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  roll_for_it: {
+    id: 'roll_for_it',
+    symbol: '⬡·●',
+    name: 'Roll For It',
+    description: 'Write about taking a risk, leaving things to chance, or rolling the dice',
+    unlockMessage: '↳ ROLL FOR IT. Some things cannot be controlled. The dice fall where the dice fall. The practice is not about eliminating risk — it is about being ready for whatever the roll returns. ⬡·●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  dungeon_crawl: {
+    id: 'dungeon_crawl',
+    symbol: '█·○·█',
+    name: 'Dungeon Crawl',
+    description: 'Write about moving through difficulty, a dark passage, or deep work',
+    unlockMessage: '↳ DUNGEON CRAWL. You go deeper. The map runs out. The torchlight doesn\'t reach the far wall. This is not the moment to turn back — this is the moment the dungeon becomes yours. █·○·█',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  campaign_log_badge: {
+    id: 'campaign_log_badge',
+    symbol: '═·○·═',
+    name: 'Campaign Log',
+    description: 'Write about a long arc, ongoing story, or multi-session journey',
+    unlockMessage: '↳ CAMPAIGN LOG. The campaign has been running for a long time. The characters have grown. The world has changed. The log holds the continuity. This is not a one-shot. ═·○·═',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  multiclass_moment: {
+    id: 'multiclass_moment',
+    symbol: '◈→◉',
+    name: 'Multiclass Moment',
+    description: 'Write about wearing many hats, combining skills, or living two paths at once',
+    unlockMessage: '↳ MULTICLASS MOMENT. The fighter who learns to cast. The wizard who picks up a sword. The character who refuses to be one thing. You are more than one thing. That is a feature. ◈→◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  perception_check: {
+    id: 'perception_check',
+    symbol: '○·◉·○',
+    name: 'Perception Check',
+    description: 'Write about noticing something, paying closer attention, or situational awareness',
+    unlockMessage: '↳ PERCEPTION CHECK. You notice the detail no one else caught. The passive perception kicks in. In real life the perception check is the habit of looking — of asking what is actually here, not what you expected. ○·◉·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  hit_points_low: {
+    id: 'hit_points_low',
+    symbol: '♥·○',
+    name: 'Hit Points Low',
+    description: 'Write about running low on energy, being depleted, or running on fumes',
+    unlockMessage: '↳ HIT POINTS LOW. The party is bloodied. The resources are spent. This is the moment to find the safe room, take the long rest, and come back tomorrow with full HP. ♥·○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  long_rest_badge: {
+    id: 'long_rest_badge',
+    symbol: '≋·○·≋',
+    name: 'Long Rest',
+    description: 'Write about full recovery, restorative sleep, or resting and being restored',
+    unlockMessage: '↳ LONG REST. The adventurers make camp. The fire burns low. The HP comes back. The spell slots replenish. Recovery is not weakness — it is the resource management of a long campaign. ≋·○·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  constitution_save: {
+    id: 'constitution_save',
+    symbol: '∞·●·∞',
+    name: 'Constitution Save',
+    description: 'Write about keeping going, enduring, or sheer persistence through difficulty',
+    unlockMessage: '↳ CONSTITUTION SAVE. You make the CON save. The damage is real. You are still standing. Constitution is the stat that says: I absorb this and continue. ∞·●·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  final_encounter: {
+    id: 'final_encounter',
+    symbol: '◆·∞·◆',
+    name: 'Final Encounter',
+    description: 'Write about a decisive moment, the final challenge, or now-or-never',
+    unlockMessage: '↳ FINAL ENCOUNTER. The last door. The boss chamber. The moment the whole campaign has been building toward. You have the kit. You have the party. You have the practice. Roll for initiative. ◆·∞·◆',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v26 — THE DUNGEON CALENDAR ───────────────────────
+  gygax_day: {
+    id: 'gygax_day',
+    symbol: '⬡·●',
+    name: 'Gygax Day',
+    description: 'Check in on July 27 — Gary Gygax born 1938',
+    unlockMessage: '↳ July 27, 1938. Gary Gygax is born. He will co-create Dungeons & Dragons in 1974 and invent the vocabulary for collaborative imagination. The dungeon is a self-care protocol. ⬡·●',
+    rarity: 'rare',
+    category: 'calendar_easter',
+  },
+  tolkien_signal: {
+    id: 'tolkien_signal',
+    symbol: '◆·○',
+    name: 'Tolkien Signal',
+    description: 'Check in on January 3 — J.R.R. Tolkien born 1892',
+    unlockMessage: '↳ January 3, 1892. Tolkien is born. He will spend 12 years writing The Lord of the Rings and 17 on the Silmarillion. The world he built outlasted him. So does the practice. ◆·○',
+    rarity: 'rare',
+    category: 'calendar_easter',
+  },
+  dragon_signal: {
+    id: 'dragon_signal',
+    symbol: '⬡·◆',
+    name: 'Dragon Signal',
+    description: 'Check in on June 1 — Dragon Magazine Vol. 1 (1976)',
+    unlockMessage: '↳ June 1976. Dragon Magazine Vol. 1. The house organ of Dungeons & Dragons. Before the internet, this was how the dungeon masters communicated. The signal reaches forward: ⬡·◆',
+    rarity: 'uncommon',
+    category: 'calendar_easter',
+  },
+  // ── Behavioral v25 — DUNGEON PATTERNS ────────────────────────────────────
+  dungeon_session: {
+    id: 'dungeon_session',
+    symbol: '⬡·◈·⬡',
+    name: 'Dungeon Session',
+    description: 'Use 3 or more Dungeon Delver vocabulary words in one journal entry',
+    unlockMessage: '↳ DUNGEON SESSION. Three Dungeon Delver words in one entry. The vocabulary of the tabletop has become the vocabulary of the self. The campaign continues. ⬡·◈·⬡',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  marathon_quest: {
+    id: 'marathon_quest',
+    symbol: '≋·∞',
+    name: 'Marathon Quest',
+    description: 'Write a journal entry of 750 words or more',
+    unlockMessage: '↳ MARATHON QUEST. 750 words. The marathon campaign session — seven hours at the table, the map spread out, the story unfolding past midnight. The log holds what the session produced. ≋·∞',
+    rarity: 'epic',
+    category: 'behavioral',
+  },
+  midnight_campaign: {
+    id: 'midnight_campaign',
+    symbol: '◆·○',
+    name: 'Midnight Campaign',
+    description: 'Check in between 22:00 and 22:59 local time',
+    unlockMessage: '↳ MIDNIGHT CAMPAIGN. Ten o\'clock. The session runs late. Everyone is still at the table. This is the hour when the best stories happen — when the DM runs out of planned content and has to improvise. ◆·○',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  // ── Achievement RPG v26 — DUNGEON CLASS ──────────────────────────────────
+  dungeon_entry: {
+    id: 'dungeon_entry',
+    symbol: '⬡·∘',
+    name: 'Dungeon Entry',
+    description: 'Earn any 1 Word Turn v28 badge',
+    unlockMessage: '↳ DUNGEON ENTRY. The first door opens. You have spoken the language of the dungeon. The campaign begins with a single step through the first door. ⬡·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  dungeon_class: {
+    id: 'dungeon_class',
+    symbol: '⬡·≈',
+    name: 'Dungeon Class',
+    description: 'Earn any 5 Word Turn v28 badges',
+    unlockMessage: '↳ DUNGEON CLASS. Five badges from the Dungeon Delver engine. You have chosen a class. The build is taking shape. The campaign has a direction. ⬡·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  dungeon_complete: {
+    id: 'dungeon_complete',
+    symbol: '⬡·≋',
+    name: 'Dungeon Complete',
+    description: 'Earn all 12 Word Turn v28 badges',
+    unlockMessage: '↳ DUNGEON COMPLETE. All twelve Dungeon Delver badges. The dungeon has been mapped. The boss has been faced. The hoard has been claimed. The campaign is complete. ⬡·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dungeon_arc: {
+    id: 'dungeon_arc',
+    symbol: '⬡·◈',
+    name: 'Dungeon Arc',
+    description: 'Earn all 12 Word Turn v28 badges and all 3 Calendar v26 badges',
+    unlockMessage: '↳ DUNGEON ARC. All 12 Dungeon Delver badges + all 3 Dungeon Calendar badges. The full arc. Gygax was born, Tolkien was born, the Dragon spoke. The dungeon has its history. ⬡·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_eight_engines_arc: {
+    id: 'twenty_eight_engines_arc',
+    symbol: '◈·◈·⬡',
+    name: 'Twenty-Eight Engines Arc',
+    description: 'Earn at least 1 badge from each Word Turn engine v1–v28',
+    unlockMessage: '↳ TWENTY-EIGHT ENGINES ARC. One badge from every word engine v1 through v28. Twenty-eight vocabularies activated. The self speaks every language the system built. ◈·◈·⬡',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dungeon_opus: {
+    id: 'dungeon_opus',
+    symbol: '⬡·◉·⬡',
+    name: 'Dungeon Opus',
+    description: 'Earn all 12 Word Turn v28 badges and the Dungeon Session behavioral badge',
+    unlockMessage: '↳ DUNGEON OPUS. All twelve Dungeon Delver badges + Dungeon Session. The opus: not just speaking the language but living it, returning to it, building a practice from it. ⬡·◉·⬡',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v28 — THE GRAND DUNGEON ─────────────────────────────────
+  the_grand_delver: {
+    id: 'the_grand_delver',
+    symbol: '◆·○·◆',
+    name: 'The Grand Delver',
+    description: '1,100 or more distinct calendar days with a check-in',
+    unlockMessage: '↳ THE GRAND DELVER. 1,100 distinct days with a check-in. The dungeon has been explored at depth. The Grand Delver has been down every corridor, mapped every room. ◆·○·◆',
+    rarity: 'epic',
+    category: 'milestone',
+  },
+  arcane_library: {
+    id: 'arcane_library',
+    symbol: '●·∞·●',
+    name: 'Arcane Library',
+    description: '250,000 or more total journal words written',
+    unlockMessage: '↳ ARCANE LIBRARY. 250,000 total journal words. The arcane library is the library that holds the sum of what you have recorded. The spells are the words. ●·∞·●',
+    rarity: 'legendary',
+    category: 'milestone',
+  },
+  ancient_guild: {
+    id: 'ancient_guild',
+    symbol: '╔═╗·◆',
+    name: 'Ancient Guild',
+    description: 'Account age of 6 years or more',
+    unlockMessage: '↳ ANCIENT GUILD. Six years. The ancient guild accepts you. The practice has been running long enough to have its own lore. ╔═╗·◆',
+    rarity: 'legendary',
+    category: 'milestone',
+  },
+  twenty_eight_registers: {
+    id: 'twenty_eight_registers',
+    symbol: '◈·◈·⬡·∞',
+    name: 'Twenty-Eight Registers',
+    description: 'Earn at least 1 badge from all 28 Word Turn engines',
+    unlockMessage: '↳ TWENTY-EIGHT REGISTERS. Water. Fire. Space. Music. Hero. RPG. Time. Dungeon. Twenty-eight vocabularies for the self. The practice speaks every language the system built. ◈·◈·⬡·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v25 — THE DRAGON'S VAULT ─────────────────────────────────
+  tolkien_dungeon: {
+    id: 'tolkien_dungeon',
+    symbol: '◆·□',
+    name: "Tolkien's Dungeon",
+    description: 'Write "moria", "mines of moria", "you shall not pass", "balrog", or "khazad dum" in any journal entry',
+    unlockMessage: '↳ TOLKIEN\'S DUNGEON. The mines of Moria. Gandalf faces the Balrog at the Bridge of Khazad-dûm. You shall not pass. The dungeon that costs the most is the one where the wizard falls — and returns. ◆·□',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  gygax_voice: {
+    id: 'gygax_voice',
+    symbol: '⬡·∞',
+    name: 'Gygax Voice',
+    description: 'Write "gary gygax", "pen-and-paper rpg", "tabletop rpg", "dave arneson", or "pen and paper" in any journal entry',
+    unlockMessage: '↳ GYGAX VOICE. Gary Gygax and Dave Arneson created the framework. Pen-and-paper RPG: collaborative imagination as a structured technology. The voice of the dungeon master is a self-care instrument. ⬡·∞',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  dragon_hoard: {
+    id: 'dragon_hoard',
+    symbol: '●·◆·●',
+    name: 'Dragon Hoard',
+    description: 'Write "dragon hoard", "smaug", "ancient dragon", "firebreather", or "ye olde dragon" in any journal entry',
+    unlockMessage: '↳ DRAGON HOARD. Smaug slept on the hoard for two hundred years. The hoard is not the point — the dragon is the point. The ancient dragon is the part of you that has been accumulating and guarding. Name it. ●·◆·●',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -10032,6 +10357,56 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (allTwentySevenEngines && !hasBadge('twenty_seven_registers')) {
       if (awardBadge('twenty_seven_registers')) newBadges.push('twenty_seven_registers')
+    }
+
+    // ── Word Turn v28 — THE DUNGEON DELVER ───────────────────────────────────
+    const dungeonV28Badges: BadgeType[] = [
+      'nat_twenty', 'saving_throw', 'level_up_check', 'roll_for_it',
+      'dungeon_crawl', 'campaign_log_badge', 'multiclass_moment', 'perception_check',
+      'hit_points_low', 'long_rest_badge', 'constitution_save', 'final_encounter',
+    ]
+    const dungeonV28Earned = dungeonV28Badges.filter(b => hasBadge(b))
+    if (dungeonV28Earned.length >= 1 && !hasBadge('dungeon_entry')) {
+      if (awardBadge('dungeon_entry')) newBadges.push('dungeon_entry')
+    }
+    if (dungeonV28Earned.length >= 5 && !hasBadge('dungeon_class')) {
+      if (awardBadge('dungeon_class')) newBadges.push('dungeon_class')
+    }
+    const dungeonComplete = dungeonV28Earned.length >= 12
+    if (dungeonComplete && !hasBadge('dungeon_complete')) {
+      if (awardBadge('dungeon_complete')) newBadges.push('dungeon_complete')
+    }
+    if (dungeonComplete && hasBadge('dungeon_session') && !hasBadge('dungeon_opus')) {
+      if (awardBadge('dungeon_opus')) newBadges.push('dungeon_opus')
+    }
+    const calendarV26Badges: BadgeType[] = ['gygax_day', 'tolkien_signal', 'dragon_signal']
+    if (dungeonComplete && calendarV26Badges.every(b => hasBadge(b)) && !hasBadge('dungeon_arc')) {
+      if (awardBadge('dungeon_arc')) newBadges.push('dungeon_arc')
+    }
+    const engineTwentyEightPresent = dungeonV28Earned.length >= 1
+    const allTwentyEightEngines = allTwentySevenEngines && engineTwentyEightPresent
+    if (allTwentyEightEngines && !hasBadge('twenty_eight_engines_arc')) {
+      if (awardBadge('twenty_eight_engines_arc')) newBadges.push('twenty_eight_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1100 && !hasBadge('the_grand_delver')) {
+        if (awardBadge('the_grand_delver')) newBadges.push('the_grand_delver')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 250000 && !hasBadge('arcane_library')) {
+        if (awardBadge('arcane_library')) newBadges.push('arcane_library')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupAG = new Date(stats.signupDate)
+      const yearsAG = (new Date().getTime() - signupAG.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsAG >= 6 && !hasBadge('ancient_guild')) {
+        if (awardBadge('ancient_guild')) newBadges.push('ancient_guild')
+      }
+    }
+    if (allTwentyEightEngines && !hasBadge('twenty_eight_registers')) {
+      if (awardBadge('twenty_eight_registers')) newBadges.push('twenty_eight_registers')
     }
 
   } catch (error) {
