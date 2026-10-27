@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getAstrologyReading } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -203,29 +203,36 @@ export const System = React.memo(function SystemInner() {
   }, [])
 
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
-  // rokuyo), not a personal natal chart.
-  const astrology = React.useMemo(() => {
-    const now = new Date()
-    const hourlyZodiac = getHourlyZodiac(now)
-    const westernZodiac = getWesternZodiac(now)
-    const moonPhase = getMoonPhase(now)
-    const rokuyo = getRokuyo(now)
-
-    return {
-      hourlyZodiac,
-      westernZodiac,
-      moonPhase: moonPhase.phase,
-      moonIllumination: moonPhase.illumination,
-      rokuyo,
-    }
+  // rokuyo), not a personal natal chart. Personalized to the user's saved
+  // timeZone (same basis as the Logs snapshot), device-local when unset.
+  const userTimeZone = me?.timeZone || null
+  const astrology = React.useMemo(
+    () => getAstrologyReading(new Date(), userTimeZone),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+    [astrologyTick, userTimeZone]
+  )
+
+  // Logs synchronization: entries stamped with today's rokuyo reading
+  // (same user-timeZone day), so the block reflects the journal.
+  const astrologyLogsToday = React.useMemo(() => {
+    const dayKey = (d: Date) => {
+      try {
+        return new Intl.DateTimeFormat('en-CA', { timeZone: userTimeZone || undefined }).format(d)
+      } catch {
+        return d.toDateString()
+      }
+    }
+    const today = dayKey(new Date())
+    return logs.filter(
+      log => log.context?.astroRokuyo === astrology.rokuyo && dayKey(new Date(log.createdAt)) === today
+    ).length
+  }, [logs, astrology.rokuyo, userTimeZone, astrologyTick])
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
   React.useEffect(() => {
     if (typeof window === 'undefined') return
-    const today = dayjs().format('YYYY-MM-DD')
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: userTimeZone || undefined }).format(new Date())
     const lastRecordedKey = 'astrology_signal_date'
     if (localStorage.getItem(lastRecordedKey) === today) return
     recordAstrologySignal(
@@ -236,7 +243,7 @@ export const System = React.memo(function SystemInner() {
       astrology.westernZodiac
     )
     localStorage.setItem(lastRecordedKey, today)
-  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac])
+  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac, userTimeZone])
 
   const answerLogs = React.useMemo(() => {
     return logs.filter(log => log.event === 'answer')
@@ -465,7 +472,7 @@ export const System = React.memo(function SystemInner() {
         <div>
           <Block label="Astrology:">
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%){astrologyLogsToday > 0 && ` • ${astrologyLogsToday} logged`}
             </div>
           </Block>
         </div>
@@ -671,7 +678,7 @@ export const System = React.memo(function SystemInner() {
         >
           {astrologyView === 'astrology' ? (
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%){astrologyLogsToday > 0 && ` • ${astrologyLogsToday} logged`}
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>
