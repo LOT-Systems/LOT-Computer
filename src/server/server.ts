@@ -28,6 +28,7 @@ import authRoutes from './routes/auth.js'
 import apiRoutes from './routes/api.js'
 import adminApiRoutes from './routes/admin-api.js'
 import publicApiRoutes from './routes/public-api.js'
+import { registerBasicPublic } from './routes/basic-public.js'
 
 const CWD = process.cwd()
 
@@ -255,6 +256,7 @@ fastify.register(async (fastify: FastifyInstance) => {
 
     // Client app / index page
     fastify.register(async (fastify) => {
+      registerBasicPublic(fastify)
       // Note: /u/ routes are registered at top level (lines 131-191)
 
       KNOWN_CLIENT_ROUTES.forEach((route) => {
