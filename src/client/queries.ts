@@ -895,6 +895,7 @@ export const usePrayerScripture = createMutation<
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    period?: 'day' | 'week' | 'month' | 'year'
     quantumState?: {
       energy?: string
       clarity?: string
@@ -912,3 +913,12 @@ export const useStoryGeneration = createMutation<
     logId: string | null
   }
 >('post', '/api/story')
+
+// ============================================================================
+// ARCADE — gamified user evolution (/rank)
+// ============================================================================
+
+export const useArcadeRank = createMutation<
+  Record<string, never>,
+  { rank: string; level: number; xp: number }
+>('post', '/api/rank')
