@@ -173,6 +173,11 @@ their attention.
 04 // THE HAPTIC NOTIFICATION LANGUAGE
 --------------------------------------------------------------------------------
 
+  ERRATUM (2026-10-27, cycle 02): the HOP/LEAP geometry below is internally
+  inconsistent (a 40 mm range at 5-15 deg bias needs a 37-114 mm apex, not
+  <10 mm). Corrected in LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md Sections 03 and 10.
+  The text below is left as written; the R02 values supersede it.
+
 Every motion the cube performs corresponds to exactly one signal class
 from the operator's Index of Systems (docs/corporate/LOT-CUBIQ-OPERATOR.md,
 Section 03). v.0 ships four gestures, all built from the single hop
@@ -320,6 +325,25 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE STARTLE-SAFE EVENING CLOSE               2026-10-27
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, former night-shift ER paramedic with the
+  trauma-informed protocol active (LOT_PTSD_Protocol.md). For this operator a
+  phone buzz after dark lands like a pager; a cube that hops at 22:40 for a
+  rare badge would be a pager with better industrial design.
+
+  At sunset the cube enters QUIET MODE: HOP and LEAP are disabled in firmware,
+  not softened. The 20:15 badge is held for morning. At 22:00 the evening
+  close fires; the cube runs a 3-second rising tremor (a knock before
+  entering), then one SETTLE — two seconds of standing pressure, no motion.
+  The operator rests a hand on the cube. Pickup is the acknowledgment: no
+  swipe, no dismiss. If they decline the 3-minute close, "seen, declined" is
+  logged and the cube stays silent until morning. A rising decline rate
+  lowers cube cadence via QI·46 instead of escalating.
+
+  Full derivation and binding requirements UC02-R1…R6:
+  docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md, Section 07.
 
 --------------------------------------------------------------------------------
 08 // BRAND
