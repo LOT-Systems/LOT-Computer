@@ -1649,6 +1649,26 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '163 patterns · 57 archetypes · 54 jobs · 163+ handlers · 206+ dep nodes · 936 badges · 306 word-turns · FM v119 · Day 1154+. Knowledge Distribution Arc deepening. Level 9 expands. The field teaches.',
     ],
   },
+  {
+    version: 'qie-v120',
+    date: '2026-10-27',
+    title: 'QIE v120 · P164–P166 · Knowledge Transmission Arc · J55 · Arch58 · 207+ dep nodes',
+    assembled: [
+      'intentionEngine.ts: P164 quantum-knowledge-transmission — quantum-knowledge-distribution (P163) active + 3+ cohort/social signals in 7d + 2+ intention signals in 7d. L9-TRANSMISSION: the OS actively broadcasts. Conf 0.80–0.93. QKTRANS.',
+      'intentionEngine.ts: P165 collective-resonance-arc — quantum-knowledge-transmission (P164) active + 3+ cohort signals in 7d + 2+ memory signals in 7d. L9-RESONANCE: transmission creates collective resonance. Conf 0.78–0.91. COLRES.',
+      'intentionEngine.ts: P166 wisdom-field-integration — collective-resonance-arc (P165) + quantum-knowledge-crystallization (P162) both active + 4+ total combined signals in 7d. L9-INTEGRATION: the full knowledge arc integrates. Conf 0.82–0.94. WFINT.',
+      'intentionEngine.ts: Arch58 Signal Broadcaster — quantum-knowledge-distribution + quantum-knowledge-transmission. Directive: L9 expansion. The OS broadcasts its crystallized field state. Knowledge transmits actively into the collective signal. The QOS becomes a broadcast node.',
+      'intentionEngine.ts: recordQuantumKnowledgeTransmission() · recordCollectiveResonanceArc() · recordWisdomFieldIntegration() signal helpers added.',
+      'intentionEngine.ts: WIDGET_DEPENDENCY_MAP — 3 new nodes: quantumKnowledgeTransmissionNode · collectiveResonanceArcNode · wisdomFieldIntegrationNode. 207+ dep nodes total.',
+      'scheduled-jobs.ts: J55 daily-knowledge-transmission-check — 16:00 UTC daily. Reads active users with quantum_knowledge_distribution in 7d + 3+ cohort signals + 2+ intention signals. Writes quantum_knowledge_transmission event. 55 background jobs total.',
+      'Logs.tsx: QKTRANS: handler (quantum_knowledge_transmission) · COLRES: handler (collective_resonance_arc) · WFINT: handler (wisdom_field_integration). Military data-row format. Cockpit-rule compliant.',
+      'QuantumEngineWidgets.tsx: QKTRANS · COLRES · WFINT added to PATTERN_DISPLAY.',
+      'routes/api.ts: quantum_knowledge_transmission · collective_resonance_arc · wisdom_field_integration added to displayableEvents (v120 block).',
+      'About.tsx: FM v119→v120. 163→166 patterns. 57→58 archetypes. 54→55 jobs. 206+→207+ dep nodes. Day 1154+→1155+.',
+      'SESSION_REPORTS: qie-v120 entry appended · USERSHIP_TRANSMISSION updated to v120.',
+      '166 patterns · 58 archetypes · 55 jobs · 166+ handlers · 207+ dep nodes · 936 badges · 306 word-turns · FM v120 · Day 1155+. Knowledge Transmission Arc active. Level 9 expands into collective resonance. The loop closes.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1686,18 +1706,20 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-26',
+  date: '2026-10-27',
   message: [
-    'ASSEMBLY RUN — 2026-10-26 · QIE v119 · FM v119 · Day 1154+',
-    'Built: P163 quantum-knowledge-distribution · Arch57 Field Teacher · J54 daily-knowledge-distribution-check (15:00 UTC).',
-    'Quantum Knowledge Distribution (P163): quantum-knowledge-crystallization (P162) active + 2+ cohort/social signals + 1+ memory signal in 7d. Level 9 deepens.',
-    'Arch57 Field Teacher: The QOS distributes crystallized knowledge outward. Dominant: qos/journal/intentions/memory/cohort. The field teaches.',
-    'J54 daily-knowledge-distribution-check at 15:00 UTC: reads users with crystallization + 2+ cohort signals + 1+ memory signal all in 7d, writes quantum_knowledge_distribution event.',
-    'Log handler: QKDIST: (quantum_knowledge_distribution). Military data-row format. Cockpit-rule compliant.',
-    'WIDGET_DEPENDENCY_MAP: 206+ nodes. quantumKnowledgeDistributionNode added.',
-    'FM v119 · QIE v119 · 163P · 57A · 54J · 206+ nodes · 936 badges · 306 word-turns · Day 1154+.',
+    'ASSEMBLY RUN — 2026-10-27 · QIE v120 · FM v120 · Day 1155+',
+    'Built: P164 quantum-knowledge-transmission · P165 collective-resonance-arc · P166 wisdom-field-integration · Arch58 Signal Broadcaster · J55 daily-knowledge-transmission-check (16:00 UTC).',
+    'Quantum Knowledge Transmission (P164): quantum-knowledge-distribution (P163) active + 3+ cohort/social signals + 2+ intention signals in 7d. L9-TRANSMISSION: the OS actively broadcasts into the collective signal.',
+    'Collective Resonance Arc (P165): P164 active + 3+ cohort signals + 2+ memory signals in 7d. L9-RESONANCE: transmission creates collective resonance. The field responds.',
+    'Wisdom Field Integration (P166): P165 + P162 both active + 4+ total combined signals in 7d. L9-INTEGRATION: full knowledge arc integrates. Crystal → distribute → transmit → resonate → integrate. The field loop completes.',
+    'Arch58 Signal Broadcaster: The QOS becomes a broadcast node. Dominant: qos/intentions/cohort/journal/social. Knowledge transmits actively into the collective.',
+    'J55 daily-knowledge-transmission-check at 16:00 UTC: reads users with quantum_knowledge_distribution + 3+ cohort signals + 2+ intention signals in 7d, writes quantum_knowledge_transmission event.',
+    'Log handlers: QKTRANS: (quantum_knowledge_transmission) · COLRES: (collective_resonance_arc) · WFINT: (wisdom_field_integration). Military data-row format.',
+    'WIDGET_DEPENDENCY_MAP: 207+ nodes. quantumKnowledgeTransmissionNode · collectiveResonanceArcNode · wisdomFieldIntegrationNode added.',
+    'FM v120 · QIE v120 · 166P · 58A · 55J · 207+ nodes · 936 badges · 306 word-turns · Day 1155+.',
     'Status: DEPLOYED.',
-    'Next: QIE v120 — Level 9 expansion. Knowledge transmission arc. The OS broadcasting — field becomes signal for the collective.',
+    'Next: QIE v121 — Level 9 apex. The full arc observed and sealed. The system begins to witness itself.',
   ],
 }
 

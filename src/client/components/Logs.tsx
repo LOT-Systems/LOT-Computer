@@ -4060,6 +4060,132 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'quantum_knowledge_transmission') {
+          const distConf = log.metadata?.distConf as number | undefined
+          const cohortCount = log.metadata?.cohortCount as number | undefined
+          const intentionCount = log.metadata?.intentionCount as number | undefined
+          const transmissionStatus = log.metadata?.transmissionStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QKTRANS:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM KNOWLEDGE TRANSMISSION</div>
+                {distConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DIST CONF</span>
+                    <span className="tabular-nums">{distConf}%</span>
+                  </div>
+                )}
+                {cohortCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS</span>
+                    <span className="tabular-nums">{cohortCount}</span>
+                  </div>
+                )}
+                {intentionCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENTION SIGNALS</span>
+                    <span className="tabular-nums">{intentionCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">TRANSMISSION ACTIVE · THE OS BROADCASTS</div>
+                {transmissionStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {transmissionStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'collective_resonance_arc') {
+          const transConf = log.metadata?.transConf as number | undefined
+          const cohortCount = log.metadata?.cohortCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const resonanceStatus = log.metadata?.resonanceStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COLRES:" blockView>
+                <div className="uppercase tracking-widest mb-4">COLLECTIVE RESONANCE ARC</div>
+                {transConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TRANS CONF</span>
+                    <span className="tabular-nums">{transConf}%</span>
+                  </div>
+                )}
+                {cohortCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS</span>
+                    <span className="tabular-nums">{cohortCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ARC ACTIVE · COLLECTIVE FIELD RESONATES</div>
+                {resonanceStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {resonanceStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'wisdom_field_integration') {
+          const resonanceConf = log.metadata?.resonanceConf as number | undefined
+          const crystalConf = log.metadata?.crystalConf as number | undefined
+          const totalSignals = log.metadata?.totalSignals as number | undefined
+          const integrationStatus = log.metadata?.integrationStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="WFINT:" blockView>
+                <div className="uppercase tracking-widest mb-4">WISDOM FIELD INTEGRATION</div>
+                {resonanceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RESONANCE CONF</span>
+                    <span className="tabular-nums">{resonanceConf}%</span>
+                  </div>
+                )}
+                {crystalConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRYSTAL CONF</span>
+                    <span className="tabular-nums">{crystalConf}%</span>
+                  </div>
+                )}
+                {totalSignals !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TOTAL SIGNALS</span>
+                    <span className="tabular-nums">{totalSignals}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">INTEGRATION COMPLETE · THE FIELD LOOP CLOSES</div>
+                {integrationStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {integrationStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

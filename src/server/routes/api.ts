@@ -1231,6 +1231,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_knowledge_crystallization',
       // v119: quantum knowledge distribution (P163)
       'quantum_knowledge_distribution',
+      // v120: quantum knowledge transmission (P164), collective resonance arc (P165), wisdom field integration (P166)
+      'quantum_knowledge_transmission',
+      'collective_resonance_arc',
+      'wisdom_field_integration',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

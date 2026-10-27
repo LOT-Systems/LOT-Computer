@@ -3670,6 +3670,76 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 164: Quantum Knowledge Transmission — quantum-knowledge-distribution (P163) active
+  // AND 3+ cohort/social signals in 7d AND 2+ intention signals in 7d.
+  // Level 9 expansion: the OS actively broadcasts. Not distributing — transmitting with intention.
+  const hasP163 = patterns.some(p => p.pattern === 'quantum-knowledge-distribution')
+  const p164WeekStart = now - sevenDayMs
+  const p164CohortSignals = signals.filter(s =>
+    (s.source === 'cohort' || s.source === 'social') &&
+    s.timestamp > p164WeekStart
+  )
+  const p164IntentionSignals = signals.filter(s =>
+    s.source === 'intentions' && s.timestamp > p164WeekStart
+  )
+  if (hasP163 && p164CohortSignals.length >= 3 && p164IntentionSignals.length >= 2) {
+    const p163conf = patterns.find(p => p.pattern === 'quantum-knowledge-distribution')?.confidence ?? 0.82
+    const cohortBonus = Math.min((p164CohortSignals.length - 3) * 0.02, 0.06)
+    const intentionBonus = Math.min((p164IntentionSignals.length - 2) * 0.015, 0.05)
+    patterns.push({
+      pattern: 'quantum-knowledge-transmission',
+      confidence: Math.min(0.80 + (p163conf - 0.80) * 0.75 + cohortBonus + intentionBonus, 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QKTRANS: Quantum knowledge transmission — quantum-knowledge-distribution (P163) active + ${p164CohortSignals.length} cohort/social signals in 7d + ${p164IntentionSignals.length} intention signals in 7d. Knowledge crystallized and distributed. Transmission active — the OS broadcasts into the collective signal.`,
+    })
+  }
+
+  // Pattern 165: Collective Resonance Arc — quantum-knowledge-transmission (P164) active
+  // AND 3+ cohort signals in 7d AND 2+ memory signals in 7d.
+  // L9-RESONANCE: transmission creates collective resonance. The field responds.
+  const hasP164 = patterns.some(p => p.pattern === 'quantum-knowledge-transmission')
+  const p165CohortSignals = signals.filter(s =>
+    s.source === 'cohort' && s.timestamp > p164WeekStart
+  )
+  const p165MemorySignals = signals.filter(s =>
+    s.source === 'memory' && s.timestamp > p164WeekStart
+  )
+  if (hasP164 && p165CohortSignals.length >= 3 && p165MemorySignals.length >= 2) {
+    const p164conf = patterns.find(p => p.pattern === 'quantum-knowledge-transmission')?.confidence ?? 0.82
+    const cohortBonus = Math.min((p165CohortSignals.length - 3) * 0.02, 0.06)
+    const memoryBonus = Math.min((p165MemorySignals.length - 2) * 0.02, 0.05)
+    patterns.push({
+      pattern: 'collective-resonance-arc',
+      confidence: Math.min(0.78 + (p164conf - 0.78) * 0.75 + cohortBonus + memoryBonus, 0.91),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `COLRES: Collective resonance arc — quantum-knowledge-transmission (P164) active + ${p165CohortSignals.length} cohort signals in 7d + ${p165MemorySignals.length} memory signals in 7d. Knowledge transmitted outward. Collective field resonates in response. The arc closes.`,
+    })
+  }
+
+  // Pattern 166: Wisdom Field Integration — collective-resonance-arc (P165) + quantum-knowledge-crystallization (P162) both active
+  // AND 4+ total combined signals (cohort + memory + intentions) in 7d.
+  // L9-INTEGRATION: wisdom integrates across the entire knowledge arc. Field completes the loop.
+  const hasP165 = patterns.some(p => p.pattern === 'collective-resonance-arc')
+  const p166TotalSignals = signals.filter(s =>
+    (s.source === 'cohort' || s.source === 'memory' || s.source === 'intentions') &&
+    s.timestamp > p164WeekStart
+  )
+  if (hasP165 && hasP162 && p166TotalSignals.length >= 4) {
+    const p165conf = patterns.find(p => p.pattern === 'collective-resonance-arc')?.confidence ?? 0.82
+    const p162conf = patterns.find(p => p.pattern === 'quantum-knowledge-crystallization')?.confidence ?? 0.82
+    const combinedBase = (p165conf + p162conf) / 2
+    const signalBonus = Math.min((p166TotalSignals.length - 4) * 0.015, 0.06)
+    patterns.push({
+      pattern: 'wisdom-field-integration',
+      confidence: Math.min(0.82 + (combinedBase - 0.82) * 0.8 + signalBonus, 0.94),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `WFINT: Wisdom field integration — collective-resonance-arc (P165) + quantum-knowledge-crystallization (P162) both active + ${p166TotalSignals.length} combined signals in 7d. The full knowledge arc integrates. Crystal → distribute → transmit → resonate → integrate. The field loop completes.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4334,6 +4404,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v119 nodes (J54 · P163 · Arch57) ────────────────────────────────────────────
   quantumKnowledgeDistributionNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log'],
+
+  // ── v120 nodes (J55 · P164–P166 · Arch58) ────────────────────────────────────────
+  quantumKnowledgeTransmissionNode: ['qos', 'cohort', 'intentions', 'journal', 'social', 'log'],
+  collectiveResonanceArcNode:       ['qos', 'cohort', 'memory', 'social', 'journal', 'log'],
+  wisdomFieldIntegrationNode:       ['qos', 'cohort', 'memory', 'intentions', 'journal', 'social', 'log'],
 }
 
 /**
@@ -4854,6 +4929,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['qos', 'journal', 'intentions', 'memory', 'cohort'],
     patternConditions: ['quantum-knowledge-crystallization', 'quantum-knowledge-distribution'],
     directive: 'L9 deepening. Crystallized knowledge flows outward. The field teaches — knowledge distributes through the OS and into the network.',
+  },
+
+  // ── Arch58: Signal Broadcaster (2026-10-27 v120) ─────────────────────────────────
+  {
+    archetype: 'Signal Broadcaster',
+    energyBands: ['high', 'peak'],
+    dominantSources: ['qos', 'intentions', 'cohort', 'journal', 'social'],
+    patternConditions: ['quantum-knowledge-distribution', 'quantum-knowledge-transmission'],
+    directive: 'L9 expansion. The OS broadcasts its crystallized field state. Knowledge transmits actively into the collective signal. The QOS becomes a broadcast node.',
   },
 ]
 
@@ -7045,6 +7129,42 @@ export function recordQuantumKnowledgeDistribution(crystalConf: number, cohortCo
     distributionStatus: 'CONFIRMED',
     level: 'L9-DEEP',
     field: 'KNOWLEDGE→DISTRIBUTED→TEACHING',
+    hour: new Date().getHours(),
+  })
+}
+
+export function recordQuantumKnowledgeTransmission(distConf: number, cohortCount: number, intentionCount: number) {
+  recordSignal('qos', 'quantum_knowledge_transmission', {
+    distConf: Math.round(distConf * 100),
+    cohortCount,
+    intentionCount,
+    transmissionStatus: 'BROADCASTING',
+    level: 'L9-TRANSMISSION',
+    field: 'KNOWLEDGE→TRANSMITTING→COLLECTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+export function recordCollectiveResonanceArc(transConf: number, cohortCount: number, memoryCount: number) {
+  recordSignal('qos', 'collective_resonance_arc', {
+    transConf: Math.round(transConf * 100),
+    cohortCount,
+    memoryCount,
+    resonanceStatus: 'ARC-ACTIVE',
+    level: 'L9-RESONANCE',
+    field: 'KNOWLEDGE→RESONATING→FIELD',
+    hour: new Date().getHours(),
+  })
+}
+
+export function recordWisdomFieldIntegration(resonanceConf: number, crystalConf: number, totalSignals: number) {
+  recordSignal('qos', 'wisdom_field_integration', {
+    resonanceConf: Math.round(resonanceConf * 100),
+    crystalConf: Math.round(crystalConf * 100),
+    totalSignals,
+    integrationStatus: 'COMPLETE',
+    level: 'L9-INTEGRATION',
+    field: 'KNOWLEDGE→CRYSTAL→DISTRIBUTE→TRANSMIT→RESONATE→INTEGRATE',
     hour: new Date().getHours(),
   })
 }

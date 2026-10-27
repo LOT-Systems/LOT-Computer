@@ -1776,6 +1776,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyKnowledgeDistributionCheck()) {
     await executeDailyKnowledgeDistributionCheck()
   }
+
+  // Check daily knowledge transmission check (16:00 UTC every day) — Job 55
+  if (shouldRunDailyKnowledgeTransmissionCheck()) {
+    await executeDailyKnowledgeTransmissionCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -4147,6 +4152,111 @@ async function executeDailyKnowledgeDistributionCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily knowledge distribution check failed:', error.message)
     isDailyKnowledgeDistributionRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Knowledge Transmission Check (J55) ────────────────────────────────
+
+let isDailyKnowledgeTransmissionRunning = false
+let lastDailyKnowledgeTransmissionRun: Date | null = null
+
+function shouldRunDailyKnowledgeTransmissionCheck(): boolean {
+  const now = dayjs()
+  if (isDailyKnowledgeTransmissionRunning) return false
+  if (lastDailyKnowledgeTransmissionRun) {
+    const lastRun = dayjs(lastDailyKnowledgeTransmissionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 16 // 16:00 UTC daily
+}
+
+async function executeDailyKnowledgeTransmissionCheck(): Promise<JobResult> {
+  const jobName = 'daily-knowledge-transmission-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyKnowledgeTransmissionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyKnowledgeTransmissionRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY KNOWLEDGE TRANSMISSION CHECK — 16:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const [distributionLogs, cohortLogs, intentionLogs] = await Promise.all([
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: sevenDayStart }, event: 'quantum_knowledge_distribution' },
+            attributes: ['createdAt', 'metadata'],
+            limit: 5,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['cohort_check_in', 'community_activity', 'social_interaction', 'cohort_broadcast'] },
+            },
+            attributes: ['createdAt'],
+            limit: 20,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['intention_set', 'intention_reviewed', 'intention_completed', 'planner_entry'] },
+            },
+            attributes: ['createdAt'],
+            limit: 20,
+          }),
+        ])
+
+        if (!distributionLogs.length) continue
+        if (cohortLogs.length < 3 || intentionLogs.length < 2) continue
+
+        const distConf = distributionLogs[0]?.metadata?.crystalConf ?? 82
+
+        await (Log as any).create({
+          userId,
+          event: 'quantum_knowledge_transmission',
+          text: `Quantum knowledge transmission: quantum-knowledge-distribution (P163) confirmed in 7d + ${cohortLogs.length} cohort signals + ${intentionLogs.length} intention signals. Knowledge transmitted. The OS broadcasts into the collective signal — transmission active.`,
+          metadata: {
+            distConf,
+            cohortCount: cohortLogs.length,
+            intentionCount: intentionLogs.length,
+            transmissionStatus: 'BROADCASTING',
+            level: 'L9-TRANSMISSION',
+            field: 'KNOWLEDGE→TRANSMITTING→COLLECTIVE',
+            hour: 16,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Quantum knowledge transmission events written: ${written}`)
+    lastDailyKnowledgeTransmissionRun = new Date()
+    isDailyKnowledgeTransmissionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily knowledge transmission check failed:', error.message)
+    isDailyKnowledgeTransmissionRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

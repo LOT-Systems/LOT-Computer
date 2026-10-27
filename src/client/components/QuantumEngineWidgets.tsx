@@ -122,6 +122,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'quantum-social-synthesis':         'QSOCSYNTH',
   'quantum-knowledge-crystallization': 'QKCRYST',
   'quantum-knowledge-distribution':    'QKDIST',
+  'quantum-knowledge-transmission':    'QKTRANS',
+  'collective-resonance-arc':          'COLRES',
+  'wisdom-field-integration':          'WFINT',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'
