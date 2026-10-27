@@ -20,6 +20,7 @@ import { cn } from '#client/utils'
 import {
   useDirectMessages,
   useSendDirectMessage,
+  useSendEmail,
   DirectMessageRecord,
 } from '#client/queries'
 import { sync } from '../sync'
@@ -44,6 +45,9 @@ export const DirectMessageThread: React.FC<DirectMessageThreadProps> = ({ userId
   const { mutate: sendDirectMessage } = useSendDirectMessage({
     onSuccess: () => setMessage(''),
   })
+
+  // Cohort → Email: send the draft as a LOT® Email instead of a chat line
+  const { mutate: sendEmail } = useSendEmail({ onSuccess: () => setMessage('') })
 
   const onChangeMessage = React.useCallback((value: string) => {
     setMessage(
@@ -161,6 +165,16 @@ export const DirectMessageThread: React.FC<DirectMessageThreadProps> = ({ userId
               disabled={!message.trim()}
             >
               Send
+            </Button>
+            <Button
+              type="button"
+              kind="secondary"
+              size="small"
+              disabled={!message.trim()}
+              title="Send as LOT® Email (read in Sync)"
+              onClick={() => sendEmail({ to: userId, body: message, source: 'cohort' })}
+            >
+              Email
             </Button>
           </div>
         </form>

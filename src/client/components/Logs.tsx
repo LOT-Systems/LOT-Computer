@@ -33,6 +33,8 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
+import { useSendEmail } from '#client/queries'
+import { parseEmailCommand } from '#client/utils/emailCommand'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
@@ -3707,6 +3709,21 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  // LOT® Email: derived live from the log text ("/email to NAME." + body)
+  const emailDraft = React.useMemo(() => parseEmailCommand(value), [value])
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const { mutate: sendEmail, isLoading: emailSending } = useSendEmail({
+    onSuccess: (data) => {
+      setEmailStatus(`SENT → ${data.to.toUpperCase()}`)
+      // Drop the command + body from the log; the email lives in Sync now
+      setValue('')
+      valueRef.current = ''
+      onChangeRef.current('')
+    },
+    onError: (err: any) => {
+      setEmailStatus((err?.response?.data?.error || 'SEND FAILED').toUpperCase())
+    },
+  })
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -4138,6 +4155,7 @@ const NoteEditor = ({
           '/synth        Toggle keyboard sound',
           '/radio        Toggle radio',
           '/night        Dark mode',
+          '/email to NAME  Send LOT® Email (read in Sync)',
           '/how          Open LOT AI check-in (System tab)',
           '/system       This help screen',
           '',
@@ -4384,6 +4402,36 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {(emailDraft || emailStatus) && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-80" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6' }}>
+                {emailDraft && (
+                  <>
+                    <div>TO: {emailDraft.to}</div>
+                    <div className="opacity-60" style={{ whiteSpace: 'pre-wrap' }}>
+                      {emailDraft.body || 'Write your message in the log…'}
+                    </div>
+                    <div className="mt-4">
+                      <Button
+                        kind="secondary"
+                        size="small"
+                        disabled={!emailDraft.body || emailSending}
+                        onClick={() => {
+                          setEmailStatus(null)
+                          sendEmail({ to: emailDraft.to, body: emailDraft.body, source: 'log' })
+                        }}
+                      >
+                        Send
+                      </Button>
+                    </div>
+                  </>
+                )}
+                {emailStatus && <div className="opacity-60 mt-4">{emailStatus}</div>}
+              </div>
             </Block>
           </div>
         )}
