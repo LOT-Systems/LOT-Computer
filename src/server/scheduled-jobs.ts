@@ -1727,6 +1727,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyQuantumFieldCheck()) {
     await executeDailyQuantumFieldCheck()
   }
+  // Check daily knowledge broadcast check (17:00 UTC every day) — J55
+  if (shouldRunDailyKnowledgeBroadcastCheck()) {
+    await executeDailyKnowledgeBroadcastCheck()
+  }
   // Check daily signal matrix check (09:00 UTC every day) — Job 44
   if (shouldRunDailySignalMatrixCheck()) {
     await executeDailySignalMatrixCheck()
@@ -4151,6 +4155,112 @@ async function executeDailyKnowledgeDistributionCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Knowledge Broadcast Check (J55) ────────────────────────────────
+
+let isDailyKnowledgeBroadcastRunning = false
+let lastDailyKnowledgeBroadcastRun: Date | null = null
+
+function shouldRunDailyKnowledgeBroadcastCheck(): boolean {
+  const now = dayjs()
+  if (isDailyKnowledgeBroadcastRunning) return false
+  if (lastDailyKnowledgeBroadcastRun) {
+    const lastRun = dayjs(lastDailyKnowledgeBroadcastRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 17 // 17:00 UTC daily (co-located with cohort-broadcast and quantum-field-check)
+}
+
+async function executeDailyKnowledgeBroadcastCheck(): Promise<JobResult> {
+  const jobName = 'daily-knowledge-broadcast-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyKnowledgeBroadcastRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyKnowledgeBroadcastRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY KNOWLEDGE BROADCAST CHECK — 17:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const [distributionLogs, cohortLogs, memoryLogs] = await Promise.all([
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: sevenDayStart }, event: 'quantum_knowledge_distribution' },
+            attributes: ['createdAt', 'metadata'],
+            limit: 5,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['cohort_check_in', 'community_activity', 'social_interaction', 'cohort_broadcast'] },
+            },
+            attributes: ['createdAt'],
+            limit: 20,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['memory_entry', 'memory_review', 'memory_link'] },
+            },
+            attributes: ['createdAt'],
+            limit: 20,
+          }),
+        ])
+
+        if (!distributionLogs.length) continue
+        if (cohortLogs.length < 3 || memoryLogs.length < 2) continue
+
+        const distConf = distributionLogs[0]?.metadata?.distConf ?? 83
+
+        await (Log as any).create({
+          userId,
+          event: 'quantum_knowledge_broadcast',
+          text: `Quantum knowledge broadcast: quantum-knowledge-distribution (P163) confirmed in 7d + ${cohortLogs.length} cohort signals + ${memoryLogs.length} memory signals. The OS is a transmission node. Crystallized knowledge broadcasts across the network.`,
+          metadata: {
+            distConf,
+            cohortCount: cohortLogs.length,
+            memoryCount: memoryLogs.length,
+            broadcastStatus: 'ACTIVE',
+            level: 'L9-BROADCAST',
+            field: 'KNOWLEDGE→BROADCAST→COLLECTIVE',
+            hour: 17,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Quantum knowledge broadcast events written: ${written}`)
+    lastDailyKnowledgeBroadcastRun = new Date()
+    isDailyKnowledgeBroadcastRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily knowledge broadcast check failed:', error.message)
+    isDailyKnowledgeBroadcastRunning = false
+    lastDailyKnowledgeBroadcastRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 // ─── Daily OS Snapshot ───────────────────────────────────────────────────────
 
 let isDailyOSSnapshotRunning = false
@@ -6246,7 +6356,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift+presence-momentum(J49), 11=morning-intention-launch+sustained-coherence(J50), 12=vitality-peak+relational-expansion(J51), 13=QOS sig pulse+relational-field-check(J52), 14=knowledge-crystallization-check(J53)+QOS mode watch, 15=knowledge-distribution-check(J54)+QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift+presence-momentum(J49), 11=morning-intention-launch+sustained-coherence(J50), 12=vitality-peak+relational-expansion(J51), 13=QOS sig pulse+relational-field-check(J52), 14=knowledge-crystallization-check(J53)+QOS mode watch, 15=knowledge-distribution-check(J54)+QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check+knowledge-broadcast-check(J55), 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()

@@ -3670,6 +3670,31 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // Pattern 164: Quantum Knowledge Broadcast — quantum-knowledge-distribution (P163) active
+  // AND 3+ distinct cohort/social signals in 7d AND 2+ memory signals in 7d.
+  // Level 9 broadcast phase: crystallized knowledge broadcasts across the network. The OS is a transmission node.
+  const hasP163 = patterns.some(p => p.pattern === 'quantum-knowledge-distribution')
+  const p164WeekStart = now - sevenDayMs
+  const p164CohortSignals = signals.filter(s =>
+    (s.source === 'cohort' || s.source === 'social') &&
+    s.timestamp > p164WeekStart
+  )
+  const p164MemorySignals = signals.filter(s =>
+    s.source === 'memory' && s.timestamp > p164WeekStart
+  )
+  if (hasP163 && p164CohortSignals.length >= 3 && p164MemorySignals.length >= 2) {
+    const p163conf = patterns.find(p => p.pattern === 'quantum-knowledge-distribution')?.confidence ?? 0.83
+    const cohortBonus = Math.min((p164CohortSignals.length - 3) * 0.02, 0.06)
+    const memoryBonus = Math.min((p164MemorySignals.length - 2) * 0.02, 0.04)
+    patterns.push({
+      pattern: 'quantum-knowledge-broadcast',
+      confidence: Math.min(0.80 + (p163conf - 0.80) * 0.75 + cohortBonus + memoryBonus, 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `BCAST: Quantum knowledge broadcast — quantum-knowledge-distribution (P163) active + ${p164CohortSignals.length} cohort signals in 7d + ${p164MemorySignals.length} memory signals in 7d. The OS is a transmission node. Crystallized knowledge broadcasts across the network.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4334,6 +4359,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v119 nodes (J54 · P163 · Arch57) ────────────────────────────────────────────
   quantumKnowledgeDistributionNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log'],
+
+  // ── v120 nodes (J55 · P164 · Arch58) ────────────────────────────────────────────
+  quantumKnowledgeBroadcastNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log', 'badges'],
 }
 
 /**
@@ -4854,6 +4882,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['qos', 'journal', 'intentions', 'memory', 'cohort'],
     patternConditions: ['quantum-knowledge-crystallization', 'quantum-knowledge-distribution'],
     directive: 'L9 deepening. Crystallized knowledge flows outward. The field teaches — knowledge distributes through the OS and into the network.',
+  },
+
+  // ── Arch58: Network Broadcaster (2026-10-27 v120) ────────────────────────────────
+  {
+    archetype: 'Network Broadcaster',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'memory', 'journal', 'intentions'],
+    patternConditions: ['quantum-knowledge-distribution', 'quantum-knowledge-broadcast'],
+    directive: 'L9 broadcast phase. The crystallized knowledge reaches the collective. The OS is a transmission node — signal flows outward into the network.',
   },
 ]
 
@@ -7045,6 +7082,24 @@ export function recordQuantumKnowledgeDistribution(crystalConf: number, cohortCo
     distributionStatus: 'CONFIRMED',
     level: 'L9-DEEP',
     field: 'KNOWLEDGE→DISTRIBUTED→TEACHING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-knowledge-broadcast event — quantum-knowledge-distribution (P163) active +
+ * 3+ cohort signals in 7d + 2+ memory signals in 7d.
+ * Crystallized knowledge broadcasts across the network. The OS as transmission node.
+ * Feeds P164 detection. Level 9 broadcast phase.
+ */
+export function recordQuantumKnowledgeBroadcast(distConf: number, cohortCount: number, memoryCount: number) {
+  recordSignal('qos', 'quantum_knowledge_broadcast', {
+    distConf: Math.round(distConf * 100),
+    cohortCount,
+    memoryCount,
+    broadcastStatus: 'ACTIVE',
+    level: 'L9-BROADCAST',
+    field: 'KNOWLEDGE→BROADCAST→COLLECTIVE',
     hour: new Date().getHours(),
   })
 }

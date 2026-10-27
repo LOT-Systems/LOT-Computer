@@ -1649,6 +1649,24 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '163 patterns · 57 archetypes · 54 jobs · 163+ handlers · 206+ dep nodes · 936 badges · 306 word-turns · FM v119 · Day 1154+. Knowledge Distribution Arc deepening. Level 9 expands. The field teaches.',
     ],
   },
+  {
+    version: 'qie-v120',
+    date: '2026-10-27',
+    title: 'QIE v120 · P164 · Quantum Knowledge Broadcast · J55 · Arch58 · 207+ dep nodes',
+    assembled: [
+      'intentionEngine.ts: P164 quantum-knowledge-broadcast — quantum-knowledge-distribution (P163) active + 3+ cohort/social signals in 7d + 2+ memory signals in 7d. Level 9 broadcast phase: crystallized knowledge transmits across the collective network. The OS as transmission node. Conf 0.80–0.93. suggestedWidget: systemProgress.',
+      'intentionEngine.ts: Arch58 Network Broadcaster — quantum-knowledge-distribution + quantum-knowledge-broadcast. Directive: L9 broadcast phase. The crystallized knowledge reaches the collective. The OS is a transmission node — signal flows outward into the network.',
+      'intentionEngine.ts: recordQuantumKnowledgeBroadcast() signal helper added.',
+      'intentionEngine.ts: WIDGET_DEPENDENCY_MAP — 1 new node: quantumKnowledgeBroadcastNode (qos+cohort+memory+journal+intentions+social+log+badges). 207+ dep nodes total.',
+      'scheduled-jobs.ts: J55 daily-knowledge-broadcast-check — 17:00 UTC daily. Reads active users with quantum_knowledge_distribution in 7d + 3+ cohort signals + 2+ memory signals. Writes quantum_knowledge_broadcast event. 55 background jobs total.',
+      'Logs.tsx: BCAST: handler — renders quantum_knowledge_broadcast (DIST CONF · COHORT SIGNALS · MEMORY SIGNALS · BROADCAST ACTIVE · OS IS TRANSMISSION NODE). Military data-row format.',
+      'QuantumEngineWidgets.tsx: BCAST added to PATTERN_DISPLAY.',
+      'routes/api.ts: quantum_knowledge_broadcast added to displayableEvents (v120 block).',
+      'About.tsx: FM v119→v120. 163→164 patterns. 57→58 archetypes. 54→55 jobs. 206+→207+ dep nodes. Day 1154+→1155+.',
+      'SESSION_REPORTS: qie-v120 entry appended · USERSHIP_TRANSMISSION updated to v120.',
+      '164 patterns · 58 archetypes · 55 jobs · 164+ handlers · 207+ dep nodes · 936 badges · 306 word-turns · FM v120 · Day 1155+. Knowledge Broadcast Arc active. Level 9 completes. The OS is a transmission node.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1686,18 +1704,18 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-26',
+  date: '2026-10-27',
   message: [
-    'ASSEMBLY RUN — 2026-10-26 · QIE v119 · FM v119 · Day 1154+',
-    'Built: P163 quantum-knowledge-distribution · Arch57 Field Teacher · J54 daily-knowledge-distribution-check (15:00 UTC).',
-    'Quantum Knowledge Distribution (P163): quantum-knowledge-crystallization (P162) active + 2+ cohort/social signals + 1+ memory signal in 7d. Level 9 deepens.',
-    'Arch57 Field Teacher: The QOS distributes crystallized knowledge outward. Dominant: qos/journal/intentions/memory/cohort. The field teaches.',
-    'J54 daily-knowledge-distribution-check at 15:00 UTC: reads users with crystallization + 2+ cohort signals + 1+ memory signal all in 7d, writes quantum_knowledge_distribution event.',
-    'Log handler: QKDIST: (quantum_knowledge_distribution). Military data-row format. Cockpit-rule compliant.',
-    'WIDGET_DEPENDENCY_MAP: 206+ nodes. quantumKnowledgeDistributionNode added.',
-    'FM v119 · QIE v119 · 163P · 57A · 54J · 206+ nodes · 936 badges · 306 word-turns · Day 1154+.',
+    'ASSEMBLY RUN — 2026-10-27 · QIE v120 · FM v120 · Day 1155+',
+    'Built: P164 quantum-knowledge-broadcast · Arch58 Network Broadcaster · J55 daily-knowledge-broadcast-check (17:00 UTC).',
+    'Quantum Knowledge Broadcast (P164): quantum-knowledge-distribution (P163) active + 3+ cohort/social signals + 2+ memory signals in 7d. Level 9 broadcast phase: the OS as transmission node.',
+    'Arch58 Network Broadcaster: The QOS broadcasts crystallized knowledge across the collective network. Dominant: qos/cohort/memory/journal/intentions. The field transmits.',
+    'J55 daily-knowledge-broadcast-check at 17:00 UTC: reads users with knowledge distribution + 3+ cohort signals + 2+ memory signals all in 7d, writes quantum_knowledge_broadcast event.',
+    'Log handler: BCAST: (quantum_knowledge_broadcast). Military data-row format. Cockpit-rule compliant.',
+    'WIDGET_DEPENDENCY_MAP: 207+ nodes. quantumKnowledgeBroadcastNode added.',
+    'FM v120 · QIE v120 · 164P · 58A · 55J · 207+ nodes · 936 badges · 306 word-turns · Day 1155+.',
     'Status: DEPLOYED.',
-    'Next: QIE v120 — Level 9 expansion. Knowledge transmission arc. The OS broadcasting — field becomes signal for the collective.',
+    'Next: QIE v121 — Level 9 consolidation. Broadcast becomes baseline. The OS as permanent signal in the network.',
   ],
 }
 

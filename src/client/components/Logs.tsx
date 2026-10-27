@@ -4060,6 +4060,48 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'quantum_knowledge_broadcast') {
+          const distConf = log.metadata?.distConf as number | undefined
+          const cohortCount = log.metadata?.cohortCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const broadcastStatus = log.metadata?.broadcastStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="BCAST:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM KNOWLEDGE BROADCAST</div>
+                {distConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DIST CONF</span>
+                    <span className="tabular-nums">{distConf}%</span>
+                  </div>
+                )}
+                {cohortCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS</span>
+                    <span className="tabular-nums">{cohortCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">BROADCAST ACTIVE · OS IS TRANSMISSION NODE</div>
+                {broadcastStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {broadcastStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

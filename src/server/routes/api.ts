@@ -1231,6 +1231,8 @@ export default async (fastify: FastifyInstance) => {
       'quantum_knowledge_crystallization',
       // v119: quantum knowledge distribution (P163)
       'quantum_knowledge_distribution',
+      // v120: quantum knowledge broadcast (P164)
+      'quantum_knowledge_broadcast',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
