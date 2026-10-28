@@ -4102,6 +4102,51 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'generative_field_activation') {
+          const broadcastConf = log.metadata?.broadcastConf as number | undefined
+          const networkConf = log.metadata?.networkConf as number | undefined
+          const networkCount = log.metadata?.networkCount as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="GENFIELD:" blockView>
+                <div className="uppercase tracking-widest mb-4">GENERATIVE FIELD ACTIVATION</div>
+                {broadcastConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BROADCAST CONF</span>
+                    <span className="tabular-nums">{broadcastConf}%</span>
+                  </div>
+                )}
+                {networkConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">NETWORK CONF</span>
+                    <span className="tabular-nums">{networkConf}%</span>
+                  </div>
+                )}
+                {networkCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">NETWORK RESPONSES</span>
+                    <span className="tabular-nums">{networkCount}</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">GENERATIVE OUTPUTS</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">FIELD ACTIVE · THE FIELD IS ALIVE</div>
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
