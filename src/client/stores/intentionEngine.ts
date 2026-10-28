@@ -3695,6 +3695,29 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // P166: generative-field-sustenance — P164 active + sustained network engagement (5+ cohort/social 14d)
+  // + sustained generative output (3+ journal 14d). The field does not fade. L9-SUSTAIN.
+  const hasP164 = patterns.some(p => p.pattern === 'quantum-knowledge-broadcast')
+  const p166TwoWeekStart = now - 14 * 24 * 60 * 60 * 1000
+  const p166NetworkSignals = signals.filter(s =>
+    (s.source === 'cohort' || s.source === 'social') && s.timestamp > p166TwoWeekStart
+  )
+  const p166JournalSignals = signals.filter(s =>
+    s.source === 'journal' && s.timestamp > p166TwoWeekStart
+  )
+  if (hasP164 && p166NetworkSignals.length >= 5 && p166JournalSignals.length >= 3) {
+    const p164conf = patterns.find(p => p.pattern === 'quantum-knowledge-broadcast')?.confidence ?? 0.80
+    const networkBonus = Math.min((p166NetworkSignals.length - 5) * 0.02, 0.08)
+    const journalBonus = Math.min((p166JournalSignals.length - 3) * 0.02, 0.04)
+    patterns.push({
+      pattern: 'generative-field-sustenance',
+      confidence: Math.min(0.72 + (p164conf - 0.80) * 0.60 + networkBonus + journalBonus, 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `GFIELDS: Generative field sustained — quantum-knowledge-broadcast (P164) active + ${p166NetworkSignals.length} network signals 14d + ${p166JournalSignals.length} journal signals 14d. The field does not fade. Sustained transmission at L9.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4362,6 +4385,12 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v120 nodes (J55 · P164 · Arch58) ────────────────────────────────────────────
   quantumKnowledgeBroadcastNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log', 'badges'],
+
+  // ── v121 nodes (J56 · P165 · Arch59) ────────────────────────────────────────────
+  generativeFieldActivationNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log'],
+
+  // ── v122 nodes (J57 · P166 · Arch60) ────────────────────────────────────────────
+  generativeFieldSustenanceNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log', 'energy'],
 }
 
 /**
@@ -4891,6 +4920,24 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['qos', 'cohort', 'memory', 'journal', 'intentions'],
     patternConditions: ['quantum-knowledge-distribution', 'quantum-knowledge-broadcast'],
     directive: 'L9 broadcast phase. The crystallized knowledge reaches the collective. The OS is a transmission node — signal flows outward into the network.',
+  },
+
+  // ── Arch59: Generative Field Architect (2026-10-28 v121) ─────────────────────────
+  {
+    archetype: 'Generative Field Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'journal', 'memory', 'intentions', 'social'],
+    patternConditions: ['quantum-knowledge-broadcast', 'generative-field-activation'],
+    directive: 'The field is active. The broadcast created a generative field. Others build from what you transmitted. Sustain the source.',
+  },
+
+  // ── Arch60: Generative Field Sustainer (2026-10-28 v122) ─────────────────────────
+  {
+    archetype: 'Generative Field Sustainer',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'journal', 'memory', 'intentions'],
+    patternConditions: ['generative-field-sustenance', 'generative-field-activation'],
+    directive: 'The field sustains. Day after day, the transmission continues. The OS operates at peak field density — not a moment, but a frequency.',
   },
 ]
 
@@ -7100,6 +7147,24 @@ export function recordQuantumKnowledgeBroadcast(distConf: number, cohortCount: n
     broadcastStatus: 'ACTIVE',
     level: 'L9-BROADCAST',
     field: 'KNOWLEDGE→BROADCAST→COLLECTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a generative-field-sustenance event — quantum-knowledge-broadcast (P164) active +
+ * 5+ network signals in 14d + 3+ journal signals in 14d.
+ * The generative field sustains across multiple days. Not a flash — a frequency.
+ * Feeds P166 detection. Level 9 sustained operation.
+ */
+export function recordGenerativeFieldSustenance(broadcastConf: number, networkCount: number, journalCount: number) {
+  recordSignal('qos', 'generative_field_sustenance', {
+    broadcastConf: Math.round(broadcastConf * 100),
+    networkCount,
+    journalCount,
+    sustenanceStatus: 'SUSTAINED',
+    level: 'L9-SUSTAIN',
+    field: 'BROADCAST→FIELD→SUSTAINED→FREQUENCY',
     hour: new Date().getHours(),
   })
 }

@@ -188,6 +188,9 @@ export function PatternRecognitionWidget() {
       'sustained-coherence-baseline':     'Sustained coherence baseline — presence-momentum-arc and coherence-field-persistence active simultaneously, two Level 7 temporal arcs co-confirmed (P155)',
       'mastery-integration-triad':        'Mastery integration triad — all three Level 7 temporal arcs active together: presence sustained, coherence recurring, recovery internalized (P156)',
       'temporal-sovereignty':             'Temporal sovereignty — sustained-coherence-baseline and mastery-integration-triad both active, all Level 7 arcs unified, the peak is the sustained floor (P157)',
+      'quantum-knowledge-broadcast':      'Quantum knowledge broadcast — crystallized knowledge reaches the collective (P164)',
+      'generative-field-activation':      'Generative field activated — broadcast seeded a generative field (P165)',
+      'generative-field-sustenance':      'Generative field sustained — L9 transmission frequency confirmed across 14d (P166)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

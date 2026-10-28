@@ -1699,23 +1699,31 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'Journal vocabulary extraction → personal interface language injection',
   },
+  {
+    date: '2026-10-28',
+    built: ['P166 generative-field-sustenance', 'Arch59 Generative Field Architect (gap fix)', 'Arch60 Generative Field Sustainer', 'J57 daily-field-sustenance-check (19:00 UTC)', 'GFIELDS: log handler', 'dep map 210+ nodes', 'PatternRecognitionWidget P164/P165/P166 names'],
+    feedbackApplied: 'the field does not fade — sustained transmission is the highest L9 expression',
+    status: 'DEPLOYED',
+    next: 'Wiki v89 sync · LOT-LEDGER append · Badge Engine v36 assessment',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-27',
+  date: '2026-10-28',
   message: [
-    'ASSEMBLY RUN — 2026-10-27 · QIE v120 · FM v120 · Day 1155+',
-    'Built: P164 quantum-knowledge-broadcast · Arch58 Network Broadcaster · J55 daily-knowledge-broadcast-check (17:00 UTC).',
-    'Quantum Knowledge Broadcast (P164): quantum-knowledge-distribution (P163) active + 3+ cohort/social signals + 2+ memory signals in 7d. Level 9 broadcast phase: the OS as transmission node.',
-    'Arch58 Network Broadcaster: The QOS broadcasts crystallized knowledge across the collective network. Dominant: qos/cohort/memory/journal/intentions. The field transmits.',
-    'J55 daily-knowledge-broadcast-check at 17:00 UTC: reads users with knowledge distribution + 3+ cohort signals + 2+ memory signals all in 7d, writes quantum_knowledge_broadcast event.',
-    'Log handler: BCAST: (quantum_knowledge_broadcast). Military data-row format. Cockpit-rule compliant.',
-    'WIDGET_DEPENDENCY_MAP: 207+ nodes. quantumKnowledgeBroadcastNode added.',
-    'FM v120 · QIE v120 · 164P · 58A · 55J · 207+ nodes · 936 badges · 306 word-turns · Day 1155+.',
+    'ASSEMBLY RUN — 2026-10-28 · QIE v122 · FM v122 · Day 1156+',
+    'Built: P166 generative-field-sustenance · Arch59 gap-fix (Generative Field Architect) · Arch60 Generative Field Sustainer · J57 daily-field-sustenance-check (19:00 UTC) · GFIELDS: handler.',
+    'Also fixed: intentionEngine v121 gap — generativeFieldActivationNode + Arch59 were missing from intentionEngine.ts. Both added.',
+    'Generative Field Sustenance (P166): quantum-knowledge-broadcast (P164) active + 5+ network signals 14d + 3+ journal signals 14d. The field does not fade. L9-SUSTAIN frequency confirmed.',
+    'Arch60 Generative Field Sustainer: Dominant qos/cohort/journal/memory/intentions. Directive: The field sustains. Day after day, the transmission continues. Not a moment — a frequency.',
+    'J57 daily-field-sustenance-check at 19:00 UTC: reads generative_field_activation events across 14d, requires 3+ distinct days. Network engagement + journal output both sustained. Writes generative_field_sustenance.',
+    'Log handler: GFIELDS: (generative_field_sustenance). BROADCAST CONF / NETWORK 14D / JOURNAL OUT 14D / SUSTAIN level. FIELD SUSTAINED · FREQUENCY CONFIRMED.',
+    'WIDGET_DEPENDENCY_MAP: 210+ nodes. generativeFieldActivationNode (v121 gap) + generativeFieldSustenanceNode (v122) added.',
+    'FM v122 · QIE v122 · 166P · 60A · 57J · 210+ nodes · 936 badges · Day 1156+.',
     'Status: DEPLOYED.',
-    'Next: QIE v121 — Level 9 consolidation. Broadcast becomes baseline. The OS as permanent signal in the network.',
+    'Next: Wiki v89 sync · LOT-LEDGER append · Badge Engine v36 assessment.',
   ],
 }
 
