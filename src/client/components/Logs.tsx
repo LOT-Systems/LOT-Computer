@@ -4180,7 +4180,7 @@ const NoteEditor = ({
           }
         }
       } else if (trigger === 'email-compose') {
-        const emailMatch = value.match(/\/(?:email|mail)\s+to\s+(\S+(?:\s+\S+)?)\s*([\s\S]*)/i)
+        const emailMatch = value.match(/\/(?:email|mail)\s+to\s+([^\s:]+)(?::|\s)?\s*([\s\S]*)/i)
         if (emailMatch) {
           const toName = emailMatch[1].trim()
           const body = emailMatch[2]?.trim() || ''

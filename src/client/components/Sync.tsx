@@ -125,7 +125,7 @@ export const Sync = React.memo(function SyncInner() {
     )
     const { dispose: disposeLotMailListener } = sync.listen(
       'lot_mail',
-      (data) => {
+      (data: LotMailSyncPayload) => {
         setNewMailEvents((prev) => [data, ...prev])
       }
     )

@@ -4109,20 +4109,18 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       const firstName = nameParts[0]
       const lastName = nameParts.slice(1).join(' ')
 
-      const whereConditions: any[] = [
-        { firstName: { [Op.iLike]: firstName } },
-      ]
-      if (lastName) {
-        whereConditions.push({ lastName: { [Op.iLike]: lastName } })
-      }
+      const where: any = { firstName: { [Op.iLike]: firstName } }
+      if (lastName) where.lastName = { [Op.iLike]: lastName }
 
-      const recipient = await fastify.models.User.findOne({
-        where: { [Op.or]: whereConditions },
-      })
+      const matches = await fastify.models.User.findAll({ where, limit: 2 })
 
-      if (!recipient) {
+      if (matches.length === 0) {
         return reply.status(404).send({ error: 'User not found', hint: `No user named "${toName}" in LOT Community` })
       }
+      if (matches.length > 1) {
+        return reply.status(409).send({ error: 'Ambiguous recipient', hint: `More than one "${toName}" — add a last name` })
+      }
+      const recipient = matches[0]
       if (recipient.id === req.user.id) {
         return reply.status(400).send({ error: 'Cannot send mail to yourself' })
       }
