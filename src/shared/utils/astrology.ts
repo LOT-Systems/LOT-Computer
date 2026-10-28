@@ -177,3 +177,52 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Build a Date whose local getters (getHours/getDate/...) read the wall-clock
+ * time of `timeZone`, regardless of the runtime's own zone. Falls back to the
+ * given instant when no/invalid zone is supplied.
+ */
+export function toWallClockDate(instant: Date, timeZone?: string | null): Date {
+  if (!timeZone) return instant
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23', year: 'numeric', month: 'numeric',
+      day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(instant)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return instant
+  }
+}
+
+export interface AstrologyLogResonance {
+  sampled: number
+  sameRokuyo: number
+  sameMoonPhase: number
+  topRokuyo: string | null
+}
+
+/**
+ * Summarize how a user's own log history (entries carrying an ambient
+ * astrology snapshot in `context`) lines up with today's reading. Ambient
+ * only: this counts co-occurrence, it makes no predictive claim.
+ */
+export function summarizeAstrologyLogs(
+  logs: Array<{ context?: { astroRokuyo?: string | null; astroMoonPhase?: string | null } | null }>,
+  current: { rokuyo: string; moonPhase: string }
+): AstrologyLogResonance {
+  let sampled = 0, sameRokuyo = 0, sameMoonPhase = 0
+  const byRokuyo: Record<string, number> = {}
+  for (const log of logs) {
+    const r = log.context?.astroRokuyo
+    if (!r) continue
+    sampled++
+    byRokuyo[r] = (byRokuyo[r] || 0) + 1
+    if (r === current.rokuyo) sameRokuyo++
+    if (log.context?.astroMoonPhase === current.moonPhase) sameMoonPhase++
+  }
+  const top = Object.entries(byRokuyo).sort((a, b) => b[1] - a[1])[0]
+  return { sampled, sameRokuyo, sameMoonPhase, topRokuyo: top ? top[0] : null }
+}
