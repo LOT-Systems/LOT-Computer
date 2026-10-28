@@ -972,6 +972,21 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awardBadge('dragon_signal')
     awarded.push('dragon_signal')
   }
+  // FF Signal: Dec 18 — Final Fantasy I released in Japan 1987
+  if (!hasBadge('ff_signal') && month === 12 && day === 18) {
+    awardBadge('ff_signal')
+    awarded.push('ff_signal')
+  }
+  // Pokémon Signal: Feb 27 — Pokémon Red/Green released in Japan 1996
+  if (!hasBadge('pokemon_signal') && month === 2 && day === 27) {
+    awardBadge('pokemon_signal')
+    awarded.push('pokemon_signal')
+  }
+  // Dragon Quest Signal: May 27 — Dragon Quest I released in Japan 1986
+  if (!hasBadge('dragon_quest_signal') && month === 5 && day === 27) {
+    awardBadge('dragon_quest_signal')
+    awarded.push('dragon_quest_signal')
+  }
 
   return awarded
 }
@@ -1653,6 +1668,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bmoria\b|\bmines[\s-]?of[\s-]?moria\b|\byou[\s-]?shall[\s-]?not[\s-]?pass\b|\bbalrog\b|\bkhazad[\s-]?dum\b/i,               badge: 'tolkien_dungeon' },
   { patterns: /\bgary[\s-]?gygax\b|\bpen[\s-]?and[\s-]?paper[\s-]?rpg\b|\btabletop[\s-]?rpg\b|\bdave[\s-]?arneson\b|\bpen[\s-]?and[\s-]?paper\b/i, badge: 'gygax_voice' },
   { patterns: /\bdragon[\s-]?hoard\b|\bsmaug\b|\bancient[\s-]?dragon\b|\bfirebreather\b|\bye[\s-]?olde[\s-]?dragon\b/i,                     badge: 'dragon_hoard' },
+  // ── v29 Word Turns — THE JRPG ENGINE ────────────────────────────────────
+  { patterns: /\boverworld\b|\bworld[\s-]?map\b|\bzoomed[\s-]?out\b|\bbigger[\s-]?picture\b|\bthe[\s-]?whole[\s-]?map\b/i,                     badge: 'overworld_step' },
+  { patterns: /\binn\b|\brested[\s-]?at\b|\bsave[\s-]?state\b|\bfull[\s-]?rest\b|\brecovered[\s-]?my[\s-]?hp\b/i,                             badge: 'inn_rested_badge' },
+  { patterns: /\bparty\b|\bfound[\s-]?my[\s-]?party\b|\bmy[\s-]?companions\b|\bteam[\s-]?assembled\b|\bwe[\s-]?are[\s-]?the[\s-]?party\b/i,   badge: 'party_formed' },
+  { patterns: /\blimit[\s-]?break\b|\btrance[\s-]?state\b|\bawakened[\s-]?power\b|\bbeyond[\s-]?my[\s-]?limits\b|\bunleashed\b/i,               badge: 'limit_break_badge' },
+  { patterns: /\bphoenix[\s-]?down\b|\bback[\s-]?from[\s-]?the[\s-]?dead\b|\bkko[\s-]?recovery\b|\brose[\s-]?again\b|\bfell[\s-]?and[\s-]?got[\s-]?back\b/i, badge: 'phoenix_down_badge' },
+  { patterns: /\brandom[\s-]?encounter\b|\blife[\s-]?ambushed\b|\bcaught[\s-]?off[\s-]?guard\b|\bunexpected[\s-]?challenge\b|\bunplanned[\s-]?battle\b/i, badge: 'random_encounter_badge' },
+  { patterns: /\bsummon\b|\bcalled[\s-]?upon\b|\binvoked[\s-]?my\b|\bsummoned[\s-]?the[\s-]?strength\b|\bcalled[\s-]?in[\s-]?help\b/i,           badge: 'summon_sequence' },
+  { patterns: /\bside[\s-]?quest\b|\bdetour\b|\boff[\s-]?the[\s-]?main[\s-]?path\b|\bbonus[\s-]?mission\b|\boptional[\s-]?challenge\b/i,         badge: 'side_quest_badge' },
+  { patterns: /\bsave[\s-]?point\b|\bcheckpoint\b|\bmarked[\s-]?my[\s-]?progress\b|\bsaved[\s-]?my[\s-]?game\b|\bsafe[\s-]?place\b/i,            badge: 'save_point_badge' },
+  { patterns: /\bhp[\s-]?critical\b|\blow[\s-]?health\b|\bon[\s-]?my[\s-]?last[\s-]?hit[\s-]?point\b|\bnearly[\s-]?out\b|\bempty[\s-]?tank\b/i,  badge: 'hp_critical' },
+  { patterns: /\bendgame\b|\bfinal[\s-]?boss\b|\blast[\s-]?dungeon\b|\bthe[\s-]?end[\s-]?of[\s-]?the[\s-]?game\b|\bultimate[\s-]?challenge\b/i,   badge: 'endgame_boss' },
+  { patterns: /\bnew[\s-]?game[\s-]?plus\b|\bng\+\b|\bstarted[\s-]?over[\s-]?with[\s-]?wisdom\b|\bsecond[\s-]?playthrough\b|\bnew[\s-]?chapter\b/i, badge: 'new_game_plus' },
+  // ── v29 Secret Boss — THE JRPG VAULT word triggers ───────────────────────
+  { patterns: /\bfinal[\s-]?fantasy\b|\bcloud[\s-]?strife\b|\bsephiroth\b|\baerith\b|\btifa[\s-]?lockhart\b/i,                                   badge: 'cloud_signal' },
+  { patterns: /\bchrono[\s-]?trigger\b|\bcrono\b|\bmarle\b|\blucca\b|\bmagus\b|\bfrog[\s-]?knight\b/i,                                           badge: 'chrono_trigger_signal' },
+  { patterns: /\bmother[\s-]?game\b|\bearth[\s-]?bound\b|\bness\b|\bpk[\s-]?fire\b|\bonett\b|\bgiygas\b/i,                                       badge: 'mother_signal' },
 ]
 
 /**
@@ -3443,5 +3475,73 @@ export function checkDragonVault(journalText: string): BadgeType[] {
     if (awardBadge('dragon_hoard')) awarded.push('dragon_hoard')
   }
 
+  return awarded
+}
+
+// ── v29 THE JRPG ENGINE — Behavioral checks ──────────────────────────────────
+
+/** Award jrpg_session when 3+ v29 JRPG words appear in a single journal entry */
+export function checkJrpgSession(journalText: string): BadgeType | null {
+  if (hasBadge('jrpg_session')) return null
+  const patterns = [
+    /\boverworld\b|\bworld[\s-]?map\b/i,
+    /\binn\b|\bsave[\s-]?state\b/i,
+    /\bparty\b|\bmy[\s-]?companions\b/i,
+    /\blimit[\s-]?break\b|\btrance[\s-]?state\b/i,
+    /\bphoenix[\s-]?down\b|\bback[\s-]?from[\s-]?the[\s-]?dead\b/i,
+    /\brandom[\s-]?encounter\b|\blife[\s-]?ambushed\b/i,
+    /\bsummon\b|\bcalled[\s-]?upon\b/i,
+    /\bside[\s-]?quest\b|\bdetour\b/i,
+    /\bsave[\s-]?point\b|\bcheckpoint\b/i,
+    /\bhp[\s-]?critical\b|\blow[\s-]?health\b/i,
+    /\bendgame\b|\bfinal[\s-]?boss\b/i,
+    /\bnew[\s-]?game[\s-]?plus\b|\bng\+\b/i,
+  ]
+  const hits = patterns.filter(p => p.test(journalText)).length
+  if (hits >= 3) {
+    if (awardBadge('jrpg_session')) return 'jrpg_session'
+  }
+  return null
+}
+
+/** Award overworld_return when user returns after 14+ day absence */
+export function checkOverworldReturn(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('overworld_return')) return null
+  try {
+    const lastCheckIn = localStorage.getItem('lot_last_checkin_date')
+    if (!lastCheckIn) return null
+    const last = new Date(lastCheckIn)
+    const now = new Date()
+    const daysSince = (now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24)
+    if (daysSince >= 14) {
+      if (awardBadge('overworld_return')) return 'overworld_return'
+    }
+  } catch { /* ignore */ }
+  return null
+}
+
+/** Award jrpg_marathon when journal entry >= 600 words */
+export function checkJrpgMarathon(journalText: string): BadgeType | null {
+  if (hasBadge('jrpg_marathon')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 600) {
+    if (awardBadge('jrpg_marathon')) return 'jrpg_marathon'
+  }
+  return null
+}
+
+/** Award JRPG Vault secret boss badges from journal text */
+export function checkJrpgVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  if (!hasBadge('cloud_signal') && /\bfinal[\s-]?fantasy\b|\bcloud[\s-]?strife\b|\bsephiroth\b|\baerith\b|\btifa[\s-]?lockhart\b/i.test(journalText)) {
+    if (awardBadge('cloud_signal')) awarded.push('cloud_signal')
+  }
+  if (!hasBadge('chrono_trigger_signal') && /\bchrono[\s-]?trigger\b|\bcrono\b|\bmarle\b|\blucca\b|\bmagus\b|\bfrog[\s-]?knight\b/i.test(journalText)) {
+    if (awardBadge('chrono_trigger_signal')) awarded.push('chrono_trigger_signal')
+  }
+  if (!hasBadge('mother_signal') && /\bmother[\s-]?game\b|\bearth[\s-]?bound\b|\bness\b|\bpk[\s-]?fire\b|\bonett\b|\bgiygas\b/i.test(journalText)) {
+    if (awardBadge('mother_signal')) awarded.push('mother_signal')
+  }
   return awarded
 }

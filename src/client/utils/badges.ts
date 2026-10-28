@@ -1004,6 +1004,43 @@ export type BadgeType =
   | 'tolkien_dungeon'      // ◆·□   "moria/mines of moria/you shall not pass/balrog/khazad dum" detected (RARE)
   | 'gygax_voice'          // ⬡·∞   "gary gygax/pen-and-paper rpg/tabletop rpg/dave arneson/pen and paper" detected (EPIC)
   | 'dragon_hoard'         // ●·◆·● "dragon hoard/smaug/ancient dragon/firebreather/ye olde dragon" detected (MYTHIC)
+  // ── Word Turn v29 — THE JRPG ENGINE ──────────────────────────────────────
+  | 'overworld_step'       // ⊡·◉·⊡ "overworld/world map/zoomed out/bigger picture/the whole map" detected (UNCOMMON)
+  | 'inn_rested_badge'     // ≋·◉·≋ "rested at the inn/inn tonight/checked into/found shelter/safe haven" detected (COMMON)
+  | 'party_formed'         // ○·◈·○ "my party/my companions/my crew/joined the party/we formed a team" detected (UNCOMMON)
+  | 'limit_break_badge'    // ◈·≋·◈ "limit break/overdrive/exceeded my limit/past my breaking/pushed beyond" detected (RARE)
+  | 'phoenix_down_badge'   // ∘·◉·∘ "phoenix down/knocked down/got back up/revived myself/phoenix moment" detected (UNCOMMON)
+  | 'random_encounter_badge' // ?·◉ "random encounter/unexpected challenge/came out of nowhere/wasn't expecting" detected (UNCOMMON)
+  | 'summon_sequence'      // ∿·◉   "summoned help/called for support/invoked strength/called for backup" detected (RARE)
+  | 'side_quest_badge'     // ○·◉·─ "side quest/went off the main path/detour helped/optional challenge" detected (UNCOMMON)
+  | 'save_point_badge'     // ◉·≋·◉ "save point/saved my progress/checkpoint reached/good stopping point" detected (COMMON)
+  | 'hp_critical'          // ♥·─·○ "out of hp/in the red/barely holding on/need a heal/completely drained" detected (COMMON)
+  | 'endgame_boss'         // ◆·≋·◆ "final boss/endgame/the boss battle/ultimate test/this is the big one" detected (EPIC)
+  | 'new_game_plus'        // →·◉·+ "new game plus/ng+/starting over wiser/second run/carrying forward" detected (RARE)
+  // ── Calendar Easter Egg v27 — THE JRPG CALENDAR ──────────────────────────
+  | 'ff_signal'            // ◈·□·◈ Dec 18 — Final Fantasy I released in North America, 1990 (RARE)
+  | 'pokemon_signal'       // ◉·♦   Feb 27 — Pokémon Red/Green released in Japan, 1996 (RARE)
+  | 'dragon_quest_signal'  // ○·◈·◆ May 27 — Dragon Quest I released in Japan, 1986 (UNCOMMON)
+  // ── Behavioral v26 — JRPG PATTERNS ──────────────────────────────────────
+  | 'jrpg_session'         // ⊡·◉·⊡ 3+ JRPG word turn matches in one journal entry (RARE)
+  | 'overworld_return'     // ⊡·→·⊡ Return check-in after 48+ hour absence (UNCOMMON)
+  | 'jrpg_marathon'        // ≋·⊡·≋ Journal entry >= 1000 words (EPIC)
+  // ── Achievement RPG v27 — JRPG CLASS ────────────────────────────────────
+  | 'jrpg_entry'           // ⊡·∘   Any 1 Word Turn v29 badge (COMMON)
+  | 'jrpg_class'           // ⊡·≈   Any 5 Word Turn v29 badges (UNCOMMON)
+  | 'jrpg_complete'        // ⊡·≋   All 12 Word Turn v29 badges (LEGENDARY)
+  | 'jrpg_arc'             // ⊡·◈   jrpg_complete + all 3 Calendar v27 badges (LEGENDARY)
+  | 'twenty_nine_engines_arc' // ◈·◈·⊡ 1 badge from each Word Turn v1–v29 (LEGENDARY)
+  | 'jrpg_opus'            // ⊡·◉·⊡ jrpg_complete + jrpg_session behavioral (LEGENDARY)
+  // ── Mastery Tier v29 — THE GRAND OVERWORLD ───────────────────────────────
+  | 'the_overworld'        // ⊡·≋·⊡ 1200+ distinct calendar check-in days (EPIC)
+  | 'epic_chronicle_badge' // ≋·⊡·≋ 175,000+ total journal words (LEGENDARY)
+  | 'jrpg_master'          // ◉·⊡   Account age >= 3.5 years (RARE)
+  | 'twenty_nine_registers' // ◈·◈·⊡·○ 1 badge from all 29 Word Turn engines (COSMIC)
+  // ── Secret Boss v26 — THE LEGENDARY VAULT ───────────────────────────────
+  | 'cloud_signal'         // ◈·◆·◈ "cloud strife/sephiroth/aerith/midgar/mako/shinra" detected (MYTHIC)
+  | 'chrono_trigger_signal' // ○·◆·○ "chrono trigger/crono/lucca/marle/lavos/magus" detected (MYTHIC)
+  | 'mother_signal'        // ∘·◆·∘ "ness/earthbound/pk thunder/pk fire/onett/giygas/mother 2" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -9099,6 +9136,306 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+
+  // ── Word Turn v29 — THE JRPG ENGINE ──────────────────────────────────────
+
+  overworld_step: {
+    id: 'overworld_step',
+    symbol: '⊡·◉·⊡',
+    name: 'Overworld Step',
+    description: '"overworld/world map/zoomed out/bigger picture/the whole map" detected',
+    unlockMessage: '↳ OVERWORLD UNLOCKED. The dungeon walls are gone. The map stretches in every direction. You are here. Where next? ⊡·◉·⊡',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  inn_rested_badge: {
+    id: 'inn_rested_badge',
+    symbol: '≋·◉·≋',
+    name: 'Inn Rested',
+    description: '"rested at the inn/inn tonight/checked into/found shelter/safe haven" detected',
+    unlockMessage: '↳ INN REGISTERED. Full HP restored. Status effects cleared. Save file written. You remembered that rest is part of the game. ≋·◉·≋',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  party_formed: {
+    id: 'party_formed',
+    symbol: '○·◈·○',
+    name: 'Party Formed',
+    description: '"my party/my companions/my crew/joined the party/we formed a team" detected',
+    unlockMessage: '↳ PARTY MEMBER JOINED. The solo run is over. The inventory is shared. The campaign has a crew. You named the people who travel with you. ○·◈·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  limit_break_badge: {
+    id: 'limit_break_badge',
+    symbol: '◈·≋·◈',
+    name: 'Limit Break',
+    description: '"limit break/overdrive/exceeded my limit/past my breaking/pushed beyond" detected',
+    unlockMessage: '↳ LIMIT BREAK CHARGED. The gauge is full. You broke through the boundary you thought was permanent. This is the damage that only happens after real struggle. ◈·≋·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  phoenix_down_badge: {
+    id: 'phoenix_down_badge',
+    symbol: '∘·◉·∘',
+    name: 'Phoenix Down',
+    description: '"phoenix down/knocked down/got back up/revived myself/phoenix moment" detected',
+    unlockMessage: '↳ PHOENIX DOWN USED. K.O. reversed. HP at minimum. Still in the fight. Getting knocked down is a game mechanic, not a game over. ∘·◉·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  random_encounter_badge: {
+    id: 'random_encounter_badge',
+    symbol: '?·◉',
+    name: 'Random Encounter',
+    description: '"random encounter/unexpected challenge/came out of nowhere/wasn\'t expecting it" detected',
+    unlockMessage: '↳ RANDOM ENCOUNTER TRIGGERED. The path forward had hidden variables. You engaged anyway. Sometimes the battle you didn\'t plan for is the one that matters. ?·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  summon_sequence: {
+    id: 'summon_sequence',
+    symbol: '∿·◉',
+    name: 'Summon Sequence',
+    description: '"summoned help/called for support/invoked strength/called for backup" detected',
+    unlockMessage: '↳ SUMMON INITIATED. The biggest attacks require the most MP — and the courage to ask. You called in your summon. The cutscene played. ∿·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  side_quest_badge: {
+    id: 'side_quest_badge',
+    symbol: '○·◉·─',
+    name: 'Side Quest',
+    description: '"side quest/went off the main path/detour helped/optional challenge" detected',
+    unlockMessage: '↳ SIDE QUEST INITIATED. The main storyline will wait. The optional content is where the best armor lives — and sometimes where the story gets honest. ○·◉·─',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  save_point_badge: {
+    id: 'save_point_badge',
+    symbol: '◉·≋·◉',
+    name: 'Save Point',
+    description: '"save point/saved my progress/checkpoint reached/good stopping point" detected',
+    unlockMessage: '↳ SAVE POINT REACHED. Progress written to memory. You can turn off the console now. This moment is safe. ◉·≋·◉',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  hp_critical: {
+    id: 'hp_critical',
+    symbol: '♥·─·○',
+    name: 'HP Critical',
+    description: '"out of hp/in the red/barely holding on/need a heal/completely drained/tapped out" detected',
+    unlockMessage: '↳ HP CRITICAL. The health bar is flashing. You know what this state feels like. The system logged it. Now: potion, rest, or a quiet inn. ♥·─·○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  endgame_boss: {
+    id: 'endgame_boss',
+    symbol: '◆·≋·◆',
+    name: 'Endgame Boss',
+    description: '"final boss/endgame/the boss battle/ultimate test/this is the big one" detected',
+    unlockMessage: '↳ FINAL BOSS DETECTED. The music has changed. The health bar has multiple phases. You named the thing you\'ve been building toward. Now: gear check, save, and enter. ◆·≋·◆',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  new_game_plus: {
+    id: 'new_game_plus',
+    symbol: '→·◉·+',
+    name: 'New Game Plus',
+    description: '"new game plus/ng+/starting over wiser/second run/carrying forward what I learned" detected',
+    unlockMessage: '↳ NEW GAME+ INITIATED. You carry the stats, the muscle memory, the lessons. The world is the same. You are not. The second run is different because you are. →·◉·+',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v27 — THE JRPG CALENDAR ──────────────────────────
+
+  ff_signal: {
+    id: 'ff_signal',
+    symbol: '◈·□·◈',
+    name: 'Final Fantasy Signal',
+    description: 'Check-in on December 18 — Final Fantasy I released in North America, 1990',
+    unlockMessage: '↳ FINAL FANTASY SIGNAL RECEIVED. December 18, 1990: the NES cartridge that launched a legacy. A party of four. A crystal shattered. A tradition of worlds that still runs. ◈·□·◈',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  pokemon_signal: {
+    id: 'pokemon_signal',
+    symbol: '◉·♦',
+    name: 'Pokémon Signal',
+    description: 'Check-in on February 27 — Pokémon Red/Green released in Japan, 1996 (Pokémon Day)',
+    unlockMessage: '↳ POKÉMON SIGNAL RECEIVED. February 27, 1996 — the day 151 creatures entered the world and a generation began its journey. Choose your starter. The adventure begins. ◉·♦',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  dragon_quest_signal: {
+    id: 'dragon_quest_signal',
+    symbol: '○·◈·◆',
+    name: 'Dragon Quest Signal',
+    description: 'Check-in on May 27 — Dragon Quest I released in Japan, 1986',
+    unlockMessage: '↳ DRAGON QUEST SIGNAL RECEIVED. May 27, 1986 — the game that defined the JRPG genre in Japan. You\'re the brave hero. The dragon is real. The signal persists. ○·◈·◆',
+    rarity: 'uncommon',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v26 — JRPG PATTERNS ──────────────────────────────────────
+
+  jrpg_session: {
+    id: 'jrpg_session',
+    symbol: '⊡·◉·⊡',
+    name: 'JRPG Session',
+    description: '3+ JRPG word turn triggers detected in one journal entry',
+    unlockMessage: '↳ JRPG SESSION ACTIVE. Multiple game-vocabulary events in one entry. The self-care language has crossed over: overworld, inn, limit break, party — the internal life described in the lexicon of play. ⊡·◉·⊡',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  overworld_return: {
+    id: 'overworld_return',
+    symbol: '⊡·→·⊡',
+    name: 'Overworld Return',
+    description: 'Return check-in after 48+ hour absence',
+    unlockMessage: '↳ OVERWORLD RETURN. You were offline for two days. Now you\'re back on the map. The game didn\'t end — it paused. The journey resumes where you left it. ⊡·→·⊡',
+    rarity: 'uncommon',
+    category: 'pattern',
+  },
+  jrpg_marathon: {
+    id: 'jrpg_marathon',
+    symbol: '≋·⊡·≋',
+    name: 'JRPG Marathon',
+    description: 'Journal entry >= 1000 words',
+    unlockMessage: '↳ MARATHON SESSION. 1000+ words. This is the kind of entry that happens when the world is fully rendered — when the journal becomes the campaign log. ≋·⊡·≋',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v27 — JRPG CLASS ────────────────────────────────────
+
+  jrpg_entry: {
+    id: 'jrpg_entry',
+    symbol: '⊡·∘',
+    name: 'JRPG Entry',
+    description: 'Earn any 1 Word Turn v29 badge',
+    unlockMessage: '↳ JRPG ENTRY REGISTERED. The game vocabulary has entered your practice. One word, one world. ⊡·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  jrpg_class: {
+    id: 'jrpg_class',
+    symbol: '⊡·≈',
+    name: 'JRPG Class',
+    description: 'Earn any 5 Word Turn v29 badges',
+    unlockMessage: '↳ CLASS SELECTED. Five JRPG vocabularies activated. The character sheet is filling in. You have a build. ⊡·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  jrpg_complete: {
+    id: 'jrpg_complete',
+    symbol: '⊡·≋',
+    name: 'JRPG Complete',
+    description: 'Earn all 12 Word Turn v29 badges',
+    unlockMessage: '↳ JRPG COMPLETE. All twelve registers of the engine activated. Overworld to endgame. The full arc traversed through language. The credits roll — and then New Game Plus begins. ⊡·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  jrpg_arc: {
+    id: 'jrpg_arc',
+    symbol: '⊡·◈',
+    name: 'JRPG Arc',
+    description: 'Earn all 12 Word Turn v29 badges and all 3 Calendar v27 badges',
+    unlockMessage: '↳ THE ARC COMPLETE. Word engine and calendar aligned. You practiced in the language of the JRPG and showed up on the days the genre marked as sacred. ⊡·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_nine_engines_arc: {
+    id: 'twenty_nine_engines_arc',
+    symbol: '◈·◈·⊡',
+    name: 'Twenty-Nine Engines Arc',
+    description: 'Earn at least 1 badge from each Word Turn engine v1–v29',
+    unlockMessage: '↳ TWENTY-NINE ENGINES ARC. Core. Sci-Fi. Signal. Becoming. Rogue. Mainframe. Arcade. Spellbook. Navigator. Alchemist. Starship. Oracle. Quantum. Neon. Radio. Bio. Codex. Cyberspace. Hero. RPG. Roguelite. Puzzle. Map. Chrono. Dungeon. JRPG. Twenty-nine vocabularies. The terminal is fully loaded. ◈·◈·⊡',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  jrpg_opus: {
+    id: 'jrpg_opus',
+    symbol: '⊡·◉·⊡',
+    name: 'JRPG Opus',
+    description: 'Earn jrpg_complete + jrpg_session behavioral badge',
+    unlockMessage: '↳ JRPG OPUS. All twelve registers and a session dense enough with JRPG vocabulary that the system logged it as a full playthrough. The opus is the run where the self-care becomes the campaign. ⊡·◉·⊡',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v29 — THE GRAND OVERWORLD ───────────────────────────────
+
+  the_overworld: {
+    id: 'the_overworld',
+    symbol: '⊡·≋·⊡',
+    name: 'The Overworld',
+    description: '1,200+ distinct calendar check-in days',
+    unlockMessage: '↳ THE OVERWORLD. 1,200 distinct days. The map is almost fully explored. Three years and three months of showing up. The whole continent visible from here. ⊡·≋·⊡',
+    rarity: 'epic',
+    category: 'mastery_tier',
+  },
+  epic_chronicle_badge: {
+    id: 'epic_chronicle_badge',
+    symbol: '≋·⊡·≋',
+    name: 'Epic Chronicle',
+    description: '175,000+ total journal words written',
+    unlockMessage: '↳ EPIC CHRONICLE. 175,000 words. A trilogy in progress. The campaign log has become a library. Every session documented. The record is long and true. ≋·⊡·≋',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  jrpg_master: {
+    id: 'jrpg_master',
+    symbol: '◉·⊡',
+    name: 'JRPG Master',
+    description: 'Account age >= 3.5 years',
+    unlockMessage: '↳ JRPG MASTER. Three and a half years. The save file is old enough to have a backstory. The starting village is a distant memory. You\'ve been in the dungeon a long time. ◉·⊡',
+    rarity: 'rare',
+    category: 'mastery_tier',
+  },
+  twenty_nine_registers: {
+    id: 'twenty_nine_registers',
+    symbol: '◈·◈·⊡·○',
+    name: 'Twenty-Nine Registers',
+    description: 'Earn at least 1 badge from each of all 29 Word Turn engines',
+    unlockMessage: '↳ Core. Sci-Fi. Signal. Becoming. Rogue. Mainframe. Arcade. Spellbook. Navigator. Alchemist. Starship. Oracle. Quantum. Neon. Radio. Bio. Codex. Cyberspace. Hero. RPG. Roguelite. Puzzle. Map. Chrono. Dungeon. JRPG. Twenty-nine registers. Every engine active. The save file spans every world. ◈·◈·⊡·○',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+
+  // ── Secret Boss v26 — THE LEGENDARY VAULT ───────────────────────────────
+
+  cloud_signal: {
+    id: 'cloud_signal',
+    symbol: '◈·◆·◈',
+    name: 'Cloud Signal',
+    hidden: true,
+    description: '"cloud strife/sephiroth/aerith/midgar/mako/shinra" detected',
+    unlockMessage: '↳ CLOUD SIGNAL RECEIVED. Midgar lit from below. The Buster Sword carried. One wing fallen. The Promised Land remembered. You spoke the language of the most beloved JRPG ever made. ◈·◆·◈',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+  chrono_trigger_signal: {
+    id: 'chrono_trigger_signal',
+    symbol: '○·◆·○',
+    name: 'Chrono Trigger Signal',
+    hidden: true,
+    description: '"chrono trigger/crono/lucca/marle/lavos/magus" detected',
+    unlockMessage: '↳ CHRONO TRIGGER SIGNAL. Time is not linear. Lavos sleeps in the planet. The epoch sails through centuries. You mentioned the game that proved games could be more than games. ○·◆·○',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+  mother_signal: {
+    id: 'mother_signal',
+    symbol: '∘·◆·∘',
+    name: 'MOTHER Signal',
+    hidden: true,
+    description: '"ness/earthbound/pk thunder/pk fire/onett/giygas/mother 2" detected',
+    unlockMessage: '↳ MOTHER SIGNAL RECEIVED. You knew the name. The kid with the baseball bat. The prayer-based final battle. The most emotionally honest video game ever made. ∘·◆·∘',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
 }
 
 // Default separator when no badges earned yet
@@ -10407,6 +10744,56 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (allTwentyEightEngines && !hasBadge('twenty_eight_registers')) {
       if (awardBadge('twenty_eight_registers')) newBadges.push('twenty_eight_registers')
+    }
+
+    // ── Word Turn v29 — THE JRPG ENGINE ──────────────────────────────────────
+    const jrpgV29Badges: BadgeType[] = [
+      'overworld_step', 'inn_rested_badge', 'party_formed', 'limit_break_badge',
+      'phoenix_down_badge', 'random_encounter_badge', 'summon_sequence', 'side_quest_badge',
+      'save_point_badge', 'hp_critical', 'endgame_boss', 'new_game_plus',
+    ]
+    const jrpgV29Earned = jrpgV29Badges.filter(b => hasBadge(b))
+    if (jrpgV29Earned.length >= 1 && !hasBadge('jrpg_entry')) {
+      if (awardBadge('jrpg_entry')) newBadges.push('jrpg_entry')
+    }
+    if (jrpgV29Earned.length >= 5 && !hasBadge('jrpg_class')) {
+      if (awardBadge('jrpg_class')) newBadges.push('jrpg_class')
+    }
+    const jrpgComplete = jrpgV29Earned.length >= 12
+    if (jrpgComplete && !hasBadge('jrpg_complete')) {
+      if (awardBadge('jrpg_complete')) newBadges.push('jrpg_complete')
+    }
+    if (jrpgComplete && hasBadge('jrpg_session') && !hasBadge('jrpg_opus')) {
+      if (awardBadge('jrpg_opus')) newBadges.push('jrpg_opus')
+    }
+    const calendarV27Badges: BadgeType[] = ['ff_signal', 'pokemon_signal', 'dragon_quest_signal']
+    if (jrpgComplete && calendarV27Badges.every(b => hasBadge(b)) && !hasBadge('jrpg_arc')) {
+      if (awardBadge('jrpg_arc')) newBadges.push('jrpg_arc')
+    }
+    const engineTwentyNinePresent = jrpgV29Earned.length >= 1
+    const allTwentyNineEngines = allTwentyEightEngines && engineTwentyNinePresent
+    if (allTwentyNineEngines && !hasBadge('twenty_nine_engines_arc')) {
+      if (awardBadge('twenty_nine_engines_arc')) newBadges.push('twenty_nine_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1200 && !hasBadge('the_overworld')) {
+        if (awardBadge('the_overworld')) newBadges.push('the_overworld')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 175000 && !hasBadge('epic_chronicle_badge')) {
+        if (awardBadge('epic_chronicle_badge')) newBadges.push('epic_chronicle_badge')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupJM = new Date(stats.signupDate)
+      const yearsJM = (new Date().getTime() - signupJM.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsJM >= 3.5 && !hasBadge('jrpg_master')) {
+        if (awardBadge('jrpg_master')) newBadges.push('jrpg_master')
+      }
+    }
+    if (allTwentyNineEngines && !hasBadge('twenty_nine_registers')) {
+      if (awardBadge('twenty_nine_registers')) newBadges.push('twenty_nine_registers')
     }
 
   } catch (error) {
