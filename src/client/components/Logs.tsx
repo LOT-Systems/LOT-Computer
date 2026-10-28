@@ -35,6 +35,8 @@ import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
+import { renderSystemHelp } from '#shared/slash-commands'
+import { parseStoryWindow, stripStoryCommand } from '#shared/story-compression'
 import { getFastingState } from '#client/utils/fasting'
 
 const localStore = {
@@ -3706,6 +3708,7 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyStats, setStoryStats] = React.useState<string[] | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3742,6 +3745,7 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryStats(data.stats ?? null)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -4121,47 +4125,27 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(renderSystemHelp())
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
+          setStoryStats(null)
+          const storyWindow = parseStoryWindow(value)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const logText = stripStoryCommand(value)
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              window: storyWindow,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: stripStoryCommand(value), window: storyWindow })
           }
         }
       }
@@ -4393,13 +4377,14 @@ const NoteEditor = ({
               <div className="opacity-80" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                 {systemHelp.split('\n').map((line, idx) => {
                   if (!line.trim()) return <div key={idx} style={{ height: '0.75rem' }} />
-                  if (line.startsWith('/')) {
-                    const spaceIdx = line.search(/\s{2,}/)
-                    const cmd = spaceIdx > -1 ? line.slice(0, spaceIdx) : line
-                    const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
+                  const trimmed = line.trimStart()
+                  if (trimmed.startsWith('/') || (line.startsWith('  ') && trimmed.length > 0)) {
+                    const spaceIdx = trimmed.search(/\s{2,}/)
+                    const cmd = spaceIdx > -1 ? trimmed.slice(0, spaceIdx) : trimmed
+                    const desc = spaceIdx > -1 ? trimmed.slice(spaceIdx).trim() : ''
                     return (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                        <span style={{ minWidth: '210px', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )
@@ -4419,6 +4404,11 @@ const NoteEditor = ({
             <Block label="📖" blockView>
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
+              )}
+              {storyStats && (
+                <div className="opacity-40 mb-4" style={{ fontFamily: 'monospace', fontSize: '12px', whiteSpace: 'pre', overflowX: 'auto' }}>
+                  {storyStats.join('\n')}
+                </div>
               )}
               {storyResponse && (
                 <div className="opacity-60">

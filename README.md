@@ -166,6 +166,7 @@ All documentation has been organized into the [`docs/`](./docs/) directory. See 
 **Key Documentation:**
 
 - **Technical Documentation:** [`docs/technical/`](./docs/technical/)
+  - [Log /system + /story spec](./docs/technical/LOT-LOG-SLASH-AND-STORY.md) - Command index, compressed story, arcade evolution
   - AI Engine Guide - Setup for all 5 AI engines
   - Memory Engine Documentation - Complete system docs
   - Psychological Depth Analysis - User analysis engine
