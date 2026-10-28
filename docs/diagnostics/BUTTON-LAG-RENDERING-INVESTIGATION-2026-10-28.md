@@ -19,7 +19,7 @@ No open GitHub issues mention lag (search returned 0). Open PRs: #97 (docs/wiki)
 | 9364aba (#95) | Memoize SignalStream sort (1000 signals) and UserMetrics `getUserIndex`/cohort; 5 tab switches now ~118ms one-time |
 
 ## Suspected remaining causes (unverified)
-1. **Sync `analyzeIntentions()` still on interaction paths**: `SystemProgressWidget.tsx:1555` (a second call site, not deferred like the one at ~1622), `Logs.tsx:3975` (log-submit/trigger path), `System.tsx:268`. On a cooldown miss (>5 min) each runs the full pattern scan inside a handler.
+1. **Sync `analyzeIntentions()` / `recomputeAssembly()` on the main thread**: `System.tsx:268` runs both in an effect on every `[logs]` change (after paint, but still a long task that blocks the next click); `SystemProgressWidget.tsx:1555` runs it on mount; `Logs.tsx:3975` runs it synchronously in the `/qos` trigger handler (not deferred, unlike the Generate Report button). On a cooldown miss (>5 min) each is a full pattern scan.
 2. **Store fan-out**: every subscriber re-renders on any engine write; only some widgets memoize. `setTimeout(0)` defers but doesn't remove the long task — it still blocks the next input.
 3. **Button hover CSS**: `.grid-fill-hover::before` (`src/client/index.css:102`) uses gradient backgrounds with `isolation: isolate`, `overflow-hidden`, and `opacity` transition on every button; `Button.tsx` primary/rounded variants also subscribe to `theme`/`isMirrorOn` stores (cheap, but per-button). Likely minor; check paint cost on low-end/mobile with many buttons visible.
 4. **Timers**: 18 `setInterval` usages in client components, plus a 30-min background QOS monitor that pre-triggers `analyzeIntentions()`.
