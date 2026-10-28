@@ -1233,6 +1233,8 @@ export default async (fastify: FastifyInstance) => {
       'quantum_knowledge_distribution',
       // v120: quantum knowledge broadcast (P164)
       'quantum_knowledge_broadcast',
+      // v121: generative field activation (P165)
+      'generative_field_activation',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
