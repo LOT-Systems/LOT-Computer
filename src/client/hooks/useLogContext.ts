@@ -21,9 +21,25 @@ import type { Log } from '#shared/types'
  * and session-aware biofeedback from the log history.
  */
 export function useLogContext() {
-  const { data: logs = [] } = useLogs()
+  const { data: logs = EMPTY_LOGS } = useLogs()
 
+  // 15+ widgets call this hook; the per-instance useMemo alone would run the
+  // full computation once per widget. Share one result per `logs` reference.
   return React.useMemo(() => {
+    let ctx = contextCache.get(logs)
+    if (!ctx) {
+      ctx = computeLogContext(logs)
+      contextCache.set(logs, ctx)
+    }
+    return ctx
+  }, [logs])
+}
+
+const EMPTY_LOGS: Log[] = []
+const contextCache = new WeakMap<Log[], ReturnType<typeof computeLogContext>>()
+
+function computeLogContext(logs: Log[]) {
+  {
     const now = dayjs()
     const currentHour = now.hour()
 
@@ -356,7 +372,7 @@ export function useLogContext() {
       engagementLevel,
       getContextualDirective,
     }
-  }, [logs])
+  }
 }
 
 function formatTimeAgo(time: dayjs.Dayjs): string {

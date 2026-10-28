@@ -15,6 +15,44 @@ if (typeof window !== 'undefined') {
   ;(window as any).__LOT_WIDGET_PERF__ = widgetTimings
 }
 
+// Widget usage log — per-widget mount / error counters persisted on device.
+// Local-only: nothing leaves the browser until a caller reads getWidgetUsage().
+const USAGE_KEY = 'lot-widget-usage-v1'
+
+export interface WidgetUsageEntry {
+  mounts: number
+  errors: number
+  lastMountAt: number
+  lastMountMs: number
+  maxMountMs: number
+}
+
+function readUsage(): Record<string, WidgetUsageEntry> {
+  try {
+    return JSON.parse(localStorage.getItem(USAGE_KEY) || '{}')
+  } catch {
+    return {}
+  }
+}
+
+function recordUsage(name: string, patch: (e: WidgetUsageEntry) => void) {
+  try {
+    const all = readUsage()
+    const entry = all[name] || { mounts: 0, errors: 0, lastMountAt: 0, lastMountMs: 0, maxMountMs: 0 }
+    patch(entry)
+    all[name] = entry
+    localStorage.setItem(USAGE_KEY, JSON.stringify(all))
+  } catch {}
+}
+
+export function getWidgetUsage(): Record<string, WidgetUsageEntry> {
+  return readUsage()
+}
+
+if (typeof window !== 'undefined') {
+  ;(window as any).__LOT_WIDGET_USAGE__ = getWidgetUsage
+}
+
 export function getWidgetTimings(): Record<string, number> {
   return { ...widgetTimings }
 }
@@ -47,6 +85,12 @@ export class WidgetErrorBoundary extends React.Component<
     if (elapsed > 50) {
       console.warn(`[Perf] ${name} took ${elapsed}ms to mount`)
     }
+    recordUsage(name, (e) => {
+      e.mounts += 1
+      e.lastMountAt = Date.now()
+      e.lastMountMs = elapsed
+      e.maxMountMs = Math.max(e.maxMountMs, elapsed)
+    })
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
@@ -55,6 +99,9 @@ export class WidgetErrorBoundary extends React.Component<
       error,
       info.componentStack
     )
+    recordUsage(this.props.name || 'Widget', (e) => {
+      e.errors += 1
+    })
   }
 
   render() {

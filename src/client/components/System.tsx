@@ -376,6 +376,41 @@ export const System = React.memo(function SystemInner() {
 
   const optimalWidget = React.useMemo(() => getOptimalWidget(), [logs])
 
+  // Cooldown / chance rolls are drawn once per mount. Rolling in render made the
+  // Intentions and Subscribe widgets appear and vanish on unrelated re-renders.
+  const intentionsRoll = React.useRef(Math.random()).current
+  const subscribeRoll = React.useRef(Math.random()).current
+
+  const showIntentions = React.useMemo(() => {
+    const hasIntention = !!localStorage.getItem('current-intention')
+    const lastShown = localStorage.getItem('intentions-last-shown')
+    const twoDaysMs = 2 * 24 * 60 * 60 * 1000
+    const threeDaysMs = 3 * 24 * 60 * 60 * 1000
+
+    // Random cooldown between 2-3 days
+    const cooldownPeriod = twoDaysMs + intentionsRoll * (threeDaysMs - twoDaysMs)
+    const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
+    const intentionSuggestsIntentions = optimalWidget?.widget === 'intentions'
+
+    // Show if:
+    // 1. User has an existing intention to display, OR
+    // 2. Intention engine detects seeking-direction or morning-clarity patterns, OR
+    // 3. Cooldown passed (fallback for periodic prompting)
+    if (!(hasIntention || intentionSuggestsIntentions || cooldownPassed)) return false
+
+    if (!lastShown || cooldownPassed || intentionSuggestsIntentions) {
+      localStorage.setItem('intentions-last-shown', Date.now().toString())
+    }
+
+    // Store quantum reasoning for widget to display
+    if (intentionSuggestsIntentions && optimalWidget?.reason) {
+      localStorage.setItem('intentions-quantum-reason', optimalWidget.reason)
+    } else {
+      localStorage.removeItem('intentions-quantum-reason')
+    }
+    return true
+  }, [optimalWidget, intentionsRoll])
+
   // Community pulse — atmosphere layer
   const convergence = React.useMemo(() => getConvergenceSignal(), [])
   const ambientIntensity = React.useMemo(() => getAmbientIntensity(), [])
@@ -879,42 +914,7 @@ export const System = React.memo(function SystemInner() {
 
       {/* Intentions - Show if user has intention OR when intention engine detects seeking-direction pattern */}
       <WidgetErrorBoundary name="Intentions">
-        {(() => {
-          const hasIntention = !!localStorage.getItem('current-intention')
-
-          // Check cooldown (2-3 days since last shown)
-          const lastShown = localStorage.getItem('intentions-last-shown')
-          const twoDaysMs = 2 * 24 * 60 * 60 * 1000
-          const threeDaysMs = 3 * 24 * 60 * 60 * 1000
-
-          // Random cooldown between 2-3 days
-          const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
-          const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
-
-          const intentionSuggestsIntentions = optimalWidget?.widget === 'intentions'
-
-          // Show if:
-          // 1. User has an existing intention to display, OR
-          // 2. Intention engine detects seeking-direction or morning-clarity patterns, OR
-          // 3. Cooldown passed (fallback for periodic prompting)
-          if (hasIntention || intentionSuggestsIntentions || cooldownPassed) {
-            // Update last shown time
-            if (!lastShown || cooldownPassed || intentionSuggestsIntentions) {
-              localStorage.setItem('intentions-last-shown', Date.now().toString())
-            }
-
-            // Store quantum reasoning for widget to display
-            if (intentionSuggestsIntentions && optimalWidget?.reason) {
-              localStorage.setItem('intentions-quantum-reason', optimalWidget.reason)
-            } else {
-              localStorage.removeItem('intentions-quantum-reason')
-            }
-
-            return <div><IntentionsWidget /></div>
-          }
-
-          return null
-        })()}
+        {showIntentions && <div><IntentionsWidget /></div>}
       </WidgetErrorBoundary>
 
       {/* Subscribe - Show occasionally to engaged users without subscription */}
@@ -936,8 +936,8 @@ export const System = React.memo(function SystemInner() {
             return null
           }
 
-          // Random 20% chance to show when all conditions met
-          const shouldShow = Math.random() < 0.2
+          // Random 20% chance to show when all conditions met (rolled once per mount)
+          const shouldShow = subscribeRoll < 0.2
           return shouldShow && <div><SubscribeWidget /></div>
         })()}
       </WidgetErrorBoundary>
