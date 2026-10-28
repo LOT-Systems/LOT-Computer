@@ -25,6 +25,7 @@ import {
   UserSettings,
   WeatherRecord,
 } from '#shared/types'
+import type { BasicsView, Roster } from '#shared/basics/roster'
 import dayjs from '#client/utils/dayjs'
 import { DATE_TIME_FORMAT } from '#shared/constants'
 
@@ -70,6 +71,11 @@ export async function getMe(): Promise<UserProfile> {
   const { data } = await api.get<UserProfile>('/api/me')
   return data
 }
+
+// Basics (LOT-FM-001)
+export const useBasics = createQuery<BasicsView>('/api/basics', { staleTime: 30_000 })
+export const useBasicsEnlist = createMutation<Roster, BasicsView>('post', '/api/basics/enlist')
+export const useBasicsStandDown = createMutation<void, BasicsView>('post', '/api/basics/stand-down')
 
 export const useUpdateSettings = createMutation<UserSettings, void>(
   'post',

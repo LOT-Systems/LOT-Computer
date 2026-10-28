@@ -14,6 +14,9 @@ import { render } from '#client/utils/render'
 import config from '#client/config'
 import '#client/stores/theme'
 import { Layout } from '#client/components/ui'
+import { useStore } from '@nanostores/react'
+import * as stores from '#client/stores'
+import { Basics } from '#client/components/Basics'
 
 const LOT_ONELINERS = [
   'LOT is the subscription for basic essentials.',
@@ -41,6 +44,15 @@ function LotOneliner() {
 }
 
 const App = () => {
+  const route = useStore(stores.router)?.route
+  // OPEN TAB: the Basics ledger is public — no login required to read it.
+  if (route === 'basics') {
+    return (
+      <Layout>
+        <Basics />
+      </Layout>
+    )
+  }
   return (
     <Layout>
       <div className="mb-24">

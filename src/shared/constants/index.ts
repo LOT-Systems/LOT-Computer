@@ -43,6 +43,7 @@ export const USER_TAGS_BY_ID: Record<UserTag, { name: string; color?: Color }> =
   [UserTag.Mala]: { name: 'Mala' },
   [UserTag.Onyx]: { name: 'Onyx' },
   [UserTag.Usership]: { name: 'Usership' },
+  [UserTag.Basic]: { name: 'Basic' },
   [UserTag.Pro]: { name: 'Pro' },
   [UserTag.Suspended]: { name: 'Suspended', color: 'red' },
   [UserTag.Legacy]: { name: 'Legacy' },

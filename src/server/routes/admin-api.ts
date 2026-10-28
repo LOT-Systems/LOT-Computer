@@ -19,11 +19,13 @@ import { Umzug, SequelizeStorage } from 'umzug'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { escapeHtml } from '../utils/security.js'
+import { registerBasicsAdminRoutes } from './basics-api.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export default async (fastify: FastifyInstance) => {
+  registerBasicsAdminRoutes(fastify)
   // Add parser for form-encoded data from HTML forms
   // This allows the cleanup page's HTML form to POST without 415 errors
   fastify.addContentTypeParser('application/x-www-form-urlencoded',
