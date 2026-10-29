@@ -4180,6 +4180,47 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'generative_field_inheritance') {
+          const sustenanceConf = log.metadata?.sustenanceConf as number | undefined
+          const networkCount = log.metadata?.networkCount as number | undefined
+          const fieldBuilderCount = log.metadata?.fieldBuilderCount as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FIELDPROP:" blockView>
+                <div className="uppercase tracking-widest mb-4">GENERATIVE FIELD PROPAGATES</div>
+                {sustenanceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SUSTAIN CONF</span>
+                    <span className="tabular-nums">{sustenanceConf}%</span>
+                  </div>
+                )}
+                {networkCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">NETWORK 21D</span>
+                    <span className="tabular-nums">{networkCount}</span>
+                  </div>
+                )}
+                {fieldBuilderCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FIELD BUILDERS</span>
+                    <span className="tabular-nums">{fieldBuilderCount}</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL OUT 7D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">PROPAGATE: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">FIELD PROPAGATES · ORIGIN CONFIRMED</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

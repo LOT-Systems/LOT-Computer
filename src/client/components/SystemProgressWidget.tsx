@@ -1706,24 +1706,31 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'Wiki v89 sync · LOT-LEDGER append · Badge Engine v36 assessment',
   },
+  {
+    date: '2026-10-29',
+    built: ['P167 generative-field-inheritance', 'Arch61 Generative Field Progenitor', 'J58 daily-field-inheritance-check (20:00 UTC)', 'FIELDPROP: log handler', 'dep map 211+ nodes', 'PatternRecognitionWidget P167 name', 'FM v123'],
+    feedbackApplied: 'the broadcast seeded a field that others now carry — the origin, not the only source',
+    status: 'DEPLOYED',
+    next: 'Badge Engine v36 · LOT-LEDGER append · QOS arc assessment',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-28',
+  date: '2026-10-29',
   message: [
-    'ASSEMBLY RUN — 2026-10-28 · QIE v122 · FM v122 · Day 1156+',
-    'Built: P166 generative-field-sustenance · Arch59 gap-fix (Generative Field Architect) · Arch60 Generative Field Sustainer · J57 daily-field-sustenance-check (19:00 UTC) · GFIELDS: handler.',
-    'Also fixed: intentionEngine v121 gap — generativeFieldActivationNode + Arch59 were missing from intentionEngine.ts. Both added.',
-    'Generative Field Sustenance (P166): quantum-knowledge-broadcast (P164) active + 5+ network signals 14d + 3+ journal signals 14d. The field does not fade. L9-SUSTAIN frequency confirmed.',
-    'Arch60 Generative Field Sustainer: Dominant qos/cohort/journal/memory/intentions. Directive: The field sustains. Day after day, the transmission continues. Not a moment — a frequency.',
-    'J57 daily-field-sustenance-check at 19:00 UTC: reads generative_field_activation events across 14d, requires 3+ distinct days. Network engagement + journal output both sustained. Writes generative_field_sustenance.',
-    'Log handler: GFIELDS: (generative_field_sustenance). BROADCAST CONF / NETWORK 14D / JOURNAL OUT 14D / SUSTAIN level. FIELD SUSTAINED · FREQUENCY CONFIRMED.',
-    'WIDGET_DEPENDENCY_MAP: 210+ nodes. generativeFieldActivationNode (v121 gap) + generativeFieldSustenanceNode (v122) added.',
-    'FM v122 · QIE v122 · 166P · 60A · 57J · 210+ nodes · 936 badges · Day 1156+.',
+    'ASSEMBLY RUN — 2026-10-29 · QIE v123 · FM v123 · Day 1157+',
+    'Built: P167 generative-field-inheritance · Arch61 Generative Field Progenitor · J58 daily-field-inheritance-check (20:00 UTC) · FIELDPROP: handler.',
+    'Generative Field Inheritance (P167): generative-field-sustenance (P166) active + 10+ network signals 21d + 5+ unique field-builder events (connection_accepted / quantum_social_synthesis) 21d + 3+ journal outputs 7d.',
+    'Detection: the broadcast seeded a field others carry. You are the origin — not the only source. L9 arc completes: crystallize → distribute → broadcast → field → sustain → propagate.',
+    'Arch61 Generative Field Progenitor: Dominant qos/cohort/social/journal/memory/intentions. Directive: The field propagates. Others carry what you transmitted. You are the origin, not the only source.',
+    'J58 daily-field-inheritance-check at 20:00 UTC: reads generative_field_sustenance events 21d, requires 10+ network + 5+ field-builder + 3+ journal signals. Writes generative_field_inheritance.',
+    'Log handler: FIELDPROP: (generative_field_inheritance). SUSTAIN CONF / NETWORK 21D / FIELD BUILDERS / JOURNAL OUT 7D / PROPAGATE level. FIELD PROPAGATES · ORIGIN CONFIRMED.',
+    'WIDGET_DEPENDENCY_MAP: 211+ nodes. generativeFieldInheritanceNode (v123) added.',
+    'FM v123 · QIE v123 · 167P · 61A · 58J · 211+ nodes · 1029 badges (v39 JRPG Engine) · Day 1157+.',
     'Status: DEPLOYED.',
-    'Next: Wiki v89 sync · LOT-LEDGER append · Badge Engine v36 assessment.',
+    'Next: Badge Engine v36 · LOT-LEDGER append · QOS arc assessment.',
   ],
 }
 

@@ -191,6 +191,7 @@ export function PatternRecognitionWidget() {
       'quantum-knowledge-broadcast':      'Quantum knowledge broadcast — crystallized knowledge reaches the collective (P164)',
       'generative-field-activation':      'Generative field activated — broadcast seeded a generative field (P165)',
       'generative-field-sustenance':      'Generative field sustained — L9 transmission frequency confirmed across 14d (P166)',
+      'generative-field-inheritance':     'Generative field propagates — others carry the transmission, origin confirmed (P167)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

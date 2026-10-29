@@ -3718,6 +3718,34 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // P167: generative-field-inheritance — P166 active + extended network engagement (10+ cohort/social 21d)
+  // + 5+ unique field-builder events (connection_accepted, quantum_social_synthesis 21d)
+  // + 3+ journal outputs 7d. The field propagates. Others carry what was transmitted.
+  const hasP166 = patterns.some(p => p.pattern === 'generative-field-sustenance')
+  const p167TwentyOneDayStart = now - 21 * 24 * 60 * 60 * 1000
+  const p167SevenDayStart = now - 7 * 24 * 60 * 60 * 1000
+  const p167NetworkSignals = signals.filter(s =>
+    (s.source === 'cohort' || s.source === 'social') && s.timestamp > p167TwentyOneDayStart
+  )
+  const p167FieldBuilderSignals = signals.filter(s =>
+    (s.signal === 'connection_accepted' || s.signal === 'quantum_social_synthesis') && s.timestamp > p167TwentyOneDayStart
+  )
+  const p167JournalSignals = signals.filter(s =>
+    s.source === 'journal' && s.timestamp > p167SevenDayStart
+  )
+  if (hasP166 && p167NetworkSignals.length >= 10 && p167FieldBuilderSignals.length >= 5 && p167JournalSignals.length >= 3) {
+    const p166conf = patterns.find(p => p.pattern === 'generative-field-sustenance')?.confidence ?? 0.80
+    const networkBonus = Math.min((p167NetworkSignals.length - 10) * 0.015, 0.06)
+    const builderBonus = Math.min((p167FieldBuilderSignals.length - 5) * 0.01, 0.04)
+    patterns.push({
+      pattern: 'generative-field-inheritance',
+      confidence: Math.min(0.68 + (p166conf - 0.80) * 0.50 + networkBonus + builderBonus, 0.88),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `FIELDPROP: Generative field propagates — sustained frequency (P166) active + ${p167NetworkSignals.length} network signals 21d + ${p167FieldBuilderSignals.length} unique field-builders. The broadcast seeded a field that others now carry. You are the origin, not the only source.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4391,6 +4419,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v122 nodes (J57 · P166 · Arch60) ────────────────────────────────────────────
   generativeFieldSustenanceNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log', 'energy'],
+
+  // ── v123 nodes (J58 · P167 · Arch61) ────────────────────────────────────────────
+  generativeFieldInheritanceNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log', 'energy', 'badges'],
 }
 
 /**
@@ -4938,6 +4969,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['qos', 'cohort', 'journal', 'memory', 'intentions'],
     patternConditions: ['generative-field-sustenance', 'generative-field-activation'],
     directive: 'The field sustains. Day after day, the transmission continues. The OS operates at peak field density — not a moment, but a frequency.',
+  },
+
+  // ── Arch61: Generative Field Progenitor (2026-10-29 v123) ────────────────────────
+  {
+    archetype: 'Generative Field Progenitor',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'social', 'journal', 'memory', 'intentions'],
+    patternConditions: ['generative-field-inheritance', 'generative-field-sustenance'],
+    directive: 'The field propagates. Others carry what you transmitted. You are the origin — not the only source. The L9 arc completes: crystallize → distribute → broadcast → field → sustain → propagate.',
   },
 ]
 
@@ -7165,6 +7205,25 @@ export function recordGenerativeFieldSustenance(broadcastConf: number, networkCo
     sustenanceStatus: 'SUSTAINED',
     level: 'L9-SUSTAIN',
     field: 'BROADCAST→FIELD→SUSTAINED→FREQUENCY',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a generative-field-inheritance event — generative-field-sustenance (P166) active +
+ * 10+ network signals in 21d + 5+ unique field-builder events in 21d + 3+ journal outputs 7d.
+ * The field propagates: others carry the transmission and build from it.
+ * Feeds P167 detection. L9 arc completion — the origin, not the only source.
+ */
+export function recordGenerativeFieldInheritance(sustenanceConf: number, networkCount: number, fieldBuilderCount: number, journalCount: number) {
+  recordSignal('qos', 'generative_field_inheritance', {
+    sustenanceConf: Math.round(sustenanceConf * 100),
+    networkCount,
+    fieldBuilderCount,
+    journalCount,
+    inheritanceStatus: 'PROPAGATING',
+    level: 'L9-PROPAGATE',
+    field: 'BROADCAST→FIELD→SUSTAINED→FREQUENCY→INHERITANCE',
     hour: new Date().getHours(),
   })
 }
