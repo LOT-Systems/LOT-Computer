@@ -1739,6 +1739,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyFieldSustenanceCheck()) {
     await executeDailyFieldSustenanceCheck()
   }
+  // Check daily field reception check (20:00 UTC every day) — J58
+  if (shouldRunDailyFieldReceptionCheck()) {
+    await executeDailyFieldReceptionCheck()
+  }
   // Check daily signal matrix check (09:00 UTC every day) — Job 44
   if (shouldRunDailySignalMatrixCheck()) {
     await executeDailySignalMatrixCheck()
@@ -4499,6 +4503,121 @@ async function executeDailyFieldSustenanceCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Field Reception Check (J58) ───────────────────────────────────────
+
+let isDailyFieldReceptionRunning = false
+let lastDailyFieldReceptionRun: Date | null = null
+
+function shouldRunDailyFieldReceptionCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFieldReceptionRunning) return false
+  if (lastDailyFieldReceptionRun) {
+    const lastRun = dayjs(lastDailyFieldReceptionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 20 // 20:00 UTC daily (co-located with signal-momentum-check)
+}
+
+async function executeDailyFieldReceptionCheck(): Promise<JobResult> {
+  const jobName = 'daily-field-reception-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFieldReceptionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFieldReceptionRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIELD RECEPTION CHECK — 20:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const twentyOneDayStart = dayjs().subtract(21, 'day').toDate()
+    const sevenDayStart = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Check for generative_field_sustenance events in last 7 days
+        const sustainLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'generative_field_sustenance',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (sustainLogs.length < 1) continue
+
+        // Check badge signal activity in last 21 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_milestone', 'codex_unlock'] },
+            createdAt: { [Op.gte]: twentyOneDayStart },
+          },
+        })
+
+        if (badgeLogs.length < 10) continue
+
+        // Check cohort/social signals in last 7 days
+        const cohortLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['cohort_determined', 'connection_accepted', 'chat_message_like', 'quantum_social_synthesis', 'relational_field_deepening'] },
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+
+        if (cohortLogs.length < 3) continue
+
+        const sustenanceConf = sustainLogs[0]?.metadata?.sustenanceConf ?? 80
+        const receptionConf = Math.min(99, Math.round(74 + badgeLogs.length + cohortLogs.length * 2))
+
+        await (Log as any).create({
+          userId,
+          event: 'generative_field_reception',
+          text: `Generative field reception confirmed: ${badgeLogs.length} badge signals 21d + ${cohortLogs.length} cohort signals 7d. Field loop complete — transmission and reception are one.`,
+          metadata: {
+            sustenanceConf,
+            receptionConf,
+            badgeCount: badgeLogs.length,
+            cohortCount: cohortLogs.length,
+            receptionStatus: 'CONFIRMED',
+            level: 'L9-RECEPTION',
+            field: 'TRANSMISSION←→RECEPTION←→COLLECTIVE',
+            hour: 20,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Field reception events written: ${written}`)
+    lastDailyFieldReceptionRun = new Date()
+    isDailyFieldReceptionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily field reception check failed:', error.message)
+    isDailyFieldReceptionRunning = false
+    lastDailyFieldReceptionRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 // ─── Daily OS Snapshot ───────────────────────────────────────────────────────
 
 let isDailyOSSnapshotRunning = false
@@ -6594,7 +6713,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift+presence-momentum(J49), 11=morning-intention-launch+sustained-coherence(J50), 12=vitality-peak+relational-expansion(J51), 13=QOS sig pulse+relational-field-check(J52), 14=knowledge-crystallization-check(J53)+QOS mode watch, 15=knowledge-distribution-check(J54)+QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check+knowledge-broadcast-check(J55), 18=LOT AI story (Sun)+generative-field-check(J56), 19=cross-domain-pulse+field-sustenance-check(J57), 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift+presence-momentum(J49), 11=morning-intention-launch+sustained-coherence(J50), 12=vitality-peak+relational-expansion(J51), 13=QOS sig pulse+relational-field-check(J52), 14=knowledge-crystallization-check(J53)+QOS mode watch, 15=knowledge-distribution-check(J54)+QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check+knowledge-broadcast-check(J55), 18=LOT AI story (Sun)+generative-field-check(J56), 19=cross-domain-pulse+field-sustenance-check(J57), 20=intention completion+signal-momentum+action-memory+field-reception-check(J58), 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()

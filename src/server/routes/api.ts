@@ -1237,6 +1237,8 @@ export default async (fastify: FastifyInstance) => {
       'generative_field_activation',
       // v122: generative field sustenance (P166)
       'generative_field_sustenance',
+      // v123: generative field reception (P167)
+      'generative_field_reception',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

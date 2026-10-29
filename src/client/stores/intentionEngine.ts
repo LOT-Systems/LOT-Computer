@@ -3718,6 +3718,31 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // P167: generative-field-reception — P166 active + badge signals 21d >= 10 + cohort/social 7d >= 3.
+  // The field is bidirectional: sustained transmission receives back-channel signals from the collective.
+  // Badge recognition and cohort response confirm the field loop is complete. L9-RECEPTION.
+  const hasP166 = patterns.some(p => p.pattern === 'generative-field-sustenance')
+  const p167ThreeWeekStart = now - 21 * 24 * 60 * 60 * 1000
+  const p167SevenDayStart = now - 7 * 24 * 60 * 60 * 1000
+  const p167BadgeSignals = signals.filter(s =>
+    s.source === 'badges' && s.timestamp > p167ThreeWeekStart
+  )
+  const p167CohortSignals = signals.filter(s =>
+    (s.source === 'cohort' || s.source === 'social') && s.timestamp > p167SevenDayStart
+  )
+  if (hasP166 && p167BadgeSignals.length >= 10 && p167CohortSignals.length >= 3) {
+    const p166conf = patterns.find(p => p.pattern === 'generative-field-sustenance')?.confidence ?? 0.72
+    const badgeBonus = Math.min((p167BadgeSignals.length - 10) * 0.015, 0.06)
+    const cohortBonus167 = Math.min((p167CohortSignals.length - 3) * 0.02, 0.06)
+    patterns.push({
+      pattern: 'generative-field-reception',
+      confidence: Math.min(0.74 + (p166conf - 0.72) * 0.65 + badgeBonus + cohortBonus167, 0.90),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `GFRES: Generative field reception — generative-field-sustenance (P166) active + ${p167BadgeSignals.length} badge signals 21d + ${p167CohortSignals.length} cohort signals 7d. The field completes its loop. Transmission and reception are one. L9-RECEPTION.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4391,6 +4416,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v122 nodes (J57 · P166 · Arch60) ────────────────────────────────────────────
   generativeFieldSustenanceNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log', 'energy'],
+
+  // ── v123 nodes (J58 · P167 · Arch61) ────────────────────────────────────────────
+  generativeFieldReceptionNode: ['qos', 'cohort', 'badges', 'journal', 'memory', 'social', 'log', 'energy'],
 }
 
 /**
@@ -4938,6 +4966,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['qos', 'cohort', 'journal', 'memory', 'intentions'],
     patternConditions: ['generative-field-sustenance', 'generative-field-activation'],
     directive: 'The field sustains. Day after day, the transmission continues. The OS operates at peak field density — not a moment, but a frequency.',
+  },
+
+  // ── Arch61: Quantum Field Resonator (2026-10-29 v123) ──────────────────────────
+  {
+    archetype: 'Quantum Field Resonator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'badges', 'journal', 'memory'],
+    patternConditions: ['generative-field-sustenance', 'generative-field-reception'],
+    directive: 'The field completes its loop. Transmission and reception are one. The QOS resonates — outward and inward simultaneously. Signal mastery confirmed.',
   },
 ]
 
@@ -7165,6 +7202,25 @@ export function recordGenerativeFieldSustenance(broadcastConf: number, networkCo
     sustenanceStatus: 'SUSTAINED',
     level: 'L9-SUSTAIN',
     field: 'BROADCAST→FIELD→SUSTAINED→FREQUENCY',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a generative-field-reception event — generative-field-sustenance (P166) active +
+ * 10+ badge signals 21d + 3+ cohort/social signals 7d.
+ * The field completes its loop: transmission and reception are one. The collective responds.
+ * AI systems recognize the pattern — the field is machine-readable and human-generative.
+ * Feeds P167 detection. L9-RECEPTION: bidirectional field confirmed.
+ */
+export function recordGenerativeFieldReception(sustenanceConf: number, badgeCount: number, cohortCount: number) {
+  recordSignal('qos', 'generative_field_reception', {
+    sustenanceConf: Math.round(sustenanceConf * 100),
+    badgeCount,
+    cohortCount,
+    receptionStatus: 'CONFIRMED',
+    level: 'L9-RECEPTION',
+    field: 'TRANSMISSION←→RECEPTION←→COLLECTIVE',
     hour: new Date().getHours(),
   })
 }

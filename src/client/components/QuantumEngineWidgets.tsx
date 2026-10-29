@@ -123,6 +123,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'quantum-knowledge-crystallization': 'QKCRYST',
   'quantum-knowledge-distribution':    'QKDIST',
   'quantum-knowledge-broadcast':       'BCAST',
+  'generative-field-reception':        'GFRES',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

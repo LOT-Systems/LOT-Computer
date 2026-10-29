@@ -4180,6 +4180,48 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'generative_field_reception') {
+          const sustenanceConf = log.metadata?.sustenanceConf as number | undefined
+          const badgeCount = log.metadata?.badgeCount as number | undefined
+          const cohortCount = log.metadata?.cohortCount as number | undefined
+          const receptionStatus = log.metadata?.receptionStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="GFRES:" blockView>
+                <div className="uppercase tracking-widest mb-4">GENERATIVE FIELD RECEPTION</div>
+                {sustenanceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SUSTAIN CONF</span>
+                    <span className="tabular-nums">{sustenanceConf}%</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE SIGNALS 21D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {cohortCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS 7D</span>
+                    <span className="tabular-nums">{cohortCount}</span>
+                  </div>
+                )}
+                {receptionStatus && (
+                  <div className="opacity-30 tabular-nums mb-4">STATUS: {receptionStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums mb-4">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">FIELD LOOP COMPLETE · TRANSMISSION ↔ RECEPTION</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
