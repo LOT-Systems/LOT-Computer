@@ -2079,11 +2079,34 @@ export const Logs: React.FC = React.memo(function LogsInner() {
         } else if (log.event === 'calendar_entry') {
           const entryType = log.metadata?.entryType as string | undefined
           const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
                 <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                {date && <div className="opacity-40 mt-8">{date}{time ? ` ${time}` : ''}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_done') {
+          const label = log.metadata?.label as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL-DONE:" blockView>
+                <div className="uppercase tracking-widest">CLOSED</div>
+                {label && <div className="opacity-40 mt-8">{label}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_timer') {
+          const label = log.metadata?.label as string | undefined
+          const seconds = Number(log.metadata?.seconds) || 0
+          const mins = Math.max(1, Math.round(seconds / 60))
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL-TIME:" blockView>
+                <div className="tabular-nums">{mins}M</div>
+                {label && <div className="opacity-40 mt-8">{label}</div>}
               </Block>
             </LogContainer>
           )
