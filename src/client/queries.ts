@@ -17,6 +17,7 @@ import {
   AdminUsersSort,
   ChatMessageLikePayload,
   DefaultQuestion,
+  EmailRecord,
   Log,
   Paginated,
   PublicChatMessage,
@@ -119,6 +120,19 @@ export const useSendDirectMessage = createMutation<
   { receiverId: string; message: string },
   void
 >('post', '/api/direct-messages')
+
+// LOT® Email
+export const useEmails = createQuery<{ emails: EmailRecord[] }>('/api/emails', {
+  refetchOnWindowFocus: false,
+})
+
+export const useSendEmail = createMutation<
+  { to: string; body: string; subject?: string; source?: 'log' | 'sync' | 'cohort' },
+  { id: string; receiverId: string; receiverName: string }
+>('post', '/api/emails')
+
+export const markEmailRead = (id: string) =>
+  api.post(`/api/emails/${id}/read`).then((res) => res.data)
 
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,

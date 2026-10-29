@@ -380,6 +380,10 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'email': {
+          if (data.receiverId === req.user.id) write({ event, data })
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4084,6 +4088,155 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       return reply.status(500).send({ error: 'Failed to send message' })
     }
   })
+
+  // ============================================================================
+  // LOT® EMAIL — simplest possible mail between LOT Community members.
+  // Composed in Log (`/email to Hitomi.`) or from Cohort, delivered to Sync.
+  // Community = anyone who can access Sync chat (Usership/Onyx/Legacy/R&D/Admin).
+  // ============================================================================
+  const isSuspendedTags = (tags: string[]) =>
+    tags.some((t) => t.toLowerCase() === 'suspended')
+
+  fastify.get('/emails', async (req: FastifyRequest, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires LOT Community access' })
+    }
+    const emails = await fastify.models.Email.findAll({
+      where: { receiverId: req.user.id },
+      order: [['createdAt', 'DESC']],
+      limit: 50,
+    })
+    const senders = await fastify.models.User.findAll({
+      where: { id: [...new Set(emails.map((e) => e.senderId))] },
+      attributes: ['id', 'firstName', 'lastName'],
+    })
+    const nameOf = new Map(
+      senders.map((u) => [u.id, `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown'])
+    )
+    return {
+      emails: emails.map((e) => ({
+        id: e.id,
+        senderId: e.senderId,
+        senderName: nameOf.get(e.senderId) || 'Unknown',
+        subject: e.subject,
+        body: e.body,
+        source: e.source,
+        isRead: !!e.readAt,
+        createdAt: e.createdAt,
+      })),
+    }
+  })
+
+  fastify.post(
+    '/emails',
+    async (
+      req: FastifyRequest<{
+        Body: { to: string; body: string; subject?: string; source?: 'log' | 'sync' | 'cohort' }
+      }>,
+      reply
+    ) => {
+      const myTags = req.user.tags || []
+      if (isSuspendedTags(myTags)) return reply.status(403).send({ error: 'Account suspended' })
+      if (!canAccessChat(myTags)) {
+        return reply.status(403).send({ error: 'Email requires LOT Community access' })
+      }
+
+      const to = String(req.body?.to || '').trim()
+      const body = String(req.body?.body || '').trim().slice(0, 5000)
+      const subject = req.body?.subject ? String(req.body.subject).trim().slice(0, 200) : null
+      const source = ['log', 'sync', 'cohort'].includes(req.body?.source as string)
+        ? (req.body.source as 'log' | 'sync' | 'cohort')
+        : 'log'
+      if (!to || !body) return reply.status(400).send({ error: 'Recipient and body are required' })
+
+      // Recipient: user id, or first name (case-insensitive) among Community members
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(to)
+      const candidates = (
+        await fastify.models.User.findAll({
+          where: isUuid
+            ? { id: to }
+            : Sequelize.where(
+                Sequelize.fn('lower', Sequelize.col('firstName')),
+                to.toLowerCase()
+              ),
+          attributes: ['id', 'firstName', 'lastName', 'tags'],
+          limit: 20,
+        })
+      ).filter(
+        (u) =>
+          u.id !== req.user.id &&
+          canAccessChat(u.tags || []) &&
+          !isSuspendedTags(u.tags || [])
+      )
+
+      if (candidates.length === 0) {
+        return reply.status(404).send({ error: `No LOT Community member named "${to}"` })
+      }
+      if (candidates.length > 1) {
+        return reply.status(409).send({
+          error: `Several members named "${to}" — use a full name or pick from Cohort`,
+          candidates: candidates.map((u) => ({
+            id: u.id,
+            name: `${u.firstName || ''} ${u.lastName || ''}`.trim(),
+          })),
+        })
+      }
+      const receiver = candidates[0]
+
+      const email = await fastify.models.Email.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        subject,
+        body,
+        source,
+      })
+
+      // Delivered to Sync (receiver-only, see the /sync switch)
+      sync.emit('email', {
+        id: email.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        senderName: `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim() || 'Unknown',
+        subject: email.subject,
+        body: email.body,
+        source: email.source,
+        isRead: false,
+        createdAt: email.createdAt,
+      })
+
+      process.nextTick(async () => {
+        try {
+          const context = await getLogContext(req.user)
+          await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'email_sent',
+            text: '',
+            metadata: { emailId: email.id, receiverId: receiver.id, source },
+            context,
+          })
+        } catch (logError) {
+          console.error('Error logging email:', logError)
+        }
+      })
+
+      return {
+        id: email.id,
+        receiverId: receiver.id,
+        receiverName: `${receiver.firstName || ''} ${receiver.lastName || ''}`.trim(),
+      }
+    }
+  )
+
+  fastify.post(
+    '/emails/:id/read',
+    async (req: FastifyRequest<{ Params: { id: string } }>, reply) => {
+      await fastify.models.Email.update(
+        { readAt: new Date() },
+        { where: { id: req.params.id, receiverId: req.user.id, readAt: null } }
+      )
+      return { ok: true }
+    }
+  )
 
   // ============================================================================
   // STATS API - Real-time metrics and community insights

@@ -24,9 +24,13 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  useSendEmail,
+  markEmailRead,
 } from '#client/queries'
+import { $emailDraftTo } from '#client/stores/email'
 import { sync } from '../sync'
-import { PublicChatMessage, UserTag } from '#shared/types'
+import { PublicChatMessage, UserTag, EmailRecord } from '#shared/types'
 import {
   SYNC_CHAT_MESSAGES_TO_SHOW,
   MAX_SYNC_CHAT_MESSAGE_LENGTH,
@@ -69,6 +73,33 @@ export const Sync = React.memo(function SyncInner() {
     if (me.isAdmin) return true
     return me.tags.some((tag) => CHAT_ALLOWED_TAGS.includes(tag.toLowerCase()))
   }, [me])
+
+  // LOT® Email: inbox (API + live SSE) and optional compose (from Cohort)
+  const emailDraftTo = useStore($emailDraftTo)
+  const [emailBody, setEmailBody] = React.useState('')
+  const [emailError, setEmailError] = React.useState<string | null>(null)
+  const [sseEmails, setSseEmails] = React.useState<EmailRecord[]>([])
+  const [readIds, setReadIds] = React.useState<Set<string>>(new Set())
+  const { data: emailData } = useEmails({ enabled: canAccessChat })
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: () => {
+      setEmailBody('')
+      setEmailError(null)
+      $emailDraftTo.set(null)
+    },
+    onError: (err: any) =>
+      setEmailError(String(err?.response?.data?.error || 'Email failed')),
+  })
+  const emails = React.useMemo(() => {
+    const fetched = emailData?.emails || []
+    const ids = new Set(fetched.map((e) => e.id))
+    return [...sseEmails.filter((e) => !ids.has(e.id)), ...fetched]
+  }, [emailData, sseEmails])
+  const onReadEmail = (id: string) => () => {
+    if (readIds.has(id)) return
+    setReadIds((prev) => new Set(prev).add(id))
+    markEmailRead(id).catch(() => {})
+  }
 
   const { data: fetchedMessages } = useChatMessages()
   const { mutate: createChatMessage } = useCreateChatMessage({
@@ -117,8 +148,12 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeEmailListener } = sync.listen('email', (data: any) => {
+      setSseEmails((prev) => (prev.some((x) => x.id === data.id) ? prev : [data, ...prev]))
+    })
     return () => {
       disposeChatMessageListener()
+      disposeEmailListener()
       disposeChatMessageLikeListener()
     }
   }, [me?.id])
@@ -180,6 +215,63 @@ export const Sync = React.memo(function SyncInner() {
 
   return (
     <div className="max-w-[700px]">
+      {emailDraftTo && (
+        <div className="mb-40">
+          <div className="opacity-30 mb-4">Email to {emailDraftTo.name}</div>
+          <form
+            className="flex items-center gap-x-8"
+            onSubmit={(ev) => {
+              ev.preventDefault()
+              if (!emailBody.trim()) return
+              sendEmail({ to: emailDraftTo.id, body: emailBody, source: 'cohort' })
+            }}
+          >
+            <ResizibleGhostInput
+              direction="vh"
+              value={emailBody}
+              onChange={setEmailBody}
+              placeholder="Write an email..."
+              containerClassName="flex-grow leading-normal"
+              className="leading-normal"
+            />
+            <Button type="submit" kind="secondary" size="small" disabled={!emailBody.trim()}>
+              Send
+            </Button>
+            <Button type="button" kind="secondary" size="small" onClick={() => $emailDraftTo.set(null)}>
+              Cancel
+            </Button>
+          </form>
+          {emailError && <div className="text-acc/40 mt-4">{emailError}</div>}
+        </div>
+      )}
+
+      {emails.length > 0 && (
+        <div className="mb-40">
+          <div className="opacity-30 mb-4">
+            Email{emails.some((e) => !e.isRead && !readIds.has(e.id)) ? ' •' : ''}
+          </div>
+          {emails.slice(0, 5).map((e) => {
+            const unread = !e.isRead && !readIds.has(e.id)
+            return (
+              <div
+                key={e.id}
+                className={cn(
+                  'flex items-start gap-x-8 cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded',
+                  !unread && 'text-acc/40'
+                )}
+                onClick={onReadEmail(e.id)}
+              >
+                <span className="whitespace-nowrap">✉ {e.senderName}</span>
+                <div className="whitespace-breakspaces" style={{ wordBreak: 'break-word' }}>
+                  {e.subject ? `${e.subject} — ` : ''}
+                  {e.body}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}

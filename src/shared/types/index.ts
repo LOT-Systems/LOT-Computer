@@ -450,4 +450,17 @@ export type SyncEvents = {
   chatMessage: PublicChatMessage;
   chatMessageLike: ChatMessageLikeEventPayload;
   settings_updated: Record<string, never>;
+  email: EmailRecord;
 };
+
+export interface EmailRecord {
+  id: string;
+  senderId: string;
+  receiverId?: string;
+  senderName: string;
+  subject: string | null;
+  body: string;
+  source: 'log' | 'sync' | 'cohort';
+  isRead: boolean;
+  createdAt: string;
+}

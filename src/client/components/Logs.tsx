@@ -28,12 +28,12 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, parseEmailCommand, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useSendEmail } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3707,6 +3707,25 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: (data, vars) => {
+      setEmailStatus(`SENT TO ${data.receiverName.toUpperCase()} — appears in their Sync`)
+      // Replace the command so a second Ctrl+Enter can never re-send it
+      const current = valueRef.current
+      const cmd = parseEmailCommand(current)
+      if (cmd) {
+        const updated = current.slice(0, current.length - cmd.raw.length) + `✉ Email sent to ${data.receiverName}: ${vars.body}`
+        setValue(updated)
+        valueRef.current = updated
+        onChangeRef.current(updated)
+        setIsSaved(true)
+      }
+    },
+    onError: (err: any) => {
+      setEmailStatus(String(err?.response?.data?.error || 'EMAIL FAILED').toUpperCase())
+    },
+  })
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3911,6 +3930,12 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        const emailCmd = parseEmailCommand(valueRef.current)
+        if (emailCmd) {
+          setEmailStatus('SENDING...')
+          sendEmail({ to: emailCmd.to, body: emailCmd.body, source: 'log' })
+          return
+        }
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -3921,7 +3946,7 @@ const NoteEditor = ({
       }
       // Regular Enter key creates newline (default behavior)
     },
-    [primary]
+    [primary, sendEmail]
   )
 
   // --------------------------------------------------------------------
@@ -4139,12 +4164,15 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to Name. Message — then Ctrl+Enter to send (lands in their Sync)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
           'Ctrl+Enter    Save log immediately',
         ]
         setSystemHelp(lines.join('\n'))
+      } else if (trigger === 'email-compose') {
+        setEmailStatus('EMAIL: /email to Name. Message — press Ctrl+Enter to send')
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4384,6 +4412,13 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailStatus && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6' }}>{emailStatus}</div>
             </Block>
           </div>
         )}
