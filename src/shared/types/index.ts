@@ -73,6 +73,7 @@ export type UserProfile = {
   timeChime?: boolean;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
+  timeZone?: string | null;
 };
 
 export type User = {
