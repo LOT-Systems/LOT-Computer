@@ -988,6 +988,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('dragon_quest_signal')
   }
 
+  // ── Calendar v28 — THE A.I. CALENDAR ──────────────────────────────────────
+  // Shannon Signal: Apr 30 — Claude Shannon born 1916
+  if (!hasBadge('shannon_signal') && month === 4 && day === 30) {
+    awardBadge('shannon_signal')
+    awarded.push('shannon_signal')
+  }
+  // Lovelace Day: Dec 10 — Ada Lovelace born 1815
+  if (!hasBadge('lovelace_day') && month === 12 && day === 10) {
+    awardBadge('lovelace_day')
+    awarded.push('lovelace_day')
+  }
+  // Von Neumann Day: Dec 28 — John von Neumann born 1903
+  if (!hasBadge('von_neumann_day') && month === 12 && day === 28) {
+    awardBadge('von_neumann_day')
+    awarded.push('von_neumann_day')
+  }
+
   return awarded
 }
 
@@ -3542,6 +3559,82 @@ export function checkJrpgVault(journalText: string): BadgeType[] {
   }
   if (!hasBadge('mother_signal') && /\bmother[\s-]?game\b|\bearth[\s-]?bound\b|\bness\b|\bpk[\s-]?fire\b|\bonett\b|\bgiygas\b/i.test(journalText)) {
     if (awardBadge('mother_signal')) awarded.push('mother_signal')
+  }
+  return awarded
+}
+
+// ── v30 THE A.I. ENGINE — Word turn detection ─────────────────────────────────
+
+const AI_WORDS_V30: { badge: BadgeType; pattern: RegExp }[] = [
+  { badge: 'neural_pattern',      pattern: /\bneural[\s-]?network\b|\bsynapse\b|\bneural[\s-]?path\b|\bbrain[\s-]?wiring\b|\bbrain[\s-]?plasticity\b|\bneuroplasticity\b/i },
+  { badge: 'training_log',        pattern: /\bin[\s-]?training\b|\bpractice[\s-]?run\b|\bbuilding[\s-]?the[\s-]?habit\b|\btraining[\s-]?day\b|\btraining[\s-]?log\b/i },
+  { badge: 'epoch_tracked',       pattern: /\bfull[\s-]?cycle\b|\bnew[\s-]?cycle\b|\bcycle[\s-]?ends\b|\bseason[\s-]?ends\b|\bepoch[\s-]?ends\b|\bnew[\s-]?epoch\b/i },
+  { badge: 'gradient_lock',       pattern: /\bgradient\b|\bmomentum[\s-]?building\b|\bdirection[\s-]?clear\b|\bpointed[\s-]?toward\b|\bclear[\s-]?direction\b/i },
+  { badge: 'inference_spark',     pattern: /\binference\b|\bdeduced\b|\bpiecing[\s-]?together\b|\bdrew[\s-]?a[\s-]?conclusion\b|\bmade[\s-]?the[\s-]?connection\b/i },
+  { badge: 'attention_mode',      pattern: /\bpaying[\s-]?attention\b|\bmindful[\s-]?presence\b|\bpresent[\s-]?moment\b|\bfull[\s-]?attention\b|\battentive\b/i },
+  { badge: 'embedding_signal',    pattern: /\bdeeply[\s-]?rooted\b|\banchored[\s-]?in\b|\bgrounded[\s-]?in[\s-]?the\b|\bembodied[\s-]?in\b|\bembedded[\s-]?in\b/i },
+  { badge: 'fine_tuned_badge',    pattern: /\bfine[\s-]?tuned\b|\bcalibrated[\s-]?to\b|\bdialed[\s-]?in\b|\bfine[\s-]?tune\b|\badjusted[\s-]?and\b|\btuned[\s-]?to\b/i },
+  { badge: 'reality_check_badge', pattern: /\breality[\s-]?check\b|\bgrounded[\s-]?check\b|\bfact[\s-]?checked\b|\bchecking[\s-]?in[\s-]?honestly\b|\bground[\s-]?truth\b/i },
+  { badge: 'token_tracked',       pattern: /\bresource[\s-]?economy\b|\ballocating[\s-]?my\b|\btracking[\s-]?what[\s-]?costs\b|\benergy[\s-]?budget\b|\bspend[\s-]?wisely\b/i },
+  { badge: 'prompt_found',        pattern: /\basking[\s-]?the[\s-]?right\b|\bright[\s-]?question\b|\bhow[\s-]?I[\s-]?ask\b|\bframing[\s-]?the[\s-]?question\b|\bthe[\s-]?way[\s-]?I[\s-]?ask\b/i },
+  { badge: 'model_ready',         pattern: /\bsystem[\s-]?ready\b|\bloaded[\s-]?up\b|\binitialized\b|\bready[\s-]?to[\s-]?run\b|\bmodel[\s-]?is[\s-]?ready\b|\bready[\s-]?to[\s-]?go\b/i },
+]
+
+/** Run v30 A.I. Engine word turn checks on journal text. Returns newly awarded badge IDs. */
+export function checkAIWordTurns(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  for (const { badge, pattern } of AI_WORDS_V30) {
+    if (!hasBadge(badge) && pattern.test(journalText)) {
+      if (awardBadge(badge)) awarded.push(badge)
+    }
+  }
+  return awarded
+}
+
+/** Award ai_session when 3+ v30 A.I. words appear in a single journal entry */
+export function checkAISession(journalText: string): BadgeType | null {
+  if (hasBadge('ai_session')) return null
+  const hits = AI_WORDS_V30.filter(({ pattern }) => pattern.test(journalText)).length
+  if (hits >= 3) {
+    if (awardBadge('ai_session')) return 'ai_session'
+  }
+  return null
+}
+
+/** Award context_window when checking in 03:00–03:14 AM local */
+export function checkContextWindow(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('context_window')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  const min = now.getMinutes()
+  if (hour === 3 && min <= 14) {
+    if (awardBadge('context_window')) return 'context_window'
+  }
+  return null
+}
+
+/** Award model_marathon when journal entry >= 800 words */
+export function checkModelMarathon(journalText: string): BadgeType | null {
+  if (hasBadge('model_marathon')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 800) {
+    if (awardBadge('model_marathon')) return 'model_marathon'
+  }
+  return null
+}
+
+/** Award A.I. Vault secret boss badges from journal text */
+export function checkAIVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  if (!hasBadge('turing_complete') && /\bturing[\s-]?complete\b|\bturing[\s-]?machine\b|\balan[\s-]?turing\b|\balan[\s-]?m\.?[\s-]?turing\b|\bcomputational[\s-]?universality\b/i.test(journalText)) {
+    if (awardBadge('turing_complete')) awarded.push('turing_complete')
+  }
+  if (!hasBadge('godel_found') && /\bg[oö]del\b|\bgoedel\b|\bincompleteness[\s-]?theorem\b|\bunprovable\b|\bundecidable[\s-]?proposition\b/i.test(journalText)) {
+    if (awardBadge('godel_found')) awarded.push('godel_found')
+  }
+  if (!hasBadge('ada_found') && /\bada[\s-]?lovelace\b|\bcharles[\s-]?babbage\b|\bdifference[\s-]?engine\b|\banalytical[\s-]?engine\b|\bfirst[\s-]?programmer\b/i.test(journalText)) {
+    if (awardBadge('ada_found')) awarded.push('ada_found')
   }
   return awarded
 }

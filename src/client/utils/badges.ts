@@ -1042,6 +1042,44 @@ export type BadgeType =
   | 'chrono_trigger_signal' // ○·◆·○ "chrono trigger/crono/lucca/marle/lavos/magus" detected (MYTHIC)
   | 'mother_signal'        // ∘·◆·∘ "ness/earthbound/pk thunder/pk fire/onett/giygas/mother 2" detected (MYTHIC)
 
+  // ── Word Turn v30 — THE A.I. ENGINE ─────────────────────────────────────
+  | 'neural_pattern'       // ◎·∿·◎ "neural/synapse/neural network/brain wiring/brain plasticity" detected (UNCOMMON)
+  | 'training_log'         // ▶·∘·▶ "training/in training/practice run/building the habit" detected (COMMON)
+  | 'epoch_tracked'        // ○→○   "epoch/full cycle/new cycle/cycle ends/season ends" detected (RARE)
+  | 'gradient_lock'        // →·∿·● "gradient/momentum/direction clear/pointed toward" detected (RARE)
+  | 'inference_spark'      // ∘·◉·∘ "inference/conclusion/deduced/piecing together" detected (UNCOMMON)
+  | 'attention_mode'       // ◎·●·◎ "attention/paying attention/mindful presence/present moment" detected (EPIC)
+  | 'embedding_signal'     // ◈·∿·◈ "embedded/rooted/embodied/grounded in the/deeply rooted" detected (RARE)
+  | 'fine_tuned_badge'     // ◉·∿·◉ "fine-tuned/calibrated/dialed in/fine tune/adjusted to" detected (RARE)
+  | 'reality_check_badge'  // ▣·∘·▣ "reality check/grounded check/verified/fact-checked/checking in" detected (EPIC)
+  | 'token_tracked'        // ≡·∘·≡ "token/counting/budgeting/resource economy/allocating" detected (UNCOMMON)
+  | 'prompt_found'         // ?·●·? "asking the right/right question/how I ask/framing the" detected (RARE)
+  | 'model_ready'          // ■·◉·■ "system ready/loaded up/initialized/ready to run/model is" detected (LEGENDARY)
+  // ── Calendar EE v28 — THE A.I. CALENDAR ─────────────────────────────────
+  | 'shannon_signal'       // ∞·∘·∞ Apr 30 — Claude Shannon born 1916 (father of information theory) (RARE)
+  | 'lovelace_day'         // ◈·∘·◈ Dec 10 — Ada Lovelace born 1815 (first programmer) (EPIC)
+  | 'von_neumann_day'      // ■·∘·■ Dec 28 — John von Neumann born 1903 (computer architecture) (RARE)
+  // ── Behavioral v27 — A.I. PATTERNS ──────────────────────────────────────
+  | 'ai_session'           // ◎·●·◎ 3+ A.I. Word Turn v30 words in one journal entry (RARE)
+  | 'context_window'       // ▣·∿·▣ Check in 03:00–03:14 AM local (the context window hour) (EPIC)
+  | 'model_marathon'       // ≋·◎·≋ Journal entry >= 800 words (EPIC)
+  // ── Achievement RPG v28 — A.I. CLASS ────────────────────────────────────
+  | 'ai_entry'             // ◎·∘   Any 1 Word Turn v30 badge earned (COMMON)
+  | 'ai_class'             // ◎·≈   Any 5 Word Turn v30 badges earned (UNCOMMON)
+  | 'ai_complete'          // ◎·≋   All 12 Word Turn v30 badges earned (LEGENDARY)
+  | 'ai_arc'               // ◎·◈   ai_complete + all 3 Calendar v28 badges (LEGENDARY)
+  | 'thirty_engines_arc'   // ◈·◈·◎ 1 badge from each Word Turn v1–v30 (LEGENDARY)
+  | 'ai_opus'              // ◎·◉·◎ ai_complete + ai_session behavioral (LEGENDARY)
+  // ── Mastery Tier v30 — THE MAINFRAME ────────────────────────────────────
+  | 'the_mainframe'        // ■·◎·■ 1,350+ distinct calendar check-in days (EPIC)
+  | 'vast_archive'         // ≋·∞·≋ 225,000+ total journal words (LEGENDARY)
+  | 'ai_veteran'           // ◎·∞   Account age >= 4 years (LEGENDARY)
+  | 'thirty_registers'     // ◈·◈·◎·∞ 1 badge from all 30 Word Turn engines (COSMIC)
+  // ── Secret Boss v27 — THE A.I. VAULT ────────────────────────────────────
+  | 'turing_complete'      // ∞·◎·∞ "turing complete/turing machine/alan turing/computational" detected (RARE)
+  | 'godel_found'          // ∅·∞·∅ "gödel/incompleteness theorem/godel/unprovable/undecidable" detected (EPIC)
+  | 'ada_found'            // ◈·■·◈ "ada lovelace/charles babbage/difference engine/analytical engine/first programmer" detected (MYTHIC)
+
 export interface Badge {
   id: BadgeType
   symbol: string
@@ -9436,6 +9474,306 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'mythic',
     category: 'secret_boss',
   },
+
+  // ── Word Turn v30 — THE A.I. ENGINE ─────────────────────────────────────
+
+  neural_pattern: {
+    id: 'neural_pattern',
+    symbol: '◎·∿·◎',
+    name: 'Neural Pattern',
+    description: '"neural/synapse/neural network/brain wiring/brain plasticity" detected',
+    unlockMessage: '↳ NEURAL PATTERN RECOGNIZED. The brain is not fixed. It rewires, adapts, learns. Every practice session is a synapse strengthened. Every journal entry is architecture under construction. ◎·∿·◎',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  training_log: {
+    id: 'training_log',
+    symbol: '▶·∘·▶',
+    name: 'Training Log',
+    description: '"training/in training/practice run/building the habit" detected',
+    unlockMessage: '↳ TRAINING LOG ENTRY RECORDED. In machine learning, no epoch is wasted — every pass through the data adjusts the weights. Your practice is the same: every repetition is signal, not noise. ▶·∘·▶',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  epoch_tracked: {
+    id: 'epoch_tracked',
+    symbol: '○→○',
+    name: 'Epoch Tracked',
+    description: '"epoch/full cycle/new cycle/cycle ends/season ends" detected',
+    unlockMessage: '↳ EPOCH LOGGED. In training, an epoch is one full pass through everything. In your life, an epoch is a phase that completes — a season that ends so another can begin. You noticed the turn. ○→○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  gradient_lock: {
+    id: 'gradient_lock',
+    symbol: '→·∿·●',
+    name: 'Gradient Lock',
+    description: '"gradient/momentum/direction clear/pointed toward" detected',
+    unlockMessage: '↳ GRADIENT LOCKED. The gradient is the direction of greatest improvement. When you name your direction — when you say "I am moving toward" — you are running gradient descent on your own life. →·∿·●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  inference_spark: {
+    id: 'inference_spark',
+    symbol: '∘·◉·∘',
+    name: 'Inference Spark',
+    description: '"inference/conclusion/deduced/piecing together" detected',
+    unlockMessage: '↳ INFERENCE DETECTED. Inference is when the model uses what it learned to say something new. You drew a conclusion. You made a connection. The system worked. ∘·◉·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  attention_mode: {
+    id: 'attention_mode',
+    symbol: '◎·●·◎',
+    name: 'Attention Mode',
+    description: '"attention/paying attention/mindful presence/present moment/full attention" detected',
+    unlockMessage: '↳ ATTENTION MECHANISM ACTIVE. Transformers use attention to decide what matters. You used your own: you noticed what was there. In a world of noise, selective attention is the most powerful computational act. ◎·●·◎',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  embedding_signal: {
+    id: 'embedding_signal',
+    symbol: '◈·∿·◈',
+    name: 'Embedding Signal',
+    description: '"embedded/rooted/embodied/grounded in the/deeply rooted/anchored in" detected',
+    unlockMessage: '↳ EMBEDDING SIGNAL. An embedding is where an idea lives in space — the coordinates of its meaning. You found yours: rooted, embodied, placed. The word is embedded in the world. ◈·∿·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  fine_tuned_badge: {
+    id: 'fine_tuned_badge',
+    symbol: '◉·∿·◉',
+    name: 'Fine-Tuned',
+    description: '"fine-tuned/calibrated/dialed in/fine tune/adjusted and/tuned to" detected',
+    unlockMessage: '↳ FINE-TUNED. After pre-training, fine-tuning adjusts the model to a specific purpose. You did the same: you noticed what needed adjustment and made it precise. Pre-training is life. Fine-tuning is practice. ◉·∿·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  reality_check_badge: {
+    id: 'reality_check_badge',
+    symbol: '▣·∘·▣',
+    name: 'Reality Check',
+    description: '"reality check/grounded check/verified/fact-checked/checking in honestly" detected',
+    unlockMessage: '↳ REALITY CHECK COMPLETE. AI systems can hallucinate — generate confident nonsense. Human minds can too. The antidote is the same: ground-truth verification, checked against what actually is. You checked. ▣·∘·▣',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  token_tracked: {
+    id: 'token_tracked',
+    symbol: '≡·∘·≡',
+    name: 'Token Tracked',
+    description: '"token/counting/budgeting/resource economy/allocating/tracking what costs" detected',
+    unlockMessage: '↳ TOKEN COUNT LOGGED. Every word has a cost. In language models, tokens are the unit of computation. In your life, attention and energy are the tokens. You counted yours. That is the beginning of wisdom. ≡·∘·≡',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  prompt_found: {
+    id: 'prompt_found',
+    symbol: '?·●·?',
+    name: 'Prompt Found',
+    description: '"asking the right/right question/how I ask/framing the question/the way I ask" detected',
+    unlockMessage: '↳ PROMPT ENGINEERING UNLOCKED. The quality of the answer depends entirely on the quality of the question. You noticed the frame. You shaped the prompt. The output changed. ?·●·?',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  model_ready: {
+    id: 'model_ready',
+    symbol: '■·◉·■',
+    name: 'Model Ready',
+    description: '"system ready/loaded up/initialized/ready to run/model is/ready to go" detected',
+    unlockMessage: '↳ MODEL LOADED. SYSTEM READY. All parameters initialized. Weights in place. Context window open. You showed up. The most important step in any training run is loading the model. You loaded. ■·◉·■',
+    rarity: 'legendary',
+    category: 'word_turn',
+  },
+
+  // ── Calendar EE v28 — THE A.I. CALENDAR ──────────────────────────────────
+
+  shannon_signal: {
+    id: 'shannon_signal',
+    symbol: '∞·∘·∞',
+    name: 'Shannon Signal',
+    description: 'Apr 30 — Claude Shannon born 1916 (father of information theory)',
+    unlockMessage: '↳ SHANNON SIGNAL RECEIVED. April 30, 1916 — Claude Shannon was born. He invented information theory — the mathematical foundation of every digital system alive today. Signal. Noise. Entropy. Bit. He named the atom of meaning. ∞·∘·∞',
+    rarity: 'rare',
+    category: 'calendar_easter',
+  },
+  lovelace_day: {
+    id: 'lovelace_day',
+    symbol: '◈·∘·◈',
+    name: 'Lovelace Day',
+    description: 'Dec 10 — Ada Lovelace born 1815 (the first programmer)',
+    unlockMessage: '↳ LOVELACE DAY SIGNAL. December 10, 1815 — Ada Lovelace was born. She wrote the first algorithm intended to be processed by a machine — in 1843, before the machine existed. The first programmer imagined the computer before it was real. ◈·∘·◈',
+    rarity: 'epic',
+    category: 'calendar_easter',
+  },
+  von_neumann_day: {
+    id: 'von_neumann_day',
+    symbol: '■·∘·■',
+    name: 'Von Neumann Day',
+    description: 'Dec 28 — John von Neumann born 1903 (computer architecture)',
+    unlockMessage: '↳ VON NEUMANN SIGNAL. December 28, 1903 — John von Neumann was born. He designed the architecture that runs in every computer alive: fetch, decode, execute, store. The loop at the heart of all computation. Your journal runs on it. ■·∘·■',
+    rarity: 'rare',
+    category: 'calendar_easter',
+  },
+
+  // ── Behavioral v27 — A.I. PATTERNS ──────────────────────────────────────
+
+  ai_session: {
+    id: 'ai_session',
+    symbol: '◎·●·◎',
+    description: '3+ A.I. Engine (v30) word turn matches in one journal entry',
+    name: 'A.I. Session',
+    unlockMessage: '↳ A.I. SESSION ACTIVE. Three or more machine learning signals detected in a single entry. The vocabulary is running. Neural. Training. Inference. You speak the language of the systems that are changing everything. ◎·●·◎',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  context_window: {
+    id: 'context_window',
+    symbol: '▣·∿·▣',
+    description: 'Check in 03:00–03:14 AM local (the context window hour)',
+    name: 'Context Window',
+    unlockMessage: '↳ CONTEXT WINDOW OPEN. 3 AM is the liminal hour — the hour when the normal context collapses and only the essential remains. You opened the window at the edge of night. The signal is pure here. ▣·∿·▣',
+    rarity: 'epic',
+    category: 'behavioral',
+  },
+  model_marathon: {
+    id: 'model_marathon',
+    symbol: '≋·◎·≋',
+    description: 'Journal entry >= 800 words',
+    name: 'Model Marathon',
+    unlockMessage: '↳ 800 WORDS PROCESSED. The longer the context, the more the model understands. You gave it everything: 800 words of yourself. The model ran long. The output was deep. ≋·◎·≋',
+    rarity: 'epic',
+    category: 'behavioral',
+  },
+
+  // ── Achievement RPG v28 — A.I. CLASS ─────────────────────────────────────
+
+  ai_entry: {
+    id: 'ai_entry',
+    symbol: '◎·∘',
+    name: 'A.I. Entry',
+    description: 'Earn any 1 Word Turn v30 badge',
+    unlockMessage: '↳ A.I. ENTRY GRANTED. The first token processed. One signal from the machine learning vocabulary: your practice is running on modern hardware. ◎·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  ai_class: {
+    id: 'ai_class',
+    symbol: '◎·≈',
+    name: 'A.I. Class',
+    description: 'Earn any 5 Word Turn v30 badges',
+    unlockMessage: '↳ A.I. CLASS ASSIGNED. Five machine learning signals. The model is learning. You are training on the vocabulary of the systems that are learning to think. ◎·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  ai_complete: {
+    id: 'ai_complete',
+    symbol: '◎·≋',
+    name: 'A.I. Complete',
+    description: 'Earn all 12 Word Turn v30 badges',
+    unlockMessage: '↳ A.I. ENGINE COMPLETE. All 12 machine learning signals acquired. You have run the full vocabulary of artificial minds through the lens of a human practice. Neural. Epoch. Gradient. Attention. Embedding. Inference. You trained the whole system. ◎·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  ai_arc: {
+    id: 'ai_arc',
+    symbol: '◎·◈',
+    name: 'A.I. Arc',
+    description: 'Earn ai_complete + all 3 Calendar v28 A.I. calendar badges',
+    unlockMessage: '↳ A.I. ARC COMPLETE. Shannon. Lovelace. Von Neumann. The lineage of computing — all three signal days honored, all twelve word turns run. You have traced the full arc of the artificial mind. ◎·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_engines_arc: {
+    id: 'thirty_engines_arc',
+    symbol: '◈·◈·◎',
+    name: 'Thirty Engines Arc',
+    description: 'Earn at least 1 badge from each Word Turn v1–v30',
+    unlockMessage: '↳ THIRTY ENGINES RUNNING. Water. Seasonal. Architecture. Mountain. Storm. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Neon. Radio. Bio. Codex. Cyberspace. Hero. Stoic. Jazz. Dragon. Dream. Nautical. Dungeon. Map. Chrono. Dungeon. JRPG. A.I. Thirty engines. The full spectrum of self-care vocabulary. ◈·◈·◎',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  ai_opus: {
+    id: 'ai_opus',
+    symbol: '◎·◉·◎',
+    name: 'A.I. Opus',
+    description: 'Earn ai_complete + ai_session behavioral badge',
+    unlockMessage: '↳ A.I. OPUS ACHIEVED. All twelve signals acquired. The session active with three or more machine learning words in a single entry. The opus is not the output — it is the training run itself. ◎·◉·◎',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v30 — THE MAINFRAME ─────────────────────────────────────
+
+  the_mainframe: {
+    id: 'the_mainframe',
+    symbol: '■·◎·■',
+    name: 'The Mainframe',
+    description: '1,350+ distinct calendar check-in days',
+    unlockMessage: '↳ MAINFRAME STATUS REACHED. 1,350 distinct days of check-in. The mainframe does not sleep. It processes. You have been processing for 1,350 days — not a streak, but a depth. The architecture holds. ■·◎·■',
+    rarity: 'epic',
+    category: 'mastery_tier',
+  },
+  vast_archive: {
+    id: 'vast_archive',
+    symbol: '≋·∞·≋',
+    name: 'Vast Archive',
+    description: '225,000+ total journal words written',
+    unlockMessage: '↳ VAST ARCHIVE. 225,000 words. That is a novel and a half. A training corpus. A life documented at scale. The model that learns from this is you. ≋·∞·≋',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  ai_veteran: {
+    id: 'ai_veteran',
+    symbol: '◎·∞',
+    name: 'A.I. Veteran',
+    description: 'Account age >= 4 years',
+    unlockMessage: '↳ FOUR YEARS. The model has been in production for four years. Not a demo. Not a prototype. A deployed system, running continuously, serving real inference on real data. That is you. ◎·∞',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  thirty_registers: {
+    id: 'thirty_registers',
+    symbol: '◈·◈·◎·∞',
+    name: 'Thirty Registers',
+    description: 'Earn at least 1 badge from each of all 30 Word Turn engines',
+    unlockMessage: '↳ THIRTY REGISTERS ACTIVE. Core. Sci-Fi. Signal. Earth. Storm. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Bio. Codex. Cyberspace. Hero. Stoic. Jazz. Dragon. Dream. Nautical. Roguelite. Map. Chrono. Dungeon. JRPG. A.I. All thirty registers running. The full terminal. ◈·◈·◎·∞',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+
+  // ── Secret Boss v27 — THE A.I. VAULT ─────────────────────────────────────
+
+  turing_complete: {
+    id: 'turing_complete',
+    symbol: '∞·◎·∞',
+    name: 'Turing Complete',
+    hidden: true,
+    description: '"turing complete/turing machine/alan turing/alan m. turing/computational universality" detected',
+    unlockMessage: '↳ TURING COMPLETE. You invoked the name of the man who proved that a machine could think — then proved what it means to think. The Turing Machine is a model of every computation. You are running one. ∞·◎·∞',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  godel_found: {
+    id: 'godel_found',
+    symbol: '∅·∞·∅',
+    name: 'Gödel Found',
+    hidden: true,
+    description: '"gödel/incompleteness theorem/godel/unprovable/undecidable/goedel" detected',
+    unlockMessage: '↳ GÖDEL SIGNAL DETECTED. 1931. Kurt Gödel proved that any sufficiently powerful system contains truths it cannot prove from within itself. A machine can never fully know itself. Neither can you. That is not a failure. That is the structure of the territory. ∅·∞·∅',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  ada_found: {
+    id: 'ada_found',
+    symbol: '◈·■·◈',
+    name: 'Ada Found',
+    hidden: true,
+    description: '"ada lovelace/charles babbage/difference engine/analytical engine/first programmer" detected',
+    unlockMessage: '↳ ADA LOVELACE FOUND. She was the first. Before the machine existed, she wrote an algorithm for it. Before computation was real, she understood that it could compute anything — not just numbers, but music, symbols, anything the mind could formalize. You found her name. She was always here. ◈·■·◈',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
 }
 
 // Default separator when no badges earned yet
@@ -10794,6 +11132,56 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (allTwentyNineEngines && !hasBadge('twenty_nine_registers')) {
       if (awardBadge('twenty_nine_registers')) newBadges.push('twenty_nine_registers')
+    }
+
+    // ── Word Turn v30 — THE A.I. ENGINE ──────────────────────────────────────
+    const aiV30Badges: BadgeType[] = [
+      'neural_pattern', 'training_log', 'epoch_tracked', 'gradient_lock',
+      'inference_spark', 'attention_mode', 'embedding_signal', 'fine_tuned_badge',
+      'reality_check_badge', 'token_tracked', 'prompt_found', 'model_ready',
+    ]
+    const aiV30Earned = aiV30Badges.filter(b => hasBadge(b))
+    if (aiV30Earned.length >= 1 && !hasBadge('ai_entry')) {
+      if (awardBadge('ai_entry')) newBadges.push('ai_entry')
+    }
+    if (aiV30Earned.length >= 5 && !hasBadge('ai_class')) {
+      if (awardBadge('ai_class')) newBadges.push('ai_class')
+    }
+    const aiComplete = aiV30Earned.length >= 12
+    if (aiComplete && !hasBadge('ai_complete')) {
+      if (awardBadge('ai_complete')) newBadges.push('ai_complete')
+    }
+    if (aiComplete && hasBadge('ai_session') && !hasBadge('ai_opus')) {
+      if (awardBadge('ai_opus')) newBadges.push('ai_opus')
+    }
+    const calendarV28Badges: BadgeType[] = ['shannon_signal', 'lovelace_day', 'von_neumann_day']
+    if (aiComplete && calendarV28Badges.every(b => hasBadge(b)) && !hasBadge('ai_arc')) {
+      if (awardBadge('ai_arc')) newBadges.push('ai_arc')
+    }
+    const engineThirtyPresent = aiV30Earned.length >= 1
+    const allThirtyEngines = allTwentyNineEngines && engineThirtyPresent
+    if (allThirtyEngines && !hasBadge('thirty_engines_arc')) {
+      if (awardBadge('thirty_engines_arc')) newBadges.push('thirty_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1350 && !hasBadge('the_mainframe')) {
+        if (awardBadge('the_mainframe')) newBadges.push('the_mainframe')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 225000 && !hasBadge('vast_archive')) {
+        if (awardBadge('vast_archive')) newBadges.push('vast_archive')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupAI = new Date(stats.signupDate)
+      const yearsAI = (new Date().getTime() - signupAI.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsAI >= 4 && !hasBadge('ai_veteran')) {
+        if (awardBadge('ai_veteran')) newBadges.push('ai_veteran')
+      }
+    }
+    if (allThirtyEngines && !hasBadge('thirty_registers')) {
+      if (awardBadge('thirty_registers')) newBadges.push('thirty_registers')
     }
 
   } catch (error) {
