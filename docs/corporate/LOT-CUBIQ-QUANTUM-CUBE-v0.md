@@ -321,6 +321,15 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE EVENING CLOSE AT THE KITCHEN COUNTER    2026-10-29
+  ─────────────────────────────────────────────────────────────────
+  A parent's kitchen counter: the cube arms its spring silently during a
+  quiet window, shows a 1.5 s LED fade, performs one in-place HOP at the
+  Evening Close hour, and is acknowledged by a hand on top — no phone lit,
+  no travel toward the person. Full entry, startle-safety rules and the
+  errata this cycle produced: LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md
+  (Sections 02, 07, 11).
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
