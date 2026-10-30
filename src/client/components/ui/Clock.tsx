@@ -24,7 +24,10 @@ export const Clock: React.FC<Props> = ({ format, interval }) => {
     if (interval) {
       // @ts-ignore
       loop.current = setInterval(
-        () => setState(dayjs().format(format)),
+        () => {
+          if (document.hidden) return
+          setState(dayjs().format(format))
+        },
         interval
       )
     }

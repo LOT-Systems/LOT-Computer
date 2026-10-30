@@ -68,7 +68,9 @@ export function MicroCalculatorWidget() {
       }
     }
     check()
-    const iv = setInterval(check, 10000)
+    const iv = setInterval(() => {
+      if (!document.hidden) check()
+    }, 10000)
     return () => clearInterval(iv)
   }, [magicTime, fading])
 
