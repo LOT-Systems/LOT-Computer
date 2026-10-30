@@ -34,6 +34,7 @@ import {
 import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
+import { compressLogs, composeLocalStory, parseStoryRange, renderDigest, windowStart } from '#server/utils/story-compression'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
@@ -5490,6 +5491,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          range?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,18 +5516,19 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const range = parseStoryRange(`/story ${req.body.range || ''}`)
+      const now = new Date()
 
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: windowStart(range, now) },
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 2000,
       })
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
+      const digest = compressLogs(logs as any, range, now)
 
       const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
       const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
@@ -5549,7 +5552,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story. Your task: you receive a compressed DIGEST of their ${range} (counts, moods, peaks, pattern changes, context metadata). Write 1-2 paragraphs (100-200 words) that compress that ${range} into a story: mood trajectory, spikes, pattern changes, self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
@@ -5567,10 +5570,10 @@ OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
+DIGEST:
+${renderDigest(digest)}
 
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
+RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
 
 SELF-CARE DATA:
 ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
@@ -5597,6 +5600,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
             story: cleaned,
             logText: (logText || '').substring(0, 500),
             quantumState: quantumState || null,
+            range,
+            digest,
             timestamp: new Date().toISOString(),
           },
         })
@@ -5604,12 +5609,16 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          range,
+          arcade: digest.arcade,
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
         return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
+          story: composeLocalStory(digest),
           logId: null,
+          range,
+          arcade: digest.arcade,
         }
       }
     }
