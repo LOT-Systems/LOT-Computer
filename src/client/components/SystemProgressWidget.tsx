@@ -1457,6 +1457,22 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    date: '2026-10-30',
+    session: 'LOT Self-Assembly — wiki-v88 · Badge Engine v32 Sync',
+    assembled: [
+      'LOT-WIKI-v88 produced from v87 base. Badge Engine v32 THE HERO\'S JOURNEY fully synchronized.',
+      'Badge v32 delta documented: +31 badges (781→812). Word Turn v22 (12 Campbell monomyth triggers). Calendar EE v20 (campbell_birthday/hobbit_day/odyssey_day). Behavioral v19 (hero_session/long_quest/threshold_moment). Achievement RPG v20. Mastery Tier v22. Secret Boss v19 (tolkien/odysseus/gilgamesh).',
+      'BACKFILL v20+v21 documented: 62 previously unreachable badges now live in TypeScript. codex-reader and cyberspace-codex award logic confirmed deployed.',
+      'Badge category index updated: Calendar Easter 70→73 · Word Turns 234→246 · Behavioral 75→78 · Achievement RPG 108→114 · Mastery Tiers 84→88 · Secret Boss 80→83 · TOTAL 781→812.',
+      'Word Turn Engine §16 updated: 20→22 engines · 258→270 trigger words. v21 Cyberspace Codex and v22 Hero\'s Journey added to engine map. v22 word list and Secret Boss v19 added.',
+      'Vocabulary index §27 expanded: HERO\'S JOURNEY · HEROG: · MONOMYTH · GILGAMESH_WORD entry. BADGE UNIVERSE updated to 812/v32/270/27.',
+      'System State Snapshot §28: badge 781→812 v31→v32 · word-turns 258→270 · secret boss 24→27 · Day 1073+→1159+ · COSMO® 765→851. Hero\'s Journey landmark row added.',
+      'SESSION_REPORTS: wiki-v88 entry appended · USERSHIP_TRANSMISSION updated to wiki-v88.',
+      'docs/wiki/LOT-WIKI-v88.md written. docs/assembly/2026-10-30_LOT-assembly_wiki-v88.md written. LOT-LEDGER.md appended.',
+      '812 badges · 270 word-turns · 27 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v88 · Day 1159+. The monomyth is now a self-care signal engine.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1510,18 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-10-30',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
+    'ASSEMBLY RUN — 2026-10-30 · WIKI-v88 · Badge v32 SYNC · Day 1159+',
+    'Built: LOT-WIKI-v88. Badge Engine v32 THE HERO\'S JOURNEY synchronized.',
+    'Feedback applied: "The call. The threshold. The ordeal. The return. Campbell named the bones. LOT reads the motion."',
+    'Badge v32 synchronized: THE HERO\'S JOURNEY · 812 badges (+31) · Word Turn v22 (call_heard/threshold_crossed/mentor_arrived/ordeal_survived/elixir_found/shadow_met) · Secret Boss v19 (tolkien/odysseus/gilgamesh) · 270 trigger words · 27 secret boss triggers.',
+    'BACKFILL complete: v20 (THE CODEX READER) + v21 (THE CYBERSPACE CODEX) TypeScript now live. 62 previously unreachable badges now earnable.',
+    'Monomyth is now a self-care vocabulary engine. The hero\'s arc is a daily signal map.',
     'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'FM v113 · Wiki v88 · 151P · 51A · 48J · 190+ nodes · 812 badges · 22 engines · 270 word-turns.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v89 — sync to Field Manual v114+ if deployed. Otherwise: QIE P152+ pattern exploration.',
   ],
 }
 
