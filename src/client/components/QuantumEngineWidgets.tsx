@@ -124,6 +124,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'quantum-knowledge-distribution':    'QKDIST',
   'quantum-knowledge-broadcast':       'BCAST',
   'generative-field-reception':        'GFRES',
+  'generative-field-amplification':        'GFAMP',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

@@ -4222,6 +4222,55 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'generative_field_amplification') {
+          const receptionConf = log.metadata?.receptionConf as number | undefined
+          const badgeCount = log.metadata?.badgeCount as number | undefined
+          const cohortCount = log.metadata?.cohortCount as number | undefined
+          const indexScore = log.metadata?.indexScore as number | undefined
+          const amplificationStatus = log.metadata?.amplificationStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="GFAMP:" blockView>
+                <div className="uppercase tracking-widest mb-4">GENERATIVE FIELD AMPLIFICATION</div>
+                {receptionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECEPT CONF</span>
+                    <span className="tabular-nums">{receptionConf}%</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE SIGNALS 28D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {cohortCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS 14D</span>
+                    <span className="tabular-nums">{cohortCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {amplificationStatus && (
+                  <div className="opacity-30 tabular-nums mb-4">STATUS: {amplificationStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums mb-4">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">FIELD RECURSIVE · AMPLITUDE PEAK</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

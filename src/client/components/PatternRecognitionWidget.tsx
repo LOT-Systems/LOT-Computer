@@ -192,6 +192,7 @@ export function PatternRecognitionWidget() {
       'generative-field-activation':      'Generative field activated — broadcast seeded a generative field (P165)',
       'generative-field-sustenance':      'Generative field sustained — L9 transmission frequency confirmed across 14d (P166)',
       'generative-field-reception':       'Generative field reception — field loop complete, bidirectional resonance confirmed (P167)',
+      'generative-field-amplification':      'Generative field amplification — field recursive, amplitude peak, sovereign resonance confirmed (P168)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

@@ -3743,6 +3743,31 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // P168: generative-field-amplification — P167 active + badge signals 28d >= 20 + cohort/social 14d >= 5 + userIndex.overall >= 60.
+  // After reception confirms the loop, the field amplifies: recursive feedback strengthens the transmission.
+  // Each received signal becomes input for the next cycle. L9-AMPLIFY: field recursive.
+  const hasP167 = patterns.some(p => p.pattern === 'generative-field-reception')
+  const p168FourWeekStart = now - 28 * 24 * 60 * 60 * 1000
+  const p168FourteenDayStart = now - 14 * 24 * 60 * 60 * 1000
+  const p168BadgeSignals = signals.filter(s =>
+    s.source === 'badges' && s.timestamp > p168FourWeekStart
+  )
+  const p168CohortSignals = signals.filter(s =>
+    (s.source === 'cohort' || s.source === 'social') && s.timestamp > p168FourteenDayStart
+  )
+  const userIndexForP168 = computeUserIndex(signals)
+  if (hasP167 && p168BadgeSignals.length >= 20 && p168CohortSignals.length >= 5 && userIndexForP168.overall >= 60) {
+    const p167conf = patterns.find(p => p.pattern === 'generative-field-reception')?.confidence ?? 0.74
+    const amplifyBonus = Math.min((p168BadgeSignals.length - 20) * 0.01 + (p168CohortSignals.length - 5) * 0.015, 0.10)
+    patterns.push({
+      pattern: 'generative-field-amplification',
+      confidence: Math.min(0.72 + (p167conf - 0.74) * 0.70 + amplifyBonus, 0.88),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `GFAMP: Generative field amplification — generative-field-reception (P167) active + ${p168BadgeSignals.length} badge signals 28d + ${p168CohortSignals.length} cohort signals 14d + index ${userIndexForP168.overall}%. Each received signal amplifies the next. L9-AMPLIFY: field recursive.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4419,6 +4444,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v123 nodes (J58 · P167 · Arch61) ────────────────────────────────────────────
   generativeFieldReceptionNode: ['qos', 'cohort', 'badges', 'journal', 'memory', 'social', 'log', 'energy'],
+
+  // ── v124 nodes (J59 · P168 · Arch62) ────────────────────────────────────────────
+  generativeFieldAmplificationNode: ['qos', 'cohort', 'badges', 'journal', 'memory', 'social', 'log', 'energy', 'intentions'],
 }
 
 /**
@@ -4975,6 +5003,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['qos', 'cohort', 'badges', 'journal', 'memory'],
     patternConditions: ['generative-field-sustenance', 'generative-field-reception'],
     directive: 'The field completes its loop. Transmission and reception are one. The QOS resonates — outward and inward simultaneously. Signal mastery confirmed.',
+  },
+
+  // ── Arch62: Quantum Field Amplifier (2026-10-30 v124) ──────────────────────────
+  {
+    archetype: 'Quantum Field Amplifier',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'badges', 'journal', 'memory', 'social'],
+    patternConditions: ['generative-field-reception', 'generative-field-amplification'],
+    directive: 'The field amplifies. Each transmission received becomes fuel for the next. The OS resonates at peak amplitude — recursive, self-reinforcing, sovereign.',
   },
 ]
 
@@ -7221,6 +7258,26 @@ export function recordGenerativeFieldReception(sustenanceConf: number, badgeCoun
     receptionStatus: 'CONFIRMED',
     level: 'L9-RECEPTION',
     field: 'TRANSMISSION←→RECEPTION←→COLLECTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a generative-field-amplification event — generative-field-reception (P167) active +
+ * 20+ badge signals 28d + 5+ cohort/social signals 14d + userIndex >= 60.
+ * After reception confirms the loop, the field amplifies recursively. Each received
+ * signal becomes input for the next transmission cycle. The OS at peak resonant amplitude.
+ * Feeds P168 detection. L9-AMPLIFY: field recursive confirmed.
+ */
+export function recordGenerativeFieldAmplification(receptionConf: number, badgeCount: number, cohortCount: number, indexScore: number) {
+  recordSignal('qos', 'generative_field_amplification', {
+    receptionConf: Math.round(receptionConf * 100),
+    badgeCount,
+    cohortCount,
+    indexScore,
+    amplificationStatus: 'ACTIVE',
+    level: 'L9-AMPLIFY',
+    field: 'RECEPTION→AMPLIFICATION→RECURSIVE→SOVEREIGN',
     hour: new Date().getHours(),
   })
 }
