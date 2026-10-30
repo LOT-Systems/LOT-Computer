@@ -24,6 +24,8 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmailInbox,
+  useMarkEmailRead,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -80,6 +82,14 @@ export const Sync = React.memo(function SyncInner() {
     }
   })
 
+  // LOT Email: new mail lands here (compose with "/email to Name." in Log)
+  const { data: inbox } = useEmailInbox()
+  const { mutate: markEmailRead } = useMarkEmailRead({
+    onSuccess: () => queryClient.invalidateQueries(['/api/email/inbox']),
+  })
+  const unreadEmails = (inbox?.emails || []).filter((e) => !e.isRead)
+  const shownEmails = (inbox?.emails || []).slice(0, 5)
+
   // Ensure fresh data on mount (filters suspended users)
   React.useEffect(() => {
     queryClient.invalidateQueries(['/api/chat-messages'])
@@ -117,7 +127,11 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeEmailListener } = sync.listen('email', () => {
+      queryClient.invalidateQueries(['/api/email/inbox'])
+    })
     return () => {
+      disposeEmailListener()
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
     }
@@ -213,6 +227,44 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {shownEmails.length > 0 && (
+        <div className="mb-40">
+          <div className="flex items-center gap-x-8 mb-8 text-acc/40">
+            <span>Mail{unreadEmails.length > 0 && ` (${unreadEmails.length})`}</span>
+            {unreadEmails.length > 0 && (
+              <GhostButton onClick={() => markEmailRead({})}>Mark all read</GhostButton>
+            )}
+          </div>
+          {shownEmails.map((e) => (
+            <div
+              key={e.id}
+              className={cn(
+                'flex items-start gap-x-8 cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded',
+                e.isRead && 'text-acc/40'
+              )}
+              onClick={() => {
+                if (!e.isRead) markEmailRead({ id: e.id })
+                window.location.href = `/dm/${e.senderId}`
+              }}
+              title="Open conversation"
+            >
+              <span className="whitespace-nowrap">{e.senderName}</span>
+              <div
+                className="whitespace-breakspaces"
+                style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}
+              >
+                {e.message}
+              </div>
+              {!isTouchDevice && (
+                <div className="ml-auto text-acc/40 select-none whitespace-nowrap">
+                  <MessageTimeLabel dateString={e.createdAt} isTimeFormat12h={isTimeFormat12h} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {

@@ -40,6 +40,7 @@ export type LogTrigger =
   | 'qi-rfi'            // /qi — Quantum Intelligence RFI (Request for Information)
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
+  | 'email-compose'     // /email to Name. body — Ctrl+Enter sends to Name's Sync inbox
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
 
 interface TriggerRule {
@@ -66,6 +67,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'qi-rfi',         emojis: [],        keywords: ['qi'] },
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
+  { trigger: 'email-compose', emojis: [],        keywords: ['email', 'mail'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
 ]
 
@@ -114,4 +116,15 @@ export function detectNewTriggers(
   const fresh: LogTrigger[] = []
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
+}
+
+/**
+ * Parses "/email to Hitomi. Hello there" (also ":" or "," after the name,
+ * or no punctuation). Returns null unless both a recipient and a body exist.
+ */
+export function parseEmailCommand(text: string): { to: string; body: string } | null {
+  const m = text.match(/(?:^|\s)\/(?:email|mail)\s+to\s+([^\s.:,;]+)[.:,;]?\s*([\s\S]*)$/i)
+  if (!m) return null
+  const body = m[2].trim()
+  return body ? { to: m[1], body } : null
 }

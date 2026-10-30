@@ -123,7 +123,8 @@ export const CohortConnectWidget: React.FC = () => {
       connectionReadiness,
       hour: new Date().getHours()
     })
-    stores.goTo('sync')
+    // LOT Email: open the direct thread with this cohort match
+    window.location.href = `/dm/${userId}`
   }
 
   const handleToggleExpand = (userId: string) => {

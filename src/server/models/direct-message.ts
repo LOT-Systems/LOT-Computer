@@ -13,7 +13,8 @@ import { DirectMessage as DirectMessageModel } from '#shared/types'
 type DirectMessageCreateFields = Pick<
   DirectMessageModel,
   'senderId' | 'receiverId' | 'message'
->
+> &
+  Partial<Pick<DirectMessageModel, 'kind'>>
 
 export class DirectMessage
   extends Model<DirectMessageModel, DirectMessageCreateFields>
@@ -23,6 +24,8 @@ export class DirectMessage
   declare senderId: DirectMessageModel['senderId']
   declare receiverId: DirectMessageModel['receiverId']
   declare message: DirectMessageModel['message']
+  declare kind: DirectMessageModel['kind']
+  declare readAt: DirectMessageModel['readAt']
   declare createdAt: DirectMessageModel['createdAt']
   declare updatedAt: DirectMessageModel['updatedAt']
 }
@@ -56,6 +59,15 @@ DirectMessage.init(
     message: {
       type: DataTypes.TEXT,
       allowNull: false,
+    },
+    kind: {
+      type: DataTypes.STRING(16),
+      allowNull: false,
+      defaultValue: 'dm',
+    },
+    readAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
