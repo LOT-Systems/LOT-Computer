@@ -4880,9 +4880,11 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  rokuyoLogCount = 0
 ) {
   recordSignal('astrology', 'ambient_reading', {
+    rokuyoLogCount, // past Logs entries written under this rokuyo
     rokuyo,
     moonPhase,
     moonIllumination,

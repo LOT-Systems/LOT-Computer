@@ -177,3 +177,38 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Build a Date whose local getters (getHours/getDate/...) read the wall clock
+ * of the given IANA timeZone. Lets the astrology functions above reflect a
+ * user's saved timeZone regardless of the device's own. Falls back to the
+ * input date for a missing or invalid timeZone.
+ */
+export function toWallClockInZone(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(date)
+    const get = (type: string) => Number(parts.find(p => p.type === type)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return date
+  }
+}
+
+/**
+ * Personalization from Logs: count past log entries whose snapshotted
+ * astroRokuyo matches the given rokuyo (see LogContext in shared/types).
+ */
+export function countLogsOnRokuyo(
+  logs: ReadonlyArray<{ context?: { astroRokuyo?: string | null } | null }>,
+  rokuyo: string
+): number {
+  let n = 0
+  for (const log of logs) if (log.context?.astroRokuyo === rokuyo) n++
+  return n
+}
