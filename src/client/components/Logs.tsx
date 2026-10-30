@@ -2083,7 +2083,22 @@ export const Logs: React.FC = React.memo(function LogsInner() {
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
                 <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                {date && <div className="opacity-40 mt-8 tabular-nums">{date}{log.metadata?.time ? ` ${log.metadata.time}` : ''}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_alert') {
+          const stage = log.metadata?.stage as string | undefined
+          const entryType = log.metadata?.entryType as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="ALERT:" blockView>
+                <div className="uppercase tracking-widest tabular-nums">
+                  {stage === 'T-00' ? 'NOW' : stage || 'ALERT'}{entryType ? ` · ${entryType}` : ''}
+                </div>
+                <div className="opacity-40 mt-8 tabular-nums">
+                  {String(log.metadata?.date || '')} {String(log.metadata?.time || '')}
+                </div>
               </Block>
             </LogContainer>
           )
