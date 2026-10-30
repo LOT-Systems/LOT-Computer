@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.2 — see LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md (errata E1–E6)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -320,6 +320,16 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE TIDE ON THE DESK                         2026-10-30
+  ─────────────────────────────────────────────────────────────────
+  Full text, rationale and failure modes: LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md,
+  Section 08. Summary: evening, closed room, LOT® Station reports CO2 ~1,350
+  ppm, Self-Care "Breathe" is due. The cube performs one THE NUDGE; the
+  operator rests a palm on it and THE TIDE (new gesture, 4-2-6 amplitude
+  envelope, no liftoff) paces six breaths. The cube reports "Breathe
+  completed" to the OS (hardware-detected, no manual log); only then does the
+  Station widget line appear. Needs no jump — the safest, quietest v.0 stage.
 
 --------------------------------------------------------------------------------
 08 // BRAND
