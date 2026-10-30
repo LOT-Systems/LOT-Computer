@@ -871,6 +871,20 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('odyssey_day')
   }
 
+  // ── Calendar EE v21 — THE GAME MAKER'S CALENDAR ──────────────────────────────
+  if (!hasBadge('gygax_day') && month === 7 && day === 27) {
+    awardBadge('gygax_day')
+    awarded.push('gygax_day')
+  }
+  if (!hasBadge('critical_role_premiere') && month === 3 && day === 12) {
+    awardBadge('critical_role_premiere')
+    awarded.push('critical_role_premiere')
+  }
+  if (!hasBadge('pathfinder_day') && month === 8 && day === 13) {
+    awardBadge('pathfinder_day')
+    awarded.push('pathfinder_day')
+  }
+
   return awarded
 }
 
@@ -1483,6 +1497,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE DUNGEON MASTER ──────────────────────────────────────────────────
+  { patterns: /\bdungeon[\s-]?master\b|\bDM[\s-]?session\b|\bgame[\s-]?master\b|\bGM[\s-]?rules\b/i, badge: 'dungeon_master_badge' },
+  { patterns: /\bnatural[\s-]?20\b|\bnat[\s-]?twenty\b|\bcritical[\s-]?hit\b|\brolled[\s-]?a[\s-]?twenty\b/i, badge: 'nat_twenty' },
+  { patterns: /\broll[\s-]?initiative\b|\brolled[\s-]?initiative\b|\bhigh[\s-]?initiative\b/i, badge: 'initiative_rolled' },
+  { patterns: /\blong[\s-]?rest\b|\bshort[\s-]?rest\b|\bresting[\s-]?at[\s-]?the\b|\brest[\s-]?at[\s-]?camp\b/i, badge: 'long_rest_earned' },
+  { patterns: /\btavern\b|\bthe[\s-]?inn\b|\balehouse\b|\bwaypoint[\s-]?inn\b|\bthe[\s-]?keep\b/i, badge: 'tavern_keeper' },
+  { patterns: /\badventurer\b|\badventuring[\s-]?party\b|\badventuring[\s-]?group\b/i, badge: 'adventuring_class' },
+  { patterns: /\bdragon\b|\bwyrm\b|\bdragonborn\b|\bancient[\s-]?dragon\b|\bfirebreather\b/i, badge: 'dragon_detected' },
+  { patterns: /\bpaladin\b|\branger[\s-]?class\b|\bdruid\b|\bcleric\b|\bwizard[\s-]?class\b|\bbarbarian\b/i, badge: 'character_class' },
+  { patterns: /\bcantrip\b|\bspell[\s-]?slot\b|\bspellcasting\b|\barcane[\s-]?focus\b|\bupcast\b/i, badge: 'spell_slot_log' },
+  { patterns: /\bnat[\s-]?one\b|\bnatural[\s-]?one\b|\bcritical[\s-]?fail\b|\bfumble\b/i, badge: 'nat_one' },
+  { patterns: /\bexperience[\s-]?points\b|\bxp[\s-]?gained\b|\bearned[\s-]?xp\b|\bxp[\s-]?milestone\b/i, badge: 'xp_logged' },
+  { patterns: /\bgold[\s-]?coins\b|\bsilver[\s-]?pieces\b|\bgold[\s-]?pieces\b|\bgp[\s-]?earned\b|\bthe[\s-]?hoard\b/i, badge: 'gold_carried' },
+  // ── v20 Secret Boss — THE BOSS VAULT word triggers ────────────────────────────
+  { patterns: /\bkobold\b|\bgoblin[\s-]?ambush\b|\byou[\s-]?shall[\s-]?not[\s-]?pass\b/i, badge: 'kobold_ambush' },
+  { patterns: /\blich[\s-]?king\b|\blich\b|\bnecromancer\b|\bphylactery\b|\bundead[\s-]?horde\b/i, badge: 'lich_throne' },
+  { patterns: /\bnat[\s-]?20[\s-]?irl\b|\brolled[\s-]?a[\s-]?20[\s-]?in[\s-]?real[\s-]?life\b|\bnat[\s-]?twenty[\s-]?in[\s-]?real[\s-]?life\b/i, badge: 'nat_twenty_god' },
 ]
 
 /**
@@ -2711,6 +2742,66 @@ export function checkThresholdMoment(): BadgeType | null {
   if (hour === 0 && minute <= 30) {
     awardBadge('threshold_moment')
     return 'threshold_moment'
+  }
+  return null
+}
+
+// ── Dungeon Master v23 behavioral checks ─────────────────────────────────────
+
+const DUNGEON_WORDS_V23 = [
+  /\bdungeon[\s-]?master\b|\bDM[\s-]?session\b|\bgame[\s-]?master\b|\bGM[\s-]?rules\b/i,
+  /\bnatural[\s-]?20\b|\bnat[\s-]?twenty\b|\bcritical[\s-]?hit\b|\brolled[\s-]?a[\s-]?twenty\b/i,
+  /\broll[\s-]?initiative\b|\brolled[\s-]?initiative\b|\bhigh[\s-]?initiative\b/i,
+  /\blong[\s-]?rest\b|\bshort[\s-]?rest\b|\bresting[\s-]?at[\s-]?the\b|\brest[\s-]?at[\s-]?camp\b/i,
+  /\btavern\b|\bthe[\s-]?inn\b|\balehouse\b|\bwaypoint[\s-]?inn\b|\bthe[\s-]?keep\b/i,
+  /\badventurer\b|\badventuring[\s-]?party\b|\badventuring[\s-]?group\b/i,
+  /\bdragon\b|\bwyrm\b|\bdragonborn\b|\bancient[\s-]?dragon\b|\bfirebreather\b/i,
+  /\bpaladin\b|\branger[\s-]?class\b|\bdruid\b|\bcleric\b|\bwizard[\s-]?class\b|\bbarbarian\b/i,
+  /\bcantrip\b|\bspell[\s-]?slot\b|\bspellcasting\b|\barcane[\s-]?focus\b|\bupcast\b/i,
+  /\bnat[\s-]?one\b|\bnatural[\s-]?one\b|\bcritical[\s-]?fail\b|\bfumble\b/i,
+  /\bexperience[\s-]?points\b|\bxp[\s-]?gained\b|\bearned[\s-]?xp\b|\bxp[\s-]?milestone\b/i,
+  /\bgold[\s-]?coins\b|\bsilver[\s-]?pieces\b|\bgold[\s-]?pieces\b|\bgp[\s-]?earned\b|\bthe[\s-]?hoard\b/i,
+]
+
+/**
+ * Award dungeon_master_session if 3+ Dungeon Master (v23) words in one journal entry.
+ */
+export function checkDungeonMasterSession(journalText: string): BadgeType | null {
+  if (hasBadge('dungeon_master_session')) return null
+  const matchCount = DUNGEON_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('dungeon_master_session')
+    return 'dungeon_master_session'
+  }
+  return null
+}
+
+/**
+ * Award epic_chronicle if journal entry is 600+ words.
+ */
+export function checkEpicChronicle(journalText: string): BadgeType | null {
+  if (hasBadge('epic_chronicle')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 600) {
+    awardBadge('epic_chronicle')
+    return 'epic_chronicle'
+  }
+  return null
+}
+
+/**
+ * Award midnight_roll if user checks in between 01:00 and 01:30 local time.
+ */
+export function checkMidnightRoll(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('midnight_roll')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  const minute = now.getMinutes()
+  if (hour === 1 && minute <= 30) {
+    awardBadge('midnight_roll')
+    return 'midnight_roll'
   }
   return null
 }

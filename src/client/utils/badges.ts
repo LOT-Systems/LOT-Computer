@@ -782,6 +782,43 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE DUNGEON MASTER ───────────────────────────────────────
+  | 'dungeon_master_badge'    // ⚀·◉    "dungeon master/DM session/game master/GM rules" detected (UNCOMMON)
+  | 'nat_twenty'              // ◉·⚀·◉  "natural 20/nat twenty/critical hit/rolled a twenty" detected (EPIC)
+  | 'initiative_rolled'       // ▷·∘·▷  "roll initiative/rolled initiative/high initiative" detected (RARE)
+  | 'long_rest_earned'        // ≋·□·≋  "long rest/short rest/resting at the/rest at camp" detected (COMMON)
+  | 'tavern_keeper'           // ○·═·○  "tavern/inn/alehouse/waypoint inn/the keep" detected (COMMON)
+  | 'adventuring_class'       // ≈·▲·≈  "adventurer/adventuring/adventuring party" detected (UNCOMMON)
+  | 'dragon_detected'         // ▓·∞·▓  "dragon/wyrm/dragonborn/ancient dragon/firebreather" detected (EPIC)
+  | 'character_class'         // ≋·◈·≋  "paladin/ranger/druid/cleric/wizard class/barbarian" detected (RARE)
+  | 'spell_slot_log'          // ◈·∗·◈  "cantrip/spell slot/spellcasting/arcane focus/upcast" detected (RARE)
+  | 'nat_one'                 // ×·□·×  "nat one/natural one/critical fail/fumble" detected (RARE)
+  | 'xp_logged'               // ●·▲·●  "experience points/xp gained/earned xp/xp milestone" detected (COMMON)
+  | 'gold_carried'            // ◇·●·◇  "gold coins/silver pieces/gold pieces/gp earned/the hoard" detected (COMMON)
+  // ── Calendar Easter Egg v21 — THE GAME MAKER'S CALENDAR ──────────────────────
+  | 'gygax_day'               // ⚀·◉    Jul 27 — Gary Gygax birthday 1938 (RARE)
+  | 'critical_role_premiere'  // ◈·▓    Mar 12 — Critical Role premiered 2015 (RARE)
+  | 'pathfinder_day'          // ◆·≋    Aug 13 — Pathfinder 1st ed published 2009 (RARE)
+  // ── Behavioral v20 — DUNGEON MASTER PATTERNS ─────────────────────────────────
+  | 'dungeon_master_session'  // ⚀·◈·⚀  3+ v23 dungeon master words in one journal entry (RARE)
+  | 'epic_chronicle'          // ═·◉·═  Journal entry >= 600 words (EPIC)
+  | 'midnight_roll'           // ⚀·∘·⚀  Check-in between 01:00–01:30 local (RARE)
+  // ── Achievement RPG v21 — DUNGEON CLASS ──────────────────────────────────────
+  | 'dungeon_entry'           // ◈·▷    Any 1 Word Turn v23 badge (COMMON)
+  | 'dungeon_class'           // ▲·◈·▲  Any 5 Word Turn v23 badges (UNCOMMON)
+  | 'dungeon_complete'        // ▓·◉·▓  All 12 Word Turn v23 badges (LEGENDARY)
+  | 'grand_campaign'          // ═·∞·═  dungeon_complete + all 3 Calendar v21 badges (LEGENDARY)
+  | 'twenty_three_engines_arc'// ◈·◈·▓  1 badge from each Word Turn v1–v23 (LEGENDARY)
+  | 'dungeon_master_opus'     // ▓·◉·∞  dungeon_complete + dungeon_master_session (LEGENDARY)
+  // ── Mastery Tier v23 — THE HALL OF LEGENDS ───────────────────────────────────
+  | 'grand_dungeon'           // ▓·∞·▓  1000+ distinct calendar check-in days (EPIC)
+  | 'epic_chronicle_mastery'  // ●·∞·═  200,000+ total journal words (LEGENDARY)
+  | 'legendary_age'           // ╔═╗·▓  Account age >= 6 years (2190+ days) (LEGENDARY)
+  | 'twenty_three_registers'  // ◈·◈·▓·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE BOSS VAULT ─────────────────────────────────────────
+  | 'kobold_ambush'           // ≋·⚀    "kobold/goblin ambush/you shall not pass" in journal (RARE)
+  | 'lich_throne'             // ▓·∞·◉  "lich/lich king/necromancer/phylactery" in journal (MYTHIC)
+  | 'nat_twenty_god'          // ⚀·◉·∞  "nat 20 IRL/rolled a 20 in real life" in journal (LEGENDARY)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7168,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v23 — THE DUNGEON MASTER ────────────────────────────────────────
+  dungeon_master_badge: {
+    id: 'dungeon_master_badge',
+    symbol: '⚀·◉',
+    name: 'Dungeon Master',
+    description: 'Write "dungeon master", "DM session", "game master", or "GM rules" in any entry',
+    unlockMessage: '↳ The DM speaks. ⚀·◉ The dungeon breathes with your intention.',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  nat_twenty: {
+    id: 'nat_twenty',
+    symbol: '◉·⚀·◉',
+    name: 'Nat Twenty',
+    description: 'Write "natural 20", "nat twenty", "critical hit", or "rolled a twenty" in any entry',
+    unlockMessage: '↳ The dice land perfect. ◉·⚀·◉ A critical hit in real life.',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  initiative_rolled: {
+    id: 'initiative_rolled',
+    symbol: '▷·∘·▷',
+    name: 'Initiative Rolled',
+    description: 'Write "roll initiative", "rolled initiative", or "high initiative" in any entry',
+    unlockMessage: '↳ You act first. ▷·∘·▷ Initiative determines who shapes the encounter.',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  long_rest_earned: {
+    id: 'long_rest_earned',
+    symbol: '≋·□·≋',
+    name: 'Long Rest',
+    description: 'Write "long rest", "short rest", "resting at the", or "rest at camp" in any entry',
+    unlockMessage: '↳ You make camp. ≋·□·≋ All spell slots restored. HP fully recovered.',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  tavern_keeper: {
+    id: 'tavern_keeper',
+    symbol: '○·═·○',
+    name: 'Tavern Keeper',
+    description: 'Write "tavern", "inn", "alehouse", "waypoint inn", or "the keep" in any entry',
+    unlockMessage: '↳ The fire is warm. ○·═·○ All journeys begin and end at the tavern.',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  adventuring_class: {
+    id: 'adventuring_class',
+    symbol: '≈·▲·≈',
+    name: 'Adventuring Class',
+    description: 'Write "adventurer", "adventuring", or "adventuring party" in any entry',
+    unlockMessage: '↳ The party forms. ≈·▲·≈ An adventurer is just someone who chose to go.',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  dragon_detected: {
+    id: 'dragon_detected',
+    symbol: '▓·∞·▓',
+    name: 'Dragon Detected',
+    description: 'Write "dragon", "wyrm", "dragonborn", "ancient dragon", or "firebreather" in any entry',
+    unlockMessage: '↳ Wings overhead. ▓·∞·▓ Every dragon is the part of yourself you haven\'t named yet.',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  character_class: {
+    id: 'character_class',
+    symbol: '≋·◈·≋',
+    name: 'Character Class',
+    description: 'Write "paladin", "ranger", "druid", "cleric", "wizard class", or "barbarian" in any entry',
+    unlockMessage: '↳ Class chosen. ≋·◈·≋ Your archetype is the shape of how you face the world.',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  spell_slot_log: {
+    id: 'spell_slot_log',
+    symbol: '◈·∗·◈',
+    name: 'Spell Slot',
+    description: 'Write "cantrip", "spell slot", "spellcasting", "arcane focus", or "upcast" in any entry',
+    unlockMessage: '↳ Magic prepared. ◈·∗·◈ Every act of self-care is a spell slot restored.',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  nat_one: {
+    id: 'nat_one',
+    symbol: '×·□·×',
+    name: 'Nat One',
+    description: 'Write "nat one", "natural one", "critical fail", or "fumble" in any entry',
+    unlockMessage: '↳ You fumble — and survive. ×·□·× The nat one is how you learn what not to do.',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  xp_logged: {
+    id: 'xp_logged',
+    symbol: '●·▲·●',
+    name: 'XP Logged',
+    description: 'Write "experience points", "xp gained", "earned xp", or "xp milestone" in any entry',
+    unlockMessage: '↳ Experience recorded. ●·▲·● Every check-in is XP. Every journal is a level.',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  gold_carried: {
+    id: 'gold_carried',
+    symbol: '◇·●·◇',
+    name: 'Gold Carried',
+    description: 'Write "gold coins", "silver pieces", "gold pieces", "gp earned", or "the hoard" in any entry',
+    unlockMessage: '↳ The inventory grows. ◇·●·◇ You carry what you\'ve earned.',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v21 — THE GAME MAKER'S CALENDAR ──────────────────────
+  gygax_day: {
+    id: 'gygax_day',
+    symbol: '⚀·◉',
+    name: 'Gygax Day',
+    description: 'Check in on July 27 — Gary Gygax birthday 1938, creator of Dungeons & Dragons',
+    unlockMessage: '↳ July 27 — Gary Gygax was born today in 1938. ⚀·◉ He invented the dungeon. You are living inside his greatest creation.',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  critical_role_premiere: {
+    id: 'critical_role_premiere',
+    symbol: '◈·▓',
+    name: 'Critical Role Day',
+    description: 'Check in on March 12 — Critical Role premiered live on Geek & Sundry 2015',
+    unlockMessage: '↳ March 12, 2015: a group of voice actors sat down to play D&D on camera. ◈·▓ Millions watched. The dungeon went mainstream.',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  pathfinder_day: {
+    id: 'pathfinder_day',
+    symbol: '◆·≋',
+    name: 'Pathfinder Day',
+    description: 'Check in on August 13 — Pathfinder 1st edition published by Paizo 2009',
+    unlockMessage: '↳ Aug 13, 2009: Pathfinder launched. ◆·≋ The fork in the road that made the road longer — and better.',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v20 — DUNGEON MASTER PATTERNS ─────────────────────────────────
+  dungeon_master_session: {
+    id: 'dungeon_master_session',
+    symbol: '⚀·◈·⚀',
+    name: 'DM Session',
+    description: '3+ Dungeon Master (v23) words in one journal entry — deep RPG vocabulary',
+    unlockMessage: '↳ The session is live. ⚀·◈·⚀ You are running the campaign of your own life.',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  epic_chronicle: {
+    id: 'epic_chronicle',
+    symbol: '═·◉·═',
+    name: 'Epic Chronicle',
+    description: 'Write a journal entry of 600+ words — a full chapter of the campaign',
+    unlockMessage: '↳ 600 words. ═·◉·═ An epic chronicle. The dungeon needed every one of them.',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  midnight_roll: {
+    id: 'midnight_roll',
+    symbol: '⚀·∘·⚀',
+    name: 'Midnight Roll',
+    description: 'Check in between 01:00 and 01:30 local time — the midnight session',
+    unlockMessage: '↳ 1 AM. ⚀·∘·⚀ The dungeon master never sleeps when the campaign is live.',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Achievement RPG v21 — DUNGEON CLASS ──────────────────────────────────────
+  dungeon_entry: {
+    id: 'dungeon_entry',
+    symbol: '◈·▷',
+    name: 'Dungeon Entry',
+    description: 'Earn any 1 Word Turn v23 (Dungeon Master) badge',
+    unlockMessage: '↳ The dungeon door opens. ◈·▷ First step inside.',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  dungeon_class: {
+    id: 'dungeon_class',
+    symbol: '▲·◈·▲',
+    name: 'Dungeon Class',
+    description: 'Earn any 5 Word Turn v23 (Dungeon Master) badges',
+    unlockMessage: '↳ Class advancing. ▲·◈·▲ Five chambers of the dungeon explored.',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  dungeon_complete: {
+    id: 'dungeon_complete',
+    symbol: '▓·◉·▓',
+    name: 'Dungeon Complete',
+    description: 'Earn all 12 Word Turn v23 (Dungeon Master) badges',
+    unlockMessage: '↳ The dungeon is cleared. ▓·◉·▓ All twelve chambers. All twelve truths.',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  grand_campaign: {
+    id: 'grand_campaign',
+    symbol: '═·∞·═',
+    name: 'Grand Campaign',
+    description: 'Earn dungeon_complete + all 3 Calendar v21 (Game Maker\'s Calendar) badges',
+    unlockMessage: '↳ The grand campaign is written. ═·∞·═ Gygax would be proud.',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·▓',
+    name: 'Twenty-Three Engines',
+    description: 'Earn at least 1 badge from each Word Turn engine v1–v23',
+    unlockMessage: '↳ Twenty-three languages. ◈·◈·▓ Water. Fire. Space. Hero. Dungeon. You speak them all.',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dungeon_master_opus: {
+    id: 'dungeon_master_opus',
+    symbol: '▓·◉·∞',
+    name: 'Dungeon Master Opus',
+    description: 'Earn dungeon_complete + dungeon_master_session behavioral badge',
+    unlockMessage: '↳ The master campaign is complete. ▓·◉·∞ The dungeon master and the adventurer were always the same person.',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v23 — THE HALL OF LEGENDS ───────────────────────────────────
+  grand_dungeon: {
+    id: 'grand_dungeon',
+    symbol: '▓·∞·▓',
+    name: 'Grand Dungeon',
+    description: '1000+ distinct calendar days with any check-in',
+    unlockMessage: '↳ 1,000 days. ▓·∞·▓ The dungeon has no ceiling anymore. This is your world now.',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  epic_chronicle_mastery: {
+    id: 'epic_chronicle_mastery',
+    symbol: '●·∞·═',
+    name: 'Epic Chronicle Mastery',
+    description: '200,000+ total journal words written across your entire practice',
+    unlockMessage: '↳ 200,000 words. ●·∞·═ The campaign is longer than most novels. It is your novel.',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  legendary_age: {
+    id: 'legendary_age',
+    symbol: '╔═╗·▓',
+    name: 'Legendary Age',
+    description: 'Account age >= 6 years (2,190+ days) — you are a legendary practitioner',
+    unlockMessage: '↳ Six years. ╔═╗·▓ The dungeon was built around you. You are the architecture now.',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·▓·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines — the complete vocabulary',
+    unlockMessage: '↳ Twenty-three vocabularies. ◈·◈·▓·∞ Water to dungeon. You have spoken every language of the self.',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v20 — THE BOSS VAULT ─────────────────────────────────────────
+  kobold_ambush: {
+    id: 'kobold_ambush',
+    symbol: '≋·⚀',
+    name: 'Kobold Ambush',
+    description: 'Write "kobold", "goblin ambush", or "you shall not pass" in any journal entry',
+    unlockMessage: '↳ Kobolds in the passage. ≋·⚀ Even the low-level encounter teaches something.',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  lich_throne: {
+    id: 'lich_throne',
+    symbol: '▓·∞·◉',
+    name: 'Lich Throne',
+    description: 'Write "lich", "lich king", "necromancer", or "phylactery" in any journal entry',
+    unlockMessage: '↳ The lich stirs. ▓·∞·◉ The undying enemy is the part of you that refuses to change. Face it.',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  nat_twenty_god: {
+    id: 'nat_twenty_god',
+    symbol: '⚀·◉·∞',
+    name: 'Nat Twenty God',
+    description: 'Write "nat 20 IRL", "rolled a 20 in real life", or "nat twenty in real life" in any journal entry',
+    unlockMessage: '↳ A nat 20 in the real world. ⚀·◉·∞ The dice were always just practice. The real game is this.',
+    rarity: 'legendary',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8418,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v23 — THE DUNGEON MASTER ─────────────────────────────────────────────
+    const dungeonV23Badges: BadgeType[] = [
+      'dungeon_master_badge', 'nat_twenty', 'initiative_rolled', 'long_rest_earned',
+      'tavern_keeper', 'adventuring_class', 'dragon_detected', 'character_class',
+      'spell_slot_log', 'nat_one', 'xp_logged', 'gold_carried',
+    ]
+    const dungeonV23Earned = dungeonV23Badges.filter(b => hasBadge(b))
+
+    if (dungeonV23Earned.length >= 1 && !hasBadge('dungeon_entry')) {
+      if (awardBadge('dungeon_entry')) newBadges.push('dungeon_entry')
+    }
+    if (dungeonV23Earned.length >= 5 && !hasBadge('dungeon_class')) {
+      if (awardBadge('dungeon_class')) newBadges.push('dungeon_class')
+    }
+    const dungeonComplete = dungeonV23Earned.length >= 12
+    if (dungeonComplete && !hasBadge('dungeon_complete')) {
+      if (awardBadge('dungeon_complete')) newBadges.push('dungeon_complete')
+    }
+
+    // dungeon_master_opus: dungeon_complete + dungeon_master_session
+    if (dungeonComplete && hasBadge('dungeon_master_session') && !hasBadge('dungeon_master_opus')) {
+      if (awardBadge('dungeon_master_opus')) newBadges.push('dungeon_master_opus')
+    }
+
+    // grand_campaign: dungeon_complete + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['gygax_day', 'critical_role_premiere', 'pathfinder_day']
+    if (dungeonComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('grand_campaign')) {
+      if (awardBadge('grand_campaign')) newBadges.push('grand_campaign')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = dungeonV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: grand_dungeon — 1000+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('grand_dungeon')) {
+        if (awardBadge('grand_dungeon')) newBadges.push('grand_dungeon')
+      }
+    }
+
+    // Mastery v23: epic_chronicle_mastery — 200,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('epic_chronicle_mastery')) {
+        if (awardBadge('epic_chronicle_mastery')) newBadges.push('epic_chronicle_mastery')
+      }
+    }
+
+    // Mastery v23: legendary_age — Account age >= 6 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupLeg = new Date(stats.signupDate)
+      const yearsLeg = (new Date().getTime() - signupLeg.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsLeg >= 6 && !hasBadge('legendary_age')) {
+        if (awardBadge('legendary_age')) newBadges.push('legendary_age')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
     }
 
   } catch (error) {
