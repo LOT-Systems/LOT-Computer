@@ -1,0 +1,21 @@
+ref,block,part,qty,est_usd,verify
+U1,MCU,ESP32-S3-MINI-1-N8,1,3.5,stock/footprint
+DS1,Display,0.96in OLED 128x64 SSD1315 FPC,1,2.5,panel thickness/FPC pinout
+CAM1,Camera,OV2640 or GC2145 FPC module,1,3.0,module height/FPC
+U2,Env sensor,Bosch BME688,1,8.0,stock
+U3,UV/light,LTR-390UV-01,1,1.0,
+SW1,Button,Tact 3x3x1.5,1,0.2,
+M1,Haptic,LRA 6mm or piezo,1,1.0,optional
+U4,Qi RX,BQ51013B,1,2.5,
+L1,Qi coil,RX coil ~20mm + ferrite,1,1.5,thickness<=1mm
+U5,Charger,BQ25185 or MCP73831,1,1.0,
+BT1,Battery,LiPo ~502030 200-250mAh PCM,1,3.0,UN38.3 cert
+U6,Fuel gauge,MAX17048,1,1.2,optional
+U7,LDO,TLV75733P,1,0.3,
+J1,USB-C,16-pin mid-mount or pogo,1,0.5,
+X,Passives/ESD,misc,1,2.0,
+PCB,PCB 4-layer,PCBWay,1,3.0,
+ASM,SMT assembly,PCBWay,1,6.0,
+BODY,Body 2x316L CNC+polish,PCBWay CNC,1,24.0,quote needed
+WIN,Seam gasket/window,PEEK/ceramic/glass,1,4.0,RF+Qi test
+PKG,Packaging/QC,,1,4.0,
