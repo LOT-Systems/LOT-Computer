@@ -321,6 +321,16 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE REFILL DAY                              2026-10-31
+  ─────────────────────────────────────────────────────────────────
+  (Summary. Full entry, guardrails and telemetry: LOT-CUBIQ-QUANTUM-CUBE-
+  v0-R02.md, Section 08.) Tier needed: v.1 LONG JUMP. A Basic Essentials
+  subscriber's monthly box arrives; the Index of Systems confirms
+  delivery; the cube nudges, then long-jumps 200-250mm from its home pad
+  to a "Dock" pad beside the toothbrush cup, prompting the swap at the exact
+  object concerned. THE SETTLE acknowledges completion. Opt-in, no health
+  claims, refuses to jump if the Dock is moved or occluded.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
