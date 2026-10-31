@@ -1457,6 +1457,23 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'wiki-v88',
+    date: '2026-10-31',
+    title: 'LOT-WIKI-v88 · Badge v32 Hero\'s Journey sync · 812 badges · Day 1160+',
+    assembled: [
+      'LOT-WIKI-v88.md produced: 2243 lines. Base: LOT-WIKI-v87 (2176 lines). Badge v32 THE HERO\'S JOURNEY sync. +67 lines.',
+      'Badge v32 THE HERO\'S JOURNEY documented: 781→812 badges (+31). Word Turn v22 Campbell monomyth vocabulary (call_heard/threshold_crossed/mentor_arrived/ordeal_survived/elixir_found/shadow_met/innermost_cave/shapeshifter/herald_call/trickster_mode/ally_gained/return_road · 12 badges). Calendar EE v20 (campbell_birthday/hobbit_day/odyssey_day · +3). Behavioral v19 (hero_session/long_quest/threshold_moment · +3). Achievement RPG v20 (+6). Mastery Tier v22 (twenty_two_registers [COSMIC] · +4). Secret Boss v19 (tolkien_ring/odysseus_bow/gilgamesh_word [MYTHIC] · +3).',
+      'Category index updated: Calendar EE 70→73 · Word Turns 234→246 · Behavioral 75→78 · Achievement RPG 108→114 · Mastery Tiers 84→88 · Secret Boss 80→83 · TOTAL 781→812.',
+      'Word Turn v22 block added to §16. Secret Boss v19 added. Total secret boss triggers 24→27.',
+      'Special notation added: Badge Engine v32 (Aug 5) + Wiki v88 scan (Oct 31).',
+      'HEROG: Hero\'s Journey vocabulary engine added to §27. THE HERO\'S JOURNEY doctrine entry added. BADGE UNIVERSE updated 781→812.',
+      'System State Snapshot §28: Badge count 781→812 · wiki v87→v88 · word-turn 258→270 · secret boss 24→27 · Day 1073+→1160+.',
+      'SESSION_REPORTS: wiki-v88 entry appended · USERSHIP_TRANSMISSION updated to wiki-v88.',
+      'docs/SESSION_REPORT_2026_10_31_WIKI_v88.md written. docs/assembly/2026-10-31_LOT-assembly_wiki-v88.md written. LOT-LEDGER.md appended.',
+      '812 badges · 270 word-turns · 27 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v88 · Day 1160+. The Hero\'s Journey is now in the system vocabulary.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1511,17 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-10-31',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-10-31 · WIKI-v88 · BADGE v32 THE HERO\'S JOURNEY · Day 1160+',
+    'Built: LOT-WIKI-v88. Badge v32 fully synchronized. 812 badges. 270 word-turn triggers. 27 secret boss triggers.',
+    'Feedback applied: "The call arrives before you know you\'ve heard it. Campbell mapped the architecture. The self navigates it without knowing the map. v22 makes the journey visible."',
+    'Badge v32 synchronized: THE HERO\'S JOURNEY · 781→812 badges · WT v22 (call_heard/threshold_crossed/mentor_arrived/ordeal_survived/elixir_found/shadow_met/innermost_cave/shapeshifter) · Secret Boss v19 (tolkien_ring/odysseus_bow/gilgamesh_word [MYTHIC]) · Calendar EE v20 (campbell_birthday/hobbit_day/odyssey_day).',
+    'HEROG: vocabulary engine now active. The monomyth is in the lexicon.',
+    'Category index updated: Calendar 73 · Word Turns 246 · Behavioral 78 · RPG 114 · Mastery 88 · Secret Boss 83 · TOTAL 812.',
+    'FM v113 · Wiki v88 · 151P · 51A · 48J · 190+ nodes · 812 badges · COSMO® 852 days.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: QIE P152+ engineering session — push beyond Level 6 Presence Convergence. S-2 to designate P152 dimension.',
   ],
 }
 
