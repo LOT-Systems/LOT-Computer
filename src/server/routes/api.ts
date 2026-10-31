@@ -44,6 +44,9 @@ import { generateChatCatalysts, generateConversationStarters, shouldShowChatCata
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
 import { registerOSRoutes } from './os-api.js'
+import { buildStoryDigest, digestToPromptBlock, composeDigestStory } from '#shared/utils/storyCompression'
+import { computeArcade, formatArcadeLine } from '#shared/utils/arcade'
+import type { StoryPeriod } from '#shared/utils/logCommands'
 
 // ============================================================================
 // Helper Functions
@@ -5369,12 +5372,21 @@ ${qieLogs.length > 0 ? qieLogs.map(l => `${(l.metadata?.pattern as string || '')
       reply
     ) => {
       const { logText, quantumState, userIndex } = req.body
+      const period: StoryPeriod = (['day', 'week', 'month', 'year'] as const).includes(req.body.period as any)
+        ? (req.body.period as StoryPeriod)
+        : 'day'
 
+      // Window the query to the requested period (year needs deeper history).
       const logs = await fastify.models.Log.findAll({
         where: { userId: req.user.id },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: period === 'year' ? 2000 : period === 'month' ? 600 : 300,
       })
+
+      // Compressed digest of the period (LOT User data -> compression step).
+      const digest = buildStoryDigest(logs as any, period)
+      const arcade = computeArcade(logs as any)
+      const arcadeLine = formatArcadeLine(arcade)
 
       // Recent mood trajectory
       const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
@@ -5424,6 +5436,9 @@ Example outputs:
 
       const dataBlock = `
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+
+COMPRESSED PERIOD DIGEST:
+${digestToPromptBlock(digest)}
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 
@@ -5490,6 +5505,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5549,7 +5565,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story for a given PERIOD (see digest). Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
@@ -5560,6 +5576,7 @@ RULES:
 - The tone should match their current energy: reflective if low, energized if high
 - End with a single forward-looking sentence — not a pep talk, just a quiet truth
 - Return ONLY the story paragraphs. No title. No commentary. No preamble.
+- Surface the period's high and low points from the digest, and any volume spike, gently — never diagnose.
 - Keep it under 200 words.`
 
       const dataBlock = `
@@ -5595,6 +5612,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           context,
           metadata: {
             story: cleaned,
+            period,
+            digest,
             logText: (logText || '').substring(0, 500),
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
@@ -5604,12 +5623,19 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          period,
+          arcade: arcadeLine,
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
+        // Deterministic fallback from the digest — still personal, no vendor needed.
         return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
+          story: digest.entries > 0
+            ? composeDigestStory(digest)
+            : 'The system holds your data quietly. When the engine returns, your story will be here.',
           logId: null,
+          period,
+          arcade: arcadeLine,
         }
       }
     }
