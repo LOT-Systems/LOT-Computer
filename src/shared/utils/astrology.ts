@@ -177,3 +177,44 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Re-express an instant as a Date whose local getters (getHours, getDate, ...)
+ * read the wall clock in the given IANA timeZone. Lets the pure functions
+ * above work per-user on client and server, whatever the runtime's own zone.
+ * Falls back to the instant itself for a missing or invalid timeZone.
+ */
+export function getWallClockDate(timeZone?: string | null, now: Date = new Date()): Date {
+  if (!timeZone) return now
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(now)
+    const get = (type: string) => Number(parts.find(p => p.type === type)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return now
+  }
+}
+
+/**
+ * Single ambient reading, shared by the dashboard block, the QIE signal and
+ * the Logs snapshot so all three always agree.
+ */
+export function getAstrologyReading(timeZone?: string | null, now: Date = new Date()) {
+  const wall = getWallClockDate(timeZone, now)
+  const moon = getMoonPhase(wall)
+  const rokuyo = getRokuyo(wall)
+  return {
+    hourlyZodiac: getHourlyZodiac(wall),
+    westernZodiac: getWesternZodiac(wall),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    moonEmoji: getMoonEmoji(moon.phase),
+    rokuyo,
+    auspicious: rokuyo === 'Taian',
+  }
+}
