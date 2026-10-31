@@ -24,6 +24,8 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  useMarkEmailRead,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -69,6 +71,13 @@ export const Sync = React.memo(function SyncInner() {
     if (me.isAdmin) return true
     return me.tags.some((tag) => CHAT_ALLOWED_TAGS.includes(tag.toLowerCase()))
   }, [me])
+
+  // LOT® Email — "/email to Name" in Log lands here
+  const { data: emailData } = useEmails({ enabled: canAccessChat })
+  const { mutate: markEmailRead } = useMarkEmailRead({
+    onSuccess: () => queryClient.invalidateQueries(['/api/emails']),
+  })
+  const emails = emailData?.emails || []
 
   const { data: fetchedMessages } = useChatMessages()
   const { mutate: createChatMessage } = useCreateChatMessage({
@@ -117,7 +126,11 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeEmailListener } = sync.listen('email', () => {
+      queryClient.invalidateQueries(['/api/emails'])
+    })
     return () => {
+      disposeEmailListener()
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
     }
@@ -213,6 +226,38 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {emails.length > 0 && (
+        <div className="mb-80">
+          {emails.slice(0, 20).map((e) => {
+            const unread = !e.isMine && !e.isRead
+            return (
+              <div
+                key={e.id}
+                className={cn(
+                  'flex items-start gap-x-8 -mx-4 px-4 py-2 rounded grid-fill-hover',
+                  !unread && 'text-acc/60',
+                  !e.isMine && !e.isRead && 'cursor-pointer'
+                )}
+                onClick={() => unread && markEmailRead({ id: e.id })}
+              >
+                <span className="whitespace-nowrap">
+                  {e.isMine ? `→ ${e.to.name}` : e.from.name}
+                </span>
+                <div className="whitespace-breakspaces" style={{ wordBreak: 'break-word' }}>
+                  {e.body}
+                </div>
+                {unread && <Tag className="-mt-[2px]" fill={false}>new</Tag>}
+                {!isTouchDevice && (
+                  <div className="text-acc/40 select-none whitespace-nowrap">
+                    <MessageTimeLabel dateString={e.createdAt} isTimeFormat12h={isTimeFormat12h} />
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {

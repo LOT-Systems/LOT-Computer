@@ -41,6 +41,7 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'email'             // /email to Name. message — LOT® Email (sent on Ctrl+Enter)
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -67,6 +68,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'email',          emojis: [],        keywords: ['email', 'mail'] },
 ]
 
 /**
@@ -114,4 +116,22 @@ export function detectNewTriggers(
   const fresh: LogTrigger[] = []
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
+}
+
+/**
+ * Parses "/email to Hitomi. See you at 5" (also ":" or newline after the
+ * name; up to three words, e.g. "/email to Hitomi Tanaka. Hello").
+ * Returns null unless both a recipient and a message are present.
+ */
+export function parseEmailCommand(
+  text: string
+): { to: string; body: string } | null {
+  if (!text) return null
+  const m = text.match(
+    /(?:^|\s)\/(?:email|mail)\s+to\s+([^\s.:,;\n]+(?:[ \t]+[^\s.:,;\n]+){0,2}?)[ \t]*(?:[.:,;]|\n)\s*([\s\S]*)$/i
+  )
+  if (!m) return null
+  const to = m[1].trim()
+  const body = m[2].trim()
+  return to && body ? { to, body } : null
 }

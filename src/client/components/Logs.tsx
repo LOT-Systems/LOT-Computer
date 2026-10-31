@@ -10,7 +10,7 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
-import { useLogs, useUpdateLog } from '#client/queries'
+import { useLogs, useUpdateLog, useSendEmail } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
@@ -28,7 +28,7 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, parseEmailCommand, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3707,6 +3707,16 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  // LOT® Email: "/email to Name. message" is sent on Ctrl/Cmd+Enter
+  const [emailResult, setEmailResult] = React.useState<string | null>(null)
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: (data) => setEmailResult(`SENT → ${data.to.name.toUpperCase()}\nDelivered to Sync.`),
+    onError: (err: any) =>
+      setEmailResult(`NOT SENT — ${err?.response?.data?.error || 'Email unavailable.'}`),
+  })
+  const sendEmailRef = React.useRef(sendEmail)
+  sendEmailRef.current = sendEmail
+  const setEmailResultRef = React.useRef(setEmailResult)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3911,6 +3921,15 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        if (/(^|\s)\/(email|mail)\s/i.test(valueRef.current)) {
+          const cmd = parseEmailCommand(valueRef.current)
+          if (cmd) {
+            setEmailResultRef.current(`SENDING → ${cmd.to.toUpperCase()}…`)
+            sendEmailRef.current({ to: cmd.to, body: cmd.body })
+          } else {
+            setEmailResultRef.current('USAGE  /email to Name. Your message\nThen Ctrl+Enter to send.')
+          }
+        }
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -4139,6 +4158,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email        /email to Name. message — Ctrl+Enter sends to their Sync',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4384,6 +4404,13 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailResult && (
+          <div className="mt-8">
+            <Block label="MAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{emailResult}</div>
             </Block>
           </div>
         )}
