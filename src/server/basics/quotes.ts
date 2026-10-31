@@ -7,6 +7,8 @@
  * in cogs.ts. COGS flips to QUOTED only when all 23 lines hold a live quote.
  * Never import this file from src/client or src/shared.
  */
+import { QUOTE_DATA } from '#server/basics/quotes.data'
+
 export type Quote = {
   supplier: string
   /** Landed unit cost, USD cents, for one ration unit as specified in the manifest. */
@@ -19,8 +21,8 @@ export type Quote = {
   validDays: number
 }
 
-/** S-2: enter confirmed quotes here, keyed by line "01".."23". */
-export const QUOTES: Record<string, Quote> = {}
+/** Confirmed quotes keyed by line "01".."23". Fed by `npm run basics:quotes` -> quotes.data.ts. */
+export const QUOTES: Record<string, Quote> = QUOTE_DATA
 
 export const isLive = (q: Quote, now: Date): boolean => {
   const issued = Date.parse(q.quotedOn)

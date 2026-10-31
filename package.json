@@ -24,6 +24,7 @@
   },
   "scripts": {
     "basics:envelope": "npx tsx scripts/basics-envelope.ts",
+    "basics:quotes": "npx tsx scripts/basics-quotes.ts",
     "basics:rfq": "npx tsx scripts/basics-rfq.ts",
     "basics:test": "npx tsx scripts/tests/basics-engine.test.ts",
     "db:admin": "tsx scripts/db-admin.ts",

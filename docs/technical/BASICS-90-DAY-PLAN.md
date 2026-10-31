@@ -17,7 +17,7 @@ Envelope: USD 100/MO · margin ≥ 60% · landed ≤ USD 40 · 23-line load.
 - `src/shared/basics/card.ts` — printed manifest card (48-col text).
 - `src/server/basics/cogs.ts` — COGS ESTIMATES (server-only) + envelope; `npm run basics:envelope` exits 1 on breach.
 - Admin: `GET /api/basics/admin/queue`, `POST /api/basics/admin/dispatch {userId,tracking}`, `GET /api/basics/admin/envelope`.
-- `src/server/basics/quotes.ts` — supplier quote intake (empty); live quotes override estimates; QUOTED only at 23/23. `npm run basics:rfq` writes `docs/technical/BASICS-RFQ.md`.
+- `src/server/basics/quotes.ts` + `quotes-csv.ts` + `quotes.data.ts` — supplier quote intake (data empty), CSV parser/validator; live quotes override estimates; QUOTED only at 23/23. `npm run basics:rfq` writes `docs/technical/BASICS-RFQ.md`.
 - `scripts/tests/basics-engine.test.ts` — `npm run basics:test`.
 
 ## State machine
@@ -26,7 +26,7 @@ STAND DOWN from PENDING / ON STRENGTH / STEADY STATE → USERSHIP. Drops ration,
 
 ## Month 3 prerequisites (need S-2 / outside the repo)
 1. Payment processor (none in repo). Billing is ledgered, not charged.
-2. Supplier quotes for all 23 lines: send `BASICS-RFQ.md`, enter answers in `quotes.ts` (intake built 2026-10-19). Margin is VERIFIED only at 23/23 live quotes.
+2. Supplier quotes for all 23 lines: send `BASICS-RFQ.md`, put answers in a CSV, run `npm run basics:quotes -- sheet.csv` (dry run: validates, projects envelope) then `--write` (refuses a breaching sheet; writes `quotes.data.ts`). Margin is VERIFIED only at 23/23 live quotes.
 3. Fulfillment partner / ship-from address; US-only until decided.
 4. ~~Public OPEN TAB page~~ DONE: `GET /open-tab` (no auth) + `GET /api/public/basics`.
 5. Legal review of ingestible items (supplements) and the "issued, not sold" wording.

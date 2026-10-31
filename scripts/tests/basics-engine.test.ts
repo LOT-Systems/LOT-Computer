@@ -68,4 +68,12 @@ assert(!isLive(mk(100, '2026-01-01'), t0)); assert.equal(cogsStatus(t0, { ...all
 const hot = envelope(t0, { ...all, '12': mk(9000) }) // underwear quoted at 90.00 breaches ceiling
 assert(!hot.ok && /LANDED|MARGIN/.test(hot.breach!))
 assert(!isLive(mk(0), t0))
+
+// quote CSV intake
+import { parseQuotesCsv, renderQuoteData } from '../../src/server/basics/quotes-csv.ts'
+const ok = parseQuotesCsv('line,supplier,usd,moq,lead,valid,date\n# c\n01,Acme,0.95,500,14,60,2026-10-20\n02,Beta,0.40,1000,7,30,2026-10-21')
+assert.deepEqual(ok.errors, []); assert.equal(ok.quotes['01'].unitCents, 95); assert.equal(ok.quotes['02'].validDays, 30)
+assert(renderQuoteData(ok.quotes).includes('"unitCents": 95'))
+const bad = parseQuotesCsv('99,X,1,1,1,1,2026-10-20\n01,,1,1,1,1,2026-10-20\n01,A,-1,1,1,1,2026-10-20\n01,A,1,0,1,1,2026-10-20\n01,A,1,1,1,1,20-10-2026\n01,A,1,1,1,1,2026-10-20\n01,A,1,1,1,1,2026-10-20')
+assert.equal(bad.errors.length, 6); assert(bad.errors.some((e) => /DUPLICATE/.test(e)))
 console.log('basics-engine: ALL PASS')

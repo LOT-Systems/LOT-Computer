@@ -31,4 +31,4 @@ Unit volume tiers assume 100 / 500 / 1000 operators over 12 issues.
 | 23 | MANIFEST CARD, PRINTED | 1 EA | MONTHLY | 12 | 1200 / 6000 / 12000 |
 
 Return each answer as: line, supplier, unit USD, MOQ, lead time days, valid days, quote date.
-Entry point for answers: `src/server/basics/quotes.ts`. Gate: `npm run basics:envelope`.
+Entry point for answers: CSV in this row order -> `npm run basics:quotes -- sheet.csv [--write]`. Gate: `npm run basics:envelope`.

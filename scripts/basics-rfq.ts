@@ -21,7 +21,7 @@ const out = [
   ...rows,
   '',
   'Return each answer as: line, supplier, unit USD, MOQ, lead time days, valid days, quote date.',
-  'Entry point for answers: `src/server/basics/quotes.ts`. Gate: `npm run basics:envelope`.',
+  'Entry point for answers: CSV in this row order -> `npm run basics:quotes -- sheet.csv [--write]`. Gate: `npm run basics:envelope`.',
   '',
 ].join('\n')
 writeFileSync('docs/technical/BASICS-RFQ.md', out)
