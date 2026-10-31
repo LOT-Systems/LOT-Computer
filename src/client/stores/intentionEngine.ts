@@ -3428,6 +3428,58 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Signal Breadth Peak — 8+ unique signal sources active in 24h.
+  // Maximum single-day breadth. The full QIE signal field is active across almost all
+  // dimensions simultaneously.
+  // Distinct from P142 (adaptive-signal-web: 7d scope + pattern count + index requirements).
+  // P152 is purely a single-day breadth snapshot — no index or pattern conditions required.
+  const p152Sources = new Set(recentSignals.map(s => s.source))
+  if (p152Sources.size >= 8) {
+    const p152Conf = Math.min(0.70 + (p152Sources.size - 8) * 0.05, 0.90)
+    patterns.push({
+      pattern: 'signal-breadth-peak',
+      confidence: p152Conf,
+      suggestedWidget: 'signalStream',
+      suggestedTiming: 'passive',
+      reason: `SIGBRD: Signal breadth peak — ${p152Sources.size} distinct signal sources active today. Full field operational. Every dimension contributing.`,
+    })
+  }
+
+  // Pattern 153: Reflection Triad — journal + memory + log all active in 24h.
+  // The three capture-and-store channels simultaneously open: inner narrative (journal),
+  // external record (log), memory bridge (memory). Full cognitive capture architecture confirmed.
+  // Distinct from P127 (depth-breadth-convergence: requires 4+ sources + high diversity).
+  // Distinct from P122 (action-to-memory-loop: action signal required). P153 is pure capture architecture.
+  const p153Journal = recentSignals.filter(s => s.source === 'journal')
+  const p153Memory  = recentSignals.filter(s => s.source === 'memory')
+  const p153Log     = recentSignals.filter(s => s.source === 'log')
+  if (p153Journal.length >= 1 && p153Memory.length >= 1 && p153Log.length >= 1) {
+    const p153DepthBonus = Math.min((p153Journal.length - 1) * 0.05 + (p153Memory.length - 1) * 0.04 + (p153Log.length - 1) * 0.03, 0.20)
+    patterns.push({
+      pattern: 'reflection-triad',
+      confidence: Math.min(0.70 + p153DepthBonus, 0.90),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'passive',
+      reason: `REFLTRI: Reflection triad — journal ${p153Journal.length} + memory ${p153Memory.length} + log ${p153Log.length} all active in 24h. Three capture channels open. Inner signal, outer record, and memory bridge aligned.`,
+    })
+  }
+
+  // Pattern 154: Weekly Breadth Anchor — 6+ unique signal sources active in 7d.
+  // Sustained multi-source engagement across a full week. Not about peaks — about width
+  // of operational engagement over the long cadence.
+  // Distinct from P59 (multimodal-peak: 3 windows same day). P154 is the 7d breadth anchor.
+  const p154WeekSources = new Set(weekSignals.map(s => s.source))
+  if (p154WeekSources.size >= 6) {
+    const p154Conf = Math.min(0.68 + (p154WeekSources.size - 6) * 0.06, 0.88)
+    patterns.push({
+      pattern: 'weekly-breadth-anchor',
+      confidence: p154Conf,
+      suggestedWidget: 'userMetrics',
+      suggestedTiming: 'passive',
+      reason: `WKBRD: Weekly breadth anchor — ${p154WeekSources.size} signal sources active in 7d. Full-width engagement sustained. The architecture holds across the full week.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4116,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  signalBreadthPeakNode:      ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'calculator', 'log', 'energy', 'cohort'],
+  reflectionTriadNode:        ['journal', 'memory', 'log'],
+  weeklyBreadthAnchorNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'log'],
 }
 
 /**
@@ -4510,6 +4567,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Full-Spectrum Operator (2026-10-31 v114) ─────────────────────────────
+  {
+    archetype: 'Full-Spectrum Operator',
+    energyBands: ['moderate', 'high'],
+    dominantSources: ['journal', 'memory', 'log'],
+    patternConditions: ['signal-breadth-peak', 'reflection-triad', 'weekly-breadth-anchor'],
+    directive: 'Full-width operation confirmed. 8+ signal channels active. Capture is comprehensive. The archive deepens.',
   },
 ]
 
@@ -6498,6 +6564,52 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a signal-breadth-peak event — 8+ unique signal sources active in 24h.
+ * Full field operational. Every dimension contributing.
+ * Feeds P152 detection. J49 daily-signal-breadth-check (15:00 UTC) can write this.
+ */
+export function recordSignalBreadthPeak(uniqueSources: number, sourceList: string[]) {
+  recordSignal('log', 'signal_breadth_peak', {
+    uniqueSources,
+    sourceList,
+    breadthTier: uniqueSources >= 10 ? 'SATURATED' : uniqueSources >= 9 ? 'HIGH' : 'PEAK',
+    window: '24h',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a reflection-triad event — journal + memory + log all active in 24h.
+ * Three capture channels open simultaneously. Full cognitive capture architecture confirmed.
+ * Feeds P153 detection.
+ */
+export function recordReflectionTriad(journalCount: number, memoryCount: number, logCount: number) {
+  recordSignal('journal', 'reflection_triad', {
+    journalCount,
+    memoryCount,
+    logCount,
+    tripleCapture: 'JOURNAL+MEMORY+LOG',
+    depth: Math.round((journalCount + memoryCount + logCount) / 3 * 10) / 10,
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a weekly-breadth-anchor event — 6+ unique signal sources in 7d.
+ * Full-width engagement sustained across the week.
+ * Feeds P154 detection. J49 can also check this weekly dimension.
+ */
+export function recordWeeklyBreadthAnchor(uniqueSources: number, sourceList: string[]) {
+  recordSignal('energy', 'weekly_breadth_anchor', {
+    uniqueSources,
+    sourceList,
+    anchored: uniqueSources >= 8,
+    window: '7d',
     hour: new Date().getHours(),
   })
 }

@@ -3629,6 +3629,88 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'signal_breadth_peak') {
+          const uniqueSources = log.metadata?.uniqueSources as number | undefined
+          const breadthTier = log.metadata?.breadthTier as string | undefined
+          const sourceList = log.metadata?.sourceList as string[] | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SIGBRD:" blockView>
+                <div className="uppercase tracking-widest mb-4">SIGNAL BREADTH PEAK</div>
+                {uniqueSources !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES 24H</span>
+                    <span className="tabular-nums">{uniqueSources}</span>
+                  </div>
+                )}
+                {breadthTier && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TIER</span>
+                    <span className="tabular-nums">{breadthTier}</span>
+                  </div>
+                )}
+                {sourceList && sourceList.length > 0 && (
+                  <div className="opacity-40 tabular-nums">{sourceList.join(' · ').toUpperCase()}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'reflection_triad') {
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const logCount = log.metadata?.logCount as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="REFLTRI:" blockView>
+                <div className="uppercase tracking-widest mb-4">REFLECTION TRIAD</div>
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 24H</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY 24H</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {logCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LOG 24H</span>
+                    <span className="tabular-nums">{logCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">JOURNAL + MEMORY + LOG</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'weekly_breadth_anchor') {
+          const uniqueSources = log.metadata?.uniqueSources as number | undefined
+          const anchored = log.metadata?.anchored as boolean | undefined
+          const sourceList = log.metadata?.sourceList as string[] | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="WKBRD:" blockView>
+                <div className="uppercase tracking-widest mb-4">WEEKLY BREADTH ANCHOR</div>
+                {uniqueSources !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES 7D</span>
+                    <span className="tabular-nums">{uniqueSources}</span>
+                  </div>
+                )}
+                {anchored !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FULL-WIDTH</span>
+                    <span className="tabular-nums">{anchored ? 'CONFIRMED' : 'PARTIAL'}</span>
+                  </div>
+                )}
+                {sourceList && sourceList.length > 0 && (
+                  <div className="opacity-40 tabular-nums">{sourceList.join(' · ').toUpperCase()}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

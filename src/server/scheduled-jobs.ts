@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily signal breadth check (15:00 UTC every day) — Job 49
+  if (shouldRunDailySignalBreadthCheck()) {
+    await executeDailySignalBreadthCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,144 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Signal Breadth Check (Job 49 — 15:00 UTC every day) ──────────────
+// Reads active users. Counts unique signal sources in prev 24h.
+// Writes signal_breadth_peak if 8+ unique sources found (P152).
+// Also checks 7d breadth: writes weekly_breadth_anchor if 6+ unique sources (P154).
+
+let isDailySignalBreadthRunning = false
+let lastDailySignalBreadthRun: Date | null = null
+
+function shouldRunDailySignalBreadthCheck(): boolean {
+  const now = dayjs()
+  if (isDailySignalBreadthRunning) return false
+  if (lastDailySignalBreadthRun) {
+    const lastRun = dayjs(lastDailySignalBreadthRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 15 // 15:00 UTC daily
+}
+
+async function executeDailySignalBreadthCheck(): Promise<JobResult> {
+  const jobName = 'daily-signal-breadth-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySignalBreadthRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySignalBreadthRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SIGNAL BREADTH CHECK — 15:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const oneDayAgo  = dayjs().subtract(1, 'day').toDate()
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let breadthPeakWritten = 0
+    let weeklyBreadthWritten = 0
+
+    const SOURCE_EVENTS: Record<string, string> = {
+      'mood_checkin': 'mood', 'emotional_checkin': 'mood',
+      'memory_recalled': 'memory', 'memory_added': 'memory',
+      'plan_added': 'planner', 'planner_entry': 'planner',
+      'intention_set': 'intentions', 'intention_added': 'intentions',
+      'selfcare_logged': 'selfcare', 'selfcare_entry': 'selfcare',
+      'journal_entry': 'journal', 'journal_saved': 'journal',
+      'note': 'log', 'field_entry': 'log',
+      'energy_checkin': 'energy', 'energy_update': 'energy', 'energy_state': 'energy',
+      'cohort_viewed': 'cohort', 'cohort_determined': 'cohort',
+      'recipe_viewed': 'recipe', 'nutrition_logged': 'recipe',
+      'goal_set': 'goals', 'goal_updated': 'goals', 'goal_complete': 'goals',
+    }
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const prevDayLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: oneDayAgo },
+            event: { [Op.in]: Object.keys(SOURCE_EVENTS) as any[] },
+          },
+          attributes: ['event'],
+        })
+
+        const day24hSources = new Set(prevDayLogs.map((l: any) => SOURCE_EVENTS[l.event]).filter(Boolean))
+
+        if (day24hSources.size >= 8) {
+          const sourceList = Array.from(day24hSources) as string[]
+          await (Log as any).create({
+            userId,
+            event: 'signal_breadth_peak',
+            text: '',
+            metadata: {
+              uniqueSources: day24hSources.size,
+              sourceList,
+              breadthTier: day24hSources.size >= 10 ? 'SATURATED' : day24hSources.size >= 9 ? 'HIGH' : 'PEAK',
+              window: '24h',
+              hour: 15,
+            },
+          })
+          breadthPeakWritten++
+        }
+
+        const prev7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+            event: { [Op.in]: Object.keys(SOURCE_EVENTS) as any[] },
+          },
+          attributes: ['event'],
+        })
+
+        const week7dSources = new Set(prev7dLogs.map((l: any) => SOURCE_EVENTS[l.event]).filter(Boolean))
+
+        if (week7dSources.size >= 6) {
+          const sourceList = Array.from(week7dSources) as string[]
+          await (Log as any).create({
+            userId,
+            event: 'weekly_breadth_anchor',
+            text: '',
+            metadata: {
+              uniqueSources: week7dSources.size,
+              sourceList,
+              anchored: week7dSources.size >= 8,
+              window: '7d',
+              hour: 15,
+            },
+          })
+          weeklyBreadthWritten++
+        }
+      } catch {}
+    }
+
+    console.log(`  Signal breadth peak events: ${breadthPeakWritten}`)
+    console.log(`  Weekly breadth anchor events: ${weeklyBreadthWritten}`)
+    console.log('─'.repeat(60))
+    console.log('DAILY SIGNAL BREADTH CHECK COMPLETE')
+    console.log('─'.repeat(60))
+    console.log('')
+
+    lastDailySignalBreadthRun = new Date()
+    isDailySignalBreadthRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: breadthPeakWritten + weeklyBreadthWritten }
+  } catch (error: any) {
+    console.error('Daily signal breadth check failed:', error.message)
+    isDailySignalBreadthRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

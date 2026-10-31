@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: signal breadth peak · reflection triad · weekly breadth anchor (P152/P153/P154)
+      'signal_breadth_peak',
+      'reflection_triad',
+      'weekly_breadth_anchor',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

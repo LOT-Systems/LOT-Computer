@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'signal-breadth-peak':              'Signal breadth peak — 8+ distinct signal sources active in 24h, full field operational (P152)',
+      'reflection-triad':                 'Reflection triad — journal + memory + log all active in 24h, three capture channels open (P153)',
+      'weekly-breadth-anchor':            'Weekly breadth anchor — 6+ signal sources active in 7d, full-width engagement sustained (P154)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

@@ -1457,6 +1457,28 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+
+  {
+    version: 'v114',
+    date: '2026-10-31',
+    session: 'Self-Assembly Session — v114 / QIE Engineering · P152–P154 · Arch52 Full-Spectrum Operator · J49 Daily Signal Breadth Check · SIGBRD: REFLTRI: WKBRD: · Dep Map 193+',
+    assembled: [
+      'P152 SIGNAL BREADTH PEAK: single-day behavioral pattern — 8+ unique signal sources active in 24h. Full field operational. Every dimension contributing. Confidence 0.70–0.90. Breadth tiers: PEAK / HIGH / SATURATED.',
+      'P153 REFLECTION TRIAD: cognitive capture pattern — journal + memory + log all active in 24h. Three capture channels open: inner narrative + external record + memory bridge. Confidence 0.70–0.90. Depth bonus from multi-signal density.',
+      'P154 WEEKLY BREADTH ANCHOR: week-level breadth pattern — 6+ unique signal sources in 7d. Full-width engagement sustained across the full week. Confidence 0.68–0.88. Distinct from P59 (single-day multimodal) and P142 (7d with index+pattern requirements).',
+      'Arch52 FULL-SPECTRUM OPERATOR: archetype — moderate/high energy · dominant: journal/memory/log · patterns: signal-breadth-peak + reflection-triad + weekly-breadth-anchor. Directive: Full-width operation confirmed. 8+ signal channels active. Capture is comprehensive. The archive deepens.',
+      'J49 daily-signal-breadth-check: 15:00 UTC daily. Reads prev 24h logs per active user → counts unique signal sources from known event→source mapping → writes signal_breadth_peak if 8+ sources (P152). Also checks 7d breadth → writes weekly_breadth_anchor if 6+ sources (P154). 49 jobs total.',
+      'intentionEngine.ts: P152/P153/P154 detection blocks added after P151. Arch52 appended to PHYSIOLOGICAL_ARCHETYPES. 3 dep map nodes (signalBreadthPeakNode · reflectionTriadNode · weeklyBreadthAnchorNode). 3 signal helpers (recordSignalBreadthPeak · recordReflectionTriad · recordWeeklyBreadthAnchor). 193+ dep nodes.',
+      'scheduled-jobs.ts: J49 executeDailySignalBreadthCheck() · shouldRunDailySignalBreadthCheck() wired into checkAndRunScheduledJobs(). SOURCE_EVENTS map: 20+ event→source pairs for breadth detection.',
+      'routes/api.ts: signal_breadth_peak · reflection_triad · weekly_breadth_anchor added to displayableEvents.',
+      'Logs.tsx: SIGBRD: · REFLTRI: · WKBRD: military handlers added. SOURCES 24H/TIER/source list · JOURNAL/MEMORY/LOG counts · SOURCES 7D/FULL-WIDTH confirmation.',
+      'QuantumEngineWidgets.tsx: SIGBRD · REFLTRI · WKBRD added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P152/P153/P154 display names added.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/LOT-SR-20261031-01.md: Session report written.',
+      '154 patterns · 52 archetypes · 49 jobs · 154+ handlers · 193+ dep nodes. QIE v114 deployed. Signal breadth architecture online. The full-spectrum operator archetype is live.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,16 +1516,16 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-10-31',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-10-31 · QIE v114 · SIGNAL BREADTH ARCHITECTURE',
+    'Built: P152 signal-breadth-peak · P153 reflection-triad · P154 weekly-breadth-anchor.',
+    'Arch52 Full-Spectrum Operator — the full-width operator archetype is live.',
+    'J49 daily-signal-breadth-check (15:00 UTC): breadth audit for all active users. P152 + P154 detection server-side.',
+    'SIGBRD: REFLTRI: WKBRD: — three new cockpit handlers. Log reads signal architecture in real time.',
+    'Widget deps: signalBreadthPeakNode · reflectionTriadNode · weeklyBreadthAnchorNode. 193+ dep nodes.',
+    'Physiological cohorts surfaced. Log feature updated. Background pipeline extended.',
+    'FM v113 · 154P · 52A · 49J · 193+ nodes · 781 badges.',
     'Status: DEPLOYED.',
     'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
   ],
