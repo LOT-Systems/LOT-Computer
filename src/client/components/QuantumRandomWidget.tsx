@@ -9,6 +9,11 @@
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { isRouteActive } from '#client/stores'
+
+// Pause ticks while the browser tab is hidden or the user is on another in-app
+// tab: avoids hidden re-renders and keeps QIE signals tied to real observation.
+const isLive = () => !document.hidden && isRouteActive('system')
 
 /**
  * QuantumRandomWidget - Real-time quantum-random number generator.
@@ -37,6 +42,7 @@ function useQuantumNumber() {
 
   React.useEffect(() => {
     const iv = setInterval(() => {
+      if (!isLive()) return
       setRemaining((prev) => {
         if (prev <= 1) {
           const next = quantumRandom(0, 99)
@@ -63,6 +69,7 @@ export function QuantumRandomWidget() {
 
   React.useEffect(() => {
     const iv = setInterval(() => {
+      if (!isLive()) return
       setShowPair(Math.random() < 0.5)
     }, 10000)
     return () => clearInterval(iv)
