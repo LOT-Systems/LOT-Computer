@@ -78,3 +78,4 @@ ID             | CLASS        | SUMMARY                                         
 20261003-01    | ENGINEERING  | BASICS M1 landed + M2 built: upgrade state machine, roster, STAND DOWN, issue log (engine tests pass; full build not run) | PARTIAL | (pending) | WORDS: 315 (median 537)
 20261030-01    | ENGINEERING | BASICS consolidated: merged 1lq1ns (M1-M3, /open-tab, quotes, dispatch) · tests+envelope+build green · M3 exit blocked on quotes/processor/legal | GREEN | f66887dde | WORDS: 301
 20261031-01    | ENGINEERING | BASICS: merged qd3qq0 base; supplier quote CSV intake (parser, dry-run envelope projection, gated --write) · tests+envelope+build green | GREEN | (pending tag) | WORDS: 280
+20261101-01    | ENGINEERING  | BASICS consolidated M1-M3 re-verified on dybzen (ff from tz3o62) · tests+envelope+build green · margin ESTIMATE 68.3% · M3 exit blocked on suppliers/payments/fulfillment | GREEN  | d89b98d7a | WORDS: ~420
