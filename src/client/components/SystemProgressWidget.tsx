@@ -1457,6 +1457,23 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-11-01',
+    title: 'QIE v114 — Systemic Renewal · Quantum Signal Momentum · Arch52 · J49',
+    assembled: [
+      'QIE v114 deployed. P152 systemic-renewal — OS peak→rest→renewal cycle detection. P153 quantum-signal-momentum — 7-day sustained operational runway. 153 patterns · 52 archetypes.',
+      'Arch52 Renewal Architect added: peak-rest-renewal cycle confirmed archetype. Directs sustainable long-run operation. energyBands: [moderate, high]. dominantSources: selfcare/mood/journal/energy/log.',
+      'J49 daily-renewal-check (06:30 UTC): morning check for P152/P153 conditions. 49 scheduled jobs total.',
+      'Dep map expanded: systemicRenewalNode (5 deps) · quantumSignalMomentumNode (10 deps). 196+ total dep nodes.',
+      'Logs.tsx: systemic_renewal handler (SYSREN:) + quantum_signal_momentum handler (QSMOM:) added. physiological_cohort handler upgraded — confidence %, energy band, and directive now displayed.',
+      'Signal recording: recordSystemicRenewal() · recordQuantumSignalMomentum() added to intentionEngine.ts.',
+      'System.tsx: physiological cohort quantum view already surfaces Archetype/Cohort/Phase/Confidence/ATP/Clarity/Alignment/Index/Directive — confirmed complete.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/SESSION_REPORT_2026_11_01_QIE_v114.md written. docs/wiki/LOT-WIKI-v88.md written.',
+      '781 badges · 153 patterns · 52 archetypes · 49 jobs · 196+ dep nodes · FM v113 · Wiki v88 · Day 1163+. Renewal architecture operational. The system cycles peaks sustainably.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1511,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-11-01',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-11-01 · QIE v114 · RENEWAL ARCHITECTURE · Day 1163+',
+    'Built: P152 systemic-renewal · P153 quantum-signal-momentum · Arch52 Renewal Architect · J49 daily-renewal-check (06:30 UTC).',
+    'Renewal architecture operational. The OS cycles peaks sustainably — peak → rest → renewal confirmed as a structural pattern.',
+    'P152 SYSREN: Detects total-field-coherence in history + rest window + field re-activation. The system knows it cycles.',
+    'P153 QSMOM: Detects 5+/7 days with 3+ active sources. Sustained operational runway, not just peak intensity.',
+    'Arch52 Renewal Architect: peak-rest-renewal archetype. Sustainable long-run operation. The system runs long because it knows when to stop.',
+    'Log handlers: SYSREN: and QSMOM: blocks added to Logs.tsx. Cohort handler upgraded — confidence, ATP band, directive displayed.',
+    'Dep map: systemicRenewalNode + quantumSignalMomentumNode. 196+ total dep nodes.',
+    'FM v113 · Wiki v88 · 153P · 52A · 49J · 196+ nodes · 781 badges.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: Field Manual v114 sync — LOT-WIKI-v89',
   ],
 }
 

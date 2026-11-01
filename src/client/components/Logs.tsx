@@ -480,6 +480,9 @@ export const Logs: React.FC = React.memo(function LogsInner() {
         } else if (log.event === 'physiological_cohort') {
           const archetype = log.metadata?.archetype as string | undefined
           const behavioralCohort = log.metadata?.behavioralCohort as string | undefined
+          const confidence = log.metadata?.confidence as number | undefined
+          const directive = log.metadata?.directive as string | undefined
+          const energyBand = log.metadata?.energyBand as string | undefined
           const description = log.metadata?.description as string | undefined
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
@@ -488,9 +491,27 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                   <div className="uppercase tracking-widest mb-4">{archetype}</div>
                 )}
                 {behavioralCohort && (
-                  <div className="opacity-60">TYPE: {behavioralCohort}</div>
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TYPE</span>
+                    <span className="uppercase">{behavioralCohort}</span>
+                  </div>
                 )}
-                {description && (
+                {energyBand && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ATP</span>
+                    <span className="uppercase">{energyBand}</span>
+                  </div>
+                )}
+                {confidence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONF</span>
+                    <span className="tabular-nums">{confidence}%</span>
+                  </div>
+                )}
+                {directive && (
+                  <div className="opacity-40 mt-4 leading-relaxed">{directive}</div>
+                )}
+                {!directive && description && (
                   <div className="opacity-30 mt-4">{description}</div>
                 )}
               </Block>
@@ -3626,6 +3647,69 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                 {arc && (
                   <div className="opacity-30 tabular-nums">ARC: {arc}</div>
                 )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'systemic_renewal') {
+          const activeDays = log.metadata?.activeDays as number | undefined
+          const uniqueSources = log.metadata?.uniqueSources as number | undefined
+          const renewalSignalCount = log.metadata?.renewalSignalCount as number | undefined
+          const cycle = log.metadata?.cycle as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SYSREN:" blockView>
+                <div className="uppercase tracking-widest mb-4">SYSTEMIC RENEWAL</div>
+                {activeDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ACTIVE DAYS</span>
+                    <span className="tabular-nums">{activeDays}/7</span>
+                  </div>
+                )}
+                {uniqueSources !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES</span>
+                    <span className="tabular-nums">{uniqueSources}</span>
+                  </div>
+                )}
+                {renewalSignalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RENEWAL SIG</span>
+                    <span className="tabular-nums">{renewalSignalCount}</span>
+                  </div>
+                )}
+                {cycle && (
+                  <div className="opacity-40 tracking-widest mt-4">{cycle}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_signal_momentum') {
+          const activeDays = log.metadata?.activeDays as number | undefined
+          const avgSourcesPerDay = log.metadata?.avgSourcesPerDay as number | undefined
+          const runwayDays = log.metadata?.runwayDays as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QSMOM:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM SIGNAL MOMENTUM</div>
+                {activeDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ACTIVE DAYS</span>
+                    <span className="tabular-nums">{activeDays}/7</span>
+                  </div>
+                )}
+                {avgSourcesPerDay !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AVG SRC/DAY</span>
+                    <span className="tabular-nums">{avgSourcesPerDay}</span>
+                  </div>
+                )}
+                {runwayDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RUNWAY</span>
+                    <span className="tabular-nums">{runwayDays}d</span>
+                  </div>
+                )}
+                <div className="opacity-40 tracking-widest mt-4">SUSTAINED MOMENTUM CONFIRMED</div>
               </Block>
             </LogContainer>
           )

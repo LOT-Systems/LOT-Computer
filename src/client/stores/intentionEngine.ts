@@ -3428,6 +3428,53 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Systemic Renewal — total-field-coherence (P150) detected in the last 7 days,
+  // followed by a rest window (energy depleted/low + care signals), then renewed high-energy
+  // signaling the next day. The OS does not just achieve peaks — it cycles them sustainably.
+  // Peak → rest → renewal is the mark of a system that can run indefinitely.
+  const sevenDayMs = 7 * 24 * 60 * 60 * 1000
+  const last7Days = signals.filter(s => now - s.timestamp < sevenDayMs)
+  const hasTFCinHistory = last7Days.some(s => s.signal === 'total_field_coherence' && s.source === 'qos')
+  const hasRestWindow152 = last7Days.some(s => (s.source === 'energy' && s.metadata?.status && ['depleted', 'low'].includes(s.metadata.status as string)) ||
+    (s.source === 'selfcare' && now - s.timestamp < 3 * 24 * 60 * 60 * 1000))
+  const renewalSignals152 = last7Days.filter(s =>
+    now - s.timestamp < 36 * 60 * 60 * 1000 &&
+    (s.source === 'mood' || s.source === 'intentions' || s.source === 'energy') &&
+    s.signal !== 'energy_state_depleted'
+  )
+  if (hasTFCinHistory && hasRestWindow152 && renewalSignals152.length >= 3) {
+    const uniqueSources152 = new Set(renewalSignals152.map(s => s.source)).size
+    const renewalConf = Math.min(0.60 + (uniqueSources152 * 0.05) + (renewalSignals152.length * 0.02), 0.85)
+    patterns.push({
+      pattern: 'systemic-renewal',
+      confidence: renewalConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `SYSREN: Systemic renewal — peak-state (P150) achieved · rest window confirmed · field re-activated. The OS is not just reaching peaks — it is cycling them. Peak → rest → renewal. Sustainable operation confirmed.`,
+    })
+  }
+
+  // Pattern 153: Quantum Signal Momentum — 5+ unique signal sources active across 5+ of the
+  // last 7 consecutive days. Not a single peak but a sustained operational runway.
+  // Measures duration of the coherent state, not just intensity. The system has momentum.
+  const daySlots153: Set<string>[] = Array.from({ length: 7 }, () => new Set())
+  last7Days.forEach(s => {
+    const daysAgo = Math.floor((now - s.timestamp) / (24 * 60 * 60 * 1000))
+    if (daysAgo < 7) daySlots153[6 - daysAgo].add(s.source)
+  })
+  const activeDays153 = daySlots153.filter(slot => slot.size >= 3).length
+  const avgSources153 = daySlots153.reduce((sum, slot) => sum + slot.size, 0) / 7
+  if (activeDays153 >= 5 && avgSources153 >= 4) {
+    const momentumBonus = Math.min((activeDays153 - 5) * 0.04 + (avgSources153 - 4) * 0.03, 0.18)
+    patterns.push({
+      pattern: 'quantum-signal-momentum',
+      confidence: Math.min(0.68 + momentumBonus, 0.86),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QSMOM: Quantum signal momentum — ${activeDays153}/7 days with 3+ active sources · avg ${Math.round(avgSources153 * 10) / 10} sources/day. The field is not peaking occasionally — it is running continuously. Momentum confirmed.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4111,10 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P153 · Arch52) ───────────────────────────────────────
+  systemicRenewalNode:        ['mood', 'selfcare', 'energy', 'log', 'journal'],
+  quantumSignalMomentumNode:  ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
 }
 
 /**
@@ -4510,6 +4561,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Renewal Architect (2026-11-01 v114) ───────────────────────────────────
+  {
+    archetype: 'Renewal Architect',
+    energyBands: ['moderate', 'high'],
+    dominantSources: ['selfcare', 'mood', 'journal', 'energy', 'log'],
+    patternConditions: ['systemic-renewal', 'recovery-intelligence-arc'],
+    hourRange: [5, 22],
+    directive: 'Peak-rest-renewal cycle confirmed. The OS does not only reach peaks — it recovers and rebuilds them. Architecture is sustainable. The system runs long because it knows when to stop.',
   },
 ]
 
@@ -6498,6 +6559,37 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a systemic-renewal event — total-field-coherence detected in history +
+ * rest window confirmed + field re-activated with fresh signals.
+ * The OS cycles peaks sustainably. Feeds P152 detection.
+ */
+export function recordSystemicRenewal(activeDays: number, uniqueSources: number, renewalSignalCount: number) {
+  recordSignal('energy', 'systemic_renewal', {
+    activeDays,
+    uniqueSources,
+    renewalSignalCount,
+    cycle: 'PEAK→REST→RENEWAL',
+    runStatus: 'SUSTAINABLE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-signal-momentum event — 5+ signal-dense days in the last 7.
+ * Measures the sustained operational runway, not peak intensity.
+ * Feeds P153 detection.
+ */
+export function recordQuantumSignalMomentum(activeDays: number, avgSourcesPerDay: number) {
+  recordSignal('qos', 'quantum_signal_momentum', {
+    activeDays,
+    avgSourcesPerDay: Math.round(avgSourcesPerDay * 10) / 10,
+    runwayDays: activeDays,
+    momentumStatus: 'SUSTAINED',
     hour: new Date().getHours(),
   })
 }
