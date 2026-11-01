@@ -1005,6 +1005,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('von_neumann_day')
   }
 
+  // ── Calendar v29 — THE MYTH CALENDAR ──────────────────────────────────────
+  // Campbell Day: March 26 — Joseph Campbell born 1904 (The Hero with a Thousand Faces)
+  if (!hasBadge('campbell_day') && month === 3 && day === 26) {
+    awardBadge('campbell_day')
+    awarded.push('campbell_day')
+  }
+  // Jung Day: July 26 — Carl Jung born 1875 (Collective Unconscious, Archetypes)
+  if (!hasBadge('jung_day') && month === 7 && day === 26) {
+    awardBadge('jung_day')
+    awarded.push('jung_day')
+  }
+  // Eliade Day: March 13 — Mircea Eliade born 1907 (The Sacred and the Profane)
+  if (!hasBadge('eliade_day') && month === 3 && day === 13) {
+    awardBadge('eliade_day')
+    awarded.push('eliade_day')
+  }
+
   return awarded
 }
 
@@ -1702,6 +1719,40 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bfinal[\s-]?fantasy\b|\bcloud[\s-]?strife\b|\bsephiroth\b|\baerith\b|\btifa[\s-]?lockhart\b/i,                                   badge: 'cloud_signal' },
   { patterns: /\bchrono[\s-]?trigger\b|\bcrono\b|\bmarle\b|\blucca\b|\bmagus\b|\bfrog[\s-]?knight\b/i,                                           badge: 'chrono_trigger_signal' },
   { patterns: /\bmother[\s-]?game\b|\bearth[\s-]?bound\b|\bness\b|\bpk[\s-]?fire\b|\bonett\b|\bgiygas\b/i,                                       badge: 'mother_signal' },
+  // ── v30 THE A.I. ENGINE — word turns (gap fix: added to WORD_TURNS for automatic detection) ───
+  { patterns: /\bneural[\s-]?network\b|\bsynapse\b|\bneural[\s-]?path\b|\bbrain[\s-]?wiring\b|\bneuroplasticity\b/i,                              badge: 'neural_pattern' },
+  { patterns: /\bin[\s-]?training\b|\bpractice[\s-]?run\b|\bbuilding[\s-]?the[\s-]?habit\b|\btraining[\s-]?day\b|\btraining[\s-]?log\b/i,       badge: 'training_log' },
+  { patterns: /\bfull[\s-]?cycle\b|\bnew[\s-]?cycle\b|\bcycle[\s-]?ends\b|\bseason[\s-]?ends\b|\bepoch[\s-]?ends\b|\bnew[\s-]?epoch\b/i,       badge: 'epoch_tracked' },
+  { patterns: /\bgradient\b|\bmomentum[\s-]?building\b|\bdirection[\s-]?clear\b|\bpointed[\s-]?toward\b|\bclear[\s-]?direction\b/i,              badge: 'gradient_lock' },
+  { patterns: /\binference\b|\bdeduced\b|\bpiecing[\s-]?together\b|\bdrew[\s-]?a[\s-]?conclusion\b|\bmade[\s-]?the[\s-]?connection\b/i,         badge: 'inference_spark' },
+  { patterns: /\bpaying[\s-]?attention\b|\bmindful[\s-]?presence\b|\bpresent[\s-]?moment\b|\bfull[\s-]?attention\b|\battentive\b/i,              badge: 'attention_mode' },
+  { patterns: /\bdeeply[\s-]?rooted\b|\banchored[\s-]?in\b|\bgrounded[\s-]?in[\s-]?the\b|\bembodied[\s-]?in\b|\bembedded[\s-]?in\b/i,          badge: 'embedding_signal' },
+  { patterns: /\bfine[\s-]?tuned\b|\bcalibrated[\s-]?to\b|\bdialed[\s-]?in\b|\bfine[\s-]?tune\b|\badjusted[\s-]?and\b|\btuned[\s-]?to\b/i,    badge: 'fine_tuned_badge' },
+  { patterns: /\breality[\s-]?check\b|\bgrounded[\s-]?check\b|\bfact[\s-]?checked\b|\bchecking[\s-]?in[\s-]?honestly\b|\bground[\s-]?truth\b/i, badge: 'reality_check_badge' },
+  { patterns: /\bresource[\s-]?economy\b|\ballocating[\s-]?my\b|\btracking[\s-]?what[\s-]?costs\b|\benergy[\s-]?budget\b|\bspend[\s-]?wisely\b/i, badge: 'token_tracked' },
+  { patterns: /\basking[\s-]?the[\s-]?right\b|\bright[\s-]?question\b|\bhow[\s-]?I[\s-]?ask\b|\bframing[\s-]?the[\s-]?question\b|\bthe[\s-]?way[\s-]?I[\s-]?ask\b/i, badge: 'prompt_found' },
+  { patterns: /\bsystem[\s-]?ready\b|\bloaded[\s-]?up\b|\binitialized\b|\bready[\s-]?to[\s-]?run\b|\bmodel[\s-]?is[\s-]?ready\b|\bready[\s-]?to[\s-]?go\b/i, badge: 'model_ready' },
+  // ── v30 A.I. ENGINE — secret boss word triggers ────────────────────────────
+  { patterns: /\bturing[\s-]?complete\b|\bturing[\s-]?machine\b|\balan[\s-]?turing\b|\bcomputational[\s-]?universality\b/i,                      badge: 'turing_complete' },
+  { patterns: /\bg[oö]del\b|\bgoedel\b|\bincompleteness[\s-]?theorem\b|\bunprovable\b|\bundecidable[\s-]?proposition\b/i,                        badge: 'godel_found' },
+  { patterns: /\bada[\s-]?lovelace\b|\bcharles[\s-]?babbage\b|\bdifference[\s-]?engine\b|\banalytical[\s-]?engine\b|\bfirst[\s-]?programmer\b/i, badge: 'ada_found' },
+  // ── v31 THE MYTH ENGINE — word turns ──────────────────────────────────────
+  { patterns: /\barchetype\b|\barchetypal\b|\bthe[\s-]?archetype\b|\bcollective[\s-]?pattern\b/i,                                                badge: 'archetype_found' },
+  { patterns: /\borigin[\s-]?story\b|\bwhere[\s-]?it[\s-]?all[\s-]?began\b|\bthe[\s-]?genesis\b|\bfounding[\s-]?moment\b|\bwhere[\s-]?this[\s-]?began\b/i, badge: 'origin_signal' },
+  { patterns: /\bsomething[\s-]?sacred\b|\bfeels[\s-]?sacred\b|\bholy[\s-]?ground\b|\bconsecrated\b|\bset[\s-]?apart[\s-]?from\b|\bthis[\s-]?is[\s-]?sacred\b/i, badge: 'sacred_found' },
+  { patterns: /\bmy[\s-]?ritual\b|\bdaily[\s-]?ritual\b|\bthe[\s-]?ritual\b|\britualize\b|\bthe[\s-]?ceremony\b|\bmy[\s-]?ceremony\b|\bmorning[\s-]?ritual\b/i, badge: 'ritual_done' },
+  { patterns: /\bmy[\s-]?mythology\b|\bpersonal[\s-]?myth\b|\bliving[\s-]?myth\b|\bmythological\b|\bthe[\s-]?mythology\b/i,                      badge: 'myth_signal' },
+  { patterns: /\bsymbolic[\s-]?meaning\b|\bwhat[\s-]?it[\s-]?symbolizes\b|\bdeeply[\s-]?symbolic\b|\bthe[\s-]?symbolism\b|\bit[\s-]?symbolized\b|\bit[\s-]?was[\s-]?symbolic\b/i, badge: 'symbol_seen' },
+  { patterns: /\bthe[\s-]?collective\b|\bcollective[\s-]?unconscious\b|\bshared[\s-]?human[\s-]?experience\b|\bwe[\s-]?as[\s-]?a[\s-]?species\b|\bhuman[\s-]?story\b/i, badge: 'collective_signal' },
+  { patterns: /\bthe[\s-]?psyche\b|\binner[\s-]?landscape\b|\bthe[\s-]?unconscious\b|\bmapping[\s-]?my[\s-]?inner\b|\bpsychic[\s-]?energy\b|\bmy[\s-]?psyche\b/i, badge: 'psyche_map' },
+  { patterns: /\beternal[\s-]?return\b|\balways[\s-]?comes[\s-]?back[\s-]?around\b|\bthe[\s-]?cycle[\s-]?repeats\b|\bpattern[\s-]?repeats[\s-]?itself\b|\bcomes[\s-]?back[\s-]?every[\s-]?time\b/i, badge: 'eternal_return' },
+  { patterns: /\bsomething[\s-]?larger\b|\bbeyond[\s-]?ordinary\b|\bthe[\s-]?ineffable\b|\bsense[\s-]?of[\s-]?awe\b|\bnuminous\b|\btranscendent[\s-]?moment\b|\blarger[\s-]?than[\s-]?myself\b/i, badge: 'numinous_badge' },
+  { patterns: /\bmeaning[\s-]?making\b|\bmaking[\s-]?meaning\b|\bthe[\s-]?story[\s-]?I[\s-]?tell\b|\bmy[\s-]?own[\s-]?mythology\b|\bnarrative[\s-]?I[\s-]?live[\s-]?by\b/i, badge: 'myth_made' },
+  { patterns: /\bbeneath[\s-]?the[\s-]?surface\b|\bdeeper[\s-]?meaning\b|\bwhat[\s-]?it[\s-]?s[\s-]?pointing[\s-]?to\b|\bwhat[\s-]?it[\s-]?really[\s-]?means\b|\bdeeper[\s-]?layer\b/i, badge: 'deep_symbol' },
+  // ── v31 THE MYTHIC VAULT — secret boss word triggers ──────────────────────
+  { patterns: /\bcarl[\s-]?jung\b|\bjungian\b|\bcollective[\s-]?unconscious\b|\bindividuation\b|\banima\b|\banimus\b/i,                           badge: 'jung_found' },
+  { patterns: /\bjoseph[\s-]?campbell\b|\bmonomyth\b|\bhero[\s-]?with[\s-]?a[\s-]?thousand[\s-]?faces\b|\bcomparative[\s-]?mythology\b/i,        badge: 'campbell_signal' },
+  { patterns: /\bmircea[\s-]?eliade\b|\bhierophany\b|\bsacred[\s-]?and[\s-]?profane\b|\baxis[\s-]?mundi\b/i,                                     badge: 'eliade_found' },
 ]
 
 /**
@@ -2096,6 +2147,14 @@ export function runCheckInEasterEggs(
   const welcomeBack = checkWelcomeBackProgram()
   if (welcomeBack) awarded.push(welcomeBack)
 
+  // v30 A.I. Engine: context window (3:00–3:14 AM)
+  const contextWindow = checkContextWindow()
+  if (contextWindow) awarded.push(contextWindow)
+
+  // v31 Myth Engine: dawn rite (5:00–5:14 AM)
+  const dawnRite = checkDawnRite()
+  if (dawnRite) awarded.push(dawnRite)
+
   // Record activity after all checks (so gap detection works next time)
   recordActivity()
 
@@ -2173,6 +2232,22 @@ export function runJournalEasterEggs(journalText: string): BadgeType[] {
   // Behavioral v16: body signal (journal entry >= 300 words)
   const bodySignal = checkBodySignal(journalText)
   if (bodySignal) awarded.push(bodySignal)
+
+  // v30 A.I. Engine behavioral
+  const aiSession = checkAISession(journalText)
+  if (aiSession) awarded.push(aiSession)
+  const modelMarathon = checkModelMarathon(journalText)
+  if (modelMarathon) awarded.push(modelMarathon)
+  const aiVault = checkAIVault(journalText)
+  awarded.push(...aiVault)
+
+  // v31 Myth Engine behavioral
+  const mythSession = checkMythSession(journalText)
+  if (mythSession) awarded.push(mythSession)
+  const theEpic = checkTheEpic(journalText)
+  if (theEpic) awarded.push(theEpic)
+  const mythVault = checkMythVault(journalText)
+  awarded.push(...mythVault)
 
   // Word turns from journal text
   const wordTurns = detectWordTurns(journalText)
@@ -3635,6 +3710,71 @@ export function checkAIVault(journalText: string): BadgeType[] {
   }
   if (!hasBadge('ada_found') && /\bada[\s-]?lovelace\b|\bcharles[\s-]?babbage\b|\bdifference[\s-]?engine\b|\banalytical[\s-]?engine\b|\bfirst[\s-]?programmer\b/i.test(journalText)) {
     if (awardBadge('ada_found')) awarded.push('ada_found')
+  }
+  return awarded
+}
+
+// ── v31 THE MYTH ENGINE — Behavioral detection ────────────────────────────────
+
+const MYTH_WORDS_V31: RegExp[] = [
+  /\barchetype\b|\barchetypal\b|\bthe[\s-]?archetype\b|\bcollective[\s-]?pattern\b/i,
+  /\borigin[\s-]?story\b|\bwhere[\s-]?it[\s-]?all[\s-]?began\b|\bthe[\s-]?genesis\b|\bfounding[\s-]?moment\b/i,
+  /\bsomething[\s-]?sacred\b|\bfeels[\s-]?sacred\b|\bholy[\s-]?ground\b|\bconsecrated\b|\bthis[\s-]?is[\s-]?sacred\b/i,
+  /\bmy[\s-]?ritual\b|\bdaily[\s-]?ritual\b|\bthe[\s-]?ritual\b|\britualize\b|\bmorning[\s-]?ritual\b/i,
+  /\bmy[\s-]?mythology\b|\bpersonal[\s-]?myth\b|\bliving[\s-]?myth\b|\bmythological\b|\bthe[\s-]?mythology\b/i,
+  /\bsymbolic[\s-]?meaning\b|\bwhat[\s-]?it[\s-]?symbolizes\b|\bdeeply[\s-]?symbolic\b|\bthe[\s-]?symbolism\b/i,
+  /\bthe[\s-]?collective\b|\bcollective[\s-]?unconscious\b|\bshared[\s-]?human[\s-]?experience\b|\bhuman[\s-]?story\b/i,
+  /\bthe[\s-]?psyche\b|\binner[\s-]?landscape\b|\bthe[\s-]?unconscious\b|\bmy[\s-]?psyche\b/i,
+  /\beternal[\s-]?return\b|\balways[\s-]?comes[\s-]?back[\s-]?around\b|\bthe[\s-]?cycle[\s-]?repeats\b/i,
+  /\bsomething[\s-]?larger\b|\bbeyond[\s-]?ordinary\b|\bthe[\s-]?ineffable\b|\bsense[\s-]?of[\s-]?awe\b|\bnuminous\b/i,
+  /\bmeaning[\s-]?making\b|\bmaking[\s-]?meaning\b|\bmy[\s-]?own[\s-]?mythology\b|\bnarrative[\s-]?I[\s-]?live[\s-]?by\b/i,
+  /\bbeneath[\s-]?the[\s-]?surface\b|\bdeeper[\s-]?meaning\b|\bwhat[\s-]?it[\s-]?really[\s-]?means\b|\bdeeper[\s-]?layer\b/i,
+]
+
+/** Award myth_session when 3+ Myth Engine words appear in a single journal entry */
+export function checkMythSession(journalText: string): BadgeType | null {
+  if (hasBadge('myth_session')) return null
+  const hits = MYTH_WORDS_V31.filter(p => p.test(journalText)).length
+  if (hits >= 3) {
+    if (awardBadge('myth_session')) return 'myth_session'
+  }
+  return null
+}
+
+/** Award dawn_rite when checking in 5:00–5:14 AM local */
+export function checkDawnRite(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_rite')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  const min = now.getMinutes()
+  if (hour === 5 && min <= 14) {
+    if (awardBadge('dawn_rite')) return 'dawn_rite'
+  }
+  return null
+}
+
+/** Award the_epic when journal entry >= 1,200 words */
+export function checkTheEpic(journalText: string): BadgeType | null {
+  if (hasBadge('the_epic')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 1200) {
+    if (awardBadge('the_epic')) return 'the_epic'
+  }
+  return null
+}
+
+/** Award Mythic Vault secret boss badges from journal text */
+export function checkMythVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  if (!hasBadge('jung_found') && /\bcarl[\s-]?jung\b|\bjungian\b|\bcollective[\s-]?unconscious\b|\bindividuation\b|\banima\b|\banimus\b/i.test(journalText)) {
+    if (awardBadge('jung_found')) awarded.push('jung_found')
+  }
+  if (!hasBadge('campbell_signal') && /\bjoseph[\s-]?campbell\b|\bmonomyth\b|\bhero[\s-]?with[\s-]?a[\s-]?thousand[\s-]?faces\b|\bcomparative[\s-]?mythology\b/i.test(journalText)) {
+    if (awardBadge('campbell_signal')) awarded.push('campbell_signal')
+  }
+  if (!hasBadge('eliade_found') && /\bmircea[\s-]?eliade\b|\bhierophany\b|\bsacred[\s-]?and[\s-]?profane\b|\baxis[\s-]?mundi\b/i.test(journalText)) {
+    if (awardBadge('eliade_found')) awarded.push('eliade_found')
   }
   return awarded
 }

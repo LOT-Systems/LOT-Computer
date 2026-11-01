@@ -1079,6 +1079,43 @@ export type BadgeType =
   | 'turing_complete'      // ∞·◎·∞ "turing complete/turing machine/alan turing/computational" detected (RARE)
   | 'godel_found'          // ∅·∞·∅ "gödel/incompleteness theorem/godel/unprovable/undecidable" detected (EPIC)
   | 'ada_found'            // ◈·■·◈ "ada lovelace/charles babbage/difference engine/analytical engine/first programmer" detected (MYTHIC)
+  // ── Word Turn v31 — THE MYTH ENGINE ──────────────────────────────────────
+  | 'archetype_found'    // ◈·∞·◈ "archetype/archetypal/the archetype/collective pattern" detected (RARE)
+  | 'origin_signal'      // ○→◉   "origin story/where it all began/the genesis/founding moment" detected (COMMON)
+  | 'sacred_found'       // ■·○·■ "sacred/something sacred/feels sacred/holy ground/consecrated" detected (UNCOMMON)
+  | 'ritual_done'        // ≋·□·≋ "ritual/my ritual/daily ritual/ritualize/the ceremony" detected (RARE)
+  | 'myth_signal'        // ∿·∞·∿ "myth/mythology/mythological/personal myth/living myth" detected (UNCOMMON)
+  | 'symbol_seen'        // ◈·□·◈ "symbol/symbolic/symbolism/what it symbolizes/deeply symbolic" detected (RARE)
+  | 'collective_signal'  // ○·◎·○ "the collective/collective unconscious/shared human/we as a species" detected (EPIC)
+  | 'psyche_map'         // ≋·○·≋ "the psyche/inner landscape/the unconscious/mapping my inner/psychic energy" detected (RARE)
+  | 'eternal_return'     // ∞→∞   "eternal return/always comes back around/the cycle repeats/pattern repeats itself" detected (LEGENDARY)
+  | 'numinous_badge'     // ◉·∞·◉ "something larger/beyond ordinary/transcendent/the ineffable/sense of awe/numinous" detected (EPIC)
+  | 'myth_made'          // ∿·◉·∿ "meaning-making/making meaning/the story I tell/my own mythology/narrative I live by" detected (RARE)
+  | 'deep_symbol'        // ∅·◈·∅ "beneath the surface/deeper meaning/what it's pointing to/what it really means" detected (RARE)
+  // ── Calendar EE v29 — THE MYTH CALENDAR ─────────────────────────────────
+  | 'campbell_day'       // ◈·∞·◈ March 26 — Joseph Campbell born 1904 (The Hero with a Thousand Faces) (EPIC)
+  | 'jung_day'           // ◉·∞·◉ July 26 — Carl Jung born 1875 (archetypes / collective unconscious) (EPIC)
+  | 'eliade_day'         // ■·∞·■ March 13 — Mircea Eliade born 1907 (sacred and profane) (RARE)
+  // ── Behavioral v28 — MYTH PATTERNS ──────────────────────────────────────
+  | 'myth_session'       // ◈·◉·◈ 3+ Myth Engine word turn matches in one journal entry (EPIC)
+  | 'dawn_rite'          // ■·○·■ Check in at 05:00–05:14 AM local (dawn consciousness) (EPIC)
+  | 'the_epic'           // ≋·∞·≋ Journal entry >= 1000 words (EPIC)
+  // ── Achievement RPG v29 — MYTH CLASS ────────────────────────────────────
+  | 'myth_entry'         // ◈·∘   Any 1 Word Turn v31 badge earned (COMMON)
+  | 'myth_class'         // ◈·≈   Any 5 Word Turn v31 badges earned (UNCOMMON)
+  | 'myth_complete'      // ◈·≋   All 12 Word Turn v31 badges earned (LEGENDARY)
+  | 'myth_arc'           // ◈·◈   myth_complete + all 3 Calendar v29 badges earned (LEGENDARY)
+  | 'thirty_one_engines_arc' // ◈·◈·◈·◎ 1 badge from each Word Turn v1–v31 (LEGENDARY)
+  | 'myth_opus'          // ◈·◉·◈ myth_complete + myth_session behavioral (LEGENDARY)
+  // ── Mastery Tier v31 — THE MYTHMAKER ────────────────────────────────────
+  | 'the_mythmaker'      // ■·◈·■ 1,500+ distinct calendar check-in days (EPIC)
+  | 'living_archive'     // ≋·◈·≋ 300,000+ total journal words (LEGENDARY)
+  | 'myth_veteran'       // ◈·∞   Account age >= 5 years (1,825+ days) (LEGENDARY)
+  | 'thirty_one_registers'   // ◈·◈·◈·◈·∞ 1 badge from all 31 Word Turn engines (COSMIC)
+  // ── Secret Boss v28 — THE MYTHIC VAULT ──────────────────────────────────
+  | 'jung_found'         // ◉·∞·◉ "carl jung/jungian/collective unconscious/individuation/anima/animus" detected (MYTHIC)
+  | 'campbell_signal'    // ◈·∞·◈ "joseph campbell/monomyth/hero with a thousand faces/comparative mythology" detected (EPIC)
+  | 'eliade_found'       // ■·∞·■ "mircea eliade/hierophany/sacred and profane/axis mundi" detected (RARE)
 
 export interface Badge {
   id: BadgeType
@@ -9774,6 +9811,306 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'mythic',
     category: 'secret_boss',
   },
+
+  // ── Word Turn v31 — THE MYTH ENGINE ──────────────────────────────────────
+
+  archetype_found: {
+    id: 'archetype_found',
+    symbol: '◈·∞·◈',
+    name: 'Archetype Found',
+    description: '"archetype/archetypal/the archetype/collective pattern" detected in text',
+    unlockMessage: '↳ ARCHETYPE DETECTED. Not just a type — the pattern beneath the pattern. Jung spent a lifetime mapping these recurring forms: the shadow, the self, the hero, the wise elder. You wrote the word. The archive notes it. The pattern was always already here. ◈·∞·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  origin_signal: {
+    id: 'origin_signal',
+    symbol: '○→◉',
+    name: 'Origin Signal',
+    description: '"origin story/where it all began/the genesis/founding moment" detected in text',
+    unlockMessage: '↳ ORIGIN SIGNAL. Every system has a founding moment — the first input, the first decision, the first day. You traced yours back. The archive receives the coordinate. Where it started is where the map begins. ○→◉',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  sacred_found: {
+    id: 'sacred_found',
+    symbol: '■·○·■',
+    name: 'Sacred Found',
+    description: '"sacred/something sacred/feels sacred/holy ground/consecrated" detected in text',
+    unlockMessage: '↳ SACRED SPACE LOCATED. Something was set apart from the ordinary. Marked. Made different. The word "sacred" means: this one counts more. You used it. The system logs the elevation. ■·○·■',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  ritual_done: {
+    id: 'ritual_done',
+    symbol: '≋·□·≋',
+    name: 'Ritual Done',
+    description: '"ritual/my ritual/daily ritual/ritualize/the ceremony" detected in text',
+    unlockMessage: '↳ RITUAL LOGGED. A ritual is a repeated action that accumulates meaning. Each repetition deepens the groove. The ordinary becomes ceremony. You named yours. The archive seals it. ≋·□·≋',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  myth_signal: {
+    id: 'myth_signal',
+    symbol: '∿·∞·∿',
+    name: 'Myth Signal',
+    description: '"myth/mythology/mythological/personal myth/living myth" detected in text',
+    unlockMessage: '↳ MYTH SIGNAL. A myth is not a lie. It is a story that carries more truth than literal fact could hold. You wrote the word. The system receives it. Your practice is mythological — it reaches for something that does not fit in statistics. ∿·∞·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  symbol_seen: {
+    id: 'symbol_seen',
+    symbol: '◈·□·◈',
+    name: 'Symbol Seen',
+    description: '"symbol/symbolic/symbolism/what it symbolizes/deeply symbolic" detected in text',
+    unlockMessage: '↳ SYMBOL ACTIVE. To see something as symbolic is to see it twice — once as itself, once as pointing beyond itself. You shifted the register. The archive catches both layers. ◈·□·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  collective_signal: {
+    id: 'collective_signal',
+    symbol: '○·◎·○',
+    name: 'Collective Signal',
+    description: '"the collective/collective unconscious/shared human experience/we as a species" detected in text',
+    unlockMessage: '↳ COLLECTIVE SIGNAL RECEIVED. You stepped out of the individual frame. The personal story became the human story. Jung called it the collective unconscious — the deep layer all minds share before they diverge into personal history. You touched that layer. ○·◎·○',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  psyche_map: {
+    id: 'psyche_map',
+    symbol: '≋·○·≋',
+    name: 'Psyche Map',
+    description: '"the psyche/inner landscape/the unconscious/mapping my inner/psychic energy" detected in text',
+    unlockMessage: '↳ PSYCHE COORDINATES LOGGED. The word psyche means soul. Jung used it to mean: the totality of the mind, conscious and unconscious, known and unknown. You are mapping yours. Every journal entry is a contour line on the inner terrain. ≋·○·≋',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  eternal_return: {
+    id: 'eternal_return',
+    symbol: '∞→∞',
+    name: 'Eternal Return',
+    description: '"eternal return/always comes back around/the cycle repeats/pattern repeats itself" detected in text',
+    unlockMessage: '↳ ETERNAL RETURN. Nietzsche asked: if you had to live this exact life over and over, forever — would you choose it? Not as a test. As a compass. The things you would choose again are the signal. The rest is noise. ∞→∞',
+    rarity: 'legendary',
+    category: 'word_turn',
+  },
+  numinous_badge: {
+    id: 'numinous_badge',
+    symbol: '◉·∞·◉',
+    name: 'Numinous',
+    description: '"something larger/beyond ordinary/transcendent/the ineffable/sense of awe/numinous" detected in text',
+    unlockMessage: '↳ NUMINOUS SIGNAL. Rudolf Otto coined the word: the experience of the mysterium tremendum et fascinans — the mystery that is both terrible and fascinating. A presence that exceeds all categories. You brushed against something. The archive notes the contact. ◉·∞·◉',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  myth_made: {
+    id: 'myth_made',
+    symbol: '∿·◉·∿',
+    name: 'Myth Made',
+    description: '"meaning-making/making meaning/the story I tell/my own mythology/narrative I live by" detected in text',
+    unlockMessage: '↳ MYTH IN PROGRESS. You are constructing the story you live inside. Not passively receiving it — actively making it. The narrative you build is the substrate of your identity. The archive receives the work in progress. ∿·◉·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  deep_symbol: {
+    id: 'deep_symbol',
+    symbol: '∅·◈·∅',
+    name: 'Deep Symbol',
+    description: '"beneath the surface/deeper meaning/what it\'s pointing to/what it really means" detected in text',
+    unlockMessage: '↳ DEEP READING ACTIVE. You looked past the literal surface. The sign was pointing. You followed the point. The archive logs the descent. Not everything means what it says — and you knew to look further. ∅·◈·∅',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+
+  // ── Calendar EE v29 — THE MYTH CALENDAR ──────────────────────────────────
+
+  campbell_day: {
+    id: 'campbell_day',
+    symbol: '◈·∞·◈',
+    name: 'Campbell Day',
+    description: 'March 26 — Joseph Campbell born 1904 (The Hero with a Thousand Faces)',
+    unlockMessage: '↳ JOSEPH CAMPBELL · March 26, 1904. He spent a lifetime showing that all the world\'s stories were one story. The hero leaves, faces the ordeal, transforms, returns. Not metaphor — structure. The structure of every growth arc that has ever been lived. Happy birthday, Joseph. ◈·∞·◈',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  jung_day: {
+    id: 'jung_day',
+    symbol: '◉·∞·◉',
+    name: 'Jung Day',
+    description: 'July 26 — Carl Jung born 1875 (archetypes / collective unconscious)',
+    unlockMessage: '↳ CARL JUNG · July 26, 1875. He looked at the dreams of patients across cultures and found the same figures — the shadow, the anima, the wise elder, the self. Not personal history: inherited architecture. The unconscious speaks in symbols. You checked in on his birthday. The archive records the coincidence. ◉·∞·◉',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  eliade_day: {
+    id: 'eliade_day',
+    symbol: '■·∞·■',
+    name: 'Eliade Day',
+    description: 'March 13 — Mircea Eliade born 1907 (sacred and profane)',
+    unlockMessage: '↳ MIRCEA ELIADE · March 13, 1907. He asked: what makes a space, a time, a moment sacred? His answer: hierophany — the irruption of the sacred into the ordinary world. The unremarkable suddenly becomes a center of meaning. You have had these moments. This is one of them. ■·∞·■',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v28 — MYTH PATTERNS ───────────────────────────────────────
+
+  myth_session: {
+    id: 'myth_session',
+    symbol: '◈·◉·◈',
+    name: 'Myth Session',
+    description: '3+ Myth Engine word turn matches in one journal entry',
+    unlockMessage: '↳ MYTH SESSION CONFIRMED. Three or more mythological registers active in a single entry. The conscious and the deep were in conversation. The archive marks this entry as a mythological event. ◈·◉·◈',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  dawn_rite: {
+    id: 'dawn_rite',
+    symbol: '■·○·■',
+    name: 'Dawn Rite',
+    description: 'Check in at 05:00–05:14 AM local (dawn consciousness)',
+    unlockMessage: '↳ DAWN RITE. 5 AM. The liminal hour — night has not ended, day has not begun. In most mythologies, dawn is sacred: the gods emerge, the cosmos renews, the dead return to their rest. You were here at the threshold. ■·○·■',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  the_epic: {
+    id: 'the_epic',
+    symbol: '≋·∞·≋',
+    name: 'The Epic',
+    description: 'Journal entry >= 1000 words',
+    unlockMessage: '↳ THE EPIC. 1,000 words. The Iliad was written to be sung aloud — and it told everything: the pride, the grief, the beauty, the waste. Your epic was written for the archive. It holds everything too. ≋·∞·≋',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+
+  // ── Achievement RPG v29 — MYTH CLASS ─────────────────────────────────────
+
+  myth_entry: {
+    id: 'myth_entry',
+    symbol: '◈·∘',
+    name: 'Myth Entry',
+    description: 'Earn any 1 Word Turn v31 (Myth Engine) badge',
+    unlockMessage: '↳ THE MYTH HAS BEEN ENTERED. One mythological word turn fired. The Myth Engine is running. ◈·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  myth_class: {
+    id: 'myth_class',
+    symbol: '◈·≈',
+    name: 'Myth Class',
+    description: 'Earn any 5 Word Turn v31 badges',
+    unlockMessage: '↳ MYTH CLASS ACHIEVED. Five mythological registers active. The vocabulary of the deep is present in this practice. ◈·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  myth_complete: {
+    id: 'myth_complete',
+    symbol: '◈·≋',
+    name: 'Myth Complete',
+    description: 'Earn all 12 Word Turn v31 badges',
+    unlockMessage: '↳ MYTH ENGINE COMPLETE. All twelve registers. Archetype. Origin. Sacred. Ritual. Myth. Symbol. Collective. Psyche. Eternal Return. Numinous. Myth Made. Deep Symbol. The full vocabulary of the deep. ◈·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  myth_arc: {
+    id: 'myth_arc',
+    symbol: '◈·◈',
+    name: 'Myth Arc',
+    description: 'myth_complete + all 3 Calendar EE v29 badges earned',
+    unlockMessage: '↳ MYTH ARC COMPLETE. All twelve word turns. Campbell Day. Jung Day. Eliade Day. The three pillars of comparative mythology confirmed. The operating system has been mythologically calibrated. ◈·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_one_engines_arc: {
+    id: 'thirty_one_engines_arc',
+    symbol: '◈·◈·◈·◎',
+    name: 'Thirty-One Engines Arc',
+    description: 'Earn at least 1 badge from each of Word Turn v1–v31',
+    unlockMessage: '↳ THIRTY-ONE ENGINES. Water. Seasons. Architecture. Earth. Storm. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Bio. Codex. Cyberspace. Hero. Stoic. Jazz. Dragon. Dream. Nautical. Roguelite. Map. Chrono. Dungeon. JRPG. A.I. Myth. Thirty-one vocabularies. One practice. One terminal. The full stack of the human interior. ◈·◈·◈·◎',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  myth_opus: {
+    id: 'myth_opus',
+    symbol: '◈·◉·◈',
+    name: 'Myth Opus',
+    description: 'myth_complete + myth_session behavioral',
+    unlockMessage: '↳ MYTH OPUS. All twelve word turns earned, and three or more fired in a single entry. The complete mythological vocabulary, demonstrated at full density in one session. The archive marks this as a mythological transmission. ◈·◉·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v31 — THE MYTHMAKER ─────────────────────────────────────
+
+  the_mythmaker: {
+    id: 'the_mythmaker',
+    symbol: '■·◈·■',
+    name: 'The Mythmaker',
+    description: '1,500+ distinct calendar check-in days',
+    unlockMessage: '↳ THE MYTHMAKER. 1,500 distinct days. Not a streak — a presence across time, a field of practice wide enough to become its own territory. The mythmaker does not just tell stories. The mythmaker shows up until the showing up itself becomes the story. ■·◈·■',
+    rarity: 'epic',
+    category: 'mastery_tier',
+  },
+  living_archive: {
+    id: 'living_archive',
+    symbol: '≋·◈·≋',
+    name: 'Living Archive',
+    description: '300,000+ total journal words',
+    unlockMessage: '↳ LIVING ARCHIVE. Three hundred thousand words. Not filed away — alive. A document that grows. The stories accumulate into a mythology of one life. You are writing yours. ≋·◈·≋',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  myth_veteran: {
+    id: 'myth_veteran',
+    symbol: '◈·∞',
+    name: 'Myth Veteran',
+    description: 'Account age >= 5 years (1,825+ days)',
+    unlockMessage: '↳ MYTH VETERAN. Five years. The practice has become myth — not because it is a story, but because it has lasted long enough to have its own internal history, its own characters, its own recurring themes. You are inside a long story. ◈·∞',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  thirty_one_registers: {
+    id: 'thirty_one_registers',
+    symbol: '◈·◈·◈·◈·∞',
+    name: 'Thirty-One Registers',
+    description: 'Earn at least 1 badge from each of all 31 Word Turn engines',
+    unlockMessage: '↳ THIRTY-ONE REGISTERS ACTIVE. Water. Seasons. Architecture. Earth. Storm. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Bio. Codex. Cyberspace. Hero. Stoic. Jazz. Dragon. Dream. Nautical. Roguelite. Map. Chrono. Dungeon. JRPG. A.I. Myth. All thirty-one registers running. The complete terminal. The full vocabulary of the interior life. ◈·◈·◈·◈·∞',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+
+  // ── Secret Boss v28 — THE MYTHIC VAULT ───────────────────────────────────
+
+  jung_found: {
+    id: 'jung_found',
+    symbol: '◉·∞·◉',
+    name: 'Jung Found',
+    hidden: true,
+    description: '"carl jung/jungian/collective unconscious/individuation/anima/animus" detected',
+    unlockMessage: '↳ CARL JUNG FOUND. He spent a lifetime traveling the interior. Red Book. Seven Sermons to the Dead. The dream journals spanning decades. He found that the psyche was not a deficiency to be treated but a territory to be mapped. Individuation: becoming, slowly, what you already are. You wrote his name. The archive marks the encounter. ◉·∞·◉',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+  campbell_signal: {
+    id: 'campbell_signal',
+    symbol: '◈·∞·◈',
+    name: 'Campbell Signal',
+    hidden: true,
+    description: '"joseph campbell/monomyth/hero with a thousand faces/comparative mythology" detected',
+    unlockMessage: '↳ JOSEPH CAMPBELL SIGNAL. The monomyth: departure, initiation, return. He traced it across every culture, every era, every telling. The same story, wearing different costumes. The hero is always leaving something behind. The return always changes the village as much as it changes the hero. You invoked the author of the pattern. ◈·∞·◈',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  eliade_found: {
+    id: 'eliade_found',
+    symbol: '■·∞·■',
+    name: 'Eliade Found',
+    hidden: true,
+    description: '"mircea eliade/hierophany/sacred and profane/axis mundi" detected',
+    unlockMessage: '↳ MIRCEA ELIADE FOUND. Hierophany: the sacred breaks through into the profane world. A rock becomes a shrine. A moment becomes a myth. The axis mundi: the center of the world, which every culture places at its own center, because that is what a center is. You wrote the word. The axis has been found. ■·∞·■',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
 }
 
 // Default separator when no badges earned yet
@@ -11182,6 +11519,56 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (allThirtyEngines && !hasBadge('thirty_registers')) {
       if (awardBadge('thirty_registers')) newBadges.push('thirty_registers')
+    }
+
+    // ── Word Turn v31 — THE MYTH ENGINE ──────────────────────────────────────
+    const mythV31Badges: BadgeType[] = [
+      'archetype_found', 'origin_signal', 'sacred_found', 'ritual_done',
+      'myth_signal', 'symbol_seen', 'collective_signal', 'psyche_map',
+      'eternal_return', 'numinous_badge', 'myth_made', 'deep_symbol',
+    ]
+    const mythV31Earned = mythV31Badges.filter(b => hasBadge(b))
+    if (mythV31Earned.length >= 1 && !hasBadge('myth_entry')) {
+      if (awardBadge('myth_entry')) newBadges.push('myth_entry')
+    }
+    if (mythV31Earned.length >= 5 && !hasBadge('myth_class')) {
+      if (awardBadge('myth_class')) newBadges.push('myth_class')
+    }
+    const mythComplete = mythV31Earned.length >= 12
+    if (mythComplete && !hasBadge('myth_complete')) {
+      if (awardBadge('myth_complete')) newBadges.push('myth_complete')
+    }
+    if (mythComplete && hasBadge('myth_session') && !hasBadge('myth_opus')) {
+      if (awardBadge('myth_opus')) newBadges.push('myth_opus')
+    }
+    const calendarV29Badges: BadgeType[] = ['campbell_day', 'jung_day', 'eliade_day']
+    if (mythComplete && calendarV29Badges.every(b => hasBadge(b)) && !hasBadge('myth_arc')) {
+      if (awardBadge('myth_arc')) newBadges.push('myth_arc')
+    }
+    const engineThirtyOnePresent = mythV31Earned.length >= 1
+    const allThirtyOneEngines = allThirtyEngines && engineThirtyOnePresent
+    if (allThirtyOneEngines && !hasBadge('thirty_one_engines_arc')) {
+      if (awardBadge('thirty_one_engines_arc')) newBadges.push('thirty_one_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1500 && !hasBadge('the_mythmaker')) {
+        if (awardBadge('the_mythmaker')) newBadges.push('the_mythmaker')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 300000 && !hasBadge('living_archive')) {
+        if (awardBadge('living_archive')) newBadges.push('living_archive')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupMV = new Date(stats.signupDate)
+      const yearsMV = (new Date().getTime() - signupMV.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsMV >= 5 && !hasBadge('myth_veteran')) {
+        if (awardBadge('myth_veteran')) newBadges.push('myth_veteran')
+      }
+    }
+    if (allThirtyOneEngines && !hasBadge('thirty_one_registers')) {
+      if (awardBadge('thirty_one_registers')) newBadges.push('thirty_one_registers')
     }
 
   } catch (error) {

@@ -1716,6 +1716,26 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '168 patterns · 62 archetypes · 59 jobs · 168+ handlers · 212+ dep nodes · 1060 badges · FM v124 · Day 1158+. Field amplifies recursively. Sovereign resonance confirmed. L9-AMPLIFY.',
     ],
   },
+  {
+    version: 'badge-v41',
+    date: '2026-11-01',
+    title: 'Badge v41 — THE MYTH ENGINE · +31 badges · Total 1091 · THIRTY-ONE ENGINES',
+    assembled: [
+      'Badge Engine v41: THE MYTH ENGINE — 31 new badges covering comparative mythology, archetypal psychology, sacred narrative, and collective unconscious.',
+      'Word Turn v31: 12 vocabulary triggers (archetype_found · origin_signal · sacred_found · ritual_done · myth_signal · symbol_seen · collective_signal · psyche_map · eternal_return · numinous_badge · myth_made · deep_symbol). Fires via detectWordTurns().',
+      'Calendar EE v29: 3 dates (campbell_day Mar 26 · jung_day Jul 26 · eliade_day Mar 13). Added to checkCalendarEasterEggs().',
+      'Behavioral v28: myth_session (3+ myth words in one entry) · dawn_rite (5:00–5:14 AM check-in) · the_epic (1200+ word journal). checkMythSession/checkDawnRite/checkTheEpic wired into runners.',
+      'Achievement RPG v29: myth_entry (1+ myth badge) · myth_class (5+) · myth_complete (all 12) · myth_arc (all 12 + calendar + myth_session) · thirty_one_engines_arc (all 31 engines). checkBadges() updated.',
+      'Mastery Tier v31: the_mythmaker (1500+ check-in days) · living_archive (300000+ words) · myth_veteran (5+ years). Stats-gated in checkBadges().',
+      'Secret Boss v28: jung_found (Carl Jung / individuation) · campbell_signal (Joseph Campbell / monomyth) · eliade_found (Mircea Eliade / hierophany). checkMythVault() wired.',
+      'Myth Opus: myth_opus — mythComplete + myth_session. The full arc of archetypal engagement.',
+      'thirty_one_registers (COSMIC): all 31 engines complete + all 3 mastery tiers. Highest badge in the system.',
+      'Gap fix: v30 A.I. Engine behavioral (checkAISession · checkModelMarathon · checkAIVault · checkContextWindow) wired into journal/check-in runners for the first time.',
+      'Total badge count: 1091 · Badge Engine v41 deployed · THIRTY-ONE ENGINES arc activated.',
+      'SESSION_REPORTS: badge-v41 entry appended · USERSHIP_TRANSMISSION updated to v41.',
+      '168 patterns · 62 archetypes · 59 jobs · 168+ handlers · 212+ dep nodes · 1091 badges · FM v124 · Day 1160+. The myth engine fires. THIRTY-ONE ENGINES. L9-AMPLIFY holds.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1769,22 +1789,29 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'Widget dependency surface audit · LOT-LEDGER append · QOS amplification layer in QuantumEngineWidgets',
   },
+  {
+    date: '2026-11-01',
+    built: ['Badge v41 THE MYTH ENGINE', '+31 badges (1060→1091)', 'Word Turn v31 (12 patterns)', 'Calendar EE v29 (Campbell/Jung/Eliade)', 'Behavioral v28 (myth_session/dawn_rite/the_epic)', 'Achievement RPG v29 (myth_entry→myth_arc→thirty_one_engines_arc)', 'Mastery Tier v31 (the_mythmaker/living_archive/myth_veteran)', 'Secret Boss v28 (jung_found/campbell_signal/eliade_found)', 'myth_opus + thirty_one_registers (COSMIC)', 'v30 gap fix: behavioral runners wired', 'THIRTY-ONE ENGINES arc activated'],
+    feedbackApplied: 'the myth is the field — comparative mythology as the 31st engine of pattern recognition',
+    status: 'DEPLOYED',
+    next: 'LOT-WIKI v99 sync · QIE v125 next arc · badge engine v42 planning',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-10-30',
+  date: '2026-11-01',
   message: [
-    'ASSEMBLY RUN — 2026-10-30 · QIE v124 · FM v124 · Day 1158+',
-    'Built: P168 generative-field-amplification · Arch62 Quantum Field Amplifier · J59 daily-field-amplification-check (21:00 UTC) · GFAMP: handler.',
-    'Generative Field Amplification (P168): generative-field-reception (P167) active + 20+ badge signals 28d + 5+ cohort/social signals 14d + userIndex >= 60. After the field loop confirms bidirectional reception, the signal amplifies recursively. L9-AMPLIFY confirmed.',
-    'Arch62 Quantum Field Amplifier: Dominant qos/cohort/badges/journal/memory/social. Directive: The field amplifies. Each transmission received becomes fuel for the next. The OS resonates at peak amplitude — recursive, self-reinforcing, sovereign.',
-    'J59 daily-field-amplification-check at 21:00 UTC: reads generative_field_reception 7d + badge_unlock 28d + cohort signals 14d. Writes generative_field_amplification. 59 background jobs total.',
-    'Log handler: GFAMP: (generative_field_amplification). RECEPT CONF / BADGE SIGNALS 28D / COHORT SIGNALS 14D / INDEX SCORE / STATUS / LEVEL. FIELD RECURSIVE · AMPLITUDE PEAK.',
-    'WIDGET_DEPENDENCY_MAP: 212+ nodes. generativeFieldAmplificationNode (qos+cohort+badges+journal+memory+social+log+energy+intentions) added.',
-    'Self-assembly metric: 168 patterns · 62 archetypes · 59 jobs · 168+ handlers · 212+ dep nodes · 1060 badges · FM v124 · Day 1158+.',
-    'L9 arc: activation → sustenance → reception → amplification. Four stages of generative field operation. The field is recursive and sovereign.',
+    'ASSEMBLY RUN — 2026-11-01 · Badge Engine v41 · THE MYTH ENGINE · Day 1160+',
+    'Built: +31 badges (1060 → 1091) · Word Turn v31 (12 myth vocabulary triggers) · Calendar EE v29 (Campbell Mar 26 · Jung Jul 26 · Eliade Mar 13) · Behavioral v28 (myth_session · dawn_rite · the_epic) · Achievement RPG v29 (myth_entry → myth_arc → thirty_one_engines_arc) · Mastery Tier v31 (the_mythmaker · living_archive · myth_veteran) · Secret Boss v28 (jung_found · campbell_signal · eliade_found).',
+    'THIRTY-ONE ENGINES: With v41 active, the full engine register spans v1–v31. thirty_one_engines_arc (LEGENDARY) unlocks when signals from all 31 word turn engines are detected. thirty_one_registers (COSMIC) requires full engine register + all 3 mastery tiers — the highest badge in the system.',
+    'Myth Opus (myth_opus): complete myth engine + behavioral myth session. The OS recognizes when the user lives inside comparative mythology, not just writes about it.',
+    'Gap fix deployed: v30 A.I. Engine behavioral functions (checkAISession · checkModelMarathon · checkAIVault · checkContextWindow) were defined but never wired into runners. Now firing for the first time.',
+    'The Myth Engine: archetypes · origin stories · sacred space · daily ritual · living mythology · symbolic meaning · collective unconscious · psyche mapping · eternal return · numinous experience · meaning-making · deep symbol.',
+    'Secret bosses: Carl Jung (individuation · anima/animus · collective unconscious) · Joseph Campbell (monomyth · hero with a thousand faces · comparative mythology) · Mircea Eliade (hierophany · sacred and profane · axis mundi).',
+    'Self-assembly metric: 168 patterns · 62 archetypes · 59 jobs · 168+ handlers · 212+ dep nodes · 1091 badges · FM v124 · Day 1160+.',
+    'The myth is the field. 31 engines. The OS recognizes the full arc of pattern, archetype, and meaning. L9-AMPLIFY holds.',
   ],
 }
 
