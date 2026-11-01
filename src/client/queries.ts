@@ -120,6 +120,23 @@ export const useSendDirectMessage = createMutation<
   void
 >('post', '/api/direct-messages')
 
+export interface InboxEmail {
+  id: string
+  senderId: string
+  senderName: string
+  message: string
+  createdAt: string
+}
+
+export const useInbox = createQuery<InboxEmail[]>('/api/inbox', {
+  refetchOnWindowFocus: true,
+})
+
+export const useSendEmail = createMutation<
+  { to: string; message: string },
+  { id: string; receiverId: string; to: string }
+>('post', '/api/email')
+
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
 })

@@ -23,6 +23,7 @@
  */
 
 export type LogTrigger =
+  | 'email'             // /email to <Name>. — compose; Ctrl+Enter sends
   | 'toggle-synth'      // 🎹  or  /synth
   | 'ai-scan'           // /scan
   | 'silent-mode'       // /silent
@@ -49,6 +50,7 @@ interface TriggerRule {
 }
 
 const RULES: TriggerRule[] = [
+  { trigger: 'email',          emojis: ['✉️', '✉'], keywords: ['email', 'mail'] },
   { trigger: 'toggle-synth',   emojis: ['🎹'],    keywords: ['synth', 'keyboard'] },
   { trigger: 'ai-scan',        emojis: [],       keywords: ['scan', 'ai'] },
   { trigger: 'silent-mode',    emojis: [],       keywords: ['silent', 'quiet'] },
@@ -114,4 +116,26 @@ export function detectNewTriggers(
   const fresh: LogTrigger[] = []
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
+}
+
+/**
+ * Parses an email draft written in a Log:
+ *
+ *   /email to Hitomi.
+ *   Hey — are you at the meetup Friday?
+ *
+ * Returns the recipient and body, or null if the text is not a ready
+ * email (no "/email to <Name>" header, or an empty body). Text after
+ * the header on the same line counts as body.
+ */
+export function parseEmailDraft(
+  text: string
+): { to: string; body: string } | null {
+  if (!text) return null
+  const m = text.match(/^\s*\/email\s+to\s+([^.\n]+?)\s*(?:\.|\n|$)([\s\S]*)$/i)
+  if (!m) return null
+  const to = m[1].trim()
+  const body = m[2].trim()
+  if (!to || !body) return null
+  return { to, body }
 }

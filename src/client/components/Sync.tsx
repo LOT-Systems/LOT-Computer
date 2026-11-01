@@ -24,6 +24,7 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useInbox,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -172,14 +173,18 @@ export const Sync = React.memo(function SyncInner() {
 
   if (!canAccessChat) {
     return (
-      <div className="max-w-[700px] text-acc/40 py-8">
-        Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+      <div className="max-w-[700px]">
+        <Inbox />
+        <div className="text-acc/40 py-8">
+          Sync chat is available for Usership, Onyx, Legacy, R&D, and Admin members.
+        </div>
       </div>
     )
   }
 
   return (
     <div className="max-w-[700px]">
+      <Inbox />
       <div className="flex items-center mb-80">
         <span className="mr-8 whitespace-nowrap leading-normal">
           {me!.firstName}
@@ -280,6 +285,71 @@ export const Sync = React.memo(function SyncInner() {
     </div>
   )
 })
+
+const INBOX_SEEN_KEY = 'lot-inbox-seen'
+
+const readSeen = (): number => {
+  try { return Number(localStorage.getItem(INBOX_SEEN_KEY) || 0) } catch { return 0 }
+}
+
+/**
+ * LOT Email inbox — new messages from LOT Community appear here in Sync.
+ * Composed in Log with "/email to Name."; replies open the 1:1 thread.
+ */
+const Inbox: React.FC = () => {
+  const me = useStore(stores.me)
+  const isTimeFormat12h = useStore(stores.isTimeFormat12h)
+  const queryClient = useQueryClient()
+  const { data: emails } = useInbox()
+  const [seen] = React.useState(readSeen)
+
+  React.useEffect(() => {
+    const { dispose } = sync.listen('direct_message', (data: any) => {
+      if (data.receiverId === me?.id) queryClient.invalidateQueries(['/api/inbox'])
+    })
+    return dispose
+  }, [me?.id])
+
+  React.useEffect(() => {
+    if (!emails?.length) return
+    const t = setTimeout(() => {
+      try { localStorage.setItem(INBOX_SEEN_KEY, String(Date.now())) } catch {}
+    }, 3000)
+    return () => clearTimeout(t)
+  }, [emails])
+
+  if (!emails || emails.length === 0) return null
+  const unread = emails.filter((e) => new Date(e.createdAt).getTime() > seen).length
+
+  return (
+    <div className="mb-80">
+      <div className="text-acc/40 mb-8">
+        Inbox{unread > 0 ? ` · ${unread} new` : ''}
+      </div>
+      {emails.map((e) => {
+        const isNew = new Date(e.createdAt).getTime() > seen
+        const [subject, ...rest] = e.message.split('\n')
+        return (
+          <div
+            key={e.id}
+            className="group flex items-start gap-x-8 cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded"
+            onClick={() => stores.goTo('dm', { userId: e.senderId })}
+            title="Click to reply"
+          >
+            <span className={cn('whitespace-nowrap', !isNew && 'text-acc/40')}>{e.senderName}</span>
+            <div className="whitespace-breakspaces" style={{ wordBreak: 'break-word' }}>
+              <span className={cn(!isNew && 'text-acc/60')}>{subject}</span>
+              {rest.join('\n').trim() && <span className="text-acc/40">{' — ' + rest.join(' ').trim().slice(0, 120)}</span>}
+            </div>
+            <div className="ml-auto text-acc/40 whitespace-nowrap">
+              <MessageTimeLabel dateString={e.createdAt} isTimeFormat12h={isTimeFormat12h} />
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 const MessageTimeLabel: React.FC<{ dateString: string | Date; isTimeFormat12h: boolean }> = ({ dateString, isTimeFormat12h }) => {
   const date = dayjs(dateString)

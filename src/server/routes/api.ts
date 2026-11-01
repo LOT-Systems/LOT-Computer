@@ -380,6 +380,12 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'direct_message': {
+          if (data.receiverId === req.user.id || data.senderId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4082,6 +4088,100 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT EMAIL — simplest mail: composed in Log via "/email to <Name>.",
+  // delivered into Sync. Stored as DirectMessage rows (no new table):
+  // first line of the body is the subject.
+  // ============================================================================
+
+  // Send email by first name (or "First Last") — resolves within the community
+  fastify.post('/email', async (req: FastifyRequest<{
+    Body: { to: string; message: string }
+  }>, reply) => {
+    try {
+      const to = String(req.body?.to || '').trim().replace(/[.,!?;:]+$/, '')
+      const message = String(req.body?.message || '').trim()
+      if (!to || !message) {
+        return reply.status(400).send({ error: 'Recipient and message are required' })
+      }
+      const [first, ...rest] = to.split(/\s+/)
+      const last = rest.join(' ')
+      const where: any = {
+        id: { [Op.ne]: req.user.id },
+        [Op.and]: [
+          Sequelize.where(Sequelize.fn('lower', Sequelize.col('firstName')), first.toLowerCase()),
+          ...(last
+            ? [Sequelize.where(Sequelize.fn('lower', Sequelize.col('lastName')), last.toLowerCase())]
+            : []),
+        ],
+      }
+      const matches = await fastify.models.User.findAll({ where, limit: 6 })
+      if (matches.length === 0) {
+        return reply.status(404).send({ error: `No one named "${to}" in LOT Community` })
+      }
+      if (matches.length > 1) {
+        return reply.status(409).send({
+          error: `Several people named "${first}" — use "/email to ${first} <Last name>."`,
+          candidates: matches.map((m) => `${m.firstName || ''} ${m.lastName || ''}`.trim()),
+        })
+      }
+      const receiver = matches[0]
+      const dm = await fastify.models.DirectMessage.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: message.slice(0, 2000),
+      })
+      const senderName = `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim()
+      sync.emit('direct_message', {
+        id: dm.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: dm.message,
+        senderName,
+        createdAt: dm.createdAt,
+      })
+      return reply.send({
+        id: dm.id,
+        receiverId: receiver.id,
+        to: `${receiver.firstName || ''} ${receiver.lastName || ''}`.trim(),
+      })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  // Inbox — messages received by the current user (shown in Sync)
+  fastify.get('/inbox', async (req: FastifyRequest, reply) => {
+    try {
+      const rows = await fastify.models.DirectMessage.findAll({
+        where: { receiverId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 50,
+      })
+      const senderIds = [...new Set(rows.map((r) => r.senderId))]
+      const senders = senderIds.length
+        ? await fastify.models.User.findAll({ where: { id: senderIds } })
+        : []
+      const byId = new Map(senders.map((u) => [u.id, u]))
+      return reply.send(
+        rows.map((r) => {
+          const u = byId.get(r.senderId)
+          return {
+            id: r.id,
+            senderId: r.senderId,
+            senderName: u ? `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown' : 'Unknown',
+            message: r.message,
+            createdAt: r.createdAt,
+          }
+        })
+      )
+    } catch (error) {
+      console.error('Error fetching inbox:', error)
+      return reply.status(500).send({ error: 'Failed to fetch inbox' })
     }
   })
 

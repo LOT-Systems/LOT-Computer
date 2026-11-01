@@ -123,7 +123,8 @@ export const CohortConnectWidget: React.FC = () => {
       connectionReadiness,
       hour: new Date().getHours()
     })
-    stores.goTo('sync')
+    // LOT Email: open the 1:1 thread with this cohort member (replies land in Sync inbox)
+    stores.goTo('dm', { userId })
   }
 
   const handleToggleExpand = (userId: string) => {
@@ -267,7 +268,7 @@ export const CohortConnectWidget: React.FC = () => {
                           handleSendMessage(match.user.id, match.similarity)
                         }}
                       >
-                        Send message
+                        Email
                       </Button>
                     </div>
                   </div>

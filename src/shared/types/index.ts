@@ -450,4 +450,12 @@ export type SyncEvents = {
   chatMessage: PublicChatMessage;
   chatMessageLike: ChatMessageLikeEventPayload;
   settings_updated: Record<string, never>;
+  direct_message: {
+    id: string;
+    senderId: string;
+    receiverId: string;
+    message: string;
+    senderName: string;
+    createdAt: string;
+  };
 };
