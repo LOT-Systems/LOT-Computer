@@ -321,6 +321,22 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE STALE ROOM                              2026-11-01
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, LOT® Station on the shelf, CUBIQ pad
+  on the desk, headphones on, two hours into focused work.
+
+  Room CO2 passes 1000 ppm. The Station widget's quiet line ("open a
+  window for 30 minutes") would be invisible behind a full-screen
+  document. With CUBIQ v.0 the cube performs two spaced NUDGES, once per
+  episode — felt through the desk, not heard through headphones, not
+  seen. The operator stands and opens the window. When the Station
+  reports recovered air, the cube performs THE SETTLE (2s presence) and
+  nothing else. The cube speaks for the room, not the software: a
+  physical signal about a physical condition (QIoT). One alert per
+  episode, 20s motion cooldown, mutable per signal class, no health
+  claim. Full write-up: LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
