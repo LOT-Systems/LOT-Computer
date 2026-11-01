@@ -177,3 +177,25 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Wall-clock Date for `timeZone` (IANA), built so the plain getHours()/
+ * getMonth()/getDate() readers used above see that zone's fields. Falls back
+ * to the given instant on a missing/invalid zone. Isomorphic (Intl only), so
+ * the dashboard and Logs share one personalization anchor: the saved
+ * profile timeZone.
+ */
+export function getWallClockDate(timeZone?: string | null, now: Date = new Date()): Date {
+  if (!timeZone) return now
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(now)
+    const v = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(v('year'), v('month') - 1, v('day'), v('hour'), v('minute'), v('second'))
+  } catch {
+    return now
+  }
+}
