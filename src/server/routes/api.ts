@@ -5513,7 +5513,13 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         })
       }
 
-      const { logText, quantumState, userIndex } = req.body
+      const { quantumState, userIndex } = req.body
+      // The client compresses the record on-device and appends "[DIGEST] ...".
+      // Split it out: the digest is compressed context, the rest is the operator's text.
+      const rawLogText = typeof req.body.logText === 'string' ? req.body.logText.slice(0, 2000) : ''
+      const digestIdx = rawLogText.indexOf('[DIGEST]')
+      const logText = (digestIdx >= 0 ? rawLogText.slice(0, digestIdx) : rawLogText).trim()
+      const digest = digestIdx >= 0 ? rawLogText.slice(digestIdx + 8).replace(/\s+/g, ' ').trim().slice(0, 900) : ''
 
       const logs = await fastify.models.Log.findAll({
         where: { userId: req.user.id },
@@ -5560,10 +5566,14 @@ RULES:
 - The tone should match their current energy: reflective if low, energized if high
 - End with a single forward-looking sentence — not a pep talk, just a quiet truth
 - Return ONLY the story paragraphs. No title. No commentary. No preamble.
+- If a COMPRESSED DIGEST is provided, treat it as the authoritative summary of the period (counts, streak, peak time, themes, change vs prior period, rank). Narrate it; never invent numbers that are not in it.
+- If the digest shows a spike or a drop against the prior period, name it gently.
 - Keep it under 200 words.`
 
       const dataBlock = `
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+
+COMPRESSED DIGEST: ${digest || '(none)'}
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 

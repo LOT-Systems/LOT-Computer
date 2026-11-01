@@ -23,6 +23,8 @@ import {
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
 import { toCelsius } from '#shared/utils'
+import { buildSystemHelp } from '#client/utils/logCommands'
+import { compressStory, computeArcade, renderStory, digestForModel, parseStoryPeriod } from '#client/utils/logStory'
 import {
   playKeyClick,
   playSynthActivationChime,
@@ -3706,6 +3708,8 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const storyLocalRef = React.useRef<string>('')
+  const { data: allLogs = [] } = useLogs()
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3741,7 +3745,7 @@ const NoteEditor = ({
   })
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
-      setStoryResponse(data.story)
+      setStoryResponse(storyLocalRef.current ? `${storyLocalRef.current}\n\nNARRATIVE\n${data.story}` : data.story)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -3752,16 +3756,19 @@ const NoteEditor = ({
       setIsSaved(true)
     },
     onError: () => {
+      // The compressed local story is already on screen; AI narrative is optional.
       const fallback = 'The system holds your data quietly. When the engine returns, your story will be here.'
-      setStoryResponse(fallback)
+      setStoryResponse(storyLocalRef.current ? `${storyLocalRef.current}\n\nNARRATIVE\nAI narrative offline. The compressed record above is complete.` : fallback)
       setStoryLoading(false)
-      const current = valueRef.current
-      const separator = current.trim() ? '\n\n' : ''
-      const updated = current + separator + '📖 ' + fallback
-      setValue(updated)
-      valueRef.current = updated
-      onChangeRef.current(updated)
-      setIsSaved(true)
+      if (!storyLocalRef.current) {
+        const current = valueRef.current
+        const separator = current.trim() ? '\n\n' : ''
+        const updated = current + separator + '📖 ' + fallback
+        setValue(updated)
+        valueRef.current = updated
+        onChangeRef.current(updated)
+        setIsSaved(true)
+      }
     },
   })
   const debounceTime = 7000  // 7s for all logs
@@ -3931,6 +3938,51 @@ const NoteEditor = ({
   // the editor. We compare against the previous value via ref so
   // editing around an existing trigger doesn't re-fire it.
   // --------------------------------------------------------------------
+  // /story — compress the record on-device, then ask the AI vendor to narrate
+  // the compressed digest. Re-created each render so it always sees fresh refs.
+  const storyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const runStoryRef = React.useRef<() => void>(() => {})
+  runStoryRef.current = () => {
+    if (storyLoading) return
+    const text = valueRef.current
+    setStoryLoading(true)
+    setStoryResponse(null)
+    const logText = text.replace(/\/story(\s+(day|today|week|month|year))?/i, '').replace(/📖/g, '').trim()
+    let digestText = ''
+    try {
+      const digest = compressStory(allLogs as any[], parseStoryPeriod(text))
+      const arcade = computeArcade(allLogs as any[])
+      storyLocalRef.current = renderStory(digest, arcade)
+      digestText = digestForModel(digest, arcade)
+      setStoryResponse(storyLocalRef.current)
+    } catch {
+      storyLocalRef.current = ''
+    }
+    try {
+      submitStory({
+        logText: digestText ? `${logText}\n[DIGEST] ${digestText}`.trim() : logText,
+        quantumState: getUserState(),
+        userIndex: getUserIndex(),
+      })
+    } catch {
+      submitStory({ logText: digestText || text })
+    }
+  }
+  const scheduleStory = () => {
+    if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+    storyTimerRef.current = setTimeout(() => {
+      storyTimerRef.current = null
+      runStoryRef.current()
+    }, 1200)
+  }
+  React.useEffect(() => {
+    // Keep debouncing while the operator is still typing the period argument.
+    if (!storyTimerRef.current) return
+    if (/\/story/i.test(value)) scheduleStory()
+    else { clearTimeout(storyTimerRef.current); storyTimerRef.current = null }
+  }, [value])
+  React.useEffect(() => () => { if (storyTimerRef.current) clearTimeout(storyTimerRef.current) }, [])
+
   const lastTriggerScanRef = React.useRef(log.text || '')
   React.useEffect(() => {
     const fresh = detectNewTriggers(value, lastTriggerScanRef.current)
@@ -4121,49 +4173,12 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(buildSystemHelp())
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
-          setStoryLoading(true)
-          setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
-        }
+        // Debounced: lets the operator finish typing "/story week" first.
+        scheduleStory()
       }
     }
   }, [value])
@@ -4399,7 +4414,7 @@ const NoteEditor = ({
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                        <span style={{ minWidth: '220px', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )
@@ -4416,12 +4431,12 @@ const NoteEditor = ({
         )}
         {(storyLoading || storyResponse) && (
           <div className="mt-8">
-            <Block label="📖" blockView>
+            <Block label="STORY:" blockView>
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
               )}
               {storyResponse && (
-                <div className="opacity-60">
+                <div className="opacity-60" style={{ whiteSpace: 'pre-wrap', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6' }}>
                   {storyResponse.split('\n').map((line, idx) => (
                     <div key={idx}>{line || <br />}</div>
                   ))}

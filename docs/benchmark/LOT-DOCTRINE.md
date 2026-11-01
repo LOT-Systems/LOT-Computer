@@ -226,3 +226,10 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+LOG COMMAND + STORY (SR-20261101-01)
+Slash commands live in one registry (logCommands.ts); /system is generated from
+it and a check fails on drift from the detector. /story compresses on-device and
+deterministically first; the vendor (Together AI) only narrates a digest and its
+absence never blanks the story. Raw entries do not leave the client for /story.
+Arcade XP is capped per day: presence over volume. (PROVISIONAL: ARCADE, DIGEST.)
