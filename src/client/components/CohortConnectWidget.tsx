@@ -13,6 +13,7 @@ import { Block, Button } from '#client/components/ui'
 import { useCohorts, useEnergy, useProfile } from '#client/queries'
 import { useLogContext } from '#client/hooks/useLogContext'
 import { usePunctuationContext } from '#client/hooks/usePunctuationContext'
+import { composeMailTo } from '#client/utils/composeMail'
 import { recordSignal, getUserState } from '#client/stores/intentionEngine'
 
 /**
@@ -268,6 +269,16 @@ export const CohortConnectWidget: React.FC = () => {
                         }}
                       >
                         Send message
+                      </Button>
+                      <Button
+                        size="small"
+                        kind="secondary"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation()
+                          composeMailTo(match.user.firstName || '')
+                        }}
+                      >
+                        ✉ Mail
                       </Button>
                     </div>
                   </div>

@@ -16,6 +16,7 @@ import { DirectMessage } from './direct-message.js'
 import { WeatherResponse } from './weather-response.js'
 import { Log } from './log.js'
 import { Answer } from './answer.js'
+import { LotMail } from './lot-mail.js'
 
 export type UserRecord = User
 
@@ -30,6 +31,7 @@ export const models = {
   WeatherResponse,
   Log,
   Answer,
+  LotMail,
 }
 
 export type Models = {
@@ -43,6 +45,7 @@ export type Models = {
   WeatherResponse: typeof WeatherResponse
   Log: typeof Log
   Answer: typeof Answer
+  LotMail: typeof LotMail
 }
 
 User.hasMany(Session)

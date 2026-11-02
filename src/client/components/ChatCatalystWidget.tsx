@@ -6,6 +6,7 @@
  * Made in the USA | brand.lot-systems.com
  */
 
+import { composeMailTo } from '#client/utils/composeMail'
 import React from 'react'
 import { useStore } from '@nanostores/react'
 import { Block, Button } from '#client/components/ui'
@@ -56,13 +57,21 @@ export function ChatCatalystWidget() {
 
     // Navigate to specific user profile or community chat
     if (catalyst.action.cohortMember) {
-      // Navigate to user profile (using same pattern as Sync.tsx)
       const userId = catalyst.action.cohortMember.id
       window.location.href = canAccessUserProfiles ? `/us/u/${userId}` : `/u/${userId}`
     } else {
-      // Navigate to community chat
       stores.goTo('sync')
     }
+  }
+
+  const handleEmail = () => {
+    if (!catalyst.action.cohortMember) return
+    recordSignal('journal', 'connection_accepted', {
+      type: 'email',
+      cohortMember: catalyst.action.cohortMember.name,
+      hour: new Date().getHours()
+    })
+    composeMailTo(catalyst.action.cohortMember.name)
   }
 
   return (
@@ -88,10 +97,15 @@ export function ChatCatalystWidget() {
         </div>
 
         {/* Action button */}
-        <div className="mb-8">
+        <div className="mb-8 flex gap-x-8">
           <Button onClick={handleAction}>
             {catalyst.action.label}
           </Button>
+          {catalyst.action.cohortMember && (
+            <Button kind="secondary" onClick={handleEmail}>
+              ✉ Mail
+            </Button>
+          )}
         </div>
 
         {/* Conversation starters if available */}
