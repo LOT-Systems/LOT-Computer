@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: hero arc complete · narrative sovereignty · quantum monomyth lock (P152/P153/P154)
+      'hero_arc_complete',
+      'narrative_sovereignty',
+      'quantum_monomyth_lock',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

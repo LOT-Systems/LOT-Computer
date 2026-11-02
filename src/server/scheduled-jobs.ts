@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily hero arc check (18:00 UTC every day) — Job 49
+  if (shouldRunDailyHeroArcCheck()) {
+    await executeDailyHeroArcCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,149 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Hero Arc Check (Job 49 — 18:00 UTC every day) ─────────────────────
+// Scans journal + log signals from the past 7 days for Hero's Journey vocabulary
+// (hero_word_turn events, deep journal entries ≥ 200 wc/day on 3+ days, hero badge unlocks).
+// When hero arc confirmed: writes hero_arc_complete event.
+// Connects Badge v32 (The Hero's Journey) to the QIE narrative sovereignty layer.
+
+let isDailyHeroArcRunning = false
+let lastDailyHeroArcRun: Date | null = null
+
+function shouldRunDailyHeroArcCheck(): boolean {
+  const now = dayjs()
+  if (isDailyHeroArcRunning) return false
+  if (lastDailyHeroArcRun) {
+    const lastRun = dayjs(lastDailyHeroArcRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 18 // 18:00 UTC daily
+}
+
+async function executeDailyHeroArcCheck(): Promise<JobResult> {
+  const jobName = 'daily-hero-arc-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyHeroArcRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyHeroArcRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY HERO ARC CHECK — 18:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+
+    const HERO_WORDS = [
+      'call_heard', 'threshold_crossed', 'mentor_arrived', 'ordeal_survived',
+      'elixir_found', 'shadow_met', 'innermost_cave', 'shapeshifter',
+      'herald_call', 'trickster_mode', 'ally_gained', 'return_road',
+    ]
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // Skip if hero_arc_complete already written today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existing = await (Log as any).findOne({
+          where: { userId, event: 'hero_arc_complete', createdAt: { [Op.gte]: todayStart } },
+          attributes: ['id'],
+        })
+        if (existing) continue
+
+        // Gather hero-word-turn log events from the past 7 days
+        const heroWordLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+            event: 'hero_word_turn',
+          },
+          attributes: ['id', 'metadata'],
+        })
+
+        // Gather journal/log signals from past 7 days with meaningful word count
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+            event: { [Op.in]: ['journal_entry', 'note'] as any[] },
+          },
+          attributes: ['createdAt', 'metadata', 'text'],
+        })
+
+        // Count deep-journal days (≥200 words in day)
+        const dayBuckets: Record<string, number> = {}
+        for (const jl of journalLogs) {
+          const wc = (jl as any).metadata?.wordCount ?? ((jl as any).text?.split(/\s+/).length ?? 0)
+          const day = dayjs((jl as any).createdAt).format('YYYY-MM-DD')
+          dayBuckets[day] = (dayBuckets[day] ?? 0) + wc
+        }
+        const deepJournalDays = Object.values(dayBuckets).filter(wc => wc >= 200).length
+
+        // Check for hero badge unlocks (event: badge_earned with badge containing hero vocabulary)
+        const heroBadgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+            event: 'badge_earned',
+          },
+          attributes: ['metadata'],
+        })
+        const heroBadgeCount = heroBadgeLogs.filter((bl: any) => {
+          const badgeName: string = bl.metadata?.badge ?? bl.metadata?.badgeId ?? ''
+          return HERO_WORDS.some(w => badgeName.toLowerCase().includes(w.replace(/_/g, '-')))
+        }).length
+
+        // Hero arc confirmed: ≥3 hero word events OR (≥3 deep journal days + ≥1 hero badge)
+        const heroWordCount = heroWordLogs.length
+        const heroArcConfirmed =
+          heroWordCount >= 3 ||
+          (deepJournalDays >= 3 && heroBadgeCount >= 1)
+
+        if (!heroArcConfirmed) continue
+
+        const confidence = Math.min(0.72 + heroWordCount * 0.04 + deepJournalDays * 0.03, 0.92)
+
+        await (Log as any).create({
+          userId,
+          event: 'hero_arc_complete',
+          text: `Hero arc complete: ${heroWordCount} hero-word-turn signals · ${deepJournalDays} deep-journal days · ${heroBadgeCount} hero badge unlocks in past 7 days. The Campbell monomyth is active in the operating layer. Journey vocabulary confirmed. Narrative sovereignty in motion.`,
+          metadata: {
+            heroWordCount,
+            deepJournalDays,
+            heroBadgeCount,
+            confidence: Math.round(confidence * 100) / 100,
+            window: '7d',
+            hour: 18,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Hero arc events written: ${written}`)
+    lastDailyHeroArcRun = new Date()
+    isDailyHeroArcRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily hero arc check failed:', error.message)
+    isDailyHeroArcRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5608,6 +5755,9 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily signal coherence cascade check: 8 AM UTC every day (Job 47)')
+  console.log('   - Daily total field coherence check: 9 AM UTC every day (Job 48)')
+  console.log('   - Daily hero arc check: 6 PM UTC every day (Job 49)')
   console.log('')
 
   // Check every hour for scheduled jobs

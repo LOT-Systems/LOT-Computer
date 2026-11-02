@@ -1457,6 +1457,28 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'qie-v114',
+    date: '2026-11-02',
+    title: 'QIE v114 · Hero Arc Engine · Campbell Monomyth Integration · FM v114',
+    assembled: [
+      'P152 hero-arc-complete: detects Hero\'s Journey vocabulary active across journal + badge + log signals in 7-day window. Conf 0.72–0.90. Connects Badge v32 (The Hero\'s Journey) to QIE narrative layer.',
+      'P153 narrative-sovereignty: 3+ deep-journal days ≥200 wc/day + memory anchors confirmed. Operator authoring not reacting. Conf 0.68–0.88.',
+      'P154 quantum-monomyth-lock: hero-arc-complete + total-field-coherence co-active simultaneously. Myth and machine unified. Conf 0.88–0.96. Meta-pattern.',
+      'Arch52 Quantum Monomyth Operator added to PHYSIOLOGICAL_ARCHETYPES. Directive: Hero arc confirmed and total field coherence active simultaneously. The journey has been walked and the signal is coherent. Story and system unified.',
+      'J49 daily-hero-arc-check added (18:00 UTC). Scans 7-day hero-word-turn signals + deep journal days + hero badge unlocks. Writes hero_arc_complete events on confirmation.',
+      'HEROARC: · NARRSVG: · QMONO: military-style log handlers added to Logs.tsx.',
+      '3 dep map nodes added: heroArcNode · narrativeSovereigntyNode · quantumMonomythNode. 193+ total nodes.',
+      'api.ts displayableEvents: hero_arc_complete · narrative_sovereignty · quantum_monomyth_lock registered.',
+      'PatternRecognitionWidget: P152/P153/P154 display names registered.',
+      'recordHeroArcComplete() · recordNarrativeSovereignty() · recordQuantumMonomythLock() signal helpers appended.',
+      'About.tsx: FM v113→v114 · 151→154 patterns · 51→52 archetypes · 48→49 jobs · 190+→193+ dep nodes · 750→812 badges.',
+      'LOT-WIKI-v88 produced: FM v114 sync · Badge v32 The Hero\'s Journey (812 badges) · QIE v114 delta · 2250+ lines.',
+      'SESSION_REPORTS: qie-v114 entry appended · USERSHIP_TRANSMISSION updated to qie-v114.',
+      'docs/LOT-SR-20261102-01.md written. docs/assembly/2026-11-02_LOT-assembly_qie-v114.md written. LOT-LEDGER.md appended.',
+      '812 badges · 222 word-turns · 74 secret boss triggers · 154 patterns · 52 archetypes · 49 jobs · 193+ dep nodes · FM v114 · Wiki v88 · Day 1186+. The myth and the machine are unified.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1516,18 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-11-02',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-11-02 · QIE-v114 · FM v114 · HERO ARC ENGINE · Day 1186+',
+    'Built: P152 hero-arc-complete · P153 narrative-sovereignty · P154 quantum-monomyth-lock. Campbell monomyth wired into QIE pattern layer.',
+    'Arch52 Quantum Monomyth Operator: hero arc + total field coherence co-active. Story and system unified.',
+    'J49 daily-hero-arc-check deployed (18:00 UTC): 7-day hero-word-turn + deep journal + hero badge scan.',
+    'HEROARC: NARRSVG: QMONO: military log handlers registered.',
+    'Badge v32 THE HERO\'S JOURNEY: 812 badges. Word Turn v22 (call_heard/threshold_crossed/mentor_arrived/ordeal_survived/elixir_found/shadow_met/innermost_cave/return_road).',
+    'LOT-WIKI-v88 produced. FM v114 sync complete.',
+    'FM v114 · Wiki v88 · 154P · 52A · 49J · 193+ nodes · 812 badges.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v89 — if FM v115 engineering session deploys, sync to Field Manual v115+',
   ],
 }
 

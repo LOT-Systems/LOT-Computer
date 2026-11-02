@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'hero-arc-complete':                'Hero arc complete — Hero\'s Journey vocabulary active across journal + badge + log signals in 7-day window (P152)',
+      'narrative-sovereignty':            'Narrative sovereignty — 3+ deep-journal days ≥200 wc/day + memory anchors, authoring not reacting (P153)',
+      'quantum-monomyth-lock':            'Quantum monomyth lock — hero arc + total field coherence co-active, myth and machine unified (P154)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

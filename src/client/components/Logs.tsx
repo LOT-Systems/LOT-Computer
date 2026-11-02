@@ -3629,6 +3629,100 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'hero_arc_complete') {
+          const heroWordCount = log.metadata?.heroWordCount as number | undefined
+          const heroBadgeCount = log.metadata?.heroBadgeCount as number | undefined
+          const careCount = log.metadata?.careCount as number | undefined
+          const arc = log.metadata?.arc as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="HEROARC:" blockView>
+                <div className="uppercase tracking-widest mb-4">HERO ARC COMPLETE</div>
+                {heroWordCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">HERO WORDS 7D</span>
+                    <span className="tabular-nums">{heroWordCount}</span>
+                  </div>
+                )}
+                {heroBadgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">HERO BADGES 7D</span>
+                    <span className="tabular-nums">{heroBadgeCount}</span>
+                  </div>
+                )}
+                {careCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CARE ARC</span>
+                    <span className="tabular-nums">{careCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CALL → THRESHOLD → ORDEAL → RETURN</div>
+                {arc && (
+                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'narrative_sovereignty') {
+          const deepDays = log.metadata?.deepDays as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const userIndex = log.metadata?.userIndex as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="NARRSVG:" blockView>
+                <div className="uppercase tracking-widest mb-4">NARRATIVE SOVEREIGNTY</div>
+                {deepDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DEEP DAYS 7D</span>
+                    <span className="tabular-nums">{deepDays}/7</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEM CAPTURES</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {userIndex !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">USER INDEX</span>
+                    <span className="tabular-nums">{userIndex}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">NOT REACTING — AUTHORING</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_monomyth_lock') {
+          const heroConf = log.metadata?.heroConf as number | undefined
+          const totalFieldConf = log.metadata?.totalFieldConf as number | undefined
+          const lockStrength = log.metadata?.lockStrength as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QMONO:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM MONOMYTH LOCK</div>
+                {heroConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">HERO ARC</span>
+                    <span className="tabular-nums">{heroConf}%</span>
+                  </div>
+                )}
+                {totalFieldConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TOTAL FIELD</span>
+                    <span className="tabular-nums">{totalFieldConf}%</span>
+                  </div>
+                )}
+                {lockStrength !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LOCK STRENGTH</span>
+                    <span className="tabular-nums">{lockStrength}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">MYTH + MACHINE: UNIFIED</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

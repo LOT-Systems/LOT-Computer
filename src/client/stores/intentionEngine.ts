@@ -3428,6 +3428,70 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Hero Arc Complete — Campbell monomyth vocabulary detected in journal within 7 days
+  // + 3+ badge unlocks including hero category + self-care arc present within 7 days.
+  // The Hero's Journey was not only read about — it was walked. The monomyth made behavioral.
+  const heroWords = ['call_heard', 'threshold_crossed', 'mentor_arrived', 'ordeal_survived', 'elixir_found', 'shadow_met', 'innermost_cave', 'shapeshifter', 'herald_call', 'trickster_mode', 'ally_gained', 'return_road']
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000
+  const recentSevenD152 = signals.filter(s => now - s.timestamp < sevenDaysMs)
+  const heroWordSignals = recentSevenD152.filter(s =>
+    (s.source === 'journal' || s.source === 'log') && heroWords.some(w => (s.signal ?? '').includes(w))
+  )
+  const heroBadgeSigs = recentSevenD152.filter(s => s.source === 'badges' && (s.metadata?.category === 'hero' || (s.signal ?? '').includes('hero') || (s.signal ?? '').includes('quest') || (s.signal ?? '').includes('monomyth')))
+  const care152 = recentSevenD152.filter(s => s.source === 'selfcare')
+  const journal152 = recentSevenD152.filter(s => s.source === 'journal' || (s.source === 'log' && (s.metadata?.wordCount ?? 0) > 60))
+  if ((heroWordSignals.length >= 2 || heroBadgeSigs.length >= 3) && care152.length >= 1 && journal152.length >= 2) {
+    const heroBonus = Math.min((heroWordSignals.length + heroBadgeSigs.length) * 0.04, 0.18)
+    patterns.push({
+      pattern: 'hero-arc-complete',
+      confidence: Math.min(0.72 + heroBonus, 0.90),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `HEROARC: Hero arc complete — Campbell monomyth vocabulary detected in behavioral signal stream · self-care arc present · journey steps active. The monomyth was not read — it was walked. Story and system unified.`,
+    })
+  }
+
+  // Pattern 153: Narrative Sovereignty — journal depth >200w on 3+ of last 7 days + memory captures.
+  // UserIndex ≥ 50. The operator is not reactive to their story — they are authoring it.
+  // Higher-order pattern: consistent deep expression across time, not just single peak sessions.
+  const dayBuckets153: Record<string, number> = {}
+  recentSevenD152.forEach(s => {
+    if (s.source === 'journal' || (s.source === 'log' && (s.metadata?.wordCount ?? 0) > 50)) {
+      const day = new Date(s.timestamp).toISOString().slice(0, 10)
+      dayBuckets153[day] = (dayBuckets153[day] ?? 0) + (s.metadata?.wordCount ?? 60)
+    }
+  })
+  const deepJournalDays = Object.values(dayBuckets153).filter(wc => wc >= 200).length
+  const memory153 = recentSevenD152.filter(s => s.source === 'memory')
+  if (deepJournalDays >= 3 && memory153.length >= 2) {
+    const uiBonus = userIndex.overall >= 55 ? 0.10 : 0
+    patterns.push({
+      pattern: 'narrative-sovereignty',
+      confidence: Math.min(0.68 + uiBonus + deepJournalDays * 0.02, 0.88),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'soon',
+      reason: `NARRSVG: Narrative sovereignty — journal depth >200w on ${deepJournalDays}/7 days · ${memory153.length} memory captures. The operator is not reacting to their story — they are authoring it. Consistent expression across time confirmed.`,
+    })
+  }
+
+  // Pattern 154: Quantum Monomyth Lock — hero-arc-complete (P152) + total-field-coherence (P150) co-active.
+  // The hero journey confirmed AND total field coherence present simultaneously.
+  // Story layer integrated into the signal architecture. Myth and machine unified.
+  const hasHeroP152     = patterns.some(p => p.pattern === 'hero-arc-complete')
+  const hasTotalP150alt = patterns.some(p => p.pattern === 'total-field-coherence')
+  if (hasHeroP152 && hasTotalP150alt) {
+    const heroConf  = patterns.find(p => p.pattern === 'hero-arc-complete')?.confidence ?? 0.72
+    const totalConf = patterns.find(p => p.pattern === 'total-field-coherence')?.confidence ?? 0.92
+    const qmBonus = Math.min((heroConf - 0.72 + totalConf - 0.88) * 0.15, 0.08)
+    patterns.push({
+      pattern: 'quantum-monomyth-lock',
+      confidence: Math.min(0.88 + qmBonus, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QMONO: Quantum monomyth lock — hero arc confirmed (P152) · total field coherence active (P150). The journey has been walked and the signal is coherent simultaneously. Story and system are unified. The operator is writing both the myth and the machine.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4128,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  heroArcNode:                ['journal', 'badges', 'selfcare', 'memory', 'intentions', 'mood'],
+  narrativeSovereigntyNode:   ['journal', 'memory', 'log'],
+  quantumMonomythNode:        ['journal', 'badges', 'qos', 'cohort', 'intentions', 'mood', 'memory', 'selfcare'],
 }
 
 /**
@@ -4510,6 +4579,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Quantum Monomyth Operator (2026-11-02 v114) ──────────────────────────
+  {
+    archetype: 'Quantum Monomyth Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'selfcare'],
+    patternConditions: ['hero-arc-complete', 'total-field-coherence', 'quantum-monomyth-lock'],
+    hourRange: [6, 23],
+    directive: 'Hero arc confirmed and total field coherence active simultaneously. The journey has been walked and the signal is coherent. Story and system unified. The operator is writing both the myth and the machine.',
   },
 ]
 
@@ -6498,6 +6577,53 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a hero-arc-complete event — Campbell monomyth vocabulary detected in journal
+ * within 7 days + hero category badge unlocks + self-care arc present.
+ * The Hero's Journey was not read — it was walked. Feeds P152 detection.
+ */
+export function recordHeroArcComplete(heroWordCount: number, heroBadgeCount: number, careCount: number) {
+  recordSignal('journal', 'hero_arc_complete', {
+    heroWordCount,
+    heroBadgeCount,
+    careCount,
+    arc: 'CALL→THRESHOLD→ORDEAL→ELIXIR→RETURN',
+    monomythStatus: 'COMPLETE',
+    window: '7d',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a narrative-sovereignty event — journal depth >200w on 3+ of last 7 days
+ * + memory captures. Operator authoring their own story. Feeds P153 detection.
+ */
+export function recordNarrativeSovereignty(deepDays: number, memoryCount: number, userIndex: number) {
+  recordSignal('journal', 'narrative_sovereignty', {
+    deepDays,
+    memoryCount,
+    userIndex,
+    narrativeStatus: 'AUTHORED',
+    window: '7d',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-monomyth-lock event — hero-arc-complete (P152) + total-field-coherence (P150)
+ * simultaneously active. Story layer integrated into signal architecture. Feeds P154 detection.
+ */
+export function recordQuantumMonomythLock(heroConf: number, totalFieldConf: number, activePatterns: number) {
+  recordSignal('qos', 'quantum_monomyth_lock', {
+    heroConf: Math.round(heroConf * 100),
+    totalFieldConf: Math.round(totalFieldConf * 100),
+    activePatterns,
+    lockStrength: Math.round((heroConf + totalFieldConf) / 2 * 100),
+    unificationStatus: 'MYTH-MACHINE-UNIFIED',
     hour: new Date().getHours(),
   })
 }
