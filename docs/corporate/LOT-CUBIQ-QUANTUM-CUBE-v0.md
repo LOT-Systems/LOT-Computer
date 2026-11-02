@@ -321,6 +321,20 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE QUIET ALARM                              2026-11-02
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: shares a bedroom; CUBIQ pad on the nightstand; phone
+  charged in another room.
+
+  At the wake window the cube performs THE NUDGE — a sub-threshold
+  tremor felt through the nightstand, not heard, no light. It repeats
+  with long gaps and stops when the IMU detects a touch. If the operator
+  is still asleep after the escalation period, the cube performs THE HOP
+  in place. THE LEAP is never used on a nightstand; the edge gate is the
+  condition that makes this use case permissible. The partner is not
+  woken. Risks: edge (OI-3), noise (OI-4), pets (OI-5). Full write-up and
+  budget: docs/corporate/LOT-CUBIQ-DEV-REPORT-2026-11-02.md.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
