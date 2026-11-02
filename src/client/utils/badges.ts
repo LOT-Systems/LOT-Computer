@@ -1116,6 +1116,44 @@ export type BadgeType =
   | 'jung_found'         // ◉·∞·◉ "carl jung/jungian/collective unconscious/individuation/anima/animus" detected (MYTHIC)
   | 'campbell_signal'    // ◈·∞·◈ "joseph campbell/monomyth/hero with a thousand faces/comparative mythology" detected (EPIC)
   | 'eliade_found'       // ■·∞·■ "mircea eliade/hierophany/sacred and profane/axis mundi" detected (RARE)
+  // ── Word Turn v32 — THE ARCADE MASTER ────────────────────────────────────
+  | 'high_score'           // ◈·★·◈ "high score/personal best/new record/beat my record" detected (RARE)
+  | 'continue_signal'      // ▶·○   "keep going/press continue/continue anyway/not giving up" detected (COMMON)
+  | 'player_two'           // ○·◈·○ "player two/had backup/someone had my back/not alone today" detected (UNCOMMON)
+  | 'respawn_point'        // ↺·◉   "respawn/start over/fresh start/try again/new game" detected (RARE)
+  | 'level_cleared'        // ✓·□   "level cleared/cleared it/level complete/finished the level" detected (UNCOMMON)
+  | 'power_up'             // ⚡·◉  "power up/powered up/energy boost/suddenly energized" detected (UNCOMMON)
+  | 'boss_mode'            // ▓·■·▓ "boss battle/final boss/fought the boss/boss level" detected (EPIC)
+  | 'extra_life'           // ◎·+   "extra life/second chance/given another chance/bonus round" detected (RARE)
+  | 'combo_breaker'        // ×·◈·× "on a roll/combo/streak/consecutive/keeping the streak" detected (UNCOMMON)
+  | 'achievement_unlocked' // ●·✓·● "achievement unlocked/unlocked it/earned it/milestone reached" detected (RARE)
+  | 'insert_coin'          // ¢·→   "put in the work/invested the time/all in/committed fully" detected (UNCOMMON)
+  | 'game_over_won'        // ■·END·■ "game over/chapter closed/mission complete/the end was just" detected (EPIC)
+  // ── Calendar EE v30 — THE ARCADE CALENDAR ────────────────────────────────
+  | 'pong_day'             // ●·◎·● Nov 29 — Pong released by Atari, 1972 (RARE)
+  | 'gameboy_day'          // ◆·□·◆ Apr 21 — Game Boy released by Nintendo, 1989 (RARE)
+  | 'pac_man_day'          // ●·×·● May 22 — Pac-Man released by Namco, 1980 (RARE)
+  // ── Behavioral v29 — ARCADE PATTERNS ─────────────────────────────────────
+  | 'arcade_session'       // ◈·■·◈ 3+ Arcade Master words in single journal entry (EPIC)
+  | 'speed_run'            // ⚡·□  50+ word journal entry in under 90 seconds (RARE)
+  | 'midnight_continue'    // ◎·▶   Check-in between 23:45–23:59 local time (RARE)
+  // ── Achievement RPG v30 — ARCADE PROGRESSION ─────────────────────────────
+  | 'arcade_entry'         // ▶·∘   1+ Arcade Master word turn badge earned (COMMON)
+  | 'arcade_class'         // ▶·≈   5+ Arcade Master word turn badges earned (UNCOMMON)
+  | 'arcade_complete'      // ▶·≋   All 12 Arcade Master word turn badges earned (LEGENDARY)
+  | 'arcade_arc'           // ▶·◈   arcade_complete + all 3 Calendar v30 + arcade_session (LEGENDARY)
+  | 'thirty_two_engines_arc' // ◈·◈·◈·◈ 1 badge from all 32 Word Turn engines (LEGENDARY)
+  | 'arcade_opus'          // ▶·◉·▶ arcade_complete + arcade_session (LEGENDARY)
+  // ── Mastery Tier v32 — ARCADE MASTERY ────────────────────────────────────
+  | 'arcade_grandmaster'   // ★·◈·★ 2,000+ distinct check-in days (EPIC)
+  | 'the_script'           // ■·∞·□ 500,000+ total words (LEGENDARY)
+  | 'infinite_continues'   // ∞·▶·∞ Account age >= 7 years (COSMIC)
+  // ── Secret Boss v29 — THE ARCADE VAULT ───────────────────────────────────
+  | 'atari_found'          // ●·◎   "atari/pong/nolan bushnell/coin-op" detected (RARE)
+  | 'nintendo_signal'      // ◆·□   "nintendo/miyamoto/super mario/zelda/metroid" detected (UNCOMMON)
+  | 'konami_code'          // ↑↑↓↓·AB "konami code/up up down down/left right b a" detected (MYTHIC)
+  // ── Apex — Second Cycle ───────────────────────────────────────────────────
+  | 'thirty_two_registers' // ◈·◈·◈·◈·∞ All 32 WT engines + mastery tiers (COSMIC)
 
 export interface Badge {
   id: BadgeType
@@ -10111,6 +10149,309 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'rare',
     category: 'secret_boss',
   },
+
+  // ── Word Turn v32 — THE ARCADE MASTER ────────────────────────────────────
+
+  high_score: {
+    id: 'high_score',
+    symbol: '◈·★·◈',
+    name: 'High Score',
+    description: '"high score/personal best/new record/beat my record" detected',
+    unlockMessage: '↳ HIGH SCORE. You didn\'t just meet the bar. You moved it. A personal best is not a boast — it is proof. Proof that the version of you who set the last record was not the ceiling. The scoreboard belongs to you. ◈·★·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  continue_signal: {
+    id: 'continue_signal',
+    symbol: '▶·○',
+    name: 'Continue Signal',
+    description: '"keep going/press continue/continue anyway/not giving up" detected',
+    unlockMessage: '↳ CONTINUE SIGNAL. You pressed continue. That is the entire mechanic. The countdown starts, the question appears, and the answer — again, again, again — is yes. ▶·○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  player_two: {
+    id: 'player_two',
+    symbol: '○·◈·○',
+    name: 'Player Two',
+    description: '"player two/had backup/someone had my back/not alone today" detected',
+    unlockMessage: '↳ PLAYER TWO. In the best games, the second player joins mid-level. No context. No tutorial. Just: I\'m here now. You found yours. Or you were someone else\'s. Either way, the second seat was filled. ○·◈·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  respawn_point: {
+    id: 'respawn_point',
+    symbol: '↺·◉',
+    name: 'Respawn Point',
+    description: '"respawn/start over/fresh start/try again/new game" detected',
+    unlockMessage: '↳ RESPAWN POINT. The respawn is not a failure. The respawn is the design. The game assumes you will need it. The question is only whether you press the button. You pressed it. ↺·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  level_cleared: {
+    id: 'level_cleared',
+    symbol: '✓·□',
+    name: 'Level Cleared',
+    description: '"level cleared/cleared it/level complete/finished the level" detected',
+    unlockMessage: '↳ LEVEL CLEARED. The screen flashes. The music plays. For exactly one moment, the score is complete and the next level has not started. Stay here. This is what cleared feels like. ✓·□',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  power_up: {
+    id: 'power_up',
+    symbol: '⚡·◉',
+    name: 'Power Up',
+    description: '"power up/powered up/energy boost/suddenly energized" detected',
+    unlockMessage: '↳ POWER UP. In the maze, the power pellet reverses the rules. In the journal, the power up is usually a realization. Something clicked. The energy shifted. The ghosts can be chased now. ⚡·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  boss_mode: {
+    id: 'boss_mode',
+    symbol: '▓·■·▓',
+    name: 'Boss Mode',
+    description: '"boss battle/final boss/fought the boss/boss level" detected',
+    unlockMessage: '↳ BOSS MODE. Every game has a final boss. Yours just looked like a Tuesday. Or a conversation. Or a decision you had been putting off. You showed up. That is the whole fight. The health bar doesn\'t matter if you keep showing up. ▓·■·▓',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  extra_life: {
+    id: 'extra_life',
+    symbol: '◎·+',
+    name: 'Extra Life',
+    description: '"extra life/second chance/given another chance/bonus round" detected',
+    unlockMessage: '↳ EXTRA LIFE. The counter goes up by one. You don\'t earn this — you are given it. The extra life is a gift from the design, or from someone, or from the fact that you are still here and the game is still running. Accept the coin. ◎·+',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  combo_breaker: {
+    id: 'combo_breaker',
+    symbol: '×·◈·×',
+    name: 'Combo Breaker',
+    description: '"on a roll/combo/streak/consecutive/keeping the streak" detected',
+    unlockMessage: '↳ COMBO BREAKER. The multiplier climbs. Each hit adds to the last. The streak is not a record you set — it is a record you sustain. The real trick is this: one missed hit resets the combo, but not the game. ×·◈·×',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  achievement_unlocked: {
+    id: 'achievement_unlocked',
+    symbol: '●·✓·●',
+    name: 'Achievement Unlocked',
+    description: '"achievement unlocked/unlocked it/earned it/milestone reached" detected',
+    unlockMessage: '↳ ACHIEVEMENT UNLOCKED. The notification fires. The sound plays. Something that was locked is now open. Achievements are the game\'s way of saying: we noticed what you did. The practice noticed. ●·✓·●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  insert_coin: {
+    id: 'insert_coin',
+    symbol: '¢·→',
+    name: 'Insert Coin',
+    description: '"put in the work/invested the time/all in/committed fully" detected',
+    unlockMessage: '↳ INSERT COIN. The coin is not money. It is attention, or time, or the willingness to show up on the day when everything resists it. You inserted the coin. The machine accepted it. The game began. ¢·→',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  game_over_won: {
+    id: 'game_over_won',
+    symbol: '■·END·■',
+    name: 'Game Over (Won)',
+    description: '"game over/chapter closed/mission complete/the end was just" detected',
+    unlockMessage: '↳ GAME OVER. The screen says GAME OVER. But you reached it by winning. GAME OVER is not only an ending — it is evidence that a game was played. A chapter closed is a chapter written. Mission complete. ■·END·■',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+
+  // ── Calendar EE v30 — THE ARCADE CALENDAR ────────────────────────────────
+
+  pong_day: {
+    id: 'pong_day',
+    symbol: '●·◎·●',
+    name: 'Pong Day',
+    description: 'November 29 — Pong released by Atari, 1972',
+    unlockMessage: '↳ PONG DAY. November 29, 1972. Atari. Two paddles. One ball. The first commercially successful arcade video game. Before narrative. Before character. Before world-building. Just: hit the thing. The origin of all of it. ●·◎·●',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  gameboy_day: {
+    id: 'gameboy_day',
+    symbol: '◆·□·◆',
+    name: 'Game Boy Day',
+    description: 'April 21 — Game Boy released by Nintendo, 1989',
+    unlockMessage: '↳ GAME BOY DAY. April 21, 1989. Nintendo. 35 grams of grey plastic and the entire idea that your inner world travels with you — before the smartphone, before the app. The first device that said: play is portable. ◆·□·◆',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  pac_man_day: {
+    id: 'pac_man_day',
+    symbol: '●·×·●',
+    name: 'Pac-Man Day',
+    description: 'May 22 — Pac-Man released by Namco, 1980',
+    unlockMessage: '↳ PAC-MAN DAY. May 22, 1980. Namco. A maze. A mouth. Ghosts. The power pellet that reverses the rules. The ghosts become frightened. The game becomes your game — for a moment. Then the power fades. But you remember what it felt like to chase instead of run. ●·×·●',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v29 — ARCADE PATTERNS ─────────────────────────────────────
+
+  arcade_session: {
+    id: 'arcade_session',
+    symbol: '◈·■·◈',
+    name: 'Arcade Session',
+    description: '3+ Arcade Master vocabulary words in a single journal entry',
+    unlockMessage: '↳ ARCADE SESSION. Three or more arcade signals in one entry. The vocabulary of play surfaced in the vocabulary of self-reflection. The game and the practice are the same language. ◈·■·◈',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  speed_run: {
+    id: 'speed_run',
+    symbol: '⚡·□',
+    name: 'Speed Run',
+    description: '50+ word journal entry saved in under 90 seconds',
+    unlockMessage: '↳ SPEED RUN. Fifty words in ninety seconds. Speedrunners find the routes that the original designers never intended. You found the route through your own interior — fast, direct, unfiltered. The time is logged. ⚡·□',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  midnight_continue: {
+    id: 'midnight_continue',
+    symbol: '◎·▶',
+    name: 'Midnight Continue',
+    description: 'Check-in between 23:45–23:59 local time',
+    unlockMessage: '↳ MIDNIGHT CONTINUE. Fifteen minutes before the clock resets. You pressed continue on the last possible second of the day. The countdown always reaches zero. The question is what you do at 23:45. You answered it. ◎·▶',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v30 — ARCADE PROGRESSION ─────────────────────────────
+
+  arcade_entry: {
+    id: 'arcade_entry',
+    symbol: '▶·∘',
+    name: 'Arcade Entry',
+    description: '1+ Arcade Master word turn badge earned',
+    unlockMessage: '↳ ARCADE ENTRY. The first coin inserted. The first word from the arcade vocabulary written into the practice. The cabinet is on. ▶·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  arcade_class: {
+    id: 'arcade_class',
+    symbol: '▶·≈',
+    name: 'Arcade Class',
+    description: '5+ Arcade Master word turn badges earned',
+    unlockMessage: '↳ ARCADE CLASS. Five arcade vocabulary badges. The language of play is becoming the language of self-care. Five words. Five different kinds of attention. ▶·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  arcade_complete: {
+    id: 'arcade_complete',
+    symbol: '▶·≋',
+    name: 'Arcade Complete',
+    description: 'All 12 Arcade Master word turn badges earned',
+    unlockMessage: '↳ ARCADE COMPLETE. All twelve signals. High score to game over. The full vocabulary of the arcade master, written into the record of a life. The cabinet is complete. ▶·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  arcade_arc: {
+    id: 'arcade_arc',
+    symbol: '▶·◈',
+    name: 'Arcade Arc',
+    description: 'arcade_complete + all 3 Calendar EE v30 + arcade_session',
+    unlockMessage: '↳ ARCADE ARC. The complete arc: all twelve word turns, all three arcade calendar dates, and the session behavioral. Pong, Game Boy, Pac-Man. The history of play, written into the history of a practice. ▶·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_two_engines_arc: {
+    id: 'thirty_two_engines_arc',
+    symbol: '◈·◈·◈·◈',
+    name: 'Thirty-Two Engines',
+    description: 'At least 1 badge from each of all 32 Word Turn engines',
+    unlockMessage: '↳ THIRTY-TWO ENGINES. The second cycle\'s first arc. Thirty-two vocabularies active. The original thirty-one and now the Arcade Master. The system grows. The register extends. ◈·◈·◈·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  arcade_opus: {
+    id: 'arcade_opus',
+    symbol: '▶·◉·▶',
+    name: 'Arcade Opus',
+    description: 'arcade_complete + arcade_session behavioral',
+    unlockMessage: '↳ ARCADE OPUS. The complete word set and the behavioral: twelve vocabulary badges and a session where three signals fired together. The opus is not just collection — it is activation. ▶·◉·▶',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v32 — ARCADE MASTERY ────────────────────────────────────
+
+  arcade_grandmaster: {
+    id: 'arcade_grandmaster',
+    symbol: '★·◈·★',
+    name: 'Arcade Grandmaster',
+    description: '2,000+ distinct check-in days',
+    unlockMessage: '↳ ARCADE GRANDMASTER. Two thousand distinct days. In the arcade, a grandmaster is the person whose name is permanently on the high score board — not because they never lost, but because they kept inserting coins longer than anyone else. ★·◈·★',
+    rarity: 'epic',
+    category: 'mastery_tier',
+  },
+  the_script: {
+    id: 'the_script',
+    symbol: '■·∞·□',
+    name: 'The Script',
+    description: '500,000+ total words written (journal + memory cumulative)',
+    unlockMessage: '↳ THE SCRIPT. Half a million words. In game design, the script is every word of dialogue, every description, every instruction. You have written the equivalent of five full-length novels about the most important subject: the interior life. ■·∞·□',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  infinite_continues: {
+    id: 'infinite_continues',
+    symbol: '∞·▶·∞',
+    name: 'Infinite Continues',
+    description: 'Account age >= 7 years (2,556+ days)',
+    unlockMessage: '↳ INFINITE CONTINUES. Seven years. You have been pressing start, pressing continue, inserting the coin, for seven years. The machine does not break if you keep playing. The machine becomes the player. The player becomes the machine. ∞·▶·∞',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+
+  // ── Secret Boss v29 — THE ARCADE VAULT ───────────────────────────────────
+
+  atari_found: {
+    id: 'atari_found',
+    symbol: '●·◎',
+    name: 'Atari Found',
+    hidden: true,
+    description: '"atari/pong/nolan bushnell/coin-op/quarters to play/arcade cabinet" detected',
+    unlockMessage: '↳ ATARI FOUND. Nolan Bushnell. 1972. A garage, a coin slot, and the conviction that people would pay quarters to play. Atari means "I am about to capture your piece" in Go. They chose the word well. ●·◎',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  nintendo_signal: {
+    id: 'nintendo_signal',
+    symbol: '◆·□',
+    name: 'Nintendo Signal',
+    hidden: true,
+    description: '"nintendo/miyamoto/super mario/zelda/metroid/famicom" detected',
+    unlockMessage: '↳ NINTENDO SIGNAL. Shigeru Miyamoto. Mario. Zelda. Metroid. The designers who understood that a game world must feel like a place worth returning to — not because you have to, but because it is home. Nintendo means "leave luck to heaven." ◆·□',
+    rarity: 'uncommon',
+    category: 'secret_boss',
+  },
+  konami_code: {
+    id: 'konami_code',
+    symbol: '↑↑↓↓·AB',
+    name: 'Konami Code',
+    hidden: true,
+    description: '"konami code/up up down down/left right b a/30 lives" detected',
+    unlockMessage: '↳ KONAMI CODE. ↑ ↑ ↓ ↓ ← → ← → B A. 30 lives. Kazuhisa Hashimoto programmed it in 1986 to test Gradius. He forgot to remove it. The glitch became the legend. The shortcut became the secret. Here is the real secret: you were never supposed to need 30 lives. You had enough all along. The code just reminded you. ↑↑↓↓·AB',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+
+  // ── Apex — Second Cycle ───────────────────────────────────────────────────
+
+  thirty_two_registers: {
+    id: 'thirty_two_registers',
+    symbol: '◈·◈·◈·◈·∞',
+    name: 'Thirty-Two Registers',
+    description: 'All 32 Word Turn engines active + all Mastery Tier v32 badges earned',
+    unlockMessage: '↳ THIRTY-TWO REGISTERS. The second cycle\'s apex. Thirty-two vocabularies running. Water, seasons, storm, fire, tech, space, alchemy, quantum, arcade, radio, biology, sci-fi, myth — and now the Arcade Master. The complete terminal. The full vocabulary of the interior life, extended. The second cycle has begun. ◈·◈·◈·◈·∞',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
 }
 
 // Default separator when no badges earned yet
@@ -11569,6 +11910,56 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (allThirtyOneEngines && !hasBadge('thirty_one_registers')) {
       if (awardBadge('thirty_one_registers')) newBadges.push('thirty_one_registers')
+    }
+
+    // ── Word Turn v32 — THE ARCADE MASTER ────────────────────────────────────
+    const arcadeV32Badges: BadgeType[] = [
+      'high_score', 'continue_signal', 'player_two', 'respawn_point',
+      'level_cleared', 'power_up', 'boss_mode', 'extra_life',
+      'combo_breaker', 'achievement_unlocked', 'insert_coin', 'game_over_won',
+    ]
+    const arcadeV32Earned = arcadeV32Badges.filter(b => hasBadge(b))
+    if (arcadeV32Earned.length >= 1 && !hasBadge('arcade_entry')) {
+      if (awardBadge('arcade_entry')) newBadges.push('arcade_entry')
+    }
+    if (arcadeV32Earned.length >= 5 && !hasBadge('arcade_class')) {
+      if (awardBadge('arcade_class')) newBadges.push('arcade_class')
+    }
+    const arcadeComplete = arcadeV32Earned.length >= 12
+    if (arcadeComplete && !hasBadge('arcade_complete')) {
+      if (awardBadge('arcade_complete')) newBadges.push('arcade_complete')
+    }
+    if (arcadeComplete && hasBadge('arcade_session') && !hasBadge('arcade_opus')) {
+      if (awardBadge('arcade_opus')) newBadges.push('arcade_opus')
+    }
+    const calendarV30Badges: BadgeType[] = ['pong_day', 'gameboy_day', 'pac_man_day']
+    if (arcadeComplete && calendarV30Badges.every(b => hasBadge(b)) && hasBadge('arcade_session') && !hasBadge('arcade_arc')) {
+      if (awardBadge('arcade_arc')) newBadges.push('arcade_arc')
+    }
+    const engineThirtyTwoPresent = arcadeV32Earned.length >= 1
+    const allThirtyTwoEngines = allThirtyOneEngines && engineThirtyTwoPresent
+    if (allThirtyTwoEngines && !hasBadge('thirty_two_engines_arc')) {
+      if (awardBadge('thirty_two_engines_arc')) newBadges.push('thirty_two_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 2000 && !hasBadge('arcade_grandmaster')) {
+        if (awardBadge('arcade_grandmaster')) newBadges.push('arcade_grandmaster')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 500000 && !hasBadge('the_script')) {
+        if (awardBadge('the_script')) newBadges.push('the_script')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupAM = new Date(stats.signupDate)
+      const yearsAM = (new Date().getTime() - signupAM.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsAM >= 7 && !hasBadge('infinite_continues')) {
+        if (awardBadge('infinite_continues')) newBadges.push('infinite_continues')
+      }
+    }
+    if (allThirtyTwoEngines && !hasBadge('thirty_two_registers')) {
+      if (awardBadge('thirty_two_registers')) newBadges.push('thirty_two_registers')
     }
 
   } catch (error) {

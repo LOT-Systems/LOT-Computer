@@ -1021,6 +1021,22 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awardBadge('eliade_day')
     awarded.push('eliade_day')
   }
+  // ── Calendar EE v30 — THE ARCADE CALENDAR ────────────────────────────────
+  // Pong Day: November 29 — Pong released by Atari, 1972
+  if (!hasBadge('pong_day') && month === 11 && day === 29) {
+    awardBadge('pong_day')
+    awarded.push('pong_day')
+  }
+  // Game Boy Day: April 21 — Game Boy released by Nintendo, 1989
+  if (!hasBadge('gameboy_day') && month === 4 && day === 21) {
+    awardBadge('gameboy_day')
+    awarded.push('gameboy_day')
+  }
+  // Pac-Man Day: May 22 — Pac-Man released by Namco, 1980
+  if (!hasBadge('pac_man_day') && month === 5 && day === 22) {
+    awardBadge('pac_man_day')
+    awarded.push('pac_man_day')
+  }
 
   return awarded
 }
@@ -1753,6 +1769,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bcarl[\s-]?jung\b|\bjungian\b|\bcollective[\s-]?unconscious\b|\bindividuation\b|\banima\b|\banimus\b/i,                           badge: 'jung_found' },
   { patterns: /\bjoseph[\s-]?campbell\b|\bmonomyth\b|\bhero[\s-]?with[\s-]?a[\s-]?thousand[\s-]?faces\b|\bcomparative[\s-]?mythology\b/i,        badge: 'campbell_signal' },
   { patterns: /\bmircea[\s-]?eliade\b|\bhierophany\b|\bsacred[\s-]?and[\s-]?profane\b|\baxis[\s-]?mundi\b/i,                                     badge: 'eliade_found' },
+  // ── v32 THE ARCADE MASTER — word turns ────────────────────────────────────
+  { patterns: /\bhigh[\s-]?score\b|\bpersonal[\s-]?best\b|\bnew[\s-]?record\b|\bbeat[\s-]?my[\s-]?record\b|\bbest[\s-]?i'?ve[\s-]?ever[\s-]?done\b/i, badge: 'high_score' },
+  { patterns: /\bkeep[\s-]?going\b|\bpress[\s-]?continue\b|\bcontinue[\s-]?anyway\b|\bnot[\s-]?giving[\s-]?up\b|\bhit[\s-]?continue\b|\bi[\s-]?continued\b/i, badge: 'continue_signal' },
+  { patterns: /\bplayer[\s-]?two\b|\bhad[\s-]?backup\b|\bsomeone[\s-]?had[\s-]?my[\s-]?back\b|\bnot[\s-]?alone[\s-]?today\b|\bmy[\s-]?partner[\s-]?in\b|\bsomeone[\s-]?showed[\s-]?up\b/i, badge: 'player_two' },
+  { patterns: /\brespawn\b|\bfresh[\s-]?start\b|\btry[\s-]?again\b|\breset[\s-]?and[\s-]?begin\b|\bnew[\s-]?game\b|\bstarting[\s-]?over\b|\bstart[\s-]?over\b/i, badge: 'respawn_point' },
+  { patterns: /\blevel[\s-]?cleared\b|\bcleared[\s-]?it\b|\blevel[\s-]?complete\b|\bfinished[\s-]?the[\s-]?level\b|\bmoved[\s-]?to[\s-]?the[\s-]?next[\s-]?level\b|\bstage[\s-]?complete\b/i, badge: 'level_cleared' },
+  { patterns: /\bpower[\s-]?up\b|\bpowered[\s-]?up\b|\benergy[\s-]?boost\b|\bsuddenly[\s-]?energized\b|\bfelt[\s-]?the[\s-]?power\b|\bpowered[\s-]?through\b/i, badge: 'power_up' },
+  { patterns: /\bboss[\s-]?battle\b|\bfinal[\s-]?boss\b|\bfought[\s-]?the[\s-]?boss\b|\bboss[\s-]?level\b|\bthe[\s-]?big[\s-]?one\b|\bultimate[\s-]?challenge\b|\bboss[\s-]?mode\b/i, badge: 'boss_mode' },
+  { patterns: /\bextra[\s-]?life\b|\bsecond[\s-]?chance\b|\bgiven[\s-]?another[\s-]?chance\b|\bbonus[\s-]?round\b|\bone[\s-]?more[\s-]?try\b|\ba[\s-]?reprieve\b|\blife[\s-]?left\b/i, badge: 'extra_life' },
+  { patterns: /\bon[\s-]?a[\s-]?roll\b|\bmy[\s-]?combo\b|\bkeeping[\s-]?the[\s-]?streak\b|\bnot[\s-]?breaking[\s-]?the[\s-]?chain\b|\bconsecutive[\s-]?days\b|\bstreak[\s-]?going\b/i, badge: 'combo_breaker' },
+  { patterns: /\bachievement[\s-]?unlocked\b|\bunlocked[\s-]?it\b|\bi[\s-]?earned[\s-]?it\b|\bmilestone[\s-]?reached\b|\bgot[\s-]?the[\s-]?badge\b|\bunlocked[\s-]?something\b/i, badge: 'achievement_unlocked' },
+  { patterns: /\bput[\s-]?in[\s-]?the[\s-]?work\b|\binvested[\s-]?the[\s-]?time\b|\ball[\s-]?in\b|\bcommitted[\s-]?fully\b|\bcoin[\s-]?inserted\b|\bshowed[\s-]?up[\s-]?anyway\b|\bshowed[\s-]?up[\s-]?for\b/i, badge: 'insert_coin' },
+  { patterns: /\bgame[\s-]?over\b|\bchapter[\s-]?closed\b|\bmission[\s-]?complete\b|\bthe[\s-]?end[\s-]?was[\s-]?just\b|\bfinished[\s-]?the[\s-]?game\b|\bfinal[\s-]?screen\b|\bthat[\s-]?chapter[\s-]?is[\s-]?done\b/i, badge: 'game_over_won' },
+  // ── v32 THE ARCADE VAULT — secret boss word triggers ─────────────────────
+  { patterns: /\batari\b|\bnolan[\s-]?bushnell\b|\bcoin[\s-]?op\b|\bquarters[\s-]?to[\s-]?play\b|\barcade[\s-]?cabinet\b/i,                       badge: 'atari_found' },
+  { patterns: /\bnintendo\b|\bshigeru[\s-]?miyamoto\b|\bsuper[\s-]?mario\b|\blegend[\s-]?of[\s-]?zelda\b|\bmetroid\b|\bfamicom\b|\bsuper[\s-]?famicom\b/i, badge: 'nintendo_signal' },
+  { patterns: /\bkonami[\s-]?code\b|\bup[\s-]?up[\s-]?down[\s-]?down\b|\bleft[\s-]?right[\s-]?b[\s-]?a\b|\b30[\s-]?lives\b|\bkonami\b/i,         badge: 'konami_code' },
 ]
 
 /**
@@ -2155,6 +2188,10 @@ export function runCheckInEasterEggs(
   const dawnRite = checkDawnRite()
   if (dawnRite) awarded.push(dawnRite)
 
+  // v32 Arcade Master: midnight continue (23:45–23:59)
+  const midnightContinue = checkMidnightContinue()
+  if (midnightContinue) awarded.push(midnightContinue)
+
   // Record activity after all checks (so gap detection works next time)
   recordActivity()
 
@@ -2248,6 +2285,12 @@ export function runJournalEasterEggs(journalText: string): BadgeType[] {
   if (theEpic) awarded.push(theEpic)
   const mythVault = checkMythVault(journalText)
   awarded.push(...mythVault)
+
+  // v32 Arcade Master behavioral
+  const arcadeSession = checkArcadeSession(journalText)
+  if (arcadeSession) awarded.push(arcadeSession)
+  const arcadeVault = checkArcadeVault(journalText)
+  awarded.push(...arcadeVault)
 
   // Word turns from journal text
   const wordTurns = detectWordTurns(journalText)
@@ -3775,6 +3818,71 @@ export function checkMythVault(journalText: string): BadgeType[] {
   }
   if (!hasBadge('eliade_found') && /\bmircea[\s-]?eliade\b|\bhierophany\b|\bsacred[\s-]?and[\s-]?profane\b|\baxis[\s-]?mundi\b/i.test(journalText)) {
     if (awardBadge('eliade_found')) awarded.push('eliade_found')
+  }
+  return awarded
+}
+
+// ── v32 THE ARCADE MASTER — Behavioral detection ──────────────────────────────
+
+const ARCADE_WORDS_V32: RegExp[] = [
+  /\bhigh[\s-]?score\b|\bpersonal[\s-]?best\b|\bnew[\s-]?record\b|\bbeat[\s-]?my[\s-]?record\b|\bbest[\s-]?i'?ve[\s-]?ever[\s-]?done\b/i,
+  /\bkeep[\s-]?going\b|\bpress[\s-]?continue\b|\bcontinue[\s-]?anyway\b|\bnot[\s-]?giving[\s-]?up\b|\bhit[\s-]?continue\b/i,
+  /\bplayer[\s-]?two\b|\bhad[\s-]?backup\b|\bsomeone[\s-]?had[\s-]?my[\s-]?back\b|\bnot[\s-]?alone[\s-]?today\b/i,
+  /\brespawn\b|\bfresh[\s-]?start\b|\btry[\s-]?again\b|\breset[\s-]?and[\s-]?begin\b|\bnew[\s-]?game\b|\bstart[\s-]?over\b/i,
+  /\blevel[\s-]?cleared\b|\bcleared[\s-]?it\b|\blevel[\s-]?complete\b|\bfinished[\s-]?the[\s-]?level\b|\bstage[\s-]?complete\b/i,
+  /\bpower[\s-]?up\b|\bpowered[\s-]?up\b|\benergy[\s-]?boost\b|\bsuddenly[\s-]?energized\b|\bfelt[\s-]?the[\s-]?power\b/i,
+  /\bboss[\s-]?battle\b|\bfinal[\s-]?boss\b|\bfought[\s-]?the[\s-]?boss\b|\bboss[\s-]?level\b|\bboss[\s-]?mode\b/i,
+  /\bextra[\s-]?life\b|\bsecond[\s-]?chance\b|\bgiven[\s-]?another[\s-]?chance\b|\bbonus[\s-]?round\b|\bone[\s-]?more[\s-]?try\b/i,
+  /\bon[\s-]?a[\s-]?roll\b|\bmy[\s-]?combo\b|\bkeeping[\s-]?the[\s-]?streak\b|\bnot[\s-]?breaking[\s-]?the[\s-]?chain\b/i,
+  /\bachievement[\s-]?unlocked\b|\bunlocked[\s-]?it\b|\bi[\s-]?earned[\s-]?it\b|\bmilestone[\s-]?reached\b/i,
+  /\bput[\s-]?in[\s-]?the[\s-]?work\b|\binvested[\s-]?the[\s-]?time\b|\ball[\s-]?in\b|\bcommitted[\s-]?fully\b|\bshowed[\s-]?up[\s-]?anyway\b/i,
+  /\bgame[\s-]?over\b|\bchapter[\s-]?closed\b|\bmission[\s-]?complete\b|\bfinished[\s-]?the[\s-]?game\b|\bfinal[\s-]?screen\b/i,
+]
+
+/** Award arcade_session when 3+ Arcade Master words appear in a single journal entry */
+export function checkArcadeSession(journalText: string): BadgeType | null {
+  if (hasBadge('arcade_session')) return null
+  const hits = ARCADE_WORDS_V32.filter(p => p.test(journalText)).length
+  if (hits >= 3) {
+    if (awardBadge('arcade_session')) return 'arcade_session'
+  }
+  return null
+}
+
+/** Award speed_run when 50+ words are submitted in under 90 seconds */
+export function checkSpeedRun(journalText: string, elapsedMs: number): BadgeType | null {
+  if (hasBadge('speed_run')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 50 && elapsedMs <= 90000) {
+    if (awardBadge('speed_run')) return 'speed_run'
+  }
+  return null
+}
+
+/** Award midnight_continue when checking in between 23:45–23:59 local time */
+export function checkMidnightContinue(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('midnight_continue')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  const min = now.getMinutes()
+  if (hour === 23 && min >= 45) {
+    if (awardBadge('midnight_continue')) return 'midnight_continue'
+  }
+  return null
+}
+
+/** Award Arcade Vault secret boss badges from journal text */
+export function checkArcadeVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  if (!hasBadge('atari_found') && /\batari\b|\bnolan[\s-]?bushnell\b|\bcoin[\s-]?op\b|\bquarters[\s-]?to[\s-]?play\b|\barcade[\s-]?cabinet\b/i.test(journalText)) {
+    if (awardBadge('atari_found')) awarded.push('atari_found')
+  }
+  if (!hasBadge('nintendo_signal') && /\bnintendo\b|\bshigeru[\s-]?miyamoto\b|\bsuper[\s-]?mario\b|\blegend[\s-]?of[\s-]?zelda\b|\bmetroid\b|\bfamicom\b|\bsuper[\s-]?famicom\b/i.test(journalText)) {
+    if (awardBadge('nintendo_signal')) awarded.push('nintendo_signal')
+  }
+  if (!hasBadge('konami_code') && /\bkonami[\s-]?code\b|\bup[\s-]?up[\s-]?down[\s-]?down\b|\bleft[\s-]?right[\s-]?b[\s-]?a\b|\b30[\s-]?lives\b|\bkonami\b/i.test(journalText)) {
+    if (awardBadge('konami_code')) awarded.push('konami_code')
   }
   return awarded
 }
