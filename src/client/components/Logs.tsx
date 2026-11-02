@@ -14,6 +14,7 @@ import { useLogs, useUpdateLog } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
+import { buildSystemHelp, parseStoryPeriod, stripStoryCommand } from '#shared/utils/logCommands'
 import { Log, LogSettingsChangeMetadata } from '#shared/types'
 import { cn } from '#client/utils'
 import { atom, map } from 'nanostores'
@@ -3706,6 +3707,7 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyMeta, setStoryMeta] = React.useState<string | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3742,6 +3744,7 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryMeta(data.period ? `${data.period.toUpperCase()}${data.arcade ? ' · ' + data.arcade : ''}` : null)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -4121,48 +4124,31 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(buildSystemHelp())
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
+          // /story fires the moment the word is complete, before the user can
+          // type a period ("/story week"). Wait briefly, then read the final
+          // text from the ref so the period argument is honoured.
+          window.setTimeout(() => {
+            const text = valueRef.current
+            const period = parseStoryPeriod(text)
+            const logText = stripStoryCommand(text)
+            try {
+              submitStory({
+                logText,
+                period,
+                quantumState: getUserState(),
+                userIndex: getUserIndex(),
+              })
+            } catch {
+              submitStory({ logText, period })
+            }
+          }, 1500)
         }
       }
     }
@@ -4419,6 +4405,9 @@ const NoteEditor = ({
             <Block label="📖" blockView>
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
+              )}
+              {storyMeta && (
+                <div className="opacity-40 mb-2" style={{ fontSize: '11px', letterSpacing: '0.08em' }}>{storyMeta}</div>
               )}
               {storyResponse && (
                 <div className="opacity-60">

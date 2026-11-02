@@ -18,6 +18,7 @@ import {
 } from '#shared/types'
 import config from '#server/config'
 import { fp } from '#shared/utils'
+import { STORY_PERIOD_DAYS, computeArcade, computeStreakDays, formatArcadeLine, type StoryPeriod } from '#shared/utils/logCommands'
 import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
@@ -5490,6 +5491,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: StoryPeriod
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,16 +5516,42 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const period: StoryPeriod =
+        req.body.period && req.body.period in STORY_PERIOD_DAYS ? req.body.period : 'day'
+      const windowDays = STORY_PERIOD_DAYS[period]
+      const since = dayjs().subtract(windowDays, 'day').toDate()
+      const CHECKIN_EVENTS = ['emotional_checkin', 'energy_checkin', 'self_care_checkin', 'memory_answer']
 
+      // Window = the requested period. Streak needs up to a year of history,
+      // so dates are fetched separately (attributes: createdAt only).
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: { userId: req.user.id, createdAt: { [Op.gte]: since } },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 1000,
       })
+      const streakRows = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: ['log_entry', 'journal', ...CHECKIN_EVENTS],
+          createdAt: { [Op.gte]: dayjs().subtract(365, 'day').toDate() },
+        },
+        attributes: ['createdAt'],
+        order: [['createdAt', 'DESC']],
+        limit: 5000,
+      })
+      const arcade = formatArcadeLine(
+        computeArcade({
+          entries: logs.filter(l => l.event === 'log_entry' || l.event === 'journal').length,
+          checkIns: logs.filter(l => CHECKIN_EVENTS.includes(l.event as string)).length,
+          streakDays: computeStreakDays(streakRows.map(r => r.createdAt as Date)),
+        })
+      )
+      const entryCap = period === 'day' ? 10 : period === 'week' ? 20 : 30
 
       const recentEntries = logs
         .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
+        
+        .slice(0, entryCap)
         .map(l => (l.text || '').substring(0, 200))
         .filter(Boolean)
 
@@ -5549,7 +5577,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story for the last ${period.toUpperCase()} (${windowDays} day${windowDays > 1 ? 's' : ''}). Your task: compress that period into 1-2 paragraphs (100-200 words) that reflect their journey, mood trajectory, and self-care patterns. Surface the most intimate high and the most intimate low of the period if the data shows them. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
@@ -5560,17 +5588,20 @@ RULES:
 - The tone should match their current energy: reflective if low, energized if high
 - End with a single forward-looking sentence — not a pep talk, just a quiet truth
 - Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Keep it under 200 words.
+- Do not invent events, numbers or names that are not in the data. If the window holds little data, say so briefly instead of padding.`
 
       const dataBlock = `
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
+PERIOD: ${period} · RECORDS IN WINDOW: ${logs.length}
+ARCADE: ${arcade}
 
 RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
 
 RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
+${recentEntries.slice(0, entryCap).map(e => `- ${e}`).join('\n') || '- (none)'}
 
 SELF-CARE DATA:
 ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
@@ -5596,6 +5627,9 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            period,
+            arcade,
+            recordsInWindow: logs.length,
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5604,6 +5638,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          period,
+          arcade,
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
