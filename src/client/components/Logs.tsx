@@ -22,7 +22,8 @@ import {
   USER_SETTING_NAMES,
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
-import { toCelsius } from '#shared/utils'
+import { toCelsius, hasEmailCommand } from '#shared/utils'
+import { EmailCommandBlock } from '#client/components/EmailCommandBlock'
 import {
   playKeyClick,
   playSynthActivationChime,
@@ -4139,6 +4140,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email       Email a member: /email to Name. Message',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4380,6 +4382,7 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        {hasEmailCommand(value) && <EmailCommandBlock text={value} />}
         {physResult && (
           <div className="mt-8">
             <Block label="PHYS:" blockView>
