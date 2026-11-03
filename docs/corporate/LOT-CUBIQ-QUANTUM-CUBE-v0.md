@@ -321,6 +321,17 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE ENTANGLED PAIR                          2026-11-03
+  ─────────────────────────────────────────────────────────────────
+  Two linked operators (a daughter and her mother, "quantum
+  entanglements" per LOT-CUBIQ-VISION.md) each own a CUBIQ™. When one
+  completes a session and chooses to share, the other's cube performs
+  THE SETTLE or THE NUDGE; on a shared rare badge, THE LEAP. Only
+  "session completed / badge tier" crosses — no text, no location, no
+  reply expected. A presence signal that cannot be scrolled or left
+  unread. Full write-up, guardrails and the physics/architecture errata
+  that accompany this cycle: LOT-CUBIQ-QUANTUM-CUBE-v0.2-REPORT.md.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
