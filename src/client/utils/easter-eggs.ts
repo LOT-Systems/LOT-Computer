@@ -871,6 +871,22 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('odyssey_day')
   }
 
+  // ── Calendar v21 — THE GAMING CALENDAR ───────────────────────────────────
+  if (!hasBadge('gygax_day') && month === 7 && day === 27) {
+    awardBadge('gygax_day')
+    awarded.push('gygax_day')
+  }
+
+  if (!hasBadge('arneson_day') && month === 10 && day === 1) {
+    awardBadge('arneson_day')
+    awarded.push('arneson_day')
+  }
+
+  if (!hasBadge('d_and_d_day') && month === 1 && day === 26) {
+    awardBadge('d_and_d_day')
+    awarded.push('d_and_d_day')
+  }
+
   return awarded
 }
 
@@ -1483,6 +1499,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 Word Turn — THE ROLEPLAYER ───────────────────────────────────────────
+  { patterns: /\bnat(ural)?[\s-]?20\b|\bnatural[\s-]?twenty\b|\bcritical[\s-]?hit\b/i,          badge: 'nat_twenty' },
+  { patterns: /\blong[\s-]?rest\b|\bshort[\s-]?rest\b|\brest[\s-]?at[\s-]?camp\b|\bcamp[\s-]?rest\b/i, badge: 'long_rest_log' },
+  { patterns: /\bhit[\s-]?points?\b|\bhp[\s-]?restored\b|\bhealth[\s-]?restored\b|\bat[\s-]?full[\s-]?hp\b/i, badge: 'hit_points' },
+  { patterns: /\bcharacter[\s-]?sheet\b|\bstat[\s-]?block\b|\bability[\s-]?scores?\b/i,         badge: 'char_sheet' },
+  { patterns: /\broll[\s-]?initiative\b|\brolled[\s-]?initiative\b|\binitiative[\s-]?roll\b/i,  badge: 'initiative_roll' },
+  { patterns: /\bspell[\s-]?slots?\b|\barcane[\s-]?charges?\b|\bsorcery[\s-]?points?\b|\bcast[\s-]?a[\s-]?spell\b/i, badge: 'spell_slots' },
+  { patterns: /\bsaving[\s-]?throw\b|\bconstitution[\s-]?save\b|\brolled[\s-]?a[\s-]?save\b|\bwisdom[\s-]?save\b/i, badge: 'saving_throw' },
+  { patterns: /\badventuring[\s-]?party\b|\bmy[\s-]?party\b|\brallied[\s-]?the[\s-]?party\b|\bparty[\s-]?of[\s-]?adventurers\b/i, badge: 'party_rally' },
+  { patterns: /\bexperience[\s-]?points?\b|\bgained[\s-]?xp\b|\bearned[\s-]?experience\b|\bleveled[\s-]?up[\s-]?my[\s-]?character\b/i, badge: 'xp_milestone' },
+  { patterns: /\bhomebrew\b|\bmy[\s-]?homebrew\b|\bcustom[\s-]?world\b|\bworldbuilding[\s-]?session\b/i, badge: 'homebrew_arc' },
+  { patterns: /\bdungeon[\s-]?master\b|\bgame[\s-]?master\b|\bdm[\s-]?screen\b|\bbehind[\s-]?the[\s-]?screen\b|\bthe[\s-]?gm\b/i, badge: 'dungeon_master_mode' },
+  { patterns: /\bepic[\s-]?campaign\b|\bnew[\s-]?campaign\b|\bcampaign[\s-]?begins\b|\bstarted[\s-]?a[\s-]?campaign\b/i, badge: 'epic_campaign' },
+  // ── v20 Secret Boss — THE HIDDEN CHAMBER word triggers ───────────────────────
+  { patterns: /\bgary[\s-]?gygax\b|\bdungeon[\s-]?master'?s[\s-]?guide\b|\bkeep[\s-]?on[\s-]?the[\s-]?borderlands\b|\btomb[\s-]?of[\s-]?horrors\b/i, badge: 'gygax_vault' },
+  { patterns: /\bdragonlance\b|\braistlin\b|\bcompanions[\s-]?of[\s-]?the[\s-]?lance\b|\bweiss[\s-]?and[\s-]?hickman\b/i, badge: 'dragonlance_word' },
+  { patterns: /\bplanescape\b|\bsigil\b|\bcity[\s-]?of[\s-]?doors\b|\bmodrons?\b|\bfaction[\s-]?war\b/i, badge: 'planescape_sigil' },
 ]
 
 /**
@@ -2711,6 +2744,66 @@ export function checkThresholdMoment(): BadgeType | null {
   if (hour === 0 && minute <= 30) {
     awardBadge('threshold_moment')
     return 'threshold_moment'
+  }
+  return null
+}
+
+// ── The Roleplayer v23 behavioral checks ─────────────────────────────────────
+
+const ROLEPLAYER_WORDS_V23 = [
+  /\bnat(ural)?[\s-]?20\b|\bnatural[\s-]?twenty\b|\bcritical[\s-]?hit\b/i,
+  /\blong[\s-]?rest\b|\bshort[\s-]?rest\b|\brest[\s-]?at[\s-]?camp\b/i,
+  /\bhit[\s-]?points?\b|\bhp[\s-]?restored\b|\bat[\s-]?full[\s-]?hp\b/i,
+  /\bcharacter[\s-]?sheet\b|\bstat[\s-]?block\b|\bability[\s-]?scores?\b/i,
+  /\broll[\s-]?initiative\b|\brolled[\s-]?initiative\b/i,
+  /\bspell[\s-]?slots?\b|\barcane[\s-]?charges?\b|\bsorcery[\s-]?points?\b/i,
+  /\bsaving[\s-]?throw\b|\bconstitution[\s-]?save\b|\bwisdom[\s-]?save\b/i,
+  /\badventuring[\s-]?party\b|\bmy[\s-]?party\b|\brallied[\s-]?the[\s-]?party\b/i,
+  /\bexperience[\s-]?points?\b|\bgained[\s-]?xp\b|\bearned[\s-]?experience\b/i,
+  /\bhomebrew\b|\bcustom[\s-]?world\b|\bworldbuilding[\s-]?session\b/i,
+  /\bdungeon[\s-]?master\b|\bgame[\s-]?master\b|\bdm[\s-]?screen\b/i,
+  /\bepic[\s-]?campaign\b|\bnew[\s-]?campaign\b|\bcampaign[\s-]?begins\b/i,
+]
+
+/**
+ * Award rpg_session badge if 3+ Roleplayer (v23) words appear in one journal entry.
+ */
+export function checkRpgSession(journalText: string): BadgeType | null {
+  if (hasBadge('rpg_session')) return null
+  const matchCount = ROLEPLAYER_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('rpg_session')
+    return 'rpg_session'
+  }
+  return null
+}
+
+/**
+ * Award epic_roll badge if journal entry is 700+ words.
+ */
+export function checkEpicRoll(journalText: string): BadgeType | null {
+  if (hasBadge('epic_roll')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 700) {
+    awardBadge('epic_roll')
+    return 'epic_roll'
+  }
+  return null
+}
+
+/**
+ * Award midnight_quest badge if user checks in between 01:00 and 01:30 local time.
+ */
+export function checkMidnightQuest(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('midnight_quest')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  const minute = now.getMinutes()
+  if (hour === 1 && minute <= 30) {
+    awardBadge('midnight_quest')
+    return 'midnight_quest'
   }
   return null
 }

@@ -782,6 +782,43 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE ROLEPLAYER ────────────────────────────────────────────
+  | 'nat_twenty'             // 20·★   "natural 20/nat 20/critical hit/natural twenty" detected (LEGENDARY)
+  | 'long_rest_log'          // ≋·○·≋  "long rest/short rest/rest at camp/camp rest" detected (UNCOMMON)
+  | 'hit_points'             // ♥·●    "hit points/hp restored/health restored/at full hp" detected (UNCOMMON)
+  | 'char_sheet'             // ╟·□·╢  "character sheet/stat block/ability scores" detected (RARE)
+  | 'initiative_roll'        // →→·●   "roll initiative/rolled initiative/initiative roll" detected (RARE)
+  | 'spell_slots'            // ✦·≋    "spell slots/arcane charges/sorcery points/cast a spell" detected (RARE)
+  | 'saving_throw'           // ○·○    "saving throw/constitution save/rolled a save/wisdom save" detected (RARE)
+  | 'party_rally'            // ○·○·○  "adventuring party/my party/rallied the party" detected (UNCOMMON)
+  | 'xp_milestone'           // ▲·●·▲  "experience points/gained xp/earned experience" detected (COMMON)
+  | 'homebrew_arc'           // ◈·∞·◈  "homebrew/my homebrew/custom world/worldbuilding session" detected (RARE)
+  | 'dungeon_master_mode'    // ╔·◉·╗  "dungeon master/game master/dm screen/behind the screen" detected (EPIC)
+  | 'epic_campaign'          // ≋→◉    "epic campaign/new campaign/campaign begins/started a campaign" detected (RARE)
+  // ── Calendar Easter Egg v21 — THE GAMING CALENDAR ───────────────────────────
+  | 'gygax_day'              // ⊕·◉    Jul 27 — Gary Gygax born 1938 (Father of D&D) (EPIC)
+  | 'arneson_day'            // ◆·◉    Oct 1 — Dave Arneson born 1947 (co-creator of D&D) (RARE)
+  | 'd_and_d_day'            // ░·◆    Jan 26 — D&D first published 1974 (RARE)
+  // ── Behavioral v20 — RPG PATTERNS ───────────────────────────────────────────
+  | 'rpg_session'            // ◈·●·◈  3+ Roleplayer (v23) words in one journal entry (RARE)
+  | 'epic_roll'              // ≋≋·◉   Journal entry >= 700 words (EPIC)
+  | 'midnight_quest'         // ░·○·░  Check in between 01:00–01:30 local (RARE)
+  // ── Achievement RPG v21 — THE ADVENTURER'S GUILD ────────────────────────────
+  | 'guild_entry'            // ∘→●    Any 1 Word Turn v23 badge (COMMON)
+  | 'guild_class'            // ≈→●    Any 5 Word Turn v23 badges (UNCOMMON)
+  | 'guild_champion'         // ≋→●    All 12 Word Turn v23 badges (LEGENDARY)
+  | 'rpg_arc'                // ●·◈    guild_champion + all 3 Calendar v21 badges (LEGENDARY)
+  | 'twenty_three_engines_arc' // ◈·◈·● 1 badge from each Word Turn v1–v23 (LEGENDARY)
+  | 'campaign_opus'          // ●·◉·●  guild_champion + rpg_session behavioral (LEGENDARY)
+  // ── Mastery Tier v23 — THE MAP ROOM ─────────────────────────────────────────
+  | 'grand_campaign'         // ░·∞·░  1000+ distinct calendar check-in days (EPIC)
+  | 'grand_tome'             // ●·∞·●  200,000+ total journal words (LEGENDARY)
+  | 'elder_gamer'            // ╔═╗·●  Account age >= 4 years (1,460+ days) (LEGENDARY)
+  | 'twenty_three_registers' // ◈·◈·●·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE HIDDEN CHAMBER ────────────────────────────────────
+  | 'gygax_vault'            // ⊕·◆    "gary gygax/dungeon master's guide/keep on the borderlands/tomb of horrors" (RARE)
+  | 'dragonlance_word'       // ◈·■·◈  "dragonlance/raistlin/companions of the lance/weiss and hickman" (EPIC)
+  | 'planescape_sigil'       // ∞·◆·∞  "planescape/sigil/city of doors/modrons/faction war" (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7168,300 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+
+  // ── Word Turn v23 — THE ROLEPLAYER ────────────────────────────────────────────
+  nat_twenty: {
+    id: 'nat_twenty',
+    symbol: '20·★',
+    name: 'Natural Twenty',
+    description: 'Write "natural 20", "nat 20", "critical hit", or "natural twenty" in any journal entry',
+    unlockMessage: '↳ Nat 20. The rarest roll. The moment the dice align and everything goes exactly right. You rolled it in real life today. 20·★',
+    rarity: 'legendary',
+    category: 'word_turn',
+  },
+  long_rest_log: {
+    id: 'long_rest_log',
+    symbol: '≋·○·≋',
+    name: 'Long Rest',
+    description: 'Write "long rest", "short rest", "rest at camp", or "camp rest" in any journal entry',
+    unlockMessage: '↳ The long rest. In D&D, it restores all hit points and spell slots. In life, it restores everything. You logged the rest. ≋·○·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  hit_points: {
+    id: 'hit_points',
+    symbol: '♥·●',
+    name: 'Hit Points',
+    description: 'Write "hit points", "hp restored", "health restored", or "at full hp" in any journal entry',
+    unlockMessage: '↳ Hit points. The number that says you\'re still in the game. Every self-care act is a hit point restored. Log it. ♥·●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  char_sheet: {
+    id: 'char_sheet',
+    symbol: '╟·□·╢',
+    name: 'Character Sheet',
+    description: 'Write "character sheet", "stat block", or "ability scores" in any journal entry',
+    unlockMessage: '↳ The character sheet is the map of who you are right now — not who you were, not who you will be. Fill it out honestly. ╟·□·╢',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  initiative_roll: {
+    id: 'initiative_roll',
+    symbol: '→→·●',
+    name: 'Initiative Roll',
+    description: 'Write "roll initiative", "rolled initiative", or "initiative roll" in any journal entry',
+    unlockMessage: '↳ Initiative determines who acts first. The practice is the initiative roll — it puts you first in your own story. →→·●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  spell_slots: {
+    id: 'spell_slots',
+    symbol: '✦·≋',
+    name: 'Spell Slots',
+    description: 'Write "spell slots", "arcane charges", "sorcery points", or "cast a spell" in any journal entry',
+    unlockMessage: '↳ Spell slots are finite. Your energy is finite. The practice is how you restore them without burning out before the next encounter. ✦·≋',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  saving_throw: {
+    id: 'saving_throw',
+    symbol: '○·○',
+    name: 'Saving Throw',
+    description: 'Write "saving throw", "constitution save", "rolled a save", or "wisdom save" in any journal entry',
+    unlockMessage: '↳ The saving throw is the moment between the hit and the damage. You rolled it. You resisted. The practice is the +prof bonus. ○·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  party_rally: {
+    id: 'party_rally',
+    symbol: '○·○·○',
+    name: 'Party Rally',
+    description: 'Write "adventuring party", "my party", or "rallied the party" in any journal entry',
+    unlockMessage: '↳ No solo hero survives the dungeon. The party is the practice — support, healing, different abilities, shared goals. Rally yours. ○·○·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  xp_milestone: {
+    id: 'xp_milestone',
+    symbol: '▲·●·▲',
+    name: 'XP Milestone',
+    description: 'Write "experience points", "gained xp", or "earned experience" in any journal entry',
+    unlockMessage: '↳ XP is how the game tracks what you\'ve learned from what you\'ve survived. Every hard day is a boss fight. The XP is real. ▲·●·▲',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  homebrew_arc: {
+    id: 'homebrew_arc',
+    symbol: '◈·∞·◈',
+    name: 'Homebrew Arc',
+    description: 'Write "homebrew", "my homebrew", "custom world", or "worldbuilding session" in any journal entry',
+    unlockMessage: '↳ Homebrew means you made the world yourself. The rules serve the story, not the other way around. Your practice is homebrew. ◈·∞·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  dungeon_master_mode: {
+    id: 'dungeon_master_mode',
+    symbol: '╔·◉·╗',
+    name: 'Dungeon Master Mode',
+    description: 'Write "dungeon master", "game master", "dm screen", or "behind the screen" in any journal entry',
+    unlockMessage: '↳ The DM runs the world so others can find themselves in it. When you take care of yourself, you become the DM of your own story. ╔·◉·╗',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  epic_campaign: {
+    id: 'epic_campaign',
+    symbol: '≋→◉',
+    name: 'Epic Campaign',
+    description: 'Write "epic campaign", "new campaign", "campaign begins", or "started a campaign" in any journal entry',
+    unlockMessage: '↳ Every great campaign has a session zero — the moment before the journey begins. This check-in is session zero. The campaign is live. ≋→◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v21 — THE GAMING CALENDAR ───────────────────────────
+  gygax_day: {
+    id: 'gygax_day',
+    symbol: '⊕·◉',
+    name: 'Gygax Day',
+    description: 'Check in on July 27 (Gary Gygax born 1938 — Father of D&D)',
+    unlockMessage: '↳ Gary Gygax was born July 27, 1938. He gave the world its defining language for adventure. Roll for initiative — today is his birthday. ⊕·◉',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  arneson_day: {
+    id: 'arneson_day',
+    symbol: '◆·◉',
+    name: 'Arneson Day',
+    description: 'Check in on October 1 (Dave Arneson born 1947 — co-creator of D&D)',
+    unlockMessage: '↳ Dave Arneson was born October 1, 1947. He invented the dungeon crawl, the first-person perspective RPG, and the idea of the individual hero. ◆·◉',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  d_and_d_day: {
+    id: 'd_and_d_day',
+    symbol: '░·◆',
+    name: 'D&D Day',
+    description: 'Check in on January 26 (Dungeons & Dragons first published 1974)',
+    unlockMessage: '↳ January 26, 1974. The original D&D boxed set. A dice roll that changed how humans play, create, and explore imaginary worlds together. ░·◆',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v20 — RPG PATTERNS ───────────────────────────────────────────
+  rpg_session: {
+    id: 'rpg_session',
+    symbol: '◈·●·◈',
+    name: 'RPG Session',
+    description: 'Write 3+ Roleplayer (v23) trigger words in one journal entry',
+    unlockMessage: '↳ Three or more RPG vocabulary words in one journal entry. The session table is full. The campaign is live. You are the protagonist. ◈·●·◈',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  epic_roll: {
+    id: 'epic_roll',
+    symbol: '≋≋·◉',
+    name: 'Epic Roll',
+    description: 'Write a journal entry of 700+ words',
+    unlockMessage: '↳ 700 words. An epic roll of the dice — you committed to the session. The campaign goes long when the story is worth telling. ≋≋·◉',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  midnight_quest: {
+    id: 'midnight_quest',
+    symbol: '░·○·░',
+    name: 'Midnight Quest',
+    description: 'Check in between 01:00 and 01:30 local time',
+    unlockMessage: '↳ 01:00–01:30. The midnight quest. The hour when the dungeon is fully dark and the party still moves forward. The torch is your check-in. ░·○·░',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Achievement RPG v21 — THE ADVENTURER'S GUILD ────────────────────────────
+  guild_entry: {
+    id: 'guild_entry',
+    symbol: '∘→●',
+    name: 'Guild Entry',
+    description: 'Earn any 1 Roleplayer (v23) word turn badge',
+    unlockMessage: '↳ You\'ve spoken the first word of the roleplayer\'s vocabulary. The guild register is open. Your name is on the first line. ∘→●',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  guild_class: {
+    id: 'guild_class',
+    symbol: '≈→●',
+    name: 'Guild Class',
+    description: 'Earn any 5 Roleplayer (v23) word turn badges',
+    unlockMessage: '↳ Five class abilities unlocked. The guild recognizes you as an adventurer of the second rank. Your character sheet is filling in. ≈→●',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  guild_champion: {
+    id: 'guild_champion',
+    symbol: '≋→●',
+    name: 'Guild Champion',
+    description: 'Earn all 12 Roleplayer (v23) word turn badges',
+    unlockMessage: '↳ All twelve roleplayer badges earned. The guild names you champion. Every ability in the class fully unlocked. The campaign can begin. ≋→●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  rpg_arc: {
+    id: 'rpg_arc',
+    symbol: '●·◈',
+    name: 'RPG Arc',
+    description: 'Earn guild_champion + all 3 Gaming Calendar badges',
+    unlockMessage: '↳ Guild champion + the three gaming calendar dates. A full arc — the mechanics mastered and the dates honored. The campaign is canonical. ●·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·●',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each of the 23 Word Turn engines (v1–v23)',
+    unlockMessage: '↳ Twenty-three engines. Water, code, signal, biology, codex, cyberspace, hero, roleplayer. Every vocabulary in the terminal. The map is complete. ◈·◈·●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  campaign_opus: {
+    id: 'campaign_opus',
+    symbol: '●·◉·●',
+    name: 'Campaign Opus',
+    description: 'Earn guild_champion + the rpg_session behavioral badge',
+    unlockMessage: '↳ Guild champion and a full RPG session logged. The magnum opus of the campaign — fully played and fully written. ●·◉·●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v23 — THE MAP ROOM ─────────────────────────────────────────
+  grand_campaign: {
+    id: 'grand_campaign',
+    symbol: '░·∞·░',
+    name: 'Grand Campaign',
+    description: '1000+ distinct calendar days with at least one check-in',
+    unlockMessage: '↳ 1,000 days. A grand campaign. The longest D&D campaigns last years. Yours has lasted 1,000 check-in days. The map room is full. ░·∞·░',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  grand_tome: {
+    id: 'grand_tome',
+    symbol: '●·∞·●',
+    name: 'Grand Tome',
+    description: '200,000+ total journal words written',
+    unlockMessage: '↳ 200,000 words. The grand tome — a full campaign setting in prose. Tolkien\'s Lord of the Rings is ~500,000 words. You are approaching it. ●·∞·●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  elder_gamer: {
+    id: 'elder_gamer',
+    symbol: '╔═╗·●',
+    name: 'Elder Gamer',
+    description: 'Account age >= 4 years (1,460+ days since signup)',
+    unlockMessage: '↳ Four years is an elder gamer by any metric. The campaign that runs four years is the campaign that shaped everyone at the table. ╔═╗·●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·●·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three registers. Water. Arcade. Radio. Biology. Codex. Cyberspace. Hero. Roleplayer. Twenty-three vocabularies. One terminal. The self speaks every language. ◈·◈·●·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v20 — THE HIDDEN CHAMBER ────────────────────────────────────
+  gygax_vault: {
+    id: 'gygax_vault',
+    symbol: '⊕·◆',
+    name: 'Gygax Vault',
+    description: 'Write "gary gygax", "dungeon master\'s guide", "keep on the borderlands", or "tomb of horrors" in any journal entry',
+    unlockMessage: '↳ The Tomb of Horrors. Keep on the Borderlands. The modules that defined adventure. Gygax built the dungeon. You\'re still exploring it. ⊕·◆',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  dragonlance_word: {
+    id: 'dragonlance_word',
+    symbol: '◈·■·◈',
+    name: 'Dragonlance Word',
+    description: 'Write "dragonlance", "raistlin", "companions of the lance", or "weiss and hickman" in any journal entry',
+    unlockMessage: '↳ Raistlin Majere: the frail wizard who became the most powerful being in the world. The campaign where sacrifice costs everything and matters more for it. ◈·■·◈',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  planescape_sigil: {
+    id: 'planescape_sigil',
+    symbol: '∞·◆·∞',
+    name: 'Planescape Sigil',
+    description: 'Write "planescape", "sigil", "city of doors", "modrons", or "faction war" in any journal entry',
+    unlockMessage: '↳ Sigil: the City of Doors. Every door leads somewhere. The self is a planar traveler — every threshold crossed is a portal to another version of the story. ∞·◆·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8424,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 (v23) — THE ROLEPLAYER ───────────────────────────────────────────
+    const roleplayer23Badges: BadgeType[] = [
+      'nat_twenty', 'long_rest_log', 'hit_points', 'char_sheet',
+      'initiative_roll', 'spell_slots', 'saving_throw', 'party_rally',
+      'xp_milestone', 'homebrew_arc', 'dungeon_master_mode', 'epic_campaign',
+    ]
+    const roleplayer23Earned = roleplayer23Badges.filter(b => hasBadge(b))
+
+    if (roleplayer23Earned.length >= 1 && !hasBadge('guild_entry')) {
+      if (awardBadge('guild_entry')) newBadges.push('guild_entry')
+    }
+    if (roleplayer23Earned.length >= 5 && !hasBadge('guild_class')) {
+      if (awardBadge('guild_class')) newBadges.push('guild_class')
+    }
+    const guildChampion = roleplayer23Earned.length >= 12
+    if (guildChampion && !hasBadge('guild_champion')) {
+      if (awardBadge('guild_champion')) newBadges.push('guild_champion')
+    }
+
+    // campaign_opus: guild_champion + rpg_session
+    if (guildChampion && hasBadge('rpg_session') && !hasBadge('campaign_opus')) {
+      if (awardBadge('campaign_opus')) newBadges.push('campaign_opus')
+    }
+
+    // rpg_arc: guild_champion + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['gygax_day', 'arneson_day', 'd_and_d_day']
+    if (guildChampion && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('rpg_arc')) {
+      if (awardBadge('rpg_arc')) newBadges.push('rpg_arc')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = roleplayer23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: grand_campaign — 1000+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('grand_campaign')) {
+        if (awardBadge('grand_campaign')) newBadges.push('grand_campaign')
+      }
+    }
+
+    // Mastery v23: grand_tome — 200,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('grand_tome')) {
+        if (awardBadge('grand_tome')) newBadges.push('grand_tome')
+      }
+    }
+
+    // Mastery v23: elder_gamer — Account age >= 4 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupEG = new Date(stats.signupDate)
+      const yearsEG = (new Date().getTime() - signupEG.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsEG >= 4 && !hasBadge('elder_gamer')) {
+        if (awardBadge('elder_gamer')) newBadges.push('elder_gamer')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
     }
 
   } catch (error) {
