@@ -17,6 +17,7 @@ type Routes = {
   adminUsers: void
   adminUser: 'userId'
   logs: void
+  basics: void
   dm: 'userId'
 }
 
@@ -29,6 +30,7 @@ export const router = createRouter<Routes>({
   adminUsers: '/us',
   adminUser: '/us/:userId',
   logs: '/log',
+  basics: '/basics',
   dm: '/dm/:userId',
 })
 
