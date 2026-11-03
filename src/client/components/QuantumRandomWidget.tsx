@@ -9,6 +9,14 @@
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { isRouteActive } from '#client/stores'
+
+/**
+ * Off-screen gate — the 1s countdown ticks re-render this widget and, on each
+ * rollover, write a QIE signal (JSON persist of the signal buffer). Skip all of
+ * it while the browser tab is hidden or another in-app tab is in front.
+ */
+const isDormant = () => document.hidden || !isRouteActive('system')
 
 /**
  * QuantumRandomWidget - Real-time quantum-random number generator.
@@ -37,6 +45,7 @@ function useQuantumNumber() {
 
   React.useEffect(() => {
     const iv = setInterval(() => {
+      if (isDormant()) return
       setRemaining((prev) => {
         if (prev <= 1) {
           const next = quantumRandom(0, 99)
@@ -63,6 +72,7 @@ export function QuantumRandomWidget() {
 
   React.useEffect(() => {
     const iv = setInterval(() => {
+      if (isDormant()) return
       setShowPair(Math.random() < 0.5)
     }, 10000)
     return () => clearInterval(iv)

@@ -7,6 +7,7 @@
  */
 
 import * as React from 'react'
+import axios from 'axios'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import {
@@ -30,6 +31,7 @@ import { UserTag } from '#shared/types'
 import { TimeWidget } from './TimeWidget'
 import { QuantumRandomWidget } from './QuantumRandomWidget'
 import { MemoryWidget } from './MemoryWidget'
+import { flushWidgetUsageReport } from '#client/utils/widgetTelemetry'
 import { RecipeWidget } from './RecipeWidget'
 import { MonthlyPulseWidget } from './MonthlyPulseWidget'
 import { EmotionalCheckIn } from './EmotionalCheckIn'
@@ -397,6 +399,24 @@ export const System = React.memo(function SystemInner() {
   React.useEffect(() => {
     checkRecipeWidget()
     checkPlannerWidget()
+  }, [])
+
+  // Widget usage ledger → Log (SITREP style), at most once per 24h. Deferred
+  // 20s past mount so it never competes with first paint or data loading;
+  // the latest weather / users-online are read through a ref at fire time.
+  const sitrepCtx = React.useRef<{ weather: any; usersOnline: number }>({ weather: null, usersOnline: 0 })
+  sitrepCtx.current = {
+    weather: weather ? { description: weather.description, temperature: typeof weather.tempKelvin === 'number' ? weather.tempKelvin - 273.15 : undefined } : null,
+    usersOnline,
+  }
+  React.useEffect(() => {
+    const t = setTimeout(() => {
+      flushWidgetUsageReport(
+        (body) => axios.post('/api/logs', body),
+        { ...sitrepCtx.current, source: 'system' }
+      )
+    }, 20_000)
+    return () => clearTimeout(t)
   }, [])
 
   // Sound is now managed globally in app.tsx via useSound hook

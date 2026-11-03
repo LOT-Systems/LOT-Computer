@@ -1098,6 +1098,8 @@ export default async (fastify: FastifyInstance) => {
       'user_login', 'user_logout', 'theme_change', 'weather_update',
       // Recipe + benchmark
       'recipe_viewed', 'benchmark_read',
+      // Widget usage ledger (daily SITREP-style report from the System tab)
+      'widget_usage_report',
       // QOS signature + operator pattern events
       'qos_signature_lock', 'operator_signature',
       // Integration arc + adaptive resonance + community coherence (v60)

@@ -1845,6 +1845,25 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'widget_usage_report') {
+          const m = (log.metadata || {}) as Record<string, any>
+          if (!m.widgets) return null
+          const top = (m.top as Array<{ name: string; taps: number }> | undefined) || []
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="WGT-RPT:" blockView>
+                <div className="uppercase tracking-widest">
+                  {m.widgets} UP · {m.faults || 0} FAULT · {m.slow || 0} SLOW · {m.taps || 0} TAP
+                </div>
+                {!!top.length && (
+                  <div className="opacity-60 uppercase">
+                    TOP {top.map((t) => `${t.name} ${t.taps}`).join(' · ')}
+                  </div>
+                )}
+                {!!m.sitrep && <div className="opacity-40">{m.sitrep}</div>}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'theme_change') {
           const theme = log.metadata?.theme as string | undefined
           if (!theme) return null
