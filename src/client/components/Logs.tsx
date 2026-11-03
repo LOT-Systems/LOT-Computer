@@ -29,6 +29,7 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { parseStoryPeriod, parseSystemFilter, renderSystemHelp } from '#client/utils/logCommands'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3707,6 +3708,11 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [storyMeta, setStoryMeta] = React.useState<{
+    period: string
+    arcade?: { xp: number; level: number; rank: string; nextRank: string | null; xpToNext: number; streak: number }
+    spikes?: { kind: string; detail: string }[]
+  } | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3742,6 +3748,7 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryMeta({ period: data.period || 'week', arcade: data.arcade, spikes: data.spikes })
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -3932,6 +3939,17 @@ const NoteEditor = ({
   // editing around an existing trigger doesn't re-fire it.
   // --------------------------------------------------------------------
   const lastTriggerScanRef = React.useRef(log.text || '')
+  const deferredTimersRef = React.useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+  const storyLoadingRef = React.useRef(false)
+  storyLoadingRef.current = storyLoading
+  const scheduleDeferred = (key: string, fn: () => void) => {
+    clearTimeout(deferredTimersRef.current[key])
+    deferredTimersRef.current[key] = setTimeout(fn, 900)
+  }
+  React.useEffect(() => () => {
+    Object.values(deferredTimersRef.current).forEach(clearTimeout)
+  }, [])
+
   React.useEffect(() => {
     const fresh = detectNewTriggers(value, lastTriggerScanRef.current)
     lastTriggerScanRef.current = value
@@ -4121,49 +4139,28 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        // Deferred so "/system ai" can finish typing before the filter is read.
+        scheduleDeferred('system-help', () => {
+          setSystemHelp(renderSystemHelp(parseSystemFilter(valueRef.current)))
+        })
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
+        // Deferred so "/story month" can finish typing before the period is read.
+        scheduleDeferred('story-mode', () => {
+          if (storyLoadingRef.current) return
+          const text = valueRef.current
+          const period = parseStoryPeriod(text)
           setStoryLoading(true)
           setStoryResponse(null)
+          setStoryMeta(null)
+          const logText = text.replace(/\/story(\s+(day|week|month|year))?/i, '').replace(/📖/g, '').trim()
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
+            submitStory({ logText, period, quantumState: getUserState(), userIndex: getUserIndex() })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText, period })
           }
-        }
+        })
       }
     }
   }, [value])
@@ -4399,7 +4396,7 @@ const NoteEditor = ({
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                        <span style={{ minWidth: '210px', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )
@@ -4425,6 +4422,18 @@ const NoteEditor = ({
                   {storyResponse.split('\n').map((line, idx) => (
                     <div key={idx}>{line || <br />}</div>
                   ))}
+                  {storyMeta?.arcade && (
+                    <div className="mt-4 opacity-60" style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                      {[
+                        storyMeta.period.toUpperCase(),
+                        `${storyMeta.arcade.rank} · LV ${storyMeta.arcade.level}`,
+                        `${storyMeta.arcade.xp} XP`,
+                        storyMeta.arcade.streak > 0 ? `STREAK ${storyMeta.arcade.streak}D` : null,
+                        storyMeta.arcade.nextRank ? `${storyMeta.arcade.xpToNext} TO ${storyMeta.arcade.nextRank}` : 'TOP RANK',
+                        ...(storyMeta.spikes || []).map(sp => sp.kind.replace('-', ' ').toUpperCase()),
+                      ].filter(Boolean).join('  ·  ')}
+                    </div>
+                  )}
                 </div>
               )}
             </Block>
