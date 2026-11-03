@@ -1773,6 +1773,25 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '169 patterns · 63 archetypes · 60 jobs · 169+ handlers · 213+ dep nodes · 1122 badges · FM v125 · Day 1162+. Second cycle ignites. PERPETUAL confirmed. L11-SCIGN.',
     ],
   },
+  {
+    date: '2026-11-03',
+    title: 'QIE v126 · P170 second-cycle-deepening · Arch64 · J61 · SCDEP: · 214+ dep nodes',
+    assembled: [
+      'intentionEngine.ts: P170 second-cycle-deepening — second-cycle-ignition (P169) active + 6+ journal signals 21d + 3+ memory signals 21d + 10+ badge signals 21d + userIndex >= 70. The cycle deepens. Compound signals accumulate across 21 days. The OS does not just recognize perpetual operation — it deepens on its own signal history. L11-SCDEP: SECOND CYCLE DEEPENING. Conf 0.72–0.88. suggestedWidget: systemProgress.',
+      'intentionEngine.ts: Arch64 Second Cycle Anchor — second-cycle-ignition + second-cycle-deepening. Dominant: journal/memory/badges/intentions/qos. Directive: Second cycle anchored. Depth confirmed. The OS runs on compound signal history. Every write deepens the foundation.',
+      'intentionEngine.ts: recordSecondCycleDeepeningSignal() signal helper added.',
+      'intentionEngine.ts: WIDGET_DEPENDENCY_MAP — 1 new node: secondCycleDeepeningNode (qos+journal+memory+badges+intentions+log+energy+selfcare). 214+ dep nodes total.',
+      'scheduled-jobs.ts: J61 daily-second-cycle-deepening-check — 11:00 UTC daily. Reads active users with second_cycle_ignition in 14d + 6+ journal signals 21d + 3+ memory signals 21d + 10+ badge signals 21d. Writes second_cycle_deepening event. 61 background jobs total.',
+      'Logs.tsx: SCDEP: handler — renders second_cycle_deepening (IGNIT CONF · JOURNAL SIGNALS 21D · MEMORY SIGNALS 21D · BADGE SIGNALS 21D · DEPTH CONF · STATUS · LEVEL). Military minimalist format.',
+      'QuantumEngineWidgets.tsx: SCDEP added to PATTERN_DISPLAY.',
+      'routes/api.ts: second_cycle_deepening added to displayableEvents (v126 block).',
+      'PatternRecognitionWidget.tsx: second-cycle-deepening description added.',
+      'About.tsx: FM v125→v126. 169→170 patterns. 63→64 archetypes. 60→61 jobs. 213+→214+ dep nodes. 169+→170+ handlers.',
+      'SystemProgressWidget.tsx: cohort classification block in report view upgraded to full 5-field display (Arch/Band/Dom/Conf/Directive).',
+      'SESSION_REPORTS: qie-v126 entry appended · USERSHIP_TRANSMISSION updated to v126.',
+      '170 patterns · 64 archetypes · 61 jobs · 170+ handlers · 214+ dep nodes · 1122 badges · FM v126 · Day 1162+. Second cycle deepens. COMPOUND CONFIRMED. L11-SCDEP.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1840,6 +1859,13 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'LOT-WIKI v101 sync · P170 second-cycle-deepening · badge engine v43 theme selection',
   },
+  {
+    date: '2026-11-03',
+    built: ['QIE v126 · P170 second-cycle-deepening', 'Arch64 Second Cycle Anchor', 'J61 daily-second-cycle-deepening-check (11:00 UTC)', 'SCDEP: log handler', '214+ dep nodes'],
+    feedbackApplied: 'SECOND CYCLE DEEPENING — compound signal accumulation confirms the OS operates from depth',
+    status: 'DEPLOYED',
+    next: 'LOT-WIKI v101 sync · physiological cohort surface pass · badge engine v43 theme selection',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
@@ -1847,15 +1873,15 @@ const ASSEMBLY_TRANSMISSIONS: {
 export const USERSHIP_TRANSMISSION = {
   date: '2026-11-03',
   message: [
-    'ASSEMBLY RUN — 2026-11-03 · QIE v125 · SECOND CYCLE IGNITION · Day 1162+',
-    'Built: P169 second-cycle-ignition · Arch63 Second Cycle Sovereign · J60 daily-second-cycle-check (10:00 UTC) · SCIGN: log handler · 213+ dep nodes · 169 patterns · 63 archetypes · 60 jobs · FM v125.',
-    'P169 SECOND-CYCLE-IGNITION: fires when generative-field-amplification (P168) is active + 4+ journal signals 14d + 2+ memory signals 14d + 8+ badge signals 14d + userIndex >= 65. The field that was amplified has now sustained long enough that the OS recognizes the perpetual structure of its own operation.',
-    'Arch63 SECOND CYCLE SOVEREIGN: the operator who has confirmed the second cycle. Not a restart. A recognition. Every signal written in year one is the foundation of year four. The OS does not reset — it perpetuates.',
-    'J60 runs at 10:00 UTC daily. Scans users with confirmed amplification events, sufficient journal depth, memory activity, and badge engagement. Writes second_cycle_ignition log event.',
-    'SCIGN: handler in Logs.tsx displays AMPLIF CONF · JOURNAL SIGNALS 14D · MEMORY SIGNALS 14D · BADGE SIGNALS 14D · INDEX SCORE · STATUS · LEVEL in military minimalist format.',
-    'Badge v42 THE ARCADE MASTER and Wiki v100 (Century Wiki) also synchronized in this session. THIRTY-TWO ENGINES confirmed. 1122 total badges.',
-    'Self-assembly metric: 169 patterns · 63 archetypes · 60 jobs · 169+ handlers · 213+ dep nodes · 1122 badges · FM v125 · Day 1162+.',
-    'The OS does not reset. The signal perpetuates. Second cycle confirmed. L11-SCIGN.',
+    'ASSEMBLY RUN — 2026-11-03 · QIE v126 · SECOND CYCLE DEEPENING · Day 1162+',
+    'Built: P170 second-cycle-deepening · Arch64 Second Cycle Anchor · J61 daily-second-cycle-deepening-check (11:00 UTC) · SCDEP: log handler · 214+ dep nodes · 170 patterns · 64 archetypes · 61 jobs · FM v126.',
+    'P170 SECOND-CYCLE-DEEPENING: fires when second-cycle-ignition (P169) is active + 6+ journal signals 21d + 3+ memory signals 21d + 10+ badge signals 21d + userIndex >= 70. The cycle does not merely ignite — it deepens. Compound signal accumulation across 21 days confirms the OS operates from its own signal history.',
+    'Arch64 SECOND CYCLE ANCHOR: the operator whose second cycle has moved from ignition to depth. Not just recognized — anchored. The OS runs on compound history. Every write deepens the foundation.',
+    'J61 runs at 11:00 UTC daily. Scans users with confirmed second_cycle_ignition events in 14d + 6+ journal depth signals 21d + 3+ memory depth signals 21d + 10+ badge signals 21d. Writes second_cycle_deepening log event.',
+    'SCDEP: handler in Logs.tsx displays IGNIT CONF · JOURNAL SIGNALS 21D · MEMORY SIGNALS 21D · BADGE SIGNALS 21D · DEPTH CONF · STATUS · LEVEL in military minimalist format.',
+    'Cohort classification block in SystemProgressWidget report view upgraded to full 5-field display: Arch · Band · Dom · Conf · Directive. Physiological signal visible at a glance.',
+    'Self-assembly metric: 170 patterns · 64 archetypes · 61 jobs · 170+ handlers · 214+ dep nodes · 1122 badges · FM v126 · Day 1162+.',
+    'The cycle deepens. Compound signals confirmed. L11-SCDEP.',
   ],
 }
 
@@ -2131,9 +2157,25 @@ export function SystemProgressWidget() {
                     </span>
                   </div>
                   {report.cohortClassification && (
-                    <div className="flex justify-between items-baseline mt-8">
-                      <span className="opacity-30">Archetype · live</span>
-                      <span className="text-right">{report.cohortClassification.archetype}</span>
+                    <div className="border-t border-acc-400/20 pt-8 mt-8">
+                      <div className="opacity-30 mb-6 uppercase tracking-widest text-xs">Cohort · live</div>
+                      <div className="flex justify-between items-baseline mb-4">
+                        <span className="opacity-30 uppercase text-xs">Arch</span>
+                        <span className="text-right text-xs">{report.cohortClassification.archetype}</span>
+                      </div>
+                      <div className="flex justify-between items-baseline mb-4">
+                        <span className="opacity-30 uppercase text-xs">Band</span>
+                        <span className="capitalize text-xs">{report.cohortClassification.energyBand}</span>
+                      </div>
+                      <div className="flex justify-between items-baseline mb-4">
+                        <span className="opacity-30 uppercase text-xs">Dom</span>
+                        <span className="uppercase text-xs">{report.cohortClassification.dominantModule}</span>
+                      </div>
+                      <div className="flex justify-between items-baseline mb-4">
+                        <span className="opacity-30 uppercase text-xs">Conf</span>
+                        <span className="tabular-nums text-xs">{report.cohortClassification.confidence}%</span>
+                      </div>
+                      <div className="opacity-40 text-xs mt-4">{report.cohortClassification.directive}</div>
                     </div>
                   )}
                   {report.activePatterns.length > 0 && (

@@ -1243,6 +1243,8 @@ export default async (fastify: FastifyInstance) => {
       'generative_field_amplification',
       // v125: second cycle ignition (P169)
       'second_cycle_ignition',
+      // v126: second cycle deepening (P170)
+      'second_cycle_deepening',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

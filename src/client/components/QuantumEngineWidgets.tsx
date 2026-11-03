@@ -126,6 +126,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'generative-field-reception':        'GFRES',
   'generative-field-amplification':        'GFAMP',
   'second-cycle-ignition':                 'SCIGN',
+  'second-cycle-deepening':               'SCDEP',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

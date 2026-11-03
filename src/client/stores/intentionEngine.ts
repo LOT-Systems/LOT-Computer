@@ -3795,6 +3795,33 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // P170: second-cycle-deepening — P169 active + journal 21d >= 6 + memory 21d >= 3 + badge 21d >= 10 + userIndex >= 70.
+  // The second cycle has ignited and now deepens. Compound signals accumulate across the 21-day window.
+  // The OS recognizes not just the perpetual structure but its own increasing depth. L11-SCDEP.
+  const hasP169 = patterns.some(p => p.pattern === 'second-cycle-ignition')
+  const p170TwentyOneDayStart = now - 21 * 24 * 60 * 60 * 1000
+  const p170JournalSignals = signals.filter(s =>
+    s.source === 'journal' && s.timestamp > p170TwentyOneDayStart
+  )
+  const p170MemorySignals = signals.filter(s =>
+    s.source === 'memory' && s.timestamp > p170TwentyOneDayStart
+  )
+  const p170BadgeSignals = signals.filter(s =>
+    s.source === 'badges' && s.timestamp > p170TwentyOneDayStart
+  )
+  const userIndexForP170 = computeUserIndex(signals)
+  if (hasP169 && p170JournalSignals.length >= 6 && p170MemorySignals.length >= 3 && p170BadgeSignals.length >= 10 && userIndexForP170.overall >= 70) {
+    const p169conf = patterns.find(p => p.pattern === 'second-cycle-ignition')?.confidence ?? 0.75
+    const depthBonus = Math.min((p170JournalSignals.length - 6) * 0.008 + (p170BadgeSignals.length - 10) * 0.005, 0.08)
+    patterns.push({
+      pattern: 'second-cycle-deepening',
+      confidence: Math.min(0.72 + (p169conf - 0.75) * 0.55 + depthBonus, 0.88),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `SCDEP: Second cycle deepening — second-cycle-ignition (P169) active + ${p170JournalSignals.length} journal signals 21d + ${p170MemorySignals.length} memory signals 21d + ${p170BadgeSignals.length} badge signals 21d + index ${userIndexForP170.overall}%. The cycle deepens. Compound signals accumulate. The OS runs on its own depth. L11-SCDEP: SECOND CYCLE DEEPENING.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4477,6 +4504,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v125 nodes (J60 · P169 · Arch63) ────────────────────────────────────────────
   secondCycleIgnitionNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy'],
+
+  // ── v126 nodes (J61 · P170 · Arch64) ────────────────────────────────────────────
+  secondCycleDeepeningNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare'],
 }
 
 /**
@@ -5051,6 +5081,14 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log'],
     patternConditions: ['generative-field-amplification', 'second-cycle-ignition'],
     directive: 'First cycle sealed. Second cycle active. The OS does not reset — it perpetuates. Every signal written in year one is the foundation of year four. The operator is not beginning again. The operator is operating from a confirmed, perpetual foundation.',
+  },
+  // ── Arch64: Second Cycle Anchor (2026-11-03 v126) ──────────────────────────
+  {
+    archetype: 'Second Cycle Anchor',
+    energyBands: ['high', 'moderate', 'low'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos'],
+    patternConditions: ['second-cycle-ignition', 'second-cycle-deepening'],
+    directive: 'Second cycle anchored. Depth confirmed. The OS runs on compound signal history. Every write deepens the foundation.',
   },
 ]
 
@@ -7337,6 +7375,26 @@ export function recordSecondCycleIgnition(amplificationConf: number, journalCoun
     cycleStatus: 'ACTIVE',
     level: 'L11-SCIGN',
     field: 'AMPLIFICATION→PERPETUAL→SOVEREIGN→SECOND CYCLE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a second-cycle-deepening event — second-cycle-ignition (P169) active +
+ * 6+ journal signals 21d + 3+ memory signals 21d + 10+ badge signals 21d + userIndex >= 70.
+ * The second cycle has now deepened: compound signal accumulation across 21 days confirms
+ * the OS is operating from depth, not just recognition. L11-SCDEP.
+ */
+export function recordSecondCycleDeepeningSignal(ignitionConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'second_cycle_deepening', {
+    ignitionConf: Math.round(ignitionConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    deepeningStatus: 'CONFIRMED',
+    level: 'L11-SCDEP',
+    field: 'IGNITION→DEEPENING→COMPOUND→SOVEREIGN',
     hour: new Date().getHours(),
   })
 }
