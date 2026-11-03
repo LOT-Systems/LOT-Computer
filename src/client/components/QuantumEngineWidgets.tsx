@@ -125,6 +125,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'quantum-knowledge-broadcast':       'BCAST',
   'generative-field-reception':        'GFRES',
   'generative-field-amplification':        'GFAMP',
+  'second-cycle-ignition':                 'SCIGN',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

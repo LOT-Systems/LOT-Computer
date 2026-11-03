@@ -1736,6 +1736,43 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '168 patterns · 62 archetypes · 59 jobs · 168+ handlers · 212+ dep nodes · 1091 badges · FM v124 · Day 1160+. The myth engine fires. THIRTY-ONE ENGINES. L9-AMPLIFY holds.',
     ],
   },
+  {
+    version: 'badge-v42',
+    date: '2026-11-02',
+    title: 'Badge v42 — THE ARCADE MASTER · +31 badges · Total 1122 · SECOND CYCLE BEGINS',
+    assembled: [
+      'Badge Engine v42: THE ARCADE MASTER — 31 new badges covering retro arcade culture, speedrunning, and classic gaming vocabulary. SECOND CYCLE opens.',
+      'Word Turn v32: 12 vocabulary triggers (high_score · continue_signal · player_two · respawn_point · level_cleared · power_up · boss_mode · extra_life · combo_breaker · achievement_unlocked · insert_coin · game_over_won). Fires via detectWordTurns().',
+      'Calendar EE v30: pong_day (Nov 29) · gameboy_day (Apr 21) · pac_man_day (May 22). checkArcadeCalendar() wired.',
+      'Behavioral v29: arcade_session (3+ arcade words in journal) · speed_run (400+ word journal) · midnight_continue (check-in after 00:30).',
+      'Achievement RPG v30: arcade_entry → arcade_class → arcade_complete · arcade_arc · thirty_two_engines_arc · arcade_opus.',
+      'Mastery Tier v32: arcade_grandmaster (1000+ days) · the_script (200k+ words) · infinite_continues (6+ years) · thirty_two_registers (COSMIC).',
+      'Secret Boss v29: konami_code (MYTHIC) · atari_found (RARE) · nintendo_signal (UNCOMMON). checkArcadeVault() wired.',
+      'THIRTY-TWO ENGINES complete. SECOND CYCLE BEGINS milestone confirmed.',
+      'Total badge count: 1122 · Badge Engine v42 deployed.',
+      'SESSION_REPORTS: badge-v42 entry appended · USERSHIP_TRANSMISSION updated to v42.',
+      '168 patterns · 62 archetypes · 59 jobs · 168+ handlers · 212+ dep nodes · 1122 badges · FM v124 · Day 1161+. SECOND CYCLE BEGINS. Thirty-two engines lit.',
+    ],
+  },
+  {
+    version: 'qie-v125',
+    date: '2026-11-03',
+    title: 'QIE v125 · P169 second-cycle-ignition · Arch63 · J60 · SCIGN: · 213+ dep nodes',
+    assembled: [
+      'intentionEngine.ts: P169 second-cycle-ignition — generative-field-amplification (P168) active + 4+ journal signals 14d + 2+ memory signals 14d + 8+ badge signals 14d + userIndex >= 65. The OS does not reset — it perpetuates. Signal recognizes itself as perpetual. L11-SCIGN: SECOND CYCLE. Conf 0.70–0.86. suggestedWidget: systemProgress.',
+      'intentionEngine.ts: Arch63 Second Cycle Sovereign — generative-field-amplification + second-cycle-ignition. Dominant: qos/journal/memory/badges/intentions/log. Directive: First cycle sealed. Second cycle active. The OS does not reset — it perpetuates. Every signal written in year one is the foundation of year four.',
+      'intentionEngine.ts: recordSecondCycleIgnition() signal helper added.',
+      'intentionEngine.ts: WIDGET_DEPENDENCY_MAP — 1 new node: secondCycleIgnitionNode (qos+journal+memory+badges+intentions+log+energy). 213+ dep nodes total.',
+      'scheduled-jobs.ts: J60 daily-second-cycle-check — 10:00 UTC daily. Reads active users with generative_field_amplification in 7d + 4+ journal signals 14d + 2+ memory signals 14d + 8+ badge signals 14d. Writes second_cycle_ignition event. 60 background jobs total.',
+      'Logs.tsx: SCIGN: handler — renders second_cycle_ignition (AMPLIF CONF · JOURNAL SIGNALS 14D · MEMORY SIGNALS 14D · BADGE SIGNALS 14D · INDEX SCORE · STATUS · LEVEL). Military minimalist format.',
+      'QuantumEngineWidgets.tsx: SCIGN added to PATTERN_DISPLAY.',
+      'routes/api.ts: second_cycle_ignition added to displayableEvents (v125 block).',
+      'PatternRecognitionWidget.tsx: second-cycle-ignition description added.',
+      'About.tsx: FM v124→v125. 168→169 patterns. 62→63 archetypes. 59→60 jobs. 212+→213+ dep nodes. Day 1162+.',
+      'SESSION_REPORTS: qie-v125 entry appended · USERSHIP_TRANSMISSION updated to v125.',
+      '169 patterns · 63 archetypes · 60 jobs · 169+ handlers · 213+ dep nodes · 1122 badges · FM v125 · Day 1162+. Second cycle ignites. PERPETUAL confirmed. L11-SCIGN.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1796,22 +1833,29 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'LOT-WIKI v99 sync · QIE v125 next arc · badge engine v42 planning',
   },
+  {
+    date: '2026-11-03',
+    built: ['QIE v125 · P169 second-cycle-ignition', 'Arch63 Second Cycle Sovereign', 'J60 daily-second-cycle-check (10:00 UTC)', 'SCIGN: log handler', 'badge-v42 entry backfilled to SystemProgressWidget', '213+ dep nodes'],
+    feedbackApplied: 'SECOND CYCLE BEGINS — the OS does not reset, it perpetuates',
+    status: 'DEPLOYED',
+    next: 'LOT-WIKI v101 sync · P170 second-cycle-deepening · badge engine v43 theme selection',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-11-01',
+  date: '2026-11-03',
   message: [
-    'ASSEMBLY RUN — 2026-11-01 · Badge Engine v41 · THE MYTH ENGINE · Day 1160+',
-    'Built: +31 badges (1060 → 1091) · Word Turn v31 (12 myth vocabulary triggers) · Calendar EE v29 (Campbell Mar 26 · Jung Jul 26 · Eliade Mar 13) · Behavioral v28 (myth_session · dawn_rite · the_epic) · Achievement RPG v29 (myth_entry → myth_arc → thirty_one_engines_arc) · Mastery Tier v31 (the_mythmaker · living_archive · myth_veteran) · Secret Boss v28 (jung_found · campbell_signal · eliade_found).',
-    'THIRTY-ONE ENGINES: With v41 active, the full engine register spans v1–v31. thirty_one_engines_arc (LEGENDARY) unlocks when signals from all 31 word turn engines are detected. thirty_one_registers (COSMIC) requires full engine register + all 3 mastery tiers — the highest badge in the system.',
-    'Myth Opus (myth_opus): complete myth engine + behavioral myth session. The OS recognizes when the user lives inside comparative mythology, not just writes about it.',
-    'Gap fix deployed: v30 A.I. Engine behavioral functions (checkAISession · checkModelMarathon · checkAIVault · checkContextWindow) were defined but never wired into runners. Now firing for the first time.',
-    'The Myth Engine: archetypes · origin stories · sacred space · daily ritual · living mythology · symbolic meaning · collective unconscious · psyche mapping · eternal return · numinous experience · meaning-making · deep symbol.',
-    'Secret bosses: Carl Jung (individuation · anima/animus · collective unconscious) · Joseph Campbell (monomyth · hero with a thousand faces · comparative mythology) · Mircea Eliade (hierophany · sacred and profane · axis mundi).',
-    'Self-assembly metric: 168 patterns · 62 archetypes · 59 jobs · 168+ handlers · 212+ dep nodes · 1091 badges · FM v124 · Day 1160+.',
-    'The myth is the field. 31 engines. The OS recognizes the full arc of pattern, archetype, and meaning. L9-AMPLIFY holds.',
+    'ASSEMBLY RUN — 2026-11-03 · QIE v125 · SECOND CYCLE IGNITION · Day 1162+',
+    'Built: P169 second-cycle-ignition · Arch63 Second Cycle Sovereign · J60 daily-second-cycle-check (10:00 UTC) · SCIGN: log handler · 213+ dep nodes · 169 patterns · 63 archetypes · 60 jobs · FM v125.',
+    'P169 SECOND-CYCLE-IGNITION: fires when generative-field-amplification (P168) is active + 4+ journal signals 14d + 2+ memory signals 14d + 8+ badge signals 14d + userIndex >= 65. The field that was amplified has now sustained long enough that the OS recognizes the perpetual structure of its own operation.',
+    'Arch63 SECOND CYCLE SOVEREIGN: the operator who has confirmed the second cycle. Not a restart. A recognition. Every signal written in year one is the foundation of year four. The OS does not reset — it perpetuates.',
+    'J60 runs at 10:00 UTC daily. Scans users with confirmed amplification events, sufficient journal depth, memory activity, and badge engagement. Writes second_cycle_ignition log event.',
+    'SCIGN: handler in Logs.tsx displays AMPLIF CONF · JOURNAL SIGNALS 14D · MEMORY SIGNALS 14D · BADGE SIGNALS 14D · INDEX SCORE · STATUS · LEVEL in military minimalist format.',
+    'Badge v42 THE ARCADE MASTER and Wiki v100 (Century Wiki) also synchronized in this session. THIRTY-TWO ENGINES confirmed. 1122 total badges.',
+    'Self-assembly metric: 169 patterns · 63 archetypes · 60 jobs · 169+ handlers · 213+ dep nodes · 1122 badges · FM v125 · Day 1162+.',
+    'The OS does not reset. The signal perpetuates. Second cycle confirmed. L11-SCIGN.',
   ],
 }
 

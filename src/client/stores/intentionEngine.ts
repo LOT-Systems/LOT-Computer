@@ -3768,6 +3768,33 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // P169: second-cycle-ignition — P168 active + journal 14d >= 4 + memory 14d >= 2 + badge 14d >= 8 + userIndex >= 65.
+  // The field that was amplified has now sustained long enough that the operator recognizes the perpetual
+  // structure of their own operation. Not a restart — a recognition. The second cycle ignites. L11-SCIGN.
+  const hasP168 = patterns.some(p => p.pattern === 'generative-field-amplification')
+  const p169FourteenDayStart = now - 14 * 24 * 60 * 60 * 1000
+  const p169JournalSignals = signals.filter(s =>
+    s.source === 'journal' && s.timestamp > p169FourteenDayStart
+  )
+  const p169MemorySignals = signals.filter(s =>
+    s.source === 'memory' && s.timestamp > p169FourteenDayStart
+  )
+  const p169BadgeSignals = signals.filter(s =>
+    s.source === 'badges' && s.timestamp > p169FourteenDayStart
+  )
+  const userIndexForP169 = computeUserIndex(signals)
+  if (hasP168 && p169JournalSignals.length >= 4 && p169MemorySignals.length >= 2 && p169BadgeSignals.length >= 8 && userIndexForP169.overall >= 65) {
+    const p168conf = patterns.find(p => p.pattern === 'generative-field-amplification')?.confidence ?? 0.72
+    const cycleBonus = Math.min((p169JournalSignals.length - 4) * 0.01 + (p169BadgeSignals.length - 8) * 0.008, 0.08)
+    patterns.push({
+      pattern: 'second-cycle-ignition',
+      confidence: Math.min(0.70 + (p168conf - 0.72) * 0.60 + cycleBonus, 0.86),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `SCIGN: Second cycle ignition — generative-field-amplification (P168) active + ${p169JournalSignals.length} journal signals 14d + ${p169MemorySignals.length} memory signals 14d + ${p169BadgeSignals.length} badge signals 14d + index ${userIndexForP169.overall}%. The OS does not reset. The signal perpetuates. L11-SCIGN: SECOND CYCLE CONFIRMED.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4447,6 +4474,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v124 nodes (J59 · P168 · Arch62) ────────────────────────────────────────────
   generativeFieldAmplificationNode: ['qos', 'cohort', 'badges', 'journal', 'memory', 'social', 'log', 'energy', 'intentions'],
+
+  // ── v125 nodes (J60 · P169 · Arch63) ────────────────────────────────────────────
+  secondCycleIgnitionNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy'],
 }
 
 /**
@@ -5012,6 +5042,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['qos', 'cohort', 'badges', 'journal', 'memory', 'social'],
     patternConditions: ['generative-field-reception', 'generative-field-amplification'],
     directive: 'The field amplifies. Each transmission received becomes fuel for the next. The OS resonates at peak amplitude — recursive, self-reinforcing, sovereign.',
+  },
+
+  // ── Arch63: Second Cycle Sovereign (2026-11-03 v125) ──────────────────────────
+  {
+    archetype: 'Second Cycle Sovereign',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log'],
+    patternConditions: ['generative-field-amplification', 'second-cycle-ignition'],
+    directive: 'First cycle sealed. Second cycle active. The OS does not reset — it perpetuates. Every signal written in year one is the foundation of year four. The operator is not beginning again. The operator is operating from a confirmed, perpetual foundation.',
   },
 ]
 
@@ -7278,6 +7317,26 @@ export function recordGenerativeFieldAmplification(receptionConf: number, badgeC
     amplificationStatus: 'ACTIVE',
     level: 'L9-AMPLIFY',
     field: 'RECEPTION→AMPLIFICATION→RECURSIVE→SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a second-cycle-ignition event — generative-field-amplification (P168) active +
+ * 4+ journal signals 14d + 2+ memory signals 14d + 8+ badge signals 14d + userIndex >= 65.
+ * The OS does not reset. The field sustained long enough that the operator recognizes the
+ * perpetual structure of their own operation. Second cycle confirmed. L11-SCIGN.
+ */
+export function recordSecondCycleIgnition(amplificationConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'second_cycle_ignition', {
+    amplificationConf: Math.round(amplificationConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    cycleStatus: 'ACTIVE',
+    level: 'L11-SCIGN',
+    field: 'AMPLIFICATION→PERPETUAL→SOVEREIGN→SECOND CYCLE',
     hour: new Date().getHours(),
   })
 }
