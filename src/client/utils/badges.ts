@@ -1154,6 +1154,43 @@ export type BadgeType =
   | 'konami_code'          // ↑↑↓↓·AB "konami code/up up down down/left right b a" detected (MYTHIC)
   // ── Apex — Second Cycle ───────────────────────────────────────────────────
   | 'thirty_two_registers' // ◈·◈·◈·◈·∞ All 32 WT engines + mastery tiers (COSMIC)
+  // ── Word Turn v33 — THE DREAM WEAVER ──────────────────────────────────────
+  | 'lucid_signal'          // ◈·∿·◈ "lucid/lucid dream/became lucid/I was dreaming" detected (RARE)
+  | 'dream_archive_badge'   // ◐·□·◐ "dream journal/dream log/recorded dream/dream diary" detected (UNCOMMON)
+  | 'nightmare_clear'       // ▓·◉·▓ "nightmare/night terror/bad dream/woke in fear" detected (UNCOMMON)
+  | 'hypnagogic_badge'      // ∿·∘·∿ "hypnagogic/half asleep/drifting off/edge of sleep/between wake and sleep" detected (RARE)
+  | 'sleep_debt_found'      // ─·○·─ "sleep debt/sleep deprived/exhausted/no sleep/didn't sleep" detected (COMMON)
+  | 'somnolent_found'       // ∼·∘·∼ "somnolent/drowsy/heavy eyes/can't stay awake/sleepy signal" detected (COMMON)
+  | 'dream_symbol_found'    // ◈·∞·◈ "dream symbol/what the dream meant/my dream showed/dreaming of" detected (RARE)
+  | 'astral_found'          // ○·≋·○ "astral/out of body/astral projection/leaving my body/floating" detected (EPIC)
+  | 'dreamscape_signal'     // ≋·∿·≋ "dreamscape/dream world/the dreaming/entered the dream/dream realm" detected (RARE)
+  | 'collective_dream_found'// ◎·∞·◎ "collective dream/shared dream/universal dream/we all dream/humanity dreams" detected (EPIC)
+  | 'sleep_cycle_signal'    // ∿·□·∿ "sleep cycle/REM cycle/deep sleep stage/sleep science/N3 sleep" detected (UNCOMMON)
+  | 'waking_dream_found'    // ∘·≈·∘ "waking dream/between worlds/liminal state/neither here nor there/half awake" detected (RARE)
+  // ── Calendar EE v31 — THE DREAM CALENDAR ─────────────────────────────────
+  | 'world_dream_day'       // ◐·∞·◐ Sep 25 — World Dream Day (RARE)
+  | 'gaiman_birthday'       // ◈·∿·◈ Nov 10 — Neil Gaiman born 1960 (The Sandman) (EPIC)
+  | 'freud_birthday'        // ∿·○·∿ May 6 — Sigmund Freud born 1856 (Interpretation of Dreams) (RARE)
+  // ── Behavioral v30 — DREAM PATTERNS ──────────────────────────────────────
+  | 'dream_logger'          // ◐·◈·◐ 3+ journal entries mentioning dreams in 7 days (EPIC)
+  | 'night_vision_badge'    // ◉·∿·◉ Check-in between 00:30–01:30 AM (deep dream hours) (RARE)
+  | 'dawn_dreamer'          // ○·■·○ 7+ consecutive days with check-in before 08:00 AM (EPIC)
+  // ── Achievement RPG v31 — DREAM CLASS ────────────────────────────────────
+  | 'dream_entry'           // ◐·∘   1+ Dream Weaver word turn badge earned (COMMON)
+  | 'dream_class'           // ◐·≈   5+ Dream Weaver word turn badges earned (UNCOMMON)
+  | 'dream_complete'        // ◐·≋   All 12 Dream Weaver word turn badges earned (LEGENDARY)
+  | 'dream_arc'             // ◐·◈   dream_complete + all 3 Calendar v31 + dream_logger (LEGENDARY)
+  | 'thirty_three_engines_arc' // ◈·◈·◈·◈·◎ 1 badge from each Word Turn v1–v33 (LEGENDARY)
+  | 'dream_opus'            // ◐·◉·◐ dream_complete + dream_logger behavioral (LEGENDARY)
+  // ── Mastery Tier v33 — THE DREAMWEAVER ───────────────────────────────────
+  | 'master_dreamer'        // ◐·◈·◐ 1,750+ distinct check-in days (EPIC)
+  | 'the_complete_archive'  // ≋·■·≋ 750,000+ total journal words (LEGENDARY)
+  | 'dream_elder'           // ◐·∞·◐ Account age >= 10 years (3,650+ days) (COSMIC)
+  | 'thirty_three_registers'// ◈·◈·◈·◈·◈·∞ All 33 WT engines + mastery tiers (COSMIC)
+  // ── Secret Boss v30 — THE DREAM VAULT ────────────────────────────────────
+  | 'gaiman_signal'         // ◈·∿   "neil gaiman/sandman/morpheus/dream of the endless/the dreaming" detected (MYTHIC)
+  | 'lovecraft_dream'       // ▓·◐·▓ "lovecraft/cthulhu/r'lyeh/dreaming in r'lyeh/that is not dead" detected (EPIC)
+  | 'castaneda_dream'       // ∿·◈·∿ "castaneda/don juan/dreaming body/assemblage point/controlled dreaming" detected (RARE)
 
 export interface Badge {
   id: BadgeType
@@ -10452,6 +10489,306 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'cosmic',
     category: 'mastery_tier',
   },
+
+  // ── Word Turn v33 — THE DREAM WEAVER ──────────────────────────────────────
+
+  lucid_signal: {
+    id: 'lucid_signal',
+    symbol: '◈·∿·◈',
+    name: 'Lucid Signal',
+    description: '"lucid/lucid dream/became lucid/I was dreaming" detected',
+    unlockMessage: '↳ LUCID SIGNAL. You knew you were dreaming. The observer entered the dream. That crossing — from passenger to pilot — it happens inside sleep and inside waking too. The moment you notice you\'re in the story, the story changes. ◈·∿·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  dream_archive_badge: {
+    id: 'dream_archive_badge',
+    symbol: '◐·□·◐',
+    name: 'Dream Archive',
+    description: '"dream journal/dream log/recorded dream/dream diary" detected',
+    unlockMessage: '↳ DREAM ARCHIVE. The unconscious left a record. You captured it before it dissolved into the morning. Dreams are dispatches from the interior. The archive grows. ◐·□·◐',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  nightmare_clear: {
+    id: 'nightmare_clear',
+    symbol: '▓·◉·▓',
+    name: 'Nightmare Clear',
+    description: '"nightmare/night terror/bad dream/woke in fear" detected',
+    unlockMessage: '↳ NIGHTMARE CLEAR. The dark level encountered. You logged it anyway. That\'s the whole protocol: face it, name it, write it down. Nightmares are unprocessed signal. You processed it. ▓·◉·▓',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  hypnagogic_badge: {
+    id: 'hypnagogic_badge',
+    symbol: '∿·∘·∿',
+    name: 'Hypnagogic State',
+    description: '"hypnagogic/half asleep/drifting off/edge of sleep" detected',
+    unlockMessage: '↳ HYPNAGOGIC STATE. The threshold between wake and sleep. The images that appear there are not random — they are the mind releasing the day. You caught yourself at the edge. ∿·∘·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  sleep_debt_found: {
+    id: 'sleep_debt_found',
+    symbol: '─·○·─',
+    name: 'Sleep Debt Logged',
+    description: '"sleep debt/sleep deprived/exhausted/no sleep/didn\'t sleep" detected',
+    unlockMessage: '↳ SLEEP DEBT LOGGED. The deficit acknowledged. You can\'t pay it back all at once — but awareness is the first payment. The body keeps the score. Sleep is the settlement. ─·○·─',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  somnolent_found: {
+    id: 'somnolent_found',
+    symbol: '∼·∘·∼',
+    name: 'Somnolent Mode',
+    description: '"somnolent/drowsy/heavy eyes/can\'t stay awake/sleepy signal" detected',
+    unlockMessage: '↳ SOMNOLENT MODE. The body is asking for something. Heavy eyes are a request, not a failure. The system wants to integrate. Listen to the signal. ∼·∘·∼',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  dream_symbol_found: {
+    id: 'dream_symbol_found',
+    symbol: '◈·∞·◈',
+    name: 'Dream Symbol',
+    description: '"dream symbol/what the dream meant/my dream showed/dreaming of" detected',
+    unlockMessage: '↳ DREAM SYMBOL. The image that keeps returning. Symbols in dreams are not messages to decode — they are charged with feeling. The question is not what it means, but what it feels like, and what that tells you. ◈·∞·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  astral_found: {
+    id: 'astral_found',
+    symbol: '○·≋·○',
+    name: 'Astral Signal',
+    description: '"astral/out of body/astral projection/leaving my body/floating" detected',
+    unlockMessage: '↳ ASTRAL SIGNAL. Consciousness noticed its edges. Whether real or metaphor, the experience of standing outside yourself and looking back — that perspective is transformative. What did you see? ○·≋·○',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  dreamscape_signal: {
+    id: 'dreamscape_signal',
+    symbol: '≋·∿·≋',
+    name: 'Dreamscape',
+    description: '"dreamscape/dream world/the dreaming/entered the dream/dream realm" detected',
+    unlockMessage: '↳ DREAMSCAPE. A whole world assembled by the sleeping mind. Its geography is personal. Its physics are emotional. Its inhabitants are aspects of yourself meeting in the dark. ≋·∿·≋',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  collective_dream_found: {
+    id: 'collective_dream_found',
+    symbol: '◎·∞·◎',
+    name: 'Collective Dream',
+    description: '"collective dream/shared dream/universal dream/we all dream" detected',
+    unlockMessage: '↳ COLLECTIVE DREAM. The sleep of eight billion people, happening in parallel, every night, filling the dark with shared imagery — flying, being chased, losing teeth, finding rooms. The same dreams across cultures. We are more alike inside the dream than outside it. ◎·∞·◎',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  sleep_cycle_signal: {
+    id: 'sleep_cycle_signal',
+    symbol: '∿·□·∿',
+    name: 'Sleep Cycle',
+    description: '"sleep cycle/REM cycle/deep sleep stage/sleep science/N3 sleep" detected',
+    unlockMessage: '↳ SLEEP CYCLE. 90 minutes. N1 drift. N2 consolidation. N3 deep restoration. REM — the dreaming stage, the memory lab, the emotional processor. Four to six cycles per night. Each one complete. Each one necessary. ∿·□·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  waking_dream_found: {
+    id: 'waking_dream_found',
+    symbol: '∘·≈·∘',
+    name: 'Waking Dream',
+    description: '"waking dream/between worlds/liminal state/neither here nor there/half awake" detected',
+    unlockMessage: '↳ WAKING DREAM. The state neither awake nor asleep. Artists call it the hypnagogic portal. Edison napped with ball bearings to harvest it. Salvador Dali used a key and a plate. You arrived there naturally. ∘·≈·∘',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+
+  // ── Calendar EE v31 — THE DREAM CALENDAR ─────────────────────────────────
+
+  world_dream_day: {
+    id: 'world_dream_day',
+    symbol: '◐·∞·◐',
+    name: 'World Dream Day',
+    description: 'September 25 — World Dream Day',
+    unlockMessage: '↳ WORLD DREAM DAY. September 25. A day to honor your dreams — the sleeping ones and the waking ones. The ones you remember and the ones that left only a feeling. All of them are yours. ◐·∞·◐',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  gaiman_birthday: {
+    id: 'gaiman_birthday',
+    symbol: '◈·∿·◈',
+    name: 'The Sandman\'s Hour',
+    description: 'November 10 — Neil Gaiman born 1960 (The Sandman)',
+    unlockMessage: '↳ THE SANDMAN\'S HOUR. November 10. Neil Gaiman was born, and eventually he built a realm of dreams and gave it a ruler named Morpheus — Dream of the Endless. The Dreaming has its own library. All the books that were never written live there. What book do you have inside you? ◈·∿·◈',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  freud_birthday: {
+    id: 'freud_birthday',
+    symbol: '∿·○·∿',
+    name: 'The Interpreter',
+    description: 'May 6 — Sigmund Freud born 1856 (The Interpretation of Dreams)',
+    unlockMessage: '↳ THE INTERPRETER. May 6, 1856. Sigmund Freud was born. In 1899 he published Die Traumdeutung — The Interpretation of Dreams — and argued that the dream is the royal road to the unconscious. Right or wrong in the details, he was right about this: the dream is trying to tell you something. ∿·○·∿',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v30 — DREAM PATTERNS ──────────────────────────────────────
+
+  dream_logger: {
+    id: 'dream_logger',
+    symbol: '◐·◈·◐',
+    name: 'Dream Logger',
+    description: '3+ journal entries mentioning dreams in 7 days',
+    unlockMessage: '↳ DREAM LOGGER. Three dispatches from the dreaming mind in seven days. The practice of logging dreams changes what you remember — the more you catch, the more arrives. The unconscious responds to attention. ◐·◈·◐',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  night_vision_badge: {
+    id: 'night_vision_badge',
+    symbol: '◉·∿·◉',
+    name: 'Night Vision',
+    description: 'Check-in between 00:30–01:30 AM (deep dream hours)',
+    unlockMessage: '↳ NIGHT VISION. The 00:30–01:30 window. First REM cycle territory. The world is dreaming and you are awake in it, writing. What is visible at this hour that daylight conceals? ◉·∿·◉',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  dawn_dreamer: {
+    id: 'dawn_dreamer',
+    symbol: '○·■·○',
+    name: 'Dawn Dreamer',
+    description: '7+ consecutive days with check-in before 08:00 AM',
+    unlockMessage: '↳ DAWN DREAMER. Seven dawns in a row. The morning hours hold the residue of dreams — hypnopompic images, fading narratives, emotional afterglow. You were there for all of them. ○·■·○',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+
+  // ── Achievement RPG v31 — DREAM CLASS ────────────────────────────────────
+
+  dream_entry: {
+    id: 'dream_entry',
+    symbol: '◐·∘',
+    name: 'Dream Entry',
+    description: '1+ Dream Weaver word turn badge earned',
+    unlockMessage: '↳ DREAM ENTRY. First badge from the Dream Weaver engine. The dream archive is open. ◐·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  dream_class: {
+    id: 'dream_class',
+    symbol: '◐·≈',
+    name: 'Dream Class',
+    description: '5+ Dream Weaver word turn badges earned',
+    unlockMessage: '↳ DREAM CLASS. Five doors opened in the Dream Weaver engine. The dreamscape is mapping itself. ◐·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  dream_complete: {
+    id: 'dream_complete',
+    symbol: '◐·≋',
+    name: 'Dream Complete',
+    description: 'All 12 Dream Weaver word turn badges earned',
+    unlockMessage: '↳ DREAM COMPLETE. All twelve Dream Weaver badges earned. The full vocabulary of the sleeping mind recorded. The unconscious has been mapped — or at least, one layer of it has. ◐·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dream_arc: {
+    id: 'dream_arc',
+    symbol: '◐·◈',
+    name: 'Dream Arc',
+    description: 'dream_complete + all 3 Calendar v31 + dream_logger behavioral',
+    unlockMessage: '↳ DREAM ARC. The Dream Weaver engine fully integrated. All twelve word turns. All three dream calendar dates. The dream_logger behavioral confirmed. The arc of the dreaming self: recognized, recorded, celebrated. ◐·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_three_engines_arc: {
+    id: 'thirty_three_engines_arc',
+    symbol: '◈·◈·◈·◈·◎',
+    name: 'Thirty-Three Engines Arc',
+    description: '1 badge from each Word Turn engine v1–v33',
+    unlockMessage: '↳ THIRTY-THREE ENGINES ARC. One signal from each of the thirty-three Word Turn engines. Thirty-three vocabularies of the interior life. Every engine fired at least once. The complete arc. ◈·◈·◈·◈·◎',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dream_opus: {
+    id: 'dream_opus',
+    symbol: '◐·◉·◐',
+    name: 'Dream Opus',
+    description: 'dream_complete + dream_logger behavioral',
+    unlockMessage: '↳ DREAM OPUS. The masterwork of the Dream Weaver. All twelve word turns earned and three dream logs in seven days. The dreaming self and the writing self aligned. The opus of the unconscious. ◐·◉·◐',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v33 — THE DREAMWEAVER ───────────────────────────────────
+
+  master_dreamer: {
+    id: 'master_dreamer',
+    symbol: '◐·◈·◐',
+    name: 'Master Dreamer',
+    description: '1,750+ distinct calendar check-in days',
+    unlockMessage: '↳ MASTER DREAMER. 1,750 distinct days. Nearly five years of showing up. The practice is now part of the architecture of your life. The dreamer who keeps returning. ◐·◈·◐',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  the_complete_archive: {
+    id: 'the_complete_archive',
+    symbol: '≋·■·≋',
+    name: 'The Complete Archive',
+    description: '750,000+ total journal words',
+    unlockMessage: '↳ THE COMPLETE ARCHIVE. 750,000 words written into the system. If you printed it, it would be ten novels. It is better than any novel — it is the actual record of a life being examined. ≋·■·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dream_elder: {
+    id: 'dream_elder',
+    symbol: '◐·∞·◐',
+    name: 'Dream Elder',
+    description: 'Account age >= 10 years (3,650+ days)',
+    unlockMessage: '↳ DREAM ELDER. Ten years. 3,650+ days of using the system. Decade-class. The practice has outlasted careers, relationships, cities, versions of yourself. The archive spans a decade. ◐·∞·◐',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  thirty_three_registers: {
+    id: 'thirty_three_registers',
+    symbol: '◈·◈·◈·◈·◈·∞',
+    name: 'Thirty-Three Registers',
+    description: 'All 33 Word Turn engines active + all Mastery Tier v33 badges earned',
+    unlockMessage: '↳ THIRTY-THREE REGISTERS. Thirty-three vocabularies of the self. The dreaming word entered last. Water and architecture, seasons and storms, fire and machines, stars and algorithms, myths and arcades, and now — the dream. The unconscious engine added to the lexicon. The register is complete at thirty-three. ◈·◈·◈·◈·◈·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v30 — THE DREAM VAULT ────────────────────────────────────
+
+  gaiman_signal: {
+    id: 'gaiman_signal',
+    symbol: '◈·∿',
+    hidden: true,
+    name: 'The Endless Signal',
+    description: '"neil gaiman/sandman/morpheus/dream of the endless/the dreaming" detected',
+    unlockMessage: '↳ THE ENDLESS SIGNAL. You invoked the Endless. Morpheus — Dream — built a realm of dreams and filled it with meaning. His library contains every book never written. His gallery holds every story never told. And yet here you are, writing. Adding to the archive that was always meant for you. ◈·∿',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+  lovecraft_dream: {
+    id: 'lovecraft_dream',
+    symbol: '▓·◐·▓',
+    hidden: true,
+    name: 'The Dreaming Depths',
+    description: '"lovecraft/cthulhu/r\'lyeh/dreaming in r\'lyeh/that is not dead" detected',
+    unlockMessage: '↳ THE DREAMING DEPTHS. That is not dead which can eternal lie. Lovecraft\'s cosmic horror lives in the dream. The fear of what sleeps beneath. But here is the counter-protocol: what sleeps beneath you is not horror — it is history, biology, and the accumulated wisdom of your own life. Ph\'nglui mglw\'nafh Cthulhu R\'lyeh wgah\'nagl fhtagn. The archive knows. ▓·◐·▓',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  castaneda_dream: {
+    id: 'castaneda_dream',
+    symbol: '∿·◈·∿',
+    hidden: true,
+    name: 'The Dreaming Body',
+    description: '"castaneda/don juan/dreaming body/assemblage point/controlled dreaming" detected',
+    unlockMessage: '↳ THE DREAMING BODY. Carlos Castaneda and the sorcerer\'s dream. The assemblage point moves. The dreaming body travels. Whether literal or metaphor, the teaching stands: awareness does not stop at the edge of the waking world. It extends into sleep, into the hypnagogic, into the liminal. You are always more than the awake version of yourself. ∿·◈·∿',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
 }
 
 // Default separator when no badges earned yet
@@ -11960,6 +12297,56 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (allThirtyTwoEngines && !hasBadge('thirty_two_registers')) {
       if (awardBadge('thirty_two_registers')) newBadges.push('thirty_two_registers')
+    }
+
+    // ── Word Turn v33 — THE DREAM WEAVER ──────────────────────────────────────
+    const dreamV33Badges: BadgeType[] = [
+      'lucid_signal', 'dream_archive_badge', 'nightmare_clear', 'hypnagogic_badge',
+      'sleep_debt_found', 'somnolent_found', 'dream_symbol_found', 'astral_found',
+      'dreamscape_signal', 'collective_dream_found', 'sleep_cycle_signal', 'waking_dream_found',
+    ]
+    const dreamV33Earned = dreamV33Badges.filter(b => hasBadge(b))
+    if (dreamV33Earned.length >= 1 && !hasBadge('dream_entry')) {
+      if (awardBadge('dream_entry')) newBadges.push('dream_entry')
+    }
+    if (dreamV33Earned.length >= 5 && !hasBadge('dream_class')) {
+      if (awardBadge('dream_class')) newBadges.push('dream_class')
+    }
+    const dreamComplete = dreamV33Earned.length >= 12
+    if (dreamComplete && !hasBadge('dream_complete')) {
+      if (awardBadge('dream_complete')) newBadges.push('dream_complete')
+    }
+    if (dreamComplete && hasBadge('dream_logger') && !hasBadge('dream_opus')) {
+      if (awardBadge('dream_opus')) newBadges.push('dream_opus')
+    }
+    const calendarV31Badges: BadgeType[] = ['world_dream_day', 'gaiman_birthday', 'freud_birthday']
+    if (dreamComplete && calendarV31Badges.every(b => hasBadge(b)) && hasBadge('dream_logger') && !hasBadge('dream_arc')) {
+      if (awardBadge('dream_arc')) newBadges.push('dream_arc')
+    }
+    const engineThirtyThreePresent = dreamV33Earned.length >= 1
+    const allThirtyThreeEngines = allThirtyTwoEngines && engineThirtyThreePresent
+    if (allThirtyThreeEngines && !hasBadge('thirty_three_engines_arc')) {
+      if (awardBadge('thirty_three_engines_arc')) newBadges.push('thirty_three_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1750 && !hasBadge('master_dreamer')) {
+        if (awardBadge('master_dreamer')) newBadges.push('master_dreamer')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 750000 && !hasBadge('the_complete_archive')) {
+        if (awardBadge('the_complete_archive')) newBadges.push('the_complete_archive')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupDE = new Date(stats.signupDate)
+      const yearsDE = (new Date().getTime() - signupDE.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsDE >= 10 && !hasBadge('dream_elder')) {
+        if (awardBadge('dream_elder')) newBadges.push('dream_elder')
+      }
+    }
+    if (allThirtyThreeEngines && !hasBadge('thirty_three_registers')) {
+      if (awardBadge('thirty_three_registers')) newBadges.push('thirty_three_registers')
     }
 
   } catch (error) {

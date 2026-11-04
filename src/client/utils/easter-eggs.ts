@@ -1038,6 +1038,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('pac_man_day')
   }
 
+  // ── Calendar EE v31 — THE DREAM CALENDAR ──────────────────────────────────
+  // World Dream Day: September 25
+  if (!hasBadge('world_dream_day') && month === 9 && day === 25) {
+    awardBadge('world_dream_day')
+    awarded.push('world_dream_day')
+  }
+  // Neil Gaiman Birthday: November 10 — born 1960 (The Sandman)
+  if (!hasBadge('gaiman_birthday') && month === 11 && day === 10) {
+    awardBadge('gaiman_birthday')
+    awarded.push('gaiman_birthday')
+  }
+  // Sigmund Freud Birthday: May 6 — born 1856 (The Interpretation of Dreams)
+  if (!hasBadge('freud_birthday') && month === 5 && day === 6) {
+    awardBadge('freud_birthday')
+    awarded.push('freud_birthday')
+  }
+
   return awarded
 }
 
@@ -1786,6 +1803,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\batari\b|\bnolan[\s-]?bushnell\b|\bcoin[\s-]?op\b|\bquarters[\s-]?to[\s-]?play\b|\barcade[\s-]?cabinet\b/i,                       badge: 'atari_found' },
   { patterns: /\bnintendo\b|\bshigeru[\s-]?miyamoto\b|\bsuper[\s-]?mario\b|\blegend[\s-]?of[\s-]?zelda\b|\bmetroid\b|\bfamicom\b|\bsuper[\s-]?famicom\b/i, badge: 'nintendo_signal' },
   { patterns: /\bkonami[\s-]?code\b|\bup[\s-]?up[\s-]?down[\s-]?down\b|\bleft[\s-]?right[\s-]?b[\s-]?a\b|\b30[\s-]?lives\b|\bkonami\b/i,         badge: 'konami_code' },
+  // ── v33 THE DREAM WEAVER — word turns ─────────────────────────────────────
+  { patterns: /\b(lucid|lucid[\s-]?dream(?:ing)?|became[\s-]?lucid|i[\s-]?was[\s-]?dreaming|realized[\s-]?i[\s-]?was[\s-]?dreaming)\b/i,          badge: 'lucid_signal' },
+  { patterns: /\b(dream[\s-]?journal|dream[\s-]?log|recorded[\s-]?(my[\s-]?)?dream|dream[\s-]?diary|kept[\s-]?a[\s-]?dream)\b/i,                   badge: 'dream_archive_badge' },
+  { patterns: /\b(nightmare|night[\s-]?terror|bad[\s-]?dream|woke[\s-]?(?:up[\s-]?)?(?:from[\s-]?a[\s-]?)?nightmare|woke[\s-]?in[\s-]?fear)\b/i,  badge: 'nightmare_clear' },
+  { patterns: /\b(hypnagogic|hypnopompic|half[\s-]?asleep|drifting[\s-]?off|edge[\s-]?of[\s-]?sleep|between[\s-]?wake[\s-]?and[\s-]?sleep)\b/i,   badge: 'hypnagogic_badge' },
+  { patterns: /\b(sleep[\s-]?debt|sleep[\s-]?deprived|sleep[\s-]?deprivation|didn'?t[\s-]?sleep|no[\s-]?sleep|running[\s-]?on[\s-]?empty)\b/i,    badge: 'sleep_debt_found' },
+  { patterns: /\b(somnolent|drowsy|heavy[\s-]?eyes|so[\s-]?sleepy|fighting[\s-]?sleep|can'?t[\s-]?stay[\s-]?awake)\b/i,                           badge: 'somnolent_found' },
+  { patterns: /\b(dream[\s-]?symbol|what[\s-]?(?:the[\s-]?)?dream[\s-]?meant|my[\s-]?dream[\s-]?showed|dreaming[\s-]?of|i[\s-]?dreamed[\s-]?about)\b/i, badge: 'dream_symbol_found' },
+  { patterns: /\b(astral|out[\s-]?of[\s-]?body|astral[\s-]?projection|leaving[\s-]?my[\s-]?body|astral[\s-]?travel|floated[\s-]?above)\b/i,       badge: 'astral_found' },
+  { patterns: /\b(dreamscape|dream[\s-]?world|the[\s-]?dreaming|entered[\s-]?the[\s-]?dream|dream[\s-]?realm|inside[\s-]?the[\s-]?dream)\b/i,     badge: 'dreamscape_signal' },
+  { patterns: /\b(collective[\s-]?dream|shared[\s-]?dream|universal[\s-]?dream|we[\s-]?all[\s-]?dream|humanity(?:'s)?[\s-]?dream|archetypal[\s-]?dream)\b/i, badge: 'collective_dream_found' },
+  { patterns: /\b(sleep[\s-]?cycle|rem[\s-]?cycle|deep[\s-]?sleep[\s-]?stage|sleep[\s-]?science|slow[\s-]?wave[\s-]?sleep|sleep[\s-]?stages)\b/i, badge: 'sleep_cycle_signal' },
+  { patterns: /\b(waking[\s-]?dream|between[\s-]?worlds|liminal[\s-]?state|neither[\s-]?here[\s-]?nor[\s-]?there|half[\s-]?awake|not[\s-]?quite[\s-]?awake)\b/i, badge: 'waking_dream_found' },
+  // ── v33 THE DREAM VAULT — secret boss word triggers ───────────────────────
+  { patterns: /\bneil[\s-]?gaiman\b|\bsandman[\s-]?comic\b|\bdream[\s-]?of[\s-]?the[\s-]?endless\b|\bthe[\s-]?dreaming[\s-]?realm\b|\bmorpheus[\s-]?(?:dream|endless)\b/i, badge: 'gaiman_signal' },
+  { patterns: /\blovecraft\b|\bcthulhu\b|\br['']?lyeh\b|\bthat[\s-]?is[\s-]?not[\s-]?dead\b|\bdreaming[\s-]?in[\s-]?r['']?lyeh\b|\bnecronom(?:icon)?\b/i,                badge: 'lovecraft_dream' },
+  { patterns: /\bcastaneda\b|\bdon[\s-]?juan\b|\bdreaming[\s-]?body\b|\bassemblage[\s-]?point\b|\bcontrolled[\s-]?dreaming\b|\bcarlos[\s-]?castaneda\b/i,                 badge: 'castaneda_dream' },
 ]
 
 /**
@@ -3883,6 +3917,183 @@ export function checkArcadeVault(journalText: string): BadgeType[] {
   }
   if (!hasBadge('konami_code') && /\bkonami[\s-]?code\b|\bup[\s-]?up[\s-]?down[\s-]?down\b|\bleft[\s-]?right[\s-]?b[\s-]?a\b|\b30[\s-]?lives\b|\bkonami\b/i.test(journalText)) {
     if (awardBadge('konami_code')) awarded.push('konami_code')
+  }
+  return awarded
+}
+
+// ── Word Turn v33 — THE DREAM WEAVER ─────────────────────────────────────────
+
+const DREAM_WEAVER_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
+  { patterns: /\b(lucid|lucid[\s-]?dream(?:ing)?|became[\s-]?lucid|i[\s-]?was[\s-]?dreaming|realized[\s-]?i[\s-]?was[\s-]?dreaming)\b/i, badge: 'lucid_signal' },
+  { patterns: /\b(dream[\s-]?journal|dream[\s-]?log|recorded[\s-]?(my[\s-]?)?dream|dream[\s-]?diary|kept[\s-]?a[\s-]?dream)\b/i, badge: 'dream_archive_badge' },
+  { patterns: /\b(nightmare|night[\s-]?terror|bad[\s-]?dream|woke[\s-]?(?:up[\s-]?)?(?:from[\s-]?)?(?:a[\s-]?)?nightmare|woke[\s-]?in[\s-]?fear)\b/i, badge: 'nightmare_clear' },
+  { patterns: /\b(hypnagogic|hypnopompic|half[\s-]?asleep|drifting[\s-]?off|edge[\s-]?of[\s-]?sleep|between[\s-]?wake[\s-]?and[\s-]?sleep|that[\s-]?moment[\s-]?before[\s-]?sleep)\b/i, badge: 'hypnagogic_badge' },
+  { patterns: /\b(sleep[\s-]?debt|sleep[\s-]?deprived|sleep[\s-]?deprivation|didn'?t[\s-]?sleep|no[\s-]?sleep(?:[\s-]?last[\s-]?night)?|slept[\s-]?(?:so[\s-]?)?little|running[\s-]?on[\s-]?empty)\b/i, badge: 'sleep_debt_found' },
+  { patterns: /\b(somnolent|drowsy|heavy[\s-]?eyes|can'?t[\s-]?(?:stay|keep[\s-]?my[\s-]?eyes?)[\s-]?awake|so[\s-]?sleepy|fighting[\s-]?sleep)\b/i, badge: 'somnolent_found' },
+  { patterns: /\b(dream[\s-]?symbol|what[\s-]?(?:the[\s-]?)?dream[\s-]?meant|my[\s-]?dream[\s-]?showed|dreaming[\s-]?of|i[\s-]?dreamed[\s-]?about|the[\s-]?dream[\s-]?had)\b/i, badge: 'dream_symbol_found' },
+  { patterns: /\b(astral|out[\s-]?of[\s-]?body|astral[\s-]?projection|leaving[\s-]?my[\s-]?body|astral[\s-]?travel|floated[\s-]?above|saw[\s-]?myself[\s-]?below)\b/i, badge: 'astral_found' },
+  { patterns: /\b(dreamscape|dream[\s-]?world|the[\s-]?dreaming|entered[\s-]?the[\s-]?dream|dream[\s-]?realm|inside[\s-]?the[\s-]?dream|within[\s-]?the[\s-]?dream)\b/i, badge: 'dreamscape_signal' },
+  { patterns: /\b(collective[\s-]?dream|shared[\s-]?dream|universal[\s-]?dream|we[\s-]?all[\s-]?dream|humanity(?:'s)?[\s-]?dream|the[\s-]?same[\s-]?dream|archetypal[\s-]?dream)\b/i, badge: 'collective_dream_found' },
+  { patterns: /\b(sleep[\s-]?cycle|rem[\s-]?cycle|deep[\s-]?sleep[\s-]?stage|sleep[\s-]?science|n3[\s-]?sleep|slow[\s-]?wave[\s-]?sleep|sleep[\s-]?stages|90[\s-]?minute[\s-]?cycle)\b/i, badge: 'sleep_cycle_signal' },
+  { patterns: /\b(waking[\s-]?dream|between[\s-]?worlds|liminal[\s-]?state|neither[\s-]?here[\s-]?nor[\s-]?there|half[\s-]?awake|not[\s-]?quite[\s-]?awake|the[\s-]?threshold[\s-]?between)\b/i, badge: 'waking_dream_found' },
+]
+
+/** Scan text for Dream Weaver word turn triggers */
+export function detectDreamWeaverTurns(text: string): BadgeType[] {
+  if (!text || text.length < 2) return []
+  const awarded: BadgeType[] = []
+  for (const { patterns, badge } of DREAM_WEAVER_TURNS) {
+    if (!hasBadge(badge) && patterns.test(text)) {
+      if (awardBadge(badge)) awarded.push(badge)
+    }
+  }
+  return awarded
+}
+
+// ── Calendar EE v31 — THE DREAM CALENDAR ─────────────────────────────────────
+
+/** Check Dream Calendar easter eggs based on current date */
+export function checkDreamCalendarEasterEggs(): BadgeType[] {
+  const awarded: BadgeType[] = []
+  const now = new Date()
+  const month = now.getMonth() + 1
+  const day = now.getDate()
+
+  // World Dream Day: September 25
+  if (!hasBadge('world_dream_day') && month === 9 && day === 25) {
+    awardBadge('world_dream_day')
+    awarded.push('world_dream_day')
+  }
+
+  // Neil Gaiman birthday: November 10 (born 1960)
+  if (!hasBadge('gaiman_birthday') && month === 11 && day === 10) {
+    awardBadge('gaiman_birthday')
+    awarded.push('gaiman_birthday')
+  }
+
+  // Sigmund Freud birthday: May 6 (born 1856)
+  if (!hasBadge('freud_birthday') && month === 5 && day === 6) {
+    awardBadge('freud_birthday')
+    awarded.push('freud_birthday')
+  }
+
+  return awarded
+}
+
+// ── Behavioral v30 — DREAM PATTERNS ──────────────────────────────────────────
+
+/**
+ * Check Dream Logger badge: 3+ journal entries mentioning dreams in 7 days.
+ * Call this when a journal entry is saved.
+ */
+export function checkDreamLogger(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dream_logger')) return null
+
+  const dreamPattern = /\b(dream|dreamed|dreaming|dreamt|nightmare|lucid|dreamscape|rem[\s-]?sleep|sleep[\s-]?cycle)\b/i
+  if (!dreamPattern.test(journalText)) return null
+
+  try {
+    const key = 'dream_logger_dates'
+    const stored = localStorage.getItem(key)
+    const entries: string[] = stored ? JSON.parse(stored) : []
+    const todayStr = new Date().toISOString().slice(0, 10)
+
+    // Add today if not already logged
+    if (!entries.includes(todayStr)) {
+      entries.push(todayStr)
+    }
+
+    // Keep only entries in last 7 days
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    const recent = entries.filter(d => d >= sevenDaysAgo)
+    localStorage.setItem(key, JSON.stringify(recent))
+
+    if (recent.length >= 3) {
+      awardBadge('dream_logger')
+      return 'dream_logger'
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+/**
+ * Check Night Vision badge: check-in between 00:30–01:30 AM (deep dream hours).
+ * Call this on every check-in.
+ */
+export function checkNightVisionBadge(): BadgeType | null {
+  if (hasBadge('night_vision_badge')) return null
+  const now = new Date()
+  const h = now.getHours()
+  const m = now.getMinutes()
+  const totalMins = h * 60 + m
+  // 00:30 = 30 mins, 01:30 = 90 mins
+  if (totalMins >= 30 && totalMins <= 90) {
+    awardBadge('night_vision_badge')
+    return 'night_vision_badge'
+  }
+  return null
+}
+
+/**
+ * Check Dawn Dreamer badge: 7+ consecutive days with check-in before 08:00 AM.
+ * Call this on every check-in.
+ */
+export function checkDawnDreamer(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_dreamer')) return null
+
+  const now = new Date()
+  if (now.getHours() >= 8) return null  // Not before 08:00
+
+  try {
+    const key = 'dawn_dreamer_log'
+    const stored = localStorage.getItem(key)
+    const log: string[] = stored ? JSON.parse(stored) : []
+    const todayStr = now.toISOString().slice(0, 10)
+
+    if (!log.includes(todayStr)) {
+      log.push(todayStr)
+      const recent = log.slice(-10)
+      localStorage.setItem(key, JSON.stringify(recent))
+
+      if (recent.length >= 7) {
+        const sorted = [...recent].sort()
+        let consecutive = 1
+        for (let i = sorted.length - 1; i > 0; i--) {
+          const diff = Math.round(
+            (new Date(sorted[i]).getTime() - new Date(sorted[i - 1]).getTime())
+            / (1000 * 60 * 60 * 24)
+          )
+          if (diff === 1) {
+            consecutive++
+            if (consecutive >= 7) {
+              awardBadge('dawn_dreamer')
+              return 'dawn_dreamer'
+            }
+          } else {
+            break
+          }
+        }
+      }
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+/** Award Dream Vault secret boss badges from journal/memory text */
+export function checkDreamVault(text: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  if (!hasBadge('gaiman_signal') && /\bneil[\s-]?gaiman\b|\bsandman[\s-]?comic\b|\bmorpheus[\s-]?(?:dream|endless)\b|\bdream[\s-]?of[\s-]?the[\s-]?endless\b|\bthe[\s-]?dreaming[\s-]?realm\b|\bsandman'?s[\s-]?library\b/i.test(text)) {
+    if (awardBadge('gaiman_signal')) awarded.push('gaiman_signal')
+  }
+  if (!hasBadge('lovecraft_dream') && /\blovecraft\b|\bcthulhu\b|\br['']?lyeh\b|\bthat[\s-]?is[\s-]?not[\s-]?dead\b|\bdreaming[\s-]?in[\s-]?r['']?lyeh\b|\bph'nglui\b|\bnecronom(?:icon)?\b/i.test(text)) {
+    if (awardBadge('lovecraft_dream')) awarded.push('lovecraft_dream')
+  }
+  if (!hasBadge('castaneda_dream') && /\bcastaneda\b|\bdon[\s-]?juan\b|\bdreaming[\s-]?body\b|\bassemblage[\s-]?point\b|\bcontrolled[\s-]?dreaming\b|\bcarlos[\s-]?castaneda\b|\bthe[\s-]?art[\s-]?of[\s-]?dreaming\b/i.test(text)) {
+    if (awardBadge('castaneda_dream')) awarded.push('castaneda_dream')
   }
   return awarded
 }
