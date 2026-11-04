@@ -28,12 +28,13 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
+import { renderSystemHelp, parseStoryPeriod, stripStoryCommand } from '#shared/utils/logCommands'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, fetchArcadeStatus } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3706,6 +3707,7 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyMeta, setStoryMeta] = React.useState<string | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3743,6 +3745,14 @@ const NoteEditor = ({
     onSuccess: (data) => {
       setStoryResponse(data.story)
       setStoryLoading(false)
+      setStoryMeta(
+        [
+          data.period ? data.period.toUpperCase() : null,
+          data.digest ? `${data.digest.entryCount} ENTRIES · ${data.digest.activeDays}/${data.digest.windowDays} DAYS` : null,
+          data.digest && data.digest.spikes.length ? `${data.digest.spikes.length} PATTERN SHIFT${data.digest.spikes.length > 1 ? 'S' : ''}` : null,
+          data.arcade ? `${data.arcade.rank} · ${data.arcade.xp} XP` : null,
+        ].filter(Boolean).join('  ·  ') || null
+      )
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + data.story
@@ -4121,30 +4131,20 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(renderSystemHelp())
+      } else if (trigger === 'rank-status') {
+        fetchArcadeStatus()
+          .then(a => setSystemHelp(
+            [
+              'ARCADE',
+              '',
+              `RANK            ${a.rank}`,
+              `LEVEL           ${a.level}`,
+              `XP              ${a.xp}`,
+              a.nextRank ? `NEXT            ${a.nextRank} IN ${a.xpToNext} XP` : 'NEXT            MAX RANK',
+            ].join('\n')
+          ))
+          .catch(() => setSystemHelp('ARCADE\n\nRANK UNAVAILABLE'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4152,16 +4152,18 @@ const NoteEditor = ({
           setStoryLoading(true)
           setStoryResponse(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const logText = stripStoryCommand(value)
+            const period = parseStoryPeriod(value)
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              period,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: stripStoryCommand(value), period: parseStoryPeriod(value) })
           }
         }
       }
@@ -4393,13 +4395,13 @@ const NoteEditor = ({
               <div className="opacity-80" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                 {systemHelp.split('\n').map((line, idx) => {
                   if (!line.trim()) return <div key={idx} style={{ height: '0.75rem' }} />
-                  if (line.startsWith('/')) {
+                  if (line.startsWith('/') || /^[A-Za-z+ ]+?\s{2,}\S/.test(line)) {
                     const spaceIdx = line.search(/\s{2,}/)
                     const cmd = spaceIdx > -1 ? line.slice(0, spaceIdx) : line
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                        <span style={{ minWidth: '210px', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )
@@ -4425,6 +4427,9 @@ const NoteEditor = ({
                   {storyResponse.split('\n').map((line, idx) => (
                     <div key={idx}>{line || <br />}</div>
                   ))}
+                  {storyMeta && (
+                    <div className="mt-3 opacity-60" style={{ fontSize: '11px', letterSpacing: '0.08em' }}>{storyMeta}</div>
+                  )}
                 </div>
               )}
             </Block>

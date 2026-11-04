@@ -40,6 +40,7 @@ export type LogTrigger =
   | 'qi-rfi'            // /qi — Quantum Intelligence RFI (Request for Information)
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
+  | 'rank-status'       // /rank — arcade rank, XP, next level
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
 
 interface TriggerRule {
@@ -66,6 +67,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'qi-rfi',         emojis: [],        keywords: ['qi'] },
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
+  { trigger: 'rank-status',    emojis: [],        keywords: ['rank', 'arcade'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
 ]
 

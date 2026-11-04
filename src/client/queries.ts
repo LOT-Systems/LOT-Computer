@@ -869,6 +869,7 @@ export const useAssemblyDirective = createMutation<
 export const usePrayerScripture = createMutation<
   {
     logText: string
+    period?: 'day' | 'week' | 'month' | 'year'
     quantumState?: {
       energy?: string
       clarity?: string
@@ -910,5 +911,27 @@ export const useStoryGeneration = createMutation<
   {
     story: string
     logId: string | null
+    period?: 'day' | 'week' | 'month' | 'year'
+    arcade?: ArcadeStatusDTO
+    digest?: {
+      entryCount: number
+      activeDays: number
+      windowDays: number
+      spikes: Array<{ day: string; kind: string; detail: string }>
+    } | null
   }
 >('post', '/api/story')
+
+export type ArcadeStatusDTO = {
+  rank: string
+  level: number
+  xp: number
+  nextRank: string | null
+  xpToNext: number
+}
+
+// /rank — lifetime arcade status (GET, imperative fetch from the Log)
+export async function fetchArcadeStatus(): Promise<ArcadeStatusDTO> {
+  const { data } = await api.get<ArcadeStatusDTO>('/api/arcade')
+  return data
+}
