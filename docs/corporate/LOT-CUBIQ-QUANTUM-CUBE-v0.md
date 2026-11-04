@@ -321,6 +321,15 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+
+  USE CASE 02 — THE NIGHT-SHIFT PARENT                      2026-11-04
+  ─────────────────────────────────────────────────────────────────
+  Full entry, physics budget and spec amendments:
+  docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md
+  Summary: an evening-working parent on a kitchen counter; after 22:00 the
+  cube is restricted to THE NUDGE and THE SETTLE (felt, not heard, <30 dBA),
+  never repeats within 90 s, and is edge-gated. Justifies quiet-hours rules.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
