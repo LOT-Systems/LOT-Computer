@@ -200,3 +200,5 @@ Ship sequentially across Sundays, not all at once.
 AUTHORIZED BY: S-2 // VADIK MARMELADOV
 END LOT-MANIFEST
 ================================================================================
+
+NOTE 2026-11-04: LOT Mail re-applied to claude/determined-turing-y8dajx (LOT-SR-20261104-01) with 4 fixes; not yet on master.
