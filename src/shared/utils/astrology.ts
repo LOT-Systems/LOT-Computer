@@ -177,3 +177,24 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Build a Date whose local getters (getHours/getDate/...) return the wall-clock
+ * time in the given IANA timeZone. Lets the isomorphic astrology functions
+ * (which read local getters) reflect a user's saved timeZone on any device.
+ * Falls back to the original date on a missing/invalid zone.
+ */
+export function toWallClockDateInZone(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(date)
+    const g = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(g('year'), g('month') - 1, g('day'), g('hour') % 24, g('minute'), g('second'))
+  } catch {
+    return date
+  }
+}
