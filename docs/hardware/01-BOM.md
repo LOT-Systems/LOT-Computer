@@ -1,0 +1,30 @@
+# LOT Pager — Components Buying List (BOM v0.1)
+
+> Prices are **planning estimates, USD, qty-100 pricing, unverified** (vendor sites unreachable from build sandbox). Links are search/product-family URLs; confirm exact MPN and stock. Machine-readable copy: `bom.csv`.
+
+| Ref | Function | Part (MPN) | Why | Est. $/unit | Link |
+|---|---|---|---|---|---|
+| U1 | MCU + Wi-Fi/BLE + camera DVP | Espressif ESP32-S3-MINI-1U-N8R2 *(or bare ESP32-S3R8 on custom PCB for v1)* | Only mainstream MCU with camera + Wi-Fi + low-power | 4.0 | https://www.espressif.com/en/products/socs/esp32-s3 |
+| U2 | Environment (T/RH/P/gas, AI) | Bosch BME688 | Weather + BSEC AI gas classification, 3×3×0.93 mm | 9.0 | https://www.bosch-sensortec.com/products/environmental-sensors/gas-sensors/bme688/ |
+| U3 | IMU w/ on-chip ML | ST LSM6DSOX | Machine Learning Core: tap/orientation/gesture without MCU | 3.5 | https://www.st.com/en/mems-and-sensors/lsm6dsox.html |
+| U4 | Ambient light | Vishay VEML7700 | Auto-dim screen | 1.5 | https://www.vishay.com/en/product/84286/ |
+| CAM | 2 MP camera | OmniVision OV2640 or GalaxyCore GC2145 FPC module (≤ 3.5 mm Z) | Cheap, ESP32 drivers exist | 4.5 | https://www.omnivision.com/products/ |
+| DSP | Screen | 1.14" IPS 240×135, ST7789, SPI (≤1.6 mm panel) | Readable text, cheap | 3.5 | https://www.digikey.com/en/products/result?keywords=1.14%22%20ST7789 |
+| WPC | Qi RX coil + ferrite | 20 mm Qi receiver coil, 0.35 mm flex + ferrite sheet | Thin | 2.5 | https://www.digikey.com/en/products/result?keywords=wireless%20charging%20receiver%20coil |
+| U5 | Qi RX IC | TI BQ51003 *(or BQ51013B)* | 5 V Qi receiver, Li-ion path | 3.0 | https://www.ti.com/product/BQ51013B |
+| U6 | Battery charger/PMIC | TI BQ25185 | Linear charger, power-path | 1.5 | https://www.ti.com/product/BQ25185 |
+| BAT | LiPo | 301520 (≈ 3.0×15×20 mm, ~70 mAh) v0; 401230 alt | Thin; protected cell with PCM | 3.0 | https://www.digikey.com/en/products/result?keywords=lipo%20301520 |
+| HAP | Haptic ("pager buzz") | 6 mm coin LRA + DRV2605L driver | Silent pager feel | 3.0 | https://www.ti.com/product/DRV2605L |
+| SW1 | COPY button | 3×3 mm low-profile tact (≤ 0.6 mm stroke) or capacitive-metal press | One button | 0.4 | https://www.digikey.com/en/products/result?keywords=low%20profile%20tact%20switch |
+| LED | Camera-active LED (privacy) | 0402 red | Trust | 0.05 | — |
+| PCB | 4-layer rigid-flex, 0.8 mm | PCBWay rigid-flex + PCBA | Fits stack | 14.0 | https://www.pcbway.com/rigid-flex-pcb.html |
+| ANT | Antenna | ESP32 module PCB ant. via seam slot (v0) or 2.4 GHz ceramic chip | Needs non-metal gap | 0.3 | — |
+| TOP | Front shell | 316L stainless, CNC, bead-blast/satin | | 45–60 | https://www.pcbway.com/cnc-machining-quote.html |
+| BOT | Back shell | 316L stainless, CNC, **mirror polish** | | 55–75 | same |
+| GLS | Window | 0.5 mm chemically-strengthened glass / sapphire, AR | Display + camera + Qi path | 6–10 | https://www.pcbway.com/ |
+| GSK | Seam gasket | PEEK or epoxy band 0.8 mm | RF slot + seal | 1.0 | — |
+| MISC | Screws M1.2 ×4, adhesive, ferrite, FPC | | | 2.0 | — |
+
+**Charger (CHG):** v0 = any off-the-shelf 5 W Qi pad (~$8) for dev. v1 = custom TX (e.g. TI BQ500212A or Renesas P9242) in a matching stainless disc with a recessed 40×40 pocket.
+
+**Estimated per-unit @100:** ≈ $165–235. **Run total:** ≈ $16.5–23.5k + NRE.
