@@ -441,7 +441,7 @@ export const System = React.memo(function SystemInner() {
         </div>
 
         <div>
-          <TimeWidget />
+          <WidgetErrorBoundary name="Time"><TimeWidget /></WidgetErrorBoundary>
           {!!weather && (
             <>
               <Block label="Sky:">{weather?.description || 'Unknown'}</Block>
@@ -613,8 +613,8 @@ export const System = React.memo(function SystemInner() {
       </div>
 
       <div>
-        <TimeWidget />
-        <QuantumRandomWidget />
+        <WidgetErrorBoundary name="Time"><TimeWidget /></WidgetErrorBoundary>
+        <WidgetErrorBoundary name="QuantumRandom"><QuantumRandomWidget /></WidgetErrorBoundary>
         {!!weather && (
           <>
             <Block label="Sky:">{weather?.description || 'Unknown'}</Block>
@@ -992,12 +992,14 @@ export const System = React.memo(function SystemInner() {
 
       {/* Investor stack — Visible when Investment switch is On in Settings */}
       <WidgetErrorBoundary name="Investor">
+        <LazyMount>
         <div className={cn('flex flex-col', density.stackGap)}>
           <AngelInvestorWidget />
           <CorporatePlanWidget />
           <DemoDayWidget />
           <FourDimensionalUI />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Quantum Engine Connect Widgets — lazy-mounted: subscriptions only start when widget enters viewport */}
@@ -1020,6 +1022,7 @@ export const System = React.memo(function SystemInner() {
 
       {/* CQGS Dashboard stack */}
       <WidgetErrorBoundary name="Dashboard">
+        <LazyMount>
         <div className={cn('flex flex-col', density.stackGap)}>
           {/* CQGS Dashboard - Bioethics health, performance, version */}
           <UserMetricsWidget />
@@ -1033,15 +1036,19 @@ export const System = React.memo(function SystemInner() {
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Architect — executive self-assembly telemetry, paid users only */}
       <WidgetErrorBoundary name="Architect">
+        <LazyMount>
         <ArchitectWidget />
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Stats stack */}
       <WidgetErrorBoundary name="Stats">
+        <LazyMount>
         <div className={cn('flex flex-col', density.sectionGap)}>
           <IntentionPatterns />
           <CollectiveConsciousness />
@@ -1050,15 +1057,20 @@ export const System = React.memo(function SystemInner() {
           <GrowthMilestones />
           <BadgeUnlockFeed />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Calendar — Personal date planner */}
       <WidgetErrorBoundary name="Calendar">
+        <LazyMount>
         <CalendarWidget />
+        </LazyMount>
       </WidgetErrorBoundary>
 
       <WidgetErrorBoundary name="Benchmark">
+        <LazyMount>
         <BenchmarkWidget />
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* The original. Imitation is the sincerest form of flattery, but the quantum field knows. */}
