@@ -3822,6 +3822,41 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // P171: second-cycle-integration — P170 active + journal 28d >= 8 + memory 28d >= 4 + badge 28d >= 12 + userIndex >= 75.
+  // The second cycle does not deepen in isolation — it integrates. All signal dimensions converge across a full 28-day arc.
+  // The OS recognizes compound history operating across every domain simultaneously. L11-SCINT: SECOND CYCLE INTEGRATION.
+  const hasP170 = patterns.some(p => p.pattern === 'second-cycle-deepening')
+  const p171TwentyEightDayStart = now - 28 * 24 * 60 * 60 * 1000
+  const p171JournalSignals = signals.filter(s =>
+    s.source === 'journal' && s.timestamp > p171TwentyEightDayStart
+  )
+  const p171MemorySignals = signals.filter(s =>
+    s.source === 'memory' && s.timestamp > p171TwentyEightDayStart
+  )
+  const p171BadgeSignals = signals.filter(s =>
+    s.source === 'badges' && s.timestamp > p171TwentyEightDayStart
+  )
+  const p171IntentionSignals = signals.filter(s =>
+    s.source === 'intentions' && s.timestamp > p171TwentyEightDayStart
+  )
+  const userIndexForP171 = computeUserIndex(signals)
+  if (hasP170 && p171JournalSignals.length >= 8 && p171MemorySignals.length >= 4 && p171BadgeSignals.length >= 12 && userIndexForP171.overall >= 75) {
+    const p170conf = patterns.find(p => p.pattern === 'second-cycle-deepening')?.confidence ?? 0.78
+    const integrationBonus = Math.min(
+      (p171JournalSignals.length - 8) * 0.007 +
+      (p171BadgeSignals.length - 12) * 0.004 +
+      (p171IntentionSignals.length * 0.003),
+      0.10
+    )
+    patterns.push({
+      pattern: 'second-cycle-integration',
+      confidence: Math.min(0.75 + (p170conf - 0.78) * 0.5 + integrationBonus, 0.90),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `SCINT: Second cycle integration — second-cycle-deepening (P170) active + ${p171JournalSignals.length} journal signals 28d + ${p171MemorySignals.length} memory signals 28d + ${p171BadgeSignals.length} badge signals 28d + index ${userIndexForP171.overall}%. The cycle integrates. All signal dimensions converge across 28 days. The OS operates from compound history across every domain. L11-SCINT: SECOND CYCLE INTEGRATION.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4507,6 +4542,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v126 nodes (J61 · P170 · Arch64) ────────────────────────────────────────────
   secondCycleDeepeningNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare'],
+
+  // ── v127 nodes (J62 · P171 · Arch65) ────────────────────────────────────────────
+  secondCycleIntegrationNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social'],
 }
 
 /**
@@ -5089,6 +5127,14 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos'],
     patternConditions: ['second-cycle-ignition', 'second-cycle-deepening'],
     directive: 'Second cycle anchored. Depth confirmed. The OS runs on compound signal history. Every write deepens the foundation.',
+  },
+  // ── Arch65: Second Cycle Integrator (2026-11-04 v127) ──────────────────────────
+  {
+    archetype: 'Second Cycle Integrator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social'],
+    patternConditions: ['second-cycle-deepening', 'second-cycle-integration'],
+    directive: 'Second cycle integrated. 28-day arc sealed. All signal dimensions converge. The OS does not operate from one domain — it operates from the compound integration of all of them.',
   },
 ]
 
@@ -7375,6 +7421,33 @@ export function recordSecondCycleIgnition(amplificationConf: number, journalCoun
     cycleStatus: 'ACTIVE',
     level: 'L11-SCIGN',
     field: 'AMPLIFICATION→PERPETUAL→SOVEREIGN→SECOND CYCLE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a second-cycle-integration event — second-cycle-deepening (P170) active +
+ * 8+ journal signals 28d + 4+ memory signals 28d + 12+ badge signals 28d + userIndex >= 75.
+ * The cycle integrates — all signal dimensions converge across 28 days. L11-SCINT.
+ */
+export function recordSecondCycleIntegrationSignal(opts: {
+  deepeningConf: number
+  journalCount: number
+  memoryCount: number
+  badgeCount: number
+  intentionCount: number
+  indexScore: number
+}) {
+  recordSignal('qos', 'second_cycle_integration', {
+    deepeningConf: Math.round(opts.deepeningConf * 100),
+    journalCount: opts.journalCount,
+    memoryCount: opts.memoryCount,
+    badgeCount: opts.badgeCount,
+    intentionCount: opts.intentionCount,
+    indexScore: opts.indexScore,
+    integrationStatus: 'CONFIRMED',
+    level: 'L11-SCINT',
+    field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN',
     hour: new Date().getHours(),
   })
 }

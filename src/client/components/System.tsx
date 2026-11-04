@@ -277,6 +277,19 @@ export const System = React.memo(function SystemInner() {
     return classifyPhysiologicalCohort(eng.signals, quantumState, eng.recognizedPatterns ?? [])
   }, [quantumState])
 
+  // Second cycle status — derived from recognized patterns
+  const secondCycleStatus = React.useMemo(() => {
+    const eng = intentionEngine.get()
+    const patterns = eng.recognizedPatterns ?? []
+    const hasIntegration = patterns.some(p => p.pattern === 'second-cycle-integration')
+    const hasDeepening = patterns.some(p => p.pattern === 'second-cycle-deepening')
+    const hasIgnition = patterns.some(p => p.pattern === 'second-cycle-ignition')
+    if (hasIntegration) return 'L11-SCINT'
+    if (hasDeepening) return 'L11-SCDEP'
+    if (hasIgnition) return 'L11-SCIGN'
+    return null
+  }, [quantumState])
+
   // Accumulative User Index - holistic score from all widget signals
   const userIndex = React.useMemo(() => {
     return getUserIndex()
@@ -698,6 +711,7 @@ export const System = React.memo(function SystemInner() {
                 { metric: 'Clarity', value: quantumState.clarity },
                 { metric: 'Alignment', value: quantumState.alignment },
                 { metric: 'Index', value: `${userIndex.overall}%` },
+                ...(secondCycleStatus ? [{ metric: 'Cycle', value: secondCycleStatus }] : []),
                 { metric: 'Directive', value: physiologicalCohort?.directive ?? '—' }
               ]}
               columns={[

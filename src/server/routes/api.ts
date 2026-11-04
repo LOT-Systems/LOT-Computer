@@ -1245,6 +1245,8 @@ export default async (fastify: FastifyInstance) => {
       'second_cycle_ignition',
       // v126: second cycle deepening (P170)
       'second_cycle_deepening',
+      // v127: second cycle integration (P171)
+      'second_cycle_integration',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

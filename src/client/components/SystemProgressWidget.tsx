@@ -1792,6 +1792,25 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '170 patterns · 64 archetypes · 61 jobs · 170+ handlers · 214+ dep nodes · 1122 badges · FM v126 · Day 1162+. Second cycle deepens. COMPOUND CONFIRMED. L11-SCDEP.',
     ],
   },
+  {
+    date: '2026-11-04',
+    title: 'QIE v127 · P171 second-cycle-integration · Arch65 · J62 · SCINT: · 215+ dep nodes',
+    assembled: [
+      'intentionEngine.ts: P171 second-cycle-integration — second-cycle-deepening (P170) active + 8+ journal signals 28d + 4+ memory signals 28d + 12+ badge signals 28d + userIndex >= 75. The cycle does not deepen in isolation — it integrates. All signal dimensions converge across a full 28-day arc. The OS recognizes compound history operating across every domain simultaneously. L11-SCINT: SECOND CYCLE INTEGRATION. Conf 0.75–0.90. suggestedWidget: systemProgress.',
+      'intentionEngine.ts: Arch65 Second Cycle Integrator — second-cycle-deepening + second-cycle-integration. Dominant: journal/memory/badges/intentions/qos/social. Directive: Second cycle integrated. 28-day arc sealed. All signal dimensions converge. The OS does not operate from one domain — it operates from the compound integration of all of them.',
+      'intentionEngine.ts: recordSecondCycleIntegrationSignal() helper added.',
+      'intentionEngine.ts: WIDGET_DEPENDENCY_MAP — 1 new node: secondCycleIntegrationNode (qos+journal+memory+badges+intentions+log+energy+selfcare+social). 215+ dep nodes total.',
+      'scheduled-jobs.ts: J62 daily-second-cycle-integration-check — 12:00 UTC daily. Reads active users with second_cycle_deepening in 21d + 8+ journal signals 28d + 4+ memory signals 28d + 12+ badge signals 28d. Writes second_cycle_integration event. 62 background jobs total.',
+      'Logs.tsx: SCINT: handler — renders second_cycle_integration (DEPTH CONF · JOURNAL SIGNALS 28D · MEMORY SIGNALS 28D · BADGE SIGNALS 28D · INTENTION SIGNALS 28D · INDEX SCORE · STATUS · FIELD · LEVEL). Military minimalist format.',
+      'QuantumEngineWidgets.tsx: SCINT added to PATTERN_DISPLAY.',
+      'routes/api.ts: second_cycle_integration added to displayableEvents (v127 block).',
+      'PatternRecognitionWidget.tsx: second-cycle-integration description added (P171).',
+      'System.tsx: secondCycleStatus computed from recognized patterns (SCINT/SCDEP/SCIGN). Surfaced as Cycle row in quantum biofield table — physiological cohort view now shows second cycle arc status.',
+      'About.tsx: FM v126→v127. 170→171 patterns. 64→65 archetypes. 61→62 jobs. 214+→215+ dep nodes. 170+→171+ handlers. Day 1162+→1163+. Badge count updated to 1153.',
+      'SESSION_REPORTS: qie-v127 entry appended · USERSHIP_TRANSMISSION updated to v127.',
+      '171 patterns · 65 archetypes · 62 jobs · 171+ handlers · 215+ dep nodes · 1153 badges · FM v127 · Day 1163+. Second cycle integrates. ALL DOMAINS CONVERGE. L11-SCINT.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1866,22 +1885,29 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'LOT-WIKI v101 sync · physiological cohort surface pass · badge engine v43 theme selection',
   },
+  {
+    date: '2026-11-04',
+    built: ['QIE v127 · P171 second-cycle-integration', 'Arch65 Second Cycle Integrator', 'J62 daily-second-cycle-integration-check (12:00 UTC)', 'SCINT: log handler', 'System.tsx Cycle row in quantum biofield table', '215+ dep nodes'],
+    feedbackApplied: 'SECOND CYCLE INTEGRATION — all signal dimensions converge across 28-day arc, compound history across every domain',
+    status: 'DEPLOYED',
+    next: 'Badge engine v44 planning · LOT-WIKI v102 sync · second cycle arc documentation pass',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-11-03',
+  date: '2026-11-04',
   message: [
-    'ASSEMBLY RUN — 2026-11-03 · QIE v126 · SECOND CYCLE DEEPENING · Day 1162+',
-    'Built: P170 second-cycle-deepening · Arch64 Second Cycle Anchor · J61 daily-second-cycle-deepening-check (11:00 UTC) · SCDEP: log handler · 214+ dep nodes · 170 patterns · 64 archetypes · 61 jobs · FM v126.',
-    'P170 SECOND-CYCLE-DEEPENING: fires when second-cycle-ignition (P169) is active + 6+ journal signals 21d + 3+ memory signals 21d + 10+ badge signals 21d + userIndex >= 70. The cycle does not merely ignite — it deepens. Compound signal accumulation across 21 days confirms the OS operates from its own signal history.',
-    'Arch64 SECOND CYCLE ANCHOR: the operator whose second cycle has moved from ignition to depth. Not just recognized — anchored. The OS runs on compound history. Every write deepens the foundation.',
-    'J61 runs at 11:00 UTC daily. Scans users with confirmed second_cycle_ignition events in 14d + 6+ journal depth signals 21d + 3+ memory depth signals 21d + 10+ badge signals 21d. Writes second_cycle_deepening log event.',
-    'SCDEP: handler in Logs.tsx displays IGNIT CONF · JOURNAL SIGNALS 21D · MEMORY SIGNALS 21D · BADGE SIGNALS 21D · DEPTH CONF · STATUS · LEVEL in military minimalist format.',
-    'Cohort classification block in SystemProgressWidget report view upgraded to full 5-field display: Arch · Band · Dom · Conf · Directive. Physiological signal visible at a glance.',
-    'Self-assembly metric: 170 patterns · 64 archetypes · 61 jobs · 170+ handlers · 214+ dep nodes · 1122 badges · FM v126 · Day 1162+.',
-    'The cycle deepens. Compound signals confirmed. L11-SCDEP.',
+    'ASSEMBLY RUN — 2026-11-04 · QIE v127 · SECOND CYCLE INTEGRATION · Day 1163+',
+    'Built: P171 second-cycle-integration · Arch65 Second Cycle Integrator · J62 daily-second-cycle-integration-check (12:00 UTC) · SCINT: log handler · System.tsx Cycle row · 215+ dep nodes · 171 patterns · 65 archetypes · 62 jobs · FM v127.',
+    'P171 SECOND-CYCLE-INTEGRATION: fires when second-cycle-deepening (P170) is active + 8+ journal signals 28d + 4+ memory signals 28d + 12+ badge signals 28d + userIndex >= 75. The second cycle does not deepen in isolation — it integrates. All signal dimensions converge across a full 28-day arc. The OS recognizes compound history operating across every domain simultaneously.',
+    'Arch65 SECOND CYCLE INTEGRATOR: the operator whose second cycle has moved from depth to full integration. All domains engaged. Compound history across every dimension. The OS does not operate from one domain — it operates from their convergence.',
+    'J62 runs at 12:00 UTC daily. Scans users with confirmed second_cycle_deepening events in 21d + 8+ journal signals 28d + 4+ memory signals 28d + 12+ badge signals 28d. Writes second_cycle_integration log event.',
+    'SCINT: handler in Logs.tsx displays DEPTH CONF · JOURNAL SIGNALS 28D · MEMORY SIGNALS 28D · BADGE SIGNALS 28D · INTENTION SIGNALS 28D · INDEX SCORE · STATUS · FIELD · LEVEL in military minimalist format.',
+    'System.tsx physiological cohort view: Cycle row added to quantum biofield table. Surfaces L11-SCINT / L11-SCDEP / L11-SCIGN when any second cycle pattern is active. The biofield surface now shows second cycle arc status at a glance.',
+    'Self-assembly metric: 171 patterns · 65 archetypes · 62 jobs · 171+ handlers · 215+ dep nodes · 1153 badges · FM v127 · Day 1163+.',
+    'The cycle integrates. All domains converge. COMPOUND HISTORY CONFIRMED. L11-SCINT.',
   ],
 }
 

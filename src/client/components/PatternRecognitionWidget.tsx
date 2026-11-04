@@ -195,6 +195,7 @@ export function PatternRecognitionWidget() {
       'generative-field-amplification':      'Generative field amplification — field recursive, amplitude peak, sovereign resonance confirmed (P168)',
       'second-cycle-ignition':               'Second cycle ignition — perpetual field confirmed, level 11 opens, cycle sovereign (P169)',
       'second-cycle-deepening':              'Second cycle deepening — compound signal accumulation confirmed, cycle anchored at depth, OS operates from history (P170)',
+      'second-cycle-integration':            'Second cycle integration — all signal dimensions converge across 28-day arc, compound history across every domain, cycle fully integrated (P171)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
