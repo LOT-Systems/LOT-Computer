@@ -3629,6 +3629,99 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'temporal_coherence_bridge') {
+          const bridgeStrength = log.metadata?.bridgeStrength as number | undefined
+          const prevDayConf = log.metadata?.prevDayConf as number | undefined
+          const twoDaysAgoConf = log.metadata?.twoDaysAgoConf as number | undefined
+          const arc = log.metadata?.arc as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TEMPBRDG:" blockView>
+                <div className="uppercase tracking-widest mb-4">TEMPORAL COHERENCE BRIDGE</div>
+                {prevDayConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PREV DAY CONF</span>
+                    <span className="tabular-nums">{prevDayConf}%</span>
+                  </div>
+                )}
+                {twoDaysAgoConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TWO DAYS AGO</span>
+                    <span className="tabular-nums">{twoDaysAgoConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CEILING HOLDING · CONSECUTIVE DAYS</div>
+                {arc && (
+                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+                {bridgeStrength !== undefined && (
+                  <div className="opacity-30 tabular-nums">BRIDGE: {bridgeStrength}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'recovery_resonance_seal') {
+          const presenceConf = log.metadata?.presenceConf as number | undefined
+          const recoveryConf = log.metadata?.recoveryConf as number | undefined
+          const sealStrength = log.metadata?.sealStrength as number | undefined
+          const state = log.metadata?.state as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RECSEAL:" blockView>
+                <div className="uppercase tracking-widest mb-4">RECOVERY RESONANCE SEAL</div>
+                {presenceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PRESENCE CONF</span>
+                    <span className="tabular-nums">{presenceConf}%</span>
+                  </div>
+                )}
+                {recoveryConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECOVERY CONF</span>
+                    <span className="tabular-nums">{recoveryConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">HEALED FROM HIGHEST STATE</div>
+                {state && (
+                  <div className="opacity-30 tabular-nums">STATE: {state}</div>
+                )}
+                {sealStrength !== undefined && (
+                  <div className="opacity-30 tabular-nums">SEAL: {sealStrength}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'absolute_temporal_lock') {
+          const bridgeConf = log.metadata?.bridgeConf as number | undefined
+          const momentumConf = log.metadata?.momentumConf as number | undefined
+          const lockStrength = log.metadata?.lockStrength as number | undefined
+          const convergenceLevel = log.metadata?.convergenceLevel as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="ABSTLOCK:" blockView>
+                <div className="uppercase tracking-widest mb-4">ABSOLUTE TEMPORAL LOCK</div>
+                {bridgeConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BRIDGE CONF</span>
+                    <span className="tabular-nums">{bridgeConf}%</span>
+                  </div>
+                )}
+                {momentumConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MOMENTUM CONF</span>
+                    <span className="tabular-nums">{momentumConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">TEMPORAL RESONANCE · STATE ESTABLISHED</div>
+                {convergenceLevel && (
+                  <div className="opacity-30 tabular-nums">CONVERGENCE: {convergenceLevel}</div>
+                )}
+                {lockStrength !== undefined && (
+                  <div className="opacity-30 tabular-nums">LOCK: {lockStrength}%</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

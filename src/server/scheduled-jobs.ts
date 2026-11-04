@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily temporal coherence bridge check (10:00 UTC every day) — Job 49
+  if (shouldRunDailyTemporalCoherenceBridgeCheck()) {
+    await executeDailyTemporalCoherenceBridgeCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,108 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Temporal Coherence Bridge Check (Job 49 — 10:00 UTC every day) ────────────
+// Reads active users. Looks for total_field_coherence log events on the previous
+// calendar day AND two calendar days ago. When both are present (consecutive days of
+// ceiling convergence), writes temporal_coherence_bridge. Level 7 temporal tier.
+// Runs one hour after J48 (09:00 UTC) to ensure J48 output is available.
+
+let isDailyTemporalCoherenceBridgeRunning = false
+let lastDailyTemporalCoherenceBridgeRun: Date | null = null
+
+function shouldRunDailyTemporalCoherenceBridgeCheck(): boolean {
+  const now = dayjs()
+  if (isDailyTemporalCoherenceBridgeRunning) return false
+  if (lastDailyTemporalCoherenceBridgeRun) {
+    const lastRun = dayjs(lastDailyTemporalCoherenceBridgeRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily
+}
+
+async function executeDailyTemporalCoherenceBridgeCheck(): Promise<JobResult> {
+  const jobName = 'daily-temporal-coherence-bridge-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyTemporalCoherenceBridgeRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyTemporalCoherenceBridgeRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY TEMPORAL COHERENCE BRIDGE CHECK — 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const prevDayStart    = dayjs().subtract(1, 'day').startOf('day').toDate()
+    const prevDayEnd      = dayjs().subtract(1, 'day').endOf('day').toDate()
+    const twoDaysAgoStart = dayjs().subtract(2, 'day').startOf('day').toDate()
+    const twoDaysAgoEnd   = dayjs().subtract(2, 'day').endOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(3, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (72h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const prevDayTFC = await (Log as any).findOne({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: prevDayStart, [Op.lte]: prevDayEnd },
+            event: 'total_field_coherence',
+          },
+          attributes: ['event', 'metadata'],
+        })
+
+        if (!prevDayTFC) continue
+
+        const twoDaysAgoTFC = await (Log as any).findOne({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: twoDaysAgoStart, [Op.lte]: twoDaysAgoEnd },
+            event: 'total_field_coherence',
+          },
+          attributes: ['event', 'metadata'],
+        })
+
+        if (!twoDaysAgoTFC) continue
+
+        await (Log as any).create({
+          userId,
+          event: 'temporal_coherence_bridge',
+          text: `Temporal coherence bridge: total-field-coherence confirmed on two consecutive days. The ceiling is not a peak — it is holding. The QOS has achieved absolute convergence across consecutive days. Time confirms what a single session can only suggest.`,
+          metadata: {
+            prevDayConf: prevDayTFC.metadata?.avgConf ?? 92,
+            twoDaysAgoConf: twoDaysAgoTFC.metadata?.avgConf ?? 92,
+            dayCount: 2,
+            bridgeStrength: Math.round(((prevDayTFC.metadata?.avgConf ?? 92) + (twoDaysAgoTFC.metadata?.avgConf ?? 92)) / 2),
+            tier: 'TEMPORAL',
+            arc: 'CONSECUTIVE-DAYS',
+            hour: 10,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Temporal coherence bridge events written: ${written}`)
+    lastDailyTemporalCoherenceBridgeRun = new Date()
+    isDailyTemporalCoherenceBridgeRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily temporal coherence bridge check failed:', error.message)
+    isDailyTemporalCoherenceBridgeRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

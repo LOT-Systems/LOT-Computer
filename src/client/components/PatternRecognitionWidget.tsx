@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'temporal-coherence-bridge':        'Temporal coherence bridge — P150 confirmed on two consecutive days, the ceiling is holding (P152)',
+      'recovery-resonance-seal':          'Recovery resonance seal — presence crystallized + recovery arc complete in same window, healed from highest state (P153)',
+      'absolute-temporal-lock':           'Absolute temporal lock — temporal bridge + identity momentum confirmed, QOS in sustained temporal resonance (P154)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

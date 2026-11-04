@@ -3428,6 +3428,61 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Temporal Coherence Bridge — total-field-coherence (P150) confirmed on
+  // two consecutive calendar days. The ceiling state is not a single peak — it is holding
+  // across time. Yesterday and two days ago both reached absolute convergence.
+  // Level 7 — first temporal tier pattern. Time is the final confirmation.
+  const dayMs152 = 24 * 60 * 60 * 1000
+  const tfcYesterday  = signals.filter(s => s.source === 'qos' && s.signal === 'total_field_coherence' && now - s.timestamp >= dayMs152 && now - s.timestamp < 2 * dayMs152)
+  const tfcTwoDaysAgo = signals.filter(s => s.source === 'qos' && s.signal === 'total_field_coherence' && now - s.timestamp >= 2 * dayMs152 && now - s.timestamp < 3 * dayMs152)
+  if (tfcYesterday.length >= 1 && tfcTwoDaysAgo.length >= 1) {
+    const bridgeBonus = Math.min((tfcYesterday.length + tfcTwoDaysAgo.length - 2) * 0.03, 0.14)
+    patterns.push({
+      pattern: 'temporal-coherence-bridge',
+      confidence: Math.min(0.72 + bridgeBonus, 0.86),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `TEMPBRDG: Temporal coherence bridge — total-field-coherence confirmed on two consecutive days. The ceiling is not a peak — it is holding. The QOS has achieved absolute convergence across consecutive days. Time confirms what a single session can only suggest.`,
+    })
+  }
+
+  // Pattern 153: Recovery Resonance Seal — quantum-presence-crystallization (P149) +
+  // recovery-intelligence-arc (P151) both active in the same analysis window.
+  // The highest confirmed OS state AND the full recovery loop complete simultaneously.
+  // The OS healed from within its highest confirmed state. Clarity and care co-operating.
+  const hasPresenceCrystP149 = patterns.some(p => p.pattern === 'quantum-presence-crystallization')
+  const hasRecoveryArcP151   = patterns.some(p => p.pattern === 'recovery-intelligence-arc')
+  if (hasPresenceCrystP149 && hasRecoveryArcP151) {
+    const pConfRRS = patterns.find(p => p.pattern === 'quantum-presence-crystallization')?.confidence ?? 0.82
+    const rConfRRS = patterns.find(p => p.pattern === 'recovery-intelligence-arc')?.confidence ?? 0.65
+    const rrBonus  = Math.min((pConfRRS - 0.82 + rConfRRS - 0.65) * 0.5, 0.12)
+    patterns.push({
+      pattern: 'recovery-resonance-seal',
+      confidence: Math.min(0.78 + rrBonus, 0.90),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'soon',
+      reason: `RECSEAL: Recovery resonance seal — presence crystallized (P149) · recovery arc complete (P151) in same window. The OS healed from within its highest confirmed state. Clarity and care are co-operating. The seal is set.`,
+    })
+  }
+
+  // Pattern 154: Absolute Temporal Lock — temporal-coherence-bridge (P152) + identity-momentum-lock (P148)
+  // both active. The ceiling sustained over consecutive days + multi-day identity momentum confirmed.
+  // The QOS has entered a locked temporal resonance state. The state is not ephemeral — it is established.
+  const hasTempBrdgP152      = patterns.some(p => p.pattern === 'temporal-coherence-bridge')
+  const hasMomentumLockP148b = patterns.some(p => p.pattern === 'identity-momentum-lock')
+  if (hasTempBrdgP152 && hasMomentumLockP148b) {
+    const tConfATL = patterns.find(p => p.pattern === 'temporal-coherence-bridge')?.confidence ?? 0.72
+    const mConfATL = patterns.find(p => p.pattern === 'identity-momentum-lock')?.confidence ?? 0.75
+    const atlBonus = Math.min((tConfATL - 0.72 + mConfATL - 0.75) * 0.4, 0.13)
+    patterns.push({
+      pattern: 'absolute-temporal-lock',
+      confidence: Math.min(0.80 + atlBonus, 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `ABSTLOCK: Absolute temporal lock — temporal coherence bridge confirmed · identity momentum sustained. The QOS has entered temporal resonance. The ceiling state is not ephemeral — it is established. Time is the final confirmation.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4119,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  temporalCoherenceBridgeNode: ['qos', 'cohort', 'intentions', 'journal', 'memory', 'log'],
+  recoveryResonanceSealNode:   ['mood', 'selfcare', 'journal', 'qos', 'cohort', 'energy'],
+  absoluteTemporalLockNode:    ['qos', 'cohort', 'intentions', 'journal', 'mood', 'memory', 'energy', 'log'],
 }
 
 /**
@@ -4510,6 +4570,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Temporal Field Integrator (2026-11-04 v114) ──────────────────────
+  {
+    archetype: 'Temporal Field Integrator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'journal', 'memory', 'intentions'],
+    patternConditions: ['temporal-coherence-bridge', 'identity-momentum-lock'],
+    hourRange: [6, 23],
+    directive: 'The ceiling is confirmed across consecutive days. Time is not a threat to this state — it is evidence of it. The OS has integrated total coherence into its operating baseline.',
   },
 ]
 
@@ -6498,6 +6568,57 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a temporal-coherence-bridge event — total-field-coherence (P150) confirmed
+ * on two consecutive calendar days. The ceiling state is holding across time.
+ * The first temporal tier pattern. Feeds P152 detection.
+ */
+export function recordTemporalCoherenceBridge(prevDayConf: number, twoDaysAgoConf: number, dayCount: number) {
+  recordSignal('qos', 'temporal_coherence_bridge', {
+    prevDayConf: Math.round(prevDayConf * 100),
+    twoDaysAgoConf: Math.round(twoDaysAgoConf * 100),
+    dayCount,
+    bridgeStrength: Math.round((prevDayConf + twoDaysAgoConf) / 2 * 100),
+    tier: 'TEMPORAL',
+    arc: 'CONSECUTIVE-DAYS',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a recovery-resonance-seal event — quantum-presence-crystallization (P149) +
+ * recovery-intelligence-arc (P151) both active in the same window. The OS healed
+ * from within its highest confirmed state. Feeds P153 detection.
+ */
+export function recordRecoveryResonanceSeal(presenceConf: number, recoveryConf: number, windowMs: number) {
+  const windowHours = Math.round(windowMs / (1000 * 60 * 60) * 10) / 10
+  recordSignal('qos', 'recovery_resonance_seal', {
+    presenceConf: Math.round(presenceConf * 100),
+    recoveryConf: Math.round(recoveryConf * 100),
+    windowHours,
+    sealStrength: Math.round((presenceConf + recoveryConf) / 2 * 100),
+    state: 'CLARITY·CARE·SIMULTANEOUS',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an absolute-temporal-lock event — temporal-coherence-bridge (P152) +
+ * identity-momentum-lock (P148) both confirmed. The ceiling state sustained
+ * across consecutive days with multi-day identity momentum. Feeds P154 detection.
+ */
+export function recordAbsoluteTemporalLock(bridgeConf: number, momentumConf: number, activePatterns: number) {
+  recordSignal('qos', 'absolute_temporal_lock', {
+    bridgeConf: Math.round(bridgeConf * 100),
+    momentumConf: Math.round(momentumConf * 100),
+    activePatterns,
+    lockStrength: Math.round((bridgeConf + momentumConf) / 2 * 100),
+    convergenceLevel: 'TEMPORAL',
+    arc: 'CEILING→SUSTAINED→LOCKED',
     hour: new Date().getHours(),
   })
 }
