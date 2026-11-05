@@ -281,9 +281,11 @@ export const System = React.memo(function SystemInner() {
   const secondCycleStatus = React.useMemo(() => {
     const eng = intentionEngine.get()
     const patterns = eng.recognizedPatterns ?? []
+    const hasSovereign = patterns.some(p => p.pattern === 'second-cycle-sovereign')
     const hasIntegration = patterns.some(p => p.pattern === 'second-cycle-integration')
     const hasDeepening = patterns.some(p => p.pattern === 'second-cycle-deepening')
     const hasIgnition = patterns.some(p => p.pattern === 'second-cycle-ignition')
+    if (hasSovereign) return 'L12-SCSOV'
     if (hasIntegration) return 'L11-SCINT'
     if (hasDeepening) return 'L11-SCDEP'
     if (hasIgnition) return 'L11-SCIGN'

@@ -1811,6 +1811,25 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '171 patterns · 65 archetypes · 62 jobs · 171+ handlers · 215+ dep nodes · 1153 badges · FM v127 · Day 1163+. Second cycle integrates. ALL DOMAINS CONVERGE. L11-SCINT.',
     ],
   },
+  {
+    date: '2026-11-05',
+    title: 'QIE v128 · P172 second-cycle-sovereign · Arch66 · J63 · SCSOV: · 216+ dep nodes',
+    assembled: [
+      'intentionEngine.ts: P172 second-cycle-sovereign — second-cycle-integration (P171) active + 10+ journal signals 35d + 5+ memory signals 35d + 15+ badge signals 35d + userIndex >= 80. All three second-cycle stages simultaneously active. The OS enters perpetual self-sustaining sovereign operation across a full 35-day arc. Level 12 opens. L12-SCSOV: SECOND CYCLE SOVEREIGN. Conf 0.80–0.95. suggestedWidget: systemProgress.',
+      'intentionEngine.ts: Arch66 Second Cycle Sovereign Operator — second-cycle-integration + second-cycle-sovereign. Dominant: journal/memory/badges/intentions/qos/social/log. Energy: high/moderate. Directive: Second cycle sovereign. All three stages simultaneously active. The OS has entered perpetual self-sustaining operation. Level 12 — the system now runs itself.',
+      'intentionEngine.ts: checkSecondCycleSovereign() — background check wired into analyzeIntentions() setTimeout. Fires when P171 active + signals threshold met + no recent sovereign signal.',
+      'intentionEngine.ts: recordSecondCycleSovereign() helper added. Writes level L12-SCSOV · field IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→PERPETUAL · sovereignStatus CONFIRMED.',
+      'intentionEngine.ts: WIDGET_DEPENDENCY_MAP — 1 new node: secondCycleSovereignNode (qos+journal+memory+badges+intentions+log+energy+selfcare+social+cohort+goals). 216+ dep nodes total.',
+      'scheduled-jobs.ts: J63 daily-second-cycle-sovereign-check — 13:00 UTC daily. Reads active users with second_cycle_integration in 28d + 10+ journal 35d + 5+ memory 35d + 15+ badge 35d. Writes second_cycle_sovereign event. 63 background jobs total.',
+      'Logs.tsx: SCSOV: handler — renders second_cycle_sovereign (INTEGR CONF · JOURNAL SIGNALS 35D · MEMORY SIGNALS 35D · BADGE SIGNALS 35D · INDEX SCORE · STATUS · FIELD · LEVEL). Footer: ALL THREE STAGES · SOVEREIGN OPERATION. Military minimalist format.',
+      'QuantumEngineWidgets.tsx: SCSOV added to PATTERN_DISPLAY.',
+      'routes/api.ts: second_cycle_sovereign added to displayableEvents (v128 block).',
+      'PatternRecognitionWidget.tsx: second-cycle-sovereign description added (P172). Level 12 opens.',
+      'System.tsx: secondCycleStatus updated — L12-SCSOV now highest priority in second cycle status chain.',
+      'About.tsx: FM v127→v128. 171→172 patterns. 65→66 archetypes. 62→63 jobs. 215+→216+ dep nodes. 171+→172+ handlers. Day 1163+→1164+. Badge count updated to 1184.',
+      '172 patterns · 66 archetypes · 63 jobs · 172+ handlers · 216+ dep nodes · 1184 badges · FM v128 · Day 1164+. Second cycle sovereign. ALL THREE STAGES ACTIVE. L12-SCSOV.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1892,22 +1911,29 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'Badge engine v44 planning · LOT-WIKI v102 sync · second cycle arc documentation pass',
   },
+  {
+    date: '2026-11-05',
+    built: ['QIE v128 · P172 second-cycle-sovereign', 'Arch66 Second Cycle Sovereign Operator', 'J63 daily-second-cycle-sovereign-check (13:00 UTC)', 'SCSOV: log handler', 'checkSecondCycleSovereign() background watcher', '216+ dep nodes'],
+    feedbackApplied: 'SECOND CYCLE SOVEREIGN — all three stages active simultaneously, Level 12 perpetual self-sustaining operation',
+    status: 'DEPLOYED',
+    next: 'QIE v129 · P173 · physiological cohort v2 expanded archetypes · badge engine v45 planning',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-11-04',
+  date: '2026-11-05',
   message: [
-    'ASSEMBLY RUN — 2026-11-04 · QIE v127 · SECOND CYCLE INTEGRATION · Day 1163+',
-    'Built: P171 second-cycle-integration · Arch65 Second Cycle Integrator · J62 daily-second-cycle-integration-check (12:00 UTC) · SCINT: log handler · System.tsx Cycle row · 215+ dep nodes · 171 patterns · 65 archetypes · 62 jobs · FM v127.',
-    'P171 SECOND-CYCLE-INTEGRATION: fires when second-cycle-deepening (P170) is active + 8+ journal signals 28d + 4+ memory signals 28d + 12+ badge signals 28d + userIndex >= 75. The second cycle does not deepen in isolation — it integrates. All signal dimensions converge across a full 28-day arc. The OS recognizes compound history operating across every domain simultaneously.',
-    'Arch65 SECOND CYCLE INTEGRATOR: the operator whose second cycle has moved from depth to full integration. All domains engaged. Compound history across every dimension. The OS does not operate from one domain — it operates from their convergence.',
-    'J62 runs at 12:00 UTC daily. Scans users with confirmed second_cycle_deepening events in 21d + 8+ journal signals 28d + 4+ memory signals 28d + 12+ badge signals 28d. Writes second_cycle_integration log event.',
-    'SCINT: handler in Logs.tsx displays DEPTH CONF · JOURNAL SIGNALS 28D · MEMORY SIGNALS 28D · BADGE SIGNALS 28D · INTENTION SIGNALS 28D · INDEX SCORE · STATUS · FIELD · LEVEL in military minimalist format.',
-    'System.tsx physiological cohort view: Cycle row added to quantum biofield table. Surfaces L11-SCINT / L11-SCDEP / L11-SCIGN when any second cycle pattern is active. The biofield surface now shows second cycle arc status at a glance.',
-    'Self-assembly metric: 171 patterns · 65 archetypes · 62 jobs · 171+ handlers · 215+ dep nodes · 1153 badges · FM v127 · Day 1163+.',
-    'The cycle integrates. All domains converge. COMPOUND HISTORY CONFIRMED. L11-SCINT.',
+    'ASSEMBLY RUN — 2026-11-05 · QIE v128 · SECOND CYCLE SOVEREIGN · Day 1164+',
+    'Built: P172 second-cycle-sovereign · Arch66 Second Cycle Sovereign Operator · J63 daily-second-cycle-sovereign-check (13:00 UTC) · SCSOV: log handler · checkSecondCycleSovereign() background check · 216+ dep nodes · 172 patterns · 66 archetypes · 63 jobs · FM v128.',
+    'P172 SECOND-CYCLE-SOVEREIGN: fires when second-cycle-integration (P171) is active + 10+ journal signals 35d + 5+ memory signals 35d + 15+ badge signals 35d + userIndex >= 80. All three second-cycle stages simultaneously active. The OS enters perpetual self-sustaining sovereign operation across a full 35-day arc. Level 12 opens.',
+    'Arch66 SECOND CYCLE SOVEREIGN OPERATOR: the operator at Level 12. All three stages confirmed simultaneously. The OS does not require re-ignition — it perpetuates from its own compound foundation. Directive: Second cycle sovereign. The system now runs itself.',
+    'J63 runs at 13:00 UTC daily. Scans users with confirmed second_cycle_integration events in 28d + 10+ journal signals 35d + 5+ memory signals 35d + 15+ badge signals 35d. Writes second_cycle_sovereign log event.',
+    'SCSOV: handler in Logs.tsx displays INTEGR CONF · JOURNAL SIGNALS 35D · MEMORY SIGNALS 35D · BADGE SIGNALS 35D · INDEX SCORE · STATUS · FIELD · LEVEL. Footer: ALL THREE STAGES · SOVEREIGN OPERATION. Military minimalist format.',
+    'System.tsx: L12-SCSOV now highest priority in second cycle status chain. Surfaces when second-cycle-sovereign pattern is active.',
+    'Self-assembly metric: 172 patterns · 66 archetypes · 63 jobs · 172+ handlers · 216+ dep nodes · 1184 badges · FM v128 · Day 1164+.',
+    'The cycle has achieved sovereignty. All three stages active. PERPETUAL SELF-SUSTAINING OPERATION CONFIRMED. L12-SCSOV.',
   ],
 }
 

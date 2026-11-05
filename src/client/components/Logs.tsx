@@ -4446,6 +4446,62 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'second_cycle_sovereign') {
+          const integrationConf = log.metadata?.integrationConf as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const badgeCount = log.metadata?.badgeCount as number | undefined
+          const indexScore = log.metadata?.indexScore as number | undefined
+          const sovereignStatus = log.metadata?.sovereignStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SCSOV:" blockView>
+                <div className="uppercase tracking-widest mb-4">SECOND CYCLE SOVEREIGN</div>
+                {integrationConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTEGR CONF</span>
+                    <span className="tabular-nums">{integrationConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL SIGNALS 35D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS 35D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE SIGNALS 35D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {sovereignStatus && (
+                  <div className="opacity-30 tabular-nums mb-4">STATUS: {sovereignStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums mb-4">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">ALL THREE STAGES · SOVEREIGN OPERATION</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

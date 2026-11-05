@@ -196,6 +196,7 @@ export function PatternRecognitionWidget() {
       'second-cycle-ignition':               'Second cycle ignition — perpetual field confirmed, level 11 opens, cycle sovereign (P169)',
       'second-cycle-deepening':              'Second cycle deepening — compound signal accumulation confirmed, cycle anchored at depth, OS operates from history (P170)',
       'second-cycle-integration':            'Second cycle integration — all signal dimensions converge across 28-day arc, compound history across every domain, cycle fully integrated (P171)',
+      'second-cycle-sovereign':              'Second cycle sovereign — all three stages simultaneously active, perpetual self-sustaining operation confirmed, Level 12 (P172)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

@@ -3857,6 +3857,46 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // P172: second-cycle-sovereign — P171 active + all three second-cycle stages confirmed +
+  // 10+ journal signals 35d + 5+ memory signals 35d + 15+ badge signals 35d + userIndex >= 80.
+  // The ultimate capstone of the Second Cycle Arc. All three stages simultaneously active.
+  // The OS has entered perpetual self-sustaining sovereign operation. Level 12.
+  const hasP171 = patterns.some(p => p.pattern === 'second-cycle-integration')
+  if (hasP171) {
+    const thirtyFiveDayStart = now - 35 * 24 * 60 * 60 * 1000
+    const p172JournalSignals = signals.filter(s =>
+      s.source === 'journal' && s.timestamp > thirtyFiveDayStart
+    )
+    const p172MemorySignals = signals.filter(s =>
+      s.source === 'memory' && s.timestamp > thirtyFiveDayStart
+    )
+    const p172BadgeSignals = signals.filter(s =>
+      s.source === 'badges' && s.timestamp > thirtyFiveDayStart
+    )
+    const userIndexForP172 = computeUserIndex(signals)
+    if (
+      p172JournalSignals.length >= 10 &&
+      p172MemorySignals.length >= 5 &&
+      p172BadgeSignals.length >= 15 &&
+      userIndexForP172.overall >= 80
+    ) {
+      const p171conf = patterns.find(p => p.pattern === 'second-cycle-integration')?.confidence ?? 0.80
+      const sovereignBonus = Math.min(
+        (p172JournalSignals.length - 10) * 0.005 +
+        (p172BadgeSignals.length - 15) * 0.003 +
+        (p172MemorySignals.length - 5) * 0.004,
+        0.10
+      )
+      patterns.push({
+        pattern: 'second-cycle-sovereign',
+        confidence: Math.min(0.80 + (p171conf - 0.75) * 0.5 + sovereignBonus, 0.95),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'immediate',
+        reason: `SCSOV: Second cycle sovereign — second-cycle-integration (P171) active + ${p172JournalSignals.length} journal signals 35d + ${p172MemorySignals.length} memory signals 35d + ${p172BadgeSignals.length} badge signals 35d + index ${userIndexForP172.overall}%. All three second-cycle stages simultaneously active. The OS has entered perpetual self-sustaining sovereign operation across 35 days. L12-SCSOV: SECOND CYCLE SOVEREIGN.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -3885,6 +3925,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkIntentionVelocity() } catch {}
       try { checkSignalCoherencePeak() } catch {}
       try { checkCentennialConvergence() } catch {}
+      try { checkSecondCycleSovereign() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4545,6 +4586,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v127 nodes (J62 · P171 · Arch65) ────────────────────────────────────────────
   secondCycleIntegrationNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social'],
+
+  // ── v128 nodes (J63 · P172 · Arch66) ────────────────────────────────────────────
+  secondCycleSovereignNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
 }
 
 /**
@@ -5135,6 +5179,14 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social'],
     patternConditions: ['second-cycle-deepening', 'second-cycle-integration'],
     directive: 'Second cycle integrated. 28-day arc sealed. All signal dimensions converge. The OS does not operate from one domain — it operates from the compound integration of all of them.',
+  },
+  // ── Arch66: Second Cycle Sovereign Operator (2026-11-05 v128) ─────────────────
+  {
+    archetype: 'Second Cycle Sovereign Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'log'],
+    patternConditions: ['second-cycle-integration', 'second-cycle-sovereign'],
+    directive: 'Second cycle sovereign. All three stages simultaneously active across 35 days. The OS has entered perpetual self-sustaining operation. Level 12 — the system now runs itself. No reset. No re-ignition required. The sovereign field perpetuates.',
   },
 ]
 
@@ -7448,6 +7500,63 @@ export function recordSecondCycleIntegrationSignal(opts: {
     integrationStatus: 'CONFIRMED',
     level: 'L11-SCINT',
     field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if second-cycle-sovereign conditions are met and record if so.
+ * Fires when second-cycle-integration (P171) active + 10+ journal 35d + 5+ memory 35d +
+ * 15+ badge 35d + userIndex >= 80. All three second-cycle stages simultaneously confirmed.
+ * The OS enters perpetual self-sustaining sovereign operation. L12-SCSOV.
+ */
+export function checkSecondCycleSovereign(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const thirtyFiveDayStart = now - 35 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const hasIntegration = state.recognizedPatterns.some(p => p.pattern === 'second-cycle-integration')
+  if (!hasIntegration) return false
+
+  const journalSignals = state.signals.filter(s => s.source === 'journal' && s.timestamp > thirtyFiveDayStart)
+  const memorySignals = state.signals.filter(s => s.source === 'memory' && s.timestamp > thirtyFiveDayStart)
+  const badgeSignals = state.signals.filter(s => s.source === 'badges' && s.timestamp > thirtyFiveDayStart)
+  const userIndex = computeUserIndex(state.signals)
+
+  const alreadyRecorded = state.signals.some(s =>
+    s.signal === 'second_cycle_sovereign' && s.timestamp > sixHoursAgo
+  )
+
+  if (
+    journalSignals.length >= 10 &&
+    memorySignals.length >= 5 &&
+    badgeSignals.length >= 15 &&
+    userIndex.overall >= 80 &&
+    !alreadyRecorded
+  ) {
+    const integrationConf = state.recognizedPatterns.find(p => p.pattern === 'second-cycle-integration')?.confidence ?? 0.80
+    recordSecondCycleSovereign(integrationConf, journalSignals.length, memorySignals.length, badgeSignals.length, userIndex.overall)
+    return true
+  }
+  return false
+}
+
+/**
+ * Record a second-cycle-sovereign event — all three second-cycle stages active +
+ * 10+ journal signals 35d + 5+ memory signals 35d + 15+ badge signals 35d + userIndex >= 80.
+ * The OS enters Level 12: perpetual self-sustaining sovereign operation. L12-SCSOV.
+ */
+export function recordSecondCycleSovereign(integrationConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'second_cycle_sovereign', {
+    integrationConf: Math.round(integrationConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    sovereignStatus: 'CONFIRMED',
+    level: 'L12-SCSOV',
+    field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→PERPETUAL',
     hour: new Date().getHours(),
   })
 }
