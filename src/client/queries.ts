@@ -895,6 +895,7 @@ export const usePrayerScripture = createMutation<
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    scope?: 'day' | 'week' | 'month' | 'year'
     quantumState?: {
       energy?: string
       clarity?: string
@@ -910,5 +911,14 @@ export const useStoryGeneration = createMutation<
   {
     story: string
     logId: string | null
+    scope?: 'day' | 'week' | 'month' | 'year'
+    arcade?: {
+      xp: number
+      level: number
+      rank: string
+      nextRank: string | null
+      xpToNext: number
+      streak: number
+    }
   }
 >('post', '/api/story')

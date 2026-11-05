@@ -44,6 +44,12 @@ import { generateChatCatalysts, generateConversationStarters, shouldShowChatCata
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
 import { registerOSRoutes } from './os-api.js'
+import {
+  compressStory,
+  computeArcade,
+  STORY_SCOPES,
+  type StoryScope,
+} from '#shared/utils/log-commands'
 
 // ============================================================================
 // Helper Functions
@@ -5490,6 +5496,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          scope?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,15 +5521,30 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      // /story [day|week|month|year] — validated against the shared registry
+      const scope: StoryScope = STORY_SCOPES.includes(req.body.scope as StoryScope)
+        ? (req.body.scope as StoryScope)
+        : 'day'
 
+      // Window = 2x scope (current + previous) so the digest can detect spikes
+      // and pattern changes. Hard-capped at 3000 rows.
+      const scopeDays = { day: 1, week: 7, month: 30, year: 365 }[scope]
+      const since = new Date(Date.now() - scopeDays * 2 * 86_400_000)
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: { userId: req.user.id, createdAt: { [Op.gte]: since } },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 3000,
       })
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
+      const entryLogs = logs.filter(l => l.event === 'log_entry' || l.event === 'journal')
+
+      // Deterministic compression of text + context metadata (shared module)
+      const digest = compressStory(
+        entryLogs.map(l => ({ text: l.text, createdAt: l.createdAt, context: l.context })),
+        scope
+      )
+
+      const recentEntries = entryLogs
         .slice(0, 10)
         .map(l => (l.text || '').substring(0, 200))
         .filter(Boolean)
@@ -5549,7 +5571,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
 
       const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed a log entry and invoked /story for the last ${scope === 'day' ? '24 hours' : scope}. Your task: write 1-2 paragraphs (100-200 words) that compress that period — their journey, mood trajectory, and self-care patterns. The COMPRESSED DIGEST below is computed from their real entries and context metadata (weather, place, time, moon); treat it as ground truth and never invent facts beyond it. If it lists spikes or silence, name them gently. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
@@ -5567,6 +5589,8 @@ OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 
+COMPRESSED DIGEST (${scope}): ${digest.narrative}
+
 RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
 
 RECENT LOG ENTRIES:
@@ -5576,6 +5600,21 @@ SELF-CARE DATA:
 ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
 
       const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
+
+      // Arcade rank is all-time (scope-independent): timestamps only, capped.
+      const lifetime = await fastify.models.Log.findAll({
+        where: { userId: req.user.id, event: ['log_entry', 'journal', 'generated_story'] },
+        attributes: ['event', 'createdAt'],
+        order: [['createdAt', 'DESC']],
+        limit: 20000,
+        raw: true,
+      }) as unknown as Array<{ event: string; createdAt: Date }>
+      const storiesBefore = lifetime.filter(l => l.event === 'generated_story').length
+      const arcade = (extraStories: number) =>
+        computeArcade(
+          lifetime.filter(l => l.event !== 'generated_story'),
+          storiesBefore + extraStories
+        )
 
       try {
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
@@ -5596,6 +5635,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           metadata: {
             story: cleaned,
             logText: (logText || '').substring(0, 500),
+            scope,
+            digest,
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
@@ -5604,12 +5645,19 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          scope,
+          arcade: arcade(1),
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
+        // Offline fallback: the deterministic digest IS a valid compressed story.
         return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
+          story: digest.entryCount
+            ? `${digest.narrative}\n\nThe engine is resting; this is the raw compression of your ${scope}.`
+            : 'The system holds your data quietly. When the engine returns, your story will be here.',
           logId: null,
+          scope,
+          arcade: arcade(0),
         }
       }
     }
