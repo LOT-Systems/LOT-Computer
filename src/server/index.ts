@@ -222,6 +222,15 @@ fastify.get('/health', async (request, reply) => {
 // Public API routes (no authentication required)
 fastify.register(publicApiRoutes, { prefix: '/api/public' })
 
+// Public OPEN TAB (LOT-FM-001 §5) — read-only ledger, no auth.
+fastify.get('/basics', async (req, reply) => {
+  return reply.view('generic-spa', {
+    scriptName: req.user ? 'app' : 'basics',
+    scriptNonce: reply.cspNonce.script,
+    styleNonce: reply.cspNonce.style,
+  })
+})
+
 // Public status page route (no authentication required)
 fastify.get('/status', async (req, reply) => {
   return reply.view('generic-spa', {
