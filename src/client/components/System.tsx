@@ -1042,23 +1042,29 @@ export const System = React.memo(function SystemInner() {
 
       {/* Stats stack */}
       <WidgetErrorBoundary name="Stats">
-        <div className={cn('flex flex-col', density.sectionGap)}>
-          <IntentionPatterns />
-          <CollectiveConsciousness />
-          <WellnessPulse />
-          <MemoryEngineStats />
-          <GrowthMilestones />
-          <BadgeUnlockFeed />
-        </div>
+        <LazyMount>
+          <div className={cn('flex flex-col', density.sectionGap)}>
+            <IntentionPatterns />
+            <CollectiveConsciousness />
+            <WellnessPulse />
+            <MemoryEngineStats />
+            <GrowthMilestones />
+            <BadgeUnlockFeed />
+          </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Calendar — Personal date planner */}
       <WidgetErrorBoundary name="Calendar">
-        <CalendarWidget />
+        <LazyMount>
+          <CalendarWidget />
+        </LazyMount>
       </WidgetErrorBoundary>
 
       <WidgetErrorBoundary name="Benchmark">
-        <BenchmarkWidget />
+        <LazyMount>
+          <BenchmarkWidget />
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* The original. Imitation is the sincerest form of flattery, but the quantum field knows. */}
