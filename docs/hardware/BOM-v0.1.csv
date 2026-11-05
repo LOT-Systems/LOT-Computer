@@ -1,0 +1,21 @@
+block,part,qty,est_usd_each,link
+MCU,ESP32-S3-MINI-1U-N8,1,4,https://www.espressif.com/en/products/modules/esp32-s3
+Camera,OV2640 FPC module,1,5,https://www.digikey.com/en/products/result?keywords=OV2640
+Display,0.96in SSD1306 OLED,1,3,https://www.digikey.com/en/products/result?keywords=SSD1306%20OLED
+Weather,BME688,1,8,https://www.bosch-sensortec.com/products/environmental-sensors/gas-sensors/bme688/
+IMU,BMI270,1,3,https://www.bosch-sensortec.com/products/motion-sensors/imus/bmi270/
+Light,VEML7700,1,1.5,https://www.vishay.com/en/product/84286/
+QiRX,BQ51013B,1,3,https://www.ti.com/product/BQ51013B
+Charger,BQ25120A,1,2.5,https://www.ti.com/product/BQ25120A
+FuelGauge,MAX17048,1,1.5,https://www.analog.com/en/products/max17048.html
+Coil,WE-WPCC 760308101104 (verify),1,3,https://www.we-online.com/en/components/products/WPCC
+Battery,LiPo 3mm 150-250mAh PCM,1,4,https://www.digikey.com/en/products/result?keywords=lipo%203.7v%20300mah
+Haptic,LRA 8mm,1,2,https://www.digikey.com/en/products/result?keywords=LRA%20haptic%208mm
+Button,Tactile 3x3 sealed,1,0.3,https://www.digikey.com/en/products/result?keywords=tactile%20switch%203x3
+Misc,passives LDO LED FPC,1,3,
+PCBA,PCBWay 4-layer 0.8mm assembled,1,14,https://www.pcbway.com/pcb-assembly.html
+Shells,316L CNC mirror polish x2,1,45,https://www.pcbway.com/cnc-machining-quote.html
+Windows,zirconia/sapphire,1,8,https://www.pcbway.com/cnc-machining-quote.html
+Fasteners,gasket screws adhesive,1,1.5,
+Charger pad,Qi TX 5V,1,8,https://www.digikey.com/en/products/result?keywords=Qi%20transmitter%20module
+Packaging,box + quick-start,1,4,
