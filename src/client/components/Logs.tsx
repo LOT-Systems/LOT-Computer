@@ -2083,7 +2083,32 @@ export const Logs: React.FC = React.memo(function LogsInner() {
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
                 <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                {date && <div className="opacity-40 mt-8 tabular-nums">{date}{log.metadata?.time ? ` ${log.metadata.time}` : ''}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_alert') {
+          const stage = log.metadata?.stage as string | undefined
+          const label = stage === 'T15' ? 'INBOUND' : stage === 'T0' ? 'NOW' : stage === 'OVERDUE' ? 'OVERDUE' : 'ALERT'
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL ALERT:" blockView>
+                <div className="uppercase tracking-widest">{label}{stage ? ` // ${stage}` : ''}</div>
+                <div className="opacity-60 mt-8 uppercase tabular-nums">
+                  {(log.metadata?.entryType as string) || 'ENTRY'} {(log.metadata?.time as string) || ''}
+                </div>
+                {log.metadata?.text && <div className="opacity-40">{log.metadata.text as string}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_done') {
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL ACK:" blockView>
+                <div className="uppercase tracking-widest">
+                  ACKNOWLEDGED // {(log.metadata?.entryType as string) || 'ENTRY'} {(log.metadata?.time as string) || ''}
+                </div>
+                {log.metadata?.text && <div className="opacity-40 mt-8">{log.metadata.text as string}</div>}
               </Block>
             </LogContainer>
           )

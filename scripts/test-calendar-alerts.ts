@@ -1,0 +1,17 @@
+import * as c from '../src/client/utils/calendarAlerts'
+const mk=(time:string,done=false)=>({id:'a',date:'2026-11-05',time,text:'x',type:'call',done})
+const t=(h:number,m:number,s=0)=>new Date(2026,10,5,h,m,s).getTime()
+const eq=(a:any,b:any,n:string)=>{ if(a!==b){console.error('FAIL',n,a,b);process.exit(1)} }
+eq(c.currentStage(mk('10:00'),t(9,40)),null,'early')
+eq(c.currentStage(mk('10:00'),t(9,45)),'T15','t15')
+eq(c.currentStage(mk('10:00'),t(10,0)),'T0','t0')
+eq(c.currentStage(mk('10:00'),t(10,6)),'OVERDUE','over')
+eq(c.currentStage(mk('10:00'),t(16,30)),null,'expired')
+eq(c.currentStage(mk('10:00',true),t(10,0)),null,'done')
+eq(c.currentStage({...mk('10:00'),time:undefined},t(10,0)),null,'untimed')
+eq(c.currentStage(mk('25:00'),t(10,0)),null,'invalid')
+eq(c.dueAlerts([mk('10:00')],t(10,0),new Set(['a:T0'])).length,0,'dedupe')
+eq(c.formatCountdown(mk('10:00'),t(9,45,1)),'T-14:59','cd')
+eq(c.formatCountdown(mk('10:00'),t(10,0,42)),'T+00:42','cd+')
+eq(c.formatCountdown(mk('10:00'),t(7,55)),'T-02H05M','cdh')
+console.log('ALL PASS')
