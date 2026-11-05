@@ -115,3 +115,27 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+
+/**
+ * LOT® Email — "/email to Hitomi." composes an internal email.
+ * Returns the recipient and the body (log text with the command line
+ * removed), or null if the log has no email command.
+ */
+export function parseEmailCommand(text: string): { to: string; body: string } | null {
+  if (!text) return null
+  const m = text.match(/(^|\s)\/email\s+to\s+([^\s.,:;!?]+(?:\s+[^\s.,:;!?]+)?)\s*[.:,;]?/i)
+  if (!m) return null
+  // Allow an optional last name only when the second word is capitalised
+  // and directly follows the first name; otherwise treat it as body.
+  const words = m[2].trim().split(/\s+/)
+  let to = words[0]
+  let consumed = m[0]
+  if (words.length > 1 && !/^[A-ZА-Я]/.test(words[1])) {
+    consumed = consumed.replace(new RegExp(`\\s+${words[1]}\\s*[.:,;]?$`), '')
+  } else if (words.length > 1) {
+    to = `${words[0]} ${words[1]}`
+  }
+  const body = text.replace(consumed, ' ').trim()
+  return { to, body }
+}

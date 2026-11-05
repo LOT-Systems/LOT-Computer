@@ -28,12 +28,12 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, parseEmailCommand, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useSendEmail, useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3713,6 +3713,14 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  // LOT® Email: "/email to Hitomi." in a log composes; Send delivers to Sync inbox
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const emailDraft = React.useMemo(() => parseEmailCommand(value), [value])
+  const { mutate: sendEmail, isLoading: emailSending } = useSendEmail({
+    onSuccess: (res) => setEmailStatus(`SENT → ${res.to.toUpperCase()}`),
+    onError: (err: any) =>
+      setEmailStatus(String(err?.response?.data?.error || 'EMAIL FAILED').toUpperCase()),
+  })
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -4139,6 +4147,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to X.  Email a community member (Sync inbox)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4377,6 +4386,28 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="FAST:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{fastResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailDraft && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-80 flex items-center gap-x-8" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px' }}>
+                <span>TO {emailDraft.to.toUpperCase()}</span>
+                <span className="opacity-40">{emailDraft.body.length} CHARS</span>
+                <Button
+                  kind="secondary"
+                  size="small"
+                  disabled={!emailDraft.body || emailSending}
+                  onClick={() => {
+                    setEmailStatus(null)
+                    sendEmail({ to: emailDraft.to, body: emailDraft.body })
+                  }}
+                >
+                  Send
+                </Button>
+                {emailStatus && <span className="opacity-60">{emailStatus}</span>}
+              </div>
             </Block>
           </div>
         )}

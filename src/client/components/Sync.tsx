@@ -24,6 +24,8 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmails,
+  useMarkEmailRead,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -79,6 +81,18 @@ export const Sync = React.memo(function SyncInner() {
       queryClient.invalidateQueries(['/api/chat-messages'])
     }
   })
+
+  // LOT® Email inbox (new mail also arrives live via SSE 'email')
+  const { data: inbox } = useEmails()
+  const { mutate: markEmailRead } = useMarkEmailRead({
+    onSuccess: () => queryClient.invalidateQueries(['/api/emails']),
+  })
+  React.useEffect(() => {
+    const { dispose } = (sync as any).listen('email', () => {
+      queryClient.invalidateQueries(['/api/emails'])
+    })
+    return dispose
+  }, [])
 
   // Ensure fresh data on mount (filters suspended users)
   React.useEffect(() => {
@@ -213,6 +227,33 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {!!inbox?.emails?.length && (
+        <div className="mb-80">
+          <div className="text-acc/40 mb-4 select-none">
+            INBOX{inbox.unread ? ` · ${inbox.unread} NEW` : ''}
+          </div>
+          {inbox.emails.slice(0, 10).map((e) => (
+            <div
+              key={e.id}
+              className={cn(
+                'flex items-start gap-x-8 cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded',
+                e.readAt && 'text-acc/40'
+              )}
+              onClick={() => !e.readAt && markEmailRead({ id: e.id })}
+              title={e.readAt ? undefined : 'Click to mark read'}
+            >
+              <span className="whitespace-nowrap">✉ {e.from}</span>
+              <div className="whitespace-breakspaces" style={{ wordBreak: 'break-word' }}>
+                {e.body}
+              </div>
+              <span className="text-acc/40 whitespace-nowrap ml-auto">
+                {dayjs(e.createdAt).fromNow()}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {

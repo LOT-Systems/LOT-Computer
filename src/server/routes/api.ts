@@ -380,6 +380,11 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'email': {
+          // Private: delivered only to the recipient's own stream
+          if (data.receiverId === req.user.id) write({ event, data })
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -3968,6 +3973,98 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       console.error('Error calculating community emotion:', error)
       return reply.status(500).send({ error: 'Failed to calculate community emotion' })
     }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — Log "/email to Name" → recipient's Sync inbox (community only)
+  // ============================================================================
+
+  // Inbox: latest 50 received emails + unread count
+  fastify.get('/emails', async (req: FastifyRequest, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires LOT Community access' })
+    }
+    const rows = await fastify.models.Email.findAll({
+      where: { receiverId: req.user.id },
+      order: [['createdAt', 'DESC']],
+      limit: 50,
+    })
+    const senders = await fastify.models.User.findAll({
+      where: { id: [...new Set(rows.map((r) => r.senderId))] },
+      attributes: ['id', 'firstName', 'lastName'],
+    })
+    const nameOf = new Map(
+      senders.map((u) => [u.id, `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown'])
+    )
+    return reply.send({
+      unread: rows.filter((r) => !r.readAt).length,
+      emails: rows.map((r) => ({
+        id: r.id,
+        senderId: r.senderId,
+        from: nameOf.get(r.senderId) || 'Unknown',
+        body: r.body,
+        readAt: r.readAt,
+        createdAt: r.createdAt,
+      })),
+    })
+  })
+
+  // Mark one email read
+  fastify.post('/emails/:id/read', async (req: FastifyRequest<{ Params: { id: string } }>, reply) => {
+    await fastify.models.Email.update(
+      { readAt: new Date() },
+      { where: { id: req.params.id, receiverId: req.user.id, readAt: null } }
+    )
+    return reply.send({ ok: true })
+  })
+
+  // Send: { to: "Hitomi" | "Hitomi Tanaka", body }
+  fastify.post('/emails', async (req: FastifyRequest<{ Body: { to: string; body: string } }>, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires LOT Community access' })
+    }
+    const to = String(req.body?.to || '').trim().toLowerCase()
+    const body = String(req.body?.body || '').trim().slice(0, 5000)
+    if (!to || !body) {
+      return reply.status(400).send({ error: 'Recipient and body are required' })
+    }
+    const candidates = (
+      await fastify.models.User.findAll({ attributes: ['id', 'firstName', 'lastName', 'tags'] })
+    ).filter((u) => {
+      if (u.id === req.user.id) return false
+      if (!canAccessChat(u.tags || [])) return false // community members only
+      const first = (u.firstName || '').trim().toLowerCase()
+      const full = `${first} ${(u.lastName || '').trim().toLowerCase()}`.trim()
+      return first === to || full === to
+    })
+    if (candidates.length === 0) {
+      return reply.status(404).send({ error: `No community member named "${req.body.to}"` })
+    }
+    if (candidates.length > 1) {
+      return reply.status(409).send({
+        error: 'Several members match — use full name',
+        matches: candidates.map((u) => `${u.firstName || ''} ${u.lastName || ''}`.trim()),
+      })
+    }
+    const receiver = candidates[0]
+    const email = await fastify.models.Email.create({
+      senderId: req.user.id,
+      receiverId: receiver.id,
+      body,
+    })
+    sync.emit('email', {
+      id: email.id,
+      senderId: req.user.id,
+      receiverId: receiver.id,
+      from: `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim(),
+      body: email.body,
+      readAt: null,
+      createdAt: email.createdAt,
+    } as any)
+    return reply.send({
+      id: email.id,
+      to: `${receiver.firstName || ''} ${receiver.lastName || ''}`.trim(),
+    })
   })
 
   // Get direct message thread with another user
