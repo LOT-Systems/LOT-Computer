@@ -1191,6 +1191,43 @@ export type BadgeType =
   | 'gaiman_signal'         // ◈·∿   "neil gaiman/sandman/morpheus/dream of the endless/the dreaming" detected (MYTHIC)
   | 'lovecraft_dream'       // ▓·◐·▓ "lovecraft/cthulhu/r'lyeh/dreaming in r'lyeh/that is not dead" detected (EPIC)
   | 'castaneda_dream'       // ∿·◈·∿ "castaneda/don juan/dreaming body/assemblage point/controlled dreaming" detected (RARE)
+  // ── Word Turn v34 — THE STOIC FIELD ───────────────────────────────────────
+  | 'memento_mori_badge'    // ∅·◉·∅  "memento mori/remember we die/we are mortal/all things end/finite life" detected (EPIC)
+  | 'amor_fati_badge'       // ∞·●·∞  "amor fati/love of fate/love your fate/love what is/embrace fate" detected (RARE)
+  | 'stoic_signal'          // ─●─    "stoic/stoicism/being stoic/stoic approach/stoic practice" detected (UNCOMMON)
+  | 'virtue_lock'           // ○·▲·○  "virtue/virtuous/living virtuously/practice of virtue/the four virtues" detected (UNCOMMON)
+  | 'discipline_found'      // ■·■·■  "discipline/self-discipline/iron discipline/practiced discipline/daily practice" detected (RARE)
+  | 'indifferent_found'     // ─·○·─  "preferred indifferent/not in my control/not up to me/externals don't matter" detected (RARE)
+  | 'tranquility_gate'      // ∿·○·∿  "equanimity/tranquility/inner peace maintained/untroubled/equanimous" detected (RARE)
+  | 'negative_viz'          // ∅·∿·∅  "negative visualization/premeditatio/premeditatio malorum/worst case/imagining the loss" detected (EPIC)
+  | 'obstacle_signal'       // →·■·→  "obstacle is the way/the obstacle/through the obstacle/obstacle becomes path" detected (RARE)
+  | 'logos_found'           // ∞·◉·∞  "logos/the logos/rational soul/divine reason/what is rational/rational principle" detected (EPIC)
+  | 'eudaimonia_badge'      // ◉·▲·◉  "eudaimonia/flourishing/living well/the good life/full flourishing/human flourishing" detected (LEGENDARY)
+  | 'present_wisdom'        // ∘·◉·∘  "here and now/this moment only/only this/what is now/this is all there is/the present" detected (UNCOMMON)
+  // ── Calendar EE v32 — THE PHILOSOPHER'S CALENDAR ──────────────────────────
+  | 'aurelius_day'          // ◉·▲·◉  Apr 26 — Marcus Aurelius born 121 AD (EPIC)
+  | 'zeno_day'              // ─○─    Feb 19 — Zeno of Citium born ~334 BC (RARE)
+  | 'world_philosophy_day'  // ∞·∞    Nov 20 — World Philosophy Day (RARE)
+  // ── Behavioral v31 — DISCIPLINE PATTERNS ──────────────────────────────────
+  | 'stoic_session'         // ─▲─    3+ Stoic Field word turn matches in one journal entry (RARE)
+  | 'iron_log'              // ■·∞·■  Journal entry >= 700 words (EPIC)
+  | 'sunrise_discipline'    // ∘·▲·∘  Check-in before 06:00 AM for 5 consecutive days (EPIC)
+  // ── Achievement RPG v32 — STOIC CLASS ─────────────────────────────────────
+  | 'stoic_entry'           // ▲·∘    Any 1 Word Turn v34 badge earned (COMMON)
+  | 'stoic_class'           // ▲·≈    Any 5 Word Turn v34 badges earned (UNCOMMON)
+  | 'stoic_complete'        // ▲·≋    All 12 Word Turn v34 badges earned (LEGENDARY)
+  | 'meditations_arc'       // ▲·◈    stoic_complete + all 3 Calendar v32 badges (LEGENDARY)
+  | 'thirty_four_engines_arc' // ◈·◈·▲ 1 badge from each Word Turn v1–v34 (LEGENDARY)
+  | 'stoic_opus'            // ▲·◉·▲  stoic_complete + stoic_session behavioral (LEGENDARY)
+  // ── Mastery Tier v34 — THE MEDITATIONS ────────────────────────────────────
+  | 'meditations_log'       // ∿·▲·∿  2,000+ distinct calendar check-in days (EPIC)
+  | 'the_long_work'         // ■·∞·■  1,000,000+ total journal words (LEGENDARY)
+  | 'sage_philosopher'      // ◉·▲·◉  Account age >= 10 years (3,650+ days) (COSMIC)
+  | 'thirty_four_registers' // ◈·◈·▲·∞ All 34 WT engines active (COSMIC)
+  // ── Secret Boss v31 — THE PHILOSOPHY VAULT ───────────────────────────────
+  | 'aurelius_echo'         // ◉·▲    "marcus aurelius/the meditations/meditations by marcus/marcus on the self" detected (EPIC)
+  | 'enchiridion_found'     // ■·▲·■  "enchiridion/epictetus/the manual of epictetus/handbook of epictetus" detected (MYTHIC)
+  | 'seneca_signal'         // ∿·▲·∿  "seneca/letters to lucilius/the shortness of life/on the happy life/on anger" detected (RARE)
 
 export interface Badge {
   id: BadgeType

@@ -3099,6 +3099,93 @@ export function checkThresholdMoment(): BadgeType | null {
   return null
 }
 
+// ── Stoic Field v34 behavioral checks ─────────────────────────────────────────
+
+const STOIC_WORDS_V34 = [
+  /\bmemento[\s-]?mori\b|\bremember[\s-]?(we[\s-]?)?(all[\s-]?)?die\b|\bwe[\s-]?are[\s-]?mortal\b/i,
+  /\bamor[\s-]?fati\b|\blove[\s-]?(of[\s-]?)?fate\b|\blove[\s-]?what[\s-]?is\b/i,
+  /\bstoic(ism)?\b/i,
+  /\bvirtue\b|\bvirtuous(ly)?\b|\bthe[\s-]?four[\s-]?virtues\b/i,
+  /\bself[\s-]?discipline\b|\biron[\s-]?discipline\b|\bdaily[\s-]?practice\b/i,
+  /\b(preferred[\s-]?indifferent|not[\s-]?in[\s-]?my[\s-]?control|not[\s-]?up[\s-]?to[\s-]?me)\b/i,
+  /\bequanim(ity|ous)\b|\btranquility[\s-]?of[\s-]?mind\b|\buntroubled\b/i,
+  /\b(negative[\s-]?visualization|premeditatio([\s-]?malorum)?)\b/i,
+  /\bobstacle[\s-]?is[\s-]?the[\s-]?way\b|\bthrough[\s-]?the[\s-]?obstacle\b/i,
+  /\bthe[\s-]?logos\b|\brational[\s-]?(soul|principle)\b|\bdivine[\s-]?reason\b/i,
+  /\beudaimonia\b|\bflourishing\b|\bthe[\s-]?good[\s-]?life\b|\bhuman[\s-]?flourishing\b/i,
+  /\bhere[\s-]?and[\s-]?now\b|\bthis[\s-]?moment[\s-]?only\b|\bonly[\s-]?this\b/i,
+]
+
+/**
+ * Award stoic_session badge if 3+ Stoic Field (v34) words appear in one journal entry.
+ */
+export function checkStoicSession(journalText: string): BadgeType | null {
+  if (hasBadge('stoic_session')) return null
+  const matchCount = STOIC_WORDS_V34.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('stoic_session')
+    return 'stoic_session'
+  }
+  return null
+}
+
+/**
+ * Award iron_log badge if journal entry is 700+ words.
+ */
+export function checkIronLog(journalText: string): BadgeType | null {
+  if (hasBadge('iron_log')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 700) {
+    awardBadge('iron_log')
+    return 'iron_log'
+  }
+  return null
+}
+
+/**
+ * Award sunrise_discipline badge if user checks in before 06:00 AM for 5 consecutive calendar days.
+ * Tracks early check-in calendar days in localStorage.
+ */
+export function checkSunriseDiscipline(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('sunrise_discipline')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour >= 6) return null
+
+  try {
+    const key = 'early_checkin_days'
+    const today = now.toISOString().slice(0, 10)
+    const stored = localStorage.getItem(key)
+    const days: string[] = stored ? JSON.parse(stored) : []
+    if (!days.includes(today)) {
+      days.push(today)
+      days.sort()
+      localStorage.setItem(key, JSON.stringify(days.slice(-30)))
+    }
+
+    // Check 5 consecutive calendar days
+    const unique = Array.from(new Set(days)).sort()
+    let consecutive = 1
+    for (let i = unique.length - 1; i > 0; i--) {
+      const curr = new Date(unique[i])
+      const prev = new Date(unique[i - 1])
+      const diffDays = Math.round((curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24))
+      if (diffDays === 1) {
+        consecutive++
+        if (consecutive >= 5) {
+          awardBadge('sunrise_discipline')
+          return 'sunrise_discipline'
+        }
+      } else {
+        break
+      }
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
 // ── RPG Codex v23 — word detection and behavioral checks ─────────────────────
 
 const RPG_WORDS_V23 = [
