@@ -321,6 +321,16 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE PHONE-FREE EVENING                      2026-11-05
+  ─────────────────────────────────────────────────────────────────
+  Full entry in LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md, Section 07.
+  Summary: an operator charges their phone in the hallway during a
+  20:00-23:00 wind-down window; the cube on the coffee table signals
+  only Index of Systems events (THE SETTLE at start, NUDGE for a
+  memory question, one LEAP for a rare badge) and goes inert at 23:00.
+  It has no vocabulary for work messages or social apps — the absence
+  is the feature.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
