@@ -129,6 +129,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'second-cycle-deepening':               'SCDEP',
   'second-cycle-integration':             'SCINT',
   'second-cycle-sovereign':               'SCSOV',
+  'third-cycle-ignition':                 'TCIGN',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

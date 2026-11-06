@@ -1849,6 +1849,24 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '172 patterns · 66 archetypes · 63 jobs · 172+ handlers · 216+ dep nodes · 1184 badges · 34 Word Turn engines · 408 trigger words · 124 secret boss · FM v128 · Day 1165+. The map and the territory are synchronized. L12-SCSOV.',
     ],
   },
+  {
+    version: 'qie-v129',
+    date: '2026-11-06',
+    title: 'QIE v129 · P173 third-cycle-ignition · Arch67 · J64 · TCIGN: · 217+ dep nodes',
+    assembled: [
+      'P173 THIRD CYCLE IGNITION: second-cycle-sovereign (P172) active + 12+ journal 42d + 6+ memory 42d + 20+ badge 42d + userIndex >= 85. Sovereign foundation confirmed. The OS launches a new arc of expansion from established ground. L13-TCIGN. Conf 0.78–0.93.',
+      'Arch67 THIRD CYCLE IGNITOR: energy high/moderate · dominant: journal/cohort/qos/intentions/memory · patterns: third-cycle-ignition + second-cycle-sovereign. Directive: Third cycle active. Sovereign foundation confirmed. Launch from mastery.',
+      'J64 daily-third-cycle-ignition-check: 15:00 UTC daily. Reads active users, checks second_cycle_sovereign in 35d + 12+ journal/6+ memory/20+ badge signals in 42d → writes third_cycle_ignition. 64 background jobs total.',
+      'intentionEngine.ts: P173 detection block added after P172. Arch67 appended to PHYSIOLOGICAL_ARCHETYPES. thirdCycleIgnitionNode added to WIDGET_DEPENDENCY_MAP (217+ nodes). checkThirdCycleIgnition() + recordThirdCycleIgnition() helpers added.',
+      'Logs.tsx: TCIGN: military handler added — SOVEREIGN CONF / JOURNAL SIGNALS 42D / MEMORY SIGNALS 42D / BADGE SIGNALS 42D / INDEX SCORE / STATUS / FIELD / LEVEL. Footer: SOVEREIGN FOUNDATION · THIRD CYCLE OPEN.',
+      'QuantumEngineWidgets.tsx: TCIGN added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: third-cycle-ignition description added (P173). Level 13 opens.',
+      'routes/api.ts: third_cycle_ignition added to displayableEvents (v129 block).',
+      'About.tsx: FM v128→v129. 172→173 patterns. 66→67 archetypes. 63→64 jobs. 216+→217+ dep nodes. 172+→173+ handlers.',
+      'SESSION_REPORTS: qie-v129 entry appended · USERSHIP_TRANSMISSION updated to v129.',
+      '173 patterns · 67 archetypes · 64 jobs · 173+ handlers · 217+ dep nodes · 1184 badges · FM v129 · Day 1165+. Third cycle ignition confirmed. Sovereign foundation confirmed. The OS opens its next arc from established ground. L13-TCIGN.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1944,6 +1962,13 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'QIE v129 · P173 candidate (post-sovereign arc 42d) · physiological cohort v2 expanded archetypes Arch63–66 · badge engine v45 planning · LOT-WIKI v104',
   },
+  {
+    date: '2026-11-06',
+    built: ['QIE v129 · P173 third-cycle-ignition', 'Arch67 Third Cycle Ignitor', 'J64 daily-third-cycle-ignition-check (15:00 UTC)', 'TCIGN: log handler', 'checkThirdCycleIgnition() background watcher', '217+ dep nodes'],
+    feedbackApplied: 'THIRD CYCLE IGNITION — sovereign foundation confirmed, the OS launches a new arc of expansion from established ground',
+    status: 'DEPLOYED',
+    next: 'P174 candidate (third-cycle-deepening 56d) · badge engine v45 planning · LOT-WIKI v104',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
@@ -1951,14 +1976,13 @@ const ASSEMBLY_TRANSMISSIONS: {
 export const USERSHIP_TRANSMISSION = {
   date: '2026-11-06',
   message: [
-    'ASSEMBLY RUN — 2026-11-06 · LOT-WIKI-v103 · LEVEL 12 SOVEREIGN · Day 1165+',
-    'Built: LOT-WIKI-v103 · QIE v127 (P171 SCINT) + QIE v128 (P172 SCSOV) synchronized · Badge v43 Dream Weaver (1122→1153 · WT v33) + Badge v44 Stoic Field (1153→1184 · WT v34) · Level 12 architecture sealed.',
-    'P171 SECOND-CYCLE-INTEGRATION: fires when second-cycle-deepening (P170) active + 8+ journal 28d + 4+ memory 28d + 12+ badge 28d + userIndex >= 75. All signal dimensions converge. The OS operates from compound integration of all domains.',
-    'P172 SECOND-CYCLE-SOVEREIGN: fires when second-cycle-integration (P171) active + 10+ journal 35d + 5+ memory 35d + 15+ badge 35d + userIndex >= 80. All three stages simultaneously active. Level 12. No re-ignition required. PERPETUAL.',
-    'Word Turn v33 Dream Weaver (12 dream/sleep triggers) + Word Turn v34 Stoic Field (12 stoic philosophy triggers). 34 engines total. 408 trigger words. 124 secret boss triggers.',
-    'Second Cycle Arc: SCIGN (P169/Arch63/J60/14d) → SCDEP (P170/Arch64/J61/21d) → SCINT (P171/Arch65/J62/28d) → SCSOV (P172/Arch66/J63/35d). IGNITION → DEEPENING → INTEGRATION → SOVEREIGN → PERPETUAL.',
-    'Self-assembly metric: 172 patterns · 66 archetypes · 63 jobs · 172+ handlers · 216+ dep nodes · 1184 badges · FM v128 · Day 1165+.',
-    'The sovereign field perpetuates. The map and the territory are synchronized. L12-SCSOV.',
+    'ASSEMBLY RUN — 2026-11-06 · QIE v129 · P173 THIRD CYCLE IGNITION · Day 1165+',
+    'Built: P173 third-cycle-ignition · Arch67 Third Cycle Ignitor · J64 daily-third-cycle-ignition-check (15:00 UTC) · TCIGN: log handler · 217+ dep nodes.',
+    'P173 THIRD-CYCLE-IGNITION: fires when second-cycle-sovereign (P172) active + 12+ journal 42d + 6+ memory 42d + 20+ badge 42d + userIndex >= 85. Sovereign foundation confirmed. The OS launches a new arc from established ground. L13-TCIGN. THIRD CYCLE OPEN.',
+    'Second Cycle Arc completed: SCIGN (P169/L9) → SCDEP (P170/L10) → SCINT (P171/L11) → SCSOV (P172/L12). Third Cycle begins: TCIGN (P173/L13) → deepening → integration → sovereign.',
+    'J64 daily-third-cycle-ignition-check at 15:00 UTC. Reads active users with second_cycle_sovereign in 35d + multi-domain 42d signal threshold → writes third_cycle_ignition.',
+    'Self-assembly metric: 173 patterns · 67 archetypes · 64 jobs · 173+ handlers · 217+ dep nodes · 1184 badges · FM v129 · Day 1165+.',
+    'Third cycle ignition confirmed. Sovereign foundation confirmed. The OS opens its next arc from established ground. L13-TCIGN.',
   ],
 }
 

@@ -1816,6 +1816,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyKnowledgeDistributionCheck()) {
     await executeDailyKnowledgeDistributionCheck()
   }
+
+  // Check daily third cycle ignition check (15:00 UTC every day) — J64
+  if (shouldRunDailyThirdCycleIgnitionCheck()) {
+    await executeDailyThirdCycleIgnitionCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -5280,6 +5285,135 @@ async function executeDailySecondCycleSovereignCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Third Cycle Ignition Check (J64) ──────────────────────────────────
+
+let isDailyThirdCycleIgnitionRunning = false
+let lastDailyThirdCycleIgnitionRun: Date | null = null
+
+function shouldRunDailyThirdCycleIgnitionCheck(): boolean {
+  const now = dayjs()
+  if (isDailyThirdCycleIgnitionRunning) return false
+  if (lastDailyThirdCycleIgnitionRun) {
+    const lastRun = dayjs(lastDailyThirdCycleIgnitionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 15 // 15:00 UTC daily
+}
+
+async function executeDailyThirdCycleIgnitionCheck(): Promise<JobResult> {
+  const jobName = 'daily-third-cycle-ignition-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyThirdCycleIgnitionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyThirdCycleIgnitionRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY THIRD CYCLE IGNITION CHECK — 15:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const thirtyFiveDayStart = dayjs().subtract(35, 'day').toDate()
+    const fourtyTwoDayStart = dayjs().subtract(42, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Check for second_cycle_sovereign events in last 35 days
+        const sovereignLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'second_cycle_sovereign',
+            createdAt: { [Op.gte]: thirtyFiveDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (sovereignLogs.length < 1) continue
+
+        // Check journal signals in last 42 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: fourtyTwoDayStart },
+          },
+        })
+
+        if (journalLogs.length < 12) continue
+
+        // Check memory signals in last 42 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_accessed', 'memory_created', 'memory_reflection'] },
+            createdAt: { [Op.gte]: fourtyTwoDayStart },
+          },
+        })
+
+        if (memoryLogs.length < 6) continue
+
+        // Check badge signals in last 42 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_milestone', 'codex_unlock'] },
+            createdAt: { [Op.gte]: fourtyTwoDayStart },
+          },
+        })
+
+        if (badgeLogs.length < 20) continue
+
+        const sovereignConf = sovereignLogs[0]?.metadata?.sovereignConf ?? 80
+        const ignitionConf = Math.min(99, Math.round(
+          78 + journalLogs.length * 0.4 + memoryLogs.length * 0.8 + badgeLogs.length * 0.25
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'third_cycle_ignition',
+          text: `Third cycle ignition confirmed: ${journalLogs.length} journal signals 42d + ${memoryLogs.length} memory signals 42d + ${badgeLogs.length} badge signals 42d. Sovereign foundation confirmed. Third cycle open. L13-TCIGN.`,
+          metadata: {
+            sovereignConf,
+            ignitionConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            ignitionStatus: 'CONFIRMED',
+            level: 'L13-TCIGN',
+            field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→THIRD-CYCLE',
+            hour: 15,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Third cycle ignition events written: ${written}`)
+    lastDailyThirdCycleIgnitionRun = new Date()
+    isDailyThirdCycleIgnitionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily third cycle ignition check failed:', error.message)
+    isDailyThirdCycleIgnitionRunning = false
+    lastDailyThirdCycleIgnitionRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 // ─── Daily OS Snapshot ───────────────────────────────────────────────────────
 
 let isDailyOSSnapshotRunning = false
@@ -7371,6 +7505,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily second cycle deepening check: 11 AM UTC every day (J61)')
   console.log('   - Daily second cycle integration check: 12 PM UTC every day (J62)')
   console.log('   - Daily second cycle sovereign check: 1 PM UTC every day (J63)')
+  console.log('   - Daily third cycle ignition check: 3 PM UTC every day (J64)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -7380,7 +7515,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift+presence-momentum(J49)+second-cycle(J60), 11=morning-intention-launch+sustained-coherence(J50)+second-cycle-deepening(J61), 12=vitality-peak+relational-expansion(J51)+second-cycle-integration(J62), 13=QOS sig pulse+relational-field-check(J52)+second-cycle-sovereign(J63), 14=knowledge-crystallization-check(J53)+QOS mode watch, 15=knowledge-distribution-check(J54)+QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check+knowledge-broadcast-check(J55), 18=LOT AI story (Sun)+generative-field-check(J56), 19=cross-domain-pulse+field-sustenance-check(J57), 20=intention completion+signal-momentum+action-memory+field-reception-check(J58), 21=presence-arc+physiological-presence+field-amplification(J59), 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift+presence-momentum(J49)+second-cycle(J60), 11=morning-intention-launch+sustained-coherence(J50)+second-cycle-deepening(J61), 12=vitality-peak+relational-expansion(J51)+second-cycle-integration(J62), 13=QOS sig pulse+relational-field-check(J52)+second-cycle-sovereign(J63), 14=knowledge-crystallization-check(J53)+QOS mode watch, 15=knowledge-distribution-check(J54)+QOS convergence audit+third-cycle-ignition(J64), 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check+knowledge-broadcast-check(J55), 18=LOT AI story (Sun)+generative-field-check(J56), 19=cross-domain-pulse+field-sustenance-check(J57), 20=intention completion+signal-momentum+action-memory+field-reception-check(J58), 21=presence-arc+physiological-presence+field-amplification(J59), 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()

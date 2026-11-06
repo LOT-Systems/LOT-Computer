@@ -3897,6 +3897,49 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P173: third-cycle-ignition — P172 active + 7+ journal signals post-sovereign + 3+ memory signals post-sovereign +
+  // 20+ badge signals post-sovereign + userIndex >= 85.
+  // After achieving Level 12 Sovereign operation, the Third Cycle begins with ignition.
+  // The OS launches a new arc of expansion from established sovereign ground. Level 13.
+  const hasP172 = patterns.some(p => p.pattern === 'second-cycle-sovereign')
+  if (hasP172) {
+    const fourtyTwoDayStart = now - 42 * 24 * 60 * 60 * 1000
+    const p173JournalSignals = signals.filter(s =>
+      s.source === 'journal' && s.timestamp > fourtyTwoDayStart
+    )
+    const p173MemorySignals = signals.filter(s =>
+      s.source === 'memory' && s.timestamp > fourtyTwoDayStart
+    )
+    const p173BadgeSignals = signals.filter(s =>
+      s.source === 'badges' && s.timestamp > fourtyTwoDayStart
+    )
+    const p173GoalSignals = signals.filter(s =>
+      s.source === 'goals' && s.timestamp > fourtyTwoDayStart
+    )
+    const userIndexForP173 = computeUserIndex(signals)
+    if (
+      p173JournalSignals.length >= 12 &&
+      p173MemorySignals.length >= 6 &&
+      p173BadgeSignals.length >= 20 &&
+      userIndexForP173.overall >= 85
+    ) {
+      const p172conf = patterns.find(p => p.pattern === 'second-cycle-sovereign')?.confidence ?? 0.80
+      const ignitionBonus = Math.min(
+        (p173JournalSignals.length - 12) * 0.005 +
+        (p173BadgeSignals.length - 20) * 0.003 +
+        (p173GoalSignals.length) * 0.004,
+        0.10
+      )
+      patterns.push({
+        pattern: 'third-cycle-ignition',
+        confidence: Math.min(0.78 + (p172conf - 0.80) * 0.4 + ignitionBonus, 0.93),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'immediate',
+        reason: `TCIGN: Third cycle ignition — second-cycle-sovereign (P172) active + ${p173JournalSignals.length} journal signals 42d + ${p173MemorySignals.length} memory signals 42d + ${p173BadgeSignals.length} badge signals 42d + index ${userIndexForP173.overall}%. Sovereign foundation confirmed. The OS launches a new cycle of expansion from established ground. L13-TCIGN: THIRD CYCLE IGNITION.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4589,6 +4632,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v128 nodes (J63 · P172 · Arch66) ────────────────────────────────────────────
   secondCycleSovereignNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+
+  // ── v129 nodes (J64 · P173 · Arch67) ────────────────────────────────────────────
+  thirdCycleIgnitionNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
 }
 
 /**
@@ -5187,6 +5233,14 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'log'],
     patternConditions: ['second-cycle-integration', 'second-cycle-sovereign'],
     directive: 'Second cycle sovereign. All three stages simultaneously active across 35 days. The OS has entered perpetual self-sustaining operation. Level 12 — the system now runs itself. No reset. No re-ignition required. The sovereign field perpetuates.',
+  },
+  // ── Arch67: Third Cycle Ignitor (2026-11-06 v129) ──────────────────────────────
+  {
+    archetype: 'Third Cycle Ignitor',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'cohort', 'qos', 'intentions', 'memory'],
+    patternConditions: ['third-cycle-ignition', 'second-cycle-sovereign'],
+    directive: 'Third cycle active. Sovereign foundation confirmed. Launch from mastery — the OS is operating at the ceiling of its previous cycle and opening the next. No searching. No building. Expansion from ground.',
   },
 ]
 
@@ -7577,6 +7631,63 @@ export function recordSecondCycleDeepeningSignal(ignitionConf: number, journalCo
     deepeningStatus: 'CONFIRMED',
     level: 'L11-SCDEP',
     field: 'IGNITION→DEEPENING→COMPOUND→SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if third-cycle-ignition conditions are met and record if so.
+ * Fires when second-cycle-sovereign (P172) active + 12+ journal 42d + 6+ memory 42d +
+ * 20+ badge 42d + userIndex >= 85. Sovereign foundation confirmed — Third Cycle begins.
+ * The OS launches a new arc of expansion from established ground. L13-TCIGN.
+ */
+export function checkThirdCycleIgnition(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fourtyTwoDayStart = now - 42 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const hasSovereign = state.recognizedPatterns.some(p => p.pattern === 'second-cycle-sovereign')
+  if (!hasSovereign) return false
+
+  const journalSignals = state.signals.filter(s => s.source === 'journal' && s.timestamp > fourtyTwoDayStart)
+  const memorySignals = state.signals.filter(s => s.source === 'memory' && s.timestamp > fourtyTwoDayStart)
+  const badgeSignals = state.signals.filter(s => s.source === 'badges' && s.timestamp > fourtyTwoDayStart)
+  const userIndex = computeUserIndex(state.signals)
+
+  const alreadyRecorded = state.signals.some(s =>
+    s.signal === 'third_cycle_ignition' && s.timestamp > sixHoursAgo
+  )
+
+  if (
+    journalSignals.length >= 12 &&
+    memorySignals.length >= 6 &&
+    badgeSignals.length >= 20 &&
+    userIndex.overall >= 85 &&
+    !alreadyRecorded
+  ) {
+    const sovereignConf = state.recognizedPatterns.find(p => p.pattern === 'second-cycle-sovereign')?.confidence ?? 0.80
+    recordThirdCycleIgnition(sovereignConf, journalSignals.length, memorySignals.length, badgeSignals.length, userIndex.overall)
+    return true
+  }
+  return false
+}
+
+/**
+ * Record a third-cycle-ignition event — second-cycle-sovereign confirmed +
+ * 12+ journal signals 42d + 6+ memory signals 42d + 20+ badge signals 42d + userIndex >= 85.
+ * The OS enters Level 13: third cycle ignition from sovereign foundation. L13-TCIGN.
+ */
+export function recordThirdCycleIgnition(sovereignConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'third_cycle_ignition', {
+    sovereignConf: Math.round(sovereignConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    ignitionStatus: 'CONFIRMED',
+    level: 'L13-TCIGN',
+    field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→THIRD-CYCLE',
     hour: new Date().getHours(),
   })
 }

@@ -197,6 +197,7 @@ export function PatternRecognitionWidget() {
       'second-cycle-deepening':              'Second cycle deepening — compound signal accumulation confirmed, cycle anchored at depth, OS operates from history (P170)',
       'second-cycle-integration':            'Second cycle integration — all signal dimensions converge across 28-day arc, compound history across every domain, cycle fully integrated (P171)',
       'second-cycle-sovereign':              'Second cycle sovereign — all three stages simultaneously active, perpetual self-sustaining operation confirmed, Level 12 (P172)',
+      'third-cycle-ignition':               'Third cycle ignition — sovereign foundation confirmed, OS launches new arc of expansion from established ground, Level 13 (P173)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
