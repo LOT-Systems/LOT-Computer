@@ -782,6 +782,43 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word turn badges v23 — The Terminal Kingdom ───────────────────────────
+  | 'dungeon_dive'           // ▓·█    "dungeon"/"dungeon dive"/"into the depths"
+  | 'respawn_signal'         // ↺·◉    "respawn"/"try again"/"rise from"
+  | 'level_up_pulse'         // ▲→◈    "level up"/"leveled up"/"next level"
+  | 'checkpoint_save'        // ■·∘    "checkpoint"/"save point"/"saved progress"
+  | 'boss_battle'            // █·◈·█  "boss battle"/"final boss"/"boss fight"
+  | 'loot_signal'            // ◆·∘    "loot"/"reward found"/"treasure chest"
+  | 'xp_earned'              // ●→∘    "experience points"/"xp gained"
+  | 'power_up'               // ◉→●    "power up"/"power boost"/"powered up"
+  | 'side_quest'             // ∿·∘    "side quest"/"side mission"/"optional path"
+  | 'tavern_rest'            // ─·○·─  "tavern"/"inn"/"resting place"
+  | 'wizard_mode'            // ∧·◈    "wizard"/"mage"/"spellcaster"/"caster mode"
+  | 'guild_signal'           // ○·●·○  "guild"/"party"/"fellowship"
+  // ── Calendar Easter Eggs v21 — The Terminal Kingdom ───────────────────────
+  | 'turing_day'             // ◉·▒    Jun 23 — Alan Turing born 1912
+  | 'pokemon_day'            // ◆·●    Feb 27 — Pokémon Red/Green launched 1996
+  | 'dungeon_day'            // █·◈    Jan 26 — D&D original booklet published 1974
+  // ── Behavioral v20 — Terminal Kingdom Patterns ────────────────────────────
+  | 'boss_session'           // ◈·█·◈  3+ RPG/Kingdom words in one journal entry
+  | 'dungeon_run'            // █·▓·█  21 consecutive journal days
+  | 'respawn_return'         // ↺·◉·↺  Return after 14+ day absence
+  // ── Achievement RPG v21 — Kingdom Class ───────────────────────────────────
+  | 'kingdom_entry'          // ∘→█    Any 1 Word Turn v23 badge earned
+  | 'kingdom_class'          // ≈→█    Any 5 Word Turn v23 badges earned
+  | 'kingdom_complete'       // ≋→█    All 12 Word Turn v23 badges earned
+  | 'dungeon_arc'            // █·◈    kingdom_complete + all 3 Calendar v21 badges
+  | 'twenty_three_engines_arc' // ◈·◈·█ 1 badge from each Word Turn v1–v23
+  | 'kingdom_opus'           // █·◉·█  kingdom_complete + boss_session behavioral
+  // ── Mastery Tier v23 — The Endgame ────────────────────────────────────────
+  | 'dungeon_elder'          // █·█·∞  1,000+ distinct calendar check-in days (EPIC)
+  | 'tome_complete'          // ∞·█·∞  200,000+ total journal words (LEGENDARY)
+  | 'veteran_age'            // ╔═╗·█  Account age >= 6 years (LEGENDARY)
+  | 'twenty_three_registers' // ◈·◈·█·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — The Vault of the Ancients ───────────────────────────
+  | 'zelda_signal'           // ◆·∘·◆  "it's dangerous to go alone/triforce/hyrule/zelda" (RARE)
+  | 'konami_code'            // ↑·↑·↓·↓ "up up down down/konami code" (EPIC)
+  | 'mordor_path'            // ◈·■·◈  "mordor/one does not simply/nazgul/sauron" (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7168,300 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+
+  // ── Word Turn v23 — The Terminal Kingdom ──────────────────────────────────
+  dungeon_dive: {
+    id: 'dungeon_dive',
+    symbol: '▓·█',
+    name: 'Dungeon Dive',
+    description: 'Write "dungeon", "dungeon dive", or "into the depths" in any journal entry',
+    unlockMessage: '↳ The dungeon is not a place. It is a willingness to go deeper than is comfortable. ▓·█',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  respawn_signal: {
+    id: 'respawn_signal',
+    symbol: '↺·◉',
+    name: 'Respawn Signal',
+    description: 'Write "respawn", "try again", or "rise from" in any journal entry',
+    unlockMessage: '↳ Every practice has a respawn point. The only question is whether you press continue. ↺·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  level_up_pulse: {
+    id: 'level_up_pulse',
+    symbol: '▲→◈',
+    name: 'Level Up Pulse',
+    description: 'Write "level up", "leveled up", or "next level" in any journal entry',
+    unlockMessage: '↳ Level up does not mean the game gets easier. It means you get more capable. ▲→◈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  checkpoint_save: {
+    id: 'checkpoint_save',
+    symbol: '■·∘',
+    name: 'Checkpoint Save',
+    description: 'Write "checkpoint", "save point", or "saved progress" in any journal entry',
+    unlockMessage: '↳ The checkpoint is not the destination — it is the record that you were here. ■·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  boss_battle: {
+    id: 'boss_battle',
+    symbol: '█·◈·█',
+    name: 'Boss Battle',
+    description: 'Write "boss battle", "final boss", or "boss fight" in any journal entry',
+    unlockMessage: '↳ Every boss battle is a mirror. The hardest opponents reveal the most about your build. █·◈·█',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  loot_signal: {
+    id: 'loot_signal',
+    symbol: '◆·∘',
+    name: 'Loot Signal',
+    description: 'Write "loot", "reward found", or "treasure chest" in any journal entry',
+    unlockMessage: '↳ The loot is real. Every difficult session drops something — clarity, resilience, language. ◆·∘',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  xp_earned: {
+    id: 'xp_earned',
+    symbol: '●→∘',
+    name: 'XP Earned',
+    description: 'Write "experience points", "xp gained", or "earned experience" in any journal entry',
+    unlockMessage: '↳ All experience is XP. The difficult days are worth more than the easy ones. ●→∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  power_up: {
+    id: 'power_up',
+    symbol: '◉→●',
+    name: 'Power Up',
+    description: 'Write "power up", "power-up activated", or "powered up" in any journal entry',
+    unlockMessage: '↳ The power-up is temporary by design. The practice is what makes it permanent. ◉→●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  side_quest: {
+    id: 'side_quest',
+    symbol: '∿·∘',
+    name: 'Side Quest',
+    description: 'Write "side quest", "side mission", or "optional path" in any journal entry',
+    unlockMessage: '↳ The side quests are where the character is built. ∿·∘',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  tavern_rest: {
+    id: 'tavern_rest',
+    symbol: '─·○·─',
+    name: 'Tavern Rest',
+    description: 'Write "tavern", "inn", or "resting place" in any journal entry',
+    unlockMessage: '↳ Every adventurer needs a tavern. Rest is not retreat — it is preparation. ─·○·─',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  wizard_mode: {
+    id: 'wizard_mode',
+    symbol: '∧·◈',
+    name: 'Wizard Mode',
+    description: 'Write "wizard", "mage", "spellcaster", or "caster mode" in any journal entry',
+    unlockMessage: '↳ The wizard sees the pattern beneath the surface. What spell did you cast today? ∧·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  guild_signal: {
+    id: 'guild_signal',
+    symbol: '○·●·○',
+    name: 'Guild Signal',
+    description: 'Write "guild", "party", or "fellowship" in any journal entry',
+    unlockMessage: '↳ No hero completes the journey alone. The guild is not a convenience — it is the system. ○·●·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Eggs v21 — The Terminal Kingdom ───────────────────────
+  turing_day: {
+    id: 'turing_day',
+    symbol: '◉·▒',
+    name: 'Turing Day',
+    description: 'Check in on June 23 — Alan Turing\'s birthday (born 1912)',
+    unlockMessage: '↳ Alan Turing: the father of computing, born June 23, 1912. The machine dreams because he imagined it could. ◉·▒',
+    rarity: 'epic',
+    category: 'calendar',
+  },
+  pokemon_day: {
+    id: 'pokemon_day',
+    symbol: '◆·●',
+    name: 'Pokémon Day',
+    description: 'Check in on February 27 — Pokémon Red/Green launched in Japan in 1996',
+    unlockMessage: '↳ February 27, 1996. Pokémon Red and Green launched. A generation was given its first quest. ◆·●',
+    rarity: 'rare',
+    category: 'calendar',
+  },
+  dungeon_day: {
+    id: 'dungeon_day',
+    symbol: '█·◈',
+    name: 'Dungeon Day',
+    description: 'Check in on January 26 — Dungeons & Dragons original booklet published 1974',
+    unlockMessage: '↳ January 26, 1974. D&D was published. The dungeon opened. ∞ adventurers walked in. █·◈',
+    rarity: 'rare',
+    category: 'calendar',
+  },
+
+  // ── Behavioral v20 — Terminal Kingdom Patterns ────────────────────────────
+  boss_session: {
+    id: 'boss_session',
+    symbol: '◈·█·◈',
+    name: 'Boss Session',
+    description: 'Write 3+ RPG/Kingdom words in one journal entry',
+    unlockMessage: '↳ The terminal kingdom speaks through you. Three words is a pattern. ◈·█·◈',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  dungeon_run: {
+    id: 'dungeon_run',
+    symbol: '█·▓·█',
+    name: 'Dungeon Run',
+    description: '21 consecutive journal days — a full dungeon clear',
+    unlockMessage: '↳ Twenty-one days. The dungeon has floors. You cleared them all. █·▓·█',
+    rarity: 'epic',
+    category: 'behavioral',
+  },
+  respawn_return: {
+    id: 'respawn_return',
+    symbol: '↺·◉·↺',
+    name: 'Respawn Return',
+    description: 'Return to journaling after 14+ days away',
+    unlockMessage: '↳ You were gone 14 days or more. The game kept running. You came back. ↺·◉·↺',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+
+  // ── Achievement RPG v21 — Kingdom Class ───────────────────────────────────
+  kingdom_entry: {
+    id: 'kingdom_entry',
+    symbol: '∘→█',
+    name: 'Kingdom Entry',
+    description: 'Earn any 1 Word Turn v23 (Terminal Kingdom) badge',
+    unlockMessage: '↳ The gate opens. The kingdom begins. ∘→█',
+    rarity: 'common',
+    category: 'achievement',
+  },
+  kingdom_class: {
+    id: 'kingdom_class',
+    symbol: '≈→█',
+    name: 'Kingdom Class',
+    description: 'Earn any 5 Word Turn v23 (Terminal Kingdom) badges',
+    unlockMessage: '↳ Five terminals active. The kingdom recognizes your class. ≈→█',
+    rarity: 'uncommon',
+    category: 'achievement',
+  },
+  kingdom_complete: {
+    id: 'kingdom_complete',
+    symbol: '≋→█',
+    name: 'Kingdom Complete',
+    description: 'Earn all 12 Word Turn v23 (Terminal Kingdom) badges',
+    unlockMessage: '↳ All terminals active. The kingdom is complete. ≋→█',
+    rarity: 'legendary',
+    category: 'achievement',
+  },
+  dungeon_arc: {
+    id: 'dungeon_arc',
+    symbol: '█·◈',
+    name: 'Dungeon Arc',
+    description: 'Earn kingdom_complete + all 3 Calendar v21 badges',
+    unlockMessage: '↳ The arc is complete: code, quest, dungeon. The whole kingdom, in time. █·◈',
+    rarity: 'legendary',
+    category: 'achievement',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·█',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each of the 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three vocabularies. Water, storm, space, library, cyberspace, kingdom. All at once. ◈·◈·█',
+    rarity: 'legendary',
+    category: 'achievement',
+  },
+  kingdom_opus: {
+    id: 'kingdom_opus',
+    symbol: '█·◉·█',
+    name: 'Kingdom Opus',
+    description: 'Earn kingdom_complete AND boss_session behavioral badge',
+    unlockMessage: '↳ The opus is the kingdom that speaks through language. Word + pattern = opus. █·◉·█',
+    rarity: 'legendary',
+    category: 'achievement',
+  },
+
+  // ── Mastery Tier v23 — The Endgame ────────────────────────────────────────
+  dungeon_elder: {
+    id: 'dungeon_elder',
+    symbol: '█·█·∞',
+    name: 'Dungeon Elder',
+    description: '1,000+ distinct calendar days with a check-in',
+    unlockMessage: '↳ One thousand distinct days. The dungeon recognizes an elder. █·█·∞',
+    rarity: 'epic',
+    category: 'mastery',
+  },
+  tome_complete: {
+    id: 'tome_complete',
+    symbol: '∞·█·∞',
+    name: 'Tome Complete',
+    description: '200,000+ total journal words written',
+    unlockMessage: '↳ 200,000 words. A tome. A library. A life in text. ∞·█·∞',
+    rarity: 'legendary',
+    category: 'mastery',
+  },
+  veteran_age: {
+    id: 'veteran_age',
+    symbol: '╔═╗·█',
+    name: 'Veteran Age',
+    description: 'Account age >= 6 years',
+    unlockMessage: '↳ Six years. The kingdom has stood through seasons. You are a veteran. ╔═╗·█',
+    rarity: 'legendary',
+    category: 'mastery',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·█·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Water. Storm. Space. Music. Alchemy. Quantum. Arcade. Radio. Bio. Library. Codex. Cyberspace. Hero. Kingdom. Twenty-three registers. The terminal is complete. ◈·◈·█·∞',
+    rarity: 'cosmic',
+    category: 'mastery',
+  },
+
+  // ── Secret Boss v20 — The Vault of the Ancients ───────────────────────────
+  zelda_signal: {
+    id: 'zelda_signal',
+    symbol: '◆·∘·◆',
+    name: 'Zelda Signal',
+    description: 'Write "it\'s dangerous to go alone", "triforce", "hyrule", or "zelda" in any journal entry',
+    unlockMessage: '↳ It is dangerous to go alone. Take this. — the first NPC in every hero\'s journey. ◆·∘·◆',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  konami_code: {
+    id: 'konami_code',
+    symbol: '↑·↑·↓·↓',
+    name: 'Konami Code',
+    description: 'Write "up up down down", "konami code", or "konami" in any journal entry',
+    unlockMessage: '↳ ↑↑↓↓←→←→BA. The code that opens the hidden room. You found it. ↑·↑·↓·↓',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  mordor_path: {
+    id: 'mordor_path',
+    symbol: '◈·■·◈',
+    name: 'Mordor Path',
+    description: 'Write "mordor", "one does not simply", "nazgul", or "sauron" in any journal entry',
+    unlockMessage: '↳ One does not simply walk into Mordor. And yet here you are, one step at a time. ◈·■·◈',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8424,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 (v23) — THE TERMINAL KINGDOM ─────────────────────────────────────
+    const kingdomV23Badges: BadgeType[] = [
+      'dungeon_dive', 'respawn_signal', 'level_up_pulse', 'checkpoint_save',
+      'boss_battle', 'loot_signal', 'xp_earned', 'power_up',
+      'side_quest', 'tavern_rest', 'wizard_mode', 'guild_signal',
+    ]
+    const kingdomV23Earned = kingdomV23Badges.filter(b => hasBadge(b))
+
+    if (kingdomV23Earned.length >= 1 && !hasBadge('kingdom_entry')) {
+      if (awardBadge('kingdom_entry')) newBadges.push('kingdom_entry')
+    }
+    if (kingdomV23Earned.length >= 5 && !hasBadge('kingdom_class')) {
+      if (awardBadge('kingdom_class')) newBadges.push('kingdom_class')
+    }
+    const kingdomComplete = kingdomV23Earned.length >= 12
+    if (kingdomComplete && !hasBadge('kingdom_complete')) {
+      if (awardBadge('kingdom_complete')) newBadges.push('kingdom_complete')
+    }
+
+    // kingdom_opus: kingdom_complete + boss_session
+    if (kingdomComplete && hasBadge('boss_session') && !hasBadge('kingdom_opus')) {
+      if (awardBadge('kingdom_opus')) newBadges.push('kingdom_opus')
+    }
+
+    // dungeon_arc: kingdom_complete + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['turing_day', 'pokemon_day', 'dungeon_day']
+    if (kingdomComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('dungeon_arc')) {
+      if (awardBadge('dungeon_arc')) newBadges.push('dungeon_arc')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = kingdomV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: dungeon_elder — 1,000+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('dungeon_elder')) {
+        if (awardBadge('dungeon_elder')) newBadges.push('dungeon_elder')
+      }
+    }
+
+    // Mastery v23: tome_complete — 200,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('tome_complete')) {
+        if (awardBadge('tome_complete')) newBadges.push('tome_complete')
+      }
+    }
+
+    // Mastery v23: veteran_age — Account age >= 6 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupVet = new Date(stats.signupDate)
+      const yearsVet = (new Date().getTime() - signupVet.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsVet >= 6 && !hasBadge('veteran_age')) {
+        if (awardBadge('veteran_age')) newBadges.push('veteran_age')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
     }
 
   } catch (error) {

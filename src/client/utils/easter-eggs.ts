@@ -871,6 +871,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('odyssey_day')
   }
 
+  // Calendar v21 — The Terminal Kingdom
+  // Turing Day: June 23 — Alan Turing born 1912
+  if (!hasBadge('turing_day') && month === 6 && day === 23) {
+    awardBadge('turing_day')
+    awarded.push('turing_day')
+  }
+  // Pokémon Day: February 27 — Pokémon Red/Green launched 1996
+  if (!hasBadge('pokemon_day') && month === 2 && day === 27) {
+    awardBadge('pokemon_day')
+    awarded.push('pokemon_day')
+  }
+  // Dungeon Day: January 26 — D&D original booklet published 1974
+  if (!hasBadge('dungeon_day') && month === 1 && day === 26) {
+    awardBadge('dungeon_day')
+    awarded.push('dungeon_day')
+  }
+
   return awarded
 }
 
@@ -1483,6 +1500,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE TERMINAL KINGDOM ────────────────────────────────────────────────
+  { patterns: /\bdungeon[\s-]?(dive|run|clear|crawl)?\b|\binto[\s-]?the[\s-]?depths\b/i,  badge: 'dungeon_dive' },
+  { patterns: /\brespawn(ed|ing)?\b|\btry[\s-]?again\b|\brise[\s-]?from\b/i,              badge: 'respawn_signal' },
+  { patterns: /\blevel[\s-]?up\b|\bleveled[\s-]?up\b|\bnext[\s-]?level\b/i,               badge: 'level_up_pulse' },
+  { patterns: /\bcheckpoint\b|\bsave[\s-]?point\b|\bsaved[\s-]?progress\b/i,              badge: 'checkpoint_save' },
+  { patterns: /\bboss[\s-]?battle\b|\bfinal[\s-]?boss\b|\bboss[\s-]?fight\b/i,            badge: 'boss_battle' },
+  { patterns: /\bloot\b|\breward[\s-]?found\b|\btreasure[\s-]?chest\b/i,                  badge: 'loot_signal' },
+  { patterns: /\bexperience[\s-]?points\b|\bxp[\s-]?gained\b|\bearned[\s-]?experience\b/i, badge: 'xp_earned' },
+  { patterns: /\bpower[\s-]?up\b|\bpower[\s-]?boost\b|\bpowered[\s-]?up\b/i,              badge: 'power_up' },
+  { patterns: /\bside[\s-]?quest\b|\bside[\s-]?mission\b|\boptional[\s-]?path\b/i,        badge: 'side_quest' },
+  { patterns: /\btavern\b|\bresting[\s-]?place\b/i,                                        badge: 'tavern_rest' },
+  { patterns: /\bwizard\b|\bmage\b|\bspellcaster\b|\bcaster[\s-]?mode\b/i,                badge: 'wizard_mode' },
+  { patterns: /\bguild\b|\bfellowship\b/i,                                                  badge: 'guild_signal' },
+  // ── v20 Secret Boss — THE VAULT OF THE ANCIENTS word triggers ────────────────
+  { patterns: /it'?s[\s-]?dangerous[\s-]?to[\s-]?go[\s-]?alone|\btriforce\b|\bhyrule\b|\bzelda\b/i, badge: 'zelda_signal' },
+  { patterns: /\bup[\s,]*up[\s,]*down[\s,]*down\b|\bkonami[\s-]?code\b|\bkonami\b/i,       badge: 'konami_code' },
+  { patterns: /\bmordor\b|\bone[\s-]?does[\s-]?not[\s-]?simply\b|\bnazgul\b|\bsauron\b/i,  badge: 'mordor_path' },
 ]
 
 /**
@@ -1954,6 +1988,18 @@ export function runJournalEasterEggs(journalText: string): BadgeType[] {
   // Behavioral v16: body signal (journal entry >= 300 words)
   const bodySignal = checkBodySignal(journalText)
   if (bodySignal) awarded.push(bodySignal)
+
+  // Behavioral v20: boss session (3+ Terminal Kingdom v23 words in one entry)
+  const bossSession = checkBossSession(journalText)
+  if (bossSession) awarded.push(bossSession)
+
+  // Behavioral v20: dungeon run (21+ consecutive journal days)
+  const dungeonRun = checkDungeonRun()
+  if (dungeonRun) awarded.push(dungeonRun)
+
+  // Behavioral v20: respawn return (return after 14+ day gap)
+  const respawnReturn = checkRespawnReturn()
+  if (respawnReturn) awarded.push(respawnReturn)
 
   // Word turns from journal text
   const wordTurns = detectWordTurns(journalText)
@@ -2712,6 +2758,90 @@ export function checkThresholdMoment(): BadgeType | null {
     awardBadge('threshold_moment')
     return 'threshold_moment'
   }
+  return null
+}
+
+// ── Terminal Kingdom v23 behavioral checks ───────────────────────────────────
+
+const RPG_WORDS_V23 = [
+  /\bdungeon\b/i,
+  /\brespawn\b/i,
+  /\blevel[\s-]?up\b/i,
+  /\bcheckpoint\b/i,
+  /\bboss[\s-]?battle\b|\bfinal[\s-]?boss\b/i,
+  /\bloot\b/i,
+  /\bxp[\s-]?gained\b|\bexperience[\s-]?points\b/i,
+  /\bpower[\s-]?up\b/i,
+  /\bside[\s-]?quest\b/i,
+  /\btavern\b/i,
+  /\bwizard\b|\bmage\b/i,
+  /\bguild\b|\bfellowship\b/i,
+]
+
+/**
+ * Award boss_session badge if 3+ Terminal Kingdom (v23) RPG words appear in one journal entry.
+ */
+export function checkBossSession(journalText: string): BadgeType | null {
+  if (hasBadge('boss_session')) return null
+  const matchCount = RPG_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('boss_session')
+    return 'boss_session'
+  }
+  return null
+}
+
+/**
+ * Award dungeon_run badge if user has 21+ consecutive journal days.
+ */
+export function checkDungeonRun(): BadgeType | null {
+  if (hasBadge('dungeon_run')) return null
+  if (typeof window === 'undefined') return null
+  try {
+    const stored = localStorage.getItem('journal_dates')
+    if (!stored) return null
+    const dates: string[] = JSON.parse(stored)
+    if (dates.length < 21) return null
+    const sorted = [...dates].sort()
+    let streak = 1
+    for (let i = sorted.length - 1; i > 0; i--) {
+      const d1 = new Date(sorted[i])
+      const d2 = new Date(sorted[i - 1])
+      const diff = Math.round((d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24))
+      if (diff === 1) {
+        streak++
+        if (streak >= 21) {
+          awardBadge('dungeon_run')
+          return 'dungeon_run'
+        }
+      } else {
+        streak = 1
+      }
+    }
+  } catch {}
+  return null
+}
+
+/**
+ * Award respawn_return badge if user returns to journaling after a 14+ day absence.
+ */
+export function checkRespawnReturn(): BadgeType | null {
+  if (hasBadge('respawn_return')) return null
+  if (typeof window === 'undefined') return null
+  try {
+    const stored = localStorage.getItem('journal_dates')
+    if (!stored) return null
+    const dates: string[] = JSON.parse(stored)
+    if (dates.length < 2) return null
+    const sorted = [...dates].sort()
+    const lastDate = new Date(sorted[sorted.length - 1])
+    const prevDate = new Date(sorted[sorted.length - 2])
+    const gapDays = Math.round((lastDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24))
+    if (gapDays >= 14) {
+      awardBadge('respawn_return')
+      return 'respawn_return'
+    }
+  } catch {}
   return null
 }
 
