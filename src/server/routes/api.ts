@@ -380,6 +380,13 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'email': {
+          // Private: only the recipient's stream receives the event
+          if (data.toUserId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4083,6 +4090,107 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
     }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — simplest mail. Sent from Log via "/email to Name. body",
+  // received in Sync. Recipients are limited to LOT Community members (same
+  // gate as Sync chat / Cohort Connect).
+  // ============================================================================
+  const emailUserView = (u: any) => ({
+    id: u.id,
+    firstName: u.firstName,
+    lastName: u.lastName,
+  })
+
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { to?: string; toUserId?: string; body: string }
+  }>, reply) => {
+    const isSuspended = (tags: string[]) => tags.some((t) => t.toLowerCase() === 'suspended')
+    if (isSuspended(req.user.tags || [])) return reply.status(403).send({ error: 'Account suspended' })
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires Usership, Onyx, Legacy, R&D, or Admin' })
+    }
+    const body = (req.body.body || '').trim().slice(0, 5000)
+    if (isBlankMessage(body)) return reply.status(400).send({ error: 'Email body is empty' })
+
+    let recipient: any = null
+    if (req.body.toUserId) {
+      recipient = await fastify.models.User.findByPk(req.body.toUserId)
+    } else {
+      const name = (req.body.to || '').trim().toLowerCase()
+      if (!name) return reply.status(400).send({ error: 'Recipient required' })
+      const users = await fastify.models.User.findAll({
+        where: Sequelize.where(Sequelize.fn('lower', Sequelize.col('firstName')), name),
+        limit: 20,
+      })
+      const eligible = users.filter((u: any) =>
+        u.id !== req.user.id && canAccessChat(u.tags || []) && !isSuspended(u.tags || []))
+      if (eligible.length > 1) {
+        return reply.status(409).send({
+          error: `Several members named "${req.body.to}"`,
+          candidates: eligible.map(emailUserView),
+        })
+      }
+      recipient = eligible[0] || null
+    }
+    if (!recipient || !canAccessChat(recipient.tags || []) || isSuspended(recipient.tags || [])) {
+      return reply.status(404).send({ error: 'Recipient not found in LOT Community' })
+    }
+    if (recipient.id === req.user.id) return reply.status(400).send({ error: 'Cannot email yourself' })
+
+    const email = await fastify.models.Email.create({
+      fromUserId: req.user.id,
+      toUserId: recipient.id,
+      body,
+    })
+    sync.emit('email', {
+      id: email.id,
+      fromUserId: req.user.id,
+      toUserId: recipient.id,
+      from: emailUserView(req.user),
+      body: email.body,
+      createdAt: email.createdAt,
+      readAt: null,
+    })
+    return reply.send({ id: email.id, to: emailUserView(recipient), createdAt: email.createdAt })
+  })
+
+  // Inbox + sent (latest 100 each)
+  fastify.get('/emails', async (req: FastifyRequest, reply) => {
+    if (!canAccessChat(req.user.tags || [])) {
+      return reply.status(403).send({ error: 'Email requires Usership, Onyx, Legacy, R&D, or Admin' })
+    }
+    const [inbox, sent] = await Promise.all([
+      fastify.models.Email.findAll({ where: { toUserId: req.user.id }, order: [['createdAt', 'DESC']], limit: 100 }),
+      fastify.models.Email.findAll({ where: { fromUserId: req.user.id }, order: [['createdAt', 'DESC']], limit: 100 }),
+    ])
+    const ids = Array.from(new Set([...inbox.map((m) => m.fromUserId), ...sent.map((m) => m.toUserId)]))
+    const users = await fastify.models.User.findAll({ where: { id: ids } })
+    const byId = new Map(users.map((u: any) => [u.id, emailUserView(u)]))
+    const view = (m: any) => ({
+      id: m.id,
+      fromUserId: m.fromUserId,
+      toUserId: m.toUserId,
+      from: byId.get(m.fromUserId) || null,
+      to: byId.get(m.toUserId) || null,
+      body: m.body,
+      createdAt: m.createdAt,
+      readAt: m.readAt,
+    })
+    return reply.send({
+      inbox: inbox.map(view),
+      sent: sent.map(view),
+      unread: inbox.filter((m) => !m.readAt).length,
+    })
+  })
+
+  fastify.post('/emails/:id/read', async (req: FastifyRequest<{ Params: { id: string } }>, reply) => {
+    await fastify.models.Email.update(
+      { readAt: new Date() },
+      { where: { id: req.params.id, toUserId: req.user.id, readAt: null } }
+    )
+    return reply.ok()
   })
 
   // ============================================================================

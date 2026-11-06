@@ -10,7 +10,7 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
-import { useLogs, useUpdateLog } from '#client/queries'
+import { useLogs, useUpdateLog, sendEmail } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
@@ -29,6 +29,7 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { parseEmailCommand } from '#client/utils/emailCommand'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3707,6 +3708,7 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3911,6 +3913,21 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        // LOT® Email: "/email to Name. body" is sent on Ctrl+Enter, then the
+        // command line is replaced by a SENT receipt so it never re-sends.
+        const emailCmd = parseEmailCommand(valueRef.current)
+        if (emailCmd) {
+          sendEmail({ to: emailCmd.to, body: emailCmd.body })
+            .then((res: any) => {
+              const name = res?.data?.to?.firstName || emailCmd.to
+              const updated = valueRef.current.replace(emailCmd.raw, `✉ SENT to ${name}: ${emailCmd.body}`)
+              setValue(updated)
+              valueRef.current = updated
+              onChangeRef.current(updated)
+              setEmailStatus(`EMAIL SENT → ${name}`)
+            })
+            .catch((e: any) => setEmailStatus(`EMAIL FAILED — ${e?.response?.data?.error || 'offline'}`))
+        }
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -4139,6 +4156,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to Name. Message   Send LOT® Email (Ctrl+Enter) — arrives in Sync',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4384,6 +4402,13 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailStatus && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60">{emailStatus}</div>
             </Block>
           </div>
         )}

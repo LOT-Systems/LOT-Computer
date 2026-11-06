@@ -20,7 +20,11 @@ import {
 } from '#client/components/ui'
 import dayjs from '#client/utils/dayjs'
 import { cn } from '#client/utils'
+import { emailComposeTo } from '#client/stores/emailCompose'
 import {
+  useEmails,
+  useSendEmail,
+  useMarkEmailRead,
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
@@ -50,6 +54,10 @@ export const Sync = React.memo(function SyncInner() {
   const queryClient = useQueryClient()
 
   const [message, setMessage] = React.useState('')
+  const composeTo = useStore(emailComposeTo)
+  const [emailBody, setEmailBody] = React.useState('')
+  const [emailError, setEmailError] = React.useState<string | null>(null)
+  const [showSent, setShowSent] = React.useState(false)
   // SSE-received messages not yet reflected in the API response
   const [sseMessages, setSseMessages] = React.useState<PublicChatMessage[]>([])
 
@@ -70,6 +78,19 @@ export const Sync = React.memo(function SyncInner() {
     return me.tags.some((tag) => CHAT_ALLOWED_TAGS.includes(tag.toLowerCase()))
   }, [me])
 
+  const { data: mail } = useEmails()
+  const { mutate: markRead } = useMarkEmailRead({
+    onSuccess: () => queryClient.invalidateQueries(['/api/emails']),
+  })
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: () => {
+      setEmailBody('')
+      setEmailError(null)
+      emailComposeTo.set(null)
+      queryClient.invalidateQueries(['/api/emails'])
+    },
+    onError: (e: any) => setEmailError(e?.response?.data?.error || 'Send failed'),
+  })
   const { data: fetchedMessages } = useChatMessages()
   const { mutate: createChatMessage } = useCreateChatMessage({
     onSuccess: () => setMessage(''),
@@ -117,7 +138,11 @@ export const Sync = React.memo(function SyncInner() {
         queryClient.invalidateQueries(['/api/chat-messages'])
       }
     )
+    const { dispose: disposeEmailListener } = sync.listen('email', () => {
+      queryClient.invalidateQueries(['/api/emails'])
+    })
     return () => {
+      disposeEmailListener()
       disposeChatMessageListener()
       disposeChatMessageLikeListener()
     }
@@ -213,6 +238,74 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+
+      {(composeTo || (mail && (mail.inbox.length > 0 || mail.sent.length > 0))) && (
+        <div className="mb-80">
+          <div className="flex items-center gap-x-8 mb-8 text-acc/40">
+            <span>MAIL</span>
+            {!!mail?.unread && <Tag fill={false}>{mail.unread} new</Tag>}
+            {!!mail?.sent.length && (
+              <GhostButton onClick={() => setShowSent((v) => !v)}>
+                {showSent ? 'Inbox' : 'Sent'}
+              </GhostButton>
+            )}
+          </div>
+          {composeTo && (
+            <form
+              className="flex items-start gap-x-8 mb-16"
+              onSubmit={(ev) => {
+                ev.preventDefault()
+                if (emailBody.trim()) sendEmail({ toUserId: composeTo.id, body: emailBody })
+              }}
+            >
+              <span className="whitespace-nowrap leading-normal">✉ {composeTo.name}</span>
+              <ResizibleGhostInput
+                direction="vh"
+                value={emailBody}
+                onChange={setEmailBody}
+                placeholder="Email..."
+                containerClassName="flex-grow leading-normal"
+                className="leading-normal"
+              />
+              <Button type="submit" kind="secondary" size="small" disabled={!emailBody.trim()}>
+                Send
+              </Button>
+              <GhostButton onClick={() => emailComposeTo.set(null)}>×</GhostButton>
+            </form>
+          )}
+          {emailError && <div className="text-acc/40 mb-8">{emailError}</div>}
+          {(showSent ? mail?.sent : mail?.inbox)?.slice(0, 20).map((m) => {
+            const other = showSent ? m.to : m.from
+            const name = `${other?.firstName || ''} ${other?.lastName || ''}`.trim() || 'Unknown'
+            const unread = !showSent && !m.readAt
+            return (
+              <div
+                key={m.id}
+                className={cn(
+                  'flex items-start gap-x-8 cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded',
+                  !unread && 'text-acc/60'
+                )}
+                onClick={() => unread && markRead({ id: m.id })}
+              >
+                <span className="whitespace-nowrap">{unread ? '● ' : ''}{showSent ? '→ ' : ''}{name}</span>
+                <div className="whitespace-breakspaces" style={{ wordBreak: 'break-word' }}>{m.body}</div>
+                {!showSent && other && (
+                  <GhostButton
+                    className="whitespace-nowrap ml-auto"
+                    onClick={(ev: React.MouseEvent) => {
+                      ev.stopPropagation()
+                      emailComposeTo.set({ id: other.id, name: other.firstName || name })
+                    }}
+                  >
+                    Reply
+                  </GhostButton>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {
