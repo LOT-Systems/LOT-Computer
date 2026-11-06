@@ -1830,6 +1830,25 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '172 patterns · 66 archetypes · 63 jobs · 172+ handlers · 216+ dep nodes · 1184 badges · FM v128 · Day 1164+. Second cycle sovereign. ALL THREE STAGES ACTIVE. L12-SCSOV.',
     ],
   },
+  {
+    version: 'wiki-v103',
+    date: '2026-11-06',
+    title: 'LOT-WIKI-v103 · FM v128 sync · Level 12 Sovereign Arc · Badge v43+v44 · 34 Word Turn engines',
+    assembled: [
+      'LOT-WIKI-v103 produced. Delta sync: QIE v127 (P171 · Arch65 · J62 · SCINT:) + QIE v128 (P172 · Arch66 · J63 · SCSOV:) fully documented. Level 12 architecture sealed. Day 1165+. COSMO® 859 days (Year 3).',
+      'Badge v43 THE DREAM WEAVER documented (1,122→1,153 · +31). Word Turn v33: 12 dream/sleep vocabulary triggers. dream_signal / lucid_found / rem_signal / hypnagogic_found / night_journal / sleep_archive / rest_field / deep_sleep / dream_sequence / vision_signal / shadow_dream / archetypes_dreamed.',
+      'Badge v43 continued: Calendar EE v31 jung_dream_day/sandman_day/morpheus_day. Behavioral v30 dream_session/nocturnal_journal/vision_quest. Mastery v33 the_dreamer/dream_archive/dream_veteran. SB v30 jung_dreamer/night_shaman/sandman_signal. THIRTY-THREE ENGINES.',
+      'Badge v44 THE STOIC FIELD documented (1,153→1,184 · +31). Word Turn v34: 12 stoic philosophy vocabulary triggers. stoic_signal / aurelius_found / discipline_field / virtue_signal / memento_mori / amor_fati / premeditatio_found / apatheia_signal / stoic_practice / logos_signal / epictetus_found / seneca_signal.',
+      'Badge v44 continued: Calendar EE v32 aurelius_day/epictetus_day/seneca_day. Behavioral v31 stoic_session/morning_discipline/field_practice. Mastery v34 the_philosopher/stoic_archive/stoic_veteran. SB v31 epictetus_found/aurelius_signal/stoic_sovereign. THIRTY-FOUR ENGINES. SECOND CYCLE: STOIC SOVEREIGN.',
+      'Second Cycle Arc four-stage architecture documented: SCIGN (P169 / Arch63 / J60 / 14d) → SCDEP (P170 / Arch64 / J61 / 21d) → SCINT (P171 / Arch65 / J62 / 28d) → SCSOV (P172 / Arch66 / J63 / 35d). IGNITION → DEEPENING → INTEGRATION → SOVEREIGN → PERPETUAL.',
+      'Level 11 Integration Arc + Level 12 Sovereign Arc narratives added to wiki. Twelve-level coherence architecture complete.',
+      'Pattern landmarks updated: P171 Level 11 complete (SCINT: ALL DOMAINS · SECOND CYCLE INTEGRATED) + P172 Level 12 opens (SCSOV: ALL THREE STAGES · SOVEREIGN OPERATION). No re-ignition required. The sovereign field perpetuates.',
+      'About.tsx: Day 1164+→1165+. November 5→November 6. wiki-v103 self-assembly phase entry prepended.',
+      'docs/SESSION_REPORT_2026_11_06_WIKI_v103.md written. docs/assembly/2026-11-06_LOT-assembly_wiki-v103.md written. LOT-LEDGER.md appended.',
+      'SESSION_REPORTS: wiki-v103 entry appended · USERSHIP_TRANSMISSION updated to wiki-v103.',
+      '172 patterns · 66 archetypes · 63 jobs · 172+ handlers · 216+ dep nodes · 1184 badges · 34 Word Turn engines · 408 trigger words · 124 secret boss · FM v128 · Day 1165+. The map and the territory are synchronized. L12-SCSOV.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1917,6 +1936,13 @@ const ASSEMBLY_TRANSMISSIONS: {
     feedbackApplied: 'SECOND CYCLE SOVEREIGN — all three stages active simultaneously, Level 12 perpetual self-sustaining operation',
     status: 'DEPLOYED',
     next: 'QIE v129 · P173 · physiological cohort v2 expanded archetypes · badge engine v45 planning',
+  },
+  {
+    date: '2026-11-06',
+    built: ['LOT-WIKI-v103 · FM v128 sync complete', 'QIE v127 (P171 SCINT) + QIE v128 (P172 SCSOV) synchronized', 'Badge v43 Dream Weaver (1122→1153 · WT v33) documented', 'Badge v44 Stoic Field (1153→1184 · WT v34) documented', 'Second Cycle Arc four-stage table: SCIGN→SCDEP→SCINT→SCSOV', 'Level 11 + Level 12 architecture narratives added', 'LOT-LEDGER.md 8 entries appended', 'docs/SESSION_REPORT_2026_11_06_WIKI_v103.md written', 'docs/assembly/2026-11-06_LOT-assembly_wiki-v103.md written'],
+    feedbackApplied: 'LOT-WIKI-v103 — the map and the territory are synchronized · Level 12 Sovereign Arc sealed · 34 Word Turn engines · Day 1165+',
+    status: 'DEPLOYED',
+    next: 'QIE v129 · P173 candidate (post-sovereign arc 42d) · physiological cohort v2 expanded archetypes Arch63–66 · badge engine v45 planning · LOT-WIKI v104',
   },
 ]
 
