@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.2 — USE CASE 02 APPENDED (see REPORT-02)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -320,6 +320,29 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE CLOSED-DOOR STUDY                       2026-11-06
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, studying for an exam, 4-6 hour
+  sessions in a small closed room, with the LOT® Station on the shelf
+  and the Cube on its pad beside the laptop.
+
+  CO₂ climbs in the closed room and the operator's focus quietly drops;
+  they read it as "this chapter is hard." The Station sees CO₂ above
+  threshold for 10+ minutes with the room occupied. The Cube performs
+  one THE NUDGE — felt through the desk, not seen or heard. Twenty
+  minutes later, if CO₂ is still high, THE SETTLE — a held 2-second
+  pressure, the final signal (two-gesture cap; the Cube never nags).
+  The operator taps the top of the Cube to acknowledge, sees the
+  Ambient AI™ line "Air quality: open a window for 30 minutes," and
+  opens the door. When CO₂ falls, the Cube does nothing further.
+
+  Why the Cube: it speaks through touch while the task consumes eyes and
+  language; the signal expires instead of piling up as alerts; and
+  environmental signals get only the quietest gestures — the harder the
+  Cube moves, the more the operator achieved, never the more the system
+  wants. Full detail, policy gates and test scope: see
+  LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md, Section 07.
 
 --------------------------------------------------------------------------------
 08 // BRAND
