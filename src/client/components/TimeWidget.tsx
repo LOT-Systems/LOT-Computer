@@ -138,7 +138,7 @@ export const TimeWidget = () => {
       ) : (
         <Clock
           format={isTimeFormat12h ? 'h:mm:ss A' : 'H:mm:ss'}
-          interval={100}
+          interval={250}
         />
       )}
     </Block>

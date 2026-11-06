@@ -24,7 +24,11 @@ export const Clock: React.FC<Props> = ({ format, interval }) => {
     if (interval) {
       // @ts-ignore
       loop.current = setInterval(
-        () => setState(dayjs().format(format)),
+        () => {
+          // Skip repaint work while the browser tab is hidden
+          if (document.hidden) return
+          setState(dayjs().format(format))
+        },
         interval
       )
     }
