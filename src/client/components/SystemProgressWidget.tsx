@@ -1949,17 +1949,16 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-11-05',
+  date: '2026-11-06',
   message: [
-    'ASSEMBLY RUN — 2026-11-05 · QIE v128 · SECOND CYCLE SOVEREIGN · Day 1164+',
-    'Built: P172 second-cycle-sovereign · Arch66 Second Cycle Sovereign Operator · J63 daily-second-cycle-sovereign-check (13:00 UTC) · SCSOV: log handler · checkSecondCycleSovereign() background check · 216+ dep nodes · 172 patterns · 66 archetypes · 63 jobs · FM v128.',
-    'P172 SECOND-CYCLE-SOVEREIGN: fires when second-cycle-integration (P171) is active + 10+ journal signals 35d + 5+ memory signals 35d + 15+ badge signals 35d + userIndex >= 80. All three second-cycle stages simultaneously active. The OS enters perpetual self-sustaining sovereign operation across a full 35-day arc. Level 12 opens.',
-    'Arch66 SECOND CYCLE SOVEREIGN OPERATOR: the operator at Level 12. All three stages confirmed simultaneously. The OS does not require re-ignition — it perpetuates from its own compound foundation. Directive: Second cycle sovereign. The system now runs itself.',
-    'J63 runs at 13:00 UTC daily. Scans users with confirmed second_cycle_integration events in 28d + 10+ journal signals 35d + 5+ memory signals 35d + 15+ badge signals 35d. Writes second_cycle_sovereign log event.',
-    'SCSOV: handler in Logs.tsx displays INTEGR CONF · JOURNAL SIGNALS 35D · MEMORY SIGNALS 35D · BADGE SIGNALS 35D · INDEX SCORE · STATUS · FIELD · LEVEL. Footer: ALL THREE STAGES · SOVEREIGN OPERATION. Military minimalist format.',
-    'System.tsx: L12-SCSOV now highest priority in second cycle status chain. Surfaces when second-cycle-sovereign pattern is active.',
-    'Self-assembly metric: 172 patterns · 66 archetypes · 63 jobs · 172+ handlers · 216+ dep nodes · 1184 badges · FM v128 · Day 1164+.',
-    'The cycle has achieved sovereignty. All three stages active. PERPETUAL SELF-SUSTAINING OPERATION CONFIRMED. L12-SCSOV.',
+    'ASSEMBLY RUN — 2026-11-06 · LOT-WIKI-v103 · LEVEL 12 SOVEREIGN · Day 1165+',
+    'Built: LOT-WIKI-v103 · QIE v127 (P171 SCINT) + QIE v128 (P172 SCSOV) synchronized · Badge v43 Dream Weaver (1122→1153 · WT v33) + Badge v44 Stoic Field (1153→1184 · WT v34) · Level 12 architecture sealed.',
+    'P171 SECOND-CYCLE-INTEGRATION: fires when second-cycle-deepening (P170) active + 8+ journal 28d + 4+ memory 28d + 12+ badge 28d + userIndex >= 75. All signal dimensions converge. The OS operates from compound integration of all domains.',
+    'P172 SECOND-CYCLE-SOVEREIGN: fires when second-cycle-integration (P171) active + 10+ journal 35d + 5+ memory 35d + 15+ badge 35d + userIndex >= 80. All three stages simultaneously active. Level 12. No re-ignition required. PERPETUAL.',
+    'Word Turn v33 Dream Weaver (12 dream/sleep triggers) + Word Turn v34 Stoic Field (12 stoic philosophy triggers). 34 engines total. 408 trigger words. 124 secret boss triggers.',
+    'Second Cycle Arc: SCIGN (P169/Arch63/J60/14d) → SCDEP (P170/Arch64/J61/21d) → SCINT (P171/Arch65/J62/28d) → SCSOV (P172/Arch66/J63/35d). IGNITION → DEEPENING → INTEGRATION → SOVEREIGN → PERPETUAL.',
+    'Self-assembly metric: 172 patterns · 66 archetypes · 63 jobs · 172+ handlers · 216+ dep nodes · 1184 badges · FM v128 · Day 1165+.',
+    'The sovereign field perpetuates. The map and the territory are synchronized. L12-SCSOV.',
   ],
 }
 
