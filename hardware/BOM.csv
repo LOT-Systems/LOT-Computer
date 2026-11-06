@@ -1,0 +1,16 @@
+ref,function,candidate_part,qty_per_unit,est_unit_usd_at_100,source_link,notes
+U1,MCU+WiFi+BLE (camera DVP capable),Espressif ESP32-S3-MINI-1-N8,1,3.5,https://www.digikey.com/en/products/result?keywords=ESP32-S3-MINI-1-N8,2.4mm tall; antenna needs non-metal window
+DISP1,Notification screen 1.3in 240x240 IPS (ST7789) or 1.12in OLED,generic 1.3in ST7789 FPC panel,1,4.0,https://www.aliexpress.com/wholesale?SearchText=1.3+inch+ST7789+240x240+FPC,custom FPC panel via PCBWay/supplier for 100 run; verify thickness <=1.8mm
+CAM1,Camera,OmniVision OV2640 CSP/FPC module (or GC2145),1,3.0,https://www.digikey.com/en/products/result?keywords=OV2640,tallest part; verify z-height vs 5mm
+S1,Weather/air (T/RH/P/VOC AI-gas),Bosch BME688 (BSEC AI),1,6.5,https://www.digikey.com/en/products/result?keywords=BME688,2.5x2.5x0.93mm; needs vent hole in steel
+S2,IMU (tap/motion),Bosch BMI270,1,2.0,https://www.digikey.com/en/products/result?keywords=BMI270,optional wake-on-motion
+S3,Ambient light,Vishay VEML7700,1,1.2,https://www.digikey.com/en/products/result?keywords=VEML7700,auto screen brightness
+BAT1,LiPo cell ~3.0mm thick 60-100mAh,e.g. 303040 class pouch cell,1,3.0,https://www.aliexpress.com/wholesale?SearchText=303040+lipo+battery,UN38.3 cert required; ship <100Wh ok
+U2,Qi RX + Li-ion charger,TI BQ51050B (or BQ51003),1,2.8,https://www.digikey.com/en/products/result?keywords=BQ51050B,no metal over coil
+L1,Qi RX coil thin ferrite,Wurth 760308101 series / generic 20mm coil,1,1.5,https://www.digikey.com/en/products/result?keywords=wireless+charging+receiver+coil,sits behind non-metal window
+SW1,Button 'Copy',low-profile tact 3x2x0.6 mm,1,0.2,https://www.digikey.com/en/products/result?keywords=ultra+low+profile+tactile+switch,or capacitive pad under bezel
+PCB,PCBA 4-layer 0.8mm 38x38mm ENIG,PCBWay,1,9.0,https://www.pcbway.com/,assembly service; est incl SMT
+BODY-A,Front shell 316L stainless (screen/cam/button),CNC + glass window,1,14.0,https://www.pcbway.com/cnc-machining-quote.html,est for 100 qty
+BODY-B,Back shell 316L polished mirror + ceramic/PEEK Qi inlay,CNC + polish,1,16.0,https://www.pcbway.com/cnc-machining-quote.html,est; 2-part laser-welded or screw-less snap
+GLS,Cover glass / sapphire windows,AR glass 0.5mm,2,1.5,https://www.pcbway.com/,screen + camera lens window
+CHG,Wireless charger puck,Qi 5W transmitter pad (custom LOT-branded),1,6.0,https://www.digikey.com/en/products/result?keywords=Qi+transmitter+module,per unit shipped separately
