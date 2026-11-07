@@ -71,22 +71,12 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
           { label: 'Sync', route: 'sync' },
           { label: 'Log', route: 'logs' },
           { label: 'System', route: 'system' },
-          { label: 'Basics' },
-          { label: 'Self-care' },
-          { label: 'Kids' },
-          { label: 'Home' },
           { label: null, spacer: true },
           { label: 'API', route: 'api' },
           { label: 'Settings', route: 'settings' },
         ]
       : [
-          { label: 'Sync' },
-          { label: 'Logs' },
           { label: 'System', route: 'system' },
-          { label: 'Basics' },
-          { label: 'Self-care' },
-          { label: 'Kids' },
-          { label: 'Home' },
           { label: null, spacer: true },
           { label: 'Settings' },
         ]
