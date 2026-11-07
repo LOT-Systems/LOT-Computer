@@ -2079,11 +2079,29 @@ export const Logs: React.FC = React.memo(function LogsInner() {
         } else if (log.event === 'calendar_entry') {
           const entryType = log.metadata?.entryType as string | undefined
           const date = log.metadata?.date as string | undefined
+          const calTime = log.metadata?.time as string | undefined
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
                 <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                {date && <div className="opacity-40 mt-8 tabular-nums">{date}{calTime ? ` ${calTime}` : ''}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_alert') {
+          const tier = log.metadata?.tier as string | undefined
+          const alertType = log.metadata?.entryType as string | undefined
+          const alertDate = log.metadata?.date as string | undefined
+          const alertTime = log.metadata?.time as string | undefined
+          const alertText = log.metadata?.text as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="ALERT:" blockView>
+                <div className="uppercase tracking-widest">
+                  {tier === 'LATE' ? 'OVERDUE' : tier === 'T-0' ? 'NOW' : 'STANDBY'} · {alertType || 'ENTRY'}
+                </div>
+                {alertText && <div className="mt-8">{alertText}</div>}
+                {alertDate && <div className="opacity-40 mt-8 tabular-nums">{alertDate}{alertTime ? ` ${alertTime}` : ''} · {tier}</div>}
               </Block>
             </LogContainer>
           )
