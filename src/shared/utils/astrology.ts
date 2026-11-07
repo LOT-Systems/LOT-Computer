@@ -177,3 +177,69 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Convert an instant into a Date whose local getters (getHours/getDate/…)
+ * return the wall-clock fields of the given IANA timeZone. Isomorphic
+ * (Intl only) so client and server derive identical readings for a user.
+ * Invalid/missing timeZone falls back to the instant unchanged.
+ */
+export function toWallClockDate(instant: Date, timeZone?: string | null): Date {
+  if (!timeZone) return instant
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(instant)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return instant
+  }
+}
+
+export interface AstrologyReading {
+  hourlyZodiac: string
+  westernZodiac: string
+  moonPhase: string
+  moonIllumination: number
+  rokuyo: string
+  auspicious: boolean
+}
+
+/** Full ambient reading (not a natal chart) for an instant, in the user's timeZone. */
+export function getAstrologyReading(instant: Date = new Date(), timeZone?: string | null): AstrologyReading {
+  const d = toWallClockDate(instant, timeZone)
+  const moon = getMoonPhase(d)
+  const rokuyo = getRokuyo(d)
+  return {
+    hourlyZodiac: getHourlyZodiac(d),
+    westernZodiac: getWesternZodiac(d),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    rokuyo,
+    auspicious: rokuyo === 'Taian',
+  }
+}
+
+/**
+ * Log synchronization: how many of the user's log entries were written under
+ * the same rokuyo / moon phase as the current reading. Reads the astro*
+ * snapshot stored on each log's context (older logs without it are skipped).
+ */
+export function getLogAlignment(
+  logs: Array<{ context?: { astroRokuyo?: string | null; astroMoonPhase?: string | null } | null }>,
+  reading: Pick<AstrologyReading, 'rokuyo' | 'moonPhase'>
+): { total: number; sameRokuyo: number; sameMoonPhase: number } {
+  let total = 0, sameRokuyo = 0, sameMoonPhase = 0
+  for (const l of logs) {
+    const c = l.context
+    if (!c?.astroRokuyo) continue
+    total++
+    if (c.astroRokuyo === reading.rokuyo) sameRokuyo++
+    if (c.astroMoonPhase === reading.moonPhase) sameMoonPhase++
+  }
+  return { total, sameRokuyo, sameMoonPhase }
+}
