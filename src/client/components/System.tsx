@@ -45,7 +45,6 @@ import { EnergyCapacitor } from './EnergyCapacitor'
 import { NarrativeWidget } from './NarrativeWidget'
 import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
-import { SystemProgressWidget } from './SystemProgressWidget'
 import { SystemPulseWidget } from './SystemPulseWidget'
 import { EvolutionWidget } from './EvolutionWidget'
 import { CohortConnectWidget } from './CohortConnectWidget'
@@ -58,7 +57,6 @@ import { checkPlannerWidget } from '#client/stores/plannerWidget'
 import { getOptimalWidget, shouldShowWidget, getUserState, getUserIndex, analyzeIntentions, classifyPhysiologicalCohort, intentionEngine, recordAstrologySignal, getCircadianPhase } from '#client/stores/intentionEngine'
 import { QuantumStateWidget } from './QuantumStateWidget'
 import { SignalStreamWidget } from './SignalStreamWidget'
-import { PatternRecognitionWidget } from './PatternRecognitionWidget'
 import { UserMetricsWidget } from './UserMetricsWidget'
 import { AIFeedbackWidget } from './AIFeedbackWidget'
 import { CorrelatedIndexesWidget } from './CorrelatedIndexesWidget'
@@ -73,15 +71,27 @@ import { FourDimensionalUI } from './FourDimensionalUI'
 import { QuantumSignWidget } from './QuantumSignWidget'
 import { MicroGameWidget } from './MicroGameWidget'
 import { CosmicUpdateWidget } from './CosmicUpdateWidget'
-import { QuantumEngineWidgets } from './QuantumEngineWidgets'
 import { ChakraErgonomicsWidget } from './ChakraErgonomicsWidget'
 import { CalendarWidget } from './CalendarWidget'
 import { BenchmarkWidget } from './BenchmarkWidget'
-import { ArchitectWidget } from './ArchitectWidget'
-import { IntegrityWidget } from './IntegrityWidget'
 import { recomputeAssembly } from '#client/stores/selfAssembly'
 import { $layoutDensity } from '#client/stores/evolution'
 import { useInViewport } from '#client/hooks/useInViewport'
+
+// Heavy, below-the-fold widgets are code-split: their chunks download after the
+// first paint instead of blocking it (SystemProgressWidget alone is ~180 KB
+// minified). A failed chunk fetch is caught by the surrounding
+// WidgetErrorBoundary. Fallback is null so the layout never jumps.
+const lazyWidget = <K extends string>(
+  load: () => Promise<Record<K, React.ComponentType<any>>>,
+  name: K
+) => React.lazy(() => load().then((m) => ({ default: m[name] })))
+
+const SystemProgressWidget = lazyWidget(() => import('./SystemProgressWidget'), 'SystemProgressWidget')
+const ArchitectWidget = lazyWidget(() => import('./ArchitectWidget'), 'ArchitectWidget')
+const PatternRecognitionWidget = lazyWidget(() => import('./PatternRecognitionWidget'), 'PatternRecognitionWidget')
+const IntegrityWidget = lazyWidget(() => import('./IntegrityWidget'), 'IntegrityWidget')
+const QuantumEngineWidgets = lazyWidget(() => import('./QuantumEngineWidgets'), 'QuantumEngineWidgets')
 
 // Defers mount of children until element first enters the viewport.
 // Once mounted, stays mounted — no unmount on scroll away.
@@ -89,7 +99,11 @@ import { useInViewport } from '#client/hooks/useInViewport'
 function LazyMount({ children }: { children: React.ReactNode }) {
   const ref = React.useRef<HTMLDivElement>(null)
   const inViewport = useInViewport(ref)
-  return <div ref={ref}>{inViewport ? children : null}</div>
+  return (
+    <div ref={ref}>
+      {inViewport ? <React.Suspense fallback={null}>{children}</React.Suspense> : null}
+    </div>
+  )
 }
 
 function LoadingDots() {
@@ -1011,10 +1025,14 @@ export const System = React.memo(function SystemInner() {
       <WidgetErrorBoundary name="Biofield Engine">
         <div className={cn('flex flex-col', density.sectionGap)}>
           <QuantumStateWidget />
-          <PatternRecognitionWidget />
+          <React.Suspense fallback={null}>
+            <PatternRecognitionWidget />
+          </React.Suspense>
           <AIFeedbackWidget />
           <SignalStreamWidget />
-          <IntegrityWidget />
+          <React.Suspense fallback={null}>
+            <IntegrityWidget />
+          </React.Suspense>
         </div>
       </WidgetErrorBoundary>
 
@@ -1028,7 +1046,9 @@ export const System = React.memo(function SystemInner() {
           <CorrelatedIndexesWidget />
 
           {/* System Progress - Deployment info with feedback */}
-          <SystemProgressWidget />
+          <React.Suspense fallback={null}>
+            <SystemProgressWidget />
+          </React.Suspense>
 
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />
@@ -1037,7 +1057,9 @@ export const System = React.memo(function SystemInner() {
 
       {/* Architect — executive self-assembly telemetry, paid users only */}
       <WidgetErrorBoundary name="Architect">
-        <ArchitectWidget />
+        <React.Suspense fallback={null}>
+          <ArchitectWidget />
+        </React.Suspense>
       </WidgetErrorBoundary>
 
       {/* Stats stack */}

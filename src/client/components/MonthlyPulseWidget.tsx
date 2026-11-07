@@ -14,6 +14,9 @@ import { cn } from '#client/utils'
 import { UserTag } from '#shared/types'
 import dayjs from '#client/utils/dayjs'
 
+// The month-by-month reveal runs 15 months, then holds at the final state.
+const REVEAL_MONTHS = 15
+
 // One message per milestone month; everything in between gets the generic line.
 const MONTH_MESSAGES: Record<number, string> = {
   1:  'The first month. The system is beginning to know you.',
@@ -28,6 +31,9 @@ const MONTH_MESSAGES: Record<number, string> = {
   10: 'Ten months. Almost there.',
   11: 'Eleven months. One more.',
   12: 'One year with LOT. The portrait is complete — and still evolving.',
+  13: 'Thirteen months. The practice no longer needs reminding.',
+  14: 'Fourteen months. The interface has become quiet.',
+  15: 'Fifteen months. The reveal is complete — the system and the person are one rhythm.',
 }
 
 const DISMISS_PHRASES = [
@@ -103,9 +109,9 @@ export const MonthlyPulseWidget: React.FC = () => {
 
   if (!visible) return null
 
-  const message = MONTH_MESSAGES[Math.min(monthNumber, 12)] ??
+  const message = MONTH_MESSAGES[Math.min(monthNumber, REVEAL_MONTHS)] ??
     `Month ${monthNumber}. The journey continues.`
-  const capped = Math.min(monthNumber, 12)
+  const capped = Math.min(monthNumber, REVEAL_MONTHS)
   const label = `Month ${capped}:`
 
   return (
@@ -131,7 +137,7 @@ export const MonthlyPulseWidget: React.FC = () => {
             >
               <div>{message}</div>
               <div className="opacity-30 mt-4 text-sm">
-                {capped} / 12 months
+                {capped} / {REVEAL_MONTHS} months
               </div>
             </div>
           )}
