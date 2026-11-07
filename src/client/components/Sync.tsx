@@ -24,9 +24,12 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmailInbox,
+  useMarkEmailsRead,
+  useSendEmail,
 } from '#client/queries'
 import { sync } from '../sync'
-import { PublicChatMessage, UserTag } from '#shared/types'
+import { PublicChatMessage, LotEmailRecord, UserTag } from '#shared/types'
 import {
   SYNC_CHAT_MESSAGES_TO_SHOW,
   MAX_SYNC_CHAT_MESSAGE_LENGTH,
@@ -69,6 +72,42 @@ export const Sync = React.memo(function SyncInner() {
     if (me.isAdmin) return true
     return me.tags.some((tag) => CHAT_ALLOWED_TAGS.includes(tag.toLowerCase()))
   }, [me])
+
+  // ---- LOT Email inbox (compose lives in Log: "/email to Name. text") ----
+  const { data: inbox } = useEmailInbox()
+  const { mutate: markEmailsRead } = useMarkEmailsRead()
+  const [sseEmails, setSseEmails] = React.useState<LotEmailRecord[]>([])
+  const [replyTo, setReplyTo] = React.useState<LotEmailRecord | null>(null)
+  const [replyText, setReplyText] = React.useState('')
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: () => {
+      setReplyTo(null)
+      setReplyText('')
+    },
+  })
+  const emails = React.useMemo(() => {
+    const fetched = inbox || []
+    const ids = new Set(fetched.map((e) => e.id))
+    return [...sseEmails.filter((e) => !ids.has(e.id)), ...fetched]
+  }, [inbox, sseEmails])
+  const unreadCount = emails.filter((e) => !e.readAt).length
+  React.useEffect(() => {
+    const { dispose } = sync.listen('email', (data) => {
+      setSseEmails((prev) => (prev.some((x) => x.id === data.id) ? prev : [data, ...prev]))
+    })
+    return () => dispose()
+  }, [])
+  // Opening Sync = reading mail
+  React.useEffect(() => {
+    if (unreadCount > 0) {
+      const t = setTimeout(() => {
+        markEmailsRead(undefined as any, {
+          onSuccess: () => queryClient.invalidateQueries(['/api/email/inbox']),
+        })
+      }, 3000)
+      return () => clearTimeout(t)
+    }
+  }, [unreadCount])
 
   const { data: fetchedMessages } = useChatMessages()
   const { mutate: createChatMessage } = useCreateChatMessage({
@@ -213,6 +252,53 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {emails.length > 0 && (
+        <div className="mb-40">
+          <div className="text-acc/40 mb-8 select-none">
+            EMAIL{unreadCount > 0 ? ` · ${unreadCount} NEW` : ''}
+          </div>
+          {emails.slice(0, 10).map((e) => (
+            <div key={e.id} className="mb-8">
+              <div className="flex items-start gap-x-8">
+                <span className={cn('whitespace-nowrap', !e.readAt && 'underline')}>
+                  ✉ {e.senderName}
+                </span>
+                <div className="whitespace-breakspaces flex-1" style={{ wordBreak: 'break-word' }}>
+                  {e.body}
+                </div>
+                <GhostButton
+                  className="text-acc/40 whitespace-nowrap"
+                  onClick={() => setReplyTo(replyTo?.id === e.id ? null : e)}
+                >
+                  Reply
+                </GhostButton>
+              </div>
+              {replyTo?.id === e.id && (
+                <form
+                  className="flex items-center gap-x-8 mt-4"
+                  onSubmit={(ev) => {
+                    ev.preventDefault()
+                    if (replyText.trim()) sendEmail({ toUserId: e.senderId, body: replyText })
+                  }}
+                >
+                  <ResizibleGhostInput
+                    direction="vh"
+                    value={replyText}
+                    onChange={setReplyText}
+                    placeholder={`Reply to ${e.senderName}...`}
+                    containerClassName="flex-grow leading-normal"
+                    className="leading-normal"
+                  />
+                  <Button type="submit" kind="secondary" size="small" disabled={!replyText.trim()}>
+                    Send
+                  </Button>
+                </form>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div>
         {messages.map((x, i) => {

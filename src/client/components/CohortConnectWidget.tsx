@@ -10,7 +10,7 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button } from '#client/components/ui'
-import { useCohorts, useEnergy, useProfile } from '#client/queries'
+import { useCohorts, useEnergy, useProfile, useSendEmail } from '#client/queries'
 import { useLogContext } from '#client/hooks/useLogContext'
 import { usePunctuationContext } from '#client/hooks/usePunctuationContext'
 import { recordSignal, getUserState } from '#client/stores/intentionEngine'
@@ -105,6 +105,19 @@ export const CohortConnectWidget: React.FC = () => {
     })
     .sort((a, b) => b.rankScore - a.rankScore)
     .slice(0, 5)
+
+  // LOT Email from a cohort match — lands in their Sync inbox
+  const [emailOpenId, setEmailOpenId] = React.useState<string | null>(null)
+  const [emailText, setEmailText] = React.useState('')
+  const [emailNote, setEmailNote] = React.useState<string | null>(null)
+  const { mutate: sendEmail } = useSendEmail({
+    onSuccess: (d) => {
+      setEmailNote(`Email sent to ${d.to}`)
+      setEmailOpenId(null)
+      setEmailText('')
+    },
+    onError: () => setEmailNote('Email not sent'),
+  })
 
   const handleViewProfile = (userId: string, similarity: number) => {
     recordSignal('mood', 'cohort_profile_viewed', {
@@ -269,7 +282,44 @@ export const CohortConnectWidget: React.FC = () => {
                       >
                         Send message
                       </Button>
+                      <Button
+                        size="small"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation()
+                          recordSignal('mood', 'cohort_email_initiated', {
+                            userId: match.user.id,
+                            similarity: match.similarity,
+                            hour: new Date().getHours()
+                          })
+                          setEmailNote(null)
+                          setEmailOpenId(emailOpenId === match.user.id ? null : match.user.id)
+                        }}
+                      >
+                        Email
+                      </Button>
                     </div>
+                    {emailOpenId === match.user.id && (
+                      <form
+                        className="flex gap-4"
+                        onClick={(e) => e.stopPropagation()}
+                        onSubmit={(e) => {
+                          e.preventDefault()
+                          if (emailText.trim()) sendEmail({ toUserId: match.user.id, body: emailText })
+                        }}
+                      >
+                        <input
+                          autoFocus
+                          className="flex-1 bg-transparent border-b border-acc/20 outline-none"
+                          value={emailText}
+                          onChange={(e) => setEmailText(e.target.value)}
+                          placeholder={`Email ${match.user.firstName}...`}
+                        />
+                        <Button size="small" type="submit" disabled={!emailText.trim()}>
+                          Send
+                        </Button>
+                      </form>
+                    )}
+                    {emailNote && <div className="text-acc/40">{emailNote}</div>}
                   </div>
                 )}
               </div>

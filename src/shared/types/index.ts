@@ -445,8 +445,18 @@ export type ChatMessageLikeEventPayload = {
   isLiked?: boolean;
 };
 
+export type LotEmailRecord = {
+  id: string;
+  senderId: string;
+  senderName: string;
+  body: string;
+  createdAt: string;
+  readAt: string | null;
+};
+
 // Sync Events
 export type SyncEvents = {
+  email: LotEmailRecord & { receiverId: string };
   chatMessage: PublicChatMessage;
   chatMessageLike: ChatMessageLikeEventPayload;
   settings_updated: Record<string, never>;

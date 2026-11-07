@@ -24,6 +24,7 @@ import {
   UserProfile,
   UserSettings,
   WeatherRecord,
+  LotEmailRecord,
 } from '#shared/types'
 import dayjs from '#client/utils/dayjs'
 import { DATE_TIME_FORMAT } from '#shared/constants'
@@ -119,6 +120,18 @@ export const useSendDirectMessage = createMutation<
   { receiverId: string; message: string },
   void
 >('post', '/api/direct-messages')
+
+export const useEmailInbox = createQuery<LotEmailRecord[]>('/api/email/inbox', {
+  refetchOnWindowFocus: true,
+  staleTime: 60 * 1000,
+})
+
+export const useSendEmail = createMutation<
+  { to?: string; toUserId?: string; body: string },
+  { id: string; to: string; toUserId: string }
+>('post', '/api/email')
+
+export const useMarkEmailsRead = createMutation<void, void>('post', '/api/email/read')
 
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
