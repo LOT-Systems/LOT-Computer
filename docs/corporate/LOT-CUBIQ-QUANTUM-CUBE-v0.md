@@ -321,6 +321,18 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE TWIN NUDGE                              2026-11-07
+  ─────────────────────────────────────────────────────────────────
+  A travelling parent holds the top face of their paired CUBIQ for two
+  seconds; the child's cube at home performs THE NUDGE in the parent's
+  signature cadence. The child's hand on the cube returns a single THE
+  SETTLE under the parent's palm. No text, no feed, no screen; safe at
+  bedtime because it uses only no-flight gestures. Full specification,
+  guardrails and success signal: LOT-CUBIQ-QUANTUM-CUBE-v0.2-DEV-REPORT.md
+  §09. NOTE: that report also raises two binding spec corrections to
+  Section 03 (edge margin 20mm → 100mm) and the v.1 long-jump launch
+  angle (≥55° for surface independence) — see its §03.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
