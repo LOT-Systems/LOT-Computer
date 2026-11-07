@@ -130,6 +130,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'second-cycle-integration':             'SCINT',
   'second-cycle-sovereign':               'SCSOV',
   'third-cycle-ignition':                 'TCIGN',
+  'longitudinal-signal-persistence':      'SIGPERS',
+  'coherence-memory-cascade':             'COHMES',
+  'quantum-integration-spiral':           'QISP',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'

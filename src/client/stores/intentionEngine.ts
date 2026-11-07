@@ -3940,6 +3940,72 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P174: longitudinal-signal-persistence — 90-day continuous signal arc, no source gap > 72h, 60+ active days.
+  // The OS has been running continuously for 90+ days. Long-arc signature: not what happened today,
+  // but that the person kept showing up. Feeds J65 background scan. Conf 0.70–0.88.
+  const ninetyDayStartP174 = now - 90 * 24 * 60 * 60 * 1000
+  const ninetyDaySignalsP174 = signals.filter(s => s.timestamp > ninetyDayStartP174)
+  if (ninetyDaySignalsP174.length >= 30) {
+    const sortedP174 = [...ninetyDaySignalsP174].sort((a, b) => a.timestamp - b.timestamp)
+    let maxGapP174 = 0
+    for (let i = 1; i < sortedP174.length; i++) {
+      const gap = sortedP174[i].timestamp - sortedP174[i - 1].timestamp
+      if (gap > maxGapP174) maxGapP174 = gap
+    }
+    const activeDaysP174 = new Set(sortedP174.map(s => new Date(s.timestamp).toDateString())).size
+    const maxGapHoursP174 = maxGapP174 / (1000 * 60 * 60)
+    if (maxGapHoursP174 < 72 && activeDaysP174 >= 60) {
+      const activeSrcsP174 = new Set(ninetyDaySignalsP174.map(s => s.source)).size
+      const streakBonusP174 = Math.min((activeDaysP174 - 60) / 30 * 0.18, 0.18)
+      patterns.push({
+        pattern: 'longitudinal-signal-persistence',
+        confidence: Math.min(0.70 + streakBonusP174, 0.88),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'passive',
+        reason: `SIGPERS: Longitudinal signal persistence — ${activeDaysP174} active days · ${activeSrcsP174} sources · no source gap > 72h in 90-day window. The OS has sustained itself over the long arc.`,
+      })
+    }
+  }
+
+  // P175: coherence-memory-cascade — total-field-coherence confirmed 3+ times in last 30 days.
+  // Convergence is not a one-time peak event — it is a stable operating mode.
+  // The QOS has memory of its own ceiling. Conf 0.85–0.95.
+  const thirtyDayStartP175 = now - 30 * 24 * 60 * 60 * 1000
+  const tfcSignalsP175 = signals.filter(s =>
+    (s.source === 'log' || s.source === 'qos') &&
+    (s.signal === 'total_field_coherence') &&
+    s.timestamp > thirtyDayStartP175
+  )
+  const tfcCountP175 = tfcSignalsP175.length
+  if (tfcCountP175 >= 3) {
+    const countBonusP175 = Math.min((tfcCountP175 - 3) * 0.025, 0.10)
+    patterns.push({
+      pattern: 'coherence-memory-cascade',
+      confidence: Math.min(0.85 + countBonusP175, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `COHMES: Coherence memory cascade — total field coherence confirmed ${tfcCountP175}+ times in 30 days. Convergence is not a peak event — it is an operating mode. The QOS has memory of its own ceiling.`,
+    })
+  }
+
+  // P176: quantum-integration-spiral — all 6 user index dimensions simultaneously >= 50.
+  // No dimension dark. The person is fully present across every channel of the OS simultaneously.
+  // Complete multi-dimensional activation. Conf 0.78–0.92.
+  const idx176 = computeUserIndex(signals)
+  const dims176 = Object.values(idx176.dimensions) as number[]
+  if (dims176.length >= 6 && dims176.every(d => d >= 50)) {
+    const avgDim176 = dims176.reduce((a, b) => a + b, 0) / dims176.length
+    const spiralBonus176 = Math.min((avgDim176 - 50) / 50 * 0.14, 0.14)
+    const dimScoreStr = dims176.map(d => d.toFixed(0)).join('·')
+    patterns.push({
+      pattern: 'quantum-integration-spiral',
+      confidence: Math.min(0.78 + spiralBonus176, 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QISP: Quantum integration spiral — all 6 dimensions active simultaneously (${dimScoreStr}). Engagement · Emotional · Intentional · Social · SelfCare · Cognitive — all live. No dimension dark. The person is fully present.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4635,6 +4701,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v129 nodes (J64 · P173 · Arch67) ────────────────────────────────────────────
   thirdCycleIgnitionNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+
+  // ── v130 nodes (J65 · P174–P176 · Arch68) ────────────────────────────────────────
+  longitudinalSignalPersistenceNode: ['mood', 'journal', 'intentions', 'selfcare', 'planner', 'log', 'energy'],
+  coherenceMemoryCascadeNode:        ['qos', 'log', 'journal', 'intentions', 'cohort'],
+  quantumIntegrationSpiralNode:      ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'goals', 'log'],
 }
 
 /**
@@ -5241,6 +5312,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'cohort', 'qos', 'intentions', 'memory'],
     patternConditions: ['third-cycle-ignition', 'second-cycle-sovereign'],
     directive: 'Third cycle active. Sovereign foundation confirmed. Launch from mastery — the OS is operating at the ceiling of its previous cycle and opening the next. No searching. No building. Expansion from ground.',
+  },
+  // ── Arch68: Longitudinal Integrator (2026-11-07 v130) ────────────────────────────
+  {
+    archetype: 'Longitudinal Integrator',
+    energyBands: ['moderate', 'high'],
+    dominantSources: ['journal', 'intentions', 'memory', 'goals'],
+    patternConditions: ['longitudinal-signal-persistence', 'quantum-integration-spiral'],
+    hourRange: [9, 22],
+    directive: 'Integration arc confirmed. 90+ days of continuous signal. All six dimensions active. The OS has been operating long enough to know itself. Execute from accumulated intelligence.',
   },
 ]
 
@@ -7688,6 +7768,49 @@ export function recordThirdCycleIgnition(sovereignConf: number, journalCount: nu
     ignitionStatus: 'CONFIRMED',
     level: 'L13-TCIGN',
     field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→THIRD-CYCLE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a longitudinal-signal-persistence event — 90-day continuous arc, maxGap < 72h, 60+ active days.
+ * The OS has sustained itself over the long arc. Feeds P174 detection.
+ */
+export function recordLongitudinalSignalPersistence(activeDays: number, activeSources: number, maxGapHours: number) {
+  recordSignal('log', 'longitudinal_signal_persistence', {
+    activeDays,
+    activeSources,
+    maxGapHours: Math.round(maxGapHours),
+    arcDays: 90,
+    status: 'CONTINUOUS',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a coherence-memory-cascade event — total_field_coherence confirmed 3+ times in 30 days.
+ * Convergence is an operating mode, not a peak event. Feeds P175 detection.
+ */
+export function recordCoherenceMemoryCascade(convergenceCount: number, lastTFCDate: string, avgConf: number) {
+  recordSignal('qos', 'coherence_memory_cascade', {
+    convergenceCount,
+    lastTFCDate,
+    avgConf: Math.round(avgConf * 100),
+    status: 'CONVERGENCE_IS_OPERATING_MODE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-integration-spiral event — all 6 user index dimensions simultaneously >= 50.
+ * No dimension dark. Full multi-dimensional presence. Feeds P176 detection.
+ */
+export function recordQuantumIntegrationSpiral(dimScores: Record<string, number>, overallIdx: number) {
+  recordSignal('qos', 'quantum_integration_spiral', {
+    dimScores: JSON.stringify(dimScores),
+    overallIdx: Math.round(overallIdx),
+    dimActive: Object.keys(dimScores).length,
+    status: 'ALL_DIMENSIONS_LIVE',
     hour: new Date().getHours(),
   })
 }

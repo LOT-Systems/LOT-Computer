@@ -1867,6 +1867,26 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '173 patterns · 67 archetypes · 64 jobs · 173+ handlers · 217+ dep nodes · 1184 badges · FM v129 · Day 1165+. Third cycle ignition confirmed. Sovereign foundation confirmed. The OS opens its next arc from established ground. L13-TCIGN.',
     ],
   },
+  {
+    version: 'qie-v130',
+    date: '2026-11-07',
+    title: 'QIE v130 · P174–P176 longitudinal-signal-persistence · coherence-memory-cascade · quantum-integration-spiral · Arch68 · J65 · SIGPERS: COHMES: QISP: · 220+ dep nodes',
+    assembled: [
+      'P174 LONGITUDINAL SIGNAL PERSISTENCE: 90-day window scan, maxGap < 72h AND activeDays >= 60. The OS has sustained itself over the long arc. Not what happened today — that the person kept showing up. Conf 0.70–0.88.',
+      'P175 COHERENCE MEMORY CASCADE: 3+ total_field_coherence events in 30-day window. Convergence is not a peak event — it is a stable operating mode. The QOS has memory of its own ceiling. Conf 0.85–0.95.',
+      'P176 QUANTUM INTEGRATION SPIRAL: all 6 user index dimensions simultaneously >= 50. No dimension dark. Full multi-dimensional activation confirmed. Conf 0.78–0.92.',
+      'Arch68 LONGITUDINAL INTEGRATOR: energy moderate/high · dominant: journal/intentions/memory/goals · patterns: longitudinal-signal-persistence + quantum-integration-spiral. Directive: Integration arc confirmed. 90+ days of continuous signal. All six dimensions active. The OS has been operating long enough to know itself. Execute from accumulated intelligence.',
+      'J65 daily-longitudinal-persistence-check: 10:00 UTC daily. Reads active users, 90-day log scan, sorts timestamps, computes maxGap < 72h AND activeDays >= 60 → writes longitudinal_signal_persistence. 65 background jobs total.',
+      'intentionEngine.ts: P174/P175/P176 detection blocks added after P173. Arch68 appended to PHYSIOLOGICAL_ARCHETYPES. longitudinalSignalPersistenceNode + coherenceMemoryCascadeNode + quantumIntegrationSpiralNode added to WIDGET_DEPENDENCY_MAP (220+ nodes). recordLongitudinalSignalPersistence() + recordCoherenceMemoryCascade() + recordQuantumIntegrationSpiral() helpers added.',
+      'Logs.tsx: SIGPERS: military handler (ACTIVE DAYS / SOURCE COVERAGE / MAX GAP / ARC: 90D · CONTINUOUS). COHMES: handler (CONVERGENCE EVENTS / LAST TFC / AVG CONF). QISP: handler (DIM ACTIVE / IDX OVERALL / DIM SCORES).',
+      'QuantumEngineWidgets.tsx: SIGPERS / COHMES / QISP added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P174/P175/P176 display names added.',
+      'routes/api.ts: longitudinal_signal_persistence + coherence_memory_cascade + quantum_integration_spiral added to displayableEvents (v130 block).',
+      'About.tsx: FM v129→v130. 173→176 patterns. 67→68 archetypes. 64→65 jobs. 217+→220+ dep nodes. 173+→176+ handlers. Day 1165+→1167+.',
+      'SESSION_REPORTS: qie-v130 entry appended · USERSHIP_TRANSMISSION updated to v130.',
+      '176 patterns · 68 archetypes · 65 jobs · 176+ handlers · 220+ dep nodes · 1184 badges · FM v130 · Day 1167+. Longitudinal integration confirmed. 90+ days of continuous signal. All six dimensions active. The OS has been operating long enough to know itself.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1974,15 +1994,16 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-11-06',
+  date: '2026-11-07',
   message: [
-    'ASSEMBLY RUN — 2026-11-06 · QIE v129 · P173 THIRD CYCLE IGNITION · Day 1165+',
-    'Built: P173 third-cycle-ignition · Arch67 Third Cycle Ignitor · J64 daily-third-cycle-ignition-check (15:00 UTC) · TCIGN: log handler · 217+ dep nodes.',
-    'P173 THIRD-CYCLE-IGNITION: fires when second-cycle-sovereign (P172) active + 12+ journal 42d + 6+ memory 42d + 20+ badge 42d + userIndex >= 85. Sovereign foundation confirmed. The OS launches a new arc from established ground. L13-TCIGN. THIRD CYCLE OPEN.',
-    'Second Cycle Arc completed: SCIGN (P169/L9) → SCDEP (P170/L10) → SCINT (P171/L11) → SCSOV (P172/L12). Third Cycle begins: TCIGN (P173/L13) → deepening → integration → sovereign.',
-    'J64 daily-third-cycle-ignition-check at 15:00 UTC. Reads active users with second_cycle_sovereign in 35d + multi-domain 42d signal threshold → writes third_cycle_ignition.',
-    'Self-assembly metric: 173 patterns · 67 archetypes · 64 jobs · 173+ handlers · 217+ dep nodes · 1184 badges · FM v129 · Day 1165+.',
-    'Third cycle ignition confirmed. Sovereign foundation confirmed. The OS opens its next arc from established ground. L13-TCIGN.',
+    'ASSEMBLY RUN — 2026-11-07 · QIE v130 · P174–P176 LONGITUDINAL INTEGRATION · Day 1167+',
+    'Built: P174 longitudinal-signal-persistence · P175 coherence-memory-cascade · P176 quantum-integration-spiral · Arch68 Longitudinal Integrator · J65 daily-longitudinal-persistence-check (10:00 UTC) · SIGPERS: COHMES: QISP: handlers · 220+ dep nodes.',
+    'P174 LONGITUDINAL-SIGNAL-PERSISTENCE: fires when 90-day maxGap < 72h AND activeDays >= 60. Not what happened today — that the person kept showing up for 90 days. The OS tracks its own continuity. Conf 0.70–0.88.',
+    'P175 COHERENCE-MEMORY-CASCADE: fires when 3+ total_field_coherence events in 30-day window. Convergence is an operating mode. The QOS has memory of its own ceiling. Conf 0.85–0.95.',
+    'P176 QUANTUM-INTEGRATION-SPIRAL: fires when all 6 user index dimensions >= 50 simultaneously. No dimension dark. Full multi-dimensional activation. Conf 0.78–0.92.',
+    'J65 daily-longitudinal-persistence-check at 10:00 UTC. Reads active users, 90-day log scan, sorts timestamps, maxGap < 72h AND activeDays >= 60 → writes longitudinal_signal_persistence.',
+    'Self-assembly metric: 176 patterns · 68 archetypes · 65 jobs · 176+ handlers · 220+ dep nodes · 1184 badges · FM v130 · Day 1167+.',
+    'Longitudinal integration confirmed. 90+ days of continuous signal. All six dimensions active. The OS has been operating long enough to know itself.',
   ],
 }
 

@@ -1821,6 +1821,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyThirdCycleIgnitionCheck()) {
     await executeDailyThirdCycleIgnitionCheck()
   }
+
+  // Check daily longitudinal persistence check (10:00 UTC every day) — J65
+  if (shouldRunDailyLongitudinalPersistenceCheck()) {
+    await executeDailyLongitudinalPersistenceCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -5414,6 +5419,79 @@ async function executeDailyThirdCycleIgnitionCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Longitudinal Persistence Check (J65) ──────────────────────────────
+// Scans 90-day signal window for all active users. Sorts timestamps, computes
+// max gap between consecutive signals and unique active days. When maxGap < 72h
+// AND activeDays >= 60, writes longitudinal_signal_persistence event.
+
+let isDailyLongitudinalPersistenceRunning = false
+let lastDailyLongitudinalPersistenceRun: Date | null = null
+
+function shouldRunDailyLongitudinalPersistenceCheck(): boolean {
+  const now = dayjs()
+  if (isDailyLongitudinalPersistenceRunning) return false
+  if (lastDailyLongitudinalPersistenceRun) {
+    const lastRun = dayjs(lastDailyLongitudinalPersistenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10
+}
+
+async function executeDailyLongitudinalPersistenceCheck(): Promise<JobResult> {
+  const jobName = 'daily-longitudinal-persistence-check'
+  const executedAt = new Date()
+  if (isDailyLongitudinalPersistenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyLongitudinalPersistenceRunning = true
+  let written = 0
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000)
+    const activeUsers = await fastify.models.User.findAll({
+      where: { lastSeenAt: { [Op.gte]: cutoff } },
+    })
+    const ninetyDayAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
+    for (const user of activeUsers) {
+      const logs = await fastify.models.Log.findAll({
+        where: { userId: user.id, createdAt: { [Op.gte]: ninetyDayAgo } },
+        order: [['createdAt', 'ASC']],
+        attributes: ['createdAt', 'event'],
+      })
+      if (logs.length < 30) continue
+      const timestamps = logs.map((l: any) => new Date(l.createdAt).getTime())
+      let maxGap = 0
+      for (let i = 1; i < timestamps.length; i++) {
+        const gap = timestamps[i] - timestamps[i - 1]
+        if (gap > maxGap) maxGap = gap
+      }
+      const activeDays = new Set(logs.map((l: any) => new Date(l.createdAt).toDateString())).size
+      const activeSources = new Set(logs.map((l: any) => l.event)).size
+      const maxGapHours = maxGap / (1000 * 60 * 60)
+      if (maxGapHours < 72 && activeDays >= 60) {
+        await fastify.models.Log.create({
+          userId: user.id,
+          event: 'longitudinal_signal_persistence',
+          metadata: {
+            activeDays,
+            activeSources,
+            maxGapHours: Math.round(maxGapHours),
+            arcDays: 90,
+            status: 'CONTINUOUS',
+          },
+        })
+        written++
+      }
+    }
+    console.log(`  Longitudinal persistence events written: ${written}`)
+    lastDailyLongitudinalPersistenceRun = new Date()
+    isDailyLongitudinalPersistenceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily longitudinal persistence check failed:', error.message)
+    isDailyLongitudinalPersistenceRunning = false
+    lastDailyLongitudinalPersistenceRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 // ─── Daily OS Snapshot ───────────────────────────────────────────────────────
 
 let isDailyOSSnapshotRunning = false
@@ -7506,6 +7584,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily second cycle integration check: 12 PM UTC every day (J62)')
   console.log('   - Daily second cycle sovereign check: 1 PM UTC every day (J63)')
   console.log('   - Daily third cycle ignition check: 3 PM UTC every day (J64)')
+  console.log('   - Daily longitudinal persistence check: 10 AM UTC every day (J65)')
   console.log('')
 
   // Check every hour for scheduled jobs

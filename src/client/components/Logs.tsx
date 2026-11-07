@@ -4558,6 +4558,100 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'longitudinal_signal_persistence') {
+          const activeDays = log.metadata?.activeDays as number | undefined
+          const activeSources = log.metadata?.activeSources as number | undefined
+          const maxGapHours = log.metadata?.maxGapHours as number | undefined
+          const arcDays = log.metadata?.arcDays as number | undefined
+          const status = log.metadata?.status as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SIGPERS:" blockView>
+                <div className="uppercase tracking-widest mb-4">LONGITUDINAL SIGNAL PERSISTENCE</div>
+                {activeDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ACTIVE DAYS</span>
+                    <span className="tabular-nums">{activeDays}</span>
+                  </div>
+                )}
+                {activeSources !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCE COVERAGE</span>
+                    <span className="tabular-nums">{activeSources}</span>
+                  </div>
+                )}
+                {maxGapHours !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MAX GAP</span>
+                    <span className="tabular-nums">{maxGapHours}H</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ARC: {arcDays ?? 90}D · {status ?? 'CONTINUOUS'}</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'coherence_memory_cascade') {
+          const convergenceCount = log.metadata?.convergenceCount as number | undefined
+          const lastTFCDate = log.metadata?.lastTFCDate as string | undefined
+          const avgConf = log.metadata?.avgConf as number | undefined
+          const cascadeStatus = log.metadata?.status as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COHMES:" blockView>
+                <div className="uppercase tracking-widest mb-4">COHERENCE MEMORY CASCADE</div>
+                {convergenceCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONVERGENCE EVENTS</span>
+                    <span className="tabular-nums">{convergenceCount}</span>
+                  </div>
+                )}
+                {lastTFCDate && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LAST TFC</span>
+                    <span className="tabular-nums">{lastTFCDate}</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AVG CONF</span>
+                    <span className="tabular-nums">{avgConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">{cascadeStatus ?? 'CONVERGENCE IS AN OPERATING MODE'}</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_integration_spiral') {
+          const dimActive = log.metadata?.dimActive as number | undefined
+          const overallIdx = log.metadata?.overallIdx as number | undefined
+          const dimScoresRaw = log.metadata?.dimScores as string | undefined
+          const spiralStatus = log.metadata?.status as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QISP:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM INTEGRATION SPIRAL</div>
+                {dimActive !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DIM ACTIVE</span>
+                    <span className="tabular-nums">{dimActive} / 6</span>
+                  </div>
+                )}
+                {overallIdx !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">IDX OVERALL</span>
+                    <span className="tabular-nums">{overallIdx}%</span>
+                  </div>
+                )}
+                {dimScoresRaw && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DIM SCORES</span>
+                    <span className="tabular-nums opacity-60">{dimScoresRaw.length > 40 ? dimScoresRaw.slice(0, 40) + '…' : dimScoresRaw}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">{spiralStatus ?? 'ALL DIMENSIONS LIVE · NO DIM DARK'}</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
