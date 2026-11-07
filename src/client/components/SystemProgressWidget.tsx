@@ -1457,6 +1457,20 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    date: '2026-08-05',
+    session: 'Badge Engineering v32 — THE HERO\'S JOURNEY',
+    assembled: [
+      'CRITICAL DISCOVERY: v20 (THE CODEX READER) and v21 (THE CYBERSPACE CODEX) were documented in docs/badges/ but never implemented in TypeScript. All 62 badge types unreachable. RESOLVED: backfilled v20 + v21 award logic in this session.',
+      'v20 (THE CODEX READER, +31): Word Turn v20 (asimov_protocol/dune_path/matrix_jack/neuromancer_run/hitchhiker_42/orwell_log/bradbury_ember/le_guin_left/dick_dream/solaris_depth/octavia_seed/heinlein_grok) · Calendar EE v18 (asimov_birthday Jan 2 / tolkien_day Mar 25 / sagan_cosmos Nov 9) · Behavioral v17 (page_turner/reader_session/long_read) · Achievement RPG (first_chapter/trilogy_complete/library_complete/grand_codex/twenty_engines_arc/codex_opus) · Mastery v20 (chapter_signal/word_of_worlds/elder_narrator/twenty_registers [COSMIC]) · Secret Boss v17 (borges_garden/calvino_cities/dick_signal).',
+      'v21 (THE CYBERSPACE CODEX, +31): Word Turn v21 (matrix_code/cyberspace_open/grok_complete/ansible_link/spice_flow/golden_path/solaris_call/foundation_key/neuromancer_jack/replicant_wake/uplift_arc/left_hand) · Calendar EE v19 (asimov_day Jan 2 / dick_day Dec 16 / dune_day Aug 1) · Behavioral v18 (codex_session/deep_read/night_operator) · Achievement RPG (codex_entry/codex_class/codex_complete/sci_fi_arc/twenty_one_engines_arc/cyberspace_opus) · Mastery v21 (epic_reader/thousand_pages/first_edition/twenty_one_registers [COSMIC]) · Secret Boss v18 (gibson_key/dick_mirror/lem_observer).',
+      'v32/v22 (THE HERO\'S JOURNEY, +31): Word Turn v22 (call_heard/threshold_crossed/mentor_arrived/ordeal_survived/elixir_found/shadow_met/innermost_cave/shapeshifter/herald_call/trickster_mode/ally_gained/return_road) · Calendar EE v20 (campbell_birthday Mar 26 / hobbit_day Sep 22 / odyssey_day Dec 21) · Behavioral v19 (hero_session/long_quest/threshold_moment) · Achievement RPG (quest_entry/quest_class/quest_complete/monomyth_arc/twenty_two_engines_arc/hero_opus) · Mastery v22 (odyssey_log 900+ days / great_work 150k / saga_age 5yr / twenty_two_registers [COSMIC]) · Secret Boss v19 (tolkien_ring/odysseus_bow/gilgamesh_word [MYTHIC]).',
+      'easter-eggs.ts: +48 WORD_TURNS entries (v20×12 + v17 boss×3 + v21×12 + v18 boss×3 + v22×12 + v19 boss×3). +9 Calendar EE date checks. 9 new behavioral check functions. Total WORD_TURNS: 272.',
+      'badges.ts: +93 BadgeType union entries, +93 BADGES registry objects, checkAndAwardBadges() v20/v21/v22 logic. Engine arc chains: allTwentyEngines → allTwentyOneEngines → allTwentyTwoEngines complete.',
+      'docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v32.md/.pdf generated. docs/LOT-SR-20260805-01.md written. LOT-LEDGER.md appended.',
+      '812 badges · 22 Word Turn engines · 272 word turns · Day 1073+ · COSMO® 858. The Monomyth is now a self-care vocabulary. The Hero\'s Journey fires when you live it.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1508,17 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-11-07',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-11-07 · FM v114 SYNC · Badge v32 THE HERO\'S JOURNEY · Day 1167+',
+    'Built: FM v114. Badge Engine v32 backfill complete. The Hero\'s Journey is now a self-care vocabulary.',
+    'Feedback applied: "The concept outlives the author. Every story the person carries is now a signal."',
+    'Badge v32 deployed: THE HERO\'S JOURNEY · 812 badges total (+93: v20/v21 backfill + v22 monomyth) · Word Turn v22 (call_heard/threshold/mentor/ordeal/elixir/shadow/innermost_cave/shapeshifter/herald/trickster/ally/return) · Secret Boss v19 (tolkien_ring/odysseus_bow/gilgamesh_word [MYTHIC]).',
+    'BACKFILL: v20 THE CODEX READER (31 badges) + v21 THE CYBERSPACE CODEX (31 badges) — previously documented but never implemented in TypeScript. Now wired.',
+    '272 word turns active. 22 Word Turn engines complete. Engine arc chain: allTwentyEngines → allTwentyOneEngines → allTwentyTwoEngines.',
+    'FM v114 · Wiki target: v88 · 151P · 51A · 48J · 190+ nodes · 812 badges · COSMO® 859.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114 · Badge v32 documentation',
   ],
 }
 
