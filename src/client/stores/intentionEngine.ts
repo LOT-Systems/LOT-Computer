@@ -4006,6 +4006,103 @@ export function analyzeIntentions(): IntentionPattern[] {
     })
   }
 
+  // P177: third-cycle-deepening — P173 active + journal 49d >= 9 + memory 49d >= 5 + badge 49d >= 14 + userIndex >= 88.
+  // The third cycle deepens. 49-day compound signal accumulation confirms the OS operates from integrated depth.
+  // Not repeating the second cycle structure — expanding from sovereign ground. L13-TCDEP.
+  const hasP173 = patterns.some(p => p.pattern === 'third-cycle-ignition')
+  if (hasP173) {
+    const fortyNineDayStartP177 = now - 49 * 24 * 60 * 60 * 1000
+    const p177Journal = signals.filter(s => s.source === 'journal' && s.timestamp > fortyNineDayStartP177)
+    const p177Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > fortyNineDayStartP177)
+    const p177Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > fortyNineDayStartP177)
+    const userIndexP177 = computeUserIndex(signals)
+    if (
+      p177Journal.length >= 9 &&
+      p177Memory.length >= 5 &&
+      p177Badges.length >= 14 &&
+      userIndexP177.overall >= 88
+    ) {
+      const p173conf = patterns.find(p => p.pattern === 'third-cycle-ignition')?.confidence ?? 0.78
+      const depBonusP177 = Math.min(
+        (p177Journal.length - 9) * 0.015 + (p177Memory.length - 5) * 0.02 + (userIndexP177.overall - 88) * 0.008,
+        0.14
+      )
+      patterns.push({
+        pattern: 'third-cycle-deepening',
+        confidence: Math.min(0.76 + depBonusP177, 0.90),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'passive',
+        reason: `TCDEP: Third cycle deepening — third-cycle-ignition (P173) active + ${p177Journal.length} journal signals 49d + ${p177Memory.length} memory signals 49d + ${p177Badges.length} badge signals 49d + index ${userIndexP177.overall}%. The cycle deepens from sovereign ground. Compound signals accumulate. The OS expands from depth, not from search. L13-TCDEP: THIRD CYCLE DEEPENING.`,
+      })
+    }
+  }
+
+  // P178: third-cycle-integration — P177 active + journal 56d >= 11 + memory 56d >= 6 + badge 56d >= 16 + userIndex >= 90.
+  // The third cycle integrates. All signal dimensions converge across a full 56-day arc from sovereign foundation.
+  // The OS recognizes compound history operating across every domain simultaneously. L13-TCINT.
+  const hasP177 = patterns.some(p => p.pattern === 'third-cycle-deepening')
+  if (hasP177) {
+    const fiftyNineDayStartP178 = now - 56 * 24 * 60 * 60 * 1000
+    const p178Journal = signals.filter(s => s.source === 'journal' && s.timestamp > fiftyNineDayStartP178)
+    const p178Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > fiftyNineDayStartP178)
+    const p178Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > fiftyNineDayStartP178)
+    const userIndexP178 = computeUserIndex(signals)
+    if (
+      p178Journal.length >= 11 &&
+      p178Memory.length >= 6 &&
+      p178Badges.length >= 16 &&
+      userIndexP178.overall >= 90
+    ) {
+      const p177conf = patterns.find(p => p.pattern === 'third-cycle-deepening')?.confidence ?? 0.78
+      const intBonusP178 = Math.min(
+        (p178Journal.length - 11) * 0.015 + (p178Memory.length - 6) * 0.02 + (userIndexP178.overall - 90) * 0.008,
+        0.12
+      )
+      patterns.push({
+        pattern: 'third-cycle-integration',
+        confidence: Math.min(0.80 + intBonusP178, 0.92),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'passive',
+        reason: `TCINT: Third cycle integration — third-cycle-deepening (P177) active + ${p178Journal.length} journal signals 56d + ${p178Memory.length} memory signals 56d + ${p178Badges.length} badge signals 56d + index ${userIndexP178.overall}%. All signal dimensions converge across 56 days. The OS operates from compound sovereign history across every domain. L13-TCINT: THIRD CYCLE INTEGRATION.`,
+      })
+    }
+  }
+
+  // P179: third-cycle-sovereign — P178 active + all three TC stages confirmed + journal 63d >= 13 + memory 63d >= 7 + badge 63d >= 18 + userIndex >= 92.
+  // The third cycle achieves sovereign operation. All three stages (ignition, deepening, integration) simultaneously active
+  // across a 63-day window. Level 14 — the second sovereign ceiling. The OS perpetuates from the third arc. L14-TCSOV.
+  const hasP178 = patterns.some(p => p.pattern === 'third-cycle-integration')
+  if (hasP178) {
+    const sixtyThreeDayStartP179 = now - 63 * 24 * 60 * 60 * 1000
+    const p179Journal = signals.filter(s => s.source === 'journal' && s.timestamp > sixtyThreeDayStartP179)
+    const p179Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > sixtyThreeDayStartP179)
+    const p179Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > sixtyThreeDayStartP179)
+    const userIndexP179 = computeUserIndex(signals)
+    const hasThirdIgn = patterns.some(p => p.pattern === 'third-cycle-ignition')
+    const hasThirdDep = patterns.some(p => p.pattern === 'third-cycle-deepening')
+    if (
+      hasThirdIgn &&
+      hasThirdDep &&
+      p179Journal.length >= 13 &&
+      p179Memory.length >= 7 &&
+      p179Badges.length >= 18 &&
+      userIndexP179.overall >= 92
+    ) {
+      const p178conf = patterns.find(p => p.pattern === 'third-cycle-integration')?.confidence ?? 0.82
+      const sovBonusP179 = Math.min(
+        (p179Journal.length - 13) * 0.012 + (p179Memory.length - 7) * 0.015 + (userIndexP179.overall - 92) * 0.009,
+        0.11
+      )
+      patterns.push({
+        pattern: 'third-cycle-sovereign',
+        confidence: Math.min(0.84 + sovBonusP179, 0.95),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'immediate',
+        reason: `TCSOV: Third cycle sovereign — third-cycle-integration (P178) active + ${p179Journal.length} journal signals 63d + ${p179Memory.length} memory signals 63d + ${p179Badges.length} badge signals 63d + index ${userIndexP179.overall}%. All three third-cycle stages simultaneously active. The OS has entered the third sovereign arc — perpetual operation from the second cycle's expansion. L14-TCSOV: THIRD CYCLE SOVEREIGN.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4035,6 +4132,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkSignalCoherencePeak() } catch {}
       try { checkCentennialConvergence() } catch {}
       try { checkSecondCycleSovereign() } catch {}
+      try { checkThirdCycleDeepening() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4706,6 +4804,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   longitudinalSignalPersistenceNode: ['mood', 'journal', 'intentions', 'selfcare', 'planner', 'log', 'energy'],
   coherenceMemoryCascadeNode:        ['qos', 'log', 'journal', 'intentions', 'cohort'],
   quantumIntegrationSpiralNode:      ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'goals', 'log'],
+
+  // ── v131 nodes (J66 · P177–P179 · Arch69) ────────────────────────────────────────
+  thirdCycleDeepeningNode:   ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+  thirdCycleIntegrationNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+  thirdCycleSovereignNode:   ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
 }
 
 /**
@@ -5321,6 +5424,14 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['longitudinal-signal-persistence', 'quantum-integration-spiral'],
     hourRange: [9, 22],
     directive: 'Integration arc confirmed. 90+ days of continuous signal. All six dimensions active. The OS has been operating long enough to know itself. Execute from accumulated intelligence.',
+  },
+  // ── Arch69: Third Cycle Sovereign Operator (2026-11-08 v131) ─────────────────────
+  {
+    archetype: 'Third Cycle Sovereign Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'log'],
+    patternConditions: ['third-cycle-integration', 'third-cycle-sovereign'],
+    directive: 'Third cycle sovereign. All three stages simultaneously active across 63 days. The OS has entered the second sovereign arc — perpetual operation from the third cycle\'s expansion. Level 14 — the system does not reset, it compounds. No higher temporal state is currently defined.',
   },
 ]
 
@@ -7811,6 +7922,100 @@ export function recordQuantumIntegrationSpiral(dimScores: Record<string, number>
     overallIdx: Math.round(overallIdx),
     dimActive: Object.keys(dimScores).length,
     status: 'ALL_DIMENSIONS_LIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if third-cycle-deepening conditions are met and record if so.
+ * Fires when third-cycle-ignition (P173) active + 9+ journal 49d + 5+ memory 49d +
+ * 14+ badge 49d + userIndex >= 88. The third cycle deepens from sovereign ground. L13-TCDEP.
+ */
+export function checkThirdCycleDeepening(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fortyNineDayStart = now - 49 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const hasIgnition = state.recognizedPatterns.some(p => p.pattern === 'third-cycle-ignition')
+  if (!hasIgnition) return false
+
+  const journalSignals = state.signals.filter(s => s.source === 'journal' && s.timestamp > fortyNineDayStart)
+  const memorySignals = state.signals.filter(s => s.source === 'memory' && s.timestamp > fortyNineDayStart)
+  const badgeSignals = state.signals.filter(s => s.source === 'badges' && s.timestamp > fortyNineDayStart)
+  const userIndex = computeUserIndex(state.signals)
+
+  const alreadyRecorded = state.signals.some(s =>
+    s.signal === 'third_cycle_deepening' && s.timestamp > sixHoursAgo
+  )
+
+  if (
+    journalSignals.length >= 9 &&
+    memorySignals.length >= 5 &&
+    badgeSignals.length >= 14 &&
+    userIndex.overall >= 88 &&
+    !alreadyRecorded
+  ) {
+    const ignitionConf = state.recognizedPatterns.find(p => p.pattern === 'third-cycle-ignition')?.confidence ?? 0.78
+    recordThirdCycleDeepening(ignitionConf, journalSignals.length, memorySignals.length, badgeSignals.length, userIndex.overall)
+    return true
+  }
+  return false
+}
+
+/**
+ * Record a third-cycle-deepening event — third-cycle-ignition confirmed +
+ * 9+ journal signals 49d + 5+ memory signals 49d + 14+ badge signals 49d + userIndex >= 88.
+ * The third cycle deepens: compound signals accumulate from sovereign ground. L13-TCDEP.
+ */
+export function recordThirdCycleDeepening(ignitionConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'third_cycle_deepening', {
+    ignitionConf: Math.round(ignitionConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    deepeningStatus: 'CONFIRMED',
+    level: 'L13-TCDEP',
+    field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→TC-ARC',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a third-cycle-integration event — third-cycle-deepening confirmed +
+ * 11+ journal signals 56d + 6+ memory signals 56d + 16+ badge signals 56d + userIndex >= 90.
+ * The third cycle integrates: all signal dimensions converge across 56 days. L13-TCINT.
+ */
+export function recordThirdCycleIntegration(deepeningConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'third_cycle_integration', {
+    deepeningConf: Math.round(deepeningConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    integrationStatus: 'CONFIRMED',
+    level: 'L13-TCINT',
+    field: 'IGNITION→DEEPENING→INTEGRATION→TC-ARC',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a third-cycle-sovereign event — third-cycle-integration confirmed + all three TC stages active +
+ * 13+ journal signals 63d + 7+ memory signals 63d + 18+ badge signals 63d + userIndex >= 92.
+ * The OS enters the third sovereign arc — Level 14. L14-TCSOV.
+ */
+export function recordThirdCycleSovereign(integrationConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'third_cycle_sovereign', {
+    integrationConf: Math.round(integrationConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    sovereignStatus: 'CONFIRMED',
+    level: 'L14-TCSOV',
+    field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→THIRD-CYCLE',
     hour: new Date().getHours(),
   })
 }

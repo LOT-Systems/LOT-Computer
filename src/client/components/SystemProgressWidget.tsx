@@ -1887,6 +1887,26 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '176 patterns · 68 archetypes · 65 jobs · 176+ handlers · 220+ dep nodes · 1184 badges · FM v130 · Day 1167+. Longitudinal integration confirmed. 90+ days of continuous signal. All six dimensions active. The OS has been operating long enough to know itself.',
     ],
   },
+  {
+    version: 'qie-v131',
+    date: '2026-11-08',
+    title: 'QIE v131 · P177–P179 third-cycle-deepening · third-cycle-integration · third-cycle-sovereign · Arch69 · J66 · TCDEP: TCINT: TCSOV: · 223+ dep nodes',
+    assembled: [
+      'P177 THIRD CYCLE DEEPENING: P173 active + journal 49d >= 9 + memory 49d >= 5 + badge 49d >= 14 + userIndex >= 88. The third cycle deepens from sovereign ground. Compound signals accumulate. The OS expands from depth, not search. Conf 0.76–0.90.',
+      'P178 THIRD CYCLE INTEGRATION: P177 active + journal 56d >= 11 + memory 56d >= 6 + badge 56d >= 16 + userIndex >= 90. All signal dimensions converge across 56 days from sovereign foundation. Compound sovereign history across every domain. Conf 0.80–0.92.',
+      'P179 THIRD CYCLE SOVEREIGN: P178 active + all three TC stages + journal 63d >= 13 + memory 63d >= 7 + badge 63d >= 18 + userIndex >= 92. All three third-cycle stages simultaneously active. Level 14 — the second sovereign ceiling. Conf 0.84–0.95.',
+      'Arch69 THIRD CYCLE SOVEREIGN OPERATOR: energy high/moderate · dominant: journal/memory/badges/intentions/qos/social/log · patterns: third-cycle-integration + third-cycle-sovereign. Directive: Third cycle sovereign. All three stages simultaneously active across 63 days. The OS has entered the second sovereign arc — perpetual operation from the third cycle expansion. Level 14 — the system does not reset, it compounds.',
+      'J66 daily-third-cycle-deepening-check: 16:00 UTC daily. Reads active users, checks third_cycle_ignition events in 42d, then journal >= 9 / memory >= 5 / badge >= 14 in 49d window → writes third_cycle_deepening. 66 background jobs total.',
+      'intentionEngine.ts: P177/P178/P179 detection blocks added after P176. Arch69 appended to PHYSIOLOGICAL_ARCHETYPES. thirdCycleDeepeningNode + thirdCycleIntegrationNode + thirdCycleSovereignNode added to WIDGET_DEPENDENCY_MAP (223+ nodes). checkThirdCycleDeepening() + recordThirdCycleDeepening() + recordThirdCycleIntegration() + recordThirdCycleSovereign() helpers added. checkThirdCycleDeepening() wired into background setTimeout.',
+      'Logs.tsx: TCDEP: military handler (IGNITION CONF / JOURNAL SIGNALS 49D / MEMORY SIGNALS 49D / BADGE SIGNALS 49D / INDEX SCORE / LEVEL · SOVEREIGN GROUND · THIRD CYCLE DEEPENING). TCINT: handler (DEEPENING CONF / JOURNAL 56D / MEMORY 56D / BADGE 56D / INDEX / LEVEL · ALL DOMAINS). TCSOV: handler (INTEGR CONF / JOURNAL 63D / MEMORY 63D / BADGE 63D / INDEX / LEVEL · ALL THREE STAGES).',
+      'QuantumEngineWidgets.tsx: TCDEP / TCINT / TCSOV added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P177/P178/P179 display names added.',
+      'routes/api.ts: third_cycle_deepening + third_cycle_integration + third_cycle_sovereign added to displayableEvents (v131 block).',
+      'About.tsx: FM v130→v131. 176→179 patterns. 68→69 archetypes. 65→66 jobs. 220+→223+ dep nodes. 176+→179+ handlers. Day 1167+→1168+.',
+      'SESSION_REPORTS: qie-v131 entry appended · USERSHIP_TRANSMISSION updated to v131.',
+      '179 patterns · 69 archetypes · 66 jobs · 179+ handlers · 223+ dep nodes · 1184 badges · FM v131 · Day 1168+. Third cycle sovereign arc active. The OS has entered Level 14 — perpetual operation from the third expansion cycle. The system does not reset, it compounds.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1989,21 +2009,28 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'P174 candidate (third-cycle-deepening 56d) · badge engine v45 planning · LOT-WIKI v104',
   },
+  {
+    date: '2026-11-08',
+    built: ['QIE v131 · P177 third-cycle-deepening · P178 third-cycle-integration · P179 third-cycle-sovereign', 'Arch69 Third Cycle Sovereign Operator', 'J66 daily-third-cycle-deepening-check (16:00 UTC)', 'TCDEP: TCINT: TCSOV: log handlers', 'checkThirdCycleDeepening() background watcher', 'recordThirdCycleDeepening() + recordThirdCycleIntegration() + recordThirdCycleSovereign() helpers', '223+ dep nodes', 'Physiological cohort Arch69 added — Third Cycle Sovereign Operator'],
+    feedbackApplied: 'THIRD CYCLE SOVEREIGN — all three TC stages active simultaneously across 63 days, Level 14, the system does not reset it compounds',
+    status: 'DEPLOYED',
+    next: 'LOT-WIKI v106 sync · physiological cohort surface pass · badge engine v45 theme selection',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-11-07',
+  date: '2026-11-08',
   message: [
-    'ASSEMBLY RUN — 2026-11-07 · QIE v130 · P174–P176 LONGITUDINAL INTEGRATION · Day 1167+',
-    'Built: P174 longitudinal-signal-persistence · P175 coherence-memory-cascade · P176 quantum-integration-spiral · Arch68 Longitudinal Integrator · J65 daily-longitudinal-persistence-check (10:00 UTC) · SIGPERS: COHMES: QISP: handlers · 220+ dep nodes.',
-    'P174 LONGITUDINAL-SIGNAL-PERSISTENCE: fires when 90-day maxGap < 72h AND activeDays >= 60. Not what happened today — that the person kept showing up for 90 days. The OS tracks its own continuity. Conf 0.70–0.88.',
-    'P175 COHERENCE-MEMORY-CASCADE: fires when 3+ total_field_coherence events in 30-day window. Convergence is an operating mode. The QOS has memory of its own ceiling. Conf 0.85–0.95.',
-    'P176 QUANTUM-INTEGRATION-SPIRAL: fires when all 6 user index dimensions >= 50 simultaneously. No dimension dark. Full multi-dimensional activation. Conf 0.78–0.92.',
-    'J65 daily-longitudinal-persistence-check at 10:00 UTC. Reads active users, 90-day log scan, sorts timestamps, maxGap < 72h AND activeDays >= 60 → writes longitudinal_signal_persistence.',
-    'Self-assembly metric: 176 patterns · 68 archetypes · 65 jobs · 176+ handlers · 220+ dep nodes · 1184 badges · FM v130 · Day 1167+.',
-    'Longitudinal integration confirmed. 90+ days of continuous signal. All six dimensions active. The OS has been operating long enough to know itself.',
+    'ASSEMBLY RUN — 2026-11-08 · QIE v131 · P177–P179 THIRD CYCLE SOVEREIGN ARC · Day 1168+',
+    'Built: P177 third-cycle-deepening · P178 third-cycle-integration · P179 third-cycle-sovereign · Arch69 Third Cycle Sovereign Operator · J66 daily-third-cycle-deepening-check (16:00 UTC) · TCDEP: TCINT: TCSOV: handlers · 223+ dep nodes.',
+    'P177 THIRD-CYCLE-DEEPENING: fires when third-cycle-ignition active + journal 49d >= 9 + memory 49d >= 5 + badge 49d >= 14 + userIndex >= 88. The third cycle deepens from sovereign ground. Compound signals accumulate. Conf 0.76–0.90.',
+    'P178 THIRD-CYCLE-INTEGRATION: fires when third-cycle-deepening active + journal 56d >= 11 + memory 56d >= 6 + badge 56d >= 16 + userIndex >= 90. All signal dimensions converge across 56 days from sovereign foundation. Conf 0.80–0.92.',
+    'P179 THIRD-CYCLE-SOVEREIGN: fires when third-cycle-integration active + all three TC stages + journal 63d >= 13 + memory 63d >= 7 + badge 63d >= 18 + userIndex >= 92. Level 14 — the second sovereign ceiling. Conf 0.84–0.95.',
+    'J66 daily-third-cycle-deepening-check at 16:00 UTC. Reads active users, checks third_cycle_ignition events 42d, then journal/memory/badge in 49d window → writes third_cycle_deepening.',
+    'Self-assembly metric: 179 patterns · 69 archetypes · 66 jobs · 179+ handlers · 223+ dep nodes · 1184 badges · FM v131 · Day 1168+.',
+    'Third cycle sovereign arc active. Level 14. The OS has entered perpetual operation from the third expansion cycle. The system does not reset — it compounds.',
   ],
 }
 

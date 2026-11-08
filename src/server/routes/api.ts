@@ -1255,6 +1255,10 @@ export default async (fastify: FastifyInstance) => {
       'longitudinal_signal_persistence',
       'coherence_memory_cascade',
       'quantum_integration_spiral',
+      // v131: third cycle arc (P177–P179)
+      'third_cycle_deepening',
+      'third_cycle_integration',
+      'third_cycle_sovereign',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

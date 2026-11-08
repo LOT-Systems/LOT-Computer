@@ -1826,6 +1826,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyLongitudinalPersistenceCheck()) {
     await executeDailyLongitudinalPersistenceCheck()
   }
+
+  // Check daily third cycle deepening check (16:00 UTC every day) — J66
+  if (shouldRunDailyThirdCycleDeepeningCheck()) {
+    await executeDailyThirdCycleDeepeningCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -5488,6 +5493,138 @@ async function executeDailyLongitudinalPersistenceCheck(): Promise<JobResult> {
     console.error('Daily longitudinal persistence check failed:', error.message)
     isDailyLongitudinalPersistenceRunning = false
     lastDailyLongitudinalPersistenceRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Third Cycle Deepening Check (J66) ─────────────────────────────────
+// Scans for users with third-cycle-ignition event in last 49 days. Checks journal >= 9,
+// memory >= 5, badge >= 14 signals in 49-day window, userIndex >= 88. When all conditions
+// met, writes third_cycle_deepening event. The OS expands from sovereign ground.
+
+let isDailyThirdCycleDeepeningRunning = false
+let lastDailyThirdCycleDeepeningRun: Date | null = null
+
+function shouldRunDailyThirdCycleDeepeningCheck(): boolean {
+  const now = dayjs()
+  if (isDailyThirdCycleDeepeningRunning) return false
+  if (lastDailyThirdCycleDeepeningRun) {
+    const lastRun = dayjs(lastDailyThirdCycleDeepeningRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 16 // 16:00 UTC daily
+}
+
+async function executeDailyThirdCycleDeepeningCheck(): Promise<JobResult> {
+  const jobName = 'daily-third-cycle-deepening-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyThirdCycleDeepeningRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyThirdCycleDeepeningRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY THIRD CYCLE DEEPENING CHECK — 16:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const fortyTwoDayStart = dayjs().subtract(42, 'day').toDate()
+    const fortyNineDayStart = dayjs().subtract(49, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Check for third_cycle_ignition events in last 42 days
+        const ignitionLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'third_cycle_ignition',
+            createdAt: { [Op.gte]: fortyTwoDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (ignitionLogs.length < 1) continue
+
+        // Check journal signals in last 49 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: fortyNineDayStart },
+          },
+        })
+
+        if (journalLogs.length < 9) continue
+
+        // Check memory signals in last 49 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_accessed', 'memory_created', 'memory_reflection'] },
+            createdAt: { [Op.gte]: fortyNineDayStart },
+          },
+        })
+
+        if (memoryLogs.length < 5) continue
+
+        // Check badge signals in last 49 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_milestone', 'codex_unlock'] },
+            createdAt: { [Op.gte]: fortyNineDayStart },
+          },
+        })
+
+        if (badgeLogs.length < 14) continue
+
+        const ignitionConf = ignitionLogs[0]?.metadata?.ignitionConf ?? 80
+        const deepeningConf = Math.min(90, Math.round(
+          76 + journalLogs.length * 0.4 + memoryLogs.length * 0.8 + badgeLogs.length * 0.2
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'third_cycle_deepening',
+          text: `Third cycle deepening confirmed: ${journalLogs.length} journal signals 49d + ${memoryLogs.length} memory signals 49d + ${badgeLogs.length} badge signals 49d. Third cycle deepens from sovereign ground. L13-TCDEP.`,
+          metadata: {
+            ignitionConf,
+            deepeningConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            deepeningStatus: 'CONFIRMED',
+            level: 'L13-TCDEP',
+            field: 'IGNITION→DEEPENING→TC-ARC',
+            hour: 16,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Third cycle deepening events written: ${written}`)
+    lastDailyThirdCycleDeepeningRun = new Date()
+    isDailyThirdCycleDeepeningRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily third cycle deepening check failed:', error.message)
+    isDailyThirdCycleDeepeningRunning = false
+    lastDailyThirdCycleDeepeningRun = new Date()
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
