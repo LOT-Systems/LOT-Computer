@@ -36,6 +36,8 @@ import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
+import { buildSystemHelp } from '#shared/logCommands'
+import { parseStoryRange, stripStoryCommand } from '#shared/story'
 
 const localStore = {
   logById: map<Record<string, Log>>({}),
@@ -3705,7 +3707,16 @@ const NoteEditor = ({
   const [prayerResponse, setPrayerResponse] = React.useState<string | null>(null)
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
-  const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyLoading, setStoryLoadingState] = React.useState(false)
+  const storyLoadingRef = React.useRef(false)
+  const storyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const setStoryLoading = React.useCallback((v: boolean) => {
+    storyLoadingRef.current = v
+    setStoryLoadingState(v)
+  }, [])
+  React.useEffect(() => () => {
+    if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+  }, [])
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3741,11 +3752,14 @@ const NoteEditor = ({
   })
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
-      setStoryResponse(data.story)
+      const label = data.range ? `[${data.range.toUpperCase()}] ` : ''
+      const display = data.arcade?.line ? `${data.story}\n\n${data.arcade.line}` : data.story
+      setStoryResponse(display)
       setStoryLoading(false)
+      // Persist only the story itself into the log text (Arcade line is live HUD, not journal content)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
-      const updated = current + separator + '📖 ' + data.story
+      const updated = current + separator + '📖 ' + label + data.story
       setValue(updated)
       valueRef.current = updated
       onChangeRef.current(updated)
@@ -4121,49 +4135,35 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
+        const lines = [buildSystemHelp()]
         setSystemHelp(lines.join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
+        // Defer so the user can finish typing the range argument
+        // ("/story week"). The trigger fires on "/story"; the argument
+        // is read from the latest text after a short settle window.
+        if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+        storyTimerRef.current = setTimeout(() => {
+          storyTimerRef.current = null
+          if (storyLoadingRef.current) return
+          const latest = valueRef.current
+          const range = parseStoryRange(latest)
+          const logText = stripStoryCommand(latest)
+          storyLoadingRef.current = true
           setStoryLoading(true)
           setStoryResponse(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
             submitStory({
               logText,
-              quantumState: state,
-              userIndex: index,
+              range,
+              quantumState: getUserState(),
+              userIndex: getUserIndex(),
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText, range })
           }
-        }
+        }, 1500)
       }
     }
   }, [value])
@@ -4398,8 +4398,8 @@ const NoteEditor = ({
                     const cmd = spaceIdx > -1 ? line.slice(0, spaceIdx) : line
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
-                      <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                      <div key={idx} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem 1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
+                        <span style={{ minWidth: '190px', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )

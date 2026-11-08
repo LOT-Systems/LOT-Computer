@@ -34,6 +34,8 @@ import {
 import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
+import { STORY_RANGES, STORY_RANGE_DAYS, buildStoryDigest, renderDigestBlock, composeLocalStory, dayKey, type StoryRange } from '#shared/story'
+import { getArcadeStanding, computeStreak, renderArcadeLine } from '#shared/arcade'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
@@ -5479,9 +5481,15 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   )
 
   // ============================================================================
-  // STORY — Contextual AI Story
-  // Generates a 1-2 paragraph story based on recent logs, self-care events,
-  // and widget data. The story reflects the operator's recent journey.
+  // STORY — Compressed story of the operator's day / week / month / year
+  //
+  //   LOT User data → digest (shared/story.ts) → QIE state → Together AI
+  //                 → stored as `generated_story` (metadata: range, digest)
+  //
+  // Only a small deterministic DIGEST of the window reaches the vendor,
+  // never the raw archive. Identical windows with no new entries are served
+  // from the stored story (no vendor call). Rate-limited per route.
+  // Docs: docs/log/LOT-LOG-COMMANDS.md
   // ============================================================================
   fastify.post(
     '/story',
@@ -5490,6 +5498,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          range?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,30 +5523,79 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const range: StoryRange = (STORY_RANGES as string[]).includes(req.body.range || '')
+        ? (req.body.range as StoryRange)
+        : 'day'
+      const now = new Date()
+      const since = new Date(now.getTime() - STORY_RANGE_DAYS[range] * 86_400_000)
 
-      const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
-        order: [['createdAt', 'DESC']],
-        limit: 200,
+      // Window rows: journal notes + check-ins (journal entries are event='note').
+      const rows = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: { [Op.in]: ['note', 'journal', 'emotional_checkin'] },
+          createdAt: { [Op.gte]: since },
+        },
+        order: [['createdAt', 'ASC']],
+        limit: 1500,
       })
+      const digest = buildStoryDigest(rows as any, range, now)
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
+      // Arcade standing (lifetime). Counts are cheap indexed lookups.
+      const [lifeEntries, lifeStories, lifeCheckins, dayRows] = await Promise.all([
+        fastify.models.Log.count({ where: { userId: req.user.id, event: 'note' } }),
+        fastify.models.Log.count({ where: { userId: req.user.id, event: 'generated_story' } }),
+        fastify.models.Log.count({ where: { userId: req.user.id, event: 'emotional_checkin' } }),
+        fastify.models.Log.findAll({
+          where: { userId: req.user.id, event: 'note' },
+          attributes: ['createdAt', 'context'],
+          order: [['createdAt', 'DESC']],
+          limit: 3000,
+        }),
+      ])
+      const dayKeys = new Set<string>(
+        dayRows.map((r: any) => dayKey(new Date(r.createdAt), (r.context as any)?.timeZone))
+      )
+      const tz = (dayRows[0] as any)?.context?.timeZone as string | undefined
+      const streak = computeStreak(dayKeys, dayKey(now, tz))
+      const buildArcade = (storiesTotal: number) => {
+        const standing = getArcadeStanding({
+          entries: lifeEntries,
+          activeDays: dayKeys.size,
+          streak,
+          stories: storiesTotal,
+          checkins: lifeCheckins,
+        })
+        return {
+          xp: standing.xp,
+          rank: standing.rank.name,
+          next: standing.next?.name || null,
+          toNext: standing.toNext,
+          progressPct: standing.progressPct,
+          streak,
+          line: renderArcadeLine(standing, streak),
+        }
+      }
 
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
+      // Cache: same range, no newer entry since the stored story → reuse.
+      const prior = await fastify.models.Log.findAll({
+        where: { userId: req.user.id, event: 'generated_story' },
+        order: [['createdAt', 'DESC']],
+        limit: 20,
+      })
+      const cached = prior.find((l: any) => l.metadata?.range === range)
+      const digestKey = `${digest.entries}:${digest.words}:${digest.checkins}`
+      if (cached && cached.text && cached.metadata?.digestKey === digestKey
+          && now.getTime() - new Date(cached.createdAt).getTime() < 6 * 3_600_000) {
+        return {
+          story: cached.text,
+          logId: cached.id,
+          range,
+          cached: true,
+          digest: { entries: digest.entries, activeDays: digest.activeDays, windowDays: digest.windowDays },
+          arcade: buildArcade(lifeStories),
+        }
+      }
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
@@ -5547,46 +5605,44 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const wordBudget = { day: 120, week: 160, month: 200, year: 240 }[range]
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's recorded ${range} into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator invoked /story ${range}. Below is a DIGEST of that window: entry counts, mood tally, context captured at each moment (weather, place, moon), spikes, trend, and a few excerpts of their own words. Your task: write a compressed story (about ${wordBudget} words, 1-3 short paragraphs) of this ${range}.
 
 RULES:
 - Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
-- End with a single forward-looking sentence — not a pep talk, just a quiet truth
-- Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Use ONLY facts present in the digest. Never invent events, people, or numbers.
+- Name the high and the low of the ${range} if the data shows them; surface a spike or a pattern change if one exists.
+- Quote or echo their own words sparingly — it should sound like THEM, compressed.
+- If the window is sparse, say so plainly and gently; do not pad.
+- Tone follows their state: reflective if low, energized if high. Grounded, intimate, never generic motivational writing.
+- End with a single forward-looking sentence — a quiet truth, not a pep talk.
+- Return ONLY the story. No title. No commentary. No preamble.`
 
-      const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+      const fullPrompt = `${systemPrompt}
 
-${stateBlock ? stateBlock : 'STATE: unknown'}
+${stateBlock || 'STATE: unknown'}
+${logText ? `OPERATOR NOTE (this entry): "${String(logText).substring(0, 300)}"\n` : ''}
+DIGEST:
+${renderDigestBlock(digest)}`
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
-
-      const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
-
+      let cleaned: string
+      let source: 'ai' | 'local' = 'ai'
       try {
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
+        console.log(`📖 Story[${range}] for ${req.user.email}: ${digest.entries} entries, ${digest.activeDays} active days`)
+        const story = await engine.generateCompletion(fullPrompt, 640)
+        cleaned = story.trim().replace(/^["']|["']$/g, '')
+        if (!cleaned) throw new Error('empty completion')
+      } catch (error: any) {
+        console.error('Story generation failed, using local composition:', error?.message || error)
+        cleaned = composeLocalStory(digest)
+        source = 'local'
+      }
 
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
-
-        const story = await engine.generateCompletion(fullPrompt, 512)
-
-        const cleaned = story.trim().replace(/^["']|["']$/g, '')
-
+      try {
         const context = await getLogContext(req.user)
         const storyLog = await fastify.models.Log.create({
           userId: req.user.id,
@@ -5595,22 +5651,27 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           context,
           metadata: {
             story: cleaned,
+            range,
+            source,
+            digestKey,
+            digest: { ...digest, excerpts: undefined },
             logText: (logText || '').substring(0, 500),
             quantumState: quantumState || null,
-            timestamp: new Date().toISOString(),
+            timestamp: now.toISOString(),
           },
         })
-
         return {
           story: cleaned,
           logId: storyLog.id,
+          range,
+          cached: false,
+          source,
+          digest: { entries: digest.entries, activeDays: digest.activeDays, windowDays: digest.windowDays },
+          arcade: buildArcade(lifeStories + 1),
         }
       } catch (error: any) {
-        console.error('Story generation failed:', error)
-        return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
-          logId: null,
-        }
+        console.error('Story persist failed:', error)
+        return { story: cleaned, logId: null, range, cached: false, source, arcade: buildArcade(lifeStories) }
       }
     }
   )

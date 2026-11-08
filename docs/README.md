@@ -21,6 +21,9 @@ Core technical documentation about system architecture, engines, and implementat
 - Psychological Depth Analysis - User analysis engine documentation
 - Quantum Intent Engine - Intent pattern recognition system
 
+### [Log Command System](./log/LOT-LOG-COMMANDS.md)
+`/system`, `/story [day|week|month|year]`, Arcade ranks — registry, digest pipeline, API, roadmap.
+
 ### [Deployment Documentation](./deployment/)
 Guides for deploying and managing the application in production.
 
