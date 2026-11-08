@@ -321,6 +321,23 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE BEDSIDE CHECK-IN                        2026-11-08
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, night-shift nurse sleeping by day,
+  phone in another room, partner sleeping beside them.
+
+  The cube sits on its charging pad on the nightstand. At the chosen
+  wake window it performs THE NUDGE — a tremor through the nightstand,
+  inaudible, no light. If untouched, it escalates once to THE HOP
+  (never THE LEAP: the nightstand edge keeps the cube inside the
+  20mm inhibit zone, so the edge gate holds it to in-place gestures).
+  A palm resting on the cube is read by the IMU as acknowledgement and
+  the gesture stops. Nobody else in the room is woken. Time-to-touch
+  and escalation count feed the QI·46 haptic-preference loop.
+
+  Full treatment, energy budget and test protocol:
+  docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
