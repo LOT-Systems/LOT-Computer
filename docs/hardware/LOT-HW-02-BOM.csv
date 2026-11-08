@@ -1,0 +1,17 @@
+Ref,Part,Qty,Est_USD_at_100,Supplier_search
+U1,ESP32-S3FH4R2,1,3.50,https://www.lcsc.com/search?q=ESP32-S3FH4R2
+M1,OV2640 FPC camera 8x8mm,1,4.00,https://www.aliexpress.com/wholesale?SearchText=OV2640+fpc
+D1,0.96in 160x80 IPS SPI,1,3.00,https://www.lcsc.com/search?q=0.96+inch+IPS+SPI
+S1,BME688,1,9.00,https://www.digikey.com/en/products/result?keywords=BME688
+S2,BMI270,1,2.50,https://www.digikey.com/en/products/result?keywords=BMI270
+S3,VEML7700,1,1.50,https://www.lcsc.com/search?q=VEML7700
+H1,6mm LRA + DRV2605L,1,2.50,https://www.digikey.com/en/products/result?keywords=DRV2605L
+SW1,Low-profile tact switch <=1.5mm,1,0.30,https://www.lcsc.com/search?q=SMD+tact+switch+1.5mm
+B1,LiPo 301525 ~130mAh protected,1,3.00,https://www.digikey.com/en/products/result?keywords=lipo+301525
+P1,BQ25100 + TPS62740 + passives,1,3.00,https://www.digikey.com/en/products/result?keywords=BQ25100
+Q1,Qi RX IC + 0.3mm coil + ferrite,1,4.00,https://www.lcsc.com/search?q=qi+receiver+coil
+A1,2.4GHz ceramic antenna,1,0.50,https://www.lcsc.com/search?q=2.4GHz+chip+antenna
+PCB,4-layer 0.8mm ENIG + SMT,1,17.00,https://www.pcbway.com/
+BODY,316L 2-part CNC + mirror polish back,1,55.00,https://www.pcbway.com/cnc-machining-quote.html
+GSK,Gasket + glass windows,1,5.00,https://www.pcbway.com/
+DOCK,5W Qi puck,1,6.00,https://www.aliexpress.com/wholesale?SearchText=qi+wireless+charger+5w
