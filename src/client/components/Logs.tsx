@@ -13,6 +13,7 @@ import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/
 import { useLogs, useUpdateLog } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
+import { getMoonEmoji } from '#shared/utils/astrology'
 import * as fp from '#shared/utils/fp'
 import { Log, LogSettingsChangeMetadata } from '#shared/types'
 import { cn } from '#client/utils'
@@ -363,7 +364,7 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                   <div>HUM: {log.context.humidity}%</div>
                 )}
                 {log.context?.astroRokuyo && (
-                  <div>ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}</div>
+                  <div>ASTRO: {log.context.astroRokuyo}{log.context.astroAuspicious ? ' ★' : ''} · {getMoonEmoji(log.context.astroMoonPhase || '')} {log.context.astroMoonPhase}</div>
                 )}
                 {log.metadata?.sound && (
                   <div>SND: {log.metadata.sound}</div>

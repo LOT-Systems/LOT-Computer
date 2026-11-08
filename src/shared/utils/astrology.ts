@@ -80,15 +80,17 @@ export function getHourlyZodiac(date: Date): string {
  * Simplified calculation based on Gregorian calendar
  */
 export function getRokuyo(date: Date): string {
-  // Known starting point: January 1, 2000 was Sensho (index 0)
-  const knownDate = new Date('2000-01-01')
-  const knownRokuyoIndex = 0
+  // Known starting point: January 1, 2000 was Sensho (index 0).
+  // Uses the date's own calendar day (local Y/M/D fields), not its UTC
+  // instant, so the day boundary follows whichever wall-clock the caller
+  // built the Date from (device time on the client, user timeZone on the
+  // server) instead of flipping at UTC midnight.
+  const dayNumber = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000
+  const knownDayNumber = Date.UTC(2000, 0, 1) / 86400000
+  const daysDiff = Math.round(dayNumber - knownDayNumber)
 
-  // Calculate days since known date
-  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
-
-  // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
+  // Positive modulo (safe for dates before 2000)
+  const rokuyoIndex = ((daysDiff % 6) + 6) % 6
 
   return ROKUYO[rokuyoIndex]
 }
@@ -176,4 +178,35 @@ export function getMoonEmoji(phaseName: string): string {
     'Waning Crescent': '🌘',
   }
   return emojiMap[phaseName] || '🌑'
+}
+
+export interface AstrologyReading {
+  hourlyZodiac: string
+  westernZodiac: string
+  moonPhase: string
+  moonIllumination: number
+  moonEmoji: string
+  rokuyo: string
+  /** Taian (大安) — the most auspicious day of the rokuyo cycle */
+  auspicious: boolean
+}
+
+/**
+ * Single source of truth for the ambient astrology reading. Used by the
+ * dashboard block (System.tsx) and the Logs context snapshot (server) so
+ * both always agree. Pass a Date whose local fields are the wall-clock of
+ * the viewer (see wall-clock helpers in each caller).
+ */
+export function getAstrologyReading(date: Date): AstrologyReading {
+  const moon = getMoonPhase(date)
+  const rokuyo = getRokuyo(date)
+  return {
+    hourlyZodiac: getHourlyZodiac(date),
+    westernZodiac: getWesternZodiac(date),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    moonEmoji: getMoonEmoji(moon.phase),
+    rokuyo,
+    auspicious: rokuyo === 'Taian',
+  }
 }

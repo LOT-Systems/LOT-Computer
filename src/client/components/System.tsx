@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getAstrologyReading } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -205,21 +205,26 @@ export const System = React.memo(function SystemInner() {
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
   // rokuyo), not a personal natal chart.
   const astrology = React.useMemo(() => {
-    const now = new Date()
-    const hourlyZodiac = getHourlyZodiac(now)
-    const westernZodiac = getWesternZodiac(now)
-    const moonPhase = getMoonPhase(now)
-    const rokuyo = getRokuyo(now)
-
-    return {
-      hourlyZodiac,
-      westernZodiac,
-      moonPhase: moonPhase.phase,
-      moonIllumination: moonPhase.illumination,
-      rokuyo,
+    // Personalization: read the clock in the user's saved profile timeZone
+    // (same anchor the server uses for Logs), falling back to device time.
+    // Wall-clock passthrough keeps the pure astrology.ts readers tz-agnostic.
+    const tz = (me as any)?.timeZone as string | undefined
+    let now = new Date()
+    if (tz) {
+      try {
+        const parts: Record<string, number> = {}
+        new Intl.DateTimeFormat('en-US', {
+          timeZone: tz, hourCycle: 'h23', year: 'numeric', month: 'numeric',
+          day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric',
+        }).formatToParts(new Date()).forEach(p => { if (p.type !== 'literal') parts[p.type] = Number(p.value) })
+        now = new Date(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second)
+      } catch {
+        /* invalid tz string — keep device time */
+      }
     }
+    return getAstrologyReading(now)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+  }, [astrologyTick, (me as any)?.timeZone])
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
@@ -465,7 +470,7 @@ export const System = React.memo(function SystemInner() {
         <div>
           <Block label="Astrology:">
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonEmoji} {astrology.moonPhase} ({astrology.moonIllumination}%){astrology.auspicious ? ' ★' : ''}
             </div>
           </Block>
         </div>
@@ -671,7 +676,7 @@ export const System = React.memo(function SystemInner() {
         >
           {astrologyView === 'astrology' ? (
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonEmoji} {astrology.moonPhase} ({astrology.moonIllumination}%){astrology.auspicious ? ' ★' : ''}
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>
