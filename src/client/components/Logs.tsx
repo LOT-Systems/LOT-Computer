@@ -35,6 +35,7 @@ import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
+import { EmailComposer, parseEmailRecipient } from '#client/components/Email'
 import { getFastingState } from '#client/utils/fasting'
 
 const localStore = {
@@ -3707,6 +3708,7 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [emailOpen, setEmailOpen] = React.useState(false)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -4101,6 +4103,8 @@ const NoteEditor = ({
         } catch {
           setFastResult('FAST STATE UNAVAILABLE')
         }
+      } else if (trigger === 'email-compose') {
+        setEmailOpen(true)
       } else if (trigger === 'phys-report') {
         try {
           const state = getUserState()
@@ -4130,6 +4134,7 @@ const NoteEditor = ({
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
           '/phys         Physiological cohort report',
+          '/email to X   Compose LOT Email (inbox in Sync)',
           '/qos          Quantum OS state analysis',
           '/fast         Orthodox fasting calendar',
           '/breathe      4-2-6 breathing exercise',
@@ -4384,6 +4389,16 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailOpen && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <EmailComposer
+                initialName={parseEmailRecipient(value)}
+                onClose={() => setEmailOpen(false)}
+              />
             </Block>
           </div>
         )}

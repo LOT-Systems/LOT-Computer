@@ -85,3 +85,7 @@ export const lastAnsweredMemoryQuestionId = persistentAtom<string | null>(
 
 // computed
 export const isLoggedIn = computed(me, (m) => !!m)
+
+// LOT Email: pending recipient set by other surfaces (e.g. cohort widget)
+// and consumed by the Sync mail composer.
+export const emailDraftTo = atom<{ id: string; name: string } | null>(null)
