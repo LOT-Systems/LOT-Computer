@@ -1,14 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><%= appName %></title>
     <meta name="description" content="<%= appDescription %>">
-    <link rel="stylesheet" href="/css/index.css?v=20241213-002">
+    <link rel="canonical" href="<%= appHost %>">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= appHost %>">
+    <meta property="og:title" content="<%= appName %>">
+    <meta property="og:description" content="<%= appDescription %>">
+    <meta property="og:image" content="<%= appHost %>/og.jpg">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="<%= appHost %>">
+    <meta property="twitter:title" content="<%= appName %>">
+    <meta property="twitter:description" content="<%= appDescription %>">
+    <meta property="twitter:image" content="<%= appHost %>/og.jpg">
+    <meta property="twitter:site" content="@LOT_systems">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/css/index.css?v=20261108-001">
     <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/icon/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="192x192" href="/icon/icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/icon/icon-512.png">
+    <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
 </head>
 <body>
     <div id="root"></div>

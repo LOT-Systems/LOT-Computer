@@ -10,7 +10,8 @@
   "start_url": "/",
   "scope": "/",
   "icons": [
-    { "src": "/icon/icon-192.png", "type": "image/png", "sizes": "192x192" },
-    { "src": "/icon/icon-512.png", "type": "image/png", "sizes": "512x512" }
+    { "src": "/icon/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "/icon/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    { "src": "/icon/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
   ]
 }
