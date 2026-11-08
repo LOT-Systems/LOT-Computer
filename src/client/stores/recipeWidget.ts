@@ -183,9 +183,12 @@ export function dismissRecipeWidget() {
 }
 
 // Initialize periodic check (call this once on app start)
+let recipeInterval: ReturnType<typeof setInterval> | null = null
 export function initRecipeWidget() {
-  // Check every 5 minutes
-  setInterval(checkRecipeWidget, 5 * 60 * 1000)
+  // Idempotent: re-mounts / StrictMode must not stack timers
+  if (recipeInterval === null) {
+    recipeInterval = setInterval(checkRecipeWidget, 5 * 60 * 1000)
+  }
   // Check immediately on init
   checkRecipeWidget()
 }

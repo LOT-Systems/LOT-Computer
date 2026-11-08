@@ -8,6 +8,7 @@
 
 import * as React from 'react'
 import { Block } from './Block'
+import { recordWidgetEvent } from '#client/utils/widgetUsage'
 
 const widgetTimings: Record<string, number> = {}
 
@@ -29,6 +30,7 @@ export class WidgetErrorBoundary extends React.Component<
   { hasError: boolean; error: Error | null }
 > {
   private mountStart: number
+  private visibleSince = 0
 
   constructor(props: { children: React.ReactNode; name?: string }) {
     super(props)
@@ -47,6 +49,13 @@ export class WidgetErrorBoundary extends React.Component<
     if (elapsed > 50) {
       console.warn(`[Perf] ${name} took ${elapsed}ms to mount`)
     }
+    this.visibleSince = performance.now()
+    recordWidgetEvent(name, 'mount', elapsed)
+  }
+
+  componentWillUnmount() {
+    const name = this.props.name || 'Widget'
+    recordWidgetEvent(name, 'unmount', Math.round(performance.now() - this.visibleSince))
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
@@ -55,6 +64,7 @@ export class WidgetErrorBoundary extends React.Component<
       error,
       info.componentStack
     )
+    recordWidgetEvent(this.props.name || 'Widget', 'error')
   }
 
   render() {
@@ -64,7 +74,10 @@ export class WidgetErrorBoundary extends React.Component<
           <div className="opacity-30">
             Failed to load.{' '}
             <button
-              onClick={() => this.setState({ hasError: false, error: null })}
+              onClick={() => {
+                recordWidgetEvent(this.props.name || 'Widget', 'retry')
+                this.setState({ hasError: false, error: null })
+              }}
               className="underline cursor-pointer"
               style={{ background: 'none', border: 'none', color: 'inherit', font: 'inherit', padding: 0 }}
             >
