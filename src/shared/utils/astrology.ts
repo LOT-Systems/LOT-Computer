@@ -177,3 +177,47 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Wall-clock Date for an IANA timeZone. astrology.ts readers use
+ * getHours()/getDate(), so a Date built from the zone's wall-clock fields
+ * yields the reading for that zone regardless of the device's own zone.
+ * Falls back to the plain date on a missing/invalid zone.
+ */
+export function toWallClockInZone(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(date)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  } catch {
+    return date
+  }
+}
+
+/**
+ * Logs <-> Astrology sync: summarize how the user's Logs relate to the
+ * current ambient reading, using the astro* snapshot stored on each log's
+ * context at creation time. Ambient only, not a natal chart.
+ */
+export function summarizeAstrologyLogs(
+  logs: Array<{ createdAt?: Date | string; context?: { astroRokuyo?: string | null; astroMoonPhase?: string | null } | null }>,
+  current: { rokuyo: string; moonPhase: string },
+  now: Date = new Date()
+) {
+  const todayKey = now.toDateString()
+  let withReading = 0, todayCount = 0, sameRokuyo = 0, sameMoon = 0
+  for (const log of logs) {
+    const ctx = log.context
+    if (!ctx?.astroRokuyo) continue
+    withReading++
+    if (log.createdAt && new Date(log.createdAt).toDateString() === todayKey) todayCount++
+    if (ctx.astroRokuyo === current.rokuyo) sameRokuyo++
+    if (ctx.astroMoonPhase === current.moonPhase) sameMoon++
+  }
+  return { withReading, todayCount, sameRokuyo, sameMoon }
+}
