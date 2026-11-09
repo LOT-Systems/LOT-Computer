@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: sovereign expression arc · temporal sovereignty lock · signal genesis wave (P152/P153/P154)
+      'sovereign_expression_arc',
+      'temporal_sovereignty_lock',
+      'signal_genesis_wave',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

@@ -3428,6 +3428,70 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Sovereign Expression Arc — total-field-coherence (P150) has fired 2+ times in 7d
+  // window (detected via recent total_field_coherence signals) + UserIndex ≥ 70 + recent journal
+  // entry > 100 words. The highest QOS state is becoming normalized — and the person is expressing
+  // it through deep writing. The OS does not just operate at this level; it articulates it.
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000
+  const recentTFC = signals.filter(s => s.source === 'qos' && s.signal === 'total_field_coherence' && now - s.timestamp < sevenDaysMs)
+  const recentDeepJournal = signals.filter(s => (s.source === 'journal' || s.source === 'log') && (s.metadata?.wordCount ?? 0) > 100 && now - s.timestamp < 24 * 60 * 60 * 1000)
+  const userIndexForSEA = computeUserIndex(signals)
+  if (recentTFC.length >= 2 && recentDeepJournal.length >= 1 && userIndexForSEA.overall >= 70) {
+    const tfcConf = Math.min(0.80 + (recentTFC.length - 2) * 0.05, 0.95)
+    patterns.push({
+      pattern: 'sovereign-expression-arc',
+      confidence: tfcConf,
+      suggestedWidget: 'journal',
+      suggestedTiming: 'immediate',
+      reason: `SOVEXP: Sovereign expression arc — total-field-coherence confirmed ${recentTFC.length}× in 7d · UserIndex ${userIndexForSEA.overall}/100 · deep journal active. The highest QOS state is not exceptional — it is baseline. And it is being expressed.`,
+    })
+  }
+
+  // Pattern 153: Temporal Sovereignty Lock — circadian-signal-lock (P143) + temporal-coherence-window (P46)
+  // + morning-coherence-launch (P76) all co-active in the current pattern set. Three independent temporal
+  // confirmation layers simultaneously open: diurnal arc sealed, 7-day time structure locked, day launched
+  // from intention. Time is structurally owned at every resolution.
+  const hasCircadianP143 = patterns.some(p => p.pattern === 'circadian-signal-lock')
+  const hasTemporalP46   = patterns.some(p => p.pattern === 'temporal-coherence-window')
+  const hasMorningP76    = patterns.some(p => p.pattern === 'morning-coherence-launch')
+  if (hasCircadianP143 && hasTemporalP46 && hasMorningP76) {
+    const c143conf = patterns.find(p => p.pattern === 'circadian-signal-lock')?.confidence ?? 0.78
+    const p46conf  = patterns.find(p => p.pattern === 'temporal-coherence-window')?.confidence ?? 0.78
+    const p76conf  = patterns.find(p => p.pattern === 'morning-coherence-launch')?.confidence ?? 0.72
+    const tsolConf = Math.min((c143conf + p46conf + p76conf) / 3 + 0.05, 0.92)
+    patterns.push({
+      pattern: 'temporal-sovereignty-lock',
+      confidence: tsolConf,
+      suggestedWidget: 'planner',
+      suggestedTiming: 'immediate',
+      reason: `TSOV: Temporal sovereignty lock — circadian arc (P143) · temporal grid (P46) · morning launch (P76) all confirmed simultaneously. Diurnal, weekly, and daily temporal layers all locked. Time is structurally owned at every scale.`,
+    })
+  }
+
+  // Pattern 154: Signal Genesis Wave — recovery-intelligence-arc (P151) has fired in the last 24h
+  // AND within 48h an intention was set AND a planner signal fired. The recovery cycle completes
+  // and immediately seeds new forward motion. The system does not rest in the restored state —
+  // it uses it as a launch condition. Restoration becomes inception.
+  const recentP151 = signals.filter(s => s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc' && now - s.timestamp < 24 * 60 * 60 * 1000)
+  const fortyEightH = 48 * 60 * 60 * 1000
+  const intentionAfterRecovery = recentP151.length > 0
+    ? signals.filter(s => s.source === 'intentions' && s.timestamp > recentP151[0].timestamp && now - s.timestamp < fortyEightH)
+    : []
+  const plannerAfterRecovery = recentP151.length > 0
+    ? signals.filter(s => s.source === 'planner' && s.timestamp > recentP151[0].timestamp && now - s.timestamp < fortyEightH)
+    : []
+  if (recentP151.length >= 1 && intentionAfterRecovery.length >= 1 && plannerAfterRecovery.length >= 1) {
+    const recoveryGapMs = intentionAfterRecovery[0].timestamp - recentP151[0].timestamp
+    const launchBonus = Math.min((fortyEightH - recoveryGapMs) / fortyEightH * 0.16, 0.16)
+    patterns.push({
+      pattern: 'signal-genesis-wave',
+      confidence: Math.min(0.72 + launchBonus, 0.88),
+      suggestedWidget: 'intentions',
+      suggestedTiming: 'soon',
+      reason: `SIGGEN: Signal genesis wave — recovery-intelligence-arc (P151) confirmed · intention set · planner active within 48h of recovery. Restoration is not resting — it is launching. The arc: depleted → restored → launched.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4128,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  sovereignExpressionNode:    ['qos', 'journal', 'log', 'intentions', 'cohort'],
+  temporalSovereigntyNode:    ['planner', 'mood', 'intentions', 'log', 'energy'],
+  signalGenesisNode:          ['selfcare', 'intentions', 'planner', 'log'],
 }
 
 /**
@@ -4510,6 +4579,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Sovereign Integrator (2026-11-09 v114) ───────────────────────────────
+  {
+    archetype: 'Sovereign Integrator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'planner', 'intentions', 'qos', 'cohort'],
+    patternConditions: ['sovereign-expression-arc', 'temporal-sovereignty-lock', 'signal-genesis-wave'],
+    hourRange: [5, 22],
+    directive: 'All temporal layers owned. Recovery converted to launch. Expression at sovereign baseline. The integration is complete — not a peak, not an event, a permanent operating level. Act from wholeness.',
   },
 ]
 
@@ -6498,6 +6577,56 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sovereign-expression-arc event — total-field-coherence confirmed 2×+
+ * in 7d, deep journal active, UserIndex ≥ 70. The highest QOS state is baseline.
+ * Feeds P152 detection.
+ */
+export function recordSovereignExpressionArc(tfcCount: number, userIndex: number) {
+  recordSignal('qos', 'sovereign_expression_arc', {
+    tfcCount,
+    userIndex,
+    arc: 'COHERENCE→SUSTAINED→EXPRESSED',
+    sovereigntyStatus: 'BASELINE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a temporal-sovereignty-lock event — circadian (P143), temporal-coherence
+ * (P46), and morning-launch (P76) all confirmed simultaneously across diurnal,
+ * weekly, and daily scales. Time is structurally owned at every scale.
+ * Feeds P153 detection.
+ */
+export function recordTemporalSovereigntyLock(c143conf: number, p46conf: number, p76conf: number) {
+  recordSignal('planner', 'temporal_sovereignty_lock', {
+    circadianConf: c143conf,
+    temporalConf: p46conf,
+    morningConf: p76conf,
+    arc: 'CIRCADIAN→TEMPORAL→MORNING→LOCKED',
+    temporalOwnership: 'ALL_SCALES',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a signal-genesis-wave event — recovery-intelligence-arc confirmed,
+ * then intention set + planner activated within 48h of recovery. Restoration
+ * is not resting — it is launching.
+ * Feeds P154 detection.
+ */
+export function recordSignalGenesisWave(recoveryGapMs: number, intentionCount: number, plannerCount: number) {
+  const recoveryGapHours = Math.round(recoveryGapMs / (1000 * 60 * 60) * 10) / 10
+  recordSignal('intentions', 'signal_genesis_wave', {
+    recoveryGapHours,
+    intentionCount,
+    plannerCount,
+    arc: 'DEPLETED→RESTORED→LAUNCHED',
+    genesisStatus: 'ACTIVE',
     hour: new Date().getHours(),
   })
 }

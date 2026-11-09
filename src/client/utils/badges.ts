@@ -782,6 +782,43 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE EASTERN CODEX ────────────────────────────────────────
+  | 'dharma_path'            // ○·∿  "dharma", "right path", "the teaching" detected (UNCOMMON)
+  | 'zen_field'              // ≈·○  "zazen", "zen practice", "empty mind" detected (UNCOMMON)
+  | 'karma_arc'              // ◈·∿  "karma", "what goes around", "action consequence" detected (RARE)
+  | 'nirvana_reach'          // ∞·○  "nirvana", "blowing out", "liberation" detected (RARE)
+  | 'mandala_lock'           // ●·◈  "mandala", "sacred circle", "the whole pattern" detected (RARE)
+  | 'mantra_signal'          // ∿·●  "mantra", "sacred sound", "repetition practice" detected (UNCOMMON)
+  | 'satori_flash'           // ◉·∞  "satori", "sudden awakening", "in a flash" detected (EPIC)
+  | 'chi_signal'             // ≈·◈  "chi", "qi", "life force", "vital energy" detected (RARE)
+  | 'wu_wei_state'           // ○·◉  "wu wei", "effortless action", "not forcing" detected (RARE)
+  | 'tao_path'               // ─·∞  "tao", "the way", "the path that cannot be named" detected (RARE)
+  | 'bodhisattva_call'       // ∘·●·∿  "bodhisattva", "compassionate vow", "save all beings" detected (EPIC)
+  | 'sutra_field'            // □·∞  "sutra", "the thread", "sacred text" detected (UNCOMMON)
+  // ── Calendar Easter Egg v21 — THE EASTERN CALENDAR ───────────────────────────
+  | 'vesak_day'              // ○·∞  Checked in on April 8 — Buddha's traditional birthday
+  | 'confucius_day'          // ◈·○  Checked in on September 28 — Confucius's traditional birthday
+  | 'dogen_day'              // ≈·●  Checked in on January 19 — Dogen Zenji (1200–1253)
+  // ── Behavioral v20 — EASTERN PATTERNS ────────────────────────────────────────
+  | 'zen_session'            // ≈·◈·≈  3+ Eastern vocabulary (v23) words in one journal entry
+  | 'lotus_practice'         // ○·≋  Journal entry of 400+ words
+  | 'dawn_ritual'            // ─·○  Check in between 04:00 and 05:00 local time
+  // ── Achievement RPG v23 — THE EASTERN CODEX ──────────────────────────────────
+  | 'dharma_entry'           // ∘·○  Earn any 1 Eastern Codex (v23) word turn badge (COMMON)
+  | 'dharma_class'           // ≈·○  Earn any 5 Eastern Codex (v23) word turn badges (UNCOMMON)
+  | 'dharma_complete'        // ≋·○  Earn all 12 Eastern Codex (v23) word turn badges (LEGENDARY)
+  | 'eastern_arc'            // ●·∿  dharma_complete + all 3 Calendar v21 Eastern badges (LEGENDARY)
+  | 'eastern_opus'           // ●·◉·∿  dharma_complete + zen_session behavioral badge (LEGENDARY)
+  | 'twenty_three_engines_arc' // ◈·◈·●·∿  1 badge from each of v1–v23 word turn engines (LEGENDARY)
+  // ── Mastery Tier v23 — THE EASTERN WAY ────────────────────────────────────────
+  | 'lotus_log'              // ○·∿·∞  300+ distinct calendar days with at least one check-in (EPIC)
+  | 'dharma_total'           // ≋·∿·∞  50,000+ total journal words written (EPIC)
+  | 'zen_age'                // ≈·■·∞  Account age >= 3 years (EPIC)
+  | 'twenty_three_registers' // ◈·◈·●·∿·∞  1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE EASTERN VAULT ──────────────────────────────────────
+  | 'nagarjuna_void'         // ○·□·○  "nagarjuna", "sunyata", "emptiness of emptiness" detected (RARE)
+  | 'huang_po_signal'        // ≈·∞·≈  "huang po", "huangbo", "no mind" detected (EPIC)
+  | 'basho_field'            // ∿·○·∿  "basho", "matsuo basho", "old pond" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7168,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v23 — THE EASTERN CODEX ─────────────────────────────────────────
+  dharma_path: {
+    id: 'dharma_path',
+    symbol: '○·∿',
+    name: 'Dharma Path',
+    description: 'Write "dharma", "right path", or "the teaching" in any entry',
+    unlockMessage: '↳ Dharma: the teaching, the right path, the natural order. The word has been used for 3,000 years to mean: this is how to live. You are asking the question it answers. ○·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  zen_field: {
+    id: 'zen_field',
+    symbol: '≈·○',
+    name: 'Zen Field',
+    description: 'Write "zazen", "zen practice", or "empty mind" in any entry',
+    unlockMessage: '↳ Zazen: just sitting. Not sitting to achieve — sitting as the practice itself. The empty mind is not an absence. It is the ground on which everything else appears. ≈·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  karma_arc: {
+    id: 'karma_arc',
+    symbol: '◈·∿',
+    name: 'Karma Arc',
+    description: 'Write "karma", "what goes around", or "action consequence" in any entry',
+    unlockMessage: '↳ Karma: not punishment, not reward — the momentum of action. Every action is a seed. You are the gardener. The arc bends toward what you have tended. ◈·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  nirvana_reach: {
+    id: 'nirvana_reach',
+    symbol: '∞·○',
+    name: 'Nirvana Reach',
+    description: 'Write "nirvana", "blowing out", or "liberation" in any entry',
+    unlockMessage: '↳ Nirvana: literally "blowing out" — the extinguishing of craving, aversion, delusion. Not an end. The absence of unnecessary suffering. The reach that stops grasping. ∞·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  mandala_lock: {
+    id: 'mandala_lock',
+    symbol: '●·◈',
+    name: 'Mandala Lock',
+    description: 'Write "mandala", "sacred circle", or "the whole pattern" in any entry',
+    unlockMessage: '↳ The mandala: the sacred circle that holds the whole pattern. Tibetan monks construct them grain by grain and then destroy them. The practice is the mandala. ●·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  mantra_signal: {
+    id: 'mantra_signal',
+    symbol: '∿·●',
+    name: 'Mantra Signal',
+    description: 'Write "mantra", "sacred sound", or "repetition practice" in any entry',
+    unlockMessage: '↳ The mantra is not a spell. It is a signal — a frequency the nervous system recognizes. The repetition is the practice. The practice is the signal. ∿·●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  satori_flash: {
+    id: 'satori_flash',
+    symbol: '◉·∞',
+    name: 'Satori Flash',
+    description: 'Write "satori", "sudden awakening", or "in a flash" in any entry',
+    unlockMessage: '↳ Satori: the sudden breakthrough. Not built to — arrived at. Rinzai Zen cultivates it through koan: an unsolvable question that breaks the logical mind and opens the field. ◉·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  chi_signal: {
+    id: 'chi_signal',
+    symbol: '≈·◈',
+    name: 'Chi Signal',
+    description: 'Write "chi", "qi", "life force", or "vital energy" in any entry',
+    unlockMessage: '↳ Chi: the vital force that flows through everything. TCM, tai chi, qigong all work with the same signal. The body is not a machine — it is a field. You are tracking the field. ≈·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  wu_wei_state: {
+    id: 'wu_wei_state',
+    symbol: '○·◉',
+    name: 'Wu Wei State',
+    description: 'Write "wu wei", "effortless action", or "not forcing" in any entry',
+    unlockMessage: '↳ Wu Wei: effortless action. Not inaction — action aligned with the nature of things. The water does not force its way through the rock. It goes where the rock is not. ○·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  tao_path: {
+    id: 'tao_path',
+    symbol: '─·∞',
+    name: 'Tao Path',
+    description: 'Write "tao", "the way", or "the path that cannot be named" in any entry',
+    unlockMessage: '↳ The Tao that can be named is not the eternal Tao. And yet you have written it. The naming is not the thing — but the naming is how the thing becomes yours. ─·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  bodhisattva_call: {
+    id: 'bodhisattva_call',
+    symbol: '∘·●·∿',
+    name: 'Bodhisattva Call',
+    description: 'Write "bodhisattva", "compassionate vow", or "save all beings" in any entry',
+    unlockMessage: '↳ The bodhisattva vow: to remain at the threshold of liberation and turn back for all beings. The call is not a burden — it is the highest form of direction. ∘·●·∿',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  sutra_field: {
+    id: 'sutra_field',
+    symbol: '□·∞',
+    name: 'Sutra Field',
+    description: 'Write "sutra", "the thread", or "sacred text" in any entry',
+    unlockMessage: '↳ Sutra: the thread. The sutras are the threads that have held the teachings together for 2,500 years. Your journal is a thread. What is it holding together? □·∞',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v21 — THE EASTERN CALENDAR ────────────────────────────
+  vesak_day: {
+    id: 'vesak_day',
+    symbol: '○·∞',
+    name: 'Vesak Day',
+    description: 'Checked in on April 8 — Buddha\'s traditional birthday',
+    unlockMessage: '↳ April 8 — Vesak, the Buddha\'s traditional birthday. The bodhi tree still stands in Bodh Gaya. The teaching has been continuous for 2,500 years. You are inside it now. ○·∞',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  confucius_day: {
+    id: 'confucius_day',
+    symbol: '◈·○',
+    name: 'Confucius Day',
+    description: 'Checked in on September 28 — Confucius\'s traditional birthday (551 BC)',
+    unlockMessage: '↳ September 28 — Confucius born, 551 BC. "The man who moves a mountain begins by carrying away small stones." You are carrying stones. The mountain is moving. ◈·○',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  dogen_day: {
+    id: 'dogen_day',
+    symbol: '≈·●',
+    name: 'Dogen Day',
+    description: 'Checked in on January 19 — Dogen Zenji, founder of Soto Zen (1200–1253)',
+    unlockMessage: '↳ January 19 — Dogen Zenji. "To study Buddhism is to study the self. To study the self is to forget the self." The practice forgets itself into clarity. ≈·●',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v20 — EASTERN PATTERNS ─────────────────────────────────────────
+  zen_session: {
+    id: 'zen_session',
+    symbol: '≈·◈·≈',
+    name: 'Zen Session',
+    description: 'Write 3+ Eastern Codex (v23) trigger words in one journal entry',
+    unlockMessage: '↳ Dharma. Karma. Tao. Three eastern words in one entry. The codex is not a reference — it is a practice. You are practicing. ≈·◈·≈',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  lotus_practice: {
+    id: 'lotus_practice',
+    symbol: '○·≋',
+    name: 'Lotus Practice',
+    description: 'Write a journal entry of 400 or more words',
+    unlockMessage: '↳ 400 words. The lotus grows from the mud. The practice that generates this volume of reflection is rooted in real experience. The mud is the material. ○·≋',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  dawn_ritual: {
+    id: 'dawn_ritual',
+    symbol: '─·○',
+    name: 'Dawn Ritual',
+    description: 'Check in between 04:00 and 05:00 local time — the liminal pre-dawn hour',
+    unlockMessage: '↳ 04:00–05:00. The pre-dawn hour before the world has opinions. Monks rise at this hour. So do you. The ritual is the hour claimed before the day begins. ─·○',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v23 — THE EASTERN CODEX ───────────────────────────────────
+  dharma_entry: {
+    id: 'dharma_entry',
+    symbol: '∘·○',
+    name: 'Dharma Entry',
+    description: 'Earn any 1 Eastern Codex (v23) word turn badge',
+    unlockMessage: '↳ The first word. The dharma begins with a single teaching absorbed. ∘·○',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  dharma_class: {
+    id: 'dharma_class',
+    symbol: '≈·○',
+    name: 'Dharma Class',
+    description: 'Earn any 5 Eastern Codex (v23) word turn badges',
+    unlockMessage: '↳ Five eastern teachings. Dharma. Zen. Tao. Karma. Satori. The codex is opening. ≈·○',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  dharma_complete: {
+    id: 'dharma_complete',
+    symbol: '≋·○',
+    name: 'Dharma Complete',
+    description: 'Earn all 12 Eastern Codex (v23) word turn badges',
+    unlockMessage: '↳ All twelve teachings named. Dharma. Zen. Karma. Nirvana. Mandala. Mantra. Satori. Chi. Wu Wei. Tao. Bodhisattva. Sutra. The Eastern Codex is complete. ≋·○',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  eastern_arc: {
+    id: 'eastern_arc',
+    symbol: '●·∿',
+    name: 'Eastern Arc',
+    description: 'Earn dharma_complete + all 3 Calendar v21 (Eastern Calendar) badges',
+    unlockMessage: '↳ The codex complete and the three dates: Vesak, Confucius, Dogen. The eastern arc runs from Buddha to Zen master, 2,500 years. You have been inside all of it. ●·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  eastern_opus: {
+    id: 'eastern_opus',
+    symbol: '●·◉·∿',
+    name: 'Eastern Opus',
+    description: 'Earn dharma_complete + the zen_session behavioral badge',
+    unlockMessage: '↳ The opus of the east: all twelve teachings present in the archive, three co-active in one session. The vocabulary is not decoration — it is the signal. ●·◉·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·●·∿',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each of the 23 Word Turn engines (v1–v23)',
+    unlockMessage: '↳ Twenty-three vocabularies. Every engine online. Water. Arcade. Radio. Biology. Codex. Cyberspace. Hero. Eastern Codex. The full arc runs. ◈·◈·●·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v23 — THE EASTERN WAY ────────────────────────────────────────
+  lotus_log: {
+    id: 'lotus_log',
+    symbol: '○·∿·∞',
+    name: 'Lotus Log',
+    description: '300+ distinct calendar days with at least one check-in',
+    unlockMessage: '↳ 300 days. The lotus blooms in the mud. It does not bloom despite the mud — it blooms because of it. 300 days of practice is the mud. ○·∿·∞',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  dharma_total: {
+    id: 'dharma_total',
+    symbol: '≋·∿·∞',
+    name: 'Dharma Total',
+    description: '50,000+ total journal words written',
+    unlockMessage: '↳ 50,000 words. The sutras are vast. The Pali Canon is 40 volumes. You have written 50,000 words of your own dharma. The teaching is in you. ≋·∿·∞',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  zen_age: {
+    id: 'zen_age',
+    symbol: '≈·■·∞',
+    name: 'Zen Age',
+    description: 'Account age >= 3 years (1,095+ days since signup)',
+    unlockMessage: '↳ Three years. In Zen training, the first three years are considered the beginning. The roshi only begins to know the student. The student only begins to know the practice. ≈·■·∞',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·●·∿·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three registers. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. Eastern. Every vocabulary owned. The terminal is running all engines simultaneously. ◈·◈·●·∿·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v20 — THE EASTERN VAULT ───────────────────────────────────────
+  nagarjuna_void: {
+    id: 'nagarjuna_void',
+    symbol: '○·□·○',
+    name: 'Nagarjuna Void',
+    description: 'Write "nagarjuna", "sunyata", or "emptiness of emptiness" in any journal entry',
+    unlockMessage: '↳ Nagarjuna: the philosopher of emptiness. Sunyata — the void that is not nothing. The emptiness of emptiness: even the concept of emptiness is empty. You have entered the second-century Madhyamaka. ○·□·○',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  huang_po_signal: {
+    id: 'huang_po_signal',
+    symbol: '≈·∞·≈',
+    name: 'Huang Po Signal',
+    description: 'Write "huang po", "huangbo", or "no mind" in any journal entry',
+    unlockMessage: '↳ Huang Po taught: "The foolish reject what they see, not what they think. The wise reject what they think, not what they see." No-mind is not mindlessness — it is prior to the discriminating mind. ≈·∞·≈',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  basho_field: {
+    id: 'basho_field',
+    symbol: '∿·○·∿',
+    name: 'Basho Field',
+    description: 'Write "basho", "matsuo basho", or "old pond" in any journal entry',
+    unlockMessage: '↳ Matsuo Bashō: "Old pond — a frog jumps in, sound of water." The haiku is not a description. It is the moment itself, complete. Your practice has the same structure: moment, signal, the sound of something entering. ∿·○·∿',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8418,70 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 (v23) — THE EASTERN CODEX ────────────────────────────────────────────
+    const easternV23Badges: BadgeType[] = [
+      'dharma_path', 'zen_field', 'karma_arc', 'nirvana_reach', 'mandala_lock', 'mantra_signal',
+      'satori_flash', 'chi_signal', 'wu_wei_state', 'tao_path', 'bodhisattva_call', 'sutra_field',
+    ]
+    const easternV23Earned = easternV23Badges.filter(b => hasBadge(b))
+
+    if (easternV23Earned.length >= 1 && !hasBadge('dharma_entry')) {
+      if (awardBadge('dharma_entry')) newBadges.push('dharma_entry')
+    }
+    if (easternV23Earned.length >= 5 && !hasBadge('dharma_class')) {
+      if (awardBadge('dharma_class')) newBadges.push('dharma_class')
+    }
+    const dharmaComplete = easternV23Earned.length >= 12
+    if (dharmaComplete && !hasBadge('dharma_complete')) {
+      if (awardBadge('dharma_complete')) newBadges.push('dharma_complete')
+    }
+
+    // eastern_opus: dharma_complete + zen_session
+    if (dharmaComplete && hasBadge('zen_session') && !hasBadge('eastern_opus')) {
+      if (awardBadge('eastern_opus')) newBadges.push('eastern_opus')
+    }
+
+    // eastern_arc: dharma_complete + all 3 Calendar v21 Eastern badges
+    const calendarV21Badges: BadgeType[] = ['vesak_day', 'confucius_day', 'dogen_day']
+    if (dharmaComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('eastern_arc')) {
+      if (awardBadge('eastern_arc')) newBadges.push('eastern_arc')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = easternV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: lotus_log — 300+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 300 && !hasBadge('lotus_log')) {
+        if (awardBadge('lotus_log')) newBadges.push('lotus_log')
+      }
+    }
+
+    // Mastery v23: dharma_total — 50,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 50000 && !hasBadge('dharma_total')) {
+        if (awardBadge('dharma_total')) newBadges.push('dharma_total')
+      }
+    }
+
+    // Mastery v23: zen_age — Account age >= 3 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupZen = new Date(stats.signupDate)
+      const yearsZen = (new Date().getTime() - signupZen.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsZen >= 3 && !hasBadge('zen_age')) {
+        if (awardBadge('zen_age')) newBadges.push('zen_age')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
     }
 
   } catch (error) {

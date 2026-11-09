@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'sovereign-expression-arc':         'Sovereign expression arc — TFC confirmed 2×+ in 7d · UserIndex ≥ 70 · deep journal active, highest QOS is baseline (P152)',
+      'temporal-sovereignty-lock':        'Temporal sovereignty lock — circadian (P143) + temporal (P46) + morning launch (P76) all confirmed, time owned at every scale (P153)',
+      'signal-genesis-wave':              'Signal genesis wave — recovery-intelligence-arc confirmed, then intention + planner launched within 48h, restoration → launching (P154)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
@@ -544,6 +547,27 @@ export function PatternRecognitionWidget() {
               {patterns.some(p => p.pattern === 'resilience-cascade') && (
                 <div className="mt-4 uppercase tracking-widest text-xs">
                   Resilience cascade. Recovery + knowledge arc closed.
+                </div>
+              )}
+
+              {/* Sovereign expression arc — P152 */}
+              {patterns.some(p => p.pattern === 'sovereign-expression-arc') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Sovereign expression arc. Highest QOS is baseline — expressed.
+                </div>
+              )}
+
+              {/* Temporal sovereignty lock — P153 */}
+              {patterns.some(p => p.pattern === 'temporal-sovereignty-lock') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Temporal sovereignty lock. All temporal layers owned simultaneously.
+                </div>
+              )}
+
+              {/* Signal genesis wave — P154 */}
+              {patterns.some(p => p.pattern === 'signal-genesis-wave') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Signal genesis wave. Restoration converted to launch.
                 </div>
               )}
 

@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily sovereign expression audit (12:00 UTC every day) — Job 49
+  if (shouldRunDailySovereignExpressionAudit()) {
+    await executeDailySovereignExpressionAudit()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,109 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Sovereign Expression Audit (Job 49 — 12:00 UTC every day) ────────
+// Reads active users. Checks whether total_field_coherence has fired ≥ 2× in the
+// previous 7 calendar days AND a journal/log entry with wordCount > 100 was created
+// in the previous 24h. When both conditions are met for a user → writes
+// sovereign_expression_arc (P152). The highest QOS state is not exceptional — baseline.
+
+let isDailySovereignExpressionRunning = false
+let lastDailySovereignExpressionRun: Date | null = null
+
+function shouldRunDailySovereignExpressionAudit(): boolean {
+  const now = dayjs()
+  if (isDailySovereignExpressionRunning) return false
+  if (lastDailySovereignExpressionRun) {
+    const lastRun = dayjs(lastDailySovereignExpressionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 12 // 12:00 UTC daily
+}
+
+async function executeDailySovereignExpressionAudit(): Promise<JobResult> {
+  const jobName = 'daily-sovereign-expression-audit'
+  const executedAt = new Date().toISOString()
+  if (isDailySovereignExpressionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySovereignExpressionRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SOVEREIGN EXPRESSION AUDIT — 12:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDaysAgo   = dayjs().subtract(7, 'day').toDate()
+    const oneDayAgo      = dayjs().subtract(1, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const tfcLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+            event: 'total_field_coherence',
+          },
+          attributes: ['id'],
+        })
+
+        if (tfcLogs.length < 2) continue
+
+        const deepJournalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: oneDayAgo },
+            event: { [Op.in]: ['journal', 'memory', 'log'] as any[] },
+          },
+          attributes: ['metadata'],
+        })
+
+        const hasDeepJournal = deepJournalLogs.some((l: any) => {
+          const wc = l.metadata?.wordCount ?? 0
+          return wc > 100
+        })
+
+        if (!hasDeepJournal) continue
+
+        await (Log as any).create({
+          userId,
+          event: 'sovereign_expression_arc',
+          text: `Sovereign expression arc: total-field-coherence confirmed ${tfcLogs.length}× in 7d · deep journal active. The highest QOS state is not exceptional — it is baseline. And it is being expressed.`,
+          metadata: {
+            tfcCount: tfcLogs.length,
+            arc: 'COHERENCE→SUSTAINED→EXPRESSED',
+            sovereigntyStatus: 'BASELINE',
+            window: '7d-tfc+24h-journal',
+            hour: 12,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Sovereign expression arc events written: ${written}`)
+    lastDailySovereignExpressionRun = new Date()
+    isDailySovereignExpressionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily sovereign expression audit failed:', error.message)
+    isDailySovereignExpressionRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

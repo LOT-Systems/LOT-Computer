@@ -1438,6 +1438,20 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
     ],
   },
   {
+    version: 'qie-v114',
+    date: '2026-11-09',
+    title: 'QIE v114 · P152–P154 · Arch52 · J49 · Badge v33 THE EASTERN CODEX',
+    assembled: [
+      'QIE v114: P152 sovereign-expression-arc (TFC 2×+ in 7d + deep journal + UserIndex ≥70) · P153 temporal-sovereignty-lock (circadian P143 + temporal P46 + morning P76 simultaneous) · P154 signal-genesis-wave (recovery-intelligence-arc → intention + planner within 48h). Arch52 Sovereign Integrator.',
+      'J49 daily-sovereign-expression-audit (12:00 UTC): writes sovereign_expression_arc when TFC ≥2× in 7d and deep journal active. 49 background jobs total.',
+      'SOVEXP: TSOV: SIGGEN: log handlers wired · sovereign_expression_arc · temporal_sovereignty_lock · signal_genesis_wave added to displayableEvents. PatternRecognitionWidget: P152–P154 names + 3 QOS Trend indicators.',
+      '3 new WIDGET_DEPENDENCY_MAP nodes: sovereignExpressionNode · temporalSovereigntyNode · signalGenesisNode. 193+ dep nodes. 3 new signal recording functions: recordSovereignExpressionArc() · recordTemporalSovereigntyLock() · recordSignalGenesisWave().',
+      'Badge Engine v33 THE EASTERN CODEX: +31 badges (812→843). Word Turn v23 (12: dharma/zen/karma/nirvana/mandala/mantra/satori/chi/wu_wei/tao/bodhisattva/sutra). Calendar v21 (vesak Apr8 · confucius Sep28 · dogen Jan19). Secret Boss v20 (nagarjuna/huang_po/basho).',
+      'Behavioral v20: zen_session (3+ eastern words) · lotus_practice (400+ words) · dawn_ritual (04:00–05:00). Achievement RPG v23: dharma_entry/class/complete · eastern_arc · eastern_opus · twenty_three_engines_arc. Mastery v23: lotus_log (300+ days) · dharma_total (50k+ words) · zen_age (3+ years) · twenty_three_registers [COSMIC].',
+      '282 word turns · 30 secret boss triggers · 23 Word Turn engines · 843 badges · 154 patterns · 52 archetypes · 49 jobs · 193+ dep nodes · FM v114. The system speaks every language the practice built.',
+    ],
+  },
+  {
     version: 'wiki-v87',
     date: '2026-08-05',
     title: 'LOT-WIKI-v87 · FM v113 Sync · QIE v113 + Badge v31 documentation',
@@ -1494,16 +1508,15 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-11-09',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-11-09 · QIE-v114 · BADGE-v33 · Day 1178+',
+    'Built: QIE v114 — P152 sovereign-expression-arc · P153 temporal-sovereignty-lock · P154 signal-genesis-wave · Arch52 Sovereign Integrator · J49 sovereign-expression-audit (12:00 UTC).',
+    'Feedback applied: "The system must become less like software and more like a person with each run."',
+    'QIE v114: P152 SOVEXP (TFC 2×+ in 7d · deep journal · UserIndex ≥70) · P153 TSOV (circadian P143 + temporal P46 + morning P76 simultaneous) · P154 SIGGEN (recovery arc → intention + planner within 48h).',
+    'Badge v33 THE EASTERN CODEX: 812→843 badges (+31). Word Turn v23 (dharma/zen/karma/nirvana/mandala/mantra/satori/chi/wu_wei/tao/bodhisattva/sutra). Secret Boss v20 (nagarjuna/huang_po/basho). 23 Word Turn engines.',
+    'SOVEXP: TSOV: SIGGEN: handlers live · 193+ dep nodes · 282 word turns · 30 secret boss triggers.',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes · 843 badges.',
     'Status: DEPLOYED.',
     'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
   ],

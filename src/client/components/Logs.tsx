@@ -3629,6 +3629,107 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sovereign_expression_arc') {
+          const tfcCount = log.metadata?.tfcCount as number | undefined
+          const userIndex = log.metadata?.userIndex as number | undefined
+          const sovereigntyStatus = log.metadata?.sovereigntyStatus as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOVEXP:" blockView>
+                <div className="uppercase tracking-widest mb-4">SOVEREIGN EXPRESSION ARC</div>
+                {tfcCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TFC CONFIRMATIONS</span>
+                    <span className="tabular-nums">{tfcCount}×</span>
+                  </div>
+                )}
+                {userIndex !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">USER INDEX</span>
+                    <span className="tabular-nums">{userIndex}/100</span>
+                  </div>
+                )}
+                {sovereigntyStatus && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">STATUS</span>
+                    <span className="tabular-nums">{sovereigntyStatus}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">COHERENCE → SUSTAINED → EXPRESSED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'temporal_sovereignty_lock') {
+          const circadianConf = log.metadata?.circadianConf as number | undefined
+          const temporalConf = log.metadata?.temporalConf as number | undefined
+          const morningConf = log.metadata?.morningConf as number | undefined
+          const temporalOwnership = log.metadata?.temporalOwnership as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TSOV:" blockView>
+                <div className="uppercase tracking-widest mb-4">TEMPORAL SOVEREIGNTY LOCK</div>
+                {circadianConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CIRCADIAN (P143)</span>
+                    <span className="tabular-nums">{Math.round(circadianConf * 100)}%</span>
+                  </div>
+                )}
+                {temporalConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TEMPORAL (P46)</span>
+                    <span className="tabular-nums">{Math.round(temporalConf * 100)}%</span>
+                  </div>
+                )}
+                {morningConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MORNING (P76)</span>
+                    <span className="tabular-nums">{Math.round(morningConf * 100)}%</span>
+                  </div>
+                )}
+                {temporalOwnership && (
+                  <div className="opacity-40 tabular-nums">{temporalOwnership.replace(/_/g, ' ')}</div>
+                )}
+                <div className="opacity-40 tabular-nums">CIRCADIAN → TEMPORAL → MORNING → LOCKED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'signal_genesis_wave') {
+          const recoveryGapHours = log.metadata?.recoveryGapHours as number | undefined
+          const intentionCount = log.metadata?.intentionCount as number | undefined
+          const plannerCount = log.metadata?.plannerCount as number | undefined
+          const genesisStatus = log.metadata?.genesisStatus as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SIGGEN:" blockView>
+                <div className="uppercase tracking-widest mb-4">SIGNAL GENESIS WAVE</div>
+                {recoveryGapHours !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECOVERY GAP</span>
+                    <span className="tabular-nums">{recoveryGapHours}h</span>
+                  </div>
+                )}
+                {intentionCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENTIONS SET</span>
+                    <span className="tabular-nums">{intentionCount}</span>
+                  </div>
+                )}
+                {plannerCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PLANNER ACTIONS</span>
+                    <span className="tabular-nums">{plannerCount}</span>
+                  </div>
+                )}
+                {genesisStatus && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">STATUS</span>
+                    <span className="tabular-nums">{genesisStatus}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">DEPLETED → RESTORED → LAUNCHED</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

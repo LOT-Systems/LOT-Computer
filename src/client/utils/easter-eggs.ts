@@ -870,6 +870,22 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awardBadge('odyssey_day')
     awarded.push('odyssey_day')
   }
+  // ── Calendar v21 — THE EASTERN CALENDAR ──────────────────────────────────────
+  // Vesak Day: April 8 — Buddha's traditional birthday
+  if (!hasBadge('vesak_day') && month === 4 && day === 8) {
+    awardBadge('vesak_day')
+    awarded.push('vesak_day')
+  }
+  // Confucius Day: September 28 — Confucius's traditional birthday (551 BC)
+  if (!hasBadge('confucius_day') && month === 9 && day === 28) {
+    awardBadge('confucius_day')
+    awarded.push('confucius_day')
+  }
+  // Dogen Day: January 19 — Dogen Zenji, founder of Soto Zen (1200–1253)
+  if (!hasBadge('dogen_day') && month === 1 && day === 19) {
+    awardBadge('dogen_day')
+    awarded.push('dogen_day')
+  }
 
   return awarded
 }
@@ -1483,6 +1499,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 Word Turns — THE EASTERN CODEX ───────────────────────────────────────
+  { patterns: /\bdharma\b|\bright[\s-]?path\b|\bthe[\s-]?teaching\b/i,                 badge: 'dharma_path' },
+  { patterns: /\bzazen\b|\bzen[\s-]?practice\b|\bempty[\s-]?mind\b/i,                  badge: 'zen_field' },
+  { patterns: /\bkarma\b|\bwhat[\s-]?goes[\s-]?around\b|\baction[\s-]?consequence\b/i, badge: 'karma_arc' },
+  { patterns: /\bnirvana\b|\bblowing[\s-]?out\b|\bliberation\b/i,                      badge: 'nirvana_reach' },
+  { patterns: /\bmandala\b|\bsacred[\s-]?circle\b|\bthe[\s-]?whole[\s-]?pattern\b/i,  badge: 'mandala_lock' },
+  { patterns: /\bmantra\b|\bsacred[\s-]?sound\b|\brepetition[\s-]?practice\b/i,        badge: 'mantra_signal' },
+  { patterns: /\bsatori\b|\bsudden[\s-]?awakening\b|\bin[\s-]?a[\s-]?flash\b/i,       badge: 'satori_flash' },
+  { patterns: /\bchi\b|\bqi\b|\blife[\s-]?force\b|\bvital[\s-]?energy\b/i,            badge: 'chi_signal' },
+  { patterns: /\bwu[\s-]?wei\b|\beffortless[\s-]?action\b|\bnot[\s-]?forcing\b/i,     badge: 'wu_wei_state' },
+  { patterns: /\btao\b|\bthe[\s-]?way\b|\bpath[\s-]?that[\s-]?cannot[\s-]?be[\s-]?named\b/i, badge: 'tao_path' },
+  { patterns: /\bbodhisattva\b|\bcompassionate[\s-]?vow\b|\bsave[\s-]?all[\s-]?beings\b/i, badge: 'bodhisattva_call' },
+  { patterns: /\bsutra\b|\bthe[\s-]?thread\b|\bsacred[\s-]?text\b/i,                  badge: 'sutra_field' },
+  // ── v20 Secret Boss — THE EASTERN VAULT word triggers ────────────────────────
+  { patterns: /\b(nagarjuna|sunyata|emptiness[\s-]?of[\s-]?emptiness|madhyamaka)\b/i,  badge: 'nagarjuna_void' },
+  { patterns: /\b(huang[\s-]?po|huangbo|no[\s-]?mind)\b/i,                            badge: 'huang_po_signal' },
+  { patterns: /\b(basho|matsuo[\s-]?basho|old[\s-]?pond)\b/i,                         badge: 'basho_field' },
 ]
 
 /**
@@ -2711,6 +2744,65 @@ export function checkThresholdMoment(): BadgeType | null {
   if (hour === 0 && minute <= 30) {
     awardBadge('threshold_moment')
     return 'threshold_moment'
+  }
+  return null
+}
+
+// ── Eastern Codex v23 behavioral checks ──────────────────────────────────────
+
+const EASTERN_WORDS_V23 = [
+  /\bdharma\b|\bright[\s-]?path\b|\bthe[\s-]?teaching\b/i,
+  /\bzazen\b|\bzen[\s-]?practice\b|\bempty[\s-]?mind\b/i,
+  /\bkarma\b|\bwhat[\s-]?goes[\s-]?around\b/i,
+  /\bnirvana\b|\bliberation\b/i,
+  /\bmandala\b|\bsacred[\s-]?circle\b/i,
+  /\bmantra\b|\bsacred[\s-]?sound\b/i,
+  /\bsatori\b|\bsudden[\s-]?awakening\b/i,
+  /\bchi\b|\bqi\b|\blife[\s-]?force\b/i,
+  /\bwu[\s-]?wei\b|\beffortless[\s-]?action\b/i,
+  /\btao\b|\bthe[\s-]?way\b/i,
+  /\bbodhisattva\b|\bcompassionate[\s-]?vow\b/i,
+  /\bsutra\b|\bthe[\s-]?thread\b/i,
+]
+
+/**
+ * Award zen_session badge if 3+ Eastern Codex (v23) words appear in one journal entry.
+ */
+export function checkZenSession(journalText: string): BadgeType | null {
+  if (hasBadge('zen_session')) return null
+  const matchCount = EASTERN_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('zen_session')
+    return 'zen_session'
+  }
+  return null
+}
+
+/**
+ * Award lotus_practice badge if journal entry is 400+ words.
+ */
+export function checkLotusPractice(journalText: string): BadgeType | null {
+  if (hasBadge('lotus_practice')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 400) {
+    awardBadge('lotus_practice')
+    return 'lotus_practice'
+  }
+  return null
+}
+
+/**
+ * Award dawn_ritual badge if user checks in between 04:00 and 05:00 local time.
+ */
+export function checkDawnRitual(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_ritual')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour === 4) {
+    awardBadge('dawn_ritual')
+    return 'dawn_ritual'
   }
   return null
 }
