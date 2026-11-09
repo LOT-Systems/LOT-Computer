@@ -1228,6 +1228,43 @@ export type BadgeType =
   | 'aurelius_echo'         // ◉·▲    "marcus aurelius/the meditations/meditations by marcus/marcus on the self" detected (EPIC)
   | 'enchiridion_found'     // ■·▲·■  "enchiridion/epictetus/the manual of epictetus/handbook of epictetus" detected (MYTHIC)
   | 'seneca_signal'         // ∿·▲·∿  "seneca/letters to lucilius/the shortness of life/on the happy life/on anger" detected (RARE)
+  // ── Word Turn v35 — THE ZEN TERMINAL ──────────────────────────────────────
+  | 'zazen_badge'           // ○·∿·○  "zazen/sitting meditation/meditation cushion/zazen practice" detected (UNCOMMON)
+  | 'koan_solved'           // ◈·∞·◈  "koan/what is the sound/what was your face/mu answer" detected (RARE)
+  | 'beginner_mind'         // ∘·○·∘  "beginner's mind/shoshin/mind is empty/open mind always/mind of a beginner" detected (UNCOMMON)
+  | 'impermanence_badge'    // ∿·∅·∿  "impermanence/anicca/nothing lasts/all things pass/this too shall pass/everything changes" detected (RARE)
+  | 'enso_drawn'            // ○·─·○  "ensō/the circle/drawing the circle/brushstroke complete/enso" detected (UNCOMMON)
+  | 'dharma_gate'           // ∞·◉·∞  "dharma/the dharma/dharma gate/dharma practice/the teaching" detected (RARE)
+  | 'mu_signal'             // □·∿·□  "mu/the koan mu/not/no-thing/the great doubt/without/wu" detected (EPIC)
+  | 'dojo_active'           // ■·○·■  "dojo/the dojo/training hall/the zendo/meditation hall/practice hall" detected (UNCOMMON)
+  | 'just_this'             // →·∘·→  "just this/only this/this moment/exactly this/nothing else needed/just being here" detected (UNCOMMON)
+  | 'no_self_badge'         // ∅·○·∅  "no self/anatta/anatman/no fixed self/the self is empty/there is no self" detected (EPIC)
+  | 'suchness_signal'       // ◉·∿·◉  "suchness/tathata/thusness/as it is/just as it is/the way things are/isness" detected (RARE)
+  | 'nirvana_signal'        // ●·∞·●  "nirvana/parinirvana/awakening complete/liberation from/the great peace/final release" detected (LEGENDARY)
+  // ── Calendar EE v33 — THE ZEN CALENDAR ────────────────────────────────────
+  | 'bodhi_day_badge'       // ●·∞·●  Dec 8 — Bodhi Day (Buddha's enlightenment under the Bodhi tree) (EPIC)
+  | 'vesak_signal'          // ○·●·○  May 23 — Vesak Day (Buddha's birth, enlightenment, parinirvana) (RARE)
+  | 'basho_day'             // ∿·○·∿  Oct 12 — Matsuo Bashō death anniversary 1694 (RARE)
+  // ── Behavioral v32 — ZEN PATTERNS ─────────────────────────────────────────
+  | 'zen_session'           // ○·∿·○  3+ Zen Terminal word turn matches in one journal entry (RARE)
+  | 'dawn_scribe'           // ∘·○·∘  Journal written before 05:00 AM, 7+ times in last 30 days (EPIC)
+  | 'evening_audit'         // ◉·∘·◉  Journal written 20:00–22:59 for 5 consecutive days (RARE)
+  // ── Achievement RPG v33 — ZEN CLASS ───────────────────────────────────────
+  | 'zen_entry'             // ∘→○    Any 1 Word Turn v35 badge earned (COMMON)
+  | 'zen_class'             // ≈→○    Any 5 Word Turn v35 badges earned (UNCOMMON)
+  | 'zen_complete'          // ≋→○    All 12 Word Turn v35 badges earned (LEGENDARY)
+  | 'zazen_arc'             // ○·◈    zen_complete + all 3 Calendar v33 badges (LEGENDARY)
+  | 'thirty_five_engines_arc' // ◈·◈·○ 1 badge from each Word Turn v1–v35 (LEGENDARY)
+  | 'zen_opus'              // ○·◉·○  zen_complete + zen_session behavioral (LEGENDARY)
+  // ── Mastery Tier v35 — THE ZEN MOUNTAIN ───────────────────────────────────
+  | 'practice_log'          // ∿·○·∿  2,500+ distinct calendar check-in days (EPIC)
+  | 'ten_thousand_hours'    // ■·○·■  Account age >= 7 years (2,555+ days) (LEGENDARY)
+  | 'century_level'         // ◉·○·◉  100+ Achievement RPG badges earned (COSMIC)
+  | 'thirty_five_registers' // ◈·◈·○·∞ 1 badge from all 35 Word Turn engines (COSMIC)
+  // ── Secret Boss v32 — THE ZEN VAULT ───────────────────────────────────────
+  | 'huang_po_signal'       // ∿·□·∿  "huang po/huangbo/huang-po/no-mind/dharma of mind" detected (RARE)
+  | 'joshu_gate_badge'      // □·∞·□  "joshu/zhaozhou/wash your bowl/joshu's dog/mu!/case one" detected (EPIC)
+  | 'satori_signal'         // ●·∞·●  "satori/kensho/sudden awakening/great enlightenment/the veil lifted" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
