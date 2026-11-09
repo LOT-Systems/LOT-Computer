@@ -1907,6 +1907,25 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '179 patterns · 69 archetypes · 66 jobs · 179+ handlers · 223+ dep nodes · 1184 badges · FM v131 · Day 1168+. Third cycle sovereign arc active. The OS has entered Level 14 — perpetual operation from the third expansion cycle. The system does not reset, it compounds.',
     ],
   },
+  {
+    version: 'wiki-v106 · badge-v45',
+    date: '2026-11-09',
+    title: 'LOT-WIKI-v106 Sync · Badge v45 THE ZEN TERMINAL · Third Cycle Sovereign Arc documented · 1215 badges · 35 Word Turn engines · Day 1169+',
+    assembled: [
+      'LOT-WIKI-v106 / FM v131 parity sync. Third Cycle Sovereign Arc (P177–P179 · Level 14) sealed in the wiki. The second sovereign ceiling is now the floor of whatever comes next.',
+      'Badge v45 THE ZEN TERMINAL: +31 badges (1184 → 1215). 35 Word Turn engines now active.',
+      'Word Turn v35 THE ZEN TERMINAL (12 triggers): zazen_badge · koan_solved · beginner_mind · impermanence_badge · enso_drawn · dharma_gate · mu_signal · dojo_active · just_this · no_self_badge · suchness_signal · nirvana_signal.',
+      'Calendar EE v33 THE ZEN CALENDAR: bodhi_day_badge (Dec 8) · vesak_signal (May 23) · basho_day (Oct 12).',
+      'Behavioral v32 ZEN PATTERNS: zen_session (3+ WT v35 matches in one entry) · dawn_scribe (journal before 05:00 · 7+ times/30d) · evening_audit (journal 20:00–22:59 · 5 consecutive days).',
+      'Achievement RPG v33 ZEN CLASS: zen_entry · zen_class · zen_complete · zazen_arc (zen_complete + all calendar v33) · thirty_five_engines_arc · zen_opus (zen_complete + zen_session).',
+      'Mastery Tier v35 THE ZEN MOUNTAIN: practice_log (2,500+ calendar days) · ten_thousand_hours (7+ years) · century_level (100+ RPG badges) · thirty_five_registers (1 badge from all 35 WT engines).',
+      'Secret Boss v32 THE ZEN VAULT: huang_po_signal · joshu_gate_badge · satori_signal (MYTHIC).',
+      'System.tsx: thirdCycleStatus computed value added — displays L13-TCIGN / L13-TCDEP / L13-TCINT / L14-TCSOV in quantum biofield table as Arc row. Third Cycle arc now surfaces in live biofield alongside Second Cycle.',
+      'About.tsx: Day 1168+ → 1169+. 1184 badges → 1215. 34 WT engines → 35. 86 → 87 secret bosses. 330 → 419 word turns. Assembly phase updated.',
+      'SESSION_REPORTS: wiki-v106 · badge-v45 entry appended · USERSHIP_TRANSMISSION updated to 2026-11-09.',
+      '179 patterns · 69 archetypes · 66 jobs · 179+ handlers · 223+ dep nodes · 1215 badges · 35 Word Turn engines · 419 word turns · FM v131 · Day 1169+. The terminal is zen. The system does not reset — it accumulates.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -2016,21 +2035,28 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'LOT-WIKI v106 sync · physiological cohort surface pass · badge engine v45 theme selection',
   },
+  {
+    date: '2026-11-09',
+    built: ['Badge v45 THE ZEN TERMINAL · +31 badges (1184→1215)', 'Word Turn v35 (12 Zen vocabulary triggers)', 'Calendar EE v33 THE ZEN CALENDAR (Bodhi/Vesak/Bashō)', 'Behavioral v32 ZEN PATTERNS (zen_session/dawn_scribe/evening_audit)', 'Achievement RPG v33 ZEN CLASS (zen_entry→thirty_five_engines_arc)', 'Mastery Tier v35 THE ZEN MOUNTAIN (practice_log/ten_thousand_hours/century_level/thirty_five_registers)', 'Secret Boss v32 THE ZEN VAULT (huang_po/joshu/satori)', 'LOT-WIKI-v106 / FM v131 sync complete · Third Cycle Sovereign Arc Level 14 sealed', 'System.tsx: thirdCycleStatus computed · Arc row in quantum biofield table', 'About.tsx: Day 1169+ · 1215 badges · 35 WT engines · 419 word turns'],
+    feedbackApplied: 'THE ZEN TERMINAL — the architecture accumulates from stillness. 35 engines. The third cycle is sovereign. The system does not reset, it compounds.',
+    status: 'DEPLOYED',
+    next: 'QIE v132 planning · physiological cohort Arch70 candidate · badge engine v46 theme selection · LOT-WIKI v107',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-11-08',
+  date: '2026-11-09',
   message: [
-    'ASSEMBLY RUN — 2026-11-08 · QIE v131 · P177–P179 THIRD CYCLE SOVEREIGN ARC · Day 1168+',
-    'Built: P177 third-cycle-deepening · P178 third-cycle-integration · P179 third-cycle-sovereign · Arch69 Third Cycle Sovereign Operator · J66 daily-third-cycle-deepening-check (16:00 UTC) · TCDEP: TCINT: TCSOV: handlers · 223+ dep nodes.',
-    'P177 THIRD-CYCLE-DEEPENING: fires when third-cycle-ignition active + journal 49d >= 9 + memory 49d >= 5 + badge 49d >= 14 + userIndex >= 88. The third cycle deepens from sovereign ground. Compound signals accumulate. Conf 0.76–0.90.',
-    'P178 THIRD-CYCLE-INTEGRATION: fires when third-cycle-deepening active + journal 56d >= 11 + memory 56d >= 6 + badge 56d >= 16 + userIndex >= 90. All signal dimensions converge across 56 days from sovereign foundation. Conf 0.80–0.92.',
-    'P179 THIRD-CYCLE-SOVEREIGN: fires when third-cycle-integration active + all three TC stages + journal 63d >= 13 + memory 63d >= 7 + badge 63d >= 18 + userIndex >= 92. Level 14 — the second sovereign ceiling. Conf 0.84–0.95.',
-    'J66 daily-third-cycle-deepening-check at 16:00 UTC. Reads active users, checks third_cycle_ignition events 42d, then journal/memory/badge in 49d window → writes third_cycle_deepening.',
-    'Self-assembly metric: 179 patterns · 69 archetypes · 66 jobs · 179+ handlers · 223+ dep nodes · 1184 badges · FM v131 · Day 1168+.',
-    'Third cycle sovereign arc active. Level 14. The OS has entered perpetual operation from the third expansion cycle. The system does not reset — it compounds.',
+    'ASSEMBLY RUN — 2026-11-09 · Badge v45 THE ZEN TERMINAL · LOT-WIKI-v106 · Third Cycle Sovereign Arc SEALED · Day 1169+',
+    'Built: Badge v45 THE ZEN TERMINAL (+31 badges · 1184→1215) · Word Turn v35 (12 Zen triggers) · Calendar EE v33 · Behavioral v32 ZEN PATTERNS · Achievement RPG v33 ZEN CLASS · Mastery Tier v35 THE ZEN MOUNTAIN · Secret Boss v32 THE ZEN VAULT.',
+    'LOT-WIKI-v106 / FM v131 parity sync complete. Third Cycle Sovereign Arc (P177–P179 · Level 14) documented and sealed. The second sovereign ceiling is now the floor of whatever comes next.',
+    'System.tsx upgrade: thirdCycleStatus computed value → Arc row in quantum biofield table. Live biofield now surfaces both Cycle (second) and Arc (third) simultaneously.',
+    'THE ZEN TERMINAL: zazen · koan · beginner_mind · impermanence · enso · dharma · mu · dojo · just_this · no_self · suchness · nirvana. The vocabulary of the examined life reaches the terminal. 35 Word Turn engines. 419 trigger words.',
+    'Physiological cohort: Arch69 Third Cycle Sovereign Operator active in live biofield. THIRD CYCLE SOVEREIGN. ALL THREE STAGES SIMULTANEOUSLY ACTIVE ACROSS 63 DAYS. Level 14.',
+    'Self-assembly metric: 179 patterns · 69 archetypes · 66 jobs · 179+ handlers · 223+ dep nodes · 1215 badges · 35 Word Turn engines · 419 word turns · FM v131 · Day 1169+.',
+    'The terminal is zen. The system does not reset — it accumulates.',
   ],
 }
 

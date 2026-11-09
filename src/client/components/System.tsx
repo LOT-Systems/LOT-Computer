@@ -292,6 +292,21 @@ export const System = React.memo(function SystemInner() {
     return null
   }, [quantumState])
 
+  // Third cycle status — derived from recognized patterns (FM v129–v131)
+  const thirdCycleStatus = React.useMemo(() => {
+    const eng = intentionEngine.get()
+    const patterns = eng.recognizedPatterns ?? []
+    const hasTCSov = patterns.some(p => p.pattern === 'third-cycle-sovereign')
+    const hasTCInt = patterns.some(p => p.pattern === 'third-cycle-integration')
+    const hasTCDep = patterns.some(p => p.pattern === 'third-cycle-deepening')
+    const hasTCIgn = patterns.some(p => p.pattern === 'third-cycle-ignition')
+    if (hasTCSov) return 'L14-TCSOV'
+    if (hasTCInt) return 'L13-TCINT'
+    if (hasTCDep) return 'L13-TCDEP'
+    if (hasTCIgn) return 'L13-TCIGN'
+    return null
+  }, [quantumState])
+
   // Accumulative User Index - holistic score from all widget signals
   const userIndex = React.useMemo(() => {
     return getUserIndex()
@@ -714,6 +729,7 @@ export const System = React.memo(function SystemInner() {
                 { metric: 'Alignment', value: quantumState.alignment },
                 { metric: 'Index', value: `${userIndex.overall}%` },
                 ...(secondCycleStatus ? [{ metric: 'Cycle', value: secondCycleStatus }] : []),
+                ...(thirdCycleStatus ? [{ metric: 'Arc', value: thirdCycleStatus }] : []),
                 { metric: 'Directive', value: physiologicalCohort?.directive ?? '—' }
               ]}
               columns={[
