@@ -894,7 +894,10 @@ export const usePrayerScripture = createMutation<
 
 export const useStoryGeneration = createMutation<
   {
-    logText: string
+    logText?: string
+    scope?: 'day' | 'week' | 'month' | 'year'
+    /** true → Arcade/rhythm card only: no AI call, no Usership gate (/rank) */
+    cardOnly?: boolean
     quantumState?: {
       energy?: string
       clarity?: string
@@ -909,6 +912,9 @@ export const useStoryGeneration = createMutation<
   },
   {
     story: string
+    card?: string | null
+    scope?: 'day' | 'week' | 'month' | 'year'
+    source?: 'ai' | 'local'
     logId: string | null
   }
 >('post', '/api/story')

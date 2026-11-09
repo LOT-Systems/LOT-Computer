@@ -28,7 +28,9 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, detectTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { buildSystemHelp, parseSystemFilter } from '#client/utils/logCommands'
+import { parseStoryScope } from '#shared/utils/log-story'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3705,8 +3707,16 @@ const NoteEditor = ({
   const [prayerResponse, setPrayerResponse] = React.useState<string | null>(null)
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
-  const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyLoading, setStoryLoadingState] = React.useState(false)
+  const storyLoadingRef = React.useRef(false)
+  const setStoryLoading = React.useCallback((v: boolean) => {
+    storyLoadingRef.current = v
+    setStoryLoadingState(v)
+  }, [])
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [storyCard, setStoryCard] = React.useState<string | null>(null)
+  const [rankCard, setRankCard] = React.useState<string | null>(null)
+  const [rankLoading, setRankLoading] = React.useState(false)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3739,9 +3749,20 @@ const NoteEditor = ({
       setIsSaved(true)
     },
   })
+  const { mutate: submitRank } = useStoryGeneration({
+    onSuccess: (data) => {
+      setRankCard(data.card || 'ARCADE         UNAVAILABLE')
+      setRankLoading(false)
+    },
+    onError: () => {
+      setRankCard('ARCADE         OFFLINE — try again shortly')
+      setRankLoading(false)
+    },
+  })
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryCard(data.card || null)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -4121,48 +4142,47 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        // Argument-taking command: wait briefly so "/system body" can be typed,
+        // then read the live text (value in this closure is already stale).
+        setTimeout(() => {
+          const live = valueRef.current
+          if (!detectTriggers(live).includes('system-help')) return
+          setSystemHelp(buildSystemHelp(parseSystemFilter(live)))
+        }, 1200)
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
+        // Argument-taking command: wait briefly so "/story month" can be typed,
+        // then read the live text (value in this closure is already stale).
+        setTimeout(() => {
+          const live = valueRef.current
+          if (!detectTriggers(live).includes('story-mode')) return
+          if (storyLoadingRef.current) return
+          storyLoadingRef.current = true
           setStoryLoading(true)
           setStoryResponse(null)
+          setStoryCard(null)
+          const scope = parseStoryScope(live)
+          const logText = live
+            .replace(/\/story(\s+[a-z]+)?/i, '')
+            .replace(/📖/g, '')
+            .trim()
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
             submitStory({
               logText,
-              quantumState: state,
-              userIndex: index,
+              scope,
+              quantumState: getUserState(),
+              userIndex: getUserIndex(),
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText, scope })
           }
+        }, 1200)
+      } else if (trigger === 'rank-status') {
+        if (!rankLoading) {
+          setRankLoading(true)
+          setRankCard(null)
+          submitRank({ cardOnly: true, scope: 'week' })
         }
       }
     }
@@ -4393,13 +4413,13 @@ const NoteEditor = ({
               <div className="opacity-80" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                 {systemHelp.split('\n').map((line, idx) => {
                   if (!line.trim()) return <div key={idx} style={{ height: '0.75rem' }} />
-                  if (line.startsWith('/')) {
+                  if (/\S\s{2,}\S/.test(line)) {
                     const spaceIdx = line.search(/\s{2,}/)
-                    const cmd = spaceIdx > -1 ? line.slice(0, spaceIdx) : line
-                    const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
+                    const cmd = line.slice(0, spaceIdx)
+                    const desc = line.slice(spaceIdx).trim()
                     return (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                        <span style={{ minWidth: '230px', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )
@@ -4420,12 +4440,27 @@ const NoteEditor = ({
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
               )}
+              {storyCard && (
+                <div className="opacity-40 mb-4" style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: '12px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{storyCard}</div>
+              )}
               {storyResponse && (
                 <div className="opacity-60">
                   {storyResponse.split('\n').map((line, idx) => (
                     <div key={idx}>{line || <br />}</div>
                   ))}
                 </div>
+              )}
+            </Block>
+          </div>
+        )}
+        {(rankLoading || rankCard) && (
+          <div className="mt-8">
+            <Block label="ARCADE:" blockView>
+              {rankLoading && !rankCard && (
+                <div className="opacity-40 tracking-widest">...</div>
+              )}
+              {rankCard && (
+                <div className="opacity-60" style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: '12px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{rankCard}</div>
               )}
             </Block>
           </div>

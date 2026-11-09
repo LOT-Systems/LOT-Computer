@@ -34,6 +34,15 @@ import {
 import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
+import {
+  compressLogs,
+  composeLocalStory,
+  cleanEntryText,
+  renderDigestForPrompt,
+  renderStoryCard,
+  DEFAULT_STORY_SCOPE,
+  type StoryScope,
+} from '#shared/utils/log-story'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
@@ -5479,9 +5488,17 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   )
 
   // ============================================================================
-  // STORY — Contextual AI Story
-  // Generates a 1-2 paragraph story based on recent logs, self-care events,
-  // and widget data. The story reflects the operator's recent journey.
+  // STORY — Compressed user-story (/story [day|week|month|year] in the Log)
+  //
+  // Pipeline:  LOT user data (Log rows + context metadata)
+  //            → Log Story Compression (shared/utils/log-story.ts)
+  //            → AI vendor (Together AI) — receives the DIGEST, not the raw log
+  //            → LOT personalized data stored (event: 'generated_story')
+  //
+  // `cardOnly: true` returns the Arcade/rhythm card with no AI call and no
+  // Usership gate (used by /rank). If the vendor fails, a deterministic local
+  // story is returned so the command always answers.
+  // Spec: docs/technical/LOT-LOG-COMMAND-SYSTEM.md
   // ============================================================================
   fastify.post(
     '/story',
@@ -5489,7 +5506,9 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
     async (
       req: FastifyRequest<{
         Body: {
-          logText: string
+          logText?: string
+          scope?: string
+          cardOnly?: boolean
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5505,112 +5524,97 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }>,
       reply
     ) => {
-      const hasUsership = req.user.tags.some((t: string) => t.toLowerCase() === 'usership')
-      if (!hasUsership) {
-        return reply.code(403).send({
-          story: 'Story generation is available for Usership members.',
-          logId: null,
-        })
+      const { logText, quantumState, userIndex, cardOnly } = req.body || {}
+      const scope: StoryScope = (['day', 'week', 'month', 'year'] as const).includes(
+        req.body?.scope as StoryScope
+      )
+        ? (req.body.scope as StoryScope)
+        : DEFAULT_STORY_SCOPE
+
+      if (!cardOnly) {
+        const hasUsership = req.user.tags.some((t: string) => t.toLowerCase() === 'usership')
+        if (!hasUsership) {
+          return reply.code(403).send({
+            story: 'Story generation is available for Usership members.',
+            card: null,
+            logId: null,
+          })
+        }
       }
 
-      const { logText, quantumState, userIndex } = req.body
-
-      const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+      // One query: trailing 365 days = the Arcade "season"; the scope window
+      // is derived from it inside compressLogs().
+      const since = dayjs().subtract(365, 'day').toDate()
+      const rows = await fastify.models.Log.findAll({
+        where: { userId: req.user.id, createdAt: { [Op.gte]: since } },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 3000,
       })
+      const tzOffsetMinutes = req.user.timeZone
+        ? dayjs().tz(req.user.timeZone).utcOffset()
+        : 0
+      const digest = compressLogs(rows as any, scope, { tzOffsetMinutes })
+      const card = renderStoryCard(digest)
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
-
-      let stateBlock = ''
-      if (quantumState && quantumState.energy) {
-        stateBlock = `OPERATOR STATE: ${quantumState.energy} energy, ${quantumState.clarity} clarity, ${quantumState.alignment} alignment`
-      }
-      if (userIndex && userIndex.overall !== undefined) {
-        stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
+      if (cardOnly) {
+        return { story: '', card, logId: null }
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's ${scope} into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator typed /story in their Log. You receive a compressed DIGEST (volume, rhythm, environment, spikes, mood, Arcade standing) plus a few short excerpts. Write 2 short paragraphs (80-160 words) that tell the story of this ${scope}.
 
 RULES:
-- Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
-- End with a single forward-looking sentence — not a pep talk, just a quiet truth
-- Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Second person ("You...")
+- Ground every claim in the digest. Never invent events, people or numbers.
+- If SPIKES lists a change (volume, silence, rhythm, mood, length), name it gently as something the Log noticed — a pattern, not a diagnosis.
+- Weave in the environment (place, weather, time of day) only where the digest has it.
+- Mention the Arcade rank at most once, in a single plain clause — it is self-care progress, not a game score to brag about.
+- Gaps or heavy stretches are met with compassion, not advice.
+- End with one quiet forward-looking sentence. No pep talk.
+- Return ONLY the story. No title, no preamble, no lists.`
 
-      const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+      const dataBlock = `${renderDigestForPrompt(digest)}
+${quantumState?.energy ? `\nOPERATOR STATE: ${quantumState.energy} energy, ${quantumState.clarity} clarity, ${quantumState.alignment} alignment` : ''}${userIndex?.overall !== undefined ? `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})` : ''}
+OPERATOR NOTE WITH COMMAND: "${cleanEntryText(logText || '').slice(0, 300) || '(none)'}"`
 
-${stateBlock ? stateBlock : 'STATE: unknown'}
-
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
-
-      const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
-
+      let story = ''
+      let source: 'ai' | 'local' = 'ai'
       try {
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
+        console.log(`📖 Story[${scope}] generation for user ${req.user.id}`)
+        story = (await engine.generateCompletion(`${systemPrompt}\n\n${dataBlock}`, 512))
+          .trim()
+          .replace(/^["']|["']$/g, '')
+        if (!story) throw new Error('empty completion')
+      } catch (error: any) {
+        console.error('Story generation failed, using local compression:', error?.message || error)
+        story = composeLocalStory(digest)
+        source = 'local'
+      }
 
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
-
-        const story = await engine.generateCompletion(fullPrompt, 512)
-
-        const cleaned = story.trim().replace(/^["']|["']$/g, '')
-
+      try {
         const context = await getLogContext(req.user)
         const storyLog = await fastify.models.Log.create({
           userId: req.user.id,
-          text: cleaned,
+          text: story,
           event: 'generated_story',
           context,
           metadata: {
-            story: cleaned,
-            logText: (logText || '').substring(0, 500),
+            story,
+            scope,
+            source,
+            digest: { ...digest, excerpts: undefined },
+            logText: cleanEntryText(logText || '').slice(0, 500),
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
         })
-
-        return {
-          story: cleaned,
-          logId: storyLog.id,
-        }
+        return { story, card, scope, source, logId: storyLog.id }
       } catch (error: any) {
-        console.error('Story generation failed:', error)
-        return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
-          logId: null,
-        }
+        console.error('Story persist failed:', error)
+        return { story, card, scope, source, logId: null }
       }
     }
   )

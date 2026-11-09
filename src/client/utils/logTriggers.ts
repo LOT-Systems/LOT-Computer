@@ -41,6 +41,7 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'rank-status'       // /rank — Arcade standing (rank, XP, streak)
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -67,6 +68,7 @@ const RULES: TriggerRule[] = [
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'rank-status',    emojis: [],        keywords: ['rank', 'arcade', 'xp'] },
 ]
 
 /**
@@ -115,3 +117,6 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+/** Every trigger the detector knows — used by the registry sync self-check. */
+export const ALL_TRIGGERS: LogTrigger[] = RULES.map(r => r.trigger)
