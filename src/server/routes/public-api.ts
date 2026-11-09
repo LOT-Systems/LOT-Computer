@@ -20,6 +20,8 @@ import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
+import { RATION_MANIFEST, RATION_PRICE_USD } from '#shared/basics/manifest'
+import { DOCTRINE, TERMS } from '#shared/basics/doctrine'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -504,6 +506,15 @@ export default async (fastify: FastifyInstance) => {
 
   // Public status endpoint - no authentication required
   // Cached for 2 minutes to be cost-effective with Digital Ocean
+  // LOT-FM-001 s5: OPEN TAB ledger. Public, read-only. COGS withheld.
+  fastify.get('/basics', async () => ({
+    tab: 'OPEN',
+    price: { tier: 'BASIC', usd: RATION_PRICE_USD, per: 'MONTH' },
+    doctrine: DOCTRINE,
+    terms: TERMS,
+    manifest: RATION_MANIFEST.map(({ months, ...i }) => i),
+  }))
+
   fastify.get('/status', async (req, reply) => {
     const now = Date.now()
 
