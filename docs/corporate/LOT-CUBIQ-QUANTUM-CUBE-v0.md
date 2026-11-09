@@ -321,6 +321,14 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE OPEN WINDOW                              2026-11-09
+  ─────────────────────────────────────────────────────────────────
+  Appended in LOT-CUBIQ-QUANTUM-CUBE-v0-REPORT-02.md §08. The cube, via
+  THE KNOCK, becomes the physical voice of the LOT® Station: CO2 rises, two
+  soft taps through the desk, the Ambient AI(TM) line appears at the next
+  natural pause, and THE SETTLE confirms the room is fine again.
+  (Note: Report 02 amends §03 mechanism sequencing and the piezo role.)
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
