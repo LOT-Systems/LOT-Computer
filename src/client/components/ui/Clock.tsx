@@ -24,11 +24,20 @@ export const Clock: React.FC<Props> = ({ format, interval }) => {
     if (interval) {
       // @ts-ignore
       loop.current = setInterval(
-        () => setState(dayjs().format(format)),
+        () => {
+          // Skip work while the tab is hidden; the visibility handler below resyncs
+          if (typeof document !== 'undefined' && document.hidden) return
+          setState(dayjs().format(format))
+        },
         interval
       )
     }
+    const onVisible = () => {
+      if (!document.hidden) setState(dayjs().format(format))
+    }
+    document.addEventListener('visibilitychange', onVisible)
     return () => {
+      document.removeEventListener('visibilitychange', onVisible)
       if (loop.current) {
         clearInterval(loop.current)
       }
