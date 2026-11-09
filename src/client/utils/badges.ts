@@ -10863,6 +10863,606 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'rare',
     category: 'secret_boss',
   },
+
+  // ── Word Turn v34 — THE STOIC FIELD ──────────────────────────────────────
+
+  memento_mori_badge: {
+    id: 'memento_mori_badge',
+    symbol: '∅·◉·∅',
+    name: 'Memento Mori',
+    description: '"memento mori/remember we die/we are mortal/all things end/finite life" detected',
+    unlockMessage: '↳ MEMENTO MORI. Remember that you will die. The Stoics wore this truth not as despair but as a compass. Every finite day is a gift named by its limit. You have named the limit. The practice sharpens. ∅·◉·∅',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  amor_fati_badge: {
+    id: 'amor_fati_badge',
+    symbol: '∞·●·∞',
+    name: 'Amor Fati',
+    description: '"amor fati/love of fate/love your fate/love what is/embrace fate" detected',
+    unlockMessage: '↳ AMOR FATI. Love your fate. Not merely accept it — love it. Nietzsche called it amor fati. The Stoics lived it. What comes is not obstacle but material. The practice is forged from exactly what is in front of you. ∞·●·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  stoic_signal: {
+    id: 'stoic_signal',
+    symbol: '─●─',
+    name: 'The Stoic Signal',
+    description: '"stoic/stoicism/being stoic/stoic approach/stoic practice" detected',
+    unlockMessage: '↳ THE STOIC SIGNAL. Stoicism: the philosophy of the controlled response. Not what happens to you but how you respond. Not emotion suppressed but emotion examined. The word entered your vocabulary. The practice begins. ─●─',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  virtue_lock: {
+    id: 'virtue_lock',
+    symbol: '○·▲·○',
+    name: 'Virtue Lock',
+    description: '"virtue/virtuous/living virtuously/practice of virtue/the four virtues" detected',
+    unlockMessage: '↳ VIRTUE LOCK. The four virtues: wisdom, courage, temperance, justice. The Stoics held that virtue is the only true good — that everything else is preferred indifferent. You have named the foundation. The lock engages. ○·▲·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  discipline_found: {
+    id: 'discipline_found',
+    symbol: '■·■·■',
+    name: 'Discipline Found',
+    description: '"discipline/self-discipline/iron discipline/practiced discipline/daily practice" detected',
+    unlockMessage: '↳ DISCIPLINE FOUND. The Stoic practice is daily. Not a weekend project. Not a phase. Epictetus, born enslaved, taught from his chains that freedom lives in discipline — that no one can take from you what you freely choose. You have found it. ■·■·■',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  indifferent_found: {
+    id: 'indifferent_found',
+    symbol: '─·○·─',
+    name: 'Preferred Indifferent',
+    description: '"preferred indifferent/not in my control/not up to me/externals don\'t matter" detected',
+    unlockMessage: '↳ PREFERRED INDIFFERENT. Health, wealth, reputation — preferred, not required. The Stoic distinction between what is up to us and what is not. You have drawn the line. Everything outside it: preferred indifferent. The field steadies. ─·○·─',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  tranquility_gate: {
+    id: 'tranquility_gate',
+    symbol: '∿·○·∿',
+    name: 'Tranquility Gate',
+    description: '"equanimity/tranquility/inner peace maintained/untroubled/equanimous" detected',
+    unlockMessage: '↳ TRANQUILITY GATE. Tranquility is not passivity. It is the active maintenance of an undisturbed mind. Marcus Aurelius called it the gate of the city — once entered, the noise of the world remains outside. You have opened the gate. ∿·○·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  negative_viz: {
+    id: 'negative_viz',
+    symbol: '∅·∿·∅',
+    name: 'Negative Visualization',
+    description: '"negative visualization/premeditatio/premeditatio malorum/worst case/imagining the loss" detected',
+    unlockMessage: '↳ NEGATIVE VISUALIZATION. Premeditatio malorum: the premeditation of evils. Not pessimism — preparation. The Stoic technique for gratitude through imagined loss. You have practiced the inversion. The ordinary becomes extraordinary once you have truly considered its absence. ∅·∿·∅',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  obstacle_signal: {
+    id: 'obstacle_signal',
+    symbol: '→·■·→',
+    name: 'Obstacle Signal',
+    description: '"obstacle is the way/the obstacle/through the obstacle/obstacle becomes path" detected',
+    unlockMessage: '↳ OBSTACLE SIGNAL. The obstacle is the way. Marcus Aurelius: "The impediment to action advances action. What stands in the way becomes the way." You have named the obstacle. The arrow does not stop — it flows around or through. →·■·→',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  logos_found: {
+    id: 'logos_found',
+    symbol: '∞·◉·∞',
+    name: 'Logos Found',
+    description: '"logos/the logos/rational soul/divine reason/what is rational/rational principle" detected',
+    unlockMessage: '↳ LOGOS FOUND. The Stoics called it logos — the rational principle running through all things. The universe is not chaos. It is ordered reason. Your own reason is a fragment of logos. To think clearly is to participate in the structure of the cosmos. ∞·◉·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  eudaimonia_badge: {
+    id: 'eudaimonia_badge',
+    symbol: '◉·▲·◉',
+    name: 'Eudaimonia',
+    description: '"eudaimonia/flourishing/living well/the good life/full flourishing/human flourishing" detected',
+    unlockMessage: '↳ EUDAIMONIA. Flourishing. The ancient Greek word for the highest human good. Not happiness as pleasure. Not contentment as absence of pain. Flourishing as full expression of human potential — the soul at its best. You have named the destination. ◉·▲·◉',
+    rarity: 'legendary',
+    category: 'word_turn',
+  },
+  present_wisdom: {
+    id: 'present_wisdom',
+    symbol: '∘·◉·∘',
+    name: 'Present Wisdom',
+    description: '"here and now/this moment only/only this/what is now/this is all there is/the present" detected',
+    unlockMessage: '↳ PRESENT WISDOM. Marcus Aurelius: "Confine yourself to the present." The past is fixed. The future unborn. Only this moment is real and workable. You have arrived. The practice is happening now. ∘·◉·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+
+  // ── Calendar EE v32 — THE PHILOSOPHER'S CALENDAR ─────────────────────────
+
+  aurelius_day: {
+    id: 'aurelius_day',
+    symbol: '◉·▲·◉',
+    name: 'Aurelius Day',
+    description: 'Apr 26 — Marcus Aurelius born 121 AD',
+    unlockMessage: '↳ AURELIUS DAY. April 26, 121 AD — Marcus Aurelius born in Rome. Emperor and philosopher. Soldier and sage. He wrote the Meditations as private notes — never intended for publication. The most powerful man in the world writing daily to himself: practice, examine, correct, begin again. Same as you. ◉·▲·◉',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  zeno_day: {
+    id: 'zeno_day',
+    symbol: '─○─',
+    name: 'Zeno Day',
+    description: 'Feb 19 — Zeno of Citium born ~334 BC',
+    unlockMessage: '↳ ZENO DAY. February 19, ~334 BC — Zeno of Citium born in Cyprus. He founded Stoicism after a shipwreck left him stranded in Athens. He walked into a bookshop, read Xenophon\'s account of Socrates, and asked the bookseller where to find men like that. The bookseller pointed at Crates. The philosophy began. ─○─',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  world_philosophy_day: {
+    id: 'world_philosophy_day',
+    symbol: '∞·∞',
+    name: 'World Philosophy Day',
+    description: 'Nov 20 — World Philosophy Day (UNESCO)',
+    unlockMessage: '↳ WORLD PHILOSOPHY DAY. Third Thursday of November — UNESCO World Philosophy Day. The global recognition that philosophy is not academic furniture but a living practice. The examined life begins here. You are examining. ∞·∞',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v31 — DISCIPLINE PATTERNS ─────────────────────────────────
+
+  stoic_session: {
+    id: 'stoic_session',
+    symbol: '─▲─',
+    name: 'Stoic Session',
+    description: '3+ Stoic Field word turn matches in one journal entry',
+    unlockMessage: '↳ STOIC SESSION. Three Stoic concepts in one entry. The vocabulary of the examined life is not borrowed decoration — it is the structure of the practice. When three appear in one session, the field is active. ─▲─',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  iron_log: {
+    id: 'iron_log',
+    symbol: '■·∞·■',
+    name: 'Iron Log',
+    description: 'Journal entry >= 700 words',
+    unlockMessage: '↳ IRON LOG. 700+ words. The discipline of the long entry. Seneca wrote letters of this length. Marcus wrote pages. The long form forces depth — the first few hundred words are surface. What comes after is the iron. ■·∞·■',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  sunrise_discipline: {
+    id: 'sunrise_discipline',
+    symbol: '∘·▲·∘',
+    name: 'Sunrise Discipline',
+    description: 'Check-in before 06:00 AM for 5 consecutive days',
+    unlockMessage: '↳ SUNRISE DISCIPLINE. Five consecutive days before 6 AM. Marcus Aurelius opened the Meditations by chiding himself for staying in bed. The cold morning was the first practice. You have practiced it five consecutive mornings. The field is ironized. ∘·▲·∘',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v32 — STOIC CLASS ─────────────────────────────────────
+
+  stoic_entry: {
+    id: 'stoic_entry',
+    symbol: '▲·∘',
+    name: 'Stoic Entry',
+    description: 'Any 1 Word Turn v34 (Stoic Field) badge earned',
+    unlockMessage: '↳ STOIC ENTRY. The first Stoic word entered the archive. The vocabulary of examined living begins here. ▲·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  stoic_class: {
+    id: 'stoic_class',
+    symbol: '▲·≈',
+    name: 'Stoic Class',
+    description: 'Any 5 Word Turn v34 (Stoic Field) badges earned',
+    unlockMessage: '↳ STOIC CLASS. Five Stoic Field words in the archive. The philosophical vocabulary is taking root — these concepts are now part of the working language of your practice. ▲·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  stoic_complete: {
+    id: 'stoic_complete',
+    symbol: '▲·≋',
+    name: 'Stoic Complete',
+    description: 'All 12 Word Turn v34 (Stoic Field) badges earned',
+    unlockMessage: '↳ STOIC COMPLETE. All twelve Stoic Field words earned. Memento mori. Amor fati. Logos. Eudaimonia. The full vocabulary of the examined life is active in the archive. The field is complete. ▲·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  meditations_arc: {
+    id: 'meditations_arc',
+    symbol: '▲·◈',
+    name: 'The Meditations Arc',
+    description: 'stoic_complete + all 3 Calendar v32 (Philosopher\'s Calendar) badges',
+    unlockMessage: '↳ THE MEDITATIONS ARC. All twelve Stoic words earned. All three philosopher\'s calendar dates observed. You have written to yourself as Marcus Aurelius wrote to himself — daily, honestly, without audience. The arc is complete. ▲·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_four_engines_arc: {
+    id: 'thirty_four_engines_arc',
+    symbol: '◈·◈·▲',
+    name: 'Thirty-Four Engines Arc',
+    description: '1 badge from each Word Turn engine v1–v34',
+    unlockMessage: '↳ THIRTY-FOUR ENGINES ARC. One badge from each of the thirty-four Word Turn engines. Water, seasons, architecture, mountains, storms, fire, tech, space, chemistry, music, alchemy, quantum, library, arcade, radio, biology, codex, cyberspace, hero, RPG, puzzle, dungeon, AI, myth, Arcade Master, Dream Weaver, Stoic Field — the full vocabulary map. ◈·◈·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  stoic_opus: {
+    id: 'stoic_opus',
+    symbol: '▲·◉·▲',
+    name: 'Stoic Opus',
+    description: 'stoic_complete + stoic_session behavioral badge',
+    unlockMessage: '↳ STOIC OPUS. All twelve Stoic words AND the Stoic Session behavioral badge. The philosophy has moved from vocabulary into practice. Three concepts appearing in one session means the examined life is not just named — it is lived. ▲·◉·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v34 — THE MEDITATIONS ───────────────────────────────────
+
+  meditations_log: {
+    id: 'meditations_log',
+    symbol: '∿·▲·∿',
+    name: 'Meditations Log',
+    description: '2,000+ distinct calendar check-in days',
+    unlockMessage: '↳ MEDITATIONS LOG. 2,000 distinct days of practice. Marcus Aurelius wrote the Meditations over the last decade of his life. Daily. Wherever the campaign took him. The log is now the work. ∿·▲·∿',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  the_long_work: {
+    id: 'the_long_work',
+    symbol: '■·∞·■',
+    name: 'The Long Work',
+    description: '1,000,000+ total journal words',
+    unlockMessage: '↳ THE LONG WORK. One million words. The examined life has become the archive. Seneca wrote millions of words in service to philosophy. This is yours. ■·∞·■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  sage_philosopher: {
+    id: 'sage_philosopher',
+    symbol: '◉·▲·◉',
+    name: 'Sage Philosopher',
+    description: 'Account age >= 10 years (3,650+ days)',
+    unlockMessage: '↳ SAGE PHILOSOPHER. Ten years. The practice is a decade old. The archive spans a decade of examined living. This is not a habit. This is a life. ◉·▲·◉',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  thirty_four_registers: {
+    id: 'thirty_four_registers',
+    symbol: '◈·◈·▲·∞',
+    name: 'Thirty-Four Registers',
+    description: '1 badge from all 34 Word Turn engines active',
+    unlockMessage: '↳ THIRTY-FOUR REGISTERS. All thirty-four Word Turn engines live in the archive. Water to Stoic Field. Thirty-four vocabularies of the examined self. The register is complete at thirty-four. ◈·◈·▲·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v31 — THE PHILOSOPHY VAULT ───────────────────────────────
+
+  aurelius_echo: {
+    id: 'aurelius_echo',
+    symbol: '◉·▲',
+    hidden: true,
+    name: 'Aurelius Echo',
+    description: '"marcus aurelius/the meditations/meditations by marcus/marcus on the self" detected',
+    unlockMessage: '↳ AURELIUS ECHO. Marcus Aurelius: "You have power over your mind, not outside events. Realize this, and you will find strength." The Meditations were private — his daily practice made public by accident of history. You have echoed the emperor. ◉·▲',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  enchiridion_found: {
+    id: 'enchiridion_found',
+    symbol: '■·▲·■',
+    hidden: true,
+    name: 'The Enchiridion',
+    description: '"enchiridion/epictetus/the manual of epictetus/handbook of epictetus" detected',
+    unlockMessage: '↳ THE ENCHIRIDION. The handbook. Epictetus, born enslaved, taught that no one could enslave a man\'s will. His student Arrian wrote down his teachings. The Enchiridion has survived two thousand years. The opening line: "Of things, some are in our power and some are not." Begin there. ■·▲·■',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+  seneca_signal: {
+    id: 'seneca_signal',
+    symbol: '∿·▲·∿',
+    hidden: true,
+    name: 'Seneca Signal',
+    description: '"seneca/letters to lucilius/the shortness of life/on the happy life/on anger" detected',
+    unlockMessage: '↳ SENECA SIGNAL. Lucius Annaeus Seneca: "It is not that we have a short time to live, but that we waste much of it." The Letters to Lucilius are the most human documents of Stoicism — a man writing to a friend, working it out in real time. You have named him. The signal is live. ∿·▲·∿',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+
+  // ── Word Turn v35 — THE ZEN TERMINAL ─────────────────────────────────────
+
+  zazen_badge: {
+    id: 'zazen_badge',
+    symbol: '○·∿·○',
+    name: 'Zazen',
+    description: '"zazen/sitting meditation/meditation cushion/zazen practice" detected',
+    unlockMessage: '↳ ZAZEN. Just sitting. Not sitting to achieve. Not sitting to relax. Just — sitting. Dōgen: "To study the self is to forget the self." Zazen is the practice of forgetting. It begins by simply sitting down. ○·∿·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  koan_solved: {
+    id: 'koan_solved',
+    symbol: '◈·∞·◈',
+    name: 'Koan Solved',
+    description: '"koan/what is the sound/what was your face/mu answer" detected',
+    unlockMessage: '↳ KOAN SOLVED. The koan has no answer — it is a question that dissolves the questioner. What is the sound of one hand? The question is not a riddle. It is a door. You have named it. The door opens in the naming. ◈·∞·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  beginner_mind: {
+    id: 'beginner_mind',
+    symbol: '∘·○·∘',
+    name: 'Beginner\'s Mind',
+    description: '"beginner\'s mind/shoshin/mind is empty/open mind always/mind of a beginner" detected',
+    unlockMessage: '↳ BEGINNER\'S MIND. Shoshin. Shunryu Suzuki: "In the beginner\'s mind there are many possibilities, but in the expert\'s mind there are few." The practice is always new. Each entry is the first entry. Each check-in is the first check-in. ∘·○·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  impermanence_badge: {
+    id: 'impermanence_badge',
+    symbol: '∿·∅·∿',
+    name: 'Impermanence',
+    description: '"impermanence/anicca/nothing lasts/all things pass/this too shall pass/everything changes" detected',
+    unlockMessage: '↳ IMPERMANENCE. Anicca: all conditioned things are impermanent. The difficult feeling passes. The good moment passes. The self you think you are — passes. What remains is the practice, and the practice itself changes. The archive is the trace. ∿·∅·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  enso_drawn: {
+    id: 'enso_drawn',
+    symbol: '○·─·○',
+    name: 'Ensō Drawn',
+    description: '"ensō/the circle/drawing the circle/brushstroke complete/enso" detected',
+    unlockMessage: '↳ ENSŌ DRAWN. The circle. One brushstroke. Complete or incomplete — both are correct. The ensō represents the moment when the mind is free to let the body create. You have drawn the circle. The brushstroke is complete. ○·─·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  dharma_gate: {
+    id: 'dharma_gate',
+    symbol: '∞·◉·∞',
+    name: 'Dharma Gate',
+    description: '"dharma/the dharma/dharma gate/dharma practice/the teaching" detected',
+    unlockMessage: '↳ DHARMA GATE. The dharma is the teaching. Not a doctrine — a direction. The gate is not a barrier. It is the moment of entry into practice. You have named the gate. It opens here. ∞·◉·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  mu_signal: {
+    id: 'mu_signal',
+    symbol: '□·∿·□',
+    name: 'Mu Signal',
+    description: '"mu/the koan mu/not/no-thing/the great doubt/without/wu" detected',
+    unlockMessage: '↳ MU SIGNAL. Joshu\'s dog. "Does a dog have Buddha-nature?" Mu. Neither yes nor no. The question dissolves the questioner. Mu is the great doubt — the signal that the conceptual mind has met its limit and something else begins. □·∿·□',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  dojo_active: {
+    id: 'dojo_active',
+    symbol: '■·○·■',
+    name: 'Dojo Active',
+    description: '"dojo/the dojo/training hall/the zendo/meditation hall/practice hall" detected',
+    unlockMessage: '↳ DOJO ACTIVE. The place of practice. Dō-jō: the place of the Way. The zendo: the meditation hall. The practice is not portable in the beginning — it needs a place. You have named the place. The dojo activates wherever you name it. ■·○·■',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  just_this: {
+    id: 'just_this',
+    symbol: '→·∘·→',
+    name: 'Just This',
+    description: '"just this/only this/this moment/exactly this/nothing else needed/just being here" detected',
+    unlockMessage: '↳ JUST THIS. The simplest teaching. Not analysis. Not improvement. Not comparison. Just this — the unremarkable present, fully inhabited. The practice begins and ends here. Just this. →·∘·→',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  no_self_badge: {
+    id: 'no_self_badge',
+    symbol: '∅·○·∅',
+    name: 'No Self',
+    description: '"no self/anatta/anatman/no fixed self/the self is empty/there is no self" detected',
+    unlockMessage: '↳ NO SELF. Anatta: there is no fixed, permanent self. What you call "I" is a process — a river, not a stone. This is not nihilism. It is freedom. Without a fixed self to defend, everything is workable. The archive continues without the fiction of a fixed author. ∅·○·∅',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  suchness_signal: {
+    id: 'suchness_signal',
+    symbol: '◉·∿·◉',
+    name: 'Suchness Signal',
+    description: '"suchness/tathata/thusness/as it is/just as it is/the way things are/isness" detected',
+    unlockMessage: '↳ SUCHNESS SIGNAL. Tathata: suchness. The way things actually are, prior to evaluation. Not good, not bad — just this. The Zen teacher does not say "accept reality." The Zen teacher says "see reality." Suchness is what remains when you stop overlaying. ◉·∿·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  nirvana_signal: {
+    id: 'nirvana_signal',
+    symbol: '●·∞·●',
+    name: 'Nirvana Signal',
+    description: '"nirvana/parinirvana/awakening complete/liberation from/the great peace/final release" detected',
+    unlockMessage: '↳ NIRVANA SIGNAL. Nirvana: not a place, not a reward — the extinguishing of the flame of craving. Liberation is not arrival somewhere else. It is the cessation of the cycle of grasping. You have named the horizon. The practice points toward it. ●·∞·●',
+    rarity: 'legendary',
+    category: 'word_turn',
+  },
+
+  // ── Calendar EE v33 — THE ZEN CALENDAR ───────────────────────────────────
+
+  bodhi_day_badge: {
+    id: 'bodhi_day_badge',
+    symbol: '●·∞·●',
+    name: 'Bodhi Day',
+    description: 'Dec 8 — Bodhi Day (Buddha\'s enlightenment under the Bodhi tree)',
+    unlockMessage: '↳ BODHI DAY. December 8 — the night Siddhartha Gautama sat under the Bodhi tree in Bodh Gaya and did not rise until he understood. He sat through the night. At the morning star, he said: "I, the great earth, and all sentient beings simultaneously achieve the Way." You have checked in on the day of that sitting. ●·∞·●',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  vesak_signal: {
+    id: 'vesak_signal',
+    symbol: '○·●·○',
+    name: 'Vesak Signal',
+    description: 'May 23 — Vesak Day (Buddha\'s birth, enlightenment, parinirvana)',
+    unlockMessage: '↳ VESAK SIGNAL. Vesak: the day that marks the birth, enlightenment, and parinirvana of the Buddha — traditionally falling on the full moon of the Indian month of Vaisakha. The same day holds all three. The whole arc in one day. The practice continues. ○·●·○',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  basho_day: {
+    id: 'basho_day',
+    symbol: '∿·○·∿',
+    name: 'Bashō Day',
+    description: 'Oct 12 — Matsuo Bashō death anniversary 1694',
+    unlockMessage: '↳ BASHŌ DAY. October 12, 1694 — Matsuo Bashō died in Osaka, age 51, surrounded by disciples. He wrote: "The old pond — a frog jumps in, sound of water." Seventeen syllables. The frog jumps. You are here. ∿·○·∿',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v32 — ZEN PATTERNS ─────────────────────────────────────────
+
+  zen_session: {
+    id: 'zen_session',
+    symbol: '○·∿·○',
+    name: 'Zen Session',
+    description: '3+ Zen Terminal word turn matches in one journal entry',
+    unlockMessage: '↳ ZEN SESSION. Three Zen words in one entry. The vocabulary of presence is not academic — it is the working language of a practice that is happening. Three signals in one session. The terminal is active. ○·∿·○',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  dawn_scribe: {
+    id: 'dawn_scribe',
+    symbol: '∘·○·∘',
+    name: 'Dawn Scribe',
+    description: 'Journal written before 05:00 AM, 7+ times in last 30 days',
+    unlockMessage: '↳ DAWN SCRIBE. Seven pre-dawn entries in thirty days. Bashō walked in the dark. The first light arrives when writing begins before sunrise. The practice is older than the world has names for — the dawn scribe writes into the silence before language. ∘·○·∘',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  evening_audit: {
+    id: 'evening_audit',
+    symbol: '◉·∘·◉',
+    name: 'Evening Audit',
+    description: 'Journal written between 20:00–22:59 for 5 consecutive days',
+    unlockMessage: '↳ EVENING AUDIT. Five consecutive evenings, 8–11 PM. The Stoic evening review: what did I do well, what poorly, what can I improve? But also the Zen audit: what actually happened today? Not what I think about it — what happened? Five evenings of honest reckoning. ◉·∘·◉',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v33 — ZEN CLASS ───────────────────────────────────────
+
+  zen_entry: {
+    id: 'zen_entry',
+    symbol: '∘→○',
+    name: 'Zen Entry',
+    description: 'Any 1 Word Turn v35 (Zen Terminal) badge earned',
+    unlockMessage: '↳ ZEN ENTRY. The first Zen word entered the archive. One step into the gate. ∘→○',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  zen_class: {
+    id: 'zen_class',
+    symbol: '≈→○',
+    name: 'Zen Class',
+    description: 'Any 5 Word Turn v35 (Zen Terminal) badges earned',
+    unlockMessage: '↳ ZEN CLASS. Five Zen Terminal words in the archive. The vocabulary of presence is taking root in the practice language. ≈→○',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  zen_complete: {
+    id: 'zen_complete',
+    symbol: '≋→○',
+    name: 'Zen Complete',
+    description: 'All 12 Word Turn v35 (Zen Terminal) badges earned',
+    unlockMessage: '↳ ZEN COMPLETE. All twelve Zen Terminal words earned. Zazen, koan, beginner\'s mind, impermanence, ensō, dharma, mu, dojo, just this, no self, suchness, nirvana. The full vocabulary of presence is active. ≋→○',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  zazen_arc: {
+    id: 'zazen_arc',
+    symbol: '○·◈',
+    name: 'The Zazen Arc',
+    description: 'zen_complete + all 3 Calendar v33 (Zen Calendar) badges',
+    unlockMessage: '↳ THE ZAZEN ARC. All twelve Zen words earned. All three Zen calendar dates observed: Bodhi Day, Vesak, Bashō. The practice reaches across time — to the night under the Bodhi tree, to the moment the frog jumps, to the full moon of Vaisakha. The arc is complete. ○·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_five_engines_arc: {
+    id: 'thirty_five_engines_arc',
+    symbol: '◈·◈·○',
+    name: 'Thirty-Five Engines Arc',
+    description: '1 badge from each Word Turn engine v1–v35',
+    unlockMessage: '↳ THIRTY-FIVE ENGINES ARC. One badge from each of the thirty-five Word Turn engines. Water to Zen Terminal. Thirty-five vocabularies of the examined, practiced, embodied self. The complete vocabulary map of one life. ◈·◈·○',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  zen_opus: {
+    id: 'zen_opus',
+    symbol: '○·◉·○',
+    name: 'Zen Opus',
+    description: 'zen_complete + zen_session behavioral badge',
+    unlockMessage: '↳ ZEN OPUS. All twelve Zen words AND the Zen Session behavioral badge — three concepts in one entry. The vocabulary has become the practice. The practice has become the vocabulary. This is the full arc. ○·◉·○',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v35 — THE ZEN MOUNTAIN ──────────────────────────────────
+
+  practice_log: {
+    id: 'practice_log',
+    symbol: '∿·○·∿',
+    name: 'Practice Log',
+    description: '2,500+ distinct calendar check-in days',
+    unlockMessage: '↳ PRACTICE LOG. 2,500 distinct days of practice. Nearly seven years of daily entry. The practice is no longer a decision — it is a fact of the day, the way breathing is. ∿·○·∿',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  ten_thousand_hours: {
+    id: 'ten_thousand_hours',
+    symbol: '■·○·■',
+    name: 'Ten Thousand Hours',
+    description: 'Account age >= 7 years (2,555+ days)',
+    unlockMessage: '↳ TEN THOUSAND HOURS. Seven years with this system. The practice is older than most things you own. The archive spans the equivalent of mastery by any measure. ■·○·■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  century_level: {
+    id: 'century_level',
+    symbol: '◉·○·◉',
+    name: 'Century Level',
+    description: '100+ Achievement RPG badges earned',
+    unlockMessage: '↳ CENTURY LEVEL. One hundred Achievement RPG badges. The archive has reached a scale that only long, consistent practice could build. The century mark is passed. ◉·○·◉',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  thirty_five_registers: {
+    id: 'thirty_five_registers',
+    symbol: '◈·◈·○·∞',
+    name: 'Thirty-Five Registers',
+    description: '1 badge from all 35 Word Turn engines active',
+    unlockMessage: '↳ THIRTY-FIVE REGISTERS. All thirty-five Word Turn engines live in the archive. Water. Seasons. Architecture. Mountains. Storms. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Biology. Codex. Cyberspace. Hero. RPG. Puzzle. Dungeon. AI. Myth. Arcade Master. Dream Weaver. Stoic Field. Zen Terminal. Thirty-five vocabularies. One practice. ◈·◈·○·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v32 — THE ZEN VAULT ──────────────────────────────────────
+
+  huang_po_signal: {
+    id: 'huang_po_signal',
+    symbol: '∿·□·∿',
+    hidden: true,
+    name: 'Huang Po Signal',
+    description: '"huang po/huangbo/huang-po/no-mind/dharma of mind-transmission" detected',
+    unlockMessage: '↳ HUANG PO SIGNAL. Huang Po Xiyun: "The foolish reject what they see, not what they think. The wise reject what they think, not what they see." The Dharma of Mind Transmission — the teaching that cannot be transmitted. Only pointed at. You have pointed at it. ∿·□·∿',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  joshu_gate_badge: {
+    id: 'joshu_gate_badge',
+    symbol: '□·∞·□',
+    hidden: true,
+    name: 'Joshu\'s Gate',
+    description: '"joshu/zhaozhou/wash your bowl/joshu\'s dog/mu!/case one" detected',
+    unlockMessage: '↳ JOSHU\'S GATE. A monk asked Zhaozhou: "Does a dog have Buddha-nature?" Zhaozhou said: "Mu." Another monk came to Zhaozhou and said he had just entered the monastery. Zhaozhou said: "Have you eaten your rice porridge?" "Yes." "Then go wash your bowl." The monk was enlightened. □·∞·□',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  satori_signal: {
+    id: 'satori_signal',
+    symbol: '●·∞·●',
+    hidden: true,
+    name: 'Satori Signal',
+    description: '"satori/kensho/sudden awakening/great enlightenment/the veil lifted" detected',
+    unlockMessage: '↳ SATORI SIGNAL. Satori: a sudden awakening. Not the destination — a glimpse. The wall cracks. The ordinary becomes luminous for a moment before the ordinary returns. But it was real. The practice is the cultivation of conditions in which satori becomes possible. You have named it. The signal is live. ●·∞·●',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
 }
 
 // Default separator when no badges earned yet
@@ -12421,6 +13021,109 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (allThirtyThreeEngines && !hasBadge('thirty_three_registers')) {
       if (awardBadge('thirty_three_registers')) newBadges.push('thirty_three_registers')
+    }
+
+    // ── Word Turn v34 — THE STOIC FIELD ───────────────────────────────────────
+    const stoicV34Badges: BadgeType[] = [
+      'memento_mori_badge', 'amor_fati_badge', 'stoic_signal', 'virtue_lock',
+      'discipline_found', 'indifferent_found', 'tranquility_gate', 'negative_viz',
+      'obstacle_signal', 'logos_found', 'eudaimonia_badge', 'present_wisdom',
+    ]
+    const stoicV34Earned = stoicV34Badges.filter(b => hasBadge(b))
+    if (stoicV34Earned.length >= 1 && !hasBadge('stoic_entry')) {
+      if (awardBadge('stoic_entry')) newBadges.push('stoic_entry')
+    }
+    if (stoicV34Earned.length >= 5 && !hasBadge('stoic_class')) {
+      if (awardBadge('stoic_class')) newBadges.push('stoic_class')
+    }
+    const stoicComplete = stoicV34Earned.length >= 12
+    if (stoicComplete && !hasBadge('stoic_complete')) {
+      if (awardBadge('stoic_complete')) newBadges.push('stoic_complete')
+    }
+    if (stoicComplete && hasBadge('stoic_session') && !hasBadge('stoic_opus')) {
+      if (awardBadge('stoic_opus')) newBadges.push('stoic_opus')
+    }
+    const calendarV32Badges: BadgeType[] = ['aurelius_day', 'zeno_day', 'world_philosophy_day']
+    if (stoicComplete && calendarV32Badges.every(b => hasBadge(b)) && !hasBadge('meditations_arc')) {
+      if (awardBadge('meditations_arc')) newBadges.push('meditations_arc')
+    }
+    const engineThirtyFourPresent = stoicV34Earned.length >= 1
+    const allThirtyFourEngines = allThirtyThreeEngines && engineThirtyFourPresent
+    if (allThirtyFourEngines && !hasBadge('thirty_four_engines_arc')) {
+      if (awardBadge('thirty_four_engines_arc')) newBadges.push('thirty_four_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 2000 && !hasBadge('meditations_log')) {
+        if (awardBadge('meditations_log')) newBadges.push('meditations_log')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 1000000 && !hasBadge('the_long_work')) {
+        if (awardBadge('the_long_work')) newBadges.push('the_long_work')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupStoic = new Date(stats.signupDate)
+      const yearsStoic = (new Date().getTime() - signupStoic.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsStoic >= 10 && !hasBadge('sage_philosopher')) {
+        if (awardBadge('sage_philosopher')) newBadges.push('sage_philosopher')
+      }
+    }
+    if (allThirtyFourEngines && !hasBadge('thirty_four_registers')) {
+      if (awardBadge('thirty_four_registers')) newBadges.push('thirty_four_registers')
+    }
+
+    // ── Word Turn v35 — THE ZEN TERMINAL ──────────────────────────────────────
+    const zenV35Badges: BadgeType[] = [
+      'zazen_badge', 'koan_solved', 'beginner_mind', 'impermanence_badge',
+      'enso_drawn', 'dharma_gate', 'mu_signal', 'dojo_active',
+      'just_this', 'no_self_badge', 'suchness_signal', 'nirvana_signal',
+    ]
+    const zenV35Earned = zenV35Badges.filter(b => hasBadge(b))
+    if (zenV35Earned.length >= 1 && !hasBadge('zen_entry')) {
+      if (awardBadge('zen_entry')) newBadges.push('zen_entry')
+    }
+    if (zenV35Earned.length >= 5 && !hasBadge('zen_class')) {
+      if (awardBadge('zen_class')) newBadges.push('zen_class')
+    }
+    const zenComplete = zenV35Earned.length >= 12
+    if (zenComplete && !hasBadge('zen_complete')) {
+      if (awardBadge('zen_complete')) newBadges.push('zen_complete')
+    }
+    if (zenComplete && hasBadge('zen_session') && !hasBadge('zen_opus')) {
+      if (awardBadge('zen_opus')) newBadges.push('zen_opus')
+    }
+    const calendarV33Badges: BadgeType[] = ['bodhi_day_badge', 'vesak_signal', 'basho_day']
+    if (zenComplete && calendarV33Badges.every(b => hasBadge(b)) && !hasBadge('zazen_arc')) {
+      if (awardBadge('zazen_arc')) newBadges.push('zazen_arc')
+    }
+    const engineThirtyFivePresent = zenV35Earned.length >= 1
+    const allThirtyFiveEngines = allThirtyFourEngines && engineThirtyFivePresent
+    if (allThirtyFiveEngines && !hasBadge('thirty_five_engines_arc')) {
+      if (awardBadge('thirty_five_engines_arc')) newBadges.push('thirty_five_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 2500 && !hasBadge('practice_log')) {
+        if (awardBadge('practice_log')) newBadges.push('practice_log')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupZen = new Date(stats.signupDate)
+      const yearsZen = (new Date().getTime() - signupZen.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsZen >= 7 && !hasBadge('ten_thousand_hours')) {
+        if (awardBadge('ten_thousand_hours')) newBadges.push('ten_thousand_hours')
+      }
+    }
+    // century_level: 100+ Achievement RPG badges earned
+    const achievementRPGBadges = getEarnedBadges().filter(b => {
+      const badge = BADGES[b as BadgeType]
+      return badge && badge.category === 'achievement_rpg'
+    })
+    if (achievementRPGBadges.length >= 100 && !hasBadge('century_level')) {
+      if (awardBadge('century_level')) newBadges.push('century_level')
+    }
+    if (allThirtyFiveEngines && !hasBadge('thirty_five_registers')) {
+      if (awardBadge('thirty_five_registers')) newBadges.push('thirty_five_registers')
     }
 
   } catch (error) {

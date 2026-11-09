@@ -1055,6 +1055,40 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('freud_birthday')
   }
 
+  // ── Calendar EE v32 — THE PHILOSOPHER'S CALENDAR ──────────────────────────
+  // Marcus Aurelius Birthday: April 26 — born 121 AD
+  if (!hasBadge('aurelius_day') && month === 4 && day === 26) {
+    awardBadge('aurelius_day')
+    awarded.push('aurelius_day')
+  }
+  // Zeno of Citium Birthday: February 19 — born ~334 BC (founder of Stoicism)
+  if (!hasBadge('zeno_day') && month === 2 && day === 19) {
+    awardBadge('zeno_day')
+    awarded.push('zeno_day')
+  }
+  // World Philosophy Day: November 20 — UNESCO World Philosophy Day
+  if (!hasBadge('world_philosophy_day') && month === 11 && day === 20) {
+    awardBadge('world_philosophy_day')
+    awarded.push('world_philosophy_day')
+  }
+
+  // ── Calendar EE v33 — THE ZEN CALENDAR ────────────────────────────────────
+  // Bodhi Day: December 8 — Buddha's enlightenment under the Bodhi tree
+  if (!hasBadge('bodhi_day_badge') && month === 12 && day === 8) {
+    awardBadge('bodhi_day_badge')
+    awarded.push('bodhi_day_badge')
+  }
+  // Vesak Day: May 23 — Buddha's birth, enlightenment, and parinirvana
+  if (!hasBadge('vesak_signal') && month === 5 && day === 23) {
+    awardBadge('vesak_signal')
+    awarded.push('vesak_signal')
+  }
+  // Bashō Day: October 12 — Matsuo Bashō death anniversary 1694
+  if (!hasBadge('basho_day') && month === 10 && day === 12) {
+    awardBadge('basho_day')
+    awarded.push('basho_day')
+  }
+
   return awarded
 }
 
@@ -1820,6 +1854,40 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bneil[\s-]?gaiman\b|\bsandman[\s-]?comic\b|\bdream[\s-]?of[\s-]?the[\s-]?endless\b|\bthe[\s-]?dreaming[\s-]?realm\b|\bmorpheus[\s-]?(?:dream|endless)\b/i, badge: 'gaiman_signal' },
   { patterns: /\blovecraft\b|\bcthulhu\b|\br['']?lyeh\b|\bthat[\s-]?is[\s-]?not[\s-]?dead\b|\bdreaming[\s-]?in[\s-]?r['']?lyeh\b|\bnecronom(?:icon)?\b/i,                badge: 'lovecraft_dream' },
   { patterns: /\bcastaneda\b|\bdon[\s-]?juan\b|\bdreaming[\s-]?body\b|\bassemblage[\s-]?point\b|\bcontrolled[\s-]?dreaming\b|\bcarlos[\s-]?castaneda\b/i,                 badge: 'castaneda_dream' },
+  // ── v34 — THE STOIC FIELD — word turns ────────────────────────────────────
+  { patterns: /\bmemento[\s-]?mori\b|\bremember[\s-]?(we[\s-]?)?(all[\s-]?)?die\b|\bwe[\s-]?are[\s-]?mortal\b|\ball[\s-]?things[\s-]?end\b|\bfinite[\s-]?life\b/i,   badge: 'memento_mori_badge' },
+  { patterns: /\bamor[\s-]?fati\b|\blove[\s-]?(of[\s-]?)?fate\b|\blove[\s-]?your[\s-]?fate\b|\blove[\s-]?what[\s-]?is\b|\bembrace[\s-]?fate\b/i,                    badge: 'amor_fati_badge' },
+  { patterns: /\bstoic(ism)?\b|\bbeing[\s-]?stoic\b|\bstoic[\s-]?approach\b|\bstoic[\s-]?practice\b/i,                                                               badge: 'stoic_signal' },
+  { patterns: /\bvirtue\b|\bvirtuous(ly)?\b|\bliving[\s-]?virtuously\b|\bpractice[\s-]?of[\s-]?virtue\b|\bthe[\s-]?four[\s-]?virtues\b/i,                           badge: 'virtue_lock' },
+  { patterns: /\bself[\s-]?discipline\b|\biron[\s-]?discipline\b|\bpracticed[\s-]?discipline\b|\bdaily[\s-]?practice\b/i,                                             badge: 'discipline_found' },
+  { patterns: /\bpreferred[\s-]?indifferent\b|\bnot[\s-]?in[\s-]?my[\s-]?control\b|\bnot[\s-]?up[\s-]?to[\s-]?me\b|\bexternals[\s-]?don'?t[\s-]?matter\b/i,       badge: 'indifferent_found' },
+  { patterns: /\bequanim(ity|ous)\b|\btranquility[\s-]?of[\s-]?mind\b|\binner[\s-]?peace[\s-]?maintained\b|\buntroubled\b|\bequanimous\b/i,                           badge: 'tranquility_gate' },
+  { patterns: /\bnegative[\s-]?visualization\b|\bpremeditatio([\s-]?malorum)?\b|\bworst[\s-]?case[\s-]?scenario\b|\bimagining[\s-]?the[\s-]?loss\b/i,                badge: 'negative_viz' },
+  { patterns: /\bobstacle[\s-]?is[\s-]?the[\s-]?way\b|\bthe[\s-]?obstacle\b|\bthrough[\s-]?the[\s-]?obstacle\b|\bobstacle[\s-]?becomes[\s-]?path\b/i,                badge: 'obstacle_signal' },
+  { patterns: /\bthe[\s-]?logos\b|\brational[\s-]?(soul|principle)\b|\bdivine[\s-]?reason\b|\bwhat[\s-]?is[\s-]?rational\b/i,                                        badge: 'logos_found' },
+  { patterns: /\beudaimonia\b|\bflourishing\b|\bthe[\s-]?good[\s-]?life\b|\bfull[\s-]?flourishing\b|\bhuman[\s-]?flourishing\b/i,                                    badge: 'eudaimonia_badge' },
+  { patterns: /\bhere[\s-]?and[\s-]?now\b|\bthis[\s-]?moment[\s-]?only\b|\bonly[\s-]?this\b|\bwhat[\s-]?is[\s-]?now\b|\bthis[\s-]?is[\s-]?all[\s-]?there[\s-]?is\b/i, badge: 'present_wisdom' },
+  // ── v34 — THE PHILOSOPHY VAULT — secret boss word triggers ───────────────
+  { patterns: /\bmarcus[\s-]?aurelius\b|\bthe[\s-]?meditations\b|\bmeditations[\s-]?by[\s-]?marcus\b|\bmarcus[\s-]?on[\s-]?the[\s-]?self\b/i,                       badge: 'aurelius_echo' },
+  { patterns: /\benchiridion\b|\bepictetus\b|\bthe[\s-]?manual[\s-]?of[\s-]?epictetus\b|\bhandbook[\s-]?of[\s-]?epictetus\b/i,                                       badge: 'enchiridion_found' },
+  { patterns: /\bseneca\b|\bletters[\s-]?to[\s-]?lucilius\b|\bthe[\s-]?shortness[\s-]?of[\s-]?life\b|\bon[\s-]?the[\s-]?happy[\s-]?life\b|\bon[\s-]?anger\b/i,     badge: 'seneca_signal' },
+  // ── v35 — THE ZEN TERMINAL — word turns ───────────────────────────────────
+  { patterns: /\bzazen\b|\bsitting[\s-]?meditation\b|\bmeditation[\s-]?cushion\b|\bzazen[\s-]?practice\b/i,                                                          badge: 'zazen_badge' },
+  { patterns: /\bkoan\b|\bwhat[\s-]?is[\s-]?the[\s-]?sound\b|\bwhat[\s-]?was[\s-]?your[\s-]?face\b|\bmu[\s-]?answer\b/i,                                           badge: 'koan_solved' },
+  { patterns: /\bbeginner'?s[\s-]?mind\b|\bshoshin\b|\bmind[\s-]?is[\s-]?empty\b|\bopen[\s-]?mind[\s-]?always\b|\bmind[\s-]?of[\s-]?a[\s-]?beginner\b/i,           badge: 'beginner_mind' },
+  { patterns: /\bimpermanence\b|\banicca\b|\bnothing[\s-]?lasts\b|\ball[\s-]?things[\s-]?pass\b|\bthis[\s-]?too[\s-]?shall[\s-]?pass\b|\beverything[\s-]?changes\b/i, badge: 'impermanence_badge' },
+  { patterns: /\bens[oō]\b|\bthe[\s-]?circle\b|\bdrawing[\s-]?the[\s-]?circle\b|\bbrushstroke[\s-]?complete\b/i,                                                    badge: 'enso_drawn' },
+  { patterns: /\bdharma\b|\bthe[\s-]?dharma\b|\bdharma[\s-]?gate\b|\bdharma[\s-]?practice\b|\bthe[\s-]?teaching\b/i,                                                 badge: 'dharma_gate' },
+  { patterns: /\bthe[\s-]?koan[\s-]?mu\b|\bno[\s-]?thing\b|\bthe[\s-]?great[\s-]?doubt\b|\bwithout[\s-]?buddha\b|\bmu!\b/i,                                        badge: 'mu_signal' },
+  { patterns: /\bdojo\b|\bthe[\s-]?zendo\b|\bmeditation[\s-]?hall\b|\bpractice[\s-]?hall\b|\btraining[\s-]?hall\b/i,                                                 badge: 'dojo_active' },
+  { patterns: /\bjust[\s-]?this\b|\bonly[\s-]?this\b|\bexactly[\s-]?this\b|\bnothing[\s-]?else[\s-]?needed\b|\bjust[\s-]?being[\s-]?here\b/i,                       badge: 'just_this' },
+  { patterns: /\bno[\s-]?self\b|\banatta\b|\banatman\b|\bno[\s-]?fixed[\s-]?self\b|\bthe[\s-]?self[\s-]?is[\s-]?empty\b|\bthere[\s-]?is[\s-]?no[\s-]?self\b/i,     badge: 'no_self_badge' },
+  { patterns: /\bsuchness\b|\btathata\b|\bthusness\b|\bas[\s-]?it[\s-]?is\b|\bjust[\s-]?as[\s-]?it[\s-]?is\b|\bthe[\s-]?way[\s-]?things[\s-]?are\b|\bisness\b/i,   badge: 'suchness_signal' },
+  { patterns: /\bnirvana\b|\bparinirvana\b|\bawakening[\s-]?complete\b|\bliberation[\s-]?from\b|\bthe[\s-]?great[\s-]?peace\b|\bfinal[\s-]?release\b/i,              badge: 'nirvana_signal' },
+  // ── v35 — THE ZEN VAULT — secret boss word triggers ──────────────────────
+  { patterns: /\bhuang[\s-]?p[ōo]\b|\bhuangbo\b|\bno[\s-]?mind\b|\bdharma[\s-]?of[\s-]?mind[\s-]?transmission\b/i,                                                 badge: 'huang_po_signal' },
+  { patterns: /\bjoshu\b|\bzhaozhou\b|\bwash[\s-]?your[\s-]?bowl\b|\bjoshu'?s[\s-]?dog\b|\bcase[\s-]?one\b/i,                                                       badge: 'joshu_gate_badge' },
+  { patterns: /\bsatori\b|\bkensho\b|\bsudden[\s-]?awakening\b|\bgreat[\s-]?enlightenment\b|\bthe[\s-]?veil[\s-]?lifted\b|\bbreaking[\s-]?through\b/i,              badge: 'satori_signal' },
 ]
 
 /**
@@ -2226,6 +2294,10 @@ export function runCheckInEasterEggs(
   const midnightContinue = checkMidnightContinue()
   if (midnightContinue) awarded.push(midnightContinue)
 
+  // v34 Stoic Field: sunrise discipline (before 06:00 AM, 5 consecutive days)
+  const sunriseDiscipline = checkSunriseDiscipline()
+  if (sunriseDiscipline) awarded.push(sunriseDiscipline)
+
   // Record activity after all checks (so gap detection works next time)
   recordActivity()
 
@@ -2325,6 +2397,22 @@ export function runJournalEasterEggs(journalText: string): BadgeType[] {
   if (arcadeSession) awarded.push(arcadeSession)
   const arcadeVault = checkArcadeVault(journalText)
   awarded.push(...arcadeVault)
+
+  // v34 Stoic Field behavioral
+  const stoicSession = checkStoicSession(journalText)
+  if (stoicSession) awarded.push(stoicSession)
+  const ironLog = checkIronLog(journalText)
+  if (ironLog) awarded.push(ironLog)
+
+  // v35 Zen Terminal behavioral
+  const zenSession = checkZenSession(journalText)
+  if (zenSession) awarded.push(zenSession)
+  const dawnScribe = checkDawnScribe(journalText)
+  if (dawnScribe) awarded.push(dawnScribe)
+  const eveningAudit = checkEveningAudit(journalText)
+  if (eveningAudit) awarded.push(eveningAudit)
+  const zenVault = checkZenVault(journalText)
+  awarded.push(...zenVault)
 
   // Word turns from journal text
   const wordTurns = detectWordTurns(journalText)
@@ -4181,6 +4269,125 @@ export function checkDreamVault(text: string): BadgeType[] {
   }
   if (!hasBadge('castaneda_dream') && /\bcastaneda\b|\bdon[\s-]?juan\b|\bdreaming[\s-]?body\b|\bassemblage[\s-]?point\b|\bcontrolled[\s-]?dreaming\b|\bcarlos[\s-]?castaneda\b|\bthe[\s-]?art[\s-]?of[\s-]?dreaming\b/i.test(text)) {
     if (awardBadge('castaneda_dream')) awarded.push('castaneda_dream')
+  }
+  return awarded
+}
+
+// ── Zen Terminal v35 behavioral checks ───────────────────────────────────────
+
+const ZEN_WORDS_V35 = [
+  /\bzazen\b|\bsitting[\s-]?meditation\b|\bmeditation[\s-]?cushion\b/i,
+  /\bkoan\b|\bwhat[\s-]?is[\s-]?the[\s-]?sound\b|\bmu[\s-]?answer\b/i,
+  /\bbeginner'?s[\s-]?mind\b|\bshoshin\b|\bmind[\s-]?of[\s-]?a[\s-]?beginner\b/i,
+  /\bimpermanence\b|\banicca\b|\bnothing[\s-]?lasts\b|\ball[\s-]?things[\s-]?pass\b/i,
+  /\bens[oō]\b|\bthe[\s-]?circle\b|\bbrushstroke[\s-]?complete\b/i,
+  /\bdharma\b|\bdharma[\s-]?gate\b|\bdharma[\s-]?practice\b/i,
+  /\bthe[\s-]?koan[\s-]?mu\b|\bno[\s-]?thing\b|\bthe[\s-]?great[\s-]?doubt\b/i,
+  /\bdojo\b|\bthe[\s-]?zendo\b|\bmeditation[\s-]?hall\b|\bpractice[\s-]?hall\b/i,
+  /\bjust[\s-]?this\b|\bonly[\s-]?this\b|\bexactly[\s-]?this\b|\bnothing[\s-]?else[\s-]?needed\b/i,
+  /\bno[\s-]?self\b|\banatta\b|\banatman\b|\bno[\s-]?fixed[\s-]?self\b/i,
+  /\bsuchness\b|\btathata\b|\bthusness\b|\bjust[\s-]?as[\s-]?it[\s-]?is\b/i,
+  /\bnirvana\b|\bparinirvana\b|\bawakening[\s-]?complete\b|\bthe[\s-]?great[\s-]?peace\b/i,
+]
+
+/**
+ * Award zen_session badge if 3+ Zen Terminal (v35) words appear in one journal entry.
+ */
+export function checkZenSession(journalText: string): BadgeType | null {
+  if (hasBadge('zen_session')) return null
+  const matchCount = ZEN_WORDS_V35.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('zen_session')
+    return 'zen_session'
+  }
+  return null
+}
+
+/**
+ * Award dawn_scribe badge if journal written before 05:00 AM, 7+ times in last 30 days.
+ */
+export function checkDawnScribe(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_scribe')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour >= 5) return null
+
+  try {
+    const key = 'dawn_scribe_days'
+    const today = now.toISOString().slice(0, 10)
+    const stored = localStorage.getItem(key)
+    const days: string[] = stored ? JSON.parse(stored) : []
+    if (!days.includes(today)) {
+      days.push(today)
+      const thirtyAgo = new Date()
+      thirtyAgo.setDate(thirtyAgo.getDate() - 30)
+      const recent = days.filter(d => new Date(d) >= thirtyAgo)
+      localStorage.setItem(key, JSON.stringify(recent))
+      if (recent.length >= 7) {
+        awardBadge('dawn_scribe')
+        return 'dawn_scribe'
+      }
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+/**
+ * Award evening_audit badge if journal written 20:00–22:59 for 5 consecutive days.
+ */
+export function checkEveningAudit(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('evening_audit')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour < 20 || hour >= 23) return null
+
+  try {
+    const key = 'evening_audit_days'
+    const today = now.toISOString().slice(0, 10)
+    const stored = localStorage.getItem(key)
+    const days: string[] = stored ? JSON.parse(stored) : []
+    if (!days.includes(today)) {
+      days.push(today)
+      days.sort()
+      localStorage.setItem(key, JSON.stringify(days.slice(-30)))
+    }
+    const unique = Array.from(new Set(days)).sort()
+    let consecutive = 1
+    for (let i = unique.length - 1; i > 0; i--) {
+      const curr = new Date(unique[i])
+      const prev = new Date(unique[i - 1])
+      const diffDays = Math.round((curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24))
+      if (diffDays === 1) {
+        consecutive++
+        if (consecutive >= 5) {
+          awardBadge('evening_audit')
+          return 'evening_audit'
+        }
+      } else {
+        break
+      }
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+/** Award Zen Vault secret boss badges from journal/memory text */
+export function checkZenVault(text: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  if (!hasBadge('huang_po_signal') && /\bhuang[\s-]?p[ōo]\b|\bhuangbo\b|\bno[\s-]?mind\b|\bdharma[\s-]?of[\s-]?mind[\s-]?transmission\b/i.test(text)) {
+    if (awardBadge('huang_po_signal')) awarded.push('huang_po_signal')
+  }
+  if (!hasBadge('joshu_gate_badge') && /\bjoshu\b|\bzhaozhou\b|\bwash[\s-]?your[\s-]?bowl\b|\bjoshu'?s[\s-]?dog\b|\bcase[\s-]?one\b/i.test(text)) {
+    if (awardBadge('joshu_gate_badge')) awarded.push('joshu_gate_badge')
+  }
+  if (!hasBadge('satori_signal') && /\bsatori\b|\bkensho\b|\bsudden[\s-]?awakening\b|\bgreat[\s-]?enlightenment\b|\bthe[\s-]?veil[\s-]?lifted\b|\bbreaking[\s-]?through\b/i.test(text)) {
+    if (awardBadge('satori_signal')) awarded.push('satori_signal')
   }
   return awarded
 }
