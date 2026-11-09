@@ -9,19 +9,14 @@
 import * as React from 'react'
 import { useQueryClient } from 'react-query'
 import { Block, Button } from '#client/components/ui'
-import { useCreateLog, useLogs } from '#client/queries'
+import { useCreateLog } from '#client/queries'
 import { cn } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import type { Dayjs } from '#client/utils/dayjs'
 import { recordCalendarSignal } from '#client/stores/intentionEngine'
-
-type EntryType = 'note' | 'task' | 'call'
-
-type CalendarEntry = {
-  date: string
-  text: string
-  type: EntryType
-}
+import { useCalendarEntries } from '#client/hooks/useCalendarEntries'
+import type { EntryType, CalendarEntry } from '#client/hooks/useCalendarEntries'
+import { alertStage, isValidTime, relativeLabel } from '#client/utils/calendarAlerts'
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
@@ -50,7 +45,7 @@ function getMonthWeeks(year: number, month: number): Dayjs[][] {
 
 export function CalendarWidget() {
   const queryClient = useQueryClient()
-  const { data: logs = [] } = useLogs()
+  const { entries } = useCalendarEntries()
   const { mutate: createLog } = useCreateLog()
 
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
@@ -58,24 +53,19 @@ export function CalendarWidget() {
   const [selectedDate, setSelectedDate] = React.useState<string | null>(null)
   const [isAddingEntry, setIsAddingEntry] = React.useState(false)
   const [entryText, setEntryText] = React.useState('')
-  const [entryType, setEntryType] = React.useState<EntryType>('note')
+  const [entryTime, setEntryTime] = React.useState('')
+  const [now, setNow] = React.useState(() => new Date())
 
-  const entries = React.useMemo<CalendarEntry[]>(() => {
-    return logs
-      .filter(log => log.event === 'calendar_entry' && log.metadata)
-      .map(log => ({
-        date: log.metadata?.date as string,
-        text: log.metadata?.text as string || log.text || '',
-        type: (log.metadata?.entryType as EntryType) || 'note',
-      }))
-      .filter(e => e.date && e.text)
-      .sort((a, b) => a.date.localeCompare(b.date))
-  }, [logs])
+  React.useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30_000)
+    return () => clearInterval(id)
+  }, [])
+  const [entryType, setEntryType] = React.useState<EntryType>('note')
 
   const upcomingEntries = React.useMemo(() => {
     const today = dayjs().format('YYYY-MM-DD')
     return entries
-      .filter(e => e.date >= today)
+      .filter(e => !e.done && (e.date >= today || alertStage(e, new Date()) === 'OVERDUE'))
       .slice(0, 10)
   }, [entries])
 
@@ -109,14 +99,16 @@ export function CalendarWidget() {
     if (!selectedDate || !entryText.trim()) return
 
     const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
+    const time = isValidTime(entryTime) ? entryTime : undefined
 
     createLog({
-      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel})`,
+      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel}${time ? ' ' + time : ''})`,
       event: 'calendar_entry',
       metadata: {
         date: selectedDate,
         text: entryText.trim(),
         entryType,
+        ...(time ? { time } : {}),
       },
     }, {
       onSuccess: () => {
@@ -126,7 +118,17 @@ export function CalendarWidget() {
     })
 
     setEntryText('')
+    setEntryTime('')
     setIsAddingEntry(false)
+  }
+
+  const handleDone = (e: CalendarEntry) => {
+    if (e.done) return
+    createLog({
+      text: `[DONE] ${e.type}: ${e.text}`,
+      event: 'calendar_done',
+      metadata: { entryId: e.id, date: e.date, time: e.time, text: e.text, stage: 'DONE' },
+    }, { onSuccess: () => queryClient.refetchQueries(['/api/logs']) })
   }
 
   const handleToggleCalendar = () => {
@@ -237,6 +239,14 @@ export function CalendarWidget() {
                     className="bg-transparent border border-acc/20 text-acc px-4 py-2 flex-1 outline-none focus:border-acc/40"
                     autoFocus
                   />
+                  <input
+                    type="time"
+                    value={entryTime}
+                    onChange={e => setEntryTime(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleAddEntry() }}
+                    aria-label="Time (optional)"
+                    className="bg-transparent border border-acc/20 text-acc px-4 py-2 outline-none focus:border-acc/40"
+                  />
                   <Button onClick={handleAddEntry}>Add</Button>
                 </div>
               </div>
@@ -247,9 +257,17 @@ export function CalendarWidget() {
                 <div className="text-acc/40 mb-4">
                   {dayjs(selectedDate).format('dddd, MMMM D')}
                 </div>
-                {entriesOnDate.map((e, i) => (
-                  <div key={i} className="text-acc/80 mb-1">
-                    {e.text}
+                {entriesOnDate.map(e => (
+                  <div key={e.id} className="flex justify-between gap-16 mb-1">
+                    <span className={cn('text-acc/80', e.done && 'line-through text-acc/30')}>
+                      {e.time && <span className="tabular-nums text-acc/50">{e.time} </span>}
+                      {e.text}
+                    </span>
+                    {!e.done && (
+                      <button className="text-acc/30 hover:text-acc/60 transition-opacity" onClick={() => handleDone(e)}>
+                        done
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -259,16 +277,32 @@ export function CalendarWidget() {
 
         {upcomingEntries.length > 0 && (
           <div className="space-y-1">
-            {upcomingEntries.map((entry, i) => (
-              <div key={i} className="flex justify-between gap-16">
-                <span className="text-acc whitespace-nowrap">
-                  {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
-                </span>
-                <span className="text-acc text-right">
-                  {entry.text}
-                </span>
-              </div>
-            ))}
+            {upcomingEntries.map(entry => {
+              const stage = alertStage(entry, now)
+              const overdue = stage === 'OVERDUE'
+              return (
+                <div key={entry.id} className="flex justify-between gap-16">
+                  <span className="text-acc whitespace-nowrap tabular-nums">
+                    {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
+                    {entry.time && ` ${entry.time}`}
+                    {entry.time && stage && stage !== 'OVERDUE' && (
+                      <span className="text-acc/40"> {relativeLabel(entry, now)}</span>
+                    )}
+                  </span>
+                  <span className="text-acc text-right">
+                    {overdue && <span className="text-acc/40">OVERDUE </span>}
+                    {entry.text}
+                    <button
+                      className="text-acc/30 hover:text-acc/60 transition-opacity ml-8"
+                      onClick={() => handleDone(entry)}
+                      aria-label="Mark done"
+                    >
+                      [x]
+                    </button>
+                  </span>
+                </div>
+              )
+            })}
           </div>
         )}
 
