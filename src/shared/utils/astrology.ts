@@ -177,3 +177,44 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+/**
+ * Build a Date whose local getters (getHours/getMonth/getDate) read the
+ * wall-clock fields of `date` in the given IANA timeZone. Lets the pure
+ * astrology functions be timeZone-aware on both client and server without
+ * depending on the runtime's own timeZone. Invalid/missing zone -> unchanged.
+ */
+export function toWallClockDate(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23', year: 'numeric', month: 'numeric',
+      day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(date)
+    const g = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(g('year'), g('month') - 1, g('day'), g('hour'), g('minute'), g('second'))
+  } catch {
+    return date
+  }
+}
+
+export interface AstrologyReading {
+  hourlyZodiac: string
+  westernZodiac: string
+  moonPhase: string
+  moonIllumination: number
+  rokuyo: string
+}
+
+/** Single ambient reading, optionally in a user's timeZone. */
+export function getAstrologyReading(date: Date = new Date(), timeZone?: string | null): AstrologyReading {
+  const d = toWallClockDate(date, timeZone)
+  const moon = getMoonPhase(d)
+  return {
+    hourlyZodiac: getHourlyZodiac(d),
+    westernZodiac: getWesternZodiac(d),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    rokuyo: getRokuyo(d),
+  }
+}
