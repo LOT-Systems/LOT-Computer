@@ -304,7 +304,7 @@ const App = () => {
     )
 
     // Initialize recipe widget periodic checking
-    initRecipeWidget()
+    const stopRecipeWidget = initRecipeWidget()
 
     // Initialize interaction latency observer
     initPerfObserver()
@@ -319,6 +319,7 @@ const App = () => {
 
     return () => {
       unbindRouter()
+      stopRecipeWidget()
       document.removeEventListener('visibilitychange', onVisibilityChange)
     }
   }, [])

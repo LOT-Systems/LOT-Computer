@@ -89,7 +89,9 @@ import { useInViewport } from '#client/hooks/useInViewport'
 function LazyMount({ children }: { children: React.ReactNode }) {
   const ref = React.useRef<HTMLDivElement>(null)
   const inViewport = useInViewport(ref)
-  return <div ref={ref}>{inViewport ? children : null}</div>
+  // minHeight placeholder: without it every zero-height LazyMount stacks at the
+  // same y-offset and all of them intersect at once, defeating the deferral.
+  return <div ref={ref} style={inViewport ? undefined : { minHeight: 160 }}>{inViewport ? children : null}</div>
 }
 
 function LoadingDots() {
@@ -1009,6 +1011,7 @@ export const System = React.memo(function SystemInner() {
 
       {/* CQGS Biofield Engine Widgets */}
       <WidgetErrorBoundary name="Biofield Engine">
+        <LazyMount>
         <div className={cn('flex flex-col', density.sectionGap)}>
           <QuantumStateWidget />
           <PatternRecognitionWidget />
@@ -1016,10 +1019,12 @@ export const System = React.memo(function SystemInner() {
           <SignalStreamWidget />
           <IntegrityWidget />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* CQGS Dashboard stack */}
       <WidgetErrorBoundary name="Dashboard">
+        <LazyMount>
         <div className={cn('flex flex-col', density.stackGap)}>
           {/* CQGS Dashboard - Bioethics health, performance, version */}
           <UserMetricsWidget />
@@ -1033,6 +1038,7 @@ export const System = React.memo(function SystemInner() {
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Architect — executive self-assembly telemetry, paid users only */}
@@ -1042,6 +1048,7 @@ export const System = React.memo(function SystemInner() {
 
       {/* Stats stack */}
       <WidgetErrorBoundary name="Stats">
+        <LazyMount>
         <div className={cn('flex flex-col', density.sectionGap)}>
           <IntentionPatterns />
           <CollectiveConsciousness />
@@ -1050,6 +1057,7 @@ export const System = React.memo(function SystemInner() {
           <GrowthMilestones />
           <BadgeUnlockFeed />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Calendar — Personal date planner */}

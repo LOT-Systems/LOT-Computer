@@ -8,6 +8,7 @@
 
 import * as React from 'react'
 import { Block } from './Block'
+import { recordWidgetMount, recordWidgetInteraction } from '#client/utils/widgetUsage'
 
 const widgetTimings: Record<string, number> = {}
 
@@ -44,6 +45,7 @@ export class WidgetErrorBoundary extends React.Component<
     const elapsed = Math.round((performance.now() - this.mountStart) * 100) / 100
     const name = this.props.name || 'Widget'
     widgetTimings[name] = elapsed
+    recordWidgetMount(name, elapsed)
     if (elapsed > 50) {
       console.warn(`[Perf] ${name} took ${elapsed}ms to mount`)
     }
@@ -74,6 +76,14 @@ export class WidgetErrorBoundary extends React.Component<
         </Block>
       )
     }
-    return this.props.children
+    // display:contents keeps layout identical while letting us log interactions.
+    return (
+      <div
+        style={{ display: 'contents' }}
+        onClickCapture={() => recordWidgetInteraction(this.props.name || 'Widget')}
+      >
+        {this.props.children}
+      </div>
+    )
   }
 }

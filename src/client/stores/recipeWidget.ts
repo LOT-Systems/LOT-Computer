@@ -183,9 +183,20 @@ export function dismissRecipeWidget() {
 }
 
 // Initialize periodic check (call this once on app start)
-export function initRecipeWidget() {
-  // Check every 5 minutes
-  setInterval(checkRecipeWidget, 5 * 60 * 1000)
-  // Check immediately on init
-  checkRecipeWidget()
+let _recipeIntervalHandle: ReturnType<typeof setInterval> | null = null
+
+export function initRecipeWidget(): () => void {
+  // Idempotent: only one interval ever runs (guards HMR / effect re-runs)
+  if (_recipeIntervalHandle === null) {
+    // Check every 5 minutes
+    _recipeIntervalHandle = setInterval(checkRecipeWidget, 5 * 60 * 1000)
+    // Check immediately on init
+    checkRecipeWidget()
+  }
+  return () => {
+    if (_recipeIntervalHandle !== null) {
+      clearInterval(_recipeIntervalHandle)
+      _recipeIntervalHandle = null
+    }
+  }
 }
