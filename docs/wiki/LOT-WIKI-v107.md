@@ -4273,10 +4273,6 @@ THE A.I. ENGINE           Badge v40. 1,060 badges. Machine learning vocabulary
                           as self-care lens. Word Turn v30. FM v123.
                           THIRTY ENGINES SEALED.
 
-THE STOIC FIELD           Badge v44. 1,184 badges. Stoic philosophy vocabulary
-                          as self-care lens. Word Turn v34. FM v128.
-                          SECOND CYCLE: STOIC SOVEREIGN. THIRTY-FOUR ENGINES SEALED.
-
 THE MYTH ENGINE           Badge v41. 1,091 badges. Comparative mythology vocabulary
                           (Campbell / Jung / Eliade). Word Turn v31. FM v124.
                           THIRTY-ONE ENGINES SEALED.
@@ -4302,6 +4298,18 @@ THIRTY_REGISTERS          Mastery Tier v30 COSMIC badge. 1 badge from all 30
 SECOND CYCLE              Badge Engine second arc. Engines v32+. Opens with v42
                           THE ARCADE MASTER. First Cycle (v1–v31) complete.
                           New game plus: memory intact, engines rebuilt deeper.
+
+HUANG_PO_FOUND            Secret Boss v32 MYTHIC. "huang po / no-mind / sudden school /
+                          transmission outside scripture" in text. The gate has no door
+                          because the seeker IS the gate. FM v131.
+
+WATTS_FOUND               Secret Boss v32 EPIC. "alan watts / the book / taboo against knowing
+                          / reality itself" in text. The bridge between East and West.
+                          The terminal opens. FM v131.
+
+DOGEN_SIGNAL              Secret Boss v32 RARE. "dogen / shobogenzo / just this /
+                          being-time" in text. Each moment the full expression of time.
+                          The operator who writes this is practicing. FM v131.
 
 STOIC_SOVEREIGN           Secret Boss v31 MYTHIC. "amor fati / memento mori / stoic sovereign
                           / dichotomy of control" in text. The sovereign field perpetuates.
@@ -4350,14 +4358,30 @@ THE DREAM WEAVER          Badge v43. 1,153 badges. Sleep and dream vocabulary
 THIRTY-THREE ENGINES      Word Turn Engine v33. 396 trigger words. 33 lexicons.
                           Badge v43 THE DREAM WEAVER. DREAM CYCLE OPENS. FM v126.
 
+THIRTY-FIVE ENGINES       Word Turn Engine v35. 419 trigger words. 35 lexicons.
+                          Badge v45 THE ZEN TERMINAL. ZEN SOVEREIGN. FM v131.
+
 THIRTY-FOUR ENGINES       Word Turn Engine v34. 408 trigger words. 34 lexicons.
                           Badge v44 THE STOIC FIELD. STOIC SOVEREIGN. FM v128.
+
+THIRTY_FIVE_REGISTERS     Mastery Tier v35 COSMIC badge. 1 badge from all 35
+                          Word Turn engines. Zen Terminal completed. FM v131.
 
 THIRTY_FOUR_REGISTERS     Mastery Tier v34 COSMIC badge. 1 badge from all 34
                           Word Turn engines. Stoic Field completed. FM v128.
 
 THIRTY_THREE_REGISTERS    Mastery Tier v33 COSMIC badge. 1 badge from all 33
                           Word Turn engines. Dream Weaver completed. FM v126.
+
+THE ZEN TERMINAL          Badge v45. 1,215 badges. Zen philosophy vocabulary
+                          as self-care operating system. Presence. Impermanence.
+                          The gate has no door. Word Turn v35. FM v131.
+                          THIRTY-FIVE ENGINES SEALED. THIRD CYCLE: ZEN SOVEREIGN.
+
+THE STOIC FIELD           Badge v44. 1,184 badges. Stoic philosophy vocabulary
+                          as self-care operating system. Discipline. Virtue. Amor fati.
+                          Word Turn v34. FM v128.
+                          THIRTY-FOUR ENGINES SEALED. SECOND CYCLE: STOIC SOVEREIGN.
 
 DREAM WEAVER              Badge v43 theme concept. Sleep/dream vocabulary as
                           self-care engine. The unconscious as game world.
