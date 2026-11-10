@@ -17,6 +17,10 @@
  *
  * Only the CURRENT stage is ever returned, so opening the app late fires one
  * alert, not a burst. Each (entry, stage) fires at most once (key dedupe).
+ *
+ * Snooze: an entry with `snoozeUntil` is silent until that instant, then
+ * re-arms as a timed entry anchored there (T-0 → OVERDUE, no pre-alert).
+ * `snoozeGen` is folded into the alert key so each snooze can fire again.
  */
 
 export type AlertStage = 'T-15' | 'T-0' | 'OVERDUE' | 'TODAY'
@@ -26,6 +30,8 @@ export type AlertEntry = {
   date: string // YYYY-MM-DD (local)
   time?: string // HH:mm (local, 24h)
   done?: boolean
+  snoozeUntil?: number // epoch ms
+  snoozeGen?: number // number of snoozes applied
 }
 
 export const OVERDUE_WINDOW_MIN = 48 * 60
@@ -55,11 +61,26 @@ export function entryMoment(e: Pick<AlertEntry, 'date' | 'time'>): Date | null {
   return new Date(+m[1], +m[2] - 1, +m[3], h, min, 0, 0)
 }
 
+export const SNOOZE_MIN = 10
+
+/** Instant the entry is currently due: snooze target if snoozed, else its own moment. */
+export function effectiveMoment(e: AlertEntry): Date | null {
+  if (e.snoozeUntil && Number.isFinite(e.snoozeUntil)) return new Date(e.snoozeUntil)
+  return entryMoment(e)
+}
+
 export function alertStage(e: AlertEntry, now: Date): AlertStage | null {
   if (e.done) return null
-  const at = entryMoment(e)
+  const snoozed = !!(e.snoozeUntil && Number.isFinite(e.snoozeUntil))
+  const at = effectiveMoment(e)
   if (!at) return null
   const diffMin = (at.getTime() - now.getTime()) / 60000
+
+  if (snoozed) {
+    if (diffMin > 0) return null
+    if (-diffMin < T0_WINDOW_MIN) return 'T-0'
+    return -diffMin <= OVERDUE_WINDOW_MIN ? 'OVERDUE' : null
+  }
 
   if (!e.time) {
     // Untimed: TODAY from 08:00 until midnight, OVERDUE the day after (<=48h)
@@ -75,11 +96,15 @@ export function alertStage(e: AlertEntry, now: Date): AlertStage | null {
   return -diffMin <= OVERDUE_WINDOW_MIN ? 'OVERDUE' : null
 }
 
-export const alertKey = (id: string, stage: AlertStage) => `${id}:${stage}`
+export const alertKey = (id: string, stage: AlertStage, gen = 0) =>
+  gen > 0 ? `${id}:s${gen}:${stage}` : `${id}:${stage}`
+
+/** Stages that hold on screen until the operator acts. */
+export const isHoldStage = (s: AlertStage) => s !== 'T-15'
 
 /** Minutes label for display: "in 12m", "now", "+37m", "+2h". */
-export function relativeLabel(e: Pick<AlertEntry, 'date' | 'time'>, now: Date): string {
-  const at = entryMoment(e)
+export function relativeLabel(e: AlertEntry, now: Date): string {
+  const at = effectiveMoment(e)
   if (!at) return ''
   const d = Math.round((at.getTime() - now.getTime()) / 60000)
   if (d === 0) return 'now'

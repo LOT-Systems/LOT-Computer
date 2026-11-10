@@ -7,16 +7,15 @@
  */
 
 import * as React from 'react'
-import { useQueryClient } from 'react-query'
 import { Block, Button } from '#client/components/ui'
-import { useCreateLog } from '#client/queries'
 import { cn } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import type { Dayjs } from '#client/utils/dayjs'
 import { recordCalendarSignal } from '#client/stores/intentionEngine'
-import { useCalendarEntries } from '#client/hooks/useCalendarEntries'
+import { useCalendarActions, useCalendarEntries } from '#client/hooks/useCalendarEntries'
 import type { EntryType, CalendarEntry } from '#client/hooks/useCalendarEntries'
 import { alertStage, isValidTime, relativeLabel } from '#client/utils/calendarAlerts'
+import { setSysNotify, sysNotifyEnabled, sysNotifySupported } from '#client/utils/calendarNotify'
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
@@ -44,9 +43,9 @@ function getMonthWeeks(year: number, month: number): Dayjs[][] {
 }
 
 export function CalendarWidget() {
-  const queryClient = useQueryClient()
   const { entries } = useCalendarEntries()
-  const { mutate: createLog } = useCreateLog()
+  const actions = useCalendarActions()
+  const [sysOn, setSysOn] = React.useState(() => sysNotifyEnabled())
 
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
   const [viewMonth, setViewMonth] = React.useState(() => dayjs())
@@ -63,11 +62,11 @@ export function CalendarWidget() {
   const [entryType, setEntryType] = React.useState<EntryType>('note')
 
   const upcomingEntries = React.useMemo(() => {
-    const today = dayjs().format('YYYY-MM-DD')
+    const today = dayjs(now).format('YYYY-MM-DD')
     return entries
-      .filter(e => !e.done && (e.date >= today || alertStage(e, new Date()) === 'OVERDUE'))
+      .filter(e => !e.done && (e.date >= today || alertStage(e, now) !== null))
       .slice(0, 10)
-  }, [entries])
+  }, [entries, now])
 
   const entriesOnDate = React.useMemo(() => {
     if (!selectedDate) return []
@@ -76,7 +75,7 @@ export function CalendarWidget() {
 
   const datesWithEntries = React.useMemo(() => {
     const set = new Set<string>()
-    entries.forEach(e => set.add(e.date))
+    entries.forEach(e => { if (!e.done) set.add(e.date) })
     return set
   }, [entries])
 
@@ -98,23 +97,12 @@ export function CalendarWidget() {
   const handleAddEntry = () => {
     if (!selectedDate || !entryText.trim()) return
 
-    const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
     const time = isValidTime(entryTime) ? entryTime : undefined
+    const date = selectedDate
+    const type = entryType
 
-    createLog({
-      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel}${time ? ' ' + time : ''})`,
-      event: 'calendar_entry',
-      metadata: {
-        date: selectedDate,
-        text: entryText.trim(),
-        entryType,
-        ...(time ? { time } : {}),
-      },
-    }, {
-      onSuccess: () => {
-        queryClient.refetchQueries(['/api/logs'])
-        try { recordCalendarSignal(entryType, selectedDate!) } catch (_) {}
-      },
+    actions.add({ date, time, text: entryText.trim().slice(0, 280), type }, () => {
+      try { recordCalendarSignal(type, date) } catch (_) {}
     })
 
     setEntryText('')
@@ -122,14 +110,14 @@ export function CalendarWidget() {
     setIsAddingEntry(false)
   }
 
-  const handleDone = (e: CalendarEntry) => {
-    if (e.done) return
-    createLog({
-      text: `[DONE] ${e.type}: ${e.text}`,
-      event: 'calendar_done',
-      metadata: { entryId: e.id, date: e.date, time: e.time, text: e.text, stage: 'DONE' },
-    }, { onSuccess: () => queryClient.refetchQueries(['/api/logs']) })
+  const handleDone = (e: CalendarEntry) => actions.done(e)
+
+  const handleScrub = (e: CalendarEntry) => {
+    if (typeof window !== 'undefined' && !window.confirm(`Scrub "${e.text}"?`)) return
+    actions.cancel(e)
   }
+
+  const toggleSys = async () => setSysOn(await setSysNotify(!sysOn))
 
   const handleToggleCalendar = () => {
     if (!isCalendarOpen) {
@@ -264,9 +252,14 @@ export function CalendarWidget() {
                       {e.text}
                     </span>
                     {!e.done && (
-                      <button className="text-acc/30 hover:text-acc/60 transition-opacity" onClick={() => handleDone(e)}>
-                        done
-                      </button>
+                      <span className="whitespace-nowrap">
+                        <button className="text-acc/30 hover:text-acc/60 transition-opacity" onClick={() => handleDone(e)}>
+                          done
+                        </button>
+                        <button className="text-acc/30 hover:text-acc/60 transition-opacity ml-8" onClick={() => handleScrub(e)}>
+                          scrub
+                        </button>
+                      </span>
                     )}
                   </div>
                 ))}
@@ -285,8 +278,11 @@ export function CalendarWidget() {
                   <span className="text-acc whitespace-nowrap tabular-nums">
                     {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
                     {entry.time && ` ${entry.time}`}
-                    {entry.time && stage && stage !== 'OVERDUE' && (
+                    {(entry.time || entry.snoozeUntil) && stage && stage !== 'OVERDUE' && (
                       <span className="text-acc/40"> {relativeLabel(entry, now)}</span>
+                    )}
+                    {entry.snoozeUntil && !stage && (
+                      <span className="text-acc/40"> snz {dayjs(entry.snoozeUntil).format('HH:mm')}</span>
                     )}
                   </span>
                   <span className="text-acc text-right">
@@ -308,6 +304,14 @@ export function CalendarWidget() {
 
         {upcomingEntries.length === 0 && !isCalendarOpen && (
           <div className="text-acc/40">No upcoming dates.</div>
+        )}
+
+        {isCalendarOpen && sysNotifySupported() && (
+          <div className="mt-16">
+            <button className="text-acc/30 hover:text-acc/60 transition-opacity" onClick={toggleSys}>
+              System alerts: {sysOn ? 'on' : 'off'}
+            </button>
+          </div>
         )}
       </div>
     </Block>

@@ -15,23 +15,25 @@
  */
 
 import * as React from 'react'
-import { useQueryClient } from 'react-query'
-import { useCreateLog } from '#client/queries'
 import { cn } from '#client/utils'
-import { useCalendarEntries } from '#client/hooks/useCalendarEntries'
+import { useCalendarActions, useCalendarEntries } from '#client/hooks/useCalendarEntries'
 import type { CalendarEntry } from '#client/hooks/useCalendarEntries'
 import {
   alertKey,
   alertStage,
+  isHoldStage,
   relativeLabel,
+  SNOOZE_MIN,
 } from '#client/utils/calendarAlerts'
 import type { AlertStage } from '#client/utils/calendarAlerts'
+import { sysNotify } from '#client/utils/calendarNotify'
 
 const TICK_MS = 15_000
+const PRE_DISMISS_MS = 15_000
 const LS_KEY = 'lot.calendar.fired.v1'
-const LS_MAX = 300
+const LS_MAX = 400
 
-type Toast = { key: string; entry: CalendarEntry; stage: AlertStage }
+type Toast = { key: string; entryId: string; stage: AlertStage; seq: number; firedAt: number }
 
 function readFired(): string[] {
   try {
@@ -68,43 +70,51 @@ function beep(stage: AlertStage) {
   } catch (_) {}
 }
 
+const pad = (n: number, w = 3) => String(n).padStart(w, '0')
+const hhmm = (ms: number) => new Date(ms).toTimeString().slice(0, 5)
+
 export function CalendarAlertHost() {
-  const queryClient = useQueryClient()
-  const { mutate: createLog } = useCreateLog()
+  const actions = useCalendarActions()
   const { entries, firedKeys, ready } = useCalendarEntries()
   const [toasts, setToasts] = React.useState<Toast[]>([])
+  const [, force] = React.useReducer((x: number) => x + 1, 0)
 
   // Latest values for the interval callback without re-creating the timer.
-  const latest = React.useRef({ entries, firedKeys })
-  latest.current = { entries, firedKeys }
+  const latest = React.useRef({ entries, firedKeys, actions })
+  latest.current = { entries, firedKeys, actions }
   const session = React.useRef(new Set<string>())
+  const seq = React.useRef(0)
+
+  const byId = React.useMemo(() => new Map(entries.map(e => [e.id, e])), [entries])
+
+  // Drop toasts whose entry was completed / scrubbed / snoozed (here or on another device).
+  React.useEffect(() => {
+    setToasts(ts => {
+      const next = ts.filter(t => {
+        const e = byId.get(t.entryId)
+        return e && !e.done && alertStage(e, new Date()) !== null && (e.snoozeGen === 0 || t.key.includes(`:s${e.snoozeGen}:`))
+      })
+      return next.length === ts.length ? ts : next
+    })
+  }, [byId])
 
   const dismiss = React.useCallback((key: string) => {
     setToasts(t => t.filter(x => x.key !== key))
   }, [])
-
-  const markDone = React.useCallback((entry: CalendarEntry, key: string) => {
-    createLog({
-      text: `[DONE] ${entry.type}: ${entry.text}`,
-      event: 'calendar_done',
-      metadata: { entryId: entry.id, date: entry.date, time: entry.time, text: entry.text, stage: 'DONE' },
-    }, { onSuccess: () => queryClient.refetchQueries(['/api/logs']) })
-    dismiss(key)
-  }, [createLog, dismiss, queryClient])
 
   React.useEffect(() => {
     if (!ready) return
 
     const tick = () => {
       const now = new Date()
-      const { entries, firedKeys } = latest.current
+      const { entries, firedKeys, actions } = latest.current
       const stored = readFired()
       const fresh: Toast[] = []
 
       for (const entry of entries) {
         const stage = alertStage(entry, now)
         if (!stage) continue
-        const key = alertKey(entry.id, stage)
+        const key = alertKey(entry.id, stage, entry.snoozeGen)
         if (session.current.has(key) || firedKeys.has(key) || stored.includes(key)) continue
 
         // Claim before side effects (also guards a second tab).
@@ -112,24 +122,24 @@ export function CalendarAlertHost() {
         stored.push(key)
         writeFired(stored)
 
-        const stamp = `${entry.date}${entry.time ? ' ' + entry.time : ''}`
-        createLog({
-          text: `[ALERT ${stage}] ${entry.type}: ${entry.text} (${stamp})`,
-          event: 'calendar_alert',
-          metadata: { key, entryId: entry.id, stage, date: entry.date, time: entry.time, text: entry.text, entryType: entry.type },
-        }, { onSuccess: () => queryClient.refetchQueries(['/api/logs']) })
-
-        fresh.push({ key, entry, stage })
+        actions.alert(entry, stage, key)
+        seq.current += 1
+        fresh.push({ key, entryId: entry.id, stage, seq: seq.current, firedAt: now.getTime() })
         beep(stage)
+        sysNotify(
+          `LOT // ${stage}`,
+          `${entry.type.toUpperCase()} · ${entry.text}${entry.time ? ' · ' + entry.time : ''}`,
+          key
+        )
       }
 
       if (fresh.length) {
-        setToasts(prev => [...prev.filter(p => !fresh.some(f => f.entry.id === p.entry.id)), ...fresh].slice(-4))
-        // Pre-alerts fade on their own; T-0 / OVERDUE / TODAY wait for ACK.
-        fresh.filter(f => f.stage === 'T-15').forEach(f => {
-          setTimeout(() => dismiss(f.key), 15_000)
+        setToasts(prev => [...prev.filter(p => !fresh.some(f => f.entryId === p.entryId)), ...fresh].slice(-4))
+        fresh.filter(f => !isHoldStage(f.stage)).forEach(f => {
+          setTimeout(() => dismiss(f.key), PRE_DISMISS_MS)
         })
       }
+      force()
     }
 
     tick()
@@ -140,9 +150,22 @@ export function CalendarAlertHost() {
       clearInterval(id)
       document.removeEventListener('visibilitychange', onVisible)
     }
-  }, [ready, createLog, dismiss, queryClient])
+  }, [ready, dismiss])
 
-  if (!toasts.length) return null
+  // ESC acknowledges the most recent alert.
+  React.useEffect(() => {
+    if (!toasts.length) return
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key === 'Escape') dismiss(toasts[toasts.length - 1].key)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [toasts, dismiss])
+
+  const visible = toasts
+    .map(t => ({ t, e: byId.get(t.entryId) }))
+    .filter((x): x is { t: Toast; e: CalendarEntry } => !!x.e)
+  if (!visible.length) return null
   const now = new Date()
 
   return (
@@ -151,32 +174,44 @@ export function CalendarAlertHost() {
       role="alert"
       aria-live="assertive"
     >
-      {toasts.map(({ key, entry, stage }) => (
-        <div
-          key={key}
-          className={cn(
-            'bg-[var(--bg,#000)] border px-12 py-8 font-mono',
-            stage === 'OVERDUE' ? 'border-acc' : 'border-acc/40',
-          )}
-        >
-          <div className="flex justify-between gap-16 text-acc tabular-nums">
-            <span className="tracking-widest">
-              {stage === 'OVERDUE' ? '!! ' : '// '}{stage}
-            </span>
-            <span className="text-acc/60">
-              {entry.time || 'ALL DAY'} · {relativeLabel(entry, now)}
-            </span>
+      {visible.map(({ t, e }) => {
+        const hot = t.stage === 'OVERDUE'
+        const live = t.stage === 'T-0'
+        return (
+          <div
+            key={t.key}
+            className={cn(
+              'bg-bac border px-16 py-8 font-mono tabular-nums',
+              hot || live ? 'border-acc' : 'border-acc/40',
+            )}
+          >
+            <div className="flex justify-between gap-16 text-acc">
+              <span className="tracking-wider whitespace-nowrap">
+                <span className={cn((hot || live) && 'animate-pulse')}>{hot ? '!!' : live ? '>>' : '//'}</span>
+                {' '}CAL · {t.stage}
+              </span>
+              <span className="text-acc/40 whitespace-nowrap">#{pad(t.seq)} · {hhmm(t.firedAt)}</span>
+            </div>
+            <div className="text-acc mt-4 break-words">
+              <span className="text-acc/50 uppercase tracking-widest">{e.type} </span>
+              {e.text}
+            </div>
+            <div className="text-acc/50 mt-4">
+              {e.date} {e.time || 'ALL DAY'} · {relativeLabel(e, now).toUpperCase()}
+              {e.snoozeGen > 0 && ` · SNZ ${e.snoozeGen}`}
+            </div>
+            <div className="flex gap-16 mt-8 text-acc/60 uppercase">
+              <button className="hover:text-acc" onClick={() => dismiss(t.key)}>[ack]</button>
+              {isHoldStage(t.stage) && (
+                <button className="hover:text-acc" onClick={() => { actions.snooze(e); dismiss(t.key) }}>
+                  [+{SNOOZE_MIN}m]
+                </button>
+              )}
+              <button className="hover:text-acc" onClick={() => { actions.done(e, t.stage); dismiss(t.key) }}>[done]</button>
+            </div>
           </div>
-          <div className="text-acc mt-4 break-words">
-            <span className="text-acc/60 uppercase">{entry.type} </span>
-            {entry.text}
-          </div>
-          <div className="flex gap-16 mt-8 text-acc/60">
-            <button className="hover:text-acc" onClick={() => dismiss(key)}>[ack]</button>
-            <button className="hover:text-acc" onClick={() => markDone(entry, key)}>[done]</button>
-          </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

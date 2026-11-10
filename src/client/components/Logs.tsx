@@ -2087,8 +2087,8 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
-        } else if (log.event === 'calendar_alert' || log.event === 'calendar_done') {
-          const stage = (log.metadata?.stage as string | undefined) || (log.event === 'calendar_done' ? 'DONE' : 'ALERT')
+        } else if (log.event === 'calendar_alert' || log.event === 'calendar_done' || log.event === 'calendar_snooze' || log.event === 'calendar_cancel') {
+          const stage = (log.metadata?.stage as string | undefined) || ({ calendar_done: 'DONE', calendar_snooze: 'SNOOZE', calendar_cancel: 'SCRUBBED' } as Record<string, string>)[log.event] || 'ALERT'
           const when = [log.metadata?.date, log.metadata?.time].filter(Boolean).join(' ')
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>

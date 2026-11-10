@@ -133,6 +133,8 @@ function generateCompassionateResponse(
     'Thank you for checking in with yourself. This awareness is self-care.'
 }
 
+const CALENDAR_EVENTS = ['calendar_entry', 'calendar_alert', 'calendar_done', 'calendar_snooze', 'calendar_cancel']
+
 export default async (fastify: FastifyInstance) => {
   // Register User Operating System API routes
   registerOSRoutes(fastify)
@@ -1079,12 +1081,34 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
+  // Calendar feed — every calendar_* event for the user, independent of the
+  // 500-row /logs window and of hideActivityLogs, so entries, completions and
+  // fired-alert keys never silently drop out of the alert engine.
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    const logs = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: { [Op.in]: CALENDAR_EVENTS },
+      },
+      attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
+      order: [['createdAt', 'DESC']],
+      limit: 3000,
+    })
+    return logs.map((l) => ({
+      id: l.id,
+      event: l.event,
+      text: l.text,
+      metadata: l.metadata,
+      createdAt: l.createdAt,
+    }))
+  })
+
   fastify.get('/logs', async (req: FastifyRequest, reply) => {
     // Only return user-facing log events (exclude raw QIE signal events)
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'calendar_alert', 'calendar_done', 'qi_rfi',
+      'weekly_summary_response', ...CALENDAR_EVENTS, 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',

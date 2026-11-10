@@ -7,53 +7,94 @@
  */
 
 import * as React from 'react'
-import { useLogs } from '#client/queries'
-import { isValidTime } from '#client/utils/calendarAlerts'
+import { useQueryClient } from 'react-query'
+import { useCalendarFeed, useCreateLog } from '#client/queries'
+import type { CalendarLog } from '#client/queries'
+import { SNOOZE_MIN } from '#client/utils/calendarAlerts'
+import { deriveCalendar } from '#client/utils/calendarFeed'
+import type { CalendarEntry, EntryType } from '#client/utils/calendarFeed'
+import type { AlertStage } from '#client/utils/calendarAlerts'
 
-export type EntryType = 'note' | 'task' | 'call'
+export type { EntryType, CalendarEntry } from '#client/utils/calendarFeed'
 
-export type CalendarEntry = {
-  id: string
-  date: string
-  time?: string
-  text: string
-  type: EntryType
-  done: boolean
+const FEED_KEY = ['/api/calendar']
+
+/** Entries, completions and already-fired alert keys, from the calendar feed. */
+export function useCalendarEntries() {
+  const { data, isSuccess } = useCalendarFeed()
+  return React.useMemo(() => {
+    const d = deriveCalendar(data || [])
+    return { ...d, ready: isSuccess }
+  }, [data, isSuccess])
 }
 
-/** Derive calendar entries, completions and already-fired alert keys from the Log. */
-export function useCalendarEntries() {
-  const { data: logs = [], isSuccess } = useLogs()
+const stamp = (e: Pick<CalendarEntry, 'date' | 'time'>) => `${e.date}${e.time ? ' ' + e.time : ''}`
 
-  return React.useMemo(() => {
-    const doneIds = new Set<string>()
-    const firedKeys = new Set<string>()
-    for (const log of logs) {
-      if (log.event === 'calendar_done' && log.metadata?.entryId) {
-        doneIds.add(String(log.metadata.entryId))
-      } else if (log.event === 'calendar_alert' && log.metadata?.key) {
-        firedKeys.add(String(log.metadata.key))
-      }
-    }
+/**
+ * All calendar writes go through here. Each write is appended to the feed
+ * cache on success (so the alert engine sees it before the next poll) and
+ * the main Log is invalidated so the record shows up there too.
+ */
+export function useCalendarActions() {
+  const queryClient = useQueryClient()
+  const { mutate } = useCreateLog()
 
-    const entries: CalendarEntry[] = []
-    for (const log of logs) {
-      if (log.event !== 'calendar_entry' || !log.metadata) continue
-      const date = log.metadata.date as string
-      const text = (log.metadata.text as string) || log.text || ''
-      if (!date || !text) continue
-      const time = isValidTime(log.metadata.time) ? (log.metadata.time as string) : undefined
-      entries.push({
-        id: String(log.id),
-        date,
-        time,
-        text,
-        type: ((log.metadata.entryType as EntryType) || 'note'),
-        done: doneIds.has(String(log.id)),
+  const write = React.useCallback(
+    (body: { text: string; event: string; metadata: Record<string, any> }, after?: () => void) => {
+      mutate(body, {
+        onSuccess: (log: any) => {
+          queryClient.setQueryData<CalendarLog[]>(FEED_KEY, (prev = []) =>
+            log && log.id ? [{ id: log.id, event: body.event, text: body.text, metadata: body.metadata, createdAt: log.createdAt }, ...prev] : prev
+          )
+          queryClient.invalidateQueries(FEED_KEY)
+          queryClient.invalidateQueries(['/api/logs'])
+          after?.()
+        },
       })
-    }
-    entries.sort((a, b) => `${a.date} ${a.time || ''}`.localeCompare(`${b.date} ${b.time || ''}`))
+    },
+    [mutate, queryClient]
+  )
 
-    return { entries, firedKeys, ready: isSuccess }
-  }, [logs, isSuccess])
+  return React.useMemo(() => ({
+    add(input: { date: string; time?: string; text: string; type: EntryType }, after?: () => void) {
+      const label = `${input.date}${input.time ? ' ' + input.time : ''}`
+      write({
+        text: `[SCHEDULE] ${input.type}: ${input.text} (${label})`,
+        event: 'calendar_entry',
+        metadata: { date: input.date, text: input.text, entryType: input.type, ...(input.time ? { time: input.time } : {}) },
+      }, after)
+    },
+    done(e: CalendarEntry, stage: AlertStage | 'MANUAL' = 'MANUAL') {
+      if (e.done) return
+      write({
+        text: `[DONE] ${e.type}: ${e.text} (${stamp(e)})`,
+        event: 'calendar_done',
+        metadata: { entryId: e.id, date: e.date, time: e.time, text: e.text, stage: 'DONE', from: stage, at: Date.now() },
+      })
+    },
+    snooze(e: CalendarEntry, minutes = SNOOZE_MIN) {
+      const until = Date.now() + minutes * 60_000
+      const gen = (e.snoozeGen || 0) + 1
+      const hhmm = new Date(until).toTimeString().slice(0, 5)
+      write({
+        text: `[SNOOZE +${minutes}m] ${e.type}: ${e.text} → ${hhmm}`,
+        event: 'calendar_snooze',
+        metadata: { entryId: e.id, date: e.date, time: e.time, text: e.text, stage: `SNOOZE +${minutes}M`, until, gen, minutes },
+      })
+    },
+    cancel(e: CalendarEntry) {
+      write({
+        text: `[SCRUB] ${e.type}: ${e.text} (${stamp(e)})`,
+        event: 'calendar_cancel',
+        metadata: { entryId: e.id, date: e.date, time: e.time, text: e.text, stage: 'SCRUBBED' },
+      })
+    },
+    alert(e: CalendarEntry, stage: AlertStage, key: string) {
+      write({
+        text: `[ALERT ${stage}] ${e.type}: ${e.text} (${stamp(e)})`,
+        event: 'calendar_alert',
+        metadata: { key, entryId: e.id, stage, date: e.date, time: e.time, text: e.text, entryType: e.type, gen: e.snoozeGen || 0 },
+      })
+    },
+  }), [write])
 }
