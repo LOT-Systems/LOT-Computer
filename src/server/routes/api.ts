@@ -7,6 +7,7 @@
  */
 
 import { Op, Sequelize } from 'sequelize'
+import { MAX_EMAIL_LENGTH } from '#shared/email'
 import { FastifyInstance, FastifyRequest } from 'fastify'
 import seedrandom from 'seedrandom'
 import {
@@ -378,6 +379,11 @@ export default async (fastify: FastifyInstance) => {
             attributes: ['id'],
           })
           write({ event, data: { ...payload, isLiked: !!myLike } })
+          break
+        }
+        case 'email': {
+          // Private: only the recipient's connection receives it
+          if (data.receiverId === req.user.id) write({ event, data })
           break
         }
         case 'settings_updated': {
@@ -3967,6 +3973,135 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error calculating community emotion:', error)
       return reply.status(500).send({ error: 'Failed to calculate community emotion' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — internal member mail. Compose: Log `/email to <name>`.
+  // Read: Sync. Recipients are found by first name (or "First Last").
+  // ============================================================================
+
+  const emailName = (u: { firstName?: string | null; lastName?: string | null } | null | undefined) =>
+    u ? `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown' : 'Unknown'
+
+  fastify.post('/emails', async (req: FastifyRequest<{
+    Body: { to?: string; toUserId?: string; body: string }
+  }>, reply) => {
+    try {
+      if (req.user.tags?.some((t: string) => t.toLowerCase() === 'suspended')) {
+        return reply.status(403).send({ error: 'Account suspended' })
+      }
+      const body = (req.body?.body || '').trim().slice(0, MAX_EMAIL_LENGTH)
+      if (!body) return reply.status(400).send({ error: 'Email body is empty' })
+
+      let receiver: InstanceType<typeof fastify.models.User> | null = null
+      if (req.body.toUserId) {
+        receiver = await fastify.models.User.findByPk(req.body.toUserId)
+      } else {
+        const to = (req.body.to || '').trim().toLowerCase()
+        if (!to) return reply.status(400).send({ error: 'Recipient is required' })
+        const candidates = (await fastify.models.User.findAll({
+          where: Sequelize.where(
+            Sequelize.fn('lower', Sequelize.fn('concat_ws', ' ', Sequelize.col('firstName'), Sequelize.col('lastName'))),
+            { [Op.like]: `${to.replace(/[%_\\]/g, '\\$&')}%` }
+          ),
+          limit: 10,
+        })).filter(
+          (u) => u.id !== req.user.id && !u.tags?.some((t: string) => t.toLowerCase() === 'suspended')
+        )
+        const exact = candidates.filter((u) => (u.firstName || '').toLowerCase() === to || emailName(u).toLowerCase() === to)
+        const pool = exact.length ? exact : candidates
+        if (pool.length === 0) return reply.status(404).send({ error: `No member named "${req.body.to}"` })
+        if (pool.length > 1) {
+          return reply.status(409).send({
+            error: `Several members match "${req.body.to}" — use first and last name`,
+            candidates: pool.map((u) => emailName(u)),
+          })
+        }
+        receiver = pool[0]
+      }
+      if (!receiver) return reply.status(404).send({ error: 'Recipient not found' })
+      if (receiver.id === req.user.id) return reply.status(400).send({ error: 'Cannot email yourself' })
+
+      const email = await fastify.models.Email.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        body,
+      })
+      const payload = {
+        id: email.id,
+        senderId: req.user.id,
+        senderName: emailName(req.user),
+        receiverId: receiver.id,
+        receiverName: emailName(receiver),
+        body: email.body,
+        readAt: null,
+        createdAt: email.createdAt,
+      }
+      sync.emit('email', payload)
+
+      process.nextTick(async () => {
+        try {
+          const context = await getLogContext(req.user)
+          await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'email_sent',
+            text: '',
+            metadata: { emailId: email.id, receiverId: receiver!.id },
+            context,
+          })
+        } catch (logError) {
+          console.error('Error logging email:', logError)
+        }
+      })
+
+      return reply.send({ ...payload, isMine: true })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  // Inbox + sent, newest first
+  fastify.get('/emails', async (req: FastifyRequest, reply) => {
+    try {
+      const rows = await fastify.models.Email.findAll({
+        where: { [Op.or]: [{ receiverId: req.user.id }, { senderId: req.user.id }] },
+        order: [['createdAt', 'DESC']],
+        limit: 100,
+      })
+      const ids = Array.from(new Set(rows.flatMap((r) => [r.senderId, r.receiverId])))
+      const users = ids.length ? await fastify.models.User.findAll({ where: { id: ids } }) : []
+      const byId = new Map(users.map((u) => [u.id, u]))
+      return reply.send(
+        rows.map((r) => ({
+          id: r.id,
+          senderId: r.senderId,
+          senderName: emailName(byId.get(r.senderId)),
+          receiverId: r.receiverId,
+          receiverName: emailName(byId.get(r.receiverId)),
+          body: r.body,
+          readAt: r.readAt,
+          createdAt: r.createdAt,
+          isMine: r.senderId === req.user.id,
+        }))
+      )
+    } catch (error) {
+      console.error('Error fetching emails:', error)
+      return reply.status(500).send({ error: 'Failed to fetch emails' })
+    }
+  })
+
+  // Mark one (id) or all received emails as read
+  fastify.post('/emails/read', async (req: FastifyRequest<{ Body: { id?: string } }>, reply) => {
+    try {
+      const where: any = { receiverId: req.user.id, readAt: null }
+      if (req.body?.id) where.id = req.body.id
+      await fastify.models.Email.update({ readAt: new Date() }, { where })
+      return reply.ok()
+    } catch (error) {
+      console.error('Error marking emails read:', error)
+      return reply.status(500).send({ error: 'Failed to mark read' })
     }
   })
 

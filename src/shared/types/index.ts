@@ -451,3 +451,16 @@ export type SyncEvents = {
   chatMessageLike: ChatMessageLikeEventPayload;
   settings_updated: Record<string, never>;
 };
+
+// LOT® Email — internal mail between members (composed in Log, read in Sync)
+export type PublicEmail = {
+  id: string;
+  senderId: string;
+  senderName: string;
+  receiverId: string;
+  receiverName: string;
+  body: string;
+  readAt: Date | string | null;
+  createdAt: Date | string;
+  isMine: boolean;
+};

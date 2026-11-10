@@ -20,6 +20,7 @@ import {
   Log,
   Paginated,
   PublicChatMessage,
+  PublicEmail,
   User,
   UserProfile,
   UserSettings,
@@ -91,6 +92,19 @@ export const useCreateChatMessage = createMutation<{ message: string }, void>(
 export const useLikeChatMessage = createMutation<ChatMessageLikePayload, void>(
   'post',
   '/api/chat-messages/like'
+)
+
+// LOT® Email
+export const useEmails = createQuery<PublicEmail[]>('/api/emails')
+
+export const useSendEmail = createMutation<
+  { to?: string; toUserId?: string; body: string },
+  PublicEmail
+>('post', '/api/emails')
+
+export const useMarkEmailsRead = createMutation<{ id?: string }, void>(
+  'post',
+  '/api/emails/read'
 )
 
 export interface DirectMessageRecord {

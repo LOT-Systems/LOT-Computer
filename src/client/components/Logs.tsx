@@ -9,7 +9,7 @@
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
-import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
+import { Block, Button, GhostButton, ResizibleGhostInput, Unknown } from '#client/components/ui'
 import { useLogs, useUpdateLog } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
@@ -33,7 +33,9 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useSendEmail } from '#client/queries'
+import { parseEmailCommand } from '#shared/email'
+import { useQueryClient } from 'react-query'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3707,6 +3709,44 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+
+  // LOT® Email: `/email to <name>: message` — send with Ctrl+Enter or the button.
+  const emailCmd = React.useMemo(() => parseEmailCommand(value), [value])
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const lastSentEmailRef = React.useRef<string>('')
+  const queryClientForEmail = useQueryClient()
+  const { mutate: sendEmail, isLoading: emailSending } = useSendEmail({
+    onSuccess: (data) => {
+      setEmailStatus(`SENT → ${data.receiverName}`)
+      queryClientForEmail.invalidateQueries(['/api/emails'])
+    },
+    onError: (err: any) => {
+      lastSentEmailRef.current = ''
+      const d = err?.response?.data
+      setEmailStatus(
+        d?.error
+          ? `NOT SENT — ${d.error}${d.candidates ? ': ' + d.candidates.join(', ') : ''}`
+          : 'NOT SENT — network error'
+      )
+    },
+  })
+  const sendEmailFromLog = React.useCallback(() => {
+    const cmd = parseEmailCommand(valueRef.current)
+    if (!cmd || !cmd.body || emailSending) return false
+    const key = `${cmd.to}\n${cmd.body}`
+    if (lastSentEmailRef.current === key) return false // already sent this exact email
+    lastSentEmailRef.current = key
+    setEmailStatus('SENDING…')
+    sendEmail({ to: cmd.to, body: cmd.body })
+    return true
+  }, [emailSending, sendEmail])
+  React.useEffect(() => {
+    // Editing the command after a send re-arms it
+    const key = emailCmd ? `${emailCmd.to}\n${emailCmd.body}` : ''
+    if (key !== lastSentEmailRef.current) setEmailStatus(null)
+  }, [emailCmd])
+  const sendEmailRef = React.useRef(sendEmailFromLog)
+  sendEmailRef.current = sendEmailFromLog
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3911,6 +3951,7 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        sendEmailRef.current()
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -4139,6 +4180,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to X   Email a member — Ctrl+Enter sends (read in Sync)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4384,6 +4426,23 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailCmd && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60 flex items-center gap-x-8">
+                <span>
+                  → {emailCmd.to}
+                  {emailCmd.body ? '' : ' — type your message'}
+                </span>
+                {emailStatus ? (
+                  <span>{emailStatus}</span>
+                ) : emailCmd.body ? (
+                  <GhostButton onClick={() => sendEmailFromLog()}>Send (Ctrl+Enter)</GhostButton>
+                ) : null}
+              </div>
             </Block>
           </div>
         )}
