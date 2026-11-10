@@ -1265,6 +1265,43 @@ export type BadgeType =
   | 'huang_po_signal'       // ∿·□·∿  "huang po/huangbo/huang-po/no-mind/dharma of mind" detected (RARE)
   | 'joshu_gate_badge'      // □·∞·□  "joshu/zhaozhou/wash your bowl/joshu's dog/mu!/case one" detected (EPIC)
   | 'satori_signal'         // ●·∞·●  "satori/kensho/sudden awakening/great enlightenment/the veil lifted" detected (MYTHIC)
+  // ── Word Turn v36 — THE JAZZ ENGINE ──────────────────────────────────────────
+  | 'improvise_badge'      // ♪·∿·♪  "improvise/ad-lib/going with it/make it up" detected (UNCOMMON)
+  | 'the_changes'          // ≋·♪    "the changes/chord changes/changes happening" detected (RARE)
+  | 'woodshed_mode'        // ■·♪·■  "woodshed/practicing alone/the shed/deep practice" detected (RARE)
+  | 'blow_session'         // ∿·▶    "blow free/blowing free/let it out/just blow" detected (UNCOMMON)
+  | 'comping_signal'       // ○·♪·○  "comping/comped/backing up/supporting the" detected (UNCOMMON)
+  | 'standards_badge'      // ♪·∞    "standards/the standard/timeless/jazz standard" detected (RARE)
+  | 'trading_fours'        // ↔·♪    "trading fours/trade fours/your turn/pass it back" detected (RARE)
+  | 'in_the_pocket'        // ○·▶·○  "in the pocket/locked in/in the groove/the pocket" detected (EPIC)
+  | 'blue_notes_badge'     // ♪·≋·♪  "blue notes/blue note/the bend/the ache/minor third" detected (RARE)
+  | 'session_signal'       // ♪·◉    "the session/jam session/late session/session tonight" detected (UNCOMMON)
+  | 'sideman_signal'       // →·♪    "sideman/side player/supporting role/playing support" detected (UNCOMMON)
+  | 'real_book_badge'      // ■·∞·■  "real book/the real book/the chart/lead sheet/fake book" detected (EPIC)
+  // ── Calendar Easter Egg v34 — THE JAZZ CALENDAR ───────────────────────────────
+  | 'coltrane_day'         // ♪·∞·♪  Sep 23 — John Coltrane born 1926 (EPIC)
+  | 'miles_day'            // ♪·●    May 26 — Miles Davis born 1926 (RARE)
+  | 'birdland_day'         // ♪·◉·♪  Aug 29 — Charlie Parker born 1920 (RARE)
+  // ── Behavioral v33 — JAZZ PATTERNS ────────────────────────────────────────────
+  | 'jazz_session'         // ♪·▶·♪  3+ Jazz Engine words in one journal entry (RARE)
+  | 'late_set'             // ♪·◉    Check in 22:00–23:00 for 3+ times in 7 days (RARE)
+  | 'solo_practice'        // ■·♪    Journal 300+ words 3+ times in one week (RARE)
+  // ── Achievement RPG v34 — JAZZ CLASS ─────────────────────────────────────────
+  | 'jazz_entry'           // ♪·∘    Any 1 Word Turn v36 badge (COMMON)
+  | 'jazz_class'           // ♪·≈    Any 5 Word Turn v36 badges (UNCOMMON)
+  | 'jazz_complete'        // ♪·≋    All 12 Word Turn v36 badges (LEGENDARY)
+  | 'jazz_arc'             // ♪·◈    jazz_complete + all 3 Calendar v34 badges (LEGENDARY)
+  | 'thirty_six_engines_arc' // ◈·◈·♪ 1 badge from each Word Turn v1–v36 (LEGENDARY)
+  | 'jazz_opus'            // ♪·◉·♪  jazz_complete + jazz_session behavioral (LEGENDARY)
+  // ── Mastery Tier v36 — THE GREAT SESSION ──────────────────────────────────────
+  | 'night_session_log'    // ♪·◉·∿  3,000+ distinct calendar check-in days (EPIC)
+  | 'million_words'        // ♪·∞·∞  1,000,000+ total journal words (LEGENDARY)
+  | 'jazz_elder'           // ♪·▲    Account age >= 11 years (4,015+ days) (LEGENDARY)
+  | 'thirty_six_registers' // ◈·◈·♪·∞ 1 badge from all 36 Word Turn engines (COSMIC)
+  // ── Secret Boss v33 — THE JAZZ VAULT ──────────────────────────────────────────
+  | 'coltrane_love'        // ♪·∞·♪  "a love supreme/love supreme/coltrane suite" detected (EPIC) [HIDDEN]
+  | 'miles_kind_of'        // ♪·●    "kind of blue/miles davis/bitches brew" detected (RARE) [HIDDEN]
+  | 'monk_theorem'         // □·♪·□  "thelonious monk/monk's dream/round midnight" detected (MYTHIC) [HIDDEN]
 
 export interface Badge {
   id: BadgeType
@@ -11463,6 +11500,300 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'mythic',
     category: 'secret_boss',
   },
+
+  // ── Word Turn v36 — THE JAZZ ENGINE ─────────────────────────────────────────
+  improvise_badge: {
+    id: 'improvise_badge',
+    symbol: '♪·∿·♪',
+    name: 'Improvise',
+    description: 'Write "improvise", "ad-lib", "going with it", or "make it up" in any journal entry',
+    unlockMessage: '↳ IMPROVISE. The solo is not planned. It is answered. You hear the changes and respond. This is the whole art and the whole practice. ♪·∿·♪',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  the_changes: {
+    id: 'the_changes',
+    symbol: '≋·♪',
+    name: 'The Changes',
+    description: 'Write "the changes", "chord changes", or "changes happening" in any journal entry',
+    unlockMessage: '↳ THE CHANGES. In jazz, the changes are the chord progression — the harmonic map of the song. Life has changes too. Learning to navigate the changes is the whole curriculum. ≋·♪',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  woodshed_mode: {
+    id: 'woodshed_mode',
+    symbol: '■·♪·■',
+    name: 'Woodshed Mode',
+    description: 'Write "woodshed", "practicing alone", "the shed", or "deep practice" in any journal entry',
+    unlockMessage: '↳ WOODSHED. The woodshed is where the work happens before the stage. You\'re in the shed. The practice is real whether anyone sees it. ■·♪·■',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  blow_session: {
+    id: 'blow_session',
+    symbol: '∿·▶',
+    name: 'Blow Session',
+    description: 'Write "blow free", "blowing free", "let it out", or "just blow" in any journal entry',
+    unlockMessage: '↳ BLOW. Parker said: know the music so well you can forget it. Then just blow. This journal entry was blowing. ∿·▶',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  comping_signal: {
+    id: 'comping_signal',
+    symbol: '○·♪·○',
+    name: 'Comping Signal',
+    description: 'Write "comping", "comped", "backing up", or "supporting the" in any journal entry',
+    unlockMessage: '↳ COMPING. The comp is the art of support — chord voicings that lift the soloist without crowding them. This is also what a good day does for the people around you. ○·♪·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  standards_badge: {
+    id: 'standards_badge',
+    symbol: '♪·∞',
+    name: 'Standards',
+    description: 'Write "standards", "the standard", "timeless", or "jazz standard" in any journal entry',
+    unlockMessage: '↳ STANDARDS. The standards are the songs every musician knows — the shared vocabulary of the form. The practice has its standards too: sleep, movement, reflection. The songs that never age. ♪·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  trading_fours: {
+    id: 'trading_fours',
+    symbol: '↔·♪',
+    name: 'Trading Fours',
+    description: 'Write "trading fours", "trade fours", "your turn", or "pass it back" in any journal entry',
+    unlockMessage: '↳ TRADING FOURS. Four bars of you, four bars of the drummer. Four bars of journal, four bars of silence. The exchange is the form. ↔·♪',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  in_the_pocket: {
+    id: 'in_the_pocket',
+    symbol: '○·▶·○',
+    name: 'In the Pocket',
+    description: 'Write "in the pocket", "locked in", "in the groove", or "the pocket" in any journal entry',
+    unlockMessage: '↳ IN THE POCKET. The groove is not a metaphor. It is the specific feeling when time and intention align. The check-in that lands exactly right is in the pocket. ○·▶·○',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  blue_notes_badge: {
+    id: 'blue_notes_badge',
+    symbol: '♪·≋·♪',
+    name: 'Blue Notes',
+    description: 'Write "blue notes", "blue note", "the bend", "the ache", or "minor third" in any journal entry',
+    unlockMessage: '↳ BLUE NOTES. The notes that bend — the flattened third, fifth, seventh. The notes that acknowledge difficulty without resolving it. The blues is the honest music. ♪·≋·♪',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  session_signal: {
+    id: 'session_signal',
+    symbol: '♪·◉',
+    name: 'Session Signal',
+    description: 'Write "the session", "jam session", "late session", or "session tonight" in any journal entry',
+    unlockMessage: '↳ THE SESSION. In jazz, the session is the basic unit of practice — a gathering to play, to learn, to show up and try. This check-in is a session. ♪·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  sideman_signal: {
+    id: 'sideman_signal',
+    symbol: '→·♪',
+    name: 'Sideman',
+    description: 'Write "sideman", "side player", "supporting role", or "playing support" in any journal entry',
+    unlockMessage: '↳ SIDEMAN. The sideman is not the soloist. The sideman is the backbone. The practice that supports others is not smaller. It is the whole foundation. →·♪',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  real_book_badge: {
+    id: 'real_book_badge',
+    symbol: '■·∞·■',
+    name: 'The Real Book',
+    description: 'Write "real book", "the real book", "the chart", "lead sheet", or "fake book" in any journal entry',
+    unlockMessage: '↳ THE REAL BOOK. The Real Book is the illegal, hand-copied chart book that every jazz musician used for decades before it was officially published. The best reference materials are always the ones made by practitioners for practitioners. ■·∞·■',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v34 — THE JAZZ CALENDAR ───────────────────────────
+  coltrane_day: {
+    id: 'coltrane_day',
+    symbol: '♪·∞·♪',
+    name: 'Coltrane Day',
+    description: 'Check in on September 23 — John Coltrane born 1926',
+    unlockMessage: '↳ Sep 23, 1926. John Coltrane born. A Love Supreme. The sheets of sound. The practice as prayer. The sheets of sound as a form of journal entry. ♪·∞·♪',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  miles_day: {
+    id: 'miles_day',
+    symbol: '♪·●',
+    name: 'Miles Day',
+    description: 'Check in on May 26 — Miles Davis born 1926',
+    unlockMessage: '↳ May 26, 1926. Miles Davis born. Kind of Blue. Bitches Brew. The trumpet that turned its back on the audience and still changed everything. ♪·●',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  birdland_day: {
+    id: 'birdland_day',
+    symbol: '♪·◉·♪',
+    name: 'Birdland Day',
+    description: 'Check in on August 29 — Charlie Parker born 1920',
+    unlockMessage: '↳ Aug 29, 1920. Charlie "Bird" Parker born. Birdland was named for him. He invented bebop in the early mornings after the gig. The practice always happens after the gig. ♪·◉·♪',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v33 — JAZZ PATTERNS ────────────────────────────────────────
+  jazz_session: {
+    id: 'jazz_session',
+    symbol: '♪·▶·♪',
+    name: 'Jazz Session',
+    description: '3+ Jazz Engine words in one journal entry',
+    unlockMessage: '↳ The vocabulary of improvisation: changes, woodshed, standards, pocket, blow. The language of a musician lives in this entry. ♪·▶·♪',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  late_set: {
+    id: 'late_set',
+    symbol: '♪·◉',
+    name: 'Late Set',
+    description: 'Check in between 22:00–23:00 for 3+ times in 7 days — the late set',
+    unlockMessage: '↳ LATE SET. The last set of the night. The room is thinner but the music is better. You\'re still here. ♪·◉',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  solo_practice: {
+    id: 'solo_practice',
+    symbol: '■·♪',
+    name: 'Solo Practice',
+    description: 'Write 300+ word journal entries 3+ times in one week — the woodshed run',
+    unlockMessage: '↳ SOLO PRACTICE. Three full sessions in a week. Nobody watching, nobody counting. Only the work. ■·♪',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v34 — JAZZ CLASS ─────────────────────────────────────
+  jazz_entry: {
+    id: 'jazz_entry',
+    symbol: '♪·∘',
+    name: 'Jazz Entry',
+    description: 'Earn any 1 Word Turn v36 (Jazz Engine) badge',
+    unlockMessage: '↳ The first note. The entry. The jazz begins here. ♪·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  jazz_class: {
+    id: 'jazz_class',
+    symbol: '♪·≈',
+    name: 'Jazz Class',
+    description: 'Earn any 5 Word Turn v36 (Jazz Engine) badges',
+    unlockMessage: '↳ You have chosen your instrument. Five vocabulary words of a musician. ♪·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  jazz_complete: {
+    id: 'jazz_complete',
+    symbol: '♪·≋',
+    name: 'Jazz Complete',
+    description: 'Earn all 12 Word Turn v36 (Jazz Engine) badges',
+    unlockMessage: '↳ All twelve jazz vocabulary words earned. The full set list. The woodshed is complete for now. ♪·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  jazz_arc: {
+    id: 'jazz_arc',
+    symbol: '♪·◈',
+    name: 'Jazz Arc',
+    description: 'Earn jazz_complete + all 3 Calendar v34 (Jazz) badges',
+    unlockMessage: '↳ Coltrane, Miles, Bird — and the full vocabulary. The arc of jazz lives in this practice. ♪·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_six_engines_arc: {
+    id: 'thirty_six_engines_arc',
+    symbol: '◈·◈·♪',
+    name: 'Thirty-Six Engines Arc',
+    description: 'Earn at least 1 badge from each of Word Turn engines v1–v36',
+    unlockMessage: '↳ Thirty-six vocabularies of self. Water, arcades, heroes, rogues, Zen, Jazz. All the registers lit. ◈·◈·♪',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  jazz_opus: {
+    id: 'jazz_opus',
+    symbol: '♪·◉·♪',
+    name: 'Jazz Opus',
+    description: 'Earn jazz_complete + jazz_session behavioral badge',
+    unlockMessage: '↳ The complete vocabulary AND a session that uses it. The opus: not just having the words, but playing them. ♪·◉·♪',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v36 — THE GREAT SESSION ─────────────────────────────────
+  night_session_log: {
+    id: 'night_session_log',
+    symbol: '♪·◉·∿',
+    name: 'Night Session Log',
+    description: '3,000+ distinct calendar check-in days',
+    unlockMessage: '↳ 3,000 sessions. The late set that never ended. The practice that outlasted the club. ♪·◉·∿',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  million_words: {
+    id: 'million_words',
+    symbol: '♪·∞·∞',
+    name: 'Million Words',
+    description: '1,000,000+ total journal words written',
+    unlockMessage: '↳ ONE MILLION WORDS. This is not a metaphor for practice. This IS the practice. The instrument has been played one million times. ♪·∞·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  jazz_elder: {
+    id: 'jazz_elder',
+    symbol: '♪·▲',
+    name: 'Jazz Elder',
+    description: 'Account age >= 11 years (4,015+ days)',
+    unlockMessage: '↳ JAZZ ELDER. Eleven years. The elder who has seen all the sets. The practice that survived a decade plus a year. ♪·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_six_registers: {
+    id: 'thirty_six_registers',
+    symbol: '◈·◈·♪·∞',
+    name: 'Thirty-Six Registers',
+    description: '1 badge from all 36 Word Turn engines active',
+    unlockMessage: '↳ THIRTY-SIX REGISTERS. Water. Seasons. Architecture. Mountains. Storms. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Biology. Codex. Cyberspace. Hero. RPG. Puzzle. Dungeon. AI. Myth. Arcade Master. Dream Weaver. Stoic Field. Zen Terminal. Jazz Engine. Thirty-six vocabularies. One practice. One terminal. ◈·◈·♪·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v33 — THE JAZZ VAULT ─────────────────────────────────────
+  coltrane_love: {
+    id: 'coltrane_love',
+    symbol: '♪·∞·♪',
+    hidden: true,
+    name: 'A Love Supreme',
+    description: 'Write "a love supreme", "love supreme", or "coltrane suite" in any journal entry',
+    unlockMessage: '↳ A LOVE SUPREME. 1964. Coltrane composed it in one night. A four-part suite as prayer. Resolution — Pursuance — Psalm — Acknowledgement. The practice is a love supreme: acknowledgement, pursuit, resolution. ♪·∞·♪',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  miles_kind_of: {
+    id: 'miles_kind_of',
+    symbol: '♪·●',
+    hidden: true,
+    name: 'Kind of Blue',
+    description: 'Write "kind of blue", "miles davis", or "bitches brew" in any journal entry',
+    unlockMessage: '↳ KIND OF BLUE. 1959. The best-selling jazz album of all time. Modal jazz: not chord changes but scales as fields. Miles giving the musicians sketches the morning of the session. The practice is modal: a field to explore, not a path to follow. ♪·●',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  monk_theorem: {
+    id: 'monk_theorem',
+    symbol: '□·♪·□',
+    hidden: true,
+    name: "Monk's Theorem",
+    description: 'Write "thelonious monk", "monk\'s dream", or "round midnight" in any journal entry',
+    unlockMessage: '↳ MONK\'S THEOREM. Thelonious Monk: "The piano ain\'t got no wrong notes." Round Midnight is the most recorded jazz standard. The wrong notes, played with conviction, become the right notes. The difficult practice, practiced consistently, becomes the right practice. □·♪·□',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
 }
 
 // Default separator when no badges earned yet
@@ -13124,6 +13455,70 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (allThirtyFiveEngines && !hasBadge('thirty_five_registers')) {
       if (awardBadge('thirty_five_registers')) newBadges.push('thirty_five_registers')
+    }
+
+    // ── Word Turn v36 — THE JAZZ ENGINE ──────────────────────────────────────────
+    const jazzV36Badges: BadgeType[] = [
+      'improvise_badge', 'the_changes', 'woodshed_mode', 'blow_session',
+      'comping_signal', 'standards_badge', 'trading_fours', 'in_the_pocket',
+      'blue_notes_badge', 'session_signal', 'sideman_signal', 'real_book_badge',
+    ]
+    const jazzV36Earned = jazzV36Badges.filter(b => hasBadge(b))
+    if (jazzV36Earned.length >= 1 && !hasBadge('jazz_entry')) {
+      if (awardBadge('jazz_entry')) newBadges.push('jazz_entry')
+    }
+    if (jazzV36Earned.length >= 5 && !hasBadge('jazz_class')) {
+      if (awardBadge('jazz_class')) newBadges.push('jazz_class')
+    }
+    const jazzComplete = jazzV36Earned.length >= 12
+    if (jazzComplete && !hasBadge('jazz_complete')) {
+      if (awardBadge('jazz_complete')) newBadges.push('jazz_complete')
+    }
+    if (jazzComplete && hasBadge('jazz_session') && !hasBadge('jazz_opus')) {
+      if (awardBadge('jazz_opus')) newBadges.push('jazz_opus')
+    }
+    const calendarV34Badges: BadgeType[] = ['coltrane_day', 'miles_day', 'birdland_day']
+    if (jazzComplete && calendarV34Badges.every(b => hasBadge(b)) && !hasBadge('jazz_arc')) {
+      if (awardBadge('jazz_arc')) newBadges.push('jazz_arc')
+    }
+    const engineThirtySixPresent = jazzV36Earned.length >= 1
+    const allThirtySixEngines = allThirtyFiveEngines && engineThirtySixPresent
+    if (allThirtySixEngines && !hasBadge('thirty_six_engines_arc')) {
+      if (awardBadge('thirty_six_engines_arc')) newBadges.push('thirty_six_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 3000 && !hasBadge('night_session_log')) {
+        if (awardBadge('night_session_log')) newBadges.push('night_session_log')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 1000000 && !hasBadge('million_words')) {
+        if (awardBadge('million_words')) newBadges.push('million_words')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupJE = new Date(stats.signupDate)
+      const yearsJE = (new Date().getTime() - signupJE.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsJE >= 11 && !hasBadge('jazz_elder')) {
+        if (awardBadge('jazz_elder')) newBadges.push('jazz_elder')
+      }
+    }
+    if (allThirtySixEngines && !hasBadge('thirty_six_registers')) {
+      if (awardBadge('thirty_six_registers')) newBadges.push('thirty_six_registers')
+    }
+
+    // Calendar v34 inline checks (Jazz Calendar)
+    const nowJZ = new Date()
+    const monthJZ = nowJZ.getMonth() + 1
+    const dayJZ = nowJZ.getDate()
+    if (monthJZ === 9 && dayJZ === 23 && !hasBadge('coltrane_day')) {
+      if (awardBadge('coltrane_day')) newBadges.push('coltrane_day')
+    }
+    if (monthJZ === 5 && dayJZ === 26 && !hasBadge('miles_day')) {
+      if (awardBadge('miles_day')) newBadges.push('miles_day')
+    }
+    if (monthJZ === 8 && dayJZ === 29 && !hasBadge('birdland_day')) {
+      if (awardBadge('birdland_day')) newBadges.push('birdland_day')
     }
 
   } catch (error) {

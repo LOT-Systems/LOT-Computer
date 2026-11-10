@@ -4391,3 +4391,127 @@ export function checkZenVault(text: string): BadgeType[] {
   }
   return awarded
 }
+
+// ── Jazz Engine v36 — word turn + behavioral checks ───────────────────────────
+
+const JAZZ_WORDS_V36 = [
+  /\bimprovise\b|\bad[\s-]?lib\b|\bgoing[\s-]?with[\s-]?it\b|\bmake[\s-]?it[\s-]?up\b/i,
+  /\bthe[\s-]?changes\b|\bchord[\s-]?changes\b|\bchanges[\s-]?happening\b/i,
+  /\bwoodshed\b|\bpracticing[\s-]?alone\b|\bthe[\s-]?shed\b|\bdeep[\s-]?practice\b/i,
+  /\bblow[\s-]?free\b|\bblowing[\s-]?free\b|\blet[\s-]?it[\s-]?out\b|\bjust[\s-]?blow\b/i,
+  /\bcomping\b|\bcomped\b|\bbacking[\s-]?up\b|\bsupporting[\s-]?the\b/i,
+  /\bjazz[\s-]?standard\b|\bthe[\s-]?standard\b|\btimeless[\s-]?song\b|\bstandards\b/i,
+  /\btrading[\s-]?fours\b|\btrade[\s-]?fours\b|\byour[\s-]?turn\b|\bpass[\s-]?it[\s-]?back\b/i,
+  /\bin[\s-]?the[\s-]?pocket\b|\blocked[\s-]?in\b|\bin[\s-]?the[\s-]?groove\b|\bthe[\s-]?pocket\b/i,
+  /\bblue[\s-]?notes?\b|\bthe[\s-]?bend\b|\bthe[\s-]?ache\b|\bminor[\s-]?third\b/i,
+  /\bthe[\s-]?session\b|\bjam[\s-]?session\b|\blate[\s-]?session\b|\bsession[\s-]?tonight\b/i,
+  /\bsideman\b|\bside[\s-]?player\b|\bsupporting[\s-]?role\b|\bplaying[\s-]?support\b/i,
+  /\breal[\s-]?book\b|\bthe[\s-]?real[\s-]?book\b|\bthe[\s-]?chart\b|\blead[\s-]?sheet\b|\bfake[\s-]?book\b/i,
+]
+
+const JAZZ_SECRET_WORDS: { regex: RegExp; badge: BadgeType }[] = [
+  { regex: /\ba[\s-]?love[\s-]?supreme\b|\blove[\s-]?supreme\b|\bcoltrane[\s-]?suite\b/i, badge: 'coltrane_love' },
+  { regex: /\bkind[\s-]?of[\s-]?blue\b|\bmiles[\s-]?davis\b|\bbitches[\s-]?brew\b/i, badge: 'miles_kind_of' },
+  { regex: /\bthelonious[\s-]?monk\b|\bmonk'?s[\s-]?dream\b|\bround[\s-]?midnight\b/i, badge: 'monk_theorem' },
+]
+
+const JAZZ_WORD_MAP: { regex: RegExp; badge: BadgeType }[] = [
+  { regex: /\bimprovise\b|\bad[\s-]?lib\b|\bgoing[\s-]?with[\s-]?it\b|\bmake[\s-]?it[\s-]?up\b/i, badge: 'improvise_badge' },
+  { regex: /\bthe[\s-]?changes\b|\bchord[\s-]?changes\b|\bchanges[\s-]?happening\b/i, badge: 'the_changes' },
+  { regex: /\bwoodshed\b|\bpracticing[\s-]?alone\b|\bthe[\s-]?shed\b|\bdeep[\s-]?practice\b/i, badge: 'woodshed_mode' },
+  { regex: /\bblow[\s-]?free\b|\bblowing[\s-]?free\b|\blet[\s-]?it[\s-]?out\b|\bjust[\s-]?blow\b/i, badge: 'blow_session' },
+  { regex: /\bcomping\b|\bcomped\b|\bbacking[\s-]?up\b|\bsupporting[\s-]?the\b/i, badge: 'comping_signal' },
+  { regex: /\bjazz[\s-]?standard\b|\bthe[\s-]?standard\b|\btimeless[\s-]?song\b|\bstandards\b/i, badge: 'standards_badge' },
+  { regex: /\btrading[\s-]?fours\b|\btrade[\s-]?fours\b|\byour[\s-]?turn\b|\bpass[\s-]?it[\s-]?back\b/i, badge: 'trading_fours' },
+  { regex: /\bin[\s-]?the[\s-]?pocket\b|\blocked[\s-]?in\b|\bin[\s-]?the[\s-]?groove\b|\bthe[\s-]?pocket\b/i, badge: 'in_the_pocket' },
+  { regex: /\bblue[\s-]?notes?\b|\bthe[\s-]?bend\b|\bthe[\s-]?ache\b|\bminor[\s-]?third\b/i, badge: 'blue_notes_badge' },
+  { regex: /\bthe[\s-]?session\b|\bjam[\s-]?session\b|\blate[\s-]?session\b|\bsession[\s-]?tonight\b/i, badge: 'session_signal' },
+  { regex: /\bsideman\b|\bside[\s-]?player\b|\bsupporting[\s-]?role\b|\bplaying[\s-]?support\b/i, badge: 'sideman_signal' },
+  { regex: /\breal[\s-]?book\b|\bthe[\s-]?real[\s-]?book\b|\bthe[\s-]?chart\b|\blead[\s-]?sheet\b|\bfake[\s-]?book\b/i, badge: 'real_book_badge' },
+]
+
+/** Scan journal text for all 12 Jazz Engine (v36) word turns + 3 secret boss words. */
+export function checkJazzWordTurns(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  for (const { regex, badge } of JAZZ_WORD_MAP) {
+    if (!hasBadge(badge) && regex.test(journalText)) {
+      awardBadge(badge)
+      awarded.push(badge)
+    }
+  }
+  for (const { regex, badge } of JAZZ_SECRET_WORDS) {
+    if (!hasBadge(badge) && regex.test(journalText)) {
+      awardBadge(badge)
+      awarded.push(badge)
+    }
+  }
+  return awarded
+}
+
+/** Award jazz_session badge if 3+ Jazz Engine (v36) words appear in one journal entry. */
+export function checkJazzSession(journalText: string): BadgeType | null {
+  if (hasBadge('jazz_session')) return null
+  const matchCount = JAZZ_WORDS_V36.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('jazz_session')
+    return 'jazz_session'
+  }
+  return null
+}
+
+/** Award late_set badge if user checks in 22:00–23:00 for 3+ times in 7 days. */
+export function checkLateSet(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('late_set')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour < 22 || hour >= 23) return null
+
+  try {
+    const key = 'late_set_timestamps'
+    const stored = localStorage.getItem(key)
+    const timestamps: string[] = stored ? JSON.parse(stored) : []
+    timestamps.push(now.toISOString())
+    localStorage.setItem(key, JSON.stringify(timestamps.slice(-100)))
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    const lateCheckins = timestamps.filter(ts => {
+      const d = new Date(ts)
+      return d >= sevenDaysAgo && d.getHours() >= 22 && d.getHours() < 23
+    })
+    if (lateCheckins.length >= 3) {
+      awardBadge('late_set')
+      return 'late_set'
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+/** Award solo_practice badge if journal 300+ words written 3+ times in one week. */
+export function checkSoloPractice(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('solo_practice')) return null
+
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount < 300) return null
+
+  try {
+    const key = 'solo_practice_dates'
+    const stored = localStorage.getItem(key)
+    const dates: string[] = stored ? JSON.parse(stored) : []
+    const today = new Date().toISOString().split('T')[0]
+    if (!dates.includes(today)) {
+      dates.push(today)
+      localStorage.setItem(key, JSON.stringify(dates.slice(-365)))
+    }
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    const recentDates = dates.filter(d => d >= sevenDaysAgo)
+    if (recentDates.length >= 3) {
+      awardBadge('solo_practice')
+      return 'solo_practice'
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
