@@ -28,14 +28,18 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, formatSystemHelp, type LogTrigger, type ArcadeStatus } from '#client/utils/logTriggers'
+import { parseStoryHorizon } from '#shared/utils/story-compression'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
-import { getEarnedBadges, BADGES } from '#client/utils/badges'
+import { getEarnedBadges, BADGES, getLevelName, getLevelSymbol, getNextBadgeUnlock } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
+
+/** Grace period after typing `/story` so a horizon argument can follow. */
+const STORY_ARG_SETTLE_MS = 1200
 
 const localStore = {
   logById: map<Record<string, Log>>({}),
@@ -3741,7 +3745,11 @@ const NoteEditor = ({
   })
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
-      setStoryResponse(data.story)
+      setStoryResponse(
+        data.header && data.header.length
+          ? data.header.join('\n') + '\n\n' + data.story
+          : data.story
+      )
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -3932,7 +3940,16 @@ const NoteEditor = ({
   // editing around an existing trigger doesn't re-fire it.
   // --------------------------------------------------------------------
   const lastTriggerScanRef = React.useRef(log.text || '')
+  // /story waits for its horizon argument ("/story month") before firing:
+  // the trigger is detected on the bare "/story" keystroke, so we settle
+  // for STORY_ARG_SETTLE_MS and read the latest text then.
+  const latestTypedRef = React.useRef(log.text || '')
+  const storyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  React.useEffect(() => () => {
+    if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+  }, [])
   React.useEffect(() => {
+    latestTypedRef.current = value
     const fresh = detectNewTriggers(value, lastTriggerScanRef.current)
     lastTriggerScanRef.current = value
     if (fresh.length === 0) return
@@ -4121,48 +4138,51 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        let arcade: ArcadeStatus | null = null
+        try {
+          const earned = getEarnedBadges()
+          // Arcade rank = highest streak milestone badge earned (milestone_7 … milestone_365)
+          const topMilestone = earned
+            .map(b => /^milestone_(\d+)$/.exec(b))
+            .filter((m): m is RegExpExecArray => !!m)
+            .map(m => Number(m[1]))
+            .sort((a, b) => b - a)[0] || 0
+          const next = getNextBadgeUnlock()
+          arcade = {
+            rank: topMilestone ? getLevelName(topMilestone) || null : null,
+            symbol: topMilestone ? getLevelSymbol(topMilestone) || null : null,
+            badges: earned.length,
+            next: next ? next.name : null,
+          }
+        } catch {
+          arcade = null
+        }
+        setSystemHelp(formatSystemHelp(arcade))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
+        if (!storyLoading && !storyTimerRef.current) {
           setStoryLoading(true)
           setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
+          storyTimerRef.current = setTimeout(() => {
+            storyTimerRef.current = null
+            const text = latestTypedRef.current
+            const horizon = parseStoryHorizon(text)
+            const logText = text
+              .replace(/\/story(\s+(day|d|today|24h|week|w|7d|month|m|30d|year|y|365d)\b)?/i, '')
+              .replace(/📖/g, '')
+              .trim()
+            try {
+              submitStory({
+                logText,
+                horizon,
+                quantumState: getUserState(),
+                userIndex: getUserIndex(),
+              })
+            } catch {
+              submitStory({ logText, horizon })
+            }
+          }, STORY_ARG_SETTLE_MS)
         }
       }
     }

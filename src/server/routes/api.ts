@@ -43,6 +43,20 @@ import { generateUserNarrative } from '#server/utils/rpg-narrative'
 import { generateChatCatalysts, generateConversationStarters, shouldShowChatCatalyst } from '#server/utils/cohort-chat-catalyst'
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
+import {
+  compressLogs,
+  formatDigestForPrompt,
+  formatDigestHeader,
+  parseStoryHorizon,
+  HORIZON_MS,
+  HORIZON_WORDS,
+  STORY_HORIZONS,
+  type StoryHorizon,
+} from '#shared/utils/story-compression'
+
+/** Row cap for /story compression — keeps a year-long query bounded. */
+const STORY_MAX_ROWS = 2000
+const STORY_MAX_TOKENS: Record<StoryHorizon, number> = { day: 384, week: 512, month: 640, year: 768 }
 import { registerOSRoutes } from './os-api.js'
 
 // ============================================================================
@@ -5490,6 +5504,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          horizon?: StoryHorizon
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,30 +5529,34 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      const horizon: StoryHorizon = STORY_HORIZONS.includes(req.body.horizon as StoryHorizon)
+        ? (req.body.horizon as StoryHorizon)
+        : parseStoryHorizon(`/story ${req.body.horizon || ''}`)
 
+      // Compression window: every signal inside the horizon, capped so a
+      // year-long story stays bounded. Digest is deterministic; only the
+      // digest (never raw rows) is forwarded to the AI vendor.
+      const now = new Date()
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: new Date(now.getTime() - HORIZON_MS[horizon]) },
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: STORY_MAX_ROWS,
       })
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
+      const digest = compressLogs(
+        logs.map(l => ({
+          event: l.event,
+          text: l.text,
+          createdAt: l.createdAt,
+          context: l.context as any,
+          metadata: l.metadata as any,
+        })),
+        horizon,
+        now
+      )
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
@@ -5547,33 +5566,30 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const words = HORIZON_WORDS[horizon]
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's recorded moments into a short narrative.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator invoked /story ${horizon}. Your task: compress their last ${horizon} into 1-3 paragraphs (under ${words} words). Every log was recorded with its environmental context (place, weather, moon) — use it as the setting, not as decoration.
 
 RULES:
 - Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
+- Draw only from the compressed digest below — never invent events
+- Name the HIGH PEAK and LOW PEAK if present; they are the spine of the story
+- Reflect the mood drift: rising, falling or steady across the ${horizon}
+- If there are gaps (long silence, few active days), acknowledge them with compassion
+- If self-care was consistent, acknowledge the discipline plainly
+- Tone matches current energy: reflective if low, energized if high
 - End with a single forward-looking sentence — not a pep talk, just a quiet truth
 - Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- If the digest has no signals, write two quiet sentences that the ${horizon} was unrecorded and the system is listening.`
 
       const dataBlock = `
 OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
+COMPRESSED DIGEST:
+${formatDigestForPrompt(digest)}`
 
       const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
 
@@ -5583,7 +5599,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
 
         console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
 
-        const story = await engine.generateCompletion(fullPrompt, 512)
+        const story = await engine.generateCompletion(fullPrompt, STORY_MAX_TOKENS[horizon])
 
         const cleaned = story.trim().replace(/^["']|["']$/g, '')
 
@@ -5597,6 +5613,8 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
             story: cleaned,
             logText: (logText || '').substring(0, 500),
             quantumState: quantumState || null,
+            horizon,
+            digest: { ...digest, excerpts: undefined },
             timestamp: new Date().toISOString(),
           },
         })
@@ -5604,12 +5622,16 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          horizon,
+          header: formatDigestHeader(digest),
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
         return {
           story: 'The system holds your data quietly. When the engine returns, your story will be here.',
           logId: null,
+          horizon,
+          header: formatDigestHeader(digest),
         }
       }
     }

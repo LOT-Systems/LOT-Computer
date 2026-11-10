@@ -115,3 +115,82 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+// ---------------------------------------------------------------------------
+// COMMAND REGISTRY — single source of truth for `/system`
+// ---------------------------------------------------------------------------
+
+export interface LogCommand {
+  usage: string        // as typed, e.g. "/story [day|week|month|year]"
+  description: string
+  trigger: LogTrigger
+  group: 'NARRATIVE' | 'INTELLIGENCE' | 'SELF-CARE' | 'ENVIRONMENT'
+}
+
+export const LOG_COMMANDS: LogCommand[] = [
+  { usage: '/story [day|week|month|year]', description: 'Compressed story of your horizon (default week)', trigger: 'story-mode', group: 'NARRATIVE' },
+  { usage: '/prayer',      description: 'Contextual scripture for this moment',   trigger: 'prayer-mode',    group: 'NARRATIVE' },
+  { usage: '/how',         description: 'Open LOT AI check-in (System tab)',      trigger: 'how-checkin',    group: 'NARRATIVE' },
+  { usage: '/qi [query]',  description: 'Ask the Quantum Intelligence engine',    trigger: 'qi-rfi',         group: 'INTELLIGENCE' },
+  { usage: '/scan',        description: 'System status overview',                 trigger: 'ai-scan',        group: 'INTELLIGENCE' },
+  { usage: '/qos',         description: 'Quantum OS state analysis',              trigger: 'qos-report',     group: 'INTELLIGENCE' },
+  { usage: '/assembly',    description: 'Self-assembly module status',            trigger: 'assembly-check', group: 'INTELLIGENCE' },
+  { usage: '/phys',        description: 'Physiological cohort report',            trigger: 'phys-report',    group: 'INTELLIGENCE' },
+  { usage: '/sil',         description: 'Signal silence check',                   trigger: 'sil-check',      group: 'INTELLIGENCE' },
+  { usage: '/breathe',     description: '4-2-6 breathing exercise',               trigger: 'breathe',        group: 'SELF-CARE' },
+  { usage: '/freeze',      description: 'Pause and reflect protocol',             trigger: 'freeze-widgets', group: 'SELF-CARE' },
+  { usage: '/fast',        description: 'Orthodox fasting calendar',              trigger: 'force-fast',     group: 'SELF-CARE' },
+  { usage: '/silent',      description: 'Quiet mode — acknowledge silence',       trigger: 'silent-mode',    group: 'SELF-CARE' },
+  { usage: '/synth',       description: 'Toggle keyboard sound',                  trigger: 'toggle-synth',   group: 'ENVIRONMENT' },
+  { usage: '/radio',       description: 'Toggle radio',                           trigger: 'radio-toggle',   group: 'ENVIRONMENT' },
+  { usage: '/night',       description: 'Dark mode',                              trigger: 'night-mode',     group: 'ENVIRONMENT' },
+  { usage: '/system',      description: 'This command list',                      trigger: 'system-help',    group: 'ENVIRONMENT' },
+]
+
+/** Emoji shortcuts derived from RULES so they never drift from detection. */
+export function getEmojiShortcuts(): Array<{ emoji: string; trigger: LogTrigger }> {
+  return RULES.filter(r => r.emojis.length).map(r => ({ emoji: r.emojis[0], trigger: r.trigger }))
+}
+
+export interface ArcadeStatus {
+  rank: string | null       // current level name, null before first milestone
+  symbol: string | null
+  badges: number
+  next: string | null       // next badge unlock name
+}
+
+/**
+ * Renders the `/system` screen. Pure — Logs.tsx supplies the Arcade
+ * status so this module stays free of stores/localStorage.
+ */
+export function formatSystemHelp(arcade?: ArcadeStatus | null): string {
+  const width = 30
+  const lines: string[] = ['LOT® LOG — COMMAND GRID', '']
+  const groups: LogCommand['group'][] = ['NARRATIVE', 'INTELLIGENCE', 'SELF-CARE', 'ENVIRONMENT']
+  for (const g of groups) {
+    lines.push(g)
+    LOG_COMMANDS.filter(c => c.group === g).forEach(c => {
+      lines.push(`${c.usage.padEnd(width, ' ')}${c.description}`)
+    })
+    lines.push('')
+  }
+  const emojiTriggers = getEmojiShortcuts()
+  if (emojiTriggers.length) {
+    lines.push('EMOJI')
+    lines.push(emojiTriggers.map(e => {
+      const cmd = LOG_COMMANDS.find(c => c.trigger === e.trigger)
+      return `${e.emoji} ${cmd ? cmd.usage.split(' ')[0] : 'cohort support'}`
+    }).join('   '))
+    lines.push('')
+  }
+  if (arcade) {
+    lines.push('ARCADE')
+    lines.push(`${'RANK'.padEnd(width, ' ')}${arcade.rank ? `${arcade.symbol ? arcade.symbol + ' ' : ''}${arcade.rank}` : 'INITIATE — first milestone at 7 days'}`)
+    lines.push(`${'BADGES'.padEnd(width, ' ')}${arcade.badges}`)
+    if (arcade.next) lines.push(`${'NEXT UNLOCK'.padEnd(width, ' ')}${arcade.next}`)
+    lines.push('')
+  }
+  lines.push('SHORTCUTS')
+  lines.push(`${'Ctrl+Enter'.padEnd(width, ' ')}Save log immediately`)
+  return lines.join('\n')
+}
