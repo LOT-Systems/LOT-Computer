@@ -35,7 +35,7 @@ const fastify = Fastify({
   logger: false  // Temporarily disable logging for development
 })
 
-const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/api', '/sync', '/log']
+const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/api', '/sync', '/log', '/basics']
 
 // Plugins
 fastify.register(fastifyCookie)
@@ -185,6 +185,15 @@ fastify.get('/u/:userIdOrUsername', async function (req, reply) {
 
   return reply.view('generic-spa', {
     scriptName: 'public-profile',
+    scriptNonce: reply.cspNonce.script,
+    styleNonce: reply.cspNonce.style,
+  })
+})
+
+// OPEN TAB — public BASIC ration ledger (no authentication)
+fastify.get('/open', async (req, reply) => {
+  return reply.view('generic-spa', {
+    scriptName: 'open',
     scriptNonce: reply.cspNonce.script,
     styleNonce: reply.cspNonce.style,
   })

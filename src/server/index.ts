@@ -48,7 +48,7 @@ const fastify = Fastify({
   bodyLimit: 1_048_576,
 })
 
-const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log']
+const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log', '/basics']
 
 // ==============================================================================
 // SECURITY PLUGINS
@@ -221,6 +221,15 @@ fastify.get('/health', async (request, reply) => {
 
 // Public API routes (no authentication required)
 fastify.register(publicApiRoutes, { prefix: '/api/public' })
+
+// OPEN TAB — public BASIC ration ledger (no authentication)
+fastify.get('/open', async (req, reply) => {
+  return reply.view('generic-spa', {
+    scriptName: 'open',
+    scriptNonce: reply.cspNonce.script,
+    styleNonce: reply.cspNonce.style,
+  })
+})
 
 // Public status page route (no authentication required)
 fastify.get('/status', async (req, reply) => {
