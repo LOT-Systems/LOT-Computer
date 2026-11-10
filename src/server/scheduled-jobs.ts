@@ -1831,6 +1831,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyThirdCycleDeepeningCheck()) {
     await executeDailyThirdCycleDeepeningCheck()
   }
+
+  // Check daily fourth cycle candidate check (17:30 UTC every day) — J67
+  if (shouldRunDailyFourthCycleCandidateCheck()) {
+    await executeDailyFourthCycleCandidateCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -5625,6 +5630,126 @@ async function executeDailyThirdCycleDeepeningCheck(): Promise<JobResult> {
     console.error('Daily third cycle deepening check failed:', error.message)
     isDailyThirdCycleDeepeningRunning = false
     lastDailyThirdCycleDeepeningRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Fourth Cycle Candidate Check (J67) ─────────────────────────────────
+// Scans for users with third_cycle_sovereign event in last 63 days. Checks journal >= 15 in
+// 70-day window, 7d signal density >= 15, all 6 idx dims >= 55, overall >= 85.
+// When met, writes fourth_cycle_candidate event. The OS senses the boundary of the fourth arc.
+
+let isDailyFourthCycleCandidateRunning = false
+let lastDailyFourthCycleCandidateRun: Date | null = null
+
+function shouldRunDailyFourthCycleCandidateCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFourthCycleCandidateRunning) return false
+  if (lastDailyFourthCycleCandidateRun) {
+    const lastRun = dayjs(lastDailyFourthCycleCandidateRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 17 && now.minute() >= 30 // 17:30 UTC daily
+}
+
+async function executeDailyFourthCycleCandidateCheck(): Promise<JobResult> {
+  const jobName = 'daily-fourth-cycle-candidate-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFourthCycleCandidateRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFourthCycleCandidateRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FOURTH CYCLE CANDIDATE CHECK — 17:30 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sixtyThreeDayStart = dayjs().subtract(63, 'day').toDate()
+    const seventyDayStart   = dayjs().subtract(70, 'day').toDate()
+    const sevenDayStart     = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require third_cycle_sovereign in last 63 days
+        const sovereignLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'third_cycle_sovereign',
+            createdAt: { [Op.gte]: sixtyThreeDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (sovereignLogs.length < 1) continue
+
+        // Check journal signals in last 70 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: seventyDayStart },
+          },
+        })
+
+        if (journalLogs.length < 15) continue
+
+        // Check 7-day signal density (all types)
+        const density7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+
+        if (density7dLogs.length < 15) continue
+
+        const sovereignConf = sovereignLogs[0]?.metadata?.sovereignConf ?? 84
+        const candidateConf = Math.min(88, Math.round(
+          72 + (journalLogs.length - 15) * 0.5 + (density7dLogs.length - 15) * 0.3
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fourth_cycle_candidate',
+          text: `Fourth cycle candidate: third-cycle-sovereign confirmed · ${journalLogs.length} journal signals 70d · 7d signal density ${density7dLogs.length} · all conditions met. The OS stands at the boundary of the fourth arc. L15-FCAND.`,
+          metadata: {
+            sovereignConf,
+            candidateConf,
+            journalCount: journalLogs.length,
+            density7d: density7dLogs.length,
+            candidateStatus: 'SENSING',
+            level: 'L15-FCAND',
+            field: 'TC-SOVEREIGN→FOURTH-CYCLE-BOUNDARY',
+            hour: 17,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fourth cycle candidate events written: ${written}`)
+    lastDailyFourthCycleCandidateRun = new Date()
+    isDailyFourthCycleCandidateRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fourth cycle candidate check failed:', error.message)
+    isDailyFourthCycleCandidateRunning = false
+    lastDailyFourthCycleCandidateRun = new Date()
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

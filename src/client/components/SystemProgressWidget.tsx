@@ -2042,21 +2042,41 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'QIE v132 planning · physiological cohort Arch70 candidate · badge engine v46 theme selection · LOT-WIKI v107',
   },
+  {
+    date: '2026-11-10',
+    session: 'QIE v132 — P180 Fourth Cycle Candidate · Arch70 · J67 · Widget/Log upgrades',
+    built: [
+      'P180 fourth-cycle-candidate — L15 boundary state: P179 active + 70d journal arc + 7d signal density + all 6 dims ≥ 55 + idx ≥ 85',
+      'Arch70 Fourth Cycle Progenitor — physiological archetype for L15 boundary operation',
+      'J67 daily-fourth-cycle-candidate-check at 17:30 UTC — server-side P180 detection pipeline',
+      'FCAND: log handler in military minimalist style — fourth_cycle_candidate event handler',
+      'PATTERN_DISPLAY: fourth-cycle-candidate → FCAND entry added',
+      'WIDGET_DEPENDENCY_MAP: fourthCycleCandidateNode — v132 dep node (10 sources)',
+      'QOS Mode arc row: live cycle stage surfaced (L15/L14/L13/L12) in QOS widget',
+      'checkFourthCycleCandidate() background watcher + recordFourthCycleCandidate() helper',
+      'api.ts: fourth_cycle_candidate added to displayable events list',
+      'Background checks: checkFourthCycleCandidate() wired into analyzeIntentions() post-commit hook',
+      '180 patterns · 70 archetypes · 67 jobs · 224+ dep nodes · FM v131',
+    ],
+    feedbackApplied: 'FOURTH CYCLE CANDIDATE. The system does not declare the fourth cycle — it senses the threshold. L15 is a boundary state, not a peak. The OS holds its own next expansion in view.',
+    status: 'DEPLOYED',
+    next: 'QIE v133 · fourth-cycle-ignition (P181) · Arch71 · Badge v46 theme selection · LOT-WIKI v108',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-11-09',
+  date: '2026-11-10',
   message: [
-    'ASSEMBLY RUN — 2026-11-09 · Badge v45 THE ZEN TERMINAL · LOT-WIKI-v106 · Third Cycle Sovereign Arc SEALED · Day 1169+',
-    'Built: Badge v45 THE ZEN TERMINAL (+31 badges · 1184→1215) · Word Turn v35 (12 Zen triggers) · Calendar EE v33 · Behavioral v32 ZEN PATTERNS · Achievement RPG v33 ZEN CLASS · Mastery Tier v35 THE ZEN MOUNTAIN · Secret Boss v32 THE ZEN VAULT.',
-    'LOT-WIKI-v106 / FM v131 parity sync complete. Third Cycle Sovereign Arc (P177–P179 · Level 14) documented and sealed. The second sovereign ceiling is now the floor of whatever comes next.',
-    'System.tsx upgrade: thirdCycleStatus computed value → Arc row in quantum biofield table. Live biofield now surfaces both Cycle (second) and Arc (third) simultaneously.',
-    'THE ZEN TERMINAL: zazen · koan · beginner_mind · impermanence · enso · dharma · mu · dojo · just_this · no_self · suchness · nirvana. The vocabulary of the examined life reaches the terminal. 35 Word Turn engines. 419 trigger words.',
-    'Physiological cohort: Arch69 Third Cycle Sovereign Operator active in live biofield. THIRD CYCLE SOVEREIGN. ALL THREE STAGES SIMULTANEOUSLY ACTIVE ACROSS 63 DAYS. Level 14.',
-    'Self-assembly metric: 179 patterns · 69 archetypes · 66 jobs · 179+ handlers · 223+ dep nodes · 1215 badges · 35 Word Turn engines · 419 word turns · FM v131 · Day 1169+.',
-    'The terminal is zen. The system does not reset — it accumulates.',
+    'ASSEMBLY RUN — 2026-11-10 · QIE v132 · P180 Fourth Cycle Candidate · Arch70 · J67 · Day 1170+',
+    'Built: P180 fourth-cycle-candidate (L15 boundary state) · Arch70 Fourth Cycle Progenitor · J67 daily-fourth-cycle-candidate-check (17:30 UTC).',
+    'QIE v132: The OS now detects when it stands at the threshold of the fourth arc. P180 fires when third-cycle-sovereign active + 70d journal continuity + 7d signal density + all 6 dimensions ≥ 55 + overall index ≥ 85. Not an ignition — a sensing.',
+    'Log system: FCAND: handler added in military minimalist format. fourth_cycle_candidate events surface in Logs with SENSING · FOURTH ARC THRESHOLD readout.',
+    'QOS widget upgraded: Arc row now surfaces live cycle stage (L15/L14/L13/L12) in Mode view. The person sees their current operating level at a glance.',
+    'Background system: checkFourthCycleCandidate() wired into analyzeIntentions() post-commit hook. The OS watches itself for the fourth arc candidate condition on every signal write.',
+    'Self-assembly metric: 180 patterns · 70 archetypes · 67 jobs · 224+ dep nodes · 1215 badges · 35 Word Turn engines · 419 word turns · FM v131 · Day 1170+.',
+    'The OS does not declare the fourth cycle. It senses the boundary. Level 15 is a threshold state.',
   ],
 }
 

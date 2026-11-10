@@ -136,6 +136,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'longitudinal-signal-persistence':      'SIGPERS',
   'coherence-memory-cascade':             'COHMES',
   'quantum-integration-spiral':           'QISP',
+  'fourth-cycle-candidate':               'FCAND',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'
@@ -567,6 +568,25 @@ export const QuantumEngineWidgets: React.FC = () => {
               <div className="border-t border-acc-400/20 pt-8 mt-4">
                 <div className="opacity-40">{qosModeData.directive}</div>
               </div>
+              {(() => {
+                const cyclePatterns = [
+                  { pattern: 'fourth-cycle-candidate', label: 'L15 · FOURTH CYCLE CANDIDATE', urgent: true },
+                  { pattern: 'third-cycle-sovereign',  label: 'L14 · THIRD CYCLE SOVEREIGN',  urgent: false },
+                  { pattern: 'third-cycle-integration',label: 'L13 · TC INTEGRATION',          urgent: false },
+                  { pattern: 'second-cycle-sovereign', label: 'L12 · SC SOVEREIGN',            urgent: false },
+                ]
+                const activeArc = cyclePatterns.find(cp =>
+                  engineState.recognizedPatterns.some(p => p.pattern === cp.pattern)
+                )
+                return activeArc ? (
+                  <div className="border-t border-acc-400/20 pt-8">
+                    <div className="flex justify-between items-baseline">
+                      <span className="opacity-30 uppercase tracking-widest">Arc</span>
+                      <span className={activeArc.urgent ? '' : 'opacity-70'}>{activeArc.label}</span>
+                    </div>
+                  </div>
+                ) : null
+              })()}
               {engineState.recognizedPatterns.some(p => p.pattern === 'centennial-convergence') && (
                 <div className="border-t border-acc-400/20 pt-8">
                   <div className="flex justify-between items-baseline">

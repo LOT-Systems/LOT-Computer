@@ -1259,6 +1259,8 @@ export default async (fastify: FastifyInstance) => {
       'third_cycle_deepening',
       'third_cycle_integration',
       'third_cycle_sovereign',
+      // v132: fourth cycle candidate (P180)
+      'fourth_cycle_candidate',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

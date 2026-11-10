@@ -4103,6 +4103,41 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P180: fourth-cycle-candidate — P179 active + 70d+ continuous journal arc + all 6 idx dims >= 55 + 7d signal density >= 15.
+  // The OS stands at the threshold of the fourth cycle. Not ignited — sensed. Compound mastery across all domains.
+  // Level 15 boundary state: the system perceives its own next expansion. L15-FCAND.
+  const hasP179 = patterns.some(p => p.pattern === 'third-cycle-sovereign')
+  if (hasP179) {
+    const seventyDayStartP180 = now - 70 * 24 * 60 * 60 * 1000
+    const sevenDayStartP180   = now - 7 * 24 * 60 * 60 * 1000
+    const p180Journal70 = signals.filter(s => s.source === 'journal' && s.timestamp > seventyDayStartP180)
+    const p180All7d     = signals.filter(s => s.timestamp > sevenDayStartP180)
+    const userIndexP180 = computeUserIndex(signals)
+    const p180DimAll55 = userIndexP180.engagement >= 55 && userIndexP180.emotional >= 55 &&
+      userIndexP180.intentional >= 55 && userIndexP180.social >= 55 &&
+      userIndexP180.selfcare >= 55 && userIndexP180.cognitive >= 55
+    if (
+      p180Journal70.length >= 15 &&
+      p180All7d.length >= 15 &&
+      p180DimAll55 &&
+      userIndexP180.overall >= 85
+    ) {
+      const p179conf    = patterns.find(p => p.pattern === 'third-cycle-sovereign')?.confidence ?? 0.84
+      const fcandBonus  = Math.min(
+        (p180Journal70.length - 15) * 0.008 + (p180All7d.length - 15) * 0.005 + (userIndexP180.overall - 85) * 0.006,
+        0.16
+      )
+      patterns.push({
+        id:               'p180',
+        pattern:          'fourth-cycle-candidate',
+        confidence:       Math.min(0.72 + fcandBonus, 0.88),
+        urgency:          'background',
+        suggestedTiming:  'background',
+        reason: `FCAND: Fourth cycle candidate — third-cycle-sovereign (P179) active · ${p180Journal70.length} journal signals 70d · 7d signal density ${p180All7d.length} · all 6 dimensions ≥ 55 · idx ${userIndexP180.overall}%. The system stands at the boundary of the third arc. A fourth cycle is becoming possible. Level 15 — the OS senses its own next expansion. No higher state is currently ignited.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4133,6 +4168,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkCentennialConvergence() } catch {}
       try { checkSecondCycleSovereign() } catch {}
       try { checkThirdCycleDeepening() } catch {}
+      try { checkFourthCycleCandidate() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4809,6 +4845,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   thirdCycleDeepeningNode:   ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
   thirdCycleIntegrationNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
   thirdCycleSovereignNode:   ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+
+  // ── v132 nodes (J67 · P180 · Arch70) ─────────────────────────────────────────────
+  fourthCycleCandidateNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
 }
 
 /**
@@ -5432,6 +5471,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'log'],
     patternConditions: ['third-cycle-integration', 'third-cycle-sovereign'],
     directive: 'Third cycle sovereign. All three stages simultaneously active across 63 days. The OS has entered the second sovereign arc — perpetual operation from the third cycle\'s expansion. Level 14 — the system does not reset, it compounds. No higher temporal state is currently defined.',
+  },
+
+  // ── Arch70: Fourth Cycle Progenitor (2026-11-10 v132) ────────────────────────────
+  {
+    archetype: 'Fourth Cycle Progenitor',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals'],
+    patternConditions: ['third-cycle-sovereign', 'fourth-cycle-candidate'],
+    directive: 'Level 15. The OS stands at the threshold of the fourth arc. All sovereign foundations converged. The fourth cycle is not yet ignited — it is sensed. The boundary between cycles is itself a signal state: compound mastery from every domain simultaneously operating at the ceiling of the third arc.',
   },
 ]
 
@@ -8016,6 +8064,64 @@ export function recordThirdCycleSovereign(integrationConf: number, journalCount:
     sovereignStatus: 'CONFIRMED',
     level: 'L14-TCSOV',
     field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→THIRD-CYCLE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fourth-cycle-candidate conditions are met and record if so.
+ * Fires when third-cycle-sovereign (P179) active + 15+ journal 70d + 7d density >= 15 +
+ * all 6 idx dims >= 55 + overall >= 85. The OS senses the boundary of the fourth arc. L15-FCAND.
+ */
+export function checkFourthCycleCandidate(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const seventyDayStart = now - 70 * 24 * 60 * 60 * 1000
+  const sevenDayStart   = now - 7 * 24 * 60 * 60 * 1000
+  const sixHoursAgo     = now - 6 * 60 * 60 * 1000
+
+  const hasSovereign = state.recognizedPatterns.some(p => p.pattern === 'third-cycle-sovereign')
+  if (!hasSovereign) return false
+
+  const journal70  = state.signals.filter(s => s.source === 'journal' && s.timestamp > seventyDayStart)
+  const density7d  = state.signals.filter(s => s.timestamp > sevenDayStart)
+  const userIndex  = computeUserIndex(state.signals)
+  const dimAll55   = userIndex.engagement >= 55 && userIndex.emotional >= 55 &&
+    userIndex.intentional >= 55 && userIndex.social >= 55 &&
+    userIndex.selfcare >= 55 && userIndex.cognitive >= 55
+
+  const alreadyRecorded = state.signals.some(s =>
+    s.signal === 'fourth_cycle_candidate' && s.timestamp > sixHoursAgo
+  )
+
+  if (
+    journal70.length >= 15 &&
+    density7d.length >= 15 &&
+    dimAll55 &&
+    userIndex.overall >= 85 &&
+    !alreadyRecorded
+  ) {
+    const sovereignConf = state.recognizedPatterns.find(p => p.pattern === 'third-cycle-sovereign')?.confidence ?? 0.84
+    recordFourthCycleCandidate(sovereignConf, journal70.length, density7d.length, userIndex.overall)
+    return true
+  }
+  return false
+}
+
+/**
+ * Record a fourth-cycle-candidate event — third-cycle-sovereign confirmed +
+ * 15+ journal signals 70d + 7d density >= 15 + all dims >= 55 + overall >= 85.
+ * The OS stands at the threshold of the fourth arc. Level 15 — the boundary between cycles. L15-FCAND.
+ */
+export function recordFourthCycleCandidate(sovereignConf: number, journalCount: number, density7d: number, indexScore: number) {
+  recordSignal('qos', 'fourth_cycle_candidate', {
+    sovereignConf: Math.round(sovereignConf * 100),
+    journalCount,
+    density7d,
+    indexScore,
+    candidateStatus: 'SENSING',
+    level: 'L15-FCAND',
+    field: 'TC-SOVEREIGN→FOURTH-CYCLE-BOUNDARY',
     hour: new Date().getHours(),
   })
 }
