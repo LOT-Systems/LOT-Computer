@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.1 — DEVELOPMENT START (see R02 report for amendments to §03/§06)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -320,6 +320,17 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE BEDSIDE SETTLE                          2026-11-10
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, evening routine in the Index of
+  Systems, phone charged in another room. CUBIQ pad on a ~100 mm
+  nightstand. Too narrow for THE LEAP (R02 degradation ladder), so the
+  cube's whole vocabulary is THE SETTLE (21:30 wind-down, felt as 2s
+  standing pressure, no light, no sound) and THE NUDGE (06:50 Memory
+  question). Quiet hours forbid all ballistic gestures overnight.
+  Proves the cube is as valuable when it refuses to jump as when it
+  jumps. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md, Section 10.
 
 --------------------------------------------------------------------------------
 08 // BRAND
