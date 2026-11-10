@@ -228,8 +228,8 @@ AUTH             JWT · HTTP-only cookie · RESEND email
 │                                                                 │
 │  SYNTHESIS LAYER                                                │
 │  ─────────────────                                              │
-│  Badge Engine v44 · Memory Engine · Self-Assembly v18          │
-│  Word Turn Engine v34 · Citizen Index · Cohort Engine          │
+│  Badge Engine v45 · Memory Engine · Self-Assembly v18          │
+│  Word Turn Engine v35 · Citizen Index · Cohort Engine          │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -3826,7 +3826,11 @@ BADGE ENGINE v44          Achievement system. 1,184 badges. THE STOIC FIELD. FM 
                           THIRTY-FOUR ENGINES. Word Turn v34 (stoic philosophy vocabulary).
                           SECOND CYCLE: STOIC SOVEREIGN.
 
-BADGE UNIVERSE            1,184 badges / v44 / 408 trigger words / 124 secret boss
+BADGE ENGINE v45          Achievement system. 1,215 badges. THE ZEN TERMINAL. FM v131.
+                          THIRTY-FIVE ENGINES. Word Turn v35 (zen philosophy vocabulary).
+                          THIRD CYCLE: ZEN SOVEREIGN.
+
+BADGE UNIVERSE            1,215 badges / v45 / 419 trigger words / 127 secret boss
 
 CHRONO OPERATOR           Badge v37. 967 badges. Theme: the operator reads timelines.
                           Word Turn v27 (temporal sci-fi vocabulary). FM v118.
@@ -3887,7 +3891,7 @@ DUNGEON DELVER            Badge v38. 998 badges. Theme: the delver clears the du
 FIELD TEACHER             Arch57. L9 deepening. Crystallized knowledge flows
                           outward. The field teaches. FM v119.
 
-FM (FIELD MANUAL)         Complete technical specification. Current: v130.
+FM (FIELD MANUAL)         Complete technical specification. Current: v131.
                           Lives in src/client/components/About.tsx.
 
 GENFIELD:                 generative-field-activation (P165). FM v121.
