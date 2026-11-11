@@ -11,7 +11,7 @@ import { Block } from '#client/components/ui'
 import { ProgressBars } from '#client/utils/progressBars'
 import { useLogContext } from '#client/hooks/useLogContext'
 import { useStore } from '@nanostores/react'
-import { intentionEngine, classifyPhysiologicalCohort, getCircadianPhase, getUserState, getUserIndex } from '#client/stores/intentionEngine'
+import { intentionEngine, classifyPhysiologicalCohort, getCircadianPhase, getUserState, getUserIndex, getLatestAstrologyReading } from '#client/stores/intentionEngine'
 import { isRouteActive } from '#client/stores/router'
 
 interface CommunityPulse {
@@ -69,6 +69,8 @@ export function SystemPulseWidget() {
   }, [engineState.signals.length, engineState.userState.energy])
 
   const circadianPhase = React.useMemo(() => getCircadianPhase(), [])
+  // Astrology sync — the day's ambient reading from the QIE signal bus
+  const astroReading = React.useMemo(() => getLatestAstrologyReading(engineState.signals), [engineState.signals.length])
   const userIndex = React.useMemo(() => getUserIndex(), [engineState.userIndex?.overall])
 
   // Fetch pulse data
@@ -248,6 +250,12 @@ export function SystemPulseWidget() {
                 <span className="opacity-30 uppercase tracking-widest">Circadian</span>
                 <span className="capitalize">{circadianPhase}</span>
               </div>
+              {astroReading?.rokuyo && (
+                <div className="flex justify-between items-baseline">
+                  <span className="opacity-30 uppercase tracking-widest">Rokuyo</span>
+                  <span>{astroReading.rokuyo}{astroReading.resonanceMatch ? ' · in tune' : ''}</span>
+                </div>
+              )}
               {userIndex.overall > 0 && (
                 <div className="flex justify-between items-baseline">
                   <span className="opacity-30 uppercase tracking-widest">Index</span>

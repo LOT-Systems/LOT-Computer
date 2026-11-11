@@ -170,6 +170,8 @@ export type LogContext = {
   astroMoonIllumination?: number | null;
   astroHourlyZodiac?: string | null;
   astroWesternZodiac?: string | null;
+  // Rokuyo time-of-day window at log time (added 2026-11-11)
+  astroWindow?: 'favorable' | 'unfavorable' | null;
   [key: string]: any;
 };
 

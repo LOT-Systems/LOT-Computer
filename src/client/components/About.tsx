@@ -3978,17 +3978,36 @@ Ecosystem Synchrony signal: ecosystem_full_sync (all 5 nodes)`}</CodeBlock>
           </P>
           <div className="mb-16">
             <Row label="Sensho" value="Morning fortune — early action favored" />
-            <Row label="Tomobiki" value="Midday fortune — avoid funerals, good for celebrations" />
+            <Row label="Tomobiki" value="Morning and evening favored, midday (11–13) not — good for celebrations, avoid funerals" />
             <Row label="Senpu" value="Afternoon fortune — morning unlucky, afternoon favored" />
             <Row label="Butsumetsu" value="Unlucky day — day of Buddha's death, rest recommended" />
             <Row label="Taian" value="Most fortunate — all activities favored" />
-            <Row label="Shakku" value="Midday caution — morning and evening safe, noon risky" />
+            <Row label="Shakku" value="Caution day — only the Hour of the Horse (11–13) is favored" />
           </div>
 
           <SubHeading>Moon Phase</SubHeading>
           <P>
             Current lunar phase with illumination percentage. Computed from
-            astronomical algorithms, not API calls. Updates daily.
+            astronomical algorithms, not API calls. Re-derived every 15 minutes
+            while the tab is visible.
+          </P>
+
+          <SubHeading>Now Window</SubHeading>
+          <P>
+            Each rokuyo day carries traditional time-of-day guidance. The
+            widget combines today's rokuyo with the current hour and shows
+            whether this moment is favorable or unfavorable, with a short
+            note (e.g. "Now: favorable · act early" on a Sensho morning).
+            Read in the timezone saved on your profile.
+          </P>
+
+          <SubHeading>Your Rhythm</SubHeading>
+          <P>
+            Every log entry records the ambient reading it was written under.
+            After five such entries, the widget shows the rokuyo and moon
+            phase you most often log under, and marks the day "in tune" when
+            today matches. Ambient conditions only — no birth data is
+            collected or used.
           </P>
 
           {/* ── WEATHER SOUND SYSTEM ────────────────────────────────── */}

@@ -80,17 +80,156 @@ export function getHourlyZodiac(date: Date): string {
  * Simplified calculation based on Gregorian calendar
  */
 export function getRokuyo(date: Date): string {
-  // Known starting point: January 1, 2000 was Sensho (index 0)
-  const knownDate = new Date('2000-01-01')
-  const knownRokuyoIndex = 0
-
-  // Calculate days since known date
-  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
-
-  // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
-
+  // Known starting point: January 1, 2000 was Sensho (index 0).
+  // (2026-11-11 fix) Count whole *calendar* days from the date's own
+  // wall-clock Y/M/D. The previous version diffed against
+  // new Date('2000-01-01') — parsed as UTC midnight — so the rokuyo
+  // flipped at the user's UTC offset (e.g. 16:00 in California, 09:00 in
+  // Tokyo) instead of at local midnight.
+  const dayNumber = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000
+  const knownDayNumber = Date.UTC(2000, 0, 1) / 86400000
+  const daysDiff = Math.round(dayNumber - knownDayNumber)
+  const rokuyoIndex = ((daysDiff % 6) + 6) % 6
   return ROKUYO[rokuyoIndex]
+}
+
+export type RokuyoWindow = 'favorable' | 'unfavorable'
+
+/**
+ * Traditional time-of-day guidance for each rokuyo day, keyed to the
+ * current wall-clock hour. Sources the classic almanac rules:
+ *   Sensho      — morning favorable, afternoon not
+ *   Tomobiki    — morning & evening favorable, midday (11–13) not
+ *   Senpu       — morning not, afternoon favorable
+ *   Butsumetsu  — unfavorable all day
+ *   Taian       — favorable all day
+ *   Shakku      — only the Hour of the Horse (11–13) is favorable
+ */
+export function getRokuyoTiming(rokuyo: string, hour: number): { window: RokuyoWindow; note: string } {
+  const isMorning = hour < 12
+  const isMidday = hour >= 11 && hour < 13
+  switch (rokuyo) {
+    case 'Sensho':
+      return isMorning
+        ? { window: 'favorable', note: 'act early' }
+        : { window: 'unfavorable', note: 'morning has passed' }
+    case 'Tomobiki':
+      return isMidday
+        ? { window: 'unfavorable', note: 'pause at midday' }
+        : { window: 'favorable', note: 'shared things go well' }
+    case 'Senpu':
+      return isMorning
+        ? { window: 'unfavorable', note: 'wait for afternoon' }
+        : { window: 'favorable', note: 'afternoon opens' }
+    case 'Butsumetsu':
+      return { window: 'unfavorable', note: 'rest, close loops' }
+    case 'Taian':
+      return { window: 'favorable', note: 'good for beginnings' }
+    case 'Shakku':
+      return isMidday
+        ? { window: 'favorable', note: 'Hour of the Horse' }
+        : { window: 'unfavorable', note: 'favorable only 11–13' }
+    default:
+      return { window: 'unfavorable', note: '' }
+  }
+}
+
+/**
+ * Convert a real instant into a Date whose *local* getters
+ * (getHours/getDate/getMonth/getFullYear) return the wall-clock time in
+ * `timeZone`. Isomorphic (Intl only — no tz plugin needed on the client).
+ * Falls back to the instant itself when timeZone is missing/invalid.
+ */
+export function toWallClockInZone(instant: Date, timeZone?: string | null): Date {
+  if (!timeZone) return instant
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(instant)
+    const get = (type: string) => Number(parts.find(p => p.type === type)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'))
+  } catch {
+    return instant
+  }
+}
+
+export type AstrologyReading = {
+  hourlyZodiac: string
+  westernZodiac: string
+  rokuyo: string
+  moonPhase: string
+  moonIllumination: number
+  window: RokuyoWindow
+  windowNote: string
+}
+
+/**
+ * Single source of truth for the ambient reading — used by the dashboard
+ * block, the QIE astrology signal, and every Log context snapshot, so all
+ * three always agree. Calendar fields (rokuyo, zodiac hour, sign) are read
+ * in the user's timeZone; the moon phase uses the real instant (it is a
+ * global astronomical quantity, not a wall-clock one).
+ */
+export function getAstrologyReading(instant: Date = new Date(), timeZone?: string | null): AstrologyReading {
+  const wallClock = toWallClockInZone(instant, timeZone)
+  const moon = getMoonPhase(instant)
+  const rokuyo = getRokuyo(wallClock)
+  const timing = getRokuyoTiming(rokuyo, wallClock.getHours())
+  return {
+    hourlyZodiac: getHourlyZodiac(wallClock),
+    westernZodiac: getWesternZodiac(wallClock),
+    rokuyo,
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    window: timing.window,
+    windowNote: timing.note,
+  }
+}
+
+export type AstroResonance = {
+  sampleSize: number
+  topRokuyo: string | null
+  topMoonPhase: string | null
+  topZodiacHour: string | null
+  favorableShare: number | null // % of logs written in a favorable window
+}
+
+/**
+ * Personalization from the user's own Logs: which ambient conditions they
+ * actually show up under. Reads the astro* fields every log context has
+ * carried since 2026-07-27. Ambient only — no birth data involved.
+ */
+export function summarizeAstroResonance(
+  logs: Array<{ context?: Record<string, any> | null }>,
+  minSample = 5
+): AstroResonance {
+  const withAstro = logs.filter(l => l.context && l.context.astroRokuyo)
+  const empty: AstroResonance = { sampleSize: withAstro.length, topRokuyo: null, topMoonPhase: null, topZodiacHour: null, favorableShare: null }
+  if (withAstro.length < minSample) return empty
+  const top = (key: string): string | null => {
+    const counts: Record<string, number> = {}
+    for (const l of withAstro) {
+      const v = l.context![key]
+      if (typeof v === 'string' && v) counts[v] = (counts[v] || 0) + 1
+    }
+    let best: string | null = null
+    let bestCount = 0
+    for (const [k, c] of Object.entries(counts)) if (c > bestCount) { best = k; bestCount = c }
+    return best
+  }
+  const withWindow = withAstro.filter(l => l.context!.astroWindow === 'favorable' || l.context!.astroWindow === 'unfavorable')
+  return {
+    sampleSize: withAstro.length,
+    topRokuyo: top('astroRokuyo'),
+    topMoonPhase: top('astroMoonPhase'),
+    topZodiacHour: top('astroHourlyZodiac'),
+    favorableShare: withWindow.length >= minSample
+      ? Math.round((withWindow.filter(l => l.context!.astroWindow === 'favorable').length / withWindow.length) * 100)
+      : null,
+  }
 }
 
 /**

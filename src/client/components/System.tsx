@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getAstrologyReading, summarizeAstroResonance } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -203,40 +203,66 @@ export const System = React.memo(function SystemInner() {
   }, [])
 
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
-  // rokuyo), not a personal natal chart.
-  const astrology = React.useMemo(() => {
-    const now = new Date()
-    const hourlyZodiac = getHourlyZodiac(now)
-    const westernZodiac = getWesternZodiac(now)
-    const moonPhase = getMoonPhase(now)
-    const rokuyo = getRokuyo(now)
+  // rokuyo), not a personal natal chart. (2026-11-11) Read in the user's
+  // saved profile timeZone via the shared getAstrologyReading — the same
+  // reader the server uses for every Log context snapshot — so the block,
+  // the QIE signal and the Logs ASTRO line always agree, even when the
+  // device clock is set to a different zone than the profile.
+  const userTimeZone = me?.timeZone ?? null
+  const astrology = React.useMemo(
+    () => getAstrologyReading(new Date(), userTimeZone),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [astrologyTick, userTimeZone]
+  )
 
-    return {
-      hourlyZodiac,
-      westernZodiac,
-      moonPhase: moonPhase.phase,
-      moonIllumination: moonPhase.illumination,
-      rokuyo,
+  // Personal resonance — which ambient conditions this user actually logs
+  // under, derived from their own Logs' astro* context snapshots.
+  const astroResonance = React.useMemo(() => summarizeAstroResonance(logs), [logs])
+  const astroResonanceMatch =
+    !!astroResonance.topRokuyo &&
+    (astroResonance.topRokuyo === astrology.rokuyo || astroResonance.topMoonPhase === astrology.moonPhase)
+
+  // Calendar day in the user's zone — the once-per-day QIE throttle key.
+  const astrologyDayKey = React.useMemo(() => {
+    try {
+      return new Intl.DateTimeFormat('en-CA', userTimeZone ? { timeZone: userTimeZone } : {}).format(new Date())
+    } catch {
+      return dayjs().format('YYYY-MM-DD')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+  }, [astrologyTick, userTimeZone])
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
   React.useEffect(() => {
     if (typeof window === 'undefined') return
-    const today = dayjs().format('YYYY-MM-DD')
     const lastRecordedKey = 'astrology_signal_date'
-    if (localStorage.getItem(lastRecordedKey) === today) return
+    try {
+      if (localStorage.getItem(lastRecordedKey) === astrologyDayKey) return
+    } catch { /* storage blocked — still record */ }
     recordAstrologySignal(
       astrology.rokuyo,
       astrology.moonPhase,
       astrology.moonIllumination,
       astrology.hourlyZodiac,
-      astrology.westernZodiac
+      astrology.westernZodiac,
+      {
+        window: astrology.window,
+        resonantRokuyo: astroResonance.topRokuyo,
+        resonantMoonPhase: astroResonance.topMoonPhase,
+        resonanceMatch: astroResonanceMatch,
+      }
     )
-    localStorage.setItem(lastRecordedKey, today)
-  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac])
+    try { localStorage.setItem(lastRecordedKey, astrologyDayKey) } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [astrologyDayKey])
+
+  // Secondary lines for the block: rokuyo time-window guidance, and the
+  // user's own resonance (only once there are enough logs to say so).
+  const astrologyWindowLine = `Now: ${astrology.window} · ${astrology.windowNote}`
+  const astrologyResonanceLine = astroResonance.topRokuyo
+    ? `Your rhythm: ${astroResonance.topRokuyo} · ${astroResonance.topMoonPhase}${astroResonanceMatch ? ' — in tune today' : ''}`
+    : null
 
   const answerLogs = React.useMemo(() => {
     return logs.filter(log => log.event === 'answer')
@@ -465,7 +491,9 @@ export const System = React.memo(function SystemInner() {
         <div>
           <Block label="Astrology:">
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              <div>{astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)</div>
+              <div>{astrologyWindowLine}</div>
+              {astrologyResonanceLine && <div>{astrologyResonanceLine}</div>}
             </div>
           </Block>
         </div>
@@ -671,7 +699,9 @@ export const System = React.memo(function SystemInner() {
         >
           {astrologyView === 'astrology' ? (
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              <div>{astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)</div>
+              <div>{astrologyWindowLine}</div>
+              {astrologyResonanceLine && <div>{astrologyResonanceLine}</div>}
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>
@@ -693,6 +723,7 @@ export const System = React.memo(function SystemInner() {
                 { metric: 'Archetype', value: physiologicalCohort?.archetype ?? '—' },
                 { metric: 'Cohort', value: physiologicalCohort?.dominantModule ?? '—' },
                 { metric: 'Phase', value: getCircadianPhase() },
+                { metric: 'Rokuyo', value: `${astrology.rokuyo} · ${astrology.window}` },
                 { metric: 'Confidence', value: physiologicalCohort ? `${physiologicalCohort.confidence}%` : '—' },
                 { metric: 'ATP', value: quantumState.energy },
                 { metric: 'Clarity', value: quantumState.clarity },

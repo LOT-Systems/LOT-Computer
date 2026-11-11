@@ -4880,7 +4880,13 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  extra: {
+    window?: 'favorable' | 'unfavorable'
+    resonantRokuyo?: string | null
+    resonantMoonPhase?: string | null
+    resonanceMatch?: boolean
+  } = {}
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,7 +4895,32 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    // (2026-11-11) rokuyo time-of-day window + personal Logs resonance, so
+    // dependents (system, cosmic) can key off "favorable now" and "today
+    // matches the conditions this user usually logs under".
+    window: extra.window ?? null,
+    resonantRokuyo: extra.resonantRokuyo ?? null,
+    resonantMoonPhase: extra.resonantMoonPhase ?? null,
+    resonanceMatch: extra.resonanceMatch ?? false,
   })
+}
+
+/**
+ * Read side of the astrology Tier 0 source (2026-11-11). Returns the most
+ * recent 'ambient_reading' metadata within the last 36h, or null. Lets any
+ * widget synchronize with the day's reading without recomputing it or
+ * importing the dashboard.
+ */
+export function getLatestAstrologyReading(
+  signals: IntentionSignal[] = intentionEngine.get().signals
+): Record<string, any> | null {
+  const cutoff = Date.now() - 36 * 60 * 60 * 1000
+  for (let i = signals.length - 1; i >= 0; i--) {
+    const s = signals[i]
+    if (s.timestamp < cutoff) continue
+    if (s.source === 'astrology' && s.signal === 'ambient_reading') return s.metadata ?? null
+  }
+  return null
 }
 
 /**
