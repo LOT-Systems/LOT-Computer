@@ -11,6 +11,14 @@ import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
 import { useLogs, useUpdateLog } from '#client/queries'
+import {
+  formatSystemHelp,
+  parseStoryScope,
+  stripStoryCommand,
+  computeArcadeState,
+  formatArcadeLines,
+  type StoryScope,
+} from '#shared/utils/logCommands'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
@@ -28,7 +36,7 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, detectTriggers, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3653,6 +3661,9 @@ export const Logs: React.FC = React.memo(function LogsInner() {
   )
 })
 
+/** Wait for the operator to finish typing "/story <scope>" before submitting. */
+const STORY_SCOPE_DEBOUNCE_MS = 1500
+
 const NoteEditor = ({
   log,
   primary,
@@ -3707,6 +3718,11 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [storyScope, setStoryScope] = React.useState<StoryScope>('recent')
+  const storyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  React.useEffect(() => () => { if (storyTimerRef.current) clearTimeout(storyTimerRef.current) }, [])
+  const [arcadeResult, setArcadeResult] = React.useState<string | null>(null)
+  const { data: arcadeLogs } = useLogs()
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -4121,48 +4137,48 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(formatSystemHelp().join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
+      } else if (trigger === 'arcade-level') {
+        try {
+          const dates = (arcadeLogs || [])
+            .filter(l => l.event === 'note' && (l.text || '').trim())
+            .map(l => l.createdAt)
+          const arcade = computeArcadeState(dates, new Date(), new Date().getTimezoneOffset())
+          setArcadeResult(formatArcadeLines(arcade).join('\n'))
+        } catch {
+          setArcadeResult('ARCADE          OFFLINE')
+        }
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
+          // Debounce: the trigger fires the moment "/story" is typed, before
+          // an optional scope word ("week", "month"…) has been entered. Wait
+          // for the operator to stop typing, then read the settled text.
+          if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
           setStoryLoading(true)
           setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
+          storyTimerRef.current = setTimeout(() => {
+            storyTimerRef.current = null
+            const settled = valueRef.current
+            if (!detectTriggers(settled).includes('story-mode')) {
+              setStoryLoading(false)
+              return
+            }
+            const scope = parseStoryScope(settled)
+            setStoryScope(scope)
+            const logText = stripStoryCommand(settled)
+            try {
+              submitStory({
+                logText,
+                scope,
+                quantumState: getUserState(),
+                userIndex: getUserIndex(),
+              })
+            } catch {
+              submitStory({ logText, scope })
+            }
+          }, STORY_SCOPE_DEBOUNCE_MS)
         }
       }
     }
@@ -4414,9 +4430,16 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        {arcadeResult && (
+          <div className="mt-8">
+            <Block label="ARCADE:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{arcadeResult}</div>
+            </Block>
+          </div>
+        )}
         {(storyLoading || storyResponse) && (
           <div className="mt-8">
-            <Block label="📖" blockView>
+            <Block label={storyScope === 'recent' ? '📖' : `📖 ${storyScope.toUpperCase()}`} blockView>
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
               )}

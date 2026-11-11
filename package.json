@@ -29,6 +29,7 @@
     "db:backup:verify": "bash scripts/backup-to-github.sh --verify",
     "pre-deploy": "bash scripts/pre-deploy-backup.sh",
     "cleanup-logs": "tsx scripts/cleanup-empty-logs.ts",
+    "verify:log-commands": "tsx scripts/verify-log-commands.ts",
     "server:build": "tsc --project tsconfig.server.json && node scripts/fix-esm-imports.js",
     "server:start": "node dist/server/server/index.js",
     "build": "yarn run client:build && yarn run server:build",
