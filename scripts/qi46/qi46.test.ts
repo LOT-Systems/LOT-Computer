@@ -10,6 +10,8 @@ import {
   dominantRegisters,
   eraseBeingProfile,
   normalizeWeights,
+  detectQi46Signals,
+  directiveForMessage,
 } from '../../src/shared/utils/qi46.ts'
 
 const sum = (w: Record<string, number>) => Object.values(w).reduce((a, b) => a + b, 0)
@@ -67,4 +69,30 @@ test('erase returns clean profile', () => {
   assert.equal(e.samples, 0)
   assert.equal(e.consent.journal, false)
   assert.equal(e.voice, 'neutral')
+})
+
+test('crisis detector: flags crisis language', () => {
+  for (const t of [
+    'I want to kill myself',
+    'honestly everyone would be better off without me',
+    "I can't go on like this",
+    'thinking about suicide again',
+    'I want to end my life',
+  ]) assert.equal(detectQi46Signals(t).crisis, true, t)
+})
+
+test('crisis detector: ignores ordinary language', () => {
+  for (const t of ['', 'this deadline is killing me', 'I love this song to death', 'cut the onions', 'going to the gym']) {
+    assert.equal(detectQi46Signals(t).crisis, false, t)
+  }
+})
+
+test('directiveForMessage: crisis drops registers, ordinary keeps them', () => {
+  const p = createBeingProfile('u1')
+  const crisis = directiveForMessage(p, 'I want to die')
+  assert.match(crisis, /Safety override/)
+  assert.doesNotMatch(crisis, /Registers/)
+  const calm = directiveForMessage(p, 'long day, but good')
+  assert.match(calm, /Registers, strongest first/)
+  assert.match(calm, /not the person, and not human/)
 })

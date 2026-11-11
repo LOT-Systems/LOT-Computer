@@ -154,3 +154,31 @@ export function composeDirective(profile: Qi46BeingProfile, signals: Qi46Signals
 export function eraseBeingProfile(profile: Qi46BeingProfile, now: Date = new Date()): Qi46BeingProfile {
   return createBeingProfile(profile.personId, {}, 'neutral', now)
 }
+
+/* ── S3-4 · Crisis signal detector (v0.1, pure, high-recall) ─────────────
+ * Deliberately over-inclusive: a false positive only swaps poetic registers
+ * for plain safety language, a false negative could cost a life.
+ * Not a clinical classifier; it gates tone, never diagnoses.
+ */
+const CRISIS_PATTERNS: RegExp[] = [
+  /\b(kill|hurt|harm|cut)(ing)?\s+myself\b/i,
+  /\bsuicid(e|al)\b/i,
+  /\b(end|take)\s+(my|it)\s+(own\s+)?(life|all)\b/i,
+  /\b(want|wanna|going)\s+(to\s+)?die\b/i,
+  /\bbetter\s+off\s+(dead|without\s+me)\b/i,
+  /\bno\s+(reason|point)\s+(to|in)\s+(live|living|go(ing)?\s+on)\b/i,
+  /\bcan'?t\s+(go\s+on|do\s+this\s+anymore|keep\s+going)\b/i,
+  /\boverdos(e|ing)\b/i,
+  /\bself[-\s]?harm\b/i,
+]
+
+/** Detects crisis language in a user message. Returns signals for composeDirective(). */
+export function detectQi46Signals(text: string): Qi46Signals {
+  if (!text) return { crisis: false }
+  return { crisis: CRISIS_PATTERNS.some((re) => re.test(text)) }
+}
+
+/** One-call helper: profile + latest user message → directive (crisis-aware). */
+export function directiveForMessage(profile: Qi46BeingProfile, userText: string): string {
+  return composeDirective(profile, detectQi46Signals(userText))
+}
