@@ -1084,16 +1084,37 @@ export default async (fastify: FastifyInstance) => {
   // Calendar feed — every calendar_* event for the user, independent of the
   // 500-row /logs window and of hideActivityLogs, so entries, completions and
   // fired-alert keys never silently drop out of the alert engine.
+  //
+  // Alert rows dominate volume (~4 per entry) but only matter while an entry
+  // can still alert (<= 48 h overdue, + snoozes), so they are windowed to
+  // 10 days. Lifecycle rows (entry/done/snooze/cancel) are kept in full so
+  // no entry ever falls out of the window.
   fastify.get('/calendar', async (req: FastifyRequest) => {
-    const logs = await fastify.models.Log.findAll({
-      where: {
-        userId: req.user.id,
-        event: { [Op.in]: CALENDAR_EVENTS },
-      },
-      attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
-      order: [['createdAt', 'DESC']],
-      limit: 3000,
-    })
+    const attributes = ['id', 'event', 'text', 'metadata', 'createdAt']
+    const [lifecycle, alerts] = await Promise.all([
+      fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: { [Op.in]: CALENDAR_EVENTS.filter((e) => e !== 'calendar_alert') },
+        },
+        attributes,
+        order: [['createdAt', 'DESC']],
+        limit: 10000,
+      }),
+      fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: 'calendar_alert',
+          createdAt: { [Op.gte]: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000) },
+        },
+        attributes,
+        order: [['createdAt', 'DESC']],
+        limit: 5000,
+      }),
+    ])
+    const logs = [...lifecycle, ...alerts].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
     return logs.map((l) => ({
       id: l.id,
       event: l.event,

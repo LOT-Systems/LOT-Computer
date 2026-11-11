@@ -12,21 +12,39 @@ import { useCalendarFeed, useCreateLog } from '#client/queries'
 import type { CalendarLog } from '#client/queries'
 import { SNOOZE_MIN } from '#client/utils/calendarAlerts'
 import { deriveCalendar } from '#client/utils/calendarFeed'
-import type { CalendarEntry, EntryType } from '#client/utils/calendarFeed'
+import type { CalendarEntry, EntryType, Repeat } from '#client/utils/calendarFeed'
 import type { AlertStage } from '#client/utils/calendarAlerts'
 
-export type { EntryType, CalendarEntry } from '#client/utils/calendarFeed'
+export type { EntryType, CalendarEntry, Repeat } from '#client/utils/calendarFeed'
 
 const FEED_KEY = ['/api/calendar']
 
 /** Entries, completions and already-fired alert keys, from the calendar feed. */
 export function useCalendarEntries() {
   const { data, isSuccess } = useCalendarFeed()
+  // Recurring expansion (and which occurrence has lapsed) depends on the
+  // clock, so re-derive once a minute even when the feed is unchanged.
+  const [minute, setMinute] = React.useState(() => Math.floor(Date.now() / 60000))
+  React.useEffect(() => {
+    const id = setInterval(() => setMinute(Math.floor(Date.now() / 60000)), 15_000)
+    return () => clearInterval(id)
+  }, [])
   return React.useMemo(() => {
-    const d = deriveCalendar(data || [])
+    const d = deriveCalendar(data || [], { now: Date.now() })
     return { ...d, ready: isSuccess }
-  }, [data, isSuccess])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, isSuccess, minute])
 }
+
+type EntryInput = { date: string; time?: string; text: string; type: EntryType; repeat?: Repeat }
+
+const entryMeta = (input: EntryInput) => ({
+  date: input.date,
+  text: input.text,
+  entryType: input.type,
+  ...(input.time ? { time: input.time } : {}),
+  ...(input.repeat ? { repeat: input.repeat } : {}),
+})
 
 const stamp = (e: Pick<CalendarEntry, 'date' | 'time'>) => `${e.date}${e.time ? ' ' + e.time : ''}`
 
@@ -56,12 +74,22 @@ export function useCalendarActions() {
   )
 
   return React.useMemo(() => ({
-    add(input: { date: string; time?: string; text: string; type: EntryType }, after?: () => void) {
-      const label = `${input.date}${input.time ? ' ' + input.time : ''}`
+    add(input: EntryInput, after?: () => void) {
+      const label = `${stamp(input)}${input.repeat ? ' · ' + input.repeat : ''}`
       write({
         text: `[SCHEDULE] ${input.type}: ${input.text} (${label})`,
         event: 'calendar_entry',
-        metadata: { date: input.date, text: input.text, entryType: input.type, ...(input.time ? { time: input.time } : {}) },
+        metadata: entryMeta(input),
+      }, after)
+    },
+    /** Edit = a new calendar_entry that supersedes the old one (whole series for an occurrence). */
+    edit(prev: CalendarEntry, input: EntryInput, after?: () => void) {
+      const replaces = prev.seriesId || prev.id
+      const label = `${stamp(input)}${input.repeat ? ' · ' + input.repeat : ''}`
+      write({
+        text: `[EDIT] ${input.type}: ${input.text} (${label})`,
+        event: 'calendar_entry',
+        metadata: { ...entryMeta(input), replaces, edited: true },
       }, after)
     },
     done(e: CalendarEntry, stage: AlertStage | 'MANUAL' = 'MANUAL') {
@@ -82,11 +110,16 @@ export function useCalendarActions() {
         metadata: { entryId: e.id, date: e.date, time: e.time, text: e.text, stage: `SNOOZE +${minutes}M`, until, gen, minutes },
       })
     },
-    cancel(e: CalendarEntry) {
+    /** Scrub one entry / one occurrence; `series: true` scrubs every occurrence. */
+    cancel(e: CalendarEntry, opts: { series?: boolean } = {}) {
+      const series = !!(opts.series && e.seriesId)
       write({
-        text: `[SCRUB] ${e.type}: ${e.text} (${stamp(e)})`,
+        text: `[${series ? 'SCRUB SERIES' : e.seriesId ? 'SKIP' : 'SCRUB'}] ${e.type}: ${e.text} (${series ? e.repeat : stamp(e)})`,
         event: 'calendar_cancel',
-        metadata: { entryId: e.id, date: e.date, time: e.time, text: e.text, stage: 'SCRUBBED' },
+        metadata: {
+          entryId: series ? e.seriesId : e.id, date: e.date, time: e.time, text: e.text,
+          stage: series ? 'SCRUBBED SERIES' : e.seriesId ? 'SKIPPED' : 'SCRUBBED',
+        },
       })
     },
     alert(e: CalendarEntry, stage: AlertStage, key: string) {

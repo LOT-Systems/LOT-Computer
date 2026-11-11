@@ -2082,7 +2082,10 @@ export const Logs: React.FC = React.memo(function LogsInner() {
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
-                <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
+                <div className="uppercase tracking-widest">
+                  {log.metadata?.replaces != null && 'EDIT · '}{entryType || 'ENTRY'}{log.metadata?.repeat ? ` · ${String(log.metadata.repeat).toUpperCase()}` : ''}
+                </div>
+                {log.metadata?.text && <div className="mt-8">{log.metadata.text as string}</div>}
                 {date && <div className="opacity-40 mt-8 tabular-nums">{date}{log.metadata?.time ? ` ${log.metadata.time}` : ''}</div>}
               </Block>
             </LogContainer>

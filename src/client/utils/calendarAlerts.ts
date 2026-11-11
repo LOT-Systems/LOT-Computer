@@ -32,6 +32,7 @@ export type AlertEntry = {
   done?: boolean
   snoozeUntil?: number // epoch ms
   snoozeGen?: number // number of snoozes applied
+  lapsed?: boolean // superseded occurrence of a recurring series
 }
 
 export const OVERDUE_WINDOW_MIN = 48 * 60
@@ -70,7 +71,7 @@ export function effectiveMoment(e: AlertEntry): Date | null {
 }
 
 export function alertStage(e: AlertEntry, now: Date): AlertStage | null {
-  if (e.done) return null
+  if (e.done || e.lapsed) return null
   const snoozed = !!(e.snoozeUntil && Number.isFinite(e.snoozeUntil))
   const at = effectiveMoment(e)
   if (!at) return null
@@ -111,4 +112,37 @@ export function relativeLabel(e: AlertEntry, now: Date): string {
   const a = Math.abs(d)
   const s = a >= 120 ? `${Math.floor(a / 60)}h` : `${a}m`
   return d > 0 ? `in ${s}` : `+${s}`
+}
+
+/** Instant after which an entry counts as late: start + T-0 window, or end of day if untimed. */
+export function deadline(e: Pick<AlertEntry, 'date' | 'time'>): number | null {
+  const at = entryMoment(e)
+  if (!at) return null
+  if (e.time) return at.getTime() + T0_WINDOW_MIN * 60000
+  return new Date(at.getFullYear(), at.getMonth(), at.getDate() + 1).getTime()
+}
+
+export type OnTimeEntry = Pick<AlertEntry, 'date' | 'time' | 'done'> & { type: string; doneAt?: number }
+
+/**
+ * Discipline readout over the last `days`: tasks and calls whose deadline has
+ * passed (or that were already closed), and how many were closed on time.
+ * Notes are informational and not scored.
+ */
+export function onTimeStats(entries: OnTimeEntry[], now: Date, days = 7) {
+  const t = now.getTime()
+  const since = t - days * 86400000
+  let due = 0
+  let onTime = 0
+  for (const e of entries) {
+    if (e.type === 'note') continue
+    const at = entryMoment(e)
+    const dl = deadline(e)
+    if (!at || dl == null || at.getTime() < since) continue
+    if (dl > t && !e.done) continue // not due yet
+    if (e.done && !e.doneAt && dl > t) continue
+    due++
+    if (e.done && e.doneAt != null && e.doneAt <= dl) onTime++
+  }
+  return { due, onTime, days }
 }

@@ -13,11 +13,14 @@ import dayjs from '#client/utils/dayjs'
 import type { Dayjs } from '#client/utils/dayjs'
 import { recordCalendarSignal } from '#client/stores/intentionEngine'
 import { useCalendarActions, useCalendarEntries } from '#client/hooks/useCalendarEntries'
-import type { EntryType, CalendarEntry } from '#client/hooks/useCalendarEntries'
-import { alertStage, isValidTime, relativeLabel } from '#client/utils/calendarAlerts'
+import type { EntryType, CalendarEntry, Repeat } from '#client/hooks/useCalendarEntries'
+import { alertStage, isValidTime, onTimeStats, relativeLabel } from '#client/utils/calendarAlerts'
+import { REPEATS } from '#client/utils/calendarFeed'
 import { setSysNotify, sysNotifyEnabled, sysNotifySupported } from '#client/utils/calendarNotify'
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+const REPEAT_CYCLE: (Repeat | undefined)[] = [undefined, ...REPEATS]
+const nextRepeat = (r?: Repeat) => REPEAT_CYCLE[(REPEAT_CYCLE.indexOf(r) + 1) % REPEAT_CYCLE.length]
 
 function getMonthWeeks(year: number, month: number): Dayjs[][] {
   const first = dayjs().year(year).month(month).startOf('month')
@@ -60,13 +63,28 @@ export function CalendarWidget() {
     return () => clearInterval(id)
   }, [])
   const [entryType, setEntryType] = React.useState<EntryType>('note')
+  const [entryRepeat, setEntryRepeat] = React.useState<Repeat | undefined>(undefined)
+  const [editing, setEditing] = React.useState<CalendarEntry | null>(null)
 
+  // Upcoming: one line per one-off entry, and only the next live occurrence per series.
   const upcomingEntries = React.useMemo(() => {
     const today = dayjs(now).format('YYYY-MM-DD')
-    return entries
-      .filter(e => !e.done && (e.date >= today || alertStage(e, now) !== null))
-      .slice(0, 10)
+    const seen = new Set<string>()
+    const out: CalendarEntry[] = []
+    for (const e of entries) {
+      if (e.done || e.lapsed) continue
+      if (!(e.date >= today || alertStage(e, now) !== null)) continue
+      if (e.seriesId) {
+        if (seen.has(e.seriesId)) continue
+        seen.add(e.seriesId)
+      }
+      out.push(e)
+      if (out.length >= 10) break
+    }
+    return out
   }, [entries, now])
+
+  const stats = React.useMemo(() => onTimeStats(entries, now, 7), [entries, now])
 
   const entriesOnDate = React.useMemo(() => {
     if (!selectedDate) return []
@@ -75,7 +93,7 @@ export function CalendarWidget() {
 
   const datesWithEntries = React.useMemo(() => {
     const set = new Set<string>()
-    entries.forEach(e => { if (!e.done) set.add(e.date) })
+    entries.forEach(e => { if (!e.done && !e.lapsed) set.add(e.date) })
     return set
   }, [entries])
 
@@ -89,33 +107,60 @@ export function CalendarWidget() {
     const key = d.format('YYYY-MM-DD')
     if (selectedDate === key) {
       setSelectedDate(null)
+      resetForm()
     } else {
       setSelectedDate(key)
     }
   }
 
+  const resetForm = () => {
+    setEntryText('')
+    setEntryTime('')
+    setEntryRepeat(undefined)
+    setEditing(null)
+    setIsAddingEntry(false)
+  }
+
   const handleAddEntry = () => {
     if (!selectedDate || !entryText.trim()) return
 
-    const time = isValidTime(entryTime) ? entryTime : undefined
-    const date = selectedDate
-    const type = entryType
+    const input = {
+      date: selectedDate,
+      time: isValidTime(entryTime) ? entryTime : undefined,
+      text: entryText.trim().slice(0, 280),
+      type: entryType,
+      repeat: entryRepeat,
+    }
 
-    actions.add({ date, time, text: entryText.trim().slice(0, 280), type }, () => {
-      try { recordCalendarSignal(type, date) } catch (_) {}
-    })
+    if (editing) {
+      actions.edit(editing, input)
+    } else {
+      actions.add(input, () => {
+        try { recordCalendarSignal(input.type, input.date) } catch (_) {}
+      })
+    }
+    resetForm()
+  }
 
-    setEntryText('')
-    setEntryTime('')
-    setIsAddingEntry(false)
+  const handleEdit = (e: CalendarEntry) => {
+    setEditing(e)
+    setEntryText(e.text)
+    setEntryTime(e.time || '')
+    setEntryType(e.type)
+    setEntryRepeat(e.repeat)
+    setIsAddingEntry(true)
   }
 
   const handleDone = (e: CalendarEntry) => actions.done(e)
 
   const handleScrub = (e: CalendarEntry) => {
-    if (typeof window !== 'undefined' && !window.confirm(`Scrub "${e.text}"?`)) return
-    actions.cancel(e)
+    const msg = e.seriesId ? `Scrub every ${e.repeat} "${e.text}"?` : `Scrub "${e.text}"?`
+    if (typeof window !== 'undefined' && !window.confirm(msg)) return
+    if (editing?.id === e.id) resetForm()
+    actions.cancel(e, { series: true })
   }
+
+  const handleSkip = (e: CalendarEntry) => actions.cancel(e)
 
   const toggleSys = async () => setSysOn(await setSysNotify(!sysOn))
 
@@ -204,6 +249,7 @@ export function CalendarWidget() {
             {isAddingEntry && selectedDate && (
               <div className="mt-8">
                 <div className="flex gap-8 mb-8">
+                  {editing && <span className="text-acc/40">Edit:</span>}
                   {(['note', 'task', 'call'] as EntryType[]).map(t => (
                     <button
                       key={t}
@@ -216,6 +262,18 @@ export function CalendarWidget() {
                       {t}
                     </button>
                   ))}
+                  <button
+                    onClick={() => setEntryRepeat(nextRepeat(entryRepeat))}
+                    className={cn('transition-opacity ml-8', entryRepeat ? 'text-acc' : 'text-acc/40 hover:text-acc/60')}
+                    aria-label="Repeat"
+                  >
+                    {entryRepeat ? `Repeat ${entryRepeat}` : 'Once'}
+                  </button>
+                  {editing && (
+                    <button className="text-acc/40 hover:text-acc/60 transition-opacity ml-auto" onClick={resetForm}>
+                      cancel
+                    </button>
+                  )}
                 </div>
                 <div className="flex gap-8 items-center">
                   <input
@@ -235,7 +293,7 @@ export function CalendarWidget() {
                     aria-label="Time (optional)"
                     className="bg-transparent border border-acc/20 text-acc px-4 py-2 outline-none focus:border-acc/40"
                   />
-                  <Button onClick={handleAddEntry}>Add</Button>
+                  <Button onClick={handleAddEntry}>{editing ? 'Save' : 'Add'}</Button>
                 </div>
               </div>
             )}
@@ -250,12 +308,21 @@ export function CalendarWidget() {
                     <span className={cn('text-acc/80', e.done && 'line-through text-acc/30')}>
                       {e.time && <span className="tabular-nums text-acc/50">{e.time} </span>}
                       {e.text}
+                      {e.repeat && <span className="text-acc/40"> · {e.repeat}</span>}
                     </span>
                     {!e.done && (
                       <span className="whitespace-nowrap">
                         <button className="text-acc/30 hover:text-acc/60 transition-opacity" onClick={() => handleDone(e)}>
                           done
                         </button>
+                        <button className="text-acc/30 hover:text-acc/60 transition-opacity ml-8" onClick={() => handleEdit(e)}>
+                          edit
+                        </button>
+                        {e.seriesId && (
+                          <button className="text-acc/30 hover:text-acc/60 transition-opacity ml-8" onClick={() => handleSkip(e)}>
+                            skip
+                          </button>
+                        )}
                         <button className="text-acc/30 hover:text-acc/60 transition-opacity ml-8" onClick={() => handleScrub(e)}>
                           scrub
                         </button>
@@ -288,6 +355,7 @@ export function CalendarWidget() {
                   <span className="text-acc text-right">
                     {overdue && <span className="text-acc/40">OVERDUE </span>}
                     {entry.text}
+                    {entry.repeat && <span className="text-acc/40"> · {entry.repeat}</span>}
                     <button
                       className="text-acc/30 hover:text-acc/60 transition-opacity ml-8"
                       onClick={() => handleDone(entry)}
@@ -304,6 +372,12 @@ export function CalendarWidget() {
 
         {upcomingEntries.length === 0 && !isCalendarOpen && (
           <div className="text-acc/40">No upcoming dates.</div>
+        )}
+
+        {stats.due > 0 && (
+          <div className="text-acc/40 mt-8 tabular-nums" aria-label="On-time rate, last 7 days">
+            ON-TIME {stats.onTime}/{stats.due} · 7D
+          </div>
         )}
 
         {isCalendarOpen && sysNotifySupported() && (

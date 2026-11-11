@@ -7,6 +7,7 @@
  */
 
 import * as React from 'react'
+import { useCalendarEntries } from '#client/hooks/useCalendarEntries'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import {
@@ -381,17 +382,21 @@ export const System = React.memo(function SystemInner() {
   const ambientIntensity = React.useMemo(() => getAmbientIntensity(), [])
 
   // Temporal Planner — next scheduled calendar entry, from QIE signal pipeline
+  // Reads the calendar feed so done / scrubbed / edited entries drop out and
+  // a recurring series counts once (its next occurrence).
+  const { entries: calendarEntries } = useCalendarEntries()
   const upcomingCalendar = React.useMemo(() => {
     const today = dayjs().format('YYYY-MM-DD')
-    const entries = logs
-      .filter(log => log.event === 'calendar_entry' && log.metadata?.date && (log.metadata.date as string) >= today)
-      .map(log => ({
-        date: log.metadata!.date as string,
-        text: (log.metadata!.text as string) || log.text || '',
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date))
+    const seen = new Set<string>()
+    const entries = calendarEntries.filter(e => {
+      if (e.done || e.lapsed || e.date < today) return false
+      if (!e.seriesId) return true
+      if (seen.has(e.seriesId)) return false
+      seen.add(e.seriesId)
+      return true
+    })
     return { next: entries[0] ?? null, count: entries.length }
-  }, [logs])
+  }, [calendarEntries])
 
   // Check for recipe and planner suggestions when component mounts
   React.useEffect(() => {
