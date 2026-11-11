@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START (see R02 report for amendments to §03/§06)
+VERSION:  0.1 — DEVELOPMENT START (see R02, R03 reports for amendments to §03/§06)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -331,6 +331,18 @@ entry — never editing or removing a prior one.
   question). Quiet hours forbid all ballistic gestures overnight.
   Proves the cube is as valuable when it refuses to jump as when it
   jumps. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md, Section 10.
+
+  USE CASE 03 — THE PRACTICE PIANO                          2026-11-11
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, adult returning to piano, 40-minute
+  evening practice, phone in a drawer. CUBIQ pad on the upright's top
+  lid. The cube's surface resonance probe (R03 §06) classifies the lid
+  RESONANT: NUDGE would sound as a faint note through the soundboard, and
+  a landing would sound like a drum. So the cube downgrades to THE SETTLE,
+  fires once at the end of the practice block, never repeats, and holds
+  the waiting Memory question until the operator lifts the cube. Proves
+  the cube must listen to the furniture before it speaks through it.
+  Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R03.md, Section 09.
 
 --------------------------------------------------------------------------------
 08 // BRAND
