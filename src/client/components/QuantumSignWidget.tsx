@@ -7,6 +7,7 @@
  */
 
 import React from 'react'
+import { safeSetItem } from '#client/utils/safeStorage'
 import { Block } from '#client/components/ui'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
@@ -123,19 +124,19 @@ export function QuantumSignWidget() {
           </div>
           <div className="flex flex-col gap-4">
             <div className="cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
-                 onClick={() => localStorage.setItem('quantum-sign-action', 'journal')}>
+                 onClick={() => safeSetItem('quantum-sign-action', 'journal')}>
               Journal — Write what you feel right now
             </div>
             <div className="cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
-                 onClick={() => localStorage.setItem('quantum-sign-action', 'create')}>
+                 onClick={() => safeSetItem('quantum-sign-action', 'create')}>
               Create — Build something, anything
             </div>
             <div className="cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
-                 onClick={() => localStorage.setItem('quantum-sign-action', 'connect')}>
+                 onClick={() => safeSetItem('quantum-sign-action', 'connect')}>
               Connect — Talk to another user
             </div>
             <div className="cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
-                 onClick={() => localStorage.setItem('quantum-sign-action', 'rest')}>
+                 onClick={() => safeSetItem('quantum-sign-action', 'rest')}>
               Rest — Self-care and rest, here, now
             </div>
           </div>

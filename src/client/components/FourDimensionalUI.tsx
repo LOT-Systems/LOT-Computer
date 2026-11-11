@@ -7,6 +7,7 @@
  */
 
 import React from 'react'
+import { isInvestorMode } from '#client/utils/safeStorage'
 import { Block } from '#client/components/ui'
 
 /**
@@ -19,7 +20,7 @@ export function FourDimensionalUI() {
   const [dimension, setDimension] = React.useState<1 | 2 | 3 | 4>(1)
 
   // Only show in investor mode
-  const investorMode = localStorage.getItem('lot-investor-mode') === 'true'
+  const investorMode = isInvestorMode()
   if (!investorMode) return null
 
   const cycleDimension = () => {

@@ -86,10 +86,17 @@ import { useInViewport } from '#client/hooks/useInViewport'
 // Defers mount of children until element first enters the viewport.
 // Once mounted, stays mounted — no unmount on scroll away.
 // Prevents heavy store subscriptions from running before the widget is needed.
-function LazyMount({ children }: { children: React.ReactNode }) {
+// The placeholder reserves a min-height until mount: zero-height placeholders
+// stack at the same y-offset, so every LazyMount below the fold would
+// intersect (and mount) at once — defeating the deferral.
+function LazyMount({ children, minHeight = 160 }: { children: React.ReactNode; minHeight?: number }) {
   const ref = React.useRef<HTMLDivElement>(null)
   const inViewport = useInViewport(ref)
-  return <div ref={ref}>{inViewport ? children : null}</div>
+  return (
+    <div ref={ref} style={inViewport ? undefined : { minHeight }}>
+      {inViewport ? children : null}
+    </div>
+  )
 }
 
 function LoadingDots() {
@@ -115,6 +122,9 @@ export const System = React.memo(function SystemInner() {
   const { data: profile } = useProfile()
   const { data: logs = [] } = useLogs()
   const { data: communityEmotion } = useCommunityEmotion()
+  // Roll the 20% Subscribe prompt once per mount — rolling inside render made
+  // the widget flicker in/out on every System re-render (weather, users online…)
+  const [subscribeRoll] = React.useState(() => Math.random() < 0.2)
 
 
   const isTempFahrenheit = useStore(stores.isTempFahrenheit)
@@ -265,8 +275,10 @@ export const System = React.memo(function SystemInner() {
   // before the browser can paint, causing visible UI lag on every logs change.
   const [quantumState, setQuantumState] = React.useState(() => getUserState())
   React.useEffect(() => {
-    analyzeIntentions()
-    recomputeAssembly()
+    // Guarded: a single faulty QIE pattern must never take down the System tab
+    // (an uncaught throw here propagates to the AppErrorBoundary).
+    try { analyzeIntentions() } catch (err) { console.error('[QIE] analyzeIntentions failed:', err) }
+    try { recomputeAssembly() } catch (err) { console.error('[QIE] recomputeAssembly failed:', err) }
     setQuantumState(getUserState())
   }, [logs])
 
@@ -930,15 +942,15 @@ export const System = React.memo(function SystemInner() {
           if (answerLogs.length < 10) return null
 
           // Check if clicked recently (10 days cooldown)
-          const lastClicked = localStorage.getItem('subscribe-clicked')
+          let lastClicked: string | null = null
+          try { lastClicked = localStorage.getItem('subscribe-clicked') } catch {}
           const tenDaysMs = 10 * 24 * 60 * 60 * 1000
           if (lastClicked && (Date.now() - parseInt(lastClicked)) < tenDaysMs) {
             return null
           }
 
-          // Random 20% chance to show when all conditions met
-          const shouldShow = Math.random() < 0.2
-          return shouldShow && <div><SubscribeWidget /></div>
+          // 20% chance to show when all conditions met (rolled once per mount)
+          return subscribeRoll && <div><SubscribeWidget /></div>
         })()}
       </WidgetErrorBoundary>
 
@@ -1009,6 +1021,7 @@ export const System = React.memo(function SystemInner() {
 
       {/* CQGS Biofield Engine Widgets */}
       <WidgetErrorBoundary name="Biofield Engine">
+        <LazyMount>
         <div className={cn('flex flex-col', density.sectionGap)}>
           <QuantumStateWidget />
           <PatternRecognitionWidget />
@@ -1016,6 +1029,7 @@ export const System = React.memo(function SystemInner() {
           <SignalStreamWidget />
           <IntegrityWidget />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* CQGS Dashboard stack */}
@@ -1037,11 +1051,14 @@ export const System = React.memo(function SystemInner() {
 
       {/* Architect — executive self-assembly telemetry, paid users only */}
       <WidgetErrorBoundary name="Architect">
-        <ArchitectWidget />
+        <LazyMount minHeight={1}>
+          <ArchitectWidget />
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Stats stack */}
       <WidgetErrorBoundary name="Stats">
+        <LazyMount>
         <div className={cn('flex flex-col', density.sectionGap)}>
           <IntentionPatterns />
           <CollectiveConsciousness />
@@ -1050,15 +1067,20 @@ export const System = React.memo(function SystemInner() {
           <GrowthMilestones />
           <BadgeUnlockFeed />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Calendar — Personal date planner */}
       <WidgetErrorBoundary name="Calendar">
-        <CalendarWidget />
+        <LazyMount>
+          <CalendarWidget />
+        </LazyMount>
       </WidgetErrorBoundary>
 
       <WidgetErrorBoundary name="Benchmark">
-        <BenchmarkWidget />
+        <LazyMount minHeight={1}>
+          <BenchmarkWidget />
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* The original. Imitation is the sincerest form of flattery, but the quantum field knows. */}

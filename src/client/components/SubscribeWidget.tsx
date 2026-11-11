@@ -7,6 +7,7 @@
  */
 
 import React from 'react'
+import { safeSetItem } from '#client/utils/safeStorage'
 import { Block, Button } from '#client/components/ui'
 
 /**
@@ -17,7 +18,7 @@ import { Block, Button } from '#client/components/ui'
 export function SubscribeWidget() {
   const handleSubscribe = () => {
     // Store click timestamp - widget won't show again after this
-    localStorage.setItem('subscribe-clicked', Date.now().toString())
+    safeSetItem('subscribe-clicked', Date.now().toString())
 
     // Open subscription page in new tab
     window.open('https://brand.lot-systems.com', '_blank', 'noopener,noreferrer')

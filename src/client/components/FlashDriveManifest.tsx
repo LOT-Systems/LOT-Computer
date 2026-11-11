@@ -7,6 +7,7 @@
  */
 
 import React from 'react'
+import { isInvestorMode } from '#client/utils/safeStorage'
 import { Block } from '#client/components/ui'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
@@ -36,7 +37,7 @@ export function FlashDriveManifest() {
   }, [])
 
   // Always show in investor mode, or when offline
-  const investorMode = localStorage.getItem('lot-investor-mode') === 'true'
+  const investorMode = isInvestorMode()
   if (!isOffline && !investorMode) return null
 
   const cycleView = () => {

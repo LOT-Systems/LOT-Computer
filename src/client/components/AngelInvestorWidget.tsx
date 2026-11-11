@@ -7,6 +7,7 @@
  */
 
 import React from 'react'
+import { isInvestorMode } from '#client/utils/safeStorage'
 import { Block, Button } from '#client/components/ui'
 
 /**
@@ -19,7 +20,7 @@ export function AngelInvestorWidget() {
   const [view, setView] = React.useState<'pitch' | 'thesis' | 'terms'>('pitch')
 
   // Only show in investor mode
-  const investorMode = localStorage.getItem('lot-investor-mode') === 'true'
+  const investorMode = isInvestorMode()
   if (!investorMode) return null
 
   const cycleView = () => {

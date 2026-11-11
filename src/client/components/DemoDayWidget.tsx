@@ -7,6 +7,7 @@
  */
 
 import React from 'react'
+import { isInvestorMode } from '#client/utils/safeStorage'
 import { Block } from '#client/components/ui'
 
 /**
@@ -18,7 +19,7 @@ export function DemoDayWidget() {
   const [view, setView] = React.useState<'announcement' | 'venue' | 'agenda'>('announcement')
 
   // Only show in investor mode
-  const investorMode = localStorage.getItem('lot-investor-mode') === 'true'
+  const investorMode = isInvestorMode()
   if (!investorMode) return null
 
   const cycleView = () => {
