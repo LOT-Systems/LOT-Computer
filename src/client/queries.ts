@@ -18,6 +18,7 @@ import {
   ChatMessageLikePayload,
   DefaultQuestion,
   Log,
+  LotEmail,
   Paginated,
   PublicChatMessage,
   User,
@@ -119,6 +120,41 @@ export const useSendDirectMessage = createMutation<
   { receiverId: string; message: string },
   void
 >('post', '/api/direct-messages')
+
+// LOT® Email — composed in Log via "/email to <Name>", delivered to Sync
+export interface LotEmailRecipient {
+  id: string
+  firstName: string | null
+  lastName: string | null
+  score?: number
+}
+
+export const useLotEmailInbox = createQuery<{ emails: LotEmail[]; unread: number }>(
+  '/api/lot-email/inbox',
+  { refetchOnWindowFocus: true }
+)
+
+export const useLotEmailRecipients = (q: string) =>
+  useQuery<{ recipients: LotEmailRecipient[] }>({
+    queryKey: ['/api/lot-email/recipients', q],
+    queryFn: async () =>
+      api
+        .get<{ recipients: LotEmailRecipient[] }>('/api/lot-email/recipients', { params: { q } })
+        .then((res) => res.data),
+    enabled: q.trim().length >= 2,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  })
+
+export const useSendLotEmail = createMutation<
+  { to?: string; receiverId?: string; message: string },
+  { email: LotEmail }
+>('post', '/api/lot-email')
+
+export const useMarkLotEmailRead = createMutation<void, { ok: boolean; count: number }>(
+  'post',
+  '/api/lot-email/read'
+)
 
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,

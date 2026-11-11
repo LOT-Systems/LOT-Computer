@@ -9,6 +9,7 @@
 export * from './state.js'
 export * from './theme.js'
 export * from './layout.js'
+export * from './lotEmail.js'
 export { router, goTo, isRouteActive } from './router.js'
 // export * as actions from './actions'
 // export * from './cipher'

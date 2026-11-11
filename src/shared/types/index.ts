@@ -196,8 +196,23 @@ export type DirectMessage = {
   senderId: string;
   receiverId: string;
   message: string;
+  kind: DirectMessageKind;
+  readAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
+};
+
+// 'dm' = Sync thread, 'email' = LOT® Email composed in Log via /email
+export type DirectMessageKind = 'dm' | 'email';
+
+// LOT® Email — inbox record as delivered to Sync
+export type LotEmail = {
+  id: string;
+  message: string;
+  createdAt: string | Date;
+  readAt: string | Date | null;
+  isMine: boolean;
+  counterpart: { id: string; firstName: string | null; lastName: string | null };
 };
 
 // Chat Message Types
@@ -450,4 +465,5 @@ export type SyncEvents = {
   chatMessage: PublicChatMessage;
   chatMessageLike: ChatMessageLikeEventPayload;
   settings_updated: Record<string, never>;
+  lot_email: LotEmail;
 };

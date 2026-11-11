@@ -36,6 +36,8 @@ import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
+import { LotEmailComposer } from '#client/components/LotEmailComposer'
+import { parseLotEmailCommand, lotEmailReceipt } from '#shared/utils/lot-email'
 
 const localStore = {
   logById: map<Record<string, Log>>({}),
@@ -75,7 +77,9 @@ export const Logs: React.FC = React.memo(function LogsInner() {
       })
       // Only refetch (push down) if this is the primary/most recent log
       // Past logs don't need to trigger push-down
-      if (log.id === recentLogId) {
+      // Keep an unsent LOT® Email draft in the primary entry — push down
+      // only after it is sent (the command line becomes a receipt).
+      if (log.id === recentLogId && !parseLotEmailCommand(log.text)) {
         // Refetch logs to push down saved entry and create new empty log
         // Wait 7 seconds: 3s pause (read saved entry) + 4s gentle blink = 7s total
         // Push happens when blink completes at opacity 0.2 (matching saved logs)
@@ -3713,6 +3717,53 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  // LOT® Email — "/email to <Name>" in the primary entry opens the composer
+  const emailCmd = React.useMemo(
+    () => parseLotEmailCommand(value),
+    [value]
+  )
+  const emailSendRef = React.useRef<(() => void) | null>(null)
+  const onEmailSent = React.useCallback((recipientName: string) => {
+    const current = valueRef.current
+    const time = dayjs().format(stores.isTimeFormat12h.get() ? 'h:mm A' : 'HH:mm')
+    // Replace the command line with a receipt so the entry never re-sends;
+    // an inline body ("/email to X: hi") is kept on the next line.
+    const updated = current.replace(
+      /(^|\n)[ \t]*\/email[ \t]+to[ \t]+([^\n]*)/i,
+      (_m: string, pre: string, header: string) => {
+        const colon = header.search(/[:—]/)
+        const inline = colon > -1 ? header.slice(colon + 1).trim() : ''
+        return `${pre}${lotEmailReceipt(recipientName, time)}${inline ? '\n' + inline : ''}`
+      }
+    )
+    setValue(updated)
+    valueRef.current = updated
+    onChangeRef.current(updated)
+    setLastSavedAt(new Date())
+    setIsSaved(true)
+  }, [])
+
+  // Draft handed over from Sync / Cohort ("Email" buttons)
+  const emailDraft = useStore(stores.lotEmailDraft)
+  React.useEffect(() => {
+    if (!primary || !emailDraft) return
+    stores.lotEmailDraft.set(null)
+    // Deferred past this commit so the mount-time server-sync effect
+    // (which resets value to log.text) cannot overwrite the draft.
+    setTimeout(() => {
+      const current = valueRef.current
+      const updated = (current.trim() ? current.replace(/\s+$/, '') + '\n\n' : '') + emailDraft
+      valueRef.current = updated
+      setIsSaved(false)
+      setValue(updated)
+      setTimeout(() => {
+        const ta = containerRef.current?.querySelector('textarea')
+        if (!ta) return
+        ta.focus()
+        ta.selectionStart = ta.selectionEnd = 9e6
+      }, 50)
+    }, 0)
+  }, [primary, emailDraft])
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -3793,6 +3844,11 @@ const NoteEditor = ({
   // Timeline: finish typing > wait 7s > save > opacity fades to 20% > push
   React.useEffect(() => {
     if (log.text === debouncedValue) return
+    // Stale debounce: the text moved on (typing, or an immediate save such
+    // as a sent /email receipt or /prayer). Saving the old snapshot would
+    // overwrite — or, when it is empty, delete — the entry. A fresh
+    // debounce with the current text will follow.
+    if (debouncedValue !== valueRef.current) return
 
     // Save the log
     onChange(debouncedValue)
@@ -3911,6 +3967,11 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        // LOT® Email: Ctrl/Cmd+Enter sends when a composed /email is present
+        if (emailSendRef.current && parseLotEmailCommand(valueRef.current)?.body) {
+          emailSendRef.current()
+          return
+        }
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -4128,6 +4189,7 @@ const NoteEditor = ({
           '/story        Generate a personal story from recent data',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
+          '/email to [name]   LOT® Email — body on next lines, Ctrl+Enter to send',
           '/assembly     Self-assembly module status',
           '/phys         Physiological cohort report',
           '/qos          Quantum OS state analysis',
@@ -4274,6 +4336,9 @@ const NoteEditor = ({
           )}
           rows={primary ? 10 : 1}
         />
+        {emailCmd && (
+          <LotEmailComposer cmd={emailCmd} onSent={onEmailSent} sendRef={emailSendRef} />
+        )}
         {(qiLoading || qiResponse) && (
           <div className="mt-8">
             <Block label="QI [INTSUM]:" blockView>

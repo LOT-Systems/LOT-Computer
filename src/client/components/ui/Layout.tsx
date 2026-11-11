@@ -33,6 +33,8 @@ const NavButton = React.memo(function NavButton({
   isActive: boolean
   isMirrorOn: boolean
 }) {
+  const unread = useStore(stores.lotEmailUnread)
+  const showUnread = link.route === 'sync' && unread > 0
   return (
     <Button
       kind="secondary-rounded"
@@ -50,6 +52,11 @@ const NavButton = React.memo(function NavButton({
       disabled={!link.route}
     >
       {link.label}
+      {showUnread && (
+        <span className="ml-4 tabular-nums" title="LOT® Email — unread">
+          ✉{unread}
+        </span>
+      )}
     </Button>
   )
 })

@@ -303,6 +303,9 @@ const App = () => {
       }
     )
 
+    // LOT® Email — unread count + live delivery to Sync
+    stores.initLotEmail()
+
     // Initialize recipe widget periodic checking
     initRecipeWidget()
 
