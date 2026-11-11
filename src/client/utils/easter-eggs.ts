@@ -1888,6 +1888,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bhuang[\s-]?p[ōo]\b|\bhuangbo\b|\bno[\s-]?mind\b|\bdharma[\s-]?of[\s-]?mind[\s-]?transmission\b/i,                                                 badge: 'huang_po_signal' },
   { patterns: /\bjoshu\b|\bzhaozhou\b|\bwash[\s-]?your[\s-]?bowl\b|\bjoshu'?s[\s-]?dog\b|\bcase[\s-]?one\b/i,                                                       badge: 'joshu_gate_badge' },
   { patterns: /\bsatori\b|\bkensho\b|\bsudden[\s-]?awakening\b|\bgreat[\s-]?enlightenment\b|\bthe[\s-]?veil[\s-]?lifted\b|\bbreaking[\s-]?through\b/i,              badge: 'satori_signal' },
+  // ── v37 — THE NATURE SIGNAL — word turns ─────────────────────────────────
+  { patterns: /\bforest\b|\bwoods\b|\bwalk[\s-]?in[\s-]?the[\s-]?forest\b|\bthrough[\s-]?the[\s-]?trees\b|\bin[\s-]?the[\s-]?woods\b/i,                            badge: 'forest_signal' },
+  { patterns: /\bmycelium\b|\bmycelial\b|\bfungal[\s-]?network\b|\bmushroom[\s-]?network\b|\bwood[\s-]?wide[\s-]?web\b/i,                                           badge: 'mycelium_net' },
+  { patterns: /\bwatershed\b|\briver[\s-]?basin\b|\bwaterway\b|\bthe[\s-]?river[\s-]?flows\b|\bdrainage[\s-]?basin\b/i,                                             badge: 'watershed_badge' },
+  { patterns: /\bbiophilia\b|\blove[\s-]?of[\s-]?nature\b|\bnature[\s-]?connection\b|\bnature[\s-]?deficit\b|\baffiliation[\s-]?with[\s-]?nature\b/i,               badge: 'biophilia' },
+  { patterns: /\bdeep[\s-]?ecology\b|\becopsychology\b|\bnature[\s-]?psychology\b|\becotherapy\b|\becological[\s-]?self\b/i,                                         badge: 'deep_ecology' },
+  { patterns: /\bforest[\s-]?bath(ing)?\b|\bshinrin[\s-]?yoku\b|\bforest[\s-]?therapy\b|\bwalk[\s-]?among[\s-]?trees\b|\bimmersive[\s-]?nature\b/i,                 badge: 'forest_bath' },
+  { patterns: /\bphenology\b|\bseasonal[\s-]?cycles\b|\bbloom[\s-]?season\b|\bmigration[\s-]?patterns\b|\bphenological\b/i,                                         badge: 'phenology' },
+  { patterns: /\broot[\s-]?system\b|\btap[\s-]?root\b|\bdeep[\s-]?roots\b|\binterconnected[\s-]?roots\b|\broot[\s-]?network\b/i,                                   badge: 'root_system' },
+  { patterns: /\brewild(ing)?\b|\brestore[\s-]?habitat\b|\bwild[\s-]?spaces\b|\breintroduce\b|\bwildlife[\s-]?corridor\b/i,                                          badge: 'rewild_signal' },
+  { patterns: /\bold[\s-]?growth\b|\bancient[\s-]?forest\b|\bthousand[\s-]?year[\s-]?tree\b|\bold[\s-]?trees\b|\bgrowth[\s-]?forest\b/i,                            badge: 'old_growth' },
+  { patterns: /\btopsoil\b|\bhumus\b|\bsoil[\s-]?health\b|\bliving[\s-]?soil\b|\bsoil[\s-]?microbiome\b|\bmicrobiome[\s-]?of[\s-]?soil\b/i,                        badge: 'soil_alive' },
+  { patterns: /\bemergence\b|\bemergent\b|\bself[\s-]?organizing\b|\bcomplexity[\s-]?of[\s-]?system\b|\bcomplex[\s-]?adaptive\b|\bmurmuration\b/i,                   badge: 'emergence_field' },
+  // ── v37 — THE WILD VAULT — secret boss word triggers ─────────────────────
+  { patterns: /\bjohn[\s-]?muir\b|\bthe[\s-]?mountains[\s-]?are[\s-]?calling\b|\byosemite\b|\bsierra[\s-]?nevada\b/i,                                              badge: 'muir_signal' },
+  { patterns: /\bwalden\b|\bthoreau\b|\bcivil[\s-]?disobedience\b|\bbean[\s-]?field\b|\bwalden[\s-]?pond\b/i,                                                       badge: 'walden_signal' },
+  { patterns: /\bgaia[\s-]?hypothesis\b|\bjames[\s-]?lovelock\b|\bliving[\s-]?earth\b|\bbiosphere\b|\bself[\s-]?regulating[\s-]?system\b/i,                         badge: 'gaia_hypothesis' },
 ]
 
 /**
@@ -2298,6 +2315,14 @@ export function runCheckInEasterEggs(
   const sunriseDiscipline = checkSunriseDiscipline()
   if (sunriseDiscipline) awarded.push(sunriseDiscipline)
 
+  // v36 Jazz Engine: late_set (wire-up fix: was defined but not called in check-ins)
+  const lateSet = checkLateSet()
+  if (lateSet) awarded.push(lateSet)
+
+  // v37 Nature Signal: dawn_walker (05:00–07:00)
+  const dawnWalker = checkDawnWalker()
+  if (dawnWalker) awarded.push(dawnWalker)
+
   // Record activity after all checks (so gap detection works next time)
   recordActivity()
 
@@ -2413,6 +2438,20 @@ export function runJournalEasterEggs(journalText: string): BadgeType[] {
   if (eveningAudit) awarded.push(eveningAudit)
   const zenVault = checkZenVault(journalText)
   awarded.push(...zenVault)
+
+  // v36 Jazz Engine behavioral + word turns (wire-up fix: were defined but not called)
+  const jazzWordTurns = checkJazzWordTurns(journalText)
+  awarded.push(...jazzWordTurns)
+  const jazzSession = checkJazzSession(journalText)
+  if (jazzSession) awarded.push(jazzSession)
+  const soloPractice = checkSoloPractice(journalText)
+  if (soloPractice) awarded.push(soloPractice)
+
+  // v37 Nature Signal behavioral
+  const natureSession = checkNatureSession(journalText)
+  if (natureSession) awarded.push(natureSession)
+  const longWalk = checkLongWalk(journalText)
+  if (longWalk) awarded.push(longWalk)
 
   // Word turns from journal text
   const wordTurns = detectWordTurns(journalText)
@@ -4513,5 +4552,57 @@ export function checkSoloPractice(journalText: string): BadgeType | null {
     }
   } catch { /* non-critical */ }
 
+  return null
+}
+
+// ── Nature Signal v37 — behavioral checks ─────────────────────────────────────
+
+const NATURE_WORDS_V37 = [
+  /\bforest\b|\bwoods\b|\bwalk[\s-]?in[\s-]?the[\s-]?forest\b|\bthrough[\s-]?the[\s-]?trees\b/i,
+  /\bmycelium\b|\bmycelial\b|\bfungal[\s-]?network\b|\bmushroom[\s-]?network\b/i,
+  /\bwatershed\b|\briver[\s-]?basin\b|\bwaterway\b/i,
+  /\bbiophilia\b|\blove[\s-]?of[\s-]?nature\b|\bnature[\s-]?connection\b/i,
+  /\bdeep[\s-]?ecology\b|\becopsychology\b|\becotherapy\b/i,
+  /\bforest[\s-]?bath(ing)?\b|\bshinrin[\s-]?yoku\b|\bforest[\s-]?therapy\b/i,
+  /\bphenology\b|\bseasonal[\s-]?cycles\b|\bmigration[\s-]?patterns\b/i,
+  /\broot[\s-]?system\b|\btap[\s-]?root\b|\bdeep[\s-]?roots\b/i,
+  /\brewild(ing)?\b|\brestore[\s-]?habitat\b|\bwild[\s-]?spaces\b/i,
+  /\bold[\s-]?growth\b|\bancient[\s-]?forest\b|\bthousand[\s-]?year[\s-]?tree\b/i,
+  /\btopsoil\b|\bhumus\b|\bsoil[\s-]?health\b|\bliving[\s-]?soil\b/i,
+  /\bemergence\b|\bemergent\b|\bself[\s-]?organizing\b|\bmurmuration\b/i,
+]
+
+/** Award nature_session badge if 3+ Nature Signal (v37) words appear in one journal entry. */
+export function checkNatureSession(journalText: string): BadgeType | null {
+  if (hasBadge('nature_session')) return null
+  const matchCount = NATURE_WORDS_V37.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('nature_session')
+    return 'nature_session'
+  }
+  return null
+}
+
+/** Award dawn_walker badge if journal entry is written between 05:00 and 07:00 local time. */
+export function checkDawnWalker(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_walker')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour >= 5 && hour < 7) {
+    awardBadge('dawn_walker')
+    return 'dawn_walker'
+  }
+  return null
+}
+
+/** Award long_walk badge if journal entry has 400+ words. */
+export function checkLongWalk(journalText: string): BadgeType | null {
+  if (hasBadge('long_walk')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 400) {
+    awardBadge('long_walk')
+    return 'long_walk'
+  }
   return null
 }

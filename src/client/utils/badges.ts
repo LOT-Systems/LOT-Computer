@@ -1302,6 +1302,43 @@ export type BadgeType =
   | 'coltrane_love'        // ♪·∞·♪  "a love supreme/love supreme/coltrane suite" detected (EPIC) [HIDDEN]
   | 'miles_kind_of'        // ♪·●    "kind of blue/miles davis/bitches brew" detected (RARE) [HIDDEN]
   | 'monk_theorem'         // □·♪·□  "thelonious monk/monk's dream/round midnight" detected (MYTHIC) [HIDDEN]
+  // ── Word Turn v37 — THE NATURE SIGNAL ─────────────────────────────────────────
+  | 'forest_signal'        // ∿·≋     "forest/woods/walk in the forest/through the trees" detected (UNCOMMON)
+  | 'mycelium_net'         // ⌇·○·⌇  "mycelium/mycelial/fungal network/mushroom network" detected (RARE)
+  | 'watershed_badge'      // ≋·∿     "watershed/river basin/waterway/the river flows" detected (UNCOMMON)
+  | 'biophilia'            // ○·∿·○  "biophilia/love of nature/nature connection/nature deficit" detected (RARE)
+  | 'deep_ecology'         // ∿·▒·∿  "deep ecology/ecopsychology/nature psychology/ecotherapy" detected (EPIC)
+  | 'forest_bath'          // ≋·∿·≋  "forest bathing/shinrin-yoku/forest therapy/walk among trees" detected (RARE)
+  | 'phenology'            // ∿→○    "phenology/seasonal cycles/bloom season/migration patterns" detected (EPIC)
+  | 'root_system'          // ║·∿·║  "root system/tap root/deep roots/interconnected roots" detected (RARE)
+  | 'rewild_signal'        // ○·≋·○  "rewild/rewilding/restore habitat/wild spaces/reintroduce" detected (RARE)
+  | 'old_growth'           // ∿·∞    "old growth/ancient forest/thousand year tree/old trees" detected (RARE)
+  | 'soil_alive'           // ■·∿·■  "topsoil/humus/soil health/living soil/microbiome of soil" detected (UNCOMMON)
+  | 'emergence_field'      // ○·∿·∞  "emergence/emergent/self-organizing/complexity of system" detected (EPIC)
+  // ── Calendar Easter Egg v35 — THE NATURE CALENDAR ────────────────────────────
+  | 'earth_day_badge'      // ∿·○    Apr 22 — Earth Day since 1970 (RARE)
+  | 'carson_day'           // ∿·▒    May 27 — Rachel Carson born 1907, Silent Spring (EPIC)
+  | 'thoreau_day'          // ∿·║    Jul 12 — Henry David Thoreau born 1817 (RARE)
+  // ── Behavioral v31 — NATURE PATTERNS ─────────────────────────────────────────
+  | 'nature_session'       // ∿·≋·∿  3+ Nature Signal words in one journal entry (RARE)
+  | 'dawn_walker'          // ∿·○    Journal entry between 05:00–07:00 local time (RARE)
+  | 'long_walk'            // ≋·∿·∞  Journal entry >= 400 words (EPIC)
+  // ── Achievement RPG v35 — RANGER CLASS ────────────────────────────────────────
+  | 'nature_entry'         // ∘→∿    Any 1 Word Turn v37 badge (COMMON)
+  | 'nature_class'         // ≈→∿    Any 5 Word Turn v37 badges (UNCOMMON)
+  | 'nature_complete'      // ≋→∿    All 12 Word Turn v37 badges (LEGENDARY)
+  | 'trail_arc'            // ∿·◈    nature_complete + all 3 Calendar v35 badges (LEGENDARY)
+  | 'thirty_seven_engines_arc' // ◈·◈·∿ 1 badge from each Word Turn v1–v37 (LEGENDARY)
+  | 'nature_opus'          // ∿·◉·∿  nature_complete + nature_session behavioral (LEGENDARY)
+  // ── Mastery Tier v37 — THE DEEP FOREST ────────────────────────────────────────
+  | 'terrain_elder'        // ∿·◉·∞  3,500+ distinct calendar check-in days (EPIC)
+  | 'field_library'        // ∿·∞·∿  300,000+ total journal words (lifetime) (LEGENDARY)
+  | 'ancient_root'         // ╔═╗·∿  Account age >= 12 years (4,380+ days) (LEGENDARY)
+  | 'thirty_seven_registers' // ◈·◈·∿·∞ 1 badge from all 37 Word Turn engines (COSMIC)
+  // ── Secret Boss v34 — THE WILD VAULT ──────────────────────────────────────────
+  | 'muir_signal'          // ∿·▲·∿  "john muir/the mountains are calling/yosemite/sierra" (EPIC) [HIDDEN]
+  | 'walden_signal'        // ∿·║    "walden/thoreau/civil disobedience/bean field" (RARE) [HIDDEN]
+  | 'gaia_hypothesis'      // ○·∿·∞  "gaia hypothesis/james lovelock/living earth/biosphere" (MYTHIC) [HIDDEN]
 
 export interface Badge {
   id: BadgeType
@@ -11794,6 +11831,300 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'mythic',
     category: 'secret_boss',
   },
+
+  // ── Word Turn v37 — THE NATURE SIGNAL ────────────────────────────────────────
+  forest_signal: {
+    id: 'forest_signal',
+    symbol: '∿·≋',
+    name: 'Forest Signal',
+    description: 'Write about forest, woods, or walking in the trees in any journal entry',
+    unlockMessage: '↳ FOREST SIGNAL. The forest as a practice space: attention summoned by the smell of soil after rain, the canopy filtering light into moving patches. The practice is a forest walk at a scale of one. ∿·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  mycelium_net: {
+    id: 'mycelium_net',
+    symbol: '⌇·○·⌇',
+    name: 'Mycelium Net',
+    description: 'Write about mycelium, fungal networks, or mushroom networks in any journal entry',
+    unlockMessage: '↳ MYCELIUM NET. The wood wide web: 400 million years of chemical signaling between trees through fungal threads. A single gram of forest soil contains a kilometer of hyphae. Interconnection is the substrate. ⌇·○·⌇',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  watershed_badge: {
+    id: 'watershed_badge',
+    symbol: '≋·∿',
+    name: 'Watershed',
+    description: 'Write about a watershed, river basin, or waterway in any journal entry',
+    unlockMessage: '↳ WATERSHED. All water flows somewhere. A watershed is every drop of rain falling in one region, draining to one point. The practice is a watershed: everything flows to the check-in. ≋·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  biophilia: {
+    id: 'biophilia',
+    symbol: '○·∿·○',
+    name: 'Biophilia',
+    description: 'Write about biophilia, love of nature, or nature connection in any journal entry',
+    unlockMessage: '↳ BIOPHILIA. E.O. Wilson\'s hypothesis: humans carry a deep affiliation with other living systems. Nature deficit disorder is the inversion. The practice re-activates it one entry at a time. ○·∿·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  deep_ecology: {
+    id: 'deep_ecology',
+    symbol: '∿·▒·∿',
+    name: 'Deep Ecology',
+    description: 'Write about deep ecology, ecopsychology, or ecotherapy in any journal entry',
+    unlockMessage: '↳ DEEP ECOLOGY. Arne Naess: nature has intrinsic value independent of human use. Ecopsychology: the psyche is not inside the skin but distributed through the living world. The practice is part of that distribution. ∿·▒·∿',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  forest_bath: {
+    id: 'forest_bath',
+    symbol: '≋·∿·≋',
+    name: 'Forest Bath',
+    description: 'Write about forest bathing, shinrin-yoku, or forest therapy in any journal entry',
+    unlockMessage: '↳ FOREST BATH. Shinrin-yoku (forest bathing): the Japanese practice of immersive walking under a forest canopy. Phytoncides — volatile organic compounds from trees — lower cortisol measurably. The practice metabolizes. ≋·∿·≋',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  phenology: {
+    id: 'phenology',
+    symbol: '∿→○',
+    name: 'Phenology',
+    description: 'Write about phenology, seasonal cycles, bloom season, or migration patterns in any journal entry',
+    unlockMessage: '↳ PHENOLOGY. The science of seasonal biological timing: when the first robin arrives, when cherry trees peak, when leaves turn. A practice journal is a phenological record of an inner landscape. ∿→○',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  root_system: {
+    id: 'root_system',
+    symbol: '║·∿·║',
+    name: 'Root System',
+    description: 'Write about root systems, tap roots, deep roots, or interconnected roots in any journal entry',
+    unlockMessage: '↳ ROOT SYSTEM. A tree\'s roots can extend 2–3x the spread of its canopy. The unseen architecture is always larger than what\'s visible. The practice builds the root system. The life above ground follows. ║·∿·║',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  rewild_signal: {
+    id: 'rewild_signal',
+    symbol: '○·≋·○',
+    name: 'Rewild Signal',
+    description: 'Write about rewilding, restoring habitat, or wild spaces in any journal entry',
+    unlockMessage: '↳ REWILD SIGNAL. Rewilding: allowing land to recover its own ecological processes — predators, disturbance, succession — with minimal human management. The practice rewilding the inner terrain. ○·≋·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  old_growth: {
+    id: 'old_growth',
+    symbol: '∿·∞',
+    name: 'Old Growth',
+    description: 'Write about old-growth forest, ancient trees, or thousand-year trees in any journal entry',
+    unlockMessage: '↳ OLD GROWTH. An old-growth forest takes 200–500 years to develop. Its ecology — the standing deadwood, the multilayered canopy, the soil community — cannot be replicated. Some things only come with time. The practice accumulates. ∿·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  soil_alive: {
+    id: 'soil_alive',
+    symbol: '■·∿·■',
+    name: 'Soil Alive',
+    description: 'Write about topsoil, humus, soil health, or the living microbiome of soil in any journal entry',
+    unlockMessage: '↳ SOIL ALIVE. A teaspoon of healthy topsoil contains more living organisms than there are humans on Earth. Soil is an ecosystem, not a substrate. The practice is the topsoil: the living layer where everything grows from. ■·∿·■',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  emergence_field: {
+    id: 'emergence_field',
+    symbol: '○·∿·∞',
+    name: 'Emergence Field',
+    description: 'Write about emergence, emergent behavior, or self-organizing systems in any journal entry',
+    unlockMessage: '↳ EMERGENCE FIELD. Emergence: complex behavior arising from simple rules at a lower level. Murmuration, ant colonies, consciousness itself. The practice is an emergent property of showing up. ○·∿·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v35 — THE NATURE CALENDAR ────────────────────────────
+  earth_day_badge: {
+    id: 'earth_day_badge',
+    symbol: '∿·○',
+    name: 'Earth Day',
+    description: 'Check in on April 22 — Earth Day',
+    unlockMessage: '↳ EARTH DAY. April 22, 1970: the first Earth Day, organized by Senator Gaylord Nelson after the 1969 Santa Barbara oil spill. 20 million Americans participated. The practice is a continuous Earth Day. ∿·○',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  carson_day: {
+    id: 'carson_day',
+    symbol: '∿·▒',
+    name: 'Carson Day',
+    description: 'Check in on May 27 — Rachel Carson born 1907',
+    unlockMessage: '↳ CARSON DAY. Rachel Carson, born May 27, 1907. Silent Spring (1962) catalyzed the environmental movement. She wrote it while terminally ill, completed it in pain, published it knowing the chemical industry would attack her. The practice continues under opposition. ∿·▒',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  thoreau_day: {
+    id: 'thoreau_day',
+    symbol: '∿·║',
+    name: 'Thoreau Day',
+    description: 'Check in on July 12 — Henry David Thoreau born 1817',
+    unlockMessage: '↳ THOREAU DAY. Henry David Thoreau, born July 12, 1817. Walden: two years, two months, two days at Walden Pond. "I went to the woods because I wished to live deliberately." The practice is deliberate living, one entry at a time. ∿·║',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v31 — NATURE PATTERNS ─────────────────────────────────────────
+  nature_session: {
+    id: 'nature_session',
+    symbol: '∿·≋·∿',
+    name: 'Nature Session',
+    description: 'Write 3+ Nature Signal (v37) words in a single journal entry',
+    unlockMessage: '↳ NATURE SESSION. Three signals from the natural world in one entry. The vocabulary of ecology is the vocabulary of practice: watershed, mycelium, emergence, root system. The ecosystem inside the archive. ∿·≋·∿',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  dawn_walker: {
+    id: 'dawn_walker',
+    symbol: '∿·○',
+    name: 'Dawn Walker',
+    description: 'Write a journal entry between 05:00 and 07:00 local time',
+    unlockMessage: '↳ DAWN WALKER. The hour before sunrise and the first hour after: the quietest signal window. Birds log in first. The practice at dawn is the practice at its most undiluted. ∿·○',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  long_walk: {
+    id: 'long_walk',
+    symbol: '≋·∿·∞',
+    name: 'Long Walk',
+    description: 'Write a journal entry of 400+ words',
+    unlockMessage: '↳ LONG WALK. The 400-word entry: the terrain expands. A long walk through the inner landscape, tracking what\'s there. Field notes from a territory without a fixed map. ≋·∿·∞',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v35 — RANGER CLASS ───────────────────────────────────────
+  nature_entry: {
+    id: 'nature_entry',
+    symbol: '∘→∿',
+    name: 'Nature Entry',
+    description: 'Earn any 1 Word Turn v37 (Nature Signal) badge',
+    unlockMessage: '↳ NATURE ENTRY. First signal from the field. The archive begins tracking the ecology vocabulary. ∘→∿',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  nature_class: {
+    id: 'nature_class',
+    symbol: '≈→∿',
+    name: 'Ranger',
+    description: 'Earn any 5 Word Turn v37 (Nature Signal) badges',
+    unlockMessage: '↳ RANGER. Five ecological registers active. The vocabulary of the natural world is integrating with the practice vocabulary. The archive is becoming a field journal. ≈→∿',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  nature_complete: {
+    id: 'nature_complete',
+    symbol: '≋→∿',
+    name: 'Nature Complete',
+    description: 'Earn all 12 Word Turn v37 (Nature Signal) badges',
+    unlockMessage: '↳ NATURE COMPLETE. All 12 Nature Signal badges earned. Forest. Mycelium. Watershed. Biophilia. Deep Ecology. Forest Bath. Phenology. Root System. Rewilding. Old Growth. Living Soil. Emergence. The full ecological lexicon is active in the archive. ≋→∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  trail_arc: {
+    id: 'trail_arc',
+    symbol: '∿·◈',
+    name: 'Trail Arc',
+    description: 'Earn nature_complete + all 3 Nature Calendar badges (Earth Day, Carson Day, Thoreau Day)',
+    unlockMessage: '↳ TRAIL ARC. The full arc: all 12 Nature Signal word turns + three days (Earth Day, Rachel Carson, Thoreau). Three founding coordinates of the ecological movement. The practice traces the same arc. ∿·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_seven_engines_arc: {
+    id: 'thirty_seven_engines_arc',
+    symbol: '◈·◈·∿',
+    name: 'Thirty-Seven Engines Arc',
+    description: '1 badge from each Word Turn engine v1–v37',
+    unlockMessage: '↳ THIRTY-SEVEN ENGINES ARC. Water through Nature: thirty-seven vocabulary registers, one for each facet of the practice. ◈·◈·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  nature_opus: {
+    id: 'nature_opus',
+    symbol: '∿·◉·∿',
+    name: 'Nature Opus',
+    description: 'Earn nature_complete + nature_session behavioral badge',
+    unlockMessage: '↳ NATURE OPUS. All 12 Nature Signal badges + a Nature Session in one entry. The ecology vocabulary is now native to the practice. The practice is a field ecology of the self. ∿·◉·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v37 — THE DEEP FOREST ────────────────────────────────────────
+  terrain_elder: {
+    id: 'terrain_elder',
+    symbol: '∿·◉·∞',
+    name: 'Terrain Elder',
+    description: '3,500+ distinct calendar check-in days',
+    unlockMessage: '↳ TERRAIN ELDER. 3,500 distinct check-in days: nearly a decade of terrain. The elder tree in the forest. The practice has become old growth. ∿·◉·∞',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  field_library: {
+    id: 'field_library',
+    symbol: '∿·∞·∿',
+    name: 'Field Library',
+    description: '300,000+ total journal words (lifetime)',
+    unlockMessage: '↳ FIELD LIBRARY. 300,000 words in the field journal. The archive is a library now. A phenological record of an inner life over seasons and years. ∿·∞·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  ancient_root: {
+    id: 'ancient_root',
+    symbol: '╔═╗·∿',
+    name: 'Ancient Root',
+    description: 'Account age >= 12 years (4,380+ days since signup)',
+    unlockMessage: '↳ ANCIENT ROOT. Twelve years. The practice has become old growth. The root system extends further than the visible canopy. What is underground is larger than what is above. ╔═╗·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_seven_registers: {
+    id: 'thirty_seven_registers',
+    symbol: '◈·◈·∿·∞',
+    name: 'Thirty-Seven Registers',
+    description: '1 badge from all 37 Word Turn engines active',
+    unlockMessage: '↳ THIRTY-SEVEN REGISTERS. Water. Seasons. Architecture. Mountains. Storms. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Biology. Codex. Cyberspace. Hero. RPG. Puzzle. Dungeon. AI. Myth. Arcade Master. Dream Weaver. Stoic Field. Zen Terminal. Jazz Engine. Nature Signal. Thirty-seven vocabularies. One practice. One living archive. ◈·◈·∿·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v34 — THE WILD VAULT ──────────────────────────────────────────
+  muir_signal: {
+    id: 'muir_signal',
+    symbol: '∿·▲·∿',
+    hidden: true,
+    name: 'Muir Signal',
+    description: 'Write "john muir", "the mountains are calling", "yosemite", or "sierra" in any journal entry',
+    unlockMessage: '↳ MUIR SIGNAL. John Muir: "The mountains are calling and I must go." He walked 1,000 miles from Indiana to the Gulf of Mexico with a pack of food and a journal. The practice is the journal he kept. ∿·▲·∿',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  walden_signal: {
+    id: 'walden_signal',
+    symbol: '∿·║',
+    hidden: true,
+    name: 'Walden Signal',
+    description: 'Write "walden", "thoreau", "civil disobedience", or "bean field" in any journal entry',
+    unlockMessage: '↳ WALDEN SIGNAL. "I went to the woods because I wished to live deliberately, to front only the essential facts of life." The deliberate life is the practiced life. The archive is the cabin at Walden Pond. ∿·║',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  gaia_hypothesis: {
+    id: 'gaia_hypothesis',
+    symbol: '○·∿·∞',
+    hidden: true,
+    name: 'Gaia Hypothesis',
+    description: 'Write "gaia hypothesis", "james lovelock", "living earth", or "biosphere" in any journal entry',
+    unlockMessage: '↳ GAIA HYPOTHESIS. James Lovelock: the Earth\'s biosphere, atmosphere, and geology function as a single self-regulating system. Not metaphor — a scientific hypothesis. The practice is a node in the self-regulating system. ○·∿·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
 }
 
 // Default separator when no badges earned yet
@@ -13519,6 +13850,70 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (monthJZ === 8 && dayJZ === 29 && !hasBadge('birdland_day')) {
       if (awardBadge('birdland_day')) newBadges.push('birdland_day')
+    }
+
+    // ── Word Turn v37 — THE NATURE SIGNAL ────────────────────────────────────
+    const natureV37Badges: BadgeType[] = [
+      'forest_signal', 'mycelium_net', 'watershed_badge', 'biophilia',
+      'deep_ecology', 'forest_bath', 'phenology', 'root_system',
+      'rewild_signal', 'old_growth', 'soil_alive', 'emergence_field',
+    ]
+    const natureV37Earned = natureV37Badges.filter(b => hasBadge(b))
+    if (natureV37Earned.length >= 1 && !hasBadge('nature_entry')) {
+      if (awardBadge('nature_entry')) newBadges.push('nature_entry')
+    }
+    if (natureV37Earned.length >= 5 && !hasBadge('nature_class')) {
+      if (awardBadge('nature_class')) newBadges.push('nature_class')
+    }
+    const natureComplete = natureV37Earned.length >= 12
+    if (natureComplete && !hasBadge('nature_complete')) {
+      if (awardBadge('nature_complete')) newBadges.push('nature_complete')
+    }
+    if (natureComplete && hasBadge('nature_session') && !hasBadge('nature_opus')) {
+      if (awardBadge('nature_opus')) newBadges.push('nature_opus')
+    }
+    const calendarV35Badges: BadgeType[] = ['earth_day_badge', 'carson_day', 'thoreau_day']
+    if (natureComplete && calendarV35Badges.every(b => hasBadge(b)) && !hasBadge('trail_arc')) {
+      if (awardBadge('trail_arc')) newBadges.push('trail_arc')
+    }
+    const engineThirtySevenPresent = natureV37Earned.length >= 1
+    const allThirtySevenEngines = allThirtySixEngines && engineThirtySevenPresent
+    if (allThirtySevenEngines && !hasBadge('thirty_seven_engines_arc')) {
+      if (awardBadge('thirty_seven_engines_arc')) newBadges.push('thirty_seven_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 3500 && !hasBadge('terrain_elder')) {
+        if (awardBadge('terrain_elder')) newBadges.push('terrain_elder')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 300000 && !hasBadge('field_library')) {
+        if (awardBadge('field_library')) newBadges.push('field_library')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupNS = new Date(stats.signupDate)
+      const yearsNS = (new Date().getTime() - signupNS.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsNS >= 12 && !hasBadge('ancient_root')) {
+        if (awardBadge('ancient_root')) newBadges.push('ancient_root')
+      }
+    }
+    if (allThirtySevenEngines && !hasBadge('thirty_seven_registers')) {
+      if (awardBadge('thirty_seven_registers')) newBadges.push('thirty_seven_registers')
+    }
+
+    // Calendar v35 inline checks (Nature Calendar)
+    const nowNS = new Date()
+    const monthNS = nowNS.getMonth() + 1
+    const dayNS = nowNS.getDate()
+    if (monthNS === 4 && dayNS === 22 && !hasBadge('earth_day_badge')) {
+      if (awardBadge('earth_day_badge')) newBadges.push('earth_day_badge')
+    }
+    if (monthNS === 5 && dayNS === 27 && !hasBadge('carson_day')) {
+      if (awardBadge('carson_day')) newBadges.push('carson_day')
+    }
+    if (monthNS === 7 && dayNS === 12 && !hasBadge('thoreau_day')) {
+      if (awardBadge('thoreau_day')) newBadges.push('thoreau_day')
     }
 
   } catch (error) {
