@@ -108,15 +108,56 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
     return () => clearInterval(interval)
   }, [fetchStatus])
 
-  const getStatusIcon = (checkStatus: 'ok' | 'error' | 'unknown') => {
+  const getStatusBadge = (checkStatus: 'ok' | 'error' | 'unknown') => {
+    const base = 'inline-flex items-center gap-x-6 text-xs font-mono tracking-wide uppercase'
     switch (checkStatus) {
       case 'ok':
-        return '✓'
+        return (
+          <span className={cn(base, 'text-acc')}>
+            <span className="w-6 h-6 rounded-full bg-current opacity-80 shrink-0" />
+            Operational
+          </span>
+        )
       case 'error':
-        return '✕'
+        return (
+          <span className={cn(base, 'text-acc/50')}>
+            <span className="w-6 h-6 rounded-full bg-current shrink-0" />
+            Degraded
+          </span>
+        )
       case 'unknown':
-        return '?'
+        return (
+          <span className={cn(base, 'text-acc/30')}>
+            <span className="w-6 h-6 rounded-full bg-current shrink-0" />
+            Unknown
+          </span>
+        )
     }
+  }
+
+  const getOverallBanner = (overall: 'ok' | 'degraded' | 'error') => {
+    if (overall === 'ok') {
+      return (
+        <div className="flex items-center gap-x-12 py-12 px-16 border border-acc/20 rounded">
+          <span className="w-8 h-8 rounded-full bg-acc shrink-0" />
+          <span className="text-acc font-mono text-xs uppercase tracking-widest">All systems operational</span>
+        </div>
+      )
+    }
+    if (overall === 'degraded') {
+      return (
+        <div className="flex items-center gap-x-12 py-12 px-16 border border-acc/40 rounded">
+          <span className="w-8 h-8 rounded-full bg-acc/50 shrink-0" />
+          <span className="text-acc/70 font-mono text-xs uppercase tracking-widest">Degraded performance</span>
+        </div>
+      )
+    }
+    return (
+      <div className="flex items-center gap-x-12 py-12 px-16 border border-acc/60 rounded">
+        <span className="w-8 h-8 rounded-full bg-acc/30 shrink-0" />
+        <span className="text-acc/60 font-mono text-xs uppercase tracking-widest">System issues detected</span>
+      </div>
+    )
   }
 
   const formatDate = (dateString: string) => {
@@ -144,12 +185,14 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
       </div>
 
       {loading && !status && (
-        <div className="text-acc/40">Loading...</div>
+        <div className="text-acc/30 font-mono text-xs uppercase tracking-widest animate-pulse">Checking systems…</div>
       )}
 
       {error && !status && (
         <div className="mb-32">
-          <div className="mb-16 text-acc/80">Error: {error}</div>
+          <div className="mb-16 font-mono text-xs text-acc/60 border border-acc/20 rounded py-12 px-16">
+            Error: {error}
+          </div>
           <Button kind="secondary" size="small" onClick={fetchStatus}>
             Retry
           </Button>
@@ -159,11 +202,10 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
       {status && (
         <>
           <div className="mb-16">
-            <Block label="Status:" labelClassName="!pl-0">
-              {status.overall === 'ok' ? 'All systems operational' :
-               status.overall === 'degraded' ? 'Degraded performance' :
-               'System issues detected'}
-            </Block>
+            {getOverallBanner(status.overall)}
+          </div>
+
+          <div className="mb-16">
             <Block label="Version:" labelClassName="!pl-0">v{status.version}</Block>
             <Block label="Environment:" labelClassName="!pl-0">{status.environment}</Block>
             <Block label="Last updated:" labelClassName="!pl-0" containsSmallButton>
@@ -182,14 +224,14 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
                   onClick={fetchStatus}
                   disabled={loading}
                 >
-                  {loading ? 'Refreshing...' : 'Refresh'}
+                  {loading ? 'Refreshing…' : 'Refresh'}
                 </Button>
               </div>
             </Block>
           </div>
 
           <div className="mb-16">
-            <div className="mb-16">System components:</div>
+            <div className="mb-16 font-mono text-xs uppercase tracking-widest text-acc/50">System components</div>
             {status.checks.map((check, index) => (
               <Block
                 key={index}
@@ -197,22 +239,14 @@ export const StatusPage = ({ noWrapper = false }: StatusPageProps) => {
                 labelClassName="!pl-0"
                 className="mb-8"
               >
-                <div className="flex items-center gap-x-8">
-                  <span>{getStatusIcon(check.status)}</span>
-                  <span className={cn(
-                    check.status === 'ok' && 'text-acc',
-                    check.status === 'error' && 'text-acc/60'
-                  )}>
-                    {check.status === 'ok' ? 'Ok' :
-                     check.status === 'error' ? 'Error' :
-                     'Unknown'}
-                  </span>
+                <div className="flex items-center gap-x-16">
+                  {getStatusBadge(check.status)}
                   {check.duration !== undefined && (
-                    <span className="text-acc/40">({check.duration}ms)</span>
+                    <span className="text-acc/30 font-mono text-xs">{check.duration}ms</span>
                   )}
                 </div>
                 {check.message && (
-                  <div className="text-acc/60 mt-4">{check.message}</div>
+                  <div className="text-acc/50 font-mono text-xs mt-6">{check.message}</div>
                 )}
               </Block>
             ))}
