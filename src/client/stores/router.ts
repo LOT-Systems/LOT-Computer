@@ -10,6 +10,7 @@ import { createRouter, openPage } from '@nanostores/router'
 
 type Routes = {
   system: void
+  basics: void
   settings: void
   api: void
   sync: void
@@ -22,6 +23,7 @@ type Routes = {
 
 export const router = createRouter<Routes>({
   system: '/',
+  basics: '/basics',
   settings: '/settings',
   api: '/api',
   sync: '/sync',

@@ -419,3 +419,81 @@ td:last-child {
   content: 'built different since day one';
   display: none;
 }
+
+/* ==========================================================================
+   LOT-FM-001 — BASIC TERMINAL GRID (.lot-term)
+   Monospace bold. Ink on ground. Hierarchy by inversion only. 2px rules.
+   Square corners. Fixed character grid. No color beyond the theme pair.
+   ========================================================================== */
+.lot-term {
+  --lt-ink: rgb(var(--acc-color-default));
+  --lt-ground: var(--base-color);
+  font-family: 'Liberation Mono', 'LiberationMono-Bold', 'Cousine', 'Courier New', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--lt-ink);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 88ch;
+  border-radius: 0;
+}
+.lot-term * { border-radius: 0 !important; }
+.lot-term-standalone {
+  min-height: 100dvh;
+  padding: 16px;
+  margin: 0 auto;
+  background: var(--lt-ground);
+}
+@media (min-width: 640px) { .lot-term-standalone { padding: 48px 32px; } }
+.lot-term-rule { border-top: 2px solid var(--lt-ink); width: 100%; }
+.lot-term-invert { background: var(--lt-ink); color: var(--lt-ground); }
+.lot-term-inline { display: inline-block; align-self: flex-start; padding: 0 1ch; margin-top: 4px; }
+.lot-term-dim { opacity: 0.5; }
+.lot-term-title { display: flex; flex-direction: column; gap: 4px; }
+.lot-term-title > .lot-term-invert {
+  display: inline-block; align-self: flex-start;
+  font-size: 26px; line-height: 32px; padding: 0 1ch;
+}
+.lot-term-head { display: inline-block; align-self: flex-start; padding: 0 1ch; background: var(--lt-ink); color: var(--lt-ground); }
+.lot-term-body { display: flex; flex-direction: column; gap: 4px; }
+.lot-term-kv { display: grid; grid-template-columns: 10ch 1fr; gap: 1ch; }
+.lot-term-k { opacity: 0.5; }
+.lot-term-status {
+  display: flex; flex-wrap: wrap; gap: 0;
+  border: 2px solid var(--lt-ink);
+}
+.lot-term-status-cell { padding: 0 1ch; border-right: 2px solid var(--lt-ink); white-space: nowrap; }
+.lot-term-status-cell:last-child { border-right: 0; }
+.lot-term-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.lot-term-btn {
+  font: inherit; text-transform: inherit; color: inherit; background: transparent;
+  border: 2px solid var(--lt-ink); padding: 0 1ch; cursor: pointer; align-self: flex-start;
+}
+.lot-term-btn.lot-term-invert { background: var(--lt-ink); color: var(--lt-ground); }
+.lot-term-btn:not(.lot-term-btn-disabled):hover { background: var(--lt-ink); color: var(--lt-ground); }
+.lot-term-btn:focus-visible { outline: 2px solid var(--lt-ink); outline-offset: 2px; }
+.lot-term-btn-disabled { opacity: 0.4; cursor: not-allowed; }
+.lot-term-ledger { border: 2px solid var(--lt-ink); overflow-x: auto; }
+.lot-term-row {
+  display: grid;
+  grid-template-columns: 3ch 5ch minmax(0, 1fr) 6ch 3ch;
+  gap: 0 2ch;
+  padding: 0 1ch;
+  border-bottom: 1px dotted rgb(var(--acc-color-default) / 0.35);
+}
+.lot-term-row:last-child { border-bottom: 0; }
+.lot-term-row-head { background: var(--lt-ink); color: var(--lt-ground); border-bottom: 0; }
+.lot-term-row-class { grid-template-columns: 1fr; border-bottom: 2px solid var(--lt-ink); border-top: 2px solid var(--lt-ink); }
+.lot-term-row-head + .lot-term-row-class { border-top: 0; }
+.lot-term-off { opacity: 0.2; }
+.lot-term-legend { display: flex; flex-direction: column; gap: 0; margin-top: 8px; opacity: 0.7; }
+@media (max-width: 480px) {
+  .lot-term { font-size: 11px; line-height: 18px; }
+  .lot-term-row { grid-template-columns: 3ch minmax(0, 1fr) 6ch 2ch; gap: 0 1ch; }
+  .lot-term-row > span:nth-child(2) { display: none; }
+  .lot-term-row-class { grid-template-columns: 1fr; }
+}

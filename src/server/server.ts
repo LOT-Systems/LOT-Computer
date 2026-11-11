@@ -256,6 +256,13 @@ fastify.register(async (fastify: FastifyInstance) => {
     // Client app / index page
     fastify.register(async (fastify) => {
       // Note: /u/ routes are registered at top level (lines 131-191)
+      fastify.get('/basics', async function (req, reply) {
+        return reply.view('generic-spa', {
+          scriptName: req.user ? 'app' : 'basics',
+          scriptNonce: reply.cspNonce.script,
+          styleNonce: reply.cspNonce.style,
+        })
+      })
 
       KNOWN_CLIENT_ROUTES.forEach((route) => {
         fastify.get(route, async function (req, reply) {

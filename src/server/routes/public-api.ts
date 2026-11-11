@@ -20,6 +20,15 @@ import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
+import {
+  BASICS_MODULE,
+  BASICS_MANIFEST,
+  BASICS_CADENCE,
+  BASICS_CLASSES,
+  BASICS_DOCTRINE,
+  BASICS_TERMS,
+} from '#shared/constants/basics'
+import { computeBasicsEnvelope, auditBasicsManifest } from '#server/utils/basics-cogs'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -499,6 +508,31 @@ export default async (fastify: FastifyInstance) => {
     } catch (error: any) {
       console.error('[PUBLIC-ANALYTICS] Error:', error.message)
       return reply.code(500).send({ error: 'Analytics unavailable' })
+    }
+  })
+
+  // LOT-FM-001 — BASIC OPEN TAB. Public, read-only. Nomenclature + cadence
+  // only; per-line landed cost is withheld. The envelope verdict is published.
+  fastify.get('/basics', async (req, reply) => {
+    const env = computeBasicsEnvelope()
+    const faults = auditBasicsManifest()
+    reply.header('Cache-Control', 'public, max-age=300')
+    return {
+      module: BASICS_MODULE,
+      doctrine: BASICS_DOCTRINE,
+      terms: BASICS_TERMS,
+      classes: BASICS_CLASSES,
+      cadence: BASICS_CADENCE,
+      manifest: BASICS_MANIFEST,
+      envelope: {
+        withinCeiling: env.withinCeiling,
+        marginHeld: env.marginHeld,
+        quotedLines: env.quotedLines,
+        totalLines: env.totalLines,
+        manifestIntact: faults.length === 0,
+      },
+      roster: 'CLOSED',
+      generatedAt: new Date().toISOString(),
     }
   })
 

@@ -19,6 +19,7 @@ import { Sync } from '#client/components/Sync'
 import { DirectMessageThread } from '#client/components/DirectMessageThread'
 import { StatusPage } from '#client/components/StatusPage'
 import { ApiPage } from '#client/components/ApiPage'
+import { Basics } from '#client/components/Basics'
 import { ConnectionStatus } from '#client/components/ConnectionStatus'
 import { render } from '#client/utils/render'
 import { listenSSE } from '#client/utils/sse'
@@ -140,7 +141,7 @@ if (typeof window !== 'undefined') {
   })
 }
 
-type PersistentRoute = 'system' | 'logs' | 'sync' | 'settings' | 'api'
+type PersistentRoute = 'system' | 'basics' | 'logs' | 'sync' | 'settings' | 'api'
 
 const TabPanel = React.memo(function TabPanel({
   active,
@@ -186,6 +187,9 @@ const TabPanels = React.memo(function TabPanels() {
     <>
       <TabPanel active={currentRoute === 'system'} unmountWhenInactive>
         <System />
+      </TabPanel>
+      <TabPanel active={currentRoute === 'basics'}>
+        <Basics />
       </TabPanel>
       <TabPanel active={currentRoute === 'logs'}>
         <Logs />
