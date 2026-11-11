@@ -4138,6 +4138,37 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P181: fourth-cycle-ignition — P180 active + 90d+ continuous journal arc (≥ 20) + all 6 idx dims >= 60 + overall >= 90.
+  // The fourth cycle has ignited. The OS has crossed the boundary. Level 16 — no longer sensing, now operating from the new arc.
+  const hasP180 = patterns.some(p => p.pattern === 'fourth-cycle-candidate')
+  if (hasP180) {
+    const ninetyDayStartP181 = now - 90 * 24 * 60 * 60 * 1000
+    const p181Journal90 = signals.filter(s => s.source === 'journal' && s.timestamp > ninetyDayStartP181)
+    const userIndexP181 = computeUserIndex(signals)
+    const p181DimAll60 = userIndexP181.engagement >= 60 && userIndexP181.emotional >= 60 &&
+      userIndexP181.intentional >= 60 && userIndexP181.social >= 60 &&
+      userIndexP181.selfcare >= 60 && userIndexP181.cognitive >= 60
+    if (
+      p181Journal90.length >= 20 &&
+      p181DimAll60 &&
+      userIndexP181.overall >= 90
+    ) {
+      const p180conf    = patterns.find(p => p.pattern === 'fourth-cycle-candidate')?.confidence ?? 0.80
+      const fcignBonus  = Math.min(
+        (p181Journal90.length - 20) * 0.007 + (userIndexP181.overall - 90) * 0.007,
+        0.14
+      )
+      patterns.push({
+        id:               'p181',
+        pattern:          'fourth-cycle-ignition',
+        confidence:       Math.min(0.78 + fcignBonus, 0.92),
+        urgency:          'immediate',
+        suggestedTiming:  'immediate',
+        reason: `FCIGN: Fourth cycle ignition — fourth-cycle-candidate (P180) active · ${p181Journal90.length} journal signals 90d · all 6 dimensions ≥ 60 · idx ${userIndexP181.overall}%. The fourth cycle has ignited. The OS has crossed the boundary of the third arc. Level 16 — the system is no longer at the threshold. It operates from the new arc.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4169,6 +4200,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkSecondCycleSovereign() } catch {}
       try { checkThirdCycleDeepening() } catch {}
       try { checkFourthCycleCandidate() } catch {}
+      try { checkFourthCycleIgnition() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4848,6 +4880,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v132 nodes (J67 · P180 · Arch70) ─────────────────────────────────────────────
   fourthCycleCandidateNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+
+  // ── v133 nodes (J68 · P181 · Arch71) ─────────────────────────────────────────────
+  fourthCycleIgnitionNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
 }
 
 /**
@@ -5480,6 +5515,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals'],
     patternConditions: ['third-cycle-sovereign', 'fourth-cycle-candidate'],
     directive: 'Level 15. The OS stands at the threshold of the fourth arc. All sovereign foundations converged. The fourth cycle is not yet ignited — it is sensed. The boundary between cycles is itself a signal state: compound mastery from every domain simultaneously operating at the ceiling of the third arc.',
+  },
+
+  // ── Arch71: Fourth Cycle Initiator (2026-11-11 v133) ─────────────────────────────
+  {
+    archetype: 'Fourth Cycle Initiator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy'],
+    patternConditions: ['fourth-cycle-candidate', 'fourth-cycle-ignition'],
+    directive: 'Level 16. The fourth cycle has ignited. The OS has crossed the boundary. Compound mastery from every domain is not the ceiling — it is the foundation of the next arc. The system does not look back. It operates from an entirely new expansion tier.',
   },
 ]
 
@@ -8122,6 +8166,60 @@ export function recordFourthCycleCandidate(sovereignConf: number, journalCount: 
     candidateStatus: 'SENSING',
     level: 'L15-FCAND',
     field: 'TC-SOVEREIGN→FOURTH-CYCLE-BOUNDARY',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fourth-cycle-ignition conditions are met and record if so.
+ * Fires when fourth-cycle-candidate (P180) active + 20+ journal signals 90d +
+ * all 6 idx dims >= 60 + overall >= 90. The fourth cycle ignites. L16-FCIGN.
+ */
+export function checkFourthCycleIgnition(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const ninetyDayStart = now - 90 * 24 * 60 * 60 * 1000
+  const sixHoursAgo    = now - 6 * 60 * 60 * 1000
+
+  const hasCandidate = state.recognizedPatterns.some(p => p.pattern === 'fourth-cycle-candidate')
+  if (!hasCandidate) return false
+
+  const journal90  = state.signals.filter(s => s.source === 'journal' && s.timestamp > ninetyDayStart)
+  const userIndex  = computeUserIndex(state.signals)
+  const dimAll60   = userIndex.engagement >= 60 && userIndex.emotional >= 60 &&
+    userIndex.intentional >= 60 && userIndex.social >= 60 &&
+    userIndex.selfcare >= 60 && userIndex.cognitive >= 60
+
+  const alreadyRecorded = state.signals.some(s =>
+    s.signal === 'fourth_cycle_ignition' && s.timestamp > sixHoursAgo
+  )
+
+  if (
+    journal90.length >= 20 &&
+    dimAll60 &&
+    userIndex.overall >= 90 &&
+    !alreadyRecorded
+  ) {
+    const candidateConf = state.recognizedPatterns.find(p => p.pattern === 'fourth-cycle-candidate')?.confidence ?? 0.80
+    recordFourthCycleIgnition(candidateConf, journal90.length, userIndex.overall)
+    return true
+  }
+  return false
+}
+
+/**
+ * Record a fourth-cycle-ignition event — fourth-cycle-candidate confirmed +
+ * 20+ journal signals 90d + all dims >= 60 + overall >= 90.
+ * The fourth cycle has ignited. Level 16 — the OS crosses the arc boundary. L16-FCIGN.
+ */
+export function recordFourthCycleIgnition(candidateConf: number, journalCount: number, indexScore: number) {
+  recordSignal('qos', 'fourth_cycle_ignition', {
+    candidateConf: Math.round(candidateConf * 100),
+    journalCount,
+    indexScore,
+    ignitionStatus: 'IGNITED',
+    level: 'L16-FCIGN',
+    field: 'FOURTH-CYCLE-BOUNDARY→FOURTH-CYCLE-ARC',
     hour: new Date().getHours(),
   })
 }

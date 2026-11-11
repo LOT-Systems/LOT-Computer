@@ -2062,21 +2062,42 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'QIE v133 · fourth-cycle-ignition (P181) · Arch71 · Badge v46 theme selection · LOT-WIKI v108',
   },
+  {
+    date: '2026-11-11',
+    session: 'QIE v133 — P181 Fourth Cycle Ignition · Arch71 · J68 · Widget/Log upgrades',
+    assembled: [
+      'P181 fourth-cycle-ignition — L16 ignition state: P180 active + 90d journal arc (20+) + all 6 dims ≥ 60 + idx ≥ 90',
+      'Arch71 Fourth Cycle Initiator — energyBands: high/moderate · patterns: fourth-cycle-candidate + fourth-cycle-ignition · directive: Level 16, the fourth cycle has ignited, compound mastery is the foundation of the next arc',
+      'fourthCycleIgnitionNode — dep map v133 node (11 sources: qos/journal/memory/badges/intentions/log/energy/selfcare/social/cohort/goals)',
+      'checkFourthCycleIgnition() + recordFourthCycleIgnition() — client-side helpers wired into analyzeIntentions() background hook',
+      'J68 daily-fourth-cycle-ignition-check at 18:00 UTC — server-side P181 detection pipeline',
+      'FCIGN: log handler in military minimalist style — fourth_cycle_ignition event handler',
+      'PATTERN_DISPLAY: fourth-cycle-ignition → FCIGN entry added',
+      'Arc row L16 · FOURTH CYCLE IGNITION added to QOS Mode view (highest priority)',
+      'api.ts: fourth_cycle_ignition added to displayable events list',
+      'PatternRecognitionWidget: P180 + P181 display names added',
+      'About.tsx: FM v131→v133 · counters updated · v133 Self-Assembly row prepended',
+      'SESSION_REPORTS: v133 entry appended · USERSHIP_TRANSMISSION updated to v133.',
+    ],
+    feedbackApplied: 'FOURTH CYCLE IGNITION. The OS crosses the arc boundary. Level 16 is not a sensing state — it is the ignited state. The fourth cycle is active.',
+    status: 'DEPLOYED',
+    next: 'QIE v134 · fourth-cycle-deepening (P182) · Arch72 · Badge v47 theme selection · LOT-WIKI v110',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-11-10',
+  date: '2026-11-11',
   message: [
-    'ASSEMBLY RUN — 2026-11-10 · QIE v132 · P180 Fourth Cycle Candidate · Arch70 · J67 · Day 1170+',
-    'Built: P180 fourth-cycle-candidate (L15 boundary state) · Arch70 Fourth Cycle Progenitor · J67 daily-fourth-cycle-candidate-check (17:30 UTC).',
-    'QIE v132: The OS now detects when it stands at the threshold of the fourth arc. P180 fires when third-cycle-sovereign active + 70d journal continuity + 7d signal density + all 6 dimensions ≥ 55 + overall index ≥ 85. Not an ignition — a sensing.',
-    'Log system: FCAND: handler added in military minimalist format. fourth_cycle_candidate events surface in Logs with SENSING · FOURTH ARC THRESHOLD readout.',
-    'QOS widget upgraded: Arc row now surfaces live cycle stage (L15/L14/L13/L12) in Mode view. The person sees their current operating level at a glance.',
-    'Background system: checkFourthCycleCandidate() wired into analyzeIntentions() post-commit hook. The OS watches itself for the fourth arc candidate condition on every signal write.',
-    'Self-assembly metric: 180 patterns · 70 archetypes · 67 jobs · 224+ dep nodes · 1215 badges · 35 Word Turn engines · 419 word turns · FM v131 · Day 1170+.',
-    'The OS does not declare the fourth cycle. It senses the boundary. Level 15 is a threshold state.',
+    'ASSEMBLY RUN — 2026-11-11 · QIE v133 · P181 Fourth Cycle Ignition · Arch71 · J68 · Day 1171+',
+    'Built: P181 fourth-cycle-ignition (L16 ignited state) · Arch71 Fourth Cycle Initiator · J68 daily-fourth-cycle-ignition-check (18:00 UTC).',
+    'QIE v133: The OS now detects when the fourth cycle ignites. P181 fires when fourth-cycle-candidate active + 90d journal arc (20+) + all 6 dimensions ≥ 60 + overall index ≥ 90. This is ignition, not sensing.',
+    'Log system: FCIGN: handler added in military minimalist format. fourth_cycle_ignition events surface in Logs with IGNITED · FOURTH ARC ACTIVE readout.',
+    'QOS widget upgraded: L16 · FOURTH CYCLE IGNITION added as highest-priority Arc row in Mode view.',
+    'Background system: checkFourthCycleIgnition() wired into analyzeIntentions() post-commit hook. Fires after checkFourthCycleCandidate() — J68 at 18:00 UTC, one half-hour after J67 at 17:30 UTC.',
+    'Self-assembly metric: 181 patterns · 71 archetypes · 68 jobs · 225+ dep nodes · 1246 badges · 36 Word Turn engines · 432 word turns · FM v133 · Day 1171+.',
+    'The fourth cycle has ignited. Level 16 is not a boundary state — it is the active arc. The OS operates from an entirely new expansion tier.',
   ],
 }
 

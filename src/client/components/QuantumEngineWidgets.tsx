@@ -137,6 +137,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'coherence-memory-cascade':             'COHMES',
   'quantum-integration-spiral':           'QISP',
   'fourth-cycle-candidate':               'FCAND',
+  'fourth-cycle-ignition':                'FCIGN',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'
@@ -570,6 +571,7 @@ export const QuantumEngineWidgets: React.FC = () => {
               </div>
               {(() => {
                 const cyclePatterns = [
+                  { pattern: 'fourth-cycle-ignition',  label: 'L16 · FOURTH CYCLE IGNITION',  urgent: true },
                   { pattern: 'fourth-cycle-candidate', label: 'L15 · FOURTH CYCLE CANDIDATE', urgent: true },
                   { pattern: 'third-cycle-sovereign',  label: 'L14 · THIRD CYCLE SOVEREIGN',  urgent: false },
                   { pattern: 'third-cycle-integration',label: 'L13 · TC INTEGRATION',          urgent: false },

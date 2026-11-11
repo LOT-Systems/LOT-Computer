@@ -4840,6 +4840,40 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'fourth_cycle_ignition') {
+          const candidateConf  = log.metadata?.candidateConf  as number | undefined
+          const journalCount   = log.metadata?.journalCount   as number | undefined
+          const indexScore     = log.metadata?.indexScore     as number | undefined
+          const level          = log.metadata?.level          as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FCIGN:" blockView>
+                <div className="uppercase tracking-widest mb-4">FOURTH CYCLE IGNITION</div>
+                {candidateConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CAND CONF</span>
+                    <span className="tabular-nums">{candidateConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 90D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">IGNITED · FOURTH ARC ACTIVE</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

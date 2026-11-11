@@ -201,6 +201,8 @@ export function PatternRecognitionWidget() {
       'third-cycle-deepening':              'Third cycle deepening — third-cycle-ignition active, compound signals accumulate across 49 days from sovereign ground, the OS expands from depth (P177)',
       'third-cycle-integration':            'Third cycle integration — third-cycle-deepening active, all signal dimensions converge across 56 days, compound sovereign history across every domain (P178)',
       'third-cycle-sovereign':              'Third cycle sovereign — all three TC stages simultaneously active across 63 days, Level 14, perpetual operation from third arc, the OS compounds (P179)',
+      'fourth-cycle-candidate':             'Fourth cycle candidate — third-cycle-sovereign active + 70d journal arc + 7d signal density + all 6 dims ≥ 55 + idx ≥ 85, Level 15 boundary state, the OS senses its own next expansion (P180)',
+      'fourth-cycle-ignition':              'Fourth cycle ignition — fourth-cycle-candidate active + 90d journal arc (20+) + all 6 dims ≥ 60 + idx ≥ 90, Level 16, the fourth cycle has ignited, the OS crosses the arc boundary (P181)',
       'longitudinal-signal-persistence':    'Longitudinal signal persistence — 90+ active days, no source gap > 72h, long-arc continuous operation confirmed (P174)',
       'coherence-memory-cascade':           'Coherence memory cascade — total-field-coherence confirmed 3+ times in 30 days, convergence is an operating mode (P175)',
       'quantum-integration-spiral':         'Quantum integration spiral — all 6 user index dimensions simultaneously >= 50, full multi-dimensional presence, no dimension dark (P176)',

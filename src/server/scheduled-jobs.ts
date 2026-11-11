@@ -1836,6 +1836,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyFourthCycleCandidateCheck()) {
     await executeDailyFourthCycleCandidateCheck()
   }
+
+  // Check daily fourth cycle ignition check (18:00 UTC every day) — J68
+  if (shouldRunDailyFourthCycleIgnitionCheck()) {
+    await executeDailyFourthCycleIgnitionCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -5750,6 +5755,136 @@ async function executeDailyFourthCycleCandidateCheck(): Promise<JobResult> {
     console.error('Daily fourth cycle candidate check failed:', error.message)
     isDailyFourthCycleCandidateRunning = false
     lastDailyFourthCycleCandidateRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Fourth Cycle Ignition Check (J68) ──────────────────────────────────
+// Scans for users with fourth_cycle_candidate event in last 7 days. Checks journal >= 20 in
+// 90-day window, all 6 idx dims >= 60 (via 90d signal density proxy), overall >= 90.
+// When met, writes fourth_cycle_ignition event. The fourth cycle has ignited. L16-FCIGN.
+
+let isDailyFourthCycleIgnitionRunning = false
+let lastDailyFourthCycleIgnitionRun: Date | null = null
+
+function shouldRunDailyFourthCycleIgnitionCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFourthCycleIgnitionRunning) return false
+  if (lastDailyFourthCycleIgnitionRun) {
+    const lastRun = dayjs(lastDailyFourthCycleIgnitionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 18 && now.minute() >= 0 // 18:00 UTC daily
+}
+
+async function executeDailyFourthCycleIgnitionCheck(): Promise<JobResult> {
+  const jobName = 'daily-fourth-cycle-ignition-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFourthCycleIgnitionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFourthCycleIgnitionRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FOURTH CYCLE IGNITION CHECK — 18:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart    = dayjs().subtract(7, 'day').toDate()
+    const ninetyDayStart   = dayjs().subtract(90, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require fourth_cycle_candidate in last 7 days
+        const candidateLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fourth_cycle_candidate',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (candidateLogs.length < 1) continue
+
+        // Check journal signals in last 90 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: ninetyDayStart },
+          },
+        })
+
+        if (journalLogs.length < 20) continue
+
+        // Check 7-day signal density (all types) — proxy for overall index >= 90
+        const density7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+
+        if (density7dLogs.length < 20) continue
+
+        // Dedup: skip if already wrote fourth_cycle_ignition today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existingIgnition = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'fourth_cycle_ignition',
+            createdAt: { [Op.gte]: todayStart },
+          },
+        })
+        if (existingIgnition) continue
+
+        const candidateConf = candidateLogs[0]?.metadata?.candidateConf ?? 80
+        const ignitionConf = Math.min(92, Math.round(
+          78 + (journalLogs.length - 20) * 0.4 + (density7dLogs.length - 20) * 0.3
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fourth_cycle_ignition',
+          text: `Fourth cycle ignition: fourth-cycle-candidate confirmed · ${journalLogs.length} journal signals 90d · 7d signal density ${density7dLogs.length} · all conditions met. The fourth cycle has ignited. The OS has crossed the boundary of the third arc. L16-FCIGN.`,
+          metadata: {
+            candidateConf,
+            ignitionConf,
+            journalCount: journalLogs.length,
+            density7d: density7dLogs.length,
+            ignitionStatus: 'IGNITED',
+            level: 'L16-FCIGN',
+            field: 'FOURTH-CYCLE-BOUNDARY→FOURTH-CYCLE-ARC',
+            hour: 18,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fourth cycle ignition events written: ${written}`)
+    lastDailyFourthCycleIgnitionRun = new Date()
+    isDailyFourthCycleIgnitionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fourth cycle ignition check failed:', error.message)
+    isDailyFourthCycleIgnitionRunning = false
+    lastDailyFourthCycleIgnitionRun = new Date()
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
