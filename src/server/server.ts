@@ -28,6 +28,7 @@ import authRoutes from './routes/auth.js'
 import apiRoutes from './routes/api.js'
 import adminApiRoutes from './routes/admin-api.js'
 import publicApiRoutes from './routes/public-api.js'
+import deviceApiRoutes from './routes/device-api.js'
 
 const CWD = process.cwd()
 
@@ -241,6 +242,9 @@ fastify.register(async (fastify: FastifyInstance) => {
       })
       fastify.register(apiRoutes, { prefix: '/api' })
     })
+
+    // LOT hardware pager API (per-device bearer token, no cookie session)
+    fastify.register(deviceApiRoutes, { prefix: '/api/device' })
 
     // Admin API
     fastify.register(async (fastify) => {

@@ -1,0 +1,21 @@
+block,part,mpn_candidate,qty_per_unit,est_unit_usd_qty1,est_unit_usd_qty100,source,notes
+MCU,ESP32-S3 module,ESP32-S3-MINI-1-N8,1,3.50,2.60,LCSC / DigiKey,Wi-Fi+BLE; DVP camera; chip antenna at gasket seam (R3)
+Display,1.54in e-paper 200x200,GDEY0154D67,1,7.00,4.50,Good Display,Alt: 0.96in OLED 160x80 for slim (R1)
+Camera,2MP DVP sensor FPC,OV2640 / GC2145,1,4.00,2.50,LCSC / AliExpress module,Must be <=3.5 mm tall for slim build
+Weather,T/H/P sensor,BME280 (EVT) -> BME688 (DVT),1,3.00,2.00,DigiKey / Mouser,BME688 ~9/6 USD with BSEC AI gas
+IMU,6-axis IMU,LSM6DSO,1,2.50,1.80,DigiKey,wake-on-motion
+Light,Ambient light,VEML7700,1,1.50,1.00,DigiKey,auto contrast
+Battery,LiPo 2.0-3.0 mm,402030 (130mAh) / 303030 (250mAh),1,4.00,2.50,DigiKey / Grepow,UN38.3 docs required
+Charger IC,Li-ion linear charger,BQ25100,1,1.20,0.90,TI / DigiKey,NTC input
+Fuel gauge,Battery gauge,MAX17048,1,1.30,0.90,DigiKey,
+Qi RX,Wireless power receiver,BQ51003 + 20mm RX coil w/ ferrite,1,6.00,4.00,TI / DigiKey / Wurth,Coil behind front glass (R2)
+Haptic,Coin LRA + driver,LRA 8mm + DRV2605L,1,2.50,1.60,DigiKey,"pager buzz"
+Button,Low-profile tact,PTS815 or similar <=1.2 mm,1,0.40,0.20,DigiKey,"Copy"
+Power/ESD,LDO + ESD,TLV75533 + TPD4E05U06,1,1.20,0.80,LCSC,
+Passives,R/C/L,various,1,1.00,0.50,LCSC (PCBWay turnkey),
+PCB,4-layer 0.8 mm ENIG ~38x38,custom,1,6.00,2.50,PCBWay,proto 5 pcs ~30 USD total
+Assembly,PCBA turnkey,custom,1,25.00,6.00,PCBWay,setup cost amortised
+Body,316L 2-part CNC + mirror polish,custom,1,120.00,18.00,PCBWay CNC / Protolabs,R7 DFM on 0.6 mm walls
+Window,Glass/sapphire front + lens cover,custom,1,8.00,3.00,PCBWay / local glass,Qi + camera window
+Charger,5W certified Qi pad,off the shelf,1,12.00,6.00,DigiKey / Amazon,ships in box
+Jig,Pogo programming + test jig,custom,0.01,0.00,2.00,PCBWay + DigiKey,one jig for run
