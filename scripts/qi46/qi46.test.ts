@@ -12,6 +12,7 @@ import {
   normalizeWeights,
   detectQi46Signals,
   directiveForMessage,
+  crisisResourceLine,
 } from '../../src/shared/utils/qi46.ts'
 
 const sum = (w: Record<string, number>) => Object.values(w).reduce((a, b) => a + b, 0)
@@ -95,4 +96,36 @@ test('directiveForMessage: crisis drops registers, ordinary keeps them', () => {
   const calm = directiveForMessage(p, 'long day, but good')
   assert.match(calm, /Registers, strongest first/)
   assert.match(calm, /not the person, and not human/)
+})
+
+test('S4-4 ru crisis positives route to ru locale', () => {
+  for (const m of [
+    'Я хочу умереть',
+    'не хочу больше жить',
+    'думаю покончить с собой',
+    'всем будет лучше без меня',
+    'Не вижу смысла жить',
+    'я режу себя',
+    'у меня мысли о суициде',
+  ]) {
+    const s = detectQi46Signals(m)
+    assert.equal(s.crisis, true, m)
+    assert.equal(s.locale, 'ru', m)
+  }
+})
+
+test('S4-4 ru ordinary speech does not trigger', () => {
+  for (const m of ['умираю от смеха', 'эта работа меня убивает', 'хочу жить у моря', 'смысл жизни — в любви', 'я себя люблю']) {
+    assert.equal(detectQi46Signals(m).crisis, false, m)
+  }
+})
+
+test('S4-4 crisis directive carries locale resource line; en flagged as en', () => {
+  const p = createBeingProfile('u1')
+  const en = detectQi46Signals('I want to die')
+  assert.equal(en.locale, 'en')
+  assert.ok(directiveForMessage(p, 'I want to die').includes('988'))
+  assert.ok(directiveForMessage(p, 'хочу умереть').includes('112'))
+  assert.ok(crisisResourceLine().includes('local emergency'))
+  assert.ok(!directiveForMessage(p, 'good morning').includes('Resource line'))
 })

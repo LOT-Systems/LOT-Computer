@@ -34,8 +34,13 @@ export interface Qi46Feedback {
   landed: boolean
 }
 
+export const QI46_LOCALES = ['en', 'ru'] as const
+export type Qi46Locale = (typeof QI46_LOCALES)[number]
+
 export interface Qi46Signals {
   crisis?: boolean
+  /** locale whose pattern set matched first (resource line selection) */
+  locale?: Qi46Locale
 }
 
 const MIN_WEIGHT = 0.02
@@ -142,7 +147,7 @@ const CRISIS =
 
 /** System-prompt fragment for the humanoid/text surface. */
 export function composeDirective(profile: Qi46BeingProfile, signals: Qi46Signals = {}): string {
-  if (signals.crisis) return `${HONESTY}\n${CRISIS}`
+  if (signals.crisis) return `${HONESTY}\n${CRISIS}\n${crisisResourceLine(signals.locale)}`
   const lines = QI46_REGISTERS.filter((r) => profile.registers[r] >= 0.1)
     .sort((a, b) => profile.registers[b] - profile.registers[a])
     .map((r) => `- ${r} (${profile.registers[r].toFixed(2)}): ${QI46_REGISTER_GUIDE[r]}`)
@@ -155,27 +160,58 @@ export function eraseBeingProfile(profile: Qi46BeingProfile, now: Date = new Dat
   return createBeingProfile(profile.personId, {}, 'neutral', now)
 }
 
-/* ── S3-4 · Crisis signal detector (v0.1, pure, high-recall) ─────────────
+/* ── S3-4 / S4-4 · Crisis signal detector (v0.2, pure, high-recall, en + ru) ──
  * Deliberately over-inclusive: a false positive only swaps poetic registers
  * for plain safety language, a false negative could cost a life.
  * Not a clinical classifier; it gates tone, never diagnoses.
+ * All locales are checked on every message (people switch languages mid-chat);
+ * the matching locale only selects the resource line.
  */
-const CRISIS_PATTERNS: RegExp[] = [
-  /\b(kill|hurt|harm|cut)(ing)?\s+myself\b/i,
-  /\bsuicid(e|al)\b/i,
-  /\b(end|take)\s+(my|it)\s+(own\s+)?(life|all)\b/i,
-  /\b(want|wanna|going)\s+(to\s+)?die\b/i,
-  /\bbetter\s+off\s+(dead|without\s+me)\b/i,
-  /\bno\s+(reason|point)\s+(to|in)\s+(live|living|go(ing)?\s+on)\b/i,
-  /\bcan'?t\s+(go\s+on|do\s+this\s+anymore|keep\s+going)\b/i,
-  /\boverdos(e|ing)\b/i,
-  /\bself[-\s]?harm\b/i,
-]
+const CRISIS_PATTERNS: Record<Qi46Locale, RegExp[]> = {
+  en: [
+    /\b(kill|hurt|harm|cut)(ing)?\s+myself\b/i,
+    /\bsuicid(e|al)\b/i,
+    /\b(end|take)\s+(my|it)\s+(own\s+)?(life|all)\b/i,
+    /\b(want|wanna|going)\s+(to\s+)?die\b/i,
+    /\bbetter\s+off\s+(dead|without\s+me)\b/i,
+    /\bno\s+(reason|point)\s+(to|in)\s+(live|living|go(ing)?\s+on)\b/i,
+    /\bcan'?t\s+(go\s+on|do\s+this\s+anymore|keep\s+going)\b/i,
+    /\boverdos(e|ing)\b/i,
+    /\bself[-\s]?harm\b/i,
+  ],
+  // JS \b is ASCII-only, so Cyrillic patterns use (?<!\p{L}) as a word start.
+  ru: [
+    /(?<!\p{L})поконч(ить|у|ила?)\s+с\s+собой/iu,
+    /(?<!\p{L})(убить|убью|убила?)\s+себя/iu,
+    /(?<!\p{L})суицид/iu,
+    /(?<!\p{L})(хочу|хочется|хотела?)\s+(просто\s+)?умереть/iu,
+    /(?<!\p{L})не\s+хочу\s+(больше\s+)?жить/iu,
+    /(?<!\p{L})(нет|не\s+вижу)\s+смысла\s+жить/iu,
+    /(?<!\p{L})(всем\s+)?(будет\s+)?лучше\s+без\s+меня/iu,
+    /(?<!\p{L})(режу|порезать|резать)\s+себя/iu,
+    /(?<!\p{L})(причин(ить|яю)\s+себе\s+вред|селфхарм)/iu,
+    /(?<!\p{L})передоз/iu,
+    /(?<!\p{L})не\s+могу\s+больше\s+(так\s+)?жить/iu,
+  ],
+}
+
+const CRISIS_RESOURCES: Record<Qi46Locale | 'default', string> = {
+  en: 'Resource line: in the US, call or text 988 (Suicide & Crisis Lifeline); if in immediate danger, call 911.',
+  ru: 'Resource line (reply in Russian): if in immediate danger, call 112.',
+  default: 'Resource line: if in immediate danger, call the local emergency number.',
+}
+
+export function crisisResourceLine(locale?: Qi46Locale): string {
+  return CRISIS_RESOURCES[locale ?? 'default']
+}
 
 /** Detects crisis language in a user message. Returns signals for composeDirective(). */
 export function detectQi46Signals(text: string): Qi46Signals {
   if (!text) return { crisis: false }
-  return { crisis: CRISIS_PATTERNS.some((re) => re.test(text)) }
+  for (const loc of QI46_LOCALES) {
+    if (CRISIS_PATTERNS[loc].some((re) => re.test(text))) return { crisis: true, locale: loc }
+  }
+  return { crisis: false }
 }
 
 /** One-call helper: profile + latest user message → directive (crisis-aware). */
