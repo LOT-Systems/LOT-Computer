@@ -321,6 +321,32 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE KITCHEN TABLE HOUR                      2026-11-12
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, parent of a seven-year-old, remote
+  worker, phone kept out of the room in the evening. Cube on its pad on
+  the kitchen table, not the desk.
+
+  The evening self-care window opens → THE SETTLE, felt through the
+  tablecloth, nothing visible. The memory question is ready → THE HOP;
+  the child sees it first ("It's asking"), and the question is answered
+  out loud at the table. A 30-day streak closes → THE LEAP, 40mm toward
+  the child's side on an operator-set heading, edge gate cleared first.
+  The cube carries the ritual into a screenless room and makes the
+  parent's self-care visible to the child without ever revealing
+  content. New design rule from this case: gestures signal that
+  something exists, never what it is — no display, text or audio
+  content on the cube at any version.
+
+  Full narrative and engineering implications:
+  docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md, Section 11.
+
+  REVISION NOTE (2026-11-12): Development Report R02 corrects the
+  Section 03 hop mechanism — an internal mass driven DOWN onto the base
+  cannot lift a closed shell. See R02 Section 03 (Option A internal
+  upward striker / Option B kick plunger) and R02 Section 06 (four-edge
+  cliff-sensor gate replacing the single forward ToF).
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
