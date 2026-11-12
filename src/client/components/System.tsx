@@ -307,6 +307,19 @@ export const System = React.memo(function SystemInner() {
     return null
   }, [quantumState])
 
+  // Fourth cycle status — derived from recognized patterns (FM v132–v134)
+  const fourthCycleStatus = React.useMemo(() => {
+    const eng = intentionEngine.get()
+    const patterns = eng.recognizedPatterns ?? []
+    const hasFCDep = patterns.some(p => p.pattern === 'fourth-cycle-deepening')
+    const hasFCIgn = patterns.some(p => p.pattern === 'fourth-cycle-ignition')
+    const hasFCCand = patterns.some(p => p.pattern === 'fourth-cycle-candidate')
+    if (hasFCDep)  return 'L17-FCDEP'
+    if (hasFCIgn)  return 'L16-FCIGN'
+    if (hasFCCand) return 'L15-FCAND'
+    return null
+  }, [quantumState])
+
   // Accumulative User Index - holistic score from all widget signals
   const userIndex = React.useMemo(() => {
     return getUserIndex()
@@ -730,6 +743,7 @@ export const System = React.memo(function SystemInner() {
                 { metric: 'Index', value: `${userIndex.overall}%` },
                 ...(secondCycleStatus ? [{ metric: 'Cycle', value: secondCycleStatus }] : []),
                 ...(thirdCycleStatus ? [{ metric: 'Arc', value: thirdCycleStatus }] : []),
+                ...(fourthCycleStatus ? [{ metric: 'Fourth Arc', value: fourthCycleStatus }] : []),
                 { metric: 'Directive', value: physiologicalCohort?.directive ?? '—' }
               ]}
               columns={[

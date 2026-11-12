@@ -1263,6 +1263,8 @@ export default async (fastify: FastifyInstance) => {
       'fourth_cycle_candidate',
       // v133: fourth cycle ignition (P181)
       'fourth_cycle_ignition',
+      // v134: fourth cycle deepening (P182)
+      'fourth_cycle_deepening',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

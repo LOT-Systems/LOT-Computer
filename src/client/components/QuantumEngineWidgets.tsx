@@ -138,6 +138,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'quantum-integration-spiral':           'QISP',
   'fourth-cycle-candidate':               'FCAND',
   'fourth-cycle-ignition':                'FCIGN',
+  'fourth-cycle-deepening':               'FCDEP',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'
@@ -571,6 +572,7 @@ export const QuantumEngineWidgets: React.FC = () => {
               </div>
               {(() => {
                 const cyclePatterns = [
+                  { pattern: 'fourth-cycle-deepening', label: 'L17 · FOURTH CYCLE DEEPENING', urgent: true },
                   { pattern: 'fourth-cycle-ignition',  label: 'L16 · FOURTH CYCLE IGNITION',  urgent: true },
                   { pattern: 'fourth-cycle-candidate', label: 'L15 · FOURTH CYCLE CANDIDATE', urgent: true },
                   { pattern: 'third-cycle-sovereign',  label: 'L14 · THIRD CYCLE SOVEREIGN',  urgent: false },

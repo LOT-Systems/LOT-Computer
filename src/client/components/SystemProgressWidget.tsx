@@ -2083,21 +2083,42 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'QIE v134 · fourth-cycle-deepening (P182) · Arch72 · Badge v47 theme selection · LOT-WIKI v110',
   },
+  {
+    date: '2026-11-12',
+    session: 'QIE v134 — P182 Fourth Cycle Deepening · Arch72 · J69 · Widget/Log upgrades',
+    assembled: [
+      'P182 fourth-cycle-deepening — L17 deepening state: P181 active + 100d journal arc (23+) + memory 100d (7+) + badge 100d (22+) + all 6 dims ≥ 62 + idx ≥ 91',
+      'Arch72 Fourth Cycle Deepener — energyBands: high/moderate · patterns: fourth-cycle-ignition + fourth-cycle-deepening · directive: Level 17, the fourth cycle deepens from ignition, compound signals accumulate from the new arc\'s foundation',
+      'fourthCycleDeepeningNode — dep map v134 node (11 sources: qos/journal/memory/badges/intentions/log/energy/selfcare/social/cohort/goals)',
+      'checkFourthCycleDeepening() + recordFourthCycleDeepening() — client-side helpers wired into analyzeIntentions() background hook',
+      'J69 daily-fourth-cycle-deepening-check at 18:30 UTC — server-side P182 detection pipeline (sequential: J67 17:30 → J68 18:00 → J69 18:30)',
+      'FCDEP: log handler in military minimalist style — fourth_cycle_deepening event handler (Journal 100D · Memory 100D · Badge 100D · Index · Level)',
+      'PATTERN_DISPLAY: fourth-cycle-deepening → FCDEP entry added',
+      'Arc row L17 · FOURTH CYCLE DEEPENING added to QOS Mode view (highest priority above L16)',
+      'System.tsx: fourthCycleStatus computed — L17-FCDEP/L16-FCIGN/L15-FCAND — Fourth Arc row in quantum biofield table',
+      'api.ts: fourth_cycle_deepening added to displayable events list',
+      '182 patterns · 72 archetypes · 69 jobs · 226+ dep nodes · FM v134',
+    ],
+    feedbackApplied: 'FOURTH CYCLE DEEPENING. The fourth cycle does not hold at ignition — it deepens. Level 17 is the first compound state of the new arc. The OS expands from depth, not from search.',
+    status: 'DEPLOYED',
+    next: 'QIE v135 · fourth-cycle-integration (P183) · Arch73 · physiological cohort expansion pass · LOT-WIKI v111',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-11-11',
+  date: '2026-11-12',
   message: [
-    'ASSEMBLY RUN — 2026-11-11 · QIE v133 · P181 Fourth Cycle Ignition · Arch71 · J68 · Day 1171+',
-    'Built: P181 fourth-cycle-ignition (L16 ignited state) · Arch71 Fourth Cycle Initiator · J68 daily-fourth-cycle-ignition-check (18:00 UTC).',
-    'QIE v133: The OS now detects when the fourth cycle ignites. P181 fires when fourth-cycle-candidate active + 90d journal arc (20+) + all 6 dimensions ≥ 60 + overall index ≥ 90. This is ignition, not sensing.',
-    'Log system: FCIGN: handler added in military minimalist format. fourth_cycle_ignition events surface in Logs with IGNITED · FOURTH ARC ACTIVE readout.',
-    'QOS widget upgraded: L16 · FOURTH CYCLE IGNITION added as highest-priority Arc row in Mode view.',
-    'Background system: checkFourthCycleIgnition() wired into analyzeIntentions() post-commit hook. Fires after checkFourthCycleCandidate() — J68 at 18:00 UTC, one half-hour after J67 at 17:30 UTC.',
-    'Self-assembly metric: 181 patterns · 71 archetypes · 68 jobs · 225+ dep nodes · 1246 badges · 36 Word Turn engines · 432 word turns · FM v133 · Day 1171+.',
-    'The fourth cycle has ignited. Level 16 is not a boundary state — it is the active arc. The OS operates from an entirely new expansion tier.',
+    'ASSEMBLY RUN — 2026-11-12 · QIE v134 · P182 Fourth Cycle Deepening · Arch72 · J69 · Day 1172+',
+    'Built: P182 fourth-cycle-deepening (L17 deepened state) · Arch72 Fourth Cycle Deepener · J69 daily-fourth-cycle-deepening-check (18:30 UTC).',
+    'QIE v134: The OS now tracks when the fourth cycle deepens past ignition. P182 fires when fourth-cycle-ignition active + 100d compound arc (journal 23+ · memory 7+ · badge 22+) + all 6 dimensions ≥ 62 + overall index ≥ 91. The deepening is not a gate — it is a state: compound signals accumulating from the new arc\'s ground.',
+    'Log system: FCDEP: handler added in military minimalist format. fourth_cycle_deepening events surface in Logs with DEEPENING · FOURTH ARC COMPOUNDS readout.',
+    'QOS widget upgraded: L17 · FOURTH CYCLE DEEPENING added as highest-priority Arc row in Mode view, above L16.',
+    'System.tsx: fourthCycleStatus computed — highest active fourth-cycle pattern (L17-FCDEP → L16-FCIGN → L15-FCAND) — Fourth Arc row added to quantum biofield table.',
+    'Background system: checkFourthCycleDeepening() wired into analyzeIntentions() post-commit hook. Sequential chain: J67 17:30 UTC → J68 18:00 UTC → J69 18:30 UTC. The fourth cycle arc now has three detection layers.',
+    'Self-assembly metric: 182 patterns · 72 archetypes · 69 jobs · 226+ dep nodes · FM v134 · Day 1172+.',
+    'The fourth cycle deepens. Level 17 is the first compound state past the boundary. The OS does not hold at ignition — it expands.',
   ],
 }
 

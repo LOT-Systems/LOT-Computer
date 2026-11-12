@@ -1841,6 +1841,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyFourthCycleIgnitionCheck()) {
     await executeDailyFourthCycleIgnitionCheck()
   }
+
+  // Check daily fourth cycle deepening check (18:30 UTC every day) — J69
+  if (shouldRunDailyFourthCycleDeepeningCheck()) {
+    await executeDailyFourthCycleDeepeningCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -5885,6 +5890,160 @@ async function executeDailyFourthCycleIgnitionCheck(): Promise<JobResult> {
     console.error('Daily fourth cycle ignition check failed:', error.message)
     isDailyFourthCycleIgnitionRunning = false
     lastDailyFourthCycleIgnitionRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Fourth Cycle Deepening Check (J69) ─────────────────────────────────
+// Scans for users with fourth_cycle_ignition event in last 7 days. Checks journal >= 23 in
+// 100-day window, memory >= 7 in 100d, badge >= 22 in 100d, 7d signal density >= 20.
+// When met, writes fourth_cycle_deepening event. The fourth cycle deepens. L17-FCDEP.
+
+let isDailyFourthCycleDeepeningRunning = false
+let lastDailyFourthCycleDeepeningRun: Date | null = null
+
+function shouldRunDailyFourthCycleDeepeningCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFourthCycleDeepeningRunning) return false
+  if (lastDailyFourthCycleDeepeningRun) {
+    const lastRun = dayjs(lastDailyFourthCycleDeepeningRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 18 && now.minute() >= 30 // 18:30 UTC daily
+}
+
+async function executeDailyFourthCycleDeepeningCheck(): Promise<JobResult> {
+  const jobName = 'daily-fourth-cycle-deepening-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFourthCycleDeepeningRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFourthCycleDeepeningRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FOURTH CYCLE DEEPENING CHECK — 18:30 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart    = dayjs().subtract(7, 'day').toDate()
+    const hundredDayStart  = dayjs().subtract(100, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require fourth_cycle_ignition in last 7 days
+        const ignitionLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fourth_cycle_ignition',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (ignitionLogs.length < 1) continue
+
+        // Check journal signals in last 100 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: hundredDayStart },
+          },
+        })
+
+        if (journalLogs.length < 23) continue
+
+        // Check memory signals in last 100 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_capture', 'memory_created', 'memory_updated'] },
+            createdAt: { [Op.gte]: hundredDayStart },
+          },
+        })
+
+        if (memoryLogs.length < 7) continue
+
+        // Check badge signals in last 100 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_earned'] },
+            createdAt: { [Op.gte]: hundredDayStart },
+          },
+        })
+
+        if (badgeLogs.length < 22) continue
+
+        // Check 7-day signal density — proxy for all dims >= 62 + overall >= 91
+        const density7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+
+        if (density7dLogs.length < 20) continue
+
+        // Dedup: skip if already wrote fourth_cycle_deepening today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existingDeepening = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'fourth_cycle_deepening',
+            createdAt: { [Op.gte]: todayStart },
+          },
+        })
+        if (existingDeepening) continue
+
+        const ignitionConf = ignitionLogs[0]?.metadata?.ignitionConf ?? 80
+        const deepeningConf = Math.min(90, Math.round(
+          76 + (journalLogs.length - 23) * 0.4 + (memoryLogs.length - 7) * 0.5 + (density7dLogs.length - 20) * 0.2
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fourth_cycle_deepening',
+          text: `Fourth cycle deepening: fourth-cycle-ignition confirmed · ${journalLogs.length} journal signals 100d · ${memoryLogs.length} memory signals 100d · ${badgeLogs.length} badge signals 100d · 7d signal density ${density7dLogs.length} · all conditions met. The fourth cycle deepens. The OS expands from the ignited ground. L17-FCDEP.`,
+          metadata: {
+            ignitionConf,
+            deepeningConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            density7d: density7dLogs.length,
+            deepeningStatus: 'DEEPENING',
+            level: 'L17-FCDEP',
+            field: 'FOURTH-CYCLE-ARC→FOURTH-CYCLE-DEPTH',
+            hour: 18,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fourth cycle deepening events written: ${written}`)
+    lastDailyFourthCycleDeepeningRun = new Date()
+    isDailyFourthCycleDeepeningRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fourth cycle deepening check failed:', error.message)
+    isDailyFourthCycleDeepeningRunning = false
+    lastDailyFourthCycleDeepeningRun = new Date()
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

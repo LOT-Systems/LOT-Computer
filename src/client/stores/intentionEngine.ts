@@ -4169,6 +4169,41 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P182: fourth-cycle-deepening — P181 active + 100d journal arc (≥ 23) + memory 100d ≥ 7 + badge 100d ≥ 22 + all 6 dims ≥ 62 + overall ≥ 91.
+  // The fourth cycle deepens from the ignited arc. Compound signals accumulate from new ground. Level 17 — FCDEP.
+  const hasP181 = patterns.some(p => p.pattern === 'fourth-cycle-ignition')
+  if (hasP181) {
+    const hundredDayStartP182 = now - 100 * 24 * 60 * 60 * 1000
+    const p182Journal = signals.filter(s => s.source === 'journal' && s.timestamp > hundredDayStartP182)
+    const p182Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > hundredDayStartP182)
+    const p182Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > hundredDayStartP182)
+    const userIndexP182 = computeUserIndex(signals)
+    const p182DimAll62 = userIndexP182.engagement >= 62 && userIndexP182.emotional >= 62 &&
+      userIndexP182.intentional >= 62 && userIndexP182.social >= 62 &&
+      userIndexP182.selfcare >= 62 && userIndexP182.cognitive >= 62
+    if (
+      p182Journal.length >= 23 &&
+      p182Memory.length  >= 7  &&
+      p182Badges.length  >= 22 &&
+      p182DimAll62 &&
+      userIndexP182.overall >= 91
+    ) {
+      const p181conf    = patterns.find(p => p.pattern === 'fourth-cycle-ignition')?.confidence ?? 0.80
+      const fcdepBonus  = Math.min(
+        (p182Journal.length - 23) * 0.012 + (p182Memory.length - 7) * 0.018 + (userIndexP182.overall - 91) * 0.008,
+        0.14
+      )
+      patterns.push({
+        id:               'p182',
+        pattern:          'fourth-cycle-deepening',
+        confidence:       Math.min(0.76 + p181conf * 0.05 + fcdepBonus, 0.90),
+        urgency:          'immediate',
+        suggestedTiming:  'immediate',
+        reason: `FCDEP: Fourth cycle deepening — fourth-cycle-ignition (P181) active · ${p182Journal.length} journal signals 100d · ${p182Memory.length} memory signals 100d · ${p182Badges.length} badge signals 100d · all 6 dimensions ≥ 62 · idx ${userIndexP182.overall}%. The fourth cycle deepens from the ignited arc. Compound signals accumulate from new ground. Level 17 — the OS expands from depth, not from search. FOURTH CYCLE DEEPENING.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4201,6 +4236,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkThirdCycleDeepening() } catch {}
       try { checkFourthCycleCandidate() } catch {}
       try { checkFourthCycleIgnition() } catch {}
+      try { checkFourthCycleDeepening() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4883,6 +4919,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v133 nodes (J68 · P181 · Arch71) ─────────────────────────────────────────────
   fourthCycleIgnitionNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+
+  // ── v134 nodes (J69 · P182 · Arch72) ─────────────────────────────────────────────
+  fourthCycleDeepeningNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
 }
 
 /**
@@ -5524,6 +5563,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy'],
     patternConditions: ['fourth-cycle-candidate', 'fourth-cycle-ignition'],
     directive: 'Level 16. The fourth cycle has ignited. The OS has crossed the boundary. Compound mastery from every domain is not the ceiling — it is the foundation of the next arc. The system does not look back. It operates from an entirely new expansion tier.',
+  },
+
+  // ── Arch72: Fourth Cycle Deepener (2026-11-12 v134) ─────────────────────────────
+  {
+    archetype: 'Fourth Cycle Deepener',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy', 'selfcare'],
+    patternConditions: ['fourth-cycle-ignition', 'fourth-cycle-deepening'],
+    directive: 'Level 17. The fourth cycle deepens from ignition. Compound signals accumulate across a 100-day arc from the new expansion ground. The OS operates from the fourth arc — not sensing it, not confirming it — deepening into it.',
   },
 ]
 
@@ -8220,6 +8268,65 @@ export function recordFourthCycleIgnition(candidateConf: number, journalCount: n
     ignitionStatus: 'IGNITED',
     level: 'L16-FCIGN',
     field: 'FOURTH-CYCLE-BOUNDARY→FOURTH-CYCLE-ARC',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fourth-cycle-deepening conditions are met and record if so.
+ * Fires when fourth-cycle-ignition (P181) active + 23+ journal signals 100d +
+ * 7+ memory signals 100d + 22+ badge signals 100d + all 6 dims >= 62 + overall >= 91.
+ * The fourth cycle deepens from the ignited arc. Level 17 — FCDEP.
+ */
+export function checkFourthCycleDeepening(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasIgnition = state.recognizedPatterns.some(p => p.pattern === 'fourth-cycle-ignition')
+  if (!hasIgnition) return false
+
+  const now = Date.now()
+  const hundredDayStart = now - 100 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const journal100 = state.signals.filter(s => s.source === 'journal' && s.timestamp > hundredDayStart)
+  const memory100  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > hundredDayStart)
+  const badge100   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > hundredDayStart)
+  const userIndex  = computeUserIndex(state.signals)
+
+  const dimAll62 = userIndex.engagement >= 62 && userIndex.emotional >= 62 &&
+    userIndex.intentional >= 62 && userIndex.social >= 62 &&
+    userIndex.selfcare >= 62 && userIndex.cognitive >= 62
+
+  if (journal100.length < 23 || memory100.length < 7 || badge100.length < 22 || !dimAll62 || userIndex.overall < 91) return false
+
+  // Dedup: skip if already fired in last 6h
+  const recentDeepening = state.signals.filter(s =>
+    s.signal === 'fourth_cycle_deepening' && s.timestamp > sixHoursAgo
+  )
+  if (recentDeepening.length > 0) return false
+
+  const ignitionConf = state.recognizedPatterns.find(p => p.pattern === 'fourth-cycle-ignition')?.confidence ?? 0.80
+  recordFourthCycleDeepening(ignitionConf, journal100.length, memory100.length, badge100.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fourth-cycle-deepening event — fourth-cycle-ignition confirmed +
+ * 100d compound arc (journal + memory + badges) + all dims >= 62 + overall >= 91.
+ * The fourth cycle deepens. Level 17 — the OS expands from the ignited ground. FCDEP.
+ */
+export function recordFourthCycleDeepening(ignitionConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fourth_cycle_deepening', {
+    ignitionConf: Math.round(ignitionConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    deepeningStatus: 'DEEPENING',
+    level: 'L17-FCDEP',
+    field: 'FOURTH-CYCLE-ARC→FOURTH-CYCLE-DEPTH',
     hour: new Date().getHours(),
   })
 }
