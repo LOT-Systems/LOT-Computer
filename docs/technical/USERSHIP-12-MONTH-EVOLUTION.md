@@ -50,6 +50,8 @@ chapter, and the feature is the chapter's illustration.
 | P5 | **Quiet ceremony** | Celebrations follow LOT doctrine: plain text, periods instead of symbols, no emojis, opacity-based hierarchy, fades of 1400 ms. |
 | P6 | **The system speaks less, then better** | Month 1: the AI barely talks. Month 12: it speaks in full sentences, about *you*, from evidence. Voice is an unlock too. |
 | P7 | **Evidence over flattery** | Affirmations must cite something real ("You checked in 19 mornings. 14 of them before 8 AM."). Generic praise is not allowed, the same rule already used for Memory questions. |
+| P8 | **Months, not days** | Doctrine counts time in months and years, so the plan has no day streaks. Progress is shown as months sealed and signal counts. The word "operator" is used in copy, never "user". |
+| P9 | **Database over localStorage** | Seal state, Cards and badges are stored on the server, so they survive across devices. |
 
 ---
 
@@ -131,7 +133,7 @@ the footer reads something like `2,108 signals → 1 sentence`.
 ### 3.1 Month Card anatomy
 
 ```
-┌ Month 4: Portrait ───────────────────────────────────────────────┐
+┌ Month 4: ───────────────────────────────────────────────┐
 │                                                                  │
 │  October was quieter than September and more deliberate. You     │
 │  wrote mostly after dark, about work you are choosing rather     │
@@ -178,14 +180,14 @@ becomes each month's Seal line.
 ```
 Usership · Day 1
 
-Time          09:14 AM · Thursday
-Weather       Lisbon 14° · Clear
+Time:         09:14 AM · Thursday
+Weather:      Lisbon 14° · Clear
 
-Morning       How are you arriving today?   [ calm ] [ tired ] [ uncertain ]
-Care          One thing for you today:      [ Drink a glass of water ]
-Log           _
+Morning:      How are you arriving today?   [ Calm ] [ Tired ] [ Uncertain ]
+Care:         One thing for you today:      [ Drink a glass of water (2 mins) ]
+Log:          _
 
-Months        0 / 12
+Months:       0 / 12
 ```
 
 - No profile, no stats, no psychological profile, no badges grid.
@@ -252,7 +254,7 @@ Months        0 / 12
 
 | Part | Spec |
 |------|------|
-| **Unlock (UI)** | **Routine builder.** The member can pin the AI's proposed routine and edit its order. Streak line appears: `Ritual · 12 days`. |
+| **Unlock (UI)** | **Routine builder.** The member can pin the AI's proposed routine and edit its order. A kept-count line appears: `Ritual: kept 23 of 30 mornings.` (a count, not a streak; see P8). |
 | **Compression** | The Card adds a **care ledger** line: "Care: 41 completions, 6 skips, most kept: evening walk." |
 | **AI guidance** | Evening check-ins are offered, so the AI can close the day as well as open it. |
 | **Badge** | `USERSHIP V · RITUAL` |
@@ -348,6 +350,8 @@ Months        0 / 12
 | **AI guidance** | The Year Story becomes the standing context of the member's AI. From here on, every suggestion is written *from* the year. |
 | **Badge** | `USERSHIP XII · LOT® AI` + `CHAPTER IV` + `THE YEAR` |
 
+**Alignment with QI·46 Memory Arc** (`docs/corporate/LOT_QI46_ENGINE.md` Layer 4): Months 0–3 Calibration = Seed / Pattern / Rhythm. Months 3–6 Pattern recognition = Portrait / Ritual / Chapter. Months 6–12 Coherence = Listening to LOT® AI. Month 12+ = Quantum Cube delivery milestone (Volume II).
+
 The Year Seal screen:
 
 ```
@@ -418,6 +422,11 @@ ribbon with *n* filled cells, so the badge itself shows progress.
 | Monthly summary is tied to the **calendar** month (days 1–3) | `monthly-summary.ts`, `scheduled-jobs.ts` | Add a Usership-month path keyed to `startedAt + n·30d`. Reuse `generateMonthlySummary` as the Card engine. |
 | Memory Story has no time axis | `memory.ts` `generateMemoryStory` | Keep it as the "whole-life" story. Add a Month Card generator that reads one window plus the previous Card. |
 | No Usership tenure badges | `src/client/utils/badges.ts` | Add the Codex in §6. |
+| Only `milestone_7/30/100` are persisted server-side; ~800 other badges live only in localStorage | `api.ts` `/api/sync-badges` | Whitelist the Usership Codex in sync-badges so seals are permanent (P4, P9). |
+| `/api/user-stats` returns no `totalCheckIns` / `totalAnswers` | `api.ts` ~2874 | Counters come from the new `getUsershipYear`, not user-stats. |
+| Board-profile active-days SQL queries `"Logs"`, but the table is `logs` | `public-api.ts` ~1272 | Verify and fix; the same count feeds the Signals view. |
+| Weekly Story-Report API (`/api/story/*`) is documented but not built | `docs/corporate/LOT-AI-PRODUCT-BRIEF.md` | The Month Card is the monthly level of the same pipeline. Build both on one compression module. |
+| Monthly email goes only to operators who joined 3+ months ago | `scheduled-jobs.ts` | The Month Card replaces that gate: every sealed month gets a Card from Month 1. |
 
 ### 7.2 Proposed shape (stored on `user.metadata.usership`)
 
@@ -494,10 +503,11 @@ Year Sentence: *"He stopped waiting for fortune and built a morning it could not
 
 ## 9. Open questions for S-2
 
-1. **Pricing tie-in.** The code assumes $99/month (`totalInvested = months × 99`).
+1. **Pricing tie-in.** The code and SubscribeWidget use $99/month. The docs conflict: $50 (`LOT_SYSTEMS_BRIEF.md`, IPO doc), $99, $399 priority (QI·46), and Legacy $3,564/3 yrs.
    Is the Year a 12-month commitment, or month-to-month with the Year as the arc?
 2. **Pause.** If Usership lapses, does the clock freeze (recommended) or keep running?
 3. **Year 2.** Does Month 13 restart at `1 / 12` with a "Volume II" label (recommended)?
 4. **Public share.** Should the Year Seal produce a shareable `/u/<user>/year` page?
 5. **Quorum tuning.** The numbers in §2.1 are a first proposal. Check them against real
    Usership activity before shipping.
+6. **Doctrine tension.** Doctrine clause 9 says "no gamification, no streaks", and Ambient AI™ says "no celebrations", but there are already 812 badges. This plan keeps badges and makes them quiet: no pop-ups, one fading Seal line, counts instead of streaks. Should Usership badges be visible only on the operator's own OS?
