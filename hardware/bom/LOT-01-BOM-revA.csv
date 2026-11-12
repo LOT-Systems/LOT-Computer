@@ -1,0 +1,31 @@
+section,ref,part,manufacturer_pn,qty_per_unit,est_unit_usd,link,notes
+device,U1,MCU SiP,ESP32-S3-PICO-1-N8R2,1,3.60,https://www.espressif.com/en/products/socs/esp32-s3,7x7x1.0mm LGA
+device,ANT,2.4GHz chip antenna,2450AT18A100,1,0.45,https://www.digikey.com/en/products/result?keywords=2450AT18A100,under glass edge with keep-out
+device,DS1,Memory LCD 1.28in 128x128,LS013B7DH03,1,10.00,https://www.digikey.com/en/products/result?keywords=LS013B7DH03,verify thickness
+device,CAM,VGA camera FPC module,GC0308,1,3.00,https://www.lcsc.com/search?q=GC0308,Z<=3.0mm
+device,U2,Gas/T/RH/P sensor,BME688,1,8.50,https://www.bosch-sensortec.com/products/environmental-sensors/gas-sensors/bme688/,needs vent
+device,U3,6-axis IMU,BMI270,1,2.40,https://www.bosch-sensortec.com/products/motion-sensors/imus/bmi270/,wake gesture
+device,U4,Qi receiver + charger,BQ51050B,1,2.60,https://www.ti.com/product/BQ51050B,coil under front glass
+device,L1,Qi RX coil with ferrite,Wurth WE-WPCC (select),1,3.20,https://www.we-online.com/en/components/products/WE-WPCC,<=25mm <=0.6mm
+device,U5,Buck 3.3V 750mA,TPS62840,1,1.20,https://www.ti.com/product/TPS62840,60nA Iq
+device,U6,Fuel gauge,MAX17048,1,1.80,https://www.analog.com/en/products/max17048.html,
+device,BT1,LiPo 2.0x25x30mm ~90mAh PCM UN38.3,generic,1,2.80,https://www.digikey.com/en/products/result?keywords=lipo%20303030,DVT 1.6mm
+device,SW1,Tactile switch COPY,C&K KMR2,1,0.40,https://www.ckswitches.com/products/switches/product-details/Tactile/KMR2/,
+device,M1,Coin ERM 8mm,generic,1,0.70,https://www.digikey.com/en/products/result?keywords=coin%20vibration%20motor%208mm,verify <=2.0mm
+device,Q1,N-MOSFET + diode,generic,1,0.15,,
+device,RT1,NTC 10k 0402,generic,1,0.05,,
+device,PASS,Passives,generic,45,0.02,,
+device,VNT,Protective vent,GORE adhesive vent,1,0.60,https://www.gore.com/products/categories/venting,
+device,PCB,6L HDI 0.6mm 36x36 ENIG,PCBWay,1,7.50,https://www.pcbway.com/orderonline.aspx,
+device,PCBA,SMT assembly + X-ray,PCBWay,1,11.00,https://www.pcbway.com/pcb-assembly.html,
+device,GLS,Cover glass 0.55mm 38x38,custom RFQ,1,4.50,,black mask + AR
+device,BDY,316L body 2 parts CNC + mirror polish,PCBWay CNC,1,34.00,https://www.pcbway.com/rapid-prototyping/,
+device,BTN,316L button cap,PCBWay CNC,1,1.50,,
+device,GSK,PEEK seam gasket 0.3mm,laser cut,1,0.60,,RF window
+device,SCR,M1.2x3 Torx A4,generic,4,0.06,,
+device,ADH,Die-cut adhesive set,tesa 61395 / 3M 5925,1,0.40,,
+dock,TX,Qi 5V transmitter PCBA,generic A11,1,4.00,,off-the-shelf run 1
+dock,RING,316L puck ring 50x8mm,PCBWay CNC,1,12.00,,
+dock,TOP,Ceramic/glass top 46mm,custom,1,2.50,,
+dock,FOOT,Silicone foot + screws,generic,1,0.60,,
+dock,CBL,USB-C cable 1m braided,generic,1,2.50,,
