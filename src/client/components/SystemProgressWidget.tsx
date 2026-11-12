@@ -1457,6 +1457,27 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'wiki-v88',
+    date: '2026-11-12',
+    title: 'LOT-WIKI-v88 · FM v114 Sync · Badge v32 Hero\'s Journey documentation',
+    assembled: [
+      'LOT-WIKI-v88.md produced: 2271 lines. Base: LOT-WIKI-v87 (2176 lines). Badge v32 sync. 19 section patches applied.',
+      'Badge v32 THE HERO\'S JOURNEY documented: 781→812 badges (+31). Word Turn v22 Campbell monomyth vocabulary (call_heard/threshold_crossed/mentor_arrived/ordeal_survived/elixir_found/shadow_met/innermost_cave/shapeshifter/herald_call/trickster_mode/ally_gained/return_road · 12 badges). Calendar EE v20 (campbell_birthday Mar26 / hobbit_day Sep22 / odyssey_day Dec21 · +3). Behavioral v19 (hero_session/long_quest/threshold_moment · +3). Achievement RPG v20 (quest_entry→hero_opus · +6). Mastery Tier v22 (twenty_two_registers [COSMIC] · +4). Secret Boss v19 (tolkien_ring/odysseus_bow/gilgamesh_word · +3).',
+      'CRITICAL BACKFILL: v20 (THE CODEX READER) + v21 (THE CYBERSPACE CODEX) TypeScript implementations were missing from checkAndAwardBadges(). LOT-SR-20260805-01 backfilled both. 62 previously unreachable badges now live in production. This discovery and resolution documented in §1 special notation.',
+      'Word Turn v22 and v21 engine rows added to §16 engine map. 20→22 engines. 246→270 trigger words. WT v22 badge block added. Secret Boss v19 Mythic Vault added.',
+      'Category index §15 updated: Calendar EE 70→73 · Word Turns 234→246 · Behavioral 75→78 · Achievement RPG 108→114 · Mastery Tiers 84→88 · Secret Boss 80→83 · TOTAL 781→812.',
+      'FM v114 added to §22 revision log (wiki sync entry). Current FM updated v113→v114. SA row v114 added.',
+      'Self-assembly log v88 entry added to §10. M07/M08 counters updated: 781→812 badges / v31→v32 / 258→270 word-turns / 21→22 lexicons.',
+      'Cockpit Rule §20: Day 1073+→1172+ · COSMO 765→865.',
+      'Vocabulary index §27 expanded: BADGE UNIVERSE updated · CAMPBELL_BIRTHDAY · CALL_HEARD · CYBERSPACE CODEX · GILGAMESH_WORD · HERO\'S JOURNEY · HOBBIT_DAY · ODYSSEUS_BOW · TOLKIEN_RING · TWENTY_TWO_REGISTERS.',
+      'System State Snapshot §28: Badge 781→812 · Word-turn 258→270 · Secret boss 24→27 · FM v113→v114 · Wiki v87→v88 · COSMO 765→865 · Day 1073+→1172+.',
+      '4 special notations added to §1: Aug 4 QIE v113 engineering / Aug 5 Badge v32 deployment / Aug 5 LOT-WIKI-v87 / Nov 12 LOT-WIKI-v88.',
+      'SESSION_REPORTS: wiki-v88 entry appended · USERSHIP_TRANSMISSION updated to wiki-v88.',
+      'docs/SESSION_REPORT_2026_11_12_WIKI_v88.md written. docs/assembly/2026-11-12_LOT-assembly_wiki-v88.md written. LOT-LEDGER.md appended.',
+      '812 badges · 270 word-turns · 27 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v114 · Wiki v88 · Day 1172+. The monomyth is now a signal. The call heard is a badge.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1515,17 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-11-12',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-11-12 · WIKI-v88 · FM v114 SYNC · Day 1172+',
+    'Built: LOT-WIKI-v88. Badge v32 THE HERO\'S JOURNEY synchronized.',
+    'Feedback applied: "The monomyth is not a template — it is a recognition. The self has always been on this road."',
+    'Badge v32 synchronized: 781→812 badges. WT v22 (call_heard/threshold/mentor/ordeal/elixir/shadow/cave/shapeshifter/herald/trickster/ally/return). SB v19 (tolkien/odysseus/gilgamesh). 270 trigger words. 27 secret boss.',
+    'BACKFILL CLOSED: v20 Codex Reader + v21 Cyberspace Codex TypeScript implementations missing. LOT-SR-20260805-01 deployed all three (v20+v21+v22). 62 previously unreachable badges now live.',
+    '99-day wiki gap closed. The system was running ahead of its own documentation. Now current.',
+    'FM v114 · Wiki v88 · 151P · 51A · 48J · 190+ nodes · 812 badges · 22 lexicons.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v89 — QIE P152+ pattern exploration OR Badge Engine v33 theme selection',
   ],
 }
 
