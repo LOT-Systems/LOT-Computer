@@ -4880,7 +4880,18 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  // v2 (2026-11-12): direction + guidance + Logs resonance, so downstream
+  // widgets can key off "waxing + Taian + user has history under this moon"
+  extra: {
+    moonTrend?: string
+    rokuyoGuidance?: string
+    timeZone?: string | null
+    logsTagged?: number
+    logsSamePhase?: number
+    logsSameRokuyo?: number
+    dominantPhase?: string | null
+  } = {}
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4900,10 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    inauspicious: rokuyo === 'Butsumetsu',
+    ...extra,
+    // The user's personally most-written moon phase is "their" moon
+    resonant: !!extra.dominantPhase && extra.dominantPhase === moonPhase,
   })
 }
 

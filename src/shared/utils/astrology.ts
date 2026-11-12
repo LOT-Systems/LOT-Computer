@@ -80,15 +80,16 @@ export function getHourlyZodiac(date: Date): string {
  * Simplified calculation based on Gregorian calendar
  */
 export function getRokuyo(date: Date): string {
-  // Known starting point: January 1, 2000 was Sensho (index 0)
-  const knownDate = new Date('2000-01-01')
-  const knownRokuyoIndex = 0
+  // Known starting point: January 1, 2000 was Sensho (index 0).
+  // Count whole *calendar* days from the date's own wall-clock Y/M/D, not raw
+  // epoch ms — the previous ms-diff flipped the rokuyo at UTC midnight (e.g.
+  // 4 PM in Los Angeles) instead of at the viewer's local midnight. (v2 fix)
+  const knownDay = Date.UTC(2000, 0, 1)
+  const localDay = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  const daysDiff = Math.round((localDay - knownDay) / (1000 * 60 * 60 * 24))
 
-  // Calculate days since known date
-  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
-
-  // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
+  // ((n % 6) + 6) % 6 keeps the index valid for dates before 2000 too
+  const rokuyoIndex = ((daysDiff % 6) + 6) % 6
 
   return ROKUYO[rokuyoIndex]
 }
@@ -176,4 +177,148 @@ export function getMoonEmoji(phaseName: string): string {
     'Waning Crescent': '🌘',
   }
   return emojiMap[phaseName] || '🌑'
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// v2 (2026-11-12) — unified reading, timeZone anchoring, guidance, Logs resonance
+// Still strictly ambient: nothing here reads birth data or builds a natal chart.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Short, practical meaning of each rokuyo day — surfaced next to the reading. */
+const ROKUYO_GUIDANCE: Record<string, string> = {
+  Sensho: 'Morning favored',
+  Tomobiki: 'Good for shared plans',
+  Senpu: 'Afternoon favored',
+  Butsumetsu: 'Rest, avoid launches',
+  Taian: 'Auspicious all day',
+  Shakku: 'Midday only, take care',
+}
+
+export function getRokuyoGuidance(rokuyo: string): string {
+  return ROKUYO_GUIDANCE[rokuyo] || ''
+}
+
+export type MoonTrend = 'dark' | 'waxing' | 'full' | 'waning'
+
+/** Coarse lunar direction: build while waxing, release while waning. */
+export function getMoonTrend(phaseName: string): MoonTrend {
+  if (phaseName === 'New Moon') return 'dark'
+  if (phaseName === 'Full Moon') return 'full'
+  if (phaseName.startsWith('Waxing') || phaseName === 'First Quarter') return 'waxing'
+  return 'waning'
+}
+
+const MOON_TREND_HINT: Record<MoonTrend, string> = {
+  dark: 'Set intentions',
+  waxing: 'Build',
+  full: 'Reflect',
+  waning: 'Release',
+}
+
+export function getMoonTrendHint(trend: MoonTrend): string {
+  return MOON_TREND_HINT[trend]
+}
+
+/**
+ * Re-express an instant as a Date whose *local* getters (getHours/getDate/…)
+ * return the wall-clock time in `timeZone`. Isomorphic (Intl only), so the
+ * dashboard and the server Logs snapshot share the exact same anchoring.
+ * Falls back to the original date for a missing/invalid timeZone.
+ */
+export function toZonedWallClock(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(date)
+    const get = (type: string) => Number(parts.find(p => p.type === type)?.value)
+    const hour = get('hour') === 24 ? 0 : get('hour')
+    return new Date(get('year'), get('month') - 1, get('day'), hour, get('minute'), get('second'))
+  } catch {
+    return date
+  }
+}
+
+export type AstrologyReading = {
+  hourlyZodiac: string
+  westernZodiac: string
+  rokuyo: string
+  rokuyoGuidance: string
+  moonPhase: string
+  moonIllumination: number
+  moonTrend: MoonTrend
+  moonTrendHint: string
+  auspicious: boolean
+  timeZone: string | null
+}
+
+/**
+ * One reading for one instant. Calendar-based parts (hour animal, sign,
+ * rokuyo) use the wall clock in `timeZone`; the moon phase uses the real
+ * instant, since lunar phase is global — feeding it a shifted wall-clock Date
+ * would skew it by the UTC offset (up to ±14h). (v2 fix)
+ */
+export function getAstrologyReading(now: Date = new Date(), timeZone?: string | null): AstrologyReading {
+  const wall = toZonedWallClock(now, timeZone)
+  const moon = getMoonPhase(now)
+  const rokuyo = getRokuyo(wall)
+  const moonTrend = getMoonTrend(moon.phase)
+  return {
+    hourlyZodiac: getHourlyZodiac(wall),
+    westernZodiac: getWesternZodiac(wall),
+    rokuyo,
+    rokuyoGuidance: getRokuyoGuidance(rokuyo),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    moonTrend,
+    moonTrendHint: getMoonTrendHint(moonTrend),
+    auspicious: rokuyo === 'Taian',
+    timeZone: timeZone || null,
+  }
+}
+
+export type AstroLogResonance = {
+  /** Logs carrying an astrology snapshot at all (written since v1, 2026-07-27) */
+  tagged: number
+  /** Of those, written under the same moon phase as now */
+  samePhase: number
+  /** Of those, written on the same rokuyo day as today */
+  sameRokuyo: number
+  /** The user's most-written moon phase, once there is enough history (>= 5) */
+  dominantPhase: string | null
+}
+
+/**
+ * Personal echo of the ambient reading, derived from the user's own Logs:
+ * every log's `context` snapshots the reading it was written under (see
+ * server/utils/logs.ts getLogContext), so we can say "you've written N notes
+ * under this moon" without any birth data.
+ */
+export function getLogAstroResonance(
+  logs: Array<{ context?: Record<string, any> | null }>,
+  reading: Pick<AstrologyReading, 'moonPhase' | 'rokuyo'>
+): AstroLogResonance {
+  let tagged = 0
+  let samePhase = 0
+  let sameRokuyo = 0
+  const phaseCounts: Record<string, number> = {}
+  for (const log of logs) {
+    const ctx = log?.context
+    if (!ctx || !ctx.astroMoonPhase) continue
+    tagged++
+    phaseCounts[ctx.astroMoonPhase] = (phaseCounts[ctx.astroMoonPhase] || 0) + 1
+    if (ctx.astroMoonPhase === reading.moonPhase) samePhase++
+    if (ctx.astroRokuyo === reading.rokuyo) sameRokuyo++
+  }
+  let dominantPhase: string | null = null
+  if (tagged >= 5) {
+    let best = 0
+    for (const [phase, count] of Object.entries(phaseCounts)) {
+      if (count > best) { best = count; dominantPhase = phase }
+    }
+  }
+  return { tagged, samePhase, sameRokuyo, dominantPhase }
 }
