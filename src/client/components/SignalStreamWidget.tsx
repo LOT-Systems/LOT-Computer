@@ -35,9 +35,6 @@ export function SignalStreamWidget() {
     prevCountRef.current = engine.signals.length
   }, [engine.signals.length])
 
-  // Don't show if fewer than 3 signals
-  if (engine.signals.length < 3) return null
-
   // Get last 12 signals, newest first. Memoized on engine.signals so the
   // full copy+sort of up to 1000 signals only runs when signals actually
   // change — not on every re-render this mounted widget receives from other
@@ -91,6 +88,12 @@ export function SignalStreamWidget() {
 
     return (daySignals.length / hours).toFixed(1)
   }, [engine.signals])
+
+  // Don't show if fewer than 3 signals. Must sit AFTER every hook — an early
+  // return above the useMemo calls crashed with "Rendered more hooks than
+  // during the previous render" the moment a user crossed 3 signals
+  // (Widget Health 2026-11-12).
+  if (engine.signals.length < 3) return null
 
   return (
     <Block label="Signal Bus:" blockView>

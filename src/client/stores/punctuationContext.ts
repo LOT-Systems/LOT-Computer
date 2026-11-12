@@ -122,6 +122,9 @@ export function updatePunctuationFromLogs(
     .slice(0, 20) // analyze the last 20 texted entries — enough signal, bounded cost
 
   if (withText.length === 0) {
+    // Already at the empty baseline — skip the write so subscribers don't re-render.
+    const prevEmpty = punctuationContext.get()
+    if (prevEmpty.sampleSize === 0 && prevEmpty.lastUpdated) return prevEmpty
     const next: PunctuationContextState = {
       ...DEFAULT_STATE,
       lastUpdated: Date.now(),

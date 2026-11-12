@@ -376,6 +376,27 @@ export const System = React.memo(function SystemInner() {
 
   const optimalWidget = React.useMemo(() => getOptimalWidget(), [logs])
 
+  // Per-mount gating snapshots (Widget Health 2026-11-12).
+  // These decisions used to be re-rolled inside render IIFEs: the Intentions
+  // gate stamped `intentions-last-shown` during render, so the *next* render
+  // (any store tick — usersOnline, weather, logs) saw the cooldown as active
+  // and unmounted the widget a moment after it appeared; the Subscribe gate
+  // re-rolled Math.random() < 0.2 on every render and flickered in/out.
+  // Snapshot once per System mount so a widget that appears stays put.
+  const [intentionsCooldownPassed] = React.useState(() => {
+    try {
+      const lastShown = localStorage.getItem('intentions-last-shown')
+      const twoDaysMs = 2 * 24 * 60 * 60 * 1000
+      const threeDaysMs = 3 * 24 * 60 * 60 * 1000
+      const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
+      return !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
+    } catch {
+      return false
+    }
+  })
+  const [subscribeRoll] = React.useState(() => Math.random() < 0.2)
+  const intentionsStampedRef = React.useRef(false)
+
   // Community pulse — atmosphere layer
   const convergence = React.useMemo(() => getConvergenceSignal(), [])
   const ambientIntensity = React.useMemo(() => getAmbientIntensity(), [])
@@ -736,13 +757,13 @@ export const System = React.memo(function SystemInner() {
       <WidgetErrorBoundary name="Context">
         <div className={cn('flex flex-col', density.sectionGap)}>
           {/* Contextual Prompts - Show pattern-based suggestions based on current context */}
-          <ContextualPromptsWidget />
+          <WidgetErrorBoundary name="Prompts"><ContextualPromptsWidget /></WidgetErrorBoundary>
 
           {/* Chat Catalyst - Prompts to connect with cohort members when online */}
-          <ChatCatalystWidget />
+          <WidgetErrorBoundary name="Chat Catalyst"><ChatCatalystWidget /></WidgetErrorBoundary>
 
           {/* Interventions - Compassionate care based on semantic struggle detection */}
-          <InterventionsWidget />
+          <WidgetErrorBoundary name="Interventions"><InterventionsWidget /></WidgetErrorBoundary>
         </div>
       </WidgetErrorBoundary>
 
@@ -750,22 +771,22 @@ export const System = React.memo(function SystemInner() {
       <WidgetErrorBoundary name="Bioethics">
         <div className={cn('flex flex-col', density.stackGap)}>
           {/* Biofield Capacitor - Track ATP energy depletion/replenishment */}
-          <EnergyCapacitor />
+          <WidgetErrorBoundary name="Biofield Capacitor"><EnergyCapacitor /></WidgetErrorBoundary>
 
           {/* Chakra Ergonomics - Seven-chakra energy map + session ergonomics */}
-          <ChakraErgonomicsWidget />
+          <WidgetErrorBoundary name="Chakra"><ChakraErgonomicsWidget /></WidgetErrorBoundary>
 
           {/* Narrative - Story progression and achievements */}
-          <NarrativeWidget />
+          <WidgetErrorBoundary name="Narrative"><NarrativeWidget /></WidgetErrorBoundary>
 
           {/* Goal Journey - Detected goals, journey stages, and narrative arc */}
-          <GoalJourneyWidget />
+          <WidgetErrorBoundary name="Goal Journey"><GoalJourneyWidget /></WidgetErrorBoundary>
 
           {/* Citizen Index - CQGS growth indicators */}
-          <EvolutionWidget />
+          <WidgetErrorBoundary name="Citizen Index"><EvolutionWidget /></WidgetErrorBoundary>
 
           {/* Interface Evolution - Progression & feature unlocks */}
-          <InterfaceEvolutionWidget />
+          <WidgetErrorBoundary name="Interface Evolution"><InterfaceEvolutionWidget /></WidgetErrorBoundary>
 
           {/* Evolution Milestone Toast - Subtle notifications for progression milestones */}
           <EvolutionMilestoneToast />
@@ -881,25 +902,18 @@ export const System = React.memo(function SystemInner() {
       <WidgetErrorBoundary name="Intentions">
         {(() => {
           const hasIntention = !!localStorage.getItem('current-intention')
-
-          // Check cooldown (2-3 days since last shown)
-          const lastShown = localStorage.getItem('intentions-last-shown')
-          const twoDaysMs = 2 * 24 * 60 * 60 * 1000
-          const threeDaysMs = 3 * 24 * 60 * 60 * 1000
-
-          // Random cooldown between 2-3 days
-          const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
-          const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
+          const cooldownPassed = intentionsCooldownPassed
 
           const intentionSuggestsIntentions = optimalWidget?.widget === 'intentions'
 
           // Show if:
           // 1. User has an existing intention to display, OR
           // 2. Intention engine detects seeking-direction or morning-clarity patterns, OR
-          // 3. Cooldown passed (fallback for periodic prompting)
+          // 3. Cooldown passed (fallback for periodic prompting) — snapshotted per mount
           if (hasIntention || intentionSuggestsIntentions || cooldownPassed) {
-            // Update last shown time
-            if (!lastShown || cooldownPassed || intentionSuggestsIntentions) {
+            // Stamp last-shown once per mount (not on every render)
+            if (!intentionsStampedRef.current && (cooldownPassed || intentionSuggestsIntentions)) {
+              intentionsStampedRef.current = true
               localStorage.setItem('intentions-last-shown', Date.now().toString())
             }
 
@@ -937,7 +951,7 @@ export const System = React.memo(function SystemInner() {
           }
 
           // Random 20% chance to show when all conditions met
-          const shouldShow = Math.random() < 0.2
+          const shouldShow = subscribeRoll
           return shouldShow && <div><SubscribeWidget /></div>
         })()}
       </WidgetErrorBoundary>
@@ -946,13 +960,13 @@ export const System = React.memo(function SystemInner() {
       <WidgetErrorBoundary name="Community">
         <div className={cn('flex flex-col', density.stackGap)}>
           {/* Pattern Insights - Show user's discovered patterns and cohort matches */}
-          <PatternInsightsWidget />
+          <WidgetErrorBoundary name="Pattern Insights"><PatternInsightsWidget /></WidgetErrorBoundary>
 
           {/* Mood Analytics - Mood-time and mood-selfcare correlations from check-ins */}
-          <MoodAnalytics />
+          <WidgetErrorBoundary name="Mood Analytics"><MoodAnalytics /></WidgetErrorBoundary>
 
           {/* Cohort Connect - Browse and connect with cohort members */}
-          <CohortConnectWidget />
+          <WidgetErrorBoundary name="Cohort Connect"><CohortConnectWidget /></WidgetErrorBoundary>
         </div>
       </WidgetErrorBoundary>
 
@@ -960,18 +974,18 @@ export const System = React.memo(function SystemInner() {
       <WidgetErrorBoundary name="Planning">
         <div className={cn('flex flex-col', density.stackGap)}>
           {/* Planner - Show occasionally for daily/weekly planning */}
-          <PlannerWidget />
+          <WidgetErrorBoundary name="Planner"><PlannerWidget /></WidgetErrorBoundary>
 
-          <MemoryWidget />
+          <WidgetErrorBoundary name="Memory"><MemoryWidget /></WidgetErrorBoundary>
 
           {/* Micro Calculator - appears at magical number times */}
-          <MicroCalculatorWidget />
+          <WidgetErrorBoundary name="Calculator"><MicroCalculatorWidget /></WidgetErrorBoundary>
 
           {/* Micro Game - 2×2cm monochromatic pixel game screen */}
-          <MicroGameWidget />
+          <WidgetErrorBoundary name="Game"><MicroGameWidget /></WidgetErrorBoundary>
 
           {/* Micro Image - 2×2cm procedural pixel image, responds to user's punctuation */}
-          <MicroImageWidget />
+          <WidgetErrorBoundary name="Image"><MicroImageWidget /></WidgetErrorBoundary>
         </div>
       </WidgetErrorBoundary>
 
@@ -993,10 +1007,10 @@ export const System = React.memo(function SystemInner() {
       {/* Investor stack — Visible when Investment switch is On in Settings */}
       <WidgetErrorBoundary name="Investor">
         <div className={cn('flex flex-col', density.stackGap)}>
-          <AngelInvestorWidget />
-          <CorporatePlanWidget />
-          <DemoDayWidget />
-          <FourDimensionalUI />
+          <WidgetErrorBoundary name="Angel Investor"><AngelInvestorWidget /></WidgetErrorBoundary>
+          <WidgetErrorBoundary name="Corporate Plan"><CorporatePlanWidget /></WidgetErrorBoundary>
+          <WidgetErrorBoundary name="Demo Day"><DemoDayWidget /></WidgetErrorBoundary>
+          <WidgetErrorBoundary name="4D UI"><FourDimensionalUI /></WidgetErrorBoundary>
         </div>
       </WidgetErrorBoundary>
 
@@ -1009,29 +1023,31 @@ export const System = React.memo(function SystemInner() {
 
       {/* CQGS Biofield Engine Widgets */}
       <WidgetErrorBoundary name="Biofield Engine">
-        <div className={cn('flex flex-col', density.sectionGap)}>
-          <QuantumStateWidget />
-          <PatternRecognitionWidget />
-          <AIFeedbackWidget />
-          <SignalStreamWidget />
-          <IntegrityWidget />
-        </div>
+        <LazyMount>
+          <div className={cn('flex flex-col', density.sectionGap)}>
+            <WidgetErrorBoundary name="Biofield State"><QuantumStateWidget /></WidgetErrorBoundary>
+            <WidgetErrorBoundary name="Pattern Recognition"><PatternRecognitionWidget /></WidgetErrorBoundary>
+            <WidgetErrorBoundary name="AI Feedback"><AIFeedbackWidget /></WidgetErrorBoundary>
+            <WidgetErrorBoundary name="Signal Bus"><SignalStreamWidget /></WidgetErrorBoundary>
+            <WidgetErrorBoundary name="Integrity"><IntegrityWidget /></WidgetErrorBoundary>
+          </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* CQGS Dashboard stack */}
       <WidgetErrorBoundary name="Dashboard">
         <div className={cn('flex flex-col', density.stackGap)}>
           {/* CQGS Dashboard - Bioethics health, performance, version */}
-          <UserMetricsWidget />
+          <WidgetErrorBoundary name="CQGS Health"><UserMetricsWidget /></WidgetErrorBoundary>
 
           {/* Correlated Indexes - Four-dimensional weekly tracking */}
-          <CorrelatedIndexesWidget />
+          <WidgetErrorBoundary name="Correlated Indexes"><CorrelatedIndexesWidget /></WidgetErrorBoundary>
 
           {/* System Progress - Deployment info with feedback */}
-          <SystemProgressWidget />
+          <WidgetErrorBoundary name="System Progress"><SystemProgressWidget /></WidgetErrorBoundary>
 
           {/* System Pulse - Real-time system metrics */}
-          <SystemPulseWidget />
+          <WidgetErrorBoundary name="System Pulse"><SystemPulseWidget /></WidgetErrorBoundary>
         </div>
       </WidgetErrorBoundary>
 
@@ -1042,14 +1058,16 @@ export const System = React.memo(function SystemInner() {
 
       {/* Stats stack */}
       <WidgetErrorBoundary name="Stats">
-        <div className={cn('flex flex-col', density.sectionGap)}>
-          <IntentionPatterns />
-          <CollectiveConsciousness />
-          <WellnessPulse />
-          <MemoryEngineStats />
-          <GrowthMilestones />
-          <BadgeUnlockFeed />
-        </div>
+        <LazyMount>
+          <div className={cn('flex flex-col', density.sectionGap)}>
+            <WidgetErrorBoundary name="Intention Patterns"><IntentionPatterns /></WidgetErrorBoundary>
+            <WidgetErrorBoundary name="Collective"><CollectiveConsciousness /></WidgetErrorBoundary>
+            <WidgetErrorBoundary name="Wellness"><WellnessPulse /></WidgetErrorBoundary>
+            <WidgetErrorBoundary name="Memory Engine"><MemoryEngineStats /></WidgetErrorBoundary>
+            <WidgetErrorBoundary name="Growth"><GrowthMilestones /></WidgetErrorBoundary>
+            <WidgetErrorBoundary name="Badges"><BadgeUnlockFeed /></WidgetErrorBoundary>
+          </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Calendar — Personal date planner */}

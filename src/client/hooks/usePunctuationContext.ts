@@ -27,8 +27,14 @@ import {
  * Returns the full PunctuationContextState (aggregate, latest, trend,
  * callForHelp flag, etc.).
  */
+// Stable empty fallback — a fresh `[]` default on every render (while
+// /api/logs is loading) re-fired the effect below on every render and,
+// combined with the store write, produced an infinite update loop
+// (React #185) in MicroImage / CohortConnect (Widget Health 2026-11-12).
+const EMPTY_LOGS: never[] = []
+
 export function usePunctuationContext(): PunctuationContextState {
-  const { data: logs = [] } = useLogs()
+  const { data: logs = EMPTY_LOGS } = useLogs()
   const snapshot = useStore(punctuationContext)
 
   // Recompute whenever logs change. The store short-circuits on no-op

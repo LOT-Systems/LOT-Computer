@@ -41,9 +41,6 @@ export function QuantumStateWidget() {
     })
   }
 
-  // Don't render if no signals have been recorded
-  if (engine.signals.length === 0) return null
-
   const label =
     view === 'state' ? 'Biofield State:' :
     view === 'dimensions' ? 'Signal Allocation:' :
@@ -138,6 +135,11 @@ export function QuantumStateWidget() {
     if (signalLabels[signal]) return signalLabels[signal]
     return signal.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase())
   }
+
+  // Don't render if no signals have been recorded. Must sit AFTER every hook —
+  // returning above the useMemo calls crashed on the 0 → 1 signal transition
+  // ("Rendered more hooks") (Widget Health 2026-11-12).
+  if (engine.signals.length === 0) return null
 
   return (
     <Block
