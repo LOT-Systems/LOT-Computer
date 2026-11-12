@@ -1084,7 +1084,7 @@ export default async (fastify: FastifyInstance) => {
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_status', 'calendar_alert', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -1246,6 +1246,22 @@ export default async (fastify: FastifyInstance) => {
     }
 
     // Already have an empty log at top, just return existing logs
+    return logs
+  })
+
+  // Calendar feed — every calendar_* event for the user, independent of the
+  // /logs 500-row window and the hideActivityLogs preference, so scheduled
+  // entries, status changes and alert receipts never silently drop out.
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    const logs = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: { [Op.in]: ['calendar_entry', 'calendar_status', 'calendar_alert'] },
+      },
+      attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
+      order: [['createdAt', 'DESC']],
+      limit: 2000,
+    })
     return logs
   })
 

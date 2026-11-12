@@ -2076,14 +2076,31 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
-        } else if (log.event === 'calendar_entry') {
-          const entryType = log.metadata?.entryType as string | undefined
-          const date = log.metadata?.date as string | undefined
+        } else if (log.event === 'calendar_entry' || log.event === 'calendar_status' || log.event === 'calendar_alert') {
+          const md = log.metadata || {}
+          const entryType = md.entryType as string | undefined
+          const date = md.date as string | undefined
+          const time = md.time as string | undefined
+          const text = md.text as string | undefined
+          const code = entryType === 'task' ? 'TSK' : entryType === 'call' ? 'CLL' : 'NTE'
+          const label =
+            log.event === 'calendar_alert' ? 'CAL-ALRT:' :
+            log.event === 'calendar_status' ? 'CAL-STAT:' : 'CAL:'
+          const headline =
+            log.event === 'calendar_alert' ? `${md.stage || 'ALERT'} · ${code}` :
+            log.event === 'calendar_status'
+              ? `${md.status === 'done' ? 'COMPLETE' : md.status === 'scrubbed' ? 'SCRUBBED' : 'REOPENED'} · ${code}`
+              : code
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
-              <Block label="CAL:" blockView>
-                <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+              <Block label={label} blockView>
+                <div className="uppercase tracking-widest">{headline}</div>
+                {text && <div className="mt-4">{text}</div>}
+                {date && (
+                  <div className="opacity-40 mt-8 tabular-nums">
+                    {date}{time ? ` · ${time.replace(':', '')}L` : ' · ALL-DAY'}
+                  </div>
+                )}
               </Block>
             </LogContainer>
           )

@@ -141,6 +141,14 @@ export const useCreateLog = createMutation<{ text: string; event?: string; metad
   '/api/logs'
 )
 
+// Calendar feed — calendar_entry / calendar_status / calendar_alert only.
+// Polled so alerts and status changes from other devices converge.
+export const useCalendarLogs = createQuery<Log[]>('/api/calendar', {
+  refetchOnWindowFocus: true,
+  refetchInterval: 2 * 60 * 1000,
+  staleTime: 30 * 1000,
+})
+
 export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
   'put',
   (data) => `/api/logs/${data.id}`

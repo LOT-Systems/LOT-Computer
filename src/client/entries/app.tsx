@@ -15,6 +15,7 @@ import { Layout } from '#client/components/ui'
 import { System } from '#client/components/System'
 import { Settings } from '#client/components/Settings'
 import { Logs } from '#client/components/Logs'
+import { CalendarAlerts } from '#client/components/CalendarAlerts'
 import { Sync } from '#client/components/Sync'
 import { DirectMessageThread } from '#client/components/DirectMessageThread'
 import { StatusPage } from '#client/components/StatusPage'
@@ -344,6 +345,7 @@ const App = () => {
   return (
     <>
       <ConnectionStatus />
+      <CalendarAlerts />
       <Layout>
         <TabPanels />
         <DynamicRoutes />
