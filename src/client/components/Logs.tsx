@@ -29,6 +29,8 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { LotEmailCompose } from '#client/components/LotEmail'
+import { lotEmailDraftTo } from '#client/stores/lotEmail'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3931,6 +3933,27 @@ const NoteEditor = ({
   // the editor. We compare against the previous value via ref so
   // editing around an existing trigger doesn't re-fire it.
   // --------------------------------------------------------------------
+  // LOT® Email: Cohort Dating / Community hand a recipient to the
+  // primary Log via lotEmailDraftTo — insert the command line here.
+  const emailDraftTo = useStore(lotEmailDraftTo)
+  React.useEffect(() => {
+    if (!primary || !emailDraftTo) return
+    const current = valueRef.current
+    const sep = current.trim() ? (current.endsWith('\n') ? '\n' : '\n\n') : ''
+    const updated = `${current}${sep}/email to ${emailDraftTo}\n`
+    setValue(updated)
+    valueRef.current = updated
+    lotEmailDraftTo.set(null)
+  }, [primary, emailDraftTo])
+
+  const onLotEmailSent = React.useCallback((next: string) => {
+    setValue(next)
+    valueRef.current = next
+    onChangeRef.current(next)
+    setLastSavedAt(new Date())
+    setIsSaved(true)
+  }, [])
+
   const lastTriggerScanRef = React.useRef(log.text || '')
   React.useEffect(() => {
     const fresh = detectNewTriggers(value, lastTriggerScanRef.current)
@@ -4128,6 +4151,7 @@ const NoteEditor = ({
           '/story        Generate a personal story from recent data',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
+          '/email to Name  LOT Email — body below, arrives in Sync',
           '/assembly     Self-assembly module status',
           '/phys         Physiological cohort report',
           '/qos          Quantum OS state analysis',
@@ -4326,6 +4350,7 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        <LotEmailCompose value={value} onSent={onLotEmailSent} />
         {scanResult && (
           <div className="mt-8">
             <Block label="SCAN:" blockView>

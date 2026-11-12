@@ -14,6 +14,7 @@ import { useCohorts, useEnergy, useProfile } from '#client/queries'
 import { useLogContext } from '#client/hooks/useLogContext'
 import { usePunctuationContext } from '#client/hooks/usePunctuationContext'
 import { recordSignal, getUserState } from '#client/stores/intentionEngine'
+import { composeLotEmail } from '#client/stores/lotEmail'
 
 /**
  * Cohort Connect Widget - Find and connect with cohort members
@@ -116,14 +117,22 @@ export const CohortConnectWidget: React.FC = () => {
     window.location.href = `/users/${userId}`
   }
 
-  const handleSendMessage = (userId: string, similarity: number) => {
+  // Cohort Dating → LOT® Email: hand the recipient to the Log composer.
+  const handleSendMessage = (userId: string, similarity: number, firstName?: string | null, lastName?: string | null) => {
     recordSignal('mood', 'cohort_message_initiated', {
       userId,
       similarity,
       connectionReadiness,
+      channel: 'email',
       hour: new Date().getHours()
     })
-    stores.goTo('sync')
+    const name = [firstName, lastName].filter(Boolean).join(' ')
+    if (name) {
+      composeLotEmail(name)
+      stores.goTo('logs')
+    } else {
+      stores.goTo('dm', { userId })
+    }
   }
 
   const handleToggleExpand = (userId: string) => {
@@ -264,10 +273,10 @@ export const CohortConnectWidget: React.FC = () => {
                         size="small"
                         onClick={(e: React.MouseEvent) => {
                           e.stopPropagation()
-                          handleSendMessage(match.user.id, match.similarity)
+                          handleSendMessage(match.user.id, match.similarity, match.user.firstName, match.user.lastName)
                         }}
                       >
-                        Send message
+                        Email
                       </Button>
                     </div>
                   </div>
