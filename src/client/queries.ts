@@ -895,6 +895,7 @@ export const usePrayerScripture = createMutation<
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    scope?: 'day' | 'week' | 'month' | 'year'
     quantumState?: {
       energy?: string
       clarity?: string
@@ -910,5 +911,24 @@ export const useStoryGeneration = createMutation<
   {
     story: string
     logId: string | null
+    scope?: 'day' | 'week' | 'month' | 'year'
+    header?: string[]
+    source?: 'ai' | 'offline'
   }
 >('post', '/api/story')
+
+/** /level · /xp · /arcade — operator arcade state (shared/utils/log-arcade) */
+export type LogArcadeResponse = {
+  xp: number
+  level: number
+  rank: string
+  tier: string
+  nextLevelAt: number
+  progress: number
+  todayXp: number
+  activeDays: number
+  returns: number
+  lines: string[]
+}
+export const fetchLogArcade = (): Promise<LogArcadeResponse> =>
+  api.get<LogArcadeResponse>('/api/log-arcade').then((res) => res.data)

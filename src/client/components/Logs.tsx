@@ -28,12 +28,13 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, buildSystemHelp, type LogTrigger } from '#client/utils/logTriggers'
+import { parseStoryScope, stripStoryCommand } from '#shared/utils/story-compression'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, fetchLogArcade } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3706,6 +3707,11 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyHeader, setStoryHeader] = React.useState<string[] | null>(null)
+  const storyInFlightRef = React.useRef(false)
+  const storyPendingRef = React.useRef(false)
+  const storyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [arcadeResult, setArcadeResult] = React.useState<string | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3741,6 +3747,8 @@ const NoteEditor = ({
   })
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
+      storyInFlightRef.current = false
+      setStoryHeader(data.header || null)
       setStoryResponse(data.story)
       setStoryLoading(false)
       const current = valueRef.current
@@ -3751,8 +3759,12 @@ const NoteEditor = ({
       onChangeRef.current(updated)
       setIsSaved(true)
     },
-    onError: () => {
-      const fallback = 'The system holds your data quietly. When the engine returns, your story will be here.'
+    onError: (err: any) => {
+      storyInFlightRef.current = false
+      // Server returns a deterministic compression story even on 403 (no Usership)
+      const body = err?.response?.data
+      if (body?.header) setStoryHeader(body.header)
+      const fallback = body?.story || 'The system holds your data quietly. When the engine returns, your story will be here.'
       setStoryResponse(fallback)
       setStoryLoading(false)
       const current = valueRef.current
@@ -3931,10 +3943,37 @@ const NoteEditor = ({
   // the editor. We compare against the previous value via ref so
   // editing around an existing trigger doesn't re-fire it.
   // --------------------------------------------------------------------
+  // /story [day|week|month|year] — fired ~1.2s after the operator stops
+  // typing, so the scope argument typed after "/story" is captured.
+  const fireStory = React.useCallback(() => {
+    storyPendingRef.current = false
+    storyTimerRef.current = null
+    if (storyInFlightRef.current) return
+    storyInFlightRef.current = true
+    const text = valueRef.current
+    const scope = parseStoryScope(text)
+    const logText = stripStoryCommand(text)
+    setStoryLoading(true)
+    setStoryResponse(null)
+    setStoryHeader(null)
+    try {
+      submitStory({ logText, scope, quantumState: getUserState(), userIndex: getUserIndex() })
+    } catch {
+      submitStory({ logText, scope })
+    }
+  }, [submitStory])
+  React.useEffect(() => () => {
+    if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+  }, [])
+
   const lastTriggerScanRef = React.useRef(log.text || '')
   React.useEffect(() => {
     const fresh = detectNewTriggers(value, lastTriggerScanRef.current)
     lastTriggerScanRef.current = value
+    if (storyPendingRef.current) {
+      if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+      storyTimerRef.current = setTimeout(fireStory, 1200)
+    }
     if (fresh.length === 0) return
 
     for (const trigger of fresh as LogTrigger[]) {
@@ -4121,49 +4160,23 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(buildSystemHelp())
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
+        if (!storyInFlightRef.current) {
+          storyPendingRef.current = true
           setStoryLoading(true)
           setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
+          setStoryHeader(null)
+          if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+          storyTimerRef.current = setTimeout(fireStory, 1200)
         }
+      } else if (trigger === 'arcade-level') {
+        setArcadeResult('RANK            RESOLVING...')
+        fetchLogArcade()
+          .then(data => setArcadeResult(data.lines.join('\n')))
+          .catch(() => setArcadeResult('ARCADE OFFLINE — XP is safe. It never decays.'))
       }
     }
   }, [value])
@@ -4414,11 +4427,23 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        {arcadeResult && (
+          <div className="mt-8">
+            <Block label="ARCADE:" blockView>
+              <div className="opacity-60 tabular-nums" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{arcadeResult}</div>
+            </Block>
+          </div>
+        )}
         {(storyLoading || storyResponse) && (
           <div className="mt-8">
             <Block label="📖" blockView>
               {storyLoading && !storyResponse && (
-                <div className="opacity-40 tracking-widest">...</div>
+                <div className="opacity-40 tracking-widest">COMPRESSING...</div>
+              )}
+              {storyHeader && storyHeader.length > 0 && (
+                <div className="opacity-40 tabular-nums mb-8" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '12px', lineHeight: '1.6', whiteSpace: 'pre-wrap', letterSpacing: '0.04em' }}>
+                  {storyHeader.join('\n')}
+                </div>
               )}
               {storyResponse && (
                 <div className="opacity-60">

@@ -41,6 +41,7 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'arcade-level'      // /level · /xp · /arcade — operator arcade evolution
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -67,7 +68,75 @@ const RULES: TriggerRule[] = [
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'arcade-level',   emojis: [],        keywords: ['level', 'xp', 'arcade'] },
 ]
+
+/**
+ * COMMAND REGISTRY — single source of truth for `/system`.
+ * Every slash command the Log understands is listed here, grouped by
+ * function. `/system` renders this table verbatim, so adding a command
+ * to RULES without adding it here is a documentation defect.
+ */
+export interface CommandSpec {
+  usage: string
+  description: string
+  trigger: LogTrigger
+}
+
+export const COMMAND_GROUPS: Array<{ group: string; commands: CommandSpec[] }> = [
+  {
+    group: 'NARRATIVE',
+    commands: [
+      { usage: '/story', description: 'Compressed story of your week', trigger: 'story-mode' },
+      { usage: '/story day', description: 'Compress the last 24 hours', trigger: 'story-mode' },
+      { usage: '/story month', description: 'Compress the last 30 days', trigger: 'story-mode' },
+      { usage: '/story year', description: 'Compress the last 365 days', trigger: 'story-mode' },
+      { usage: '/level', description: 'Arcade rank, XP and progress (/xp, /arcade)', trigger: 'arcade-level' },
+    ],
+  },
+  {
+    group: 'INTELLIGENCE',
+    commands: [
+      { usage: '/qi [query]', description: 'Ask the Quantum Intelligence engine', trigger: 'qi-rfi' },
+      { usage: '/scan', description: 'System status overview', trigger: 'ai-scan' },
+      { usage: '/qos', description: 'Quantum OS state analysis', trigger: 'qos-report' },
+      { usage: '/phys', description: 'Physiological cohort report', trigger: 'phys-report' },
+      { usage: '/assembly', description: 'Self-assembly module status', trigger: 'assembly-check' },
+      { usage: '/how', description: 'Open LOT AI check-in (System tab)', trigger: 'how-checkin' },
+    ],
+  },
+  {
+    group: 'SELF-CARE',
+    commands: [
+      { usage: '/breathe', description: '4-2-6 breathing exercise', trigger: 'breathe' },
+      { usage: '/freeze', description: 'Pause and reflect protocol', trigger: 'freeze-widgets' },
+      { usage: '/silent', description: 'Signal silence check', trigger: 'silent-mode' },
+      { usage: '/prayer', description: 'Generate contextual scripture', trigger: 'prayer-mode' },
+      { usage: '/fast', description: 'Orthodox fasting calendar', trigger: 'force-fast' },
+    ],
+  },
+  {
+    group: 'ENVIRONMENT',
+    commands: [
+      { usage: '/synth', description: 'Toggle keyboard sound', trigger: 'toggle-synth' },
+      { usage: '/radio', description: 'Toggle radio', trigger: 'radio-toggle' },
+      { usage: '/night', description: 'Dark mode', trigger: 'night-mode' },
+      { usage: '/system', description: 'This command index', trigger: 'system-help' },
+    ],
+  },
+]
+
+/** Plain-text `/system` screen, parsed by the Log renderer. */
+export function buildSystemHelp(): string {
+  const lines: string[] = []
+  for (const g of COMMAND_GROUPS) {
+    if (lines.length) lines.push('')
+    lines.push(g.group)
+    for (const c of g.commands) lines.push(`${c.usage.padEnd(14, ' ')}${c.description}`)
+  }
+  lines.push('', 'SHORTCUTS', 'Ctrl+Enter    Save log immediately')
+  return lines.join('\n')
+}
 
 /**
  * Returns every trigger present in `text`. An empty array means the
