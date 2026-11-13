@@ -380,6 +380,13 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'direct_message': {
+          // LOT® Email / DM — private: deliver only to sender + receiver
+          if (data.receiverId === req.user.id || data.senderId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -4082,6 +4089,160 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — simplest person-to-person mail inside LOT.
+  // Composed in Log with "/email to <Name> <message>", delivered to Sync.
+  // Stored in direct_messages (same thread as DM), so Email, Sync and
+  // Cohort Connect all read one source of truth. No external SMTP.
+  // ============================================================================
+
+  const isSuspendedUser = (u: any) =>
+    (u?.tags || []).some((t: string) => String(t).toLowerCase() === 'suspended')
+
+  // Resolve "Hitomi" / "Hitomi Tanaka" → users (excluding self + suspended)
+  const resolveEmailRecipients = async (to: string, meId: string) => {
+    const clean = String(to || '').replace(/[^\p{L}\p{N}\s'.-]/gu, '').trim()
+    if (!clean) return []
+    const [first, ...rest] = clean.split(/\s+/)
+    const last = rest.join(' ')
+    const where: any = {
+      id: { [Op.ne]: meId },
+      firstName: { [Op.iLike]: first },
+    }
+    if (last) where.lastName = { [Op.iLike]: `${last}%` }
+    let users = await fastify.models.User.findAll({
+      where,
+      attributes: ['id', 'firstName', 'lastName', 'tags'],
+      limit: 10,
+    })
+    // Fallback: allow a first-name prefix ("Hito" → Hitomi)
+    if (!users.length && !last && first.length >= 3) {
+      users = await fastify.models.User.findAll({
+        where: { id: { [Op.ne]: meId }, firstName: { [Op.iLike]: `${first}%` } },
+        attributes: ['id', 'firstName', 'lastName', 'tags'],
+        limit: 10,
+      })
+    }
+    return users.filter((u: any) => !isSuspendedUser(u))
+  }
+
+  // Inbox — newest mail received (and sent) for Sync
+  fastify.get('/lot-email/inbox', async (req: FastifyRequest, reply) => {
+    try {
+      const messages = await fastify.models.DirectMessage.findAll({
+        where: {
+          [Op.or]: [{ receiverId: req.user.id }, { senderId: req.user.id }],
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 30,
+      })
+      const otherIds = Array.from(new Set(messages.map((m: any) =>
+        m.senderId === req.user.id ? m.receiverId : m.senderId)))
+      const users = otherIds.length
+        ? await fastify.models.User.findAll({
+            where: { id: otherIds },
+            attributes: ['id', 'firstName', 'lastName', 'tags'],
+          })
+        : []
+      const byId: Record<string, any> = {}
+      users.forEach((u: any) => { byId[u.id] = u })
+      return reply.send({
+        emails: messages
+          .filter((m: any) => {
+            const other = byId[m.senderId === req.user.id ? m.receiverId : m.senderId]
+            return other && !isSuspendedUser(other)
+          })
+          .map((m: any) => {
+            const isMine = m.senderId === req.user.id
+            const other = byId[isMine ? m.receiverId : m.senderId]
+            return {
+              id: m.id,
+              senderId: m.senderId,
+              receiverId: m.receiverId,
+              message: m.message,
+              createdAt: m.createdAt,
+              isMine,
+              other: { id: other.id, firstName: other.firstName, lastName: other.lastName },
+            }
+          }),
+      })
+    } catch (error) {
+      console.error('Error fetching LOT Email inbox:', error)
+      return reply.status(500).send({ error: 'Failed to fetch inbox' })
+    }
+  })
+
+  // Send — by name ("to") or explicit receiverId (after disambiguation)
+  fastify.post('/lot-email', async (req: FastifyRequest<{
+    Body: { to?: string; receiverId?: string; message: string }
+  }>, reply) => {
+    try {
+      const { to, receiverId, message } = req.body || ({} as any)
+      const body = String(message || '').trim().slice(0, 2000)
+      if (!body) return reply.status(400).send({ error: 'Message is empty' })
+      if (isSuspendedUser(req.user)) return reply.status(403).send({ error: 'Not allowed' })
+
+      let receiver: any = null
+      if (receiverId) {
+        receiver = await fastify.models.User.findByPk(receiverId)
+        if (!receiver || receiver.id === req.user.id || isSuspendedUser(receiver)) receiver = null
+      } else {
+        const candidates = await resolveEmailRecipients(to || '', req.user.id)
+        if (candidates.length > 1) {
+          return reply.status(409).send({
+            error: 'Multiple recipients',
+            candidates: candidates.map((u: any) => ({
+              id: u.id, firstName: u.firstName, lastName: u.lastName,
+            })),
+          })
+        }
+        receiver = candidates[0] || null
+      }
+      if (!receiver) return reply.status(404).send({ error: 'Recipient not found' })
+
+      const email = await fastify.models.DirectMessage.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: body,
+      })
+
+      sync.emit('direct_message', {
+        id: email.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: email.message,
+        senderName: `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim(),
+        createdAt: email.createdAt,
+        kind: 'email',
+      })
+
+      process.nextTick(async () => {
+        try {
+          const context = await getLogContext(req.user)
+          await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'direct_message_sent',
+            text: '',
+            metadata: { directMessageId: email.id, receiverId: receiver.id, message: email.message, kind: 'lot_email' },
+            context,
+          })
+        } catch (logError) {
+          console.error('Error logging LOT Email:', logError)
+        }
+      })
+
+      return reply.send({
+        id: email.id,
+        receiverId: receiver.id,
+        createdAt: email.createdAt,
+        to: { id: receiver.id, firstName: receiver.firstName, lastName: receiver.lastName },
+      })
+    } catch (error) {
+      console.error('Error sending LOT Email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
     }
   })
 
