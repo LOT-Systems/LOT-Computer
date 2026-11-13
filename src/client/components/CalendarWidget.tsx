@@ -9,18 +9,33 @@
 import * as React from 'react'
 import { useQueryClient } from 'react-query'
 import { Block, Button } from '#client/components/ui'
-import { useCreateLog, useLogs } from '#client/queries'
+import { useCreateLog, useCalendar, calendarAction } from '#client/queries'
 import { cn } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import type { Dayjs } from '#client/utils/dayjs'
 import { recordCalendarSignal } from '#client/stores/intentionEngine'
+import {
+  type CalendarEntry,
+  type CalendarEntryType as EntryType,
+  compareEntries,
+  dueAt,
+  isOverdue,
+  isValidTime,
+  localDateKey,
+  milDay,
+  milTime,
+  tMinus,
+} from '#shared/utils/calendar'
 
-type EntryType = 'note' | 'task' | 'call'
+const UPCOMING_LIMIT = 10
+const COUNTDOWN_WINDOW_MS = 48 * 60 * 60 * 1000
 
-type CalendarEntry = {
-  date: string
-  text: string
-  type: EntryType
+function requestAlertPermission() {
+  try {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      Notification.requestPermission().catch(() => {})
+    }
+  } catch (_) {}
 }
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -50,34 +65,39 @@ function getMonthWeeks(year: number, month: number): Dayjs[][] {
 
 export function CalendarWidget() {
   const queryClient = useQueryClient()
-  const { data: logs = [] } = useLogs()
-  const { mutate: createLog } = useCreateLog()
+  const { data: calendar, isError } = useCalendar()
+  const { mutate: createLog, isLoading: isSaving } = useCreateLog()
 
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
   const [viewMonth, setViewMonth] = React.useState(() => dayjs())
   const [selectedDate, setSelectedDate] = React.useState<string | null>(null)
   const [isAddingEntry, setIsAddingEntry] = React.useState(false)
   const [entryText, setEntryText] = React.useState('')
+  const [entryTime, setEntryTime] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
+  const [openRow, setOpenRow] = React.useState<string | null>(null)
+  const [saveError, setSaveError] = React.useState(false)
 
-  const entries = React.useMemo<CalendarEntry[]>(() => {
-    return logs
-      .filter(log => log.event === 'calendar_entry' && log.metadata)
-      .map(log => ({
-        date: log.metadata?.date as string,
-        text: log.metadata?.text as string || log.text || '',
-        type: (log.metadata?.entryType as EntryType) || 'note',
-      }))
-      .filter(e => e.date && e.text)
-      .sort((a, b) => a.date.localeCompare(b.date))
-  }, [logs])
+  // Live clock — minute resolution is all the UI shows, 15s keeps it honest.
+  const [now, setNow] = React.useState(() => new Date())
+  React.useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 15 * 1000)
+    return () => clearInterval(id)
+  }, [])
 
+  const entries = React.useMemo<CalendarEntry[]>(
+    () => (calendar || []).slice().sort(compareEntries),
+    [calendar]
+  )
+
+  const today = localDateKey(now)
+
+  // Overdue (open, past) first, then upcoming open entries in time order.
   const upcomingEntries = React.useMemo(() => {
-    const today = dayjs().format('YYYY-MM-DD')
-    return entries
-      .filter(e => e.date >= today)
-      .slice(0, 10)
-  }, [entries])
+    const overdue = entries.filter(e => isOverdue(e, now) && e.date >= dayjs(today).subtract(7, 'day').format('YYYY-MM-DD'))
+    const ahead = entries.filter(e => e.status === 'open' && !isOverdue(e, now) && e.date >= today)
+    return [...overdue, ...ahead].slice(0, UPCOMING_LIMIT)
+  }, [entries, now, today])
 
   const entriesOnDate = React.useMemo(() => {
     if (!selectedDate) return []
@@ -86,11 +106,10 @@ export function CalendarWidget() {
 
   const datesWithEntries = React.useMemo(() => {
     const set = new Set<string>()
-    entries.forEach(e => set.add(e.date))
+    entries.forEach(e => { if (e.status !== 'void') set.add(e.date) })
     return set
   }, [entries])
 
-  const today = dayjs().format('YYYY-MM-DD')
   const weeks = React.useMemo(
     () => getMonthWeeks(viewMonth.year(), viewMonth.month()),
     [viewMonth]
@@ -105,28 +124,55 @@ export function CalendarWidget() {
     }
   }
 
+  const refresh = () => {
+    queryClient.invalidateQueries(['/api/calendar'])
+    queryClient.invalidateQueries(['/api/logs'])
+  }
+
   const handleAddEntry = () => {
-    if (!selectedDate || !entryText.trim()) return
+    const text = entryText.trim()
+    if (!selectedDate || !text || isSaving) return
+    const time = isValidTime(entryTime) ? entryTime : null
 
     const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
+    const date = selectedDate
+    const type = entryType
 
+    setSaveError(false)
     createLog({
-      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel})`,
+      text: `[SCHEDULE] ${type}: ${text} (${dateLabel}${time ? ` ${time}` : ''})`,
       event: 'calendar_entry',
       metadata: {
-        date: selectedDate,
-        text: entryText.trim(),
-        entryType,
+        date,
+        time,
+        text,
+        entryType: type,
+        status: 'open',
       },
     }, {
       onSuccess: () => {
-        queryClient.refetchQueries(['/api/logs'])
-        try { recordCalendarSignal(entryType, selectedDate!) } catch (_) {}
+        refresh()
+        try { recordCalendarSignal(type, date) } catch (_) {}
+        setEntryText('')
+        setEntryTime('')
+        setIsAddingEntry(false)
       },
+      // Keep the draft on failure so nothing typed is lost.
+      onError: () => setSaveError(true),
     })
 
-    setEntryText('')
-    setIsAddingEntry(false)
+    if (time) requestAlertPermission()
+  }
+
+  const handleEntryAction = (entry: CalendarEntry, action: 'done' | 'void' | 'reopen') => {
+    setOpenRow(null)
+    // Optimistic status flip; server is the source of truth on refetch.
+    queryClient.setQueryData<CalendarEntry[]>(['/api/calendar'], (prev = []) =>
+      prev.map(e => e.id === entry.id
+        ? { ...e, status: action === 'reopen' ? 'open' : action }
+        : e)
+    )
+    calendarAction(entry.id, action).finally(refresh)
   }
 
   const handleToggleCalendar = () => {
@@ -139,10 +185,13 @@ export function CalendarWidget() {
   return (
     <Block label="Calendar:" blockView onLabelClick={handleToggleCalendar}>
       <div className="w-full">
-        <div className="mb-16">
+        <div className="mb-16 flex items-center justify-between gap-16">
           <Button onClick={handleToggleCalendar}>
             Add date
           </Button>
+          <span className="text-acc/40 uppercase tracking-wider tabular-nums whitespace-nowrap" title="Local time (J)">
+            {milTime(now)}J · {milDay(now)}
+          </span>
         </div>
 
         {isCalendarOpen && (
@@ -229,6 +278,14 @@ export function CalendarWidget() {
                 </div>
                 <div className="flex gap-8 items-center">
                   <input
+                    type="time"
+                    value={entryTime}
+                    onChange={e => setEntryTime(e.target.value)}
+                    aria-label="Time (optional)"
+                    title="Time (optional — empty = all day, alert 09:00)"
+                    className="bg-transparent border border-acc/20 text-acc px-4 py-2 outline-none focus:border-acc/40 tabular-nums"
+                  />
+                  <input
                     type="text"
                     value={entryText}
                     onChange={e => setEntryText(e.target.value)}
@@ -237,8 +294,11 @@ export function CalendarWidget() {
                     className="bg-transparent border border-acc/20 text-acc px-4 py-2 flex-1 outline-none focus:border-acc/40"
                     autoFocus
                   />
-                  <Button onClick={handleAddEntry}>Add</Button>
+                  <Button onClick={handleAddEntry} disabled={isSaving || !entryText.trim()}>Add</Button>
                 </div>
+                {saveError && (
+                  <div className="mt-4 text-acc/60 uppercase tracking-wider">Not saved — retry</div>
+                )}
               </div>
             )}
 
@@ -247,9 +307,18 @@ export function CalendarWidget() {
                 <div className="text-acc/40 mb-4">
                   {dayjs(selectedDate).format('dddd, MMMM D')}
                 </div>
-                {entriesOnDate.map((e, i) => (
-                  <div key={i} className="text-acc/80 mb-1">
-                    {e.text}
+                {entriesOnDate.map(e => (
+                  <div
+                    key={e.id}
+                    className={cn(
+                      'mb-1 flex gap-8',
+                      e.status === 'open' ? 'text-acc/80' : 'text-acc/30',
+                      e.status === 'void' && 'line-through'
+                    )}
+                  >
+                    <span className="tabular-nums whitespace-nowrap">{e.time ? e.time.replace(':', '') : '----'}</span>
+                    <span>{e.text}</span>
+                    {e.status === 'done' && <span className="uppercase tracking-wider">· done</span>}
                   </div>
                 ))}
               </div>
@@ -259,20 +328,52 @@ export function CalendarWidget() {
 
         {upcomingEntries.length > 0 && (
           <div className="space-y-1">
-            {upcomingEntries.map((entry, i) => (
-              <div key={i} className="flex justify-between gap-16">
-                <span className="text-acc whitespace-nowrap">
-                  {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
-                </span>
-                <span className="text-acc text-right">
-                  {entry.text}
-                </span>
-              </div>
-            ))}
+            {upcomingEntries.map(entry => {
+              const due = dueAt(entry)
+              const overdue = isOverdue(entry, now)
+              const near = due.getTime() - now.getTime() < COUNTDOWN_WINDOW_MS
+              const isOpen = openRow === entry.id
+              return (
+                <div key={entry.id}>
+                  <button
+                    className="w-full flex justify-between gap-16 text-left hover:opacity-60 transition-opacity"
+                    onClick={() => setOpenRow(isOpen ? null : entry.id)}
+                    aria-expanded={isOpen}
+                  >
+                    <span className={cn('whitespace-nowrap', overdue ? 'text-acc/60' : 'text-acc')}>
+                      {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
+                      {entry.time && <span className="tabular-nums"> · {entry.time}</span>}
+                    </span>
+                    <span className="text-acc text-right">
+                      {entry.text}
+                    </span>
+                  </button>
+                  {(overdue || (near && entry.time) || entry.snoozeUntil || isOpen) && (
+                    <div className="flex justify-between gap-16 text-acc/40 uppercase tracking-wider tabular-nums">
+                      <span>
+                        {entry.entryType}
+                        {overdue ? ' · overdue' : entry.snoozeUntil ? ' · snoozed' : ''}
+                        {(near || overdue) && entry.time ? ` · ${tMinus(due, now)}` : ''}
+                      </span>
+                      {isOpen && (
+                        <span className="flex gap-16 normal-case tracking-normal">
+                          <button className="text-acc/60 hover:text-acc" onClick={() => handleEntryAction(entry, 'done')}>Done</button>
+                          <button className="text-acc/60 hover:text-acc" onClick={() => handleEntryAction(entry, 'void')}>Void</button>
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
 
-        {upcomingEntries.length === 0 && !isCalendarOpen && (
+        {isError && !calendar && (
+          <div className="text-acc/40">Calendar offline — retrying.</div>
+        )}
+
+        {upcomingEntries.length === 0 && !isCalendarOpen && !isError && (
           <div className="text-acc/40">No upcoming dates.</div>
         )}
       </div>

@@ -27,6 +27,7 @@ import {
 } from '#shared/types'
 import dayjs from '#client/utils/dayjs'
 import { DATE_TIME_FORMAT } from '#shared/constants'
+import type { CalendarEntry, CalendarAction } from '#shared/utils/calendar'
 
 const api = axios.create({
   baseURL: '/',
@@ -140,6 +141,21 @@ export const useCreateLog = createMutation<{ text: string; event?: string; metad
   'post',
   '/api/logs'
 )
+
+// LOT/CAL — calendar feed (all calendar_entry rows, not capped by /api/logs' 500)
+export const useCalendar = createQuery<CalendarEntry[]>('/api/calendar', {
+  refetchOnWindowFocus: true,
+  refetchInterval: 5 * 60 * 1000,
+  staleTime: 30 * 1000,
+})
+
+export async function calendarAction(
+  id: string,
+  action: CalendarAction,
+  body: { minutes?: number; lateMin?: number } = {}
+): Promise<{ entry: CalendarEntry | null; claimed: boolean }> {
+  return api.post(`/api/calendar/${id}/${action}`, body).then((res) => res.data)
+}
 
 export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
   'put',

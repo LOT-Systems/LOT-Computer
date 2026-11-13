@@ -34,6 +34,12 @@ import {
 import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
+import {
+  entryFromLog as calendarEntryFromLog,
+  compareEntries as compareCalendarEntries,
+  alertLogText as calendarAlertLogText,
+  type CalendarAction,
+} from '#shared/utils/calendar'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
@@ -1084,7 +1090,7 @@ export default async (fastify: FastifyInstance) => {
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_alert', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -1597,7 +1603,8 @@ export default async (fastify: FastifyInstance) => {
     ) => {
       const text = (req.body.text || '').trim().slice(0, MAX_LOG_TEXT_LENGTH)
       const log = await fastify.models.Log.findByPk(req.params.id)
-      if (!log) return reply.throw.notFound()
+      // Ownership check — a log id alone must never grant write access.
+      if (!log || log.userId !== req.user.id) return reply.throw.notFound()
       if (log.event !== 'note') return log
 
       // If user backspaced all content, delete the log instead of saving empty text
@@ -1615,6 +1622,123 @@ export default async (fastify: FastifyInstance) => {
         }
       })
       return log
+    }
+  )
+
+  // ============================================================================
+  // LOT/CAL — CALENDAR ENDPOINTS
+  // Entries live as `calendar_entry` logs (so QIE + scheduled jobs keep seeing
+  // them). /logs caps at 500 rows, so the widget reads its own unbounded-by-age
+  // feed here. Alert claims are atomic: a conditional UPDATE guarantees one
+  // ALERT (and one Log row) per due time across tabs and devices.
+  // ============================================================================
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    const rows = await fastify.models.Log.findAll({
+      where: { userId: req.user.id, event: 'calendar_entry' },
+      order: [['createdAt', 'DESC']],
+      limit: 1000,
+    })
+    return rows
+      .map((r) => calendarEntryFromLog(r))
+      .filter((e): e is NonNullable<typeof e> => !!e)
+      .sort(compareCalendarEntries)
+  })
+
+  fastify.post(
+    '/calendar/:id/:action',
+    async (
+      req: FastifyRequest<{
+        Params: { id: string; action: string }
+        Body: { minutes?: number; lateMin?: number }
+      }>,
+      reply
+    ) => {
+      const action = req.params.action as CalendarAction
+      if (!['prealert', 'fire', 'snooze', 'done', 'void', 'reopen'].includes(action)) {
+        return reply.throw.badParams('Unknown calendar action')
+      }
+      const log = await fastify.models.Log.findOne({
+        where: { id: req.params.id, userId: req.user.id, event: 'calendar_entry' },
+      })
+      if (!log) return reply.throw.notFound()
+      const entry = calendarEntryFromLog(log)
+      if (!entry) return reply.throw.badParams('Malformed calendar entry')
+
+      const md: Record<string, any> = { ...(log.metadata || {}) }
+      const nowIso = new Date().toISOString()
+      // Claim key: only the request that flips this field from NULL wins.
+      let claimKey: 'firedAt' | 'prealertAt' | null = null
+      let logKind: 'ALERT' | 'DONE' | 'VOID' | 'SNOOZE' | 'REOPEN' | null = null
+
+      switch (action) {
+        case 'prealert':
+          if (entry.status !== 'open' || entry.prealertAt || entry.firedAt) {
+            return { entry, claimed: false }
+          }
+          md.prealertAt = nowIso
+          claimKey = 'prealertAt'
+          break
+        case 'fire':
+          if (entry.status !== 'open' || entry.firedAt) return { entry, claimed: false }
+          md.firedAt = nowIso
+          claimKey = 'firedAt'
+          logKind = 'ALERT'
+          break
+        case 'snooze': {
+          if (entry.status !== 'open') return { entry, claimed: false }
+          const minutes = Math.min(Math.max(Math.round(Number(req.body?.minutes) || 10), 1), 24 * 60)
+          md.snoozeUntil = new Date(Date.now() + minutes * 60000).toISOString()
+          md.firedAt = null
+          logKind = 'SNOOZE'
+          break
+        }
+        case 'done':
+        case 'void':
+          if (entry.status !== 'open') return { entry, claimed: false }
+          md.status = action
+          md.closedAt = nowIso
+          logKind = action === 'done' ? 'DONE' : 'VOID'
+          break
+        case 'reopen':
+          if (entry.status === 'open') return { entry, claimed: false }
+          md.status = 'open'
+          md.closedAt = null
+          logKind = 'REOPEN'
+          break
+      }
+
+      const where: any = { id: log.id, userId: req.user.id }
+      if (claimKey) {
+        where[Op.and] = Sequelize.literal(`("metadata"->>'${claimKey}') IS NULL`)
+      }
+      const [count] = await fastify.models.Log.update({ metadata: md }, { where })
+      if (count === 0) return { entry, claimed: false }
+
+      if (logKind) {
+        const lateMin =
+          logKind === 'ALERT' && req.body?.lateMin !== undefined
+            ? Math.max(0, Math.round(Number(req.body.lateMin) || 0))
+            : undefined
+        await fastify.models.Log.create({
+          userId: req.user.id,
+          text: calendarAlertLogText(logKind, entry),
+          event: 'calendar_alert',
+          metadata: {
+            entryId: entry.id,
+            kind: logKind.toLowerCase(),
+            date: entry.date,
+            time: entry.time,
+            entryType: entry.entryType,
+            text: entry.text,
+            ...(lateMin !== undefined ? { lateMin } : {}),
+            ...(logKind === 'SNOOZE' ? { snoozeUntil: md.snoozeUntil } : {}),
+          },
+          context: {},
+        })
+      }
+
+      const updated = calendarEntryFromLog({ ...log.get({ plain: true }), metadata: md })
+      return { entry: updated, claimed: true }
     }
   )
 

@@ -2079,11 +2079,35 @@ export const Logs: React.FC = React.memo(function LogsInner() {
         } else if (log.event === 'calendar_entry') {
           const entryType = log.metadata?.entryType as string | undefined
           const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const entryText = (log.metadata?.text as string | undefined) || ''
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
                 <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                {entryText && <div className="mt-8">{entryText}</div>}
+                {date && <div className="opacity-40 mt-8 tabular-nums">{date}{time ? ` · ${time}` : ''}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_alert') {
+          const kind = String(log.metadata?.kind || 'alert').toUpperCase()
+          const entryType = String(log.metadata?.entryType || 'entry').toUpperCase()
+          const entryText = (log.metadata?.text as string | undefined) || ''
+          const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const lateMin = log.metadata?.lateMin as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL:" blockView>
+                <div className="uppercase tracking-widest">{kind} · {entryType}</div>
+                {entryText && <div className="mt-8">{entryText}</div>}
+                {date && (
+                  <div className="opacity-40 mt-8 tabular-nums">
+                    {date}{time ? ` · ${time}` : ' · all day'}
+                    {kind === 'ALERT' && lateMin ? ` · +${lateMin}m late` : ''}
+                  </div>
+                )}
               </Block>
             </LogContainer>
           )
