@@ -4880,7 +4880,8 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  extra?: { timeZone?: string | null; localDate?: string; guidance?: string }
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4890,11 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    // (2026-11-13) day key + zone the reading was taken in, so consumers can
+    // line the signal up with Logs entries' context.astro* snapshot.
+    timeZone: extra?.timeZone ?? null,
+    localDate: extra?.localDate,
+    guidance: extra?.guidance,
   })
 }
 

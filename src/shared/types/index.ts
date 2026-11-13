@@ -66,6 +66,7 @@ export type UserProfile = {
   lastName: string | null;
   country: string | null;
   city: string | null;
+  timeZone?: string | null;
   address: string | null;
   phone: string | null;
   tags: string[];
@@ -170,6 +171,7 @@ export type LogContext = {
   astroMoonIllumination?: number | null;
   astroHourlyZodiac?: string | null;
   astroWesternZodiac?: string | null;
+  astroAuspicious?: boolean | null;
   [key: string]: any;
 };
 

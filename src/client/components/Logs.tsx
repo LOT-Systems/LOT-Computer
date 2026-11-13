@@ -363,7 +363,13 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                   <div>HUM: {log.context.humidity}%</div>
                 )}
                 {log.context?.astroRokuyo && (
-                  <div>ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}</div>
+                  <div>
+                    ASTRO: {log.context.astroRokuyo}
+                    {log.context.astroAuspicious && ' ✦'}
+                    {log.context.astroHourlyZodiac && ` · ${log.context.astroHourlyZodiac} hr`}
+                    {' · '}{log.context.astroMoonPhase}
+                    {log.context.astroMoonIllumination != null && ` (${log.context.astroMoonIllumination}%)`}
+                  </div>
                 )}
                 {log.metadata?.sound && (
                   <div>SND: {log.metadata.sound}</div>
@@ -4179,10 +4185,10 @@ const NoteEditor = ({
       weatherParts.push(`${Math.round(log.context.humidity)}%`)
     }
     const weatherText = weatherParts.join(', ')
-    if (log.context?.city) {
-      return `${weatherText} – ${log.context.city}`
-    }
-    return weatherText
+    const base = log.context?.city
+      ? `${weatherText} – ${log.context.city}`
+      : weatherText
+    return withAstroContext(base, log.context)
   }, [log?.context])
 
   return (
@@ -4435,6 +4441,15 @@ const NoteEditor = ({
   )
 }
 
+// Ambient astrology snapshot taken at log time (server getLogContext, user's
+// timeZone) — appended to each entry's hover context so the journal and the
+// System dashboard Astrology block read the same conditions. 2026-11-13.
+function withAstroContext(base: string, context?: Log['context'] | null): string {
+  if (!context?.astroRokuyo) return base
+  const astro = `${context.astroRokuyo}${context.astroAuspicious ? ' ✦' : ''} · ${context.astroMoonPhase}`
+  return base ? `${base} · ${astro}` : astro
+}
+
 const LogContainer: React.FC<{
   children: React.ReactNode
   log: Log
@@ -4450,10 +4465,10 @@ const LogContainer: React.FC<{
       weatherParts.push(`${Math.round(log.context.humidity)}%`)
     }
     const weatherText = weatherParts.join(', ')
-    if (log.context?.city) {
-      return `${weatherText} – ${log.context.city}`
-    }
-    return weatherText
+    const base = log.context?.city
+      ? `${weatherText} – ${log.context.city}`
+      : weatherText
+    return withAstroContext(base, log.context)
   }, [log.context])
 
   return (

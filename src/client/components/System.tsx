@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getAstrologyReading } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -199,44 +199,49 @@ export const System = React.memo(function SystemInner() {
     const id = setInterval(() => {
       if (!document.hidden) setAstrologyTick(t => t + 1)
     }, 15 * 60 * 1000)
-    return () => clearInterval(id)
+    // Returning to a backgrounded tab re-derives immediately instead of
+    // showing up to 15 min of stale reading (2026-11-13).
+    const onVisible = () => { if (!document.hidden) setAstrologyTick(t => t + 1) }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      clearInterval(id)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
   }, [])
 
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
-  // rokuyo), not a personal natal chart.
-  const astrology = React.useMemo(() => {
-    const now = new Date()
-    const hourlyZodiac = getHourlyZodiac(now)
-    const westernZodiac = getWesternZodiac(now)
-    const moonPhase = getMoonPhase(now)
-    const rokuyo = getRokuyo(now)
-
-    return {
-      hourlyZodiac,
-      westernZodiac,
-      moonPhase: moonPhase.phase,
-      moonIllumination: moonPhase.illumination,
-      rokuyo,
-    }
+  // rokuyo), not a personal natal chart. Personalized to the user's saved
+  // profile timeZone (falls back to device time) via the same shared
+  // getAstrologyReading() the server uses to snapshot every Logs entry, so
+  // the widget and the journal always agree (2026-11-13).
+  const userTimeZone = me?.timeZone || null
+  const astrology = React.useMemo(
+    () => getAstrologyReading(new Date(), userTimeZone),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+    [astrologyTick, userTimeZone]
+  )
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
-  // per calendar day, so other widgets (cosmic, system) can react to it.
+  // per calendar day (in the reading's own timeZone), so other widgets
+  // (cosmic, system) can react to it.
   React.useEffect(() => {
     if (typeof window === 'undefined') return
-    const today = dayjs().format('YYYY-MM-DD')
     const lastRecordedKey = 'astrology_signal_date'
-    if (localStorage.getItem(lastRecordedKey) === today) return
-    recordAstrologySignal(
-      astrology.rokuyo,
-      astrology.moonPhase,
-      astrology.moonIllumination,
-      astrology.hourlyZodiac,
-      astrology.westernZodiac
-    )
-    localStorage.setItem(lastRecordedKey, today)
-  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac])
+    try {
+      if (localStorage.getItem(lastRecordedKey) === astrology.localDate) return
+      recordAstrologySignal(
+        astrology.rokuyo,
+        astrology.moonPhase,
+        astrology.moonIllumination,
+        astrology.hourlyZodiac,
+        astrology.westernZodiac,
+        { timeZone: astrology.timeZone, localDate: astrology.localDate, guidance: astrology.rokuyoGuidance }
+      )
+      localStorage.setItem(lastRecordedKey, astrology.localDate)
+    } catch {
+      // storage blocked — skip the signal rather than spam it every render
+    }
+  }, [astrology.localDate, astrology.rokuyo])
 
   const answerLogs = React.useMemo(() => {
     return logs.filter(log => log.event === 'answer')
@@ -467,6 +472,9 @@ export const System = React.memo(function SystemInner() {
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
+            {astrology.rokuyoGuidance && (
+              <div className="opacity-50">{astrology.rokuyoGuidance}</div>
+            )}
           </Block>
         </div>
 
@@ -670,9 +678,14 @@ export const System = React.memo(function SystemInner() {
           }}
         >
           {astrologyView === 'astrology' ? (
-            <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
-            </div>
+            <>
+              <div>
+                {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              </div>
+              {astrology.rokuyoGuidance && (
+                <div className="opacity-50">{astrology.rokuyoGuidance}</div>
+              )}
+            </>
           ) : astrologyView === 'psychology' ? (
             <div>
               {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}

@@ -51,6 +51,7 @@ export class User
       'lastName',
       'country',
       'city',
+      'timeZone', // own /me only — lets the Astrology block follow the saved zone (2026-11-13)
       'address',
       'phone',
       'tags',

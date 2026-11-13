@@ -80,17 +80,36 @@ export function getHourlyZodiac(date: Date): string {
  * Simplified calculation based on Gregorian calendar
  */
 export function getRokuyo(date: Date): string {
-  // Known starting point: January 1, 2000 was Sensho (index 0)
-  const knownDate = new Date('2000-01-01')
-  const knownRokuyoIndex = 0
+  // Known starting point: January 1, 2000 was Sensho (index 0).
+  // Count whole *local calendar* days (2026-11-13 fix): the old version
+  // diffed getTime() against UTC midnight, so the six-day cycle flipped at
+  // the UTC-offset moment instead of at the reader's own midnight, and the
+  // server's wall-clock-shifted Date could land on the neighbouring day.
+  const knownDay = Date.UTC(2000, 0, 1)
+  const localDay = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  const daysDiff = Math.round((localDay - knownDay) / 86400000)
 
-  // Calculate days since known date
-  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
-
-  // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
+  // Safe modulo — dates before 2000 must not produce a negative index.
+  const rokuyoIndex = ((daysDiff % 6) + 6) % 6
 
   return ROKUYO[rokuyoIndex]
+}
+
+/**
+ * Short ambient guidance line for each rokuyo day — the traditional
+ * almanac reading, phrased as conditions rather than predictions.
+ */
+const ROKUYO_GUIDANCE: Record<string, string> = {
+  Sensho: 'Act early — mornings favoured',
+  Tomobiki: 'Shared plans favoured — midday quiet',
+  Senpu: 'Go slow — afternoons favoured',
+  Butsumetsu: 'Rest and close loops',
+  Taian: 'Auspicious — good day to begin',
+  Shakku: 'Take care — noon hour only',
+}
+
+export function getRokuyoGuidance(rokuyo: string): string {
+  return ROKUYO_GUIDANCE[rokuyo] || ''
 }
 
 /**
@@ -176,4 +195,75 @@ export function getMoonEmoji(phaseName: string): string {
     'Waning Crescent': '🌘',
   }
   return emojiMap[phaseName] || '🌑'
+}
+
+/**
+ * Wall-clock Date for an instant in a given IANA timeZone.
+ *
+ * The returned Date's getFullYear()/getMonth()/getDate()/getHours() readers
+ * report the wall clock *in that timeZone*, regardless of the runtime's own
+ * zone — so calendar-based readings (zodiac hour, western sign, rokuyo)
+ * follow the user's saved profile zone on both client and server. Do NOT
+ * use its getTime() for astronomical math (moon phase) — that needs the
+ * true instant. Falls back to the instant itself on an invalid/missing zone.
+ */
+export function toZonedWallClock(instant: Date, timeZone?: string | null): Date {
+  if (!timeZone) return instant
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(instant)
+    const get = (type: string) => Number(parts.find((p) => p.type === type)?.value)
+    const hour = get('hour') % 24
+    return new Date(get('year'), get('month') - 1, get('day'), hour, get('minute'), get('second'))
+  } catch {
+    return instant
+  }
+}
+
+export interface AstrologyReading {
+  westernZodiac: string
+  hourlyZodiac: string
+  rokuyo: string
+  rokuyoGuidance: string
+  auspicious: boolean
+  moonPhase: string
+  moonIllumination: number
+  moonEmoji: string
+  /** YYYY-MM-DD in the reading's timeZone — the day this reading belongs to */
+  localDate: string
+  timeZone: string | null
+}
+
+/**
+ * Single source of truth for the ambient Astrology block — used by the
+ * System dashboard AND by getLogContext() on the server, so the widget and
+ * every Logs entry snapshot read identical values for the same moment and
+ * timeZone. Ambient conditions only — not a personal natal chart.
+ */
+export function getAstrologyReading(instant: Date = new Date(), timeZone?: string | null): AstrologyReading {
+  const wall = toZonedWallClock(instant, timeZone)
+  // Moon phase is astronomical — always from the true instant.
+  const moon = getMoonPhase(instant)
+  const rokuyo = getRokuyo(wall)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return {
+    westernZodiac: getWesternZodiac(wall),
+    hourlyZodiac: getHourlyZodiac(wall),
+    rokuyo,
+    rokuyoGuidance: getRokuyoGuidance(rokuyo),
+    auspicious: rokuyo === 'Taian',
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    moonEmoji: getMoonEmoji(moon.phase),
+    localDate: `${wall.getFullYear()}-${pad(wall.getMonth() + 1)}-${pad(wall.getDate())}`,
+    timeZone: timeZone || null,
+  }
 }
