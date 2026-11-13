@@ -419,3 +419,85 @@ td:last-child {
   content: 'built different since day one';
   display: none;
 }
+
+/* ==========================================================================
+   LOT-FM-001 / BASIC (RATION) — terminal tokens
+   Mono bold. Ground/ink only (theme base/acc). Inversion is the only
+   hierarchy. 2px rules. Square corners. Fixed character grid.
+   ========================================================================== */
+.lot-basic {
+  --lb-ground: var(--base-color);
+  --lb-ink: rgb(var(--acc-color-default));
+  --lb-rule: 2px solid var(--lb-ink);
+  font-family: 'Liberation Mono', 'LiberationMono-Bold', 'Courier New', Courier, monospace;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 24px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--lb-ink);
+  background: var(--lb-ground);
+  border-radius: 0;
+  max-width: 100%;
+}
+.lot-basic * { border-radius: 0 !important; }
+.lot-basic-masthead {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 4px;
+  border-bottom: var(--lb-rule);
+}
+.lot-basic-status {
+  display: flex;
+  flex-wrap: wrap;
+  background: var(--lb-ink);
+  color: var(--lb-ground);
+  padding: 0 8px;
+  margin-top: 8px;
+}
+.lot-basic-status-cell { white-space: nowrap; }
+.lot-basic-status-cell + .lot-basic-status-cell::before { content: '\00a0|\00a0'; }
+.lot-basic-section { margin-top: 32px; }
+.lot-basic-section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-bottom: var(--lb-rule);
+  margin-bottom: 8px;
+}
+.lot-basic-lines li, .lot-basic-lines > div { display: flex; gap: 2ch; }
+.lot-basic-ln { flex: 0 0 2ch; }
+.lot-basic-terms > div { display: grid; grid-template-columns: 14ch 1fr; gap: 2ch; }
+.lot-basic-ledger { overflow-x: auto; }
+.lot-basic-row {
+  display: grid;
+  grid-template-columns: 3ch minmax(0, 34ch) 4ch 6ch 12ch 12ch;
+  column-gap: 2ch;
+  padding: 0 4px;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+}
+.lot-basic-row > span { overflow: hidden; text-overflow: ellipsis; }
+.lot-basic-row-head { cursor: default; border-bottom: var(--lb-rule); }
+.lot-basic-row:not(.lot-basic-row-head):hover,
+.lot-basic-row:focus-visible,
+.lot-basic-inv {
+  background: var(--lb-ink);
+  color: var(--lb-ground);
+}
+.lot-basic-num { text-align: right; }
+.lot-basic-note { margin-top: 8px; border-top: var(--lb-rule); padding-top: 4px; }
+.lot-basic-link { color: inherit; text-decoration: none; padding: 0 1ch; border: var(--lb-rule); }
+.lot-basic-link:hover, .lot-basic-link:focus-visible { background: var(--lb-ink); color: var(--lb-ground); outline: none; }
+@media (max-width: 767px) {
+  .lot-basic { font-size: 12px; }
+  .lot-basic-status { flex-direction: column; }
+  .lot-basic-status-cell + .lot-basic-status-cell::before { content: none; }
+  .lot-basic-row { grid-template-columns: 3ch minmax(0, 1fr) 3ch 6ch; column-gap: 1ch; }
+  .lot-basic-row > span:nth-child(5), .lot-basic-row > .lot-basic-wide { display: none; }
+  .lot-basic-terms > div { grid-template-columns: 11ch 1fr; gap: 1ch; }
+}

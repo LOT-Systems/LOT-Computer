@@ -20,6 +20,15 @@ import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
+import { cycleEnvelope } from '#server/utils/basics-envelope'
+import {
+  BASIC_FORM,
+  BASIC_BUILD_PHASE,
+  BASIC_PRICE_USD,
+  BASIC_CYCLE_ISSUES,
+  BASIC_LOAD,
+  type BasicPublicLedger,
+} from '#shared/constants/basics'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -374,6 +383,21 @@ let analyticsLastCheck = 0
 const ANALYTICS_CACHE_DURATION = 60 * 1000 // 1 minute
 
 export default async (fastify: FastifyInstance) => {
+  // LOT-FM-001 OPEN TAB — public ledger header. Envelope status only;
+  // COGS, landed cost and margin are never returned from a public route.
+  fastify.get('/basics', async (req, reply) => {
+    const body: BasicPublicLedger = {
+      form: BASIC_FORM,
+      phase: BASIC_BUILD_PHASE,
+      priceUsd: BASIC_PRICE_USD,
+      envelope: cycleEnvelope().status,
+      cycleIssues: BASIC_CYCLE_ISSUES,
+      lines: BASIC_LOAD.length,
+    }
+    reply.header('Cache-Control', 'public, max-age=300')
+    return body
+  })
+
   fastify.get('/analytics', async (req, reply) => {
     const now = Date.now()
     if (analyticsCache && (now - analyticsLastCheck) < ANALYTICS_CACHE_DURATION) {

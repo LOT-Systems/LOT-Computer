@@ -48,7 +48,7 @@ const fastify = Fastify({
   bodyLimit: 1_048_576,
 })
 
-const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log']
+const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log', '/basics']
 
 // ==============================================================================
 // SECURITY PLUGINS
@@ -350,6 +350,14 @@ fastify.register(async (fastify: FastifyInstance) => {
           if (req.user) {
             return reply.view('generic-spa', {
               scriptName: 'app',
+              scriptNonce: reply.cspNonce.script,
+              styleNonce: reply.cspNonce.style,
+            })
+          }
+          // LOT-FM-001 OPEN TAB: /basics is public. Strangers read the ledger.
+          if (route === '/basics') {
+            return reply.view('generic-spa', {
+              scriptName: 'basics',
               scriptNonce: reply.cspNonce.script,
               styleNonce: reply.cspNonce.style,
             })
