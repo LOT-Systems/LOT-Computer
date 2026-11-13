@@ -410,6 +410,27 @@ export const System = React.memo(function SystemInner() {
     )
   }, [me])
 
+  // Render-stable gates — System re-renders on every usersOnline / liveMessage /
+  // weather push. Rolling Math.random() or re-reading cooldowns inside JSX made
+  // Subscribe flicker in/out on each push, and Intentions vanished on the first
+  // re-render after its cooldown fired (it wrote last-shown during render, then
+  // read it back as "cooldown not passed"). Decide once per mount instead.
+  const [subscribeRoll] = React.useState(() => Math.random() < 0.2)
+  const [intentionsCooldownGate] = React.useState(() => {
+    try {
+      const lastShown = localStorage.getItem('intentions-last-shown')
+      const twoDaysMs = 2 * 24 * 60 * 60 * 1000
+      const cooldownPeriod = twoDaysMs + Math.random() * (24 * 60 * 60 * 1000)
+      return !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
+    } catch {
+      return false
+    }
+  })
+  React.useEffect(() => {
+    if (!intentionsCooldownGate) return
+    try { localStorage.setItem('intentions-last-shown', Date.now().toString()) } catch {}
+  }, [intentionsCooldownGate])
+
   // Simple, clean layout for non-paid accounts — no AI, just essentials
   if (!isPaidAccount) {
     return (
@@ -882,14 +903,9 @@ export const System = React.memo(function SystemInner() {
         {(() => {
           const hasIntention = !!localStorage.getItem('current-intention')
 
-          // Check cooldown (2-3 days since last shown)
-          const lastShown = localStorage.getItem('intentions-last-shown')
-          const twoDaysMs = 2 * 24 * 60 * 60 * 1000
-          const threeDaysMs = 3 * 24 * 60 * 60 * 1000
-
-          // Random cooldown between 2-3 days
-          const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
-          const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
+          // Cooldown (random 2–3 days since last shown) is decided once per
+          // mount — see intentionsCooldownGate above.
+          const cooldownPassed = intentionsCooldownGate
 
           const intentionSuggestsIntentions = optimalWidget?.widget === 'intentions'
 
@@ -898,8 +914,9 @@ export const System = React.memo(function SystemInner() {
           // 2. Intention engine detects seeking-direction or morning-clarity patterns, OR
           // 3. Cooldown passed (fallback for periodic prompting)
           if (hasIntention || intentionSuggestsIntentions || cooldownPassed) {
-            // Update last shown time
-            if (!lastShown || cooldownPassed || intentionSuggestsIntentions) {
+            // Engine-suggested surfacing also resets the cooldown clock
+            // (cooldown-gated surfacing is recorded in the mount effect).
+            if (intentionSuggestsIntentions) {
               localStorage.setItem('intentions-last-shown', Date.now().toString())
             }
 
@@ -936,9 +953,8 @@ export const System = React.memo(function SystemInner() {
             return null
           }
 
-          // Random 20% chance to show when all conditions met
-          const shouldShow = Math.random() < 0.2
-          return shouldShow && <div><SubscribeWidget /></div>
+          // 20% chance to show when all conditions met — rolled once per mount
+          return subscribeRoll && <div><SubscribeWidget /></div>
         })()}
       </WidgetErrorBoundary>
 
@@ -1008,14 +1024,18 @@ export const System = React.memo(function SystemInner() {
       </WidgetErrorBoundary>
 
       {/* CQGS Biofield Engine Widgets */}
+      {/* Lazy-mounted: five full intentionEngine subscribers, display-only
+          (no signal writes on mount) — no reason to re-render them off-screen. */}
       <WidgetErrorBoundary name="Biofield Engine">
-        <div className={cn('flex flex-col', density.sectionGap)}>
-          <QuantumStateWidget />
-          <PatternRecognitionWidget />
-          <AIFeedbackWidget />
-          <SignalStreamWidget />
-          <IntegrityWidget />
-        </div>
+        <LazyMount>
+          <div className={cn('flex flex-col', density.sectionGap)}>
+            <QuantumStateWidget />
+            <PatternRecognitionWidget />
+            <AIFeedbackWidget />
+            <SignalStreamWidget />
+            <IntegrityWidget />
+          </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* CQGS Dashboard stack */}
@@ -1041,15 +1061,18 @@ export const System = React.memo(function SystemInner() {
       </WidgetErrorBoundary>
 
       {/* Stats stack */}
+      {/* Lazy-mounted: 7 stats API queries deferred until the stack nears view */}
       <WidgetErrorBoundary name="Stats">
-        <div className={cn('flex flex-col', density.sectionGap)}>
-          <IntentionPatterns />
-          <CollectiveConsciousness />
-          <WellnessPulse />
-          <MemoryEngineStats />
-          <GrowthMilestones />
-          <BadgeUnlockFeed />
-        </div>
+        <LazyMount>
+          <div className={cn('flex flex-col', density.sectionGap)}>
+            <IntentionPatterns />
+            <CollectiveConsciousness />
+            <WellnessPulse />
+            <MemoryEngineStats />
+            <GrowthMilestones />
+            <BadgeUnlockFeed />
+          </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Calendar — Personal date planner */}
