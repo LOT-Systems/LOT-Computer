@@ -35,6 +35,8 @@ import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
+import { parseLotEmail, stampLotEmailSent } from '#client/utils/lotEmail'
+import { LotEmailCompose } from '#client/components/LotEmail'
 import { getFastingState } from '#client/utils/fasting'
 
 const localStore = {
@@ -3713,6 +3715,17 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  // LOT® Email — "/email to Hitomi" in this log opens the EMAIL: composer
+  const lotEmailDraft = React.useMemo(() => parseLotEmail(value), [value])
+  const onLotEmailSent = React.useCallback((toName: string) => {
+    const draft = parseLotEmail(valueRef.current)
+    if (!draft) return
+    const updated = stampLotEmailSent(valueRef.current, draft, toName)
+    setValue(updated)
+    valueRef.current = updated
+    onChangeRef.current(updated)
+    setIsSaved(true)
+  }, [])
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -4139,6 +4152,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to Name  Send a LOT® Email — arrives in Sync',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4348,6 +4362,9 @@ const NoteEditor = ({
               )}
             </Block>
           </div>
+        )}
+        {primary && lotEmailDraft && (
+          <LotEmailCompose draft={lotEmailDraft} onSent={onLotEmailSent} />
         )}
         {breatheEnabled && (
           <div className="mt-8">
