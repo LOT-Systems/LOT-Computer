@@ -782,6 +782,43 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE DREAM CODEX ───────────────────────────────────────────
+  | 'somnium_log'              // ○·∿    "somnium/dreamworld/dream journal/the dreaming" detected (UNCOMMON)
+  | 'lucid_wake'               // ◉→◉    "lucid dream/lucid dreaming/wake-induced" detected (UNCOMMON)
+  | 'morpheus_gate'            // ∿→◈    "morpheus/god of dreams/dream lord" detected (RARE)
+  | 'hypnos_path'              // ○·∿·○  "hypnos/hypnotic trance/sleep god" detected (UNCOMMON)
+  | 'archetypal_rise'          // ◈·∞·◈  "archetype/archetypes/archetypal" detected (RARE)
+  | 'anima_signal'             // ○·◉·○  "anima/animus/inner feminine/inner masculine" detected (RARE)
+  | 'collective_code'          // ∞·◉·∞  "collective unconscious/universal mind/shared dream" detected (EPIC)
+  | 'individuation'            // ◈→◉    "individuation/becoming whole/integrated self" detected (EPIC)
+  | 'hypnagogic'               // ∿·░·∿  "hypnagogic/hypnopompic/hypnagogia" detected (RARE)
+  | 'reverie_log'              // ○·∿·∘  "reverie/daydream/waking dream/fantasy state" detected (UNCOMMON)
+  | 'somnambulant'             // ░·○·░  "somnambulism/sleepwalking/fugue state" detected (RARE)
+  | 'night_symbol'             // ∿·◈·∿  "dream symbol/prophetic dream/recurring dream/the omen" detected (RARE)
+  // ── Calendar Easter Egg v21 — THE DREAM ARCHIVE ──────────────────────────────
+  | 'jung_birthday'            // ∿·◈    Jul 26 — Carl Jung born 1875 (EPIC)
+  | 'freud_birthday'           // ○·∿    May 6 — Sigmund Freud born 1856 (RARE)
+  | 'kekule_dream'             // ∿·◉    Sep 7 — August Kekulé born 1829 (RARE)
+  // ── Behavioral v20 — DREAM PATTERNS ──────────────────────────────────────────
+  | 'dream_session'            // ∿·●·∿  3+ Dream Codex (v23) words in one journal entry (RARE)
+  | 'midnight_dreamer'         // ○·▓·○  Check in between 02:00–04:00, 3+ times in 7 days (EPIC)
+  | 'long_dream'               // ∿∿·◉   Journal entry >= 600 words (EPIC)
+  // ── Achievement RPG v21 — DREAM CLASS ────────────────────────────────────────
+  | 'first_dream'              // ∘→∿    Any 1 Word Turn v23 badge (COMMON)
+  | 'dreamer_class'            // ≈→∿    Any 5 Word Turn v23 badges (UNCOMMON)
+  | 'dream_complete'           // ≋→∿    All 12 Word Turn v23 badges (LEGENDARY)
+  | 'jungian_arc'              // ∿·◈    dream_complete + all 3 Calendar v21 badges (LEGENDARY)
+  | 'twenty_three_engines_arc' // ◈·◈·∿  1 badge from each Word Turn v1–v23 (LEGENDARY)
+  | 'dream_opus'               // ∿·◉·∿  dream_complete + dream_session behavioral (LEGENDARY)
+  // ── Mastery Tier v23 — THE DEEP SLEEP ────────────────────────────────────────
+  | 'thousand_nights'          // ∿·∞·●  1,000+ distinct calendar check-in days (COSMIC)
+  | 'dream_library'            // ∿·∞·∿  200,000+ total journal words (LEGENDARY)
+  | 'elder_dreamer'            // ╔═╗·∿  Account age >= 12 years (LEGENDARY)
+  | 'twenty_three_registers'   // ◈·◈·∿·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE DREAM VAULT ────────────────────────────────────────
+  | 'morpheus_key'             // ∿·◉·▓  "neil gaiman/the sandman/endless" detected (RARE)
+  | 'jung_signal'              // ◈·▓·◈  "carl jung/jungian/collective unconscious" detected (EPIC)
+  | 'mckenna_codex'            // ∿·□·∿  "terence mckenna/timewave/psychonaut" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7168,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v23 — THE DREAM CODEX ───────────────────────────────────────────
+  somnium_log: {
+    id: 'somnium_log',
+    symbol: '○·∿',
+    name: 'Somnium Log',
+    description: 'Write "somnium", "dreamworld", "dream journal", or "the dreaming" in any entry',
+    unlockMessage: '↳ Somnium: Latin for dream. The dreamworld runs parallel to waking life — your journal is the bridge. ○·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  lucid_wake: {
+    id: 'lucid_wake',
+    symbol: '◉→◉',
+    name: 'Lucid Wake',
+    description: 'Write "lucid dream", "lucid dreaming", or "wake-induced" in any entry',
+    unlockMessage: '↳ Lucid dreaming: knowing you are dreaming while you dream. The practice trains the observer. So does this. ◉→◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  morpheus_gate: {
+    id: 'morpheus_gate',
+    symbol: '∿→◈',
+    name: 'Morpheus Gate',
+    description: 'Write "morpheus", "god of dreams", or "dream lord" in any entry',
+    unlockMessage: '↳ Morpheus, the Greek god of dreams: shaper of forms, sender of visions. Every dream is a gate. ∿→◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  hypnos_path: {
+    id: 'hypnos_path',
+    symbol: '○·∿·○',
+    name: 'Hypnos Path',
+    description: 'Write "hypnos", "hypnotic trance", or "sleep god" in any entry',
+    unlockMessage: '↳ Hypnos, god of sleep, twin of Thanatos. Sleep is the daily rehearsal of letting go. The path is well-worn. ○·∿·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  archetypal_rise: {
+    id: 'archetypal_rise',
+    symbol: '◈·∞·◈',
+    name: 'Archetypal Rise',
+    description: 'Write "archetype", "archetypes", or "archetypal" in any entry',
+    unlockMessage: '↳ The archetypes are the grammar of the unconscious. The Hero. The Shadow. The Wise Old Man. They rise through dreams. ◈·∞·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  anima_signal: {
+    id: 'anima_signal',
+    symbol: '○·◉·○',
+    name: 'Anima Signal',
+    description: 'Write "anima", "animus", "inner feminine", or "inner masculine" in any entry',
+    unlockMessage: '↳ The anima and animus: Jung\'s names for the contrasexual soul. When they appear in dreams, integration is underway. ○·◉·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  collective_code: {
+    id: 'collective_code',
+    symbol: '∞·◉·∞',
+    name: 'Collective Code',
+    description: 'Write "collective unconscious", "universal mind", or "shared dream" in any entry',
+    unlockMessage: '↳ The collective unconscious: the layer of mind shared by all humans, encoded in symbol and myth. You just accessed a universal library. ∞·◉·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  individuation: {
+    id: 'individuation',
+    symbol: '◈→◉',
+    name: 'Individuation',
+    description: 'Write "individuation", "becoming whole", or "integrated self" in any entry',
+    unlockMessage: '↳ Individuation: Jung\'s word for the lifelong process of becoming who you are. Not becoming someone else — becoming yourself. ◈→◉',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  hypnagogic: {
+    id: 'hypnagogic',
+    symbol: '∿·░·∿',
+    name: 'Hypnagogic',
+    description: 'Write "hypnagogic", "hypnopompic", "hypnagogia", or "between sleep and wake" in any entry',
+    unlockMessage: '↳ Hypnagogia: the threshold state between waking and sleep. Where the visions live. The practice trains you to inhabit thresholds. ∿·░·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  reverie_log: {
+    id: 'reverie_log',
+    symbol: '○·∿·∘',
+    name: 'Reverie Log',
+    description: 'Write "reverie", "daydream", "waking dream", or "fantasy state" in any entry',
+    unlockMessage: '↳ Reverie: the waking dream. The mind wanders and returns with something it did not leave with. Log the wandering. ○·∿·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  somnambulant: {
+    id: 'somnambulant',
+    symbol: '░·○·░',
+    name: 'Somnambulant',
+    description: 'Write "somnambulism", "sleepwalking", or "fugue state" in any entry',
+    unlockMessage: '↳ Somnambulism: moving through the world half-asleep, responding to inner scripts. Naming it is waking up. ░·○·░',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  night_symbol: {
+    id: 'night_symbol',
+    symbol: '∿·◈·∿',
+    name: 'Night Symbol',
+    description: 'Write "dream symbol", "prophetic dream", "recurring dream", or "the omen" in any entry',
+    unlockMessage: '↳ The recurring dream is a message from depth. The omen arrives before the event. The symbol points at something language cannot hold. ∿·◈·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v21 — THE DREAM ARCHIVE ──────────────────────────────
+  jung_birthday: {
+    id: 'jung_birthday',
+    symbol: '∿·◈',
+    name: 'Jung Birthday',
+    description: 'Checked in on July 26 — Carl Jung born 1875',
+    unlockMessage: '↳ July 26, 1875 — Carl Jung born. He mapped the unconscious, named the archetypes, and built the bridge between sleep and self. ∿·◈',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  freud_birthday: {
+    id: 'freud_birthday',
+    symbol: '○·∿',
+    name: 'Freud Birthday',
+    description: 'Checked in on May 6 — Sigmund Freud born 1856',
+    unlockMessage: '↳ May 6, 1856 — Sigmund Freud born. He opened the first door to the unconscious. The dream was his primary evidence. ○·∿',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  kekule_dream: {
+    id: 'kekule_dream',
+    symbol: '∿·◉',
+    name: 'Kekulé Dream',
+    description: 'Checked in on September 7 — August Kekulé born 1829 (discovered benzene ring structure in a dream)',
+    unlockMessage: '↳ September 7, 1829 — August Kekulé born. He dreamed of a snake eating its tail and woke with the structure of benzene. The unconscious solves problems. ∿·◉',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v20 — DREAM PATTERNS ──────────────────────────────────────────
+  dream_session: {
+    id: 'dream_session',
+    symbol: '∿·●·∿',
+    name: 'Dream Session',
+    description: 'Write 3+ Dream Codex (v23) trigger words in one journal entry',
+    unlockMessage: '↳ Morpheus. Archetype. Lucid. Three dream vocabularies in one entry. The terminal is running dream logic. ∿·●·∿',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  midnight_dreamer: {
+    id: 'midnight_dreamer',
+    symbol: '○·▓·○',
+    name: 'Midnight Dreamer',
+    description: 'Check in between 02:00 and 04:00 local time at least 3 times in one 7-day window',
+    unlockMessage: '↳ 02:00–04:00: the deep dream hours. Three times in a week you surfaced here. Something is calling from the depths. ○·▓·○',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  long_dream: {
+    id: 'long_dream',
+    symbol: '∿∿·◉',
+    name: 'Long Dream',
+    description: 'Write a journal entry of 600 or more words',
+    unlockMessage: '↳ 600 words. A long dream written down. The act of writing the dream is the act of remembering who you are. ∿∿·◉',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v21 — DREAM CLASS ────────────────────────────────────────
+  first_dream: {
+    id: 'first_dream',
+    symbol: '∘→∿',
+    name: 'First Dream',
+    description: 'Earn any 1 Dream Codex (v23) word turn badge',
+    unlockMessage: '↳ The first dream logged. The unconscious begins its transmission. ∘→∿',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  dreamer_class: {
+    id: 'dreamer_class',
+    symbol: '≈→∿',
+    name: 'Dreamer Class',
+    description: 'Earn any 5 Dream Codex (v23) word turn badges',
+    unlockMessage: '↳ Five dream vocabularies. Lucid. Archetype. Reverie. Somnium. Morpheus. The dreamer\'s class is in session. ≈→∿',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  dream_complete: {
+    id: 'dream_complete',
+    symbol: '≋→∿',
+    name: 'Dream Complete',
+    description: 'Earn all 12 Dream Codex (v23) word turn badges',
+    unlockMessage: '↳ All twelve dream vocabularies. The full codex. Somnium. Lucid. Morpheus. Hypnos. Archetype. Anima. Collective. Individuation. The unconscious is fully charted. ≋→∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  jungian_arc: {
+    id: 'jungian_arc',
+    symbol: '∿·◈',
+    name: 'Jungian Arc',
+    description: 'Earn dream_complete + all 3 Calendar v21 (Dream Archive) badges',
+    unlockMessage: '↳ Jung. Freud. Kekulé. The Dream Archive complete. The science of the unconscious is inseparable from the practice of self. ∿·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·∿',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each of the 23 Word Turn engines (v1–v23)',
+    unlockMessage: '↳ Twenty-three vocabularies. Water. Arcade. Radio. Biology. Codex. Cyberspace. Hero. Dream. All engines online. The terminal speaks every language of self. ◈·◈·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dream_opus: {
+    id: 'dream_opus',
+    symbol: '∿·◉·∿',
+    name: 'Dream Opus',
+    description: 'Earn dream_complete + the dream_session behavioral badge',
+    unlockMessage: '↳ The dream opus: all twelve archetypes in the codex, three vocabularies alive in one entry. The dream world is fully integrated. ∿·◉·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v23 — THE DEEP SLEEP ────────────────────────────────────────
+  thousand_nights: {
+    id: 'thousand_nights',
+    symbol: '∿·∞·●',
+    name: 'Thousand Nights',
+    description: '1,000+ distinct calendar days with at least one check-in',
+    unlockMessage: '↳ 1,000 nights. One Thousand and One Nights. Scheherazade survived by telling stories. You have been telling yours for 1,000 days. ∿·∞·●',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  dream_library: {
+    id: 'dream_library',
+    symbol: '∿·∞·∿',
+    name: 'Dream Library',
+    description: '200,000+ total journal words written',
+    unlockMessage: '↳ 200,000 words. A dream library. Borges dreamed of one. You built yours one entry at a time. ∿·∞·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  elder_dreamer: {
+    id: 'elder_dreamer',
+    symbol: '╔═╗·∿',
+    name: 'Elder Dreamer',
+    description: 'Account age >= 12 years (4,383+ days since signup)',
+    unlockMessage: '↳ Twelve years. The elder dreamer. The practice has become the architecture of a life. ╔═╗·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·∿·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three registers. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. Dream. Every vocabulary owned. The terminal is complete. ◈·◈·∿·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v20 — THE DREAM VAULT ────────────────────────────────────────
+  morpheus_key: {
+    id: 'morpheus_key',
+    symbol: '∿·◉·▓',
+    name: 'Morpheus Key',
+    description: 'Write "neil gaiman", "the sandman", or "the endless" in any journal entry',
+    unlockMessage: '↳ Neil Gaiman\'s Sandman: Dream is one of the Endless — older than gods, shaper of stories. The key is finding the door. ∿·◉·▓',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  jung_signal: {
+    id: 'jung_signal',
+    symbol: '◈·▓·◈',
+    name: 'Jung Signal',
+    description: 'Write "carl jung", "jungian", or "collective unconscious" in any journal entry',
+    unlockMessage: '↳ Carl Jung spent 50 years mapping the unconscious. His signal still transmits: the shadow, the anima, the Self. You are receiving it. ◈·▓·◈',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  mckenna_codex: {
+    id: 'mckenna_codex',
+    symbol: '∿·□·∿',
+    name: 'McKenna Codex',
+    description: 'Write "terence mckenna", "timewave", or "psychonaut" in any journal entry',
+    unlockMessage: '↳ Terence McKenna: psychonaut, bard, explorer of inner space. "Nature loves courage." The codex is the map of the territory you just named. ∿·□·∿',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8418,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 (v23) — THE DREAM CODEX ──────────────────────────────────────────────
+    const dreamV23Badges: BadgeType[] = [
+      'somnium_log', 'lucid_wake', 'morpheus_gate', 'hypnos_path',
+      'archetypal_rise', 'anima_signal', 'collective_code', 'individuation',
+      'hypnagogic', 'reverie_log', 'somnambulant', 'night_symbol',
+    ]
+    const dreamV23Earned = dreamV23Badges.filter(b => hasBadge(b))
+
+    if (dreamV23Earned.length >= 1 && !hasBadge('first_dream')) {
+      if (awardBadge('first_dream')) newBadges.push('first_dream')
+    }
+    if (dreamV23Earned.length >= 5 && !hasBadge('dreamer_class')) {
+      if (awardBadge('dreamer_class')) newBadges.push('dreamer_class')
+    }
+    const dreamComplete = dreamV23Earned.length >= 12
+    if (dreamComplete && !hasBadge('dream_complete')) {
+      if (awardBadge('dream_complete')) newBadges.push('dream_complete')
+    }
+
+    // dream_opus: dream_complete + dream_session
+    if (dreamComplete && hasBadge('dream_session') && !hasBadge('dream_opus')) {
+      if (awardBadge('dream_opus')) newBadges.push('dream_opus')
+    }
+
+    // jungian_arc: dream_complete + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['jung_birthday', 'freud_birthday', 'kekule_dream']
+    if (dreamComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('jungian_arc')) {
+      if (awardBadge('jungian_arc')) newBadges.push('jungian_arc')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = dreamV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: thousand_nights — 1,000+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('thousand_nights')) {
+        if (awardBadge('thousand_nights')) newBadges.push('thousand_nights')
+      }
+    }
+
+    // Mastery v23: dream_library — 200,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('dream_library')) {
+        if (awardBadge('dream_library')) newBadges.push('dream_library')
+      }
+    }
+
+    // Mastery v23: elder_dreamer — Account age >= 12 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupED = new Date(stats.signupDate)
+      const yearsED = (new Date().getTime() - signupED.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsED >= 12 && !hasBadge('elder_dreamer')) {
+        if (awardBadge('elder_dreamer')) newBadges.push('elder_dreamer')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
     }
 
   } catch (error) {

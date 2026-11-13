@@ -870,6 +870,19 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awardBadge('odyssey_day')
     awarded.push('odyssey_day')
   }
+  // Calendar EE v21 — THE DREAM ARCHIVE
+  if (month === 7 && day === 26 && !hasBadge('jung_birthday')) {
+    awardBadge('jung_birthday')
+    awarded.push('jung_birthday')
+  }
+  if (month === 5 && day === 6 && !hasBadge('freud_birthday')) {
+    awardBadge('freud_birthday')
+    awarded.push('freud_birthday')
+  }
+  if (month === 9 && day === 7 && !hasBadge('kekule_dream')) {
+    awardBadge('kekule_dream')
+    awarded.push('kekule_dream')
+  }
 
   return awarded
 }
@@ -1483,6 +1496,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── Word Turn v23 — THE DREAM CODEX ─────────────────────────────────────────
+  { patterns: /\bsomnium\b|\bdreamworld\b|\bdream[\s-]?journal\b|\bthe[\s-]?dreaming\b/i,                                badge: 'somnium_log' },
+  { patterns: /\blucid[\s-]?dream(?:ing)?\b|\bwake[\s-]?induced\b/i,                                                     badge: 'lucid_wake' },
+  { patterns: /\bmorpheus\b|\bgod[\s-]?of[\s-]?dreams?\b|\bdream[\s-]?lord\b/i,                                          badge: 'morpheus_gate' },
+  { patterns: /\bhypnos\b|\bhypnotic[\s-]?trance\b|\bthe[\s-]?sleep\b|\bsleep[\s-]?god\b/i,                              badge: 'hypnos_path' },
+  { patterns: /\barchetype[s]?\b|\barchetypal\b/i,                                                                        badge: 'archetypal_rise' },
+  { patterns: /\banima\b|\banimus\b|\binner[\s-]?feminine\b|\binner[\s-]?masculine\b|\bcontrasexual\b/i,                  badge: 'anima_signal' },
+  { patterns: /\bcollective[\s-]?unconscious\b|\buniversal[\s-]?mind\b|\bshared[\s-]?dream\b/i,                           badge: 'collective_code' },
+  { patterns: /\bindividuation\b|\bbecoming[\s-]?whole\b|\bintegrated[\s-]?self\b/i,                                      badge: 'individuation' },
+  { patterns: /\bhypnagogic\b|\bhypnopompic\b|\bhypnagogia\b|\bbetween[\s-]?sleep[\s-]?and[\s-]?wake\b/i,                badge: 'hypnagogic' },
+  { patterns: /\breverie\b|\bdaydream\b|\bwaking[\s-]?dream\b|\bfantasy[\s-]?state\b/i,                                  badge: 'reverie_log' },
+  { patterns: /\bsomnambulism\b|\bsleepwalking\b|\bfugue[\s-]?state\b|\bhalf[\s-]?awake\b/i,                             badge: 'somnambulant' },
+  { patterns: /\bdream[\s-]?symbol\b|\bprophetic[\s-]?dream\b|\brecurring[\s-]?dream\b|\bthe[\s-]?omen\b/i,              badge: 'night_symbol' },
+  // ── Secret Boss v20 — THE DREAM VAULT ───────────────────────────────────────
+  { patterns: /\bneil[\s-]?gaiman\b|\bthe[\s-]?sandman\b|\bthe[\s-]?endless\b/i,                                         badge: 'morpheus_key' },
+  { patterns: /\bcarl[\s-]?jung\b|\bjungian\b|\bcollective[\s-]?unconscious\b/i,                                          badge: 'jung_signal' },
+  { patterns: /\bterence[\s-]?mckenna\b|\btimewave\b|\bpsychonaut\b/i,                                                    badge: 'mckenna_codex' },
 ]
 
 /**
@@ -2712,6 +2742,76 @@ export function checkThresholdMoment(): BadgeType | null {
     awardBadge('threshold_moment')
     return 'threshold_moment'
   }
+  return null
+}
+
+// ── Dream Codex v23 behavioral checks ────────────────────────────────────────
+
+const DREAM_WORDS_V23 = [
+  /\bsomnium\b|\bdreamworld\b|\bdream[\s-]?journal\b|\bthe[\s-]?dreaming\b/i,
+  /\blucid[\s-]?dream(?:ing)?\b|\bwake[\s-]?induced\b/i,
+  /\bmorpheus\b|\bgod[\s-]?of[\s-]?dreams?\b|\bdream[\s-]?lord\b/i,
+  /\bhypnos\b|\bhypnotic[\s-]?trance\b|\bsleep[\s-]?god\b/i,
+  /\barchetype[s]?\b|\barchetypal\b/i,
+  /\banima\b|\banimus\b|\binner[\s-]?feminine\b|\binner[\s-]?masculine\b/i,
+  /\bcollective[\s-]?unconscious\b|\buniversal[\s-]?mind\b|\bshared[\s-]?dream\b/i,
+  /\bindividuation\b|\bbecoming[\s-]?whole\b|\bintegrated[\s-]?self\b/i,
+  /\bhypnagogic\b|\bhypnopompic\b|\bhypnagogia\b/i,
+  /\breverie\b|\bdaydream\b|\bwaking[\s-]?dream\b|\bfantasy[\s-]?state\b/i,
+  /\bsomnambulism\b|\bsleepwalking\b|\bfugue[\s-]?state\b/i,
+  /\bdream[\s-]?symbol\b|\bprophetic[\s-]?dream\b|\brecurring[\s-]?dream\b|\bthe[\s-]?omen\b/i,
+]
+
+/** Award dream_session badge if 3+ Dream Codex (v23) words appear in one journal entry. */
+export function checkDreamSession(journalText: string): BadgeType | null {
+  if (hasBadge('dream_session')) return null
+  const matchCount = DREAM_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('dream_session')
+    return 'dream_session'
+  }
+  return null
+}
+
+/** Award long_dream badge if journal entry is 600+ words. */
+export function checkLongDream(journalText: string): BadgeType | null {
+  if (hasBadge('long_dream')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 600) {
+    awardBadge('long_dream')
+    return 'long_dream'
+  }
+  return null
+}
+
+/** Award midnight_dreamer badge if user checks in between 02:00–04:00, 3+ times in 7 days. */
+export function checkMidnightDreamer(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('midnight_dreamer')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour < 2 || hour >= 4) return null
+
+  try {
+    const key = 'dream_checkin_timestamps'
+    const stored = localStorage.getItem(key)
+    const timestamps: string[] = stored ? JSON.parse(stored) : []
+    timestamps.push(now.toISOString())
+    localStorage.setItem(key, JSON.stringify(timestamps.slice(-100)))
+
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    const dreamCheckins = timestamps.filter(ts => {
+      const d = new Date(ts)
+      const h = d.getHours()
+      return d >= sevenDaysAgo && h >= 2 && h < 4
+    })
+    if (dreamCheckins.length >= 3) {
+      awardBadge('midnight_dreamer')
+      return 'midnight_dreamer'
+    }
+  } catch { /* non-critical */ }
+
   return null
 }
 
