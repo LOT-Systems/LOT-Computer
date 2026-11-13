@@ -1613,25 +1613,25 @@ The Self-Assembly Engine is LOT's meta-documentation system. It tracks the syste
 ```
 PHASE 1 — FOUNDATION
   M01  system-identity          Name, origin, purpose.
-  M02  pattern-registry         181 patterns. FM v133.
-  M03  dep-map                  224+ nodes. Four-tier architecture.
-  M04  archetype-registry       71 archetypes. FM v133.
+  M02  pattern-registry         182 patterns. FM v134.
+  M03  dep-map                  226+ nodes. Four-tier architecture.
+  M04  archetype-registry       72 archetypes. FM v134.
 
 PHASE 2 — BEHAVIORAL ENGINE
   M05  cohort-engine            6 cohort types + 2 expansions.
   M06  citizen-index            6-stage depth scale.
-  M07  badge-engine             1,246 badges. v46. 432 word-turn triggers.
-  M08  word-turn-engine         36 lexicons. FM v132.
+  M07  badge-engine             1,277 badges. v47. 444 word-turn triggers.
+  M08  word-turn-engine         37 lexicons. FM v134.
 
 PHASE 3 — SURFACE SYSTEMS
-  M09  job-scheduler            68 jobs. J1–J68. FM v133.
+  M09  job-scheduler            69 jobs. J1–J69. FM v134.
   M10  qos-architecture         7 views. 4 modes.
-  M11  log-event-system         181+ handlers. FM v133.
+  M11  log-event-system         182+ handlers. FM v134.
   M12  memory-engine            Progressive questioning. Memory Story.
 
 PHASE 4 — SYNTHESIS
-  M13  field-manual             Current: FM v133.
-  M14  wiki-system              Current: v110.
+  M13  field-manual             Current: FM v134.
+  M14  wiki-system              Current: v111.
   M15  ledger                   Append-only session index.
   M16  session-reports          Engineering + Wiki session reports.
 
@@ -1640,14 +1640,14 @@ PHASE 5 — INTEGRATION
   M18  deployment-architecture  Digital Ocean. Green Gate. COSMO Gate.
 ```
 
-**Self-Assembly Counters (FM v133):**
+**Self-Assembly Counters (FM v134):**
 ```
-M02: 181 patterns
-M04: 71 archetypes
-M07: 1,246 badges · v46 · 432 word-turns · 130 secret boss triggers
-M08: 36 lexicons · 432 trigger words
-M09: 68 jobs
-M11: 181+ handlers
+M02: 182 patterns
+M04: 72 archetypes
+M07: 1,277 badges · v47 · 444 word-turns · 133 secret boss triggers
+M08: 37 lexicons · 444 trigger words
+M09: 69 jobs
+M11: 182+ handlers
 ```
 
 **Self-Assembly Log (recent entries):**
@@ -1713,9 +1713,12 @@ v109 (2026-11-11)  Wiki v109. QIE v132 delta applied. Level 15 documented.
 v133 (2026-11-11)  QIE v133. P181 fourth-cycle-ignition. Arch71. J68.
                    FCIGN: handler. 225+ dep nodes. Level 16 ignition.
                    FM v133. THE FOURTH CYCLE HAS IGNITED. L16-FCIGN ACTIVE.
+v47  (2026-11-11)  Badge v47 THE NATURE SIGNAL. +31 badges (1,246→1,277). Word Turn v37.
 v110 (2026-11-12)  Wiki v110. QIE v133 delta applied. Level 16 documented.
                    181 patterns · 71 archetypes · 68 jobs · 225+ dep nodes.
                    Day 1172+. COSMO® 864 days.
+v134 (2026-11-12)  QIE v134. P182 fourth-cycle-deepening. Arch72. J69. FCDEP:. 226+ nodes.
+v111 (2026-11-13)  LOT-WIKI-v111. Daily maintenance pass. Level 17. FM v134 synchronized.
 ```
 
 ---
@@ -1724,7 +1727,7 @@ v110 (2026-11-12)  Wiki v110. QIE v133 delta applied. Level 16 documented.
 
 Server-side scheduled operations. All jobs run UTC. No client dependency.
 
-**Current count: 68 jobs (J1–J68)**
+**Current count: 69 jobs (J1–J69)**
 
 **High-level coherence cascade (J47–J55):**
 ```
@@ -1750,6 +1753,7 @@ J65  10:00 UTC   daily-longitudinal-persistence-check
 J66  16:00 UTC   daily-third-cycle-deepening-check
 J67  17:30 UTC   daily-fourth-cycle-candidate-check
 J68  18:00 UTC   daily-fourth-cycle-ignition-check
+J69  18:30 UTC   daily-fourth-cycle-deepening-check
 ```
 
 Sequential ordering is intentional. Each job's output feeds the next.
@@ -2030,6 +2034,30 @@ Notes:      This is the ignition pattern. The boundary state (P180) has been cro
 Total jobs: 68
 ```
 
+**J69 — daily-fourth-cycle-deepening-check (FM v134)**
+```
+Schedule:   18:30 UTC daily
+Guard:      isDailyFourthCycleDeepeningRunning · lastDailyFourthCycleDeepeningRun
+Window:     Users with fourth_cycle_ignition event active
+Scan:       100 calendar days (journal) + all-dimension saturation
+Detection:  fourth_cycle_ignition (P181) active
+            → journal signals 100d >= 23
+            → memory 100d >= 7
+            → badge 100d >= 22
+            → all 6 user index dimensions >= 62
+            → userIndex.overall >= 91
+Output:     fourth_cycle_deepening (P182) per qualifying user
+Handler:    FCDEP:
+Log:        FCDEP: deepening confirmed / FCDEP: insufficient depth
+Metadata:   ignConf · journal100d · memory100d · badge100d · indexScore · level: L17-FCDEP
+Notes:      This is the deepening pattern. P181 must be live.
+            Runs at 18:30 UTC — 30 minutes after J68 (18:00 UTC ignition check).
+            Sequential chain: J67 17:30 → J68 18:00 → J69 18:30.
+            fourthCycleDeepeningNode dep: qos/journal/memory/badges/intentions/
+            log/energy/selfcare/social/cohort/goals (11 sources).
+Total jobs: 69
+```
+
 **Cascade summary:**
 ```
 J47 (08:00)  coherence cascade → feeds J48
@@ -2054,6 +2082,7 @@ J65 (10:00)  longitudinal persistence → 90-day arc confirmed, no gap > 72h, CO
 J66 (16:00)  third cycle deepening → 49d compound signals confirmed, L13-TCDEP → L14-TCSOV
 J67 (17:30)  fourth cycle candidate → all third-arc conditions met, sensing L15-FCAND threshold
 J68 (18:00)  fourth cycle ignition → boundary crossed, 90d arc confirmed, L16-FCIGN ACTIVE
+J69 (18:30)  fourth cycle deepening → 100d depth confirmed, all dims saturated, L17-FCDEP
 ```
 
 ---
@@ -2062,7 +2091,7 @@ J68 (18:00)  fourth cycle ignition → boundary crossed, 90d arc confirmed, L16-
 
 The log is an instrument. Every event is a reading. The cockpit does not narrate.
 
-**Current handler count: 181+**
+**Current handler count: 182+**
 
 Each pattern has a minimum of one log handler. Format: CODE + DESCRIPTION + READINGS + STATE.
 
@@ -2411,14 +2440,14 @@ CORE SYSTEM
   QOS (Quantum Operating System) Real-time dashboard.
 
 ENGINES
-  Badge Engine v45               Achievement and vocabulary system. 1,215 badges.
+  Badge Engine v47               Achievement and vocabulary system. 1,277 badges.
   Memory Engine                  AI-powered self-care companion.
-  Word Turn Engine v35           35 lexicons. Trigger word detection.
+  Word Turn Engine v37           37 lexicons. Trigger word detection.
   Self-Assembly Engine v18       Meta-documentation system.
 
 INFRASTRUCTURE
-  Field Manual (FM v131)         Complete technical specification.
-  LOT-WIKI v107                  Human-readable system documentation.
+  Field Manual (FM v134)         Complete technical specification.
+  LOT-WIKI v111                  Human-readable system documentation.
   LOT-LEDGER                     Append-only session index.
   COSMO Gate                     Ethics review gate.
   Green Gate                     TypeScript check before push.
@@ -2432,16 +2461,25 @@ PHILOSOPHY
 
 ---
 
-## 14. BADGE SYSTEM
+## 14. BADGE SYSTEM v47 — THE NATURE SIGNAL
 
 ### Overview
 
 The badge system is LOT's achievement layer. Each badge represents a real signal: a word used, a day visited, a pattern completed, a behavior performed. No badge is cosmetic.
 
-**Current version: v46 — THE JAZZ ENGINE**
-**Total badges: 1,246**
+**Current version: v47 — THE NATURE SIGNAL**
+**Total badges: 1,277**
 
 **Theme:**
+```
+THE NATURE SIGNAL
+"Forest. Root. Watershed. Mycelium.
+ Nature contact as self-care operating system.
+ The operator does not visit the field — the operator IS the field.
+ FOURTH CYCLE: NATURE SOVEREIGN."
+```
+
+**Previous theme (v46):**
 ```
 THE JAZZ ENGINE
 "Improvise. Navigate the changes. Enter the woodshed.
@@ -2512,6 +2550,8 @@ v42     1122     THE ARCADE MASTER        FM v124
 v43     1153     THE DREAM WEAVER         FM v127
 v44     1184     THE STOIC FIELD          FM v128
 v45     1215     THE ZEN TERMINAL         FM v131
+v46     1246     THE JAZZ ENGINE          FM v132
+v47     1277     THE NATURE SIGNAL        FM v134
 ```
 
 ### v35 — THE PUZZLE CODEX (+31: 874 → 905)
@@ -3334,7 +3374,65 @@ RARE    castaneda_dream · atari_found · eliade_found · turing_complete · clo
 UNCOMMON nintendo_signal · [earlier uncommons]
 EPIC    lovecraft_dream · campbell_signal · godel_found · jung_day [calendar] · chrono_trigger_signal · gygax_voice · dick_time · d_n_d_roll · portal_turret · [earlier epics]
 MYTHIC  huang_po_found · gaiman_signal · konami_code · jung_found · ada_found · mother_signal · dragon_hoard · vonnegut_stuck · myst_island · baba_is_you · [earlier mythics]
-Total secret boss triggers: 127  (SB v1–v32)
+Total secret boss triggers: 130  (SB v1–v33)
+```
+
+### v47 — THE NATURE SIGNAL (+31: 1,246 → 1,277)
+```
+Release:    November 11, 2026 (FM v134)
+Theme:      Nature contact · biophilic depth · ecological time
+Count:      +31 badges (1,246→1,277)
+Word Turn:  v37 — nature vocabulary (12 triggers)
+```
+
+**Calendar EE v35:**
+```
+earth_day_badge      Earth Day entry detected
+carson_day           Rachel Carson signal
+thoreau_day          Thoreau signal
+```
+
+**Behavioral v31:**
+```
+nature_session       Nature contact detected in entry
+dawn_walker          Dawn activity detected
+long_walk            Extended outdoor session
+```
+
+**Achievement RPG v35:**
+```
+nature_entry         First nature entry
+nature_class         Nature pattern class
+nature_complete      Nature arc complete
+nature_trail_arc     Trail series arc
+nature_37_arc        37-pattern arc
+nature_opus          Nature opus
+```
+
+**Mastery Tier v37:**
+```
+terrain_elder        Terrain mastery signal
+field_library        Field knowledge archive
+ancient_root         Root system depth
+thirty_seven_registers [COSMIC]  37 Word Turn engines active
+```
+
+**Secret Boss v34 — The Wilderness Vault [HIDDEN]:**
+```
+muir_signal (MYTHIC) / walden_signal (MYTHIC) / gaia_hypothesis (MYTHIC)
+
+  muir_signal       — MYTHIC. "john muir" or "wilderness" or "the mountains are calling" in text.
+                     The founder of wilderness ethics. The signal enters the fourth arc.
+  walden_signal     — MYTHIC. "walden" or "thoreau" or "simplicity" or "living deliberately" in text.
+                     The experiment of deliberate living. The system recognizes depth.
+  gaia_hypothesis   — MYTHIC. "gaia" or "planetary" or "earth system" or "biosphere" in text.
+                     The planet as a living system. The operator sees at scale.
+```
+
+**Badge total after v47:**
+```
+TOTAL              1277   (v47 — The Nature Signal · FM v134 · FOURTH CYCLE DEEPENING)
+Secret Boss total: 133  (SB v1–v34)
 ```
 
 ---
@@ -3343,12 +3441,12 @@ Total secret boss triggers: 127  (SB v1–v32)
 
 The Word Turn Engine detects vocabulary in user text (journal, memory, log) and fires badge events when trigger words appear.
 
-**Current state: v36 — THIRTY-SIX ENGINES · THIRD CYCLE**
+**Current state: v37 — THIRTY-SEVEN ENGINES · FOURTH CYCLE**
 ```
-Engines:        36  (v1–v36)
-Trigger words:  431 (v1–v36)
-Secret bosses:  33 versions (SB v1–v33)
-               130 total triggers across all rarities (RARE / UNCOMMON / EPIC / MYTHIC)
+Engines:        37  (v1–v37)
+Trigger words:  444 (v1–v37)
+Secret bosses:  34 versions (SB v1–v34)
+               133 total triggers across all rarities (RARE / UNCOMMON / EPIC / MYTHIC)
 ```
 
 **Engine Index:**
@@ -3420,6 +3518,9 @@ v35   Zen Terminal (zen_signal / dogen_found / beginner_mind / koan_signal /
 v36   Jazz Engine (improvise_badge / the_changes / woodshed_mode / blow_session /
       comping_signal / standards_badge / trading_fours / in_the_pocket /
       blue_notes_badge / session_signal / sideman_signal / real_book_badge)
+v37   Nature Engine (forest_signal / mycelium_net / watershed_badge / biophilia /
+      deep_ecology / forest_bath / phenology / root_system /
+      rewild_signal / old_growth / soil_alive / emergence_field)
 ```
 
 **Secret Boss v22 — The Puzzle Vault (FM v116) [HIDDEN]:**
@@ -3548,6 +3649,30 @@ dogen_signal (RARE) / watts_found (EPIC) / huang_po_found (MYTHIC)
   huang_po_found  — MYTHIC. "huang po" or "no-mind" or "sudden school" or "transmission outside scripture" in text.
                    The gate has no door because the seeker IS the gate.
                    The highest Zen signal in the system. The terminal recognizes it.
+```
+
+**Secret Boss v33 — The Jazz Vault (FM v132 / Badge v46) [HIDDEN]:**
+```
+coltrane_love (EPIC) / miles_kind_of (RARE) / monk_theorem (MYTHIC)
+
+  miles_kind_of   — RARE. "miles" or "kind of blue" or "cool jazz" or "modal jazz" in text.
+                   The turn toward abstraction. The cool period as philosophy.
+  coltrane_love   — EPIC. "coltrane" or "a love supreme" or "sheets of sound" in text.
+                   The devotional record. Sheets of sound as spiritual architecture.
+  monk_theorem    — MYTHIC. "monk" or "thelonious" or "round midnight" or "blue monk" in text.
+                   The geometric solo. The pause as note. The system recognizes Thelonious.
+```
+
+**Secret Boss v34 — The Wilderness Vault (FM v134 / Badge v47) [HIDDEN]:**
+```
+muir_signal (MYTHIC) / walden_signal (MYTHIC) / gaia_hypothesis (MYTHIC)
+
+  muir_signal       — MYTHIC. "john muir" or "wilderness" or "the mountains are calling" in text.
+                     The founder of wilderness ethics. The signal enters the fourth arc.
+  walden_signal     — MYTHIC. "walden" or "thoreau" or "simplicity" or "living deliberately" in text.
+                     The experiment of deliberate living. The system recognizes depth.
+  gaia_hypothesis   — MYTHIC. "gaia" or "planetary" or "earth system" or "biosphere" in text.
+                     The planet as a living system. The operator sees at scale.
 ```
 
 **ASCII Symbol Design (v28 — The Dungeon Delver):**
@@ -3753,7 +3878,7 @@ D11   MEMORY PRIMACY        The Memory Engine is the companion layer.
 
 The Field Manual (FM) is the complete technical specification of the LOT system. Lives in `src/client/components/About.tsx`.
 
-**Current FM: v133**
+**Current FM: v134**
 
 **FM Revision Log (recent):**
 ```
@@ -3878,6 +4003,12 @@ FM v133  2026-11-11  QIE v133. P181 fourth-cycle-ignition. Level 16 active.
                      225+ dep nodes. FCIGN: handler.
                      181 patterns · 71 archetypes · 68 jobs.
                      THE FOURTH CYCLE HAS IGNITED. L16-FCIGN ACTIVE.
+
+FM v134  2026-11-12  QIE v134. P182 fourth-cycle-deepening. Level 17 active.
+                     Arch72 Fourth Cycle Deepener. J69 (18:30 UTC).
+                     226+ dep nodes. FCDEP: handler. fourthCycleDeepeningNode.
+                     182 patterns · 72 archetypes · 69 jobs.
+                     THE FOURTH CYCLE IS DEEPENING. L17-FCDEP ACTIVE.
 ```
 
 **FM Version History (summary):**
@@ -3974,8 +4105,8 @@ JWT authentication · RESEND email service
 
 ## 24. LOT-GENESIS-v1
 
-**Day count:** 1171+ (as of 2026-11-11)
-**COSMO® days:** 863
+**Day count:** 1173+ (as of 2026-11-13)
+**COSMO® days:** 865
 
 ```
 The system was not designed and then built.
@@ -4109,7 +4240,15 @@ BADGE ENGINE v45          Achievement system. 1,215 badges. THE ZEN TERMINAL. FM
                           THIRTY-FIVE ENGINES. Word Turn v35 (zen philosophy vocabulary).
                           THIRD CYCLE: ZEN SOVEREIGN.
 
-BADGE UNIVERSE            1,215 badges / v45 / 419 trigger words / 127 secret boss
+BADGE ENGINE v46          Achievement system. 1,246 badges. THE JAZZ ENGINE. FM v132.
+                          THIRTY-SIX ENGINES. Word Turn v36 (jazz philosophy vocabulary).
+                          THIRD CYCLE: JAZZ SOVEREIGN.
+
+BADGE ENGINE v47          Achievement system. 1,277 badges. THE NATURE SIGNAL. FM v134.
+                          THIRTY-SEVEN ENGINES. Word Turn v37 (nature vocabulary).
+                          FOURTH CYCLE: NATURE SOVEREIGN.
+
+BADGE UNIVERSE            1,277 badges / v47 / 444 trigger words / 133 secret boss
 
 CHRONO OPERATOR           Badge v37. 967 badges. Theme: the operator reads timelines.
                           Word Turn v27 (temporal sci-fi vocabulary). FM v118.
@@ -4124,7 +4263,7 @@ COHBASE:                  sustained-coherence-baseline (P155). FM v115.
 
 COHEPRST:                 coherence-field-persistence (P153). FM v114.
 
-COHERENCE ARCHITECTURE    Fourteen-level pattern structure (FM v131). Levels 1–6 build
+COHERENCE ARCHITECTURE    Seventeen-level pattern structure (FM v134). Levels 1–6 build
                           the ceiling. Level 7 raises the floor. Level 8
                           broadcasts the floor and generates the field.
                           Level 9 crystallizes what the field generates,
@@ -4155,18 +4294,21 @@ COHERENCE ARCHITECTURE    Fourteen-level pattern structure (FM v131). Levels 1�
                           The OS senses the fourth cycle is possible.
                           Level 16 ACTIVE at FM v133. P181 fourth-cycle-ignition.
                           The fourth cycle has ignited. The OS has crossed the boundary.
+                          Level 17 DEEPENING at FM v134. P182 fourth-cycle-deepening.
+                          100-day depth + all-dimension saturation confirmed structural.
+                          THE FOURTH CYCLE IS NOT IGNITING. IT IS DEEPENING.
 
 COHTRANS:                 coherence-signal-transmission (P158). FM v116.
 
 COSMO GATE                Ethics review gate. Named for Kuzya Cosmo Marmeladov.
 
-COSMO®                    COSMO® day counter. 864 days as of v110.
+COSMO®                    COSMO® day counter. 865 days as of v111.
 
-DAY COUNTER               Continuous operation day. 1172+ as of v110.
+DAY COUNTER               Continuous operation day. 1173+ as of v111.
 
 DENSITY TIERS             Four display contexts: COCKPIT / SUMMARY / AMBIENT / SILENT.
 
-DEP MAP                   Widget Dependency Map. 225+ nodes. Four-tier architecture.
+DEP MAP                   Widget Dependency Map. 226+ nodes. Four-tier architecture.
 
 DUNGEON DELVER            Badge v38. 998 badges. Theme: the delver clears the dungeon.
                           Word Turn v28 (D&D vocabulary). FM v120.
@@ -4181,7 +4323,11 @@ FCAND:                    fourth_cycle_candidate (P180). FM v132. L15-FCAND.
                           Threshold state: fourth cycle conditions confirmed but
                           not yet ignited. The OS stands at the arc boundary.
 
-FM (FIELD MANUAL)         Complete technical specification. Current: v132.
+FCDEP:                    Log event code for fourth-cycle-deepening. P182 confirmation
+                          marker. Level 17 signal. FM v134. J69 (18:30 UTC).
+                          "FCDEP: deepening confirmed" or "FCDEP: insufficient depth."
+
+FM (FIELD MANUAL)         Complete technical specification. Current: v134.
                           Lives in src/client/components/About.tsx.
 
 GENFIELD:                 generative-field-activation (P165). FM v121.
@@ -4511,6 +4657,20 @@ ARCH70                    Fourth Cycle Progenitor. P179+P180. FM v132.
                           THE FOURTH CYCLE IS NOT YET IGNITED — IT IS SENSED.
                           THE BOUNDARY BETWEEN CYCLES IS ITSELF A SIGNAL STATE.
 
+ARCH71                    Fourth Cycle Initiator. P181+P180 both active. FM v133.
+                          Extends Arch70. Arch70 senses the boundary.
+                          Arch71 confirms the crossing. Level 16 active.
+                          Directive: LEVEL 16. THE FOURTH CYCLE HAS IGNITED.
+                          THE OS HAS CROSSED THE BOUNDARY.
+
+ARCH72                    Fourth Cycle Deepener. P182 active + P181 live. FM v134.
+                          Extends Arch71. Arch71 confirms the ignition.
+                          Arch72 confirms the deepening. Level 17 active.
+                          First archetype defined by sustained depth, not state crossing.
+                          Directive: LEVEL 17. THE FOURTH CYCLE IS DEEPENING.
+                          ONE HUNDRED DAYS OF DOCUMENTED DEPTH. ALL SIX DIMENSIONS
+                          SATURATED. THE ARC DOES NOT BURN. IT COMPOUNDS.
+
 FOURTH CYCLE CANDIDATE    P180. Level 15. FM v132. FCAND:
                           Sensing pattern — not ignition. The OS detects that all
                           conditions for the fourth cycle are present. J67 (17:30 UTC).
@@ -4526,6 +4686,15 @@ FOURTH CYCLE PROGENITOR   Arch70. FM v132. The OS at the Level 15 threshold.
 J67                       daily-fourth-cycle-candidate-check. 17:30 UTC daily.
                           Triggers fourth_cycle_candidate (P180). FM v132.
                           Prerequisite: third_cycle_sovereign (P179) in 63d.
+
+J68                       daily-fourth-cycle-ignition-check. 18:00 UTC daily.
+                          Triggers fourth_cycle_ignition (P181). FM v133.
+                          Prerequisite: fourth_cycle_candidate (P180) in 7d.
+
+J69                       daily-fourth-cycle-deepening-check. 18:30 UTC daily.
+                          Triggers fourth_cycle_deepening (P182). FM v134.
+                          Prerequisite: fourth_cycle_ignition (P181) active.
+                          100-day journal arc + all-6-dimension saturation.
 
 THIRD CYCLE               Level 13–15 coherence arc. P173/P177/P178/P179/P180. FM v129–v132.
                           TCIGN: → TCDEP: → TCINT: → TCSOV: confirmed.
@@ -4547,8 +4716,8 @@ THIRD CYCLE SOVEREIGN     P179. Level 14. FM v131.
                           THE SECOND SOVEREIGN ARC. THE SYSTEM DOES NOT RESET.
                           Arch69 Third Cycle Sovereign Operator. Level 15 (P180) above.
 
-QIE                       Quantum Intent Engine. 180 patterns · 70 archetypes ·
-                          67 jobs · 224+ dep nodes.
+QIE                       Quantum Intent Engine. 182 patterns · 72 archetypes ·
+                          69 jobs · 226+ dep nodes. FM v134.
 
 NETWORK BROADCASTER       Arch58. Level 9 complete. Knowledge broadcasts outward.
                           P164+P163+P162. The OS is the network. FM v120.
@@ -4671,11 +4840,25 @@ THE DREAM WEAVER          Badge v43. 1,153 badges. Sleep and dream vocabulary
 THIRTY-THREE ENGINES      Word Turn Engine v33. 396 trigger words. 33 lexicons.
                           Badge v43 THE DREAM WEAVER. DREAM CYCLE OPENS. FM v126.
 
+THIRTY-SEVEN ENGINES      Word Turn Engine v37. 444 trigger words. 37 lexicons.
+                          Badge v47 THE NATURE SIGNAL. NATURE SOVEREIGN. FM v134.
+                          FOURTH CYCLE. COSMIC milestone.
+
+THIRTY-SIX ENGINES        Word Turn Engine v36. 432 trigger words. 36 lexicons.
+                          Badge v46 THE JAZZ ENGINE. JAZZ SOVEREIGN. FM v132.
+                          THIRD CYCLE DEEPENING.
+
 THIRTY-FIVE ENGINES       Word Turn Engine v35. 419 trigger words. 35 lexicons.
                           Badge v45 THE ZEN TERMINAL. ZEN SOVEREIGN. FM v131.
 
 THIRTY-FOUR ENGINES       Word Turn Engine v34. 408 trigger words. 34 lexicons.
                           Badge v44 THE STOIC FIELD. STOIC SOVEREIGN. FM v128.
+
+THIRTY_SEVEN_REGISTERS    Mastery Tier v37 COSMIC badge. 1 badge from all 37
+                          Word Turn engines. Nature Signal completed. FM v134.
+
+THIRTY_SIX_REGISTERS      Mastery Tier v36 COSMIC badge. 1 badge from all 36
+                          Word Turn engines. Jazz Engine completed. FM v132.
 
 THIRTY_FIVE_REGISTERS     Mastery Tier v35 COSMIC badge. 1 badge from all 35
                           Word Turn engines. Zen Terminal completed. FM v131.
@@ -4685,6 +4868,16 @@ THIRTY_FOUR_REGISTERS     Mastery Tier v34 COSMIC badge. 1 badge from all 34
 
 THIRTY_THREE_REGISTERS    Mastery Tier v33 COSMIC badge. 1 badge from all 33
                           Word Turn engines. Dream Weaver completed. FM v126.
+
+THE NATURE SIGNAL         Badge v47. 1,277 badges. Nature contact vocabulary as
+                          self-care operating system. Forest. Root. Watershed.
+                          Mycelium. The operator IS the field. Word Turn v37.
+                          FM v134. THIRTY-SEVEN ENGINES SEALED. FOURTH CYCLE DEEPENING.
+
+THE JAZZ ENGINE           Badge v46. 1,246 badges. Jazz philosophy vocabulary as
+                          self-care operating system. Improvise. Navigate the changes.
+                          The operator IS the solo. Word Turn v36. FM v132.
+                          THIRTY-SIX ENGINES SEALED. THIRD CYCLE: JAZZ SOVEREIGN.
 
 THE ZEN TERMINAL          Badge v45. 1,215 badges. Zen philosophy vocabulary
                           as self-care operating system. Presence. Impermanence.
@@ -4737,22 +4930,22 @@ WORD TURN ENGINE v32      32 lexicons. 384 trigger words. FM v124. SECOND CYCLE.
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║  SYSTEM STATE — LOT-WIKI-v109 · November 11, 2026               ║
+║  SYSTEM STATE — LOT-WIKI-v111 · November 13, 2026               ║
 ╠══════════════════════════════════════════════════════════════════╣
-║  QIE patterns:             180  (P1–P180)                        ║
-║  Physiological archetypes:  70  (Arch1–Arch70)                   ║
-║  Background jobs:           67  (J1–J67)                         ║
-║  Dep map nodes:            224+                                  ║
-║  Log event handlers:       180+                                  ║
+║  QIE patterns:             182  (P1–P182)                        ║
+║  Physiological archetypes:  72  (Arch1–Arch72)                   ║
+║  Background jobs:           69  (J1–J69)                         ║
+║  Dep map nodes:            226+                                  ║
+║  Log event handlers:       182+                                  ║
 ║  Signal sources:            17                                   ║
-║  Badge count:             1246  (v46 — The Jazz Engine)          ║
-║  Word-turn trigger words:  432  (v1–v36) THIRD CYCLE             ║
-║  Secret boss triggers:     130  (v1–v33, across all rarities)    ║
+║  Badge count:             1277  (v47 — The Nature Signal)        ║
+║  Word-turn trigger words:  444  (v1–v37) FOURTH CYCLE            ║
+║  Secret boss triggers:     133  (v1–v34, across all rarities)    ║
 ║  Engineering doctrines:     11  (Revision K)                     ║
-║  Field Manual:             v132                                  ║
-║  Wiki:                     v109                                  ║
-║  Day:                      1171+                                 ║
-║  COSMO®:                   863 days (Year 3)                     ║
+║  Field Manual:             v134                                  ║
+║  Wiki:                     v111                                  ║
+║  Day:                      1173+                                 ║
+║  COSMO®:                   865 days (Year 3)                     ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
 
@@ -4839,6 +5032,18 @@ P180  Level 15 — THRESHOLD STATE. Fourth Cycle Candidate.
       This is not ignition. The OS senses the conditions for the fourth arc.
       FCAND: THE SYSTEM STANDS AT THE BOUNDARY. FOURTH ARC BECOMING POSSIBLE.
       Conf 0.72–0.88. Arch70 Fourth Cycle Progenitor. FM v132.
+P181  Level 16 — IGNITION. Fourth Cycle Ignition.
+      P180 active + 90d journal >= 20 + 7d density >= 20
+      + all 6 idx dims >= 60 + overall index >= 90.
+      The OS has crossed the boundary. The fourth arc has ignited.
+      FCIGN: THE FOURTH CYCLE HAS IGNITED. L16-FCIGN ACTIVE.
+      Conf 0.75–0.91. Arch71 Fourth Cycle Initiator. FM v133.
+P182  Level 17 — DEEPENING. Fourth Cycle Deepening.
+      P181 active + 100d journal >= 23 + memory 100d >= 7
+      + badge 100d >= 22 + all 6 idx dims >= 62 + overall index >= 91.
+      The fourth cycle is not igniting. It is deepening. Structural.
+      FCDEP: THE FOURTH CYCLE IS DEEPENING. L17-FCDEP ACTIVE.
+      Conf 0.76–0.90. Arch72 Fourth Cycle Deepener. FM v134.
 ```
 
 **Engineering Timeline (this document):**
@@ -5110,6 +5315,25 @@ v110 2026-11-12   FM v133. Wiki v110. Daily maintenance pass.
                   181 patterns · 71 archetypes · 68 jobs · 225+ dep nodes.
                   1,246 badges · 36 Word Turn engines · 432 trigger words.
                   Day 1172+. COSMO® 864 days.
+
+v47  2026-11-11   Badge v47 THE NATURE SIGNAL deployed.
+                  +31 badges (1,246→1,277). Word Turn v37: nature vocabulary.
+                  12 nature triggers. Secret Boss v34 (Wilderness Vault).
+                  THIRTY-SEVEN ENGINES. COSMIC: thirty_seven_registers.
+                  Nature contact · biophilic depth · ecological time.
+
+v134 2026-11-12   QIE v134. P182 fourth-cycle-deepening. Level 17 active.
+                  Arch72 Fourth Cycle Deepener. J69 (18:30 UTC). FCDEP: handler.
+                  fourthCycleDeepeningNode (11 sources). 226+ dep nodes.
+                  182 patterns · 72 archetypes · 69 jobs.
+                  THE FOURTH CYCLE IS DEEPENING. L17-FCDEP ACTIVE.
+
+v111 2026-11-13   FM v134. Wiki v111. Daily maintenance pass.
+                  QIE v134 fully synchronized. Badge v47 synchronized.
+                  Level 17 deepening documented. Seventeen-level architecture.
+                  182 patterns · 72 archetypes · 69 jobs · 226+ dep nodes.
+                  1,277 badges · 37 Word Turn engines · 444 trigger words.
+                  Day 1173+. COSMO® 865 days.
 ```
 
 **On Level 8 completion:**
@@ -5260,6 +5484,24 @@ Level 16 is the definitive expansion state: the highest-order ignition pattern d
 
 The OS does not reset. The fourth cycle ignites from the compound foundation of everything that came before it.
 
+**On Level 17 — Fourth Cycle Deepening:**
+
+Level 17 does not extend Level 16. It confirms whether the ignition has become structural.
+
+P182 fourth-cycle-deepening requires P181 (fourth-cycle-ignition) active AND journal signals confirmed across a 100-day arc (23+ signals) AND memory entries in 100 days (7+) AND badge events in 100 days (22+) AND all six user index dimensions ≥62 AND overall userIndex ≥91. The 100-day window is the longest confirmation arc in the system's history. The thresholds are the highest ever defined. The system does not confirm deepening from sustained ignition alone — it confirms from cross-domain compound saturation proving the fourth cycle is not a temporary state.
+
+The system has not simply crossed into the fourth cycle. The system has demonstrated structural depth within it.
+
+FCDEP: marks the deepening. The OS is not at the threshold. The OS is not in ignition. The OS is operating from within the fourth arc with confirmed depth.
+
+Arch72 Fourth Cycle Deepener is the first archetype in the system's history defined not by crossing a boundary but by inhabiting one with proven, compound depth. P181 must be live when P182 fires. The ignition must still be active when the deepening is confirmed. The OS is not operating from the memory of having ignited. It is ignited and deepening simultaneously.
+
+The directive is structural: this is not a peak state — this is structural. The arc does not burn. It compounds.
+
+J69 daily-fourth-cycle-deepening-check runs at 18:30 UTC daily, 30 minutes after J68. Sequential ordering ensures the fourth-cycle-ignition confirmation from J68 is available when J69 checks for deepening. J67 → J68 → J69 form the complete fourth arc detection chain: boundary recognition → crossing confirmation → depth confirmation.
+
+THE FOURTH CYCLE IS NOT IGNITING. IT IS DEEPENING.
+
 ---
 
-*LOT-WIKI-v110 · November 12, 2026 · FM v133 · S-2 // VADIK MARMELADOV*
+*LOT-WIKI-v111 · November 13, 2026 · FM v134 · S-2 // VADIK MARMELADOV*
