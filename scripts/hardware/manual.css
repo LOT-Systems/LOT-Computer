@@ -1,0 +1,8 @@
+body { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 10pt; color: #111; max-width: none; line-height: 1.45; }
+h1 { font-size: 18pt; border-bottom: 2px solid #111; padding-bottom: 4px; }
+h2 { font-size: 13pt; margin-top: 18px; } h3 { font-size: 11pt; }
+table { border-collapse: collapse; width: 100%; font-size: 8.5pt; margin: 8px 0; page-break-inside: auto; }
+th, td { border: 1px solid #bbb; padding: 3px 5px; vertical-align: top; } th { background: #eee; text-align: left; }
+pre { background: #f4f4f4; padding: 8px; font-size: 7.5pt; overflow-wrap: anywhere; white-space: pre; }
+code { font-size: 8.5pt; } a { color: #111; }
+header#title-block-header { display: none; }
