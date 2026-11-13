@@ -218,3 +218,52 @@ export function detectQi46Signals(text: string): Qi46Signals {
 export function directiveForMessage(profile: Qi46BeingProfile, userText: string): string {
   return composeDirective(profile, detectQi46Signals(userText))
 }
+
+/* ── S5-1a · Being Profile codec (v0.1, pure) ──
+ * Storage boundary for the future encrypted JSON column. Everything read back
+ * is untrusted: parse is strict, never throws, and returns null on anything
+ * malformed instead of guessing. Consent never defaults to true on read.
+ */
+const QI46_VOICES: readonly Qi46Voice[] = ['male', 'female', 'neutral']
+
+export function serializeBeingProfile(profile: Qi46BeingProfile): string {
+  const { version, personId, consent, registers, voice, samples, updatedAt } = profile
+  return JSON.stringify({ version, personId, consent, registers, voice, samples, updatedAt })
+}
+
+export function parseBeingProfile(raw: string, expectedPersonId?: string): Qi46BeingProfile | null {
+  let o: unknown
+  try {
+    o = JSON.parse(raw)
+  } catch {
+    return null
+  }
+  if (!o || typeof o !== 'object' || Array.isArray(o)) return null
+  const p = o as Record<string, unknown>
+  if (p.version !== 1) return null
+  if (typeof p.personId !== 'string' || !p.personId) return null
+  if (expectedPersonId !== undefined && p.personId !== expectedPersonId) return null
+  if (!QI46_VOICES.includes(p.voice as Qi46Voice)) return null
+  if (typeof p.samples !== 'number' || !Number.isInteger(p.samples) || p.samples < 0) return null
+  if (typeof p.updatedAt !== 'string' || Number.isNaN(Date.parse(p.updatedAt))) return null
+  const c = p.consent as Record<string, unknown> | null
+  const r = p.registers as Record<string, unknown> | null
+  if (!c || typeof c !== 'object' || !r || typeof r !== 'object') return null
+  const consent = {} as Record<Qi46Source, boolean>
+  for (const s of QI46_SOURCES) consent[s] = c[s] === true
+  const regs: Partial<Qi46RegisterWeights> = {}
+  for (const k of QI46_REGISTERS) {
+    const v = r[k]
+    if (typeof v !== 'number' || !Number.isFinite(v) || v < 0) return null
+    regs[k] = v
+  }
+  return {
+    version: 1,
+    personId: p.personId,
+    consent,
+    registers: normalizeWeights(regs),
+    voice: p.voice as Qi46Voice,
+    samples: p.samples,
+    updatedAt: new Date(p.updatedAt).toISOString(),
+  }
+}

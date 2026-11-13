@@ -13,6 +13,8 @@ import {
   detectQi46Signals,
   directiveForMessage,
   crisisResourceLine,
+  serializeBeingProfile,
+  parseBeingProfile,
 } from '../../src/shared/utils/qi46.ts'
 
 const sum = (w: Record<string, number>) => Object.values(w).reduce((a, b) => a + b, 0)
@@ -128,4 +130,40 @@ test('S4-4 crisis directive carries locale resource line; en flagged as en', () 
   assert.ok(directiveForMessage(p, 'хочу умереть').includes('112'))
   assert.ok(crisisResourceLine().includes('local emergency'))
   assert.ok(!directiveForMessage(p, 'good morning').includes('Resource line'))
+})
+
+test('codec: round-trip preserves calibrated profile', () => {
+  let p = createBeingProfile('u1', { journal: true, chat: true }, 'male', new Date('2026-11-13T00:00:00Z'))
+  p = calibrate(p, { used: { hug: 1, beingThere: 1 }, landed: true }, new Date('2026-11-13T01:00:00Z'))
+  const back = parseBeingProfile(serializeBeingProfile(p), 'u1')
+  assert.ok(back)
+  assert.deepEqual(back!.consent, p.consent)
+  assert.equal(back!.voice, 'male')
+  assert.equal(back!.samples, 1)
+  for (const r of QI46_REGISTERS) assert.ok(Math.abs(back!.registers[r] - p.registers[r]) < 1e-12)
+})
+
+test('codec: rejects malformed, foreign or tampered rows', () => {
+  const good = JSON.parse(serializeBeingProfile(createBeingProfile('u1')))
+  const bad = (patch: object) => JSON.stringify({ ...good, ...patch })
+  assert.equal(parseBeingProfile('not json'), null)
+  assert.equal(parseBeingProfile('[]'), null)
+  assert.equal(parseBeingProfile(bad({ version: 2 })), null)
+  assert.equal(parseBeingProfile(bad({ personId: '' })), null)
+  assert.equal(parseBeingProfile(serializeBeingProfile(createBeingProfile('u2')), 'u1'), null)
+  assert.equal(parseBeingProfile(bad({ voice: 'robot' })), null)
+  assert.equal(parseBeingProfile(bad({ samples: -1 })), null)
+  assert.equal(parseBeingProfile(bad({ updatedAt: 'yesterday' })), null)
+  assert.equal(parseBeingProfile(bad({ registers: { ...good.registers, love: 'lots' } })), null)
+  assert.equal(parseBeingProfile(bad({ registers: { ...good.registers, cool: -0.5 } })), null)
+})
+
+test('codec: consent never defaults to true; extra fields dropped', () => {
+  const good = JSON.parse(serializeBeingProfile(createBeingProfile('u1')))
+  const raw = JSON.stringify({ ...good, consent: { journal: 'yes', chat: 1, body: true }, admin: true })
+  const p = parseBeingProfile(raw)!
+  assert.equal(p.consent.journal, false)
+  assert.equal(p.consent.chat, false)
+  assert.equal(p.consent.body, true)
+  assert.equal((p as unknown as Record<string, unknown>).admin, undefined)
 })
