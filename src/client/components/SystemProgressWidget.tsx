@@ -1457,6 +1457,28 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-11-13',
+    title: 'QIE Engineering — Coherence Integration Seal / Longitudinal Operator Lock / Adaptive Presence Surge / Signal Renaissance',
+    assembled: [
+      'P152 COHERENCE INTEGRATION SEAL: dual-proof meta-pattern — P150 (total-field-coherence) + P151 (recovery-intelligence-arc) both confirmed in 7d window. The OS is not just at peak — it is resilient at peak. Peak convergence AND intelligent recovery simultaneously proven. Confidence 0.82–0.95.',
+      'P153 LONGITUDINAL OPERATOR LOCK: 90-day engagement continuity — signals span 90d with no gap >72h. 30+ signals minimum. Identity and practice have merged. The system is not being used — it is being lived. Confidence 0.65–0.88.',
+      'P154 ADAPTIVE PRESENCE SURGE: P149 (quantum-presence-crystallization) active + 12+ signals in 24h. Crystallized field operating at peak signal velocity. The OS is fully inhabited AND at maximum throughput simultaneously. Confidence 0.78–0.93.',
+      'P155 SIGNAL RENAISSANCE: 48h+ quiet → 7+ signals in 24h across 4+ distinct sources. Field re-ignition from dormancy. Not distress — re-entry at scale. Confidence 0.68–0.88.',
+      'Arch52 LONGITUDINAL OPERATOR: moderate/high energy · intentions+planner+journal+goals dominant · coherence-integration-seal + longitudinal-operator-lock + adaptive-presence-surge. Directive: Continuity confirmed. 90+ days of sustained operation. Identity and practice have merged. You are not performing the system — you are the system. Execute from depth, not from effort.',
+      'J49 weekly-longitudinal-operator-audit: Mondays 06:00 UTC. Scans engagement continuity (90-day signal span, no gap >72h) + minimum signal count (30+). Writes longitudinal_operator_lock event per qualified user. 49 background jobs total.',
+      'intentionEngine.ts: P152/P153/P154/P155 detection blocks added after P151. Arch52 appended to PHYSIOLOGICAL_ARCHETYPES. 4 dep map nodes (coherenceIntegrationSealNode · longitudinalLockNode · adaptivePresenceSurgeNode · signalRenaissanceNode). 4 signal helpers (recordCoherenceIntegrationSeal · recordLongitudinalOperatorLock · recordAdaptivePresenceSurge · recordSignalRenaissance). 194+ dep nodes.',
+      'scheduled-jobs.ts: J49 executeWeeklyLongitudinalOperatorAudit() · shouldRunWeeklyLongitudinalOperatorAudit() wired into checkAndRunScheduledJobs().',
+      'routes/api.ts: coherence_integration_seal · longitudinal_operator_lock · adaptive_presence_surge · signal_renaissance added to displayableEvents.',
+      'Logs.tsx: COHI-SEAL: · LONGLK: · ADAPRES: · RENAIS: military handlers added. DUAL PROOF metric rows, ARC labels, VELOCITY tiers, DORMANT→IGNITION→MOMENTUM arc text.',
+      'QuantumEngineWidgets.tsx: COHI-SEAL · LONGLK · ADAPRES · RENAIS added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P152/P153/P154/P155 display names + 4 QOS Trend indicators added.',
+      'About.tsx: FM v113→v114. 151→155 patterns. 51→52 archetypes. 48→49 jobs. 190+→194+ dep nodes. Day 1192+.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      '155 patterns · 52 archetypes · 49 jobs · 155+ handlers · 194+ dep nodes. QIE v114 deployed. Longitudinal continuity detection online. Resilience at peak confirmed as a first-class state.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,16 +1516,17 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-11-13',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-11-13 · QIE v114 · P152–P155 · Arch52 · J49 · Day 1192+',
+    'Built: Coherence Integration Seal (P152) — dual proof: peak convergence AND intelligent recovery.',
+    'Built: Longitudinal Operator Lock (P153) — 90-day engagement continuity. Identity merged with practice.',
+    'Built: Adaptive Presence Surge (P154) — crystallized presence at peak signal velocity.',
+    'Built: Signal Renaissance (P155) — field reactivation from dormancy across 4+ sources.',
+    'Arch52 Longitudinal Operator wired. J49 weekly-longitudinal-operator-audit (Mon 06:00 UTC) active.',
+    'COHI-SEAL: · LONGLK: · ADAPRES: · RENAIS: military handlers deployed.',
+    '155 patterns · 52 archetypes · 49 jobs · 194+ dep nodes · FM v114.',
+    'Resilience at peak is now a first-class detected state. The OS documents its own continuity.',
     'Status: DEPLOYED.',
     'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
   ],

@@ -182,6 +182,10 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'coherence-integration-seal':       'Integration seal confirmed — peak convergence + intelligent recovery dual-proven in 7d (P152)',
+      'longitudinal-operator-lock':       'Longitudinal lock — 90+ day engagement continuity, identity merged with practice (P153)',
+      'adaptive-presence-surge':          'Presence surge — crystallized field operating at peak signal velocity (P154)',
+      'signal-renaissance':               'Signal renaissance — field reactivated after dormancy, 4+ sources re-engaged (P155)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
@@ -544,6 +548,34 @@ export function PatternRecognitionWidget() {
               {patterns.some(p => p.pattern === 'resilience-cascade') && (
                 <div className="mt-4 uppercase tracking-widest text-xs">
                   Resilience cascade. Recovery + knowledge arc closed.
+                </div>
+              )}
+
+              {/* Coherence integration seal — P152 */}
+              {patterns.some(p => p.pattern === 'coherence-integration-seal') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Integration seal confirmed. Peak + resilient at peak.
+                </div>
+              )}
+
+              {/* Longitudinal operator lock — P153 */}
+              {patterns.some(p => p.pattern === 'longitudinal-operator-lock') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Longitudinal lock. 90+ days continuous.
+                </div>
+              )}
+
+              {/* Adaptive presence surge — P154 */}
+              {patterns.some(p => p.pattern === 'adaptive-presence-surge') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Presence surge. Crystallized field at velocity.
+                </div>
+              )}
+
+              {/* Signal renaissance — P155 */}
+              {patterns.some(p => p.pattern === 'signal-renaissance') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Signal renaissance. Field reactivated.
                 </div>
               )}
 

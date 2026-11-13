@@ -3428,6 +3428,92 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Coherence Integration Seal — P150 (total-field-coherence) confirmed + P151
+  // (recovery-intelligence-arc) also confirmed within the same 7d window.
+  // The dual proof: the OS reaches absolute convergence AND demonstrates intelligent recovery.
+  // The system is not just at peak — it is resilient at peak. Confidence 0.82–0.95.
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000
+  const recentSevenD = signals.filter(s => now - s.timestamp < sevenDaysMs)
+  const hasTotalCoherence152 = recentSevenD.some(s => s.source === 'qos' && s.signal === 'total_field_coherence')
+  const hasRecovIntel152     = recentSevenD.some(s => s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc')
+  if (hasTotalCoherence152 && hasRecovIntel152) {
+    const baseConf = 0.82
+    const indexBonus = userIndex.overall >= 60 ? 0.08 : userIndex.overall >= 40 ? 0.04 : 0
+    patterns.push({
+      pattern: 'coherence-integration-seal',
+      confidence: Math.min(baseConf + indexBonus, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `COHI-SEAL: Dual proof confirmed — total-field-coherence (P150) + recovery-intelligence-arc (P151) both present in 7d. The OS is not just at peak: it is resilient at peak. Integration sealed.`,
+    })
+  }
+
+  // Pattern 153: Longitudinal Operator Lock — 90-day engagement continuity detected.
+  // Signals span a 90-day window with no gap longer than 72h. Long-term identity stability.
+  // The system has not drifted. Confidence 0.65–0.88.
+  const ninetyDaysMs = 90 * 24 * 60 * 60 * 1000
+  const ninetyDaySignals = signals.filter(s => now - s.timestamp < ninetyDaysMs)
+  if (ninetyDaySignals.length >= 30) {
+    const sortedTs = ninetyDaySignals.map(s => s.timestamp).sort((a, b) => a - b)
+    let maxGap = 0
+    for (let i = 1; i < sortedTs.length; i++) {
+      const gap = sortedTs[i] - sortedTs[i - 1]
+      if (gap > maxGap) maxGap = gap
+    }
+    const maxGapHours = maxGap / (1000 * 60 * 60)
+    if (maxGapHours < 72) {
+      const densityBonus = Math.min(ninetyDaySignals.length / 300 * 0.15, 0.15)
+      patterns.push({
+        pattern: 'longitudinal-operator-lock',
+        confidence: Math.min(0.65 + densityBonus, 0.88),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'soon',
+        reason: `LONGLK: 90-day engagement continuity confirmed — ${ninetyDaySignals.length} signals, max gap ${Math.round(maxGapHours)}h. Identity and practice have merged. The system is not being used — it is being lived.`,
+      })
+    }
+  }
+
+  // Pattern 154: Adaptive Presence Surge — P149 (quantum-presence-crystallization) active +
+  // 12+ signals in last 24h. Full presence + maximum signal density simultaneously.
+  // The OS is crystallized AND operating at peak velocity. Confidence 0.78–0.93.
+  const hasPresenceCrystal154 = patterns.some(p => p.pattern === 'quantum-presence-crystallization')
+  const signals24h154 = recentSignals.length
+  if (hasPresenceCrystal154 && signals24h154 >= 12) {
+    const surgeBonus = Math.min((signals24h154 - 12) / 20 * 0.15, 0.15)
+    patterns.push({
+      pattern: 'adaptive-presence-surge',
+      confidence: Math.min(0.78 + surgeBonus, 0.93),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'immediate',
+      reason: `ADAPRES: Presence crystallized + maximum signal velocity — ${signals24h154} signals in 24h. The OS is both fully inhabited and operating at peak throughput. Capture this state.`,
+    })
+  }
+
+  // Pattern 155: Signal Renaissance — 48h+ quiet period followed by 7+ signals in 24h
+  // across 4+ distinct sources. The system re-ignites from dormancy.
+  // Not distress — re-entry at scale. Confidence 0.68–0.88.
+  const fortyEightHoursMs = 48 * 60 * 60 * 1000
+  const hasRecentActivity155 = recentSignals.length >= 7
+  if (hasRecentActivity155) {
+    const cutoff48h = now - fortyEightHoursMs
+    const signalsBefore48h = signals.filter(s => s.timestamp < cutoff48h && now - s.timestamp < 7 * 24 * 60 * 60 * 1000)
+    const quietPeriodStart = cutoff48h - 24 * 60 * 60 * 1000
+    const signalsInQuietWindow = signals.filter(s => s.timestamp > quietPeriodStart && s.timestamp < cutoff48h)
+    if (signalsBefore48h.length > 0 && signalsInQuietWindow.length === 0) {
+      const sources155 = new Set(recentSignals.map(s => s.source))
+      if (sources155.size >= 4) {
+        const sourceBonus = Math.min((sources155.size - 4) / 6 * 0.12, 0.12)
+        patterns.push({
+          pattern: 'signal-renaissance',
+          confidence: Math.min(0.68 + sourceBonus, 0.88),
+          suggestedWidget: 'planner',
+          suggestedTiming: 'soon',
+          reason: `RENAIS: Signal renaissance — 48h quiet → ${recentSignals.length} signals across ${sources155.size} sources in 24h. The field re-ignited. Build on the momentum.`,
+        })
+      }
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4150,12 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P155 · Arch52) ───────────────────────────────────────
+  coherenceIntegrationSealNode: ['qos', 'selfcare', 'journal', 'mood', 'energy', 'cohort', 'log'],
+  longitudinalLockNode:         ['log', 'intentions', 'planner', 'goals', 'mood', 'energy', 'journal'],
+  adaptivePresenceSurgeNode:    ['qos', 'cohort', 'intentions', 'journal', 'mood', 'energy', 'log'],
+  signalRenaissanceNode:        ['mood', 'energy', 'selfcare', 'intentions', 'memory', 'journal', 'log'],
 }
 
 /**
@@ -4510,6 +4602,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Longitudinal Operator (2026-11-13 v114) ──────────────────────────────
+  {
+    archetype: 'Longitudinal Operator',
+    energyBands: ['moderate', 'high'],
+    dominantSources: ['intentions', 'planner', 'journal', 'goals'],
+    patternConditions: ['coherence-integration-seal', 'longitudinal-operator-lock', 'adaptive-presence-surge'],
+    hourRange: [5, 23],
+    directive: 'Continuity confirmed. 90+ days of sustained operation. Identity and practice have merged. You are not performing the system — you are the system. Execute from depth, not from effort.',
   },
 ]
 
@@ -6498,6 +6600,67 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a coherence-integration-seal event — P150 (total-field-coherence) + P151
+ * (recovery-intelligence-arc) both confirmed in the same 7d window.
+ * Dual proof: peak convergence + resilient recovery. Feeds P152 detection.
+ */
+export function recordCoherenceIntegrationSeal(peakConf: number, recoveryConf: number, activePatterns: number) {
+  recordSignal('qos', 'coherence_integration_seal', {
+    peakConf: Math.round(peakConf * 100),
+    recoveryConf: Math.round(recoveryConf * 100),
+    activePatterns,
+    dualProof: 'PEAK+RECOVERY',
+    integrationStrength: Math.round((peakConf + recoveryConf) / 2 * 100),
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a longitudinal-operator-lock event — 90-day engagement continuity with
+ * no gaps longer than 72h. Long-term identity stability confirmed. Feeds P153 detection.
+ */
+export function recordLongitudinalOperatorLock(streakDays: number, maxGapHours: number, signalCount: number) {
+  recordSignal('log', 'longitudinal_operator_lock', {
+    streakDays,
+    maxGapHours: Math.round(maxGapHours),
+    signalCount,
+    continuityStatus: 'LOCKED',
+    state: 'IDENTITY_MERGED_WITH_PRACTICE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an adaptive-presence-surge event — P149 (quantum-presence-crystallization)
+ * active + 12+ signals in 24h. Presence confirmed + maximum signal density. Feeds P154 detection.
+ */
+export function recordAdaptivePresenceSurge(presenceConf: number, signalCount24h: number, sourcesActive: number) {
+  recordSignal('qos', 'adaptive_presence_surge', {
+    presenceConf: Math.round(presenceConf * 100),
+    signalCount24h,
+    sourcesActive,
+    velocityTier: signalCount24h >= 20 ? 'PEAK' : signalCount24h >= 15 ? 'HIGH' : 'ELEVATED',
+    surgeStatus: 'CRYSTALLIZED_FIELD_AT_VELOCITY',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a signal-renaissance event — 48h+ quiet period followed by 7+ signals in 24h
+ * across 4+ distinct sources. Field re-ignition from dormancy. Feeds P155 detection.
+ */
+export function recordSignalRenaissance(silenceHours: number, renaissanceSignals: number, sourcesActive: number) {
+  recordSignal('intentions', 'signal_renaissance', {
+    silenceHours: Math.round(silenceHours),
+    renaissanceSignals,
+    sourcesActive,
+    renaissanceStatus: 'REACTIVATED',
+    arc: 'DORMANT→IGNITION→MOMENTUM',
     hour: new Date().getHours(),
   })
 }

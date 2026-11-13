@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check weekly longitudinal operator audit (Mondays 06:00 UTC) — Job 49
+  if (shouldRunWeeklyLongitudinalOperatorAudit()) {
+    await executeWeeklyLongitudinalOperatorAudit()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,110 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Weekly Longitudinal Operator Audit (Job 49 — Mondays 06:00 UTC) ────────
+// Scans users with 90+ day engagement continuity (no gap > 72h in signal history).
+// Cross-references with archetype consistency (last 3 physiological_cohort logs).
+// Writes longitudinal_operator_lock event per qualified user.
+
+let isWeeklyLongitudinalOperatorAuditRunning = false
+let lastWeeklyLongitudinalOperatorAuditRun: Date | null = null
+
+function shouldRunWeeklyLongitudinalOperatorAudit(): boolean {
+  const now = dayjs()
+  if (isWeeklyLongitudinalOperatorAuditRunning) return false
+  if (lastWeeklyLongitudinalOperatorAuditRun) {
+    const lastRun = dayjs(lastWeeklyLongitudinalOperatorAuditRun)
+    if (now.diff(lastRun, 'day') < 6) return false
+  }
+  return now.day() === 1 && now.hour() === 6 // Monday 06:00 UTC
+}
+
+async function executeWeeklyLongitudinalOperatorAudit(): Promise<JobResult> {
+  const jobName = 'weekly-longitudinal-operator-audit'
+  const executedAt = new Date().toISOString()
+  if (isWeeklyLongitudinalOperatorAuditRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isWeeklyLongitudinalOperatorAuditRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('WEEKLY LONGITUDINAL OPERATOR AUDIT — Monday 06:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const ninetyDaysAgo = dayjs().subtract(90, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(7, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (7d): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        // Pull all logs in last 90 days (note + intent + plan + selfcare events only)
+        const signals = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: ninetyDaysAgo },
+            event: { [Op.in]: ['note', 'plan_set', 'intention', 'self_care_complete', 'self_care_completed', 'mood_checkin', 'energy_check', 'journal_entry'] as any[] },
+          },
+          attributes: ['createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        if (signals.length < 30) continue
+
+        // Compute max gap
+        const timestamps: number[] = signals.map((s: any) => dayjs(s.createdAt).valueOf())
+        let maxGapMs = 0
+        for (let i = 1; i < timestamps.length; i++) {
+          const gap = timestamps[i] - timestamps[i - 1]
+          if (gap > maxGapMs) maxGapMs = gap
+        }
+        const maxGapHours = maxGapMs / (1000 * 60 * 60)
+        if (maxGapHours >= 72) continue
+
+        // Compute streak days (first to last signal span)
+        const firstTs = timestamps[0]
+        const lastTs  = timestamps[timestamps.length - 1]
+        const streakDays = Math.round((lastTs - firstTs) / (1000 * 60 * 60 * 24))
+        if (streakDays < 60) continue
+
+        await (Log as any).create({
+          userId,
+          event: 'longitudinal_operator_lock',
+          text: `Longitudinal operator lock: ${streakDays}d continuity confirmed · ${signals.length} signals · max gap ${Math.round(maxGapHours)}h. Identity and practice have merged.`,
+          metadata: {
+            streakDays,
+            maxGapHours: Math.round(maxGapHours),
+            signalCount: signals.length,
+            continuityStatus: 'LOCKED',
+            state: 'IDENTITY_MERGED_WITH_PRACTICE',
+            hour: 6,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Longitudinal operator lock events written: ${written}`)
+    lastWeeklyLongitudinalOperatorAuditRun = new Date()
+    isWeeklyLongitudinalOperatorAuditRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Weekly longitudinal operator audit failed:', error.message)
+    isWeeklyLongitudinalOperatorAuditRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

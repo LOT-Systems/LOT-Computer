@@ -3629,6 +3629,130 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'coherence_integration_seal') {
+          const peakConf = log.metadata?.peakConf as number | undefined
+          const recoveryConf = log.metadata?.recoveryConf as number | undefined
+          const integrationStrength = log.metadata?.integrationStrength as number | undefined
+          const dualProof = log.metadata?.dualProof as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COHI-SEAL:" blockView>
+                {peakConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PEAK CONF</span>
+                    <span className="tabular-nums">{peakConf}%</span>
+                  </div>
+                )}
+                {recoveryConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECOVERY CONF</span>
+                    <span className="tabular-nums">{recoveryConf}%</span>
+                  </div>
+                )}
+                {integrationStrength !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTEGRATION</span>
+                    <span className="tabular-nums">{integrationStrength}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">DUAL PROOF: {dualProof ?? 'PEAK+RECOVERY'}</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'longitudinal_operator_lock') {
+          const streakDays = log.metadata?.streakDays as number | undefined
+          const maxGapHours = log.metadata?.maxGapHours as number | undefined
+          const signalCount = log.metadata?.signalCount as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="LONGLK:" blockView>
+                {streakDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">STREAK</span>
+                    <span className="tabular-nums">{streakDays}d</span>
+                  </div>
+                )}
+                {maxGapHours !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MAX GAP</span>
+                    <span className="tabular-nums">{maxGapHours}h</span>
+                  </div>
+                )}
+                {signalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SIGNALS 90D</span>
+                    <span className="tabular-nums">{signalCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">IDENTITY MERGED WITH PRACTICE</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'adaptive_presence_surge') {
+          const presenceConf = log.metadata?.presenceConf as number | undefined
+          const signalCount24h = log.metadata?.signalCount24h as number | undefined
+          const sourcesActive = log.metadata?.sourcesActive as number | undefined
+          const velocityTier = log.metadata?.velocityTier as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="ADAPRES:" blockView>
+                {presenceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PRESENCE CONF</span>
+                    <span className="tabular-nums">{presenceConf}%</span>
+                  </div>
+                )}
+                {signalCount24h !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SIG 24H</span>
+                    <span className="tabular-nums">{signalCount24h}</span>
+                  </div>
+                )}
+                {sourcesActive !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES</span>
+                    <span className="tabular-nums">{sourcesActive}</span>
+                  </div>
+                )}
+                {velocityTier && (
+                  <div className="opacity-40 tabular-nums">VELOCITY: {velocityTier}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'signal_renaissance') {
+          const silenceHours = log.metadata?.silenceHours as number | undefined
+          const renaissanceSignals = log.metadata?.renaissanceSignals as number | undefined
+          const sourcesActive = log.metadata?.sourcesActive as number | undefined
+          const renaissanceStatus = log.metadata?.renaissanceStatus as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RENAIS:" blockView>
+                {silenceHours !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SILENCE</span>
+                    <span className="tabular-nums">{silenceHours}h</span>
+                  </div>
+                )}
+                {renaissanceSignals !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SIGNALS 24H</span>
+                    <span className="tabular-nums">{renaissanceSignals}</span>
+                  </div>
+                )}
+                {sourcesActive !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES</span>
+                    <span className="tabular-nums">{sourcesActive}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ARC: DORMANT→IGNITION→MOMENTUM</div>
+                {renaissanceStatus && (
+                  <div className="opacity-30 tabular-nums">{renaissanceStatus}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
