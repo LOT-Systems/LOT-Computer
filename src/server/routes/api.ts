@@ -1084,7 +1084,7 @@ export default async (fastify: FastifyInstance) => {
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_status', 'calendar_alert', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -1583,6 +1583,121 @@ export default async (fastify: FastifyInstance) => {
       })
 
       return log
+    }
+  )
+
+  // ============================================================================
+  // CALENDAR — event-sourced from the Log (calendar_entry / calendar_status /
+  // calendar_alert). Dedicated read path so entries are never lost behind the
+  // 500-row /logs cap or the hideActivityLogs filter.
+  // ============================================================================
+  const CALENDAR_EVENTS = ['calendar_entry', 'calendar_status', 'calendar_alert']
+  const CAL_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+  const CAL_TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/
+  const CAL_STAGES = ['T-15', 'T-0', 'D-0']
+  const CAL_STATUSES = ['open', 'done', 'cancelled']
+  const CAL_TYPES = ['note', 'task', 'call']
+
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    const rows = await fastify.models.Log.findAll({
+      where: { userId: req.user.id, event: { [Op.in]: CALENDAR_EVENTS } },
+      attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
+      order: [['createdAt', 'DESC']],
+      limit: 3000,
+    })
+    return rows.reverse()
+  })
+
+  fastify.post(
+    '/calendar/status',
+    async (
+      req: FastifyRequest<{ Body: { entryId: string; status: string } }>,
+      reply
+    ) => {
+      const { entryId, status } = req.body || ({} as any)
+      if (typeof entryId !== 'string' || !entryId || entryId.length > 100) {
+        return reply.throw.badParams('entryId is required')
+      }
+      if (!CAL_STATUSES.includes(status)) return reply.throw.badParams('Invalid status')
+
+      const entries = await fastify.models.Log.findAll({
+        where: { userId: req.user.id, event: 'calendar_entry' },
+        attributes: ['id', 'text', 'metadata'],
+        order: [['createdAt', 'DESC']],
+        limit: 3000,
+      })
+      const entry = entries.find(
+        (l) => l.id === entryId || (l.metadata as any)?.entryId === entryId
+      )
+      if (!entry) return reply.throw.notFound()
+      const md = (entry.metadata || {}) as Record<string, any>
+      const label = status === 'done' ? 'DONE' : status === 'cancelled' ? 'CANCELLED' : 'REOPENED'
+      const entryType = CAL_TYPES.includes(md.entryType) ? md.entryType : 'note'
+
+      return fastify.models.Log.create({
+        userId: req.user.id,
+        event: 'calendar_status',
+        text: `[${label}] ${entryType}: ${String(md.text || entry.text || '').slice(0, 500)}`,
+        metadata: {
+          entryId,
+          status,
+          date: md.date,
+          time: md.time || null,
+          text: md.text,
+          entryType,
+        },
+        context: {},
+      })
+    }
+  )
+
+  fastify.post(
+    '/calendar/alert',
+    async (
+      req: FastifyRequest<{
+        Body: {
+          entryId: string
+          stage: string
+          date: string
+          time?: string | null
+          text: string
+          entryType: string
+        }
+      }>,
+      reply
+    ) => {
+      const b = req.body || ({} as any)
+      if (typeof b.entryId !== 'string' || !b.entryId || b.entryId.length > 100) {
+        return reply.throw.badParams('entryId is required')
+      }
+      if (!CAL_STAGES.includes(b.stage)) return reply.throw.badParams('Invalid stage')
+      if (typeof b.date !== 'string' || !CAL_DATE_RE.test(b.date)) {
+        return reply.throw.badParams('Invalid date')
+      }
+      const time = typeof b.time === 'string' && CAL_TIME_RE.test(b.time) ? b.time : null
+      const entryType = CAL_TYPES.includes(b.entryType) ? b.entryType : 'note'
+      const text = String(b.text || '').trim().slice(0, 500)
+
+      // Idempotent: one alert log per (entry, stage) — multiple tabs/devices
+      // may race to fire the same alert.
+      const recent = await fastify.models.Log.findAll({
+        where: { userId: req.user.id, event: 'calendar_alert' },
+        attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
+        order: [['createdAt', 'DESC']],
+        limit: 500,
+      })
+      const existing = recent.find(
+        (l) => (l.metadata as any)?.entryId === b.entryId && (l.metadata as any)?.stage === b.stage
+      )
+      if (existing) return existing
+
+      return fastify.models.Log.create({
+        userId: req.user.id,
+        event: 'calendar_alert',
+        text: `[ALERT ${b.stage}] ${entryType}: ${text}${time ? ` @ ${time}` : ''} (${b.date})`,
+        metadata: { entryId: b.entryId, stage: b.stage, date: b.date, time, text, entryType },
+        context: {},
+      })
     }
   )
 

@@ -419,3 +419,26 @@ td:last-child {
   content: 'built different since day one';
   display: none;
 }
+
+/* Calendar alerts — hard on/off blink (signal lamp), entry slide-in */
+.lot-cal-blink {
+  animation: lot-cal-blink 1s steps(1, end) infinite;
+}
+
+@keyframes lot-cal-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.15; }
+}
+
+.lot-cal-alert {
+  animation: lot-cal-in 180ms ease-out;
+}
+
+@keyframes lot-cal-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lot-cal-blink, .lot-cal-alert { animation: none; }
+}

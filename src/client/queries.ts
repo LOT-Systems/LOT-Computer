@@ -141,6 +141,23 @@ export const useCreateLog = createMutation<{ text: string; event?: string; metad
   '/api/logs'
 )
 
+// Calendar — dedicated, uncapped read path for calendar_* log events
+export const useCalendar = createQuery<import('#client/utils/calendar').CalendarLogRow[]>('/api/calendar', {
+  refetchOnWindowFocus: true,
+  staleTime: 60 * 1000,
+  refetchInterval: 5 * 60 * 1000, // keep multi-device state converged for alerts
+})
+
+export const useSetCalendarStatus = createMutation<
+  { entryId: string; status: 'open' | 'done' | 'cancelled' },
+  Log
+>('post', '/api/calendar/status')
+
+export const useCalendarAlert = createMutation<
+  { entryId: string; stage: string; date: string; time: string | null; text: string; entryType: string },
+  Log
+>('post', '/api/calendar/alert')
+
 export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
   'put',
   (data) => `/api/logs/${data.id}`

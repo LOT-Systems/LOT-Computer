@@ -11,7 +11,7 @@ import { QueryClientProvider, QueryClient } from 'react-query'
 import { useStore } from '@nanostores/react'
 import { getMe, useWeather } from '#client/queries'
 import * as stores from '#client/stores'
-import { Layout } from '#client/components/ui'
+import { Layout, WidgetErrorBoundary } from '#client/components/ui'
 import { System } from '#client/components/System'
 import { Settings } from '#client/components/Settings'
 import { Logs } from '#client/components/Logs'
@@ -20,6 +20,7 @@ import { DirectMessageThread } from '#client/components/DirectMessageThread'
 import { StatusPage } from '#client/components/StatusPage'
 import { ApiPage } from '#client/components/ApiPage'
 import { ConnectionStatus } from '#client/components/ConnectionStatus'
+import { CalendarAlerts } from '#client/components/CalendarAlerts'
 import { render } from '#client/utils/render'
 import { listenSSE } from '#client/utils/sse'
 import { useSun } from '#client/utils/sun'
@@ -344,6 +345,9 @@ const App = () => {
   return (
     <>
       <ConnectionStatus />
+      <WidgetErrorBoundary name="CalendarAlerts">
+        <CalendarAlerts />
+      </WidgetErrorBoundary>
       <Layout>
         <TabPanels />
         <DynamicRoutes />
