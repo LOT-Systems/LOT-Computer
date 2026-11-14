@@ -1457,6 +1457,19 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    date: '2026-11-14',
+    session: 'QI·46 Self-Assembly — Phase 0 / Corpus Assembly · Session 1 · Calibration Vector v0.1',
+    assembled: [
+      'qi46/calibration/vector.json: Calibration Vector v0.1 — 7 registers: GRACE · POETRY · LOVE · HUGS · BEING_THERE · BEING_COOL · MALE (persona layer). Mix rule: 1 primary + max 1 secondary. COSMO® safety + consent block embedded.',
+      'scripts/qi46/assemble-corpus.mjs: Steps 0.1–0.3 automated. Zero-dependency. Inventory → section split → sha256 dedupe → tag schema → COSMO® heuristic screen → JSONL → validation → Checkpoint 0 gate.',
+      'Corpus v0: 7 source dirs · 306 docs · 4068 pairs · 3954 COSMO® cleared · 114 flagged · 487 duplicates dropped · ~1.24M tokens · 0 malformed lines.',
+      'Review sample: 100 soul-first pairs (voice/philosophy with calibration registers) committed for review.',
+      'Gated (not read, not committed): platform journals · consumable feedback · COSMO® event logs. Consent-gated DB pull required.',
+      'Checkpoint 0: HOLD — corpus 3954 < 10000 pairs · 100-sample review pending. A failed gate is a checkpoint working correctly.',
+      'docs/assembly/2026-11-14_QI46-assembly_phase-0-corpus.md: Assembly log written.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1488,6 +1501,13 @@ const ASSEMBLY_TRANSMISSIONS: {
     feedbackApplied: 'the system talking to the person',
     status: 'DEPLOYED',
     next: 'Journal vocabulary extraction → personal interface language injection',
+  },
+  {
+    date: '2026-11-14',
+    built: ['QI·46 Calibration Vector v0.1', 'Corpus assembler (Phase 0)', 'Corpus v0 — 3954 cleared pairs'],
+    feedbackApplied: 'the engine listens to the soul before it speaks',
+    status: 'HELD',
+    next: 'Consent-gated subscriber stream + soul-weighted pair synthesis → Checkpoint 0 re-run',
   },
 ]
 

@@ -98,3 +98,7 @@ audit-logs/
 __pycache__/
 *.pyc
 *.pyo
+
+# QI·46 corpus build (reproducible: node scripts/qi46/assemble-corpus.mjs)
+qi46/corpus/build/*.jsonl
+!qi46/corpus/build/review-sample-100.jsonl

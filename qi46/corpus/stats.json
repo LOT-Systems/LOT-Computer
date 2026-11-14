@@ -1,0 +1,113 @@
+{
+  "generated_at": "2026-11-14T19:35:51.402Z",
+  "vector_version": "0.1",
+  "inventory": [
+    {
+      "dir": "docs/corporate",
+      "source": "institute",
+      "files": 25,
+      "pairs": 341
+    },
+    {
+      "dir": "docs/wiki",
+      "source": "institute",
+      "files": 33,
+      "pairs": 999
+    },
+    {
+      "dir": "docs/technical",
+      "source": "bioelectric",
+      "files": 29,
+      "pairs": 639
+    },
+    {
+      "dir": "docs/badges",
+      "source": "brand",
+      "files": 32,
+      "pairs": 740
+    },
+    {
+      "dir": "docs/benchmark",
+      "source": "brand",
+      "files": 79,
+      "pairs": 141
+    },
+    {
+      "dir": "docs/assembly",
+      "source": "brand",
+      "files": 98,
+      "pairs": 1036
+    },
+    {
+      "dir": "docs/releases",
+      "source": "brand",
+      "files": 10,
+      "pairs": 172
+    }
+  ],
+  "excluded_dirs": [
+    "docs/deployment",
+    "docs/setup",
+    "docs/security",
+    "docs/backup",
+    "docs/diagnostics"
+  ],
+  "gated_sources_pending": [
+    "platform",
+    "consumable",
+    "cosmo"
+  ],
+  "totals": {
+    "pairs_total": 4068,
+    "cosmo_cleared": 3954,
+    "cosmo_flagged": 114,
+    "duplicates_dropped": 487,
+    "est_tokens": 1243498,
+    "malformed_lines": 0
+  },
+  "by_source": {
+    "institute": 1257,
+    "bioelectric": 634,
+    "brand": 2063
+  },
+  "by_type": {
+    "voice": 514,
+    "technical": 2541,
+    "instruction": 732,
+    "philosophy": 167
+  },
+  "by_arc_position": {
+    "0-3mo": 2311,
+    "12mo+": 419,
+    "6-12mo": 497,
+    "3-6mo": 727
+  },
+  "by_body_state": {
+    "calibration": 2311,
+    "hardware": 419,
+    "coherence": 497,
+    "pattern": 727
+  },
+  "by_register": {
+    "POETRY": 540,
+    "BEING_THERE": 651,
+    "GRACE": 76,
+    "LOVE": 89,
+    "HUGS": 165,
+    "BEING_COOL": 47
+  },
+  "flag_reasons": {
+    "pii-or-secret": 20,
+    "sensitive-file": 93,
+    "crisis-language": 1
+  },
+  "gate": {
+    "sources_inventoried": true,
+    "tagged_per_schema": true,
+    "all_training_cosmo_cleared": true,
+    "corpus_over_10000_pairs": false,
+    "jsonl_valid": true,
+    "vadik_review_100": false,
+    "result": "HOLD"
+  }
+}
