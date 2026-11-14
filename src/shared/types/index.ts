@@ -71,6 +71,7 @@ export type UserProfile = {
   tags: string[];
   hideActivityLogs: boolean;
   timeChime?: boolean;
+  joinedAt?: Date | string | null;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
 };

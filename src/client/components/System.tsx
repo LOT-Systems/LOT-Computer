@@ -1008,14 +1008,17 @@ export const System = React.memo(function SystemInner() {
       </WidgetErrorBoundary>
 
       {/* CQGS Biofield Engine Widgets */}
+      {/* Lazy-mounted (display-only at mount — no signal writes / monitors) */}
       <WidgetErrorBoundary name="Biofield Engine">
-        <div className={cn('flex flex-col', density.sectionGap)}>
-          <QuantumStateWidget />
-          <PatternRecognitionWidget />
-          <AIFeedbackWidget />
-          <SignalStreamWidget />
-          <IntegrityWidget />
-        </div>
+        <LazyMount>
+          <div className={cn('flex flex-col', density.sectionGap)}>
+            <QuantumStateWidget />
+            <PatternRecognitionWidget />
+            <AIFeedbackWidget />
+            <SignalStreamWidget />
+            <IntegrityWidget />
+          </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* CQGS Dashboard stack */}
@@ -1037,28 +1040,37 @@ export const System = React.memo(function SystemInner() {
 
       {/* Architect — executive self-assembly telemetry, paid users only */}
       <WidgetErrorBoundary name="Architect">
-        <ArchitectWidget />
+        <LazyMount>
+          <ArchitectWidget />
+        </LazyMount>
       </WidgetErrorBoundary>
 
-      {/* Stats stack */}
+      {/* Stats stack — lazy-mounted: 7 polling queries (2-min refetch) only
+          start once the user scrolls near the bottom of the System tab */}
       <WidgetErrorBoundary name="Stats">
-        <div className={cn('flex flex-col', density.sectionGap)}>
-          <IntentionPatterns />
-          <CollectiveConsciousness />
-          <WellnessPulse />
-          <MemoryEngineStats />
-          <GrowthMilestones />
-          <BadgeUnlockFeed />
-        </div>
+        <LazyMount>
+          <div className={cn('flex flex-col', density.sectionGap)}>
+            <IntentionPatterns />
+            <CollectiveConsciousness />
+            <WellnessPulse />
+            <MemoryEngineStats />
+            <GrowthMilestones />
+            <BadgeUnlockFeed />
+          </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Calendar — Personal date planner */}
       <WidgetErrorBoundary name="Calendar">
-        <CalendarWidget />
+        <LazyMount>
+          <CalendarWidget />
+        </LazyMount>
       </WidgetErrorBoundary>
 
       <WidgetErrorBoundary name="Benchmark">
-        <BenchmarkWidget />
+        <LazyMount>
+          <BenchmarkWidget />
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* The original. Imitation is the sincerest form of flattery, but the quantum field knows. */}

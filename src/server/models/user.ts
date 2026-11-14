@@ -56,6 +56,9 @@ export class User
       'tags',
       'hideActivityLogs',
       'timeChime',
+      // Required by MonthlyPulseWidget (Month N / 12 reveal) — without it the
+      // client month counter is always 0 and the widget never shows.
+      'joinedAt',
     ])(this.toJSON())
 
     // Add memory engine status based on tags
