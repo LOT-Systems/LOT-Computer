@@ -20,6 +20,7 @@ import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
+import { DOCTRINE_LINES, RATION_MANIFEST, RATION_PRICE_USD } from '#shared/constants/basic-ration'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -1358,4 +1359,17 @@ export default async (fastify: FastifyInstance) => {
       })
     }
   })
+
+  // LOT-FM-001 — OPEN TAB. Public ledger: nomenclature + cadence. COGS withheld.
+  fastify.get('/basic/manifest', async () => {
+    return {
+      module: 'BASIC / LOT-FM-001',
+      priceUsdMonthly: RATION_PRICE_USD,
+      doctrine: DOCTRINE_LINES,
+      items: RATION_MANIFEST.map(({ seq, nomenclature, cadence, qty, unit, category }) => ({
+        seq, nomenclature, cadence, qty, unit, category,
+      })),
+    }
+  })
 }
+

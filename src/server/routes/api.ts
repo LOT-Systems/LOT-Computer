@@ -34,6 +34,7 @@ import {
 import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
+import { issueDateFrom, itemsForIssue, periodLabelFor } from '#shared/constants/basic-ration'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
@@ -5614,4 +5615,130 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
       }
     }
   )
+
+  // ============================================================================
+  // LOT-FM-001 — BASIC RATION MODULE
+  // State machine: USERSHIP → PENDING → ON_STRENGTH → STEADY_STATE.
+  // STAND DOWN returns the row to USERSHIP (ration dropped, AI plan and issue
+  // log retained). Fulfillment transitions live in admin-api (operator-only).
+  // ============================================================================
+
+  const basicLog = async (req: FastifyRequest, text: string, metadata: Record<string, any>) => {
+    try {
+      const context = await getLogContext(req.user)
+      await fastify.models.Log.create({ userId: req.user.id, event: 'other', text, metadata, context })
+    } catch (err) {
+      console.error('[BASIC] log write failed:', err)
+    }
+  }
+
+  // GET /api/basic/subscription — current subscriber status
+  fastify.get('/basic/subscription', async (req: FastifyRequest) => {
+    const sub = await fastify.models.BasicSubscription.findOne({
+      where: { userId: req.user.id },
+    })
+    return sub ?? null
+  })
+
+  // POST /api/basic/upgrade — USERSHIP → PENDING
+  fastify.post('/basic/upgrade', async (req: FastifyRequest, reply) => {
+    const existing = await fastify.models.BasicSubscription.findOne({
+      where: { userId: req.user.id },
+    })
+    if (existing && existing.status !== 'USERSHIP') {
+      return reply.status(409).send({ error: 'ALREADY ON STRENGTH OR PENDING' })
+    }
+    const sub = existing
+      ? await existing.update({ status: 'PENDING' })
+      : await fastify.models.BasicSubscription.create({ userId: req.user.id, status: 'PENDING' })
+    await basicLog(req, 'BASIC: UPGRADE INITIATED — PENDING ROSTER', {
+      type: 'basic_upgrade',
+      subscriptionId: sub.id,
+    })
+    return sub
+  })
+
+  const ROSTER_REQUIRED = [
+    'shippingName', 'shippingLine1', 'shippingCity', 'shippingState',
+    'shippingZip', 'shippingCountry', 'shirtSize', 'shoeSize',
+  ] as const
+  const ROSTER_OPTIONAL = ['shippingLine2'] as const
+
+  // POST /api/basic/roster — roster intake → ON_STRENGTH + schedule next issue
+  fastify.post<{ Body: Record<string, unknown> }>('/basic/roster', async (req, reply) => {
+    const sub = await fastify.models.BasicSubscription.findOne({
+      where: { userId: req.user.id },
+    })
+    if (!sub) return reply.status(404).send({ error: 'NO SUBSCRIPTION FOUND' })
+    if (sub.status !== 'PENDING') {
+      return reply.status(409).send({ error: 'ROSTER ALREADY CONFIRMED' })
+    }
+
+    // Whitelist fields — never spread the request body into the model.
+    const body = req.body || {}
+    const fields: Record<string, string | null> = {}
+    for (const key of ROSTER_REQUIRED) {
+      const v = typeof body[key] === 'string' ? (body[key] as string).trim() : ''
+      if (!v || v.length > 200) {
+        return reply.status(400).send({ error: `INVALID FIELD: ${key}` })
+      }
+      fields[key] = v
+    }
+    for (const key of ROSTER_OPTIONAL) {
+      const v = typeof body[key] === 'string' ? (body[key] as string).trim().slice(0, 200) : ''
+      fields[key] = v || null
+    }
+
+    const cadenceStart = issueDateFrom(new Date(), 1)
+    const lastIssueNumber =
+      ((await fastify.models.BasicIssue.max('issueNumber', {
+        where: { subscriptionId: sub.id },
+      })) as number | null) ?? 0
+    const issueNumber = lastIssueNumber + 1
+
+    await sub.update({ ...fields, status: 'ON_STRENGTH', cadenceStart })
+    await fastify.models.BasicIssue.create({
+      subscriptionId: sub.id,
+      userId: req.user.id,
+      issueNumber,
+      periodLabel: periodLabelFor(cadenceStart),
+      itemCount: itemsForIssue(issueNumber).length,
+      status: 'SCHEDULED',
+      issuedAt: cadenceStart,
+    })
+
+    await basicLog(req, `BASIC: ON STRENGTH — ISSUE ${issueNumber} ${periodLabelFor(cadenceStart)}`, {
+      type: 'basic_roster',
+      subscriptionId: sub.id,
+    })
+    return sub
+  })
+
+  // POST /api/basic/stand-down — PENDING | ON_STRENGTH | STEADY_STATE → USERSHIP
+  fastify.post('/basic/stand-down', async (req: FastifyRequest, reply) => {
+    const sub = await fastify.models.BasicSubscription.findOne({
+      where: { userId: req.user.id },
+    })
+    if (!sub || sub.status === 'USERSHIP') {
+      return reply.status(404).send({ error: 'NOT ON STRENGTH' })
+    }
+    await fastify.models.BasicIssue.update(
+      { status: 'CANCELLED' },
+      { where: { subscriptionId: sub.id, status: 'SCHEDULED' } }
+    )
+    await sub.update({ status: 'USERSHIP' })
+    await basicLog(req, 'BASIC: STAND DOWN — RATION DROPPED, AI PLAN RETAINED', {
+      type: 'basic_stand_down',
+      subscriptionId: sub.id,
+    })
+    return { ok: true }
+  })
+
+  // GET /api/basic/issues — issue log for this subscriber
+  fastify.get('/basic/issues', async (req: FastifyRequest) => {
+    return fastify.models.BasicIssue.findAll({
+      where: { userId: req.user.id },
+      order: [['issueNumber', 'ASC']],
+    })
+  })
 }

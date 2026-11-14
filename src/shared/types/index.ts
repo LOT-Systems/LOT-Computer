@@ -445,6 +445,57 @@ export type ChatMessageLikeEventPayload = {
   isLiked?: boolean;
 };
 
+// LOT-FM-001 — BASIC RATION MODULE
+export type BasicSubscriptionStatus = 'USERSHIP' | 'PENDING' | 'ON_STRENGTH' | 'STEADY_STATE'
+
+export type BasicSubscription = {
+  id: string
+  userId: string
+  status: BasicSubscriptionStatus
+  shippingName: string | null
+  shippingLine1: string | null
+  shippingLine2: string | null
+  shippingCity: string | null
+  shippingState: string | null
+  shippingZip: string | null
+  shippingCountry: string | null
+  shirtSize: string | null
+  shoeSize: string | null
+  cadenceStart: Date | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type RosterIntakePayload = {
+  shippingName: string
+  shippingLine1: string
+  shippingLine2?: string
+  shippingCity: string
+  shippingState: string
+  shippingZip: string
+  shippingCountry: string
+  shirtSize: string
+  shoeSize: string
+}
+
+export type BasicIssueStatus = 'SCHEDULED' | 'PACKED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED'
+
+export type BasicIssue = {
+  id: string
+  subscriptionId: string
+  userId: string
+  issueNumber: number
+  periodLabel: string | null
+  itemCount: number | null
+  status: BasicIssueStatus
+  issuedAt: Date | null
+  shippedAt: Date | null
+  deliveredAt: Date | null
+  trackingNumber: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
 // Sync Events
 export type SyncEvents = {
   chatMessage: PublicChatMessage;

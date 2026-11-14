@@ -19,6 +19,7 @@ import { Umzug, SequelizeStorage } from 'umzug'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { escapeHtml } from '../utils/security.js'
+import { issueDateFrom, itemsForIssue, periodLabelFor } from '#shared/constants/basic-ration'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -2390,4 +2391,70 @@ export default async (fastify: FastifyInstance) => {
       })
     }
   })
+
+  // ============================================================================
+  // LOT-FM-001 — BASIC RATION FULFILLMENT (operator-only)
+  // Forward-only issue transitions. DELIVERED advances the subscriber to
+  // STEADY_STATE and schedules the next issue on cadence (anchored to the
+  // delivered issue's month, not wall-clock).
+  // ============================================================================
+  const BASIC_TRANSITIONS: Record<string, string[]> = {
+    SCHEDULED: ['PACKED', 'CANCELLED'],
+    PACKED: ['SHIPPED', 'CANCELLED'],
+    SHIPPED: ['DELIVERED'],
+    DELIVERED: [],
+    CANCELLED: [],
+  }
+
+  fastify.get('/basic/issues', async () => {
+    return fastify.models.BasicIssue.findAll({
+      where: { status: { [Op.in]: ['SCHEDULED', 'PACKED', 'SHIPPED'] } },
+      order: [['issuedAt', 'ASC']],
+    })
+  })
+
+  fastify.post<{ Params: { id: string }; Body: { status?: string; trackingNumber?: string } }>(
+    '/basic/issues/:id/advance',
+    async (req, reply) => {
+      const issue = await fastify.models.BasicIssue.findByPk(req.params.id)
+      if (!issue) return reply.status(404).send({ error: 'ISSUE NOT FOUND' })
+
+      const next = String(req.body?.status || '')
+      if (!(BASIC_TRANSITIONS[issue.status] || []).includes(next)) {
+        return reply.status(409).send({ error: `INVALID TRANSITION ${issue.status} -> ${next}` })
+      }
+
+      const updates: Record<string, any> = { status: next }
+      if (typeof req.body?.trackingNumber === 'string' && req.body.trackingNumber.trim()) {
+        updates.trackingNumber = req.body.trackingNumber.trim().slice(0, 100)
+      }
+      if (next === 'SHIPPED') updates.shippedAt = new Date()
+      if (next === 'DELIVERED') updates.deliveredAt = new Date()
+      await issue.update(updates)
+
+      if (next === 'DELIVERED') {
+        const sub = await fastify.models.BasicSubscription.findByPk(issue.subscriptionId)
+        if (sub && (sub.status === 'ON_STRENGTH' || sub.status === 'STEADY_STATE')) {
+          if (sub.status === 'ON_STRENGTH') await sub.update({ status: 'STEADY_STATE' })
+          const nextIssueNumber = issue.issueNumber + 1
+          const exists = await fastify.models.BasicIssue.findOne({
+            where: { subscriptionId: sub.id, issueNumber: nextIssueNumber },
+          })
+          if (!exists) {
+            const issueDate = issueDateFrom(issue.issuedAt ? new Date(issue.issuedAt) : new Date(), 1)
+            await fastify.models.BasicIssue.create({
+              subscriptionId: sub.id,
+              userId: sub.userId,
+              issueNumber: nextIssueNumber,
+              periodLabel: periodLabelFor(issueDate),
+              itemCount: itemsForIssue(nextIssueNumber).length,
+              status: 'SCHEDULED',
+              issuedAt: issueDate,
+            })
+          }
+        }
+      }
+      return issue
+    }
+  )
 }
