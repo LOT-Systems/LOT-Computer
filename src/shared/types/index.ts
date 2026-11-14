@@ -73,6 +73,8 @@ export type UserProfile = {
   timeChime?: boolean;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
+  // Activation date — drives the Usership 12-month journey (MonthlyPulseWidget)
+  joinedAt?: Date | string | null;
 };
 
 export type User = {

@@ -13,22 +13,18 @@ import { Block } from '#client/components/ui'
 import { cn } from '#client/utils'
 import { UserTag } from '#shared/types'
 import dayjs from '#client/utils/dayjs'
+import {
+  USERSHIP_TOTAL_MONTHS,
+  buildMonthStrip,
+  countMonthsUnlocked,
+  getUsershipChapter,
+  getUsershipMonth,
+  usershipMonthFromDays,
+  type UsershipMonthGrade,
+} from '#shared/constants/usership-journey'
 
-// One message per milestone month; everything in between gets the generic line.
-const MONTH_MESSAGES: Record<number, string> = {
-  1:  'The first month. The system is beginning to know you.',
-  2:  'Two months in. Patterns are starting to form.',
-  3:  'Three months. You have reached Active User status.',
-  4:  'Four months. The portrait deepens.',
-  5:  'Five months. Consistency is its own reward.',
-  6:  'Six months. The journey is half-declared.',
-  7:  'Seven months in. The system has been listening.',
-  8:  'Eight months. Rare air.',
-  9:  'Nine months. The self-care practice is a habit now.',
-  10: 'Ten months. Almost there.',
-  11: 'Eleven months. One more.',
-  12: 'One year with LOT. The portrait is complete — and still evolving.',
-}
+// Month stages, glyphs and messages live in the shared Usership Journey config.
+// Spec: docs/technical/LOT-USERSHIP-12-MONTH-EVOLUTION.md
 
 const DISMISS_PHRASES = [
   'Onward.',
@@ -70,13 +66,30 @@ export const MonthlyPulseWidget: React.FC = () => {
     )
   }, [user])
 
+  // Usership month is 1-based from Day 1 (30-day anniversary windows):
+  // Day 0–29 = Month 1, so a new member is greeted on their first day.
   const monthNumber = React.useMemo(() => {
     if (!user?.joinedAt) return 0
-    const joined = dayjs(user.joinedAt)
-    const now = dayjs()
-    const months = now.diff(joined, 'month')
-    return Math.max(0, months)
+    const days = dayjs().diff(dayjs(user.joinedAt), 'day')
+    return usershipMonthFromDays(days)
   }, [user?.joinedAt])
+
+  // P0: calendar approximation — completed months count as unlocked, the
+  // current month is open. P1 replaces this with evidence-gated grades from
+  // the server (journal, answers, morning check-ins, self-care).
+  const grades = React.useMemo<UsershipMonthGrade[]>(() => {
+    return Array.from({ length: USERSHIP_TOTAL_MONTHS }, (_, i) => {
+      const m = i + 1
+      if (m < monthNumber) return 'unlocked'
+      if (m === monthNumber) return 'open'
+      return 'locked'
+    })
+  }, [monthNumber])
+
+  const [view, setView] = React.useState<'month' | 'unlocked'>('month')
+  const cycleView = React.useCallback(() => {
+    setView((prev) => (prev === 'month' ? 'unlocked' : 'month'))
+  }, [])
 
   const [visible, setVisible] = React.useState(false)
   const [isShown, setIsShown] = React.useState(false)
@@ -103,10 +116,14 @@ export const MonthlyPulseWidget: React.FC = () => {
 
   if (!visible) return null
 
-  const message = MONTH_MESSAGES[Math.min(monthNumber, 12)] ??
-    `Month ${monthNumber}. The journey continues.`
-  const capped = Math.min(monthNumber, 12)
-  const label = `Month ${capped}:`
+  const capped = Math.min(monthNumber, USERSHIP_TOTAL_MONTHS)
+  const monthDef = getUsershipMonth(capped)
+  const chapter = getUsershipChapter(capped)
+  const message = monthNumber > USERSHIP_TOTAL_MONTHS
+    ? `Month ${monthNumber}. The journey continues.`
+    : monthDef?.message ?? `Month ${monthNumber}. The journey continues.`
+  const label = view === 'month' ? `Month ${capped}:` : 'Unlocked:'
+  const unlockedCount = countMonthsUnlocked(grades)
 
   return (
     <div
@@ -115,7 +132,7 @@ export const MonthlyPulseWidget: React.FC = () => {
         isFading ? 'opacity-0' : 'opacity-100'
       )}
     >
-      <Block label={label} blockView>
+      <Block label={label} blockView onLabelClick={cycleView}>
         <div
           onClick={handleDismiss}
           className="cursor-pointer select-none"
@@ -129,10 +146,27 @@ export const MonthlyPulseWidget: React.FC = () => {
                 isShown && 'opacity-100'
               )}
             >
-              <div>{message}</div>
-              <div className="opacity-30 mt-4 text-sm">
-                {capped} / 12 months
-              </div>
+              {view === 'month' ? (
+                <>
+                  <div>{message}</div>
+                  {monthDef && (
+                    <div className="opacity-60 mt-4 text-sm">
+                      {monthDef.glyph} {monthDef.name}
+                      {chapter && ` · Chapter ${chapter.chapter}: ${chapter.title}`}
+                    </div>
+                  )}
+                  <div className="opacity-30 mt-4 text-sm">
+                    {capped} / {USERSHIP_TOTAL_MONTHS} months
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="whitespace-pre-wrap">{buildMonthStrip(grades)}</div>
+                  <div className="opacity-60 mt-4 text-sm">
+                    Months unlocked: {unlockedCount}/{USERSHIP_TOTAL_MONTHS}
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>
