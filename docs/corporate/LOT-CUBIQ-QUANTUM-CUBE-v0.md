@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START (see R02, R03, R04 reports for amendments to §03/§06)
+VERSION:  0.1 — DEVELOPMENT START (see R02, R03, R04, R05 reports for amendments to §03/§06)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -357,6 +357,22 @@ entry — never editing or removing a prior one.
   local time. Proves the cube's value isn't tied to one desk: it measures
   each new surface before it moves on it.
   Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R04.md, Section 09.
+
+  USE CASE 05 — THE SILENT HOUSEHOLD                        2026-11-14
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, Deaf, a native signer, architectural
+  drafter in a home studio, hearing partner. The home already uses
+  flashing lights for the doorbell and smoke alarm and a bed shaker for
+  waking. For this operator both the phone and the cube are touch
+  channels, so the cube's job is to be told apart from the phone: THE
+  NUDGE becomes a two-beat push signature that a hand on the desk can't
+  mistake for a phone's buzz (R05 §07). The LED ring never blinks, so it
+  never competes with alert lights. During a live signed call, gestures
+  drop to SETTLE, because motion next to a signer pulls the eye off the
+  conversation. Quiet hours still apply for the sleeping partner.
+  Proves that a motion-first, sound-free cube suits Deaf operators
+  especially well, and that they belong on the design panel from the
+  start. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R05.md, Section 09.
 
 --------------------------------------------------------------------------------
 08 // BRAND
