@@ -43,6 +43,18 @@ import { generateUserNarrative } from '#server/utils/rpg-narrative'
 import { generateChatCatalysts, generateConversationStarters, shouldShowChatCatalyst } from '#server/utils/cohort-chat-catalyst'
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
+import {
+  compressStory,
+  selectAutoHorizon,
+  renderPacketForPrompt,
+  renderStoryHeader,
+  composeFallbackStory,
+  STORY_HORIZONS,
+  JOURNAL_EVENTS,
+  MOOD_EVENTS,
+  ANSWER_EVENTS,
+  SELFCARE_EVENTS,
+} from '#shared/utils/story-compression'
 import { registerOSRoutes } from './os-api.js'
 
 // ============================================================================
@@ -5479,9 +5491,14 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   )
 
   // ============================================================================
-  // STORY — Contextual AI Story
-  // Generates a 1-2 paragraph story based on recent logs, self-care events,
-  // and widget data. The story reflects the operator's recent journey.
+  // STORY — LOT® Story Compression (SCE v1)
+  // /story [day|week|month|year] — compresses the operator's context-stamped
+  // records for the chosen horizon into a Story Packet (#shared/utils/
+  // story-compression), frames it through the Quantum Intent state, sends
+  // ONLY the packet to the AI vendor (Together AI), and persists the result
+  // as a `generated_story` log. Omitted horizon → auto (smallest horizon
+  // holding ≥3 signals). Vendor offline → deterministic local story.
+  // Spec: docs/technical/LOT-LOG-COMMAND-SYSTEM.md
   // ============================================================================
   fastify.post(
     '/story',
@@ -5490,6 +5507,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          horizon?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5513,105 +5531,110 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         })
       }
 
-      const { logText, quantumState, userIndex } = req.body
+      const { logText, quantumState, userIndex } = req.body || ({} as any)
+      const requested = String(req.body?.horizon || '').toLowerCase()
+      const now = new Date()
 
-      const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+      // Pull one year of signal-bearing events only (bounded). Auto-horizon
+      // needs the wider window; explicit horizons filter inside compressStory.
+      const rows = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: { [Op.in]: [...JOURNAL_EVENTS, ...MOOD_EVENTS, ...ANSWER_EVENTS, ...SELFCARE_EVENTS] },
+          createdAt: { [Op.gte]: new Date(now.getTime() - 365 * 86400000) },
+        },
+        attributes: ['createdAt', 'event', 'text', 'metadata', 'context'],
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 3000,
       })
+      const logs = rows.map((r: any) => (r.toJSON ? r.toJSON() : r))
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
+      const horizon =
+        requested in STORY_HORIZONS
+          ? (requested as keyof typeof STORY_HORIZONS)
+          : selectAutoHorizon(logs, now)
+      const auto = !(requested in STORY_HORIZONS)
+      const packet = compressStory(logs, horizon, { now })
+      const header = renderStoryHeader(packet)
+      const followUp = packet.followUp
 
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
-
-      let stateBlock = ''
+      let stateBlock = 'QUANTUM INTENT STATE: unknown'
       if (quantumState && quantumState.energy) {
-        stateBlock = `OPERATOR STATE: ${quantumState.energy} energy, ${quantumState.clarity} clarity, ${quantumState.alignment} alignment`
+        stateBlock = `QUANTUM INTENT STATE: ${quantumState.energy} energy, ${quantumState.clarity} clarity, ${quantumState.alignment} alignment${quantumState.needsSupport ? `, support need ${quantumState.needsSupport}` : ''}`
       }
       if (userIndex && userIndex.overall !== undefined) {
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
-
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+      const noun = STORY_HORIZONS[horizon].noun
+      const systemPrompt = `You are the Story module of LOT Systems — a personal, context-based self-care operating system. Every record below was captured with its environmental context (place, weather, moon, sun sign). Your task: compress the operator's ${noun} into a short narrative that returns their own pattern to them.
 
 RULES:
 - Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
-- End with a single forward-looking sentence — not a pep talk, just a quiet truth
-- Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- 1-2 paragraphs, ${horizon === 'day' ? '70-130' : horizon === 'year' ? '150-230' : '110-190'} words
+- Use ONLY facts in the STORY PACKET. Never invent events, people or places.
+- Name the HIGH PEAK and LOW PEAK when present, with their dates — gently, without judgement
+- Weave in environment (place, weather, moon) only where it adds meaning
+- Acknowledge presence (days active, streak) without praise inflation
+- If data is thin, say so honestly in one sentence
+- No title, no lists, no preamble, no closing question (the system appends its own)
+- End with one quiet, forward-looking sentence — not a pep talk`
 
-      const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+      const fullPrompt = `${systemPrompt}
 
-${stateBlock ? stateBlock : 'STATE: unknown'}
+${stateBlock}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
+OPERATOR LOG ENTRY (current): "${String(logText || '').replace(/\/story\s*\w*/i, '').replace(/📖/g, '').trim().substring(0, 300) || '(none)'}"
 
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
+STORY PACKET:
+${renderPacketForPrompt(packet)}`
 
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
+      let story: string
+      let engineUsed: 'together' | 'local' = 'together'
+      if (packet.counts.total === 0) {
+        story = composeFallbackStory(packet)
+        engineUsed = 'local'
+      } else {
+        try {
+          const { aiEngineManager } = await import('#server/utils/ai-engines.js')
+          const engine = aiEngineManager.getEngine('together')
+          console.log(`📖 Story [${horizon}${auto ? ' auto' : ''}] for user ${req.user.id}: ${packet.counts.total} signals, ${packet.compression.ratio}× compression`)
+          const raw = await engine.generateCompletion(fullPrompt, 640)
+          story = String(raw || '').trim().replace(/^["']|["']$/g, '')
+          if (!story) throw new Error('empty completion')
+        } catch (error: any) {
+          console.error('Story generation failed, using local composer:', error?.message || error)
+          story = composeFallbackStory(packet)
+          engineUsed = 'local'
+        }
+      }
 
-      const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
-
+      let logId: string | null = null
       try {
-        const { aiEngineManager } = await import('#server/utils/ai-engines.js')
-        const engine = aiEngineManager.getEngine('together')
-
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
-
-        const story = await engine.generateCompletion(fullPrompt, 512)
-
-        const cleaned = story.trim().replace(/^["']|["']$/g, '')
-
         const context = await getLogContext(req.user)
         const storyLog = await fastify.models.Log.create({
           userId: req.user.id,
-          text: cleaned,
+          text: story,
           event: 'generated_story',
           context,
           metadata: {
-            story: cleaned,
-            logText: (logText || '').substring(0, 500),
+            story,
+            horizon,
+            auto,
+            engine: engineUsed,
+            followUp,
+            packet,
+            logText: String(logText || '').substring(0, 500),
             quantumState: quantumState || null,
-            timestamp: new Date().toISOString(),
+            timestamp: now.toISOString(),
           },
         })
-
-        return {
-          story: cleaned,
-          logId: storyLog.id,
-        }
+        logId = storyLog.id
       } catch (error: any) {
-        console.error('Story generation failed:', error)
-        return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
-          logId: null,
-        }
+        console.error('Story persistence failed:', error?.message || error)
       }
+
+      return { story, logId, horizon, auto, header, followUp, engine: engineUsed }
     }
   )
 }

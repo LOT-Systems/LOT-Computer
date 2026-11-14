@@ -895,6 +895,8 @@ export const usePrayerScripture = createMutation<
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    /** 'day' | 'week' | 'month' | 'year'. Omit for auto-horizon. */
+    horizon?: string
     quantumState?: {
       energy?: string
       clarity?: string
@@ -910,5 +912,12 @@ export const useStoryGeneration = createMutation<
   {
     story: string
     logId: string | null
+    horizon?: 'day' | 'week' | 'month' | 'year'
+    auto?: boolean
+    /** Terminal header lines (HORIZON / SIGNALS / HIGH / LOW / ARCADE). */
+    header?: string[]
+    /** Loop-closing question the machine asks back. */
+    followUp?: string | null
+    engine?: 'together' | 'local'
   }
 >('post', '/api/story')

@@ -115,3 +115,83 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+// ─────────────────────────────────────────────────────────────────────
+// COMMAND REGISTRY — single source of truth for `/system`.
+//
+// Every user-facing slash command is declared here once. The `/system`
+// screen is rendered from this table, so the help text can never drift
+// from what the detector actually recognises. A unit check in
+// scripts/tests/test-log-commands.ts asserts that every registry
+// command resolves to a RULES trigger.
+// ─────────────────────────────────────────────────────────────────────
+
+export type CommandGroup = 'NARRATIVE' | 'INTELLIGENCE' | 'SELF-CARE' | 'ENVIRONMENT' | 'SYSTEM'
+
+export interface LogCommand {
+  command: string // as typed, without arguments: "/story"
+  usage?: string // argument hint: "[day|week|month|year]"
+  description: string
+  group: CommandGroup
+  trigger: LogTrigger
+  aliases?: string[]
+}
+
+export const COMMAND_GROUP_ORDER: CommandGroup[] = [
+  'NARRATIVE', 'INTELLIGENCE', 'SELF-CARE', 'ENVIRONMENT', 'SYSTEM',
+]
+
+export const LOG_COMMANDS: LogCommand[] = [
+  { command: '/story',    usage: '[day|week|month|year]', description: 'Compressed story of your day, week, month or year — peaks, context, XP', group: 'NARRATIVE', trigger: 'story-mode' },
+  { command: '/prayer',   description: 'Contextual scripture for this moment', group: 'NARRATIVE', trigger: 'prayer-mode', aliases: ['/candle'] },
+  { command: '/qi',       usage: '[question]', description: 'Ask the Quantum Intelligence engine', group: 'INTELLIGENCE', trigger: 'qi-rfi' },
+  { command: '/scan',     description: 'System status overview', group: 'INTELLIGENCE', trigger: 'ai-scan', aliases: ['/ai'] },
+  { command: '/qos',      description: 'Quantum OS state analysis', group: 'INTELLIGENCE', trigger: 'qos-report' },
+  { command: '/assembly', description: 'Self-assembly module status', group: 'INTELLIGENCE', trigger: 'assembly-check' },
+  { command: '/phys',     description: 'Physiological cohort report', group: 'INTELLIGENCE', trigger: 'phys-report' },
+  { command: '/how',      description: 'Open LOT AI check-in (System tab)', group: 'SELF-CARE', trigger: 'how-checkin' },
+  { command: '/breathe',  description: '4-2-6 breathing exercise', group: 'SELF-CARE', trigger: 'breathe' },
+  { command: '/freeze',   description: 'Pause and reflect protocol', group: 'SELF-CARE', trigger: 'freeze-widgets', aliases: ['/pause'] },
+  { command: '/silent',   description: 'Signal silence check', group: 'SELF-CARE', trigger: 'silent-mode', aliases: ['/quiet'] },
+  { command: '/fast',     description: 'Orthodox fasting calendar', group: 'SELF-CARE', trigger: 'force-fast' },
+  { command: '/radio',    description: 'Toggle radio', group: 'ENVIRONMENT', trigger: 'radio-toggle' },
+  { command: '/synth',    description: 'Toggle keyboard sound', group: 'ENVIRONMENT', trigger: 'toggle-synth', aliases: ['/keyboard'] },
+  { command: '/night',    description: 'Dark mode', group: 'ENVIRONMENT', trigger: 'night-mode' },
+  { command: '/system',   description: 'This command index', group: 'SYSTEM', trigger: 'system-help', aliases: ['/commands'] },
+]
+
+/** Triggers whose handler reads an argument typed after the command. */
+export const DEFERRED_TRIGGERS: LogTrigger[] = ['story-mode', 'qi-rfi']
+
+/** Milliseconds of typing silence before a deferred command fires. */
+export const DEFERRED_TRIGGER_IDLE_MS = 1200
+
+/** Returns the keyword list a trigger answers to (for tests / docs). */
+export function keywordsForTrigger(trigger: LogTrigger): string[] {
+  return RULES.find(r => r.trigger === trigger)?.keywords || []
+}
+
+/**
+ * Renders the `/system` screen. Lines starting with "/" are commands
+ * (command + two-space gap + description); other non-empty lines are
+ * section headers. Format is consumed by the SYSTEM block in Logs.tsx.
+ */
+export function renderSystemHelp(commands: LogCommand[] = LOG_COMMANDS): string {
+  const lines: string[] = ['LOT® LOG — COMMAND INDEX', '']
+  for (const group of COMMAND_GROUP_ORDER) {
+    const inGroup = commands.filter(c => c.group === group)
+    if (!inGroup.length) continue
+    lines.push(group)
+    for (const c of inGroup) {
+      const head = c.usage ? `${c.command} ${c.usage}` : c.command
+      lines.push(`${head}  ${c.description}`)
+    }
+    lines.push('')
+  }
+  lines.push('EMOJI TRIGGERS')
+  lines.push('📖 story · 🕯️ prayer · 🎧 radio · 🎹 synth · 🌙 night · 🧊 freeze')
+  lines.push('')
+  lines.push('SHORTCUTS')
+  lines.push('Ctrl+Enter — save log immediately')
+  return lines.join('\n')
+}

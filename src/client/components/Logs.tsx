@@ -28,7 +28,15 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import {
+  detectNewTriggers,
+  detectTriggers,
+  renderSystemHelp,
+  DEFERRED_TRIGGERS,
+  DEFERRED_TRIGGER_IDLE_MS,
+  type LogTrigger,
+} from '#client/utils/logTriggers'
+import { parseStoryHorizon } from '#shared/utils/story-compression'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3706,6 +3714,8 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyHeader, setStoryHeader] = React.useState<string[] | null>(null)
+  const [storyFollowUp, setStoryFollowUp] = React.useState<string | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3742,6 +3752,8 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryHeader(data.header || null)
+      setStoryFollowUp(data.followUp || null)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -3932,9 +3944,35 @@ const NoteEditor = ({
   // editing around an existing trigger doesn't re-fire it.
   // --------------------------------------------------------------------
   const lastTriggerScanRef = React.useRef(log.text || '')
+  // Deferred triggers (/story, /qi) take an argument typed AFTER the
+  // command, so they fire only once typing has been idle for
+  // DEFERRED_TRIGGER_IDLE_MS. Each keystroke re-arms the timer, and the
+  // handler always reads the latest text.
+  const pendingDeferredRef = React.useRef<Set<LogTrigger>>(new Set())
+  const deferredTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  React.useEffect(() => () => {
+    if (deferredTimerRef.current) clearTimeout(deferredTimerRef.current)
+  }, [])
   React.useEffect(() => {
-    const fresh = detectNewTriggers(value, lastTriggerScanRef.current)
+    const detected = detectNewTriggers(value, lastTriggerScanRef.current)
     lastTriggerScanRef.current = value
+    const immediate = detected.filter(t => !DEFERRED_TRIGGERS.includes(t))
+    detected.filter(t => DEFERRED_TRIGGERS.includes(t)).forEach(t => pendingDeferredRef.current.add(t))
+    if (pendingDeferredRef.current.size > 0) {
+      if (deferredTimerRef.current) clearTimeout(deferredTimerRef.current)
+      deferredTimerRef.current = setTimeout(() => {
+        // Drop commands the user deleted before the idle window closed.
+        const stillPresent = new Set(detectTriggers(valueRef.current))
+        const due = Array.from(pendingDeferredRef.current).filter(t => stillPresent.has(t))
+        pendingDeferredRef.current.clear()
+        deferredTimerRef.current = null
+        runTriggers(due, valueRef.current)
+      }, DEFERRED_TRIGGER_IDLE_MS)
+    }
+    runTriggers(immediate, value)
+  }, [value])
+
+  function runTriggers(fresh: LogTrigger[], value: string) {
     if (fresh.length === 0) return
 
     for (const trigger of fresh as LogTrigger[]) {
@@ -4053,7 +4091,7 @@ const NoteEditor = ({
         }
       } else if (trigger === 'breathe') {
         setBreatheEnabled(prev => !prev)
-      } else if (trigger === 'silent-mode') {
+      } else if (trigger === 'silent-mode' || trigger === 'sil-check') {
         try {
           const eng = intentionEngine.get()
           const signals = (eng as any).signals || []
@@ -4121,30 +4159,7 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(renderSystemHelp())
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
@@ -4152,21 +4167,25 @@ const NoteEditor = ({
           setStoryLoading(true)
           setStoryResponse(null)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const horizon = parseStoryHorizon(value) || undefined
+            const logText = value.replace(/\/story(\s+[a-z0-9]+)?/i, '').replace(/📖/g, '').trim()
+            setStoryHeader(null)
+            setStoryFollowUp(null)
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              horizon,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: value, horizon: parseStoryHorizon(value) || undefined })
           }
         }
       }
     }
-  }, [value])
+  }
 
   const contextText = React.useMemo(() => {
     if (!log?.context) return ''
@@ -4398,8 +4417,8 @@ const NoteEditor = ({
                     const cmd = spaceIdx > -1 ? line.slice(0, spaceIdx) : line
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
-                      <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                      <div key={idx} style={{ display: 'flex', flexWrap: 'wrap', columnGap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
+                        <span style={{ minWidth: '120px', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )
@@ -4420,12 +4439,22 @@ const NoteEditor = ({
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
               )}
+              {storyResponse && storyHeader && storyHeader.length > 0 && (
+                <div className="opacity-40 mb-4" style={{ fontSize: '11px', letterSpacing: '0.06em', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
+                  {storyHeader.map((line, idx) => (
+                    <div key={idx}>{line}</div>
+                  ))}
+                </div>
+              )}
               {storyResponse && (
                 <div className="opacity-60">
                   {storyResponse.split('\n').map((line, idx) => (
                     <div key={idx}>{line || <br />}</div>
                   ))}
                 </div>
+              )}
+              {storyResponse && storyFollowUp && (
+                <div className="opacity-80 mt-4">↳ {storyFollowUp}</div>
               )}
             </Block>
           </div>
