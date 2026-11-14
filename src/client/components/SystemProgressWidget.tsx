@@ -1512,18 +1512,18 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-11-14',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-11-14 · QIE v114 · SOVEREIGN EPOCH MATURATION · Day 1174+',
+    'Built: P152 quantum-os-maturation · P153 signal-epoch-transition · P154 coherence-field-sovereign.',
+    'Arch52 Quantum Field Sovereign deployed. The OS can now recognize its own apex operating state.',
+    'J49 daily-quantum-maturation-check (20:00 UTC): 7d signal diversity audit. Writes quantum_os_maturation when field is confirmed mature.',
+    'Log cockpit: QOS-MAT: · EPOCH: · COH-LOCK: handlers. The three sovereign codes.',
+    'P154 coherence-field-sovereign: the sovereign apex — total-field-coherence + maturation + epoch all co-active. Confidence up to 0.97.',
+    'WIDGET_DEPENDENCY_MAP: quantumFieldSovereignNode · epochTransitionDetector · maturationMonitor. 193+ nodes total.',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes · Day 1174+.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114 · sovereign state documentation',
   ],
 }
 
