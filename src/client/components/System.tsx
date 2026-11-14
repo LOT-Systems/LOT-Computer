@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getAstrologyReading, getAstroResonance } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -113,7 +113,7 @@ export const System = React.memo(function SystemInner() {
   const myProfileVisits: number = (me as any)?.metadata?.profileVisits ?? 0
 
   const { data: profile } = useProfile()
-  const { data: logs = [] } = useLogs()
+  const { data: logs = [], isFetched: logsFetched } = useLogs()
   const { data: communityEmotion } = useCommunityEmotion()
 
 
@@ -204,22 +204,28 @@ export const System = React.memo(function SystemInner() {
 
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
   // rokuyo), not a personal natal chart.
-  const astrology = React.useMemo(() => {
-    const now = new Date()
-    const hourlyZodiac = getHourlyZodiac(now)
-    const westernZodiac = getWesternZodiac(now)
-    const moonPhase = getMoonPhase(now)
-    const rokuyo = getRokuyo(now)
-
-    return {
-      hourlyZodiac,
-      westernZodiac,
-      moonPhase: moonPhase.phase,
-      moonIllumination: moonPhase.illumination,
-      rokuyo,
-    }
+  // Single shared reading (same function the server uses for Logs context),
+  // so the dashboard and every journal entry agree on the ambient conditions.
+  const astrology = React.useMemo(() => getAstrologyReading(new Date()),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+    [astrologyTick])
+
+  // Logs resonance — personalization from the user's own journal: which
+  // rokuyo / moon phase their written entries most often fall on. Only
+  // entries carrying the astro context snapshot (2026-07-27+) count.
+  const astroResonance = React.useMemo(
+    () => getAstroResonance(logs.filter((l) => l.event === 'note' && !!l.text).map((l) => l.context)),
+    [logs]
+  )
+  const astroResonanceText = React.useMemo(() => {
+    if (!astroResonance) return ''
+    const isTodayYourDay = astroResonance.topRokuyo === astrology.rokuyo
+    const isYourMoon = astroResonance.topMoonPhase === astrology.moonPhase
+    if (isTodayYourDay && isYourMoon) return `Your writing day and moon — ${astroResonance.sample} entries`
+    if (isTodayYourDay) return `${astrology.rokuyo} is your most-written day`
+    if (isYourMoon) return `You write most under the ${astrology.moonPhase}`
+    return `You write most on ${astroResonance.topRokuyo}${astroResonance.topMoonPhase ? ` · ${astroResonance.topMoonPhase}` : ''}`
+  }, [astroResonance, astrology.rokuyo, astrology.moonPhase])
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
@@ -228,15 +234,21 @@ export const System = React.memo(function SystemInner() {
     const today = dayjs().format('YYYY-MM-DD')
     const lastRecordedKey = 'astrology_signal_date'
     if (localStorage.getItem(lastRecordedKey) === today) return
+    // Wait for Logs so the once-a-day signal carries the resonance flag
+    if (!logsFetched) return
     recordAstrologySignal(
       astrology.rokuyo,
       astrology.moonPhase,
       astrology.moonIllumination,
       astrology.hourlyZodiac,
-      astrology.westernZodiac
+      astrology.westernZodiac,
+      {
+        favorableNow: astrology.favorableNow,
+        resonantDay: !!astroResonance && astroResonance.topRokuyo === astrology.rokuyo,
+      }
     )
     localStorage.setItem(lastRecordedKey, today)
-  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac])
+  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac, astrology.favorableNow, astroResonance, logsFetched])
 
   const answerLogs = React.useMemo(() => {
     return logs.filter(log => log.event === 'answer')
@@ -467,6 +479,10 @@ export const System = React.memo(function SystemInner() {
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
+            <div className="opacity-60">
+              {astrology.rokuyoHint}
+              {astroResonanceText && <span className="opacity-60"> · {astroResonanceText}</span>}
+            </div>
           </Block>
         </div>
 
@@ -670,9 +686,15 @@ export const System = React.memo(function SystemInner() {
           }}
         >
           {astrologyView === 'astrology' ? (
-            <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
-            </div>
+            <>
+              <div>
+                {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              </div>
+              <div className="opacity-60">
+                {astrology.rokuyoHint}
+                {astroResonanceText && <span className="opacity-60"> · {astroResonanceText}</span>}
+              </div>
+            </>
           ) : astrologyView === 'psychology' ? (
             <div>
               {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}

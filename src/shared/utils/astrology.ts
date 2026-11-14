@@ -47,7 +47,7 @@ const WESTERN_ZODIAC = [
  */
 export function getJapaneseZodiac(year: number): string {
   // 1900 is year of the Rat (index 0)
-  const index = (year - 1900) % 12
+  const index = (((year - 1900) % 12) + 12) % 12
   return JAPANESE_ZODIAC[index]
 }
 
@@ -80,17 +80,177 @@ export function getHourlyZodiac(date: Date): string {
  * Simplified calculation based on Gregorian calendar
  */
 export function getRokuyo(date: Date): string {
-  // Known starting point: January 1, 2000 was Sensho (index 0)
-  const knownDate = new Date('2000-01-01')
-  const knownRokuyoIndex = 0
-
-  // Calculate days since known date
-  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
-
-  // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
-
+  // Known starting point: January 1, 2000 was Sensho (index 0).
+  // Count whole *calendar* days from the date's own wall-clock Y/M/D, not
+  // raw epoch milliseconds — the old `date.getTime() - new Date('2000-01-01')`
+  // form anchored the day boundary to UTC midnight, so the rokuyo flipped
+  // mid-afternoon/evening for users west of UTC (and mid-morning east of it)
+  // instead of at their local midnight. (2026-11-14 fix)
+  const dayIndex = Math.floor(
+    (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(2000, 0, 1)) /
+      86400000
+  )
+  // Safe modulo — dates before 2000 previously produced a negative index
+  // and an `undefined` rokuyo.
+  const rokuyoIndex = ((dayIndex % 6) + 6) % 6
   return ROKUYO[rokuyoIndex]
+}
+
+/**
+ * Rokuyo guidance — the traditional meaning of each day, resolved against the
+ * current local hour so the reading is time-aware ("morning is favored" reads
+ * differently at 8 AM than at 4 PM). Ambient, not personal.
+ *
+ * `favorable` is true when *this moment* is the favored part of the day.
+ */
+export function getRokuyoGuidance(
+  rokuyo: string,
+  hour: number
+): { meaning: string; hint: string; favorable: boolean } {
+  const isMorning = hour < 12
+  switch (rokuyo) {
+    case 'Sensho':
+      return {
+        meaning: 'Early wins',
+        hint: isMorning ? 'Morning is favored — act early' : 'Morning has passed — keep it light',
+        favorable: isMorning,
+      }
+    case 'Tomobiki':
+      return {
+        meaning: 'Shared luck',
+        hint: hour >= 11 && hour < 13 ? 'Midday pause — step back briefly' : 'Good for gatherings and shared plans',
+        favorable: !(hour >= 11 && hour < 13),
+      }
+    case 'Senpu':
+      return {
+        meaning: 'Patience first',
+        hint: isMorning ? 'Hold steady — afternoon is favored' : 'Afternoon is favored — move now',
+        favorable: !isMorning,
+      }
+    case 'Butsumetsu':
+      return {
+        meaning: 'Quiet day',
+        hint: 'Rest, close loops, avoid new starts',
+        favorable: false,
+      }
+    case 'Taian':
+      return {
+        meaning: 'Great peace',
+        hint: 'Auspicious all day — good for beginnings',
+        favorable: true,
+      }
+    case 'Shakku':
+      return {
+        meaning: 'Take care',
+        hint: hour >= 11 && hour < 13 ? 'Midday window is clear' : 'Move carefully — midday is clearest',
+        favorable: hour >= 11 && hour < 13,
+      }
+    default:
+      return { meaning: '', hint: '', favorable: false }
+  }
+}
+
+/**
+ * Wall-clock Date for a given IANA timeZone, built with the plain Date
+ * constructor so getHours()/getDate()/getMonth() return the *zone's* local
+ * fields regardless of the runtime's own zone. Isomorphic (Intl only, no
+ * dayjs-timezone plugin required) so server Logs and the client dashboard
+ * share one implementation. Falls back to the runtime-local clock on an
+ * unknown/missing zone.
+ */
+export function toZonedWallClock(now: Date, timeZone?: string | null): Date {
+  if (!timeZone) return now
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+    }).formatToParts(now)
+    const get = (t: string) => Number(parts.find((p) => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'))
+  } catch {
+    return now
+  }
+}
+
+export type AstrologyReading = {
+  hourlyZodiac: string
+  westernZodiac: string
+  rokuyo: string
+  rokuyoMeaning: string
+  rokuyoHint: string
+  favorableNow: boolean
+  moonPhase: string
+  moonIllumination: number
+  moonEmoji: string
+  yearAnimal: string
+}
+
+/**
+ * Single source of truth for the ambient reading. Calendar/clock-based parts
+ * (zodiac hour, rokuyo, western sign, year animal) use the zone's wall clock;
+ * the moon phase uses the *absolute* instant — the moon is the same for
+ * everyone, and feeding it a shifted wall-clock Date skewed it by the UTC
+ * offset (up to ±14h) in the old server-side Logs path.
+ */
+export function getAstrologyReading(now: Date = new Date(), timeZone?: string | null): AstrologyReading {
+  const local = toZonedWallClock(now, timeZone)
+  const rokuyo = getRokuyo(local)
+  const guidance = getRokuyoGuidance(rokuyo, local.getHours())
+  const moon = getMoonPhase(now)
+  return {
+    hourlyZodiac: getHourlyZodiac(local),
+    westernZodiac: getWesternZodiac(local),
+    rokuyo,
+    rokuyoMeaning: guidance.meaning,
+    rokuyoHint: guidance.hint,
+    favorableNow: guidance.favorable,
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    moonEmoji: getMoonEmoji(moon.phase),
+    yearAnimal: getJapaneseZodiac(local.getFullYear()),
+  }
+}
+
+/**
+ * Compact ambient tag for a stored log context, e.g. "Taian · Full Moon".
+ * Used by the journal's per-entry context hover line so every entry — not
+ * just SYS snapshots — shows the conditions it was written under.
+ */
+export function formatAstroTag(context?: { astroRokuyo?: string | null; astroMoonPhase?: string | null } | null): string {
+  if (!context) return ''
+  return [context.astroRokuyo, context.astroMoonPhase].filter(Boolean).join(' · ')
+}
+
+/**
+ * Logs resonance — personalization derived from the user's *own* journal:
+ * which rokuyo and moon phase their entries most often fall on. Requires a
+ * minimum sample so a handful of entries doesn't produce a spurious pattern.
+ */
+export function getAstroResonance(
+  contexts: Array<{ astroRokuyo?: string | null; astroMoonPhase?: string | null } | null | undefined>,
+  minSample = 5
+): { sample: number; topRokuyo: string | null; topRokuyoCount: number; topMoonPhase: string | null; topMoonCount: number } | null {
+  const rokuyoCounts: Record<string, number> = {}
+  const moonCounts: Record<string, number> = {}
+  let sample = 0
+  for (const c of contexts) {
+    if (!c?.astroRokuyo) continue
+    sample++
+    rokuyoCounts[c.astroRokuyo] = (rokuyoCounts[c.astroRokuyo] || 0) + 1
+    if (c.astroMoonPhase) moonCounts[c.astroMoonPhase] = (moonCounts[c.astroMoonPhase] || 0) + 1
+  }
+  if (sample < minSample) return null
+  const top = (m: Record<string, number>): [string | null, number] =>
+    Object.entries(m).reduce<[string | null, number]>((best, [k, v]) => (v > best[1] ? [k, v] : best), [null, 0])
+  const [topRokuyo, topRokuyoCount] = top(rokuyoCounts)
+  const [topMoonPhase, topMoonCount] = top(moonCounts)
+  return { sample, topRokuyo, topRokuyoCount, topMoonPhase, topMoonCount }
 }
 
 /**

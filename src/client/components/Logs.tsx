@@ -12,6 +12,7 @@ import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
 import { useLogs, useUpdateLog } from '#client/queries'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
+import { formatAstroTag } from '#shared/utils/astrology'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
 import { Log, LogSettingsChangeMetadata } from '#shared/types'
@@ -363,7 +364,11 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                   <div>HUM: {log.context.humidity}%</div>
                 )}
                 {log.context?.astroRokuyo && (
-                  <div>ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}</div>
+                  <div>
+                    ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}
+                    {typeof log.context.astroMoonIllumination === 'number' && ` (${log.context.astroMoonIllumination}%)`}
+                    {log.context.astroHourlyZodiac && ` · ${log.context.astroHourlyZodiac} hour`}
+                  </div>
                 )}
                 {log.metadata?.sound && (
                   <div>SND: {log.metadata.sound}</div>
@@ -4179,10 +4184,10 @@ const NoteEditor = ({
       weatherParts.push(`${Math.round(log.context.humidity)}%`)
     }
     const weatherText = weatherParts.join(', ')
-    if (log.context?.city) {
-      return `${weatherText} – ${log.context.city}`
-    }
-    return weatherText
+    // Ambient astrology the entry was written under (Logs ↔ Astrology sync)
+    const astroTag = formatAstroTag(log.context)
+    const base = log.context?.city ? `${weatherText} – ${log.context.city}` : weatherText
+    return [base, astroTag].filter(Boolean).join(' · ')
   }, [log?.context])
 
   return (
@@ -4450,10 +4455,10 @@ const LogContainer: React.FC<{
       weatherParts.push(`${Math.round(log.context.humidity)}%`)
     }
     const weatherText = weatherParts.join(', ')
-    if (log.context?.city) {
-      return `${weatherText} – ${log.context.city}`
-    }
-    return weatherText
+    // Ambient astrology the entry was written under (Logs ↔ Astrology sync)
+    const astroTag = formatAstroTag(log.context)
+    const base = log.context?.city ? `${weatherText} – ${log.context.city}` : weatherText
+    return [base, astroTag].filter(Boolean).join(' · ')
   }, [log.context])
 
   return (

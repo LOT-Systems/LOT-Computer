@@ -4880,7 +4880,8 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  extra: { favorableNow?: boolean; resonantDay?: boolean } = {}
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4890,10 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    // Time-aware rokuyo window at reading time (2026-11-14)
+    favorableNow: !!extra.favorableNow,
+    // Today's rokuyo matches the one the user's own Logs most often fall on
+    resonantDay: !!extra.resonantDay,
   })
 }
 

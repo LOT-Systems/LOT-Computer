@@ -170,6 +170,8 @@ export type LogContext = {
   astroMoonIllumination?: number | null;
   astroHourlyZodiac?: string | null;
   astroWesternZodiac?: string | null;
+  // Whether the log moment fell in the rokuyo's favored window (2026-11-14)
+  astroFavorable?: boolean | null;
   [key: string]: any;
 };
 
