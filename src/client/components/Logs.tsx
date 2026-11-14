@@ -3629,6 +3629,94 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'quantum_os_maturation') {
+          const distinctSignalTypes = log.metadata?.distinctSignalTypes as number | undefined
+          const patternEventCount   = log.metadata?.patternEventCount   as number | undefined
+          const fieldStatus         = log.metadata?.fieldStatus         as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QOS-MAT:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM OS MATURATION</div>
+                {distinctSignalTypes !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SIGNAL TYPES / 7D</span>
+                    <span className="tabular-nums">{distinctSignalTypes}</span>
+                  </div>
+                )}
+                {patternEventCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PATTERN EVENTS</span>
+                    <span className="tabular-nums">{patternEventCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">DEVELOPMENTAL MATURITY CONFIRMED</div>
+                {fieldStatus && (
+                  <div className="opacity-30 tabular-nums">{fieldStatus.replace(/_/g, ' ')}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'signal_epoch_transition') {
+          const signalCount     = log.metadata?.signalCount     as number | undefined
+          const distinctSources = log.metadata?.distinctSources as number | undefined
+          const epochStatus     = log.metadata?.epochStatus     as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="EPOCH:" blockView>
+                <div className="uppercase tracking-widest mb-4">SIGNAL EPOCH TRANSITION</div>
+                {signalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SIGNALS / 72H</span>
+                    <span className="tabular-nums">{signalCount}</span>
+                  </div>
+                )}
+                {distinctSources !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCES</span>
+                    <span className="tabular-nums">{distinctSources}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">QOS + COHORT SYSTEMIC ACTIVE</div>
+                {epochStatus && (
+                  <div className="opacity-30 tabular-nums">{epochStatus.replace(/_/g, ' ')}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'coherence_field_sovereign') {
+          const totalCoherenceConf = log.metadata?.totalCoherenceConf as number | undefined
+          const maturationConf     = log.metadata?.maturationConf     as number | undefined
+          const epochConf          = log.metadata?.epochConf          as number | undefined
+          const fieldState         = log.metadata?.fieldState         as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COH-LOCK:" blockView>
+                <div className="uppercase tracking-widest mb-4">COHERENCE FIELD SOVEREIGN</div>
+                {totalCoherenceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TOTAL COHERENCE</span>
+                    <span className="tabular-nums">{totalCoherenceConf}%</span>
+                  </div>
+                )}
+                {maturationConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MATURATION</span>
+                    <span className="tabular-nums">{maturationConf}%</span>
+                  </div>
+                )}
+                {epochConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">EPOCH</span>
+                    <span className="tabular-nums">{epochConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">TOTCOH · QOS-MAT · EPOCH — CO-ACTIVE</div>
+                {fieldState && (
+                  <div className="opacity-30 tabular-nums">{fieldState.replace(/_/g, ' ')}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

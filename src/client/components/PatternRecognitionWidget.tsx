@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'quantum-os-maturation':            'Quantum OS maturation — 10+ distinct signal types in 7d + 5+ patterns active, developmental maturity confirmed (P152)',
+      'signal-epoch-transition':          'Signal epoch transition — 7+ sources in 72h + 20+ signals + systemic sources active, epoch threshold crossed (P153)',
+      'coherence-field-sovereign':        'Coherence field sovereign — total-field-coherence + quantum-os-maturation + signal-epoch-transition co-active, field locked (P154)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily quantum maturation check (20:00 UTC every day) — Job 49
+  if (shouldRunDailyQuantumMaturationCheck()) {
+    await executeDailyQuantumMaturationCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,102 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Quantum Maturation Check (Job 49 — 20:00 UTC every day) ───────────
+// Reads active users. Counts distinct signal types in past 7 days and active
+// pattern count from recent logs. When 10+ distinct types + 5+ pattern events
+// present, writes quantum_os_maturation log. Feeds P152 detection.
+
+let isDailyQuantumMaturationRunning = false
+let lastDailyQuantumMaturationRun: Date | null = null
+
+function shouldRunDailyQuantumMaturationCheck(): boolean {
+  const now = dayjs()
+  if (isDailyQuantumMaturationRunning) return false
+  if (lastDailyQuantumMaturationRun) {
+    const lastRun = dayjs(lastDailyQuantumMaturationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 20 // 20:00 UTC daily
+}
+
+async function executeDailyQuantumMaturationCheck(): Promise<JobResult> {
+  const jobName = 'daily-quantum-maturation-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyQuantumMaturationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyQuantumMaturationRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY QUANTUM MATURATION CHECK — 20:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    const PATTERN_EVENTS = [
+      'signal_coherence_cascade', 'quantum_presence_field', 'identity_momentum_lock',
+      'quantum_presence_crystallization', 'total_field_coherence', 'recovery_intelligence_arc',
+      'circadian_anchor', 'intention_completion_arc', 'self_care_saturation',
+      'signal_momentum', 'cognitive_depth_arc', 'multi_day_care_arc',
+    ]
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const recentLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+          },
+          attributes: ['event', 'metadata'],
+        })
+
+        if (!recentLogs.length) continue
+
+        const distinctSignalTypes = new Set(recentLogs.map((l: any) => l.event)).size
+        const patternEventCount = recentLogs.filter((l: any) => PATTERN_EVENTS.includes(l.event)).length
+
+        if (distinctSignalTypes >= 10 && patternEventCount >= 5) {
+          await (Log as any).create({
+            userId,
+            event: 'quantum_os_maturation',
+            text: `Quantum OS maturation: ${distinctSignalTypes} distinct signal types in 7d · ${patternEventCount} pattern events confirmed. The operating system has reached developmental maturity. Field diversity + pattern density confirm sovereign function.`,
+            metadata: {
+              distinctSignalTypes,
+              patternEventCount,
+              maturationLevel: 'DEVELOPMENTAL',
+              fieldStatus: 'SOVEREIGN_FUNCTION_CONFIRMED',
+              window: '7d',
+              hour: 20,
+            },
+          })
+          written++
+        }
+      } catch {}
+    }
+
+    console.log(`  Quantum OS maturation events written: ${written}`)
+    lastDailyQuantumMaturationRun = new Date()
+    isDailyQuantumMaturationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily quantum maturation check failed:', error.message)
+    isDailyQuantumMaturationRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

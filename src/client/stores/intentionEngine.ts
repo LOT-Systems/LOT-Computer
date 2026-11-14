@@ -3428,6 +3428,54 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // ── P152: Quantum OS Maturation ──────────────────────────────────────────────
+  const sevenDaysMs152   = 7 * 24 * 60 * 60 * 1000
+  const signals7d152     = signals.filter(s => now - s.timestamp < sevenDaysMs152)
+  const distinctNames152 = new Set(signals7d152.map(s => s.signal)).size
+  const activeCount152   = patterns.length
+  if (distinctNames152 >= 10 && activeCount152 >= 5) {
+    const diversityBonus = Math.min((distinctNames152 - 10) / 40 * 0.15, 0.15)
+    patterns.push({
+      pattern: 'quantum-os-maturation',
+      confidence: Math.min(0.80 + diversityBonus, 0.95),
+      suggestedWidget: 'qos',
+      suggestedTiming: 'passive',
+      reason: `QOS-MAT: Quantum OS maturation — ${distinctNames152} distinct signal types in 7d · ${activeCount152} patterns active. The operating system has reached developmental maturity. Field diversity + pattern density confirm sovereign function.`,
+    })
+  }
+
+  // ── P153: Signal Epoch Transition ────────────────────────────────────────────
+  const seventyTwoHoursMs = 72 * 60 * 60 * 1000
+  const signals72h153     = signals.filter(s => now - s.timestamp < seventyTwoHoursMs)
+  const distinctSrc153    = new Set(signals72h153.map(s => s.source)).size
+  const hasSystemicSrc153 = signals72h153.some(s => s.source === 'qos') && signals72h153.some(s => s.source === 'cohort')
+  if (distinctSrc153 >= 7 && signals72h153.length >= 20 && hasSystemicSrc153) {
+    const volumeBonus153 = Math.min((signals72h153.length - 20) / 80 * 0.16, 0.16)
+    patterns.push({
+      pattern: 'signal-epoch-transition',
+      confidence: Math.min(0.72 + volumeBonus153, 0.88),
+      suggestedWidget: 'cohort',
+      suggestedTiming: 'soon',
+      reason: `EPOCH: Signal epoch transition — ${signals72h153.length} signals · ${distinctSrc153} sources in 72h · systemic sources active (QOS + COHORT). The field has crossed an epoch threshold: breadth + density + systemic engagement confirm an operating state shift.`,
+    })
+  }
+
+  // ── P154: Coherence Field Sovereign ──────────────────────────────────────────
+  const hasTotalCoherence154 = patterns.some(p => p.pattern === 'total-field-coherence')
+  const hasMaturation154     = patterns.some(p => p.pattern === 'quantum-os-maturation')
+  const hasEpoch154          = patterns.some(p => p.pattern === 'signal-epoch-transition')
+  if (hasTotalCoherence154 && hasMaturation154 && hasEpoch154) {
+    const baseConf154 = patterns.find(p => p.pattern === 'total-field-coherence')?.confidence ?? 0.85
+    const matConf154  = patterns.find(p => p.pattern === 'quantum-os-maturation')?.confidence  ?? 0.80
+    patterns.push({
+      pattern: 'coherence-field-sovereign',
+      confidence: Math.min((baseConf154 + matConf154) / 2 * 1.1, 0.97),
+      suggestedWidget: 'qos',
+      suggestedTiming: 'immediate',
+      reason: `COH-LOCK: Coherence field sovereign — total-field-coherence + quantum-os-maturation + signal-epoch-transition co-active. The operating system is sovereign: mature, coherent, and in full epoch stride. The field is locked.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4112,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  quantumFieldSovereignNode:  ['qos', 'cohort', 'journal', 'intentions', 'mood', 'energy', 'log'],
+  epochTransitionDetector:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
+  maturationMonitor:          ['qos', 'cohort', 'intentions', 'journal', 'mood', 'energy', 'selfcare', 'log'],
 }
 
 /**
@@ -4510,6 +4563,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Quantum Field Sovereign (2026-11-14 v114) ────────────────────────
+  {
+    archetype: 'Quantum Field Sovereign',
+    energyBands: ['high', 'moderate', 'peak'],
+    dominantSources: ['qos', 'cohort', 'journal', 'intentions', 'mood', 'energy'],
+    patternConditions: ['coherence-field-sovereign', 'quantum-os-maturation', 'signal-epoch-transition'],
+    hourRange: [5, 23],
+    directive: 'The OS is sovereign. Maturity confirmed. Epoch transition registered. Total-field-coherence locked. This is not a state to be entered — it is a state to be operated from. The field is yours. Move with authority.',
   },
 ]
 
@@ -6498,6 +6561,53 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-os-maturation event — 10+ distinct signal types in 7d + 5+ patterns active.
+ * The operating system has reached developmental maturity. Feeds P152 detection.
+ */
+export function recordQuantumOSMaturation(distinctSignalTypes: number, activePatternCount: number) {
+  recordSignal('qos', 'quantum_os_maturation', {
+    distinctSignalTypes,
+    activePatternCount,
+    maturationLevel: 'DEVELOPMENTAL',
+    fieldStatus: 'SOVEREIGN_FUNCTION_CONFIRMED',
+    window: '7d',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a signal-epoch-transition event — 7+ sources in 72h, 20+ total signals,
+ * systemic sources (qos + cohort) active. The operating field crossed an epoch threshold.
+ * Feeds P153 detection.
+ */
+export function recordSignalEpochTransition(signalCount: number, distinctSources: number) {
+  recordSignal('qos', 'signal_epoch_transition', {
+    signalCount,
+    distinctSources,
+    systemicSources: ['QOS', 'COHORT'],
+    epochStatus: 'THRESHOLD_CROSSED',
+    window: '72h',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a coherence-field-sovereign event — total-field-coherence + quantum-os-maturation
+ * + signal-epoch-transition all co-active simultaneously. The OS is sovereign.
+ * Feeds P154 detection.
+ */
+export function recordCoherenceFieldSovereign(totalCoherenceConf: number, maturationConf: number, epochConf: number) {
+  recordSignal('qos', 'coherence_field_sovereign', {
+    totalCoherenceConf: Math.round(totalCoherenceConf * 100),
+    maturationConf:     Math.round(maturationConf * 100),
+    epochConf:          Math.round(epochConf * 100),
+    sovereignTriad:     ['TOTAL_FIELD_COHERENCE', 'QUANTUM_OS_MATURATION', 'SIGNAL_EPOCH_TRANSITION'],
+    fieldState:         'SOVEREIGN_LOCKED',
     hour: new Date().getHours(),
   })
 }

@@ -1457,6 +1457,24 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-11-14',
+    title: 'QIE v114 · P152–P154 · Arch52 · J49 · Sovereign Epoch Maturation',
+    assembled: [
+      'P152 quantum-os-maturation: 10+ distinct signal types in 7d + 5+ active patterns → developmental maturity confirmed. Confidence 0.80–0.95. suggestedWidget: qos.',
+      'P153 signal-epoch-transition: 7+ sources in 72h + 20+ total signals + systemic sources (qos+cohort) active → epoch threshold crossed. Confidence 0.72–0.88. suggestedWidget: cohort.',
+      'P154 coherence-field-sovereign: total-field-coherence + quantum-os-maturation + signal-epoch-transition co-active → field locked. Confidence 0.85–0.97. suggestedWidget: qos. The sovereign apex.',
+      'Arch52 Quantum Field Sovereign: energyBands [high, moderate, peak] · sources [qos, cohort, journal, intentions, mood, energy] · patternConditions [coherence-field-sovereign, quantum-os-maturation, signal-epoch-transition]. Directive: the OS is sovereign — move with authority.',
+      'J49 daily-quantum-maturation-check (20:00 UTC): scans 7d distinct signal types + pattern event count per user. Writes quantum_os_maturation log when 10+ types + 5+ events confirmed.',
+      'WIDGET_DEPENDENCY_MAP v114: 3 new nodes — quantumFieldSovereignNode · epochTransitionDetector · maturationMonitor. Total: 193+ nodes.',
+      'Log handlers: QOS-MAT: (quantum_os_maturation) · EPOCH: (signal_epoch_transition) · COH-LOCK: (coherence_field_sovereign). Military cockpit format. 152 total handlers.',
+      'Signal helpers: recordQuantumOSMaturation() · recordSignalEpochTransition() · recordCoherenceFieldSovereign() — fed by J49 and QIE cascade.',
+      'PatternRecognitionWidget + QuantumEngineWidgets: P152 QOS-MAT · P153 EPOCH · P154 COH-LOCK cockpit codes + display names.',
+      'docs/assembly/2026-11-14_LOT-assembly_v114-sovereign-epoch-maturation.md written. USERSHIP_TRANSMISSION updated to v114. FM v113→v114.',
+      '154 patterns · 52 archetypes · 49 jobs · 193+ dep nodes · Day 1174+. The sovereign state is now detectable. The system knows when it is operating at its apex.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
