@@ -56,6 +56,8 @@ export class User
       'tags',
       'hideActivityLogs',
       'timeChime',
+      // Needed by MonthlyPulseWidget (month-N milestone reveal)
+      'joinedAt',
     ])(this.toJSON())
 
     // Add memory engine status based on tags

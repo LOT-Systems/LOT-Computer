@@ -12,7 +12,7 @@ import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { ProgressBars } from '#client/utils/progressBars'
 import { selfAssembly, phaseSymbol, phaseLabel, recomputeAssembly, type AssembledModule } from '#client/stores/selfAssembly'
-import { useEnergy, useLogs } from '#client/queries'
+import { useEnergy, useLogs, useProfile } from '#client/queries'
 import {
   getPhysiologicalReport,
   getEnrichedPhysiologicalReport,
@@ -1573,16 +1573,14 @@ export function SystemProgressWidget() {
   }, [])
 
   // Load physiological cohort classification from user-profile (server-derived archetype)
+  // Shared react-query cache (same key as System tab + Portrait) instead of a
+  // per-widget raw fetch — removes a duplicate /api/user-profile request.
+  const { data: profileData } = useProfile()
   React.useEffect(() => {
-    fetch('/api/user-profile')
-      .then(res => res.json())
-      .then(data => {
-        if (data.archetype || data.behavioralCohort) {
-          setCohortData({ archetype: data.archetype, behavioralCohort: data.behavioralCohort })
-        }
-      })
-      .catch(() => {})
-  }, [])
+    if (profileData?.archetype || profileData?.behavioralCohort) {
+      setCohortData({ archetype: profileData.archetype, behavioralCohort: profileData.behavioralCohort })
+    }
+  }, [profileData?.archetype, profileData?.behavioralCohort])
 
   // Load OS journal (vitals snapshots + signal reports) when view is active
   React.useEffect(() => {

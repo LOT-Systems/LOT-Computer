@@ -21,7 +21,7 @@ import {
   getCircadianPhase,
 } from '#client/stores/intentionEngine'
 import { getEcosystemNarrative } from '#client/utils/narrative'
-import { useEnergy } from '#client/queries'
+import { useEnergy, useProfile } from '#client/queries'
 import { selfAssembly, phaseSymbol, phaseLabel, recomputeAssembly } from '#client/stores/selfAssembly'
 
 function usePersistedState(key: string): [boolean, React.Dispatch<React.SetStateAction<boolean>>] {
@@ -175,16 +175,14 @@ export const QuantumEngineWidgets: React.FC = () => {
   )
 
   // Load cohort/archetype from user-profile (server-derived)
+  // Shared react-query cache (same key as System tab + Portrait) instead of a
+  // per-widget raw fetch — removes a duplicate /api/user-profile request.
+  const { data: profileData } = useProfile()
   React.useEffect(() => {
-    fetch('/api/user-profile')
-      .then(res => res.json())
-      .then(data => {
-        if (data.archetype || data.behavioralCohort) {
-          setCohortData({ archetype: data.archetype, behavioralCohort: data.behavioralCohort })
-        }
-      })
-      .catch(() => {})
-  }, [])
+    if (profileData?.archetype || profileData?.behavioralCohort) {
+      setCohortData({ archetype: profileData.archetype, behavioralCohort: profileData.behavioralCohort })
+    }
+  }, [profileData?.archetype, profileData?.behavioralCohort])
 
   // Compute readiness from physiological report
   React.useEffect(() => {
@@ -469,7 +467,7 @@ export const QuantumEngineWidgets: React.FC = () => {
                   </div>
                   <div className="flex justify-between items-baseline">
                     <span className="opacity-30 uppercase">CARE</span>
-                    <span className="tabular-nums">{userIndex.dimensions.selfcare}</span>
+                    <span className="tabular-nums">{userIndex.dimensions.selfCare}</span>
                   </div>
                   <div className="flex justify-between items-baseline">
                     <span className="opacity-30 uppercase">COG</span>

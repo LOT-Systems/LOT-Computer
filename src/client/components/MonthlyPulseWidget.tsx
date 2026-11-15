@@ -28,7 +28,13 @@ const MONTH_MESSAGES: Record<number, string> = {
   10: 'Ten months. Almost there.',
   11: 'Eleven months. One more.',
   12: 'One year with LOT. The portrait is complete — and still evolving.',
+  13: 'Thirteen months. The second cycle begins with what the first one taught.',
+  14: 'Fourteen months. Fewer words, clearer signal.',
+  15: 'Fifteen months. The full reveal — every module is yours.',
 }
+
+// The UI reveal program runs 15 months (month-to-month build-up).
+const PROGRAM_MONTHS = 15
 
 const DISMISS_PHRASES = [
   'Onward.',
@@ -103,10 +109,12 @@ export const MonthlyPulseWidget: React.FC = () => {
 
   if (!visible) return null
 
-  const message = MONTH_MESSAGES[Math.min(monthNumber, 12)] ??
+  // Label always shows the real month (previously capped at 12, so months
+  // 13+ re-appeared every month as "Month 12").
+  const message = MONTH_MESSAGES[monthNumber] ??
     `Month ${monthNumber}. The journey continues.`
-  const capped = Math.min(monthNumber, 12)
-  const label = `Month ${capped}:`
+  const capped = Math.min(monthNumber, PROGRAM_MONTHS)
+  const label = `Month ${monthNumber}:`
 
   return (
     <div
@@ -131,7 +139,7 @@ export const MonthlyPulseWidget: React.FC = () => {
             >
               <div>{message}</div>
               <div className="opacity-30 mt-4 text-sm">
-                {capped} / 12 months
+                {capped} / {PROGRAM_MONTHS} months
               </div>
             </div>
           )}

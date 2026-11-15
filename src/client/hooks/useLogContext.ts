@@ -20,10 +20,32 @@ import type { Log } from '#shared/types'
  * breakdowns, environment-time context, recent content excerpts,
  * and session-aware biofeedback from the log history.
  */
-export function useLogContext() {
-  const { data: logs = [] } = useLogs()
+// Shared cache: ~15 widgets call useLogContext() on the System tab. Without
+// this, each instance re-ran the full analytics pass over every log on every
+// logs change (O(widgets × logs)). Keyed by the logs array reference that
+// react-query hands to every subscriber, plus the current hour so time-phase
+// fields stay fresh.
+let _cacheLogs: Log[] | null = null
+let _cacheHour = -1
+let _cacheValue: ReturnType<typeof computeLogContext> | null = null
 
+export function useLogContext() {
+  const { data: logs = EMPTY_LOGS } = useLogs()
   return React.useMemo(() => {
+    const hour = new Date().getHours()
+    if (_cacheValue && _cacheLogs === logs && _cacheHour === hour) return _cacheValue
+    const value = computeLogContext(logs)
+    _cacheLogs = logs
+    _cacheHour = hour
+    _cacheValue = value
+    return value
+  }, [logs])
+}
+
+const EMPTY_LOGS: Log[] = []
+
+function computeLogContext(logs: Log[]) {
+  return (() => {
     const now = dayjs()
     const currentHour = now.hour()
 
@@ -356,7 +378,7 @@ export function useLogContext() {
       engagementLevel,
       getContextualDirective,
     }
-  }, [logs])
+  })()
 }
 
 function formatTimeAgo(time: dayjs.Dayjs): string {

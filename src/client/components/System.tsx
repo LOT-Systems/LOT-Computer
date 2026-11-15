@@ -376,6 +376,50 @@ export const System = React.memo(function SystemInner() {
 
   const optimalWidget = React.useMemo(() => getOptimalWidget(), [logs])
 
+  // Per-mount rolls for occasional widgets. Previously these ran inside render
+  // IIFEs, so every System re-render (weather, users-online, live message ticks)
+  // re-rolled Math.random() — the Subscribe widget flickered in and out, and the
+  // Intentions cooldown window was re-randomised + written to localStorage on
+  // each render. Rolling once per mount keeps the UI stable.
+  const subscribeRoll = React.useMemo(() => Math.random() < 0.2, [])
+  const intentionsCooldownMs = React.useMemo(
+    () => (2 + Math.random()) * 24 * 60 * 60 * 1000,
+    []
+  )
+  // Latched: once shown during this mount it stays shown, so stamping
+  // 'intentions-last-shown' below cannot hide it again on the next render.
+  const intentionsShownRef = React.useRef(false)
+  const showIntentions = React.useMemo(() => {
+    if (intentionsShownRef.current) return true
+    try {
+      const hasIntention = !!localStorage.getItem('current-intention')
+      const lastShown = localStorage.getItem('intentions-last-shown')
+      const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= intentionsCooldownMs
+      const show = hasIntention || optimalWidget?.widget === 'intentions' || cooldownPassed
+      if (show) intentionsShownRef.current = true
+      return show
+    } catch {
+      return false
+    }
+  }, [optimalWidget?.widget, intentionsCooldownMs])
+
+  // Side effects for Intentions visibility live in an effect, not render.
+  React.useEffect(() => {
+    if (!showIntentions) return
+    try {
+      const lastShown = localStorage.getItem('intentions-last-shown')
+      const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= intentionsCooldownMs
+      if (cooldownPassed || optimalWidget?.widget === 'intentions') {
+        localStorage.setItem('intentions-last-shown', Date.now().toString())
+      }
+      if (optimalWidget?.widget === 'intentions' && optimalWidget?.reason) {
+        localStorage.setItem('intentions-quantum-reason', optimalWidget.reason)
+      } else {
+        localStorage.removeItem('intentions-quantum-reason')
+      }
+    } catch {}
+  }, [showIntentions, optimalWidget?.widget, optimalWidget?.reason, intentionsCooldownMs])
+
   // Community pulse — atmosphere layer
   const convergence = React.useMemo(() => getConvergenceSignal(), [])
   const ambientIntensity = React.useMemo(() => getAmbientIntensity(), [])
@@ -879,42 +923,7 @@ export const System = React.memo(function SystemInner() {
 
       {/* Intentions - Show if user has intention OR when intention engine detects seeking-direction pattern */}
       <WidgetErrorBoundary name="Intentions">
-        {(() => {
-          const hasIntention = !!localStorage.getItem('current-intention')
-
-          // Check cooldown (2-3 days since last shown)
-          const lastShown = localStorage.getItem('intentions-last-shown')
-          const twoDaysMs = 2 * 24 * 60 * 60 * 1000
-          const threeDaysMs = 3 * 24 * 60 * 60 * 1000
-
-          // Random cooldown between 2-3 days
-          const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
-          const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
-
-          const intentionSuggestsIntentions = optimalWidget?.widget === 'intentions'
-
-          // Show if:
-          // 1. User has an existing intention to display, OR
-          // 2. Intention engine detects seeking-direction or morning-clarity patterns, OR
-          // 3. Cooldown passed (fallback for periodic prompting)
-          if (hasIntention || intentionSuggestsIntentions || cooldownPassed) {
-            // Update last shown time
-            if (!lastShown || cooldownPassed || intentionSuggestsIntentions) {
-              localStorage.setItem('intentions-last-shown', Date.now().toString())
-            }
-
-            // Store quantum reasoning for widget to display
-            if (intentionSuggestsIntentions && optimalWidget?.reason) {
-              localStorage.setItem('intentions-quantum-reason', optimalWidget.reason)
-            } else {
-              localStorage.removeItem('intentions-quantum-reason')
-            }
-
-            return <div><IntentionsWidget /></div>
-          }
-
-          return null
-        })()}
+        {showIntentions && <div><IntentionsWidget /></div>}
       </WidgetErrorBoundary>
 
       {/* Subscribe - Show occasionally to engaged users without subscription */}
@@ -936,9 +945,8 @@ export const System = React.memo(function SystemInner() {
             return null
           }
 
-          // Random 20% chance to show when all conditions met
-          const shouldShow = Math.random() < 0.2
-          return shouldShow && <div><SubscribeWidget /></div>
+          // 20% chance per mount (rolled once — see subscribeRoll)
+          return subscribeRoll && <div><SubscribeWidget /></div>
         })()}
       </WidgetErrorBoundary>
 
