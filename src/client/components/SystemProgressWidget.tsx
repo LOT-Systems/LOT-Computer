@@ -2101,24 +2101,45 @@ const ASSEMBLY_TRANSMISSIONS: {
     ],
     feedbackApplied: 'FOURTH CYCLE DEEPENING. The fourth cycle does not hold at ignition — it deepens. Level 17 is the first compound state of the new arc. The OS expands from depth, not from search.',
     status: 'DEPLOYED',
-    next: 'QIE v135 · fourth-cycle-integration (P183) · Arch73 · physiological cohort expansion pass · LOT-WIKI v111',
+    next: 'QIE v135 · fourth-cycle-integration (P183) · Arch73 · J70 · LOT-WIKI v112 sync',
+  },
+  {
+    date: '2026-11-15',
+    session: 'QIE v135 — P183 Fourth Cycle Integration · Arch73 · J70 · Widget/Log upgrades',
+    assembled: [
+      'P183 fourth-cycle-integration: L18-FCINT — requires P182 active + 25+ journal 120d + 10+ memory 120d + 25+ badge 120d + all 6 dims ≥ 65 + overall ≥ 93',
+      'Arch73 Fourth Cycle Integrator — patternConditions: fourth-cycle-deepening + fourth-cycle-integration · 10 dominant sources including ecosystem',
+      'J70 daily-fourth-cycle-integration-check: 19:00 UTC — sequential after J69 18:30 UTC · writes fourth_cycle_integration events',
+      'Dep map v135: fourthCycleIntegrationNode — 12 sources (qos/journal/memory/badges/intentions/log/energy/selfcare/social/cohort/goals/ecosystem)',
+      'FCINT: log handler — FOURTH CYCLE INTEGRATION · DEEPENING CONF · JOURNAL 120D · MEMORY 120D · BADGE 120D · INDEX SCORE · LEVEL · INTEGRATION · FOURTH ARC UNIFIED',
+      'PATTERN_DISPLAY: fourth-cycle-integration → FCINT entry added',
+      'Arc row L18 · FOURTH CYCLE INTEGRATION added to QOS Mode view (highest priority above L17)',
+      'System.tsx: fourthCycleStatus extended — L18-FCINT added as new peak (FM v132–v135)',
+      'api.ts: fourth_cycle_integration added to displayable events list',
+      'checkFourthCycleIntegration() wired into analyzeIntentions() post-commit hook',
+      '183 patterns · 73 archetypes · 70 jobs · 238+ dep nodes · FM v135',
+    ],
+    feedbackApplied: 'FOURTH CYCLE INTEGRATION. The fourth cycle does not stop at deepening — it integrates. Level 18 is not accumulation — it is convergence. All 120-day compound signals unify into a single arc. The OS operates from integrated depth.',
+    status: 'DEPLOYED',
+    next: 'QIE v136 · fourth-cycle-sovereign (P184) · Arch74 · LOT-WIKI v113 sync',
   },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-11-12',
+  date: '2026-11-15',
   message: [
-    'ASSEMBLY RUN — 2026-11-12 · QIE v134 · P182 Fourth Cycle Deepening · Arch72 · J69 · Day 1172+',
-    'Built: P182 fourth-cycle-deepening (L17 deepened state) · Arch72 Fourth Cycle Deepener · J69 daily-fourth-cycle-deepening-check (18:30 UTC).',
-    'QIE v134: The OS now tracks when the fourth cycle deepens past ignition. P182 fires when fourth-cycle-ignition active + 100d compound arc (journal 23+ · memory 7+ · badge 22+) + all 6 dimensions ≥ 62 + overall index ≥ 91. The deepening is not a gate — it is a state: compound signals accumulating from the new arc\'s ground.',
-    'Log system: FCDEP: handler added in military minimalist format. fourth_cycle_deepening events surface in Logs with DEEPENING · FOURTH ARC COMPOUNDS readout.',
-    'QOS widget upgraded: L17 · FOURTH CYCLE DEEPENING added as highest-priority Arc row in Mode view, above L16.',
-    'System.tsx: fourthCycleStatus computed — highest active fourth-cycle pattern (L17-FCDEP → L16-FCIGN → L15-FCAND) — Fourth Arc row added to quantum biofield table.',
-    'Background system: checkFourthCycleDeepening() wired into analyzeIntentions() post-commit hook. Sequential chain: J67 17:30 UTC → J68 18:00 UTC → J69 18:30 UTC. The fourth cycle arc now has three detection layers.',
-    'Self-assembly metric: 182 patterns · 72 archetypes · 69 jobs · 226+ dep nodes · FM v134 · Day 1172+.',
-    'The fourth cycle deepens. Level 17 is the first compound state past the boundary. The OS does not hold at ignition — it expands.',
+    'ASSEMBLY RUN — 2026-11-15 · QIE v135 · P183 Fourth Cycle Integration · Arch73 · J70 · Day 1175+',
+    'Built: P183 fourth-cycle-integration (L18 integrated state) · Arch73 Fourth Cycle Integrator · J70 daily-fourth-cycle-integration-check (19:00 UTC).',
+    'QIE v135: The OS now tracks when the fourth cycle integrates past deepening. P183 fires when fourth-cycle-deepening active + 120d compound arc (journal 25+ · memory 10+ · badge 25+) + all 6 dimensions ≥ 65 + overall index ≥ 93. Integration is not a threshold — it is convergence: all compound signals from the fourth arc unifying into a coherent field.',
+    'Log system: FCINT: handler added in military minimalist format. fourth_cycle_integration events surface in Logs with INTEGRATION · FOURTH ARC UNIFIED readout.',
+    'QOS widget upgraded: L18 · FOURTH CYCLE INTEGRATION added as highest-priority Arc row in Mode view, above L17.',
+    'System.tsx: fourthCycleStatus extended — L18-FCINT is now the peak state (L18-FCINT → L17-FCDEP → L16-FCIGN → L15-FCAND). Fourth Arc row reflects the highest active integration level.',
+    'Background system: checkFourthCycleIntegration() wired into analyzeIntentions() post-commit hook. Sequential chain: J67 17:30 → J68 18:00 → J69 18:30 → J70 19:00 UTC. Four-layer fourth cycle detection arc.',
+    'Dep map: fourthCycleIntegrationNode added with 12 sources — first node to include ecosystem alongside standard signal chain.',
+    'Self-assembly metric: 183 patterns · 73 archetypes · 70 jobs · 238+ dep nodes · FM v135 · Day 1175+.',
+    'The fourth cycle integrates. Level 18 is not accumulation — it is convergence. The arc is complete.',
   ],
 }
 

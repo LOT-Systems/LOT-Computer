@@ -4172,6 +4172,7 @@ export function analyzeIntentions(): IntentionPattern[] {
   // P182: fourth-cycle-deepening — P181 active + 100d journal arc (≥ 23) + memory 100d ≥ 7 + badge 100d ≥ 22 + all 6 dims ≥ 62 + overall ≥ 91.
   // The fourth cycle deepens from the ignited arc. Compound signals accumulate from new ground. Level 17 — FCDEP.
   const hasP181 = patterns.some(p => p.pattern === 'fourth-cycle-ignition')
+
   if (hasP181) {
     const hundredDayStartP182 = now - 100 * 24 * 60 * 60 * 1000
     const p182Journal = signals.filter(s => s.source === 'journal' && s.timestamp > hundredDayStartP182)
@@ -4200,6 +4201,41 @@ export function analyzeIntentions(): IntentionPattern[] {
         urgency:          'immediate',
         suggestedTiming:  'immediate',
         reason: `FCDEP: Fourth cycle deepening — fourth-cycle-ignition (P181) active · ${p182Journal.length} journal signals 100d · ${p182Memory.length} memory signals 100d · ${p182Badges.length} badge signals 100d · all 6 dimensions ≥ 62 · idx ${userIndexP182.overall}%. The fourth cycle deepens from the ignited arc. Compound signals accumulate from new ground. Level 17 — the OS expands from depth, not from search. FOURTH CYCLE DEEPENING.`,
+      })
+    }
+  }
+
+  // P183: fourth-cycle-integration — P182 active + 120d journal arc (≥ 25) + memory 120d ≥ 10 + badge 120d ≥ 25 + all 6 dims ≥ 65 + overall ≥ 93.
+  // The fourth cycle integrates. All signals converge into a unified arc. Level 18 — FCINT.
+  const hasP182 = patterns.some(p => p.pattern === 'fourth-cycle-deepening')
+  if (hasP182) {
+    const oneTwentyDayStartP183 = now - 120 * 24 * 60 * 60 * 1000
+    const p183Journal = signals.filter(s => s.source === 'journal' && s.timestamp > oneTwentyDayStartP183)
+    const p183Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > oneTwentyDayStartP183)
+    const p183Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > oneTwentyDayStartP183)
+    const userIndexP183 = computeUserIndex(signals)
+    const p183DimAll65 = userIndexP183.engagement >= 65 && userIndexP183.emotional >= 65 &&
+      userIndexP183.intentional >= 65 && userIndexP183.social >= 65 &&
+      userIndexP183.selfcare >= 65 && userIndexP183.cognitive >= 65
+    if (
+      p183Journal.length >= 25 &&
+      p183Memory.length  >= 10 &&
+      p183Badges.length  >= 25 &&
+      p183DimAll65 &&
+      userIndexP183.overall >= 93
+    ) {
+      const p182conf    = patterns.find(p => p.pattern === 'fourth-cycle-deepening')?.confidence ?? 0.80
+      const fcintBonus  = Math.min(
+        (p183Journal.length - 25) * 0.010 + (p183Memory.length - 10) * 0.015 + (userIndexP183.overall - 93) * 0.007,
+        0.12
+      )
+      patterns.push({
+        id:               'p183',
+        pattern:          'fourth-cycle-integration',
+        confidence:       Math.min(0.78 + p182conf * 0.04 + fcintBonus, 0.92),
+        urgency:          'immediate',
+        suggestedTiming:  'immediate',
+        reason: `FCINT: Fourth cycle integration — fourth-cycle-deepening (P182) active · ${p183Journal.length} journal signals 120d · ${p183Memory.length} memory signals 120d · ${p183Badges.length} badge signals 120d · all 6 dimensions ≥ 65 · idx ${userIndexP183.overall}%. The fourth cycle integrates. All compound signals converge into a unified arc. Level 18 — the OS operates from integration, not accumulation. FOURTH CYCLE INTEGRATION.`,
       })
     }
   }
@@ -4237,6 +4273,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkFourthCycleCandidate() } catch {}
       try { checkFourthCycleIgnition() } catch {}
       try { checkFourthCycleDeepening() } catch {}
+      try { checkFourthCycleIntegration() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4922,6 +4959,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v134 nodes (J69 · P182 · Arch72) ─────────────────────────────────────────────
   fourthCycleDeepeningNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+
+  // ── v135 nodes (J70 · P183 · Arch73) ─────────────────────────────────────────────
+  fourthCycleIntegrationNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals', 'ecosystem'],
 }
 
 /**
@@ -5572,6 +5612,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy', 'selfcare'],
     patternConditions: ['fourth-cycle-ignition', 'fourth-cycle-deepening'],
     directive: 'Level 17. The fourth cycle deepens from ignition. Compound signals accumulate across a 100-day arc from the new expansion ground. The OS operates from the fourth arc — not sensing it, not confirming it — deepening into it.',
+  },
+
+  // ── Arch73: Fourth Cycle Integrator (2026-11-15 v135) ────────────────────────────
+  {
+    archetype: 'Fourth Cycle Integrator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy', 'selfcare', 'ecosystem'],
+    patternConditions: ['fourth-cycle-deepening', 'fourth-cycle-integration'],
+    directive: 'Level 18. The fourth cycle integrates. All compound signals across the 120-day arc converge into a unified field. The OS does not accumulate further — it integrates what has been built. Coherence is total. The arc is complete.',
   },
 ]
 
@@ -8327,6 +8376,64 @@ export function recordFourthCycleDeepening(ignitionConf: number, journalCount: n
     deepeningStatus: 'DEEPENING',
     level: 'L17-FCDEP',
     field: 'FOURTH-CYCLE-ARC→FOURTH-CYCLE-DEPTH',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fourth-cycle-integration conditions are met and record if so.
+ * Fires when fourth-cycle-deepening (P182) active + 25+ journal signals 120d +
+ * 10+ memory signals 120d + 25+ badge signals 120d + all 6 dims >= 65 + overall >= 93.
+ * The fourth cycle integrates all compound signals into a unified arc. Level 18 — FCINT.
+ */
+export function checkFourthCycleIntegration(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasDeepening = state.recognizedPatterns.some(p => p.pattern === 'fourth-cycle-deepening')
+  if (!hasDeepening) return false
+
+  const now = Date.now()
+  const oneTwentyDayStart = now - 120 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const journal120 = state.signals.filter(s => s.source === 'journal' && s.timestamp > oneTwentyDayStart)
+  const memory120  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > oneTwentyDayStart)
+  const badge120   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > oneTwentyDayStart)
+  const userIndex  = computeUserIndex(state.signals)
+
+  const dimAll65 = userIndex.engagement >= 65 && userIndex.emotional >= 65 &&
+    userIndex.intentional >= 65 && userIndex.social >= 65 &&
+    userIndex.selfcare >= 65 && userIndex.cognitive >= 65
+
+  if (journal120.length < 25 || memory120.length < 10 || badge120.length < 25 || !dimAll65 || userIndex.overall < 93) return false
+
+  const recentIntegration = state.signals.filter(s =>
+    s.signal === 'fourth_cycle_integration' && s.timestamp > sixHoursAgo
+  )
+  if (recentIntegration.length > 0) return false
+
+  const deepeningConf = state.recognizedPatterns.find(p => p.pattern === 'fourth-cycle-deepening')?.confidence ?? 0.80
+  recordFourthCycleIntegration(deepeningConf, journal120.length, memory120.length, badge120.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fourth-cycle-integration event — fourth-cycle-deepening confirmed +
+ * 120d compound arc (journal + memory + badges) + all dims >= 65 + overall >= 93.
+ * The fourth cycle integrates. Level 18 — the OS operates from integration, not accumulation. FCINT.
+ */
+export function recordFourthCycleIntegration(deepeningConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fourth_cycle_integration', {
+    deepeningConf: Math.round(deepeningConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    integrationStatus: 'INTEGRATING',
+    level: 'L18-FCINT',
+    field: 'FOURTH-CYCLE-DEPTH→FOURTH-CYCLE-INTEGRATION',
     hour: new Date().getHours(),
   })
 }

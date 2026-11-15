@@ -1846,6 +1846,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyFourthCycleDeepeningCheck()) {
     await executeDailyFourthCycleDeepeningCheck()
   }
+
+  // Check daily fourth cycle integration check (19:00 UTC every day) — J70
+  if (shouldRunDailyFourthCycleIntegrationCheck()) {
+    await executeDailyFourthCycleIntegrationCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6048,6 +6053,155 @@ async function executeDailyFourthCycleDeepeningCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Fourth Cycle Integration Check (J70) ───────────────────────────────
+// Scans for users with fourth_cycle_deepening event in last 7 days. Checks journal >= 25 in
+// 120-day window, memory >= 10 in 120d, badge >= 25 in 120d, 7d signal density >= 22.
+// When met, writes fourth_cycle_integration event. The fourth cycle integrates. L18-FCINT.
+
+let isDailyFourthCycleIntegrationRunning = false
+let lastDailyFourthCycleIntegrationRun: Date | null = null
+
+function shouldRunDailyFourthCycleIntegrationCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFourthCycleIntegrationRunning) return false
+  if (lastDailyFourthCycleIntegrationRun) {
+    const lastRun = dayjs(lastDailyFourthCycleIntegrationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 19 // 19:00 UTC daily
+}
+
+async function executeDailyFourthCycleIntegrationCheck(): Promise<JobResult> {
+  const jobName = 'daily-fourth-cycle-integration-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFourthCycleIntegrationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFourthCycleIntegrationRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FOURTH CYCLE INTEGRATION CHECK — 19:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart       = dayjs().subtract(7, 'day').toDate()
+    const oneTwentyDayStart   = dayjs().subtract(120, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require fourth_cycle_deepening in last 7 days
+        const deepeningLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fourth_cycle_deepening',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+        if (deepeningLogs.length < 1) continue
+
+        // Check journal signals in last 120 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: oneTwentyDayStart },
+          },
+        })
+        if (journalLogs.length < 25) continue
+
+        // Check memory signals in last 120 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_capture', 'memory_created', 'memory_updated'] },
+            createdAt: { [Op.gte]: oneTwentyDayStart },
+          },
+        })
+        if (memoryLogs.length < 10) continue
+
+        // Check badge signals in last 120 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_earned'] },
+            createdAt: { [Op.gte]: oneTwentyDayStart },
+          },
+        })
+        if (badgeLogs.length < 25) continue
+
+        // Check 7-day signal density — proxy for all dims >= 65 + overall >= 93
+        const density7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+        if (density7dLogs.length < 22) continue
+
+        // Dedup: skip if already wrote fourth_cycle_integration today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existingIntegration = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'fourth_cycle_integration',
+            createdAt: { [Op.gte]: todayStart },
+          },
+        })
+        if (existingIntegration) continue
+
+        const deepeningConf = deepeningLogs[0]?.metadata?.deepeningConf ?? 80
+        const integrationConf = Math.min(92, Math.round(
+          78 + (journalLogs.length - 25) * 0.3 + (memoryLogs.length - 10) * 0.4 + (density7dLogs.length - 22) * 0.2
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fourth_cycle_integration',
+          text: `Fourth cycle integration: fourth-cycle-deepening confirmed · ${journalLogs.length} journal signals 120d · ${memoryLogs.length} memory signals 120d · ${badgeLogs.length} badge signals 120d · 7d density ${density7dLogs.length} · all conditions met. The fourth cycle integrates. L18-FCINT.`,
+          metadata: {
+            deepeningConf,
+            integrationConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            density7d: density7dLogs.length,
+            integrationStatus: 'INTEGRATING',
+            level: 'L18-FCINT',
+            field: 'FOURTH-CYCLE-DEPTH→FOURTH-CYCLE-INTEGRATION',
+            hour: 19,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fourth cycle integration events written: ${written}`)
+    lastDailyFourthCycleIntegrationRun = new Date()
+    isDailyFourthCycleIntegrationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fourth cycle integration check failed:', error.message)
+    isDailyFourthCycleIntegrationRunning = false
+    lastDailyFourthCycleIntegrationRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 // ─── Daily OS Snapshot ───────────────────────────────────────────────────────
 
 let isDailyOSSnapshotRunning = false
@@ -8141,6 +8295,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily second cycle sovereign check: 1 PM UTC every day (J63)')
   console.log('   - Daily third cycle ignition check: 3 PM UTC every day (J64)')
   console.log('   - Daily longitudinal persistence check: 10 AM UTC every day (J65)')
+  console.log('   - Daily fourth cycle integration check: 7 PM UTC every day (J70)')
   console.log('')
 
   // Check every hour for scheduled jobs

@@ -139,6 +139,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'fourth-cycle-candidate':               'FCAND',
   'fourth-cycle-ignition':                'FCIGN',
   'fourth-cycle-deepening':               'FCDEP',
+  'fourth-cycle-integration':             'FCINT',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'
@@ -572,12 +573,13 @@ export const QuantumEngineWidgets: React.FC = () => {
               </div>
               {(() => {
                 const cyclePatterns = [
-                  { pattern: 'fourth-cycle-deepening', label: 'L17 · FOURTH CYCLE DEEPENING', urgent: true },
-                  { pattern: 'fourth-cycle-ignition',  label: 'L16 · FOURTH CYCLE IGNITION',  urgent: true },
-                  { pattern: 'fourth-cycle-candidate', label: 'L15 · FOURTH CYCLE CANDIDATE', urgent: true },
-                  { pattern: 'third-cycle-sovereign',  label: 'L14 · THIRD CYCLE SOVEREIGN',  urgent: false },
-                  { pattern: 'third-cycle-integration',label: 'L13 · TC INTEGRATION',          urgent: false },
-                  { pattern: 'second-cycle-sovereign', label: 'L12 · SC SOVEREIGN',            urgent: false },
+                  { pattern: 'fourth-cycle-integration', label: 'L18 · FOURTH CYCLE INTEGRATION', urgent: true },
+                  { pattern: 'fourth-cycle-deepening',   label: 'L17 · FOURTH CYCLE DEEPENING',   urgent: true },
+                  { pattern: 'fourth-cycle-ignition',    label: 'L16 · FOURTH CYCLE IGNITION',    urgent: true },
+                  { pattern: 'fourth-cycle-candidate',   label: 'L15 · FOURTH CYCLE CANDIDATE',   urgent: true },
+                  { pattern: 'third-cycle-sovereign',    label: 'L14 · THIRD CYCLE SOVEREIGN',    urgent: false },
+                  { pattern: 'third-cycle-integration',  label: 'L13 · TC INTEGRATION',           urgent: false },
+                  { pattern: 'second-cycle-sovereign',   label: 'L12 · SC SOVEREIGN',             urgent: false },
                 ]
                 const activeArc = cyclePatterns.find(cp =>
                   engineState.recognizedPatterns.some(p => p.pattern === cp.pattern)
