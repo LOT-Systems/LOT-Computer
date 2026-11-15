@@ -41,6 +41,11 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'story-day'         // /day — compressed story of the last 24h
+  | 'story-week'        // /week — compressed story of the last 7 days
+  | 'story-month'       // /month — compressed story of the last 30 days
+  | 'story-year'        // /year — compressed story of the last 365 days
+  | 'arcade-status'     // /level — Arcade self-care evolution status
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -67,7 +72,78 @@ const RULES: TriggerRule[] = [
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'story-day',      emojis: [],        keywords: ['day'] },
+  { trigger: 'story-week',     emojis: [],        keywords: ['week'] },
+  { trigger: 'story-month',    emojis: [],        keywords: ['month'] },
+  { trigger: 'story-year',     emojis: [],        keywords: ['year'] },
+  { trigger: 'arcade-status',  emojis: [],        keywords: ['level', 'arcade', 'xp'] },
 ]
+
+/** Story triggers → compression horizon. */
+export const STORY_TRIGGER_HORIZON: Partial<Record<LogTrigger, 'day' | 'week' | 'month' | 'year'>> = {
+  'story-day': 'day',
+  'story-week': 'week',
+  'story-month': 'month',
+  'story-year': 'year',
+}
+
+// ─── Command registry — single source of truth for /system ──────────────────
+
+export interface LogCommand {
+  usage: string
+  description: string
+  group: 'NARRATIVE' | 'ENGINE' | 'SELF-CARE' | 'ENVIRONMENT' | 'ARCADE' | 'SYSTEM'
+}
+
+export const LOG_COMMAND_GROUPS: LogCommand['group'][] = [
+  'NARRATIVE', 'ENGINE', 'SELF-CARE', 'ENVIRONMENT', 'ARCADE', 'SYSTEM',
+]
+
+export const LOG_COMMANDS: LogCommand[] = [
+  { group: 'NARRATIVE',   usage: '/story',       description: 'Compressed story — today, widens if quiet' },
+  { group: 'NARRATIVE',   usage: '/day',         description: 'Compress the last 24 hours' },
+  { group: 'NARRATIVE',   usage: '/week',        description: 'Compress the last 7 days' },
+  { group: 'NARRATIVE',   usage: '/month',       description: 'Compress the last 30 days' },
+  { group: 'NARRATIVE',   usage: '/year',        description: 'Compress the last 365 days' },
+  { group: 'NARRATIVE',   usage: '/prayer',      description: 'Contextual scripture for this entry' },
+  { group: 'ENGINE',      usage: '/scan',        description: 'System status overview' },
+  { group: 'ENGINE',      usage: '/qi [query]',  description: 'Ask the Quantum Intelligence engine' },
+  { group: 'ENGINE',      usage: '/qos',         description: 'Quantum OS state analysis' },
+  { group: 'ENGINE',      usage: '/assembly',    description: 'Self-assembly module status' },
+  { group: 'ENGINE',      usage: '/phys',        description: 'Physiological cohort report' },
+  { group: 'SELF-CARE',   usage: '/breathe',     description: '4-2-6 breathing exercise' },
+  { group: 'SELF-CARE',   usage: '/freeze',      description: 'Pause and reflect protocol' },
+  { group: 'SELF-CARE',   usage: '/silent',      description: 'Signal silence check' },
+  { group: 'SELF-CARE',   usage: '/fast',        description: 'Orthodox fasting calendar' },
+  { group: 'SELF-CARE',   usage: '/how',         description: 'Open LOT AI check-in (System tab)' },
+  { group: 'ENVIRONMENT', usage: '/synth',       description: 'Toggle keyboard sound' },
+  { group: 'ENVIRONMENT', usage: '/radio',       description: 'Toggle radio' },
+  { group: 'ENVIRONMENT', usage: '/night',       description: 'Dark mode' },
+  { group: 'ARCADE',      usage: '/level',       description: 'Your level, rank, XP and streak' },
+  { group: 'SYSTEM',      usage: '/system',      description: 'This command list' },
+]
+
+/** Plain-text help screen, rendered by the Log's SYSTEM block. */
+export function renderSystemHelp(): string {
+  const lines: string[] = ['AVAILABLE COMMANDS']
+  for (const g of LOG_COMMAND_GROUPS) {
+    const cmds = LOG_COMMANDS.filter(c => c.group === g)
+    if (!cmds.length) continue
+    lines.push('', g)
+    for (const c of cmds) lines.push(`${c.usage.padEnd(14)}${c.description}`)
+  }
+  lines.push(
+    '',
+    'EMOJI',
+    '📖  story · 🎹  synth · 🎧  radio · 🌙  night · 🕯️  prayer · 🧊  freeze',
+    '',
+    'SHORTCUTS',
+    'Ctrl+Enter    Save log immediately',
+    '',
+    'Every entry is stored with its moment: time, weather, place, sky.',
+  )
+  return lines.join('\n')
+}
 
 /**
  * Returns every trigger present in `text`. An empty array means the

@@ -27,6 +27,7 @@ import {
 } from '#shared/types'
 import dayjs from '#client/utils/dayjs'
 import { DATE_TIME_FORMAT } from '#shared/constants'
+import type { ArcadeStatus, StoryHorizon } from '#shared/utils/story-compression'
 
 const api = axios.create({
   baseURL: '/',
@@ -895,6 +896,7 @@ export const usePrayerScripture = createMutation<
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    horizon?: StoryHorizon
     quantumState?: {
       energy?: string
       clarity?: string
@@ -909,6 +911,17 @@ export const useStoryGeneration = createMutation<
   },
   {
     story: string
+    header: string | null
+    horizon: StoryHorizon | null
+    followUp: string | null
+    arcade?: ArcadeStatus
+    processor?: 'together' | 'deterministic'
     logId: string | null
   }
 >('post', '/api/story')
+
+// Arcade — gamified self-care evolution (no AI call)
+export const useArcadeStatus = createMutation<
+  void,
+  { arcade: ArcadeStatus; nextRank: string }
+>('post', '/api/story/arcade')

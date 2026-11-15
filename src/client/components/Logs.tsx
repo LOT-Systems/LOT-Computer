@@ -28,12 +28,12 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, renderSystemHelp, STORY_TRIGGER_HORIZON, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useArcadeStatus } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3706,6 +3706,10 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyHeader, setStoryHeader] = React.useState<string | null>(null)
+  const [storyFollowUp, setStoryFollowUp] = React.useState<string | null>(null)
+  const [arcadeResult, setArcadeResult] = React.useState<string | null>(null)
+  const { mutate: fetchArcade } = useArcadeStatus()
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3742,10 +3746,14 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryHeader(data.header || null)
+      setStoryFollowUp(data.followUp || null)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + data.story
+      // Mark the appended 📖 as already-scanned so it can't re-fire /story.
+      lastTriggerScanRef.current = updated
       setValue(updated)
       valueRef.current = updated
       onChangeRef.current(updated)
@@ -3758,6 +3766,8 @@ const NoteEditor = ({
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + fallback
+      // Mark the appended 📖 as already-scanned so it can't re-fire /story.
+      lastTriggerScanRef.current = updated
       setValue(updated)
       valueRef.current = updated
       onChangeRef.current(updated)
@@ -4121,47 +4131,47 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(renderSystemHelp())
+      } else if (trigger === 'arcade-status') {
+        setArcadeResult('...')
+        fetchArcade(undefined, {
+          onSuccess: ({ arcade, nextRank }) => {
+            const filled = Math.round(arcade.progress * 20)
+            const bar = '█'.repeat(filled) + '░'.repeat(20 - filled)
+            setArcadeResult([
+              `LEVEL           ${arcade.level} · ${arcade.rank.toUpperCase()}`,
+              `XP              ${arcade.xp} / ${arcade.nextLevelXp}`,
+              `PROGRESS        ${bar} ${Math.round(arcade.progress * 100)}%`,
+              `STREAK          ${arcade.streakDays} day${arcade.streakDays === 1 ? '' : 's'}`,
+              `NEXT RANK       ${nextRank.toUpperCase()}`,
+              '',
+              'XP is earned by presence, not performance: entries, check-ins, self-care, streaks.',
+            ].join('\n'))
+          },
+          onError: () => setArcadeResult('ARCADE OFFLINE — progress is still being recorded.'),
+        })
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
-      } else if (trigger === 'story-mode') {
+      } else if (trigger === 'story-mode' || STORY_TRIGGER_HORIZON[trigger]) {
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
+          setStoryHeader(null)
+          setStoryFollowUp(null)
+          const horizon = STORY_TRIGGER_HORIZON[trigger]
+          const logText = value
+            .replace(/\/(story|day|week|month|year)\b/gi, '')
+            .replace(/📖/g, '')
+            .trim()
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
             submitStory({
               logText,
-              quantumState: state,
-              userIndex: index,
+              horizon,
+              quantumState: getUserState(),
+              userIndex: getUserIndex(),
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText, horizon })
           }
         }
       }
@@ -4420,6 +4430,9 @@ const NoteEditor = ({
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
               )}
+              {storyHeader && (
+                <div className="opacity-40 mb-4" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '12px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{storyHeader}</div>
+              )}
               {storyResponse && (
                 <div className="opacity-60">
                   {storyResponse.split('\n').map((line, idx) => (
@@ -4427,6 +4440,16 @@ const NoteEditor = ({
                   ))}
                 </div>
               )}
+              {storyFollowUp && storyResponse && !storyResponse.trim().endsWith(storyFollowUp) && (
+                <div className="opacity-80 mt-4">{storyFollowUp}</div>
+              )}
+            </Block>
+          </div>
+        )}
+        {arcadeResult && (
+          <div className="mt-8">
+            <Block label="ARCADE:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{arcadeResult}</div>
             </Block>
           </div>
         )}
