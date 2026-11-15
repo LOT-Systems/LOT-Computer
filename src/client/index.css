@@ -419,3 +419,23 @@ td:last-child {
   content: 'built different since day one';
   display: none;
 }
+
+/* Calendar alert — military-grade overlay (CalendarAlerts.tsx) */
+@keyframes lot-cal-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes lot-cal-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.lot-cal-alert {
+  animation: lot-cal-in 160ms ease-out;
+  box-shadow: 0 0 0 1px rgb(var(--acc-color-default) / 0.2), 0 8px 32px rgb(0 0 0 / 0.12);
+}
+.lot-cal-blink {
+  animation: lot-cal-blink 1s steps(1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lot-cal-alert, .lot-cal-blink { animation: none; }
+}

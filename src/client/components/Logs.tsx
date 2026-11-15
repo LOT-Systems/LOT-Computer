@@ -2079,11 +2079,52 @@ export const Logs: React.FC = React.memo(function LogsInner() {
         } else if (log.event === 'calendar_entry') {
           const entryType = log.metadata?.entryType as string | undefined
           const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const text = log.metadata?.text as string | undefined
+          const status = log.metadata?.status as string | undefined
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
-                <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                <div className="flex justify-between gap-16">
+                  <span className="uppercase tracking-widest">{entryType || 'ENTRY'}</span>
+                  {status && status !== 'open' && (
+                    <span className="opacity-40 uppercase tracking-widest">
+                      {status === 'cancelled' ? 'SCRUB' : status}
+                    </span>
+                  )}
+                </div>
+                {text && <div className={cn('mt-8', status === 'cancelled' && 'line-through opacity-40')}>{text}</div>}
+                {date && (
+                  <div className="opacity-40 mt-8 tabular-nums">
+                    {date}{time ? ` · ${time.replace(':', '')} HRS` : ''}
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_alert') {
+          const stage = (log.metadata?.stage as string | undefined) || 'ALERT'
+          const entryType = log.metadata?.entryType as string | undefined
+          const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const text = log.metadata?.text as string | undefined
+          const dtg = log.metadata?.dtg as string | undefined
+          const loud = stage === 'ALERT' || stage === 'MISSED'
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL-ALRT:" blockView>
+                <div className="flex justify-between gap-16 tabular-nums">
+                  <span className={cn('tracking-widest', !loud && 'opacity-60')}>
+                    {loud ? '■ ' : ''}{stage} // {(entryType || 'entry').toUpperCase()}
+                  </span>
+                  {dtg && <span className="opacity-40 whitespace-nowrap">{dtg}</span>}
+                </div>
+                {text && <div className={cn('mt-8', stage === 'SCRUB' && 'line-through opacity-40')}>{text}</div>}
+                {date && (
+                  <div className="opacity-40 mt-8 tabular-nums">
+                    {date} · {time ? `${time.replace(':', '')} HRS` : 'ALL DAY'}
+                  </div>
+                )}
               </Block>
             </LogContainer>
           )

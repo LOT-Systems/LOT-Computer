@@ -384,7 +384,8 @@ export const System = React.memo(function SystemInner() {
   const upcomingCalendar = React.useMemo(() => {
     const today = dayjs().format('YYYY-MM-DD')
     const entries = logs
-      .filter(log => log.event === 'calendar_entry' && log.metadata?.date && (log.metadata.date as string) >= today)
+      .filter(log => log.event === 'calendar_entry' && log.metadata?.date && (log.metadata.date as string) >= today
+        && (!log.metadata.status || log.metadata.status === 'open'))
       .map(log => ({
         date: log.metadata!.date as string,
         text: (log.metadata!.text as string) || log.text || '',

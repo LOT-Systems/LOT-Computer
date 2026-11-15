@@ -1084,7 +1084,7 @@ export default async (fastify: FastifyInstance) => {
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_alert', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -1586,6 +1586,66 @@ export default async (fastify: FastifyInstance) => {
     }
   )
 
+  // ============================================================================
+  // CALENDAR — entries are `calendar_entry` logs. Dedicated read path so entries
+  // never fall out of the 500-row /logs window; update path for status, snooze
+  // and cross-device alert dedupe. Text/date are immutable once logged.
+  // ============================================================================
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    const rows = await fastify.models.Log.findAll({
+      where: { userId: req.user.id, event: 'calendar_entry' },
+      attributes: ['id', 'text', 'metadata', 'createdAt'],
+      order: [['createdAt', 'DESC']],
+      limit: 2000,
+    })
+    return rows.map((r) => ({
+      id: r.id,
+      text: r.text,
+      metadata: r.metadata,
+      createdAt: r.createdAt,
+    }))
+  })
+
+  fastify.put(
+    '/calendar/:id',
+    async (
+      req: FastifyRequest<{
+        Params: { id: string }
+        Body: {
+          status?: 'open' | 'done' | 'cancelled'
+          snoozeUntil?: string | null
+          alertedFor?: string | null
+        }
+      }>,
+      reply
+    ) => {
+      const log = await fastify.models.Log.findOne({
+        where: { id: req.params.id, userId: req.user.id, event: 'calendar_entry' },
+      })
+      if (!log) return reply.throw.notFound()
+      const body = req.body || {}
+      const patch: Record<string, any> = {}
+      if (body.status !== undefined) {
+        if (!['open', 'done', 'cancelled'].includes(body.status)) {
+          return reply.throw.badParams('Invalid status')
+        }
+        patch.status = body.status
+        patch.statusAt = new Date().toISOString()
+      }
+      for (const key of ['snoozeUntil', 'alertedFor'] as const) {
+        const v = body[key]
+        if (v === undefined) continue
+        if (v !== null && (typeof v !== 'string' || isNaN(Date.parse(v)))) {
+          return reply.throw.badParams(`Invalid ${key}`)
+        }
+        patch[key] = v
+      }
+      if (!Object.keys(patch).length) return log
+      await log.set({ metadata: { ...(log.metadata || {}), ...patch } }).save()
+      return { id: log.id, text: log.text, metadata: log.metadata, createdAt: log.createdAt }
+    }
+  )
+
   fastify.put(
     '/logs/:id',
     async (
@@ -1597,7 +1657,7 @@ export default async (fastify: FastifyInstance) => {
     ) => {
       const text = (req.body.text || '').trim().slice(0, MAX_LOG_TEXT_LENGTH)
       const log = await fastify.models.Log.findByPk(req.params.id)
-      if (!log) return reply.throw.notFound()
+      if (!log || log.userId !== req.user.id) return reply.throw.notFound()
       if (log.event !== 'note') return log
 
       // If user backspaced all content, delete the log instead of saving empty text

@@ -146,6 +146,30 @@ export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
   (data) => `/api/logs/${data.id}`
 )
 
+// Calendar — dedicated endpoint (not bounded by the /logs 500-row window)
+export type CalendarLogRecord = {
+  id: string
+  text: string | null
+  metadata: Record<string, any> | null
+  createdAt: string
+}
+
+export const useCalendar = createQuery<CalendarLogRecord[]>('/api/calendar', {
+  refetchOnWindowFocus: true,
+  refetchInterval: 5 * 60 * 1000,
+  staleTime: 60 * 1000,
+})
+
+export const useUpdateCalendarEntry = createMutation<
+  {
+    id: string
+    status?: 'open' | 'done' | 'cancelled'
+    snoozeUntil?: string | null
+    alertedFor?: string | null
+  },
+  CalendarLogRecord
+>('put', (data) => `/api/calendar/${data.id}`)
+
 export const useMemory = () => {
   const date = btoa(dayjs().format('YYYY-MM-DD'))
   const path = '/api/memory'
