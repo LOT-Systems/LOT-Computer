@@ -374,6 +374,23 @@ entry — never editing or removing a prior one.
   especially well, and that they belong on the design panel from the
   start. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R05.md, Section 09.
 
+  USE CASE 06 — THE MAKER'S BENCH                           2026-11-15
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, studio potter in a garage studio,
+  900 mm plywood bench, concrete floor, phone bagged away from clay and
+  dust. In the workshop, the felt channel and the touch ack both fail:
+  the bench is pounded during wedging and hands are wet with clay. When
+  the shared surface vibrates, the cube DEFERS (G9). It never escalates.
+  Instead, the operator chooses to raise memory_ready one rung to HOP
+  (an operator-set ceiling that QI·46 can lower but never set) and acks
+  by approach. The LEAP spring is cocked only on intent, so when a
+  sleeve knocks the cube onto concrete, nothing fires. SAFE-HOLD,
+  placement and a self-test follow (G8). Dusty ToF windows fail quiet to
+  SETTLE. Proves that hands-busy makers need the visible channel, that
+  drops are routine rather than an edge case, and that only the operator
+  may make the cube louder. Full narrative:
+  LOT-CUBIQ-QUANTUM-CUBE-v0-R06.md, Section 10.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
