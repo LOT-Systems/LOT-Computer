@@ -80,16 +80,17 @@ export function getHourlyZodiac(date: Date): string {
  * Simplified calculation based on Gregorian calendar
  */
 export function getRokuyo(date: Date): string {
-  // Known starting point: January 1, 2000 was Sensho (index 0)
-  const knownDate = new Date('2000-01-01')
-  const knownRokuyoIndex = 0
-
-  // Calculate days since known date
-  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
-
-  // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
-
+  // Known starting point: January 1, 2000 was Sensho (index 0).
+  // Count whole *calendar* days from the date's own wall-clock Y/M/D, not
+  // raw millisecond deltas — the old ms-delta form compared a local Date
+  // against a UTC-midnight anchor, so the rokuyo flipped at 19:00 (UTC-5)
+  // or 09:00 (UTC+9) local instead of midnight, and the client dashboard
+  // disagreed with the server-side Logs snapshot for non-UTC users.
+  // (2026-11-15 astrology v2 fix)
+  const anchor = Date.UTC(2000, 0, 1)
+  const day = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  const daysDiff = Math.round((day - anchor) / 86400000)
+  const rokuyoIndex = ((daysDiff % 6) + 6) % 6
   return ROKUYO[rokuyoIndex]
 }
 
@@ -131,7 +132,7 @@ export function getMoonPhase(date: Date): { phase: string; illumination: number 
 
   // Calculate days since known new moon
   const daysSinceNewMoon = (date.getTime() - knownNewMoon) / secondsInDay
-  const phase = daysSinceNewMoon % lunarCycle
+  const phase = ((daysSinceNewMoon % lunarCycle) + lunarCycle) % lunarCycle
 
   // Calculate illumination (0-100%)
   const illumination = Math.round(50 * (1 - Math.cos((phase / lunarCycle) * 2 * Math.PI)))
@@ -152,7 +153,9 @@ export function getMoonPhase(date: Date): { phase: string; illumination: number 
     phaseName = 'Waning Gibbous'
   } else if (phase < 23.61224) {
     phaseName = 'Last Quarter'
-  } else if (phase < 29.53059) {
+  } else if (phase < 27.68493) {
+    // Was < 29.53059, which swallowed the 1.85 days *before* each new moon
+    // into Waning Crescent — New Moon was half as wide as it should be.
     phaseName = 'Waning Crescent'
   } else {
     phaseName = 'New Moon'
@@ -176,4 +179,154 @@ export function getMoonEmoji(phaseName: string): string {
     'Waning Crescent': '🌘',
   }
   return emojiMap[phaseName] || '🌑'
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Astrology v2 (2026-11-15) — timeZone-aware reading + Logs resonance
+// Ambient conditions only. Personalization is derived from the user's own
+// Logs history (when they write), never from birth data.
+// ─────────────────────────────────────────────────────────────────────────
+
+export const MOON_PHASES = [
+  'New Moon', 'Waxing Crescent', 'First Quarter', 'Waxing Gibbous',
+  'Full Moon', 'Waning Gibbous', 'Last Quarter', 'Waning Crescent',
+] as const
+
+// Share of the lunar cycle each named phase occupies (from the thresholds
+// in getMoonPhase). Used as the "expected" baseline for resonance.
+const LUNAR_CYCLE_DAYS = 29.53058770576
+const MOON_PHASE_SHARE: Record<string, number> = {
+  'New Moon': (1.84566 + (LUNAR_CYCLE_DAYS - 27.68493)) / LUNAR_CYCLE_DAYS,
+  'Waxing Crescent': (7.38264 - 1.84566) / LUNAR_CYCLE_DAYS,
+  'First Quarter': (8.84566 - 7.38264) / LUNAR_CYCLE_DAYS,
+  'Waxing Gibbous': (14.76529 - 8.84566) / LUNAR_CYCLE_DAYS,
+  'Full Moon': (16.22892 - 14.76529) / LUNAR_CYCLE_DAYS,
+  'Waning Gibbous': (22.14855 - 16.22892) / LUNAR_CYCLE_DAYS,
+  'Last Quarter': (23.61224 - 22.14855) / LUNAR_CYCLE_DAYS,
+  'Waning Crescent': (27.68493 - 23.61224) / LUNAR_CYCLE_DAYS,
+}
+
+export interface AstrologyReading {
+  hourlyZodiac: string
+  westernZodiac: string
+  rokuyo: string
+  moonPhase: string
+  moonIllumination: number
+  auspicious: boolean
+  timeZone: string | null
+}
+
+/**
+ * Wall-clock Date for `date` as seen in `timeZone`. The returned Date's
+ * local getters (getHours/getDate/...) read the zone's wall clock, which is
+ * what the calendar-based readers above expect. Falls back to `date` when
+ * the zone is missing or invalid. Isomorphic (Intl), no dayjs dependency.
+ */
+export function toZonedWallClock(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+    }).formatToParts(date)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'))
+  } catch {
+    return date
+  }
+}
+
+/**
+ * One canonical ambient reading. Calendar/clock readings (rokuyo, zodiac
+ * hour, western sign) use the zone's wall clock; the moon phase uses the
+ * real instant (the moon is the same everywhere). Dashboard and Logs both
+ * call this, so the widget and the journal snapshot always agree.
+ */
+export function getAstrologyReading(date: Date = new Date(), timeZone?: string | null): AstrologyReading {
+  const wall = toZonedWallClock(date, timeZone)
+  const moon = getMoonPhase(date)
+  const rokuyo = getRokuyo(wall)
+  return {
+    hourlyZodiac: getHourlyZodiac(wall),
+    westernZodiac: getWesternZodiac(wall),
+    rokuyo,
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    auspicious: rokuyo === 'Taian',
+    timeZone: timeZone || null,
+  }
+}
+
+export interface AstroContextLike {
+  astroRokuyo?: string | null
+  astroMoonPhase?: string | null
+  astroHourlyZodiac?: string | null
+}
+
+export type AstroResonanceLevel = 'resonant' | 'steady' | 'quiet'
+
+export interface AstroResonance {
+  sampleSize: number
+  topHourZodiac: string | null
+  topMoonPhase: string | null
+  topRokuyo: string | null
+  /** Observed/expected share of the user's logs written under today's rokuyo + moon phase */
+  todayRatio: number
+  level: AstroResonanceLevel
+  /** True when the current zodiac hour is the user's most-written hour */
+  isPeakHour: boolean
+}
+
+export const ASTRO_RESONANCE_MIN_SAMPLE = 12
+
+function topKey(counts: Record<string, number>): string | null {
+  let best: string | null = null
+  let bestN = 0
+  for (const [k, n] of Object.entries(counts)) {
+    if (n > bestN) { best = k; bestN = n }
+  }
+  return best
+}
+
+/**
+ * Personal rhythm from Logs: which zodiac hour / moon phase / rokuyo the
+ * user actually writes under (read from each log's context snapshot), and
+ * how today's conditions compare to that history. Returns null until there
+ * are enough astro-stamped logs to say anything honest.
+ */
+export function computeAstroResonance(
+  contexts: Array<AstroContextLike | null | undefined>,
+  today: Pick<AstrologyReading, 'rokuyo' | 'moonPhase' | 'hourlyZodiac'>
+): AstroResonance | null {
+  const hour: Record<string, number> = {}
+  const moon: Record<string, number> = {}
+  const rok: Record<string, number> = {}
+  let n = 0
+  for (const c of contexts) {
+    if (!c || !c.astroRokuyo || !c.astroMoonPhase) continue
+    n++
+    rok[c.astroRokuyo] = (rok[c.astroRokuyo] || 0) + 1
+    moon[c.astroMoonPhase] = (moon[c.astroMoonPhase] || 0) + 1
+    if (c.astroHourlyZodiac) hour[c.astroHourlyZodiac] = (hour[c.astroHourlyZodiac] || 0) + 1
+  }
+  if (n < ASTRO_RESONANCE_MIN_SAMPLE) return null
+
+  const rokRatio = ((rok[today.rokuyo] || 0) / n) / (1 / 6)
+  const moonShare = MOON_PHASE_SHARE[today.moonPhase] || 1 / 8
+  const moonRatio = ((moon[today.moonPhase] || 0) / n) / moonShare
+  const todayRatio = Math.round(((rokRatio + moonRatio) / 2) * 100) / 100
+  const level: AstroResonanceLevel = todayRatio >= 1.25 ? 'resonant' : todayRatio <= 0.75 ? 'quiet' : 'steady'
+  const topHourZodiac = topKey(hour)
+
+  return {
+    sampleSize: n,
+    topHourZodiac,
+    topMoonPhase: topKey(moon),
+    topRokuyo: topKey(rok),
+    todayRatio,
+    level,
+    isPeakHour: !!topHourZodiac && topHourZodiac === today.hourlyZodiac,
+  }
 }

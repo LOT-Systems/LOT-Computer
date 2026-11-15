@@ -4880,7 +4880,17 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  // v2 (2026-11-15): personal rhythm derived from the user's own Logs
+  // history (computeAstroResonance). Optional — absent until enough
+  // astro-stamped logs exist.
+  resonance?: {
+    resonance: 'resonant' | 'steady' | 'quiet'
+    resonanceRatio: number
+    topHourZodiac: string | null
+    topMoonPhase: string | null
+    sampleSize: number
+  }
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4899,7 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    ...(resonance || {}),
   })
 }
 
