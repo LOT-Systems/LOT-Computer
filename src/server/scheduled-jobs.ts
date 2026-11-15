@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily temporal depth check (23:00 UTC every day) — Job 49
+  if (shouldRunDailyTemporalDepthCheck()) {
+    await executeDailyTemporalDepthCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,113 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── J49: Daily Temporal Depth Check — 23:00 UTC ────────────────────────────
+// Checks the prior 7 days for circadian_signal_lock events. If 7 consecutive
+// calendar days have circadian lock confirmed, fires temporal_depth_seal.
+
+let isDailyTemporalDepthRunning = false
+let lastDailyTemporalDepthRun: Date | null = null
+
+function shouldRunDailyTemporalDepthCheck(): boolean {
+  const now = dayjs()
+  if (isDailyTemporalDepthRunning) return false
+  if (lastDailyTemporalDepthRun) {
+    const lastRun = dayjs(lastDailyTemporalDepthRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 23 // 23:00 UTC daily
+}
+
+async function executeDailyTemporalDepthCheck(): Promise<JobResult> {
+  const jobName = 'daily-temporal-depth-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyTemporalDepthRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyTemporalDepthRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY TEMPORAL DEPTH CHECK — 23:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDaysAgo = dayjs().subtract(7, 'day').startOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(3, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (72h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const recentLocks = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+            event: 'circadian_signal_lock',
+          },
+          attributes: ['createdAt'],
+          order: [['createdAt', 'ASC']],
+        })
+
+        if (!recentLocks.length) continue
+
+        const lockDays = new Set(
+          recentLocks.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD'))
+        )
+
+        if (lockDays.size < 7) continue
+
+        const sortedDays = Array.from(lockDays).sort()
+        let consecutiveCount = 1
+        let maxConsecutive = 1
+        for (let i = 1; i < sortedDays.length; i++) {
+          const diff = dayjs(sortedDays[i]).diff(dayjs(sortedDays[i - 1]), 'day')
+          if (diff === 1) {
+            consecutiveCount++
+            maxConsecutive = Math.max(maxConsecutive, consecutiveCount)
+          } else {
+            consecutiveCount = 1
+          }
+        }
+
+        if (maxConsecutive >= 7) {
+          await (Log as any).create({
+            userId,
+            event: 'temporal_depth_seal',
+            text: `Temporal depth seal: ${maxConsecutive} consecutive days of circadian-signal-lock confirmed. Morning · meridian · dusk across the full arc. The operating architecture is structural.`,
+            metadata: {
+              consecutiveDays: maxConsecutive,
+              totalLockDays: lockDays.size,
+              arc: 'DAWN·MERIDIAN·DUSK',
+              lockType: 'STRUCTURAL',
+              window: '7d',
+              hour: 23,
+            },
+          })
+          written++
+        }
+      } catch {}
+    }
+
+    console.log(`  Temporal depth seal events written: ${written}`)
+    lastDailyTemporalDepthRun = new Date()
+    isDailyTemporalDepthRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily temporal depth check failed:', error.message)
+    isDailyTemporalDepthRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5608,6 +5719,9 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily signal coherence cascade check: 8 AM UTC every day (Job 47)')
+  console.log('   - Daily total field coherence check: 9 AM UTC every day (Job 48)')
+  console.log('   - Daily temporal depth check: 11 PM UTC every day (Job 49)')
   console.log('')
 
   // Check every hour for scheduled jobs

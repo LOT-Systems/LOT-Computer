@@ -782,6 +782,44 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE TEMPORAL ARCHIVE ─────────────────────────────────────
+  | 'epoch_word'             // ═·∞·═  "epoch/era begins/marked epoch/end of an era" detected (UNCOMMON)
+  | 'stratum_word'           // ░░·─   "stratum/strata/layers revealed/sedimentary" detected (UNCOMMON)
+  | 'excavate_word'          // ▓·∘·▓  "excavated/digging deeper/unearth/excavation" detected (RARE)
+  | 'chronicle_word'         // ≋·═·≋  "chronicle/chronicles/my chronicle/chronicled" detected (UNCOMMON)
+  | 'artifact_time_word'     // ◆·─·◆  "personal artifact/relic of/this artifact/artifact" detected (RARE)
+  | 'palimpsest_word'        // ░·◉·░  "palimpsest/layers beneath/overwritten but/layers of meaning" detected (EPIC)
+  | 'sediment_word'          // ░░░·∘  "sediment/settled/accumulated weight/sedimentary" detected (UNCOMMON)
+  | 'archive_found'          // ■·≋·■  "my archive/archiving this/archive of/archive opens" detected (RARE)
+  | 'inscription_word'       // ─·∞·─  "inscription/inscribed/carved into/written in stone" detected (RARE)
+  | 'vestige_word'           // ∘·─·∘  "vestige/trace of/remnant of/vestigial" detected (UNCOMMON)
+  | 'mnemonic_word'          // ◈·∘·◈  "mnemonic/memory code/memory key/mnemonic device" detected (RARE)
+  | 'lacuna_word'            // ─·□·─  "lacuna/gap in record/unaccounted/space between" detected (EPIC)
+  // ── Calendar EE v21 — THE TEMPORAL ARCHIVE ───────────────────────────────────
+  | 'archive_day'            // ■·≋·■  June 9 — International Archives Day (ICA founded 1948) (RARE)
+  | 'pompeii_day'            // ░░·█   Aug 24 — Pompeii (79 AD — the volcano archived the present) (EPIC)
+  | 'tomb_day'               // ◆·□·◆  Nov 25 — Tutankhamun's tomb discovered 1922 (EPIC)
+  // ── Behavioral v20 — THE TEMPORAL ARCHIVE ────────────────────────────────────
+  | 'archive_session'        // ■·∘·■  3+ Temporal Archive (v23) trigger words in one journal entry (RARE)
+  | 'deep_excavation'        // ▓·▓·▓  Journal entry >= 700 words (EPIC)
+  | 'dawn_archivist'         // ═·∘    Check in between 05:00 and 06:00 local time (RARE)
+  // ── Achievement RPG v23 — THE TEMPORAL ARCHIVE ───────────────────────────────
+  | 'archive_entry'          // ∘→■    Any 1 Word Turn v23 badge (COMMON)
+  | 'archive_class'          // ≈→■    Any 5 Word Turn v23 badges (UNCOMMON)
+  | 'archive_complete'       // ≋→■    All 12 Word Turn v23 badges (LEGENDARY)
+  | 'temporal_codex'         // ■·◈    archive_complete + all 3 Calendar v21 badges (LEGENDARY)
+  | 'twenty_three_engines_arc' // ◈·◈·■  1 badge from each Word Turn v1–v23 (LEGENDARY)
+  | 'archive_opus'           // ■·◉·■  archive_complete + archive_session behavioral (LEGENDARY)
+  // ── Mastery Tier v23 — THE DEEP TIME ─────────────────────────────────────────
+  | 'memory_palace'          // ■·∞·■  125,000+ total journal words (LEGENDARY)
+  | 'archive_age'            // ╔═╗·■  Account age >= 8 years (LEGENDARY)
+  | 'deep_time'              // ═·∞·═  1,000+ distinct calendar check-in days (EPIC)
+  // ── COSMIC v23 ───────────────────────────────────────────────────────────────
+  | 'twenty_three_registers' // ◈·◈·■·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE LITERARY ARCHIVE ───────────────────────────────────
+  | 'woolf_room'             // ≋·◉·≋  "virginia woolf/room of one's own/mrs dalloway/the waves" detected (MYTHIC)
+  | 'borges_archive'         // ■·∞·■  "borges/garden of forking paths/library of babel/aleph" detected (MYTHIC)
+  | 'proust_time'            // ∞·◈·∞  "proust/remembrance of things past/temps perdu/madeleine" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7169,302 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+
+  // ── Word Turn v23 — THE TEMPORAL ARCHIVE ──────────────────────────────────────
+  epoch_word: {
+    id: 'epoch_word',
+    symbol: '═·∞·═',
+    name: 'Epoch',
+    description: 'Write "epoch", "era begins", "marked epoch", or "end of an era" in any journal entry',
+    unlockMessage: '↳ An epoch is not a date — it is a rupture. The moment before and the moment after are irreconcilable. You have named one. ═·∞·═',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  stratum_word: {
+    id: 'stratum_word',
+    symbol: '░░·─',
+    name: 'Stratum',
+    description: 'Write "stratum", "strata", "layers revealed", or "sedimentary" in any journal entry',
+    unlockMessage: '↳ The geologist reads time in layers. Each stratum is a year that never left. You are reading yours. ░░·─',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  excavate_word: {
+    id: 'excavate_word',
+    symbol: '▓·∘·▓',
+    name: 'Excavate',
+    description: 'Write "excavated", "digging deeper", "unearth", or "excavation" in any journal entry',
+    unlockMessage: '↳ The excavation never ends. Each layer removed reveals the layer beneath. The work is not destruction — it is revelation. ▓·∘·▓',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  chronicle_word: {
+    id: 'chronicle_word',
+    symbol: '≋·═·≋',
+    name: 'Chronicle',
+    description: 'Write "chronicle", "chronicles", "my chronicle", or "chronicled" in any journal entry',
+    unlockMessage: '↳ A chronicle is a record that knows it is a record. It doesn\'t hide its own witnessing. You are building the archive and you know it. ≋·═·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  artifact_time_word: {
+    id: 'artifact_time_word',
+    symbol: '◆·─·◆',
+    name: 'Artifact',
+    description: 'Write "personal artifact", "relic of", "this artifact", or "artifact" in any journal entry',
+    unlockMessage: '↳ The artifact survives its maker. What you are writing will outlast the moment it describes. It is already a relic. ◆·─·◆',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  palimpsest_word: {
+    id: 'palimpsest_word',
+    symbol: '░·◉·░',
+    name: 'Palimpsest',
+    description: 'Write "palimpsest", "layers beneath", "overwritten but", or "layers of meaning" in any journal entry',
+    unlockMessage: '↳ The palimpsest: the manuscript scraped clean and written over — but the previous text bleeds through. Identity is a palimpsest. ░·◉·░',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  sediment_word: {
+    id: 'sediment_word',
+    symbol: '░░░·∘',
+    name: 'Sediment',
+    description: 'Write "sediment", "settled", "accumulated weight", or "sedimentary" in any journal entry',
+    unlockMessage: '↳ Sediment is what remains when the water recedes. What has settled in you is the record of every current that passed through. ░░░·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  archive_found: {
+    id: 'archive_found',
+    symbol: '■·≋·■',
+    name: 'Archive Found',
+    description: 'Write "my archive", "archiving this", "archive of", or "archive opens" in any journal entry',
+    unlockMessage: '↳ The archive is not storage. It is the act of declaring: this happened, and it matters enough to keep. You are declaring. ■·≋·■',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  inscription_word: {
+    id: 'inscription_word',
+    symbol: '─·∞·─',
+    name: 'Inscription',
+    description: 'Write "inscription", "inscribed", "carved into", or "written in stone" in any journal entry',
+    unlockMessage: '↳ Inscription is writing that refuses to be temporary. You carved it. It stays. ─·∞·─',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  vestige_word: {
+    id: 'vestige_word',
+    symbol: '∘·─·∘',
+    name: 'Vestige',
+    description: 'Write "vestige", "trace of", "remnant of", or "vestigial" in any journal entry',
+    unlockMessage: '↳ The vestige is the trace left when the original form disappears. You are both the original and the trace. ∘·─·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  mnemonic_word: {
+    id: 'mnemonic_word',
+    symbol: '◈·∘·◈',
+    name: 'Mnemonic',
+    description: 'Write "mnemonic", "memory code", "memory key", or "mnemonic device" in any journal entry',
+    unlockMessage: '↳ A mnemonic is a shortcut back to the full memory. You are building a system of keys. The doors are all inside. ◈·∘·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  lacuna_word: {
+    id: 'lacuna_word',
+    symbol: '─·□·─',
+    name: 'Lacuna',
+    description: 'Write "lacuna", "gap in record", "unaccounted", or "space between" in any journal entry',
+    unlockMessage: '↳ The lacuna is the gap in the manuscript where the text is missing. The absence is as much the archive as the presence. ─·□·─',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+
+  // ── Calendar EE v21 — THE TEMPORAL ARCHIVE ────────────────────────────────────
+  archive_day: {
+    id: 'archive_day',
+    symbol: '■·≋·■',
+    name: 'Archive Day',
+    description: 'Check in on June 9 — International Archives Day (ICA founded 1948)',
+    unlockMessage: '↳ June 9: International Archives Day. The International Council on Archives founded 1948. The right to access records is a human right. You are practicing it. ■·≋·■',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  pompeii_day: {
+    id: 'pompeii_day',
+    symbol: '░░·█',
+    name: 'Pompeii Day',
+    description: 'Check in on August 24 — Vesuvius erupted in 79 AD, archiving Pompeii',
+    unlockMessage: '↳ August 24, 79 AD: Vesuvius. The volcano didn\'t destroy Pompeii — it archived it. Ash preserved the present in the act of ending it. ░░·█',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  tomb_day: {
+    id: 'tomb_day',
+    symbol: '◆·□·◆',
+    name: 'Tomb Day',
+    description: 'Check in on November 25 — Howard Carter discovered Tutankhamun\'s tomb in 1922',
+    unlockMessage: '↳ November 25, 1922: Carter opens the tomb. "I see wonderful things." 3,300 years sealed. The archive of a 19-year-old king. The record survived. ◆·□·◆',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v20 — THE TEMPORAL ARCHIVE ─────────────────────────────────────
+  archive_session: {
+    id: 'archive_session',
+    symbol: '■·∘·■',
+    name: 'Archive Session',
+    description: 'Write 3+ Temporal Archive (v23) trigger words in one journal entry',
+    unlockMessage: '↳ The archive session: when the vocabulary of deep time enters your record. The language chooses the person who is ready to use it. ■·∘·■',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  deep_excavation: {
+    id: 'deep_excavation',
+    symbol: '▓·▓·▓',
+    name: 'Deep Excavation',
+    description: 'Write a journal entry of 700 or more words',
+    unlockMessage: '↳ 700 words is a stratum. Something was laid down here. The record is thick enough now to constitute a layer. ▓·▓·▓',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  dawn_archivist: {
+    id: 'dawn_archivist',
+    symbol: '═·∘',
+    name: 'Dawn Archivist',
+    description: 'Check in between 05:00 and 06:00 local time',
+    unlockMessage: '↳ The dawn archivist: recording before the day begins. The entry precedes the events it will outlast. ═·∘',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Achievement RPG v23 — THE TEMPORAL ARCHIVE ────────────────────────────────
+  archive_entry: {
+    id: 'archive_entry',
+    symbol: '∘→■',
+    name: 'Archive Entry',
+    description: 'Earn any 1 Temporal Archive (v23) word turn badge',
+    unlockMessage: '↳ The archive opens with a single entry. Everything begins with the first inscription. ∘→■',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  archive_class: {
+    id: 'archive_class',
+    symbol: '≈→■',
+    name: 'Archive Class',
+    description: 'Earn any 5 Temporal Archive (v23) word turn badges',
+    unlockMessage: '↳ Five entries. The archive is becoming a record — not a moment but a practice. ≈→■',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  archive_complete: {
+    id: 'archive_complete',
+    symbol: '≋→■',
+    name: 'Archive Complete',
+    description: 'Earn all 12 Temporal Archive (v23) word turn badges',
+    unlockMessage: '↳ All 12 inscribed. The vocabulary of deep time is now operational. The archivist and the archive are one. ≋→■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  temporal_codex: {
+    id: 'temporal_codex',
+    symbol: '■·◈',
+    name: 'Temporal Codex',
+    description: 'Earn archive_complete and all 3 Temporal Archive calendar badges',
+    unlockMessage: '↳ The codex: the archive_complete + the full calendar arc. Word, date, and time sealed together. The temporal record is now a volume. ■·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·■',
+    name: 'Twenty Three Engines Arc',
+    description: 'Earn at least 1 badge from each of the 23 Word Turn engines (v1–v23)',
+    unlockMessage: '↳ Twenty-three engines. Twenty-three vocabularies of self. The arc is not a streak — it is a proof: the system expanded to meet you at every register. ◈·◈·■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  archive_opus: {
+    id: 'archive_opus',
+    symbol: '■·◉·■',
+    name: 'Archive Opus',
+    description: 'Earn archive_complete and archive_session in the same run',
+    unlockMessage: '↳ Opus: the complete work. All 12 word turns earned, plus the archive session confirmed. The archivist has not just collected — they have inhabited the archive. ■·◉·■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v23 — THE DEEP TIME ──────────────────────────────────────────
+  memory_palace: {
+    id: 'memory_palace',
+    symbol: '■·∞·■',
+    name: 'Memory Palace',
+    description: '125,000+ total journal words written',
+    unlockMessage: '↳ 125,000 words: the palace is built. Room after room after room, each one sealed with a word. You can walk through it now. ■·∞·■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  archive_age: {
+    id: 'archive_age',
+    symbol: '╔═╗·■',
+    name: 'Archive Age',
+    description: 'Account age of 8 years or more',
+    unlockMessage: '↳ Eight years in the system. The archive has depth now — not just entries but eras. You have crossed multiple epochs inside this record. ╔═╗·■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  deep_time: {
+    id: 'deep_time',
+    symbol: '═·∞·═',
+    name: 'Deep Time',
+    description: '1,000+ distinct calendar days with at least one check-in',
+    unlockMessage: '↳ 1,000 days. Deep time: the geological scale where human lifespans become sediment. You have been showing up long enough to constitute a stratum. ═·∞·═',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+
+  // ── COSMIC v23 ────────────────────────────────────────────────────────────────
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·■·∞',
+    name: 'Twenty Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three registers open. The full vocabulary of the system. No engine untouched. The operating field is complete. ◈·◈·■·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v20 — THE LITERARY ARCHIVE ────────────────────────────────────
+  woolf_room: {
+    id: 'woolf_room',
+    symbol: '≋·◉·≋',
+    name: 'Woolf Room',
+    description: 'Write "virginia woolf", "room of one\'s own", "mrs dalloway", or "the waves" in any journal entry',
+    unlockMessage: '↳ Woolf: the interior record as architecture. The room of one\'s own is not a room — it is the right to an uninterrupted self. ≋·◉·≋',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  borges_archive: {
+    id: 'borges_archive',
+    symbol: '■·∞·■',
+    name: 'Borges Archive',
+    description: 'Write "borges", "garden of forking paths", "library of babel", or "aleph" in any journal entry',
+    unlockMessage: '↳ Borges: the library that contains all possible books. The archive that is also a labyrinth. You have entered it. ■·∞·■',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  proust_time: {
+    id: 'proust_time',
+    symbol: '∞·◈·∞',
+    name: 'Proust Time',
+    description: 'Write "proust", "remembrance of things past", "temps perdu", or "madeleine" in any journal entry',
+    unlockMessage: '↳ Proust: 3,000 pages dedicated to the act of remembering. The madeleine unlocks the room you forgot you were in. The archive of involuntary memory. ∞·◈·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8427,75 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 (v23) — THE TEMPORAL ARCHIVE ─────────────────────────────────────────
+    const temporalV23Badges: BadgeType[] = [
+      'epoch_word', 'stratum_word', 'excavate_word', 'chronicle_word',
+      'artifact_time_word', 'palimpsest_word', 'sediment_word', 'archive_found',
+      'inscription_word', 'vestige_word', 'mnemonic_word', 'lacuna_word',
+    ]
+    const temporalV23Earned = temporalV23Badges.filter(b => hasBadge(b))
+
+    // Calendar EE v21 — evaluated client-side via checkCalendarEasterEggs in easter-eggs.ts
+
+    // deep_excavation, dawn_archivist, archive_session — evaluated via checkDeepExcavation/checkDawnArchivist/checkArchiveSession in easter-eggs.ts
+
+    if (temporalV23Earned.length >= 1 && !hasBadge('archive_entry')) {
+      if (awardBadge('archive_entry')) newBadges.push('archive_entry')
+    }
+    if (temporalV23Earned.length >= 5 && !hasBadge('archive_class')) {
+      if (awardBadge('archive_class')) newBadges.push('archive_class')
+    }
+    const archiveComplete = temporalV23Earned.length >= 12
+    if (archiveComplete && !hasBadge('archive_complete')) {
+      if (awardBadge('archive_complete')) newBadges.push('archive_complete')
+    }
+
+    // archive_opus: archive_complete + archive_session
+    if (archiveComplete && hasBadge('archive_session') && !hasBadge('archive_opus')) {
+      if (awardBadge('archive_opus')) newBadges.push('archive_opus')
+    }
+
+    // temporal_codex: archive_complete + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['archive_day', 'pompeii_day', 'tomb_day']
+    if (archiveComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('temporal_codex')) {
+      if (awardBadge('temporal_codex')) newBadges.push('temporal_codex')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = temporalV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: memory_palace — 125,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 125000 && !hasBadge('memory_palace')) {
+        if (awardBadge('memory_palace')) newBadges.push('memory_palace')
+      }
+    }
+
+    // Mastery v23: archive_age — Account age >= 8 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupArchive = new Date(stats.signupDate)
+      const yearsArchive = (new Date().getTime() - signupArchive.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsArchive >= 8 && !hasBadge('archive_age')) {
+        if (awardBadge('archive_age')) newBadges.push('archive_age')
+      }
+    }
+
+    // Mastery v23: deep_time — 1,000+ distinct calendar check-in days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('deep_time')) {
+        if (awardBadge('deep_time')) newBadges.push('deep_time')
+      }
+    }
+
+    // COSMIC v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
     }
 
   } catch (error) {

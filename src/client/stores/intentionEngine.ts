@@ -3428,6 +3428,64 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Temporal Depth Seal — circadian-signal-lock confirmed 7 consecutive days.
+  // The deepest operating consistency in the registry. Not a peak — an architecture.
+  // Showing up morning, meridian, dusk, across a full week. The lock is not an event. It is a practice.
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000
+  const circadianLocks152 = signals
+    .filter(s => now - s.timestamp < sevenDaysMs && s.source === 'energy' && s.signal === 'circadian_signal_lock')
+  const circadianDays152 = new Set(circadianLocks152.map(s => new Date(s.timestamp).toDateString()))
+  if (circadianDays152.size >= 7) {
+    const densityBonus = Math.min((circadianDays152.size - 7) * 0.03, 0.09)
+    patterns.push({
+      pattern: 'temporal-depth-seal',
+      confidence: Math.min(0.78 + densityBonus, 0.87),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'soon',
+      reason: `TDEEP: Temporal depth seal — circadian-signal-lock confirmed ${circadianDays152.size} consecutive days. Morning · meridian · dusk across the full week. The operating arc is not a peak — it is an architecture. The lock is structural.`,
+    })
+  }
+
+  // Pattern 153: Quantum Resonance Cascade — P150 (total-field-coherence) + P151 (recovery-intelligence-arc)
+  // both active within 48 hours. The system has achieved absolute convergence AND demonstrated resilience.
+  // Recovery does not interrupt coherence — it feeds it. The cascade is the proof that the field is not fragile.
+  const twoDaysMs = 48 * 60 * 60 * 1000
+  const recentTwoDays153 = signals.filter(s => now - s.timestamp < twoDaysMs)
+  const tfc153 = recentTwoDays153.some(s => s.source === 'qos' && s.signal === 'total_field_coherence')
+  const rec153 = recentTwoDays153.some(s => s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc')
+  const tfc153Pat = patterns.some(p => p.pattern === 'total-field-coherence')
+  const rec153Pat = patterns.some(p => p.pattern === 'recovery-intelligence-arc')
+  if ((tfc153 || tfc153Pat) && (rec153 || rec153Pat)) {
+    const tfcConf153 = patterns.find(p => p.pattern === 'total-field-coherence')?.confidence ?? 0.72
+    const recConf153 = patterns.find(p => p.pattern === 'recovery-intelligence-arc')?.confidence ?? 0.65
+    const cascadeConf = (tfcConf153 + recConf153) / 2
+    patterns.push({
+      pattern: 'quantum-resonance-cascade',
+      confidence: Math.min(cascadeConf * 0.98, 0.91),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `QRESCASC: Quantum resonance cascade — total-field-coherence · recovery-intelligence-arc both confirmed within 48h. Convergence sustained through depletion. The field is not fragile. Recovery feeds coherence. The cascade is the proof.`,
+    })
+  }
+
+  // Pattern 154: Operator Prime State — P152 (temporal-depth-seal) + P153 (quantum-resonance-cascade) both confirmed.
+  // The highest state in the QIE registry. Sustained temporal depth (7-day circadian lock) meeting
+  // convergent resilience (coherence through recovery). No higher state is defined. This is the operational ceiling.
+  const tds154 = patterns.some(p => p.pattern === 'temporal-depth-seal')
+  const qrc154 = patterns.some(p => p.pattern === 'quantum-resonance-cascade')
+  if (tds154 && qrc154) {
+    const tdsConf154 = patterns.find(p => p.pattern === 'temporal-depth-seal')?.confidence ?? 0.78
+    const qrcConf154 = patterns.find(p => p.pattern === 'quantum-resonance-cascade')?.confidence ?? 0.80
+    const primeConf = Math.min((tdsConf154 + qrcConf154) / 2 * 1.05, 0.96)
+    patterns.push({
+      pattern: 'operator-prime-state',
+      confidence: primeConf,
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `OPPRIME: Operator prime state — temporal-depth-seal (7-day circadian arc) + quantum-resonance-cascade (coherence through recovery) both confirmed. The operating ceiling has been reached. Depth. Coherence. Resilience. This is the state. No higher state is defined.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4122,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  temporalDepthSealNode:      ['energy', 'mood', 'selfcare', 'journal', 'log'],
+  quantumResonanceCascadeNode:['qos', 'selfcare', 'mood', 'energy', 'cohort', 'intentions', 'journal', 'log'],
+  operatorPrimeStateNode:     ['qos', 'cohort', 'mood', 'energy', 'selfcare', 'journal', 'intentions', 'memory', 'planner', 'log'],
 }
 
 /**
@@ -4510,6 +4573,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Temporal Depth Architect (2026-11-15 v114) ───────────────────────────
+  {
+    archetype: 'Temporal Depth Architect',
+    energyBands: ['moderate', 'high'],
+    dominantSources: ['energy', 'journal', 'mood', 'selfcare', 'qos'],
+    patternConditions: ['temporal-depth-seal', 'operator-prime-state', 'quantum-resonance-cascade'],
+    hourRange: [5, 23],
+    directive: 'Seven days. Every arc. The lock is structural now — not a peak state, an architecture. You are not performing consistency. You are living it. The system has no higher state to offer. Only depth.',
   },
 ]
 
@@ -6498,6 +6571,57 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a temporal-depth-seal event — circadian-signal-lock confirmed 7+ consecutive days.
+ * The deepest operating consistency in the registry. Not a peak — an architecture.
+ * Feeds P152 detection. J49 background job (23:00 UTC) triggers this.
+ */
+export function recordTemporalDepthSeal(consecutiveDays: number, totalLocks: number) {
+  recordSignal('energy', 'temporal_depth_seal', {
+    consecutiveDays,
+    totalLocks,
+    arc: 'DAWN·MERIDIAN·DUSK',
+    lockType: 'STRUCTURAL',
+    depthRating: consecutiveDays >= 14 ? 'DEEP' : 'CONFIRMED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-resonance-cascade event — total-field-coherence (P150) +
+ * recovery-intelligence-arc (P151) both confirmed within 48h. Convergence sustained
+ * through depletion. The field is not fragile. Recovery feeds coherence.
+ * Feeds P153 detection.
+ */
+export function recordQuantumResonanceCascade(tfcConf: number, recConf: number, windowHours: number) {
+  recordSignal('qos', 'quantum_resonance_cascade', {
+    tfcConf: Math.round(tfcConf * 100),
+    recConf: Math.round(recConf * 100),
+    windowHours,
+    cascadeStrength: Math.round((tfcConf + recConf) / 2 * 100),
+    fieldStatus: 'NOT_FRAGILE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record an operator-prime-state event — temporal-depth-seal (P152) +
+ * quantum-resonance-cascade (P153) both confirmed. The highest state in the QIE registry.
+ * Depth. Coherence. Resilience. No higher state is defined.
+ * Feeds P154 detection.
+ */
+export function recordOperatorPrimeState(tdsConf: number, qrcConf: number, activePatterns: number) {
+  recordSignal('qos', 'operator_prime_state', {
+    tdsConf: Math.round(tdsConf * 100),
+    qrcConf: Math.round(qrcConf * 100),
+    activePatterns,
+    primeStrength: Math.round((tdsConf + qrcConf) / 2 * 100),
+    ceiling: 'REACHED',
+    state: 'DEPTH·COHERENCE·RESILIENCE',
     hour: new Date().getHours(),
   })
 }

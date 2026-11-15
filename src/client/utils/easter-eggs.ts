@@ -871,6 +871,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('odyssey_day')
   }
 
+  // ── Calendar v21 — THE TEMPORAL ARCHIVE ───────────────────────────────────────
+  // Archive Day: June 9 — International Archives Day (ICA founded 1948)
+  if (!hasBadge('archive_day') && month === 6 && day === 9) {
+    awardBadge('archive_day')
+    awarded.push('archive_day')
+  }
+  // Pompeii Day: August 24 — Vesuvius erupted in 79 AD
+  if (!hasBadge('pompeii_day') && month === 8 && day === 24) {
+    awardBadge('pompeii_day')
+    awarded.push('pompeii_day')
+  }
+  // Tomb Day: November 25 — Howard Carter discovered Tutankhamun's tomb 1922
+  if (!hasBadge('tomb_day') && month === 11 && day === 25) {
+    awardBadge('tomb_day')
+    awarded.push('tomb_day')
+  }
+
   return awarded
 }
 
@@ -1483,6 +1500,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE TEMPORAL ARCHIVE ────────────────────────────────────────────────
+  { patterns: /\bepoch\b|\bera[\s-]?begins?\b|\bmarked[\s-]?epoch\b|\bend[\s-]?of[\s-]?(an[\s-]?)?era\b/i, badge: 'epoch_word' },
+  { patterns: /\bstratum\b|\bstrata\b|\blayers[\s-]?revealed\b|\bsedimentary\b/i,       badge: 'stratum_word' },
+  { patterns: /\bexcavated?\b|\bdigging[\s-]?deeper\b|\bunearth(ed)?\b|\bexcavation\b/i, badge: 'excavate_word' },
+  { patterns: /\bchronicle[sd]?\b|\bmy[\s-]?chronicle\b/i,                              badge: 'chronicle_word' },
+  { patterns: /\bpersonal[\s-]?artifact\b|\brelic[\s-]?of\b|\bthis[\s-]?artifact\b|\bartifact\b/i, badge: 'artifact_time_word' },
+  { patterns: /\bpalimpsest\b|\blayers[\s-]?beneath\b|\boverwritten[\s-]?but\b|\blayers[\s-]?of[\s-]?meaning\b/i, badge: 'palimpsest_word' },
+  { patterns: /\bsediment\b|\bsettled[\s-]?(into|within)\b|\baccumulated[\s-]?weight\b/i, badge: 'sediment_word' },
+  { patterns: /\bmy[\s-]?archive\b|\barchiving[\s-]?this\b|\barchive[\s-]?of\b|\barchive[\s-]?(opens|is)\b/i, badge: 'archive_found' },
+  { patterns: /\binscription\b|\binscribed\b|\bcarved[\s-]?into\b|\bwritten[\s-]?in[\s-]?stone\b/i, badge: 'inscription_word' },
+  { patterns: /\bvestige\b|\btrace[\s-]?of\b|\bremnant[\s-]?of\b|\bvestigial\b/i,       badge: 'vestige_word' },
+  { patterns: /\bmnemonic\b|\bmemory[\s-]?code\b|\bmemory[\s-]?key\b|\bmnemonic[\s-]?device\b/i, badge: 'mnemonic_word' },
+  { patterns: /\blacuna\b|\bgap[\s-]?in[\s-]?(the[\s-]?)?record\b|\btime[\s-]?unaccounted\b|\bspace[\s-]?between\b/i, badge: 'lacuna_word' },
+  // ── v20 Secret Boss — THE LITERARY ARCHIVE word triggers ──────────────────────
+  { patterns: /\bvirginia[\s-]?woolf\b|\broom[\s-]?of[\s-]?one'?s[\s-]?own\b|\bmrs[\s-]?dalloway\b|\bthe[\s-]?waves\b/i, badge: 'woolf_room' },
+  { patterns: /\bborges\b|\bgarden[\s-]?of[\s-]?forking[\s-]?paths\b|\blibrary[\s-]?of[\s-]?babel\b|\bthe[\s-]?aleph\b/i, badge: 'borges_archive' },
+  { patterns: /\bproust\b|\bremembrance[\s-]?of[\s-]?things[\s-]?past\b|\btemps[\s-]?perdu\b|\bmadeleine\b/i, badge: 'proust_time' },
 ]
 
 /**
@@ -1954,6 +1988,30 @@ export function runJournalEasterEggs(journalText: string): BadgeType[] {
   // Behavioral v16: body signal (journal entry >= 300 words)
   const bodySignal = checkBodySignal(journalText)
   if (bodySignal) awarded.push(bodySignal)
+
+  // Behavioral v19: hero session (3+ Hero's Journey words in one entry)
+  const heroSession = checkHeroSession(journalText)
+  if (heroSession) awarded.push(heroSession)
+
+  // Behavioral v19: long quest (journal entry >= 500 words)
+  const longQuest = checkLongQuest(journalText)
+  if (longQuest) awarded.push(longQuest)
+
+  // Behavioral v19: threshold moment (check in 00:00–00:30)
+  const thresholdMoment = checkThresholdMoment()
+  if (thresholdMoment) awarded.push(thresholdMoment)
+
+  // Behavioral v20: archive session (3+ Temporal Archive words in one entry)
+  const archiveSession = checkArchiveSession(journalText)
+  if (archiveSession) awarded.push(archiveSession)
+
+  // Behavioral v20: deep excavation (journal entry >= 700 words)
+  const deepExcavation = checkDeepExcavation(journalText)
+  if (deepExcavation) awarded.push(deepExcavation)
+
+  // Behavioral v20: dawn archivist (check in 05:00–05:59)
+  const dawnArchivist = checkDawnArchivist()
+  if (dawnArchivist) awarded.push(dawnArchivist)
 
   // Word turns from journal text
   const wordTurns = detectWordTurns(journalText)
@@ -2711,6 +2769,65 @@ export function checkThresholdMoment(): BadgeType | null {
   if (hour === 0 && minute <= 30) {
     awardBadge('threshold_moment')
     return 'threshold_moment'
+  }
+  return null
+}
+
+// ── v23 — THE TEMPORAL ARCHIVE behavioral checks ──────────────────────────────
+
+const TEMPORAL_ARCHIVE_WORDS_V23 = [
+  /\bepoch\b|\bera[\s-]?begins?\b|\bmarked[\s-]?epoch\b/i,
+  /\bstratum\b|\bstrata\b|\blayers[\s-]?revealed\b/i,
+  /\bexcavated?\b|\bdigging[\s-]?deeper\b|\bunearth(ed)?\b/i,
+  /\bchronicle[sd]?\b|\bmy[\s-]?chronicle\b/i,
+  /\bpalimpsest\b|\blayers[\s-]?beneath\b|\boverwritten[\s-]?but\b/i,
+  /\bsediment\b|\baccumulated[\s-]?weight\b/i,
+  /\bmy[\s-]?archive\b|\barchiving[\s-]?this\b/i,
+  /\binscription\b|\binscribed\b|\bcarved[\s-]?into\b/i,
+  /\bvestige\b|\btrace[\s-]?of\b|\bremnant[\s-]?of\b/i,
+  /\bmnemonic\b|\bmemory[\s-]?code\b|\bmemory[\s-]?key\b/i,
+  /\blacuna\b|\bgap[\s-]?in[\s-]?(the[\s-]?)?record\b/i,
+  /\bpersonal[\s-]?artifact\b|\brelic[\s-]?of\b/i,
+]
+
+/**
+ * Award archive_session badge if 3+ Temporal Archive (v23) words appear in one journal entry.
+ */
+export function checkArchiveSession(journalText: string): BadgeType | null {
+  if (hasBadge('archive_session')) return null
+  const matchCount = TEMPORAL_ARCHIVE_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('archive_session')
+    return 'archive_session'
+  }
+  return null
+}
+
+/**
+ * Award deep_excavation badge if journal entry is 700+ words.
+ */
+export function checkDeepExcavation(journalText: string): BadgeType | null {
+  if (hasBadge('deep_excavation')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 700) {
+    awardBadge('deep_excavation')
+    return 'deep_excavation'
+  }
+  return null
+}
+
+/**
+ * Award dawn_archivist badge if user checks in between 05:00 and 05:59 local time.
+ */
+export function checkDawnArchivist(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_archivist')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour === 5) {
+    awardBadge('dawn_archivist')
+    return 'dawn_archivist'
   }
   return null
 }
