@@ -85,3 +85,7 @@ export const lastAnsweredMemoryQuestionId = persistentAtom<string | null>(
 
 // computed
 export const isLoggedIn = computed(me, (m) => !!m)
+
+// LOT® Email — pending letter opened from Cohort Connect / LOT Community.
+// Sync reads this and opens a composer addressed to that operator.
+export const emailDraft = atom<{ receiverId: string; name: string; source: 'cohort' | 'sync' } | null>(null)

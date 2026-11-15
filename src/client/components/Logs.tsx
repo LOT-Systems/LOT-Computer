@@ -35,6 +35,7 @@ import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
+import { LogEmailComposer } from '#client/components/LotEmail'
 import { getFastingState } from '#client/utils/fasting'
 
 const localStore = {
@@ -4128,6 +4129,7 @@ const NoteEditor = ({
           '/story        Generate a personal story from recent data',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
+          '/email to [name]  Write a LOT® Email (delivered in Sync)',
           '/assembly     Self-assembly module status',
           '/phys         Physiological cohort report',
           '/qos          Quantum OS state analysis',
@@ -4349,6 +4351,7 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        {primary && <LogEmailComposer text={value} />}
         {breatheEnabled && (
           <div className="mt-8">
             <Block label="BRE:" blockView>

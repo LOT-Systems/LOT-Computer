@@ -370,3 +370,7 @@ export const COUNTRY_BY_ALPHA3 = COUNTRIES.reduce<Record<string, Country>>(
   (acc, x) => ({ ...acc, [x.alpha3]: x }),
   {}
 )
+
+// LOT® Email — operator-to-operator letters (compose in Log, receive in Sync)
+export const LOT_EMAIL_MAX_LENGTH = 4000
+export const LOT_EMAIL_HOURLY_LIMIT = 30

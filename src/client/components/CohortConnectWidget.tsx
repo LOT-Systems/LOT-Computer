@@ -116,13 +116,15 @@ export const CohortConnectWidget: React.FC = () => {
     window.location.href = `/users/${userId}`
   }
 
-  const handleSendMessage = (userId: string, similarity: number) => {
+  const handleSendMessage = (userId: string, similarity: number, name?: string) => {
     recordSignal('mood', 'cohort_message_initiated', {
       userId,
       similarity,
       connectionReadiness,
       hour: new Date().getHours()
     })
+    // LOT® Email: open a letter to this cohort member in Sync
+    stores.emailDraft.set({ receiverId: userId, name: name || 'Cohort member', source: 'cohort' })
     stores.goTo('sync')
   }
 
@@ -264,10 +266,10 @@ export const CohortConnectWidget: React.FC = () => {
                         size="small"
                         onClick={(e: React.MouseEvent) => {
                           e.stopPropagation()
-                          handleSendMessage(match.user.id, match.similarity)
+                          handleSendMessage(match.user.id, match.similarity, `${match.user.firstName || ''} ${match.user.lastName || ''}`.trim())
                         }}
                       >
-                        Send message
+                        Send email
                       </Button>
                     </div>
                   </div>
