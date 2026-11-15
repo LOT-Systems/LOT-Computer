@@ -37,6 +37,7 @@ import authRoutes from './routes/auth.js'
 import apiRoutes from './routes/api.js'
 import adminApiRoutes from './routes/admin-api.js'
 import publicApiRoutes from './routes/public-api.js'
+import rationPublicRoutes from './routes/ration-public.js'
 
 const CWD = process.cwd()
 
@@ -48,7 +49,7 @@ const fastify = Fastify({
   bodyLimit: 1_048_576,
 })
 
-const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log']
+const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log', '/basics']
 
 // ==============================================================================
 // SECURITY PLUGINS
@@ -221,11 +222,21 @@ fastify.get('/health', async (request, reply) => {
 
 // Public API routes (no authentication required)
 fastify.register(publicApiRoutes, { prefix: '/api/public' })
+fastify.register(rationPublicRoutes, { prefix: '/api/public' })
 
 // Public status page route (no authentication required)
 fastify.get('/status', async (req, reply) => {
   return reply.view('generic-spa', {
     scriptName: 'status',
+    scriptNonce: reply.cspNonce.script,
+    styleNonce: reply.cspNonce.style,
+  })
+})
+
+// LOT-FM-001 OPEN TAB — public ration ledger. No auth. Read-only.
+fastify.get('/open', async (req, reply) => {
+  return reply.view('generic-spa', {
+    scriptName: 'open-tab',
     scriptNonce: reply.cspNonce.script,
     styleNonce: reply.cspNonce.style,
   })

@@ -19,6 +19,8 @@ import { Sync } from '#client/components/Sync'
 import { DirectMessageThread } from '#client/components/DirectMessageThread'
 import { StatusPage } from '#client/components/StatusPage'
 import { ApiPage } from '#client/components/ApiPage'
+import { Basics } from '#client/components/Basics'
+import { UserTag } from '#shared/types'
 import { ConnectionStatus } from '#client/components/ConnectionStatus'
 import { render } from '#client/utils/render'
 import { listenSSE } from '#client/utils/sse'
@@ -140,7 +142,16 @@ if (typeof window !== 'undefined') {
   })
 }
 
-type PersistentRoute = 'system' | 'logs' | 'sync' | 'settings' | 'api'
+type PersistentRoute = 'system' | 'logs' | 'sync' | 'basics' | 'settings' | 'api'
+
+// LOT-FM-001: Usership members stand at USERSHIP / AI on the ration upgrade path.
+const BasicsTab = React.memo(function BasicsTab() {
+  const me = useStore(stores.me)
+  const isUsership = !!me?.tags?.some(
+    (t) => t.toLowerCase() === UserTag.Usership.toLowerCase()
+  )
+  return <Basics state={isUsership ? 'USERSHIP_AI' : null} />
+})
 
 const TabPanel = React.memo(function TabPanel({
   active,
@@ -192,6 +203,9 @@ const TabPanels = React.memo(function TabPanels() {
       </TabPanel>
       <TabPanel active={currentRoute === 'sync'}>
         <Sync />
+      </TabPanel>
+      <TabPanel active={currentRoute === 'basics'}>
+        <BasicsTab />
       </TabPanel>
       <TabPanel active={currentRoute === 'settings'}>
         <Settings />

@@ -419,3 +419,16 @@ td:last-child {
   content: 'built different since day one';
   display: none;
 }
+
+/* LOT-FM-001 BASICS — upgrade strip. 2px rules via grid gap on ink ground. */
+[data-lot-ration-strip] {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: #000;
+}
+@media (max-width: 600px) {
+  [data-lot-ration-strip] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

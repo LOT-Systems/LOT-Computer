@@ -35,7 +35,7 @@ const fastify = Fastify({
   logger: false  // Temporarily disable logging for development
 })
 
-const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/api', '/sync', '/log']
+const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/api', '/sync', '/log', '/basics']
 
 // Plugins
 fastify.register(fastifyCookie)
