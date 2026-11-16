@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: sustained recovery mastery · circadian continuity arc · total field persistence (P152/P153/P154)
+      'sustained_recovery_mastery',
+      'circadian_continuity_arc',
+      'total_field_persistence',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

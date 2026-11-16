@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily circadian continuity check (10:00 UTC every day) — Job 49
+  if (shouldRunDailyCircadianContinuityCheck()) {
+    await executeDailyCircadianContinuityCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,96 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Circadian Continuity Check (Job 49 — 10:00 UTC every day) ─────────
+// Checks the last 7 calendar days. If circadian_signal_lock fired on 5+ distinct
+// calendar days, writes circadian_continuity_arc for that user.
+// Runs one hour after J46 (07:00 UTC circadian-lock) to consume its output.
+
+let isDailyCircadianContinuityRunning = false
+let lastDailyCircadianContinuityRun: Date | null = null
+
+function shouldRunDailyCircadianContinuityCheck(): boolean {
+  const now = dayjs()
+  if (isDailyCircadianContinuityRunning) return false
+  if (lastDailyCircadianContinuityRun) {
+    const lastRun = dayjs(lastDailyCircadianContinuityRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily
+}
+
+async function executeDailyCircadianContinuityCheck(): Promise<JobResult> {
+  const jobName = 'daily-circadian-continuity-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyCircadianContinuityRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyCircadianContinuityRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY CIRCADIAN CONTINUITY CHECK — 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDaysAgo = dayjs().subtract(7, 'day').startOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const recentLocks = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDaysAgo },
+            event: 'circadian_signal_lock',
+          },
+          attributes: ['createdAt'],
+        })
+
+        if (!recentLocks.length) continue
+
+        const distinctDays = new Set(recentLocks.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD'))).size
+
+        if (distinctDays >= 5) {
+          await (Log as any).create({
+            userId,
+            event: 'circadian_continuity_arc',
+            text: `Circadian continuity arc: circadian-signal-lock confirmed on ${distinctDays} distinct days in the last 7d. The biological clock is not anchored for one day — it is a sustained weekly rhythm. The arc is continuous. The OS lives in cadence.`,
+            metadata: {
+              streakDays: distinctDays,
+              windowDays: 7,
+              continuityRate: Math.round((distinctDays / 7) * 100),
+              rhythm: 'SUSTAINED',
+              arc: 'WEEKLY',
+              hour: 10,
+            },
+          })
+          written++
+        }
+      } catch {}
+    }
+
+    console.log(`  Circadian continuity arc events written: ${written}`)
+    lastDailyCircadianContinuityRun = new Date()
+    isDailyCircadianContinuityRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily circadian continuity check failed:', error.message)
+    isDailyCircadianContinuityRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

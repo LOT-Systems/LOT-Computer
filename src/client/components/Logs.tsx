@@ -3629,6 +3629,90 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sustained_recovery_mastery') {
+          const arcCount = log.metadata?.arcCount as number | undefined
+          const windowDays = log.metadata?.windowDays as number | undefined
+          const discipline = log.metadata?.discipline as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SUSREC:" blockView>
+                <div className="uppercase tracking-widest mb-4">SUSTAINED RECOVERY MASTERY</div>
+                {arcCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ARC COUNT</span>
+                    <span className="tabular-nums">{arcCount}</span>
+                  </div>
+                )}
+                {windowDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">WINDOW</span>
+                    <span className="tabular-nums">{windowDays}d</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">RECOVERY LOOP: MASTERED</div>
+                {discipline && (
+                  <div className="opacity-30 tabular-nums">DISCIPLINE: {discipline}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'circadian_continuity_arc') {
+          const streakDays = log.metadata?.streakDays as number | undefined
+          const windowDays = log.metadata?.windowDays as number | undefined
+          const rhythm = log.metadata?.rhythm as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CIRARC:" blockView>
+                <div className="uppercase tracking-widest mb-4">CIRCADIAN CONTINUITY ARC</div>
+                {streakDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">STREAK DAYS</span>
+                    <span className="tabular-nums">{streakDays}</span>
+                  </div>
+                )}
+                {windowDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">WINDOW</span>
+                    <span className="tabular-nums">{windowDays}d</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">BIOLOGICAL CLOCK SUSTAINED</div>
+                {rhythm && (
+                  <div className="opacity-30 tabular-nums">RHYTHM: {rhythm}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'total_field_persistence') {
+          const dayCount = log.metadata?.dayCount as number | undefined
+          const windowDays = log.metadata?.windowDays as number | undefined
+          const persistenceRate = log.metadata?.persistenceRate as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TOFPER:" blockView>
+                <div className="uppercase tracking-widest mb-4">TOTAL FIELD PERSISTENCE</div>
+                {dayCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DAYS</span>
+                    <span className="tabular-nums">{dayCount}</span>
+                  </div>
+                )}
+                {windowDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">WINDOW</span>
+                    <span className="tabular-nums">{windowDays}d</span>
+                  </div>
+                )}
+                {persistenceRate !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RATE</span>
+                    <span className="tabular-nums">{persistenceRate}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">CEILING BECOMING FLOOR</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

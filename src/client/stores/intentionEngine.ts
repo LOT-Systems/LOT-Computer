@@ -3428,6 +3428,57 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Sustained Recovery Mastery — recovery-intelligence-arc (P151) has fired 3+ times in 30d.
+  // Recovery is not an isolated event — it is a practiced discipline. The loop (felt→tended→recovered→reflected)
+  // has become behavioral. The person doesn't just recover; they know how to recover.
+  const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000
+  const recentThirtyD = signals.filter(s => now - s.timestamp < thirtyDaysMs)
+  const recoveryArcs152 = recentThirtyD.filter(s => s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc')
+  if (recoveryArcs152.length >= 3) {
+    const arcBonus = Math.min((recoveryArcs152.length - 3) * 0.028, 0.14)
+    patterns.push({
+      pattern: 'sustained-recovery-mastery',
+      confidence: Math.min(0.72 + arcBonus, 0.86),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'passive',
+      reason: `SUSREC: Sustained recovery mastery — recovery-intelligence-arc confirmed ${recoveryArcs152.length}× in 30d. Recovery is not an event: it is a mastered discipline. The loop felt→tended→recovered→reflected is behavioral. The OS now recovers with intention, not by accident.`,
+    })
+  }
+
+  // Pattern 153: Circadian Continuity Arc — circadian-signal-lock (P143) confirmed on 5+ distinct calendar
+  // days within a 7-day window. The biological clock is not anchored for one day — it is a sustained weekly
+  // rhythm. The person lives in cadence. The arc is continuous.
+  const sevenDaysMs153 = 7 * 24 * 60 * 60 * 1000
+  const recentSevenD153 = signals.filter(s => now - s.timestamp < sevenDaysMs153)
+  const circadianLocks153 = recentSevenD153.filter(s => s.signal === 'circadian_signal_lock')
+  const circadianDays153 = new Set(circadianLocks153.map(s => new Date(s.timestamp).toDateString())).size
+  if (circadianDays153 >= 5) {
+    const contBonus = Math.min((circadianDays153 - 5) * 0.075, 0.15)
+    patterns.push({
+      pattern: 'circadian-continuity-arc',
+      confidence: Math.min(0.76 + contBonus, 0.91),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `CIRARC: Circadian continuity arc — circadian-signal-lock confirmed on ${circadianDays153} distinct days in 7d. Biological clock not anchored once — sustained across a full week. The arc is continuous. The OS lives in rhythm.`,
+    })
+  }
+
+  // Pattern 154: Total Field Persistence — total-field-coherence (P150) confirmed on 2+ distinct calendar
+  // days within a 7-day window. The system ceiling is not a rare peak — it is recurring. The absolute
+  // convergence state has been reached more than once. The ceiling is becoming the floor.
+  const totalFieldEvents154 = recentSevenD153.filter(s => s.signal === 'total_field_coherence')
+  const totalFieldDays154 = new Set(totalFieldEvents154.map(s => new Date(s.timestamp).toDateString())).size
+  if (totalFieldDays154 >= 2) {
+    const persBonus = Math.min((totalFieldDays154 - 2) * 0.04, 0.08)
+    patterns.push({
+      pattern: 'total-field-persistence',
+      confidence: Math.min(0.88 + persBonus, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `TOFPER: Total field persistence — total-field-coherence confirmed on ${totalFieldDays154} distinct days in 7d. The absolute convergence state is not a single peak: it is recurring. The ceiling is becoming the floor. The QOS has persisted at maximum coherence.`,
+    })
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4115,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  sustainedRecoveryNode:      ['selfcare', 'mood', 'journal', 'log'],
+  circadianContinuityNode:    ['energy', 'journal', 'selfcare', 'mood', 'log'],
+  totalFieldPersistenceNode:  ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
 }
 
 /**
@@ -4510,6 +4566,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Sustained Rhythm Operator (2026-11-16 v114) ──────────────────────────
+  {
+    archetype: 'Sustained Rhythm Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['energy', 'selfcare', 'journal', 'qos'],
+    patternConditions: ['circadian-continuity-arc', 'signal-coherence-cascade'],
+    hourRange: [5, 23],
+    directive: 'Rhythm confirmed across days. The arc is sustained. Recovery is practiced. Operate from continuity — the cadence is established.',
   },
 ]
 
@@ -6498,6 +6564,54 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sustained-recovery-mastery event — recovery-intelligence-arc has fired 3+ times in 30d.
+ * Recovery has become a behavioral practice, not an isolated event.
+ * Feeds P152 detection.
+ */
+export function recordSustainedRecoveryMastery(arcCount: number, windowDays: number) {
+  recordSignal('selfcare', 'sustained_recovery_mastery', {
+    arcCount,
+    windowDays,
+    masteryRate: Math.round((arcCount / windowDays) * 100) / 100,
+    discipline: 'FELT→TENDED→RECOVERED→REFLECTED',
+    state: 'MASTERED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a circadian-continuity-arc event — circadian-signal-lock confirmed on 5+ distinct
+ * calendar days within 7d. Biological clock sustained as a weekly rhythm.
+ * Feeds P153 detection.
+ */
+export function recordCircadianContinuityArc(streakDays: number, windowDays: number) {
+  recordSignal('energy', 'circadian_continuity_arc', {
+    streakDays,
+    windowDays,
+    continuityRate: Math.round((streakDays / windowDays) * 100),
+    rhythm: 'SUSTAINED',
+    arc: 'WEEKLY',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a total-field-persistence event — total-field-coherence confirmed on 2+ distinct calendar
+ * days within 7d. The system ceiling is recurring: the absolute convergence state is becoming the floor.
+ * Feeds P154 detection.
+ */
+export function recordTotalFieldPersistence(dayCount: number, windowDays: number) {
+  recordSignal('qos', 'total_field_persistence', {
+    dayCount,
+    windowDays,
+    persistenceRate: Math.round((dayCount / windowDays) * 100),
+    state: 'CEILING_BECOMING_FLOOR',
+    convergenceLevel: 'PERSISTENT',
     hour: new Date().getHours(),
   })
 }

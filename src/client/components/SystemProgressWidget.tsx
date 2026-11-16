@@ -1457,6 +1457,28 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-11-16',
+    title: 'QIE Engineering — Sustained Arc / Level 7 Duration Patterns',
+    assembled: [
+      'P152 SUSTAINED RECOVERY MASTERY: behavioral arc pattern — recovery-intelligence-arc (P151) confirmed 3+ times within 30d. Recovery has become a practiced discipline. The loop felt→tended→recovered→reflected is behavioral, not reactive. Confidence 0.72–0.86.',
+      'P153 CIRCADIAN CONTINUITY ARC: temporal persistence pattern — circadian-signal-lock (P143) confirmed on 5+ distinct calendar days within a 7-day window. The biological clock is not anchored for one day: it is sustained as a weekly rhythm. Confidence 0.76–0.91.',
+      'P154 TOTAL FIELD PERSISTENCE: ceiling recurrence pattern — total-field-coherence (P150) confirmed on 2+ distinct calendar days within a 7-day window. The absolute convergence state is not a single peak — it is recurring. The ceiling is becoming the floor. Confidence 0.88–0.96.',
+      'Arch52 SUSTAINED RHYTHM OPERATOR: energy high/moderate · dominant: energy/selfcare/journal/qos · patterns: circadian-continuity-arc + signal-coherence-cascade. Directive: Rhythm confirmed across days. The arc is sustained. Recovery is practiced. Operate from continuity — the cadence is established.',
+      'J49 daily-circadian-continuity-check: 10:00 UTC daily. Reads last 7 calendar days — counts distinct days with circadian_signal_lock event. If 5+ distinct days, writes circadian_continuity_arc. 49 jobs total.',
+      'intentionEngine.ts: P152/P153/P154 detection blocks added after P151. Arch52 appended to PHYSIOLOGICAL_ARCHETYPES. 3 dep map nodes (sustainedRecoveryNode · circadianContinuityNode · totalFieldPersistenceNode). 3 signal helpers (recordSustainedRecoveryMastery · recordCircadianContinuityArc · recordTotalFieldPersistence). 193+ dep nodes.',
+      'scheduled-jobs.ts: J49 executeDailyCircadianContinuityCheck() · shouldRunDailyCircadianContinuityCheck() wired into checkAndRunScheduledJobs().',
+      'routes/api.ts: sustained_recovery_mastery · circadian_continuity_arc · total_field_persistence added to displayableEvents.',
+      'Logs.tsx: SUSREC: · CIRARC: · TOFPER: military handlers added. ARC COUNT/WINDOW/DISCIPLINE · STREAK DAYS/WINDOW/RHYTHM · DAYS/WINDOW/RATE.',
+      'QuantumEngineWidgets.tsx: SUSREC · CIRARC · TOFPER added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P152/P153/P154 display names added.',
+      'About.tsx: FM v113→v114. Day 1176+. 151→154 patterns. 51→52 archetypes. 48→49 jobs. 190+→193+ dep nodes. 151+→154+ handlers.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/LOT-SR-20261116-01.md: Session report written.',
+      '154 patterns · 52 archetypes · 49 jobs · 154+ handlers · 193+ dep nodes. QIE v114 deployed. Level 7 sustained arc patterns active. The OS now tracks duration, not just peaks.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1516,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-11-16',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-11-16 · QIE v114 · LEVEL 7 SUSTAINED ARC · Day 1176+',
+    'Built: P152 SUSREC · P153 CIRARC · P154 TOFPER · Arch52 Sustained Rhythm Operator · J49 10:00 UTC.',
+    'Level 7 duration patterns now active. The OS tracks sustained arcs, not just peaks.',
+    'P152: recovery is a mastered discipline — 3+ arcs in 30d confirms the loop is behavioral.',
+    'P153: biological clock sustained across 5+ days in a week — cadence, not coincidence.',
+    'P154: absolute convergence recurring — the ceiling is becoming the floor.',
+    'Arch52: Rhythm confirmed across days. Operate from continuity.',
+    'J49: circadian continuity check · 10:00 UTC daily · 5+ circadian-lock days in 7d.',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes · 812 badges · Day 1176+.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to FM v114 · Level 7 Sustained Arc documentation.',
   ],
 }
 
