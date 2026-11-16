@@ -51,7 +51,7 @@ interface TriggerRule {
 const RULES: TriggerRule[] = [
   { trigger: 'toggle-synth',   emojis: ['🎹'],    keywords: ['synth', 'keyboard'] },
   { trigger: 'ai-scan',        emojis: [],       keywords: ['scan', 'ai'] },
-  { trigger: 'silent-mode',    emojis: [],       keywords: ['silent', 'quiet'] },
+  { trigger: 'silent-mode',    emojis: [],       keywords: ['silent', 'quiet', 'sil', 'silence-check'] },
   { trigger: 'breathe',        emojis: [],       keywords: ['breathe', 'breath'] },
   { trigger: 'force-fast',     emojis: [],       keywords: ['fast'] },
   { trigger: 'radio-toggle',   emojis: ['🎧'],    keywords: ['radio'] },
@@ -62,7 +62,8 @@ const RULES: TriggerRule[] = [
   { trigger: 'qos-report',     emojis: [],        keywords: ['qos', 'os-report'] },
   { trigger: 'assembly-check', emojis: [],        keywords: ['assembly', 'assemble'] },
   { trigger: 'phys-report',    emojis: [],        keywords: ['phys', 'cohort-report'] },
-  { trigger: 'sil-check',      emojis: [],        keywords: ['sil', 'silence-check'] },
+  // sil-check had no handler; /sil and /silence-check now route to silent-mode
+  { trigger: 'sil-check',      emojis: [],        keywords: [] },
   { trigger: 'qi-rfi',         emojis: [],        keywords: ['qi'] },
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
@@ -114,4 +115,67 @@ export function detectNewTriggers(
   const fresh: LogTrigger[] = []
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
+}
+
+// ── Command registry (single source of truth for /system) ─────────────────
+
+export type LogCommandGroup = 'NARRATIVE' | 'CONTEXT' | 'SELF-CARE' | 'MODES'
+
+export interface LogCommand {
+  command: string      // as displayed, e.g. "/story [scope]"
+  trigger: LogTrigger
+  group: LogCommandGroup
+  description: string
+}
+
+/**
+ * Every slash command the Log understands, grouped for /system.
+ * `detectTriggers` is driven by RULES above; a unit check
+ * (`missingFromRegistry`) guarantees every trigger with a keyword
+ * appears here, so the help screen can never silently drift.
+ */
+export const LOG_COMMANDS: LogCommand[] = [
+  { command: '/story [scope]', trigger: 'story-mode', group: 'NARRATIVE', description: 'Compressed story · scope: day | week | month | year (default week)' },
+  { command: '/qi [query]', trigger: 'qi-rfi', group: 'NARRATIVE', description: 'Ask the Quantum Intelligence engine' },
+  { command: '/prayer', trigger: 'prayer-mode', group: 'NARRATIVE', description: 'Contextual scripture' },
+  { command: '/how', trigger: 'how-checkin', group: 'NARRATIVE', description: 'LOT AI check-in (System tab)' },
+  { command: '/scan', trigger: 'ai-scan', group: 'CONTEXT', description: 'System status overview' },
+  { command: '/qos', trigger: 'qos-report', group: 'CONTEXT', description: 'Quantum OS state analysis' },
+  { command: '/phys', trigger: 'phys-report', group: 'CONTEXT', description: 'Physiological cohort report' },
+  { command: '/assembly', trigger: 'assembly-check', group: 'CONTEXT', description: 'Self-assembly module status' },
+  { command: '/silent', trigger: 'silent-mode', group: 'CONTEXT', description: 'Signal silence check' },
+  { command: '/breathe', trigger: 'breathe', group: 'SELF-CARE', description: '4-2-6 breathing exercise' },
+  { command: '/freeze', trigger: 'freeze-widgets', group: 'SELF-CARE', description: 'Pause and reflect protocol' },
+  { command: '/fast', trigger: 'force-fast', group: 'SELF-CARE', description: 'Orthodox fasting calendar' },
+  { command: '/synth', trigger: 'toggle-synth', group: 'MODES', description: 'Toggle keyboard sound' },
+  { command: '/radio', trigger: 'radio-toggle', group: 'MODES', description: 'Toggle radio' },
+  { command: '/night', trigger: 'night-mode', group: 'MODES', description: 'Dark mode' },
+  { command: '/system', trigger: 'system-help', group: 'MODES', description: 'This help screen' },
+]
+
+const GROUP_ORDER: LogCommandGroup[] = ['NARRATIVE', 'CONTEXT', 'SELF-CARE', 'MODES']
+
+/** Triggers reachable by keyword that are not documented in LOG_COMMANDS. */
+export function missingFromRegistry(): LogTrigger[] {
+  const documented = new Set(LOG_COMMANDS.map(c => c.trigger))
+  return RULES.filter(r => r.keywords.length > 0 && !documented.has(r.trigger)).map(r => r.trigger)
+}
+
+/**
+ * Lines for the SYSTEM: block. Command lines start with "/" and use
+ * 2+ spaces between command and description (the Log renderer splits
+ * on that gap). Header lines are rendered as small caps labels.
+ */
+export function renderSystemHelp(): string[] {
+  const lines: string[] = []
+  for (const group of GROUP_ORDER) {
+    const cmds = LOG_COMMANDS.filter(c => c.group === group)
+    if (!cmds.length) continue
+    if (lines.length) lines.push('')
+    lines.push(group)
+    for (const c of cmds) lines.push(`${c.command.padEnd(16, ' ')}  ${c.description}`)
+  }
+  lines.push('', 'JOURNAL', 'Write freely. Every entry is saved with its moment: time, weather, place, sky.')
+  lines.push('', 'SHORTCUTS', 'Ctrl+Enter  Save log immediately')
+  return lines
 }

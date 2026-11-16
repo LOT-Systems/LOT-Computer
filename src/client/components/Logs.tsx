@@ -28,7 +28,8 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, renderSystemHelp, type LogTrigger } from '#client/utils/logTriggers'
+import { parseStoryScope, stripStoryCommand } from '#shared/utils/story-compression'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3706,6 +3707,7 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyHeader, setStoryHeader] = React.useState<string[] | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3742,10 +3744,12 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryHeader(data.header || null)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
-      const updated = current + separator + '📖 ' + data.story
+      const scopeTag = data.scope ? `[${data.scope.toUpperCase()}] ` : ''
+      const updated = current + separator + '📖 ' + scopeTag + data.story
       setValue(updated)
       valueRef.current = updated
       onChangeRef.current(updated)
@@ -4121,47 +4125,28 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        // Rendered from the LOT_COMMANDS registry so help never drifts from wiring.
+        setSystemHelp(renderSystemHelp().join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
+          setStoryHeader(null)
+          const scope = parseStoryScope(value)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const logText = stripStoryCommand(value)
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              scope,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: stripStoryCommand(value), scope })
           }
         }
       }
@@ -4419,6 +4404,11 @@ const NoteEditor = ({
             <Block label="📖" blockView>
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
+              )}
+              {storyHeader && storyHeader.length > 0 && (
+                <div className="opacity-40 mb-4" style={{ fontSize: '12px', letterSpacing: '0.04em', whiteSpace: 'pre' , overflowX: 'auto' }}>
+                  {storyHeader.map((line, idx) => <div key={idx}>{line}</div>)}
+                </div>
               )}
               {storyResponse && (
                 <div className="opacity-60">

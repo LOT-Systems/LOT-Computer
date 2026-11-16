@@ -889,12 +889,13 @@ export const usePrayerScripture = createMutation<
 >('post', '/api/prayer')
 
 // ============================================================================
-// STORY — Contextual AI Story
+// STORY — Compressed LOT® AI Story (/story [day|week|month|year])
 // ============================================================================
 
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    scope?: 'day' | 'week' | 'month' | 'year'
     quantumState?: {
       energy?: string
       clarity?: string
@@ -910,5 +911,8 @@ export const useStoryGeneration = createMutation<
   {
     story: string
     logId: string | null
+    scope?: 'day' | 'week' | 'month' | 'year'
+    header?: string[] // terminal-grid capsule lines (renderCapsule)
+    ai?: boolean // false = deterministic fallback narrative
   }
 >('post', '/api/story')

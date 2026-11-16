@@ -24,6 +24,7 @@
   },
   "scripts": {
     "db:admin": "tsx scripts/db-admin.ts",
+    "verify:story": "npx tsx scripts/verify/story-compression.verify.ts",
     "db:backup": "tsx scripts/db-backup.ts",
     "db:backup:encrypted": "bash scripts/backup-to-github.sh",
     "db:backup:verify": "bash scripts/backup-to-github.sh --verify",
