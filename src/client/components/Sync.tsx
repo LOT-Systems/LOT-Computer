@@ -26,6 +26,7 @@ import {
   useLikeChatMessage,
 } from '#client/queries'
 import { sync } from '../sync'
+import { LotEmailInbox } from './LotEmailInbox'
 import { PublicChatMessage, UserTag } from '#shared/types'
 import {
   SYNC_CHAT_MESSAGES_TO_SHOW,
@@ -172,8 +173,11 @@ export const Sync = React.memo(function SyncInner() {
 
   if (!canAccessChat) {
     return (
-      <div className="max-w-[700px] text-acc/40 py-8">
-        Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+      <div className="max-w-[700px] py-8">
+        <LotEmailInbox />
+        <div className="text-acc/40">
+          Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+        </div>
       </div>
     )
   }
@@ -213,6 +217,8 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      <LotEmailInbox />
 
       <div>
         {messages.map((x, i) => {
