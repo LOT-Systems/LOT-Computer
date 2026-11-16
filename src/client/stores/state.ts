@@ -85,3 +85,7 @@ export const lastAnsweredMemoryQuestionId = persistentAtom<string | null>(
 
 // computed
 export const isLoggedIn = computed(me, (m) => !!m)
+
+// LOT® Email — recipient preset from Cohort Connect ("Email" button) or a
+// Sync reply. Sync reads it to open the composer addressed to that member.
+export const lotEmailComposeTo = atom<{ id: string; name: string } | null>(null)

@@ -35,6 +35,8 @@ import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
+import { useSendLotEmail } from '#client/queries'
+import { parseEmailCommand } from '#shared/utils/lotEmail'
 import { getFastingState } from '#client/utils/fasting'
 
 const localStore = {
@@ -249,6 +251,14 @@ export const Logs: React.FC = React.memo(function LogsInner() {
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="COMM:" blockView>
                 {log.metadata.message as string}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'lot_email_sent') {
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="MAIL:" blockView>
+                SENT → {String(log.metadata?.receiverName || 'LOT MEMBER')}
               </Block>
             </LogContainer>
           )
@@ -3713,6 +3723,48 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  // ------------------------------------------------------------------
+  // LOT® Email — "/email to Hitomi. Body…" composes a letter in Log.
+  // The draft is derived from the live text; Send delivers it to the
+  // recipient's Sync and rewrites the command line into a sent stamp.
+  // ------------------------------------------------------------------
+  const emailDraft = React.useMemo(
+    () => (primary ? parseEmailCommand(value) : null),
+    [value, primary]
+  )
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const { mutate: sendLotEmail, isLoading: emailSending } = useSendLotEmail({
+    onSuccess: (letter) => {
+      const hh = dayjs(letter.createdAt).format('HH:mm')
+      const draft = parseEmailCommand(valueRef.current)
+      if (draft) {
+        const current = valueRef.current
+        const idx = current.lastIndexOf(draft.matched)
+        const stamp = `✉ Sent to ${letter.receiverName} · ${hh}\n${draft.body}`
+        const updated = idx > -1
+          ? current.slice(0, idx) + stamp + current.slice(idx + draft.matched.length)
+          : current
+        setValue(updated)
+        valueRef.current = updated
+        onChangeRef.current(updated)
+      }
+      setEmailStatus(`DELIVERED → ${letter.receiverName.toUpperCase()} · ${hh} · SYNC`)
+    },
+    onError: (err: any) => {
+      const data = err?.response?.data
+      const msg = data?.error || 'MAIL OFFLINE — try again.'
+      const cands = Array.isArray(data?.candidates) ? `\n${data.candidates.join(' · ')}` : ''
+      setEmailStatus(msg + cands)
+    },
+  })
+  React.useEffect(() => {
+    if (emailDraft) setEmailStatus(null)
+  }, [emailDraft?.to])
+  const onSendEmail = React.useCallback(() => {
+    if (!emailDraft || !emailDraft.body || emailSending) return
+    sendLotEmail({ to: emailDraft.to, message: emailDraft.body })
+  }, [emailDraft, emailSending])
+
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -4139,6 +4191,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email        /email to Hitomi. Your letter — delivered to Sync',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4384,6 +4437,35 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {(emailDraft || emailStatus) && (
+          <div className="mt-8">
+            <Block label="MAIL:" blockView>
+              <div style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                {emailDraft && (
+                  <>
+                    <div className="opacity-60">TO              {emailDraft.to}</div>
+                    <div className="opacity-60">
+                      BODY            {emailDraft.body ? `${emailDraft.body.length} CHARS` : 'WRITE AFTER THE NAME…'}
+                    </div>
+                    <div className="mt-8">
+                      <Button
+                        size="small"
+                        kind="secondary"
+                        disabled={!emailDraft.body || emailSending}
+                        onClick={onSendEmail}
+                      >
+                        {emailSending ? 'Sending…' : 'Send'}
+                      </Button>
+                    </div>
+                  </>
+                )}
+                {emailStatus && (
+                  <div className="opacity-60 mt-4" style={{ whiteSpace: 'pre-wrap' }}>{emailStatus}</div>
+                )}
+              </div>
             </Block>
           </div>
         )}
