@@ -2079,11 +2079,44 @@ export const Logs: React.FC = React.memo(function LogsInner() {
         } else if (log.event === 'calendar_entry') {
           const entryType = log.metadata?.entryType as string | undefined
           const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const text = log.metadata?.text as string | undefined
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
                 <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                {text && <div className="mt-8">{text}</div>}
+                {date && <div className="opacity-40 mt-8 tabular-nums">{date}{time ? ` ${time}L` : ''}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (
+          log.event === 'calendar_alert' ||
+          log.event === 'calendar_done' ||
+          log.event === 'calendar_cancel'
+        ) {
+          const entryType = (log.metadata?.entryType as string | undefined) || 'entry'
+          const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const text = log.metadata?.text as string | undefined
+          const stage = log.metadata?.stage as string | undefined
+          const status =
+            log.event === 'calendar_done'
+              ? 'DONE'
+              : log.event === 'calendar_cancel'
+              ? 'SCRUB'
+              : stage === 'day'
+              ? 'DAY OF'
+              : 'EXECUTE'
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label={log.event === 'calendar_alert' ? 'CAL//ALERT:' : 'CAL:'} blockView>
+                <div className="flex justify-between items-baseline uppercase tracking-widest">
+                  <span>{status}</span>
+                  <span className="opacity-40">{entryType}</span>
+                </div>
+                {text && <div className="mt-8">{text}</div>}
+                {date && <div className="opacity-40 mt-8 tabular-nums">{date}{time ? ` ${time}L` : ''}</div>}
               </Block>
             </LogContainer>
           )
