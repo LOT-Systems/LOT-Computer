@@ -9,6 +9,7 @@
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { isRouteActive } from '#client/stores/router'
 
 /**
  * QuantumRandomWidget - Real-time quantum-random number generator.
@@ -30,24 +31,37 @@ function pickCountdown(): number {
   return COUNTDOWN_OPTIONS[quantumRandom(0, COUNTDOWN_OPTIONS.length - 1)]
 }
 
+// One quantum_random signal per minute at most, shared across both counters.
+// Unthrottled, the two counters emitted ~320 signals/hour (avg countdown 22.5s)
+// and evicted real user signals from the 1000-slot QIE buffer within ~3h.
+const SIGNAL_THROTTLE_MS = 60_000
+let lastSignalAt = 0
+
 function useQuantumNumber() {
   const [number, setNumber] = React.useState(() => quantumRandom(0, 99))
-  const [countdown, setCountdown] = React.useState(() => pickCountdown())
-  const [remaining, setRemaining] = React.useState(countdown)
+  const [remaining, setRemaining] = React.useState(() => pickCountdown())
+  const remainingRef = React.useRef(remaining)
 
   React.useEffect(() => {
     const iv = setInterval(() => {
-      setRemaining((prev) => {
-        if (prev <= 1) {
-          const next = quantumRandom(0, 99)
-          const nextCountdown = pickCountdown()
-          setNumber(next)
-          setCountdown(nextCountdown)
-          recordSignal('calculator', 'quantum_random', { value: next, interval: nextCountdown })
-          return nextCountdown
-        }
-        return prev - 1
-      })
+      // Display-only widget: freeze while the browser tab is hidden or the
+      // user is on another in-app tab (no re-renders, no signals off-tab).
+      if (document.hidden || !isRouteActive('system')) return
+      if (remainingRef.current > 1) {
+        remainingRef.current -= 1
+        setRemaining(remainingRef.current)
+        return
+      }
+      const next = quantumRandom(0, 99)
+      const nextCountdown = pickCountdown()
+      remainingRef.current = nextCountdown
+      setNumber(next)
+      setRemaining(nextCountdown)
+      const now = Date.now()
+      if (now - lastSignalAt >= SIGNAL_THROTTLE_MS) {
+        lastSignalAt = now
+        recordSignal('calculator', 'quantum_random', { value: next, interval: nextCountdown })
+      }
     }, 1000)
 
     return () => clearInterval(iv)
@@ -63,6 +77,7 @@ export function QuantumRandomWidget() {
 
   React.useEffect(() => {
     const iv = setInterval(() => {
+      if (document.hidden || !isRouteActive('system')) return
       setShowPair(Math.random() < 0.5)
     }, 10000)
     return () => clearInterval(iv)

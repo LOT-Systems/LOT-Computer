@@ -3329,7 +3329,8 @@ export function analyzeIntentions(): IntentionPattern[] {
   // active OS dimension contributing signal at the same time. The field is not building — it is saturated.
   const hasPresenceP142 = patterns.some(p => p.pattern === 'adaptive-signal-web')
   const hasPresenceP137 = patterns.some(p => p.pattern === 'quantum-coherence-peak')
-  const daySignals147 = signals.filter(s => now - s.timestamp < dayMs)
+  const p147DayMs = 24 * 60 * 60 * 1000
+  const daySignals147 = signals.filter(s => now - s.timestamp < p147DayMs)
   const uniqueSources147 = new Set(daySignals147.map(s => s.source)).size
   if (hasPresenceP142 && hasPresenceP137 && uniqueSources147 >= 7) {
     const presenceBonus = Math.min((uniqueSources147 - 7) * 0.02, 0.14)
@@ -3752,10 +3753,17 @@ export async function syncToServer(): Promise<boolean> {
 
     const result = await response.json()
 
-    // Update last synced timestamp
+    // Update last synced timestamp. Re-read the store: signals recorded while
+    // the request was in flight must not be overwritten by the pre-await
+    // snapshot, and the watermark is the newest *sent* signal so those
+    // in-flight signals stay unsynced and go out on the next sync.
+    const sentWatermark = unsyncedSignals.reduce(
+      (max, s) => (s.timestamp > max ? s.timestamp : max),
+      state.lastSyncedTimestamp
+    )
     intentionEngine.set({
-      ...state,
-      lastSyncedTimestamp: now
+      ...intentionEngine.get(),
+      lastSyncedTimestamp: sentWatermark
     })
 
     console.log(`Synced ${result.savedSignals}/${result.totalSignals} signals successfully`)

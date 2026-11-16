@@ -26,22 +26,27 @@ export function InterventionsWidget() {
     setCurrentIndex(prev => (prev + 1) % data.interventions.length)
   }
 
+  // Store write deferred to commit phase — recordSignal() sets the shared
+  // intentionEngine atom, which must not happen during render. Declared above
+  // the early returns so hook order stays stable across loading states.
+  React.useEffect(() => {
+    const intervention = data?.interventions?.[currentIndex]
+    if (!hasRecordedRef.current && intervention) {
+      recordSignal('mood', `intervention_${intervention.severity}`, {
+        type: intervention.type,
+        severity: intervention.severity,
+        hour: new Date().getHours()
+      })
+      hasRecordedRef.current = true
+    }
+  })
+
   if (isLoading) return null
   if (!data || data.message) return null // Not enough data yet
   if (data.interventions.length === 0) return null // No interventions needed
 
   const intervention = data.interventions[currentIndex]
   const hasMultiple = data.interventions.length > 1
-
-  // Record intervention signal once per mount
-  if (!hasRecordedRef.current) {
-    recordSignal('mood', `intervention_${intervention.severity}`, {
-      type: intervention.type,
-      severity: intervention.severity,
-      hour: new Date().getHours()
-    })
-    hasRecordedRef.current = true
-  }
 
   const getSeverityIndicator = () => {
     switch (intervention.severity) {

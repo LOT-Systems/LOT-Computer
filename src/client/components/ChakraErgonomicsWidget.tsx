@@ -59,17 +59,21 @@ export function ChakraErgonomicsWidget() {
   }, [])
 
   // Record signal once per mount
-  if (!hasInitRef.current) {
-    const weakest = [...state.chakras].sort((a, b) => a.charge - b.charge)[0]
-    if (weakest) {
-      recordSignal('selfcare', `chakra_scan_${weakest.id}`, {
-        weakestCharge: weakest.charge,
-        coherence: state.session.coherence,
-        durationMinutes: state.session.durationMinutes,
-      })
+  // Store write deferred to commit phase — recordSignal() sets the shared
+  // intentionEngine atom, which must not happen during render.
+  React.useEffect(() => {
+    if (!hasInitRef.current) {
+      const weakest = [...state.chakras].sort((a, b) => a.charge - b.charge)[0]
+      if (weakest) {
+        recordSignal('selfcare', `chakra_scan_${weakest.id}`, {
+          weakestCharge: weakest.charge,
+          coherence: state.session.coherence,
+          durationMinutes: state.session.durationMinutes,
+        })
+      }
+      hasInitRef.current = true
     }
-    hasInitRef.current = true
-  }
+  })
 
   const cycleView = () => {
     setView(prev =>

@@ -245,17 +245,21 @@ export const MicroImageWidget: React.FC = () => {
   }, [composition, density, seed])
 
   // Record a signal once when the widget mounts with meaningful context
-  if (!hasRecordedRef.current && punctuation.sampleSize > 0) {
-    recordSignal('intentions', 'microimage_rendered', {
-      composition,
-      tone: punctuation.aggregate.tone,
-      intent: punctuation.aggregate.intent,
-      intensity: punctuation.aggregate.intensity,
-      callForHelp: punctuation.callForHelp,
-      hour: new Date().getHours(),
-    })
-    hasRecordedRef.current = true
-  }
+  // Store write deferred to commit phase — recordSignal() sets the shared
+  // intentionEngine atom, which must not happen during render.
+  React.useEffect(() => {
+    if (!hasRecordedRef.current && punctuation.sampleSize > 0) {
+      recordSignal('intentions', 'microimage_rendered', {
+        composition,
+        tone: punctuation.aggregate.tone,
+        intent: punctuation.aggregate.intent,
+        intensity: punctuation.aggregate.intensity,
+        callForHelp: punctuation.callForHelp,
+        hour: new Date().getHours(),
+      })
+      hasRecordedRef.current = true
+    }
+  })
 
   const handleRegenerate = () => {
     setSeed(Math.floor(Math.random() * 1e6) + 1)

@@ -40,21 +40,26 @@ export function EnergyCapacitor() {
     })
   }
 
+  // Store write deferred to commit phase — recordSignal() sets the shared
+  // intentionEngine atom, which must not happen during render. Declared above
+  // the early returns so hook order stays stable across loading states.
+  React.useEffect(() => {
+    const energyState = data?.energyState
+    if (!hasRecordedRef.current && energyState) {
+      recordSignal('selfcare', `energy_${energyState.status}`, {
+        level: energyState.currentLevel,
+        trajectory: energyState.trajectory,
+        hour: new Date().getHours()
+      })
+      hasRecordedRef.current = true
+    }
+  })
+
   if (isLoading) return null
   if (!data || data.message) return null // Not enough data yet
   if (!data.energyState) return null
 
   const { energyState, suggestions } = data
-
-  // Record energy signal once per mount
-  if (!hasRecordedRef.current && energyState) {
-    recordSignal('selfcare', `energy_${energyState.status}`, {
-      level: energyState.currentLevel,
-      trajectory: energyState.trajectory,
-      hour: new Date().getHours()
-    })
-    hasRecordedRef.current = true
-  }
 
   // Correlate energy with mood
   const getMoodEnergyCorrelation = (): string | null => {

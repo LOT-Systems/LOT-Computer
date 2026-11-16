@@ -35,23 +35,28 @@ export function GoalJourneyWidget() {
     })
   }
 
+  // Store write deferred to commit phase — recordSignal() sets the shared
+  // intentionEngine atom, which must not happen during render. Declared above
+  // the early returns so hook order stays stable across loading states.
+  React.useEffect(() => {
+    const progression = data?.progression
+    if (!hasRecordedRef.current && progression) {
+      const activeGoals = progression.goals?.filter((g: any) => g.state === 'active' || g.state === 'progressing') || []
+      recordSignal('intentions', 'goals_viewed', {
+        activeGoalCount: activeGoals.length,
+        primaryGoal: progression.overallJourney?.primaryGoal?.title || null,
+        hour: new Date().getHours()
+      })
+      hasRecordedRef.current = true
+    }
+  })
+
   if (isLoading) return null
   if (!data || data.message) return null // Not enough data yet
   if (!data.progression) return null
 
   const { progression } = data
   const { goals, overallJourney, narrative } = progression
-
-  // Record goal signal once per mount
-  if (!hasRecordedRef.current) {
-    const activeGoals = goals?.filter((g: any) => g.state === 'active' || g.state === 'progressing') || []
-    recordSignal('intentions', 'goals_viewed', {
-      activeGoalCount: activeGoals.length,
-      primaryGoal: overallJourney?.primaryGoal?.title || null,
-      hour: new Date().getHours()
-    })
-    hasRecordedRef.current = true
-  }
 
   const label =
     view === 'journey' ? 'Journey:' :
