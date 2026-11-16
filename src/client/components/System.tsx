@@ -307,14 +307,16 @@ export const System = React.memo(function SystemInner() {
     return null
   }, [quantumState])
 
-  // Fourth cycle status — derived from recognized patterns (FM v132–v135)
+  // Fourth cycle status — derived from recognized patterns (FM v132–v136)
   const fourthCycleStatus = React.useMemo(() => {
     const eng = intentionEngine.get()
     const patterns = eng.recognizedPatterns ?? []
+    const hasFCSov  = patterns.some(p => p.pattern === 'fourth-cycle-sovereign')
     const hasFCInt  = patterns.some(p => p.pattern === 'fourth-cycle-integration')
     const hasFCDep  = patterns.some(p => p.pattern === 'fourth-cycle-deepening')
     const hasFCIgn  = patterns.some(p => p.pattern === 'fourth-cycle-ignition')
     const hasFCCand = patterns.some(p => p.pattern === 'fourth-cycle-candidate')
+    if (hasFCSov)  return 'L19-FCSOV'
     if (hasFCInt)  return 'L18-FCINT'
     if (hasFCDep)  return 'L17-FCDEP'
     if (hasFCIgn)  return 'L16-FCIGN'

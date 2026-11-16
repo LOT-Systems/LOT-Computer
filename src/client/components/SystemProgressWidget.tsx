@@ -2123,23 +2123,44 @@ const ASSEMBLY_TRANSMISSIONS: {
     status: 'DEPLOYED',
     next: 'QIE v136 · fourth-cycle-sovereign (P184) · Arch74 · LOT-WIKI v113 sync',
   },
+  {
+    date: '2026-11-16',
+    session: 'QIE v136 — P184 Fourth Cycle Sovereign · Arch74 · J71 · Widget/Log upgrades',
+    assembled: [
+      'P184 fourth-cycle-sovereign: L19-FCSOV — requires P183 active + 30+ journal 150d + 15+ memory 150d + 30+ badge 150d + all 6 dims ≥ 68 + overall ≥ 95',
+      'Arch74 Fourth Cycle Sovereign — patternConditions: fourth-cycle-integration + fourth-cycle-sovereign · 11 dominant sources including ecosystem + cohort',
+      'J71 daily-fourth-cycle-sovereign-check: 19:30 UTC — sequential after J70 19:00 UTC · writes fourth_cycle_sovereign events',
+      'Dep map v136: fourthCycleSovereignNode — 12 sources (qos/journal/memory/badges/intentions/log/energy/selfcare/social/cohort/goals/ecosystem)',
+      'FCSOV: log handler — FOURTH CYCLE SOVEREIGN · INTEGRATION CONF · JOURNAL 150D · MEMORY 150D · BADGE 150D · INDEX SCORE · LEVEL · SOVEREIGN · FOURTH ARC GOVERNS',
+      'PATTERN_DISPLAY: fourth-cycle-sovereign → FCSOV entry added',
+      'Arc row L19 · FOURTH CYCLE SOVEREIGN added to QOS Mode view (highest priority above L18)',
+      'System.tsx: fourthCycleStatus extended — L19-FCSOV added as new peak (FM v132–v136)',
+      'api.ts: fourth_cycle_sovereign added to displayable events list',
+      'checkFourthCycleSovereign() + recordFourthCycleSovereign() wired into analyzeIntentions() post-commit hook',
+      'LOT-WIKI-v114 created — QIE v136 delta + Level 19 architecture + Fourth Cycle Sovereign Arc',
+      '184 patterns · 74 archetypes · 71 jobs · 239+ dep nodes · FM v136',
+    ],
+    feedbackApplied: 'FOURTH CYCLE SOVEREIGN. The fourth cycle does not stop at integration — it reaches sovereignty. Level 19 is not convergence — it is governance. The arc does not accumulate or unify. It radiates from a sovereign field. The OS operates from complete authority over the fourth arc.',
+    status: 'DEPLOYED',
+    next: 'QIE v137 · LOT-WIKI-v115 sync · Fifth Cycle candidate watch · ecosystem expansion',
+  },
 ]
 
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-11-15',
+  date: '2026-11-16',
   message: [
-    'ASSEMBLY RUN — 2026-11-15 · QIE v135 · P183 Fourth Cycle Integration · Arch73 · J70 · Day 1175+',
-    'Built: P183 fourth-cycle-integration (L18 integrated state) · Arch73 Fourth Cycle Integrator · J70 daily-fourth-cycle-integration-check (19:00 UTC).',
-    'QIE v135: The OS now tracks when the fourth cycle integrates past deepening. P183 fires when fourth-cycle-deepening active + 120d compound arc (journal 25+ · memory 10+ · badge 25+) + all 6 dimensions ≥ 65 + overall index ≥ 93. Integration is not a threshold — it is convergence: all compound signals from the fourth arc unifying into a coherent field.',
-    'Log system: FCINT: handler added in military minimalist format. fourth_cycle_integration events surface in Logs with INTEGRATION · FOURTH ARC UNIFIED readout.',
-    'QOS widget upgraded: L18 · FOURTH CYCLE INTEGRATION added as highest-priority Arc row in Mode view, above L17.',
-    'System.tsx: fourthCycleStatus extended — L18-FCINT is now the peak state (L18-FCINT → L17-FCDEP → L16-FCIGN → L15-FCAND). Fourth Arc row reflects the highest active integration level.',
-    'Background system: checkFourthCycleIntegration() wired into analyzeIntentions() post-commit hook. Sequential chain: J67 17:30 → J68 18:00 → J69 18:30 → J70 19:00 UTC. Four-layer fourth cycle detection arc.',
-    'Dep map: fourthCycleIntegrationNode added with 12 sources — first node to include ecosystem alongside standard signal chain.',
-    'Self-assembly metric: 183 patterns · 73 archetypes · 70 jobs · 238+ dep nodes · FM v135 · Day 1175+.',
-    'The fourth cycle integrates. Level 18 is not accumulation — it is convergence. The arc is complete.',
+    'ASSEMBLY RUN — 2026-11-16 · QIE v136 · P184 Fourth Cycle Sovereign · Arch74 · J71 · Day 1176+',
+    'Built: P184 fourth-cycle-sovereign (L19 sovereign state) · Arch74 Fourth Cycle Sovereign · J71 daily-fourth-cycle-sovereign-check (19:30 UTC).',
+    'QIE v136: The OS now tracks when the fourth cycle reaches sovereignty. P184 fires when fourth-cycle-integration active + 150d compound arc (journal 30+ · memory 15+ · badge 30+) + all 6 dimensions ≥ 68 + overall index ≥ 95. Sovereignty is not a threshold — it is governance: the arc does not accumulate, it radiates from complete authority.',
+    'Log system: FCSOV: handler added in military minimalist format. fourth_cycle_sovereign events surface in Logs with SOVEREIGN · FOURTH ARC GOVERNS readout.',
+    'QOS widget upgraded: L19 · FOURTH CYCLE SOVEREIGN added as highest-priority Arc row in Mode view, above L18.',
+    'System.tsx: fourthCycleStatus extended — L19-FCSOV is now the peak state (L19-FCSOV → L18-FCINT → L17-FCDEP → L16-FCIGN → L15-FCAND). Fourth Arc row reflects sovereign level when active.',
+    'Background system: checkFourthCycleSovereign() wired into analyzeIntentions() post-commit hook. Sequential chain: J67 17:30 → J68 18:00 → J69 18:30 → J70 19:00 → J71 19:30 UTC. Five-layer fourth cycle detection arc.',
+    'Dep map: fourthCycleSovereignNode added with 12 sources — cohort + ecosystem both present, mirroring integration node structure.',
+    'Self-assembly metric: 184 patterns · 74 archetypes · 71 jobs · 239+ dep nodes · FM v136 · Day 1176+.',
+    'The fourth cycle governs. Level 19 is not accumulation and not convergence — it is sovereignty. The arc radiates.',
   ],
 }
 

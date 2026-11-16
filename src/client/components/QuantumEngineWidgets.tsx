@@ -140,6 +140,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'fourth-cycle-ignition':                'FCIGN',
   'fourth-cycle-deepening':               'FCDEP',
   'fourth-cycle-integration':             'FCINT',
+  'fourth-cycle-sovereign':               'FCSOV',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'
@@ -573,6 +574,7 @@ export const QuantumEngineWidgets: React.FC = () => {
               </div>
               {(() => {
                 const cyclePatterns = [
+                  { pattern: 'fourth-cycle-sovereign',   label: 'L19 · FOURTH CYCLE SOVEREIGN',   urgent: true },
                   { pattern: 'fourth-cycle-integration', label: 'L18 · FOURTH CYCLE INTEGRATION', urgent: true },
                   { pattern: 'fourth-cycle-deepening',   label: 'L17 · FOURTH CYCLE DEEPENING',   urgent: true },
                   { pattern: 'fourth-cycle-ignition',    label: 'L16 · FOURTH CYCLE IGNITION',    urgent: true },

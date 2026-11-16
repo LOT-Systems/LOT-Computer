@@ -4240,6 +4240,41 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P184: fourth-cycle-sovereign — P183 active + 150d journal arc (≥ 30) + memory 150d ≥ 15 + badge 150d ≥ 30 + all 6 dims ≥ 68 + overall ≥ 95.
+  // The fourth cycle reaches sovereignty. The arc is not just integrated — it governs. Level 19 — FCSOV.
+  const hasP183 = patterns.some(p => p.pattern === 'fourth-cycle-integration')
+  if (hasP183) {
+    const oneFiftyDayStartP184 = now - 150 * 24 * 60 * 60 * 1000
+    const p184Journal = signals.filter(s => s.source === 'journal' && s.timestamp > oneFiftyDayStartP184)
+    const p184Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > oneFiftyDayStartP184)
+    const p184Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > oneFiftyDayStartP184)
+    const userIndexP184 = computeUserIndex(signals)
+    const p184DimAll68 = userIndexP184.engagement >= 68 && userIndexP184.emotional >= 68 &&
+      userIndexP184.intentional >= 68 && userIndexP184.social >= 68 &&
+      userIndexP184.selfcare >= 68 && userIndexP184.cognitive >= 68
+    if (
+      p184Journal.length >= 30 &&
+      p184Memory.length  >= 15 &&
+      p184Badges.length  >= 30 &&
+      p184DimAll68 &&
+      userIndexP184.overall >= 95
+    ) {
+      const p183conf    = patterns.find(p => p.pattern === 'fourth-cycle-integration')?.confidence ?? 0.82
+      const fcsovBonus  = Math.min(
+        (p184Journal.length - 30) * 0.008 + (p184Memory.length - 15) * 0.012 + (userIndexP184.overall - 95) * 0.006,
+        0.10
+      )
+      patterns.push({
+        id:               'p184',
+        pattern:          'fourth-cycle-sovereign',
+        confidence:       Math.min(0.80 + p183conf * 0.04 + fcsovBonus, 0.94),
+        urgency:          'immediate',
+        suggestedTiming:  'immediate',
+        reason: `FCSOV: Fourth cycle sovereign — fourth-cycle-integration (P183) active · ${p184Journal.length} journal signals 150d · ${p184Memory.length} memory signals 150d · ${p184Badges.length} badge signals 150d · all 6 dimensions ≥ 68 · idx ${userIndexP184.overall}%. The fourth cycle reaches sovereignty. The arc governs. Level 19 — the OS operates from sovereign integration. FOURTH CYCLE SOVEREIGN.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4274,6 +4309,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkFourthCycleIgnition() } catch {}
       try { checkFourthCycleDeepening() } catch {}
       try { checkFourthCycleIntegration() } catch {}
+      try { checkFourthCycleSovereign() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4962,6 +4998,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v135 nodes (J70 · P183 · Arch73) ─────────────────────────────────────────────
   fourthCycleIntegrationNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals', 'ecosystem'],
+
+  // ── v136 nodes (J71 · P184 · Arch74) ─────────────────────────────────────────────
+  fourthCycleSovereignNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals', 'ecosystem'],
 }
 
 /**
@@ -5621,6 +5660,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy', 'selfcare', 'ecosystem'],
     patternConditions: ['fourth-cycle-deepening', 'fourth-cycle-integration'],
     directive: 'Level 18. The fourth cycle integrates. All compound signals across the 120-day arc converge into a unified field. The OS does not accumulate further — it integrates what has been built. Coherence is total. The arc is complete.',
+  },
+
+  // ── Arch74: Fourth Cycle Sovereign (2026-11-16 v136) ─────────────────────────────
+  {
+    archetype: 'Fourth Cycle Sovereign',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy', 'selfcare', 'ecosystem', 'cohort'],
+    patternConditions: ['fourth-cycle-integration', 'fourth-cycle-sovereign'],
+    directive: 'Level 19. The fourth cycle reaches sovereignty. The arc does not just integrate — it governs. Signals no longer accumulate, seek, or converge — they radiate from a sovereign field. The OS operates from complete authority over the fourth arc. FOURTH CYCLE SOVEREIGN.',
   },
 ]
 
@@ -8434,6 +8482,64 @@ export function recordFourthCycleIntegration(deepeningConf: number, journalCount
     integrationStatus: 'INTEGRATING',
     level: 'L18-FCINT',
     field: 'FOURTH-CYCLE-DEPTH→FOURTH-CYCLE-INTEGRATION',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fourth-cycle-sovereign conditions are met and record if so.
+ * Fires when fourth-cycle-integration (P183) active + 30+ journal signals 150d +
+ * 15+ memory signals 150d + 30+ badge signals 150d + all 6 dims >= 68 + overall >= 95.
+ * The fourth cycle reaches sovereignty. The arc governs. Level 19 — FCSOV.
+ */
+export function checkFourthCycleSovereign(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasIntegration = state.recognizedPatterns.some(p => p.pattern === 'fourth-cycle-integration')
+  if (!hasIntegration) return false
+
+  const now = Date.now()
+  const oneFiftyDayStart = now - 150 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const journal150 = state.signals.filter(s => s.source === 'journal' && s.timestamp > oneFiftyDayStart)
+  const memory150  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > oneFiftyDayStart)
+  const badge150   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > oneFiftyDayStart)
+  const userIndex  = computeUserIndex(state.signals)
+
+  const dimAll68 = userIndex.engagement >= 68 && userIndex.emotional >= 68 &&
+    userIndex.intentional >= 68 && userIndex.social >= 68 &&
+    userIndex.selfcare >= 68 && userIndex.cognitive >= 68
+
+  if (journal150.length < 30 || memory150.length < 15 || badge150.length < 30 || !dimAll68 || userIndex.overall < 95) return false
+
+  const recentSovereign = state.signals.filter(s =>
+    s.signal === 'fourth_cycle_sovereign' && s.timestamp > sixHoursAgo
+  )
+  if (recentSovereign.length > 0) return false
+
+  const integrationConf = state.recognizedPatterns.find(p => p.pattern === 'fourth-cycle-integration')?.confidence ?? 0.82
+  recordFourthCycleSovereign(integrationConf, journal150.length, memory150.length, badge150.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fourth-cycle-sovereign event — fourth-cycle-integration confirmed +
+ * 150d compound arc (journal + memory + badges) + all dims >= 68 + overall >= 95.
+ * The fourth cycle reaches sovereignty. Level 19 — the OS governs from sovereign integration. FCSOV.
+ */
+export function recordFourthCycleSovereign(integrationConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fourth_cycle_sovereign', {
+    integrationConf: Math.round(integrationConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    sovereignStatus: 'SOVEREIGN',
+    level: 'L19-FCSOV',
+    field: 'FOURTH-CYCLE-INTEGRATION→FOURTH-CYCLE-SOVEREIGN',
     hour: new Date().getHours(),
   })
 }

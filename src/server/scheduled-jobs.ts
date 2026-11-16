@@ -1851,6 +1851,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyFourthCycleIntegrationCheck()) {
     await executeDailyFourthCycleIntegrationCheck()
   }
+
+  // Check daily fourth cycle sovereign check (19:30 UTC every day) — J71
+  if (shouldRunDailyFourthCycleSovereignCheck()) {
+    await executeDailyFourthCycleSovereignCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6198,6 +6203,155 @@ async function executeDailyFourthCycleIntegrationCheck(): Promise<JobResult> {
     console.error('Daily fourth cycle integration check failed:', error.message)
     isDailyFourthCycleIntegrationRunning = false
     lastDailyFourthCycleIntegrationRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Fourth Cycle Sovereign Check (J71) ──────────────────────────────
+// Scans for users with fourth_cycle_integration event in last 7 days. Checks journal >= 30 in
+// 150-day window, memory >= 15 in 150d, badge >= 30 in 150d, 7d signal density >= 25.
+// When met, writes fourth_cycle_sovereign event. The fourth cycle governs. L19-FCSOV.
+
+let isDailyFourthCycleSovereignRunning = false
+let lastDailyFourthCycleSovereignRun: Date | null = null
+
+function shouldRunDailyFourthCycleSovereignCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFourthCycleSovereignRunning) return false
+  if (lastDailyFourthCycleSovereignRun) {
+    const lastRun = dayjs(lastDailyFourthCycleSovereignRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 19 && now.minute() >= 30 // 19:30 UTC daily
+}
+
+async function executeDailyFourthCycleSovereignCheck(): Promise<JobResult> {
+  const jobName = 'daily-fourth-cycle-sovereign-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFourthCycleSovereignRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFourthCycleSovereignRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FOURTH CYCLE SOVEREIGN CHECK — 19:30 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart       = dayjs().subtract(7, 'day').toDate()
+    const oneFiftyDayStart    = dayjs().subtract(150, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require fourth_cycle_integration in last 7 days
+        const integrationLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fourth_cycle_integration',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+        if (integrationLogs.length < 1) continue
+
+        // Check journal signals in last 150 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: oneFiftyDayStart },
+          },
+        })
+        if (journalLogs.length < 30) continue
+
+        // Check memory signals in last 150 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_capture', 'memory_created', 'memory_updated'] },
+            createdAt: { [Op.gte]: oneFiftyDayStart },
+          },
+        })
+        if (memoryLogs.length < 15) continue
+
+        // Check badge signals in last 150 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_earned'] },
+            createdAt: { [Op.gte]: oneFiftyDayStart },
+          },
+        })
+        if (badgeLogs.length < 30) continue
+
+        // Check 7-day signal density — proxy for all dims >= 68 + overall >= 95
+        const density7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+        if (density7dLogs.length < 25) continue
+
+        // Dedup: skip if already wrote fourth_cycle_sovereign today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existingSovereign = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'fourth_cycle_sovereign',
+            createdAt: { [Op.gte]: todayStart },
+          },
+        })
+        if (existingSovereign) continue
+
+        const integrationConf = integrationLogs[0]?.metadata?.integrationConf ?? 82
+        const sovereignConf = Math.min(94, Math.round(
+          80 + (journalLogs.length - 30) * 0.25 + (memoryLogs.length - 15) * 0.35 + (density7dLogs.length - 25) * 0.18
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fourth_cycle_sovereign',
+          text: `Fourth cycle sovereign: fourth-cycle-integration confirmed · ${journalLogs.length} journal signals 150d · ${memoryLogs.length} memory signals 150d · ${badgeLogs.length} badge signals 150d · 7d density ${density7dLogs.length} · all conditions met. The fourth cycle governs. L19-FCSOV.`,
+          metadata: {
+            integrationConf,
+            sovereignConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            density7d: density7dLogs.length,
+            sovereignStatus: 'SOVEREIGN',
+            level: 'L19-FCSOV',
+            field: 'FOURTH-CYCLE-INTEGRATION→FOURTH-CYCLE-SOVEREIGN',
+            hour: 19,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fourth cycle sovereign events written: ${written}`)
+    lastDailyFourthCycleSovereignRun = new Date()
+    isDailyFourthCycleSovereignRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fourth cycle sovereign check failed:', error.message)
+    isDailyFourthCycleSovereignRunning = false
+    lastDailyFourthCycleSovereignRun = new Date()
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
