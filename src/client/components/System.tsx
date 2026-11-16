@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo, getLunarDate, getRokuyoMeaning, getWallClockDate, getAstroResonance, ASTRO_RESONANCE_MIN_SAMPLE, AstroResonance } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -205,21 +205,34 @@ export const System = React.memo(function SystemInner() {
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
   // rokuyo), not a personal natal chart.
   const astrology = React.useMemo(() => {
-    const now = new Date()
-    const hourlyZodiac = getHourlyZodiac(now)
-    const westernZodiac = getWesternZodiac(now)
-    const moonPhase = getMoonPhase(now)
+    // Personalization (2026-11-16): read the wall clock in the user's saved
+    // profile timeZone, matching the server-side Logs snapshot, so the
+    // dashboard and journal agree even when the device zone differs.
+    const instant = new Date()
+    const now = getWallClockDate(me?.timeZone, instant)
     const rokuyo = getRokuyo(now)
-
+    const moonPhase = getMoonPhase(instant)
+    const lunar = getLunarDate(now)
     return {
-      hourlyZodiac,
-      westernZodiac,
+      hourlyZodiac: getHourlyZodiac(now),
+      westernZodiac: getWesternZodiac(now),
       moonPhase: moonPhase.phase,
       moonIllumination: moonPhase.illumination,
       rokuyo,
+      rokuyoMeaning: getRokuyoMeaning(rokuyo),
+      lunarMonth: lunar.month,
+      lunarDay: lunar.day,
+      lunarLeap: lunar.leap,
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+  }, [astrologyTick, me?.timeZone])
+
+  // Logs synchronization (2026-11-16): aggregate the ambient snapshot each
+  // log carries into a personal resonance — which moon phase / rokuyo /
+  // zodiac hour this user actually writes under.
+  const astroResonance = React.useMemo(() => getAstroResonance(logs), [logs])
+  const hasAstroResonance = astroResonance.sample >= ASTRO_RESONANCE_MIN_SAMPLE && !!astroResonance.topMoonPhase
+  const inLunarResonance = hasAstroResonance && astroResonance.topMoonPhase === astrology.moonPhase
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
   // per calendar day, so other widgets (cosmic, system) can react to it.
@@ -227,16 +240,26 @@ export const System = React.memo(function SystemInner() {
     if (typeof window === 'undefined') return
     const today = dayjs().format('YYYY-MM-DD')
     const lastRecordedKey = 'astrology_signal_date'
-    if (localStorage.getItem(lastRecordedKey) === today) return
+    try {
+      if (localStorage.getItem(lastRecordedKey) === today) return
+    } catch { /* storage blocked — record anyway */ }
     recordAstrologySignal(
       astrology.rokuyo,
       astrology.moonPhase,
       astrology.moonIllumination,
       astrology.hourlyZodiac,
-      astrology.westernZodiac
+      astrology.westernZodiac,
+      {
+        lunarMonth: astrology.lunarMonth,
+        lunarDay: astrology.lunarDay,
+        resonantMoonPhase: hasAstroResonance ? astroResonance.topMoonPhase : null,
+        inLunarResonance,
+        resonanceSample: astroResonance.sample,
+      }
     )
-    localStorage.setItem(lastRecordedKey, today)
-  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac])
+    try { localStorage.setItem(lastRecordedKey, today) } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [astrology.rokuyo, astrology.moonPhase, astrology.lunarDay, hasAstroResonance])
 
   const answerLogs = React.useMemo(() => {
     return logs.filter(log => log.event === 'answer')
@@ -466,6 +489,7 @@ export const System = React.memo(function SystemInner() {
           <Block label="Astrology:">
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              <AstrologyDetail astrology={astrology} resonance={hasAstroResonance ? astroResonance : null} inResonance={inLunarResonance} />
             </div>
           </Block>
         </div>
@@ -672,6 +696,7 @@ export const System = React.memo(function SystemInner() {
           {astrologyView === 'astrology' ? (
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              <AstrologyDetail astrology={astrology} resonance={hasAstroResonance ? astroResonance : null} inResonance={inLunarResonance} />
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>
@@ -1069,3 +1094,31 @@ export const System = React.memo(function SystemInner() {
     </div>
   )
 })
+
+// Second line of the Astrology block (2026-11-16): the 旧暦 date behind the
+// rokuyo, its plain-language gloss, and — once enough Logs carry an astro
+// snapshot — the user's own lunar resonance, synced from their journal.
+function AstrologyDetail({
+  astrology,
+  resonance,
+  inResonance,
+}: {
+  astrology: { rokuyoMeaning: string; lunarMonth: number; lunarDay: number; lunarLeap: boolean }
+  resonance: AstroResonance | null
+  inResonance: boolean
+}) {
+  return (
+    <>
+      <div className="opacity-60">
+        Lunar {astrology.lunarLeap ? 'leap ' : ''}{astrology.lunarMonth}/{astrology.lunarDay}
+        {astrology.rokuyoMeaning ? ` • ${astrology.rokuyoMeaning}` : ''}
+      </div>
+      {resonance && (
+        <div className="opacity-60">
+          {inResonance ? 'In resonance' : 'Resonance'}: you write most under {resonance.topMoonPhase} ({resonance.topMoonPhaseShare}% of {resonance.sample})
+          {resonance.topHourlyZodiac ? ` • ${resonance.topHourlyZodiac} hour` : ''}
+        </div>
+      )}
+    </>
+  )
+}

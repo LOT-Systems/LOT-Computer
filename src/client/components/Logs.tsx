@@ -363,7 +363,12 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                   <div>HUM: {log.context.humidity}%</div>
                 )}
                 {log.context?.astroRokuyo && (
-                  <div>ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}</div>
+                  <div>
+                    ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}
+                    {typeof log.context.astroMoonIllumination === 'number' && ` ${log.context.astroMoonIllumination}%`}
+                    {log.context.astroHourlyZodiac && ` · ${log.context.astroHourlyZodiac} hr`}
+                    {log.context.astroLunarMonth && log.context.astroLunarDay && ` · L${log.context.astroLunarMonth}/${log.context.astroLunarDay}`}
+                  </div>
                 )}
                 {log.metadata?.sound && (
                   <div>SND: {log.metadata.sound}</div>

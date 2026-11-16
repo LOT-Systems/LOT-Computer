@@ -4880,7 +4880,15 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  // (2026-11-16) lunisolar date + Logs-derived personal resonance
+  extra: {
+    lunarMonth?: number
+    lunarDay?: number
+    resonantMoonPhase?: string | null
+    inLunarResonance?: boolean
+    resonanceSample?: number
+  } = {}
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4897,8 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    inauspicious: rokuyo === 'Butsumetsu',
+    ...extra,
   })
 }
 

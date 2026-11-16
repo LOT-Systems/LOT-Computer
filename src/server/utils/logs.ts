@@ -10,7 +10,7 @@ import { Op } from 'sequelize'
 import dayjs from '#server/utils/dayjs'
 import { LogContext, User } from '#shared/types'
 import { DATE_TIME_FORMAT, WEATHER_STALE_TIME_MINUTES } from '#shared/constants'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo, getLunarDate } from '#shared/utils/astrology'
 import { models } from '../models/index.js'
 
 // Building a Date from a moment's local (timeZone-aware) wall-clock fields
@@ -25,7 +25,9 @@ function toWallClockDate(moment: dayjs.Dayjs): Date {
 export async function getLogContext(user: User): Promise<LogContext> {
   const localMoment = user.timeZone ? dayjs().tz(user.timeZone) : dayjs()
   const localDate = toWallClockDate(localMoment)
-  const moonPhase = getMoonPhase(localDate)
+  // Moon phase is an instant, not a wall-clock reading — use the real now
+  const moonPhase = getMoonPhase(new Date())
+  const lunarDate = getLunarDate(localDate)
 
   const context: LogContext = {
     temperature: null,
@@ -42,6 +44,9 @@ export async function getLogContext(user: User): Promise<LogContext> {
     astroMoonIllumination: moonPhase.illumination,
     astroHourlyZodiac: getHourlyZodiac(localDate),
     astroWesternZodiac: getWesternZodiac(localDate),
+    astroLunarMonth: lunarDate.month,
+    astroLunarDay: lunarDate.day,
+    astroEngine: 'lunisolar-v2',
   }
   if (user.country && user.city) {
     const cachedWeather = await models.WeatherResponse.findOne({

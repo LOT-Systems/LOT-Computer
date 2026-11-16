@@ -56,6 +56,7 @@ export class User
       'tags',
       'hideActivityLogs',
       'timeChime',
+      'timeZone', // (2026-11-16) Astrology block reads the saved zone client-side
     ])(this.toJSON())
 
     // Add memory engine status based on tags

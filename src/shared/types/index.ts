@@ -71,6 +71,7 @@ export type UserProfile = {
   tags: string[];
   hideActivityLogs: boolean;
   timeChime?: boolean;
+  timeZone?: string | null;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
 };
@@ -170,6 +171,11 @@ export type LogContext = {
   astroMoonIllumination?: number | null;
   astroHourlyZodiac?: string | null;
   astroWesternZodiac?: string | null;
+  // (2026-11-16) 旧暦 date behind the rokuyo; absent on pre-v2 entries,
+  // whose astroRokuyo came from the old free-running 6-day approximation
+  astroLunarMonth?: number | null;
+  astroLunarDay?: number | null;
+  astroEngine?: 'lunisolar-v2' | null;
   [key: string]: any;
 };
 
