@@ -871,6 +871,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('odyssey_day')
   }
 
+  // ── Calendar v21 — THE STOIC CALENDAR ─────────────────────────────────────────
+  // Marcus Birthday: April 26 — Marcus Aurelius born 121 CE
+  if (!hasBadge('marcus_birthday') && month === 4 && day === 26) {
+    awardBadge('marcus_birthday')
+    awarded.push('marcus_birthday')
+  }
+  // Seneca Day: December 4 — Seneca born c. 4 BCE
+  if (!hasBadge('seneca_day') && month === 12 && day === 4) {
+    awardBadge('seneca_day')
+    awarded.push('seneca_day')
+  }
+  // Stoic Week: October 5 — International Stoic Week
+  if (!hasBadge('stoic_week') && month === 10 && day === 5) {
+    awardBadge('stoic_week')
+    awarded.push('stoic_week')
+  }
+
   return awarded
 }
 
@@ -1483,6 +1500,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE STOIC CODEX word triggers ───────────────────────────────────────
+  { patterns: /\bvirtue\b|\bvirtuous\b|\barete\b|\bmoral[\s-]?excellence\b/i,              badge: 'virtue_path' },
+  { patterns: /\bamor[\s-]?fati\b|\blove[\s-]?what[\s-]?is\b|\bembrace[\s-]?what[\s-]?is\b/i, badge: 'amor_fati' },
+  { patterns: /\bmemento[\s-]?mori\b|\bremember[\s-]?death\b|\bmortality[\s-]?reminder\b/i, badge: 'memento_mori' },
+  { patterns: /\bin[\s-]?my[\s-]?control\b|\bnot[\s-]?in[\s-]?my[\s-]?control\b|\bdichotomy[\s-]?of[\s-]?control\b/i, badge: 'dichotomy_key' },
+  { patterns: /\bequanimity\b|\btranquility[\s-]?of[\s-]?mind\b|\bataraxia\b/i,            badge: 'equanimity_found' },
+  { patterns: /\bpremeditatio[\s-]?malorum\b|\bnegative[\s-]?visualization\b|\bprepare[\s-]?for[\s-]?(the[\s-])?worst\b/i, badge: 'premeditatio_evil' },
+  { patterns: /\blogos\b|\brational[\s-]?soul\b|\buniversal[\s-]?reason\b|\brational[\s-]?order\b/i, badge: 'logos_pulse' },
+  { patterns: /\bhegemonikon\b|\bruling[\s-]?faculty\b|\bcommanding[\s-]?self\b|\bself[\s-]?command\b/i, badge: 'hegemonikon' },
+  { patterns: /\bpreferred[\s-]?indifferent\b|\bnot[\s-]?up[\s-]?to[\s-]?me\b|\bindifferent[\s-]?to[\s-]?(the[\s-])?outcome\b/i, badge: 'indifferent_node' },
+  { patterns: /\bmeditations\b|\bmarcus[\s-]?aurelius\b|\bstoic[\s-]?philosophy\b/i,       badge: 'tranquil_core' },
+  { patterns: /\bphilosopher[\s-]?king\b|\bstoic[\s-]?sage\b|\bwise[\s-]?person\b/i,       badge: 'sage_signal' },
+  { patterns: /\bcosmic[\s-]?sympathy\b|\bsumpatheia\b|\bcosmopolitan\b|\buniversal[\s-]?order\b/i, badge: 'cosmic_sympathy' },
+  // ── v20 Secret Boss — THE STOIC VAULT word triggers ──────────────────────────
+  { patterns: /\bepictetus\b|\benchiridion\b|\bonly[\s-]?my[\s-]?will[\s-]?is[\s-]?mine\b/i, badge: 'epictetus_code' },
+  { patterns: /\bmarcus[\s-]?aurelius\b|\bstoic[\s-]?emperor\b/i,                          badge: 'aurelius_note' },
+  { patterns: /\bseneca\b|\bletters[\s-]?to[\s-]?lucilius\b|\bmoral[\s-]?letters\b|\bon[\s-]?the[\s-]?shortness\b/i, badge: 'seneca_scroll' },
 ]
 
 /**
@@ -2711,6 +2745,66 @@ export function checkThresholdMoment(): BadgeType | null {
   if (hour === 0 && minute <= 30) {
     awardBadge('threshold_moment')
     return 'threshold_moment'
+  }
+  return null
+}
+
+// ── v23 Stoic Codex behavioral patterns ────────────────────────────────────────
+
+const STOIC_WORDS_V23: RegExp[] = [
+  /\bvirtue\b|\bvirtuous\b|\barete\b|\bmoral[\s-]?excellence\b/i,
+  /\bamor[\s-]?fati\b|\blove[\s-]?what[\s-]?is\b|\bembrace[\s-]?what[\s-]?is\b/i,
+  /\bmemento[\s-]?mori\b|\bremember[\s-]?death\b|\bmortality[\s-]?reminder\b/i,
+  /\bin[\s-]?my[\s-]?control\b|\bnot[\s-]?in[\s-]?my[\s-]?control\b|\bdichotomy[\s-]?of[\s-]?control\b/i,
+  /\bequanimity\b|\btranquility[\s-]?of[\s-]?mind\b|\bataraxia\b/i,
+  /\bpremeditatio[\s-]?malorum\b|\bnegative[\s-]?visualization\b|\bprepare[\s-]?for[\s-]?(the[\s-])?worst\b/i,
+  /\blogos\b|\brational[\s-]?soul\b|\buniversal[\s-]?reason\b|\brational[\s-]?order\b/i,
+  /\bhegemonikon\b|\bruling[\s-]?faculty\b|\bcommanding[\s-]?self\b|\bself[\s-]?command\b/i,
+  /\bpreferred[\s-]?indifferent\b|\bnot[\s-]?up[\s-]?to[\s-]?me\b|\bindifferent[\s-]?to[\s-]?(the[\s-])?outcome\b/i,
+  /\bmeditations\b|\bmarcus[\s-]?aurelius\b|\bstoic[\s-]?philosophy\b/i,
+  /\bphilosopher[\s-]?king\b|\bstoic[\s-]?sage\b|\bwise[\s-]?person\b/i,
+  /\bcosmic[\s-]?sympathy\b|\bsumpatheia\b|\bcosmopolitan\b|\buniversal[\s-]?order\b/i,
+]
+
+/**
+ * Award stoic_session badge if 3+ Stoic (v23) words appear in one journal entry.
+ */
+export function checkStoicSession(journalText: string): BadgeType | null {
+  if (hasBadge('stoic_session')) return null
+  const matchCount = STOIC_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('stoic_session')
+    return 'stoic_session'
+  }
+  return null
+}
+
+/**
+ * Award deep_reflection badge if journal entry is 1,000+ words.
+ */
+export function checkDeepReflection(journalText: string): BadgeType | null {
+  if (hasBadge('deep_reflection')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 1000) {
+    awardBadge('deep_reflection')
+    return 'deep_reflection'
+  }
+  return null
+}
+
+/**
+ * Award discipline_dawn badge if user checks in between 05:00 and 05:30 local time.
+ */
+export function checkDisciplineDawn(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('discipline_dawn')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  const minute = now.getMinutes()
+  if (hour === 5 && minute <= 30) {
+    awardBadge('discipline_dawn')
+    return 'discipline_dawn'
   }
   return null
 }
