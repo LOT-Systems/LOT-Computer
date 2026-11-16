@@ -5,9 +5,30 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.2 — CYCLE 02 (2026-11-16); 0.1 — DEVELOPMENT START (2026-07-28)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
+
+--------------------------------------------------------------------------------
+REVISION 0.2 — 2026-11-16 (see LOT-CUBIQ-REPORT-2026-11-16.md)
+--------------------------------------------------------------------------------
+
+  The cycle-02 report supersedes parts of Sections 03, 04 and 06 below.
+  Original v0.1 text is kept unedited for the record. Supersessions:
+
+  §03 MECHANISM   Hop is produced by an UPWARD strike of the internal
+                  mass against an upper stop (floor reaction supplies the
+                  momentum), not by driving the mass down. Split
+                  actuation: spring-latch for HOP/LEAP (~160 mJ spring),
+                  voice-coil for NUDGE/SETTLE/righting, piezo demoted to
+                  texture. Forward bias from a 6° tilted strike axis.
+  §03 SAFETY      Added: zero stored energy at rest; hand/lift gate;
+                  level+still surface gate; quiet hours.
+  §04 LANGUAGE    Added output gesture THE PULSE and input gesture
+                  THE TAP.
+  §06 v.3         Levitation down-selected to active electromagnetic
+                  levitation from the pad; acoustic and passive
+                  diamagnetic retired for a ~100 g body.
 
 --------------------------------------------------------------------------------
 00 // READING LOG — SOURCES THIS DOCUMENT IS BUILT ON
@@ -320,6 +341,22 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE PAIRED CUBES                            2026-11-16
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: $399/mo priority tier, Phase 5 "Community
+  Resonance", a parent who travels half of every month; the child has a
+  second CUBIQ paired as a cohort of two.
+
+  The child finishes the morning self-check; the parent's cube, twelve
+  hours away, plays THE PULSE — two soft nudges through the hotel desk.
+  Later the parent knuckle-taps their cube twice (THE TAP); the child's
+  cube performs THE HOP in place on the bedroom desk. The child taps
+  back once. Two bits crossed the ocean; no screen, no message, no feed.
+
+  First case where the cube is INPUT as well as OUTPUT — THE TAP becomes
+  a v.0 requirement. Full narrative, safety-gate mapping, privacy floor
+  and acceptance targets: LOT-CUBIQ-REPORT-2026-11-16.md §08.
 
 --------------------------------------------------------------------------------
 08 // BRAND
